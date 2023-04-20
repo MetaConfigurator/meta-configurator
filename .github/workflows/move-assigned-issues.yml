@@ -22,5 +22,6 @@ jobs:
       - uses: brian-hayward/update-issue-status@v0.1.5
         with:
           project-url: https://github.com/users/PaulBredl/projects/1
-          open-status: 'Assigned'
+          open-status: 'Todo'
+          new-status: 'Assigned'
           github-token: ${{ secrets.REPO_ACCESS_TOKEN }}
