@@ -1,0 +1,26 @@
+# This is a workflow to move assigned issues from "Todo" to "Assigned".
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: Move assigned card
+on:
+  issues:
+    types:
+      - assigned
+
+jobs:
+  move-assigned-card:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: brian-hayward/update-issue-status@v0.1.5
+        with:
+          project-url: https://github.com/users/PaulBredl/projects/1
+          open-status: 'Assigned'
+          github-token: ${{ secrets.REPO_ACCESS_TOKEN }}
