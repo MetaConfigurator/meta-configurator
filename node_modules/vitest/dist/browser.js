@@ -1,0 +1,10 @@
+export { startTests } from '@vitest/runner';
+export { s as setupCommonEnv } from './vendor-setup.common.cef38f4e.js';
+export { g as getCoverageProvider, a as startCoverageInsideWorker, s as stopCoverageInsideWorker, t as takeCoverageInsideWorker } from './vendor-coverage.a585b712.js';
+import '@vitest/utils';
+import './vendor-run-once.69ce7172.js';
+import './vendor-index.fad2598b.js';
+import 'pathe';
+import 'std-env';
+import '@vitest/runner/utils';
+import './vendor-global.6795f91f.js';
