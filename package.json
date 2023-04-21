@@ -8,7 +8,7 @@
     "lint:ts": "eslint --ext .jsx,.js,.ts,.tsx --ignore-path .eslintignore",
     "lint:ls": "ls-lint",
     "lint": "npm run lint:ts && npm run lint:ls",
-    "prettier": "prettier --write --ignore-path .eslintignore",
+    "prettier": "prettier --write . --ignore-path .eslintignore",
     "test": "echo \"No tests yet...\" && exit 0",
     "preview": "vite preview"
   },
