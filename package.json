@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint:ts": "eslint --ext .jsx,.js,.ts,.tsx --ignore-path .gitignore .",
+    "lint:ts": "eslint --ext .jsx,.js,.ts,.tsx",
     "lint:ec": "editorconfig-checker",
     "lint:ls": "ls-lint",
     "lint": "npm run lint:ts && npm run lint:ls && npm run lint:ec",
