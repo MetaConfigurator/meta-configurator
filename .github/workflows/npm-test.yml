@@ -31,7 +31,7 @@ jobs:
           commit_message: Apply formatting changes
           branch: ${{ github.head_ref }}
           status_options: '--untracked-files=no'
-          file_pattern: 'src/*'
+          file_pattern: 'src/* test/*'
 
   build:
     runs-on: ubuntu-latest
