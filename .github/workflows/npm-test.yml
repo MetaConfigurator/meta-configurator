@@ -3,7 +3,8 @@ name: Node.js CI
 on: [ push ]
 
 jobs:
-  prettify:
+
+  build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -14,31 +15,6 @@ jobs:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
       contents: write
-    steps:
-      - uses: actions/checkout@v3
-        name: Use Node.js ${{ matrix.node-version }}
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: npm install
-      - run: npm ci
-      - name: Prettier
-        run: npm run prettier
-      - name: Commit format changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Apply formatting changes
-          branch: ${{ github.head_ref }}
-          status_options: '--untracked-files=no'
-          file_pattern: 'src/* test/*'
-
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [ 18.x ]
 
     steps:
       - uses: actions/checkout@v3
@@ -55,3 +31,12 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm test
+      - name: Prettier
+        run: npm run prettier
+      - name: Commit format changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply formatting changes
+          branch: ${{ github.head_ref }}
+          status_options: '--untracked-files=no'
+          file_pattern: 'src/* test/*'
