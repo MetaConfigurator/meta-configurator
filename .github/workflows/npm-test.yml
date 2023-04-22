@@ -23,8 +23,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: npm install
-      - run: npm ci
+        run: npm ci
       - name: Build
         run: npm run build --if-present
       - name: Lint
@@ -36,7 +35,9 @@ jobs:
       - name: Commit format changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Apply formatting changes
+          commit_message: apply formatting changes
           branch: ${{ github.head_ref }}
           status_options: '--untracked-files=no'
+          # only changed files in src/ and test/ will be committed
+          # because otherwise this bot commits node_modules/ and dist/
           file_pattern: 'src/* test/*'
