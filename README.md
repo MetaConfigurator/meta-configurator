@@ -2,9 +2,18 @@
 
 This template should help get you started developing with Vue 3 in Vite.
 
+## Prerequisite
+[Node Js + npm](https://nodejs.org/en/download/) (npm comes with node js)
+
+
 ## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+[WebStorm](https://www.jetbrains.com/webstorm/download/)
+
+[Vue.js](https://cli.vuejs.org/guide/installation.html)
+
+[Vite](https://v3.ru.vuejs.org/guide/installation.html)
+
 
 ## Customize configuration
 
