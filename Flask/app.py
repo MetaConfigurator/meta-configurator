@@ -2,14 +2,11 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
 
-# app = Flask(__name__)
-# app.config["MONGO_URI"] = "mongodb://localhost:27017/TestDatabase"
-# mongo = PyMongo(app)
-
 app = Flask(__name__)
 
-client = MongoClient('localhost', 27017, username='minye', password='trymongodb123')
-db = client.TestDatabase
+# connect Flask App with MongoDB database
+client = MongoClient('mongodb+srv://minye:trymongodb123@cluster0.orsd0wn.mongodb.net/?retryWrites=true&w=majority', 27017, username='minye', password='trymongodb123')
+db = client.TestDatabase  # instantiate the mongodb instance
 todos = db.todos
 
 
