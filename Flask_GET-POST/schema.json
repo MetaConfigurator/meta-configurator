@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "name": {
+    "Firstname": {
       "type": "string"
     },
     "age": {
@@ -9,5 +9,5 @@
       "minimum": 0
     }
   },
-  "required": ["name", "age"]
+  "required": ["Firstname", "age"]
 }

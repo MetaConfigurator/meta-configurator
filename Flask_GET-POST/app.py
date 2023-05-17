@@ -4,9 +4,9 @@ from jsonschema import validate, ValidationError
 import json
 
 app = Flask(__name__)
-client = MongoClient('<connection_string>')
-db = client['<database_name>']
-collection = db['<connection_name>']
+client = MongoClient('<your mongodb connection_string>')
+db = client['<your database_name>']
+collection = db['<your connection_name>']
 
 def load_json_schema():
     with open('schema.json', 'r') as file:
