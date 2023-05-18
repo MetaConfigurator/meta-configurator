@@ -22,10 +22,6 @@ function userUpdatedText (text: string) {
 </script>
 
 <template>
-  <!--    <div class="greetings">
-        <h1 class="">{{ store.configData }}</h1>
-
-    </div>-->
 
   <textarea v-model='textContent' class='bg-amber-300'> </textarea>
 </template>
