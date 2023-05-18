@@ -1,37 +1,30 @@
 <script setup lang="ts">
 import { dataStore } from '@/stores/dataStore';
-import { ref, watch } from 'vue';
+import { computed } from 'vue';
 import YAML from 'yaml';
+import { storeToRefs } from 'pinia';
 
 const store = dataStore();
 
-store.$subscribe((mutation, state) => {
-  textContent.value = getConfigText(state);
+const { configData } = storeToRefs(store);
+
+const textContent = computed({
+  get: () => configToYamlString(),
+  set: (value: string) => userUpdatedText(value),
 });
 
-const textContent = ref(getConfigText(store));
-
-watch(textContent, () => {
-  // this callback is invoked when myRef changes
-  userUpdatedText(textContent.value);
-});
-
-function getConfigText(state) {
-  return YAML.stringify(state.configData);
+function configToYamlString () {
+  return YAML.stringify(configData.value);
 }
 
-function userUpdatedText(text) {
+function userUpdatedText (text: string) {
   store.configData = YAML.parse(text);
 }
 </script>
 
 <template>
-  <!--    <div class="greetings">
-        <h1 class="green">{{ store.configData }}</h1>
 
-    </div>-->
-
-  <textarea v-model='textContent' class='bg-blue-500' v-on:change='userUpdatedText'> </textarea>
+  <textarea v-model='textContent' class='bg-blue-500'> </textarea>
 </template>
 
 <style scoped></style>
