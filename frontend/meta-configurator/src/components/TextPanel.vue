@@ -22,7 +22,7 @@ function userUpdatedText(text: string) {
 </script>
 
 <template>
-  <textarea v-model="textContent" class="bg-amber-300"> </textarea>
+  <textarea v-model="textContent" class="bg-amber-300 h-screen"> </textarea>
 </template>
 
 <style scoped></style>

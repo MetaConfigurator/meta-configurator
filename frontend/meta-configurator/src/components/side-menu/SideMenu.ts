@@ -1,6 +1,7 @@
 import IconSettings from '@/components/icons/IconSettings.vue';
 import IconSchemaFile from '@/components/icons/IconSchemaFile.vue';
 import IconEditor from '@/components/icons/IconEditor.vue';
+import { markRaw } from 'vue';
 
 export class MenuItem {
   public name: string;
@@ -24,17 +25,17 @@ export class SideMenuController {
   public menuItems: MenuItem[] = [
     {
       name: 'File',
-      icon: IconEditor,
+      icon: markRaw(IconEditor),
       path: '/',
     },
     {
       name: 'Schema',
-      icon: IconSchemaFile,
+      icon: markRaw(IconSchemaFile),
       path: '/schema',
     },
     {
       name: 'Settings',
-      icon: IconSettings,
+      icon: markRaw(IconSettings),
       path: '/settings',
     },
   ];
