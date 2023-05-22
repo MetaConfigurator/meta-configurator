@@ -6,8 +6,8 @@
   "useTabs": false,
   "semi": true,
   "trailingComma": "es5",
-  "bracketSpacing": true,
-  "bracketSameLine": false,
-  "arrowParens": "always",
+  "bracketSpacing": false,
+  "bracketSameLine": true,
+  "arrowParens": "avoid",
   "endOfLine": "auto"
 }

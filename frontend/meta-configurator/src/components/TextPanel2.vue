@@ -6,25 +6,24 @@ import { storeToRefs } from 'pinia';
 
 const store = dataStore();
 
-const { configData } = storeToRefs(store);
+const {configData} = storeToRefs(store);
 
 const textContent = computed({
   get: () => configToYamlString(),
   set: (value: string) => userUpdatedText(value),
 });
 
-function configToYamlString () {
+function configToYamlString() {
   return YAML.stringify(configData.value);
 }
 
-function userUpdatedText (text: string) {
+function userUpdatedText(text: string) {
   store.configData = YAML.parse(text);
 }
 </script>
 
 <template>
-
-  <textarea v-model='textContent' class='bg-blue-500'> </textarea>
+  <textarea v-model="textContent" class="bg-blue-500"> </textarea>
 </template>
 
 <style scoped></style>
