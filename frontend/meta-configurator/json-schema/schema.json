@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://json-schema.org/draft/2020-12/schema",
+  "$vocabulary": {
+    "https://json-schema.org/draft/2020-12/meta/core": true,
+    "https://json-schema.org/draft/2020-12/meta/applicator": true,
+    "https://json-schema.org/draft/2020-12/meta/unevaluated": true,
+    "https://json-schema.org/draft/2020-12/meta/validation": true,
+    "https://json-schema.org/draft/2020-12/meta/meta-data": true,
+    "https://json-schema.org/draft/2020-12/meta/format-annotation": true,
+    "https://json-schema.org/draft/2020-12/meta/format-assertion": true,
+    "https://json-schema.org/draft/2020-12/meta/content": true
+  },
+  "$dynamicAnchor": "meta",
+  "title": "Core and Validation specifications meta-schema",
+  "allOf": [
+    {
+      "$ref": "https://json-schema.org/draft/2020-12/meta/core"
+    },
+    {
+      "$ref": "https://json-schema.org/draft/2020-12/meta/applicator"
+    },
+    {
+      "$ref": "https://json-schema.org/draft/2020-12/meta/unevaluated"
+    },
+    {
+      "$ref": "https://json-schema.org/draft/2020-12/meta/validation"
+    },
+    {
+      "$ref": "https://json-schema.org/draft/2020-12/meta/meta-data"
+    },
+    {
+      "$ref": "https://json-schema.org/draft/2020-12/meta/format-annotation"
+    },
+    {
+      "$ref": "https://json-schema.org/draft/2020-12/meta/content"
+    }
+  ],
+  "type": [
+    "object",
+    "boolean"
+  ],
+  "$comment": "This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.",
+  "properties": {
+    "definitions": {
+      "$comment": "\"definitions\" has been replaced by \"$defs\".",
+      "type": "object",
+      "additionalProperties": {
+        "$dynamicRef": "#meta"
+      },
+      "deprecated": true,
+      "default": {}
+    },
+    "dependencies": {
+      "$comment": "\"dependencies\" has been split and replaced by \"dependentSchemas\" and \"dependentRequired\" in order to serve their differing semantics.",
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$dynamicRef": "#meta"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "default": []
+          }
+        ]
+      },
+      "deprecated": true,
+      "default": {}
+    },
+    "$recursiveAnchor": {
+      "$comment": "\"$recursiveAnchor\" has been replaced by \"$dynamicAnchor\".",
+      "type": "string",
+      "pattern": "^[A-Za-z_][-A-Za-z0-9._]*$",
+      "deprecated": true
+    },
+    "$recursiveRef": {
+      "$comment": "\"$recursiveRef\" has been replaced by \"$dynamicRef\".",
+      "type": "string",
+      "format": "uri-reference",
+      "deprecated": true
+    }
+  }
+}

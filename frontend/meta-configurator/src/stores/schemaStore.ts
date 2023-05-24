@@ -1,31 +1,24 @@
-import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
-import { dataStore } from '@/stores/dataStore';
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import { dataStore } from "@/stores/dataStore";
+import type { JsonSchemaType, TopLevelSchema } from "@/schema/type";
+import { SchemaHelper } from "@/schema/SchemaUtils";
 
 export const schemaStore = defineStore('schemaStore', () => {
   const schema = ref(exampleSchema);
 
-  /**
-   * Traverses the schema and returns the schema at the given path.
-   * @param path The array of keys to traverse.
-   */
-  const schemaAtPath = (path: string[]) => {
-    let currentSchema: any = schema.value;
 
-    for (const key of path) {
-      currentSchema = currentSchema.properties[key];
-    }
-    return currentSchema;
+  const schemaAtPath = (path: string[]): JsonSchemaType => {
+    return new SchemaHelper(schema.value).getSubSchemaAtPath(path);
   };
 
   return {
     schema,
-    schemaAtPath,
     schemaAtCurrentPath: computed(() => schemaAtPath(dataStore().currentPath)),
   };
 });
 
-const exampleSchema = {
+const exampleSchema: TopLevelSchema = {
   type: 'object',
   title: 'Person',
   description: 'A person schema',

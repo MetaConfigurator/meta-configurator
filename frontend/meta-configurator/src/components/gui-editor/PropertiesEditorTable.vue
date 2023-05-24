@@ -1,12 +1,14 @@
 <!-- only a prototype -->
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import IconExpand from '@/components/icons/IconExpand.vue';
-import ChevronRight from '@/components/icons/ChevronRight.vue';
+import { computed, ref } from "vue";
+import IconExpand from "@/components/icons/IconExpand.vue";
+import ChevronRight from "@/components/icons/ChevronRight.vue";
+import type { JsonSchemaType } from "@/schema/type";
+import { nonBooleanSchema, SchemaHelper } from "@/schema/SchemaUtils";
 
 const props = defineProps<{
-  currentSchema: any;
+  currentSchema: JsonSchemaType;
   currentData: any;
 }>();
 
@@ -17,20 +19,24 @@ defineEmits<{
 const expandedKeys = ref<string[]>([]);
 
 const schemaAtCurrentPath = computed(() => {
-  return props.currentSchema;
+  const schema = nonBooleanSchema(props.currentSchema);
+  if (!schema) {
+    throw new Error('Schema at current path false');
+  }
+  return schema;
+});
+
+const schemaHelper = computed(() => {
+  return new SchemaHelper(schemaAtCurrentPath.value);
 });
 
 function isRequired(key: string) {
-  return (
-    schemaAtCurrentPath.value.required != null && schemaAtCurrentPath.value.required.includes(key)
-  );
+  return schemaHelper.value.isPropertyRequired(key);
 }
 
 function isExpandable(key: string) {
-  return (
-    schemaAtCurrentPath.value.properties[key].type == 'object' ||
-    schemaAtCurrentPath.value.properties[key].type == 'array'
-  );
+  const subSchema = new SchemaHelper(schemaHelper.value.getSubSchema(key));
+  return subSchema.isOfType('object') || subSchema.isOfType('array');
 }
 
 function isExpanded(key: string) {
@@ -74,7 +80,7 @@ function toggleExpansion(key: string) {
       </tr>
       <tr
         v-show="isExpanded(key as string)"
-        v-for="(subSchemaDef, subKey) in schemaAtCurrentPath.properties[key].properties"
+        v-for="(subSchemaDef, subKey) in schemaAtCurrentPath.properties!![key].properties"
         :key="subKey">
         <!-- in the future there will be a better, generic solution -->
         <td class="p-2 bg-slate-50 border-b border-r border-slate-300 flex flex-row items-center">

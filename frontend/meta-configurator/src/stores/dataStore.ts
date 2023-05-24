@@ -1,5 +1,5 @@
-import { computed, ref } from 'vue';
-import { defineStore } from 'pinia';
+import { computed, ref } from "vue";
+import { defineStore } from "pinia";
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref({
@@ -26,11 +26,15 @@ export const dataStore = defineStore('dataStore', () => {
   /**
    * Returns the data at the given path.
    * @param path The array of keys to traverse.
+   * @returns The data at the given path, or an empty object if the path does not exist.
    */
   function dataAtPath(path: string[]): any {
     let currentData: any = configData.value;
 
     for (const key of path) {
+      if (!currentData[key]) {
+        return { };
+      }
       currentData = currentData[key];
     }
 
