@@ -27,6 +27,7 @@ export const dataStore = defineStore('dataStore', () => {
    * Returns the data at the given path.
    * @param path The array of keys to traverse.
    * @returns The data at the given path, or an empty object if the path does not exist.
+   * @todo consider using lodash
    */
   function dataAtPath(path: string[]): any {
     let currentData: any = configData.value;

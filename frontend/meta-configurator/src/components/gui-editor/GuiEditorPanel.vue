@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { schemaStore } from '@/stores/schemaStore';
-import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
-import SchemaBreadcrumb from '@/components/gui-editor/SchemaBreadcrumb.vue';
-import PropertiesEditorTable from '@/components/gui-editor/PropertiesEditorTable.vue';
-import { dataStore } from '@/stores/dataStore';
+import { schemaStore } from "@/stores/schemaStore";
+import SchemaInfoPanel from "@/components/gui-editor/SchemaInfoPanel.vue";
+import SchemaBreadcrumb from "@/components/gui-editor/SchemaBreadcrumb.vue";
+import PropertiesEditorTable from "@/components/gui-editor/PropertiesEditorTable.vue";
+import { dataStore } from "@/stores/dataStore";
 
 const schemaStoreInstance = schemaStore();
 
 const dataStoreInstance = dataStore();
 
 function updatePath(newPath: string[]) {
-  console.log('updatePath', newPath);
   dataStoreInstance.$patch({currentPath: newPath});
 }
 
