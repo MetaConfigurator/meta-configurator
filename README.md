@@ -103,7 +103,7 @@ For more information, see the LICENSE file.
 If you have any questions, suggestions, or feedback, feel free to contact the project team at 
 [kkpatel.de@gmail.com](mailto:contact@example.com),
 [minyeexu@gmail.com](mailto:contact@example.com), [Felix@neuby.de](mailto:contact@example.com), 
-[paul..@gmail.com](mailto:contact@example.com).
+[paulbredl@gmx.de](mailto:contact@example.com).
 
 
 
