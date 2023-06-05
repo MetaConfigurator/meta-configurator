@@ -1,4 +1,5 @@
 # Contributing to Meta Configurator
+**Note: Contribution we only accept after 10/2023.**
 
 Welcome to the Meta Configurator project! We appreciate your interest in contributing. Here are some guidelines to get you started:
 
