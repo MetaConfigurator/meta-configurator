@@ -15,7 +15,6 @@ The benefits of using this tool include:
 2. Time-saving: With automated generation, users can swiftly create multiple configuration files with different settings, reducing manual effort and saving time.
 3. Error reduction: The tool ensures that the generated files conform to the specified format and structure, reducing the likelihood of syntax errors or inconsistencies.
 4. Collaboration: Users can share the generated configuration files with others, enabling collaboration and updates.
-5. Controlled updates: The tool provides mechanisms for controlled updates, ensuring that modifications to the shared configuration files are managed and tracked.
 
 ## Features
 
