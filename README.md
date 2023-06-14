@@ -1,6 +1,8 @@
 # Meta Configurator
 ## Description
-The project aims to solve the problem of manual creation and understanding of configuration files by providing a user-friendly GUI (Graphical User Interface) tool. With this tool, users can effortlessly generate various types of configuration files, such as JSON, YAML, and more, without the need for deep knowledge of their syntax or structure.Additionally, users can share the generated configuration files with others and allow them to update and modify the files.
+The project aims to solve the problem of manual creation and understanding of configuration files by providing a user-friendly GUI (Graphical User Interface) tool. 
+With this tool, users can effortlessly generate various types of configuration files, such as JSON, YAML, and more, without the need for deep knowledge of their syntax or structure.
+Additionally, users can share the generated configuration files with others and allow them to update and modify the files.
 
 ## Problem
 
