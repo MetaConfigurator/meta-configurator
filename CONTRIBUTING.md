@@ -30,7 +30,7 @@ Be prepared to address any feedback or make necessary changes.
 ## Code Style and Guidelines
 
 - Follow the coding conventions and style guidelines that are defined in prettier and eslint config file.
-They are automatically checks in on each pull request.
+They are automatically checked on each pull request.
 - Write clear and concise code with appropriate comments when necessary.
 - Ensure that your code is properly formatted and free from any syntax errors.
 
