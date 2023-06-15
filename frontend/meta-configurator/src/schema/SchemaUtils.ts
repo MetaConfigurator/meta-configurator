@@ -7,7 +7,7 @@ import {JsonSchema} from '@/schema/JsonSchema';
  */
 export function nonBooleanSchema(schema: JsonSchemaType) {
   if (schema === true) {
-    return {};
+      return {};
   }
   if (schema === false) {
     return undefined;
@@ -16,12 +16,12 @@ export function nonBooleanSchema(schema: JsonSchemaType) {
 }
 
 export function schemaArray(schema?: JsonSchemaType[]): JsonSchema[] {
-  return schema?.map(s => new JsonSchema(s)) ?? [];
+      return schema?.map(s => new JsonSchema(s)) ?? [];
 }
 
 export function schemaRecord(schema?: Record<string, JsonSchemaType>): Record<string, JsonSchema> {
   return Object.fromEntries(
-    Object.entries(schema ?? {}).map(([key, value]) => [key, new JsonSchema(value)])
+       Object.entries(schema ?? {}).map(([key, value]) => [key, new JsonSchema(value)])
   );
 }
 
