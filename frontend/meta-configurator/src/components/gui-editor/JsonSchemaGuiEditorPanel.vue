@@ -14,6 +14,10 @@ function updatePath(newPath: string[]) {
   dataStoreInstance.$patch({currentPath: newPath});
 }
 
+function updateData(path: (string | number)[], newValue: any) {
+    dataStoreInstance.updateDataAtPath(path, newValue)
+}
+
 function expandPath(pathToAdd: string | number) {
   dataStoreInstance.$patch(state => state.currentPath.push(pathToAdd));
 }
@@ -30,7 +34,8 @@ function expandPath(pathToAdd: string | number) {
       :current-schema="schemaStoreInstance.schemaAtCurrentPath"
       :current-path="dataStoreInstance.currentPath"
       :current-data="dataStoreInstance.dataAtCurrentPath"
-      @expand:path="pathToAdd => expandPath(pathToAdd)" />
+      @expand:path="pathToAdd => expandPath(pathToAdd)"
+      @update_data="updateData"/>
   </div>
 </template>
 

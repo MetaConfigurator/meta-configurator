@@ -12,21 +12,28 @@ const props = defineProps<{
     propertyName: string;
     propertySchema: JsonSchema;
     propertyData: any;
-    propertyPath: Array<string | number>
+}>();
+
+const emit = defineEmits<{
+    (e: 'update_property_value', propertyName: string, newValue: string): void
 }>();
 
 
 function resolveCorrespondingComponent() : VNode {
     if (props.propertySchema.hasType("boolean")) {
-       return h(BooleanProperty, {propertyPath: props.propertyPath, propertyName: props.propertyName, propertyData : props.propertyData})
+       return h(BooleanProperty, { propertyName: props.propertyName, propertyData : props.propertyData})
     } else if (props.propertySchema.hasType("string")) {
         const propertyName = props.propertyName
         const propertyData = props.propertyData
 
-        return h(StringProperty, { propertyPath: props.propertyPath, propertyName: propertyName, propertyData: propertyData});
+        return h(StringProperty, { propertyName: propertyName, propertyData: propertyData});
     }
 
     return h("p", `Property ${props.propertyName} with type ${props.propertySchema.type} is not supported`);
+}
+
+function propagateUpdateEvent(propertyName: string, newValue: any) {
+    emit('update_property_value', propertyName, newValue);
 }
 
 </script>
@@ -36,7 +43,8 @@ function resolveCorrespondingComponent() : VNode {
 
 
   <div>{{ propertyName }}</div>
-  <Component :is="resolveCorrespondingComponent()"></Component>
+  <Component :is="resolveCorrespondingComponent()"
+             @update_property_value="(propertyName, newValue) => propagateUpdateEvent(propertyName, newValue)"></Component>
 
 
 </template>

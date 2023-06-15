@@ -11,8 +11,9 @@ const props = defineProps<{
   currentPath: Array<string | number>
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'update_current_path', new_path: Array<string | number>): void;
+    (e: 'update_data', path: Array<string | number>, newValue: any): void;
 }>();
 
 const expandedPropertyKeys = ref<string[]>([]);
@@ -39,9 +40,14 @@ function toggleExpansion(propertyKey: string) {
   expandedPropertyKeys.value.push(propertyKey);
 }
 
-function dataForProperty(propertyKey: string) {
+function updateData(propertyKey: string, newValue: any) {
+    const completePath = props.currentPath.concat(propertyKey);
+    emit('update_data', completePath, newValue);
+}
+
+function dataForProperty(propertyKey: string | number) {
     // TODO better logic
-    return props.currentData[propertyKey] ?? {}
+    return props.currentData[propertyKey]
 }
 </script>
 
@@ -51,8 +57,9 @@ function dataForProperty(propertyKey: string) {
           :propertySchema="schema"
           :propertyName="key"
           :propertyPath="currentPath.concat(key)"
-          :propertyData="dataForProperty(key as string)"
-          v-for="(schema, key) in propertiesToDisplay"/>
+          :propertyData="dataForProperty(key)"
+          v-for="(schema, key) in propertiesToDisplay"
+          @update_property_value="updateData"/>
 </template>
 
 <style scoped></style>

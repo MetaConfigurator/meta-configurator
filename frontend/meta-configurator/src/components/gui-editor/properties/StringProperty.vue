@@ -1,24 +1,24 @@
 <script setup lang="ts">
 
-import {JsonSchema} from "@/schema/JsonSchema";
 import InputText from 'primevue/inputtext';
 import {computed} from "vue";
-import {dataStore} from "@/stores/dataStore";
 
-const dataStoreInstance = dataStore();
 
 const props = defineProps<{
     propertyName: string;
     propertyData: string;
-    propertyPath: Array<string | number>,
+}>();
+
+const emit = defineEmits<{
+    (e: 'update_property_value', propertyName: string, newValue: string): void
 }>();
 
 const valueProperty = computed({
     get() {
-        return dataStoreInstance.dataAtPath(props.propertyPath)
+        return props.propertyData;
     },
     set(newValue) {
-        dataStoreInstance.updateDataAtPath(props.propertyPath, newValue)
+        emit('update_property_value', props.propertyName, newValue)
     }
 });
 

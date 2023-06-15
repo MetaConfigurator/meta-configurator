@@ -1,23 +1,24 @@
 <script setup lang="ts">
 
-import {JsonSchema} from "@/schema/JsonSchema";
 import Checkbox from 'primevue/checkbox';
-import InputText from 'primevue/inputtext';
-import {computed, ref} from "vue";
-import {dataStore} from "@/stores/dataStore";
+import {computed} from "vue";
 
-const dataStoreInstance = dataStore()
 
 const props = defineProps<{
-    propertyPath: Array<string | number>,
+    propertyName: string;
+    propertyData: string;
+}>();
+
+const emit = defineEmits<{
+    (e: 'update_property_value', propertyName: string, newValue: boolean): void
 }>();
 
 const valueProperty = computed({
     get() {
-        return dataStoreInstance.dataAtPath(props.propertyPath)
+        return props.propertyData;
     },
     set(newValue) {
-        dataStoreInstance.updateDataAtPath(props.propertyPath, newValue)
+        emit('update_property_value', props.propertyName, newValue)
     }
 });
 
@@ -27,7 +28,6 @@ const valueProperty = computed({
 <template>
 
     <Checkbox v-model="valueProperty" :binary=true value="propertyName"/>
-
 
 
 </template>
