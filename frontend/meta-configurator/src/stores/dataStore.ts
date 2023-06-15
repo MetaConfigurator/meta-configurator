@@ -5,6 +5,7 @@ export const dataStore = defineStore('dataStore', () => {
   const configData = ref({
     name: 'test',
     firstName: 'testFirstName',
+    isMarried: true,
     address: {
       street: 'test',
       number: 12,
