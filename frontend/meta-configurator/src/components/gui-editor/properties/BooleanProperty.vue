@@ -1,38 +1,28 @@
 <script setup lang="ts">
-
 import Checkbox from 'primevue/checkbox';
-import {computed} from "vue";
-
+import {computed} from 'vue';
 
 const props = defineProps<{
-    propertyName: string;
-    propertyData: string;
+  propertyName: string;
+  propertyData: string;
 }>();
 
 const emit = defineEmits<{
-    (e: 'update_property_value', propertyName: string, newValue: boolean): void
+  (e: 'update_property_value', propertyName: string, newValue: boolean): void;
 }>();
 
 const valueProperty = computed({
-    get() {
-        return props.propertyData;
-    },
-    set(newValue) {
-        emit('update_property_value', props.propertyName, newValue)
-    }
+  get() {
+    return props.propertyData;
+  },
+  set(newValue) {
+    emit('update_property_value', props.propertyName, newValue);
+  },
 });
-
 </script>
 
-
 <template>
-
-    <Checkbox v-model="valueProperty" :binary=true value="propertyName"/>
-
-
+  <Checkbox v-model="valueProperty" :binary="true" value="propertyName" />
 </template>
 
-
-<style scoped>
-
-</style>
+<style scoped></style>

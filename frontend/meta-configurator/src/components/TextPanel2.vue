@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { dataStore } from '@/stores/dataStore';
-import { computed } from 'vue';
+import {dataStore} from '@/stores/dataStore';
+import {computed} from 'vue';
 import YAML from 'yaml';
-import { storeToRefs } from 'pinia';
+import {storeToRefs} from 'pinia';
 
 const store = dataStore();
 
