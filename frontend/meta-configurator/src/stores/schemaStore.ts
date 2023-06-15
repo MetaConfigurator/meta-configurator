@@ -33,6 +33,10 @@ const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
       description: 'First name',
       examples: ['John'],
     },
+    isMarried: {
+      type: 'boolean',
+      description: 'Marital Status',
+    },
     address: {
       type: 'object',
       description: 'Address of the person',

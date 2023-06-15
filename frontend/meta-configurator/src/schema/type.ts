@@ -55,7 +55,7 @@ export type JsonSchemaType = boolean | {
   not?: JsonSchemaType;
   unevaluatedItems?: JsonSchemaType;
   unevaluatedProperties?: JsonSchemaType;
-  type?: AllowedTypes,
+  type?: SchemaPropertyTypes,
   const?: unknown;
   enum?: unknown[];
   multipleOf?: number;
@@ -111,10 +111,10 @@ export type TopLevelSchema = JsonSchemaType & {
   };
 }
 
-export type AllowedType = "array" | "boolean" | "integer" | "null" | "number" | "object" | "string";
-export type AllowedTypes =
-  | AllowedType
+export type SchemaPropertyType = "array" | "boolean" | "integer" | "null" | "number" | "object" | "string";
+export type SchemaPropertyTypes =
+  | SchemaPropertyType
   | [
-  AllowedType,
-  ...(AllowedType)[]
+  SchemaPropertyType,
+  ...(SchemaPropertyType)[]
 ];
