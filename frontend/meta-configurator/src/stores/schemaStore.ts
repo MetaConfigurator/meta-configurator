@@ -1,41 +1,31 @@
-import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
-import { dataStore } from '@/stores/dataStore';
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import { dataStore } from "@/stores/dataStore";
+import { TopLevelJsonSchema } from "@/schema/TopLevelJsonSchema";
 
+/**
+ * The store for the applied editor schema.
+ */
 export const schemaStore = defineStore('schemaStore', () => {
   const schema = ref(exampleSchema);
 
-  /**
-   * Traverses the schema and returns the schema at the given path.
-   * @param path The array of keys to traverse.
-   */
-  const schemaAtPath = (path: string[]) => {
-    let currentSchema: any = schema.value;
-
-    for (const key of path) {
-      currentSchema = currentSchema.properties[key];
-    }
-    return currentSchema;
-  };
-
   return {
     schema,
-    schemaAtPath,
-    schemaAtCurrentPath: computed(() => schemaAtPath(dataStore().currentPath)),
+    schemaAtCurrentPath: computed(() => schema.value.subSchemaAt(dataStore().currentPath)),
   };
 });
 
-const exampleSchema = {
-  type: 'object',
-  title: 'Person',
-  description: 'A person schema',
-  $schema: 'http://json-schema.org/draft-2020-12/schema',
-  $id: 'https://example.com/person.schema.json',
-  required: ['name', 'firstName'],
+const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
+  type: "object",
+  title: "Person",
+  description: "A person schema",
+  $schema: "http://json-schema.org/draft-2020-12/schema",
+  $id: "https://example.com/person.schema.json",
+  required: ["name", "firstName"],
   properties: {
     name: {
-      type: 'string',
-      description: 'Last name',
+      type: "string",
+      description: "Last name",
       examples: ['Doe'],
     },
     firstName: {
@@ -82,12 +72,12 @@ const exampleSchema = {
               description: 'Neighborhood name',
             },
             timeZone: {
-              type: 'string',
-              description: 'Time zone',
+              type: "string",
+              description: "Time zone",
             },
           },
         },
       },
     },
   },
-};
+});
