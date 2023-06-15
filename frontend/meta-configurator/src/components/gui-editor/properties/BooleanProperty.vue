@@ -3,30 +3,30 @@
 import {JsonSchema} from "@/schema/JsonSchema";
 import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {dataStore} from "@/stores/dataStore";
 
 const dataStoreInstance = dataStore()
 
 const props = defineProps<{
-    propertyName: string;
-    propertyData: boolean;
+    propertyPath: Array<string | number>,
 }>();
 
-const checked = ref(true);
+const valueProperty = computed({
+    get() {
+        return dataStoreInstance.dataAtPath(props.propertyPath)
+    },
+    set(newValue) {
+        dataStoreInstance.updateDataAtPath(props.propertyPath, newValue)
+    }
+});
 
 </script>
 
 
 <template>
 
-    <div>BEGIN OF {{ propertyName }}</div>
-
-    <Checkbox v-model="checked" :binary=true value="propertyName"/>
-
-    <InputText v-bind="propertyData"/>
-
-    <div>END OF {{ propertyName }}</div>
+    <Checkbox v-model="valueProperty" :binary=true value="propertyName"/>
 
 
 

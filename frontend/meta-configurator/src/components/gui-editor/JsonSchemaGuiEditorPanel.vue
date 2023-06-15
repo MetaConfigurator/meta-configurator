@@ -28,6 +28,7 @@ function expandPath(pathToAdd: string | number) {
       @update:path="newPath => updatePath(newPath)" />
     <PropertiesPanel
       :current-schema="schemaStoreInstance.schemaAtCurrentPath"
+      :current-path="dataStoreInstance.currentPath"
       :current-data="dataStoreInstance.dataAtCurrentPath"
       @expand:path="pathToAdd => expandPath(pathToAdd)" />
   </div>

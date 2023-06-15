@@ -8,6 +8,7 @@ import PropertyComponent from "@/components/gui-editor/PropertyComponent.vue";
 const props = defineProps<{
   currentSchema: JsonSchema;
   currentData: any;
+  currentPath: Array<string | number>
 }>();
 
 defineEmits<{
@@ -49,6 +50,7 @@ function dataForProperty(propertyKey: string) {
   <PropertyComponent
           :propertySchema="schema"
           :propertyName="key"
+          :propertyPath="currentPath.concat(key)"
           :propertyData="dataForProperty(key as string)"
           v-for="(schema, key) in propertiesToDisplay"/>
 </template>

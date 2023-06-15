@@ -12,20 +12,21 @@ const props = defineProps<{
     propertyName: string;
     propertySchema: JsonSchema;
     propertyData: any;
+    propertyPath: Array<string | number>
 }>();
 
 
 function resolveCorrespondingComponent() : VNode {
-    console.log("Type of " + props.propertyName + " is ")
-    console.log(props.propertySchema.type)
     if (props.propertySchema.hasType("boolean")) {
-        return h(BooleanProperty, {propertyName: props.propertyName, propertyData : props.propertyData})
-
+       return h(BooleanProperty, {propertyPath: props.propertyPath, propertyName: props.propertyName, propertyData : props.propertyData})
     } else if (props.propertySchema.hasType("string")) {
-        return h(StringProperty, {propertyName: props.propertyName, propertyData : props.propertyData})
+        const propertyName = props.propertyName
+        const propertyData = props.propertyData
+
+        return h(StringProperty, { propertyPath: props.propertyPath, propertyName: propertyName, propertyData: propertyData});
     }
 
-    return h(BooleanProperty, {propertyName: "fallback", propertyData: true})
+    return h("p", `Property ${props.propertyName} with type ${props.propertySchema.type} is not supported`);
 }
 
 </script>
@@ -36,6 +37,7 @@ function resolveCorrespondingComponent() : VNode {
 
   <div>{{ propertyName }}</div>
   <Component :is="resolveCorrespondingComponent()"></Component>
+
 
 </template>
 

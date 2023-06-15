@@ -1,5 +1,7 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
+import _ from "lodash";
+import {pathToString} from "@/pathHelper";
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref({
@@ -30,7 +32,7 @@ export const dataStore = defineStore('dataStore', () => {
    * @returns The data at the given path, or an empty object if the path does not exist.
    * @todo consider using lodash
    */
-  function dataAtPath(path: string[]): any {
+  function dataAtPath(path: (string | number)[]): any {
     let currentData: any = configData.value;
 
     for (const key of path) {
@@ -43,10 +45,16 @@ export const dataStore = defineStore('dataStore', () => {
     return currentData;
   }
 
+  function updateDataAtPath(path: (string | number)[], newValue: any) {
+    const pathAsString = pathToString(path)
+    _.set(configData.value, pathAsString!!, newValue)
+  }
+
   return {
     configData,
     dataAtPath,
     currentPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
+    updateDataAtPath
   };
 });
