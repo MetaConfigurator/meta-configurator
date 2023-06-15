@@ -1,7 +1,7 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { dataStore } from "@/stores/dataStore";
-import { TopLevelJsonSchema } from "@/schema/TopLevelJsonSchema";
+import {defineStore} from 'pinia';
+import {computed, ref} from 'vue';
+import {dataStore} from '@/stores/dataStore';
+import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
 
 /**
  * The store for the applied editor schema.
@@ -16,16 +16,16 @@ export const schemaStore = defineStore('schemaStore', () => {
 });
 
 const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
-  type: "object",
-  title: "Person",
-  description: "A person schema",
-  $schema: "http://json-schema.org/draft-2020-12/schema",
-  $id: "https://example.com/person.schema.json",
-  required: ["name", "firstName"],
+  type: 'object',
+  title: 'Person',
+  description: 'A person schema',
+  $schema: 'http://json-schema.org/draft-2020-12/schema',
+  $id: 'https://example.com/person.schema.json',
+  required: ['name', 'firstName'],
   properties: {
     name: {
-      type: "string",
-      description: "Last name",
+      type: 'string',
+      description: 'Last name',
       examples: ['Doe'],
     },
     firstName: {
@@ -76,8 +76,8 @@ const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
               description: 'Neighborhood name',
             },
             timeZone: {
-              type: "string",
-              description: "Time zone",
+              type: 'string',
+              description: 'Time zone',
             },
           },
         },

@@ -1,7 +1,7 @@
-import { computed, ref } from "vue";
-import { defineStore } from "pinia";
-import _ from "lodash";
-import {pathToString} from "@/pathHelper";
+import {computed, ref} from 'vue';
+import {defineStore} from 'pinia';
+import _ from 'lodash';
+import {pathToString} from '@/pathHelper';
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref({
@@ -37,7 +37,7 @@ export const dataStore = defineStore('dataStore', () => {
 
     for (const key of path) {
       if (!currentData[key]) {
-        return { };
+        return {};
       }
       currentData = currentData[key];
     }
@@ -46,8 +46,8 @@ export const dataStore = defineStore('dataStore', () => {
   }
 
   function updateDataAtPath(path: (string | number)[], newValue: any) {
-    const pathAsString = pathToString(path)
-    _.set(configData.value, pathAsString!!, newValue)
+    const pathAsString = pathToString(path);
+    _.set(configData.value, pathAsString!!, newValue);
   }
 
   return {
@@ -55,6 +55,6 @@ export const dataStore = defineStore('dataStore', () => {
     dataAtPath,
     currentPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
-    updateDataAtPath
+    updateDataAtPath,
   };
 });

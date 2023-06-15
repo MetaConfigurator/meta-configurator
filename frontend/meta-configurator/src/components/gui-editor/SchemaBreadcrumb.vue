@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ChevronRight from '@/components/icons/ChevronRight.vue';
-import { computed } from 'vue';
+import {computed} from 'vue';
 
 const props = defineProps<{
   path: string[];

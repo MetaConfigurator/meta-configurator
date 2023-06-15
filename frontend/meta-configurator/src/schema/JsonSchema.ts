@@ -1,5 +1,5 @@
-import type { SchemaPropertyType, JsonSchemaType } from "@/schema/type";
-import { nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord } from "@/schema/SchemaUtils";
+import type {SchemaPropertyType, JsonSchemaType} from '@/schema/type';
+import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/SchemaUtils';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -11,7 +11,6 @@ import { nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord } from "@
  *       "if", "then", "else" and other properties that can contain a schema are handled.
  */
 export class JsonSchema {
-
   private readonly jsonSchema?;
   private _additionalProperties?: JsonSchema;
   private _allOf?: JsonSchema[];
@@ -68,7 +67,7 @@ export class JsonSchema {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
-    if (typeof subElement === "string") {
+    if (typeof subElement === 'string') {
       return this.subProperty(subElement);
     }
 
@@ -114,9 +113,11 @@ export class JsonSchema {
    * or if it has an enum keyword with only one value, or if it is of type null.
    */
   get isConstant(): boolean {
-    return this.jsonSchema?.const !== undefined
-      || (this.jsonSchema?.enum !== undefined && this.jsonSchema?.enum.length === 1)
-      || (this.hasType("null") && this.type?.length === 1);
+    return (
+      this.jsonSchema?.const !== undefined ||
+      (this.jsonSchema?.enum !== undefined && this.jsonSchema?.enum.length === 1) ||
+      (this.hasType('null') && this.type?.length === 1)
+    );
   }
 
   /**
@@ -343,7 +344,7 @@ export class JsonSchema {
    * @todo to properly support this, we need to calculate an effective schema depending on the
    *      presence of other properties in the data.
    */
-  get dependentRequired(): { [k: string]: string[] } {
+  get dependentRequired(): {[k: string]: string[]} {
     // TODO maybe also consider deprecated "dependencies" keyword
     return this.jsonSchema?.dependentRequired ?? {};
   }
@@ -384,7 +385,7 @@ export class JsonSchema {
    * @return {string} the description of this schema, or an empty string if not defined
    */
   get description(): string {
-    return this.jsonSchema?.description ?? "";
+    return this.jsonSchema?.description ?? '';
   }
 
   /**
@@ -661,7 +662,7 @@ export class JsonSchema {
    * @return {string} the title of this schema, or an empty string if not defined
    */
   get title(): string {
-    return this.jsonSchema?.title ?? "";
+    return this.jsonSchema?.title ?? '';
   }
 
   /**
@@ -679,10 +680,10 @@ export class JsonSchema {
    * Here implemented as a string array for convenience.
    */
   get type(): SchemaPropertyType[] {
-    if (typeof this.jsonSchema?.type === "string") {
+    if (typeof this.jsonSchema?.type === 'string') {
       return [this.jsonSchema.type];
     }
-    return this.jsonSchema?.type ?? ["object", "array", "string", "number", "boolean", "null"];
+    return this.jsonSchema?.type ?? ['object', 'array', 'string', 'number', 'boolean', 'null'];
   }
 
   /**
@@ -690,7 +691,9 @@ export class JsonSchema {
    */
   get unevaluatedItems(): JsonSchema {
     if (this._unevaluatedItems === undefined) {
-      this._unevaluatedItems = schemaFromObject(this.jsonSchema?.unevaluatedItems ?? true) as JsonSchema;
+      this._unevaluatedItems = schemaFromObject(
+        this.jsonSchema?.unevaluatedItems ?? true
+      ) as JsonSchema;
     }
     return this._unevaluatedItems;
   }
@@ -700,7 +703,9 @@ export class JsonSchema {
    */
   get unevaluatedProperties(): JsonSchema {
     if (this._unevaluatedProperties === undefined) {
-      this._unevaluatedProperties = schemaFromObject(this.jsonSchema?.unevaluatedProperties ?? true) as JsonSchema;
+      this._unevaluatedProperties = schemaFromObject(
+        this.jsonSchema?.unevaluatedProperties ?? true
+      ) as JsonSchema;
     }
     return this._unevaluatedProperties;
   }
@@ -723,7 +728,4 @@ export class JsonSchema {
   get writeOnly(): boolean {
     return this.jsonSchema?.writeOnly ?? false;
   }
-
 }
-
-
