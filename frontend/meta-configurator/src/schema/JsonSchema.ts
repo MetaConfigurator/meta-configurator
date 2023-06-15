@@ -1,4 +1,4 @@
-import type { AllowedType, JsonSchemaType } from "@/schema/type";
+import type { SchemaPropertyType, JsonSchemaType } from "@/schema/type";
 import { nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord } from "@/schema/SchemaUtils";
 
 /**
@@ -40,7 +40,7 @@ export class JsonSchema {
    * Returns true, if the schema has the given type.
    * @param type The type to check for.
    */
-  public hasType(type: AllowedType): boolean {
+  public hasType(type: SchemaPropertyType): boolean {
     return this.type?.includes(type) ?? false;
   }
 
@@ -678,7 +678,7 @@ export class JsonSchema {
    *
    * Here implemented as a string array for convenience.
    */
-  get type(): AllowedType[] {
+  get type(): SchemaPropertyType[] {
     if (typeof this.jsonSchema?.type === "string") {
       return [this.jsonSchema.type];
     }

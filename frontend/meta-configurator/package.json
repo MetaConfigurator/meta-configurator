@@ -20,6 +20,7 @@
     "json-schema-resolver": "^2.0.0",
     "json-schema-to-typescript": "^13.0.1",
     "pinia": "^2.0.36",
+    "primevue": "^3.29.2",
     "vue": "^3.3.2",
     "vue-router": "^4.2.0",
     "yaml": "^2.2.2"
