@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { computed, ref } from "vue";
 import type { JsonSchema } from "@/schema/JsonSchema";
 import TreeTable from "primevue/treetable";
@@ -15,9 +15,9 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update_current_path", new_path: Array<string | number>): void;
-  (e: "expand_current_path", path_to_add: Array<string | number>): void;
-  (e: "update_data", path: Array<string | number>, newValue: any): void;
+  (e: 'update_current_path', new_path: Array<string | number>): void;
+  (e: 'expand_current_path', path_to_add: Array<string | number>): void;
+  (e: 'update_data', path: Array<string | number>, newValue: any): void;
 }>();
 
 const propertiesToDisplay = computed(() => {
@@ -27,7 +27,7 @@ const propertiesToDisplay = computed(() => {
 
 function updateData(subPath: Array<string | number>, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
-  emit("update_data", completePath, newValue);
+  emit('update_data', completePath, newValue);
 }
 
 const DEPTH_LIMIT = 2;
@@ -35,39 +35,47 @@ const DEPTH_LIMIT = 2;
 const treeNodeResolver = new SchemaTreeNodeResolver(() => props.currentData, DEPTH_LIMIT);
 
 const nodesToDisplay = computed(() => {
-  return Object.entries(propertiesToDisplay.value)
-    .map(([key, value]) => treeNodeResolver.createTreeNodeOfProperty(key, value, props.currentSchema));
+  return Object.entries(propertiesToDisplay.value).map(([key, value]) =>
+    treeNodeResolver.createTreeNodeOfProperty(key, value, props.currentSchema)
+  );
 });
 
 const filters = ref<Record<string, string>>({});
 </script>
 
 <template>
-  <TreeTable :value='nodesToDisplay' filter-mode='lenient'
-             removable-sort class='p-treetable-sm overflow-auto'
-             resizable-columns scrollable scroll-direction='vertical'
-             row-hover
-             :filters='filters'>
+  <TreeTable
+    :value="nodesToDisplay"
+    filter-mode="lenient"
+    removable-sort
+    class="p-treetable-sm overflow-auto"
+    resizable-columns
+    scrollable
+    scroll-direction="vertical"
+    row-hover
+    :filters="filters">
     <!-- Filter field -->
     <template #header>
-      <div class='text-left'>
-        <div class='p-input-icon-left w-full'>
-          <i class='pi pi-search' />
-          <InputText v-model="filters['global']" placeholder='Search for properties or data'
-                     class='h-8 w-80' />
+      <div class="text-left">
+        <div class="p-input-icon-left w-full">
+          <i class="pi pi-search" />
+          <InputText
+            v-model="filters['global']"
+            placeholder="Search for properties or data"
+            class="h-8 w-80" />
         </div>
       </div>
     </template>
-    <Column field='name' header='Property' sortable='true' expander>
-      <template #body='slotProps'>
-        <PropertyMetadata :metadata='slotProps.node.data'
-                          @expand_current_path='path_to_add => $emit("expand_current_path", path_to_add)' />
+    <Column field="name" header="Property" sortable="true" expander>
+      <template #body="slotProps">
+        <PropertyMetadata
+          :metadata="slotProps.node.data"
+          @expand_current_path="path_to_add => $emit('expand_current_path', path_to_add)" />
       </template>
     </Column>
-    <Column field='data' header='Data'>
-      <template #body='slotProps'>
-        <PropertyComponent :metadata='slotProps.node.data'
-                           @update_property_value='updateData' />
+    <Column field="data" header="Data">
+      <template #body="slotProps">
+        <PropertyComponent :metadata="slotProps.node.data" @update_property_value="updateData" />
       </template>
     </Column>
   </TreeTable>

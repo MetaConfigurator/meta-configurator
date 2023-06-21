@@ -8,7 +8,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update_property_value", newValue: boolean): void;
+  (e: 'update_property_value', newValue: boolean): void;
 }>();
 
 const valueProperty = computed({
@@ -16,7 +16,7 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    emit("update_property_value", newValue);
+    emit('update_property_value', newValue);
   },
 });
 </script>

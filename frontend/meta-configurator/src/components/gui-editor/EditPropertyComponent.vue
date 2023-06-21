@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import type { VNode } from "vue";
 import { h } from "vue";
 import BooleanProperty from "@/components/gui-editor/properties/BooleanProperty.vue";
@@ -10,7 +10,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update_property_value", path: Array<string | number>, newValue: string): void;
+  (e: 'update_property_value', path: Array<string | number>, newValue: string): void;
 }>();
 
 function resolveCorrespondingComponent(): VNode {
@@ -18,29 +18,28 @@ function resolveCorrespondingComponent(): VNode {
     propertyName: props.metadata.name,
     propertyData: props.metadata.data,
   };
-  if (props.metadata.schema.hasType("boolean")) {
+  if (props.metadata.schema.hasType('boolean')) {
     return h(BooleanProperty, propsObject);
-  } else if (props.metadata.schema.hasType("string")) {
+  } else if (props.metadata.schema.hasType('string')) {
     return h(StringProperty, propsObject);
   }
 
   return h(
-    "p",
-    `Property ${props.metadata.name} with type ${props.metadata.schema.type} is not supported`,
+    'p',
+    `Property ${props.metadata.name} with type ${props.metadata.schema.type} is not supported`
   );
 }
 
 function propagateUpdateEvent(newValue: any) {
-  emit("update_property_value", props.metadata.relativePath, newValue);
+  emit('update_property_value', props.metadata.relativePath, newValue);
 }
 </script>
 
 <template>
   <Component
-    class='truncate'
-    :is='resolveCorrespondingComponent()'
-    @update_property_value='(newValue) => propagateUpdateEvent(newValue)'
-  />
+    class="truncate"
+    :is="resolveCorrespondingComponent()"
+    @update_property_value="newValue => propagateUpdateEvent(newValue)" />
 </template>
 
 <style scoped></style>
