@@ -22,7 +22,7 @@ const valueProperty = computed({
 </script>
 
 <template>
-  <!--  <InputNumber v-model="valueProperty" value="propertyName" input-id="integeronly" mode="decimal" minFractionDigits="0" maxFractionDigits="0" />-->
+  
   <InputNumber
     v-model="valueProperty"
     value="propertyName"
