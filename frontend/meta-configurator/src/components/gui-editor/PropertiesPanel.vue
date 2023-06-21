@@ -1,9 +1,12 @@
-<script setup lang="ts">
-import {computed, ref} from 'vue';
-import IconExpand from '@/components/icons/IconExpand.vue';
-import ChevronRight from '@/components/icons/ChevronRight.vue';
-import type {JsonSchema} from '@/schema/JsonSchema';
-import PropertyComponent from '@/components/gui-editor/PropertyComponent.vue';
+<script setup lang='ts'>
+import { computed, ref } from "vue";
+import type { JsonSchema } from "@/schema/JsonSchema";
+import TreeTable from "primevue/treetable";
+import Column from "primevue/column";
+import InputText from "primevue/inputtext";
+import PropertyComponent from "@/components/gui-editor/EditPropertyComponent.vue";
+import PropertyMetadata from "@/components/gui-editor/PropertyMetadata.vue";
+import { SchemaTreeNodeResolver } from "@/schema/SchemaTreeNodeResolver";
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -12,57 +15,62 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'update_current_path', new_path: Array<string | number>): void;
-  (e: 'update_data', path: Array<string | number>, newValue: any): void;
+  (e: "update_current_path", new_path: Array<string | number>): void;
+  (e: "expand_current_path", path_to_add: Array<string | number>): void;
+  (e: "update_data", path: Array<string | number>, newValue: any): void;
 }>();
-
-const expandedPropertyKeys = ref<string[]>([]);
 
 const propertiesToDisplay = computed(() => {
   // TODO: consider properties of data, i.e., additionalProperties, patternProperties.
   return props.currentSchema.properties;
 });
 
-function isExpandable(propertyKey: string): boolean {
-  return (
-    props.currentSchema.subSchema(propertyKey)?.hasType('object') ||
-    props.currentSchema.subSchema(propertyKey)?.hasType('array') ||
-    false
-  );
+function updateData(subPath: Array<string | number>, newValue: any) {
+  const completePath = props.currentPath.concat(subPath);
+  emit("update_data", completePath, newValue);
 }
 
-function isExpanded(propertyKey: string) {
-  return expandedPropertyKeys.value.includes(propertyKey);
-}
+const DEPTH_LIMIT = 2;
 
-function toggleExpansion(propertyKey: string) {
-  if (isExpanded(propertyKey)) {
-    expandedPropertyKeys.value.splice(expandedPropertyKeys.value.indexOf(propertyKey), 1);
-    return;
-  }
-  expandedPropertyKeys.value.push(propertyKey);
-}
+const treeNodeResolver = new SchemaTreeNodeResolver(() => props.currentData, DEPTH_LIMIT);
 
-function updateData(propertyKey: string, newValue: any) {
-  const completePath = props.currentPath.concat(propertyKey);
-  emit('update_data', completePath, newValue);
-}
+const nodesToDisplay = computed(() => {
+  return Object.entries(propertiesToDisplay.value)
+    .map(([key, value]) => treeNodeResolver.createTreeNodeOfProperty(key, value, props.currentSchema));
+});
 
-function dataForProperty(propertyKey: string | number) {
-  // TODO better logic
-  return props.currentData[propertyKey];
-}
+const filters = ref<Record<string, string>>({});
 </script>
 
 <template>
-  <TableHeader />
-  <PropertyComponent
-    :propertySchema="schema"
-    :propertyName="key"
-    :propertyPath="currentPath.concat(key)"
-    :propertyData="dataForProperty(key)"
-    v-for="(schema, key) in propertiesToDisplay"
-    @update_property_value="updateData" />
+  <TreeTable :value='nodesToDisplay' filter-mode='lenient'
+             removable-sort class='p-treetable-sm overflow-auto'
+             resizable-columns scrollable scroll-direction='vertical'
+             row-hover
+             :filters='filters'>
+    <!-- Filter field -->
+    <template #header>
+      <div class='text-left'>
+        <div class='p-input-icon-left w-full'>
+          <i class='pi pi-search' />
+          <InputText v-model="filters['global']" placeholder='Search for properties or data'
+                     class='h-8 w-80' />
+        </div>
+      </div>
+    </template>
+    <Column field='name' header='Property' sortable='true' expander>
+      <template #body='slotProps'>
+        <PropertyMetadata :metadata='slotProps.node.data'
+                          @expand_current_path='path_to_add => $emit("expand_current_path", path_to_add)' />
+      </template>
+    </Column>
+    <Column field='data' header='Data'>
+      <template #body='slotProps'>
+        <PropertyComponent :metadata='slotProps.node.data'
+                           @update_property_value='updateData' />
+      </template>
+    </Column>
+  </TreeTable>
 </template>
 
 <style scoped></style>

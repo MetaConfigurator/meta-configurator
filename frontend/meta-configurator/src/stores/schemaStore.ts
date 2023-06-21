@@ -1,7 +1,8 @@
-import {defineStore} from 'pinia';
-import {computed, ref} from 'vue';
-import {dataStore} from '@/stores/dataStore';
-import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import { dataStore } from "@/stores/dataStore";
+import { TopLevelJsonSchema } from "@/schema/TopLevelJsonSchema";
+import { JsonSchema } from "@/schema/JsonSchema";
 
 /**
  * The store for the applied editor schema.
@@ -11,7 +12,8 @@ export const schemaStore = defineStore('schemaStore', () => {
 
   return {
     schema,
-    schemaAtCurrentPath: computed(() => schema.value.subSchemaAt(dataStore().currentPath)),
+    schemaAtCurrentPath: computed(() => schema.value.subSchemaAt(dataStore().currentPath)
+      ?? new JsonSchema({})),
   };
 });
 
@@ -24,22 +26,30 @@ const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
   required: ['name', 'firstName'],
   properties: {
     name: {
-      type: 'string',
-      description: 'Last name',
-      examples: ['Doe'],
+      type: "string",
+      description: "Last name",
+      examples: ["Doe"],
     },
     firstName: {
-      type: 'string',
-      description: 'First name',
-      examples: ['John'],
+      type: "string",
+      description: "First name",
+      examples: ["John"],
+      deprecated: true,
+    },
+    nickNames: {
+      type: "array",
+      description: "Nick names",
+      items: {
+        type: "string",
+      },
     },
     isMarried: {
-      type: 'boolean',
-      description: 'Marital Status',
+      type: "boolean",
+      description: "Marital Status",
     },
     address: {
-      type: 'object',
-      description: 'Address of the person',
+      type: "object",
+      description: "Address of the person",
       properties: {
         street: {
           type: 'string',

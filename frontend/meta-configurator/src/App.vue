@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import TextPanel from './components/TextPanel.vue';
-import {computed, reactive, ref} from 'vue';
-import SideMenu from '@/components/side-menu/SideMenu.vue';
-import {SideMenuController} from '@/components/side-menu/SideMenu';
-import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
+import TextPanel from "./components/TextPanel.vue";
+import { computed, reactive, ref } from "vue";
+import SideMenu from "@/components/side-menu/SideMenu.vue";
+import { SideMenuController } from "@/components/side-menu/SideMenu";
+import GuiEditorPanel from "@/components/gui-editor/JsonSchemaGuiEditorPanel.vue";
+import "primeicons/primeicons.css";
 
 const currentFile = ref('config.yaml');
 

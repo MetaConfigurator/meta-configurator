@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
-import ChevronRight from '@/components/icons/ChevronRight.vue';
-import type {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import { computed, ref } from "vue";
+import ChevronRight from "@/components/icons/ChevronRight.vue";
+import type { TopLevelJsonSchema } from "@/schema/TopLevelJsonSchema";
 
 const props = defineProps<{
-  schema: TopLevelJsonSchema;
+  schema: ref<TopLevelJsonSchema>;
 }>();
 
 const collapsed = ref(false);
