@@ -8,16 +8,22 @@ const props = defineProps<{
   metadata: SchemaTreeNodeData;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'expand_current_path', path_to_add: Array<string | number>): void;
 }>();
 
 function isExpandable(): boolean {
   return props.metadata.schema.hasType('object');
 }
+
+function expandCurrentPath() {
+  emit('expand_current_path', props.metadata.relativePath);
+}
 </script>
 <template>
-  <span class="mr-2">{{ metadata.name }}</span>
+  <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="expandCurrentPath()">
+    {{ metadata.name }}
+  </span>
 
   <span class="text-xs text-gray-400">:&nbsp;{{ metadata.schema.type.join(',') }}</span>
 
@@ -26,7 +32,7 @@ function isExpandable(): boolean {
     <IconExpand
       class="text-gray-700 hover:scale-110 h-5"
       v-if="isExpandable()"
-      @click="$emit('expand_current_path', metadata.relativePath)" />
+      @click="expandCurrentPath()" />
   </div>
 </template>
 
