@@ -42,4 +42,4 @@ jobs:
           status_options: '--untracked-files=no'
           # only changed files in src/ and test/ will be committed
           # because otherwise this bot commits node_modules/ and dist/
-          file_pattern: 'src/* test/*'
+          file_pattern: 'frontend/*'

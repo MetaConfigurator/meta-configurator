@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { SideMenuController } from '@/components/side-menu/SideMenu';
+import type {SideMenuController} from '@/components/side-menu/SideMenu';
 import IconThreeBars from '@/components/icons/IconThreeBars.vue';
 
 defineProps<{

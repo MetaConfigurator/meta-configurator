@@ -1,11 +1,10 @@
-import { JsonSchema } from "@/schema/JsonSchema";
-import type { TopLevelSchema } from "@/schema/type";
+import {JsonSchema} from '@/schema/JsonSchema';
+import type {TopLevelSchema} from '@/schema/type';
 
 /**
  * Like {@link JsonSchema}, but with additional properties that are only allowed at the top level of a schema.
  */
 export class TopLevelJsonSchema extends JsonSchema {
-
   private readonly _$schema?: string;
   private _$id?: string;
   private _$vocabulary?: Record<string, boolean>;

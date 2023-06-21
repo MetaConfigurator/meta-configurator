@@ -1,7 +1,7 @@
 import IconSettings from '@/components/icons/IconSettings.vue';
 import IconSchemaFile from '@/components/icons/IconSchemaFile.vue';
 import IconEditor from '@/components/icons/IconEditor.vue';
-import { markRaw } from 'vue';
+import {markRaw} from 'vue';
 
 export class MenuItem {
   public name: string;

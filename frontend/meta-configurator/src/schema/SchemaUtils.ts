@@ -1,5 +1,5 @@
-import type { JsonSchemaType } from "@/schema/type";
-import { JsonSchema } from "@/schema/JsonSchema";
+import type {JsonSchemaType} from '@/schema/type';
+import {JsonSchema} from '@/schema/JsonSchema';
 
 /**
  * @returns the schema if it is not a boolean, otherwise
@@ -21,7 +21,8 @@ export function schemaArray(schema?: JsonSchemaType[]): JsonSchema[] {
 
 export function schemaRecord(schema?: Record<string, JsonSchemaType>): Record<string, JsonSchema> {
   return Object.fromEntries(
-    Object.entries(schema ?? {}).map(([key, value]) => [key, new JsonSchema(value)]));
+    Object.entries(schema ?? {}).map(([key, value]) => [key, new JsonSchema(value)])
+  );
 }
 
 export function schemaFromObject(jsonSchema?: JsonSchemaType): JsonSchema | undefined {
