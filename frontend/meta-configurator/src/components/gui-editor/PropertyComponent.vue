@@ -37,15 +37,7 @@ function resolveCorrespondingComponent() : VNode {
     } else if (props.propertySchema.hasType("integer")) {
         return h(IntegerProperty, { propertyName: props.propertyName, propertyData: props.propertyData})
     }
-
-    return h(StringProperty, {propertyName: propertyName, propertyData: propertyData});
-  }
-
-
-  return h(
-    'p',
-    `Property ${props.propertyName} with type ${props.propertySchema.type} is not supported`
-  );
+    return h('p',`Property ${props.propertyName} with type ${props.propertySchema.type} is not supported`)
 }
 
 function propagateUpdateEvent(propertyName: string, newValue: any) {
