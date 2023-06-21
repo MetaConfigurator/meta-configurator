@@ -1,5 +1,5 @@
-import type { JsonSchemaType, SchemaPropertyType } from "@/schema/type";
-import { nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord } from "@/schema/SchemaUtils";
+import type {JsonSchemaType, SchemaPropertyType} from '@/schema/type';
+import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/SchemaUtils';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -683,7 +683,7 @@ export class JsonSchema {
     if (typeof this.jsonSchema?.type === 'string') {
       return [this.jsonSchema.type];
     }
-    console.log("this.jsonSchema?.type", this.jsonSchema?.type);
+    console.log('this.jsonSchema?.type', this.jsonSchema?.type);
     return this.jsonSchema?.type ?? ['object', 'array', 'string', 'number', 'boolean', 'null'];
   }
 

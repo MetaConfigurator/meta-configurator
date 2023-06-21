@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import InputText from "primevue/inputtext";
-import { computed } from "vue";
+import InputText from 'primevue/inputtext';
+import {computed} from 'vue';
 
 const props = defineProps<{
   propertyName: string;
@@ -8,7 +8,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update_property_value", newValue: string): void;
+  (e: 'update_property_value', newValue: string): void;
 }>();
 
 const valueProperty = computed({
@@ -16,13 +16,13 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    emit("update_property_value", newValue);
+    emit('update_property_value', newValue);
   },
 });
 </script>
 
 <template>
-  <InputText class='h-8' type='text' v-model='valueProperty'></InputText>
+  <InputText class="h-8" type="text" v-model="valueProperty"></InputText>
 </template>
 
 <style scoped></style>

@@ -1,23 +1,23 @@
-import { computed, ref } from "vue";
-import { defineStore } from "pinia";
-import _ from "lodash";
-import { pathToString } from "@/pathHelper";
+import {computed, ref} from 'vue';
+import {defineStore} from 'pinia';
+import _ from 'lodash';
+import {pathToString} from '@/pathHelper';
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref({
-    name: "testName",
-    firstName: "testFirstName",
+    name: 'testName',
+    firstName: 'testFirstName',
     isMarried: true,
-    nickNames: ["test1", "test2"],
+    nickNames: ['test1', 'test2'],
     address: {
-      street: "testStreet",
+      street: 'testStreet',
       number: 12,
-      zipCode: "testZip",
-      city: "testCity",
-      country: "testCountry",
+      zipCode: 'testZip',
+      city: 'testCity',
+      country: 'testCountry',
       moreInfo: {
-        info: "testInfo",
-        neighborhood: "testNH",
+        info: 'testInfo',
+        neighborhood: 'testNH',
       },
     },
   });

@@ -1,5 +1,5 @@
-import type { TreeNode } from "primevue/tree";
-import { JsonSchema } from "@/schema/JsonSchema";
+import type {TreeNode} from 'primevue/tree';
+import {JsonSchema} from '@/schema/JsonSchema';
 
 /**
  * Represents a node in the schema tree.
@@ -16,7 +16,6 @@ export interface SchemaTreeNode extends TreeNode {
 }
 
 export class SchemaTreeNodeResolver {
-
   private readonly depthLimit: number;
   private readonly configDataSupplier: () => any;
 
@@ -25,12 +24,13 @@ export class SchemaTreeNodeResolver {
     this.depthLimit = depthLimit;
   }
 
-  public createTreeNodeOfProperty(name: string,
+  public createTreeNodeOfProperty(
+    name: string,
     schema: JsonSchema,
     parentSchema: JsonSchema,
     depth = 0,
-    subPath: Array<string | number> = []): SchemaTreeNode {
-
+    subPath: Array<string | number> = []
+  ): SchemaTreeNode {
     if (!schema) {
       throw new Error(`Schema for property ${name} is undefined`);
     }
@@ -52,27 +52,32 @@ export class SchemaTreeNodeResolver {
     };
   }
 
-  private createChildNodes(name: string,
+  private createChildNodes(
+    name: string,
     schema: JsonSchema,
     parentSchema: JsonSchema,
     depth = 0,
-    subPath: Array<string | number> = []): SchemaTreeNode[] {
-
+    subPath: Array<string | number> = []
+  ): SchemaTreeNode[] {
     let children: SchemaTreeNode[] = [];
     const path = subPath.concat(name);
     if (this.isObject(name, parentSchema) && depth < this.depthLimit) {
       children = children.concat(
-        Object.entries(schema.properties)
-          .map(([key, value]) =>
-            this.createTreeNodeOfProperty(key, value, schema, depth + 1, subPath.concat(name)),
-          ));
+        Object.entries(schema.properties).map(([key, value]) =>
+          this.createTreeNodeOfProperty(key, value, schema, depth + 1, subPath.concat(name))
+        )
+      );
     }
     if (this.isArray(name, parentSchema) && depth < this.depthLimit) {
-      children = this.dataForProperty(path).map(
-        (value: any, index: number) => {
-          return this.createTreeNodeOfProperty(index.toString(), schema.items, schema, depth + 1, path);
-        },
-      );
+      children = this.dataForProperty(path).map((value: any, index: number) => {
+        return this.createTreeNodeOfProperty(
+          index.toString(),
+          schema.items,
+          schema,
+          depth + 1,
+          path
+        );
+      });
     }
     return children;
   }
@@ -91,10 +96,10 @@ export class SchemaTreeNodeResolver {
   }
 
   private isObject(name: string | number, parentSchema: JsonSchema): boolean {
-    return parentSchema.properties[name]?.hasType("object") ?? false;
+    return parentSchema.properties[name]?.hasType('object') ?? false;
   }
 
   private isArray(name: string | number, parentSchema: JsonSchema): boolean {
-    return parentSchema.properties[name]?.hasType("array") ?? false;
+    return parentSchema.properties[name]?.hasType('array') ?? false;
   }
 }
