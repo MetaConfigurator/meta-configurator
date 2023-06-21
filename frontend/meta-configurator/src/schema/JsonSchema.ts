@@ -1,5 +1,5 @@
-import type { JsonSchemaType, SchemaPropertyType } from "@/schema/type";
-import { nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord } from "@/schema/SchemaUtils";
+import type {JsonSchemaType, SchemaPropertyType} from '@/schema/type';
+import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/SchemaUtils';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions

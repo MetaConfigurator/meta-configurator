@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Checkbox from "primevue/checkbox";
-import { computed } from "vue";
+import Checkbox from 'primevue/checkbox';
+import {computed} from 'vue';
 
 const props = defineProps<{
   propertyName: string;

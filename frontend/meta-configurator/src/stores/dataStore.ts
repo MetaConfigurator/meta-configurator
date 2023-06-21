@@ -1,7 +1,7 @@
-import { computed, ref } from "vue";
-import { defineStore } from "pinia";
-import _ from "lodash";
-import { pathToString } from "@/pathHelper";
+import {computed, ref} from 'vue';
+import {defineStore} from 'pinia';
+import _ from 'lodash';
+import {pathToString} from '@/pathHelper';
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref({

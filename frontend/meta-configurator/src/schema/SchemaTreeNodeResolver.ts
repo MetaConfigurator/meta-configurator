@@ -1,5 +1,5 @@
-import type { TreeNode } from "primevue/tree";
-import { JsonSchema } from "@/schema/JsonSchema";
+import type {TreeNode} from 'primevue/tree';
+import {JsonSchema} from '@/schema/JsonSchema';
 
 /**
  * Represents a node in the schema tree.

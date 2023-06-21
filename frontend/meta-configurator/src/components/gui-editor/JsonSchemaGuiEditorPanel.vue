@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { schemaStore } from "@/stores/schemaStore";
-import SchemaInfoPanel from "@/components/gui-editor/SchemaInfoPanel.vue";
-import SchemaBreadcrumb from "@/components/gui-editor/SchemaBreadcrumb.vue";
-import { dataStore } from "@/stores/dataStore";
-import PropertiesPanel from "@/components/gui-editor/PropertiesPanel.vue";
+import {schemaStore} from '@/stores/schemaStore';
+import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
+import SchemaBreadcrumb from '@/components/gui-editor/SchemaBreadcrumb.vue';
+import {dataStore} from '@/stores/dataStore';
+import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 
 const schemaStoreInstance = schemaStore();
 
