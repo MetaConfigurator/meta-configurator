@@ -88,7 +88,7 @@ export class SchemaTreeNodeResolver {
     let currentData: any = this.configDataSupplier();
 
     for (const key of name) {
-      if (!currentData[key]) {
+      if (currentData[key] === undefined) {
         return undefined;
       }
       currentData = currentData[key];

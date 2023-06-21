@@ -27,8 +27,8 @@ const valueProperty = computed({
     v-model="valueProperty"
     value="propertyName"
     mode="decimal"
-    minFractionDigits="0"
-    maxFractionDigits="20" />
+    minFractionDigits=0
+    maxFractionDigits=20 />
 </template>
 
 <style scoped></style>
