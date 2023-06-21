@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import type { JsonSchema } from "@/schema/JsonSchema";
-import TreeTable from "primevue/treetable";
-import Column from "primevue/column";
-import InputText from "primevue/inputtext";
-import PropertyComponent from "@/components/gui-editor/EditPropertyComponent.vue";
-import PropertyMetadata from "@/components/gui-editor/PropertyMetadata.vue";
-import { SchemaTreeNodeResolver } from "@/schema/SchemaTreeNodeResolver";
+import {computed, ref} from 'vue';
+import type {JsonSchema} from '@/schema/JsonSchema';
+import TreeTable from 'primevue/treetable';
+import Column from 'primevue/column';
+import InputText from 'primevue/inputtext';
+import PropertyComponent from '@/components/gui-editor/EditPropertyComponent.vue';
+import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
+import {SchemaTreeNodeResolver} from '@/schema/SchemaTreeNodeResolver';
 
 const props = defineProps<{
   currentSchema: JsonSchema;

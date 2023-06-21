@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import InputNumber from "primevue/inputnumber";
-import { computed } from "vue";
+import InputNumber from 'primevue/inputnumber';
+import {computed} from 'vue';
 
 const props = defineProps<{
   propertyName: string;
@@ -27,8 +27,8 @@ const valueProperty = computed({
     v-model="valueProperty"
     value="propertyName"
     mode="decimal"
-    minFractionDigits=0
-    maxFractionDigits=20 />
+    minFractionDigits="0"
+    maxFractionDigits="20" />
 </template>
 
 <style scoped></style>

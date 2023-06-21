@@ -1,8 +1,8 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
-import IconExpand from "@/components/icons/IconExpand.vue";
-import type { SchemaTreeNodeData } from "@/schema/SchemaTreeNodeResolver";
+import IconExpand from '@/components/icons/IconExpand.vue';
+import type {SchemaTreeNodeData} from '@/schema/SchemaTreeNodeResolver';
 
 const props = defineProps<{
   metadata: SchemaTreeNodeData;

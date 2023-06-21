@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { dataStore } from "@/stores/dataStore";
-import { TopLevelJsonSchema } from "@/schema/TopLevelJsonSchema";
-import { JsonSchema } from "@/schema/JsonSchema";
+import {defineStore} from 'pinia';
+import {computed, ref} from 'vue';
+import {dataStore} from '@/stores/dataStore';
+import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import {JsonSchema} from '@/schema/JsonSchema';
 
 /**
  * The store for the applied editor schema.
