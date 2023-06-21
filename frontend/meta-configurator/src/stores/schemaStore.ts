@@ -39,11 +39,11 @@ const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
     },
     telephoneNumber: {
       type: 'integer',
-      description: 'phone number'
+      description: 'phone number',
     },
     heightInMeter: {
-      type: "number",
-      description: 'Height'
+      type: 'number',
+      description: 'Height',
     },
     address: {
       type: 'object',

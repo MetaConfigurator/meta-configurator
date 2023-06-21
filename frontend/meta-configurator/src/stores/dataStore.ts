@@ -9,7 +9,7 @@ export const dataStore = defineStore('dataStore', () => {
     firstName: 'testFirstName',
     isMarried: true,
     telephoneNumber: 152000,
-    heightInMeter: 1.70,
+    heightInMeter: 1.7,
     address: {
       street: 'test',
       number: 12,
