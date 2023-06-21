@@ -6,13 +6,15 @@ import { JsonSchema } from "@/schema/JsonSchema";
  * Compatible with the PrimeVue TreeNode interface.
  */
 export interface SchemaTreeNode extends TreeNode {
-  data: {
-    name: string;
-    schema: JsonSchema;
-    parentSchema?: JsonSchema;
-    data: any;
-    relativePath: (string | number)[];
-  };
+  data: SchemaTreeNodeData;
+}
+
+export interface SchemaTreeNodeData {
+  name: string;
+  schema: JsonSchema;
+  parentSchema?: JsonSchema;
+  data: any;
+  relativePath: (string | number)[];
 }
 
 export class SchemaTreeNodeResolver {

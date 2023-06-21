@@ -3,10 +3,10 @@
 <script setup lang='ts'>
 
 import IconExpand from "@/components/icons/IconExpand.vue";
-import type { SchemaTreeNode } from "@/schema/SchemaTreeNodeResolver";
+import type { SchemaTreeNodeData } from "@/schema/SchemaTreeNodeResolver";
 
 const props = defineProps<{
-  metadata: SchemaTreeNode;
+  metadata: SchemaTreeNodeData;
 }>();
 
 defineEmits<{

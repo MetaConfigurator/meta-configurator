@@ -3,10 +3,10 @@ import type { VNode } from "vue";
 import { h } from "vue";
 import BooleanProperty from "@/components/gui-editor/properties/BooleanProperty.vue";
 import StringProperty from "@/components/gui-editor/properties/StringProperty.vue";
-import type { SchemaTreeNode } from "@/schema/SchemaTreeNodeResolver";
+import type { SchemaTreeNodeData } from "@/schema/SchemaTreeNodeResolver";
 
 const props = defineProps<{
-  metadata: SchemaTreeNode;
+  metadata: SchemaTreeNodeData;
 }>();
 
 const emit = defineEmits<{
