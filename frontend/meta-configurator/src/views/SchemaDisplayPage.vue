@@ -7,7 +7,7 @@ const currentFile = ref('config.yaml');
 
 const sideMenuController = reactive(new SideMenuController());
 const currentTitle = computed(
-    () => sideMenuController.selectedItem.name + ' - ' + currentFile.value
+  () => sideMenuController.selectedItem.name + ' - ' + currentFile.value
 );
 </script>
 
@@ -16,15 +16,9 @@ const currentTitle = computed(
     <SideMenu :menu="sideMenuController"></SideMenu>
 
     <div class="container">
-     <h2>Welcome in Schema page</h2>
-
-
+      <h2>Welcome in Schema page</h2>
     </div>
   </div>
 </template>
 
-
-
-<style scoped>
-
-</style>
+<style scoped></style>
