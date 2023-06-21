@@ -6,6 +6,8 @@ import StringProperty from '@/components/gui-editor/properties/StringProperty.vu
 import type {SchemaTreeNodeData} from '@/schema/SchemaTreeNodeResolver';
 import NumberProperty from '@/components/gui-editor/properties/NumberProperty.vue';
 import IntegerProperty from '@/components/gui-editor/properties/IntegerProperty.vue';
+import SimpleObjectProperty from '@/components/gui-editor/properties/SimpleObjectProperty.vue';
+import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayProperty.vue';
 
 const props = defineProps<{
   metadata: SchemaTreeNodeData;
@@ -19,6 +21,7 @@ function resolveCorrespondingComponent(): VNode {
   const propsObject = {
     propertyName: props.metadata.name,
     propertyData: props.metadata.data,
+    propertySchema: props.metadata.schema,
   };
   if (props.metadata.schema.hasType('boolean')) {
     return h(BooleanProperty, propsObject);
@@ -28,6 +31,10 @@ function resolveCorrespondingComponent(): VNode {
     return h(NumberProperty, propsObject);
   } else if (props.metadata.schema.hasType('integer')) {
     return h(IntegerProperty, propsObject);
+  } else if (props.metadata.schema.hasType('object')) {
+    return h(SimpleObjectProperty, propsObject);
+  } else if (props.metadata.schema.hasType('array')) {
+    return h(SimpleArrayProperty, propsObject);
   }
 
   return h(
