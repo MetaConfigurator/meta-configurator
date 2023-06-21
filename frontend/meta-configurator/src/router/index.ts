@@ -1,13 +1,13 @@
 import {createWebHistory, createRouter} from 'vue-router';
-import Home from '@/Home.vue';
+import HomePage from '@/HomePage.vue';
 import SchemaDisplayPage from '@/views/SchemaDisplayPage.vue';
-import Setting from '@/views/Setting.vue';
+import SettingPage from '@/views/SettingPage.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home,
+    component: HomePage,
   },
   {
     path: '/schema',
@@ -15,7 +15,7 @@ const routes = [
   },
   {
     path: '/setting',
-    component: Setting,
+    component: SettingPage,
   },
 ];
 

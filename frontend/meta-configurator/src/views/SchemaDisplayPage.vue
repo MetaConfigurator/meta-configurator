@@ -16,7 +16,7 @@ const currentTitle = computed(
     <SideMenu :menu="sideMenuController"></SideMenu>
 
     <div class="container">
-     <h2>This is Schema page</h2>
+     <h2>Welcome in Schema page</h2>
 
 
     </div>
@@ -26,14 +26,5 @@ const currentTitle = computed(
 
 
 <style scoped>
-.container {
-  padding: 20px;
-}
 
-pre {
-  background-color: #f9f9f9;
-  padding: 10px;
-  overflow-x: auto;
-  font-size: 12px;
-}
 </style>

@@ -14,7 +14,7 @@ const currentTitle = computed(
   <div class="w-screen h-screen flex">
 
     <SideMenu :menu="sideMenuController"></SideMenu>
-    <h1>Welcome!!!!This is a setting page</h1>
+    <h1>Welcome in a setting page</h1>
 
   </div>
 </template>
