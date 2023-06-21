@@ -37,6 +37,14 @@ const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
       type: 'boolean',
       description: 'Marital Status',
     },
+    telephoneNumber: {
+      type: 'integer',
+      description: 'phone number',
+    },
+    heightInMeter: {
+      type: 'number',
+      description: 'Height',
+    },
     address: {
       type: 'object',
       description: 'Address of the person',
