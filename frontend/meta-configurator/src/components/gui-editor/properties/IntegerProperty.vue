@@ -22,7 +22,6 @@ const valueProperty = computed({
 </script>
 
 <template>
-  
   <InputNumber
     v-model="valueProperty"
     value="propertyName"
