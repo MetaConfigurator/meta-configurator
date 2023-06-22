@@ -20,7 +20,7 @@ const emit = defineEmits<{
   (e: 'update_data', path: Array<string | number>, newValue: any): void;
 }>();
 
-const propertiesToDisplay: ref<Record<string, JsonSchema>> = computed(() => {
+const propertiesToDisplay = computed(() => {
   // TODO: consider properties of data, i.e., additionalProperties, patternProperties.
   if (props.currentSchema.hasType('array') && Array.isArray(props.currentData)) {
     return Object.fromEntries(
@@ -53,7 +53,7 @@ const filters = ref<Record<string, string>>({});
     :value="nodesToDisplay"
     filter-mode="lenient"
     removable-sort
-    class="p-treetable-sm overflow-auto"
+    class="overflow-auto"
     resizable-columns
     scrollable
     scroll-direction="vertical"
@@ -71,7 +71,7 @@ const filters = ref<Record<string, string>>({});
         </div>
       </div>
     </template>
-    <Column field="name" header="Property" sortable="true" expander>
+    <Column field="name" header="Property" :sortable='true' expander>
       <template #body="slotProps">
         <PropertyMetadata
           :metadata="slotProps.node.data"
@@ -80,10 +80,25 @@ const filters = ref<Record<string, string>>({});
     </Column>
     <Column field="data" header="Data">
       <template #body="slotProps">
-        <PropertyComponent :metadata="slotProps.node.data" @update_property_value="updateData" />
+        <PropertyComponent
+          :metadata="slotProps.node.data"
+          @update_property_value="updateData"
+          class="w-full"
+          bodyClass="w-full" />
       </template>
     </Column>
   </TreeTable>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* The following lines make the table cells take less space */
+:deep(.p-treetable-tbody > tr > td) {
+  padding: 0.25rem 0.5rem;
+}
+:deep(.p-treetable-header) {
+  padding: 0.5rem 0.5rem;
+}
+:deep(.p-treetable-thead > tr > th) {
+  padding: 0.5rem 0.5rem;
+}
+</style>
