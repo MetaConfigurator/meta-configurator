@@ -50,8 +50,8 @@ const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
           lastName: {
             type: 'string',
             description: 'Last name',
-          }
-        }
+          },
+        },
       },
     },
     isMarried: {

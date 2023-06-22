@@ -69,17 +69,13 @@ export class SchemaTreeNodeResolver {
         )
       );
     }
-    if (schema.hasType('array')
-      && depth < this.depthLimit
-      && Array.isArray(this.dataForProperty(path))) {
+    if (
+      schema.hasType('array') &&
+      depth < this.depthLimit &&
+      Array.isArray(this.dataForProperty(path))
+    ) {
       children = this.dataForProperty(path).map((value: any, index: number) => {
-        return this.createTreeNodeOfProperty(
-          index,
-          schema.items,
-          schema,
-          depth + 1,
-          path
-        );
+        return this.createTreeNodeOfProperty(index, schema.items, schema, depth + 1, path);
       });
     }
     return children;
