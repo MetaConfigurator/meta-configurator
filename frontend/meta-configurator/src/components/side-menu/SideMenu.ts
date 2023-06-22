@@ -2,6 +2,7 @@ import IconSettings from '@/components/icons/IconSettings.vue';
 import IconSchemaFile from '@/components/icons/IconSchemaFile.vue';
 import IconEditor from '@/components/icons/IconEditor.vue';
 import {markRaw} from 'vue';
+import router from "@/router";
 
 export class MenuItem {
   public name: string;
@@ -36,7 +37,7 @@ export class SideMenuController {
     {
       name: 'Settings',
       icon: markRaw(IconSettings),
-      path: '/settings',
+      path: '/setting',
     },
   ];
 
@@ -48,8 +49,9 @@ export class SideMenuController {
     return this.menuItems[this.selectedIndex];
   }
 
-  public selectItem(index: number): void {
+  public async selectItem(index: number) {
     this.selectedIndex = index;
+    await router.push(this.selectedItem.path)
   }
 
   public toggle(): void {

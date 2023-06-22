@@ -21,7 +21,7 @@ const currentTitle = computed(
     <SideMenu :menu="sideMenuController"></SideMenu>
 
     <header></header>
-    <main class="flex flex-col w-full h-full">
+    <main class="flex flex-col w-full h-full" v-if="sideMenuController.selectedItem.path == '/'">
       <!-- toolbar -->
       <div
         class="w-full h-16 bg-slate-100 flex flex-row items-center p-2 px-6 border-b-2 border-gray-600 space-x-6">

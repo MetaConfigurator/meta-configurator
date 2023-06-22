@@ -1,4 +1,4 @@
-import {createWebHistory, createRouter} from 'vue-router';
+import { createWebHistory, createRouter, createMemoryHistory } from "vue-router";
 import HomePage from '@/HomePage.vue';
 import SchemaDisplayPage from '@/views/SchemaDisplayPage.vue';
 import SettingPage from '@/views/SettingPage.vue';
@@ -11,16 +11,16 @@ const routes = [
   },
   {
     path: '/schema',
-    component: SchemaDisplayPage,
+    component: HomePage,
   },
   {
     path: '/setting',
-    component: SettingPage,
+    component: HomePage,
   },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createMemoryHistory(),
   routes,
 });
 

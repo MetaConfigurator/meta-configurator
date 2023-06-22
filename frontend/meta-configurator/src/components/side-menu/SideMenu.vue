@@ -29,6 +29,7 @@ defineProps<{
       </div>
 
       <!-- menu items -->
+
       <div
         v-for="(item, index) in menu.menuItems"
         v-bind:key="item.name"
