@@ -4,8 +4,7 @@ import SideMenu from '@/components/side-menu/SideMenu.vue';
 import {SideMenuController} from '@/components/side-menu/SideMenu';
 import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
 import 'primeicons/primeicons.css';
-import AceEditor from "@/components/code-editor/AceEditor.vue";
-
+import AceEditor from '@/components/code-editor/AceEditor.vue';
 
 const currentFile = ref('config.yaml');
 
