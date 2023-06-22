@@ -8,7 +8,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'update_property_value', propertyName: string, newValue: number): void;
+  (e: 'update_property_value', newValue: number): void;
 }>();
 
 const valueProperty = computed({
@@ -16,13 +16,14 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    emit('update_property_value', props.propertyName, newValue);
+    emit('update_property_value', newValue);
   },
 });
 </script>
 
 <template>
   <InputNumber
+    class="h-8"
     v-model="valueProperty"
     value="propertyName"
     input-id="integeronly"

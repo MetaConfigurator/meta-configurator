@@ -1,4 +1,4 @@
-import type {SchemaPropertyType, JsonSchemaType} from '@/schema/type';
+import type {JsonSchemaType, SchemaPropertyType} from '@/schema/type';
 import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/SchemaUtils';
 
 /**

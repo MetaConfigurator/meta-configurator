@@ -4,7 +4,7 @@ import ChevronRight from '@/components/icons/ChevronRight.vue';
 import type {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
 
 const props = defineProps<{
-  schema: TopLevelJsonSchema;
+  schema: ref<TopLevelJsonSchema>;
 }>();
 
 const collapsed = ref(false);
