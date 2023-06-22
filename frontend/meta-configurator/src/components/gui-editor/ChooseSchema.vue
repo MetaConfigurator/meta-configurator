@@ -1,16 +1,16 @@
 <template>
-  <input type="file" ref="fileInput" accept=".json" style="display: none">
+  <input type="file" ref="fileInput" accept=".json" style="display: none" />
   <Button @click="uploadSchema" class="p-button-primary" label="Choose Schema" />
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance, onMounted } from 'vue';
+import {ref, getCurrentInstance, onMounted} from 'vue';
 import Button from 'primevue/button';
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const uploadSchema = () => {
   if (fileInput.value) {
-    if ("click" in fileInput.value) {
+    if ('click' in fileInput.value) {
       fileInput.value.click();
     }
   }
@@ -34,8 +34,8 @@ if (app) {
 }
 onMounted(() => {
   if (fileInput.value) {
-    if ("addEventListener" in fileInput.value) {
-      fileInput.value.addEventListener("change", handleFileChange);
+    if ('addEventListener' in fileInput.value) {
+      fileInput.value.addEventListener('change', handleFileChange);
     }
   }
 });
@@ -45,6 +45,6 @@ onMounted(() => {
 .p-button-primary {
   position: absolute;
   top: 80px; /* Adjust top position as needed */
-  right:10px; /* Adjust right position as needed */
+  right: 10px; /* Adjust right position as needed */
 }
 </style>
