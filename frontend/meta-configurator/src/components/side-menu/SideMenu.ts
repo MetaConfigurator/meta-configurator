@@ -28,7 +28,6 @@ export class SideMenuController {
       name: 'File',
       icon: markRaw(IconEditor),
       path: '/',
-
     },
     {
       name: 'Schema',
