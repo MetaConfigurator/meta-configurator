@@ -1,0 +1,19 @@
+<script setup lang="ts">
+import type {JsonSchema} from '@/schema/JsonSchema';
+
+const props = defineProps<{
+  propertyName: string;
+  propertySchema: JsonSchema;
+  propertyData: Array<any> | undefined;
+}>();
+
+function getNumberOfItems(): number {
+  return props.propertyData?.length ?? 0;
+}
+</script>
+
+<template>
+  <p class="text-gray-400 font-extralight">{{ getNumberOfItems() }} items</p>
+</template>
+
+<style scoped></style>

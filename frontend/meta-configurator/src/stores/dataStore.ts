@@ -5,20 +5,21 @@ import {pathToString} from '@/pathHelper';
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref({
-    name: 'test',
+    name: 'testName',
     firstName: 'testFirstName',
     isMarried: true,
     telephoneNumber: 152000,
     heightInMeter: 1.7,
+    nickNames: ['test1', 'test2'],
     address: {
-      street: 'test',
+      street: 'testStreet',
       number: 12,
-      zipCode: 'test',
-      city: 'test',
-      country: 'test',
+      zipCode: 'testZip',
+      city: 'testCity',
+      country: 'testCountry',
       moreInfo: {
-        info: 'test',
-        neighborhood: 'test',
+        info: 'testInfo',
+        neighborhood: 'testNH',
       },
     },
   });
