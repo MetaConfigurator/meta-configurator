@@ -2,6 +2,7 @@
 import {computed, ref} from 'vue';
 import ChevronRight from '@/components/icons/ChevronRight.vue';
 import type {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import ChooseSchema from "@/components/gui-editor/ChooseSchema.vue";
 
 const props = defineProps<{
   schema: ref<TopLevelJsonSchema>;
@@ -43,6 +44,7 @@ const schemaInformation = computed(() => {
         <span class="font-semibold">{{ info.title }}: </span>
         {{ info.value }}
       </p>
+      <ChooseSchema></ChooseSchema>
     </div>
   </div>
 </template>
