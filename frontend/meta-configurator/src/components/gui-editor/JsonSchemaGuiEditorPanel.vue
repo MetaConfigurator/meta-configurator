@@ -2,7 +2,6 @@
 import {schemaStore} from '@/stores/schemaStore';
 import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
 import SchemaBreadcrumb from '@/components/gui-editor/SchemaBreadcrumb.vue';
-import PropertiesEditorTable from '@/components/gui-editor/PropertiesEditorTable.vue';
 import {dataStore} from '@/stores/dataStore';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 
@@ -18,8 +17,8 @@ function updateData(path: (string | number)[], newValue: any) {
   dataStoreInstance.updateDataAtPath(path, newValue);
 }
 
-function expandPath(pathToAdd: string | number) {
-  dataStoreInstance.$patch(state => state.currentPath.push(pathToAdd));
+function expandPath(pathToAdd: Array<string | number>) {
+  dataStoreInstance.$patch(state => (state.currentPath = state.currentPath.concat(pathToAdd)));
 }
 </script>
 
@@ -34,7 +33,7 @@ function expandPath(pathToAdd: string | number) {
       :current-schema="schemaStoreInstance.schemaAtCurrentPath"
       :current-path="dataStoreInstance.currentPath"
       :current-data="dataStoreInstance.dataAtCurrentPath"
-      @expand:path="pathToAdd => expandPath(pathToAdd)"
+      @expand_current_path="pathToAdd => expandPath(pathToAdd)"
       @update_data="updateData" />
   </div>
 </template>

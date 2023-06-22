@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
 
 const props = defineProps<{
   propertyName: string;
-  propertyData: string | undefined;
+  propertyData: number;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update_property_value', newValue: string): void;
+  (e: 'update_property_value', newValue: number): void;
 }>();
 
 const valueProperty = computed({
@@ -22,7 +22,12 @@ const valueProperty = computed({
 </script>
 
 <template>
-  <InputText class="h-8" type="text" v-model="valueProperty"></InputText>
+  <InputNumber
+    class="h-8"
+    v-model="valueProperty"
+    value="propertyName"
+    input-id="integeronly"
+    :use-grouping="false" />
 </template>
 
 <style scoped></style>
