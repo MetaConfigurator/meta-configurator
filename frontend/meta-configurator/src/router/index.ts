@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter, createMemoryHistory } from "vue-router";
+import {createWebHistory, createRouter, createMemoryHistory} from 'vue-router';
 import HomePage from '@/HomePage.vue';
 import SchemaDisplayPage from '@/views/SchemaDisplayPage.vue';
 import SettingPage from '@/views/SettingPage.vue';

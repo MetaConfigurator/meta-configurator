@@ -2,7 +2,7 @@ import IconSettings from '@/components/icons/IconSettings.vue';
 import IconSchemaFile from '@/components/icons/IconSchemaFile.vue';
 import IconEditor from '@/components/icons/IconEditor.vue';
 import {markRaw} from 'vue';
-import router from "@/router";
+import router from '@/router';
 
 export class MenuItem {
   public name: string;
@@ -51,7 +51,7 @@ export class SideMenuController {
 
   public async selectItem(index: number) {
     this.selectedIndex = index;
-    await router.push(this.selectedItem.path)
+    await router.push(this.selectedItem.path);
   }
 
   public toggle(): void {
