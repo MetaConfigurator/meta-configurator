@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import {dataStore} from '@/stores/dataStore';
 import {storeToRefs} from 'pinia';
 import * as ace from 'brace';
@@ -8,7 +8,6 @@ import 'brace/mode/json';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
-
 
 const store = dataStore();
 const {configData} = storeToRefs(store);
@@ -36,13 +35,15 @@ onMounted(() => {
         const currEditorContent = editor.value.getValue();
         const newEditorContent = JSON.stringify(newVal, null, 2);
 
-      if (currEditorContent !== newEditorContent) {
-        editor.value.setValue(newEditorContent);
+        if (currEditorContent !== newEditorContent) {
+          editor.value.setValue(newEditorContent);
 
-        editor.value.clearSelection();
+          editor.value.clearSelection();
+        }
       }
-    }
-  }, { deep: true });
+    },
+    {deep: true}
+  );
   editor.value.clearSelection();
 });
 </script>
@@ -51,5 +52,4 @@ onMounted(() => {
   <div class="bg-amber-300 h-screen" id="javascript-editor"></div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
