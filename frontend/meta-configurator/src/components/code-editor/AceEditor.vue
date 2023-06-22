@@ -17,6 +17,7 @@ onMounted(() => {
   editor.value = ace.edit('javascript-editor');
   editor.value.getSession().setMode('ace/mode/json');
   editor.value.setTheme('ace/theme/clouds');
+  editor.value.setShowPrintMargin(false);
 
   editor.value.setValue(JSON.stringify(store.configData, null, 2));
   // listen to changes on AceEditor
