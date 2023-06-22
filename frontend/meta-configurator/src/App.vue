@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import TextPanel from './components/TextPanel.vue';
 import {computed, reactive, ref} from 'vue';
 import SideMenu from '@/components/side-menu/SideMenu.vue';
 import {SideMenuController} from '@/components/side-menu/SideMenu';
 import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
 import 'primeicons/primeicons.css';
+import AceEditor from '@/components/code-editor/AceEditor.vue';
 
 const currentFile = ref('config.yaml');
 
@@ -27,7 +27,7 @@ const currentTitle = computed(
         <h2 class="text-3xl text-gray-700" v-html="currentTitle"></h2>
       </div>
       <div class="flex flex-row">
-        <TextPanel class="flex-initial w-full" />
+        <AceEditor class="flex-initial w-full" />
         <GuiEditorPanel class="w-full" />
       </div>
     </main>
