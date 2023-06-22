@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref, watch} from 'vue';
+import { onMounted, ref, watch} from 'vue';
 import {dataStore} from "@/stores/dataStore";
 import {storeToRefs} from "pinia";
 import * as ace from 'brace';
@@ -9,25 +9,10 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai'
 
-import {edit} from "brace";
 
 const store = dataStore();
 const {configData} = storeToRefs(store);
-const editorValue = ref('');
 const editor = ref();
-
-const textContent = computed({
-  get: () => configToYamlString(),
-  set: (value: string) => userUpdatedText(value),
-});
-
-function configToYamlString() {
-  return JSON.stringify(configData.value);
-}
-
-function userUpdatedText(text: string) {
-  store.configData = JSON.parse(text);
-}
 
 onMounted(() => {
   editor.value = ace.edit('javascript-editor');
@@ -50,6 +35,8 @@ onMounted(() => {
 
       if (currEditorContent !== newEditorContent) {
         editor.value.setValue(newEditorContent);
+
+        editor.value.clearSelection();
       }
     }
   }, { deep: true });
@@ -59,13 +46,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="javascript-editor"></div>
-  <textarea v-model="textContent" id="javascript-editor" class="bg-amber-300 h-screen"> </textarea>
+  <div class="bg-amber-300 h-screen" id="javascript-editor"></div>
 </template>
 
 <style scoped>
-#javascript-editor {
-  width: 600px;
-  height: 735px;
-}
 </style>
