@@ -13,11 +13,13 @@ const emit = defineEmits<{
 }>();
 
 function isExpandable(): boolean {
-  return props.metadata.schema.hasType('object');
+  return props.metadata.schema.hasType('object') || props.metadata.schema.hasType('array');
 }
 
 function expandCurrentPath() {
-  emit('expand_current_path', props.metadata.relativePath);
+  if (isExpandable()) {
+    emit('expand_current_path', props.metadata.relativePath);
+  }
 }
 </script>
 <template>
