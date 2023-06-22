@@ -10,7 +10,7 @@ export interface SchemaTreeNode extends TreeNode {
 }
 
 export interface SchemaTreeNodeData {
-  name: string;
+  name: string | number;
   schema: JsonSchema;
   parentSchema?: JsonSchema;
   data: any;
@@ -27,7 +27,7 @@ export class SchemaTreeNodeResolver {
   }
 
   public createTreeNodeOfProperty(
-    name: string,
+    name: string | number,
     schema: JsonSchema,
     parentSchema: JsonSchema,
     depth = 0,
@@ -49,31 +49,32 @@ export class SchemaTreeNodeResolver {
         data: this.dataForProperty(path),
         relativePath: path,
       },
-      key: depth + name,
-      children: this.createChildNodes(name, schema, parentSchema, depth, subPath),
+      key: depth + name.toString(),
+      children: this.createChildNodes(name, schema, depth, subPath),
     };
   }
 
   private createChildNodes(
-    name: string,
+    name: string | number,
     schema: JsonSchema,
-    parentSchema: JsonSchema,
     depth = 0,
     subPath: Array<string | number> = []
   ): SchemaTreeNode[] {
     let children: SchemaTreeNode[] = [];
     const path = subPath.concat(name);
-    if (this.isObject(name, parentSchema) && depth < this.depthLimit) {
+    if (schema.hasType('object') && depth < this.depthLimit) {
       children = children.concat(
         Object.entries(schema.properties).map(([key, value]) =>
           this.createTreeNodeOfProperty(key, value, schema, depth + 1, subPath.concat(name))
         )
       );
     }
-    if (this.isArray(name, parentSchema) && depth < this.depthLimit) {
+    if (schema.hasType('array')
+      && depth < this.depthLimit
+      && Array.isArray(this.dataForProperty(path))) {
       children = this.dataForProperty(path).map((value: any, index: number) => {
         return this.createTreeNodeOfProperty(
-          index.toString(),
+          index,
           schema.items,
           schema,
           depth + 1,
@@ -95,13 +96,5 @@ export class SchemaTreeNodeResolver {
     }
 
     return currentData;
-  }
-
-  private isObject(name: string | number, parentSchema: JsonSchema): boolean {
-    return parentSchema.properties[name]?.hasType('object') ?? false;
-  }
-
-  private isArray(name: string | number, parentSchema: JsonSchema): boolean {
-    return parentSchema.properties[name]?.hasType('array') ?? false;
   }
 }

@@ -41,7 +41,17 @@ const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
       type: 'array',
       description: 'Nick names',
       items: {
-        type: 'string',
+        type: 'object',
+        properties: {
+          firstName: {
+            type: 'string',
+            description: 'First name',
+          },
+          lastName: {
+            type: 'string',
+            description: 'Last name',
+          }
+        }
       },
     },
     isMarried: {

@@ -20,8 +20,11 @@ const emit = defineEmits<{
   (e: 'update_data', path: Array<string | number>, newValue: any): void;
 }>();
 
-const propertiesToDisplay = computed(() => {
+const propertiesToDisplay: ref<Record<string, JsonSchema>> = computed(() => {
   // TODO: consider properties of data, i.e., additionalProperties, patternProperties.
+  if (props.currentSchema.hasType('array') && Array.isArray(props.currentData)) {
+    return Object.fromEntries(props.currentData.map((_, index) => [index, props.currentSchema.items]));
+  }
   return props.currentSchema.properties;
 });
 
