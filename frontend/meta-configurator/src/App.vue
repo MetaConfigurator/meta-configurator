@@ -3,7 +3,10 @@ import {computed, reactive, ref} from 'vue';
 import SideMenu from '@/components/side-menu/SideMenu.vue';
 import {SideMenuController} from '@/components/side-menu/SideMenu';
 import 'primeicons/primeicons.css';
-import ResizePanel from "@/components/icons/ResizePanel.vue";
+import SplitterPanel from "primevue/splitterpanel";
+import AceEditor from "@/components/code-editor/AceEditor.vue";
+import JsonSchemaGuiEditorPanel from "@/components/gui-editor/JsonSchemaGuiEditorPanel.vue";
+import Splitter from "primevue/splitter";
 
 const currentFile = ref('config.yaml');
 
@@ -26,8 +29,18 @@ const currentTitle = computed(
         <h2 class="text-3xl text-gray-700" v-html="currentTitle"></h2>
 
       </div>
-      <div class="flex flex-row">
-        <ResizePanel></ResizePanel>
+      <div>
+        <Splitter>
+            <!-- Left panel for the GUI editor -->
+            <SplitterPanel>
+              <AceEditor />
+            </SplitterPanel>
+
+            <!-- Right panel for the text editor -->
+            <SplitterPanel class="flex align-items-center justify-content-center" :size="80">
+              <JsonSchemaGuiEditorPanel/>
+            </SplitterPanel>
+        </Splitter>
       </div>
     </main>
   </div>
