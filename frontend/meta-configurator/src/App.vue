@@ -5,8 +5,7 @@ import {SideMenuController} from '@/components/side-menu/SideMenu';
 import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
 import 'primeicons/primeicons.css';
 import AceEditor from '@/components/code-editor/AceEditor.vue';
-import IconDropDown from "@/components/icons/IconDropDown.vue";
-
+import IconDropDown from '@/components/icons/IconDropDown.vue';
 
 const currentFile = ref('config.yaml');
 
@@ -32,7 +31,6 @@ const currentTitle = computed(
       <div class="flex flex-row">
         <AceEditor class="flex-initial w-full" />
         <GuiEditorPanel class="w-full" />
-
       </div>
     </main>
   </div>
