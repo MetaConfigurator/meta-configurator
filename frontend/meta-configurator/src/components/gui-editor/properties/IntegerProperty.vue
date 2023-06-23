@@ -27,13 +27,13 @@ const valueProperty = computed({
     v-model="valueProperty"
     value="propertyName"
     input-id="integeronly"
-    locale='us'
+    locale="us"
     :use-grouping="false"
     showButtons
-    buttonLayout='stacked'
-    :step='1'
-    increment-button-class='p-button-text p-button-secondary'
-    decrement-button-class='p-button-text p-button-secondary' />
+    buttonLayout="stacked"
+    :step="1"
+    increment-button-class="p-button-text p-button-secondary"
+    decrement-button-class="p-button-text p-button-secondary" />
 </template>
 
 <style scoped>

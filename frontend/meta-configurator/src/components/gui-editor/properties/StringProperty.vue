@@ -22,12 +22,12 @@ const valueProperty = computed({
 </script>
 
 <template>
-  <InputText :class="$style.tableInput" class='h-8' v-model="valueProperty"></InputText>
+  <InputText :class="$style.tableInput" class="h-8" v-model="valueProperty"></InputText>
 </template>
 
 <style module>
 /* remove border so it fits the look of the table better */
 .tableInput {
-    border: none;
+  border: none;
 }
 </style>

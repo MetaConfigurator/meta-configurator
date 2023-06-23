@@ -71,7 +71,7 @@ const filters = ref<Record<string, string>>({});
         </div>
       </div>
     </template>
-    <Column field="name" header="Property" :sortable='true' expander>
+    <Column field="name" header="Property" :sortable="true" expander>
       <template #body="slotProps">
         <PropertyMetadata
           :metadata="slotProps.node.data"

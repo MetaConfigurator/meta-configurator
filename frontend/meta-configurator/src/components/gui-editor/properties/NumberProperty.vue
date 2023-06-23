@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
 
@@ -23,18 +23,18 @@ const valueProperty = computed({
 
 <template>
   <InputNumber
-    class='h-8'
-    v-model='valueProperty'
-    value='propertyName'
-    mode='decimal'
-    locale='en-US'
-    :minFractionDigits='0'
-    :maxFractionDigits='20'
+    class="h-8"
+    v-model="valueProperty"
+    value="propertyName"
+    mode="decimal"
+    locale="en-US"
+    :minFractionDigits="0"
+    :maxFractionDigits="20"
     showButtons
-    buttonLayout='stacked'
-    :step='0.1'
-    increment-button-class='p-button-text p-button-secondary'
-    decrement-button-class='p-button-text p-button-secondary' />
+    buttonLayout="stacked"
+    :step="0.1"
+    increment-button-class="p-button-text p-button-secondary"
+    decrement-button-class="p-button-text p-button-secondary" />
 </template>
 
 <style scoped>
