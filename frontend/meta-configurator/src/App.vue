@@ -4,10 +4,10 @@ import SideMenu from '@/components/side-menu/SideMenu.vue';
 import {SideMenuController} from '@/components/side-menu/SideMenu';
 import 'primeicons/primeicons.css';
 
-import SplitterPanel from "primevue/splitterpanel";
-import AceEditor from "@/components/code-editor/AceEditor.vue";
-import GuiEditorPanel from "@/components/gui-editor/JsonSchemaGuiEditorPanel.vue";
-import Splitter from "primevue/splitter";
+import SplitterPanel from 'primevue/splitterpanel';
+import AceEditor from '@/components/code-editor/AceEditor.vue';
+import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
+import Splitter from 'primevue/splitter';
 
 const currentFile = ref('config.yaml');
 
