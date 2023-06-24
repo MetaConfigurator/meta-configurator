@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type {VNode} from 'vue';
 import {h} from 'vue';
-import BooleanProperty from '@/components/gui-editor/properties/BooleanProperty.vue';
-import StringProperty from '@/components/gui-editor/properties/StringProperty.vue';
+import BooleanProperty from '@/components/gui_editor/properties/BooleanProperty.vue';
+import StringProperty from '@/components/gui_editor/properties/StringProperty.vue';
 import type {SchemaTreeNodeData} from '@/schema/SchemaTreeNodeResolver';
-import NumberProperty from '@/components/gui-editor/properties/NumberProperty.vue';
-import IntegerProperty from '@/components/gui-editor/properties/IntegerProperty.vue';
-import SimpleObjectProperty from '@/components/gui-editor/properties/SimpleObjectProperty.vue';
-import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayProperty.vue';
+import NumberProperty from '@/components/gui_editor/properties/NumberProperty.vue';
+import IntegerProperty from '@/components/gui_editor/properties/IntegerProperty.vue';
+import SimpleObjectProperty from '@/components/gui_editor/properties/SimpleObjectProperty.vue';
+import SimpleArrayProperty from '@/components/gui_editor/properties/SimpleArrayProperty.vue';
 
 const props = defineProps<{
   metadata: SchemaTreeNodeData;

@@ -10,17 +10,20 @@ import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 
 const store = dataStore();
-const {configData} = storeToRefs(store);
+const {configData, currentPath} = storeToRefs(store);
 const editor = ref();
 
 onMounted(() => {
+  // Set up editor mode to JSON and define theme
   editor.value = ace.edit('javascript-editor');
   editor.value.getSession().setMode('ace/mode/json');
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
+  // Feed config data from store into editor
   editor.value.setValue(JSON.stringify(store.configData, null, 2));
-  // listen to changes on AceEditor
+
+  // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
       store.configData = JSON.parse(editor.value.getValue());
@@ -28,25 +31,34 @@ onMounted(() => {
       /* empty */
     }
   });
-  // listen to changes on configData
+
+  // Listen to changes in store and update content accordingly
   watch(
     configData,
     newVal => {
       if (editor.value) {
-        const currEditorContent = editor.value.getValue();
-        const newEditorContent = JSON.stringify(newVal, null, 2);
-
-        if (currEditorContent !== newEditorContent) {
-          editor.value.setValue(newEditorContent);
-
-          editor.value.clearSelection();
-        }
+          updateEditorValue(newVal, store.currentPath)
       }
     },
     {deep: true}
   );
   editor.value.clearSelection();
 });
+
+function updateEditorValue(configData, currentPath: (string | number)[]) {
+    const currEditorContent = editor.value.getValue();
+    const newEditorContent = JSON.stringify(configData, null, 2);
+    if (currEditorContent !== newEditorContent) {
+        // Update value with new data and also update cursor position
+        editor.value.setValue(newEditorContent, determineCursorPosition(configData, currentPath));
+    }
+
+}
+
+function determineCursorPosition(configData, currentPath: (string | number)[]) {
+    // todo
+    return 1
+}
 </script>
 
 <template>
