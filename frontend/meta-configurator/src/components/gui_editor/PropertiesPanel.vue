@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
-import type {JsonSchema} from '@/schema/JsonSchema';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
+
+import type {JsonSchema} from '@/schema/JsonSchema';
 import PropertyComponent from '@/components/gui_editor/EditPropertyComponent.vue';
 import PropertyMetadata from '@/components/gui_editor/PropertyMetadata.vue';
 import {SchemaTreeNodeResolver} from '@/schema/SchemaTreeNodeResolver';
+import {GuiConstants} from "@/constants";
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -40,9 +42,7 @@ function updateData(subPath: Array<string | number>, newValue: any) {
   emit('update_data', completePath, newValue);
 }
 
-const DEPTH_LIMIT = 2;
-
-const treeNodeResolver = new SchemaTreeNodeResolver(() => props.currentData, DEPTH_LIMIT);
+const treeNodeResolver = new SchemaTreeNodeResolver(() => props.currentData, GuiConstants.DEPTH_LIMIT);
 
 const nodesToDisplay = computed(() => {
   return Object.entries(propertiesToDisplay.value).map(([key, value]) => {

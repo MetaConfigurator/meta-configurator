@@ -1,31 +1,12 @@
 import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
 import _ from 'lodash';
+
 import {pathToString} from '@/pathHelper';
+import { DEFAULT_CONFIG_DATA } from "@/defaults/DefaultConfigData";
 
 export const dataStore = defineStore('dataStore', () => {
-  const configData = ref({
-    name: 'testName',
-    firstName: 'testFirstName',
-    isMarried: true,
-    telephoneNumber: 152000,
-    heightInMeter: 1.7,
-    nickNames: [
-      {firstName: 'testNickName1', lastName: 'testLastName1'},
-      {firstName: 'testNickName2', lastName: 'testLastName2'},
-    ],
-    address: {
-      street: 'testStreet',
-      number: 12,
-      zipCode: 'testZip',
-      city: 'testCity',
-      country: 'testCountry',
-      moreInfo: {
-        info: 'testInfo',
-        neighborhood: 'testNH',
-      },
-    },
-  });
+  const configData = ref(DEFAULT_CONFIG_DATA);
 
   /**
    * The current path in the data tree.
