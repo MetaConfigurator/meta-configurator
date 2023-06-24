@@ -1,7 +1,7 @@
-import {JsonSchema} from '@/schema/model/JsonSchema';
-import type {SchemaTreeNode} from '@/schema/model/SchemaTreeNode';
+import {JsonSchema} from '@/model/JsonSchema';
+import type {ConfigTreeNode} from '@/model/ConfigTreeNode';
 
-export class SchemaTreeNodeResolver {
+export class ConfigTreeNodeResolver {
   private readonly depthLimit: number;
   private readonly configDataSupplier: () => any;
 
@@ -16,7 +16,7 @@ export class SchemaTreeNodeResolver {
     parentSchema: JsonSchema,
     depth = 0,
     subPath: Array<string | number> = []
-  ): SchemaTreeNode {
+  ): ConfigTreeNode {
     if (!schema) {
       throw new Error(`Schema for property ${name} is undefined`);
     }
@@ -43,8 +43,8 @@ export class SchemaTreeNodeResolver {
     schema: JsonSchema,
     depth = 0,
     subPath: Array<string | number> = []
-  ): SchemaTreeNode[] {
-    let children: SchemaTreeNode[] = [];
+  ): ConfigTreeNode[] {
+    let children: ConfigTreeNode[] = [];
     const path = subPath.concat(name);
     if (schema.hasType('object') && depth < this.depthLimit) {
       children = children.concat(

@@ -2,8 +2,8 @@ import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
 import _ from 'lodash';
 
-import {pathToString} from '@/pathHelper';
-import {DEFAULT_CONFIG_DATA} from '@/default-data/DefaultConfigData';
+import {pathToString} from '@/helpers/pathHelper';
+import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref(DEFAULT_CONFIG_DATA);

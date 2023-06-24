@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref, watch} from 'vue';
-import {dataStore} from '@/stores/dataStore';
+import {dataStore} from '@/store/dataStore';
 import {storeToRefs} from 'pinia';
 import * as ace from 'brace';
 import 'brace/mode/javascript';

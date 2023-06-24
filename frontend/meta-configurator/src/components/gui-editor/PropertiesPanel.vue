@@ -4,10 +4,10 @@ import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 
-import type {JsonSchema} from '@/schema/model/JsonSchema';
+import type {JsonSchema} from '@/model/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
-import {SchemaTreeNodeResolver} from '@/schema/SchemaTreeNodeResolver';
+import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import {GuiConstants} from '@/constants';
 
 const props = defineProps<{
@@ -22,7 +22,7 @@ const emit = defineEmits<{
   (e: 'update_data', path: Array<string | number>, newValue: any): void;
 }>();
 
-const treeNodeResolver = new SchemaTreeNodeResolver(
+const treeNodeResolver = new ConfigTreeNodeResolver(
   () => props.currentData,
   GuiConstants.DEPTH_LIMIT
 );
@@ -86,13 +86,13 @@ function updateData(subPath: Array<string | number>, newValue: any) {
     <Column field="name" header="Property" sortable="true" expander>
       <template #body="slotProps">
         <PropertyMetadata
-          :data="slotProps.node.data"
+          :nodeData="slotProps.node.data"
           @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
       </template>
     </Column>
     <Column field="data" header="Data">
       <template #body="slotProps">
-        <PropertyData :data="slotProps.node.data" @update_property_value="updateData" />
+        <PropertyData :nodeData="slotProps.node.data" @update_property_value="updateData" />
       </template>
     </Column>
   </TreeTable>

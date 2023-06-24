@@ -1,15 +1,15 @@
 import type {TreeNode} from 'primevue/tree';
-import {JsonSchema} from '@/schema/model/JsonSchema';
+import {JsonSchema} from '@/model/JsonSchema';
 
 /**
  * Represents a node in the schema tree.
  * Compatible with the PrimeVue TreeNode interface.
  */
-export interface SchemaTreeNode extends TreeNode {
-  data: SchemaTreeNodeData;
+export interface ConfigTreeNode extends TreeNode {
+  data: ConfigTreeNodeData;
 }
 
-export interface SchemaTreeNodeData {
+export interface ConfigTreeNodeData {
   name: string | number;
   schema: JsonSchema;
   parentSchema?: JsonSchema;

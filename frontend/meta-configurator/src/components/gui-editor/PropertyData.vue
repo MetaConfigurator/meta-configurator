@@ -2,7 +2,7 @@
 import type {VNode} from 'vue';
 import {h} from 'vue';
 
-import type {SchemaTreeNodeData} from '@/schema/model/SchemaTreeNode';
+import type {ConfigTreeNodeData} from '@/model/ConfigTreeNode';
 import BooleanProperty from '@/components/gui-editor/properties/BooleanProperty.vue';
 import StringProperty from '@/components/gui-editor/properties/StringProperty.vue';
 import NumberProperty from '@/components/gui-editor/properties/NumberProperty.vue';
@@ -11,7 +11,7 @@ import SimpleObjectProperty from '@/components/gui-editor/properties/SimpleObjec
 import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayProperty.vue';
 
 const props = defineProps<{
-  data: SchemaTreeNodeData;
+  nodeData: ConfigTreeNodeData;
 }>();
 
 const emit = defineEmits<{
@@ -20,29 +20,29 @@ const emit = defineEmits<{
 
 function resolveCorrespondingComponent(): VNode {
   const propsObject = {
-    propertyName: props.data.name,
-    propertyData: props.data.data,
-    propertySchema: props.data.schema,
+    propertyName: props.nodeData.name,
+    propertyData: props.nodeData.data,
+    propertySchema: props.nodeData.schema,
   };
-  if (props.data.schema.hasType('boolean')) {
+  if (props.nodeData.schema.hasType('boolean')) {
     return h(BooleanProperty, propsObject);
-  } else if (props.data.schema.hasType('string')) {
+  } else if (props.nodeData.schema.hasType('string')) {
     return h(StringProperty, propsObject);
-  } else if (props.data.schema.hasType('number')) {
+  } else if (props.nodeData.schema.hasType('number')) {
     return h(NumberProperty, propsObject);
-  } else if (props.data.schema.hasType('integer')) {
+  } else if (props.nodeData.schema.hasType('integer')) {
     return h(IntegerProperty, propsObject);
-  } else if (props.data.schema.hasType('object')) {
+  } else if (props.nodeData.schema.hasType('object')) {
     return h(SimpleObjectProperty, propsObject);
-  } else if (props.data.schema.hasType('array')) {
+  } else if (props.nodeData.schema.hasType('array')) {
     return h(SimpleArrayProperty, propsObject);
   }
 
-  return h('p', `Property ${props.data.name} with type ${props.data.schema.type} is not supported`);
+  return h('p', `Property ${props.nodeData.name} with type ${props.nodeData.schema.type} is not supported`);
 }
 
 function propagateUpdateEvent(newValue: any) {
-  emit('update_property_value', props.data.relativePath, newValue);
+  emit('update_property_value', props.nodeData.relativePath, newValue);
 }
 </script>
 
