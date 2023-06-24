@@ -38,7 +38,10 @@ function resolveCorrespondingComponent(): VNode {
     return h(SimpleArrayProperty, propsObject);
   }
 
-  return h('p', `Property ${props.nodeData.name} with type ${props.nodeData.schema.type} is not supported`);
+  return h(
+    'p',
+    `Property ${props.nodeData.name} with type ${props.nodeData.schema.type} is not supported`
+  );
 }
 
 function propagateUpdateEvent(newValue: any) {
