@@ -9,7 +9,7 @@ export const dataStore = defineStore('dataStore', () => {
   const configData = ref(DEFAULT_CONFIG_DATA);
 
   /**
-   * The current path in the data tree.
+   * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
    */
   const currentPath = ref<string[]>([]);
 

@@ -1,27 +1,11 @@
-import type {TreeNode} from 'primevue/tree';
-import {JsonSchema} from '@/schema/JsonSchema';
-
-/**
- * Represents a node in the schema tree.
- * Compatible with the PrimeVue TreeNode interface.
- */
-export interface SchemaTreeNode extends TreeNode {
-  data: SchemaTreeNodeData;
-}
-
-export interface SchemaTreeNodeData {
-  name: string | number;
-  schema: JsonSchema;
-  parentSchema?: JsonSchema;
-  data: any;
-  relativePath: (string | number)[];
-}
+import {JsonSchema} from '@/schema/model/JsonSchema';
+import type {SchemaTreeNode} from "@/schema/model/SchemaTreeNode";
 
 export class SchemaTreeNodeResolver {
   private readonly depthLimit: number;
   private readonly configDataSupplier: () => any;
 
-  constructor(configDataSupplier: () => any, depthLimit = 3) {
+  constructor(configDataSupplier: () => any, depthLimit: number) {
     this.configDataSupplier = configDataSupplier;
     this.depthLimit = depthLimit;
   }

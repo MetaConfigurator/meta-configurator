@@ -4,7 +4,7 @@ import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/model/JsonSchema';
 import PropertyComponent from '@/components/gui_editor/EditPropertyComponent.vue';
 import PropertyMetadata from '@/components/gui_editor/PropertyMetadata.vue';
 import {SchemaTreeNodeResolver} from '@/schema/SchemaTreeNodeResolver';

@@ -2,8 +2,8 @@ import {defineStore} from 'pinia';
 import {computed, ref} from 'vue';
 
 import {dataStore} from '@/stores/dataStore';
-import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
-import {JsonSchema} from '@/schema/JsonSchema';
+import {TopLevelJsonSchema} from '@/schema/model/TopLevelJsonSchema';
+import {JsonSchema} from '@/schema/model/JsonSchema';
 import {DEFAULT_SCHEMA} from "@/defaults/DefaultSchema";
 
 /**

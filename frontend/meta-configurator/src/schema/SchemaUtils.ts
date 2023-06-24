@@ -1,5 +1,5 @@
-import type {JsonSchemaType} from '@/schema/type';
-import {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchemaType} from '@/schema/model/JsonSchemaType';
+import {JsonSchema} from '@/schema/model/JsonSchema';
 
 /**
  * @returns the schema if it is not a boolean, otherwise
