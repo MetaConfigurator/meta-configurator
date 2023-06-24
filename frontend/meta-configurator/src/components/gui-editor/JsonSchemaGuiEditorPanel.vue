@@ -23,10 +23,10 @@ function expandPath(pathToAdd: Array<string | number>) {
 </script>
 
 <template>
-  <div class="border-x-2 border-gray-600 p-5 space-y-3">
+  <div class="p-5 space-y-3 h-full">
     <SchemaInfoPanel :schema="schemaStoreInstance.schema" />
     <SchemaBreadcrumb
-      :root-name="schemaStoreInstance.schema.title"
+      :root-name="schemaStoreInstance.schema.title ?? 'root'"
       :path="dataStoreInstance.currentPath"
       @update:path="newPath => updatePath(newPath)" />
     <PropertiesPanel

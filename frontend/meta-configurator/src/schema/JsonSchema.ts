@@ -659,10 +659,10 @@ export class JsonSchema {
 
   /**
    * @see https://json-schema.org/draft/2020-12/json-schema-validation.html#name-title-and-description
-   * @return {string} the title of this schema, or an empty string if not defined
+   * @return {string} the title of this schema
    */
-  get title(): string {
-    return this.jsonSchema?.title ?? '';
+  get title(): string | undefined {
+    return this.jsonSchema?.title;
   }
 
   /**
