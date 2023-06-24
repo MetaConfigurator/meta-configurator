@@ -5,7 +5,7 @@ import IconExpand from '@/components/icons/IconExpand.vue';
 import type {SchemaTreeNodeData} from '@/schema/model/SchemaTreeNode';
 
 const props = defineProps<{
-  metadata: SchemaTreeNodeData;
+  data: SchemaTreeNodeData;
 }>();
 
 const emit = defineEmits<{
@@ -13,21 +13,21 @@ const emit = defineEmits<{
 }>();
 
 function isExpandable(): boolean {
-  return props.metadata.schema.hasType('object') || props.metadata.schema.hasType('array');
+  return props.data.schema.hasType('object') || props.data.schema.hasType('array');
 }
 
 function zoomIntoPath() {
   if (isExpandable()) {
-    emit('zoom_into_path', props.metadata.relativePath);
+    emit('zoom_into_path', props.data.relativePath);
   }
 }
 </script>
 <template>
   <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="zoomIntoPath()">
-    {{ metadata.name }}
+    {{ data.name }}
   </span>
 
-  <span class="text-xs text-gray-400">:&nbsp;{{ metadata.schema.type.join(',') }}</span>
+  <span class="text-xs text-gray-400">:&nbsp;{{ data.schema.type.join(',') }}</span>
 
   <!-- "zoom in" icon -->
   <div class="flex flex-row w-full justify-end mr-5">

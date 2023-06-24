@@ -21,7 +21,7 @@ onMounted(() => {
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  editor.value.setValue(JSON.stringify(store.configData, null, 2));
+  updateEditorValue(store.configData, store.currentPath);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
@@ -37,27 +37,41 @@ onMounted(() => {
     configData,
     newVal => {
       if (editor.value) {
-          updateEditorValue(newVal, store.currentPath)
+        updateEditorValue(newVal, store.currentPath);
       }
     },
     {deep: true}
   );
-  editor.value.clearSelection();
+  // Listen to changes in current path and update cursor accordingly
+  watch(
+    currentPath,
+    newVal => {
+      if (editor.value) {
+        updateSelectedPath(newVal, store.currentPath);
+      }
+    },
+    {deep: true}
+  );
 });
 
 function updateEditorValue(configData, currentPath: (string | number)[]) {
-    const currEditorContent = editor.value.getValue();
-    const newEditorContent = JSON.stringify(configData, null, 2);
-    if (currEditorContent !== newEditorContent) {
-        // Update value with new data and also update cursor position
-        editor.value.setValue(newEditorContent, determineCursorPosition(configData, currentPath));
-    }
-
+  const currEditorContent = editor.value.getValue();
+  const newEditorContent = JSON.stringify(configData, null, 2);
+  if (currEditorContent !== newEditorContent) {
+    // Update value with new data and also update cursor position
+    editor.value.setValue(newEditorContent);
+    updateSelectedPath(configData, currentPath);
+  }
 }
 
-function determineCursorPosition(configData, currentPath: (string | number)[]) {
-    // todo
-    return 1
+function updateSelectedPath(configData, currentPath: (string | number)[]) {
+  let line = determineCursorLine(configData, currentPath);
+  editor.value.gotoLine(line);
+}
+
+function determineCursorLine(configData, currentPath: (string | number)[]): number {
+  // todo: implement
+  return 3;
 }
 </script>
 

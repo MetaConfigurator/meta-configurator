@@ -1,3 +1,3 @@
 export const GuiConstants = {
-    DEPTH_LIMIT: 2
+  DEPTH_LIMIT: 2,
 };

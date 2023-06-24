@@ -3,7 +3,7 @@ import {defineStore} from 'pinia';
 import _ from 'lodash';
 
 import {pathToString} from '@/pathHelper';
-import { DEFAULT_CONFIG_DATA } from "@/default_data/DefaultConfigData";
+import {DEFAULT_CONFIG_DATA} from '@/default-data/DefaultConfigData';
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref(DEFAULT_CONFIG_DATA);

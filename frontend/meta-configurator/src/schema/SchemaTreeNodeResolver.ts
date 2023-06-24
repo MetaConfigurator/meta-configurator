@@ -1,5 +1,5 @@
 import {JsonSchema} from '@/schema/model/JsonSchema';
-import type {SchemaTreeNode} from "@/schema/model/SchemaTreeNode";
+import type {SchemaTreeNode} from '@/schema/model/SchemaTreeNode';
 
 export class SchemaTreeNodeResolver {
   private readonly depthLimit: number;
