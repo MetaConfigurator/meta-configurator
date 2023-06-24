@@ -3,7 +3,7 @@ import {defineStore} from 'pinia';
 import _ from 'lodash';
 
 import {pathToString} from '@/pathHelper';
-import { DEFAULT_CONFIG_DATA } from "@/defaults/DefaultConfigData";
+import { DEFAULT_CONFIG_DATA } from "@/default_data/DefaultConfigData";
 
 export const dataStore = defineStore('dataStore', () => {
   const configData = ref(DEFAULT_CONFIG_DATA);
@@ -11,7 +11,7 @@ export const dataStore = defineStore('dataStore', () => {
   /**
    * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
    */
-  const currentPath = ref<string[]>([]);
+  const currentPath = ref<(string | number)[]>([]);
 
   /**
    * Returns the data at the given path.

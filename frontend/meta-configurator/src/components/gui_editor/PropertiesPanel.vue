@@ -18,7 +18,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update_current_path', new_path: Array<string | number>): void;
-  (e: 'expand_current_path', path_to_add: Array<string | number>): void;
+  (e: 'zoom_into_path', path_to_add: Array<string | number>): void;
   (e: 'update_data', path: Array<string | number>, newValue: any): void;
 }>();
 
@@ -84,7 +84,7 @@ const filters = ref<Record<string, string>>({});
       <template #body="slotProps">
         <PropertyMetadata
           :metadata="slotProps.node.data"
-          @expand_current_path="path_to_add => $emit('expand_current_path', path_to_add)" />
+          @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
       </template>
     </Column>
     <Column field="data" header="Data">

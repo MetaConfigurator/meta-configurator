@@ -2,28 +2,28 @@
 
 <script setup lang="ts">
 import IconExpand from '@/components/icons/IconExpand.vue';
-import type {SchemaTreeNodeData} from '@/schema/SchemaTreeNodeResolver';
+import type {SchemaTreeNodeData} from '@/schema/model/SchemaTreeNode';
 
 const props = defineProps<{
   metadata: SchemaTreeNodeData;
 }>();
 
 const emit = defineEmits<{
-  (e: 'expand_current_path', path_to_add: Array<string | number>): void;
+  (e: 'zoom_into_path', path_to_add: Array<string | number>): void;
 }>();
 
 function isExpandable(): boolean {
   return props.metadata.schema.hasType('object') || props.metadata.schema.hasType('array');
 }
 
-function expandCurrentPath() {
+function zoomIntoPath() {
   if (isExpandable()) {
-    emit('expand_current_path', props.metadata.relativePath);
+    emit('zoom_into_path', props.metadata.relativePath);
   }
 }
 </script>
 <template>
-  <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="expandCurrentPath()">
+  <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="zoomIntoPath()">
     {{ metadata.name }}
   </span>
 
@@ -34,7 +34,7 @@ function expandCurrentPath() {
     <IconExpand
       class="text-gray-700 hover:scale-110 h-5"
       v-if="isExpandable()"
-      @click="expandCurrentPath()" />
+      @click="zoomIntoPath()" />
   </div>
 </template>
 

@@ -3,7 +3,7 @@ import type {VNode} from 'vue';
 import {h} from 'vue';
 import BooleanProperty from '@/components/gui_editor/properties/BooleanProperty.vue';
 import StringProperty from '@/components/gui_editor/properties/StringProperty.vue';
-import type {SchemaTreeNodeData} from '@/schema/SchemaTreeNodeResolver';
+import type {SchemaTreeNodeData} from '@/schema/model/SchemaTreeNode';
 import NumberProperty from '@/components/gui_editor/properties/NumberProperty.vue';
 import IntegerProperty from '@/components/gui_editor/properties/IntegerProperty.vue';
 import SimpleObjectProperty from '@/components/gui_editor/properties/SimpleObjectProperty.vue';

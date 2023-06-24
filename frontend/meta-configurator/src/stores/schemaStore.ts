@@ -4,7 +4,7 @@ import {computed, ref} from 'vue';
 import {dataStore} from '@/stores/dataStore';
 import {TopLevelJsonSchema} from '@/schema/model/TopLevelJsonSchema';
 import {JsonSchema} from '@/schema/model/JsonSchema';
-import {DEFAULT_SCHEMA} from "@/defaults/DefaultSchema";
+import {DEFAULT_SCHEMA} from "@/default_data/DefaultSchema";
 
 /**
  * The store for the active editor schema.
