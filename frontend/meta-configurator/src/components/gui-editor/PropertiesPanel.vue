@@ -20,11 +20,16 @@ const emit = defineEmits<{
   (e: 'update_data', path: Array<string | number>, newValue: any): void;
 }>();
 
-const propertiesToDisplay: ref<Record<string, JsonSchema>> = computed(() => {
+function isArray(): boolean {
+  return props.currentSchema.hasType('array') && Array.isArray(props.currentData);
+}
+
+const propertiesToDisplay: ref<Record<string | number, JsonSchema>> = computed(() => {
+  // TODO this logic should be part of the TreeNodeResolver.
   // TODO: consider properties of data, i.e., additionalProperties, patternProperties.
-  if (props.currentSchema.hasType('array') && Array.isArray(props.currentData)) {
+  if (isArray()) {
     return Object.fromEntries(
-      props.currentData.map((_, index) => [index, props.currentSchema.items])
+      props.currentData.map((_, index: number) => [index, props.currentSchema.items])
     );
   }
   return props.currentSchema.properties;
@@ -40,9 +45,13 @@ const DEPTH_LIMIT = 2;
 const treeNodeResolver = new SchemaTreeNodeResolver(() => props.currentData, DEPTH_LIMIT);
 
 const nodesToDisplay = computed(() => {
-  return Object.entries(propertiesToDisplay.value).map(([key, value]) =>
-    treeNodeResolver.createTreeNodeOfProperty(key, value, props.currentSchema)
-  );
+  return Object.entries(propertiesToDisplay.value).map(([key, value]) => {
+    if (isArray()) {
+      // cast is required because record properties are always interpreted as strings
+      return treeNodeResolver.createTreeNodeOfProperty(Number(key), value, props.currentSchema);
+    }
+    return treeNodeResolver.createTreeNodeOfProperty(key, value, props.currentSchema);
+  });
 });
 
 const filters = ref<Record<string, string>>({});

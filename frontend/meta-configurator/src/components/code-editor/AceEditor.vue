@@ -50,7 +50,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-amber-300 h-screen" id="javascript-editor"></div>
+  <div class="h-full" id="javascript-editor"></div>
 </template>
 
 <style scoped></style>
