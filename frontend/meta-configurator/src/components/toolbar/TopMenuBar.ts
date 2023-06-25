@@ -8,6 +8,7 @@ export class TopMenuBar {
 
   get fileEditorMenuItems() {
     return [
+
       {
         label: 'File',
         icon: 'pi pi-fw pi-file',
@@ -31,6 +32,23 @@ export class TopMenuBar {
             icon: 'pi pi-fw pi-external-link',
             command: this.onMenuItemClicked,
           },
+          {
+            label: 'Select Config Language',
+            icon: 'pi pi-fw pi-user-edit',
+            class: 'z-10',
+            items: [
+              {
+                label: 'JSON',
+                icon: 'pi pi-fw pi-code',
+                command: this.onMenuItemClicked,
+              },
+              {
+                label: 'YAML',
+                icon: 'pi pi-fw pi-code',
+                command: this.onMenuItemClicked,
+              },
+            ],
+          },
         ],
       },
       {
@@ -50,6 +68,7 @@ export class TopMenuBar {
           },
         ],
       },
+
       {
         label: 'View',
         icon: 'pi pi-fw pi-eye',
