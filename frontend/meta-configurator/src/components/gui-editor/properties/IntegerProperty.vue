@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
+import InputNumber from 'primevue/inputnumber';
 
 const props = defineProps<{
   propertyName: string;
@@ -27,7 +27,20 @@ const valueProperty = computed({
     v-model="valueProperty"
     value="propertyName"
     input-id="integeronly"
-    :use-grouping="false" />
+    locale="us"
+    :use-grouping="false"
+    showButtons
+    buttonLayout="stacked"
+    :step="1"
+    increment-button-class="p-button-text p-button-secondary"
+    decrement-button-class="p-button-text p-button-secondary" />
 </template>
 
-<style scoped></style>
+<style scoped>
+/* remove the border so it better fits to the table look,
+   remove the box shadow, otherwise it looks buggy */
+:deep(.p-inputtext) {
+  border: none !important;
+  box-shadow: none !important;
+}
+</style>

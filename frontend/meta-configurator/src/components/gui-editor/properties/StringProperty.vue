@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import InputText from 'primevue/inputtext';
 import {computed} from 'vue';
+import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
   propertyName: string;
@@ -8,7 +8,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'update_property_value', newValue: string): void;
+  (e: 'update_property_value', newValue: string | undefined): void;
 }>();
 
 const valueProperty = computed({
@@ -22,7 +22,12 @@ const valueProperty = computed({
 </script>
 
 <template>
-  <InputText class="h-8" type="text" v-model="valueProperty"></InputText>
+  <InputText :class="$style.tableInput" class="h-8" v-model="valueProperty"></InputText>
 </template>
 
-<style scoped></style>
+<style module>
+/* remove border so it fits the look of the table better */
+.tableInput {
+  border: none;
+}
+</style>

@@ -1,33 +1,17 @@
 import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
 import _ from 'lodash';
-import {pathToString} from '@/pathHelper';
+
+import {pathToString} from '@/helpers/pathHelper';
+import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
 
 export const dataStore = defineStore('dataStore', () => {
-  const configData = ref({
-    name: 'testName',
-    firstName: 'testFirstName',
-    isMarried: true,
-    telephoneNumber: 152000,
-    heightInMeter: 1.7,
-    nickNames: ['test1', 'test2'],
-    address: {
-      street: 'testStreet',
-      number: 12,
-      zipCode: 'testZip',
-      city: 'testCity',
-      country: 'testCountry',
-      moreInfo: {
-        info: 'testInfo',
-        neighborhood: 'testNH',
-      },
-    },
-  });
+  const configData = ref(DEFAULT_CONFIG_DATA);
 
   /**
-   * The current path in the data tree.
+   * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
    */
-  const currentPath = ref<string[]>([]);
+  const currentPath = ref<(string | number)[]>([]);
 
   /**
    * Returns the data at the given path.

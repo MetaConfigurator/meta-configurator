@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/model/JsonSchema';
 
 const props = defineProps<{
   propertyName: string;
@@ -8,7 +8,6 @@ const props = defineProps<{
 }>();
 
 function getNumberOfProperties(): number {
-  console.log(props.propertyData);
   return Math.max(
     Object.keys(props.propertyData).length,
     Object.keys(props.propertySchema.properties).length
@@ -16,7 +15,7 @@ function getNumberOfProperties(): number {
 }
 </script>
 <template>
-  <p class="text-gray-400 font-extralight">{{ getNumberOfProperties() }} properties</p>
+  <p class="pl-2 text-gray-400 font-extralight">{{ getNumberOfProperties() }} properties</p>
 </template>
 
 <style scoped></style>

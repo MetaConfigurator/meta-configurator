@@ -27,8 +27,21 @@ const valueProperty = computed({
     v-model="valueProperty"
     value="propertyName"
     mode="decimal"
-    minFractionDigits="0"
-    maxFractionDigits="20" />
+    locale="en-US"
+    :minFractionDigits="0"
+    :maxFractionDigits="20"
+    showButtons
+    buttonLayout="stacked"
+    :step="0.1"
+    increment-button-class="p-button-text p-button-secondary"
+    decrement-button-class="p-button-text p-button-secondary" />
 </template>
 
-<style scoped></style>
+<style scoped>
+/* remove the border so it better fits to the table look,
+   remove the box shadow, otherwise it looks buggy */
+:deep(.p-inputtext) {
+  border: none !important;
+  box-shadow: none !important;
+}
+</style>
