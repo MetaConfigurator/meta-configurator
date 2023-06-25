@@ -57,7 +57,7 @@ export class TopMenuBar {
         items: [
           {
             label: 'Flip order',
-            icon: 'pi pi-fw pi-align-left',
+            icon: 'pi pi-fw pi-arrows-h',
             key: 'toggle-order',
             command: this.onMenuItemClicked,
           },
