@@ -10,10 +10,11 @@ import {DEFAULT_SCHEMA} from '@/data/DefaultSchema';
  */
 export const schemaStore = defineStore('schemaStore', () => {
   const schema: Ref<any> = ref<TopLevelJsonSchema>(new TopLevelJsonSchema(DEFAULT_SCHEMA));
-  const metaSchema = ref(fetch('../../resources/json-schema/schema.json')
-    .then((response) => response.json()));
+  const metaSchema = ref(
+    fetch('../../resources/json-schema/schema.json').then(response => response.json())
+  );
   return {
     schema,
-    metaSchema
+    metaSchema,
   };
 });

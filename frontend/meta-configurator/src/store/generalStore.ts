@@ -75,5 +75,5 @@ export const generalStore = defineStore('generalStore', () => {
       () => schemaToDisplay.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
     ),
     updateDataAtPath,
-  }
+  };
 });
