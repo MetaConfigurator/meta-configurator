@@ -1,4 +1,3 @@
-import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
 import {dataStore} from '@/store/dataStore';
@@ -9,17 +8,18 @@ import {JsonSchema} from '@/model/JsonSchema';
 import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 
 export const generalStore = defineStore('generalStore', () => {
+
   const currentPage = ref('file');
 
-  const dataToDisplay: Ref<any> = getDataToDisplay();
-  const schemaToDisplay: Ref<TopLevelJsonSchema> = getSchemaToDisplay();
+  const dataToDisplay = computed(() => getDataToDisplay());
+  const schemaToDisplay = computed(() => getSchemaToDisplay());
 
   /**
    * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
    */
   const currentPath = ref<(string | number)[]>([]);
 
-  function getDataToDisplay(): Ref<any> {
+  function getDataToDisplay() {
     if (currentPage.value === 'file') {
       return dataStore().configData;
     } else if (currentPage.value === 'schema') {
@@ -27,18 +27,18 @@ export const generalStore = defineStore('generalStore', () => {
     } else if (currentPage.value === 'settings') {
       // use settingsStore
     }
-    return ref({});
+    return {};
   }
 
-  function getSchemaToDisplay() {
+  function getSchemaToDisplay(): TopLevelJsonSchema {
     if (currentPage.value === 'file') {
-      return schemaStore().schema;
+      return schemaStore().schema as TopLevelJsonSchema;
     } else if (currentPage.value === 'schema') {
-      return schemaStore().metaSchema;
+      return schemaStore().metaSchema as TopLevelJsonSchema;
     } else if (currentPage.value === 'settings') {
       // use settingsStore
     }
-    return ref({});
+    return new TopLevelJsonSchema({});
   }
 
   /**
@@ -48,7 +48,7 @@ export const generalStore = defineStore('generalStore', () => {
    * @todo consider using lodash
    */
   function dataAtPath(path: (string | number)[]): any {
-    let currentData: any = dataToDisplay;
+    let currentData: any = dataToDisplay.value;
 
     for (const key of path) {
       if (!currentData[key]) {
@@ -62,7 +62,7 @@ export const generalStore = defineStore('generalStore', () => {
 
   function updateDataAtPath(path: (string | number)[], newValue: any) {
     const pathAsString = pathToString(path);
-    _.set(dataToDisplay.value, pathAsString!!, newValue);
+    _.set(dataToDisplay, pathAsString!!, newValue);
   }
   return {
     currentPage,
