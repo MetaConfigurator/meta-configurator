@@ -53,7 +53,7 @@ function propagateUpdateEvent(newValue: any) {
   <Component
     class="truncate"
     :is="resolveCorrespondingComponent()"
-    @update_property_value="newValue => propagateUpdateEvent(newValue)" />
+    @update_property_value="(newValue: any) => propagateUpdateEvent(newValue)" />
 </template>
 
 <style scoped></style>

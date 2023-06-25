@@ -15,7 +15,7 @@ function getNumberOfProperties(): number {
 }
 </script>
 <template>
-  <p class="text-gray-400 font-extralight">{{ getNumberOfProperties() }} properties</p>
+  <p class="pl-2 text-gray-400 font-extralight">{{ getNumberOfProperties() }} properties</p>
 </template>
 
 <style scoped></style>
