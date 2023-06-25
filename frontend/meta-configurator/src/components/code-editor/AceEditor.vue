@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {onMounted, ref, watch} from 'vue';
-import {dataStore} from '@/store/dataStore';
 import {storeToRefs} from 'pinia';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
@@ -8,8 +7,9 @@ import 'brace/mode/json';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
+import {generalStore} from '@/store/generalStore';
 
-const store = dataStore();
+const store = generalStore();
 const {configData, currentPath} = storeToRefs(store);
 const editor = ref();
 
@@ -21,12 +21,12 @@ onMounted(() => {
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  updateEditorValue(store.configData, store.currentPath);
+  updateEditorValue(store.dataToDisplay, store.currentPath);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      store.configData = JSON.parse(editor.value.getValue());
+      store.dataToDisplay = JSON.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }

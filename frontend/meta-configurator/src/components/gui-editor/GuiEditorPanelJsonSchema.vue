@@ -1,37 +1,35 @@
 <script setup lang="ts">
-import {schemaStore} from '@/store/schemaStore';
 import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump.vue';
-import {dataStore} from '@/store/dataStore';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
+import {generalStore} from '@/store/generalStore';
 
-const schemaStoreInstance = schemaStore();
-const dataStoreInstance = dataStore();
+const generalStoreInstance = generalStore();
 
 function updatePath(newPath: (string | number)[]) {
-  dataStoreInstance.$patch({currentPath: newPath});
+  generalStoreInstance.$patch({currentPath: newPath});
 }
 
 function updateData(path: (string | number)[], newValue: any) {
-  dataStoreInstance.updateDataAtPath(path, newValue);
+  generalStoreInstance.updateDataAtPath(path, newValue);
 }
 
 function zoomIntoPath(pathToAdd: Array<string | number>) {
-  dataStoreInstance.$patch(state => (state.currentPath = state.currentPath.concat(pathToAdd)));
+  generalStoreInstance.$patch(state => (state.currentPath = state.currentPath.concat(pathToAdd)));
 }
 </script>
 
 <template>
   <div class="p-5 space-y-3 h-full">
-    <SchemaInfoPanel :schema="schemaStoreInstance.schema" />
+    <SchemaInfoPanel :schema="generalStoreInstance.schemaToDisplay" />
     <CurrentPathBreadcrumb
-      :root-name="schemaStoreInstance.schema.title ?? 'root'"
-      :path="dataStoreInstance.currentPath"
+      :root-name="generalStoreInstance.schemaToDisplay.title ?? 'root'"
+      :path="generalStoreInstance.currentPath"
       @update:path="newPath => updatePath(newPath)" />
     <PropertiesPanel
-      :current-schema="schemaStoreInstance.schemaAtCurrentPath"
-      :current-path="dataStoreInstance.currentPath"
-      :current-data="dataStoreInstance.dataAtCurrentPath"
+      :current-schema="generalStoreInstance.schemaAtCurrentPath"
+      :current-path="generalStoreInstance.currentPath"
+      :current-data="generalStoreInstance.dataToDisplay"
       @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
       @update_data="updateData" />
   </div>

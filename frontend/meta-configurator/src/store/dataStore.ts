@@ -1,4 +1,5 @@
-import {computed, ref} from 'vue';
+import type {Ref} from 'vue';
+import {ref} from 'vue';
 import {defineStore} from 'pinia';
 import _ from 'lodash';
 
@@ -6,12 +7,7 @@ import {pathToString} from '@/helpers/pathHelper';
 import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
 
 export const dataStore = defineStore('dataStore', () => {
-  const configData = ref(DEFAULT_CONFIG_DATA);
-
-  /**
-   * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
-   */
-  const currentPath = ref<(string | number)[]>([]);
+  const configData: Ref<any> = ref(DEFAULT_CONFIG_DATA);
 
   /**
    * Returns the data at the given path.
@@ -40,8 +36,6 @@ export const dataStore = defineStore('dataStore', () => {
   return {
     configData,
     dataAtPath,
-    currentPath,
-    dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     updateDataAtPath,
   };
 });
