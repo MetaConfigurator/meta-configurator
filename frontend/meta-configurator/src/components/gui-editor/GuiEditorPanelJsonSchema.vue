@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import {schemaStore} from '@/stores/schemaStore';
+import {schemaStore} from '@/store/schemaStore';
 import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
-import SchemaBreadcrumb from '@/components/gui-editor/SchemaBreadcrumb.vue';
-import {dataStore} from '@/stores/dataStore';
+import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump.vue';
+import {dataStore} from '@/store/dataStore';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 
 const schemaStoreInstance = schemaStore();
-
 const dataStoreInstance = dataStore();
 
-function updatePath(newPath: string[]) {
+function updatePath(newPath: (string | number)[]) {
   dataStoreInstance.$patch({currentPath: newPath});
 }
 
@@ -17,7 +16,7 @@ function updateData(path: (string | number)[], newValue: any) {
   dataStoreInstance.updateDataAtPath(path, newValue);
 }
 
-function expandPath(pathToAdd: Array<string | number>) {
+function zoomIntoPath(pathToAdd: Array<string | number>) {
   dataStoreInstance.$patch(state => (state.currentPath = state.currentPath.concat(pathToAdd)));
 }
 </script>
@@ -25,7 +24,7 @@ function expandPath(pathToAdd: Array<string | number>) {
 <template>
   <div class="p-5 space-y-3 h-full">
     <SchemaInfoPanel :schema="schemaStoreInstance.schema" />
-    <SchemaBreadcrumb
+    <CurrentPathBreadcrumb
       :root-name="schemaStoreInstance.schema.title ?? 'root'"
       :path="dataStoreInstance.currentPath"
       @update:path="newPath => updatePath(newPath)" />
@@ -33,7 +32,7 @@ function expandPath(pathToAdd: Array<string | number>) {
       :current-schema="schemaStoreInstance.schemaAtCurrentPath"
       :current-path="dataStoreInstance.currentPath"
       :current-data="dataStoreInstance.dataAtCurrentPath"
-      @expand_current_path="pathToAdd => expandPath(pathToAdd)"
+      @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
       @update_data="updateData" />
   </div>
 </template>

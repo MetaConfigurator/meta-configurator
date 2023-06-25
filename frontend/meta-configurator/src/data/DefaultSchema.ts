@@ -1,24 +1,6 @@
-import {defineStore} from 'pinia';
-import {computed, ref} from 'vue';
-import {dataStore} from '@/stores/dataStore';
-import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
-import {JsonSchema} from '@/schema/JsonSchema';
+import type {TopLevelSchema} from '@/model/JsonSchemaType';
 
-/**
- * The store for the applied editor schema.
- */
-export const schemaStore = defineStore('schemaStore', () => {
-  const schema = ref(exampleSchema);
-
-  return {
-    schema,
-    schemaAtCurrentPath: computed(
-      () => schema.value.subSchemaAt(dataStore().currentPath) ?? new JsonSchema({})
-    ),
-  };
-});
-
-const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
+export const DEFAULT_SCHEMA: TopLevelSchema = {
   type: 'object',
   title: 'Person',
   description: 'A person schema',
@@ -113,4 +95,4 @@ const exampleSchema: TopLevelJsonSchema = new TopLevelJsonSchema({
       },
     },
   },
-});
+};

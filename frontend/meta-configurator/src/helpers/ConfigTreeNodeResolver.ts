@@ -1,27 +1,11 @@
-import type {TreeNode} from 'primevue/tree';
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/model/JsonSchema';
+import type {ConfigTreeNode} from '@/model/ConfigTreeNode';
 
-/**
- * Represents a node in the schema tree.
- * Compatible with the PrimeVue TreeNode interface.
- */
-export interface SchemaTreeNode extends TreeNode {
-  data: SchemaTreeNodeData;
-}
-
-export interface SchemaTreeNodeData {
-  name: string | number;
-  schema: JsonSchema;
-  parentSchema?: JsonSchema;
-  data: any;
-  relativePath: (string | number)[];
-}
-
-export class SchemaTreeNodeResolver {
+export class ConfigTreeNodeResolver {
   private readonly depthLimit: number;
   private readonly configDataSupplier: () => any;
 
-  constructor(configDataSupplier: () => any, depthLimit = 3) {
+  constructor(configDataSupplier: () => any, depthLimit: number) {
     this.configDataSupplier = configDataSupplier;
     this.depthLimit = depthLimit;
   }
@@ -32,7 +16,7 @@ export class SchemaTreeNodeResolver {
     parentSchema: JsonSchema,
     depth = 0,
     subPath: Array<string | number> = []
-  ): SchemaTreeNode {
+  ): ConfigTreeNode {
     if (!schema) {
       throw new Error(`Schema for property ${name} is undefined`);
     }
@@ -59,8 +43,8 @@ export class SchemaTreeNodeResolver {
     schema: JsonSchema,
     depth = 0,
     subPath: Array<string | number> = []
-  ): SchemaTreeNode[] {
-    let children: SchemaTreeNode[] = [];
+  ): ConfigTreeNode[] {
+    let children: ConfigTreeNode[] = [];
     const path = subPath.concat(name);
     if (schema.hasType('object') && depth < this.depthLimit) {
       children = children.concat(

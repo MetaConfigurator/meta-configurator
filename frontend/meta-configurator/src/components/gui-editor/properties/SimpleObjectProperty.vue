@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/model/JsonSchema';
 
 const props = defineProps<{
   propertyName: string;
