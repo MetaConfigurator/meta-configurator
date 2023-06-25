@@ -8,7 +8,6 @@ export class TopMenuBar {
 
   get fileEditorMenuItems() {
     return [
-
       {
         label: 'File',
         icon: 'pi pi-fw pi-file',
