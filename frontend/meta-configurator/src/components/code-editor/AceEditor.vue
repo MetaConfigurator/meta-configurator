@@ -10,7 +10,7 @@ import 'brace/theme/monokai';
 import {generalStore} from '@/store/generalStore';
 
 const store = generalStore();
-const {configData, currentPath} = storeToRefs(store);
+const {dataToDisplay, currentPath} = storeToRefs(store);
 const editor = ref();
 
 onMounted(() => {
@@ -21,12 +21,12 @@ onMounted(() => {
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  updateEditorValue(store.dataToDisplay, store.currentPath);
+  updateEditorValue(dataToDisplay.value, store.currentPath);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      store.dataToDisplay = JSON.parse(editor.value.getValue());
+      dataToDisplay.value = JSON.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }
@@ -34,7 +34,7 @@ onMounted(() => {
 
   // Listen to changes in store and update content accordingly
   watch(
-    configData,
+    dataToDisplay,
     newVal => {
       if (editor.value) {
         updateEditorValue(newVal, store.currentPath);
