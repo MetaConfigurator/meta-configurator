@@ -4,6 +4,7 @@ import SideMenu from '@/components/side-menu/SideMenu.vue';
 import {SideMenuController} from '@/components/side-menu/SideMenu';
 import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
 import AceEditor from '@/components/code-editor/AceEditor.vue';
+import SettingPage from "@/SettingPage.vue";
 
 const currentFile = ref('config.yaml');
 
@@ -38,6 +39,7 @@ const currentTitle = computed(
 
       <template v-else-if="sideMenuController.selectedItem.path === '/setting'">
         <!-- Content for the 'Settings' menu item -->
+        <SettingPage></SettingPage>
       </template>
 
       <template v-else>
