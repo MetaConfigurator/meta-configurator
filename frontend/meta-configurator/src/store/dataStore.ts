@@ -30,7 +30,7 @@ export const dataStore = defineStore('dataStore', () => {
 
   function updateDataAtPath(path: (string | number)[], newValue: any) {
     const pathAsString = pathToString(path);
-    _.set(configData.value, pathAsString ?? "", newValue);
+    _.set(configData.value, pathAsString ?? '', newValue);
   }
 
   return {

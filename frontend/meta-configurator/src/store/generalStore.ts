@@ -8,7 +8,6 @@ import {JsonSchema} from '@/model/JsonSchema';
 import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 
 export const generalStore = defineStore('generalStore', () => {
-
   const currentPage = ref('file');
 
   const dataToDisplay = computed(() => getDataToDisplay());
@@ -75,5 +74,5 @@ export const generalStore = defineStore('generalStore', () => {
       () => schemaToDisplay.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
     ),
     updateDataAtPath,
-  }
+  };
 });

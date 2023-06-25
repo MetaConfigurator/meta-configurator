@@ -12,12 +12,11 @@ export const schemaStore = defineStore('schemaStore', () => {
   const metaSchema = ref(new TopLevelJsonSchema({}));
 
   fetch('../../resources/json-schema/schema.json')
-    .then((response) => response.json())
-    .then((json) => new TopLevelJsonSchema(json))
-    .then((schema) => metaSchema.value = schema);
-
+    .then(response => response.json())
+    .then(json => new TopLevelJsonSchema(json))
+    .then(schema => (metaSchema.value = schema));
   return {
     schema,
-    metaSchema
+    metaSchema,
   };
 });
