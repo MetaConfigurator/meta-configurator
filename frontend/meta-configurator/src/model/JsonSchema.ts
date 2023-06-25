@@ -11,7 +11,7 @@ import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/h
  *       "if", "then", "else" and other properties that can contain a schema are handled.
  */
 export class JsonSchema {
-  private readonly jsonSchema?;
+  readonly jsonSchema?;
   private _additionalProperties?: JsonSchema;
   private _allOf?: JsonSchema[];
   private _anyOf?: JsonSchema[];

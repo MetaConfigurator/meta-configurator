@@ -10,7 +10,9 @@ import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 export const generalStore = defineStore('generalStore', () => {
   const currentPage = ref('file');
 
-  const dataToDisplay = computed(() => getDataToDisplay());
+  const dataToDisplay = computed(({
+    get: () => getDataToDisplay(),
+    set: (newValue) => setDataToDisplay(newValue)}));
   const schemaToDisplay = computed(() => getSchemaToDisplay());
 
   /**
@@ -22,11 +24,22 @@ export const generalStore = defineStore('generalStore', () => {
     if (currentPage.value === 'file') {
       return dataStore().configData;
     } else if (currentPage.value === 'schema') {
-      return schemaStore().schema;
+      console.log("Tschema", schemaStore().schema);
+      return schemaStore().schema.jsonSchema ?? {};
     } else if (currentPage.value === 'settings') {
       // use settingsStore
     }
     return {};
+  }
+
+  function setDataToDisplay(newValue: any) {
+    if (currentPage.value === 'file') {
+      dataStore().configData = newValue;
+    } else if (currentPage.value === 'schema') {
+      schemaStore().schema = new TopLevelJsonSchema(newValue);
+    } else if (currentPage.value === 'settings') {
+      // use settingsStore
+    }
   }
 
   function getSchemaToDisplay(): TopLevelJsonSchema {
