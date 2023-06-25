@@ -4,7 +4,7 @@ import SideMenu from '@/components/side-menu/SideMenu.vue';
 import {SideMenuController} from '@/components/side-menu/SideMenu';
 import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
 import AceEditor from '@/components/code-editor/AceEditor.vue';
-import SettingPage from "@/SettingPage.vue";
+import SettingPage from '@/SettingPage.vue';
 
 const currentFile = ref('config.yaml');
 

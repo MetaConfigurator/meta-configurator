@@ -1,15 +1,15 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import HomePage from '@/HomePage.vue';
-import SettingPage from "@/SettingPage.vue";
+import SettingPage from '@/SettingPage.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: HomePage,
-    meta:{
-      title:"Home",
-    }
+    meta: {
+      title: 'Home',
+    },
   },
   {
     path: '/setting',
