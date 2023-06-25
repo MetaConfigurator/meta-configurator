@@ -10,9 +10,10 @@ import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 export const generalStore = defineStore('generalStore', () => {
   const currentPage = ref('file');
 
-  const dataToDisplay = computed(({
+  const dataToDisplay = computed({
     get: () => getDataToDisplay(),
-    set: (newValue) => setDataToDisplay(newValue)}));
+    set: newValue => setDataToDisplay(newValue),
+  });
   const schemaToDisplay = computed(() => getSchemaToDisplay());
 
   /**
