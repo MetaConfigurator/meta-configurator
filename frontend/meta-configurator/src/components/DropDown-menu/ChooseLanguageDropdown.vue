@@ -47,5 +47,5 @@ export default defineComponent({
 </script>
 
 <style>
-/* Add any custom styles here */
+
 </style>
