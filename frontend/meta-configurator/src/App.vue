@@ -5,9 +5,7 @@ import {SideMenuController} from '@/components/side-menu/SideMenu';
 import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
 import 'primeicons/primeicons.css';
 import AceEditor from '@/components/code-editor/AceEditor.vue';
-import ChooseLanguageDropdown from "@/components/dropdown-menu/ChooseLanguageDropdown.vue";
-
-
+import ChooseLanguageDropdown from '@/components/dropdown-menu/ChooseLanguageDropdown.vue';
 
 const currentFile = ref('config.yaml');
 
