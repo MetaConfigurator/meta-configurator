@@ -5,7 +5,9 @@ import {SideMenuController} from '@/components/side-menu/SideMenu';
 import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
 import 'primeicons/primeicons.css';
 import AceEditor from '@/components/code-editor/AceEditor.vue';
-import IconDropDown from '@/components/icons/IconDropDown.vue';
+import ChooseLanguageDropdown from "@/components/DropDown-menu/ChooseLanguageDropdown.vue";
+
+
 
 const currentFile = ref('config.yaml');
 
@@ -26,7 +28,7 @@ const currentTitle = computed(
       <div
         class="w-full h-16 bg-slate-100 flex flex-row items-center p-2 px-6 border-b-2 border-gray-600 space-x-6">
         <h2 class="text-3xl text-gray-700" v-html="currentTitle"></h2>
-        <IconDropDown></IconDropDown>
+        <ChooseLanguageDropdown></ChooseLanguageDropdown>
       </div>
       <div class="flex flex-row">
         <AceEditor class="flex-initial w-full" />
