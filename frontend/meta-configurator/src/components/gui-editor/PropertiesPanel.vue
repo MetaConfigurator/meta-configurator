@@ -92,7 +92,8 @@ function updateData(subPath: Array<string | number>, newValue: any) {
     </Column>
     <Column field="data" header="Data">
       <template #body="slotProps">
-        <PropertyData :nodeData="slotProps.node.data"
+        <PropertyData
+          :nodeData="slotProps.node.data"
           @update_property_value="updateData"
           class="w-full"
           bodyClass="w-full" />
