@@ -10,9 +10,10 @@ import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 export const generalStore = defineStore('generalStore', () => {
   const currentPage = ref('file');
 
-  const dataToDisplay = computed(({
+  const dataToDisplay = computed({
     get: () => getDataToDisplay(),
-    set: (newValue) => setDataToDisplay(newValue)}));
+    set: newValue => setDataToDisplay(newValue),
+  });
   const schemaToDisplay = computed(() => getSchemaToDisplay());
 
   /**
@@ -24,7 +25,7 @@ export const generalStore = defineStore('generalStore', () => {
     if (currentPage.value === 'file') {
       return dataStore().configData;
     } else if (currentPage.value === 'schema') {
-      console.log("Tschema", schemaStore().schema);
+      console.log('Tschema', schemaStore().schema);
       return schemaStore().schema.jsonSchema ?? {};
     } else if (currentPage.value === 'settings') {
       // use settingsStore
