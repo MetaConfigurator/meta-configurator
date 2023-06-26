@@ -7,11 +7,9 @@ import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
 import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
 import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
-import {storeToRefs} from 'pinia';
-import {useCommonStore} from '@/store/commonStore';
 import type {PageName} from '@/router/pageName';
 
-const {currentPage} = storeToRefs(useCommonStore());
+const currentPage = ref<PageName>('File');
 const panelOrder = ref<'code' | 'gui'>('code');
 
 const panels = computed(() => {
