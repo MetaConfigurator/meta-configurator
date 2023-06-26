@@ -1,37 +1,40 @@
 <script setup lang="ts">
-import {schemaStore} from '@/store/schemaStore';
 import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump.vue';
-import {dataStore} from '@/store/dataStore';
+import {useDataStore} from '@/store/dataStore';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
+import type {Path} from '@/model/path';
+import {useSchemaStore} from '@/store/schemaStore';
+import {useCommonStore} from '@/store/commonStore';
 
-const schemaStoreInstance = schemaStore();
-const dataStoreInstance = dataStore();
+const schemaStore = useSchemaStore();
+const dataStore = useDataStore();
+const commonStore = useCommonStore();
 
-function updatePath(newPath: (string | number)[]) {
-  dataStoreInstance.$patch({currentPath: newPath});
+function updatePath(newPath: Path) {
+  commonStore.$patch({currentPath: newPath});
 }
 
-function updateData(path: (string | number)[], newValue: any) {
-  dataStoreInstance.updateDataAtPath(path, newValue);
+function updateData(path: Path, newValue: any) {
+  dataStore.updateDataAtPath(path, newValue);
 }
 
-function zoomIntoPath(pathToAdd: Array<string | number>) {
-  dataStoreInstance.$patch(state => (state.currentPath = state.currentPath.concat(pathToAdd)));
+function zoomIntoPath(pathToAdd: Path) {
+  commonStore.$patch(state => (state.currentPath = state.currentPath.concat(pathToAdd)));
 }
 </script>
 
 <template>
   <div class="p-5 space-y-3 h-full">
-    <SchemaInfoPanel :schema="schemaStoreInstance.schema" />
+    <SchemaInfoPanel :schema="schemaStore.schema" />
     <CurrentPathBreadcrumb
-      :root-name="schemaStoreInstance.schema.title ?? 'root'"
-      :path="dataStoreInstance.currentPath"
+      :root-name="schemaStore.schema.title ?? 'root'"
+      :path="commonStore.currentPath"
       @update:path="newPath => updatePath(newPath)" />
     <PropertiesPanel
-      :current-schema="schemaStoreInstance.schemaAtCurrentPath"
-      :current-path="dataStoreInstance.currentPath"
-      :current-data="dataStoreInstance.dataAtCurrentPath"
+      :current-schema="schemaStore.schemaAtCurrentPath"
+      :current-path="commonStore.currentPath"
+      :current-data="dataStore.dataAtCurrentPath"
       @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
       @update_data="updateData" />
   </div>

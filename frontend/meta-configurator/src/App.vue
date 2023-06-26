@@ -7,8 +7,11 @@ import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
 import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
 import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
+import {storeToRefs} from 'pinia';
+import {useCommonStore} from '@/store/commonStore';
+import type {PageName} from '@/router/pageName';
 
-const selectedPage = ref('file');
+const {currentPage} = storeToRefs(useCommonStore());
 const panelOrder = ref<'code' | 'gui'>('code');
 
 const panels = computed(() => {
@@ -25,8 +28,8 @@ window.onresize = () => {
   windowWidth.value = window.innerWidth;
 };
 
-function updatePage(newPage: string) {
-  selectedPage.value = newPage;
+function updatePage(newPage: PageName) {
+  currentPage.value = newPage;
 }
 
 function togglePanelOrder() {
@@ -44,7 +47,7 @@ function togglePanelOrder() {
       <!-- toolbar -->
       <TopToolbar
         class="h-12 flex-none"
-        :selectedPage="selectedPage"
+        :selectedPage="currentPage"
         @page-changed="updatePage"
         @toggle-order="togglePanelOrder" />
       <Splitter class="h-full" :layout="windowWidth < 600 ? 'vertical' : 'horizontal'">

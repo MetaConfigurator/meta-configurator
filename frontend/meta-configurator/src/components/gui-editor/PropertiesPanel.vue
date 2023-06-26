@@ -9,17 +9,18 @@ import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import {GuiConstants} from '@/constants';
+import type {Path} from '@/model/path';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
   currentData: any;
-  currentPath: Array<string | number>;
+  currentPath: Path;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update_current_path', new_path: Array<string | number>): void;
-  (e: 'zoom_into_path', path_to_add: Array<string | number>): void;
-  (e: 'update_data', path: Array<string | number>, newValue: any): void;
+  (e: 'update_current_path', new_path: Path): void;
+  (e: 'zoom_into_path', path_to_add: Path): void;
+  (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
 const treeNodeResolver = new ConfigTreeNodeResolver(
@@ -54,7 +55,7 @@ const propertiesToDisplay = computed(() => {
   return props.currentSchema.properties;
 });
 
-function updateData(subPath: Array<string | number>, newValue: any) {
+function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
 }

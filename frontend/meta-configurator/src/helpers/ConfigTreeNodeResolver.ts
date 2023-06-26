@@ -1,5 +1,6 @@
 import {JsonSchema} from '@/model/JsonSchema';
 import type {ConfigTreeNode} from '@/model/ConfigTreeNode';
+import type {Path, PathElement} from '@/model/path';
 
 export class ConfigTreeNodeResolver {
   private readonly depthLimit: number;
@@ -11,11 +12,11 @@ export class ConfigTreeNodeResolver {
   }
 
   public createTreeNodeOfProperty(
-    name: string | number,
+    name: PathElement,
     schema: JsonSchema,
     parentSchema: JsonSchema,
     depth = 0,
-    subPath: Array<string | number> = []
+    subPath: Path = []
   ): ConfigTreeNode {
     if (!schema) {
       throw new Error(`Schema for property ${name} is undefined`);
@@ -39,10 +40,10 @@ export class ConfigTreeNodeResolver {
   }
 
   private createChildNodes(
-    name: string | number,
+    name: PathElement,
     schema: JsonSchema,
     depth = 0,
-    subPath: Array<string | number> = []
+    subPath: Path = []
   ): ConfigTreeNode[] {
     let children: ConfigTreeNode[] = [];
     const path = subPath.concat(name);
@@ -65,7 +66,7 @@ export class ConfigTreeNodeResolver {
     return children;
   }
 
-  private dataForProperty(name: Array<string | number>): any {
+  private dataForProperty(name: Path): any {
     let currentData: any = this.configDataSupplier();
 
     for (const key of name) {
