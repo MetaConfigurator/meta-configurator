@@ -23,7 +23,7 @@ function zoomIntoPath(pathToAdd: Array<string | number>) {
 
 <template>
   <div class="p-5 space-y-3 h-full">
-    <SchemaInfoPanel :schema="schemaStoreInstance.schema" />
+<!--    <SchemaInfoPanel :schema="schemaStoreInstance.schema" />-->
     <CurrentPathBreadcrumb
       :root-name="schemaStoreInstance.schema.title ?? 'root'"
       :path="dataStoreInstance.currentPath"

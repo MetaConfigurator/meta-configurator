@@ -4,10 +4,21 @@
 
 <script setup lang="ts">
 import AceEditor from '@/components/code-editor/AceEditor.vue';
+import AceEditorForYaml from "@/components/code-editor/AceEditorForYaml.vue";
+import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
+import {schemaStore} from '@/store/schemaStore';
+
+const schemaStoreInstance = schemaStore();
 </script>
 
+// Here we should link to the language-choosing-button,
+// deciding which language would be shown in code editor.
+// For now I just comment the editor for JSON and show YAML
 <template>
-  <AceEditor />
+
+  <!--  <AceEditor />-->
+  <SchemaInfoPanel :schema="schemaStoreInstance.schema" />
+  <AceEditorForYaml />
 </template>
 
 <style scoped></style>

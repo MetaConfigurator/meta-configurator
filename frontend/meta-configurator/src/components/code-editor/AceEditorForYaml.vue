@@ -4,10 +4,11 @@ import {dataStore} from '@/store/dataStore';
 import {storeToRefs} from 'pinia';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
-import 'brace/mode/json';
+import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
+import YAML from 'yaml';
 
 
 const store = dataStore();
@@ -17,7 +18,7 @@ const editor = ref();
 onMounted(() => {
   // Set up editor mode to JSON and define theme
   editor.value = ace.edit('javascript-editor');
-  editor.value.getSession().setMode('ace/mode/json');
+  editor.value.getSession().setMode('ace/mode/yaml');
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
@@ -27,7 +28,7 @@ onMounted(() => {
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      store.configData = JSON.parse(editor.value.getValue());
+      store.configData = YAML.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }
@@ -35,29 +36,29 @@ onMounted(() => {
 
   // Listen to changes in store and update content accordingly
   watch(
-    configData,
-    newVal => {
-      if (editor.value) {
-        updateEditorValue(newVal, store.currentPath);
-      }
-    },
-    {deep: true}
+      configData,
+      newVal => {
+        if (editor.value) {
+          updateEditorValue(newVal, store.currentPath);
+        }
+      },
+      {deep: true}
   );
   // Listen to changes in current path and update cursor accordingly
   watch(
-    currentPath,
-    newVal => {
-      if (editor.value) {
-        updateSelectedPath(newVal, store.currentPath);
-      }
-    },
-    {deep: true}
+      currentPath,
+      newVal => {
+        if (editor.value) {
+          updateSelectedPath(newVal, store.currentPath);
+        }
+      },
+      {deep: true}
   );
 });
 
 function updateEditorValue(configData, currentPath: (string | number)[]) {
   const currEditorContent = editor.value.getValue();
-  const newEditorContent = JSON.stringify(configData, null, 2);
+  const newEditorContent = YAML.stringify(configData, null, 2);
   if (currEditorContent !== newEditorContent) {
     // Update value with new data and also update cursor position
     editor.value.setValue(newEditorContent);
@@ -80,4 +81,4 @@ function determineCursorLine(configData, currentPath: (string | number)[]): numb
   <div class="h-full" id="javascript-editor"></div>
 </template>
 
-<style scoped></style>x
+<style scoped></style>
