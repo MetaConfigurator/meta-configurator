@@ -5,10 +5,6 @@
 <script setup lang="ts">
 import AceEditor from '@/components/code-editor/AceEditor.vue';
 import AceEditorForYaml from "@/components/code-editor/AceEditorForYaml.vue";
-import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
-import {schemaStore} from '@/store/schemaStore';
-
-const schemaStoreInstance = schemaStore();
 </script>
 
 // Here we should link to the language-choosing-button,
@@ -17,7 +13,6 @@ const schemaStoreInstance = schemaStore();
 <template>
 
   <!--  <AceEditor />-->
-  <SchemaInfoPanel :schema="schemaStoreInstance.schema" />
   <AceEditorForYaml />
 </template>
 
