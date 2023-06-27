@@ -9,7 +9,6 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 
-
 const store = dataStore();
 const {configData, currentPath} = storeToRefs(store);
 const editor = ref();
@@ -80,4 +79,5 @@ function determineCursorLine(configData, currentPath: (string | number)[]): numb
   <div class="h-full" id="javascript-editor"></div>
 </template>
 
-<style scoped></style>x
+<style scoped></style>
+x

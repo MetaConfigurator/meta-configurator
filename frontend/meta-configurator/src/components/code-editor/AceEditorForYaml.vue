@@ -10,7 +10,6 @@ import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import YAML from 'yaml';
 
-
 const store = dataStore();
 const {configData, currentPath} = storeToRefs(store);
 const editor = ref();
@@ -36,23 +35,23 @@ onMounted(() => {
 
   // Listen to changes in store and update content accordingly
   watch(
-      configData,
-      newVal => {
-        if (editor.value) {
-          updateEditorValue(newVal, store.currentPath);
-        }
-      },
-      {deep: true}
+    configData,
+    newVal => {
+      if (editor.value) {
+        updateEditorValue(newVal, store.currentPath);
+      }
+    },
+    {deep: true}
   );
   // Listen to changes in current path and update cursor accordingly
   watch(
-      currentPath,
-      newVal => {
-        if (editor.value) {
-          updateSelectedPath(newVal, store.currentPath);
-        }
-      },
-      {deep: true}
+    currentPath,
+    newVal => {
+      if (editor.value) {
+        updateSelectedPath(newVal, store.currentPath);
+      }
+    },
+    {deep: true}
   );
 });
 
