@@ -73,7 +73,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
         country: {
           type: 'string',
           description: 'Country name',
-          enum: ['Germany','India','China','America','Japan','Spain','France'],
+          enum: ['Germany', 'India', 'China', 'America', 'Japan', 'Spain', 'France'],
         },
         moreInfo: {
           type: 'object',

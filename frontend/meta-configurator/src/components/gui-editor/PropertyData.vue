@@ -9,7 +9,7 @@ import NumberProperty from '@/components/gui-editor/properties/NumberProperty.vu
 import IntegerProperty from '@/components/gui-editor/properties/IntegerProperty.vue';
 import SimpleObjectProperty from '@/components/gui-editor/properties/SimpleObjectProperty.vue';
 import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayProperty.vue';
-import EnumProperty from "@/components/gui-editor/properties/EnumProperty.vue";
+import EnumProperty from '@/components/gui-editor/properties/EnumProperty.vue';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;

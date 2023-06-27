@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineProps, defineEmits } from 'vue';
+import {computed, defineProps, defineEmits} from 'vue';
 import Dropdown from 'primevue/dropdown';
 
 const props = defineProps<{
@@ -25,12 +25,11 @@ const valueProperty = computed({
 <template>
   <div>
     <Dropdown
-        v-model="valueProperty"
-        editable
-        showClear
-        :options="possibleValues"
-        placeholder="Select a Country"
-    />
+      v-model="valueProperty"
+      editable
+      showClear
+      :options="possibleValues"
+      placeholder="Select a Country" />
   </div>
 </template>
 
@@ -38,7 +37,7 @@ const valueProperty = computed({
 div {
   display: flex;
   flex-direction: row;
-  height:30px;
+  height: 30px;
   width: 400px;
 }
 </style>
