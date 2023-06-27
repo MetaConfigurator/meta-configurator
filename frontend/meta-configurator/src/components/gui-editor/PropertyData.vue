@@ -9,6 +9,7 @@ import NumberProperty from '@/components/gui-editor/properties/NumberProperty.vu
 import IntegerProperty from '@/components/gui-editor/properties/IntegerProperty.vue';
 import SimpleObjectProperty from '@/components/gui-editor/properties/SimpleObjectProperty.vue';
 import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayProperty.vue';
+import EnumProperty from "@/components/gui-editor/properties/EnumProperty.vue";
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -24,7 +25,12 @@ function resolveCorrespondingComponent(): VNode {
     propertyData: props.nodeData.data,
     propertySchema: props.nodeData.schema,
   };
-  if (props.nodeData.schema.hasType('boolean')) {
+  if (props.nodeData.schema.enum !== undefined) {
+    return h(EnumProperty, {
+      ...propsObject,
+      possibleValues: props.nodeData.schema.enum,
+    });
+  } else if (props.nodeData.schema.hasType('boolean')) {
     return h(BooleanProperty, propsObject);
   } else if (props.nodeData.schema.hasType('string')) {
     return h(StringProperty, propsObject);
