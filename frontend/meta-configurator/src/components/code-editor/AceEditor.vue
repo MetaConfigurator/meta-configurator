@@ -12,10 +12,14 @@ import 'brace/theme/monokai';
 import {useDataStore} from '@/store/dataStore';
 import type {Path} from '@/model/path';
 import {useCommonStore} from '@/store/commonStore';
+import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
+import type {Position} from 'brace';
 
 const {currentPath} = storeToRefs(useCommonStore());
 const {configData} = storeToRefs(useDataStore());
+const commonStore = useCommonStore();
 const editor = ref();
+const manipulator = new ConfigManipulatorJson();
 
 onMounted(() => {
   // Set up editor mode to JSON and define theme
@@ -35,6 +39,14 @@ onMounted(() => {
       /* empty */
     }
   });
+  editor.value.on('changeSelection', () => {
+    try {
+      let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
+      commonStore.$patch({currentPath: newPath});
+    } catch (e) {
+      /* empty */
+    }
+  });
 
   // Listen to changes in store and update content accordingly
   watch(
@@ -48,7 +60,9 @@ onMounted(() => {
   watch(
     currentPath,
     newVal => {
-      updateSelectedPath(newVal, currentPath.value);
+      if (editor.value) {
+        updateCursorPositionBasedOnPath(newVal, currentPath.value);
+      }
     },
     {deep: true}
   );
@@ -61,18 +75,24 @@ function updateEditorValue(configData, currentPath: Path) {
     // Update value with new data and also update cursor position
     const newEditorContent = JSON.stringify(configData, null, 2);
     editor.value.setValue(newEditorContent);
-    updateSelectedPath(configData, currentPath);
+    updateCursorPositionBasedOnPath(configData, currentPath);
   }
 }
 
-function updateSelectedPath(configData, currentPath: Path) {
-  let line = determineCursorLine(configData, currentPath);
-  editor.value.gotoLine(line);
+function updateCursorPositionBasedOnPath(configData, currentPath: Path) {
+  let position = determineCursorPosition(configData, currentPath);
+  //editor.value.gotoLine(position.row);
 }
 
-function determineCursorLine(configData, currentPath: Path): number {
-  // todo: implement
-  return 3;
+function determineCursorPosition(editorContent: string, currentPath: Path): Position {
+  return manipulator.determineCursorPosition(editorContent, currentPath);
+}
+
+function determinePath(editorContent: string, cursorPosition: Position): Path {
+  let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
+  return manipulator.determinePath(editorContent, targetCharacter);
+  // TODO: determines path. but missing is that we don't go into simple properties. Only into objects and arrays
+  // so to do: compare result path with schema and cut off last path array element if it is not complex
 }
 </script>
 
