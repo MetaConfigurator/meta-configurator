@@ -39,25 +39,25 @@ onMounted(() => {
 
   // Listen to changes in store and update content accordingly
   watch(
-      configData,
-      newVal => {
-        updateEditorValue(newVal, currentPath.value);
-      },
-      {deep: true}
+    configData,
+    newVal => {
+      updateEditorValue(newVal, currentPath.value);
+    },
+    {deep: true}
   );
   // Listen to changes in current path and update cursor accordingly
   watch(
-      currentPath,
-      newVal => {
-        updateSelectedPath(newVal, currentPath.value);
-      },
-      {deep: true}
+    currentPath,
+    newVal => {
+      updateSelectedPath(newVal, currentPath.value);
+    },
+    {deep: true}
   );
 });
 
 function updateEditorValue(configData, currentPath: Path) {
   const currEditorConfigObject =
-      editor.value.getValue() != '' ? YAML.parse(editor.value.getValue()) : {};
+    editor.value.getValue() != '' ? YAML.parse(editor.value.getValue()) : {};
   if (!_.isEqual(currEditorConfigObject, configData)) {
     // Update value with new data and also update cursor position
     const newEditorContent = YAML.stringify(configData, null, 2);
@@ -82,4 +82,3 @@ function determineCursorLine(configData, currentPath: Path): number {
 </template>
 
 <style scoped></style>
-

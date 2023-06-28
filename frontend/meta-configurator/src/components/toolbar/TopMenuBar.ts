@@ -40,15 +40,13 @@ export class TopMenuBar {
                 label: 'JSON',
                 icon: 'pi pi-fw pi-code',
                 key: 'json',
-                command: (event: MenuItemCommandEvent) =>
-                    this.onMenuItemClicked(event, 'json'),
+                command: (event: MenuItemCommandEvent) => this.onMenuItemClicked(event, 'json'),
               },
               {
                 label: 'YAML',
                 icon: 'pi pi-fw pi-code',
                 key: 'yaml',
-                command: (event: MenuItemCommandEvent) =>
-                    this.onMenuItemClicked(event, 'yaml'),
+                command: (event: MenuItemCommandEvent) => this.onMenuItemClicked(event, 'yaml'),
               },
             ],
           },
