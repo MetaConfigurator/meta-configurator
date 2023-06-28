@@ -4,22 +4,18 @@ import _ from 'lodash';
 
 import {pathToString} from '@/helpers/pathHelper';
 import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
+import type {Path} from '@/model/path';
+import {useCommonStore} from '@/store/commonStore';
 
-export const dataStore = defineStore('dataStore', () => {
+export const useDataStore = defineStore('dataStore', () => {
   const configData = ref(DEFAULT_CONFIG_DATA);
-
-  /**
-   * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
-   */
-  const currentPath = ref<(string | number)[]>([]);
 
   /**
    * Returns the data at the given path.
    * @param path The array of keys to traverse.
    * @returns The data at the given path, or an empty object if the path does not exist.
-   * @todo consider using lodash
    */
-  function dataAtPath(path: (string | number)[]): any {
+  function dataAtPath(path: Path): any {
     let currentData: any = configData.value;
 
     for (const key of path) {
@@ -32,7 +28,7 @@ export const dataStore = defineStore('dataStore', () => {
     return currentData;
   }
 
-  function updateDataAtPath(path: (string | number)[], newValue: any) {
+  function updateDataAtPath(path: Path, newValue: any) {
     const pathAsString = pathToString(path);
     _.set(configData.value, pathAsString!!, newValue);
   }
@@ -40,8 +36,7 @@ export const dataStore = defineStore('dataStore', () => {
   return {
     configData,
     dataAtPath,
-    currentPath,
-    dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
+    dataAtCurrentPath: computed(() => dataAtPath(useCommonStore().currentPath)),
     updateDataAtPath,
   };
 });

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Settings",
+  "description": "MetaConfigurator settings",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "metaConfiguratorServerUrl": {
+      "type": "string",
+      "description": "MetaConfigurator server URL",
+      "format": "uri"
+    },
+    "dataFormat": {
+      "type": "string",
+      "description": "The data format to use for the configuration files.",
+      "default": "json",
+      "enum": ["json", "yaml"]
+    }
+  }
+}

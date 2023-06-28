@@ -1,5 +1,6 @@
 import type {JsonSchemaType, SchemaPropertyType} from '@/model/JsonSchemaType';
 import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/helpers/SchemaUtils';
+import type {Path, PathElement} from '@/model/path';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -11,7 +12,7 @@ import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/h
  *       "if", "then", "else" and other properties that can contain a schema are handled.
  */
 export class JsonSchema {
-  private readonly jsonSchema?;
+  readonly jsonSchema?;
   private _additionalProperties?: JsonSchema;
   private _allOf?: JsonSchema[];
   private _anyOf?: JsonSchema[];
@@ -47,7 +48,7 @@ export class JsonSchema {
     return this.required?.includes(key) ?? false;
   }
 
-  public subSchemaAt(path: (string | number)[]): JsonSchema | undefined {
+  public subSchemaAt(path: Path): JsonSchema | undefined {
     let schema: JsonSchema | undefined = this;
     for (const element of path) {
       schema = schema.subSchema(element);
@@ -63,7 +64,7 @@ export class JsonSchema {
    * @param subElement The name of the property or the index of the item.
    * @returns The schema at the given property or item, or undefined, if there is none.
    */
-  public subSchema(subElement: string | number): JsonSchema | undefined {
+  public subSchema(subElement: PathElement): JsonSchema | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }

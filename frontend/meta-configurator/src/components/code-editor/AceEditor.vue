@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref, watch} from 'vue';
-import {dataStore} from '@/store/dataStore';
+import {useDataStore} from '@/store/dataStore';
 import {storeToRefs} from 'pinia';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
@@ -8,9 +8,11 @@ import 'brace/mode/json';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
+import type {Path} from '@/model/path';
+import {useCommonStore} from '@/store/commonStore';
 
-const store = dataStore();
-const {configData, currentPath} = storeToRefs(store);
+const {currentPath} = storeToRefs(useCommonStore());
+const {configData} = storeToRefs(useDataStore());
 const editor = ref();
 
 onMounted(() => {
@@ -21,12 +23,12 @@ onMounted(() => {
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  updateEditorValue(store.configData, store.currentPath);
+  updateEditorValue(configData.value, currentPath.value);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      store.configData = JSON.parse(editor.value.getValue());
+      configData.value = JSON.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }
@@ -37,7 +39,7 @@ onMounted(() => {
     configData,
     newVal => {
       if (editor.value) {
-        updateEditorValue(newVal, store.currentPath);
+        updateEditorValue(newVal, currentPath.value);
       }
     },
     {deep: true}
@@ -47,14 +49,14 @@ onMounted(() => {
     currentPath,
     newVal => {
       if (editor.value) {
-        updateSelectedPath(newVal, store.currentPath);
+        updateSelectedPath(newVal, currentPath.value);
       }
     },
     {deep: true}
   );
 });
 
-function updateEditorValue(configData, currentPath: (string | number)[]) {
+function updateEditorValue(configData, currentPath: Path) {
   const currEditorContent = editor.value.getValue();
   const newEditorContent = JSON.stringify(configData, null, 2);
   if (currEditorContent !== newEditorContent) {
@@ -64,12 +66,12 @@ function updateEditorValue(configData, currentPath: (string | number)[]) {
   }
 }
 
-function updateSelectedPath(configData, currentPath: (string | number)[]) {
+function updateSelectedPath(configData, currentPath: Path) {
   let line = determineCursorLine(configData, currentPath);
   editor.value.gotoLine(line);
 }
 
-function determineCursorLine(configData, currentPath: (string | number)[]): number {
+function determineCursorLine(configData, currentPath: Path): number {
   // todo: implement
   return 3;
 }
