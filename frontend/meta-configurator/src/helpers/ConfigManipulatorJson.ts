@@ -1,18 +1,12 @@
-import {JsonSchema} from '@/model/JsonSchema';
-import type {ConfigTreeNode} from '@/model/ConfigTreeNode';
-import type {Path, PathElement} from '@/model/path';
+
+import type {Path} from '@/model/path';
 import type {ConfigManipulator} from '@/helpers/ConfigManipulator';
 import type {Position} from 'brace';
 import type {
   CstDocument,
   CstNode,
-  TokenWithOffset,
-  CstKindObjectProperty,
-  CstValueNode,
-  CstNodeObjectProperty,
 } from 'json-cst';
 import {parse} from 'json-cst';
-import type {WhitespaceToken} from 'json-lexer';
 
 export class ConfigManipulatorJson implements ConfigManipulator {
   constructor() {}
