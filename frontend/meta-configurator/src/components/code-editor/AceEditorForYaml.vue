@@ -9,8 +9,8 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import YAML from 'yaml';
-
 import {useDataStore} from '@/store/dataStore';
+const store = useDataStore();
 import type {Path} from '@/model/path';
 import {useCommonStore} from '@/store/commonStore';
 
@@ -19,14 +19,14 @@ const {configData} = storeToRefs(useDataStore());
 const editor = ref();
 
 onMounted(() => {
-  // Set up editor mode to JSON and define theme
+  // Set up editor mode to YAML and define theme
   editor.value = ace.edit('javascript-editor');
   editor.value.getSession().setMode('ace/mode/yaml');
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  updateEditorValue(configData.value, currentPath.value);
+  updateEditorValue(store.configData, currentPath.value);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
@@ -41,7 +41,9 @@ onMounted(() => {
   watch(
     configData,
     newVal => {
-      updateEditorValue(newVal, currentPath.value);
+      if (editor.value) {
+        updateEditorValue(newVal, currentPath.value);
+      }
     },
     {deep: true}
   );
@@ -49,7 +51,9 @@ onMounted(() => {
   watch(
     currentPath,
     newVal => {
-      updateSelectedPath(newVal, currentPath.value);
+      if (editor.value) {
+        updateSelectedPath(newVal, currentPath.value);
+      }
     },
     {deep: true}
   );
