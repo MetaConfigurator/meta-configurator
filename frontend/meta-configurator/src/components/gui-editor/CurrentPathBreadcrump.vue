@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import ChevronRight from '@/components/icons/ChevronRight.vue';
 import {computed} from 'vue';
+import type {Path} from '@/model/path';
 
 const props = defineProps<{
-  path: (string | number)[];
+  path: Path;
   rootName: string;
 }>();
 
 const pathWithRoot = computed(() => [props.rootName, ...props.path]);
 
 const emit = defineEmits<{
-  (e: 'update:path', newPath: string[]): void;
+  (e: 'update:path', newPath: Path): void;
 }>();
 
 function isNotLast(index: number) {

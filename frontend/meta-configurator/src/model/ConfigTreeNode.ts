@@ -1,5 +1,6 @@
 import type {TreeNode} from 'primevue/tree';
 import {JsonSchema} from '@/model/JsonSchema';
+import type {Path, PathElement} from '@/model/path';
 
 /**
  * Represents a node in the schema tree.
@@ -10,9 +11,9 @@ export interface ConfigTreeNode extends TreeNode {
 }
 
 export interface ConfigTreeNodeData {
-  name: string | number;
+  name: PathElement;
   schema: JsonSchema;
   parentSchema?: JsonSchema;
   data: any;
-  relativePath: (string | number)[];
+  relativePath: Path;
 }

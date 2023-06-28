@@ -3,13 +3,14 @@
 <script setup lang="ts">
 import IconExpand from '@/components/icons/IconExpand.vue';
 import type {ConfigTreeNodeData} from '@/model/ConfigTreeNode';
+import type {Path} from '@/model/path';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
 }>();
 
 const emit = defineEmits<{
-  (e: 'zoom_into_path', path_to_add: Array<string | number>): void;
+  (e: 'zoom_into_path', path_to_add: Path): void;
 }>();
 
 function isExpandable(): boolean {

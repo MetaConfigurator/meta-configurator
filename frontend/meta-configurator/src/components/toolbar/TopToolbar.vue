@@ -3,23 +3,25 @@ import Menubar from 'primevue/menubar';
 import {computed, Ref, ref} from 'vue';
 import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
+import type {PageName} from '@/router/pageName';
 
 const props = defineProps<{
-  selectedPage: string;
+  selectedPage: PageName;
 }>();
 
 const emit = defineEmits<{
-  (e: 'page-changed', page: string): void;
+  // TODO: solve page-change with routing
+  (e: 'page-changed', page: PageName): void;
   (e: 'toggle-order'): void;
 }>();
 
 function getPageName(): string {
   switch (props.selectedPage) {
-    case 'file':
+    case 'File':
       return 'File Editor';
-    case 'schema':
+    case 'Schema':
       return 'Schema Editor';
-    case 'settings':
+    case 'Settings':
       return 'Settings';
     default:
       return 'Unknown';
@@ -34,39 +36,39 @@ const pageSelectionMenuItems: MenuItem[] = [
     label: 'File Editor',
     icon: 'pi pi-fw pi-file',
     class: () => {
-      if (props.selectedPage !== 'file') {
+      if (props.selectedPage !== 'File') {
         return 'font-normal text-lg';
       }
       return 'font-bold text-lg';
     },
     command: () => {
-      emit('page-changed', 'file');
+      emit('page-changed', 'File');
     },
   },
   {
     label: 'Schema Editor',
     icon: 'pi pi-fw pi-pencil',
     class: () => {
-      if (props.selectedPage !== 'schema') {
+      if (props.selectedPage !== 'Schema') {
         return 'font-normal text-lg';
       }
       return 'font-bold text-lg';
     },
     command: () => {
-      emit('page-changed', 'schema');
+      emit('page-changed', 'Schema');
     },
   },
   {
     label: 'Settings',
     icon: 'pi pi-fw pi-cog',
     class: () => {
-      if (props.selectedPage !== 'settings') {
+      if (props.selectedPage !== 'Settings') {
         return 'font-normal text-lg';
       }
       return 'font-bold text-lg';
     },
     command: () => {
-      emit('page-changed', 'settings');
+      emit('page-changed', 'Settings');
     },
   },
 ];
@@ -77,13 +79,13 @@ const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
 const settingsMenuItems = topMenuBar.settingsMenuItems;
 
-function getMenuItems(pageId: String = props.selectedPage): MenuItem[] {
+function getMenuItems(pageId: PageName = props.selectedPage): MenuItem[] {
   switch (pageId) {
-    case 'file':
+    case 'File':
       return fileEditorMenuItems;
-    case 'schema':
+    case 'Schema':
       return schemaEditorMenuItems;
-    case 'settings':
+    case 'Settings':
       return settingsMenuItems;
     default:
       return [];

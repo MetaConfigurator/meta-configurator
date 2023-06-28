@@ -10,13 +10,14 @@ import IntegerProperty from '@/components/gui-editor/properties/IntegerProperty.
 import SimpleObjectProperty from '@/components/gui-editor/properties/SimpleObjectProperty.vue';
 import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayProperty.vue';
 import EnumProperty from '@/components/gui-editor/properties/EnumProperty.vue';
+import type {Path} from '@/model/path';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update_property_value', path: Array<string | number>, newValue: string): void;
+  (e: 'update_property_value', path: Path, newValue: string): void;
 }>();
 
 function resolveCorrespondingComponent(): VNode {
