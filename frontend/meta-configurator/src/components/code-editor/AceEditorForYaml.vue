@@ -1,36 +1,33 @@
 <script setup lang="ts">
 import {onMounted, ref, watch} from 'vue';
+import {dataStore} from '@/store/dataStore';
 import {storeToRefs} from 'pinia';
-import _ from 'lodash';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
-import 'brace/mode/json';
+import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
+import YAML from 'yaml';
 
-import {useDataStore} from '@/store/dataStore';
-import type {Path} from '@/model/path';
-import {useCommonStore} from '@/store/commonStore';
-
-const {currentPath} = storeToRefs(useCommonStore());
-const {configData} = storeToRefs(useDataStore());
+const store = dataStore();
+const {configData, currentPath} = storeToRefs(store);
 const editor = ref();
 
 onMounted(() => {
   // Set up editor mode to JSON and define theme
   editor.value = ace.edit('javascript-editor');
-  editor.value.getSession().setMode('ace/mode/json');
+  editor.value.getSession().setMode('ace/mode/yaml');
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  updateEditorValue(configData.value, currentPath.value);
+  updateEditorValue(store.configData, store.currentPath);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      configData.value = JSON.parse(editor.value.getValue());
+      store.configData = YAML.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }
@@ -40,7 +37,9 @@ onMounted(() => {
   watch(
     configData,
     newVal => {
-      updateEditorValue(newVal, currentPath.value);
+      if (editor.value) {
+        updateEditorValue(newVal, store.currentPath);
+      }
     },
     {deep: true}
   );
@@ -48,29 +47,30 @@ onMounted(() => {
   watch(
     currentPath,
     newVal => {
-      updateSelectedPath(newVal, currentPath.value);
+      if (editor.value) {
+        updateSelectedPath(newVal, store.currentPath);
+      }
     },
     {deep: true}
   );
 });
 
-function updateEditorValue(configData, currentPath: Path) {
-  const currEditorConfigObject =
-    editor.value.getValue() != '' ? JSON.parse(editor.value.getValue()) : {};
-  if (!_.isEqual(currEditorConfigObject, configData)) {
+function updateEditorValue(configData, currentPath: (string | number)[]) {
+  const currEditorContent = editor.value.getValue();
+  const newEditorContent = YAML.stringify(configData, null, 2);
+  if (currEditorContent !== newEditorContent) {
     // Update value with new data and also update cursor position
-    const newEditorContent = JSON.stringify(configData, null, 2);
     editor.value.setValue(newEditorContent);
     updateSelectedPath(configData, currentPath);
   }
 }
 
-function updateSelectedPath(configData, currentPath: Path) {
+function updateSelectedPath(configData, currentPath: (string | number)[]) {
   let line = determineCursorLine(configData, currentPath);
   editor.value.gotoLine(line);
 }
 
-function determineCursorLine(configData, currentPath: Path): number {
+function determineCursorLine(configData, currentPath: (string | number)[]): number {
   // todo: implement
   return 3;
 }
@@ -81,4 +81,3 @@ function determineCursorLine(configData, currentPath: Path): number {
 </template>
 
 <style scoped></style>
-x
