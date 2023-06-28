@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import {onMounted, ref, watch} from 'vue';
-import {useDataStore} from '@/store/dataStore';
 import {storeToRefs} from 'pinia';
+import _ from 'lodash';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
+
+import {useDataStore} from '@/store/dataStore';
 import type {Path} from '@/model/path';
 import {useCommonStore} from '@/store/commonStore';
 import {ConfigManipulatorJson} from "@/helpers/ConfigManipulatorJson";
@@ -50,9 +52,7 @@ onMounted(() => {
   watch(
     configData,
     newVal => {
-      if (editor.value) {
-        updateEditorValue(newVal, currentPath.value);
-      }
+      updateEditorValue(newVal, currentPath.value);
     },
     {deep: true}
   );
@@ -70,10 +70,11 @@ onMounted(() => {
 });
 
 function updateEditorValue(configData, currentPath: Path) {
-  const currEditorContent = editor.value.getValue();
-  const newEditorContent = JSON.stringify(configData, null, 2);
-  if (currEditorContent !== newEditorContent) {
+  const currEditorConfigObject =
+    editor.value.getValue() != '' ? JSON.parse(editor.value.getValue()) : {};
+  if (!_.isEqual(currEditorConfigObject, configData)) {
     // Update value with new data and also update cursor position
+    const newEditorContent = JSON.stringify(configData, null, 2);
     editor.value.setValue(newEditorContent);
     updateCursorPositionBasedOnPath(configData, currentPath);
   }
