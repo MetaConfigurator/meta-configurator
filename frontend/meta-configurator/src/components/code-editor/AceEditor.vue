@@ -12,8 +12,8 @@ import 'brace/theme/monokai';
 import {useDataStore} from '@/store/dataStore';
 import type {Path} from '@/model/path';
 import {useCommonStore} from '@/store/commonStore';
-import {ConfigManipulatorJson} from "@/helpers/ConfigManipulatorJson";
-import type {Position} from "brace";
+import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
+import type {Position} from 'brace';
 
 const {currentPath} = storeToRefs(useCommonStore());
 const {configData} = storeToRefs(useDataStore());
@@ -32,21 +32,21 @@ onMounted(() => {
   updateEditorValue(configData.value, currentPath.value);
 
   // Listen to changes on AceEditor and update store accordingly
-    editor.value.on('change', () => {
-        try {
-            configData.value = JSON.parse(editor.value.getValue());
-        } catch (e) {
-            /* empty */
-        }
-    });
-    editor.value.on('changeSelection', () => {
-        try {
-            let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-            commonStore.$patch({currentPath: newPath});
-        } catch (e) {
-            /* empty */
-        }
-    });
+  editor.value.on('change', () => {
+    try {
+      configData.value = JSON.parse(editor.value.getValue());
+    } catch (e) {
+      /* empty */
+    }
+  });
+  editor.value.on('changeSelection', () => {
+    try {
+      let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
+      commonStore.$patch({currentPath: newPath});
+    } catch (e) {
+      /* empty */
+    }
+  });
 
   // Listen to changes in store and update content accordingly
   watch(
@@ -61,12 +61,11 @@ onMounted(() => {
     currentPath,
     newVal => {
       if (editor.value) {
-          updateCursorPositionBasedOnPath(newVal, currentPath.value);
+        updateCursorPositionBasedOnPath(newVal, currentPath.value);
       }
     },
     {deep: true}
   );
-
 });
 
 function updateEditorValue(configData, currentPath: Path) {
@@ -86,14 +85,14 @@ function updateCursorPositionBasedOnPath(configData, currentPath: Path) {
 }
 
 function determineCursorPosition(editorContent: string, currentPath: Path): Position {
-    return manipulator.determineCursorPosition(editorContent, currentPath);
+  return manipulator.determineCursorPosition(editorContent, currentPath);
 }
 
 function determinePath(editorContent: string, cursorPosition: Position): Path {
-    let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
-    return manipulator.determinePath(editorContent, targetCharacter);
-    // TODO: determines path. but missing is that we don't go into simple properties. Only into objects and arrays
-    // so to do: compare result path with schema and cut off last path array element if it is not complex
+  let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
+  return manipulator.determinePath(editorContent, targetCharacter);
+  // TODO: determines path. but missing is that we don't go into simple properties. Only into objects and arrays
+  // so to do: compare result path with schema and cut off last path array element if it is not complex
 }
 </script>
 
