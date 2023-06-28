@@ -22,7 +22,9 @@ const valueProperty = computed({
 </script>
 
 <template>
-  <Checkbox v-model="valueProperty" :binary="true" value="propertyName" />
+  <div class="pl-2">
+    <Checkbox v-model="valueProperty" :binary="true" value="propertyName" />
+  </div>
 </template>
 
 <style scoped></style>

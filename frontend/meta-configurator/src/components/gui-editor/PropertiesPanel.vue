@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
-import type {JsonSchema} from '@/schema/JsonSchema';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
-import PropertyComponent from '@/components/gui-editor/EditPropertyComponent.vue';
+
+import type {JsonSchema} from '@/model/JsonSchema';
+import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
-import {SchemaTreeNodeResolver} from '@/schema/SchemaTreeNodeResolver';
+import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
+import {GuiConstants} from '@/constants';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -16,12 +18,39 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update_current_path', new_path: Array<string | number>): void;
-  (e: 'expand_current_path', path_to_add: Array<string | number>): void;
+  (e: 'zoom_into_path', path_to_add: Array<string | number>): void;
   (e: 'update_data', path: Array<string | number>, newValue: any): void;
 }>();
 
+const treeNodeResolver = new ConfigTreeNodeResolver(
+  () => props.currentData,
+  GuiConstants.DEPTH_LIMIT
+);
+
+const nodesToDisplay = computed(() => {
+  return Object.entries(propertiesToDisplay.value).map(([key, value]) => {
+    if (isArray()) {
+      // Cast is required because record properties are always interpreted as strings
+      return treeNodeResolver.createTreeNodeOfProperty(Number(key), value, props.currentSchema);
+    }
+    return treeNodeResolver.createTreeNodeOfProperty(key, value, props.currentSchema);
+  });
+});
+
+const treeTableFilters = ref<Record<string, string>>({});
+
+function isArray(): boolean {
+  return props.currentSchema.hasType('array') && Array.isArray(props.currentData);
+}
+
 const propertiesToDisplay = computed(() => {
+  // TODO this logic should be part of the TreeNodeResolver.
   // TODO: consider properties of data, i.e., additionalProperties, patternProperties.
+  if (isArray()) {
+    return Object.fromEntries(
+      props.currentData.map((_, index: number) => [index, props.currentSchema.items])
+    );
+  }
   return props.currentSchema.properties;
 });
 
@@ -29,18 +58,6 @@ function updateData(subPath: Array<string | number>, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
 }
-
-const DEPTH_LIMIT = 2;
-
-const treeNodeResolver = new SchemaTreeNodeResolver(() => props.currentData, DEPTH_LIMIT);
-
-const nodesToDisplay = computed(() => {
-  return Object.entries(propertiesToDisplay.value).map(([key, value]) =>
-    treeNodeResolver.createTreeNodeOfProperty(key, value, props.currentSchema)
-  );
-});
-
-const filters = ref<Record<string, string>>({});
 </script>
 
 <template>
@@ -48,37 +65,52 @@ const filters = ref<Record<string, string>>({});
     :value="nodesToDisplay"
     filter-mode="lenient"
     removable-sort
-    class="p-treetable-sm overflow-auto"
+    class="overflow-auto"
     resizable-columns
     scrollable
     scroll-direction="vertical"
     row-hover
-    :filters="filters">
+    :filters="treeTableFilters">
     <!-- Filter field -->
     <template #header>
       <div class="text-left">
         <div class="p-input-icon-left w-full">
           <i class="pi pi-search" />
           <InputText
-            v-model="filters['global']"
+            v-model="treeTableFilters['global']"
             placeholder="Search for properties or data"
             class="h-8 w-80" />
         </div>
       </div>
     </template>
-    <Column field="name" header="Property" sortable="true" expander>
+    <Column field="name" header="Property" :sortable="true" expander>
       <template #body="slotProps">
         <PropertyMetadata
-          :metadata="slotProps.node.data"
-          @expand_current_path="path_to_add => $emit('expand_current_path', path_to_add)" />
+          :nodeData="slotProps.node.data"
+          @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
       </template>
     </Column>
     <Column field="data" header="Data">
       <template #body="slotProps">
-        <PropertyComponent :metadata="slotProps.node.data" @update_property_value="updateData" />
+        <PropertyData
+          :nodeData="slotProps.node.data"
+          @update_property_value="updateData"
+          class="w-full"
+          bodyClass="w-full" />
       </template>
     </Column>
   </TreeTable>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* The following lines make the table cells take less space */
+:deep(.p-treetable-tbody > tr > td) {
+  padding: 0.25rem 0.5rem;
+}
+:deep(.p-treetable-header) {
+  padding: 0.5rem 0.5rem;
+}
+:deep(.p-treetable-thead > tr > th) {
+  padding: 0.5rem 0.5rem;
+}
+</style>

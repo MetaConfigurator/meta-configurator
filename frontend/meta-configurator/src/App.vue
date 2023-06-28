@@ -1,35 +1,61 @@
 <script lang="ts" setup>
-import {computed, reactive, ref} from 'vue';
-import SideMenu from '@/components/side-menu/SideMenu.vue';
-import {SideMenuController} from '@/components/side-menu/SideMenu';
-import GuiEditorPanel from '@/components/gui-editor/JsonSchemaGuiEditorPanel.vue';
+import {computed, ref} from 'vue';
 import 'primeicons/primeicons.css';
-import AceEditor from '@/components/code-editor/AceEditor.vue';
 
-const currentFile = ref('config.yaml');
+import SplitterPanel from 'primevue/splitterpanel';
+import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
+import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
+import Splitter from 'primevue/splitter';
+import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 
-const sideMenuController = reactive(new SideMenuController());
-const currentTitle = computed(
-  () => sideMenuController.selectedItem.name + ' - ' + currentFile.value
-);
+const selectedPage = ref('file');
+const panelOrder = ref<'code' | 'gui'>('code');
+
+const panels = computed(() => {
+  let result = [CodeEditorPanel, GuiEditorPanel];
+  if (panelOrder.value === 'gui') {
+    result = result.reverse();
+  }
+  return result;
+});
+
+// Reactive window width
+let windowWidth = ref(window.innerWidth);
+window.onresize = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+function updatePage(newPage: string) {
+  selectedPage.value = newPage;
+}
+
+function togglePanelOrder() {
+  if (panelOrder.value === 'code') {
+    panelOrder.value = 'gui';
+  } else {
+    panelOrder.value = 'code';
+  }
+}
 </script>
 
 <template>
-  <div class="w-screen h-screen flex">
-    <!-- collapsible sidebar -->
-    <SideMenu :menu="sideMenuController"></SideMenu>
-
-    <header></header>
-    <main class="flex flex-col w-full h-full">
+  <div class="w-screen h-full flex">
+    <main class="h-full flex flex-col">
       <!-- toolbar -->
-      <div
-        class="w-full h-16 bg-slate-100 flex flex-row items-center p-2 px-6 border-b-2 border-gray-600 space-x-6">
-        <h2 class="text-3xl text-gray-700" v-html="currentTitle"></h2>
-      </div>
-      <div class="flex flex-row">
-        <AceEditor class="flex-initial w-full" />
-        <GuiEditorPanel class="w-full" />
-      </div>
+      <TopToolbar
+        class="h-12 flex-none"
+        :selectedPage="selectedPage"
+        @page-changed="updatePage"
+        @toggle-order="togglePanelOrder" />
+      <Splitter class="h-full" :layout="windowWidth < 600 ? 'vertical' : 'horizontal'">
+        <SplitterPanel
+          v-for="(panel, index) in panels"
+          :key="index"
+          :min-size="20"
+          :resizable="true">
+          <component :is="panel" />
+        </SplitterPanel>
+      </Splitter>
     </main>
   </div>
 </template>

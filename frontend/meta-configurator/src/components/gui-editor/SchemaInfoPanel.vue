@@ -3,6 +3,7 @@ import {computed, ref} from 'vue';
 import ChevronRight from '@/components/icons/ChevronRight.vue';
 import type {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
 import ChooseSchema from '@/components/gui-editor/ChooseSchema.vue';
+import type {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 
 const props = defineProps<{
   schema: ref<TopLevelJsonSchema>;

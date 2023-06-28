@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/model/JsonSchema';
 
 const props = defineProps<{
   propertyName: string;
@@ -13,7 +13,7 @@ function getNumberOfItems(): number {
 </script>
 
 <template>
-  <p class="text-gray-400 font-extralight">{{ getNumberOfItems() }} items</p>
+  <p class="text-gray-400 font-extralight pl-2">{{ getNumberOfItems() }} items</p>
 </template>
 
 <style scoped></style>
