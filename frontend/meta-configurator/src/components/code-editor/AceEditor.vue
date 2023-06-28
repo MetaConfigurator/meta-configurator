@@ -40,7 +40,7 @@ onMounted(() => {
   watch(
     configData,
     newVal => {
-        updateEditorValue(newVal, currentPath.value);
+      updateEditorValue(newVal, currentPath.value);
     },
     {deep: true}
   );
@@ -48,14 +48,15 @@ onMounted(() => {
   watch(
     currentPath,
     newVal => {
-        updateSelectedPath(newVal, currentPath.value);
+      updateSelectedPath(newVal, currentPath.value);
     },
     {deep: true}
   );
 });
 
 function updateEditorValue(configData, currentPath: Path) {
-  const currEditorConfigObject = editor.value.getValue() != "" ? JSON.parse(editor.value.getValue()) : {};
+  const currEditorConfigObject =
+    editor.value.getValue() != '' ? JSON.parse(editor.value.getValue()) : {};
   if (!_.isEqual(currEditorConfigObject, configData)) {
     // Update value with new data and also update cursor position
     const newEditorContent = JSON.stringify(configData, null, 2);
