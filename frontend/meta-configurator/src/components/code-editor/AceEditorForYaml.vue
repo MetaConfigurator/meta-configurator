@@ -8,6 +8,7 @@ import 'brace/mode/json';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
+import YAML from 'yaml';
 
 import {useDataStore} from '@/store/dataStore';
 import type {Path} from '@/model/path';
@@ -20,7 +21,7 @@ const editor = ref();
 onMounted(() => {
   // Set up editor mode to JSON and define theme
   editor.value = ace.edit('javascript-editor');
-  editor.value.getSession().setMode('ace/mode/json');
+  editor.value.getSession().setMode('ace/mode/yaml');
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
@@ -30,7 +31,7 @@ onMounted(() => {
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      configData.value = JSON.parse(editor.value.getValue());
+      configData.value = YAML.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }
@@ -38,28 +39,28 @@ onMounted(() => {
 
   // Listen to changes in store and update content accordingly
   watch(
-    configData,
-    newVal => {
-      updateEditorValue(newVal, currentPath.value);
-    },
-    {deep: true}
+      configData,
+      newVal => {
+        updateEditorValue(newVal, currentPath.value);
+      },
+      {deep: true}
   );
   // Listen to changes in current path and update cursor accordingly
   watch(
-    currentPath,
-    newVal => {
-      updateSelectedPath(newVal, currentPath.value);
-    },
-    {deep: true}
+      currentPath,
+      newVal => {
+        updateSelectedPath(newVal, currentPath.value);
+      },
+      {deep: true}
   );
 });
 
 function updateEditorValue(configData, currentPath: Path) {
   const currEditorConfigObject =
-    editor.value.getValue() != '' ? JSON.parse(editor.value.getValue()) : {};
+      editor.value.getValue() != '' ? YAML.parse(editor.value.getValue()) : {};
   if (!_.isEqual(currEditorConfigObject, configData)) {
     // Update value with new data and also update cursor position
-    const newEditorContent = JSON.stringify(configData, null, 2);
+    const newEditorContent = YAML.stringify(configData, null, 2);
     editor.value.setValue(newEditorContent);
     updateSelectedPath(configData, currentPath);
   }
@@ -81,4 +82,4 @@ function determineCursorLine(configData, currentPath: Path): number {
 </template>
 
 <style scoped></style>
-x
+
