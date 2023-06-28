@@ -10,10 +10,14 @@ import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import type {Path} from '@/model/path';
 import {useCommonStore} from '@/store/commonStore';
+import {ConfigManipulatorJson} from "@/helpers/ConfigManipulatorJson";
+import type {Position} from "brace";
 
 const {currentPath} = storeToRefs(useCommonStore());
 const {configData} = storeToRefs(useDataStore());
+const commonStore = useCommonStore();
 const editor = ref();
+const manipulator = new ConfigManipulatorJson();
 
 onMounted(() => {
   // Set up editor mode to JSON and define theme
@@ -26,13 +30,21 @@ onMounted(() => {
   updateEditorValue(configData.value, currentPath.value);
 
   // Listen to changes on AceEditor and update store accordingly
-  editor.value.on('change', () => {
-    try {
-      configData.value = JSON.parse(editor.value.getValue());
-    } catch (e) {
-      /* empty */
-    }
-  });
+    editor.value.on('change', () => {
+        try {
+            configData.value = JSON.parse(editor.value.getValue());
+        } catch (e) {
+            /* empty */
+        }
+    });
+    editor.value.on('changeSelection', () => {
+        try {
+            let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
+            commonStore.$patch({currentPath: newPath});
+        } catch (e) {
+            /* empty */
+        }
+    });
 
   // Listen to changes in store and update content accordingly
   watch(
@@ -49,11 +61,12 @@ onMounted(() => {
     currentPath,
     newVal => {
       if (editor.value) {
-        updateSelectedPath(newVal, currentPath.value);
+          updateCursorPositionBasedOnPath(newVal, currentPath.value);
       }
     },
     {deep: true}
   );
+
 });
 
 function updateEditorValue(configData, currentPath: Path) {
@@ -62,18 +75,21 @@ function updateEditorValue(configData, currentPath: Path) {
   if (currEditorContent !== newEditorContent) {
     // Update value with new data and also update cursor position
     editor.value.setValue(newEditorContent);
-    updateSelectedPath(configData, currentPath);
+    updateCursorPositionBasedOnPath(configData, currentPath);
   }
 }
 
-function updateSelectedPath(configData, currentPath: Path) {
-  let line = determineCursorLine(configData, currentPath);
-  editor.value.gotoLine(line);
+function updateCursorPositionBasedOnPath(configData, currentPath: Path) {
+  let position = determineCursorPosition(configData, currentPath);
+  //editor.value.gotoLine(position.row);
 }
 
-function determineCursorLine(configData, currentPath: Path): number {
-  // todo: implement
-  return 3;
+function determineCursorPosition(editorContent: string, currentPath: Path): Position {
+    return manipulator.determineCursorPosition(editorContent, currentPath);
+}
+
+function determinePath(editorContent: string, cursorPosition: Position): Path {
+    return manipulator.determinePath(editorContent, cursorPosition);
 }
 </script>
 
