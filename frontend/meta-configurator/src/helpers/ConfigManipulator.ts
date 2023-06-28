@@ -5,5 +5,5 @@ export interface ConfigManipulator {
 
 
   determineCursorPosition(editorContent: string, currentPath: Path): Position;
-  determinePath(editorContent: string, cursorPosition: Position): Path;
+  determinePath(editorContent: string, targetCharacter: number): Path;
 }

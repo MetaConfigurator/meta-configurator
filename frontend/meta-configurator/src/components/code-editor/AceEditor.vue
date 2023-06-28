@@ -90,7 +90,10 @@ function determineCursorPosition(editorContent: string, currentPath: Path): Posi
 }
 
 function determinePath(editorContent: string, cursorPosition: Position): Path {
-    return manipulator.determinePath(editorContent, cursorPosition);
+    let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
+    return manipulator.determinePath(editorContent, targetCharacter);
+    // TODO: determines path. but missing is that we don't go into simple properties. Only into objects and arrays
+    // so to do: compare result path with schema and cut off last path array element if it is not complex
 }
 </script>
 

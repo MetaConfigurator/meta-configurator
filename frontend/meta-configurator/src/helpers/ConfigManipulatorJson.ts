@@ -26,69 +26,68 @@ export class ConfigManipulatorJson implements ConfigManipulator {
   }
 
 
-  determinePath(editorContent: string, cursorPosition: Position): Path {
-    // todo: implement
-
-    let rowsLeftToTraverse = cursorPosition.row;
-    let columnsLeftToTraverse = cursorPosition.column;
-
+  determinePath(editorContent: string, targetCharacter: number): Path {
     let cst: CstDocument = parse(editorContent);
-    rowsLeftToTraverse -= this.countNewlines(cst.whitespaceBefore);
-
-
-    console.log(cst)
-    return this.determinePathNew(rowsLeftToTraverse, columnsLeftToTraverse, cst.root);
+    let result = this.determinePathNew(cst.root, targetCharacter) || [];
+    console.log(result)
+    return result;
   }
 
-  private countNewlines(whitespaces: TokenWithOffset< WhitespaceToken > | undefined): number {
-    if (whitespaces === undefined) {
-      return 0;
-    }
-    return (whitespaces.value.match("/n/g") || []).length;
-  }
 
-  private countSpaces(whitespaces: TokenWithOffset< WhitespaceToken > | undefined): number {
-    if (whitespaces === undefined) {
-      return 0;
-    }
-    return (whitespaces.value.match("/s/g") || []).length - this.countNewlines(whitespaces);
-  }
+  private determinePathNew(currentNode : CstNode, targetCharacter: number): Path | undefined{
 
-  private determinePathNew(rowsLeftToTraverse: number, columnsLeftToTraverse: number, currentNode : CstNode): Path {
-    if (currentNode.kind == "object-property-colon") {
-      rowsLeftToTraverse -= this.countNewlines(currentNode.whitespaceBefore);
-    }
-    if (currentNode.kind == "object-property") {
-      rowsLeftToTraverse -= this.countNewlines(currentNode.whitespaceBefore);
-    }
-    if (currentNode.kind == "array-element") {
-      rowsLeftToTraverse -= this.countNewlines(currentNode.whitespaceBefore);
-    }
-
-    if (rowsLeftToTraverse <= 0 ) {
-      if (currentNode.kind == "object-property") {
-        return [currentNode.key]
-      } else {
-        return []
-      }
-    } else {
-
-
-      if (currentNode.kind == "object-property-colon") {
-        rowsLeftToTraverse -= this.countNewlines(currentNode.whitespaceAfter);
-      }
-
-      if (currentNode.kind == "object") {
-
-        for(let child of currentNode.children) {
-          child.
-
+    if (currentNode.kind == "object") {
+      if(targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
+        for (let childNode of currentNode.children) {
+          let childPath = this.determinePathNew(childNode, targetCharacter);
+          if(childPath !== undefined) {
+            return childPath;
+          }
         }
-        return this.determinePathNew(rowsLeftToTraverse, columnsLeftToTraverse, cst.root);
-
+        return []
+      } else {
+        return undefined
       }
 
-    }
+    } else if (currentNode.kind == "object-property") {
+      if(targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
+        let childPath = this.determinePathNew(currentNode.valueNode, targetCharacter);
+        let resultPath: Path = [ currentNode.key ]
+        if (childPath !== undefined) {
+          resultPath = resultPath.concat(childPath);
+        }
+        return resultPath;
+      } else {
+        return undefined
+      }
 
+    } else if (currentNode.kind == "array") {
+      if(targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
+        let index = 0;
+      for (let childNode of currentNode.children) {
+        let childPath = this.determinePathNew(childNode, targetCharacter);
+        if (childPath !== undefined) {
+          let result_list: Path = [index];
+          return result_list.concat(childPath);
+        }
+        index++;
+      }
+      return []
+      } else {
+        return undefined
+      }
+
+    } else if (currentNode.kind == "array-element") {
+      if(targetCharacter >= currentNode.range.start && targetCharacter < currentNode.range.end) {
+        let childPath = this.determinePathNew(currentNode.valueNode, targetCharacter);
+        let resultPath: Path = []
+        if (childPath !== undefined) {
+          resultPath = resultPath.concat(childPath);
+        }
+        return resultPath;
+      } else {
+        return undefined
+      }
+    }
   }
 }
