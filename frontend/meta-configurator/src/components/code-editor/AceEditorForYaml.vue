@@ -62,7 +62,7 @@ onMounted(() => {
 
 function updateEditorValue(configData, currentPath: Path) {
   const currEditorConfigObject =
-      editor.value.getValue() != '' ? YAML.parse(editor.value.getValue()) : {};
+    editor.value.getValue() != '' ? YAML.parse(editor.value.getValue()) : {};
   if (!_.isEqual(currEditorConfigObject, configData)) {
     // Update value with new data and also update cursor position
     const newEditorContent = YAML.stringify(configData, null, 2);
