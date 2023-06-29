@@ -3,15 +3,14 @@
  and the main view does not need to know about any of that. -->
 
 <script setup lang="ts">
-import AceEditor from '@/components/code-editor/AceEditor.vue';
-import AceEditorForYaml from '@/components/code-editor/AceEditorForYaml.vue';
+import AceEditorJson from '@/components/code-editor/AceEditorJson.vue';
+import AceEditorYaml from '@/components/code-editor/AceEditorYaml.vue';
 </script>
 
 // Here we should link to the language-choosing-button, // deciding which language would be shown in
 code editor. // For now I just comment the editor for JSON and show YAML
 <template>
-  <!--  <AceEditor />-->
-  <AceEditorForYaml />
+  <AceEditorJson />
 </template>
 
 <style scoped></style>
