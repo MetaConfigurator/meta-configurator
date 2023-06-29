@@ -1,10 +1,12 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
+import {chooseSchemaFromFile} from "@/components/SchemaSelection/ChooseSchema";
 
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
+
 
   get fileEditorMenuItems() {
     return [
@@ -65,6 +67,11 @@ export class TopMenuBar {
             icon: 'pi pi-fw pi-align-right',
             command: this.onMenuItemClicked,
           },
+          {
+            label: 'Choose schema',
+            icon: 'pi pi-fw pi-align-plus',
+            command: this.chooseSchema,
+          },
         ],
       },
 
@@ -96,5 +103,8 @@ export class TopMenuBar {
 
   get settingsMenuItems() {
     return [];
+  }
+  private chooseSchema(): void {
+    chooseSchemaFromFile();
   }
 }
