@@ -1,42 +1,52 @@
-import {computed, ref} from 'vue';
+import {ref} from 'vue';
 import {defineStore} from 'pinia';
-import _ from 'lodash';
-
-import {pathToString} from '@/helpers/pathHelper';
 import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
-import type {Path} from '@/model/path';
-import {useCommonStore} from '@/store/commonStore';
+import {computed} from "vue";
+import {TopLevelJsonSchema} from "@/model/TopLevelJsonSchema";
+import {DEFAULT_SCHEMA} from "@/data/DefaultSchema";
 
 export const useDataStore = defineStore('dataStore', () => {
-  const configData = ref(DEFAULT_CONFIG_DATA);
+
 
   /**
-   * Returns the data at the given path.
-   * @param path The array of keys to traverse.
-   * @returns The data at the given path, or an empty object if the path does not exist.
+   * The configuration file that the user can modify
    */
-  function dataAtPath(path: Path): any {
-    let currentData: any = configData.value;
+  const fileData = ref(DEFAULT_CONFIG_DATA);
 
-    for (const key of path) {
-      if (!currentData[key]) {
-        return {};
-      }
-      currentData = currentData[key];
-    }
 
-    return currentData;
-  }
+  /**
+   * The json schema as a TopLevelJsonSchema object
+   */
+  const schema = computed(() => new TopLevelJsonSchema(schemaData.value));
 
-  function updateDataAtPath(path: Path, newValue: any) {
-    const pathAsString = pathToString(path);
-    _.set(configData.value, pathAsString!!, newValue);
-  }
+
+  /**
+   * The json schema as a plain object
+   */
+  const schemaData = ref(DEFAULT_SCHEMA);
+
+
+  /**
+   * The json schema meta schema as a TopLevelJsonSchema object
+   */
+  const metaSchema = computed(() => new TopLevelJsonSchema(metaSchemaData.value));
+
+  /**
+   * The json schema meta schema as a plain object
+   */
+  const metaSchemaData = ref({});
+
+
+  // load meta schema
+  fetch('../../resources/json-schema/schema.json')
+      .then(response => response.json())
+      .then(metaSchema => (metaSchemaData.value = metaSchema));
 
   return {
-    configData,
-    dataAtPath,
-    dataAtCurrentPath: computed(() => dataAtPath(useCommonStore().currentPath)),
-    updateDataAtPath,
+    fileData,
+    schema,
+    schemaData,
+    metaSchema,
+    metaSchemaData,
   };
 });
