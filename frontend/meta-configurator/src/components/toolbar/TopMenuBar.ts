@@ -1,5 +1,5 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
-import {useSettingsStore} from "@/store/settingsStore";
+import {useSettingsStore} from '@/store/settingsStore';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -41,13 +41,15 @@ export class TopMenuBar {
                 label: 'JSON',
                 icon: 'pi pi-fw pi-code',
                 key: 'json',
-                command: (event: MenuItemCommandEvent) => useSettingsStore().settingsData.configLanguage = "json"
+                command: (event: MenuItemCommandEvent) =>
+                  (useSettingsStore().settingsData.configLanguage = 'json'),
               },
               {
                 label: 'YAML',
                 icon: 'pi pi-fw pi-code',
                 key: 'yaml',
-                command: (event: MenuItemCommandEvent) => useSettingsStore().settingsData.configLanguage = "yaml"
+                command: (event: MenuItemCommandEvent) =>
+                  (useSettingsStore().settingsData.configLanguage = 'yaml'),
               },
             ],
           },
