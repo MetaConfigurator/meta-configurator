@@ -3,25 +3,19 @@
  and the main view does not need to know about any of that. -->
 <template>
   <div>
-    <TopMenuBar @menuItemSelected="handleMenuItemSelected" />
-    <div v-if="selectedOption === 'json'">
-      <AceEditor />
+    <div v-if="settingsStore.configLanguage === 'json'">
+      <AceEditor></AceEditor>
     </div>
-    <div v-else-if="selectedOption === 'yaml'">
-      <AceEditorForYaml />
+    <div v-else-if="settingsStore.configLanguage === 'yaml'">
+      <AceEditorForYaml></AceEditorForYaml>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import {ref} from 'vue';
-import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
-import AceEditor from '@/components/code-editor/AceEditor.vue';
-import AceEditorForYaml from '@/components/code-editor/AceEditorForYaml.vue';
+<script setup>
+import { useSettingsStore } from '@/store/settingsStore';
+import AceEditor from "@/components/code-editor/AceEditor.vue";
+import AceEditorForYaml from "@/components/code-editor/AceEditorForYaml.vue";
 
-const selectedOption = ref('');
-
-function handleMenuItemSelected(event, option) {
-  selectedOption.value = option;
-}
+const settingsStore = useSettingsStore();
 </script>

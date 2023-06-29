@@ -4,7 +4,7 @@ import type {MenuItemCommandEvent} from 'primevue/menuitem';
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
-  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent, json: string) => void) {}
+  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent, language: string) => void) {}
 
   get fileEditorMenuItems() {
     return [
