@@ -1,5 +1,6 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
+import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -70,6 +71,11 @@ export class TopMenuBar {
             icon: 'pi pi-fw pi-align-right',
             command: this.onMenuItemClicked,
           },
+          {
+            label: 'Choose schema',
+            icon: 'pi pi-fw pi-plus',
+            command: this.chooseSchema,
+          },
         ],
       },
 
@@ -101,5 +107,8 @@ export class TopMenuBar {
 
   get settingsMenuItems() {
     return [];
+  }
+  private chooseSchema(): void {
+    chooseSchemaFromFile();
   }
 }
