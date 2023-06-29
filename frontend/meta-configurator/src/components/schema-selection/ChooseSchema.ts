@@ -1,8 +1,10 @@
 import {schemaStore} from "@/store/schemaStore";
 import { TopLevelJsonSchema } from '@/model/TopLevelJsonSchema';
 
+
 export function chooseSchemaFromFile(): void {
     const inputElement = document.createElement('input');
+
     inputElement.type = 'file';
     inputElement.accept = '.json';
 
@@ -15,7 +17,8 @@ export function chooseSchemaFromFile(): void {
                 const contents = e.target?.result as string;
                 try {
                     const selectedSchema = JSON.parse(contents);
-                    schemaStore.schema.value = new TopLevelJsonSchema(selectedSchema);
+                    schemaStore().schema = new TopLevelJsonSchema(selectedSchema);
+
                     console.log('Selected JSON schema:', selectedSchema);
                 } catch (error) {
                     console.error('Error parsing JSON schema:', error);
