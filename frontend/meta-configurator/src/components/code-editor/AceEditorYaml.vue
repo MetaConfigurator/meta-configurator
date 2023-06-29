@@ -10,6 +10,7 @@ import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import YAML from 'yaml';
 import {useDataStore} from '@/store/dataStore';
+
 const store = useDataStore();
 import type {Path} from '@/model/path';
 import {useCommonStore} from '@/store/commonStore';
