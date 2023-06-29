@@ -42,7 +42,7 @@ onMounted(() => {
   editor.value.on('changeSelection', () => {
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-      commonStore.$patch({currentPath: newPath});
+      commonStore.updateCurrentPath(newPath);
     } catch (e) {
       /* empty */
     }

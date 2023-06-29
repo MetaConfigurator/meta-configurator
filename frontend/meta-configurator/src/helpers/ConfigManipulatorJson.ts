@@ -1,5 +1,5 @@
 import type {Path} from '@/model/path';
-import type {ConfigManipulator} from '@/helpers/ConfigManipulator';
+import type {ConfigManipulator} from '@/model/ConfigManipulator';
 import type {Position} from 'brace';
 import type {CstDocument, CstNode} from 'json-cst';
 import {parse} from 'json-cst';
