@@ -1,12 +1,11 @@
 import {schemaStore} from '@/store/schemaStore';
 import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 
-
 export function chooseSchemaFromFile(): void {
-    const inputElement = document.createElement('input');
+  const inputElement = document.createElement('input');
 
-    inputElement.type = 'file';
-    inputElement.accept = '.json';
+  inputElement.type = 'file';
+  inputElement.accept = '.json';
 
   inputElement.onchange = event => {
     const file = (event.target as HTMLInputElement).files?.[0];

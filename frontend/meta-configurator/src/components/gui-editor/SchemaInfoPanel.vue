@@ -43,7 +43,6 @@ const schemaInformation = computed(() => {
         <span class="font-semibold">{{ info.title }}: </span>
         {{ info.value }}
       </p>
-
     </div>
   </div>
 </template>
