@@ -7,9 +7,9 @@ import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
 import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
 import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
-import type {PageName} from '@/router/pageName';
+import {SessionMode, useSessionStore} from "@/store/sessionStore";
+import router from "@/router";
 
-const currentPage = ref<PageName>('File');
 const panelOrder = ref<'code' | 'gui'>('code');
 
 const panels = computed(() => {
@@ -26,8 +26,18 @@ window.onresize = () => {
   windowWidth.value = window.innerWidth;
 };
 
-function updatePage(newPage: PageName) {
-  currentPage.value = newPage;
+function updateMode(newMode: SessionMode) {
+    switch (newMode) {
+        case SessionMode.FileEditor:
+            router.push("/")
+            break
+        case SessionMode.SchemaEditor:
+            router.push("/schema")
+            break
+        case SessionMode.Settings:
+            router.push("/settings")
+            break
+    }
 }
 
 function togglePanelOrder() {
@@ -45,8 +55,8 @@ function togglePanelOrder() {
       <!-- toolbar -->
       <TopToolbar
         class="h-12 flex-none"
-        :selectedPage="currentPage"
-        @page-changed="updatePage"
+        :current-mode="useSessionStore().currentMode"
+        @mode-selected="updateMode"
         @toggle-order="togglePanelOrder" />
       <Splitter class="h-full" :layout="windowWidth < 600 ? 'vertical' : 'horizontal'">
         <SplitterPanel

@@ -9,7 +9,7 @@ import _ from 'lodash';
 import type {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 import {useSettingsStore} from '@/store/settingsStore';
 
-enum SessionMode {
+export enum SessionMode {
   FileEditor,
   SchemaEditor,
   Settings,

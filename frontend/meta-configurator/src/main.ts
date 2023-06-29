@@ -6,10 +6,10 @@ import 'primevue/resources/themes/lara-light-indigo/theme.css';
 import 'primevue/resources/primevue.min.css';
 
 import router from './router';
-import App from '@/App.vue';
+import SchemaEditorView from "@/views/SchemaEditorView.vue";
 
 // @ts-ignore
-const app = createApp(App);
+const app = createApp(SchemaEditorView);
 
 app.use(createPinia());
 app.use(router);
