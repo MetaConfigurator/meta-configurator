@@ -1,4 +1,5 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
+import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 
 /**
@@ -40,12 +41,16 @@ export class TopMenuBar {
               {
                 label: 'JSON',
                 icon: 'pi pi-fw pi-code',
-                command: this.onMenuItemClicked,
+                key: 'json',
+                command: (event: MenuItemCommandEvent) =>
+                  (useSettingsStore().settingsData.configLanguage = 'json'),
               },
               {
                 label: 'YAML',
                 icon: 'pi pi-fw pi-code',
-                command: this.onMenuItemClicked,
+                key: 'yaml',
+                command: (event: MenuItemCommandEvent) =>
+                  (useSettingsStore().settingsData.configLanguage = 'yaml'),
               },
             ],
           },

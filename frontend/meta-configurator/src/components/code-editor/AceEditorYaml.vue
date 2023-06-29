@@ -32,7 +32,7 @@ onMounted(() => {
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      store.configData = YAML.parse(editor.value.getValue());
+      configData.value = YAML.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }

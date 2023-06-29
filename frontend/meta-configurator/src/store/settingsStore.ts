@@ -6,7 +6,7 @@ import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
  * Store for the Meta Configurator settings.
  */
 export const useSettingsStore = defineStore('settings', () => {
-  const settingsData = ref({});
+  const settingsData = ref({configLanguage: 'json'});
   const settingsSchema = ref(new TopLevelJsonSchema({}));
 
   fetch('../settings/settingsSchema.json')

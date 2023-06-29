@@ -73,7 +73,9 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
 ];
 
-const topMenuBar = new TopMenuBar(handleMenuClick);
+const topMenuBar = new TopMenuBar(event => {
+  handleMenuClick(event);
+});
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;

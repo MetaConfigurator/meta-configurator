@@ -1,16 +1,15 @@
 <!-- Facade for CodeEditorPanel. Higher level code does not need to know about any details
  of this panel. When the panel or underlying editor changes, the changes can be applied here
  and the main view does not need to know about any of that. -->
-
-<script setup lang="ts">
-import AceEditorJson from '@/components/code-editor/AceEditorJson.vue';
-import AceEditorYaml from '@/components/code-editor/AceEditorYaml.vue';
-</script>
-
-// Here we should link to the language-choosing-button, // deciding which language would be shown in
-code editor. // For now I just comment the editor for JSON and show YAML
 <template>
-  <AceEditorJson />
+  <AceEditor v-if="settingsStore.settingsData.configLanguage === 'json'" />
+  <AceEditorForYaml v-else-if="settingsStore.settingsData.configLanguage === 'yaml'" />
 </template>
 
-<style scoped></style>
+<script setup>
+import {useSettingsStore} from '@/store/settingsStore';
+import AceEditor from '@/components/code-editor/AceEditor.vue';
+import AceEditorForYaml from '@/components/code-editor/AceEditorForYaml.vue';
+
+const settingsStore = useSettingsStore();
+</script>
