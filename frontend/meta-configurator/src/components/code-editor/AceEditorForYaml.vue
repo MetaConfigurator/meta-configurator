@@ -4,7 +4,7 @@ import {storeToRefs} from 'pinia';
 import _ from 'lodash';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
-import 'brace/mode/json';
+import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';

@@ -4,7 +4,7 @@ import {computed, Ref, ref} from 'vue';
 import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
 import type {PageName} from '@/router/pageName';
-import { useSettingsStore } from '@/store/settingsStore';
+
 
 const props = defineProps<{
   selectedPage: PageName;
