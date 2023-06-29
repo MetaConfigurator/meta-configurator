@@ -1,10 +1,11 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
+import {useSettingsStore} from "@/store/settingsStore";
 
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
-  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent, language: string) => void) {}
+  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
     return [
@@ -40,13 +41,13 @@ export class TopMenuBar {
                 label: 'JSON',
                 icon: 'pi pi-fw pi-code',
                 key: 'json',
-                command: (event: MenuItemCommandEvent) => this.onMenuItemClicked(event, 'json'),
+                command: (event: MenuItemCommandEvent) => useSettingsStore().settingsData.configLanguage = "json"
               },
               {
                 label: 'YAML',
                 icon: 'pi pi-fw pi-code',
                 key: 'yaml',
-                command: (event: MenuItemCommandEvent) => this.onMenuItemClicked(event, 'yaml'),
+                command: (event: MenuItemCommandEvent) => useSettingsStore().settingsData.configLanguage = "yaml"
               },
             ],
           },

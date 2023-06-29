@@ -74,10 +74,9 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
 ];
 
-const settingsStore = useSettingsStore();
 
-const topMenuBar = new TopMenuBar((event, language) => {
-  settingsStore.setConfigLanguage(language);
+const topMenuBar = new TopMenuBar((event) => {
+  handleMenuClick(event);
 });
 
 
