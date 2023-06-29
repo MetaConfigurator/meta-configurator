@@ -101,4 +101,4 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 </template>
 
 <style scoped></style>
-x
+
