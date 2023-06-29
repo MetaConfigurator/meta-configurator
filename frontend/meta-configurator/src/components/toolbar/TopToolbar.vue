@@ -4,7 +4,7 @@ import {computed, Ref, ref} from 'vue';
 import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
 import type {PageName} from '@/router/pageName';
-import { useSettingsStore } from '@/store/settingsStore';
+import {useSettingsStore} from '@/store/settingsStore';
 
 const props = defineProps<{
   selectedPage: PageName;
@@ -74,11 +74,9 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
 ];
 
-
-const topMenuBar = new TopMenuBar((event) => {
+const topMenuBar = new TopMenuBar(event => {
   handleMenuClick(event);
 });
-
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
