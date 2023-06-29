@@ -29,7 +29,7 @@ const valueProperty = computed({
       editable
       showClear
       :options="possibleValues"
-      placeholder="Select a Country" />
+      :placeholder="`Select ${props.propertyName}`" />
   </div>
 </template>
 
