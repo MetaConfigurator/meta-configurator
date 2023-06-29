@@ -2,17 +2,17 @@ import {computed, ref} from 'vue';
 import type {ComputedRef, WritableComputedRef, Ref} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
-import {useDataStore} from "@/store/dataStore";
-import {JsonSchema} from "@/model/JsonSchema";
-import {pathToString} from "@/helpers/pathHelper";
-import _ from "lodash";
-import type {TopLevelJsonSchema} from "@/model/TopLevelJsonSchema";
-import {useSettingsStore} from "@/store/settingsStore";
+import {useDataStore} from '@/store/dataStore';
+import {JsonSchema} from '@/model/JsonSchema';
+import {pathToString} from '@/helpers/pathHelper';
+import _ from 'lodash';
+import type {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
+import {useSettingsStore} from '@/store/settingsStore';
 
 enum SessionMode {
   FileEditor,
   SchemaEditor,
-  Settings
+  Settings,
 }
 
 /**
@@ -25,19 +25,18 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentPath: Ref<Path> = ref<Path>([]);
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
 
-
   const fileData: WritableComputedRef<any> = computed({
     // getter
     get() {
       switch (currentMode.value) {
         case SessionMode.FileEditor:
-          return useDataStore().fileData
+          return useDataStore().fileData;
 
         case SessionMode.SchemaEditor:
-          return useDataStore().schemaData
+          return useDataStore().schemaData;
 
         case SessionMode.Settings:
-          return useSettingsStore().settingsData
+          return useSettingsStore().settingsData;
       }
     },
     // setter
@@ -45,39 +44,35 @@ export const useSessionStore = defineStore('commonStore', () => {
       switch (currentMode.value) {
         case SessionMode.FileEditor:
           useDataStore().fileData = newValue;
-          break
+          break;
 
         case SessionMode.SchemaEditor:
           useDataStore().schemaData = newValue;
-          break
+          break;
 
         case SessionMode.Settings:
           useSettingsStore().settingsData = newValue;
-          break
+          break;
       }
+    },
+  });
+
+  const fileSchema: ComputedRef<TopLevelJsonSchema> = computed(() => {
+    switch (currentMode.value) {
+      case SessionMode.FileEditor:
+        return useDataStore().schema;
+
+      case SessionMode.SchemaEditor:
+        return useDataStore().metaSchema;
+
+      case SessionMode.Settings:
+        return useSettingsStore().settingsSchema;
     }
-  })
-
-
-
-  const fileSchema: ComputedRef<TopLevelJsonSchema> = computed( () =>
-      {
-        switch (currentMode.value) {
-          case SessionMode.FileEditor:
-            return useDataStore().schema
-
-          case SessionMode.SchemaEditor:
-            return useDataStore().metaSchema
-
-          case SessionMode.Settings:
-            return useSettingsStore().settingsSchema
-        }
-      }
-  )
+  });
 
   const schemaAtCurrentPath: ComputedRef<JsonSchema> = computed(
-      () => fileSchema.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
-  )
+    () => fileSchema.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
+  );
 
   /**
    * Returns the data at the given path.

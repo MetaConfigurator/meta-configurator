@@ -1,4 +1,4 @@
-import {useDataStore} from "@/store/dataStore";
+import {useDataStore} from '@/store/dataStore';
 
 export function chooseSchemaFromFile(): void {
   const inputElement = document.createElement('input');
