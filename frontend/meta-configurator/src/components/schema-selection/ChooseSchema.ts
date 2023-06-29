@@ -17,7 +17,6 @@ export function chooseSchemaFromFile(): void {
         try {
           const selectedSchema = JSON.parse(contents);
           schemaStore().schema = new TopLevelJsonSchema(selectedSchema);
-
         } catch (error) {
           console.error('Error parsing JSON schema:', error);
         }
