@@ -5,7 +5,6 @@ import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
 import type {PageName} from '@/router/pageName';
 
-
 const props = defineProps<{
   selectedPage: PageName;
 }>();
