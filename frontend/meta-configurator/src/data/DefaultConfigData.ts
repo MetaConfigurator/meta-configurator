@@ -13,7 +13,7 @@ export const DEFAULT_CONFIG_DATA = {
     number: 12,
     zipCode: 'testZip',
     city: 'testCity',
-    country: 'testCountry',
+    country: '',
     moreInfo: {
       info: 'testInfo',
       neighborhood: 'testNH',
