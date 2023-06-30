@@ -2,10 +2,12 @@ import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 
+import {clearTextEditorContent} from "@/components/schema-selection/ClearContent";
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
+  private editor: any;
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
@@ -18,7 +20,7 @@ export class TopMenuBar {
           {
             label: 'New',
             icon: 'pi pi-fw pi-plus',
-            command: this.onMenuItemClicked,
+            command: this.clearEditor,
           },
           {
             label: 'Delete',
@@ -111,4 +113,9 @@ export class TopMenuBar {
   private chooseSchema(): void {
     chooseSchemaFromFile();
   }
+  private clearEditor(): void {
+    clearTextEditorContent(this.editor);
+  }
+
+
 }
