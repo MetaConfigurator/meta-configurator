@@ -3,8 +3,8 @@ import Menubar from 'primevue/menubar';
 import {computed, Ref, ref} from 'vue';
 import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
-import {SessionMode} from "@/store/sessionStore";
-import SchemaEditorView from "@/views/SchemaEditorView.vue";
+import {SessionMode} from '@/store/sessionStore';
+import SchemaEditorView from '@/views/SchemaEditorView.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;

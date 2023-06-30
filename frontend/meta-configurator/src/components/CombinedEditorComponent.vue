@@ -7,8 +7,8 @@ import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
 import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
 import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
-import {SessionMode, useSessionStore} from "@/store/sessionStore";
-import router from "@/router";
+import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import router from '@/router';
 
 const panelOrder = ref<'code' | 'gui'>('code');
 
@@ -27,17 +27,17 @@ window.onresize = () => {
 };
 
 function updateMode(newMode: SessionMode) {
-    switch (newMode) {
-        case SessionMode.FileEditor:
-            router.push("/")
-            break
-        case SessionMode.SchemaEditor:
-            router.push("/schema")
-            break
-        case SessionMode.Settings:
-            router.push("/settings")
-            break
-    }
+  switch (newMode) {
+    case SessionMode.FileEditor:
+      router.push('/');
+      break;
+    case SessionMode.SchemaEditor:
+      router.push('/schema');
+      break;
+    case SessionMode.Settings:
+      router.push('/settings');
+      break;
+  }
 }
 
 function togglePanelOrder() {

@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import CombinedEditorComponent from "@/components/CombinedEditorComponent.vue";
+import CombinedEditorComponent from '@/components/CombinedEditorComponent.vue';
 </script>
 
 <template>
-    <CombinedEditorComponent/>
+  <CombinedEditorComponent />
 </template>
 
-
-<style scoped>
-</style>
+<style scoped></style>
