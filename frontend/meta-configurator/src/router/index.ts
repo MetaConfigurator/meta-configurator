@@ -44,6 +44,7 @@ router.beforeEach((to, from, next) => {
 
   let newMode: SessionMode = to.meta.sessionMode!!;
   useSessionStore().currentMode = newMode;
+  useSessionStore().currentPath = [];
   next();
 });
 
