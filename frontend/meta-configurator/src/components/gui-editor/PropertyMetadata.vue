@@ -14,11 +14,11 @@ const emit = defineEmits<{
 }>();
 
 function isExpandable(): boolean {
-    return props.nodeData.schema.hasType('object') || props.nodeData.schema.hasType('array');
+  return props.nodeData.schema.hasType('object') || props.nodeData.schema.hasType('array');
 }
 
 function isRequired(): boolean {
-    return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string)  || false;
+  return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string) || false;
 }
 
 function zoomIntoPath() {
@@ -30,7 +30,7 @@ function zoomIntoPath() {
 
 <template>
   <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="zoomIntoPath()">
-      {{ nodeData.name }}<span class="text-red-600">{{isRequired()?"*":""}}</span>
+    {{ nodeData.name }}<span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
   </span>
 
   <span class="text-xs text-gray-400">:&nbsp;{{ nodeData.schema.type.join(',') }}</span>
