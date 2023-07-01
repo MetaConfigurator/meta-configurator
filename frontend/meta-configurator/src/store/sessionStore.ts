@@ -1,12 +1,11 @@
+import type {Ref, WritableComputedRef} from 'vue';
 import {computed, ref} from 'vue';
-import type {ComputedRef, WritableComputedRef, Ref} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
 import {useDataStore} from '@/store/dataStore';
 import {JsonSchema} from '@/model/JsonSchema';
 import {pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
-import type {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 import {useSettingsStore} from '@/store/settingsStore';
 
 export enum SessionMode {
@@ -37,6 +36,9 @@ export const useSessionStore = defineStore('commonStore', () => {
 
         case SessionMode.Settings:
           return useSettingsStore().settingsData;
+
+        default:
+          throw new Error('Invalid mode');
       }
     },
     // setter
@@ -57,7 +59,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     },
   });
 
-  const fileSchema: ComputedRef<TopLevelJsonSchema> = computed(() => {
+  const fileSchema = computed(() => {
     switch (currentMode.value) {
       case SessionMode.FileEditor:
         return useDataStore().schema;
@@ -67,10 +69,13 @@ export const useSessionStore = defineStore('commonStore', () => {
 
       case SessionMode.Settings:
         return useSettingsStore().settingsSchema;
+
+      default:
+        throw new Error('Invalid mode');
     }
   });
 
-  const schemaAtCurrentPath: ComputedRef<JsonSchema> = computed(
+  const schemaAtCurrentPath: Ref<JsonSchema> = computed(
     () => fileSchema.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
   );
 
@@ -94,7 +99,7 @@ export const useSessionStore = defineStore('commonStore', () => {
 
   function updateCurrentPath(proposedPath: Path): void {
     currentPath.value = proposedPath;
-    let schema = schemaAtCurrentPath.value;
+    const schema = schemaAtCurrentPath.value;
     if (!schema.hasType('object') && !schema.hasType('array')) {
       currentPath.value = proposedPath.slice(0, -1);
     }

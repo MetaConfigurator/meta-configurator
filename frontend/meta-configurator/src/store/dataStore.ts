@@ -1,7 +1,7 @@
-import {ref} from 'vue';
+import type {Ref} from 'vue';
+import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
 import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
-import {computed} from 'vue';
 import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
 import {DEFAULT_SCHEMA} from '@/data/DefaultSchema';
 
@@ -14,7 +14,7 @@ export const useDataStore = defineStore('dataStore', () => {
   /**
    * The json schema as a TopLevelJsonSchema object
    */
-  const schema = computed(() => new TopLevelJsonSchema(schemaData.value));
+  const schema: Ref<TopLevelJsonSchema> = computed(() => new TopLevelJsonSchema(schemaData.value));
 
   /**
    * The json schema as a plain object
@@ -24,7 +24,9 @@ export const useDataStore = defineStore('dataStore', () => {
   /**
    * The json schema meta schema as a TopLevelJsonSchema object
    */
-  const metaSchema = computed(() => new TopLevelJsonSchema(metaSchemaData.value));
+  const metaSchema: Ref<TopLevelJsonSchema> = computed(
+    () => new TopLevelJsonSchema(metaSchemaData.value)
+  );
 
   /**
    * The json schema meta schema as a plain object

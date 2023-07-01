@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import {SessionMode} from '@/store/sessionStore';
-import {useSessionStore} from '@/store/sessionStore';
+import {SessionMode, useSessionStore} from '@/store/sessionStore';
 
 // Note: currently not in use/active
 
@@ -42,8 +41,7 @@ router.beforeEach((to, from, next) => {
   // Update the page title based on the current route
   document.title = (to.meta.title || DEFAULT_TITLE) as string;
 
-  let newMode: SessionMode = to.meta.sessionMode!!;
-  useSessionStore().currentMode = newMode;
+  useSessionStore().currentMode = to.meta.sessionMode as SessionMode;
   useSessionStore().currentPath = [];
   next();
 });
