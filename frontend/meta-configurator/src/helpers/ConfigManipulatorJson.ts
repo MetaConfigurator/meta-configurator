@@ -17,8 +17,8 @@ export class ConfigManipulatorJson implements ConfigManipulator {
   }
 
   determinePath(editorContent: string, targetCharacter: number): Path {
-    let cst: CstDocument = parse(editorContent);
-    let result = this.determinePathNew(cst.root, targetCharacter) || [];
+    const cst: CstDocument = parse(editorContent);
+    const result = this.determinePathNew(cst.root, targetCharacter) || [];
     console.log(result);
     return result;
   }
@@ -26,8 +26,8 @@ export class ConfigManipulatorJson implements ConfigManipulator {
   private determinePathNew(currentNode: CstNode, targetCharacter: number): Path | undefined {
     if (currentNode.kind == 'object') {
       if (targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
-        for (let childNode of currentNode.children) {
-          let childPath = this.determinePathNew(childNode, targetCharacter);
+        for (const childNode of currentNode.children) {
+          const childPath = this.determinePathNew(childNode, targetCharacter);
           if (childPath !== undefined) {
             return childPath;
           }
@@ -38,7 +38,7 @@ export class ConfigManipulatorJson implements ConfigManipulator {
       }
     } else if (currentNode.kind == 'object-property') {
       if (targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
-        let childPath = this.determinePathNew(currentNode.valueNode, targetCharacter);
+        const childPath = this.determinePathNew(currentNode.valueNode, targetCharacter);
         let resultPath: Path = [currentNode.key];
         if (childPath !== undefined) {
           resultPath = resultPath.concat(childPath);
@@ -50,10 +50,10 @@ export class ConfigManipulatorJson implements ConfigManipulator {
     } else if (currentNode.kind == 'array') {
       if (targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
         let index = 0;
-        for (let childNode of currentNode.children) {
-          let childPath = this.determinePathNew(childNode, targetCharacter);
+        for (const childNode of currentNode.children) {
+          const childPath = this.determinePathNew(childNode, targetCharacter);
           if (childPath !== undefined) {
-            let result_list: Path = [index];
+            const result_list: Path = [index];
             return result_list.concat(childPath);
           }
           index++;
@@ -64,7 +64,7 @@ export class ConfigManipulatorJson implements ConfigManipulator {
       }
     } else if (currentNode.kind == 'array-element') {
       if (targetCharacter >= currentNode.range.start && targetCharacter < currentNode.range.end) {
-        let childPath = this.determinePathNew(currentNode.valueNode, targetCharacter);
+        const childPath = this.determinePathNew(currentNode.valueNode, targetCharacter);
         let resultPath: Path = [];
         if (childPath !== undefined) {
           resultPath = resultPath.concat(childPath);

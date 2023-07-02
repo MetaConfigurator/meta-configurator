@@ -17,15 +17,20 @@ function isExpandable(): boolean {
   return props.nodeData.schema.hasType('object') || props.nodeData.schema.hasType('array');
 }
 
+function isRequired(): boolean {
+  return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string) || false;
+}
+
 function zoomIntoPath() {
   if (isExpandable()) {
     emit('zoom_into_path', props.nodeData.relativePath);
   }
 }
 </script>
+
 <template>
   <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="zoomIntoPath()">
-    {{ nodeData.name }}
+    {{ nodeData.name }}<span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
   </span>
 
   <span class="text-xs text-gray-400">:&nbsp;{{ nodeData.schema.type.join(',') }}</span>

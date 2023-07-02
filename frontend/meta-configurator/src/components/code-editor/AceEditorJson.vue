@@ -9,15 +9,14 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 
-import {useDataStore} from '@/store/dataStore';
 import type {Path} from '@/model/path';
-import {useCommonStore} from '@/store/commonStore';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
 import type {Position} from 'brace';
 
-const {currentPath} = storeToRefs(useCommonStore());
-const {configData} = storeToRefs(useDataStore());
-const commonStore = useCommonStore();
+import {useSessionStore} from '@/store/sessionStore';
+const sessionStore = useSessionStore();
+const {currentPath, fileData} = storeToRefs(sessionStore);
+
 const editor = ref();
 const manipulator = new ConfigManipulatorJson();
 
@@ -29,12 +28,12 @@ onMounted(() => {
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  updateEditorValue(configData.value, currentPath.value);
+  updateEditorValue(fileData.value, sessionStore.currentPath);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      configData.value = JSON.parse(editor.value.getValue());
+      fileData.value = JSON.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }
@@ -42,7 +41,7 @@ onMounted(() => {
   editor.value.on('changeSelection', () => {
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-      commonStore.updateCurrentPath(newPath);
+      sessionStore.updateCurrentPath(newPath);
     } catch (e) {
       /* empty */
     }
@@ -50,9 +49,9 @@ onMounted(() => {
 
   // Listen to changes in store and update content accordingly
   watch(
-    configData,
+    fileData,
     newVal => {
-      updateEditorValue(newVal, currentPath.value);
+      updateEditorValue(newVal, sessionStore.currentPath);
     },
     {deep: true}
   );
@@ -61,7 +60,7 @@ onMounted(() => {
     currentPath,
     newVal => {
       if (editor.value) {
-        updateCursorPositionBasedOnPath(newVal, currentPath.value);
+        updateCursorPositionBasedOnPath(newVal, sessionStore.currentPath);
       }
     },
     {deep: true}

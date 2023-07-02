@@ -13,10 +13,9 @@ import {useDataStore} from '@/store/dataStore';
 
 const store = useDataStore();
 import type {Path} from '@/model/path';
-import {useCommonStore} from '@/store/commonStore';
+import {useSessionStore} from '@/store/sessionStore';
 
-const {currentPath} = storeToRefs(useCommonStore());
-const {configData} = storeToRefs(useDataStore());
+const {currentPath, fileData} = storeToRefs(useSessionStore());
 const editor = ref();
 
 onMounted(() => {
@@ -27,12 +26,12 @@ onMounted(() => {
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  updateEditorValue(store.configData, currentPath.value);
+  updateEditorValue(store.fileData, useSessionStore().currentPath);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      configData.value = YAML.parse(editor.value.getValue());
+      fileData.value = YAML.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }
@@ -40,10 +39,10 @@ onMounted(() => {
 
   // Listen to changes in store and update content accordingly
   watch(
-    configData,
+    fileData,
     newVal => {
       if (editor.value) {
-        updateEditorValue(newVal, currentPath.value);
+        updateEditorValue(newVal, useSessionStore().currentPath);
       }
     },
     {deep: true}
@@ -53,7 +52,7 @@ onMounted(() => {
     currentPath,
     newVal => {
       if (editor.value) {
-        updateSelectedPath(newVal, currentPath.value);
+        updateSelectedPath(newVal, useSessionStore().currentPath);
       }
     },
     {deep: true}
