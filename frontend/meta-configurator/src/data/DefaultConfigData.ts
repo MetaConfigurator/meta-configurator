@@ -1,5 +1,5 @@
 export const DEFAULT_CONFIG_DATA = {
-  name: 'testName',
+   name: 'testName',
   firstName: 'testFirstName',
   isMarried: true,
   telephoneNumber: 152000,

@@ -1,6 +1,7 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
+import {chooseConfigFromFile} from "@/components/config-selection/ChooseConfig";
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -24,6 +25,11 @@ export class TopMenuBar {
             label: 'Delete',
             icon: 'pi pi-fw pi-trash',
             command: this.onMenuItemClicked,
+          },
+          {
+            label: 'Choose Config',
+            icon: 'pi pi-fw pi-plus',
+            command: this.chooseConfig,
           },
           {
             separator: true,
@@ -110,5 +116,9 @@ export class TopMenuBar {
   }
   private chooseSchema(): void {
     chooseSchemaFromFile();
+  }
+  private chooseConfig(): void {
+    const { openFileDialog } = chooseConfigFromFile();
+    openFileDialog();
   }
 }
