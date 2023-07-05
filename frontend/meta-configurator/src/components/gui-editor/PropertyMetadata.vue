@@ -34,7 +34,8 @@ function zoomIntoPath() {
 
 <template>
   <!--If expandable: show underline on hovering. Call zoom function when double click. -->
-  <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="zoomIntoPath()">
+  <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="zoomIntoPath()"
+  v-tooltip="nodeData.schema.description">
       <!--If deprecated: put name into a s tag (strikethrough) -->
       <s v-if="isDeprecated()">{{ nodeData.name }}</s>
       <!--Otherwise: just normal text -->
