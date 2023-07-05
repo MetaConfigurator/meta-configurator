@@ -1,22 +1,20 @@
 <script setup lang="ts">
 import {computed} from 'vue';
 import InputNumber from 'primevue/inputnumber';
+import {JsonSchema} from "@/model/JsonSchema";
 
 const props = defineProps<{
   propertyName: string;
   propertyData: number;
-  maxValue: number ;
-  minValue: number ;
-  exclusiveMaxValue: number ;
-  exclusiveMinValue: number ;
+  propertySchema: JsonSchema;
 }>();
 
 const minValue = computed(() => {
-    return props.exclusiveMinValue ? props.exclusiveMinValue + 1 : props.minValue ;
+    return props.propertySchema.exclusiveMinimum ? props.propertySchema.exclusiveMinimum + 1 :props.propertySchema.minimum;
 });
 
 const maxValue = computed(() => {
-    return props.exclusiveMaxValue ? props.exclusiveMaxValue - 1 : props.maxValue;
+    return props.propertySchema.exclusiveMaximum ? props.propertySchema.exclusiveMaximum + 1 :props.propertySchema.maximum;
 });
 
 const emit = defineEmits<{

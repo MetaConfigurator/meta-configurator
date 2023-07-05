@@ -25,11 +25,6 @@ function resolveCorrespondingComponent(): VNode {
     propertyName: props.nodeData.name,
     propertyData: props.nodeData.data,
     propertySchema: props.nodeData.schema,
-    minValue: props.nodeData.schema.minimum,
-    maxValue: props.nodeData.schema.maximum,
-    exclusiveMaxValue: props.nodeData.schema.exclusiveMaximum,
-    exclusiveMinValue: props.nodeData.schema.exclusiveMinimum,
-    multipleOf: props.nodeData.schema.multipleOf,
   };
   if (props.nodeData.schema.enum !== undefined) {
     return h(EnumProperty, {

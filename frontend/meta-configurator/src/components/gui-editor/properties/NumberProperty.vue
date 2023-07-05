@@ -1,27 +1,26 @@
 <script setup lang="ts">
 import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
+import type {JsonSchema} from '@/model/JsonSchema';
 
 const props = defineProps<{
   propertyName: string;
   propertyData: number;
-  minValue?: number;
-  maxValue?: number;
-  exclusiveMinValue?: number;
-  exclusiveMaxValue?: number;
-  multipleOf?: number;
+  propertySchema: JsonSchema;
 }>();
 
 const minValue = computed(() => {
-    return props.exclusiveMinValue ? props.exclusiveMinValue + props.multipleOf : props.minValue ;
+    return props.propertySchema.exclusiveMinimum ?
+        props.propertySchema.exclusiveMinimum + props.propertySchema.multipleOf : props.propertySchema.minimum;
 });
 
 const maxValue = computed(() => {
-    return props.exclusiveMaxValue ? props.exclusiveMaxValue - props.multipleOf : props.maxValue;
+    return props.propertySchema.exclusiveMaximum ?
+        props.propertySchema.exclusiveMaximum + props.propertySchema.multipleOf : props.propertySchema.maximum;
 });
 
 const stepValue = computed(()=>{
-    return props.multipleOf ?? 0.1;
+    return props.propertySchema.multipleOf ?? 0.1;
 });
 
 const emit = defineEmits<{
