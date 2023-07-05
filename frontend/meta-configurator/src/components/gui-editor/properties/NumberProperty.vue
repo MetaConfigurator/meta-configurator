@@ -5,7 +5,24 @@ import {computed} from 'vue';
 const props = defineProps<{
   propertyName: string;
   propertyData: number;
+  minValue?: number;
+  maxValue?: number;
+  exclusiveMinValue?: number;
+  exclusiveMaxValue?: number;
+  multipleOf?: number;
 }>();
+
+const minValue = computed(() => {
+    return props.exclusiveMinValue ? props.exclusiveMinValue + props.multipleOf : props.minValue ;
+});
+
+const maxValue = computed(() => {
+    return props.exclusiveMaxValue ? props.exclusiveMaxValue - props.multipleOf : props.maxValue;
+});
+
+const stepValue = computed(()=>{
+    return props.multipleOf ?? 0.1;
+});
 
 const emit = defineEmits<{
   (e: 'update_property_value', newValue: number): void;
@@ -32,7 +49,9 @@ const valueProperty = computed({
     :maxFractionDigits="20"
     showButtons
     buttonLayout="stacked"
-    :step="0.1"
+    :step="stepValue"
+    :min="minValue"
+    :max="maxValue"
     increment-button-class="p-button-text p-button-secondary"
     decrement-button-class="p-button-text p-button-secondary" />
 </template>
