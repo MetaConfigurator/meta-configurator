@@ -13,7 +13,7 @@ import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
 import type {Position} from 'brace';
 
-import {useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 const sessionStore = useSessionStore();
 const {currentPath, fileData} = storeToRefs(sessionStore);
 
@@ -28,12 +28,13 @@ onMounted(() => {
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-  updateEditorValue(fileData.value, sessionStore.currentPath);
+    editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentPath);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-      fileData.value = JSON.parse(editor.value.getValue());
+        sessionStore.$patch( { fileData: JSON.parse(editor.value.getValue()),
+            lastChangeResponsible: ChangeResponsible.GuiEditor})
     } catch (e) {
       /* empty */
     }
@@ -41,7 +42,7 @@ onMounted(() => {
   editor.value.on('changeSelection', () => {
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-      sessionStore.updateCurrentPath(newPath);
+      sessionStore.$patch( { currentSelectedElement: newPath, lastChangeResponsible: ChangeResponsible.GuiEditor });
     } catch (e) {
       /* empty */
     }
@@ -51,7 +52,9 @@ onMounted(() => {
   watch(
     fileData,
     newVal => {
-      updateEditorValue(newVal, sessionStore.currentPath);
+        if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+            editorValueWasUpdatedFromOutside(newVal, sessionStore.currentPath);
+        }
     },
     {deep: true}
   );
@@ -60,35 +63,43 @@ onMounted(() => {
     currentPath,
     newVal => {
       if (editor.value) {
-        updateCursorPositionBasedOnPath(newVal, sessionStore.currentPath);
+          if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+              updateCursorPositionBasedOnPath(newVal, sessionStore.currentPath);
+          }
       }
     },
     {deep: true}
   );
 });
 
-function updateEditorValue(configData, currentPath: Path) {
-  const currEditorConfigObject =
-    editor.value.getValue() != '' ? JSON.parse(editor.value.getValue()) : {};
-  if (!_.isEqual(currEditorConfigObject, configData)) {
+function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
     // Update value with new data and also update cursor position
     const newEditorContent = JSON.stringify(configData, null, 2);
     editor.value.setValue(newEditorContent);
     updateCursorPositionBasedOnPath(configData, currentPath);
-  }
 }
 
 function updateCursorPositionBasedOnPath(configData, currentPath: Path) {
   let position = determineCursorPosition(configData, currentPath);
-  //editor.value.gotoLine(position.row);
+  editor.value.gotoLine(position.row);
 }
 
 function determineCursorPosition(editorContent: string, currentPath: Path): Position {
-  return manipulator.determineCursorPosition(editorContent, currentPath);
+    console.log("determine cursor position", editorContent)
+    let x = manipulator.determinePath(editorContent, 4);
+    console.log("determine cursor position 2")
+  //let index =  manipulator.determineCursorPosition(editorContent, currentPath);
+ // console.log("got index "+ index);
+  //return editor.value.session.doc.indexToPosition(index, 0);
+    return {
+        row: 0,
+        column: 0
+    }
 }
 
 function determinePath(editorContent: string, cursorPosition: Position): Path {
   let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
+    console.log("determine path position", editorContent)
   return manipulator.determinePath(editorContent, targetCharacter);
   // TODO: determines path. but missing is that we don't go into simple properties. Only into objects and arrays
   // so to do: compare result path with schema and cut off last path array element if it is not complex

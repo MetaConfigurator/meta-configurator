@@ -13,6 +13,11 @@ export enum SessionMode {
   SchemaEditor,
   Settings,
 }
+export enum ChangeResponsible {
+  None,
+  CodeEditor,
+  GuiEditor,
+}
 
 /**
  * Store for common data.
@@ -22,7 +27,9 @@ export const useSessionStore = defineStore('commonStore', () => {
    * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
    */
   const currentPath: Ref<Path> = ref<Path>([]);
+  const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
+  const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(ChangeResponsible.None);
 
   const fileData: WritableComputedRef<any> = computed({
     // getter
@@ -105,6 +112,10 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   }
 
+  function updateCurrentSelectedElement(proposedElement: Path): void {
+    currentSelectedElement.value = proposedElement;
+  }
+
   function updateDataAtPath(path: Path, newValue: any): void {
     const pathAsString = pathToString(path);
     _.set(fileData.value, pathAsString!!, newValue);
@@ -117,7 +128,10 @@ export const useSessionStore = defineStore('commonStore', () => {
     schemaAtCurrentPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     currentPath,
+    currentSelectedElement,
+    lastChangeResponsible,
     updateCurrentPath,
+    updateCurrentSelectedElement,
     updateDataAtPath,
   };
 });

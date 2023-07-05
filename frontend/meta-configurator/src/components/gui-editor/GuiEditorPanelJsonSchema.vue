@@ -3,12 +3,28 @@ import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/model/path';
-import {useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {onMounted, watch} from "vue";
+import * as ace from "brace";
+import {storeToRefs} from "pinia";
 
 const sessionStore = useSessionStore();
+const {currentSelectedElement} = storeToRefs(sessionStore);
+
+
+onMounted(() => {
+    watch(
+        currentSelectedElement,
+        newVal => {
+            // new element has been selected
+            // TODO: automatically expand objects/arrays contained in path
+        },
+        {deep: true}
+    );
+});
 
 function updatePath(newPath: Path) {
-  sessionStore.$patch({currentPath: newPath});
+  sessionStore.$patch({currentPath: newPath, lastChangeResponsible: ChangeResponsible.GuiEditor});
 }
 
 function updateData(path: Path, newValue: any) {
@@ -16,7 +32,8 @@ function updateData(path: Path, newValue: any) {
 }
 
 function zoomIntoPath(pathToAdd: Path) {
-  sessionStore.$patch(state => (state.currentPath = state.currentPath.concat(pathToAdd)));
+  sessionStore.$patch({currentPath: sessionStore.currentPath.concat(pathToAdd),
+      lastChangeResponsible: ChangeResponsible.GuiEditor});
 }
 </script>
 
