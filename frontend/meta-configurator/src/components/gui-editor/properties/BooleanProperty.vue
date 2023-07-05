@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SelectButton from "primevue/selectbutton";
+import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
 
 const props = defineProps<{
@@ -8,8 +8,8 @@ const props = defineProps<{
 }>();
 
 const options = ref([
-    { name : 'true' , value : true},
-    { name : 'false', value: false},
+  {name: 'true', value: true},
+  {name: 'false', value: false},
 ]);
 
 const emit = defineEmits<{
@@ -28,12 +28,11 @@ const valueProperty = computed({
 
 <template>
   <div class="pl-2">
-      <SelectButton
-              v-model="valueProperty"
-              :options="options"
-              option-label="name"
-              option-value="value"
-      />
+    <SelectButton
+      v-model="valueProperty"
+      :options="options"
+      option-label="name"
+      option-value="value" />
   </div>
 </template>
 
