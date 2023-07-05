@@ -18,7 +18,11 @@ function isExpandable(): boolean {
 }
 
 function isRequired(): boolean {
-  return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string) || false;
+    return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string) || false;
+}
+
+function isDeprecated(): boolean {
+    return props.nodeData.schema.deprecated;
 }
 
 function zoomIntoPath() {
@@ -29,8 +33,14 @@ function zoomIntoPath() {
 </script>
 
 <template>
+  <!--If expandable: show underline on hovering. Call zoom function when double click. -->
   <span class="mr-2" :class="{'hover:underline': isExpandable()}" @dblclick="zoomIntoPath()">
-    {{ nodeData.name }}<span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
+      <!--If deprecated: put name into a s tag (strikethrough) -->
+      <s v-if="isDeprecated()">{{ nodeData.name }}</s>
+      <!--Otherwise: just normal text -->
+      <span v-else>{{ nodeData.name }}</span>
+      <!--Show red star after text if property is required -->
+      <span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
   </span>
 
   <span class="text-xs text-gray-400">:&nbsp;{{ nodeData.schema.type.join(',') }}</span>
