@@ -1,7 +1,7 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
-import {chooseConfigFromFile} from "@/components/config-selection/ChooseConfig";
+import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -119,6 +119,5 @@ export class TopMenuBar {
   }
   private chooseConfig(): void {
     chooseConfigFromFile();
-
   }
 }

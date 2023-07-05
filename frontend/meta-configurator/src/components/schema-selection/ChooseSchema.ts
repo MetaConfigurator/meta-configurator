@@ -5,7 +5,6 @@ export function chooseSchemaFromFile(): void {
 
   inputElement.type = 'file';
 
-
   inputElement.onchange = event => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
@@ -16,7 +15,6 @@ export function chooseSchemaFromFile(): void {
         try {
           const selectedSchema = JSON.parse(contents);
           useDataStore().schemaData = selectedSchema;
-
         } catch (error) {
           console.error('Error parsing JSON schema:', error);
           alert('Invalid JSON schema. Please choose a valid JSON schema.');
