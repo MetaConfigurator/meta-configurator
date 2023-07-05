@@ -49,8 +49,8 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
     heightInMeter: {
       type: 'number',
       description: 'Height',
-      exclusiveMinimum: 1.5,
-      maximum: 2.5,
+      exclusiveMinimum: 1.2,
+      maximum: 2.3,
       multipleOf: 0.01,
     },
     address: {

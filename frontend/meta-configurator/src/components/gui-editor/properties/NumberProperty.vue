@@ -9,18 +9,42 @@ const props = defineProps<{
   propertySchema: JsonSchema;
 }>();
 
-const minValue = computed(() => {
-  return props.propertySchema.exclusiveMinimum ?
-        props.propertySchema.exclusiveMinimum + props.propertySchema.multipleOf : props.propertySchema.minimum;
-});
-
-const maxValue = computed(() => {
-  return props.propertySchema.exclusiveMaximum ?
-        props.propertySchema.exclusiveMaximum + props.propertySchema.multipleOf : props.propertySchema.maximum;
-});
+// const minValue = computed(() => {
+//   return props.propertySchema.exclusiveMinimum ?
+//         props.propertySchema.exclusiveMinimum + props.propertySchema.multipleOf : props.propertySchema.minimum;
+// });
+//
+// const maxValue = computed(() => {
+//   return props.propertySchema.exclusiveMaximum ?
+//         props.propertySchema.exclusiveMaximum + props.propertySchema.multipleOf : props.propertySchema.maximum;
+// });
+//
+// const stepValue = computed(() => {
+//   return props.propertySchema.multipleOf ?? 0.1;
+// });
 
 const stepValue = computed(() => {
   return props.propertySchema.multipleOf ?? 0.1;
+});
+
+const maxValue = computed(() => {
+  if (props.propertySchema.exclusiveMaximum !== undefined) {
+    return props.propertySchema.exclusiveMaximum - stepValue.value;
+  } else if (props.propertySchema.maximum !== undefined) {
+    return props.propertySchema.maximum;
+  } else {
+    return undefined;
+  }
+});
+
+const minValue = computed(() => {
+  if (props.propertySchema.exclusiveMinimum !== undefined) {
+    return props.propertySchema.exclusiveMinimum + stepValue.value;
+  } else if (props.propertySchema.minimum !== undefined) {
+    return props.propertySchema.minimum;
+  } else {
+    return undefined;
+  }
 });
 
 const emit = defineEmits<{
