@@ -1,7 +1,7 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
-import {downloadConfig} from "@/components/download-config/downloadConfig";
+import {downloadConfig} from '@/components/download-config/downloadConfig';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
