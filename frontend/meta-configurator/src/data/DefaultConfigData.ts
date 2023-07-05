@@ -2,7 +2,7 @@ export const DEFAULT_CONFIG_DATA = {
   name: 'testName',
   firstName: 'testFirstName',
   isMarried: true,
-  telephoneNumber: 152000,
+  telephoneNumber: 155,
   heightInMeter: 1.7,
   nickNames: [
     {firstName: 'testNickName1', lastName: 'testLastName1'},
