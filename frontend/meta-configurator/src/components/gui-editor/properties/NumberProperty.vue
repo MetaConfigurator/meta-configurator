@@ -10,17 +10,17 @@ const props = defineProps<{
 }>();
 
 const minValue = computed(() => {
-    return props.propertySchema.exclusiveMinimum ?
+  return props.propertySchema.exclusiveMinimum ?
         props.propertySchema.exclusiveMinimum + props.propertySchema.multipleOf : props.propertySchema.minimum;
 });
 
 const maxValue = computed(() => {
-    return props.propertySchema.exclusiveMaximum ?
+  return props.propertySchema.exclusiveMaximum ?
         props.propertySchema.exclusiveMaximum + props.propertySchema.multipleOf : props.propertySchema.maximum;
 });
 
-const stepValue = computed(()=>{
-    return props.propertySchema.multipleOf ?? 0.1;
+const stepValue = computed(() => {
+  return props.propertySchema.multipleOf ?? 0.1;
 });
 
 const emit = defineEmits<{
