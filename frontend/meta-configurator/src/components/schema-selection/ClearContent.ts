@@ -1,3 +1,3 @@
 export function clearTextEditorContent(editor: any) {
-    editor.value.setValue('');
+  editor.value.setValue('');
 }

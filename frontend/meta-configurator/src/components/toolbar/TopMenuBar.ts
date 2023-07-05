@@ -2,7 +2,7 @@ import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 
-import {clearTextEditorContent} from "@/components/schema-selection/ClearContent";
+import {clearTextEditorContent} from '@/components/schema-selection/ClearContent';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
@@ -116,6 +116,4 @@ export class TopMenuBar {
   private clearEditor(): void {
     clearTextEditorContent(this.editor);
   }
-
-
 }
