@@ -13,15 +13,15 @@ const props = defineProps<{
 }>();
 
 const minValue = computed(() => {
-    return props.exclusiveMinValue ? props.exclusiveMinValue + props.multipleOf : props.minValue ;
+  return props.exclusiveMinValue ? props.exclusiveMinValue + props.multipleOf : props.minValue;
 });
 
 const maxValue = computed(() => {
-    return props.exclusiveMaxValue ? props.exclusiveMaxValue - props.multipleOf : props.maxValue;
+  return props.exclusiveMaxValue ? props.exclusiveMaxValue - props.multipleOf : props.maxValue;
 });
 
-const stepValue = computed(()=>{
-    return props.multipleOf ?? 0.1;
+const stepValue = computed(() => {
+  return props.multipleOf ?? 0.1;
 });
 
 const emit = defineEmits<{

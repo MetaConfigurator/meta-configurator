@@ -5,18 +5,18 @@ import InputNumber from 'primevue/inputnumber';
 const props = defineProps<{
   propertyName: string;
   propertyData: number;
-  maxValue: number ;
-  minValue: number ;
-  exclusiveMaxValue: number ;
-  exclusiveMinValue: number ;
+  maxValue: number;
+  minValue: number;
+  exclusiveMaxValue: number;
+  exclusiveMinValue: number;
 }>();
 
 const minValue = computed(() => {
-    return props.exclusiveMinValue ? props.exclusiveMinValue + 1 : props.minValue ;
+  return props.exclusiveMinValue ? props.exclusiveMinValue + 1 : props.minValue;
 });
 
 const maxValue = computed(() => {
-    return props.exclusiveMaxValue ? props.exclusiveMaxValue - 1 : props.maxValue;
+  return props.exclusiveMaxValue ? props.exclusiveMaxValue - 1 : props.maxValue;
 });
 
 const emit = defineEmits<{
