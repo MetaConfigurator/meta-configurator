@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import Checkbox from 'primevue/checkbox';
-import {computed} from 'vue';
+import SelectButton from "primevue/selectbutton";
+import {computed, ref} from 'vue';
 
 const props = defineProps<{
   propertyName: string;
   propertyData: boolean | undefined;
 }>();
 
+const options = ref([
+    { name : 'true' , value : true},
+    { name : 'false', value: false},
+]);
+
 const emit = defineEmits<{
-  (e: 'update_property_value', newValue: boolean): void;
+  (e: 'update_property_value', newValue: boolean | undefined): void;
 }>();
 
 const valueProperty = computed({
@@ -23,7 +28,12 @@ const valueProperty = computed({
 
 <template>
   <div class="pl-2">
-    <Checkbox v-model="valueProperty" :binary="true" value="propertyName" />
+      <SelectButton
+              v-model="valueProperty"
+              :options="options"
+              option-label="name"
+              option-value="value"
+      />
   </div>
 </template>
 
