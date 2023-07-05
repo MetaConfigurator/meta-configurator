@@ -28,6 +28,9 @@ function updatePath(newPath: Path) {
 }
 
 function updateData(path: Path, newValue: any) {
+    console.log("select path ", path)
+    sessionStore.$patch({currentSelectedElement: path,
+        lastChangeResponsible: ChangeResponsible.GuiEditor});
   sessionStore.updateDataAtPath(path, newValue);
 }
 

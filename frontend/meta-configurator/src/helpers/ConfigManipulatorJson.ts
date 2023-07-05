@@ -9,26 +9,31 @@ export class ConfigManipulatorJson implements ConfigManipulator {
   constructor() {}
 
   determineCursorPosition(editorContent: string, currentPath: Path): number {
-    console.log("test, using editorcontent ", editorContent)
-    const cst: CstDocument = parse(editorContent);
-    console.log("unable to parse cst")
-    const result = this.determineCursorPositionStep(cst.root,  currentPath)
-    console.log("done")
-    return result
+    try {
+      const cst: CstDocument = parse(editorContent);
+      const result = this.determineCursorPositionStep(cst.root,  currentPath)
+      return result
+
+    } catch (e) {
+      console.log(e)
+      return 0
+    }
   }
 
   determineCursorPositionStep(currentNode: CstNode, currentPath: Path): number {
     if (currentPath.length == 0) {
-      return currentNode.range.start
+      return currentNode.range.start;
     }
 
     const nextKey = currentPath[0];
     console.log("determine position step with path ", currentPath, " and node ", currentNode)
 
-    /*if (currentNode.kind == 'object') {
+    if (currentNode.kind == 'object') {
         for (const childNode of currentNode.children) {
+          console.log("is object and has child ", childNode.key)
           if (childNode.key == nextKey) {
-            return this.determineCursorPositionStep(currentNode, currentPath.slice(0, -1))
+            console.log("find child with right key")
+            return this.determineCursorPositionStep(childNode, currentPath.slice(0, -1))
           }
         }
         console.log("Unable to find path key ", nextKey, " in children of node ", currentNode);
@@ -40,7 +45,7 @@ export class ConfigManipulatorJson implements ConfigManipulator {
       let index = 0;
       for (const childNode of currentNode.children) {
         if (index == nextKey) {
-          return this.determineCursorPositionStep(currentNode, currentPath.slice(0, -1))
+          return this.determineCursorPositionStep(childNode, currentPath.slice(0, -1))
         }
         index++;
       }
@@ -48,7 +53,7 @@ export class ConfigManipulatorJson implements ConfigManipulator {
 
     } else if (currentNode.kind == 'array-element') {
       return this.determineCursorPositionStep(currentNode.valueNode, currentPath)
-    }*/
+    }
     return currentNode.range.start
   }
 
