@@ -1,9 +1,7 @@
 import type {Path} from '@/model/path';
 import type {ConfigManipulator} from '@/model/ConfigManipulator';
-import type {Position} from 'brace';
 import type {CstDocument, CstNode} from 'json-cst';
 import {parse} from 'json-cst';
-import {useSessionStore} from "@/store/sessionStore";
 
 export class ConfigManipulatorJson implements ConfigManipulator {
   constructor() {}
@@ -22,21 +20,17 @@ export class ConfigManipulatorJson implements ConfigManipulator {
 
   determineCursorPositionStep(currentNode: CstNode, currentPath: Path): number {
     if (currentPath.length == 0) {
-      return currentNode.range.start;
+      return currentNode.range.end;
     }
 
     const nextKey = currentPath[0];
-    console.log("determine position step with path ", currentPath, " and node ", currentNode)
 
     if (currentNode.kind == 'object') {
         for (const childNode of currentNode.children) {
-          console.log("is object and has child ", childNode.key)
           if (childNode.key == nextKey) {
-            console.log("find child with right key")
-            return this.determineCursorPositionStep(childNode, currentPath.slice(0, -1))
+            return this.determineCursorPositionStep(childNode, currentPath.slice(1, currentPath.length))
           }
         }
-        console.log("Unable to find path key ", nextKey, " in children of node ", currentNode);
 
     } else if (currentNode.kind == 'object-property') {
       return this.determineCursorPositionStep(currentNode.valueNode, currentPath)
@@ -45,11 +39,10 @@ export class ConfigManipulatorJson implements ConfigManipulator {
       let index = 0;
       for (const childNode of currentNode.children) {
         if (index == nextKey) {
-          return this.determineCursorPositionStep(childNode, currentPath.slice(0, -1))
+          return this.determineCursorPositionStep(childNode, currentPath.slice(1, currentPath.length))
         }
         index++;
       }
-      console.log("Unable to find path key ", nextKey, " in children of node ", currentNode);
 
     } else if (currentNode.kind == 'array-element') {
       return this.determineCursorPositionStep(currentNode.valueNode, currentPath)

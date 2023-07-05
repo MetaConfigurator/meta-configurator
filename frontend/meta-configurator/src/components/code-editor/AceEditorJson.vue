@@ -34,7 +34,7 @@ onMounted(() => {
   editor.value.on('change', () => {
     try {
         sessionStore.$patch( { fileData: JSON.parse(editor.value.getValue()),
-            lastChangeResponsible: ChangeResponsible.GuiEditor})
+            lastChangeResponsible: ChangeResponsible.CodeEditor})
     } catch (e) {
       /* empty */
     }
@@ -42,7 +42,7 @@ onMounted(() => {
   editor.value.on('changeSelection', () => {
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-      sessionStore.$patch( { currentSelectedElement: newPath, lastChangeResponsible: ChangeResponsible.GuiEditor });
+      sessionStore.$patch( { currentSelectedElement: newPath, lastChangeResponsible: ChangeResponsible.CodeEditor });
     } catch (e) {
       /* empty */
     }
@@ -81,21 +81,19 @@ function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {
   let position = determineCursorPosition(editorContent, currentPath);
-  editor.value.gotoLine(position.row);
+  editor.value.gotoLine(position.row, position.column)
 }
 
 function determineCursorPosition(editorContent: string, currentPath: Path): Position {
     console.log("determine cursor position", editorContent)
   let index =  manipulator.determineCursorPosition(editorContent, currentPath);
-  console.log("got index "+ index);
-  return editor.value.session.doc.indexToPosition(index, 0);
+  let pos =  editor.value.session.doc.indexToPosition(index, 0);
+   return pos;
 }
 
 function determinePath(editorContent: string, cursorPosition: Position): Path {
   let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
   return manipulator.determinePath(editorContent, targetCharacter);
-  // TODO: determines path. but missing is that we don't go into simple properties. Only into objects and arrays
-  // so to do: compare result path with schema and cut off last path array element if it is not complex
 }
 </script>
 
