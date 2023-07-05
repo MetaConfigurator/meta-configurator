@@ -20,7 +20,7 @@ export class TopMenuBar {
           {
             label: 'New',
             icon: 'pi pi-fw pi-plus',
-            command: this.clearEditor,
+            command: this.clearEditor.bind(this),
           },
           {
             label: 'Delete',

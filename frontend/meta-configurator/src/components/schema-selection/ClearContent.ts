@@ -1,8 +1,3 @@
-import * as ace from 'brace';
-export function clearTextEditorContent(editor: ace.Editor): void {
-    if (editor && typeof editor.setValue === 'function') {
-        // Clear the content of the editor
-        editor.setValue('');
-
-    }
+export function clearTextEditorContent(editor: any) {
+    editor.value.setValue('');
 }
