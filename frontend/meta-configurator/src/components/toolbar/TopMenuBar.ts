@@ -118,7 +118,7 @@ export class TopMenuBar {
     chooseSchemaFromFile();
   }
   private chooseConfig(): void {
-    const { openFileDialog } = chooseConfigFromFile();
-    openFileDialog();
+    chooseConfigFromFile();
+
   }
 }

@@ -1,38 +1,30 @@
-
 import { useDataStore } from '@/store/dataStore';
 
-export function chooseConfigFromFile(): {
-    openFileDialog: () => void;
-    handleFileSelect: (event: Event) => void;
-} {
-    const openFileDialog = (): void => {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'application/json';
-        fileInput.addEventListener('change', handleFileSelect);
-        fileInput.click();
-    };
+export function chooseConfigFromFile(): void {
+    const inputElement = document.createElement('input');
 
-    const handleFileSelect = (event: Event): void => {
+    inputElement.type = 'file';
+
+    inputElement.onchange = event => {
         const file = (event.target as HTMLInputElement).files?.[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+
+            reader.onload = e => {
                 const contents = e.target?.result as string;
                 try {
-                    const jsonData = JSON.parse(contents);
-                    const dataStore = useDataStore();
-                    dataStore.configData = jsonData; // Update the configData value in the store
+                    const selectedConfig = JSON.parse(contents);
+                    useDataStore().fileData = selectedConfig;
+                    console.log('Updated fileData:', selectedConfig);
                 } catch (error) {
-                    console.error('Error parsing JSON file:', error);
+                    console.error('Error parsing JSON schema:', error);
+                    alert('Invalid JSON file. Please choose a valid JSON file.');
                 }
             };
+
             reader.readAsText(file);
         }
     };
 
-    return {
-        openFileDialog,
-        handleFileSelect,
-    };
+    inputElement.click();
 }
