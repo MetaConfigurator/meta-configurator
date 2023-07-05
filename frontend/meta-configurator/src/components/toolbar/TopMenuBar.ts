@@ -1,7 +1,7 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
-
+import {downloadConfig} from "@/components/download-config/downloadConfig";
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
@@ -29,9 +29,9 @@ export class TopMenuBar {
             separator: true,
           },
           {
-            label: 'Export',
-            icon: 'pi pi-fw pi-external-link',
-            command: this.onMenuItemClicked,
+            label: 'Download',
+            icon: 'pi pi-fw pi-cloud-download',
+            command: this.download,
           },
           {
             label: 'Select Config Language',
@@ -110,5 +110,8 @@ export class TopMenuBar {
   }
   private chooseSchema(): void {
     chooseSchemaFromFile();
+  }
+  private download(): void {
+    downloadConfig();
   }
 }
