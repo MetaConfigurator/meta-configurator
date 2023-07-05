@@ -78,6 +78,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
         moreInfo: {
           type: 'object',
           description: 'More info about the address',
+          deprecated: true,
           properties: {
             info: {
               type: 'string',
