@@ -28,13 +28,15 @@ onMounted(() => {
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
-    editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
+  editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-        sessionStore.$patch( { fileData: JSON.parse(editor.value.getValue()),
-            lastChangeResponsible: ChangeResponsible.CodeEditor})
+      sessionStore.$patch({
+        fileData: JSON.parse(editor.value.getValue()),
+        lastChangeResponsible: ChangeResponsible.CodeEditor,
+      });
     } catch (e) {
       /* empty */
     }
@@ -42,7 +44,10 @@ onMounted(() => {
   editor.value.on('changeSelection', () => {
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-      sessionStore.$patch( { currentSelectedElement: newPath, lastChangeResponsible: ChangeResponsible.CodeEditor });
+      sessionStore.$patch({
+        currentSelectedElement: newPath,
+        lastChangeResponsible: ChangeResponsible.CodeEditor,
+      });
     } catch (e) {
       /* empty */
     }
@@ -52,9 +57,9 @@ onMounted(() => {
   watch(
     fileData,
     newVal => {
-        if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-            editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
-        }
+      if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
+      }
     },
     {deep: true}
   );
@@ -63,9 +68,12 @@ onMounted(() => {
     currentSelectedElement,
     newVal => {
       if (editor.value) {
-          if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-              updateCursorPositionBasedOnPath(editor.value.getValue(), sessionStore.currentSelectedElement);
-          }
+        if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+          updateCursorPositionBasedOnPath(
+            editor.value.getValue(),
+            sessionStore.currentSelectedElement
+          );
+        }
       }
     },
     {deep: true}
@@ -73,22 +81,22 @@ onMounted(() => {
 });
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
-    // Update value with new data and also update cursor position
-    const newEditorContent = JSON.stringify(configData, null, 2);
-    editor.value.setValue(newEditorContent);
-    updateCursorPositionBasedOnPath(newEditorContent, currentPath);
+  // Update value with new data and also update cursor position
+  const newEditorContent = JSON.stringify(configData, null, 2);
+  editor.value.setValue(newEditorContent);
+  updateCursorPositionBasedOnPath(newEditorContent, currentPath);
 }
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {
   let position = determineCursorPosition(editorContent, currentPath);
-  editor.value.gotoLine(position.row, position.column)
+  editor.value.gotoLine(position.row, position.column);
 }
 
 function determineCursorPosition(editorContent: string, currentPath: Path): Position {
-    console.log("determine cursor position", editorContent)
-  let index =  manipulator.determineCursorPosition(editorContent, currentPath);
-  let pos =  editor.value.session.doc.indexToPosition(index, 0);
-   return pos;
+  console.log('determine cursor position', editorContent);
+  let index = manipulator.determineCursorPosition(editorContent, currentPath);
+  let pos = editor.value.session.doc.indexToPosition(index, 0);
+  return pos;
 }
 
 function determinePath(editorContent: string, cursorPosition: Position): Path {

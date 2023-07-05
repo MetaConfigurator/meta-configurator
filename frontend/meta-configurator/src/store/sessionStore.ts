@@ -29,7 +29,9 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentPath: Ref<Path> = ref<Path>([]);
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
-  const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(ChangeResponsible.None);
+  const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
+    ChangeResponsible.None
+  );
 
   const fileData: WritableComputedRef<any> = computed({
     // getter

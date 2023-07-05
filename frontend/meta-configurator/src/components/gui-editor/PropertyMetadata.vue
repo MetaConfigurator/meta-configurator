@@ -21,7 +21,6 @@ function isRequired(): boolean {
   return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string) || false;
 }
 
-
 function zoomIntoPath() {
   if (isExpandable()) {
     emit('zoom_into_path', props.nodeData.relativePath);

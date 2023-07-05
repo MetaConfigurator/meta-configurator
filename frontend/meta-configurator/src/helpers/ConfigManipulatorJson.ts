@@ -9,12 +9,11 @@ export class ConfigManipulatorJson implements ConfigManipulator {
   determineCursorPosition(editorContent: string, currentPath: Path): number {
     try {
       const cst: CstDocument = parse(editorContent);
-      const result = this.determineCursorPositionStep(cst.root,  currentPath)
-      return result
-
+      const result = this.determineCursorPositionStep(cst.root, currentPath);
+      return result;
     } catch (e) {
-      console.log(e)
-      return 0
+      console.log(e);
+      return 0;
     }
   }
 
@@ -26,28 +25,31 @@ export class ConfigManipulatorJson implements ConfigManipulator {
     const nextKey = currentPath[0];
 
     if (currentNode.kind == 'object') {
-        for (const childNode of currentNode.children) {
-          if (childNode.key == nextKey) {
-            return this.determineCursorPositionStep(childNode, currentPath.slice(1, currentPath.length))
-          }
+      for (const childNode of currentNode.children) {
+        if (childNode.key == nextKey) {
+          return this.determineCursorPositionStep(
+            childNode,
+            currentPath.slice(1, currentPath.length)
+          );
         }
-
+      }
     } else if (currentNode.kind == 'object-property') {
-      return this.determineCursorPositionStep(currentNode.valueNode, currentPath)
-
+      return this.determineCursorPositionStep(currentNode.valueNode, currentPath);
     } else if (currentNode.kind == 'array') {
       let index = 0;
       for (const childNode of currentNode.children) {
         if (index == nextKey) {
-          return this.determineCursorPositionStep(childNode, currentPath.slice(1, currentPath.length))
+          return this.determineCursorPositionStep(
+            childNode,
+            currentPath.slice(1, currentPath.length)
+          );
         }
         index++;
       }
-
     } else if (currentNode.kind == 'array-element') {
-      return this.determineCursorPositionStep(currentNode.valueNode, currentPath)
+      return this.determineCursorPositionStep(currentNode.valueNode, currentPath);
     }
-    return currentNode.range.start
+    return currentNode.range.start;
   }
 
   determinePath(editorContent: string, targetCharacter: number): Path {
