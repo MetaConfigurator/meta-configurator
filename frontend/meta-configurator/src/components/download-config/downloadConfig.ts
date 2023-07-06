@@ -3,7 +3,6 @@ import {useSessionStore} from "@/store/sessionStore";
 export function downloadConfig(): void {
   // Get the current config data from the `fileData` variable
   const configData: any = useSessionStore().fileData;
-
   // Convert the config data to a JSON string
   const configString: string = JSON.stringify(configData, null, 2);
 
