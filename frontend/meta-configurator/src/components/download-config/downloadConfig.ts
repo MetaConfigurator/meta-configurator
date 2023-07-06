@@ -1,16 +1,8 @@
-import {ref, watch} from 'vue';
-import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
-
-const fileData = ref(DEFAULT_CONFIG_DATA);
-// Watch for changes in the `fileData` variable
-watch(fileData, newData => {
-  // Update the `fileData` whenever it changes
-  fileData.value = newData;
-});
+import {useSessionStore} from "@/store/sessionStore";
 
 export function downloadConfig(): void {
   // Get the current config data from the `fileData` variable
-  const configData: any = fileData.value;
+  const configData: any = useSessionStore().fileData;
 
   // Convert the config data to a JSON string
   const configString: string = JSON.stringify(configData, null, 2);
