@@ -21,7 +21,11 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    emit('update_property_value', newValue);
+    if (newValue === null) {
+      emit('update_property_value', undefined)
+    } else {
+      emit('update_property_value', newValue);
+    }
   },
 });
 </script>
@@ -36,4 +40,12 @@ const valueProperty = computed({
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+:deep(.p-button) {
+  padding: 0 0.5rem;
+}
+:deep(.p-button-label) {
+  font-weight: 500;
+}
+</style>
