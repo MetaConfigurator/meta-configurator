@@ -22,7 +22,7 @@ const valueProperty = computed({
   },
   set(newValue) {
     if (newValue === null) {
-      emit('update_property_value', undefined)
+      emit('update_property_value', undefined);
     } else {
       emit('update_property_value', newValue);
     }
@@ -41,7 +41,6 @@ const valueProperty = computed({
 </template>
 
 <style scoped>
-
 :deep(.p-button) {
   padding: 0 0.5rem;
 }
