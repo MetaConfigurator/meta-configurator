@@ -1,13 +1,12 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
-
-import {clearTextEditorContent} from '@/components/schema-selection/ClearContent';
+import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
+import {downloadConfig} from '@/components/download-config/downloadConfig';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
-  private editor: any;
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
@@ -20,7 +19,7 @@ export class TopMenuBar {
           {
             label: 'New',
             icon: 'pi pi-fw pi-plus',
-            command: this.clearEditor.bind(this),
+            command: this.onMenuItemClicked,
           },
           {
             label: 'Delete',
@@ -28,12 +27,17 @@ export class TopMenuBar {
             command: this.onMenuItemClicked,
           },
           {
+            label: 'Choose Config',
+            icon: 'pi pi-fw pi-plus',
+            command: this.chooseConfig,
+          },
+          {
             separator: true,
           },
           {
-            label: 'Export',
-            icon: 'pi pi-fw pi-external-link',
-            command: this.onMenuItemClicked,
+            label: 'Download',
+            icon: 'pi pi-fw pi-cloud-download',
+            command: this.download,
           },
           {
             label: 'Select Config Language',
@@ -113,7 +117,11 @@ export class TopMenuBar {
   private chooseSchema(): void {
     chooseSchemaFromFile();
   }
-  private clearEditor(): void {
-    clearTextEditorContent(this.editor);
+
+  private chooseConfig(): void {
+    chooseConfigFromFile();
+  }
+  private download(): void {
+    downloadConfig();
   }
 }

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "json-lexer": "^1.2.0"
+  }
+}

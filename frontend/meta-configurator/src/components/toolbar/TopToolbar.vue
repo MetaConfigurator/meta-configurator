@@ -3,25 +3,25 @@ import Menubar from 'primevue/menubar';
 import {computed, Ref, ref} from 'vue';
 import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
-import type {PageName} from '@/router/pageName';
+import {SessionMode} from '@/store/sessionStore';
+import SchemaEditorView from '@/views/SchemaEditorView.vue';
 
 const props = defineProps<{
-  selectedPage: PageName;
+  currentMode: SessionMode;
 }>();
 
 const emit = defineEmits<{
-  // TODO: solve page-change with routing
-  (e: 'page-changed', page: PageName): void;
+  (e: 'mode-selected', newMode: SessionMode): void;
   (e: 'toggle-order'): void;
 }>();
 
 function getPageName(): string {
-  switch (props.selectedPage) {
-    case 'File':
+  switch (props.currentMode) {
+    case SessionMode.FileEditor:
       return 'File Editor';
-    case 'Schema':
+    case SessionMode.SchemaEditor:
       return 'Schema Editor';
-    case 'Settings':
+    case SessionMode.Settings:
       return 'Settings';
     default:
       return 'Unknown';
@@ -36,39 +36,39 @@ const pageSelectionMenuItems: MenuItem[] = [
     label: 'File Editor',
     icon: 'pi pi-fw pi-file',
     class: () => {
-      if (props.selectedPage !== 'File') {
+      if (props.currentMode !== SessionMode.FileEditor) {
         return 'font-normal text-lg';
       }
       return 'font-bold text-lg';
     },
     command: () => {
-      emit('page-changed', 'File');
+      emit('mode-selected', SessionMode.FileEditor);
     },
   },
   {
     label: 'Schema Editor',
     icon: 'pi pi-fw pi-pencil',
     class: () => {
-      if (props.selectedPage !== 'Schema') {
+      if (props.currentMode !== SchemaEditorView) {
         return 'font-normal text-lg';
       }
       return 'font-bold text-lg';
     },
     command: () => {
-      emit('page-changed', 'Schema');
+      emit('mode-selected', SessionMode.SchemaEditor);
     },
   },
   {
     label: 'Settings',
     icon: 'pi pi-fw pi-cog',
     class: () => {
-      if (props.selectedPage !== 'Settings') {
+      if (props.currentMode !== SessionMode.Settings) {
         return 'font-normal text-lg';
       }
       return 'font-bold text-lg';
     },
     command: () => {
-      emit('page-changed', 'Settings');
+      emit('mode-selected', SessionMode.Settings);
     },
   },
 ];
@@ -81,13 +81,13 @@ const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
 const settingsMenuItems = topMenuBar.settingsMenuItems;
 
-function getMenuItems(pageId: PageName = props.selectedPage): MenuItem[] {
-  switch (pageId) {
-    case 'File':
+function getMenuItems(): MenuItem[] {
+  switch (props.currentMode) {
+    case SessionMode.FileEditor:
       return fileEditorMenuItems;
-    case 'Schema':
+    case SessionMode.SchemaEditor:
       return schemaEditorMenuItems;
-    case 'Settings':
+    case SessionMode.Settings:
       return settingsMenuItems;
     default:
       return [];

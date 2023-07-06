@@ -32,6 +32,7 @@ export class ConfigTreeNodeResolver {
         schema: schema,
         parentSchema: parentSchema,
         data: this.dataForProperty(path),
+        depth: depth,
         relativePath: path,
       },
       key: depth + name.toString(),

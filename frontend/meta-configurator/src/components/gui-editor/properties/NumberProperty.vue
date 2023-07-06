@@ -1,11 +1,37 @@
 <script setup lang="ts">
 import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
+import type {JsonSchema} from '@/model/JsonSchema';
 
 const props = defineProps<{
   propertyName: string;
   propertyData: number;
+  propertySchema: JsonSchema;
 }>();
+
+const stepValue = computed(() => {
+  return props.propertySchema.multipleOf ?? 0.1;
+});
+
+const maxValue = computed(() => {
+  if (props.propertySchema.exclusiveMaximum !== undefined) {
+    return props.propertySchema.exclusiveMaximum - stepValue.value;
+  } else if (props.propertySchema.maximum !== undefined) {
+    return props.propertySchema.maximum;
+  } else {
+    return undefined;
+  }
+});
+
+const minValue = computed(() => {
+  if (props.propertySchema.exclusiveMinimum !== undefined) {
+    return props.propertySchema.exclusiveMinimum + stepValue.value;
+  } else if (props.propertySchema.minimum !== undefined) {
+    return props.propertySchema.minimum;
+  } else {
+    return undefined;
+  }
+});
 
 const emit = defineEmits<{
   (e: 'update_property_value', newValue: number): void;
@@ -32,7 +58,9 @@ const valueProperty = computed({
     :maxFractionDigits="20"
     showButtons
     buttonLayout="stacked"
-    :step="0.1"
+    :step="stepValue"
+    :min="minValue"
+    :max="maxValue"
     increment-button-class="p-button-text p-button-secondary"
     decrement-button-class="p-button-text p-button-secondary" />
 </template>

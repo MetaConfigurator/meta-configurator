@@ -43,10 +43,15 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
     telephoneNumber: {
       type: 'integer',
       description: 'phone number',
+      exclusiveMinimum: 149,
+      maximum: 159,
     },
     heightInMeter: {
       type: 'number',
       description: 'Height',
+      exclusiveMinimum: 1.2,
+      maximum: 2.3,
+      multipleOf: 0.01,
     },
     address: {
       type: 'object',
@@ -78,6 +83,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
         moreInfo: {
           type: 'object',
           description: 'More info about the address',
+          deprecated: true,
           properties: {
             info: {
               type: 'string',

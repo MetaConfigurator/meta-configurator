@@ -1,40 +1,55 @@
 <script setup lang="ts">
 import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump.vue';
-import {useDataStore} from '@/store/dataStore';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/model/path';
-import {useSchemaStore} from '@/store/schemaStore';
-import {useCommonStore} from '@/store/commonStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {onMounted, watch} from 'vue';
+import {storeToRefs} from 'pinia';
 
-const schemaStore = useSchemaStore();
-const dataStore = useDataStore();
-const commonStore = useCommonStore();
+const sessionStore = useSessionStore();
+const {currentSelectedElement} = storeToRefs(sessionStore);
+
+onMounted(() => {
+  watch(
+    currentSelectedElement,
+    newVal => {
+      // new element has been selected
+      // TODO: automatically expand objects/arrays contained in path
+    },
+    {deep: true}
+  );
+});
 
 function updatePath(newPath: Path) {
-  commonStore.$patch({currentPath: newPath});
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.currentPath = newPath;
 }
 
 function updateData(path: Path, newValue: any) {
-  dataStore.updateDataAtPath(path, newValue);
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.updateDataAtPath(path, newValue);
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.currentSelectedElement = path;
 }
 
 function zoomIntoPath(pathToAdd: Path) {
-  commonStore.$patch(state => (state.currentPath = state.currentPath.concat(pathToAdd)));
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.currentPath = sessionStore.currentPath.concat(pathToAdd);
 }
 </script>
 
 <template>
   <div class="p-5 space-y-3 h-full">
-    <SchemaInfoPanel :schema="schemaStore.schema" />
+    <SchemaInfoPanel :schema="sessionStore.fileSchema" />
     <CurrentPathBreadcrumb
-      :root-name="schemaStore.schema.title ?? 'root'"
-      :path="commonStore.currentPath"
+      :root-name="sessionStore.fileSchema.title ?? 'root'"
+      :path="sessionStore.currentPath"
       @update:path="newPath => updatePath(newPath)" />
     <PropertiesPanel
-      :current-schema="schemaStore.schemaAtCurrentPath"
-      :current-path="commonStore.currentPath"
-      :current-data="dataStore.dataAtCurrentPath"
+      :current-schema="sessionStore.schemaAtCurrentPath"
+      :current-path="sessionStore.currentPath"
+      :current-data="sessionStore.dataAtCurrentPath"
       @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
       @update_data="updateData" />
   </div>
