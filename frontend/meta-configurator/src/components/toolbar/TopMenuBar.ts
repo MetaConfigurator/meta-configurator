@@ -120,7 +120,7 @@ export class TopMenuBar {
   
   private chooseConfig(): void {
     chooseConfigFromFile();
-    
+  }
   private download(): void {
     downloadConfig();
   }
