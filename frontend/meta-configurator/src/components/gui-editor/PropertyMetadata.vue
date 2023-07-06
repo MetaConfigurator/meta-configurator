@@ -50,7 +50,7 @@ function zoomIntoPath() {
   <span class="text-xs text-gray-400">:&nbsp;{{ nodeData.schema.type.join(',') }}</span>
 
   <!-- "zoom in" icon -->
-  <div class="flex flex-row w-full justify-end mr-5">
+  <div class="flex flex-row w-full ml-5">
     <IconExpand
       class="text-gray-700 hover:scale-110 h-5"
       v-if="isExpandable()"
