@@ -1,8 +1,8 @@
 export const DEFAULT_CONFIG_DATA = {
   name: 'testName',
   firstName: 'testFirstName',
-  isMarried: true,
-  telephoneNumber: 155,
+  isMarried: undefined,
+  telephoneNumber: 152000,
   heightInMeter: 1.7,
   nickNames: [
     {firstName: 'testNickName1', lastName: 'testLastName1'},
