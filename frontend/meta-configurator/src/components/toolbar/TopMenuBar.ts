@@ -3,12 +3,13 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
 import {downloadConfig} from '@/components/download-config/downloadConfig';
+import {clearTextEditorContent} from "@/components/toolbar/ClearContent";
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
-
+  private editor:any;
   get fileEditorMenuItems() {
     return [
       {
@@ -17,25 +18,21 @@ export class TopMenuBar {
         class: 'z-10', // z-10 is required otherwise the menu is behind the ace editor
         items: [
           {
-            label: 'New',
-            icon: 'pi pi-fw pi-plus',
-            command: this.onMenuItemClicked,
-          },
-          {
-            label: 'Delete',
+            label: 'Clear',
             icon: 'pi pi-fw pi-trash',
-            command: this.onMenuItemClicked,
+            command: this.clearEditor.bind(this),
+
           },
           {
-            label: 'Choose Config',
-            icon: 'pi pi-fw pi-plus',
+            label: 'Upload Config',
+            icon: 'pi pi-fw pi-upload',
             command: this.chooseConfig,
           },
           {
             separator: true,
           },
           {
-            label: 'Download',
+            label: 'Download Config',
             icon: 'pi pi-fw pi-cloud-download',
             command: this.download,
           },
@@ -117,11 +114,15 @@ export class TopMenuBar {
   private chooseSchema(): void {
     chooseSchemaFromFile();
   }
-
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
   private download(): void {
     downloadConfig();
   }
+  private clearEditor(): void {
+     console.log('Clearing editor');
+     clearTextEditorContent(this.editor);
+  }
+
 }
