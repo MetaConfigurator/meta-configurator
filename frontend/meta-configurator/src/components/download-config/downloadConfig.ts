@@ -1,4 +1,4 @@
-import {useSessionStore} from "@/store/sessionStore";
+import {useSessionStore} from '@/store/sessionStore';
 
 export function downloadConfig(): void {
   // Get the current config data from the `fileData` variable
