@@ -117,7 +117,7 @@ export class TopMenuBar {
   private chooseSchema(): void {
     chooseSchemaFromFile();
   }
-  
+
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
