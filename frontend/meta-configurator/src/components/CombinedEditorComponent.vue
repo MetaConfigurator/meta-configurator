@@ -9,6 +9,8 @@ import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import router from '@/router';
+import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
+import {useSettingsStore} from '@/store/settingsStore';
 
 const panelOrder = ref<'code' | 'gui'>('code');
 
@@ -58,6 +60,7 @@ function togglePanelOrder() {
         :current-mode="useSessionStore().currentMode"
         @mode-selected="updateMode"
         @toggle-order="togglePanelOrder" />
+
       <Splitter class="h-full" :layout="windowWidth < 600 ? 'vertical' : 'horizontal'">
         <SplitterPanel
           v-for="(panel, index) in panels"
@@ -65,6 +68,9 @@ function togglePanelOrder() {
           :min-size="20"
           :resizable="true">
           <component :is="panel" />
+        </SplitterPanel>
+        <SplitterPanel v-if="useSettingsStore().settingsData.debuggingActive">
+          <PanelDataCurrentPath />
         </SplitterPanel>
       </Splitter>
     </main>

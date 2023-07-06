@@ -1,33 +1,68 @@
 import type {Path} from '@/model/path';
 import type {ConfigManipulator} from '@/model/ConfigManipulator';
-import type {Position} from 'brace';
 import type {CstDocument, CstNode} from 'json-cst';
 import {parse} from 'json-cst';
 
 export class ConfigManipulatorJson implements ConfigManipulator {
   constructor() {}
 
-  determineCursorPosition(editorContent: string, currentPath: Path): Position {
-    // todo: implement
+  determineCursorPosition(editorContent: string, currentPath: Path): number {
+    try {
+      const cst: CstDocument = parse(editorContent);
+      const result = this.determineCursorPositionStep(cst.root, currentPath);
+      return result;
+    } catch (e) {
+      console.log(e);
+      return 0;
+    }
+  }
 
-    return {
-      row: 4,
-      column: 0,
-    };
+  determineCursorPositionStep(currentNode: CstNode, currentPath: Path): number {
+    if (currentPath.length == 0) {
+      return currentNode.range.end;
+    }
+
+    const nextKey = currentPath[0];
+
+    if (currentNode.kind == 'object') {
+      for (const childNode of currentNode.children) {
+        if (childNode.key == nextKey) {
+          return this.determineCursorPositionStep(
+            childNode,
+            currentPath.slice(1, currentPath.length)
+          );
+        }
+      }
+    } else if (currentNode.kind == 'object-property') {
+      return this.determineCursorPositionStep(currentNode.valueNode, currentPath);
+    } else if (currentNode.kind == 'array') {
+      let index = 0;
+      for (const childNode of currentNode.children) {
+        if (index == nextKey) {
+          return this.determineCursorPositionStep(
+            childNode,
+            currentPath.slice(1, currentPath.length)
+          );
+        }
+        index++;
+      }
+    } else if (currentNode.kind == 'array-element') {
+      return this.determineCursorPositionStep(currentNode.valueNode, currentPath);
+    }
+    return currentNode.range.start;
   }
 
   determinePath(editorContent: string, targetCharacter: number): Path {
     const cst: CstDocument = parse(editorContent);
-    const result = this.determinePathNew(cst.root, targetCharacter) || [];
-    console.log(result);
+    const result = this.determinePathStep(cst.root, targetCharacter) || [];
     return result;
   }
 
-  private determinePathNew(currentNode: CstNode, targetCharacter: number): Path | undefined {
+  private determinePathStep(currentNode: CstNode, targetCharacter: number): Path | undefined {
     if (currentNode.kind == 'object') {
       if (targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
         for (const childNode of currentNode.children) {
-          const childPath = this.determinePathNew(childNode, targetCharacter);
+          const childPath = this.determinePathStep(childNode, targetCharacter);
           if (childPath !== undefined) {
             return childPath;
           }
@@ -38,7 +73,7 @@ export class ConfigManipulatorJson implements ConfigManipulator {
       }
     } else if (currentNode.kind == 'object-property') {
       if (targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
-        const childPath = this.determinePathNew(currentNode.valueNode, targetCharacter);
+        const childPath = this.determinePathStep(currentNode.valueNode, targetCharacter);
         let resultPath: Path = [currentNode.key];
         if (childPath !== undefined) {
           resultPath = resultPath.concat(childPath);
@@ -51,7 +86,7 @@ export class ConfigManipulatorJson implements ConfigManipulator {
       if (targetCharacter > currentNode.range.start && targetCharacter < currentNode.range.end) {
         let index = 0;
         for (const childNode of currentNode.children) {
-          const childPath = this.determinePathNew(childNode, targetCharacter);
+          const childPath = this.determinePathStep(childNode, targetCharacter);
           if (childPath !== undefined) {
             const result_list: Path = [index];
             return result_list.concat(childPath);
@@ -64,7 +99,7 @@ export class ConfigManipulatorJson implements ConfigManipulator {
       }
     } else if (currentNode.kind == 'array-element') {
       if (targetCharacter >= currentNode.range.start && targetCharacter < currentNode.range.end) {
-        const childPath = this.determinePathNew(currentNode.valueNode, targetCharacter);
+        const childPath = this.determinePathStep(currentNode.valueNode, targetCharacter);
         let resultPath: Path = [];
         if (childPath !== undefined) {
           resultPath = resultPath.concat(childPath);
