@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
 
 // Note: currently not in use/active
 
@@ -25,8 +25,8 @@ const router = createRouter({
       },
     },
     {
-      path: '/setting',
-      name: 'setting',
+      path: '/settings',
+      name: 'settings',
       component: () => import('../views/SettingsEditorView.vue'),
       meta: {
         title: 'SettingEditor',
@@ -41,7 +41,9 @@ router.beforeEach((to, from, next) => {
   // Update the page title based on the current route
   document.title = (to.meta.title || DEFAULT_TITLE) as string;
 
+  useSessionStore().lastChangeResponsible = ChangeResponsible.Routing
   useSessionStore().currentMode = to.meta.sessionMode as SessionMode;
+  console.log("new mode ", useSessionStore().currentMode)
   useSessionStore().currentPath = [];
   next();
 });
