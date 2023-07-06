@@ -1,6 +1,6 @@
 import {useDataStore} from '@/store/dataStore';
 
-export function chooseSchemaFromFile(): void {
+export function chooseConfigFromFile(): void {
   const inputElement = document.createElement('input');
 
   inputElement.type = 'file';
@@ -13,11 +13,12 @@ export function chooseSchemaFromFile(): void {
       reader.onload = e => {
         const contents = e.target?.result as string;
         try {
-          const selectedSchema = JSON.parse(contents);
-          useDataStore().schemaData = selectedSchema;
+          const selectedConfig = JSON.parse(contents);
+          useDataStore().fileData = selectedConfig;
+          console.log('Updated fileData:', selectedConfig);
         } catch (error) {
           console.error('Error parsing JSON schema:', error);
-          alert('Invalid JSON schema. Please choose a valid JSON schema.');
+          alert('Invalid JSON file. Please choose a valid JSON file.');
         }
       };
 
