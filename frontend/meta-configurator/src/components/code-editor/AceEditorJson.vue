@@ -17,6 +17,8 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 const sessionStore = useSessionStore();
 const {currentPath, currentSelectedElement, fileData} = storeToRefs(sessionStore);
 
+let currentSelectionIsForcedFromOutside = false;
+
 const editor = ref();
 const manipulator = new ConfigManipulatorJson();
 
@@ -40,12 +42,14 @@ onMounted(() => {
     }
   });
   editor.value.on('changeSelection', () => {
+      if (currentSelectionIsForcedFromOutside) {
+          // we do not need to consider the event and send updates if the selection was forced from outside
+          return
+      }
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-      sessionStore.$patch({
-        currentSelectedElement: newPath,
-        lastChangeResponsible: ChangeResponsible.CodeEditor,
-      });
+      sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+      sessionStore.currentSelectedElement = newPath;
     } catch (e) {
       /* empty */
     }
@@ -67,10 +71,12 @@ onMounted(() => {
     newVal => {
       if (editor.value) {
         if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+            currentSelectionIsForcedFromOutside = true;
           updateCursorPositionBasedOnPath(
             editor.value.getValue(),
             sessionStore.currentSelectedElement
           );
+          currentSelectionIsForcedFromOutside = false;
         }
       }
     },
@@ -80,9 +86,11 @@ onMounted(() => {
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
+    currentSelectionIsForcedFromOutside = true;
   const newEditorContent = JSON.stringify(configData, null, 2);
   editor.value.setValue(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
+    currentSelectionIsForcedFromOutside = false;
 }
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {

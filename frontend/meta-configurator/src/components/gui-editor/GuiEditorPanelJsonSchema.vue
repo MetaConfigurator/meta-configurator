@@ -5,7 +5,6 @@ import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/model/path';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {onMounted, watch} from 'vue';
-import * as ace from 'brace';
 import {storeToRefs} from 'pinia';
 
 const sessionStore = useSessionStore();
@@ -23,23 +22,20 @@ onMounted(() => {
 });
 
 function updatePath(newPath: Path) {
-  sessionStore.$patch({currentPath: newPath, lastChangeResponsible: ChangeResponsible.GuiEditor});
+    sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+    sessionStore.currentPath = newPath;
 }
 
 function updateData(path: Path, newValue: any) {
-  console.log('select path ', path);
-  sessionStore.$patch({
-    currentSelectedElement: path,
-    lastChangeResponsible: ChangeResponsible.GuiEditor,
-  });
+    sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
   sessionStore.updateDataAtPath(path, newValue);
+    sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+    sessionStore.currentSelectedElement = path;
 }
 
 function zoomIntoPath(pathToAdd: Path) {
-  sessionStore.$patch({
-    currentPath: sessionStore.currentPath.concat(pathToAdd),
-    lastChangeResponsible: ChangeResponsible.GuiEditor,
-  });
+    sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+    sessionStore.currentPath = sessionStore.currentPath.concat(pathToAdd)
 }
 </script>
 

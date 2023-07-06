@@ -7,14 +7,14 @@ import {useDataStore} from "@/store/dataStore";
 const store = useSessionStore();
 
 
-const textContent = computed (() => getConfigText());
+const fileData = computed (() => getFileData());
 const schemaContent = computed (() => getSchema());
 const schemaContentDataStore = computed (() => getSchemaDataStore());
 const dataAtCurrentPathContent = computed (() => getDataAtCurrentPath());
 
 
 
-function getConfigText() {
+function getFileData() {
     return JSON.stringify(store.fileData);
 }
 
@@ -38,12 +38,16 @@ function getDataAtCurrentPath() {
 <template>
 
 
-
-    <textarea class=" bg-amber-300" v-model="store.currentMode"/>
-    <textarea class=" bg-amber-300" v-model="textContent"/>
-    <textarea class=" bg-amber-300" v-model="schemaContent"/>
-    <textarea class=" bg-amber-300" v-model="dataAtCurrentPathContent"/>
-    <textarea class=" bg-amber-300" v-model="schemaContentDataStore"/>
+    <div><b>currentMode:</b> {{ store.currentMode }}</div>
+    <div><b>lastChangeResponsible:</b> {{ store.lastChangeResponsible }}</div>
+    <div><b>fileData</b></div>
+    <textarea class=" bg-amber-300" v-model="fileData"/>
+    <div><b>schemaContent</b></div>
+    <textarea class=" bg-cyan-200" v-model="schemaContent"/>
+    <div><b>dataAtCurrentPath</b></div>
+    <textarea class=" bg-green-300" v-model="dataAtCurrentPathContent"/>
+    <div><b>schemaContentDataStore</b></div>
+    <textarea class=" bg-gradient-to-r from-purple-100 to-red-200" v-model="schemaContentDataStore"/>
 
 
 
