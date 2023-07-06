@@ -35,17 +35,17 @@ onMounted(() => {
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
     try {
-        sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-        fileData.value = JSON.parse(editor.value.getValue());
+      sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+      fileData.value = JSON.parse(editor.value.getValue());
     } catch (e) {
       /* empty */
     }
   });
   editor.value.on('changeSelection', () => {
-      if (currentSelectionIsForcedFromOutside) {
-          // we do not need to consider the event and send updates if the selection was forced from outside
-          return
-      }
+    if (currentSelectionIsForcedFromOutside) {
+      // we do not need to consider the event and send updates if the selection was forced from outside
+      return;
+    }
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
       sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
@@ -71,7 +71,7 @@ onMounted(() => {
     newVal => {
       if (editor.value) {
         if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-            currentSelectionIsForcedFromOutside = true;
+          currentSelectionIsForcedFromOutside = true;
           updateCursorPositionBasedOnPath(
             editor.value.getValue(),
             sessionStore.currentSelectedElement
@@ -86,11 +86,11 @@ onMounted(() => {
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
-    currentSelectionIsForcedFromOutside = true;
+  currentSelectionIsForcedFromOutside = true;
   const newEditorContent = JSON.stringify(configData, null, 2);
   editor.value.setValue(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
-    currentSelectionIsForcedFromOutside = false;
+  currentSelectionIsForcedFromOutside = false;
 }
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {

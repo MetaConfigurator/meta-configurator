@@ -9,15 +9,15 @@ import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
 
 export enum SessionMode {
-  FileEditor = "file_editor",
-  SchemaEditor = "schema_editor",
-  Settings = "settings",
+  FileEditor = 'file_editor',
+  SchemaEditor = 'schema_editor',
+  Settings = 'settings',
 }
 export enum ChangeResponsible {
-  None = "none",
-  CodeEditor = "code_editor",
-  GuiEditor = "gui_editor",
-  Routing = "routing",
+  None = 'none',
+  CodeEditor = 'code_editor',
+  GuiEditor = 'gui_editor',
+  Routing = 'routing',
 }
 
 /**

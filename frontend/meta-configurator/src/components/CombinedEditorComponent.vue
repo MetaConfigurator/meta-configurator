@@ -9,8 +9,8 @@ import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import router from '@/router';
-import PanelDataCurrentPath from "@/components/DebuggingPanel.vue";
-import {useSettingsStore} from "@/store/settingsStore";
+import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
+import {useSettingsStore} from '@/store/settingsStore';
 
 const panelOrder = ref<'code' | 'gui'>('code');
 
@@ -69,9 +69,9 @@ function togglePanelOrder() {
           :resizable="true">
           <component :is="panel" />
         </SplitterPanel>
-          <SplitterPanel v-if="useSettingsStore().settingsData.debuggingActive">
-              <PanelDataCurrentPath/>
-          </SplitterPanel>
+        <SplitterPanel v-if="useSettingsStore().settingsData.debuggingActive">
+          <PanelDataCurrentPath />
+        </SplitterPanel>
       </Splitter>
     </main>
   </div>

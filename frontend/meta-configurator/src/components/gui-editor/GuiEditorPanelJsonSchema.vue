@@ -22,20 +22,20 @@ onMounted(() => {
 });
 
 function updatePath(newPath: Path) {
-    sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
-    sessionStore.currentPath = newPath;
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.currentPath = newPath;
 }
 
 function updateData(path: Path, newValue: any) {
-    sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
   sessionStore.updateDataAtPath(path, newValue);
-    sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
-    sessionStore.currentSelectedElement = path;
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.currentSelectedElement = path;
 }
 
 function zoomIntoPath(pathToAdd: Path) {
-    sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
-    sessionStore.currentPath = sessionStore.currentPath.concat(pathToAdd)
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.currentPath = sessionStore.currentPath.concat(pathToAdd);
 }
 </script>
 
