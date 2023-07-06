@@ -3,13 +3,13 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
 import {downloadConfig} from '@/components/download-config/downloadConfig';
-import {clearTextEditorContent} from "@/components/toolbar/ClearContent";
+import {clearTextEditorContent} from '@/components/toolbar/ClearContent';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
-  private editor:any;
+  private editor: any;
   get fileEditorMenuItems() {
     return [
       {
@@ -21,7 +21,6 @@ export class TopMenuBar {
             label: 'Clear',
             icon: 'pi pi-fw pi-trash',
             command: this.clearEditor.bind(this),
-
           },
           {
             label: 'Upload Config',
@@ -121,8 +120,7 @@ export class TopMenuBar {
     downloadConfig();
   }
   private clearEditor(): void {
-     console.log('Clearing editor');
-     clearTextEditorContent(this.editor);
+    console.log('Clearing editor');
+    clearTextEditorContent(this.editor);
   }
-
 }

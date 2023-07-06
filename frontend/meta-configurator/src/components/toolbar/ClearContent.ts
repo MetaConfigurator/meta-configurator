@@ -7,5 +7,3 @@ export function clearTextEditorContent(editor: ace.Editor): void {
     editor.session.setValue('');
   }
 }
-
-
