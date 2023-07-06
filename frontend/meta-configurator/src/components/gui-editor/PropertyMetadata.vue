@@ -33,6 +33,7 @@ function zoomIntoPath() {
 </script>
 
 <template>
+  <span class="flex flex-row w-full items-center">
   <!--If expandable: show underline on hovering. Call zoom function when double click. -->
   <span
     class="mr-2"
@@ -52,10 +53,11 @@ function zoomIntoPath() {
   <!-- "zoom in" icon -->
   <div class="flex flex-row w-full ml-5">
     <IconExpand
-      class="text-gray-700 hover:scale-110 h-5"
+      class="text-gray-700 hover:scale-110 h-5 ml-5"
       v-if="isExpandable()"
       @click="zoomIntoPath()" />
   </div>
+  </span>
 </template>
 
 <style scoped></style>

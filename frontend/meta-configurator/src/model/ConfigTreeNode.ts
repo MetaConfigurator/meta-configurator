@@ -16,4 +16,5 @@ export interface ConfigTreeNodeData {
   parentSchema?: JsonSchema;
   data: any;
   relativePath: Path;
+  depth: number;
 }
