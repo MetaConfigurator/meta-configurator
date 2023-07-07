@@ -1,4 +1,4 @@
-import { useDataStore } from '@/store/dataStore';
+import {useDataStore} from '@/store/dataStore';
 
 export function clearEditor(): void {
   console.log('clearEditor called');
@@ -13,4 +13,3 @@ export function clearEditor(): void {
     console.log('Cleared fileData:', useDataStore().fileData);
   }
 }
-
