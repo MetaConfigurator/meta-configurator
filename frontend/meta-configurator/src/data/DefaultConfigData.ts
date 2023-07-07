@@ -1,4 +1,4 @@
-export const DEFAULT_CONFIG_DATA:  any = {
+export const DEFAULT_CONFIG_DATA: any = {
   name: 'testName',
   firstName: 'testFirstName',
   isMarried: undefined,
