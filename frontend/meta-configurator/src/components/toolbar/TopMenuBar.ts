@@ -3,13 +3,13 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
 import {downloadConfig} from '@/components/download-config/downloadConfig';
-import {clearTextEditorContent} from '@/components/toolbar/ClearContent';
+import {clearEditor} from "@/components/toolbar/ClearContent";
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
-  private editor: any;
+
   get fileEditorMenuItems() {
     return [
       {
@@ -121,6 +121,6 @@ export class TopMenuBar {
   }
   private clearEditor(): void {
     console.log('Clearing editor');
-    clearTextEditorContent(this.editor);
+    clearEditor.call(this);
   }
 }
