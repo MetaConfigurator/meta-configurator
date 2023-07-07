@@ -20,7 +20,7 @@ export class TopMenuBar {
           {
             label: 'Clear',
             icon: 'pi pi-fw pi-trash',
-            command: this.clearEditor.bind(this),
+            command: this.clearEditor,
           },
           {
             label: 'Upload Config',
@@ -121,6 +121,6 @@ export class TopMenuBar {
   }
   private clearEditor(): void {
     console.log('Clearing editor');
-    clearEditor.call(this);
+    clearEditor();
   }
 }
