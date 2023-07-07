@@ -3,7 +3,7 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
 import {downloadConfig} from '@/components/download-config/downloadConfig';
-import {clearEditor} from "@/components/toolbar/ClearContent";
+import {clearEditor} from '@/components/toolbar/ClearContent';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
