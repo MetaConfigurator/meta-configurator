@@ -1,15 +1,20 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {useSettingsStore} from '@/store/settingsStore';
-import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
 import {downloadConfig} from '@/components/download-config/downloadConfig';
+import { combinedSchema } from "@/data/CombinedSchema";
+import { handleChooseSchema } from './schemaActions';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
+
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
+
+
+    console.log('Combined Schema:', combinedSchema);
     return [
       {
         label: 'File',
@@ -80,7 +85,15 @@ export class TopMenuBar {
           {
             label: 'Choose schema',
             icon: 'pi pi-fw pi-plus',
-            command: this.chooseSchema,
+            command: handleChooseSchema,
+            items: combinedSchema.map((schema, index) => ({
+              label: schema.label, // Replace 'name' with the property you want to use as the label
+              icon: 'pi pi-fw pi-code',
+              key: index, // You can use the index as the key or replace it with the property you want
+              command: this.onMenuItemClicked,
+            })),
+
+
           },
         ],
       },
@@ -115,9 +128,8 @@ export class TopMenuBar {
     return [];
   }
   private chooseSchema(): void {
-    chooseSchemaFromFile();
-  }
 
+  }
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
