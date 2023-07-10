@@ -12,11 +12,10 @@ import router from '@/router';
 import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
 import {useSettingsStore} from '@/store/settingsStore';
 
-const panelOrder = ref<'code' | 'gui'>('code');
 
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
-  if (panelOrder.value === 'gui') {
+  if (!useSettingsStore().settingsData.guiEditorOnRightSide) {
     result = result.reverse();
   }
   return result;
@@ -42,13 +41,6 @@ function updateMode(newMode: SessionMode) {
   }
 }
 
-function togglePanelOrder() {
-  if (panelOrder.value === 'code') {
-    panelOrder.value = 'gui';
-  } else {
-    panelOrder.value = 'code';
-  }
-}
 </script>
 
 <template>
@@ -58,8 +50,7 @@ function togglePanelOrder() {
       <TopToolbar
         class="h-12 flex-none"
         :current-mode="useSessionStore().currentMode"
-        @mode-selected="updateMode"
-        @toggle-order="togglePanelOrder" />
+        @mode-selected="updateMode"/>
 
       <Splitter class="h-full" :layout="windowWidth < 600 ? 'vertical' : 'horizontal'">
         <SplitterPanel

@@ -12,7 +12,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
-  (e: 'toggle-order'): void;
 }>();
 
 function getPageName(): string {
@@ -107,9 +106,6 @@ const topLevelMenuItems: Ref<MenuItem[]> = computed(() => [mainMenuItem, ...getM
 const items = ref(topLevelMenuItems);
 
 function handleMenuClick(e: MenuItemCommandEvent) {
-  if (e.item.key === 'toggle-order') {
-    emit('toggle-order');
-  }
 }
 </script>
 
