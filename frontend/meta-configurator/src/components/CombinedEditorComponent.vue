@@ -12,7 +12,6 @@ import router from '@/router';
 import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
 import {useSettingsStore} from '@/store/settingsStore';
 
-
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
   if (!useSettingsStore().settingsData.guiEditorOnRightSide) {
@@ -40,7 +39,6 @@ function updateMode(newMode: SessionMode) {
       break;
   }
 }
-
 </script>
 
 <template>
@@ -50,7 +48,7 @@ function updateMode(newMode: SessionMode) {
       <TopToolbar
         class="h-12 flex-none"
         :current-mode="useSessionStore().currentMode"
-        @mode-selected="updateMode"/>
+        @mode-selected="updateMode" />
 
       <Splitter class="h-full" :layout="windowWidth < 600 ? 'vertical' : 'horizontal'">
         <SplitterPanel

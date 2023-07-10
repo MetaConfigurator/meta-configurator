@@ -105,8 +105,7 @@ const topLevelMenuItems: Ref<MenuItem[]> = computed(() => [mainMenuItem, ...getM
 
 const items = ref(topLevelMenuItems);
 
-function handleMenuClick(e: MenuItemCommandEvent) {
-}
+function handleMenuClick(e: MenuItemCommandEvent) {}
 </script>
 
 <template>

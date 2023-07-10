@@ -48,7 +48,6 @@ function zoomIntoPath() {
     </span>
 
     <span class="text-xs text-gray-400">:&nbsp;{{ nodeData.schema.type.join(',') }}</span>
-
   </span>
 </template>
 
