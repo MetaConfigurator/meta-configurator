@@ -65,7 +65,7 @@ function togglePanelOrder() {
         <SplitterPanel
           v-for="(panel, index) in panels"
           :key="index"
-          :min-size="20"
+          :min-size="25"
           :resizable="true">
           <component :is="panel" />
         </SplitterPanel>

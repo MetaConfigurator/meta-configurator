@@ -23,17 +23,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
       type: 'array',
       description: 'Nick names',
       items: {
-        type: 'object',
-        properties: {
-          firstName: {
-            type: 'string',
-            description: 'First name',
-          },
-          lastName: {
-            type: 'string',
-            description: 'Last name',
-          },
-        },
+        type: 'string',
       },
     },
     isMarried: {

@@ -5,8 +5,7 @@ export const DEFAULT_CONFIG_DATA = {
   telephoneNumber: 152000,
   heightInMeter: 1.7,
   nickNames: [
-    {firstName: 'testNickName1', lastName: 'testLastName1'},
-    {firstName: 'testNickName2', lastName: 'testLastName2'},
+    "testNickName1", 'testNickName2', 'testNickName3'
   ],
   address: {
     street: 'testStreet',
