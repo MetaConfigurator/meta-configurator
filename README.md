@@ -73,7 +73,7 @@ To launch the application, follow these steps:
    ```
 ## Screenshot
 
-![Screenshot 1](public/pictures/GUI_SS.png)
+![Screenshot 1](resources/GUI_SS.png)
 
 ## Contribution
 **Contribution we only accept after 10/2023.**
