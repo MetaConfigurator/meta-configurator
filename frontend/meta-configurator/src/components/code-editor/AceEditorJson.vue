@@ -9,17 +9,17 @@ import 'brace/mode/json';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
-import Ajv2020 from "ajv/dist/2020";
+import Ajv2020 from 'ajv/dist/2020';
 
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
 
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {useDataStore} from "@/store/dataStore";
+import {useDataStore} from '@/store/dataStore';
 
 const sessionStore = useSessionStore();
 const dataStore = useDataStore();
-const { currentSelectedElement, fileData} = storeToRefs(sessionStore);
+const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
 
 let currentSelectionIsForcedFromOutside = false;
 
@@ -133,13 +133,13 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 </script>
 
 <template>
-  <Message v-if="jsonSyntaxError" severity="error" sticky >{{ jsonSyntaxError }}</Message>
-  <Message v-else-if="jsonSchemaError" severity="error" sticky >{{ jsonSchemaError }}</Message>
+  <Message v-if="jsonSyntaxError" severity="error" sticky>{{ jsonSyntaxError }}</Message>
+  <Message v-else-if="jsonSchemaError" severity="error" sticky>{{ jsonSchemaError }}</Message>
   <div class="h-full" id="javascript-editor"></div>
 </template>
 
 <style scoped>
 .p-component {
-    margin: 0 !important;
+  margin: 0 !important;
 }
 </style>
