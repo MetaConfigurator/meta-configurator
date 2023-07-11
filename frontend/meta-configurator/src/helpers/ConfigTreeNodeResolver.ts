@@ -1,4 +1,4 @@
-import {JsonSchema} from '@/model/JsonSchema';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {ConfigTreeNode} from '@/model/ConfigTreeNode';
 import type {Path, PathElement} from '@/model/path';
 

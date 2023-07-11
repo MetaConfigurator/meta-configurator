@@ -1,5 +1,5 @@
 import type {TreeNode} from 'primevue/tree';
-import {JsonSchema} from '@/model/JsonSchema';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {Path, PathElement} from '@/model/path';
 
 /**

@@ -3,7 +3,7 @@ import {computed, ref} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
 import {useDataStore} from '@/store/dataStore';
-import {JsonSchema} from '@/model/JsonSchema';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
