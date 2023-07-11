@@ -21,6 +21,17 @@
       "description": "If enabled, the GUI editor will be on the right side and the code editor on the left. Otherwise, it will be the opposite way.",
       "default": true
     },
+    "guiEditor": {
+      "type": "object",
+      "description": "GUI Editor related settings belong here.",
+      "properties": {
+        "elementNavigationWithSeparateButton": {
+          "type": "boolean",
+          "description": "If true, every array or object element will have a navigation button displayed next to its name, that allows navigating into that object/array. If false, instead of a separate button the object/array property key itself will become clickable for navigation inside.",
+          "default": true
+        }
+      }
+    },
     "debuggingActive": {
       "type": "boolean",
       "description": "If enabled, the internal application state is shown.",
