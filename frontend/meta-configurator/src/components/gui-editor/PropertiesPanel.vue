@@ -86,18 +86,20 @@ function updateData(subPath: Path, newValue: any) {
     </template>
     <Column field="name" header="Property" :sortable="true" expander>
       <template #body="slotProps">
-        <span style="width: 50%; min-width: 50%"
-              :style="{'margin-right': -slotProps.node.data.depth * 16 + 'px'}">
+        <span
+          style="width: 50%; min-width: 50%"
+          :style="{'margin-right': -slotProps.node.data.depth * 16 + 'px'}">
           <PropertyMetadata
             :nodeData="slotProps.node.data"
             @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
         </span>
 
-        <span style='max-width: 50%' class='w-full'>
-          <PropertyData class='w-full'
+        <span style="max-width: 50%" class="w-full">
+          <PropertyData
+            class="w-full"
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
-            bodyClass="w-full"/>
+            bodyClass="w-full" />
         </span>
       </template>
     </Column>

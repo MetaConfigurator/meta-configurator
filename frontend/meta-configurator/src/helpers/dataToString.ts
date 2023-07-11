@@ -5,7 +5,7 @@
  * @param currentDepth internal parameter that takes care of not using too deeply nested data in
  * the string representation. Should not be used by the caller.
  */
-export function dataToString(data: any, currentDepth= 0): string {
+export function dataToString(data: any, currentDepth = 0): string {
   if (currentDepth > 1) {
     // to deeply nested string representations are not useful
     return '[...]';
