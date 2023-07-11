@@ -1,7 +1,9 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
+import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/toolbar/uploadSchema';
 import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
+import {clearEditor} from '@/components/toolbar/ClearContent';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
@@ -18,7 +20,7 @@ export class TopMenuBar {
           {
             label: 'Clear File',
             icon: 'pi pi-fw pi-trash',
-            command: this.onMenuItemClicked,
+            command: this.clearEditor,
           },
           {
             label: 'Upload File',
@@ -100,11 +102,14 @@ export class TopMenuBar {
   private chooseSchema(): void {
     chooseSchemaFromFile();
   }
-
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
   private download(): void {
     downloadFile();
+  }
+  private clearEditor(): void {
+    console.log('Clearing editor');
+    clearEditor();
   }
 }
