@@ -5,6 +5,8 @@ import type {ConfigTreeNodeData} from '@/model/ConfigTreeNode';
 import type {Path} from '@/model/path';
 import IconExpand from '@/components/icons/IconExpand.vue';
 import {useSettingsStore} from '@/store/settingsStore';
+import { computed } from "vue";
+import { generateTooltipText } from "@/helpers/propertyTooltipGenerator";
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -48,7 +50,7 @@ function zoomIntoPath() {
       :class="{'hover:underline': isExpandable()}"
       @click="clickedPropertyKey()"
       @dblclick="zoomIntoPath()"
-      v-tooltip="nodeData.schema.description">
+      v-tooltip.bottom="generateTooltipText(props.nodeData)">
       <!--If deprecated: put name into a s tag (strikethrough) -->
       <s v-if="isDeprecated()">{{ nodeData.name }}</s>
       <!--Otherwise: just normal text -->
