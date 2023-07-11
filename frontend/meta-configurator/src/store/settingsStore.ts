@@ -11,7 +11,7 @@ export const useSettingsStore = defineStore('settings', () => {
     dataFormat: 'json',
     guiEditorOnRightSide: true,
     guiEditor: {
-      elementNavigationWithSeparateButton: true
+      elementNavigationWithSeparateButton: true,
     },
     debuggingActive: false,
   });

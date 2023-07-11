@@ -3,8 +3,8 @@
 <script setup lang="ts">
 import type {ConfigTreeNodeData} from '@/model/ConfigTreeNode';
 import type {Path} from '@/model/path';
-import IconExpand from "@/components/icons/IconExpand.vue";
-import {useSettingsStore} from "@/store/settingsStore";
+import IconExpand from '@/components/icons/IconExpand.vue';
+import {useSettingsStore} from '@/store/settingsStore';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -26,13 +26,12 @@ function isDeprecated(): boolean {
   return props.nodeData.schema.deprecated;
 }
 
-
 function clickedPropertyKey() {
-    if (useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton) {
-        // TODO: Collapse/expand
-    } else {
-        zoomIntoPath()
-    }
+  if (useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton) {
+    // TODO: Collapse/expand
+  } else {
+    zoomIntoPath();
+  }
 }
 function zoomIntoPath() {
   if (isExpandable()) {
@@ -59,14 +58,16 @@ function zoomIntoPath() {
     </span>
 
     <span class="text-xs text-gray-400">:&nbsp;{{ nodeData.schema.type.join(',') }}</span>
-      <!-- "zoom in" icon -->
+    <!-- "zoom in" icon -->
     <div class="flex flex-row w-full ml-5">
       <IconExpand
-              class="text-gray-700 hover:scale-110 h-5 ml-5"
-              v-if="isExpandable() && useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton"
-              @click="zoomIntoPath()" />
+        class="text-gray-700 hover:scale-110 h-5 ml-5"
+        v-if="
+          isExpandable() &&
+          useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton
+        "
+        @click="zoomIntoPath()" />
     </div>
-
   </span>
 </template>
 
