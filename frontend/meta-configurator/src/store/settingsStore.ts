@@ -10,6 +10,9 @@ export const useSettingsStore = defineStore('settings', () => {
   const settingsData = ref({
     dataFormat: 'json',
     guiEditorOnRightSide: true,
+    guiEditor: {
+      elementNavigationWithSeparateButton: true
+    },
     debuggingActive: false,
   });
   const settingsSchemaObject = ref({});
