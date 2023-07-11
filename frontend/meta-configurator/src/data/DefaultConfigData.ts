@@ -4,9 +4,7 @@ export const DEFAULT_CONFIG_DATA: any = {
   isMarried: undefined,
   telephoneNumber: 152000,
   heightInMeter: 1.7,
-  nickNames: [
-    "testNickName1", 'testNickName2', 'testNickName3'
-  ],
+  nickNames: ['testNickName1', 'testNickName2', 'testNickName3'],
   address: {
     street: 'testStreet',
     number: 12,
