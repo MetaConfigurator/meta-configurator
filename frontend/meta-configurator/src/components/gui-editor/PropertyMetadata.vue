@@ -1,9 +1,12 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
-import IconExpand from '@/components/icons/IconExpand.vue';
 import type {ConfigTreeNodeData} from '@/model/ConfigTreeNode';
 import type {Path} from '@/model/path';
+import IconExpand from '@/components/icons/IconExpand.vue';
+import {useSettingsStore} from '@/store/settingsStore';
+import {computed} from 'vue';
+import {generateTooltipText} from '@/helpers/propertyTooltipGenerator';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -25,6 +28,13 @@ function isDeprecated(): boolean {
   return props.nodeData.schema.deprecated;
 }
 
+function clickedPropertyKey() {
+  if (useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton) {
+    // TODO: Collapse/expand
+  } else {
+    zoomIntoPath();
+  }
+}
 function zoomIntoPath() {
   if (isExpandable()) {
     emit('zoom_into_path', props.nodeData.relativePath);
@@ -38,8 +48,9 @@ function zoomIntoPath() {
     <span
       class="mr-2"
       :class="{'hover:underline': isExpandable()}"
+      @click="clickedPropertyKey()"
       @dblclick="zoomIntoPath()"
-      v-tooltip="nodeData.schema.description">
+      v-tooltip.bottom="generateTooltipText(props.nodeData)">
       <!--If deprecated: put name into a s tag (strikethrough) -->
       <s v-if="isDeprecated()">{{ nodeData.name }}</s>
       <!--Otherwise: just normal text -->
@@ -49,12 +60,14 @@ function zoomIntoPath() {
     </span>
 
     <span class="text-xs text-gray-400">:&nbsp;{{ nodeData.schema.type.join(',') }}</span>
-
     <!-- "zoom in" icon -->
     <div class="flex flex-row w-full ml-5">
       <IconExpand
         class="text-gray-700 hover:scale-110 h-5 ml-5"
-        v-if="isExpandable()"
+        v-if="
+          isExpandable() &&
+          useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton
+        "
         @click="zoomIntoPath()" />
     </div>
   </span>

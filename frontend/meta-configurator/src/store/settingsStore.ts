@@ -7,7 +7,14 @@ import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
  * Store for the Meta Configurator settings.
  */
 export const useSettingsStore = defineStore('settings', () => {
-  const settingsData = ref({configLanguage: 'json', debuggingActive: false});
+  const settingsData = ref({
+    dataFormat: 'json',
+    guiEditorOnRightSide: true,
+    guiEditor: {
+      elementNavigationWithSeparateButton: false,
+    },
+    debuggingActive: false,
+  });
   const settingsSchemaObject = ref({});
   const settingsSchema: Ref<TopLevelJsonSchema> = computed(
     () => new TopLevelJsonSchema(settingsSchemaObject.value)
