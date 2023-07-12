@@ -41,7 +41,7 @@ export function generateTooltipText(nodeData: ConfigTreeNodeData) {
       if (hadConstraintBefore) {
         result += ' and';
       }
-      result += ' > ' + schema.maximum;
+      result += ' >= ' + schema.maximum;
     }
   }
   return result;
