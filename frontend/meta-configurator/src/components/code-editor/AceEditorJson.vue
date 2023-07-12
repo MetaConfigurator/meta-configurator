@@ -27,7 +27,7 @@ let currentSelectionIsForcedFromOutside = false;
 const editor = ref();
 const jsonSyntaxError = ref('');
 const jsonSchemaError = ref('');
-const jsonSchemeEditorSyntaxError = ref('');
+const SchemeEditorSyntaxError = ref('');
 const manipulator = new ConfigManipulatorJson();
 
 onMounted(() => {
@@ -73,7 +73,7 @@ onMounted(() => {
     }
 
     if (sessionStore.currentMode === SessionMode.SchemaEditor) {
-        jsonSchemeEditorSyntaxError.value = '';
+        SchemeEditorSyntaxError.value = '';
         try {
             sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
             const jsonString = editor.value.getValue();
@@ -81,7 +81,7 @@ onMounted(() => {
             fileData.value = parsedJson;
         } catch (e) {
             /* empty */
-            jsonSchemeEditorSyntaxError.value = 'Invalid JSON syntax in Schema Editor';
+            SchemeEditorSyntaxError.value = 'Invalid JSON syntax in Schema Editor';
         }
     }
   });
@@ -158,7 +158,7 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 <template>
   <Message v-if="jsonSyntaxError" severity="error" sticky >{{ jsonSyntaxError }}</Message>
   <Message v-else-if="jsonSchemaError" severity="error" sticky >{{ jsonSchemaError }}</Message>
-  <Message v-if="jsonSchemeEditorSyntaxError" severity="error" sticky >{{ jsonSchemeEditorSyntaxError }}</Message>
+  <Message v-if="SchemeEditorSyntaxError" severity="error" sticky >{{ SchemeEditorSyntaxError }}</Message>
   <div class="h-full" id="javascript-editor"></div>
 </template>
 
