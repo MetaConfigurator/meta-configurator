@@ -29,6 +29,13 @@
           "type": "boolean",
           "description": "If true, every array or object element will have a navigation button displayed next to its name, that allows navigating into that object/array. If false, instead of a separate button the object/array property key itself will become clickable for navigation inside.",
           "default": true
+        },
+        "maximumDepth": {
+          "type": "integer",
+          "description": "The maximum depth of the GUI editor. If the depth of the configuration object is higher, the GUI editor will not show the deeper levels, but they can be navigated by clicking on the property name",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10
         }
       }
     },

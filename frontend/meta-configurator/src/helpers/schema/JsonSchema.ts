@@ -1,6 +1,12 @@
 import type {JsonSchemaType, SchemaPropertyType} from '@/model/JsonSchemaType';
-import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/helpers/schema/SchemaUtils';
+import {
+  nonBooleanSchema,
+  schemaArray,
+  schemaFromObject,
+  schemaRecord,
+} from '@/helpers/schema/SchemaUtils';
 import type {Path, PathElement} from '@/model/path';
+import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -34,6 +40,9 @@ export class JsonSchema {
 
   constructor(jsonSchema: JsonSchemaType) {
     this.jsonSchema = nonBooleanSchema(jsonSchema);
+    if (this.jsonSchema !== undefined) {
+      this.jsonSchema = preprocessSchema(this.jsonSchema);
+    }
   }
 
   /**

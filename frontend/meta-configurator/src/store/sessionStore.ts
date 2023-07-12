@@ -18,6 +18,7 @@ export enum ChangeResponsible {
   CodeEditor = 'code_editor',
   GuiEditor = 'gui_editor',
   Routing = 'routing',
+  FileUpload = 'file_upload',
 }
 
 /**
@@ -85,6 +86,10 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
+  const fileSchemaObject = computed(() => {
+    return fileSchema.value.jsonSchema;
+  });
+
   const schemaAtCurrentPath: Ref<JsonSchema> = computed(
     () => fileSchema.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
   );
@@ -128,6 +133,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentMode,
     fileData,
     fileSchema,
+    fileSchemaObject,
     schemaAtCurrentPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     currentPath,

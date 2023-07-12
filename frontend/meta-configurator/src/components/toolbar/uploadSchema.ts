@@ -13,8 +13,7 @@ export function chooseSchemaFromFile(): void {
       reader.onload = e => {
         const contents = e.target?.result as string;
         try {
-          const selectedSchema = JSON.parse(contents);
-          useDataStore().schemaData = selectedSchema;
+          useDataStore().schemaData = JSON.parse(contents);
         } catch (error) {
           console.error('Error parsing JSON schema:', error);
           alert('Invalid JSON schema. Please choose a valid JSON schema.');

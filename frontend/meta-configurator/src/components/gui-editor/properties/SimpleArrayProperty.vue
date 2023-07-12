@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {dataToString} from '@/helpers/dataToString';
+import {dataToString} from '@/helpers/data/dataToString';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{

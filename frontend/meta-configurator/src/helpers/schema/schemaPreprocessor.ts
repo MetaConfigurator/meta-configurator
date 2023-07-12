@@ -1,30 +1,46 @@
-import type {JsonSchemaType} from '@/model/JsonSchemaType';
-
-// import $RefParser from '@apidevtools/json-schema-ref-parser';
+import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
+// @ts-ignore
+import mergeAllOf from 'json-schema-merge-allof';
+import pointer from 'json-pointer';
+import {useSessionStore} from '@/store/sessionStore';
+import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
 
 /**
- * Preprocesses the schema. Currently, this means de-referencing it,
- * so all references are resolved.
- * Note that this function is async, because de-referencing is async.
- *
- * NOTE: If the schema contains circular references, this function will
- * work, but calling things like Json.stringify on the schema or
- * calculating the tree of schema nodes will lead to an infinite loop.
+ * Preprocesses the schema.
  *
  * @param schema the schema to preprocess
- * @returns the preprocessed schema (as a promise)
+ * @returns the preprocessed schema
  */
-export function preprocessSchema(schema: JsonSchemaType): Promise<JsonSchemaType> {
-  return dereferenceSchema(schema);
+export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObjectType {
+  // TODO: resolve refs once at the beginning using json-schema-ref-parser
+  // this is technically possible because the json schema faker also uses json-schema-ref-parser
+  // and it works there
+  // so we have to find a way to make it work here as well
+  if (hasRef(schema)) {
+    // remove leading # from ref if present
+    const refString = schema.$ref?.startsWith('#') ? schema.$ref.substring(1) : schema.$ref!!;
+    let refSchema = pointer.get(
+      nonBooleanSchema(useSessionStore().fileSchemaObject ?? {}) ?? {},
+      refString
+    );
+    refSchema = preprocessSchema(refSchema);
+    delete schema.$ref;
+    schema = {allOf: [schema, refSchema]};
+  }
+
+  if (hasAllOfs(schema)) {
+    // @ts-ignore
+    schema.allOf = schema.allOf!!.map(preprocessSchema);
+    schema = mergeAllOf(schema);
+  }
+
+  return schema;
 }
 
-async function dereferenceSchema(schema: JsonSchemaType): Promise<JsonSchemaType> {
-  if (schema === true || schema === false) {
-    return schema;
-  }
-  // this library seems to mainly work for JSON Schema Draft 4 thus the types are
-  // not compatible with our JsonSchemaType, but actually the
-  // de-referencing should work for all versions
- //return await $RefParser.dereference(schema as any) as JsonSchemaType; // we assume the typing does not change
-  return Promise.resolve(schema);
+function hasRef(schema: JsonSchemaObjectType): boolean {
+  return schema.$ref !== undefined;
+}
+
+function hasAllOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.allOf !== undefined && schema.allOf.length > 0;
 }

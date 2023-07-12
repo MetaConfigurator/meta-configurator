@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {PathElement} from '@/model/path';
-import {dataToString} from '@/helpers/dataToString';
+import {dataToString} from '@/helpers/data/dataToString';
 
 const props = defineProps<{
   propertyName: PathElement;

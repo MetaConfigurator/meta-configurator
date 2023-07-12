@@ -12,6 +12,7 @@ export const useSettingsStore = defineStore('settings', () => {
     guiEditorOnRightSide: true,
     guiEditor: {
       elementNavigationWithSeparateButton: false,
+      maximumDepth: 3,
     },
     debuggingActive: false,
   });
