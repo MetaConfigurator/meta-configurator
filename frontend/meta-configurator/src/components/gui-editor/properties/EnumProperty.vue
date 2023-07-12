@@ -38,6 +38,5 @@ div {
   display: flex;
   flex-direction: row;
   height: 30px;
-  width: 400px;
 }
 </style>
