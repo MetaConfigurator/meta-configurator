@@ -88,7 +88,6 @@ export type JsonSchemaType =
 export type TopLevelSchema = JsonSchemaType & {
   $schema?: string;
   $id?: string;
-  $title?: string;
   $vocabulary?: {
     [k: string]: boolean;
   };
