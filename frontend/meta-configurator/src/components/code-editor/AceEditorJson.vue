@@ -43,6 +43,18 @@ onMounted(() => {
     sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
     const jsonString = editor.value.getValue();
 
+    // Current workaround until schema of schema editor works: just accept schema without validation
+    //fileData.value = JSON.parse(jsonString);
+    if (sessionStore.currentMode === SessionMode.SchemaEditor) {
+      try {
+        const parsedJson = JSON.parse(jsonString);
+        fileData.value = parsedJson;
+      } catch (e) {
+        userError.value = e.toString();
+      }
+      return;
+    }
+
     try {
       const parsedJson = JSON.parse(jsonString);
 
