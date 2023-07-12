@@ -11,7 +11,6 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
-  private selectedSchemaKey: string = 'default';
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
@@ -58,7 +57,7 @@ export class TopMenuBar {
               label: schema.label,
               icon: 'pi pi-fw pi-code',
               key: schema.key,
-              command: () => this.chooseSchema(schema.key, this.selectedSchemaKey),
+              command: () => this.chooseSchema(schema.key),
             })),
           },
         ],
@@ -97,7 +96,7 @@ export class TopMenuBar {
               label: schema.label,
               icon: 'pi pi-fw pi-code',
               key: schema.key,
-              command: () => this.chooseSchema(schema.key, this.selectedSchemaKey),
+              command: () => this.chooseSchema(schema.key),
             })),
           },
           {
@@ -126,9 +125,8 @@ export class TopMenuBar {
   private uploadSchema(): void {
     chooseSchemaFromFile();
   }
-  private chooseSchema(schemaKey: string, selectedSchema: any): void {
-    this.selectedSchemaKey = schemaKey;
-    selectedSchema = schemaCollection.find(schema => schema.key === schemaKey);
+  private chooseSchema(schemaKey: string): void {
+    let selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
     useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().schemaData = selectedSchema?.schema;
   }
