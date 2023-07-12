@@ -90,7 +90,7 @@ function addDefaultValue(subPath: Path) {
     addItem(subPath, []);
   } else if (arraySchema.items.hasType('string')) {
     addItem(subPath, '');
-  } else if (arraySchema.items.hasType('number')) {
+  } else if (arraySchema.items.hasType('number') || arraySchema.items.hasType('integer')) {
     addItem(subPath, 0);
   } else if (arraySchema.items.hasType('boolean')) {
     addItem(subPath, false);
