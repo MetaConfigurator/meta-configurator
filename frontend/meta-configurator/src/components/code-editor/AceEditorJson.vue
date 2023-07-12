@@ -45,13 +45,14 @@ onMounted(() => {
 
     try {
       const parsedJson = JSON.parse(jsonString);
-      fileData.value = parsedJson;
 
       const ajv = new Ajv2020();
       const validateFunction = ajv.compile(useSessionStore().fileSchemaData);
 
       const valid = validateFunction(parsedJson);
-      if (!valid) {
+      if (valid) {
+        fileData.value = parsedJson;
+      } else {
         userError.value = 'Invalid JSON according to the schema.';
         //TODO: more detailed error message
       }
