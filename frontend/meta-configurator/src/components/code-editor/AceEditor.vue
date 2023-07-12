@@ -16,21 +16,39 @@ import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
 
 import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
 import {useDataStore} from '@/store/dataStore';
+import type {ConfigManipulator} from '@/model/ConfigManipulator';
+import {ConfigManipulatorYaml} from '@/helpers/ConfigManipulatorYaml';
 
 const sessionStore = useSessionStore();
 const dataStore = useDataStore();
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
 
-let currentSelectionIsForcedFromOutside = false;
+const props = defineProps<{
+  dataFormat: string;
+}>();
 
 const editor = ref();
 const userError = ref('');
-const manipulator = new ConfigManipulatorJson();
+let currentSelectionIsForcedFromOutside = false;
+const manipulator = createConfigManipulator(props.dataFormat);
+
+function createConfigManipulator(dataFormat: string): ConfigManipulator {
+  if (dataFormat == 'json') {
+    return new ConfigManipulatorJson();
+  } else if (dataFormat == 'yaml') {
+    return new ConfigManipulatorYaml();
+  }
+}
 
 onMounted(() => {
-  // Set up editor mode to JSON and define theme
   editor.value = ace.edit('javascript-editor');
-  editor.value.getSession().setMode('ace/mode/json');
+
+  if (props.dataFormat == 'json') {
+    editor.value.getSession().setMode('ace/mode/json');
+  } else if (props.dataFormat == 'yaml') {
+    editor.value.getSession().setMode('ace/mode/yaml');
+  }
+
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
@@ -41,14 +59,14 @@ onMounted(() => {
   editor.value.on('change', () => {
     userError.value = '';
     sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-    const jsonString = editor.value.getValue();
+    const fileContentString = editor.value.getValue();
 
     // Current workaround until schema of schema editor works: just accept schema without validation
     //fileData.value = JSON.parse(jsonString);
     if (sessionStore.currentMode === SessionMode.SchemaEditor) {
       try {
-        const parsedJson = JSON.parse(jsonString);
-        fileData.value = parsedJson;
+        const parsedContent = manipulator.parseFileContent(fileContentString);
+        fileData.value = parsedContent;
       } catch (e) {
         userError.value = e.toString();
       }
@@ -56,14 +74,14 @@ onMounted(() => {
     }
 
     try {
-      const parsedJson = JSON.parse(jsonString);
+      const parsedContent = manipulator.parseFileContent(fileContentString);
 
       const ajv = new Ajv2020();
       const validateFunction = ajv.compile(useSessionStore().fileSchemaData);
 
-      const valid = validateFunction(parsedJson);
+      const valid = validateFunction(parsedContent);
       if (valid) {
-        fileData.value = parsedJson;
+        fileData.value = parsedContent;
       } else {
         userError.value = 'Invalid JSON according to the schema.';
         //TODO: more detailed error message
@@ -119,7 +137,7 @@ onMounted(() => {
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
   currentSelectionIsForcedFromOutside = true;
-  const newEditorContent = JSON.stringify(configData, null, 2);
+  const newEditorContent = manipulator.stringifyContentObject(configData);
   editor.value.setValue(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
   currentSelectionIsForcedFromOutside = false;
