@@ -52,7 +52,7 @@ export class TopMenuBar {
           {
             label: 'Choose schema',
             icon: 'pi pi-fw pi-pencil',
-            items: storeSchema.map((schema, index) => ({
+            items: storeSchema.map(schema => ({
               label: schema.label,
               icon: 'pi pi-fw pi-code',
               key: schema.key,
@@ -91,7 +91,7 @@ export class TopMenuBar {
           {
             label: 'Choose schema',
             icon: 'pi pi-fw pi-pencil',
-            items: storeSchema.map((schema, index) => ({
+            items: storeSchema.map(schema => ({
               label: schema.label,
               icon: 'pi pi-fw pi-code',
               key: schema.key,
