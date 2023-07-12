@@ -15,17 +15,18 @@ export const useSettingsStore = defineStore('settings', () => {
     },
     debuggingActive: false,
   });
-  const settingsSchemaObject = ref({});
+  const settingsSchemaData = ref({});
   const settingsSchema: Ref<TopLevelJsonSchema> = computed(
-    () => new TopLevelJsonSchema(settingsSchemaObject.value)
+    () => new TopLevelJsonSchema(settingsSchemaData.value)
   );
 
   fetch('/src/settings/settingsSchema.json')
     .then(response => response.json())
-    .then(settingsSchema => (settingsSchemaObject.value = settingsSchema));
+    .then(settingsSchema => (settingsSchemaData.value = settingsSchema));
 
   return {
     settingsData,
     settingsSchema,
+    settingsSchemaData,
   };
 });
