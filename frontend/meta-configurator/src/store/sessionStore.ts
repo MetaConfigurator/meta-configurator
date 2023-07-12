@@ -85,6 +85,22 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
+  const fileSchemaData = computed(() => {
+    switch (currentMode.value) {
+      case SessionMode.FileEditor:
+        return useDataStore().schemaData;
+
+      case SessionMode.SchemaEditor:
+        return useDataStore().metaSchemaData;
+
+      case SessionMode.Settings:
+        return useSettingsStore().settingsSchemaData;
+
+      default:
+        throw new Error('Invalid mode');
+    }
+  });
+
   const schemaAtCurrentPath: Ref<JsonSchema> = computed(
     () => fileSchema.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
   );
@@ -128,6 +144,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentMode,
     fileData,
     fileSchema,
+    fileSchemaData,
     schemaAtCurrentPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     currentPath,

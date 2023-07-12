@@ -5,11 +5,6 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "metaConfiguratorServerUrl": {
-      "type": "string",
-      "description": "MetaConfigurator server URL",
-      "format": "uri"
-    },
     "dataFormat": {
       "type": "string",
       "description": "The data format to use for the configuration files.",

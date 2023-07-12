@@ -24,9 +24,7 @@ const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
 let currentSelectionIsForcedFromOutside = false;
 
 const editor = ref();
-const jsonSyntaxError = ref('');
-const jsonSchemaError = ref('');
-const SchemeEditorSyntaxError = ref('');
+const userError = ref('');
 const manipulator = new ConfigManipulatorJson();
 
 onMounted(() => {
@@ -41,47 +39,24 @@ onMounted(() => {
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
-    if (sessionStore.currentMode === SessionMode.FileEditor) {
-      jsonSyntaxError.value = '';
-      jsonSchemaError.value = '';
+    userError.value = '';
+    sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+    const jsonString = editor.value.getValue();
 
-      try {
-        sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-        const jsonString = editor.value.getValue();
-        const parsedJson = JSON.parse(jsonString);
-        fileData.value = parsedJson;
-        try {
-          if (!jsonSyntaxError.value) {
-            const ajv = new Ajv2020();
-            const validateFunction = ajv.compile(dataStore.schemaData);
+    try {
+      const parsedJson = JSON.parse(jsonString);
+      fileData.value = parsedJson;
 
-            const valid = validateFunction(parsedJson);
-            if (!valid) {
-              jsonSchemaError.value = 'Invalid JSON according to the schema';
-            } else if (valid) {
-              jsonSchemaError.value = '';
-            }
-          }
-        } catch (e) {
-          jsonSchemaError.value = 'Invalid JSON according to the schema';
-        }
-      } catch (e) {
-        /* empty */
-        jsonSyntaxError.value = 'Invalid JSON syntax';
+      const ajv = new Ajv2020();
+      const validateFunction = ajv.compile(useSessionStore().fileSchemaData);
+
+      const valid = validateFunction(parsedJson);
+      if (!valid) {
+        userError.value = 'Invalid JSON according to the schema.';
+        //TODO: more detailed error message
       }
-    }
-
-    if (sessionStore.currentMode === SessionMode.SchemaEditor) {
-      SchemeEditorSyntaxError.value = '';
-      try {
-        sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-        const jsonString = editor.value.getValue();
-        const parsedJson = JSON.parse(jsonString);
-        fileData.value = parsedJson;
-      } catch (e) {
-        /* empty */
-        SchemeEditorSyntaxError.value = 'Invalid JSON syntax in Schema Editor';
-      }
+    } catch (e) {
+      userError.value = e.toString();
     }
   });
 
@@ -155,11 +130,7 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 </script>
 
 <template>
-  <Message v-if="jsonSyntaxError" severity="error" sticky>{{ jsonSyntaxError }}</Message>
-  <Message v-else-if="jsonSchemaError" severity="error" sticky>{{ jsonSchemaError }}</Message>
-  <Message v-if="SchemeEditorSyntaxError" severity="error" sticky>{{
-    SchemeEditorSyntaxError
-  }}</Message>
+  <Message v-if="userError" severity="error" sticky>{{ userError }}</Message>
   <div class="h-full" id="javascript-editor"></div>
 </template>
 
