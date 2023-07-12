@@ -15,8 +15,12 @@ function getNumberOfItems(): number {
 
 <template>
   <div class="pl-3 grid grid-cols-5 items-center justify-between gap-x-6 w-full pr-5">
-    <span class="text-sm text-gray-400 truncate col-span-4" style='max-width: 90%'>{{ dataToString(propertyData) }}</span>
-    <span class="text-gray-500 font-extralight justify-self-end"> {{ getNumberOfItems() }} items </span>
+    <span class="text-sm text-gray-400 truncate col-span-4" style="max-width: 90%">{{
+      dataToString(propertyData)
+    }}</span>
+    <span class="text-gray-500 font-extralight justify-self-end">
+      {{ getNumberOfItems() }} items
+    </span>
   </div>
 </template>
 

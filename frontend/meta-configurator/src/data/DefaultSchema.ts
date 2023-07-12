@@ -92,14 +92,14 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
               description: 'Boolean array',
               items: {
                 type: 'boolean',
-              }
+              },
             },
             numbers: {
               type: 'array',
               description: 'Numbers',
               items: {
                 type: 'number',
-              }
+              },
             },
             objects: {
               type: 'array',
@@ -112,9 +112,9 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
                   },
                   age: {
                     type: 'number',
-                  }
-                }
-              }
+                  },
+                },
+              },
             },
           },
         },
