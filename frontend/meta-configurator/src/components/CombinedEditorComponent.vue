@@ -42,7 +42,7 @@ function updateMode(newMode: SessionMode) {
 </script>
 
 <template>
-  <div class="w-screen h-full flex">
+  <div class="w-full h-full flex" style='max-height: 100%'>
     <main class="h-full flex flex-col">
       <!-- toolbar -->
       <TopToolbar

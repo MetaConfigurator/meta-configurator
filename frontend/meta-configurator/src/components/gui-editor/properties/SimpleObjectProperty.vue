@@ -10,7 +10,6 @@ const props = defineProps<{
 }>();
 
 function getNumberOfProperties(): number {
-  console.log('propertydata is ', props.propertyData, ' of ', props.propertyName);
   return Math.max(
     Object.keys(props.propertyData ?? {}).length,
     Object.keys(props.propertySchema.properties).length
