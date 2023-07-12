@@ -5,6 +5,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
   title: 'Person',
   description: 'A person schema',
   $schema: 'https://json-schema.org/draft/2020-12/schema',
+  $id: 'https://example.com/person.schema.json',
   required: ['name', 'firstName'],
   properties: {
     name: {
