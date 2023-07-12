@@ -18,6 +18,7 @@ export enum ChangeResponsible {
   CodeEditor = 'code_editor',
   GuiEditor = 'gui_editor',
   Routing = 'routing',
+  Menubar = 'menubar',
 }
 
 /**
