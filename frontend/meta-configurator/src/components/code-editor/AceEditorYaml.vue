@@ -3,23 +3,29 @@ import {onMounted, ref, watch} from 'vue';
 import {storeToRefs} from 'pinia';
 import Message from 'primevue/message';
 import * as ace from 'brace';
+import {Position} from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import YAML from 'yaml';
+import Ajv2020 from "ajv/dist/2020";
 
 import type {Path} from '@/model/path';
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {Position} from 'brace';
+import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
+import {useDataStore} from "@/store/dataStore";
 
 const sessionStore = useSessionStore();
+const dataStore = useDataStore();
+
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
 let currentSelectionIsForcedFromOutside = false;
 const editor = ref();
-const yamlError = ref();
+const yamlSyntaxError = ref('');
+const yamlSchemaError = ref('');
+const schemaEditorSyntaxError = ref('');
 const manipulator = new ConfigManipulatorJson();
 
 onMounted(() => {
@@ -34,15 +40,46 @@ onMounted(() => {
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
-    try {
-      sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-      fileData.value = YAML.parse(editor.value.getValue());
-      const yamlString = editor.value.getValue();
-      yamlError.value = '';
-    } catch (e) {
-      /* empty */
-      yamlError.value = 'Invalid YAML';
-    }
+      if (sessionStore.currentMode === SessionMode.FileEditor) {
+          yamlSyntaxError.value = '';
+          yamlSchemaError.value = '';
+
+          try {
+              sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+              const parsedYAML = YAML.parse(editor.value.getValue());
+              fileData.value = parsedYAML;
+              yamlSyntaxError.value = '';
+              try {
+                  if(!yamlSyntaxError.value) {
+                      const ajv = new Ajv2020();
+                      const validateFunction = ajv.compile(dataStore.schemaData);
+                      const valid = validateFunction(parsedYAML)
+                      if (!valid) {
+                          yamlSchemaError.value = 'Invalid YAML according to the schema';
+                      } else if (valid) {
+                          yamlSchemaError.value = '';
+                      }
+                  }
+              } catch (e) {
+                  yamlSchemaError.value = 'catch error';
+              }
+          } catch (e) {
+              /* empty */
+              yamlSyntaxError.value = 'Invalid YAML syntax';
+          }
+      }
+
+      if (sessionStore.currentMode === SessionMode.SchemaEditor) {
+          schemaEditorSyntaxError.value = '';
+          try {
+              sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+              fileData.value = YAML.parse(editor.value.getValue());
+              schemaEditorSyntaxError.value = '';
+          } catch (e) {
+              /* empty */
+              schemaEditorSyntaxError.value = 'Invalid YAML syntax in Schema Editor';
+          }
+      }
   });
 
   editor.value.on('changeSelection', () => {
@@ -115,7 +152,9 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 </script>
 
 <template>
-  <Message v-if="yamlError" severity="error" sticky :closable="false">{{ yamlError }}</Message>
+  <Message v-if="yamlSyntaxError" severity="error" sticky >{{ yamlSyntaxError }}</Message>
+  <Message v-else-if="yamlSchemaError" severity="error" sticky >{{ yamlSchemaError }}</Message>
+  <Message v-if="schemaEditorSyntaxError" severity="error" sticky >{{ schemaEditorSyntaxError }}</Message>
   <div class="h-full" id="javascript-editor"></div>
 </template>
 
