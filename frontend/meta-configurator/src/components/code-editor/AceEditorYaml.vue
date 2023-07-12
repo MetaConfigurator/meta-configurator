@@ -10,12 +10,12 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import YAML from 'yaml';
-import Ajv2020 from "ajv/dist/2020";
+import Ajv2020 from 'ajv/dist/2020';
 
 import type {Path} from '@/model/path';
 import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
-import {useDataStore} from "@/store/dataStore";
+import {useDataStore} from '@/store/dataStore';
 
 const sessionStore = useSessionStore();
 const dataStore = useDataStore();
@@ -40,46 +40,46 @@ onMounted(() => {
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
-      if (sessionStore.currentMode === SessionMode.FileEditor) {
-          yamlSyntaxError.value = '';
-          yamlSchemaError.value = '';
+    if (sessionStore.currentMode === SessionMode.FileEditor) {
+      yamlSyntaxError.value = '';
+      yamlSchemaError.value = '';
 
-          try {
-              sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-              const parsedYAML = YAML.parse(editor.value.getValue());
-              fileData.value = parsedYAML;
-              yamlSyntaxError.value = '';
-              try {
-                  if(!yamlSyntaxError.value) {
-                      const ajv = new Ajv2020();
-                      const validateFunction = ajv.compile(dataStore.schemaData);
-                      const valid = validateFunction(parsedYAML)
-                      if (!valid) {
-                          yamlSchemaError.value = 'Invalid YAML according to the schema';
-                      } else if (valid) {
-                          yamlSchemaError.value = '';
-                      }
-                  }
-              } catch (e) {
-                  yamlSchemaError.value = 'catch error';
-              }
-          } catch (e) {
-              /* empty */
-              yamlSyntaxError.value = 'Invalid YAML syntax';
+      try {
+        sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+        const parsedYAML = YAML.parse(editor.value.getValue());
+        fileData.value = parsedYAML;
+        yamlSyntaxError.value = '';
+        try {
+          if (!yamlSyntaxError.value) {
+            const ajv = new Ajv2020();
+            const validateFunction = ajv.compile(dataStore.schemaData);
+            const valid = validateFunction(parsedYAML);
+            if (!valid) {
+              yamlSchemaError.value = 'Invalid YAML according to the schema';
+            } else if (valid) {
+              yamlSchemaError.value = '';
+            }
           }
+        } catch (e) {
+          yamlSchemaError.value = 'catch error';
+        }
+      } catch (e) {
+        /* empty */
+        yamlSyntaxError.value = 'Invalid YAML syntax';
       }
+    }
 
-      if (sessionStore.currentMode === SessionMode.SchemaEditor) {
-          schemaEditorSyntaxError.value = '';
-          try {
-              sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-              fileData.value = YAML.parse(editor.value.getValue());
-              schemaEditorSyntaxError.value = '';
-          } catch (e) {
-              /* empty */
-              schemaEditorSyntaxError.value = 'Invalid YAML syntax in Schema Editor';
-          }
+    if (sessionStore.currentMode === SessionMode.SchemaEditor) {
+      schemaEditorSyntaxError.value = '';
+      try {
+        sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+        fileData.value = YAML.parse(editor.value.getValue());
+        schemaEditorSyntaxError.value = '';
+      } catch (e) {
+        /* empty */
+        schemaEditorSyntaxError.value = 'Invalid YAML syntax in Schema Editor';
       }
+    }
   });
 
   editor.value.on('changeSelection', () => {
@@ -152,9 +152,11 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 </script>
 
 <template>
-  <Message v-if="yamlSyntaxError" severity="error" sticky >{{ yamlSyntaxError }}</Message>
-  <Message v-else-if="yamlSchemaError" severity="error" sticky >{{ yamlSchemaError }}</Message>
-  <Message v-if="schemaEditorSyntaxError" severity="error" sticky >{{ schemaEditorSyntaxError }}</Message>
+  <Message v-if="yamlSyntaxError" severity="error" sticky>{{ yamlSyntaxError }}</Message>
+  <Message v-else-if="yamlSchemaError" severity="error" sticky>{{ yamlSchemaError }}</Message>
+  <Message v-if="schemaEditorSyntaxError" severity="error" sticky>{{
+    schemaEditorSyntaxError
+  }}</Message>
   <div class="h-full" id="javascript-editor"></div>
 </template>
 
