@@ -1,13 +1,15 @@
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
-import {useSettingsStore} from '@/store/settingsStore';
 import {chooseSchemaFromFile} from '@/components/toolbar/uploadSchema';
 import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {clearEditor} from '@/components/toolbar/ClearContent';
+import {storeSchema} from '@/data/StoreSchema';
+import {useDataStore} from '@/store/dataStore';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
+  private selectedSchemaKey: string = 'default';
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
@@ -45,7 +47,17 @@ export class TopMenuBar {
           {
             label: 'Upload schema',
             icon: 'pi pi-fw pi-upload',
-            command: this.chooseSchema,
+            command: this.uploadSchema,
+          },
+          {
+            label: 'Choose schema',
+            icon: 'pi pi-fw pi-pencil',
+            items: storeSchema.map((schema, index) => ({
+              label: schema.label,
+              icon: 'pi pi-fw pi-code',
+              key: schema.key,
+              command: () => this.chooseSchema(schema.key, this.selectedSchemaKey),
+            })),
           },
         ],
       },
@@ -74,7 +86,17 @@ export class TopMenuBar {
           {
             label: 'Upload Schema',
             icon: 'pi pi-fw pi-upload',
-            command: this.chooseSchema,
+            command: this.uploadSchema,
+          },
+          {
+            label: 'Choose schema',
+            icon: 'pi pi-fw pi-pencil',
+            items: storeSchema.map((schema, index) => ({
+              label: schema.label,
+              icon: 'pi pi-fw pi-code',
+              key: schema.key,
+              command: () => this.chooseSchema(schema.key, this.selectedSchemaKey),
+            })),
           },
           {
             separator: true,
@@ -99,9 +121,15 @@ export class TopMenuBar {
   get settingsMenuItems() {
     return [];
   }
-  private chooseSchema(): void {
+  private uploadSchema(): void {
     chooseSchemaFromFile();
   }
+  private chooseSchema(schemaKey: string, selectedSchema: any): void {
+    this.selectedSchemaKey = schemaKey;
+    selectedSchema = storeSchema.find(schema => schema.key === schemaKey);
+    useDataStore().schemaData = selectedSchema?.schema;
+  }
+
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
