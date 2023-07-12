@@ -11,10 +11,11 @@ import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import Ajv2020 from "ajv/dist/2020";
 
+
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
 
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
 import {useDataStore} from "@/store/dataStore";
 
 const sessionStore = useSessionStore();
@@ -26,8 +27,9 @@ let currentSelectionIsForcedFromOutside = false;
 const editor = ref();
 const jsonSyntaxError = ref('');
 const jsonSchemaError = ref('');
+const jsonSchemeEditorSyntaxError = ref('');
 const manipulator = new ConfigManipulatorJson();
-const ajv = new Ajv2020();
+
 onMounted(() => {
   // Set up editor mode to JSON and define theme
   editor.value = ace.edit('javascript-editor');
@@ -40,27 +42,48 @@ onMounted(() => {
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
-    jsonSyntaxError.value = '';
-    jsonSchemaError.value = '';
+    if (sessionStore.currentMode === SessionMode.FileEditor){
+      jsonSyntaxError.value = '';
+      jsonSchemaError.value = '';
 
-    try {
-      sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-      const jsonString = editor.value.getValue();
-      const parsedJson = JSON.parse(jsonString);
-      fileData.value = parsedJson;
-    } catch (e) {
-      /* empty */
-      jsonSyntaxError.value = 'Invalid JSON syntax';
+      try {
+          sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+          const jsonString = editor.value.getValue();
+          const parsedJson = JSON.parse(jsonString);
+          fileData.value = parsedJson;
+          try {
+              if (!jsonSyntaxError.value) {
+                  const ajv = new Ajv2020();
+                  const validateFunction = ajv.compile(dataStore.schemaData);
+
+                  const valid = validateFunction(parsedJson);
+                  if (!valid) {
+                      jsonSchemaError.value = 'Invalid JSON according to the schema';
+                  } else if (valid) {
+                      jsonSchemaError.value = '';
+                  }
+              }
+          } catch (e) {
+              jsonSchemaError.value = 'Invalid JSON according to the schema';
+          }
+      } catch (e) {
+          /* empty */
+          jsonSyntaxError.value = 'Invalid JSON syntax';
+      }
     }
 
-    // if (!jsonSyntaxError.value) {
-    //     const parsedSchema = ajv.compile(dataStore.schemaData);
-    //
-    //     const valid = parsedSchema(editor.value.getValue());
-    //     if (!valid) {
-    //         jsonSchemaError.value = 'Invalid JSON according to the schema';
-    //     }
-    // }
+    if (sessionStore.currentMode === SessionMode.SchemaEditor) {
+        jsonSchemeEditorSyntaxError.value = '';
+        try {
+            sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+            const jsonString = editor.value.getValue();
+            const parsedJson = JSON.parse(jsonString);
+            fileData.value = parsedJson;
+        } catch (e) {
+            /* empty */
+            jsonSchemeEditorSyntaxError.value = 'Invalid JSON syntax in Schema Editor';
+        }
+    }
   });
 
   editor.value.on('changeSelection', () => {
@@ -135,6 +158,7 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 <template>
   <Message v-if="jsonSyntaxError" severity="error" sticky >{{ jsonSyntaxError }}</Message>
   <Message v-else-if="jsonSchemaError" severity="error" sticky >{{ jsonSchemaError }}</Message>
+  <Message v-if="jsonSchemeEditorSyntaxError" severity="error" sticky >{{ jsonSchemeEditorSyntaxError }}</Message>
   <div class="h-full" id="javascript-editor"></div>
 </template>
 

@@ -1,8 +1,8 @@
 export const DEFAULT_CONFIG_DATA = {
   name: 'testName',
   firstName: 'testFirstName',
-  isMarried: undefined,
-  telephoneNumber: 152000,
+  isMarried: true,
+  telephoneNumber: 152,
   heightInMeter: 1.7,
   nickNames: [
     {firstName: 'testNickName1', lastName: 'testLastName1'},
@@ -13,7 +13,7 @@ export const DEFAULT_CONFIG_DATA = {
     number: 12,
     zipCode: 'testZip',
     city: 'testCity',
-    country: '',
+    country: 'Germany',
     moreInfo: {
       info: 'testInfo',
       neighborhood: 'testNH',
