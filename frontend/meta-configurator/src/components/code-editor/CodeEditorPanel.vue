@@ -2,8 +2,8 @@
  of this panel. When the panel or underlying editor changes, the changes can be applied here
  and the main view does not need to know about any of that. -->
 <template>
-  <AceEditorJson v-if="settingsStore.settingsData.configLanguage === 'json'" />
-  <AceEditorYaml v-else-if="settingsStore.settingsData.configLanguage === 'yaml'" />
+  <AceEditorJson v-if="settingsStore.settingsData.dataFormat === 'json'" />
+  <AceEditorYaml v-else-if="settingsStore.settingsData.dataFormat === 'yaml'" />
 </template>
 
 <script setup>
