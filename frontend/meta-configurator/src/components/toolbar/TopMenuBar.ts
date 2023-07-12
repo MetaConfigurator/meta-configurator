@@ -1,39 +1,32 @@
-import type {MenuItemCommandEvent} from 'primevue/menuitem';
-import {useSettingsStore} from '@/store/settingsStore';
-import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
-import {downloadConfig} from '@/components/download-config/downloadConfig';
+import type { MenuItemCommandEvent } from 'primevue/menuitem';
+import { useSettingsStore } from '@/store/settingsStore';
+import { chooseConfigFromFile } from '@/components/config-selection/ChooseConfig';
+import { downloadConfig } from '@/components/download-config/downloadConfig';
 import { combinedSchema } from "@/data/CombinedSchema";
 import { handleChooseSchema } from './schemaActions';
-/**
- * Helper class that contains the menu items for the top menu bar.
- */
+import { chooseSchemaFromFile } from "@/components/schema-selection/ChooseSchema";
+
 export class TopMenuBar {
+  private selectedSchemaKey: string = 'default';
 
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
-
-
     console.log('Combined Schema:', combinedSchema);
     return [
       {
         label: 'File',
         icon: 'pi pi-fw pi-file',
-        class: 'z-10', // z-10 is required otherwise the menu is behind the ace editor
+        class: 'z-10',
         items: [
           {
-            label: 'New',
-            icon: 'pi pi-fw pi-plus',
-            command: this.onMenuItemClicked,
-          },
-          {
-            label: 'Delete',
+            label: 'Clear',
             icon: 'pi pi-fw pi-trash',
             command: this.onMenuItemClicked,
           },
           {
-            label: 'Choose Config',
-            icon: 'pi pi-fw pi-plus',
+            label: 'Upload Config',
+            icon: 'pi pi-fw pi-cloud-upload',
             command: this.chooseConfig,
           },
           {
@@ -84,20 +77,16 @@ export class TopMenuBar {
           },
           {
             label: 'Choose schema',
-            icon: 'pi pi-fw pi-plus',
-            command: handleChooseSchema,
+            icon: 'pi pi-fw pi-pencil',
             items: combinedSchema.map((schema, index) => ({
-              label: schema.label, // Replace 'name' with the property you want to use as the label
+              label: schema.label,
               icon: 'pi pi-fw pi-code',
-              key: index, // You can use the index as the key or replace it with the property you want
-              command: this.onMenuItemClicked,
+              key: schema.key,
+              command: () => this.chooseSchema(schema.key),
             })),
-
-
           },
         ],
       },
-
       {
         label: 'View',
         icon: 'pi pi-fw pi-eye',
@@ -127,12 +116,16 @@ export class TopMenuBar {
   get settingsMenuItems() {
     return [];
   }
-  private chooseSchema(): void {
 
+  private chooseSchema(schemaKey: string): void {
+    this.selectedSchemaKey = schemaKey;
+    handleChooseSchema(combinedSchema.find((schema) => schema.key === schemaKey));
   }
+
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
+
   private download(): void {
     downloadConfig();
   }
