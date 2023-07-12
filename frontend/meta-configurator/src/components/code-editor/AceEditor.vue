@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import {storeToRefs} from 'pinia';
 import Message from 'primevue/message';
 import type {Position} from 'brace';
@@ -31,6 +31,11 @@ const editor = ref();
 const userError = ref('');
 let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
+
+const schemaValidationFunction = computed(() => {
+  const ajv = new Ajv2020();
+  return ajv.compile(useSessionStore().fileSchemaData);
+});
 
 function createConfigManipulator(dataFormat: string): ConfigManipulator {
   if (dataFormat == 'json') {
@@ -65,8 +70,7 @@ onMounted(() => {
     //fileData.value = JSON.parse(jsonString);
     if (sessionStore.currentMode === SessionMode.SchemaEditor) {
       try {
-        const parsedContent = manipulator.parseFileContent(fileContentString);
-        fileData.value = parsedContent;
+        fileData.value = manipulator.parseFileContent(fileContentString);
       } catch (e) {
         userError.value = e.toString();
       }
@@ -76,10 +80,7 @@ onMounted(() => {
     try {
       const parsedContent = manipulator.parseFileContent(fileContentString);
 
-      const ajv = new Ajv2020();
-      const validateFunction = ajv.compile(useSessionStore().fileSchemaData);
-
-      const valid = validateFunction(parsedContent);
+      const valid = schemaValidationFunction.value(parsedContent);
       if (valid) {
         fileData.value = parsedContent;
       } else {
