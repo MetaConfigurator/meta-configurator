@@ -1,15 +1,7 @@
-import { DEFAULT_SCHEMA } from "@/data/DefaultSchema";
-import { ANIMAL_SCHEMA } from "@/data/AnimalSchema";
+import {DEFAULT_SCHEMA} from '@/data/DefaultSchema';
+import {ANIMAL_SCHEMA} from '@/data/AnimalSchema';
 
 export const combinedSchema = [
-  { label: 'Default Schema', key: 'default', schema: DEFAULT_SCHEMA },
-  { label: 'Animal Schema', key: 'animal', schema: ANIMAL_SCHEMA },
-
+  {label: 'Default Schema', key: 'default', schema: DEFAULT_SCHEMA},
+  {label: 'Animal Schema', key: 'animal', schema: ANIMAL_SCHEMA},
 ];
-
-
-
-
-
-
-

@@ -1,10 +1,10 @@
-import type { MenuItemCommandEvent } from 'primevue/menuitem';
-import { useSettingsStore } from '@/store/settingsStore';
-import { chooseConfigFromFile } from '@/components/config-selection/ChooseConfig';
-import { downloadConfig } from '@/components/download-config/downloadConfig';
-import { combinedSchema } from "@/data/CombinedSchema";
-import { handleChooseSchema } from './schemaActions';
-import { chooseSchemaFromFile } from "@/components/schema-selection/ChooseSchema";
+import type {MenuItemCommandEvent} from 'primevue/menuitem';
+import {useSettingsStore} from '@/store/settingsStore';
+import {chooseConfigFromFile} from '@/components/config-selection/ChooseConfig';
+import {downloadConfig} from '@/components/download-config/downloadConfig';
+import {combinedSchema} from '@/data/CombinedSchema';
+import {handleChooseSchema} from './schemaActions';
+import {chooseSchemaFromFile} from '@/components/schema-selection/ChooseSchema';
 
 export class TopMenuBar {
   private selectedSchemaKey: string = 'default';
@@ -119,7 +119,7 @@ export class TopMenuBar {
 
   private chooseSchema(schemaKey: string): void {
     this.selectedSchemaKey = schemaKey;
-    handleChooseSchema(combinedSchema.find((schema) => schema.key === schemaKey));
+    handleChooseSchema(combinedSchema.find(schema => schema.key === schemaKey));
   }
 
   private chooseConfig(): void {

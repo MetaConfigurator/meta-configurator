@@ -51,6 +51,5 @@ export const ANIMAL_SCHEMA: TopLevelSchema = {
         },
       },
     },
-
   },
 };
