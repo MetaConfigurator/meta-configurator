@@ -9,7 +9,7 @@ import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
-import {useSettingsStore} from '@/store/settingsStore';
+import {GuiConstants} from '@/constants';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -25,7 +25,7 @@ const emit = defineEmits<{
 
 const treeNodeResolver = new ConfigTreeNodeResolver(
   () => props.currentData,
-  useSettingsStore().settingsData.guiEditor.maximumDepth
+  GuiConstants.DEPTH_LIMIT
 );
 
 const nodesToDisplay = computed(() => {

@@ -20,7 +20,7 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
     // remove leading # from ref if present
     const refString = schema.$ref?.startsWith('#') ? schema.$ref.substring(1) : schema.$ref!!;
     let refSchema = pointer.get(
-      nonBooleanSchema(useSessionStore().fileSchemaObject ?? {}) ?? {},
+      nonBooleanSchema(useSessionStore().fileSchemaData ?? {}) ?? {},
       refString
     );
     refSchema = preprocessSchema(refSchema);
@@ -31,7 +31,11 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
   if (hasAllOfs(schema)) {
     // @ts-ignore
     schema.allOf = schema.allOf!!.map(preprocessSchema);
-    schema = mergeAllOf(schema);
+    schema = mergeAllOf(schema, {
+      resolvers: {
+        defaultResolver: mergeAllOf.options.resolvers.title,
+      },
+    });
   }
 
   return schema;

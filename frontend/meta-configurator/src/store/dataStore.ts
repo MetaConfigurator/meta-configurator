@@ -5,6 +5,7 @@ import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
 import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {DEFAULT_SCHEMA} from '@/data/DefaultSchema';
 import {watchThrottled} from '@vueuse/core';
+import {jsonSchemaMetaSchema} from '../../resources/json-schema/schema';
 
 export const useDataStore = defineStore('dataStore', () => {
   /**
@@ -23,21 +24,16 @@ export const useDataStore = defineStore('dataStore', () => {
   const schema = ref(new TopLevelJsonSchema(schemaData.value));
 
   /**
+   * The json schema meta schema as a plain object
+   */
+  const metaSchemaData = ref(jsonSchemaMetaSchema);
+
+  /**
    * The json schema meta schema as a TopLevelJsonSchema object
    */
   const metaSchema: Ref<TopLevelJsonSchema> = computed(
-    () => new TopLevelJsonSchema(metaSchemaData.value)
+    () => new TopLevelJsonSchema(metaSchemaData.value as any)
   );
-
-  /**
-   * The json schema meta schema as a plain object
-   */
-  const metaSchemaData = ref({});
-
-  // load meta schema
-  fetch('../../resources/json-schema/schema.json')
-    .then(response => response.json())
-    .then(metaSchema => (metaSchemaData.value = metaSchema));
 
   // make sure that the schema is not preprocessed too often
   watchThrottled(
