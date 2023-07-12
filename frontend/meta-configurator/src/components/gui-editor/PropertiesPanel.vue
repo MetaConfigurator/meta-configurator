@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import {computed, ref} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
@@ -28,7 +28,7 @@ const emit = defineEmits<{
 
 const treeNodeResolver = new ConfigTreeNodeResolver(
   () => props.currentData,
-  GuiConstants.DEPTH_LIMIT,
+  GuiConstants.DEPTH_LIMIT
 );
 
 const nodesToDisplay = computed(() => {
@@ -52,7 +52,7 @@ const propertiesToDisplay = computed(() => {
   // TODO: consider properties of data, i.e., additionalProperties, patternProperties.
   if (isArray()) {
     return Object.fromEntries(
-      props.currentData.map((_, index: number) => [index, props.currentSchema.items]),
+      props.currentData.map((_, index: number) => [index, props.currentSchema.items])
     );
   }
   return props.currentSchema.properties;
@@ -67,7 +67,7 @@ function addItem(subPath: Path, newValue: any) {
   updateData(subPath, newValue);
   const pathAsString = props.currentPath.concat(subPath).join('.');
   // focus on the same element (otherwise the focus stays on the "add item" input field)
-  window.setTimeout(function() {
+  window.setTimeout(function () {
     document.getElementById(pathAsString).focus();
   }, 0);
 }
@@ -80,7 +80,7 @@ function addDefaultValue(subPath: Path) {
   const arraySchema = props.currentSchema.subSchemaAt(subPath.slice(0, -1));
 
   if (!arraySchema?.items) {
-    console.log('addDefaultValue called on array schema without items')
+    console.log('addDefaultValue called on array schema without items');
     // TODO: handle this case
     return {};
   }
@@ -107,79 +107,85 @@ function addDefaultValue(subPath: Path) {
 function addNegativeMarginForTableStyle(depth: number) {
   return {'margin-right': `${-depth * GuiConstants.INDENTATION_STEP}px`};
 }
-
 </script>
 
 <template>
-  <ScrollPanel class='w-full h-full' style='max-height: 90%'>
+  <ScrollPanel class="w-full h-full" style="max-height: 90%">
     <TreeTable
-      :value='nodesToDisplay'
-      filter-mode='lenient'
+      :value="nodesToDisplay"
+      filter-mode="lenient"
       removable-sort
       resizable-columns
       scrollable
-      scroll-direction='vertical'
+      scroll-direction="vertical"
       row-hover
-      :filters='treeTableFilters'>
+      :filters="treeTableFilters">
       <!-- Filter field -->
       <template #header>
-        <div class='text-left'>
-          <div class='p-input-icon-left w-full'>
-            <i class='pi pi-search' />
+        <div class="text-left">
+          <div class="p-input-icon-left w-full">
+            <i class="pi pi-search" />
             <InputText
               v-model="treeTableFilters['global']"
-              placeholder='Search for properties or data'
-              class='h-8 w-80' />
+              placeholder="Search for properties or data"
+              class="h-8 w-80" />
           </div>
         </div>
       </template>
-      <Column field='name' header='Property' :sortable='true' expander>
-        <template #body='slotProps'>
+      <Column field="name" header="Property" :sortable="true" expander>
+        <template #body="slotProps">
           <!-- data nodes, note: wrapping in another span breaks the styling completely -->
-          <span v-if='slotProps.node.type === TreeNodeType.DATA'
-                style='width: 50%; min-width: 50%'
-                :style='addNegativeMarginForTableStyle(slotProps.node.data.depth)'>
+          <span
+            v-if="slotProps.node.type === TreeNodeType.DATA"
+            style="width: 50%; min-width: 50%"
+            :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
             <PropertyMetadata
-              :nodeData='slotProps.node.data'
+              :nodeData="slotProps.node.data"
               @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
           </span>
 
           <span
-            v-if='slotProps.node.type === TreeNodeType.DATA'
-            style='max-width: 50%' class='w-full'>
+            v-if="slotProps.node.type === TreeNodeType.DATA"
+            style="max-width: 50%"
+            class="w-full">
             <PropertyData
-              class='w-full'
-              :nodeData='slotProps.node.data'
-              @update_property_value='updateData'
-              bodyClass='w-full' />
+              class="w-full"
+              :nodeData="slotProps.node.data"
+              @update_property_value="updateData"
+              bodyClass="w-full" />
           </span>
 
           <!-- special tree nodes -->
-          <span v-if='slotProps.node.type === TreeNodeType.ADD_ITEM'
-                style='width: 50%; min-width: 50%'
-                :style='addNegativeMarginForTableStyle(slotProps.node.data.depth)'>
-            <Button text severity='secondary' class='text-gray-500' style='margin-left: -0.75rem'
-                    tabindex='-1'
-                    @click='addDefaultValue(slotProps.node.data.relativePath)'>
-              <i class='pi pi-plus' />
-              <span class='pl-2'>Add item...</span>
+          <span
+            v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
+            style="width: 50%; min-width: 50%"
+            :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+            <Button
+              text
+              severity="secondary"
+              class="text-gray-500"
+              style="margin-left: -0.75rem"
+              tabindex="-1"
+              @click="addDefaultValue(slotProps.node.data.relativePath)">
+              <i class="pi pi-plus" />
+              <span class="pl-2">Add item...</span>
             </Button>
           </span>
 
           <span
-            v-if='slotProps.node.type === TreeNodeType.ADD_ITEM'
-            style='max-width: 50%' class='w-full'>
+            v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
+            style="max-width: 50%"
+            class="w-full">
             <PropertyData
-              class='w-full'
-              :nodeData='slotProps.node.data'
-              @update_property_value='addItem'
-              bodyClass='w-full' />
+              class="w-full"
+              :nodeData="slotProps.node.data"
+              @update_property_value="addItem"
+              bodyClass="w-full" />
           </span>
         </template>
       </Column>
     </TreeTable>
   </ScrollPanel>
-
 </template>
 
 <style scoped>

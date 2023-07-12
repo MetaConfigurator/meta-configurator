@@ -9,7 +9,9 @@ import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTr
 import type {VNode} from 'vue';
 import {h} from 'vue';
 
-export function resolveCorrespondingComponent(nodeData: ConfigTreeNodeData | AddItemTreeNodeData): VNode {
+export function resolveCorrespondingComponent(
+  nodeData: ConfigTreeNodeData | AddItemTreeNodeData
+): VNode {
   const propsObject = {
     propertyName: nodeData.name,
     propertyData: nodeData.data,
@@ -34,8 +36,5 @@ export function resolveCorrespondingComponent(nodeData: ConfigTreeNodeData | Add
     return h(SimpleArrayProperty, propsObject);
   }
 
-  return h(
-    'p',
-    `Property ${nodeData.name} with type ${nodeData.schema.type} is not supported`,
-  );
+  return h('p', `Property ${nodeData.name} with type ${nodeData.schema.type} is not supported`);
 }

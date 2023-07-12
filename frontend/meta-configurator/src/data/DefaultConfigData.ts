@@ -17,9 +17,9 @@ export const DEFAULT_CONFIG_DATA: any = {
       booleanArray: [true, false, true],
       numbers: [1, 2, 3],
       objects: [
-        { name: 'testName1', age: 12 },
-        { name: 'testName2', age: 13 },
-        { name: 'testName3', age: 14 },
+        {name: 'testName1', age: 12},
+        {name: 'testName2', age: 13},
+        {name: 'testName3', age: 14},
       ],
     },
   },
