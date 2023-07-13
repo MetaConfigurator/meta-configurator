@@ -1,18 +1,21 @@
 # Meta Configurator
+
 ## Description
-The project aims to solve the problem of manual creation and understanding of configuration files by providing a user-friendly GUI (Graphical User Interface) tool. 
+
+The project aims to solve the problem of manual creation and understanding of configuration files by providing a user-friendly GUI (Graphical User Interface) tool.
 With this tool, users can effortlessly generate various types of configuration files, such as JSON, YAML, and more, without the need for deep knowledge of their syntax or structure.
 Additionally, users can share the generated configuration files with others and allow them to update and modify the files.
 
 ## Problem
 
-Creating and managing configuration files manually can be a daunting task, especially for users who are not familiar with the specific file formats or syntax. 
-This process often requires understanding complex rules and ensuring accurate formatting, which can lead to errors or inconsistencies. 
+Creating and managing configuration files manually can be a daunting task, especially for users who are not familiar with the specific file formats or syntax.
+This process often requires understanding complex rules and ensuring accurate formatting, which can lead to errors or inconsistencies.
 Furthermore, sharing configuration files with others and enabling them to update and modify the files in a controlled manner can be challenging.
 
 ## Solution
-The project offers a GUI-based solution that simplifies the creation, sharing, and updating of configuration files. 
-Users can interact with a user-friendly interface that provides intuitive controls and options to configure their settings. 
+
+The project offers a GUI-based solution that simplifies the creation, sharing, and updating of configuration files.
+Users can interact with a user-friendly interface that provides intuitive controls and options to configure their settings.
 The tool abstracts away the complexities of file formats and syntax, making it accessible to users with limited technical knowledge. Additionally, the generated configuration files can be easily shared with others, allowing collaboration and updates.
 
 The benefits of using this tool include:
@@ -33,7 +36,6 @@ The project relies on the following dependencies:
 
 - [Node Js + npm](https://nodejs.org/en/download/) (npm comes with node js)
 
-
 Make sure to install these dependencies before running the project.
 
 ## Recommended IDE Setup
@@ -43,7 +45,6 @@ Make sure to install these dependencies before running the project.
 [Vue.js](https://cli.vuejs.org/guide/installation.html)
 
 [Vite](https://v3.ru.vuejs.org/guide/installation.html)
-
 
 ## Customize configuration
 
@@ -56,9 +57,11 @@ To launch the application, follow these steps:
 1. Clone the repository to your local machine:
    ```shell
    git clone https://github.com/PaulBredl/meta-configurator.git
+   ```
 2. Navigate to the project directory:
-    ```shell
+   ```shell
    cd your-repository
+   ```
 3. Install the necessary dependencies:
    ```sh
    npm install
@@ -71,26 +74,25 @@ To launch the application, follow these steps:
    ```sh
    npm run build
    ```
+
 ## Screenshot
 
 ![Screenshot 1](resources/GUI_SS.png)
 
 ## Contribution
+
 **Contribution we only accept after 10/2023.**
 
 Contributions to the project are welcome! If you would like to contribute, please follow the guidelines outlined in the project's contribution guide located in the repository.
 
 ## License
+
 This project is licensed under the [MIT License](LICENSE).
 For more information, see the LICENSE file.
 
 ## Contact
 
-If you have any questions, suggestions, or feedback, feel free to contact the project team at 
+If you have any questions, suggestions, or feedback, feel free to contact the project team at
 [kkpatel.de@gmail.com](mailto:kkpatel.de@gmail.com),
-[minyeexu@gmail.com](mailto:minyeexu@gmail.com), [Felix@neuby.de](mailto:Felix@neuby.de), 
+[minyeexu@gmail.com](mailto:minyeexu@gmail.com), [Felix@neuby.de](mailto:Felix@neuby.de),
 [paulbredl@gmx.de](mailto:cpaulbredl@gmx.de).
-
-
-
-
