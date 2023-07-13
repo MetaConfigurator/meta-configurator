@@ -143,7 +143,6 @@ export class TopMenuBar {
     clearEditor();
   }
   private clearSchemaEditor(): void {
-    console.log('Clearing schema editor');
     clearSchemaEditor();
   }
 }
