@@ -20,28 +20,28 @@ export function generateTooltipText(nodeData: ConfigTreeNodeData) {
     result += '\nValue must be';
     let hadConstraintBefore = false;
     if (schema.exclusiveMinimum !== undefined) {
-      result += ' < ' + schema.exclusiveMinimum;
+      result += ' > ' + schema.exclusiveMinimum;
       hadConstraintBefore = true;
     }
     if (schema.minimum !== undefined) {
       if (hadConstraintBefore) {
         result += ' and';
       }
-      result += ' <= ' + schema.minimum;
+      result += ' >= ' + schema.minimum;
       hadConstraintBefore = true;
     }
     if (schema.exclusiveMaximum !== undefined) {
       if (hadConstraintBefore) {
         result += ' and';
       }
-      result += ' > ' + schema.exclusiveMaximum;
+      result += ' < ' + schema.exclusiveMaximum;
       hadConstraintBefore = true;
     }
     if (schema.maximum !== undefined) {
       if (hadConstraintBefore) {
         result += ' and';
       }
-      result += ' >= ' + schema.maximum;
+      result += ' <= ' + schema.maximum;
     }
   }
   return result;

@@ -1,4 +1,5 @@
 import {useDataStore} from '@/store/dataStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 
 export function chooseConfigFromFile(): void {
   const inputElement = document.createElement('input');
@@ -14,6 +15,7 @@ export function chooseConfigFromFile(): void {
         const contents = e.target?.result as string;
         try {
           const selectedConfig = JSON.parse(contents);
+          useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
           useDataStore().fileData = selectedConfig;
           console.log('Updated fileData:', selectedConfig);
         } catch (error) {
