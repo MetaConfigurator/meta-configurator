@@ -693,7 +693,9 @@ export class JsonSchema {
     if (typeof this.jsonSchema?.type === 'string') {
       return [this.jsonSchema.type];
     }
-    return this.jsonSchema?.type ?? ['object', 'array', 'string', 'number', 'boolean', 'null'];
+    return (
+      this.jsonSchema?.type ?? ['object', 'array', 'string', 'number', 'integer', 'boolean', 'null']
+    );
   }
 
   /**

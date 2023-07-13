@@ -107,6 +107,7 @@ export type SchemaPropertyType =
   | 'number'
   | 'object'
   | 'string';
+export const NUMBER_OF_PROPERTY_TYPES = 7;
 export type SchemaPropertyTypes =
   | SchemaPropertyType
   | [SchemaPropertyType, ...SchemaPropertyType[]];
