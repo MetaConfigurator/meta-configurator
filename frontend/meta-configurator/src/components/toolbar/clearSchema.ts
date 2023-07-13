@@ -10,6 +10,5 @@ export function clearSchemaEditor(): void {
     // User confirmed, clear the editor
     useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().schemaData = {};
-    console.log('Cleared schema:', useDataStore().schemaData);
   }
 }
