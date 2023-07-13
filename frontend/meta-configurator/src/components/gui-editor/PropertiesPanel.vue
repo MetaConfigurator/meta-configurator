@@ -6,13 +6,14 @@ import InputText from 'primevue/inputtext';
 import ScrollPanel from 'primevue/scrollpanel';
 import Button from 'primevue/button';
 
-import type {JsonSchema} from '@/model/JsonSchema';
+import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
-import {GuiConstants} from '@/constants';
 import type {Path} from '@/model/path';
+import {GuiConstants} from '@/constants';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {useSettingsStore} from '@/store/settingsStore';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -26,10 +27,7 @@ const emit = defineEmits<{
   (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
-const treeNodeResolver = new ConfigTreeNodeResolver(
-  () => props.currentData,
-  GuiConstants.DEPTH_LIMIT
-);
+const treeNodeResolver = new ConfigTreeNodeResolver(() => props.currentData);
 
 const nodesToDisplay = computed(() => {
   return Object.entries(propertiesToDisplay.value).map(([key, value]) => {

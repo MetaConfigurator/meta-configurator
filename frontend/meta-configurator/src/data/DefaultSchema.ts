@@ -7,11 +7,16 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   $id: 'https://example.com/person.schema.json',
   required: ['name', 'firstName'],
-  properties: {
+  $defs: {
     name: {
       type: 'string',
       description: 'Last name',
       examples: ['Doe'],
+    },
+  },
+  properties: {
+    name: {
+      $ref: '#/$defs/name',
     },
     firstName: {
       type: 'string',
@@ -46,16 +51,26 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
     address: {
       type: 'object',
       description: 'Address of the person',
+      allOf: [
+        {
+          properties: {
+            street: {
+              type: 'string',
+              description: 'Street name',
+              examples: ['Main Street'],
+            },
+          },
+        },
+        {
+          properties: {
+            number: {
+              type: 'number',
+              description: 'Street number',
+            },
+          },
+        },
+      ],
       properties: {
-        street: {
-          type: 'string',
-          description: 'Street name',
-          examples: ['Main Street'],
-        },
-        number: {
-          type: 'number',
-          description: 'Street number',
-        },
         city: {
           type: 'string',
           description: 'City name',

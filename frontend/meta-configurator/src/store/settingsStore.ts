@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
-import {TopLevelJsonSchema} from '@/model/TopLevelJsonSchema';
+import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 
 /**
  * Store for the Meta Configurator settings.
@@ -15,6 +15,7 @@ export const useSettingsStore = defineStore('settings', () => {
     },
     guiEditor: {
       elementNavigationWithSeparateButton: false,
+      maximumDepth: 3,
     },
     debuggingActive: false,
   });

@@ -17,7 +17,6 @@ export function chooseConfigFromFile(): void {
           const selectedConfig = JSON.parse(contents);
           useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
           useDataStore().fileData = selectedConfig;
-          console.log('Updated fileData:', selectedConfig);
         } catch (error) {
           console.error('Error parsing JSON schema:', error);
           alert('Invalid JSON file. Please choose a valid JSON file.');

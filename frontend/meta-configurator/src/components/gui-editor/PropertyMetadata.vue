@@ -6,6 +6,7 @@ import type {Path} from '@/model/path';
 import IconExpand from '@/components/icons/IconExpand.vue';
 import {useSettingsStore} from '@/store/settingsStore';
 import {generateTooltipText} from '@/helpers/propertyTooltipGenerator';
+import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -39,6 +40,22 @@ function zoomIntoPath() {
     emit('zoom_into_path', props.nodeData.relativePath);
   }
 }
+
+function getTypeDescription(): string {
+  if (props.nodeData.schema.enum) {
+    return 'enum';
+  }
+
+  const type = props.nodeData.schema.type;
+  if (Array.isArray(type)) {
+    if (type.length === NUMBER_OF_PROPERTY_TYPES) {
+      return 'any';
+    }
+    return type.join(', ');
+  }
+
+  return type;
+}
 </script>
 
 <template>
@@ -58,7 +75,7 @@ function zoomIntoPath() {
       <span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
     </span>
 
-    <span class="text-xs text-gray-400">:&nbsp;{{ nodeData.schema.type.join(',') }}</span>
+    <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription() }}</span>
     <!-- "zoom in" icon -->
     <div class="flex flex-row w-full ml-5">
       <IconExpand

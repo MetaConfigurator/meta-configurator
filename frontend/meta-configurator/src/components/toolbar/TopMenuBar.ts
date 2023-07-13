@@ -2,9 +2,11 @@ import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {chooseSchemaFromFile} from '@/components/toolbar/uploadSchema';
 import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
-import {clearEditor} from '@/components/toolbar/clearContent';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
+
+import {clearEditor} from '@/components/toolbar/clearContent';
+import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 
@@ -30,6 +32,11 @@ export class TopMenuBar {
             label: 'Upload File',
             icon: 'pi pi-fw pi-upload',
             command: this.chooseConfig,
+          },
+          {
+            label: 'Generate data',
+            icon: 'pi pi-fw pi-cog',
+            command: this.generateSampleFile,
           },
           {
             separator: true,
@@ -135,11 +142,20 @@ export class TopMenuBar {
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
+  private generateSampleFile() {
+    const confirmClear = window.confirm(
+      'This will delete all the existing data. Are you sure you want to continue?'
+    );
+
+    if (confirmClear) {
+      useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
+      useDataStore().fileData = generateSampleData(useDataStore().schema.jsonSchema);
+    }
+  }
   private downloadFile(fileNamePrefix: string): void {
     downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
-    console.log('Clearing editor');
     clearEditor();
   }
   private clearSchemaEditor(): void {

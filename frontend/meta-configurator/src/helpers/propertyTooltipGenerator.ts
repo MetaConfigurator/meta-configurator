@@ -1,10 +1,10 @@
-import type {ConfigTreeNodeData} from '@/model/ConfigTreeNode';
+import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
 
 export function generateTooltipText(nodeData: ConfigTreeNodeData) {
   const schema = nodeData.schema;
   let result = schema.description === undefined ? '' : '"' + schema.description + '"\n';
 
-  if (nodeData.parentSchema?.isRequired(nodeData.name as string) || false) {
+  if (nodeData.parentSchema?.isRequired(nodeData.name as string)) {
     result += '\nThis property is required.';
   }
   if (schema.deprecated) {
