@@ -2,14 +2,15 @@ import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {chooseSchemaFromFile} from '@/components/toolbar/uploadSchema';
 import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
-import {clearEditor} from '@/components/toolbar/ClearContent';
-import {storeSchema} from '@/data/StoreSchema';
+import {clearEditor} from '@/components/toolbar/clearContent';
+import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
-  private selectedSchemaKey: string = 'default';
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
@@ -52,11 +53,11 @@ export class TopMenuBar {
           {
             label: 'Choose schema',
             icon: 'pi pi-fw pi-pencil',
-            items: storeSchema.map(schema => ({
+            items: schemaCollection.map(schema => ({
               label: schema.label,
               icon: 'pi pi-fw pi-code',
               key: schema.key,
-              command: () => this.chooseSchema(schema.key, this.selectedSchemaKey),
+              command: () => this.chooseSchema(schema.key),
             })),
           },
         ],
@@ -91,11 +92,11 @@ export class TopMenuBar {
           {
             label: 'Choose schema',
             icon: 'pi pi-fw pi-pencil',
-            items: storeSchema.map(schema => ({
+            items: schemaCollection.map(schema => ({
               label: schema.label,
               icon: 'pi pi-fw pi-code',
               key: schema.key,
-              command: () => this.chooseSchema(schema.key, this.selectedSchemaKey),
+              command: () => this.chooseSchema(schema.key),
             })),
           },
           {
@@ -124,9 +125,9 @@ export class TopMenuBar {
   private uploadSchema(): void {
     chooseSchemaFromFile();
   }
-  private chooseSchema(schemaKey: string, selectedSchema: any): void {
-    this.selectedSchemaKey = schemaKey;
-    selectedSchema = storeSchema.find(schema => schema.key === schemaKey);
+  private chooseSchema(schemaKey: string): void {
+    let selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().schemaData = selectedSchema?.schema;
   }
 
