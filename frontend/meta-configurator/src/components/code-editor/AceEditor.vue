@@ -19,6 +19,7 @@ import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionSt
 import {useDataStore} from '@/store/dataStore';
 import type {ConfigManipulator} from '@/model/ConfigManipulator';
 import {ConfigManipulatorYaml} from '@/helpers/ConfigManipulatorYaml';
+import {useSettingsStore} from '@/store/settingsStore';
 
 const sessionStore = useSessionStore();
 const dataStore = useDataStore();
@@ -34,7 +35,10 @@ let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
 
 const schemaValidationFunction = computed(() => {
-  const ajv = new Ajv2020();
+  const ajv = new Ajv2020({
+    strict: false,
+    strictRequired: true,
+  });
   return ajv.compile(useSessionStore().fileSchemaData);
 });
 
@@ -80,10 +84,16 @@ onMounted(() => {
 
     try {
       const parsedContent = manipulator.parseFileContent(fileContentString);
+      if (useSettingsStore().settingsData.codeEditor.allowSchemaViolatingInput) {
+        fileData.value = parsedContent;
+      }
 
       const valid = schemaValidationFunction.value(parsedContent);
+
       if (valid) {
-        fileData.value = parsedContent;
+        if (!useSettingsStore().settingsData.codeEditor.allowSchemaViolatingInput) {
+          fileData.value = parsedContent;
+        }
       } else {
         userError.value = 'Invalid JSON according to the schema.';
         //TODO: more detailed error message
