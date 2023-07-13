@@ -2,7 +2,6 @@ import {useDataStore} from '@/store/dataStore';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 
 export function clearSchemaEditor(): void {
-  console.log('clearSchemaEditor called');
 
   // Show confirmation dialog
   const confirmClear = window.confirm('Are you sure you want to clear the schemaEditor?');
