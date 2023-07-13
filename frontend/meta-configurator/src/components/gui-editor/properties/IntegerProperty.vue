@@ -38,7 +38,9 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    emit('update_property_value', newValue);
+    if (newValue !== null) {
+      emit('update_property_value', newValue);
+    }
   },
 });
 </script>

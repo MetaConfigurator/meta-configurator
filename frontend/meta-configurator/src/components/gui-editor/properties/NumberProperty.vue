@@ -34,7 +34,7 @@ const minValue = computed(() => {
 });
 
 const emit = defineEmits<{
-  (e: 'update_property_value', newValue: number): void;
+  (e: 'update_property_value', newValue: number | undefined): void;
 }>();
 
 const valueProperty = computed({
@@ -42,7 +42,9 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    emit('update_property_value', newValue);
+    if (newValue !== null) {
+      emit('update_property_value', newValue);
+    }
   },
 });
 </script>
