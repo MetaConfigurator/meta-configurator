@@ -37,7 +37,7 @@ export class TopMenuBar {
           {
             label: 'Download File',
             icon: 'pi pi-fw pi-download',
-            command: this.download,
+            command: () => this.downloadFile(useDataStore().schema.title ?? 'file'),
           },
         ],
       },
@@ -106,7 +106,7 @@ export class TopMenuBar {
           {
             label: 'Download Schema',
             icon: 'pi pi-fw pi-download',
-            command: this.download,
+            command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
           },
         ],
       },
@@ -135,8 +135,8 @@ export class TopMenuBar {
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
-  private download(): void {
-    downloadFile();
+  private downloadFile(fileNamePrefix: string): void {
+    downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
     console.log('Clearing editor');

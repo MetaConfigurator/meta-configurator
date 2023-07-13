@@ -1,7 +1,7 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
-import type {ConfigTreeNodeData} from '@/model/ConfigTreeNode';
+import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import IconExpand from '@/components/icons/IconExpand.vue';
 import {useSettingsStore} from '@/store/settingsStore';

@@ -1,6 +1,6 @@
 import {useSessionStore} from '@/store/sessionStore';
 
-export function downloadFile(): void {
+export function downloadFile(fileNamePrefix: string): void {
   // Get the current config data from the `fileData` variable
   const configData: any = useSessionStore().fileData;
   // Convert the config data to a JSON string
@@ -20,7 +20,7 @@ export function downloadFile(): void {
     second: '2-digit',
   });
   const formattedDate = formatter.format(now);
-  const fileName: string = `config-${formattedDate}.json`;
+  const fileName: string = `${fileNamePrefix}-${formattedDate}.json`;
 
   // Create a temporary link element
   const link: HTMLAnchorElement = document.createElement('a');

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
+import type {PathElement} from '@/model/path';
 
 const props = defineProps<{
-  propertyName: string;
+  propertyName: PathElement;
   propertyData: boolean | undefined;
 }>();
 

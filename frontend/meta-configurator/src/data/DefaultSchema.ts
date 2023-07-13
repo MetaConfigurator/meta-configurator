@@ -87,6 +87,35 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
               type: 'string',
               description: 'Time zone',
             },
+            booleanArray: {
+              type: 'array',
+              description: 'Boolean array',
+              items: {
+                type: 'boolean',
+              },
+            },
+            numbers: {
+              type: 'array',
+              description: 'Numbers',
+              items: {
+                type: 'number',
+              },
+            },
+            objects: {
+              type: 'array',
+              description: 'Objects',
+              items: {
+                type: 'object',
+                properties: {
+                  name: {
+                    type: 'string',
+                  },
+                  age: {
+                    type: 'number',
+                  },
+                },
+              },
+            },
           },
         },
       },
