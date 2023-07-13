@@ -1,4 +1,6 @@
 import {useDataStore} from '@/store/dataStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+
 export function clearSchemaEditor(): void {
   console.log('clearSchemaEditor called');
 
@@ -7,8 +9,8 @@ export function clearSchemaEditor(): void {
 
   if (confirmClear) {
     // User confirmed, clear the editor
+    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().schemaData = {};
-
     console.log('Cleared schema:', useDataStore().schemaData);
   }
 }

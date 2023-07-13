@@ -1,4 +1,5 @@
 import {useDataStore} from '@/store/dataStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 
 export function clearEditor(): void {
   console.log('clearEditor called');
@@ -8,6 +9,7 @@ export function clearEditor(): void {
 
   if (confirmClear) {
     // User confirmed, clear the editor
+    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().fileData = {};
 
     console.log('Cleared fileData:', useDataStore().fileData);
