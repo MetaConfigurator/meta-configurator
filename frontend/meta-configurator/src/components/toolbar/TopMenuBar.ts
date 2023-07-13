@@ -6,6 +6,7 @@ import {clearEditor} from '@/components/toolbar/clearContent';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -82,7 +83,7 @@ export class TopMenuBar {
           {
             label: 'Clear Schema',
             icon: 'pi pi-fw pi-trash',
-            command: this.onMenuItemClicked,
+            command: this.clearSchemaEditor,
           },
           {
             label: 'Upload Schema',
@@ -140,5 +141,9 @@ export class TopMenuBar {
   private clearEditor(): void {
     console.log('Clearing editor');
     clearEditor();
+  }
+  private clearSchemaEditor(): void {
+    console.log('Clearing schema editor');
+    clearSchemaEditor();
   }
 }
