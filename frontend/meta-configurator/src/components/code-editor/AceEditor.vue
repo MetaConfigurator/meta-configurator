@@ -1,31 +1,60 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import {storeToRefs} from 'pinia';
+import Message from 'primevue/message';
 import type {Position} from 'brace';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
+import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
+import Ajv2020 from 'ajv/dist/2020';
 
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
 
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useDataStore} from '@/store/dataStore';
+import type {ConfigManipulator} from '@/model/ConfigManipulator';
+import {ConfigManipulatorYaml} from '@/helpers/ConfigManipulatorYaml';
 
 const sessionStore = useSessionStore();
-const {currentPath, currentSelectedElement, fileData} = storeToRefs(sessionStore);
+const dataStore = useDataStore();
+const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
 
-let currentSelectionIsForcedFromOutside = false;
+const props = defineProps<{
+  dataFormat: string;
+}>();
 
 const editor = ref();
-const manipulator = new ConfigManipulatorJson();
+const userError = ref('');
+let currentSelectionIsForcedFromOutside = false;
+const manipulator = createConfigManipulator(props.dataFormat);
+
+const schemaValidationFunction = computed(() => {
+  const ajv = new Ajv2020();
+  return ajv.compile(useSessionStore().fileSchemaData);
+});
+
+function createConfigManipulator(dataFormat: string): ConfigManipulator {
+  if (dataFormat == 'json') {
+    return new ConfigManipulatorJson();
+  } else if (dataFormat == 'yaml') {
+    return new ConfigManipulatorYaml();
+  }
+}
 
 onMounted(() => {
-  // Set up editor mode to JSON and define theme
   editor.value = ace.edit('javascript-editor');
-  editor.value.getSession().setMode('ace/mode/json');
+
+  if (props.dataFormat == 'json') {
+    editor.value.getSession().setMode('ace/mode/json');
+  } else if (props.dataFormat == 'yaml') {
+    editor.value.getSession().setMode('ace/mode/yaml');
+  }
+
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
@@ -34,13 +63,36 @@ onMounted(() => {
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on('change', () => {
+    userError.value = '';
+    sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+    const fileContentString = editor.value.getValue();
+
+    // Current workaround until schema of schema editor works: just accept schema without validation
+    //fileData.value = JSON.parse(jsonString);
+    if (sessionStore.currentMode === SessionMode.SchemaEditor) {
+      try {
+        fileData.value = manipulator.parseFileContent(fileContentString);
+      } catch (e) {
+        userError.value = e.toString();
+      }
+      return;
+    }
+
     try {
-      sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-      fileData.value = JSON.parse(editor.value.getValue());
+      const parsedContent = manipulator.parseFileContent(fileContentString);
+
+      const valid = schemaValidationFunction.value(parsedContent);
+      if (valid) {
+        fileData.value = parsedContent;
+      } else {
+        userError.value = 'Invalid JSON according to the schema.';
+        //TODO: more detailed error message
+      }
     } catch (e) {
-      /* empty */
+      userError.value = e.toString();
     }
   });
+
   editor.value.on('changeSelection', () => {
     if (currentSelectionIsForcedFromOutside) {
       // we do not need to consider the event and send updates if the selection was forced from outside
@@ -87,7 +139,7 @@ onMounted(() => {
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
   currentSelectionIsForcedFromOutside = true;
-  const newEditorContent = JSON.stringify(configData, null, 2);
+  const newEditorContent = manipulator.stringifyContentObject(configData);
   editor.value.setValue(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
   currentSelectionIsForcedFromOutside = false;
@@ -111,7 +163,12 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 </script>
 
 <template>
+  <Message v-if="userError" severity="error" sticky>{{ userError }}</Message>
   <div class="h-full" id="javascript-editor"></div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.p-component {
+  margin: 0 !important;
+}
+</style>

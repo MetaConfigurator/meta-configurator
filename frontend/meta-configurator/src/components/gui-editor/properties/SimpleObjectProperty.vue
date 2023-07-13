@@ -10,7 +10,6 @@ const props = defineProps<{
 }>();
 
 function getNumberOfProperties(): number {
-  console.log('propertydata is ', props.propertyData, ' of ', props.propertyName);
   return Math.max(
     Object.keys(props.propertyData ?? {}).length,
     Object.keys(props.propertySchema.properties).length
@@ -18,9 +17,11 @@ function getNumberOfProperties(): number {
 }
 </script>
 <template>
-  <div class="pl-3 flex flex-row items-center justify-between space-x-6 w-full pr-10">
-    <span class="text-sm text-gray-400 truncate w-4/5">{{ dataToString(propertyData) }}</span>
-    <span class="text-gray-500 font-extralight min-w-max">
+  <div class="pl-3 grid grid-cols-5 items-center justify-between gap-x-6 w-full pr-5">
+    <span class="text-sm text-gray-400 truncate col-span-4" style="max-width: 90%">{{
+      dataToString(propertyData)
+    }}</span>
+    <span class="text-gray-500 font-extralight justify-self-end">
       {{ getNumberOfProperties() }} properties
     </span>
   </div>

@@ -15,7 +15,7 @@ export function chooseConfigFromFile(): void {
         const contents = e.target?.result as string;
         try {
           const selectedConfig = JSON.parse(contents);
-          useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
+          useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
           useDataStore().fileData = selectedConfig;
         } catch (error) {
           console.error('Error parsing JSON schema:', error);

@@ -7,7 +7,7 @@ import GuiEditorPanelJsonSchema from '@/components/gui-editor/GuiEditorPanelJson
 </script>
 
 <template>
-  <GuiEditorPanelJsonSchema />
+  <GuiEditorPanelJsonSchema class="h-full" />
 </template>
 
 <style scoped></style>

@@ -2,8 +2,10 @@ import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {chooseSchemaFromFile} from '@/components/toolbar/uploadSchema';
 import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
-import {clearEditor} from '@/components/toolbar/clearContent';
+import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
+
+import {clearEditor} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 
@@ -41,7 +43,7 @@ export class TopMenuBar {
           {
             label: 'Download File',
             icon: 'pi pi-fw pi-download',
-            command: this.download,
+            command: () => this.downloadFile(useDataStore().schema.title ?? 'file'),
           },
         ],
       },
@@ -53,7 +55,17 @@ export class TopMenuBar {
           {
             label: 'Upload schema',
             icon: 'pi pi-fw pi-upload',
-            command: this.chooseSchema,
+            command: this.uploadSchema,
+          },
+          {
+            label: 'Choose schema',
+            icon: 'pi pi-fw pi-pencil',
+            items: schemaCollection.map(schema => ({
+              label: schema.label,
+              icon: 'pi pi-fw pi-code',
+              key: schema.key,
+              command: () => this.chooseSchema(schema.key),
+            })),
           },
         ],
       },
@@ -82,7 +94,17 @@ export class TopMenuBar {
           {
             label: 'Upload Schema',
             icon: 'pi pi-fw pi-upload',
-            command: this.chooseSchema,
+            command: this.uploadSchema,
+          },
+          {
+            label: 'Choose schema',
+            icon: 'pi pi-fw pi-pencil',
+            items: schemaCollection.map(schema => ({
+              label: schema.label,
+              icon: 'pi pi-fw pi-code',
+              key: schema.key,
+              command: () => this.chooseSchema(schema.key),
+            })),
           },
           {
             separator: true,
@@ -90,7 +112,7 @@ export class TopMenuBar {
           {
             label: 'Download Schema',
             icon: 'pi pi-fw pi-download',
-            command: this.download,
+            command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
           },
         ],
       },
@@ -107,9 +129,15 @@ export class TopMenuBar {
   get settingsMenuItems() {
     return [];
   }
-  private chooseSchema(): void {
+  private uploadSchema(): void {
     chooseSchemaFromFile();
   }
+  private chooseSchema(schemaKey: string): void {
+    let selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+    useDataStore().schemaData = selectedSchema?.schema;
+  }
+
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
@@ -123,8 +151,8 @@ export class TopMenuBar {
       useDataStore().fileData = generateSampleData(useDataStore().schema.jsonSchema);
     }
   }
-  private download(): void {
-    downloadFile();
+  private downloadFile(fileNamePrefix: string): void {
+    downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
     clearEditor();

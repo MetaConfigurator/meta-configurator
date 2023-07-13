@@ -1,4 +1,5 @@
 import {useDataStore} from '@/store/dataStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 
 export function chooseSchemaFromFile(): void {
   const inputElement = document.createElement('input');
@@ -13,7 +14,9 @@ export function chooseSchemaFromFile(): void {
       reader.onload = e => {
         const contents = e.target?.result as string;
         try {
-          useDataStore().schemaData = JSON.parse(contents);
+          const selectedSchema = JSON.parse(contents);
+          useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+          useDataStore().schemaData = selectedSchema;
         } catch (error) {
           console.error('Error parsing JSON schema:', error);
           alert('Invalid JSON schema. Please choose a valid JSON schema.');

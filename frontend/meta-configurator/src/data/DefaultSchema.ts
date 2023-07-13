@@ -4,7 +4,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
   type: 'object',
   title: 'Person',
   description: 'A person schema',
-  $schema: 'http://json-schema.org/draft-2020-12/schema',
+  $schema: 'https://json-schema.org/draft/2020-12/schema',
   $id: 'https://example.com/person.schema.json',
   required: ['name', 'firstName'],
   $defs: {
@@ -101,6 +101,35 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
             timeZone: {
               type: 'string',
               description: 'Time zone',
+            },
+            booleanArray: {
+              type: 'array',
+              description: 'Boolean array',
+              items: {
+                type: 'boolean',
+              },
+            },
+            numbers: {
+              type: 'array',
+              description: 'Numbers',
+              items: {
+                type: 'number',
+              },
+            },
+            objects: {
+              type: 'array',
+              description: 'Objects',
+              items: {
+                type: 'object',
+                properties: {
+                  name: {
+                    type: 'string',
+                  },
+                  age: {
+                    type: 'number',
+                  },
+                },
+              },
             },
           },
         },

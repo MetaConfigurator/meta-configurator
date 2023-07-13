@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {computed} from 'vue';
 import InputText from 'primevue/inputtext';
+import type {PathElement} from '@/model/path';
 
 const props = defineProps<{
-  propertyName: string;
+  propertyName: PathElement;
   propertyData: string | undefined;
 }>();
 

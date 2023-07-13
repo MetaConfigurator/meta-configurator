@@ -18,7 +18,7 @@ export enum ChangeResponsible {
   CodeEditor = 'code_editor',
   GuiEditor = 'gui_editor',
   Routing = 'routing',
-  FileUpload = 'file_upload',
+  Menubar = 'menubar',
 }
 
 /**

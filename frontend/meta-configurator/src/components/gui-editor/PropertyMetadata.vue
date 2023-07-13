@@ -1,7 +1,7 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
-import type {ConfigTreeNodeData} from '@/model/ConfigTreeNode';
+import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import IconExpand from '@/components/icons/IconExpand.vue';
 import {useSettingsStore} from '@/store/settingsStore';
@@ -75,7 +75,7 @@ function getTypeDescription(): string {
       <span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
     </span>
 
-    <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription(nodeData.schema.type) }}</span>
+    <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription() }}</span>
     <!-- "zoom in" icon -->
     <div class="flex flex-row w-full ml-5">
       <IconExpand

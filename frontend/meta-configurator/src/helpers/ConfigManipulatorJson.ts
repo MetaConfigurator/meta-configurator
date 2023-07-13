@@ -6,6 +6,14 @@ import {parse} from 'json-cst';
 export class ConfigManipulatorJson implements ConfigManipulator {
   constructor() {}
 
+  parseFileContent(editorContent: string): any {
+    return JSON.parse(editorContent);
+  }
+
+  stringifyContentObject(content: any): string {
+    return JSON.stringify(content, null, 2);
+  }
+
   determineCursorPosition(editorContent: string, currentPath: Path): number {
     try {
       const cst: CstDocument = parse(editorContent);
