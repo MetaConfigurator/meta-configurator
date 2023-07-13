@@ -2,14 +2,13 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {GuiEditorTreeNode} from '@/model/ConfigDataTreeNode';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import type {Path, PathElement} from '@/model/path';
+import {useSettingsStore} from '@/store/settingsStore';
 
 export class ConfigTreeNodeResolver {
-  private readonly depthLimit: number;
   private readonly configDataSupplier: () => any;
 
-  constructor(configDataSupplier: () => any, depthLimit: number) {
+  constructor(configDataSupplier: () => any) {
     this.configDataSupplier = configDataSupplier;
-    this.depthLimit = depthLimit;
   }
 
   public createTreeNodeOfProperty(
@@ -48,9 +47,10 @@ export class ConfigTreeNodeResolver {
     depth = 0,
     subPath: Path = []
   ): GuiEditorTreeNode[] {
+    const depthLimit = useSettingsStore().settingsData.guiEditor.maximumDepth;
     let children: GuiEditorTreeNode[] = [];
     const path = subPath.concat(name);
-    if (schema.hasType('object') && depth < this.depthLimit) {
+    if (schema.hasType('object') && depth < depthLimit) {
       children = children.concat(
         Object.entries(schema.properties).map(([key, value]) =>
           this.createTreeNodeOfProperty(key, value, schema, depth + 1, subPath.concat(name))
@@ -59,7 +59,7 @@ export class ConfigTreeNodeResolver {
     }
     if (
       schema.hasType('array') &&
-      depth < this.depthLimit &&
+      depth < depthLimit &&
       Array.isArray(this.dataForProperty(path))
     ) {
       children = this.dataForProperty(path).map((value: any, index: number) => {

@@ -13,6 +13,7 @@ import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {useSettingsStore} from '@/store/settingsStore';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -26,10 +27,7 @@ const emit = defineEmits<{
   (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
-const treeNodeResolver = new ConfigTreeNodeResolver(
-  () => props.currentData,
-  GuiConstants.DEPTH_LIMIT
-);
+const treeNodeResolver = new ConfigTreeNodeResolver(() => props.currentData);
 
 const nodesToDisplay = computed(() => {
   return Object.entries(propertiesToDisplay.value).map(([key, value]) => {
