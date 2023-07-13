@@ -6,6 +6,7 @@ import type {Position} from 'brace';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
+import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
