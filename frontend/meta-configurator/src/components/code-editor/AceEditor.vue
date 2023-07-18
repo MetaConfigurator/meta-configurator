@@ -76,7 +76,7 @@ onMounted(() => {
           try {
             fileData.value = manipulator.parseFileContent(fileContentString);
           } catch (e) {
-            errorService.onWarning(e);
+            errorService.onErrorThrottled(e);
           }
           return;
         }

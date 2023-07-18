@@ -9,7 +9,7 @@ import ToastService from 'primevue/toastservice';
 
 import router from './router';
 import FileEditorView from '@/views/FileEditorView.vue';
-import ErrorService from '@/helpers/errorHandler';
+import ErrorService from '@/helpers/errorService';
 
 // @ts-ignore
 const app = createApp(FileEditorView);
