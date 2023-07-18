@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from 'vue';
 import InputNumber from 'primevue/inputnumber';
-import {JsonSchema} from '@/model/JsonSchema';
+import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{
   propertyName: string;

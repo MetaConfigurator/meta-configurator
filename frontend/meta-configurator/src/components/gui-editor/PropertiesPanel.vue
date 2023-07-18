@@ -13,7 +13,6 @@ import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
-import {useSettingsStore} from '@/store/settingsStore';
 
 const props = defineProps<{
   currentSchema: JsonSchema;

@@ -3,7 +3,7 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 
 export function clearSchemaEditor(): void {
   // Show confirmation dialog
-  const confirmClear = window.confirm('Are you sure you want to clear the schemaEditor?');
+  const confirmClear = window.confirm('Are you sure you want to clear the schema Editor?');
 
   if (confirmClear) {
     // User confirmed, clear the editor

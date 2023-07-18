@@ -1,8 +1,8 @@
 import {JSONSchemaFaker} from 'json-schema-faker';
 
-export function generateSampleData(schema: any): any {
+export async function generateSampleData(schema: any): Promise<any> {
   JSONSchemaFaker.option('alwaysFakeOptionals', true);
   JSONSchemaFaker.option('minItems', 1);
   JSONSchemaFaker.option('failOnInvalidFormat', false);
-  return JSONSchemaFaker.generate(schema);
+  return JSONSchemaFaker.resolve(schema);
 }
