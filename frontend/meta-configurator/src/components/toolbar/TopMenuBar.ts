@@ -184,7 +184,7 @@ export class TopMenuBar {
   private clearSchemaEditor(): void {
     clearSchemaEditor();
   }
-  private async selectSchema(schemaURL: string): Promise<void> {
+  /*private async selectSchema(schemaURL: string): Promise<void> {
     const existingSchemaTitle = useDataStore().schema.title;
     if (existingSchemaTitle) {
       const confirmClear = window.confirm(
@@ -206,13 +206,12 @@ export class TopMenuBar {
     } catch (error) {
       window.alert('Error fetching schema!! Please try again!!!');
     }
-  }
-  //
+  }*/
 
   /*private async selectSchema(schemaURL: string): Promise<void> {
     const existingSchemaTitle = useDataStore().schema.title;
     const confirmClear = window.confirm(
-      `Selecting a web schema will clear the existing configuration for "${existingSchemaTitle}". Are you sure you want to continue?`
+      `Do you want to clear current data for "${existingSchemaTitle}" schema?`
     );
 
     if (!confirmClear) {
@@ -244,4 +243,30 @@ export class TopMenuBar {
       }
     }
   }*/
+  private async selectSchema(schemaURL: string): Promise<void> {
+    const existingSchemaTitle = useDataStore().schema.title;
+
+    // Custom dialog box with options
+    const userChoice = window.prompt(
+      `Do you want to clear current data for "${existingSchemaTitle} ".\n\nPlease choose an option:\n1. Keep Data\n2. Clear Data`,
+      '1' // Default value, 1 represents "Keep Data"
+    );
+
+    try {
+      // Fetch the schema content from the selected schemaURL.
+      const response = await axios.get(schemaURL);
+      const schemaContent = response.data;
+      useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
+      // Update the schemaData in the dataStore with the fetched schema content.
+      useDataStore().schemaData = schemaContent;
+
+      if (userChoice === '2') {
+        // User chose to clear the data, proceed with clearing the editor content.
+        useDataStore().fileData = {};
+      }
+      window.alert('Schema fetched successfully!');
+    } catch (error) {
+      window.alert('Error fetching schema!! Please try again!!!');
+    }
+  }
 }
