@@ -2,19 +2,40 @@ import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {chooseSchemaFromFile} from '@/components/toolbar/uploadSchema';
 import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
-import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
-
 import {clearEditor} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
+import axios from 'axios';
+import {schemaCollection} from '@/data/SchemaCollection';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
-  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
+  private schemaItems: {label: string; icon: string; command: () => void}[] = [];
+  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {
+    this.fetchWebSchemas();
+  }
+  private async fetchWebSchemas(): Promise<void> {
+    const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';
+
+    try {
+      const response = await axios.get(schemaStoreURL);
+      const schemas = response.data.schemas;
+
+      schemas.forEach(schema => {
+        this.schemaItems.push({
+          label: schema.name,
+          icon: 'pi pi-fw pi-code',
+          command: () => this.selectSchema(schema.url),
+        });
+      });
+    } catch (error) {
+      console.error('Error fetching web schemas:', error);
+    }
+  }
 
   get fileEditorMenuItems() {
     return [
@@ -108,6 +129,11 @@ export class TopMenuBar {
             })),
           },
           {
+            label: 'WebSchemas',
+            icon: 'pi pi-fw pi-cloud-upload',
+            items: this.schemaItems, // Add the fetched schema items to the dropdown menu.
+          },
+          {
             separator: true,
           },
           {
@@ -117,7 +143,6 @@ export class TopMenuBar {
           },
         ],
       },
-
       {
         label: 'Share',
         class: 'z-10',
@@ -138,7 +163,6 @@ export class TopMenuBar {
     useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().schemaData = selectedSchema?.schema;
   }
-
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
@@ -160,5 +184,18 @@ export class TopMenuBar {
   }
   private clearSchemaEditor(): void {
     clearSchemaEditor();
+  }
+  private async selectSchema(schemaURL: string): Promise<void> {
+    try {
+      // Fetch the schema content from the selected schemaURL.
+      const response = await axios.get(schemaURL);
+      const schemaContent = response.data;
+      useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
+      // Update the schemaData in the dataStore with the fetched schema content.
+      useDataStore().schemaData = schemaContent;
+      window.alert('Schema fetched successfully!');
+    } catch (error) {
+      window.alert('Error fetching schema!! Please try again!!!');
+    }
   }
 }
