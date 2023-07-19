@@ -10,9 +10,13 @@ import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 
+import {ref} from 'vue';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
+const showDialog = ref(false); // Add this property to handle dialog visibility
+const existingSchemaTitle = ref(''); // Add this property to store the existing schema title
+
 export class TopMenuBar {
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
@@ -135,13 +139,20 @@ export class TopMenuBar {
   }
   private chooseSchema(schemaKey: string): void {
     const existingSchemaTitle = useDataStore().schema.title;
-    const confirmClear = window.confirm(
-      `Selecting a new schema will clear the existing configuration for "${existingSchemaTitle}". Are you sure you want to continue?`
+
+    // Custom dialog box with options
+    const userChoice = window.prompt(
+      `Do you want to clear current data for "${existingSchemaTitle}" schema or keep it ? .\n\nPlease choose an option:\n1. Keep Data\n2. Clear Data`,
+      '1' // Default value, 1 represents "Keep Data"
     );
 
-    if (confirmClear) {
-      // User confirmed, clear the editor content.
+    // Check user's choice
+    if (userChoice === '2') {
+      // User chose to clear the data, proceed with clearing the editor content.
       useDataStore().fileData = {};
+    } else {
+      // User chose to keep the data or canceled the dialog, do nothing.
+      return;
     }
 
     let selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
