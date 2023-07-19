@@ -81,7 +81,7 @@ export class ConfigTreeNodeResolver {
         return this.createTreeNodeOfProperty(index, schema.items, schema, path, depth + 1);
       });
     }
-    return children.concat(this.createAddItemTreeNode(name, path, schema, depth, children));
+    return children.concat(this.createAddItemTreeNode(name, path, schema, depth + 1, children));
   }
 
   private createAddItemTreeNode(
@@ -94,7 +94,7 @@ export class ConfigTreeNodeResolver {
     return {
       data: {
         schema: schema.items,
-        depth: depth + 1,
+        depth: depth,
         relativePath: path.concat(children.length),
         name: children.length,
         data: undefined,
