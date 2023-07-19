@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {computed} from 'vue';
 import InputNumber from 'primevue/inputnumber';
-import {JsonSchema} from '@/model/JsonSchema';
+import type {PathElement} from '@/model/path';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{
-  propertyName: string;
-  propertyData: number;
+  propertyName: PathElement;
+  propertyData: number | undefined;
   propertySchema: JsonSchema;
 }>();
 

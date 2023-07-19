@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
+import {ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {watchThrottled} from '@vueuse/core';
@@ -36,13 +36,7 @@ function updateValue() {
     class="h-8"
     v-model="valueProperty"
     @blur="updateValue"
-    @keydown="
-      ev => {
-        if (ev.key === 'Enter') {
-          updateValue();
-        }
-      }
-    " />
+    @keyup.enter="updateValue" />
 </template>
 
 <style module>

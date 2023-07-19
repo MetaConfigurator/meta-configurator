@@ -2,6 +2,7 @@
 import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import {resolveCorrespondingComponent} from '@/components/gui-editor/resolveCorrespondingComponent';
+import {pathToString} from '@/helpers/pathHelper';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -18,9 +19,9 @@ function propagateUpdateEvent(newValue: any) {
 
 <template>
   <Component
-    :id="nodeData.relativePath.join('.')"
+    :id="pathToString(nodeData.absolutePath)"
     class="truncate"
-    :is="resolveCorrespondingComponent(props.nodeData)"
+    :is="resolveCorrespondingComponent(nodeData)"
     @update_property_value="(newValue: any) => propagateUpdateEvent(newValue)" />
 </template>
 
