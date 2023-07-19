@@ -44,8 +44,10 @@ function updateData(subPath: Path, newValue: any) {
 
 function addItem(subPath: Path, newValue: any) {
   updateData(subPath, newValue);
+  // focus on "add item" element (which id is the path of the array + 1
+  // on the last element of the path)
+  subPath = subPath.slice(0, -1).concat(subPath[subPath.length - 1] + 1);
   const pathAsString = props.currentPath.concat(subPath).join('.');
-  // focus on the same element (otherwise the focus stays on the "add item" input field)
   window.setTimeout(function () {
     document.getElementById(pathAsString).focus();
   }, 0);
@@ -144,10 +146,9 @@ function addNegativeMarginForTableStyle(depth: number) {
             severity="secondary"
             class="text-gray-500"
             style="margin-left: -0.75rem"
-            tabindex="-1"
             @click="addDefaultValue(slotProps.node.data.relativePath)">
             <i class="pi pi-plus" />
-            <span class="pl-2">Add item...</span>
+            <span class="pl-2">Add item</span>
           </Button>
         </span>
 
