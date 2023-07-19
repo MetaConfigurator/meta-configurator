@@ -7,7 +7,7 @@ import {clearEditor} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
-import axios from 'axios';
+
 import {schemaCollection} from '@/data/SchemaCollection';
 
 /**
@@ -22,10 +22,11 @@ export class TopMenuBar {
     const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';
 
     try {
-      const response = await axios.get(schemaStoreURL);
-      const schemas = response.data.schemas;
+      const response = await fetch(schemaStoreURL);
+      const data = await response.json();
+      const schemas = data.schemas;
 
-      schemas.forEach(schema => {
+      schemas.forEach((schema: {name: string; url: string}) => {
         this.schemaItems.push({
           label: schema.name,
           icon: 'pi pi-fw pi-code',
@@ -184,78 +185,19 @@ export class TopMenuBar {
   private clearSchemaEditor(): void {
     clearSchemaEditor();
   }
-  /*private async selectSchema(schemaURL: string): Promise<void> {
-    const existingSchemaTitle = useDataStore().schema.title;
-    if (existingSchemaTitle) {
-      const confirmClear = window.confirm(
-        `Selecting a new schema will clear the existing configuration for "${existingSchemaTitle}". Are you sure you want to continue?`
-      );
-      if (!confirmClear) {
-        return; // User canceled, do nothing.
-      }
-    }
-    try {
-      // Fetch the schema content from the selected schemaURL.
-      const response = await axios.get(schemaURL);
-      const schemaContent = response.data;
-      useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
-      // Update the schemaData in the dataStore with the fetched schema content.
-      useDataStore().schemaData = schemaContent;
-      useDataStore().fileData = {};
-      window.alert('Schema fetched successfully!');
-    } catch (error) {
-      window.alert('Error fetching schema!! Please try again!!!');
-    }
-  }*/
-
-  /*private async selectSchema(schemaURL: string): Promise<void> {
-    const existingSchemaTitle = useDataStore().schema.title;
-    const confirmClear = window.confirm(
-      `Do you want to clear current data for "${existingSchemaTitle}" schema?`
-    );
-
-    if (!confirmClear) {
-      // User chose "No", proceed without clearing the editor content
-      try {
-        // Fetch the schema content from the selected schemaURL.
-        const response = await axios.get(schemaURL);
-        const schemaContent = response.data;
-        useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
-        // Update the schemaData in the dataStore with the fetched schema content.
-        useDataStore().schemaData = schemaContent;
-        window.alert('Schema fetched successfully!');
-      } catch (error) {
-        window.alert('Error fetching schema!! Please try again!!!');
-      }
-    } else {
-      // User chose "Yes", clear the editor content and proceed
-      try {
-        // Fetch the schema content from the selected schemaURL.
-        const response = await axios.get(schemaURL);
-        const schemaContent = response.data;
-        useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
-        // Update the schemaData in the dataStore with the fetched schema content.
-        useDataStore().schemaData = schemaContent;
-        useDataStore().fileData = null; // Clear the editor content here by setting it to null
-        window.alert('Schema fetched successfully!');
-      } catch (error) {
-        window.alert('Error fetching schema!! Please try again!!!');
-      }
-    }
-  }*/
   private async selectSchema(schemaURL: string): Promise<void> {
     const existingSchemaTitle = useDataStore().schema.title;
 
     // Custom dialog box with options
     const userChoice = window.prompt(
-      `Do you want to clear current data for "${existingSchemaTitle} ".\n\nPlease choose an option:\n1. Keep Data\n2. Clear Data`,
+      `Do you want to clear current data for "${existingSchemaTitle} schema for keep it? ".\n\nPlease choose an option:\n1. Keep Data\n2. Clear Data`,
       '1' // Default value, 1 represents "Keep Data"
     );
 
     try {
       // Fetch the schema content from the selected schemaURL.
-      const response = await axios.get(schemaURL);
-      const schemaContent = response.data;
+      const response = await fetch(schemaURL);
+      const schemaContent = await response.json();
       useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
       // Update the schemaData in the dataStore with the fetched schema content.
       useDataStore().schemaData = schemaContent;
