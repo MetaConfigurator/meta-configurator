@@ -35,7 +35,7 @@ export class TopMenuBar {
         });
       });
     } catch (error) {
-      console.error('Error fetching web schemas:', error);
+      errorService.onError('Error fetching web schemas:', error);
     }
   }
 
