@@ -3,7 +3,6 @@ import {computed, ref} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
-import ScrollPanel from 'primevue/scrollpanel';
 import Button from 'primevue/button';
 
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
@@ -13,7 +12,6 @@ import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
-import {useSettingsStore} from '@/store/settingsStore';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -110,81 +108,80 @@ function addNegativeMarginForTableStyle(depth: number) {
 </script>
 
 <template>
-  <ScrollPanel class="w-full h-full" style="max-height: 90%">
-    <TreeTable
-      :value="nodesToDisplay"
-      filter-mode="lenient"
-      removable-sort
-      resizable-columns
-      scrollable
-      scroll-direction="vertical"
-      row-hover
-      :filters="treeTableFilters">
-      <!-- Filter field -->
-      <template #header>
-        <div class="text-left">
-          <div class="p-input-icon-left w-full">
-            <i class="pi pi-search" />
-            <InputText
-              v-model="treeTableFilters['global']"
-              placeholder="Search for properties or data"
-              class="h-8 w-80" />
-          </div>
+  <TreeTable
+    :value="nodesToDisplay"
+    filter-mode="lenient"
+    removable-sort
+    resizable-columns
+    scrollable
+    scroll-direction="vertical"
+    scroll-height="flex"
+    row-hover
+    :filters="treeTableFilters">
+    <!-- Filter field -->
+    <template #header>
+      <div class="text-left">
+        <div class="p-input-icon-left w-full">
+          <i class="pi pi-search" />
+          <InputText
+            v-model="treeTableFilters['global']"
+            placeholder="Search for properties or data"
+            class="h-8 w-80" />
         </div>
+      </div>
+    </template>
+    <Column field="name" header="Property" :sortable="true" expander>
+      <template #body="slotProps">
+        <!-- data nodes, note: wrapping in another span breaks the styling completely -->
+        <span
+          v-if="slotProps.node.type === TreeNodeType.DATA"
+          style="width: 50%; min-width: 50%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          <PropertyMetadata
+            :nodeData="slotProps.node.data"
+            @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
+        </span>
+
+        <span
+          v-if="slotProps.node.type === TreeNodeType.DATA"
+          style="max-width: 50%"
+          class="w-full">
+          <PropertyData
+            class="w-full"
+            :nodeData="slotProps.node.data"
+            @update_property_value="updateData"
+            bodyClass="w-full" />
+        </span>
+
+        <!-- special tree nodes -->
+        <span
+          v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
+          style="width: 50%; min-width: 50%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          <Button
+            text
+            severity="secondary"
+            class="text-gray-500"
+            style="margin-left: -0.75rem"
+            @click="addDefaultValue(slotProps.node.data.relativePath)">
+            <i class="pi pi-plus" />
+            <span class="pl-2">Add item</span>
+          </Button>
+        </span>
+
+        <span
+          v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
+          style="max-width: 50%"
+          class="w-full">
+          <PropertyData
+            class="w-full"
+            :nodeData="slotProps.node.data"
+            @update_property_value="addItem"
+            bodyClass="w-full" />
+        </span>
       </template>
-      <Column field="name" header="Property" :sortable="true" expander>
-        <template #body="slotProps">
-          <!-- data nodes, note: wrapping in another span breaks the styling completely -->
-          <span
-            v-if="slotProps.node.type === TreeNodeType.DATA"
-            style="width: 50%; min-width: 50%"
-            :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
-            <PropertyMetadata
-              :nodeData="slotProps.node.data"
-              @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
-          </span>
-
-          <span
-            v-if="slotProps.node.type === TreeNodeType.DATA"
-            style="max-width: 50%"
-            class="w-full">
-            <PropertyData
-              class="w-full"
-              :nodeData="slotProps.node.data"
-              @update_property_value="updateData"
-              bodyClass="w-full" />
-          </span>
-
-          <!-- special tree nodes -->
-          <span
-            v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
-            style="width: 50%; min-width: 50%"
-            :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
-            <Button
-              text
-              severity="secondary"
-              class="text-gray-500"
-              style="margin-left: -0.75rem"
-              @click="addDefaultValue(slotProps.node.data.relativePath)">
-              <i class="pi pi-plus" />
-              <span class="pl-2">Add item</span>
-            </Button>
-          </span>
-
-          <span
-            v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
-            style="max-width: 50%"
-            class="w-full">
-            <PropertyData
-              class="w-full"
-              :nodeData="slotProps.node.data"
-              @update_property_value="addItem"
-              bodyClass="w-full" />
-          </span>
-        </template>
-      </Column>
-    </TreeTable>
-  </ScrollPanel>
+    </Column>
+  </TreeTable>
 </template>
 
 <style scoped>
@@ -209,6 +206,7 @@ function addNegativeMarginForTableStyle(depth: number) {
 :deep(.p-button) {
   padding: 0 0.5rem;
 }
+
 :deep(.p-button-label) {
   font-weight: 500;
 }
