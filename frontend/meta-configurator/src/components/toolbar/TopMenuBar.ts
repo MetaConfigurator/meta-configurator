@@ -9,6 +9,7 @@ import {clearEditor} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
+import {editor} from '@/components/toolbar/useAceEditor';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -77,6 +78,20 @@ export class TopMenuBar {
         icon: 'pi pi-fw pi-share-alt',
         command: this.onMenuItemClicked,
       },
+      {
+        label: 'Undo',
+        icon: 'pi pi-chevron-left',
+        command: () => {
+          editor.value.getSession().getUndoManager().undo();
+        },
+      },
+      {
+        label: 'Redo',
+        icon: 'pi pi-chevron-right',
+        command: () => {
+          editor.value.getSession().getUndoManager().redo();
+        },
+      },
     ];
   }
 
@@ -124,11 +139,40 @@ export class TopMenuBar {
         icon: 'pi pi-fw pi-share-alt',
         command: this.onMenuItemClicked,
       },
+      {
+        label: 'Undo',
+        icon: 'pi pi-chevron-left',
+        command: () => {
+          editor.value.getSession().getUndoManager().undo();
+        },
+      },
+      {
+        label: 'Redo',
+        icon: 'pi pi-chevron-right',
+        command: () => {
+          editor.value.getSession().getUndoManager().redo();
+        },
+      },
     ];
   }
 
   get settingsMenuItems() {
-    return [];
+    return [
+      {
+        label: 'Undo',
+        icon: 'pi pi-chevron-left',
+        command: () => {
+          editor.value.getSession().getUndoManager().undo();
+        },
+      },
+      {
+        label: 'Redo',
+        icon: 'pi pi-chevron-right',
+        command: () => {
+          editor.value.getSession().getUndoManager().redo();
+        },
+      },
+    ];
   }
   private uploadSchema(): void {
     chooseSchemaFromFile();

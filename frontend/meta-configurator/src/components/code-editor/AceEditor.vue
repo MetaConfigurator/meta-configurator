@@ -11,6 +11,7 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import Ajv2020 from 'ajv/dist/2020';
+import 'primeicons/primeicons.css';
 
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
@@ -20,6 +21,7 @@ import {useDataStore} from '@/store/dataStore';
 import type {ConfigManipulator} from '@/model/ConfigManipulator';
 import {ConfigManipulatorYaml} from '@/helpers/ConfigManipulatorYaml';
 import {useSettingsStore} from '@/store/settingsStore';
+import {useAceEditor} from '@/components/toolbar/useAceEditor';
 
 const sessionStore = useSessionStore();
 const dataStore = useDataStore();
@@ -29,7 +31,7 @@ const props = defineProps<{
   dataFormat: string;
 }>();
 
-const editor = ref();
+const {editor} = useAceEditor();
 const userError = ref('');
 let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
