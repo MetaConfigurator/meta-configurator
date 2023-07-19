@@ -8,6 +8,7 @@ import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
 import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import Toast from 'primevue/toast';
 import router from '@/router';
 import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
 import {useSettingsStore} from '@/store/settingsStore';
@@ -42,6 +43,7 @@ function updateMode(newMode: SessionMode) {
 </script>
 
 <template>
+  <Toast position="bottom-left" />
   <div class="w-full h-full flex" style="max-height: 100%">
     <main class="h-full flex flex-col">
       <!-- toolbar -->
