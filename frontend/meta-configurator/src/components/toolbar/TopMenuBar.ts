@@ -207,4 +207,41 @@ export class TopMenuBar {
       window.alert('Error fetching schema!! Please try again!!!');
     }
   }
+  //
+
+  /*private async selectSchema(schemaURL: string): Promise<void> {
+    const existingSchemaTitle = useDataStore().schema.title;
+    const confirmClear = window.confirm(
+      `Selecting a web schema will clear the existing configuration for "${existingSchemaTitle}". Are you sure you want to continue?`
+    );
+
+    if (!confirmClear) {
+      // User chose "No", proceed without clearing the editor content
+      try {
+        // Fetch the schema content from the selected schemaURL.
+        const response = await axios.get(schemaURL);
+        const schemaContent = response.data;
+        useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
+        // Update the schemaData in the dataStore with the fetched schema content.
+        useDataStore().schemaData = schemaContent;
+        window.alert('Schema fetched successfully!');
+      } catch (error) {
+        window.alert('Error fetching schema!! Please try again!!!');
+      }
+    } else {
+      // User chose "Yes", clear the editor content and proceed
+      try {
+        // Fetch the schema content from the selected schemaURL.
+        const response = await axios.get(schemaURL);
+        const schemaContent = response.data;
+        useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
+        // Update the schemaData in the dataStore with the fetched schema content.
+        useDataStore().schemaData = schemaContent;
+        useDataStore().fileData = null; // Clear the editor content here by setting it to null
+        window.alert('Schema fetched successfully!');
+      } catch (error) {
+        window.alert('Error fetching schema!! Please try again!!!');
+      }
+    }
+  }*/
 }
