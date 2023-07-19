@@ -91,7 +91,6 @@ export class TopMenuBar {
           },
         ],
       },
-
       {
         label: 'Share',
         class: 'z-10',
@@ -186,6 +185,15 @@ export class TopMenuBar {
     clearSchemaEditor();
   }
   private async selectSchema(schemaURL: string): Promise<void> {
+    const existingSchemaTitle = useDataStore().schema.title;
+    if (existingSchemaTitle) {
+      const confirmClear = window.confirm(
+        `Selecting a new schema will clear the existing configuration for "${existingSchemaTitle}". Are you sure you want to continue?`
+      );
+      if (!confirmClear) {
+        return; // User canceled, do nothing.
+      }
+    }
     try {
       // Fetch the schema content from the selected schemaURL.
       const response = await axios.get(schemaURL);
@@ -193,6 +201,7 @@ export class TopMenuBar {
       useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
       // Update the schemaData in the dataStore with the fetched schema content.
       useDataStore().schemaData = schemaContent;
+      useDataStore().fileData = {};
       window.alert('Schema fetched successfully!');
     } catch (error) {
       window.alert('Error fetching schema!! Please try again!!!');
