@@ -134,6 +134,18 @@ export class TopMenuBar {
     chooseSchemaFromFile();
   }
   private chooseSchema(schemaKey: string): void {
+    const existingSchemaTitle = useDataStore().schema.title;
+    if (existingSchemaTitle) {
+      const confirmClear = window.confirm(
+        `Selecting a new schema will clear the existing configuration for "${existingSchemaTitle}". Are you sure you want to continue?`
+      );
+      if (!confirmClear) {
+        return; // User canceled, do nothing.
+      } else {
+        // User confirmed, clear the editor content.
+        useDataStore().fileData = {};
+      }
+    }
     let selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
     useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().schemaData = selectedSchema?.schema;
@@ -146,7 +158,6 @@ export class TopMenuBar {
     const confirmClear = window.confirm(
       'This will delete all the existing data. Are you sure you want to continue?'
     );
-
     if (confirmClear) {
       useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
       useDataStore().fileData = generateSampleData(useDataStore().schema.jsonSchema);
