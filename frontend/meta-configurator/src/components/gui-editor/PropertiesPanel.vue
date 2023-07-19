@@ -39,7 +39,6 @@ const nodesToDisplay = computed(() => {
 const treeTableFilters = ref<Record<string, string>>({});
 
 function updateData(subPath: Path, newValue: any) {
-  // add subPath (excluding the first element, which is the root element)
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
 }
