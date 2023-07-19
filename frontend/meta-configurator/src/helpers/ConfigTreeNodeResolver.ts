@@ -14,15 +14,12 @@ export class ConfigTreeNodeResolver {
   public createTreeNodeOfProperty(
     name: PathElement,
     schema: JsonSchema,
-    parentSchema: JsonSchema,
-    depth = 0,
-    subPath: Path = []
+    parentSchema?: JsonSchema,
+    subPath: Path = [],
+    depth: number = 0
   ): GuiEditorTreeNode {
     if (!schema) {
       throw new Error(`Schema for property ${name} is undefined`);
-    }
-    if (!parentSchema) {
-      throw new Error(`Parent schema for property ${name} is undefined`);
     }
 
     const path = subPath.concat(name);
@@ -37,48 +34,75 @@ export class ConfigTreeNodeResolver {
       },
       type: TreeNodeType.DATA,
       key: depth + name.toString(),
-      children: this.createChildNodes(name, schema, depth, subPath),
+      children: this.createChildNodes(name, schema, subPath, depth),
     };
   }
 
   private createChildNodes(
     name: PathElement,
     schema: JsonSchema,
-    depth = 0,
-    subPath: Path = []
+    subPath: Path = [],
+    depth = 0
   ): GuiEditorTreeNode[] {
     const depthLimit = useSettingsStore().settingsData.guiEditor.maximumDepth;
+    const path = depth == 0 ? subPath : subPath.concat(name); // don't add root name to path
+
     let children: GuiEditorTreeNode[] = [];
-    const path = subPath.concat(name);
     if (schema.hasType('object') && depth < depthLimit) {
-      children = children.concat(
-        Object.entries(schema.properties).map(([key, value]) =>
-          this.createTreeNodeOfProperty(key, value, schema, depth + 1, subPath.concat(name))
-        )
-      );
+      children = this.createObjectChildrenTreeNodes(path, schema, depth);
     }
-    if (
-      schema.hasType('array') &&
-      depth < depthLimit &&
-      Array.isArray(this.dataForProperty(path))
-    ) {
-      children = this.dataForProperty(path).map((value: any, index: number) => {
-        return this.createTreeNodeOfProperty(index, schema.items, schema, depth + 1, path);
-      });
-      children = children.concat({
-        data: {
-          schema: schema.items,
-          depth: depth + 1,
-          relativePath: path.concat(children.length),
-          name: children.length,
-          data: undefined,
-        },
-        type: TreeNodeType.ADD_ITEM,
-        key: depth + name.toString(),
-        children: [],
-      });
+    if (schema.hasType('array') && depth < depthLimit) {
+      children = this.createArrayChildrenTreeNodes(name, path, schema, depth);
     }
+
     return children;
+  }
+
+  private createObjectChildrenTreeNodes(
+    path: Array<PathElement>,
+    schema: JsonSchema,
+    depth: number
+  ) {
+    return Object.entries(schema.properties).map(([key, value]) =>
+      this.createTreeNodeOfProperty(key, value, schema, path, depth + 1)
+    );
+  }
+
+  private createArrayChildrenTreeNodes(
+    name: string | number,
+    path: Array<PathElement>,
+    schema: JsonSchema,
+    depth: number
+  ) {
+    const data = this.dataForProperty(path);
+    let children: GuiEditorTreeNode[] = [];
+    if (Array.isArray(data)) {
+      children = data.map((value: any, index: number) => {
+        return this.createTreeNodeOfProperty(index, schema.items, schema, path, depth + 1);
+      });
+    }
+    return children.concat(this.createAddItemTreeNode(name, path, schema, depth + 1, children));
+  }
+
+  private createAddItemTreeNode(
+    name: string | number,
+    path: Array<PathElement>,
+    schema: JsonSchema,
+    depth: number,
+    children: GuiEditorTreeNode[]
+  ): GuiEditorTreeNode {
+    return {
+      data: {
+        schema: schema.items,
+        depth: depth,
+        relativePath: path.concat(children.length),
+        name: children.length,
+        data: undefined,
+      },
+      type: TreeNodeType.ADD_ITEM,
+      key: depth + name.toString(),
+      children: [],
+    };
   }
 
   private dataForProperty(name: Path): any {
