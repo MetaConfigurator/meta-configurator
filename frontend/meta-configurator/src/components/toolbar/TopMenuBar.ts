@@ -34,8 +34,12 @@ export class TopMenuBar {
           command: () => this.selectSchema(schema.url),
         });
       });
-    } catch (error) {
-      errorService.onError('Error fetching web schemas:', error);
+    } catch (error: Error) {
+      errorService.onError({
+        message: 'Error fetching web schemas',
+        details: error.message,
+        stack: error.stack,
+      });
     }
   }
 
