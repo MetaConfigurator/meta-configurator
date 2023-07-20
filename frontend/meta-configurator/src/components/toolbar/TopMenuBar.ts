@@ -5,7 +5,7 @@ import {downloadFile} from '@/components/toolbar/downloadFile';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
 
-import {clearEditor} from '@/components/toolbar/clearContent';
+import {clearFile} from '@/components/toolbar/clearFile';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
@@ -144,7 +144,7 @@ export class TopMenuBar {
     // Check user's choice
     if (userChoice === '2') {
       // User chose to clear the data, proceed with clearing the editor content.
-      useDataStore().fileData = {};
+      clearFile();
     } else {
       // User chose to keep the data or canceled the dialog, do nothing.
       return;
@@ -159,11 +159,10 @@ export class TopMenuBar {
     chooseConfigFromFile();
   }
   private generateSampleFile() {
-    const confirmClear = window.confirm(
+    const confirmClear = clearFile(
       'This will delete all the existing data. Are you sure you want to continue?'
     );
     if (confirmClear) {
-      useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
       useDataStore().fileData = generateSampleData(useDataStore().schema.jsonSchema);
     }
   }
@@ -171,7 +170,7 @@ export class TopMenuBar {
     downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
-    clearEditor();
+    clearFile();
   }
   private clearSchemaEditor(): void {
     clearSchemaEditor();

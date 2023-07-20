@@ -1,7 +1,7 @@
 import type {TopLevelSchema} from '@/model/JsonSchemaType';
 
 export const ANIMAL_SCHEMA: TopLevelSchema = {
-  $schema: 'https://json-schema.org/draft-2020-12/schema',
+  $schema: 'https://json-schema.org/draft/2020-12/schema',
   title: 'Animal',
   description: 'A Animal schema',
   type: 'object',
