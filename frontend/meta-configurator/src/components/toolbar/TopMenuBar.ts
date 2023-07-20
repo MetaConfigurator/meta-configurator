@@ -20,13 +20,26 @@ export class TopMenuBar {
   get fileEditorMenuItems() {
     return [
       {
+        icon: 'pi pi-chevron-left',
+        command: () => {
+          editor.value.getSession().getUndoManager().undo();
+        },
+      },
+      {
+        icon: 'pi pi-chevron-right',
+        command: () => {
+          editor.value.getSession().getUndoManager().redo();
+        },
+      },
+
+      {
         label: 'File',
-        icon: 'pi pi-fw pi-file',
-        class: 'z-10', // z-10 is required otherwise the menu is behind the ace editor
+        icon: 'pi pi-fw pi-pencil',
+        class: 'z-10',
         items: [
           {
             label: 'Clear File',
-            icon: 'pi pi-fw pi-trash',
+            icon: 'pi pi-fw pi-file-edit',
             command: this.clearEditor,
           },
           {
@@ -35,7 +48,7 @@ export class TopMenuBar {
             command: this.chooseConfig,
           },
           {
-            label: 'Generate data',
+            label: 'Generate Sample',
             icon: 'pi pi-fw pi-cog',
             command: this.generateSampleFile,
           },
@@ -50,47 +63,9 @@ export class TopMenuBar {
         ],
       },
       {
-        label: 'Schema',
-        icon: 'pi pi-fw pi-pencil',
-        class: 'z-10',
-        items: [
-          {
-            label: 'Upload schema',
-            icon: 'pi pi-fw pi-upload',
-            command: this.uploadSchema,
-          },
-          {
-            label: 'Choose schema',
-            icon: 'pi pi-fw pi-pencil',
-            items: schemaCollection.map(schema => ({
-              label: schema.label,
-              icon: 'pi pi-fw pi-code',
-              key: schema.key,
-              command: () => this.chooseSchema(schema.key),
-            })),
-          },
-        ],
-      },
-
-      {
-        label: 'Share',
         class: 'z-10',
         icon: 'pi pi-fw pi-share-alt',
         command: this.onMenuItemClicked,
-      },
-      {
-        label: 'Undo',
-        icon: 'pi pi-chevron-left',
-        command: () => {
-          editor.value.getSession().getUndoManager().undo();
-        },
-      },
-      {
-        label: 'Redo',
-        icon: 'pi pi-chevron-right',
-        command: () => {
-          editor.value.getSession().getUndoManager().redo();
-        },
       },
     ];
   }
@@ -98,9 +73,22 @@ export class TopMenuBar {
   get schemaEditorMenuItems() {
     return [
       {
+        icon: 'pi pi-chevron-left',
+        command: () => {
+          editor.value.getSession().getUndoManager().undo();
+        },
+      },
+      {
+        icon: 'pi pi-chevron-right',
+        command: () => {
+          editor.value.getSession().getUndoManager().redo();
+        },
+      },
+
+      {
         label: 'Schema',
-        icon: 'pi pi-fw pi-file',
-        class: 'z-10', // z-10 is required otherwise the menu is behind the ace editor
+        icon: 'pi pi-fw pi-pencil',
+        class: 'z-10',
         items: [
           {
             label: 'Clear Schema',
@@ -113,7 +101,7 @@ export class TopMenuBar {
             command: this.uploadSchema,
           },
           {
-            label: 'Choose schema',
+            label: 'Choose Schema',
             icon: 'pi pi-fw pi-pencil',
             items: schemaCollection.map(schema => ({
               label: schema.label,
@@ -132,26 +120,10 @@ export class TopMenuBar {
           },
         ],
       },
-
       {
-        label: 'Share',
         class: 'z-10',
         icon: 'pi pi-fw pi-share-alt',
         command: this.onMenuItemClicked,
-      },
-      {
-        label: 'Undo',
-        icon: 'pi pi-chevron-left',
-        command: () => {
-          editor.value.getSession().getUndoManager().undo();
-        },
-      },
-      {
-        label: 'Redo',
-        icon: 'pi pi-chevron-right',
-        command: () => {
-          editor.value.getSession().getUndoManager().redo();
-        },
       },
     ];
   }
@@ -159,14 +131,12 @@ export class TopMenuBar {
   get settingsMenuItems() {
     return [
       {
-        label: 'Undo',
         icon: 'pi pi-chevron-left',
         command: () => {
           editor.value.getSession().getUndoManager().undo();
         },
       },
       {
-        label: 'Redo',
         icon: 'pi pi-chevron-right',
         command: () => {
           editor.value.getSession().getUndoManager().redo();
