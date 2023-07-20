@@ -6,6 +6,7 @@ import type {PathElement} from '@/model/path';
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: boolean | undefined;
+  required: boolean;
 }>();
 
 const options = ref([
@@ -22,6 +23,9 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
+    if (newValue === undefined && props.required) {
+      return;
+    }
     if (newValue === null) {
       emit('update_property_value', undefined);
     } else {
