@@ -12,6 +12,9 @@ import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {storeToRefs} from 'pinia';
+import {useSessionStore} from '@/store/sessionStore';
+import {pathToString} from '@/helpers/pathHelper';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -31,34 +34,58 @@ const nodesToDisplay = computed(() => {
   return treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema.title ?? 'root',
     props.currentSchema,
-    undefined
+    undefined,
+    props.currentPath
   ).children;
 });
 
 const treeTableFilters = ref<Record<string, string>>({});
+const {currentExpandedElements} = storeToRefs(useSessionStore());
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
 }
 
-function addItem(subPath: Path, newValue: any) {
-  updateData(subPath, newValue);
+function focus(id: string) {
+  window.setTimeout(function () {
+    const element = document.getElementById(id);
+    if (element) {
+      element.focus();
+    }
+  }, 0);
+}
+
+function addItem(relativePath: Path, newValue: any) {
+  updateData(relativePath, newValue);
+  const absolutePath = props.currentPath.concat(relativePath);
+
+  const subSchema = props.currentSchema.subSchemaAt(relativePath);
+  if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
+    useSessionStore().expand(absolutePath);
+
+    // focus on first property of object or first element of array
+    const firstPropertyOfObject = Object.keys(subSchema?.properties)[0];
+    const pathToFirstProperty = props.currentPath.concat(
+      relativePath.concat(firstPropertyOfObject)
+    );
+    focus(pathToString(pathToFirstProperty));
+
+    return;
+  }
+
   // focus on "add item" element (which id is the path of the array + 1
   // on the last element of the path)
-  subPath = subPath.slice(0, -1).concat(subPath[subPath.length - 1] + 1);
-  const pathAsString = props.currentPath.concat(subPath).join('.');
-  window.setTimeout(function () {
-    document.getElementById(pathAsString).focus();
-  }, 0);
+  const pathToAddItem = relativePath.slice(0, -1).concat(relativePath[relativePath.length - 1] + 1);
+  focus(pathToString(props.currentPath.concat(pathToAddItem)));
 }
 
 /**
  * Function for adding a default value to an array.
  * This function is called when the user clicks on the "add item" button.
  */
-function addDefaultValue(subPath: Path) {
-  const arraySchema = props.currentSchema.subSchemaAt(subPath.slice(0, -1));
+function addDefaultValue(relativePath: Path) {
+  const arraySchema = props.currentSchema.subSchemaAt(relativePath.slice(0, -1));
 
   if (!arraySchema?.items) {
     console.log('addDefaultValue called on array schema without items');
@@ -66,15 +93,15 @@ function addDefaultValue(subPath: Path) {
     return {};
   }
   if (arraySchema.items.hasType('object')) {
-    addItem(subPath, {});
+    addItem(relativePath, {});
   } else if (arraySchema.items.hasType('array')) {
-    addItem(subPath, []);
+    addItem(relativePath, []);
   } else if (arraySchema.items.hasType('string')) {
-    addItem(subPath, '');
+    addItem(relativePath, '');
   } else if (arraySchema.items.hasType('number') || arraySchema.items.hasType('integer')) {
-    addItem(subPath, 0);
+    addItem(relativePath, 0);
   } else if (arraySchema.items.hasType('boolean')) {
-    addItem(subPath, false);
+    addItem(relativePath, false);
   }
 }
 
@@ -100,6 +127,9 @@ function addNegativeMarginForTableStyle(depth: number) {
     scroll-direction="vertical"
     scroll-height="flex"
     row-hover
+    :expandedKeys="currentExpandedElements"
+    @nodeExpand="node => (currentExpandedElements[node.key] = true)"
+    @nodeCollapse="node => delete currentExpandedElements[node.key]"
     :filters="treeTableFilters">
     <!-- Filter field -->
     <template #header>
@@ -146,7 +176,8 @@ function addNegativeMarginForTableStyle(depth: number) {
             severity="secondary"
             class="text-gray-500"
             style="margin-left: -0.75rem"
-            @click="addDefaultValue(slotProps.node.data.relativePath)">
+            @click="addDefaultValue(slotProps.node.data.relativePath)"
+            @keyup.enter="addDefaultValue(slotProps.node.data.relativePath)">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>
