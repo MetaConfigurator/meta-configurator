@@ -28,31 +28,14 @@ const emit = defineEmits<{
 const treeNodeResolver = new ConfigTreeNodeResolver(() => props.currentData);
 
 const nodesToDisplay = computed(() => {
-  return Object.entries(propertiesToDisplay.value).map(([key, value]) => {
-    if (isArray()) {
-      // Cast is required because record properties are always interpreted as strings
-      return treeNodeResolver.createTreeNodeOfProperty(Number(key), value, props.currentSchema);
-    }
-    return treeNodeResolver.createTreeNodeOfProperty(key, value, props.currentSchema);
-  });
+  return treeNodeResolver.createTreeNodeOfProperty(
+    props.currentSchema.title ?? 'root',
+    props.currentSchema,
+    undefined
+  ).children;
 });
 
 const treeTableFilters = ref<Record<string, string>>({});
-
-function isArray(): boolean {
-  return props.currentSchema.hasType('array') && Array.isArray(props.currentData);
-}
-
-const propertiesToDisplay = computed(() => {
-  // TODO this logic should be part of the TreeNodeResolver.
-  // TODO: consider properties of data, i.e., additionalProperties, patternProperties.
-  if (isArray()) {
-    return Object.fromEntries(
-      props.currentData.map((_, index: number) => [index, props.currentSchema.items])
-    );
-  }
-  return props.currentSchema.properties;
-});
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
