@@ -9,14 +9,9 @@ import {clearEditor} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
-
-import {ref} from 'vue';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
-const showDialog = ref(false); // Add this property to handle dialog visibility
-const existingSchemaTitle = ref(''); // Add this property to store the existing schema title
-
 export class TopMenuBar {
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
