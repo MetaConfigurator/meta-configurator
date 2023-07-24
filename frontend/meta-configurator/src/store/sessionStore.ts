@@ -30,6 +30,7 @@ export const useSessionStore = defineStore('commonStore', () => {
    */
   const currentPath: Ref<Path> = ref<Path>([]);
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
+  const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
@@ -141,6 +142,22 @@ export const useSessionStore = defineStore('commonStore', () => {
     _.set(fileData.value, pathAsString!!, newValue);
   }
 
+  function isExpanded(path: Path): boolean {
+    return currentExpandedElements.value[pathToString(path)!!] ?? false;
+  }
+
+  function expand(path: Path): void {
+    const pathAsString = pathToString(path) ?? '';
+    currentExpandedElements.value = {...currentExpandedElements.value, [pathAsString]: true};
+  }
+
+  function collapse(path: Path): void {
+    const pathAsString = pathToString(path) ?? '';
+    const _currentExpandedElements = {...currentExpandedElements.value};
+    delete _currentExpandedElements[pathAsString];
+    currentExpandedElements.value = _currentExpandedElements;
+  }
+
   return {
     currentMode,
     fileData,
@@ -150,6 +167,10 @@ export const useSessionStore = defineStore('commonStore', () => {
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     currentPath,
     currentSelectedElement,
+    currentExpandedElements,
+    isExpanded,
+    expand,
+    collapse,
     lastChangeResponsible,
     updateCurrentPath,
     updateCurrentSelectedElement,

@@ -16,6 +16,8 @@ export function resolveCorrespondingComponent(
     propertyName: nodeData.name,
     propertyData: nodeData.data,
     propertySchema: nodeData.schema,
+    relativePath: nodeData.relativePath,
+    absolutePath: nodeData.absolutePath,
   };
   if (nodeData.schema.enum !== undefined) {
     return h(EnumProperty, {

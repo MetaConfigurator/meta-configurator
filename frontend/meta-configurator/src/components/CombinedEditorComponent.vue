@@ -45,14 +45,16 @@ function updateMode(newMode: SessionMode) {
 <template>
   <Toast position="bottom-left" />
   <div class="w-full h-full flex" style="max-height: 100%">
-    <main class="h-full flex flex-col">
+    <main class="flex flex-col">
       <!-- toolbar -->
       <TopToolbar
         class="h-12 flex-none"
         :current-mode="useSessionStore().currentMode"
         @mode-selected="updateMode" />
 
-      <Splitter class="h-full" :layout="windowWidth < 600 ? 'vertical' : 'horizontal'">
+      <Splitter
+        class="flex-grow overflow-hidden"
+        :layout="windowWidth < 600 ? 'vertical' : 'horizontal'">
         <SplitterPanel
           v-for="(panel, index) in panels"
           :key="index"

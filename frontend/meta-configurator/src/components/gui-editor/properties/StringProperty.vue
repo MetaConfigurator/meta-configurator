@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import {computed} from 'vue';
+import {ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
+import {watchThrottled} from '@vueuse/core';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -12,18 +13,30 @@ const emit = defineEmits<{
   (e: 'update_property_value', newValue: string | undefined): void;
 }>();
 
-const valueProperty = computed({
-  get() {
-    return props.propertyData;
+const valueProperty = ref<string | undefined>(props.propertyData);
+watchThrottled(
+  props,
+  () => {
+    valueProperty.value = props.propertyData;
   },
-  set(newValue) {
-    emit('update_property_value', newValue);
-  },
-});
+  {immediate: true, throttle: 500, deep: true}
+);
+
+function updateValue() {
+  if (valueProperty.value === undefined) {
+    return;
+  }
+  emit('update_property_value', valueProperty.value);
+}
 </script>
 
 <template>
-  <InputText :class="$style.tableInput" class="h-8" v-model="valueProperty"></InputText>
+  <InputText
+    :class="$style.tableInput"
+    class="h-8"
+    v-model="valueProperty"
+    @blur="updateValue"
+    @keyup.enter="updateValue" />
 </template>
 
 <style module>
