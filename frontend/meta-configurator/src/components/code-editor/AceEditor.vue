@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref, watch} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import {storeToRefs} from 'pinia';
 import type {Position} from 'brace';
 import * as ace from 'brace';
@@ -10,7 +10,7 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import Ajv2020 from 'ajv/dist/2020';
-import {useDebounceFn, watchThrottled} from '@vueuse/core';
+import {useDebounceFn, useThrottleFn, watchThrottled} from '@vueuse/core';
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
 
@@ -30,6 +30,19 @@ const props = defineProps<{
 const editor = ref();
 let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
+
+/**
+ * Throttle time for schema validation in ms
+ */
+const SCHEMA_VALIDATION_THROTTLE_TIME = 5000;
+/**
+ * Debounce time for writing changes to store in ms
+ */
+const WRITE_DEBOUNCE_TIME = 50;
+/**
+ * Throttle time for reading changes from store in ms
+ */
+const READ_THROTTLE_TIME = 100;
 
 const schemaValidationFunction = computed(() => {
   const ajv = new Ajv2020({
@@ -86,11 +99,12 @@ onMounted(() => {
           if (useSettingsStore().settingsData.codeEditor.allowSchemaViolatingInput) {
             fileData.value = parsedContent;
           }
-          validateAgainstSchemaDebounced(parsedContent)
+          validateAgainstSchemaThrottled(parsedContent)
             .then(valid => {
               if (valid) {
                 fileData.value = parsedContent;
               } else {
+                // TODO: show error in editor
                 errorService.onWarningThrottled(new Error('Invalid JSON according to the schema.'));
                 //TODO: more detailed error message
               }
@@ -100,18 +114,14 @@ onMounted(() => {
           // Do nothing: showing the parse error in the editor is enough
         }
       },
-      50,
-      {maxWait: 500}
+      WRITE_DEBOUNCE_TIME,
+      {maxWait: 10 * WRITE_DEBOUNCE_TIME}
     )
   );
 
-  const validateAgainstSchemaDebounced = useDebounceFn(
-    (parsedContent: any) => {
-      return schemaValidationFunction.value(parsedContent);
-    },
-    5000,
-    {maxWait: 10_000}
-  );
+  const validateAgainstSchemaThrottled = useThrottleFn((parsedContent: any) => {
+    return schemaValidationFunction.value(parsedContent);
+  }, SCHEMA_VALIDATION_THROTTLE_TIME);
 
   editor.value.on('changeSelection', () => {
     if (currentSelectionIsForcedFromOutside) {
@@ -135,7 +145,7 @@ onMounted(() => {
         editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
       }
     },
-    {deep: true, throttle: 100}
+    {deep: true, throttle: READ_THROTTLE_TIME}
   );
   // Listen to changes in current path and update cursor accordingly
   watchThrottled(
@@ -152,7 +162,7 @@ onMounted(() => {
         }
       }
     },
-    {deep: true, throttle: 100}
+    {deep: true, throttle: READ_THROTTLE_TIME}
   );
 });
 
