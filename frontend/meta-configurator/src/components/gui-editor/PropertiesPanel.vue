@@ -201,7 +201,7 @@ function addNegativeMarginForTableStyle(depth: number) {
 <style scoped>
 /* The following lines make the table cells take less space */
 :deep(.p-treetable-tbody > tr > td) {
-  padding: 0.25rem 0.5rem;
+  padding: 0.1rem 0.5rem;
 }
 
 :deep(.p-treetable-header) {
