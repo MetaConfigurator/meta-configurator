@@ -9,6 +9,7 @@ import {clearEditor} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
+import {errorService} from '@/main';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -134,7 +135,7 @@ export class TopMenuBar {
     chooseSchemaFromFile();
   }
   private chooseSchema(schemaKey: string): void {
-    let selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+    const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
     useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().schemaData = selectedSchema?.schema;
   }
@@ -148,8 +149,16 @@ export class TopMenuBar {
     );
 
     if (confirmClear) {
-      useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
-      useDataStore().fileData = generateSampleData(useDataStore().schema.jsonSchema);
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      generateSampleData(useDataStore().schema.jsonSchema)
+        .then(data => (useDataStore().fileData = data))
+        .catch((error: Error) =>
+          errorService.onError({
+            message: 'Error generating sample data',
+            details: error.message,
+            stack: error.stack,
+          })
+        );
     }
   }
   private downloadFile(fileNamePrefix: string): void {
