@@ -4,7 +4,7 @@ import {defineStore} from 'pinia';
 import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
 import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {DEFAULT_SCHEMA} from '@/data/DefaultSchema';
-import {watchThrottled} from '@vueuse/core';
+import {watchDebounced} from '@vueuse/core';
 import {jsonSchemaMetaSchema} from '../../resources/json-schema/schema';
 
 export const useDataStore = defineStore('dataStore', () => {
@@ -36,13 +36,13 @@ export const useDataStore = defineStore('dataStore', () => {
   );
 
   // make sure that the schema is not preprocessed too often
-  watchThrottled(
+  watchDebounced(
     schemaData,
     () => {
       schema.value = new TopLevelJsonSchema(schemaData.value);
     },
     {
-      throttle: 1000,
+      debounce: 1000,
     }
   );
 
