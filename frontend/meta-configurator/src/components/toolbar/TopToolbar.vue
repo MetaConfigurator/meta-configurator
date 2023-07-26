@@ -5,6 +5,8 @@ import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
 import {SessionMode} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -116,6 +118,13 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
           <p class="font-semibold text-lg">MetaConfigurator</p>
         </div>
+        <Dialog v-model="topMenuBar.showDialog" @hide="topMenuBar.showDialog = false">
+          <!-- Dialog content goes here -->
+          <h3>{{ topMenuBar.dialogMessage }}</h3>
+          <p>This is a visible content in the dialog.</p>
+          <Button label="Cancel" @click="topMenuBar.showDialog = false" />
+          <Button label="OK" @click="topMenuBar.showDialog = false" />
+        </Dialog>
         <!-- link to our github, opens in a new tab -->
         <a
           href="https://github.com/PaulBredl/meta-configurator"
