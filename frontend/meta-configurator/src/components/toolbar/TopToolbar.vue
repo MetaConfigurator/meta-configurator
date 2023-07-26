@@ -10,9 +10,6 @@ import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
-import {useConfirm} from 'primevue/useconfirm';
-
-const confirm = useConfirm();
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -85,9 +82,7 @@ const topMenuBar = new TopMenuBar(event => {
   handleMenuClick(event);
 });
 function handleFromWebClick(): void {
-  // Log topMenuBar.fetchedSchemas before fetching schemas
-  console.log('Before fetching schemas:', topMenuBar.fetchedSchemas);
-
+  console.log('After fetching schemas:', topMenuBar.fetchedSchemas);
   // Assuming topMenuBar.fetchWebSchemas() fetches the schemas and updates topMenuBar.fetchedSchemas
   topMenuBar.fetchWebSchemas();
 
@@ -105,7 +100,7 @@ function handleFromOurExampleClick() {
   showFetchedSchemas.value = true;
 }
 
-watch(selectedSchema, newSelectedSchema => {
+/*watch(selectedSchema, newSelectedSchema => {
   if (newSelectedSchema) {
     // If a schema is selected, show the confirmation dialog
     console.log('Schema selected:', newSelectedSchema);
@@ -129,7 +124,32 @@ watch(selectedSchema, newSelectedSchema => {
     useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     useDataStore().schemaData = null;
   }
+});*/
+const showConfirmation = ref(false);
+watch(selectedSchema, newSelectedSchema => {
+  if (newSelectedSchema) {
+    // If a schema is selected, show the custom confirmation dialog
+    showFetchedSchemas.value = false;
+    topMenuBar.showDialog.value = false;
+    showConfirmation.value = true;
+  }
 });
+function handleAccept() {
+  // User accepted the confirmation, handle keeping the existing data
+  useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+  useDataStore().schemaData = selectedSchema.value.schema;
+  // Hide the confirmation dialog
+  showConfirmation.value = false;
+}
+
+function handleReject() {
+  // User rejected the confirmation, handle removing the data
+  useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+  useDataStore().schemaData = selectedSchema.value.schema;
+  useDataStore().fileData = {}; // Call the clearFile() function here
+  // Hide the confirmation dialog
+  showConfirmation.value = false;
+}
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
@@ -169,12 +189,12 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
     <h3>{{ topMenuBar.dialogMessage.value }}</h3>
 
     <Button
-      label="FROM WEB"
+      label="Frow JSON-schema-store"
       @click="handleFromWebClick"
       class="mr-4 mt-4 button-small"
       v-if="!showFetchedSchemas" />
     <Button
-      label="FROM OUR EXAMPLE"
+      label="Fro our example schema"
       @click="handleFromOurExampleClick"
       class="mr-4 mt-4 button-small"
       v-if="!showFetchedSchemas" />
@@ -190,6 +210,11 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
         <!-- Add a slot for the search input -->
       </Listbox>
     </div>
+  </Dialog>
+  <Dialog v-model:visible="showConfirmation">
+    <h3>Do you want to keep the existing data?</h3>
+    <Button label="Yes" @click="handleAccept" class="mr-4 mt-4 button-small" />
+    <Button label="No" @click="handleReject" class="mr-4 mt-4 button-small" />
   </Dialog>
 
   <Menubar :model="items">
