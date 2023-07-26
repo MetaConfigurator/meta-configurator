@@ -5,7 +5,8 @@ import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
 import {SessionMode} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
-import Toast from 'primevue/toast';
+import {useToast} from 'primevue/usetoast';
+import {useConfirm} from 'primevue/useconfirm';
 
 const props = defineProps<{
   currentMode: SessionMode;
