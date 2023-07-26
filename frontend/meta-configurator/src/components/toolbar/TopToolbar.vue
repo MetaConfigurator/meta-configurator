@@ -10,6 +10,9 @@ import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
+import {useConfirm} from 'primevue/useconfirm';
+
+const confirm = useConfirm();
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -103,15 +106,24 @@ function handleFromOurExampleClick() {
 }
 
 watch(selectedSchema, newSelectedSchema => {
-  // Check if a schema is selected
   if (newSelectedSchema) {
-    // Update the schemaData in your data store with the selected schema
-
-    showFetchedSchemas.value = false;
-    topMenuBar.showDialog.value = false;
-
-    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-    useDataStore().schemaData = newSelectedSchema.schema;
+    // If a schema is selected, show the confirmation dialog
+    console.log('Schema selected:', newSelectedSchema);
+    confirm.require({
+      message: 'Do you want to keep the existing data?',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        console.log('User accepted the confirmation');
+        // User accepted the confirmation, handle keeping the existing data
+        useDataStore().schemaData = newSelectedSchema.schema;
+      },
+      reject: () => {
+        console.log('User rejected the confirmation');
+        // User rejected the confirmation, handle removing the data
+        useDataStore().schemaData = newSelectedSchema.schema;
+        useDataStore().fileData = {}; // Call the clearFile() function here
+      },
+    });
   } else {
     // If no schema is selected, reset the schemaData in your data store
     useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
