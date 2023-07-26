@@ -5,6 +5,7 @@ import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
 import {SessionMode} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
+import Toast from 'primevue/toast';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -71,10 +72,10 @@ const pageSelectionMenuItems: MenuItem[] = [
     },
   },
 ];
-
+const toast = new Toast();
 const topMenuBar = new TopMenuBar(event => {
   handleMenuClick(event);
-});
+}, toast);
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;

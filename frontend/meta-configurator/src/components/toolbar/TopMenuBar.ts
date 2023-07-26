@@ -8,16 +8,27 @@ import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
-
+import ToastService from 'primevue/toastservice';
 import {schemaCollection} from '@/data/SchemaCollection';
+
+import {showToast} from './utils';
+/*function showToast(severity, summary, detail, life) {
+  const app = getCurrentInstance();
+  if (app) {
+    app.appContext.config.globalProperties.$toast.add({ severity, summary, detail, life });
+  }
+}*/
 
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
   private schemaItems: {label: string; icon: string; command: () => void}[] = [];
-  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {
+  private toast;
+
+  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void, toast = null) {
     this.fetchWebSchemas();
+    this.toast = toast;
   }
   private async fetchWebSchemas(): Promise<void> {
     const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';
@@ -219,9 +230,27 @@ export class TopMenuBar {
         // User chose to clear the data, proceed with clearing the editor content.
         useDataStore().fileData = {};
       }
-      window.alert('Schema fetched successfully!');
+      //window.alert('Schema fetched successfully!');
+      //showToast('info', 'Info', 'Schema fetched successfully!', 3000);
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: 'Schema fetched successfully!',
+          life: 3000,
+        });
+      }
     } catch (error) {
-      window.alert('Error fetching schema!! Please try again!!!');
+      //window.alert('Error fetching schema!! Please try again!!!');
+      //showToast('error', 'Error', 'Error fetching schema!! Please try again!!!', 3000);
+      if (this.toast) {
+        this.toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error fetching schema!! Please try again!!!',
+          life: 3000,
+        });
+      }
     }
   }
 }
