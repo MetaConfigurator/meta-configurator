@@ -114,9 +114,14 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
   <Dialog v-model:visible="topMenuBar.showDialog.value" @hide="topMenuBar.showDialog.value = false">
     <!-- Dialog content goes here -->
     <h3>{{ topMenuBar.dialogMessage.value }}</h3>
-    <p>This is a visible content in the dialog.</p>
-    <Button label="FROM WEB" @click="topMenuBar.showDialog.value = false" />
-    <Button label="FROM OUR EXAMPLE" @click="topMenuBar.showDialog.value = false" />
+    <Button
+      label="FROM WEB"
+      @click="topMenuBar.showDialog.value = false"
+      class="mr-4 mt-4 button-small" />
+    <Button
+      label="FROM OUR EXAMPLE"
+      @click="topMenuBar.showDialog.value = false"
+      class="mr-4 mt-4 button-small" />
   </Dialog>
   <Menubar :model="items">
     <template #end>
@@ -138,4 +143,16 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
   </Menubar>
 </template>
 
-<style scoped></style>
+<style scoped>
+.mr-4 {
+  margin-right: 1rem; /* You can adjust the value (1rem = 16px) to your desired margin size */
+}
+.mt-4 {
+  margin-top: 1rem; /* You can adjust the value (1rem = 16px) to your desired margin size */
+}
+.button-small {
+  font-size: 15px; /* Adjust the font size to change the button size */
+  padding: 0.5rem 1rem; /* Adjust the padding to change the button size */
+  /* You can add other styles like height and width to control the button size further */
+}
+</style>
