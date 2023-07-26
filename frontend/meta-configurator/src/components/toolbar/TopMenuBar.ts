@@ -16,7 +16,36 @@ import {ref} from 'vue';
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
-  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
+  public fetchedSchemas: {label: string; icon: string; command: () => void}[] = [];
+
+  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {
+    this.fetchWebSchemas();
+  }
+  public async fetchWebSchemas(): Promise<void> {
+    const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';
+
+    try {
+      const response = await fetch(schemaStoreURL);
+      const data = await response.json();
+      const schemas = data.schemas;
+
+      schemas.forEach((schema: {name: string; url: string}) => {
+        this.fetchedSchemas.push({
+          label: schema.name,
+          icon: 'pi pi-fw pi-code',
+          command: () => this.selectSchema(schema.url),
+        });
+      });
+
+      // Show the dialog with the fetched schemas
+    } catch (error: Error) {
+      errorService.onError({
+        message: 'Error fetching web schemas',
+        details: error.message,
+        stack: error.stack,
+      });
+    }
+  }
 
   get fileEditorMenuItems() {
     return [

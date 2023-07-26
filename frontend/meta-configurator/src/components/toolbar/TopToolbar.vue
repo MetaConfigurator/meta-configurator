@@ -7,7 +7,8 @@ import {SessionMode} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-
+import Listbox from 'primevue/listbox';
+import {schemaCollection} from '@/data/SchemaCollection';
 const props = defineProps<{
   currentMode: SessionMode;
 }>();
@@ -15,7 +16,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
-
+const selectedSchema = ref();
+const showFetchedSchemas = ref(false);
 function getPageName(): string {
   switch (props.currentMode) {
     case SessionMode.FileEditor:
@@ -78,6 +80,31 @@ const topMenuBar = new TopMenuBar(event => {
   handleMenuClick(event);
 });
 
+/*function handleFromWebClick(): void {
+  topMenuBar.fetchWebSchemas();
+  showFetchedSchemas.value = true; // Set the flag to true after fetching schemas
+}*/
+function handleFromWebClick(): void {
+  // Log topMenuBar.fetchedSchemas before fetching schemas
+  console.log('Before fetching schemas:', topMenuBar.fetchedSchemas);
+
+  // Assuming topMenuBar.fetchWebSchemas() fetches the schemas and updates topMenuBar.fetchedSchemas
+  topMenuBar.fetchWebSchemas();
+
+  // Log topMenuBar.fetchedSchemas after fetching schemas
+  console.log('After fetching schemas:', topMenuBar.fetchedSchemas);
+
+  // Set the flag to true after fetching schemas
+  showFetchedSchemas.value = true;
+}
+function handleFromOurExampleClick() {
+  // Set the fetchedSchemas to your schemaCollection array
+  topMenuBar.fetchedSchemas = schemaCollection;
+
+  // Set the flag to true to show the fetched schemas
+  showFetchedSchemas.value = true;
+}
+
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
 const settingsMenuItems = topMenuBar.settingsMenuItems;
@@ -114,15 +141,31 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
   <Dialog v-model:visible="topMenuBar.showDialog.value" @hide="topMenuBar.showDialog.value = false">
     <!-- Dialog content goes here -->
     <h3>{{ topMenuBar.dialogMessage.value }}</h3>
+
     <Button
       label="FROM WEB"
-      @click="topMenuBar.showDialog.value = false"
-      class="mr-4 mt-4 button-small" />
+      @click="handleFromWebClick"
+      class="mr-4 mt-4 button-small"
+      v-if="!showFetchedSchemas" />
     <Button
       label="FROM OUR EXAMPLE"
-      @click="topMenuBar.showDialog.value = false"
-      class="mr-4 mt-4 button-small" />
+      @click="handleFromOurExampleClick"
+      class="mr-4 mt-4 button-small"
+      v-if="!showFetchedSchemas" />
+    <div class="card flex justify-content-center">
+      <!-- Listbox to display fetched schemas -->
+      <Listbox
+        v-model="selectedSchema"
+        :options="topMenuBar.fetchedSchemas"
+        v-show="showFetchedSchemas"
+        filter
+        optionLabel="label"
+        class="w-50 md:w-14rem">
+        <!-- Add a slot for the search input -->
+      </Listbox>
+    </div>
   </Dialog>
+
   <Menubar :model="items">
     <template #end>
       <div class="flex space-x-10 mr-4">
