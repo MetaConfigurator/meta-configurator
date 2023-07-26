@@ -17,9 +17,11 @@ import {ref} from 'vue';
  */
 export class TopMenuBar {
   public fetchedSchemas: {label: string; icon: string; command: () => void}[] = [];
+  private toast: any;
 
-  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {
+  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void, toast = null) {
     this.fetchWebSchemas();
+    this.toast = toast;
   }
   public async fetchWebSchemas(): Promise<void> {
     const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';

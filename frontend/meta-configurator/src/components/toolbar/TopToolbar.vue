@@ -10,6 +10,7 @@ import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
+import {useToast} from 'primevue/usetoast';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -77,10 +78,10 @@ const pageSelectionMenuItems: MenuItem[] = [
     },
   },
 ];
-
+const toast = useToast();
 const topMenuBar = new TopMenuBar(event => {
   handleMenuClick(event);
-});
+}, toast);
 function handleFromWebClick(): void {
   console.log('After fetching schemas:', topMenuBar.fetchedSchemas);
   // Assuming topMenuBar.fetchWebSchemas() fetches the schemas and updates topMenuBar.fetchedSchemas
@@ -128,7 +129,7 @@ function handleFromOurExampleClick() {
 const showConfirmation = ref(false);
 watch(selectedSchema, newSelectedSchema => {
   if (newSelectedSchema) {
-    topMenuBar.selectSchema(newSelectedSchema.url);
+    //topMenuBar.selectSchema(newSelectedSchema.url);
     // If a schema is selected, show the custom confirmation dialog
     showFetchedSchemas.value = false;
     topMenuBar.showDialog.value = false;
