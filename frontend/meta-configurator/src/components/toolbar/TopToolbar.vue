@@ -18,7 +18,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
-const selectedSchema = ref();
+const selectedSchema = ref<any>(null);
 const showFetchedSchemas = ref(false);
 function getPageName(): string {
   switch (props.currentMode) {
@@ -213,6 +213,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
   </Dialog>
   <Dialog v-model:visible="showConfirmation">
     <h3>Do you want to keep the existing data?</h3>
+
     <Button label="Yes" @click="handleAccept" class="mr-4 mt-4 button-small" />
     <Button label="No" @click="handleReject" class="mr-4 mt-4 button-small" />
   </Dialog>
