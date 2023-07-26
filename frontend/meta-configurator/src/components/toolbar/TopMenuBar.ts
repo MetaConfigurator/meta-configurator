@@ -10,7 +10,7 @@ import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
-import {ref} from 'vue/dist/vue';
+import {ref} from 'vue';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
