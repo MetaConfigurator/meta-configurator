@@ -129,9 +129,9 @@ function handleFromOurExampleClick() {
 const showConfirmation = ref(false);
 watch(selectedSchema, newSelectedSchema => {
   if (newSelectedSchema) {
-    //topMenuBar.selectSchema(newSelectedSchema.url);
     // If a schema is selected, show the custom confirmation dialog
     showFetchedSchemas.value = false;
+    topMenuBar.selectSchema(newSelectedSchema.url);
     topMenuBar.showDialog.value = false;
     showConfirmation.value = true;
   }

@@ -153,6 +153,11 @@ export class TopMenuBar {
             icon: 'pi pi-fw pi-download',
             command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
           },
+          {
+            label: 'web Schema',
+            icon: 'pi pi-fw pi-download',
+            command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
+          },
         ],
       },
 
@@ -218,21 +223,36 @@ export class TopMenuBar {
     this.showDialog.value = true;
   };
 
-  public async selectSchema(schemaURL: string): Promise<void> {
+  async selectSchema(schemaURL: string): Promise<void> {
     try {
       // Fetch the schema content from the selected schemaURL.
-
       const response = await fetch(schemaURL);
-      const data = await response.json();
-
-      const schemaContent = data.schemas;
-      console.log('Fetched Schema:', schemaContent);
+      const schemaContent = await response.json();
       useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
       // Update the schemaData in the dataStore with the fetched schema content.
       useDataStore().schemaData = schemaContent;
-      //window.alert('Schema fetched successfully!');
+      console.log('Fetched Schema:', schemaContent);
+      // Always clear the data without prompting the user.
+      useDataStore().fileData = {};
+
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: 'Schema fetched successfully!',
+          life: 3000,
+        });
+      }
     } catch (error) {
-      //window.alert('Error fetching schema!! Please try again!!!');
+      // Handle the error if there's an issue fetching the schema.
+      if (this.toast) {
+        this.toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error fetching schema!! Please try again!!!',
+          life: 3000,
+        });
+      }
     }
   }
 }
