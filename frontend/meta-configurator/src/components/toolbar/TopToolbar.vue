@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import Menubar from 'primevue/menubar';
-import {computed, Ref, ref} from 'vue';
+import {computed, onBeforeUnmount, onMounted, Ref, ref, watch} from 'vue';
 import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
-import {SessionMode} from '@/store/sessionStore';
+import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
+import {useDataStore} from '@/store/dataStore';
+
 const props = defineProps<{
   currentMode: SessionMode;
 }>();
@@ -79,11 +81,6 @@ const pageSelectionMenuItems: MenuItem[] = [
 const topMenuBar = new TopMenuBar(event => {
   handleMenuClick(event);
 });
-
-/*function handleFromWebClick(): void {
-  topMenuBar.fetchWebSchemas();
-  showFetchedSchemas.value = true; // Set the flag to true after fetching schemas
-}*/
 function handleFromWebClick(): void {
   // Log topMenuBar.fetchedSchemas before fetching schemas
   console.log('Before fetching schemas:', topMenuBar.fetchedSchemas);
@@ -104,6 +101,23 @@ function handleFromOurExampleClick() {
   // Set the flag to true to show the fetched schemas
   showFetchedSchemas.value = true;
 }
+
+watch(selectedSchema, newSelectedSchema => {
+  // Check if a schema is selected
+  if (newSelectedSchema) {
+    // Update the schemaData in your data store with the selected schema
+
+    showFetchedSchemas.value = false;
+    topMenuBar.showDialog.value = false;
+
+    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+    useDataStore().schemaData = newSelectedSchema.schema;
+  } else {
+    // If no schema is selected, reset the schemaData in your data store
+    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+    useDataStore().schemaData = null;
+  }
+});
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
@@ -138,7 +152,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
 </script>
 
 <template>
-  <Dialog v-model:visible="topMenuBar.showDialog.value" @hide="topMenuBar.showDialog.value = false">
+  <Dialog v-model:visible="topMenuBar.showDialog.value">
     <!-- Dialog content goes here -->
     <h3>{{ topMenuBar.dialogMessage.value }}</h3>
 
