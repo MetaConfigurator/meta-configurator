@@ -15,6 +15,7 @@ import {editor} from '@/components/toolbar/useAceEditor';
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
+  sessionStore = useSessionStore();
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void) {}
 
   get fileEditorMenuItems() {
@@ -22,13 +23,21 @@ export class TopMenuBar {
       {
         icon: 'pi pi-chevron-left',
         command: () => {
-          editor.value.getSession().getUndoManager().undo();
+          // editor.value.getSession().getUndoManager().undo();
+          // if (this.sessionStore.currentUndoManager) {
+          //   // editor.value.getSession().setUndoManager(this.sessionStore.currentUndoManager).
+          //   this.sessionStore.currentUndoManager.undo(false);
+          // }
+          editor.value.getSession().getUndoManager(useSessionStore().currentUndoManager).undo();
         },
       },
       {
         icon: 'pi pi-chevron-right',
         command: () => {
-          editor.value.getSession().getUndoManager().redo();
+          // if (this.sessionStore.currentUndoManager) {
+          //   this.sessionStore.currentUndoManager.redo(false);
+          // }
+          editor.value.getSession().getUndoManager(useSessionStore().currentUndoManager).redo();
         },
       },
 
@@ -75,13 +84,13 @@ export class TopMenuBar {
       {
         icon: 'pi pi-chevron-left',
         command: () => {
-          editor.value.getSession().getUndoManager().undo();
+          editor.value.getSession().getUndoManager(useSessionStore().currentUndoManager).undo();
         },
       },
       {
         icon: 'pi pi-chevron-right',
         command: () => {
-          editor.value.getSession().getUndoManager().redo();
+          editor.value.getSession().getUndoManager(useSessionStore().currentUndoManager).redo();
         },
       },
 

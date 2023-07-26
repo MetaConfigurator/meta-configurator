@@ -7,6 +7,7 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
+import {UndoManager} from 'brace';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -34,6 +35,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
   );
+  const undoManagers = new Map<SessionMode, UndoManager>();
 
   const fileData: WritableComputedRef<any> = computed({
     // getter
@@ -141,6 +143,23 @@ export const useSessionStore = defineStore('commonStore', () => {
     _.set(fileData.value, pathAsString!!, newValue);
   }
 
+  Object.values(SessionMode).forEach(mode => {
+    undoManagers.set(mode, new UndoManager());
+  });
+
+  // get current Undomanager
+  const currentUndoManager: Ref<UndoManager | undefined> = computed(() => {
+    return undoManagers.get(currentMode.value);
+  });
+
+  // reset the state of Undomanager
+  function resetUndoManagerForCurrentMode() {
+    const undoManager = undoManagers.get(currentMode.value);
+    if (undoManager) {
+      undoManager.reset();
+    }
+  }
+
   return {
     currentMode,
     fileData,
@@ -154,5 +173,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     updateCurrentPath,
     updateCurrentSelectedElement,
     updateDataAtPath,
+    currentUndoManager,
+    resetUndoManagerForCurrentMode,
   };
 });
