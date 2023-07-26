@@ -10,6 +10,7 @@ import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
+import {ref} from 'vue/dist/vue';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -170,4 +171,14 @@ export class TopMenuBar {
   private clearSchemaEditor(): void {
     clearSchemaEditor();
   }
+  public showDialog = ref(false);
+  public dialogMessage = ref('');
+
+  public openDialog = (): void => {
+    console.log('openDialog function called');
+    // Set the message for the dialog
+    this.dialogMessage.value = 'Hello, this is a dialog!';
+    // Show the dialog
+    this.showDialog.value = true;
+  };
 }
