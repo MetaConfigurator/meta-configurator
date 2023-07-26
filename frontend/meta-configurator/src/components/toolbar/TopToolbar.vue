@@ -111,6 +111,13 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
 </script>
 
 <template>
+  <Dialog v-model:visible="topMenuBar.showDialog.value" @hide="topMenuBar.showDialog.value = false">
+    <!-- Dialog content goes here -->
+    <h3>{{ topMenuBar.dialogMessage.value }}</h3>
+    <p>This is a visible content in the dialog.</p>
+    <Button label="FROM WEB" @click="topMenuBar.showDialog.value = false" />
+    <Button label="FROM OUR EXAMPLE" @click="topMenuBar.showDialog.value = false" />
+  </Dialog>
   <Menubar :model="items">
     <template #end>
       <div class="flex space-x-10 mr-4">
@@ -118,13 +125,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
           <p class="font-semibold text-lg">MetaConfigurator</p>
         </div>
-        <Dialog v-model="topMenuBar.showDialog" @hide="topMenuBar.showDialog = false">
-          <!-- Dialog content goes here -->
-          <h3>{{ topMenuBar.dialogMessage }}</h3>
-          <p>This is a visible content in the dialog.</p>
-          <Button label="Cancel" @click="topMenuBar.showDialog = false" />
-          <Button label="OK" @click="topMenuBar.showDialog = false" />
-        </Dialog>
+
         <!-- link to our github, opens in a new tab -->
         <a
           href="https://github.com/PaulBredl/meta-configurator"
