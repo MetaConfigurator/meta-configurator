@@ -70,6 +70,11 @@ export class TopMenuBar {
               command: () => this.chooseSchema(schema.key),
             })),
           },
+          {
+            label: 'Choose SchemaFile',
+            icon: 'pi pi-fw pi-upload',
+            command: this.openDialog,
+          },
         ],
       },
 
@@ -177,7 +182,7 @@ export class TopMenuBar {
   public openDialog = (): void => {
     console.log('openDialog function called');
     // Set the message for the dialog
-    this.dialogMessage.value = 'Hello, this is a dialog!';
+    this.dialogMessage.value = 'Which Schema you want to open?';
     // Show the dialog
     this.showDialog.value = true;
   };
