@@ -24,7 +24,7 @@ import {showToast} from './utils';
  */
 export class TopMenuBar {
   private schemaItems: {label: string; icon: string; command: () => void}[] = [];
-  private toast;
+  private toast: any;
 
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void, toast = null) {
     this.fetchWebSchemas();

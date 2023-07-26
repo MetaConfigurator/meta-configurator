@@ -73,7 +73,7 @@ const pageSelectionMenuItems: MenuItem[] = [
     },
   },
 ];
-const toast = new Toast();
+const toast = useToast();
 const topMenuBar = new TopMenuBar(event => {
   handleMenuClick(event);
 }, toast);
