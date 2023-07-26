@@ -128,6 +128,7 @@ function handleFromOurExampleClick() {
 const showConfirmation = ref(false);
 watch(selectedSchema, newSelectedSchema => {
   if (newSelectedSchema) {
+    topMenuBar.selectSchema(newSelectedSchema.url);
     // If a schema is selected, show the custom confirmation dialog
     showFetchedSchemas.value = false;
     topMenuBar.showDialog.value = false;
@@ -149,6 +150,10 @@ function handleReject() {
   useDataStore().fileData = {}; // Call the clearFile() function here
   // Hide the confirmation dialog
   showConfirmation.value = false;
+}
+function handleSchemaItemClick(schemaURL: string) {
+  // Assuming you have a way to get the schema URL from the item click event
+  topMenuBar.selectSchema(schemaURL);
 }
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;

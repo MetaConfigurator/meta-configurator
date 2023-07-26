@@ -215,4 +215,22 @@ export class TopMenuBar {
     // Show the dialog
     this.showDialog.value = true;
   };
+
+  public async selectSchema(schemaURL: string): Promise<void> {
+    try {
+      // Fetch the schema content from the selected schemaURL.
+
+      const response = await fetch(schemaURL);
+      const data = await response.json();
+
+      const schemaContent = data.schemas;
+      console.log('Fetched Schema:', schemaContent);
+      useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
+      // Update the schemaData in the dataStore with the fetched schema content.
+      useDataStore().schemaData = schemaContent;
+      //window.alert('Schema fetched successfully!');
+    } catch (error) {
+      //window.alert('Error fetching schema!! Please try again!!!');
+    }
+  }
 }
