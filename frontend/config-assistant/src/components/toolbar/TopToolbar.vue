@@ -118,7 +118,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
         </div>
         <!-- link to our github, opens in a new tab -->
         <a
-          href="https://github.com/PaulBredl/meta-configurator"
+          href="https://github.com/PaulBredl/config-assistant"
           target="_blank"
           rel="noopener noreferrer"
           class="pi pi-github hover:scale-110"
