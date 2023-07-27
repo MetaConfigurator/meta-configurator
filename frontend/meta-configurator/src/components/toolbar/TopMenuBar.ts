@@ -11,12 +11,19 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
+import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
-  public fetchedSchemas: {label: string; icon: string; command: () => void}[] = [];
+  public fetchedSchemas: {
+    label: string;
+    icon: string;
+    command: () => void;
+    schema: JsonSchema;
+    url: string | undefined;
+  }[] = [];
   private toast: any;
 
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void, toast = null) {
@@ -36,6 +43,8 @@ export class TopMenuBar {
           label: schema.name,
           icon: 'pi pi-fw pi-code',
           command: () => this.selectSchema(schema.url),
+          url: schema.url,
+          schema: data,
         });
       });
 
@@ -226,9 +235,10 @@ export class TopMenuBar {
   public async selectSchema(schemaURL: string): Promise<void> {
     try {
       // Fetch the schema content from the selected schemaURL.
+      console.log('fetching from URL', schemaURL);
       const response = await fetch(schemaURL);
       const schemaContent = await response.json();
-      useSessionStore().lastChangeResponsible = ChangeResponsible.FileUpload;
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
       // Update the schemaData in the dataStore with the fetched schema content.
       useDataStore().schemaData = schemaContent;
       console.log('Fetched Schema:', schemaContent);
@@ -245,14 +255,7 @@ export class TopMenuBar {
       }
     } catch (error) {
       // Handle the error if there's an issue fetching the schema.
-      if (this.toast) {
-        this.toast.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error fetching schema!! Please try again!!!',
-          life: 3000,
-        });
-      }
+      errorService.onError(error);
     }
   }
 }
