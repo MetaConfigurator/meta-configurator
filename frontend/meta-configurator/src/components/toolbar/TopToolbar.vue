@@ -164,7 +164,7 @@ function handleAccept() {
   // User accepted the confirmation, handle keeping the existing data
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   console.log('selected schema', selectedSchema.value);
-  useDataStore().schemaData = selectedSchema.value.schema;
+  // useDataStore().schemaData = selectedSchema.value.schema;
   // Hide the confirmation dialog
   showConfirmation.value = false;
 }

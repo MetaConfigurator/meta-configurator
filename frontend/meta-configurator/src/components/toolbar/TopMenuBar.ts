@@ -21,7 +21,6 @@ export class TopMenuBar {
     label: string;
     icon: string;
     command: () => void;
-    schema: JsonSchema;
     url: string | undefined;
   }[] = [];
   private toast: any;
@@ -44,7 +43,6 @@ export class TopMenuBar {
           icon: 'pi pi-fw pi-code',
           command: () => this.selectSchema(schema.url),
           url: schema.url,
-          schema: data,
         });
       });
 
@@ -216,7 +214,7 @@ export class TopMenuBar {
     downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
-    clearEditor();
+    clearEditor('Are you sure that you want to clear the editor?');
   }
   private clearSchemaEditor(): void {
     clearSchemaEditor();
@@ -243,7 +241,7 @@ export class TopMenuBar {
       useDataStore().schemaData = schemaContent;
       console.log('Fetched Schema:', schemaContent);
       // Always clear the data without prompting the user.
-      useDataStore().fileData = {};
+      clearEditor('Do you want to clear the existing data?');
 
       if (this.toast) {
         this.toast.add({
