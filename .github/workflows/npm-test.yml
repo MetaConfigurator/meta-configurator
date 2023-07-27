@@ -1,15 +1,14 @@
 name: Node.js CI
 
-on: [ push, workflow_dispatch ]
+on: [push, workflow_dispatch]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [ 18.x ]
+        node-version: [18.x]
 
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
@@ -17,7 +16,7 @@ jobs:
       contents: write
     defaults:
       run:
-        working-directory: ./frontend/meta-configurator
+        working-directory: ./frontend/config-assistant
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -39,7 +38,7 @@ jobs:
         with:
           commit_message: apply formatting changes
           branch: ${{ github.head_ref }}
-          status_options: '--untracked-files=no'
+          status_options: "--untracked-files=no"
           # only changed files in src/ and test/ will be committed
           # because otherwise this bot commits node_modules/ and dist/
-          file_pattern: 'frontend/*'
+          file_pattern: "frontend/*"
