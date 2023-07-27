@@ -35,7 +35,9 @@ export const useSessionStore = defineStore('commonStore', () => {
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
   );
-  const undoManagers = new Map<SessionMode, UndoManager>();
+  const fileEditorUndoManager: Ref<UndoManager> = ref(new UndoManager());
+  const schemaEditorUndoManager: Ref<UndoManager> = ref(new UndoManager());
+  const settingsEditorUndoManager: Ref<UndoManager> = ref(new UndoManager());
 
   const fileData: WritableComputedRef<any> = computed({
     // getter
@@ -142,24 +144,6 @@ export const useSessionStore = defineStore('commonStore', () => {
     const pathAsString = pathToString(path);
     _.set(fileData.value, pathAsString!!, newValue);
   }
-
-  Object.values(SessionMode).forEach(mode => {
-    undoManagers.set(mode, new UndoManager());
-  });
-
-  // get current Undomanager
-  const currentUndoManager: Ref<UndoManager | undefined> = computed(() => {
-    return undoManagers.get(currentMode.value);
-  });
-
-  // reset the state of Undomanager
-  function resetUndoManagerForCurrentMode() {
-    const undoManager = undoManagers.get(currentMode.value);
-    if (undoManager) {
-      undoManager.reset();
-    }
-  }
-
   return {
     currentMode,
     fileData,
@@ -173,7 +157,8 @@ export const useSessionStore = defineStore('commonStore', () => {
     updateCurrentPath,
     updateCurrentSelectedElement,
     updateDataAtPath,
-    currentUndoManager,
-    resetUndoManagerForCurrentMode,
+    fileEditorUndoManager,
+    schemaEditorUndoManager,
+    settingsEditorUndoManager,
   };
 });

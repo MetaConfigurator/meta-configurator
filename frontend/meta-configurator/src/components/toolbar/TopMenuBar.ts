@@ -9,7 +9,6 @@ import {clearEditor} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
-import {editor} from '@/components/toolbar/useAceEditor';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -23,21 +22,17 @@ export class TopMenuBar {
       {
         icon: 'pi pi-chevron-left',
         command: () => {
-          // editor.value.getSession().getUndoManager().undo();
-          // if (this.sessionStore.currentUndoManager) {
-          //   // editor.value.getSession().setUndoManager(this.sessionStore.currentUndoManager).
-          //   this.sessionStore.currentUndoManager.undo(false);
-          // }
-          editor.value.getSession().getUndoManager(useSessionStore().currentUndoManager).undo();
+          if (this.sessionStore.currentMode == 'file_editor') {
+            this.sessionStore.fileEditorUndoManager.undo();
+          }
         },
       },
       {
         icon: 'pi pi-chevron-right',
         command: () => {
-          // if (this.sessionStore.currentUndoManager) {
-          //   this.sessionStore.currentUndoManager.redo(false);
-          // }
-          editor.value.getSession().getUndoManager(useSessionStore().currentUndoManager).redo();
+          if (this.sessionStore.currentMode == 'file_editor') {
+            this.sessionStore.fileEditorUndoManager.redo();
+          }
         },
       },
 
@@ -84,13 +79,17 @@ export class TopMenuBar {
       {
         icon: 'pi pi-chevron-left',
         command: () => {
-          editor.value.getSession().getUndoManager(useSessionStore().currentUndoManager).undo();
+          if (this.sessionStore.currentMode == 'schema_editor') {
+            this.sessionStore.schemaEditorUndoManager.undo();
+          }
         },
       },
       {
         icon: 'pi pi-chevron-right',
         command: () => {
-          editor.value.getSession().getUndoManager(useSessionStore().currentUndoManager).redo();
+          if (this.sessionStore.currentMode == 'schema_editor') {
+            this.sessionStore.schemaEditorUndoManager.redo();
+          }
         },
       },
 
@@ -142,13 +141,17 @@ export class TopMenuBar {
       {
         icon: 'pi pi-chevron-left',
         command: () => {
-          editor.value.getSession().getUndoManager().undo();
+          if (this.sessionStore.currentMode == 'settings') {
+            this.sessionStore.settingsEditorUndoManager.undo();
+          }
         },
       },
       {
         icon: 'pi pi-chevron-right',
         command: () => {
-          editor.value.getSession().getUndoManager().redo();
+          if (this.sessionStore.currentMode == 'settings') {
+            this.sessionStore.settingsEditorUndoManager.redo();
+          }
         },
       },
     ];
@@ -184,4 +187,35 @@ export class TopMenuBar {
   private clearSchemaEditor(): void {
     clearSchemaEditor();
   }
+
+  // private undo(): void {
+  //   const sessionStore = useSessionStore();
+  //
+  //   switch (sessionStore.currentMode) {
+  //     case SessionMode.FileEditor:
+  //       sessionStore.fileEditorUndoManager.undo(true);
+  //       break;
+  //     case SessionMode.SchemaEditor:
+  //       sessionStore.schemaEditorUndoManager.undo(true);
+  //       break;
+  //     case SessionMode.Settings:
+  //       sessionStore.settingsEditorUndoManager.undo(true);
+  //       break;
+  //   }
+  // }
+  //
+  // private redo(): void {
+  //
+  //   switch (this.sessionStore.currentMode) {
+  //     case SessionMode.FileEditor:
+  //       sessionStore.fileEditorUndoManager.redo(true);
+  //       break;
+  //     case SessionMode.SchemaEditor:
+  //       sessionStore.schemaEditorUndoManager.redo(true);
+  //       break;
+  //     case SessionMode.Settings:
+  //       sessionStore.settingsEditorUndoManager.redo(true);
+  //       break;
+  //   }
+  // }
 }

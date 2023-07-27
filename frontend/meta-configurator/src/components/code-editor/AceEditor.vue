@@ -55,6 +55,18 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
 onMounted(() => {
   editor.value = ace.edit('javascript-editor');
 
+  switch (sessionStore.currentMode) {
+    case SessionMode.FileEditor:
+      editor.value.getSession().setUndoManager(sessionStore.fileEditorUndoManager);
+      break;
+    case SessionMode.SchemaEditor:
+      editor.value.getSession().setUndoManager(sessionStore.schemaEditorUndoManager);
+      break;
+    case SessionMode.Settings:
+      editor.value.getSession().setUndoManager(sessionStore.settingsEditorUndoManager);
+      break;
+  }
+
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
   } else if (props.dataFormat == 'yaml') {
