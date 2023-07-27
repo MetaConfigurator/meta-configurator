@@ -1,5 +1,5 @@
 export enum PropertySorting {
-  DEFAULT = 'default',
+  PRIORITY_ORDER = 'priorityOrder',
   SCHEMA_ORDER = 'schemaOrder',
   DATA_ORDER = 'dataOrder',
 }
