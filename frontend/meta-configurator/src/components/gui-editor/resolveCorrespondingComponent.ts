@@ -16,6 +16,7 @@ export function resolveCorrespondingComponent(
     propertyName: nodeData.name,
     propertyData: nodeData.data,
     propertySchema: nodeData.schema,
+    parentSchema: nodeData.parentSchema,
   };
   if (nodeData.schema.enum !== undefined) {
     return h(EnumProperty, {

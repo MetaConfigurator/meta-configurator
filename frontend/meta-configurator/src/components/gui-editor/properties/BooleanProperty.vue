@@ -2,11 +2,12 @@
 import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/model/path';
+import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: boolean | undefined;
-  required: boolean;
+  parentSchema: JsonSchema;
 }>();
 
 const options = ref([
@@ -23,7 +24,12 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    if (newValue === undefined && props.required) {
+    if (
+      newValue === null &&
+      (props.parentSchema.isRequired(props.propertyName as string) ||
+        props.parentSchema.hasType('array'))
+    ) {
+      emit('update_property_value', !props.propertyData);
       return;
     }
     if (newValue === null) {
