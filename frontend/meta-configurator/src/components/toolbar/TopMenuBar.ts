@@ -150,7 +150,7 @@ export class TopMenuBar {
 
     if (confirmClear) {
       useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-      generateSampleData(useDataStore().schema.jsonSchema)
+      generateSampleData(useDataStore().schemaData)
         .then(data => (useDataStore().fileData = data))
         .catch((error: Error) =>
           errorService.onError({
