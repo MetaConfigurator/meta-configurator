@@ -154,9 +154,9 @@ export class TopMenuBar {
             command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
           },
           {
-            label: 'web Schema',
-            icon: 'pi pi-fw pi-download',
-            command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
+            label: 'WebSchemas',
+            icon: 'pi pi-fw pi-cloud-upload',
+            items: this.fetchedSchemas, // Add the fetched schema items to the dropdown menu.
           },
         ],
       },
@@ -223,7 +223,7 @@ export class TopMenuBar {
     this.showDialog.value = true;
   };
 
-  async selectSchema(schemaURL: string): Promise<void> {
+  public async selectSchema(schemaURL: string): Promise<void> {
     try {
       // Fetch the schema content from the selected schemaURL.
       const response = await fetch(schemaURL);

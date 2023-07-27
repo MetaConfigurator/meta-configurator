@@ -82,16 +82,16 @@ const toast = useToast();
 const topMenuBar = new TopMenuBar(event => {
   handleMenuClick(event);
 }, toast);
-function handleFromWebClick(): void {
-  console.log('After fetching schemas:', topMenuBar.fetchedSchemas);
-  // Assuming topMenuBar.fetchWebSchemas() fetches the schemas and updates topMenuBar.fetchedSchemas
-  topMenuBar.fetchWebSchemas();
-
-  // Log topMenuBar.fetchedSchemas after fetching schemas
-  console.log('After fetching schemas:', topMenuBar.fetchedSchemas);
-
-  // Set the flag to true after fetching schemas
-  showFetchedSchemas.value = true;
+async function handleFromWebClick(): Promise<void> {
+  console.log('Before fetching schemas:', topMenuBar.fetchedSchemas);
+  try {
+    await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
+    console.log('After fetching schemas:', topMenuBar.fetchedSchemas);
+    showFetchedSchemas.value = true;
+  } catch (error) {
+    console.error('Error fetching schemas:', error);
+    // Handle errors if needed
+  }
 }
 function handleFromOurExampleClick() {
   // Set the fetchedSchemas to your schemaCollection array
@@ -127,15 +127,31 @@ function handleFromOurExampleClick() {
   }
 });*/
 const showConfirmation = ref(false);
-watch(selectedSchema, newSelectedSchema => {
+/*watch(selectedSchema, newSelectedSchema => {
   if (newSelectedSchema) {
     // If a schema is selected, show the custom confirmation dialog
-    showFetchedSchemas.value = false;
-    topMenuBar.selectSchema(newSelectedSchema.url);
+    showFetchedSchemas.value = true;
+
+    //topMenuBar.selectSchema(newSelectedSchema.url);
     topMenuBar.showDialog.value = false;
     showConfirmation.value = true;
   }
+});*/
+watch(selectedSchema, async newSelectedSchema => {
+  if (newSelectedSchema) {
+    // If a schema is selected, call the selectSchema function with the schema's URL
+    try {
+      await topMenuBar.selectSchema(newSelectedSchema.url);
+      showFetchedSchemas.value = true;
+      topMenuBar.showDialog.value = false;
+      showConfirmation.value = true;
+    } catch (error) {
+      console.error('Error fetching schema:', error);
+      // Handle errors if needed
+    }
+  }
 });
+
 function handleAccept() {
   // User accepted the confirmation, handle keeping the existing data
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
@@ -151,10 +167,6 @@ function handleReject() {
   useDataStore().fileData = {}; // Call the clearFile() function here
   // Hide the confirmation dialog
   showConfirmation.value = false;
-}
-function handleSchemaItemClick(schemaURL: string) {
-  // Assuming you have a way to get the schema URL from the item click event
-  topMenuBar.selectSchema(schemaURL);
 }
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
