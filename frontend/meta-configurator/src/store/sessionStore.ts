@@ -103,6 +103,10 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
+  function schemaAtPath(path: Path): JsonSchema {
+    return fileSchema.value.subSchemaAt(path) ?? new JsonSchema({});
+  }
+
   const schemaAtCurrentPath: Ref<JsonSchema> = computed(
     () => fileSchema.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
   );
@@ -163,7 +167,9 @@ export const useSessionStore = defineStore('commonStore', () => {
     fileData,
     fileSchema,
     fileSchemaData,
+    schemaAtPath,
     schemaAtCurrentPath,
+    dataAtPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     currentPath,
     currentSelectedElement,
