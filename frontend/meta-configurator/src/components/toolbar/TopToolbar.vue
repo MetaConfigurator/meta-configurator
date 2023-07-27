@@ -11,6 +11,7 @@ import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
 import {useToast} from 'primevue/usetoast';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -19,7 +20,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
-const selectedSchema = ref<any>(null);
+const selectedSchema = ref<{
+  label: string;
+  icon: string;
+  command: () => void;
+  schema: JsonSchema;
+  url: string | undefined;
+}>(null);
 const showFetchedSchemas = ref(false);
 function getPageName(): string {
   switch (props.currentMode) {
@@ -138,6 +145,7 @@ const showConfirmation = ref(false);
   }
 });*/
 watch(selectedSchema, async newSelectedSchema => {
+  console.log('newSelectedSchema', newSelectedSchema);
   if (newSelectedSchema) {
     // If a schema is selected, call the selectSchema function with the schema's URL
     try {
@@ -155,6 +163,7 @@ watch(selectedSchema, async newSelectedSchema => {
 function handleAccept() {
   // User accepted the confirmation, handle keeping the existing data
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+  console.log('selected schema', selectedSchema.value);
   useDataStore().schemaData = selectedSchema.value.schema;
   // Hide the confirmation dialog
   showConfirmation.value = false;
