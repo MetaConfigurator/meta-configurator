@@ -24,10 +24,10 @@ export function resolveCorrespondingComponent(
       ...propsObject,
       possibleValues: nodeData.schema.enum,
     });
-  } else if (nodeData.schema.hasType('boolean')) {
-    return h(BooleanProperty, propsObject);
   } else if (nodeData.schema.hasType('string')) {
     return h(StringProperty, propsObject);
+  } else if (nodeData.schema.hasType('boolean')) {
+    return h(BooleanProperty, propsObject);
   } else if (nodeData.schema.hasType('number')) {
     return h(NumberProperty, propsObject);
   } else if (nodeData.schema.hasType('integer')) {

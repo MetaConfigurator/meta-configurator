@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
@@ -9,7 +9,7 @@ import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
-import type {Path} from '@/model/path';
+import type {Path, PathElement} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
@@ -28,15 +28,17 @@ const emit = defineEmits<{
   (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
-const treeNodeResolver = new ConfigTreeNodeResolver(() => props.currentData);
+const treeNodeResolver = new ConfigTreeNodeResolver();
 
 const nodesToDisplay = computed(() => {
-  return treeNodeResolver.createTreeNodeOfProperty(
+  const rootNode = treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema.title ?? 'root',
     props.currentSchema,
     undefined,
     props.currentPath
-  ).children;
+  );
+
+  return rootNode.children;
 });
 
 const treeTableFilters = ref<Record<string, string>>({});
@@ -64,13 +66,7 @@ function addItem(relativePath: Path, newValue: any) {
   if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
     useSessionStore().expand(absolutePath);
 
-    // focus on first property of object or first element of array
-    const firstPropertyOfObject = Object.keys(subSchema?.properties)[0];
-    const pathToFirstProperty = props.currentPath.concat(
-      relativePath.concat(firstPropertyOfObject)
-    );
-    focus(pathToString(pathToFirstProperty));
-
+    focusOnFirstPropertyOfSchema(absolutePath);
     return;
   }
 
@@ -78,6 +74,22 @@ function addItem(relativePath: Path, newValue: any) {
   // on the last element of the path)
   const pathToAddItem = relativePath.slice(0, -1).concat(relativePath[relativePath.length - 1] + 1);
   focus(pathToString(props.currentPath.concat(pathToAddItem)));
+}
+
+function focusOnFirstPropertyOfSchema(absolutePath: Path) {
+  const dataAtPath = useSessionStore().dataAtPath(absolutePath);
+  const subSchema = useSessionStore().schemaAtPath(absolutePath);
+
+  let firstPropertyOfObject: PathElement =
+    Object.keys(subSchema?.properties)[0] ?? Object.keys(dataAtPath)[0];
+  if (Array.isArray(dataAtPath)) {
+    // if the data is an array, the first property is the index of the array
+    // (which is a number)
+    firstPropertyOfObject = 0;
+  }
+  const pathToFirstProperty = absolutePath.concat(firstPropertyOfObject);
+
+  focus(pathToString(pathToFirstProperty));
 }
 
 /**
@@ -115,6 +127,18 @@ function addDefaultValue(relativePath: Path) {
 function addNegativeMarginForTableStyle(depth: number) {
   return {'margin-right': `${-depth * GuiConstants.INDENTATION_STEP}px`};
 }
+
+watch(storeToRefs(useSessionStore()).currentPath, (path: Path) => {
+  focusOnFirstPropertyOfSchema(path);
+});
+
+function displayAsDefaultProperty(node: any) {
+  return (
+    node.type === TreeNodeType.PATTERN_PROPERTY ||
+    node.type === TreeNodeType.SCHEMA_PROPERTY ||
+    node.type === TreeNodeType.ADDITIONAL_PROPERTY
+  );
+}
 </script>
 
 <template>
@@ -147,18 +171,16 @@ function addNegativeMarginForTableStyle(depth: number) {
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->
         <span
-          v-if="slotProps.node.type === TreeNodeType.DATA"
+          v-if="displayAsDefaultProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
           <PropertyMetadata
             :nodeData="slotProps.node.data"
+            :type="slotProps.node.type"
             @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
         </span>
 
-        <span
-          v-if="slotProps.node.type === TreeNodeType.DATA"
-          style="max-width: 50%"
-          class="w-full">
+        <span v-if="displayAsDefaultProperty(slotProps.node)" style="max-width: 50%" class="w-full">
           <PropertyData
             class="w-full"
             :nodeData="slotProps.node.data"
@@ -201,7 +223,7 @@ function addNegativeMarginForTableStyle(depth: number) {
 <style scoped>
 /* The following lines make the table cells take less space */
 :deep(.p-treetable-tbody > tr > td) {
-  padding: 0.25rem 0.5rem;
+  padding: 0.1rem 0.5rem;
 }
 
 :deep(.p-treetable-header) {

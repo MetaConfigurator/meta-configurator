@@ -1,15 +1,18 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
-import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
+import type {ConfigDataTreeNodeType, ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
+import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import IconExpand from '@/components/icons/IconExpand.vue';
 import {useSettingsStore} from '@/store/settingsStore';
 import {generateTooltipText} from '@/helpers/propertyTooltipGenerator';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
+import {useSessionStore} from '@/store/sessionStore';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
+  type: ConfigDataTreeNodeType;
 }>();
 
 const emit = defineEmits<{
@@ -28,9 +31,32 @@ function isDeprecated(): boolean {
   return props.nodeData.schema.deprecated;
 }
 
+function toggleExpand() {
+  const settingsStore = useSettingsStore();
+  if (props.nodeData.depth === settingsStore.settingsData.guiEditor.maximumDepth) {
+    zoomIntoPath();
+    return;
+  }
+
+  const store = useSessionStore();
+  if (store.isExpanded(props.nodeData.absolutePath)) {
+    store.collapse(props.nodeData.absolutePath);
+  } else {
+    store.expand(props.nodeData.absolutePath);
+  }
+}
+
+function isAdditionalProperty(): boolean {
+  return props.type === TreeNodeType.ADDITIONAL_PROPERTY;
+}
+
+function isPatternProperty(): boolean {
+  return props.type === TreeNodeType.PATTERN_PROPERTY;
+}
+
 function clickedPropertyKey() {
   if (useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton) {
-    // TODO: Collapse/expand
+    toggleExpand();
   } else {
     zoomIntoPath();
   }
@@ -64,13 +90,21 @@ function getTypeDescription(): string {
     <span
       class="mr-2"
       :class="{'hover:underline': isExpandable()}"
+      :tabindex="isExpandable() ? 0 : -1"
       @click="clickedPropertyKey()"
+      @keyup.enter="toggleExpand()"
       @dblclick="zoomIntoPath()"
       v-tooltip.bottom="generateTooltipText(props.nodeData)">
-      <!--If deprecated: put name into a s tag (strikethrough) -->
-      <s v-if="isDeprecated()">{{ nodeData.name }}</s>
       <!--Otherwise: just normal text -->
-      <span v-else>{{ nodeData.name }}</span>
+      <span
+        :class="{
+          'text-indigo-700': isExpandable(),
+          'line-through': isDeprecated(),
+          'font-semibold': isRequired(),
+          italic: isAdditionalProperty() || isPatternProperty(),
+        }">
+        {{ nodeData.name }}
+      </span>
       <!--Show red star after text if property is required -->
       <span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
     </span>

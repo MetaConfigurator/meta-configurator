@@ -28,7 +28,7 @@ const schemaInformation = computed(() => {
 
 <template>
   <Accordion :activeIndex="1">
-    <AccordionTab :header="schema.title ?? 'Schema information'">
+    <AccordionTab :header="'Schema: ' + (schema.title ?? 'Untitled schema')">
       <p v-for="info in schemaInformation" :key="info.title">
         <span class="font-semibold">{{ info.title }}: </span>
         {{ info.value }}

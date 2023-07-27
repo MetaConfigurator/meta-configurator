@@ -36,6 +36,7 @@ function updateData(path: Path, newValue: any) {
 function zoomIntoPath(pathToAdd: Path) {
   sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
   sessionStore.currentPath = sessionStore.currentPath.concat(pathToAdd);
+  sessionStore.currentSelectedElement = sessionStore.currentPath;
 }
 </script>
 
