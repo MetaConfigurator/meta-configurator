@@ -1,4 +1,4 @@
-# Meta Configurator
+# Config Assistant
 
 ## Description
 
@@ -56,7 +56,7 @@ To launch the application, follow these steps:
 
 1. Clone the repository to your local machine:
    ```shell
-   git clone https://github.com/PaulBredl/meta-configurator.git
+   git clone https://github.com/PaulBredl/config-assistant.git
    ```
 2. Navigate to the project directory:
    ```shell

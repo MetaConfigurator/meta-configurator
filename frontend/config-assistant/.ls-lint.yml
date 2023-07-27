@@ -1,0 +1,13 @@
+ls:
+  src:
+    .dir: kebab-case
+    .js: kebab-case
+    .css: regex:([.a-z]*)([-.][a-z]+)*
+    .vue: PascalCase
+
+ignore:
+  - .git
+  - node_modules
+  - .github
+  - .vscode
+  - .idea
