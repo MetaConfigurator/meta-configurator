@@ -114,7 +114,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
       <div class="flex space-x-10 mr-4">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
-          <p class="font-semibold text-lg">MetaConfigurator</p>
+          <p class="font-semibold text-lg">ConfigAssistant</p>
         </div>
         <!-- link to our github, opens in a new tab -->
         <a

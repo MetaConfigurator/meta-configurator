@@ -16,6 +16,7 @@ export function resolveCorrespondingComponent(
     propertyName: nodeData.name,
     propertyData: nodeData.data,
     propertySchema: nodeData.schema,
+    parentSchema: nodeData.parentSchema,
     relativePath: nodeData.relativePath,
     absolutePath: nodeData.absolutePath,
   };
