@@ -16,6 +16,7 @@ export const useSettingsStore = defineStore('settings', () => {
     guiEditor: {
       elementNavigationWithSeparateButton: false,
       maximumDepth: 3,
+      propertySorting: 'default',
     },
     debuggingActive: false,
   });

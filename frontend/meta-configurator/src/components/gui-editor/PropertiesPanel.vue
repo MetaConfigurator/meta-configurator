@@ -28,15 +28,17 @@ const emit = defineEmits<{
   (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
-const treeNodeResolver = new ConfigTreeNodeResolver(() => props.currentData);
+const treeNodeResolver = new ConfigTreeNodeResolver();
 
 const nodesToDisplay = computed(() => {
-  return treeNodeResolver.createTreeNodeOfProperty(
+  const rootNode = treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema.title ?? 'root',
     props.currentSchema,
     undefined,
     props.currentPath
-  ).children;
+  );
+
+  return rootNode.children;
 });
 
 const treeTableFilters = ref<Record<string, string>>({});
@@ -115,6 +117,14 @@ function addDefaultValue(relativePath: Path) {
 function addNegativeMarginForTableStyle(depth: number) {
   return {'margin-right': `${-depth * GuiConstants.INDENTATION_STEP}px`};
 }
+
+function displayAsDefaultProperty(node: any) {
+  return (
+    node.type === TreeNodeType.PATTERN_PROPERTY ||
+    node.type === TreeNodeType.SCHEMA_PROPERTY ||
+    node.type === TreeNodeType.ADDITIONAL_PROPERTY
+  );
+}
 </script>
 
 <template>
@@ -147,18 +157,16 @@ function addNegativeMarginForTableStyle(depth: number) {
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->
         <span
-          v-if="slotProps.node.type === TreeNodeType.DATA"
+          v-if="displayAsDefaultProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
           <PropertyMetadata
             :nodeData="slotProps.node.data"
+            :type="slotProps.node.type"
             @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
         </span>
 
-        <span
-          v-if="slotProps.node.type === TreeNodeType.DATA"
-          style="max-width: 50%"
-          class="w-full">
+        <span v-if="displayAsDefaultProperty(slotProps.node)" style="max-width: 50%" class="w-full">
           <PropertyData
             class="w-full"
             :nodeData="slotProps.node.data"

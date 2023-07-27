@@ -1,7 +1,8 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
-import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
+import type {ConfigDataTreeNodeType, ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
+import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import IconExpand from '@/components/icons/IconExpand.vue';
 import {useSettingsStore} from '@/store/settingsStore';
@@ -10,6 +11,7 @@ import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
+  type: ConfigDataTreeNodeType;
 }>();
 
 const emit = defineEmits<{
@@ -26,6 +28,14 @@ function isRequired(): boolean {
 
 function isDeprecated(): boolean {
   return props.nodeData.schema.deprecated;
+}
+
+function isAdditionalProperty(): boolean {
+  return props.type === TreeNodeType.ADDITIONAL_PROPERTY;
+}
+
+function isPatternProperty(): boolean {
+  return props.type === TreeNodeType.PATTERN_PROPERTY;
 }
 
 function clickedPropertyKey() {
@@ -67,10 +77,16 @@ function getTypeDescription(): string {
       @click="clickedPropertyKey()"
       @dblclick="zoomIntoPath()"
       v-tooltip.bottom="generateTooltipText(props.nodeData)">
-      <!--If deprecated: put name into a s tag (strikethrough) -->
-      <s v-if="isDeprecated()">{{ nodeData.name }}</s>
       <!--Otherwise: just normal text -->
-      <span v-else>{{ nodeData.name }}</span>
+      <span
+        :class="{
+          'text-indigo-700': isExpandable(),
+          'line-through': isDeprecated(),
+          'font-semibold': isRequired(),
+          italic: isAdditionalProperty() || isPatternProperty(),
+        }">
+        {{ nodeData.name }}
+      </span>
       <!--Show red star after text if property is required -->
       <span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
     </span>

@@ -14,6 +14,17 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
       examples: ['Doe'],
     },
   },
+  additionalProperties: {
+    type: 'string',
+    description: 'Any other property',
+    maxLength: 20,
+  },
+  patternProperties: {
+    '^Number.*': {
+      type: 'number',
+      description: 'Any number property',
+    },
+  },
   properties: {
     name: {
       $ref: '#/$defs/name',

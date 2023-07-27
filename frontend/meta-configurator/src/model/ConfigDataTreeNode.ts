@@ -8,7 +8,7 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
  */
 export interface ConfigDataTreeNode extends TreeNode {
   data: ConfigTreeNodeData;
-  type: TreeNodeType.DATA;
+  type: ConfigDataTreeNodeType;
 }
 
 export interface AddItemTreeNode extends TreeNode {
@@ -18,8 +18,14 @@ export interface AddItemTreeNode extends TreeNode {
 
 export type GuiEditorTreeNode = ConfigDataTreeNode | AddItemTreeNode;
 
+export type ConfigDataTreeNodeType =
+  | TreeNodeType.SCHEMA_PROPERTY
+  | TreeNodeType.ADDITIONAL_PROPERTY
+  | TreeNodeType.PATTERN_PROPERTY;
 export enum TreeNodeType {
-  DATA = 'data',
+  SCHEMA_PROPERTY = 'data',
+  ADDITIONAL_PROPERTY = 'additionalProperty',
+  PATTERN_PROPERTY = 'patternProperty',
   ADD_ITEM = 'addItem',
 }
 
