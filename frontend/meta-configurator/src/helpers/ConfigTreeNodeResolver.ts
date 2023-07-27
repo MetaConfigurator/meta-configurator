@@ -93,11 +93,11 @@ export class ConfigTreeNodeResolver {
     if (propertySorting === PropertySorting.DATA_ORDER) {
       return this.createObjectChildrenNodesAccordingToDataOrder(path, schema, parentPath, depth);
     }
-    // default sorting
-    return this.createObjectChildrenNodesDefaultOrder(schema, parentPath, path, depth);
+    // priority sorting
+    return this.createObjectChildrenNodesPriorityOrder(schema, parentPath, path, depth);
   }
 
-  private createObjectChildrenNodesDefaultOrder(
+  private createObjectChildrenNodesPriorityOrder(
     schema: JsonSchema,
     parentPath: Array<PathElement>,
     path: Array<PathElement>,
