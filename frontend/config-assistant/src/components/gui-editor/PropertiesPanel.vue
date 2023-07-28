@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
@@ -15,6 +15,7 @@ import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
+import {refDebounced} from '@vueuse/core';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -30,16 +31,32 @@ const emit = defineEmits<{
 
 const treeNodeResolver = new ConfigTreeNodeResolver();
 
-const nodesToDisplay = computed(() => {
-  const rootNode = treeNodeResolver.createTreeNodeOfProperty(
-    props.currentSchema.title ?? 'root',
+const loading = ref(false);
+const loadingDebounced = refDebounced(loading, 100);
+
+function computeTree() {
+  const root = treeNodeResolver.createTreeNodeOfProperty(
+    props.currentSchema?.title ?? 'root',
     props.currentSchema,
     undefined,
     props.currentPath
   );
+  root.children = treeNodeResolver.createChildNodesOfNode(root);
+  return root;
+}
 
-  return rootNode.children;
-});
+function updateTree() {
+  loadingDebounced.value = true;
+  console.log(loading.value);
+  window.setTimeout(() => {
+    nodesToDisplay.value = computeTree().children;
+    loadingDebounced.value = false;
+  }, 0);
+}
+
+const nodesToDisplay = ref(computeTree().children);
+
+watch(storeToRefs(useSessionStore()).fileSchema, updateTree);
 
 const treeTableFilters = ref<Record<string, string>>({});
 const {currentExpandedElements} = storeToRefs(useSessionStore());
@@ -129,6 +146,7 @@ function addNegativeMarginForTableStyle(depth: number) {
 }
 
 watch(storeToRefs(useSessionStore()).currentPath, (path: Path) => {
+  updateTree();
   focusOnFirstPropertyOfSchema(path);
 });
 
@@ -138,6 +156,12 @@ function displayAsDefaultProperty(node: any) {
     node.type === TreeNodeType.SCHEMA_PROPERTY ||
     node.type === TreeNodeType.ADDITIONAL_PROPERTY
   );
+}
+
+function expandElement(node: any) {
+  currentExpandedElements[node.key] = true;
+  node.children = treeNodeResolver.createChildNodesOfNode(node);
+  console.log('expandElement', node);
 }
 </script>
 
@@ -151,8 +175,10 @@ function displayAsDefaultProperty(node: any) {
     scroll-direction="vertical"
     scroll-height="flex"
     row-hover
+    :lazy="true"
+    :loading="loading"
     :expandedKeys="currentExpandedElements"
-    @nodeExpand="node => (currentExpandedElements[node.key] = true)"
+    @nodeExpand="expandElement"
     @nodeCollapse="node => delete currentExpandedElements[node.key]"
     :filters="treeTableFilters">
     <!-- Filter field -->

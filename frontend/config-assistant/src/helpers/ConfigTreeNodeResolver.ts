@@ -38,20 +38,39 @@ export class ConfigTreeNodeResolver {
     }
 
     const path = subPath.concat(name);
-    return {
+    const result = {
       data: {
         name: name,
         schema: schema,
         parentSchema: parentSchema,
-        data: this.dataForProperty(path),
         depth: depth,
         relativePath: path,
         absolutePath: parentPath.concat(path),
       },
       type: nodeType,
       key: pathToString(parentPath.concat(path)),
-      children: this.createChildNodes(name, schema, parentPath, subPath, depth),
+      children: [],
+      leaf: this.isLeaf(schema, depth),
     };
+
+    return result;
+  }
+
+  private isLeaf(schema: JsonSchema, depth: number): boolean {
+    return (
+      (!schema.hasType('object') && !schema.hasType('array')) ||
+      depth >= useSettingsStore().settingsData.guiEditor.maximumDepth
+    );
+  }
+
+  public createChildNodesOfNode(guiEditorTreeNode: GuiEditorTreeNode): GuiEditorTreeNode[] {
+    return this.createChildNodes(
+      guiEditorTreeNode.data.name,
+      guiEditorTreeNode.data.schema,
+      guiEditorTreeNode.data.absolutePath.slice(0, -1),
+      guiEditorTreeNode.data.relativePath.slice(0, -1),
+      guiEditorTreeNode.data.depth
+    );
   }
 
   private createChildNodes(
@@ -196,7 +215,7 @@ export class ConfigTreeNodeResolver {
     depth: number,
     filter: (key: string) => boolean = () => true
   ) {
-    const data = this.dataForProperty(path);
+    const data = useSessionStore().dataAtPath(parentPath.concat(path));
     if (!data) {
       return [];
     }
@@ -243,7 +262,7 @@ export class ConfigTreeNodeResolver {
     schema: JsonSchema,
     depth: number
   ) {
-    const data = this.dataForProperty(path);
+    const data = useSessionStore().dataAtPath(parentPath.concat(path));
     let children: GuiEditorTreeNode[] = [];
     if (Array.isArray(data)) {
       children = data.map((value: any, index: number) => {
@@ -277,24 +296,12 @@ export class ConfigTreeNodeResolver {
         relativePath: pathWithIndex,
         absolutePath: parentPath.concat(pathWithIndex),
         name: children.length,
-        data: undefined,
       },
       type: TreeNodeType.ADD_ITEM,
       key: pathToString(parentPath.concat(pathWithIndex)),
       children: [],
+      leaf: true,
+      loaded: true,
     };
-  }
-
-  private dataForProperty(name: Path): any {
-    let currentData: any = useSessionStore().dataAtCurrentPath;
-
-    for (const key of name) {
-      if (currentData[key] === undefined) {
-        return undefined;
-      }
-      currentData = currentData[key];
-    }
-
-    return currentData;
   }
 }

@@ -121,7 +121,7 @@ export const useSessionStore = defineStore('commonStore', () => {
 
     for (const key of path) {
       if (!currentData[key]) {
-        return {};
+        return undefined;
       }
       currentData = currentData[key];
     }
