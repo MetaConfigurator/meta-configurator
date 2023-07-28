@@ -12,6 +12,12 @@ import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
 import {useToast} from 'primevue/usetoast';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {
+  clearEditor,
+  showConfirmation,
+  confirmationDialogMessage,
+  newEmptyFile,
+} from '@/components/toolbar/clearContent';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -27,8 +33,9 @@ const selectedSchema = ref<{
   schema: JsonSchema;
   url: string | undefined;
 }>(null);
+
 const showFetchedSchemas = ref(false);
-const showConfirmation = ref(false);
+
 function getPageName(): string {
   switch (props.currentMode) {
     case SessionMode.FileEditor:
@@ -117,7 +124,8 @@ watch(selectedSchema, async newSelectedSchema => {
       await topMenuBar.selectSchema(newSelectedSchema.url);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      showConfirmation.value = true;
+
+      newEmptyFile('Are you sure?');
     } catch (error) {
       console.error('Error fetching schema:', error);
       // Handle errors if needed
@@ -126,18 +134,15 @@ watch(selectedSchema, async newSelectedSchema => {
 });
 
 function handleAccept() {
-  // User accepted the confirmation, handle keeping the existing data
-  useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-  console.log('selected schema', selectedSchema.value);
+  clearEditor();
   // Hide the confirmation dialog
   showConfirmation.value = false;
 }
 
 function handleReject() {
-  // User rejected the confirmation, handle removing the data
-  useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+  // User accepted the confirmation, handle keeping the existing data
 
-  useDataStore().fileData = {}; // Call the clearFile() function here
+  console.log('selected schema', selectedSchema.value);
   // Hide the confirmation dialog
   showConfirmation.value = false;
 }
@@ -192,6 +197,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
     <div class="card flex justify-content-center">
       <!-- Listbox to display fetched schemas -->
       <Listbox
+        listStyle="max-height:250px"
         v-model="selectedSchema"
         :options="topMenuBar.fetchedSchemas"
         v-show="showFetchedSchemas"
@@ -203,7 +209,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
     </div>
   </Dialog>
   <Dialog v-model:visible="showConfirmation">
-    <h3>Do you want to keep the existing data?</h3>
+    <h3>{{ confirmationDialogMessage }}</h3>
     <Button label="Yes" @click="handleAccept" class="mr-4 mt-4 button-small" />
     <Button label="No" @click="handleReject" class="mr-4 mt-4 button-small" />
   </Dialog>

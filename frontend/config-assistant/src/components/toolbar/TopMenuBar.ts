@@ -5,7 +5,7 @@ import {downloadFile} from '@/components/toolbar/downloadFile';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
 
-import {clearEditor} from '@/components/toolbar/clearContent';
+import {newEmptyFile} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
@@ -19,7 +19,6 @@ export class TopMenuBar {
   public fetchedSchemas: {
     label: string;
     icon: string;
-    command: () => void;
     url: string | undefined;
   }[] = [];
   private toast: any;
@@ -39,7 +38,6 @@ export class TopMenuBar {
         this.fetchedSchemas.push({
           label: schema.name,
           icon: 'pi pi-fw pi-code',
-          command: () => this.selectSchema(schema.url),
           url: schema.url,
         });
       });
@@ -179,7 +177,7 @@ export class TopMenuBar {
     downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
-    clearEditor('Are you sure that you want to clear the editor?');
+    newEmptyFile('Are you sure that you want to clear the editor?');
   }
   private clearSchemaEditor(): void {
     clearSchemaEditor();
