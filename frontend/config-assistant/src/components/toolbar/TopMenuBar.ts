@@ -205,7 +205,7 @@ export class TopMenuBar {
       useDataStore().schemaData = schemaContent;
       console.log('Fetched Schema:', schemaContent);
       // Always clear the data without prompting the user.
-      //clearEditor('Do you want to clear the existing data?');
+      newEmptyFile('Do you want to clear the existing data?');
 
       if (this.toast) {
         this.toast.add({

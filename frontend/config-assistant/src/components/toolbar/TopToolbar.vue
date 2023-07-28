@@ -190,7 +190,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
       class="mr-4 mt-4 button-small"
       v-if="!showFetchedSchemas" />
     <Button
-      label="Fro our example schema"
+      label="From our example schema"
       @click="handleFromOurExampleClick"
       class="mr-4 mt-4 button-small"
       v-if="!showFetchedSchemas" />
@@ -203,7 +203,7 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
         v-show="showFetchedSchemas"
         filter
         optionLabel="label"
-        class="w-50 md:w-14rem">
+        class="w-50 md:w-14rem overflow-hidden">
         <!-- Add a slot for the search input -->
       </Listbox>
     </div>
