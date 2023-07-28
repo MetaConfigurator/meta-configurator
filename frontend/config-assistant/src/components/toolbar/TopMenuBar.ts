@@ -45,12 +45,9 @@ export class TopMenuBar {
       });
 
       // Show the dialog with the fetched schemas
-    } catch (error: Error) {
-      errorService.onError({
-        message: 'Error fetching web schemas',
-        details: error.message,
-        stack: error.stack,
-      });
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
     }
   }
 
@@ -157,12 +154,6 @@ export class TopMenuBar {
   private uploadSchema(): void {
     chooseSchemaFromFile();
   }
-  private chooseSchema(schemaKey: string): void {
-    const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
-    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-    useDataStore().schemaData = selectedSchema?.schema;
-  }
-
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
