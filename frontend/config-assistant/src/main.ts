@@ -10,6 +10,7 @@ import ToastService from 'primevue/toastservice';
 import router from './router';
 import FileEditorView from '@/views/FileEditorView.vue';
 import ErrorService from '@/helpers/errorService';
+import {registerIcons} from '@/fontawesome';
 
 // @ts-ignore
 const app = createApp(FileEditorView);
@@ -22,5 +23,7 @@ app.directive('tooltip', Tooltip);
 
 export const errorService = new ErrorService(app.config.globalProperties.$toast);
 app.config.errorHandler = (error: unknown) => errorService.onError(error);
+
+registerIcons();
 
 app.mount('#app');
