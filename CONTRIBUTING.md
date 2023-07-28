@@ -1,7 +1,8 @@
-# Contributing to Meta Configurator
+# Contributing to Config Assistant
+
 **Note: Contribution we only accept after 10/2023.**
 
-Welcome to the Meta Configurator project! We appreciate your interest in contributing. 
+Welcome to the Config Assistant project! We appreciate your interest in contributing.
 Here are some guidelines to get you started:
 
 ## Getting Started
@@ -12,32 +13,34 @@ Here are some guidelines to get you started:
    git push origin feature/your-feature
 
    git checkout -b feature/your-featurebranch
+
 4. Make your changes and commit them:
    ```shell
    git commit -m "Add your commit message"
+   ```
 
 ## Submitting a Pull Request
 
 1. Push your branch to your forked repository:
    ```shell
    git push origin feature/your-feature
+   ```
 2. Go to the original repository and create a new Pull Request.
 3. Provide a clear and descriptive title for your Pull Request.
 4. Include a detailed description of your changes, the problem they solve, and any relevant information that would help reviewers.
-5. Wait for the maintainers to review your Pull Request. 
-Be prepared to address any feedback or make necessary changes.
+5. Wait for the maintainers to review your Pull Request.
+   Be prepared to address any feedback or make necessary changes.
 
 ## Code Style and Guidelines
 
 - Follow the coding conventions and style guidelines that are defined in prettier and eslint config file.
-They are automatically checked on each pull request.
+  They are automatically checked on each pull request.
 - Write clear and concise code with appropriate comments when necessary.
 - Ensure that your code is properly formatted and free from any syntax errors.
 
 ## Issue Reporting
 
-If you encounter any issues or have suggestions for improvement, please open an issue in the project repository. 
+If you encounter any issues or have suggestions for improvement, please open an issue in the project repository.
 Provide a clear and descriptive title and include steps to reproduce the problem, if applicable.
-
 
 Thank you for your contribution!

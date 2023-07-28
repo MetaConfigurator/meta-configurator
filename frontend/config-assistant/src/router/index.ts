@@ -36,7 +36,7 @@ const router = createRouter({
   ],
 });
 
-const DEFAULT_TITLE = 'META CONFIGURATOR';
+const DEFAULT_TITLE = 'Config Assistant';
 router.beforeEach((to, from, next) => {
   // Update the page title based on the current route
   document.title = (to.meta.title || DEFAULT_TITLE) as string;
