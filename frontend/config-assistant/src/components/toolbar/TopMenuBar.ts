@@ -1,4 +1,3 @@
-import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {chooseSchemaFromFile} from '@/components/toolbar/uploadSchema';
 import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
@@ -52,59 +51,51 @@ export class TopMenuBar {
   get fileEditorMenuItems() {
     return [
       {
-        label: 'File',
-        icon: 'pi pi-fw pi-file',
-        class: 'z-10', // z-10 is required otherwise the menu is behind the ace editor
+        label: 'New File',
+        icon: 'fa-regular fa-file',
         items: [
           {
-            label: 'Clear File',
-            icon: 'pi pi-fw pi-trash',
+            label: 'New empty File',
+            icon: 'fa-regular fa-file',
             command: this.clearEditor,
           },
           {
-            label: 'Upload File',
-            icon: 'pi pi-fw pi-upload',
-            command: this.chooseConfig,
-          },
-          {
-            label: 'Generate data',
-            icon: 'pi pi-fw pi-cog',
+            label: 'Generate File...',
+            icon: 'fa-solid fa-gears',
             command: this.generateSampleFile,
-          },
-          {
-            separator: true,
-          },
-          {
-            label: 'Download File',
-            icon: 'pi pi-fw pi-download',
-            command: () => this.downloadFile(useDataStore().schema.title ?? 'file'),
           },
         ],
       },
       {
-        label: 'Schema',
-        icon: 'pi pi-fw pi-pencil',
-        class: 'z-10',
-        items: [
-          {
-            label: 'Upload schema',
-            icon: 'pi pi-fw pi-upload',
-            command: this.uploadSchema,
-          },
-
-          {
-            label: 'Choose SchemaFile',
-            icon: 'pi pi-fw pi-upload',
-            command: this.openDialog,
-          },
-        ],
+        label: 'Open File',
+        icon: 'fa-regular fa-folder-open',
+        command: this.chooseConfig,
       },
-
+      {
+        label: 'Save File',
+        icon: 'fa-regular fa-floppy-disk',
+        command: () => this.downloadFile(useDataStore().schema.title ?? 'file'),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Undo',
+        icon: 'fa-solid fa-rotate-left',
+        command: () => console.log('undo'),
+      },
+      {
+        label: 'Redo',
+        icon: 'fa-solid fa-rotate-right',
+        command: () => console.log('redo'),
+      },
+      {
+        separator: true,
+      },
       {
         label: 'Share',
         class: 'z-10',
-        icon: 'pi pi-fw pi-share-alt',
-        command: this.onMenuItemClicked,
+        icon: 'fa-solid fa-share-nodes',
       },
     ];
   }
@@ -112,42 +103,119 @@ export class TopMenuBar {
   get schemaEditorMenuItems() {
     return [
       {
-        label: 'Schema',
-        icon: 'pi pi-fw pi-file',
-        class: 'z-10', // z-10 is required otherwise the menu is behind the ace editor
+        label: 'New empty Schema',
+        icon: 'fa-regular fa-file',
         items: [
           {
-            label: 'Clear Schema',
-            icon: 'pi pi-fw pi-trash',
+            label: 'New empty Schema',
+            icon: 'fa-regular fa-file',
             command: this.clearSchemaEditor,
           },
           {
-            label: 'Upload Schema',
-            icon: 'pi pi-fw pi-upload',
-            command: this.uploadSchema,
-          },
-
-          {
-            separator: true,
-          },
-          {
-            label: 'Download Schema',
-            icon: 'pi pi-fw pi-download',
-            command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
+            label: 'Infer Schema',
+            icon: 'fa-solid fa-wand-magic-sparkles',
+            command: () => {
+              throw new Error('Not implemented yet');
+            },
           },
         ],
       },
       {
+        label: 'Open Schema',
+        icon: 'fa-regular fa-folder-open',
+        items: [
+          {
+            label: 'From File',
+            icon: 'fa-regular fa-folder-open',
+            command: this.uploadSchema,
+          },
+
+          {
+            label: 'From JSON Schema Store',
+            icon: 'fa-solid fa-database',
+            command: this.openDialog,
+          },
+          {
+            label: 'From URL',
+            icon: 'fa-solid fa-globe',
+            command: () => {
+              throw new Error('Not implemented yet');
+            },
+          },
+          {
+            label: 'Example Schemas',
+            icon: 'fa-solid fa-database',
+            command: () => {
+              throw new Error('Not implemented yet');
+            },
+          },
+        ],
+      },
+      {
+        label: 'Save File',
+        icon: 'fa-regular fa-floppy-disk',
+        command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Undo',
+        icon: 'fa-solid fa-rotate-left',
+        command: () => console.log('undo'),
+      },
+      {
+        label: 'Redo',
+        icon: 'fa-solid fa-rotate-right',
+        command: () => console.log('redo'),
+      },
+      {
+        separator: true,
+      },
+      {
         label: 'Share',
         class: 'z-10',
-        icon: 'pi pi-fw pi-share-alt',
-        command: this.onMenuItemClicked,
+        icon: 'fa-solid fa-share-nodes',
       },
     ];
   }
 
   get settingsMenuItems() {
-    return [];
+    return [
+      {
+        label: 'Open settings file',
+        icon: 'fa-regular fa-folder-open',
+        command: () => {
+          throw new Error('Not implemented yet');
+        },
+      },
+      {
+        label: 'Save settings file',
+        icon: 'fa-regular fa-floppy-disk',
+        command: () => this.downloadFile('configAssistantSettings'),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Undo',
+        icon: 'fa-solid fa-rotate-left',
+        command: () => console.log('undo'),
+      },
+      {
+        label: 'Redo',
+        icon: 'fa-solid fa-rotate-right',
+        command: () => console.log('redo'),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Share',
+        class: 'z-10',
+        icon: 'fa-solid fa-share-nodes',
+      },
+    ];
   }
   private uploadSchema(): void {
     chooseSchemaFromFile();
