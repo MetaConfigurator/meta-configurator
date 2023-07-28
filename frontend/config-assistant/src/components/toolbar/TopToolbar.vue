@@ -4,13 +4,12 @@ import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
-import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
+import {SessionMode} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
-import {useDataStore} from '@/store/dataStore';
 import {useToast} from 'primevue/usetoast';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {
