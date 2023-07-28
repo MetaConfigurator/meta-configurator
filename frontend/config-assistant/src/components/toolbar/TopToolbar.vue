@@ -28,6 +28,7 @@ const selectedSchema = ref<{
   url: string | undefined;
 }>(null);
 const showFetchedSchemas = ref(false);
+const showConfirmation = ref(false);
 function getPageName(): string {
   switch (props.currentMode) {
     case SessionMode.FileEditor:
@@ -108,42 +109,6 @@ function handleFromOurExampleClick() {
   showFetchedSchemas.value = true;
 }
 
-/*watch(selectedSchema, newSelectedSchema => {
-  if (newSelectedSchema) {
-    // If a schema is selected, show the confirmation dialog
-    console.log('Schema selected:', newSelectedSchema);
-    confirm.require({
-      message: 'Do you want to keep the existing data?',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        console.log('User accepted the confirmation');
-        // User accepted the confirmation, handle keeping the existing data
-        useDataStore().schemaData = newSelectedSchema.schema;
-      },
-      reject: () => {
-        console.log('User rejected the confirmation');
-        // User rejected the confirmation, handle removing the data
-        useDataStore().schemaData = newSelectedSchema.schema;
-        useDataStore().fileData = {}; // Call the clearFile() function here
-      },
-    });
-  } else {
-    // If no schema is selected, reset the schemaData in your data store
-    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-    useDataStore().schemaData = null;
-  }
-});*/
-const showConfirmation = ref(false);
-/*watch(selectedSchema, newSelectedSchema => {
-  if (newSelectedSchema) {
-    // If a schema is selected, show the custom confirmation dialog
-    showFetchedSchemas.value = true;
-
-    //topMenuBar.selectSchema(newSelectedSchema.url);
-    topMenuBar.showDialog.value = false;
-    showConfirmation.value = true;
-  }
-});*/
 watch(selectedSchema, async newSelectedSchema => {
   console.log('newSelectedSchema', newSelectedSchema);
   if (newSelectedSchema) {
@@ -164,7 +129,6 @@ function handleAccept() {
   // User accepted the confirmation, handle keeping the existing data
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   console.log('selected schema', selectedSchema.value);
-  // useDataStore().schemaData = selectedSchema.value.schema;
   // Hide the confirmation dialog
   showConfirmation.value = false;
 }
@@ -172,7 +136,7 @@ function handleAccept() {
 function handleReject() {
   // User rejected the confirmation, handle removing the data
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-  useDataStore().schemaData = selectedSchema.value.schema;
+
   useDataStore().fileData = {}; // Call the clearFile() function here
   // Hide the confirmation dialog
   showConfirmation.value = false;
@@ -240,7 +204,6 @@ function handleMenuClick(e: MenuItemCommandEvent) {}
   </Dialog>
   <Dialog v-model:visible="showConfirmation">
     <h3>Do you want to keep the existing data?</h3>
-
     <Button label="Yes" @click="handleAccept" class="mr-4 mt-4 button-small" />
     <Button label="No" @click="handleReject" class="mr-4 mt-4 button-small" />
   </Dialog>

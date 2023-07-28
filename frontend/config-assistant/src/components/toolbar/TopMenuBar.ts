@@ -11,7 +11,6 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -26,7 +25,6 @@ export class TopMenuBar {
   private toast: any;
 
   constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void, toast = null) {
-    this.fetchWebSchemas();
     this.toast = toast;
   }
   public async fetchWebSchemas(): Promise<void> {
@@ -98,16 +96,7 @@ export class TopMenuBar {
             icon: 'pi pi-fw pi-upload',
             command: this.uploadSchema,
           },
-          {
-            label: 'Choose schema',
-            icon: 'pi pi-fw pi-pencil',
-            items: schemaCollection.map(schema => ({
-              label: schema.label,
-              icon: 'pi pi-fw pi-code',
-              key: schema.key,
-              command: () => this.chooseSchema(schema.key),
-            })),
-          },
+
           {
             label: 'Choose SchemaFile',
             icon: 'pi pi-fw pi-upload',
@@ -142,16 +131,7 @@ export class TopMenuBar {
             icon: 'pi pi-fw pi-upload',
             command: this.uploadSchema,
           },
-          {
-            label: 'Choose schema',
-            icon: 'pi pi-fw pi-pencil',
-            items: schemaCollection.map(schema => ({
-              label: schema.label,
-              icon: 'pi pi-fw pi-code',
-              key: schema.key,
-              command: () => this.chooseSchema(schema.key),
-            })),
-          },
+
           {
             separator: true,
           },
@@ -160,14 +140,8 @@ export class TopMenuBar {
             icon: 'pi pi-fw pi-download',
             command: () => this.downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
           },
-          {
-            label: 'WebSchemas',
-            icon: 'pi pi-fw pi-cloud-upload',
-            items: this.fetchedSchemas, // Add the fetched schema items to the dropdown menu.
-          },
         ],
       },
-
       {
         label: 'Share',
         class: 'z-10',
@@ -223,6 +197,7 @@ export class TopMenuBar {
   public dialogMessage = ref('');
 
   public openDialog = (): void => {
+    this.fetchWebSchemas();
     console.log('openDialog function called');
     // Set the message for the dialog
     this.dialogMessage.value = 'Which Schema you want to open?';
@@ -241,7 +216,7 @@ export class TopMenuBar {
       useDataStore().schemaData = schemaContent;
       console.log('Fetched Schema:', schemaContent);
       // Always clear the data without prompting the user.
-      clearEditor('Do you want to clear the existing data?');
+      //clearEditor('Do you want to clear the existing data?');
 
       if (this.toast) {
         this.toast.add({
