@@ -36,7 +36,7 @@ function getPageName(): string {
 const pageSelectionMenuItems: MenuItem[] = [
   {
     label: 'File Editor',
-    icon: 'pi pi-fw pi-file',
+    icon: 'fa-regular fa-file',
     class: () => {
       if (props.currentMode !== SessionMode.FileEditor) {
         return 'font-normal text-lg';
@@ -49,7 +49,7 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
   {
     label: 'Schema Editor',
-    icon: 'pi pi-fw pi-pencil',
+    icon: 'fa-regular fa-file-code',
     class: () => {
       if (props.currentMode !== SchemaEditorView) {
         return 'font-normal text-lg';
@@ -62,7 +62,7 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
   {
     label: 'Settings',
-    icon: 'pi pi-fw pi-cog',
+    icon: 'fa-solid fa-cog',
     class: () => {
       if (props.currentMode !== SessionMode.Settings) {
         return 'font-normal text-lg';
@@ -129,7 +129,13 @@ function getLabelOfItem(item: MenuItem): string {
 <template>
   <Toolbar class="h-10 no-padding">
     <template #start>
-      <Menu ref="menu" :model="items" :popup="true" />
+      <Menu ref="menu" :model="items" :popup="true">
+        <template #itemicon="slotProps">
+          <div v-if="slotProps.item.icon !== undefined">
+            <FontAwesomeIcon :icon="slotProps.item.icon" style="min-width: 1rem" class="mr-3" />
+          </div>
+        </template>
+      </Menu>
 
       <Button outlined text class="main-menu-button" @click="toggle">
         <FontAwesomeIcon icon="fa-solid fa-bars" class="mr-3" />
@@ -155,7 +161,7 @@ function getLabelOfItem(item: MenuItem): string {
           :popup="true"
           :ref="itemMenu => setItemMenuRef(item, itemMenu)">
           <template #itemicon="slotProps">
-            <div v-if="item.icon !== undefined">
+            <div v-if="slotProps.item.icon !== undefined">
               <FontAwesomeIcon
                 :icon="slotProps.item.icon ?? []"
                 style="min-width: 1.5rem"

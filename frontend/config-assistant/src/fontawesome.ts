@@ -4,6 +4,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 /* import specific icons */
 import {
   faBars,
+  faCog,
   faDatabase,
   faFileCirclePlus,
   faFloppyDisk,
@@ -17,6 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
+  faFileCode,
   faFloppyDisk as faFloppyDiskRegular,
   faFolderOpen as faFolderOpenRegular,
 } from '@fortawesome/free-regular-svg-icons';
@@ -36,4 +38,6 @@ export function registerIcons() {
   library.add(faDatabase);
   library.add(faGlobe);
   library.add(faMagicWandSparkles);
+  library.add(faFileCode);
+  library.add(faCog);
 }
