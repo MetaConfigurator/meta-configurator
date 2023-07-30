@@ -95,26 +95,33 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
 ];
 const toast = useToast();
-const topMenuBar = new TopMenuBar(event => {
-  handleMenuClick(event);
-}, toast);
+const topMenuBar = new TopMenuBar(
+  event => {
+    handleMenuClick(event);
+  },
+  toast,
+  handleFromWebClick,
+  handleFromOurExampleClick
+);
 async function handleFromWebClick(): Promise<void> {
   console.log('Before fetching schemas:', topMenuBar.fetchedSchemas);
   try {
     await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
     console.log('After fetching schemas:', topMenuBar.fetchedSchemas);
     showFetchedSchemas.value = true;
+    topMenuBar.showDialog.value = true;
   } catch (error) {
     console.error('Error fetching schemas:', error);
     // Handle errors if needed
   }
 }
+
 function handleFromOurExampleClick() {
   // Set the fetchedSchemas to your schemaCollection array
   topMenuBar.fetchedSchemas = schemaCollection;
-
   // Set the flag to true to show the fetched schemas
   showFetchedSchemas.value = true;
+  topMenuBar.showDialog.value = true;
 }
 
 watch(selectedSchema, async newSelectedSchema => {
@@ -126,7 +133,7 @@ watch(selectedSchema, async newSelectedSchema => {
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
 
-      newEmptyFile('Are you sure?');
+      newEmptyFile('Do you want to clear current config data ?');
     } catch (error) {
       console.error('Error fetching schema:', error);
       // Handle errors if needed
@@ -200,20 +207,10 @@ function getLabelOfItem(item: MenuItem): string {
 <template>
   <Dialog v-model:visible="topMenuBar.showDialog.value">
     <!-- Dialog content goes here -->
-    <h3>{{ topMenuBar.dialogMessage.value }}</h3>
-
-    <Button
-      label="Frow JSON-schema-store"
-      @click="handleFromWebClick"
-      class="mr-4 mt-4 button-small"
-      v-if="!showFetchedSchemas" />
-    <Button
-      label="From our example schema"
-      @click="handleFromOurExampleClick"
-      class="mr-4 mt-4 button-small"
-      v-if="!showFetchedSchemas" />
+    <h3>Which Schema you want to open?</h3>
     <div class="card flex justify-content-center">
       <!-- Listbox to display fetched schemas -->
+
       <Listbox
         listStyle="max-height:250px"
         v-model="selectedSchema"

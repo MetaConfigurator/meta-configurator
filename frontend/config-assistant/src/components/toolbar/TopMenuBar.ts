@@ -10,6 +10,7 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
+import type {MenuItemCommandEvent} from 'primevue/menuitem';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -21,9 +22,17 @@ export class TopMenuBar {
     url: string | undefined;
   }[] = [];
   private toast: any;
-
-  constructor(public onMenuItemClicked: (event: MenuItemCommandEvent) => void, toast = null) {
+  private onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
+  private onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
+  constructor(
+    public onMenuItemClicked: (event: MenuItemCommandEvent) => void,
+    toast = null,
+    onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
+    onFromOurExampleClick: () => void
+  ) {
     this.toast = toast;
+    this.onFromWebClick = onFromWebClick;
+    this.onFromOurExampleClick = onFromOurExampleClick;
   }
   public async fetchWebSchemas(): Promise<void> {
     const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';
@@ -133,7 +142,7 @@ export class TopMenuBar {
           {
             label: 'From JSON Schema Store',
             icon: 'fa-solid fa-database',
-            command: this.openDialog,
+            command: this.onFromWebClick,
           },
           {
             label: 'From URL',
@@ -145,9 +154,7 @@ export class TopMenuBar {
           {
             label: 'Example Schemas',
             icon: 'fa-solid fa-database',
-            command: () => {
-              throw new Error('Not implemented yet');
-            },
+            command: this.onFromOurExampleClick,
           },
         ],
       },
@@ -251,16 +258,15 @@ export class TopMenuBar {
     clearSchemaEditor();
   }
   public showDialog = ref(false);
-  public dialogMessage = ref('');
 
-  public openDialog = (): void => {
+  /*public openDialog = (): void => {
     this.fetchWebSchemas();
     console.log('openDialog function called');
     // Set the message for the dialog
     this.dialogMessage.value = 'Which Schema you want to open?';
     // Show the dialog
     this.showDialog.value = true;
-  };
+  };*/
 
   public async selectSchema(schemaURL: string): Promise<void> {
     try {
@@ -268,6 +274,7 @@ export class TopMenuBar {
       console.log('fetching from URL', schemaURL);
       const response = await fetch(schemaURL);
       const schemaContent = await response.json();
+      const schemaName = schemaContent.title || 'Unknown Schema';
       useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
       // Update the schemaData in the dataStore with the fetched schema content.
       useDataStore().schemaData = schemaContent;
@@ -279,7 +286,7 @@ export class TopMenuBar {
         this.toast.add({
           severity: 'info',
           summary: 'Info',
-          detail: 'Schema fetched successfully!',
+          detail: `Schema "${schemaName}" fetched successfully!`,
           life: 3000,
         });
       }
