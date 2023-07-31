@@ -16,6 +16,7 @@ import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
 import {refDebounced} from '@vueuse/core';
+import {isObjectStructureEqual} from '@/helpers/compareObjectStructure';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -81,6 +82,14 @@ const nodesToDisplay = ref(computeTree().children);
 watch(storeToRefs(useSessionStore()).fileSchema, () => {
   currentExpandedElements.value = {};
   updateTree();
+});
+
+// recalculate the tree when the data structure changes, but not
+// single values (e.g. when a property is changed)
+watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
+  if (!isObjectStructureEqual(value, oldValue)) {
+    updateTree();
+  }
 });
 
 function updateData(subPath: Path, newValue: any) {
