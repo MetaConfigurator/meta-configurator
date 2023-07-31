@@ -4,6 +4,7 @@
 <template>
   <AceEditor data-format="json" v-if="settingsStore.settingsData.dataFormat === 'json'" />
   <AceEditor data-format="yaml" v-else-if="settingsStore.settingsData.dataFormat === 'yaml'" />
+  <AceEditor data-format="json" v-else />
 </template>
 
 <script setup>

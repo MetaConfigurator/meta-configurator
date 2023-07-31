@@ -10,14 +10,13 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import Ajv2020 from 'ajv/dist/2020';
-import {useDebounceFn, useThrottleFn, watchThrottled} from '@vueuse/core';
+import {useDebounceFn, watchThrottled} from '@vueuse/core';
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
 
-import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import type {ConfigManipulator} from '@/model/ConfigManipulator';
 import {ConfigManipulatorYaml} from '@/helpers/ConfigManipulatorYaml';
-import {useSettingsStore} from '@/store/settingsStore';
 import {errorService} from '@/main';
 
 const sessionStore = useSessionStore();
@@ -26,15 +25,15 @@ const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
 const props = defineProps<{
   dataFormat: string;
 }>();
-
+//
 const editor = ref();
 let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
 
 /**
- * Throttle time for schema validation in ms
+ * Debounce time for schema validation in ms
  */
-const SCHEMA_VALIDATION_THROTTLE_TIME = 5000;
+const SCHEMA_VALIDATION_DEBOUNCE_TIME = 2000;
 /**
  * Debounce time for writing changes to store in ms
  */
@@ -83,35 +82,14 @@ onMounted(() => {
         sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
         const fileContentString = editor.value.getValue();
 
-        // Current workaround until schema of schema editor works: just accept schema without validation
-        //fileData.value = JSON.parse(jsonString);
-        if (sessionStore.currentMode === SessionMode.SchemaEditor) {
-          try {
-            fileData.value = manipulator.parseFileContent(fileContentString);
-          } catch (e) {
-            errorService.onErrorThrottled(e);
-          }
-          return;
-        }
-
         try {
           const parsedContent = manipulator.parseFileContent(fileContentString);
-          if (useSettingsStore().settingsData.codeEditor.allowSchemaViolatingInput) {
-            fileData.value = parsedContent;
-          }
-          validateAgainstSchemaThrottled(parsedContent)
-            .then(valid => {
-              if (valid) {
-                fileData.value = parsedContent;
-              } else {
-                // TODO: show error in editor
-                errorService.onWarningThrottled(new Error('Invalid JSON according to the schema.'));
-                //TODO: more detailed error message
-              }
-            })
-            .catch(e => errorService.onErrorThrottled(e));
+          fileData.value = parsedContent;
+
+          validateAgainstSchemaDebounced(parsedContent);
         } catch (e) {
-          // Do nothing: showing the parse error in the editor is enough
+          // if file content can not be parsed, that is because of error in input
+          // Invalid JSON is already highlighted by Ace Editor -> no action needed here
         }
       },
       WRITE_DEBOUNCE_TIME,
@@ -119,9 +97,18 @@ onMounted(() => {
     )
   );
 
-  const validateAgainstSchemaThrottled = useThrottleFn((parsedContent: any) => {
-    return schemaValidationFunction.value(parsedContent);
-  }, SCHEMA_VALIDATION_THROTTLE_TIME);
+  const validateAgainstSchemaDebounced = useDebounceFn((parsedContent: any) => {
+    try {
+      const valid = schemaValidationFunction.value(parsedContent);
+      if (valid) {
+        useSessionStore().schemaErrorMessage = null;
+      } else {
+        errorService.onWarningThrottled(new Error('Invalid JSON according to the schema.'));
+      }
+    } catch (e) {
+      useSessionStore().schemaErrorMessage = e.message;
+    }
+  }, SCHEMA_VALIDATION_DEBOUNCE_TIME);
 
   editor.value.on('changeSelection', () => {
     if (currentSelectionIsForcedFromOutside) {

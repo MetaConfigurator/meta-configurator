@@ -7,6 +7,7 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
+import {nil} from 'ajv';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -35,6 +36,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
   );
+  const schemaErrorMessage: Ref<string | null> = ref<string | null>(null);
 
   const fileData: WritableComputedRef<any> = computed({
     // getter
@@ -169,6 +171,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     fileSchemaData,
     schemaAtPath,
     schemaAtCurrentPath,
+    schemaErrorMessage,
     dataAtPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     currentPath,
