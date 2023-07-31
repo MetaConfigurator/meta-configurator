@@ -103,7 +103,22 @@ onMounted(() => {
       if (valid) {
         useSessionStore().schemaErrorMessage = null;
       } else {
-        errorService.onWarningThrottled(new Error('Invalid JSON according to the schema.'));
+        const errors = schemaValidationFunction.value.errors;
+        let annotations = [];
+        for (const error of errors) {
+          const instancePath = error.instancePath;
+          const instancePathTranslated = convertAjvPathToPath(instancePath);
+          const relatedRow =
+            determineCursorPosition(editor.value.getValue(), instancePathTranslated).row - 1;
+          const message = error.message;
+          annotations.push({
+            row: relatedRow,
+            column: 0,
+            text: message,
+            type: 'warning',
+          });
+        }
+        editor.value.getSession().setAnnotations(annotations);
       }
     } catch (e) {
       useSessionStore().schemaErrorMessage = e.message;
@@ -152,6 +167,14 @@ onMounted(() => {
     {deep: true, throttle: READ_THROTTLE_TIME}
   );
 });
+
+function convertAjvPathToPath(path: string): Path {
+  let result = path.split('/');
+  if (result.length > 0 && result[0].length == 0) {
+    result = result.slice(1);
+  }
+  return result;
+}
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
