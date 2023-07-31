@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {watchThrottled} from '@vueuse/core';
+import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: string | undefined;
+  propertySchema: JsonSchema;
 }>();
 
 const emit = defineEmits<{
@@ -14,6 +16,13 @@ const emit = defineEmits<{
 }>();
 
 const valueProperty = ref<string | undefined>(props.propertyData);
+
+const placeHolderValue = computed(() => {
+  return props.propertySchema.examples && props.propertySchema.examples.length > 0
+    ? `Possible Examples: ${props.propertySchema.examples}`
+    : '';
+});
+
 watchThrottled(
   props,
   () => {
@@ -35,6 +44,7 @@ function updateValue() {
     :class="$style.tableInput"
     class="h-8"
     v-model="valueProperty"
+    :placeholder="placeHolderValue"
     @blur="updateValue"
     @keyup.enter="updateValue" />
 </template>

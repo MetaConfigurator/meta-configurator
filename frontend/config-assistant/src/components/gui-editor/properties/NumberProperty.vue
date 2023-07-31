@@ -10,6 +10,12 @@ const props = defineProps<{
   propertySchema: JsonSchema;
 }>();
 
+const placeHolderValue = computed(() => {
+  return props.propertySchema.examples && props.propertySchema.examples.length > 0
+    ? `Possible Examples: ${props.propertySchema.examples}`
+    : '';
+});
+
 const stepValue = computed(() => {
   return props.propertySchema.multipleOf ?? 0.1;
 });
@@ -61,6 +67,7 @@ const valueProperty = computed({
     :maxFractionDigits="20"
     showButtons
     buttonLayout="stacked"
+    :placeholder="placeHolderValue"
     :step="stepValue"
     :min="minValue"
     :max="maxValue"

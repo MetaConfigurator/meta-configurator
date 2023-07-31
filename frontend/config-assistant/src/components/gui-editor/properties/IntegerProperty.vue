@@ -30,6 +30,12 @@ const maxValue = computed(() => {
   }
 });
 
+const placeHolderValue = computed(() => {
+  return props.propertySchema.examples && props.propertySchema.examples.length > 0
+    ? `Possible Examples: ${props.propertySchema.examples}`
+    : '';
+});
+
 const emit = defineEmits<{
   (e: 'update_property_value', newValue: number): void;
 }>();
@@ -56,6 +62,7 @@ const valueProperty = computed({
     :use-grouping="false"
     showButtons
     buttonLayout="stacked"
+    :placeholder="placeHolderValue"
     :step="1"
     :min="minValue"
     :max="maxValue"
