@@ -22,7 +22,7 @@ export const useSettingsStore = defineStore('settings', () => {
   });
   const settingsSchemaData = ref({});
   const settingsSchema: Ref<TopLevelJsonSchema> = computed(
-    () => new TopLevelJsonSchema(settingsSchemaData.value, ['settings'])
+    () => new TopLevelJsonSchema(settingsSchemaData.value)
   );
 
   fetch('/src/settings/settingsSchema.json')
