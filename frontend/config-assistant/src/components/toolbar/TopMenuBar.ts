@@ -50,14 +50,14 @@ export class TopMenuBar {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
         command: () => {
-          this.sessionStore.fileEditorUndoManager.undo();
+          this.sessionStore.currentAceEditor.getSession().getUndoManager().undo();
         },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
         command: () => {
-          this.sessionStore.fileEditorUndoManager.redo();
+          this.sessionStore.currentAceEditor.getSession().getUndoManager().redo();
         },
       },
       {
@@ -133,14 +133,14 @@ export class TopMenuBar {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
         command: () => {
-          this.sessionStore.schemaEditorUndoManager.undo();
+          this.sessionStore.currentAceEditor.getSession().getUndoManager().undo();
         },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
         command: () => {
-          this.sessionStore.schemaEditorUndoManager.redo();
+          this.sessionStore.currentAceEditor.getSession().getUndoManager().redo();
         },
       },
       {
@@ -175,14 +175,14 @@ export class TopMenuBar {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
         command: () => {
-          this.sessionStore.settingEditorUndoManager.undo();
+          this.sessionStore.currentAceEditor.getSession().getUndoManager().undo();
         },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
         command: () => {
-          this.sessionStore.settingEditorUndoManager.redo();
+          this.sessionStore.currentAceEditor.getSession().getUndoManager().redo();
         },
       },
       {
