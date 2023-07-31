@@ -16,44 +16,37 @@ export class ConfigTreeNodeResolver {
    * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
    * the corresponding data.
    *
-   * @param name The name of the node. Use the schema's title for the root node.
    * @param schema The schema of the node.
    * @param parentSchema The schema of the parent node.
-   * @param parentPath The path of the parent node.
-   * @param subPath The path of the node relative to the parent node. Defaults to the empty path.
+   * @param absolutePath The path of the parent node.
+   * @param relativePath The path of the node relative to the parent node. Defaults to the empty path.
    * @param depth The depth of the node in the tree, starting with 0 for the root node.
    * @param nodeType The type of the node, e.g. {@link TreeNodeType.SCHEMA_PROPERTY} by default.
    */
   public createTreeNodeOfProperty(
-    name: PathElement,
     schema: JsonSchema,
     parentSchema?: JsonSchema,
-    parentPath: Array<PathElement> = [],
-    subPath: Path = [],
+    absolutePath: Array<PathElement> = [],
+    relativePath: Path = [],
     depth: number = 0,
     nodeType: ConfigDataTreeNodeType = TreeNodeType.SCHEMA_PROPERTY
   ): GuiEditorTreeNode {
-    if (!schema) {
-      throw new Error(`Schema for property ${name} is undefined`);
-    }
+    const name = absolutePath[absolutePath.length - 1] ?? '';
 
-    const path = subPath.concat(name);
-    const result = {
+    return {
       data: {
         name: name,
         schema: schema,
         parentSchema: parentSchema,
         depth: depth,
-        relativePath: path,
-        absolutePath: parentPath.concat(path),
+        relativePath: relativePath,
+        absolutePath: absolutePath,
       },
       type: nodeType,
-      key: pathToString(parentPath.concat(path)),
+      key: pathToString(absolutePath),
       children: [],
       leaf: this.isLeaf(schema, depth),
     };
-
-    return result;
   }
 
   private isLeaf(schema: JsonSchema, depth: number): boolean {
@@ -64,31 +57,29 @@ export class ConfigTreeNodeResolver {
   }
 
   public createChildNodesOfNode(guiEditorTreeNode: GuiEditorTreeNode): GuiEditorTreeNode[] {
-    return this.createChildNodes(
-      guiEditorTreeNode.data.name,
+    guiEditorTreeNode.children = this.createChildNodes(
       guiEditorTreeNode.data.schema,
-      guiEditorTreeNode.data.absolutePath.slice(0, -1),
-      guiEditorTreeNode.data.relativePath.slice(0, -1),
+      guiEditorTreeNode.data.absolutePath,
+      guiEditorTreeNode.data.relativePath,
       guiEditorTreeNode.data.depth
     );
+    return guiEditorTreeNode.children as GuiEditorTreeNode[];
   }
 
   private createChildNodes(
-    name: PathElement,
     schema: JsonSchema,
-    parentPath: Array<PathElement>,
-    subPath: Path = [],
+    absolutePath: Array<PathElement>,
+    relativePath: Path = [],
     depth = 0
   ): GuiEditorTreeNode[] {
     const depthLimit = useSettingsStore().settingsData.guiEditor.maximumDepth;
-    const path = depth == 0 ? subPath : subPath.concat(name); // don't add root name to path
 
     let children: GuiEditorTreeNode[] = [];
     if (schema.hasType('object') && depth < depthLimit) {
-      children = this.createObjectChildrenTreeNodes(parentPath, path, schema, depth);
+      children = this.createObjectChildrenTreeNodes(absolutePath, relativePath, schema, depth);
     }
     if (schema.hasType('array') && depth < depthLimit) {
-      children = this.createArrayChildrenTreeNodes(parentPath, path, schema, depth);
+      children = this.createArrayChildrenTreeNodes(absolutePath, relativePath, schema, depth);
     }
 
     return children;
@@ -137,9 +128,9 @@ export class ConfigTreeNodeResolver {
       key => !schema.isRequired(key) && !schema.properties[key].deprecated
     );
     const additionalProperties = this.createDataPropertiesChildNodes(
+      parentPath,
       path,
       schema,
-      parentPath,
       depth,
       key => !schema.properties || !schema.properties[key]
     ); // filter out properties that are already in the schema
@@ -163,7 +154,7 @@ export class ConfigTreeNodeResolver {
     parentPath: Array<PathElement>,
     depth: number
   ) {
-    const dataProperties = this.createDataPropertiesChildNodes(path, schema, parentPath, depth);
+    const dataProperties = this.createDataPropertiesChildNodes(parentPath, path, schema, depth);
     const schemaProperties = this.createPropertiesChildNodes(
       schema,
       parentPath,
@@ -184,11 +175,10 @@ export class ConfigTreeNodeResolver {
   ) {
     const schemaProperties = this.createPropertiesChildNodes(schema, parentPath, path, depth);
     const dataProperties = this.createDataPropertiesChildNodes(
+      parentPath,
       path,
       schema,
-      parentPath,
       depth,
-      // filter out properties that are already in the schema
       key => !schema.properties || !schema.properties[key]
     );
     return schemaProperties.concat(dataProperties);
@@ -204,18 +194,24 @@ export class ConfigTreeNodeResolver {
     return Object.entries(schema.properties)
       .filter(([key]) => filter(key))
       .map(([key, value]) =>
-        this.createTreeNodeOfProperty(key, value, schema, parentPath, path, depth + 1)
+        this.createTreeNodeOfProperty(
+          value,
+          schema,
+          parentPath.concat(key),
+          path.concat(key),
+          depth + 1
+        )
       );
   }
 
   private createDataPropertiesChildNodes(
-    path: Array<PathElement>,
+    absolutePath: Path,
+    relativePath: Path,
     schema: JsonSchema,
-    parentPath: Array<PathElement>,
     depth: number,
     filter: (key: string) => boolean = () => true
   ) {
-    const data = useSessionStore().dataAtPath(parentPath.concat(path));
+    const data = useSessionStore().dataAtPath(absolutePath);
     if (!data) {
       return [];
     }
@@ -225,11 +221,10 @@ export class ConfigTreeNodeResolver {
       .map(([key]) => {
         if (schema.properties && schema.properties[key]) {
           return this.createTreeNodeOfProperty(
-            key,
             schema.properties[key],
             schema,
-            parentPath,
-            path,
+            absolutePath.concat(key),
+            relativePath.concat(key),
             depth + 1
           );
         }
@@ -245,11 +240,10 @@ export class ConfigTreeNodeResolver {
         });
 
         return this.createTreeNodeOfProperty(
-          key,
           childSchema,
           schema,
-          parentPath,
-          path,
+          absolutePath.concat(key),
+          relativePath.concat(key),
           depth + 1,
           type
         );
@@ -257,48 +251,48 @@ export class ConfigTreeNodeResolver {
   }
 
   private createArrayChildrenTreeNodes(
-    parentPath: Array<PathElement>,
-    path: Array<PathElement>,
+    absolutePath: Path,
+    relativePath: Path,
     schema: JsonSchema,
     depth: number
   ) {
-    const data = useSessionStore().dataAtPath(parentPath.concat(path));
+    const data = useSessionStore().dataAtPath(absolutePath);
     let children: GuiEditorTreeNode[] = [];
     if (Array.isArray(data)) {
       children = data.map((value: any, index: number) => {
         return this.createTreeNodeOfProperty(
-          index,
           schema.items,
           schema,
-          parentPath,
-          path,
+          absolutePath.concat(index),
+          relativePath.concat(index),
           depth + 1
         );
       });
     }
     return children.concat(
-      this.createAddItemTreeNode(parentPath, path, schema, depth + 1, children)
+      this.createAddItemTreeNode(absolutePath, relativePath, schema, depth + 1, children)
     );
   }
 
   private createAddItemTreeNode(
-    parentPath: Path,
-    path: Path,
+    absolutePath: Path,
+    relativePath: Path,
     schema: JsonSchema,
     depth: number,
     children: GuiEditorTreeNode[]
   ): GuiEditorTreeNode {
-    const pathWithIndex = path.concat(children.length);
+    const pathWithIndex = relativePath.concat(children.length);
+    const absolutePathWithIndex = absolutePath.concat(children.length);
     return {
       data: {
         schema: schema.items,
         depth: depth,
         relativePath: pathWithIndex,
-        absolutePath: parentPath.concat(pathWithIndex),
+        absolutePath: absolutePathWithIndex,
         name: children.length,
       },
       type: TreeNodeType.ADD_ITEM,
-      key: pathToString(parentPath.concat(pathWithIndex)),
+      key: pathToString(absolutePathWithIndex),
       children: [],
       leaf: true,
       loaded: true,

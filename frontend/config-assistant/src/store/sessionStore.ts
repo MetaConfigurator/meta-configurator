@@ -25,11 +25,6 @@ export enum ChangeResponsible {
  * Store for common data.
  */
 export const useSessionStore = defineStore('commonStore', () => {
-  /**
-   * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
-   */
-  const currentPath: Ref<Path> = ref<Path>([]);
-  const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
@@ -103,13 +98,17 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
+  /**
+   * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
+   */
+  const currentPath: Ref<Path> = ref<Path>([fileSchema.value.title ?? 'root']);
+  const currentSelectedElement: Ref<Path> = ref<Path>([fileSchema.value.title ?? 'root']);
+
   function schemaAtPath(path: Path): JsonSchema {
-    return fileSchema.value.subSchemaAt(path) ?? new JsonSchema({});
+    return fileSchema.value.subSchemaAt(path.slice(1)) ?? new JsonSchema({});
   }
 
-  const schemaAtCurrentPath: Ref<JsonSchema> = computed(
-    () => fileSchema.value.subSchemaAt(currentPath.value) ?? new JsonSchema({})
-  );
+  const schemaAtCurrentPath: Ref<JsonSchema> = computed(() => schemaAtPath(currentPath.value));
 
   /**
    * Returns the data at the given path.
@@ -119,7 +118,10 @@ export const useSessionStore = defineStore('commonStore', () => {
   function dataAtPath(path: Path): any {
     let currentData: any = fileData.value;
 
-    for (const key of path) {
+    // skip the first element, which is the root
+    const pathWithoutRoot = path.slice(1);
+
+    for (const key of pathWithoutRoot) {
       if (!currentData[key]) {
         return undefined;
       }
@@ -137,12 +139,16 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   }
 
+  function resetPathToRoot(): void {
+    currentPath.value = [fileSchema.value.title ?? 'root'];
+  }
+
   function updateCurrentSelectedElement(proposedElement: Path): void {
     currentSelectedElement.value = proposedElement;
   }
 
   function updateDataAtPath(path: Path, newValue: any): void {
-    const pathAsString = pathToString(path);
+    const pathAsString = pathToString(path.slice(1));
     _.set(fileData.value, pathAsString!!, newValue);
   }
 
@@ -172,6 +178,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     dataAtPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     currentPath,
+    resetPathToRoot,
     currentSelectedElement,
     currentExpandedElements,
     isExpanded,

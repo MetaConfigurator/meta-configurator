@@ -43,8 +43,7 @@ router.beforeEach((to, from, next) => {
 
   useSessionStore().lastChangeResponsible = ChangeResponsible.Routing;
   useSessionStore().currentMode = to.meta.sessionMode as SessionMode;
-  console.log('new mode ', useSessionStore().currentMode);
-  useSessionStore().currentPath = [];
+  useSessionStore().resetPathToRoot();
   next();
 });
 
