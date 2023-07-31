@@ -3,7 +3,6 @@ import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
-
 import {newEmptyFile} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
@@ -20,6 +19,7 @@ export class TopMenuBar {
     label: string;
     icon: string;
     url: string | undefined;
+    key: string | undefined;
   }[] = [];
   private toast: any;
   private onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
@@ -42,15 +42,14 @@ export class TopMenuBar {
       const data = await response.json();
       const schemas = data.schemas;
 
-      schemas.forEach((schema: {name: string; url: string}) => {
+      schemas.forEach((schema: {name: string; url: string; key: string}) => {
         this.fetchedSchemas.push({
           label: schema.name,
           icon: 'pi pi-fw pi-code',
           url: schema.url,
+          key: schema.key,
         });
       });
-
-      // Show the dialog with the fetched schemas
     } catch (error) {
       // Handle the error if there's an issue fetching the schema.
       errorService.onError(error);
@@ -259,26 +258,15 @@ export class TopMenuBar {
   }
   public showDialog = ref(false);
 
-  /*public openDialog = (): void => {
-    this.fetchWebSchemas();
-    console.log('openDialog function called');
-    // Set the message for the dialog
-    this.dialogMessage.value = 'Which Schema you want to open?';
-    // Show the dialog
-    this.showDialog.value = true;
-  };*/
-
   public async selectSchema(schemaURL: string): Promise<void> {
     try {
       // Fetch the schema content from the selected schemaURL.
-      console.log('fetching from URL', schemaURL);
       const response = await fetch(schemaURL);
       const schemaContent = await response.json();
       const schemaName = schemaContent.title || 'Unknown Schema';
       useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
       // Update the schemaData in the dataStore with the fetched schema content.
       useDataStore().schemaData = schemaContent;
-      console.log('Fetched Schema:', schemaContent);
       // Always clear the data without prompting the user.
       newEmptyFile('Do you want to clear the existing data?');
 
@@ -286,7 +274,28 @@ export class TopMenuBar {
         this.toast.add({
           severity: 'info',
           summary: 'Info',
-          detail: `Schema "${schemaName}" fetched successfully!`,
+          detail: `"${schemaName}" fetched successfully!`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  }
+  public fetchExampleSchema(schemaKey: string): void {
+    try {
+      const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      const schemaName = selectedSchema.label || 'Unknown Schema';
+      useDataStore().schemaData = selectedSchema?.schema;
+      newEmptyFile('Do you want to clear the existing data?');
+
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: `"${schemaName}" fetched successfully!`,
           life: 3000,
         });
       }

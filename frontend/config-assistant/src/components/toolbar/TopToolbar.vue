@@ -19,6 +19,7 @@ import {
   newEmptyFile,
 } from '@/components/toolbar/clearContent';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {errorService} from '@/main';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -33,6 +34,7 @@ const selectedSchema = ref<{
   command: () => void;
   schema: JsonSchema;
   url: string | undefined;
+  key: string | undefined;
 }>(null);
 
 const showFetchedSchemas = ref(false);
@@ -104,18 +106,15 @@ const topMenuBar = new TopMenuBar(
   handleFromOurExampleClick
 );
 async function handleFromWebClick(): Promise<void> {
-  console.log('Before fetching schemas:', topMenuBar.fetchedSchemas);
   try {
     await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
-    console.log('After fetching schemas:', topMenuBar.fetchedSchemas);
     showFetchedSchemas.value = true;
     topMenuBar.showDialog.value = true;
   } catch (error) {
-    console.error('Error fetching schemas:', error);
-    // Handle errors if needed
+    // Handle the error if there's an issue fetching the schema.
+    errorService.onError(error);
   }
 }
-
 function handleFromOurExampleClick() {
   // Set the fetchedSchemas to your schemaCollection array
   topMenuBar.fetchedSchemas = schemaCollection;
@@ -123,38 +122,41 @@ function handleFromOurExampleClick() {
   showFetchedSchemas.value = true;
   topMenuBar.showDialog.value = true;
 }
-
 watch(selectedSchema, async newSelectedSchema => {
-  console.log('newSelectedSchema', newSelectedSchema);
-  if (newSelectedSchema) {
-    // If a schema is selected, call the selectSchema function with the schema's URL
+  if (!newSelectedSchema) {
+    return;
+  }
+  if (newSelectedSchema.url) {
     try {
       await topMenuBar.selectSchema(newSelectedSchema.url);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-
       newEmptyFile('Do you want to clear current config data ?');
     } catch (error) {
-      console.error('Error fetching schema:', error);
-      // Handle errors if needed
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  } else if (newSelectedSchema.key) {
+    try {
+      topMenuBar.fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
+      showFetchedSchemas.value = true;
+      topMenuBar.showDialog.value = false;
+      newEmptyFile('Do you want to clear current config data ?');
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
     }
   }
 });
-
 function handleAccept() {
   clearEditor();
   // Hide the confirmation dialog
   showConfirmation.value = false;
 }
-
 function handleReject() {
-  // User accepted the confirmation, handle keeping the existing data
-
-  console.log('selected schema', selectedSchema.value);
   // Hide the confirmation dialog
   showConfirmation.value = false;
 }
-
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
 const settingsMenuItems = topMenuBar.settingsMenuItems;
@@ -171,7 +173,6 @@ function getMenuItems(): MenuItem[] {
       return [];
   }
 }
-
 const items = ref(pageSelectionMenuItems);
 const menu = ref();
 const toggle = event => {
@@ -183,7 +184,6 @@ const itemMenuRefs = ref(new Map<string, Menu>());
 function setItemMenuRef(item: MenuItem, menu: Menu) {
   itemMenuRefs.value.set(getLabelOfItem(item), menu);
 }
-
 function handleItemButtonClick(item: MenuItem, event: Event) {
   if (item.items) {
     const menu = itemMenuRefs.value.get(getLabelOfItem(item));
@@ -192,7 +192,6 @@ function handleItemButtonClick(item: MenuItem, event: Event) {
     item.command({item, originalEvent: event});
   }
 }
-
 function getLabelOfItem(item: MenuItem): string {
   if (!item.label) {
     return;
