@@ -14,6 +14,7 @@ import {errorService} from '@/main';
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
+  sessionStore = useSessionStore();
   get fileEditorMenuItems() {
     return [
       {
@@ -48,12 +49,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.fileEditorUndoManager.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.fileEditorUndoManager.redo();
+        },
       },
       {
         separator: true,
@@ -127,12 +132,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.schemaEditorUndoManager.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.schemaEditorUndoManager.redo();
+        },
       },
       {
         separator: true,
@@ -165,12 +174,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.settingEditorUndoManager.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.settingEditorUndoManager.redo();
+        },
       },
       {
         separator: true,

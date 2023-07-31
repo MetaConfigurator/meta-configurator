@@ -7,6 +7,7 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
+import {UndoManager} from 'brace';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -35,6 +36,9 @@ export const useSessionStore = defineStore('commonStore', () => {
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
   );
+  const fileEditorUndoManager: Ref<UndoManager> = ref(new UndoManager());
+  const schemaEditorUndoManager: Ref<UndoManager> = ref(new UndoManager());
+  const settingEditorUndoManager: Ref<UndoManager> = ref(new UndoManager());
 
   const fileData: WritableComputedRef<any> = computed({
     // getter
@@ -181,5 +185,8 @@ export const useSessionStore = defineStore('commonStore', () => {
     updateCurrentPath,
     updateCurrentSelectedElement,
     updateDataAtPath,
+    fileEditorUndoManager,
+    schemaEditorUndoManager,
+    settingEditorUndoManager,
   };
 });

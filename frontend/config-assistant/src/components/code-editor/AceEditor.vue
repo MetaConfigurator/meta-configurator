@@ -75,6 +75,18 @@ onMounted(() => {
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
 
+  switch (sessionStore.currentMode) {
+    case SessionMode.FileEditor:
+      editor.value.getSession().setUndoManager(sessionStore.fileEditorUndoManager);
+      break;
+    case SessionMode.SchemaEditor:
+      editor.value.getSession().setUndoManager(sessionStore.schemaEditorUndoManager);
+      break;
+    case SessionMode.Settings:
+      editor.value.getSession().setUndoManager(sessionStore.settingEditorUndoManager);
+      break;
+  }
+
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on(
     'change',
