@@ -1,5 +1,5 @@
-import {computed} from 'vue/dist/vue';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {computed} from 'vue';
 
 const props = defineProps<{
   propertySchema: JsonSchema;
