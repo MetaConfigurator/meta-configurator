@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, Ref, ref } from "vue";
+import {computed, onMounted, Ref, ref} from 'vue';
 import {storeToRefs} from 'pinia';
-import type { Editor, Position } from "brace";
+import type {Editor, Position} from 'brace';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
@@ -19,8 +19,8 @@ import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator
 import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
 import {useSettingsStore} from '@/store/settingsStore';
 import {errorService} from '@/main';
-import { CodeEditorWrapperAce } from "@/components/code-editor/CodeEditorWrapperAce";
-import type { CodeEditorWrapper } from "@/components/code-editor/CodeEditorWrapper";
+import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
+import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 
 const sessionStore = useSessionStore();
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
@@ -34,7 +34,7 @@ const editor: Ref<Editor> = ref();
 let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
 
-let editorWrapper: CodeEditorWrapper
+let editorWrapper: CodeEditorWrapper;
 
 /**
  * Throttle time for schema validation in ms
@@ -69,7 +69,7 @@ onMounted(() => {
   editor.value = ace.edit('javascript-editor');
   editorWrapper = new CodeEditorWrapperAce(editor.value);
   useSessionStore().currentEditorWrapper = editorWrapper;
-  console.log("mounted ace editor with new editorwrapper")
+  console.log('mounted ace editor with new editorwrapper');
 
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
@@ -83,16 +83,13 @@ onMounted(() => {
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
 
-  console.log('new Instance was created', props.editorMode);
-  useSessionStore().currentAceEditor = editor.value;
-
   // Listen to changes on AceEditor and update store accordingly
   editor.value?.on(
     'change',
     useDebounceFn(
       () => {
         sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-        const fileContentString = editor.value.getValue();
+        const fileContentString = editor.value?.getValue();
 
         // Current workaround until schema of schema editor works: just accept schema without validation
         //fileData.value = JSON.parse(jsonString);
