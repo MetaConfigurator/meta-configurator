@@ -22,5 +22,5 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: frontend/config-assistant/build # The folder the action should deploy.
+          folder: frontend/config-assistant/dist # The folder the action should deploy.
           branch: gh-pages
