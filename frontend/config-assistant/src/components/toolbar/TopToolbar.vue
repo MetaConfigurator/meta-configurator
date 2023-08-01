@@ -97,14 +97,7 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
 ];
 const toast = useToast();
-const topMenuBar = new TopMenuBar(
-  event => {
-    handleMenuClick(event);
-  },
-  toast,
-  handleFromWebClick,
-  handleFromOurExampleClick
-);
+const topMenuBar = new TopMenuBar(toast, handleFromWebClick, handleFromOurExampleClick);
 async function handleFromWebClick(): Promise<void> {
   try {
     await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
@@ -224,8 +217,14 @@ function getLabelOfItem(item: MenuItem): string {
   </Dialog>
   <Dialog v-model:visible="showConfirmation">
     <h3>{{ confirmationDialogMessage }}</h3>
-    <Button label="Yes" @click="handleAccept" class="mr-4 mt-4 button-small" />
-    <Button label="No" @click="handleReject" class="mr-4 mt-4 button-small" />
+    <Button
+      label="Yes"
+      @click="handleAccept"
+      class="dialog-button-mr dialog-button-mt button-small" />
+    <Button
+      label="No"
+      @click="handleReject"
+      class="dialog-button-mr dialog-button-mt button-small" />
   </Dialog>
 
   <Toolbar class="h-10 no-padding">
@@ -273,7 +272,7 @@ function getLabelOfItem(item: MenuItem): string {
       </div>
     </template>
     <template #end>
-      <div class="flex space-x-10 mr-4">
+      <div class="flex space-x-10 mr-3">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
           <p class="font-semibold text-lg">ConfigAssistant</p>
@@ -292,6 +291,16 @@ function getLabelOfItem(item: MenuItem): string {
 </template>
 
 <style scoped>
+.dialog-button-mr {
+  margin-right: 1rem;
+}
+.dialog-button-mt {
+  margin-top: 1rem;
+}
+.button-small {
+  font-size: 15px;
+  padding: 0.5rem 1rem;
+}
 .no-padding {
   padding: 0 !important;
 }

@@ -25,7 +25,6 @@ export class TopMenuBar {
   private onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
   private onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
   constructor(
-    public onMenuItemClicked: (event: MenuItemCommandEvent) => void,
     toast = null,
     onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
     onFromOurExampleClick: () => void
