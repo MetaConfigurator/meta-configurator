@@ -292,19 +292,6 @@ function getLabelOfItem(item: MenuItem): string {
 </template>
 
 <style scoped>
-.mr-4 {
-  margin-right: 1rem; /* You can adjust the value (1rem = 16px) to your desired margin size */
-}
-.mt-4 {
-  margin-top: 1rem; /* You can adjust the value (1rem = 16px) to your desired margin size */
-}
-.button-small {
-  font-size: 15px; /* Adjust the font size to change the button size */
-  padding: 0.5rem 1rem; /* Adjust the padding to change the button size */
-  /* You can add other styles like height and width to control the button size further */
-}
-</style>
-<style scoped>
 .no-padding {
   padding: 0 !important;
 }
