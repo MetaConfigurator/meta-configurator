@@ -217,14 +217,8 @@ function getLabelOfItem(item: MenuItem): string {
   </Dialog>
   <Dialog v-model:visible="showConfirmation">
     <h3>{{ confirmationDialogMessage }}</h3>
-    <Button
-      label="Yes"
-      @click="handleAccept"
-      class="dialog-button-mr dialog-button-mt button-small" />
-    <Button
-      label="No"
-      @click="handleReject"
-      class="dialog-button-mr dialog-button-mt button-small" />
+    <Button label="Yes" @click="handleAccept" class="dialog-button" />
+    <Button label="No" @click="handleReject" class="dialog-button" />
   </Dialog>
 
   <Toolbar class="h-10 no-padding">
@@ -291,20 +285,15 @@ function getLabelOfItem(item: MenuItem): string {
 </template>
 
 <style scoped>
-.dialog-button-mr {
+.dialog-button {
   margin-right: 1rem;
-}
-.dialog-button-mt {
   margin-top: 1rem;
-}
-.button-small {
   font-size: 15px;
   padding: 0.5rem 1rem;
 }
 .no-padding {
   padding: 0 !important;
 }
-
 .main-menu-button {
   font-weight: bold;
   font-size: large;
@@ -314,7 +303,6 @@ function getLabelOfItem(item: MenuItem): string {
   padding-bottom: 0.3rem !important;
   min-width: 13rem !important;
 }
-
 .toolbar-button {
   font-weight: bold;
   font-size: large;
