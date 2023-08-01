@@ -250,10 +250,10 @@ export class TopMenuBar {
     downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
-    newEmptyFile('Are you sure that you want to clear the editor?');
+    newEmptyFile('Are you sure that you want to clear the File editor?');
   }
   private clearSchemaEditor(): void {
-    clearSchemaEditor();
+    newEmptyFile('Are you sure that you want to clear the Schema editor?');
   }
   public showDialog = ref(false);
 
