@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, Ref, ref} from 'vue';
 import {storeToRefs} from 'pinia';
-import type {Position} from 'brace';
+import type {Editor, Position} from 'brace';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
@@ -12,12 +12,15 @@ import 'brace/theme/monokai';
 import Ajv2020 from 'ajv/dist/2020';
 import {useDebounceFn, watchThrottled} from '@vueuse/core';
 import type {Path} from '@/model/path';
-import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
+import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import type {ConfigManipulator} from '@/model/ConfigManipulator';
-import {ConfigManipulatorYaml} from '@/helpers/ConfigManipulatorYaml';
+import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
+import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
+import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
+import {useSettingsStore} from '@/store/settingsStore';
 import {errorService} from '@/main';
+import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
+import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 
 const sessionStore = useSessionStore();
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
@@ -25,10 +28,13 @@ const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
 const props = defineProps<{
   dataFormat: string;
 }>();
-//
-const editor = ref();
+
+let editor: Ref<Editor>;
+
 let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
+
+let editorWrapper: CodeEditorWrapper;
 
 /**
  * Debounce time for schema validation in ms
@@ -59,7 +65,10 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
 }
 
 onMounted(() => {
-  editor.value = ace.edit('javascript-editor');
+  editor = ref(ace.edit('javascript-editor'));
+
+  editorWrapper = new CodeEditorWrapperAce(editor.value);
+  useSessionStore().currentEditorWrapper = editorWrapper;
 
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');

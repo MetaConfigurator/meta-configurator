@@ -1,6 +1,6 @@
-import {useDataStore} from '@/store/dataStore';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
+import {useDataStore} from '@/store/dataStore';
 
 export const showConfirmation = ref(false);
 export const confirmationDialogMessage = ref('');

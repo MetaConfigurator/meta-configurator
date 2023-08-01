@@ -6,15 +6,16 @@ import {useDataStore} from '@/store/dataStore';
 import {newEmptyFile} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
+import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
+  sessionStore = useSessionStore();
   public fetchedSchemas: {
     label: string;
     icon: string;
@@ -89,12 +90,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.redo();
+        },
       },
       {
         separator: true,
@@ -167,12 +172,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.redo();
+        },
       },
       {
         separator: true,
@@ -205,12 +214,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.redo();
+        },
       },
       {
         separator: true,

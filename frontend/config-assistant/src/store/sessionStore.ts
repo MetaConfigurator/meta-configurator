@@ -7,6 +7,8 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
+import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
+import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
 import {nil} from 'ajv';
 
 export enum SessionMode {
@@ -36,6 +38,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
   );
+  const currentEditorWrapper: Ref<CodeEditorWrapper> = ref(new CodeEditorWrapperUninitialized());
   const schemaErrorMessage: Ref<string | null> = ref<string | null>(null);
 
   const fileData: WritableComputedRef<any> = computed({
@@ -184,5 +187,6 @@ export const useSessionStore = defineStore('commonStore', () => {
     updateCurrentPath,
     updateCurrentSelectedElement,
     updateDataAtPath,
+    currentEditorWrapper,
   };
 });
