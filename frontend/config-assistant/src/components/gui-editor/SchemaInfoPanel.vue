@@ -3,6 +3,8 @@ import {computed, ref} from 'vue';
 import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import {useSessionStore} from '../../store/sessionStore';
+import {generateTooltipText} from '@/helpers/propertyTooltipGenerator';
 
 const props = defineProps<{
   schema: ref<TopLevelJsonSchema>;
@@ -32,6 +34,9 @@ const schemaInformation = computed(() => {
       <p v-for="info in schemaInformation" :key="info.title">
         <span class="font-semibold">{{ info.title }}: </span>
         {{ info.value }}
+      </p>
+      <p v-if="useSessionStore().schemaErrorMessage != null" class="text-red-700">
+        Schema Error: {{ useSessionStore().schemaErrorMessage }}
       </p>
     </AccordionTab>
   </Accordion>

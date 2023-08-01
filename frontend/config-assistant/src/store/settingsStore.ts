@@ -10,11 +10,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const settingsData = ref({
     dataFormat: 'json',
     guiEditorOnRightSide: true,
-    codeEditor: {
-      allowSchemaViolatingInput: true,
-    },
     guiEditor: {
-      elementNavigationWithSeparateButton: false,
       maximumDepth: 3,
       propertySorting: 'dataOrder',
     },
