@@ -3,10 +3,13 @@ import {ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {watchThrottled} from '@vueuse/core';
+import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
+import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: string | undefined;
+  propertySchema: JsonSchema;
 }>();
 
 const emit = defineEmits<{
@@ -14,6 +17,7 @@ const emit = defineEmits<{
 }>();
 
 const valueProperty = ref<string | undefined>(props.propertyData);
+
 watchThrottled(
   props,
   () => {
@@ -35,6 +39,7 @@ function updateValue() {
     :class="$style.tableInput"
     class="h-8"
     v-model="valueProperty"
+    :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     @blur="updateValue"
     @keyup.enter="updateValue" />
 </template>
