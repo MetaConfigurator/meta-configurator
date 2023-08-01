@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import { computed, onMounted, Ref, ref } from "vue";
 import {storeToRefs} from 'pinia';
-import type {Position} from 'brace';
+import type { Editor, Position } from "brace";
 import * as ace from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
@@ -12,25 +12,29 @@ import 'brace/theme/monokai';
 import Ajv2020 from 'ajv/dist/2020';
 import {useDebounceFn, useThrottleFn, watchThrottled} from '@vueuse/core';
 import type {Path} from '@/model/path';
-import {ConfigManipulatorJson} from '@/helpers/ConfigManipulatorJson';
+import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
 import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
-import type {ConfigManipulator} from '@/model/ConfigManipulator';
-import {ConfigManipulatorYaml} from '@/helpers/ConfigManipulatorYaml';
+import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
+import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
 import {useSettingsStore} from '@/store/settingsStore';
 import {errorService} from '@/main';
+import { CodeEditorWrapperAce } from "@/components/code-editor/CodeEditorWrapperAce";
+import type { CodeEditorWrapper } from "@/components/code-editor/CodeEditorWrapper";
 
 const sessionStore = useSessionStore();
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
 
 const props = defineProps<{
   dataFormat: string;
-  editorMode: string;
 }>();
 
-const editor = ref();
+const editor: Ref<Editor> = ref();
+
 let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
+
+let editorWrapper: CodeEditorWrapper
 
 /**
  * Throttle time for schema validation in ms
@@ -63,15 +67,18 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
 
 onMounted(() => {
   editor.value = ace.edit('javascript-editor');
+  editorWrapper = new CodeEditorWrapperAce(editor.value);
+  useSessionStore().currentEditorWrapper = editorWrapper;
+  console.log("mounted ace editor with new editorwrapper")
 
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
   } else if (props.dataFormat == 'yaml') {
-    editor.value.getSession().setMode('ace/mode/yaml');
+    editor.value?.getSession().setMode('ace/mode/yaml');
   }
 
-  editor.value.setTheme('ace/theme/clouds');
-  editor.value.setShowPrintMargin(false);
+  editor.value?.setTheme('ace/theme/clouds');
+  editor.value?.setShowPrintMargin(false);
 
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
@@ -80,7 +87,7 @@ onMounted(() => {
   useSessionStore().currentAceEditor = editor.value;
 
   // Listen to changes on AceEditor and update store accordingly
-  editor.value.on(
+  editor.value?.on(
     'change',
     useDebounceFn(
       () => {
@@ -127,13 +134,13 @@ onMounted(() => {
     return schemaValidationFunction.value(parsedContent);
   }, SCHEMA_VALIDATION_THROTTLE_TIME);
 
-  editor.value.on('changeSelection', () => {
+  editor.value?.on('changeSelection', () => {
     if (currentSelectionIsForcedFromOutside) {
       // we do not need to consider the event and send updates if the selection was forced from outside
       return;
     }
     try {
-      let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
+      let newPath = determinePath(editor.value!!.getValue(), editor.value!!.getCursorPosition());
       sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
       sessionStore.currentSelectedElement = newPath;
     } catch (e) {
@@ -159,7 +166,7 @@ onMounted(() => {
         if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
           currentSelectionIsForcedFromOutside = true;
           updateCursorPositionBasedOnPath(
-            editor.value.getValue(),
+            editor.value!!.getValue(),
             sessionStore.currentSelectedElement
           );
           currentSelectionIsForcedFromOutside = false;
@@ -174,23 +181,23 @@ function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
   currentSelectionIsForcedFromOutside = true;
   const newEditorContent = manipulator.stringifyContentObject(configData);
-  editor.value.setValue(newEditorContent);
+  editor.value!!.setValue(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
   currentSelectionIsForcedFromOutside = false;
 }
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {
   let position = determineCursorPosition(editorContent, currentPath);
-  editor.value.gotoLine(position.row, position.column);
+  editor.value!!.gotoLine(position.row, position.column);
 }
 
 function determineCursorPosition(editorContent: string, currentPath: Path): Position {
   let index = manipulator.determineCursorPosition(editorContent, currentPath);
-  return editor.value.session.doc.indexToPosition(index, 0);
+  return editor.value!!.session.doc.indexToPosition(index, 0);
 }
 
 function determinePath(editorContent: string, cursorPosition: Position): Path {
-  let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
+  let targetCharacter = editor.value!!.session.doc.positionToIndex(cursorPosition, 0);
   return manipulator.determinePath(editorContent, targetCharacter);
 }
 </script>

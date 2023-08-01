@@ -13,6 +13,10 @@ import router from '@/router';
 import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
 import {useSettingsStore} from '@/store/settingsStore';
 
+const props = defineProps<{
+  editorMode: string;
+}>();
+
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
   if (!useSettingsStore().settingsData.guiEditorOnRightSide) {
