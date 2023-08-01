@@ -20,6 +20,7 @@ import {
 } from '@/components/toolbar/clearContent';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
+import {useConfirm} from 'primevue/useconfirm';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -97,6 +98,7 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
 ];
 const toast = useToast();
+
 const topMenuBar = new TopMenuBar(toast, handleFromWebClick, handleFromOurExampleClick);
 async function handleFromWebClick(): Promise<void> {
   try {
@@ -141,15 +143,7 @@ watch(selectedSchema, async newSelectedSchema => {
     }
   }
 });
-function handleAccept() {
-  clearEditor();
-  // Hide the confirmation dialog
-  showConfirmation.value = false;
-}
-function handleReject() {
-  // Hide the confirmation dialog
-  showConfirmation.value = false;
-}
+
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
 const settingsMenuItems = topMenuBar.settingsMenuItems;
@@ -214,11 +208,6 @@ function getLabelOfItem(item: MenuItem): string {
         <!-- Add a slot for the search input -->
       </Listbox>
     </div>
-  </Dialog>
-  <Dialog v-model:visible="showConfirmation">
-    <h3>{{ confirmationDialogMessage }}</h3>
-    <Button label="Yes" @click="handleAccept" class="dialog-button" />
-    <Button label="No" @click="handleReject" class="dialog-button" />
   </Dialog>
 
   <Toolbar class="h-10 no-padding">
