@@ -46,7 +46,6 @@ const READ_THROTTLE_TIME = 100;
 const schemaValidationFunction = computed(() => {
   const ajv = new Ajv2020({
     strict: false,
-    strictRequired: true,
   });
   return ajv.compile(useSessionStore().fileSchemaData);
 });
