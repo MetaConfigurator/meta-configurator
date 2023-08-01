@@ -3,7 +3,7 @@ import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
 import type {PathElement} from '@/model/path';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {placeHolderValue} from '@/components/gui-editor/properties/PlaceHolderForExamples';
+import {placeHolderValue} from '@/helpers/PlaceHolderForExamples';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -62,7 +62,7 @@ const valueProperty = computed({
     :maxFractionDigits="20"
     showButtons
     buttonLayout="stacked"
-    :placeholder="placeHolderValue()"
+    :placeholder="placeHolderValue(props.propertySchema)"
     :step="stepValue"
     :min="minValue"
     :max="maxValue"

@@ -3,7 +3,7 @@ import {ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {watchThrottled} from '@vueuse/core';
-import {placeHolderValue} from '@/components/gui-editor/properties/PlaceHolderForExamples';
+import {placeHolderValue} from '@/helpers/PlaceHolderForExamples';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{
@@ -39,7 +39,7 @@ function updateValue() {
     :class="$style.tableInput"
     class="h-8"
     v-model="valueProperty"
-    :placeholder="placeHolderValue()"
+    :placeholder="placeHolderValue(props.propertySchema)"
     @blur="updateValue"
     @keyup.enter="updateValue" />
 </template>
