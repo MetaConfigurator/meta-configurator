@@ -2,9 +2,15 @@
  of this panel. When the panel or underlying editor changes, the changes can be applied here
  and the main view does not need to know about any of that. -->
 <template>
-  <AceEditor data-format="json" v-if="settingsStore.settingsData.dataFormat === 'json'" />
-  <AceEditor data-format="yaml" v-else-if="settingsStore.settingsData.dataFormat === 'yaml'" />
-  <AceEditor data-format="json" v-else />
+  <AceEditor
+    :data-format="settingsStore.settingsData.dataFormat"
+    v-if="useSessionStore().currentMode === SessionMode.FileEditor" />
+  <AceEditor
+    :data-format="settingsStore.settingsData.dataFormat"
+    v-else-if="useSessionStore().currentMode === SessionMode.SchemaEditor" />
+  <AceEditor
+    :data-format="settingsStore.settingsData.dataFormat"
+    v-else-if="useSessionStore().currentMode === SessionMode.Settings" />
 </template>
 
 <script setup>

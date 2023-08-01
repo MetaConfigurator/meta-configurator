@@ -7,7 +7,6 @@ import {useDataStore} from '@/store/dataStore';
 import {clearEditor} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 
 /**
@@ -229,9 +228,9 @@ export class TopMenuBar {
     downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
-    clearEditor();
+    clearEditor('Are you sure you want to clear the editor?');
   }
   private clearSchemaEditor(): void {
-    clearSchemaEditor();
+    clearEditor('Are you sure you want to clear the schema editor?');
   }
 }
