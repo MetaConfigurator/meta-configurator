@@ -66,7 +66,6 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
 
 onMounted(() => {
   editor = ref(ace.edit('javascript-editor'));
-  console.log('mount new ace editor');
 
   editorWrapper = new CodeEditorWrapperAce(editor.value);
   useSessionStore().currentEditorWrapper = editorWrapper;
