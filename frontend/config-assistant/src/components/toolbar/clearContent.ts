@@ -11,13 +11,11 @@ export function newEmptyFile(message: string | undefined = undefined): void {
     // no data, so we don't have to ask user if he wants to clear it
     return;
   }
-
   // Show confirmation dialog
   if (message !== undefined) {
     confirmationDialogMessage.value = message;
     showConfirmation.value = true;
     return;
-    //performClear = window.confirm(message);
   }
   // User confirmed, clear the editor
   clearEditor();
