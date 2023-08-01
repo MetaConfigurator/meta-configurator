@@ -29,7 +29,7 @@ const props = defineProps<{
   dataFormat: string;
 }>();
 
-const editor: Ref<Editor> = ref();
+let editor: Ref<Editor>;
 
 let currentSelectionIsForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
@@ -66,30 +66,30 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
 }
 
 onMounted(() => {
-  editor.value = ace.edit('javascript-editor');
+  editor = ref(ace.edit('javascript-editor'));
+
   editorWrapper = new CodeEditorWrapperAce(editor.value);
   useSessionStore().currentEditorWrapper = editorWrapper;
-  console.log('mounted ace editor with new editorwrapper');
 
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
   } else if (props.dataFormat == 'yaml') {
-    editor.value?.getSession().setMode('ace/mode/yaml');
+    editor.value.getSession().setMode('ace/mode/yaml');
   }
 
-  editor.value?.setTheme('ace/theme/clouds');
-  editor.value?.setShowPrintMargin(false);
+  editor.value.setTheme('ace/theme/clouds');
+  editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
 
   // Listen to changes on AceEditor and update store accordingly
-  editor.value?.on(
+  editor.value.on(
     'change',
     useDebounceFn(
       () => {
         sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-        const fileContentString = editor.value?.getValue();
+        const fileContentString = editor.value.getValue();
 
         // Current workaround until schema of schema editor works: just accept schema without validation
         //fileData.value = JSON.parse(jsonString);
@@ -131,13 +131,13 @@ onMounted(() => {
     return schemaValidationFunction.value(parsedContent);
   }, SCHEMA_VALIDATION_THROTTLE_TIME);
 
-  editor.value?.on('changeSelection', () => {
+  editor.value.on('changeSelection', () => {
     if (currentSelectionIsForcedFromOutside) {
       // we do not need to consider the event and send updates if the selection was forced from outside
       return;
     }
     try {
-      let newPath = determinePath(editor.value!!.getValue(), editor.value!!.getCursorPosition());
+      let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
       sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
       sessionStore.currentSelectedElement = newPath;
     } catch (e) {
@@ -163,7 +163,7 @@ onMounted(() => {
         if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
           currentSelectionIsForcedFromOutside = true;
           updateCursorPositionBasedOnPath(
-            editor.value!!.getValue(),
+            editor.value.getValue(),
             sessionStore.currentSelectedElement
           );
           currentSelectionIsForcedFromOutside = false;
@@ -178,23 +178,23 @@ function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
   currentSelectionIsForcedFromOutside = true;
   const newEditorContent = manipulator.stringifyContentObject(configData);
-  editor.value!!.setValue(newEditorContent);
+  editor.value.setValue(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
   currentSelectionIsForcedFromOutside = false;
 }
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {
   let position = determineCursorPosition(editorContent, currentPath);
-  editor.value!!.gotoLine(position.row, position.column);
+  editor.value.gotoLine(position.row, position.column);
 }
 
 function determineCursorPosition(editorContent: string, currentPath: Path): Position {
   let index = manipulator.determineCursorPosition(editorContent, currentPath);
-  return editor.value!!.session.doc.indexToPosition(index, 0);
+  return editor.value.session.doc.indexToPosition(index, 0);
 }
 
 function determinePath(editorContent: string, cursorPosition: Position): Path {
-  let targetCharacter = editor.value!!.session.doc.positionToIndex(cursorPosition, 0);
+  let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
   return manipulator.determinePath(editorContent, targetCharacter);
 }
 </script>
