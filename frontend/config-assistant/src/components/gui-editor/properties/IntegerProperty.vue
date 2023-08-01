@@ -57,7 +57,7 @@ const valueProperty = computed({
     :use-grouping="false"
     showButtons
     buttonLayout="stacked"
-    :placeholder="placeHolderValue"
+    :placeholder="placeHolderValue()"
     :step="1"
     :min="minValue"
     :max="maxValue"

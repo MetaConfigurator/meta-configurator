@@ -39,7 +39,7 @@ function updateValue() {
     :class="$style.tableInput"
     class="h-8"
     v-model="valueProperty"
-    :placeholder="placeHolderValue"
+    :placeholder="placeHolderValue()"
     @blur="updateValue"
     @keyup.enter="updateValue" />
 </template>

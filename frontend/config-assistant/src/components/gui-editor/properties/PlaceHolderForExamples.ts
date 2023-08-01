@@ -1,11 +1,11 @@
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {computed} from 'vue';
 
-const props = defineProps<{
-  propertySchema: JsonSchema;
-}>();
-export const placeHolderValue = computed(() => {
+export function placeHolderValue() {
+  const props = defineProps<{
+    propertySchema: JsonSchema;
+  }>();
+
   return props.propertySchema.examples && props.propertySchema.examples.length > 0
     ? `Possible Examples: ${props.propertySchema.examples}`
     : '';
-});
+}

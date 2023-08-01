@@ -62,7 +62,7 @@ const valueProperty = computed({
     :maxFractionDigits="20"
     showButtons
     buttonLayout="stacked"
-    :placeholder="placeHolderValue"
+    :placeholder="placeHolderValue()"
     :step="stepValue"
     :min="minValue"
     :max="maxValue"
