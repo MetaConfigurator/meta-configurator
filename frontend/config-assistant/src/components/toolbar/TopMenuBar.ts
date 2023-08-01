@@ -3,17 +3,59 @@ import {chooseConfigFromFile} from '@/components/toolbar/uploadConfig';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
-
-import {clearEditor} from '@/components/toolbar/clearContent';
+import {newEmptyFile} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {errorService} from '@/main';
+import {ref} from 'vue';
+import type {MenuItemCommandEvent} from 'primevue/menuitem';
+import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
   sessionStore = useSessionStore();
+  public fetchedSchemas: {
+    label: string;
+    icon: string;
+    url: string | undefined;
+    key: string | undefined;
+  }[] = [];
+  private toast: any;
+  private onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
+  private onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
+  constructor(
+    toast = null,
+    onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
+    onFromOurExampleClick: () => void
+  ) {
+    this.toast = toast;
+    this.onFromWebClick = onFromWebClick;
+    this.onFromOurExampleClick = onFromOurExampleClick;
+  }
+  public async fetchWebSchemas(): Promise<void> {
+    const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';
+
+    try {
+      const response = await fetch(schemaStoreURL);
+      const data = await response.json();
+      const schemas = data.schemas;
+
+      schemas.forEach((schema: {name: string; url: string; key: string}) => {
+        this.fetchedSchemas.push({
+          label: schema.name,
+          icon: 'pi pi-fw pi-code',
+          url: schema.url,
+          key: schema.key,
+        });
+      });
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  }
+
   get fileEditorMenuItems() {
     return [
       {
@@ -99,10 +141,11 @@ export class TopMenuBar {
             icon: 'fa-regular fa-folder-open',
             command: this.uploadSchema,
           },
+
           {
             label: 'From JSON Schema Store',
             icon: 'fa-solid fa-database',
-            command: this.chooseSchema,
+            command: this.onFromWebClick,
           },
           {
             label: 'From URL',
@@ -114,9 +157,7 @@ export class TopMenuBar {
           {
             label: 'Example Schemas',
             icon: 'fa-solid fa-database',
-            command: () => {
-              throw new Error('Not implemented yet');
-            },
+            command: this.onFromOurExampleClick,
           },
         ],
       },
@@ -197,12 +238,6 @@ export class TopMenuBar {
   private uploadSchema(): void {
     chooseSchemaFromFile();
   }
-  private chooseSchema(schemaKey: string): void {
-    const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
-    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-    useDataStore().schemaData = selectedSchema?.schema;
-  }
-
   private chooseConfig(): void {
     chooseConfigFromFile();
   }
@@ -228,9 +263,57 @@ export class TopMenuBar {
     downloadFile(fileNamePrefix);
   }
   private clearEditor(): void {
-    clearEditor('Are you sure you want to clear the editor?');
+    newEmptyFile('Are you sure that you want to clear the editor?');
   }
   private clearSchemaEditor(): void {
-    clearEditor('Are you sure you want to clear the schema editor?');
+    clearSchemaEditor();
+  }
+  public showDialog = ref(false);
+
+  public async selectSchema(schemaURL: string): Promise<void> {
+    try {
+      // Fetch the schema content from the selected schemaURL.
+      const response = await fetch(schemaURL);
+      const schemaContent = await response.json();
+      const schemaName = schemaContent.title || 'Unknown Schema';
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      // Update the schemaData in the dataStore with the fetched schema content.
+      useDataStore().schemaData = schemaContent;
+      // Always clear the data without prompting the user.
+      newEmptyFile('Do you want to clear the existing data?');
+
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: `"${schemaName}" fetched successfully!`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  }
+  public fetchExampleSchema(schemaKey: string): void {
+    try {
+      const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      const schemaName = selectedSchema.label || 'Unknown Schema';
+      useDataStore().schemaData = selectedSchema?.schema;
+      newEmptyFile('Do you want to clear the existing data?');
+
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: `"${schemaName}" fetched successfully!`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
   }
 }

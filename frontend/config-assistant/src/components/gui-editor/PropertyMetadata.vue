@@ -54,13 +54,6 @@ function isPatternProperty(): boolean {
   return props.type === TreeNodeType.PATTERN_PROPERTY;
 }
 
-function clickedPropertyKey() {
-  if (useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton) {
-    toggleExpand();
-  } else {
-    zoomIntoPath();
-  }
-}
 function zoomIntoPath() {
   if (isExpandable()) {
     emit('zoom_into_path', props.nodeData.relativePath);
@@ -86,16 +79,14 @@ function getTypeDescription(): string {
 
 <template>
   <span class="flex flex-row w-full items-center">
-    <!--If expandable: show underline on hovering. Call zoom function when double click. -->
     <span
       class="mr-2"
       :class="{'hover:underline': isExpandable()}"
       :tabindex="isExpandable() ? 0 : -1"
-      @click="clickedPropertyKey()"
+      @click="zoomIntoPath()"
       @keyup.enter="toggleExpand()"
       @dblclick="zoomIntoPath()"
       v-tooltip.bottom="generateTooltipText(props.nodeData)">
-      <!--Otherwise: just normal text -->
       <span
         :class="{
           'text-indigo-700': isExpandable(),
@@ -110,16 +101,6 @@ function getTypeDescription(): string {
     </span>
 
     <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription() }}</span>
-    <!-- "zoom in" icon -->
-    <div class="flex flex-row w-full ml-5">
-      <IconExpand
-        class="text-gray-700 hover:scale-110 h-5 ml-5"
-        v-if="
-          isExpandable() &&
-          useSettingsStore().settingsData.guiEditor.elementNavigationWithSeparateButton
-        "
-        @click="zoomIntoPath()" />
-    </div>
   </span>
 </template>
 

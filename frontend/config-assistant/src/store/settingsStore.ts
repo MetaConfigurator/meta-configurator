@@ -2,6 +2,7 @@ import {defineStore} from 'pinia';
 import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
 import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
+import {SETTINGS_SCHEMA} from '@/data/SettingsSchema';
 
 /**
  * Store for the Meta Configurator settings.
@@ -10,24 +11,16 @@ export const useSettingsStore = defineStore('settings', () => {
   const settingsData = ref({
     dataFormat: 'json',
     guiEditorOnRightSide: true,
-    codeEditor: {
-      allowSchemaViolatingInput: true,
-    },
     guiEditor: {
-      elementNavigationWithSeparateButton: false,
       maximumDepth: 3,
       propertySorting: 'dataOrder',
     },
     debuggingActive: false,
   });
-  const settingsSchemaData = ref({});
+  const settingsSchemaData = ref(SETTINGS_SCHEMA);
   const settingsSchema: Ref<TopLevelJsonSchema> = computed(
     () => new TopLevelJsonSchema(settingsSchemaData.value)
   );
-
-  fetch('/src/settings/settingsSchema.json')
-    .then(response => response.json())
-    .then(settingsSchema => (settingsSchemaData.value = settingsSchema));
 
   return {
     settingsData,

@@ -1,12 +1,29 @@
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {ref} from 'vue';
+import {useDataStore} from '@/store/dataStore';
 
-export function clearEditor(dialogMessage: string): void {
-  // Show confirmation dialog
-  const confirmClear = window.confirm(dialogMessage);
+export const showConfirmation = ref(false);
+export const confirmationDialogMessage = ref('');
 
-  if (confirmClear) {
-    // User confirmed, clear the editor
-    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-    useSessionStore().currentEditorWrapper.setContent('');
+export function newEmptyFile(message: string | undefined = undefined): void {
+  console.log(JSON.stringify(useDataStore().fileData));
+  if (JSON.stringify(useDataStore().fileData) === '{}') {
+    // no data, so we don't have to ask user if he wants to clear it
+    return;
   }
+  // Show confirmation dialog
+  if (message !== undefined) {
+    confirmationDialogMessage.value = message;
+    showConfirmation.value = true;
+    return;
+  }
+  // User confirmed, clear the editor
+  clearEditor();
+}
+
+export function clearEditor() {
+  useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+  useDataStore().fileData = {};
+  useSessionStore().updateCurrentPath([]);
+  useSessionStore().updateCurrentSelectedElement([]);
 }

@@ -4,7 +4,7 @@ import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import type {Path, PathElement} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
 import {pathToString} from '@/helpers/pathHelper';
-import {PropertySorting} from '@/settings/settingsTypes';
+import {PropertySorting} from '@/model/SettingsTypes';
 import {useSessionStore} from '@/store/sessionStore';
 
 /**

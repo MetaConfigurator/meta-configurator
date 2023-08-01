@@ -9,6 +9,7 @@ import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
+import {nil} from 'ajv';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -38,6 +39,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     ChangeResponsible.None
   );
   const currentEditorWrapper: Ref<CodeEditorWrapper> = ref(new CodeEditorWrapperUninitialized());
+  const schemaErrorMessage: Ref<string | null> = ref<string | null>(null);
 
   const fileData: WritableComputedRef<any> = computed({
     // getter
@@ -172,6 +174,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     fileSchemaData,
     schemaAtPath,
     schemaAtCurrentPath,
+    schemaErrorMessage,
     dataAtPath,
     dataAtCurrentPath: computed(() => dataAtPath(currentPath.value)),
     currentPath,

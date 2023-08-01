@@ -11,6 +11,11 @@ export function generateTooltipText(nodeData: ConfigTreeNodeData) {
     result += '\nThis property is deprecated.';
   }
 
+  const hasExample = schema.examples !== undefined && schema.examples.length > 0;
+  if (hasExample) {
+    result += '\nPossible Examples:' + schema.examples;
+  }
+
   const hasMinOrMax =
     schema.exclusiveMinimum !== undefined ||
     schema.exclusiveMaximum !== undefined ||
