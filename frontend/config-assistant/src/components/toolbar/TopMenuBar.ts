@@ -6,7 +6,6 @@ import {useDataStore} from '@/store/dataStore';
 import {newEmptyFile} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
 import type {MenuItemCommandEvent} from 'primevue/menuitem';
@@ -15,6 +14,7 @@ import type {MenuItemCommandEvent} from 'primevue/menuitem';
  * Helper class that contains the menu items for the top menu bar.
  */
 export class TopMenuBar {
+  sessionStore = useSessionStore();
   public fetchedSchemas: {
     label: string;
     icon: string;
@@ -89,12 +89,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.redo();
+        },
       },
       {
         separator: true,
@@ -167,12 +171,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.redo();
+        },
       },
       {
         separator: true,
@@ -205,12 +213,16 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        command: () => console.log('undo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.undo();
+        },
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
-        command: () => console.log('redo'),
+        command: () => {
+          this.sessionStore.currentEditorWrapper.redo();
+        },
       },
       {
         separator: true,
@@ -254,6 +266,54 @@ export class TopMenuBar {
   }
   private clearSchemaEditor(): void {
     newEmptyFile('Are you sure that you want to clear the Schema editor?');
+  }
+  public showDialog = ref(false);
+
+  public async selectSchema(schemaURL: string): Promise<void> {
+    try {
+      // Fetch the schema content from the selected schemaURL.
+      const response = await fetch(schemaURL);
+      const schemaContent = await response.json();
+      const schemaName = schemaContent.title || 'Unknown Schema';
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      // Update the schemaData in the dataStore with the fetched schema content.
+      useDataStore().schemaData = schemaContent;
+      // Always clear the data without prompting the user.
+      newEmptyFile('Do you want to clear the existing data?');
+
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: `"${schemaName}" fetched successfully!`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  }
+  public fetchExampleSchema(schemaKey: string): void {
+    try {
+      const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      const schemaName = selectedSchema.label || 'Unknown Schema';
+      useDataStore().schemaData = selectedSchema?.schema;
+      newEmptyFile('Do you want to clear the existing data?');
+
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: `"${schemaName}" fetched successfully!`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
   }
   public showDialog = ref(false);
 

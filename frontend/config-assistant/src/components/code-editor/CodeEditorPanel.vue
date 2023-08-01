@@ -2,14 +2,15 @@
  of this panel. When the panel or underlying editor changes, the changes can be applied here
  and the main view does not need to know about any of that. -->
 <template>
-  <AceEditor data-format="json" v-if="settingsStore.settingsData.dataFormat === 'json'" />
-  <AceEditor data-format="yaml" v-else-if="settingsStore.settingsData.dataFormat === 'yaml'" />
-  <AceEditor data-format="json" v-else />
+  <CodeEditorPanelForDifferentFormats
+    v-if="useSessionStore().currentMode === SessionMode.FileEditor" />
+  <CodeEditorPanelForDifferentFormats
+    v-else-if="useSessionStore().currentMode === SessionMode.SchemaEditor" />
+  <CodeEditorPanelForDifferentFormats
+    v-else-if="useSessionStore().currentMode === SessionMode.Settings" />
 </template>
 
 <script setup>
-import {useSettingsStore} from '@/store/settingsStore';
-import AceEditor from '@/components/code-editor/AceEditor.vue';
-
-const settingsStore = useSettingsStore();
+import {useSessionStore, SessionMode} from '@/store/sessionStore';
+import CodeEditorPanelForDifferentFormats from '@/components/code-editor/CodeEditorPanelForDifferentFormats.vue';
 </script>
