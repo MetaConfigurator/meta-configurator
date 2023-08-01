@@ -3,6 +3,7 @@ import {computed} from 'vue';
 import InputNumber from 'primevue/inputnumber';
 import type {PathElement} from '@/model/path';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {placeHolderValue} from '@/components/gui-editor/properties/PlaceHolderForExamples';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -28,12 +29,6 @@ const maxValue = computed(() => {
   } else {
     return undefined;
   }
-});
-
-const placeHolderValue = computed(() => {
-  return props.propertySchema.examples && props.propertySchema.examples.length > 0
-    ? `Possible Examples: ${props.propertySchema.examples}`
-    : '';
 });
 
 const emit = defineEmits<{

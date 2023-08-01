@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
+import {ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {watchThrottled} from '@vueuse/core';
+import {placeHolderValue} from '@/components/gui-editor/properties/PlaceHolderForExamples';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const props = defineProps<{
@@ -16,12 +17,6 @@ const emit = defineEmits<{
 }>();
 
 const valueProperty = ref<string | undefined>(props.propertyData);
-
-const placeHolderValue = computed(() => {
-  return props.propertySchema.examples && props.propertySchema.examples.length > 0
-    ? `Possible Examples: ${props.propertySchema.examples}`
-    : '';
-});
 
 watchThrottled(
   props,
