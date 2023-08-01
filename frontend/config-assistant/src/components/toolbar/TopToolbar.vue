@@ -1,13 +1,25 @@
 <script setup lang="ts">
+import {ref, watch} from 'vue';
+import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
-import Button from 'primevue/button';
-import {ref} from 'vue';
-import type {MenuItem} from 'primevue/menuitem';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
 import {SessionMode} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import Listbox from 'primevue/listbox';
+import {schemaCollection} from '@/data/SchemaCollection';
+import {useToast} from 'primevue/usetoast';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {
+  clearEditor,
+  showConfirmation,
+  confirmationDialogMessage,
+  newEmptyFile,
+} from '@/components/toolbar/clearContent';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {errorService} from '@/main';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -16,6 +28,16 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
+const selectedSchema = ref<{
+  label: string;
+  icon: string;
+  command: () => void;
+  schema: JsonSchema;
+  url: string | undefined;
+  key: string | undefined;
+}>(null);
+
+const showFetchedSchemas = ref(false);
 
 function getPageName(): string {
   switch (props.currentMode) {
@@ -74,9 +96,60 @@ const pageSelectionMenuItems: MenuItem[] = [
     },
   },
 ];
-
-const topMenuBar = new TopMenuBar();
-
+const toast = useToast();
+const topMenuBar = new TopMenuBar(toast, handleFromWebClick, handleFromOurExampleClick);
+async function handleFromWebClick(): Promise<void> {
+  try {
+    await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
+    showFetchedSchemas.value = true;
+    topMenuBar.showDialog.value = true;
+  } catch (error) {
+    // Handle the error if there's an issue fetching the schema.
+    errorService.onError(error);
+  }
+}
+function handleFromOurExampleClick() {
+  // Set the fetchedSchemas to your schemaCollection array
+  topMenuBar.fetchedSchemas = schemaCollection;
+  // Set the flag to true to show the fetched schemas
+  showFetchedSchemas.value = true;
+  topMenuBar.showDialog.value = true;
+}
+watch(selectedSchema, async newSelectedSchema => {
+  if (!newSelectedSchema) {
+    return;
+  }
+  if (newSelectedSchema.url) {
+    try {
+      await topMenuBar.selectSchema(newSelectedSchema.url);
+      showFetchedSchemas.value = true;
+      topMenuBar.showDialog.value = false;
+      newEmptyFile('Do you want to clear current config data ?');
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  } else if (newSelectedSchema.key) {
+    try {
+      topMenuBar.fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
+      showFetchedSchemas.value = true;
+      topMenuBar.showDialog.value = false;
+      newEmptyFile('Do you want to clear current config data ?');
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  }
+});
+function handleAccept() {
+  clearEditor();
+  // Hide the confirmation dialog
+  showConfirmation.value = false;
+}
+function handleReject() {
+  // Hide the confirmation dialog
+  showConfirmation.value = false;
+}
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
 const settingsMenuItems = topMenuBar.settingsMenuItems;
@@ -93,7 +166,6 @@ function getMenuItems(): MenuItem[] {
       return [];
   }
 }
-
 const items = ref(pageSelectionMenuItems);
 const menu = ref();
 const toggle = event => {
@@ -105,7 +177,6 @@ const itemMenuRefs = ref(new Map<string, Menu>());
 function setItemMenuRef(item: MenuItem, menu: Menu) {
   itemMenuRefs.value.set(getLabelOfItem(item), menu);
 }
-
 function handleItemButtonClick(item: MenuItem, event: Event) {
   if (item.items) {
     const menu = itemMenuRefs.value.get(getLabelOfItem(item));
@@ -114,7 +185,6 @@ function handleItemButtonClick(item: MenuItem, event: Event) {
     item.command({item, originalEvent: event});
   }
 }
-
 function getLabelOfItem(item: MenuItem): string {
   if (!item.label) {
     return;
@@ -127,6 +197,30 @@ function getLabelOfItem(item: MenuItem): string {
 </script>
 
 <template>
+  <Dialog v-model:visible="topMenuBar.showDialog.value">
+    <!-- Dialog content goes here -->
+    <h3>Which Schema you want to open?</h3>
+    <div class="card flex justify-content-center">
+      <!-- Listbox to display fetched schemas -->
+
+      <Listbox
+        listStyle="max-height:250px"
+        v-model="selectedSchema"
+        :options="topMenuBar.fetchedSchemas"
+        v-show="showFetchedSchemas"
+        filter
+        optionLabel="label"
+        class="w-50 md:w-14rem overflow-hidden">
+        <!-- Add a slot for the search input -->
+      </Listbox>
+    </div>
+  </Dialog>
+  <Dialog v-model:visible="showConfirmation">
+    <h3>{{ confirmationDialogMessage }}</h3>
+    <Button label="Yes" @click="handleAccept" class="dialog-button" />
+    <Button label="No" @click="handleReject" class="dialog-button" />
+  </Dialog>
+
   <Toolbar class="h-10 no-padding">
     <template #start>
       <Menu ref="menu" :model="items" :popup="true">
@@ -172,11 +266,12 @@ function getLabelOfItem(item: MenuItem): string {
       </div>
     </template>
     <template #end>
-      <div class="flex space-x-10 mr-4">
+      <div class="flex space-x-10 mr-3">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
           <p class="font-semibold text-lg">ConfigAssistant</p>
         </div>
+
         <!-- link to our github, opens in a new tab -->
         <a
           href="https://github.com/PaulBredl/config-assistant"
@@ -190,10 +285,15 @@ function getLabelOfItem(item: MenuItem): string {
 </template>
 
 <style scoped>
+.dialog-button {
+  margin-right: 1rem;
+  margin-top: 1rem;
+  font-size: 15px;
+  padding: 0.5rem 1rem;
+}
 .no-padding {
   padding: 0 !important;
 }
-
 .main-menu-button {
   font-weight: bold;
   font-size: large;
@@ -203,7 +303,6 @@ function getLabelOfItem(item: MenuItem): string {
   padding-bottom: 0.3rem !important;
   min-width: 13rem !important;
 }
-
 .toolbar-button {
   font-weight: bold;
   font-size: large;
