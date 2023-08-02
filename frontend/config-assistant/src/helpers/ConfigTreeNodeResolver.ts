@@ -1,7 +1,7 @@
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {ConfigDataTreeNodeType, GuiEditorTreeNode} from '@/model/ConfigDataTreeNode';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
-import type {Path, PathElement} from '@/model/path';
+import type {Path} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
 import {pathToString} from '@/helpers/pathHelper';
 import {PropertySorting} from '@/settings/settingsTypes';
@@ -26,7 +26,7 @@ export class ConfigTreeNodeResolver {
   public createTreeNodeOfProperty(
     schema: JsonSchema,
     parentSchema?: JsonSchema,
-    absolutePath: Array<PathElement> = [],
+    absolutePath: Path = [],
     relativePath: Path = [],
     depth: number = 0,
     nodeType: ConfigDataTreeNodeType = TreeNodeType.SCHEMA_PROPERTY
@@ -58,18 +58,18 @@ export class ConfigTreeNodeResolver {
 
   public createChildNodesOfNode(guiEditorTreeNode: GuiEditorTreeNode): GuiEditorTreeNode[] {
     guiEditorTreeNode.children = this.createChildNodes(
-      guiEditorTreeNode.data.schema,
       guiEditorTreeNode.data.absolutePath,
       guiEditorTreeNode.data.relativePath,
+      guiEditorTreeNode.data.schema,
       guiEditorTreeNode.data.depth
     );
     return guiEditorTreeNode.children as GuiEditorTreeNode[];
   }
 
   private createChildNodes(
-    schema: JsonSchema,
-    absolutePath: Array<PathElement>,
+    absolutePath: Path,
     relativePath: Path = [],
+    schema: JsonSchema,
     depth = 0
   ): GuiEditorTreeNode[] {
     const depthLimit = useSettingsStore().settingsData.guiEditor.maximumDepth;
@@ -90,54 +90,64 @@ export class ConfigTreeNodeResolver {
    * in the settings.
    */
   private createObjectChildrenTreeNodes(
-    parentPath: Array<PathElement>,
-    path: Array<PathElement>,
+    absolutePath: Path,
+    relativePath: Path,
     schema: JsonSchema,
     depth: number
   ) {
     const propertySorting = useSettingsStore().settingsData.guiEditor.propertySorting;
 
     if (propertySorting === PropertySorting.SCHEMA_ORDER) {
-      return this.createObjectChildrenNodesAccordingToSchemaOrder(schema, parentPath, path, depth);
+      return this.createObjectChildrenNodesAccordingToSchemaOrder(
+        absolutePath,
+        relativePath,
+        schema,
+        depth
+      );
     }
     if (propertySorting === PropertySorting.DATA_ORDER) {
-      return this.createObjectChildrenNodesAccordingToDataOrder(path, schema, parentPath, depth);
+      return this.createObjectChildrenNodesAccordingToDataOrder(
+        absolutePath,
+        relativePath,
+        schema,
+        depth
+      );
     }
     // priority sorting
-    return this.createObjectChildrenNodesPriorityOrder(schema, parentPath, path, depth);
+    return this.createObjectChildrenNodesPriorityOrder(absolutePath, relativePath, schema, depth);
   }
 
   private createObjectChildrenNodesPriorityOrder(
+    absolutePath: Path,
+    relativePath: Path,
     schema: JsonSchema,
-    parentPath: Array<PathElement>,
-    path: Array<PathElement>,
     depth: number
   ) {
     const requiredProperties = this.createPropertiesChildNodes(
+      absolutePath,
+      relativePath,
       schema,
-      parentPath,
-      path,
       depth,
       key => schema.isRequired(key)
     );
     const optionalProperties = this.createPropertiesChildNodes(
+      absolutePath,
+      relativePath,
       schema,
-      parentPath,
-      path,
       depth,
       key => !schema.isRequired(key) && !schema.properties[key].deprecated
     );
     const additionalProperties = this.createDataPropertiesChildNodes(
-      parentPath,
-      path,
+      absolutePath,
+      relativePath,
       schema,
       depth,
       key => !schema.properties || !schema.properties[key]
     ); // filter out properties that are already in the schema
     const deprecatedProperties = this.createPropertiesChildNodes(
+      absolutePath,
+      relativePath,
       schema,
-      parentPath,
-      path,
       depth,
       key => schema.properties[key].deprecated && !schema.isRequired(key)
     );
@@ -149,18 +159,22 @@ export class ConfigTreeNodeResolver {
   }
 
   private createObjectChildrenNodesAccordingToDataOrder(
-    path: Array<PathElement>,
+    absolutePath: Path,
+    relativePath: Path,
     schema: JsonSchema,
-    parentPath: Array<PathElement>,
     depth: number
   ) {
-    const dataProperties = this.createDataPropertiesChildNodes(parentPath, path, schema, depth);
-    const schemaProperties = this.createPropertiesChildNodes(
+    const dataProperties = this.createDataPropertiesChildNodes(
+      absolutePath,
+      relativePath,
       schema,
-      parentPath,
-      path,
+      depth
+    );
+    const schemaProperties = this.createPropertiesChildNodes(
+      absolutePath,
+      relativePath,
+      schema,
       depth,
-      // filter out properties that are already in the data
       key => !dataProperties.find(node => node.data.name === key)
     );
 
@@ -168,15 +182,20 @@ export class ConfigTreeNodeResolver {
   }
 
   private createObjectChildrenNodesAccordingToSchemaOrder(
+    absolutePath: Path,
+    relativePath: Path,
     schema: JsonSchema,
-    parentPath: Array<PathElement>,
-    path: Array<PathElement>,
     depth: number
   ) {
-    const schemaProperties = this.createPropertiesChildNodes(schema, parentPath, path, depth);
+    const schemaProperties = this.createPropertiesChildNodes(
+      absolutePath,
+      relativePath,
+      schema,
+      depth
+    );
     const dataProperties = this.createDataPropertiesChildNodes(
-      parentPath,
-      path,
+      absolutePath,
+      relativePath,
       schema,
       depth,
       key => !schema.properties || !schema.properties[key]
@@ -185,9 +204,9 @@ export class ConfigTreeNodeResolver {
   }
 
   private createPropertiesChildNodes(
+    absolutePath: Path,
+    relativePath: Path,
     schema: JsonSchema,
-    parentPath: Array<PathElement>,
-    path: Array<PathElement>,
     depth: number,
     filter: (key: string) => boolean = () => true
   ) {
@@ -197,8 +216,8 @@ export class ConfigTreeNodeResolver {
         this.createTreeNodeOfProperty(
           value,
           schema,
-          parentPath.concat(key),
-          path.concat(key),
+          absolutePath.concat(key),
+          relativePath.concat(key),
           depth + 1
         )
       );

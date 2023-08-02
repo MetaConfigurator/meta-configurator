@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ChevronRight from '@/components/icons/ChevronRight.vue';
+import {computed} from 'vue';
 import type {Path} from '@/model/path';
 
 const props = defineProps<{
@@ -7,19 +8,21 @@ const props = defineProps<{
   rootName: string;
 }>();
 
+const pathWithRoot = computed(() => [props.rootName, ...props.path]);
+
 const emit = defineEmits<{
   (e: 'update:path', newPath: Path): void;
 }>();
 
 function isNotLast(index: number) {
-  return index != props.path.length - 1;
+  return index != pathWithRoot.value.length - 1;
 }
 
 function jumpToLevel(index: number) {
   if (index == 0) {
-    emit('update:path', [props.path[0]]);
+    emit('update:path', []);
   } else if (isNotLast(index)) {
-    emit('update:path', props.path.slice(0, index + 1));
+    emit('update:path', props.path.slice(0, index));
   }
 }
 </script>
@@ -28,7 +31,7 @@ function jumpToLevel(index: number) {
   <nav class="flex h-8" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-1 h-full">
       <li
-        v-for="(pathItem, index) in path"
+        v-for="(pathItem, index) in pathWithRoot"
         :key="pathItem"
         class="inline-flex items-center space-x-3">
         <div
