@@ -136,7 +136,7 @@ watch(selectedSchema, async newSelectedSchema => {
       topMenuBar.fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to clear current config data ?');
+      newEmptyFile('Do you want to also clear current config data ?');
     } catch (error) {
       // Handle the error if there's an issue fetching the schema.
       errorService.onError(error);

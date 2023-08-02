@@ -16,7 +16,7 @@ export function newEmptyFile(message: string | undefined = undefined): void {
       toastService.add({
         severity: 'info',
         summary: 'Confirmed',
-        detail: 'Config data deleted',
+        detail: 'Config data is deleted from File editor',
         life: 3000,
       });
       clearEditor();
@@ -25,7 +25,7 @@ export function newEmptyFile(message: string | undefined = undefined): void {
       toastService.add({
         severity: 'error',
         summary: 'Rejected',
-        detail: 'Config data is keep',
+        detail: 'Config data is kept in File Editor',
         life: 3000,
       });
     },
