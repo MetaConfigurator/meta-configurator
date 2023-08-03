@@ -41,7 +41,7 @@ export class TopMenuBar {
       const response = await fetch(schemaStoreURL);
       const data = await response.json();
       const schemas = data.schemas;
-
+      this.fetchedSchemas = [];
       schemas.forEach((schema: {name: string; url: string; key: string}) => {
         this.fetchedSchemas.push({
           label: schema.name,

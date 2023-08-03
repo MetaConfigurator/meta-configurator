@@ -188,20 +188,19 @@ function getLabelOfItem(item: MenuItem): string {
 <template>
   <Dialog v-model:visible="topMenuBar.showDialog.value">
     <!-- Dialog content goes here -->
-    <h3>Which Schema you want to open?</h3>
+    <h3>Which Schema do you want to open?</h3>
     <div class="card flex justify-content-center">
-      <!-- Listbox to display fetched schemas -->
-
-      <Listbox
-        listStyle="max-height:250px"
-        v-model="selectedSchema"
-        :options="topMenuBar.fetchedSchemas"
-        v-show="showFetchedSchemas"
-        filter
-        optionLabel="label"
-        class="w-50 md:w-14rem overflow-hidden">
-        <!-- Add a slot for the search input -->
-      </Listbox>
+      <div class="listbox-container" style="width: 300px">
+        <Listbox
+          listStyle="max-height: 250px"
+          v-model="selectedSchema"
+          :options="topMenuBar.fetchedSchemas"
+          v-show="showFetchedSchemas"
+          filter
+          optionLabel="label"
+          class="overflow-hidden">
+        </Listbox>
+      </div>
     </div>
   </Dialog>
 
@@ -269,11 +268,8 @@ function getLabelOfItem(item: MenuItem): string {
 </template>
 
 <style scoped>
-.dialog-button {
-  margin-right: 1rem;
-  margin-top: 1rem;
-  font-size: 15px;
-  padding: 0.5rem 1rem;
+.listbox-container {
+  width: 100%;
 }
 .no-padding {
   padding: 0 !important;
