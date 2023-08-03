@@ -24,11 +24,15 @@ export class CodeEditorWrapperAce implements CodeEditorWrapper {
     this.editor.getSession().getUndoManager().redo(true);
   }
 
-  setContent(value: string): void {
-    this.editor.setValue(value);
+  setContent(value: string): string {
+    return this.editor.setValue(value, 1);
   }
 
   undo(): void {
     this.editor.getSession().getUndoManager().undo(true);
+  }
+
+  reset() {
+    this.editor.getSession().getUndoManager().reset();
   }
 }

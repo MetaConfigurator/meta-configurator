@@ -14,11 +14,9 @@ import {useDebounceFn, watchThrottled} from '@vueuse/core';
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
-import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
 import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
-import {useSettingsStore} from '@/store/settingsStore';
-import {errorService} from '@/main';
 import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 
@@ -67,9 +65,6 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
 onMounted(() => {
   editor = ref(ace.edit('javascript-editor'));
 
-  editorWrapper = new CodeEditorWrapperAce(editor.value);
-  useSessionStore().currentEditorWrapper = editorWrapper;
-
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
   } else if (props.dataFormat == 'yaml') {
@@ -81,6 +76,10 @@ onMounted(() => {
 
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
+  editorWrapper = new CodeEditorWrapperAce(editor.value);
+  useSessionStore().currentEditorWrapper = editorWrapper;
+  let currentContent = useSessionStore().currentEditorWrapper.getContent();
+  useSessionStore().currentEditorWrapper.setContent(currentContent);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on(
