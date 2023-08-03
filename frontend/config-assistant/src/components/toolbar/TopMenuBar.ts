@@ -6,11 +6,9 @@ import {useDataStore} from '@/store/dataStore';
 import {newEmptyFile} from '@/components/toolbar/clearContent';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {clearSchemaEditor, newEmptySchemafile} from '@/components/toolbar/clearSchema';
+import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
-import type {MenuItemCommandEvent} from 'primevue/menuitem';
-import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 import {storeToRefs} from 'pinia';
 
 /**

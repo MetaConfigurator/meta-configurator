@@ -13,15 +13,8 @@ import {schemaCollection} from '@/data/SchemaCollection';
 import {useToast} from 'primevue/usetoast';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {newEmptyFile} from '@/components/toolbar/clearContent';
-import {
-  clearEditor,
-  confirmationDialogMessage,
-  newEmptyFile,
-  showConfirmation,
-} from '@/components/toolbar/clearContent';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
-import {useConfirm} from 'primevue/useconfirm';
 import {storeToRefs} from 'pinia';
 
 const props = defineProps<{
