@@ -8,7 +8,6 @@ import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {errorService} from '@/main';
 import {ref} from 'vue';
-import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 
 /**
@@ -151,7 +150,10 @@ export class TopMenuBar {
             label: 'From URL',
             icon: 'fa-solid fa-globe',
             command: () => {
-              throw new Error('Not implemented yet');
+              const schemaURL = prompt('Enter the URL of the schema:');
+              if (schemaURL) {
+                this.fetchSchemaFromURL(schemaURL);
+              }
             },
           },
           {
@@ -316,4 +318,28 @@ export class TopMenuBar {
       errorService.onError(error);
     }
   }
+  public async fetchSchemaFromURL(url: string): Promise<void> {
+    try {
+      const response = await fetch(url);
+      const schemaContent = await response.json();
+      const schemaName = schemaContent.title || 'Unknown Schema';
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      // Update the schemaData in the dataStore with the fetched schema content.
+      useDataStore().schemaData = schemaContent;
+      // Always clear the data without prompting the user.
+      newEmptyFile('Do you want to also clear the current config file?');
+
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: `"${schemaName}" fetched successfully!`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  } //Sample schema URL: https://json.schemastore.org/github-action
 }
