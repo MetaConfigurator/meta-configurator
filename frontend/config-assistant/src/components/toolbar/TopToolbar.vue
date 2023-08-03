@@ -12,12 +12,7 @@ import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useToast} from 'primevue/usetoast';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {
-  clearEditor,
-  showConfirmation,
-  confirmationDialogMessage,
-  newEmptyFile,
-} from '@/components/toolbar/clearContent';
+import {newEmptyFile} from '@/components/toolbar/clearContent';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import {useConfirm} from 'primevue/useconfirm';
