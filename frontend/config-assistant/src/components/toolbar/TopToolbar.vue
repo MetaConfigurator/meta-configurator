@@ -4,7 +4,7 @@ import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
-import {SessionMode} from '@/store/sessionStore';
+import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
@@ -13,9 +13,16 @@ import {schemaCollection} from '@/data/SchemaCollection';
 import {useToast} from 'primevue/usetoast';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {newEmptyFile} from '@/components/toolbar/clearContent';
+import {
+  clearEditor,
+  confirmationDialogMessage,
+  newEmptyFile,
+  showConfirmation,
+} from '@/components/toolbar/clearContent';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import {useConfirm} from 'primevue/useconfirm';
+import {storeToRefs} from 'pinia';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -183,6 +190,32 @@ function getLabelOfItem(item: MenuItem): string {
   }
   return item.label();
 }
+
+function isDisabled(item: MenuItem) {
+  if (!item.disabled) {
+    return false;
+  }
+  if (typeof item.disabled === 'boolean') {
+    return item.disabled;
+  }
+  return item.disabled();
+}
+
+// apparently, the primevue button cannot reactively update its disabled state
+// so this is a workaround to change the disabled state of the button
+watch(storeToRefs(useSessionStore()).fileData, () => {
+  for (const item of getMenuItems()) {
+    if (item.key) {
+      if (isDisabled(item)) {
+        document.getElementById(item.key)?.setAttribute('disabled', '');
+        document.getElementById(item.key)?.classList.add('p-disabled');
+      } else {
+        document.getElementById(item.key)?.removeAttribute('disabled');
+        document.getElementById(item.key)?.classList.remove('p-disabled');
+      }
+    }
+  }
+});
 </script>
 
 <template>
@@ -228,6 +261,8 @@ function getLabelOfItem(item: MenuItem): string {
           class="toolbar-button"
           size="small"
           v-tooltip.bottom="item.label"
+          :id="item.key ?? ''"
+          :disabled="isDisabled(item)"
           @click="event => handleItemButtonClick(item, event)">
           <FontAwesomeIcon :icon="item.icon!!" />
         </Button>
