@@ -64,6 +64,8 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
 
 onMounted(() => {
   editor = ref(ace.edit('javascript-editor'));
+  editorWrapper = new CodeEditorWrapperAce(editor.value);
+  sessionStore.currentEditorWrapper = editorWrapper;
 
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
@@ -76,10 +78,9 @@ onMounted(() => {
 
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
-  editorWrapper = new CodeEditorWrapperAce(editor.value);
-  useSessionStore().currentEditorWrapper = editorWrapper;
-  let currentContent = useSessionStore().currentEditorWrapper.getContent();
-  useSessionStore().currentEditorWrapper.setContent(currentContent);
+
+  let currentContent = sessionStore.currentEditorWrapper.getContent();
+  sessionStore.currentEditorWrapper.setContent(currentContent);
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on(
@@ -174,7 +175,6 @@ onMounted(() => {
     {deep: true, throttle: READ_THROTTLE_TIME}
   );
 });
-
 function convertAjvPathToPath(path: string): Path {
   let result = path.split('/');
   if (result.length > 0 && result[0].length == 0) {

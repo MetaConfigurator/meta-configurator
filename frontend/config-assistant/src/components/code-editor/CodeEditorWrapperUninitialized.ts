@@ -22,4 +22,6 @@ export class CodeEditorWrapperUninitialized implements CodeEditorWrapper {
   }
 
   undo(): void {}
+
+  getUndoManager(): void {}
 }

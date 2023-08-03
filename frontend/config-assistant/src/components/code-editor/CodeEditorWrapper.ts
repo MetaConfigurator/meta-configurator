@@ -8,4 +8,5 @@ export interface CodeEditorWrapper {
 
   getContent(): string;
   setContent(value: string): string;
+  getUndoManager(): void;
 }

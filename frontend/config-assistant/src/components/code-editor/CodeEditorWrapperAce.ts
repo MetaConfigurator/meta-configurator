@@ -21,7 +21,13 @@ export class CodeEditorWrapperAce implements CodeEditorWrapper {
   }
 
   redo(): void {
-    this.editor.getSession().getUndoManager().redo(true);
+    if (this.hasRedo() === true) {
+      this.editor.getSession().getUndoManager().redo(true);
+    }
+  }
+
+  getUndoManager(): void {
+    this.editor.getSession().getUndoManager();
   }
 
   setContent(value: string): string {
@@ -29,7 +35,9 @@ export class CodeEditorWrapperAce implements CodeEditorWrapper {
   }
 
   undo(): void {
-    this.editor.getSession().getUndoManager().undo(true);
+    if (this.hasUndo() === true) {
+      this.editor.getSession().getUndoManager().undo();
+    }
   }
 
   reset() {

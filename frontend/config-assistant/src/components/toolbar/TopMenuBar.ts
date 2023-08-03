@@ -8,7 +8,6 @@ import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {errorService} from '@/main';
 import {ref} from 'vue';
-import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
 
 /**
@@ -91,6 +90,7 @@ export class TopMenuBar {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
         command: () => {
+          console.log(this.sessionStore.currentEditorWrapper.hasUndo());
           this.sessionStore.currentEditorWrapper.undo();
         },
       },
