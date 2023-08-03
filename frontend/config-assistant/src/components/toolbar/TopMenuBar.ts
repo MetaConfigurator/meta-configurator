@@ -8,8 +8,8 @@ import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {errorService} from '@/main';
 import {ref} from 'vue';
-import type {MenuItemCommandEvent} from 'primevue/menuitem';
 import {clearSchemaEditor} from '@/components/toolbar/clearSchema';
+import {storeToRefs} from 'pinia';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -90,6 +90,8 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
+        disabled: () => !storeToRefs(useSessionStore()).currentEditorWrapper.value.hasUndo(),
+        key: 'undo',
         command: () => {
           this.sessionStore.currentEditorWrapper.undo();
         },
@@ -100,6 +102,8 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.redo();
         },
+        key: 'redo',
+        disabled: () => !useSessionStore().currentEditorWrapper.hasRedo(),
       },
       {
         separator: true,
@@ -108,6 +112,7 @@ export class TopMenuBar {
         label: 'Share',
         class: 'z-10',
         icon: 'fa-solid fa-share-nodes',
+        disabled: true,
       },
     ];
   }
@@ -129,6 +134,7 @@ export class TopMenuBar {
             command: () => {
               throw new Error('Not implemented yet');
             },
+            disabled: true,
           },
         ],
       },
@@ -153,6 +159,7 @@ export class TopMenuBar {
             command: () => {
               throw new Error('Not implemented yet');
             },
+            disabled: true,
           },
           {
             label: 'Example Schemas',
@@ -175,6 +182,8 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.undo();
         },
+        disabled: () => !useSessionStore().currentEditorWrapper.hasUndo(),
+        key: 'schema_undo',
       },
       {
         label: 'Redo',
@@ -182,6 +191,8 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.redo();
         },
+        disabled: () => !useSessionStore().currentEditorWrapper.hasRedo(),
+        key: 'schema_redo',
       },
       {
         separator: true,
@@ -190,6 +201,7 @@ export class TopMenuBar {
         label: 'Share',
         class: 'z-10',
         icon: 'fa-solid fa-share-nodes',
+        disabled: true,
       },
     ];
   }
@@ -202,6 +214,7 @@ export class TopMenuBar {
         command: () => {
           throw new Error('Not implemented yet');
         },
+        disabled: true,
       },
       {
         label: 'Save settings file',
@@ -217,6 +230,8 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.undo();
         },
+        disabled: () => !useSessionStore().currentEditorWrapper.hasUndo(),
+        key: 'settings_undo',
       },
       {
         label: 'Redo',
@@ -224,6 +239,8 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.redo();
         },
+        disabled: () => !useSessionStore().currentEditorWrapper.hasRedo(),
+        key: 'settings_redo',
       },
       {
         separator: true,
@@ -232,6 +249,7 @@ export class TopMenuBar {
         label: 'Share',
         class: 'z-10',
         icon: 'fa-solid fa-share-nodes',
+        disabled: true,
       },
     ];
   }
