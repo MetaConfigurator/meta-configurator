@@ -161,8 +161,6 @@ export class TopMenuBar {
             icon: 'fa-solid fa-globe',
 
             command: this.handleFromURLClick,
-
-
           },
           {
             label: 'Example Schemas',

@@ -25,7 +25,6 @@ import InputText from 'primevue/inputtext';
 
 import {storeToRefs} from 'pinia';
 
-
 const props = defineProps<{
   currentMode: SessionMode;
 }>();
