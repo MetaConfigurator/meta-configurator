@@ -20,6 +20,7 @@ import {
 } from '@/components/toolbar/clearContent';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
+import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -38,7 +39,8 @@ const selectedSchema = ref<{
 }>(null);
 
 const showFetchedSchemas = ref(false);
-
+const showUrlInputDialog = ref(false);
+const schemaUrl = ref('');
 function getPageName(): string {
   switch (props.currentMode) {
     case SessionMode.FileEditor:
@@ -97,7 +99,12 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
 ];
 const toast = useToast();
-const topMenuBar = new TopMenuBar(toast, handleFromWebClick, handleFromOurExampleClick);
+const topMenuBar = new TopMenuBar(
+  toast,
+  handleFromWebClick,
+  handleFromOurExampleClick,
+  showUrlDialog
+);
 async function handleFromWebClick(): Promise<void> {
   try {
     await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
@@ -149,6 +156,26 @@ function handleAccept() {
 function handleReject() {
   // Hide the confirmation dialog
   showConfirmation.value = false;
+}
+function showUrlDialog() {
+  showUrlInputDialog.value = true;
+}
+
+// Method to hide the URL dialog
+function hideUrlDialog() {
+  showUrlInputDialog.value = false;
+}
+
+// Method to fetch schema from URL
+async function fetchSchemaFromURL() {
+  try {
+    await topMenuBar.fetchSchemaFromURL(schemaUrl.value);
+    // Do any additional processing if required
+    hideUrlDialog();
+  } catch (error) {
+    // Handle the error if there's an issue fetching the schema.
+    errorService.onError(error);
+  }
 }
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
@@ -220,7 +247,21 @@ function getLabelOfItem(item: MenuItem): string {
     <Button label="Yes" @click="handleAccept" class="dialog-button" />
     <Button label="No" @click="handleReject" class="dialog-button" />
   </Dialog>
-
+  <Dialog v-model:visible="showUrlInputDialog">
+    <div class="p-fluid">
+      <div class="p-field">
+        <label for="urlInput">Enter the URL of the schema:</label>
+        <InputText v-model="schemaUrl" id="urlInput" />
+      </div>
+      <div class="p-dialog-footer">
+        <!-- Wrap the buttons in a div and add margin to it -->
+        <div class="button-container">
+          <Button label="Cancel" @click="hideUrlDialog" class="dialog-button" />
+          <Button label="Fetch Schema" @click="fetchSchemaFromURL" class="dialog-button" />
+        </div>
+      </div>
+    </div>
+  </Dialog>
   <Toolbar class="h-10 no-padding">
     <template #start>
       <Menu ref="menu" :model="items" :popup="true">
@@ -290,6 +331,9 @@ function getLabelOfItem(item: MenuItem): string {
   margin-top: 1rem;
   font-size: 15px;
   padding: 0.5rem 1rem;
+}
+.button-container {
+  margin-top: 1rem;
 }
 .no-padding {
   padding: 0 !important;

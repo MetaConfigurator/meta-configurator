@@ -24,14 +24,17 @@ export class TopMenuBar {
   private toast: any;
   private onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
   private onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
+  private handleFromURLClick: () => void;
   constructor(
     toast = null,
     onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
-    onFromOurExampleClick: () => void
+    onFromOurExampleClick: () => void,
+    handleFromURLClick: () => void
   ) {
     this.toast = toast;
     this.onFromWebClick = onFromWebClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
+    this.handleFromURLClick = handleFromURLClick;
   }
   public async fetchWebSchemas(): Promise<void> {
     const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';
@@ -149,12 +152,7 @@ export class TopMenuBar {
           {
             label: 'From URL',
             icon: 'fa-solid fa-globe',
-            command: () => {
-              const schemaURL = prompt('Enter the URL of the schema:');
-              if (schemaURL) {
-                this.fetchSchemaFromURL(schemaURL);
-              }
-            },
+            command: this.handleFromURLClick,
           },
           {
             label: 'Example Schemas',
