@@ -79,9 +79,6 @@ onMounted(() => {
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
 
-  let currentContent = sessionStore.currentEditorWrapper.getContent();
-  sessionStore.currentEditorWrapper.setContent(currentContent);
-
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on(
     'change',
@@ -187,7 +184,7 @@ function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
   currentSelectionIsForcedFromOutside = true;
   const newEditorContent = manipulator.stringifyContentObject(configData);
-  editor.value.setValue(newEditorContent);
+  sessionStore.currentEditorWrapper.setContent(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
   currentSelectionIsForcedFromOutside = false;
 }

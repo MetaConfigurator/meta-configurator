@@ -17,7 +17,7 @@ export class CodeEditorWrapperUninitialized implements CodeEditorWrapper {
 
   redo(): void {}
 
-  setContent(value: string): string {
+  setContent(): string {
     return '';
   }
 

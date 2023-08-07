@@ -9,7 +9,7 @@ import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
-import {nil} from 'ajv';
+import type {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
