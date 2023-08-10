@@ -105,7 +105,6 @@ const topMenuBar = new TopMenuBar(
   showUrlDialog
 );
 
-
 async function handleFromWebClick(): Promise<void> {
   try {
     await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
@@ -179,8 +178,6 @@ async function fetchSchemaFromURL() {
     errorService.onError(error);
   }
 }
-
-
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
@@ -293,7 +290,6 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
       </div>
     </div>
   </Dialog>
-
 
   <Toolbar class="h-10 no-padding">
     <template #start>
