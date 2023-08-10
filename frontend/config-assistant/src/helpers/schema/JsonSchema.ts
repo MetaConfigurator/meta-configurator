@@ -58,6 +58,10 @@ export class JsonSchema {
   }
 
   public subSchemaAt(path: Path): JsonSchema | undefined {
+    if (path.length === 0) {
+      return this;
+    }
+
     let schema: JsonSchema | undefined = this;
     for (const element of path) {
       schema = schema.subSchema(element);

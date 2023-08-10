@@ -35,14 +35,12 @@ export interface AddItemTreeNodeData {
   relativePath: Path;
   absolutePath: Path;
   name: PathElement;
-  data?: any;
 }
 
 export interface ConfigTreeNodeData {
   name: PathElement;
   schema: JsonSchema;
   parentSchema?: JsonSchema;
-  data: any;
   relativePath: Path;
   absolutePath: Path;
   depth: number;
