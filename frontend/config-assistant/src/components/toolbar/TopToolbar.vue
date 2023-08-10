@@ -12,14 +12,12 @@ import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useToast} from 'primevue/usetoast';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {
-  clearEditor,
-  confirmationDialogMessage,
-  newEmptyFile,
-  showConfirmation,
-} from '@/components/toolbar/clearContent';
+import {newEmptyFile} from '@/components/toolbar/clearContent';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
+
+import InputText from 'primevue/inputtext';
+
 import {storeToRefs} from 'pinia';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
 
@@ -40,8 +38,9 @@ const selectedSchema = ref<{
 }>(null);
 
 const showFetchedSchemas = ref(false);
-
 const showAboutDialog = ref(false);
+const showUrlInputDialog = ref(false);
+const schemaUrl = ref('');
 
 function getPageName(): string {
   switch (props.currentMode) {
@@ -101,7 +100,14 @@ const pageSelectionMenuItems: MenuItem[] = [
   },
 ];
 const toast = useToast();
-const topMenuBar = new TopMenuBar(toast, handleFromWebClick, handleFromOurExampleClick);
+
+const topMenuBar = new TopMenuBar(
+  toast,
+  handleFromWebClick,
+  handleFromOurExampleClick,
+  showUrlDialog
+);
+
 async function handleFromWebClick(): Promise<void> {
   try {
     await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
@@ -138,13 +144,14 @@ watch(selectedSchema, async newSelectedSchema => {
       topMenuBar.fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to clear current config data ?');
+      newEmptyFile('Do you want to also clear current config data ?');
     } catch (error) {
       // Handle the error if there's an issue fetching the schema.
       errorService.onError(error);
     }
   }
 });
+
 function handleAccept() {
   clearEditor();
   // Hide the confirmation dialog
@@ -154,6 +161,27 @@ function handleReject() {
   // Hide the confirmation dialog
   showConfirmation.value = false;
 }
+function showUrlDialog() {
+  showUrlInputDialog.value = true;
+}
+
+// Method to hide the URL dialog
+function hideUrlDialog() {
+  showUrlInputDialog.value = false;
+}
+
+// Method to fetch schema from URL
+async function fetchSchemaFromURL() {
+  try {
+    await topMenuBar.fetchSchemaFromURL(schemaUrl.value);
+    // Do any additional processing if required
+    hideUrlDialog();
+  } catch (error) {
+    // Handle the error if there's an issue fetching the schema.
+    errorService.onError(error);
+  }
+}
+
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
 const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
 const settingsMenuItems = topMenuBar.settingsMenuItems;
@@ -229,26 +257,41 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
 <template>
   <Dialog v-model:visible="topMenuBar.showDialog.value">
     <!-- Dialog content goes here -->
-    <h3>Which Schema you want to open?</h3>
+    <h3>Which Schema do you want to open?</h3>
     <div class="card flex justify-content-center">
-      <!-- Listbox to display fetched schemas -->
-
-      <Listbox
-        listStyle="max-height:250px"
-        v-model="selectedSchema"
-        :options="topMenuBar.fetchedSchemas"
-        v-show="showFetchedSchemas"
-        filter
-        optionLabel="label"
-        class="w-50 md:w-14rem overflow-hidden">
-        <!-- Add a slot for the search input -->
-      </Listbox>
+      <div class="listbox-container" style="width: 300px">
+        <Listbox
+          listStyle="max-height: 250px"
+          v-model="selectedSchema"
+          :options="topMenuBar.fetchedSchemas"
+          v-show="showFetchedSchemas"
+          filter
+          optionLabel="label"
+          class="overflow-hidden">
+        </Listbox>
+      </div>
     </div>
   </Dialog>
+
   <Dialog v-model:visible="showConfirmation">
     <h3>{{ confirmationDialogMessage }}</h3>
     <Button label="Yes" @click="handleAccept" class="dialog-button" />
     <Button label="No" @click="handleReject" class="dialog-button" />
+  </Dialog>
+  <Dialog v-model:visible="showUrlInputDialog">
+    <div class="p-fluid">
+      <div class="p-field">
+        <label for="urlInput">Enter the URL of the schema:</label>
+        <InputText v-model="schemaUrl" id="urlInput" />
+      </div>
+      <div class="p-dialog-footer">
+        <!-- Wrap the buttons in a div and add margin to it -->
+        <div class="button-container">
+          <Button label="Cancel" @click="hideUrlDialog" class="dialog-button" />
+          <Button label="Fetch Schema" @click="fetchSchemaFromURL" class="dialog-button" />
+        </div>
+      </div>
+    </div>
   </Dialog>
 
   <AboutDialog
@@ -331,11 +374,11 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
 </template>
 
 <style scoped>
-.dialog-button {
-  margin-right: 1rem;
+.listbox-container {
+  width: 100%;
+}
+.button-container {
   margin-top: 1rem;
-  font-size: 15px;
-  padding: 0.5rem 1rem;
 }
 .no-padding {
   padding: 0 !important;

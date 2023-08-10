@@ -12,6 +12,11 @@ import Toast from 'primevue/toast';
 import router from '@/router';
 import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
 import {useSettingsStore} from '@/store/settingsStore';
+import ConfirmDialog from 'primevue/confirmdialog';
+import {useToast} from 'primevue/usetoast';
+import {useConfirm} from 'primevue/useconfirm';
+import {confirmationService} from '@/helpers/confirmationService';
+import {toastService} from '@/helpers/toastService';
 
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
@@ -40,10 +45,14 @@ function updateMode(newMode: SessionMode) {
       break;
   }
 }
+
+confirmationService.confirm = useConfirm();
+toastService.toast = useToast();
 </script>
 
 <template>
   <Toast position="bottom-left" />
+  <ConfirmDialog />
   <div class="w-full h-full flex" style="max-height: 100%">
     <main class="flex flex-col">
       <!-- toolbar -->
