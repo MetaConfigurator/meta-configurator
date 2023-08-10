@@ -19,6 +19,7 @@ import {errorService} from '@/main';
 import InputText from 'primevue/inputtext';
 
 import {storeToRefs} from 'pinia';
+import AboutDialog from '@/components/dialogs/AboutDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -37,8 +38,10 @@ const selectedSchema = ref<{
 }>(null);
 
 const showFetchedSchemas = ref(false);
+const showAboutDialog = ref(false);
 const showUrlInputDialog = ref(false);
 const schemaUrl = ref('');
+
 function getPageName(): string {
   switch (props.currentMode) {
     case SessionMode.FileEditor:
@@ -291,6 +294,10 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
     </div>
   </Dialog>
 
+  <AboutDialog
+    :visible="showAboutDialog"
+    @update:visible="newValue => (showAboutDialog = newValue)" />
+
   <Toolbar class="h-10 no-padding">
     <template #start>
       <Menu ref="menu" :model="items" :popup="true">
@@ -338,18 +345,28 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
       </div>
     </template>
     <template #end>
-      <div class="flex space-x-10 mr-3">
+      <div class="flex space-x-5 mr-3">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
           <p class="font-semibold text-lg">ConfigAssistant</p>
         </div>
+
+        <Button
+          circular
+          text
+          class="toolbar-button"
+          size="small"
+          v-tooltip.bottom="'About'"
+          @click="() => (showAboutDialog = true)">
+          <FontAwesomeIcon icon="fa-solid fa-circle-info" />
+        </Button>
 
         <!-- link to our github, opens in a new tab -->
         <a
           href="https://github.com/PaulBredl/config-assistant"
           target="_blank"
           rel="noopener noreferrer"
-          class="pi pi-github hover:scale-110"
+          class="pi pi-github hover:scale-110 text-gray-600"
           style="font-size: 1.7rem" />
       </div>
     </template>

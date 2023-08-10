@@ -4,11 +4,13 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 /* import specific icons */
 import {
   faBars,
+  faCircleInfo,
   faCog,
   faDatabase,
   faFileCirclePlus,
   faFloppyDisk,
   faFolderOpen,
+  faFontAwesome,
   faGears,
   faGlobe,
   faMagicWandSparkles,
@@ -40,4 +42,6 @@ export function registerIcons() {
   library.add(faMagicWandSparkles);
   library.add(faFileCode);
   library.add(faCog);
+  library.add(faCircleInfo);
+  library.add(faFontAwesome);
 }
