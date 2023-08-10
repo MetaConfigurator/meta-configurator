@@ -358,5 +358,5 @@ export class TopMenuBar {
       // Handle the error if there's an issue fetching the schema.
       errorService.onError(error);
     }
-  } //Sample schema URL: https://json.schemastore.org/github-action
+  }
 }
