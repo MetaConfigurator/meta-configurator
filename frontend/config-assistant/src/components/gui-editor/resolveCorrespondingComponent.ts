@@ -8,13 +8,14 @@ import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayP
 import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
 import type {VNode} from 'vue';
 import {h} from 'vue';
+import {useSessionStore} from '@/store/sessionStore';
 
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData
 ): VNode {
   const propsObject = {
     propertyName: nodeData.name,
-    propertyData: nodeData.data,
+    propertyData: useSessionStore().dataAtPath(nodeData.absolutePath),
     propertySchema: nodeData.schema,
     parentSchema: nodeData.parentSchema,
     relativePath: nodeData.relativePath,

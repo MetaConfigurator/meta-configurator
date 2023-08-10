@@ -44,7 +44,7 @@ function zoomIntoPath(pathToAdd: Path) {
   <div class="p-5 space-y-3 flex flex-col">
     <SchemaInfoPanel :schema="sessionStore.fileSchema" />
     <CurrentPathBreadcrumb
-      :root-name="sessionStore.fileSchema.title ?? 'root'"
+      :root-name="sessionStore.fileSchema?.title ?? 'root'"
       :path="sessionStore.currentPath"
       @update:path="newPath => updatePath(newPath)" />
     <PropertiesPanel
