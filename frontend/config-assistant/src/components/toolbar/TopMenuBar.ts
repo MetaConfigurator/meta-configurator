@@ -25,14 +25,17 @@ export class TopMenuBar {
   private toast: any;
   private onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
   private onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
+  private handleFromURLClick: () => void;
   constructor(
     toast = null,
     onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
-    onFromOurExampleClick: () => void
+    onFromOurExampleClick: () => void,
+    handleFromURLClick: () => void
   ) {
     this.toast = toast;
     this.onFromWebClick = onFromWebClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
+    this.handleFromURLClick = handleFromURLClick;
   }
   public async fetchWebSchemas(): Promise<void> {
     const schemaStoreURL = 'https://www.schemastore.org/api/json/catalog.json';
@@ -156,10 +159,8 @@ export class TopMenuBar {
           {
             label: 'From URL',
             icon: 'fa-solid fa-globe',
-            command: () => {
-              throw new Error('Not implemented yet');
-            },
-            disabled: true,
+
+            command: this.handleFromURLClick,
           },
           {
             label: 'Example Schemas',
@@ -319,6 +320,30 @@ export class TopMenuBar {
       useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
       const schemaName = selectedSchema.label || 'Unknown Schema';
       useDataStore().schemaData = selectedSchema?.schema;
+      newEmptyFile('Do you want to also clear the current config file?');
+
+      if (this.toast) {
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: `"${schemaName}" fetched successfully!`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      // Handle the error if there's an issue fetching the schema.
+      errorService.onError(error);
+    }
+  }
+  public async fetchSchemaFromURL(url: string): Promise<void> {
+    try {
+      const response = await fetch(url);
+      const schemaContent = await response.json();
+      const schemaName = schemaContent.title || 'Unknown Schema';
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      // Update the schemaData in the dataStore with the fetched schema content.
+      useDataStore().schemaData = schemaContent;
+      // Always clear the data without prompting the user.
       newEmptyFile('Do you want to also clear the current config file?');
 
       if (this.toast) {
