@@ -3,7 +3,7 @@ import type {SchemaPropertyType} from '@/model/JsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 
 /**
- * Creates a HTML paragraph describing the given schema.
+ * Creates an HTML paragraph describing the given schema.
  *
  * The following properties are not described yet:
  * - $schema

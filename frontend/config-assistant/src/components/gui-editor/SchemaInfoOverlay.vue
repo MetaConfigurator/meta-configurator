@@ -1,3 +1,14 @@
+<!--
+This component is used to display the schema description in a popup.
+It exposes the following functions:
+- showPanel(schema: JsonSchema, propertyName: string, parentSchema: JsonSchema, event: Event): void
+  - Shows the panel with the given schema description
+- closePanel(): void
+  - Closes the panel
+It emits the following events:
+- hide: void
+  - Emitted when the panel is closed
+-->
 <script setup lang="ts">
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import OverlayPanel from 'primevue/overlaypanel';
@@ -18,6 +29,11 @@ const schemaDescription = computed(() =>
 );
 
 const panelRef = ref();
+/**
+ * Whether the panel should stay open, because the mouse is over it
+ * This can be useful if the user wants to copy something from the panel
+ * or if we put clickable links in the panel
+ */
 const keepOpen = ref(false);
 
 const showPanel = (schema: JsonSchema, propertyName: string, parentSchema: JsonSchema, event) => {
