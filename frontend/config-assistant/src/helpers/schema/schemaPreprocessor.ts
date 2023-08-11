@@ -5,6 +5,8 @@ import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
 import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
 
+const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
+
 /**
  * Preprocesses the schema.
  *
@@ -22,18 +24,28 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
     const refString = copiedSchema.$ref?.startsWith('#')
       ? copiedSchema.$ref.substring(1)
       : copiedSchema.$ref!!;
-    let refSchema = pointer.get(
-      nonBooleanSchema(useSessionStore().fileSchemaData ?? {}) ?? {},
-      refString
-    );
-    refSchema = preprocessSchema(refSchema);
+
+    let refSchema: any;
+    if (preprocessedRefSchemas.has(refString)) {
+      refSchema = preprocessedRefSchemas.get(refString);
+    } else {
+      refSchema = pointer.get(
+        nonBooleanSchema(useSessionStore().fileSchemaData ?? {}) ?? {},
+        refString
+      );
+      refSchema = preprocessSchema(refSchema);
+      preprocessedRefSchemas.set(refString, refSchema);
+    }
+
     delete copiedSchema.$ref;
     copiedSchema = {allOf: [copiedSchema, refSchema]};
   }
 
   if (hasAllOfs(copiedSchema)) {
     // @ts-ignore
-    copiedSchema.allOf = copiedSchema.allOf!!.map(preprocessSchema);
+    copiedSchema.allOf = copiedSchema.allOf!!.map((subSchema, index) =>
+      preprocessSchema(subSchema as JsonSchemaObjectType)
+    );
     copiedSchema = mergeAllOf(copiedSchema, {
       resolvers: {
         defaultResolver: mergeAllOf.options.resolvers.title,

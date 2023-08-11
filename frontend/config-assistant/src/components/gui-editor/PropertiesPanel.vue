@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {Ref} from 'vue';
-import {computed, ref, watch} from 'vue';
+import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
@@ -10,14 +10,17 @@ import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
-import type {Path, PathElement} from '@/model/path';
+import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {ConfigTreeNodeData, TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {useDebounceFn} from '@vueuse/core';
+import {refDebounced} from '@vueuse/core';
+import {isObjectStructureEqual} from '@/helpers/compareObjectStructure';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -33,19 +36,65 @@ const emit = defineEmits<{
 
 const treeNodeResolver = new ConfigTreeNodeResolver();
 
-const nodesToDisplay = computed(() => {
-  const rootNode = treeNodeResolver.createTreeNodeOfProperty(
-    props.currentSchema.title ?? 'root',
+const loading = ref(false);
+const loadingDebounced = refDebounced(loading, 100);
+
+const treeTableFilters = ref<Record<string, string>>({});
+const {currentExpandedElements} = storeToRefs(useSessionStore());
+
+const currentTree = ref({});
+
+function computeTree() {
+  currentTree.value = treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema,
     undefined,
     props.currentPath
   );
+  currentTree.value.children = treeNodeResolver.createChildNodesOfNode(currentTree.value);
 
-  return rootNode.children;
+  expandPreviouslyExpandedElements(currentTree.value.children as Array<GuiEditorTreeNode>);
+
+  return currentTree.value;
+}
+
+/**
+ * Calculate the children of all nodes that are expanded.
+ * @param nodes initial nodes
+ */
+function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
+  for (const node of nodes) {
+    const expanded = currentExpandedElements.value[pathToString(node.data.absolutePath)] ?? false;
+    if (expanded) {
+      node.children = treeNodeResolver.createChildNodesOfNode(node);
+      if (node.children && node.children.length > 0) {
+        expandPreviouslyExpandedElements(node.children as Array<GuiEditorTreeNode>);
+      }
+    }
+  }
+}
+
+function updateTree() {
+  loadingDebounced.value = true;
+  window.setTimeout(() => {
+    nodesToDisplay.value = computeTree().children;
+    loadingDebounced.value = false;
+  }, 0);
+}
+
+const nodesToDisplay = ref(computeTree().children);
+
+watch(storeToRefs(useSessionStore()).fileSchema, () => {
+  currentExpandedElements.value = {};
+  updateTree();
 });
 
-const treeTableFilters = ref<Record<string, string>>({});
-const {currentExpandedElements} = storeToRefs(useSessionStore());
+// recalculate the tree when the data structure changes, but not
+// single values (e.g. when a property is changed)
+watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
+  if (!isObjectStructureEqual(value, oldValue)) {
+    updateTree();
+  }
+});
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
@@ -63,13 +112,16 @@ function focus(id: string) {
 
 function addItem(relativePath: Path, newValue: any) {
   updateData(relativePath, newValue);
+  updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
   const subSchema = props.currentSchema.subSchemaAt(relativePath);
   if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
     useSessionStore().expand(absolutePath);
 
-    focusOnFirstPropertyOfSchema(absolutePath);
+    window.setTimeout(() => {
+      focusOnFirstProperty(relativePath);
+    }, 0);
     return;
   }
 
@@ -79,20 +131,42 @@ function addItem(relativePath: Path, newValue: any) {
   focus(pathToString(props.currentPath.concat(pathToAddItem)));
 }
 
-function focusOnFirstPropertyOfSchema(absolutePath: Path) {
-  const dataAtPath = useSessionStore().dataAtPath(absolutePath);
-  const subSchema = useSessionStore().schemaAtPath(absolutePath);
+/**
+ * Focus on the first property of the current tree or the first property of the given relative path.
+ * @param relativePath the relative path to the property to focus on
+ */
+function focusOnFirstProperty(relativePath?: Path) {
+  let pathToFirstProperty = currentTree.value.children[0]?.data?.absolutePath;
 
-  let firstPropertyOfObject: PathElement =
-    Object.keys(subSchema?.properties)[0] ?? Object.keys(dataAtPath)[0];
-  if (Array.isArray(dataAtPath)) {
-    // if the data is an array, the first property is the index of the array
-    // (which is a number)
-    firstPropertyOfObject = 0;
+  if (relativePath) {
+    const node = findNode(relativePath);
+    if (node) {
+      pathToFirstProperty = node.children[0]?.data?.absolutePath;
+    }
   }
-  const pathToFirstProperty = absolutePath.concat(firstPropertyOfObject);
+  if (pathToFirstProperty) {
+    focus(pathToString(pathToFirstProperty));
+  }
+}
 
-  focus(pathToString(pathToFirstProperty));
+/**
+ * Find a node in the current tree by its relative path.
+ * @param relativePath the relative path of the node to find
+ * @param root the root of the tree to search in
+ */
+function findNode(relativePath, root = currentTree.value) {
+  const absolutePath = pathToString(props.currentPath.concat(relativePath));
+  if (root.key === absolutePath) {
+    return root;
+  }
+
+  for (const child of root.children) {
+    const foundNode = findNode(relativePath, child);
+    if (foundNode) {
+      return foundNode;
+    }
+  }
+  return undefined;
 }
 
 /**
@@ -132,7 +206,8 @@ function addNegativeMarginForTableStyle(depth: number) {
 }
 
 watch(storeToRefs(useSessionStore()).currentPath, (path: Path) => {
-  focusOnFirstPropertyOfSchema(path);
+  updateTree();
+  focusOnFirstProperty();
 });
 
 function displayAsDefaultProperty(node: any) {
@@ -141,6 +216,12 @@ function displayAsDefaultProperty(node: any) {
     node.type === TreeNodeType.SCHEMA_PROPERTY ||
     node.type === TreeNodeType.ADDITIONAL_PROPERTY
   );
+}
+
+function expandElement(node: any) {
+  currentExpandedElements.value[node.key] = true;
+  node.children = treeNodeResolver.createChildNodesOfNode(node);
+  expandPreviouslyExpandedElements(node.children as Array<GuiEditorTreeNode>);
 }
 
 const schemaInfoOverlay: Ref<SchemaInfoOverlay | undefined> = ref();
@@ -181,8 +262,10 @@ function closeInfoOverlayPanelDebounced0() {
     scroll-direction="vertical"
     scroll-height="flex"
     row-hover
+    :lazy="true"
+    :loading="loading"
     :expandedKeys="currentExpandedElements"
-    @nodeExpand="node => (currentExpandedElements[node.key] = true)"
+    @nodeExpand="expandElement"
     @nodeCollapse="node => delete currentExpandedElements[node.key]"
     :filters="treeTableFilters">
     <!-- Filter field -->
