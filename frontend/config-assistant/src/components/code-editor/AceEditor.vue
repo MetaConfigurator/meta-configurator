@@ -66,12 +66,17 @@ onMounted(() => {
   editor = ref(ace.edit('javascript-editor'));
   editorWrapper = new CodeEditorWrapperAce(editor.value);
   sessionStore.currentEditorWrapper = editorWrapper;
+  editor.value.$blockScrolling = Infinity;
 
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
   } else if (props.dataFormat == 'yaml') {
     editor.value.getSession().setMode('ace/mode/yaml');
   }
+
+  editor.value.setOptions({
+    autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
+  });
 
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
