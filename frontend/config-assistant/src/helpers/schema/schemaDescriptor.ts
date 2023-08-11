@@ -342,9 +342,9 @@ function describeContains(schema: JsonSchema): string {
     const min = schema.minContains ?? 1;
     const max = schema.maxContains;
 
-    const result = `The array must contain at least ${formatValue(min)}`;
+    let result = `The array must contain at least ${formatValue(min)}`;
     if (max) {
-      return paragraph(`${result} and ${bold('at most')} ${formatValue(max)}`);
+      result += paragraph(`${result} and ${bold('at most')} ${formatValue(max)}`);
     }
     return paragraph(
       `${result} items that match the following schema: ${describeSubSchema(
