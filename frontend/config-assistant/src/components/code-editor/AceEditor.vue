@@ -14,11 +14,9 @@ import {useDebounceFn, watchThrottled} from '@vueuse/core';
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
-import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
 import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
-import {useSettingsStore} from '@/store/settingsStore';
-import {errorService} from '@/main';
 import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 

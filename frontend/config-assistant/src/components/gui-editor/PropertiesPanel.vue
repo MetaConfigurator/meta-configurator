@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {Ref} from 'vue';
 import {computed, ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
@@ -11,10 +12,12 @@ import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import type {Path, PathElement} from '@/model/path';
 import {GuiConstants} from '@/constants';
-import {TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {ConfigTreeNodeData, TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
+import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
+import {useDebounceFn} from '@vueuse/core';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -139,9 +142,36 @@ function displayAsDefaultProperty(node: any) {
     node.type === TreeNodeType.ADDITIONAL_PROPERTY
   );
 }
+
+const schemaInfoOverlay: Ref<SchemaInfoOverlay | undefined> = ref();
+const overlayVisible = ref(false);
+
+const showInfoOverlayPanel = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
+  schemaInfoOverlay.value?.showPanel(nodeData.schema, nodeData.name, nodeData.parentSchema, event);
+};
+const showInfoOverlayPanelDebounced = useDebounceFn((nodeData: ConfigTreeNodeData, event) => {
+  if (overlayVisible.value) {
+    showInfoOverlayPanel(nodeData, event);
+  }
+}, 500);
+
+function showInfoOverlayPanelDebounced0(nodeData: ConfigTreeNodeData, event) {
+  overlayVisible.value = true;
+  showInfoOverlayPanelDebounced(nodeData, event);
+}
+
+const closeInfoOverlayPanelDebounced = useDebounceFn(() => {
+  schemaInfoOverlay.value?.closePanel();
+}, 100);
+
+function closeInfoOverlayPanelDebounced0() {
+  overlayVisible.value = false;
+  closeInfoOverlayPanelDebounced();
+}
 </script>
 
 <template>
+  <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="overlayVisible = false" />
   <TreeTable
     :value="nodesToDisplay"
     filter-mode="lenient"
@@ -173,7 +203,9 @@ function displayAsDefaultProperty(node: any) {
         <span
           v-if="displayAsDefaultProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          @mouseenter="event => showInfoOverlayPanelDebounced0(slotProps.node.data, event)"
+          @mouseleave="closeInfoOverlayPanelDebounced0">
           <PropertyMetadata
             :nodeData="slotProps.node.data"
             :type="slotProps.node.type"
@@ -185,7 +217,8 @@ function displayAsDefaultProperty(node: any) {
             class="w-full"
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
-            bodyClass="w-full" />
+            bodyClass="w-full"
+            @keydown.ctrl.i="event => showInfoOverlayPanel(slotProps.node.data, event)" />
         </span>
 
         <!-- special tree nodes -->
