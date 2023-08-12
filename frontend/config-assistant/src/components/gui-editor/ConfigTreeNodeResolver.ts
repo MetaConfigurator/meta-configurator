@@ -6,6 +6,7 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {pathToString} from '@/helpers/pathHelper';
 import {PropertySorting} from '@/model/SettingsTypes';
 import {useSessionStore} from '@/store/sessionStore';
+import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
 
 /**
  * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
@@ -80,6 +81,10 @@ export class ConfigTreeNodeResolver {
     }
     if (schema.hasType('array') && depth < depthLimit) {
       children = this.createArrayChildrenTreeNodes(absolutePath, relativePath, schema, depth);
+    }
+    if (schema.oneOf.length > 0) {
+      console.log('oneof ', schema);
+      children = this.createOneOfChildrenTreeNodes(absolutePath, relativePath, schema, depth);
     }
 
     return children;
@@ -316,5 +321,23 @@ export class ConfigTreeNodeResolver {
       leaf: true,
       loaded: true,
     };
+  }
+
+  private createOneOfChildrenTreeNodes(
+    absolutePath: Path,
+    relativePath: Path,
+    schema: JsonSchema,
+    depth: number
+  ) {
+    const data = useSessionStore().dataAtPath(absolutePath);
+    let children: GuiEditorTreeNode[] = [];
+
+    for (const subSchema of schema.oneOf) {
+      console.log('sub schema ', subSchema);
+      children = children.concat(
+        this.createChildNodes(absolutePath, relativePath, subSchema, depth)
+      );
+    }
+    return children;
   }
 }
