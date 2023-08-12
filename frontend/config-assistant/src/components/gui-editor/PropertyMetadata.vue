@@ -64,6 +64,9 @@ function getTypeDescription(): string {
   if (props.nodeData.schema.enum) {
     return 'enum';
   }
+  if (props.nodeData.schema.oneOf.length > 0) {
+    return 'oneOf';
+  }
 
   const type = props.nodeData.schema.type;
   if (Array.isArray(type)) {

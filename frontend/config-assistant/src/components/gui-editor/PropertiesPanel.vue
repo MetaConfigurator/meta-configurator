@@ -92,6 +92,11 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
   }
 });
 
+watch(storeToRefs(useSessionStore()).currentSelectedOneOfOptions, () => {
+  console.log('current selected OneOfOptions updated');
+  updateTree();
+});
+
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
@@ -206,7 +211,7 @@ watch(storeToRefs(useSessionStore()).currentPath, (path: Path) => {
   focusOnFirstProperty();
 });
 
-function displayAsDefaultProperty(node: any) {
+function displayAsRegularProperty(node: any) {
   return (
     node.type === TreeNodeType.PATTERN_PROPERTY ||
     node.type === TreeNodeType.SCHEMA_PROPERTY ||
@@ -253,7 +258,7 @@ function expandElement(node: any) {
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->
         <span
-          v-if="displayAsDefaultProperty(slotProps.node)"
+          v-if="displayAsRegularProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
           <PropertyMetadata
@@ -262,7 +267,7 @@ function expandElement(node: any) {
             @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
         </span>
 
-        <span v-if="displayAsDefaultProperty(slotProps.node)" style="max-width: 50%" class="w-full">
+        <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 50%" class="w-full">
           <PropertyData
             class="w-full"
             :nodeData="slotProps.node.data"

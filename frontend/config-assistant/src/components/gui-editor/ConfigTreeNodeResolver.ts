@@ -332,10 +332,20 @@ export class ConfigTreeNodeResolver {
     const data = useSessionStore().dataAtPath(absolutePath);
     let children: GuiEditorTreeNode[] = [];
 
-    for (const subSchema of schema.oneOf) {
+    const path = pathToString(absolutePath);
+    const subSchemaIndex = useSessionStore().currentSelectedOneOfOptions.get(path);
+    console.log(
+      'oneOf children tree nodes creation for path ',
+      path,
+      ' and found subSchemaIndex ',
+      subSchemaIndex
+    );
+    if (subSchemaIndex !== undefined) {
+      const subSchema = schema.oneOf[subSchemaIndex];
       console.log('sub schema ', subSchema);
       children = children.concat(
         this.createChildNodes(absolutePath, relativePath, subSchema, depth)
+        //this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth)
       );
     }
     return children;

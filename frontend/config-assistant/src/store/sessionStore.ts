@@ -34,6 +34,8 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentPath: Ref<Path> = ref<Path>([]);
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
+  // @ts-ignore
+  const currentSelectedOneOfOptions: Ref<Map<string, number>> = ref(new Map([]));
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
@@ -178,6 +180,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentPath,
     currentSelectedElement,
     currentExpandedElements,
+    currentSelectedOneOfOptions,
     isExpanded,
     expand,
     collapse,
