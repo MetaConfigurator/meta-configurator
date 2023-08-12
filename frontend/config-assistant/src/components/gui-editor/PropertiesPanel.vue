@@ -8,7 +8,7 @@ import Button from 'primevue/button';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
-import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
+import {ConfigTreeNodeResolver} from '@/components/gui-editor/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
