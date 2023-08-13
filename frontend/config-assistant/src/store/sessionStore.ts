@@ -1,4 +1,4 @@
-import type {Ref, WritableComputedRef} from 'vue';
+import type {ComputedRef, Ref, WritableComputedRef} from 'vue';
 import {computed, ref} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
@@ -9,7 +9,8 @@ import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
-import {nil} from 'ajv';
+import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
+import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -34,6 +35,10 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentPath: Ref<Path> = ref<Path>([]);
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
+  // @ts-ignore
+  const currentSelectedOneOfAnyOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(
+    new Map([])
+  );
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
@@ -109,7 +114,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   });
 
   function schemaAtPath(path: Path): JsonSchema {
-    return fileSchema.value.subSchemaAt(path) ?? new JsonSchema({});
+    return fileSchema.value.subSchemaAt(path, []) ?? new JsonSchema({});
   }
 
   const schemaAtCurrentPath: Ref<JsonSchema> = computed(() => schemaAtPath(currentPath.value));
@@ -178,6 +183,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentPath,
     currentSelectedElement,
     currentExpandedElements,
+    currentSelectedOneOfAnyOfOptions: currentSelectedOneOfAnyOfOptions,
     isExpanded,
     expand,
     collapse,

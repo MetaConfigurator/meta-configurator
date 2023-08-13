@@ -2,7 +2,7 @@
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {PathElement} from '@/model/path';
 import {Path} from '@/model/path';
-import {dataToString} from '@/helpers/data/dataToString';
+import {dataToString} from '@/helpers/dataToString';
 import {useSessionStore} from '@/store/sessionStore';
 
 const props = defineProps<{

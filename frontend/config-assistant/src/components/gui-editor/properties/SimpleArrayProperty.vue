@@ -2,7 +2,7 @@
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
 import type {Path} from '@/model/path';
-import {dataToString} from '@/helpers/data/dataToString';
+import {dataToString} from '@/helpers/dataToString';
 
 const props = defineProps<{
   propertyName: string;

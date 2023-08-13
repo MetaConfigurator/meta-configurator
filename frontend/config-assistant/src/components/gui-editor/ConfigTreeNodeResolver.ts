@@ -45,11 +45,20 @@ export class ConfigTreeNodeResolver {
       type: nodeType,
       key: pathToString(absolutePath),
       children: [],
-      leaf: this.isLeaf(schema, depth),
+      leaf: this.isLeaf(schema, absolutePath, depth),
     };
   }
 
-  private isLeaf(schema: JsonSchema, depth: number): boolean {
+  private isLeaf(schema: JsonSchema, absolutePath: Path, depth: number): boolean {
+    const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
+    if (dependsOnUserSelection) {
+      const path = pathToString(absolutePath);
+      const hasUserSelection = useSessionStore().currentSelectedOneOfAnyOfOptions.has(path);
+      if (!hasUserSelection) {
+        return true;
+      }
+    }
+
     return (
       (!schema.hasType('object') && !schema.hasType('array')) ||
       depth >= useSettingsStore().settingsData.guiEditor.maximumDepth
@@ -80,6 +89,12 @@ export class ConfigTreeNodeResolver {
     }
     if (schema.hasType('array') && depth < depthLimit) {
       children = this.createArrayChildrenTreeNodes(absolutePath, relativePath, schema, depth);
+    }
+    if (schema.oneOf.length > 0) {
+      children = this.createOneOfChildrenTreeNodes(absolutePath, relativePath, schema, depth);
+    }
+    if (schema.anyOf.length > 0) {
+      children = this.createAnyOfChildrenTreeNodes(absolutePath, relativePath, schema, depth);
     }
 
     return children;
@@ -316,5 +331,36 @@ export class ConfigTreeNodeResolver {
       leaf: true,
       loaded: true,
     };
+  }
+  private createOneOfChildrenTreeNodes(
+    absolutePath: Path,
+    relativePath: Path,
+    schema: JsonSchema,
+    depth: number
+  ) {
+    const path = pathToString(absolutePath);
+    const selectionOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
+
+    if (selectionOption !== undefined) {
+      const subSchema = schema.oneOf[selectionOption.index];
+      return [this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth)];
+    }
+    return [];
+  }
+
+  private createAnyOfChildrenTreeNodes(
+    absolutePath: Path,
+    relativePath: Path,
+    schema: JsonSchema,
+    depth: number
+  ) {
+    const path = pathToString(absolutePath);
+    const selectionOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
+
+    if (selectionOption !== undefined) {
+      const subSchema = schema.anyOf[selectionOption.index];
+      return [this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth)];
+    }
+    return [];
   }
 }

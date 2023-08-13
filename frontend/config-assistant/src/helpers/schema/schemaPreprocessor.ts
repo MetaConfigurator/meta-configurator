@@ -53,6 +53,40 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
     });
   }
 
+  if (hasOneOfs(copiedSchema)) {
+    // @ts-ignore
+    copiedSchema.oneOf = copiedSchema.oneOf!!.map((subSchema, index) => {
+      let copiedSchemaWithoutOneOf = {...copiedSchema};
+      delete copiedSchemaWithoutOneOf.oneOf;
+      let resultSchema = {
+        allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutOneOf],
+      };
+      return mergeAllOf(resultSchema, {
+        resolvers: {
+          defaultResolver: mergeAllOf.options.resolvers.title,
+        },
+      });
+    });
+  }
+
+  if (hasAnyOfs(copiedSchema)) {
+    // @ts-ignore
+    copiedSchema.anyOf = copiedSchema.anyOf!!.map((subSchema, index) => {
+      let copiedSchemaWithoutAnyOf = {...copiedSchema};
+      delete copiedSchemaWithoutAnyOf.anyOf;
+      let resultSchema = {
+        allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutAnyOf],
+      };
+      return mergeAllOf(resultSchema, {
+        resolvers: {
+          defaultResolver: mergeAllOf.options.resolvers.title,
+        },
+      });
+    });
+  }
+
+  optimizeSchema(copiedSchema);
+
   return copiedSchema;
 }
 
@@ -62,4 +96,16 @@ function hasRef(schema: JsonSchemaObjectType): boolean {
 
 function hasAllOfs(schema: JsonSchemaObjectType): boolean {
   return schema.allOf !== undefined && schema.allOf.length > 0;
+}
+function hasOneOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.oneOf !== undefined && schema.oneOf.length > 0;
+}
+function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.anyOf !== undefined && schema.anyOf.length > 0;
+}
+
+function optimizeSchema(schema: JsonSchemaObjectType) {
+  if (hasOneOfs(schema)) {
+    // TODO: if it is just oneOf of types, then replace it by a choice of types
+  }
 }
