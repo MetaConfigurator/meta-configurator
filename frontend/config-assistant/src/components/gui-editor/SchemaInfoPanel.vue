@@ -4,7 +4,6 @@ import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import {useSessionStore} from '../../store/sessionStore';
-import {generateTooltipText} from '@/helpers/propertyTooltipGenerator';
 
 const props = defineProps<{
   schema: ref<TopLevelJsonSchema>;

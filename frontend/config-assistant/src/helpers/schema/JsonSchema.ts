@@ -122,6 +122,14 @@ export class JsonSchema {
     return this.items;
   }
 
+  get isAlwaysTrue(): boolean {
+    return JSON.stringify(this.jsonSchema) === '{}';
+  }
+
+  get isAlwaysFalse(): boolean {
+    return this.jsonSchema === undefined;
+  }
+
   /**
    * Returns true if it is a constant value, i.e. if it has a const keyword,
    * or if it has an enum keyword with only one value, or if it is of type null.

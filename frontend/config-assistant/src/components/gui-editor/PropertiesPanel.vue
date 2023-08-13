@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {Ref} from 'vue';
 import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
@@ -11,12 +12,14 @@ import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
-import {GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {ConfigTreeNodeData, GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
-import {refDebounced} from '@vueuse/core';
+import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
+import {refDebounced, useDebounceFn} from '@vueuse/core';
 import {isObjectStructureEqual} from '@/helpers/compareObjectStructure';
+import type {TreeNode} from 'primevue/tree';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -77,7 +80,7 @@ function updateTree() {
   }, 0);
 }
 
-const nodesToDisplay = ref(computeTree().children);
+const nodesToDisplay: Ref<TreeNode[]> = ref(computeTree().children);
 
 watch(storeToRefs(useSessionStore()).fileSchema, () => {
   currentExpandedElements.value = {};
@@ -219,9 +222,38 @@ function expandElement(node: any) {
   node.children = treeNodeResolver.createChildNodesOfNode(node);
   expandPreviouslyExpandedElements(node.children as Array<GuiEditorTreeNode>);
 }
+
+const schemaInfoOverlay = ref<InstanceType<typeof SchemaInfoOverlay> | undefined>();
+const overlayVisible = ref(false);
+
+const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
+  // @ts-ignore
+  schemaInfoOverlay.value?.showPanel(nodeData.schema, nodeData.name, nodeData.parentSchema, event);
+};
+const showInfoOverlayPanelDebounced = useDebounceFn((nodeData: ConfigTreeNodeData, event) => {
+  if (overlayVisible.value) {
+    showInfoOverlayPanelInstantly(nodeData, event);
+  }
+}, 500);
+
+function showInfoOverlayPanel(nodeData: ConfigTreeNodeData, event) {
+  overlayVisible.value = true;
+  showInfoOverlayPanelDebounced(nodeData, event);
+}
+
+const closeInfoOverlayPanelDebounced = useDebounceFn(() => {
+  // @ts-ignore
+  schemaInfoOverlay.value?.closePanel();
+}, 100);
+
+function closeInfoOverlayPanel() {
+  overlayVisible.value = false;
+  closeInfoOverlayPanelDebounced();
+}
 </script>
 
 <template>
+  <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="overlayVisible = false" />
   <TreeTable
     :value="nodesToDisplay"
     filter-mode="lenient"
@@ -255,7 +287,9 @@ function expandElement(node: any) {
         <span
           v-if="displayAsDefaultProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          @mouseenter="event => showInfoOverlayPanel(slotProps.node.data, event)"
+          @mouseleave="closeInfoOverlayPanel">
           <PropertyMetadata
             :nodeData="slotProps.node.data"
             :type="slotProps.node.type"
@@ -267,7 +301,8 @@ function expandElement(node: any) {
             class="w-full"
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
-            bodyClass="w-full" />
+            bodyClass="w-full"
+            @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />
         </span>
 
         <!-- special tree nodes -->
