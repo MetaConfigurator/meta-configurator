@@ -67,6 +67,8 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
     );
   }
 
+  optimizeSchema(copiedSchema);
+
   return copiedSchema;
 }
 
@@ -82,4 +84,10 @@ function hasOneOfs(schema: JsonSchemaObjectType): boolean {
 }
 function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
   return schema.anyOf !== undefined && schema.anyOf.length > 0;
+}
+
+function optimizeSchema(schema: JsonSchemaObjectType) {
+  if (hasOneOfs(schema)) {
+    // TODO: if it is just oneOf of types, then replace it by a choice of types
+  }
 }
