@@ -6,7 +6,6 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {pathToString} from '@/helpers/pathHelper';
 import {PropertySorting} from '@/model/SettingsTypes';
 import {useSessionStore} from '@/store/sessionStore';
-import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
 
 /**
  * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
@@ -46,11 +45,20 @@ export class ConfigTreeNodeResolver {
       type: nodeType,
       key: pathToString(absolutePath),
       children: [],
-      leaf: this.isLeaf(schema, depth),
+      leaf: this.isLeaf(schema, absolutePath, depth),
     };
   }
 
-  private isLeaf(schema: JsonSchema, depth: number): boolean {
+  private isLeaf(schema: JsonSchema, absolutePath: Path, depth: number): boolean {
+    const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
+    if (dependsOnUserSelection) {
+      const path = pathToString(absolutePath);
+      const hasUserSelection = useSessionStore().currentSelectedOneOfAnyOfOptions.has(path);
+      if (!hasUserSelection) {
+        return true;
+      }
+    }
+
     return (
       (!schema.hasType('object') && !schema.hasType('array')) ||
       depth >= useSettingsStore().settingsData.guiEditor.maximumDepth
@@ -83,8 +91,10 @@ export class ConfigTreeNodeResolver {
       children = this.createArrayChildrenTreeNodes(absolutePath, relativePath, schema, depth);
     }
     if (schema.oneOf.length > 0) {
-      console.log('oneof ', schema);
       children = this.createOneOfChildrenTreeNodes(absolutePath, relativePath, schema, depth);
+    }
+    if (schema.anyOf.length > 0) {
+      children = this.createAnyOfChildrenTreeNodes(absolutePath, relativePath, schema, depth);
     }
 
     return children;
@@ -323,6 +333,21 @@ export class ConfigTreeNodeResolver {
     };
   }
 
+  private createOneOfAnyOfChildrenTreeNodes(
+    absolutePath: Path,
+    relativePath: Path,
+    schema: JsonSchema,
+    depth: number
+  ) {
+    const path = pathToString(absolutePath);
+    const selectionOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
+
+    if (selectionOption !== undefined) {
+      const subSchema = schema.oneOf[selectionOption.index];
+      return this.createChildNodes(absolutePath, relativePath, subSchema, depth);
+    }
+    return [];
+  }
   private createOneOfChildrenTreeNodes(
     absolutePath: Path,
     relativePath: Path,
@@ -330,10 +355,26 @@ export class ConfigTreeNodeResolver {
     depth: number
   ) {
     const path = pathToString(absolutePath);
-    const selectionOption = useSessionStore().currentSelectedOneOfOptions.get(path);
+    const selectionOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
 
     if (selectionOption !== undefined) {
       const subSchema = schema.oneOf[selectionOption.index];
+      return this.createChildNodes(absolutePath, relativePath, subSchema, depth);
+    }
+    return [];
+  }
+
+  private createAnyOfChildrenTreeNodes(
+    absolutePath: Path,
+    relativePath: Path,
+    schema: JsonSchema,
+    depth: number
+  ) {
+    const path = pathToString(absolutePath);
+    const selectionOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
+
+    if (selectionOption !== undefined) {
+      const subSchema = schema.anyOf[selectionOption.index];
       return this.createChildNodes(absolutePath, relativePath, subSchema, depth);
     }
     return [];

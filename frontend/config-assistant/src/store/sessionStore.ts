@@ -183,7 +183,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentPath,
     currentSelectedElement,
     currentExpandedElements,
-    currentSelectedOneOfOptions: currentSelectedOneOfAnyOfOptions,
+    currentSelectedOneOfAnyOfOptions: currentSelectedOneOfAnyOfOptions,
     isExpanded,
     expand,
     collapse,

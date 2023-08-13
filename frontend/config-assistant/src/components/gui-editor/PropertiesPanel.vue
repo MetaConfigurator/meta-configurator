@@ -93,7 +93,7 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
 });
 
 watch(
-  storeToRefs(useSessionStore()).currentSelectedOneOfOptions,
+  storeToRefs(useSessionStore()).currentSelectedOneOfAnyOfOptions,
   () => {
     updateTree();
   },

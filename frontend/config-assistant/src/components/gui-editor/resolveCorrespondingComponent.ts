@@ -11,6 +11,7 @@ import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
 import OneOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
 import {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
+import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
 
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData
@@ -24,15 +25,15 @@ export function resolveCorrespondingComponent(
     absolutePath: nodeData.absolutePath,
   };
   if (nodeData.schema.oneOf.length > 0) {
-    return h(OneOfAnyOfSelectionOption, {
+    return h(OneOfAnyOfSelectionProperty, {
       ...propsObject,
       possibleValues: nodeData.schema.oneOf,
     });
-    /* } else if (nodeData.schema.anyOf.length > 0) {
-    return h(OneOfAnyOfSelectionOption, {
+  } else if (nodeData.schema.anyOf.length > 0) {
+    return h(OneOfAnyOfSelectionProperty, {
       ...propsObject,
       possibleValues: nodeData.schema.anyOf,
-    });*/
+    });
   } else if (nodeData.schema.enum !== undefined) {
     return h(EnumProperty, {
       ...propsObject,

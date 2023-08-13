@@ -21,13 +21,13 @@ const possibleValues = props.propertySchema.oneOf.map(
 const valueProperty = computed({
   get() {
     const path = pathToString(props.absolutePath);
-    const result = useSessionStore().currentSelectedOneOfOptions.get(path);
+    const result = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
     return result;
   },
   set(newValue) {
     const selectedOption: OneOfAnyOfSelectionOption = newValue;
     const path = pathToString(props.absolutePath);
-    useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
+    useSessionStore().currentSelectedOneOfAnyOfOptions.set(path, selectedOption);
   },
 });
 </script>
