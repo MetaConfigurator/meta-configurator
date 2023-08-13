@@ -60,6 +60,13 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
     );
   }
 
+  if (hasAnyOfs(copiedSchema)) {
+    // @ts-ignore
+    copiedSchema.anyOf = copiedSchema.anyOf!!.map((subSchema, index) =>
+      preprocessSchema(subSchema as JsonSchemaObjectType)
+    );
+  }
+
   return copiedSchema;
 }
 
@@ -72,4 +79,7 @@ function hasAllOfs(schema: JsonSchemaObjectType): boolean {
 }
 function hasOneOfs(schema: JsonSchemaObjectType): boolean {
   return schema.oneOf !== undefined && schema.oneOf.length > 0;
+}
+function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.anyOf !== undefined && schema.anyOf.length > 0;
 }
