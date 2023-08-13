@@ -9,7 +9,7 @@ import Button from 'primevue/button';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
-import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
+import {ConfigTreeNodeResolver} from '@/components/gui-editor/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {ConfigTreeNodeData, GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
@@ -95,6 +95,14 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
   }
 });
 
+watch(
+  storeToRefs(useSessionStore()).currentSelectedOneOfAnyOfOptions,
+  () => {
+    updateTree();
+  },
+  {deep: true}
+);
+
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
@@ -114,7 +122,11 @@ function addItem(relativePath: Path, newValue: any) {
   updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
-  const subSchema = props.currentSchema.subSchemaAt(relativePath);
+  // TODO fix parent path, not absolute Path
+  const subSchema = props.currentSchema.subSchemaAt(
+    relativePath,
+    absolutePath.slice(0, -relativePath.length)
+  );
   if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
     useSessionStore().expand(absolutePath);
 
@@ -169,14 +181,15 @@ function findNode(relativePath, root = currentTree.value) {
 }
 
 /**
- * Function for adding a default value to an array.
+ * Function for adding an empty value to an array.
  * This function is called when the user clicks on the "add item" button.
  */
-function addDefaultValue(relativePath: Path) {
-  const arraySchema = props.currentSchema.subSchemaAt(relativePath.slice(0, -1));
+function addEmptyArrayEntry(relativePath: Path, absolutePath: Path) {
+  const relativePathOfArray = relativePath.slice(0, -1);
+  const absolutePathOfArray = absolutePath.slice(0, -relativePathOfArray.length);
+  const arraySchema = props.currentSchema.subSchemaAt(relativePathOfArray, absolutePathOfArray);
 
   if (!arraySchema?.items) {
-    console.log('addDefaultValue called on array schema without items');
     // TODO: handle this case
     return {};
   }
@@ -209,7 +222,7 @@ watch(storeToRefs(useSessionStore()).currentPath, (path: Path) => {
   focusOnFirstProperty();
 });
 
-function displayAsDefaultProperty(node: any) {
+function displayAsRegularProperty(node: any) {
   return (
     node.type === TreeNodeType.PATTERN_PROPERTY ||
     node.type === TreeNodeType.SCHEMA_PROPERTY ||
@@ -285,7 +298,7 @@ function closeInfoOverlayPanel() {
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->
         <span
-          v-if="displayAsDefaultProperty(slotProps.node)"
+          v-if="displayAsRegularProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
           @mouseenter="event => showInfoOverlayPanel(slotProps.node.data, event)"
@@ -296,7 +309,7 @@ function closeInfoOverlayPanel() {
             @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
         </span>
 
-        <span v-if="displayAsDefaultProperty(slotProps.node)" style="max-width: 50%" class="w-full">
+        <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 50%" class="w-full">
           <PropertyData
             class="w-full"
             :nodeData="slotProps.node.data"
@@ -315,8 +328,12 @@ function closeInfoOverlayPanel() {
             severity="secondary"
             class="text-gray-500"
             style="margin-left: -0.75rem"
-            @click="addDefaultValue(slotProps.node.data.relativePath)"
-            @keyup.enter="addDefaultValue(slotProps.node.data.relativePath)">
+            @click="
+              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+            "
+            @keyup.enter="
+              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+            ">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>

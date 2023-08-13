@@ -7,6 +7,7 @@ import type {Path} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
+import {pathToString} from '@/helpers/pathHelper';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -18,7 +19,18 @@ const emit = defineEmits<{
 }>();
 
 function isExpandable(): boolean {
-  return props.nodeData.schema.hasType('object') || props.nodeData.schema.hasType('array');
+  const schema = props.nodeData.schema;
+
+  const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
+  if (dependsOnUserSelection) {
+    const path = pathToString(props.nodeData.absolutePath);
+    const hasUserSelection = useSessionStore().currentSelectedOneOfAnyOfOptions.has(path);
+    if (!hasUserSelection) {
+      return false;
+    }
+  }
+
+  return schema.hasType('object') || schema.hasType('array');
 }
 
 function isRequired(): boolean {
@@ -61,6 +73,12 @@ function zoomIntoPath() {
 function getTypeDescription(): string {
   if (props.nodeData.schema.enum) {
     return 'enum';
+  }
+  if (props.nodeData.schema.oneOf.length > 0) {
+    return 'oneOf';
+  }
+  if (props.nodeData.schema.anyOf.length > 0) {
+    return 'anyOf';
   }
 
   const type = props.nodeData.schema.type;
