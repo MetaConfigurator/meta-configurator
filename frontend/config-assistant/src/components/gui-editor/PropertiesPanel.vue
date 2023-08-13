@@ -119,7 +119,11 @@ function addItem(relativePath: Path, newValue: any) {
   updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
-  const subSchema = props.currentSchema.subSchemaAt(relativePath);
+  // TODO fix parent path, not absolute Path
+  const subSchema = props.currentSchema.subSchemaAt(
+    relativePath,
+    absolutePath.slice(0, -relativePath.length)
+  );
   if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
     useSessionStore().expand(absolutePath);
 
@@ -174,14 +178,15 @@ function findNode(relativePath, root = currentTree.value) {
 }
 
 /**
- * Function for adding a default value to an array.
+ * Function for adding an empty value to an array.
  * This function is called when the user clicks on the "add item" button.
  */
-function addDefaultValue(relativePath: Path) {
-  const arraySchema = props.currentSchema.subSchemaAt(relativePath.slice(0, -1));
+function addEmptyArrayEntry(relativePath: Path, absolutePath: Path) {
+  const relativePathOfArray = relativePath.slice(0, -1);
+  const absolutePathOfArray = absolutePath.slice(0, -relativePathOfArray.length);
+  const arraySchema = props.currentSchema.subSchemaAt(relativePathOfArray, absolutePathOfArray);
 
   if (!arraySchema?.items) {
-    console.log('addDefaultValue called on array schema without items');
     // TODO: handle this case
     return {};
   }
@@ -288,8 +293,12 @@ function expandElement(node: any) {
             severity="secondary"
             class="text-gray-500"
             style="margin-left: -0.75rem"
-            @click="addDefaultValue(slotProps.node.data.relativePath)"
-            @keyup.enter="addDefaultValue(slotProps.node.data.relativePath)">
+            @click="
+              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+            "
+            @keyup.enter="
+              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+            ">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>

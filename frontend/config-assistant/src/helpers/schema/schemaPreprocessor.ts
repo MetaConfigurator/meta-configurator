@@ -55,16 +55,34 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
 
   if (hasOneOfs(copiedSchema)) {
     // @ts-ignore
-    copiedSchema.oneOf = copiedSchema.oneOf!!.map((subSchema, index) =>
-      preprocessSchema(subSchema as JsonSchemaObjectType)
-    );
+    copiedSchema.oneOf = copiedSchema.oneOf!!.map((subSchema, index) => {
+      let copiedSchemaWithoutOneOf = {...copiedSchema};
+      delete copiedSchemaWithoutOneOf.oneOf;
+      let resultSchema = {
+        allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutOneOf],
+      };
+      return mergeAllOf(resultSchema, {
+        resolvers: {
+          defaultResolver: mergeAllOf.options.resolvers.title,
+        },
+      });
+    });
   }
 
   if (hasAnyOfs(copiedSchema)) {
     // @ts-ignore
-    copiedSchema.anyOf = copiedSchema.anyOf!!.map((subSchema, index) =>
-      preprocessSchema(subSchema as JsonSchemaObjectType)
-    );
+    copiedSchema.anyOf = copiedSchema.anyOf!!.map((subSchema, index) => {
+      let copiedSchemaWithoutAnyOf = {...copiedSchema};
+      delete copiedSchemaWithoutAnyOf.anyOf;
+      let resultSchema = {
+        allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutAnyOf],
+      };
+      return mergeAllOf(resultSchema, {
+        resolvers: {
+          defaultResolver: mergeAllOf.options.resolvers.title,
+        },
+      });
+    });
   }
 
   optimizeSchema(copiedSchema);

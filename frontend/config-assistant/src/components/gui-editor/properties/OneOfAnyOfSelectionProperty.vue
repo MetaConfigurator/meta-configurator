@@ -3,12 +3,12 @@ import {computed, defineProps} from 'vue';
 import Dropdown from 'primevue/dropdown';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
-import {Path} from '@/model/path';
+import {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/helpers/pathHelper';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
 
 const props = defineProps<{
-  propertyName: string;
+  propertyName: PathElement;
   propertySchema: JsonSchema;
   propertyData: any | undefined;
   absolutePath: Path;

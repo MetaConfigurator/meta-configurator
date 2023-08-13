@@ -343,7 +343,7 @@ export class ConfigTreeNodeResolver {
 
     if (selectionOption !== undefined) {
       const subSchema = schema.oneOf[selectionOption.index];
-      return this.createChildNodes(absolutePath, relativePath, subSchema, depth);
+      return [this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth)];
     }
     return [];
   }
@@ -359,7 +359,7 @@ export class ConfigTreeNodeResolver {
 
     if (selectionOption !== undefined) {
       const subSchema = schema.anyOf[selectionOption.index];
-      return this.createChildNodes(absolutePath, relativePath, subSchema, depth);
+      return [this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth)];
     }
     return [];
   }
