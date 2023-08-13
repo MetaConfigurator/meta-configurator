@@ -329,25 +329,13 @@ export class ConfigTreeNodeResolver {
     schema: JsonSchema,
     depth: number
   ) {
-    const data = useSessionStore().dataAtPath(absolutePath);
-    let children: GuiEditorTreeNode[] = [];
-
     const path = pathToString(absolutePath);
-    const subSchemaIndex = useSessionStore().currentSelectedOneOfOptions.get(path);
-    console.log(
-      'oneOf children tree nodes creation for path ',
-      path,
-      ' and found subSchemaIndex ',
-      subSchemaIndex
-    );
-    if (subSchemaIndex !== undefined) {
-      const subSchema = schema.oneOf[subSchemaIndex];
-      console.log('sub schema ', subSchema);
-      children = children.concat(
-        this.createChildNodes(absolutePath, relativePath, subSchema, depth)
-        //this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth)
-      );
+    const selectionOption = useSessionStore().currentSelectedOneOfOptions.get(path);
+
+    if (selectionOption !== undefined) {
+      const subSchema = schema.oneOf[selectionOption.index];
+      return this.createChildNodes(absolutePath, relativePath, subSchema, depth);
     }
-    return children;
+    return [];
   }
 }

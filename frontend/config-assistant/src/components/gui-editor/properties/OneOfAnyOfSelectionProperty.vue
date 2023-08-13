@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {computed, defineProps, defineEmits} from 'vue';
+import {computed, defineProps} from 'vue';
 import Dropdown from 'primevue/dropdown';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
 import {Path} from '@/model/path';
 import {pathToString} from '@/helpers/pathHelper';
-import {toInteger} from 'lodash';
+import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
 
 const props = defineProps<{
   propertyName: string;
@@ -14,24 +14,20 @@ const props = defineProps<{
   absolutePath: Path;
 }>();
 
-//const possibleValues = [1, 2, 0]// props.schema.oneOf.map(subSchema => subSchema)
-const possibleValues = Array.from(Array(props.propertySchema.oneOf.length).keys());
-
-const emit = defineEmits<{
-  (e: 'update_property_value', newValue: any): void;
-}>();
+const possibleValues = props.propertySchema.oneOf.map(
+  (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
+);
 
 const valueProperty = computed({
   get() {
     const path = pathToString(props.absolutePath);
-    return useSessionStore().currentSelectedOneOfOptions.get(path) | 0;
+    const result = useSessionStore().currentSelectedOneOfOptions.get(path);
+    return result;
   },
   set(newValue) {
-    console.log('selected ', newValue);
+    const selectedOption: OneOfAnyOfSelectionOption = newValue;
     const path = pathToString(props.absolutePath);
-    console.log('update current selected oneOfOptions for path ', path, ' and index  ', newValue);
-    useSessionStore().currentSelectedOneOfOptions.set(path, toInteger(newValue));
-    useSessionStore().currentSelectedOneOfOptions = useSessionStore().currentSelectedOneOfOptions;
+    useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
   },
 });
 </script>

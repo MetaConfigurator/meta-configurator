@@ -92,10 +92,13 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
   }
 });
 
-watch(storeToRefs(useSessionStore()).currentSelectedOneOfOptions, () => {
-  console.log('current selected OneOfOptions updated');
-  updateTree();
-});
+watch(
+  storeToRefs(useSessionStore()).currentSelectedOneOfOptions,
+  () => {
+    updateTree();
+  },
+  {deep: true}
+);
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);

@@ -9,7 +9,8 @@ import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTr
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
-import OneOfSelectionProperty from '@/components/gui-editor/properties/OneOfSelectionProperty.vue';
+import OneOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
+import {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData
@@ -23,10 +24,15 @@ export function resolveCorrespondingComponent(
     absolutePath: nodeData.absolutePath,
   };
   if (nodeData.schema.oneOf.length > 0) {
-    return h(OneOfSelectionProperty, {
+    return h(OneOfAnyOfSelectionOption, {
       ...propsObject,
       possibleValues: nodeData.schema.oneOf,
     });
+    /* } else if (nodeData.schema.anyOf.length > 0) {
+    return h(OneOfAnyOfSelectionOption, {
+      ...propsObject,
+      possibleValues: nodeData.schema.anyOf,
+    });*/
   } else if (nodeData.schema.enum !== undefined) {
     return h(EnumProperty, {
       ...propsObject,
