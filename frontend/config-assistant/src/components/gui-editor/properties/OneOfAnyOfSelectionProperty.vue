@@ -12,9 +12,10 @@ const props = defineProps<{
   propertySchema: JsonSchema;
   propertyData: any | undefined;
   absolutePath: Path;
+  possibleSchemas: Array<JsonSchema>;
 }>();
 
-const possibleValues = props.propertySchema.oneOf.map(
+const possibleValues = props.possibleSchemas.map(
   (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
 );
 

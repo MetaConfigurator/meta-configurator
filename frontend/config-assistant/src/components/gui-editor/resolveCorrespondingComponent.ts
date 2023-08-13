@@ -27,12 +27,12 @@ export function resolveCorrespondingComponent(
   if (nodeData.schema.oneOf.length > 0) {
     return h(OneOfAnyOfSelectionProperty, {
       ...propsObject,
-      possibleValues: nodeData.schema.oneOf,
+      possibleSchemas: nodeData.schema.oneOf,
     });
   } else if (nodeData.schema.anyOf.length > 0) {
     return h(OneOfAnyOfSelectionProperty, {
       ...propsObject,
-      possibleValues: nodeData.schema.anyOf,
+      possibleSchemas: nodeData.schema.anyOf,
     });
   } else if (nodeData.schema.enum !== undefined) {
     return h(EnumProperty, {
