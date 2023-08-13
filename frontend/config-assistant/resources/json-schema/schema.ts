@@ -436,6 +436,7 @@ export const jsonSchemaMetaSchema = {
     },
     simpleTypes: {
       enum: ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string'],
+      type: 'string',
     },
     stringArray: {
       type: 'array',
