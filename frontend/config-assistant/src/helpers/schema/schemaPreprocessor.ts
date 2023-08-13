@@ -53,6 +53,8 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
     });
   }
 
+  induceTitles(copiedSchema);
+
   return copiedSchema;
 }
 
@@ -62,4 +64,20 @@ function hasRef(schema: JsonSchemaObjectType): boolean {
 
 function hasAllOfs(schema: JsonSchemaObjectType): boolean {
   return schema.allOf !== undefined && schema.allOf.length > 0;
+}
+
+function induceTitles(schema: JsonSchemaObjectType): void {
+  induceTitlesOnObject(schema.properties ?? {});
+  induceTitlesOnObject(schema.definitions ?? {});
+  induceTitlesOnObject(schema.$defs ?? {});
+}
+
+function induceTitlesOnObject(object: object) {
+  Object.entries(object).forEach(([key, value]) => {
+    if (typeof value === 'object') {
+      if (value.title === undefined) {
+        value.title = key;
+      }
+    }
+  });
 }
