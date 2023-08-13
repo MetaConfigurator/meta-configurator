@@ -47,6 +47,7 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
       preprocessSchema(subSchema as JsonSchemaObjectType)
     );
     copiedSchema = mergeAllOf(copiedSchema, {
+      deep: false,
       resolvers: {
         defaultResolver: mergeAllOf.options.resolvers.title,
       },
@@ -56,38 +57,43 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
   if (hasOneOfs(copiedSchema)) {
     // @ts-ignore
     copiedSchema.oneOf = copiedSchema.oneOf!!.map((subSchema, index) => {
-      let copiedSchemaWithoutOneOf = {...copiedSchema};
+      const copiedSchemaWithoutOneOf = {...copiedSchema};
       delete copiedSchemaWithoutOneOf.oneOf;
-      let resultSchema = {
+      delete copiedSchemaWithoutOneOf.title;
+      delete copiedSchemaWithoutOneOf.description;
+      const resultSchema = {
         allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutOneOf],
       };
-      return mergeAllOf(resultSchema, {
-        resolvers: {
-          defaultResolver: mergeAllOf.options.resolvers.title,
-        },
-      });
+      return mergeAllOfs(resultSchema as JsonSchemaObjectType);
     });
   }
 
   if (hasAnyOfs(copiedSchema)) {
     // @ts-ignore
     copiedSchema.anyOf = copiedSchema.anyOf!!.map((subSchema, index) => {
-      let copiedSchemaWithoutAnyOf = {...copiedSchema};
+      const copiedSchemaWithoutAnyOf = {...copiedSchema};
       delete copiedSchemaWithoutAnyOf.anyOf;
-      let resultSchema = {
+      delete copiedSchemaWithoutAnyOf.title;
+      delete copiedSchemaWithoutAnyOf.description;
+      const resultSchema = {
         allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutAnyOf],
       };
-      return mergeAllOf(resultSchema, {
-        resolvers: {
-          defaultResolver: mergeAllOf.options.resolvers.title,
-        },
-      });
+      return mergeAllOfs(resultSchema as JsonSchemaObjectType);
     });
   }
 
   optimizeSchema(copiedSchema);
 
   return copiedSchema;
+}
+
+function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
+  return mergeAllOf(schema, {
+    deep: false,
+    resolvers: {
+      defaultResolver: mergeAllOf.options.resolvers.title,
+    },
+  });
 }
 
 function hasRef(schema: JsonSchemaObjectType): boolean {
