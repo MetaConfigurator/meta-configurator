@@ -12,7 +12,7 @@ export const useSettingsStore = defineStore('settings', () => {
     dataFormat: 'json',
     guiEditorOnRightSide: true,
     guiEditor: {
-      maximumDepth: 3,
+      maximumDepth: 5,
       propertySorting: 'dataOrder',
     },
     debuggingActive: false,

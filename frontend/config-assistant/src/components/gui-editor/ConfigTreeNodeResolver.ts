@@ -84,20 +84,26 @@ export class ConfigTreeNodeResolver {
     const depthLimit = useSettingsStore().settingsData.guiEditor.maximumDepth;
 
     let children: GuiEditorTreeNode[] = [];
-    if (schema.hasType('object') && depth < depthLimit) {
-      children = this.createObjectChildrenTreeNodes(absolutePath, relativePath, schema, depth);
-    }
-    if (schema.hasType('array') && depth < depthLimit) {
-      children = this.createArrayChildrenTreeNodes(absolutePath, relativePath, schema, depth);
-    }
     if (schema.oneOf.length > 0) {
       children = this.createOneOfChildrenTreeNodes(absolutePath, relativePath, schema, depth);
     }
     if (schema.anyOf.length > 0) {
-      children = this.createAnyOfChildrenTreeNodes(absolutePath, relativePath, schema, depth);
+      children = children.concat(
+        this.createAnyOfChildrenTreeNodes(absolutePath, relativePath, schema, depth)
+      );
     }
 
-    return children;
+    if (schema.anyOf.length > 0 || schema.oneOf.length > 0) {
+      return children;
+    }
+
+    if (schema.hasType('object') && depth < depthLimit) {
+      return this.createObjectChildrenTreeNodes(absolutePath, relativePath, schema, depth);
+    }
+    if (schema.hasType('array') && depth < depthLimit) {
+      return this.createArrayChildrenTreeNodes(absolutePath, relativePath, schema, depth);
+    }
+    return [];
   }
 
   /**
@@ -343,7 +349,9 @@ export class ConfigTreeNodeResolver {
 
     if (selectionOption !== undefined) {
       const subSchema = schema.oneOf[selectionOption.index];
-      return [this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth)];
+      return [
+        this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
+      ];
     }
     return [];
   }
@@ -359,7 +367,9 @@ export class ConfigTreeNodeResolver {
 
     if (selectionOption !== undefined) {
       const subSchema = schema.anyOf[selectionOption.index];
-      return [this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth)];
+      return [
+        this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
+      ];
     }
     return [];
   }
