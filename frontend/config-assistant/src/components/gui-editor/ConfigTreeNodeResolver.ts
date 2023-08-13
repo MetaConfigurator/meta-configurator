@@ -332,22 +332,6 @@ export class ConfigTreeNodeResolver {
       loaded: true,
     };
   }
-
-  private createOneOfAnyOfChildrenTreeNodes(
-    absolutePath: Path,
-    relativePath: Path,
-    schema: JsonSchema,
-    depth: number
-  ) {
-    const path = pathToString(absolutePath);
-    const selectionOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
-
-    if (selectionOption !== undefined) {
-      const subSchema = schema.oneOf[selectionOption.index];
-      return this.createChildNodes(absolutePath, relativePath, subSchema, depth);
-    }
-    return [];
-  }
   private createOneOfChildrenTreeNodes(
     absolutePath: Path,
     relativePath: Path,
