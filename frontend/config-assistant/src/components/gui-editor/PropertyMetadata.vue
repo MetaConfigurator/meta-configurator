@@ -23,8 +23,7 @@ function isExpandable(): boolean {
 
   const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
   if (dependsOnUserSelection) {
-    const path = pathToString(props.nodeData.absolutePath);
-    const hasUserSelection = useSessionStore().currentSelectedOneOfAnyOfOptions.has(path);
+    const hasUserSelection = schema.userSelectionOneOfAnyOf;
     if (!hasUserSelection) {
       return false;
     }
