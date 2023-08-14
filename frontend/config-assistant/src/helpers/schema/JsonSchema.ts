@@ -9,6 +9,7 @@ import type {Path, PathElement} from '@/model/path';
 import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
+import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -40,6 +41,8 @@ export class JsonSchema {
   private _else?: JsonSchema;
   private _contentSchema?: JsonSchema;
 
+  private _userSelectionOnOfAnyOf?: OneOfAnyOfSelectionOption;
+
   constructor(jsonSchema: JsonSchemaType) {
     this.jsonSchema = nonBooleanSchema(jsonSchema);
     if (this.jsonSchema !== undefined) {
@@ -59,18 +62,17 @@ export class JsonSchema {
     return this.required?.includes(key) ?? false;
   }
 
-  public subSchemaAt(relativePath: Path, parentPath: Path): JsonSchema | undefined {
+  public subSchemaAt(relativePath: Path): JsonSchema | undefined {
     if (relativePath.length === 0) {
       return this;
     }
 
     let schema: JsonSchema | undefined = this;
     for (const element of relativePath) {
-      schema = schema.subSchema(element, parentPath);
+      schema = schema.subSchema(element);
       if (schema === undefined) {
         return undefined;
       }
-      parentPath = parentPath.concat(element);
     }
 
     return schema;
@@ -79,19 +81,18 @@ export class JsonSchema {
   /**
    * Returns the schema at the given property or item.
    * @param subElement The name of the property or the index of the item.
-   * @param parentPath The absolutePath exclusive the sub element
    * @returns The schema at the given property or item, or undefined, if there is none.
    */
-  public subSchema(subElement: PathElement, parentPath: Path): JsonSchema | undefined {
+  public subSchema(subElement: PathElement): JsonSchema | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
     if (typeof subElement === 'string') {
-      return this.resolveOneOfAnyOf(parentPath).subProperty(subElement);
+      return this.resolveOneOfAnyOf().subProperty(subElement);
     }
 
     // subElement is a number
-    return this.subItem(subElement)?.resolveOneOfAnyOf(parentPath);
+    return this.subItem(subElement)?.resolveOneOfAnyOf();
   }
 
   private subProperty(subElement: string): JsonSchema | undefined {
@@ -127,9 +128,8 @@ export class JsonSchema {
     return this.items;
   }
 
-  public resolveOneOfAnyOf(absolutePath: Path) {
-    const path = pathToString(absolutePath);
-    const selectedOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
+  public resolveOneOfAnyOf() {
+    const selectedOption = this.userSelectionOneOfAnyOf;
     if (this.oneOf.length > 0) {
       return this.oneOf[selectedOption?.index ?? 0];
     }
@@ -145,6 +145,14 @@ export class JsonSchema {
 
   get isAlwaysFalse(): boolean {
     return this.jsonSchema === undefined;
+  }
+
+  get userSelectionOneOfAnyOf(): OneOfAnyOfSelectionOption | undefined {
+    return this._userSelectionOnOfAnyOf;
+  }
+
+  set userSelectionOneOfAnyOf(value) {
+    this._userSelectionOnOfAnyOf = value;
   }
 
   /**

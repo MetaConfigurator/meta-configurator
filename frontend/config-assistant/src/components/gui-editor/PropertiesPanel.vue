@@ -96,7 +96,7 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
 });
 
 watch(
-  storeToRefs(useSessionStore()).currentSelectedOneOfAnyOfOptions,
+  storeToRefs(useSessionStore()).fileSchema,
   () => {
     updateTree();
   },
@@ -123,10 +123,7 @@ function addItem(relativePath: Path, newValue: any) {
   const absolutePath = props.currentPath.concat(relativePath);
 
   // TODO fix parent path, not absolute Path
-  const subSchema = props.currentSchema.subSchemaAt(
-    relativePath,
-    absolutePath.slice(0, -relativePath.length)
-  );
+  const subSchema = props.currentSchema.subSchemaAt(relativePath);
   if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
     useSessionStore().expand(absolutePath);
 
@@ -184,10 +181,8 @@ function findNode(relativePath, root = currentTree.value) {
  * Function for adding an empty value to an array.
  * This function is called when the user clicks on the "add item" button.
  */
-function addEmptyArrayEntry(relativePath: Path, absolutePath: Path) {
-  const relativePathOfArray = relativePath.slice(0, -1);
-  const absolutePathOfArray = absolutePath.slice(0, -relativePathOfArray.length);
-  const arraySchema = props.currentSchema.subSchemaAt(relativePathOfArray, absolutePathOfArray);
+function addEmptyArrayEntry(relativePath: Path) {
+  const arraySchema = props.currentSchema.subSchemaAt(relativePath.slice(0, -1));
 
   if (!arraySchema?.items) {
     // TODO: handle this case
@@ -328,12 +323,8 @@ function closeInfoOverlayPanel() {
             severity="secondary"
             class="text-gray-500"
             style="margin-left: -0.75rem"
-            @click="
-              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-            "
-            @keyup.enter="
-              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-            ">
+            @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
+            @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>

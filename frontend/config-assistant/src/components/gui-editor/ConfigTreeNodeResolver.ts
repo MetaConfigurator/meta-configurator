@@ -52,8 +52,7 @@ export class ConfigTreeNodeResolver {
   private isLeaf(schema: JsonSchema, absolutePath: Path, depth: number): boolean {
     const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
     if (dependsOnUserSelection) {
-      const path = pathToString(absolutePath);
-      const hasUserSelection = useSessionStore().currentSelectedOneOfAnyOfOptions.has(path);
+      const hasUserSelection = schema.userSelectionOneOfAnyOf;
       if (!hasUserSelection) {
         return true;
       }
@@ -344,8 +343,7 @@ export class ConfigTreeNodeResolver {
     schema: JsonSchema,
     depth: number
   ) {
-    const path = pathToString(absolutePath);
-    const selectionOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
+    const selectionOption = schema.userSelectionOneOfAnyOf;
 
     if (selectionOption !== undefined) {
       const subSchema = schema.oneOf[selectionOption.index];
@@ -362,8 +360,7 @@ export class ConfigTreeNodeResolver {
     schema: JsonSchema,
     depth: number
   ) {
-    const path = pathToString(absolutePath);
-    const selectionOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
+    const selectionOption = schema.userSelectionOneOfAnyOf;
 
     if (selectionOption !== undefined) {
       const subSchema = schema.anyOf[selectionOption.index];
