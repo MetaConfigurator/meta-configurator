@@ -84,6 +84,8 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
 
   optimizeSchema(copiedSchema);
 
+  induceTitles(copiedSchema);
+
   return copiedSchema;
 }
 
@@ -114,4 +116,20 @@ function optimizeSchema(schema: JsonSchemaObjectType) {
   if (hasOneOfs(schema)) {
     // TODO: if it is just oneOf of types, then replace it by a choice of types
   }
+}
+
+function induceTitles(schema: JsonSchemaObjectType): void {
+  induceTitlesOnObject(schema.properties ?? {});
+  induceTitlesOnObject(schema.definitions ?? {});
+  induceTitlesOnObject(schema.$defs ?? {});
+}
+
+function induceTitlesOnObject(object: object) {
+  Object.entries(object).forEach(([key, value]) => {
+    if (typeof value === 'object') {
+      if (value.title === undefined) {
+        value.title = key;
+      }
+    }
+  });
 }
