@@ -1,5 +1,9 @@
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import type {ConfigDataTreeNodeType, GuiEditorTreeNode} from '@/model/ConfigDataTreeNode';
+import type {
+  AddPropertyTreeNode,
+  ConfigDataTreeNodeType,
+  GuiEditorTreeNode,
+} from '@/model/ConfigDataTreeNode';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
@@ -66,6 +70,12 @@ export class ConfigTreeNodeResolver {
   }
 
   public createChildNodesOfNode(guiEditorTreeNode: GuiEditorTreeNode): GuiEditorTreeNode[] {
+    if (
+      guiEditorTreeNode.type === TreeNodeType.ADD_ITEM ||
+      guiEditorTreeNode.type === TreeNodeType.ADD_PROPERTY
+    ) {
+      return [];
+    }
     guiEditorTreeNode.children = this.createChildNodes(
       guiEditorTreeNode.data.absolutePath,
       guiEditorTreeNode.data.relativePath,
@@ -117,9 +127,10 @@ export class ConfigTreeNodeResolver {
     depth: number
   ) {
     const propertySorting = useSettingsStore().settingsData.guiEditor.propertySorting;
+    let result: GuiEditorTreeNode[] = [];
 
     if (propertySorting === PropertySorting.SCHEMA_ORDER) {
-      return this.createObjectChildrenNodesAccordingToSchemaOrder(
+      result = this.createObjectChildrenNodesAccordingToSchemaOrder(
         absolutePath,
         relativePath,
         schema,
@@ -127,15 +138,31 @@ export class ConfigTreeNodeResolver {
       );
     }
     if (propertySorting === PropertySorting.DATA_ORDER) {
-      return this.createObjectChildrenNodesAccordingToDataOrder(
+      result = this.createObjectChildrenNodesAccordingToDataOrder(
         absolutePath,
         relativePath,
         schema,
         depth
       );
     }
-    // priority sorting
-    return this.createObjectChildrenNodesPriorityOrder(absolutePath, relativePath, schema, depth);
+
+    if (propertySorting === PropertySorting.PRIORITY_ORDER) {
+      result = this.createObjectChildrenNodesPriorityOrder(
+        absolutePath,
+        relativePath,
+        schema,
+        depth
+      );
+    }
+
+    const data = useSessionStore().dataAtPath(absolutePath);
+    if (this.shouldAddAddPropertyNode(schema, data)) {
+      return result.concat(
+        this.createAddPropertyTreeNode(absolutePath, relativePath, schema, depth)
+      );
+    }
+
+    return result;
   }
 
   private createObjectChildrenNodesPriorityOrder(
@@ -309,9 +336,34 @@ export class ConfigTreeNodeResolver {
         );
       });
     }
-    return children.concat(
-      this.createAddItemTreeNode(absolutePath, relativePath, schema, depth + 1, children)
-    );
+    if (this.shouldAddAddItemNode(schema, data)) {
+      return children.concat(
+        this.createAddItemTreeNode(absolutePath, relativePath, schema, depth + 1, children)
+      );
+    }
+    return children;
+  }
+
+  private createAddPropertyTreeNode(
+    absolutePath: Path,
+    relativePath: Path,
+    schema: JsonSchema,
+    depth: number
+  ): AddPropertyTreeNode {
+    return {
+      data: {
+        absolutePath: absolutePath,
+        relativePath: relativePath,
+        schema: schema.additionalProperties || new JsonSchema({}), // not used
+        parentSchema: schema,
+        name: '', // name is not used for add property node, but we keep it for easier type checking
+        depth: depth,
+      },
+      type: TreeNodeType.ADD_PROPERTY,
+      key: pathToString(absolutePath.concat('add-property')),
+      children: [],
+      leaf: true,
+    };
   }
 
   private createAddItemTreeNode(
@@ -335,7 +387,6 @@ export class ConfigTreeNodeResolver {
       key: pathToString(absolutePathWithIndex),
       children: [],
       leaf: true,
-      loaded: true,
     };
   }
   private createOneOfChildrenTreeNodes(
@@ -372,5 +423,41 @@ export class ConfigTreeNodeResolver {
       ];
     }
     return [];
+  }
+
+  private shouldAddAddPropertyNode(schema: JsonSchema, data: any) {
+    if (data === undefined || (typeof data === 'object' && !data)) {
+      return true;
+    }
+    if (Array.isArray(data)) {
+      return false;
+    }
+    if (typeof data !== 'object') {
+      return false;
+    }
+    if (schema.maxProperties !== undefined && Object.keys(data).length >= schema.maxProperties) {
+      return false;
+    }
+    return (
+      schema.patternProperties ||
+      !schema.additionalProperties.isAlwaysFalse ||
+      !schema.unevaluatedProperties.isAlwaysFalse
+    );
+  }
+
+  private shouldAddAddItemNode(schema: JsonSchema, data: any) {
+    if (data === undefined || (typeof data === 'object' && !data)) {
+      return true;
+    }
+    if (!Array.isArray(data)) {
+      return false;
+    }
+    if (schema.maxItems !== undefined && data.length >= schema.maxItems) {
+      return false;
+    }
+    if (schema.items.isAlwaysFalse) {
+      return data.length < schema.prefixItems?.length ?? 0;
+    }
+    return true;
   }
 }

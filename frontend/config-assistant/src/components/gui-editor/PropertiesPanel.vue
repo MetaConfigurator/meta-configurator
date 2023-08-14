@@ -6,7 +6,7 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/components/gui-editor/ConfigTreeNodeResolver';
@@ -15,7 +15,7 @@ import {GuiConstants} from '@/constants';
 import {ConfigTreeNodeData, GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
-import {pathToString} from '@/helpers/pathHelper';
+import {dataAt, pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import {isObjectStructureEqual} from '@/helpers/compareObjectStructure';
@@ -105,7 +105,36 @@ watch(
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
+  console.log('update data', completePath, newValue);
   emit('update_data', completePath, newValue);
+}
+
+function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData) {
+  const dataAtParentPath = dataAt(parentPath, props.currentData);
+
+  if (oldData === undefined) {
+    oldData = initializeNewProperty(parentPath, newName);
+  } else {
+    delete dataAtParentPath[oldName];
+  }
+
+  dataAtParentPath[newName] = oldData;
+
+  updateData(parentPath, dataAtParentPath);
+}
+
+function initializeNewProperty(parentPath: Path, name: string): any {
+  const schema = props.currentSchema.subSchemaAt(parentPath.concat([name]), props.currentPath);
+  return schema?.initialValue();
+}
+
+function updatePropertyName(subPath: Path, oldName, newName: string) {
+  const oldData = dataAt(subPath, props.currentData);
+  const parentPath = subPath.slice(0, -1);
+
+  replacePropertyName(parentPath, oldName, newName, oldData);
+  updateTree();
+  focus(pathToString(props.currentPath.concat(parentPath).concat([newName])));
 }
 
 function focus(id: string) {
@@ -191,19 +220,73 @@ function addEmptyArrayEntry(relativePath: Path, absolutePath: Path) {
 
   if (!arraySchema?.items) {
     // TODO: handle this case
-    return {};
-  }
-  if (arraySchema.items.hasType('object')) {
-    addItem(relativePath, {});
-  } else if (arraySchema.items.hasType('array')) {
-    addItem(relativePath, []);
-  } else if (arraySchema.items.hasType('string')) {
     addItem(relativePath, '');
-  } else if (arraySchema.items.hasType('number') || arraySchema.items.hasType('integer')) {
-    addItem(relativePath, 0);
-  } else if (arraySchema.items.hasType('boolean')) {
-    addItem(relativePath, false);
   }
+  addItem(relativePath, arraySchema?.items?.initialValue());
+}
+
+function addEmptyProperty(relativePath: Path, absolutePath: Path) {
+  console.log('add empty property', relativePath, absolutePath);
+  const objectSchema = props.currentSchema.subSchemaAt(relativePath, absolutePath);
+
+  const dataAtParentPath = dataAt(relativePath.slice(0, -1), props.currentData);
+  const name = findNameForNewProperty(objectSchema, dataAtParentPath);
+
+  // insert a new node in the tree
+  const objectNode = findNode(relativePath);
+  const treeData: ConfigTreeNodeData = {
+    absolutePath: absolutePath.concat(name),
+    relativePath: relativePath.concat(name),
+    schema: new JsonSchema({}),
+    parentSchema: objectSchema,
+    depth: ((objectNode?.data?.depth as number) ?? 0) + 1,
+    name: name,
+  };
+  const nodeToInsert: GuiEditorTreeNode = {
+    type: TreeNodeType.ADDITIONAL_PROPERTY!!,
+    key: pathToString(absolutePath.concat(name)),
+    data: treeData,
+    leaf: true,
+    children: [],
+  } as GuiEditorTreeNode;
+
+  // insert the new node before the "add property" node
+  const indexOfAddPropertyNode = objectNode.children.length - 1;
+  objectNode.children.splice(indexOfAddPropertyNode, 0, nodeToInsert);
+
+  if (nodeToInsert.key) {
+    const id = '_label_' + nodeToInsert.key;
+    console.log('id', id);
+    console.log('element', document.getElementById(id));
+    focus(id);
+    function selectElementContents(el) {
+      var range = document.createRange();
+      range.selectNodeContents(el);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    window.setTimeout(() => {
+      var el = document.getElementById(id);
+      selectElementContents(el);
+    }, 0);
+  }
+}
+
+function findNameForNewProperty(objectSchema: JsonSchema | undefined, data: any) {
+  if (objectSchema === undefined) {
+    return 'newProperty';
+  }
+
+  const existingProperties = Object.keys(data);
+  let index = 1;
+  let name = 'newProperty';
+  while (existingProperties.includes(name)) {
+    name = `newProperty${index}`;
+    index++;
+  }
+  return name;
 }
 
 /**
@@ -217,7 +300,7 @@ function addNegativeMarginForTableStyle(depth: number) {
   return {'margin-right': `${-depth * GuiConstants.INDENTATION_STEP}px`};
 }
 
-watch(storeToRefs(useSessionStore()).currentPath, (path: Path) => {
+watch(storeToRefs(useSessionStore()).currentPath, () => {
   updateTree();
   focusOnFirstProperty();
 });
@@ -237,20 +320,20 @@ function expandElement(node: any) {
 }
 
 const schemaInfoOverlay = ref<InstanceType<typeof SchemaInfoOverlay> | undefined>();
-const overlayVisible = ref(false);
+const allowShowOverlay = ref(false);
 
 const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
   // @ts-ignore
   schemaInfoOverlay.value?.showPanel(nodeData.schema, nodeData.name, nodeData.parentSchema, event);
 };
 const showInfoOverlayPanelDebounced = useDebounceFn((nodeData: ConfigTreeNodeData, event) => {
-  if (overlayVisible.value) {
+  if (allowShowOverlay.value) {
     showInfoOverlayPanelInstantly(nodeData, event);
   }
-}, 500);
+}, 1000);
 
 function showInfoOverlayPanel(nodeData: ConfigTreeNodeData, event) {
-  overlayVisible.value = true;
+  allowShowOverlay.value = true;
   showInfoOverlayPanelDebounced(nodeData, event);
 }
 
@@ -260,13 +343,13 @@ const closeInfoOverlayPanelDebounced = useDebounceFn(() => {
 }, 100);
 
 function closeInfoOverlayPanel() {
-  overlayVisible.value = false;
+  allowShowOverlay.value = false;
   closeInfoOverlayPanelDebounced();
 }
 </script>
 
 <template>
-  <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="overlayVisible = false" />
+  <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="allowShowOverlay = false" />
   <TreeTable
     :value="nodesToDisplay"
     filter-mode="lenient"
@@ -304,9 +387,15 @@ function closeInfoOverlayPanel() {
           @mouseenter="event => showInfoOverlayPanel(slotProps.node.data, event)"
           @mouseleave="closeInfoOverlayPanel">
           <PropertyMetadata
-            :nodeData="slotProps.node.data"
+            :node="slotProps.node"
             :type="slotProps.node.type"
-            @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
+            @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)"
+            @update_property_name="
+              (oldName, newName) =>
+                updatePropertyName(slotProps.node.data.relativePath, oldName, newName)
+            "
+            @start_editing_property_name="() => (allowShowOverlay = false)"
+            @stop_editing_property_name="() => (allowShowOverlay = true)" />
         </span>
 
         <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 50%" class="w-full">
@@ -348,6 +437,26 @@ function closeInfoOverlayPanel() {
             :nodeData="slotProps.node.data"
             @update_property_value="addItem"
             bodyClass="w-full" />
+        </span>
+
+        <span
+          v-if="slotProps.node.type === TreeNodeType.ADD_PROPERTY"
+          style="width: 50%; min-width: 50%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          <Button
+            text
+            severity="secondary"
+            class="text-gray-500"
+            style="margin-left: -1.5rem"
+            @click="
+              addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+            "
+            @keyup.enter="
+              addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+            ">
+            <i class="pi pi-plus" />
+            <span class="pl-2">New property</span>
+          </Button>
         </span>
       </template>
     </Column>
