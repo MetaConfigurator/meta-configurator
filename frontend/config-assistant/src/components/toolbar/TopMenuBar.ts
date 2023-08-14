@@ -93,7 +93,6 @@ export class TopMenuBar {
       {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
-        disabled: () => !storeToRefs(useSessionStore()).currentEditorWrapper.value.hasUndo(),
         key: 'undo',
         command: () => {
           console.log(this.sessionStore.currentEditorWrapper.hasUndo());
@@ -107,7 +106,6 @@ export class TopMenuBar {
           this.sessionStore.currentEditorWrapper.redo();
         },
         key: 'redo',
-        disabled: () => !useSessionStore().currentEditorWrapper.hasRedo(),
       },
       {
         separator: true,
@@ -184,7 +182,6 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.undo();
         },
-        disabled: () => !useSessionStore().currentEditorWrapper.hasUndo(),
         key: 'schema_undo',
       },
       {
@@ -193,7 +190,6 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.redo();
         },
-        disabled: () => !useSessionStore().currentEditorWrapper.hasRedo(),
         key: 'schema_redo',
       },
       {
@@ -232,7 +228,6 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.undo();
         },
-        disabled: () => !useSessionStore().currentEditorWrapper.hasUndo(),
         key: 'settings_undo',
       },
       {
@@ -241,7 +236,6 @@ export class TopMenuBar {
         command: () => {
           this.sessionStore.currentEditorWrapper.redo();
         },
-        disabled: () => !useSessionStore().currentEditorWrapper.hasRedo(),
         key: 'settings_redo',
       },
       {
