@@ -5,7 +5,7 @@ import {useDataStore} from '@/store/dataStore';
 
 export function newEmptyFile(message: string | undefined = undefined): void {
   if (!message) {
-    clearEditor();
+    clearFile();
     return;
   }
   confirmationService.require({
@@ -20,7 +20,7 @@ export function newEmptyFile(message: string | undefined = undefined): void {
         detail: 'Config data is deleted from File editor',
         life: 3000,
       });
-      clearEditor();
+      clearFile();
     },
     reject: () => {
       toastService.add({
@@ -32,7 +32,7 @@ export function newEmptyFile(message: string | undefined = undefined): void {
     },
   });
 }
-export function clearEditor() {
+export function clearFile() {
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   useDataStore().fileData = {};
   useSessionStore().updateCurrentPath([]);
