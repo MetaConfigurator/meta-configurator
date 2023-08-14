@@ -15,11 +15,12 @@ import {GuiConstants} from '@/constants';
 import {ConfigTreeNodeData, GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
-import {dataAt, pathToString} from '@/helpers/pathHelper';
+import {absolutePathToParentPath, dataAt, pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import {isObjectStructureEqual} from '@/helpers/compareObjectStructure';
 import type {TreeNode} from 'primevue/tree';
+import {focus, focusOnPath, selectContents} from '@/helpers/focusUtils';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -110,7 +111,7 @@ function updateData(subPath: Path, newValue: any) {
 }
 
 function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData) {
-  const dataAtParentPath = dataAt(parentPath, props.currentData);
+  const dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
 
   if (oldData === undefined) {
     oldData = initializeNewProperty(parentPath, newName);
@@ -134,16 +135,7 @@ function updatePropertyName(subPath: Path, oldName, newName: string) {
 
   replacePropertyName(parentPath, oldName, newName, oldData);
   updateTree();
-  focus(pathToString(props.currentPath.concat(parentPath).concat([newName])));
-}
-
-function focus(id: string) {
-  window.setTimeout(function () {
-    const element = document.getElementById(id);
-    if (element) {
-      element.focus();
-    }
-  }, 0);
+  focusOnPath(props.currentPath.concat(parentPath).concat([newName]));
 }
 
 function addItem(relativePath: Path, newValue: any) {
@@ -151,7 +143,6 @@ function addItem(relativePath: Path, newValue: any) {
   updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
-  // TODO fix parent path, not absolute Path
   const subSchema = props.currentSchema.subSchemaAt(
     relativePath,
     absolutePath.slice(0, -relativePath.length)
@@ -168,7 +159,7 @@ function addItem(relativePath: Path, newValue: any) {
   // focus on "add item" element (which id is the path of the array + 1
   // on the last element of the path)
   const pathToAddItem = relativePath.slice(0, -1).concat(relativePath[relativePath.length - 1] + 1);
-  focus(pathToString(props.currentPath.concat(pathToAddItem)));
+  focusOnPath(props.currentPath.concat(pathToAddItem));
 }
 
 /**
@@ -185,7 +176,7 @@ function focusOnFirstProperty(relativePath?: Path) {
     }
   }
   if (pathToFirstProperty) {
-    focus(pathToString(pathToFirstProperty));
+    focusOnPath(pathToFirstProperty);
   }
 }
 
@@ -215,8 +206,9 @@ function findNode(relativePath, root = currentTree.value) {
  */
 function addEmptyArrayEntry(relativePath: Path, absolutePath: Path) {
   const relativePathOfArray = relativePath.slice(0, -1);
-  const absolutePathOfArray = absolutePath.slice(0, -relativePathOfArray.length);
-  const arraySchema = props.currentSchema.subSchemaAt(relativePathOfArray, absolutePathOfArray);
+  let parentPathOfArray = absolutePath.slice(0, -1);
+  parentPathOfArray = absolutePathToParentPath(parentPathOfArray, relativePathOfArray);
+  const arraySchema = props.currentSchema.subSchemaAt(relativePathOfArray, parentPathOfArray);
 
   if (!arraySchema?.items) {
     // TODO: handle this case
@@ -226,8 +218,11 @@ function addEmptyArrayEntry(relativePath: Path, absolutePath: Path) {
 }
 
 function addEmptyProperty(relativePath: Path, absolutePath: Path) {
-  console.log('add empty property', relativePath, absolutePath);
-  const objectSchema = props.currentSchema.subSchemaAt(relativePath, absolutePath);
+  allowShowOverlay.value = false;
+  const objectSchema = props.currentSchema.subSchemaAt(
+    relativePath,
+    absolutePathToParentPath(absolutePath, relativePath)
+  );
 
   const dataAtParentPath = dataAt(relativePath.slice(0, -1), props.currentData);
   const name = findNameForNewProperty(objectSchema, dataAtParentPath);
@@ -256,21 +251,8 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
 
   if (nodeToInsert.key) {
     const id = '_label_' + nodeToInsert.key;
-    console.log('id', id);
-    console.log('element', document.getElementById(id));
     focus(id);
-    function selectElementContents(el) {
-      var range = document.createRange();
-      range.selectNodeContents(el);
-      var sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-
-    window.setTimeout(() => {
-      var el = document.getElementById(id);
-      selectElementContents(el);
-    }, 0);
+    selectContents(id);
   }
 }
 
@@ -320,20 +302,21 @@ function expandElement(node: any) {
 }
 
 const schemaInfoOverlay = ref<InstanceType<typeof SchemaInfoOverlay> | undefined>();
-const allowShowOverlay = ref(false);
+const allowShowOverlay = ref(true);
+const overlayShowScheduled = ref(false);
 
 const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
   // @ts-ignore
   schemaInfoOverlay.value?.showPanel(nodeData.schema, nodeData.name, nodeData.parentSchema, event);
 };
 const showInfoOverlayPanelDebounced = useDebounceFn((nodeData: ConfigTreeNodeData, event) => {
-  if (allowShowOverlay.value) {
+  if (allowShowOverlay.value && overlayShowScheduled.value) {
     showInfoOverlayPanelInstantly(nodeData, event);
   }
 }, 1000);
 
 function showInfoOverlayPanel(nodeData: ConfigTreeNodeData, event) {
-  allowShowOverlay.value = true;
+  overlayShowScheduled.value = true;
   showInfoOverlayPanelDebounced(nodeData, event);
 }
 
@@ -343,13 +326,13 @@ const closeInfoOverlayPanelDebounced = useDebounceFn(() => {
 }, 100);
 
 function closeInfoOverlayPanel() {
-  allowShowOverlay.value = false;
+  overlayShowScheduled.value = false;
   closeInfoOverlayPanelDebounced();
 }
 </script>
 
 <template>
-  <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="allowShowOverlay = false" />
+  <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="overlayShowScheduled = false" />
   <TreeTable
     :value="nodesToDisplay"
     filter-mode="lenient"

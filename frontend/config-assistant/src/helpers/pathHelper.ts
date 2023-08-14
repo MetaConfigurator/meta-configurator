@@ -13,6 +13,13 @@ export function dataAt(path: Path, data: any): any {
   return currentData;
 }
 
+export function absolutePathToParentPath(absPath: Path, relativePath: Path): Path {
+  if (absPath.length <= relativePath.length) {
+    return [];
+  }
+  return absPath.slice(0, absPath.length - relativePath.length);
+}
+
 export function pathToString(path: Path): string {
   return path.length === 0
     ? ''

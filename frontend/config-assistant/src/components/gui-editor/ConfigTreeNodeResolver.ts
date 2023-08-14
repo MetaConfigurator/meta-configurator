@@ -107,13 +107,18 @@ export class ConfigTreeNodeResolver {
       return children;
     }
 
-    if (schema.hasType('object') && depth < depthLimit) {
-      return this.createObjectChildrenTreeNodes(absolutePath, relativePath, schema, depth);
-    }
+    children = [];
     if (schema.hasType('array') && depth < depthLimit) {
-      return this.createArrayChildrenTreeNodes(absolutePath, relativePath, schema, depth);
+      children = children.concat(
+        this.createArrayChildrenTreeNodes(absolutePath, relativePath, schema, depth)
+      );
     }
-    return [];
+    if (schema.hasType('object') && depth < depthLimit) {
+      children = children.concat(
+        this.createObjectChildrenTreeNodes(absolutePath, relativePath, schema, depth)
+      );
+    }
+    return children;
   }
 
   /**
@@ -426,37 +431,27 @@ export class ConfigTreeNodeResolver {
   }
 
   private shouldAddAddPropertyNode(schema: JsonSchema, data: any) {
-    if (data === undefined || (typeof data === 'object' && !data)) {
-      return true;
-    }
     if (Array.isArray(data)) {
       return false;
     }
-    if (typeof data !== 'object') {
+    if (data !== undefined && typeof data !== 'object') {
       return false;
     }
     if (schema.maxProperties !== undefined && Object.keys(data).length >= schema.maxProperties) {
       return false;
     }
-    return (
-      schema.patternProperties ||
-      !schema.additionalProperties.isAlwaysFalse ||
-      !schema.unevaluatedProperties.isAlwaysFalse
-    );
+    return schema.patternProperties || !schema.additionalProperties.isAlwaysFalse;
   }
 
   private shouldAddAddItemNode(schema: JsonSchema, data: any) {
-    if (data === undefined || (typeof data === 'object' && !data)) {
-      return true;
-    }
-    if (!Array.isArray(data)) {
+    if (data !== undefined && !Array.isArray(data)) {
       return false;
     }
     if (schema.maxItems !== undefined && data.length >= schema.maxItems) {
       return false;
     }
     if (schema.items.isAlwaysFalse) {
-      return data.length < schema.prefixItems?.length ?? 0;
+      return data?.length < schema.prefixItems?.length ?? 0;
     }
     return true;
   }
