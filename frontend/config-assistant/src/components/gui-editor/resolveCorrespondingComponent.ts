@@ -8,19 +8,33 @@ import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayP
 import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
 import type {VNode} from 'vue';
 import {h} from 'vue';
+import {useSessionStore} from '@/store/sessionStore';
+import OneOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
+import {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
+import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
 
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData
 ): VNode {
   const propsObject = {
     propertyName: nodeData.name,
-    propertyData: nodeData.data,
+    propertyData: useSessionStore().dataAtPath(nodeData.absolutePath),
     propertySchema: nodeData.schema,
     parentSchema: nodeData.parentSchema,
     relativePath: nodeData.relativePath,
     absolutePath: nodeData.absolutePath,
   };
-  if (nodeData.schema.enum !== undefined) {
+  if (nodeData.schema.oneOf.length > 0) {
+    return h(OneOfAnyOfSelectionProperty, {
+      ...propsObject,
+      possibleSchemas: nodeData.schema.oneOf,
+    });
+  } else if (nodeData.schema.anyOf.length > 0) {
+    return h(OneOfAnyOfSelectionProperty, {
+      ...propsObject,
+      possibleSchemas: nodeData.schema.anyOf,
+    });
+  } else if (nodeData.schema.enum !== undefined) {
     return h(EnumProperty, {
       ...propsObject,
       possibleValues: nodeData.schema.enum,

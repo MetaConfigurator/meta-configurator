@@ -7,6 +7,8 @@ import {
 } from '@/helpers/schema/SchemaUtils';
 import type {Path, PathElement} from '@/model/path';
 import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
+import {useSessionStore} from '@/store/sessionStore';
+import {pathToString} from '@/helpers/pathHelper';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -57,32 +59,39 @@ export class JsonSchema {
     return this.required?.includes(key) ?? false;
   }
 
-  public subSchemaAt(path: Path): JsonSchema | undefined {
+  public subSchemaAt(relativePath: Path, parentPath: Path): JsonSchema | undefined {
+    if (relativePath.length === 0) {
+      return this;
+    }
+
     let schema: JsonSchema | undefined = this;
-    for (const element of path) {
-      schema = schema.subSchema(element);
+    for (const element of relativePath) {
+      schema = schema.subSchema(element, parentPath);
       if (schema === undefined) {
         return undefined;
       }
+      parentPath = parentPath.concat(element);
     }
+
     return schema;
   }
 
   /**
    * Returns the schema at the given property or item.
    * @param subElement The name of the property or the index of the item.
+   * @param parentPath The absolutePath exclusive the sub element
    * @returns The schema at the given property or item, or undefined, if there is none.
    */
-  public subSchema(subElement: PathElement): JsonSchema | undefined {
+  public subSchema(subElement: PathElement, parentPath: Path): JsonSchema | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
     if (typeof subElement === 'string') {
-      return this.subProperty(subElement);
+      return this.resolveOneOfAnyOf(parentPath).subProperty(subElement);
     }
 
     // subElement is a number
-    return this.subItem(subElement);
+    return this.subItem(subElement)?.resolveOneOfAnyOf(parentPath);
   }
 
   private subProperty(subElement: string): JsonSchema | undefined {
@@ -116,6 +125,26 @@ export class JsonSchema {
       return this.unevaluatedItems;
     }
     return this.items;
+  }
+
+  public resolveOneOfAnyOf(absolutePath: Path) {
+    const path = pathToString(absolutePath);
+    const selectedOption = useSessionStore().currentSelectedOneOfAnyOfOptions.get(path);
+    if (this.oneOf.length > 0) {
+      return this.oneOf[selectedOption?.index ?? 0];
+    }
+    if (this.anyOf.length > 0) {
+      return this.anyOf[selectedOption?.index ?? 0];
+    }
+    return this;
+  }
+
+  get isAlwaysTrue(): boolean {
+    return JSON.stringify(this.jsonSchema) === '{}';
+  }
+
+  get isAlwaysFalse(): boolean {
+    return this.jsonSchema === undefined;
   }
 
   /**

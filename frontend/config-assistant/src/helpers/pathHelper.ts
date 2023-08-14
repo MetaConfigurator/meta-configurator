@@ -1,8 +1,8 @@
 import type {Path, PathElement} from '@/model/path';
 
-export function pathToString(path: Path) {
+export function pathToString(path: Path): string {
   return path.length === 0
-    ? undefined
+    ? ''
     : path
         .reduce(
           (prev: string, val: PathElement) =>

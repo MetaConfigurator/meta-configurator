@@ -5,6 +5,8 @@ import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
 import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
 
+const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
+
 /**
  * Preprocesses the schema.
  *
@@ -22,26 +24,76 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
     const refString = copiedSchema.$ref?.startsWith('#')
       ? copiedSchema.$ref.substring(1)
       : copiedSchema.$ref!!;
-    let refSchema = pointer.get(
-      nonBooleanSchema(useSessionStore().fileSchemaData ?? {}) ?? {},
-      refString
-    );
-    refSchema = preprocessSchema(refSchema);
+
+    let refSchema: any;
+    if (preprocessedRefSchemas.has(refString)) {
+      refSchema = preprocessedRefSchemas.get(refString);
+    } else {
+      refSchema = pointer.get(
+        nonBooleanSchema(useSessionStore().fileSchemaData ?? {}) ?? {},
+        refString
+      );
+      refSchema = preprocessSchema(refSchema);
+      preprocessedRefSchemas.set(refString, refSchema);
+    }
+
     delete copiedSchema.$ref;
     copiedSchema = {allOf: [copiedSchema, refSchema]};
   }
 
   if (hasAllOfs(copiedSchema)) {
     // @ts-ignore
-    copiedSchema.allOf = copiedSchema.allOf!!.map(preprocessSchema);
+    copiedSchema.allOf = copiedSchema.allOf!!.map((subSchema, index) =>
+      preprocessSchema(subSchema as JsonSchemaObjectType)
+    );
     copiedSchema = mergeAllOf(copiedSchema, {
+      deep: false,
       resolvers: {
         defaultResolver: mergeAllOf.options.resolvers.title,
       },
     });
   }
 
+  if (hasOneOfs(copiedSchema)) {
+    // @ts-ignore
+    copiedSchema.oneOf = copiedSchema.oneOf!!.map((subSchema, index) => {
+      const copiedSchemaWithoutOneOf = {...copiedSchema};
+      delete copiedSchemaWithoutOneOf.oneOf;
+      delete copiedSchemaWithoutOneOf.title;
+      delete copiedSchemaWithoutOneOf.description;
+      const resultSchema = {
+        allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutOneOf],
+      };
+      return mergeAllOfs(resultSchema as JsonSchemaObjectType);
+    });
+  }
+
+  if (hasAnyOfs(copiedSchema)) {
+    // @ts-ignore
+    copiedSchema.anyOf = copiedSchema.anyOf!!.map((subSchema, index) => {
+      const copiedSchemaWithoutAnyOf = {...copiedSchema};
+      delete copiedSchemaWithoutAnyOf.anyOf;
+      delete copiedSchemaWithoutAnyOf.title;
+      delete copiedSchemaWithoutAnyOf.description;
+      const resultSchema = {
+        allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutAnyOf],
+      };
+      return mergeAllOfs(resultSchema as JsonSchemaObjectType);
+    });
+  }
+
+  optimizeSchema(copiedSchema);
+
   return copiedSchema;
+}
+
+function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
+  return mergeAllOf(schema, {
+    deep: false,
+    resolvers: {
+      defaultResolver: mergeAllOf.options.resolvers.title,
+    },
+  });
 }
 
 function hasRef(schema: JsonSchemaObjectType): boolean {
@@ -50,4 +102,16 @@ function hasRef(schema: JsonSchemaObjectType): boolean {
 
 function hasAllOfs(schema: JsonSchemaObjectType): boolean {
   return schema.allOf !== undefined && schema.allOf.length > 0;
+}
+function hasOneOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.oneOf !== undefined && schema.oneOf.length > 0;
+}
+function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.anyOf !== undefined && schema.anyOf.length > 0;
+}
+
+function optimizeSchema(schema: JsonSchemaObjectType) {
+  if (hasOneOfs(schema)) {
+    // TODO: if it is just oneOf of types, then replace it by a choice of types
+  }
 }

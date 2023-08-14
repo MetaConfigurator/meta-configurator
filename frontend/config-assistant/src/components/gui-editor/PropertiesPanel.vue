@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import type {Ref} from 'vue';
+import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
@@ -8,13 +9,17 @@ import Button from 'primevue/button';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
-import {ConfigTreeNodeResolver} from '@/helpers/ConfigTreeNodeResolver';
-import type {Path, PathElement} from '@/model/path';
+import {ConfigTreeNodeResolver} from '@/components/gui-editor/ConfigTreeNodeResolver';
+import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
-import {TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {ConfigTreeNodeData, GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
+import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
+import {refDebounced, useDebounceFn} from '@vueuse/core';
+import {isObjectStructureEqual} from '@/helpers/compareObjectStructure';
+import type {TreeNode} from 'primevue/tree';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -30,19 +35,73 @@ const emit = defineEmits<{
 
 const treeNodeResolver = new ConfigTreeNodeResolver();
 
-const nodesToDisplay = computed(() => {
-  const rootNode = treeNodeResolver.createTreeNodeOfProperty(
-    props.currentSchema.title ?? 'root',
+const loading = ref(false);
+const loadingDebounced = refDebounced(loading, 100);
+
+const treeTableFilters = ref<Record<string, string>>({});
+const {currentExpandedElements} = storeToRefs(useSessionStore());
+
+const currentTree = ref({});
+
+function computeTree() {
+  currentTree.value = treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema,
     undefined,
     props.currentPath
   );
+  currentTree.value.children = treeNodeResolver.createChildNodesOfNode(currentTree.value);
 
-  return rootNode.children;
+  expandPreviouslyExpandedElements(currentTree.value.children as Array<GuiEditorTreeNode>);
+
+  return currentTree.value;
+}
+
+/**
+ * Calculate the children of all nodes that are expanded.
+ * @param nodes initial nodes
+ */
+function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
+  for (const node of nodes) {
+    const expanded = currentExpandedElements.value[pathToString(node.data.absolutePath)] ?? false;
+    if (expanded) {
+      node.children = treeNodeResolver.createChildNodesOfNode(node);
+      if (node.children && node.children.length > 0) {
+        expandPreviouslyExpandedElements(node.children as Array<GuiEditorTreeNode>);
+      }
+    }
+  }
+}
+
+function updateTree() {
+  loadingDebounced.value = true;
+  window.setTimeout(() => {
+    nodesToDisplay.value = computeTree().children;
+    loadingDebounced.value = false;
+  }, 0);
+}
+
+const nodesToDisplay: Ref<TreeNode[]> = ref(computeTree().children);
+
+watch(storeToRefs(useSessionStore()).fileSchema, () => {
+  currentExpandedElements.value = {};
+  updateTree();
 });
 
-const treeTableFilters = ref<Record<string, string>>({});
-const {currentExpandedElements} = storeToRefs(useSessionStore());
+// recalculate the tree when the data structure changes, but not
+// single values (e.g. when a property is changed)
+watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
+  if (!isObjectStructureEqual(value, oldValue)) {
+    updateTree();
+  }
+});
+
+watch(
+  storeToRefs(useSessionStore()).currentSelectedOneOfAnyOfOptions,
+  () => {
+    updateTree();
+  },
+  {deep: true}
+);
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
@@ -60,13 +119,20 @@ function focus(id: string) {
 
 function addItem(relativePath: Path, newValue: any) {
   updateData(relativePath, newValue);
+  updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
-  const subSchema = props.currentSchema.subSchemaAt(relativePath);
+  // TODO fix parent path, not absolute Path
+  const subSchema = props.currentSchema.subSchemaAt(
+    relativePath,
+    absolutePath.slice(0, -relativePath.length)
+  );
   if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
     useSessionStore().expand(absolutePath);
 
-    focusOnFirstPropertyOfSchema(absolutePath);
+    window.setTimeout(() => {
+      focusOnFirstProperty(relativePath);
+    }, 0);
     return;
   }
 
@@ -76,31 +142,54 @@ function addItem(relativePath: Path, newValue: any) {
   focus(pathToString(props.currentPath.concat(pathToAddItem)));
 }
 
-function focusOnFirstPropertyOfSchema(absolutePath: Path) {
-  const dataAtPath = useSessionStore().dataAtPath(absolutePath);
-  const subSchema = useSessionStore().schemaAtPath(absolutePath);
+/**
+ * Focus on the first property of the current tree or the first property of the given relative path.
+ * @param relativePath the relative path to the property to focus on
+ */
+function focusOnFirstProperty(relativePath?: Path) {
+  let pathToFirstProperty = currentTree.value.children[0]?.data?.absolutePath;
 
-  let firstPropertyOfObject: PathElement =
-    Object.keys(subSchema?.properties)[0] ?? Object.keys(dataAtPath)[0];
-  if (Array.isArray(dataAtPath)) {
-    // if the data is an array, the first property is the index of the array
-    // (which is a number)
-    firstPropertyOfObject = 0;
+  if (relativePath) {
+    const node = findNode(relativePath);
+    if (node) {
+      pathToFirstProperty = node.children[0]?.data?.absolutePath;
+    }
   }
-  const pathToFirstProperty = absolutePath.concat(firstPropertyOfObject);
-
-  focus(pathToString(pathToFirstProperty));
+  if (pathToFirstProperty) {
+    focus(pathToString(pathToFirstProperty));
+  }
 }
 
 /**
- * Function for adding a default value to an array.
+ * Find a node in the current tree by its relative path.
+ * @param relativePath the relative path of the node to find
+ * @param root the root of the tree to search in
+ */
+function findNode(relativePath, root = currentTree.value) {
+  const absolutePath = pathToString(props.currentPath.concat(relativePath));
+  if (root.key === absolutePath) {
+    return root;
+  }
+
+  for (const child of root.children) {
+    const foundNode = findNode(relativePath, child);
+    if (foundNode) {
+      return foundNode;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Function for adding an empty value to an array.
  * This function is called when the user clicks on the "add item" button.
  */
-function addDefaultValue(relativePath: Path) {
-  const arraySchema = props.currentSchema.subSchemaAt(relativePath.slice(0, -1));
+function addEmptyArrayEntry(relativePath: Path, absolutePath: Path) {
+  const relativePathOfArray = relativePath.slice(0, -1);
+  const absolutePathOfArray = absolutePath.slice(0, -relativePathOfArray.length);
+  const arraySchema = props.currentSchema.subSchemaAt(relativePathOfArray, absolutePathOfArray);
 
   if (!arraySchema?.items) {
-    console.log('addDefaultValue called on array schema without items');
     // TODO: handle this case
     return {};
   }
@@ -129,19 +218,55 @@ function addNegativeMarginForTableStyle(depth: number) {
 }
 
 watch(storeToRefs(useSessionStore()).currentPath, (path: Path) => {
-  focusOnFirstPropertyOfSchema(path);
+  updateTree();
+  focusOnFirstProperty();
 });
 
-function displayAsDefaultProperty(node: any) {
+function displayAsRegularProperty(node: any) {
   return (
     node.type === TreeNodeType.PATTERN_PROPERTY ||
     node.type === TreeNodeType.SCHEMA_PROPERTY ||
     node.type === TreeNodeType.ADDITIONAL_PROPERTY
   );
 }
+
+function expandElement(node: any) {
+  currentExpandedElements.value[node.key] = true;
+  node.children = treeNodeResolver.createChildNodesOfNode(node);
+  expandPreviouslyExpandedElements(node.children as Array<GuiEditorTreeNode>);
+}
+
+const schemaInfoOverlay = ref<InstanceType<typeof SchemaInfoOverlay> | undefined>();
+const overlayVisible = ref(false);
+
+const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
+  // @ts-ignore
+  schemaInfoOverlay.value?.showPanel(nodeData.schema, nodeData.name, nodeData.parentSchema, event);
+};
+const showInfoOverlayPanelDebounced = useDebounceFn((nodeData: ConfigTreeNodeData, event) => {
+  if (overlayVisible.value) {
+    showInfoOverlayPanelInstantly(nodeData, event);
+  }
+}, 500);
+
+function showInfoOverlayPanel(nodeData: ConfigTreeNodeData, event) {
+  overlayVisible.value = true;
+  showInfoOverlayPanelDebounced(nodeData, event);
+}
+
+const closeInfoOverlayPanelDebounced = useDebounceFn(() => {
+  // @ts-ignore
+  schemaInfoOverlay.value?.closePanel();
+}, 100);
+
+function closeInfoOverlayPanel() {
+  overlayVisible.value = false;
+  closeInfoOverlayPanelDebounced();
+}
 </script>
 
 <template>
+  <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="overlayVisible = false" />
   <TreeTable
     :value="nodesToDisplay"
     filter-mode="lenient"
@@ -151,8 +276,10 @@ function displayAsDefaultProperty(node: any) {
     scroll-direction="vertical"
     scroll-height="flex"
     row-hover
+    :lazy="true"
+    :loading="loading"
     :expandedKeys="currentExpandedElements"
-    @nodeExpand="node => (currentExpandedElements[node.key] = true)"
+    @nodeExpand="expandElement"
     @nodeCollapse="node => delete currentExpandedElements[node.key]"
     :filters="treeTableFilters">
     <!-- Filter field -->
@@ -171,21 +298,24 @@ function displayAsDefaultProperty(node: any) {
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->
         <span
-          v-if="displayAsDefaultProperty(slotProps.node)"
+          v-if="displayAsRegularProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          @mouseenter="event => showInfoOverlayPanel(slotProps.node.data, event)"
+          @mouseleave="closeInfoOverlayPanel">
           <PropertyMetadata
             :nodeData="slotProps.node.data"
             :type="slotProps.node.type"
             @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)" />
         </span>
 
-        <span v-if="displayAsDefaultProperty(slotProps.node)" style="max-width: 50%" class="w-full">
+        <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 50%" class="w-full">
           <PropertyData
             class="w-full"
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
-            bodyClass="w-full" />
+            bodyClass="w-full"
+            @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />
         </span>
 
         <!-- special tree nodes -->
@@ -198,8 +328,12 @@ function displayAsDefaultProperty(node: any) {
             severity="secondary"
             class="text-gray-500"
             style="margin-left: -0.75rem"
-            @click="addDefaultValue(slotProps.node.data.relativePath)"
-            @keyup.enter="addDefaultValue(slotProps.node.data.relativePath)">
+            @click="
+              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+            "
+            @keyup.enter="
+              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+            ">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>
