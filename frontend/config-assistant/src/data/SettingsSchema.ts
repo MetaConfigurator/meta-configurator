@@ -25,9 +25,9 @@ export const SETTINGS_SCHEMA: any = {
           type: 'integer',
           description:
             'The maximum depth of the GUI editor. If the depth of the configuration object is higher, the GUI editor will not show the deeper levels, but they can be navigated by clicking on the property name',
-          default: 3,
+          default: 5,
           minimum: 1,
-          maximum: 10,
+          maximum: 20,
         },
         propertySorting: {
           type: 'string',
