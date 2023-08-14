@@ -95,14 +95,6 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
   }
 });
 
-watch(
-  storeToRefs(useSessionStore()).fileSchema,
-  () => {
-    updateTree();
-  },
-  {deep: true}
-);
-
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
@@ -309,6 +301,7 @@ function closeInfoOverlayPanel() {
             class="w-full"
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
+            @update_tree="updateTree"
             bodyClass="w-full"
             @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />
         </span>

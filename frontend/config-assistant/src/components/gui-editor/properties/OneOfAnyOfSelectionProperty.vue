@@ -19,13 +19,20 @@ const possibleValues = props.possibleSchemas.map(
   (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
 );
 
+const emit = defineEmits<{
+  (e: 'update_tree'): void;
+}>();
+
 const valueProperty = computed({
   get() {
     return props.propertySchema.userSelectionOneOfAnyOf;
   },
   set(newValue) {
     const selectedOption: OneOfAnyOfSelectionOption | undefined = newValue;
-    props.propertySchema.userSelectionOneOfAnyOf = selectedOption;
+    if (selectedOption !== props.propertySchema.userSelectionOneOfAnyOf) {
+      props.propertySchema.userSelectionOneOfAnyOf = selectedOption;
+      emit('update_tree');
+    }
   },
 });
 </script>
