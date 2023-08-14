@@ -13,7 +13,6 @@ import type {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrap
 import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 
-
 export enum SessionMode {
   FileEditor = 'file_editor',
   SchemaEditor = 'schema_editor',
