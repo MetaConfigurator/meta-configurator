@@ -83,7 +83,7 @@ onMounted(() => {
 
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
-  editor.value.getSession().getUndoManager().reset();
+  editor.value.getSession().setUndoManager(new ace.UndoManager());
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on(
