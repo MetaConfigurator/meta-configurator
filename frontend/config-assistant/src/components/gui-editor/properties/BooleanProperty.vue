@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const options = ref([
   {name: 'true', value: true},
-  {name: 'false', value: false},
+  {name: 'false', value: 'false'},
 ]);
 
 const emit = defineEmits<{
