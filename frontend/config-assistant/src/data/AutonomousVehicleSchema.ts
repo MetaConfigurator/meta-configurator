@@ -1,7 +1,7 @@
 import type {TopLevelSchema} from '@/model/JsonSchemaType';
 
 export const AUTONOMOUS_VEHICLE_SCHEMA: TopLevelSchema = {
-  $schema: 'http://json-schema.org/draft-07/schema#',
+  $schema: 'http://json-schema.org/draft/2020-12/schema',
   title: 'Self-Driving Vehicle',
   description: 'A JSON schema for configuration of autonomous vehicles',
   type: 'object',
