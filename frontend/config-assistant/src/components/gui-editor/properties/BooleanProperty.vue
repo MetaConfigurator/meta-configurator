@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SelectButton from 'primevue/selectbutton';
+import RadioButton from 'primevue/radiobutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/model/path';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
@@ -12,7 +13,7 @@ const props = defineProps<{
 
 const options = ref([
   {name: 'true', value: true},
-  {name: 'false', value: 'false'},
+  {name: 'false', value: false},
 ]);
 
 const emit = defineEmits<{
@@ -43,11 +44,12 @@ const valueProperty = computed({
 
 <template>
   <div class="pl-2">
-    <SelectButton
-      v-model="valueProperty"
-      :options="options"
-      option-label="name"
-      option-value="value" />
+    <RadioButton v-model="valueProperty" inputId="True" name="pizza" value="true" />
+    <label for="True">true</label>
+  </div>
+  <div class="pl-2">
+    <RadioButton v-model="valueProperty" inputId="False" name="pizza" value="false" />
+    <label for="False">false</label>
   </div>
 </template>
 
