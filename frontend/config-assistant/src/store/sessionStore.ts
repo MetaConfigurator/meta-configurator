@@ -1,16 +1,15 @@
-import type {ComputedRef, Ref, WritableComputedRef} from 'vue';
+import type {Ref, WritableComputedRef} from 'vue';
 import {computed, ref} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
 import {useDataStore} from '@/store/dataStore';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {pathToString} from '@/helpers/pathHelper';
+import {dataAt, pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
 import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
-import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -121,16 +120,7 @@ export const useSessionStore = defineStore('commonStore', () => {
    * @returns The data at the given path, or an empty object if the path does not exist.
    */
   function dataAtPath(path: Path): any {
-    let currentData: any = fileData.value;
-
-    for (const key of path) {
-      if (!currentData[key]) {
-        return undefined;
-      }
-      currentData = currentData[key];
-    }
-
-    return currentData;
+    return dataAt(path, fileData.value);
   }
 
   function updateCurrentPath(proposedPath: Path): void {
@@ -146,6 +136,10 @@ export const useSessionStore = defineStore('commonStore', () => {
   }
 
   function updateDataAtPath(path: Path, newValue: any): void {
+    if (path.length === 0) {
+      fileData.value = newValue;
+      return;
+    }
     const pathAsString = pathToString(path);
     _.set(fileData.value, pathAsString!!, newValue);
   }

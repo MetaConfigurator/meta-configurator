@@ -10,6 +10,8 @@ import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
 import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
+import type {ValidateFunction} from 'ajv/dist/2020';
+import Ajv2020 from 'ajv/dist/2020';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -40,6 +42,7 @@ export class JsonSchema {
   private _then?: JsonSchema;
   private _else?: JsonSchema;
   private _contentSchema?: JsonSchema;
+  private _validationFunction?: ValidateFunction;
 
   private _userSelectionOnOfAnyOf?: OneOfAnyOfSelectionOption;
 
@@ -48,6 +51,49 @@ export class JsonSchema {
     if (this.jsonSchema !== undefined) {
       this.jsonSchema = preprocessSchema(this.jsonSchema);
     }
+  }
+
+  public get validationFunction(): ValidateFunction {
+    if (this._validationFunction === undefined) {
+      this._validationFunction = new Ajv2020().compile(this.jsonSchema ?? {not: 'true'});
+    }
+    return this._validationFunction;
+  }
+
+  /**
+   * Validates the given data.
+   * @param data the data to validate.
+   * @return if the data is valid according to the schema.
+   */
+  public validate(data: unknown): boolean {
+    if (this.jsonSchema === undefined) {
+      return false;
+    }
+    return this.validationFunction(data);
+  }
+
+  /**
+   * Returns an empty, initial value that matches the type of
+   * the schema (this is NOT the default value).
+   */
+  public initialValue(): any {
+    if (this.hasType('object')) {
+      return {};
+    }
+    if (this.hasType('array')) {
+      return [];
+    }
+    if (this.hasType('string')) {
+      return '';
+    }
+    if (this.hasType('number') || this.hasType('integer')) {
+      return 0;
+    }
+    if (this.hasType('boolean')) {
+      return false;
+    }
+    // type null
+    return null;
   }
 
   /**
