@@ -15,7 +15,7 @@ import {GuiConstants} from '@/constants';
 import {ConfigTreeNodeData, GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
-import {absolutePathToParentPath, dataAt, pathToString} from '@/helpers/pathHelper';
+import {dataAt, pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import {isObjectStructureEqual} from '@/helpers/compareObjectStructure';
@@ -205,10 +205,7 @@ function addEmptyArrayEntry(relativePath: Path) {
 
 function addEmptyProperty(relativePath: Path, absolutePath: Path) {
   allowShowOverlay.value = false;
-  const objectSchema = props.currentSchema.subSchemaAt(
-    relativePath,
-    absolutePathToParentPath(absolutePath, relativePath)
-  );
+  const objectSchema = props.currentSchema.subSchemaAt(relativePath);
 
   const dataAtParentPath = dataAt(relativePath.slice(0, -1), props.currentData);
   const name = findNameForNewProperty(objectSchema, dataAtParentPath);
