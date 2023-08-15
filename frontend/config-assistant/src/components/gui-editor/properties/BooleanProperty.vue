@@ -12,8 +12,8 @@ const props = defineProps<{
 }>();
 
 const options = ref([
-  {name: 'true', value: true},
-  {name: 'false', value: false},
+  {name: 'true', value: 'true'},
+  {name: 'false', value: 'false'},
 ]);
 
 const emit = defineEmits<{
@@ -44,12 +44,11 @@ const valueProperty = computed({
 
 <template>
   <div class="pl-2">
-    <RadioButton v-model="valueProperty" inputId="True" name="pizza" value="true" />
-    <label for="True">true</label>
-  </div>
-  <div class="pl-2">
-    <RadioButton v-model="valueProperty" inputId="False" name="pizza" value="false" />
-    <label for="False">false</label>
+    <SelectButton
+      v-model="valueProperty"
+      :options="options"
+      option-label="name"
+      option-value="value" />
   </div>
 </template>
 
