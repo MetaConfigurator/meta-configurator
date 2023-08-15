@@ -96,14 +96,6 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
   }
 });
 
-watch(
-  storeToRefs(useSessionStore()).currentSelectedOneOfAnyOfOptions,
-  () => {
-    updateTree();
-  },
-  {deep: true}
-);
-
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   console.log('update data', completePath, newValue);
@@ -143,10 +135,7 @@ function addItem(relativePath: Path, newValue: any) {
   updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
-  const subSchema = props.currentSchema.subSchemaAt(
-    relativePath,
-    absolutePath.slice(0, -relativePath.length)
-  );
+  const subSchema = props.currentSchema.subSchemaAt(relativePath);
   if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
     useSessionStore().expand(absolutePath);
 
@@ -204,11 +193,8 @@ function findNode(relativePath, root = currentTree.value) {
  * Function for adding an empty value to an array.
  * This function is called when the user clicks on the "add item" button.
  */
-function addEmptyArrayEntry(relativePath: Path, absolutePath: Path) {
-  const relativePathOfArray = relativePath.slice(0, -1);
-  let parentPathOfArray = absolutePath.slice(0, -1);
-  parentPathOfArray = absolutePathToParentPath(parentPathOfArray, relativePathOfArray);
-  const arraySchema = props.currentSchema.subSchemaAt(relativePathOfArray, parentPathOfArray);
+function addEmptyArrayEntry(relativePath: Path) {
+  const arraySchema = props.currentSchema.subSchemaAt(relativePath.slice(0, -1));
 
   if (!arraySchema?.items) {
     // TODO: handle this case
@@ -386,6 +372,7 @@ function closeInfoOverlayPanel() {
             class="w-full"
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
+            @update_tree="updateTree"
             bodyClass="w-full"
             @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />
         </span>
@@ -400,12 +387,8 @@ function closeInfoOverlayPanel() {
             severity="secondary"
             class="text-gray-500"
             style="margin-left: -0.75rem"
-            @click="
-              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-            "
-            @keyup.enter="
-              addEmptyArrayEntry(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-            ">
+            @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
+            @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>

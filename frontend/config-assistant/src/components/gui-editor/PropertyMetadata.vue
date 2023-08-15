@@ -34,8 +34,7 @@ function canZoomIn(): boolean {
 
   const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
   if (dependsOnUserSelection) {
-    const path = pathToString(props.node.data.absolutePath);
-    const hasUserSelection = useSessionStore().currentSelectedOneOfAnyOfOptions.has(path);
+    const hasUserSelection = schema.userSelectionOneOfAnyOf;
     if (!hasUserSelection) {
       return false;
     }
