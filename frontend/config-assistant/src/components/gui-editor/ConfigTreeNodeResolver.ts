@@ -10,6 +10,7 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {pathToString} from '@/helpers/pathHelper';
 import {PropertySorting} from '@/model/SettingsTypes';
 import {useSessionStore} from '@/store/sessionStore';
+import _ from 'lodash';
 
 /**
  * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
@@ -437,14 +438,14 @@ export class ConfigTreeNodeResolver {
     if (schema.maxProperties !== undefined && Object.keys(data).length >= schema.maxProperties) {
       return false;
     }
-    return schema.patternProperties || !schema.additionalProperties.isAlwaysFalse;
+    return !_.isEmpty(schema.patternProperties) || !schema.additionalProperties.isAlwaysFalse;
   }
 
   private shouldAddAddItemNode(schema: JsonSchema, data: any) {
     if (data !== undefined && !Array.isArray(data)) {
       return false;
     }
-    if (schema.maxItems !== undefined && data.length >= schema.maxItems) {
+    if (schema.maxItems !== undefined && data !== undefined && data.length >= schema.maxItems) {
       return false;
     }
     if (schema.items.isAlwaysFalse) {

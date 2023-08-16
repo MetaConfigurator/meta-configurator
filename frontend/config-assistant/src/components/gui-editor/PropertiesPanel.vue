@@ -3,7 +3,6 @@ import type {Ref} from 'vue';
 import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
-import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
@@ -18,7 +17,6 @@ import {useSessionStore} from '@/store/sessionStore';
 import {dataAt, pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
-import {isObjectStructureEqual} from '@/helpers/compareObjectStructure';
 import type {TreeNode} from 'primevue/tree';
 import {focus, focusOnPath, selectContents} from '@/helpers/focusUtils';
 
@@ -91,14 +89,13 @@ watch(storeToRefs(useSessionStore()).fileSchema, () => {
 // recalculate the tree when the data structure changes, but not
 // single values (e.g. when a property is changed)
 watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
-  if (!isObjectStructureEqual(value, oldValue)) {
-    updateTree();
-  }
+  /*if (!isObjectStructureEqual(value, oldValue)) { */ // currently not working as expected
+  updateTree();
+  /*}*/
 });
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
-  console.log('update data', completePath, newValue);
   emit('update_data', completePath, newValue);
 }
 
@@ -127,7 +124,18 @@ function updatePropertyName(subPath: Path, oldName, newName: string) {
 
   replacePropertyName(parentPath, oldName, newName, oldData);
   updateTree();
-  focusOnPath(props.currentPath.concat(parentPath).concat([newName]));
+  const newRelativePath = parentPath.concat([newName]);
+  const newAbsolutePath = props.currentPath.concat(newRelativePath);
+  focusOnPath(newAbsolutePath);
+  const subSchema = props.currentSchema.subSchemaAt(newRelativePath);
+  if (subSchema?.hasType('object') || subSchema?.hasType('array')) {
+    useSessionStore().expand(newAbsolutePath);
+
+    window.setTimeout(() => {
+      focusOnFirstProperty(newRelativePath);
+    }, 0);
+    return;
+  }
 }
 
 function addItem(relativePath: Path, newValue: any) {
@@ -331,18 +339,6 @@ function closeInfoOverlayPanel() {
     @nodeExpand="expandElement"
     @nodeCollapse="node => delete currentExpandedElements[node.key]"
     :filters="treeTableFilters">
-    <!-- Filter field -->
-    <template #header>
-      <div class="text-left">
-        <div class="p-input-icon-left w-full">
-          <i class="pi pi-search" />
-          <InputText
-            v-model="treeTableFilters['global']"
-            placeholder="Search for properties or data"
-            class="h-8 w-80" />
-        </div>
-      </div>
-    </template>
     <Column field="name" header="Property" :sortable="true" expander>
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->

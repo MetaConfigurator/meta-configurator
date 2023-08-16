@@ -13,7 +13,7 @@ export const useSettingsStore = defineStore('settings', () => {
     guiEditorOnRightSide: true,
     guiEditor: {
       maximumDepth: 5,
-      propertySorting: 'dataOrder',
+      propertySorting: 'schemaOrder',
     },
     debuggingActive: false,
   });

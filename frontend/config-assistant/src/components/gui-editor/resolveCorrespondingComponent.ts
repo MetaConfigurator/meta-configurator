@@ -9,8 +9,6 @@ import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTr
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
-import OneOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
-import {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
 
 export function resolveCorrespondingComponent(
