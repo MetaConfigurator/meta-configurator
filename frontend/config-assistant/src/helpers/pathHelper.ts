@@ -4,7 +4,7 @@ export function dataAt(path: Path, data: any): any {
   let currentData: any = data;
 
   for (const key of path) {
-    if (!currentData[key]) {
+    if (currentData[key] === undefined) {
       return undefined;
     }
     currentData = currentData[key];

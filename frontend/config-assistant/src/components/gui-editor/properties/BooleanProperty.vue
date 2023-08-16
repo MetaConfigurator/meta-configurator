@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import SelectButton from 'primevue/selectbutton';
-import RadioButton from 'primevue/radiobutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/model/path';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
@@ -12,8 +11,8 @@ const props = defineProps<{
 }>();
 
 const options = ref([
-  {name: 'true', value: 'true'},
-  {name: 'false', value: 'false'},
+  {name: 'true', value: true},
+  {name: 'false', value: false},
 ]);
 
 const emit = defineEmits<{
