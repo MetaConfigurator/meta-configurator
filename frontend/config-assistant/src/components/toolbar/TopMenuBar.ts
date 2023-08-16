@@ -95,7 +95,6 @@ export class TopMenuBar {
         icon: 'fa-solid fa-rotate-left',
         key: 'undo',
         command: () => {
-          console.log(this.sessionStore.currentEditorWrapper.hasUndo());
           this.sessionStore.currentEditorWrapper.undo();
         },
       },
