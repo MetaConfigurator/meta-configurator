@@ -3,4 +3,4 @@ export const GuiConstants = {
   INDENTATION_STEP: 16,
 };
 
-export const JSON_SCHEMA_STORE_CATALOG = 'https://www.schemastore.org/api/json/catalog.json';
+export const JSON_SCHEMA_STORE_CATALOG_URL = 'https://www.schemastore.org/api/json/catalog.json';

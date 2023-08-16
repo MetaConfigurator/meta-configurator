@@ -1,6 +1,6 @@
 import {errorService} from '@/main';
 import type {SchemaOption} from '@/model/SchemaOption';
-import {JSON_SCHEMA_STORE_CATALOG} from '@/constants';
+import {JSON_SCHEMA_STORE_CATALOG_URL} from '@/constants';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {useDataStore} from '@/store/dataStore';
