@@ -225,7 +225,7 @@ export class TopMenuBar {
       },
     ];
   }
-  
+
   private clearFile(): void {
     newEmptyFile('Do you want to clear the File editor?');
   }
