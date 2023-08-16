@@ -278,9 +278,9 @@ function describeMinimumAndMaximum(schema: JsonSchema): string {
 
   let result = 'The value must be ';
   if (min !== undefined && exclusiveMin === undefined) {
-    result += bold(`greater than `) + formatValue(min);
+    result += bold(`at least `) + formatValue(min);
   } else if (exclusiveMin !== undefined) {
-    result += bold(`at least `) + formatValue(exclusiveMin);
+    result += bold(`greater than `) + formatValue(exclusiveMin);
   }
 
   if (
@@ -291,9 +291,9 @@ function describeMinimumAndMaximum(schema: JsonSchema): string {
   }
 
   if (max !== undefined && exclusiveMax === undefined) {
-    result += bold(`less than `) + formatValue(max);
+    result += bold(`at most `) + formatValue(max);
   } else if (exclusiveMax !== undefined) {
-    result += bold(`at most `) + formatValue(exclusiveMax);
+    result += bold(`less than `) + formatValue(exclusiveMax);
   }
 
   return paragraph(result + '.');

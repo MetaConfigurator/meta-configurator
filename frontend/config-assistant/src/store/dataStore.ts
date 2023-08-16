@@ -1,9 +1,7 @@
 import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
-import {DEFAULT_CONFIG_DATA} from '@/data/DefaultConfigData';
 import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
-import {DEFAULT_SCHEMA} from '@/data/DefaultSchema';
 import {watchDebounced} from '@vueuse/core';
 import {jsonSchemaMetaSchema} from '../../resources/json-schema/schema';
 
@@ -11,12 +9,15 @@ export const useDataStore = defineStore('dataStore', () => {
   /**
    * The configuration file that the user can modify
    */
-  const fileData = ref(DEFAULT_CONFIG_DATA);
+  const fileData = ref({});
 
   /**
    * The json schema as a plain object
    */
-  const schemaData = ref(DEFAULT_SCHEMA);
+  const schemaData = ref({
+    title: 'No schema loaded',
+    description: 'Go to the schema editor to load a schema.',
+  });
 
   /**
    * The json schema as a TopLevelJsonSchema object

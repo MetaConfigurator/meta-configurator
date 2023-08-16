@@ -33,7 +33,7 @@ export const SETTINGS_SCHEMA: any = {
           type: 'string',
           description:
             "The sorting of the properties in the GUI editor. If set to 'priorityOrder', the order will be required properties first, then optional properties, then additional and pattern properties and finally deprecated properties. If set to 'dataOrder', the properties will be displayed in the order they are in the configuration object. If set to 'schemaOrder', the properties will be sorted according to the order in the schema.",
-          default: 'dataOrder',
+          default: 'schemaOrder',
           enum: ['priorityOrder', 'schemaOrder', 'dataOrder'],
         },
       },
