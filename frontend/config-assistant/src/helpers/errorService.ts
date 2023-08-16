@@ -1,5 +1,5 @@
 import type {ToastServiceMethods} from 'primevue/toastservice';
-import {useDebounceFn, useThrottleFn} from '@vueuse/core';
+import {useThrottleFn} from '@vueuse/core';
 
 /**
  * Service that handles errors and warnings.
@@ -36,8 +36,8 @@ export default class ErrorService {
   onWarningThrottled = useThrottleFn(this.onWarning, 5000);
 
   getSummary(error: unknown): string {
-    if (error instanceof Error) {
-      return error.message;
+    if ((error as any).summary) {
+      return (error as any).summary;
     }
     return 'Unknown Error occurred';
   }

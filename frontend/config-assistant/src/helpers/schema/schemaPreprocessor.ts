@@ -47,6 +47,7 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
       preprocessSchema(subSchema as JsonSchemaObjectType)
     );
     copiedSchema = mergeAllOf(copiedSchema, {
+      deep: false,
       resolvers: {
         defaultResolver: mergeAllOf.options.resolvers.title,
       },
@@ -56,38 +57,45 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
   if (hasOneOfs(copiedSchema)) {
     // @ts-ignore
     copiedSchema.oneOf = copiedSchema.oneOf!!.map((subSchema, index) => {
-      let copiedSchemaWithoutOneOf = {...copiedSchema};
+      const copiedSchemaWithoutOneOf = {...copiedSchema};
       delete copiedSchemaWithoutOneOf.oneOf;
-      let resultSchema = {
+      delete copiedSchemaWithoutOneOf.title;
+      delete copiedSchemaWithoutOneOf.description;
+      const resultSchema = {
         allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutOneOf],
       };
-      return mergeAllOf(resultSchema, {
-        resolvers: {
-          defaultResolver: mergeAllOf.options.resolvers.title,
-        },
-      });
+      return mergeAllOfs(resultSchema as JsonSchemaObjectType);
     });
   }
 
   if (hasAnyOfs(copiedSchema)) {
     // @ts-ignore
     copiedSchema.anyOf = copiedSchema.anyOf!!.map((subSchema, index) => {
-      let copiedSchemaWithoutAnyOf = {...copiedSchema};
+      const copiedSchemaWithoutAnyOf = {...copiedSchema};
       delete copiedSchemaWithoutAnyOf.anyOf;
-      let resultSchema = {
+      delete copiedSchemaWithoutAnyOf.title;
+      delete copiedSchemaWithoutAnyOf.description;
+      const resultSchema = {
         allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutAnyOf],
       };
-      return mergeAllOf(resultSchema, {
-        resolvers: {
-          defaultResolver: mergeAllOf.options.resolvers.title,
-        },
-      });
+      return mergeAllOfs(resultSchema as JsonSchemaObjectType);
     });
   }
 
   optimizeSchema(copiedSchema);
 
+  induceTitles(copiedSchema);
+
   return copiedSchema;
+}
+
+function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
+  return mergeAllOf(schema, {
+    deep: false,
+    resolvers: {
+      defaultResolver: mergeAllOf.options.resolvers.title,
+    },
+  });
 }
 
 function hasRef(schema: JsonSchemaObjectType): boolean {
@@ -108,4 +116,20 @@ function optimizeSchema(schema: JsonSchemaObjectType) {
   if (hasOneOfs(schema)) {
     // TODO: if it is just oneOf of types, then replace it by a choice of types
   }
+}
+
+function induceTitles(schema: JsonSchemaObjectType): void {
+  induceTitlesOnObject(schema.properties ?? {});
+  induceTitlesOnObject(schema.definitions ?? {});
+  induceTitlesOnObject(schema.$defs ?? {});
+}
+
+function induceTitlesOnObject(object: object) {
+  Object.entries(object).forEach(([key, value]) => {
+    if (typeof value === 'object') {
+      if (value.title === undefined) {
+        value.title = key;
+      }
+    }
+  });
 }

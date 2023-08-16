@@ -10,10 +10,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update_property_value', path: Path, newValue: string): void;
+  (e: 'update_tree'): void;
 }>();
 
-function propagateUpdateEvent(newValue: any) {
+function propagateUpdateValueEvent(newValue: any) {
   emit('update_property_value', props.nodeData.relativePath, newValue);
+}
+function propagateUpdateTreeEvent() {
+  emit('update_tree');
 }
 </script>
 
@@ -22,7 +26,8 @@ function propagateUpdateEvent(newValue: any) {
     :id="pathToString(nodeData.absolutePath)"
     class="truncate"
     :is="resolveCorrespondingComponent(nodeData)"
-    @update_property_value="(newValue: any) => propagateUpdateEvent(newValue)" />
+    @update_property_value="(newValue: any) => propagateUpdateValueEvent(newValue)"
+    @update_tree="propagateUpdateTreeEvent()" />
 </template>
 
 <style scoped></style>

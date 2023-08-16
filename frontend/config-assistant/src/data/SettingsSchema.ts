@@ -25,15 +25,15 @@ export const SETTINGS_SCHEMA: any = {
           type: 'integer',
           description:
             'The maximum depth of the GUI editor. If the depth of the configuration object is higher, the GUI editor will not show the deeper levels, but they can be navigated by clicking on the property name',
-          default: 3,
+          default: 5,
           minimum: 1,
-          maximum: 10,
+          maximum: 20,
         },
         propertySorting: {
           type: 'string',
           description:
             "The sorting of the properties in the GUI editor. If set to 'priorityOrder', the order will be required properties first, then optional properties, then additional and pattern properties and finally deprecated properties. If set to 'dataOrder', the properties will be displayed in the order they are in the configuration object. If set to 'schemaOrder', the properties will be sorted according to the order in the schema.",
-          default: 'dataOrder',
+          default: 'schemaOrder',
           enum: ['priorityOrder', 'schemaOrder', 'dataOrder'],
         },
       },

@@ -1,30 +1,40 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
-import type {ConfigDataTreeNodeType, ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
+import type {ConfigDataTreeNodeType, GuiEditorTreeNode} from '@/model/ConfigDataTreeNode';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/helpers/pathHelper';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {errorService} from '@/main';
+import {ref} from 'vue';
 
 const props = defineProps<{
-  nodeData: ConfigTreeNodeData;
+  node: GuiEditorTreeNode;
   type: ConfigDataTreeNodeType;
 }>();
 
 const emit = defineEmits<{
   (e: 'zoom_into_path', path_to_add: Path): void;
+  (e: 'update_property_name', old_name: string, new_name: string): void;
+  (e: 'start_editing_property_name'): void;
+  (e: 'stop_editing_property_name'): void;
 }>();
 
-function isExpandable(): boolean {
-  const schema = props.nodeData.schema;
+const isEditingPropertyName = ref(false);
+
+function canZoomIn(): boolean {
+  if (isEditingPropertyName.value) {
+    return false;
+  }
+  const schema = props.node.data.schema;
 
   const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
   if (dependsOnUserSelection) {
-    const path = pathToString(props.nodeData.absolutePath);
-    const hasUserSelection = useSessionStore().currentSelectedOneOfAnyOfOptions.has(path);
+    const hasUserSelection = schema.userSelectionOneOfAnyOf;
     if (!hasUserSelection) {
       return false;
     }
@@ -34,25 +44,25 @@ function isExpandable(): boolean {
 }
 
 function isRequired(): boolean {
-  return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string) || false;
+  return props.node.data.parentSchema?.isRequired(props.node.data.name as string) || false;
 }
 
 function isDeprecated(): boolean {
-  return props.nodeData.schema.deprecated;
+  return props.node.data.schema.deprecated;
 }
 
 function toggleExpand() {
   const settingsStore = useSettingsStore();
-  if (props.nodeData.depth === settingsStore.settingsData.guiEditor.maximumDepth) {
+  if (props.node.data.depth === settingsStore.settingsData.guiEditor.maximumDepth) {
     zoomIntoPath();
     return;
   }
 
   const store = useSessionStore();
-  if (store.isExpanded(props.nodeData.absolutePath)) {
-    store.collapse(props.nodeData.absolutePath);
+  if (store.isExpanded(props.node.data.absolutePath)) {
+    store.collapse(props.node.data.absolutePath);
   } else {
-    store.expand(props.nodeData.absolutePath);
+    store.expand(props.node.data.absolutePath);
   }
 }
 
@@ -65,23 +75,57 @@ function isPatternProperty(): boolean {
 }
 
 function zoomIntoPath() {
-  if (isExpandable()) {
-    emit('zoom_into_path', props.nodeData.relativePath);
+  if (canZoomIn()) {
+    emit('zoom_into_path', props.node.data.relativePath);
   }
 }
 
+function isPropertyNameEditable(): boolean {
+  if (!props.node.data.parentSchema?.hasType('object')) {
+    return false;
+  }
+  if (!props.node.data.parentSchema?.properties) {
+    return true;
+  }
+  return !Object.keys(props.node.data.parentSchema.properties).includes(
+    props.node.data.name as string
+  );
+}
+
+function updatePropertyName(event) {
+  if (isPropertyNameEditable() && isValidNewPropertyName(event.target.innerText)) {
+    emit('update_property_name', props.node.data.name as string, event.target.innerText);
+  } else {
+    event.target.innerText = props.node.data.name;
+  }
+  isEditingPropertyName.value = false;
+  emit('stop_editing_property_name');
+  event.target.contenteditable = false;
+}
+
+function isValidNewPropertyName(newName: string) {
+  const parentSchema = props.node.data.parentSchema;
+  const propertyNames: JsonSchema | undefined = parentSchema?.propertyNames;
+  if (propertyNames?.validate(newName) === false) {
+    const errorMessage = propertyNames.validationFunction?.errors?.at(0)?.message ?? '';
+    errorService.onError({message: `Invalid property name '${newName}'`, details: errorMessage});
+    return false;
+  }
+  return true;
+}
+
 function getTypeDescription(): string {
-  if (props.nodeData.schema.enum) {
+  if (props.node.data.schema.enum) {
     return 'enum';
   }
-  if (props.nodeData.schema.oneOf.length > 0) {
+  if (props.node.data.schema.oneOf.length > 0) {
     return 'oneOf';
   }
-  if (props.nodeData.schema.anyOf.length > 0) {
+  if (props.node.data.schema.anyOf.length > 0) {
     return 'anyOf';
   }
 
-  const type = props.nodeData.schema.type;
+  const type = props.node.data.schema.type;
   if (Array.isArray(type)) {
     if (type.length === NUMBER_OF_PROPERTY_TYPES) {
       return 'any';
@@ -91,25 +135,47 @@ function getTypeDescription(): string {
 
   return type;
 }
+
+function getId(): string {
+  return '_label_' + props.node.key;
+}
+
+function focusEditingLabel() {
+  if (isPropertyNameEditable()) {
+    isEditingPropertyName.value = true;
+    emit('start_editing_property_name');
+  }
+}
 </script>
 
 <template>
   <span class="flex flex-row w-full items-center">
     <span
       class="mr-2"
-      :class="{'hover:underline': isExpandable()}"
-      :tabindex="isExpandable() ? 0 : -1"
-      @click="zoomIntoPath()"
+      :class="{'hover:underline': canZoomIn()}"
+      :tabindex="canZoomIn() ? 0 : -1"
+      @click="
+        isPropertyNameEditable()
+          ? event => {
+              event.target.contenteditable = true;
+            }
+          : zoomIntoPath()
+      "
       @keyup.enter="toggleExpand()"
       @dblclick="zoomIntoPath()">
       <span
+        :contenteditable="isPropertyNameEditable()"
+        :id="getId()"
+        @focus="() => focusEditingLabel()"
+        @blur="updatePropertyName"
+        @keyup.enter="updatePropertyName"
         :class="{
-          'text-indigo-700': isExpandable(),
+          'text-indigo-700': canZoomIn(),
           'line-through': isDeprecated(),
           'font-semibold': isRequired(),
           italic: isAdditionalProperty() || isPatternProperty(),
         }">
-        {{ nodeData.name }}
+        {{ node.data.name }}
       </span>
       <!--Show red star after text if property is required -->
       <span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>

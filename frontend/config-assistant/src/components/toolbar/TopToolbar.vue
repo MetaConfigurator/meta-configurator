@@ -12,7 +12,7 @@ import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useToast} from 'primevue/usetoast';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {newEmptyFile} from '@/components/toolbar/clearContent';
+import {clearFile, newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 
@@ -20,6 +20,8 @@ import InputText from 'primevue/inputtext';
 
 import {storeToRefs} from 'pinia';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
+import {fetchWebSchemas} from '@/components/toolbar/fetchWebSchemas';
+import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -41,6 +43,15 @@ const showFetchedSchemas = ref(false);
 const showAboutDialog = ref(false);
 const showUrlInputDialog = ref(false);
 const schemaUrl = ref('');
+const menu = ref();
+const toast = useToast();
+
+const topMenuBar = new TopMenuBar(
+  toast,
+  handleFromWebClick,
+  handleFromOurExampleClick,
+  showUrlDialog
+);
 
 function getPageName(): string {
   switch (props.currentMode) {
@@ -99,18 +110,14 @@ const pageSelectionMenuItems: MenuItem[] = [
     },
   },
 ];
-const toast = useToast();
 
-const topMenuBar = new TopMenuBar(
-  toast,
-  handleFromWebClick,
-  handleFromOurExampleClick,
-  showUrlDialog
-);
+const items = ref(pageSelectionMenuItems);
 
 async function handleFromWebClick(): Promise<void> {
   try {
-    await topMenuBar.fetchWebSchemas(); // Wait for the fetch to complete
+    // Wait for the fetch to complete
+    let fetchedSchemas = await fetchWebSchemas();
+    topMenuBar.fetchedSchemas = fetchedSchemas;
     showFetchedSchemas.value = true;
     topMenuBar.showDialog.value = true;
   } catch (error) {
@@ -119,9 +126,7 @@ async function handleFromWebClick(): Promise<void> {
   }
 }
 function handleFromOurExampleClick() {
-  // Set the fetchedSchemas to your schemaCollection array
   topMenuBar.fetchedSchemas = schemaCollection;
-  // Set the flag to true to show the fetched schemas
   showFetchedSchemas.value = true;
   topMenuBar.showDialog.value = true;
 }
@@ -131,7 +136,7 @@ watch(selectedSchema, async newSelectedSchema => {
   }
   if (newSelectedSchema.url) {
     try {
-      await topMenuBar.selectSchema(newSelectedSchema.url);
+      await fetchSchemaFromUrl(newSelectedSchema.url);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
       newEmptyFile('Do you want to clear current config data ?');
@@ -153,7 +158,7 @@ watch(selectedSchema, async newSelectedSchema => {
 });
 
 function handleAccept() {
-  clearEditor();
+  clearFile();
   // Hide the confirmation dialog
   showConfirmation.value = false;
 }
@@ -171,15 +176,9 @@ function hideUrlDialog() {
 }
 
 // Method to fetch schema from URL
-async function fetchSchemaFromURL() {
-  try {
-    await topMenuBar.fetchSchemaFromURL(schemaUrl.value);
-    // Do any additional processing if required
-    hideUrlDialog();
-  } catch (error) {
-    // Handle the error if there's an issue fetching the schema.
-    errorService.onError(error);
-  }
+async function fetchSchemaFromSelectedUrl() {
+  await fetchSchemaFromUrl(schemaUrl.value!, toast);
+  hideUrlDialog();
 }
 
 const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
@@ -198,8 +197,6 @@ function getMenuItems(): MenuItem[] {
       return [];
   }
 }
-const items = ref(pageSelectionMenuItems);
-const menu = ref();
 const toggle = event => {
   menu.value.toggle(event);
 };
@@ -288,7 +285,7 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
         <!-- Wrap the buttons in a div and add margin to it -->
         <div class="button-container">
           <Button label="Cancel" @click="hideUrlDialog" class="dialog-button" />
-          <Button label="Fetch Schema" @click="fetchSchemaFromURL" class="dialog-button" />
+          <Button label="Fetch Schema" @click="fetchSchemaFromSelectedUrl" class="dialog-button" />
         </div>
       </div>
     </div>
