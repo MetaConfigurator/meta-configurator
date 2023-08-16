@@ -167,10 +167,10 @@ onMounted(() => {
       if (editor.value) {
         if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
           currentSelectionIsForcedFromOutside = true;
-          updateCursorPositionBasedOnPath(
+          /*updateCursorPositionBasedOnPath(
             editor.value.getValue(),
             sessionStore.currentSelectedElement
-          );
+          );*/
           currentSelectionIsForcedFromOutside = false;
         }
       }
