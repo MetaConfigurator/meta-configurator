@@ -51,5 +51,6 @@ div {
   display: flex;
   flex-direction: row;
   height: 30px;
+  line-height: 10px;
 }
 </style>
