@@ -5,7 +5,7 @@ import {confirmationService} from '@/helpers/confirmationService';
 
 export function newEmptySchemafile(message: string | undefined = undefined): void {
   if (!message) {
-    clearSchemaEditor();
+    clearSchema();
     return;
   }
   confirmationService.require({
@@ -20,7 +20,7 @@ export function newEmptySchemafile(message: string | undefined = undefined): voi
         detail: 'Schema is deleted',
         life: 3000,
       });
-      clearSchemaEditor();
+      clearSchema();
     },
     reject: () => {
       toastService.add({
@@ -32,7 +32,7 @@ export function newEmptySchemafile(message: string | undefined = undefined): voi
     },
   });
 }
-export function clearSchemaEditor() {
+export function clearSchema() {
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   useDataStore().schemaData = {};
   useSessionStore().updateCurrentPath([]);

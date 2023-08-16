@@ -98,7 +98,6 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
-  console.log('update data', completePath, newValue);
   emit('update_data', completePath, newValue);
 }
 

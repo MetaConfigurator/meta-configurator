@@ -3,8 +3,9 @@ import {ANIMAL_SCHEMA} from '@/data/AnimalSchema';
 import {STRENDA_SCHEMA} from '@/data/StrendaSchema';
 import {ENZYMEML_SCHEMA} from '@/data/EnzymemlSchema';
 import {AUTONOMOUS_VEHICLE_SCHEMA} from '@/data/AutonomousVehicleSchema';
+import type {SchemaOption} from '@/model/SchemaOption';
 
-export const schemaCollection = [
+export const schemaCollection: SchemaOption[] = [
   {label: 'Default Schema', key: 'default', schema: DEFAULT_SCHEMA},
   {label: 'Animal Schema', key: 'animal', schema: ANIMAL_SCHEMA},
   {label: 'Strenda Schema', key: 'strenda', schema: STRENDA_SCHEMA},

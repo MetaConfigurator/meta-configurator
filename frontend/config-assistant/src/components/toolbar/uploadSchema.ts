@@ -1,7 +1,7 @@
 import {useDataStore} from '@/store/dataStore';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 
-export function chooseSchemaFromFile(): void {
+export function openUploadSchemaDialog(): void {
   const inputElement = document.createElement('input');
 
   inputElement.type = 'file';
