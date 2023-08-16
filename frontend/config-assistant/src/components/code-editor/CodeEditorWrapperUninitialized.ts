@@ -1,10 +1,11 @@
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
-import type {Editor} from 'brace';
 
 export class CodeEditorWrapperUninitialized implements CodeEditorWrapper {
   getContent(): string {
     return '';
   }
+
+  reset(): void {}
 
   hasRedo(): boolean {
     return false;
@@ -16,7 +17,11 @@ export class CodeEditorWrapperUninitialized implements CodeEditorWrapper {
 
   redo(): void {}
 
-  setContent(value: string): void {}
+  setContent(): string {
+    return '';
+  }
 
   undo(): void {}
+
+  getUndoManager(): void {}
 }

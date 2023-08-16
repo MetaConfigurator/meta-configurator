@@ -64,9 +64,9 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
 
 onMounted(() => {
   editor = ref(ace.edit('javascript-editor'));
-
   editorWrapper = new CodeEditorWrapperAce(editor.value);
-  useSessionStore().currentEditorWrapper = editorWrapper;
+  sessionStore.currentEditorWrapper = editorWrapper;
+  editor.value.$blockScrolling = Infinity;
 
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
@@ -74,11 +74,16 @@ onMounted(() => {
     editor.value.getSession().setMode('ace/mode/yaml');
   }
 
+  editor.value.setOptions({
+    autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
+  });
+
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
+  editor.value.getSession().setUndoManager(new ace.UndoManager());
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on(
@@ -173,7 +178,6 @@ onMounted(() => {
     {deep: true, throttle: READ_THROTTLE_TIME}
   );
 });
-
 function convertAjvPathToPath(path: string): Path {
   let result = path.split('/');
   if (result.length > 0 && result[0].length == 0) {
@@ -186,7 +190,7 @@ function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
   currentSelectionIsForcedFromOutside = true;
   const newEditorContent = manipulator.stringifyContentObject(configData);
-  editor.value.setValue(newEditorContent);
+  sessionStore.currentEditorWrapper.setContent(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
   currentSelectionIsForcedFromOutside = false;
 }

@@ -16,7 +16,12 @@ export interface AddItemTreeNode extends TreeNode {
   type: TreeNodeType.ADD_ITEM;
 }
 
-export type GuiEditorTreeNode = ConfigDataTreeNode | AddItemTreeNode;
+export interface AddPropertyTreeNode extends TreeNode {
+  data: AddPropertyTreeData;
+  type: TreeNodeType.ADD_PROPERTY;
+}
+
+export type GuiEditorTreeNode = ConfigDataTreeNode | AddItemTreeNode | AddPropertyTreeNode;
 
 export type ConfigDataTreeNodeType =
   | TreeNodeType.SCHEMA_PROPERTY
@@ -27,10 +32,12 @@ export enum TreeNodeType {
   ADDITIONAL_PROPERTY = 'additionalProperty',
   PATTERN_PROPERTY = 'patternProperty',
   ADD_ITEM = 'addItem',
+  ADD_PROPERTY = 'addProperty',
 }
 
 export interface AddItemTreeNodeData {
   schema: JsonSchema; // schema of the items
+  parentSchema?: JsonSchema;
   depth: number;
   relativePath: Path;
   absolutePath: Path;
@@ -41,6 +48,15 @@ export interface ConfigTreeNodeData {
   name: PathElement;
   schema: JsonSchema;
   parentSchema?: JsonSchema;
+  relativePath: Path;
+  absolutePath: Path;
+  depth: number;
+}
+
+export interface AddPropertyTreeData {
+  name: PathElement;
+  schema: JsonSchema;
+  parentSchema: JsonSchema;
   relativePath: Path;
   absolutePath: Path;
   depth: number;
