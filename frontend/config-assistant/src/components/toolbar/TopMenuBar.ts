@@ -4,12 +4,12 @@ import {downloadFile} from '@/components/toolbar/downloadFile';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
 import {newEmptyFile} from '@/components/toolbar/clearContent';
-import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
 import {storeToRefs} from 'pinia';
+import {randomDataGeneration} from '@/components/toolbar/createSampleData';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -255,22 +255,9 @@ export class TopMenuBar {
     chooseConfigFromFile();
   }
   private generateSampleFile() {
-    const confirmClear = window.confirm(
+    randomDataGeneration(
       'This will delete all the existing data. Are you sure you want to continue?'
     );
-
-    if (confirmClear) {
-      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-      generateSampleData(useDataStore().schemaData)
-        .then(data => (useDataStore().fileData = data))
-        .catch((error: Error) =>
-          errorService.onError({
-            message: 'Error generating sample data',
-            details: error.message,
-            stack: error.stack,
-          })
-        );
-    }
   }
   private downloadFile(fileNamePrefix: string): void {
     downloadFile(fileNamePrefix);
