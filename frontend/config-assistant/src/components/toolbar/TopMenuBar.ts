@@ -9,7 +9,7 @@ import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
 import {storeToRefs} from 'pinia';
-import {newEmptyFileAfterGeneration} from '@/components/toolbar/GenerateFileClearance';
+import {randomDataGeneration} from '@/components/toolbar/createSampleData';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -261,7 +261,7 @@ export class TopMenuBar {
     chooseConfigFromFile();
   }
   private generateSampleFile() {
-    newEmptyFileAfterGeneration(
+    randomDataGeneration(
       'This will delete all the existing data. Are you sure you want to continue?'
     );
   }
