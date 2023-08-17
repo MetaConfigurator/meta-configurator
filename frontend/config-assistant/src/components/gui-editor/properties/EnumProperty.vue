@@ -27,7 +27,6 @@ const valueProperty = computed({
     <Dropdown
       v-model="valueProperty"
       editable
-      showClear
       :options="possibleValues"
       :placeholder="`Select ${props.propertyName}`" />
   </div>

@@ -172,7 +172,7 @@ function focusEditingLabel() {
         :class="{
           'text-indigo-700': canZoomIn(),
           'line-through': isDeprecated(),
-          'font-semibold': isRequired(),
+          'font-normal': isRequired(),
           italic: isAdditionalProperty() || isPatternProperty(),
         }">
         {{ node.data.name }}
