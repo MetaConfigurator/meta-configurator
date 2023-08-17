@@ -22,17 +22,10 @@ export function newEmptyFile(message: string | undefined = undefined): void {
       });
       clearFile();
     },
-    reject: () => {
-      toastService.add({
-        severity: 'error',
-        summary: 'Rejected',
-        detail: 'Config data is kept in File Editor',
-        life: 3000,
-      });
-    },
   });
 }
 export function clearFile() {
+  newEmptyFile('Do you want to clear the File editor?');
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   useDataStore().fileData = {};
   useSessionStore().updateCurrentPath([]);

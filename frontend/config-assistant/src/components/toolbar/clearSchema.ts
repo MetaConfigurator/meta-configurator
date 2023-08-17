@@ -22,17 +22,10 @@ export function newEmptySchemafile(message: string | undefined = undefined): voi
       });
       clearSchema();
     },
-    reject: () => {
-      toastService.add({
-        severity: 'error',
-        summary: 'Rejected',
-        detail: 'Schema is kept',
-        life: 3000,
-      });
-    },
   });
 }
 export function clearSchema() {
+  newEmptySchemafile('Do you want to clear the Schema editor?');
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   useDataStore().schemaData = {};
   useSessionStore().updateCurrentPath([]);

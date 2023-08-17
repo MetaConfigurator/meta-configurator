@@ -32,6 +32,9 @@ export function randomDataGeneration(message: string | undefined = undefined): v
   });
 }
 export function generateExampleData() {
+  randomDataGeneration(
+    'This will delete all the existing data. Are you sure you want to continue?'
+  );
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   generateSampleData(useDataStore().schemaData)
     .then(data => (useDataStore().fileData = data))
