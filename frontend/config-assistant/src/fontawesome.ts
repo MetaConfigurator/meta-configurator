@@ -17,6 +17,7 @@ import {
   faRotateLeft,
   faRotateRight,
   faShareNodes,
+  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -36,6 +37,7 @@ export function registerIcons() {
   library.add(faRotateLeft);
   library.add(faRotateRight);
   library.add(faShareNodes);
+  library.add(faDownload);
   library.add(faGears);
   library.add(faDatabase);
   library.add(faGlobe);
