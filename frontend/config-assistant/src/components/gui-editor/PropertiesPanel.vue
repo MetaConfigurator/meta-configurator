@@ -29,6 +29,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update_current_path', new_path: Path): void;
   (e: 'zoom_into_path', path_to_add: Path): void;
+  (e: 'select_path', path: Path): void;
   (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
@@ -97,6 +98,12 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
+}
+function clickedPropertyData(nodeData: ConfigTreeNodeData) {
+  const path = nodeData.absolutePath;
+  if (useSessionStore().dataAtPath(path) != undefined) {
+    emit('select_path', path);
+  }
 }
 
 function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData) {
@@ -366,6 +373,7 @@ function closeInfoOverlayPanel() {
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
             @update_tree="updateTree"
+            @click="() => clickedPropertyData(slotProps.node.data)"
             bodyClass="w-full"
             @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />
         </span>
