@@ -1,6 +1,7 @@
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {SchemaPropertyType} from '@/model/JsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
+import type {ErrorObject} from 'ajv';
 
 /**
  * Creates an HTML paragraph describing the given schema.
@@ -37,13 +38,15 @@ import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
  * @param parentSchema the schema of the parent object
  * @param deep whether to describe the schema in detail (used for recursive calls)
  * @param indentation the indentation level (used for recursive calls)
+ * @param validationErrors optional validation errors to display
  */
 export function describeSchema(
   schema: JsonSchema,
   propertyName?: string,
   parentSchema?: JsonSchema,
   deep: boolean = false,
-  indentation = 0
+  indentation = 0,
+  validationErrors: ErrorObject[] = []
 ): string {
   if (schema.isAlwaysTrue) {
     return paragraph(`This schema is ${bold('always')} valid.`);
@@ -51,7 +54,14 @@ export function describeSchema(
   if (schema.isAlwaysFalse) {
     return paragraph(`This schema is ${bold('never')} valid.`);
   }
-  return describeObjectSchema(schema, propertyName, parentSchema, deep, indentation);
+  return describeObjectSchema(
+    schema,
+    propertyName,
+    parentSchema,
+    deep,
+    indentation,
+    validationErrors
+  );
 }
 
 function describeObjectSchema(
@@ -59,7 +69,8 @@ function describeObjectSchema(
   propertyName?: string,
   parentSchema?: JsonSchema,
   deep: boolean = false,
-  indentation = 0
+  indentation = 0,
+  validationErrors: ErrorObject[] = []
 ): string {
   let result = '';
   if (deep) {
@@ -73,31 +84,36 @@ function describeObjectSchema(
   result =
     `${result}` +
     describeRequired(propertyName, parentSchema) +
-    describeType(schema) +
+    describeType(schema, validationErrors) +
     describeExamples(schema) +
     describeDefault(schema) +
     describeDeprecated(schema) +
-    describeConst(schema) +
-    describeEnum(schema) +
-    describeMinimumAndMaximum(schema) +
-    describeMultipleOf(schema) +
-    describeStringLength(schema) +
-    describeFormatAndPattern(schema) +
-    describeRequiredProperties(schema) +
+    describeConst(schema, validationErrors) +
+    describeEnum(schema, validationErrors) +
+    describeMinimumAndMaximum(schema, validationErrors) +
+    describeMultipleOf(schema, validationErrors) +
+    describeStringLength(schema, validationErrors) +
+    describeFormatAndPattern(schema, validationErrors) +
+    describeRequiredProperties(schema, validationErrors) +
     describeProperties(schema);
 
   if (deep) {
     result +=
       describePatternProperties(schema) +
-      describeAdditionalProperties(schema) +
-      describePropertyNames(schema) +
-      describeItems(schema) +
-      describeContains(schema) +
+      describeAdditionalProperties(schema, validationErrors) +
+      describePropertyNames(schema, validationErrors) +
+      describeItems(schema, validationErrors) +
+      describeContains(schema, validationErrors) +
       describeAllOf(schema) +
-      describeAnyOf(schema) +
-      describeOneOf(schema) +
-      describeNot(schema) +
+      describeAnyOf(schema, validationErrors) +
+      describeOneOf(schema, validationErrors) +
+      describeNot(schema, validationErrors) +
       describeComment(schema);
+
+    if (validationErrors.length > 0) {
+      result += '<br>';
+      result += describeSchemaValidationErrors(validationErrors);
+    }
   }
 
   if (isBlank(result)) {
@@ -128,12 +144,15 @@ function describeRequired(propertyName?: string, parentSchema?: JsonSchema): str
   return paragraph(`This property is ${bold('required')}.`);
 }
 
-function describeType(schema: JsonSchema) {
+function describeType(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.type.length === NUMBER_OF_PROPERTY_TYPES) {
     return '';
   }
   if (schema.type) {
-    return paragraph(`The value must be ${formatType(schema.type)}.`);
+    const type =
+      'The value must be ' +
+      formatAsErrorIfInvalid(formatType(schema.type), 'type', validationErrors);
+    return paragraph(type);
   }
   return '';
 }
@@ -145,9 +164,13 @@ function describeTitle(schema: JsonSchema): string {
   return '';
 }
 
-function describeRequiredProperties(schema: JsonSchema): string {
+function describeRequiredProperties(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.required && schema.required.length > 0) {
-    return paragraph(`The following properties are ${bold('required')}: 
+    return paragraph(`The following properties are ${formatAsErrorIfInvalid(
+      bold('required'),
+      'required',
+      validationErrors
+    )}: 
           ${ul(schema.required.map(p => formatValue(p)))}`);
   }
   return '';
@@ -166,12 +189,11 @@ function describeProperties(schema: JsonSchema): string {
   return '';
 }
 
-function describePropertyNames(schema: JsonSchema): string {
+function describePropertyNames(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.hasType('object') && schema.propertyNames && !schema.propertyNames.isAlwaysTrue) {
     return paragraph(
-      `The ${bold('property names')} must match the following schema: ${describeSubSchema(
-        schema.propertyNames
-      )}`
+      `The ${formatAsErrorIfInvalid(bold('property names'), 'propertyNames', validationErrors)} 
+      must match the following schema: ${describeSubSchema(schema.propertyNames)}`
     );
   }
   return '';
@@ -197,16 +219,19 @@ function describePatternProperties(schema: JsonSchema): string {
   return '';
 }
 
-function describeMultipleOf(schema: JsonSchema): string {
+function describeMultipleOf(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.multipleOf) {
-    return paragraph(
-      `The value must be ${bold('divisible')} by ${formatValue(schema.multipleOf)}.`
-    );
+    const multipleOf = `The value must be ${formatAsErrorIfInvalid(
+      bold('divisible') + ' by ' + formatValue(schema.multipleOf),
+      'multipleOf',
+      validationErrors
+    )}.`;
+    return paragraph(multipleOf);
   }
   return '';
 }
 
-function describeItems(schema: JsonSchema): string {
+function describeItems(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.hasType('array') && schema.items && !schema.items.isAlwaysTrue) {
     const minItems = schema.minItems ?? 0;
     const maxItems = schema.maxItems;
@@ -215,16 +240,18 @@ function describeItems(schema: JsonSchema): string {
 
     let result = `The array must contain`;
     if (minItems) {
-      result += ` ${bold('at least')} ${formatValue(minItems)}`;
+      const atLeast = ` ${bold('at least')} ${formatValue(minItems)}`;
+      result += formatAsErrorIfInvalid(atLeast, 'minItems', validationErrors);
     }
     if (minItems && maxItems) {
       result += ' and';
     }
     if (maxItems) {
-      result += ` ${bold('at most')} ${formatValue(maxItems)}`;
+      const atMost = ` ${bold('at most')} ${formatValue(maxItems)}`;
+      result += formatAsErrorIfInvalid(atMost, 'maxItems', validationErrors);
     }
     if (uniqueItems) {
-      result += ' ' + bold('unique');
+      result += ' ' + formatAsErrorIfInvalid(bold('unique'), 'uniqueItems', validationErrors);
     }
     result += ' items ';
     if (typeof schema.items === 'object' && schema.items.type && schema.items.type.length > 0) {
@@ -232,13 +259,14 @@ function describeItems(schema: JsonSchema): string {
     }
 
     result += 'that match the following schema: ';
-    result += describeSubSchema(items, undefined, schema);
+    const subschema = describeSubSchema(items, undefined, schema);
+    result += formatAsErrorIfInvalid(subschema, 'items', validationErrors);
     return paragraph(result);
   }
   return '';
 }
 
-function describeStringLength(schema: JsonSchema): string {
+function describeStringLength(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   const min = schema.minLength;
   const max = schema.maxLength;
 
@@ -248,20 +276,28 @@ function describeStringLength(schema: JsonSchema): string {
 
   let result = 'The string must be ';
   if (min !== undefined) {
-    result += bold(`at least `) + formatValue(min);
+    result += formatAsErrorIfInvalid(
+      bold(`at least `) + formatValue(min),
+      'minLength',
+      validationErrors
+    );
   }
   if (min !== undefined && max !== undefined) {
     result += ' and ';
   }
   if (max !== undefined) {
-    result += bold(`at most `) + formatValue(max);
+    result += formatAsErrorIfInvalid(
+      bold(`at most `) + formatValue(max),
+      'maxLength',
+      validationErrors
+    );
   }
   result += ' characters long.';
 
   return paragraph(result);
 }
 
-function describeMinimumAndMaximum(schema: JsonSchema): string {
+function describeMinimumAndMaximum(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   const min = schema.minimum;
   const max = schema.maximum;
   const exclusiveMin = schema.exclusiveMinimum;
@@ -278,9 +314,17 @@ function describeMinimumAndMaximum(schema: JsonSchema): string {
 
   let result = 'The value must be ';
   if (min !== undefined && exclusiveMin === undefined) {
-    result += bold(`at least `) + formatValue(min);
+    result += formatAsErrorIfInvalid(
+      bold(`at least `) + formatValue(min),
+      'minimum',
+      validationErrors
+    );
   } else if (exclusiveMin !== undefined) {
-    result += bold(`greater than `) + formatValue(exclusiveMin);
+    result += formatAsErrorIfInvalid(
+      bold(`greater than `) + formatValue(exclusiveMin),
+      'exclusiveMinimum',
+      validationErrors
+    );
   }
 
   if (
@@ -291,9 +335,17 @@ function describeMinimumAndMaximum(schema: JsonSchema): string {
   }
 
   if (max !== undefined && exclusiveMax === undefined) {
-    result += bold(`at most `) + formatValue(max);
+    result += formatAsErrorIfInvalid(
+      bold(`at most `) + formatValue(max),
+      'maximum',
+      validationErrors
+    );
   } else if (exclusiveMax !== undefined) {
-    result += bold(`less than `) + formatValue(exclusiveMax);
+    result += formatAsErrorIfInvalid(
+      bold(`less than `) + formatValue(exclusiveMax),
+      'exclusiveMaximum',
+      validationErrors
+    );
   }
 
   return paragraph(result + '.');
@@ -306,9 +358,15 @@ function describeExamples(schema: JsonSchema): string {
   return '';
 }
 
-function describeEnum(schema: JsonSchema): string {
+function describeEnum(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.enum && schema.enum.length > 0) {
-    return `The value must be one of the following:` + ul(schema.enum.map(e => formatValue(e)));
+    return (
+      `The value must be ${formatAsErrorIfInvalid(
+        'one of the following values:',
+        'enum',
+        validationErrors
+      )}` + ul(schema.enum.map(e => formatValue(e)))
+    );
   }
   return '';
 }
@@ -337,40 +395,53 @@ function describeDefault(schema: JsonSchema): string {
   return '';
 }
 
-function describeContains(schema: JsonSchema): string {
+function describeContains(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.contains) {
     const min = schema.minContains ?? 1;
     const max = schema.maxContains;
 
-    let result = `The array must contain at least ${formatValue(min)}`;
+    let result = `The array must contain ${formatAsErrorIfInvalid(
+      bold('at least ') + min,
+      'minContains',
+      validationErrors
+    )}`;
+
     if (max) {
-      result += paragraph(`${result} and ${bold('at most')} ${formatValue(max)}`);
+      result += paragraph(
+        `${result} and ${formatAsErrorIfInvalid(
+          bold('at most ' + formatValue(max)),
+          'maxContains',
+          validationErrors
+        )}`
+      );
     }
     return paragraph(
-      `${result} items that match the following schema: ${describeSubSchema(
-        schema.contains,
-        undefined,
-        schema
-      )}`
+      `${result} items that match the ${formatAsErrorIfInvalid(
+        'following schema:',
+        'contains',
+        validationErrors
+      )}
+       ${describeSubSchema(schema.contains, undefined, schema)}`
     );
   }
   return '';
 }
 
-function describeConst(schema: JsonSchema): string {
+function describeConst(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.const) {
-    return paragraph(`The value must be ${formatValue(schema.const)}.`);
+    const constString = `The value must be ${formatValue(schema.const)}.`;
+    return paragraph(formatAsErrorIfInvalid(constString, 'const', validationErrors));
   }
   return '';
 }
 
-function describeNot(schema: JsonSchema): string {
+function describeNot(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.not) {
-    return `The following schema must ${bold('not')} be fulfilled: <br> ${describeSubSchema(
-      schema.not,
-      undefined,
-      schema
-    )}`;
+    const not = `The following schema must ${bold('not')} be fulfilled: `;
+    return paragraph(
+      formatAsErrorIfInvalid(not, 'not', validationErrors) +
+        `<br> ${describeSubSchema(schema.not, undefined, schema)}`
+    );
   }
   return '';
 }
@@ -382,38 +453,52 @@ function describeAllOf(schema: JsonSchema): string {
   return '';
 }
 
-function describeAnyOf(schema: JsonSchema): string {
+function describeAnyOf(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.anyOf && schema.anyOf.length > 0) {
     return (
-      'At least one of the following schemas must be fulfilled: ' +
+      'At least ' +
+      formatAsErrorIfInvalid('one of', 'anyOf', validationErrors) +
+      ' the following schemas must be fulfilled: ' +
       schemaDescriptionList(schema.anyOf)
     );
   }
   return '';
 }
 
-function describeOneOf(schema: JsonSchema): string {
+function describeOneOf(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.oneOf && schema.oneOf.length > 0) {
     return (
-      'Exactly one of the following schemas must be fulfilled: ' +
+      'Exactly ' +
+      formatAsErrorIfInvalid('one of', 'oneOf', validationErrors) +
+      ' the following schemas must be fulfilled: ' +
       schemaDescriptionList(schema.oneOf)
     );
   }
   return '';
 }
 
-function describeAdditionalProperties(schema: JsonSchema): string {
-  if (!schema.hasType('object') || schema.additionalProperties?.isAlwaysTrue === true) {
+function describeAdditionalProperties(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+  if (!schema.hasType('object')) {
     return '';
   }
   if (schema.additionalProperties === undefined || schema.additionalProperties.isAlwaysTrue) {
     return paragraph(`Any additional properties are allowed.`);
   }
   if (schema.additionalProperties.isAlwaysFalse) {
-    return paragraph(`${bold('No additional properties')} are allowed.`);
+    return paragraph(
+      `${formatAsErrorIfInvalid(
+        'No additional properties',
+        'additionalProperties',
+        validationErrors
+      )} are allowed.`
+    );
   }
   return paragraph(
-    `Additional properties must match the following schema: ${describeSubSchema(
+    `${formatAsErrorIfInvalid(
+      'Additional properties ',
+      'additionalProperties',
+      validationErrors
+    )} must match the following schema: ${describeSubSchema(
       schema.additionalProperties,
       undefined,
       schema
@@ -428,51 +513,77 @@ function describeComment(schema: JsonSchema): string {
   return '';
 }
 
-function describeFormatAndPattern(schema: JsonSchema): string {
+function describeFormatAndPattern(schema: JsonSchema, validationErrors: ErrorObject[]): string {
   if (schema.format) {
+    let format = `The value must be ${formatValue(schema.format)}`;
     switch (schema.format) {
       case 'date-time':
-        return paragraph(`The value must be a date and time in the format YYYY-MM-DDThh:mm:ssZ.`);
+        format += ` in the format YYYY-MM-DDThh:mm:ssZ.`;
+        break;
       case 'date':
-        return paragraph(`The value must be a date in the format YYYY-MM-DD.`);
+        format += ` in the format YYYY-MM-DD.`;
+        break;
       case 'time':
-        return paragraph(`The value must be a time in the format hh:mm:ss.`);
+        format += ` in the format hh:mm:ss.`;
+        break;
       case 'email':
-        return paragraph(`The value must be an email address.`);
+        format = `The value must be an email address according to RFC 5322.`;
+        break;
       case 'idn-email':
-        return paragraph(`The value must be an email address.`);
+        format = `The value must be an email address according to RFC 6531.`;
+        break;
       case 'hostname':
-        return paragraph(`The value must be a hostname.`);
+        format = `The value must be a hostname according to RFC 1034.`;
+        break;
       case 'idn-hostname':
-        return paragraph(`The value must be a hostname.`);
+        format = `The value must be a hostname according to RFC 5890.`;
+        break;
       case 'ipv4':
-        return paragraph(`The value must be an IPv4 address.`);
+        format = `The value must be an IPv4 address according to RFC 2673.`;
+        break;
       case 'ipv6':
-        return paragraph(`The value must be an IPv6 address.`);
+        format = `The value must be an IPv6 address according to RFC 4291.`;
+        break;
       case 'uri':
-        return paragraph(`The value must be a URI.`);
+        format = `The value must be a URI according to RFC 3986.`;
+        break;
       case 'uri-reference':
-        return paragraph(`The value must be a URI reference.`);
+        format = `The value must be a URI reference according to RFC 3986.`;
+        break;
       case 'iri':
-        return paragraph(`The value must be an IRI.`);
+        format = `The value must be an IRI according to RFC 3987.`;
+        break;
       case 'iri-reference':
-        return paragraph(`The value must be an IRI reference.`);
+        format = `The value must be an IRI reference according to RFC 3987.`;
+        break;
       case 'uri-template':
-        return paragraph(`The value must be a URI template.`);
+        format = `The value must be a URI template according to RFC 6570.`;
+        break;
       case 'json-pointer':
-        return paragraph(`The value must be a JSON pointer.`);
+        format = `The value must be a JSON pointer according to RFC 6901.`;
+        break;
       case 'relative-json-pointer':
-        return paragraph(`The value must be a relative JSON pointer.`);
+        format = `The value must be a relative JSON pointer according to RFC 6901.`;
+        break;
       case 'regex':
-        return paragraph(`The value must be a regular expression.`);
-      default:
-        return paragraph(`The value must be a ${schema.format}.`);
+        format = `The value must be a regular expression according to ECMA 262.`;
+        break;
     }
+    return paragraph(formatAsErrorIfInvalid(format, 'format', validationErrors));
   }
   if (schema.pattern) {
-    return paragraph(`The value must match the following pattern: ${formatValue(schema.pattern)}`);
+    const pattern = `The value must match the following pattern: ${formatValue(schema.pattern)}`;
+    return paragraph(formatAsErrorIfInvalid(pattern, 'pattern', validationErrors));
   }
   return '';
+}
+
+function describeSchemaValidationErrors(validationErrors: ErrorObject[]): string {
+  return paragraph(
+    `The following validation errors were found: ${ul(
+      validationErrors.map(e => formatError(e.message ?? ''))
+    )}`
+  );
 }
 
 function formatType(type: SchemaPropertyType[]): string {
@@ -496,9 +607,25 @@ function ul(elements: any[]) {
   return `<ul class='list-disc list-inside'>${elements.map(e => `<li>${e}</li>`).join('')}</ul>`;
 }
 
+function formatAsErrorIfInvalid(
+  display: string,
+  keyword: string,
+  validationErrors: ErrorObject[]
+): string {
+  const relevantErrors = validationErrors.filter(e => e.keyword === keyword);
+  if (relevantErrors.length === 0) {
+    return display;
+  }
+  return `<span class='underline decoration-wavy decoration-red-600'>${display}</span>`;
+}
+
 function formatValue(value: any): string {
   const formattedValue = typeof value === 'string' ? value : JSON.stringify(value);
   return `<span class='font-mono text-violet-700 whitespace-nowrap'>${formattedValue}</span>`;
+}
+
+function formatError(error: string): string {
+  return `<span class='text-red-600'>${error}</span>`;
 }
 
 function schemaDescriptionList(schemas: JsonSchema[]): string {
