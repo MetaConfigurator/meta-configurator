@@ -161,7 +161,6 @@ function focusEditingLabel() {
           'text-indigo-700': canZoomIn(),
           'underline decoration-wavy decoration-red-600': !props.validationResults.valid,
           'line-through': isDeprecated(),
-          'font-semibold': isRequired(),
           italic: isAdditionalProperty() || isPatternProperty(),
         }">
         {{ node.data.name }}
