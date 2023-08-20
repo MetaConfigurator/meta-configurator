@@ -37,19 +37,21 @@ function isShowRemove(): boolean {
 </script>
 
 <template>
-  <div>
+  <div class="grid-cols-5 content-center justify-between">
     <Component
       :id="pathToString(nodeData.absolutePath)"
-      class="truncate"
+      class="truncate col-span-4"
+      style="width: 90%; max-width: 90%"
       :is="resolveCorrespondingComponent(nodeData)"
       @update_property_value="(newValue: any) => propagateUpdateValueEvent(newValue)"
       @update_tree="propagateUpdateTreeEvent()" />
     <Button
+      class="h-full"
+      style="width: 10%"
       v-if="isShowRemove()"
       icon="pi pi-times"
       severity="secondary"
       text
-      rounded
       aria-label="Remove"
       @click="removeProperty" />
   </div>
