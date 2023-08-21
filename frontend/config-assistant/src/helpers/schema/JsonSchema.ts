@@ -7,8 +7,6 @@ import {
 } from '@/helpers/schema/SchemaUtils';
 import type {Path, PathElement} from '@/model/path';
 import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
-import {useSessionStore} from '@/store/sessionStore';
-import {pathToString} from '@/helpers/pathHelper';
 import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 import type {ValidateFunction} from 'ajv/dist/2020';
 import Ajv2020 from 'ajv/dist/2020';
@@ -141,7 +139,7 @@ export class JsonSchema {
     return this.subItem(subElement)?.resolveOneOfAnyOf();
   }
 
-  private subProperty(subElement: string): JsonSchema | undefined {
+  subProperty(subElement: string): JsonSchema | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
@@ -160,7 +158,7 @@ export class JsonSchema {
     return this.additionalProperties;
   }
 
-  private subItem(subElement: number): JsonSchema | undefined {
+  subItem(subElement: number): JsonSchema | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }

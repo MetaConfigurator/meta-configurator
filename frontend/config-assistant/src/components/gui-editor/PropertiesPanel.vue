@@ -11,7 +11,12 @@ import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/components/gui-editor/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
-import {ConfigTreeNodeData, GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {
+  ConfigDataTreeNode,
+  ConfigTreeNodeData,
+  GuiEditorTreeNode,
+  TreeNodeType,
+} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
 import {dataAt, pathToString} from '@/helpers/pathHelper';
@@ -320,6 +325,15 @@ function closeInfoOverlayPanel() {
   overlayShowScheduled.value = false;
   closeInfoOverlayPanelDebounced();
 }
+
+/**
+ * Returns true if the node or any of its children is highlighted.
+ */
+function isHighlighted(node: ConfigDataTreeNode) {
+  return useSessionStore()
+    .currentHighlightedElements.map(path => pathToString(path))
+    .some(path => node.key && path.startsWith(node.key));
+}
 </script>
 
 <template>
@@ -351,6 +365,7 @@ function closeInfoOverlayPanel() {
           <PropertyMetadata
             :node="slotProps.node"
             :type="slotProps.node.type"
+            :highlighted="isHighlighted(slotProps.node)"
             @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)"
             @update_property_name="
               (oldName, newName) =>

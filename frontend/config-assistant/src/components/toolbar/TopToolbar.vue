@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {ref, watch} from 'vue';
+import {Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
 import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
@@ -12,7 +12,7 @@ import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useToast} from 'primevue/usetoast';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {clearFile, newEmptyFile} from '@/components/toolbar/clearFile';
+import {newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 
@@ -22,6 +22,9 @@ import {storeToRefs} from 'pinia';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
 import {fetchWebSchemas} from '@/components/toolbar/fetchWebSchemas';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
+import {useMagicKeys, watchDebounced} from '@vueuse/core';
+import {searchInDataAndSchema} from '@/helpers/search';
+import {focus} from '@/helpers/focusUtils';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -50,7 +53,8 @@ const topMenuBar = new TopMenuBar(
   toast,
   handleFromWebClick,
   handleFromOurExampleClick,
-  showUrlDialog
+  showUrlDialog,
+  toggleSearchBar
 );
 
 function getPageName(): string {
@@ -157,15 +161,6 @@ watch(selectedSchema, async newSelectedSchema => {
   }
 });
 
-function handleAccept() {
-  clearFile();
-  // Hide the confirmation dialog
-  showConfirmation.value = false;
-}
-function handleReject() {
-  // Hide the confirmation dialog
-  showConfirmation.value = false;
-}
 function showUrlDialog() {
   showUrlInputDialog.value = true;
 }
@@ -249,6 +244,50 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
     }
   }
 });
+
+const searchTerm: Ref<string> = ref('');
+const searchBarVisible = ref(false);
+
+useMagicKeys({
+  passive: false,
+  onEventFired(event) {
+    if (event.key === 'f' && event.ctrlKey) {
+      event.preventDefault();
+      showSearchBar();
+    }
+  },
+});
+
+function showSearchBar() {
+  searchBarVisible.value = true;
+  focus('searchBar');
+}
+
+function toggleSearchBar() {
+  searchBarVisible.value = !searchBarVisible.value;
+  if (!searchBarVisible.value) {
+    searchTerm.value = '';
+  } else {
+    focus('searchBar');
+  }
+}
+
+watchDebounced(
+  [searchTerm],
+  () => {
+    if (!searchTerm.value) {
+      useSessionStore().currentHighlightedElements = [];
+      return;
+    }
+    const searchResults = searchInDataAndSchema(searchTerm.value);
+    if (searchResults.length > 0) {
+      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+      useSessionStore().currentSelectedElement = searchResults[0].path;
+    }
+    useSessionStore().currentHighlightedElements = searchResults.map(result => result.path);
+  },
+  {debounce: 500}
+);
 </script>
 
 <template>
@@ -270,11 +309,6 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
     </div>
   </Dialog>
 
-  <Dialog v-model:visible="showConfirmation">
-    <h3>{{ confirmationDialogMessage }}</h3>
-    <Button label="Yes" @click="handleAccept" class="dialog-button" />
-    <Button label="No" @click="handleReject" class="dialog-button" />
-  </Dialog>
   <Dialog v-model:visible="showUrlInputDialog">
     <div class="p-fluid">
       <div class="p-field">
@@ -340,7 +374,27 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
           </template>
         </Menu>
       </div>
+
+      <!-- search bar -->
+      <span class="p-input-icon-left ml-5" style="width: 20rem" v-if="searchBarVisible">
+        <i class="pi pi-search" style="font-size: 0.9rem" />
+        <InputText
+          show-clear
+          class="h-7 w-full"
+          placeholder="Search for data or properties..."
+          v-model="searchTerm"
+          id="searchBar" />
+      </span>
+      <Button
+        v-if="searchBarVisible"
+        class="toolbar-button"
+        text
+        :disabled="!searchTerm"
+        @click="() => (searchTerm = '')">
+        <i class="pi pi-times" />
+      </Button>
     </template>
+
     <template #end>
       <div class="flex space-x-5 mr-3">
         <div class="flex space-x-2">
