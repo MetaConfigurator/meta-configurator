@@ -24,7 +24,7 @@ function propagateUpdateTreeEvent() {
 }
 
 function removeProperty() {
-  emit('update_property_value', props.nodeData.relativePath, undefined);
+  emit('remove_property', props.nodeData.relativePath);
 }
 
 function isRequired(): boolean {

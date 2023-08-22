@@ -30,6 +30,7 @@ const emit = defineEmits<{
   (e: 'update_current_path', new_path: Path): void;
   (e: 'zoom_into_path', path_to_add: Path): void;
   (e: 'update_data', path: Path, newValue: any): void;
+  (e: 'remove_property', path: Path): void;
 }>();
 
 const treeNodeResolver = new ConfigTreeNodeResolver();
@@ -97,6 +98,18 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
+}
+
+function removeProperty(subPath: Path) {
+  const completePath = props.currentPath.concat(subPath);
+  const parentPath = completePath.slice(0, -1);
+  const propertyName = completePath.slice(completePath.length - 1);
+  const dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
+  delete dataAtParentPath[propertyName];
+  updateData(parentPath, dataAtParentPath);
+
+  emit('remove_property', completePath);
+  updateTree();
 }
 
 function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData) {
@@ -365,6 +378,7 @@ function closeInfoOverlayPanel() {
             class="w-full"
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
+            @remove_property="removeProperty"
             @update_tree="updateTree"
             bodyClass="w-full"
             @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />

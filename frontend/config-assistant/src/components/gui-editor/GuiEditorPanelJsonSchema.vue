@@ -33,6 +33,13 @@ function updateData(path: Path, newValue: any) {
   sessionStore.currentSelectedElement = path;
 }
 
+function removeProperty(path: Path) {
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.removeDataAtPath(path);
+  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  sessionStore.currentSelectedElement = path;
+}
+
 function zoomIntoPath(pathToAdd: Path) {
   sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
   sessionStore.currentPath = sessionStore.currentPath.concat(pathToAdd);
@@ -53,6 +60,7 @@ function zoomIntoPath(pathToAdd: Path) {
         :current-path="sessionStore.currentPath"
         :current-data="sessionStore.dataAtCurrentPath"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
+        @remove_property="removeProperty"
         @update_data="updateData" />
     </div>
   </div>
