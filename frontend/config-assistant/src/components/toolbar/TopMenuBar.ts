@@ -2,12 +2,12 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
 import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {useDataStore} from '@/store/dataStore';
-import {clearFile} from '@/components/toolbar/clearFile';
+import {clearFile, openClearFileDialog} from '@/components/toolbar/clearFile';
 import {useSessionStore} from '@/store/sessionStore';
-import {clearSchema} from '@/components/toolbar/clearSchema';
+import {newEmptySchemafile, openClearSchemaDialog} from '@/components/toolbar/clearSchema';
 import {ref} from 'vue';
 import type {SchemaOption} from '@/model/SchemaOption';
-import {generateExampleData} from '@/components/toolbar/createSampleData';
+import {generateExampleData, openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -41,12 +41,12 @@ export class TopMenuBar {
           {
             label: 'New empty File',
             icon: 'fa-regular fa-file',
-            command: clearFile,
+            command: openClearFileDialog,
           },
           {
             label: 'Generate File...',
             icon: 'fa-solid fa-gears',
-            command: generateExampleData,
+            command: openGenerateDataDialog,
           },
         ],
       },
@@ -100,7 +100,7 @@ export class TopMenuBar {
           {
             label: 'New empty Schema',
             icon: 'fa-regular fa-file',
-            command: clearSchema,
+            command: openClearSchemaDialog,
           },
           {
             label: 'Infer Schema',

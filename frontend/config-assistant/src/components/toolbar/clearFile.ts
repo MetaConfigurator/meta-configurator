@@ -2,6 +2,7 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {toastService} from '@/helpers/toastService';
 import {confirmationService} from '@/helpers/confirmationService';
 import {useDataStore} from '@/store/dataStore';
+import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
 
 export function newEmptyFile(message: string | undefined = undefined): void {
   if (!message) {
@@ -30,4 +31,9 @@ export function clearFile() {
   useDataStore().fileData = {};
   useSessionStore().updateCurrentPath([]);
   useSessionStore().updateCurrentSelectedElement([]);
+}
+export function openClearFileDialog() {
+  newEmptySchemafile(
+    ' This will delete current config from File editor. Are you sure you want to continue?'
+  );
 }

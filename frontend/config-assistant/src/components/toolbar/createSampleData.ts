@@ -4,6 +4,7 @@ import {toastService} from '@/helpers/toastService';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {useDataStore} from '@/store/dataStore';
 import {errorService} from '@/main';
+import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
 export async function generateSampleData(schema: any): Promise<any> {
   JSONSchemaFaker.option('alwaysFakeOptionals', true);
   JSONSchemaFaker.option('minItems', 1);
@@ -32,9 +33,6 @@ export function randomDataGeneration(message: string | undefined = undefined): v
   });
 }
 export function generateExampleData() {
-  randomDataGeneration(
-    'This will delete all the existing data. Are you sure you want to continue?'
-  );
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   generateSampleData(useDataStore().schemaData)
     .then(data => (useDataStore().fileData = data))
@@ -45,4 +43,9 @@ export function generateExampleData() {
         stack: error.stack,
       })
     );
+}
+export function openGenerateDataDialog() {
+  randomDataGeneration(
+    'This will delete all the existing data. Are you sure you want to continue?'
+  );
 }

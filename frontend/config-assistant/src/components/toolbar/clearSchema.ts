@@ -25,9 +25,13 @@ export function newEmptySchemafile(message: string | undefined = undefined): voi
   });
 }
 export function clearSchema() {
-  newEmptySchemafile('Do you want to clear the Schema editor?');
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   useDataStore().schemaData = {};
   useSessionStore().updateCurrentPath([]);
   useSessionStore().updateCurrentSelectedElement([]);
+}
+export function openClearSchemaDialog() {
+  newEmptySchemafile(
+    ' This will delete current schema from schema editor. Are you sure you want to continue?'
+  );
 }
