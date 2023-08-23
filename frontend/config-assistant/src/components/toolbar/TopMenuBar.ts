@@ -56,8 +56,8 @@ export class TopMenuBar {
         command: openUploadFileDialog,
       },
       {
-        label: 'Save File',
-        icon: 'fa-regular fa-floppy-disk',
+        label: 'Download File',
+        icon: 'fa-solid fa-download',
         command: () => downloadFile(useDataStore().schema.title ?? 'file'),
       },
       {
@@ -141,8 +141,8 @@ export class TopMenuBar {
         ],
       },
       {
-        label: 'Save File',
-        icon: 'fa-regular fa-floppy-disk',
+        label: 'Download Schema',
+        icon: 'fa-solid fa-download',
         command: () => downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
       },
       {
