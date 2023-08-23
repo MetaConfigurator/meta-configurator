@@ -12,7 +12,7 @@ import FileEditorView from '@/views/FileEditorView.vue';
 import ErrorService from '@/helpers/errorService';
 import {registerIcons} from '@/fontawesome';
 import VueCookies from 'vue-cookies';
-import cookiesHandler from '@/CreateCookies/CookiesHandler';
+import cookiesHandler from '@/create-cookies/cookiesHandler';
 import {VueCookieNext} from 'vue-cookie-next';
 
 // @ts-ignore
