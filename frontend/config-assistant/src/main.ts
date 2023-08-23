@@ -11,6 +11,9 @@ import router from './router';
 import FileEditorView from '@/views/FileEditorView.vue';
 import ErrorService from '@/helpers/errorService';
 import {registerIcons} from '@/fontawesome';
+import VueCookies from 'vue-cookies';
+import cookiesHandler from '@/CreateCookies/CookiesHandler';
+import {VueCookieNext} from 'vue-cookie-next';
 
 // @ts-ignore
 const app = createApp(FileEditorView);
@@ -19,12 +22,18 @@ app.use(createPinia());
 app.use(router);
 app.use(PrimeVue);
 app.use(ToastService);
+app.use(VueCookieNext);
+
+app.use(VueCookies);
+
 app.use(ConfirmationService);
+
 app.directive('tooltip', Tooltip);
 
 export const errorService = new ErrorService(app.config.globalProperties.$toast);
 app.config.errorHandler = (error: unknown) => errorService.onError(error);
 
 registerIcons();
+cookiesHandler.initializeFromCookies();
 
 app.mount('#app');
