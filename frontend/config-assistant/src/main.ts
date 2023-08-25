@@ -22,8 +22,6 @@ app.use(createPinia());
 app.use(router);
 app.use(PrimeVue);
 app.use(ToastService);
-app.use(VueCookieNext);
-
 app.use(VueCookies);
 
 app.use(ConfirmationService);
