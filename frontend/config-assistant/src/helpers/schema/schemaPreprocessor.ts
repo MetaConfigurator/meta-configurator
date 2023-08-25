@@ -1,4 +1,4 @@
-import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
+import type {JsonSchemaObjectType, SchemaPropertyType} from '@/model/JsonSchemaType';
 // @ts-ignore
 import mergeAllOf from 'json-schema-merge-allof';
 import pointer from 'json-pointer';
@@ -86,6 +86,8 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
 
   induceTitles(copiedSchema);
 
+  injectTypesOfEnum(copiedSchema);
+
   return copiedSchema;
 }
 
@@ -132,4 +134,37 @@ function induceTitlesOnObject(object: object) {
       }
     }
   });
+}
+
+function injectTypesOfEnum(schema: JsonSchemaObjectType): void {
+  const foundTypes = new Set<SchemaPropertyType>();
+  const enumValues = schema.enum || [schema.const];
+  if (enumValues !== undefined && enumValues.length > 0) {
+    enumValues.forEach(value => {
+      switch (typeof value) {
+        case 'string':
+          foundTypes.add('string');
+          break;
+        case 'number':
+          foundTypes.add('number');
+          break;
+        case 'boolean':
+          foundTypes.add('boolean');
+          break;
+        case 'object':
+          if (Array.isArray(value)) {
+            foundTypes.add('array');
+          } else if (value === null) {
+            foundTypes.add('null');
+          } else {
+            foundTypes.add('object');
+          }
+          break;
+      }
+    });
+  }
+
+  if (schema.type === undefined && foundTypes.size > 0) {
+    schema.type = [...foundTypes];
+  }
 }

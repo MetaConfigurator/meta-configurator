@@ -92,7 +92,6 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
           examples: ['12345'],
         },
         country: {
-          type: 'string',
           description: 'Country name',
           enum: ['Germany', 'India', 'China', 'America', 'Japan', 'Spain', 'France'],
         },
@@ -110,8 +109,8 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
               description: 'Neighborhood name',
             },
             timeZone: {
-              type: 'string',
               description: 'Time zone',
+              const: 'UTC',
             },
             booleanArray: {
               type: 'array',
