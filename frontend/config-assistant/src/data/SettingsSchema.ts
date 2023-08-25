@@ -44,5 +44,11 @@ export const SETTINGS_SCHEMA: any = {
       description: 'If enabled, the internal application state is shown.',
       default: false,
     },
+    codeFontSize: {
+      type: 'number',
+      description: 'The font size of the code editor.',
+      default: 14,
+      enum: [12, 13, 14, 15, 16, 17, 18, 19, 20],
+    },
   },
 };

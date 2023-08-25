@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, Ref, ref} from 'vue';
+import {computed, onMounted, Ref, ref, watch} from 'vue';
 import {storeToRefs} from 'pinia';
 import type {Editor, Position} from 'brace';
 import * as ace from 'brace';
@@ -19,6 +19,7 @@ import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator
 import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
 import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
+import {useSettingsStore} from '@/store/settingsStore';
 
 const sessionStore = useSessionStore();
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
@@ -73,6 +74,15 @@ onMounted(() => {
   } else if (props.dataFormat == 'yaml') {
     editor.value.getSession().setMode('ace/mode/yaml');
   }
+
+  watch(
+    () => useSettingsStore().settingsData.codeFontSize,
+    newFontSize => {
+      if (editor.value) {
+        editor.value.setOptions({fontSize: newFontSize});
+      }
+    }
+  );
 
   editor.value.setOptions({
     autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page

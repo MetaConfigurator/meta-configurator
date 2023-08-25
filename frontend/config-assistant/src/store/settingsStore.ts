@@ -15,6 +15,7 @@ export const useSettingsStore = defineStore('settings', () => {
       maximumDepth: 5,
       propertySorting: 'schemaOrder',
     },
+    codeFontSize: 14,
     debuggingActive: false,
   });
   const settingsSchemaData = ref(SETTINGS_SCHEMA);
