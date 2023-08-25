@@ -86,6 +86,7 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
 
   induceTitles(copiedSchema);
 
+  convertConstToEnum(copiedSchema);
   injectTypesOfEnum(copiedSchema);
 
   return copiedSchema;
@@ -136,9 +137,16 @@ function induceTitlesOnObject(object: object) {
   });
 }
 
+function convertConstToEnum(schema: JsonSchemaObjectType): void {
+  if (schema.const !== undefined) {
+    schema.enum = [schema.const];
+    delete schema.const;
+  }
+}
+
 function injectTypesOfEnum(schema: JsonSchemaObjectType): void {
   const foundTypes = new Set<SchemaPropertyType>();
-  const enumValues = schema.enum || [schema.const];
+  const enumValues = schema.enum;
   if (enumValues !== undefined && enumValues.length > 0) {
     enumValues.forEach(value => {
       switch (typeof value) {
