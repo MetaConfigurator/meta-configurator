@@ -11,26 +11,6 @@ const props = defineProps<{
   propertySchema: JsonSchema;
 }>();
 
-const minValue = computed(() => {
-  if (props.propertySchema.exclusiveMinimum !== undefined) {
-    return props.propertySchema.exclusiveMinimum + 1;
-  } else if (props.propertySchema.minimum !== undefined) {
-    return props.propertySchema.minimum;
-  } else {
-    return undefined;
-  }
-});
-
-const maxValue = computed(() => {
-  if (props.propertySchema.exclusiveMaximum !== undefined) {
-    return props.propertySchema.exclusiveMaximum - 1;
-  } else if (props.propertySchema.maximum !== undefined) {
-    return props.propertySchema.maximum;
-  } else {
-    return undefined;
-  }
-});
-
 const emit = defineEmits<{
   (e: 'update_property_value', newValue: number): void;
 }>();
@@ -59,8 +39,6 @@ const valueProperty = computed({
     buttonLayout="stacked"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     :step="1"
-    :min="minValue"
-    :max="maxValue"
     increment-button-class="p-button-text p-button-secondary"
     decrement-button-class="p-button-text p-button-secondary" />
 </template>

@@ -15,26 +15,6 @@ const stepValue = computed(() => {
   return props.propertySchema.multipleOf ?? 0.1;
 });
 
-const maxValue = computed(() => {
-  if (props.propertySchema.exclusiveMaximum !== undefined) {
-    return props.propertySchema.exclusiveMaximum - stepValue.value;
-  } else if (props.propertySchema.maximum !== undefined) {
-    return props.propertySchema.maximum;
-  } else {
-    return undefined;
-  }
-});
-
-const minValue = computed(() => {
-  if (props.propertySchema.exclusiveMinimum !== undefined) {
-    return props.propertySchema.exclusiveMinimum + stepValue.value;
-  } else if (props.propertySchema.minimum !== undefined) {
-    return props.propertySchema.minimum;
-  } else {
-    return undefined;
-  }
-});
-
 const emit = defineEmits<{
   (e: 'update_property_value', newValue: number | undefined): void;
 }>();
@@ -64,8 +44,6 @@ const valueProperty = computed({
     buttonLayout="stacked"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     :step="stepValue"
-    :min="minValue"
-    :max="maxValue"
     increment-button-class="p-button-text p-button-secondary"
     decrement-button-class="p-button-text p-button-secondary" />
 </template>
