@@ -7,6 +7,7 @@ import {
   faCircleInfo,
   faCog,
   faDatabase,
+  faDownload,
   faFileCirclePlus,
   faFloppyDisk,
   faFolderOpen,
@@ -16,8 +17,8 @@ import {
   faMagicWandSparkles,
   faRotateLeft,
   faRotateRight,
+  faSearch,
   faShareNodes,
-  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -46,4 +47,5 @@ export function registerIcons() {
   library.add(faCog);
   library.add(faCircleInfo);
   library.add(faFontAwesome);
+  library.add(faSearch);
 }

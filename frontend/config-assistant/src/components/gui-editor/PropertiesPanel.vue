@@ -11,10 +11,15 @@ import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/components/gui-editor/ConfigTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
-import {ConfigTreeNodeData, GuiEditorTreeNode, TreeNodeType} from '@/model/ConfigDataTreeNode';
+import {
+  ConfigDataTreeNode,
+  ConfigTreeNodeData,
+  GuiEditorTreeNode,
+  TreeNodeType,
+} from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
-import {dataAt, pathToString} from '@/helpers/pathHelper';
+import {dataAt, pathToJsonPointer, pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/tree';
@@ -29,6 +34,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update_current_path', new_path: Path): void;
   (e: 'zoom_into_path', path_to_add: Path): void;
+  (e: 'select_path', path: Path): void;
   (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
@@ -72,10 +78,10 @@ function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
 }
 
 function updateTree() {
-  loadingDebounced.value = true;
+  loading.value = true;
   window.setTimeout(() => {
     nodesToDisplay.value = computeTree().children;
-    loadingDebounced.value = false;
+    loading.value = false;
   }, 0);
 }
 
@@ -98,6 +104,12 @@ function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
 }
+function clickedPropertyData(nodeData: ConfigTreeNodeData) {
+  const path = nodeData.absolutePath;
+  if (useSessionStore().dataAtPath(path) != undefined) {
+    emit('select_path', path);
+  }
+}
 
 function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData) {
   const dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
@@ -114,7 +126,7 @@ function replacePropertyName(parentPath: Path, oldName: string, newName: string,
 }
 
 function initializeNewProperty(parentPath: Path, name: string): any {
-  const schema = props.currentSchema.subSchemaAt(parentPath.concat([name]), props.currentPath);
+  const schema = props.currentSchema.subSchemaAt(parentPath.concat([name]));
   return schema?.initialValue();
 }
 
@@ -297,8 +309,17 @@ const allowShowOverlay = ref(true);
 const overlayShowScheduled = ref(false);
 
 const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
+  const relevantErrors = useSessionStore().dataValidationResults.filterForExactPath(
+    pathToJsonPointer(nodeData.absolutePath)
+  ).errors;
   // @ts-ignore
-  schemaInfoOverlay.value?.showPanel(nodeData.schema, nodeData.name, nodeData.parentSchema, event);
+  schemaInfoOverlay.value?.showPanel(
+    nodeData.schema,
+    nodeData.name,
+    nodeData.parentSchema,
+    relevantErrors,
+    event
+  );
 };
 const showInfoOverlayPanelDebounced = useDebounceFn((nodeData: ConfigTreeNodeData, event) => {
   if (allowShowOverlay.value && overlayShowScheduled.value) {
@@ -320,6 +341,19 @@ function closeInfoOverlayPanel() {
   overlayShowScheduled.value = false;
   closeInfoOverlayPanelDebounced();
 }
+
+/**
+ * Returns true if the node or any of its children is highlighted.
+ */
+function isHighlighted(node: ConfigDataTreeNode) {
+  return useSessionStore()
+    .currentHighlightedElements.map(path => pathToString(path))
+    .some(path => node.key && path.startsWith(node.key));
+}
+
+function getValidationResults(absolutePath: Path) {
+  return useSessionStore().dataValidationResults.filterForPath(pathToJsonPointer(absolutePath));
+}
 </script>
 
 <template>
@@ -334,7 +368,7 @@ function closeInfoOverlayPanel() {
     scroll-height="flex"
     row-hover
     :lazy="true"
-    :loading="loading"
+    :loading="loadingDebounced"
     :expandedKeys="currentExpandedElements"
     @nodeExpand="expandElement"
     @nodeCollapse="node => delete currentExpandedElements[node.key]"
@@ -349,8 +383,10 @@ function closeInfoOverlayPanel() {
           @mouseenter="event => showInfoOverlayPanel(slotProps.node.data, event)"
           @mouseleave="closeInfoOverlayPanel">
           <PropertyMetadata
+            :validationResults="getValidationResults(slotProps.node.data.absolutePath)"
             :node="slotProps.node"
             :type="slotProps.node.type"
+            :highlighted="isHighlighted(slotProps.node)"
             @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)"
             @update_property_name="
               (oldName, newName) =>
@@ -366,6 +402,7 @@ function closeInfoOverlayPanel() {
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
             @update_tree="updateTree"
+            @click="() => clickedPropertyData(slotProps.node.data)"
             bodyClass="w-full"
             @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />
         </span>
