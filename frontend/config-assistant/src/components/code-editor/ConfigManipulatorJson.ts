@@ -2,6 +2,7 @@ import type {Path} from '@/model/path';
 import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
 import type {CstDocument, CstNode} from 'json-cst';
 import {parse} from 'json-cst';
+import {errorService} from '@/main';
 
 export class ConfigManipulatorJson implements ConfigManipulator {
   constructor() {}
@@ -17,10 +18,9 @@ export class ConfigManipulatorJson implements ConfigManipulator {
   determineCursorPosition(editorContent: string, currentPath: Path): number {
     try {
       const cst: CstDocument = parse(editorContent);
-      const result = this.determineCursorPositionStep(cst.root, currentPath);
-      return result;
+      return this.determineCursorPositionStep(cst.root, currentPath);
     } catch (e) {
-      console.log(e);
+      errorService.onError(e);
       return 0;
     }
   }

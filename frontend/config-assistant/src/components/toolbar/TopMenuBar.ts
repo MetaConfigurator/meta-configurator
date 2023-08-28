@@ -1,17 +1,16 @@
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
 import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
-import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
+import {openClearFileDialog} from '@/components/toolbar/clearFile';
+import {useSessionStore} from '@/store/sessionStore';
+import {openClearSchemaDialog} from '@/components/toolbar/clearSchema';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
-import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
-import {storeToRefs} from 'pinia';
 import type {SchemaOption} from '@/model/SchemaOption';
-import {openGenerateSampleFileDialog} from '@/components/toolbar/generateSampleFile';
+import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -24,16 +23,19 @@ export class TopMenuBar {
   private readonly onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
   private readonly onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
   private readonly handleFromURLClick: () => void;
+  private readonly handleSearchButtonClick: () => void;
   constructor(
     toast = null,
     onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
     onFromOurExampleClick: () => void,
-    handleFromURLClick: () => void
+    handleFromURLClick: () => void,
+    handleSearchButtonClick: () => void
   ) {
     this.toast = toast;
     this.onFromWebClick = onFromWebClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
     this.handleFromURLClick = handleFromURLClick;
+    this.handleSearchButtonClick = handleSearchButtonClick;
   }
 
   get fileEditorMenuItems() {
@@ -45,12 +47,12 @@ export class TopMenuBar {
           {
             label: 'New empty File',
             icon: 'fa-regular fa-file',
-            command: this.clearFile,
+            command: openClearFileDialog,
           },
           {
             label: 'Generate File...',
             icon: 'fa-solid fa-gears',
-            command: openGenerateSampleFileDialog,
+            command: openGenerateDataDialog,
           },
         ],
       },
@@ -92,6 +94,14 @@ export class TopMenuBar {
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
       },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
+      },
     ];
   }
 
@@ -104,7 +114,7 @@ export class TopMenuBar {
           {
             label: 'New empty Schema',
             icon: 'fa-regular fa-file',
-            command: this.clearSchema,
+            command: openClearSchemaDialog,
           },
           {
             label: 'Infer Schema',
@@ -177,6 +187,14 @@ export class TopMenuBar {
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
       },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
+      },
     ];
   }
 
@@ -223,35 +241,14 @@ export class TopMenuBar {
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
       },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
+      },
     ];
-  }
-
-  private clearFile(): void {
-    newEmptyFile('Do you want to clear the File editor?');
-  }
-  private clearSchema(): void {
-    newEmptySchemafile('Do you want to clear the Schema editor?');
-  }
-
-  public fetchExampleSchema(schemaKey: string): void {
-    try {
-      const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
-      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-      const schemaName = selectedSchema.label || 'Unknown Schema';
-      useDataStore().schemaData = selectedSchema?.schema;
-      newEmptyFile('Do you want to also clear the current config file?');
-
-      if (this.toast) {
-        this.toast.add({
-          severity: 'info',
-          summary: 'Info',
-          detail: `"${schemaName}" fetched successfully!`,
-          life: 3000,
-        });
-      }
-    } catch (error) {
-      // Handle the error if there's an issue fetching the schema.
-      errorService.onError(error);
-    }
   }
 }

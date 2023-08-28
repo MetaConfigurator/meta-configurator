@@ -11,6 +11,9 @@ export const useSettingsStore = defineStore('settings', () => {
   const settingsData = ref({
     dataFormat: 'json',
     guiEditorOnRightSide: true,
+    codeEditor: {
+      fontSize: 14,
+    },
     guiEditor: {
       maximumDepth: 5,
       propertySorting: 'schemaOrder',

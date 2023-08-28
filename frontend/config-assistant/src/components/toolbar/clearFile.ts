@@ -2,6 +2,7 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {toastService} from '@/helpers/toastService';
 import {confirmationService} from '@/helpers/confirmationService';
 import {useDataStore} from '@/store/dataStore';
+import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
 
 export function newEmptyFile(message: string | undefined = undefined): void {
   if (!message) {
@@ -22,19 +23,17 @@ export function newEmptyFile(message: string | undefined = undefined): void {
       });
       clearFile();
     },
-    reject: () => {
-      toastService.add({
-        severity: 'error',
-        summary: 'Rejected',
-        detail: 'Config data is kept in File Editor',
-        life: 3000,
-      });
-    },
   });
 }
 export function clearFile() {
+  newEmptyFile('Do you want to clear the File editor?');
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   useDataStore().fileData = {};
   useSessionStore().updateCurrentPath([]);
   useSessionStore().updateCurrentSelectedElement([]);
+}
+export function openClearFileDialog() {
+  newEmptyFile(
+    ' This will delete current config from File editor. Are you sure you want to continue?'
+  );
 }
