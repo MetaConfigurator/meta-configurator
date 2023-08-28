@@ -52,6 +52,7 @@ export const simplifiedMetaSchema = {
         'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
     },
     nullProperty: {
+      title: 'Null property',
       type: ['object'],
       $ref: '#/$defs/meta-data',
       properties: {
@@ -164,6 +165,7 @@ export const simplifiedMetaSchema = {
       },
     },
     booleanProperty: {
+      title: 'Boolean property',
       type: ['object'],
       $ref: '#/$defs/meta-data',
       properties: {
@@ -180,10 +182,6 @@ export const simplifiedMetaSchema = {
         type: {
           enum: ['number', 'integer'],
         },
-        multipleOf: {
-          type: 'number',
-          exclusiveMinimum: 0,
-        },
         maximum: {
           type: 'number',
         },
@@ -196,6 +194,10 @@ export const simplifiedMetaSchema = {
         exclusiveMinimum: {
           type: 'number',
         },
+        multipleOf: {
+          type: 'number',
+          exclusiveMinimum: 0,
+        },
       },
     },
     objectProperty: {
@@ -206,14 +208,37 @@ export const simplifiedMetaSchema = {
         type: {
           const: 'object',
         },
+        properties: {
+          type: 'object',
+          additionalProperties: {
+            $ref: '#/$defs/jsonSchema',
+          },
+          default: {},
+        },
+        required: {
+          $ref: '#/$defs/stringArray',
+        },
+        patternProperties: {
+          type: 'object',
+          additionalProperties: {
+            $ref: '#/$defs/jsonSchema',
+          },
+          propertyNames: {
+            format: 'regex',
+          },
+          default: {},
+        },
+        additionalProperties: {
+          $ref: '#/$defs/jsonSchema',
+        },
         maxProperties: {
           $ref: '#/$defs/nonNegativeInteger',
         },
         minProperties: {
           $ref: '#/$defs/nonNegativeIntegerDefault0',
         },
-        required: {
-          $ref: '#/$defs/stringArray',
+        propertyNames: {
+          $ref: '#/$defs/jsonSchema',
         },
         dependentRequired: {
           type: 'object',
@@ -228,7 +253,6 @@ export const simplifiedMetaSchema = {
           additionalProperties: {
             anyOf: [
               {
-                $dynamicRef: '#meta',
                 $ref: '#/$defs/jsonSchema',
               },
               {
@@ -244,44 +268,15 @@ export const simplifiedMetaSchema = {
           deprecated: true,
           default: {},
         },
-        additionalProperties: {
-          $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
-        },
-        properties: {
-          type: 'object',
-          additionalProperties: {
-            $ref: '#/$defs/jsonSchema',
-            $dynamicRef: '#meta',
-          },
-          default: {},
-        },
-        patternProperties: {
-          type: 'object',
-          additionalProperties: {
-            $ref: '#/$defs/jsonSchema',
-            $dynamicRef: '#meta',
-          },
-          propertyNames: {
-            format: 'regex',
-          },
-          default: {},
-        },
         dependentSchemas: {
           type: 'object',
           additionalProperties: {
             $ref: '#/$defs/jsonSchema',
-            $dynamicRef: '#meta',
           },
           default: {},
         },
-        propertyNames: {
-          $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
-        },
         unevaluatedProperties: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
       },
     },
@@ -291,7 +286,7 @@ export const simplifiedMetaSchema = {
       $ref: '#/$defs/meta-data',
       properties: {
         type: {
-          const: 'string',
+          enum: ['string'],
         },
         maxLength: {
           $ref: '#/$defs/nonNegativeInteger',
@@ -314,7 +309,6 @@ export const simplifiedMetaSchema = {
         },
         contentSchema: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
       },
     },
@@ -326,31 +320,31 @@ export const simplifiedMetaSchema = {
         type: {
           const: 'array',
         },
-        prefixItems: {
-          $ref: '#/$defs/schemaArray',
-        },
         items: {
           $ref: '#/$defs/jsonSchema',
-        },
-        contains: {
-          $ref: '#/$defs/jsonSchema',
-        },
-        maxItems: {
-          $ref: '#/$defs/nonNegativeInteger',
         },
         minItems: {
           $ref: '#/$defs/nonNegativeIntegerDefault0',
         },
-        uniqueItems: {
-          type: 'boolean',
-          default: false,
-        },
-        maxContains: {
+        maxItems: {
           $ref: '#/$defs/nonNegativeInteger',
+        },
+        contains: {
+          $ref: '#/$defs/jsonSchema',
         },
         minContains: {
           $ref: '#/$defs/nonNegativeInteger',
           default: 1,
+        },
+        maxContains: {
+          $ref: '#/$defs/nonNegativeInteger',
+        },
+        prefixItems: {
+          $ref: '#/$defs/schemaArray',
+        },
+        uniqueItems: {
+          type: 'boolean',
+          default: false,
         },
         unevaluatedItems: {
           $ref: '#/$defs/jsonSchema',
@@ -385,6 +379,10 @@ export const simplifiedMetaSchema = {
         description: {
           type: 'string',
         },
+        examples: {
+          type: 'array',
+          items: true,
+        },
         default: true,
         deprecated: {
           type: 'boolean',
@@ -397,10 +395,6 @@ export const simplifiedMetaSchema = {
         writeOnly: {
           type: 'boolean',
           default: false,
-        },
-        examples: {
-          type: 'array',
-          items: true,
         },
       },
     },

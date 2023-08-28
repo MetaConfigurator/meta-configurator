@@ -36,8 +36,6 @@ export const useDataStore = defineStore('dataStore', () => {
     () => new TopLevelJsonSchema(metaSchemaData.value as any)
   );
 
-  console.log('useDataStore.ts: metaSchemaData.value: ', metaSchemaData.value);
-
   // make sure that the schema is not preprocessed too often
   watchDebounced(
     schemaData,
