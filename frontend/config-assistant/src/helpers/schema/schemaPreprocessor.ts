@@ -38,7 +38,7 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
     }
 
     delete copiedSchema.$ref;
-    copiedSchema = {allOf: [copiedSchema, refSchema]};
+    copiedSchema = {allOf: [refSchema, copiedSchema]};
   }
 
   if (hasAllOfs(copiedSchema)) {

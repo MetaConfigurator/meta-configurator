@@ -10,7 +10,7 @@ export const simplifiedMetaSchema = {
           $ref: '#/$defs/core',
         },
         {
-          $ref: '#/$defs/jsonSchema',
+          $ref: '#/$defs/objectProperty',
         },
       ],
     },
@@ -173,6 +173,7 @@ export const simplifiedMetaSchema = {
       },
     },
     numberProperty: {
+      title: 'Number property',
       type: ['object'],
       $ref: '#/$defs/meta-data',
       properties: {
@@ -198,6 +199,7 @@ export const simplifiedMetaSchema = {
       },
     },
     objectProperty: {
+      title: 'Object property',
       type: ['object'],
       $ref: '#/$defs/meta-data',
       properties: {
@@ -284,6 +286,7 @@ export const simplifiedMetaSchema = {
       },
     },
     stringProperty: {
+      title: 'String property',
       type: ['object'],
       $ref: '#/$defs/meta-data',
       properties: {
@@ -316,6 +319,7 @@ export const simplifiedMetaSchema = {
       },
     },
     arrayProperty: {
+      title: 'Array property',
       type: ['object'],
       $ref: '#/$defs/meta-data',
       properties: {
@@ -373,11 +377,6 @@ export const simplifiedMetaSchema = {
       },
     },
     'meta-data': {
-      $schema: 'https://json-schema.org/draft/2020-12/schema',
-      $vocabulary: {
-        'https://json-schema.org/draft/2020-12/vocab/meta-data': true,
-      },
-      title: 'Meta-data vocabulary meta-schema',
       type: ['object', 'boolean'],
       properties: {
         title: {
