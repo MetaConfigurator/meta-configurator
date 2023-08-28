@@ -3,7 +3,7 @@ import type {PathElement} from '@/model/path';
 
 export function generatePlaceholderText(schema: JsonSchema, propertyName: PathElement) {
   if (schema.examples && schema.examples.length > 0) {
-    return `e.g. ${schema.examples}`;
+    return `e.g. ${schema.examples.join(', ')}`;
   } else if (schema.default !== undefined) {
     return `e.g. ${schema.default}`;
   } else if (schema.title !== undefined) {
