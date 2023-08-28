@@ -17,6 +17,19 @@ export const SETTINGS_SCHEMA: any = {
         'If enabled, the GUI editor will be on the right side and the code editor on the left. Otherwise, it will be the opposite way.',
       default: true,
     },
+    codeEditor: {
+      type: 'object',
+      description: 'Settings of the code editor.',
+      properties: {
+        fontSize: {
+          type: 'integer',
+          description: 'The font size of the code editor.',
+          default: 14,
+          minimum: 10,
+          maximum: 40,
+        },
+      },
+    },
     guiEditor: {
       type: 'object',
       description: 'GUI Editor related settings belong here.',
