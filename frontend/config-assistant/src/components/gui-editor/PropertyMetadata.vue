@@ -10,11 +10,13 @@ import {useSessionStore} from '@/store/sessionStore';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
+import type {ValidationResults} from '@/helpers/validationService';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
   type: ConfigDataTreeNodeType;
   highlighted: boolean;
+  validationResults: ValidationResults;
 }>();
 
 const emit = defineEmits<{
@@ -93,7 +95,7 @@ function isPropertyNameEditable(): boolean {
 }
 
 function updatePropertyName(event) {
-  if (isPropertyNameEditable() && isValidNewPropertyName(event.target.innerText)) {
+  if (isPropertyNameEditable()) {
     emit('update_property_name', props.node.data.name as string, event.target.innerText);
   } else {
     event.target.innerText = props.node.data.name;
@@ -101,17 +103,6 @@ function updatePropertyName(event) {
   isEditingPropertyName.value = false;
   emit('stop_editing_property_name');
   event.target.contenteditable = false;
-}
-
-function isValidNewPropertyName(newName: string) {
-  const parentSchema = props.node.data.parentSchema;
-  const propertyNames: JsonSchema | undefined = parentSchema?.propertyNames;
-  if (propertyNames?.validate(newName) === false) {
-    const errorMessage = propertyNames.validationFunction?.errors?.at(0)?.message ?? '';
-    errorService.onError({message: `Invalid property name '${newName}'`, details: errorMessage});
-    return false;
-  }
-  return true;
 }
 
 function getTypeDescription(): string {
@@ -171,6 +162,7 @@ function focusEditingLabel() {
         @keyup.enter="updatePropertyName"
         :class="{
           'text-indigo-700': canZoomIn(),
+          'underline decoration-wavy decoration-red-600': !props.validationResults.valid,
           'line-through': isDeprecated(),
           italic: isAdditionalProperty() || isPatternProperty(),
         }">
