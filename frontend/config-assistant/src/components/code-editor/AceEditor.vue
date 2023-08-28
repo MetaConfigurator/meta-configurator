@@ -75,15 +75,6 @@ onMounted(() => {
     editor.value.getSession().setMode('ace/mode/yaml');
   }
 
-  // watch(
-  //   () => useSettingsStore().settingsData.codeFontSize,
-  //   newFontSize => {
-  //     if (editor.value) {
-  //       editor.value.setOptions({fontSize: newFontSize});
-  //     }
-  //   }
-  // );
-
   watchEffect(() => {
     const fontSize = useSettingsStore().settingsData.codeFontSize;
 
