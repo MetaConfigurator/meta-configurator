@@ -3,7 +3,6 @@ import type {Path, PathElement} from '@/model/path';
 export function dataAt(path: Path, data: any): any {
   let currentData: any = data;
 
-  console.log('data at ', path, ' with data ', data);
   if (currentData === undefined) {
     return undefined;
   }

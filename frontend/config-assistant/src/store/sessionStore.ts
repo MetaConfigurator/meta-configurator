@@ -158,7 +158,6 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
     const pathAsString = pathToString(path);
     _.unset(fileData.value, pathAsString!!);
-    console.log('new data after removing from path ', pathAsString, ' is ', fileData.value);
   }
 
   function isExpanded(path: Path): boolean {
