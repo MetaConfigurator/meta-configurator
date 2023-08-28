@@ -22,10 +22,11 @@ export const SETTINGS_SCHEMA: any = {
       description: 'Settings of the code editor.',
       properties: {
         fontSize: {
-          type: 'number',
+          type: 'integer',
           description: 'The font size of the code editor.',
           default: 14,
-          enum: [12, 13, 14, 15, 16, 17, 18, 19, 20],
+          minimum: 8,
+          maximum: 40,
         },
       },
     },
