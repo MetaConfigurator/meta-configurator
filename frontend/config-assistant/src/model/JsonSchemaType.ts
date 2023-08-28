@@ -83,7 +83,7 @@ export type JsonSchemaObjectType = {
   };
   $recursiveAnchor?: string;
   $recursiveRef?: string;
-  [k: string]: unknown;
+  [k: string]: any;
 };
 export type TopLevelSchema = JsonSchemaType & {
   $schema?: string;

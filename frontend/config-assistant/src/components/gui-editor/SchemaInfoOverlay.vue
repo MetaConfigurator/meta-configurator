@@ -14,17 +14,21 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import OverlayPanel from 'primevue/overlaypanel';
 import {computed, Ref, ref} from 'vue';
 import {describeSchema} from '@/helpers/schema/schemaDescriptor';
+import type {ErrorObject} from 'ajv';
 
 const schemaRef: Ref<JsonSchema | undefined> = ref();
 const propertyNameRef: Ref<String> = ref('');
 const parentSchemaRef: Ref<JsonSchema | undefined> = ref();
+const validationErrorsRef: Ref<ErrorObject[]> = ref([]);
 
 const schemaDescription = computed(() =>
   describeSchema(
     schemaRef.value ?? new JsonSchema(true),
     propertyNameRef.value,
     parentSchemaRef.value,
-    true
+    true,
+    0,
+    validationErrorsRef.value
   )
 );
 
@@ -36,10 +40,17 @@ const panelRef = ref();
  */
 const keepOpen = ref(false);
 
-const showPanel = (schema: JsonSchema, propertyName: string, parentSchema: JsonSchema, event) => {
+const showPanel = (
+  schema: JsonSchema,
+  propertyName: string,
+  parentSchema: JsonSchema,
+  validationErrors: ErrorObject[],
+  event
+) => {
   schemaRef.value = schema;
   propertyNameRef.value = propertyName;
   parentSchemaRef.value = parentSchema;
+  validationErrorsRef.value = validationErrors;
   panelRef.value.show(event, event.target);
 };
 
