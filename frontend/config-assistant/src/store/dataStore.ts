@@ -3,7 +3,7 @@ import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
 import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
-import {jsonSchemaMetaSchema} from '../../resources/json-schema/schema';
+import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
 
 export const useDataStore = defineStore('dataStore', () => {
   /**
@@ -27,7 +27,7 @@ export const useDataStore = defineStore('dataStore', () => {
   /**
    * The json schema meta schema as a plain object
    */
-  const metaSchemaData = ref(jsonSchemaMetaSchema);
+  const metaSchemaData = ref(simplifiedMetaSchema);
 
   /**
    * The json schema meta schema as a TopLevelJsonSchema object

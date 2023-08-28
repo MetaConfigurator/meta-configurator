@@ -83,7 +83,7 @@ export type JsonSchemaObjectType = {
   };
   $recursiveAnchor?: string;
   $recursiveRef?: string;
-  [k: string]: unknown;
+  [k: string]: any;
 };
 export type TopLevelSchema = JsonSchemaType & {
   $schema?: string;
@@ -108,6 +108,4 @@ export type SchemaPropertyType =
   | 'object'
   | 'string';
 export const NUMBER_OF_PROPERTY_TYPES = 7;
-export type SchemaPropertyTypes =
-  | SchemaPropertyType
-  | [SchemaPropertyType, ...SchemaPropertyType[]];
+export type SchemaPropertyTypes = SchemaPropertyType | SchemaPropertyType[];

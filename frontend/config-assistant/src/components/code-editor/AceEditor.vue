@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, Ref, ref} from 'vue';
+import {computed, onMounted, Ref, ref, watchEffect} from 'vue';
 import {storeToRefs} from 'pinia';
 import type {Editor, Position} from 'brace';
 import * as ace from 'brace';
@@ -9,8 +9,7 @@ import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
-import Ajv2020 from 'ajv/dist/2020';
-import {useDebounceFn, watchThrottled} from '@vueuse/core';
+import {useDebounceFn, watchArray, watchThrottled} from '@vueuse/core';
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
@@ -19,6 +18,8 @@ import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator
 import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
 import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
+import {useSettingsStore} from '@/store/settingsStore';
+import {convertAjvPathToPath} from '@/helpers/pathHelper';
 
 const sessionStore = useSessionStore();
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
@@ -35,10 +36,6 @@ const manipulator = createConfigManipulator(props.dataFormat);
 let editorWrapper: CodeEditorWrapper;
 
 /**
- * Debounce time for schema validation in ms
- */
-const SCHEMA_VALIDATION_DEBOUNCE_TIME = 2000;
-/**
  * Debounce time for writing changes to store in ms
  */
 const WRITE_DEBOUNCE_TIME = 50;
@@ -46,13 +43,6 @@ const WRITE_DEBOUNCE_TIME = 50;
  * Throttle time for reading changes from store in ms
  */
 const READ_THROTTLE_TIME = 100;
-
-const schemaValidationFunction = computed(() => {
-  const ajv = new Ajv2020({
-    strict: false,
-  });
-  return ajv.compile(useSessionStore().fileSchemaData);
-});
 
 function createConfigManipulator(dataFormat: string): ConfigManipulator {
   if (dataFormat == 'json') {
@@ -74,6 +64,14 @@ onMounted(() => {
     editor.value.getSession().setMode('ace/mode/yaml');
   }
 
+  watchEffect(() => {
+    const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
+
+    if (editor.value && fontSize) {
+      editor.value.setFontSize(fontSize);
+    }
+  });
+
   editor.value.setOptions({
     autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
   });
@@ -94,10 +92,7 @@ onMounted(() => {
         const fileContentString = editor.value.getValue();
 
         try {
-          const parsedContent = manipulator.parseFileContent(fileContentString);
-          fileData.value = parsedContent;
-
-          validateAgainstSchemaDebounced(parsedContent);
+          fileData.value = manipulator.parseFileContent(fileContentString);
         } catch (e) {
           // if file content can not be parsed, that is because of error in input
           // Invalid JSON is already highlighted by Ace Editor -> no action needed here
@@ -108,33 +103,25 @@ onMounted(() => {
     )
   );
 
-  const validateAgainstSchemaDebounced = useDebounceFn((parsedContent: any) => {
-    try {
-      const valid = schemaValidationFunction.value(parsedContent);
-      if (valid) {
-        useSessionStore().schemaErrorMessage = null;
-      } else {
-        const errors = schemaValidationFunction.value.errors;
-        let annotations = [];
-        for (const error of errors) {
-          const instancePath = error.instancePath;
-          const instancePathTranslated = convertAjvPathToPath(instancePath);
-          const relatedRow =
-            determineCursorPosition(editor.value.getValue(), instancePathTranslated).row - 1;
-          const message = error.message;
-          annotations.push({
-            row: relatedRow,
-            column: 0,
-            text: message,
-            type: 'warning',
-          });
-        }
+  watchArray(
+    computed(() => sessionStore.dataValidationResults.errors),
+    errors => {
+      let annotations = [];
+      for (const error of errors) {
+        const instancePath = error.instancePath;
+        const instancePathTranslated = convertAjvPathToPath(instancePath);
+        const relatedRow =
+          determineCursorPosition(editor.value.getValue(), instancePathTranslated).row - 1;
+        annotations.push({
+          row: relatedRow,
+          column: 0,
+          text: error.message,
+          type: 'error',
+        });
         editor.value.getSession().setAnnotations(annotations);
       }
-    } catch (e) {
-      useSessionStore().schemaErrorMessage = e.message;
     }
-  }, SCHEMA_VALIDATION_DEBOUNCE_TIME);
+  );
 
   editor.value.on('changeSelection', () => {
     if (currentSelectionIsForcedFromOutside) {
@@ -178,13 +165,6 @@ onMounted(() => {
     {deep: true, throttle: READ_THROTTLE_TIME}
   );
 });
-function convertAjvPathToPath(path: string): Path {
-  let result = path.split('/');
-  if (result.length > 0 && result[0].length == 0) {
-    result = result.slice(1);
-  }
-  return result;
-}
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position

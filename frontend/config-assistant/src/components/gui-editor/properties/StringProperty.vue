@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {ref, watch} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
-import {watchThrottled} from '@vueuse/core';
 import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
@@ -18,12 +17,12 @@ const emit = defineEmits<{
 
 const valueProperty = ref<string | undefined>(props.propertyData);
 
-watchThrottled(
+watch(
   props,
   () => {
     valueProperty.value = props.propertyData;
   },
-  {immediate: true, throttle: 500, deep: true}
+  {immediate: true, deep: true}
 );
 
 function updateValue() {
