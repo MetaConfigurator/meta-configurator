@@ -9,8 +9,6 @@ import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
-import type {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
-import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -150,6 +148,12 @@ export const useSessionStore = defineStore('commonStore', () => {
       updateCurrentPath([]);
       updateCurrentSelectedElement([]);
       fileData.value = {};
+      return;
+    }
+    const data = dataAtPath(path.slice(0, -1));
+    if (Array.isArray(data)) {
+      const indexToRemove = path[path.length - 1] as number;
+      data.splice(indexToRemove, 1);
       return;
     }
     const pathAsString = pathToString(path);
