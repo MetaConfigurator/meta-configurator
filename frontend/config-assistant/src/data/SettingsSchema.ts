@@ -25,7 +25,7 @@ export const SETTINGS_SCHEMA: any = {
           type: 'integer',
           description: 'The font size of the code editor.',
           default: 14,
-          minimum: 8,
+          minimum: 10,
           maximum: 40,
         },
       },
