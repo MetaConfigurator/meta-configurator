@@ -1,17 +1,6 @@
 export const jsonSchemaMetaSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
-  $id: 'https://json-schema.org/draft/2020-12/schema',
-  $vocabulary: {
-    'https://json-schema.org/draft/2020-12/meta/core': true,
-    'https://json-schema.org/draft/2020-12/meta/applicator': true,
-    'https://json-schema.org/draft/2020-12/meta/unevaluated': true,
-    'https://json-schema.org/draft/2020-12/meta/validation': true,
-    'https://json-schema.org/draft/2020-12/meta/meta-data': true,
-    'https://json-schema.org/draft/2020-12/meta/format-annotation': true,
-    'https://json-schema.org/draft/2020-12/meta/format-assertion': true,
-    'https://json-schema.org/draft/2020-12/meta/content': true,
-  },
-  $dynamicAnchor: 'meta',
+  $id: 'https://example.com/ourownjsonmeta.schema.json',
   title: 'Json schema meta-schema',
   $ref: '#/$defs/jsonSchema',
   $defs: {
@@ -47,7 +36,6 @@ export const jsonSchemaMetaSchema = {
           $comment: '"definitions" has been replaced by "$defs".',
           type: 'object',
           additionalProperties: {
-            $dynamicRef: '#meta',
             $ref: '#/$defs/jsonSchema',
           },
           deprecated: true,
@@ -60,7 +48,6 @@ export const jsonSchemaMetaSchema = {
           additionalProperties: {
             anyOf: [
               {
-                $dynamicRef: '#meta',
                 $ref: '#/$defs/jsonSchema',
               },
               {
@@ -92,11 +79,9 @@ export const jsonSchemaMetaSchema = {
     },
     core: {
       $schema: 'https://json-schema.org/draft/2020-12/schema',
-      $id: 'https://json-schema.org/draft/2020-12/meta/core',
       $vocabulary: {
         'https://json-schema.org/draft/2020-12/vocab/core': true,
       },
-      $dynamicAnchor: 'meta',
       title: 'Core vocabulary meta-schema',
       type: ['object', 'boolean'],
       properties: {
@@ -135,7 +120,6 @@ export const jsonSchemaMetaSchema = {
         $defs: {
           type: 'object',
           additionalProperties: {
-            $dynamicRef: '#meta',
             $ref: '#/$defs/jsonSchema',
           },
         },
@@ -143,11 +127,9 @@ export const jsonSchemaMetaSchema = {
     },
     applicator: {
       $schema: 'https://json-schema.org/draft/2020-12/schema',
-      $id: 'https://json-schema.org/draft/2020-12/meta/applicator',
       $vocabulary: {
         'https://json-schema.org/draft/2020-12/vocab/applicator': true,
       },
-      $dynamicAnchor: 'meta',
       title: 'Applicator vocabulary meta-schema',
       type: ['object', 'boolean'],
       properties: {
@@ -156,21 +138,17 @@ export const jsonSchemaMetaSchema = {
         },
         items: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
         contains: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
         additionalProperties: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
         properties: {
           type: 'object',
           additionalProperties: {
             $ref: '#/$defs/jsonSchema',
-            $dynamicRef: '#meta',
           },
           default: {},
         },
@@ -178,7 +156,6 @@ export const jsonSchemaMetaSchema = {
           type: 'object',
           additionalProperties: {
             $ref: '#/$defs/jsonSchema',
-            $dynamicRef: '#meta',
           },
           propertyNames: {
             format: 'regex',
@@ -189,25 +166,20 @@ export const jsonSchemaMetaSchema = {
           type: 'object',
           additionalProperties: {
             $ref: '#/$defs/jsonSchema',
-            $dynamicRef: '#meta',
           },
           default: {},
         },
         propertyNames: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
         if: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
         then: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
         else: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
         allOf: {
           $ref: '#/$defs/schemaArray',
@@ -220,37 +192,30 @@ export const jsonSchemaMetaSchema = {
         },
         not: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
       },
     },
     unevaluated: {
       $schema: 'https://json-schema.org/draft/2020-12/schema',
-      $id: 'https://json-schema.org/draft/2020-12/meta/unevaluated',
       $vocabulary: {
         'https://json-schema.org/draft/2020-12/vocab/unevaluated': true,
       },
-      $dynamicAnchor: 'meta',
       title: 'Unevaluated applicator vocabulary meta-schema',
       type: ['object', 'boolean'],
       properties: {
         unevaluatedItems: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
         unevaluatedProperties: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
       },
     },
     validation: {
       $schema: 'https://json-schema.org/draft/2020-12/schema',
-      $id: 'https://json-schema.org/draft/2020-12/meta/validation',
       $vocabulary: {
         'https://json-schema.org/draft/2020-12/vocab/validation': true,
       },
-      $dynamicAnchor: 'meta',
       title: 'Validation vocabulary meta-schema',
       type: ['object', 'boolean'],
       properties: {
@@ -336,11 +301,9 @@ export const jsonSchemaMetaSchema = {
     },
     'meta-data': {
       $schema: 'https://json-schema.org/draft/2020-12/schema',
-      $id: 'https://json-schema.org/draft/2020-12/meta/meta-data',
       $vocabulary: {
         'https://json-schema.org/draft/2020-12/vocab/meta-data': true,
       },
-      $dynamicAnchor: 'meta',
       title: 'Meta-data vocabulary meta-schema',
       type: ['object', 'boolean'],
       properties: {
@@ -371,11 +334,9 @@ export const jsonSchemaMetaSchema = {
     },
     'format-annotation': {
       $schema: 'https://json-schema.org/draft/2020-12/schema',
-      $id: 'https://json-schema.org/draft/2020-12/meta/format-annotation',
       $vocabulary: {
         'https://json-schema.org/draft/2020-12/vocab/format-annotation': true,
       },
-      $dynamicAnchor: 'meta',
       title: 'Format vocabulary meta-schema for annotation results',
       type: ['object', 'boolean'],
       properties: {
@@ -386,11 +347,9 @@ export const jsonSchemaMetaSchema = {
     },
     content: {
       $schema: 'https://json-schema.org/draft/2020-12/schema',
-      $id: 'https://json-schema.org/draft/2020-12/meta/content',
       $vocabulary: {
         'https://json-schema.org/draft/2020-12/vocab/content': true,
       },
-      $dynamicAnchor: 'meta',
       title: 'Content vocabulary meta-schema',
       type: ['object', 'boolean'],
       properties: {
@@ -402,7 +361,6 @@ export const jsonSchemaMetaSchema = {
         },
         contentSchema: {
           $ref: '#/$defs/jsonSchema',
-          $dynamicRef: '#meta',
         },
       },
     },
@@ -423,7 +381,6 @@ export const jsonSchemaMetaSchema = {
       minItems: 1,
       items: {
         $ref: '#/$defs/jsonSchema',
-        $dynamicRef: '#meta',
       },
     },
     nonNegativeInteger: {

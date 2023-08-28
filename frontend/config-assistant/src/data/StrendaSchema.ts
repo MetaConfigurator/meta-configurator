@@ -192,8 +192,8 @@ export const STRENDA_SCHEMA: TopLevelSchema = {
         ph: {
           title: 'Ph',
           description: 'pH value of the assay',
-          exclusiveMinimum: '0.0',
-          exclusiveMaximum: '14.0',
+          exclusiveMinimum: 0.0,
+          exclusiveMaximum: 14.0,
           type: 'number',
         },
         role: {
