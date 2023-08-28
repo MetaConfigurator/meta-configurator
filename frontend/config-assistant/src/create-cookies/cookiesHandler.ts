@@ -35,7 +35,12 @@ const cookiesHandler = {
         const compressedSettingsData = JSON.stringify(newSettingsData);
 
         if (estimateSize(compressedSettingsData) <= maxCookieSize) {
-          VueCookies.set('settingsData', compressedSettingsData);
+          const expiryDate = new Date();
+          expiryDate.setDate(expiryDate.getDate() + 7); // Example: Expires in 7 days
+
+          VueCookies.set('settingsData', compressedSettingsData, {
+            expires: expiryDate,
+          });
           console.log('SettingsData cookie updated:', newSettingsData);
         } else {
           console.warn('Cookie size exceeds limit. SettingsData cookie not updated.');
