@@ -7,12 +7,15 @@ import type {Path} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {errorService} from '@/main';
 import {ref} from 'vue';
 import type {ValidationResults} from '@/helpers/validationService';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
   type: ConfigDataTreeNodeType;
+  highlighted: boolean;
   validationResults: ValidationResults;
 }>();
 
@@ -140,7 +143,7 @@ function focusEditingLabel() {
   <span class="flex flex-row w-full items-center">
     <span
       class="mr-2"
-      :class="{'hover:underline': canZoomIn()}"
+      :class="{'hover:underline': canZoomIn(), 'bg-yellow-100': highlighted}"
       :tabindex="canZoomIn() ? 0 : -1"
       @click="
         isPropertyNameEditable()

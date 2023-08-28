@@ -1,4 +1,4 @@
-import type {Ref, WritableComputedRef} from 'vue';
+import type {ComputedRef, Ref, WritableComputedRef} from 'vue';
 import {computed, ref} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
@@ -9,6 +9,7 @@ import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
+import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {ValidationResults, ValidationService} from '@/helpers/validationService';
 import {useDebounceFn, watchDebounced} from '@vueuse/core';
 import {errorService} from '@/main';
@@ -37,6 +38,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentPath: Ref<Path> = ref<Path>([]);
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
+  const currentHighlightedElements: Ref<Path[]> = ref<Path[]>([]);
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
@@ -94,7 +96,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     },
   });
 
-  const fileSchema = computed(() => {
+  const fileSchema: ComputedRef<TopLevelJsonSchema> = computed(() => {
     switch (currentMode.value) {
       case SessionMode.FileEditor:
         return useDataStore().schema;
@@ -200,6 +202,10 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentExpandedElements.value = _currentExpandedElements;
   }
 
+  function isHighlighted(path: Path): boolean {
+    return currentHighlightedElements.value.some(p => pathToString(p) === pathToString(path));
+  }
+
   return {
     currentMode,
     fileData,
@@ -215,6 +221,8 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentPath,
     currentSelectedElement,
     currentExpandedElements,
+    currentHighlightedElements,
+    isHighlighted,
     isExpanded,
     expand,
     collapse,

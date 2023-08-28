@@ -4,12 +4,10 @@ import {downloadFile} from '@/components/toolbar/downloadFile';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useDataStore} from '@/store/dataStore';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
-import {generateSampleData} from '@/components/toolbar/createSampleData';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
 import {errorService} from '@/main';
 import {ref} from 'vue';
-import {storeToRefs} from 'pinia';
 import type {SchemaOption} from '@/model/SchemaOption';
 import {openGenerateSampleFileDialog} from '@/components/toolbar/generateSampleFile';
 
@@ -24,16 +22,19 @@ export class TopMenuBar {
   private readonly onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
   private readonly onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
   private readonly handleFromURLClick: () => void;
+  private readonly handleSearchButtonClick: () => void;
   constructor(
     toast = null,
     onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
     onFromOurExampleClick: () => void,
-    handleFromURLClick: () => void
+    handleFromURLClick: () => void,
+    handleSearchButtonClick: () => void
   ) {
     this.toast = toast;
     this.onFromWebClick = onFromWebClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
     this.handleFromURLClick = handleFromURLClick;
+    this.handleSearchButtonClick = handleSearchButtonClick;
   }
 
   get fileEditorMenuItems() {
@@ -91,6 +92,14 @@ export class TopMenuBar {
         class: 'z-10',
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
       },
     ];
   }
@@ -177,6 +186,14 @@ export class TopMenuBar {
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
       },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
+      },
     ];
   }
 
@@ -222,6 +239,14 @@ export class TopMenuBar {
         class: 'z-10',
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
       },
     ];
   }

@@ -116,7 +116,7 @@ export class JsonSchema {
     return this.subItem(subElement)?.resolveOneOfAnyOf();
   }
 
-  private subProperty(subElement: string): JsonSchema | undefined {
+  subProperty(subElement: string): JsonSchema | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
@@ -135,7 +135,7 @@ export class JsonSchema {
     return this.additionalProperties;
   }
 
-  private subItem(subElement: number): JsonSchema | undefined {
+  subItem(subElement: number): JsonSchema | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
