@@ -33,7 +33,7 @@ export function clearFile() {
   useSessionStore().updateCurrentSelectedElement([]);
 }
 export function openClearFileDialog() {
-  newEmptySchemafile(
+  newEmptyFile(
     ' This will delete current config from File editor. Are you sure you want to continue?'
   );
 }
