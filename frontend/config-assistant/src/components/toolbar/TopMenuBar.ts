@@ -2,12 +2,15 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
 import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {useDataStore} from '@/store/dataStore';
-import {clearFile, openClearFileDialog} from '@/components/toolbar/clearFile';
+import {openClearFileDialog} from '@/components/toolbar/clearFile';
 import {useSessionStore} from '@/store/sessionStore';
-import {newEmptySchemafile, openClearSchemaDialog} from '@/components/toolbar/clearSchema';
+import {openClearSchemaDialog} from '@/components/toolbar/clearSchema';
+import {newEmptyFile} from '@/components/toolbar/clearFile';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {errorService} from '@/main';
 import {ref} from 'vue';
 import type {SchemaOption} from '@/model/SchemaOption';
-import {generateExampleData, openGenerateDataDialog} from '@/components/toolbar/createSampleData';
+import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -20,16 +23,19 @@ export class TopMenuBar {
   private readonly onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
   private readonly onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
   private readonly handleFromURLClick: () => void;
+  private readonly handleSearchButtonClick: () => void;
   constructor(
     toast = null,
     onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
     onFromOurExampleClick: () => void,
-    handleFromURLClick: () => void
+    handleFromURLClick: () => void,
+    handleSearchButtonClick: () => void
   ) {
     this.toast = toast;
     this.onFromWebClick = onFromWebClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
     this.handleFromURLClick = handleFromURLClick;
+    this.handleSearchButtonClick = handleSearchButtonClick;
   }
 
   get fileEditorMenuItems() {
@@ -87,6 +93,14 @@ export class TopMenuBar {
         class: 'z-10',
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
       },
     ];
   }
@@ -173,6 +187,14 @@ export class TopMenuBar {
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
       },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
+      },
     ];
   }
 
@@ -218,6 +240,14 @@ export class TopMenuBar {
         class: 'z-10',
         icon: 'fa-solid fa-share-nodes',
         disabled: true,
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Search',
+        icon: 'fa-solid fa-search',
+        command: this.handleSearchButtonClick,
       },
     ];
   }
