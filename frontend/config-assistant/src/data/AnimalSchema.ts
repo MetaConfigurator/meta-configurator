@@ -55,5 +55,5 @@ export const ANIMAL_SCHEMA: TopLevelSchema = {
       },
     },
   },
-  required: ['name', 'species'],
+  required: ['animalname', 'species'],
 };
