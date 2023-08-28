@@ -186,6 +186,23 @@ export const useSessionStore = defineStore('commonStore', () => {
     _.set(fileData.value, pathAsString!!, newValue);
   }
 
+  function removeDataAtPath(path: Path): void {
+    if (path.length === 0) {
+      updateCurrentPath([]);
+      updateCurrentSelectedElement([]);
+      fileData.value = {};
+      return;
+    }
+    const data = dataAtPath(path.slice(0, -1));
+    if (Array.isArray(data)) {
+      const indexToRemove = path[path.length - 1] as number;
+      data.splice(indexToRemove, 1);
+      return;
+    }
+    const pathAsString = pathToString(path);
+    _.unset(fileData.value, pathAsString!!);
+  }
+
   function isExpanded(path: Path): boolean {
     return currentExpandedElements.value[pathToString(path)!!] ?? false;
   }
@@ -230,6 +247,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     updateCurrentPath,
     updateCurrentSelectedElement,
     updateDataAtPath,
+    removeDataAtPath,
     currentEditorWrapper,
   };
 });

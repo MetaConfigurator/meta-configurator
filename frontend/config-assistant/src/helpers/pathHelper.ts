@@ -5,6 +5,10 @@ import {useSessionStore} from '@/store/sessionStore';
 export function dataAt(path: Path, data: any): any {
   let currentData: any = data;
 
+  if (currentData === undefined) {
+    return undefined;
+  }
+
   for (const key of path) {
     if (currentData[key] === undefined) {
       return undefined;

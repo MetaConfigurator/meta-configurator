@@ -6,10 +6,6 @@
  * the string representation. Should not be used by the caller.
  */
 export function dataToString(data: any, currentDepth = 0): string {
-  if (currentDepth > 1) {
-    // to deeply nested string representations are not useful
-    return '[...]';
-  }
   if (data === null) {
     return 'null';
   }
@@ -23,9 +19,15 @@ export function dataToString(data: any, currentDepth = 0): string {
     return data.toString();
   }
   if (Array.isArray(data)) {
+    if (currentDepth >= 2) {
+      return '...';
+    }
     return data.map((value: any) => dataToString(value, currentDepth + 1)).join(', ');
   }
   if (typeof data === 'object') {
+    if (currentDepth >= 2) {
+      return '...';
+    }
     return Object.entries(data)
       .map(([key, value]) => `${key}: ${dataToString(value, currentDepth + 1)}`)
       .join(', ');

@@ -36,6 +36,7 @@ const emit = defineEmits<{
   (e: 'zoom_into_path', path_to_add: Path): void;
   (e: 'select_path', path: Path): void;
   (e: 'update_data', path: Path, newValue: any): void;
+  (e: 'remove_property', path: Path): void;
 }>();
 
 const treeNodeResolver = new ConfigTreeNodeResolver();
@@ -109,6 +110,18 @@ function clickedPropertyData(nodeData: ConfigTreeNodeData) {
   if (useSessionStore().dataAtPath(path) != undefined) {
     emit('select_path', path);
   }
+}
+
+function removeProperty(subPath: Path) {
+  const completePath = props.currentPath.concat(subPath);
+  const parentPath = completePath.slice(0, -1);
+  const propertyName = completePath.slice(completePath.length - 1);
+  const dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
+  delete dataAtParentPath[propertyName];
+  updateData(parentPath, dataAtParentPath);
+
+  emit('remove_property', completePath);
+  updateTree();
 }
 
 function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData) {
@@ -401,6 +414,7 @@ function getValidationResults(absolutePath: Path) {
             class="w-full"
             :nodeData="slotProps.node.data"
             @update_property_value="updateData"
+            @remove_property="removeProperty"
             @update_tree="updateTree"
             @click="() => clickedPropertyData(slotProps.node.data)"
             bodyClass="w-full"
