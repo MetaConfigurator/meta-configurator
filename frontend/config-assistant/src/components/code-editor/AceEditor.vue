@@ -76,9 +76,9 @@ onMounted(() => {
   }
 
   watchEffect(() => {
-    const fontSize = useSettingsStore().settingsData.codeFontSize;
+    const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
 
-    if (editor && fontSize) {
+    if (editor.value && fontSize) {
       editor.value.setFontSize(fontSize);
     }
   });
