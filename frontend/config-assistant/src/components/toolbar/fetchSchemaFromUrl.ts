@@ -1,6 +1,3 @@
-import {errorService} from '@/main';
-import type {SchemaOption} from '@/model/SchemaOption';
-import {JSON_SCHEMA_STORE_CATALOG_URL} from '@/constants';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {useDataStore} from '@/store/dataStore';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
@@ -11,7 +8,7 @@ export async function fetchSchemaFromUrl(schemaURL: string, toast?: any): Promis
   const schemaName = schemaContent.title || 'Unknown Schema';
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   useDataStore().schemaData = schemaContent;
-  newEmptyFile('Do you want to also clear the current config file?');
+  newEmptyFile('Do you also want to clear the current config file?');
 
   if (toast) {
     toast.add({

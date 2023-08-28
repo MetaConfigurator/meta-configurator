@@ -1,6 +1,6 @@
 import {useDataStore} from '@/store/dataStore';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-
+import {errorService} from '@/main';
 export function openUploadFileDialog(): void {
   const inputElement = document.createElement('input');
 
@@ -18,14 +18,11 @@ export function openUploadFileDialog(): void {
           useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
           useDataStore().fileData = selectedConfig;
         } catch (error) {
-          console.error('Error parsing JSON schema:', error);
-          alert('Invalid JSON file. Please choose a valid JSON file.');
+          errorService.onError(error);
         }
       };
-
       reader.readAsText(file);
     }
   };
-
   inputElement.click();
 }

@@ -22,14 +22,6 @@ export function newEmptySchemafile(message: string | undefined = undefined): voi
       });
       clearSchema();
     },
-    reject: () => {
-      toastService.add({
-        severity: 'error',
-        summary: 'Rejected',
-        detail: 'Schema is kept',
-        life: 3000,
-      });
-    },
   });
 }
 export function clearSchema() {
@@ -37,4 +29,9 @@ export function clearSchema() {
   useDataStore().schemaData = {};
   useSessionStore().updateCurrentPath([]);
   useSessionStore().updateCurrentSelectedElement([]);
+}
+export function openClearSchemaDialog() {
+  newEmptySchemafile(
+    ' This will delete current schema from schema editor. Are you sure you want to continue?'
+  );
 }

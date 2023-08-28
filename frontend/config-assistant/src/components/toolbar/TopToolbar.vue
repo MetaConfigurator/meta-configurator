@@ -22,6 +22,7 @@ import {storeToRefs} from 'pinia';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
 import {fetchWebSchemas} from '@/components/toolbar/fetchWebSchemas';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
+import {fetchExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
@@ -125,7 +126,6 @@ async function handleFromWebClick(): Promise<void> {
     showFetchedSchemas.value = true;
     topMenuBar.showDialog.value = true;
   } catch (error) {
-    // Handle the error if there's an issue fetching the schema.
     errorService.onError(error);
   }
 }
@@ -145,17 +145,15 @@ watch(selectedSchema, async newSelectedSchema => {
       topMenuBar.showDialog.value = false;
       newEmptyFile('Do you want to clear current config data ?');
     } catch (error) {
-      // Handle the error if there's an issue fetching the schema.
       errorService.onError(error);
     }
   } else if (newSelectedSchema.key) {
     try {
-      topMenuBar.fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
+      await fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
       newEmptyFile('Do you want to also clear current config data ?');
     } catch (error) {
-      // Handle the error if there's an issue fetching the schema.
       errorService.onError(error);
     }
   }
@@ -164,13 +162,9 @@ watch(selectedSchema, async newSelectedSchema => {
 function showUrlDialog() {
   showUrlInputDialog.value = true;
 }
-
-// Method to hide the URL dialog
 function hideUrlDialog() {
   showUrlInputDialog.value = false;
 }
-
-// Method to fetch schema from URL
 async function fetchSchemaFromSelectedUrl() {
   await fetchSchemaFromUrl(schemaUrl.value!, toast);
   hideUrlDialog();
