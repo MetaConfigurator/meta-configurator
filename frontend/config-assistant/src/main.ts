@@ -14,7 +14,6 @@ import {registerIcons} from '@/fontawesome';
 import VueCookies from 'vue-cookies';
 
 import cookiesHandler from '@/create-cookies/cookiesHandler';
-import {VueCookieNext} from 'vue-cookie-next';
 
 // @ts-ignore
 const app = createApp(FileEditorView);
@@ -23,7 +22,7 @@ app.use(createPinia());
 app.use(router);
 app.use(PrimeVue);
 app.use(ToastService);
-app.use(VueCookieNext);
+app.use(VueCookies);
 
 app.use(ConfirmationService);
 
