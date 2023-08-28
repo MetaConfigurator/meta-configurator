@@ -17,6 +17,10 @@ export const simplifiedMetaSchema = {
     jsonSchema: {
       anyOf: [
         {
+          title: 'True or false',
+          type: 'boolean',
+        },
+        {
           $ref: '#/$defs/booleanProperty',
         },
         {
