@@ -52,14 +52,18 @@ const cookiesHandler = {
         () => useDataStore().fileData,
       ],
       ([newSchemaData, newSettingsData, newFileData]) => {
+        const compressedSchemaData = JSON.stringify(newSchemaData);
+        const compressedSettingsData = JSON.stringify(newSettingsData);
+        const compressedFileData = JSON.stringify(newFileData);
+
         if (
-          estimateSize(newSchemaData) <= maxCookieSize &&
-          estimateSize(newSettingsData) <= maxCookieSize &&
-          estimateSize(newFileData) <= maxCookieSize
+          estimateSize(compressedSchemaData) <= maxCookieSize &&
+          estimateSize(compressedSettingsData) <= maxCookieSize &&
+          estimateSize(compressedFileData) <= maxCookieSize
         ) {
-          VueCookies.set('schemaData', JSON.stringify(newSchemaData));
-          VueCookies.set('settingsData', JSON.stringify(newSettingsData));
-          VueCookies.set('fileData', JSON.stringify(newFileData));
+          VueCookies.set('schemaData', compressedSchemaData);
+          VueCookies.set('settingsData', compressedSettingsData);
+          VueCookies.set('fileData', compressedFileData);
           console.log('Cookies updated:', newSchemaData, newSettingsData, newFileData);
         } else {
           console.warn('Cookie size exceeds limit. Cookies not updated.');
