@@ -27,7 +27,7 @@ import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
 import RadioButton from 'primevue/radiobutton';
-import {useDataStore} from '@/store/dataStore';
+import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -162,21 +162,36 @@ watch(selectedSchema, async newSelectedSchema => {
 // Function to handle click on category radio button
 async function handleCategoryClick(categoryKey) {
   if (categoryKey === 'E') {
-    await fetchExampleSchema(selectedCategory.value); // Call fetchExampleSchema for "From Example"
-
-    // Watch logic adapted to the clicked 'From Example' category
-    if (selectedSchema.value && selectedSchema.value.key) {
-      try {
-        await fetchExampleSchema(selectedSchema.value.key); // Call the fetchExampleSchema method with the schema key
-        showFetchedSchemas.value = true;
-        topMenuBar.showDialog.value = false;
-        newEmptyFile('Do you want to also clear current config data ?');
-      } catch (error) {
-        errorService.onError(error);
-      }
+    try {
+      handleFromOurExampleClick();
+      showDialog.value = false;
+    } catch (error) {
+      errorService.onError(error);
+    }
+  } else if (categoryKey === 'J') {
+    try {
+      await handleFromWebClick();
+      showDialog.value = false;
+    } catch (error) {
+      errorService.onError(error);
+    }
+  } else if (categoryKey === 'F') {
+    try {
+      openUploadFileDialog();
+      showDialog.value = false;
+    } catch (error) {
+      errorService.onError(error);
+    }
+  } else if (categoryKey === 'U') {
+    try {
+      await fetchSchemaFromUrl(schemaUrl.value);
+      showDialog.value = false;
+    } catch (error) {
+      errorService.onError(error);
     }
   }
 }
+
 function showUrlDialog() {
   showUrlInputDialog.value = true;
 }
@@ -284,16 +299,7 @@ function toggleSearchBar() {
   }
 }
 const showDialog = ref(true);
-// Watch for changes in useDataStore().fileData
-watch(
-  () => useDataStore().fileData,
-  newFileData => {
-    if (Object.keys(newFileData).length === 0) {
-      showDialog.value = true; // Open the dialog when useDataStore().fileData is empty
-    }
-  }
-);
-const selectedCategory = ref('From Example');
+const selectedCategory = ref();
 const categories = ref([
   {name: 'From Example', key: 'E'},
   {name: 'From Json Schema Store', key: 'J'},
@@ -320,7 +326,7 @@ watchDebounced(
 
 <template>
   <Dialog v-model:visible="showDialog" header="Select a Schema">
-    <div class="flex flex-column gap-3">
+    <div class="flex flex-column gap-3 bigger-dialog-content">
       <div v-for="category in categories" :key="category.key" class="flex align-items-center">
         <RadioButton
           v-model="selectedCategory"
@@ -489,5 +495,8 @@ watchDebounced(
   font-size: large;
   color: #495057;
   padding: 0.35rem !important;
+}
+.bigger-dialog-content {
+  padding: 20px;
 }
 </style>
