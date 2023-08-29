@@ -24,8 +24,9 @@ import {fetchWebSchemas} from '@/components/toolbar/fetchWebSchemas';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
 import {fetchExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
-import {searchInDataAndSchema} from '@/helpers/search';
+import {searchInDataAndSchema, searchResultToMenuItem} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
+import {GuiConstants} from '@/constants';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -266,22 +267,39 @@ function toggleSearchBar() {
   }
 }
 
+const searchResultMenu = ref();
+const searchResultItems = ref<MenuItem[]>([]);
+
 watchDebounced(
   [searchTerm],
   () => {
     if (!searchTerm.value) {
-      useSessionStore().currentHighlightedElements = [];
+      useSessionStore().currentSearchResults = [];
+      searchResultItems.value = [];
       return;
     }
-    const searchResults = searchInDataAndSchema(searchTerm.value);
-    if (searchResults.length > 0) {
-      useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-      useSessionStore().currentSelectedElement = searchResults[0].path;
-    }
-    useSessionStore().currentHighlightedElements = searchResults.map(result => result.path);
+    searchInDataAndSchema(searchTerm.value)
+      .then(searchResults => {
+        if (searchResults.length > 0) {
+          useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
+          useSessionStore().currentSelectedElement = searchResults[0].path;
+        }
+        useSessionStore().currentSearchResults = searchResults;
+        searchResultItems.value = searchResults
+          .map(res => searchResultToMenuItem(res))
+          .slice(0, GuiConstants.MAX_SEARCH_RESULTS);
+      })
+      .catch(error => {
+        errorService.onError(error);
+      });
   },
   {debounce: 500}
 );
+
+const showSearchResultsMenu = event => {
+  searchResultMenu.value?.show(event, event.target);
+  focus('searchBar');
+};
 </script>
 
 <template>
@@ -377,8 +395,18 @@ watchDebounced(
           class="h-7 w-full"
           placeholder="Search for data or properties..."
           v-model="searchTerm"
+          @focus="showSearchResultsMenu"
+          @blur="() => searchResultMenu.value?.hide()"
           id="searchBar" />
       </span>
+      <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems">
+        <template #item="slotProps">
+          <div class="px-3 py-2">
+            <div class="font-bold">{{ slotProps.item.label }}</div>
+            <div class="text-xs">{{ slotProps.item.data }}</div>
+          </div>
+        </template>
+      </Menu>
       <Button
         v-if="searchBarVisible"
         class="toolbar-button"

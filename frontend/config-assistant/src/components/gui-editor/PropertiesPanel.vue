@@ -360,7 +360,8 @@ function closeInfoOverlayPanel() {
  */
 function isHighlighted(node: ConfigDataTreeNode) {
   return useSessionStore()
-    .currentHighlightedElements.map(path => pathToString(path))
+    .currentSearchResults.map(searchResult => searchResult.path)
+    .map(path => pathToString(path))
     .some(path => node.key && path.startsWith(node.key));
 }
 
