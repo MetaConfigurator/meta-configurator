@@ -26,6 +26,8 @@ import {fetchExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
+import RadioButton from 'primevue/radiobutton';
+import {useDataStore} from '@/store/dataStore';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -121,8 +123,7 @@ const items = ref(pageSelectionMenuItems);
 async function handleFromWebClick(): Promise<void> {
   try {
     // Wait for the fetch to complete
-    let fetchedSchemas = await fetchWebSchemas();
-    topMenuBar.fetchedSchemas = fetchedSchemas;
+    topMenuBar.fetchedSchemas = await fetchWebSchemas();
     showFetchedSchemas.value = true;
     topMenuBar.showDialog.value = true;
   } catch (error) {
@@ -158,7 +159,24 @@ watch(selectedSchema, async newSelectedSchema => {
     }
   }
 });
+// Function to handle click on category radio button
+async function handleCategoryClick(categoryKey) {
+  if (categoryKey === 'E') {
+    await fetchExampleSchema(selectedCategory.value); // Call fetchExampleSchema for "From Example"
 
+    // Watch logic adapted to the clicked 'From Example' category
+    if (selectedSchema.value && selectedSchema.value.key) {
+      try {
+        await fetchExampleSchema(selectedSchema.value.key); // Call the fetchExampleSchema method with the schema key
+        showFetchedSchemas.value = true;
+        topMenuBar.showDialog.value = false;
+        newEmptyFile('Do you want to also clear current config data ?');
+      } catch (error) {
+        errorService.onError(error);
+      }
+    }
+  }
+}
 function showUrlDialog() {
   showUrlInputDialog.value = true;
 }
@@ -265,7 +283,23 @@ function toggleSearchBar() {
     focus('searchBar');
   }
 }
-
+const showDialog = ref(true);
+// Watch for changes in useDataStore().fileData
+watch(
+  () => useDataStore().fileData,
+  newFileData => {
+    if (Object.keys(newFileData).length === 0) {
+      showDialog.value = true; // Open the dialog when useDataStore().fileData is empty
+    }
+  }
+);
+const selectedCategory = ref('From Example');
+const categories = ref([
+  {name: 'From Example', key: 'E'},
+  {name: 'From Json Schema Store', key: 'J'},
+  {name: 'From File', key: 'F'},
+  {name: 'From URL', key: 'U'},
+]);
 watchDebounced(
   [searchTerm],
   () => {
@@ -285,6 +319,19 @@ watchDebounced(
 </script>
 
 <template>
+  <Dialog v-model:visible="showDialog" header="Select a Schema">
+    <div class="flex flex-column gap-3">
+      <div v-for="category in categories" :key="category.key" class="flex align-items-center">
+        <RadioButton
+          v-model="selectedCategory"
+          :inputId="category.key"
+          name="category"
+          :value="category.name"
+          @click="handleCategoryClick(category.key)" />
+        <label :for="category.key" class="ml-2">{{ category.name }}</label>
+      </div>
+    </div>
+  </Dialog>
   <Dialog v-model:visible="topMenuBar.showDialog.value">
     <!-- Dialog content goes here -->
     <h3>Which Schema do you want to open?</h3>

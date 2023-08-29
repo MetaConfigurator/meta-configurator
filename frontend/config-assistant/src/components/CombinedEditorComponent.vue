@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import 'primeicons/primeicons.css';
-
 import SplitterPanel from 'primevue/splitterpanel';
 import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
 import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
@@ -17,7 +16,10 @@ import {useToast} from 'primevue/usetoast';
 import {useConfirm} from 'primevue/useconfirm';
 import {confirmationService} from '@/helpers/confirmationService';
 import {toastService} from '@/helpers/toastService';
-
+import RadioButton from 'primevue/radiobutton';
+import Dialog from 'primevue/dialog';
+import {useDataStore} from '@/store/dataStore';
+import {fetchExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
   if (!useSettingsStore().settingsData.guiEditorOnRightSide) {
@@ -31,7 +33,6 @@ let windowWidth = ref(window.innerWidth);
 window.onresize = () => {
   windowWidth.value = window.innerWidth;
 };
-
 function updateMode(newMode: SessionMode) {
   switch (newMode) {
     case SessionMode.FileEditor:
@@ -53,6 +54,7 @@ toastService.toast = useToast();
 <template>
   <Toast position="bottom-left" />
   <ConfirmDialog />
+
   <div class="w-full h-full flex" style="max-height: 100%">
     <main class="flex flex-col">
       <!-- toolbar -->
@@ -71,6 +73,7 @@ toastService.toast = useToast();
           :resizable="true">
           <component :is="panel" />
         </SplitterPanel>
+
         <SplitterPanel v-if="useSettingsStore().settingsData.debuggingActive">
           <PanelDataCurrentPath />
         </SplitterPanel>
