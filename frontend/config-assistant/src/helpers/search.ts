@@ -61,7 +61,7 @@ async function searchInDataAndSchemaRecursive(
   }
   if (data === undefined || (typeof data === 'object' && !Array.isArray(data))) {
     const propertyNames = Object.keys(data ?? {}).concat(Object.keys(schema?.properties ?? {}));
-    for (const propertyName of propertyNames) {
+    for (const propertyName of new Set(propertyNames)) {
       await searchInDataAndSchemaRecursive(
         data !== undefined ? data[propertyName] : undefined,
         schema?.subSchema(propertyName),
