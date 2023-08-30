@@ -58,6 +58,39 @@ onMounted(() => {
   sessionStore.currentEditorWrapper = editorWrapper;
   editor.value.$blockScrolling = Infinity;
 
+  const dropElement = document.getElementById('javascript-editor');
+
+  dropElement.addEventListener('dragover', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    // Show as copy
+  });
+
+  dropElement.addEventListener('dragenter', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    dropElement.classList.add('dragover');
+    // show the overlay
+  });
+
+  dropElement.addEventListener('dragleave', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    dropElement.classList.remove('dragover');
+    // hide the overlay
+  });
+
+  dropElement.addEventListener('drop', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    dropElement.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files && files.length) {
+      readFile(files[0]);
+    }
+  });
+
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
   } else if (props.dataFormat == 'yaml') {
@@ -75,7 +108,6 @@ onMounted(() => {
   editor.value.setOptions({
     autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
   });
-
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
@@ -189,6 +221,16 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
   let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
   return manipulator.determinePath(editorContent, targetCharacter);
 }
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = function (evt) {
+    if (typeof evt.target.result === 'string') {
+      editor.value.setValue(evt.target.result, -1);
+    } // -1 sets the cursor to the start of the editor
+  };
+  reader.readAsText(file, 'UTF-8');
+}
 </script>
 
 <template>
@@ -198,5 +240,22 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
 <style scoped>
 .p-component {
   margin: 0 !important;
+}
+
+#javascript-editor.dragover::before {
+  content: 'Drag and drop here';
+  font-size: 24px;
+  color: #666;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px dashed #666;
 }
 </style>
