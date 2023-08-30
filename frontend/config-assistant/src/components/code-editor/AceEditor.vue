@@ -77,7 +77,9 @@ onMounted(() => {
   dropElement.addEventListener('dragleave', function (e) {
     e.stopPropagation();
     e.preventDefault();
-    dropElement.classList.remove('dragover');
+    if (!dropElement.contains(e.relatedTarget)) {
+      dropElement.classList.remove('dragover');
+    }
     // hide the overlay
   });
 
