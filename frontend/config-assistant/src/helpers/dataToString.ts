@@ -4,33 +4,39 @@
  * @param data the data to convert, of any type
  * @param currentDepth internal parameter that takes care of not using too deeply nested data in
  * the string representation. Should not be used by the caller.
+ * @param limit max number of character to describe the data
  */
-export function dataToString(data: any, currentDepth = 0): string {
+export function dataToString(data: any, currentDepth = 0, limit?: number): string {
+  let result = '';
   if (data === null) {
-    return 'null';
+    result = 'null';
   }
   if (data === undefined) {
-    return '';
+    result = '';
   }
   if (typeof data === 'string') {
-    return data;
+    result = data;
   }
   if (typeof data === 'number' || typeof data === 'boolean') {
-    return data.toString();
+    result = data.toString();
   }
   if (Array.isArray(data)) {
     if (currentDepth >= 2) {
-      return '...';
+      result = '...';
     }
-    return data.map((value: any) => dataToString(value, currentDepth + 1)).join(', ');
+    result = data.map((value: any) => dataToString(value, currentDepth + 1, limit)).join(', ');
   }
   if (typeof data === 'object') {
     if (currentDepth >= 2) {
-      return '...';
+      result = '...';
     }
-    return Object.entries(data)
-      .map(([key, value]) => `${key}: ${dataToString(value, currentDepth + 1)}`)
+    result = Object.entries(data)
+      .map(([key, value]) => `${key}: ${dataToString(value, currentDepth + 1, limit)}`)
       .join(', ');
   }
-  return '';
+  if (limit !== undefined && result.length > limit) {
+    result = result.slice(0, limit) + '...';
+  }
+
+  return result;
 }
