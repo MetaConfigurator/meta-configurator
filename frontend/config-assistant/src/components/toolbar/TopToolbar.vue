@@ -121,8 +121,7 @@ const items = ref(pageSelectionMenuItems);
 async function handleFromWebClick(): Promise<void> {
   try {
     // Wait for the fetch to complete
-    let fetchedSchemas = await fetchWebSchemas();
-    topMenuBar.fetchedSchemas = fetchedSchemas;
+    topMenuBar.fetchedSchemas = await fetchWebSchemas();
     showFetchedSchemas.value = true;
     topMenuBar.showDialog.value = true;
   } catch (error) {
@@ -140,7 +139,7 @@ watch(selectedSchema, async newSelectedSchema => {
   }
   if (newSelectedSchema.url) {
     try {
-      await fetchSchemaFromUrl(newSelectedSchema.url);
+      await fetchSchemaFromUrl(newSelectedSchema.url, toast);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
       newEmptyFile('Do you want to clear current config data ?');
@@ -149,7 +148,7 @@ watch(selectedSchema, async newSelectedSchema => {
     }
   } else if (newSelectedSchema.key) {
     try {
-      await fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
+      await fetchExampleSchema(newSelectedSchema.key, toast); // Call the fetchExampleSchema method with the schema key
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
       newEmptyFile('Do you want to also clear current config data ?');
