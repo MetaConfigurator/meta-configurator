@@ -159,6 +159,14 @@ watch(selectedSchema, async newSelectedSchema => {
     }
   }
 });
+const showDialog = ref(true);
+const selectedCategory = ref();
+const categories = ref([
+  {name: 'From Example', key: 'E'},
+  {name: 'From Json Schema Store', key: 'J'},
+  {name: 'From File', key: 'F'},
+  {name: 'From URL', key: 'U'},
+]);
 // Function to handle click on category radio button
 async function handleCategoryClick(categoryKey) {
   if (categoryKey === 'E') {
@@ -184,14 +192,13 @@ async function handleCategoryClick(categoryKey) {
     }
   } else if (categoryKey === 'U') {
     try {
-      await fetchSchemaFromUrl(schemaUrl.value);
+      showUrlDialog();
       showDialog.value = false;
     } catch (error) {
       errorService.onError(error);
     }
   }
 }
-
 function showUrlDialog() {
   showUrlInputDialog.value = true;
 }
@@ -298,14 +305,6 @@ function toggleSearchBar() {
     focus('searchBar');
   }
 }
-const showDialog = ref(true);
-const selectedCategory = ref();
-const categories = ref([
-  {name: 'From Example', key: 'E'},
-  {name: 'From Json Schema Store', key: 'J'},
-  {name: 'From File', key: 'F'},
-  {name: 'From URL', key: 'U'},
-]);
 watchDebounced(
   [searchTerm],
   () => {
@@ -338,9 +337,8 @@ watchDebounced(
       </div>
     </div>
   </Dialog>
-  <Dialog v-model:visible="topMenuBar.showDialog.value">
+  <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
     <!-- Dialog content goes here -->
-    <h3>Which Schema do you want to open?</h3>
     <div class="card flex justify-content-center">
       <div class="listbox-container" style="width: 300px">
         <Listbox
