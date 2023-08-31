@@ -130,8 +130,14 @@ onMounted(() => {
     }
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-      sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-      sessionStore.currentSelectedElement = newPath;
+      if (JSON.stringify(sessionStore.currentSelectedElement) !== JSON.stringify(newPath)) {
+        sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+        sessionStore.currentSelectedElement = newPath;
+        console.log(
+          'currentselected element was in codeeditor updated to ',
+          sessionStore.currentSelectedElement
+        );
+      }
     } catch (e) {
       /* empty */
     }

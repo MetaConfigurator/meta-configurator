@@ -8,18 +8,6 @@ import {onMounted, watch} from 'vue';
 import {storeToRefs} from 'pinia';
 
 const sessionStore = useSessionStore();
-const {currentSelectedElement} = storeToRefs(sessionStore);
-
-onMounted(() => {
-  watch(
-    currentSelectedElement,
-    newVal => {
-      // new element has been selected
-      // TODO: automatically expand objects/arrays contained in path
-    },
-    {deep: true}
-  );
-});
 
 function updatePath(newPath: Path) {
   sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;

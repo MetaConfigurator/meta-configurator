@@ -24,6 +24,7 @@ import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/tree';
 import {focus, focusOnPath, selectContents} from '@/helpers/focusUtils';
+import {onMounted} from 'vue/dist/vue';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -100,6 +101,22 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
   updateTree();
   /*}*/
 });
+
+watch(
+  storeToRefs(useSessionStore()).currentSelectedElement,
+  newVal => {
+    console.log(
+      'currentselected element was detected as updated to ',
+      useSessionStore().currentSelectedElement
+    );
+    const absolutePath = useSessionStore().currentSelectedElement;
+    const pathToCutOff = useSessionStore().currentPath;
+    const relativePath = absolutePath.slice(pathToCutOff.length);
+    console.log('prepare expand element by path ', relativePath);
+    expandElementByPath(relativePath);
+  },
+  {deep: true}
+);
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
@@ -309,6 +326,20 @@ function displayAsRegularProperty(node: any) {
     node.type === TreeNodeType.SCHEMA_PROPERTY ||
     node.type === TreeNodeType.ADDITIONAL_PROPERTY
   );
+}
+
+function expandElementByPath(relativePath: Path) {
+  console.log('expand element by path ', relativePath);
+  if (relativePath.length == 0) {
+    return;
+  }
+  const firstPathElement = relativePath[0];
+  const nodeToExpand = findNode(firstPathElement);
+  if (nodeToExpand !== undefined) {
+    console.log('expand node ', nodeToExpand.key);
+    expandElement(nodeToExpand);
+    expandElementByPath(relativePath.slice(1));
+  }
 }
 
 function expandElement(node: any) {
