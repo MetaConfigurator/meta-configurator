@@ -14,6 +14,7 @@ import {ValidationResults, ValidationService} from '@/helpers/validationService'
 import {useDebounceFn, watchDebounced} from '@vueuse/core';
 import {errorService} from '@/main';
 import {GuiConstants} from '@/constants';
+import type {SearchResult} from '@/helpers/search';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -38,7 +39,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentPath: Ref<Path> = ref<Path>([]);
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
-  const currentHighlightedElements: Ref<Path[]> = ref<Path[]>([]);
+  const currentSearchResults: Ref<SearchResult[]> = ref<SearchResult[]>([]);
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
@@ -186,6 +187,23 @@ export const useSessionStore = defineStore('commonStore', () => {
     _.set(fileData.value, pathAsString!!, newValue);
   }
 
+  function removeDataAtPath(path: Path): void {
+    if (path.length === 0) {
+      updateCurrentPath([]);
+      updateCurrentSelectedElement([]);
+      fileData.value = {};
+      return;
+    }
+    const data = dataAtPath(path.slice(0, -1));
+    if (Array.isArray(data)) {
+      const indexToRemove = path[path.length - 1] as number;
+      data.splice(indexToRemove, 1);
+      return;
+    }
+    const pathAsString = pathToString(path);
+    _.unset(fileData.value, pathAsString!!);
+  }
+
   function isExpanded(path: Path): boolean {
     return currentExpandedElements.value[pathToString(path)!!] ?? false;
   }
@@ -203,7 +221,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   }
 
   function isHighlighted(path: Path): boolean {
-    return currentHighlightedElements.value.some(p => pathToString(p) === pathToString(path));
+    return currentSearchResults.value.some(p => pathToString(p.path) === pathToString(path));
   }
 
   return {
@@ -221,7 +239,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentPath,
     currentSelectedElement,
     currentExpandedElements,
-    currentHighlightedElements,
+    currentSearchResults,
     isHighlighted,
     isExpanded,
     expand,
@@ -230,6 +248,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     updateCurrentPath,
     updateCurrentSelectedElement,
     updateDataAtPath,
+    removeDataAtPath,
     currentEditorWrapper,
   };
 });

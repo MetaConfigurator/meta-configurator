@@ -21,8 +21,8 @@ function isExpanded(): boolean {
 </script>
 
 <template>
-  <div class="pl-3 grid grid-cols-5 items-center justify-between gap-x-6 w-full pr-5">
-    <span class="text-sm text-gray-400 truncate col-span-4" style="max-width: 90%">
+  <div class="pl-3 grid grid-cols-5 items-center justify-between gap-x-6 w-full">
+    <span class="text-sm text-gray-400 truncate col-span-4" style="max-width: 15rem">
       <span v-if="!isExpanded()">{{ dataToString(propertyData) }}</span>
     </span>
     <span class="text-gray-500 font-extralight justify-self-end">

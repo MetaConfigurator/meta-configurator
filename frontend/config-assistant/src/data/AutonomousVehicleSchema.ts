@@ -38,6 +38,11 @@ export const AUTONOMOUS_VEHICLE_SCHEMA: TopLevelSchema = {
           pattern: 'Sensor(0[1-9]|1[0-9]|20)$',
           title: 'SensorName',
         },
+        type: {
+          type: 'string',
+          description: 'Type of the sensor.',
+          enum: ['radar', 'lidar', 'ultrasonic'],
+        },
         range: {
           type: 'number',
           description: 'Maximum range of the sensor. Unit in mm',
@@ -81,33 +86,12 @@ export const AUTONOMOUS_VEHICLE_SCHEMA: TopLevelSchema = {
           enum: ['A* search', 'Dijkstra', 'Rapidly Random Tree (RRT)'],
           title: 'PlanningAlgorithm',
         },
-        SensorSet: {
-          type: 'object',
+        Sensors: {
           description: 'Set of sensors installed on the self-driving vehicle.',
-          properties: {
-            Radar: {
-              type: 'array',
-              description: 'Array of radar sensor properties.',
-              items: {
-                $ref: '#/$defs/SensorDefinition',
-              },
-            },
-            Lidar: {
-              type: 'array',
-              description: 'Array of lidar sensor properties.',
-              items: {
-                $ref: '#/$defs/SensorDefinition',
-              },
-            },
-            Ultrasonic: {
-              type: 'array',
-              description: 'Array of ultrasonic sensor properties.',
-              items: {
-                $ref: '#/$defs/SensorDefinition',
-              },
-            },
+          type: 'array',
+          items: {
+            $ref: '#/$defs/SensorDefinition',
           },
-          additionalProperties: false,
         },
         VehicleType: {
           type: 'string',
@@ -136,7 +120,7 @@ export const AUTONOMOUS_VEHICLE_SCHEMA: TopLevelSchema = {
           default: false,
         },
       },
-      required: ['StartingLocation', 'PlanningAlgorithm', 'SensorSet', 'VehicleType'],
+      required: ['StartingLocation', 'PlanningAlgorithm', 'Sensors', 'VehicleType'],
       title: 'SelfDrivingVehicle',
     },
     Environment: {
@@ -199,6 +183,7 @@ export const AUTONOMOUS_VEHICLE_SCHEMA: TopLevelSchema = {
             description: 'Average driving speed of the vehicle.',
             minimum: 0,
             maximum: 480,
+            multipleOf: 10,
             title: 'Driving Speed',
           },
           IsElectric: {
@@ -251,23 +236,12 @@ export const AUTONOMOUS_VEHICLE_SCHEMA: TopLevelSchema = {
       items: {
         type: 'object',
         properties: {
-          Distribution: {
-            type: 'string',
-            description: 'Distribution of pedestrians in the area.',
-            enum: ['even', 'sparse', 'dense'],
-          },
           Count: {
             type: 'integer',
             description: 'Number of pedestrians.',
             default: 1,
             minimum: 1,
             maximum: 1000,
-          },
-          AgeGroup: {
-            type: 'string',
-            description: 'Age group of pedestrians.',
-            enum: ['child', 'adult', 'elderly'],
-            default: 'adult',
           },
           Path: {
             type: 'array',
