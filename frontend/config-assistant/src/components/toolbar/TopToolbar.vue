@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Ref, ref, watch} from 'vue';
+import {onMounted, Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
@@ -15,6 +15,7 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
+import InitialSchemaSelectionDialog from '@/components/toolbar/InitialSchemaSelectionDialog.vue';
 
 import InputText from 'primevue/inputtext';
 
@@ -26,9 +27,8 @@ import {fetchExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
-import RadioButton from 'primevue/radiobutton';
 import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
-
+import {useDataStore} from '@/store/dataStore';
 const props = defineProps<{
   currentMode: SessionMode;
 }>();
@@ -120,6 +120,23 @@ const pageSelectionMenuItems: MenuItem[] = [
 
 const items = ref(pageSelectionMenuItems);
 
+function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
+  switch (option) {
+    case 'Example':
+      handleFromOurExampleClick();
+      break;
+    case 'JsonStore':
+      handleFromWebClick();
+      break;
+    case 'File':
+      openUploadFileDialog();
+      break;
+    case 'URL':
+      showUrlDialog();
+      break;
+  }
+}
+
 async function handleFromWebClick(): Promise<void> {
   try {
     // Wait for the fetch to complete
@@ -135,6 +152,9 @@ function handleFromOurExampleClick() {
   showFetchedSchemas.value = true;
   topMenuBar.showDialog.value = true;
 }
+onMounted(() => {
+  showCategoryDialog();
+});
 watch(selectedSchema, async newSelectedSchema => {
   if (!newSelectedSchema) {
     return;
@@ -153,52 +173,13 @@ watch(selectedSchema, async newSelectedSchema => {
       await fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to also clear current config data ?');
+      newEmptyFile('Do you want to clear current config data ?');
     } catch (error) {
       errorService.onError(error);
     }
   }
 });
-const showDialog = ref(true);
-const selectedCategory = ref();
-const categories = ref([
-  {name: 'From Example', key: 'E'},
-  {name: 'From Json Schema Store', key: 'J'},
-  {name: 'From File', key: 'F'},
-  {name: 'From URL', key: 'U'},
-]);
-// Function to handle click on category radio button
-async function handleCategoryClick(categoryKey) {
-  if (categoryKey === 'E') {
-    try {
-      handleFromOurExampleClick();
-      showDialog.value = false;
-    } catch (error) {
-      errorService.onError(error);
-    }
-  } else if (categoryKey === 'J') {
-    try {
-      await handleFromWebClick();
-      showDialog.value = false;
-    } catch (error) {
-      errorService.onError(error);
-    }
-  } else if (categoryKey === 'F') {
-    try {
-      openUploadFileDialog();
-      showDialog.value = false;
-    } catch (error) {
-      errorService.onError(error);
-    }
-  } else if (categoryKey === 'U') {
-    try {
-      showUrlDialog();
-      showDialog.value = false;
-    } catch (error) {
-      errorService.onError(error);
-    }
-  }
-}
+
 function showUrlDialog() {
   showUrlInputDialog.value = true;
 }
@@ -282,6 +263,12 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
 const searchTerm: Ref<string> = ref('');
 const searchBarVisible = ref(false);
 
+const initialSchemaSelectionDialog = ref();
+// Function to show the category selection dialog
+const showCategoryDialog = () => {
+  initialSchemaSelectionDialog.value?.show();
+};
+
 useMagicKeys({
   passive: false,
   onEventFired(event) {
@@ -324,19 +311,9 @@ watchDebounced(
 </script>
 
 <template>
-  <Dialog v-model:visible="showDialog" header="Select a Schema">
-    <div class="flex flex-column gap-3 bigger-dialog-content">
-      <div v-for="category in categories" :key="category.key" class="flex align-items-center">
-        <RadioButton
-          v-model="selectedCategory"
-          :inputId="category.key"
-          name="category"
-          :value="category.name"
-          @click="handleCategoryClick(category.key)" />
-        <label :for="category.key" class="ml-2">{{ category.name }}</label>
-      </div>
-    </div>
-  </Dialog>
+  <InitialSchemaSelectionDialog
+    ref="initialSchemaSelectionDialog"
+    @user_selected_option="option => handleUserSelection(option)" />
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
     <!-- Dialog content goes here -->
     <div class="card flex justify-content-center">
@@ -493,8 +470,5 @@ watchDebounced(
   font-size: large;
   color: #495057;
   padding: 0.35rem !important;
-}
-.bigger-dialog-content {
-  padding: 20px;
 }
 </style>
