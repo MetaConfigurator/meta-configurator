@@ -33,7 +33,6 @@ import {useDataStore} from '@/store/dataStore';
 
 import {GuiConstants} from '@/constants';
 
-
 const props = defineProps<{
   currentMode: SessionMode;
 }>();
@@ -298,10 +297,8 @@ function toggleSearchBar() {
   }
 }
 
-
 const searchResultMenu = ref();
 const searchResultItems = ref<MenuItem[]>([]);
-
 
 watchDebounced(
   [searchTerm],
