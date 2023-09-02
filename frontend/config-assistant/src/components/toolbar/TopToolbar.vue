@@ -157,7 +157,7 @@ function handleFromOurExampleClick() {
   topMenuBar.showDialog.value = true;
 }
 onMounted(() => {
-  showCategoryDialog();
+  showInitialSchemaDialog();
 });
 watch(selectedSchema, async newSelectedSchema => {
   if (!newSelectedSchema) {
@@ -269,7 +269,7 @@ const searchBarVisible = ref(false);
 
 const initialSchemaSelectionDialog = ref();
 // Function to show the category selection dialog
-const showCategoryDialog = () => {
+const showInitialSchemaDialog = () => {
   initialSchemaSelectionDialog.value?.show();
 };
 
