@@ -14,11 +14,6 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
       examples: ['Doe'],
     },
   },
-  additionalProperties: {
-    type: 'string',
-    description: 'Any other property',
-    maxLength: 20,
-  },
   patternProperties: {
     '^Number.*': {
       type: 'number',
@@ -35,9 +30,18 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
   },
   then: {
     properties: {
-      spouseName: {
-        type: 'string',
-        description: 'Spouse name',
+      spouse: {
+        type: 'object',
+        description: 'Spouse',
+        properties: {
+          name: {
+            $ref: '#/$defs/name',
+          },
+          firstName: {
+            type: 'string',
+            description: 'First name',
+          },
+        },
       },
     },
   },

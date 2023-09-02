@@ -13,11 +13,11 @@ export class EffectiveSchema {
 }
 
 export function calculateEffectiveSchema(
-  schema: JsonSchema,
+  schema: JsonSchema | undefined,
   data: any,
   path: Path
 ): EffectiveSchema {
-  let result = schema;
+  let result = schema ?? new JsonSchema({});
   let iteration = 0;
 
   while (result.isDataDependent && iteration < 1000) {

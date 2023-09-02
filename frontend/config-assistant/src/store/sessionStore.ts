@@ -161,12 +161,27 @@ export const useSessionStore = defineStore('commonStore', () => {
 
   const schemaAtCurrentPath: Ref<JsonSchema> = computed(() => schemaAtPath(currentPath.value));
 
+  function effectiveSchemaAt(path: Path): EffectiveSchema {
+    let currentEffectiveSchema: EffectiveSchema = calculateEffectiveSchema(
+      fileSchema.value,
+      fileData.value,
+      []
+    );
+
+    const currentPath = [];
+    for (const key of path) {
+      currentPath.push(key);
+      currentEffectiveSchema = calculateEffectiveSchema(
+        currentEffectiveSchema.schema.subSchema(key),
+        dataAtPath(currentPath),
+        currentPath
+      );
+    }
+    return currentEffectiveSchema;
+  }
+
   const effectiveSchemaAtCurrentPath: Ref<EffectiveSchema> = computed(() =>
-    calculateEffectiveSchema(
-      schemaAtCurrentPath.value,
-      dataAtPath(currentPath.value),
-      currentPath.value
-    )
+    effectiveSchemaAt(currentPath.value)
   );
 
   /**
