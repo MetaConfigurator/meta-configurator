@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Ref, ref, watch} from 'vue';
+import {onMounted, Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
@@ -15,6 +15,7 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
+import InitialSchemaSelectionDialog from '@/components/toolbar/InitialSchemaSelectionDialog.vue';
 
 import InputText from 'primevue/inputtext';
 
@@ -26,6 +27,10 @@ import {fetchExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema, searchResultToMenuItem} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
+
+import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
+import {useDataStore} from '@/store/dataStore';
+
 import {GuiConstants} from '@/constants';
 
 const props = defineProps<{
@@ -119,11 +124,27 @@ const pageSelectionMenuItems: MenuItem[] = [
 
 const items = ref(pageSelectionMenuItems);
 
+function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
+  switch (option) {
+    case 'Example':
+      handleFromOurExampleClick();
+      break;
+    case 'JsonStore':
+      handleFromWebClick();
+      break;
+    case 'File':
+      openUploadFileDialog();
+      break;
+    case 'URL':
+      showUrlDialog();
+      break;
+  }
+}
+
 async function handleFromWebClick(): Promise<void> {
   try {
     // Wait for the fetch to complete
-    let fetchedSchemas = await fetchWebSchemas();
-    topMenuBar.fetchedSchemas = fetchedSchemas;
+    topMenuBar.fetchedSchemas = await fetchWebSchemas();
     showFetchedSchemas.value = true;
     topMenuBar.showDialog.value = true;
   } catch (error) {
@@ -135,6 +156,9 @@ function handleFromOurExampleClick() {
   showFetchedSchemas.value = true;
   topMenuBar.showDialog.value = true;
 }
+onMounted(() => {
+  showInitialSchemaDialog();
+});
 watch(selectedSchema, async newSelectedSchema => {
   if (!newSelectedSchema) {
     return;
@@ -153,7 +177,7 @@ watch(selectedSchema, async newSelectedSchema => {
       await fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to also clear current config data ?');
+      newEmptyFile('Do you want to clear current config data ?');
     } catch (error) {
       errorService.onError(error);
     }
@@ -243,6 +267,12 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
 const searchTerm: Ref<string> = ref('');
 const searchBarVisible = ref(false);
 
+const initialSchemaSelectionDialog = ref();
+// Function to show the category selection dialog
+const showInitialSchemaDialog = () => {
+  initialSchemaSelectionDialog.value?.show();
+};
+
 useMagicKeys({
   passive: false,
   onEventFired(event) {
@@ -303,9 +333,11 @@ const showSearchResultsMenu = event => {
 </script>
 
 <template>
-  <Dialog v-model:visible="topMenuBar.showDialog.value">
+  <InitialSchemaSelectionDialog
+    ref="initialSchemaSelectionDialog"
+    @user_selected_option="option => handleUserSelection(option)" />
+  <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
     <!-- Dialog content goes here -->
-    <h3>Which Schema do you want to open?</h3>
     <div class="card flex justify-content-center">
       <div class="listbox-container" style="width: 300px">
         <Listbox

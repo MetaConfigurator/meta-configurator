@@ -3,11 +3,8 @@ import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {useDataStore} from '@/store/dataStore';
 import {openClearFileDialog} from '@/components/toolbar/clearFile';
-import {useSessionStore} from '@/store/sessionStore';
 import {openClearSchemaDialog} from '@/components/toolbar/clearSchema';
-import {newEmptyFile} from '@/components/toolbar/clearFile';
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {errorService} from '@/main';
+import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
 import type {SchemaOption} from '@/model/SchemaOption';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
@@ -144,7 +141,6 @@ export class TopMenuBar {
           {
             label: 'From URL',
             icon: 'fa-solid fa-globe',
-
             command: this.handleFromURLClick,
           },
           {

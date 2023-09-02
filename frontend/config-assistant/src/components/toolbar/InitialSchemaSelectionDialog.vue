@@ -1,0 +1,56 @@
+<script setup lang="ts">
+import {ref, defineEmits, watch} from 'vue';
+import RadioButton from 'primevue/radiobutton';
+import Dialog from 'primevue/dialog';
+const showDialog = ref(false);
+
+const categories = ref<Array<{name: string; key: 'Example' | 'JsonStore' | 'File' | 'URL'}>>([
+  {name: 'From Example', key: 'Example'},
+  {name: 'From Json Schema Store', key: 'JsonStore'},
+  {name: 'From File', key: 'File'},
+  {name: 'From URL', key: 'URL'},
+]);
+
+const emit = defineEmits<{
+  (e: 'user_selected_option', option: 'Example' | 'JsonStore' | 'File' | 'URL'): void;
+}>();
+
+const selectedCategory = ref();
+
+function openDialog() {
+  showDialog.value = true;
+}
+
+function hideDialog() {
+  showDialog.value = false;
+}
+// Watch for changes in selectedCategory and close the dialog if it's not null
+watch(selectedCategory, newValue => {
+  if (newValue !== null) {
+    hideDialog();
+  }
+});
+defineExpose({show: openDialog, close: hideDialog});
+</script>
+
+<template>
+  <!-- Render your radio buttons here, using v-for -->
+  <Dialog v-model:visible="showDialog" header="Select a Schema">
+    <div class="flex flex-column gap-3 bigger-dialog-content">
+      <div v-for="category in categories" :key="category.key" class="flex align-items-center">
+        <RadioButton
+          v-model="selectedCategory"
+          :inputId="category.key"
+          name="category"
+          :value="category.name"
+          @click="() => $emit('user_selected_option', category.key)" />
+        <label :for="category.key" class="ml-2">{{ category.name }}</label>
+      </div>
+    </div>
+  </Dialog>
+</template>
+<style scoped>
+.bigger-dialog-content {
+  padding: 20px;
+}
+</style>
