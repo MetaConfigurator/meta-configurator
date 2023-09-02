@@ -84,12 +84,35 @@ export const jsonSchemaMetaSchema = {
       },
       title: 'Core vocabulary meta-schema',
       type: ['object', 'boolean'],
-      properties: {
-        $id: {
-          $ref: '#/$defs/uriReferenceString',
-          $comment: 'Non-empty fragments not allowed.',
-          pattern: '^[^#]*#?$',
+      if: {
+        required: ['$schema'],
+      },
+      then: {
+        properties: {
+          $id: {
+            $ref: '#/$defs/uriReferenceString',
+            $comment: 'Non-empty fragments not allowed.',
+            pattern: '^[^#]*#?$',
+          },
+          $vocabulary: {
+            type: 'object',
+            propertyNames: {
+              $ref: '#/$defs/uriString',
+            },
+            additionalProperties: {
+              type: 'boolean',
+            },
+          },
+          $defs: {
+            type: 'object',
+            additionalProperties: {
+              $dynamicRef: '#meta',
+              $ref: '#/$defs/jsonSchema',
+            },
+          },
         },
+      },
+      properties: {
         $schema: {
           $ref: '#/$defs/uriString',
         },
@@ -105,23 +128,8 @@ export const jsonSchemaMetaSchema = {
         $dynamicAnchor: {
           $ref: '#/$defs/anchorString',
         },
-        $vocabulary: {
-          type: 'object',
-          propertyNames: {
-            $ref: '#/$defs/uriString',
-          },
-          additionalProperties: {
-            type: 'boolean',
-          },
-        },
         $comment: {
           type: 'string',
-        },
-        $defs: {
-          type: 'object',
-          additionalProperties: {
-            $ref: '#/$defs/jsonSchema',
-          },
         },
       },
     },

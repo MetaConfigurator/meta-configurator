@@ -25,6 +25,32 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
       description: 'Any number property',
     },
   },
+  if: {
+    properties: {
+      isMarried: {
+        const: true,
+      },
+    },
+    required: ['isMarried'],
+  },
+  then: {
+    properties: {
+      spouseName: {
+        type: 'string',
+        description: 'Spouse name',
+      },
+    },
+  },
+  dependentSchemas: {
+    nickNames: {
+      properties: {
+        preferredNickName: {
+          type: 'string',
+          description: 'Preferred nick name',
+        },
+      },
+    },
+  },
   properties: {
     name: {
       $ref: '#/$defs/name',
@@ -81,6 +107,9 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
           },
         },
       ],
+      dependentRequired: {
+        city: ['zipCode'],
+      },
       properties: {
         city: {
           type: 'string',

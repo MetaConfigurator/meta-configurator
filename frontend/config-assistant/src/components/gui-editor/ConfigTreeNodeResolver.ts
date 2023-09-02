@@ -11,6 +11,8 @@ import {pathToString} from '@/helpers/pathHelper';
 import {PropertySorting} from '@/model/SettingsTypes';
 import {useSessionStore} from '@/store/sessionStore';
 import _ from 'lodash';
+import type {EffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
+import {calculateEffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
 
 /**
  * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
@@ -50,11 +52,11 @@ export class ConfigTreeNodeResolver {
       type: nodeType,
       key: pathToString(absolutePath),
       children: [],
-      leaf: this.isLeaf(schema, absolutePath, depth),
+      leaf: this.isLeaf(schema, depth),
     };
   }
 
-  private isLeaf(schema: JsonSchema, absolutePath: Path, depth: number): boolean {
+  private isLeaf(schema: JsonSchema, depth: number): boolean {
     const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
     if (dependsOnUserSelection) {
       const hasUserSelection = schema.userSelectionOneOfAnyOf;
@@ -76,10 +78,16 @@ export class ConfigTreeNodeResolver {
     ) {
       return [];
     }
+    const effectiveSchema = calculateEffectiveSchema(
+      guiEditorTreeNode.data.schema,
+      useSessionStore().dataAtPath(guiEditorTreeNode.data.absolutePath),
+      guiEditorTreeNode.data.absolutePath
+    );
+
     guiEditorTreeNode.children = this.createChildNodes(
       guiEditorTreeNode.data.absolutePath,
       guiEditorTreeNode.data.relativePath,
-      guiEditorTreeNode.data.schema,
+      effectiveSchema,
       guiEditorTreeNode.data.depth
     );
     return guiEditorTreeNode.children as GuiEditorTreeNode[];
@@ -88,10 +96,11 @@ export class ConfigTreeNodeResolver {
   private createChildNodes(
     absolutePath: Path,
     relativePath: Path = [],
-    schema: JsonSchema,
+    effectiveSchema: EffectiveSchema,
     depth = 0
   ): GuiEditorTreeNode[] {
     const depthLimit = useSettingsStore().settingsData.guiEditor.maximumDepth;
+    const schema = effectiveSchema.schema;
 
     let children: GuiEditorTreeNode[] = [];
     if (schema.oneOf.length > 0) {

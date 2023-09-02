@@ -15,6 +15,10 @@ import {useDebounceFn, watchDebounced} from '@vueuse/core';
 import {errorService} from '@/main';
 import {GuiConstants} from '@/constants';
 import type {SearchResult} from '@/helpers/search';
+import {
+  calculateEffectiveSchema,
+  EffectiveSchema,
+} from '@/helpers/schema/effectiveSchemaCalculator';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -157,6 +161,14 @@ export const useSessionStore = defineStore('commonStore', () => {
 
   const schemaAtCurrentPath: Ref<JsonSchema> = computed(() => schemaAtPath(currentPath.value));
 
+  const effectiveSchemaAtCurrentPath: Ref<EffectiveSchema> = computed(() =>
+    calculateEffectiveSchema(
+      schemaAtCurrentPath.value,
+      dataAtPath(currentPath.value),
+      currentPath.value
+    )
+  );
+
   /**
    * Returns the data at the given path.
    * @param path The array of keys to traverse.
@@ -168,7 +180,7 @@ export const useSessionStore = defineStore('commonStore', () => {
 
   function updateCurrentPath(proposedPath: Path): void {
     currentPath.value = proposedPath;
-    const schema = schemaAtCurrentPath.value;
+    const schema = effectiveSchemaAtCurrentPath.value.schema;
     if (!schema.hasType('object') && !schema.hasType('array')) {
       currentPath.value = proposedPath.slice(0, -1);
     }
@@ -231,6 +243,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     fileSchemaData,
     schemaAtPath,
     schemaAtCurrentPath,
+    effectiveSchemaAtCurrentPath,
     schemaErrorMessage,
     dataValidationResults,
     validationService,

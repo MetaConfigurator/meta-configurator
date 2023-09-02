@@ -1,9 +1,8 @@
 import type {JsonSchemaObjectType, SchemaPropertyType} from '@/model/JsonSchemaType';
-// @ts-ignore
-import mergeAllOf from 'json-schema-merge-allof';
 import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
 import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
+import {mergeAllOfs} from '@/helpers/schema/mergeAllOfs';
 
 const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
 
@@ -15,48 +14,21 @@ const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
  */
 export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObjectType {
   let copiedSchema = {...schema}; // shallow copy to prevent changing the original schema
-  // TODO: resolve refs once at the beginning using json-schema-ref-parser
-  // this is technically possible because the json schema faker also uses json-schema-ref-parser
-  // and it works there
-  // so we have to find a way to make it work here as well
   if (hasRef(copiedSchema)) {
-    // remove leading # from ref if present
-    const refString = copiedSchema.$ref?.startsWith('#')
-      ? copiedSchema.$ref.substring(1)
-      : copiedSchema.$ref!!;
-
-    let refSchema: any;
-    if (preprocessedRefSchemas.has(refString)) {
-      refSchema = preprocessedRefSchemas.get(refString);
-    } else {
-      refSchema = pointer.get(
-        nonBooleanSchema(useSessionStore().fileSchemaData ?? {}) ?? {},
-        refString
-      );
-      refSchema = preprocessSchema(refSchema);
-      preprocessedRefSchemas.set(refString, refSchema);
-    }
-
-    delete copiedSchema.$ref;
-    copiedSchema = {allOf: [refSchema, copiedSchema]};
+    copiedSchema = resolveReference(copiedSchema);
   }
 
   if (hasAllOfs(copiedSchema)) {
     // @ts-ignore
-    copiedSchema.allOf = copiedSchema.allOf!!.map((subSchema, index) =>
+    copiedSchema.allOf = copiedSchema.allOf!!.map(subSchema =>
       preprocessSchema(subSchema as JsonSchemaObjectType)
     );
-    copiedSchema = mergeAllOf(copiedSchema, {
-      deep: false,
-      resolvers: {
-        defaultResolver: mergeAllOf.options.resolvers.title,
-      },
-    });
+    copiedSchema = mergeAllOfs(copiedSchema as JsonSchemaObjectType);
   }
 
   if (hasOneOfs(copiedSchema)) {
     // @ts-ignore
-    copiedSchema.oneOf = copiedSchema.oneOf!!.map((subSchema, index) => {
+    copiedSchema.oneOf = copiedSchema.oneOf!!.map(subSchema => {
       const copiedSchemaWithoutOneOf = {...copiedSchema};
       delete copiedSchemaWithoutOneOf.oneOf;
       delete copiedSchemaWithoutOneOf.title;
@@ -70,7 +42,7 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
 
   if (hasAnyOfs(copiedSchema)) {
     // @ts-ignore
-    copiedSchema.anyOf = copiedSchema.anyOf!!.map((subSchema, index) => {
+    copiedSchema.anyOf = copiedSchema.anyOf!!.map(subSchema => {
       const copiedSchemaWithoutAnyOf = {...copiedSchema};
       delete copiedSchemaWithoutAnyOf.anyOf;
       delete copiedSchemaWithoutAnyOf.title;
@@ -92,17 +64,30 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
   return copiedSchema;
 }
 
-function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
-  return mergeAllOf(schema, {
-    deep: false,
-    resolvers: {
-      defaultResolver: mergeAllOf.options.resolvers.title,
-    },
-  });
-}
-
 function hasRef(schema: JsonSchemaObjectType): boolean {
   return schema.$ref !== undefined;
+}
+
+function resolveReference(copiedSchema: JsonSchemaObjectType) {
+  // remove leading # from ref if present
+  const refString = copiedSchema.$ref?.startsWith('#')
+    ? copiedSchema.$ref.substring(1)
+    : copiedSchema.$ref!!;
+
+  let refSchema: any;
+  if (preprocessedRefSchemas.has(refString)) {
+    refSchema = preprocessedRefSchemas.get(refString);
+  } else {
+    refSchema = pointer.get(
+      nonBooleanSchema(useSessionStore().fileSchemaData ?? {}) ?? {},
+      refString
+    );
+    refSchema = preprocessSchema(refSchema);
+    preprocessedRefSchemas.set(refString, refSchema);
+  }
+
+  delete copiedSchema.$ref;
+  return {allOf: [refSchema, copiedSchema]};
 }
 
 function hasAllOfs(schema: JsonSchemaObjectType): boolean {

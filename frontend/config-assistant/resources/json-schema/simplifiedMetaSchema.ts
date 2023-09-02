@@ -250,28 +250,6 @@ export const simplifiedMetaSchema = {
             $ref: '#/$defs/stringArray',
           },
         },
-        dependencies: {
-          $comment:
-            '"dependencies" has been split and replaced by "dependentSchemas" and "dependentRequired" in order to serve their differing semantics.',
-          type: 'object',
-          additionalProperties: {
-            anyOf: [
-              {
-                $ref: '#/$defs/jsonSchema',
-              },
-              {
-                type: 'array',
-                items: {
-                  type: 'string',
-                },
-                uniqueItems: true,
-                default: [],
-              },
-            ],
-          },
-          deprecated: true,
-          default: {},
-        },
         dependentSchemas: {
           type: 'object',
           additionalProperties: {

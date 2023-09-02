@@ -33,15 +33,15 @@ export type JsonSchemaObjectType = {
   /**
    * @minItems 1
    */
-  allOf?: [JsonSchemaType, ...JsonSchemaType[]];
+  allOf?: JsonSchemaType[];
   /**
    * @minItems 1
    */
-  anyOf?: [JsonSchemaType, ...JsonSchemaType[]];
+  anyOf?: JsonSchemaType[];
   /**
    * @minItems 1
    */
-  oneOf?: [JsonSchemaType, ...JsonSchemaType[]];
+  oneOf?: JsonSchemaType[];
   not?: JsonSchemaType;
   unevaluatedItems?: JsonSchemaType;
   unevaluatedProperties?: JsonSchemaType;
