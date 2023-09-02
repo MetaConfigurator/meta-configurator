@@ -9,6 +9,7 @@ import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
+import _ from 'lodash';
 import {useDebounceFn, watchArray, watchThrottled} from '@vueuse/core';
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
@@ -130,8 +131,10 @@ onMounted(() => {
     }
     try {
       let newPath = determinePath(editor.value.getValue(), editor.value.getCursorPosition());
-      sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
-      sessionStore.currentSelectedElement = newPath;
+      if (!_.isEqual(sessionStore.currentSelectedElement, newPath)) {
+        sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
+        sessionStore.currentSelectedElement = newPath;
+      }
     } catch (e) {
       /* empty */
     }

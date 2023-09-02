@@ -30,7 +30,6 @@ export function pathToString(path: Path): string {
         )
         .slice(1);
 }
-
 export function convertAjvPathToPath(path: string): Path {
   return jsonPointerToPath(path);
 }

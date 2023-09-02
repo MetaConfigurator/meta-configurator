@@ -18,7 +18,7 @@ import {
   TreeNodeType,
 } from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
-import {useSessionStore} from '@/store/sessionStore';
+import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {dataAt, pathToJsonPointer, pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
@@ -100,6 +100,24 @@ watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
   updateTree();
   /*}*/
 });
+
+watch(
+  storeToRefs(useSessionStore()).currentSelectedElement,
+  newVal => {
+    if (useSessionStore().lastChangeResponsible == ChangeResponsible.GuiEditor) {
+      return;
+    }
+    const absolutePath = useSessionStore().currentSelectedElement;
+    const pathToCutOff = useSessionStore().currentPath;
+    const relativePath = absolutePath.slice(pathToCutOff.length);
+    if (relativePath.length > 0) {
+      // cut off last element, because we want to expand until last element, but not expand children of last element
+      const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
+      expandElementsByPath(relativePathToExpand);
+    }
+  },
+  {deep: true}
+);
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
@@ -311,8 +329,43 @@ function displayAsRegularProperty(node: any) {
   );
 }
 
-function expandElement(node: any) {
-  currentExpandedElements.value[node.key] = true;
+function expandElementsByPath(relativePath: Path) {
+  if (relativePath.length == 0) {
+    return;
+  }
+
+  let currentNode = currentTree.value;
+
+  for (
+    let relativePathToExpandLength = 1;
+    relativePathToExpandLength <= relativePath.length;
+    relativePathToExpandLength++
+  ) {
+    const relativePathToExpand = relativePath.slice(0, relativePathToExpandLength);
+    const absolutePathToExpand = pathToString(props.currentPath.concat(relativePathToExpand));
+
+    let childNodeToExpand = undefined;
+
+    // search child node to expand
+    for (const child of currentNode.children) {
+      if (child.key === absolutePathToExpand) {
+        childNodeToExpand = child;
+        break;
+      }
+    }
+    if (childNodeToExpand === undefined) {
+      break;
+    }
+
+    expandElementChildren(childNodeToExpand);
+    currentExpandedElements.value[childNodeToExpand.key] = true;
+
+    // update current node, so the next iteration which is one level deeper will use this node to search next child
+    currentNode = childNodeToExpand;
+  }
+}
+
+function expandElementChildren(node: any) {
   node.children = treeNodeResolver.createChildNodesOfNode(node);
   expandPreviouslyExpandedElements(node.children as Array<GuiEditorTreeNode>);
 }
@@ -383,9 +436,8 @@ function getValidationResults(absolutePath: Path) {
     row-hover
     :lazy="true"
     :loading="loadingDebounced"
-    :expandedKeys="currentExpandedElements"
-    @nodeExpand="expandElement"
-    @nodeCollapse="node => delete currentExpandedElements[node.key]"
+    v-model:expandedKeys="currentExpandedElements"
+    @nodeExpand="expandElementChildren"
     :filters="treeTableFilters">
     <Column field="name" header="Property" :sortable="true" expander>
       <template #body="slotProps">
