@@ -16,10 +16,7 @@ import {useToast} from 'primevue/usetoast';
 import {useConfirm} from 'primevue/useconfirm';
 import {confirmationService} from '@/helpers/confirmationService';
 import {toastService} from '@/helpers/toastService';
-import RadioButton from 'primevue/radiobutton';
-import Dialog from 'primevue/dialog';
-import {useDataStore} from '@/store/dataStore';
-import {fetchExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
+
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
   if (!useSettingsStore().settingsData.guiEditorOnRightSide) {
