@@ -37,6 +37,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
     },
     nickNames: {
       type: 'array',
+      title: 'Nick names',
       description: 'Nick names',
       items: {
         type: 'string',

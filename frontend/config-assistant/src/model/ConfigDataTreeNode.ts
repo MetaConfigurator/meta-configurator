@@ -38,6 +38,7 @@ export enum TreeNodeType {
 export interface AddItemTreeNodeData {
   schema: JsonSchema; // schema of the items
   parentSchema?: JsonSchema;
+  parentName?: PathElement;
   depth: number;
   relativePath: Path;
   absolutePath: Path;
@@ -48,6 +49,7 @@ export interface ConfigTreeNodeData {
   name: PathElement;
   schema: JsonSchema;
   parentSchema?: JsonSchema;
+  parentName?: PathElement;
   relativePath: Path;
   absolutePath: Path;
   depth: number;
@@ -57,6 +59,7 @@ export interface AddPropertyTreeData {
   name: PathElement;
   schema: JsonSchema;
   parentSchema: JsonSchema;
+  parentName?: PathElement;
   relativePath: Path;
   absolutePath: Path;
   depth: number;
