@@ -14,15 +14,45 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
       examples: ['Doe'],
     },
   },
-  additionalProperties: {
-    type: 'string',
-    description: 'Any other property',
-    maxLength: 20,
-  },
   patternProperties: {
     '^Number.*': {
       type: 'number',
       description: 'Any number property',
+    },
+  },
+  if: {
+    properties: {
+      isMarried: {
+        const: true,
+      },
+    },
+    required: ['isMarried'],
+  },
+  then: {
+    properties: {
+      spouse: {
+        type: 'object',
+        description: 'Spouse',
+        properties: {
+          name: {
+            $ref: '#/$defs/name',
+          },
+          firstName: {
+            type: 'string',
+            description: 'First name',
+          },
+        },
+      },
+    },
+  },
+  dependentSchemas: {
+    nickNames: {
+      properties: {
+        preferredNickName: {
+          type: 'string',
+          description: 'Preferred nick name',
+        },
+      },
     },
   },
   properties: {
@@ -82,6 +112,9 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
           },
         },
       ],
+      dependentRequired: {
+        city: ['zipCode'],
+      },
       properties: {
         city: {
           type: 'string',

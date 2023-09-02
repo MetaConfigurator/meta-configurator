@@ -14,9 +14,6 @@ import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption'
  * and a more convenient interface for accessing the schema.
  * Especially, it provides a way to access the schema at a given path and
  * null-safe access to the schema's properties.
- *
- * @todo For the future we need to define how "allOf", "anyOf", "oneOf",
- *       "if", "then", "else" and other properties that can contain a schema are handled.
  */
 export class JsonSchema {
   readonly jsonSchema?;
@@ -39,7 +36,8 @@ export class JsonSchema {
   private _else?: JsonSchema;
   private _contentSchema?: JsonSchema;
 
-  private _userSelectionOnOfAnyOf?: OneOfAnyOfSelectionOption;
+  private _userSelectionOnOfAnyOf?: OneOfAnyOfSelectionOption; // TODO move to session store
+  // TODO different user selections for oneOf and anyOf, multiple selections for anyOf
 
   constructor(jsonSchema: JsonSchemaType) {
     this.jsonSchema = nonBooleanSchema(jsonSchema);
@@ -174,6 +172,14 @@ export class JsonSchema {
 
   set userSelectionOneOfAnyOf(value) {
     this._userSelectionOnOfAnyOf = value;
+  }
+
+  get isDataDependent(): boolean {
+    return (
+      this.if !== undefined ||
+      this.dependentSchemas !== undefined ||
+      this.dependentRequired !== undefined
+    );
   }
 
   /**
@@ -408,13 +414,9 @@ export class JsonSchema {
    * this keyword's value, every item in the corresponding array is also the name of a property in the instance.
    *
    * Omitting this keyword has the same behavior as an empty object.
-   *
-   * @todo to properly support this, we need to calculate an effective schema depending on the
-   *      presence of other properties in the data.
    */
-  get dependentRequired(): {[k: string]: string[]} {
-    // TODO maybe also consider deprecated "dependencies" keyword
-    return this.jsonSchema?.dependentRequired ?? {};
+  get dependentRequired(): {[k: string]: string[]} | undefined {
+    return this.jsonSchema?.dependentRequired;
   }
 
   /**
@@ -426,12 +428,12 @@ export class JsonSchema {
    * Its use is dependent on the presence of the property.
    *
    * Omitting this keyword has the same behavior as an empty object.
-   *
-   * @todo to properly support this, we need to calculate an effective schema depending on the
-   *      presence of other properties in the data.
    */
-  get dependentSchemas(): Record<string, JsonSchema> {
+  get dependentSchemas(): Record<string, JsonSchema> | undefined {
     if (this._dependentSchemas === undefined) {
+      if (this.jsonSchema?.dependentSchemas === undefined) {
+        return undefined;
+      }
       this._dependentSchemas = schemaRecord(this.jsonSchema?.dependentSchemas);
     }
     return this._dependentSchemas;
