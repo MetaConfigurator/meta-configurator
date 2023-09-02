@@ -133,10 +133,6 @@ onMounted(() => {
       if (JSON.stringify(sessionStore.currentSelectedElement) !== JSON.stringify(newPath)) {
         sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
         sessionStore.currentSelectedElement = newPath;
-        console.log(
-          'currentselected element was in codeeditor updated to ',
-          sessionStore.currentSelectedElement
-        );
       }
     } catch (e) {
       /* empty */
