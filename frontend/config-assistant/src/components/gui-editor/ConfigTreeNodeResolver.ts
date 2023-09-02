@@ -37,12 +37,14 @@ export class ConfigTreeNodeResolver {
     nodeType: ConfigDataTreeNodeType = TreeNodeType.SCHEMA_PROPERTY
   ): GuiEditorTreeNode {
     const name = absolutePath[absolutePath.length - 1] ?? '';
+    const parentName = absolutePath[absolutePath.length - 2] ?? '';
 
     return {
       data: {
         name: name,
         schema: schema,
         parentSchema: parentSchema,
+        parentName: parentName,
         depth: depth,
         relativePath: relativePath,
         absolutePath: absolutePath,

@@ -3,12 +3,10 @@
 <script setup lang="ts">
 import type {ConfigDataTreeNodeType, GuiEditorTreeNode} from '@/model/ConfigDataTreeNode';
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
-import type {Path} from '@/model/path';
+import type {Path, PathElement} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {errorService} from '@/main';
 import {ref} from 'vue';
 import type {ValidationResults} from '@/helpers/validationService';
 
@@ -137,6 +135,15 @@ function focusEditingLabel() {
     emit('start_editing_property_name');
   }
 }
+
+function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
+  const name: PathElement = node.data.name;
+  if (typeof name === 'string') {
+    return name;
+  }
+  // array index
+  return (node.data.parentName || node.data.parentSchema?.title || 'element') + '[' + name + ']';
+}
 </script>
 
 <template>
@@ -166,7 +173,7 @@ function focusEditingLabel() {
           'line-through': isDeprecated(),
           italic: isAdditionalProperty() || isPatternProperty(),
         }">
-        {{ node.data.name }}
+        {{ getDisplayNameOfNode(props.node) }}
       </span>
       <!--Show red star after text if property is required -->
       <span class="text-red-600">{{ isRequired() ? '*' : '' }}</span>
