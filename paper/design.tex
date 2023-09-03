@@ -1,0 +1,112 @@
+% TODO: explain why and how we define our own meta schema based on json schema, because we use just subset of its features and because our schema is used to generate schema editor GUI and therefore should only show what is supported. Also we want to add descriptions and maybe more. Also limit options to not overwhelm and confuse the user. 
+
+
+% felix
+\subsection{Functionality}\label{subsec:functionality} % todo maybe rename it requirements?
+Before we dive into the architecture and detailed design of the tool, this section sketches what functionality the tool should have, from the viewpoint of a user.
+
+Figure \ref{mockup_gui_config} shows how the tool could look like for the user.
+
+
+\begin{figure*}[!t]
+    \includegraphics[width=\textwidth]{figures/mockup_gui_config}
+    \caption{Sketch of the Tool. Workflow: the user edits their use-case specific config file based on their use-case specific schema}
+    \label{mockup_gui_config}
+\end{figure*}
+
+% TODO: add numbered annotations to the screenshot and explain them here
+\begin{enumerate}
+    \item Blabla this is the menu bar
+\end{enumerate}
+
+
+Besides the workflow of editing a config file, the user can also use the tool to create a new use-case specific schema.
+This is illustrated in figure \ref{mockup_gui_schema}.
+The schema called \textit{MyPersonSchema} that was used in figure~\ref{mockup_gui_config} is defined in figure~\ref{mockup_gui_schema}.
+As a schema is a \cfgfile{} itself, it can be treated as such and the tool can offer assistance accordingly.
+Note that whenever the user edits a \cfgfile{} using the tool, they do so using some underlying schema.
+When editing a schema file, the underlying schema will be the schema of JSON Schema.
+
+\begin{figure*}[!t]
+    \includegraphics[width=\textwidth]{figures/mockup_gui_schema}
+    \caption{Sketch of the Tool. Workflow: the user creates a schema for their use-case, based on JSON Schema}
+    \label{mockup_gui_schema}
+\end{figure*}
+
+% TODO: add numbered annotations to the screenshot and explain them here
+\begin{enumerate}
+    \item Blabla this is the menu bar
+\end{enumerate}
+
+
+% felix
+
+\subsection{Architecture}\label{subsec:architecture} % todo diagram illustrating the architecture
+The core of our tool is a single source of truth data store that contains the current user configuration data (as a JavaScript Object).
+With this data store we can bidirectionally connect what we call ``editor panels''.
+An editor panel is a modular component that the user of the tool can access to modify the config data in an indirect way.
+It might be implemented as a raw text editor, a graphical user interface or any other way in which the data can be presented to the user.
+All editor panels are independent and do only have access to the data store but not to each other.
+Every editor panel subscribes to the changes of the data store, so it can be updated accordingly whenever the data in the store is changed.
+Additionally, every panel has the capabilities of updating the data store themselves, which is done when the user modifies the data in the editor panel.
+The following example use-cases illustrate the capabilities of this architecture:
+
+\begin{itemize}
+    \item Format converter: one panel shows the data in a rich-text editor in JSON format, a second panel shows the data in a rich-text editor in YAML format. Any semantic data change on one panel will cause the same semantic change in the other panel.
+    \item Split-Screen Editor: one panel shows the data in a rich-text editor, a second panel shows the data in a GUI. This way the user can have the efficiency of a text editor, but also the assistance of a GUI at the same time. Any semantic data change on one panel will be forwarded to the other panel. The GUI editor panel would require some data schema.
+    \item The Split-Screen Editor could be implemented for different data formats, such as YAML, JSON and XML. The architecture allows any data format as long as there exists a mapping from this data format to a JavaScript Object and back.
+\end{itemize}
+
+% TODO: Add diagram with store in center in several panels with bidirectional connection of subscribe/update
+
+% felix
+
+\subsubsection{Single Source of Truth Data Store}
+this is the core of the tool.
+The panels can subscribe to this store to receive updates whenever data is changed.
+Also, panels can trigger changes of the data in the store.
+Besides the current configuration data, the store also stores the \textit{path of the currently selected data entry} and the schema that is currently being used.
+
+% felix
+
+\subsubsection{Text Editor Panel} % todo instead of writing in future, write in simple present
+For the text editor panels, we embed a rich-text editor that already supports syntax highlighting and other useful features.
+We add validation of whether the text is well-formed according to the JSON/YAML/XML Standard and schema validation. % todo it already supports that
+The architecture allows for having one text editor panel that supports multiple languages, as well as for having separate text editor panels, one for each language.
+The panels subscribe to the data store.
+Whenever the configuration data is changed in the store, the panels will take the new configuration data JavaScript Object, serialize it into the given language and replace the text in the text editor with the new serialized data.
+The action of replacing the text in the text editor will cause formatting and comments to be lost.
+An alternative to replacing the complete text in the text editor, whenever data in the store is changed, would be to only replace the section of the text, which corresponds to the change.
+This would require on the one hand identifying which part of the data is affected by the change and on the other hand understanding of the data within the serialized text in a way that it can be manipulated (e.g.\ navigating within the hierarchical data structure and changing values of a given path). % todo state that this is out of scope and may be part of future work
+However, even such deep understanding of the text would wipe out non-default formatting at the sections affected by change.
+We tackle those difficulties in the following way: we accept that user-specific text formatting might be undone by our tool.
+To allow for different styles of formatting, we will provide the user with global formatting style settings (such as level of indentation or whether in YAML strings should be in quotation marks or not). % todo actually implement this
+Whenever the configuration data JavaScript Object is serialized into text, we apply those formatting style settings.
+Second, to deal with the loss of comments, we implement a technique that keeps track of any comments in the text and then restores them after the text is replaced. % todo either write that we don't support it for now or implement it
+
+When the user edits the text in the text editor, the text is deserialized into a JavaScript Object and sent to the data store, which then updates the configuration data object and notifies all other subscribed panels of the change.
+
+% felix
+
+\subsubsection{GUI Assistance Panel}
+The GUI assistance panel(s) directly work with the given schema and provide the user with corresponding GUI elements, such as a checkbox for a boolean data structure or a text field for a string data structure.
+Additional GUI elements, such as tooltips (showing the description of a data field) are used to support the easier.
+The GUI elements are constructed in the following manner: a schema is seen as a hierarchical tree of data field definitions and their corresponding constraints.
+A data field can either be simple (string, boolean, number, \ldots) or complex (array or dictionary of data fields).
+Every schema has a root data field.
+The GUI element for this root data field is constructed. % todo describe tree generation
+When constructing the GUI element for a complex data field, this includes constructing the GUI elements for all child data fields too.
+This way, the whole schema tree is traversed and GUI elements for all entries are constructed.
+To avoid overwhelming the user with too many GUI elements, the ones with child elements can be expanded or collapsed by the user and only a limited amount of them is expanded by default.
+By design, each of these constructed GUI elements is mapped to their corresponding data field (in other words: to a path in the data structure).
+The initial values of all GUI elements are taken from the data in the store, by accessing the data at the given paths.
+Whenever the values in a GUI element are adjusted by the user, the data in the store will be updated with the new values.
+
+In the following, the corresponding GUI elements for the different JSON Schema data types and constraints are shown:
+
+\textbf{Boolean}
+
+
+\textbf{Boolean}
+
+% todo: describe how it works. Then also describe for all the different data types, how we intend to implement the GUI aspect. E.g. for boolean we have checkbox
