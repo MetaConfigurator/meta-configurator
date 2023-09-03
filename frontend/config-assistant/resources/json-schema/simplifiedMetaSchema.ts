@@ -17,10 +17,6 @@ export const simplifiedMetaSchema = {
     jsonSchema: {
       anyOf: [
         {
-          title: 'True or false',
-          type: 'boolean',
-        },
-        {
           $ref: '#/$defs/booleanProperty',
         },
         {
@@ -51,7 +47,7 @@ export const simplifiedMetaSchema = {
           $ref: '#/$defs/refProperty',
         },
       ],
-      type: ['object', 'boolean'],
+      type: ['object'],
       $comment:
         'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
     },
@@ -129,7 +125,7 @@ export const simplifiedMetaSchema = {
     },
     core: {
       title: 'Core vocabulary meta-schema',
-      type: ['object', 'boolean'],
+      type: ['object'],
       properties: {
         $id: {
           $ref: '#/$defs/uriReferenceString',
@@ -353,7 +349,7 @@ export const simplifiedMetaSchema = {
       },
     },
     'meta-data': {
-      type: ['object', 'boolean'],
+      type: ['object'],
       properties: {
         title: {
           type: 'string',
