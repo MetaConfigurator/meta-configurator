@@ -37,6 +37,11 @@ export function resolveCorrespondingComponent(
       ...propsObject,
       possibleValues: nodeData.schema.enum,
     });
+  } else if (hasTwoOrMoreExamples(nodeData.schema)) {
+    return h(EnumProperty, {
+      ...propsObject,
+      possibleValues: nodeData.schema.examples,
+    });
   } else if (nodeData.schema.hasType('string')) {
     return h(StringProperty, propsObject);
   } else if (nodeData.schema.hasType('boolean')) {
@@ -52,4 +57,8 @@ export function resolveCorrespondingComponent(
   }
 
   return h('p', `Property ${nodeData.name} with type ${nodeData.schema.type} is not supported`);
+}
+
+function hasTwoOrMoreExamples(schema: any): boolean {
+  return schema.examples !== undefined && schema.examples.length > 1;
 }
