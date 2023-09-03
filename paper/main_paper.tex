@@ -1,0 +1,269 @@
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage{minted}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{lipsum}
+\usepackage[export]{adjustbox}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{booktabs}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore} % todo remove
+% updated with editorial comments 8/9/2021
+\usepackage{utfsym}
+\usepackage{makecell}
+\renewcommand{\checkmark}{\usym{1F5F8}}
+\newcommand{\cfgfiles}{configuration files}
+\newcommand{\cfgfile}{configuration file}
+
+
+\begin{document}
+
+ \title{Design, Implementation, and Evaluation of a Meta Configuration Tool Using Schema-to-UI Approaches}
+ \author{Felix Neubauer, Paul Bredl, Minye Xu, Keyuriben Patel}
+%\author{IEEE Publication Technology,~\IEEEmembership{Staff,~IEEE,}
+ % <-this % stops a space
+%\thanks{This paper was produced by the IEEE Publication Technology Group. They are in Piscataway, NJ.}% <-this % stops a space
+%\thanks{Manuscript received April 19, 2021; revised August 16, 2021.}}
+
+% The paper headers
+ \markboth{Journal of best software 2023}%
+ {Shell \MakeLowercase{\textit{et al.}}: Revolutionizing Software}
+
+%\IEEEpubid{0000--0000/00\$00.00~\copyright~2021 IEEE}
+% Remember, if you use this you must call \IEEEpubidadjcol in the second
+% column for its text to clear the IEEEpubid mark.
+
+ \maketitle
+
+ \begin{abstract}
+  % todo write abstract
+ \end{abstract}
+
+ \begin{IEEEkeywords}
+  JSON, YAML, configuration, schema, gui
+ \end{IEEEkeywords}
+
+
+ \section{Introduction}\label{sec:introduction} %felix
+
+ Textual formats to structure data, such as JSON, XML and YAML, are human-readable as well as machine-readable.
+
+ For configuration files such formats are often used, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
+ The format of those data structures can be defined by so-called schemas, which define the rules the data has to conform to.
+ Besides configuration files and the field of software development, other academic fields, such as Biology or Chemistry also use those formats to structure and validate their data.
+
+ To simplify, we will call all file instances using such formats \textit{\cfgfiles}.
+
+ Depending on the content of such \cfgfiles, they can be complex and time-consuming to modify and maintain.
+ Tooling, such as graphical user interfaces, can significantly reduce manual efforts and assist the user.
+ Those graphical user interfaces, however, require initial effort to be developed, as well as continuous effort in being maintained and updated when the underlying configuration schema changes.
+ We intend to tackle this problem by developing a meta program that allows humans to generate such configurator GUIs, which can be shared with others.
+
+ Our approach differs from other schema-to-UI approaches in following:
+
+ \begin{enumerate}
+  \item The tool combines the assistance of a GUI with the flexibility and speed of a rich-text editor by providing both in one view
+  \item The schema can be defined using the same tool
+  \item The defined schemas, the resulting configurator GUI and the modified configuration files can all be shared with others
+ \end{enumerate}
+
+
+ In section~\ref{sec:research} we will introduce related work and introduce existing schema formats as well as schema-to-gui approaches.
+ Next we will discuss the design of our solution (section TODO).
+
+
+% Summary of our approach/idea and reference the different sections, e.g. in Section 1 we will research existing work on that area and then in section 2 blabla.
+
+
+ \section{Related Work}\label{sec:research}
+ \input{related-work}
+
+
+ \section{Design}\label{sec:design}
+ \input{design}
+
+
+ \section{Methodology}
+
+
+
+
+
+ \subsubsection*{\bf A plain unnumbered list}
+ \begin{list}{}{}
+  \item{bare\_jrnl.tex}
+  \item{bare\_conf.tex}
+  \item{bare\_jrnl\_compsoc.tex}
+  \item{bare\_conf\_compsoc.tex}
+  \item{bare\_jrnl\_comsoc.tex}
+ \end{list}
+
+ \subsubsection*{\bf A simple numbered list}
+ \begin{enumerate}
+  \item{bare\_jrnl.tex}
+  \item{bare\_conf.tex}
+  \item{bare\_jrnl\_compsoc.tex}
+  \item{bare\_conf\_compsoc.tex}
+  \item{bare\_jrnl\_comsoc.tex}
+ \end{enumerate}
+
+ \subsubsection*{\bf A simple bulleted list}
+ \begin{itemize}
+  \item{bare\_jrnl.tex}
+  \item{bare\_conf.tex}
+  \item{bare\_jrnl\_compsoc.tex}
+  \item{bare\_conf\_compsoc.tex}
+  \item{bare\_jrnl\_comsoc.tex}
+ \end{itemize}
+
+ \subsection{Figures}
+ Fig. 1 is an example of a floating figure using the graphicx package.
+ Note that $\backslash${\tt{label}} must occur AFTER (or within) $\backslash${\tt{caption}}.
+ For figures, $\backslash${\tt{caption}} should occur after the $\backslash${\tt{includegraphics}}.
+
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=2.5in]{fig1}
+%\caption{Simulation results for the network.}
+%\label{fig_1}
+%\end{figure}
+
+ Fig. 2(a) and 2(b) is an example of a double column floating figure using two subfigures.
+ (The subfig.sty package must be loaded for this to work.)
+ The subfigure $\backslash${\tt{label}} commands are set within each subfloat command,
+ and the $\backslash${\tt{label}} for the overall figure must come after $\backslash${\tt{caption}}.
+ $\backslash${\tt{hfil}} is used as a separator to get equal spacing.
+ The combined width of all the parts of the figure should do not exceed the text width or a line break will occur.
+%
+%\begin{figure*}[!t]
+%\centering
+%\subfloat[]{\includegraphics[width=2.5in]{fig1}%
+%\label{fig_first_case}}
+%\hfil
+%\subfloat[]{\includegraphics[width=2.5in]{fig1}%
+%\label{fig_second_case}}
+%\caption{Dae. Ad quatur autat ut porepel itemoles dolor autem fuga. Bus quia con nessunti as remo di quatus non perum que nimus. (a) Case I. (b) Case II.}
+%\label{fig_sim}
+%\end{figure*}
+
+ Note that often IEEE papers with multi-part figures do not place the labels within the image itself (using the optional argument to $\backslash${\tt{subfloat}}[]), but instead will
+ reference/describe all of them (a), (b), etc., within the main caption.
+ Be aware that for subfig.sty to generate the (a), (b), etc., subfigure
+ labels, the optional argument to $\backslash${\tt{subfloat}} must be present. If a
+ subcaption is not desired, leave its contents blank,
+ e.g.,$\backslash${\tt{subfloat}}[].
+
+
+ \section{Tables}
+ Note that, for IEEE-style tables, the
+ $\backslash${\tt{caption}} command should come BEFORE the table. Table captions use title case. Articles (a, an, the), coordinating conjunctions (and, but, for, or, nor), and most short prepositions are lowercase unless they are the first or last word. Table text will default to $\backslash${\tt{footnotesize}} as
+ the IEEE normally uses this smaller font for tables.
+ The $\backslash${\tt{label}} must come after $\backslash${\tt{caption}} as always.
+
+ \begin{table}[!t]
+  \caption{An Example of a Table\label{tab:table1}}
+  \centering
+  \begin{tabular}{|c||c|}
+   \hline
+   One   & Two  \\
+   \hline
+   Three & Four \\
+   \hline
+  \end{tabular}
+ \end{table}
+
+
+ \section{Conclusion}\label{sec:conclusion}
+ The conclusion goes here.
+
+
+ \section*{Acknowledgments}
+ This should be a simple paragraph before the References to thank those individuals and institutions who have supported your work on this article.
+
+
+
+  {\appendix[Proof of the Zonklar Equations]
+ Use $\backslash${\tt{appendix}} if you have a single appendix:
+ Do not use $\backslash${\tt{section}} anymore after $\backslash${\tt{appendix}}, only $\backslash${\tt{section*}}.
+ If you have multiple appendixes use $\backslash${\tt{appendices}} then use $\backslash${\tt{section}} to start each appendix.
+ You must declare a $\backslash${\tt{section}} before using any $\backslash${\tt{subsection}} or using $\backslash${\tt{label}} ($\backslash${\tt{appendices}} by itself
+ starts a section numbered zero.)}
+
+
+%{\appendices
+%\section*{Proof of the First Zonklar Equation}
+%Appendix one text goes here.
+% You can choose not to have a title for an appendix if you want by leaving the argument blank
+%\section*{Proof of the Second Zonklar Equation}
+%Appendix two text goes here.}
+
+
+ \section{References Section}
+ You can use a bibliography generated by BibTeX as a .bbl file.
+ BibTeX documentation can be easily obtained at:
+ http://mirror.ctan.org/biblio/bibtex/contrib/doc/
+ The IEEEtran BibTeX style support page is:
+ http://www.michaelshell.org/tex/ieeetran/bibtex/
+
+ \bibliographystyle{IEEEtran}
+ \bibliography{literature}
+ % argument is your BibTeX string definitions and bibliography database(s)
+%\bibliography{IEEEabrv,../bib/paper}
+%
+
+
+ \section{Simple References}
+ You can manually copy in the resultant .bbl file and set second argument of $\backslash${\tt{begin}} to the number of references
+ (used to reserve space for the reference number labels box).
+
+%\begin{thebibliography}{1}
+%\bibliographystyle{IEEEtran}
+
+
+%\end{thebibliography}
+
+
+ \newpage
+
+
+ \section{Biography Section}
+ If you have an EPS/PDF photo (graphicx package needed), extra braces are
+ needed around the contents of the optional argument to biography to prevent
+ the LaTeX parser from getting confused when it sees the complicated
+ $\backslash${\tt{includegraphics}} command within an optional argument. (You can create
+ your own custom macro containing the $\backslash${\tt{includegraphics}} command to make things
+ simpler here.)
+
+ \vspace{11pt}
+
+ \bf{If you include a photo:}\vspace{-33pt}
+%\begin{IEEEbiography}%[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{fig1}}]{Michael %Shell}
+%Use $\backslash${\tt{begin\{IEEEbiography\}}} and then for the 1st argument use %$\backslash${\tt{includegraphics}} to declare and link the author photo.
+%Use the author name as the 3rd argument followed by the biography text.
+%\end{IEEEbiography}
+
+ \vspace{11pt}
+
+ \bf{If you will not include a photo:}\vspace{-33pt}
+ \begin{IEEEbiographynophoto}{John Doe}
+  Use $\backslash${\tt{begin\{IEEEbiographynophoto\}}} and the author name as the argument followed by the biography text.
+ \end{IEEEbiographynophoto}
+
+
+
+
+ \vfill
+
+\end{document}
+
+
