@@ -30,9 +30,9 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
 
   if (hasAllOfs(copiedSchema)) {
     // @ts-ignore
-    copiedSchema.allOf = copiedSchema.allOf!!.map(subSchema => {
-      return preprocessSchema(subSchema as JsonSchemaObjectType);
-    });
+    copiedSchema.allOf = copiedSchema.allOf!!.map(subSchema =>
+      preprocessSchema(subSchema as JsonSchemaObjectType)
+    );
     copiedSchema = mergeAllOfs(copiedSchema as JsonSchemaObjectType);
   }
 
@@ -85,8 +85,6 @@ function convertTypesToOneOf(schema: JsonSchemaObjectType) {
       };
 
       schema.oneOf!.forEach((originalOneOf: JsonSchemaType) => {
-        console.log('for originalOneOf ', originalOneOf);
-
         // TODO: handle case where OneOfs already have one or more types
         const combinedSchema = {
           allOf: [typeSchema, originalOneOf],
