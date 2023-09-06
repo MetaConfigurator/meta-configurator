@@ -12,9 +12,6 @@ export const simplifiedMetaSchema = {
         {
           $ref: '#/$defs/objectProperty',
         },
-        {
-          type: ['object'],
-        },
       ],
     },
     jsonSchema: {

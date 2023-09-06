@@ -3,7 +3,6 @@ import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
 import mergeAllOf from 'json-schema-merge-allof';
 
 export function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
-  console.log('merge allOfs for ', schema);
   return mergeAllOf(schema, {
     deep: false,
     resolvers: {
@@ -14,7 +13,6 @@ export function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType 
 }
 
 export function safeMergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType | false {
-  console.log('merge allOfs for ', schema);
   try {
     return mergeAllOf(schema, {
       deep: false,
