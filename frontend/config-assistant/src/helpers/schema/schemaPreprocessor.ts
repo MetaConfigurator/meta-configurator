@@ -6,7 +6,7 @@ import type {
 import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
 import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
-import {mergeAllOfs} from '@/helpers/schema/mergeAllOfs';
+import {mergeAllOfs, safeMergeAllOfs} from '@/helpers/schema/mergeAllOfs';
 
 const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
 
@@ -27,23 +27,30 @@ export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObject
   if (hasRef(copiedSchema)) {
     copiedSchema = resolveReference(copiedSchema);
   }
+  console.log('preprocess schema ', {...copiedSchema});
 
   if (hasAllOfs(copiedSchema)) {
     // @ts-ignore
     copiedSchema.allOf = copiedSchema.allOf!!.map(subSchema =>
       preprocessSchema(subSchema as JsonSchemaObjectType)
     );
+    console.log('basic merge allOfs for ', copiedSchema);
     copiedSchema = mergeAllOfs(copiedSchema as JsonSchemaObjectType);
   }
 
+  console.log('start convert types to OneOf', {...copiedSchema});
   convertTypesToOneOf(copiedSchema);
+  console.log('finished convert types to OneOf', {...copiedSchema});
   preprocessOneOfs(copiedSchema);
+  //copiedSchema = removeRedundantOneOfs(copiedSchema)
   preprocessAnyOfs(copiedSchema);
+  //copiedSchema = removeRedundantAnyOfs(copiedSchema)
 
   induceTitles(copiedSchema);
 
   convertConstToEnum(copiedSchema);
   injectTypesOfEnum(copiedSchema);
+  console.log('finish preprocess schema ', {...copiedSchema});
 
   return copiedSchema;
 }
@@ -63,7 +70,8 @@ function convertTypesToOneOf(schema: JsonSchemaObjectType) {
   }
 
   // easier scenario: no oneOfs
-  if (!hasOneOfs(schema)) {
+  if (!hasOneOfs(schema) && schema.type.length > 1) {
+    console.log('XYX has types and no one of ', {...schema});
     let newOneOfs: JsonSchemaType[] = [];
 
     schema.type.forEach(propertyType => {
@@ -71,11 +79,12 @@ function convertTypesToOneOf(schema: JsonSchemaObjectType) {
         type: propertyType,
       };
 
-      newOneOfs.push(typeSchema);
+      newOneOfs.push(preprocessSchema(typeSchema as JsonSchemaObjectType));
     });
 
     schema.oneOf = newOneOfs;
     delete schema.type;
+    console.log('XYX afterwards ', {...schema});
   } else {
     // more difficult scenario: oneOfs exist. Multiply original oneOfs with types
     let newOneOfs: JsonSchemaType[] = [];
@@ -87,8 +96,12 @@ function convertTypesToOneOf(schema: JsonSchemaObjectType) {
       schema.oneOf!.forEach((originalOneOf: JsonSchemaType) => {
         // TODO: handle case where OneOfs already have one or more types
         const combinedSchema = {
-          allOf: [typeSchema, originalOneOf],
+          allOf: [
+            preprocessSchema(typeSchema as JsonSchemaObjectType),
+            preprocessSchema(originalOneOf as JsonSchemaObjectType),
+          ],
         };
+        console.log('merge all of trigger with combinedSchema ', {...combinedSchema});
         const newOneOf = mergeAllOfs(combinedSchema);
         newOneOfs.push(newOneOf);
       });
@@ -109,25 +122,86 @@ function preprocessAnyOfs(schema: JsonSchemaObjectType) {
       const resultSchema = {
         allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutAnyOf],
       };
-      return mergeAllOfs(resultSchema as JsonSchemaObjectType);
+      console.log('merge all of trigger with resultSchema from anyOfs ', {...resultSchema});
+      // use safeMergeAllOfs because it can happen that resulting schema is not valid
+      // For example when schema with type: object and a oneOf that has one option with type object and
+      // another object with type boolean, then the option with boolean will never be valid.
+      // In that scenario, safeMergeAllOfs will return the 'false' schema value.
+      return safeMergeAllOfs(resultSchema as JsonSchemaObjectType);
     });
+
+    if (schema.anyOf.filter(item => item == false).length > 0) {
+      console.log('anyOf got an invalid subschema that will be removed');
+    }
+    schema.anyOf = schema.anyOf.filter(anyOf => anyOf != false);
   }
 }
 
 function preprocessOneOfs(schema: JsonSchemaObjectType) {
   if (hasOneOfs(schema)) {
+    console.log('preprocess oneOfs for ', schema);
     // @ts-ignore
     schema.oneOf = schema.oneOf!!.map(subSchema => {
       const copiedSchemaWithoutOneOf = {...schema};
       delete copiedSchemaWithoutOneOf.oneOf;
       delete copiedSchemaWithoutOneOf.title;
       delete copiedSchemaWithoutOneOf.description;
+      console.log('preprocess oneOf subSchema ', subSchema, ' and copied schema withoutOneOf ', {
+        ...copiedSchemaWithoutOneOf,
+      });
       const resultSchema = {
         allOf: [preprocessSchema(subSchema as JsonSchemaObjectType), copiedSchemaWithoutOneOf],
       };
-      return mergeAllOfs(resultSchema as JsonSchemaObjectType);
+      console.log('merge all of trigger with resultSchema from oneOfs ', resultSchema);
+      // use safeMergeAllOfs because it can happen that resulting schema is not valid
+      // For example when schema with type: object and a oneOf that has one option with type object and
+      // another object with type boolean, then the option with boolean will never be valid.
+      // In that scenario, safeMergeAllOfs will return the 'false' schema value.
+      return safeMergeAllOfs(resultSchema as JsonSchemaObjectType);
     });
+
+    if (schema.oneOf.filter(item => item == false).length > 0) {
+      console.log('oneOf got an invalid subschema that will be removed');
+    }
+    schema.oneOf = schema.oneOf.filter(oneOf => oneOf != false);
   }
+}
+
+function removeRedundantOneOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
+  console.log('remove redundant oneOfs');
+  if (hasOneOfs(schema)) {
+    if (schema.oneOf!!.length == 1) {
+      const copiedSchema = {...schema};
+      delete copiedSchema.oneOf;
+      let optimizedSchema = {
+        allOf: [schema.oneOf!![0], copiedSchema],
+      };
+      console.log('remove redundant oneOfs mergeAllOfs ', {...optimizedSchema});
+      return mergeAllOfs(optimizedSchema);
+    } else if (schema.oneOf!!.length == 0) {
+      console.log('Impossible oneOfs found for ', {...schema});
+    }
+  }
+
+  return schema;
+}
+function removeRedundantAnyOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
+  console.log('remove redundant anyOfs');
+  if (hasAnyOfs(schema)) {
+    if (schema.anyOf!!.length == 1) {
+      const copiedSchema = {...schema};
+      delete copiedSchema.anyOf;
+      let optimizedSchema = {
+        allOf: [schema.anyOf!![0], copiedSchema],
+      };
+      console.log('remove redundant anyOf mergeAllOfs ', {...optimizedSchema});
+      return mergeAllOfs(optimizedSchema);
+    } else if (schema.anyOf!!.length == 0) {
+      console.log('Impossible anyOf found for ', {...schema});
+    }
+  }
+
+  return schema;
 }
 
 function resolveReference(copiedSchema: JsonSchemaObjectType) {
