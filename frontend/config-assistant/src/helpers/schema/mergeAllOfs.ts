@@ -11,3 +11,11 @@ export function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType 
     },
   });
 }
+
+export function safeMergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType | false {
+  try {
+    return mergeAllOfs(schema);
+  } catch (e) {
+    return false;
+  }
+}

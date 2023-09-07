@@ -21,6 +21,8 @@ export function schemaOptionToString(schema: JsonSchema, index: number): string 
     result += ': ' + schema.title;
   } else if (schema.description) {
     result += ': ' + schema.description;
+  } else if (schema.type) {
+    result += ': ' + schema.type;
   }
 
   return result;
