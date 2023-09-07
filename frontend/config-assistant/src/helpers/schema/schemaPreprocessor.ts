@@ -14,8 +14,11 @@ const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
  * Preprocesses the schema:
  * - Resolves references (lazy resolver)
  * - Merges all-ofs
- * - For all oneOfs and anyOfs: copies the property schema into the sub-schemas
- * - Induce title for schema if it does not have title defined
+ * - Converts list of types to oneOfs
+ * - Removes oneOfs and anyOfs not compatible with schema
+ * - Merges back oneOfs and anyOfs with just one single entry into the schema
+ * - If it is possible: merges oneOfs into anyOfs
+ * - Induces title for schema if it does not have title defined
  * - Converts const to enum
  * - Injects types of enum to types property
  *
