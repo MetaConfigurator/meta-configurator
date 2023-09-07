@@ -14,15 +14,8 @@ export function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType 
 
 export function safeMergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType | false {
   try {
-    return mergeAllOf(schema, {
-      deep: false,
-      resolvers: {
-        defaultResolver: mergeAllOf.options.resolvers.title,
-        // add additional resolvers here, most of the keywords are NOT supported by default
-      },
-    });
+    return mergeAllOfs(schema);
   } catch (e) {
-    console.log('Cannot merge allOfs for ', schema);
     return false;
   }
 }
