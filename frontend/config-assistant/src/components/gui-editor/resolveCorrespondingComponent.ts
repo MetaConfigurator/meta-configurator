@@ -37,7 +37,7 @@ export function resolveCorrespondingComponent(
       ...propsObject,
       possibleValues: nodeData.schema.enum,
     });
-  } else if (hasTwoOrMoreExamples(nodeData.schema)) {
+  } else if (nodeData.schema.hasType('string') && hasTwoOrMoreExamples(nodeData.schema)) {
     return h(EnumProperty, {
       ...propsObject,
       possibleValues: nodeData.schema.examples,
