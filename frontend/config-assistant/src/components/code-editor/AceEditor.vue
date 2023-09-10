@@ -60,6 +60,15 @@ onMounted(() => {
 
   const dropElement = document.getElementById('javascript-editor');
 
+  dropElement.addEventListener('DOMContentLoaded', function (e) {
+    const currentContent = editor.value.getValue().trim();
+    if (!currentContent || currentContent === '{}') {
+      dropElement.classList.add('DOMContentLoaded');
+    } else {
+      dropElement.classList.remove('DOMContentLoaded');
+    }
+  });
+
   dropElement.addEventListener('dragover', function (e) {
     e.stopPropagation();
     e.preventDefault();
@@ -233,6 +242,15 @@ function readFile(file) {
   };
   reader.readAsText(file, 'UTF-8');
 }
+
+// function checkEditorContent() {
+//     const currentContent = editor.value.getValue();
+//     if (!currentContent || currentContent === '{}') {
+//         dropElement.classList.add('DOMContentLoaded');  // 永久显示提示框
+//     } else {
+//         dropElement.classList.remove('DOMContentLoaded');  // 隐藏提示框
+//     }
+// }
 </script>
 
 <template>
@@ -245,6 +263,23 @@ function readFile(file) {
 }
 
 #javascript-editor.dragover::before {
+  content: 'Drag and drop here';
+  font-size: 24px;
+  color: #666;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px dashed #666;
+}
+
+#javascript-editor.DOMContentLoaded::before {
   content: 'Drag and drop here';
   font-size: 24px;
   color: #666;
