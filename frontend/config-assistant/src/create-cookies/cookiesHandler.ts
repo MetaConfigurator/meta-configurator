@@ -1,11 +1,10 @@
 import {watch} from 'vue';
 import {useSettingsStore} from '@/store/settingsStore';
 import VueCookies from 'vue-cookies';
+import {errorService} from '@/main';
 
 const cookiesHandler = {
   initializeFromCookies: () => {
-    console.log('Initializing from cookies...');
-
     const settingsDataCookie = VueCookies.get('settingsData');
 
     // Size estimation function
@@ -19,31 +18,24 @@ const cookiesHandler = {
     if (settingsDataCookie && estimateSize(settingsDataCookie) <= maxCookieSize) {
       try {
         if (settingsDataCookie !== 'undefined') {
-          useSettingsStore().settingsData = JSON.parse(settingsDataCookie);
+          useSettingsStore().settingsData = settingsDataCookie;
         }
       } catch (error) {
-        console.error('Error parsing cookies:', error);
+        errorService.onError(error);
       }
-    } else {
-      console.warn('Cookie size exceeds limit. Skipping initialization.');
     }
-
     // Watch for changes in settingsData and update cookies
     watch(
       () => useSettingsStore().settingsData,
-      newSettingsData => {
-        const compressedSettingsData = JSON.stringify(newSettingsData);
 
-        if (estimateSize(compressedSettingsData) <= maxCookieSize) {
+      newSettingsData => {
+        if (estimateSize(newSettingsData) <= maxCookieSize) {
           const expiryDate = new Date();
           expiryDate.setDate(expiryDate.getDate() + 7); // Example: Expires in 7 days
 
-          VueCookies.set('settingsData', compressedSettingsData, {
+          VueCookies.set('settingsData', newSettingsData, {
             expires: expiryDate,
           });
-          console.log('SettingsData cookie updated:', newSettingsData);
-        } else {
-          console.warn('Cookie size exceeds limit. SettingsData cookie not updated.');
         }
       }
     );
