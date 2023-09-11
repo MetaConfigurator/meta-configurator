@@ -31,7 +31,7 @@ const cookiesHandler = {
       newSettingsData => {
         if (estimateSize(newSettingsData) <= maxCookieSize) {
           const expiryDate = new Date();
-          expiryDate.setDate(expiryDate.getDate() + 7); // Example: Expires in 7 days
+          expiryDate.setDate(expiryDate.getDate() + 7); // Expires in 7 days
 
           VueCookies.set('settingsData', newSettingsData, {
             expires: expiryDate,
