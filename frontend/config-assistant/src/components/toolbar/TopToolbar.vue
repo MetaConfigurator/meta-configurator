@@ -165,7 +165,7 @@ watch(selectedSchema, async newSelectedSchema => {
   }
   if (newSelectedSchema.url) {
     try {
-      await fetchSchemaFromUrl(newSelectedSchema.url);
+      await fetchSchemaFromUrl(newSelectedSchema.url, toast);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
       newEmptyFile('Do you want to clear current config data ?');
@@ -174,7 +174,7 @@ watch(selectedSchema, async newSelectedSchema => {
     }
   } else if (newSelectedSchema.key) {
     try {
-      await fetchExampleSchema(newSelectedSchema.key); // Call the fetchExampleSchema method with the schema key
+      await fetchExampleSchema(newSelectedSchema.key, toast); // Call the fetchExampleSchema method with the schema key
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
       newEmptyFile('Do you want to clear current config data ?');
