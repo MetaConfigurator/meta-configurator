@@ -15,7 +15,7 @@ const cookiesHandler = {
     // Check and handle cookie size limit
     const maxCookieSize = 4000; // 4KB limit
 
-    if (settingsDataCookie && estimateSize(settingsDataCookie) <= maxCookieSize) {
+    if (settingsDataCookie) {
       try {
         if (settingsDataCookie !== 'undefined') {
           useSettingsStore().settingsData = settingsDataCookie;
