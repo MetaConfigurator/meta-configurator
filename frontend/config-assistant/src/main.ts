@@ -13,7 +13,7 @@ import ErrorService from '@/helpers/errorService';
 import {registerIcons} from '@/fontawesome';
 import VueCookies from 'vue-cookies';
 
-import cookiesHandler from '@/create-cookies/cookiesHandler';
+import cookiesHandler from '@/cookies/cookiesHandler';
 
 // @ts-ignore
 const app = createApp(FileEditorView);
