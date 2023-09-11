@@ -8,6 +8,9 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 export default defineConfig({
   base: '/config-assistant/',
   plugins: [vue(), vueJsx()],
+  optimizeDeps: {
+    exclude: ['ajv-formats'],
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
