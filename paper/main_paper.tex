@@ -93,76 +93,8 @@
  \input{design}
 
 
- \section{Methodology}
-
-
-
-
-
- \subsubsection*{\bf A plain unnumbered list}
- \begin{list}{}{}
-  \item{bare\_jrnl.tex}
-  \item{bare\_conf.tex}
-  \item{bare\_jrnl\_compsoc.tex}
-  \item{bare\_conf\_compsoc.tex}
-  \item{bare\_jrnl\_comsoc.tex}
- \end{list}
-
- \subsubsection*{\bf A simple numbered list}
- \begin{enumerate}
-  \item{bare\_jrnl.tex}
-  \item{bare\_conf.tex}
-  \item{bare\_jrnl\_compsoc.tex}
-  \item{bare\_conf\_compsoc.tex}
-  \item{bare\_jrnl\_comsoc.tex}
- \end{enumerate}
-
- \subsubsection*{\bf A simple bulleted list}
- \begin{itemize}
-  \item{bare\_jrnl.tex}
-  \item{bare\_conf.tex}
-  \item{bare\_jrnl\_compsoc.tex}
-  \item{bare\_conf\_compsoc.tex}
-  \item{bare\_jrnl\_comsoc.tex}
- \end{itemize}
-
- \subsection{Figures}
- Fig. 1 is an example of a floating figure using the graphicx package.
- Note that $\backslash${\tt{label}} must occur AFTER (or within) $\backslash${\tt{caption}}.
- For figures, $\backslash${\tt{caption}} should occur after the $\backslash${\tt{includegraphics}}.
-
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{fig1}
-%\caption{Simulation results for the network.}
-%\label{fig_1}
-%\end{figure}
-
- Fig. 2(a) and 2(b) is an example of a double column floating figure using two subfigures.
- (The subfig.sty package must be loaded for this to work.)
- The subfigure $\backslash${\tt{label}} commands are set within each subfloat command,
- and the $\backslash${\tt{label}} for the overall figure must come after $\backslash${\tt{caption}}.
- $\backslash${\tt{hfil}} is used as a separator to get equal spacing.
- The combined width of all the parts of the figure should do not exceed the text width or a line break will occur.
-%
-%\begin{figure*}[!t]
-%\centering
-%\subfloat[]{\includegraphics[width=2.5in]{fig1}%
-%\label{fig_first_case}}
-%\hfil
-%\subfloat[]{\includegraphics[width=2.5in]{fig1}%
-%\label{fig_second_case}}
-%\caption{Dae. Ad quatur autat ut porepel itemoles dolor autem fuga. Bus quia con nessunti as remo di quatus non perum que nimus. (a) Case I. (b) Case II.}
-%\label{fig_sim}
-%\end{figure*}
-
- Note that often IEEE papers with multi-part figures do not place the labels within the image itself (using the optional argument to $\backslash${\tt{subfloat}}[]), but instead will
- reference/describe all of them (a), (b), etc., within the main caption.
- Be aware that for subfig.sty to generate the (a), (b), etc., subfigure
- labels, the optional argument to $\backslash${\tt{subfloat}} must be present. If a
- subcaption is not desired, leave its contents blank,
- e.g.,$\backslash${\tt{subfloat}}[].
-
+ \section{Implementation}\label{sec:implementation}
+ \input{implementation}
 
  \section{Tables}
  Note that, for IEEE-style tables, the
