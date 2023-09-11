@@ -5,7 +5,19 @@ import {errorService} from '@/main';
 
 const cookiesHandler = {
   initializeFromCookies: () => {
-    const settingsDataCookie = VueCookies.get('settingsData');
+    if (VueCookies.isKey('settingsData')) {
+      const settingsDataCookie = VueCookies.get('settingsData');
+
+      if (settingsDataCookie) {
+        try {
+          if (settingsDataCookie !== 'undefined') {
+            useSettingsStore().settingsData = settingsDataCookie;
+          }
+        } catch (error) {
+          errorService.onError(error);
+        }
+      }
+    }
 
     // Size estimation function
     const estimateSize = data => {
@@ -15,15 +27,6 @@ const cookiesHandler = {
     // Check and handle cookie size limit
     const maxCookieSize = 4000; // 4KB limit
 
-    if (settingsDataCookie) {
-      try {
-        if (settingsDataCookie !== 'undefined') {
-          useSettingsStore().settingsData = settingsDataCookie;
-        }
-      } catch (error) {
-        errorService.onError(error);
-      }
-    }
     // Watch for changes in settingsData and update cookies
     watch(
       () => useSettingsStore().settingsData,
