@@ -23,7 +23,7 @@ export class ConfigTreeNodeResolver {
    * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
    * the corresponding data.
    *
-   * @param schema The schema of the node.
+   * @param effectiveSchema The schema of the node.
    * @param parentSchema The schema of the parent node.
    * @param absolutePath The path of the parent node.
    * @param relativePath The path of the node relative to the parent node. Defaults to the empty path.
@@ -31,7 +31,7 @@ export class ConfigTreeNodeResolver {
    * @param nodeType The type of the node, e.g. {@link TreeNodeType.SCHEMA_PROPERTY} by default.
    */
   public createTreeNodeOfProperty(
-    schema: JsonSchema,
+    effectiveSchema: EffectiveSchema,
     parentSchema?: JsonSchema,
     absolutePath: Path = [],
     relativePath: Path = [],
@@ -44,7 +44,7 @@ export class ConfigTreeNodeResolver {
     return {
       data: {
         name: name,
-        schema: schema,
+        schema: effectiveSchema.schema,
         parentSchema: parentSchema,
         parentName: parentName,
         depth: depth,
@@ -54,7 +54,7 @@ export class ConfigTreeNodeResolver {
       type: nodeType,
       key: pathToString(absolutePath),
       children: [],
-      leaf: this.isLeaf(schema, depth),
+      leaf: this.isLeaf(effectiveSchema.schema, depth),
     };
   }
 
@@ -276,15 +276,16 @@ export class ConfigTreeNodeResolver {
   ) {
     return Object.entries(schema.properties)
       .filter(([key]) => filter(key))
-      .map(([key, value]) =>
-        this.createTreeNodeOfProperty(
-          value,
+      .map(([key, value]) => {
+        const childPath = absolutePath.concat(key);
+        return this.createTreeNodeOfProperty(
+          calculateEffectiveSchema(value, useSessionStore().dataAtPath(childPath), childPath),
           schema,
           absolutePath.concat(key),
           relativePath.concat(key),
           depth + 1
-        )
-      );
+        );
+      });
   }
 
   private createDataPropertiesChildNodes(
@@ -303,8 +304,13 @@ export class ConfigTreeNodeResolver {
       .filter(([key]) => filter(key))
       .map(([key]) => {
         if (schema.properties && schema.properties[key]) {
+          const childPath = absolutePath.concat(key);
           return this.createTreeNodeOfProperty(
-            schema.properties[key],
+            calculateEffectiveSchema(
+              schema.properties[key],
+              useSessionStore().dataAtPath(childPath),
+              childPath
+            ),
             schema,
             absolutePath.concat(key),
             relativePath.concat(key),
@@ -322,8 +328,9 @@ export class ConfigTreeNodeResolver {
           }
         });
 
+        const childPath = absolutePath.concat(key);
         return this.createTreeNodeOfProperty(
-          childSchema,
+          calculateEffectiveSchema(childSchema, useSessionStore().dataAtPath(childPath), childPath),
           schema,
           absolutePath.concat(key),
           relativePath.concat(key),
@@ -343,8 +350,13 @@ export class ConfigTreeNodeResolver {
     let children: GuiEditorTreeNode[] = [];
     if (Array.isArray(data)) {
       children = data.map((value: any, index: number) => {
+        const childPath = absolutePath.concat(index);
         return this.createTreeNodeOfProperty(
-          schema.items,
+          calculateEffectiveSchema(
+            schema.items,
+            useSessionStore().dataAtPath(childPath),
+            childPath
+          ),
           schema,
           absolutePath.concat(index),
           relativePath.concat(index),
@@ -413,8 +425,11 @@ export class ConfigTreeNodeResolver {
   ) {
     const selectionOption = schema.userSelectionOneOfAnyOf;
 
+    // TODO: live merge of schema with subschema
+
     if (selectionOption !== undefined) {
       const subSchema = schema.oneOf[selectionOption.index];
+      const childPath = absolutePath.concat(key);
       return [
         this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
       ];

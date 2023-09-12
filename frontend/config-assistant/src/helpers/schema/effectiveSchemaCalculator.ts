@@ -21,6 +21,8 @@ export function calculateEffectiveSchema(
   let result = schema ?? new JsonSchema({});
   let iteration = 0;
 
+  console.log('calculate effective schema for ', schema, ' and path ', path);
+
   while (result.isDataDependent && iteration < 1000) {
     // if something goes wrong, we don't want to get stuck in an infinite loop
     if (result.if !== undefined && result.then !== undefined) {
@@ -36,6 +38,7 @@ export function calculateEffectiveSchema(
     }
 
     if (result.oneOf) {
+      console.log('hasOneOf');
       result = resolveOneOf(result, path);
     }
 
@@ -50,8 +53,10 @@ export function calculateEffectiveSchema(
 }
 
 function resolveOneOf(schemaWrapper: JsonSchema, path: Path) {
+  // TODO: remove because not needed. Only do automatic user selection
   const pathAsString = pathToString(path);
   const selectedOneOf = useSessionStore().currentSelectedOneOfOptions.get(pathAsString);
+  console.log('selected option for path ', pathAsString, ' is ', selectedOneOf);
   if (selectedOneOf) {
     const baseSchema = {...schemaWrapper.jsonSchema};
 

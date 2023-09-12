@@ -35,6 +35,7 @@ const valueProperty = computed({
     if (selectedOption) {
       const path = pathToString(props.absolutePath);
       useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
+      console.log('selected oneOf option ', selectedOption, ' for path ', path);
       emit('update_tree');
     }
   },
