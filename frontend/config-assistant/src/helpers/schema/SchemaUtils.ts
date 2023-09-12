@@ -1,5 +1,6 @@
-import type {JsonSchemaType} from '@/model/JsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType} from '@/model/JsonSchemaType';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {safeMergeAllOfs} from '@/helpers/schema/mergeAllOfs';
 
 /**
  * @returns the schema if it is not a boolean, otherwise

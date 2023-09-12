@@ -25,12 +25,16 @@ const emit = defineEmits<{
 
 const valueProperty = computed({
   get() {
-    return props.propertySchema.userSelectionOneOfAnyOf;
+    const path = pathToString(props.absolutePath);
+    return useSessionStore().currentSelectedOneOfOptions.get(path);
   },
+
   set(newValue) {
     const selectedOption: OneOfAnyOfSelectionOption | undefined = newValue;
-    if (selectedOption !== props.propertySchema.userSelectionOneOfAnyOf) {
-      props.propertySchema.userSelectionOneOfAnyOf = selectedOption;
+
+    if (selectedOption) {
+      const path = pathToString(props.absolutePath);
+      useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
       emit('update_tree');
     }
   },

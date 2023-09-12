@@ -36,9 +36,6 @@ export class JsonSchema {
   private _else?: JsonSchema;
   private _contentSchema?: JsonSchema;
 
-  private _userSelectionOnOfAnyOf?: OneOfAnyOfSelectionOption; // TODO move to session store
-  // TODO different user selections for oneOf and anyOf, multiple selections for anyOf
-
   constructor(jsonSchema: JsonSchemaType) {
     this.jsonSchema = nonBooleanSchema(jsonSchema);
     if (this.jsonSchema !== undefined) {
@@ -148,13 +145,14 @@ export class JsonSchema {
   }
 
   public resolveOneOfAnyOf() {
+    /*
     const selectedOption = this.userSelectionOneOfAnyOf;
     if (this.oneOf.length > 0) {
       return this.oneOf[selectedOption?.index ?? 0];
     }
     if (this.anyOf.length > 0) {
       return this.anyOf[selectedOption?.index ?? 0];
-    }
+    }*/ //TODO
     return this;
   }
 
@@ -164,14 +162,6 @@ export class JsonSchema {
 
   get isAlwaysFalse(): boolean {
     return this.jsonSchema === undefined;
-  }
-
-  get userSelectionOneOfAnyOf(): OneOfAnyOfSelectionOption | undefined {
-    return this._userSelectionOnOfAnyOf;
-  }
-
-  set userSelectionOneOfAnyOf(value) {
-    this._userSelectionOnOfAnyOf = value;
   }
 
   get isDataDependent(): boolean {

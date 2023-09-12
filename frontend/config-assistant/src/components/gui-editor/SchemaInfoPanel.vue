@@ -5,9 +5,13 @@ import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import {useSessionStore} from '../../store/sessionStore';
 
+import InputText from 'primevue/inputtext';
+
 const props = defineProps<{
   schema: ref<TopLevelJsonSchema>;
 }>();
+
+const textInput = ref('hallo');
 
 const schemaInformation = computed(() => {
   return [
@@ -28,6 +32,8 @@ const schemaInformation = computed(() => {
 </script>
 
 <template>
+  <InputText type="text" v-model="textInput" />
+
   <Accordion :activeIndex="1">
     <AccordionTab :header="'Schema: ' + (schema.title ?? 'Untitled schema')">
       <p v-for="info in schemaInformation" :key="info.title">

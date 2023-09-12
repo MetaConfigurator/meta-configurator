@@ -9,7 +9,7 @@ import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTr
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
-import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
+import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfOfSelectionProperty.vue';
 
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData

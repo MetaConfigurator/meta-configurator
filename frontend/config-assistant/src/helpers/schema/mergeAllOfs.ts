@@ -1,6 +1,7 @@
 import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
 // @ts-ignore
 import mergeAllOf from 'json-schema-merge-allof';
+import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 export function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
   return mergeAllOf(schema, {
@@ -18,4 +19,32 @@ export function safeMergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectT
   } catch (e) {
     return false;
   }
+}
+
+export function areSchemasCompatible(
+  schemaA: JsonSchemaObjectType,
+  schemaB: JsonSchemaObjectType
+): boolean {
+  const mergeResult = safeMergeSchemas(schemaA, schemaB);
+  return mergeResult != false;
+}
+
+export function safeMergeSchemas(
+  schemaA: JsonSchemaObjectType,
+  schemaB: JsonSchemaObjectType
+): JsonSchemaObjectType | false {
+  const combinedSchema = {
+    allOf: [schemaA, schemaB],
+  };
+  return safeMergeAllOfs(combinedSchema as JsonSchemaObjectType);
+}
+
+export function mergeSchemas(
+  schemaA: JsonSchemaObjectType,
+  schemaB: JsonSchemaObjectType
+): JsonSchemaObjectType {
+  const combinedSchema = {
+    allOf: [schemaA, schemaB],
+  };
+  return mergeAllOfs(combinedSchema as JsonSchemaObjectType);
 }
