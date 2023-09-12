@@ -39,7 +39,7 @@ export function calculateEffectiveSchema(
 
     if (result.oneOf) {
       console.log('hasOneOf');
-      result = resolveOneOf(result, path);
+      //result = resolveOneOf(result, path);
     }
 
     // TODO: resolve the oneOf selection that is currently active,

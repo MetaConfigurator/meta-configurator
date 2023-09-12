@@ -23,7 +23,7 @@ export class ConfigTreeNodeResolver {
    * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
    * the corresponding data.
    *
-   * @param effectiveSchema The schema of the node.
+   * @param schema The schema of the node.
    * @param parentSchema The schema of the parent node.
    * @param absolutePath The path of the parent node.
    * @param relativePath The path of the node relative to the parent node. Defaults to the empty path.
@@ -31,7 +31,7 @@ export class ConfigTreeNodeResolver {
    * @param nodeType The type of the node, e.g. {@link TreeNodeType.SCHEMA_PROPERTY} by default.
    */
   public createTreeNodeOfProperty(
-    effectiveSchema: EffectiveSchema,
+    schema: JsonSchema,
     parentSchema?: JsonSchema,
     absolutePath: Path = [],
     relativePath: Path = [],
@@ -44,7 +44,7 @@ export class ConfigTreeNodeResolver {
     return {
       data: {
         name: name,
-        schema: effectiveSchema.schema,
+        schema: schema,
         parentSchema: parentSchema,
         parentName: parentName,
         depth: depth,
@@ -54,15 +54,17 @@ export class ConfigTreeNodeResolver {
       type: nodeType,
       key: pathToString(absolutePath),
       children: [],
-      leaf: this.isLeaf(effectiveSchema.schema, depth),
+      leaf: this.isLeaf(schema, depth, absolutePath),
     };
   }
 
-  private isLeaf(schema: JsonSchema, depth: number): boolean {
+  private isLeaf(schema: JsonSchema, depth: number, absolutePath: Path): boolean {
     const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
     if (dependsOnUserSelection) {
-      const hasUserSelection = schema.userSelectionOneOfAnyOf;
-      if (!hasUserSelection) {
+      const path = pathToString(absolutePath);
+      const hasUserSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.has(path);
+      const hasUserSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.has(path);
+      if (!(hasUserSelectionOneOf || hasUserSelectionAnyOf)) {
         return true;
       }
     }
@@ -279,9 +281,9 @@ export class ConfigTreeNodeResolver {
       .map(([key, value]) => {
         const childPath = absolutePath.concat(key);
         return this.createTreeNodeOfProperty(
-          calculateEffectiveSchema(value, useSessionStore().dataAtPath(childPath), childPath),
+          value,
           schema,
-          absolutePath.concat(key),
+          childPath,
           relativePath.concat(key),
           depth + 1
         );
@@ -306,13 +308,9 @@ export class ConfigTreeNodeResolver {
         if (schema.properties && schema.properties[key]) {
           const childPath = absolutePath.concat(key);
           return this.createTreeNodeOfProperty(
-            calculateEffectiveSchema(
-              schema.properties[key],
-              useSessionStore().dataAtPath(childPath),
-              childPath
-            ),
+            schema.properties[key],
             schema,
-            absolutePath.concat(key),
+            childPath,
             relativePath.concat(key),
             depth + 1
           );
@@ -330,9 +328,9 @@ export class ConfigTreeNodeResolver {
 
         const childPath = absolutePath.concat(key);
         return this.createTreeNodeOfProperty(
-          calculateEffectiveSchema(childSchema, useSessionStore().dataAtPath(childPath), childPath),
+          childSchema,
           schema,
-          absolutePath.concat(key),
+          childPath,
           relativePath.concat(key),
           depth + 1,
           type
@@ -352,13 +350,9 @@ export class ConfigTreeNodeResolver {
       children = data.map((value: any, index: number) => {
         const childPath = absolutePath.concat(index);
         return this.createTreeNodeOfProperty(
-          calculateEffectiveSchema(
-            schema.items,
-            useSessionStore().dataAtPath(childPath),
-            childPath
-          ),
+          schema.items,
           schema,
-          absolutePath.concat(index),
+          childPath,
           relativePath.concat(index),
           depth + 1
         );
@@ -423,13 +417,16 @@ export class ConfigTreeNodeResolver {
     schema: JsonSchema,
     depth: number
   ) {
-    const selectionOption = schema.userSelectionOneOfAnyOf;
+    const path = pathToString(absolutePath);
+    const userSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.get(path);
 
     // TODO: live merge of schema with subschema
 
-    if (selectionOption !== undefined) {
-      const subSchema = schema.oneOf[selectionOption.index];
-      const childPath = absolutePath.concat(key);
+    if (userSelectionOneOf !== undefined) {
+      const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
+      const subSchema = new JsonSchema({
+        allOf: [schema.jsonSchema ?? {}, subSchemaOneOf.jsonSchema ?? {}],
+      });
       return [
         this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
       ];
@@ -443,10 +440,16 @@ export class ConfigTreeNodeResolver {
     schema: JsonSchema,
     depth: number
   ) {
-    const selectionOption = schema.userSelectionOneOfAnyOf;
+    const path = pathToString(absolutePath);
+    const userSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.get(path);
 
-    if (selectionOption !== undefined) {
-      const subSchema = schema.anyOf[selectionOption.index];
+    // TODO: live merge of schema with subschema
+
+    if (userSelectionAnyOf !== undefined) {
+      const subSchemaAnyOf = schema.oneOf[userSelectionAnyOf[0].index]; // TODO: use all selected schema
+      const subSchema = new JsonSchema({
+        allOf: [schema.jsonSchema ?? {}, subSchemaAnyOf.jsonSchema ?? {}],
+      });
       return [
         this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
       ];
