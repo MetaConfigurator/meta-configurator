@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, defineProps} from 'vue';
-import Dropdown from 'primevue/dropdown';
+import MultiSelect from 'primevue/multiselect';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
 import {Path, PathElement} from '@/model/path';
@@ -26,15 +26,15 @@ const emit = defineEmits<{
 const valueProperty = computed({
   get() {
     const path = pathToString(props.absolutePath);
-    return useSessionStore().currentSelectedOneOfOptions.get(path);
+    return useSessionStore().currentSelectedAnyOfOptions.get(path);
   },
 
   set(newValue) {
-    const selectedOption: OneOfAnyOfSelectionOption | undefined = newValue;
+    const selectedOption: OneOfAnyOfSelectionOption[] | undefined = newValue;
 
     if (selectedOption) {
       const path = pathToString(props.absolutePath);
-      useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
+      useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOption);
       emit('update_tree');
     }
   },
@@ -43,10 +43,10 @@ const valueProperty = computed({
 
 <template>
   <div>
-    <Dropdown
+    <MultiSelect
       v-model="valueProperty"
       :options="possibleValues"
-      :placeholder="`Select sub-schema`" />
+      :placeholder="`Select sub-schemas`" />
   </div>
 </template>
 

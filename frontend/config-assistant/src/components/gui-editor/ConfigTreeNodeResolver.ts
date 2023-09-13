@@ -420,12 +420,10 @@ export class ConfigTreeNodeResolver {
     const path = pathToString(absolutePath);
     const userSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.get(path);
 
-    // TODO: live merge of schema with subschema
-
     if (userSelectionOneOf !== undefined) {
-      const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.oneOf;
+      const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
       const mergedSchema = new JsonSchema({
         allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
       });
@@ -445,14 +443,14 @@ export class ConfigTreeNodeResolver {
     const path = pathToString(absolutePath);
     const userSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.get(path);
 
-    // TODO: live merge of schema with subschema
-
     if (userSelectionAnyOf !== undefined) {
-      const subSchemaAnyOf = schema.oneOf[userSelectionAnyOf[0].index]; // TODO: use all selected schema
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.anyOf;
+      const subSchemasAnyOf = userSelectionAnyOf.map(userSelectionEntry => {
+        return schema.anyOf[userSelectionEntry.index].jsonSchema ?? {};
+      });
       const mergedSchema = new JsonSchema({
-        allOf: [baseSchema, subSchemaAnyOf.jsonSchema ?? {}],
+        allOf: [baseSchema, ...subSchemasAnyOf],
       });
       return [
         this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),

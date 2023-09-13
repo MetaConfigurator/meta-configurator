@@ -15,7 +15,7 @@ export const simplifiedMetaSchema = {
       ],
     },
     jsonSchema: {
-      oneOf: [
+      anyOf: [
         {
           title: 'True or false',
           type: 'boolean',
