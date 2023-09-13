@@ -424,11 +424,13 @@ export class ConfigTreeNodeResolver {
 
     if (userSelectionOneOf !== undefined) {
       const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
-      const subSchema = new JsonSchema({
-        allOf: [schema.jsonSchema ?? {}, subSchemaOneOf.jsonSchema ?? {}],
+      const baseSchema = {...schema.jsonSchema};
+      delete baseSchema.oneOf;
+      const mergedSchema = new JsonSchema({
+        allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
       });
       return [
-        this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
+        this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
       ];
     }
     return [];
@@ -447,11 +449,13 @@ export class ConfigTreeNodeResolver {
 
     if (userSelectionAnyOf !== undefined) {
       const subSchemaAnyOf = schema.oneOf[userSelectionAnyOf[0].index]; // TODO: use all selected schema
-      const subSchema = new JsonSchema({
-        allOf: [schema.jsonSchema ?? {}, subSchemaAnyOf.jsonSchema ?? {}],
+      const baseSchema = {...schema.jsonSchema};
+      delete baseSchema.anyOf;
+      const mergedSchema = new JsonSchema({
+        allOf: [baseSchema, subSchemaAnyOf.jsonSchema ?? {}],
       });
       return [
-        this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
+        this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
       ];
     }
     return [];
