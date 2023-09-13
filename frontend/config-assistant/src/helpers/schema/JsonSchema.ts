@@ -104,11 +104,11 @@ export class JsonSchema {
       return undefined;
     }
     if (typeof subElement === 'string') {
-      return this.resolveOneOfAnyOf().subProperty(subElement);
+      return this.subProperty(subElement);
     }
 
     // subElement is a number
-    return this.subItem(subElement)?.resolveOneOfAnyOf();
+    return this.subItem(subElement);
   }
 
   subProperty(subElement: string): JsonSchema | undefined {
@@ -142,18 +142,6 @@ export class JsonSchema {
       return this.unevaluatedItems;
     }
     return this.items;
-  }
-
-  public resolveOneOfAnyOf() {
-    /*
-    const selectedOption = this.userSelectionOneOfAnyOf;
-    if (this.oneOf.length > 0) {
-      return this.oneOf[selectedOption?.index ?? 0];
-    }
-    if (this.anyOf.length > 0) {
-      return this.anyOf[selectedOption?.index ?? 0];
-    }*/ //TODO
-    return this;
   }
 
   get isAlwaysTrue(): boolean {
