@@ -13,6 +13,7 @@ import {useSessionStore} from '@/store/sessionStore';
 import _ from 'lodash';
 import type {EffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
+import {safeMergeAllOfs, safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
 
 /**
  * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
@@ -449,12 +450,21 @@ export class ConfigTreeNodeResolver {
       const subSchemasAnyOf = userSelectionAnyOf.map(userSelectionEntry => {
         return schema.anyOf[userSelectionEntry.index].jsonSchema ?? {};
       });
-      const mergedSchema = new JsonSchema({
-        allOf: [baseSchema, ...subSchemasAnyOf],
-      });
-      return [
-        this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
-      ];
+      const mergedSchema = safeMergeSchemas(baseSchema, ...subSchemasAnyOf);
+      if (!mergedSchema) {
+        // user selected schemas that are not compatible -> can never be fulfilled
+        return [];
+      } else {
+        return [
+          this.createTreeNodeOfProperty(
+            new JsonSchema(mergedSchema),
+            schema,
+            absolutePath,
+            relativePath,
+            depth + 1
+          ),
+        ];
+      }
     }
     return [];
   }

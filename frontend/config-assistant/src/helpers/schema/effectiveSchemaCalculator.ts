@@ -21,8 +21,6 @@ export function calculateEffectiveSchema(
   let result = schema ?? new JsonSchema({});
   let iteration = 0;
 
-  console.log('calculate effective schema for ', schema, ' and path ', path);
-
   while (result.isDataDependent && iteration < 1000) {
     // if something goes wrong, we don't want to get stuck in an infinite loop
     if (result.if !== undefined && result.then !== undefined) {
@@ -38,36 +36,14 @@ export function calculateEffectiveSchema(
     }
 
     if (result.oneOf) {
-      console.log('hasOneOf');
-      //result = resolveOneOf(result, path);
+      // TODO: if user has not yet made selection, automatically select most
+      // suitable oneOf based on the data
     }
-
-    // TODO: resolve the oneOf selection that is currently active,
-    //  i.e. the oneOf that is valid for the current data
-    //  and the anyOf selections that are currently active
 
     iteration++;
   }
 
   return new EffectiveSchema(result, data, path);
-}
-
-function resolveOneOf(schemaWrapper: JsonSchema, path: Path) {
-  // TODO: remove because not needed. Only do automatic user selection
-  const pathAsString = pathToString(path);
-  const selectedOneOf = useSessionStore().currentSelectedOneOfOptions.get(pathAsString);
-  console.log('selected option for path ', pathAsString, ' is ', selectedOneOf);
-  if (selectedOneOf) {
-    const baseSchema = {...schemaWrapper.jsonSchema};
-
-    const selectedSubSchema = schemaWrapper.oneOf!![selectedOneOf.index]!!;
-    delete baseSchema.oneOf;
-
-    const newSchema = {allOf: [baseSchema, selectedSubSchema.jsonSchema ?? {}]};
-    return new JsonSchema(newSchema);
-  }
-
-  return schemaWrapper;
 }
 
 function resolveDependentRequired(schemaWrapper: JsonSchema, data: any) {

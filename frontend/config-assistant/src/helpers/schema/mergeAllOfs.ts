@@ -21,30 +21,21 @@ export function safeMergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectT
   }
 }
 
-export function areSchemasCompatible(
-  schemaA: JsonSchemaObjectType,
-  schemaB: JsonSchemaObjectType
-): boolean {
-  const mergeResult = safeMergeSchemas(schemaA, schemaB);
+export function areSchemasCompatible(...schemas: JsonSchemaObjectType[]): boolean {
+  const mergeResult = safeMergeSchemas(...schemas);
   return mergeResult != false;
 }
 
-export function safeMergeSchemas(
-  schemaA: JsonSchemaObjectType,
-  schemaB: JsonSchemaObjectType
-): JsonSchemaObjectType | false {
+export function safeMergeSchemas(...schemas: JsonSchemaObjectType[]): JsonSchemaObjectType | false {
   const combinedSchema = {
-    allOf: [schemaA, schemaB],
+    allOf: [...schemas],
   };
   return safeMergeAllOfs(combinedSchema as JsonSchemaObjectType);
 }
 
-export function mergeSchemas(
-  schemaA: JsonSchemaObjectType,
-  schemaB: JsonSchemaObjectType
-): JsonSchemaObjectType {
+export function mergeSchemas(...schemas: JsonSchemaObjectType[]): JsonSchemaObjectType {
   const combinedSchema = {
-    allOf: [schemaA, schemaB],
+    allOf: [...schemas],
   };
   return mergeAllOfs(combinedSchema as JsonSchemaObjectType);
 }

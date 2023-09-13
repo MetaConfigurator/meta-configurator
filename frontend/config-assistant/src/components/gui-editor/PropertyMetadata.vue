@@ -9,6 +9,7 @@ import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
 import type {ValidationResults} from '@/helpers/validationService';
+import {pathToString} from '@/helpers/pathHelper';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -34,10 +35,10 @@ function canZoomIn(): boolean {
 
   const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
   if (dependsOnUserSelection) {
-    const hasUserSelection = schema.userSelectionOneOfAnyOf;
-    if (!hasUserSelection) {
-      return false;
-    }
+    const path = pathToString(props.node.data.absolutePath);
+    const hasUserSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.has(path);
+    const hasUserSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.has(path);
+    return hasUserSelectionOneOf || hasUserSelectionAnyOf;
   }
 
   return schema.hasType('object') || schema.hasType('array');
