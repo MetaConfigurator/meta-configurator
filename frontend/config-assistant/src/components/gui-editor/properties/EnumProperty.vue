@@ -28,6 +28,7 @@ const valueProperty = computed({
       v-model="valueProperty"
       editable
       :options="possibleValues"
+      @keydown.stop
       :placeholder="`Select ${props.propertyName}`" />
   </div>
 </template>
