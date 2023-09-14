@@ -40,7 +40,6 @@ const valueProperty = computed({
     if (selectedOption) {
       useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
       applySchemaConstantsOnDataBasedOnSelection(props.absolutePath, selectedOption);
-      // TODO: store merged Schema in session store instead of recompute in TreeNodeResolver
       emit('update_tree');
     } else {
       useSessionStore().currentSelectedOneOfOptions.delete(path);
@@ -53,22 +52,23 @@ function applySchemaConstantsOnDataBasedOnSelection(
   path: Path,
   selectedOneOfOption: OneOfAnyOfSelectionOption
 ) {
+  // Based on the user selection, a schema is created by merging the base schema
+  // of the property with the selected oneOf.
+  // If the merged schema contains constants, those are applied to the data.
+  // Note that it might seem logical to compute this merged schema only once
+  // (e.g. when oneOf is selected), store it and re-use it later.
+  // This, however, is not done because the effective merged schema could change
+  // even without a new oneOf selection by the user, due to JSON schema features
+  // such as if and else.
+
+  // TODO: maybe this function should instead of normal schema make use of the effective schema
   const schemaAtPath = useSessionStore().schemaAtPath(path);
-  console.log(
-    'apply schema constants ',
-    path,
-    selectedOneOfOption,
-    schemaAtPath.jsonSchema,
-    'oneOf ',
-    schemaAtPath.oneOf[selectedOneOfOption.index]
-  );
   const baseSchema = {...schemaAtPath.jsonSchema};
   delete baseSchema.oneOf;
   const mergedSchema = safeMergeSchemas(
     baseSchema,
     schemaAtPath.oneOf[selectedOneOfOption.index].jsonSchema
   );
-  console.log('apply schema constants merged schema ', path, mergedSchema);
   const resultData = applySchemaConstantsOnData(mergedSchema, props.propertyData);
   if (!_.isEqual(resultData, props.propertyData)) {
     emit('update_property_value', resultData);
@@ -77,10 +77,8 @@ function applySchemaConstantsOnDataBasedOnSelection(
 function applySchemaConstantsOnData(schema: JsonSchemaObjectType, data: any): any {
   // note that in pre-processing all const is converted to an enum with just one entry
   if (schema.enum) {
-    console.log('apply schema constants merged schema is enum', schema, {...data});
     if (schema.enum.length == 1) {
       data = schema.enum[0];
-      console.log('change data', schema, data);
     }
   }
   if (schema.properties) {
