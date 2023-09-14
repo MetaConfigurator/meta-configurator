@@ -76,6 +76,7 @@ function applySchemaConstantsOnDataBasedOnSelection(
 }
 function applySchemaConstantsOnData(schema: JsonSchemaObjectType, data: any): any {
   // note that in pre-processing all const is converted to an enum with just one entry
+  // hence, for us constants are equal to an enum of length 1.
   if (schema.enum) {
     if (schema.enum.length == 1) {
       data = schema.enum[0];
