@@ -4,6 +4,7 @@ import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
 import {dataAt, pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
+import {safeMergeAllOfs, safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
 
 export class EffectiveSchema {
   constructor(public schema: JsonSchema, public data: any, public path: Path) {}
@@ -34,9 +35,10 @@ export function calculateEffectiveSchema(
       result = resolveDependentSchemas(result, data);
     }
 
-    // TODO: resolve the oneOf selection that is currently active,
-    //  i.e. the oneOf that is valid for the current data
-    //  and the anyOf selections that are currently active
+    if (result.oneOf) {
+      // TODO: if user has not yet made selection, automatically select most
+      // suitable oneOf based on the data
+    }
 
     iteration++;
   }
@@ -44,14 +46,14 @@ export function calculateEffectiveSchema(
   return new EffectiveSchema(result, data, path);
 }
 
-function resolveDependentRequired(result: JsonSchema, data: any) {
-  const newRequired: string[] = result.required;
-  for (const [key, value] of Object.entries(result.dependentRequired ?? {})) {
+function resolveDependentRequired(schemaWrapper: JsonSchema, data: any) {
+  const newRequired: string[] = schemaWrapper.required;
+  for (const [key, value] of Object.entries(schemaWrapper.dependentRequired ?? {})) {
     if (dataAt([key], data) !== undefined) {
       newRequired.push(...value);
     }
   }
-  const baseSchema = {...result.jsonSchema};
+  const baseSchema = {...schemaWrapper.jsonSchema};
   delete baseSchema.dependentRequired;
 
   return new JsonSchema({
@@ -60,37 +62,37 @@ function resolveDependentRequired(result: JsonSchema, data: any) {
   });
 }
 
-function resolveIfThenElse(result: JsonSchema, data: any, path: Path) {
+function resolveIfThenElse(schemaWrapper: JsonSchema, data: any, path: Path) {
   let newSchema: JsonSchemaObjectType;
   const validationService = useSessionStore().validationService;
-  if (!result.if || !result.if.jsonSchema) {
-    return result;
+  if (!schemaWrapper.if || !schemaWrapper.if.jsonSchema) {
+    return schemaWrapper;
   }
   const valid = validationService.validateSubSchema(
-    result.if.jsonSchema,
+    schemaWrapper.if.jsonSchema,
     pathToString(path) + '.if',
     data
   ).valid;
-  const baseSchema = {...result.jsonSchema};
+  const baseSchema = {...schemaWrapper.jsonSchema};
   delete baseSchema.if;
   delete baseSchema.then;
   delete baseSchema.else;
 
   if (valid) {
-    newSchema = {allOf: [baseSchema, result.then?.jsonSchema ?? {}]};
+    newSchema = {allOf: [baseSchema, schemaWrapper.then?.jsonSchema ?? {}]};
   } else {
-    newSchema = {allOf: [baseSchema, result.else?.jsonSchema ?? {}]};
+    newSchema = {allOf: [baseSchema, schemaWrapper.else?.jsonSchema ?? {}]};
   }
   return new JsonSchema(newSchema);
 }
 
-function resolveDependentSchemas(result: JsonSchema, data: any): JsonSchema {
-  const schemas = Object.entries(result.dependentSchemas ?? {})
+function resolveDependentSchemas(schemaWrapper: JsonSchema, data: any): JsonSchema {
+  const schemas = Object.entries(schemaWrapper.dependentSchemas ?? {})
     .filter(([key]) => dataAt([key], data) !== undefined)
     .map(([, value]) => value)
     .map(schema => schema.jsonSchema || {});
 
-  const baseSchema = {...result.jsonSchema};
+  const baseSchema = {...schemaWrapper.jsonSchema};
   delete baseSchema.dependentSchemas;
 
   const newSchema = {

@@ -6,7 +6,13 @@ import type {
 import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
 import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
-import {mergeAllOfs, safeMergeAllOfs} from '@/helpers/schema/mergeAllOfs';
+import {
+  areSchemasCompatible,
+  mergeAllOfs,
+  mergeSchemas,
+  safeMergeAllOfs,
+  safeMergeSchemas,
+} from '@/helpers/schema/mergeAllOfs';
 
 const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
 
@@ -201,37 +207,16 @@ function removeIncompatibleOneOfs(schema: JsonSchemaObjectType) {
   }
 }
 
-function areSchemasCompatible(
-  schemaA: JsonSchemaObjectType,
-  schemaB: JsonSchemaObjectType
-): boolean {
-  const mergeResult = safeMergeSchemas(schemaA, schemaB);
-  return mergeResult != false;
-}
-
-function safeMergeSchemas(
-  schemaA: JsonSchemaObjectType,
-  schemaB: JsonSchemaObjectType
-): JsonSchemaObjectType | false {
-  const combinedSchema = {
-    allOf: [schemaA, schemaB],
-  };
-  return safeMergeAllOfs(combinedSchema as JsonSchemaObjectType);
-}
-
 // if oneOf has just one entry: merge into parent
 function mergeSingularOneOf(schema: JsonSchemaObjectType): JsonSchemaObjectType {
   if (hasOneOfs(schema)) {
     if (schema.oneOf!!.length == 1) {
       const copiedSchema = {...schema};
       delete copiedSchema.oneOf;
-      let optimizedSchema = {
-        allOf: [
-          preprocessSchema(schema.oneOf!![0] as JsonSchemaObjectType),
-          preprocessSchema(copiedSchema),
-        ],
-      };
-      return mergeAllOfs(optimizedSchema);
+      return mergeSchemas(
+        preprocessSchema(schema.oneOf!![0] as JsonSchemaObjectType),
+        preprocessSchema(copiedSchema)
+      );
     } else if (schema.oneOf!!.length == 0) {
       throw Error('oneOf array has zero entries for schema ' + JSON.stringify(schema));
     }
@@ -246,13 +231,10 @@ function mergeSingularAnyOf(schema: JsonSchemaObjectType): JsonSchemaObjectType 
     if (schema.anyOf!!.length == 1) {
       const copiedSchema = {...schema};
       delete copiedSchema.anyOf;
-      let optimizedSchema = {
-        allOf: [
-          preprocessSchema(schema.anyOf!![0] as JsonSchemaObjectType),
-          preprocessSchema(copiedSchema),
-        ],
-      };
-      return mergeAllOfs(optimizedSchema);
+      return mergeSchemas(
+        preprocessSchema(schema.anyOf!![0] as JsonSchemaObjectType),
+        preprocessSchema(copiedSchema)
+      );
     } else if (schema.anyOf!!.length == 0) {
       throw Error('anyOf array has zero entries for schema ' + JSON.stringify(schema));
     }
@@ -281,16 +263,6 @@ function resolveReference(copiedSchema: JsonSchemaObjectType) {
 
   delete copiedSchema.$ref;
   return {allOf: [refSchema, copiedSchema]};
-}
-
-function hasAllOfs(schema: JsonSchemaObjectType): boolean {
-  return schema.allOf !== undefined && schema.allOf.length > 0;
-}
-function hasOneOfs(schema: JsonSchemaObjectType): boolean {
-  return schema.oneOf !== undefined && schema.oneOf.length > 0;
-}
-function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
-  return schema.anyOf !== undefined && schema.anyOf.length > 0;
 }
 
 function induceTitles(schema: JsonSchemaObjectType): void {
@@ -347,4 +319,14 @@ function injectTypesOfEnum(schema: JsonSchemaObjectType): void {
   if (schema.type === undefined && foundTypes.size > 0) {
     schema.type = [...foundTypes];
   }
+}
+
+function hasAllOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.allOf !== undefined && schema.allOf.length > 0;
+}
+function hasOneOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.oneOf !== undefined && schema.oneOf.length > 0;
+}
+function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.anyOf !== undefined && schema.anyOf.length > 0;
 }

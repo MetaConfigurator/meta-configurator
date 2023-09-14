@@ -9,7 +9,8 @@ import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTr
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
-import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
+import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfOfSelectionProperty.vue';
+import AnyOfSelectionProperty from '@/components/gui-editor/properties/AnyOfSelectionProperty.vue';
 
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData
@@ -28,7 +29,7 @@ export function resolveCorrespondingComponent(
       possibleSchemas: nodeData.schema.oneOf,
     });
   } else if (nodeData.schema.anyOf.length > 0) {
-    return h(OneOfAnyOfSelectionProperty, {
+    return h(AnyOfSelectionProperty, {
       ...propsObject,
       possibleSchemas: nodeData.schema.anyOf,
     });

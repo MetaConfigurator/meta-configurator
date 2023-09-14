@@ -19,6 +19,7 @@ import {
   calculateEffectiveSchema,
   EffectiveSchema,
 } from '@/helpers/schema/effectiveSchemaCalculator';
+import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -44,6 +45,12 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
   const currentSearchResults: Ref<SearchResult[]> = ref<SearchResult[]>([]);
+
+  const currentSelectedOneOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(new Map([]));
+  const currentSelectedAnyOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption[]>> = ref(
+    new Map([])
+  );
+
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
@@ -268,6 +275,8 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentSelectedElement,
     currentExpandedElements,
     currentSearchResults,
+    currentSelectedOneOfOptions,
+    currentSelectedAnyOfOptions,
     isHighlighted,
     isExpanded,
     expand,

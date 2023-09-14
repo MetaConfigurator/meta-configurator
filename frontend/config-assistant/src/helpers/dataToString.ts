@@ -10,23 +10,18 @@ export function dataToString(data: any, currentDepth = 0, limit?: number): strin
   let result = '';
   if (data === null) {
     result = 'null';
-  }
-  if (data === undefined) {
+  } else if (data === undefined) {
     result = '';
-  }
-  if (typeof data === 'string') {
+  } else if (typeof data === 'string') {
     result = data;
-  }
-  if (typeof data === 'number' || typeof data === 'boolean') {
+  } else if (typeof data === 'number' || typeof data === 'boolean') {
     result = data.toString();
-  }
-  if (Array.isArray(data)) {
+  } else if (Array.isArray(data)) {
     if (currentDepth >= 2) {
       result = '...';
     }
     result = data.map((value: any) => dataToString(value, currentDepth + 1, limit)).join(', ');
-  }
-  if (typeof data === 'object') {
+  } else if (typeof data === 'object') {
     if (currentDepth >= 2) {
       result = '...';
     }
