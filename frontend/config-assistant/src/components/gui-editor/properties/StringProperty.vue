@@ -40,6 +40,7 @@ function updateValue() {
     v-model="valueProperty"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     @blur="updateValue"
+    @keydown.stop
     @keyup.enter="updateValue" />
 </template>
 

@@ -34,6 +34,7 @@ const valueProperty = computed({
     value="propertyName"
     input-id="integeronly"
     locale="us"
+    @keydown.stop
     :use-grouping="false"
     showButtons
     buttonLayout="stacked"

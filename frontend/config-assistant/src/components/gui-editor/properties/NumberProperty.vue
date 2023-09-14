@@ -44,6 +44,7 @@ const valueProperty = computed({
     buttonLayout="stacked"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     :step="stepValue"
+    @keydown.stop
     increment-button-class="p-button-text p-button-secondary"
     decrement-button-class="p-button-text p-button-secondary" />
 </template>
