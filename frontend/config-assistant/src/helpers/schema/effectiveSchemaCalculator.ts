@@ -5,12 +5,10 @@ import {useSessionStore} from '@/store/sessionStore';
 import {dataAt, pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
 import {safeMergeAllOfs, safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
+import {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 
 export class EffectiveSchema {
   constructor(public schema: JsonSchema, public data: any, public path: Path) {}
-
-  // TODO get user selected oneOf and anyOf, if none selected, get the ones that
-  //  are valid for the current data
 }
 
 export function calculateEffectiveSchema(
@@ -20,8 +18,10 @@ export function calculateEffectiveSchema(
 ): EffectiveSchema {
   let result = schema ?? new JsonSchema({});
   let iteration = 0;
+  console.log('asdasd calc eff schema inside sadasdasdasdasdas psadasdrops of node');
 
   while (result.isDataDependent && iteration < 1000) {
+    console.log('is data dependent');
     // if something goes wrong, we don't want to get stuck in an infinite loop
     if (result.if !== undefined && result.then !== undefined) {
       result = resolveIfThenElse(result, data, path);
@@ -35,9 +35,10 @@ export function calculateEffectiveSchema(
       result = resolveDependentSchemas(result, data);
     }
 
+    console.log('effective schema code');
     if (result.oneOf) {
-      // TODO: if user has not yet made selection, automatically select most
-      // suitable oneOf based on the data
+      console.log('oneOf exists');
+      inferOneOfUserSelection(result, data, path);
     }
 
     iteration++;

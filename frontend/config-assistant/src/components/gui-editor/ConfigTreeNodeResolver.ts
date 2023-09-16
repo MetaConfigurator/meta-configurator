@@ -77,12 +77,14 @@ export class ConfigTreeNodeResolver {
   }
 
   public createChildNodesOfNode(guiEditorTreeNode: GuiEditorTreeNode): GuiEditorTreeNode[] {
+    console.log('create child props of node');
     if (
       guiEditorTreeNode.type === TreeNodeType.ADD_ITEM ||
       guiEditorTreeNode.type === TreeNodeType.ADD_PROPERTY
     ) {
       return [];
     }
+    console.log('ccalc effective schema');
     const effectiveSchema = calculateEffectiveSchema(
       guiEditorTreeNode.data.schema,
       useSessionStore().dataAtPath(guiEditorTreeNode.data.absolutePath),
