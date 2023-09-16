@@ -179,5 +179,19 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    partner: {
+      title: 'partner',
+      oneOf: [
+        {
+          type: 'boolean',
+          const: false,
+          title: 'No Partner',
+        },
+        {
+          type: 'string',
+          title: 'Partner Name',
+        },
+      ],
+    },
   },
 };

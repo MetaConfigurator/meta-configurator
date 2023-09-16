@@ -13,7 +13,7 @@ import {useSessionStore} from '@/store/sessionStore';
 import _ from 'lodash';
 import type {EffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
-import {safeMergeAllOfs, safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
+import {safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
 
 /**
  * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
