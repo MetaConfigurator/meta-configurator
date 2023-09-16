@@ -61,8 +61,7 @@ function applySchemaConstantsOnDataBasedOnSelection(
   // even without a new oneOf selection by the user, due to JSON schema features
   // such as if and else.
 
-  // TODO: maybe this function should instead of normal schema make use of the effective schema
-  const schemaAtPath = useSessionStore().schemaAtPath(path);
+  const schemaAtPath = useSessionStore().effectiveSchemaAtPath(path).schema;
   const baseSchema = {...schemaAtPath.jsonSchema};
   delete baseSchema.oneOf;
   const mergedSchema = safeMergeSchemas(
