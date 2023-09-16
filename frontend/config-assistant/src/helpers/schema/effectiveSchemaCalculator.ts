@@ -18,10 +18,8 @@ export function calculateEffectiveSchema(
 ): EffectiveSchema {
   let result = schema ?? new JsonSchema({});
   let iteration = 0;
-  console.log('asdasd calc eff schema inside sadasdasdasdasdas psadasdrops of node');
 
   while (result.isDataDependent && iteration < 1000) {
-    console.log('is data dependent');
     // if something goes wrong, we don't want to get stuck in an infinite loop
     if (result.if !== undefined && result.then !== undefined) {
       result = resolveIfThenElse(result, data, path);
@@ -33,12 +31,6 @@ export function calculateEffectiveSchema(
 
     if (result.dependentSchemas) {
       result = resolveDependentSchemas(result, data);
-    }
-
-    console.log('effective schema code');
-    if (result.oneOf) {
-      console.log('oneOf exists');
-      inferOneOfUserSelection(result, data, path);
     }
 
     iteration++;

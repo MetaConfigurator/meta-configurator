@@ -25,8 +25,29 @@ const emit = defineEmits<{
 
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> = computed({
   get() {
+    console.log('get value for ', props.absolutePath);
     const path = pathToString(props.absolutePath);
-    return useSessionStore().currentSelectedOneOfOptions.get(path);
+    let selectedOption = useSessionStore().currentSelectedOneOfOptions.get(path);
+
+    // When the user has already made a selection but in the meantime the oneOfSelectionProperty was hidden and then
+    // initialized again, the selection of the user is a different object instance than the ones in the new oneOf
+    // property component. To make up for that, this code updates the object instance to the new one.
+    if (selectedOption && !possibleValues.includes(selectedOption)) {
+      console.log(
+        'update value ',
+        {...selectedOption},
+        ' for ',
+        path,
+        ' with options ',
+        possibleValues
+      );
+      selectedOption = findOptionBySubSchemaIndex(selectedOption.index);
+      useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption!!);
+      console.log('updated value to ', {...selectedOption}, ' for ', path);
+    }
+
+    console.log('found value ', selectedOption, ' for ', path);
+    return selectedOption;
   },
 
   set(newValue) {
@@ -34,7 +55,7 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> 
 
     if (selectedOption) {
       const path = pathToString(props.absolutePath);
-      useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
+      useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption!!);
       emit('update_tree');
     }
   },
@@ -43,11 +64,17 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> 
 onMounted(() => {
   if (valueProperty.value === undefined) {
     inferOneOfUserSelection();
+  } else {
+    console.log(
+      'mount oneOf propp. already has selection  for path ',
+      props.absolutePath,
+      ' which is ',
+      valueProperty.value
+    );
   }
 });
 
 function inferOneOfUserSelection() {
-  console.log('infer oneOf user selection');
   const pathAsString = pathToString(props.absolutePath);
   const validationService = useSessionStore().validationService;
 
@@ -61,20 +88,22 @@ function inferOneOfUserSelection() {
     props.propertySchema.oneOf.forEach((subSchema: JsonSchema, index: number) => {
       const valid = validationService.validateSubSchema(
         subSchema.jsonSchema!!,
-        pathToString(props.absolutePath) + '.if',
+        // todo: consider whether the way this key (that is used for caching the validation function for the schema)
+        // will work for nested oneOfs
+        pathToString(props.absolutePath) + '.oneOf[' + index + ']',
         props.propertyData
       ).valid;
       if (valid) {
         schemasIndexForWhichDataIsValid.push(index);
       }
-      console.log('data is valid for schema ', index, subSchema);
     });
 
-    if (schemasIndexForWhichDataIsValid.length == 1 || schemasIndexForWhichDataIsValid.length > 0) {
-      console.log('update selection because some schema are valid');
+    if (schemasIndexForWhichDataIsValid.length == 1) {
       const optionToSelect = findOptionBySubSchemaIndex(schemasIndexForWhichDataIsValid[0]);
       useSessionStore().currentSelectedOneOfOptions.set(pathAsString, optionToSelect!!);
     }
+  } else {
+    console.log('already has selection yet for path ', pathAsString);
   }
 }
 
