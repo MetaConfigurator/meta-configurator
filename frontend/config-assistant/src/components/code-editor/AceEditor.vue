@@ -60,38 +60,20 @@ onMounted(() => {
 
   const dropElement = document.getElementById('javascript-editor');
 
-  dropElement.addEventListener('DOMContentLoaded', function (e) {
-    e.stopPropagation();
-    e.preventDefault();
-    const currentContent = editor.value.getValue();
-    if (!currentContent || currentContent === '{}') {
-      dropElement.classList.add('dragover');
-    } else {
-      dropElement.classList.remove('dragover');
-    }
-  });
-
   dropElement.addEventListener('dragover', function (e) {
     e.stopPropagation();
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
-    // Show as copy
   });
 
   dropElement.addEventListener('dragenter', function (e) {
-    e.stopPropagation();
-    e.preventDefault();
     dropElement.classList.add('dragover');
-    // show the overlay
   });
 
   dropElement.addEventListener('dragleave', function (e) {
-    e.stopPropagation();
-    e.preventDefault();
     if (!dropElement.contains(e.relatedTarget)) {
       dropElement.classList.remove('dragover');
     }
-    // hide the overlay
   });
 
   dropElement.addEventListener('drop', function (e) {
