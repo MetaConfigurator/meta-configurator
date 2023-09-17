@@ -70,6 +70,7 @@ function inferOneOfUserSelection() {
         // found a oneOf subSchema for which the data is valid. Select it.
         const optionToSelect = findOptionBySubSchemaIndex(index);
         useSessionStore().currentSelectedOneOfOptions.set(pathAsString, optionToSelect!!);
+        return;
       }
 
       index++;
