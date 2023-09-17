@@ -56,25 +56,23 @@ function inferOneOfUserSelection() {
   if (!useSessionStore().currentSelectedOneOfOptions.has(pathAsString)) {
     // User has not yet made a oneOf sub-schema selection for this path
     // --> auto infer a sub-schema
-    // Idea: go through all sub-schemas. If only for one of them the data is valid, this must be the correct one to select.
-    const schemasIndexForWhichDataIsValid: number[] = [];
 
-    props.propertySchema.oneOf.forEach((subSchema: JsonSchema, index: number) => {
+    let index = 0;
+    for (let subSchema: JsonSchema of props.propertySchema.oneOf) {
       const valid = validationService.validateSubSchema(
         subSchema.jsonSchema!!,
-        // todo: consider whether the way this key (that is used for caching the validation function for the schema)
-        // will work for nested oneOfs
+        // TODO: remove key once it has become optional (change from Paul).
         pathToString(props.absolutePath) + '.oneOf[' + index + ']',
         props.propertyData
       ).valid;
-      if (valid) {
-        schemasIndexForWhichDataIsValid.push(index);
-      }
-    });
 
-    if (schemasIndexForWhichDataIsValid.length == 1) {
-      const optionToSelect = findOptionBySubSchemaIndex(schemasIndexForWhichDataIsValid[0]);
-      useSessionStore().currentSelectedOneOfOptions.set(pathAsString, optionToSelect!!);
+      if (valid) {
+        // found a oneOf subSchema for which the data is valid. Select it.
+        const optionToSelect = findOptionBySubSchemaIndex(index);
+        useSessionStore().currentSelectedOneOfOptions.set(pathAsString, optionToSelect!!);
+      }
+
+      index++;
     }
   }
 }

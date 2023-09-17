@@ -46,59 +46,9 @@ const valueProperty: WritableComputedRef<string[] | undefined> = computed({
   },
 });
 
-onMounted(() => {
-  if (valueProperty.value === undefined && props.propertyData !== undefined) {
-    // inferAnyOfUserSelection();
-  }
-});
-
-function inferAnyOfUserSelection() {
-  const pathAsString = pathToString(props.absolutePath);
-  const validationService = useSessionStore().validationService;
-
-  if (!useSessionStore().currentSelectedAnyOfOptions.has(pathAsString)) {
-    // User has not yet made a anyOf sub-schema selection for this path
-    // --> auto infer a sub-schema
-    // Idea: go through all sub-schemas. Select all sub-schemas for which the data is valid
-    const schemasIndexForWhichDataIsValid: number[] = [];
-
-    props.propertySchema.anyOf.forEach((subSchema: JsonSchema, index: number) => {
-      const valid = validationService.validateSubSchema(
-        subSchema.jsonSchema!!,
-        // todo: consider whether the way this key (that is used for caching the validation function for the schema)
-        // will work for nested oneOfs
-        pathToString(props.absolutePath) + '.anyOf[' + index + ']',
-        props.propertyData
-      ).valid;
-      if (valid) {
-        schemasIndexForWhichDataIsValid.push(index);
-      }
-    });
-
-    if (schemasIndexForWhichDataIsValid.length == 1 || schemasIndexForWhichDataIsValid.length > 0) {
-      const optionsToSelect: OneOfAnyOfSelectionOption[] = schemasIndexForWhichDataIsValid.map(
-        index => {
-          return findOptionBySubSchemaIndex(index)!!;
-        }
-      );
-      useSessionStore().currentSelectedAnyOfOptions.set(pathAsString, optionsToSelect);
-    }
-  }
-}
-
 function findOptionByDisplayText(displayText: string): OneOfAnyOfSelectionOption | undefined {
   for (let option of possibleOptions) {
     if (option.displayText === displayText) {
-      return option;
-    }
-  }
-
-  return undefined;
-}
-
-function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | undefined {
-  for (let option of possibleOptions) {
-    if (option.index === index) {
       return option;
     }
   }
