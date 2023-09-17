@@ -6,6 +6,7 @@ import {useSessionStore} from '@/store/sessionStore';
 import {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/helpers/pathHelper';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
+import {WritableComputedRef} from 'vue/dist/vue';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -15,43 +16,31 @@ const props = defineProps<{
   possibleSchemas: Array<JsonSchema>;
 }>();
 
-const possibleValues = props.possibleSchemas.map(
+const possibleOptions = props.possibleSchemas.map(
   (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
 );
+const possibleValues = possibleOptions.map(option => option.displayText);
 
 const emit = defineEmits<{
   (e: 'update_tree'): void;
 }>();
 
-const valueProperty = computed({
+const valueProperty: WritableComputedRef<string[] | undefined> = computed({
   get() {
-    console.log('get value for ', props.absolutePath);
     const path = pathToString(props.absolutePath);
-    let selectedOption = useSessionStore().currentSelectedAnyOfOptions.get(path);
-
-    // When the user has already made a selection but in the meantime the oneOfSelectionProperty was hidden and then
-    // initialized again, the selection of the user is a different object instance than the ones in the new oneOf
-    // property component. To make up for that, this code updates the object instance to the new one.
-    if (
-      selectedOption &&
-      selectedOption.length > 0 &&
-      !possibleValues.includes(selectedOption[0])
-    ) {
-      selectedOption = selectedOption.map(oldOption => {
-        return findOptionBySubSchemaIndex(oldOption.index)!!;
-      });
-      useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOption!!);
-    }
-
-    return selectedOption;
+    let selectedOptions = useSessionStore().currentSelectedAnyOfOptions.get(path);
+    return selectedOptions?.map(option => option.displayText);
   },
 
   set(newValue) {
-    const selectedOption: OneOfAnyOfSelectionOption[] | undefined = newValue;
+    const selectedOptionsText: string[] | undefined = newValue;
 
-    if (selectedOption) {
+    if (selectedOptionsText) {
       const path = pathToString(props.absolutePath);
-      useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOption);
+      const selectedOptions = selectedOptionsText.map(
+        displayText => findOptionByDisplayText(displayText)!
+      );
+      useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOptions);
       emit('update_tree');
     }
   },
@@ -68,7 +57,6 @@ function inferAnyOfUserSelection() {
   const validationService = useSessionStore().validationService;
 
   if (!useSessionStore().currentSelectedAnyOfOptions.has(pathAsString)) {
-    console.log('no selection yet for path ', pathAsString);
     // User has not yet made a anyOf sub-schema selection for this path
     // --> auto infer a sub-schema
     // Idea: go through all sub-schemas. Select all sub-schemas for which the data is valid
@@ -88,7 +76,6 @@ function inferAnyOfUserSelection() {
     });
 
     if (schemasIndexForWhichDataIsValid.length == 1 || schemasIndexForWhichDataIsValid.length > 0) {
-      console.log('update selection because some schema are valid');
       const optionsToSelect: OneOfAnyOfSelectionOption[] = schemasIndexForWhichDataIsValid.map(
         index => {
           return findOptionBySubSchemaIndex(index)!!;
@@ -99,12 +86,22 @@ function inferAnyOfUserSelection() {
   }
 }
 
-function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | undefined {
-  possibleValues.forEach(option => {
-    if (option.index == index) {
+function findOptionByDisplayText(displayText: string): OneOfAnyOfSelectionOption | undefined {
+  for (let option of possibleOptions) {
+    if (option.displayText === displayText) {
       return option;
     }
-  });
+  }
+
+  return undefined;
+}
+
+function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | undefined {
+  for (let option of possibleOptions) {
+    if (option.index === index) {
+      return option;
+    }
+  }
 
   return undefined;
 }
