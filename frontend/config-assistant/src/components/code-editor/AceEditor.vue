@@ -107,6 +107,12 @@ onMounted(() => {
   watchArray(
     computed(() => sessionStore.dataValidationResults.errors),
     errors => {
+      // Do not attempt to display schema validation errors when the text does not have valid syntax
+      // (would otherwise result in errors when trying to parse CST)
+      if (!manipulator.isValidSyntax(editor.value.getValue())) {
+        return;
+      }
+
       let annotations = [];
       for (const error of errors) {
         const instancePath = error.instancePath;

@@ -3,14 +3,9 @@ import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
 import {dataAt, pathToString} from '@/helpers/pathHelper';
-import _ from 'lodash';
-import {safeMergeAllOfs, safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
 
 export class EffectiveSchema {
   constructor(public schema: JsonSchema, public data: any, public path: Path) {}
-
-  // TODO get user selected oneOf and anyOf, if none selected, get the ones that
-  //  are valid for the current data
 }
 
 export function calculateEffectiveSchema(
@@ -33,11 +28,6 @@ export function calculateEffectiveSchema(
 
     if (result.dependentSchemas) {
       result = resolveDependentSchemas(result, data);
-    }
-
-    if (result.oneOf) {
-      // TODO: if user has not yet made selection, automatically select most
-      // suitable oneOf based on the data
     }
 
     iteration++;
