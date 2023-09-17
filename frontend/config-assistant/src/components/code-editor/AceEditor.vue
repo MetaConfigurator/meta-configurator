@@ -52,39 +52,42 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
   }
 }
 
+const editorDiv = ref();
+
+function onDragOver(e: DragEvent) {
+  e.stopPropagation();
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+}
+
+function onDragEnter() {
+  editorDiv.value.classList.add('dragover');
+}
+
+function onDragLeave(e: DragEvent) {
+  if (!editorDiv.value.contains(e.relatedTarget)) {
+    editorDiv.value.classList.remove('dragover');
+  }
+}
+
+function onDrop(e: DragEvent) {
+  e.stopPropagation();
+  e.preventDefault();
+  editorDiv.value.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files && files.length == 1) {
+    readFile(files[0]);
+  }
+  if (files && files.length > 1) {
+    alert('Please drop only one file at a time');
+  }
+}
+
 onMounted(() => {
   editor = ref(ace.edit('javascript-editor'));
   editorWrapper = new CodeEditorWrapperAce(editor.value);
   sessionStore.currentEditorWrapper = editorWrapper;
   editor.value.$blockScrolling = Infinity;
-
-  const dropElement = document.getElementById('javascript-editor');
-
-  dropElement.addEventListener('dragover', function (e) {
-    e.stopPropagation();
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
-  });
-
-  dropElement.addEventListener('dragenter', function (e) {
-    dropElement.classList.add('dragover');
-  });
-
-  dropElement.addEventListener('dragleave', function (e) {
-    if (!dropElement.contains(e.relatedTarget)) {
-      dropElement.classList.remove('dragover');
-    }
-  });
-
-  dropElement.addEventListener('drop', function (e) {
-    e.stopPropagation();
-    e.preventDefault();
-    dropElement.classList.remove('dragover');
-    const files = e.dataTransfer.files;
-    if (files && files.length) {
-      readFile(files[0]);
-    }
-  });
 
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
@@ -96,7 +99,7 @@ onMounted(() => {
     const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
 
     if (editor.value && fontSize) {
-      editor.value.setFontSize(fontSize);
+      editor.value.setFontSize(fontSize.toString());
     }
   });
 
@@ -229,7 +232,14 @@ function readFile(file) {
 </script>
 
 <template>
-  <div class="h-full" id="javascript-editor"></div>
+  <div
+    class="h-full"
+    id="javascript-editor"
+    ref="editorDiv"
+    @dragover="onDragOver"
+    @dragenter="onDragEnter"
+    @dragleave="onDragLeave"
+    @drop="onDrop" />
 </template>
 
 <style scoped>
@@ -238,7 +248,7 @@ function readFile(file) {
 }
 
 #javascript-editor.dragover::before {
-  content: 'Drag and drop here';
+  content: 'Drag and drop files here';
   font-size: 24px;
   color: #666;
   display: block;
