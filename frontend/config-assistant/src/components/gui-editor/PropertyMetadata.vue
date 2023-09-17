@@ -82,13 +82,24 @@ function zoomIntoPath() {
 }
 
 function isPropertyNameEditable(): boolean {
+  return isAdditionalOrPatternProperty();
+}
+
+function isAdditionalOrPatternProperty(): boolean {
   if (!props.node.data.parentSchema?.hasType('object')) {
     return false;
   }
-  if (!props.node.data.parentSchema?.properties) {
-    return true;
+  const nodeData = props.node.data;
+  if (nodeData.parentSchema?.hasType('array')) {
+    return false;
   }
-  return !Object.keys(props.node.data.parentSchema.properties).includes(
+
+  const propertyData = useSessionStore().dataAtPath(nodeData.absolutePath);
+  if (Array.isArray(propertyData)) {
+    return false;
+  }
+
+  return !Object.keys(props.node.data.parentSchema?.properties ?? {}).includes(
     props.node.data.name as string
   );
 }

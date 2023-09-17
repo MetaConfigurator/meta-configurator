@@ -44,7 +44,7 @@ const valueProperty: WritableComputedRef<string | undefined> = computed({
 });
 
 onMounted(() => {
-  if (valueProperty.value === undefined) {
+  if (valueProperty.value === undefined && props.propertyData !== undefined) {
     inferOneOfUserSelection();
   }
 });

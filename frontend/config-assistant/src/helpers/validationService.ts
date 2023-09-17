@@ -55,6 +55,7 @@ export class ValidationService {
     key: string,
     data: any
   ): ValidationResults {
+    console.log('validateSubSchema with schema ', schema, ' and key ', key, ' and data ', data);
     // inject definitions
     if (this._ajv?.getSchema(key) === undefined) {
       const schemaWithDefinitions = this.injectDefinitions(schema);

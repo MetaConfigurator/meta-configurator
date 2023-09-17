@@ -28,6 +28,8 @@ function getDataAtCurrentPath() {
 <template>
   <div><b>currentMode:</b> {{ store.currentMode }}</div>
   <div><b>lastChangeResponsible:</b> {{ store.lastChangeResponsible }}</div>
+  <div><b>currentPath:</b> {{ store.currentPath }}</div>
+  <div><b>currentSelectedElement:</b> {{ store.currentSelectedElement }}</div>
   <div><b>fileData</b></div>
   <textarea class="bg-amber-300" v-model="fileData" />
   <div><b>schemaContent</b></div>
