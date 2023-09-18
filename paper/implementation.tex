@@ -34,7 +34,7 @@ To ensure that the data is valid as soon as it is entered by the user, we use sc
 Therefore, the config data get validated based on the schema that is currently loaded.
 We choose to use \textbf{Ajv JSON schema validator} \cite{ajv-validator}.
 It supports the newest JSON schema draft 2020-12.
-Ajv firstly generates the input JSON Schemas into super-fast validation functions.
+Ajv firstly generates a fast validation function from the input schema.
 If the config data is not valid according to the schema, there will be a red error hint on left side of the code editor.
 In our case, we have a helper class for the validation service, so that it's more convenient to deal with validation.
 
