@@ -33,7 +33,7 @@ To make our code editor more user-friendly, we implemented several features, whi
 In order to ensure that our data is valid as soon as it's received.
 Therefore, the config data get validated based on the schema that is currently loaded.
 We choose to use a useful tool named \textbf{Ajv JSON schema validator} \cite{ajv-validator}.
-It could naturally support the newest JSON schema draft 2020-12.
+It supports the newest JSON schema draft 2020-12.
 Ajv firstly generates the input JSON Schemas into super-fast validation functions.
 If config data is violated against the schema, there will be a small error hint on left side.
 In our case, we have a helper class for the validation service, so that it's more convenient to deal with validation.
