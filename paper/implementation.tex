@@ -20,28 +20,41 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
 
 \subsection{Code Editor}\label{subsec:code-editor}
 
-The code editor is a text editor program designed for editing source code of computer programs. In our user case, we use the very popular and strong editor called  \textbf{Ace Editor}. \cite{ace-editor} It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse. It can be easily embedded in any web page or JavaScript application.
-% todo decribe the code editor component and how it works
+The code editor is a text editor program designed for editing source code of computer programs.
+In our user case, we use the very popular and strong editor called  \textbf{Ace Editor}. \cite{Ace-Editor}
+It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
+It can be easily embedded in any web page or JavaScript application.
 
 \subsubsection{Features}
 
 In order to make our code editor more user-friendly, we implemented several features, which are described in the following.
 
 \paragraph{Schema Validation}
-In order to ensure that our data is valid as soon as it's received. We need to have our config data get validated based on our schema. So we choose to use a useful tool named \textbf{Ajv JSON schema validator} \cite{ajv-validator}. It could naturally support the newest JSON schema draft 2020-12. Ajv firstly generates the input JSON Schemas into super-fast validation functions. If config data is violated against the schema, there will be a small error hint on left side. Ajv also takes advantage of TypeScript type system to provide additional functionality. In our case, we have a helper class for the validation service, so that it's more convenient to deal with validation.
+In order to ensure that our data is valid as soon as it's received.
+We need to have our config data get validated based on our schema.
+We choose to use a useful tool named \textbf{Ajv JSON schema validator} \cite{ajv-validator}.
+It could naturally support the newest JSON schema draft 2020-12.
+Ajv firstly generates the input JSON Schemas into super-fast validation functions.
+If config data is violated against the schema, there will be a small error hint on left side.
+Ajv also takes advantage of TypeScript type system to provide additional functionality.
+In our case, we have a helper class for the validation service, so that it's more convenient to deal with validation.
 
 \paragraph{Support for JSON and YAML}
-The ace editor is very compatible and there're a lot build-in support for different languages. In our project, we mainly support JSON and YAML. It could be switched in the Settings page.
+The ace editor is very compatible and there're a lot build-in support for different languages.
+In our project, we mainly support JSON and YAML. It could be switched in the Settings page.
 
 \paragraph{Concrete Syntax Tree}
 % TODO: how we get cursor position and path correctly using cst
 
 \paragraph{Syntax Highlighting}
-We have also implemented syntax highlighting for both JSON and YAML. With this functionality, users could better recognize different components in the data, like properties or values.
+We have also implemented syntax highlighting for both JSON and YAML.
+With this functionality, users could better recognize different components in the data, like properties or values.
 
 \paragraph{Editor Operations}
-There are many other useful functionalities we have implemented in the code editor.  For example, the undo and redo operations; dragging and dropping files in the code editor; Font Size configuration in the Settings.
-
+There are many other useful functionalities we have implemented in the code editor.
+For example, the undo and redo operations.
+Dragging and dropping files in the code editor.
+Font Size configuration in the Settings.
 
 
 \subsection{GUI Editor}\label{subsec:gui-editor}
