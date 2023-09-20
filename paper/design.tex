@@ -1,5 +1,5 @@
-% TODO: explain why and how we define our own meta schema based on json schema, because we use just subset of its features and because our schema is used to generate schema editor GUI and therefore should only show what is supported. Also we want to add descriptions and maybe more. Also limit options to not overwhelm and confuse the user. 
-
+% TODO (but maybe not here?): explain why and how we define our own meta schema based on json schema, because we use just subset of its features and because our schema is used to generate schema editor GUI and therefore should only show what is supported. Also we want to add descriptions and maybe more. Also limit options to not overwhelm and confuse the user.
+% TODO also describe more the users perspective how users would use the tool?
 
 % felix
 \subsection{Functionality}\label{subsec:functionality} % todo maybe rename it requirements?
@@ -42,6 +42,7 @@ When editing a schema file, the underlying schema will be the schema of JSON Sch
 % felix
 
 \subsection{Architecture}\label{subsec:architecture} % todo diagram illustrating the architecture
+% todo mention that its frontend only
 The core of our tool is a single source of truth data store that contains the current user configuration data (as a JavaScript Object).
 With this data store we can bidirectionally connect what we call ``editor panels''.
 An editor panel is a modular component that the user of the tool can access to modify the config data in an indirect way.

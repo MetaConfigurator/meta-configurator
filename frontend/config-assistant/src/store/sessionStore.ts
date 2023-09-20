@@ -19,6 +19,7 @@ import {
   calculateEffectiveSchema,
   EffectiveSchema,
 } from '@/helpers/schema/effectiveSchemaCalculator';
+import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -44,6 +45,12 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
   const currentSearchResults: Ref<SearchResult[]> = ref<SearchResult[]>([]);
+
+  const currentSelectedOneOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(new Map([]));
+  const currentSelectedAnyOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption[]>> = ref(
+    new Map([])
+  );
+
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
@@ -161,7 +168,7 @@ export const useSessionStore = defineStore('commonStore', () => {
 
   const schemaAtCurrentPath: Ref<JsonSchema> = computed(() => schemaAtPath(currentPath.value));
 
-  function effectiveSchemaAt(path: Path): EffectiveSchema {
+  function effectiveSchemaAtPath(path: Path): EffectiveSchema {
     let currentEffectiveSchema: EffectiveSchema = calculateEffectiveSchema(
       fileSchema.value,
       fileData.value,
@@ -181,7 +188,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   }
 
   const effectiveSchemaAtCurrentPath: Ref<EffectiveSchema> = computed(() =>
-    effectiveSchemaAt(currentPath.value)
+    effectiveSchemaAtPath(currentPath.value)
   );
 
   /**
@@ -258,6 +265,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     fileSchemaData,
     schemaAtPath,
     schemaAtCurrentPath,
+    effectiveSchemaAtPath,
     effectiveSchemaAtCurrentPath,
     schemaErrorMessage,
     dataValidationResults,
@@ -268,6 +276,8 @@ export const useSessionStore = defineStore('commonStore', () => {
     currentSelectedElement,
     currentExpandedElements,
     currentSearchResults,
+    currentSelectedOneOfOptions,
+    currentSelectedAnyOfOptions,
     isHighlighted,
     isExpanded,
     expand,

@@ -53,6 +53,37 @@ function createConfigManipulator(dataFormat: string): ConfigManipulator {
   }
 }
 
+const editorDiv = ref();
+
+function onDragOver(e: DragEvent) {
+  e.stopPropagation();
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+}
+
+function onDragEnter() {
+  editorDiv.value.classList.add('dragover');
+}
+
+function onDragLeave(e: DragEvent) {
+  if (!editorDiv.value.contains(e.relatedTarget)) {
+    editorDiv.value.classList.remove('dragover');
+  }
+}
+
+function onDrop(e: DragEvent) {
+  e.stopPropagation();
+  e.preventDefault();
+  editorDiv.value.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files && files.length == 1) {
+    readFile(files[0]);
+  }
+  if (files && files.length > 1) {
+    alert('Please drop only one file at a time');
+  }
+}
+
 onMounted(() => {
   editor = ref(ace.edit('javascript-editor'));
   editorWrapper = new CodeEditorWrapperAce(editor.value);
@@ -69,14 +100,13 @@ onMounted(() => {
     const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
 
     if (editor.value && fontSize) {
-      editor.value.setFontSize(fontSize);
+      editor.value.setFontSize(fontSize.toString());
     }
   });
 
   editor.value.setOptions({
     autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
   });
-
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
@@ -107,6 +137,12 @@ onMounted(() => {
   watchArray(
     computed(() => sessionStore.dataValidationResults.errors),
     errors => {
+      // Do not attempt to display schema validation errors when the text does not have valid syntax
+      // (would otherwise result in errors when trying to parse CST)
+      if (!manipulator.isValidSyntax(editor.value.getValue())) {
+        return;
+      }
+
       let annotations = [];
       for (const error of errors) {
         const instancePath = error.instancePath;
@@ -192,14 +228,48 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
   let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
   return manipulator.determinePath(editorContent, targetCharacter);
 }
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = function (evt) {
+    if (typeof evt.target.result === 'string') {
+      editor.value.setValue(evt.target.result, -1);
+    } // -1 sets the cursor to the start of the editor
+  };
+  reader.readAsText(file, 'UTF-8');
+}
 </script>
 
 <template>
-  <div class="h-full" id="javascript-editor"></div>
+  <div
+    class="h-full"
+    id="javascript-editor"
+    ref="editorDiv"
+    @dragover="onDragOver"
+    @dragenter="onDragEnter"
+    @dragleave="onDragLeave"
+    @drop="onDrop" />
 </template>
 
 <style scoped>
 .p-component {
   margin: 0 !important;
+}
+
+#javascript-editor.dragover::before {
+  content: 'Drag and drop files here';
+  font-size: 24px;
+  color: #666;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px dashed #666;
 }
 </style>

@@ -9,7 +9,8 @@ import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTr
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
-import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
+import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfOfSelectionProperty.vue';
+import AnyOfSelectionProperty from '@/components/gui-editor/properties/AnyOfSelectionProperty.vue';
 
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData
@@ -28,7 +29,7 @@ export function resolveCorrespondingComponent(
       possibleSchemas: nodeData.schema.oneOf,
     });
   } else if (nodeData.schema.anyOf.length > 0) {
-    return h(OneOfAnyOfSelectionProperty, {
+    return h(AnyOfSelectionProperty, {
       ...propsObject,
       possibleSchemas: nodeData.schema.anyOf,
     });
@@ -36,6 +37,11 @@ export function resolveCorrespondingComponent(
     return h(EnumProperty, {
       ...propsObject,
       possibleValues: nodeData.schema.enum,
+    });
+  } else if (nodeData.schema.hasType('string') && hasTwoOrMoreExamples(nodeData.schema)) {
+    return h(EnumProperty, {
+      ...propsObject,
+      possibleValues: nodeData.schema.examples,
     });
   } else if (nodeData.schema.hasType('string')) {
     return h(StringProperty, propsObject);
@@ -52,4 +58,8 @@ export function resolveCorrespondingComponent(
   }
 
   return h('p', `Property ${nodeData.name} with type ${nodeData.schema.type} is not supported`);
+}
+
+function hasTwoOrMoreExamples(schema: any): boolean {
+  return schema.examples !== undefined && schema.examples.length > 1;
 }

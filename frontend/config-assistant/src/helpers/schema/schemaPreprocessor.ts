@@ -6,7 +6,13 @@ import type {
 import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
 import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
-import {mergeAllOfs, safeMergeAllOfs} from '@/helpers/schema/mergeAllOfs';
+import {
+  areSchemasCompatible,
+  mergeAllOfs,
+  mergeSchemas,
+  safeMergeAllOfs,
+  safeMergeSchemas,
+} from '@/helpers/schema/mergeAllOfs';
 import _ from 'lodash';
 import {debuggingService} from '@/helpers/debuggingService';
 
@@ -256,14 +262,10 @@ function mergeSingularOneOf(schema: JsonSchemaObjectType, depth: number): JsonSc
     if (schema.oneOf!!.length == 1) {
       const copiedSchema = {...schema};
       delete copiedSchema.oneOf;
-      const optimizedSchema = {
-        allOf: [
-          preprocessSchema(schema.oneOf!![0] as JsonSchemaObjectType, depth + 1),
-          preprocessSchema(copiedSchema, depth + 1),
-        ],
-      };
-      debuggingService.addPreprocessingStep(depth, 'merged singular oneOf', optimizedSchema);
-      return mergeAllOfs(optimizedSchema, depth);
+      return mergeSchemas(
+        preprocessSchema(schema.oneOf!![0] as JsonSchemaObjectType),
+        preprocessSchema(copiedSchema)
+      );
     } else if (schema.oneOf!!.length == 0) {
       throw Error('oneOf array has zero entries for schema ' + JSON.stringify(schema));
     }
@@ -278,14 +280,10 @@ function mergeSingularAnyOf(schema: JsonSchemaObjectType, depth: number): JsonSc
     if (schema.anyOf!!.length == 1) {
       const copiedSchema = {...schema};
       delete copiedSchema.anyOf;
-      const optimizedSchema = {
-        allOf: [
-          preprocessSchema(schema.anyOf!![0] as JsonSchemaObjectType, depth + 1),
-          preprocessSchema(copiedSchema, depth + 1),
-        ],
-      };
-      debuggingService.addPreprocessingStep(depth, 'merged singular anyOf', optimizedSchema);
-      return mergeAllOfs(optimizedSchema, depth);
+      return mergeSchemas(
+        preprocessSchema(schema.anyOf!![0] as JsonSchemaObjectType),
+        preprocessSchema(copiedSchema)
+      );
     } else if (schema.anyOf!!.length == 0) {
       throw Error('anyOf array has zero entries for schema ' + JSON.stringify(schema));
     }
@@ -317,16 +315,6 @@ function resolveReference(copiedSchema: JsonSchemaObjectType, depth: number) {
   const result = {allOf: [refSchema, copiedSchema]};
   debuggingService.addPreprocessingStep(depth, 'resolved reference', result);
   return result;
-}
-
-function hasAllOfs(schema: JsonSchemaObjectType): boolean {
-  return schema.allOf !== undefined && schema.allOf.length > 0;
-}
-function hasOneOfs(schema: JsonSchemaObjectType): boolean {
-  return schema.oneOf !== undefined && schema.oneOf.length > 0;
-}
-function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
-  return schema.anyOf !== undefined && schema.anyOf.length > 0;
 }
 
 function induceTitles(schema: JsonSchemaObjectType, depth: number): void {
@@ -391,4 +379,14 @@ function injectTypesOfEnum(schema: JsonSchemaObjectType, depth: number): void {
     schema.type = [...foundTypes];
     debuggingService.addPreprocessingStep(depth, 'injected types of enum', schema);
   }
+}
+
+function hasAllOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.allOf !== undefined && schema.allOf.length > 0;
+}
+function hasOneOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.oneOf !== undefined && schema.oneOf.length > 0;
+}
+function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
+  return schema.anyOf !== undefined && schema.anyOf.length > 0;
 }

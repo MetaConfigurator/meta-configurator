@@ -46,6 +46,7 @@ const valueProperty = computed({
     <SelectButton
       v-model="valueProperty"
       :options="options"
+      @keydown.stop
       option-label="name"
       option-value="value" />
   </div>
