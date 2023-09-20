@@ -2,6 +2,8 @@
 import {computed} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
 import {useDataStore} from '@/store/dataStore';
+import {debuggingService} from '@/helpers/debuggingService';
+import {watchArray} from '@vueuse/core';
 
 const store = useSessionStore();
 
@@ -23,6 +25,29 @@ function getSchemaDataStore() {
 function getDataAtCurrentPath() {
   return JSON.stringify(store.dataAtCurrentPath);
 }
+
+function printPreprocessingSteps() {
+  let currentDepth = -1;
+  debuggingService.preprocessingSteps.value.forEach(step => {
+    if (step.depth > currentDepth) {
+      console.groupCollapsed(step.depth);
+      currentDepth = step.depth;
+    } else if (step.depth < currentDepth) {
+      console.groupEnd();
+      currentDepth = step.depth;
+    }
+    console.log(step.stringRepresentation);
+    console.log(step.schema);
+  });
+  for (let i = 0; i <= currentDepth; i++) {
+    console.groupEnd();
+  }
+}
+
+watchArray(debuggingService.preprocessingSteps, () => {
+  console.log('preprocessingSteps changed');
+  printPreprocessingSteps();
+});
 </script>
 
 <template>
@@ -36,6 +61,27 @@ function getDataAtCurrentPath() {
   <textarea class="bg-green-300" v-model="dataAtCurrentPathContent" />
   <div><b>schemaContentDataStore</b></div>
   <textarea class="bg-gradient-to-r from-purple-100 to-red-200" v-model="schemaContentDataStore" />
+
+  <div><b>preprocessingSteps</b></div>
+  <button
+    @click="
+      () => {
+        debuggingService.resetPreprocessingSteps();
+      }
+    "
+    class="bg-blue-200">
+    reset
+  </button>
+  <br />
+  <button
+    @click="
+      () => {
+        printPreprocessingSteps();
+      }
+    "
+    class="bg-blue-200">
+    log
+  </button>
 </template>
 
 <style scoped></style>
