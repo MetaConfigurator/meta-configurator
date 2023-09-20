@@ -1,10 +1,58 @@
 Our user study is mainly based on the qualitative research.
 We conduct several interviews with the professors and students as potential customers.
 We collect feedbacks from the customers, improve user experiences and fix bugs according to the feedback.
-We also use the survey to get interviewers' opinions during the user study.
+We also use the survey to get interviewees' opinions during the user study.
 
-\subsection{Methodology}
-% todo: describe more details about how we conduct user study
+\subsection{Methodology}\label{subsec:methodology}
+
+\paragraph{Potential Users}
+We look for potential users to conduct the interviews.
+There are two basic standards we follow to find a potential user:
+\begin{itemize}
+    \item Professors and students who are interested in our application.
+    \item People who frequently use \cfgfiles and schema languages
+\end{itemize}
+Because each interviewee has different prior knowledge of JSON and JSON schema, we improve our interview questions and the example data also after the interview.
+So that our interview is more compatible for users.
+
+\paragraph{Interview Questions}
+We prepare our interview questions based on a mockup JSON schema and \cfgfiles.
+It is about a simple and understandable autonomous vehicle schema.
+To make it easier for interviewees to solve the questions, we divide our interview into four parts:
+\begin{itemize}
+    \item Setup Question: Where to open the application and set up schema and \cfgfiles.
+    \item Basic Question: Goal is to know about the GUI of application
+    \item Modifying the configuration file: Solving problems of \cfgfiles inside the \textbf{file editor}.
+    \item Modifying the schema: Solving problems of JSON schema inside the \textbf{schema editor}.
+\end{itemize}
+
+\paragraph{Interview Process}
+Commonly, we conduct our interview with one interviewee each time.
+The interview lasts often within one hour.
+At the beginning, the interviewee is asked about approval of recording, and they can stop participating at any time.
+One of our team member hosts the interview and guides interviewee how to use our application based on the interview question.
+Another one will record the whole interview and takes notes of what are correctly and incorrectly answered.
+Opinions and critical points will also be noted.
+After the application test, all team members can ask the open questions and answer questions from the interviewee.
+
+\paragraph{Survey}
+After the interview, we ask each interviewee to finish a survey(follow-up questions).
+This survey will cover the following points:
+\begin{itemize}
+    \item Occupation of the interviewee.
+    \item Experiences in software engineering,
+    \item Frequency of working with JSON/YAML files.
+    \item Domains in which people use with JSON/YAML files.
+    \item Feedback about the application after interview.
+\end{itemize}
+Based on the survey, we could get many critical points which we can use in the future.
+We analyse the results which we get from the survey and improve our application afterwards.
+Details found in ~\ref{improvements}
+
+\paragraph{Improvements}\label{improvements}
+After getting results from the interview and survey, we have an internal meeting inside our team and discuss which features should be added to our application.
+Also, bugs which are found during the interview will be taken as improvements.
+Details found in ~\ref{subsec:improvements}
 
 \subsection{Results}
 % todo: show the results of user study. We can use tables to show specific cases.
@@ -12,7 +60,7 @@ We also use the survey to get interviewers' opinions during the user study.
 \subsection{Critical Points}
 % todo: what's most mentioned in the interviews, describe and analyse
 
-\subsection{Improvements}
+\subsection{Improvements}\label{subsec:improvements}
 % todo: what we have improved after the interviews.
 
 % TODO: if some quantitative methods are found, also mention here
