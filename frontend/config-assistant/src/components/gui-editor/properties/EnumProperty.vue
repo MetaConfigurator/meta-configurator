@@ -27,6 +27,7 @@ const valueProperty = computed({
 <template>
   <div>
     <Dropdown
+      class="tableInput w-full"
       :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
       v-model="valueProperty"
       editable
@@ -41,5 +42,9 @@ div {
   display: flex;
   flex-direction: row;
   height: 30px;
+}
+.tableInput {
+  border: none;
+  box-shadow: none;
 }
 </style>
