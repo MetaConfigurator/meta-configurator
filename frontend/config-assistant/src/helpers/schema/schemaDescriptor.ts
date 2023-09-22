@@ -581,7 +581,7 @@ function describeFormatAndPattern(schema: JsonSchema, validationErrors: ErrorObj
 function describeSchemaValidationErrors(validationErrors: ErrorObject[]): string {
   return paragraph(
     `The following validation errors were found: ${ul(
-      validationErrors.map(e => formatError(e.message ?? ''))
+      validationErrors.map(e => formatError((e.message ?? '') + ' (at ' + e.instancePath + ')'))
     )}`
   );
 }
