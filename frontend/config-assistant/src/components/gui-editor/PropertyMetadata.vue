@@ -86,11 +86,8 @@ function isPropertyNameEditable(): boolean {
 }
 
 function isAdditionalOrPatternProperty(): boolean {
-  if (!props.node.data.parentSchema?.hasType('object')) {
-    return false;
-  }
   const nodeData = props.node.data;
-  if (nodeData.parentSchema?.hasType('array')) {
+  if (!nodeData.parentSchema?.hasType('object')) {
     return false;
   }
 
