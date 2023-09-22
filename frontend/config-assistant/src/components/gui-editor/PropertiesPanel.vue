@@ -19,7 +19,7 @@ import {
 } from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {dataAt, pathToJsonPointer, pathToString} from '@/helpers/pathHelper';
+import {dataAt, pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/tree';
@@ -375,9 +375,7 @@ const allowShowOverlay = ref(true);
 const overlayShowScheduled = ref(false);
 
 const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
-  const relevantErrors = useSessionStore().dataValidationResults.filterForExactPath(
-    pathToJsonPointer(nodeData.absolutePath)
-  ).errors;
+  const relevantErrors = getValidationResults(nodeData.absolutePath).errors;
   // @ts-ignore
   schemaInfoOverlay.value?.showPanel(
     nodeData.schema,
@@ -419,7 +417,7 @@ function isHighlighted(node: ConfigDataTreeNode) {
 }
 
 function getValidationResults(absolutePath: Path) {
-  return useSessionStore().dataValidationResults.filterForPath(pathToJsonPointer(absolutePath));
+  return useSessionStore().dataValidationResults.filterForPath(absolutePath);
 }
 </script>
 

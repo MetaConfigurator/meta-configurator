@@ -3,11 +3,13 @@ import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/model/path';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import type {ValidationResults} from '@/helpers/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: boolean | undefined;
   parentSchema: JsonSchema;
+  validationResults: ValidationResults;
 }>();
 
 const options = ref([
@@ -42,8 +44,9 @@ const valueProperty = computed({
 </script>
 
 <template>
-  <div class="pl-2">
+  <div class="pl-2 pt-0.5">
     <SelectButton
+      :class="{'p-invalid': !props.validationResults.valid}"
       v-model="valueProperty"
       :options="options"
       @keydown.stop

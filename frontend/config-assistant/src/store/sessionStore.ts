@@ -46,9 +46,11 @@ export const useSessionStore = defineStore('commonStore', () => {
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
   const currentSearchResults: Ref<SearchResult[]> = ref<SearchResult[]>([]);
 
-  const currentSelectedOneOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(new Map([]));
+  const currentSelectedOneOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(
+    new Map<string, OneOfAnyOfSelectionOption>([])
+  );
   const currentSelectedAnyOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption[]>> = ref(
-    new Map([])
+    new Map<string, OneOfAnyOfSelectionOption[]>([])
   );
 
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);

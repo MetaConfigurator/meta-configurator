@@ -9,7 +9,7 @@ import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTr
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
-import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfOfSelectionProperty.vue';
+import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfAnyOfSelectionProperty.vue';
 import AnyOfSelectionProperty from '@/components/gui-editor/properties/AnyOfSelectionProperty.vue';
 
 export function resolveCorrespondingComponent(
@@ -22,38 +22,49 @@ export function resolveCorrespondingComponent(
     parentSchema: nodeData.parentSchema,
     relativePath: nodeData.relativePath,
     absolutePath: nodeData.absolutePath,
+    validationResults: useSessionStore().dataValidationResults.filterForPath(nodeData.absolutePath),
   };
   if (nodeData.schema.oneOf.length > 0) {
+    // @ts-ignore
     return h(OneOfAnyOfSelectionProperty, {
       ...propsObject,
       possibleSchemas: nodeData.schema.oneOf,
     });
   } else if (nodeData.schema.anyOf.length > 0) {
+    // @ts-ignore
     return h(AnyOfSelectionProperty, {
       ...propsObject,
       possibleSchemas: nodeData.schema.anyOf,
     });
   } else if (nodeData.schema.enum !== undefined) {
+    // @ts-ignore
     return h(EnumProperty, {
       ...propsObject,
       possibleValues: nodeData.schema.enum,
     });
   } else if (nodeData.schema.hasType('string') && hasTwoOrMoreExamples(nodeData.schema)) {
+    // @ts-ignore
     return h(EnumProperty, {
       ...propsObject,
       possibleValues: nodeData.schema.examples,
     });
   } else if (nodeData.schema.hasType('string')) {
+    // @ts-ignore
     return h(StringProperty, propsObject);
   } else if (nodeData.schema.hasType('boolean')) {
+    // @ts-ignore
     return h(BooleanProperty, propsObject);
   } else if (nodeData.schema.hasType('number')) {
+    // @ts-ignore
     return h(NumberProperty, propsObject);
   } else if (nodeData.schema.hasType('integer')) {
+    // @ts-ignore
     return h(IntegerProperty, propsObject);
   } else if (nodeData.schema.hasType('object')) {
+    // @ts-ignore
     return h(SimpleObjectProperty, propsObject);
   } else if (nodeData.schema.hasType('array')) {
+    // @ts-ignore
     return h(SimpleArrayProperty, propsObject);
   }
 

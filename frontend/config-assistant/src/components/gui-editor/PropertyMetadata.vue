@@ -10,6 +10,7 @@ import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
 import type {ValidationResults} from '@/helpers/validationService';
 import {pathToString} from '@/helpers/pathHelper';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -86,11 +87,8 @@ function isPropertyNameEditable(): boolean {
 }
 
 function isAdditionalOrPatternProperty(): boolean {
-  if (!props.node.data.parentSchema?.hasType('object')) {
-    return false;
-  }
   const nodeData = props.node.data;
-  if (nodeData.parentSchema?.hasType('array')) {
+  if (!nodeData.parentSchema?.hasType('object')) {
     return false;
   }
 
@@ -156,6 +154,10 @@ function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
   // array index
   return (node.data.parentName || node.data.parentSchema?.title || 'element') + '[' + name + ']';
 }
+
+function isInvalid(): boolean {
+  return !props.validationResults.valid;
+}
 </script>
 
 <template>
@@ -181,7 +183,7 @@ function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
         @keyup.enter="updatePropertyName"
         :class="{
           'text-indigo-700': canZoomIn(),
-          'underline decoration-wavy decoration-red-600': !props.validationResults.valid,
+          'underline decoration-wavy decoration-red-600': isInvalid(),
           'line-through': isDeprecated(),
           italic: isAdditionalProperty() || isPatternProperty(),
         }">
@@ -192,6 +194,9 @@ function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
     </span>
 
     <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription() }}</span>
+    <span class="text-red-600 ml-3" v-if="isInvalid()">
+      <FontAwesomeIcon icon="triangle-exclamation" />
+    </span>
   </span>
 </template>
 

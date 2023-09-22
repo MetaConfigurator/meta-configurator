@@ -31,7 +31,7 @@ function isExpanded(): boolean {
       v-if="!isExpanded()">
       {{ dataToString(props.propertyData) }}
     </div>
-    <span class="text-gray-500 font-extralight justify-self-end">
+    <span class="text-gray-500 font-extralight justify-self-end" v-if="!isExpanded()">
       {{ getNumberOfProperties() }} properties
     </span>
   </div>

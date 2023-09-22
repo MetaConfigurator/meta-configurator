@@ -31,7 +31,7 @@ function isRequired(): boolean {
   return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string) || false;
 }
 
-function isShowRemove(): boolean {
+function shouldShowRemove(): boolean {
   return !isRequired() && useSessionStore().dataAtPath(props.nodeData.absolutePath) !== undefined;
 }
 </script>
@@ -48,7 +48,7 @@ function isShowRemove(): boolean {
     <Button
       class="h-full"
       style="width: 10%"
-      v-if="isShowRemove()"
+      v-if="shouldShowRemove()"
       icon="pi pi-times"
       severity="secondary"
       text
