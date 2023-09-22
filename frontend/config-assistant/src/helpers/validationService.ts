@@ -3,6 +3,8 @@ import type {ErrorObject} from 'ajv';
 import type {ValidateFunction} from 'ajv/dist/2020';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
+import type {Path} from '@/model/path';
+import {pathToJsonPointer} from '@/helpers/pathHelper';
 
 export class ValidationService {
   static readonly TOP_LEVEL_SCHEMA_KEY = '$topLevelSchema';
@@ -87,13 +89,29 @@ export class ValidationResults {
     this.errors = errors;
   }
 
-  public filterForPath(jsonPointer: string): ValidationResults {
+  /**
+   * Filters for errors that are at or below the given path.
+   * @param path the path
+   * @returns the filtered errors
+   */
+  public filterForPath(path: Path): ValidationResults {
+    const jsonPointer = pathToJsonPointer(path);
     const filteredErrors = this.errors.filter(error => error.instancePath.startsWith(jsonPointer));
     return new ValidationResults(filteredErrors);
   }
 
-  public filterForExactPath(jsonPointer: string): ValidationResults {
+  /**
+   * Filters for errors that are exactly at the given path.
+   * @param  path the path
+   * @returns the filtered errors
+   */
+  public filterForExactPath(path: Path): ValidationResults {
+    const jsonPointer = pathToJsonPointer(path);
     const filteredErrors = this.errors.filter(error => error.instancePath == jsonPointer);
     return new ValidationResults(filteredErrors);
+  }
+
+  public isValidForPath(path: Path): boolean {
+    return this.filterForPath(path).valid;
   }
 }
