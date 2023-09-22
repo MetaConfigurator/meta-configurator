@@ -46,7 +46,7 @@ export default class ErrorService {
     if ((error as any).details) {
       return (error as any).details;
     }
-    return '';
+    return (error as any).toString();
   }
 }
 
