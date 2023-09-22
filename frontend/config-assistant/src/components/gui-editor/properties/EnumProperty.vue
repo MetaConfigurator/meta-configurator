@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import {computed, defineProps, defineEmits} from 'vue';
+import {computed, defineEmits, defineProps} from 'vue';
 import Dropdown from 'primevue/dropdown';
+import {ValidationResults} from '@/helpers/validationService';
 
 const props = defineProps<{
   propertyName: string;
   possibleValues: Array<any>;
   propertyData: any | undefined;
+  validationResults: ValidationResults;
 }>();
 
 const emit = defineEmits<{
@@ -25,6 +27,7 @@ const valueProperty = computed({
 <template>
   <div>
     <Dropdown
+      :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
       v-model="valueProperty"
       editable
       :options="possibleValues"

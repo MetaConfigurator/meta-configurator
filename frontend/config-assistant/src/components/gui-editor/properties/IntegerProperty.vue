@@ -4,11 +4,13 @@ import InputNumber from 'primevue/inputnumber';
 import type {PathElement} from '@/model/path';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
+import {ValidationResults} from '@/helpers/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: number | undefined;
   propertySchema: JsonSchema;
+  validationResults: ValidationResults;
 }>();
 
 const emit = defineEmits<{
@@ -30,6 +32,7 @@ const valueProperty = computed({
 <template>
   <InputNumber
     class="h-8"
+    :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="valueProperty"
     value="propertyName"
     input-id="integeronly"
