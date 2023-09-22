@@ -25,7 +25,7 @@ function isExpanded(): boolean {
     <span class="text-sm text-gray-400 truncate col-span-4" style="max-width: 15rem">
       <span v-if="!isExpanded()">{{ dataToString(propertyData) }}</span>
     </span>
-    <span class="text-gray-500 font-extralight justify-self-end">
+    <span class="text-gray-500 font-extralight justify-self-end" v-if="!isExpanded()">
       {{ getNumberOfItems() }} items
     </span>
   </div>
