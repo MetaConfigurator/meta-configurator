@@ -124,7 +124,7 @@ function applySchemaConstantsOnDataBasedOnSelection(
   delete baseSchema.oneOf;
   const mergedSchema = safeMergeSchemas(
     baseSchema,
-    schemaAtPath.oneOf[selectedOneOfOption.index].jsonSchema
+    schemaAtPath.oneOf[selectedOneOfOption.index]?.jsonSchema ?? {}
   );
   const resultData = applySchemaConstantsOnData(mergedSchema, props.propertyData);
   if (!_.isEqual(resultData, props.propertyData)) {
@@ -132,6 +132,10 @@ function applySchemaConstantsOnDataBasedOnSelection(
   }
 }
 function applySchemaConstantsOnData(schema: JsonSchemaObjectType, data: any): any {
+  if (schema === undefined) {
+    return data;
+  }
+
   // note that in pre-processing all const is converted to an enum with just one entry
   // hence, for us constants are equal to an enum of length 1.
   if (schema.enum) {
@@ -142,7 +146,12 @@ function applySchemaConstantsOnData(schema: JsonSchemaObjectType, data: any): an
   if (schema.properties) {
     for (let key: string in schema.properties) {
       const propertySchema = schema.properties[key];
-      applySchemaConstantsOnData(propertySchema, data[key]);
+      if (data === undefined) {
+        data = {};
+      }
+      if (key in data) {
+        applySchemaConstantsOnData(propertySchema, data[key]);
+      }
     }
   }
   return data;
