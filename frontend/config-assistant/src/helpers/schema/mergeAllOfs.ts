@@ -1,11 +1,10 @@
 import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
 // @ts-ignore
 import mergeAllOf from 'json-schema-merge-allof';
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 export function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
   return mergeAllOf(schema, {
-    deep: false,
+    deep: true,
     resolvers: {
       defaultResolver: mergeAllOf.options.resolvers.title,
       // add additional resolvers here, most of the keywords are NOT supported by default
