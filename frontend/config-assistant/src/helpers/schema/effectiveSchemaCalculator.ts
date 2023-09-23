@@ -3,6 +3,7 @@ import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
 import {dataAt, pathToString} from '@/helpers/pathHelper';
+import _ from 'lodash';
 
 export class EffectiveSchema {
   constructor(public schema: JsonSchema, public data: any, public path: Path) {}

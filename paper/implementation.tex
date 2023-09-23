@@ -20,7 +20,41 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
 
 \subsection{Code Editor}\label{subsec:code-editor}
 
-% todo decribe the code editor component and how it works
+The code editor is a GUI panel designed for editing the \cfgfiles.
+In our user case, we use the popular editor \textbf{Ace Editor}. \cite{Ace-Editor}
+It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
+It can be easily embedded in any web page or JavaScript application.
+
+\subsubsection{Features}
+
+To make our code editor more user-friendly, we implemented several features, which are described in the following.
+
+\paragraph{Schema Validation}
+To ensure that the data is valid as soon as it is entered by the user, we use schema validation.
+Therefore, the config data get validated based on the schema that is currently loaded.
+We choose to use \textbf{Ajv JSON schema validator} \cite{ajv-validator}.
+It supports the newest JSON schema draft 2020-12.
+Ajv firstly generates a fast validation function from the input schema.
+If the config data is not valid according to the schema, there will be a red error hint on left side of the code editor.
+
+\paragraph{Support for JSON and YAML}
+There is a lot build-in support for different languages in the ace editor.
+In our project, we support JSON and YAML. It can be switched in the Settings page.
+
+\paragraph{Concrete Syntax Tree}
+% TODO: how we get cursor position and path correctly using cst
+
+\paragraph{Syntax Highlighting}
+The ace editor supports syntax highlighting for both JSON and YAML, which we use.
+With this functionality, users can recognize different components in the data better, like properties or values.
+
+\paragraph{Editor Operations}
+There are many other useful functionalities we have implemented in the code editor.
+\begin{itemize}
+    \item Dragging and dropping files in the code editor
+    \item Font size configuration in the Settings
+    \item Setting themes
+\end{itemize}
 
 \subsection{GUI Editor}\label{subsec:gui-editor}
 

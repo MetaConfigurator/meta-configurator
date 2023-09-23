@@ -4,11 +4,13 @@ import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {ValidationResults} from '@/helpers/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: string | undefined;
   propertySchema: JsonSchema;
+  validationResults: ValidationResults;
 }>();
 
 const emit = defineEmits<{
@@ -35,8 +37,8 @@ function updateValue() {
 
 <template>
   <InputText
-    :class="$style.tableInput"
-    class="h-8"
+    :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
+    class="h-8 tableInput"
     v-model="valueProperty"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     @blur="updateValue"
@@ -44,7 +46,7 @@ function updateValue() {
     @keyup.enter="updateValue" />
 </template>
 
-<style module>
+<style scoped>
 /* remove border so it fits the look of the table better */
 .tableInput {
   border: none;

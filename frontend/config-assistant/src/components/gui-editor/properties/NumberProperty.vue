@@ -4,11 +4,13 @@ import {computed} from 'vue';
 import type {PathElement} from '@/model/path';
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
+import {ValidationResults} from '@/helpers/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: number | undefined;
   propertySchema: JsonSchema;
+  validationResults: ValidationResults;
 }>();
 
 const stepValue = computed(() => {
@@ -29,11 +31,16 @@ const valueProperty = computed({
     }
   },
 });
+
+function isValid(): boolean {
+  return props.validationResults.valid;
+}
 </script>
 
 <template>
   <InputNumber
     class="h-8"
+    :class="{'underline decoration-wavy decoration-red-600': !isValid()}"
     v-model="valueProperty"
     value="propertyName"
     mode="decimal"

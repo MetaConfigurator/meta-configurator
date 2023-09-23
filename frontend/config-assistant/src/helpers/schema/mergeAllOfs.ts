@@ -6,7 +6,7 @@ import {isNumber} from 'lodash';
 
 export function mergeAllOfs(schema: JsonSchemaObjectType, depth: number): JsonSchemaObjectType {
   const result = mergeAllOf(schema, {
-    deep: false,
+    deep: true,
     resolvers: {
       defaultResolver: mergeAllOf.options.resolvers.title,
       // add additional resolvers here, most of the keywords are NOT supported by default
