@@ -6,6 +6,19 @@ import type {
 import _ from 'lodash';
 import 'crypto';
 
+/**
+ * One time schema preprocessor.
+ * This will preprocess the schema once, so that it can be used for the GUI.
+ * This will not modify the original schema.
+ *
+ * The following steps are performed:
+ * - add $id if not present
+ * - add title if not present in properties and definitions
+ * - convert const to enum
+ * - inject types of enum to types property
+ *
+ * @param schema the schema to preprocess
+ */
 export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaType {
   if (typeof schema !== 'object') {
     return schema;
@@ -17,8 +30,6 @@ export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaType {
   const id = schemaCopy.$id || schemaCopy.id || crypto.randomUUID();
 
   preprocessOneTimeRecursive(schemaCopy, id);
-
-  console.log(schemaCopy);
 
   return schemaCopy;
 }
