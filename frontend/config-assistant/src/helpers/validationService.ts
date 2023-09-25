@@ -49,14 +49,11 @@ export class ValidationService {
    * so that the sub schema can reference them.
    *
    * @param schema the sub schema
-   * @param key unique key for the sub schema, used to cache the validation function
    * @param data the data to validate
    */
-  public validateSubSchema(
-    schema: JsonSchemaObjectType,
-    key: string,
-    data: any
-  ): ValidationResults {
+  public validateSubSchema(schema: JsonSchemaObjectType, data: any): ValidationResults {
+    const key = schema.$id || schema.id || JSON.stringify(schema);
+
     // inject definitions
     if (this._ajv?.getSchema(key) === undefined) {
       const schemaWithDefinitions = this.injectDefinitions(schema);

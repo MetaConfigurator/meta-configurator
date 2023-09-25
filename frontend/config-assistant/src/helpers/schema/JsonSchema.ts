@@ -7,7 +7,6 @@ import {
 } from '@/helpers/schema/SchemaUtils';
 import type {Path, PathElement} from '@/model/path';
 import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
-import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -39,7 +38,7 @@ export class JsonSchema {
   constructor(jsonSchema: JsonSchemaType) {
     this.jsonSchema = nonBooleanSchema(jsonSchema);
     if (this.jsonSchema !== undefined) {
-      this.jsonSchema = preprocessSchema(this.jsonSchema);
+      this.jsonSchema = preprocessSchema(this.jsonSchema, true);
     }
   }
   /**
