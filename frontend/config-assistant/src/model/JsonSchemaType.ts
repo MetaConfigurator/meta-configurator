@@ -13,7 +13,7 @@ export type JsonSchemaObjectType = {
   /**
    * @minItems 1
    */
-  prefixItems?: [JsonSchemaType, ...JsonSchemaType[]];
+  prefixItems?: JsonSchemaType[];
   items?: JsonSchemaType;
   contains?: JsonSchemaType;
   additionalProperties?: JsonSchemaType;

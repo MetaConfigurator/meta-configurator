@@ -2,7 +2,7 @@ import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
-import {dataAt, pathToString} from '@/helpers/pathHelper';
+import {dataAt} from '@/helpers/pathHelper';
 import _ from 'lodash';
 
 export class EffectiveSchema {
@@ -20,7 +20,7 @@ export function calculateEffectiveSchema(
   while (result.isDataDependent && iteration < 1000) {
     // if something goes wrong, we don't want to get stuck in an infinite loop
     if (result.if !== undefined && result.then !== undefined) {
-      result = resolveIfThenElse(result, data, path);
+      result = resolveIfThenElse(result, data);
     }
 
     if (result.dependentRequired) {
@@ -53,17 +53,13 @@ function resolveDependentRequired(schemaWrapper: JsonSchema, data: any) {
   });
 }
 
-function resolveIfThenElse(schemaWrapper: JsonSchema, data: any, path: Path) {
+function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
   let newSchema: JsonSchemaObjectType;
   const validationService = useSessionStore().validationService;
   if (!schemaWrapper.if || !schemaWrapper.if.jsonSchema) {
     return schemaWrapper;
   }
-  const valid = validationService.validateSubSchema(
-    schemaWrapper.if.jsonSchema,
-    pathToString(path) + '.if',
-    data
-  ).valid;
+  const valid = validationService.validateSubSchema(schemaWrapper.if.jsonSchema, data).valid;
   const baseSchema = {...schemaWrapper.jsonSchema};
   delete baseSchema.if;
   delete baseSchema.then;
