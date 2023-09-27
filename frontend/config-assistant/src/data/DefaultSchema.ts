@@ -107,8 +107,50 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
           properties: {
             number: {
               type: 'number',
-              description: 'Street number',
             },
+          },
+        },
+        {
+          if: {
+            properties: {
+              number: {
+                multipleOf: 2,
+              },
+            },
+            required: ['number'],
+          },
+          then: {
+            properties: {
+              number: {
+                description: 'Even street number',
+              },
+            },
+          },
+          else: {
+            properties: {
+              number: {
+                description: 'Odd street number',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            properties: {
+              street: {
+                const: 'Main Street',
+              },
+            },
+            required: ['street'],
+          },
+          then: {
+            properties: {
+              extraInfo: {
+                type: 'string',
+                description: 'Main street extra info',
+              },
+            },
+            required: ['extraInfo'],
           },
         },
       ],

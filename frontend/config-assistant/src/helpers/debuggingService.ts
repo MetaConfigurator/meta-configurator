@@ -8,7 +8,7 @@ export class DebuggingService {
   public addPreprocessingStep(
     depth: number,
     name: string,
-    schema: JsonSchemaType,
+    schema?: JsonSchemaType,
     additionalInfo: string = ''
   ) {
     this.preprocessingSteps.value.push(new PreprocessingStep(depth, name, schema, additionalInfo));
@@ -25,7 +25,7 @@ export class PreprocessingStep {
   constructor(
     public depth: number,
     public name: string,
-    public schema: JsonSchemaType,
+    public schema?: JsonSchemaType,
     public additionalInfo: string = ''
   ) {}
 

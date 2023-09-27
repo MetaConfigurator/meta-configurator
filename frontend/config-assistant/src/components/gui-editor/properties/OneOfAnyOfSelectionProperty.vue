@@ -69,9 +69,9 @@ function inferOneOfUserSelection() {
     for (let subSchema: JsonSchema of props.propertySchema.oneOf) {
       const valid = validationService.validateSubSchema(
         subSchema.jsonSchema!!,
+        props.propertyData,
         // TODO: remove key once it has become optional (change from Paul).
-        pathToString(props.absolutePath) + '.oneOf[' + index + ']',
-        props.propertyData
+        pathToString(props.absolutePath) + '.oneOf[' + index + ']'
       ).valid;
 
       if (valid) {
@@ -92,8 +92,6 @@ function findOptionByDisplayText(displayText: string): OneOfAnyOfSelectionOption
       return option;
     }
   }
-
-  return undefined;
 }
 
 function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | undefined {
@@ -102,8 +100,6 @@ function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | 
       return option;
     }
   }
-
-  return undefined;
 }
 
 function applySchemaConstantsOnDataBasedOnSelection(
@@ -133,6 +129,9 @@ function applySchemaConstantsOnDataBasedOnSelection(
 }
 function applySchemaConstantsOnData(schema: JsonSchemaObjectType, data: any): any {
   if (schema === undefined) {
+    return data;
+  }
+  if (typeof data !== 'object') {
     return data;
   }
 

@@ -8,13 +8,10 @@ import {useSessionStore} from '@/store/sessionStore';
 import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
 import {
   areSchemasCompatible,
-  mergeAllOfs,
   mergeSchemas,
   safeMergeAllOfs,
   safeMergeSchemas,
 } from '@/helpers/schema/mergeAllOfs';
-import _ from 'lodash';
-import {debuggingService} from '@/helpers/debuggingService';
 
 const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
 
@@ -31,56 +28,56 @@ const preprocessedRefSchemas: Map<string, JsonSchemaObjectType> = new Map();
  * - Injects types of enum to types property
  *
  * @param schema the schema to preprocess
- * @param depth the depth of the schema in the tree
  * @returns the preprocessed schema
  */
-export function preprocessSchema(
-  schema: JsonSchemaObjectType,
-  depth: number = 0
-): JsonSchemaObjectType {
-  debuggingService.addPreprocessingStep(depth, 'start preprocessing', schema);
+export function preprocessSchema(schema: JsonSchemaObjectType): JsonSchemaObjectType {
+  let schemaToPreprocess = {...schema};
 
-  let copiedSchema = schema;
-  if (depth == 0) {
-    // only clone at root level
-    copiedSchema = _.cloneDeep(schema);
+  console.groupCollapsed('preprocessSchema', schemaToPreprocess.title);
+  console.log('schema', schemaToPreprocess);
+
+  if (hasRef(schemaToPreprocess)) {
+    schemaToPreprocess = resolveReference(schemaToPreprocess);
+    console.log('schema after resolving ref', schemaToPreprocess);
   }
 
-  if (hasRef(copiedSchema)) {
-    copiedSchema = resolveReference(copiedSchema, depth);
-  }
-
-  if (hasAllOfs(copiedSchema)) {
+  if (hasAllOfs(schemaToPreprocess)) {
     // @ts-ignore
-    copiedSchema.allOf = copiedSchema.allOf!!.map(subSchema =>
-      preprocessSchema(subSchema as JsonSchemaObjectType, depth + 1)
+    schemaToPreprocess.allOf = schemaToPreprocess.allOf!!.map(subSchema =>
+      preprocessSchema(subSchema as JsonSchemaObjectType)
     );
-    copiedSchema = mergeAllOfs(copiedSchema as JsonSchemaObjectType, depth);
+    schemaToPreprocess =
+      nonBooleanSchema(safeMergeAllOfs(schemaToPreprocess as JsonSchemaObjectType)) ?? {};
+    console.log('schema after merging allOfs', schemaToPreprocess);
   }
-
-  convertTypesToOneOf(copiedSchema, depth);
-  removeIncompatibleOneOfs(copiedSchema, depth);
-  removeIncompatibleAnyOfs(copiedSchema, depth);
-  copiedSchema = mergeSingularOneOf(copiedSchema, depth);
-  copiedSchema = mergeSingularAnyOf(copiedSchema, depth);
-  attemptMergeOneOfsIntoAnyOfs(copiedSchema, depth);
-  preprocessOneOfs(copiedSchema, depth);
-  preprocessAnyOfs(copiedSchema, depth);
+  convertTypesToOneOf(schemaToPreprocess);
+  removeIncompatibleOneOfs(schemaToPreprocess);
+  removeIncompatibleAnyOfs(schemaToPreprocess);
+  schemaToPreprocess = mergeSingularOneOf(schemaToPreprocess);
+  schemaToPreprocess = mergeSingularAnyOf(schemaToPreprocess);
+  attemptMergeOneOfsIntoAnyOfs(schemaToPreprocess);
+  preprocessOneOfs(schemaToPreprocess);
+  preprocessAnyOfs(schemaToPreprocess);
   // TODO: deal with case where there is anyOf and oneOf --> show both options in GUI?
 
-  induceTitles(copiedSchema, depth);
+  induceTitles(schemaToPreprocess);
 
-  convertConstToEnum(copiedSchema, depth);
-  injectTypesOfEnum(copiedSchema, depth);
+  convertConstToEnum(schemaToPreprocess);
+  injectTypesOfEnum(schemaToPreprocess);
 
-  return copiedSchema;
+  // addAnyTypeToPropertiesWithoutType(schemaToPreprocess);
+
+  console.log('preprocessed schema', schemaToPreprocess);
+  console.groupEnd();
+
+  return schemaToPreprocess;
 }
 
 function hasRef(schema: JsonSchemaObjectType): boolean {
   return schema.$ref !== undefined;
 }
 
-function convertTypesToOneOf(schema: JsonSchemaObjectType, depth: number) {
+function convertTypesToOneOf(schema: JsonSchemaObjectType) {
   if (!Array.isArray(schema.type)) {
     return;
   }
@@ -99,7 +96,7 @@ function convertTypesToOneOf(schema: JsonSchemaObjectType, depth: number) {
         type: propertyType,
       };
 
-      newOneOfs.push(preprocessSchema(typeSchema as JsonSchemaObjectType, depth + 1));
+      newOneOfs.push(typeSchema as JsonSchemaObjectType);
     });
 
     schema.oneOf = newOneOfs;
@@ -116,17 +113,15 @@ function convertTypesToOneOf(schema: JsonSchemaObjectType, depth: number) {
         const combinedSchema = {
           allOf: [
             typeSchema as JsonSchemaObjectType,
-            preprocessSchema(originalOneOf as JsonSchemaObjectType, depth + 1),
+            preprocessSchema(originalOneOf as JsonSchemaObjectType),
           ],
         };
-        const newOneOf = safeMergeAllOfs(combinedSchema, depth);
+        const newOneOf = safeMergeAllOfs(combinedSchema);
         newOneOfs.push(newOneOf);
       });
     });
     schema.oneOf = newOneOfs;
     delete schema.type;
-
-    debuggingService.addPreprocessingStep(depth, 'converted types to oneOfs', schema);
   }
 }
 
@@ -138,7 +133,7 @@ function convertTypesToOneOf(schema: JsonSchemaObjectType, depth: number) {
 // the only oneOf choice for the given anyOf.
 // If for every anyOf only one oneOf is possible, the oneOf property is
 // removed from the schema altogether.
-function attemptMergeOneOfsIntoAnyOfs(schema: JsonSchemaObjectType, depth: number) {
+function attemptMergeOneOfsIntoAnyOfs(schema: JsonSchemaObjectType) {
   if (hasAnyOfs(schema) && hasOneOfs(schema)) {
     let someAnyOfHasMultipleOneOfOptions = false;
 
@@ -150,8 +145,7 @@ function attemptMergeOneOfsIntoAnyOfs(schema: JsonSchemaObjectType, depth: numbe
       schema.oneOf!!.forEach(subSchemaOneOf => {
         const mergeResult = safeMergeSchemas(
           subSchemaAnyOf as JsonSchemaObjectType,
-          subSchemaOneOf as JsonSchemaObjectType,
-          depth
+          subSchemaOneOf as JsonSchemaObjectType
         );
         if (mergeResult != false) {
           mergedOneOfs.push(mergeResult);
@@ -169,41 +163,36 @@ function attemptMergeOneOfsIntoAnyOfs(schema: JsonSchemaObjectType, depth: numbe
     if (!someAnyOfHasMultipleOneOfOptions) {
       delete schema.oneOf;
     }
-    debuggingService.addPreprocessingStep(depth, 'merged oneOfs into anyOfs', schema);
   }
 }
 
-function preprocessAnyOfs(schema: JsonSchemaObjectType, depth: number) {
+function preprocessAnyOfs(schema: JsonSchemaObjectType) {
   if (hasAnyOfs(schema)) {
     // @ts-ignore
     schema.anyOf = schema.anyOf!!.map(subSchema => {
-      return preprocessSchema(subSchema as JsonSchemaObjectType, depth + 1);
+      return preprocessSchema(subSchema as JsonSchemaObjectType);
     });
-
-    debuggingService.addPreprocessingStep(depth, 'preprocessed anyOfs', schema);
   }
 }
 
-function preprocessOneOfs(schema: JsonSchemaObjectType, depth: number) {
+function preprocessOneOfs(schema: JsonSchemaObjectType) {
   if (hasOneOfs(schema)) {
     // @ts-ignore
     schema.oneOf = schema.oneOf!!.map(subSchema => {
-      return preprocessSchema(subSchema as JsonSchemaObjectType, depth + 1);
+      return preprocessSchema(subSchema as JsonSchemaObjectType);
     });
-
-    debuggingService.addPreprocessingStep(depth, 'preprocessed oneOfs', schema);
   }
 }
 
-function removeIncompatibleAnyOfs(schema: JsonSchemaObjectType, depth: number) {
+function removeIncompatibleAnyOfs(schema: JsonSchemaObjectType) {
   if (hasAnyOfs(schema)) {
+    // console.groupCollapsed('removeIncompatibleAnyOfs')
+    // console.log('schema.anyOf before', schema.anyOf);
     // @ts-ignore
     schema.anyOf = schema.anyOf!!.map(subSchema => {
       const copiedSchemaWithoutAnyOf = {...schema};
       delete copiedSchemaWithoutAnyOf.anyOf;
-      if (
-        !areSchemasCompatible(copiedSchemaWithoutAnyOf, subSchema as JsonSchemaObjectType, depth)
-      ) {
+      if (!areSchemasCompatible(copiedSchemaWithoutAnyOf, subSchema as JsonSchemaObjectType)) {
         return false;
       } else {
         return subSchema;
@@ -211,19 +200,20 @@ function removeIncompatibleAnyOfs(schema: JsonSchemaObjectType, depth: number) {
     });
     // remove oneOfs that are not compatible with parent
     schema.anyOf = schema.anyOf.filter(anyOf => anyOf != false);
-
-    debuggingService.addPreprocessingStep(depth, 'removed incompatible anyOfs', schema);
+    // console.log('schema.anyOf after', schema.anyOf)
+    // console.groupEnd();
   }
 }
-function removeIncompatibleOneOfs(schema: JsonSchemaObjectType, depth: number) {
+
+function removeIncompatibleOneOfs(schema: JsonSchemaObjectType) {
   if (hasOneOfs(schema)) {
+    // console.groupCollapsed('removeIncompatibleOneOfs');
+    // console.log('schema.oneOf before', schema.oneOf);
     // @ts-ignore
     schema.oneOf = schema.oneOf!!.map(subSchema => {
       const copiedSchemaWithoutOneOf = {...schema};
       delete copiedSchemaWithoutOneOf.oneOf;
-      if (
-        !areSchemasCompatible(copiedSchemaWithoutOneOf, subSchema as JsonSchemaObjectType, depth)
-      ) {
+      if (!areSchemasCompatible(copiedSchemaWithoutOneOf, subSchema as JsonSchemaObjectType)) {
         return false;
       } else {
         return subSchema;
@@ -231,39 +221,19 @@ function removeIncompatibleOneOfs(schema: JsonSchemaObjectType, depth: number) {
     });
     // remove oneOfs that are not compatible with parent
     schema.oneOf = schema.oneOf.filter(oneOf => oneOf != false);
-
-    debuggingService.addPreprocessingStep(depth, 'removed incompatible oneOfs', schema);
+    /* console.log('schema.oneOf after', schema.oneOf)
+    console.groupEnd(); */
   }
 }
 
-function areSchemasCompatible(
-  schemaA: JsonSchemaObjectType,
-  schemaB: JsonSchemaObjectType,
-  depth: number
-): boolean {
-  const mergeResult = safeMergeSchemas(schemaA, schemaB, depth);
-  return mergeResult != false;
-}
-
-function safeMergeSchemas(
-  schemaA: JsonSchemaObjectType,
-  schemaB: JsonSchemaObjectType,
-  depth: number
-): JsonSchemaObjectType | false {
-  const combinedSchema = {
-    allOf: [schemaA, schemaB],
-  };
-  return safeMergeAllOfs(combinedSchema as JsonSchemaObjectType, depth);
-}
-
 // if oneOf has just one entry: merge into parent
-function mergeSingularOneOf(schema: JsonSchemaObjectType, depth: number): JsonSchemaObjectType {
+function mergeSingularOneOf(schema: JsonSchemaObjectType): JsonSchemaObjectType {
   if (hasOneOfs(schema)) {
-    if (schema.oneOf!!.length == 1) {
+    if (schema.oneOf!.length == 1) {
       const copiedSchema = {...schema};
       delete copiedSchema.oneOf;
       return mergeSchemas(
-        preprocessSchema(schema.oneOf!![0] as JsonSchemaObjectType),
+        preprocessSchema(schema.oneOf![0] as JsonSchemaObjectType),
         preprocessSchema(copiedSchema)
       );
     } else if (schema.oneOf!!.length == 0) {
@@ -275,7 +245,7 @@ function mergeSingularOneOf(schema: JsonSchemaObjectType, depth: number): JsonSc
 }
 
 // if anyOf has just one entry: merge into parent
-function mergeSingularAnyOf(schema: JsonSchemaObjectType, depth: number): JsonSchemaObjectType {
+function mergeSingularAnyOf(schema: JsonSchemaObjectType): JsonSchemaObjectType {
   if (hasAnyOfs(schema)) {
     if (schema.anyOf!!.length == 1) {
       const copiedSchema = {...schema};
@@ -292,7 +262,70 @@ function mergeSingularAnyOf(schema: JsonSchemaObjectType, depth: number): JsonSc
   return schema;
 }
 
-function resolveReference(copiedSchema: JsonSchemaObjectType, depth: number) {
+const anyType: SchemaPropertyType[] = [
+  'string',
+  'number',
+  'integer',
+  'boolean',
+  'object',
+  'array',
+  'null',
+];
+
+function addAnyTypeIfNecessary(schema: JsonSchemaType | undefined): JsonSchemaType {
+  // TODO this implementation does not 100% work yet
+  // and causes performance issues
+  if (schema === undefined || schema === true) {
+    return {
+      type: anyType,
+    };
+  }
+  if (typeof schema !== 'object') {
+    return schema;
+  }
+  if (schema.type === undefined) {
+    const copiedSchema = {...schema};
+    copiedSchema.type = anyType;
+    return copiedSchema;
+  }
+
+  return schema;
+}
+
+function addAnyTypeToProperties(properties: Record<string, JsonSchemaType>) {
+  const copiedProperties = {...properties};
+  Object.entries(copiedProperties).forEach(([key, value]) => {
+    copiedProperties[key] = addAnyTypeIfNecessary(value);
+  });
+  return copiedProperties;
+}
+
+function isOfTypeObject(schema: JsonSchemaObjectType) {
+  return schema.type === 'object' || (Array.isArray(schema.type) && schema.type.includes('object'));
+}
+
+function isOfTypeArray(schema: JsonSchemaObjectType) {
+  return schema.type === 'array' || (Array.isArray(schema.type) && schema.type.includes('array'));
+}
+
+function addAnyTypeToPropertiesWithoutType(schema: JsonSchemaObjectType) {
+  if (isOfTypeObject(schema)) {
+    schema.additionalProperties = addAnyTypeIfNecessary(schema.additionalProperties);
+
+    if (schema.properties !== undefined) {
+      schema.properties = addAnyTypeToProperties(schema.properties);
+    }
+    if (schema.patternProperties !== undefined) {
+      schema.patternProperties = addAnyTypeToProperties(schema.patternProperties);
+    }
+  }
+
+  if (isOfTypeArray(schema)) {
+    schema.items = addAnyTypeIfNecessary(schema.items);
+  }
+}
+
+function resolveReference(copiedSchema: JsonSchemaObjectType) {
   // remove leading # from ref if present
   const refString = copiedSchema.$ref?.startsWith('#')
     ? copiedSchema.$ref.substring(1)
@@ -306,48 +339,48 @@ function resolveReference(copiedSchema: JsonSchemaObjectType, depth: number) {
       nonBooleanSchema(useSessionStore().fileSchemaData ?? {}) ?? {},
       refString
     );
-    refSchema = preprocessSchema(refSchema, depth + 1);
+    refSchema = preprocessSchema(refSchema);
     preprocessedRefSchemas.set(refString, refSchema);
   }
 
   delete copiedSchema.$ref;
 
-  const result = {allOf: [refSchema, copiedSchema]};
-  debuggingService.addPreprocessingStep(depth, 'resolved reference', result);
-  return result;
+  return {allOf: [refSchema, copiedSchema]};
 }
 
-function induceTitles(schema: JsonSchemaObjectType, depth: number): void {
-  const schemaBefore = JSON.stringify(schema);
-  induceTitlesOnObject(schema.properties ?? {});
-  induceTitlesOnObject(schema.definitions ?? {});
-  induceTitlesOnObject(schema.$defs ?? {});
-
-  if (JSON.stringify(schema) !== schemaBefore) {
-    debuggingService.addPreprocessingStep(depth, 'induced titles', schema);
+function induceTitles(schema: JsonSchemaObjectType): void {
+  if (schema.properties !== undefined) {
+    schema.properties = induceTitlesOnObject(schema.properties);
+  }
+  if (schema.definitions !== undefined) {
+    schema.definitions = induceTitlesOnObject(schema.definitions);
+  }
+  if (schema.$defs !== undefined) {
+    schema.$defs = induceTitlesOnObject(schema.$defs);
   }
 }
 
-function induceTitlesOnObject(object: object) {
-  Object.entries(object).forEach(([key, value]) => {
+function induceTitlesOnObject<Type extends object>(object: Type): Type | undefined {
+  const clonedObject = {...object};
+  Object.entries(clonedObject).forEach(([key, value]) => {
     if (typeof value === 'object') {
+      // TODO this doesnt work yet!! we need to also clone the "value" object
       if (value.title === undefined) {
         value.title = key;
       }
     }
   });
+  return clonedObject;
 }
 
-function convertConstToEnum(schema: JsonSchemaObjectType, depth: number): void {
+function convertConstToEnum(schema: JsonSchemaObjectType): void {
   if (schema.const !== undefined) {
     schema.enum = [schema.const];
     delete schema.const;
-
-    debuggingService.addPreprocessingStep(depth, 'converted const to enum', schema);
   }
 }
 
-function injectTypesOfEnum(schema: JsonSchemaObjectType, depth: number): void {
+function injectTypesOfEnum(schema: JsonSchemaObjectType): void {
   const foundTypes = new Set<SchemaPropertyType>();
   const enumValues = schema.enum;
   if (enumValues !== undefined && enumValues.length > 0) {
@@ -377,16 +410,17 @@ function injectTypesOfEnum(schema: JsonSchemaObjectType, depth: number): void {
 
   if (schema.type === undefined && foundTypes.size > 0) {
     schema.type = [...foundTypes];
-    debuggingService.addPreprocessingStep(depth, 'injected types of enum', schema);
   }
 }
 
 function hasAllOfs(schema: JsonSchemaObjectType): boolean {
   return schema.allOf !== undefined && schema.allOf.length > 0;
 }
+
 function hasOneOfs(schema: JsonSchemaObjectType): boolean {
   return schema.oneOf !== undefined && schema.oneOf.length > 0;
 }
+
 function hasAnyOfs(schema: JsonSchemaObjectType): boolean {
   return schema.anyOf !== undefined && schema.anyOf.length > 0;
 }

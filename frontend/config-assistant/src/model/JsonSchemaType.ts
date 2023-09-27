@@ -107,5 +107,15 @@ export type SchemaPropertyType =
   | 'number'
   | 'object'
   | 'string';
-export const NUMBER_OF_PROPERTY_TYPES = 7;
+
+export const ANY_TYPE: SchemaPropertyType[] = [
+  'array',
+  'boolean',
+  'integer',
+  'null',
+  'number',
+  'object',
+  'string',
+];
+export const NUMBER_OF_PROPERTY_TYPES = ANY_TYPE.length;
 export type SchemaPropertyTypes = SchemaPropertyType | SchemaPropertyType[];

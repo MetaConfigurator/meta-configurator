@@ -68,7 +68,7 @@ function computeTree() {
  */
 function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
   for (const node of nodes) {
-    const expanded = currentExpandedElements.value[pathToString(node.data.absolutePath)] ?? false;
+    const expanded = currentExpandedElements.value[node.key] ?? false;
     if (expanded) {
       node.children = treeNodeResolver.createChildNodesOfNode(node);
       if (node.children && node.children.length > 0) {
@@ -291,15 +291,15 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
 }
 
 function findNameForNewProperty(objectSchema: JsonSchema | undefined, data: any) {
-  if (objectSchema === undefined) {
-    return 'newProperty';
+  if (objectSchema === undefined || data === undefined) {
+    return 'yourNewProperty';
   }
 
   const existingProperties = Object.keys(data);
   let index = 1;
-  let name = 'newProperty';
+  let name = 'yourNewProperty';
   while (existingProperties.includes(name)) {
-    name = `newProperty${index}`;
+    name = `yourNewProperty${index}`;
     index++;
   }
   return name;
@@ -366,6 +366,9 @@ function expandElementsByPath(relativePath: Path) {
 }
 
 function expandElementChildren(node: any) {
+  if (node.type === TreeNodeType.ADVANCED_PROPERTY) {
+    return;
+  }
   node.children = treeNodeResolver.createChildNodesOfNode(node);
   expandPreviouslyExpandedElements(node.children as Array<GuiEditorTreeNode>);
 }
@@ -518,6 +521,14 @@ function getValidationResults(absolutePath: Path) {
             <i class="pi pi-plus" />
             <span class="pl-2">New property</span>
           </Button>
+        </span>
+
+        <span
+          v-if="slotProps.node.type === TreeNodeType.ADVANCED_PROPERTY"
+          class="text-gray-500"
+          style="width: 100%; min-width: 100%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          Advanced
         </span>
       </template>
     </Column>

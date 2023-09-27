@@ -54,9 +54,17 @@ export class ValidationService {
    */
   public validateSubSchema(
     schema: JsonSchemaObjectType,
-    key: string,
-    data: any
+    data: any,
+    key?: string
   ): ValidationResults {
+    console.groupCollapsed('validateSubSchema');
+    if (!key) {
+      key = JSON.stringify(schema);
+    }
+    console.log('key', key);
+    console.log('schema', schema);
+    console.log('data', data);
+
     // inject definitions
     if (this._ajv?.getSchema(key) === undefined) {
       const schemaWithDefinitions = this.injectDefinitions(schema);
@@ -64,10 +72,13 @@ export class ValidationService {
     }
     const validationFunction: ValidateFunction | undefined = this._ajv?.getSchema(key);
     if (!validationFunction) {
+      console.warn('Could not compile schema for key ' + key);
       return new ValidationResults([]); // optimistic approach
     }
     validationFunction(data);
     const errors = validationFunction.errors || [];
+    console.log('errors', errors);
+    console.groupEnd();
     return new ValidationResults(errors);
   }
 

@@ -7,7 +7,7 @@ import {
 } from '@/helpers/schema/SchemaUtils';
 import type {Path, PathElement} from '@/model/path';
 import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
-import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
+import _ from 'lodash';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -42,6 +42,7 @@ export class JsonSchema {
       this.jsonSchema = preprocessSchema(this.jsonSchema);
     }
   }
+
   /**
    * Returns an empty, initial value that matches the type of
    * the schema (this is NOT the default value).
@@ -145,7 +146,7 @@ export class JsonSchema {
   }
 
   get isAlwaysTrue(): boolean {
-    return JSON.stringify(this.jsonSchema) === '{}';
+    return _.isEmpty(this.jsonSchema);
   }
 
   get isAlwaysFalse(): boolean {
@@ -156,7 +157,8 @@ export class JsonSchema {
     return (
       this.if !== undefined ||
       this.dependentSchemas !== undefined ||
-      this.dependentRequired !== undefined
+      this.dependentRequired !== undefined ||
+      this.conditions.length > 0
     );
   }
 
@@ -302,6 +304,13 @@ export class JsonSchema {
       this._not = schemaFromObject(this.jsonSchema?.not);
     }
     return this._not;
+  }
+
+  /**
+   * Custom field that potentially contains all if-then-else conditions of the allOfs.
+   */
+  get conditions(): JsonSchema[] {
+    return schemaArray(this.jsonSchema?.conditions);
   }
 
   /**
@@ -777,5 +786,12 @@ export class JsonSchema {
    */
   get writeOnly(): boolean {
     return this.jsonSchema?.writeOnly ?? false;
+  }
+
+  /**
+   * Meta configurator specific properties.
+   */
+  get metaConfigurator(): {advanced: boolean} | undefined {
+    return this.jsonSchema?.metaConfigurator;
   }
 }
