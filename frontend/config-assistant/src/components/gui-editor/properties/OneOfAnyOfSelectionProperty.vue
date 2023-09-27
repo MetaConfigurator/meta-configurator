@@ -69,9 +69,7 @@ function inferOneOfUserSelection() {
     for (let subSchema: JsonSchema of props.propertySchema.oneOf) {
       const valid = validationService.validateSubSchema(
         subSchema.jsonSchema!!,
-        props.propertyData,
-        // TODO: remove key once it has become optional (change from Paul).
-        pathToString(props.absolutePath) + '.oneOf[' + index + ']'
+        props.propertyData
       ).valid;
 
       if (valid) {

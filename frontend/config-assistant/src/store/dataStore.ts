@@ -5,6 +5,7 @@ import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
 // @ts-ignore
 import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
+import {preprocessOneTime} from '@/helpers/schema/oneTimeSchemaPreprocessor';
 
 export const useDataStore = defineStore('dataStore', () => {
   /**
@@ -23,7 +24,7 @@ export const useDataStore = defineStore('dataStore', () => {
   /**
    * The json schema as a TopLevelJsonSchema object
    */
-  const schema = ref(new TopLevelJsonSchema(schemaData.value));
+  const schema = ref(new TopLevelJsonSchema(preprocessOneTime(schemaData.value)));
 
   /**
    * The json schema meta schema as a plain object
@@ -34,17 +35,19 @@ export const useDataStore = defineStore('dataStore', () => {
    * The json schema meta schema as a TopLevelJsonSchema object
    */
   const metaSchema: Ref<TopLevelJsonSchema> = computed(
-    () => new TopLevelJsonSchema(metaSchemaData.value as any)
+    () => new TopLevelJsonSchema(preprocessOneTime(simplifiedMetaSchema))
   );
 
   // make sure that the schema is not preprocessed too often
   watchDebounced(
     schemaData,
     () => {
-      schema.value = new TopLevelJsonSchema(schemaData.value);
+      const preprocessedSchema = preprocessOneTime(schemaData.value);
+      schema.value = new TopLevelJsonSchema(preprocessedSchema);
     },
     {
       debounce: 1000,
+      immediate: true,
     }
   );
 

@@ -49,21 +49,10 @@ export class ValidationService {
    * so that the sub schema can reference them.
    *
    * @param schema the sub schema
-   * @param key unique key for the sub schema, used to cache the validation function
    * @param data the data to validate
    */
-  public validateSubSchema(
-    schema: JsonSchemaObjectType,
-    data: any,
-    key?: string
-  ): ValidationResults {
-    console.groupCollapsed('validateSubSchema');
-    if (!key) {
-      key = JSON.stringify(schema);
-    }
-    console.log('key', key);
-    console.log('schema', schema);
-    console.log('data', data);
+  public validateSubSchema(schema: JsonSchemaObjectType, data: any): ValidationResults {
+    const key = schema.$id || schema.id || JSON.stringify(schema);
 
     // inject definitions
     if (this._ajv?.getSchema(key) === undefined) {
@@ -78,7 +67,6 @@ export class ValidationService {
     validationFunction(data);
     const errors = validationFunction.errors || [];
     console.log('errors', errors);
-    console.groupEnd();
     return new ValidationResults(errors);
   }
 

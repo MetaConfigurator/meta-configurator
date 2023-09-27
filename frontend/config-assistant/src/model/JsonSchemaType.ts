@@ -13,7 +13,7 @@ export type JsonSchemaObjectType = {
   /**
    * @minItems 1
    */
-  prefixItems?: [JsonSchemaType, ...JsonSchemaType[]];
+  prefixItems?: JsonSchemaType[];
   items?: JsonSchemaType;
   contains?: JsonSchemaType;
   additionalProperties?: JsonSchemaType;
@@ -107,8 +107,7 @@ export type SchemaPropertyType =
   | 'number'
   | 'object'
   | 'string';
-
-export const ANY_TYPE: SchemaPropertyType[] = [
+export const SCHEMA_PROPERTY_TYPES: SchemaPropertyType[] = [
   'array',
   'boolean',
   'integer',
@@ -117,5 +116,5 @@ export const ANY_TYPE: SchemaPropertyType[] = [
   'object',
   'string',
 ];
-export const NUMBER_OF_PROPERTY_TYPES = ANY_TYPE.length;
+export const NUMBER_OF_PROPERTY_TYPES = SCHEMA_PROPERTY_TYPES.length;
 export type SchemaPropertyTypes = SchemaPropertyType | SchemaPropertyType[];
