@@ -2,8 +2,8 @@
 % TODO also describe more the users perspective how users would use the tool?
 
 % felix
-\subsection{Functionality}\label{subsec:functionality} % todo maybe rename it requirements?
-Before we dive into the architecture and detailed design of the tool, this section sketches what functionality the tool should have, from the viewpoint of a user.
+\subsection{Overview}\label{subsec:overview} % todo maybe rename it requirements?
+Before we dive into the architecture and detailed design of the tool, this section provides an overview of the tool from the view of the user.
 
 Figure \ref{mockup_gui_config} provides a sketch of the intended user interface design, showing the \textbf{file editor mode}. 
 
@@ -115,6 +115,62 @@ Second, to deal with the loss of comments, we implement a technique that keeps t
 
 When the user edits the text in the text editor, the text is deserialized into a JavaScript Object and sent to the data store, which then updates the configuration data object and notifies all other subscribed panels of the change.
 
+To make it possible to highlight certain lines in the editor as erroneous (schema violations) or jump to certain lines (e.g. when the user selects a property in the GUI editor, we want to jump to the same property in the text editor), we need a function \textit{determineRow(editorContent, dataPath)} that can determine the corresponding editor line, based on the configuration text and a given data path. See listing \ref{listing:determineRow} for an example input and output of such a function.
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+editorContent = 
+  "{
+     'people':
+       [
+         { 
+           'age': 22, 
+           'name': 'alex' 
+         },
+         { 
+           'age': 5, 
+           'name': 'bola' 
+         }
+       ]
+   }";
+   
+resultRow1 = determineRow(
+	editorContent,
+	"people"
+ );
+ # resultRow1 = 1 
+ 
+resultRow2 = determineRow(
+	editorContent,
+	"people.0.age"
+ );
+ # resultRow2 = 4
+ 
+resultRow3 = determineRow(
+	editorContent,
+	"people.1.name"
+ );
+ # resultRow3 = 9
+ 
+    \end{minted}
+    \caption{Example input and output for \textit{determineRow(editorContent, dataPath)}}
+    \label{listing:determineRow}
+\end{listing}
+
+The other way around, when the user places their cursor inside the text editor, we want to determine the path of the element that the cursor is currently at. This requires a function \textit{determinePath(editorContent, cursorPosition)} which returns a data path based on the configuration text and a given cursor position.
+
+For the tool to support a data format, such as JSON, YAML or XML, the following needs to be implemented for that format:
+\begin{itemize}
+	\item Function to stringify a JavaScript object to a string in the data format
+	\item Function to parse a string in that data format as a JavaScript object
+	\item determineRow(editorContent, dataPath) 
+	\item determinePath(editorContent, cursorPosition)
+\end{itemize}
+
 % felix
 
 \subsubsection{GUI Assistance Panel}
@@ -130,6 +186,7 @@ To avoid overwhelming the user with too many GUI elements, the ones with child e
 By design, each of these constructed GUI elements is mapped to their corresponding data field (in other words: to a path in the data structure).
 The initial values of all GUI elements are taken from the data in the store, by accessing the data at the given paths.
 Whenever the values in a GUI element are adjusted by the user, the data in the store will be updated with the new values.
+
 
 %In the following, the corresponding GUI elements for the different JSON Schema data types and constraints are shown:
 %
