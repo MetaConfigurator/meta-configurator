@@ -265,7 +265,7 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
 });
 
 const searchTerm: Ref<string> = ref('');
-const searchBarVisible = ref(false);
+const searchBarVisible = ref(true);
 
 const initialSchemaSelectionDialog = ref();
 // Function to show the category selection dialog

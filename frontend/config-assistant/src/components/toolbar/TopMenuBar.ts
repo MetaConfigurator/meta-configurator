@@ -94,11 +94,6 @@ export class TopMenuBar {
       {
         separator: true,
       },
-      {
-        label: 'Search',
-        icon: 'fa-solid fa-search',
-        command: this.handleSearchButtonClick,
-      },
     ];
   }
 
@@ -186,11 +181,6 @@ export class TopMenuBar {
       {
         separator: true,
       },
-      {
-        label: 'Search',
-        icon: 'fa-solid fa-search',
-        command: this.handleSearchButtonClick,
-      },
     ];
   }
 
@@ -239,11 +229,6 @@ export class TopMenuBar {
       },
       {
         separator: true,
-      },
-      {
-        label: 'Search',
-        icon: 'fa-solid fa-search',
-        command: this.handleSearchButtonClick,
       },
     ];
   }
