@@ -6,7 +6,7 @@ import {useSessionStore} from '@/store/sessionStore';
 import {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/helpers/pathHelper';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
-import {WritableComputedRef} from 'vue/dist/vue';
+import type {WritableComputedRef} from 'vue/dist/vue';
 
 const props = defineProps<{
   propertyName: PathElement;
