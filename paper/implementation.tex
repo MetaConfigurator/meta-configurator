@@ -21,24 +21,23 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
 \subsection{Code Editor}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
-In our user case, we use the popular editor \textbf{Ace Editor}. \cite{Ace-Editor}
-It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
-It can be easily embedded in any web page or JavaScript application.
+For this project, we use the popular \textbf{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface. 
+% It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
+% It can be easily embedded in any web page or JavaScript application.
 
 \subsubsection{Features}
 
 To make our code editor more user-friendly, we implemented several features, which are described in the following.
 
 \paragraph{Schema Validation}
-To ensure that the data is valid as soon as it is entered by the user, we use schema validation.
-Therefore, the config data get validated based on the schema that is currently loaded.
-We choose to use \textbf{Ajv JSON schema validator} \cite{ajv-validator}.
-It supports the newest JSON schema draft 2020-12.
-Ajv firstly generates a fast validation function from the input schema.
-If the config data is not valid according to the schema, there will be a red error hint on left side of the code editor.
+To provide the user feedback on whether their data is valid according to the provided schema, we perform schema validation.
+We make use of the \textbf{Ajv JSON schema validator}\cite{ajv-validator} library, which supports the newest JSON schema draft 2020-12.
+%Ajv firstly generates a fast validation function from the input schema.
+If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
 
 \paragraph{Support for JSON and YAML}
-There is a lot build-in support for different languages in the ace editor.
+Ace Editor supports syntax highlighting for many programming languages.
+% todo: describe why we support not all other languages
 In our project, we support JSON and YAML. It can be switched in the Settings page.
 
 \paragraph{Concrete Syntax Tree}
@@ -85,7 +84,7 @@ However, the user can also click on the property name or array index to \textit{
 This will show the sub-properties of that element at the top level, as if that property was the root of the data tree.
 The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
 
-% todo add figure to illustrate
+% todo add figure to illustrate (for all the different data types and features)
 
 \paragraph{Type specific components}
 
