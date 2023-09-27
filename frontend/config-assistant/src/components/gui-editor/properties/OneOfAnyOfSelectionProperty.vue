@@ -172,4 +172,7 @@ div {
   height: 30px;
   line-height: 10px;
 }
+::placeholder {
+  color: #a8a8a8;
+}
 </style>

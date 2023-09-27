@@ -47,4 +47,7 @@ div {
   border: none;
   box-shadow: none;
 }
+::placeholder {
+  color: #a8a8a8;
+}
 </style>
