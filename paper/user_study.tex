@@ -1,0 +1,150 @@
+Our user study is mainly based on the qualitative research.
+We conduct several interviews with the professors and students as potential customers.
+We collect feedbacks from the customers, improve user experiences and fix bugs according to the feedback.
+We also use the survey to get interviewers' opinions during the user study.
+
+\subsection{Methodology}
+% todo: describe more details about how we conduct user study
+
+\subsection{Results}
+% todo: show the results of user study. We can use tables to show specific cases.
+
+\subsection{Evaluation} %keyuri
+
+\begin{table*}
+    \vspace{-10pt}
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        \multicolumn{1}{|c|}{\multirow{2}{*}{}} & \multicolumn{1}{|c|}{Feedback} & \multicolumn{1}{|c|}{Resolution} \\
+        \cline{2-3}
+        \hline
+        User Study 1 & 1. The property value should not be autocorrected if the user enters an incorrect value. Instead, an error message or another way should be used to inform the user that their input is incorrect. & 1. To enhance user feedback, consider implementing a feature that displays a red underline beneath the property value when an error is detected. \\
+        \cline{2-3}
+        & 2. The ability to delete a property should be made easily accessible and user-friendly within the GUI panel. & 2. The deletion functionality has been implemented by adding a cross symbol next to each property, allowing users to easily delete a property by clicking on the cross symbol. \\
+        \cline{2-3}
+        & 3. Including a search functionality is essential to help users locate properties, especially within nested levels where finding specific property can be challenging. & 3.A search button has been implemented in the top toolbar to enable users to locate properties, even within nested levels. When a property is found, it is highlighted in yellow to make it easily identifiable. \\
+        \cline{2-3}
+        & 4. The Schema editor GUI panel contains extensive metadata, but the code editor panel remains empty. & 4. bla bla bla \\
+        \cline{2-3}
+        & 5.To maintain consistency and readability, it should be remove the use of different font styles of property (bold, purple colour, * with purple colour and so on)  in the file editor within the GUI panel. & 5. bla bla bla \\
+        \cline{2-3}
+        & 6. The cursor styling in the file editor within the GUI panel should be improved to ensure it doesn't resemble a link cursor. & 6. Cursor styling is chnaged. \\
+        \cline{2-3}
+        & 7. The cross symbol has been removed from the dropdown button for enum properties in the GUI panel as it is deemed unnecessary. & 7. The cross symbol has been removed from the dropdown button for enum properties in the GUI panel. \\
+        \cline{2-3}
+        & 8. If the type of a property is as "any" in the Schema Editor, it should not default to being interpreted as the "string" type. & 8. bla bla \\
+        \cline{2-3}
+        & 9. Validation error should not showed as warning symbol, proper indication needed for validation error rather than warning symbol. & 9.The warning symbol has been removed, and a red cross indication has been implemented to clearly indicate validation errors in the user interface. \\
+        \cline{2-3}
+        & 10. Validation error should not showed as warning symbol, proper indication needed for validation error rather than warning symbol. & 10.The warning symbol has been removed, and a red cross indication has been implemented to clearly indicate validation errors in the user interface. \\
+        \cline{2-3}
+        & 11. After performing an undo or redo action, the cursor should jump to the appropriate location to reflect the changes made by the user.& 10. Will be consider for future work. \\
+        \hline
+    \end{tabular}
+    \caption* {User Study Feedback and Resolution (Continued)}
+\end{table*}
+
+
+\clearpage % Force a page break
+
+\begin{table*}
+
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        User Study 2 & 1. A graph-based approach would be more intuitive for handling complex settings. & 1. Will be considered for future work. For now, we have a tree-based approach rather than a graph-based one. \\
+        \cline{2-3}
+        & 2. Providing immediate feedback to users when they enter incorrect ranges is essential to prevent them from inputting invalid values into the property. & 2. Will be consider for future work. For now, a red underline serves as an indicator to direct the user's attention when something is wrong. Additionally, when hovering over it, a dialog box can be used to inform the user of specific conditions. \\
+        & 3. Validation errors should also be reflected in the GUI panel, including for child properties. & 3. Currently, invalid properties are indicated in the code panel using a red cross mark, while in the GUI editor panel, invalid properties are highlighted with a red underline. \\
+        \cline{2-3}
+        & 4. When dealing with an array, the naming format for object name should be improved, replacing the default numerical labels (0, 1, 2, etc.) with a more descriptive way of showing the object. & 4. Improvement can be achieved by replacing simple numerical labels (0, 1, 2, etc.) for objects with a naming convention like "PropertyName[0]" and so forth. \\
+        \cline{2-3}
+        & 5. Additionally, when clicking a new property, it should not automatically create a new field, especially when there is already one field by default for adding the first property. & 5. Will be Consider for future work. \\
+        \cline{2-3}
+        & 6. In the schema editor, it would be more consistent and user-friendly if the functionality to give a name to a property were located on the right side of the GUI editor panel, eliminating the need to click on the property first in order to rename it. & 6. We have retained the property naming on the right end but improved it with an intuitive design. When clicking on a new property in the schema editor, it is now highlighted to prompt the user to change the name. \\
+        \cline{2-3}
+        & 7. The search function for locating specific properties lacks clarity at first glance. It should provide an immediate response and extend to nested levels, rather than merely highlighting the higher-level property in yellow. & 7. The search functionality has been enhanced. It now provides a list of properties containing the keyword, and upon clicking, it highlights the selected property while opening the nested levels in the GUI editor panel for improved usability. \\
+        \hline
+    \end{tabular}
+    \caption*{User Study Feedback and Resolution (Continued)}
+\end{table*}
+
+\begin{table*}
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        User Study 3 & 1.Still I have to right & 1. bla bla \\
+        \cline{2-3}
+
+        \hline
+    \end{tabular}
+    \caption*{User Study Feedback and Resolution (Continued)}
+\end{table*}
+
+\begin{table*}
+
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        User Study 4 & 1.Modifying or renaming a 'new property' in Schema Editor does not appear to take effect when double-clicking on it. & 1. Renaming of the new property is made possible by double-clicking on 'newProperty' itself. \\
+        \cline{2-3}
+        & 2. Upon selecting a property type in the schema editor, the type of the child property should be automatically chnaged. & 2. The type of the child element is automatically adjusted according to parent type. \\
+        \cline{2-3}
+        & 3.A toggle button should be implemented to enable and disable the code panel and GUI panel. & 3. Will be consider for the future work. \\
+        \cline{2-3}
+        & 4.When working with a single property in the File Editor within the GUI Editor panel, the opacity of already open properties should be decreased, rather than making everything visible. & 3. Will be consider for the future work. \\
+        \cline{2-3}
+        & 5. Simplify the JSON schema, for those who are not very familiar with JSON schema. & 3. Will be consider for the future work. \\
+        \hline
+
+    \end{tabular}
+    \caption{User Study Feedback and Resolution (Continued)}
+\end{table*}
+
+\begin{table*}
+
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        User Study 5 & 1. The search button is not immediately evident, making it challenging for users to locate the search function. & 1. We removed the search icon and made it expandable as an InputText field to help users find the desired property more easily. \\
+        \cline{2-3}
+        & 2. Should be added a toggle button to enable or disable either the GUI panel or the Code panel, providing users with the option to choose their preferred view. & 2. According to our vision, having only one view can be challenging when working with configuration files. However, we will consider this for future development. \\
+        \hline
+
+    \end{tabular}
+    \caption{User Study Feedback and Resolution (Continued)}
+\end{table*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% TODO: if some quantitative methods are found, also mention here
