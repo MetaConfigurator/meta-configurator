@@ -18,6 +18,127 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
     \end{tabular}
 \end{table}
 
+\subsection{Tool Overview}\label{subsec:tool-overview} %keyuri
+
+
+The tool provides a comprehensive solution for managing configuration files with three distinct views:
+\begin{itemize}
+    \item \textbf{File Editor}: This view is designed for editing configuration files.
+    \item \textbf{Schema Editor}: Use this view to edit the schema of configuration files.
+    \item \textbf{Settings}: The Settings view allows user to configure various tool settings.
+\end{itemize}
+\begin{minipage}[t]{0.5\textwidth} % Adjust the width as needed
+    \includegraphics[width=3.5in]{figures/Views}
+\end{minipage}
+
+While these views share a similar appearance, right side GUI Panel and left side Code Panel,
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/Code Panel}
+    \caption{Code Panel}
+\end{figure}
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/GUI Panel.jpg}
+    \caption{GUI Panel}
+\end{figure}
+each serves a unique purpose and offers a different set of functionalities.
+
+\subsubsection{File Editor}
+The File Editor view is primarily designed for creating and editing configuration files.It features a user-friendly top menu bar that provides various essential functionalities:
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/FileeditorTopmenubar}
+    \caption{FileEditor Topmenubar}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{New File:} Create a new configuration file. This option also includes two subitems:
+    \begin{itemize}
+        \item \textbf{Generate Data:} Generate random configuration data based on the selected schema from the Schema Editor.
+        \item \textbf{New Empty File:} Start with a blank configuration file, discarding any current changes.
+    \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Open File:} Open an existing configuration file from local storage.
+\end{itemize}
+\begin{itemize}
+    \item \textbf{Undo/Redo:} Easily undo or redo actions to manage changes effectively.
+\end{itemize}
+\begin{itemize}
+    \item \textbf{Download Config:} Download the current configuration with an appropriate file name.
+\end{itemize}
+\begin{itemize}
+    \item \textbf{Search:} Utilize the search option to quickly find and navigate to specific keywords or sections within user's configuration files.
+\end{itemize}
+
+\subsubsection{Schema Editor}
+
+The Schema Editor view allows users to define and manage schema templates for configuration files. This view is essential for maintaining consistency and structure within your configurations. Details of the Schema Editor and its functionalities can be inserted here.
+
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/Schemaeditor Topmenubar}
+    \caption{SchemaEditor Topmenubar}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{New Empty Schema:} Clear the current schema for starting fresh.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Open Schema:} Open an existing schema, offering four suboptions:
+    \begin{itemize}
+        \item \textbf{JSON Schema Store:} Choose a schema from the JSON Schema Store, which provides a list of available schemas.
+
+        \item \textbf{From Our Examples:} Access four example schemas provided within the tool.
+
+        \item \textbf{From File:} Select a schema from local file system.
+
+        \item \textbf{From URL:} Provide the URL of a specific schema, and the tool will retrieve and open it.
+
+    \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Download Schema:} Download the current schema for later use or reference.
+\end{itemize}
+\begin{itemize}
+    \item \textbf{Undo/Redo:} Easily undo or redo actions to manage schema changes effectively.
+
+\end{itemize}
+\begin{itemize}
+    \item \textbf{Search:} Utilize the search option to quickly find and navigate within user's schema definitions, enhancing schema management.
+\end{itemize}
+
+\subsubsection{Settings}
+
+The Settings view provides customization options for tailoring the tool to your specific needs. It allows user to configure various preferences and settings to enhance user's workflow. Details of the Settings view and its functionalities can be inserted here.
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/Settings Topmenubar}
+    \caption{Settings Topmenubar}
+\end{figure}
+\begin{itemize}
+    \item \textbf{Save:} Save the current Settings that user configured.
+    \item \textbf{Undo/Redo:} Quickly undo or redo actions related to configuration settings adjustments.
+    \item \textbf{Search:} Utilize the search option to find specific configuration settings or preferences efficiently.
+\end{itemize}
+
+The Settings view also includes a GUI editor panel, which allows users to configure various settings:
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/GUI Editor Pannel Settings}
+    \caption{Settings's GUI Pannel}
+\end{figure}
+\begin{itemize}
+    \item \textbf{Data Format:} Users can select between JSON and YAML data formats. The choice made here will influence the schema and configuration format used in both the Schema Editor and File Editor.
+    \item \textbf{GuiEditorOnRightSide:} By default, the GUI panel is located on the right side, but users have the flexibility to change it to the left side using the \textbf{guiEditorOnRightSide} option.
+    \item \textbf{Code Editor Font Size:} Customize the font size in the code editor panel to suit user's preferences.
+    \item \textbf{GUI Editor Configuration:} Users can configure the \textbf{maximum depth} and \textbf{property sorting} in the GUI editor, including options like \textbf{Schema Order}, \textbf{Priority Order}, and \textbf{Data Order}.
+    \begin{itemize}
+        \item \textbf{Schema Order:} Define the order in which schema elements are presented.
+        \item \textbf{Priority Order:} Customize the order of elements based on their priority.
+        \item \textbf{Data Order:} Specify the order in which data elements are displayed.
+    \end{itemize}
+    \item \textbf{Debugging Panel:} For debugging purposes, users can enable or disable the debugging panel as needed.
+\end{itemize}
+
 \subsection{Code Editor}\label{subsec:code-editor}
 
 % todo decribe the code editor component and how it works
