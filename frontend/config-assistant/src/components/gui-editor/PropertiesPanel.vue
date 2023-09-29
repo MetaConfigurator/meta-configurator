@@ -105,7 +105,7 @@ function computeTree() {
 function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
   for (const node of nodes) {
     const expanded =
-      sessionStore.currentExpandedElements?.value[pathToString(node.data.absolutePath)] ?? false;
+      useSessionStore().currentExpandedElements[pathToString(node.data.absolutePath)] ?? false;
     if (expanded) {
       node.children = treeNodeResolver.createChildNodesOfNode(node);
       if (node.children && node.children.length > 0) {

@@ -62,4 +62,7 @@ const valueProperty = computed({
 :deep(.p-button-label) {
   font-weight: 500;
 }
+::placeholder {
+  color: #a8a8a8;
+}
 </style>

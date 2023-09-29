@@ -63,4 +63,7 @@ function isValid(): boolean {
   border: none !important;
   box-shadow: none !important;
 }
+::placeholder {
+  color: #a8a8a8;
+}
 </style>

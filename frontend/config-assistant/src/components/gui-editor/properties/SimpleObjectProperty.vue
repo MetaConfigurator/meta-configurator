@@ -37,4 +37,8 @@ function isExpanded(): boolean {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+::placeholder {
+  color: #a8a8a8;
+}
+</style>
