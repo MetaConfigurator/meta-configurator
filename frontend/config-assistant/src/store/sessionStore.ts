@@ -260,6 +260,10 @@ export const useSessionStore = defineStore('commonStore', () => {
     return currentSearchResults.value.some(p => pathToString(p.path) === pathToString(path));
   }
 
+  function reloadSchema() {
+    useDataStore().reloadSchema();
+  }
+
   return {
     currentMode,
     fileData,
@@ -290,5 +294,6 @@ export const useSessionStore = defineStore('commonStore', () => {
     updateDataAtPath,
     removeDataAtPath,
     currentEditorWrapper,
+    reloadSchema,
   };
 });
