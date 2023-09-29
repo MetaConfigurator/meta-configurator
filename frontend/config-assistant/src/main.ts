@@ -14,7 +14,6 @@ import {registerIcons} from '@/fontawesome';
 import VueCookies from 'vue-cookies';
 
 import cookiesHandler from '@/cookies/cookiesHandler';
-import {confirmationService} from '@/helpers/confirmationService';
 
 // @ts-ignore
 const app = createApp(FileEditorView);
