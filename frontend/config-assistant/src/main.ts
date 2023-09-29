@@ -35,7 +35,7 @@ registerIcons();
 
 // warn the user if he closes the app
 window.addEventListener('beforeunload', event => {
-  event.returnValue = `Are you sure you want to leave?`;
+  event.returnValue = null;
 });
 
 app.mount('#app');
