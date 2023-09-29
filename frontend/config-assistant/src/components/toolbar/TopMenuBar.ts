@@ -82,18 +82,6 @@ export class TopMenuBar {
         },
         key: 'redo',
       },
-      {
-        separator: true,
-      },
-      {
-        label: 'Share',
-        class: 'z-10',
-        icon: 'fa-solid fa-share-nodes',
-        disabled: true,
-      },
-      {
-        separator: true,
-      },
     ];
   }
 
@@ -169,18 +157,6 @@ export class TopMenuBar {
         },
         key: 'schema_redo',
       },
-      {
-        separator: true,
-      },
-      {
-        label: 'Share',
-        class: 'z-10',
-        icon: 'fa-solid fa-share-nodes',
-        disabled: true,
-      },
-      {
-        separator: true,
-      },
     ];
   }
 
@@ -217,18 +193,6 @@ export class TopMenuBar {
           this.sessionStore.currentEditorWrapper.redo();
         },
         key: 'settings_redo',
-      },
-      {
-        separator: true,
-      },
-      {
-        label: 'Share',
-        class: 'z-10',
-        icon: 'fa-solid fa-share-nodes',
-        disabled: true,
-      },
-      {
-        separator: true,
       },
     ];
   }
