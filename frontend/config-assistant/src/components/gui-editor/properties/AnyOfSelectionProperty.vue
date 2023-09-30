@@ -1,12 +1,15 @@
+<!--
+Component for selecting one or more sub-schemas of an anyOf property.
+-->
 <script setup lang="ts">
-import {computed, defineProps, onMounted} from 'vue';
+import type {WritableComputedRef} from 'vue';
+import {computed} from 'vue';
 import MultiSelect from 'primevue/multiselect';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
-import {Path, PathElement} from '@/model/path';
+import type {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/helpers/pathHelper';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
-import type {WritableComputedRef} from 'vue/dist/vue';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -19,49 +22,32 @@ const props = defineProps<{
 const possibleOptions = props.possibleSchemas.map(
   (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
 );
-const possibleValues = possibleOptions.map(option => option.displayText);
 
 const emit = defineEmits<{
-  (e: 'update_tree'): void;
+  (e: 'update:tree'): void;
 }>();
 
-const valueProperty: WritableComputedRef<string[] | undefined> = computed({
+const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined> = computed({
   get() {
     const path = pathToString(props.absolutePath);
-    let selectedOptions = useSessionStore().currentSelectedAnyOfOptions.get(path);
-    return selectedOptions?.map(option => option.displayText);
+    return useSessionStore().currentSelectedAnyOfOptions.get(path);
   },
 
-  set(newValue) {
-    const selectedOptionsText: string[] | undefined = newValue;
-
-    if (selectedOptionsText) {
+  set(selectedOptions: OneOfAnyOfSelectionOption[] | undefined) {
+    if (selectedOptions) {
       const path = pathToString(props.absolutePath);
-      const selectedOptions = selectedOptionsText.map(
-        displayText => findOptionByDisplayText(displayText)!
-      );
       useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOptions);
-      emit('update_tree');
+      emit('update:tree');
     }
   },
 });
-
-function findOptionByDisplayText(displayText: string): OneOfAnyOfSelectionOption | undefined {
-  for (let option of possibleOptions) {
-    if (option.displayText === displayText) {
-      return option;
-    }
-  }
-
-  return undefined;
-}
 </script>
 
 <template>
   <div>
     <MultiSelect
       v-model="valueProperty"
-      :options="possibleValues"
+      :options="possibleOptions"
       :placeholder="`Select sub-schemas`" />
   </div>
 </template>
