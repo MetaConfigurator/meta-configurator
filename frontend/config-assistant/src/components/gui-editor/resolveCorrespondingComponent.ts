@@ -54,7 +54,9 @@ export function resolveCorrespondingComponent(
   } else if (nodeData.schema.hasType('boolean')) {
     // @ts-ignore
     return h(BooleanProperty, propsObject);
-  } else if (nodeData.schema.hasType('number')) {
+  }
+
+  if (nodeData.schema.hasType('number') || nodeData.schema.hasType('integer')) {
     // @ts-ignore
     return h(NumberProperty, propsObject);
   } else if (nodeData.schema.hasType('integer')) {
