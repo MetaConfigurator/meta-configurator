@@ -43,8 +43,8 @@ function shouldShowRemove(): boolean {
       class="truncate col-span-4"
       style="width: 90%; max-width: 90%"
       :is="resolveCorrespondingComponent(nodeData)"
-      @update_property_value="(newValue: any) => propagateUpdateValueEvent(newValue)"
-      @update_tree="propagateUpdateTreeEvent()" />
+      @update:propertyData="(newValue: any) => propagateUpdateValueEvent(newValue)"
+      @update:tree="() => propagateUpdateTreeEvent()" />
     <Button
       class="h-full"
       style="width: 10%"
