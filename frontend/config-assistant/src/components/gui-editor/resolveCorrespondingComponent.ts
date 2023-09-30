@@ -70,6 +70,14 @@ export function resolveCorrespondingComponent(
     return h(SimpleArrayProperty, propsObject);
   }
 
+  if (nodeData.schema.hasType('null')) {
+    // @ts-ignore
+    return h(EnumProperty, {
+      ...propsObject,
+      possibleValues: [null],
+    });
+  }
+
   return h('p', `Property ${nodeData.name} with type ${nodeData.schema.type} is not supported`);
 }
 
