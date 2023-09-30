@@ -479,6 +479,7 @@ export class ConfigTreeNodeResolver {
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.oneOf;
       const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
+      console.log('in createAnyOfChildrenTreeNodes');
       const mergedSchema = new JsonSchema({
         allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
       });
@@ -509,6 +510,7 @@ export class ConfigTreeNodeResolver {
         // user selected schemas that are not compatible -> can never be fulfilled
         return [];
       } else {
+        console.log('in createAnyOfChildrenTreeNodes');
         return [
           this.createTreeNodeOfProperty(
             new JsonSchema(mergedSchema),

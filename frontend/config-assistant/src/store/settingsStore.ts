@@ -3,6 +3,7 @@ import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
 import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {SETTINGS_SCHEMA} from '@/data/SettingsSchema';
+import {preprocessOneTime} from '@/helpers/schema/oneTimeSchemaPreprocessor';
 
 /**
  * Store for the Meta Configurator settings.
@@ -20,7 +21,7 @@ export const useSettingsStore = defineStore('settings', () => {
     },
     debuggingActive: false,
   });
-  const settingsSchemaData = ref(SETTINGS_SCHEMA);
+  const settingsSchemaData = ref(preprocessOneTime(SETTINGS_SCHEMA));
   const settingsSchema: Ref<TopLevelJsonSchema> = computed(
     () => new TopLevelJsonSchema(settingsSchemaData.value)
   );

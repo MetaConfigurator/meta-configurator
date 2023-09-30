@@ -1,9 +1,12 @@
-import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
+import type {JsonSchemaType} from '@/model/JsonSchemaType';
 // @ts-ignore
 import mergeAllOf from 'json-schema-merge-allof';
 
-export function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
-  schema = extractIfsOfAllOfs(schema);
+export function mergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
+  if (typeof schema !== 'object') {
+    return schema;
+  }
+
   const result = mergeAllOf(schema, {
     deep: true,
     resolvers: {
@@ -12,31 +15,15 @@ export function mergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType 
       conditions: function (values: any[][]) {
         return values.flat();
       },
+      $id: function (values: any[]) {
+        return values[values.length - 1] + ' (merged) ' + values.length;
+      },
     },
   });
+  console.log('mergeAllOfs', schema, result);
   return result;
 }
-
-function extractIfsOfAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType {
-  const conditions: JsonSchemaObjectType[] = [];
-  if (!schema.allOf) {
-    return schema;
-  }
-  schema.allOf.forEach(allOf => {
-    if (typeof allOf == 'object' && allOf.if) {
-      conditions.push({if: allOf.if, then: allOf.then, else: allOf.else});
-      delete allOf.if;
-      delete allOf.then;
-      delete allOf.else;
-    }
-  });
-  if (conditions.length == 0) {
-    return schema;
-  }
-  return {...schema, conditions};
-}
-
-export function safeMergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectType | false {
+export function safeMergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
   try {
     return mergeAllOfs(schema);
   } catch (e) {
@@ -44,21 +31,21 @@ export function safeMergeAllOfs(schema: JsonSchemaObjectType): JsonSchemaObjectT
   }
 }
 
-export function areSchemasCompatible(...schemas: JsonSchemaObjectType[]): boolean {
+export function areSchemasCompatible(...schemas: JsonSchemaType[]): boolean {
   const mergeResult = safeMergeSchemas(...schemas);
   return mergeResult != false;
 }
 
-export function safeMergeSchemas(...schemas: JsonSchemaObjectType[]): JsonSchemaObjectType | false {
+export function safeMergeSchemas(...schemas: JsonSchemaType[]): JsonSchemaType | false {
   const combinedSchema = {
     allOf: [...schemas],
   };
-  return safeMergeAllOfs(combinedSchema as JsonSchemaObjectType);
+  return safeMergeAllOfs(combinedSchema);
 }
 
-export function mergeSchemas(...schemas: JsonSchemaObjectType[]): JsonSchemaObjectType {
+export function mergeSchemas(...schemas: JsonSchemaType[]): JsonSchemaType {
   const combinedSchema = {
     allOf: [...schemas],
   };
-  return mergeAllOfs(combinedSchema as JsonSchemaObjectType);
+  return mergeAllOfs(combinedSchema);
 }

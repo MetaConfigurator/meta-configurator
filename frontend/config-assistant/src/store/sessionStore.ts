@@ -20,6 +20,7 @@ import {
   EffectiveSchema,
 } from '@/helpers/schema/effectiveSchemaCalculator';
 import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
+import type {JsonSchemaType} from '@/model/JsonSchemaType';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -120,6 +121,22 @@ export const useSessionStore = defineStore('commonStore', () => {
 
       case SessionMode.Settings:
         return useSettingsStore().settingsSchema;
+
+      default:
+        throw new Error('Invalid mode');
+    }
+  });
+
+  const fileSchemaDataPreprocessed: ComputedRef<JsonSchemaType> = computed(() => {
+    switch (currentMode.value) {
+      case SessionMode.FileEditor:
+        return useDataStore().schemaDataPreprocessed;
+
+      case SessionMode.SchemaEditor:
+        return useDataStore().metaSchemaData; // no difference between preprocessed and unprocessed meta schema
+
+      case SessionMode.Settings:
+        return useSettingsStore().settingsSchemaData; // no difference between preprocessed and unprocessed settings schema
 
       default:
         throw new Error('Invalid mode');
@@ -265,6 +282,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     fileData,
     fileSchema,
     fileSchemaData,
+    fileSchemaDataPreprocessed,
     schemaAtPath,
     schemaAtCurrentPath,
     effectiveSchemaAtPath,

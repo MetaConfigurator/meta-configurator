@@ -45,7 +45,9 @@ function selectPath(path: Path) {
       @update:path="newPath => updatePath(newPath)" />
     <div class="flex-grow overflow-y-auto">
       <PropertiesPanel
-        :current-schema="sessionStore.effectiveSchemaAtCurrentPath.schema"
+        :current-schema="
+          sessionStore.effectiveSchemaAtCurrentPath?.schema ?? sessionStore.fileSchema
+        "
         :current-path="sessionStore.currentPath"
         :current-data="sessionStore.dataAtCurrentPath"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"

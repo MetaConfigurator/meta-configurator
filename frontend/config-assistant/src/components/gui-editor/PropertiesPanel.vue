@@ -50,15 +50,21 @@ const {currentExpandedElements} = storeToRefs(useSessionStore());
 const currentTree = ref({});
 
 function computeTree() {
+  // console.groupCollapsed('computeTree');
+  console.log('currentPath', props.currentPath);
+  console.log('currentSchema', props.currentSchema);
   currentTree.value = treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema,
     undefined,
     props.currentPath
   );
+  console.log('currentTree', currentTree.value);
   currentTree.value.children = treeNodeResolver.createChildNodesOfNode(currentTree.value);
+  console.log('currentTree', currentTree.value);
 
   expandPreviouslyExpandedElements(currentTree.value.children as Array<GuiEditorTreeNode>);
 
+  // console.groupEnd();
   return currentTree.value;
 }
 
@@ -89,21 +95,17 @@ function updateTree() {
 const nodesToDisplay: Ref<TreeNode[]> = ref(computeTree().children);
 
 watch(storeToRefs(useSessionStore()).fileSchema, () => {
-  currentExpandedElements.value = {};
   updateTree();
 });
 
-// recalculate the tree when the data structure changes, but not
-// single values (e.g. when a property is changed)
-watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
-  /*if (!isObjectStructureEqual(value, oldValue)) { */ // currently not working as expected
+// recalculate the tree when the data structure changes
+watch(storeToRefs(useSessionStore()).fileData, () => {
   updateTree();
-  /*}*/
 });
 
 watch(
   storeToRefs(useSessionStore()).currentSelectedElement,
-  newVal => {
+  () => {
     if (useSessionStore().lastChangeResponsible == ChangeResponsible.GuiEditor) {
       return;
     }

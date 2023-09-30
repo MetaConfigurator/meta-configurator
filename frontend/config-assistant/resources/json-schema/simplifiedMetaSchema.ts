@@ -11,10 +11,7 @@ export const simplifiedMetaSchema = {
           $ref: '#/$defs/core',
         },
         {
-          $ref: '#/$defs/jsonSchema',
-        },
-        {
-          type: 'object',
+          $ref: '#/$defs/objectSubSchema',
         },
       ],
     },
@@ -32,42 +29,44 @@ export const simplifiedMetaSchema = {
           const: false,
         },
         {
-          title: 'Subschema',
-          type: 'object',
-          allOf: [
-            {
-              $ref: '#/$defs/typeDefinition',
-            },
-            {
-              $ref: '#/$defs/meta-data',
-            },
-            {
-              $ref: '#/$defs/enumProperty',
-            },
-            {
-              $ref: '#/$defs/constProperty',
-            },
-            {
-              $ref: '#/$defs/typeSpecificFields',
-            },
-            {
-              $ref: '#/$defs/schemaComposition',
-            },
-            {
-              $ref: '#/$defs/refProperty',
-            },
-            {
-              $ref: '#/$defs/conditionalSchema',
-            },
-            {
-              $ref: '#/$defs/anchor',
-            },
-          ],
+          $ref: '#/$defs/objectSubSchema',
         },
       ],
-
       $comment:
         'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
+    },
+    objectSubSchema: {
+      title: 'Subschema',
+      type: 'object',
+      allOf: [
+        {
+          $ref: '#/$defs/typeDefinition',
+        },
+        {
+          $ref: '#/$defs/meta-data',
+        },
+        {
+          $ref: '#/$defs/enumProperty',
+        },
+        {
+          $ref: '#/$defs/constProperty',
+        },
+        {
+          $ref: '#/$defs/typeSpecificFields',
+        },
+        {
+          $ref: '#/$defs/schemaComposition',
+        },
+        {
+          $ref: '#/$defs/refProperty',
+        },
+        {
+          $ref: '#/$defs/conditionalSchema',
+        },
+        {
+          $ref: '#/$defs/anchor',
+        },
+      ],
     },
     constProperty: {
       title: 'Constant',
@@ -533,6 +532,7 @@ export const simplifiedMetaSchema = {
           },
         },
       ],
+      required: ['type'],
     },
     hasTypeObject: {
       anyOf: [

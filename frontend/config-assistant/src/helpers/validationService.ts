@@ -52,21 +52,37 @@ export class ValidationService {
    * @param data the data to validate
    */
   public validateSubSchema(schema: JsonSchemaObjectType, data: any): ValidationResults {
-    const key = schema.$id || schema.id || JSON.stringify(schema);
+    const key = schema.$id || schema.id || undefined;
+
+    console.groupCollapsed('validateSubSchema', key || schema);
+    let schemaWithDefinitions = schema;
 
     // inject definitions
-    if (this._ajv?.getSchema(key) === undefined) {
-      const schemaWithDefinitions = this.injectDefinitions(schema);
+    if (key && this._ajv?.getSchema(key) === undefined) {
+      console.log('adding schema to ajv', key);
+      schemaWithDefinitions = this.injectDefinitions(schema);
       this._ajv?.addSchema(schemaWithDefinitions, key);
     }
-    const validationFunction: ValidateFunction | undefined = this._ajv?.getSchema(key);
+    if (key === undefined) {
+      schemaWithDefinitions = this.injectDefinitions(schema);
+    }
+
+    let validationFunction: ValidateFunction | undefined;
+    if (key) {
+      validationFunction = this._ajv?.getSchema(key);
+    } else {
+      validationFunction = this._ajv?.compile(schemaWithDefinitions);
+    }
+
     if (!validationFunction) {
       console.warn('Could not compile schema for key ' + key);
       return new ValidationResults([]); // optimistic approach
     }
+
     validationFunction(data);
     const errors = validationFunction.errors || [];
     console.log('errors', errors);
+    console.groupEnd();
     return new ValidationResults(errors);
   }
 

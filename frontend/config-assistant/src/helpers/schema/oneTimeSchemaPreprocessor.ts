@@ -31,6 +31,8 @@ export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaType {
 
   preprocessOneTimeRecursive(schemaCopy, id);
 
+  console.log('preprocessOneTime', schemaCopy);
+
   return schemaCopy;
 }
 

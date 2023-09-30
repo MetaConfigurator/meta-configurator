@@ -33,7 +33,7 @@ export function calculateEffectiveSchema(
   let result = schema ?? new JsonSchema({});
   let iteration = 0;
 
-  console.groupCollapsed('calculateEffectiveSchema', pathToString(path));
+  // console.groupCollapsed('calculateEffectiveSchema', pathToString(path));
   console.log('schema', schema);
 
   while (result.isDataDependent && iteration < 1000) {
@@ -54,14 +54,14 @@ export function calculateEffectiveSchema(
     }
 
     if (result.conditions && result.conditions.length > 0) {
-      result = resolveConditions(result, data, path);
+      result = resolveConditions(result, data);
       console.log('resolved conditions', result);
     }
 
     iteration++;
   }
 
-  console.groupEnd();
+  // console.groupEnd();
 
   return new EffectiveSchema(result, data, path);
 }
@@ -106,10 +106,10 @@ function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
   return new JsonSchema(newSchema);
 }
 
-function resolveConditions(result: JsonSchema, data: any, path: Path) {
+function resolveConditions(result: JsonSchema, data: any) {
   console.groupCollapsed('resolveConditions for', result);
   const resolvedConditions = result.conditions?.map(condition => {
-    return resolveIfThenElse(condition, data, path);
+    return resolveIfThenElse(condition, data);
   });
   console.log('resolvedConditions', resolvedConditions);
   const baseSchema = {...result.jsonSchema};

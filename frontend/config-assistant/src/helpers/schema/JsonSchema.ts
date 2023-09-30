@@ -36,10 +36,10 @@ export class JsonSchema {
   private _else?: JsonSchema;
   private _contentSchema?: JsonSchema;
 
-  constructor(jsonSchema: JsonSchemaType) {
+  constructor(jsonSchema: JsonSchemaType, preprocess = true) {
     this.jsonSchema = nonBooleanSchema(jsonSchema);
-    if (this.jsonSchema !== undefined) {
-      this.jsonSchema = preprocessSchema(this.jsonSchema);
+    if (preprocess && this.jsonSchema !== undefined) {
+      this.jsonSchema = nonBooleanSchema(preprocessSchema(this.jsonSchema));
     }
   }
 
