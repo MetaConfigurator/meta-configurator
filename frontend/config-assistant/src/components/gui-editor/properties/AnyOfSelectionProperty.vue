@@ -46,6 +46,7 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined
 <template>
   <div>
     <MultiSelect
+      class="tableInput w-full"
       v-model="valueProperty"
       :options="possibleOptions"
       :placeholder="`Select sub-schemas`" />
@@ -58,6 +59,10 @@ div {
   flex-direction: row;
   height: 30px;
   line-height: 10px;
+}
+.tableInput {
+  border: none;
+  box-shadow: none;
 }
 ::placeholder {
   color: #a8a8a8;

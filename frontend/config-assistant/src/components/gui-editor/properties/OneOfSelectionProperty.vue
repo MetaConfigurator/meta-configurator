@@ -148,6 +148,7 @@ function applySchemaConstantsOnData(schema: JsonSchemaType, data: any): any {
 <template>
   <div>
     <Dropdown
+      class="tableInput w-full"
       v-model="valueProperty"
       :options="possibleOptions"
       :placeholder="`Select sub-schema`" />
@@ -160,6 +161,10 @@ div {
   flex-direction: row;
   height: 30px;
   line-height: 10px;
+}
+.tableInput {
+  border: none;
+  box-shadow: none;
 }
 ::placeholder {
   color: #a8a8a8;
