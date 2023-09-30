@@ -1,5 +1,8 @@
+<!--
+List dropdown for enum properties, also used for properties with multiple examples.
+-->
 <script setup lang="ts">
-import {computed, defineEmits, defineProps} from 'vue';
+import {computed} from 'vue';
 import Dropdown from 'primevue/dropdown';
 import {ValidationResults} from '@/helpers/validationService';
 
@@ -11,16 +14,34 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'update_property_value', newValue: any): void;
+  (e: 'update:propertyData', newValue: any): void;
 }>();
 
 const valueProperty = computed({
   get() {
-    return props.propertyData;
+    return valueToSelectionOption(props.propertyData);
   },
-  set(newValue) {
-    emit('update_property_value', newValue);
+  set(newValue: {name: string; value: any} | undefined) {
+    emit('update:propertyData', newValue?.value);
   },
+});
+
+/**
+ * Converts a value to a selection option.
+ * @param value The value to convert.
+ */
+function valueToSelectionOption(value: any): any {
+  if (value === undefined) {
+    return undefined;
+  }
+  return {
+    name: `${value ?? 'No value'}`,
+    value: value,
+  };
+}
+
+const allOptions = computed(() => {
+  return props.possibleValues.map(val => valueToSelectionOption(val));
 });
 </script>
 
@@ -31,7 +52,8 @@ const valueProperty = computed({
       :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
       v-model="valueProperty"
       editable
-      :options="possibleValues"
+      :options="allOptions"
+      optionLabel="name"
       @keydown.stop
       :placeholder="`Select ${props.propertyName}`" />
   </div>
