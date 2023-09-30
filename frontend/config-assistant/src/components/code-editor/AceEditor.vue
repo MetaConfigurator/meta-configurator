@@ -119,6 +119,10 @@ onMounted(() => {
     'change',
     useDebounceFn(
       () => {
+        if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
+          return;
+        }
+
         sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
         const fileContentString = editor.value.getValue();
 
