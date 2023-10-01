@@ -34,8 +34,12 @@ function valueToSelectionOption(value: any): any {
   if (value === undefined) {
     return undefined;
   }
+  let formattedValue = `${value}`;
+  if (value === null) {
+    formattedValue = 'null';
+  }
   return {
-    name: `${value ?? 'No value'}`,
+    name: formattedValue,
     value: value,
   };
 }
