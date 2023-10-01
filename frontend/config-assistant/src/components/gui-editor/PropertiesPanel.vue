@@ -359,7 +359,7 @@ function expandElementsByPath(relativePath: Path) {
     }
 
     expandElementChildren(childNodeToExpand);
-    sessionStore.currentExpandedElements.value[childNodeToExpand.key] = true;
+    useSessionStore().currentExpandedElements[childNodeToExpand.key] = true;
 
     // update current node, so the next iteration which is one level deeper will use this node to search next child
     currentNode = childNodeToExpand;
@@ -442,7 +442,7 @@ function zoomIntoPath(path: Path) {
     row-hover
     :lazy="true"
     :loading="loadingDebounced"
-    v-model:expandedKeys="sessionStore.currentExpandedElements"
+    v-model:expandedKeys="useSessionStore().currentExpandedElements"
     @nodeExpand="expandElementChildren"
     :filters="treeTableFilters">
     <Column field="name" header="Property" :sortable="true" expander>
