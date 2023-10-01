@@ -39,13 +39,49 @@ const emit = defineEmits<{
   (e: 'remove_property', path: Path): void;
 }>();
 
+const sessionStore = storeToRefs(useSessionStore());
+
+watch(sessionStore.fileSchema, () => {
+  sessionStore.currentExpandedElements.value = {};
+  updateTree();
+});
+
+// recalculate the tree when the data structure changes, but not
+// single values (e.g. when a property is changed)
+watch(sessionStore.fileData, () => {
+  updateTree();
+});
+
+watch(
+  sessionStore.currentSelectedElement,
+  () => {
+    if (useSessionStore().lastChangeResponsible == ChangeResponsible.GuiEditor) {
+      return;
+    }
+    const absolutePath = useSessionStore().currentSelectedElement;
+    const pathToCutOff = useSessionStore().currentPath;
+    const relativePath = absolutePath.slice(pathToCutOff.length);
+    if (relativePath.length > 0) {
+      // cut off last element, because we want to expand until last element, but not expand children of last element
+      const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
+      expandElementsByPath(relativePathToExpand);
+    }
+  },
+  {deep: true}
+);
+
+watch(sessionStore.currentPath, () => {
+  updateTree();
+  focusOnFirstProperty();
+  allowShowOverlay.value = true; // reset in case the user was editing a property name
+});
+
 const treeNodeResolver = new ConfigTreeNodeResolver();
 
 const loading = ref(false);
 const loadingDebounced = refDebounced(loading, 100);
 
 const treeTableFilters = ref<Record<string, string>>({});
-const {currentExpandedElements} = storeToRefs(useSessionStore());
 
 const currentTree = ref({});
 
@@ -74,7 +110,7 @@ function computeTree() {
  */
 function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
   for (const node of nodes) {
-    const expanded = currentExpandedElements.value[node.key] ?? false;
+    const expanded = useSessionStore().currentExpandedElements[node.key] ?? false;
     if (expanded) {
       node.children = treeNodeResolver.createChildNodesOfNode(node);
       if (node.children && node.children.length > 0) {
@@ -87,12 +123,12 @@ function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
 function updateTree() {
   loading.value = true;
   window.setTimeout(() => {
-    nodesToDisplay.value = computeTree().children;
+    nodesToDisplay.value = determineNodesToDisplay(computeTree());
     loading.value = false;
   }, 0);
 }
 
-const nodesToDisplay: Ref<TreeNode[]> = ref(computeTree().children);
+const nodesToDisplay: Ref<TreeNode[]> = ref(determineNodesToDisplay(computeTree()));
 
 watch(storeToRefs(useSessionStore()).fileSchema, () => {
   updateTree();
@@ -102,6 +138,20 @@ watch(storeToRefs(useSessionStore()).fileSchema, () => {
 watch(storeToRefs(useSessionStore()).fileData, () => {
   updateTree();
 });
+
+function determineNodesToDisplay(root: TreeNode): TreeNode[] {
+  const rootSchema = root?.data?.schema;
+  if (!rootSchema) {
+    return [];
+  }
+  if (rootSchema.anyOf?.length > 0 || rootSchema.oneOf?.length > 0) {
+    return [root];
+  }
+  if (rootSchema.hasType('object') || rootSchema.hasType('array')) {
+    return root.children ?? [];
+  }
+  return [root];
+}
 
 watch(
   storeToRefs(useSessionStore()).currentSelectedElement,
@@ -318,11 +368,6 @@ function addNegativeMarginForTableStyle(depth: number) {
   return {'margin-right': `${-depth * GuiConstants.INDENTATION_STEP}px`};
 }
 
-watch(storeToRefs(useSessionStore()).currentPath, () => {
-  updateTree();
-  focusOnFirstProperty();
-});
-
 function displayAsRegularProperty(node: any) {
   return (
     node.type === TreeNodeType.PATTERN_PROPERTY ||
@@ -360,7 +405,7 @@ function expandElementsByPath(relativePath: Path) {
     }
 
     expandElementChildren(childNodeToExpand);
-    currentExpandedElements.value[childNodeToExpand.key] = true;
+    useSessionStore().currentExpandedElements[childNodeToExpand.key] = true;
 
     // update current node, so the next iteration which is one level deeper will use this node to search next child
     currentNode = childNodeToExpand;
@@ -424,6 +469,13 @@ function isHighlighted(node: ConfigDataTreeNode) {
 function getValidationResults(absolutePath: Path) {
   return useSessionStore().dataValidationResults.filterForPath(absolutePath);
 }
+
+function zoomIntoPath(path: Path) {
+  // prevent the overlay from showing up when zooming into a path
+  // because clicking on the property data would trigger the overlay (because of the mouseenter event)
+  overlayShowScheduled.value = false;
+  emit('zoom_into_path', path);
+}
 </script>
 
 <template>
@@ -439,7 +491,7 @@ function getValidationResults(absolutePath: Path) {
     row-hover
     :lazy="true"
     :loading="loadingDebounced"
-    v-model:expandedKeys="currentExpandedElements"
+    v-model:expandedKeys="useSessionStore().currentExpandedElements"
     @nodeExpand="expandElementChildren"
     :filters="treeTableFilters">
     <Column field="name" header="Property" :sortable="true" expander>
@@ -456,7 +508,7 @@ function getValidationResults(absolutePath: Path) {
             :node="slotProps.node"
             :type="slotProps.node.type"
             :highlighted="isHighlighted(slotProps.node)"
-            @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)"
+            @zoom_into_path="zoomIntoPath"
             @update_property_name="
               (oldName, newName) =>
                 updatePropertyName(slotProps.node.data.relativePath, oldName, newName)

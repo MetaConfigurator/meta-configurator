@@ -42,20 +42,17 @@ export const useDataStore = defineStore('dataStore', () => {
   );
 
   // make sure that the schema is not preprocessed too often
-  watchDebounced(
-    schemaData,
-    () => {
-      if (useSessionStore().currentMode === SessionMode.FileEditor) {
-        console.log('in file editor preprocessOneTime');
-        const preprocessedSchema = preprocessOneTime(schemaData.value);
-        schema.value = new TopLevelJsonSchema(preprocessedSchema);
-      }
-    },
-    {
-      debounce: 1000,
-      immediate: true,
+  watchDebounced(schemaData, () => reloadSchema(), {
+    debounce: 1000,
+    immediate: true,
+  });
+
+  function reloadSchema() {
+    if (useSessionStore().currentMode === SessionMode.FileEditor) {
+      const preprocessedSchema = preprocessOneTime(schemaData.value);
+      schema.value = new TopLevelJsonSchema(preprocessedSchema);
     }
-  );
+  }
 
   return {
     fileData,
@@ -64,5 +61,6 @@ export const useDataStore = defineStore('dataStore', () => {
     schemaDataPreprocessed,
     metaSchema,
     metaSchemaData,
+    reloadSchema,
   };
 });

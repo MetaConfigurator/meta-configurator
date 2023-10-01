@@ -48,6 +48,8 @@ router.beforeEach((to, from, next) => {
   useSessionStore().currentExpandedElements = {};
   useSessionStore().currentSearchResults = [];
 
+  useSessionStore().reloadSchema();
+
   next();
 });
 

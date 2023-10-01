@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import {computed, defineProps, onMounted, WritableComputedRef} from 'vue';
+import type {WritableComputedRef} from 'vue';
+import {computed, onMounted} from 'vue';
 import Dropdown from 'primevue/dropdown';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
-import {Path, PathElement} from '@/model/path';
+import type {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/helpers/pathHelper';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
-import type {JsonSchemaObjectType} from '@/model/JsonSchemaType';
+import type {JsonSchemaType} from '@/model/JsonSchemaType';
 import {safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
 import _ from 'lodash';
 
@@ -18,38 +19,10 @@ const props = defineProps<{
   possibleSchemas: Array<JsonSchema>;
 }>();
 
-const possibleOptions = props.possibleSchemas.map(
-  (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
-);
-const possibleValues = possibleOptions.map(option => option.displayText);
-
 const emit = defineEmits<{
-  (e: 'update_tree'): void;
-  (e: 'update_property_value', newValue: any | undefined): void;
+  (e: 'update:tree'): void;
+  (e: 'update:propertyData', newValue: any | undefined): void;
 }>();
-
-const valueProperty: WritableComputedRef<string | undefined> = computed({
-  get() {
-    const path = pathToString(props.absolutePath);
-    let selectedOption = useSessionStore().currentSelectedOneOfOptions.get(path);
-    return selectedOption?.displayText;
-  },
-
-  set(newValue) {
-    const selectedOptionText: string | undefined = newValue;
-    const path = pathToString(props.absolutePath);
-
-    if (selectedOptionText) {
-      const selectedOption = findOptionByDisplayText(selectedOptionText)!;
-      useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
-      applySchemaConstantsOnDataBasedOnSelection(props.absolutePath, selectedOption);
-      emit('update_tree');
-    } else {
-      useSessionStore().currentSelectedOneOfOptions.delete(path);
-      emit('update_tree');
-    }
-  },
-});
 
 onMounted(() => {
   if (valueProperty.value === undefined && props.propertyData !== undefined) {
@@ -57,46 +30,72 @@ onMounted(() => {
   }
 });
 
-function inferOneOfUserSelection() {
-  const pathAsString = pathToString(props.absolutePath);
-  const validationService = useSessionStore().validationService;
+const possibleOptions = props.possibleSchemas.map(
+  (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
+);
 
-  if (!useSessionStore().currentSelectedOneOfOptions.has(pathAsString)) {
-    // User has not yet made a oneOf sub-schema selection for this path
-    // --> auto infer a sub-schema
-
-    let index = 0;
-    for (let subSchema: JsonSchema of props.propertySchema.oneOf) {
-      const valid = validationService.validateSubSchema(
-        subSchema.jsonSchema!!,
-        props.propertyData
-      ).valid;
-
-      if (valid) {
-        // found a oneOf subSchema for which the data is valid. Select it.
-        const optionToSelect = findOptionBySubSchemaIndex(index);
-        useSessionStore().currentSelectedOneOfOptions.set(pathAsString, optionToSelect!!);
-        return;
-      }
-
-      index++;
+const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> = computed({
+  get(): OneOfAnyOfSelectionOption | undefined {
+    const path = pathToString(props.absolutePath);
+    const optionFromStore = useSessionStore().currentSelectedOneOfOptions.get(path);
+    if (!optionFromStore) {
+      return undefined;
     }
-  }
-}
+    // use the instance from the possible options array
+    // otherwise the dropdown will not show the selected option
+    // as it compares by reference
+    return findOptionBySubSchemaIndex(optionFromStore.index);
+  },
+  set(selectedOption: OneOfAnyOfSelectionOption | undefined) {
+    const path = pathToString(props.absolutePath);
 
-function findOptionByDisplayText(displayText: string): OneOfAnyOfSelectionOption | undefined {
-  for (let option of possibleOptions) {
-    if (option.displayText === displayText) {
-      return option;
+    if (selectedOption) {
+      useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
+      applySchemaConstantsOnDataBasedOnSelection(props.absolutePath, selectedOption);
+    } else {
+      useSessionStore().currentSelectedOneOfOptions.delete(path);
     }
-  }
-}
+
+    emit('update:tree');
+  },
+});
 
 function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | undefined {
   for (let option of possibleOptions) {
     if (option.index === index) {
       return option;
     }
+  }
+  return undefined;
+}
+
+// TODO consider extracting the following methods to external helper class
+
+function inferOneOfUserSelection() {
+  const pathAsString = pathToString(props.absolutePath);
+  const validationService = useSessionStore().validationService;
+
+  if (useSessionStore().currentSelectedOneOfOptions.has(pathAsString)) {
+    return;
+  }
+
+  // User has not yet made a oneOf sub-schema selection for this path
+  // --> auto infer a sub-schema
+  let index = 0;
+  for (const subSchema of props.propertySchema.oneOf) {
+    const validationResult = validationService.validateSubSchema(
+      subSchema.jsonSchema,
+      props.propertyData
+    );
+
+    if (validationResult.valid) {
+      // found a oneOf subSchema for which the data is valid. Select it.
+      const optionToSelect = findOptionBySubSchemaIndex(index);
+      useSessionStore().currentSelectedOneOfOptions.set(pathAsString, optionToSelect!!);
+      return;
+    }
+
+    index++;
   }
 }
 
@@ -122,11 +121,11 @@ function applySchemaConstantsOnDataBasedOnSelection(
   );
   const resultData = applySchemaConstantsOnData(mergedSchema, props.propertyData);
   if (!_.isEqual(resultData, props.propertyData)) {
-    emit('update_property_value', resultData);
+    emit('update:propertyData', resultData);
   }
 }
-function applySchemaConstantsOnData(schema: JsonSchemaObjectType, data: any): any {
-  if (schema === undefined) {
+function applySchemaConstantsOnData(schema: JsonSchemaType, data: any): any {
+  if (typeof schema !== 'object') {
     return data;
   }
   if (typeof data !== 'object') {
@@ -141,7 +140,7 @@ function applySchemaConstantsOnData(schema: JsonSchemaObjectType, data: any): an
     }
   }
   if (schema.properties) {
-    for (let key: string in schema.properties) {
+    for (const key in schema.properties) {
       const propertySchema = schema.properties[key];
       if (data === undefined) {
         data = {};
@@ -158,8 +157,9 @@ function applySchemaConstantsOnData(schema: JsonSchemaObjectType, data: any): an
 <template>
   <div>
     <Dropdown
+      class="tableInput w-full"
       v-model="valueProperty"
-      :options="possibleValues"
+      :options="possibleOptions"
       :placeholder="`Select sub-schema`" />
   </div>
 </template>
@@ -170,5 +170,12 @@ div {
   flex-direction: row;
   height: 30px;
   line-height: 10px;
+}
+.tableInput {
+  border: none;
+  box-shadow: none;
+}
+::placeholder {
+  color: #a8a8a8;
 }
 </style>

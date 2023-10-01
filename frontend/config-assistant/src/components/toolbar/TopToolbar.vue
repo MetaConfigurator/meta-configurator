@@ -60,8 +60,7 @@ const topMenuBar = new TopMenuBar(
   toast,
   handleFromWebClick,
   handleFromOurExampleClick,
-  showUrlDialog,
-  toggleSearchBar
+  showUrlDialog
 );
 
 function getPageName(): string {
@@ -265,7 +264,6 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
 });
 
 const searchTerm: Ref<string> = ref('');
-const searchBarVisible = ref(false);
 
 const initialSchemaSelectionDialog = ref();
 // Function to show the category selection dialog
@@ -278,25 +276,9 @@ useMagicKeys({
   onEventFired(event) {
     if (event.key === 'f' && event.ctrlKey) {
       event.preventDefault();
-      showSearchBar();
     }
   },
 });
-
-function showSearchBar() {
-  searchBarVisible.value = true;
-  focus('searchBar');
-}
-
-function toggleSearchBar() {
-  searchBarVisible.value = !searchBarVisible.value;
-  if (!searchBarVisible.value) {
-    searchTerm.value = '';
-  } else {
-    focus('searchBar');
-  }
-}
-
 const searchResultMenu = ref();
 const searchResultItems = ref<MenuItem[]>([]);
 
@@ -420,7 +402,7 @@ const showSearchResultsMenu = event => {
       </div>
 
       <!-- search bar -->
-      <span class="p-input-icon-left ml-5" style="width: 20rem" v-if="searchBarVisible">
+      <span class="p-input-icon-left ml-5" style="width: 20rem">
         <i class="pi pi-search" style="font-size: 0.9rem" />
         <InputText
           show-clear
@@ -439,12 +421,7 @@ const showSearchResultsMenu = event => {
           </div>
         </template>
       </Menu>
-      <Button
-        v-if="searchBarVisible"
-        class="toolbar-button"
-        text
-        :disabled="!searchTerm"
-        @click="() => (searchTerm = '')">
+      <Button class="toolbar-button" text :disabled="!searchTerm" @click="() => (searchTerm = '')">
         <i class="pi pi-times" />
       </Button>
     </template>

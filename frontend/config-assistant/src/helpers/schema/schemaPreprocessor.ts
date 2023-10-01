@@ -20,9 +20,6 @@ const preprocessedRefSchemas: Map<string, JsonSchemaType> = new Map();
  * - Removes oneOfs and anyOfs not compatible with schema
  * - Merges back oneOfs and anyOfs with just one single entry into the schema
  * - If it is possible: merges oneOfs into anyOfs
- * - Induces title for schema if it does not have title defined
- * - Converts const to enum
- * - Injects types of enum to types property
  *
  * @param schema2 the schema to preprocess
  * @returns the preprocessed schema
