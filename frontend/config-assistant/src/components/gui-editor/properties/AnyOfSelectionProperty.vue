@@ -43,8 +43,9 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined
     if (!optionsFromStore) {
       return undefined;
     }
-    // use an instance from the possible options
+    // use instances from the possible options array
     // otherwise the multiselect will not show the selected options
+    // as it compares by reference
     return optionsFromStore.map(option => findOptionBySubSchemaIndex(option.index));
   },
 

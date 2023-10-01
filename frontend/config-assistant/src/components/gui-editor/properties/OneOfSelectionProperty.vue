@@ -35,12 +35,15 @@ const possibleOptions = props.possibleSchemas.map(
 );
 
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> = computed({
-  get() {
+  get(): OneOfAnyOfSelectionOption | undefined {
     const path = pathToString(props.absolutePath);
     const optionFromStore = useSessionStore().currentSelectedOneOfOptions.get(path);
     if (!optionFromStore) {
       return undefined;
     }
+    // use the instance from the possible options array
+    // otherwise the dropdown will not show the selected option
+    // as it compares by reference
     return findOptionBySubSchemaIndex(optionFromStore.index);
   },
   set(selectedOption: OneOfAnyOfSelectionOption | undefined) {
