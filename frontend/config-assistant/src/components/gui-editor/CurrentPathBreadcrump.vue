@@ -1,3 +1,7 @@
+<!--
+Component for displaying the current path in the GUI editor
+and allowing the user to jump to a parent path.
+-->
 <script setup lang="ts">
 import ChevronRight from '@/components/icons/ChevronRight.vue';
 import {computed} from 'vue';
@@ -8,11 +12,11 @@ const props = defineProps<{
   rootName: string;
 }>();
 
-const pathWithRoot = computed(() => [props.rootName, ...props.path]);
-
 const emit = defineEmits<{
   (e: 'update:path', newPath: Path): void;
 }>();
+
+const pathWithRoot = computed(() => [props.rootName, ...props.path]);
 
 function isNotLast(index: number) {
   return index != pathWithRoot.value.length - 1;
@@ -34,6 +38,7 @@ function jumpToLevel(index: number) {
         v-for="(pathItem, index) in pathWithRoot"
         :key="pathItem"
         class="inline-flex items-center space-x-3">
+        <!-- the path element, clickable if it is not the last element -->
         <div
           class="inline-flex items-center text-sm font-medium text-gray-700"
           :class="{
@@ -43,6 +48,7 @@ function jumpToLevel(index: number) {
           @click="jumpToLevel(index)">
           {{ pathItem }}
         </div>
+        <!-- chevron right if it is not the last element -->
         <ChevronRight v-if="isNotLast(index)" class="text-gray-600" />
       </li>
     </ol>
