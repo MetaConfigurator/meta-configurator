@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, Ref, ref, watchEffect} from 'vue';
+import {computed, onMounted, Ref, ref, watch, watchEffect} from 'vue';
 import {storeToRefs} from 'pinia';
 import type {Editor, Position} from 'brace';
 import * as ace from 'brace';
@@ -10,7 +10,7 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import _ from 'lodash';
-import {useDebounceFn, watchArray, watchThrottled} from '@vueuse/core';
+import {useDebounceFn, watchArray} from '@vueuse/core';
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
@@ -31,7 +31,7 @@ const props = defineProps<{
 
 let editor: Ref<Editor>;
 
-let currentSelectionIsForcedFromOutside = false;
+let currentChangeForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
 
 let editorWrapper: CodeEditorWrapper;
@@ -40,10 +40,6 @@ let editorWrapper: CodeEditorWrapper;
  * Debounce time for writing changes to store in ms
  */
 const WRITE_DEBOUNCE_TIME = 50;
-/**
- * Throttle time for reading changes from store in ms
- */
-const READ_THROTTLE_TIME = 100;
 
 function createConfigManipulator(dataFormat: string): ConfigManipulator {
   if (dataFormat == 'json') {
@@ -119,7 +115,8 @@ onMounted(() => {
     'change',
     useDebounceFn(
       () => {
-        if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        if (currentChangeForcedFromOutside) {
+          currentChangeForcedFromOutside = false; // reset flag
           return;
         }
 
@@ -165,7 +162,8 @@ onMounted(() => {
   );
 
   editor.value.on('changeSelection', () => {
-    if (currentSelectionIsForcedFromOutside) {
+    if (currentChangeForcedFromOutside) {
+      console.log('changeSelection was triggered from outside');
       // we do not need to consider the event and send updates if the selection was forced from outside
       return;
     }
@@ -181,41 +179,36 @@ onMounted(() => {
   });
 
   // Listen to changes in store and update content accordingly
-  watchThrottled(
+  watch(
     fileData,
     newVal => {
       if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
         editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
       }
     },
-    {deep: true, throttle: READ_THROTTLE_TIME}
+    {deep: true}
   );
   // Listen to changes in current path and update cursor accordingly
-  watchThrottled(
+  watch(
     currentSelectedElement,
-    newVal => {
-      if (editor.value) {
-        if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-          currentSelectionIsForcedFromOutside = true;
-          updateCursorPositionBasedOnPath(
-            editor.value.getValue(),
-            sessionStore.currentSelectedElement
-          );
-          currentSelectionIsForcedFromOutside = false;
-        }
+    (newSelectedElement: Path) => {
+      if (editor.value && sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        currentChangeForcedFromOutside = true;
+        updateCursorPositionBasedOnPath(editor.value.getValue(), newSelectedElement);
+        currentChangeForcedFromOutside = false;
       }
     },
-    {deep: true, throttle: READ_THROTTLE_TIME}
+    {deep: true}
   );
 });
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
-  currentSelectionIsForcedFromOutside = true;
+  currentChangeForcedFromOutside = true;
   const newEditorContent = manipulator.stringifyContentObject(configData);
   sessionStore.currentEditorWrapper.setContent(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
-  currentSelectionIsForcedFromOutside = false;
+  // set currentChangeForcedFromOutside to false in on-change handler
 }
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {

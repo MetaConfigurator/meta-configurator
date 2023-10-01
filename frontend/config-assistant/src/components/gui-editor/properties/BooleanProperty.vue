@@ -12,7 +12,7 @@ import type {ValidationResults} from '@/helpers/validationService';
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: boolean | undefined;
-  parentSchema: JsonSchema;
+  parentSchema: JsonSchema | undefined;
   validationResults: ValidationResults;
 }>();
 
@@ -45,11 +45,11 @@ const valueProperty = computed({
 });
 
 function isRequired() {
-  return props.parentSchema.isRequired(props.propertyName as string);
+  return props.parentSchema?.isRequired(props.propertyName as string);
 }
 
 function isElementOfArray() {
-  return props.parentSchema.hasType('array');
+  return props.parentSchema?.hasType('array');
 }
 </script>
 

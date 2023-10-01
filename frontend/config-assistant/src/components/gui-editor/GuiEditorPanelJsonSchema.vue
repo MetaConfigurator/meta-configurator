@@ -4,8 +4,6 @@ import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/model/path';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {onMounted, watch} from 'vue';
-import {storeToRefs} from 'pinia';
 
 const sessionStore = useSessionStore();
 
