@@ -163,7 +163,6 @@ onMounted(() => {
 
   editor.value.on('changeSelection', () => {
     if (currentChangeForcedFromOutside) {
-      console.log('changeSelection was triggered from outside');
       // we do not need to consider the event and send updates if the selection was forced from outside
       return;
     }
