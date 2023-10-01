@@ -37,9 +37,12 @@ const possibleOptions = props.possibleSchemas.map(
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> = computed({
   get() {
     const path = pathToString(props.absolutePath);
-    return useSessionStore().currentSelectedOneOfOptions.get(path);
+    const optionFromStore = useSessionStore().currentSelectedOneOfOptions.get(path);
+    if (!optionFromStore) {
+      return undefined;
+    }
+    return findOptionBySubSchemaIndex(optionFromStore.index);
   },
-
   set(selectedOption: OneOfAnyOfSelectionOption | undefined) {
     const path = pathToString(props.absolutePath);
 

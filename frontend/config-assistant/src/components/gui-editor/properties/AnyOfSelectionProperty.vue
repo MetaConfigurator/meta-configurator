@@ -27,10 +27,25 @@ const emit = defineEmits<{
   (e: 'update:tree'): void;
 }>();
 
+function findOptionBySubSchemaIndex(index): OneOfAnyOfSelectionOption {
+  for (let option of possibleOptions) {
+    if (option.index === index) {
+      return option;
+    }
+  }
+  throw new Error(`Could not find option with index ${index}`);
+}
+
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined> = computed({
-  get() {
+  get(): OneOfAnyOfSelectionOption[] | undefined {
     const path = pathToString(props.absolutePath);
-    return useSessionStore().currentSelectedAnyOfOptions.get(path);
+    const optionsFromStore = useSessionStore().currentSelectedAnyOfOptions.get(path);
+    if (!optionsFromStore) {
+      return undefined;
+    }
+    // use an instance from the possible options
+    // otherwise the multiselect will not show the selected options
+    return optionsFromStore.map(option => findOptionBySubSchemaIndex(option.index));
   },
 
   set(selectedOptions: OneOfAnyOfSelectionOption[] | undefined) {
