@@ -1,7 +1,7 @@
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
-import {dataAt} from '@/helpers/pathHelper';
+import {dataAt, pathToString} from '@/helpers/pathHelper';
 import _ from 'lodash';
 
 /**
@@ -33,7 +33,7 @@ export function calculateEffectiveSchema(
   let result = schema ?? new JsonSchema({});
   let iteration = 0;
 
-  // console.groupCollapsed('calculateEffectiveSchema', pathToString(path));
+  console.groupCollapsed('calculateEffectiveSchema', pathToString(path));
   console.log('schema', schema);
 
   while (result.isDataDependent && iteration < 1000) {
@@ -61,7 +61,7 @@ export function calculateEffectiveSchema(
     iteration++;
   }
 
-  // console.groupEnd();
+  console.groupEnd();
 
   return new EffectiveSchema(result, data, path);
 }
@@ -107,6 +107,7 @@ function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
 }
 
 function resolveConditions(result: JsonSchema, data: any) {
+  console.trace();
   console.groupCollapsed('resolveConditions for', result);
   const resolvedConditions = result.conditions?.map(condition => {
     return resolveIfThenElse(condition, data);

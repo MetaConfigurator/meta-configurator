@@ -20,7 +20,7 @@ export function mergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
       },
     },
   });
-  console.log('mergeAllOfs', schema, result);
+  // console.log('mergeAllOfs', schema, result);
   return result;
 }
 export function safeMergeAllOfs(schema: JsonSchemaType): JsonSchemaType {

@@ -1,10 +1,11 @@
-import type {JsonSchemaObjectType, TopLevelSchema} from '@/model/JsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/model/JsonSchemaType';
 import type {ErrorObject} from 'ajv';
 import type {ValidateFunction} from 'ajv/dist/2020';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import type {Path} from '@/model/path';
 import {pathToJsonPointer} from '@/helpers/pathHelper';
+import _ from 'lodash';
 
 export class ValidationService {
   static readonly TOP_LEVEL_SCHEMA_KEY = '$topLevelSchema';
@@ -19,6 +20,8 @@ export class ValidationService {
    * @throws Error if the schema is invalid
    */
   constructor(topLevelSchema: TopLevelSchema) {
+    console.log('creating validation service', topLevelSchema);
+    console.trace();
     this.topLevelSchema = topLevelSchema;
     this.initValidationFunction();
   }
@@ -29,8 +32,13 @@ export class ValidationService {
       allErrors: true,
     });
     addFormats(this._ajv);
-    this._ajv.addSchema(this.topLevelSchema, ValidationService.TOP_LEVEL_SCHEMA_KEY);
-    this._validationFunction = this._ajv.getSchema(ValidationService.TOP_LEVEL_SCHEMA_KEY);
+    this._ajv.addSchema(
+      this.topLevelSchema,
+      this.topLevelSchema?.$id ?? ValidationService.TOP_LEVEL_SCHEMA_KEY
+    );
+    this._validationFunction = this._ajv.getSchema(
+      this.topLevelSchema?.$id ?? ValidationService.TOP_LEVEL_SCHEMA_KEY
+    );
   }
 
   public validate(data: any): ValidationResults {
@@ -54,35 +62,25 @@ export class ValidationService {
   public validateSubSchema(schema: JsonSchemaObjectType, data: any): ValidationResults {
     const key = schema.$id || schema.id || undefined;
 
-    console.groupCollapsed('validateSubSchema', key || schema);
-    let schemaWithDefinitions = schema;
-
-    // inject definitions
     if (key && this._ajv?.getSchema(key) === undefined) {
-      console.log('adding schema to ajv', key);
-      schemaWithDefinitions = this.injectDefinitions(schema);
-      this._ajv?.addSchema(schemaWithDefinitions, key);
-    }
-    if (key === undefined) {
-      schemaWithDefinitions = this.injectDefinitions(schema);
+      const schemaWithUpdatedRefs = this.updateReferences(schema);
+      this._ajv?.addSchema(schemaWithUpdatedRefs, key);
     }
 
     let validationFunction: ValidateFunction | undefined;
     if (key) {
       validationFunction = this._ajv?.getSchema(key);
     } else {
-      validationFunction = this._ajv?.compile(schemaWithDefinitions);
+      const schemaWithUpdatedRefs = this.updateReferences(schema);
+      validationFunction = this._ajv?.compile(schemaWithUpdatedRefs);
     }
 
     if (!validationFunction) {
-      console.warn('Could not compile schema for key ' + key);
       return new ValidationResults([]); // optimistic approach
     }
 
     validationFunction(data);
     const errors = validationFunction.errors || [];
-    console.log('errors', errors);
-    console.groupEnd();
     return new ValidationResults(errors);
   }
 
@@ -91,6 +89,81 @@ export class ValidationService {
     if (result.$defs === undefined) {
       result.$defs = this.topLevelSchema.definitions || this.topLevelSchema.$defs || {};
     }
+    return result;
+  }
+
+  private updateReferences(schema: JsonSchemaType) {
+    const result = _.cloneDeep(schema);
+
+    if (typeof result !== 'object' || result.$defs !== undefined) {
+      return result;
+    }
+
+    if (result.$ref !== undefined) {
+      result.$ref = this.topLevelSchema.$id + result.$ref;
+    }
+
+    if (result.if) {
+      result.if = this.updateReferences(result.if);
+    }
+    if (result.then) {
+      result.then = this.updateReferences(result.then);
+    }
+    if (result.else) {
+      result.else = this.updateReferences(result.else);
+    }
+    if (result.allOf) {
+      result.allOf = result.allOf.map(subSchema => this.updateReferences(subSchema));
+    }
+    if (result.anyOf) {
+      result.anyOf = result.anyOf.map(subSchema => this.updateReferences(subSchema));
+    }
+    if (result.oneOf) {
+      result.oneOf = result.oneOf.map(subSchema => this.updateReferences(subSchema));
+    }
+    if (result.not) {
+      result.not = this.updateReferences(result.not);
+    }
+    if (result.items) {
+      result.items = this.updateReferences(result.items);
+    }
+    if (result.prefixItems) {
+      result.prefixItems = result.prefixItems.map(subSchema => this.updateReferences(subSchema));
+    }
+    if (result.contains) {
+      result.contains = this.updateReferences(result.contains);
+    }
+    if (result.additionalProperties) {
+      result.additionalProperties = this.updateReferences(result.additionalProperties);
+    }
+    if (result.propertyNames) {
+      result.propertyNames = this.updateReferences(result.propertyNames);
+    }
+    if (result.unevaluatedItems) {
+      result.unevaluatedItems = this.updateReferences(result.unevaluatedItems);
+    }
+    if (result.unevaluatedProperties) {
+      result.unevaluatedProperties = this.updateReferences(result.unevaluatedProperties);
+    }
+    if (result.contentSchema) {
+      result.contentSchema = this.updateReferences(result.contentSchema);
+    }
+    if (result.properties) {
+      for (const key of Object.keys(result.properties)) {
+        result.properties[key] = this.updateReferences(result.properties[key]);
+      }
+    }
+    if (result.patternProperties) {
+      for (const key of Object.keys(result.patternProperties)) {
+        result.patternProperties[key] = this.updateReferences(result.patternProperties[key]);
+      }
+    }
+    if (result.dependentSchemas) {
+      for (const key of Object.keys(result.dependentSchemas)) {
+        result.dependentSchemas[key] = this.updateReferences(result.dependentSchemas[key]);
+      }
+    }
+
     return result;
   }
 }

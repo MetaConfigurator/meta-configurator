@@ -12,7 +12,6 @@ import 'crypto';
  * This will not modify the original schema.
  *
  * The following steps are performed:
- * - add $id if not present
  * - add title if not present in properties and definitions
  * - convert const to enum
  * - inject types of enum to types property
@@ -31,8 +30,6 @@ export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaType {
 
   preprocessOneTimeRecursive(schemaCopy, id);
 
-  console.log('preprocessOneTime', schemaCopy);
-
   return schemaCopy;
 }
 
@@ -41,7 +38,6 @@ function preprocessOneTimeRecursive(schema: JsonSchemaType | undefined, schemaPa
     return;
   }
 
-  setId(schema, schemaPath);
   induceTitles(schema);
 
   convertConstToEnum(schema);
@@ -90,12 +86,6 @@ function preprocessSchemaRecord(
     for (const [key, value] of Object.entries(schemaRecord)) {
       preprocessOneTimeRecursive(value, `${schemaPath}/${key}`);
     }
-  }
-}
-
-function setId(schema: JsonSchemaObjectType, schemaPath: string): void {
-  if (schema.$id === undefined && schema.id === undefined) {
-    schema.$id = schemaPath;
   }
 }
 

@@ -13,6 +13,23 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
       description: 'Last name',
       examples: ['Doe'],
     },
+    circular: {
+      title: 'Circular',
+      type: 'object',
+      properties: {
+        name: {
+          $ref: '#/$defs/name',
+          minLength: 23,
+        },
+        circular: {
+          $ref: '#/$defs/circular',
+        },
+      },
+    },
+    isMarried: {
+      type: 'boolean',
+      const: true,
+    },
   },
   patternProperties: {
     '^Number.*': {
@@ -23,7 +40,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
   if: {
     properties: {
       isMarried: {
-        const: true,
+        $ref: '#/$defs/isMarried',
       },
     },
     required: ['isMarried'],
@@ -56,6 +73,9 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
     },
   },
   properties: {
+    circular: {
+      $ref: '#/$defs/circular',
+    },
     name: {
       $ref: '#/$defs/name',
     },

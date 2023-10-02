@@ -30,33 +30,33 @@ export function preprocessSchema(schema2: JsonSchemaType): JsonSchemaType {
   }
   let schema: JsonSchemaType = {...schema2};
   // console.groupCollapsed('preprocessSchema', schema.title ?? schema.$id ?? schema.id ?? schema);
-  console.trace();
+  // console.trace();
 
-  console.log('schema', schema);
+  // console.log('schema', schema);
   if (hasRef(schema)) {
     schema = resolveReference(schema);
-    console.log('schema after resolving reference', schema);
+    // console.log('schema after resolving reference', schema);
   }
 
-  console.log('schema before handling allOfs', schema);
+  // console.log('schema before handling allOfs', schema);
   schema = handleAllOfs(schema);
-  console.log('schema after handling allOfs', schema);
+  // console.log('schema after handling allOfs', schema);
   convertTypesToOneOf(schema);
-  console.log('schema after converting types to oneOfs', schema);
+  // console.log('schema after converting types to oneOfs', schema);
   removeIncompatibleOneOfs(schema);
-  console.log('schema after removing incompatible oneOfs', schema);
+  // console.log('schema after removing incompatible oneOfs', schema);
   removeIncompatibleAnyOfs(schema);
-  console.log('schema after removing incompatible anyOfs', schema);
+  // console.log('schema after removing incompatible anyOfs', schema);
   schema = mergeSingularOneOf(schema);
-  console.log('schema after merging singular oneOf', schema);
+  // console.log('schema after merging singular oneOf', schema);
   schema = mergeSingularAnyOf(schema);
-  console.log('schema after merging singular anyOf', schema);
+  // console.log('schema after merging singular anyOf', schema);
   attemptMergeOneOfsIntoAnyOfs(schema);
-  console.log('schema after attempting to merge oneOfs into anyOfs', schema);
+  /* console.log('schema after attempting to merge oneOfs into anyOfs', schema); */
   preprocessOneOfs(schema);
-  console.log('schema after preprocessing oneOfs', schema);
+  /*  console.log('schema after preprocessing oneOfs', schema); */
   preprocessAnyOfs(schema);
-  console.log('schema after preprocessing anyOfs', schema);
+  /* console.log('schema after preprocessing anyOfs', schema); */
   // TODO: deal with case where there is anyOf and oneOf --> show both options in GUI?
 
   // console.groupEnd();
@@ -74,10 +74,10 @@ function handleAllOfs(schema: JsonSchemaType) {
   if (hasAllOfs(schema)) {
     // @ts-ignore
     schema.allOf = schema.allOf!!.map(subSchema => preprocessSchema(subSchema));
-    console.log('schema after preprocessing allOfs', schema);
+    /* console.log('schema after preprocessing allOfs', schema); */
 
     schema = extractIfsOfAllOfs(schema);
-    console.log('schema after extracting ifs of allOfs', schema);
+    /* console.log('schema after extracting ifs of allOfs', schema); */
     schema = mergeAllOfs(schema);
   }
   return schema;
@@ -136,9 +136,9 @@ function extractIfsOfAllOfs(schema: JsonSchemaType): JsonSchemaType {
   if (typeof schema !== 'object') {
     return schema;
   }
-  console.log('extractIfsOfAllOfs', schema);
+  /* console.log('extractIfsOfAllOfs', schema); */
   if (!schema.allOf) {
-    console.log('no allOfs', schema);
+    /* console.log('no allOfs', schema); */
     return schema;
   }
   const conditions: JsonSchemaType[] = [];
@@ -165,10 +165,10 @@ function extractIfsOfAllOfs(schema: JsonSchemaType): JsonSchemaType {
     }
   });
   if (conditions.length == 0) {
-    console.log('no conditions', schema);
+    /* console.log('no conditions', schema); */
     return schema;
   }
-  console.log('conditions', conditions);
+  /* console.log('conditions', conditions); */
   return {...schema, conditions};
 }
 
@@ -264,7 +264,7 @@ function removeIncompatibleOneOfs(schema: JsonSchemaType) {
     return;
   }
   if (hasOneOfs(schema)) {
-    console.log('schema.oneOf before', schema.oneOf);
+    // console.log('schema.oneOf before', schema.oneOf);
     schema.oneOf = schema.oneOf!.map(subSchema => {
       const copiedSchemaWithoutOneOf = {...schema};
       delete copiedSchemaWithoutOneOf.oneOf;
@@ -274,10 +274,10 @@ function removeIncompatibleOneOfs(schema: JsonSchemaType) {
         return subSchema;
       }
     });
-    console.log('schema.oneOf after', schema.oneOf);
+    // console.log('schema.oneOf after', schema.oneOf);
     // remove oneOfs that are not compatible with parent
     schema.oneOf = schema.oneOf.filter(oneOf => oneOf != false);
-    console.log('schema.oneOf after filtering', schema.oneOf);
+    // console.log('schema.oneOf after filtering', schema.oneOf);
   }
 }
 
@@ -329,15 +329,15 @@ function resolveReference(schema: JsonSchemaType): JsonSchemaType {
   if (preprocessedRefSchemas.has(refString)) {
     refSchema = preprocessedRefSchemas.get(refString);
   } else {
-    console.log('refString', refString);
-    console.log('useSessionStore().fileSchemaData', useSessionStore().fileSchemaDataPreprocessed);
+    // console.log('refString', refString);
+    // console.log('useSessionStore().fileSchemaData', useSessionStore().fileSchemaDataPreprocessed);
     refSchema = pointer.get(
       nonBooleanSchema(useSessionStore().fileSchemaDataPreprocessed ?? {}) ?? {},
       refString
     );
-    console.log('refSchema', refSchema);
+    // console.log('refSchema', refSchema);
     refSchema = preprocessSchema(refSchema);
-    console.log('refSchema after preprocessing', refSchema);
+    // console.log('refSchema after preprocessing', refSchema);
     preprocessedRefSchemas.set(refString, refSchema);
   }
 

@@ -159,22 +159,24 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
-  const validationService = ref(new ValidationService({}));
+  const validationService = ref(new ValidationService(fileSchemaDataPreprocessed.value));
   const validateDebounced = useDebounceFn(
     data => validationService.value.validate(data),
     GuiConstants.SCHEMA_VALIDATION_DEBOUNCE_TIME
   );
-
   /**
    * Update the validation service when the schema changes.
    */
   watchDebounced(
     fileSchemaData,
     () => {
+      currentExpandedElements.value = {};
+      currentSelectedElement.value = [];
       try {
-        validationService.value = new ValidationService(fileSchemaData.value);
+        validationService.value = new ValidationService(fileSchemaDataPreprocessed.value);
         schemaErrorMessage.value = null;
       } catch (e: any) {
+        errorService.onError(e);
         schemaErrorMessage.value = e.message;
       }
     },

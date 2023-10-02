@@ -39,12 +39,16 @@ const emit = defineEmits<{
   (e: 'remove_property', path: Path): void;
 }>();
 
-const sessionStore = storeToRefs(useSessionStore());
+watch(
+  props,
+  () => {
+    console.log('update props');
+    //  updateTree();
+  },
+  {deep: true}
+);
 
-watch(sessionStore.fileSchema, () => {
-  sessionStore.currentExpandedElements.value = {};
-  updateTree();
-});
+const sessionStore = storeToRefs(useSessionStore());
 
 // recalculate the tree when the data structure changes, but not
 // single values (e.g. when a property is changed)
@@ -87,16 +91,16 @@ const currentTree = ref({});
 
 function computeTree() {
   // console.groupCollapsed('computeTree');
-  console.log('currentPath', props.currentPath);
-  console.log('currentSchema', props.currentSchema);
+  /* console.log('currentPath', props.currentPath);
+  console.log('currentSchema', props.currentSchema); */
   currentTree.value = treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema,
     undefined,
     props.currentPath
   );
-  console.log('currentTree', currentTree.value);
+  /* console.log('currentTree', currentTree.value); */
   currentTree.value.children = treeNodeResolver.createChildNodesOfNode(currentTree.value);
-  console.log('currentTree', currentTree.value);
+  /*  console.log('currentTree', currentTree.value); */
 
   expandPreviouslyExpandedElements(currentTree.value.children as Array<GuiEditorTreeNode>);
 

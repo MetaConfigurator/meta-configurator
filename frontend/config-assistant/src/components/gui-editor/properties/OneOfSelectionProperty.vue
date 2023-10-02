@@ -27,6 +27,7 @@ const emit = defineEmits<{
 onMounted(() => {
   if (valueProperty.value === undefined && props.propertyData !== undefined) {
     inferOneOfUserSelection();
+    emit('update:tree');
   }
 });
 
