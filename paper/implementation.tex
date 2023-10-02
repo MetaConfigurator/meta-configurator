@@ -38,10 +38,20 @@ If schema violations are found, the corresponding user data lines in the code ed
 \paragraph{Support for JSON and YAML}
 Ace Editor supports syntax highlighting for many programming languages.
 % todo: describe why we support not all other languages
-In our project, we support JSON and YAML. It can be switched in the Settings page.
+In our project, we support JSON and YAML. It can be switched in the \textit{Settings} page.
 
-\paragraph{Concrete Syntax Tree}
-% TODO: how we get cursor position and path correctly using cst
+\paragraph{Linkage of text with the data model}
+As described in section \ref{sec:design_text_editor_panel}, to map a cursor position in the text editor to a path in the data model we need to implement the function \textit{determinePath(editorContent, cursorPosition)} and to map a path in the data model to a text row in the editor, we need to implement the function \textit{determineRow(editorContent, dataPath)}. For every data format to be supported, those two functions need to be implemented.
+
+For \textit{JSON}, the functions have been implemented using a \textit{Concrete Syntax Tree (CST)}. 
+The text content is parsed as a CST. Then the tree is is traversed recursively. 
+Every tree node has a range property, describing the start and end index of the text belonging to the node. 
+To determine the corresponding path for a cursor position, the cursor position is translated to a character index $targetCharacter$ within the text.
+Then the CST is traversed and for all nodes $currentNode$ of type array or object for which $targetCharacter \in currentNode.range$, 
+the child nodes are checked and the key of the node (or index for array elements) is appended to the result path. 
+This way, the corresponding path is built up. To determine the cursor position for a given path, the reverse is done: the CST is traversed until the effective path of the $currentNode$ is the target path. Then $currentNode.range.start$ is returned as result index, which is then translated into a cursor position (row and column).
+
+% TODO: section for YAML.
 
 \paragraph{Syntax Highlighting}
 The ace editor supports syntax highlighting for both JSON and YAML, which we use.
