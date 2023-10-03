@@ -73,7 +73,7 @@ Settings      & Settings data                & Settings schema           \\
 The core of our tool is a single source of truth data store that contains the current user configuration data (as a JavaScript Object).
 With this data store we can bidirectionally connect what we call ``editor panels''.
 An editor panel is a modular component that the user of the tool can access to modify the config data in an indirect way.
-It might be implemented as a raw text editor, a graphical user interface or any other way in which the data can be presented to the user.
+It might be implemented as a rich text editor, a graphical user interface or any other way in which the data can be presented to the user.
 All editor panels are independent and do only have access to the data store but not to each other.
 Every editor panel subscribes to the changes of the data store, so it can be updated accordingly whenever the data in the store is changed.
 Additionally, every panel has the capabilities of updating the data store themselves, which is done when the user modifies the data in the editor panel.
@@ -81,7 +81,7 @@ The following example use-cases illustrate the capabilities of this architecture
 
 \begin{itemize}
     \item Format converter: one panel shows the data in a rich-text editor in JSON format, a second panel shows the data in a rich-text editor in YAML format. Any semantic data change on one panel will cause the same semantic change in the other panel.
-    \item Split-Screen Editor: one panel shows the data in a rich-text editor, a second panel shows the data in a GUI. This way the user can have the efficiency of a text editor, but also the assistance of a GUI at the same time. Any semantic data change on one panel will be forwarded to the other panel. The GUI editor panel would require some data schema.
+    \item Split-Screen Editor: one panel shows the data in a rich-text editor, a second panel shows the data in a GUI. This way the user can have the efficiency of a text editor, but also the assistance of a GUI at the same time. Any semantic data change on one panel will be forwarded to the other panel. The GUI editor panel would require some data schema to know which GUI elements to show.
     \item The Split-Screen Editor could be implemented for different data formats, such as YAML, JSON and XML. The architecture allows any data format as long as there exists a mapping from this data format to a JavaScript Object and back.
 \end{itemize}
 
@@ -97,7 +97,7 @@ Besides the current configuration data, the store also stores the \textit{path o
 
 % felix
 
-\subsubsection{Text Editor Panel} % todo instead of writing in future, write in simple present
+\subsubsection{Text Editor Panel}\label{subsubsec:design_text_editor_panel} % todo instead of writing in future, write in simple present
 For the text editor panels, we embed a rich-text editor that already supports syntax highlighting and other useful features.
 We enable validation of whether the text is well-formed according to the JSON/YAML/XML Standard and add schema validation.
 The architecture allows for having one text editor panel that supports multiple languages, as well as for having separate text editor panels, one for each language.

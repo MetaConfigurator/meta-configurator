@@ -35,25 +35,26 @@ We make use of the \textbf{Ajv JSON schema validator}\cite{ajv-validator} librar
 %Ajv firstly generates a fast validation function from the input schema.
 If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
 
-\paragraph{Support for JSON and YAML}
-Ace Editor supports syntax highlighting for many programming languages.
-% todo: describe why we support not all other languages
-In our project, we support JSON and YAML. It can be switched in the Settings page.
-
-\paragraph{Concrete Syntax Tree}
-% TODO: how we get cursor position and path correctly using cst
-
 \paragraph{Syntax Highlighting}
-The ace editor supports syntax highlighting for both JSON and YAML, which we use.
-With this functionality, users can recognize different components in the data better, like properties or values.
+Ace Editor supports syntax highlighting for both JSON and YAML, which we use.
+The data format can be switched in the \textit{Settings} page.
+Note that Ace Editor allows to collapse/expand segments of the text, based on the hierarchical tree structure of the data. 
+
+\paragraph{Linkage of text with the data model}
+As described in section \ref{subsubsec:design_text_editor_panel}, to map a cursor position in the text editor to a path in the data model we need to implement the function \textit{determinePath(editorContent, cursorPosition)} and to map a path in the data model to a text row in the editor, we need to implement the function \textit{determineRow(editorContent, dataPath)}. For every data format to be supported, those two functions need to be implemented.
+
+For \textit{JSON}, the functions have been implemented using a \textit{Concrete Syntax Tree (CST)}. 
+The text content is parsed as a CST. Then the tree is is traversed recursively. 
+Every tree node has a range property, describing the start and end index of the text belonging to the node. 
+To determine the corresponding path for a cursor position, the cursor position is translated to a character index $targetCharacter$ within the text.
+Then the CST is traversed and for all nodes $currentNode$ of type array or object for which $targetCharacter \in currentNode.range$, 
+the child nodes are checked and the key of the node (or index for array elements) is appended to the result path. 
+This way, the corresponding path is built up. To determine the cursor position for a given path, the reverse is done: the CST is traversed until the effective path of the $currentNode$ is the target path. Then $currentNode.range.start$ is returned as result index, which is then translated into a cursor position (row and column).
+
+% TODO: section for YAML.
 
 \paragraph{Editor Operations}
-There are many other useful functionalities we have implemented in the code editor.
-\begin{itemize}
-    \item Dragging and dropping files in the code editor
-    \item Font size configuration in the Settings
-    \item Setting themes
-\end{itemize}
+The code editor has more functionalities, such as the possibility to open a file by drag and drop into the editor, as well as customizable font sizes.
 
 \subsection{GUI Editor}\label{subsec:gui-editor}
 
@@ -92,17 +93,18 @@ The breadcrumb at the top allows the user to see which path the GUI editor curre
 
 \paragraph{Remove Data}
 The user can delete properties or array elements from the data by clicking on the $\times$ button next to the edit field.
-This button is only shown if the property is not required.
+This button is only shown if the property is not required and there exists data.
 
 \paragraph{Schema Information Tooltip}
-When the user hovers over the property key or array index, an overlay is displayed which contains all information from the schema about that property.
+When the user hovers over the property key or array index, an overlay is displayed, which contains all information from the schema about that property.
 We manually implemented a generation of a textual description for each of the JSON schema keywords.
+Starting with title and description of the property, the overlay then shows constraints (such as the number must be greater than 0) and in the bottom it also shows schema violations, in case there are any.
 This feature helps the user to understand the constraints and the meaning of a property.
 
 \paragraph{Highlighting Schema Validation Errors}
-When the configuration data does not comply to the schema, the corresponding elements are underlined in red.
+When the configuration data does not comply to the schema, the corresponding elements are underlined in red and highlighted with a red error icon.
 This way, the user knows where any errors are.
-Additionally, when hovering over the property name, more details about the error are shown.
+Additionally, the schema information tooltip lists all schema violations.
 % todo add screenshot
 
 \subsection{Schema preprocessing}\label{subsec:schema-preprocessing}
@@ -110,7 +112,7 @@ Additionally, when hovering over the property name, more details about the error
 To represent the schema in the GUI editor, we preprocess the schema.
 We differentiate between three ways of preprocessing:
 A one-time preprocessing step when loading the schema, an internal preprocessing that happens at every layer of the schema tree,
-and calculating an effective schema that happens everytime the configuration data changes.
+and calculating an effective schema that happens every time the configuration data changes.
 
 \subsubsection{One-time Preprocessing Step}
 When the schema is loaded, we perform a one-time preprocessing step that currently only involves migrating the schema to the newest version,
@@ -123,7 +125,7 @@ After the migration, the resulting schema is loaded into the tool in the \textit
 \subsubsection{Internal preprocessing}
 This preprocessing steps are mainly used to generate the GUI editor and thus are internal steps that will not be visible for the user.
 They happen at every layer of the schema tree lazily, only when required.
-This lazy preprocessing is required as schemas can have circular references, which would lead to infinite loops.
+Laziness of the preprocessing is required as schemas can have circular references, which would, otherwise, lead to infinite loops.
 In the following, we describe the preprocessing steps in details.
 
 \paragraph{Resolving references}
@@ -218,7 +220,136 @@ Hence, the support for allOf and any other keywords for which we use this in the
     \label{listing:resolved-allOf}
 \end{listing}
 
-\paragraph{anyOf and oneOf} % todo
+
+\paragraph{Converting types to oneOf}
+In JSON schema, a property can have multiple supported types, such as shown in listing \ref{listing:multiple_types}. 
+A semantically equivalent schema can be generated by the use of oneOf, where each sub-schema contains exactly one of the types, as shown in listing \ref{listing:multiple_types_converted}. 
+If a schema defines more than one type, we convert the types to oneOf. This way, we reduce complexity by having to solve only the problem of oneOf. 
+For schemas that already contain oneOf, every type is multiplied with every existing oneOf sub-schema. 
+For 2 types and 3 oneOf sub-schemas, this will result in a new oneOf with 6 options. 
+An exception is when a type can not be merged with an oneOf sub-schema (e.g. the type is "boolean" and the oneOf sub-schema has type "string").
+In that case, the incompatible pair is dismissed.
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "type": ["object", "boolean"]
+}
+    \end{minted}
+    \caption{Simple JSON schema with two possible types}
+    \label{listing:multiple_types}
+\end{listing}
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "oneOf": [
+    {
+      "type": "object"
+    },
+    {
+      "type": "boolean"
+    },
+  ]
+}    
+	\end{minted}
+    \caption{Simple JSON schema after conversion of types to oneOf}
+    \label{listing:multiple_types_converted}
+\end{listing}
+
+
+\paragraph{Removing incompatible oneOfs and anyOfs}
+It can happen that a schema has oneOf or anyOf options which are not compatible with the schema of the property (e.g. sub-schemas that can never be fulfilled in combination with the property schema). 
+Listing \ref{listing:incompatible_one_ofs} provides an example of a schema with an incompatible oneOf option.
+An example where this occurs is in our adjusted JSON schema meta schema, if we assign the root property the jsonSchema sub-schema, which allows objects and booleans, but then additionally restrict the root to be an object.
+For every oneOf and anyOf sub-schema, we check whether it can be merged with the schema of the property. 
+The options which are not compatible (can not be merged) are removed (see listing \ref{listing:incompatible_one_ofs_removed}).
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "type": "object",
+  "oneOf": [
+    {
+      "type": "object"
+    },
+    {
+      "type": "boolean"
+    },
+  ]
+}
+    \end{minted}
+    \caption{Simple JSON schema with incompatible oneOf option}
+    \label{listing:incompatible_one_ofs}
+    
+\end{listing}
+
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "type": "object",
+  "oneOf": [
+    {
+      "type": "object"
+    }
+  ]
+}
+    \end{minted}
+    \caption{Simple JSON schema with incompatible oneOf option removed}
+    \label{listing:incompatible_one_ofs_removed}
+\end{listing}
+
+
+\paragraph{Merging singular oneOfs and anyOfs}
+Because of the previous pre-processing step, it can happen that for some oneOfs or anyOfs there remains only one compatible sub-schema left (see listing \ref{listing:incompatible_one_ofs_removed}). 
+If this is the case, the use oneOf/anyOf is redundant, as that singular sub-schema must be chosen implicitly. 
+Therefore, if there exists only one singular choice for oneOf/anyOf, we merge its sub-schema into the property schema and remove the use of oneOf/anyOf (see listing \ref{listing:singular_one_of_merged}).
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "type": "object"
+}
+    \end{minted}
+    \caption{Simple JSON schema with singular oneOf merged into property schema}
+    \label{listing:singular_one_of_merged}
+\end{listing}
+
+
+\paragraph{Attempting to merge oneOfs into anyOfs}
+Schemas can use both anyOf and oneOf at the same time. 
+Especially after converting all types (when there is more than one type) to oneOf, it happens that a schema has oneOf options (typically for types) and simultaneously anyOf options.
+The user will then have to select both an oneOf sub-schema, as well as an anyOf sub-schema in the GUI.
+We observed a special scenario in the JSON meta schema, where the oneOf selection was always implicitly given by the anyOf selection.
+For every single anyOf sub-schema, only one oneOf sub-schema was compatible. 
+In that scenario, we can merge the oneOfs into the anyOfs: for every anyOf sub-schema, we merge the one compatible oneOf sub-schema into it.
+This is precisely what this pre-processing step does: if possible, the oneOf sub-schemas are merged into the anyOf sub-schemas and the oneOf property is removed from the schema.
+
+
+\paragraph{Preprocessing oneOfs and anyOfs}
+For all remaining oneOf and anyOf sub-schems, the internal pre-processing steps are executed.
+
 
 \paragraph{Title inducing}
 
@@ -236,7 +367,7 @@ As we use the title in various cases to display for the user, we inject the prop
   "type": "object",
   "properties": {
     "name": {
-        "type": "string"
+      "type": "string"
     }
   }
 }
@@ -255,8 +386,8 @@ As we use the title in various cases to display for the user, we inject the prop
   "type": "object",
   "properties": {
     "name": {
-        "title": "name",
-        "type": "string"
+      "title": "name",
+      "type": "string"
     }
   }
 }
