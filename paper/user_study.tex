@@ -46,8 +46,123 @@ Based on the survey, we could get many feedbacks which we can use in the future.
 We analyse the results which we get from the survey and improve our application afterward.
 
 \subsection{Results}
-% todo: show specific cases of user study. Use table of feedbacks and resolutions
-% todo: not sure how we name this section.
+To evaluate the user study, we get results from interviews.
+We conducted five user studies in total and summarize the correctness and incorrectness of answers into the table, as shown in \ref{table:Results}.
+\begin{table*}
+    \label{table:Results}
+    \begin{tabular}{|c|ll|ll|}
+        \hline
+        \multicolumn{1}{|l|}{} &
+        \multicolumn{2}{c|}{
+            \begin{tabular}[c]{@{}c@{}}
+                Correct\\
+                Answer
+            \end{tabular}} &
+        \multicolumn{2}{c|}{
+
+            \begin{tabular}[c]{@{}c@{}}
+                Incorrect \\
+                Answer
+            \end{tabular}} \\ \hline
+
+        \multicolumn{1}{|l|}{} &
+        \multicolumn{1}{c|}{
+            Accuracy \& Highlights} &
+        \multicolumn{1}{c|}{
+
+            \begin{tabular}[c]{@{}c@{}}
+                Done\\
+                with efforts/hints
+            \end{tabular}} &
+
+        \multicolumn{2}{l|}{} \\ \hline
+        User Study 1 &
+        \multicolumn{1}{l|}{
+
+            \begin{tabular}[c]{@{}l@{}}Accuracy: 100\%(11/11)\\ 1. Effectively used tooltip\\ 2. All questions right
+            \end{tabular}} &
+
+        \begin{tabular}[c]{@{}l@{}}1. Task 3.2: Setting Vehicle Type to highest level\\
+        - Took some time to find the field; \\
+        - Not used the search function
+        \end{tabular} &
+        \multicolumn{2}{c|}{none} \\ \hline
+        User Study 2 &
+        \multicolumn{1}{l|}{
+
+            \begin{tabular}[c]{@{}l@{}}Accuracy: 91\%(10/11)\\
+            1. Tried to find search function\\
+            to solve task
+            \end{tabular}} &
+
+        \begin{tabular}[c]{@{}l@{}}1. Task 3.3: Validation Errors\\
+        - Expected obvious error hint\\
+        - Not used the search function
+        \end{tabular} &
+
+        \multicolumn{2}{l|}{
+            \begin{tabular}[c]{@{}l@{}}1.Task 4.2: Adding new property\\
+            - Firstly added property on root level\\
+            - Not knew how to change property name
+            \end{tabular}} \\ \hline
+
+        User Study 3 &
+        \multicolumn{1}{l|}{
+            \begin{tabular}[c]{@{}l@{}}Accuracy: 82\%(9/11)\\
+            1. used tooltip to solve the tasks\\
+            \end{tabular}} &
+
+        \begin{tabular}[c]{@{}l@{}}1. Task 2.3: Duration of Simulation\\
+        - Not knew one can use GUI panel \\
+        at the beginning\\
+        2. Task 3.3: Validation Errors\\
+        - Not found where the error locates(Spell Error)
+        \end{tabular} &
+
+        \multicolumn{2}{l|}{
+            \begin{tabular}[c]{@{}l@{}}1. Task 2.4: Valid humidity value\\
+            - Ignored the error hint\\
+            3. Task 4.2 Add new property\\
+            - Set property name in wrong place
+            \end{tabular}} \\ \hline
+
+        User Study 4 &
+        \multicolumn{1}{l|}{
+            \begin{tabular}[c]{@{}l@{}}Accuracy: 82\%(9/11)\\
+            1. Knew about JSON schema already\\
+            2. Added new property quickly
+            \end{tabular}} &
+
+        \begin{tabular}[c]{@{}l@{}}1. Task 3.3: Validation Errors\\
+        - Tried to find validation errors in schema editor\\
+        - Thought red underline was spell checking
+        \end{tabular} &
+
+        \multicolumn{2}{l|}{
+            \begin{tabular}[c]{@{}l@{}}1. Task 2.4: Valid value of humidity\\
+            - Not found that value was invalid\\
+            - Not found that he could use tooltip\\
+            2. Task 3.2: Setting Vehicle Type to highest level \\
+            - Not scrolling down in enum property
+            \end{tabular}} \\ \hline
+
+        User Study 5 &
+        \multicolumn{1}{l|}{
+            \begin{tabular}[c]{@{}l@{}}Accuracy: 100\%(11/11)\\
+            1. Understood the tool very well\\
+            2. Quickly found all errors\\
+            and solved them\\
+            3. Knew to use both sides of tool
+            \end{tabular}} &
+
+        \begin{tabular}[c]{@{}l@{}}1. Task 3.2: \\
+        - Took some time to find the vehicle type\\
+        2. Task 4.2: Adding new property\\
+        - Did not set the property type at the beginning
+        \end{tabular} &
+        \multicolumn{2}{c|}{none} \\ \hline
+    \end{tabular}
+\end{table*}
 
 \subsection{Evaluation}
 % todo: show correctness of the tasks.
