@@ -18,7 +18,7 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
     \end{tabular}
 \end{table}
 
-\subsection{Code Editor}\label{subsec:code-editor}
+\subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
 For this project, we use the popular \textbf{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface. 
@@ -55,7 +55,7 @@ There are many other useful functionalities we have implemented in the code edit
     \item Setting themes
 \end{itemize}
 
-\subsection{GUI Editor}\label{subsec:gui-editor}
+\subsection{GUI Panel}\label{subsec:gui-editor}
 
 The GUI editor is a component that allows the user to edit the configuration data in a GUI, which is generated based on the schema of the configuration data.
 It is structured in a table-like way, where each row represents a key-value pair of the configuration data.
@@ -287,6 +287,38 @@ We similarly handle the \texttt{dependentRequired} and the \texttt{dependentSche
 For schemas without any of those keywords, this step is trivial as the schema is not modified in any way.
 
 %todo examples
+
+\subsection{Schema editor}
+
+The schema editor page has the same structure as the File editor page, as discussed in previous sections.
+The only difference is that the schema used for generating the GUI panel is not the schema file provided by the user but the Json schema meta schema,
+i.e., the schema that defines the structure of valid JSON schema files.
+However, applying our generic approach on the offical Json schema meta schema (TODO citation) does not result in a user-friendly editor for
+creating and modifying schema files.
+In this section we discuss the reasons for that and how we developed a new meta schema that circumvents the problems of the official meta schema.
+
+\subsubsection{Missing descriptions}
+With the \tt{description} keyword, schema authors can give descriptions to any elements of their schema.
+This can help the user of a schema in many ways, for example, the author can specify the unit of a numeric field or give other additional information.
+The JSON schema meta schema does not provide any descriptions.
+Users, especially those without prior knowledge in JSON schema, might not understand the meaning of the fields of JSON schema.
+Thus, we insert descriptions from the JSON schema specification (TODO citation) into our modified meta-schema.
+
+\subsubsection{External references}
+\toolname does not support references to external schemas yet, i.e., references inside the schema to a schema at a specific URL.
+Also, \toolname does not support the \tt{\$vocabulary} keyword yet.
+Both features are used in the JSON schema meta schema, as it is distributed over multiple schema files.
+To circumvent that problem, we put all schemas in one schema file into the \tt{\$defs} object and replace the external references with local references.
+
+\subsubsection{Use of dynamic anchors and references}
+The JSON schema meta schema uses dynamic references and dynamic anchors.
+The difference of those keywords in comparison to the \tt{\$ref} keyword is that they provide a way to dynamically extent the JSON meta schema
+at runtime.
+For example, one could combine the JSON schema meta schema with an extension that defines how fields should be serialized in XML.
+We do not support dynamic references and anchors yet.
+We replaced all of them by "non-dynamic" references using the \tt{\$ref} keyword.
+
+\subsubsection{Allowing each field in each context}
 
 \subsubsection*{\bf A plain unnumbered list}
 \begin{list}{}{}
