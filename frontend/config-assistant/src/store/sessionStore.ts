@@ -1,5 +1,5 @@
 import type {ComputedRef, Ref, WritableComputedRef} from 'vue';
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
 import {useDataStore} from '@/store/dataStore';
@@ -11,7 +11,7 @@ import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
 import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {ValidationResults, ValidationService} from '@/helpers/validationService';
-import {useDebounceFn, watchDebounced} from '@vueuse/core';
+import {useDebounceFn} from '@vueuse/core';
 import {errorService} from '@/main';
 import {GuiConstants} from '@/constants';
 import type {SearchResult} from '@/helpers/search';
@@ -71,15 +71,18 @@ export const useSessionStore = defineStore('commonStore', () => {
   const fileData: WritableComputedRef<any> = computed({
     // getter
     get() {
+      const settingsData = useSettingsStore().settingsData;
+      const schemaData = useDataStore().schemaData;
+      const fileData = useDataStore().fileData;
       switch (currentMode.value) {
         case SessionMode.FileEditor:
-          return useDataStore().fileData;
+          return fileData;
 
         case SessionMode.SchemaEditor:
-          return useDataStore().schemaData;
+          return schemaData;
 
         case SessionMode.Settings:
-          return useSettingsStore().settingsData;
+          return settingsData;
 
         default:
           throw new Error('Invalid mode');
@@ -167,7 +170,7 @@ export const useSessionStore = defineStore('commonStore', () => {
   /**
    * Update the validation service when the schema changes.
    */
-  watchDebounced(
+  watch(
     fileSchemaData,
     () => {
       currentExpandedElements.value = {};
@@ -180,7 +183,7 @@ export const useSessionStore = defineStore('commonStore', () => {
         schemaErrorMessage.value = e.message;
       }
     },
-    {immediate: true, debounce: GuiConstants.SCHEMA_VALIDATION_DEBOUNCE_TIME}
+    {immediate: true}
   );
 
   function schemaAtPath(path: Path): JsonSchema {
