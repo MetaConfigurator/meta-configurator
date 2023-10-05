@@ -147,8 +147,9 @@ function isInvalid(): boolean {
   return !props.validationResults.valid;
 }
 
-function focusOnPropertyLabel() {
-  const element = document.getElementById(getId());
+function focusOnPropertyLabel(): void {
+  const id: string = getId();
+  const element: HTMLElement | null = document.getElementById(id);
   if (element) {
     element.contentEditable = 'true';
     element.focus();
@@ -191,7 +192,7 @@ function focusOnPropertyLabel() {
 
     <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription() }}</span>
     <span
-      class="pi pi-pencil ml-3"
+      class="pi pi-pencil ml-3 text-indigo-700"
       v-if="isPropertyNameEditable()"
       @click="focusOnPropertyLabel()"></span>
     <span class="text-red-600 ml-3" v-if="isInvalid()">
