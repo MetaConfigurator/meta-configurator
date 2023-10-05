@@ -50,11 +50,12 @@ watch(
 
 const sessionStore = storeToRefs(useSessionStore());
 
-// recalculate the tree when the data structure changes, but not
-// single values (e.g. when a property is changed)
-watch(sessionStore.fileData, () => {
-  updateTree();
-});
+watch(
+  () => useSessionStore().fileData,
+  () => {
+    updateTree();
+  }
+);
 
 watch(
   sessionStore.currentSelectedElement,
@@ -74,6 +75,10 @@ watch(
   {deep: true}
 );
 
+watch(storeToRefs(useSessionStore()).fileSchema, () => {
+  updateTree();
+});
+
 watch(sessionStore.currentPath, () => {
   updateTree();
   focusOnFirstProperty();
@@ -90,21 +95,15 @@ const treeTableFilters = ref<Record<string, string>>({});
 const currentTree = ref({});
 
 function computeTree() {
-  // console.groupCollapsed('computeTree');
-  /* console.log('currentPath', props.currentPath);
-  console.log('currentSchema', props.currentSchema); */
   currentTree.value = treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema,
     undefined,
     props.currentPath
   );
-  /* console.log('currentTree', currentTree.value); */
   currentTree.value.children = treeNodeResolver.createChildNodesOfNode(currentTree.value);
-  /*  console.log('currentTree', currentTree.value); */
 
   expandPreviouslyExpandedElements(currentTree.value.children as Array<GuiEditorTreeNode>);
 
-  // console.groupEnd();
   return currentTree.value;
 }
 
@@ -133,15 +132,6 @@ function updateTree() {
 }
 
 const nodesToDisplay: Ref<TreeNode[]> = ref(determineNodesToDisplay(computeTree()));
-
-watch(storeToRefs(useSessionStore()).fileSchema, () => {
-  updateTree();
-});
-
-// recalculate the tree when the data structure changes
-watch(storeToRefs(useSessionStore()).fileData, () => {
-  updateTree();
-});
 
 function determineNodesToDisplay(root: TreeNode): TreeNode[] {
   const rootSchema = root?.data?.schema;
@@ -178,6 +168,7 @@ watch(
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
+  updateTree();
 }
 function clickedPropertyData(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
