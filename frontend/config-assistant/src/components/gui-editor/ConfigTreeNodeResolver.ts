@@ -77,6 +77,9 @@ export class ConfigTreeNodeResolver {
   }
 
   public createChildNodesOfNode(guiEditorTreeNode: GuiEditorTreeNode): GuiEditorTreeNode[] {
+    if (guiEditorTreeNode.type === TreeNodeType.ADVANCED_PROPERTY) {
+      return guiEditorTreeNode.children as GuiEditorTreeNode[]; // children were already created
+    }
     if (
       guiEditorTreeNode.type === TreeNodeType.ADD_ITEM ||
       guiEditorTreeNode.type === TreeNodeType.ADD_PROPERTY
@@ -174,6 +177,17 @@ export class ConfigTreeNodeResolver {
       );
     }
 
+    const advanced = this.createTreeNodeOfAdvancedProperty(
+      absolutePath,
+      relativePath,
+      schema,
+      depth
+    );
+
+    if (advanced) {
+      result.push(advanced);
+    }
+
     const data = useSessionStore().dataAtPath(absolutePath);
     if (this.shouldAddAddPropertyNode(schema, data)) {
       return result.concat(
@@ -182,6 +196,41 @@ export class ConfigTreeNodeResolver {
     }
 
     return result;
+  }
+
+  private createTreeNodeOfAdvancedProperty(
+    absolutePath: Path,
+    relativePath: Path,
+    schema: JsonSchema,
+    depth: number
+  ): GuiEditorTreeNode | undefined {
+    const advanced = {
+      data: {
+        name: schema.title ?? '',
+        schema: schema,
+        parentSchema: schema,
+        parentName: '',
+        depth: 0,
+        relativePath: relativePath,
+        absolutePath: absolutePath,
+      },
+      type: TreeNodeType.ADVANCED_PROPERTY,
+      key: pathToString(absolutePath) + '$advanced',
+      children: this.createPropertiesChildNodes(
+        absolutePath,
+        relativePath,
+        schema,
+        depth + 1,
+        () => true,
+        true
+      ),
+    };
+
+    if (advanced.children.length > 0) {
+      return advanced;
+    }
+
+    return undefined;
   }
 
   private createObjectChildrenNodesPriorityOrder(
@@ -275,10 +324,12 @@ export class ConfigTreeNodeResolver {
     relativePath: Path,
     schema: JsonSchema,
     depth: number,
-    filter: (key: string) => boolean = () => true
+    filter: (key: string) => boolean = () => true,
+    advanced = false
   ) {
     return Object.entries(schema.properties)
       .filter(([key]) => filter(key))
+      .filter(([, value]) => (value?.metaConfigurator?.advanced ?? false) === advanced)
       .map(([key, value]) => {
         const childPath = absolutePath.concat(key);
         return this.createTreeNodeOfProperty(
@@ -454,17 +505,16 @@ export class ConfigTreeNodeResolver {
       if (!mergedSchema) {
         // user selected schemas that are not compatible -> can never be fulfilled
         return [];
-      } else {
-        return [
-          this.createTreeNodeOfProperty(
-            new JsonSchema(mergedSchema),
-            schema,
-            absolutePath,
-            relativePath,
-            depth + 1
-          ),
-        ];
       }
+      return [
+        this.createTreeNodeOfProperty(
+          new JsonSchema(mergedSchema),
+          schema,
+          absolutePath,
+          relativePath,
+          depth + 1
+        ),
+      ];
     }
     return [];
   }

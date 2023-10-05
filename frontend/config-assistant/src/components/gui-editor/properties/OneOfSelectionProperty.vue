@@ -27,6 +27,7 @@ const emit = defineEmits<{
 onMounted(() => {
   if (valueProperty.value === undefined && props.propertyData !== undefined) {
     inferOneOfUserSelection();
+    emit('update:tree');
   }
 });
 
@@ -126,6 +127,9 @@ function applySchemaConstantsOnDataBasedOnSelection(
 }
 function applySchemaConstantsOnData(schema: JsonSchemaType, data: any): any {
   if (typeof schema !== 'object') {
+    return data;
+  }
+  if (typeof data !== 'object') {
     return data;
   }
 

@@ -1,5 +1,5 @@
 import type {ComputedRef, Ref, WritableComputedRef} from 'vue';
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
 import {useDataStore} from '@/store/dataStore';
@@ -11,7 +11,7 @@ import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
 import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {ValidationResults, ValidationService} from '@/helpers/validationService';
-import {useDebounceFn, watchDebounced} from '@vueuse/core';
+import {useDebounceFn} from '@vueuse/core';
 import {errorService} from '@/main';
 import {GuiConstants} from '@/constants';
 import type {SearchResult} from '@/helpers/search';
@@ -20,6 +20,7 @@ import {
   EffectiveSchema,
 } from '@/helpers/schema/effectiveSchemaCalculator';
 import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
+import type {JsonSchemaType} from '@/model/JsonSchemaType';
 
 export enum SessionMode {
   FileEditor = 'file_editor',
@@ -70,15 +71,18 @@ export const useSessionStore = defineStore('commonStore', () => {
   const fileData: WritableComputedRef<any> = computed({
     // getter
     get() {
+      const settingsData = useSettingsStore().settingsData;
+      const schemaData = useDataStore().schemaData;
+      const fileData = useDataStore().fileData;
       switch (currentMode.value) {
         case SessionMode.FileEditor:
-          return useDataStore().fileData;
+          return fileData;
 
         case SessionMode.SchemaEditor:
-          return useDataStore().schemaData;
+          return schemaData;
 
         case SessionMode.Settings:
-          return useSettingsStore().settingsData;
+          return settingsData;
 
         default:
           throw new Error('Invalid mode');
@@ -126,6 +130,22 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
+  const fileSchemaDataPreprocessed: ComputedRef<JsonSchemaType> = computed(() => {
+    switch (currentMode.value) {
+      case SessionMode.FileEditor:
+        return useDataStore().schemaDataPreprocessed;
+
+      case SessionMode.SchemaEditor:
+        return useDataStore().metaSchemaData; // no difference between preprocessed and unprocessed meta schema
+
+      case SessionMode.Settings:
+        return useSettingsStore().settingsSchemaData; // no difference between preprocessed and unprocessed settings schema
+
+      default:
+        throw new Error('Invalid mode');
+    }
+  });
+
   const fileSchemaData = computed(() => {
     switch (currentMode.value) {
       case SessionMode.FileEditor:
@@ -142,26 +162,28 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
-  const validationService = ref(new ValidationService({}));
+  const validationService = ref(new ValidationService(fileSchemaDataPreprocessed.value));
   const validateDebounced = useDebounceFn(
     data => validationService.value.validate(data),
     GuiConstants.SCHEMA_VALIDATION_DEBOUNCE_TIME
   );
-
   /**
    * Update the validation service when the schema changes.
    */
-  watchDebounced(
+  watch(
     fileSchemaData,
     () => {
+      currentExpandedElements.value = {};
+      currentSelectedElement.value = [];
       try {
-        validationService.value = new ValidationService(fileSchemaData.value);
+        validationService.value = new ValidationService(fileSchemaDataPreprocessed.value);
         schemaErrorMessage.value = null;
       } catch (e: any) {
+        errorService.onError(e);
         schemaErrorMessage.value = e.message;
       }
     },
-    {immediate: true, debounce: GuiConstants.SCHEMA_VALIDATION_DEBOUNCE_TIME}
+    {immediate: true}
   );
 
   function schemaAtPath(path: Path): JsonSchema {
@@ -180,8 +202,22 @@ export const useSessionStore = defineStore('commonStore', () => {
     const currentPath = [];
     for (const key of path) {
       currentPath.push(key);
+      const schema = currentEffectiveSchema.schema.subSchema(key);
+
+      if (schema?.oneOf) {
+        // TODO not working yet
+        const oneOfSelection = currentSelectedOneOfOptions.value.get(pathToString(currentPath));
+        if (oneOfSelection !== undefined) {
+          currentEffectiveSchema = calculateEffectiveSchema(
+            schema.oneOf[oneOfSelection.index],
+            dataAtPath(currentPath),
+            currentPath
+          );
+        }
+      }
+
       currentEffectiveSchema = calculateEffectiveSchema(
-        currentEffectiveSchema.schema.subSchema(key),
+        schema,
         dataAtPath(currentPath),
         currentPath
       );
@@ -269,6 +305,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     fileData,
     fileSchema,
     fileSchemaData,
+    fileSchemaDataPreprocessed,
     schemaAtPath,
     schemaAtCurrentPath,
     effectiveSchemaAtPath,

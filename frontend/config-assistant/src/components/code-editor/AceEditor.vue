@@ -39,7 +39,7 @@ let editorWrapper: CodeEditorWrapper;
 /**
  * Debounce time for writing changes to store in ms
  */
-const WRITE_DEBOUNCE_TIME = 50;
+const WRITE_DEBOUNCE_TIME = 100;
 
 function createConfigManipulator(dataFormat: string): ConfigManipulator {
   if (dataFormat == 'json') {

@@ -11,7 +11,6 @@ import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useToast} from 'primevue/usetoast';
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
@@ -29,9 +28,9 @@ import {searchInDataAndSchema, searchResultToMenuItem} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
 
 import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
-import {useDataStore} from '@/store/dataStore';
 
 import {GuiConstants} from '@/constants';
+import type {SchemaOption} from '@/model/SchemaOption';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -40,14 +39,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
-const selectedSchema = ref<{
-  label: string;
-  icon: string;
-  command: () => void;
-  schema: JsonSchema;
-  url: string | undefined;
-  key: string | undefined;
-}>(null);
+const selectedSchema = ref<SchemaOption | null>(null);
 
 const showFetchedSchemas = ref(false);
 const showAboutDialog = ref(false);

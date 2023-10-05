@@ -5,131 +5,156 @@ export const simplifiedMetaSchema = {
   $ref: '#/$defs/jsonMetaSchema',
   $defs: {
     jsonMetaSchema: {
+      title: 'Json meta-schema',
       allOf: [
         {
           $ref: '#/$defs/core',
         },
         {
-          $ref: '#/$defs/objectProperty',
+          $ref: '#/$defs/objectSubSchema',
         },
       ],
     },
     jsonSchema: {
-      anyOf: [
+      title: 'Json schema',
+      oneOf: [
         {
-          title: 'True or false',
+          title: 'Always valid',
           type: 'boolean',
+          const: true,
         },
         {
-          $ref: '#/$defs/booleanProperty',
+          title: 'Always invalid',
+          type: 'boolean',
+          const: false,
         },
         {
-          $ref: '#/$defs/stringProperty',
+          $ref: '#/$defs/objectSubSchema',
+        },
+      ],
+      $comment:
+        'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
+    },
+    objectSubSchema: {
+      title: 'Subschema',
+      type: 'object',
+      allOf: [
+        {
+          $ref: '#/$defs/typeDefinition',
         },
         {
-          $ref: '#/$defs/numberProperty',
+          $ref: '#/$defs/meta-data',
         },
         {
-          $ref: '#/$defs/objectProperty',
+          $ref: '#/$defs/enumProperty',
         },
         {
-          $ref: '#/$defs/arrayProperty',
+          $ref: '#/$defs/constProperty',
         },
         {
-          $ref: '#/$defs/nullProperty',
-        },
-        {
-          $ref: '#/$defs/enumOrConstProperty',
+          $ref: '#/$defs/typeSpecificFields',
         },
         {
           $ref: '#/$defs/schemaComposition',
         },
         {
+          $ref: '#/$defs/refProperty',
+        },
+        {
           $ref: '#/$defs/conditionalSchema',
         },
         {
-          $ref: '#/$defs/refProperty',
+          $ref: '#/$defs/anchor',
         },
       ],
-      type: ['object', 'boolean'],
-      $comment:
-        'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
     },
-    nullProperty: {
-      title: 'Null property',
+    constProperty: {
+      title: 'Constant',
       type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
-        type: {
-          const: 'null',
+        const: {
+          description:
+            'The value of this keyword MAY be of any type, including null.\n' +
+            '\n' +
+            'Use of this keyword is functionally equivalent to an "enum" with a single value.\n' +
+            '\n' +
+            'An instance validates successfully against this keyword if its value is equal to the value of the keyword.',
+          $comment: 'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-const',
         },
       },
     },
-    enumOrConstProperty: {
-      title: 'Enumeration or Constant',
+    enumProperty: {
+      title: 'Enumeration',
       type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
-        type: {
-          anyOf: [
-            {
-              $ref: '#/$defs/simpleTypes',
-            },
-            {
-              type: 'array',
-              items: {
-                $ref: '#/$defs/simpleTypes',
-              },
-              minItems: 1,
-              uniqueItems: true,
-            },
-          ],
-        },
-        const: true,
         enum: {
           type: 'array',
           items: true,
+          description:
+            'The value of this keyword MUST be an array. This array SHOULD have at least one element. Elements in the array SHOULD be unique.\n' +
+            '\n' +
+            "An instance validates successfully against this keyword if its value is equal to one of the elements in this keyword's array value.\n" +
+            '\n' +
+            'Elements in the array might be of any type, including null.',
+          $comment: 'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-enum',
         },
       },
     },
     schemaComposition: {
       title: 'Schema composition with "allOf", "anyOf", "oneOf", "not"',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
         allOf: {
           $ref: '#/$defs/schemaArray',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         anyOf: {
           $ref: '#/$defs/schemaArray',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         oneOf: {
           $ref: '#/$defs/schemaArray',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         not: {
           $ref: '#/$defs/jsonSchema',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
     conditionalSchema: {
       title: 'Conditional schema with "if", "then", "else"',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
         if: {
           $ref: '#/$defs/jsonSchema',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
-        then: {
-          $ref: '#/$defs/jsonSchema',
-        },
-        else: {
-          $ref: '#/$defs/jsonSchema',
+      },
+      if: {
+        required: ['if'],
+      },
+      then: {
+        properties: {
+          then: {
+            $ref: '#/$defs/jsonSchema',
+          },
+          else: {
+            $ref: '#/$defs/jsonSchema',
+          },
         },
       },
     },
     core: {
       title: 'Core vocabulary meta-schema',
-      type: ['object', 'boolean'],
       properties: {
         $id: {
           $ref: '#/$defs/uriReferenceString',
@@ -147,9 +172,15 @@ export const simplifiedMetaSchema = {
           additionalProperties: {
             type: 'boolean',
           },
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         $comment: {
           type: 'string',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         $defs: {
           type: 'object',
@@ -165,27 +196,51 @@ export const simplifiedMetaSchema = {
           },
           deprecated: true,
           default: {},
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
-    booleanProperty: {
-      title: 'Boolean property',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
-      properties: {
-        type: {
-          const: 'boolean',
+    typeSpecificFields: {
+      allOf: [
+        {
+          if: {
+            $ref: '#/$defs/hasTypeArray',
+          },
+          then: {
+            $ref: '#/$defs/arrayProperty',
+          },
         },
-      },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeObject',
+          },
+          then: {
+            $ref: '#/$defs/objectProperty',
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeString',
+          },
+          then: {
+            $ref: '#/$defs/stringProperty',
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeNumberOrInteger',
+          },
+          then: {
+            $ref: '#/$defs/numberProperty',
+          },
+        },
+      ],
     },
     numberProperty: {
       title: 'Number property',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
-        type: {
-          enum: ['number', 'integer'],
-        },
         maximum: {
           type: 'number',
         },
@@ -197,21 +252,31 @@ export const simplifiedMetaSchema = {
         },
         exclusiveMinimum: {
           type: 'number',
+          description:
+            'The value of "exclusiveMinimum" MUST be a number, representing an exclusive lower limit for a numeric instance.\n' +
+            '\n' +
+            'If the instance is a number, then the instance is valid only if it has a value strictly greater than (not equal to) "exclusiveMinimum".',
+          $comment:
+            'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-exclusiveminimum',
         },
         multipleOf: {
           type: 'number',
           exclusiveMinimum: 0,
+          description:
+            'The value of "multipleOf" MUST be a number, strictly greater than 0.\n' +
+            '\n' +
+            "A numeric instance is valid only if division by this keyword's value results in an integer.",
+          $comment:
+            'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-multipleof',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
     objectProperty: {
       title: 'Object property',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
-        type: {
-          const: 'object',
-        },
         properties: {
           type: 'object',
           additionalProperties: {
@@ -231,23 +296,38 @@ export const simplifiedMetaSchema = {
             format: 'regex',
           },
           default: {},
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         additionalProperties: {
           $ref: '#/$defs/jsonSchema',
         },
         maxProperties: {
           $ref: '#/$defs/nonNegativeInteger',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         minProperties: {
           $ref: '#/$defs/nonNegativeIntegerDefault0',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         propertyNames: {
           $ref: '#/$defs/jsonSchema',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         dependentRequired: {
           type: 'object',
           additionalProperties: {
             $ref: '#/$defs/stringArray',
+          },
+          metaConfigurator: {
+            advanced: true,
           },
         },
         dependentSchemas: {
@@ -256,20 +336,21 @@ export const simplifiedMetaSchema = {
             $ref: '#/$defs/jsonSchema',
           },
           default: {},
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         unevaluatedProperties: {
           $ref: '#/$defs/jsonSchema',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
     stringProperty: {
       title: 'String property',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
-        type: {
-          enum: ['string'],
-        },
         maxLength: {
           $ref: '#/$defs/nonNegativeInteger',
         },
@@ -305,23 +386,27 @@ export const simplifiedMetaSchema = {
         },
         contentEncoding: {
           type: 'string',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         contentMediaType: {
           type: 'string',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         contentSchema: {
           $ref: '#/$defs/jsonSchema',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
     arrayProperty: {
       title: 'Array property',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
-        type: {
-          const: 'array',
-        },
         items: {
           $ref: '#/$defs/jsonSchema',
         },
@@ -333,16 +418,28 @@ export const simplifiedMetaSchema = {
         },
         contains: {
           $ref: '#/$defs/jsonSchema',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         minContains: {
           $ref: '#/$defs/nonNegativeInteger',
+          metaConfigurator: {
+            advanced: true,
+          },
           default: 1,
         },
         maxContains: {
           $ref: '#/$defs/nonNegativeInteger',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         prefixItems: {
           $ref: '#/$defs/schemaArray',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         uniqueItems: {
           type: 'boolean',
@@ -350,30 +447,36 @@ export const simplifiedMetaSchema = {
         },
         unevaluatedItems: {
           $ref: '#/$defs/jsonSchema',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
     refProperty: {
       title: 'Reference',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
         $ref: {
           $ref: '#/$defs/uriReferenceString',
         },
         $dynamicRef: {
           $ref: '#/$defs/uriReferenceString',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         $recursiveRef: {
           $comment: '"$recursiveRef" has been replaced by "$dynamicRef".',
           type: 'string',
           format: 'uri-reference',
           deprecated: true,
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
     'meta-data': {
-      type: ['object', 'boolean'],
       properties: {
         title: {
           type: 'string',
@@ -389,33 +492,137 @@ export const simplifiedMetaSchema = {
         deprecated: {
           type: 'boolean',
           default: false,
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         readOnly: {
           type: 'boolean',
           default: false,
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         writeOnly: {
           type: 'boolean',
           default: false,
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
+    hasTypeArray: {
+      anyOf: [
+        {
+          properties: {
+            type: {
+              const: 'array',
+            },
+          },
+        },
+        {
+          properties: {
+            type: {
+              type: 'array',
+              contains: {
+                const: 'array',
+              },
+            },
+          },
+        },
+      ],
+      required: ['type'],
+    },
+    hasTypeObject: {
+      anyOf: [
+        {
+          properties: {
+            type: {
+              const: 'object',
+            },
+          },
+        },
+        {
+          properties: {
+            type: {
+              type: 'array',
+              contains: {
+                const: 'object',
+              },
+            },
+          },
+        },
+      ],
+      required: ['type'],
+    },
+    hasTypeString: {
+      anyOf: [
+        {
+          properties: {
+            type: {
+              const: 'string',
+            },
+          },
+        },
+        {
+          properties: {
+            type: {
+              type: 'array',
+              contains: {
+                const: 'string',
+              },
+            },
+          },
+        },
+      ],
+      required: ['type'],
+    },
+    hasTypeNumberOrInteger: {
+      oneOf: [
+        {
+          properties: {
+            type: {
+              enum: ['number', 'integer'],
+            },
+          },
+        },
+        {
+          properties: {
+            type: {
+              type: 'array',
+              contains: {
+                enum: ['number', 'integer'],
+              },
+            },
+          },
+        },
+      ],
+      required: ['type'],
+    },
     anchor: {
       title: 'Anchor definition',
-      type: ['object'],
-      $ref: '#/$defs/meta-data',
       properties: {
         $anchor: {
           $ref: '#/$defs/anchorString',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         $dynamicAnchor: {
           $ref: '#/$defs/anchorString',
+          metaConfigurator: {
+            advanced: true,
+          },
         },
         $recursiveAnchor: {
           $comment: '"$recursiveAnchor" has been replaced by "$dynamicAnchor".',
           type: 'string',
           pattern: '^[A-Za-z_][-A-Za-z0-9._]*$',
           deprecated: true,
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
@@ -445,6 +652,27 @@ export const simplifiedMetaSchema = {
     nonNegativeIntegerDefault0: {
       $ref: '#/$defs/nonNegativeInteger',
       default: 0,
+    },
+    typeDefinition: {
+      properties: {
+        type: {
+          oneOf: [
+            {
+              $ref: '#/$defs/simpleTypes',
+              title: 'Simple type',
+            },
+            {
+              title: 'Type union',
+              type: 'array',
+              items: {
+                $ref: '#/$defs/simpleTypes',
+              },
+              minItems: 1,
+              uniqueItems: true,
+            },
+          ],
+        },
+      },
     },
     simpleTypes: {
       enum: ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string'],

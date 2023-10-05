@@ -78,7 +78,10 @@ defineEmits<{hide: void}>();
       keepOpen = false;
       closePanel();
     ">
-    <div v-html="schemaDescription" class="overflow-y-auto" style="max-height: 28vmax"></div>
+    <div
+      v-html="schemaDescription"
+      class="overflow-y-auto whitespace-pre-line"
+      style="max-height: 28vmax"></div>
   </OverlayPanel>
 </template>
 

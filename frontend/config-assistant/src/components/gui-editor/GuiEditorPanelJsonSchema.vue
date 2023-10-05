@@ -4,6 +4,8 @@ import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/model/path';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {computed} from 'vue';
+import {JsonSchema} from '@/helpers/schema/JsonSchema';
 
 const sessionStore = useSessionStore();
 
@@ -34,6 +36,14 @@ function selectPath(path: Path) {
   sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
   sessionStore.currentSelectedElement = path;
 }
+
+const currentSchema = computed(() => {
+  const schema = sessionStore.effectiveSchemaAtCurrentPath?.schema;
+  if (!schema) {
+    return new JsonSchema({});
+  }
+  return schema;
+});
 </script>
 
 <template>
@@ -45,9 +55,9 @@ function selectPath(path: Path) {
       @update:path="newPath => updatePath(newPath)" />
     <div class="flex-grow overflow-y-auto">
       <PropertiesPanel
-        :current-schema="sessionStore.effectiveSchemaAtCurrentPath.schema"
-        :current-path="sessionStore.currentPath"
-        :current-data="sessionStore.dataAtCurrentPath"
+        :currentSchema="currentSchema"
+        :currentPath="sessionStore.currentPath"
+        :currentData="sessionStore.dataAtCurrentPath"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
         @remove_property="removeProperty"
         @select_path="selectedPath => selectPath(selectedPath)"

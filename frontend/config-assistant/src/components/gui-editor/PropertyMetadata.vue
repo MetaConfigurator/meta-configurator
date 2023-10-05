@@ -83,23 +83,7 @@ function zoomIntoPath() {
 }
 
 function isPropertyNameEditable(): boolean {
-  return isAdditionalOrPatternProperty();
-}
-
-function isAdditionalOrPatternProperty(): boolean {
-  const nodeData = props.node.data;
-  if (!nodeData.parentSchema?.hasType('object')) {
-    return false;
-  }
-
-  const propertyData = useSessionStore().dataAtPath(nodeData.absolutePath);
-  if (Array.isArray(propertyData)) {
-    return false;
-  }
-
-  return !Object.keys(props.node.data.parentSchema?.properties ?? {}).includes(
-    props.node.data.name as string
-  );
+  return isAdditionalProperty() || isPatternProperty();
 }
 
 function updatePropertyName(event) {
@@ -148,7 +132,7 @@ function focusEditingLabel() {
 
 function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
   const name: PathElement = node.data.name;
-  if (!name) {
+  if (name === undefined) {
     return node.data.parentSchema?.title || 'root'; // no name should only happen for the root node
   }
   if (typeof name === 'string') {

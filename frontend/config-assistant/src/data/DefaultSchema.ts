@@ -13,6 +13,23 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
       description: 'Last name',
       examples: ['Doe'],
     },
+    circular: {
+      title: 'Circular',
+      type: 'object',
+      properties: {
+        name: {
+          $ref: '#/$defs/name',
+          minLength: 23,
+        },
+        circular: {
+          $ref: '#/$defs/circular',
+        },
+      },
+    },
+    isMarried: {
+      type: 'boolean',
+      const: true,
+    },
   },
   patternProperties: {
     '^Number.*': {
@@ -23,7 +40,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
   if: {
     properties: {
       isMarried: {
-        const: true,
+        $ref: '#/$defs/isMarried',
       },
     },
     required: ['isMarried'],
@@ -56,6 +73,9 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
     },
   },
   properties: {
+    circular: {
+      $ref: '#/$defs/circular',
+    },
     name: {
       $ref: '#/$defs/name',
     },
@@ -107,8 +127,50 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
           properties: {
             number: {
               type: 'number',
-              description: 'Street number',
             },
+          },
+        },
+        {
+          if: {
+            properties: {
+              number: {
+                multipleOf: 2,
+              },
+            },
+            required: ['number'],
+          },
+          then: {
+            properties: {
+              number: {
+                description: 'Even street number',
+              },
+            },
+          },
+          else: {
+            properties: {
+              number: {
+                description: 'Odd street number',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            properties: {
+              street: {
+                const: 'Main Street',
+              },
+            },
+            required: ['street'],
+          },
+          then: {
+            properties: {
+              extraInfo: {
+                type: 'string',
+                description: 'Main street extra info',
+              },
+            },
+            required: ['extraInfo'],
           },
         },
       ],

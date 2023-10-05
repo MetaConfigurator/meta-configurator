@@ -3,7 +3,7 @@ import {computed, ref} from 'vue';
 import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
-import {useSessionStore} from '../../store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 
 const props = defineProps<{
   schema: ref<TopLevelJsonSchema>;

@@ -1,10 +1,11 @@
-import type {JsonSchemaObjectType, TopLevelSchema} from '@/model/JsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/model/JsonSchemaType';
 import type {ErrorObject} from 'ajv';
 import type {ValidateFunction} from 'ajv/dist/2020';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import type {Path} from '@/model/path';
 import {pathToJsonPointer} from '@/helpers/pathHelper';
+import _ from 'lodash';
 
 export class ValidationService {
   static readonly TOP_LEVEL_SCHEMA_KEY = '$topLevelSchema';
@@ -29,8 +30,8 @@ export class ValidationService {
       allErrors: true,
     });
     addFormats(this._ajv);
-    this._ajv.addSchema(this.topLevelSchema, ValidationService.TOP_LEVEL_SCHEMA_KEY);
-    this._validationFunction = this._ajv.getSchema(ValidationService.TOP_LEVEL_SCHEMA_KEY);
+    this._ajv.addSchema(this.topLevelSchema, this.topLevelSchemaId);
+    this._validationFunction = this._ajv.getSchema(this.topLevelSchemaId);
   }
 
   public validate(data: any): ValidationResults {
@@ -52,28 +53,149 @@ export class ValidationService {
    * @param data the data to validate
    */
   public validateSubSchema(schema: JsonSchemaObjectType, data: any): ValidationResults {
-    const key = schema.$id || schema.id || JSON.stringify(schema);
+    const key = schema.$id || schema.id || undefined;
 
-    // inject definitions
-    if (this._ajv?.getSchema(key) === undefined) {
-      const schemaWithDefinitions = this.injectDefinitions(schema);
-      this._ajv?.addSchema(schemaWithDefinitions, key);
+    if (key && this._ajv?.getSchema(key) === undefined) {
+      const schemaWithUpdatedRefs = this.updateReferencesAndReplaceCustomKeywords(schema);
+      this._ajv?.addSchema(schemaWithUpdatedRefs, key);
     }
-    const validationFunction: ValidateFunction | undefined = this._ajv?.getSchema(key);
+
+    let validationFunction: ValidateFunction | undefined;
+    if (key) {
+      validationFunction = this._ajv?.getSchema(key);
+    } else {
+      const schemaWithUpdatedRefs = this.updateReferencesAndReplaceCustomKeywords(schema);
+      validationFunction = this._ajv?.compile(schemaWithUpdatedRefs);
+    }
+
     if (!validationFunction) {
       return new ValidationResults([]); // optimistic approach
     }
+
     validationFunction(data);
     const errors = validationFunction.errors || [];
     return new ValidationResults(errors);
   }
 
-  private injectDefinitions(schema: JsonSchemaObjectType) {
-    const result = {...schema};
-    if (result.$defs === undefined) {
-      result.$defs = this.topLevelSchema.definitions || this.topLevelSchema.$defs || {};
+  get topLevelSchemaId(): string {
+    return this.topLevelSchema.$id ?? ValidationService.TOP_LEVEL_SCHEMA_KEY;
+  }
+
+  /**
+   * Updates all references in the given schema to point to the top level schema.
+   * This allows the schema to reference definitions from the top level schema
+   * and ajv to validate the schema.
+   * Also replaces custom keywords with the corresponding JSON schema keywords.
+   * Currently, this only replaces the `conditions` keyword by `allOf`.
+   *
+   * @param schema the sub-schema
+   * @private
+   */
+  private updateReferencesAndReplaceCustomKeywords(schema: JsonSchemaType) {
+    let result = _.cloneDeep(schema);
+    result = this.replaceConditionsWithAllOfs(result);
+
+    if (typeof result !== 'object' || result.$defs !== undefined) {
+      return result;
     }
+
+    if (result.$ref !== undefined) {
+      result.$ref = this.topLevelSchema.$id + result.$ref;
+    }
+
+    if (result.if) {
+      result.if = this.updateReferencesAndReplaceCustomKeywords(result.if);
+    }
+    if (result.then) {
+      result.then = this.updateReferencesAndReplaceCustomKeywords(result.then);
+    }
+    if (result.else) {
+      result.else = this.updateReferencesAndReplaceCustomKeywords(result.else);
+    }
+    if (result.allOf) {
+      result.allOf = result.allOf.map(subSchema =>
+        this.updateReferencesAndReplaceCustomKeywords(subSchema)
+      );
+    }
+    if (result.anyOf) {
+      result.anyOf = result.anyOf.map(subSchema =>
+        this.updateReferencesAndReplaceCustomKeywords(subSchema)
+      );
+    }
+    if (result.oneOf) {
+      result.oneOf = result.oneOf.map(subSchema =>
+        this.updateReferencesAndReplaceCustomKeywords(subSchema)
+      );
+    }
+    if (result.not) {
+      result.not = this.updateReferencesAndReplaceCustomKeywords(result.not);
+    }
+    if (result.items) {
+      result.items = this.updateReferencesAndReplaceCustomKeywords(result.items);
+    }
+    if (result.prefixItems) {
+      result.prefixItems = result.prefixItems.map(subSchema =>
+        this.updateReferencesAndReplaceCustomKeywords(subSchema)
+      );
+    }
+    if (result.contains) {
+      result.contains = this.updateReferencesAndReplaceCustomKeywords(result.contains);
+    }
+    if (result.additionalProperties) {
+      result.additionalProperties = this.updateReferencesAndReplaceCustomKeywords(
+        result.additionalProperties
+      );
+    }
+    if (result.propertyNames) {
+      result.propertyNames = this.updateReferencesAndReplaceCustomKeywords(result.propertyNames);
+    }
+    if (result.unevaluatedItems) {
+      result.unevaluatedItems = this.updateReferencesAndReplaceCustomKeywords(
+        result.unevaluatedItems
+      );
+    }
+    if (result.unevaluatedProperties) {
+      result.unevaluatedProperties = this.updateReferencesAndReplaceCustomKeywords(
+        result.unevaluatedProperties
+      );
+    }
+    if (result.contentSchema) {
+      result.contentSchema = this.updateReferencesAndReplaceCustomKeywords(result.contentSchema);
+    }
+    if (result.properties) {
+      for (const key of Object.keys(result.properties)) {
+        result.properties[key] = this.updateReferencesAndReplaceCustomKeywords(
+          result.properties[key]
+        );
+      }
+    }
+    if (result.patternProperties) {
+      for (const key of Object.keys(result.patternProperties)) {
+        result.patternProperties[key] = this.updateReferencesAndReplaceCustomKeywords(
+          result.patternProperties[key]
+        );
+      }
+    }
+    if (result.dependentSchemas) {
+      for (const key of Object.keys(result.dependentSchemas)) {
+        result.dependentSchemas[key] = this.updateReferencesAndReplaceCustomKeywords(
+          result.dependentSchemas[key]
+        );
+      }
+    }
+
     return result;
+  }
+
+  private replaceConditionsWithAllOfs(schema: JsonSchemaType): JsonSchemaType {
+    if (typeof schema !== 'object') {
+      return schema;
+    }
+    if (schema.conditions) {
+      schema.allOf = (schema.allOf ?? []).concat(schema.conditions);
+      delete schema.conditions;
+    }
+    return schema;
   }
 }
 
