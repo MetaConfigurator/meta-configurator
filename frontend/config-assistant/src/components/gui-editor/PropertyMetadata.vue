@@ -11,6 +11,7 @@ import {ref} from 'vue';
 import type {ValidationResults} from '@/helpers/validationService';
 import {pathToString} from '@/helpers/pathHelper';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import 'primeicons/primeicons.css';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -145,6 +146,14 @@ function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
 function isInvalid(): boolean {
   return !props.validationResults.valid;
 }
+
+function focusOnPropertyLabel() {
+  const element = document.getElementById(getId());
+  if (element) {
+    element.contentEditable = 'true';
+    element.focus();
+  }
+}
 </script>
 
 <template>
@@ -181,6 +190,10 @@ function isInvalid(): boolean {
     </span>
 
     <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription() }}</span>
+    <span
+      class="pi pi-pencil ml-3"
+      v-if="isPropertyNameEditable()"
+      @click="focusOnPropertyLabel()"></span>
     <span class="text-red-600 ml-3" v-if="isInvalid()">
       <FontAwesomeIcon icon="triangle-exclamation" />
     </span>
