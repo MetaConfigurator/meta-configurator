@@ -39,15 +39,6 @@ const emit = defineEmits<{
   (e: 'remove_property', path: Path): void;
 }>();
 
-watch(
-  props,
-  () => {
-    console.log('update props');
-    //  updateTree();
-  },
-  {deep: true}
-);
-
 const sessionStore = storeToRefs(useSessionStore());
 
 watch(

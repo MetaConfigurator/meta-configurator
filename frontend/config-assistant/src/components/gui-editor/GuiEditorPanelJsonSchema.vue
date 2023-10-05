@@ -39,7 +39,6 @@ function selectPath(path: Path) {
 
 const currentSchema = computed(() => {
   const schema = sessionStore.effectiveSchemaAtCurrentPath?.schema;
-  console.log('update schema', schema);
   if (!schema) {
     return new JsonSchema({});
   }

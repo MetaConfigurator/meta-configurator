@@ -148,7 +148,7 @@ function focusEditingLabel() {
 
 function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
   const name: PathElement = node.data.name;
-  if (!name) {
+  if (name === undefined) {
     return node.data.parentSchema?.title || 'root'; // no name should only happen for the root node
   }
   if (typeof name === 'string') {

@@ -202,8 +202,22 @@ export const useSessionStore = defineStore('commonStore', () => {
     const currentPath = [];
     for (const key of path) {
       currentPath.push(key);
+      const schema = currentEffectiveSchema.schema.subSchema(key);
+
+      if (schema?.oneOf) {
+        // TODO not working yet
+        const oneOfSelection = currentSelectedOneOfOptions.value.get(pathToString(currentPath));
+        if (oneOfSelection !== undefined) {
+          currentEffectiveSchema = calculateEffectiveSchema(
+            schema.oneOf[oneOfSelection.index],
+            dataAtPath(currentPath),
+            currentPath
+          );
+        }
+      }
+
       currentEffectiveSchema = calculateEffectiveSchema(
-        currentEffectiveSchema.schema.subSchema(key),
+        schema,
         dataAtPath(currentPath),
         currentPath
       );

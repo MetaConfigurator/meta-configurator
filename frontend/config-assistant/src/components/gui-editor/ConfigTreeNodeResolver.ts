@@ -77,6 +77,9 @@ export class ConfigTreeNodeResolver {
   }
 
   public createChildNodesOfNode(guiEditorTreeNode: GuiEditorTreeNode): GuiEditorTreeNode[] {
+    if (guiEditorTreeNode.type === TreeNodeType.ADVANCED_PROPERTY) {
+      return guiEditorTreeNode.children as GuiEditorTreeNode[]; // children were already created
+    }
     if (
       guiEditorTreeNode.type === TreeNodeType.ADD_ITEM ||
       guiEditorTreeNode.type === TreeNodeType.ADD_PROPERTY
@@ -180,6 +183,7 @@ export class ConfigTreeNodeResolver {
       schema,
       depth
     );
+
     if (advanced) {
       result.push(advanced);
     }
