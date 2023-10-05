@@ -83,23 +83,7 @@ function zoomIntoPath() {
 }
 
 function isPropertyNameEditable(): boolean {
-  return isAdditionalOrPatternProperty();
-}
-
-function isAdditionalOrPatternProperty(): boolean {
-  const nodeData = props.node.data;
-  if (!nodeData.parentSchema?.hasType('object')) {
-    return false;
-  }
-
-  const propertyData = useSessionStore().dataAtPath(nodeData.absolutePath);
-  if (Array.isArray(propertyData)) {
-    return false;
-  }
-
-  return !Object.keys(props.node.data.parentSchema?.properties ?? {}).includes(
-    props.node.data.name as string
-  );
+  return isAdditionalProperty() || isPatternProperty();
 }
 
 function updatePropertyName(event) {
