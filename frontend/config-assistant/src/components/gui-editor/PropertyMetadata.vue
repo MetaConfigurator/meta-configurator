@@ -28,6 +28,7 @@ const emit = defineEmits<{
 }>();
 
 const isEditingPropertyName = ref(false);
+const showPencil = ref(true);
 
 function canZoomIn(): boolean {
   if (isEditingPropertyName.value) {
@@ -96,6 +97,7 @@ function updatePropertyName(event) {
   isEditingPropertyName.value = false;
   emit('stop_editing_property_name');
   event.target.contenteditable = false;
+  showPencil.value = true;
 }
 
 function getTypeDescription(): string {
@@ -150,10 +152,12 @@ function isInvalid(): boolean {
 function focusOnPropertyLabel(): void {
   const id: string = getId();
   const element: HTMLElement | null = document.getElementById(id);
-  if (element) {
-    element.contentEditable = 'true';
-    element.focus();
-  }
+
+  if (!element) return;
+
+  showPencil.value = false;
+  element.contentEditable = 'true';
+  element.focus();
 }
 </script>
 
@@ -193,7 +197,7 @@ function focusOnPropertyLabel(): void {
     <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription() }}</span>
     <span
       class="pi pi-pencil ml-3 text-indigo-700"
-      v-if="isPropertyNameEditable()"
+      v-if="isPropertyNameEditable() && showPencil"
       @click="focusOnPropertyLabel()"></span>
     <span class="text-red-600 ml-3" v-if="isInvalid()">
       <FontAwesomeIcon icon="triangle-exclamation" />
