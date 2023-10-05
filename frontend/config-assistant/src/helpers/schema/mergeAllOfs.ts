@@ -7,21 +7,16 @@ export function mergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
     return schema;
   }
 
-  const result = mergeAllOf(schema, {
+  return mergeAllOf(schema, {
     deep: true,
     resolvers: {
       defaultResolver: mergeAllOf.options.resolvers.title,
       // add additional resolvers here, most of the keywords are NOT supported by default
       conditions: function (values: any[][]) {
-        return values.flat();
-      },
-      $id: function (values: any[]) {
-        return values[values.length - 1] + ' (merged) ' + values.length;
+        return values.flat(); // just merge all conditions
       },
     },
   });
-  // console.log('mergeAllOfs', schema, result);
-  return result;
 }
 export function safeMergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
   try {

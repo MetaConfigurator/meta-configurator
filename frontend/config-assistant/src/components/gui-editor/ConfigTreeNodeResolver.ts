@@ -107,9 +107,6 @@ export class ConfigTreeNodeResolver {
     const depthLimit = useSettingsStore().settingsData.guiEditor.maximumDepth;
     const schema = effectiveSchema.schema;
 
-    /* console.groupCollapsed('createChildNodes', pathToString(absolutePath));
-    console.log('schema', schema); */
-
     let children: GuiEditorTreeNode[] = [];
     if (schema.oneOf.length > 0) {
       children = this.createOneOfChildrenTreeNodes(absolutePath, relativePath, schema, depth);
@@ -121,8 +118,6 @@ export class ConfigTreeNodeResolver {
     }
 
     if (schema.anyOf.length > 0 || schema.oneOf.length > 0) {
-      /* console.log('children', children);
-      console.groupEnd() */
       return children;
     }
 
@@ -137,8 +132,6 @@ export class ConfigTreeNodeResolver {
         this.createObjectChildrenTreeNodes(absolutePath, relativePath, schema, depth)
       );
     }
-    /* console.log('children', children)
-    console.groupEnd(); */
     return children;
   }
 
@@ -479,7 +472,6 @@ export class ConfigTreeNodeResolver {
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.oneOf;
       const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
-      console.log('in createAnyOfChildrenTreeNodes');
       const mergedSchema = new JsonSchema({
         allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
       });
@@ -509,18 +501,16 @@ export class ConfigTreeNodeResolver {
       if (!mergedSchema) {
         // user selected schemas that are not compatible -> can never be fulfilled
         return [];
-      } else {
-        console.log('in createAnyOfChildrenTreeNodes');
-        return [
-          this.createTreeNodeOfProperty(
-            new JsonSchema(mergedSchema),
-            schema,
-            absolutePath,
-            relativePath,
-            depth + 1
-          ),
-        ];
       }
+      return [
+        this.createTreeNodeOfProperty(
+          new JsonSchema(mergedSchema),
+          schema,
+          absolutePath,
+          relativePath,
+          depth + 1
+        ),
+      ];
     }
     return [];
   }

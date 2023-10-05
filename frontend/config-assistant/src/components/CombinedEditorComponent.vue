@@ -19,11 +19,11 @@ import {toastService} from '@/helpers/toastService';
 
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
-  if (useSettingsStore().settingsData.debuggingActive) {
-    result.push(PanelDataCurrentPath);
-  }
   if (!useSettingsStore().settingsData.guiEditorOnRightSide) {
     result = result.reverse();
+  }
+  if (useSettingsStore().settingsData.debuggingActive) {
+    result.push(PanelDataCurrentPath);
   }
   return result;
 });

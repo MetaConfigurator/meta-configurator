@@ -1,7 +1,7 @@
 import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
-import {dataAt, pathToString} from '@/helpers/pathHelper';
+import {dataAt} from '@/helpers/pathHelper';
 import _ from 'lodash';
 
 /**
@@ -33,35 +33,26 @@ export function calculateEffectiveSchema(
   let result = schema ?? new JsonSchema({});
   let iteration = 0;
 
-  console.groupCollapsed('calculateEffectiveSchema', pathToString(path));
-  console.log('schema', schema);
-
   while (result.isDataDependent && iteration < 1000) {
     // if something goes wrong, we don't want to get stuck in an infinite loop
     if (result.if !== undefined) {
       result = resolveIfThenElse(result, data);
-      console.log('resolved if then else', result);
     }
 
     if (result.dependentRequired) {
       result = resolveDependentRequired(result, data);
-      console.log('resolved dependentRequired', result);
     }
 
     if (result.dependentSchemas) {
       result = resolveDependentSchemas(result, data);
-      console.log('resolved dependentSchemas', result);
     }
 
     if (result.conditions && result.conditions.length > 0) {
       result = resolveConditions(result, data);
-      console.log('resolved conditions', result);
     }
 
     iteration++;
   }
-
-  console.groupEnd();
 
   return new EffectiveSchema(result, data, path);
 }
@@ -107,12 +98,9 @@ function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
 }
 
 function resolveConditions(result: JsonSchema, data: any) {
-  console.trace();
-  console.groupCollapsed('resolveConditions for', result);
   const resolvedConditions = result.conditions?.map(condition => {
     return resolveIfThenElse(condition, data);
   });
-  console.log('resolvedConditions', resolvedConditions);
   const baseSchema = {...result.jsonSchema};
   delete baseSchema.conditions;
 
@@ -122,10 +110,7 @@ function resolveConditions(result: JsonSchema, data: any) {
       ...(resolvedConditions?.map(condition => condition.jsonSchema ?? {}) ?? []),
     ],
   };
-  console.log('newSchema', newSchema);
-  const nresult = new JsonSchema(newSchema);
-  console.groupEnd();
-  return nresult;
+  return new JsonSchema(newSchema);
 }
 
 function resolveDependentSchemas(schemaWrapper: JsonSchema, data: any): JsonSchema {

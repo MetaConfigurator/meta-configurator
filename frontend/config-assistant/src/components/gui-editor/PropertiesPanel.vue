@@ -170,6 +170,7 @@ function updateData(subPath: Path, newValue: any) {
   emit('update_data', completePath, newValue);
   updateTree();
 }
+
 function clickedPropertyData(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
   if (useSessionStore().dataAtPath(path) != undefined) {
