@@ -63,7 +63,8 @@ function isValid(): boolean {
   border: none !important;
   box-shadow: none !important;
 }
-::placeholder {
+::-webkit-input-placeholder {
+  /* Chrome/Opera/Safari */
   color: #a8a8a8;
 }
 </style>

@@ -54,7 +54,13 @@ const valueProperty = computed({
   border: none !important;
   box-shadow: none !important;
 }
+::-webkit-input-placeholder {
+  /* Chrome/Opera/Safari */
+  color: #a8a8a8 !important;
+  //opacity: 1;
+}
+/* For other browsers (Firefox, Edge, etc.) */
 ::placeholder {
-  color: #a8a8a8;
+  color: #a8a8a8; /* Same color as above */
 }
 </style>
