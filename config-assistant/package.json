@@ -11,10 +11,10 @@
     "lint:ts": "eslint --ext .jsx,.js,.ts,.tsx --ignore-path .eslintignore",
     "lint:ls": "ls-lint",
     "lint": "npm run lint:ts && npm run lint:ls",
-    "prettier": "prettier --write src/ --ignore-path .eslintignore",
+    "prettier": "prettier --write src --ignore-path .eslintignore",
     "test": "vitest",
     "preview": "vite preview",
-    "prepare": "cd ../.. && husky install .husky",
+    "prepare": "cd .. && husky install .husky",
     "precommit": "pretty-quick --staged"
   },
   "dependencies": {
