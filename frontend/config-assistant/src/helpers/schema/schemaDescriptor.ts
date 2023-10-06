@@ -588,15 +588,15 @@ function describeSchemaValidationErrors(validationErrors: ErrorObject[]): string
 
 function formatType(type: SchemaPropertyType[]): string {
   if (type.length === 1) {
-    return 'of type ' + formatValue(type[0]);
+    return 'of type ' + formatValue(type[0]) + '.';
   }
   if (type.length === 2) {
-    return `of type ${formatValue(type[0])} or ${formatValue(type[1])}`;
+    return `of type ${formatValue(type[0])} or ${formatValue(type[1])}.`;
   }
   if (type.length === NUMBER_OF_PROPERTY_TYPES) {
-    return 'of any type';
+    return 'of any type.';
   }
-  return `of one of the following types: ${type.map(t => formatValue(t)).join(', ')}`;
+  return `of one of the following types: ${type.map(t => formatValue(t)).join(', ')}.`;
 }
 
 function paragraph(text: any) {

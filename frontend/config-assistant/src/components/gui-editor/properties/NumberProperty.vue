@@ -13,13 +13,13 @@ const props = defineProps<{
   validationResults: ValidationResults;
 }>();
 
-const stepValue = computed(() => {
-  return props.propertySchema.multipleOf ?? 0.1;
-});
-
 const emit = defineEmits<{
-  (e: 'update_property_value', newValue: number | undefined): void;
+  (e: 'update:propertyData', newValue: number | undefined): void;
 }>();
+
+const stepValue = computed(() => {
+  return props.propertySchema.multipleOf ?? 1;
+});
 
 const valueProperty = computed({
   get() {
@@ -27,13 +27,17 @@ const valueProperty = computed({
   },
   set(newValue) {
     if (newValue !== null) {
-      emit('update_property_value', newValue);
+      emit('update:propertyData', newValue);
     }
   },
 });
 
 function isValid(): boolean {
   return props.validationResults.valid;
+}
+
+function isInteger(): boolean {
+  return props.propertySchema.hasType('integer');
 }
 </script>
 
@@ -43,10 +47,11 @@ function isValid(): boolean {
     :class="{'underline decoration-wavy decoration-red-600': !isValid()}"
     v-model="valueProperty"
     value="propertyName"
-    mode="decimal"
+    :mode="isInteger() ? 'decimal' : undefined"
+    :input-id="isInteger() ? 'integeronly' : undefined"
     locale="en-US"
     :minFractionDigits="0"
-    :maxFractionDigits="20"
+    :maxFractionDigits="isInteger() ? 0 : 20"
     showButtons
     buttonLayout="stacked"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
@@ -62,5 +67,8 @@ function isValid(): boolean {
 :deep(.p-inputtext) {
   border: none !important;
   box-shadow: none !important;
+}
+::placeholder {
+  color: #a8a8a8;
 }
 </style>

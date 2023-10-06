@@ -1,12 +1,15 @@
+<!--
+Component for selecting one or more sub-schemas of an anyOf property.
+-->
 <script setup lang="ts">
-import {computed, defineProps, onMounted} from 'vue';
+import type {WritableComputedRef} from 'vue';
+import {computed} from 'vue';
 import MultiSelect from 'primevue/multiselect';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
-import {Path, PathElement} from '@/model/path';
+import type {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/helpers/pathHelper';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
-import type {WritableComputedRef} from 'vue/dist/vue';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -19,49 +22,49 @@ const props = defineProps<{
 const possibleOptions = props.possibleSchemas.map(
   (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
 );
-const possibleValues = possibleOptions.map(option => option.displayText);
 
 const emit = defineEmits<{
-  (e: 'update_tree'): void;
+  (e: 'update:tree'): void;
 }>();
 
-const valueProperty: WritableComputedRef<string[] | undefined> = computed({
-  get() {
-    const path = pathToString(props.absolutePath);
-    let selectedOptions = useSessionStore().currentSelectedAnyOfOptions.get(path);
-    return selectedOptions?.map(option => option.displayText);
-  },
-
-  set(newValue) {
-    const selectedOptionsText: string[] | undefined = newValue;
-
-    if (selectedOptionsText) {
-      const path = pathToString(props.absolutePath);
-      const selectedOptions = selectedOptionsText.map(
-        displayText => findOptionByDisplayText(displayText)!
-      );
-      useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOptions);
-      emit('update_tree');
-    }
-  },
-});
-
-function findOptionByDisplayText(displayText: string): OneOfAnyOfSelectionOption | undefined {
+function findOptionBySubSchemaIndex(index): OneOfAnyOfSelectionOption {
   for (let option of possibleOptions) {
-    if (option.displayText === displayText) {
+    if (option.index === index) {
       return option;
     }
   }
-
-  return undefined;
+  throw new Error(`Could not find option with index ${index}`);
 }
+
+const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined> = computed({
+  get(): OneOfAnyOfSelectionOption[] | undefined {
+    const path = pathToString(props.absolutePath);
+    const optionsFromStore = useSessionStore().currentSelectedAnyOfOptions.get(path);
+    if (!optionsFromStore) {
+      return undefined;
+    }
+    // use instances from the possible options array
+    // otherwise the multiselect will not show the selected options
+    // as it compares by reference
+    return optionsFromStore.map(option => findOptionBySubSchemaIndex(option.index));
+  },
+
+  set(selectedOptions: OneOfAnyOfSelectionOption[] | undefined) {
+    if (selectedOptions) {
+      const path = pathToString(props.absolutePath);
+      useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOptions);
+      emit('update:tree');
+    }
+  },
+});
 </script>
 
 <template>
   <div>
     <MultiSelect
+      class="tableInput w-full"
       v-model="valueProperty"
-      :options="possibleValues"
+      :options="possibleOptions"
       :placeholder="`Select sub-schemas`" />
   </div>
 </template>
@@ -72,5 +75,12 @@ div {
   flex-direction: row;
   height: 30px;
   line-height: 10px;
+}
+.tableInput {
+  border: none;
+  box-shadow: none;
+}
+::placeholder {
+  color: #a8a8a8;
 }
 </style>
