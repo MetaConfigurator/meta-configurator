@@ -534,17 +534,6 @@ function zoomIntoPath(path: Path) {
         </span>
 
         <span
-          v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
-          style="max-width: 50%"
-          class="w-full">
-          <PropertyData
-            class="w-full"
-            :nodeData="slotProps.node.data"
-            @update_property_value="addItem"
-            bodyClass="w-full" />
-        </span>
-
-        <span
           v-if="slotProps.node.type === TreeNodeType.ADD_PROPERTY"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
