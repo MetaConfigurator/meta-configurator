@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-
-cd frontend/config-assistant
+cd config-assistant
 npm run precommit
