@@ -519,46 +519,27 @@ function zoomIntoPath(path: Path) {
         <!-- special tree nodes -->
         <span
           v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
-          style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
-          <Button
-            text
-            severity="secondary"
-            class="text-gray-500"
-            style="margin-left: -0.75rem"
-            @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
-            @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
+          style="width: 100%; min-width: 50%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
+          @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
+          <Button text severity="secondary" class="text-gray-500" style="margin-left: -0.75rem">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>
         </span>
 
         <span
-          v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
-          style="max-width: 50%"
-          class="w-full">
-          <PropertyData
-            class="w-full"
-            :nodeData="slotProps.node.data"
-            @update_property_value="addItem"
-            bodyClass="w-full" />
-        </span>
-
-        <span
           v-if="slotProps.node.type === TreeNodeType.ADD_PROPERTY"
-          style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
-          <Button
-            text
-            severity="secondary"
-            class="text-gray-500"
-            style="margin-left: -1.5rem"
-            @click="
-              addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-            "
-            @keyup.enter="
-              addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-            ">
+          style="width: 100%; min-width: 50%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          @click="
+            addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+          "
+          @keyup.enter="
+            addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+          ">
+          <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">New property</span>
           </Button>
