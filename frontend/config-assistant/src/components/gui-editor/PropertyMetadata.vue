@@ -167,20 +167,11 @@ function focusOnPropertyLabel(): void {
       class="mr-2"
       :class="{'hover:underline': canZoomIn(), 'bg-yellow-100': highlighted}"
       :tabindex="canZoomIn() ? 0 : -1"
-      @click="
-        isPropertyNameEditable()
-          ? event => {
-              event.target.contenteditable = true;
-            }
-          : zoomIntoPath()
-      "
       @keyup.enter="toggleExpand()"
-      @dblclick="zoomIntoPath()">
+      @click="zoomIntoPath()">
       <span
         :contenteditable="isPropertyNameEditable()"
         :id="getId()"
-        @focus="() => focusEditingLabel()"
-        @blur="updatePropertyName"
         @keyup.enter="updatePropertyName"
         :class="{
           'text-indigo-700': canZoomIn(),
