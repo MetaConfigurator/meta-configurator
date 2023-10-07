@@ -323,8 +323,8 @@ The JSON schema meta schema allows each field in each context.
 For example, if the \texttt{type} keyword is used and set to \texttt{string}, then the \texttt{properties} keyword is allowed,
 even though it does not make sense in that context.
 According to the specification, any validator should ignore the fields that do not make sense in the current context.
-Thus, it does not make sense to show them to the user.
-The user gets overwhelmed by the amount of fields and does not know which fields are relevant for the current context.
+Consequently, the user does not need to see those fields, but instead, the user gets overwhelmed by the amount of fields
+and does not know which fields are relevant for the current context.
 This is also a feedback we got from our user study.
 Thus, we added \texttt{if} conditions to each field to only show them when they make sense in the current context.
 Listing~\ref{lst:if-then-else} shows an example of such an \texttt{if} condition.
