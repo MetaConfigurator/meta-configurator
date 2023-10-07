@@ -475,7 +475,6 @@ function zoomIntoPath(path: Path) {
     scrollable
     scroll-direction="vertical"
     scroll-height="flex"
-    row-hover
     :lazy="true"
     :loading="loadingDebounced"
     v-model:expandedKeys="useSessionStore().currentExpandedElements"
@@ -519,11 +518,12 @@ function zoomIntoPath(path: Path) {
         <!-- special tree nodes -->
         <span
           v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
+          class="cursor-pointer"
           style="width: 100%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
           @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
           @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
-          <Button text severity="secondary" class="text-gray-500" style="margin-left: -0.75rem">
+          <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>
@@ -532,6 +532,7 @@ function zoomIntoPath(path: Path) {
         <span
           v-if="slotProps.node.type === TreeNodeType.ADD_PROPERTY"
           style="width: 100%; min-width: 50%"
+          class="cursor-pointer"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
           @click="
             addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
