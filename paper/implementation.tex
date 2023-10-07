@@ -22,10 +22,10 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
     \end{tabular}
 \end{table*}
 
-\subsection{Code Editor}\label{subsec:code-editor}
+\subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
-For this project, we use the popular \textbf{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface. 
+For this project, we use the popular \textbf{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
 % It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
 % It can be easily embedded in any web page or JavaScript application.
 
@@ -60,7 +60,7 @@ This way, the corresponding path is built up. To determine the cursor position f
 \paragraph{Editor Operations}
 The code editor has more functionalities, such as the possibility to open a file by drag and drop into the editor, as well as customizable font sizes.
 
-\subsection{GUI Editor}\label{subsec:gui-editor}
+\subsection{GUI Panel}\label{subsec:gui-editor}
 
 The GUI editor is a component that allows the user to edit the configuration data in a GUI, which is generated based on the schema of the configuration data.
 It is structured in a table-like way, where each row represents a key-value pair of the configuration data.
@@ -207,7 +207,7 @@ Hence, the support for allOf and any other keywords for which we use this in the
         framesep=3mm,
         linenos=true,
         xleftmargin=15pt,
-        tabsize=4]{js}
+        tabsize=4]{json}
 {
   "title": "NonEmptyString"
   "type": "string",
@@ -423,48 +423,73 @@ For schemas without any of those keywords, this step is trivial as the schema is
 
 %todo examples
 
-\subsubsection*{\bf A plain unnumbered list}
-\begin{list}{}{}
-    \item{bare\_jrnl.tex}
-    \item{bare\_conf.tex}
-    \item{bare\_jrnl\_compsoc.tex}
-    \item{bare\_conf\_compsoc.tex}
-    \item{bare\_jrnl\_comsoc.tex}
-\end{list}
+\subsection{Schema editor}\label{subsec:schema-editor}
 
-\subsection{Figures}
-Fig. 1 is an example of a floating figure using the graphicx package.
-Note that $\backslash${\tt{label}} must occur AFTER (or within) $\backslash${\tt{caption}}.
-For figures, $\backslash${\tt{caption}} should occur after the $\backslash${\tt{includegraphics}}.
+The schema editor page has the same structure as the File editor page, as discussed in previous sections.
+The only difference is that the schema used for generating the GUI panel is not the schema file provided by the user but the Json schema meta schema,
+i.e., the schema that defines the structure of valid JSON schema files.
+However, applying our generic approach on the official Json schema meta schema (TODO citation) does not result in a user-friendly editor for
+creating and modifying schema files.
+In this section we discuss the reasons for that and how we developed a new meta schema that circumvents the problems of the official meta schema.
 
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{fig1}
-%\caption{Simulation results for the network.}
-%\label{fig_1}
-%\end{figure}
+\subsubsection{Missing descriptions}
+With the \texttt{description} keyword, schema authors can give descriptions to any elements of their schema.
+This can help the user of a schema in many ways, for example, the author can specify the unit of a numeric field or give other additional information.
+The JSON schema meta schema does not provide any descriptions.
+Users, especially those without prior knowledge in JSON schema, might not understand the meaning of the fields of JSON schema.
+Thus, we insert descriptions from the JSON schema specification (TODO citation) into our modified meta-schema.
 
-Fig. 2(a) and 2(b) is an example of a double column floating figure using two subfigures.
-(The subfig.sty package must be loaded for this to work.)
-The subfigure $\backslash${\tt{label}} commands are set within each subfloat command,
-and the $\backslash${\tt{label}} for the overall figure must come after $\backslash${\tt{caption}}.
-$\backslash${\tt{hfil}} is used as a separator to get equal spacing.
-The combined width of all the parts of the figure should do not exceed the text width or a line break will occur.
-%
-%\begin{figure*}[!t]
-%\centering
-%\subfloat[]{\includegraphics[width=2.5in]{fig1}%
-%\label{fig_first_case}}
-%\hfil
-%\subfloat[]{\includegraphics[width=2.5in]{fig1}%
-%\label{fig_second_case}}
-%\caption{Dae. Ad quatur autat ut porepel itemoles dolor autem fuga. Bus quia con nessunti as remo di quatus non perum que nimus. (a) Case I. (b) Case II.}
-%\label{fig_sim}
-%\end{figure*}
+\subsubsection{External references}
+\toolname does not support references to external schemas yet, i.e., references inside the schema to a schema at a specific URL\@.
+Also, \toolname does not support the \texttt{\$vocabulary} keyword yet.
+Both features are used in the JSON schema meta schema, as it is distributed over multiple schema files.
+To circumvent that problem, we put all schemas in one schema file into the \texttt{\$defs} object and replace the external references with local references.
 
-Note that often IEEE papers with multi-part figures do not place the labels within the image itself (using the optional argument to $\backslash${\tt{subfloat}}[]), but instead will
-reference/describe all of them (a), (b), etc., within the main caption.
-Be aware that for subfig.sty to generate the (a), (b), etc., subfigure
-labels, the optional argument to $\backslash${\tt{subfloat}} must be present. If a
-subcaption is not desired, leave its contents blank,
-e.g.,$\backslash${\tt{subfloat}}[].
+\subsubsection{Use of dynamic anchors and references}
+The JSON schema meta schema uses dynamic references and dynamic anchors.
+The difference of those keywords in comparison to the \texttt{\$ref} keyword is that they provide a way to dynamically extend the JSON meta schema
+at runtime.
+For example, one could combine the JSON schema meta schema with an extension that defines how fields should be serialized in XML\@.
+We do not support dynamic references and anchors yet.
+We replaced all of them by ``non-dynamic'' references using the \texttt{\$ref} keyword.
+
+\subsubsection{Allowing each field in each context}
+The JSON schema meta schema allows each field in each context.
+For example, if the \texttt{type} keyword is used and set to \texttt{string}, then the \texttt{properties} keyword is allowed,
+even though it does not make sense in that context.
+According to the specification, any validator should ignore the fields that do not make sense in the current context.
+Consequently, the user does not need to see those fields, but instead, the user gets overwhelmed by the amount of fields
+and does not know which fields are relevant for the current context.
+This is also a feedback we got from our user study.
+Thus, we added \texttt{if} conditions to each field to only show them when they make sense in the current context.
+Listing~\ref{lst:if-then-else} shows an example of such an \texttt{if} condition.
+The relevant properties for arrays are only shown when the current property is of type array.
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{json}
+{
+  "if": {
+    "$ref": "#/$defs/hasTypeArray"
+  },
+  "then": {
+    "$ref": "#/$defs/arrayProperty"
+  }
+}
+    \end{minted}
+    \caption{If condition for array properties. The \texttt{hasTypeArray} is valid if the current property is of type array. The \texttt{arrayProperty} schema defines the properties of an array.}
+    \label{lst:if-then-else}
+\end{listing}
+
+To even more reduce the amount of fields shown to the user, we also introduced a custom keyword just for our own meta schema.
+The keyword \texttt{advanced} is a boolean field that is set to \texttt{false} by default.
+It is wrapped in an \texttt{metaConfigurator} object, which is ignored by any validator as it is not part of the JSON schema specification.
+We use this wrapper to prevent any other schema extensions from colliding with our keyword.
+When set to \texttt{true}, the field not shown by default, but only when the user expands the advanced section.
+We put all fields that are not required for the basic usage of the schema into the advanced section.
+For this, we oriented ourselves on the work of Baazizi et al.~\cite{baazizi2021empirical}, which analyzed the usage of JSON schema keywords in 82,000 JSON schemas.
+
+% TODO screenshots
