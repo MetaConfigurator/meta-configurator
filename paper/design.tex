@@ -15,7 +15,7 @@ This GUI is based on the schema which the user provides (more on that in the nex
 For enum properties, the user will get a dropdown menu with the different options to choose from, for boolean properties the user will get a checkbox and so on. 
 Other features, such as tooltips that display the description and constraints of a property, further assist the user.
 
-This design combines the benefits of both a rich text editor (very efficient for many tasks, more suited for users with technical understanding of the data structure) with the benefits of a GUI (enables users without deep technical understanding to work with the data, assists also expert users).
+This design combines the benefits of both a rich text editor (efficient for many tasks, more suited for users with technical understanding of the data structure) with the benefits of a GUI (enables users without deep technical understanding to work with the data, assists also expert users).
 
 
 \begin{figure*}[!t]
@@ -31,7 +31,7 @@ This design combines the benefits of both a rich text editor (very efficient for
 
 
 Besides editing their data with the tool, the user can also use it to modify their schema or create a new schema.
-This is illustrated in figure \ref{mockup_gui_schema} which sketches the \textbf{schema editor mode}.
+This is illustrated in figure \ref{mockup_gui_schema}, which sketches the \textbf{schema editor mode}.
 The structure of the user interface remains the same as in the file editor mode.
 The main difference in this mode is, that the schema being used for the GUI and schema validation is not a user schema, but instead the JSON schema meta schema itself. 
 
@@ -180,7 +180,7 @@ The GUI elements are constructed in the following manner: a schema is seen as a 
 A data field can either be simple (string, boolean, number, \ldots) or complex (array or dictionary of data fields).
 Every schema has a root data field.
 The GUI element for this root data field is constructed. % todo describe tree generation
-When constructing the GUI element for a complex data field, this includes constructing the GUI elements for all child data fields too.
+When constructing the GUI element for a complex data field, all GUI elements of the child data fields are constructed too, in a recursive manner.
 This way, the whole schema tree is traversed and GUI elements for all entries are constructed.
 To avoid overwhelming the user with too many GUI elements, the ones with child elements can be expanded or collapsed by the user and only a limited amount of them is expanded by default.
 By design, each of these constructed GUI elements is mapped to their corresponding data field (in other words: to a path in the data structure).

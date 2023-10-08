@@ -500,9 +500,9 @@ For this, we oriented ourselves on the work of Baazizi et al.~\cite{baazizi2021e
 \subsection{JSON schema versions}\label{subsec:json-schema-versions}
 
 JSON schema has had 10 different drafts over the years, the newest being draft 2020--12~\cite{jsonschemaJSONSchema}.
-In real-world schemas we cannot expect schemas to all have the newest version.
+In real-world we cannot expect all schemas to have the newest version.
 Baazizi et al.~\cite{baazizi2021empirical} investigated over 82.000 open-source schemas in 2021, where they found that most of them are using draft 4, which was released in 2013.
 As the different drafts are not necessarily compatible with each other, tools supporting one draft become outdated when a new draft releases.
 However, Viotto et al.~\cite{Viotti_Lagoni_2023} provide a library for migration schemas from older versions to the newest draft without loss of information.
-Thus, our tool only needs to support the newest draft directly.
+Thus, by using this library, our tool only needs to support the newest draft directly.
 If a user uses a schema from an older draft, we first migrate it to the newest draft internally.
