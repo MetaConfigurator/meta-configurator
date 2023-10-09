@@ -90,8 +90,14 @@ function isPropertyNameEditable(): boolean {
 }
 
 function updatePropertyName(event) {
+  const target = event.target as HTMLElement;
+  let text = target.innerText;
+
+  // remove newlines from both sides
+  text = text.trim();
+
   if (isPropertyNameEditable()) {
-    emit('update_property_name', props.node.data.name as string, event.target.innerText);
+    emit('update_property_name', props.node.data.name as string, text);
   } else {
     event.target.innerText = props.node.data.name;
   }
