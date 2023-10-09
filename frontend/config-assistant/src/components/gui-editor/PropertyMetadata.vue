@@ -12,6 +12,7 @@ import type {ValidationResults} from '@/helpers/validationService';
 import {pathToString} from '@/helpers/pathHelper';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import 'primeicons/primeicons.css';
+import {selectContents, focus} from '@/helpers/focusUtils';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -89,11 +90,18 @@ function isPropertyNameEditable(): boolean {
 }
 
 function updatePropertyName(event) {
+  const target = event.target as HTMLElement;
+  let text = target.innerText;
+
+  // remove newlines from both sides
+  text = text.trim();
+
   if (isPropertyNameEditable()) {
-    emit('update_property_name', props.node.data.name as string, event.target.innerText);
+    emit('update_property_name', props.node.data.name as string, text);
   } else {
     event.target.innerText = props.node.data.name;
   }
+
   isEditingPropertyName.value = false;
   emit('stop_editing_property_name');
   event.target.contenteditable = false;
@@ -126,9 +134,8 @@ function getId(): string {
   return '_label_' + props.node.key;
 }
 
-function focusEditingLabel() {
-  if (isPropertyNameEditable()) {
-    isEditingPropertyName.value = true;
+function focusEditingLabel(): void {
+  if (isPropertyNameEditable() && isEditingPropertyName.value) {
     emit('start_editing_property_name');
   }
 }
@@ -150,14 +157,15 @@ function isInvalid(): boolean {
 }
 
 function focusOnPropertyLabel(): void {
+  isEditingPropertyName.value = true;
   const id: string = getId();
   const element: HTMLElement | null = document.getElementById(id);
 
   if (!element) return;
 
   showPencil.value = false;
-  element.contentEditable = 'true';
-  element.focus();
+  focus(id);
+  selectContents(id);
 }
 </script>
 
@@ -170,8 +178,11 @@ function focusOnPropertyLabel(): void {
       @keyup.enter="toggleExpand()"
       @click="zoomIntoPath()">
       <span
-        :contenteditable="isPropertyNameEditable()"
+        :contenteditable="isPropertyNameEditable() && isEditingPropertyName"
         :id="getId()"
+        @focus="focusEditingLabel()"
+        @keydown.stop
+        @blur="updatePropertyName"
         @keyup.enter="updatePropertyName"
         :class="{
           'text-indigo-700': canZoomIn(),
