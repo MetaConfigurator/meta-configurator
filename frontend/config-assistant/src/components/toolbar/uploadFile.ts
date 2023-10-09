@@ -1,6 +1,6 @@
-import {useDataStore} from '@/store/dataStore';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {errorService} from '@/main';
+
 export function openUploadFileDialog(): void {
   const inputElement = document.createElement('input');
 
@@ -14,9 +14,8 @@ export function openUploadFileDialog(): void {
       reader.onload = e => {
         const contents = e.target?.result as string;
         try {
-          const selectedConfig = JSON.parse(contents);
           useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-          useDataStore().fileData = selectedConfig;
+          useSessionStore().editorContentUnparsed = contents;
         } catch (error) {
           errorService.onError(error);
         }

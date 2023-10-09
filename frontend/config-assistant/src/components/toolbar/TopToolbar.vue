@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, Ref, ref, watch} from 'vue';
+import {Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
@@ -27,10 +27,9 @@ import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema, searchResultToMenuItem} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
 
-import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
-
 import {GuiConstants} from '@/constants';
 import type {SchemaOption} from '@/model/SchemaOption';
+import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -39,6 +38,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
+
 const selectedSchema = ref<SchemaOption | null>(null);
 
 const showFetchedSchemas = ref(false);
@@ -124,7 +124,7 @@ function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
       handleFromWebClick();
       break;
     case 'File':
-      openUploadFileDialog();
+      openUploadSchemaDialog();
       break;
     case 'URL':
       showUrlDialog();
@@ -147,9 +147,7 @@ function handleFromOurExampleClick() {
   showFetchedSchemas.value = true;
   topMenuBar.showDialog.value = true;
 }
-onMounted(() => {
-  showInitialSchemaDialog();
-});
+
 watch(selectedSchema, async newSelectedSchema => {
   if (!newSelectedSchema) {
     return;
@@ -263,11 +261,16 @@ const showInitialSchemaDialog = () => {
   initialSchemaSelectionDialog.value?.show();
 };
 
+defineExpose({
+  showInitialSchemaDialog,
+});
+
 useMagicKeys({
   passive: false,
   onEventFired(event) {
     if (event.key === 'f' && event.ctrlKey) {
       event.preventDefault();
+      focus('searchBar');
     }
   },
 });
