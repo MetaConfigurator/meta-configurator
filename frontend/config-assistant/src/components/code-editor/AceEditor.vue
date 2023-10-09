@@ -115,6 +115,8 @@ onMounted(() => {
     'change',
     useDebounceFn(
       () => {
+        sessionStore.editorContentUnparsed = editor.value.getValue();
+
         if (currentChangeForcedFromOutside) {
           currentChangeForcedFromOutside = false; // reset flag
           return;
@@ -133,6 +135,15 @@ onMounted(() => {
       WRITE_DEBOUNCE_TIME,
       {maxWait: 10 * WRITE_DEBOUNCE_TIME}
     )
+  );
+
+  watch(
+    computed(() => sessionStore.editorContentUnparsed),
+    content => {
+      if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        editor.value.setValue(content, -1);
+      }
+    }
   );
 
   watchArray(

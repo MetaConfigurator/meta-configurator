@@ -27,10 +27,9 @@ import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema, searchResultToMenuItem} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
 
-import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
-
 import {GuiConstants} from '@/constants';
 import type {SchemaOption} from '@/model/SchemaOption';
+import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -124,7 +123,7 @@ function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
       handleFromWebClick();
       break;
     case 'File':
-      openUploadFileDialog();
+      openUploadSchemaDialog();
       break;
     case 'URL':
       showUrlDialog();

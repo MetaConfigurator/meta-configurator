@@ -68,6 +68,9 @@ export const useSessionStore = defineStore('commonStore', () => {
     new ValidationResults([])
   );
 
+  // TODO consider one variable for each page
+  const editorContentUnparsed: Ref<string> = ref('');
+
   const fileData: WritableComputedRef<any> = computed({
     // getter
     get() {
@@ -90,13 +93,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     },
     // setter
     set(newValue: any) {
-      validateDebounced(newValue)
-        .then(validationResults => {
-          if (validationResults !== undefined) {
-            dataValidationResults.value = validationResults;
-          }
-        })
-        .catch(e => errorService.onError(e));
+      runValidation(newValue);
 
       switch (currentMode.value) {
         case SessionMode.FileEditor:
@@ -167,24 +164,44 @@ export const useSessionStore = defineStore('commonStore', () => {
     data => validationService.value.validate(data),
     GuiConstants.SCHEMA_VALIDATION_DEBOUNCE_TIME
   );
+
+  function runValidation(newData: any) {
+    validateDebounced(newData)
+      .then(validationResults => {
+        if (validationResults !== undefined) {
+          dataValidationResults.value = validationResults;
+        }
+      })
+      .catch(e => errorService.onError(e));
+  }
+
+  function refreshValidationService() {
+    try {
+      validationService.value = new ValidationService(fileSchemaDataPreprocessed.value);
+      schemaErrorMessage.value = null;
+      runValidation(fileData.value);
+    } catch (e: any) {
+      errorService.onError(e);
+      schemaErrorMessage.value = e.message;
+    }
+  }
+
   /**
-   * Update the validation service when the schema changes.
+   * Update the validation service when the page changes.
    */
   watch(
-    fileSchemaData,
+    currentMode,
     () => {
       currentExpandedElements.value = {};
       currentSelectedElement.value = [];
-      try {
-        validationService.value = new ValidationService(fileSchemaDataPreprocessed.value);
-        schemaErrorMessage.value = null;
-      } catch (e: any) {
-        errorService.onError(e);
-        schemaErrorMessage.value = e.message;
-      }
+      refreshValidationService();
     },
     {immediate: true}
   );
+
+  watch(fileSchemaData, () => {
+    refreshValidationService();
+  });
 
   function schemaAtPath(path: Path): JsonSchema {
     return fileSchema.value.subSchemaAt(path) ?? new JsonSchema({});
@@ -257,6 +274,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
     const pathAsString = pathToString(path);
     _.set(fileData.value, pathAsString!!, newValue);
+    runValidation(fileData.value);
   }
 
   function removeDataAtPath(path: Path): void {
@@ -274,6 +292,7 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
     const pathAsString = pathToString(path);
     _.unset(fileData.value, pathAsString!!);
+    runValidation(fileData.value);
   }
 
   function isExpanded(path: Path): boolean {
@@ -302,6 +321,7 @@ export const useSessionStore = defineStore('commonStore', () => {
 
   return {
     currentMode,
+    editorContentUnparsed,
     fileData,
     fileSchema,
     fileSchemaData,
