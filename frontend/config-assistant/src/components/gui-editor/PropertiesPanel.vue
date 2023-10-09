@@ -321,12 +321,6 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
   // insert the new node before the "add property" node
   const indexOfAddPropertyNode = objectNode.children.length - 1;
   objectNode.children.splice(indexOfAddPropertyNode, 0, nodeToInsert);
-
-  if (nodeToInsert.key) {
-    const id = '_label_' + nodeToInsert.key;
-    focus(id);
-    selectContents(id);
-  }
 }
 
 function findNameForNewProperty(objectSchema: JsonSchema | undefined, data: any) {
