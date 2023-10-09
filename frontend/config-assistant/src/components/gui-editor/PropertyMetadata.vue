@@ -175,6 +175,7 @@ function focusOnPropertyLabel(): void {
         :contenteditable="isPropertyNameEditable() && isEditingPropertyName"
         :id="getId()"
         @focus="focusEditingLabel()"
+        @keydown.stop
         @blur="updatePropertyName"
         @keyup.enter="updatePropertyName"
         :class="{
