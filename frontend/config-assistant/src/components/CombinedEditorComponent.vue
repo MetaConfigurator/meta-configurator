@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import 'primeicons/primeicons.css';
 import SplitterPanel from 'primevue/splitterpanel';
 import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
@@ -47,6 +47,12 @@ function updateMode(newMode: SessionMode) {
   }
 }
 
+const topToolbarRef = ref();
+
+onMounted(() => {
+  topToolbarRef.value?.showInitialSchemaDialog();
+});
+
 confirmationService.confirm = useConfirm();
 toastService.toast = useToast();
 </script>
@@ -59,6 +65,7 @@ toastService.toast = useToast();
     <main class="flex flex-col">
       <!-- toolbar -->
       <TopToolbar
+        ref="topToolbarRef"
         class="h-12 flex-none"
         :current-mode="useSessionStore().currentMode"
         @mode-selected="updateMode" />
