@@ -12,6 +12,7 @@ import type {ValidationResults} from '@/helpers/validationService';
 import {pathToString} from '@/helpers/pathHelper';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import 'primeicons/primeicons.css';
+import {selectContents, focus} from '@/helpers/focusUtils';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -94,6 +95,7 @@ function updatePropertyName(event) {
   } else {
     event.target.innerText = props.node.data.name;
   }
+
   isEditingPropertyName.value = false;
   emit('stop_editing_property_name');
   event.target.contenteditable = false;
@@ -126,9 +128,8 @@ function getId(): string {
   return '_label_' + props.node.key;
 }
 
-function focusEditingLabel() {
-  if (isPropertyNameEditable()) {
-    isEditingPropertyName.value = true;
+function focusEditingLabel(): void {
+  if (isPropertyNameEditable() && isEditingPropertyName.value) {
     emit('start_editing_property_name');
   }
 }
@@ -150,14 +151,15 @@ function isInvalid(): boolean {
 }
 
 function focusOnPropertyLabel(): void {
+  isEditingPropertyName.value = true;
   const id: string = getId();
   const element: HTMLElement | null = document.getElementById(id);
 
   if (!element) return;
 
   showPencil.value = false;
-  element.contentEditable = 'true';
-  element.focus();
+  focus(id);
+  selectContents(id);
 }
 </script>
 
@@ -167,19 +169,12 @@ function focusOnPropertyLabel(): void {
       class="mr-2"
       :class="{'hover:underline': canZoomIn(), 'bg-yellow-100': highlighted}"
       :tabindex="canZoomIn() ? 0 : -1"
-      @click="
-        isPropertyNameEditable()
-          ? event => {
-              event.target.contenteditable = true;
-            }
-          : zoomIntoPath()
-      "
       @keyup.enter="toggleExpand()"
-      @dblclick="zoomIntoPath()">
+      @click="zoomIntoPath()">
       <span
-        :contenteditable="isPropertyNameEditable()"
+        :contenteditable="isPropertyNameEditable() && isEditingPropertyName"
         :id="getId()"
-        @focus="() => focusEditingLabel()"
+        @focus="focusEditingLabel()"
         @blur="updatePropertyName"
         @keyup.enter="updatePropertyName"
         :class="{
