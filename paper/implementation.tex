@@ -3,7 +3,7 @@ A detailed list of all libraries used can be found in the wiki of our GitHub rep
 Table~\ref{tab:libraries} shows an overview of the most important libraries used and their purpose.
 
 % todo insert most important libraries used and their purpose
-\begin{table}[!t]
+\begin{table*}[!t] % Use table* for wide tables
     \caption{Libraries used in the implementation of our tool}
     \label{tab:libraries}
     \centering
@@ -14,10 +14,13 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
         vue.js           & UI framework         \\
         PrimeVue         & UI component library \\
         Tailwind CSS     & CSS utility          \\
+        @fortawesome/fontawesome-svg-core & Font Awesome SVG icons. \\
+        ajv@8.12.0 & JSON schema validator for Node.js and browsers. \\
+        brace@0.11.1 & Browser-based code editor with syntax highlighting and code folding. \\
+        primeicons@6.0.1 & It is a popular UI component library for JavaServer Faces (JSF) applications. \\
         \bottomrule
     \end{tabular}
-\end{table}
-
+\end{table*}
 \subsection{Tool Overview}\label{subsec:tool-overview} %keyuri
 
 
@@ -67,8 +70,8 @@ The File Editor view is primarily designed for creating and editing configuratio
 
 \subsubsection{Schema Editor}
 
-The Schema Editor view allows users to define and manage schema templates for configuration files. 
-This view is essential for maintaining consistency and structure within your configurations. 
+The Schema Editor view allows users to define and manage schema templates for configuration files.
+This view is essential for maintaining consistency and structure within your configurations.
 % Details of the Schema Editor and its functionalities can be inserted here.
 \begin{itemize}
     \item \textbf{New Empty Schema:} Clear the current schema for starting fresh.
@@ -101,7 +104,7 @@ This view is essential for maintaining consistency and structure within your con
 
 \subsubsection{Settings}
 
-The Settings view provides customization options for tailoring the tool to your specific needs. 
+The Settings view provides customization options for tailoring the tool to your specific needs.
 It allows user to configure various preferences and settings to enhance user's workflow.
 % Details of the Settings view and its functionalities can be inserted here.
 \begin{itemize}
@@ -135,7 +138,7 @@ In this section, we outline the workflow of our tool.
 
 \begin{enumerate}
     \item Users can open our tool ConfigAssistant. % todo link
-    \item Upon initial access, a default page is displayed, and users must select their desired Schema. 
+    \item Upon initial access, a default page is displayed, and users must select their desired Schema.
     We have implemented four options for this selection:
     \begin{enumerate}
         \item From File
@@ -146,7 +149,7 @@ In this section, we outline the workflow of our tool.
     Users can make their Schema selection either via a dialog box on the default page or in the schema Editor.
     \item After selecting a schema, the user will find that a GUI is automatically generated on the right-hand side of the File Editor, tailored to the selected schema.
     \item Through the GUI panel, users are assisted in creating or modifying configuration files effortlessly, ensuring a seamless configuration file generation process.
-    \item If a user wishes to modify the selected schema, such as adding new properties, they can do so through the schema editor. 
+    \item If a user wishes to modify the selected schema, such as adding new properties, they can do so through the schema editor.
     Changes can be made using either the GUI panel or the code panel, and these modifications will automatically reflect in the file editor.
 \end{enumerate}
 
@@ -157,11 +160,45 @@ In this section, we outline the workflow of our tool.
     \end{minipage}\label{fig:workflow}
 \end{figure}
 
-\subsection{Code Editor}\label{subsec:code-editor}
+\subsection{Code Panel}\label{subsec:code-editor}
 
-% todo decribe the code editor component and how it works
+The code editor is a GUI panel designed for editing the \cfgfiles.
+For this project, we use the popular \textbf{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
+% It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
+% It can be easily embedded in any web page or JavaScript application.
 
-\subsection{GUI Editor}\label{subsec:gui-editor}
+\subsubsection{Features}
+
+To make our code editor more user-friendly, we implemented several features, which are described in the following.
+
+\paragraph{Schema Validation}
+To provide the user feedback on whether their data is valid according to the provided schema, we perform schema validation.
+We make use of the \textbf{Ajv JSON schema validator}\cite{ajv-validator} library, which supports the newest JSON schema draft 2020-12.
+%Ajv firstly generates a fast validation function from the input schema.
+If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
+
+\paragraph{Syntax Highlighting}
+Ace Editor supports syntax highlighting for both JSON and YAML, which we use.
+The data format can be switched in the \textit{Settings} page.
+Note that Ace Editor allows to collapse/expand segments of the text, based on the hierarchical tree structure of the data.
+
+\paragraph{Linkage of text with the data model}
+As described in section \ref{subsubsec:design_text_editor_panel}, to map a cursor position in the text editor to a path in the data model we need to implement the function \textit{determinePath(editorContent, cursorPosition)} and to map a path in the data model to a text row in the editor, we need to implement the function \textit{determineRow(editorContent, dataPath)}. For every data format to be supported, those two functions need to be implemented.
+
+For \textit{JSON}, the functions have been implemented using a \textit{Concrete Syntax Tree (CST)}.
+The text content is parsed as a CST. Then the tree is is traversed recursively.
+Every tree node has a range property, describing the start and end index of the text belonging to the node.
+To determine the corresponding path for a cursor position, the cursor position is translated to a character index $targetCharacter$ within the text.
+Then the CST is traversed and for all nodes $currentNode$ of type array or object for which $targetCharacter \in currentNode.range$,
+the child nodes are checked and the key of the node (or index for array elements) is appended to the result path.
+This way, the corresponding path is built up. To determine the cursor position for a given path, the reverse is done: the CST is traversed until the effective path of the $currentNode$ is the target path. Then $currentNode.range.start$ is returned as result index, which is then translated into a cursor position (row and column).
+
+% TODO: section for YAML.
+
+\paragraph{Editor Operations}
+The code editor has more functionalities, such as the possibility to open a file by drag and drop into the editor, as well as customizable font sizes.
+
+\subsection{GUI Panel}\label{subsec:gui-editor}
 
 The GUI editor is a component that allows the user to edit the configuration data in a GUI, which is generated based on the schema of the configuration data.
 It is structured in a table-like way, where each row represents a key-value pair of the configuration data.
@@ -190,7 +227,7 @@ However, the user can also click on the property name or array index to \textit{
 This will show the sub-properties of that element at the top level, as if that property was the root of the data tree.
 The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
 
-% todo add figure to illustrate
+% todo add figure to illustrate (for all the different data types and features)
 
 \paragraph{Type specific components}
 
@@ -198,17 +235,18 @@ The breadcrumb at the top allows the user to see which path the GUI editor curre
 
 \paragraph{Remove Data}
 The user can delete properties or array elements from the data by clicking on the $\times$ button next to the edit field.
-This button is only shown if the property is not required.
+This button is only shown if the property is not required and there exists data.
 
 \paragraph{Schema Information Tooltip}
-When the user hovers over the property key or array index, an overlay is displayed which contains all information from the schema about that property.
+When the user hovers over the property key or array index, an overlay is displayed, which contains all information from the schema about that property.
 We manually implemented a generation of a textual description for each of the JSON schema keywords.
+Starting with title and description of the property, the overlay then shows constraints (such as the number must be greater than 0) and in the bottom it also shows schema violations, in case there are any.
 This feature helps the user to understand the constraints and the meaning of a property.
 
 \paragraph{Highlighting Schema Validation Errors}
-When the configuration data does not comply to the schema, the corresponding elements are underlined in red.
+When the configuration data does not comply to the schema, the corresponding elements are underlined in red and highlighted with a red error icon.
 This way, the user knows where any errors are.
-Additionally, when hovering over the property name, more details about the error are shown.
+Additionally, the schema information tooltip lists all schema violations.
 % todo add screenshot
 
 \subsection{Schema preprocessing}\label{subsec:schema-preprocessing}
@@ -216,7 +254,7 @@ Additionally, when hovering over the property name, more details about the error
 To represent the schema in the GUI editor, we preprocess the schema.
 We differentiate between three ways of preprocessing:
 A one-time preprocessing step when loading the schema, an internal preprocessing that happens at every layer of the schema tree,
-and calculating an effective schema that happens everytime the configuration data changes.
+and calculating an effective schema that happens every time the configuration data changes.
 
 \subsubsection{One-time Preprocessing Step}
 When the schema is loaded, we perform a one-time preprocessing step that currently only involves migrating the schema to the newest version,
@@ -229,7 +267,7 @@ After the migration, the resulting schema is loaded into the tool in the \textit
 \subsubsection{Internal preprocessing}
 This preprocessing steps are mainly used to generate the GUI editor and thus are internal steps that will not be visible for the user.
 They happen at every layer of the schema tree lazily, only when required.
-This lazy preprocessing is required as schemas can have circular references, which would lead to infinite loops.
+Laziness of the preprocessing is required as schemas can have circular references, which would, otherwise, lead to infinite loops.
 In the following, we describe the preprocessing steps in details.
 
 \paragraph{Resolving references}
@@ -246,7 +284,7 @@ this first preprocessing step.
         framesep=3mm,
         linenos=true,
         xleftmargin=15pt,
-        tabsize=4]{js}
+        tabsize=4]{json}
 {
   "title": "NonEmptyString",
   "$ref": "#/$defs/nonEmptyString",
@@ -302,7 +340,7 @@ It is important to note that this library only supports a few keywords of JSON s
 \texttt{properties} and \texttt{items} keyword.
 Hence, the support for allOf and any other keywords for which we use this in the preprocessing is limited.
 
-\begin{listing}[!h]
+\begin{listing}[h]
     \begin{minted}[frame=single,
         framesep=3mm,
         linenos=true,
@@ -324,7 +362,136 @@ Hence, the support for allOf and any other keywords for which we use this in the
     \label{listing:resolved-allOf}
 \end{listing}
 
-\paragraph{anyOf and oneOf} % todo
+
+\paragraph{Converting types to oneOf}
+In JSON schema, a property can have multiple supported types, such as shown in listing \ref{listing:multiple_types}.
+A semantically equivalent schema can be generated by the use of oneOf, where each sub-schema contains exactly one of the types, as shown in listing \ref{listing:multiple_types_converted}.
+If a schema defines more than one type, we convert the types to oneOf. This way, we reduce complexity by having to solve only the problem of oneOf.
+For schemas that already contain oneOf, every type is multiplied with every existing oneOf sub-schema.
+For 2 types and 3 oneOf sub-schemas, this will result in a new oneOf with 6 options.
+An exception is when a type can not be merged with an oneOf sub-schema (e.g. the type is "boolean" and the oneOf sub-schema has type "string").
+In that case, the incompatible pair is dismissed.
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{json}
+{
+  "type": ["object", "boolean"]
+}
+    \end{minted}
+    \caption{Simple JSON schema with two possible types}
+    \label{listing:multiple_types}
+\end{listing}
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "oneOf": [
+    {
+      "type": "object"
+    },
+    {
+      "type": "boolean"
+    },
+  ]
+}
+    \end{minted}
+    \caption{Simple JSON schema after conversion of types to oneOf}
+    \label{listing:multiple_types_converted}
+\end{listing}
+
+
+\paragraph{Removing incompatible oneOfs and anyOfs}
+It can happen that a schema has oneOf or anyOf options which are not compatible with the schema of the property (e.g. sub-schemas that can never be fulfilled in combination with the property schema).
+Listing \ref{listing:incompatible_one_ofs} provides an example of a schema with an incompatible oneOf option.
+An example where this occurs is in our adjusted JSON schema meta schema, if we assign the root property the jsonSchema sub-schema, which allows objects and booleans, but then additionally restrict the root to be an object.
+For every oneOf and anyOf sub-schema, we check whether it can be merged with the schema of the property.
+The options which are not compatible (can not be merged) are removed (see listing \ref{listing:incompatible_one_ofs_removed}).
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "type": "object",
+  "oneOf": [
+    {
+      "type": "object"
+    },
+    {
+      "type": "boolean"
+    },
+  ]
+}
+    \end{minted}
+    \caption{Simple JSON schema with incompatible oneOf option}
+    \label{listing:incompatible_one_ofs}
+
+\end{listing}
+
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "type": "object",
+  "oneOf": [
+    {
+      "type": "object"
+    }
+  ]
+}
+    \end{minted}
+    \caption{Simple JSON schema with incompatible oneOf option removed}
+    \label{listing:incompatible_one_ofs_removed}
+\end{listing}
+
+
+\paragraph{Merging singular oneOfs and anyOfs}
+Because of the previous pre-processing step, it can happen that for some oneOfs or anyOfs there remains only one compatible sub-schema left (see listing \ref{listing:incompatible_one_ofs_removed}).
+If this is the case, the use oneOf/anyOf is redundant, as that singular sub-schema must be chosen implicitly.
+Therefore, if there exists only one singular choice for oneOf/anyOf, we merge its sub-schema into the property schema and remove the use of oneOf/anyOf (see listing \ref{listing:singular_one_of_merged}).
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{js}
+{
+  "type": "object"
+}
+    \end{minted}
+    \caption{Simple JSON schema with singular oneOf merged into property schema}
+    \label{listing:singular_one_of_merged}
+\end{listing}
+
+
+\paragraph{Attempting to merge oneOfs into anyOfs}
+Schemas can use both anyOf and oneOf at the same time.
+Especially after converting all types (when there is more than one type) to oneOf, it happens that a schema has oneOf options (typically for types) and simultaneously anyOf options.
+The user will then have to select both an oneOf sub-schema, as well as an anyOf sub-schema in the GUI.
+We observed a special scenario in the JSON meta schema, where the oneOf selection was always implicitly given by the anyOf selection.
+For every single anyOf sub-schema, only one oneOf sub-schema was compatible.
+In that scenario, we can merge the oneOfs into the anyOfs: for every anyOf sub-schema, we merge the one compatible oneOf sub-schema into it.
+This is precisely what this pre-processing step does: if possible, the oneOf sub-schemas are merged into the anyOf sub-schemas and the oneOf property is removed from the schema.
+
+
+\paragraph{Preprocessing oneOfs and anyOfs}
+For all remaining oneOf and anyOf sub-schems, the internal pre-processing steps are executed.
+
 
 \paragraph{Title inducing}
 
@@ -342,7 +509,7 @@ As we use the title in various cases to display for the user, we inject the prop
   "type": "object",
   "properties": {
     "name": {
-        "type": "string"
+      "type": "string"
     }
   }
 }
@@ -361,8 +528,8 @@ As we use the title in various cases to display for the user, we inject the prop
   "type": "object",
   "properties": {
     "name": {
-        "title": "name",
-        "type": "string"
+      "title": "name",
+      "type": "string"
     }
   }
 }
@@ -394,48 +561,86 @@ For schemas without any of those keywords, this step is trivial as the schema is
 
 %todo examples
 
-\subsubsection*{\bf A plain unnumbered list}
-\begin{list}{}{}
-    \item{bare\_jrnl.tex}
-    \item{bare\_conf.tex}
-    \item{bare\_jrnl\_compsoc.tex}
-    \item{bare\_conf\_compsoc.tex}
-    \item{bare\_jrnl\_comsoc.tex}
-\end{list}
+\subsection{Schema editor}\label{subsec:schema-editor}
 
-\subsection{Figures}
-Fig. 1 is an example of a floating figure using the graphicx package.
-Note that $\backslash${\tt{label}} must occur AFTER (or within) $\backslash${\tt{caption}}.
-For figures, $\backslash${\tt{caption}} should occur after the $\backslash${\tt{includegraphics}}.
+The schema editor page has the same structure as the File editor page, as discussed in previous sections.
+The only difference is that the schema used for generating the GUI panel is not the schema file provided by the user but the Json schema meta schema,
+i.e., the schema that defines the structure of valid JSON schema files.
+However, applying our generic approach on the official Json schema meta schema (TODO citation) does not result in a user-friendly editor for
+creating and modifying schema files.
+In this section we discuss the reasons for that and how we developed a new meta schema that circumvents the problems of the official meta schema.
 
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{fig1}
-%\caption{Simulation results for the network.}
-%\label{fig_1}
-%\end{figure}
+\subsubsection{Missing descriptions}
+With the \texttt{description} keyword, schema authors can give descriptions to any elements of their schema.
+This can help the user of a schema in many ways, for example, the author can specify the unit of a numeric field or give other additional information.
+The JSON schema meta schema does not provide any descriptions.
+Users, especially those without prior knowledge in JSON schema, might not understand the meaning of the fields of JSON schema.
+Thus, we insert descriptions from the JSON schema specification (TODO citation) into our modified meta-schema.
 
-Fig. 2(a) and 2(b) is an example of a double column floating figure using two subfigures.
-(The subfig.sty package must be loaded for this to work.)
-The subfigure $\backslash${\tt{label}} commands are set within each subfloat command,
-and the $\backslash${\tt{label}} for the overall figure must come after $\backslash${\tt{caption}}.
-$\backslash${\tt{hfil}} is used as a separator to get equal spacing.
-The combined width of all the parts of the figure should do not exceed the text width or a line break will occur.
-%
-%\begin{figure*}[!t]
-%\centering
-%\subfloat[]{\includegraphics[width=2.5in]{fig1}%
-%\label{fig_first_case}}
-%\hfil
-%\subfloat[]{\includegraphics[width=2.5in]{fig1}%
-%\label{fig_second_case}}
-%\caption{Dae. Ad quatur autat ut porepel itemoles dolor autem fuga. Bus quia con nessunti as remo di quatus non perum que nimus. (a) Case I. (b) Case II.}
-%\label{fig_sim}
-%\end{figure*}
+\subsubsection{External references}
+\toolname does not support references to external schemas yet, i.e., references inside the schema to a schema at a specific URL\@.
+Also, \toolname does not support the \texttt{\$vocabulary} keyword yet.
+Both features are used in the JSON schema meta schema, as it is distributed over multiple schema files.
+To circumvent that problem, we put all schemas in one schema file into the \texttt{\$defs} object and replace the external references with local references.
 
-Note that often IEEE papers with multi-part figures do not place the labels within the image itself (using the optional argument to $\backslash${\tt{subfloat}}[]), but instead will
-reference/describe all of them (a), (b), etc., within the main caption.
-Be aware that for subfig.sty to generate the (a), (b), etc., subfigure
-labels, the optional argument to $\backslash${\tt{subfloat}} must be present. If a
-subcaption is not desired, leave its contents blank,
-e.g.,$\backslash${\tt{subfloat}}[].
+\subsubsection{Use of dynamic anchors and references}
+The JSON schema meta schema uses dynamic references and dynamic anchors.
+The difference of those keywords in comparison to the \texttt{\$ref} keyword is that they provide a way to dynamically extend the JSON meta schema
+at runtime.
+For example, one could combine the JSON schema meta schema with an extension that defines how fields should be serialized in XML\@.
+We do not support dynamic references and anchors yet.
+We replaced all of them by ``non-dynamic'' references using the \texttt{\$ref} keyword.
+
+\subsubsection{Allowing each field in each context}
+The JSON schema meta schema allows each field in each context.
+For example, if the \texttt{type} keyword is used and set to \texttt{string}, then the \texttt{properties} keyword is allowed,
+even though it does not make sense in that context.
+According to the specification, any validator should ignore the fields that do not make sense in the current context.
+Consequently, the user does not need to see those fields, but instead, the user gets overwhelmed by the amount of fields
+and does not know which fields are relevant for the current context.
+This is also a feedback we got from our user study.
+Thus, we added \texttt{if} conditions to each field to only show them when they make sense in the current context.
+Listing~\ref{lst:if-then-else} shows an example of such an \texttt{if} condition.
+The relevant properties for arrays are only shown when the current property is of type array.
+
+\begin{listing}[!h]
+    \begin{minted}[frame=single,
+        framesep=3mm,
+        linenos=true,
+        xleftmargin=15pt,
+        tabsize=4]{json}
+{
+  "if": {
+    "$ref": "#/$defs/hasTypeArray"
+  },
+  "then": {
+    "$ref": "#/$defs/arrayProperty"
+  }
+}
+    \end{minted}
+    \caption{If condition for array properties. The \texttt{hasTypeArray} is valid if the current property is of type array. The \texttt{arrayProperty} schema defines the properties of an array.}
+    \label{lst:if-then-else}
+\end{listing}
+
+To even more reduce the amount of fields shown to the user, we also introduced a custom keyword just for our own meta schema.
+The keyword \texttt{advanced} is a boolean field that is set to \texttt{false} by default.
+It is wrapped in an \texttt{metaConfigurator} object, which is ignored by any validator as it is not part of the JSON schema specification.
+We use this wrapper to prevent any other schema extensions from colliding with our keyword.
+When set to \texttt{true}, the field not shown by default, but only when the user expands the advanced section.
+We put all fields that are not required for the basic usage of the schema into the advanced section.
+For this, we oriented ourselves on the work of Baazizi et al.~\cite{baazizi2021empirical}, which analyzed the usage of JSON schema keywords in 82,000 JSON schemas.
+
+% TODO screenshots
+
+
+% paul
+% todo consider putting somewhere else
+\subsection{JSON schema versions}\label{subsec:json-schema-versions}
+
+JSON schema has had 10 different drafts over the years, the newest being draft 2020--12~\cite{jsonschemaJSONSchema}.
+In real-world we cannot expect all schemas to have the newest version.
+Baazizi et al.~\cite{baazizi2021empirical} investigated over 82.000 open-source schemas in 2021, where they found that most of them are using draft 4, which was released in 2013.
+As the different drafts are not necessarily compatible with each other, tools supporting one draft become outdated when a new draft releases.
+However, Viotto et al.~\cite{Viotti_Lagoni_2023} provide a library for migration schemas from older versions to the newest draft without loss of information.
+Thus, by using this library, our tool only needs to support the newest draft directly.
+If a user uses a schema from an older draft, we first migrate it to the newest draft internally.
