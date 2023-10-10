@@ -31,23 +31,15 @@ The tool provides a comprehensive solution for managing configuration files with
     \item \textbf{Schema Editor}: Use this view to edit the schema of configuration files.
     \item \textbf{Settings}: The Settings view allows user to configure various tool settings.
 \end{itemize}
-\begin{minipage}[t]{0.5\textwidth} % Adjust the width as needed
-    \includegraphics[width=3.5in]{figures/Views}
-\end{minipage}
-
-While these views share a similar appearance, right side GUI Panel and left side Code Panel,
-\begin{figure}[h]
-    \includegraphics[width=3.5 in]{figures/Code Panel}
-    \caption{Code Panel}
-\end{figure}
-\begin{figure}[h]
-    \includegraphics[width=3.5 in]{figures/GUI Panel.jpg}
-    \caption{GUI Panel}
-\end{figure}
-each serves a different purpose, which we discuss in the following.
+While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose. The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
 
 \subsubsection{File Editor}
-The File Editor view is primarily designed for creating and editing configuration files.It features a user-friendly top menu bar that provides various essential functionalities:
+The File Editor view (1) has been primarily designed to facilitate the creation and editing of configuration files. This view is equipped with a user-friendly top menu bar (2) that offers a range of essential functionalities.
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/fileeditor}
+    \caption{FileEditor}
+    \label{fig:fileeditor}
+\end{figure}
 \begin{itemize}
     \item \textbf{New File:} Create a new configuration file. This option also includes two subitems:
     \begin{itemize}
@@ -71,8 +63,12 @@ The File Editor view is primarily designed for creating and editing configuratio
 
 \subsubsection{Schema Editor}
 
-The Schema Editor view allows users to define and manage schema templates for configuration files.
-This view is essential for maintaining consistency and structure within your configurations.
+In the context of the figure, the Schema Editor view (1) empowers users to define and manage schema templates for configuration files. This view plays a crucial role in maintaining consistency and structure within your configurations.
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/schemaeditor}
+    \caption{SchemaEditor}
+    \label{fig:schemaeditor}
+\end{figure}
 % Details of the Schema Editor and its functionalities can be inserted here.
 \begin{itemize}
     \item \textbf{New Empty Schema:} Clear the current schema for starting fresh.
@@ -96,29 +92,30 @@ This view is essential for maintaining consistency and structure within your con
     \item \textbf{Download Schema:} Download the current schema for later use or reference.
 \end{itemize}
 \begin{itemize}
-    \item \textbf{Undo/Redo:} Easily undo or redo actions to manage schema changes effectively.
+    \item \textbf{Undo/Redo:} Same as File Editor
 
 \end{itemize}
 \begin{itemize}
-    \item \textbf{Search:} Utilize the search option to quickly find and navigate within user's schema definitions, enhancing schema management.
+    \item \textbf{Search:} Same as File editor
 \end{itemize}
 
 \subsubsection{Settings}
 
-The Settings view provides customization options for tailoring the tool to your specific needs.
+The Settings view (1) provides customization options for tailoring the tool to your specific needs.
 It allows user to configure various preferences and settings to enhance user's workflow.
+\begin{figure}[h]
+    \includegraphics[width=3.5 in]{figures/settings}
+    \caption{Settings}
+    \label{fig:settings}
+\end{figure}
 % Details of the Settings view and its functionalities can be inserted here.
 \begin{itemize}
     \item \textbf{Save:} Save the current Settings that user configured.
-    \item \textbf{Undo/Redo:} Quickly undo or redo actions related to configuration settings adjustments.
-    \item \textbf{Search:} Utilize the search option to find specific configuration settings or preferences efficiently.
+    \item \textbf{Undo/Redo:} Same as File Editor
+    \item \textbf{Search:} Same as File Editor
 \end{itemize}
 
-The Settings view allows users to configure various settings:
-\begin{figure}[h]
-    \includegraphics[width=3.5 in]{figures/GUI Editor Pannel Settings}
-    \caption{Settings's GUI Pannel}
-\end{figure}
+The Settings view allows users to configure various settings via GUI Panel:
 \begin{itemize}
     \item \textbf{Data Format:} Users can select between JSON and YAML data format.
     The choice made here will influence all three views.
@@ -158,9 +155,9 @@ In this section, we outline the workflow of our tool.
     \begin{minipage}[t]{0.5\textwidth}
         \includegraphics[width=3.5in]{figures/Toolworkflow}
         \caption{Workflow}
+        \label{workflow}
     \end{minipage}\label{fig:workflow}
 \end{figure}
-
 \subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
