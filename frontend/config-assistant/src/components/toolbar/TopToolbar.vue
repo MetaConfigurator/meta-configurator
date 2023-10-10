@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, Ref, ref, watch} from 'vue';
+import {Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
@@ -11,7 +11,6 @@ import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/data/SchemaCollection';
 import {useToast} from 'primevue/usetoast';
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
@@ -28,10 +27,9 @@ import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema, searchResultToMenuItem} from '@/helpers/search';
 import {focus} from '@/helpers/focusUtils';
 
-import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
-import {useDataStore} from '@/store/dataStore';
-
 import {GuiConstants} from '@/constants';
+import type {SchemaOption} from '@/model/SchemaOption';
+import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -40,14 +38,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
-const selectedSchema = ref<{
-  label: string;
-  icon: string;
-  command: () => void;
-  schema: JsonSchema;
-  url: string | undefined;
-  key: string | undefined;
-}>(null);
+
+const selectedSchema = ref<SchemaOption | null>(null);
 
 const showFetchedSchemas = ref(false);
 const showAboutDialog = ref(false);
@@ -60,8 +52,7 @@ const topMenuBar = new TopMenuBar(
   toast,
   handleFromWebClick,
   handleFromOurExampleClick,
-  showUrlDialog,
-  toggleSearchBar
+  showUrlDialog
 );
 
 function getPageName(): string {
@@ -133,7 +124,7 @@ function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
       handleFromWebClick();
       break;
     case 'File':
-      openUploadFileDialog();
+      openUploadSchemaDialog();
       break;
     case 'URL':
       showUrlDialog();
@@ -156,9 +147,7 @@ function handleFromOurExampleClick() {
   showFetchedSchemas.value = true;
   topMenuBar.showDialog.value = true;
 }
-onMounted(() => {
-  showInitialSchemaDialog();
-});
+
 watch(selectedSchema, async newSelectedSchema => {
   if (!newSelectedSchema) {
     return;
@@ -265,7 +254,6 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
 });
 
 const searchTerm: Ref<string> = ref('');
-const searchBarVisible = ref(false);
 
 const initialSchemaSelectionDialog = ref();
 // Function to show the category selection dialog
@@ -273,30 +261,19 @@ const showInitialSchemaDialog = () => {
   initialSchemaSelectionDialog.value?.show();
 };
 
+defineExpose({
+  showInitialSchemaDialog,
+});
+
 useMagicKeys({
   passive: false,
   onEventFired(event) {
     if (event.key === 'f' && event.ctrlKey) {
       event.preventDefault();
-      showSearchBar();
+      focus('searchBar');
     }
   },
 });
-
-function showSearchBar() {
-  searchBarVisible.value = true;
-  focus('searchBar');
-}
-
-function toggleSearchBar() {
-  searchBarVisible.value = !searchBarVisible.value;
-  if (!searchBarVisible.value) {
-    searchTerm.value = '';
-  } else {
-    focus('searchBar');
-  }
-}
-
 const searchResultMenu = ref();
 const searchResultItems = ref<MenuItem[]>([]);
 
@@ -420,7 +397,7 @@ const showSearchResultsMenu = event => {
       </div>
 
       <!-- search bar -->
-      <span class="p-input-icon-left ml-5" style="width: 20rem" v-if="searchBarVisible">
+      <span class="p-input-icon-left ml-5" style="width: 20rem">
         <i class="pi pi-search" style="font-size: 0.9rem" />
         <InputText
           show-clear
@@ -439,12 +416,7 @@ const showSearchResultsMenu = event => {
           </div>
         </template>
       </Menu>
-      <Button
-        v-if="searchBarVisible"
-        class="toolbar-button"
-        text
-        :disabled="!searchTerm"
-        @click="() => (searchTerm = '')">
+      <Button class="toolbar-button" text :disabled="!searchTerm" @click="() => (searchTerm = '')">
         <i class="pi pi-times" />
       </Button>
     </template>

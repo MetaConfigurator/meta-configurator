@@ -1,51 +1,49 @@
 <script setup lang="ts">
-import {ref, watch} from 'vue';
+import {ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {ValidationResults} from '@/helpers/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: string | undefined;
   propertySchema: JsonSchema;
+  validationResults: ValidationResults;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update_property_value', newValue: string | undefined): void;
+  (e: 'update:propertyData', newValue: string | undefined): void;
 }>();
 
-const valueProperty = ref<string | undefined>(props.propertyData);
-
-watch(
-  props,
-  () => {
-    valueProperty.value = props.propertyData;
-  },
-  {immediate: true, deep: true}
-);
+// new reference to the property data, so that we can emit the update event
+// only when the user is done editing and not on every keystroke
+const newPropertyData = ref(props.propertyData);
 
 function updateValue() {
-  if (valueProperty.value === undefined) {
-    return;
-  }
-  emit('update_property_value', valueProperty.value);
+  emit('update:propertyData', newPropertyData.value);
 }
 </script>
 
 <template>
   <InputText
-    :class="$style.tableInput"
-    class="h-8"
-    v-model="valueProperty"
+    :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
+    class="h-8 tableInput"
+    :model-value="props.propertyData"
+    @update:model-value="value => (newPropertyData = value)"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     @blur="updateValue"
+    @keydown.stop
     @keyup.enter="updateValue" />
 </template>
 
-<style module>
+<style scoped>
 /* remove border so it fits the look of the table better */
 .tableInput {
   border: none;
+}
+::placeholder {
+  color: #a8a8a8;
 }
 </style>

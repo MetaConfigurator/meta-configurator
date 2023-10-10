@@ -20,4 +20,13 @@ export class ConfigManipulatorYaml implements ConfigManipulator {
   determinePath(editorContent: string, targetCharacter: number): Path {
     return ['TODO'];
   }
+
+  isValidSyntax(editorContent: string): boolean {
+    try {
+      this.parseFileContent(editorContent);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

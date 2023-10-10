@@ -5,6 +5,8 @@ import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
 // @ts-ignore
 import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
+import {preprocessOneTime} from '@/helpers/schema/oneTimeSchemaPreprocessor';
+import {SessionMode, useSessionStore} from '@/store/sessionStore';
 
 export const useDataStore = defineStore('dataStore', () => {
   /**
@@ -20,39 +22,45 @@ export const useDataStore = defineStore('dataStore', () => {
     description: 'Go to the schema editor to load a schema.',
   });
 
+  const schemaDataPreprocessed = computed(() => preprocessOneTime(schemaData.value));
+
   /**
    * The json schema as a TopLevelJsonSchema object
    */
-  const schema = ref(new TopLevelJsonSchema(schemaData.value));
+  const schema = ref(new TopLevelJsonSchema(schemaDataPreprocessed.value));
 
   /**
    * The json schema meta schema as a plain object
    */
-  const metaSchemaData = ref(simplifiedMetaSchema);
+  const metaSchemaData = ref(preprocessOneTime(simplifiedMetaSchema));
 
   /**
    * The json schema meta schema as a TopLevelJsonSchema object
    */
   const metaSchema: Ref<TopLevelJsonSchema> = computed(
-    () => new TopLevelJsonSchema(metaSchemaData.value as any)
+    () => new TopLevelJsonSchema(metaSchemaData.value)
   );
 
   // make sure that the schema is not preprocessed too often
-  watchDebounced(
-    schemaData,
-    () => {
-      schema.value = new TopLevelJsonSchema(schemaData.value);
-    },
-    {
-      debounce: 1000,
+  watchDebounced(schemaData, () => reloadSchema(), {
+    debounce: 1000,
+    immediate: true,
+  });
+
+  function reloadSchema() {
+    if (useSessionStore().currentMode === SessionMode.FileEditor) {
+      const preprocessedSchema = preprocessOneTime(schemaData.value);
+      schema.value = new TopLevelJsonSchema(preprocessedSchema);
     }
-  );
+  }
 
   return {
     fileData,
     schema,
     schemaData,
+    schemaDataPreprocessed,
     metaSchema,
     metaSchemaData,
+    reloadSchema,
   };
 });

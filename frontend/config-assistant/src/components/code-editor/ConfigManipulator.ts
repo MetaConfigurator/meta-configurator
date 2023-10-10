@@ -7,4 +7,6 @@ export interface ConfigManipulator {
 
   parseFileContent(editorContent: string): any;
   stringifyContentObject(content: any): string;
+
+  isValidSyntax(editorContent: string): boolean;
 }

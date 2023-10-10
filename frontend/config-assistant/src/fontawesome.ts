@@ -19,6 +19,7 @@ import {
   faRotateRight,
   faSearch,
   faShareNodes,
+  faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -48,4 +49,5 @@ export function registerIcons() {
   library.add(faCircleInfo);
   library.add(faFontAwesome);
   library.add(faSearch);
+  library.add(faTriangleExclamation);
 }

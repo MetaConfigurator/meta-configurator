@@ -7,7 +7,7 @@ import {
 } from '@/helpers/schema/SchemaUtils';
 import type {Path, PathElement} from '@/model/path';
 import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
-import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
+import _ from 'lodash';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -36,15 +36,13 @@ export class JsonSchema {
   private _else?: JsonSchema;
   private _contentSchema?: JsonSchema;
 
-  private _userSelectionOnOfAnyOf?: OneOfAnyOfSelectionOption; // TODO move to session store
-  // TODO different user selections for oneOf and anyOf, multiple selections for anyOf
-
-  constructor(jsonSchema: JsonSchemaType) {
+  constructor(jsonSchema: JsonSchemaType, preprocess = true) {
     this.jsonSchema = nonBooleanSchema(jsonSchema);
-    if (this.jsonSchema !== undefined) {
-      this.jsonSchema = preprocessSchema(this.jsonSchema);
+    if (preprocess && this.jsonSchema !== undefined) {
+      this.jsonSchema = nonBooleanSchema(preprocessSchema(this.jsonSchema));
     }
   }
+
   /**
    * Returns an empty, initial value that matches the type of
    * the schema (this is NOT the default value).
@@ -107,11 +105,11 @@ export class JsonSchema {
       return undefined;
     }
     if (typeof subElement === 'string') {
-      return this.resolveOneOfAnyOf().subProperty(subElement);
+      return this.subProperty(subElement);
     }
 
     // subElement is a number
-    return this.subItem(subElement)?.resolveOneOfAnyOf();
+    return this.subItem(subElement);
   }
 
   subProperty(subElement: string): JsonSchema | undefined {
@@ -147,38 +145,20 @@ export class JsonSchema {
     return this.items;
   }
 
-  public resolveOneOfAnyOf() {
-    const selectedOption = this.userSelectionOneOfAnyOf;
-    if (this.oneOf.length > 0) {
-      return this.oneOf[selectedOption?.index ?? 0];
-    }
-    if (this.anyOf.length > 0) {
-      return this.anyOf[selectedOption?.index ?? 0];
-    }
-    return this;
-  }
-
   get isAlwaysTrue(): boolean {
-    return JSON.stringify(this.jsonSchema) === '{}';
+    return _.isEmpty(this.jsonSchema);
   }
 
   get isAlwaysFalse(): boolean {
     return this.jsonSchema === undefined;
   }
 
-  get userSelectionOneOfAnyOf(): OneOfAnyOfSelectionOption | undefined {
-    return this._userSelectionOnOfAnyOf;
-  }
-
-  set userSelectionOneOfAnyOf(value) {
-    this._userSelectionOnOfAnyOf = value;
-  }
-
   get isDataDependent(): boolean {
     return (
       this.if !== undefined ||
       this.dependentSchemas !== undefined ||
-      this.dependentRequired !== undefined
+      this.dependentRequired !== undefined ||
+      this.conditions.length > 0
     );
   }
 
@@ -324,6 +304,13 @@ export class JsonSchema {
       this._not = schemaFromObject(this.jsonSchema?.not);
     }
     return this._not;
+  }
+
+  /**
+   * Custom field that potentially contains all if-then-else conditions of the allOfs.
+   */
+  get conditions(): JsonSchema[] {
+    return schemaArray(this.jsonSchema?.conditions);
   }
 
   /**
@@ -799,5 +786,12 @@ export class JsonSchema {
    */
   get writeOnly(): boolean {
     return this.jsonSchema?.writeOnly ?? false;
+  }
+
+  /**
+   * Meta configurator specific properties.
+   */
+  get metaConfigurator(): {advanced: boolean} | undefined {
+    return this.jsonSchema?.metaConfigurator;
   }
 }

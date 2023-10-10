@@ -33,4 +33,9 @@ app.config.errorHandler = (error: unknown) => errorService.onError(error);
 
 registerIcons();
 
+// warn the user if he closes the app
+window.addEventListener('beforeunload', event => {
+  event.returnValue = null;
+});
+
 app.mount('#app');

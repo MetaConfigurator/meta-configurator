@@ -118,4 +118,13 @@ export class ConfigManipulatorJson implements ConfigManipulator {
       }
     }
   }
+
+  isValidSyntax(editorContent: string): boolean {
+    try {
+      this.parseFileContent(editorContent);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

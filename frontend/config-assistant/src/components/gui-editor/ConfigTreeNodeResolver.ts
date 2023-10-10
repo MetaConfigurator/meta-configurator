@@ -13,6 +13,7 @@ import {useSessionStore} from '@/store/sessionStore';
 import _ from 'lodash';
 import type {EffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
+import {safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
 
 /**
  * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
@@ -54,15 +55,17 @@ export class ConfigTreeNodeResolver {
       type: nodeType,
       key: pathToString(absolutePath),
       children: [],
-      leaf: this.isLeaf(schema, depth),
+      leaf: this.isLeaf(schema, depth, absolutePath),
     };
   }
 
-  private isLeaf(schema: JsonSchema, depth: number): boolean {
+  private isLeaf(schema: JsonSchema, depth: number, absolutePath: Path): boolean {
     const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
     if (dependsOnUserSelection) {
-      const hasUserSelection = schema.userSelectionOneOfAnyOf;
-      if (!hasUserSelection) {
+      const path = pathToString(absolutePath);
+      const hasUserSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.has(path);
+      const hasUserSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.has(path);
+      if (!(hasUserSelectionOneOf || hasUserSelectionAnyOf)) {
         return true;
       }
     }
@@ -74,6 +77,9 @@ export class ConfigTreeNodeResolver {
   }
 
   public createChildNodesOfNode(guiEditorTreeNode: GuiEditorTreeNode): GuiEditorTreeNode[] {
+    if (guiEditorTreeNode.type === TreeNodeType.ADVANCED_PROPERTY) {
+      return guiEditorTreeNode.children as GuiEditorTreeNode[]; // children were already created
+    }
     if (
       guiEditorTreeNode.type === TreeNodeType.ADD_ITEM ||
       guiEditorTreeNode.type === TreeNodeType.ADD_PROPERTY
@@ -171,6 +177,17 @@ export class ConfigTreeNodeResolver {
       );
     }
 
+    const advanced = this.createTreeNodeOfAdvancedProperty(
+      absolutePath,
+      relativePath,
+      schema,
+      depth
+    );
+
+    if (advanced) {
+      result.push(advanced);
+    }
+
     const data = useSessionStore().dataAtPath(absolutePath);
     if (this.shouldAddAddPropertyNode(schema, data)) {
       return result.concat(
@@ -179,6 +196,41 @@ export class ConfigTreeNodeResolver {
     }
 
     return result;
+  }
+
+  private createTreeNodeOfAdvancedProperty(
+    absolutePath: Path,
+    relativePath: Path,
+    schema: JsonSchema,
+    depth: number
+  ): GuiEditorTreeNode | undefined {
+    const advanced = {
+      data: {
+        name: schema.title ?? '',
+        schema: schema,
+        parentSchema: schema,
+        parentName: '',
+        depth: 0,
+        relativePath: relativePath,
+        absolutePath: absolutePath,
+      },
+      type: TreeNodeType.ADVANCED_PROPERTY,
+      key: pathToString(absolutePath) + '$advanced',
+      children: this.createPropertiesChildNodes(
+        absolutePath,
+        relativePath,
+        schema,
+        depth + 1,
+        () => true,
+        true
+      ),
+    };
+
+    if (advanced.children.length > 0) {
+      return advanced;
+    }
+
+    return undefined;
   }
 
   private createObjectChildrenNodesPriorityOrder(
@@ -272,19 +324,22 @@ export class ConfigTreeNodeResolver {
     relativePath: Path,
     schema: JsonSchema,
     depth: number,
-    filter: (key: string) => boolean = () => true
+    filter: (key: string) => boolean = () => true,
+    advanced = false
   ) {
     return Object.entries(schema.properties)
       .filter(([key]) => filter(key))
-      .map(([key, value]) =>
-        this.createTreeNodeOfProperty(
+      .filter(([, value]) => (value?.metaConfigurator?.advanced ?? false) === advanced)
+      .map(([key, value]) => {
+        const childPath = absolutePath.concat(key);
+        return this.createTreeNodeOfProperty(
           value,
           schema,
-          absolutePath.concat(key),
+          childPath,
           relativePath.concat(key),
           depth + 1
-        )
-      );
+        );
+      });
   }
 
   private createDataPropertiesChildNodes(
@@ -303,10 +358,11 @@ export class ConfigTreeNodeResolver {
       .filter(([key]) => filter(key))
       .map(([key]) => {
         if (schema.properties && schema.properties[key]) {
+          const childPath = absolutePath.concat(key);
           return this.createTreeNodeOfProperty(
             schema.properties[key],
             schema,
-            absolutePath.concat(key),
+            childPath,
             relativePath.concat(key),
             depth + 1
           );
@@ -322,10 +378,11 @@ export class ConfigTreeNodeResolver {
           }
         });
 
+        const childPath = absolutePath.concat(key);
         return this.createTreeNodeOfProperty(
           childSchema,
           schema,
-          absolutePath.concat(key),
+          childPath,
           relativePath.concat(key),
           depth + 1,
           type
@@ -343,10 +400,11 @@ export class ConfigTreeNodeResolver {
     let children: GuiEditorTreeNode[] = [];
     if (Array.isArray(data)) {
       children = data.map((value: any, index: number) => {
+        const childPath = absolutePath.concat(index);
         return this.createTreeNodeOfProperty(
           schema.items,
           schema,
-          absolutePath.concat(index),
+          childPath,
           relativePath.concat(index),
           depth + 1
         );
@@ -411,12 +469,18 @@ export class ConfigTreeNodeResolver {
     schema: JsonSchema,
     depth: number
   ) {
-    const selectionOption = schema.userSelectionOneOfAnyOf;
+    const path = pathToString(absolutePath);
+    const userSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.get(path);
 
-    if (selectionOption !== undefined) {
-      const subSchema = schema.oneOf[selectionOption.index];
+    if (userSelectionOneOf !== undefined) {
+      const baseSchema = {...schema.jsonSchema};
+      delete baseSchema.oneOf;
+      const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
+      const mergedSchema = new JsonSchema({
+        allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
+      });
       return [
-        this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
+        this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
       ];
     }
     return [];
@@ -428,12 +492,28 @@ export class ConfigTreeNodeResolver {
     schema: JsonSchema,
     depth: number
   ) {
-    const selectionOption = schema.userSelectionOneOfAnyOf;
+    const path = pathToString(absolutePath);
+    const userSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.get(path);
 
-    if (selectionOption !== undefined) {
-      const subSchema = schema.anyOf[selectionOption.index];
+    if (userSelectionAnyOf !== undefined) {
+      const baseSchema = {...schema.jsonSchema};
+      delete baseSchema.anyOf;
+      const subSchemasAnyOf = userSelectionAnyOf.map(userSelectionEntry => {
+        return schema.anyOf[userSelectionEntry.index].jsonSchema ?? {};
+      });
+      const mergedSchema = safeMergeSchemas(baseSchema, ...subSchemasAnyOf);
+      if (!mergedSchema) {
+        // user selected schemas that are not compatible -> can never be fulfilled
+        return [];
+      }
       return [
-        this.createTreeNodeOfProperty(subSchema, schema, absolutePath, relativePath, depth + 1),
+        this.createTreeNodeOfProperty(
+          new JsonSchema(mergedSchema),
+          schema,
+          absolutePath,
+          relativePath,
+          depth + 1
+        ),
       ];
     }
     return [];

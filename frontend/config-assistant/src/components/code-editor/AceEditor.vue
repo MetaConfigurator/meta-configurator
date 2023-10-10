@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, Ref, ref, watchEffect} from 'vue';
+import {computed, onMounted, Ref, ref, watch, watchEffect} from 'vue';
 import {storeToRefs} from 'pinia';
 import type {Editor, Position} from 'brace';
 import * as ace from 'brace';
@@ -10,7 +10,7 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import _ from 'lodash';
-import {useDebounceFn, watchArray, watchThrottled} from '@vueuse/core';
+import {useDebounceFn, watchArray} from '@vueuse/core';
 import type {Path} from '@/model/path';
 import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
@@ -31,7 +31,7 @@ const props = defineProps<{
 
 let editor: Ref<Editor>;
 
-let currentSelectionIsForcedFromOutside = false;
+let currentChangeForcedFromOutside = false;
 const manipulator = createConfigManipulator(props.dataFormat);
 
 let editorWrapper: CodeEditorWrapper;
@@ -39,17 +39,44 @@ let editorWrapper: CodeEditorWrapper;
 /**
  * Debounce time for writing changes to store in ms
  */
-const WRITE_DEBOUNCE_TIME = 50;
-/**
- * Throttle time for reading changes from store in ms
- */
-const READ_THROTTLE_TIME = 100;
+const WRITE_DEBOUNCE_TIME = 100;
 
 function createConfigManipulator(dataFormat: string): ConfigManipulator {
   if (dataFormat == 'json') {
     return new ConfigManipulatorJson();
   } else if (dataFormat == 'yaml') {
     return new ConfigManipulatorYaml();
+  }
+}
+
+const editorDiv = ref();
+
+function onDragOver(e: DragEvent) {
+  e.stopPropagation();
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+}
+
+function onDragEnter() {
+  editorDiv.value.classList.add('dragover');
+}
+
+function onDragLeave(e: DragEvent) {
+  if (!editorDiv.value.contains(e.relatedTarget)) {
+    editorDiv.value.classList.remove('dragover');
+  }
+}
+
+function onDrop(e: DragEvent) {
+  e.stopPropagation();
+  e.preventDefault();
+  editorDiv.value.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files && files.length == 1) {
+    readFile(files[0]);
+  }
+  if (files && files.length > 1) {
+    alert('Please drop only one file at a time');
   }
 }
 
@@ -69,14 +96,13 @@ onMounted(() => {
     const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
 
     if (editor.value && fontSize) {
-      editor.value.setFontSize(fontSize);
+      editor.value.setFontSize(fontSize.toString());
     }
   });
 
   editor.value.setOptions({
     autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
   });
-
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
@@ -89,6 +115,13 @@ onMounted(() => {
     'change',
     useDebounceFn(
       () => {
+        sessionStore.editorContentUnparsed = editor.value.getValue();
+
+        if (currentChangeForcedFromOutside) {
+          currentChangeForcedFromOutside = false; // reset flag
+          return;
+        }
+
         sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
         const fileContentString = editor.value.getValue();
 
@@ -104,9 +137,24 @@ onMounted(() => {
     )
   );
 
+  watch(
+    computed(() => sessionStore.editorContentUnparsed),
+    content => {
+      if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        editor.value.setValue(content, -1);
+      }
+    }
+  );
+
   watchArray(
     computed(() => sessionStore.dataValidationResults.errors),
     errors => {
+      // Do not attempt to display schema validation errors when the text does not have valid syntax
+      // (would otherwise result in errors when trying to parse CST)
+      if (!manipulator.isValidSyntax(editor.value.getValue())) {
+        return;
+      }
+
       let annotations = [];
       for (const error of errors) {
         const instancePath = error.instancePath;
@@ -125,7 +173,7 @@ onMounted(() => {
   );
 
   editor.value.on('changeSelection', () => {
-    if (currentSelectionIsForcedFromOutside) {
+    if (currentChangeForcedFromOutside) {
       // we do not need to consider the event and send updates if the selection was forced from outside
       return;
     }
@@ -141,41 +189,36 @@ onMounted(() => {
   });
 
   // Listen to changes in store and update content accordingly
-  watchThrottled(
+  watch(
     fileData,
     newVal => {
       if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
         editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
       }
     },
-    {deep: true, throttle: READ_THROTTLE_TIME}
+    {deep: true}
   );
   // Listen to changes in current path and update cursor accordingly
-  watchThrottled(
+  watch(
     currentSelectedElement,
-    newVal => {
-      if (editor.value) {
-        if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-          currentSelectionIsForcedFromOutside = true;
-          updateCursorPositionBasedOnPath(
-            editor.value.getValue(),
-            sessionStore.currentSelectedElement
-          );
-          currentSelectionIsForcedFromOutside = false;
-        }
+    (newSelectedElement: Path) => {
+      if (editor.value && sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        currentChangeForcedFromOutside = true;
+        updateCursorPositionBasedOnPath(editor.value.getValue(), newSelectedElement);
+        currentChangeForcedFromOutside = false;
       }
     },
-    {deep: true, throttle: READ_THROTTLE_TIME}
+    {deep: true}
   );
 });
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
   // Update value with new data and also update cursor position
-  currentSelectionIsForcedFromOutside = true;
+  currentChangeForcedFromOutside = true;
   const newEditorContent = manipulator.stringifyContentObject(configData);
   sessionStore.currentEditorWrapper.setContent(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
-  currentSelectionIsForcedFromOutside = false;
+  // set currentChangeForcedFromOutside to false in on-change handler
 }
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {
@@ -192,14 +235,48 @@ function determinePath(editorContent: string, cursorPosition: Position): Path {
   let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
   return manipulator.determinePath(editorContent, targetCharacter);
 }
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = function (evt) {
+    if (typeof evt.target.result === 'string') {
+      editor.value.setValue(evt.target.result, -1);
+    } // -1 sets the cursor to the start of the editor
+  };
+  reader.readAsText(file, 'UTF-8');
+}
 </script>
 
 <template>
-  <div class="h-full" id="javascript-editor"></div>
+  <div
+    class="h-full"
+    id="javascript-editor"
+    ref="editorDiv"
+    @dragover="onDragOver"
+    @dragenter="onDragEnter"
+    @dragleave="onDragLeave"
+    @drop="onDrop" />
 </template>
 
 <style scoped>
 .p-component {
   margin: 0 !important;
+}
+
+#javascript-editor.dragover::before {
+  content: 'Drag and drop files here';
+  font-size: 24px;
+  color: #666;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px dashed #666;
 }
 </style>

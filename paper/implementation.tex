@@ -21,6 +21,7 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
         \bottomrule
     \end{tabular}
 \end{table*}
+
 \subsection{Tool Overview}\label{subsec:tool-overview} %keyuri
 
 
@@ -176,6 +177,25 @@ To provide the user feedback on whether their data is valid according to the pro
 We make use of the \textbf{Ajv JSON schema validator}\cite{ajv-validator} library, which supports the newest JSON schema draft 2020-12.
 %Ajv firstly generates a fast validation function from the input schema.
 If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
+
+
+\subsection{Code Panel}\label{subsec:code-editor}
+
+The code editor is a GUI panel designed for editing the \cfgfiles.
+For this project, we use the popular \textbf{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
+% It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
+% It can be easily embedded in any web page or JavaScript application.
+
+\subsubsection{Features}
+
+To make our code editor more user-friendly, we implemented several features, which are described in the following.
+
+\paragraph{Schema Validation}
+To provide the user feedback on whether their data is valid according to the provided schema, we perform schema validation.
+We make use of the \textbf{Ajv JSON schema validator}\cite{ajv-validator} library, which supports the newest JSON schema draft 2020-12.
+%Ajv firstly generates a fast validation function from the input schema.
+If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
+
 
 \paragraph{Syntax Highlighting}
 Ace Editor supports syntax highlighting for both JSON and YAML, which we use.
@@ -402,7 +422,11 @@ In that case, the incompatible pair is dismissed.
     },
   ]
 }
+
     \end{minted}
+
+	\end{minted}
+
     \caption{Simple JSON schema after conversion of types to oneOf}
     \label{listing:multiple_types_converted}
 \end{listing}

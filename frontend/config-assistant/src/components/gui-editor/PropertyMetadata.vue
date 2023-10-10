@@ -9,6 +9,8 @@ import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
 import type {ValidationResults} from '@/helpers/validationService';
+import {pathToString} from '@/helpers/pathHelper';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -34,10 +36,10 @@ function canZoomIn(): boolean {
 
   const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
   if (dependsOnUserSelection) {
-    const hasUserSelection = schema.userSelectionOneOfAnyOf;
-    if (!hasUserSelection) {
-      return false;
-    }
+    const path = pathToString(props.node.data.absolutePath);
+    const hasUserSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.has(path);
+    const hasUserSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.has(path);
+    return hasUserSelectionOneOf || hasUserSelectionAnyOf;
   }
 
   return schema.hasType('object') || schema.hasType('array');
@@ -81,15 +83,7 @@ function zoomIntoPath() {
 }
 
 function isPropertyNameEditable(): boolean {
-  if (!props.node.data.parentSchema?.hasType('object')) {
-    return false;
-  }
-  if (!props.node.data.parentSchema?.properties) {
-    return true;
-  }
-  return !Object.keys(props.node.data.parentSchema.properties).includes(
-    props.node.data.name as string
-  );
+  return isAdditionalProperty() || isPatternProperty();
 }
 
 function updatePropertyName(event) {
@@ -138,11 +132,18 @@ function focusEditingLabel() {
 
 function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
   const name: PathElement = node.data.name;
+  if (name === undefined) {
+    return node.data.parentSchema?.title || 'root'; // no name should only happen for the root node
+  }
   if (typeof name === 'string') {
     return name;
   }
   // array index
   return (node.data.parentName || node.data.parentSchema?.title || 'element') + '[' + name + ']';
+}
+
+function isInvalid(): boolean {
+  return !props.validationResults.valid;
 }
 </script>
 
@@ -150,7 +151,7 @@ function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
   <span class="flex flex-row w-full items-center">
     <span
       class="mr-2"
-      :class="{'hover:underline': canZoomIn(), 'bg-yellow-100': highlighted}"
+      :class="{'hover:underline cursor-pointer': canZoomIn(), 'bg-yellow-100': highlighted}"
       :tabindex="canZoomIn() ? 0 : -1"
       @click="
         isPropertyNameEditable()
@@ -169,7 +170,7 @@ function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
         @keyup.enter="updatePropertyName"
         :class="{
           'text-indigo-700': canZoomIn(),
-          'underline decoration-wavy decoration-red-600': !props.validationResults.valid,
+          'underline decoration-wavy decoration-red-600': isInvalid(),
           'line-through': isDeprecated(),
           italic: isAdditionalProperty() || isPatternProperty(),
         }">
@@ -180,6 +181,9 @@ function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
     </span>
 
     <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription() }}</span>
+    <span class="text-red-600 ml-3" v-if="isInvalid()">
+      <FontAwesomeIcon icon="triangle-exclamation" />
+    </span>
   </span>
 </template>
 

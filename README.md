@@ -94,5 +94,5 @@ For more information, see the LICENSE file.
 
 If you have any questions, suggestions, or feedback, feel free to contact the project team at
 [kkpatel.de@gmail.com](mailto:kkpatel.de@gmail.com),
-[minyeexu@gmail.com](mailto:minyeexu@gmail.com), [Felix@neuby.de](mailto:Felix@neuby.de),
+[minyexu@gmail.com](mailto:minyeexu@gmail.com), [Felix@neuby.de](mailto:Felix@neuby.de),
 [paulbredl@gmx.de](mailto:cpaulbredl@gmx.de).

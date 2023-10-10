@@ -19,7 +19,7 @@ import {
 } from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {dataAt, pathToJsonPointer, pathToString} from '@/helpers/pathHelper';
+import {dataAt, pathToString} from '@/helpers/pathHelper';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/tree';
@@ -39,13 +39,49 @@ const emit = defineEmits<{
   (e: 'remove_property', path: Path): void;
 }>();
 
+const sessionStore = storeToRefs(useSessionStore());
+
+watch(
+  () => useSessionStore().fileData,
+  () => {
+    updateTree();
+  }
+);
+
+watch(
+  sessionStore.currentSelectedElement,
+  () => {
+    if (useSessionStore().lastChangeResponsible == ChangeResponsible.GuiEditor) {
+      return;
+    }
+    const absolutePath = useSessionStore().currentSelectedElement;
+    const pathToCutOff = useSessionStore().currentPath;
+    const relativePath = absolutePath.slice(pathToCutOff.length);
+    if (relativePath.length > 0) {
+      // cut off last element, because we want to expand until last element, but not expand children of last element
+      const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
+      expandElementsByPath(relativePathToExpand);
+    }
+  },
+  {deep: true}
+);
+
+watch(storeToRefs(useSessionStore()).fileSchema, () => {
+  updateTree();
+});
+
+watch(sessionStore.currentPath, () => {
+  updateTree();
+  focusOnFirstProperty();
+  allowShowOverlay.value = true; // reset in case the user was editing a property name
+});
+
 const treeNodeResolver = new ConfigTreeNodeResolver();
 
 const loading = ref(false);
 const loadingDebounced = refDebounced(loading, 100);
 
 const treeTableFilters = ref<Record<string, string>>({});
-const {currentExpandedElements} = storeToRefs(useSessionStore());
 
 const currentTree = ref({});
 
@@ -68,7 +104,7 @@ function computeTree() {
  */
 function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
   for (const node of nodes) {
-    const expanded = currentExpandedElements.value[pathToString(node.data.absolutePath)] ?? false;
+    const expanded = useSessionStore().currentExpandedElements[node.key] ?? false;
     if (expanded) {
       node.children = treeNodeResolver.createChildNodesOfNode(node);
       if (node.children && node.children.length > 0) {
@@ -81,29 +117,30 @@ function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
 function updateTree() {
   loading.value = true;
   window.setTimeout(() => {
-    nodesToDisplay.value = computeTree().children;
+    nodesToDisplay.value = determineNodesToDisplay(computeTree());
     loading.value = false;
   }, 0);
 }
 
-const nodesToDisplay: Ref<TreeNode[]> = ref(computeTree().children);
+const nodesToDisplay: Ref<TreeNode[]> = ref(determineNodesToDisplay(computeTree()));
 
-watch(storeToRefs(useSessionStore()).fileSchema, () => {
-  currentExpandedElements.value = {};
-  updateTree();
-});
-
-// recalculate the tree when the data structure changes, but not
-// single values (e.g. when a property is changed)
-watch(storeToRefs(useSessionStore()).fileData, (value, oldValue) => {
-  /*if (!isObjectStructureEqual(value, oldValue)) { */ // currently not working as expected
-  updateTree();
-  /*}*/
-});
+function determineNodesToDisplay(root: TreeNode): TreeNode[] {
+  const rootSchema = root?.data?.schema;
+  if (!rootSchema) {
+    return [];
+  }
+  if (rootSchema.anyOf?.length > 0 || rootSchema.oneOf?.length > 0) {
+    return [root];
+  }
+  if (rootSchema.hasType('object') || rootSchema.hasType('array')) {
+    return root.children ?? [];
+  }
+  return [root];
+}
 
 watch(
   storeToRefs(useSessionStore()).currentSelectedElement,
-  newVal => {
+  () => {
     if (useSessionStore().lastChangeResponsible == ChangeResponsible.GuiEditor) {
       return;
     }
@@ -122,7 +159,9 @@ watch(
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
+  updateTree();
 }
+
 function clickedPropertyData(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
   if (useSessionStore().dataAtPath(path) != undefined) {
@@ -291,15 +330,15 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
 }
 
 function findNameForNewProperty(objectSchema: JsonSchema | undefined, data: any) {
-  if (objectSchema === undefined) {
-    return 'newProperty';
+  if (objectSchema === undefined || data === undefined) {
+    return 'yourNewProperty';
   }
 
   const existingProperties = Object.keys(data);
   let index = 1;
-  let name = 'newProperty';
+  let name = 'yourNewProperty';
   while (existingProperties.includes(name)) {
-    name = `newProperty${index}`;
+    name = `yourNewProperty${index}`;
     index++;
   }
   return name;
@@ -315,11 +354,6 @@ function findNameForNewProperty(objectSchema: JsonSchema | undefined, data: any)
 function addNegativeMarginForTableStyle(depth: number) {
   return {'margin-right': `${-depth * GuiConstants.INDENTATION_STEP}px`};
 }
-
-watch(storeToRefs(useSessionStore()).currentPath, () => {
-  updateTree();
-  focusOnFirstProperty();
-});
 
 function displayAsRegularProperty(node: any) {
   return (
@@ -358,7 +392,7 @@ function expandElementsByPath(relativePath: Path) {
     }
 
     expandElementChildren(childNodeToExpand);
-    currentExpandedElements.value[childNodeToExpand.key] = true;
+    useSessionStore().currentExpandedElements[childNodeToExpand.key] = true;
 
     // update current node, so the next iteration which is one level deeper will use this node to search next child
     currentNode = childNodeToExpand;
@@ -366,6 +400,9 @@ function expandElementsByPath(relativePath: Path) {
 }
 
 function expandElementChildren(node: any) {
+  if (node.type === TreeNodeType.ADVANCED_PROPERTY) {
+    return;
+  }
   node.children = treeNodeResolver.createChildNodesOfNode(node);
   expandPreviouslyExpandedElements(node.children as Array<GuiEditorTreeNode>);
 }
@@ -375,9 +412,7 @@ const allowShowOverlay = ref(true);
 const overlayShowScheduled = ref(false);
 
 const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
-  const relevantErrors = useSessionStore().dataValidationResults.filterForExactPath(
-    pathToJsonPointer(nodeData.absolutePath)
-  ).errors;
+  const relevantErrors = getValidationResults(nodeData.absolutePath).errors;
   // @ts-ignore
   schemaInfoOverlay.value?.showPanel(
     nodeData.schema,
@@ -419,7 +454,14 @@ function isHighlighted(node: ConfigDataTreeNode) {
 }
 
 function getValidationResults(absolutePath: Path) {
-  return useSessionStore().dataValidationResults.filterForPath(pathToJsonPointer(absolutePath));
+  return useSessionStore().dataValidationResults.filterForPath(absolutePath);
+}
+
+function zoomIntoPath(path: Path) {
+  // prevent the overlay from showing up when zooming into a path
+  // because clicking on the property data would trigger the overlay (because of the mouseenter event)
+  overlayShowScheduled.value = false;
+  emit('zoom_into_path', path);
 }
 </script>
 
@@ -433,10 +475,9 @@ function getValidationResults(absolutePath: Path) {
     scrollable
     scroll-direction="vertical"
     scroll-height="flex"
-    row-hover
     :lazy="true"
     :loading="loadingDebounced"
-    v-model:expandedKeys="currentExpandedElements"
+    v-model:expandedKeys="useSessionStore().currentExpandedElements"
     @nodeExpand="expandElementChildren"
     :filters="treeTableFilters">
     <Column field="name" header="Property" :sortable="true" expander>
@@ -453,7 +494,7 @@ function getValidationResults(absolutePath: Path) {
             :node="slotProps.node"
             :type="slotProps.node.type"
             :highlighted="isHighlighted(slotProps.node)"
-            @zoom_into_path="path_to_add => $emit('zoom_into_path', path_to_add)"
+            @zoom_into_path="zoomIntoPath"
             @update_property_name="
               (oldName, newName) =>
                 updatePropertyName(slotProps.node.data.relativePath, oldName, newName)
@@ -477,49 +518,40 @@ function getValidationResults(absolutePath: Path) {
         <!-- special tree nodes -->
         <span
           v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
-          style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
-          <Button
-            text
-            severity="secondary"
-            class="text-gray-500"
-            style="margin-left: -0.75rem"
-            @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
-            @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
+          class="cursor-pointer"
+          style="width: 100%; min-width: 50%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
+          @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
+          <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">Add item</span>
           </Button>
         </span>
 
         <span
-          v-if="slotProps.node.type === TreeNodeType.ADD_ITEM"
-          style="max-width: 50%"
-          class="w-full">
-          <PropertyData
-            class="w-full"
-            :nodeData="slotProps.node.data"
-            @update_property_value="addItem"
-            bodyClass="w-full" />
-        </span>
-
-        <span
           v-if="slotProps.node.type === TreeNodeType.ADD_PROPERTY"
-          style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
-          <Button
-            text
-            severity="secondary"
-            class="text-gray-500"
-            style="margin-left: -1.5rem"
-            @click="
-              addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-            "
-            @keyup.enter="
-              addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-            ">
+          style="width: 100%; min-width: 50%"
+          class="cursor-pointer"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          @click="
+            addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+          "
+          @keyup.enter="
+            addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
+          ">
+          <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">New property</span>
           </Button>
+        </span>
+
+        <span
+          v-if="slotProps.node.type === TreeNodeType.ADVANCED_PROPERTY"
+          class="text-gray-500"
+          style="width: 100%; min-width: 100%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          Advanced
         </span>
       </template>
     </Column>
