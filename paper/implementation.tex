@@ -92,20 +92,28 @@ The toolbar provides basic functionalities for all three views:
 
 \subsubsection{Settings}
 
-In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters of \toolname{}:
-\begin{itemize}
-    \item \textbf{Data Format:} Users can select between JSON and YAML data format for the code editor.
-    \item \textbf{GuiEditorOnRightSide:} By default, the GUI panel is located on the right side, but users have the flexibility to change it to the left side using the \textbf{guiEditorOnRightSide} option.
-    \item \textbf{Code Editor Font Size:} Customize the font size in the code editor panel to suit user's preferences.
-    \item \textbf{GUI Editor Configuration:} Users can configure the \textbf{property sorting} in the GUI editor, including options like \textbf{Schema Order}, \textbf{Priority Order}, and \textbf{Data Order}.
-    \begin{itemize}
-        \item \textbf{Schema Order:} Define the order in which schema elements are presented.
-        \item \textbf{Priority Order:} Customize the order of elements based on their priority.
-        \item \textbf{Data Order:} Specify the order in which data elements are displayed.
-    \end{itemize}
-    \item Additionally, users have the ability to set the \textbf{maximum depth}, which determines the maximum level of nesting or hierarchy displayed in the GUI editor.
-    \item \textbf{Debugging Panel:} For debugging purposes, users can enable or disable the debugging panel as needed.
-\end{itemize}
+In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings})of \toolname{}:
+\begin{table*}
+    \centering
+    \caption{Settings view functionality\label{tab:settings}}
+    \begin{tabular}{@{}p{0.3\linewidth}p{0.6\linewidth}@{}}
+        \toprule
+        \textbf{Configuration} & \textbf{\ Description} \\
+        \midrule
+        Data Format & Users can select between JSON and YAML data format. The choice made here will influence all three views.  \\
+        Gui Editor On Right Side & By default, the GUI panel is located on the right side, but users have the flexibility to change it to the left side using this option.  \\
+        Code Editor Font Size & Customize the \textbf{font size} in the code editor panel to suit user's preferences. \\
+        GUI Editor Configuration & Users can configure the property sorting in the GUI editor, including options like:
+        \begin{itemize}
+            \item \textbf{Schema Order}: Define the order in which schema elements are presented.
+            \item \textbf{Priority Order} : Customize the order of elements based on their priority.
+            \item \textbf{Data Order } : Specify the order in which data elements are displayed.
+        \end{itemize}
+        And \textbf{maximum depth} determines the maximum level of nesting or hierarchy displayed in the GUI editor. \\
+        Debugging Active & For debugging purposes, users can enable or disable the debugging panel as needed.  \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
 
 
 \subsection{Code Panel}\label{subsec:code-editor}
