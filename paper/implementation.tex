@@ -3,7 +3,7 @@ A detailed list of all libraries used can be found in the wiki of our GitHub rep
 Table~\ref{tab:libraries} shows an overview of the most important libraries used and their purpose.
 
 % todo insert most important libraries used and their purpose
-\begin{table*}[!t] % Use table* for wide tables
+\begin{table*}[!hb] % Use table* for wide tables
     \caption{Libraries used in the implementation of our tool}
     \label{tab:libraries}
     \centering
@@ -22,6 +22,92 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
     \end{tabular}
 \end{table*}
 
+\subsection{Tool Overview}\label{subsec:tool-overview} %keyuri
+
+
+The tool provides a solution for managing \cfgfiles{} with three distinct views:
+\begin{itemize}
+    \item \textbf{File Editor} (Figure~\ref{fig:fileeditor}): For editing \cfgfiles{}, based on the schema provided to the tool.
+    \item \textbf{Schema Editor} (Figure~\ref{fig:schemaeditor}): For editing the schema, which is used by the File Editor.
+    \item \textbf{Settings} (Figure~\ref{fig:settings}): To configure various tool settings.
+\end{itemize}
+
+The user interface of \toolname{} is structured in the following way (see the numbers in red in figure~\ref{fig:fileeditor}):
+\begin{enumerate}
+    \item Button to switch to another view (e.g., from File Editor to Schema Editor).
+    \item Toolbar with various functionality.
+    \item Code editor panel.
+    \item GUI editor panel.
+\end{enumerate}
+% While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose.
+% The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/fileeditor}
+    \caption{FileEditor}
+    \label{fig:fileeditor}
+\end{figure*}
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/schemaeditor}
+    \caption{SchemaEditor}
+    \label{fig:schemaeditor}
+\end{figure*}
+
+\begin{figure*}[h]
+    \includegraphics[width=\textwidth]{figures/settings}
+    \caption{Settings}
+    \label{fig:settings}
+\end{figure*}
+
+\subsubsection{Toolbar functionalities}
+
+The toolbar provides basic functionalities for all three views:
+\begin{itemize}
+    \item \textbf{New File:} Create a new (schema) file.
+    In the file editor, this option also includes two sub-items:
+    \begin{itemize}
+        \item \textbf{Generate Data:} Generate random configuration data based on the selected schema from the Schema Editor.
+        \item \textbf{New Empty File:} Start with a blank file, discarding any current changes.
+    \end{itemize}
+
+    \item \textbf{Open File:} Open an existing file.
+    For the File Editor, this opens a dialog to open a file from the local file system.
+    For the Schema Editor, this comes with four sub-options:
+    \begin{itemize}
+        \item \textbf{JSON Schema Store:} Choose a schema from the JSON Schema Store, which provides a list of available schemas.
+
+        \item \textbf{From Our Examples:} Access four example schemas provided within the tool.
+
+        \item \textbf{From File:} Select a schema from local file system.
+
+        \item \textbf{From URL:} Provide the URL of a specific schema, and the tool will retrieve and open it.
+
+    \end{itemize}
+    \item \textbf{Undo/Redo:} Undo or redo the latest operations in the editor.
+    \item \textbf{Download:} Download the current editor content with an appropriate file name.
+    \item \textbf{Search:} Text field where the user can enter a search term to find and navigate to specific sections within the current file.
+\end{itemize}
+
+
+\subsubsection{Settings}
+
+In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters of \toolname{}:
+\begin{itemize}
+    \item \textbf{Data Format:} Users can select between JSON and YAML data format for the code editor.
+    \item \textbf{GuiEditorOnRightSide:} By default, the GUI panel is located on the right side, but users have the flexibility to change it to the left side using the \textbf{guiEditorOnRightSide} option.
+    \item \textbf{Code Editor Font Size:} Customize the font size in the code editor panel to suit user's preferences.
+    \item \textbf{GUI Editor Configuration:} Users can configure the \textbf{property sorting} in the GUI editor, including options like \textbf{Schema Order}, \textbf{Priority Order}, and \textbf{Data Order}.
+    \begin{itemize}
+        \item \textbf{Schema Order:} Define the order in which schema elements are presented.
+        \item \textbf{Priority Order:} Customize the order of elements based on their priority.
+        \item \textbf{Data Order:} Specify the order in which data elements are displayed.
+    \end{itemize}
+    \item Additionally, users have the ability to set the \textbf{maximum depth}, which determines the maximum level of nesting or hierarchy displayed in the GUI editor.
+    \item \textbf{Debugging Panel:} For debugging purposes, users can enable or disable the debugging panel as needed.
+\end{itemize}
+
+
 \subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
@@ -39,6 +125,7 @@ We make use of the \textbf{Ajv JSON schema validator}\cite{ajv-validator} librar
 %Ajv firstly generates a fast validation function from the input schema.
 If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
 
+
 \paragraph{Syntax Highlighting}
 Ace Editor supports syntax highlighting for both JSON and YAML, which we use.
 The data format can be switched in the \textit{Settings} page.
@@ -53,7 +140,8 @@ Every tree node has a range property, describing the start and end index of the 
 To determine the corresponding path for a cursor position, the cursor position is translated to a character index $targetCharacter$ within the text.
 Then the CST is traversed and for all nodes $currentNode$ of type array or object for which $targetCharacter \in currentNode.range$,
 the child nodes are checked and the key of the node (or index for array elements) is appended to the result path.
-This way, the corresponding path is built up. To determine the cursor position for a given path, the reverse is done: the CST is traversed until the effective path of the $currentNode$ is the target path. Then $currentNode.range.start$ is returned as result index, which is then translated into a cursor position (row and column).
+This way, the corresponding path is built up.
+To determine the cursor position for a given path, the reverse is done: the CST is traversed until the effective path of the $currentNode$ is the target path. Then $currentNode.range.start$ is returned as result index, which is then translated into a cursor position (row and column).
 
 % TODO: section for YAML.
 
@@ -264,7 +352,9 @@ In that case, the incompatible pair is dismissed.
     },
   ]
 }
-	\end{minted}
+
+    \end{minted}
+
     \caption{Simple JSON schema after conversion of types to oneOf}
     \label{listing:multiple_types_converted}
 \end{listing}
