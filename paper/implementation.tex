@@ -3,7 +3,7 @@ A detailed list of all libraries used can be found in the wiki of our GitHub rep
 Table~\ref{tab:libraries} shows an overview of the most important libraries used and their purpose.
 
 % todo insert most important libraries used and their purpose
-\begin{table*}[!t] % Use table* for wide tables
+\begin{table*}[!hb] % Use table* for wide tables
     \caption{Libraries used in the implementation of our tool}
     \label{tab:libraries}
     \centering
@@ -25,37 +25,55 @@ Table~\ref{tab:libraries} shows an overview of the most important libraries used
 \subsection{Tool Overview}\label{subsec:tool-overview} %keyuri
 
 
-The tool provides a comprehensive solution for managing configuration files with three distinct views:
+The tool provides a solution for managing \cfgfiles{} with three distinct views:
 \begin{itemize}
-    \item \textbf{File Editor}: This view is designed for editing configuration files.
-    \item \textbf{Schema Editor}: Use this view to edit the schema of configuration files.
-    \item \textbf{Settings}: The Settings view allows user to configure various tool settings.
+    \item \textbf{File Editor} (Figure~\ref{fig:fileeditor}): For editing \cfgfiles{}, based on the schema provided to the tool.
+    \item \textbf{Schema Editor} (Figure~\ref{fig:schemaeditor}): For editing the schema, which is used by the File Editor.
+    \item \textbf{Settings} (Figure~\ref{fig:settings}): To configure various tool settings.
 \end{itemize}
-While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose. The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
 
-\subsubsection{File Editor}
-The File Editor view (1) has been primarily designed to facilitate the creation and editing of configuration files. This view is equipped with a user-friendly top menu bar (2) that offers a range of essential functionalities.
-\begin{figure}[h]
-    \includegraphics[width=3.5 in]{figures/fileeditor}
+The user interface of \toolname{} is structured in the following way (see the numbers in red in figure~\ref{fig:fileeditor}):
+\begin{enumerate}
+    \item Button to switch to another view (e.g., from File Editor to Schema Editor).
+    \item Toolbar with various functionality.
+    \item Code editor panel.
+    \item GUI editor panel.
+\end{enumerate}
+% While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose.
+% The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/fileeditor}
     \caption{FileEditor}
     \label{fig:fileeditor}
 \end{figure*}
 
-\subsubsection{Schema Editor}
-
-In the context of the figure, the Schema Editor view (1) empowers users to define and manage schema templates for configuration files. This view plays a crucial role in maintaining consistency and structure within your configurations.
-\begin{figure}[h]
-    \includegraphics[width=3.5 in]{figures/schemaeditor}
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/schemaeditor}
     \caption{SchemaEditor}
     \label{fig:schemaeditor}
-\end{figure}
-% Details of the Schema Editor and its functionalities can be inserted here.
-\begin{itemize}
-    \item \textbf{New Empty Schema:} Clear the current schema for starting fresh.
-\end{itemize}
+\end{figure*}
 
+\begin{figure*}[h]
+    \includegraphics[width=\textwidth]{figures/settings}
+    \caption{Settings}
+    \label{fig:settings}
+\end{figure*}
+
+\subsubsection{Toolbar functionalities}
+
+The toolbar provides basic functionalities for all three views:
 \begin{itemize}
-    \item \textbf{Open Schema:} Open an existing schema, offering four suboptions:
+    \item \textbf{New File:} Create a new (schema) file.
+    In the file editor, this option also includes two sub-items:
+    \begin{itemize}
+        \item \textbf{Generate Data:} Generate random configuration data based on the selected schema from the Schema Editor.
+        \item \textbf{New Empty File:} Start with a blank file, discarding any current changes.
+    \end{itemize}
+
+    \item \textbf{Open File:} Open an existing file.
+    For the File Editor, this opens a dialog to open a file from the local file system.
+    For the Schema Editor, this comes with four sub-options:
     \begin{itemize}
         \item \textbf{JSON Schema Store:} Choose a schema from the JSON Schema Store, which provides a list of available schemas.
 
@@ -66,39 +84,17 @@ In the context of the figure, the Schema Editor view (1) empowers users to defin
         \item \textbf{From URL:} Provide the URL of a specific schema, and the tool will retrieve and open it.
 
     \end{itemize}
+    \item \textbf{Undo/Redo:} Undo or redo the latest operations in the editor.
+    \item \textbf{Download:} Download the current editor content with an appropriate file name.
+    \item \textbf{Search:} Text field where the user can enter a search term to find and navigate to specific sections within the current file.
 \end{itemize}
 
-\begin{itemize}
-    \item \textbf{Download Schema:} Download the current schema for later use or reference.
-\end{itemize}
-\begin{itemize}
-    \item \textbf{Undo/Redo:} Same as File Editor
-
-\end{itemize}
-\begin{itemize}
-    \item \textbf{Search:} Same as File editor
-\end{itemize}
 
 \subsubsection{Settings}
 
-The Settings view (1) provides customization options for tailoring the tool to your specific needs.
-It allows user to configure various preferences and settings to enhance user's workflow.
-\begin{figure}[h]
-    \includegraphics[width=3.5 in]{figures/settings}
-    \caption{Settings}
-    \label{fig:settings}
-\end{figure}
-% Details of the Settings view and its functionalities can be inserted here.
+In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters of \toolname{}:
 \begin{itemize}
-    \item \textbf{Save:} Save the current Settings that user configured.
-    \item \textbf{Undo/Redo:} Same as File Editor
-    \item \textbf{Search:} Same as File Editor
-\end{itemize}
-
-The Settings view allows users to configure various settings via GUI Panel:
-\begin{itemize}
-    \item \textbf{Data Format:} Users can select between JSON and YAML data format.
-    The choice made here will influence all three views.
+    \item \textbf{Data Format:} Users can select between JSON and YAML data format for the code editor.
     \item \textbf{GuiEditorOnRightSide:} By default, the GUI panel is located on the right side, but users have the flexibility to change it to the left side using the \textbf{guiEditorOnRightSide} option.
     \item \textbf{Code Editor Font Size:} Customize the font size in the code editor panel to suit user's preferences.
     \item \textbf{GUI Editor Configuration:} Users can configure the \textbf{property sorting} in the GUI editor, including options like \textbf{Schema Order}, \textbf{Priority Order}, and \textbf{Data Order}.
@@ -110,50 +106,6 @@ The Settings view allows users to configure various settings via GUI Panel:
     \item Additionally, users have the ability to set the \textbf{maximum depth}, which determines the maximum level of nesting or hierarchy displayed in the GUI editor.
     \item \textbf{Debugging Panel:} For debugging purposes, users can enable or disable the debugging panel as needed.
 \end{itemize}
-
-\subsection{Workflow}\label{subsec:workflow} User Guide used can be found in the wiki of our GitHub repository %todo
-In this section, we outline the workflow of our tool.
-
-\begin{enumerate}
-    \item Users can open our tool ConfigAssistant. % todo link
-    \item Upon initial access, a default page is displayed, and users must select their desired Schema.
-    We have implemented four options for this selection:
-    \begin{enumerate}
-        \item From File
-        \item From JSON Schema Store
-        \item From URL
-        \item Example Schemas
-    \end{enumerate}
-    Users can make their Schema selection either via a dialog box on the default page or in the schema Editor.
-    \item After selecting a schema, the user will find that a GUI is automatically generated on the right-hand side of the File Editor, tailored to the selected schema.
-    \item Through the GUI panel, users are assisted in creating or modifying configuration files effortlessly, ensuring a seamless configuration file generation process.
-    \item If a user wishes to modify the selected schema, such as adding new properties, they can do so through the schema editor.
-    Changes can be made using either the GUI panel or the code panel, and these modifications will automatically reflect in the file editor.
-\end{enumerate}
-
-\begin{figure}[!htb]
-    \begin{minipage}[t]{0.5\textwidth}
-        \includegraphics[width=3.5in]{figures/Toolworkflow}
-        \caption{Workflow}
-        \label{workflow}
-    \end{minipage}\label{fig:workflow}
-\end{figure}
-\subsection{Code Panel}\label{subsec:code-editor}
-
-The code editor is a GUI panel designed for editing the \cfgfiles.
-For this project, we use the popular \textbf{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
-% It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
-% It can be easily embedded in any web page or JavaScript application.
-
-\subsubsection{Features}
-
-To make our code editor more user-friendly, we implemented several features, which are described in the following.
-
-\paragraph{Schema Validation}
-To provide the user feedback on whether their data is valid according to the provided schema, we perform schema validation.
-We make use of the \textbf{Ajv JSON schema validator}\cite{ajv-validator} library, which supports the newest JSON schema draft 2020-12.
-%Ajv firstly generates a fast validation function from the input schema.
-If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
 
 
 \subsection{Code Panel}\label{subsec:code-editor}
@@ -188,7 +140,8 @@ Every tree node has a range property, describing the start and end index of the 
 To determine the corresponding path for a cursor position, the cursor position is translated to a character index $targetCharacter$ within the text.
 Then the CST is traversed and for all nodes $currentNode$ of type array or object for which $targetCharacter \in currentNode.range$,
 the child nodes are checked and the key of the node (or index for array elements) is appended to the result path.
-This way, the corresponding path is built up. To determine the cursor position for a given path, the reverse is done: the CST is traversed until the effective path of the $currentNode$ is the target path. Then $currentNode.range.start$ is returned as result index, which is then translated into a cursor position (row and column).
+This way, the corresponding path is built up.
+To determine the cursor position for a given path, the reverse is done: the CST is traversed until the effective path of the $currentNode$ is the target path. Then $currentNode.range.start$ is returned as result index, which is then translated into a cursor position (row and column).
 
 % TODO: section for YAML.
 
@@ -401,8 +354,6 @@ In that case, the incompatible pair is dismissed.
 }
 
     \end{minted}
-
-	\end{minted}
 
     \caption{Simple JSON schema after conversion of types to oneOf}
     \label{listing:multiple_types_converted}

@@ -192,3 +192,23 @@ Whenever the values in a GUI element are adjusted by the user, the data in the s
 %
 %\textbf{Boolean}
 % todo: describe how it works. Then also describe for all the different data types, how we intend to implement the GUI aspect. E.g. for boolean we have checkbox
+
+\subsection{Intended Workflow}\label{subsec:workflow}
+In this section, we outline the workflow of our tool.
+
+\begin{enumerate}
+    \item Upon initial access of \toolname{}, a dialog is displayed, where users can select their desired schema.
+    \item After selecting a schema, the user will find that a GUI is automatically generated on the right-hand side of the File Editor,
+    tailored to the selected schema.
+    \item Through the GUI panel, users are assisted in creating or modifying \cfgfiles{}.
+    \item If a user wishes to modify the selected schema, such as adding new properties, they can do so through the schema editor.
+    Changes can be made using either the GUI panel or the code panel, and these modifications will automatically reflect in the file editor.
+\end{enumerate}
+
+%\begin{figure}[!htb]
+%    \begin{minipage}[t]{0.5\textwidth}
+%        \includegraphics[width=3.5in]{figures/Toolworkflow}
+%        \caption{Workflow}
+%        \label{workflow}
+%    \end{minipage}\label{fig:workflow}
+%\end{figure}
