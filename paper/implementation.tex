@@ -64,29 +64,29 @@ The user interface of \toolname{} is structured in the following way (see the nu
 
 The toolbar provides basic functionalities for all three views:
 \begin{itemize}
-    \item \textbf{New File:} Create a new (schema) file.
+    \item {New File: Create a new (schema) file.
     In the file editor, this option also includes two sub-items:
     \begin{itemize}
-        \item \textbf{Generate Data:} Generate random configuration data based on the selected schema from the Schema Editor.
-        \item \textbf{New Empty File:} Start with a blank file, discarding any current changes.
+        \item Generate Data: Generate random configuration data based on the selected schema from the Schema Editor.
+        \item New Empty File: Start with a blank file, discarding any current changes.
     \end{itemize}
 
-    \item \textbf{Open File:} Open an existing file.
+    \item Open File: Open an existing file.
     For the File Editor, this opens a dialog to open a file from the local file system.
     For the Schema Editor, this comes with four sub-options:
     \begin{itemize}
-        \item \textbf{JSON Schema Store:} Choose a schema from the JSON Schema Store, which provides a list of available schemas.
+        \item JSON Schema Store: Choose a schema from the JSON Schema Store, which provides a list of available schemas.
 
-        \item \textbf{From Our Examples:} Access four example schemas provided within the tool.
+        \item From Our Examples: Access four example schemas provided within the tool.
 
-        \item \textbf{From File:} Select a schema from local file system.
+        \item From File: Select a schema from local file system.
 
-        \item \textbf{From URL:} Provide the URL of a specific schema, and the tool will retrieve and open it.
+        \item From URL: Provide the URL of a specific schema, and the tool will retrieve and open it.
 
     \end{itemize}
-    \item \textbf{Undo/Redo:} Undo or redo the latest operations in the editor.
-    \item \textbf{Download:} Download the current editor content with an appropriate file name.
-    \item \textbf{Search:} Text field where the user can enter a search term to find and navigate to specific sections within the current file.
+    \item Undo/Redo: Undo or redo the latest operations in the editor.
+    \item Download: Download the current editor content with an appropriate file name.
+    \item Search: Text field where the user can enter a search term to find and navigate to specific sections within the current file.
 \end{itemize}
 
 
@@ -105,9 +105,9 @@ In the Settings view (figure~\ref{fig:settings}), the user can adjust various pa
         Gui Editor On Right Side & By default, the GUI panel is located on the right side and the code panel on the left side. Using this option, their positions can be swapped. \\
         GUI Editor Property Sorting & The order in which the properties in the GUI panel should appear:
         \begin{itemize}
-            \item \textbf{Schema Order}: Orders elements according to the order in the schema.
-            \item \textbf{Priority Order}: Orders elements based on their priority (e.g. required properties first, deprecated properties last).
-            \item \textbf{Data Order }: Orders elements the same way as it is in the data.
+            \item \textit{Schema Order}: Orders elements according to the order in the schema.
+            \item \textit{Priority Order}: Orders elements based on their priority (e.g. required properties first, deprecated properties last).
+            \item \textit{Data Order }: Orders elements the same way as it is in the data.
         \end{itemize} \\
         GUI Editor Maximum Depth & Determines the maximum level of nesting or hierarchy displayed in the GUI editor. \\
         Debugging Active & For debugging purposes, users can enable or disable the debugging panel as needed.  \\
@@ -119,7 +119,7 @@ In the Settings view (figure~\ref{fig:settings}), the user can adjust various pa
 \subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
-For this project, we use the popular \textbf{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
+For this project, we use the popular \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
 % It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
 % It can be easily embedded in any web page or JavaScript application.
 
@@ -129,7 +129,7 @@ To make our code editor more user-friendly, we implemented several features, whi
 
 \paragraph{Schema Validation}
 To provide the user feedback on whether their data is valid according to the provided schema, we perform schema validation.
-We make use of the \textbf{Ajv JSON schema validator}\cite{ajv-validator} library, which supports the newest JSON schema draft 2020-12.
+We make use of the \textit{Ajv JSON schema validator}\cite{ajv-validator} library, which supports the newest JSON schema draft 2020-12.
 %Ajv firstly generates a fast validation function from the input schema.
 If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
 
@@ -151,7 +151,7 @@ the child nodes are checked and the key of the node (or index for array elements
 This way, the corresponding path is built up.
 To determine the cursor position for a given path, the reverse is done: the CST is traversed until the effective path of the $currentNode$ is the target path. Then $currentNode.range.start$ is returned as result index, which is then translated into a cursor position (row and column).
 
-% TODO: section for YAML.
+For \textit{YAML}, this linkage is not yet implemented and will be part of further work.
 
 \paragraph{Editor Operations}
 The code editor has more functionalities, such as the possibility to open a file by drag and drop into the editor, as well as customizable font sizes.
@@ -170,7 +170,7 @@ Figure~\ref{fig:gui-editor} shows the GUI editor component with an example schem
     \label{fig:gui-editor}
 \end{figure}
 
-To allow this representation of the schema, we do some preprocessing of the \textbf{schema}, which is described in section~\ref{subsec:schema-preprocessing}.
+To allow this representation of the schema, we do some preprocessing of the schema, which is described in section~\ref{subsec:schema-preprocessing}.
 
 \subsubsection{Features}\label{subsubsec:gui-editor-features}
 
@@ -189,6 +189,7 @@ The breadcrumb at the top allows the user to see which path the GUI editor curre
 
 \paragraph{Type specific components}
 
+TODO
 % todo write
 
 \paragraph{Remove Data}
