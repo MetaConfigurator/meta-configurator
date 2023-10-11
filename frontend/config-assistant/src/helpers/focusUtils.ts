@@ -20,6 +20,7 @@ export function selectContents(id: string) {
     if (!element) {
       return;
     }
+    element.contentEditable = 'true';
     const range = document.createRange();
     range.selectNodeContents(element);
     const sel = window.getSelection();

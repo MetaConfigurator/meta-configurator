@@ -26,13 +26,16 @@ export type GuiEditorTreeNode = ConfigDataTreeNode | AddItemTreeNode | AddProper
 export type ConfigDataTreeNodeType =
   | TreeNodeType.SCHEMA_PROPERTY
   | TreeNodeType.ADDITIONAL_PROPERTY
-  | TreeNodeType.PATTERN_PROPERTY;
+  | TreeNodeType.PATTERN_PROPERTY
+  | TreeNodeType.ADVANCED_PROPERTY;
+
 export enum TreeNodeType {
   SCHEMA_PROPERTY = 'data',
   ADDITIONAL_PROPERTY = 'additionalProperty',
   PATTERN_PROPERTY = 'patternProperty',
   ADD_ITEM = 'addItem',
   ADD_PROPERTY = 'addProperty',
+  ADVANCED_PROPERTY = 'advancedProperty',
 }
 
 export interface AddItemTreeNodeData {

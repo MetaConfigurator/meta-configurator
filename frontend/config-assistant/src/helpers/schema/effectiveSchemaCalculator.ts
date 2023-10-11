@@ -47,6 +47,10 @@ export function calculateEffectiveSchema(
       result = resolveDependentSchemas(result, data);
     }
 
+    if (result.conditions && result.conditions.length > 0) {
+      result = resolveConditions(result, data);
+    }
+
     iteration++;
   }
 
@@ -90,6 +94,22 @@ function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
   const elseSchema = schemaWrapper.else?.jsonSchema ?? {};
 
   const newSchema = {allOf: [baseSchema, valid ? thenSchema : elseSchema]};
+  return new JsonSchema(newSchema);
+}
+
+function resolveConditions(result: JsonSchema, data: any) {
+  const resolvedConditions = result.conditions?.map(condition => {
+    return resolveIfThenElse(condition, data);
+  });
+  const baseSchema = {...result.jsonSchema};
+  delete baseSchema.conditions;
+
+  const newSchema = {
+    allOf: [
+      baseSchema,
+      ...(resolvedConditions?.map(condition => condition.jsonSchema ?? {}) ?? []),
+    ],
+  };
   return new JsonSchema(newSchema);
 }
 

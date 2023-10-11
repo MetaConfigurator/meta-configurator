@@ -1,6 +1,10 @@
 We conduct several interviews with professors and students as potential customers.
-We collect feedback from the customers to improve user experiences and fix bugs according to the feedback.
-We also use a survey for demographic questions after the user study.
+During each interview, we introduce \toolname{}, give the participant tasks to execute using the tool and finish the session with open ended questions. 
+We observe how the participants work with the tool and which difficulties they have when executing the tasks.
+Additionally, we ask them for feedback and improvement suggestions.
+We also conduct a survey to gather demographic information about the participants of the user study.
+
+Note that besides the user study we have applied \toolname{} on several schemas (such as EnzymeML\cite{TODO} and the Strenda schema\cite{TODO}, provided by professors that we worked with) and \cfgfiles{} from the real world, to verify that it works and does bring benefits to the user. 
 
 \subsection{Methodology}\label{subsec:methodology}
 
@@ -13,28 +17,31 @@ There are two basic standards we follow to find a potential user:
 \end{itemize}
 
 \paragraph{Interview Questions}
-We prepare our interview questions based on a mockup JSON schema and \cfgfiles.
-It is about a simulation software that simulates a self-driving car.
-To make it easier for interviewees to solve the questions, we divide our interview into four parts:
+For the interview, we created a JSON schema and \cfgfile{}, about a made-up self-driving car simulation.
+The interview questions deal with working with those files.
+We divide our interview tasks into four parts:
 \begin{itemize}
-    \item Setup Question: Where to open the application and set up schema and \cfgfiles.
-    \item Basic Question: Goal is to know about the GUI of application
-    \item Modifying the configuration file: Solving problems of \cfgfiles inside the \textbf{file editor}.
-    \item Modifying the schema: Solving problems of JSON schema inside the \textbf{schema editor}.
+    \item Setup: Open the application and open schema and \cfgfile.
+    \item Information Retrieval Questions: with increasing difficulty, the participant has to retrieve information from the \cfgfile{}. Much easier to solve by using the GUI panel.
+    \item Configuration Modifications: Different tasks that involve changing the \cfgfile{}. Intend is that the participant becomes more familiar with the GUI panel.
+    \item Schema modifications: Making adjustments to the schema. Most difficult, but still feasible using the GUI panel.
 \end{itemize}
+
+%TODO: include interview material in appendix
 
 \paragraph{Interview Process}
 We proceed our interview with one interviewee each time.
 The interview lasts around one hour.
 At the beginning, the interviewee is asked about approval of recording, and they can stop participating at any time.
-One of our team member hosts the interview and guides interviewee how to use our application based on the interview question.
-Another one will record the whole interview and takes notes of what are correctly and incorrectly answered.
-Opinions and critical points will also be noted.
-After the application test, all team members can ask the open questions and answer questions from the interviewee.
+We introduce \toolname{} to the interviewee. 
+Then we send the participant the tasks and \cfgfile{} and let them work on the tasks while sharing their screen.
+During this task solving session, we provide the interviewee with some basic help if they ask specific questions about the tool.
+The interview is recorded and we make notes of the answers, feedback and behavior of the interviewee.e
+Finally, in an open dialog, we ask the interviewee about more feedback and improvement suggestions as well as their opinion on the tool.
 
 \paragraph{Survey}
-After the interview, we ask each interviewee to finish a survey(follow-up questions).
-This survey will cover the following points:
+After the interview, we ask each interviewee to fill out a survey (follow-up questions).
+This survey covers the following points:
 \begin{itemize}
     \item Occupation of the interviewee.
     \item Experiences in software engineering,
@@ -42,8 +49,8 @@ This survey will cover the following points:
     \item Domains in which people use with JSON/YAML files.
     \item Feedback about the application after interview.
 \end{itemize}
-Based on the survey, we could get many feedbacks which we can use in the future.
-We analyse the results which we get from the survey and improve our application afterward.
+%Based on the survey, we could get many feedbacks which we can use in the future.
+%We analyse the results which we get from the survey and improve our application afterward.
 
 \subsection{Results}
 To evaluate the user study, we conducted five user studies in total and summarize the biggest challenges they encountered, as shown in \ref{table:Results}.
@@ -163,8 +170,170 @@ At the end, all participants were able to complete all tasks after we gave hints
     \label{tab:my-table}
 \end{table*}
 
-\subsection{Evaluation}
+\subsection{Evaluation} %Keyuri
 % todo: show correctness of the tasks.
+
+Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the interviewees, as well as which measures we took based on it.
+\begin{table*}
+    \vspace{-10pt}
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{Feedback} & \multicolumn{1}{|c|}{Resolution} \\
+        \cline{2-3}
+        \hline
+        User Study 1 & The property value should not be autocorrected if the user enters an incorrect value. 
+        Instead, an error message or another way should be used to inform the user that their input is incorrect. & 
+        Instead of auto-correcting values, we now provide more clear user feedback on incorrect values (red underline, error symbol). \\
+        \cline{2-3}
+        & It would be good to have the ability to remove data entries with the GUI panel. & 
+        Implemented by adding a "remove" button next to properties which have data and are not required. \\
+        \cline{2-3}
+        & A search functionality to locate properties would be helpful, especially within nested levels.
+        & Implemented in the toolbar. All findings are highlighted in the GUI panel. \\
+        \cline{2-3}
+        %& 4. The Schema editor GUI panel contains extensive metadata, but the code editor panel remains empty. & 4. bla bla bla \\
+        \cline{2-3}
+        & The GUI panel feels overwhelming to the user due to many variations in styling and color of the GUI elements. & 
+        We slightly reduced the number of different stylings by no longer showing required properties in bold face and instead just show an asterisk next to it. \\
+        \cline{2-3}
+        & The cursor should not have the clickable animation when hovering over non-clickable fields in the GUI editor. & Now we only show the clickable animation when hovering over clickable GUI components. \\
+        \cline{2-3}
+        & In drop-down menus we do not need a button to clear the selection. & 
+        We disabled the option of clearing the selection. \\
+        \cline{2-3}
+        & 8. If the type of a property is "any", it should not be interpreted as the "string" type in the GUI panel. & 
+        We show a drop-down menu to the user, where they can select the type they want to use. \\
+        \cline{2-3}
+        & Validation errors should not highlighted via a warning symbol, but instead an error symbol & 
+        We changed the warning symbol into an error symbol. \\
+        \cline{2-3}
+        & After performing an undo or redo action, the cursor should jump to the corresponding location to reflect the changes made by the user.& 
+        Will be considered in future work. \\
+        \hline
+    \end{tabular}
+    \caption* {User Study Feedback and Resolution (Continued)} \label{tab:user_study1}
+\end{table*}
+
+
+\clearpage % Force a page break
+
+\begin{table*}
+
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        User Study 2 & A graph-based view would be more intuitive for handling complex data structures. & 
+        Will be considered in future work. \\
+        \cline{2-3}
+        & Providing immediate feedback to users when they enter incorrect ranges is essential to prevent them from inputting invalid values into the property. & 
+        We now highlight schema violations by a red error symbol in the GUI panel and underlining the property name in red. 
+        Additionally, the tooltip lists all schema violations of a property. \\
+        \cline{2-3}
+        & Validation errors should also be reflected in the GUI panel, including for child properties. & 
+        See point above. 
+        Also, now the tooltip lists schema violations of child properties. \\
+        \cline{2-3}
+        & When dealing with an array, the display name of array elements (index) should be improved.
+        Currently you show just the element index. & 
+        We replace the numerical labels by a standard programming notation, which is \texttt{propertyName[0]}, \texttt{propertyName[1]}, ...
+        \\
+        \cline{2-3}
+        & The input field next to the \textit{Add Item} button is confusing. Both the input field and the button can be used to create a new item, which is redundant.
+        & We removed the input field next to the button. \\
+        \cline{2-3}
+        & It would be more consistent, if all user input in the GUI panel was within the right column of the table. 
+        That in some scenarios user input is needed within the left column (for names of new properties) feels inconsistent.
+         & Because of the nature of JSON schema, we retained the property name within the left column. 
+         To make it clear to the user that the property name can be edited, we added an \textit{edit} icon next to it. \\
+        \cline{2-3}
+        & The search function for locating specific properties lacks clarity at first glance. 
+        It should provide an immediate response and extend to nested levels, rather than merely highlighting the higher-level findings. & 
+        The search now provides a list of results, and upon clicking on a particular result, it jumps to that result in the code panel and GUI panel. In the GUI panel, if the element is nested, its parents will be automatically expanded. \\
+        \hline
+    \end{tabular}
+    \caption*{User Study Feedback and Resolution (Continued)} \label{tab:user_study2}
+
+\end{table*}
+
+\begin{table*}
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        User Study 3 & Working with the schema editor is difficult for me. It does not feel intuitive. & 
+        We made the schema editor more intuitive by creating our own simplified JSON schema meta schema.
+        For example, advanced JSON schema features are separated from the simple ones.
+        See section TODO \\
+        %% TODO
+        \cline{2-3}
+
+        \hline
+    \end{tabular}
+    \caption*{User Study Feedback and Resolution (Continued)} \label{tab:user_study3}
+
+\end{table*}
+
+\begin{table*}
+
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        User Study 4 & Modifying or renaming a new property in the GUI panel does not appear to take effect when double-clicking on it. & 
+        Renaming properties in the GUI panel can now be done using the \textit{edit} button next to the property name. \\
+        \cline{2-3}
+        & When creating a new property in the schema editor, its sub-schema has to be selected, such as \textit{string property} or \textit{boolean property}. 
+        Additionally, the type of the property has to be selected by the user too. 
+        Therefore, for example, when creating a new \textit{string property}, the user has to select that it is a string two times. 
+        It would be much more intuitive if the selection needs to be done only one time.  
+        & We completely overhauled our JSON schema meta schema. 
+        Now, when creating a new property, the user will have to select the type only once. \\
+        \cline{2-3}
+        & A toggle button should be implemented to enable and disable the code panel and GUI panel. 
+        & Only having a GUI panel or only having a code panel restricts the user unnecessarily.
+        The interplay of both panels is what makes this tool most effective.
+         If the user does not want to use one of the panels, he can resize that panel to a very small size.  \\
+        \cline{2-3}
+        & When working with a particular property in the GUI panel the opacity of the other properties should be decreased, visually highlighting the property that currently is in focus. & Will be considered in future work. \\
+        \cline{2-3}
+        & 5. Simply the schema editor to make it easier to work with, for those who are not very familiar with JSON schema. &
+        Has been done. See TODO. \\
+        % TODO
+        \hline
+
+    \end{tabular}
+    \caption{User Study Feedback and Resolution (Continued)} \label{tab:user_study4}
+
+\end{table*}
+
+\begin{table*}
+
+    \centering
+    \small % Reduce font size
+    \setlength{\extrarowheight}{5pt} % Add extra vertical space
+    \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
+    \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
+        \hline
+        User Study 5 & The search button is not immediately evident, making it challenging for users to locate the search function. & 
+        Instead of showing the search bar only when clicking the search button, we now just always show it. \\
+        \hline
+
+    \end{tabular}
+    \caption{User Study Feedback and Resolution (Continued)} \label{tab:user_study5}
+
+\end{table*}
+
 
 
 % TODO: if some quantitative methods are found, also mention here

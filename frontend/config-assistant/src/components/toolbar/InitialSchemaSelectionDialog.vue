@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import {ref, defineEmits, watch} from 'vue';
+import {defineEmits, ref, watch} from 'vue';
 import RadioButton from 'primevue/radiobutton';
 import Dialog from 'primevue/dialog';
+
 const showDialog = ref(false);
 
 const categories = ref<Array<{name: string; key: 'Example' | 'JsonStore' | 'File' | 'URL'}>>([
-  {name: 'From Example', key: 'Example'},
+  {name: 'Example Schema', key: 'Example'},
   {name: 'From Json Schema Store', key: 'JsonStore'},
-  {name: 'From File', key: 'File'},
-  {name: 'From URL', key: 'URL'},
+  {name: 'Open Schema File', key: 'File'},
+  {name: 'Load Schema from URL', key: 'URL'},
 ]);
 
 const emit = defineEmits<{

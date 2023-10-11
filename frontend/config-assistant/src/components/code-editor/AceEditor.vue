@@ -39,7 +39,7 @@ let editorWrapper: CodeEditorWrapper;
 /**
  * Debounce time for writing changes to store in ms
  */
-const WRITE_DEBOUNCE_TIME = 50;
+const WRITE_DEBOUNCE_TIME = 100;
 
 function createConfigManipulator(dataFormat: string): ConfigManipulator {
   if (dataFormat == 'json') {
@@ -115,6 +115,8 @@ onMounted(() => {
     'change',
     useDebounceFn(
       () => {
+        sessionStore.editorContentUnparsed = editor.value.getValue();
+
         if (currentChangeForcedFromOutside) {
           currentChangeForcedFromOutside = false; // reset flag
           return;
@@ -133,6 +135,15 @@ onMounted(() => {
       WRITE_DEBOUNCE_TIME,
       {maxWait: 10 * WRITE_DEBOUNCE_TIME}
     )
+  );
+
+  watch(
+    computed(() => sessionStore.editorContentUnparsed),
+    content => {
+      if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        editor.value.setValue(content, -1);
+      }
+    }
   );
 
   watchArray(

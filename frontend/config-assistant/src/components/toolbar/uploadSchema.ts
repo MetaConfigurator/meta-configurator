@@ -1,6 +1,7 @@
 import {useDataStore} from '@/store/dataStore';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {errorService} from '@/main';
+import YAML from 'yaml';
 
 export function openUploadSchemaDialog(): void {
   const inputElement = document.createElement('input');
@@ -15,7 +16,7 @@ export function openUploadSchemaDialog(): void {
       reader.onload = e => {
         const contents = e.target?.result as string;
         try {
-          const selectedSchema = JSON.parse(contents);
+          const selectedSchema = YAML.parse(contents); // YAML parse also works for JSON
           useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
           useDataStore().schemaData = selectedSchema;
         } catch (error) {

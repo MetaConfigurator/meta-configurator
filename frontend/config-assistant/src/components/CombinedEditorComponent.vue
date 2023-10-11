@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import 'primeicons/primeicons.css';
 import SplitterPanel from 'primevue/splitterpanel';
 import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
@@ -21,6 +21,9 @@ const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
   if (!useSettingsStore().settingsData.guiEditorOnRightSide) {
     result = result.reverse();
+  }
+  if (useSettingsStore().settingsData.debuggingActive) {
+    result.push(PanelDataCurrentPath);
   }
   return result;
 });
@@ -44,6 +47,12 @@ function updateMode(newMode: SessionMode) {
   }
 }
 
+const topToolbarRef = ref();
+
+onMounted(() => {
+  topToolbarRef.value?.showInitialSchemaDialog();
+});
+
 confirmationService.confirm = useConfirm();
 toastService.toast = useToast();
 </script>
@@ -56,6 +65,7 @@ toastService.toast = useToast();
     <main class="flex flex-col">
       <!-- toolbar -->
       <TopToolbar
+        ref="topToolbarRef"
         class="h-12 flex-none"
         :current-mode="useSessionStore().currentMode"
         @mode-selected="updateMode" />
@@ -66,13 +76,9 @@ toastService.toast = useToast();
         <SplitterPanel
           v-for="(panel, index) in panels"
           :key="index"
-          :min-size="25"
+          :min-size="10"
           :resizable="true">
           <component :is="panel" />
-        </SplitterPanel>
-
-        <SplitterPanel v-if="useSettingsStore().settingsData.debuggingActive">
-          <PanelDataCurrentPath />
         </SplitterPanel>
       </Splitter>
     </main>

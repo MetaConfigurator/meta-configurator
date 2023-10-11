@@ -1,13 +1,11 @@
 import {useSessionStore} from '@/store/sessionStore';
+import {useSettingsStore} from '@/store/settingsStore';
 
 export function downloadFile(fileNamePrefix: string): void {
-  // Get the current config data from the `fileData` variable
-  const configData: any = useSessionStore().fileData;
-  // Convert the config data to a JSON string
-  const configString: string = JSON.stringify(configData, null, 2);
+  const configData: string = useSessionStore().editorContentUnparsed;
 
   // Create a Blob object from the config string
-  const blob: Blob = new Blob([configString], {type: 'application/json'});
+  const blob: Blob = new Blob([configData], {type: 'application/json'});
 
   // Generate a unique filename for the downloaded config
   const now = new Date();
@@ -20,7 +18,8 @@ export function downloadFile(fileNamePrefix: string): void {
     second: '2-digit',
   });
   const formattedDate = formatter.format(now);
-  const fileName: string = `${fileNamePrefix}-${formattedDate}.json`;
+  const fileEnding = useSettingsStore().settingsData.dataFormat === 'yaml' ? 'yml' : 'json';
+  const fileName: string = `${fileNamePrefix}-${formattedDate}.${fileEnding}`;
 
   // Create a temporary link element
   const link: HTMLAnchorElement = document.createElement('a');
