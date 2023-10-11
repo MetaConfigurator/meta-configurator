@@ -5,9 +5,11 @@
 \subsection{Overview}\label{subsec:overview} % todo maybe rename it requirements?
 Before we dive into the architecture and detailed design of the tool, this section provides an overview of the tool from the view of the user.
 
-Figure \ref{mockup_gui_config} provides a sketch of the intended user interface design, showing the \textbf{file editor mode}.
+Note that the design of \toolname{} is strongly inspired by another tool by one of the authors\cite{githubBspEditor}.
 
-The application is divided into two main panels: the  \textbf{Text editor panel} (on the left) and the \textbf{GUI editor panel} (on the right).
+Figure \ref{mockup_gui_config} provides a sketch of the intended user interface design, showing the \textit{file editor mode}.
+
+The application is divided into two main panels: the  \textit{Text editor panel} (on the left) and the \textit{GUI editor panel} (on the right).
 In the Text editor panel the user can modify their data by hand, just like in a regular text editor.
 On top of that, features like syntax highlighting and schema validation assist the user.
 In the GUI editor panel, the user can modify their data with the help of a GUI.
@@ -31,7 +33,7 @@ This design combines the benefits of both a rich text editor (efficient for many
 
 
 Besides editing their data with the tool, the user can also use it to modify their schema or create a new schema.
-This is illustrated in figure \ref{mockup_gui_schema}, which sketches the \textbf{schema editor mode}.
+This is illustrated in figure \ref{mockup_gui_schema}, which sketches the \textit{schema editor mode}.
 The structure of the user interface remains the same as in the file editor mode.
 The main difference in this mode is, that the schema being used for the GUI and schema validation is not a user schema, but instead the JSON schema meta schema itself.
 
@@ -108,14 +110,15 @@ An alternative to replacing the complete text in the text editor, whenever data 
 This would require on the one hand identifying which part of the data is affected by the change and on the other hand understanding of the data within the serialized text in a way that it can be manipulated (e.g.\ navigating within the hierarchical data structure and changing values of a given path).
 This is out of scope for the project, but may be part of future work.
 Even such deep understanding of the text would wipe out non-default formatting at the sections affected by change.
-We tackle those difficulties in the following way: we accept that user-specific text formatting might be undone by our tool.
-To allow for different styles of formatting, we will provide the user with global formatting style settings (such as level of indentation or whether in YAML strings should be in quotation marks or not). % todo actually implement this
+We accept that modifying data via the GUI panel will wipe out non-default formatting and also erase comments from YAML documents.
+
+In the future, those difficulties could be tackled in the following way: To allow for different styles of formatting, the user could be provided with global formatting style settings (such as level of indentation or whether in YAML strings should be in quotation marks or not). 
 Whenever the configuration data JavaScript Object is serialized into text, we apply those formatting style settings.
-Second, to deal with the loss of comments, we implement a technique that keeps track of any comments in the text and then restores them after the text is replaced. % todo either write that we don't support it for now or implement it
+Second, to deal with the loss of comments, a technique that keeps track of any comments in the text and then restores them after the text is replaced could be implemented. This has already been done in another tool of one of the authors\cite{githubBspEditor}.
 
 When the user edits the text in the text editor, the text is deserialized into a JavaScript Object and sent to the data store, which then updates the configuration data object and notifies all other subscribed panels of the change.
 
-To make it possible to highlight certain lines in the editor as erroneous (schema violations) or jump to certain lines (e.g. when the user selects a property in the GUI editor, we want to jump to the same property in the text editor), we need a function \textit{determineRow(editorContent, dataPath)} that can determine the corresponding editor line, based on the configuration text and a given data path. See listing \ref{listing:determineRow} for an example input and output of such a function.
+To make it possible to highlight certain lines in the editor as erroneous (schema violations) or jump to certain lines (e.g. when the user selects a property in the GUI editor, we want to jump to the same property in the text editor), we need a function \texttt{determineRow(editorContent, dataPath)} that can determine the corresponding editor line, based on the configuration text and a given data path. See listing \ref{listing:determineRow} for an example input and output of such a function.
 
 \begin{listing}[!h]
     \begin{minted}[frame=single,
@@ -161,7 +164,7 @@ resultRow3 = determineRow(
     \label{listing:determineRow}
 \end{listing}
 
-The other way around, when the user places their cursor inside the text editor, we want to determine the path of the element that the cursor is currently at. This requires a function \textit{determinePath(editorContent, cursorPosition)} which returns a data path based on the configuration text and a given cursor position.
+The other way around, when the user places their cursor inside the text editor, we want to determine the path of the element that the cursor is currently at. This requires a function \texttt{determinePath(editorContent, cursorPosition)} which returns a data path based on the configuration text and a given cursor position.
 
 For the tool to support a data format, such as JSON, YAML or XML, the following needs to be implemented for that format:
 \begin{itemize}
