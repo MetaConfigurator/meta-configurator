@@ -1,10 +1,10 @@
 We conduct several interviews with professors and students as potential customers.
-During each interview, we introduce \toolname{}, give the participant tasks to execute using the tool and finish the session with open ended questions. 
+During each interview, we introduce \toolname{}, give the participant tasks to execute using the tool and finish the session with open ended questions.
 We observe how the participants work with the tool and which difficulties they have when executing the tasks.
 Additionally, we ask them for feedback and improvement suggestions.
 We also conduct a survey to gather demographic information about the participants of the user study.
 
-Note that besides the user study we have applied \toolname{} on several schemas (such as EnzymeML\cite{TODO} and the Strenda schema\cite{TODO}, provided by professors that we worked with) and \cfgfiles{} from the real world, to verify that it works and does bring benefits to the user. 
+Note that besides the user study we have applied \toolname{} on several schemas (such as EnzymeML\cite{TODO} and the Strenda schema\cite{TODO}, provided by professors that we worked with) and \cfgfiles{} from the real world, to verify that it works and does bring benefits to the user.
 
 \subsection{Methodology}\label{subsec:methodology}
 
@@ -33,7 +33,7 @@ We divide our interview tasks into four parts:
 We proceed our interview with one interviewee each time.
 The interview lasts around one hour.
 At the beginning, the interviewee is asked about approval of recording, and they can stop participating at any time.
-We introduce \toolname{} to the interviewee. 
+We introduce \toolname{} to the interviewee.
 Then we send the participant the tasks and \cfgfile{} and let them work on the tasks while sharing their screen.
 During this task solving session, we provide the interviewee with some basic help if they ask specific questions about the tool.
 The interview is recorded and we make notes of the answers, feedback and behavior of the interviewee.e
@@ -53,13 +53,110 @@ This survey covers the following points:
 %We analyse the results which we get from the survey and improve our application afterward.
 
 \subsection{Results}
-% todo: show specific cases of user study. Use table of feedbacks and resolutions
-% todo: not sure how we name this section.
+We performed the user study on 5 participants.
 
-\subsection{Evaluation} %Keyuri
-% todo: show correctness of the tasks.
+\subsubsection{Task Results}
+Table \ref{table:Results} shows the accuracy and difficulties that the participants had when solving the tasks.
+Accuracy is determined as the ratio of tasks that were solved correctly without the need of any hints to the total number of tasks.
+With the help of hints, all tasks could be completed by every participant.
 
+\begin{table*}[]
+    \label{table:Results}
+    \begin{tabular}{|c|l|l|}
+        \hline
+        \multicolumn{1}{|l|}{} &
+
+        \multicolumn{1}{c|}{
+            \begin{tabular}[c]{@{}c@{}}
+                Accuracy \& Notes
+            \end{tabular}} &
+        \multicolumn{1}{c|}{
+            \begin{tabular}[c]{@{}c@{}}
+                Difficulties
+            \end{tabular}} \\ \hline
+
+        User Study 1 &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Accuracy: 100\%(11/11)\\
+            Effective use of tooltips\\
+            Used both GUI and code editor
+        \end{tabular} &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Task 3.2: Setting Vehicle Type to the highest level:\\
+            Took some time to find the field
+        \end{tabular} \\ \hline
+
+        User Study 2 &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Accuracy: 91\%(10/11)\\
+            Used search functionality\\
+            Used both GUI and code editor
+        \end{tabular} &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Task 4.2: Adding new property\\
+            Could not find where to add new property\\ in Schema Editor\\
+            Did not know how to edit property name
+        \end{tabular} \\ \hline
+
+        User Study 3 &
+        \begin{tabular}[c]{@{}l@{}}
+            Accuracy: 82\%(9/11)\\
+            Effective use of tooltips\\
+            Not familiar with JSON schema\\
+            Used only the GUI editor
+        \end{tabular} &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Task 2.3: Duration of Simulation:\\
+            Did not think about using the\\ GUI panel to retrieve information\\
+            Task 2.4: Validity of humidity:\\
+            Mistakenly thought humidity value was valid.\\
+            Did not consider red underline as an error\\
+            Task 4.2: Add new property:\\  Set property name in wrong place
+        \end{tabular} \\ \hline
+
+        User Study 4 &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Accuracy: 82\%(9/11)\\
+            Solved tasks in a short time\\
+            Used only the GUI editor
+        \end{tabular} &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Task 2.4: Validity of humidity:\\
+            Mistakenly thought humidity value was valid\\
+            Did not find out that he could use tooltips\\
+            Task 3.2: Setting Vehicle Type to the highest level: \\
+            Did not scroll down in Dropdown menu\\
+            Task 3.3: Validation Errors:\\
+            Thought red underline was spell checking
+        \end{tabular} \\ \hline
+
+        User Study 5 &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Accuracy: 100\%(11/11)\\
+            Solved tasks in a short time\\
+            Used both GUI and code editor
+        \end{tabular} &
+
+        \begin{tabular}[c]{@{}l@{}}
+            Task 3.2: Setting Vehicle Type to the highest level: \\  Took some time to find the vehicle type\\
+            Task 4.2: Adding new property\\  Did not set the property type at the beginning
+        \end{tabular} \\ \hline
+    \end{tabular}
+    \caption{Results}
+    \label{tab:my-table}
+\end{table*}
+
+\subsubsection{Feedback and Resolution} %Keyuri
 Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the interviewees, as well as which measures we took based on it.
+
 \begin{table*}
     \vspace{-10pt}
     \centering
@@ -71,11 +168,11 @@ Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
         \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{Feedback} & \multicolumn{1}{|c|}{Resolution} \\
         \cline{2-3}
         \hline
-        User Study 1 & The property value should not be autocorrected if the user enters an incorrect value. 
-        Instead, an error message or another way should be used to inform the user that their input is incorrect. & 
+        User Study 1 & The property value should not be autocorrected if the user enters an incorrect value.
+        Instead, an error message or another way should be used to inform the user that their input is incorrect. &
         Instead of auto-correcting values, we now provide more clear user feedback on incorrect values (red underline, error symbol). \\
         \cline{2-3}
-        & It would be good to have the ability to remove data entries with the GUI panel. & 
+        & It would be good to have the ability to remove data entries with the GUI panel. &
         Implemented by adding a "remove" button next to properties which have data and are not required. \\
         \cline{2-3}
         & A search functionality to locate properties would be helpful, especially within nested levels.
@@ -83,21 +180,21 @@ Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
         \cline{2-3}
         %& 4. The Schema editor GUI panel contains extensive metadata, but the code editor panel remains empty. & 4. bla bla bla \\
         \cline{2-3}
-        & The GUI panel feels overwhelming to the user due to many variations in styling and color of the GUI elements. & 
+        & The GUI panel feels overwhelming to the user due to many variations in styling and color of the GUI elements. &
         We slightly reduced the number of different stylings by no longer showing required properties in bold face and instead just show an asterisk next to it. \\
         \cline{2-3}
         & The cursor should not have the clickable animation when hovering over non-clickable fields in the GUI editor. & Now we only show the clickable animation when hovering over clickable GUI components. \\
         \cline{2-3}
-        & In drop-down menus we do not need a button to clear the selection. & 
+        & In drop-down menus we do not need a button to clear the selection. &
         We disabled the option of clearing the selection. \\
         \cline{2-3}
-        & 8. If the type of a property is "any", it should not be interpreted as the "string" type in the GUI panel. & 
+        & 8. If the type of a property is "any", it should not be interpreted as the "string" type in the GUI panel. &
         We show a drop-down menu to the user, where they can select the type they want to use. \\
         \cline{2-3}
-        & Validation errors should not highlighted via a warning symbol, but instead an error symbol & 
+        & Validation errors should not highlighted via a warning symbol, but instead an error symbol &
         We changed the warning symbol into an error symbol. \\
         \cline{2-3}
-        & After performing an undo or redo action, the cursor should jump to the corresponding location to reflect the changes made by the user.& 
+        & After performing an undo or redo action, the cursor should jump to the corresponding location to reflect the changes made by the user.&
         Will be considered in future work. \\
         \hline
     \end{tabular}
@@ -115,32 +212,32 @@ Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
     \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
     \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
         \hline
-        User Study 2 & A graph-based view would be more intuitive for handling complex data structures. & 
+        User Study 2 & A graph-based view would be more intuitive for handling complex data structures. &
         Will be considered in future work. \\
         \cline{2-3}
-        & Providing immediate feedback to users when they enter incorrect ranges is essential to prevent them from inputting invalid values into the property. & 
-        We now highlight schema violations by a red error symbol in the GUI panel and underlining the property name in red. 
+        & Providing immediate feedback to users when they enter incorrect ranges is essential to prevent them from inputting invalid values into the property. &
+        We now highlight schema violations by a red error symbol in the GUI panel and underlining the property name in red.
         Additionally, the tooltip lists all schema violations of a property. \\
         \cline{2-3}
-        & Validation errors should also be reflected in the GUI panel, including for child properties. & 
-        See point above. 
+        & Validation errors should also be reflected in the GUI panel, including for child properties. &
+        See point above.
         Also, now the tooltip lists schema violations of child properties. \\
         \cline{2-3}
         & When dealing with an array, the display name of array elements (index) should be improved.
-        Currently you show just the element index. & 
+        Currently you show just the element index. &
         We replace the numerical labels by a standard programming notation, which is \texttt{propertyName[0]}, \texttt{propertyName[1]}, ...
         \\
         \cline{2-3}
         & The input field next to the \textit{Add Item} button is confusing. Both the input field and the button can be used to create a new item, which is redundant.
         & We removed the input field next to the button. \\
         \cline{2-3}
-        & It would be more consistent, if all user input in the GUI panel was within the right column of the table. 
+        & It would be more consistent, if all user input in the GUI panel was within the right column of the table.
         That in some scenarios user input is needed within the left column (for names of new properties) feels inconsistent.
-         & Because of the nature of JSON schema, we retained the property name within the left column. 
+         & Because of the nature of JSON schema, we retained the property name within the left column.
          To make it clear to the user that the property name can be edited, we added an \textit{edit} icon next to it. \\
         \cline{2-3}
-        & The search function for locating specific properties lacks clarity at first glance. 
-        It should provide an immediate response and extend to nested levels, rather than merely highlighting the higher-level findings. & 
+        & The search function for locating specific properties lacks clarity at first glance.
+        It should provide an immediate response and extend to nested levels, rather than merely highlighting the higher-level findings. &
         The search now provides a list of results, and upon clicking on a particular result, it jumps to that result in the code panel and GUI panel. In the GUI panel, if the element is nested, its parents will be automatically expanded. \\
         \hline
     \end{tabular}
@@ -155,7 +252,7 @@ Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
     \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
     \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
         \hline
-        User Study 3 & Working with the schema editor is difficult for me. It does not feel intuitive. & 
+        User Study 3 & Working with the schema editor is difficult for me. It does not feel intuitive. &
         We made the schema editor more intuitive by creating our own simplified JSON schema meta schema.
         For example, advanced JSON schema features are separated from the simple ones.
         See section TODO \\
@@ -176,17 +273,17 @@ Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
     \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
     \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
         \hline
-        User Study 4 & Modifying or renaming a new property in the GUI panel does not appear to take effect when double-clicking on it. & 
+        User Study 4 & Modifying or renaming a new property in the GUI panel does not appear to take effect when double-clicking on it. &
         Renaming properties in the GUI panel can now be done using the \textit{edit} button next to the property name. \\
         \cline{2-3}
-        & When creating a new property in the schema editor, its sub-schema has to be selected, such as \textit{string property} or \textit{boolean property}. 
-        Additionally, the type of the property has to be selected by the user too. 
-        Therefore, for example, when creating a new \textit{string property}, the user has to select that it is a string two times. 
-        It would be much more intuitive if the selection needs to be done only one time.  
-        & We completely overhauled our JSON schema meta schema. 
+        & When creating a new property in the schema editor, its sub-schema has to be selected, such as \textit{string property} or \textit{boolean property}.
+        Additionally, the type of the property has to be selected by the user too.
+        Therefore, for example, when creating a new \textit{string property}, the user has to select that it is a string two times.
+        It would be much more intuitive if the selection needs to be done only one time.
+        & We completely overhauled our JSON schema meta schema.
         Now, when creating a new property, the user will have to select the type only once. \\
         \cline{2-3}
-        & A toggle button should be implemented to enable and disable the code panel and GUI panel. 
+        & A toggle button should be implemented to enable and disable the code panel and GUI panel.
         & Only having a GUI panel or only having a code panel restricts the user unnecessarily.
         The interplay of both panels is what makes this tool most effective.
          If the user does not want to use one of the panels, he can resize that panel to a very small size.  \\
@@ -211,7 +308,7 @@ Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
     \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
     \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
         \hline
-        User Study 5 & The search button is not immediately evident, making it challenging for users to locate the search function. & 
+        User Study 5 & The search button is not immediately evident, making it challenging for users to locate the search function. &
         Instead of showing the search bar only when clicking the search button, we now just always show it. \\
         \hline
 
