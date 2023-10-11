@@ -361,11 +361,11 @@ In that case, the incompatible pair is dismissed.
 
 
 \paragraph{Removing incompatible oneOfs and anyOfs}
-It can happen that a schema has oneOf or anyOf options which are not compatible with the schema of the property (e.g. sub-schemas that can never be fulfilled in combination with the property schema).
-Listing \ref{listing:incompatible_one_ofs} provides an example of a schema with an incompatible oneOf option.
+It can happen that a schema has oneOf or anyOf options which are not compatible with the schema of the property (e.g.\ sub-schemas that can never be fulfilled in combination with the property schema).
+Listing~\ref{listing:incompatible_one_ofs} provides an example of a schema with an incompatible oneOf option.
 An example where this occurs is in our adjusted JSON schema meta schema, if we assign the root property the jsonSchema sub-schema, which allows objects and booleans, but then additionally restrict the root to be an object.
 For every oneOf and anyOf sub-schema, we check whether it can be merged with the schema of the property.
-The options which are not compatible (can not be merged) are removed (see listing \ref{listing:incompatible_one_ofs_removed}).
+The options which are not compatible (can not be merged) are removed (see listing~\ref{listing:incompatible_one_ofs_removed}).
 
 \begin{listing}[!h]
     \begin{minted}[frame=single,
@@ -442,7 +442,7 @@ This is precisely what this pre-processing step does: if possible, the oneOf sub
 
 
 \paragraph{Preprocessing oneOfs and anyOfs}
-For all remaining oneOf and anyOf sub-schems, the internal pre-processing steps are executed.
+For all remaining oneOf and anyOf sub-schemas, the internal pre-processing steps are executed.
 
 
 \paragraph{Title inducing}
