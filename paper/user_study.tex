@@ -1,6 +1,8 @@
 We conduct several interviews with professors and students as potential customers.
-We collect feedback from the customers to improve user experiences and fix bugs according to the feedback.
-We also use a survey for demographic questions after the user study.
+During each interview, we introduce \toolname{}, give the participant tasks to execute using the tool and finish the session with open ended questions. 
+We observe how the participants work with the tool and which difficulties they have when executing the tasks.
+Additionally, we ask them for feedback and improvement suggestions.
+We also conduct a survey to gather demographic information about the participants of the user study.
 
 \subsection{Methodology}\label{subsec:methodology}
 
@@ -13,28 +15,31 @@ There are two basic standards we follow to find a potential user:
 \end{itemize}
 
 \paragraph{Interview Questions}
-We prepare our interview questions based on a mockup JSON schema and \cfgfiles.
-It is about a simulation software that simulates a self-driving car.
-To make it easier for interviewees to solve the questions, we divide our interview into four parts:
+For the interview, we created a JSON schema and \cfgfile{}, about a made-up self-driving car simulation.
+The interview questions deal with working with those files.
+We divide our interview tasks into four parts:
 \begin{itemize}
-    \item Setup Question: Where to open the application and set up schema and \cfgfiles.
-    \item Basic Question: Goal is to know about the GUI of application
-    \item Modifying the configuration file: Solving problems of \cfgfiles inside the \textbf{file editor}.
-    \item Modifying the schema: Solving problems of JSON schema inside the \textbf{schema editor}.
+    \item Setup: Open the application and open schema and \cfgfile.
+    \item Information Retrieval Questions: with increasing difficulty, the participant has to retrieve information from the \cfgfile{}. Much easier to solve by using the GUI panel.
+    \item Configuration Modifications: Different tasks that involve changing the \cfgfile{}. Intend is that the participant becomes more familiar with the GUI panel.
+    \item Schema modifications: Making adjustments to the schema. Most difficult, but still feasible using the GUI panel.
 \end{itemize}
+
+%TODO: include interview material in appendix
 
 \paragraph{Interview Process}
 We proceed our interview with one interviewee each time.
 The interview lasts around one hour.
 At the beginning, the interviewee is asked about approval of recording, and they can stop participating at any time.
-One of our team member hosts the interview and guides interviewee how to use our application based on the interview question.
-Another one will record the whole interview and takes notes of what are correctly and incorrectly answered.
-Opinions and critical points will also be noted.
-After the application test, all team members can ask the open questions and answer questions from the interviewee.
+We introduce \toolname{} to the interviewee. 
+Then we send the participant the tasks and \cfgfile{} and let them work on the tasks while sharing their screen.
+During this task solving session, we provide the interviewee with some basic help if they ask specific questions about the tool.
+The interview is recorded and we make notes of the answers, feedback and behavior of the interviewee.e
+Finally, in an open dialog, we ask the interviewee about more feedback and improvement suggestions as well as their opinion on the tool.
 
 \paragraph{Survey}
-After the interview, we ask each interviewee to finish a survey(follow-up questions).
-This survey will cover the following points:
+After the interview, we ask each interviewee to fill out a survey (follow-up questions).
+This survey covers the following points:
 \begin{itemize}
     \item Occupation of the interviewee.
     \item Experiences in software engineering,
@@ -42,8 +47,8 @@ This survey will cover the following points:
     \item Domains in which people use with JSON/YAML files.
     \item Feedback about the application after interview.
 \end{itemize}
-Based on the survey, we could get many feedbacks which we can use in the future.
-We analyse the results which we get from the survey and improve our application afterward.
+%Based on the survey, we could get many feedbacks which we can use in the future.
+%We analyse the results which we get from the survey and improve our application afterward.
 
 \subsection{Results}
 % todo: show specific cases of user study. Use table of feedbacks and resolutions
@@ -51,6 +56,8 @@ We analyse the results which we get from the survey and improve our application 
 
 \subsection{Evaluation} %Keyuri
 % todo: show correctness of the tasks.
+
+Tables \ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the interviewees, as well as which measures we took based on it.
 \begin{table*}
     \vspace{-10pt}
     \centering
@@ -59,7 +66,7 @@ We analyse the results which we get from the survey and improve our application 
     \renewcommand{\arraystretch}{1.5} % Adjust the vertical spacing between rows
     \begin{tabular}{|c|p{0.4\linewidth}|p{0.4\linewidth}|}
         \hline
-        \multicolumn{1}{|c|}{\multirow{2}{*}{}} & \multicolumn{1}{|c|}{Feedback} & \multicolumn{1}{|c|}{Resolution} \\
+        \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{Feedback} & \multicolumn{1}{|c|}{Resolution} \\
         \cline{2-3}
         \hline
         User Study 1 & The property value should not be autocorrected if the user enters an incorrect value. 
@@ -92,7 +99,7 @@ We analyse the results which we get from the survey and improve our application 
         Will be considered in future work. \\
         \hline
     \end{tabular}
-    \caption* {User Study Feedback and Resolution (Continued)}
+    \caption* {User Study Feedback and Resolution (Continued)} \label{tab:user_study1}
 \end{table*}
 
 
@@ -135,7 +142,8 @@ We analyse the results which we get from the survey and improve our application 
         The search now provides a list of results, and upon clicking on a particular result, it jumps to that result in the code panel and GUI panel. In the GUI panel, if the element is nested, its parents will be automatically expanded. \\
         \hline
     \end{tabular}
-    \caption*{User Study Feedback and Resolution (Continued)}
+    \caption*{User Study Feedback and Resolution (Continued)} \label{tab:user_study2}
+
 \end{table*}
 
 \begin{table*}
@@ -154,7 +162,8 @@ We analyse the results which we get from the survey and improve our application 
 
         \hline
     \end{tabular}
-    \caption*{User Study Feedback and Resolution (Continued)}
+    \caption*{User Study Feedback and Resolution (Continued)} \label{tab:user_study3}
+
 \end{table*}
 
 \begin{table*}
@@ -188,7 +197,8 @@ We analyse the results which we get from the survey and improve our application 
         \hline
 
     \end{tabular}
-    \caption{User Study Feedback and Resolution (Continued)}
+    \caption{User Study Feedback and Resolution (Continued)} \label{tab:user_study4}
+
 \end{table*}
 
 \begin{table*}
@@ -204,7 +214,8 @@ We analyse the results which we get from the survey and improve our application 
         \hline
 
     \end{tabular}
-    \caption{User Study Feedback and Resolution (Continued)}
+    \caption{User Study Feedback and Resolution (Continued)} \label{tab:user_study5}
+
 \end{table*}
 
 
