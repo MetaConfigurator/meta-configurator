@@ -95,21 +95,21 @@ The toolbar provides basic functionalities for all three views:
 In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings})of \toolname{}:
 \begin{table*}
     \centering
-    \caption{Settings view functionality\label{tab:settings}}
+    \caption{Setting Parameters\label{tab:settings}}
     \begin{tabular}{@{}p{0.3\linewidth}p{0.6\linewidth}@{}}
         \toprule
-        \textbf{Configuration} & \textbf{\ Description} \\
+        \textbf{Parameter} & \textbf{\ Description} \\
         \midrule
-        Data Format & Users can select between JSON and YAML data format. The choice made here will influence all three views.  \\
-        Gui Editor On Right Side & By default, the GUI panel is located on the right side, but users have the flexibility to change it to the left side using this option.  \\
-        Code Editor Font Size & Customize the \textbf{font size} in the code editor panel to suit user's preferences. \\
-        GUI Editor Configuration & Users can configure the property sorting in the GUI editor, including options like:
+        Data Format & The data format used by the code editor. Currently YAML and JSON are supported. \\
+        Code Editor Font Size & Size of the font in the code editor. \\
+        Gui Editor On Right Side & By default, the GUI panel is located on the right side and the code panel on the left side. Using this option, their positions can be swapped. \\
+        GUI Editor Property Sorting & The order in which the properties in the GUI panel should appear:
         \begin{itemize}
-            \item \textbf{Schema Order}: Define the order in which schema elements are presented.
-            \item \textbf{Priority Order} : Customize the order of elements based on their priority.
-            \item \textbf{Data Order } : Specify the order in which data elements are displayed.
-        \end{itemize}
-        And \textbf{maximum depth} determines the maximum level of nesting or hierarchy displayed in the GUI editor. \\
+            \item \textbf{Schema Order}: Orders elements according to the order in the schema.
+            \item \textbf{Priority Order}: Orders elements based on their priority (e.g. required properties first, deprecated properties last).
+            \item \textbf{Data Order }: Orders elements the same way as it is in the data.
+        \end{itemize} \\
+        GUI Editor Maximum Depth & Determines the maximum level of nesting or hierarchy displayed in the GUI editor. \\
         Debugging Active & For debugging purposes, users can enable or disable the debugging panel as needed.  \\
         \bottomrule
     \end{tabular}
