@@ -10,6 +10,8 @@ export async function fetchExampleSchema(schemaKey: string, toast?: any): Promis
     useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     const schemaName = selectedSchema.label || 'Unknown Schema';
     useDataStore().schemaData = selectedSchema?.schema;
+
+    console.log('fetch example schema');
     newEmptyFile('Do you also want to clear the current config file?');
 
     if (toast) {

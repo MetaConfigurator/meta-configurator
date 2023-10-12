@@ -4,7 +4,7 @@ import {toastService} from '@/helpers/toastService';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {useDataStore} from '@/store/dataStore';
 import {errorService} from '@/main';
-import {newEmptySchemafile} from '@/components/toolbar/clearSchema';
+import _ from 'lodash';
 export async function generateSampleData(schema: any): Promise<any> {
   JSONSchemaFaker.option('alwaysFakeOptionals', true);
   JSONSchemaFaker.option('minItems', 1);
@@ -12,7 +12,7 @@ export async function generateSampleData(schema: any): Promise<any> {
   return JSONSchemaFaker.resolve(schema);
 }
 export function randomDataGeneration(message: string | undefined = undefined): void {
-  if (!message) {
+  if (!message || _.isEmpty(useDataStore().fileData)) {
     generateExampleData();
     return;
   }
