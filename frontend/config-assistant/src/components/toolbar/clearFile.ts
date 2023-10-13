@@ -2,8 +2,13 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {toastService} from '@/helpers/toastService';
 import {confirmationService} from '@/helpers/confirmationService';
 import {useDataStore} from '@/store/dataStore';
+import _ from 'lodash';
 
 export function newEmptyFile(message: string | undefined = undefined): void {
+  if (_.isEmpty(useDataStore().fileData)) {
+    // file already is empty -> no need for clearing
+    return;
+  }
   if (!message) {
     clearFile();
     return;
@@ -25,7 +30,6 @@ export function newEmptyFile(message: string | undefined = undefined): void {
   });
 }
 export function clearFile() {
-  newEmptyFile('Do you want to clear the File editor?');
   useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
   useDataStore().fileData = {};
   useSessionStore().updateCurrentPath([]);
