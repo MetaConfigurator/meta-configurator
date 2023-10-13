@@ -47,7 +47,29 @@
  \maketitle
 
  \begin{abstract}
-  % todo write abstract
+ Textual formats to structure data, such as JSON, XML and YAML, are human-readable as well as machine-readable.
+ Such formats are often used for configuration files or to structure measurement or research data, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
+ The format of those data structures can be defined by so-called schemas, which define the rules the data has to conform to.
+ Depending on the domain of such files, they can be complex and time-consuming to modify and maintain.
+ Tooling, such as graphical user interfaces, can significantly reduce manual efforts and assist the user in editing the files.
+ Those graphical user interfaces, however, require initial effort to be developed, as well as continuous effort in being maintained and updated when the underlying data schema changes.
+ We tackle this problem by developing a meta program that automatically generates such assisting GUIs, based on the given data schema.
+
+ Our approach differs from other schema-to-UI approaches in following:
+
+ \begin{enumerate}
+  \item The tool combines the assistance of a GUI with the flexibility and speed of a rich-text code editor by providing both in one view
+  \item The schema can be edited using the same tool and type of view
+  \item We support more complex schema features, such as conditions and constraints
+ \end{enumerate}
+
+In this paper, we evaluate different schema formats by expressiveness and popularity. 
+We choose JSON schema as the most suitable for this work.
+We describe the design and implementation of our tool, as well as the results of a user study that we performed.
+5 participants (3 professors and 2 researchers) solved several tasks with the tool, while we recorded and evaluated their interaction with the tool.
+We also asked them for feedback, based on which we deduced multiple measures, which we then implemented.
+Finally, we provide a conclusion and future outlook for this work.
+
  \end{abstract}
 
  \begin{IEEEkeywords}
@@ -59,23 +81,24 @@
 
  Textual formats to structure data, such as JSON, XML and YAML, are human-readable as well as machine-readable.
 
- For configuration files such formats are often used, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
+	
+ Such formats are often used for configuration files or to structure measurement or research data, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
  The format of those data structures can be defined by so-called schemas, which define the rules the data has to conform to.
- Besides configuration files and the field of software development, other academic fields, such as Biology or Chemistry also use those formats to structure and validate their data.
+ Given a schema, it can be validated whether a particular file confirms to that schema.
 
- To simplify, we will call all file instances using such formats \textit{\cfgfiles}.
+ We will call all file instances using such formats \textit{\cfgfiles}.
 
- Depending on the content of such \cfgfiles, they can be complex and time-consuming to modify and maintain.
- Tooling, such as graphical user interfaces, can significantly reduce manual efforts and assist the user.
- Those graphical user interfaces, however, require initial effort to be developed, as well as continuous effort in being maintained and updated when the underlying configuration schema changes.
- We intend to tackle this problem by developing a meta program that allows humans to generate such configurator GUIs, which can be shared with others.
+ Depending on the domain of such \cfgfiles, they can be complex and time-consuming to modify and maintain.
+ Tooling, such as graphical user interfaces, can significantly reduce manual efforts and assist the user in editing the files.
+ Those graphical user interfaces, however, require initial effort to be developed, as well as continuous effort in being maintained and updated when the underlying data schema changes.
+ We tackle this problem by developing a meta program that automatically generates such assisting GUIs, based on the given data schema.
 
  Our approach differs from other schema-to-UI approaches in following:
 
  \begin{enumerate}
-  \item The tool combines the assistance of a GUI with the flexibility and speed of a rich-text editor by providing both in one view
-  \item The schema can be defined using the same tool
-  \item The defined schemas, the resulting configurator GUI and the modified configuration files can all be shared with others
+  \item The tool combines the assistance of a GUI with the flexibility and speed of a rich-text code editor by providing both in one view
+  \item The schema can be edited using the same tool and type of view
+  \item We support more complex schema features, such as conditions and constraints
  \end{enumerate}
 
 
