@@ -1,15 +1,19 @@
-{\huge \textbf{Appendix A: User Study}}\\\\
+{\huge \textbf{Appendix A: User Study}}\\\\\\\\
 {\large \textbf{A.1: Interview Tasks }} \\\\
 \section{Interview Tasks}
 This part is about interview tasks we prepared to conduct our user study.
 \subsection{Task: Introduction}
-For these tasks you are presented a schema that you have not seen or worked with before. We have prepared a schema of a made-up simulation software in which self-driving cars are simulated. There is one self-driving car that has to navigate from a start point to an end point but there are also other vehicles and pedestrians simulated. For these tasks, the exact details are not important.
+For these tasks you are presented a schema that you have not seen or worked with before.
+We have prepared a schema of a made-up simulation software in which self-driving cars are simulated.
+There is one self-driving car that has to navigate from a start point to an end point but there are also other vehicles and pedestrians simulated.
+For these tasks, the exact details are not important.
 
 \subsection{Task 1: Setup}
 \begin{enumerate}
     \item Go to https://paulbredl.github.io/config-assistant/
     \item Select the option “Select a Schema”: "From Example" → "Autonomous Vehicle Schema".
-    \item Open the example configuration file we have sent to you. \\ The following tasks will assume this schema and this example file.
+    \item Open the example configuration file we have sent to you. \\
+          The following tasks will assume this schema and this example file.
 \end{enumerate}
 
 \subsection{Task 2: Questions}
@@ -31,8 +35,13 @@ For these tasks you are presented a schema that you have not seen or worked with
 
 \subsection{Task 4: Modifying the schema}
 \begin{enumerate}
-    \item For many applications it is good practice or even required that a schema has a unique identifier, which usually is a URL. \\Set the \$id field of this schema to : “https://www.example.com/self-driving-vehicle”.
-    \item The simulation software will get a premium version in the next update, for which the user needs a license. The license key should be stored in the configuration file. Add a new property “LicenseKey” to the “properties” object. It should be of the type “string”. The length of the key is at most 20 characters long. Add a short exemplary description.
+    \item For many applications it is good practice or even required that a schema has a unique identifier, which usually is a URL.
+          \\Set the \$id field of this schema to : “https://www.example.com/self-driving-vehicle”.
+    \item The simulation software will get a premium version in the next update, for which the user needs a license.
+          The license key should be stored in the configuration file.
+          Add a new property “LicenseKey” to the “properties” object.
+          It should be of the type “string”.
+          The length of the key is at most 20 characters long. Add a short exemplary description.
     \item Go back to the file editor and verify that the new property “LicenseKey” is displayed and that the correct information is displayed when hovering over the property.
 \end{enumerate}
 
