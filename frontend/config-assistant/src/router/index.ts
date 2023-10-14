@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
+import {clearPreprocessedRefSchemaCache} from '@/helpers/schema/schemaPreprocessor';
 
 // Note: currently not in use/active
 
@@ -49,6 +50,8 @@ router.beforeEach((to, from, next) => {
   useSessionStore().currentSearchResults = [];
 
   useSessionStore().reloadSchema();
+
+  clearPreprocessedRefSchemaCache();
 
   next();
 });

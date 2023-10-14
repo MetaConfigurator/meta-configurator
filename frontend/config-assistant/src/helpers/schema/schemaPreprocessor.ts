@@ -337,3 +337,10 @@ function hasAnyOfs(schema: JsonSchemaType): boolean {
   }
   return schema.anyOf !== undefined && schema.anyOf.length > 0;
 }
+
+/**
+ * Clears the cache of preprocessed schemas.
+ */
+export function clearPreprocessedRefSchemaCache() {
+  preprocessedRefSchemas.clear();
+}
