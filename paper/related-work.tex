@@ -29,12 +29,7 @@ JSON and YAML documents are of a similar structure (JSON being a subset of YAML)
 Some syntactical details of YAML can, however, not be expressed with JSON schema. % todo consider citation
 
 % minye
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json,firstnumber=1,caption={JSON schema example},captionpos=b]
 {
   "$id": "https://example.com
   /person.schema.json",
@@ -58,27 +53,16 @@ Some syntactical details of YAML can, however, not be expressed with JSON schema
     }
   }
 }
-    \end{minted}
-    \caption{JSON schema example}
-    \label{json-schema-example}
-\end{listing}
+\end{lstlisting}\label{json-schema-example}
 
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json,firstnumber=1,caption={JSON example for the schema}~\ref{json-schema-example},captionpos=b]
 {
   "firstName": "John",
   "lastName": "Doe",
   "age": 21
 }
-    \end{minted}
-    \caption{JSON example for the schema shown in Listing \ref{json-schema-example}}
-    \label{json-example}
-\end{listing}
+\end{lstlisting}\label{json-example}
 
 % felix
 \subsubsection{XSD and DTD}

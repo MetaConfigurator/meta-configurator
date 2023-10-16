@@ -7,13 +7,15 @@
 \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
 \usepackage{textcomp}
 \usepackage{lipsum}
+\usepackage{xcolor}
+\usepackage[page,header]{appendix}
 \usepackage[export]{adjustbox}
 \usepackage{stfloats}
 \usepackage{url}
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{cite}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage{booktabs}
@@ -26,6 +28,42 @@
 \newcommand{\cfgfile}{configuration file}
 \newcommand{\toolname}{\textit{MetaConfigurator}} % or config assistant
 
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+
+% adding code style for json
+\lstdefinelanguage{json}{
+ basicstyle=\normalfont\ttfamily,
+ numbers=left,
+ xleftmargin=2.0ex,
+ float,
+ numberstyle=\scriptsize,
+ stepnumber=1,
+ numbersep=8pt,
+ showstringspaces=false,
+ breaklines=true,
+ frame=lines,
+ backgroundcolor=\color{background},
+ literate=
+ *{0}{{{\color{numb}0}}}{1}
+  {1}{{{\color{numb}1}}}{1}
+  {2}{{{\color{numb}2}}}{1}
+  {3}{{{\color{numb}3}}}{1}
+  {4}{{{\color{numb}4}}}{1}
+  {5}{{{\color{numb}5}}}{1}
+  {6}{{{\color{numb}6}}}{1}
+  {7}{{{\color{numb}7}}}{1}
+  {8}{{{\color{numb}8}}}{1}
+  {9}{{{\color{numb}9}}}{1}
+  {:}{{{\color{punct}{:}}}}{1}
+  {,}{{{\color{punct}{,}}}}{1}
+  {\{}{{{\color{delim}{\{}}}}{1}
+  {\}}{{{\color{delim}{\}}}}}{1}
+  {[}{{{\color{delim}{[}}}}{1}
+  {]}{{{\color{delim}{]}}}}{1},
+}
 
 \begin{document}
 
@@ -47,28 +85,18 @@
  \maketitle
 
  \begin{abstract}
- Textual formats to structure data, such as JSON, XML and YAML, are human-readable as well as machine-readable.
- Such formats are often used for configuration files or to structure measurement or research data, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
- The format of those data structures can be defined by so-called schemas, which define the rules the data has to conform to.
- Depending on the domain of such files, they can be complex and time-consuming to modify and maintain.
- Tooling, such as graphical user interfaces, can significantly reduce manual efforts and assist the user in editing the files.
- Those graphical user interfaces, however, require initial effort to be developed, as well as continuous effort in being maintained and updated when the underlying data schema changes.
- We tackle this problem by developing a meta program that automatically generates such assisting GUIs, based on the given data schema.
-
- Our approach differs from other schema-to-UI approaches in following:
-
- \begin{enumerate}
-  \item The tool combines the assistance of a GUI with the flexibility and speed of a rich-text code editor by providing both in one view
-  \item The schema can be edited using the same tool and type of view
-  \item We support more complex schema features, such as conditions and constraints
- \end{enumerate}
-
-In this paper, we evaluate different schema formats by expressiveness and popularity. 
-We choose JSON schema as the most suitable for this work.
-We describe the design and implementation of our tool, as well as the results of a user study that we performed.
-5 participants (3 professors and 2 researchers) solved several tasks with the tool, while we recorded and evaluated their interaction with the tool.
-We also asked them for feedback, based on which we deduced multiple measures, which we then implemented.
-Finally, we provide a conclusion and future outlook for this work.
+ Textual formats to structure data, such as JSON, XML and YAML, are often used for configuration files or to structure measurement and research data.
+ Depending on the domain and underlying schema, the data can be complex and time-consuming to modify and maintain.
+ Graphical user interfaces (GUIs) have proven effective in simplifying data management but entail substantial development and maintenance efforts.
+ 
+ To address this challenge, we introduce a novel approach in this paper: a meta-program that automatically generates GUIs tailored to a given data schema. 
+ Our approach differentiates itself from others by 1) offering a unified view that combines the benefits of both GUIs and rich-text code editors, 2) enabling schema editing within the same tool and 3) support of advanced schema features like conditions and constraints. 
+ 
+ We evaluate various schema formats and select JSON schema as the most suitable for our work.
+ Then we present the program design, implementation, and the results of a user study involving three professors and two researchers. 
+ Our approach offers a practical solution that makes data and schema management easier.
+ 
+  
 
  \end{abstract}
 
@@ -134,8 +162,6 @@ Finally, we provide a conclusion and future outlook for this work.
 
 
 
- \appendix[Proof of the Zonklar Equations]
-
  % TODO: add our user study tasks and schema and config file to appendix
 
 
@@ -151,6 +177,14 @@ Finally, we provide a conclusion and future outlook for this work.
 
  \bibliographystyle{IEEEtran}
  \bibliography{literature}
+
+
+ \onecolumn
+ \appendix
+ \appendixpage
+ \input{appendix}
+
+
  % argument is your BibTeX string definitions and bibliography database(s)
 %\bibliography{IEEEabrv,../bib/paper}
 %
@@ -163,9 +197,6 @@ Finally, we provide a conclusion and future outlook for this work.
 %\end{thebibliography}
 
 
- \newpage
-
-
 %
 % \vspace{11pt}
 %
@@ -175,17 +206,12 @@ Finally, we provide a conclusion and future outlook for this work.
 %Use the author name as the 3rd argument followed by the biography text.
 %\end{IEEEbiography}
 
- \vspace{11pt}
 %
 % \textbf{If you will not include a photo:}\vspace{-33pt}
 % \begin{IEEEbiographynophoto}{John Doe}
 %  Use $\backslash${\texttt{begin\{IEEEbiographynophoto\}}} and the author name as the argument followed by the biography text.
 % \end{IEEEbiographynophoto}
 
-
-
-
- \vfill
 
 \end{document}
 
