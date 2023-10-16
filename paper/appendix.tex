@@ -1,0 +1,1043 @@
+{\huge \textbf{Appendix A: User Study}}\\\\\\\\  % Minye
+{\large \textbf{A.1: Interview Tasks }} \\\\
+\section{Interview Tasks}\label{appendix:tasks}
+This part is about the newest version of interview tasks we prepared to conduct our user study.\\
+\textbf{Remarks:} Task 3 was added after the first user study and also some details in other tasks were modified.
+\subsection{Task: Introduction}
+For these tasks you are presented a schema that you have not seen or worked with before.
+We have prepared a schema of a made-up simulation software in which self-driving cars are simulated.
+There is one self-driving car that has to navigate from a start point to an end point but there are also other vehicles and pedestrians simulated.
+For these tasks, the exact details are not important.
+
+\subsection{Task 1: Setup}
+\begin{enumerate}
+    \item Go to https://paulbredl.github.io/config-assistant/
+    \item Select the option “Select a Schema”: "From Example" → "Autonomous Vehicle Schema".
+    \item Open the example configuration file we have sent to you. \\
+          The following tasks will assume this schema and this example file.
+\end{enumerate}
+
+\subsection{Task 2: Questions}
+\begin{enumerate}
+    \item What is the name of the simulation?
+    \item What is the weather in our simulated environment?
+    \item What is the total duration of the simulation?
+    \item Humidity is a subproperty of the Environment. Would 150 be a valid value for Humidity?
+\end{enumerate}
+
+\subsection{Task 3: Modifying the configuration file}
+\begin{enumerate}
+    \item Change the name of the simulation to Sim\_Advanced05.
+    \item The VehicleType of the self-driving car is currently “Level 3”. Change it to the highest possible level.
+    \item The configuration file has validation errors, i.e. it is not valid according to the schema.
+    \\ Find out what the errors are. Edit the file so it becomes a valid configuration.
+
+\end{enumerate}
+
+\subsection{Task 4: Modifying the schema}
+\begin{enumerate}
+    \item For many applications it is good practice or even required that a schema has a unique identifier, which usually is a URL.
+          \\Set the \$id field of this schema to : “https://www.example.com/self-driving-vehicle”.
+    \item The simulation software will get a premium version in the next update, for which the user needs a license.
+          The license key should be stored in the configuration file.
+          Add a new property “LicenseKey” to the “properties” object.
+          It should be of the type “string”.
+          The length of the key is at most 20 characters long. Add a short exemplary description.
+    \item Go back to the file editor and verify that the new property “LicenseKey” is displayed and that the correct information is displayed when hovering over the property.
+\end{enumerate}
+
+\newpage
+{\large \textbf{A.2: JSON Configuration File  }} \\\\
+\section{Configuration File}\label{appendix:config}
+This part shows the configuration file we used to conduct our user study based on JSON schema.
+\begin{lstlisting}[language=json,firstnumber=1]
+
+    {
+      "SimulationName": "Sim_Advanced04",
+      "SelfDrivingVehicle": {
+        "StartingLocation": {
+          "x": 69.91,
+          "y": 153.55
+        },
+        "Destination": {
+          "x": 556,
+          "y": -969
+        },
+        "PlanningAlgorithm": "Dijkstra",
+        "VehicleType": "Level 3",
+        "PassengerCapacity": 5,
+        "MaxSpeed": 180,
+        "is4-Wheel-Drive": false,
+        "Sensors": [
+          {
+            "name": "Sensor01",
+            "type": "Radar",
+            "range": 20,
+            "position": {
+              "x": 10,
+              "y": 12
+            }
+          },
+          {
+            "name": "Sensor03",
+            "type": "ultrasonic",
+            "range": 402,
+            "position": {
+              "x": 1,
+              "y": -23
+            }
+          },
+          {
+            "name": "Sensor20",
+            "type": "radar",
+            "range": 234,
+            "position": {
+              "x": 23,
+              "y": 40
+            }
+          }
+        ]
+      },
+      "Environment": {
+        "Weather": "rainy",
+        "Temperature": 15.5,
+        "Humidity": 27
+      },
+      "Vehicles": {
+        "car1": {
+          "VehicleType": "car",
+          "PathToDrive": [
+            "Str1",
+            "Str2",
+            "Str4",
+            "Str7",
+            "Str9",
+            "Str13",
+            "Str16"
+          ],
+          "DrivingSpeed": 91,
+          "IsElectric": false,
+          "DriverBehavior": {
+            "AggressivenessFactor": 0.1,
+            "ReactionTime": 0.4,
+            "Distraction": 0.1,
+            "Fatigue": 0.11
+          }
+        },
+        "car2": {
+          "VehicleType": "car",
+          "PathToDrive": [
+            "Str3",
+            "Str5",
+            "Tf1",
+            "Str9",
+            "Str13",
+            "Str16"
+          ],
+          "DrivingSpeed": 90,
+          "IsElectric": true,
+          "DriverBehavior": {
+            "AggressivenessFactor": 0.3,
+            "ReactionTime": 0.4
+          }
+        },
+        "bus1": {
+          "VehicleType": "truck",
+          "DrivingSpeed": 60,
+          "IsElectric": false,
+          "PathToDrive": [
+            "Str18",
+            "Str19",
+            "Str20"
+          ]
+        }
+      },
+      "PedestrianGroups": [
+        {
+          "Count": 5,
+          "Path": [
+            "Pd1",
+            "Pd2",
+            "Pd18",
+            "Pd19",
+            "Pd20"
+          ],
+          "Speed": 5.84
+        },
+        {
+          "Count": 12,
+          "Path": [
+            "Pd3",
+            "Pd4",
+            "Pd7",
+            "Pd6",
+            "Tf1",
+            "Pd11"
+          ],
+          "Speed": 6.286239810673617
+        },
+        {
+          "Count": 9,
+          "Path": [
+            "Dwhpfai3",
+            "Zsbinooptgnk9160853"
+          ],
+          "Speed": 7.321541879799063
+        }
+      ],
+      "Waypoints": {
+        "Pd1": {
+          "point": {
+            "x": 100,
+            "y": -200
+          },
+          "connectedWaypoints": [
+            "Pd2",
+            "Pd3"
+          ],
+          "waypointType": "street"
+        },
+        "Pd2": {
+          "point": {
+            "x": 100,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Pd1",
+            "Pd4"
+          ],
+          "waypointType": "street"
+        },
+        "Pd3": {
+          "point": {
+            "x": 100,
+            "y": 0
+          },
+          "connectedWaypoints": [
+            "Pd1",
+            "Pd5",
+            "Cr1"
+          ],
+          "waypointType": "street"
+        },
+        "Pd4": {
+          "point": {
+            "x": 300,
+            "y": 100
+          },
+          "connectedWaypoints": [
+            "Pd2",
+            "Pd6"
+          ],
+          "waypointType": "street"
+        },
+        "Pd5": {
+          "point": {
+            "x": 300,
+            "y": 0
+          },
+          "connectedWaypoints": [
+            "Pd3",
+            "Tf1"
+          ],
+          "waypointType": "street"
+        },
+        "Pd6": {
+          "point": {
+            "x": 300,
+            "y": 200
+          },
+          "connectedWaypoints": [
+            "Pd4",
+            "Pd9"
+          ],
+          "waypointType": "street"
+        },
+        "Pd7": {
+          "point": {
+            "x": 500,
+            "y": 0
+          },
+          "connectedWaypoints": [
+            "Tf1",
+            "Pd10"
+          ],
+          "waypointType": "street"
+        },
+        "Pd8": {
+          "point": {
+            "x": 500,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Tf1",
+            "Pd11"
+          ],
+          "waypointType": "street"
+        },
+        "Pd9": {
+          "point": {
+            "x": 500,
+            "y": 200
+          },
+          "connectedWaypoints": [
+            "Pd6",
+            "Cr1"
+          ],
+          "waypointType": "street"
+        },
+        "Pd10": {
+          "point": {
+            "x": 700,
+            "y": 0
+          },
+          "connectedWaypoints": [
+            "Pd7",
+            "Pd13"
+          ],
+          "waypointType": "street"
+        },
+        "Pd11": {
+          "point": {
+            "x": 700,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Pd8",
+            "Pd14"
+          ],
+          "waypointType": "street"
+        },
+        "Pd12": {
+          "point": {
+            "x": 700,
+            "y": 200
+          },
+          "connectedWaypoints": [
+            "Cr1",
+            "Pd15"
+          ],
+          "waypointType": "street"
+        },
+        "Pd13": {
+          "point": {
+            "x": 900,
+            "y": 0
+          },
+          "connectedWaypoints": [
+            "Pd10",
+            "Pd16"
+          ],
+          "waypointType": "street"
+        },
+        "Pd14": {
+          "point": {
+            "x": 900,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Pd11",
+            "Pd17"
+          ],
+          "waypointType": "street"
+        },
+        "Pd15": {
+          "point": {
+            "x": 900,
+            "y": 200
+          },
+          "connectedWaypoints": [
+            "Pd12",
+            "Pd18",
+            "Tf1"
+          ],
+          "waypointType": "street"
+        },
+        "Pd16": {
+          "point": {
+            "x": 1100,
+            "y": 0
+          },
+          "connectedWaypoints": [
+            "Pd13",
+            "Pd19"
+          ],
+          "waypointType": "street"
+        },
+        "Pd17": {
+          "point": {
+            "x": 1100,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Pd14",
+            "Pd20"
+          ],
+          "waypointType": "street"
+        },
+        "Pd18": {
+          "point": {
+            "x": 1100,
+            "y": 200
+          },
+          "connectedWaypoints": [
+            "Pd15",
+            "Pd19"
+          ],
+          "waypointType": "street"
+        },
+        "Pd19": {
+          "point": {
+            "x": 1300,
+            "y": 0
+          },
+          "connectedWaypoints": [
+            "Pd16",
+            "Pd18",
+            "Pd20"
+          ],
+          "waypointType": "street"
+        },
+        "Pd20": {
+          "point": {
+            "x": 1300,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Pd17",
+            "Pd19"
+          ],
+          "waypointType": "street"
+        },
+        "Tf1": {
+          "point": {
+            "x": 300,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Pd5",
+            "Pd15"
+          ],
+          "waypointType": "trafficLight"
+        },
+        "Cr1": {
+          "point": {
+            "x": 100,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Pd3",
+            "Pd9"
+          ],
+          "waypointType": "pedestrianCrossing"
+        },
+        "Str1": {
+          "point": {
+            "x": 50,
+            "y": -150
+          },
+          "connectedWaypoints": [
+            "Str2",
+            "Str3"
+          ],
+          "waypointType": "street"
+        },
+        "Str2": {
+          "point": {
+            "x": 50,
+            "y": -100
+          },
+          "connectedWaypoints": [
+            "Str1",
+            "Str4"
+          ],
+          "waypointType": "street"
+        },
+        "Str3": {
+          "point": {
+            "x": 50,
+            "y": -200
+          },
+          "connectedWaypoints": [
+            "Str1",
+            "Str5"
+          ],
+          "waypointType": "street"
+        },
+        "Str4": {
+          "point": {
+            "x": 50,
+            "y": 0
+          },
+          "connectedWaypoints": [
+            "Str2",
+            "Str6"
+          ],
+          "waypointType": "street"
+        },
+        "Str5": {
+          "point": {
+            "x": 50,
+            "y": -300
+          },
+          "connectedWaypoints": [
+            "Str3",
+            "Tf1"
+          ],
+          "waypointType": "street"
+        },
+        "Str6": {
+          "point": {
+            "x": 50,
+            "y": 100
+          },
+          "connectedWaypoints": [
+            "Str4",
+            "Str7"
+          ],
+          "waypointType": "street"
+        },
+        "Str7": {
+          "point": {
+            "x": 50,
+            "y": 200
+          },
+          "connectedWaypoints": [
+            "Str4",
+            "Str9"
+          ],
+          "waypointType": "street"
+        },
+        "Str8": {
+          "point": {
+            "x": 50,
+            "y": 50
+          },
+          "connectedWaypoints": [
+            "Tf1",
+            "Str10"
+          ],
+          "waypointType": "street"
+        },
+        "Str9": {
+          "point": {
+            "x": 50,
+            "y": 300
+          },
+          "connectedWaypoints": [
+            "Str7",
+            "Str11"
+          ],
+          "waypointType": "street"
+        },
+        "Str10": {
+          "point": {
+            "x": 50,
+            "y": 100
+          },
+          "connectedWaypoints": [
+            "Str8",
+            "Str12"
+          ],
+          "waypointType": "street"
+        },
+        "Str11": {
+          "point": {
+            "x": 50,
+            "y": 400
+          },
+          "connectedWaypoints": [
+            "Str9",
+            "Str13"
+          ],
+          "waypointType": "street"
+        },
+        "Str12": {
+          "point": {
+            "x": 50,
+            "y": 200
+          },
+          "connectedWaypoints": [
+            "Str10",
+            "Str14"
+          ],
+          "waypointType": "street"
+        },
+        "Str13": {
+          "point": {
+            "x": 50,
+            "y": 500
+          },
+          "connectedWaypoints": [
+            "Str11",
+            "Str15"
+          ],
+          "waypointType": "street"
+        },
+        "Str14": {
+          "point": {
+            "x": 50,
+            "y": 300
+          },
+          "connectedWaypoints": [
+            "Str12",
+            "Str16"
+          ],
+          "waypointType": "street"
+        },
+        "Str15": {
+          "point": {
+            "x": 50,
+            "y": 600
+          },
+          "connectedWaypoints": [
+            "Str13",
+            "Str17"
+          ],
+          "waypointType": "street"
+        },
+        "Str16": {
+          "point": {
+            "x": 50,
+            "y": 400
+          },
+          "connectedWaypoints": [
+            "Str14",
+            "Str18"
+          ],
+          "waypointType": "street"
+        },
+        "Str17": {
+          "point": {
+            "x": 50,
+            "y": 700
+          },
+          "connectedWaypoints": [
+            "Str15",
+            "Str19"
+          ],
+          "waypointType": "street"
+        },
+        "Str18": {
+          "point": {
+            "x": 50,
+            "y": 500
+          },
+          "connectedWaypoints": [
+            "Str16",
+            "Str20"
+          ],
+          "waypointType": "street"
+        },
+        "Str19": {
+          "point": {
+            "x": 50,
+            "y": 800
+          },
+          "connectedWaypoints": [
+            "Str17",
+            "Cr1"
+          ],
+          "waypointType": "street"
+        },
+        "Str20": {
+          "point": {
+            "x": 50,
+            "y": 600
+          },
+          "connectedWaypoints": [
+            "Str18",
+            "Cr1"
+          ],
+          "waypointType": "street"
+        }
+      },
+      "SimulationSettings": {
+        "Duration": 260,
+        "TimeUnit": "seconds"
+      }
+    }
+
+\end{lstlisting}
+
+\newpage
+{\large \textbf{A.3: JSON Schema }} \\\\
+\section{Schema} \label{appendix:json_schema}
+This part shows the JSON schema we used to conduct our user study.
+\begin{lstlisting}[language=json,firstnumber=1]
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "Self-Driving Vehicle",
+      "description": "A JSON schema for configuration of autonomous vehicles",
+      "type": "object",
+      "$defs": {
+        "Point": {
+          "title": "Point in the 2D plane",
+          "description": "Position in absolute coordinates",
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X-coordinate of the starting location."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y-coordinate of the starting location."
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ],
+          "additionalProperties": false
+        },
+        "WaypointReference": {
+          "type": "string",
+          "title": "Name of a waypoint",
+          "description": "Must a waypoint defined in the set of waypoints.",
+          "pattern": "^[A-Z][a-z]+[0-9]*$"
+        },
+        "SensorDefinition": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the radar sensor.",
+              "pattern": "Sensor(0[1-9]|1[0-9]|20)$",
+              "title": "SensorName"
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of the sensor.",
+              "enum": [
+                "radar",
+                "lidar",
+                "ultrasonic"
+              ]
+            },
+            "range": {
+              "type": "number",
+              "description": "Maximum range of the sensor. Unit in mm",
+              "examples": [
+                "400"
+              ],
+              "title": "SensorRange"
+            },
+            "position": {
+              "description": "Position of the radar sensor relative to the vehicle's center.",
+              "$ref": "#/$defs/Point",
+              "title": "SensorPosition"
+            }
+          },
+          "required": [
+            "name",
+            "range",
+            "position"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "SimulationName": {
+          "type": "string",
+          "description": "Name of the simulation.",
+          "pattern": "^Sim_.",
+          "title": "SimulationName"
+        },
+        "SelfDrivingVehicle": {
+          "type": "object",
+          "properties": {
+            "StartingLocation": {
+              "title": "Starting Location",
+              "description": "The starting location of the self-driving vehicle.",
+              "$ref": "#/$defs/Point"
+            },
+            "Destination": {
+              "title": "Destination",
+              "description": "The destination of the self-driving vehicle.",
+              "$ref": "#/$defs/Point"
+            },
+            "PlanningAlgorithm": {
+              "type": "string",
+              "description": "The algorithms used for route planning.",
+              "enum": [
+                "A* search",
+                "Dijkstra",
+                "Rapidly Random Tree (RRT)"
+              ],
+              "title": "PlanningAlgorithm"
+            },
+            "Sensors": {
+              "description": "Set of sensors installed on the self-driving vehicle.",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SensorDefinition"
+              }
+            },
+            "VehicleType": {
+              "type": "string",
+              "description": "Levels of the Self-driving vehicle. Level 1 is the lowest level of automation and Level 6 is the highest level of automation.",
+              "enum": [
+                "Level 1",
+                "Level 2",
+                "Level 3",
+                "Level 4",
+                "Level 5",
+                "Level 6"
+              ]
+            },
+            "PassengerCapacity": {
+              "type": "integer",
+              "description": "Maximum number of passengers the vehicle can carry.",
+              "minimum": 1,
+              "exclusiveMaximum": 10,
+              "title": "Passenger capacity"
+            },
+            "MaxSpeed": {
+              "type": "integer",
+              "description": "Maximum speed of the vehicle. Unit in km/h. Must be a multiple of 10.",
+              "minimum": 0,
+              "maximum": 480,
+              "multipleOf": 10
+            },
+            "is4-Wheel-Drive": {
+              "type": "boolean",
+              "description": "if the car is a 4 wheel driven model",
+              "title": "is4-Wheel-Drive",
+              "default": false
+            }
+          },
+          "required": [
+            "StartingLocation",
+            "PlanningAlgorithm",
+            "Sensors",
+            "VehicleType"
+          ],
+          "title": "SelfDrivingVehicle"
+        },
+        "Environment": {
+          "type": "object",
+          "properties": {
+            "Weather": {
+              "type": "string",
+              "description": "Current weather conditions",
+              "enum": [
+                "sunny",
+                "rainy",
+                "cloudy"
+              ],
+              "title": "Weather"
+            },
+            "Temperature": {
+              "type": "number",
+              "description": "Current temperature in Celsius.",
+              "title": "Temperature"
+            },
+            "Humidity": {
+              "type": "integer",
+              "description": "Relative humidity as a percentage.",
+              "minimum": 0,
+              "maximum": 100,
+              "title": "Humidity"
+            }
+          },
+          "required": [
+            "Weather"
+          ],
+          "additionalProperties": {
+            "type": "string",
+            "description": "Additional environment properties."
+          }
+        },
+        "Vehicles": {
+          "type": "object",
+          "description": "Set of vehicles.",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "pattern": "^[a-z]+[0-9]*$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "VehicleType": {
+                "type": "string",
+                "enum": [
+                  "car",
+                  "truck",
+                  "bus"
+                ],
+                "description": "Type of the vehicle.",
+                "default": "car"
+              },
+              "PathToDrive": {
+                "type": "array",
+                "description": "List of coordinates representing the vehicle's path.",
+                "items": {
+                  "$ref": "#/$defs/WaypointReference"
+                },
+                "additionalProperties": false,
+                "title": "PathToDrive"
+              },
+              "DrivingSpeed": {
+                "type": "number",
+                "description": "Average driving speed of the vehicle.",
+                "minimum": 0,
+                "maximum": 480,
+                "multipleOf": 10,
+                "title": "Driving Speed"
+              },
+              "IsElectric": {
+                "type": "boolean",
+                "description": "if the car is an electric model",
+                "default": false
+              },
+              "DriverBehavior": {
+                "type": "object",
+                "description": "Driver behavior of the vehicle.",
+                "properties": {
+                  "AggressivenessFactor": {
+                    "type": "number",
+                    "description": "Aggressiveness factor of the driver. This influences e.g. the acceleration and deceleration of the vehicle and the likelihood of overtaking other vehicles.",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "ReactionTime": {
+                    "type": "number",
+                    "description": "Reaction time of the driver in ms. This influences e.g. the reaction time to obstacles and traffic lights.",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "Distraction": {
+                    "type": "number",
+                    "description": "Distraction factor of the driver. This influences e.g. the likelihood of the driver being distracted by a phone call or a passenger.",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "Fatigue": {
+                    "type": "number",
+                    "description": "Fatigue factor of the driver. This influences e.g. the likelihood of the driver falling asleep.",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            },
+            "required": [
+              "VehicleType",
+              "PathToDrive",
+              "DrivingSpeed"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PedestrianGroups": {
+          "type": "array",
+          "description": "Array of pedestrian groups.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Count": {
+                "type": "integer",
+                "description": "Number of pedestrians.",
+                "default": 1,
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "Path": {
+                "type": "array",
+                "description": "List of coordinates representing the pedestrian's path.",
+                "items": {
+                  "$ref": "#/$defs/WaypointReference"
+                },
+                "minItems": 1
+              },
+              "Speed": {
+                "type": "number",
+                "description": "Average walking speed of the pedestrians in km/h.",
+                "minimum": 0,
+                "maximum": 10
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "Path",
+              "Speed"
+            ]
+          }
+        },
+        "Waypoints": {
+          "type": "object",
+          "description": "Set of waypoints. Each waypoint is defined by a name and a position. The name must consist of a capital letter followed by at least one lowercase letter and optionally a number.",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "pattern": "^[A-Z][a-z]+[0-9]*$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "description": "Position of the waypoint.",
+            "properties": {
+              "point": {
+                "$ref": "#/$defs/Point"
+              },
+              "connectedWaypoints": {
+                "type": "array",
+                "description": "List of edges connected to the waypoint.",
+                "items": {
+                  "type": "string",
+                  "description": "Name of the connected waypoint.",
+                  "pattern": "^[A-Z][a-z]+[0-9]*$"
+                }
+              },
+              "waypointType": {
+                "type": "string",
+                "description": "Type of the waypoint.",
+                "enum": [
+                  "street",
+                  "sidewalk",
+                  "bikeLane",
+                  "trafficLight",
+                  "stopSign",
+                  "pedestrianCrossing"
+                ],
+                "default": "normal"
+              }
+            },
+            "required": [
+              "point"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "SimulationSettings": {
+          "type": "object",
+          "properties": {
+            "Duration": {
+              "type": "number",
+              "description": "Duration of the simulation in the specified time unit.",
+              "minimum": 0
+            },
+            "TimeUnit": {
+              "type": "string",
+              "description": "Time unit for simulation duration.",
+              "enum": [
+                "seconds",
+                "minutes",
+                "hours"
+              ]
+            }
+          },
+          "required": [
+            "TimeUnit",
+            "Duration"
+          ],
+          "additionalProperties": false,
+          "title": "Other simulation settings"
+        }
+      }
+    }
+\end{lstlisting}
