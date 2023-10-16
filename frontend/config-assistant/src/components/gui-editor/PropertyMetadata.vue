@@ -12,7 +12,7 @@ import type {ValidationResults} from '@/helpers/validationService';
 import {pathToString} from '@/helpers/pathHelper';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import 'primeicons/primeicons.css';
-import {selectContents, focus} from '@/helpers/focusUtils';
+import {focus, selectContents} from '@/helpers/focusUtils';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -184,6 +184,7 @@ function focusOnPropertyLabel(): void {
         @keydown.stop
         @blur="updatePropertyName"
         @keyup.enter="updatePropertyName"
+        class="scroll-my-60 snap-start"
         :class="{
           'text-indigo-700': canZoomIn(),
           'underline decoration-wavy decoration-red-600': isInvalid(),

@@ -7,6 +7,8 @@ import {pathToString} from '@/helpers/pathHelper';
 import {dataToString} from '@/helpers/dataToString';
 import _ from 'lodash';
 
+const MAX_DEPTH = 250;
+
 /**
  * Searches for the given search term in the data and schema.
  * This will consider the title and description of the schema and all properties.
@@ -32,8 +34,13 @@ async function searchInDataAndSchemaRecursive(
   schema: JsonSchema | undefined,
   path: Path,
   searchTerm: string,
-  result: SearchResult[]
+  result: SearchResult[],
+  depth = 0
 ): Promise<void> {
+  if (depth > MAX_DEPTH) {
+    return; // prevent infinite recursion in circular schemas
+  }
+
   if (
     data !== undefined &&
     (typeof data === 'string' || typeof data === 'number' || typeof data === 'boolean')
@@ -55,7 +62,8 @@ async function searchInDataAndSchemaRecursive(
         schema?.subSchema(i),
         [...path, i],
         searchTerm,
-        result
+        result,
+        depth + 1
       );
     }
   }
@@ -67,7 +75,8 @@ async function searchInDataAndSchemaRecursive(
         schema?.subSchema(propertyName),
         [...path, propertyName],
         searchTerm,
-        result
+        result,
+        depth + 1
       );
       if (matchesSearchTerm(propertyName, searchTerm)) {
         addToResult(
