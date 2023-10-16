@@ -118,14 +118,9 @@ Second, to deal with the loss of comments, a technique that keeps track of any c
 
 When the user edits the text in the text editor, the text is deserialized into a JavaScript Object and sent to the data store, which then updates the configuration data object and notifies all other subscribed panels of the change.
 
-To make it possible to highlight certain lines in the editor as erroneous (schema violations) or jump to certain lines (e.g. when the user selects a property in the GUI editor, we want to jump to the same property in the text editor), we need a function \texttt{determineRow(editorContent, dataPath)} that can determine the corresponding editor line, based on the configuration text and a given data path. See listing \ref{listing:determineRow} for an example input and output of such a function.
-
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json,firstnumber=1,caption=
+    {Example input and output for
+\textit{determineRow(editorContent, dataPath)}},captionpos=b]
 editorContent =
   "{
      'people':
@@ -158,11 +153,9 @@ resultRow3 = determineRow(
 	"people.1.name"
  );
  # resultRow3 = 9
+\end{lstlisting}\label{listing:determineRow}
 
-    \end{minted}
-    \caption{Example input and output for \textit{determineRow(editorContent, dataPath)}}
-    \label{listing:determineRow}
-\end{listing}
+To make it possible to highlight certain lines in the editor as erroneous (schema violations) or jump to certain lines (e.g. when the user selects a property in the GUI editor, we want to jump to the same property in the text editor), we need a function \texttt{determineRow(editorContent, dataPath)} that can determine the corresponding editor line, based on the configuration text and a given data path. See listing \ref{listing:determineRow} for an example input and output of such a function.
 
 The other way around, when the user places their cursor inside the text editor, we want to determine the path of the element that the cursor is currently at. This requires a function \texttt{determinePath(editorContent, cursorPosition)} which returns a data path based on the configuration text and a given cursor position.
 
