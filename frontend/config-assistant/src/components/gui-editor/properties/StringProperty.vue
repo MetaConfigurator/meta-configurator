@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
 import type {JsonSchema} from '@/helpers/schema/JsonSchema';
 import {ValidationResults} from '@/helpers/validationService';
+import Calendar from 'primevue/calendar';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: string | undefined;
   propertySchema: JsonSchema;
   validationResults: ValidationResults;
+  format: string;
 }>();
 
 const emit = defineEmits<{
@@ -24,18 +26,38 @@ const newPropertyData = ref(props.propertyData);
 function updateValue() {
   emit('update:propertyData', newPropertyData.value);
 }
+
+const getComponentForFormat = computed(() => {
+  if (props.format === 'date-time') {
+    return 'Calendar';
+  } else {
+    return 'InputText';
+  }
+});
 </script>
 
 <template>
-  <InputText
-    :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
-    class="h-8 tableInput"
-    :model-value="props.propertyData"
-    @update:model-value="value => (newPropertyData = value)"
-    :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
-    @blur="updateValue"
-    @keydown.stop
-    @keyup.enter="updateValue" />
+  <div>
+    <component :is="getComponentForFormat" />
+
+    <!-- Your existing InputText component -->
+    <InputText
+      :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
+      class="h-8 tableInput"
+      :model-value="props.propertyData"
+      @update:model-value="value => (newPropertyData = value)"
+      :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
+      @blur="updateValue"
+      @keydown.stop
+      @keyup.enter="updateValue" />
+
+    <Calendar
+      v-if="props.format === 'date-time'"
+      v-model="newPropertyData"
+      :showIcon="true"
+      :showButtonBar="true"
+      :dateFormat="'mm/dd/yy'"></Calendar>
+  </div>
 </template>
 
 <style scoped>
