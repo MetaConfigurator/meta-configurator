@@ -311,7 +311,7 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
     name: name,
   };
   const nodeToInsert: GuiEditorTreeNode = {
-    type: TreeNodeType.ADDITIONAL_PROPERTY!!,
+    type: TreeNodeType.ADDITIONAL_PROPERTY,
     key: pathToString(absolutePath.concat(name)),
     data: treeData,
     leaf: true,
@@ -396,6 +396,13 @@ function expandElementsByPath(relativePath: Path) {
 
     // update current node, so the next iteration which is one level deeper will use this node to search next child
     currentNode = childNodeToExpand;
+  }
+
+  const element = document.getElementById(
+    '_label_' + pathToString(props.currentPath.concat(relativePath))
+  );
+  if (element) {
+    element.scrollIntoView();
   }
 }
 
