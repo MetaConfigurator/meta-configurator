@@ -186,12 +186,19 @@ However, the user can also click on the property name or array index to \textit{
 This will show the sub-properties of that element at the top level, as if that property was the root of the data tree.
 The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
 
-% todo add figure to illustrate (for all the different data types and features)
 
 \paragraph{Type specific components}
 
-TODO
-% todo write
+% todo: show how corresponding GUI components look like for string, number, int, array, object, boolean, enum (const would be enum with just Minyeone option)
+
+\paragraph{Components for other JSON Schema features}
+
+% TODO: show how corresponding GUI components look like for required, deprecated, oneOf, anyOf Minye
+
+
+\paragraph{Resolving data-dependent keywords}
+
+% TODO PAUL
 
 \paragraph{Remove Data}
 The user can delete properties or array elements from the data by clicking on the $\times$ button next to the edit field.
@@ -203,11 +210,13 @@ We manually implemented a generation of a textual description for each of the JS
 Starting with title and description of the property, the overlay then shows constraints (such as the number must be greater than 0) and in the bottom it also shows schema violations, in case there are any.
 This feature helps the user to understand the constraints and the meaning of a property.
 
+% TODO: exemplary tooltip screenshot that contains some constraints also Minye
+
 \paragraph{Highlighting Schema Validation Errors}
 When the configuration data does not comply to the schema, the corresponding elements are underlined in red and highlighted with a red error icon.
 This way, the user knows where any errors are.
 Additionally, the schema information tooltip lists all schema violations.
-% todo add screenshot
+% todo add screenshot of property with schema violation Minye
 
 \subsection{Schema preprocessing}\label{subsec:schema-preprocessing}
 
