@@ -62,6 +62,7 @@ watch(
       const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
       expandElementsByPath(relativePathToExpand);
     }
+    scrollToPath(absolutePath);
   },
   {deep: true}
 );
@@ -137,24 +138,6 @@ function determineNodesToDisplay(root: TreeNode): TreeNode[] {
   }
   return [root];
 }
-
-watch(
-  storeToRefs(useSessionStore()).currentSelectedElement,
-  () => {
-    if (useSessionStore().lastChangeResponsible == ChangeResponsible.GuiEditor) {
-      return;
-    }
-    const absolutePath = useSessionStore().currentSelectedElement;
-    const pathToCutOff = useSessionStore().currentPath;
-    const relativePath = absolutePath.slice(pathToCutOff.length);
-    if (relativePath.length > 0) {
-      // cut off last element, because we want to expand until last element, but not expand children of last element
-      const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
-      expandElementsByPath(relativePathToExpand);
-    }
-  },
-  {deep: true}
-);
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
@@ -397,13 +380,18 @@ function expandElementsByPath(relativePath: Path) {
     // update current node, so the next iteration which is one level deeper will use this node to search next child
     currentNode = childNodeToExpand;
   }
+}
 
-  const element = document.getElementById(
-    '_label_' + pathToString(props.currentPath.concat(relativePath))
-  );
-  if (element) {
-    element.scrollIntoView();
-  }
+function scrollToPath(absolutePath: Path) {
+  window.setTimeout(() => {
+    const element = document.getElementById('_label_' + pathToString(absolutePath));
+    if (element) {
+      element.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth',
+      });
+    }
+  }, 5);
 }
 
 function expandElementChildren(node: any) {
@@ -476,6 +464,7 @@ function zoomIntoPath(path: Path) {
   <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="overlayShowScheduled = false" />
   <TreeTable
     :value="nodesToDisplay"
+    class="scroll-pt-16"
     filter-mode="lenient"
     removable-sort
     resizable-columns
