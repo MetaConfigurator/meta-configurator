@@ -40,7 +40,6 @@ const getComponentForFormat = computed(() => {
   <div>
     <component :is="getComponentForFormat" />
 
-    <!-- Your existing InputText component -->
     <InputText
       :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
       class="h-8 tableInput"
