@@ -6,6 +6,19 @@ We also conduct a survey to gather demographic information about the participant
 
 Note that besides the user study we have applied \toolname{} on several schemas (such as EnzymeML\cite{TODO} and the Strenda schema\cite{TODO}, provided by professors that we worked with) and \cfgfiles{} from the real world, to verify that it works and does bring benefits to the user.
 
+\subsection{Research Questions}\label{subsec:research_questions}
+We intend to address the following research questions with the user study:
+\begin{enumerate}
+	\item \textbf{RQ1:} Which aspects of the tool can be improved?
+	\item \textbf{RQ2:} Are users able to perform the followings types of tasks using the tool:
+	 \begin{itemize}
+			\item \textbf{RQ2.1} Retrieve information from \cfgfiles{} in the context of a given schema
+			\item \textbf{RQ2.2} Modify \cfgfiles{} within the constraints of a given schema
+			\item \textbf{RQ2.3} Modify a schema file
+		\end{itemize}
+	\item \textbf{RQ3:} Would people use the tool in practice?
+\end{enumerate}
+
 \subsection{Methodology}\label{subsec:methodology} % Minye
 
 \paragraph{Potential Users}
@@ -58,10 +71,73 @@ This survey covers the following points:
 \subsection{Results}\label{subsec:results}
 We performed the user study on 5 participants.
 
-\subsubsection{Task Results}
+
+\subsubsection{\textbf{RQ1:} Which aspects of the tool can be improved?} %Keyuri
+Tables~\ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the interviewees, as well as which measures we took based on it.
+
+% TODO: Summarize results and answer the RQ
+
+\begin{table*}[!htbp]
+    \centering
+    \caption{User Study 1 - Feedback and Resolution}
+    \label{tab:user_study1}
+    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+        \toprule
+         \thead{Feedback} & \thead{Resolution} \\
+        \midrule
+        The property value should not be autocorrected if the user enters an incorrect value.
+        Instead, an error message or another way should be used to inform the user that their input is incorrect.
+        &
+        Instead of autocorrecting values, we now provide more clear user feedback on incorrect values (red underline, error symbol). \\
+        \midrule
+        It would be good to have the ability to remove data entries with the GUI panel.
+        &
+        Implemented by adding a \textit{remove} button next to properties which have data and are not required. \\
+        \midrule
+        A search functionality to locate properties would be helpful, especially within nested levels.
+        & Implemented in the toolbar.
+        All findings are highlighted in the GUI panel. \\
+        \midrule
+        %& 4. The Schema editor GUI panel contains extensive metadata, but the code editor panel remains empty. & 4. bla bla bla \\
+        %\midrule
+        The GUI panel feels overwhelming to the user due to many variations in styling and color of the GUI elements.
+        &
+        We slightly reduced the number of different styling by no longer showing required properties in bold face and instead just show an asterisk next to it. \\
+        \midrule
+        The cursor should not have the clickable animation when hovering over non-clickable fields in the GUI editor.
+        &
+        Now we only show the clickable animation when hovering over clickable GUI components. \\
+        \midrule
+        In drop-down menus we do not need a button to clear the selection.
+        &
+        We disabled the option of clearing the selection. \\
+        \midrule
+        If the type of a property is ``any'', it should not be interpreted as the ``string'' type in the GUI panel.
+        &
+        We show a drop-down menu to the user, where they can select the type they want to use. \\
+        \midrule
+        Validation errors should not be highlighted via a warning symbol, but instead an error symbol.
+        &
+        We changed the warning symbol into an error symbol. \\
+        \midrule
+        After performing an undo or redo action, the cursor should jump to the corresponding location to reflect the changes made by the user.
+        &
+        Will be considered in future work. \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+
+
+\subsubsection{\textbf{RQ2:} Are users able to perform the followings types of tasks using the tool?}
 Table~\ref{table:results} shows the accuracy and difficulties that the participants had when solving the tasks.
 Accuracy is determined as the ratio of tasks that were solved correctly without the need of any hints to the total number of tasks.
 With the help of hints, all tasks could be completed by every participant.
+
+
+% TODO: Summarize results and answer the RQ (around one sentence for 2.1, 2.2, 2.3 each) 
+
+% Minye
 
 \begin{table*}[!htbp]
     \centering
@@ -139,58 +215,6 @@ With the help of hints, all tasks could be completed by every participant.
     \end{tabular}
 \end{table*}
 
-\subsubsection{Feedback and Resolution} %Keyuri
-Tables~\ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the interviewees, as well as which measures we took based on it.
-
-\begin{table*}[!htbp]
-    \centering
-    \caption{User Study 1 - Feedback and Resolution}
-    \label{tab:user_study1}
-    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
-        \toprule
-         \thead{Feedback} & \thead{Resolution} \\
-        \midrule
-        The property value should not be autocorrected if the user enters an incorrect value.
-        Instead, an error message or another way should be used to inform the user that their input is incorrect.
-        &
-        Instead of autocorrecting values, we now provide more clear user feedback on incorrect values (red underline, error symbol). \\
-        \midrule
-        It would be good to have the ability to remove data entries with the GUI panel.
-        &
-        Implemented by adding a \textit{remove} button next to properties which have data and are not required. \\
-        \midrule
-        A search functionality to locate properties would be helpful, especially within nested levels.
-        & Implemented in the toolbar.
-        All findings are highlighted in the GUI panel. \\
-        \midrule
-        %& 4. The Schema editor GUI panel contains extensive metadata, but the code editor panel remains empty. & 4. bla bla bla \\
-        %\midrule
-        The GUI panel feels overwhelming to the user due to many variations in styling and color of the GUI elements.
-        &
-        We slightly reduced the number of different styling by no longer showing required properties in bold face and instead just show an asterisk next to it. \\
-        \midrule
-        The cursor should not have the clickable animation when hovering over non-clickable fields in the GUI editor.
-        &
-        Now we only show the clickable animation when hovering over clickable GUI components. \\
-        \midrule
-        In drop-down menus we do not need a button to clear the selection.
-        &
-        We disabled the option of clearing the selection. \\
-        \midrule
-        If the type of a property is ``any'', it should not be interpreted as the ``string'' type in the GUI panel.
-        &
-        We show a drop-down menu to the user, where they can select the type they want to use. \\
-        \midrule
-        Validation errors should not be highlighted via a warning symbol, but instead an error symbol.
-        &
-        We changed the warning symbol into an error symbol. \\
-        \midrule
-        After performing an undo or redo action, the cursor should jump to the corresponding location to reflect the changes made by the user.
-        &
-        Will be considered in future work. \\
-        \bottomrule
-    \end{tabular}
-\end{table*}
 
 
 \begin{table*}
@@ -313,5 +337,14 @@ Tables~\ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
 \end{table*}
 
 
+\subsubsection{\textbf{RQ3:} Would people use the tool in practice?} % Keyuri
 
-% TODO: if some quantitative methods are found, also mention here
+
+
+% TODO: create table regarding "Would you use the tool in practice?" with one row per participant
+% Keyuri 
+
+
+
+
+% maybe add more interpretations of result
