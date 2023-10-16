@@ -5,10 +5,10 @@ This sections covers existing schema languages and existing approaches to genera
 As our research is of practical nature, we also consider gray literature like specifications of schemas or websites.
 \subsection{Schema Languages}\label{subsec:schemalanguages}
 
-Schema languages are formal languages that specify the structure, constraints, and relationships of data, for example in a database or in structured data formats.
+\textit{Schema languages} are formal languages that specify the structure, constraints, and relationships of data, for example in a database or in structured data formats.
 % Schema languages are text based, we do not consider any graphical modeling languages like UML.
 
-For this work we consider using an existing schema language (or a subset of it), building on an existing schema language or introducing our own schema language.
+% For this work we consider using an existing schema language (or a subset of it), building on an existing schema language or introducing our own schema language.
 The following sections describe existing schema languages.
 
 %paul
@@ -91,43 +91,6 @@ We also do not consider any ontology languages like OWL or RDF Schema as they ar
 Future work could investigate if such languages can also be used for our use case.
 Finally, we do not consider any programming languages as schema languages.
 Technically, programming languages can be used to define data structures and constraints, but they are not intended for this purpose, and it would be very challenging to generate a GUI from them.
-
-
-%\subsubsection{Schema Validation} % Keyuri
-%
-%Schema validation is the process of checking whether a given data instance (e.g., a JSON, YAML or XML document) conforms to a predefined schema.
-%The specification for JSON schema validation can be found in the work of~\cite{JSON_schema_vailidation,JSONValidation}.
-%Listing~\ref{json-schema-example} is an exemplary JSON schema.
-%It could be used to validate the example instance shown in Listing~\ref{json-example}.
-
-% todo note that we use AJV for schema validation (maybe in another section)
-
-%We can also use a python library to validate.\ref{python_json_validation}
-
-% \begin{figure}[!t]
-% \centering
-% \includegraphics[width=2.5in]{schema_validation_demo.jpg}
-% \caption{JSON schema demo}
-% \label{schema_validation_demo}
-% \end{figure}
-
-
-
-% \begin{figure}[!t]
-% \centering
-% \includegraphics[width=2.5in]{instance_demo.jpg}
-% \caption{Instance for validation}
-% \label{instance_demo}
-% \end{figure}
-
-% \begin{figure}[!t]
-% \centering
-% \includegraphics[width=2.5in]{python_json_validation.png}
-% \caption{Validation using python library}
-% \label{python_json_validation}
-% \end{figure}
-
-% todo: add paper about schema validation and possibly a small example
 
 \subsection{Existing Approaches}\label{subsec:existing-approaches}
 % felix
@@ -291,46 +254,63 @@ However, future work could investigate how such techniques could be embedded in 
 
 
 We evaluate several schema languages in how well they fit our use-case.
-Ideally, the schema language is both popular and supported by numerous tools and libraries as well as having high expressiveness.
+We consider all schema languages mentioned in section~\ref{subsec:schemalanguages} for this evaluation.
 
-\subsection{Evaluation criteria} % evaluation by paul, some criteria ideas by felix
+\subsection{Evaluation criteria}\label{subsec:evaluation-criteria} % evaluation by paul, some criteria ideas by felix
 
+Ideally, the schema language of \toolname is both popular and supported by numerous tools and libraries as well as expressive enough to express the features we need.
 We evaluated the seven schema languages we mentioned in section~\ref{subsec:schemalanguages} based on the following criteria and metrics:
 \begin{enumerate}
 % metric: Stackoverflow question # with schema language as tag
     \item \textbf{Practical usage} --- Ideally our approach uses a schema language that already known by many developers.
     As indicator of the practical usage we use the approximate search results on stackoverflow.com as metric.
-    We aquire the results by querying the google search engine with the name of the schema language and ``site:stackoverflow.com'', which limits the search results to stackoverflow.com.
-    This metric might also correlate with the complexity of the schema language as a more complex to use schema language will likely lead to more questions asked on the site. Nevertheless, we assume that a significantly higher number of results indicates that a language is more known than others.
+    We acquire the results by querying the google search engine with the name of the schema language and ``site:stackoverflow.com'', which limits the search results to stackoverflow.com.
+    This metric might also correlate with the complexity of the schema language as a more complex to use schema language will likely lead to more questions asked on the site.
+    Nevertheless, we assume that a significantly higher number of results indicates that a language is more known than others.
 
     Additionally, we investigate how well the schema languages are supported by IDEs and code libraries.
     \begin{enumerate}
-        \item \textit{Tool support} --- We used the 10 most popular IDEs\cite{mostpopularides} and checked if the IDE supports the schema language either natively or by a plugin. Support here means that either the IDE is capable of validating documents against a schema in the schema language or supports creating schema files, e.g. by using syntax highlighting for the schema language.
+        \item \textit{Tool support} --- We used the 10 most popular IDEs\cite{mostpopularides} and checked if the IDE supports the schema language either natively or by a plugin.
+        Support here means that either the IDE is capable of validating documents against a schema in the schema language or supports creating schema files, e.g., by using syntax highlighting for the schema language.
         % # node modules with schema language keyword....
-        \item \textit{Library support} --- As we implement a web-based tool, we JavaScript or TypeScript bases tools are helpful for our approach, e.g. so we can reuse a package for schema validation. We investigate the number of node modules exist that are related to the schema languages by querying the node module search on \url{www.npmjs.com} with the name of the schema language.
+        \item \textit{Library support} --- As we implement a web-based tool, we JavaScript or TypeScript bases tools are helpful for our approach, e.g., so we can reuse a package for schema validation.
+        We investigate the number of node modules exist that are related to the schema languages by querying the node module search on \url{www.npmjs.com} with the name of the schema language.
 
     \end{enumerate}
 
     % # of cases fulfilled from below
-    \item \textbf{Expressiveness} --- We evaluate how expressive each of the schema languages are, i.e. what possible constructs the language is able to express. We defines eight requirements on the language features that we consider helpful for our approach. The number of requirements a schema language fulfills is our metric that indicates how expressive the language is. Table~\ref{tab:comparison} reports the results. The eight requirements are:
+    \item \textbf{Expressiveness} --- We evaluate how expressive each of the schema languages are, i.e., what possible constructs the language is able to express.
+    We define eight requirements on the language features that we consider helpful for our approach.
+    The number of requirements a schema language fulfills is our metric that indicates how expressive the language is.
+    Table~\ref{tab:comparison} reports the results.
+    The nine requirements are:
     \begin{enumerate}
-        \item \textit{Simple types} --- This is fulfilled if the schema language provides the possibility to define simple data types, at least strings, numeric types, and a boolean type. This is a fundamental feature required for our approach.
+        \item \textit{Simple types} --- This is fulfilled if the schema language provides the possibility to define simple data types, at least strings, numeric types, and a boolean type.
+        This is a fundamental feature for our approach.
         \item \textit{Complex types} --- This is fulfilled if the schema language provides the possibility to define complex data types, at least records and arrays.
         This is crucial feature for our approach as configuration files are often structured data rather than plain key-value pairs.
-        \item \textit{Descriptions} --- This is fulfilled if the schema language provides the possibility to add descriptions to fields. This is helpful in a schema-to-GUI approach as the description can be shown to the user, providing potential helpful information on how a field should be filled.
-        \item \textit{Examples} --- This is fulfilled if the schema language provides the possibility to add example values. This is helpful in our approach as the example values can serve as placeholders in the GUI editor.
-        \item \textit{Default values} --- This is fulfilled if the schema language provides the possibility to add default values which are assumed in an absence of a value. This often helpful information can be displayed to the user or used as placeholder values.
-        \item \textit{Optional values} --- This is fulfilled if the schema language provides the possibility to declare values as optional or required. Often it is not necessary to provide all values in a configuration file, so it is helpful to mark fields as required or optional in the GUI editor.
-        \item \textit{Constraints} --- This is fulfilled if the schema language provides the possibility possibility to constrain values of fields, e.g. maximum length of strings. To be exact, for this evaluation we required that at least two of the following constrained can be expressed by the schema language:
+        \item \textit{Descriptions} --- This is fulfilled if the schema language provides the possibility to add descriptions to fields.
+        This is helpful in a schema-to-GUI approach as the description can be shown to the user, providing potential helpful information on how a field should be filled.
+        \item \textit{Examples} --- This is fulfilled if the schema language provides the possibility to add example values.
+        This is helpful in our approach as the example values can serve as placeholders in the GUI editor.
+        \item \textit{Default values} --- This is fulfilled if the schema language provides the possibility to add default values which are assumed in an absence of a value.
+        This often helpful information can be displayed to the user or used as placeholder values.
+        \item \textit{Optional values} --- This is fulfilled if the schema language provides the possibility to declare values as optional or required.
+        Often it is not necessary to provide all values in a configuration file, so it is helpful to mark fields as required or optional in the GUI editor.
+        \item \textit{Constraints} --- This is fulfilled if the schema language provides the possibility to constrain values of fields, e.g., maximum length of strings.
+        To be exact, for this evaluation we required that at least two of the following constrained can be expressed by the schema language:
         \begin{itemize}
             \item The length of strings can be limited.
-            \item The range of numeric types can be limited, e.g. to only positive values.
+            \item The range of numeric types can be limited, e.g., to only positive values.
             \item The valid values of a field can be restricted to a finite amount of values (enumeration).
             \item The format of a string field can be constrained to a certain pattern.
         \end{itemize}
         This is a helpful feature for our approach as often not all possible values are valid for specific fields in configuration files.
-        \item \textit{Conditions} --- This is fulfilled if the schema language provides the possibility to define conditional dependencies between fields. This is a advanced feature that is helpful because it allows to express for example that a particular field must be given only if another field has a specific value.
-        \item \textit{References} --- This is fulfilled if the schema language provides the possibility to define reusable subschemas that can be referenced in other parts of the schema. This is often useful in practice to reuse common data structures.
+        \item \textit{Conditions} --- This is fulfilled if the schema language provides the possibility to define conditional dependencies between fields.
+        This is a advanced feature that is helpful because it allows to express for example that a particular field must be given only if another field has a specific value.
+        \item \textit{References} --- This is fulfilled if the schema language provides the possibility to define reusable subschemas that can be referenced in other parts of the schema.
+        This is often useful in practice to reuse common data structures.
+
     \end{enumerate}
 
     %\item \textbf{Support for XML, YAML, or JSON} ---
@@ -353,13 +333,15 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
         JSON schema &
           245.000 &
           8 / 10 &
-          4.536 & 8 / 8  \\
-        XSD & 151.000 & 8 / 10 & 116 & 7 / 8 \\
-        DTD & 69.700 & 9 / 10 & 34 & 5 / 8\\
-        CUE & 10.500 & 4 / 10 & 97 & 7 / 8 \\
-        Avro & 20.000 & 8 / 10 & 211 & 4 / 8 \\
-        protobuf &  44.800 & 9 / 10 & 1.210 & 3 / 8\\
-        GraphQl schema & 31.000 & 7 / 10 & 1.509 & 5 / 8\\ \bottomrule
+          4.536 & 9 /9 \\
+        XSD & 151.000 & 8 / 10 & 116 & 8 / 9 \\
+        DTD & 69.700 & 9 / 10 & 34 & 6 / 9 \\
+        CUE & 10.500 & 4 / 10 & 97 &   8 / 9 \\
+        Avro & 20.000 & 8 / 10 & 211 &  5 / 9 \\
+        JSON Type Definition (JTD) &  109 & 0 / 10 &  17 & 5 / 9 \\
+        TypeSchema &  8.450 & 0 / 10 & 5 & 8 / 9 \\
+        protobuf &  44.800 & 9 / 10 & 1.210 & 4 / 9 \\
+        GraphQl schema & 31.000 & 7 / 10 & 1.509 & 6 / 9\\ \bottomrule
         \end{tabular}
     \end{table*}
     %\label{fig:my_label}
@@ -383,8 +365,8 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
     \centering
     \caption{Comparison of expressiveness of different schema languages
     \label{tab:comparison}}
-    \begin{tabular}{@{}lllllllllr@{}}
-         \toprule
+    \begin{tabular}{@{}llllllllllr@{}}
+        \toprule
         \textbf{Schema language} &
           \thead{Simple \\ types} &
           \thead{Complex \\ types} &
@@ -394,6 +376,7 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
           \thead{Optional \\ values} &
           \thead{Constraints} &
           \thead{Conditions}  &
+          \thead{References}  &
           \thead{Result}\\ \midrule
         JSON schema &
           \checkmark &
@@ -403,7 +386,8 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
           \checkmark &
           \checkmark &
           \checkmark &
-          \checkmark & 8 / 8\\
+          \checkmark &
+          \checkmark & 9 / 9\\
         XSD &
           \checkmark &
           \checkmark &
@@ -412,7 +396,8 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
           \checkmark &
           \checkmark &
           \checkmark &
-          \checkmark\footnote{using assertions}& 7 / 8 \\
+          \checkmark &
+          \checkmark & 8 / 9 \\
         DTD &
          \checkmark &
          \checkmark &
@@ -421,25 +406,48 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
          \checkmark &
          \checkmark &
          x &
-         \checkmark & 5 / 8\\
+         \checkmark &
+         \checkmark & 6 / 9\\
         CUE &
          \checkmark &
          \checkmark &
          \checkmark &
-         (\checkmark)\footnote{only comments} &
+         \checkmark &
          x &
          \checkmark &
          \checkmark &
-         \checkmark & 7 / 8\\
+         \checkmark &
+         \checkmark & 8 / 9\\
         Avro &
          \checkmark &
          \checkmark &
          x &
          x &
          \checkmark &
-         \checkmark \footnote{Only allowing nullability, no distinction to absent values} &
+         \checkmark &
          x &
-         x & 4 / 8\\
+         x &
+         \checkmark & 5 / 9\\
+        JTD &
+         \checkmark &
+         \checkmark &
+         x &
+         x &
+         x &
+         \checkmark &
+         x &
+         \checkmark &
+         \checkmark & 5 / 9\\
+        TypeSchema &
+         \checkmark &
+         \checkmark &
+         \checkmark &
+         x &
+         \checkmark &
+         \checkmark &
+         \checkmark &
+         \checkmark &
+         \checkmark & 8 / 9\\
         protobuf &
             \checkmark &
             \checkmark &
@@ -448,7 +456,8 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
             x &
             \checkmark &
             x &
-            x& 3 / 8 \\
+            x &
+            \checkmark & 4 / 9 \\
         GraphQL schema &
          \checkmark &
          \checkmark &
@@ -457,7 +466,8 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
          \checkmark &
          \checkmark &
          x &
-         x & 5 / 8\\
+         x &
+        \checkmark & 6 / 9\\
           \bottomrule
     \end{tabular}
 \end{table*}
@@ -468,7 +478,8 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
 Table~\ref{tab:all} shows the results of our evaluation.
 We come to the conclusion that JSON schema is sufficiently popular and expressive that we choose to use it as the schema language for our approach.
 The other schema languages are either less expressive or less popular.
-
+This result is in line with the work of Baazizi et al.~\cite{baazizi2021empirical}, who also found over 80.000 JSON schema files on GitHub,
+and with the claim of the JSON schema website\cite{jsonschemaJSONSchema} that JSON schema is the de-facto standard for JSON schema languages.
 
 % paul
 
