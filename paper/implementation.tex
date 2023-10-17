@@ -161,13 +161,48 @@ This will show the sub-properties of that element at the top level, as if that p
 The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
 
 
-\paragraph{Type specific components}
+\paragraph{GUI implementations for JSON schema features} % Minye
+Table \ref{table:json_schema_type_component} shows how the different JSON schema features are implemented in our GUI.
 
-% todo: show how corresponding GUI components look like for string, number, int, array, object, boolean, enum (const would be enum with just Minyeone option)
+\begin{table*}
+    \centering
+    \caption{Corresponding GUI implementations for JSON schema features\label{table:json_schema_type_component}}
+    \begin{tabular}{@{}p{0.2\linewidth}p{0.6\linewidth}@{}}
+        \toprule
+        \textbf{JSON schema type / keywords} & \textbf{\ GUI implementation} \\
+        \midrule
+        string & Text field. \\
+        number & Text field which allows only floating point numbers and has buttons to increment and decrement. \\
+        integer & Text field which allows only integer numbers and has buttons to increment and decrement. \\
+        boolean & Checkbox.\\
+        object & Expandable list of child columns in the properties table (see figure \ref{fig:gui_element_object}). \\
+        array & Similar as for object. Also has a button to add new items (see figure \ref{fig:gui_element_array}).\\
+        enum & Dropdown menu.\\
+        const & Dropdown menu with just one entry.\\
+        required & Red asterisk left of the property name.\\
+        deprecated & Strikethrough styling for property name.\\
+        anyOf & Multiselect menu to choose sub-schemas. Based on the selected sub-schemas, corresponding properties will be shown as children in the table.\\
+        oneOf & Dropdown menu to choose one sub-schema. Based on the selected sub-schema, corresponding properties will be shown as children in the table.\\
+        \bottomrule
+    \end{tabular}
+\end{table*}
 
-\paragraph{Components for other JSON Schema features}
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/gui_element_object}
+    \caption{GUI implementation for object properties}
+    \label{fig:gui_element_object}
+\end{figure}
 
-% TODO: show how corresponding GUI components look like for required, deprecated, oneOf, anyOf Minye
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/gui_element_array}
+    \caption{GUI implementation for array properties}
+    \label{fig:gui_element_array}
+\end{figure}
+
+
 
 
 \paragraph{Resolving data-dependent keywords}
