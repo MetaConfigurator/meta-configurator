@@ -62,33 +62,7 @@ The user interface of \toolname{} is structured in the following way (see the nu
 
 \subsubsection{Toolbar functionalities}
 
-The toolbar provides basic functionalities for all three views:
-\begin{itemize}
-    \item {New File: Create a new (schema) file.
-    In the file editor, this option also includes two sub-items:
-    \begin{itemize}
-        \item Generate Data: Generate random configuration data based on the selected schema from the Schema Editor.
-        \item New Empty File: Start with a blank file, discarding any current changes.
-    \end{itemize}
 
-    \item Open File: Open an existing file.
-    For the File Editor, this opens a dialog to open a file from the local file system.
-    For the Schema Editor, this comes with four sub-options:
-    \begin{itemize}
-
-        \item From File: Select a schema from the local file system.
-
-        \item JSON Schema Store: Choose a schema from the JSON Schema Store, the biggest online collection of JSON schemas.
-
-        \item From URL: Provide the URL of a specific schema, and the tool will retrieve and open it.
-
-        \item From Our Examples: Select one of the example schemas inbuilt into the tool.
-
-    \end{itemize}
-    \item Undo/Redo: Undo or redo the latest operations in the editor.
-    \item Download: Download the current editor content with an appropriate file name.
-    \item Search: Text field where the user can enter a search term to find and navigate to specific sections within the current file.
-\end{itemize}
 
 
 \subsubsection{Settings}
@@ -164,12 +138,12 @@ It is structured in a table-like way, where each row represents a key-value pair
 Arrays elements are represented similarly, where the index of the array element is the key and the value is the array element itself.
 Figure~\ref{fig:gui-editor} shows the GUI editor component with an example schema and configuration data.
 
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/gui-editor} % todo replace with screenshot
-    \caption{GUI Editor Component}
-    \label{fig:gui-editor}
-\end{figure}
+%\begin{figure}[!t]
+  %  \centering
+ %   \includegraphics[width=\columnwidth]{figures/gui-editor} % todo replace with screenshot
+  %  \caption{GUI Editor Component}
+  %  \label{fig:gui-editor}
+%\end{figure}
 
 To allow this representation of the schema, we do some preprocessing of the schema, which is described in section~\ref{subsec:schema-preprocessing}.
 
