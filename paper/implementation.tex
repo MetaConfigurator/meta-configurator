@@ -187,13 +187,31 @@ This will show the sub-properties of that element at the top level, as if that p
 The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
 
 
-\paragraph{Type specific components}
+\paragraph{Type specific components} % Minye
+This part shows how the GUI representations of basic JSON Schema features look like. The table \ref{table:json_schema_type_component} summarises the basic json schema features and also some complex features and how they are represented in the GUI.
 
-% todo: show how corresponding GUI components look like for string, number, int, array, object, boolean, enum (const would be enum with just Minyeone option)
-
-\paragraph{Components for other JSON Schema features}
-
-% TODO: show how corresponding GUI components look like for required, deprecated, oneOf, anyOf Minye
+\begin{table*}
+    \centering
+    \caption{GUI REPRESENTATION OF JSON SCHEMA Features\label{table:json_schema_type_component}}
+    \begin{tabular}{@{}p{0.2\linewidth}p{0.6\linewidth}@{}}
+        \toprule
+        \textbf{JSON schema type / keywords} & \textbf{\ GUI representation} \\
+        \midrule
+        string & Simple text field that could type strings of text. \\
+        number & Simple text field that allows entering floating point number and has buttons to increment and decrement. \\
+        integer & Simple text field that only allows entering integers and has buttons to increment and decrement. \\
+        boolean & Checkbox to switch between true, false or unchosen options.\\
+        array & List of text fields, which is collapsed by default.\\
+        object & Table for the key value pairs. Properties are shown when table is expanded \\
+        enum(enumeration) & Dropdown box for different options.\\
+        const(constant) & Non-editable text field. It's implemented by enumeration with only one entry\\
+        required & Simple red star near property name indicates the property is required.\\
+        deprecated & Grey line across property name. This indicates that the property should not be used and may be removed in the future.\\
+        anyOf & Dropdown menu where one or more option is allowed.\\
+        oneOf & Dropdown menu where only one option is allowed.\\
+        \bottomrule
+    \end{tabular}
+\end{table*}
 
 
 \paragraph{Resolving data-dependent keywords}
