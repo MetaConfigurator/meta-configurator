@@ -167,19 +167,24 @@
 
  \section{Conclusion}\label{sec:conclusion} % Felix
  
-We developed a tool (\toolname{}) that generates YAML/JSON file editor GUIs tailored to a given data schema. 
+ This paper addresses the development of \toolname{}, a tool that generates YAML/JSON file editor GUIs tailored to a given data schema. 
+According to the criteria expressiveness and popularity, we choose JSON schema as schema format for the tool.
+The tool is successfully implemented and our user study shows that it can be applied to solve practical tasks in 1) retrieving information from \cfgfiles{} in the context of a schema, in 2) modifying \cfgfiles{} and in 3) editing schemas.
+The interest and positive feedback of the participants suggests that \toolname{} will be applied in practice.
 
-First, we evaluated existing schema languages by expressiveness and popularity and chose JSON schema as the most suitable for this work.
-We created a mockup showing how the tool should look like and designed the architecture, with modularity being one of the key aspects. 
-For example, data formats (JSON/YAML/XML) or the different panels (GUI/rich text code editor) can be seen as building blocks that are exchangeable.
-We implemented \toolname{} according to that design.
-One of the main challenges was supporting the different JSON schema features, such as conditions and \textit{oneOf}, \textit{anyOf}, for which we introduced multiple schema preprocessing steps.
 
-We conducted a user study with three professors and two researchers, where they had to solve particular tasks using the tool and then provide feedback about it. 
-All five participants provided useful suggestions for improving the tool, which we then incorporated into the tool.
-They rated \toolname{} very positively and answered that they would use it in practice.
+% The text below is more suitable for a summary
+%We evaluate existing schema languages by expressiveness and popularity and choose JSON schema as the most suitable for this work.
+%We created a mockup showing how the tool should look like and designed the architecture, with modularity being one of the key aspects. 
+%For example, data formats (JSON/YAML/XML) or the different panels (GUI/rich text code editor) can be seen as building blocks that are exchangeable.
+%We implemented \toolname{} according to that design.
+%One of the main challenges was supporting the different JSON schema features, such as conditions and \textit{oneOf}, \textit{anyOf}, for which we introduced multiple schema preprocessing steps.
 
-Finally, we outlined future work that could be done to further progress \toolname{}.
+%We conducted a user study with five participants, where they had to solve particular tasks using the tool and then provide feedback about it. 
+%All participants provided useful suggestions for improving the tool, which we then incorporated into the tool.
+%They rated \toolname{} very positively and answered that they would use it in practice.
+
+%Finally, we outlined future work that could be done to further progress \toolname{}.
 
 
 
