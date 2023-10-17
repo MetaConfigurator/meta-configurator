@@ -32,42 +32,33 @@ The tool provides a solution for managing \cfgfiles{} with three distinct views:
     \item \textbf{Settings} (Figure~\ref{fig:settings}): To configure various tool settings.
 \end{itemize}
 
-The user interface of \toolname{} is structured in the following way (see the numbers in red in figure~\ref{fig:fileeditor}):
-\begin{enumerate}
-    \item Button to switch to another view (e.g., from File Editor to Schema Editor).
-    \item Toolbar with various functionality.
-    \item Code editor panel.
-    \item GUI editor panel.
-\end{enumerate}
 % While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose.
 % The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/fileeditor}
-    \caption{FileEditor}
+    \caption{UI of File Editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code Editor panel, 4) GUI Editor panel}
     \label{fig:fileeditor}
 \end{figure*}
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/schemaeditor}
-    \caption{SchemaEditor}
+    \caption{UI of Schema Editor view}
     \label{fig:schemaeditor}
 \end{figure*}
 
 \begin{figure*}[h]
     \includegraphics[width=\textwidth]{figures/settings}
-    \caption{Settings}
+    \caption{UI of Settings view}
     \label{fig:settings}
 \end{figure*}
-
-\subsubsection{Toolbar functionalities}
 
 
 
 
 \subsubsection{Settings}
 
-In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings})of \toolname{}:
+In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings}) of \toolname{}:
 \begin{table*}
     \centering
     \caption{Setting Parameters\label{tab:settings}}
@@ -94,7 +85,7 @@ In the Settings view (figure~\ref{fig:settings}), the user can adjust various pa
 \subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
-For this project, we use the popular \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
+For this project, we use the \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
 % It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
 % It can be easily embedded in any web page or JavaScript application.
 
