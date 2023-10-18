@@ -14,10 +14,10 @@ In section \ref{sec:evaluation-of-schema-languages}, we will evaluate which sche
 %paul
 \subsubsection{JSON schema}
 
-JSON is a common data-interchange format for exchanging data with webservices, but also for storing documents in noSQL databases, such as MongoDB\@.
+JSON is a common data-interchange format for exchanging data with webservices, but also for storing documents in noSQL databases, such as MongoDB\@\cite{marrs2017json}.
 Because of the popularity of JSON, there is also a demand for a schema language for JSON\@.
 One such language is JSON schema~\cite{jsonSchema, jsonschemaJSONSchema}.
-Figure~\ref{json-schema-example} shows an example of a JSON schema and Listing~\ref{json-example} shows an example of a JSON document that conforms to the schema.
+Listing~\ref{lst:json-schema-example} shows an example of a JSON schema and listing~\ref{lst:json-example} shows an example of a JSON document that conforms to the schema.
 
 JSON schema has evolved to being the de-facto standard schema language for JSON documents~\cite{baazizi2021empirical}.
 Schemas for many popular \cfgfile{} types exist.
@@ -56,19 +56,19 @@ Some syntactical details of YAML can, however, not be expressed with JSON schema
 \end{lstlisting}
 
 
-\begin{lstlisting}[language=json,firstnumber=1,caption={JSON example for the schema}~\ref{json-schema-example},captionpos=b]
+\begin{lstlisting}[language=json,firstnumber=1,caption={JSON example for the schema in listing}~\ref{lst:json-schema-example},captionpos=b,label={lst:json-example}]
 {
   "firstName": "John",
   "lastName": "Doe",
   "age": 21
 }
-\end{lstlisting}\label{json-example}
+\end{lstlisting}
 
 % felix
 \subsubsection{XSD and DTD}
 For XML the two de-facto standard schema languages are Document Type Definition (DTD)\cite{dtd_spec} and XML Schema Definition (XSD)\cite{xsd_spec}.
 XSD is the newer and more expressive format of them and in large parts replaces and supersedes the more limited format DTD\cite{dtd_vs_xsd}.
-It is recommended by W3C\cite{xsd_spec}.
+It is recommended by W3C as schema language for XML documents\cite{xsd_spec}.
 
 Multiple more schema languages have been proposed and developed but are relatively unknown compared to XSD\cite{xml_schemas_1,xml_schemas_2}.
 
