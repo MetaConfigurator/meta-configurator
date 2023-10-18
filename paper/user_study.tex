@@ -45,9 +45,7 @@ We divide our interview tasks into four parts:
     Most difficult, but still feasible using the GUI panel.
 \end{itemize}
 
-The interview tasks can be found in the appendix in section \ref{subsec:tasks}.
-
-%TODO: include interview material in appendix
+The interview tasks and additional files can be found in out GitHub repository\footnote{\url{https://github.com/PaulBredl/config-assistant/tree/main/paper/userstudy}}.
 
 \paragraph{Interview Process}
 We proceed our interview with one interviewee each time.
@@ -84,10 +82,85 @@ Tables~\ref{tab:user_study1}-\ref{tab:user_study5} (in the appendix) show the fe
 
 
 \subsubsection{\textbf{RQ2:} Are users able to perform the followings types of tasks using the tool?}
-Table~\ref{table:results} (in the appendix) shows the accuracy and difficulties that the participants had when solving the tasks.
+Table~\ref{table:results} shows the accuracy and difficulties that the participants had when solving the tasks.
 Accuracy is determined as the ratio of tasks that were solved correctly without the need of any hints to the total number of tasks.
 With the help of hints, all tasks could be completed by every participant.
 
+\begin{table*}[!htbp]
+    \centering
+    \caption{Results of user study} \label{table:results}
+    \begin{tabular}{lp{4.5cm}p{6cm}}
+        \toprule
+        &
+        \thead{Accuracy \& Notes} & \thead{Difficulties} \\
+        \midrule
+
+        User Study 1 &
+        Accuracy: 100\%(11/11)\newline
+        Effective use of tooltips\newline
+        Used both GUI and code editor
+
+        &
+
+        Task 3.2: Setting Vehicle Type to the highest level:\newline
+        Took some time to find the field\\ \midrule
+
+        User Study 2 &
+        Accuracy: 91\%(10/11)\newline
+        Used search functionality\newline
+        Used both GUI and code editor
+
+        &
+
+        Task 4.2: Adding new property:\newline
+        Could not find where to add new property in Schema Editor\newline
+        Did not know how to edit property name \\ \midrule
+
+        User Study 3 &
+        Accuracy: 82\%(9/11)\newline
+        Effective use of tooltips\newline
+        Not familiar with JSON schema\newline
+        Used only code editor in beginning and then only GUI editor after task 2.3.
+
+        &
+
+        Task 2.3: Duration of Simulation:\newline
+        Did not think about using the GUI panel to retrieve information\newline
+        Task 2.4: Validity of humidity:\newline
+        Mistakenly thought humidity value was valid.\newline
+        Did not consider red underline as an error\newline
+        Task 4.2: Add new property:\newline
+        Set property name in wrong place
+        \\ \midrule
+
+        User Study 4 &
+        Accuracy: 82\%(9/11)\newline
+        Solved tasks in a short time\newline
+        Used only the GUI editor
+
+        &
+
+        Task 2.4: Validity of humidity:\newline
+        Mistakenly thought humidity value was valid\newline
+        Did not find out that he could use tooltips\newline
+        Task 3.2: Setting Vehicle Type to the highest level: \newline
+        Did not scroll down in Dropdown menu\newline
+        Task 3.3: Validation Errors:\newline
+        Thought red underline was spell checking \\ \midrule
+
+        User Study 5 &
+        Accuracy: 100\%(11/11)\newline
+        Solved tasks in a short time\newline
+        Used both GUI and code editor
+
+        &
+
+        Task 3.2: Setting Vehicle Type to the highest level: \newline
+        Took some time to find the vehicle type \newline
+        Task 4.2: Adding new property:\newline
+        Did not set the property type at the beginning \\ \bottomrule
+    \end{tabular}
+\end{table*}
 
 % TODO: Summarize results and answer the RQ (around one sentence for 2.1, 2.2, 2.3 each)
 
