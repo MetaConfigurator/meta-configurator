@@ -32,67 +32,33 @@ The tool provides a solution for managing \cfgfiles{} with three distinct views:
     \item \textbf{Settings} (Figure~\ref{fig:settings}): To configure various tool settings.
 \end{itemize}
 
-The user interface of \toolname{} is structured in the following way (see the numbers in red in figure~\ref{fig:fileeditor}):
-\begin{enumerate}
-    \item Button to switch to another view (e.g., from File Editor to Schema Editor).
-    \item Toolbar with various functionality.
-    \item Code editor panel.
-    \item GUI editor panel.
-\end{enumerate}
 % While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose.
 % The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/fileeditor}
-    \caption{FileEditor}
+    \caption{UI of File Editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code Editor panel, 4) GUI Editor panel}
     \label{fig:fileeditor}
 \end{figure*}
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/schemaeditor}
-    \caption{SchemaEditor}
+    \caption{UI of Schema Editor view}
     \label{fig:schemaeditor}
 \end{figure*}
 
 \begin{figure*}[h]
     \includegraphics[width=\textwidth]{figures/settings}
-    \caption{Settings}
+    \caption{UI of Settings view}
     \label{fig:settings}
 \end{figure*}
 
-\subsubsection{Toolbar functionalities}
 
-The toolbar provides basic functionalities for all three views:
-\begin{itemize}
-    \item {New File: Create a new (schema) file.
-    In the file editor, this option also includes two sub-items:
-    \begin{itemize}
-        \item Generate Data: Generate random configuration data based on the selected schema from the Schema Editor.
-        \item New Empty File: Start with a blank file, discarding any current changes.
-    \end{itemize}
-
-    \item Open File: Open an existing file.
-    For the File Editor, this opens a dialog to open a file from the local file system.
-    For the Schema Editor, this comes with four sub-options:
-    \begin{itemize}
-        \item JSON Schema Store: Choose a schema from the JSON Schema Store, which provides a list of available schemas.
-
-        \item From Our Examples: Access four example schemas provided within the tool.
-
-        \item From File: Select a schema from local file system.
-
-        \item From URL: Provide the URL of a specific schema, and the tool will retrieve and open it.
-
-    \end{itemize}
-    \item Undo/Redo: Undo or redo the latest operations in the editor.
-    \item Download: Download the current editor content with an appropriate file name.
-    \item Search: Text field where the user can enter a search term to find and navigate to specific sections within the current file.
-\end{itemize}
 
 
 \subsubsection{Settings}
 
-In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings})of \toolname{}:
+In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings}) of \toolname{}:
 \begin{table*}
     \centering
     \caption{Setting Parameters\label{tab:settings}}
@@ -119,7 +85,7 @@ In the Settings view (figure~\ref{fig:settings}), the user can adjust various pa
 \subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
-For this project, we use the popular \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
+For this project, we use the \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
 % It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
 % It can be easily embedded in any web page or JavaScript application.
 
@@ -163,12 +129,12 @@ It is structured in a table-like way, where each row represents a key-value pair
 Arrays elements are represented similarly, where the index of the array element is the key and the value is the array element itself.
 Figure~\ref{fig:gui-editor} shows the GUI editor component with an example schema and configuration data.
 
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/gui-editor} % todo replace with screenshot
-    \caption{GUI Editor Component}
-    \label{fig:gui-editor}
-\end{figure}
+%\begin{figure}[!t]
+  %  \centering
+ %   \includegraphics[width=\columnwidth]{figures/gui-editor} % todo replace with screenshot
+  %  \caption{GUI Editor Component}
+  %  \label{fig:gui-editor}
+%\end{figure}
 
 To allow this representation of the schema, we do some preprocessing of the schema, which is described in section~\ref{subsec:schema-preprocessing}.
 
@@ -185,12 +151,54 @@ However, the user can also click on the property name or array index to \textit{
 This will show the sub-properties of that element at the top level, as if that property was the root of the data tree.
 The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
 
-% todo add figure to illustrate (for all the different data types and features)
 
-\paragraph{Type specific components}
+\paragraph{GUI implementations for JSON schema features} % Minye
+Table \ref{table:json_schema_type_component} shows how the different JSON schema features are implemented in our GUI.
 
-TODO
-% todo write
+\begin{table*}
+    \centering
+    \caption{Corresponding GUI implementations for JSON schema features\label{table:json_schema_type_component}}
+    \begin{tabular}{@{}p{0.2\linewidth}p{0.6\linewidth}@{}}
+        \toprule
+        \textbf{JSON schema type / keywords} & \textbf{\ GUI implementation} \\
+        \midrule
+        string & Text field. \\
+        number & Text field which allows only floating point numbers and has buttons to increment and decrement. \\
+        integer & Text field which allows only integer numbers and has buttons to increment and decrement. \\
+        boolean & Checkbox.\\
+        object & Expandable list of child columns in the properties table (see figure \ref{fig:gui_element_object}). \\
+        array & Similar as for object. Also has a button to add new items (see figure \ref{fig:gui_element_array}).\\
+        enum & Dropdown menu.\\
+        const & Dropdown menu with just one entry.\\
+        required & Red asterisk left of the property name.\\
+        deprecated & Strikethrough styling for property name.\\
+        anyOf & Multiselect menu to choose sub-schemas. Based on the selected sub-schemas, corresponding properties will be shown as children in the table.\\
+        oneOf & Dropdown menu to choose one sub-schema. Based on the selected sub-schema, corresponding properties will be shown as children in the table.\\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/gui_element_object}
+    \caption{GUI implementation for object properties}
+    \label{fig:gui_element_object}
+\end{figure}
+
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/gui_element_array}
+    \caption{GUI implementation for array properties}
+    \label{fig:gui_element_array}
+\end{figure}
+
+
+
+
+\paragraph{Resolving data-dependent keywords}
+
+% TODO PAUL
 
 \paragraph{Remove Data}
 The user can delete properties or array elements from the data by clicking on the $\times$ button next to the edit field.
@@ -202,11 +210,13 @@ We manually implemented a generation of a textual description for each of the JS
 Starting with title and description of the property, the overlay then shows constraints (such as the number must be greater than 0) and in the bottom it also shows schema violations, in case there are any.
 This feature helps the user to understand the constraints and the meaning of a property.
 
+% TODO: exemplary tooltip screenshot that contains some constraints also Minye
+
 \paragraph{Highlighting Schema Validation Errors}
 When the configuration data does not comply to the schema, the corresponding elements are underlined in red and highlighted with a red error icon.
 This way, the user knows where any errors are.
 Additionally, the schema information tooltip lists all schema violations.
-% todo add screenshot
+% todo add screenshot of property with schema violation Minye
 
 \subsection{Schema preprocessing}\label{subsec:schema-preprocessing}
 
@@ -238,12 +248,8 @@ These are lazily resolved as the first preprocessing step.
 Listing~\ref{listing:preprocessing-example} shows an example schema, Listing~\ref{listing:reference-resolving} shows the equivalent example after
 this first preprocessing step.
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{json}
+\begin{lstlisting}[language=json,firstnumber=1,caption=
+    {Simple JSON schema before reference resolving},captionpos=b]
 {
   "title": "NonEmptyString",
   "$ref": "#/$defs/nonEmptyString",
@@ -254,17 +260,10 @@ this first preprocessing step.
      }
   }
 }
-    \end{minted}
-    \caption{Simple JSON schema before reference resolving}
-    \label{listing:preprocessing-example}
-\end{listing}
+\end{lstlisting}\label{listing:preprocessing-example}
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json,firstnumber=1,caption=
+    {Simple JSON schema after reference resolving},captionpos=b]
 {
   "allOf": [
    {
@@ -282,10 +281,22 @@ this first preprocessing step.
      }
   }
 }
-    \end{minted}
-    \caption{Simple JSON schema after reference resolving}
-    \label{listing:reference-resolving}
-\end{listing}
+\end{lstlisting}\label{listing:reference-resolving}
+
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {Simple JSON schema after allOf resolving}, captionpos=b]
+{
+  "title": "NonEmptyString"
+  "type": "string",
+  "minLength": 1,
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+     }
+  }
+}
+\end{lstlisting}\label{listing:resolved-allOf}
 
 \paragraph{Resolving allOfs}
 
@@ -299,29 +310,6 @@ It is important to note that this library only supports a few keywords of JSON s
 \texttt{properties} and \texttt{items} keyword.
 Hence, the support for allOf and any other keywords for which we use this in the preprocessing is limited.
 
-\begin{listing}[h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
-{
-  "title": "NonEmptyString"
-  "type": "string",
-  "minLength": 1,
-  "$defs": {
-    "nonEmptyString": {
-      "type": "string",
-      "minLength": 1
-     }
-  }
-}
-    \end{minted}
-    \caption{Simple JSON schema after allOf resolving}
-    \label{listing:resolved-allOf}
-\end{listing}
-
-
 \paragraph{Converting types to oneOf}
 In JSON schema, a property can have multiple supported types, such as shown in listing \ref{listing:multiple_types}.
 A semantically equivalent schema can be generated by the use of oneOf, where each sub-schema contains exactly one of the types, as shown in listing \ref{listing:multiple_types_converted}.
@@ -331,26 +319,15 @@ For 2 types and 3 oneOf sub-schemas, this will result in a new oneOf with 6 opti
 An exception is when a type can not be merged with an oneOf sub-schema (e.g. the type is "boolean" and the oneOf sub-schema has type "string").
 In that case, the incompatible pair is dismissed.
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{json}
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {Simple JSON schema with two possible types}, captionpos=b]
 {
   "type": ["object", "boolean"]
 }
-    \end{minted}
-    \caption{Simple JSON schema with two possible types}
-    \label{listing:multiple_types}
-\end{listing}
+\end{lstlisting}\label{listing:multiple_types}
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {Simple JSON schema after conversion of types to oneOf}, captionpos=b]
 {
   "oneOf": [
     {
@@ -361,12 +338,7 @@ In that case, the incompatible pair is dismissed.
     },
   ]
 }
-
-    \end{minted}
-
-    \caption{Simple JSON schema after conversion of types to oneOf}
-    \label{listing:multiple_types_converted}
-\end{listing}
+\end{lstlisting}\label{listing:multiple_types_converted}
 
 
 \paragraph{Removing incompatible oneOfs and anyOfs}
@@ -376,12 +348,8 @@ An example where this occurs is in our adjusted JSON schema meta schema, if we a
 For every oneOf and anyOf sub-schema, we check whether it can be merged with the schema of the property.
 The options which are not compatible (can not be merged) are removed (see listing~\ref{listing:incompatible_one_ofs_removed}).
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {Simple JSON schema with incompatible oneOf option}, captionpos=b]
 {
   "type": "object",
   "oneOf": [
@@ -393,19 +361,11 @@ The options which are not compatible (can not be merged) are removed (see listin
     },
   ]
 }
-    \end{minted}
-    \caption{Simple JSON schema with incompatible oneOf option}
-    \label{listing:incompatible_one_ofs}
-
-\end{listing}
+\end{lstlisting}\label{listing:incompatible_one_ofs}
 
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {Simple JSON schema with incompatible oneOf option removed}, captionpos=b]
 {
   "type": "object",
   "oneOf": [
@@ -414,10 +374,7 @@ The options which are not compatible (can not be merged) are removed (see listin
     }
   ]
 }
-    \end{minted}
-    \caption{Simple JSON schema with incompatible oneOf option removed}
-    \label{listing:incompatible_one_ofs_removed}
-\end{listing}
+\end{lstlisting}\label{listing:incompatible_one_ofs_removed}
 
 
 \paragraph{Merging singular oneOfs and anyOfs}
@@ -425,19 +382,12 @@ Because of the previous pre-processing step, it can happen that for some oneOfs 
 If this is the case, the use oneOf/anyOf is redundant, as that singular sub-schema must be chosen implicitly.
 Therefore, if there exists only one singular choice for oneOf/anyOf, we merge its sub-schema into the property schema and remove the use of oneOf/anyOf (see listing \ref{listing:singular_one_of_merged}).
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {Simple JSON schema with singular oneOf merged into property schema}, captionpos=b]
 {
   "type": "object"
 }
-    \end{minted}
-    \caption{Simple JSON schema with singular oneOf merged into property schema}
-    \label{listing:singular_one_of_merged}
-\end{listing}
+\end{lstlisting}\label{listing:singular_one_of_merged}
 
 
 \paragraph{Attempting to merge oneOfs into anyOfs}
@@ -460,12 +410,8 @@ The \texttt{title} keyword is used to give a schema a short description.
 This is not necessarily the same as the property name of properties of an object.
 As we use the title in various cases to display for the user, we inject the property name in cases where no explicit title is given.
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {Simple JSON schema with one property without a title}, captionpos=b]
 {
   "type": "object",
   "properties": {
@@ -474,17 +420,10 @@ As we use the title in various cases to display for the user, we inject the prop
     }
   }
 }
-    \end{minted}
-    \caption{Simple JSON schema with one property without a title}
-    \label{listing:no-title}
-\end{listing}
+\end{lstlisting}\label{listing:no-title}
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{js}
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {The property names was used for the title field}, captionpos=b]
 {
   "type": "object",
   "properties": {
@@ -494,10 +433,7 @@ As we use the title in various cases to display for the user, we inject the prop
     }
   }
 }
-    \end{minted}
-    \caption{The property names was used for the title field}
-    \label{listing:with-title}
-\end{listing}
+\end{lstlisting}\label{listing:with-title}
 
 \paragraph{Processing enum and const}
 The enum keyword is used to restrict the values of a field to a fixed set of valid values.
@@ -560,16 +496,9 @@ According to the specification, any validator should ignore the fields that do n
 Consequently, the user does not need to see those fields, but instead, the user gets overwhelmed by the amount of fields
 and does not know which fields are relevant for the current context.
 This is also a feedback we got from our user study.
-Thus, we added \texttt{if} conditions to each field to only show them when they make sense in the current context.
-Listing~\ref{lst:if-then-else} shows an example of such an \texttt{if} condition.
-The relevant properties for arrays are only shown when the current property is of type array.
 
-\begin{listing}[!h]
-    \begin{minted}[frame=single,
-        framesep=3mm,
-        linenos=true,
-        xleftmargin=15pt,
-        tabsize=4]{json}
+\begin{lstlisting}[language=json, firstnumber=1, caption=
+    {If condition for array properties. The \texttt{hasTypeArray} is valid if the current property is of type array. The \texttt{arrayProperty} schema defines the properties of an array.}, captionpos=b]
 {
   "if": {
     "$ref": "#/$defs/hasTypeArray"
@@ -578,10 +507,11 @@ The relevant properties for arrays are only shown when the current property is o
     "$ref": "#/$defs/arrayProperty"
   }
 }
-    \end{minted}
-    \caption{If condition for array properties. The \texttt{hasTypeArray} is valid if the current property is of type array. The \texttt{arrayProperty} schema defines the properties of an array.}
-    \label{lst:if-then-else}
-\end{listing}
+\end{lstlisting}\label{lst:if-then-else}
+
+Thus, we added \texttt{if} conditions to each field to only show them when they make sense in the current context.
+Listing~\ref{lst:if-then-else} shows an example of such an \texttt{if} condition.
+The relevant properties for arrays are only shown when the current property is of type array.
 
 To even more reduce the amount of fields shown to the user, we also introduced a custom keyword just for our own meta schema.
 The keyword \texttt{advanced} is a boolean field that is set to \texttt{false} by default.

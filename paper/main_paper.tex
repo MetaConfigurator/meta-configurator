@@ -7,13 +7,14 @@
 \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
 \usepackage{textcomp}
 \usepackage{lipsum}
+\usepackage{xcolor}
 \usepackage[export]{adjustbox}
 \usepackage{stfloats}
 \usepackage{url}
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{cite}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage{booktabs}
@@ -26,10 +27,46 @@
 \newcommand{\cfgfile}{configuration file}
 \newcommand{\toolname}{\textit{MetaConfigurator}} % or config assistant
 
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+
+% adding code style for json
+\lstdefinelanguage{json}{
+ basicstyle=\small\ttfamily,
+ numbers=left,
+ xleftmargin=2.0ex,
+ float,
+ numberstyle=\scriptsize,
+ stepnumber=1,
+ numbersep=8pt,
+ showstringspaces=false,
+ breaklines=true,
+ frame=lines,
+ backgroundcolor=\color{background},
+ literate=
+ *{0}{{{\color{numb}0}}}{1}
+  {1}{{{\color{numb}1}}}{1}
+  {2}{{{\color{numb}2}}}{1}
+  {3}{{{\color{numb}3}}}{1}
+  {4}{{{\color{numb}4}}}{1}
+  {5}{{{\color{numb}5}}}{1}
+  {6}{{{\color{numb}6}}}{1}
+  {7}{{{\color{numb}7}}}{1}
+  {8}{{{\color{numb}8}}}{1}
+  {9}{{{\color{numb}9}}}{1}
+  {:}{{{\color{punct}{:}}}}{1}
+  {,}{{{\color{punct}{,}}}}{1}
+  {\{}{{{\color{delim}{\{}}}}{1}
+  {\}}{{{\color{delim}{\}}}}}{1}
+  {[}{{{\color{delim}{[}}}}{1}
+  {]}{{{\color{delim}{]}}}}{1},
+}
 
 \begin{document}
 
- \title{Design, Implementation, and Evaluation of a Meta Configuration Tool Using Schema-to-UI Approaches}
+ \title{Design, Implementation, and Evaluation of a Meta Configuration Tool Using a Schema-to-UI Approach}
  \author{Felix Neubauer, Paul Bredl, Minye Xu, Keyuriben Patel}
 %\author{IEEE Publication Technology,~\IEEEmembership{Staff,~IEEE,}
  % <-this % stops a space
@@ -47,28 +84,16 @@
  \maketitle
 
  \begin{abstract}
- Textual formats to structure data, such as JSON, XML and YAML, are human-readable as well as machine-readable.
- Such formats are often used for configuration files or to structure measurement or research data, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
- The format of those data structures can be defined by so-called schemas, which define the rules the data has to conform to.
- Depending on the domain of such files, they can be complex and time-consuming to modify and maintain.
- Tooling, such as graphical user interfaces, can significantly reduce manual efforts and assist the user in editing the files.
- Those graphical user interfaces, however, require initial effort to be developed, as well as continuous effort in being maintained and updated when the underlying data schema changes.
- We tackle this problem by developing a meta program that automatically generates such assisting GUIs, based on the given data schema.
+ Textual formats to structure data, such as JSON, XML and YAML, are often used for configuration files or to structure measurement and research data.
+ Depending on the domain and underlying schema, the data can be complex and time-consuming to modify and maintain.
+ Graphical user interfaces (GUIs) have proven effective in simplifying data management but entail substantial development and maintenance efforts.
+ To address this challenge, we introduce a novel approach in this paper: a meta-program that automatically generates GUIs tailored to a given data schema.
+ Our approach differentiates itself from others by 1) offering a unified view that combines the benefits of both GUIs and rich-text code editors, 2) enabling schema editing within the same tool and 3) support of advanced schema features like conditions and constraints.
+ We evaluate various schema formats and select JSON schema as the most suitable for our work.
+ Then we present the program design, implementation, and the results of a user study involving three professors and two researchers.
+ Our approach offers a practical solution that makes data and schema management easier.
 
- Our approach differs from other schema-to-UI approaches in following:
 
- \begin{enumerate}
-  \item The tool combines the assistance of a GUI with the flexibility and speed of a rich-text code editor by providing both in one view
-  \item The schema can be edited using the same tool and type of view
-  \item We support more complex schema features, such as conditions and constraints
- \end{enumerate}
-
-In this paper, we evaluate different schema formats by expressiveness and popularity. 
-We choose JSON schema as the most suitable for this work.
-We describe the design and implementation of our tool, as well as the results of a user study that we performed.
-5 participants (3 professors and 2 researchers) solved several tasks with the tool, while we recorded and evaluated their interaction with the tool.
-We also asked them for feedback, based on which we deduced multiple measures, which we then implemented.
-Finally, we provide a conclusion and future outlook for this work.
 
  \end{abstract}
 
@@ -80,33 +105,29 @@ Finally, we provide a conclusion and future outlook for this work.
  \section{Introduction}\label{sec:introduction} %felix
 
  Textual formats to structure data, such as JSON, XML and YAML, are human-readable as well as machine-readable.
-
-	
  Such formats are often used for configuration files or to structure measurement or research data, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
  The format of those data structures can be defined by so-called schemas, which define the rules the data has to conform to.
  Given a schema, it can be validated whether a particular file confirms to that schema.
-
  We will call all file instances using such formats \textit{\cfgfiles}.
-
  Depending on the domain of such \cfgfiles, they can be complex and time-consuming to modify and maintain.
  Tooling, such as graphical user interfaces, can significantly reduce manual efforts and assist the user in editing the files.
- Those graphical user interfaces, however, require initial effort to be developed, as well as continuous effort in being maintained and updated when the underlying data schema changes.
+ Those graphical user interfaces (GUIs), however, require initial effort to be developed, as well as continuous effort in being maintained and updated when the underlying data schema changes.
  We tackle this problem by developing a meta program that automatically generates such assisting GUIs, based on the given data schema.
 
  Our approach differs from other schema-to-UI approaches in following:
 
  \begin{enumerate}
-  \item The tool combines the assistance of a GUI with the flexibility and speed of a rich-text code editor by providing both in one view
-  \item The schema can be edited using the same tool and type of view
-  \item We support more complex schema features, such as conditions and constraints
+  \item The tool combines the assistance of a GUI with the flexibility and speed of a rich-text code editor by providing both in one view.
+  \item The schema can be edited using the same tool and type of view.
+  \item We support more complex schema features, such as conditions and constraints.
  \end{enumerate}
 
 
- In section~\ref{sec:research} we introduce related work and existing schema formats, as well as schema-to-gui approaches.
- In section~\ref{sec:evaluation-of-schema-languages} we evaluate existing schema languages to find the one most suitable for this work.
- Section~\ref{sec:design} describes the design and architecture of \toolname{}.
+ In section~\ref{sec:research}, we discuss related work and existing schema formats, as well as schema-to-gui approaches.
+ In section~\ref{sec:evaluation-of-schema-languages}, we evaluate existing schema languages to find the most suitable one for this work.
+ Section~\ref{sec:design} describes the design and introduces the architecture of \toolname{}.
  Next, in section~\ref{sec:implementation}, we cover the implementation of \toolname{}.
- We conducted a user study, which is described in section~\ref{sec:user_study}.
+ To gather feedback and verify whether the tool can and will be used in the real world, we conducted a user study, which is described in section~\ref{sec:user_study}.
  Finally, we conclude our work in section~\ref{sec:conclusion}.
 
 
@@ -125,16 +146,37 @@ Finally, we provide a conclusion and future outlook for this work.
  \input{user_study}
 
 
- \section{Conclusion}\label{sec:conclusion}
- The conclusion goes here.
+ \section{Discussion}\label{sec:discussion} %Paul
+
+ \input{discussion}
+
+
+ \section{Conclusion}\label{sec:conclusion} % Felix
+
+ This paper addresses the development of \toolname{}, a tool that generates YAML/JSON file editor GUIs tailored to a given data schema.
+According to the criteria expressiveness and popularity, we choose JSON schema as schema format for the tool.
+The tool is successfully implemented and our user study shows that it can be applied to solve practical tasks in 1) retrieving information from \cfgfiles{} in the context of a schema, in 2) modifying \cfgfiles{} and in 3) editing schemas.
+The interest and positive feedback of the participants suggests that \toolname{} will be applied in practice.
+
+% The text below is more suitable for a summary
+%We evaluate existing schema languages by expressiveness and popularity and choose JSON schema as the most suitable for this work.
+%We created a mockup showing how the tool should look like and designed the architecture, with modularity being one of the key aspects.
+%For example, data formats (JSON/YAML/XML) or the different panels (GUI/rich text code editor) can be seen as building blocks that are exchangeable.
+%We implemented \toolname{} according to that design.
+%One of the main challenges was supporting the different JSON schema features, such as conditions and \textit{oneOf}, \textit{anyOf}, for which we introduced multiple schema preprocessing steps.
+
+%We conducted a user study with five participants, where they had to solve particular tasks using the tool and then provide feedback about it.
+%All participants provided useful suggestions for improving the tool, which we then incorporated into the tool.
+%They rated \toolname{} very positively and answered that they would use it in practice.
+
+%Finally, we outlined future work that could be done to further progress \toolname{}.
+
 
 
  \section*{Acknowledgments}
  This should be a simple paragraph before the References to thank those individuals and institutions who have supported your work on this article.
 
 
-
- \appendix[Proof of the Zonklar Equations]
 
  % TODO: add our user study tasks and schema and config file to appendix
 
@@ -151,19 +193,9 @@ Finally, we provide a conclusion and future outlook for this work.
 
  \bibliographystyle{IEEEtran}
  \bibliography{literature}
- % argument is your BibTeX string definitions and bibliography database(s)
-%\bibliography{IEEEabrv,../bib/paper}
-%
 
+\input{appendix}
 
-%\begin{thebibliography}{1}
-%\bibliographystyle{IEEEtran}
-
-
-%\end{thebibliography}
-
-
- \newpage
 
 
 %
@@ -175,17 +207,12 @@ Finally, we provide a conclusion and future outlook for this work.
 %Use the author name as the 3rd argument followed by the biography text.
 %\end{IEEEbiography}
 
- \vspace{11pt}
 %
 % \textbf{If you will not include a photo:}\vspace{-33pt}
 % \begin{IEEEbiographynophoto}{John Doe}
 %  Use $\backslash${\texttt{begin\{IEEEbiographynophoto\}}} and the author name as the argument followed by the biography text.
 % \end{IEEEbiographynophoto}
 
-
-
-
- \vfill
 
 \end{document}
 

@@ -62,6 +62,7 @@ watch(
       const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
       expandElementsByPath(relativePathToExpand);
     }
+    scrollToPath(absolutePath);
   },
   {deep: true}
 );
@@ -137,24 +138,6 @@ function determineNodesToDisplay(root: TreeNode): TreeNode[] {
   }
   return [root];
 }
-
-watch(
-  storeToRefs(useSessionStore()).currentSelectedElement,
-  () => {
-    if (useSessionStore().lastChangeResponsible == ChangeResponsible.GuiEditor) {
-      return;
-    }
-    const absolutePath = useSessionStore().currentSelectedElement;
-    const pathToCutOff = useSessionStore().currentPath;
-    const relativePath = absolutePath.slice(pathToCutOff.length);
-    if (relativePath.length > 0) {
-      // cut off last element, because we want to expand until last element, but not expand children of last element
-      const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
-      expandElementsByPath(relativePathToExpand);
-    }
-  },
-  {deep: true}
-);
 
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
@@ -311,7 +294,7 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
     name: name,
   };
   const nodeToInsert: GuiEditorTreeNode = {
-    type: TreeNodeType.ADDITIONAL_PROPERTY!!,
+    type: TreeNodeType.ADDITIONAL_PROPERTY,
     key: pathToString(absolutePath.concat(name)),
     data: treeData,
     leaf: true,
@@ -399,6 +382,18 @@ function expandElementsByPath(relativePath: Path) {
   }
 }
 
+function scrollToPath(absolutePath: Path) {
+  window.setTimeout(() => {
+    const element = document.getElementById('_label_' + pathToString(absolutePath));
+    if (element) {
+      element.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth',
+      });
+    }
+  }, 5);
+}
+
 function expandElementChildren(node: any) {
   if (node.type === TreeNodeType.ADVANCED_PROPERTY) {
     return;
@@ -469,6 +464,7 @@ function zoomIntoPath(path: Path) {
   <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="overlayShowScheduled = false" />
   <TreeTable
     :value="nodesToDisplay"
+    class="scroll-pt-16"
     filter-mode="lenient"
     removable-sort
     resizable-columns
