@@ -18,6 +18,7 @@
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage{booktabs}
+\usepackage{caption}
 \hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore} % todo remove
 % updated with editorial comments 8/9/2021
 \usepackage{utfsym}
@@ -26,6 +27,7 @@
 \newcommand{\cfgfiles}{configuration files}
 \newcommand{\cfgfile}{configuration file}
 \newcommand{\toolname}{\textit{MetaConfigurator}} % or config assistant
+\newcommand{\jskeyword}[1]{\texttt{#1}} % use for json schema keywords
 
 \colorlet{punct}{red!60!black}
 \definecolor{background}{HTML}{EEEEEE}
@@ -37,7 +39,7 @@
  basicstyle=\small\ttfamily,
  numbers=left,
  xleftmargin=2.0ex,
- float,
+ float=htb,
  numberstyle=\scriptsize,
  stepnumber=1,
  numbersep=8pt,
@@ -62,7 +64,14 @@
   {\}}{{{\color{delim}{\}}}}}{1}
   {[}{{{\color{delim}{[}}}}{1}
   {]}{{{\color{delim}{]}}}}{1},
+  string=[s]{"}{"},
+  comment=[l]{:\ "},
+  morecomment=[l]{:"},
 }
+
+\captionsetup[lstlisting]{font=small, justification=justified, singlelinecheck=false}
+\captionsetup[figure]{font=small, justification=justified, singlelinecheck=false}
+\captionsetup[table]{font=sc, justification=centering, singlelinecheck=false, labelsep=newline}
 
 \begin{document}
 
