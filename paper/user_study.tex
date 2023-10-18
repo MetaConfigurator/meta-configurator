@@ -1,10 +1,12 @@
-We conduct several interviews with professors and students as potential customers.
+We conduct a qualitative user study with five participants.
+
+% TODO: maybe somewhere mention demographics of user study? Like that it was 3 prof and 2 researcher?
 During each interview, we introduce \toolname{}, give the participant tasks to execute using the tool and finish the session with open ended questions.
 We observe how the participants work with the tool and which difficulties they have when executing the tasks.
 Additionally, we ask them for feedback and improvement suggestions.
 We also conduct a survey to gather demographic information about the participants of the user study.
 
-Note that besides the user study we have applied \toolname{} on several schemas (such as EnzymeML\cite{TODO} and the Strenda schema\cite{TODO}, provided by professors that we worked with) and \cfgfiles{} from the real world, to verify that it works and does bring benefits to the user.
+Note that besides the user study we have applied \toolname{} on several schemas (such as EnzymeML\cite{TODO} and the Strenda schema\cite{TODO}) and \cfgfiles{} from the real world, to verify that it works and does bring benefits to the user.
 
 \subsection{Research Questions}\label{subsec:research_questions}
 We intend to address the following research questions with the user study:
@@ -30,7 +32,7 @@ There are two basic standards we follow to find a potential user:
 \end{itemize}
 
 \paragraph{Interview Questions}
-For the interview, we created a JSON schema and \cfgfile{}, about a made-up self-driving car simulation, which could be found in the appendix. \ref{subsec:tasks}
+For the interview, we created a JSON schema and \cfgfile{}, about a made-up self-driving car simulation,
 The interview questions deal with working with those files.
 We divide our interview tasks into four parts:
 \begin{itemize}
@@ -42,6 +44,8 @@ We divide our interview tasks into four parts:
     \item Schema modifications: Making adjustments to the schema.
     Most difficult, but still feasible using the GUI panel.
 \end{itemize}
+
+The interview tasks can be found in the appendix in section \ref{subsec:tasks}.
 
 %TODO: include interview material in appendix
 
@@ -69,66 +73,19 @@ This survey covers the following points:
 %We analyse the results which we get from the survey and improve our application afterward.
 
 \subsection{Results}\label{subsec:results}
-We performed the user study on 5 participants.
 
 
 \subsubsection{\textbf{RQ1:} Which aspects of the tool can be improved?} %Keyuri
-Tables~\ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the interviewees, as well as which measures we took based on it.
+Tables~\ref{tab:user_study1}-\ref{tab:user_study5} (in the appendix) show the feedback of the interviewees, as well as which measures we took based on it.
 
 % TODO: Summarize results and answer the RQ
 
-\begin{table*}[!htbp]
-    \centering
-    \caption{User Study 1 - Feedback and Resolution}
-    \label{tab:user_study1}
-    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
-        \toprule
-         \thead{Feedback} & \thead{Resolution} \\
-        \midrule
-        The property value should not be autocorrected if the user enters an incorrect value.
-        Instead, an error message or another way should be used to inform the user that their input is incorrect.
-        &
-        Instead of autocorrecting values, we now provide more clear user feedback on incorrect values (red underline, error symbol). \\
-        \midrule
-        It would be good to have the ability to remove data entries with the GUI panel.
-        &
-        Implemented by adding a \textit{remove} button next to properties which have data and are not required. \\
-        \midrule
-        A search functionality to locate properties would be helpful, especially within nested levels.
-        & Implemented in the toolbar.
-        All findings are highlighted in the GUI panel. \\
-        \midrule
-        %& 4. The Schema editor GUI panel contains extensive metadata, but the code editor panel remains empty. & 4. bla bla bla \\
-        %\midrule
-        The GUI panel feels overwhelming to the user due to many variations in styling and color of the GUI elements.
-        &
-        We slightly reduced the number of different styling by no longer showing required properties in bold face and instead just show an asterisk next to it. \\
-        \midrule
-        The cursor should not have the clickable animation when hovering over non-clickable fields in the GUI editor.
-        &
-        Now we only show the clickable animation when hovering over clickable GUI components. \\
-        \midrule
-        In drop-down menus we do not need a button to clear the selection.
-        &
-        We disabled the option of clearing the selection. \\
-        \midrule
-        If the type of a property is ``any'', it should not be interpreted as the ``string'' type in the GUI panel.
-        &
-        We show a drop-down menu to the user, where they can select the type they want to use. \\
-        \midrule
-        Validation errors should not be highlighted via a warning symbol, but instead an error symbol.
-        &
-        We changed the warning symbol into an error symbol. \\
-        \midrule
-        After performing an undo or redo action, the cursor should jump to the corresponding location to reflect the changes made by the user.
-        &
-        Will be considered in future work. \\
-        \bottomrule
-    \end{tabular}
-\end{table*}
 
 % TODO: Summarize results and answer the RQ (around one sentence for 2.1, 2.2, 2.3 each)
 \subsubsection{\textbf{RQ2:} Are users able to perform the followings types of tasks using the tool?}
+Table~\ref{table:results} (in the appendix) shows the accuracy and difficulties that the participants had when solving the tasks.
+Accuracy is determined as the ratio of tasks that were solved correctly without the need of any hints to the total number of tasks.
+With the help of hints, all tasks could be completed by every participant.
 \begin{itemize}
     \item \textbf{RQ2.1}: According to notes part of table \ref{table:results}, we can clearly get that
     users are able to retrieving information by use of graphical user interface(GUI)(User Study 1\&2\&4\&5),
@@ -140,205 +97,6 @@ Tables~\ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
     The biggest difficulty is according to the table \ref{table:results} how to add new property in schema editor using GUI.
     They don't know where the field locates(User Study 3) or how to edit new property name(User Study 2).
 \end{itemize}
-
-% Minye
-
-\begin{table*}[!htbp]
-    \centering
-    \caption{Results of user study} \label{table:results}
-    \begin{tabular}{lp{4.5cm}p{6cm}}
-        \toprule
-        &
-        \thead{Accuracy \& Notes} & \thead{Difficulties} \\
-        \midrule
-
-        User Study 1 &
-            Accuracy: 100\%(11/11)\newline
-            Effective use of tooltips\newline
-            Used both GUI and code editor
-
-            &
-
-            Task 3.2: Setting Vehicle Type to the highest level:\newline
-            Took some time to find the field\\ \midrule
-
-        User Study 2 &
-            Accuracy: 91\%(10/11)\newline
-            Used search functionality\newline
-            Used both GUI and code editor
-
-            &
-
-            Task 4.2: Adding new property:\newline
-            Could not find where to add new property in Schema Editor\newline
-            Did not know how to edit property name \\ \midrule
-
-        User Study 3 &
-            Accuracy: 82\%(9/11)\newline
-            Effective use of tooltips\newline
-            Not familiar with JSON schema\newline
-            Used only code editor in beginning and then only GUI editor after task 2.3.
-
-            &
-
-            Task 2.3: Duration of Simulation:\newline
-            Did not think about using the GUI panel to retrieve information\newline
-            Task 2.4: Validity of humidity:\newline
-            Mistakenly thought humidity value was valid.\newline
-            Did not consider red underline as an error\newline
-            Task 4.2: Add new property:\newline
-            Set property name in wrong place
-         \\ \midrule
-
-        User Study 4 &
-            Accuracy: 82\%(9/11)\newline
-            Solved tasks in a short time\newline
-            Used only the GUI editor
-
-            &
-
-            Task 2.4: Validity of humidity:\newline
-            Mistakenly thought humidity value was valid\newline
-            Did not find out that he could use tooltips\newline
-            Task 3.2: Setting Vehicle Type to the highest level: \newline
-            Did not scroll down in Dropdown menu\newline
-            Task 3.3: Validation Errors:\newline
-            Thought red underline was spell checking \\ \midrule
-
-        User Study 5 &
-            Accuracy: 100\%(11/11)\newline
-            Solved tasks in a short time\newline
-            Used both GUI and code editor
-
-            &
-
-            Task 3.2: Setting Vehicle Type to the highest level: \newline
-            Took some time to find the vehicle type \newline
-            Task 4.2: Adding new property:\newline
-        Did not set the property type at the beginning \\ \bottomrule
-    \end{tabular}
-\end{table*}
-
-
-
-\begin{table*}
-
-    \centering
-    \caption{User Study 2 - Feedback and Resolution}
-    \label{tab:user_study2}
-    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
-        \toprule
-        \thead{Feedback} & \thead{Resolution} \\
-        \midrule
-        A graph-based view would be more intuitive for handling complex data structures.
-        &
-        Will be considered in future work. \\
-        \midrule
-        Providing immediate feedback to users when they enter incorrect ranges is essential to prevent them from inputting invalid values into the property.
-        &
-        We now highlight schema violations by a red error symbol in the GUI panel and underlining the property name in red.
-        Additionally, the tooltip lists all schema violations of a property. \\
-        \midrule
-        Validation errors should also be reflected in the GUI panel, including for child properties.
-        &
-        See point above.
-        Also, now the tooltip lists schema violations of child properties. \\
-        \midrule
-        When dealing with an array, the display name of array elements (index) should be improved.
-        Currently, the tool only shows just the element index.
-        &
-        We replaced the numerical labels by a standard programming notation, which is \texttt{propertyName[0]}, \texttt{propertyName[1]}, \ldots
-        \\
-        \midrule
-        The input field next to the \textit{Add Item} button is confusing.
-        Both the input field and the button can be used to create a new item, which is redundant.
-        &
-        We removed the input field next to the button. \\
-        \midrule
-        It would be more consistent, if all user input in the GUI panel was within the right column of the table.
-        That in some scenarios user input is needed within the left column (for names of new properties) feels inconsistent.
-        &
-        Because of the nature of JSON schema, we retained the property name within the left column.
-        To make it clear to the user that the property name can be edited, we added an \textit{edit} icon next to it. \\
-        \midrule
-        The search function for locating specific properties lacks clarity at first glance.
-        It should provide an immediate response and extend to nested levels, rather than merely highlighting the higher-level findings.
-        &
-        The search now provides a list of results, and upon clicking on a particular result, it jumps to that result in the code panel and GUI panel.
-        In the GUI panel, if the element is nested, its parents will be automatically expanded. \\
-        \bottomrule
-    \end{tabular}
-
-\end{table*}
-
-\begin{table*}
-    \centering
-    \caption{User Study 3 - Feedback and Resolution} \label{tab:user_study3}
-    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
-        \toprule
-        \thead{Feedback} & \thead{Resolution} \\
-        \midrule
-        Working with the schema editor is difficult for me.
-        It does not feel intuitive.
-        &
-        We made the schema editor more intuitive by creating our own simplified JSON schema meta schema.
-        For example, advanced JSON schema features are separated from the simple ones.
-        See section~\ref{subsec:schema-editor} \\
-        \bottomrule
-
-    \end{tabular}
-
-\end{table*}
-
-\begin{table*}
-    \centering
-    \caption{User Study 4 - Feedback and Resolution} \label{tab:user_study4}
-    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
-        \toprule
-        \thead{Feedback} & \thead{Resolution} \\
-        \midrule
-        Modifying or renaming a new property in the GUI panel does not appear to take effect when double-clicking on it.
-        &
-        Renaming properties in the GUI panel can now be done using the \textit{edit} button next to the property name. \\
-        \midrule
-        When creating a new property in the schema editor, its sub-schema has to be selected, such as \textit{string property} or \textit{boolean property}.
-        Additionally, the type of the property has to be selected by the user too.
-        Therefore, for example, when creating a new \textit{string property}, the user has to select that it is a string two times.
-        It would be much more intuitive if the selection needs to be done only one time.
-        & We completely overhauled our JSON schema meta schema.
-        Now, when creating a new property, the user will have to select the type only once. \\
-        \midrule
-        A toggle button should be implemented to enable and disable the code panel and GUI panel.
-        & Only having a GUI panel or only having a code panel restricts the user unnecessarily.
-        The interplay of both panels is what makes this tool most effective.
-         If the user does not want to use one of the panels, they can resize that panel to a very small size.  \\
-        \midrule
-        When working with a particular property in the GUI panel the opacity of the other properties should be decreased, visually highlighting the property that currently is in focus. & Will be considered in future work. \\
-        \midrule
-        Simplify the schema editor to make it easier to work with, for those who are not very familiar with JSON schema.
-        &
-        Has been done, see section~\ref{subsec:schema-editor}. \\
-        \bottomrule
-
-    \end{tabular}
-
-\end{table*}
-
-\begin{table*}
-
-    \centering
-    \caption{User Study 5 - Feedback and Resolution} \label{tab:user_study5}
-    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
-        \toprule
-        \thead{Feedback} & \thead{Resolution} \\
-        \midrule
-        The search button is not immediately evident, making it challenging for users to locate the search function. &
-        Instead of showing the search bar only when clicking the search button, we now always show it. \\
-        \bottomrule
-
-    \end{tabular}
-
-\end{table*}
 
 
 \subsubsection{\textbf{RQ3:} Would people use the tool in practice?} % Keyuri
@@ -352,3 +110,19 @@ Tables~\ref{tab:user_study1}-\ref{tab:user_study5} show the feedback of the inte
 
 
 % maybe add more interpretations of result
+
+\subsection{Threads to Validity}\label{subsec:threads_to_validity} % Paul
+
+Our user study is qualitative and only has a small sample size of 5 participants.
+Hence, the results are not representative and cannot be generalized.
+In addition, the tasks of the user study do only cover a small subset of operations
+that a user may want to perform with \toolname{} to edit \cfgfiles{} and schemas.
+Due to the time constraints of the user study, we only cover rather simple tasks.
+Thus, for very complex tasks, the user study is not conclusive.
+%The main purpose of the user study was to get feedback on the tool and to find out whether it is useful in practice,
+% which we achieved.
+For the purpose of getting feedback on the tool and finding out whether it is useful in practice, these limitations are acceptable.
+For RQ2, we cannot generalize our results but only provide a first impression of how users work with \toolname{}.
+
+
+

@@ -32,42 +32,33 @@ The tool provides a solution for managing \cfgfiles{} with three distinct views:
     \item \textbf{Settings} (Figure~\ref{fig:settings}): To configure various tool settings.
 \end{itemize}
 
-The user interface of \toolname{} is structured in the following way (see the numbers in red in figure~\ref{fig:fileeditor}):
-\begin{enumerate}
-    \item Button to switch to another view (e.g., from File Editor to Schema Editor).
-    \item Toolbar with various functionality.
-    \item Code editor panel.
-    \item GUI editor panel.
-\end{enumerate}
 % While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose.
 % The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/fileeditor}
-    \caption{FileEditor}
+    \caption{UI of File Editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code Editor panel, 4) GUI Editor panel}
     \label{fig:fileeditor}
 \end{figure*}
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/schemaeditor}
-    \caption{SchemaEditor}
+    \caption{UI of Schema Editor view}
     \label{fig:schemaeditor}
 \end{figure*}
 
 \begin{figure*}[h]
     \includegraphics[width=\textwidth]{figures/settings}
-    \caption{Settings}
+    \caption{UI of Settings view}
     \label{fig:settings}
 \end{figure*}
-
-\subsubsection{Toolbar functionalities}
 
 
 
 
 \subsubsection{Settings}
 
-In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings})of \toolname{}:
+In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings}) of \toolname{}:
 \begin{table*}
     \centering
     \caption{Setting Parameters\label{tab:settings}}
@@ -94,7 +85,7 @@ In the Settings view (figure~\ref{fig:settings}), the user can adjust various pa
 \subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
-For this project, we use the popular \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
+For this project, we use the \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
 % It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
 % It can be easily embedded in any web page or JavaScript application.
 
@@ -161,13 +152,49 @@ This will show the sub-properties of that element at the top level, as if that p
 The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
 
 
-\paragraph{Type specific components}\label{implementation:type_specific_component}
+\paragraph{GUI implementations for JSON schema features} % Minye
+Table \ref{table:json_schema_type_component} shows how the different JSON schema features are implemented in our GUI.
 
-% todo: show how corresponding GUI components look like for string, number, int, array, object, boolean, enum (const would be enum with just Minyeone option)
 
-\paragraph{Components for other JSON Schema features}
+\begin{table*}
+    \centering
+    \caption{Corresponding GUI implementations for JSON schema features\label{table:json_schema_type_component}}
+    \begin{tabular}{@{}p{0.2\linewidth}p{0.6\linewidth}@{}}
+        \toprule
+        \textbf{JSON schema type / keywords} & \textbf{\ GUI implementation} \\
+        \midrule
+        string & Text field. \\
+        number & Text field which allows only floating point numbers and has buttons to increment and decrement. \\
+        integer & Text field which allows only integer numbers and has buttons to increment and decrement. \\
+        boolean & Checkbox.\\
+        object & Expandable list of child columns in the properties table (see figure \ref{fig:gui_element_object}). \\
+        array & Similar as for object. Also has a button to add new items (see figure \ref{fig:gui_element_array}).\\
+        enum & Dropdown menu.\\
+        const & Dropdown menu with just one entry.\\
+        required & Red asterisk left of the property name.\\
+        deprecated & Strikethrough styling for property name.\\
+        anyOf & Multiselect menu to choose sub-schemas. Based on the selected sub-schemas, corresponding properties will be shown as children in the table.\\
+        oneOf & Dropdown menu to choose one sub-schema. Based on the selected sub-schema, corresponding properties will be shown as children in the table.\\
+        \bottomrule
+    \end{tabular}
+\end{table*}
 
-% TODO: show how corresponding GUI components look like for required, deprecated, oneOf, anyOf Minye
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/gui_element_object}
+    \caption{GUI implementation for object properties}
+    \label{fig:gui_element_object}
+\end{figure}
+
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/gui_element_array}
+    \caption{GUI implementation for array properties}
+    \label{fig:gui_element_array}
+\end{figure}
+
+
 
 
 \paragraph{Resolving data-dependent keywords}
