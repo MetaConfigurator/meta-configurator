@@ -137,13 +137,24 @@ We manually implemented a generation of a textual description for each of the JS
 Starting with title and description of the property, the overlay then shows constraints (such as the number must be greater than 0) and in the bottom it also shows schema violations, in case there are any.
 This feature helps the user to understand the constraints and the meaning of a property.
 
-% TODO: exemplary tooltip screenshot that contains some constraints also Minye
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=2.5in]{figures/Tooltip_example.png}
+    \caption{Tool-tip}
+    \label{fig:tooltip_example}
+\end{figure}
 
 \paragraph{Highlighting Schema Validation Errors}
 When the configuration data does not comply to the schema, the corresponding elements are underlined in red and highlighted with a red error icon.
 This way, the user knows where any errors are.
 Additionally, the schema information tooltip lists all schema violations.
-% todo add screenshot of property with schema violation Minye
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=2.5in]{figures/schema_violation.png}
+    \caption{Tool-tip with schema violation}
+    \label{fig:schema_violation}
+\end{figure}
 
 \subsection{Schema preprocessing}\label{subsec:schema-preprocessing}
 
