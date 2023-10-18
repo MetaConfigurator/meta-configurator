@@ -74,56 +74,56 @@
 %\end{table*}
 
 
-\section{User Study}\label{sec:user-study}  % Minye
-\subsection{Interview Tasks}\label{subsec:tasks}
-This part is about the newest version of interview tasks we prepared to conduct our user study.\\
-\textbf{Remark:} Task 3 was added after the first user study and also some details in other tasks were modified.
-\subsubsection{Introduction}
-For these tasks you are presented a schema that you have not seen or worked with before.
-We have prepared a schema of a made-up simulation software in which self-driving cars are simulated.
-There is one self-driving car that has to navigate from a start point to an end point but there are also other vehicles and pedestrians simulated.
-For these tasks, the exact details are not important.
-
-\subsubsection{Task 1: Setup}
-\begin{enumerate}
-    \item Go to https://paulbredl.github.io/config-assistant/
-    \item Select the option ``Select a Schema'': ``Example schema'', then ``Autonomous Vehicle Schema".
-    \item Open the example configuration file we have sent to you. \\
-          The following tasks will assume this schema and this example file.
-\end{enumerate}
-
-\subsubsection{Task 2: Questions}
-\begin{enumerate}
-    \item What is the name of the simulation?
-    \item What is the weather in our simulated environment?
-    \item What is the total duration of the simulation?
-    \item Humidity is a subproperty of the Environment.
-    Would 150 be a valid value for Humidity?
-\end{enumerate}
-
-\subsubsection{Task 3: Modifying the configuration file}
-\begin{enumerate}
-    \item Change the name of the simulation to Sim\_Advanced05.
-    \item The VehicleType of the self-driving car is currently ``Level 3''.
-    Change it to the highest possible level.
-    \item The configuration file has validation errors, i.e., it is not valid according to the schema.
-    \\ Find out what the errors are.
-    Edit the file so it becomes a valid configuration.
-
-\end{enumerate}
-
-\subsubsection{Task 4: Modifying the schema}
-\begin{enumerate}
-    \item For many applications it is good practice or even required that a schema has a unique identifier, which usually is a URL.
-          \\Set the \$id field of this schema to : ``https://www.example.com/self-driving-vehicle''.
-    \item The simulation software will get a premium version in the next update, for which the user needs a license.
-          The license key should be stored in the configuration file.
-          Add a new property ``LicenseKey'' to the ``properties'' object.
-          It should be of the type ``string''.
-          The length of the key is at most 20 characters long.
-    Add a short exemplary description.
-    \item Go back to the file editor and verify that the new property ``LicenseKey'' is displayed and that the correct information is displayed when hovering over the property.
-\end{enumerate}
+%\section{User Study}\label{sec:user-study}  % Minye
+%\subsection{Interview Tasks}\label{subsec:tasks}
+%This part is about the newest version of interview tasks we prepared to conduct our user study.\\
+%\textbf{Remark:} Task 3 was added after the first user study and also some details in other tasks were modified.
+%\subsubsection{Introduction}
+%For these tasks you are presented a schema that you have not seen or worked with before.
+%We have prepared a schema of a made-up simulation software in which self-driving cars are simulated.
+%There is one self-driving car that has to navigate from a start point to an end point but there are also other vehicles and pedestrians simulated.
+%For these tasks, the exact details are not important.
+%
+%\subsubsection{Task 1: Setup}
+%\begin{enumerate}
+%    \item Go to https://paulbredl.github.io/config-assistant/
+%    \item Select the option ``Select a Schema'': ``Example schema'', then ``Autonomous Vehicle Schema".
+%    \item Open the example configuration file we have sent to you. \\
+%          The following tasks will assume this schema and this example file.
+%\end{enumerate}
+%
+%\subsubsection{Task 2: Questions}
+%\begin{enumerate}
+%    \item What is the name of the simulation?
+%    \item What is the weather in our simulated environment?
+%    \item What is the total duration of the simulation?
+%    \item Humidity is a subproperty of the Environment.
+%    Would 150 be a valid value for Humidity?
+%\end{enumerate}
+%
+%\subsubsection{Task 3: Modifying the configuration file}
+%\begin{enumerate}
+%    \item Change the name of the simulation to Sim\_Advanced05.
+%    \item The VehicleType of the self-driving car is currently ``Level 3''.
+%    Change it to the highest possible level.
+%    \item The configuration file has validation errors, i.e., it is not valid according to the schema.
+%    \\ Find out what the errors are.
+%    Edit the file so it becomes a valid configuration.
+%
+%\end{enumerate}
+%
+%\subsubsection{Task 4: Modifying the schema}
+%\begin{enumerate}
+%    \item For many applications it is good practice or even required that a schema has a unique identifier, which usually is a URL.
+%          \\Set the \$id field of this schema to : ``https://www.example.com/self-driving-vehicle''.
+%    \item The simulation software will get a premium version in the next update, for which the user needs a license.
+%          The license key should be stored in the configuration file.
+%          Add a new property ``LicenseKey'' to the ``properties'' object.
+%          It should be of the type ``string''.
+%          The length of the key is at most 20 characters long.
+%    Add a short exemplary description.
+%    \item Go back to the file editor and verify that the new property ``LicenseKey'' is displayed and that the correct information is displayed when hovering over the property.
+%\end{enumerate}
 
 
 
@@ -131,82 +131,7 @@ For these tasks, the exact details are not important.
 
 % Minye
 
-\subsection{User Study results}
-\begin{table*}[!htbp]
-    \centering
-    \caption{Results of user study} \label{table:results}
-    \begin{tabular}{lp{4.5cm}p{6cm}}
-        \toprule
-        &
-        \thead{Accuracy \& Notes} & \thead{Difficulties} \\
-        \midrule
 
-        User Study 1 &
-            Accuracy: 100\%(11/11)\newline
-            Effective use of tooltips\newline
-            Used both GUI and code editor
-
-            &
-
-            Task 3.2: Setting Vehicle Type to the highest level:\newline
-            Took some time to find the field\\ \midrule
-
-        User Study 2 &
-            Accuracy: 91\%(10/11)\newline
-            Used search functionality\newline
-            Used both GUI and code editor
-
-            &
-
-            Task 4.2: Adding new property:\newline
-            Could not find where to add new property in Schema Editor\newline
-            Did not know how to edit property name \\ \midrule
-
-        User Study 3 &
-            Accuracy: 82\%(9/11)\newline
-            Effective use of tooltips\newline
-            Not familiar with JSON schema\newline
-            Used only code editor in beginning and then only GUI editor after task 2.3.
-
-            &
-
-            Task 2.3: Duration of Simulation:\newline
-            Did not think about using the GUI panel to retrieve information\newline
-            Task 2.4: Validity of humidity:\newline
-            Mistakenly thought humidity value was valid.\newline
-            Did not consider red underline as an error\newline
-            Task 4.2: Add new property:\newline
-            Set property name in wrong place
-         \\ \midrule
-
-        User Study 4 &
-            Accuracy: 82\%(9/11)\newline
-            Solved tasks in a short time\newline
-            Used only the GUI editor
-
-            &
-
-            Task 2.4: Validity of humidity:\newline
-            Mistakenly thought humidity value was valid\newline
-            Did not find out that he could use tooltips\newline
-            Task 3.2: Setting Vehicle Type to the highest level: \newline
-            Did not scroll down in Dropdown menu\newline
-            Task 3.3: Validation Errors:\newline
-            Thought red underline was spell checking \\ \midrule
-
-        User Study 5 &
-            Accuracy: 100\%(11/11)\newline
-            Solved tasks in a short time\newline
-            Used both GUI and code editor
-
-            &
-
-            Task 3.2: Setting Vehicle Type to the highest level: \newline
-            Took some time to find the vehicle type \newline
-            Task 4.2: Adding new property:\newline
-        Did not set the property type at the beginning \\ \bottomrule
-    \end{tabular}
-\end{table*}
 
 
 \begin{table*}[!htbp]
