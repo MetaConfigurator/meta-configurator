@@ -1,20 +1,20 @@
 % intro: felix
 
-This sections covers existing schema languages and existing approaches to generate UIs from them.
+This section covers existing schema languages and existing approaches to generate UIs from them.
 % We compare the schema languages briefly and discuss why JSON schema is the most useful language for our approach.
-As our research is of practical nature, we also consider gray literature such as specifications of schemas or websites.
+As our research is of a practical nature, we also consider gray literature such as specifications of schemas or websites.
 \subsection{Schema Languages}\label{subsec:schemalanguages}
 
-\textit{Schema languages} are formal languages that specify the structure, constraints, and relationships of data, for example in a database or in structured data formats.
+\textit{Schema languages} are formal languages that specify the structure, constraints, and relationships of data, for example in a database or structured data formats.
 
 As this work is concerned with generating a GUI based on a schema, we need to choose a suitable schema language.
 The following sections describe existing schema languages.
-In section \ref{sec:evaluation-of-schema-languages}, we will evaluate which schema language is most suitable for this work.
+We will compare them in section~\ref{sec:evaluation-of-schema-languages} to determine which is the most suitable one for this work.
 
 %paul
 \subsubsection{JSON schema}
 
-JSON is a common data-interchange format for exchanging data with webservices, but also for storing documents in noSQL databases, such as MongoDB\@\cite{marrs2017json}.
+JSON is a common data-interchange format for exchanging data with web services, but also for storing documents in NoSQL databases, such as MongoDB\@\cite{marrs2017json}.
 Because of the popularity of JSON, there is also a demand for a schema language for JSON\@.
 One such language is JSON schema~\cite{jsonSchema, jsonschemaJSONSchema}.
 Listing~\ref{lst:json-schema-example} shows an example of a JSON schema and listing~\ref{lst:json-example} shows an example of a JSON document that conforms to the schema.
@@ -25,8 +25,8 @@ Schemas for many popular \cfgfile{} types exist.
 The supported file types include for example Docker compose or OpenAPI files.
 \cite{barbaglia, ChaeronySiffa2022} give further examples of JSON schema used in practice.
 
-JSON and YAML documents are of a similar structure (JSON being a subset of YAML) and JSON schema can be applied on YAML documents too.
-Some syntactical details of YAML can, however, not be expressed with JSON schema. % todo consider citation
+JSON and YAML documents are of a similar structure (JSON is a subset of YAML) and JSON schema can be applied to YAML documents too.
+Some syntactical details of YAML can, however, not be expressed with JSON schema.
 
 % minye
 \begin{lstlisting}[language=json,firstnumber=1,caption={JSON schema example},captionpos=b,label={lst:json-schema-example}]
@@ -67,17 +67,16 @@ Some syntactical details of YAML can, however, not be expressed with JSON schema
 % felix
 \subsubsection{XSD and DTD}
 For XML the two de-facto standard schema languages are Document Type Definition (DTD)\cite{dtd_spec} and XML Schema Definition (XSD)\cite{xsd_spec}.
-XSD is the newer and more expressive format of them and in large parts replaces and supersedes the more limited format DTD\cite{dtd_vs_xsd}.
-It is recommended by W3C as schema language for XML documents\cite{xsd_spec}.
-
-Multiple more schema languages have been proposed and developed but are relatively unknown compared to XSD\cite{xml_schemas_1,xml_schemas_2}.
+XSD is the newer and more expressive format and in large parts replaces and supersedes the more limited format DTD\cite{dtd_vs_xsd}.
+It is recommended by W3C as a schema language for XML documents\cite{xsd_spec}.
+Multiple other schema languages have been proposed and developed but are relatively unknown compared to XSD\cite{xml_schemas_1,xml_schemas_2}.
 
 \subsubsection{Other schema languages} %Minye
-We consider also other schema languages that are not as popular as JSON schema, XSD or DTD\@:
+We consider also other schema languages that are not as popular as JSON schema, XSD, or DTD\@:
 \begin{enumerate}[label=(\alph*)]
     \item CUE (Configure, Unify, Execute)\cite{cuelang} is a data validation and configuration language, which can be used with various data formats, such as JSON and YAML (it is a superset of both).
     It has several use cases, especially in configuration and data validation.
-    \item Apache Avro~\cite{Apache-Avro} is an open source project that provides data serialization and data exchange services for Apache Hadoop.
+    \item Apache Avro~\cite{Apache-Avro} is an open-source project that provides data serialization and data exchange services for Apache Hadoop.
     It uses a JSON-based schema language.
     \item JSON Type Definition (JTD)~\cite{rfc8927} is a schema language for JSON documents, which is significantly simpler than JSON schema.
     \item Type Schema~\cite{Kappestein_2023} is a schema language for JSON documents, similar to JSON Type Definition but using a different syntax.
@@ -88,7 +87,7 @@ We consider also other schema languages that are not as popular as JSON schema, 
 We do not consider any graphical modeling languages, such as UML or ER diagrams, as they are not text-based.
 Although they can be converted to text-based formats, their main purpose is to model data structures and relationships between them.
 We also do not consider any ontology languages, such as OWL or RDF Schema, as they are not intended for data validation but rather for knowledge representation.
-Future work could investigate if such languages can also be used for our use case.
+Future work could investigate if such languages are also useful for our use case.
 Finally, we do not consider any programming languages as schema languages.
 Technically, programming languages can be used to define data structures and constraints, but they are not intended for this purpose, and it would be very challenging to generate a GUI from them.
 
@@ -99,10 +98,10 @@ Our work focuses on assisting users in creating and maintaining \cfgfiles{} so t
 %There exist several approaches that attempt to make maintaining \cfgfiles easier for the user.
 %Most of these approaches depend on the schema of the configuration file to be known.
 There exist techniques to validate \cfgfiles{} against a schema~\cite{JSON_schema_vailidation,JSONValidation,baeldung_2023}.
-Usually schema validation is done only internally, e.g., by web services or libraries.
+Usually, schema validation is done only internally, e.g., by web services or libraries.
 However, there exist also approaches that use the schema to assist the user in creating and maintaining \cfgfiles.
 IDEs, such as Visual Studio Code or IntelliJ IDEA, can validate \cfgfiles{} against a schema and provide the user with error messages.
-Those IDEs provide also other features, such as auto-completion, syntax highlighting and tooltips.
+Those IDEs provide also other features, such as auto-completion, syntax highlighting, and tooltips.
 However, they typically do not provide a graphical user interface (GUI) for editing the \cfgfiles{} based on the schema.
 
 
@@ -112,25 +111,18 @@ However, they typically do not provide a graphical user interface (GUI) for edit
 Related to our work are approaches that generate a GUI from a schema.
 This section covers form generators, i.e., approaches that generate a web form from a schema.
 %Schema to GUI refers to the process of generating a graphical user interface (GUI) based on a predefined schema.
-Such forms can assist the user in a multitude of ways, such as help by tooltips (Figure~\ref{fig:gui_advantage_tooltip}), auto-completion (Figure~\ref{fig:gui_advantage_autocomplete}) and choice selections (Figure~\ref{fig:gui_advantage_choiceselection}).
+Such forms can assist the user in a multitude of ways, such as help by tooltips, auto-completion (Figure~\ref{fig:gui_advantage_autocomplete}) and choice selections (Figure~\ref{fig:gui_advantage_choiceselection}).
 By inherently adhering to the schema structure, with such GUIs configuration errors are avoided or at least significantly reduced.
-Users that are not very familiar with the configuration schema profit most from the GUI assistance, but even experienced users tend to not remember every individual detail of the schema and benefit.
+Users who are not very familiar with the configuration schema profit most from the GUI assistance, but even experienced users tend to not remember every individual detail of the schema and benefit.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=2.5in]{figures/gui_advantage_tooltip}
-\caption{Tooltip Assistance}
-\label{fig:gui_advantage_tooltip}
-\end{figure}
-
-\begin{figure}[!t]
+\begin{figure}[htb]
 \centering
 \includegraphics[width=2.5in]{figures/gui_advantage_autocomplete}
 \caption{Auto-Completion}
 \label{fig:gui_advantage_autocomplete}
 \end{figure}
 
-\begin{figure}[!t]
+\begin{figure}[htb]
 \centering
 \includegraphics[width=2.5in]{figures/gui_advantage_choiceselection}
 \caption{Choice Selection}
@@ -143,21 +135,21 @@ There exist various approaches that generate web forms from a schema, for differ
 \textit{Angular Schema Form}\cite{githubGitHubJsonschemaformangularschemaform},
 \textit{Vue Form Generator}\cite{githubGitHubVuegeneratorsvueformgenerator},
 \textit{JSON Forms}\cite{jsonformsMoreForms},
-\textit{JSON Editor}\cite{githubGitHubJosdejongjsoneditor}, and
+\textit{JSON Editor}\cite{jsoneditoronlineJSONEditor}, and
 \textit{JSON Form}\cite{githubGitHubJsonformjsonform}.
 Those approaches are all based on JSON schema and generate a form that can be filled out by the user and
 the resulting JSON document is validated against the schema.
 If the user enters invalid data, the form shows an error message.
 The generated forms usually have a specific component for each type of data, e.g.\ a text field for strings or a number field for numbers,
 similar to our approach.
-Figure~\ref{fig:jsonforms} shows an example for a generated form using JSON Forms.
+Figure~\ref{fig:jsonforms} shows an example of a generated form using JSON Forms.
 
-The key differences to our approach are that those editors only provide the GUI for editing the data, but not a text-based editor.
-Also, they do not provide an editor for the schema itself.
-Finally, all except the last two of the given approaches also require a ``UI schema'' in addition to the JSON schema, which is used to configure the generated form.
-While these configurations can be used to customize the generated form, they also add need to be created and maintained by the schema author.
-Our approach does only require the JSON schema and does not require any additional configuration, so the user can
-use it with any schema file, e.g., from the JSON schema store.
+Those techniques, however, only provide the GUI for editing the data, but not a text-based editor.
+A text-based editor is useful, especially for experienced users, who prefer to edit the data directly.
+Also, these techniques do not provide a way to edit the schema itself, but only the data.
+The most significant limitation of all except the last two of the given approaches is that they also require a ``UI schema'' in addition to the JSON schema, which is used to configure the generated form.
+While these configurations can be used to customize the generated form, they also need to be created and maintained by the schema author.
+Consequently, those approaches cannot be used to generate a GUI for any arbitrary schema, but manual effort is required to create the UI schema.
 
 \begin{figure}[htb]
     \centering
@@ -170,10 +162,13 @@ Adamant~\cite{siffa2022adamant} is a JSON-schema based form generator specifical
 It is similar to our approach in that it generates a GUI from a JSON schema and also allows to edit and create JSON schema documents
 and differentiates between a schema edit mode and a data edit mode.
 It supports a subset of JSON schema, which is sufficient for many use cases.
-In addition to that, it supports the extraction of units from the description of a field, which is useful for scientific data.
+In addition to that, it supports the extraction of units from the description of a field, which is helpful for scientific data.
 Figure~\ref{fig:adamant} shows an example in the schema edit mode.
-Adamant differs to \toolname{} in that it does not provide a text-based editor for the schema and that it is specifically designed for scientific data,
-while our approach is more general.
+%Adamant differs to \toolname{} in that it does not provide a text-based editor for the schema and that it is specifically designed for scientific data,
+%while our approach is more general.
+Limitations of Adamant are first, it does only support a subset of JSON schema, which is sufficient for many use cases, but not for any arbitrary schema.
+Second, it does not provide a text-based editor for neither the schema nor the data.
+Finally, it is specifically designed for scientific data, which makes it less suitable for other use cases, especially large and complex schemas.
 
 \begin{figure}[htb]
     \centering
@@ -188,7 +183,7 @@ In \toolname{} we aim to provide a GUI for both editing \cfgfiles{} and editing 
 For the latter, there exist several so-called schema editors, which are tools for creating and editing schemas that are
 either text-based or graphical (or both).
 
-The closest to our approach is the \textit{JSON Editor Online}\cite{jsoneditoronlineJSONEditor}, which is a web-based editor for JSON schema.
+\textit{JSON Editor Online}\cite{jsoneditoronlineJSONEditor} is a web-based editor for JSON schemas and JSON documents.
 It divides the editor into two parts, where one part can be used to edit the schema and the other part can be used to edit a JSON document,
 which is validated against the schema.
 The editor provides various features, such as syntax highlighting and highlighting of validation errors (Figure~\ref{fig:jsoneditoronline}).
@@ -198,55 +193,34 @@ However, the features of the editor are very limited.
 For example, it does not provide any assistance for the user, such as tooltips or auto-completion.
 For new documents, it does not show the properties of the schema, so the user has to know the schema beforehand.
 
-There also exists variety of schema editors that are paid software, such as \textit{Altova XMLSpy}\cite{altovaEditorXMLSpy},
+There also exists a variety of schema editors that are paid software, such as \textit{Altova XMLSpy}\cite{altovaEditorXMLSpy},
 \textit{Liquid Studio}\cite{liquidtechnologiesJSONSchema}, \textit{XML ValidatorBuddy}\cite{xmlbuddyEditorValidator},
 \textit{JSONBuddy}\cite{jsonbuddyJSONSchema}, \textit{XMLBlueprint}\cite{xmlblueprintEditorXMLBlueprint},
 and \textit{Oxygen XML Editor}\cite{oxygenxmlCompleteSolution}.
 Those are editors for XML or JSON schema, mostly with a combination of text-based and graphical views.
-In contrast to our approach, they are not web-based and do not focus on editing a JSON document based on a schema,
-but rather on editing the schema itself.
-In this regard, they are more specialized than our approach.
+These tools are not web-based and not open-source.
+Furthermore, they do not focus on editing a JSON document based on a schema,
+but rather only on editing the schema itself.
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=3in]{figures/jsoneditoronline}
+	\caption{JSON Editor Online}
+	\label{fig:jsoneditoronline}
+\end{figure}
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=3in]{figures/jsoneditoronline-table}
+	\caption{JSON Editor Online, table view}
+	\label{fig:jsoneditoronline_table}
+\end{figure}
+
 
 \subsubsection{Schema visualization}\label{subsubsec:schema-visualization}
 Generating a GUI from a schema is related to schema visualization, for which several techniques exist~\cite{Frasincar2006, SILVA201928, 10.1145/1317353.1317362, 1173142}.
-However, with schema visualization the focus is only on providing a static visual representation of the schema
+However, the focus of schema visualization is on providing a static visual representation of the schema
 and not on providing a GUI for editing the schema.
 Thus, we do not consider schema visualization approaches in this work.
 However, future work could investigate how such techniques could be embedded in our approach.
-
-\begin{figure}[htb]
-    \centering
-    \includegraphics[width=2.5in]{figures/jsoneditoronline}
-    \caption{JSON Editor Online}
-    \label{fig:jsoneditoronline}
-\end{figure}
-\begin{figure}[htb]
-    \centering
-    \includegraphics[width=2.5in]{figures/jsoneditoronline-table}
-    \caption{JSON Editor Online}
-    \label{fig:jsoneditoronline_table}
-\end{figure}
-
-% Minye
-% todo more details
-% adamant is specific for science context -> would be interesting
-% it also extracts the unit from the description -> also interesting
-% also how are they different from our approach?
-%\begin{enumerate}[label=(\alph*)]
-%    \item \textbf{Vue Form Generator}\cite{vueformgenerator}: is a schema-based form generator component for Vue.js.
-%    It can be extended with custom fields.
-%    At the time of writing this paper the tool was rated with most stars among web form generator projects. % todo reword maybe
-%
-%    \item \textbf{JSON Forms}~\cite{JSONForms}: is a declarative framework for building form-based web UIs.
-%    It can be integrated with UI libraries or frameworks, such as Vue, React or Angular.
-%
-%    \item \textbf{Adamant}~\cite{siffa2022adamant}: also is a JSON-schema based form generator, that supports any valid schema.
-%    It also supports schema validation.
-%
-%\end{enumerate}
-
-% paul
-
 
 
 \section{Evaluation of Schema Languages}\label{sec:evaluation-of-schema-languages}
@@ -257,7 +231,7 @@ We evaluate the schema languages mentioned in section~\ref{subsec:schemalanguage
 
 \subsection{Evaluation criteria}\label{subsec:evaluation-criteria} % evaluation by paul, some criteria ideas by felix
 
-Ideally, the schema language of \toolname is both popular and supported by numerous tools and libraries as well as expressive enough to express the features we need.
+Ideally, the schema language of \toolname{} is both popular and supported by numerous tools and libraries as well as expressive enough to express the features we need.
 We use the following criteria and metrics:
 \begin{enumerate}
 % metric: Stackoverflow question # with schema language as tag
@@ -474,11 +448,11 @@ We use the following criteria and metrics:
 % paul
 \subsection{Evaluation results}\label{subsec:evaluation-results}
 
-Tables~\ref{tab:all} and \ref{tab:comparison} show the results of our evaluation.
+Tables~\ref{tab:all} and~\ref{tab:comparison} show the results of our evaluation.
 We come to the conclusion that JSON schema is sufficiently popular and expressive that we choose to use it as the schema language for our approach.
 The other schema languages are either less expressive or less popular.
 This result is in line with the work of Baazizi et al.~\cite{baazizi2021empirical}, who also found over 80.000 JSON schema files on GitHub,
-and with the claim of the JSON schema website\cite{jsonschemaJSONSchema} that JSON schema is the de-facto standard for JSON schema languages.
+and with their claim that JSON schema is the de-facto standard for JSON schema languages.
 
 % paul
 
