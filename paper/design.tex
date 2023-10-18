@@ -2,62 +2,60 @@
 % TODO also describe more the users perspective how users would use the tool?
 
 % felix
-\subsection{Overview}\label{subsec:overview} % todo maybe rename it requirements?
+\subsection{User Interface}\label{subsec:overview}
+The design of \toolname{} is strongly inspired by another tool by one of the authors, which is a configurator GUI for the Minecraft server plugin BossShopPro\cite{bossshoppro}, where the GUI components are generated based on a rudimentary custom schema language and several inbuilt schemas.
+That tool provides the user a text editor panel for editing configuration files of that domain in a text editor, as well as a GUI editor panel, where the user can edit their configuration file using GUI components.\cite{githubBspEditor}
+\toolname{} differs from that tool by being generic, instead of being bound to a certain domain, by having a much more expressive schema language, a schema editor and many other features that improve the user experience, such as a search functionality.
+%TODO: maybe move to related work?
+
 Before we dive into the architecture and detailed design of the tool, this section provides an overview of the tool from the view of the user.
 
-Note that the design of \toolname{} is strongly inspired by another tool by one of the authors\cite{githubBspEditor}.
+The user interface has three distinct views:
+\begin{enumerate}
+	\item File Editor (figure \ref{fig:fileeditor}): In this view the user can modify their \cfgfile{}, based on a schema.
+	\item Schema Editor (figure \ref{fig:schemaeditor}): In this view the user can modify their schema.
+	\item Settings (figure \ref{fig:settings} in appendix): In this view the user can adjust parameters of the tool.
+\end{enumerate}
 
-Figure \ref{mockup_gui_config} provides a sketch of the intended user interface design, showing the \textit{file editor mode}.
 
-The application is divided into two main panels: the  \textit{Text editor panel} (on the left) and the \textit{GUI editor panel} (on the right).
-In the Text editor panel the user can modify their data by hand, just like in a regular text editor.
-On top of that, features like syntax highlighting and schema validation assist the user.
-In the GUI editor panel, the user can modify their data with the help of a GUI.
-This GUI is based on the schema which the user provides (more on that in the next paragraphs).
+Figures \ref{mockup_gui_config} and \ref{mockup_gui_schema} (appendix) provide a sketch of the planned user interface design before the implementation.
+
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/fileeditor}
+    \caption{UI of File Editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code panel, 4) GUI panel}
+    \label{fig:fileeditor}
+\end{figure*}
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/schemaeditor}
+    \caption{UI of Schema Editor view}
+    \label{fig:schemaeditor}
+\end{figure*}
+
+
+The UI is divided into two main panels: the  \textit{Code panel} (on the left) and the \textit{GUI panel} (on the right).
+In the \textit{Code panel} the user can modify their data by hand, as in a regular code editor.
+Features, such as syntax highlighting and schema validation, assist the user.
+In the \textit{GUI panel}, the user can modify their data with the help of a GUI.
+The GUI is based on the schema which the user provides (more on that in the next paragraphs).
 For example, for enum properties, the user will get a dropdown menu with the different options to choose from and for boolean properties the user will get a checkbox.
 Other features, such as tooltips that display the description and constraints of a property, further assist the user.
 
-This design combines the benefits of both a rich text editor (efficient for many tasks, more suited for users with technical understanding of the data structure) with the benefits of a GUI (enables users without deep technical understanding to work with the data, assists also expert users).
-
-
-\begin{figure*}[!t]
-    \includegraphics[width=\textwidth]{figures/mockup_gui_config}
-    \caption{Sketch of the Tool. File Editor view.}
-    \label{mockup_gui_config}
-\end{figure*}
-
-% TODO: add numbered annotations to the screenshot and explain them here
-%\begin{enumerate}
-%    \item Blabla this is the menu bar
-%\end{enumerate}
-
-
-Besides editing their data with the tool, the user can also use it to modify their schema or create a new schema.
-This is illustrated in figure \ref{mockup_gui_schema}, which sketches the \textit{schema editor mode}.
-The structure of the user interface remains the same as in the file editor mode.
-The main difference in this mode is, that the schema being used for the GUI and schema validation is not a user schema, but instead the JSON schema meta schema itself.
-
-The exemplary file editor tab sketch in figure \ref{mockup_gui_config} shows user data based on a schema called \textit{ArchitectureSchema}.
-This \textit{ArchitectureSchema} is shown from the schema editor tab perspective in figure \ref{mockup_gui_schema}.
-
-\begin{figure*}[!t]
-    \includegraphics[width=\textwidth]{figures/mockup_gui_schema}
-    \caption{Sketch of the Tool. Schema Editor view.}
-    \label{mockup_gui_schema}
-\end{figure*}
+This design combines the benefits of both a rich text code editor (efficient for many tasks, more suited for users with technical understanding of the data structure) with the benefits of a GUI (enables users without deep technical understanding to work with the data, assists also expert users).
 
 As a schema is a \cfgfile{} itself, it can be treated as such and the tool can offer assistance accordingly.
 Note that whenever the user edits a \cfgfile{} using the tool, they do so using some underlying schema.
 Even the tool settings can be seen as a \cfgfile{}, for which the underlying schema is a settings schema.
-%When editing a schema file, the underlying schema will be the schema of JSON Schema.
-Table \ref{tab:schema_and_file_data_by_mode} illustrates how for the different modes, file data and schema being used by the tool differ.
+
+Table \ref{tab:schema_and_file_data_by_mode} illustrates how for the different views, file data and schema being used by the tool differ.
 \begin{table}[!t]
-\caption{File data and schema for the different modes}
+\caption{File data and schema for the different views}
 \label{tab:schema_and_file_data_by_mode}
 \centering
 \begin{tabular}{lll}
 \toprule
-\textbf{Mode} & \textbf{Effective File Data} & \textbf{Effective Schema} \\
+\textbf{View} & \textbf{Effective File Data} & \textbf{Effective Schema} \\
 \midrule
 File editor   & User data                    & User schema               \\
 Schema editor & User schema                  & JSON Meta Schema          \\
@@ -67,45 +65,72 @@ Settings      & Settings data                & Settings schema           \\
 \end{table}
 
 
+\subsection{Intended Workflow}\label{subsec:workflow} %keyuri
+\begin{enumerate}
+    \item Upon initial access of \toolname{}, a dialog is displayed, where users can select their desired schema.
+    \item After selecting a schema, the user will find that a GUI is automatically generated on the right-hand side of the File Editor,
+    tailored to the selected schema.
+    \item Through the GUI panel, users are assisted in creating or modifying \cfgfiles{}.
+    \item If a user wishes to modify the selected schema, such as adding new properties, they can do so through the schema editor.
+    Changes can be made using either the GUI panel or the code panel, and these modifications will automatically reflect in the file editor.
+\end{enumerate}
+
+%\begin{figure}[!htb]
+%    \begin{minipage}[t]{0.5\textwidth}
+%        \includegraphics[width=3.5in]{figures/Toolworkflow}
+%        \caption{Workflow}
+%        \label{workflow}
+%    \end{minipage}\label{fig:workflow}
+%\end{figure}
+
+
+
 
 % felix
 
 \subsection{Architecture}\label{subsec:architecture} % todo diagram illustrating the architecture
-% todo mention that its frontend only
+This section describes our main architectural design decisions.
+Those will not be relevant or visible for the user of the tool, but are important for understanding our implementation.
+Aim of those design decisions is to ensure modularity and maintainability of the tool.
+
 The core of our tool is a single source of truth data store that contains the current user configuration data (as a JavaScript Object).
 With this data store we can bidirectionally connect what we call ``editor panels''.
 An editor panel is a modular component that the user of the tool can access to modify the config data in an indirect way.
-It might be implemented as a rich text editor, a graphical user interface or any other way in which the data can be presented to the user.
+It might be implemented as a code editor, a graphical user interface or any other way in which the data can be presented to the user.
 All editor panels are independent and do only have access to the data store but not to each other.
 Every editor panel subscribes to the changes of the data store, so it can be updated accordingly whenever the data in the store is changed.
 Additionally, every panel has the capabilities of updating the data store themselves, which is done when the user modifies the data in the editor panel.
-The following example use-cases illustrate the capabilities of this architecture:
+The following artificial example use-cases illustrate the capabilities of this architecture:
 
 \begin{itemize}
-    \item Format converter: one panel shows the data in a rich-text editor in JSON format, a second panel shows the data in a rich-text editor in YAML format. Any semantic data change on one panel will cause the same semantic change in the other panel.
-    \item Split-Screen Editor: one panel shows the data in a rich-text editor, a second panel shows the data in a GUI. This way the user can have the efficiency of a text editor, but also the assistance of a GUI at the same time. Any semantic data change on one panel will be forwarded to the other panel. The GUI editor panel would require some data schema to know which GUI elements to show.
+    \item Format converter: one panel shows the data in a code editor in JSON format, a second panel shows the data in a code editor in YAML format. Any semantic data change on one panel will cause the same semantic change in the other panel.
+    \item Split-Screen Editor: one panel shows the data in a code editor, a second panel shows the data in a GUI. This way the user can have the efficiency of a text editor, but also the assistance of a GUI at the same time. Any semantic data change on one panel will be forwarded to the other panel.
     \item The Split-Screen Editor could be implemented for different data formats, such as YAML, JSON and XML. The architecture allows any data format as long as there exists a mapping from this data format to a JavaScript Object and back.
 \end{itemize}
+
+In practice, we implement only one code editor panel, as well as one GUI editor panel. 
+The architecture, however, would be flexible enough to allow replacing any of these panels or adding new ones, since they are decoupled from each other and only communicate with the single source of truth data store.
 
 % TODO: Add diagram with store in center in several panels with bidirectional connection of subscribe/update
 
 % felix
 
 \subsubsection{Single Source of Truth Data Store}
-this is the core of the tool.
+This is the core of the tool.
 The panels can subscribe to this store to receive updates whenever data is changed.
 Also, panels can trigger changes of the data in the store.
 Besides the current configuration data, the store also stores the \textit{path of the currently selected data entry} and the schema that is currently being used.
 
 % felix
 
-\subsubsection{Text Editor Panel}\label{subsubsec:design_text_editor_panel} % todo instead of writing in future, write in simple present
-For the text editor panels, we embed a rich-text editor that already supports syntax highlighting and other useful features.
+\subsubsection{Code Panel}\label{subsubsec:design_text_editor_panel} 
+For the code panel, we embed a rich-text code editor that already supports syntax highlighting and other useful features.
 We enable validation of whether the text is well-formed according to the JSON/YAML/XML Standard and add schema validation.
-The architecture allows for having one text editor panel that supports multiple languages, as well as for having separate text editor panels, one for each language.
-The panels subscribe to the data store.
-Whenever the configuration data is changed in the store, the panels will take the new configuration data JavaScript Object, serialize it into the given language and replace the text in the text editor with the new serialized data.
-The action of replacing the text in the text editor will cause formatting and comments to be lost.
+The panel subscribes to the data store.
+Whenever the configuration data is changed in the store, the panel will take the new configuration data JavaScript Object, serialize it into the given data format and replace the text in the code editor with the new serialized data.
+The action of replacing the text in the code editor will cause formatting and comments to be lost.
+
+% TODO
 An alternative to replacing the complete text in the text editor, whenever data in the store is changed, would be to only replace the section of the text, which corresponds to the change.
 This would require on the one hand identifying which part of the data is affected by the change and on the other hand understanding of the data within the serialized text in a way that it can be manipulated (e.g.\ navigating within the hierarchical data structure and changing values of a given path).
 This is out of scope for the project, but may be part of future work.
@@ -184,27 +209,3 @@ The initial values of all GUI elements are taken from the data in the store, by 
 Whenever the values in a GUI element are adjusted by the user, the data in the store will be updated with the new values.
 
 
-%In the following, the corresponding GUI elements for the different JSON Schema data types and constraints are shown:
-%
-%\textbf{Boolean}
-% todo: describe how it works. Then also describe for all the different data types, how we intend to implement the GUI aspect. E.g. for boolean we have checkbox
-
-\subsection{Intended Workflow}\label{subsec:workflow} %keyuri
-In this section, we outline the workflow of our tool.
-
-\begin{enumerate}
-    \item Upon initial access of \toolname{}, a dialog is displayed, where users can select their desired schema.
-    \item After selecting a schema, the user will find that a GUI is automatically generated on the right-hand side of the File Editor,
-    tailored to the selected schema.
-    \item Through the GUI panel, users are assisted in creating or modifying \cfgfiles{}.
-    \item If a user wishes to modify the selected schema, such as adding new properties, they can do so through the schema editor.
-    Changes can be made using either the GUI panel or the code panel, and these modifications will automatically reflect in the file editor.
-\end{enumerate}
-
-%\begin{figure}[!htb]
-%    \begin{minipage}[t]{0.5\textwidth}
-%        \includegraphics[width=3.5in]{figures/Toolworkflow}
-%        \caption{Workflow}
-%        \label{workflow}
-%    \end{minipage}\label{fig:workflow}
-%\end{figure}

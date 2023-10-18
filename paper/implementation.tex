@@ -1,85 +1,12 @@
 We use vue.js (TODO citation) as the UI framework for our tool, combined with PrimeVue (TODO citation) as the UI component library and Tailwind CSS (TODO citation) for CSS utility.
 A detailed list of all libraries used can be found in the wiki of our GitHub repository (TODO link).
-Table~\ref{tab:libraries} shows an overview of the most important libraries used and their purpose.
-
-% todo insert most important libraries used and their purpose
-\begin{table*}[!hb] % Use table* for wide tables
-    \caption{Libraries used in the implementation of our tool} %keyuri
-    \label{tab:libraries}
-    \centering
-    \begin{tabular}{ll}
-        \toprule
-        \textbf{Library} & \textbf{Purpose}     \\
-        \midrule
-        vue.js           & UI framework         \\
-        PrimeVue         & UI component library \\
-        Tailwind CSS     & CSS utility          \\
-        @fortawesome/fontawesome-svg-core & Font Awesome SVG icons. \\
-        ajv@8.12.0 & JSON schema validator for Node.js and browsers. \\
-        brace@0.11.1 & Browser-based code editor with syntax highlighting and code folding. \\
-        primeicons@6.0.1 & It is a popular UI component library for JavaServer Faces (JSF) applications. \\
-        \bottomrule
-    \end{tabular}
-\end{table*}
-
-\subsection{Tool Overview}\label{subsec:tool-overview} %keyuri
-
-
-The tool provides a solution for managing \cfgfiles{} with three distinct views:
-\begin{itemize}
-    \item \textbf{File Editor} (Figure~\ref{fig:fileeditor}): For editing \cfgfiles{}, based on the schema provided to the tool.
-    \item \textbf{Schema Editor} (Figure~\ref{fig:schemaeditor}): For editing the schema, which is used by the File Editor.
-    \item \textbf{Settings} (Figure~\ref{fig:settings}): To configure various tool settings.
-\end{itemize}
-
-% While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose.
-% The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
-
-\begin{figure*}
-    \includegraphics[width=\textwidth]{figures/fileeditor}
-    \caption{UI of File Editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code Editor panel, 4) GUI Editor panel}
-    \label{fig:fileeditor}
-\end{figure*}
-
-\begin{figure*}
-    \includegraphics[width=\textwidth]{figures/schemaeditor}
-    \caption{UI of Schema Editor view}
-    \label{fig:schemaeditor}
-\end{figure*}
-
-\begin{figure*}[h]
-    \includegraphics[width=\textwidth]{figures/settings}
-    \caption{UI of Settings view}
-    \label{fig:settings}
-\end{figure*}
-
+Table~\ref{tab:libraries} (appendix) shows an overview of the most important libraries used and their purpose.
 
 
 
 \subsubsection{Settings}
 
-In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings}) of \toolname{}:
-\begin{table*}
-    \centering
-    \caption{Setting Parameters\label{tab:settings}}
-    \begin{tabular}{@{}p{0.3\linewidth}p{0.6\linewidth}@{}}
-        \toprule
-        \textbf{Parameter} & \textbf{\ Description} \\
-        \midrule
-        Data Format & The data format used by the code editor. Currently YAML and JSON are supported. \\
-        Code Editor Font Size & Size of the font in the code editor. \\
-        Gui Editor On Right Side & By default, the GUI panel is located on the right side and the code panel on the left side. Using this option, their positions can be swapped. \\
-        GUI Editor Property Sorting & The order in which the properties in the GUI panel should appear:
-        \begin{itemize}
-            \item \textit{Schema Order}: Orders elements according to the order in the schema.
-            \item \textit{Priority Order}: Orders elements based on their priority (e.g. required properties first, deprecated properties last).
-            \item \textit{Data Order }: Orders elements the same way as it is in the data.
-        \end{itemize} \\
-        GUI Editor Maximum Depth & Determines the maximum level of nesting or hierarchy displayed in the GUI editor. \\
-        Debugging Active & For debugging purposes, users can enable or disable the debugging panel as needed.  \\
-        \bottomrule
-    \end{tabular}
-\end{table*}
+In the Settings view (figure~\ref{fig:settings} in appendix), the user can adjust various parameters (table~\ref{tab:settings} in appendix) of \toolname{}.
 
 
 \subsection{Code Panel}\label{subsec:code-editor}
