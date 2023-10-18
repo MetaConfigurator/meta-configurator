@@ -32,68 +32,33 @@ The tool provides a solution for managing \cfgfiles{} with three distinct views:
     \item \textbf{Settings} (Figure~\ref{fig:settings}): To configure various tool settings.
 \end{itemize}
 
-The user interface of \toolname{} is structured in the following way (see the numbers in red in figure~\ref{fig:fileeditor}):
-\begin{enumerate}
-    \item Button to switch to another view (e.g., from File Editor to Schema Editor).
-    \item Toolbar with various functionality.
-    \item Code editor panel.
-    \item GUI editor panel.
-\end{enumerate}
 % While these views may share a similar appearance in the figure, each number assigned to them serves a distinct purpose.
 % The first number corresponds to different views, allowing users to switch between the Schema Editor,File Editor and Settings, the second number pertains to the toolbar, functionalities for each view listed following, the third number represents the Code Panel, and the fourth number designates the GUI Panel on the right. We will discuss the unique functions of each of these views in the following sections.
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/fileeditor}
-    \caption{FileEditor}
+    \caption{UI of File Editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code Editor panel, 4) GUI Editor panel}
     \label{fig:fileeditor}
 \end{figure*}
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/schemaeditor}
-    \caption{SchemaEditor}
+    \caption{UI of Schema Editor view}
     \label{fig:schemaeditor}
 \end{figure*}
 
 \begin{figure*}[h]
     \includegraphics[width=\textwidth]{figures/settings}
-    \caption{Settings}
+    \caption{UI of Settings view}
     \label{fig:settings}
 \end{figure*}
 
-\subsubsection{Toolbar functionalities}
 
-The toolbar provides basic functionalities for all three views:
-\begin{itemize}
-    \item {New File: Create a new (schema) file.
-    In the file editor, this option also includes two sub-items:
-    \begin{itemize}
-        \item Generate Data: Generate random configuration data based on the selected schema from the Schema Editor.
-        \item New Empty File: Start with a blank file, discarding any current changes.
-    \end{itemize}
-
-    \item Open File: Open an existing file.
-    For the File Editor, this opens a dialog to open a file from the local file system.
-    For the Schema Editor, this comes with four sub-options:
-    \begin{itemize}
-
-        \item From File: Select a schema from the local file system.
-
-        \item JSON Schema Store: Choose a schema from the JSON Schema Store, the biggest online collection of JSON schemas.
-
-        \item From URL: Provide the URL of a specific schema, and the tool will retrieve and open it.
-
-        \item From Our Examples: Select one of the example schemas inbuilt into the tool.
-
-    \end{itemize}
-    \item Undo/Redo: Undo or redo the latest operations in the editor.
-    \item Download: Download the current editor content with an appropriate file name.
-    \item Search: Text field where the user can enter a search term to find and navigate to specific sections within the current file.
-\end{itemize}
 
 
 \subsubsection{Settings}
 
-In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings})of \toolname{}:
+In the Settings view (figure~\ref{fig:settings}), the user can adjust various parameters (tab~\ref{tab:settings}) of \toolname{}:
 \begin{table*}
     \centering
     \caption{Setting Parameters\label{tab:settings}}
@@ -120,7 +85,7 @@ In the Settings view (figure~\ref{fig:settings}), the user can adjust various pa
 \subsection{Code Panel}\label{subsec:code-editor}
 
 The code editor is a GUI panel designed for editing the \cfgfiles.
-For this project, we use the popular \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
+For this project, we use the \textit{Ace Editor}\cite{Ace-Editor} library to embed an interactive code editor into our user interface.
 % It is a browser based editor that matches and extends the features, usability and performance of existing native editors such as TextMate, Vim or Eclipse.
 % It can be easily embedded in any web page or JavaScript application.
 
@@ -164,12 +129,12 @@ It is structured in a table-like way, where each row represents a key-value pair
 Arrays elements are represented similarly, where the index of the array element is the key and the value is the array element itself.
 Figure~\ref{fig:gui-editor} shows the GUI editor component with an example schema and configuration data.
 
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/gui-editor} % todo replace with screenshot
-    \caption{GUI Editor Component}
-    \label{fig:gui-editor}
-\end{figure}
+%\begin{figure}[!t]
+  %  \centering
+ %   \includegraphics[width=\columnwidth]{figures/gui-editor} % todo replace with screenshot
+  %  \caption{GUI Editor Component}
+  %  \label{fig:gui-editor}
+%\end{figure}
 
 To allow this representation of the schema, we do some preprocessing of the schema, which is described in section~\ref{subsec:schema-preprocessing}.
 
@@ -186,12 +151,54 @@ However, the user can also click on the property name or array index to \textit{
 This will show the sub-properties of that element at the top level, as if that property was the root of the data tree.
 The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
 
-% todo add figure to illustrate (for all the different data types and features)
 
-\paragraph{Type specific components}
+\paragraph{GUI implementations for JSON schema features} % Minye
+Table \ref{table:json_schema_type_component} shows how the different JSON schema features are implemented in our GUI.
 
-TODO
-% todo write
+\begin{table*}
+    \centering
+    \caption{Corresponding GUI implementations for JSON schema features\label{table:json_schema_type_component}}
+    \begin{tabular}{@{}p{0.2\linewidth}p{0.6\linewidth}@{}}
+        \toprule
+        \textbf{JSON schema type / keywords} & \textbf{\ GUI implementation} \\
+        \midrule
+        string & Text field. \\
+        number & Text field which allows only floating point numbers and has buttons to increment and decrement. \\
+        integer & Text field which allows only integer numbers and has buttons to increment and decrement. \\
+        boolean & Checkbox.\\
+        object & Expandable list of child columns in the properties table (see figure \ref{fig:gui_element_object}). \\
+        array & Similar as for object. Also has a button to add new items (see figure \ref{fig:gui_element_array}).\\
+        enum & Dropdown menu.\\
+        const & Dropdown menu with just one entry.\\
+        required & Red asterisk left of the property name.\\
+        deprecated & Strikethrough styling for property name.\\
+        anyOf & Multiselect menu to choose sub-schemas. Based on the selected sub-schemas, corresponding properties will be shown as children in the table.\\
+        oneOf & Dropdown menu to choose one sub-schema. Based on the selected sub-schema, corresponding properties will be shown as children in the table.\\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/gui_element_object}
+    \caption{GUI implementation for object properties}
+    \label{fig:gui_element_object}
+\end{figure}
+
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/gui_element_array}
+    \caption{GUI implementation for array properties}
+    \label{fig:gui_element_array}
+\end{figure}
+
+
+
+
+\paragraph{Resolving data-dependent keywords}
+
+% TODO PAUL
 
 \paragraph{Remove Data}
 The user can delete properties or array elements from the data by clicking on the $\times$ button next to the edit field.
@@ -203,11 +210,13 @@ We manually implemented a generation of a textual description for each of the JS
 Starting with title and description of the property, the overlay then shows constraints (such as the number must be greater than 0) and in the bottom it also shows schema violations, in case there are any.
 This feature helps the user to understand the constraints and the meaning of a property.
 
+% TODO: exemplary tooltip screenshot that contains some constraints also Minye
+
 \paragraph{Highlighting Schema Validation Errors}
 When the configuration data does not comply to the schema, the corresponding elements are underlined in red and highlighted with a red error icon.
 This way, the user knows where any errors are.
 Additionally, the schema information tooltip lists all schema violations.
-% todo add screenshot
+% todo add screenshot of property with schema violation Minye
 
 \subsection{Schema preprocessing}\label{subsec:schema-preprocessing}
 

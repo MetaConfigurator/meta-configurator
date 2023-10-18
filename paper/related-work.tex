@@ -2,22 +2,22 @@
 
 This sections covers existing schema languages and existing approaches to generate UIs from them.
 % We compare the schema languages briefly and discuss why JSON schema is the most useful language for our approach.
-As our research is of practical nature, we also consider gray literature like specifications of schemas or websites.
+As our research is of practical nature, we also consider gray literature such as specifications of schemas or websites.
 \subsection{Schema Languages}\label{subsec:schemalanguages}
 
 \textit{Schema languages} are formal languages that specify the structure, constraints, and relationships of data, for example in a database or in structured data formats.
-% Schema languages are text based, we do not consider any graphical modeling languages like UML.
 
-% For this work we consider using an existing schema language (or a subset of it), building on an existing schema language or introducing our own schema language.
+As this work is concerned with generating a GUI based on a schema, we need to choose a suitable schema language.
 The following sections describe existing schema languages.
+In section \ref{sec:evaluation-of-schema-languages}, we will evaluate which schema language is most suitable for this work.
 
 %paul
 \subsubsection{JSON schema}
 
-JSON is a common data-interchange format for exchanging data with webservices, but also for storing documents in noSQL databases like MongoDB\@.
+JSON is a common data-interchange format for exchanging data with webservices, but also for storing documents in noSQL databases, such as MongoDB\@\cite{marrs2017json}.
 Because of the popularity of JSON, there is also a demand for a schema language for JSON\@.
 One such language is JSON schema~\cite{jsonSchema, jsonschemaJSONSchema}.
-Figure~\ref{json-schema-example} shows an example of a JSON schema and Figure~\ref{json-example} shows an example of a JSON document that conforms to the schema.
+Listing~\ref{lst:json-schema-example} shows an example of a JSON schema and listing~\ref{lst:json-example} shows an example of a JSON document that conforms to the schema.
 
 JSON schema has evolved to being the de-facto standard schema language for JSON documents~\cite{baazizi2021empirical}.
 Schemas for many popular \cfgfile{} types exist.
@@ -29,7 +29,7 @@ JSON and YAML documents are of a similar structure (JSON being a subset of YAML)
 Some syntactical details of YAML can, however, not be expressed with JSON schema. % todo consider citation
 
 % minye
-\begin{lstlisting}[language=json,firstnumber=1,caption={JSON schema example},captionpos=b]
+\begin{lstlisting}[language=json,firstnumber=1,caption={JSON schema example},captionpos=b,label={lst:json-schema-example}]
 {
   "$id": "https://example.com
   /person.schema.json",
@@ -53,22 +53,22 @@ Some syntactical details of YAML can, however, not be expressed with JSON schema
     }
   }
 }
-\end{lstlisting}\label{json-schema-example}
+\end{lstlisting}
 
 
-\begin{lstlisting}[language=json,firstnumber=1,caption={JSON example for the schema}~\ref{json-schema-example},captionpos=b]
+\begin{lstlisting}[language=json,firstnumber=1,caption={JSON example for the schema in listing}~\ref{lst:json-schema-example},captionpos=b,label={lst:json-example}]
 {
   "firstName": "John",
   "lastName": "Doe",
   "age": 21
 }
-\end{lstlisting}\label{json-example}
+\end{lstlisting}
 
 % felix
 \subsubsection{XSD and DTD}
 For XML the two de-facto standard schema languages are Document Type Definition (DTD)\cite{dtd_spec} and XML Schema Definition (XSD)\cite{xsd_spec}.
 XSD is the newer and more expressive format of them and in large parts replaces and supersedes the more limited format DTD\cite{dtd_vs_xsd}.
-It is recommended by W3C\cite{xsd_spec}.
+It is recommended by W3C as schema language for XML documents\cite{xsd_spec}.
 
 Multiple more schema languages have been proposed and developed but are relatively unknown compared to XSD\cite{xml_schemas_1,xml_schemas_2}.
 
@@ -85,9 +85,9 @@ We consider also other schema languages that are not as popular as JSON schema, 
     \item Protocol Buffers~\cite{protobufProtocolBuffers} is a language for data serialization by Google.
 \end{enumerate}
 
-We do not consider any graphical modeling languages like UML or ER diagrams as they are not text-based.
+We do not consider any graphical modeling languages, such as UML or ER diagrams, as they are not text-based.
 Although they can be converted to text-based formats, their main purpose is to model data structures and relationships between them.
-We also do not consider any ontology languages like OWL or RDF Schema as they are not intended for data validation but rather for knowledge representation.
+We also do not consider any ontology languages, such as OWL or RDF Schema, as they are not intended for data validation but rather for knowledge representation.
 Future work could investigate if such languages can also be used for our use case.
 Finally, we do not consider any programming languages as schema languages.
 Technically, programming languages can be used to define data structures and constraints, but they are not intended for this purpose, and it would be very challenging to generate a GUI from them.
@@ -101,9 +101,9 @@ Our work focuses on assisting users in creating and maintaining \cfgfiles{} so t
 There exist techniques to validate \cfgfiles{} against a schema~\cite{JSON_schema_vailidation,JSONValidation,baeldung_2023}.
 Usually schema validation is done only internally, e.g., by web services or libraries.
 However, there exist also approaches that use the schema to assist the user in creating and maintaining \cfgfiles.
-IDEs like Visual Studio Code or IntelliJ IDEA can validate \cfgfiles{} against a schema and provide the user with error messages.
-Those IDEs provide also other features like auto-completion, syntax highlighting and tooltips.
-However, they do not provide a graphical user interface (GUI) for editing the \cfgfiles{} based on the schema.
+IDEs, such as Visual Studio Code or IntelliJ IDEA, can validate \cfgfiles{} against a schema and provide the user with error messages.
+Those IDEs provide also other features, such as auto-completion, syntax highlighting and tooltips.
+However, they typically do not provide a graphical user interface (GUI) for editing the \cfgfiles{} based on the schema.
 
 
 \subsubsection{Form generation}\label{subsubsec:schema-to-gui}
@@ -112,7 +112,7 @@ However, they do not provide a graphical user interface (GUI) for editing the \c
 Related to our work are approaches that generate a GUI from a schema.
 This section covers form generators, i.e., approaches that generate a web form from a schema.
 %Schema to GUI refers to the process of generating a graphical user interface (GUI) based on a predefined schema.
-Such forms can assist the user in a multitude of ways, such as help by tooltips (Figure~\ref{fig:gui_advantage_tooltip}), Auto-Completion (Figure~\ref{fig:gui_advantage_autocomplete}) and Choice Selections (Figure~\ref{fig:gui_advantage_choiceselection}).
+Such forms can assist the user in a multitude of ways, such as help by tooltips (Figure~\ref{fig:gui_advantage_tooltip}), auto-completion (Figure~\ref{fig:gui_advantage_autocomplete}) and choice selections (Figure~\ref{fig:gui_advantage_choiceselection}).
 By inherently adhering to the schema structure, with such GUIs configuration errors are avoided or at least significantly reduced.
 Users that are not very familiar with the configuration schema profit most from the GUI assistance, but even experienced users tend to not remember every individual detail of the schema and benefit.
 
@@ -252,14 +252,13 @@ However, future work could investigate how such techniques could be embedded in 
 \section{Evaluation of Schema Languages}\label{sec:evaluation-of-schema-languages}
 
 
+We evaluate the schema languages mentioned in section~\ref{subsec:schemalanguages} to determine which is the most suitable one for this work.
 
-We evaluate several schema languages in how well they fit our use-case.
-We consider all schema languages mentioned in section~\ref{subsec:schemalanguages} for this evaluation.
 
 \subsection{Evaluation criteria}\label{subsec:evaluation-criteria} % evaluation by paul, some criteria ideas by felix
 
 Ideally, the schema language of \toolname is both popular and supported by numerous tools and libraries as well as expressive enough to express the features we need.
-We evaluated the seven schema languages we mentioned in section~\ref{subsec:schemalanguages} based on the following criteria and metrics:
+We use the following criteria and metrics:
 \begin{enumerate}
 % metric: Stackoverflow question # with schema language as tag
     \item \textbf{Practical usage} --- Ideally our approach uses a schema language that already known by many developers.
@@ -268,7 +267,7 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
     This metric might also correlate with the complexity of the schema language as a more complex to use schema language will likely lead to more questions asked on the site.
     Nevertheless, we assume that a significantly higher number of results indicates that a language is more known than others.
 
-    Additionally, we investigate how well the schema languages are supported by IDEs and code libraries.
+    Additionally, we investigate how well the schema languages are supported by IDEs and code libraries:
     \begin{enumerate}
         \item \textit{Tool support} --- We used the 10 most popular IDEs\cite{mostpopularides} and checked if the IDE supports the schema language either natively or by a plugin.
         Support here means that either the IDE is capable of validating documents against a schema in the schema language or supports creating schema files, e.g., by using syntax highlighting for the schema language.
@@ -475,7 +474,7 @@ We evaluated the seven schema languages we mentioned in section~\ref{subsec:sche
 % paul
 \subsection{Evaluation results}\label{subsec:evaluation-results}
 
-Table~\ref{tab:all} shows the results of our evaluation.
+Tables~\ref{tab:all} and \ref{tab:comparison} show the results of our evaluation.
 We come to the conclusion that JSON schema is sufficiently popular and expressive that we choose to use it as the schema language for our approach.
 The other schema languages are either less expressive or less popular.
 This result is in line with the work of Baazizi et al.~\cite{baazizi2021empirical}, who also found over 80.000 JSON schema files on GitHub,
