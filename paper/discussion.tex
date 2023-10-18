@@ -32,6 +32,11 @@ Similarly, integration in other tools, such as IDEs, could be helpful for many u
 \toolname{} currently only supports JSON schema draft 2020--12, but it could be extended to support
 other drafts by converting imported schemas to the latest draft.
 Furthermore, YAML is not fully supported yet, which could be added in the future.
+Another point that can be addressed is the loss of formatting and comments in YAML documents, when they are updated with new data.
+This could be avoided by replacing only the section in the YAML document that corresponds to the change, instead of replacing the complete document. 
+To allow for different styles of formatting, the user could be provided with global formatting style settings (such as level of indentation or whether in YAML strings should be in quotation marks or not).
+To deal with the loss of comments, a technique that keeps track of any comments in the text and then restores them after the text is replaced could be implemented. This has already been done in another tool of one of the authors\cite{githubBspEditor}.
+
 Finally, \toolname{} could be extended to support code generation, e.g., for generating
 Java classes from a JSON schema, which is useful for developers.
 
