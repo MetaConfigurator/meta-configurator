@@ -174,7 +174,7 @@ Additionally, the schema information tooltip lists all schema violations, as sho
 To represent the schema in the GUI editor, it is necessary to preprocess the schema as for some JSON schema keywords
 it is not immediately clear how to represent them in a GUI\@.
 For example, the \texttt{type} keyword can have multiple values, which represents a type union.
-Here there is no obvious GUI component that can represent this.
+There is no obvious GUI component that represents this case.
 We differentiate between three ways of preprocessing:
 A one-time preprocessing step when loading the schema, an internal preprocessing that happens at every layer of the schema tree,
 and calculating an effective schema that happens every time the configuration data changes.
