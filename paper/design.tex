@@ -96,7 +96,7 @@ An editor panel is a modular component that the user of the tool can access to m
 It might be implemented as a code editor, a graphical user interface or any other way in which the data can be presented to the user.
 All editor panels are independent and do only have access to the data store but not to each other.
 Every editor panel subscribes to the changes of the data store, so it can be updated accordingly whenever the data in the store is changed.
-Additionally, every panel has the capabilities of updating the data store themselves, which is done when the user modifies the data in the editor panel.
+Additionally, every panel has the capabilities of updating the data store themselves, which are done when the user modifies the data in the editor panel.
 The following artificial example use-cases illustrate the capabilities of this architecture:
 
 \begin{itemize}
@@ -105,7 +105,7 @@ The following artificial example use-cases illustrate the capabilities of this a
     \item The Split-Screen Editor could be implemented for different data formats, such as YAML, JSON and XML. The architecture allows any data format as long as there exists a mapping from this data format to a JavaScript Object and back.
 \end{itemize}
 
-In practice, we implement only one code editor panel, as well as one GUI editor panel. 
+In practice, we implement only one code editor panel, as well as one GUI editor panel.
 The architecture, however, would be flexible enough to allow replacing any of these panels or adding new ones, since they are decoupled from each other and only communicate with the single source of truth data store.
 
 % TODO: Add diagram with store in center in several panels with bidirectional connection of subscribe/update
@@ -120,13 +120,13 @@ Besides the current configuration data, the store also stores the path of the cu
 
 % felix
 
-\subsubsection{Code Panel}\label{subsubsec:design_text_editor_panel} 
+\subsubsection{Code Panel}\label{subsubsec:design_text_editor_panel}
 For the code panel, we embed a rich-text code editor that already supports syntax highlighting and other useful features.
 We enable validation of whether the text is well-formed according to the JSON/YAML/XML standard and add schema validation.
 The panel subscribes to the data store.
 Whenever the configuration data is changed in the store, the panel will take the new configuration data JavaScript Object, serialize it into the given data format and replace the text in the code editor with the new serialized data.
 The action of replacing the text in the code editor will cause formatting and comments to be lost, which we accept.
-In the future, several mechanism could be applied to avoid the loss of formatting or comments (see section \ref{subsec:future-work}).
+In the future, several mechanisms can be applied to avoid the loss of formatting or comments (see section \ref{subsec:future-work}).
 
 When the user edits the text in the code editor, the text is deserialized into a JavaScript Object and sent to the data store, which then updates the configuration data object and notifies all other subscribed panels of the change.
 
@@ -134,7 +134,7 @@ When the user edits the text in the code editor, the text is deserialized into a
 To enable communication with the store, for any data format that the tool should support, we need a function to stringify a JavaScript object to a string in the data format and a function to parse a string in that data format as a JavaScript object.
 
 
-To make it possible to highlight certain lines in the editor as erroneous (schema violations) or jump to certain lines (e.g. when the user selects a property in the GUI editor, we want to jump to the same property in the text editor), we need a function \texttt{determineRow(editorContent, dataPath)} that can determine the corresponding editor line, based on the configuration text and a given data path. 
+To make it possible to highlight certain lines in the editor as erroneous (schema violations) or jump to certain lines (e.g. when the user selects a property in the GUI editor, we want to jump to the same property in the text editor), we need a function \texttt{determineRow(editorContent, dataPath)} that can determine the corresponding editor line, based on the configuration text and a given data path.
 
 The other way around, when the user places their cursor inside the text editor, we want to determine the path of the element that the cursor is currently at. This requires a function \texttt{determinePath(editorContent, cursorPosition)} which returns a data path based on the configuration text and a given cursor position.
 
