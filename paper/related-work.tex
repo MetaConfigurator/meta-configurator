@@ -101,7 +101,7 @@ There exist techniques to validate \cfgfiles{} against a schema~\cite{JSON_schem
 Usually, schema validation is done only internally, e.g., by web services or libraries.
 However, there exist also approaches that use the schema to assist the user in creating and maintaining \cfgfiles.
 IDEs, such as Visual Studio Code or IntelliJ IDEA, can validate \cfgfiles{} against a schema and provide the user with error messages.
-Those IDEs provide also other features, such as auto-completion, syntax highlighting, and tooltips.
+Those IDEs also provide other features, such as auto-completion, syntax highlighting, and tooltips.
 However, they typically do not provide a graphical user interface (GUI) for editing the \cfgfiles{} based on the schema.
 
 
@@ -158,7 +158,7 @@ Consequently, those approaches cannot be used to generate a GUI for any arbitrar
 \end{figure}
 
 Adamant~\cite{siffa2022adamant} is a JSON-schema based form generator specifically designed for scientific data.
-It is similar to our approach in that it generates a GUI from a JSON schema and also allows to edit and create JSON schema documents
+It generates a GUI from a JSON schema, allows editing and creating JSON schema documents
 and differentiates between a schema edit mode and a data edit mode.
 It supports a subset of JSON schema, which is sufficient for many use cases.
 In addition to that, it supports the extraction of units from the description of a field, which is helpful for scientific data.
@@ -187,7 +187,7 @@ It divides the editor into two parts, where one part can be used to edit the sch
 which is validated against the schema.
 The editor provides various features, such as syntax highlighting and highlighting of validation errors (Figure~\ref{fig:jsoneditoronline}).
 It provides a text-based or tree-based view for editing the JSON documents.
-For simple objects that are not further nested, it provides also a table-based view (Figure~\ref{fig:jsoneditoronline_table}).
+For simple objects that are not further nested, it also provides a table-based view (Figure~\ref{fig:jsoneditoronline_table}).
 However, the features of the editor are very limited.
 For example, it does not provide any assistance for the user, such as tooltips or auto-completion.
 For new documents, it does not show the properties of the schema, so the user has to know the schema beforehand.
@@ -280,7 +280,7 @@ We use the following criteria and metrics:
         This is a helpful feature for our approach as often not all possible values are valid for specific fields in configuration files.
         \item \textit{Conditions} --- This is fulfilled if the schema language provides the possibility to define conditional dependencies between fields.
         This is an advanced feature that is helpful because it allows to express that a particular field must be given only if another field has a specific value.
-        \item \textit{References} --- This is fulfilled if the schema language provides the possibility to define reusable subschemas that can be referenced in other parts of the schema.
+        \item \textit{References} --- This is fulfilled if the schema language provides the possibility to define reusable sub-schemas that can be referenced in other parts of the schema.
         This is often useful in practice to reuse common data structures.
 
     \end{enumerate}
@@ -303,17 +303,17 @@ We use the following criteria and metrics:
         \textbf{\# Node packages} &
         \textbf{Expressiveness} \\ \midrule
         JSON schema &
-        245.000 &
+        245,000 &
         8 / 10 &
-        4.536 & 9 /9 \\
-        XSD & 151.000 & 8 / 10 & 116 & 8 / 9 \\
-        DTD & 69.700 & 9 / 10 & 34 & 6 / 9 \\
-        CUE & 10.500 & 4 / 10 & 97 &   8 / 9 \\
-        Avro & 20.000 & 8 / 10 & 211 &  5 / 9 \\
+        4,536 & 9 /9 \\
+        XSD & 151,000 & 8 / 10 & 116 & 8 / 9 \\
+        DTD & 69,700 & 9 / 10 & 34 & 6 / 9 \\
+        CUE & 10,500 & 4 / 10 & 97 &   8 / 9 \\
+        Avro & 20,000 & 8 / 10 & 211 &  5 / 9 \\
         JSON Type Definition (JTD) &  109 & 0 / 10 &  17 & 5 / 9 \\
-        TypeSchema &  8.450 & 0 / 10 & 5 & 8 / 9 \\
-        Protobuf &  44.800 & 9 / 10 & 1.210 & 4 / 9 \\
-        GraphQl schema & 31.000 & 7 / 10 & 1.509 & 6 / 9\\ \bottomrule
+        TypeSchema &  8,450 & 0 / 10 & 5 & 8 / 9 \\
+        Protobuf &  44,800 & 9 / 10 & 1,210 & 4 / 9 \\
+        GraphQl schema & 31,000 & 7 / 10 & 1,509 & 6 / 9\\ \bottomrule
     \end{tabular}
 \end{table*}
 %\label{fig:my_label}
@@ -450,7 +450,7 @@ We use the following criteria and metrics:
 Tables~\ref{tab:all} and~\ref{tab:comparison} show the results of our evaluation.
 We come to the conclusion that JSON schema is sufficiently popular and expressive that we choose to use it as the schema language for our approach.
 The other schema languages are either less expressive or less popular.
-This result is in line with the work of Baazizi et al.~\cite{baazizi2021empirical}, who also found over 80.000 JSON schema files on GitHub,
+This result is in line with the work of Baazizi et al.~\cite{baazizi2021empirical}, who also found over 80,000 JSON schema files on GitHub,
 and with their claim that JSON schema is the de-facto standard for JSON schema languages.
 
 % paul
