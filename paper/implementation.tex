@@ -6,7 +6,7 @@ Finally, we describe how we developed a new meta schema for JSON schema that is 
 \subsection{Technologies}\label{subsec:technologies}
 
 We use vue.js~\cite{vuejsVuejsProgressive} as the UI framework for our tool, combined with the component library PrimeVue~\cite{primevuePrimeVueComponent}.
-A detailed list of all libraries used can be found in the wiki of our GitHub repository\footnote{\url{https://github.com/PaulBredl/config-assistant/wiki/All-libraries}}.
+A detailed list of all libraries used can be found in the wiki of our GitHub repository\footnote{\url{https://github.com/PaulBredl/meta-configurator/wiki/Libraries-we-use}}.
 % Table~\ref{tab:libraries} (appendix) shows an overview of the most important libraries used and their purpose.
 
 %\subsubsection{Settings}
@@ -96,7 +96,7 @@ The breadcrumb at the top allows the user to see which path the GUI editor curre
 
 \subsubsection{GUI implementations for JSON schema features} % Minye
 Table~\ref{table:json_schema_type_component} shows how the different JSON schema features are implemented in our GUI\@.
-In our GitHub wiki\footnote{\url{https://github.com/PaulBredl/config-assistant/wiki/JSON-schema-keyword-support}}, we provide a detailed overview of which JSON schema features are supported by our tool.
+In our GitHub wiki\footnote{\url{https://github.com/PaulBredl/meta-configurator/wiki/JSON-schema-keyword-support}}, we provide a detailed overview of which JSON schema features are supported by our tool.
 
 \begin{table*}[htb]
     \centering
@@ -334,7 +334,7 @@ The options which are not compatible are removed (see listing~\ref{lst:incompati
 
 
 \begin{lstlisting}[language=json, firstnumber=1, caption=
-    {Simple JSON schema with incompatible oneOf option removed}, captionpos=b, label={lst:incompatible_one_ofs_removed}]
+    {Simple JSON schema with the incompatible oneOf option removed}, captionpos=b, label={lst:incompatible_one_ofs_removed}]
 {
   "type": "object",
   "oneOf": [
