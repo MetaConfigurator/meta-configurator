@@ -1,51 +1,44 @@
-# Config Assistant
+# MetaConfigurator
 
 ## Description
 
-MetaConfigurator is a meta-program that automatically generates GUIs tailored to a given (JSON schema) data schema to make editing configuration files, research data and schemas easier and more enjoyable.
+MetaConfigurator is a web app that automatically generates a GUI tailored to a given JSON schema
+to make editing configuration files, research data and schemas easier and more enjoyable.
+
+Web playground: https://paulbredl.github.io/config-assistant/
 
 ## Problem
 
-Creating and managing configuration files manually can be a daunting task, especially for users who are not familiar with the specific file formats or syntax.
-This process often requires understanding complex rules and ensuring accurate formatting, which can lead to errors or inconsistencies.
+Creating and managing files that have to conform to a specific format or structure can be a challenging task with a simple text editor,
+especially if you are not familiar with the specific file formats or syntax.
+For example, if you want to create a GitHub Actions workflow file, you have to follow the specified structure.
+This structure is defined in a JSON schema, which is a JSON document that describes the structure of another JSON document.
+But how to make sure that the file you created is valid and conforms to the schema?
 
 ## Solution
 
 The project offers a GUI-based solution that simplifies the creation and maintenance of configuration files and schemas.
-Users can interact with a user-friendly interface that provides intuitive controls and abstracts away the complexities of file formats and syntax, making it accessible to users with limited technical knowledge.
+Users can interact with a user-friendly interface that provides intuitive controls and abstracts away the complexities
+of file formats and syntax, making it accessible to users with limited technical knowledge.
+Our tool has the following advantages:
 
-The benefits of using this tool include:
+- It is easy to use and does not require knowledge of the underlying file schema
+- It is flexible and can be used for any JSON schema (we currently support draft-2020-12)
+- Less error-prone than manually editing configuration files
 
-1. Ease of use: The GUI allows users to generate configuration files effortlessly, even without prior knowledge of the file formats or syntax.
-2. Time-saving: By combining the Code panel and the GUI panel in one view, maximum efficiency can be achieved.
-3. Error reduction: The tool ensures that the generated files conform to the specified format and structure, reducing the likelihood of syntax errors or inconsistencies.
+More details can be found in [our paper](paper/main_paper.pdf) and our [user guide](https://github.com/PaulBredl/config-assistant/wiki/User-Guide).
 
-## Features
+## Screenshot
 
-- User-friendly GUI for generating configuration files
-- Support for multiple file formats (e.g., JSON, YAML)
+![Screenshot 1](resources/Tool.png)
 
-## Dependencies
+## Development
 
-The project relies on the following dependencies:
+The project relies on [Node Js](https://nodejs.org/en/download/).
 
-- [Node Js + npm](https://nodejs.org/en/download/) (npm comes with node js)
+We use [vue.js](https://vuejs.org/) as a frontend framework and [PrimeVue](https://www.primefaces.org/primevue/) for the UI components.
 
-Make sure to install these dependencies before running the project.
-
-## Recommended IDE Setup
-
-[WebStorm](https://www.jetbrains.com/webstorm/download/)
-
-[Vue.js](https://cli.vuejs.org/guide/installation.html)
-
-[Vite](https://v3.ru.vuejs.org/guide/installation.html)
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Installation
+### Installation
 
 To launch the application, follow these steps:
 
@@ -53,41 +46,16 @@ To launch the application, follow these steps:
    ```shell
    git clone https://github.com/PaulBredl/config-assistant.git
    ```
-2. Navigate to the project directory:
-   ```shell
-   cd your-repository
-   ```
-3. Install the necessary dependencies:
+2. Install the necessary dependencies:
    ```sh
    npm install
    ```
-4. Launch the application:
+3. Launch the application:
    ```sh
    npm run dev
    ```
-5. Compile and Minify for Production
-   ```sh
-   npm run build
-   ```
-
-## Screenshot
-
-![Screenshot 1](resources/Tool.png)
-
-## Contribution
-
-**Contribution we only accept after 10/2023.**
-
-Contributions to the project are welcome! If you would like to contribute, please follow the guidelines outlined in the project's contribution guide located in the repository.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
 For more information, see the LICENSE file.
-
-## Contact
-
-If you have any questions, suggestions, or feedback, feel free to contact the project team at
-[kkpatel.de@gmail.com](mailto:kkpatel.de@gmail.com),
-[minyexu@gmail.com](mailto:minyeexu@gmail.com), [Felix@neuby.de](mailto:Felix@neuby.de),
-[paulbredl@gmx.de](mailto:cpaulbredl@gmx.de).
