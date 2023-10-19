@@ -39,7 +39,7 @@ const router = createRouter({
   ],
 });
 
-const DEFAULT_TITLE = 'Config Assistant';
+const DEFAULT_TITLE = 'MetaConfigurator';
 
 /**
  * We make sure that important session variables are reset when the
