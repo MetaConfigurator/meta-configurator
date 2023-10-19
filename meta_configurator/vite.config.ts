@@ -6,7 +6,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/meta_configurator/',
+  base: '/meta-configurator/',
   plugins: [vue(), vueJsx()],
   optimizeDeps: {
     exclude: ['ajv-formats'],

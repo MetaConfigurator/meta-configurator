@@ -19,11 +19,11 @@ defineEmits<{
     :visible="visible"
     @update:visible="newValue => $emit('update:visible', newValue)">
     <p>
-      Config Assistant is a tool to help you create and edit configuration files for your
+      MetaConfigurator is a tool to help you create and edit configuration files for your
       applications.
     </p>
     <p>It is currently in alpha stage, so expect bugs and missing features.</p>
-    <p>Config Assistant is open source and licensed under the MIT license.</p>
+    <p>MetaConfigurator is open source and licensed under the MIT license.</p>
     <p>
       Check our
       <a
