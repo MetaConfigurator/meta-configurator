@@ -20,7 +20,7 @@ import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorY
 import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {useSettingsStore} from '@/store/settingsStore';
-import {convertAjvPathToPath} from '@/helpers/pathHelper';
+import {convertAjvPathToPath} from '@/utility/pathUtils';
 
 const sessionStore = useSessionStore();
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);

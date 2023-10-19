@@ -1,6 +1,9 @@
 import type {ToastServiceMethods} from 'primevue/toastservice';
 import type {ToastMessageOptions} from 'primevue/toast';
 
+/**
+ * Service for displaying toasts.
+ */
 export class ToastService implements ToastServiceMethods {
   constructor(public toast?: ToastServiceMethods) {}
 

@@ -4,7 +4,7 @@ List dropdown for enum properties, also used for properties with multiple exampl
 <script setup lang="ts">
 import {computed} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import {ValidationResults} from '@/helpers/validationService';
+import {ValidationResults} from '@/utility/validationService';
 
 const props = defineProps<{
   propertyName: string;

@@ -1,14 +1,14 @@
 import type {JsonSchemaType} from '@/model/JsonSchemaType';
 import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
-import {nonBooleanSchema} from '@/helpers/schema/SchemaUtils';
+import {nonBooleanSchema} from '@/schema/SchemaUtils';
 import {
   areSchemasCompatible,
   mergeAllOfs,
   mergeSchemas,
   safeMergeAllOfs,
   safeMergeSchemas,
-} from '@/helpers/schema/mergeAllOfs';
+} from '@/schema/mergeAllOfs';
 
 const preprocessedRefSchemas: Map<string, JsonSchemaType> = new Map();
 

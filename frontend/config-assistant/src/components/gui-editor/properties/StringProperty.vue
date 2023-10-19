@@ -2,9 +2,9 @@
 import {ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
-import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {ValidationResults} from '@/helpers/validationService';
+import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
+import type {JsonSchema} from '@/schema/JsonSchema';
+import {ValidationResults} from '@/utility/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;

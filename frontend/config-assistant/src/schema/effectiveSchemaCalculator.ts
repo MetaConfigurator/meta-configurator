@@ -1,7 +1,7 @@
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {JsonSchema} from '@/schema/JsonSchema';
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
-import {dataAt} from '@/helpers/pathHelper';
+import {dataAt} from '@/utility/pathUtils';
 import _ from 'lodash';
 
 /**

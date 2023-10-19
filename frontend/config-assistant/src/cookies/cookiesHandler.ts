@@ -3,6 +3,12 @@ import {useSettingsStore} from '@/store/settingsStore';
 import VueCookies from 'vue-cookies';
 import {errorService} from '@/main';
 
+/**
+ * We use cookies to store the settings data
+ * This way, the settings are persisted between sessions.
+ * We currently only store them for 7 days.
+ * Note: Cookies have a size limit of 4KB
+ */
 const cookiesHandler = {
   initializeFromCookies: () => {
     if (VueCookies.isKey('settingsData')) {

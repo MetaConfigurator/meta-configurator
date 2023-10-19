@@ -3,22 +3,19 @@ import {computed, ref, watch} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
 import {useDataStore} from '@/store/dataStore';
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {dataAt, pathToString} from '@/helpers/pathHelper';
+import {JsonSchema} from '@/schema/JsonSchema';
+import {dataAt, pathToString} from '@/utility/pathUtils';
 import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
-import type {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
-import {ValidationResults, ValidationService} from '@/helpers/validationService';
+import type {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import {ValidationResults, ValidationService} from '@/utility/validationService';
 import {useDebounceFn} from '@vueuse/core';
 import {errorService} from '@/main';
 import {GuiConstants} from '@/constants';
-import type {SearchResult} from '@/helpers/search';
-import {
-  calculateEffectiveSchema,
-  EffectiveSchema,
-} from '@/helpers/schema/effectiveSchemaCalculator';
+import type {SearchResult} from '@/utility/search';
+import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 import type {JsonSchemaType} from '@/model/JsonSchemaType';
 

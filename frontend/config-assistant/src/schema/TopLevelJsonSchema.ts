@@ -1,4 +1,4 @@
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {JsonSchema} from '@/schema/JsonSchema';
 import type {TopLevelSchema} from '@/model/JsonSchemaType';
 
 /**

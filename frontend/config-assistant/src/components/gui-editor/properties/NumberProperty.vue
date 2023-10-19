@@ -2,9 +2,9 @@
 import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
 import type {PathElement} from '@/model/path';
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
-import {ValidationResults} from '@/helpers/validationService';
+import {JsonSchema} from '@/schema/JsonSchema';
+import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
+import {ValidationResults} from '@/utility/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;

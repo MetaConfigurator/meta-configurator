@@ -2,13 +2,13 @@
 import type {WritableComputedRef} from 'vue';
 import {computed, onMounted} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/JsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
 import type {Path, PathElement} from '@/model/path';
-import {pathToString} from '@/helpers/pathHelper';
+import {pathToString} from '@/utility/pathUtils';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
 import type {JsonSchemaType} from '@/model/JsonSchemaType';
-import {safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
+import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import _ from 'lodash';
 
 const props = defineProps<{

@@ -1,13 +1,12 @@
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/JsonSchema';
 import {errorService} from '@/main';
 import type {MenuItem} from 'primevue/menuitem';
-import {pathToString} from '@/helpers/pathHelper';
-import {dataToString} from '@/helpers/dataToString';
+import {pathToString} from '@/utility/pathUtils';
+import {dataToString} from '@/utility/dataToString';
 import _ from 'lodash';
-
-const MAX_DEPTH = 250;
+import {MAX_SEARCH_DEPTH} from '@/constants';
 
 /**
  * Searches for the given search term in the data and schema.
@@ -37,24 +36,22 @@ async function searchInDataAndSchemaRecursive(
   result: SearchResult[],
   depth = 0
 ): Promise<void> {
-  if (depth > MAX_DEPTH) {
-    return; // prevent infinite recursion in circular schemas
+  if (depth > MAX_SEARCH_DEPTH) {
+    return; // prevent potential infinite recursion in circular schemas
   }
 
-  if (
-    data !== undefined &&
-    (typeof data === 'string' || typeof data === 'number' || typeof data === 'boolean')
-  ) {
+  if (isPrimitive(data)) {
     if (matchesSearchTerm(data.toString(), searchTerm)) {
       addToResult(path, data, schema, searchTerm, result);
     }
   }
-  if (
-    (schema?.title !== undefined && matchesSearchTerm(schema.title, searchTerm)) ||
-    (schema?.description !== undefined && matchesSearchTerm(schema.description, searchTerm))
-  ) {
+
+  // also consider the title and description of the schema
+  if (descriptionOrTitleMatches(schema, searchTerm)) {
     addToResult(path, data, schema, searchTerm, result);
   }
+
+  // search in array items
   if (data && Array.isArray(data)) {
     for (let i = 0; i < data.length; i++) {
       await searchInDataAndSchemaRecursive(
@@ -67,9 +64,11 @@ async function searchInDataAndSchemaRecursive(
       );
     }
   }
-  if (data === undefined || (typeof data === 'object' && !Array.isArray(data))) {
-    const propertyNames = Object.keys(data ?? {}).concat(Object.keys(schema?.properties ?? {}));
-    for (const propertyName of new Set(propertyNames)) {
+
+  // search in object properties
+  if (isObject(data)) {
+    const propertyNames = getPropertyNamesFromDataAndSchema(data, schema);
+    for (const propertyName of propertyNames) {
       await searchInDataAndSchemaRecursive(
         data !== undefined ? data[propertyName] : undefined,
         schema?.subSchema(propertyName),
@@ -109,8 +108,30 @@ function addToResult(
   }
 }
 
+function getPropertyNamesFromDataAndSchema(data: any, schema: JsonSchema | undefined) {
+  return new Set(Object.keys(data ?? {}).concat(Object.keys(schema?.properties ?? {})));
+}
+
+function descriptionOrTitleMatches(schema: JsonSchema | undefined, searchTerm: string) {
+  return (
+    (schema?.title !== undefined && matchesSearchTerm(schema.title, searchTerm)) ||
+    (schema?.description !== undefined && matchesSearchTerm(schema.description, searchTerm))
+  );
+}
+
 function matchesSearchTerm(dataString: string, searchTerm: string): boolean {
   return dataString.toLowerCase().includes(searchTerm.toLowerCase());
+}
+
+function isPrimitive(data: any) {
+  return (
+    data !== undefined &&
+    (typeof data === 'string' || typeof data === 'number' || typeof data === 'boolean')
+  );
+}
+
+function isObject(data: any) {
+  return data === undefined || (typeof data === 'object' && !Array.isArray(data));
 }
 
 export interface SearchResult {
@@ -120,6 +141,9 @@ export interface SearchResult {
   searchTerm: string;
 }
 
+/**
+ * Converts a search result to a menu item that can be used in the search results menu.
+ */
 export function searchResultToMenuItem(searchResult: SearchResult): MenuItem {
   const pathString = pathToString(searchResult.path);
   return {

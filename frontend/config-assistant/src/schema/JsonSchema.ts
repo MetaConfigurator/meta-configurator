@@ -1,12 +1,7 @@
 import type {JsonSchemaType, SchemaPropertyType} from '@/model/JsonSchemaType';
-import {
-  nonBooleanSchema,
-  schemaArray,
-  schemaFromObject,
-  schemaRecord,
-} from '@/helpers/schema/SchemaUtils';
+import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/SchemaUtils';
 import type {Path, PathElement} from '@/model/path';
-import {preprocessSchema} from '@/helpers/schema/schemaPreprocessor';
+import {preprocessSchema} from '@/schema/schemaPreprocessor';
 import _ from 'lodash';
 
 /**

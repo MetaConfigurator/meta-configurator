@@ -2,9 +2,9 @@
 Simple component that displays a preview of the array elements.
 -->
 <script setup lang="ts">
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/JsonSchema';
 import type {Path} from '@/model/path';
-import {dataToString} from '@/helpers/dataToString';
+import {dataToString} from '@/utility/dataToString';
 
 const props = defineProps<{
   propertyName: string;

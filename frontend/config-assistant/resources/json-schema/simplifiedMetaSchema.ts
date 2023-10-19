@@ -1,3 +1,13 @@
+/**
+ * This represents a simplified version of the json schema meta schema.
+ * We made the following changes:
+ * - usage of if/then/else instead to only show relevant fields depending on the type
+ * - usage of $comment to give a link to the original documentation
+ * - added descriptions to most fields
+ * - added custom metaConfigurator field to hide advanced fields
+ * - usage of $ref instead of anchors because we don't support anchors and dynamic anchors
+ * - added examples to some fields
+ */
 export const simplifiedMetaSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   $id: 'com.github.config-assistant.simplified-meta-schema',

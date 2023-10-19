@@ -28,6 +28,9 @@ import {
   faFolderOpen as faFolderOpenRegular,
 } from '@fortawesome/free-regular-svg-icons';
 
+/**
+ * Register all icons used in the application.
+ */
 export function registerIcons() {
   library.add(faBars);
   library.add(faFile);

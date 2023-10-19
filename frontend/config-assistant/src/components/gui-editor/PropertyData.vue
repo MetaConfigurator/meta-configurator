@@ -2,7 +2,7 @@
 import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import {resolveCorrespondingComponent} from '@/components/gui-editor/resolveCorrespondingComponent';
-import {pathToString} from '@/helpers/pathHelper';
+import {pathToString} from '@/utility/pathUtils';
 import Button from 'primevue/button';
 import {useSessionStore} from '@/store/sessionStore';
 

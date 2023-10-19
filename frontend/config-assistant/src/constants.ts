@@ -4,4 +4,8 @@ export const GuiConstants = {
   MAX_SEARCH_RESULTS: 12,
 };
 
+/**
+ * URL of the JSON schema store catalog.
+ */
 export const JSON_SCHEMA_STORE_CATALOG_URL = 'https://www.schemastore.org/api/json/catalog.json';
+export const MAX_SEARCH_DEPTH = 250;

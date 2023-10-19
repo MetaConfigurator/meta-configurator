@@ -2,9 +2,9 @@
 Simple property component that displays a preview of the object properties.
 -->
 <script setup lang="ts">
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/JsonSchema';
 import type {Path, PathElement} from '@/model/path';
-import {dataToString} from '@/helpers/dataToString';
+import {dataToString} from '@/utility/dataToString';
 
 const props = defineProps<{
   propertyName: PathElement;

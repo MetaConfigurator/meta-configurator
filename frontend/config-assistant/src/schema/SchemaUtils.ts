@@ -1,6 +1,5 @@
-import type {JsonSchemaObjectType, JsonSchemaType} from '@/model/JsonSchemaType';
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {safeMergeAllOfs} from '@/helpers/schema/mergeAllOfs';
+import type {JsonSchemaType} from '@/model/JsonSchemaType';
+import {JsonSchema} from '@/schema/JsonSchema';
 
 /**
  * @returns the schema if it is not a boolean, otherwise
@@ -16,16 +15,28 @@ export function nonBooleanSchema(schema: JsonSchemaType) {
   return schema;
 }
 
+/**
+ * Coverts an array of schemas to an array of JsonSchema objects.
+ */
 export function schemaArray(schema?: JsonSchemaType[]): JsonSchema[] {
   return schema?.map(s => new JsonSchema(s)) ?? [];
 }
 
-export function schemaRecord(schema?: Record<string, JsonSchemaType>): Record<string, JsonSchema> {
+/**
+ * Converts a record of schemas to a record of JsonSchema objects.
+ */
+export function schemaRecord(
+  schemaRecord?: Record<string, JsonSchemaType>
+): Record<string, JsonSchema> {
   return Object.fromEntries(
-    Object.entries(schema ?? {}).map(([key, value]) => [key, new JsonSchema(value)])
+    Object.entries(schemaRecord ?? {}).map(([key, value]) => [key, new JsonSchema(value)])
   );
 }
 
+/**
+ * Creates a JsonSchema object from a JsonSchemaType.
+ * In contrast to the JsonSchema constructor, this function also handles undefined values.
+ */
 export function schemaFromObject(jsonSchema?: JsonSchemaType): JsonSchema | undefined {
   if (!jsonSchema) {
     return undefined;

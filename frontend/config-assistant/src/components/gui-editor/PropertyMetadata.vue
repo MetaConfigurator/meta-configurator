@@ -8,11 +8,11 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
-import type {ValidationResults} from '@/helpers/validationService';
-import {pathToString} from '@/helpers/pathHelper';
+import type {ValidationResults} from '@/utility/validationService';
+import {pathToString} from '@/utility/pathUtils';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import 'primeicons/primeicons.css';
-import {focus, selectContents} from '@/helpers/focusUtils';
+import {focus, makeEditableAndSelectContents} from '@/utility/focusUtils';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -165,7 +165,7 @@ function focusOnPropertyLabel(): void {
 
   showPencil.value = false;
   focus(id);
-  selectContents(id);
+  makeEditableAndSelectContents(id);
 }
 </script>
 

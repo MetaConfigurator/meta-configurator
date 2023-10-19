@@ -14,8 +14,8 @@ import {useSettingsStore} from '@/store/settingsStore';
 import ConfirmDialog from 'primevue/confirmdialog';
 import {useToast} from 'primevue/usetoast';
 import {useConfirm} from 'primevue/useconfirm';
-import {confirmationService} from '@/helpers/confirmationService';
-import {toastService} from '@/helpers/toastService';
+import {confirmationService} from '@/utility/confirmationService';
+import {toastService} from '@/utility/toastService';
 
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
