@@ -102,7 +102,7 @@ onMounted(() => {
     const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
 
     if (editor.value && fontSize) {
-      editor.value.setFontSize(fontSize.toString() + "px");
+      editor.value.setFontSize(fontSize.toString() + 'px');
     }
   });
 
