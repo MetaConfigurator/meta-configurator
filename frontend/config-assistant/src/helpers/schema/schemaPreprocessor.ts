@@ -376,21 +376,33 @@ function convertAnyTypeToOneOf(schema: JsonSchemaType | undefined): JsonSchemaTy
   if (schema.type === undefined && schema.oneOf === undefined) {
     schema.oneOf = [
       {
+        title: 'string',
         type: 'string',
       },
       {
+        title: 'number',
         type: 'number',
       },
       {
+        title: 'integer',
+        type: 'integer',
+      },
+      {
+        title: 'boolean',
         type: 'boolean',
       },
       {
+        title: 'object',
         type: 'object',
+        additionalProperties: {},
       },
       {
+        title: 'array',
         type: 'array',
+        items: true,
       },
       {
+        title: 'null',
         type: 'null',
       },
     ];
