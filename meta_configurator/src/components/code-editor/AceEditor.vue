@@ -1,3 +1,7 @@
+<!--
+ Code Editor component based on Ace Editor. Supports different data formats.
+ Synchronized with file data from the store.
+ -->
 <script setup lang="ts">
 import {computed, onMounted, Ref, ref, watch, watchEffect} from 'vue';
 import {storeToRefs} from 'pinia';
@@ -112,7 +116,7 @@ onMounted(() => {
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
   editor.value.getSession().setUndoManager(new ace.UndoManager());
 
-  // Listen to changes on AceEditor and update store accordingly
+  // when the content of the editor is modified by the user, we want to update the file data in the store accordingly
   editor.value.on(
     'change',
     useDebounceFn(
@@ -151,7 +155,7 @@ onMounted(() => {
   watchArray(
     computed(() => sessionStore.dataValidationResults.errors),
     errors => {
-      // Do not attempt to display schema validation errors when the text does not have valid syntax
+      // do not attempt to display schema validation errors when the text does not have valid syntax
       // (would otherwise result in errors when trying to parse CST)
       if (!manipulator.isValidSyntax(editor.value.getValue())) {
         return;
@@ -174,6 +178,8 @@ onMounted(() => {
     }
   );
 
+  // when the user clicks into the editor, we want to use the cursor position to determine which element from the data
+  // the user clicked at. We then update the currentSelectedElement in the store accordingly.
   editor.value.on('changeSelection', () => {
     if (currentChangeForcedFromOutside) {
       // we do not need to consider the event and send updates if the selection was forced from outside
@@ -190,7 +196,7 @@ onMounted(() => {
     }
   });
 
-  // Listen to changes in store and update content accordingly
+  // listen to changes in store and update the editor content accordingly
   watch(
     fileData,
     newVal => {
@@ -200,7 +206,7 @@ onMounted(() => {
     },
     {deep: true}
   );
-  // Listen to changes in current path and update cursor accordingly
+  // listen to changes in current path and update cursor accordingly
   watch(
     currentSelectedElement,
     (newSelectedElement: Path) => {
@@ -215,7 +221,7 @@ onMounted(() => {
 });
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
-  // Update value with new data and also update cursor position
+  // update value with new data and also update cursor position
   currentChangeForcedFromOutside = true;
   const newEditorContent = manipulator.stringifyContentObject(configData);
   sessionStore.currentEditorWrapper.setContent(newEditorContent);
