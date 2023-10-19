@@ -31,6 +31,11 @@ const emit = defineEmits<{
 const isEditingPropertyName = ref(false);
 const showPencil = ref(true);
 
+/**
+ * Determines whether the user can zoom into the property.
+ * This is the case if the property is an object or array,
+ * or if the property is a oneOf or anyOf property and the user has selected one of the options.
+ */
 function canZoomIn(): boolean {
   if (isEditingPropertyName.value) {
     return false;
@@ -56,7 +61,11 @@ function isDeprecated(): boolean {
   return props.node.data.schema.deprecated;
 }
 
-function toggleExpand() {
+/**
+ * Either toggles the expansion state of the node or zooms into the node,
+ * depending on if the maximum depth has been reached or not.
+ */
+function onPressEnter() {
   const settingsStore = useSettingsStore();
   if (props.node.data.depth === settingsStore.settingsData.guiEditor.maximumDepth) {
     zoomIntoPath();
@@ -108,6 +117,11 @@ function updatePropertyName(event) {
   showPencil.value = true;
 }
 
+/**
+ * Returns a string representation of the type of the property.
+ * This does not necessarily match one of the JSON schema types,
+ * e.g, it returns 'enum' if the property has an enum.
+ */
 function getTypeDescription(): string {
   if (props.node.data.schema.enum) {
     return 'enum';
@@ -156,6 +170,9 @@ function isInvalid(): boolean {
   return !props.validationResults.valid;
 }
 
+/**
+ * Focuses the property label and makes it editable.
+ */
 function focusOnPropertyLabel(): void {
   isEditingPropertyName.value = true;
   const id: string = getId();
@@ -175,7 +192,7 @@ function focusOnPropertyLabel(): void {
       class="mr-2"
       :class="{'hover:underline cursor-pointer': canZoomIn(), 'bg-yellow-100': highlighted}"
       :tabindex="canZoomIn() ? 0 : -1"
-      @keyup.enter="toggleExpand()"
+      @keyup.enter="onPressEnter()"
       @click="zoomIntoPath()">
       <span
         :contenteditable="isPropertyNameEditable() && isEditingPropertyName"

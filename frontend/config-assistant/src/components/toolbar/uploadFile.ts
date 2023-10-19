@@ -1,6 +1,9 @@
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {errorService} from '@/main';
 
+/**
+ * Opens a file dialog to select a file to upload.
+ */
 export function openUploadFileDialog(): void {
   const inputElement = document.createElement('input');
 

@@ -11,6 +11,10 @@ import {useSessionStore} from '@/store/sessionStore';
 import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfSelectionProperty.vue';
 import AnyOfSelectionProperty from '@/components/gui-editor/properties/AnyOfSelectionProperty.vue';
 
+/**
+ * Resolves the corresponding component for a given node.
+ * The component is determined by the schema of the node.
+ */
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData
 ): VNode {

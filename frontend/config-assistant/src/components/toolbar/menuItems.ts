@@ -12,27 +12,22 @@ import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 /**
  * Helper class that contains the menu items for the top menu bar.
  */
-export class TopMenuBar {
+export class MenuItems {
   sessionStore = useSessionStore();
   public fetchedSchemas: SchemaOption[] = [];
   public showDialog = ref(false);
-  public toast: any;
-  private readonly onFromWebClick: () => Promise<void>; // Function reference for handling "From Web" click
-  private readonly onFromOurExampleClick: () => void; // Function reference for handling "From Our Example" click
+
+  private readonly onFromWebClick: () => Promise<void>;
+  private readonly onFromOurExampleClick: () => void;
   private readonly handleFromURLClick: () => void;
-  private readonly handleSearchButtonClick: () => void;
   constructor(
-    toast = null,
-    onFromWebClick: () => Promise<void>, // Add this parameter to the constructor
+    onFromSchemaStoreClick: () => Promise<void>,
     onFromOurExampleClick: () => void,
-    handleFromURLClick: () => void,
-    handleSearchButtonClick: () => void
+    onFromURLClick: () => void
   ) {
-    this.toast = toast;
-    this.onFromWebClick = onFromWebClick;
+    this.onFromWebClick = onFromSchemaStoreClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
-    this.handleFromURLClick = handleFromURLClick;
-    this.handleSearchButtonClick = handleSearchButtonClick;
+    this.handleFromURLClick = onFromURLClick;
   }
 
   get fileEditorMenuItems() {
@@ -50,6 +45,7 @@ export class TopMenuBar {
             label: 'Generate File...',
             icon: 'fa-solid fa-gears',
             command: openGenerateDataDialog,
+            disabled: true, // currently not working in the deployed version
           },
         ],
       },

@@ -1,3 +1,6 @@
+<!--
+Panel for debugging purposes
+-->
 <script setup lang="ts">
 import {computed} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';

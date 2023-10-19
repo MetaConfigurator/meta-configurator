@@ -3,6 +3,10 @@ import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {errorService} from '@/main';
 import YAML from 'yaml';
 
+/**
+ * Opens a file dialog to select a file to upload.
+ * TODO: reduce code duplication with openUploadFileDialog
+ */
 export function openUploadSchemaDialog(): void {
   const inputElement = document.createElement('input');
 
