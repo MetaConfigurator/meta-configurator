@@ -84,7 +84,7 @@ With the help of hints, all tasks could be completed by every participant.
 
 \begin{table*}[!htbp]
     \centering
-    \caption{Results of user study} \label{table:results}
+    \caption{User Study - Task solving accuracy and difficulties} \label{table:results}
     \begin{tabular}{lp{4.5cm}p{6cm}}
         \toprule
         &
@@ -171,18 +171,67 @@ With the help of hints, all tasks could be completed by every participant.
 Given that average accuracy is approximately 0.9, we conclude that the participants were able to perform all three types of tasks using \toolname{}.
 
 \subsubsection{\textbf{RQ3:} Would people use the tool in practice?} % Keyuri
-Table~\ref{table:practical use and feedback} shows the individual opinions regarding practical use, their thoughts on the fields in which this tool could be used and the target users for using this tool and their Positive Feedbacks during User study.
+Table~\ref{tab:user_study_feedback} shows the positive feedback that the participants provided and where they can imagine the tool to be used in practice.
+All five participants responded that they themselves would use the tool.
 
 
-% TODO: create table regarding "Would you use the tool in practice?" with one row per participant
-% Keyuri
+\begin{table*} %keyuri, felix
+    \centering
+    \caption{User Study - Would people use the tool in practice?}\label{tab:user_study_feedback}
+    \begin{tabular}{p{0.1\linewidth}p{0.1\linewidth}p{0.1\linewidth}p{0.3\linewidth}p{0.3\linewidth}}
+        \toprule
+        \textbf{User Study} & \textbf{Profession} & \textbf{Would you use this tool yourself?} & \textbf{Potential Use case} & \textbf{Positive Feedback} \\
+        \midrule
+        1 & Professor & Yes & Configuring CI and simulations & 
+        "[I think always having those two views (code panel and GUI panel) is very helpful]." 
+        
+        "[It was more comfortable to modify things using the GUI panel than the code panel]."
+        
+        "You also showed nice examples. [Without the GUI] you would need to jump back to the schema to find out what is the max value."
+        \\
+        \midrule
+        2 & Professor & Yes & "I would especially recommend [the tool] to some of my project partners. "
+        
+        "I would certainly not only recommend but directly invite another partner to join in." & 
+        "I think it is very intuitive already."
+        
+        "The search [functionality] is good."
+        
+        "I really like the tool and I think it's really very intuitive to work [with the GUI panel] and it's good to have the overview on the [code panel]. The combination of both views is really helpful. Really good. I like it."\\
+        \midrule
+        3 & Software Engineer & Yes & "Currently I'm working with many experimental partners from different sort of chemistry and biological laboratories and the problem is that they just dump all data in some Excel sheet and it's not machine readable. [...] Much data is lost since the only person who can work with the [data] is the person who created the Excel spreadsheet. Being able [...] as a scientist [...] to define what are your important properties, your schema, and then being able to [fill in the data] while running the experiment simultaneously, that would be a really really huge advantage and the most prominent user that [comes to my mind]."
+         &
+        "I understood how [the tool] works and I think it is really really nice and will help many many people in getting their data organized."
+        
+        "I think having this really clickable and intuitive way to show the structure of your schema is really really neat and it really looks pretty."
+         
+         "I really like where this project is heading. I always have this research field in mind and I think it will really have an impact on that, when we can promote it to our partners [...] it will really make a difference." \\
+        \midrule
+        4 & Professor & Yes & Chemistry and biology field. Considers using the tool for their work. & 
+        "yeh, looks nice, two windows is good idea and more easier and human readable". 
+        % TODO: find positive feedback by carsten
+        
+        "Nested Properties are easier to find with this" \\
+        \midrule
+        5 & Student & Yes & "If I have to change more things [in a JSON document] it might be very nice to do it in an interface like this, especially given that it also provides the errors [...], which otherwise you would probably only get in the command line."
+        
+        "I guess I'm a big fan, like even though I know how to use Git on a command line level, I often use the GUI [for several tasks] because it's just faster for many things. And I would say [your tool] is similar to that." 
+        
+        
+        & 
+        "[I was] positively surprised, like it was super easy to [...] navigate and [for example] parsing JSON is always a bit of a pain, if I would have to go through this manually. [...] It's like comparing Word and LaTeX. This felt basically like Word. I can just change things directly in an intuitive user interface." "I can just like actually change things directly in in like a intuitive interface. [...] It is pretty nice, I would say." 
+        
+        "Are you going to open source this? Because it might actually be useful."\\
+        \bottomrule
+    \end{tabular}
+\end{table*}
 
 
 
 
 % maybe add more interpretations of result
 
-\subsection{Threads to Validity}\label{subsec:threads_to_validity} % Paul
+\subsection{Threats to Validity}\label{subsec:threads_to_validity} % Paul
 
 Our user study is qualitative and only has a small sample size of 5 participants.
 Hence, the results are not representative and cannot be generalized.
