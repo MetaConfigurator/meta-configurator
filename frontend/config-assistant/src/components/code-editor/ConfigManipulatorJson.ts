@@ -4,6 +4,9 @@ import type {CstDocument, CstNode} from 'json-cst';
 import {parse} from 'json-cst';
 import {errorService} from '@/main';
 
+/**
+ * ConfigManipulator implementation for the JSON data format.
+ */
 export class ConfigManipulatorJson implements ConfigManipulator {
   constructor() {}
 
