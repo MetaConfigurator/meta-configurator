@@ -15,13 +15,13 @@ jobs:
 
       - name: Install and Build
         run: |
-          cd frontend/config-assistant
+          cd meta_configurator
           npm ci
           npm run build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: frontend/config-assistant/dist
+          folder: meta_configurator/dist
           branch: gh-pages
           target-folder: docs

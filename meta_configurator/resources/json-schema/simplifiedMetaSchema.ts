@@ -10,7 +10,7 @@
  */
 export const simplifiedMetaSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
-  $id: 'com.github.config-assistant.simplified-meta-schema',
+  $id: 'com.github.meta_configurator.simplified-meta-schema',
   title: 'Json schema (simplified)',
   $ref: '#/$defs/jsonMetaSchema',
   $defs: {

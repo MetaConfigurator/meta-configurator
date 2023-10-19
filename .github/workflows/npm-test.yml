@@ -16,7 +16,7 @@ jobs:
       contents: write
     defaults:
       run:
-        working-directory: ./frontend/config-assistant
+        working-directory: ./meta_configurator
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -41,4 +41,4 @@ jobs:
           status_options: "--untracked-files=no"
           # only changed files in src/ and test/ will be committed
           # because otherwise this bot commits node_modules/ and dist/
-          file_pattern: "frontend/*"
+          file_pattern: "*"
