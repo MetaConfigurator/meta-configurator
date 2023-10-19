@@ -45,8 +45,6 @@ export function preprocessSchema(schema: JsonSchemaType): JsonSchemaType {
   preprocessAnyOfs(schemaCopy);
   // TODO: deal with case where there is anyOf and oneOf --> show both options in GUI?
 
-  convertAnyTypeToOneOfsInSubSchemas(schemaCopy);
-
   return schemaCopy;
 }
 
@@ -338,74 +336,6 @@ function hasAnyOfs(schema: JsonSchemaType): boolean {
     return false;
   }
   return schema.anyOf !== undefined && schema.anyOf.length > 0;
-}
-
-function convertAnyTypeToOneOfsInSubSchemas(schema: JsonSchemaType): void {
-  if (typeof schema !== 'object') {
-    return;
-  }
-  if (schema.properties !== undefined) {
-    schema.properties = Object.fromEntries(
-      Object.entries(schema.properties).map(([key, subSchema]) => {
-        return [key, convertAnyTypeToOneOf(subSchema)];
-      })
-    );
-  }
-  if (schema.patternProperties !== undefined) {
-    schema.patternProperties = Object.fromEntries(
-      Object.entries(schema.patternProperties).map(([key, subSchema]) => {
-        return [key, convertAnyTypeToOneOf(subSchema)];
-      })
-    );
-  }
-  if (schema.additionalProperties !== undefined) {
-    schema.additionalProperties = convertAnyTypeToOneOf(schema.additionalProperties);
-  }
-  if (schema.items !== undefined) {
-    schema.items = convertAnyTypeToOneOf(schema.items);
-  }
-}
-
-function convertAnyTypeToOneOf(schema: JsonSchemaType | undefined): JsonSchemaType {
-  if (schema === false) {
-    return schema;
-  }
-  if (schema === true || schema === undefined) {
-    schema = {};
-  }
-  if (schema.type === undefined && schema.oneOf === undefined) {
-    schema.oneOf = [
-      {
-        title: 'string',
-        type: 'string',
-      },
-      {
-        title: 'number',
-        type: 'number',
-      },
-      {
-        title: 'integer',
-        type: 'integer',
-      },
-      {
-        title: 'boolean',
-        type: 'boolean',
-      },
-      {
-        title: 'object',
-        type: 'object',
-      },
-      {
-        title: 'array',
-        type: 'array',
-      },
-      {
-        title: 'null',
-        type: 'null',
-      },
-    ];
-  }
-  return schema;
 }
 
 /**
