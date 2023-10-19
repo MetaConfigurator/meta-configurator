@@ -97,10 +97,10 @@
  Depending on the domain and underlying schema, the data can be complex and time-consuming to modify and maintain.
  Graphical user interfaces (GUIs) have proven effective in simplifying data management but entail substantial development and maintenance efforts.
  To address this challenge, we introduce a novel approach in this paper: a meta-program that automatically generates GUIs tailored to a given data schema.
- Our approach differentiates itself from others by 1) offering a unified view that combines the benefits of both GUIs and rich-text code editors, 2) enabling schema editing within the same tool and 3) support of advanced schema features like conditions and constraints.
+ Our approach differentiates itself from others by 1) offering a unified view that combines the benefits of both GUIs and rich-text code editors, 2) enabling schema editing within the same tool and 3) support of advanced schema features, such as conditions and constraints.
  We evaluate various schema formats and select JSON schema as the most suitable for our work.
- Then we present the program design, implementation, and the results of a user study involving three professors and two researchers.
- Our approach offers a practical solution that makes data and schema management easier.
+ Then we discuss the program design and implementation.
+ Through a qualitative user study, we show that the tool seems to be effective for retrieving information from data files, editing data files and also for editing schemas.
 
 
 
@@ -113,9 +113,8 @@
 
  \section{Introduction}\label{sec:introduction} %felix
 
- Textual formats to structure data, such as JSON, XML and YAML, are human-readable as well as machine-readable.
- Such formats are often used for configuration files or to structure measurement or research data, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
- The format of those data structures can be defined by so-called schemas, which define the rules the data has to conform to.
+ Textual formats to structure data, such as JSON, XML and YAML, are often used for configuration files or to structure measurement or research data, since they can be read and maintained by humans, as well as deserialized and used by computer programs.
+ The format of data structures can be defined by so-called schemas, which define the rules the data has to conform to.
  Given a schema, it can be validated whether a particular file confirms to that schema.
  We will call all file instances using such formats \textit{\cfgfiles}.
  Depending on the domain of such \cfgfiles, they can be complex and time-consuming to modify and maintain.

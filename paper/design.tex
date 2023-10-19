@@ -3,31 +3,30 @@
 
 % felix
 \subsection{User Interface}\label{subsec:overview}
-The design of \toolname{} is strongly inspired by another tool by one of the authors, which is a configurator GUI for the Minecraft server plugin BossShopPro\cite{bossshoppro}, where the GUI components are generated based on a rudimentary custom schema language and several inbuilt schemas.
-That tool provides the user a text editor panel for editing configuration files of that domain in a text editor, as well as a GUI editor panel, where the user can edit their configuration file using GUI components.\cite{githubBspEditor}
+The design of \toolname{} is inspired by another tool\cite{githubBspEditor} by one of the authors, which is a GUI program that assists users in editing configuration files for the Minecraft server plugin BossShopPro\cite{bossshoppro}.
+That tool provides the user a code panel for editing configuration files of that domain in a text editor, as well as a GUI panel, where the user can edit their configuration file using GUI components.
 \toolname{} differs from that tool by being generic, instead of being bound to a certain domain, by having a much more expressive schema language, a schema editor and many other features that improve the user experience, such as a search functionality.
 %TODO: maybe move to related work?
 
-Before we dive into the architecture and detailed design of the tool, this section provides an overview of the tool from the view of the user.
+Before we dive into the architecture and detailed design of \toolname{}, this section provides an overview from the view of the user.
 
 The user interface has three distinct views:
 \begin{enumerate}
-	\item File Editor (figure \ref{fig:fileeditor}): In this view the user can modify their \cfgfile{}, based on a schema.
-	\item Schema Editor (figure \ref{fig:schemaeditor}): In this view the user can modify their schema.
+	\item File editor (figure \ref{fig:fileeditor}): In this view the user can modify their \cfgfile{}, based on a schema.
+	\item Schema editor (figure \ref{fig:schemaeditor}): In this view the user can modify their schema.
 	\item Settings (figure \ref{fig:settings} in appendix): In this view the user can adjust parameters of the tool.
 \end{enumerate}
-Figures \ref{mockup_gui_config} and \ref{mockup_gui_schema} (appendix) provide a sketch of the planned user interface design before the implementation.
 
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/fileeditor}
-    \caption{UI of File Editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code panel, 4) GUI panel}
+    \caption{UI of file editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code panel, 4) GUI panel}
     \label{fig:fileeditor}
 \end{figure*}
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{figures/schemaeditor}
-    \caption{UI of Schema Editor view}
+    \caption{UI of schema editor view}
     \label{fig:schemaeditor}
 \end{figure*}
 
@@ -66,7 +65,7 @@ Settings      & Settings data                & Settings schema           \\
 \subsection{Intended Workflow}\label{subsec:workflow} %keyuri
 \begin{enumerate}
     \item Upon initial access of \toolname{}, a dialog is displayed, where users can select their desired schema.
-    \item After selecting a schema, the user will find that a GUI is automatically generated on the right-hand side of the File Editor,
+    \item After selecting a schema, the user will find that a GUI is automatically generated on the right-hand side of the file editor,
     tailored to the selected schema.
     \item Through the GUI panel, users are assisted in creating or modifying \cfgfiles{}.
     \item If a user wishes to modify the selected schema, such as adding new properties, they can do so through the schema editor.
@@ -123,7 +122,7 @@ Besides the current configuration data, the store also stores the path of the cu
 
 \subsubsection{Code Panel}\label{subsubsec:design_text_editor_panel} 
 For the code panel, we embed a rich-text code editor that already supports syntax highlighting and other useful features.
-We enable validation of whether the text is well-formed according to the JSON/YAML/XML Standard and add schema validation.
+We enable validation of whether the text is well-formed according to the JSON/YAML/XML standard and add schema validation.
 The panel subscribes to the data store.
 Whenever the configuration data is changed in the store, the panel will take the new configuration data JavaScript Object, serialize it into the given data format and replace the text in the code editor with the new serialized data.
 The action of replacing the text in the code editor will cause formatting and comments to be lost, which we accept.
