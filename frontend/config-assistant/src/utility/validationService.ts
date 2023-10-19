@@ -4,9 +4,14 @@ import type {ValidateFunction} from 'ajv/dist/2020';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import type {Path} from '@/model/path';
-import {pathToJsonPointer} from '@/helpers/pathHelper';
+import {pathToJsonPointer} from '@/utility/pathUtils';
 import _ from 'lodash';
 
+/**
+ * Service for validating data against a JSON schema.
+ * This uses the ajv library.
+ * It also supports validating against sub schemas of the top level schema.
+ */
 export class ValidationService {
   static readonly TOP_LEVEL_SCHEMA_KEY = '$topLevelSchema';
 
@@ -187,6 +192,9 @@ export class ValidationService {
     return result;
   }
 
+  /**
+   * Replaces our custom `conditions` keyword with `allOf` to ensure that ajv can validate the schema.
+   */
   private replaceConditionsWithAllOfs(schema: JsonSchemaType): JsonSchemaType {
     if (typeof schema !== 'object') {
       return schema;
@@ -199,6 +207,9 @@ export class ValidationService {
   }
 }
 
+/**
+ * The result of a validation.
+ */
 export class ValidationResults {
   valid: boolean;
   errors: Array<ErrorObject>;
@@ -230,7 +241,7 @@ export class ValidationResults {
     return new ValidationResults(filteredErrors);
   }
 
-  public isValidForPath(path: Path): boolean {
+  public isValidAtPath(path: Path): boolean {
     return this.filterForPath(path).valid;
   }
 }

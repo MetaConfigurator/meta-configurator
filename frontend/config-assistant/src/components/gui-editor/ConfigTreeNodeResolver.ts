@@ -1,4 +1,4 @@
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {JsonSchema} from '@/schema/JsonSchema';
 import type {
   AddPropertyTreeNode,
   ConfigDataTreeNodeType,
@@ -7,13 +7,13 @@ import type {
 import {TreeNodeType} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
-import {pathToString} from '@/helpers/pathHelper';
+import {pathToString} from '@/utility/pathUtils';
 import {PropertySorting} from '@/model/SettingsTypes';
 import {useSessionStore} from '@/store/sessionStore';
 import _ from 'lodash';
-import type {EffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
-import {calculateEffectiveSchema} from '@/helpers/schema/effectiveSchemaCalculator';
-import {safeMergeSchemas} from '@/helpers/schema/mergeAllOfs';
+import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
+import {calculateEffectiveSchema} from '@/schema/effectiveSchemaCalculator';
+import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 
 /**
  * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and

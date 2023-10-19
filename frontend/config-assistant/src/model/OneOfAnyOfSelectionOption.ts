@@ -1,5 +1,5 @@
-import type {JsonSchema} from '@/helpers/schema/JsonSchema';
-import {dataToString} from '@/helpers/dataToString';
+import type {JsonSchema} from '@/schema/JsonSchema';
+import {dataToString} from '@/utility/dataToString';
 
 export class OneOfAnyOfSelectionOption {
   constructor(name: string, index: number) {

@@ -9,7 +9,7 @@ import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
 import router from './router';
 import FileEditorView from '@/views/FileEditorView.vue';
-import ErrorService from '@/helpers/errorService';
+import ErrorService from '@/utility/errorService';
 import {registerIcons} from '@/fontawesome';
 import VueCookies from 'vue-cookies';
 

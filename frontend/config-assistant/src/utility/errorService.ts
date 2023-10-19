@@ -1,5 +1,4 @@
 import type {ToastServiceMethods} from 'primevue/toastservice';
-import {useThrottleFn} from '@vueuse/core';
 
 /**
  * Service that handles errors and warnings.
@@ -21,8 +20,6 @@ export default class ErrorService {
     });
   }
 
-  onErrorThrottled = useThrottleFn(this.onError, 5000);
-
   onWarning(warning: unknown) {
     console.warn(warning);
     this.toast.add({
@@ -32,8 +29,6 @@ export default class ErrorService {
       life: 5_000,
     });
   }
-
-  onWarningThrottled = useThrottleFn(this.onWarning, 5000);
 
   getSummary(error: unknown): string {
     if ((error as any).summary) {

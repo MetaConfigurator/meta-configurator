@@ -10,10 +10,10 @@ It emits the following events:
   - Emitted when the panel is closed
 -->
 <script setup lang="ts">
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {JsonSchema} from '@/schema/JsonSchema';
 import OverlayPanel from 'primevue/overlaypanel';
 import {computed, Ref, ref} from 'vue';
-import {describeSchema} from '@/helpers/schema/schemaDescriptor';
+import {describeSchema} from '@/schema/schemaDescriptor';
 import type {ErrorObject} from 'ajv';
 
 const schemaRef: Ref<JsonSchema | undefined> = ref();

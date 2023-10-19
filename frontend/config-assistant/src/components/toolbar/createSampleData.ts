@@ -1,10 +1,11 @@
 import {JSONSchemaFaker} from 'json-schema-faker';
-import {confirmationService} from '@/helpers/confirmationService';
-import {toastService} from '@/helpers/toastService';
+import {confirmationService} from '@/utility/confirmationService';
+import {toastService} from '@/utility/toastService';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {useDataStore} from '@/store/dataStore';
 import {errorService} from '@/main';
 import _ from 'lodash';
+
 export async function generateSampleData(schema: any): Promise<any> {
   JSONSchemaFaker.option('alwaysFakeOptionals', true);
   JSONSchemaFaker.option('minItems', 1);

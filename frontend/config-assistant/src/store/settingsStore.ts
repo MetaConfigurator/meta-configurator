@@ -1,9 +1,9 @@
 import {defineStore} from 'pinia';
 import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
-import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
-import {SETTINGS_SCHEMA} from '@/data/SettingsSchema';
-import {preprocessOneTime} from '@/helpers/schema/oneTimeSchemaPreprocessor';
+import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import {SETTINGS_SCHEMA} from '@/example-schemas/SettingsSchema';
+import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 
 /**
  * Store for the Meta Configurator settings.

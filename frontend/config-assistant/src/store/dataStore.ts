@@ -1,11 +1,11 @@
 import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
-import {TopLevelJsonSchema} from '@/helpers/schema/TopLevelJsonSchema';
+import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
 // @ts-ignore
 import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
-import {preprocessOneTime} from '@/helpers/schema/oneTimeSchemaPreprocessor';
+import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
 
 export const useDataStore = defineStore('dataStore', () => {

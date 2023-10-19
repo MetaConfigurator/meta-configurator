@@ -1,6 +1,9 @@
 import type {ConfirmationServiceMethods} from 'primevue/confirmationservice';
 import type {ConfirmationOptions} from 'primevue/confirmationoptions';
 
+/**
+ * Service for displaying confirmation dialogs.
+ */
 export class ConfirmationService implements ConfirmationServiceMethods {
   confirm: ConfirmationServiceMethods | undefined;
 

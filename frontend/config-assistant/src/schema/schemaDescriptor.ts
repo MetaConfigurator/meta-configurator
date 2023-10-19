@@ -1,10 +1,11 @@
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {JsonSchema} from '@/schema/JsonSchema';
 import type {SchemaPropertyType} from '@/model/JsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
 import type {ErrorObject} from 'ajv';
 
 /**
  * Creates an HTML paragraph describing the given schema.
+ * Used in the schema tooltip.
  *
  * The following properties are not described yet:
  * - $schema

@@ -5,7 +5,7 @@ import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 
-import {JsonSchema} from '@/helpers/schema/JsonSchema';
+import {JsonSchema} from '@/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/components/gui-editor/ConfigTreeNodeResolver';
@@ -19,11 +19,11 @@ import {
 } from '@/model/ConfigDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {dataAt, pathToString} from '@/helpers/pathHelper';
+import {dataAt, pathToString} from '@/utility/pathUtils';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/tree';
-import {focus, focusOnPath, selectContents} from '@/helpers/focusUtils';
+import {focus, focusOnPath, makeEditableAndSelectContents} from '@/utility/focusUtils';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -308,7 +308,7 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
   if (nodeToInsert.key) {
     const id = '_label_' + nodeToInsert.key;
     focus(id);
-    selectContents(id);
+    makeEditableAndSelectContents(id);
   }
 }
 

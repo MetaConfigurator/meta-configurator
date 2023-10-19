@@ -1,6 +1,8 @@
 /* eslint-disable */
 /**
  * This file represents the type for JSON Schema, 2020-12 draft.
+ * Note that this was partially generated using a JSON Schema to TypeScript converter,
+ * but manual modifications were necessary as the generator does not support all JSON Schema features.
  */
 export type JsonSchemaType = boolean | JsonSchemaObjectType;
 
@@ -107,6 +109,10 @@ export type SchemaPropertyType =
   | 'number'
   | 'object'
   | 'string';
+
+/**
+ * All possible types for a JSON Schema property.
+ */
 export const SCHEMA_PROPERTY_TYPES: SchemaPropertyType[] = [
   'array',
   'boolean',

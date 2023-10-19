@@ -1,7 +1,7 @@
 import {useDataStore} from '@/store/dataStore';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {toastService} from '@/helpers/toastService';
-import {confirmationService} from '@/helpers/confirmationService';
+import {toastService} from '@/utility/toastService';
+import {confirmationService} from '@/utility/confirmationService';
 
 export function newEmptySchemafile(message: string | undefined = undefined): void {
   if (!message) {

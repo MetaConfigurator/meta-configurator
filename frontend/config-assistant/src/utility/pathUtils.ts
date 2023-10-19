@@ -2,6 +2,12 @@ import type {Path, PathElement} from '@/model/path';
 import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
 
+/**
+ * Returns the data at the given path. If no data is found, undefined is returned.
+ *
+ * @param path the path to the data
+ * @param data the data to search in
+ */
 export function dataAt(path: Path, data: any): any {
   let currentData: any = data;
 
@@ -19,6 +25,13 @@ export function dataAt(path: Path, data: any): any {
   return currentData;
 }
 
+/**
+ * Converts a path to a string.
+ * Strings are converted to dot notation, numbers to array notation.
+ * Example: [1, 'foo', 2] -> '[1].foo[2]'
+ *
+ * @param path the path to convert
+ */
 export function pathToString(path: Path): string {
   return path.length === 0
     ? ''
@@ -30,6 +43,13 @@ export function pathToString(path: Path): string {
         )
         .slice(1);
 }
+
+/**
+ * Converts an ajv path to a path.
+ * Ajv paths are json pointers, so this method just calls jsonPointerToPath.
+ * @see jsonPointerToPath
+ * @param path the ajv path to convert
+ */
 export function convertAjvPathToPath(path: string): Path {
   return jsonPointerToPath(path);
 }
@@ -63,6 +83,11 @@ export function jsonPointerToPath(jsonPointer: string): Path {
   return result;
 }
 
+/**
+ * Converts a path to a json pointer.
+ * Example: [1, 'foo', 2] -> '/1/foo/2'
+ * @param path the path to convert
+ */
 export function pathToJsonPointer(path: Path): string {
   return pointer.compile(path.map((element: PathElement) => element.toString()));
 }
