@@ -45,7 +45,7 @@ the function \texttt{determineRow(editorContent, dataPath)}.
 % For every data format to be supported, those two functions need to be implemented.
 
 For \textit{JSON}, the functions have been implemented using a \textit{Concrete Syntax Tree (CST)}.
-The text content is parsed as a CST@.
+The text content is parsed as a CST.
 Then this tree is traversed recursively.
 Every tree node has a range property, describing the start and end index of the text belonging to the node.
 To determine the corresponding path for a cursor position, the cursor position is translated to a character index
@@ -468,8 +468,8 @@ the effective schema when the value for \texttt{mode} is ``manual''.
 
 \subsection{Developing a Custom Meta Schema}\label{subsec:schema-editor}
 
-The schema editor page has the same structure as the File editor page, as discussed in previous sections.
-The only difference is that the schema used for generating the GUI panel is not the schema file provided by the user but the Json schema meta schema,
+The schema editor view has the same structure as the file editor view, as discussed in previous sections.
+The only difference is that the schema used for generating the GUI panel is not the schema file provided by the user but the JSON schema meta schema,
 i.e., the schema that defines the structure of valid JSON schema files.
 However, applying our generic approach on the official JSON schema meta schema~\cite{jsonschemaJSONSchema} does not result in a user-friendly editor for
 creating and modifying schema files.
@@ -501,8 +501,7 @@ The JSON schema meta schema allows each field in each context.
 For example, if the \jskeyword{type} keyword is used and set to \jskeyword{string}, then the \jskeyword{properties} keyword is allowed,
 even though it does not make sense in that context.
 According to the specification, any validator should ignore the fields that do not make sense in the current context.
-Consequently, the user does not need to see those fields, but instead, the user gets overwhelmed by the amount of fields
-and does not know which fields are relevant for the current context.
+Consequently, if the user gets shown all fields that are allowed by the meta schema, they get overwhelmed, although many fields do not make sense in a given context.
 This is also a feedback we got from our user study.
 
 \begin{lstlisting}[language=json, firstnumber=1, caption=
@@ -521,11 +520,11 @@ Thus, we added \jskeyword{if} conditions to each field to only show them when th
 Listing~\ref{lst:if-then-else} shows an example of such an \jskeyword{if} condition.
 The relevant properties for arrays are only shown when the current property is of type array.
 
-To even more reduce the amount of fields shown to the user, we also introduced a custom keyword just for our own meta schema.
+To even more reduce the amount of fields shown to the user, we also introduce a custom keyword for our own meta schema.
 The keyword \jskeyword{advanced} is a boolean field that is set to \texttt{false} by default.
 It is wrapped in an \jskeyword{metaConfigurator} object, which is ignored by any validator as it is not part of the JSON schema specification.
 We use this wrapper to prevent any other schema extensions from colliding with our keyword.
-When set to \texttt{true}, the field not shown by default, but only when the user expands the advanced section.
+When set to \texttt{true}, the field is not shown by default, but only when the user expands an \textit{advanced} section that we added to the GUI.
 We put all fields that are not required for the basic usage of the schema into the advanced section.
 For this, we oriented ourselves on the work of Baazizi et al.~\cite{baazizi2021empirical}, which analyzed the usage of JSON schema keywords in 82,000 JSON schemas.
 
