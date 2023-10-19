@@ -16,7 +16,7 @@ export const useSettingsStore = defineStore('settings', () => {
       fontSize: 14,
     },
     guiEditor: {
-      maximumDepth: 5,
+      maximumDepth: 10,
       propertySorting: 'schemaOrder',
     },
     debuggingActive: false,
