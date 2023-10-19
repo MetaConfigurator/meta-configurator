@@ -1,7 +1,7 @@
 This section discusses the implications of our work and future work.
 
 
-\subsection{Implications of our work}\label{subsec:implications-of-our-work}
+\subsection{Implications of our Work}\label{subsec:implications-of-our-work}
 
 \toolname{} provides a novel approach for editing \cfgfiles{}
 by combining the advantages of a GUI and a code editor.
@@ -17,7 +17,7 @@ The next section discusses how future work might address these limitations.
 %Specialized editors for schemas, such as those discussed in section~\ref{subsubsec:schema-editors},
 %may be more suitable for this task.
 
-\subsection{Future work}\label{subsec:future-work}
+\subsection{Future Work}\label{subsec:future-work}
 To make \toolname{} more useful for users who are not familiar with JSON schema,
 there are several possible improvements.
 First, a visual schema editor could be added to \toolname{}, similar to schema editors
@@ -30,11 +30,11 @@ e.g., by providing an interactive tutorial or supporting a less complex schema l
 There are many other possible improvements to \toolname{}.
 A desktop version of \toolname{} could be developed, which would allow users to
 edit files on their local machine, which is more convenient than loading them into the web application.
-Similarly, integration in other tools, such as IDEs, could be helpful for many users.
+Similarly, integration into other tools, such as IDEs, could be helpful for many users.
 \toolname{} currently only supports JSON schema draft 2020--12, but it could be extended to support
 other drafts by converting imported schemas to the latest draft.
 Furthermore, YAML is not fully supported yet, which could be added in the future.
-Another point that can be addressed is the loss of formatting and comments in YAML documents, when they are updated with new data.
+Another point that can be addressed is the loss of formatting and comments in YAML documents when they are updated with new data.
 This could be avoided by replacing only the section in the YAML document that corresponds to the change, instead of replacing the complete document.
 To allow for different styles of formatting, the user could be provided with global formatting style settings (such as level of indentation or whether in YAML strings should be in quotation marks or not).
 To deal with the loss of comments, a technique that keeps track of any comments in the text and then restores them after the text is replaced could be implemented. This has already been done in another tool of one of the authors\cite{githubBspEditor}.
@@ -47,6 +47,6 @@ so that the results are more representative.
 Instead of just having participants solve tasks, it could also be interesting to
 have one group of participants solve tasks with \toolname{} and another group solve
 the same tasks with only a text editor.
-This way, we could evaluate whether \toolname{} is actually more efficient than
+This way, we could evaluate whether \toolname{} is more efficient than
 just using a text editor.
 

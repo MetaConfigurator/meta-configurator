@@ -33,7 +33,7 @@
         \midrule
         It would be good to have the ability to remove data entries with the GUI panel.
         &
-        Implemented by adding a \textit{remove} button next to properties which have data and are not required. \\
+        Implemented by adding a \textit{remove} button next to properties that have data and are not required. \\
         \midrule
         A search functionality to locate properties would be helpful, especially within nested levels.
         & Implemented in the toolbar.
@@ -41,21 +41,21 @@
         \midrule
         %& 4. The Schema editor GUI panel contains extensive metadata, but the code editor panel remains empty. & 4. bla bla bla \\
         %\midrule
-        The GUI panel feels overwhelming to the user due to many variations in styling and color of the GUI elements.
+        The GUI panel feels overwhelming to the user due to many variations in the styling and color of the GUI elements.
         &
-        We slightly reduced the number of different styling by no longer showing required properties in bold face and instead just show an asterisk next to it. \\
+        We slightly reduced the number of different styles by no longer showing required properties in boldface and instead just showing an asterisk next to it. \\
         \midrule
         The cursor should not have the clickable animation when hovering over non-clickable fields in the GUI editor.
         &
         Now we only show the clickable animation when hovering over clickable GUI components. \\
         \midrule
-        In drop-down menus we do not need a button to clear the selection.
+        In drop-down menus, we do not need a button to clear the selection.
         &
         We disabled the option of clearing the selection. \\
         \midrule
         If the type of a property is ``any'', it should not be interpreted as the ``string'' type in the GUI panel.
         &
-        We show a drop-down menu to the user, where they can select the type they want to use. \\
+        We improved the representation of the ``any'' type, but further improvements are needed, which will be considered in future work.\\
         \midrule
         Validation errors should not be highlighted via a warning symbol, but instead an error symbol.
         &
@@ -63,7 +63,7 @@
         \midrule
         After performing an undo or redo action, the cursor should jump to the corresponding location to reflect the changes made by the user.
         &
-        Will be considered in future work. \\
+        This will be considered in future work. \\
         \bottomrule
     \end{tabular}
 \end{table*}
@@ -80,7 +80,7 @@
         \midrule
         A graph-based view would be more intuitive for handling complex data structures.
         &
-        Will be considered in future work. \\
+        This will be considered in future work. \\
         \midrule
         Providing immediate feedback to users when they enter incorrect ranges is essential to prevent them from inputting invalid values into the property.
         &
@@ -89,13 +89,13 @@
         \midrule
         Validation errors should also be reflected in the GUI panel, including for child properties.
         &
-        See point above.
+        See the point above.
         Also, now the tooltip lists schema violations of child properties. \\
         \midrule
         When dealing with an array, the display name of array elements (index) should be improved.
-        Currently, the tool only shows just the element index.
+        Currently, the tool only shows the element index.
         &
-        We replaced the numerical labels by a standard programming notation, which is \texttt{propertyName[0]}, \texttt{propertyName[1]}, \ldots
+        We replaced the numerical labels with a standard programming notation, which is \texttt{propertyName[0]}, \texttt{propertyName[1]}, \ldots
         \\
         \midrule
         The input field next to the \textit{Add Item} button is confusing.
@@ -103,8 +103,8 @@
         &
         We removed the input field next to the button. \\
         \midrule
-        It would be more consistent, if all user input in the GUI panel was within the right column of the table.
-        That in some scenarios user input is needed within the left column (for names of new properties) feels inconsistent.
+        It would be more consistent if all user input in the GUI panel was within the right column of the table.
+        In some scenarios user input is needed within the left column (for names of new properties), which feels inconsistent.
         &
         Because of the nature of JSON schema, we retained the property name within the left column.
         To make it clear to the user that the property name can be edited, we added an \textit{edit} icon next to it. \\
@@ -161,7 +161,8 @@
         The interplay of both panels is what makes this tool most effective.
          If the user does not want to use one of the panels, they can resize that panel to a very small size.  \\
         \midrule
-        When working with a particular property in the GUI panel the opacity of the other properties should be decreased, visually highlighting the property that currently is in focus. & Will be considered in future work. \\
+        When working with a particular property in the GUI panel, the opacity of the other properties should be decreased, visually highlighting the currently focused property.
+        & Will be considered in future work. \\
         \midrule
         Simplify the schema editor to make it easier to work with, for those who are not very familiar with JSON schema.
         &
