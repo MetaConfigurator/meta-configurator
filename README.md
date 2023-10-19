@@ -72,7 +72,7 @@ To launch the application, follow these steps:
 
 ## Screenshot
 
-![Screenshot 1](resources/GUI_CONFIG_ASSISTANCE.png)
+![Screenshot 1](resources/Tool.png)
 
 ## Contribution
 
