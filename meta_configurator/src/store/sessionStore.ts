@@ -19,11 +19,18 @@ import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchem
 import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
 import type {JsonSchemaType} from '@/model/JsonSchemaType';
 
+/**
+ * The current page/mode of the application.
+ */
 export enum SessionMode {
   FileEditor = 'file_editor',
   SchemaEditor = 'schema_editor',
   Settings = 'settings',
 }
+
+/**
+ * The last responsible for a change in the data.
+ */
 export enum ChangeResponsible {
   None = 'none',
   CodeEditor = 'code_editor',
@@ -33,41 +40,80 @@ export enum ChangeResponsible {
 }
 
 /**
- * Store for common data.
+ * Store that manages all data that is specific to the current session,
+ * including the current selected path, the validation results, and the current mode.
  */
 export const useSessionStore = defineStore('commonStore', () => {
   /**
-   * The current path in the data tree. List of path keys (or array indices). Empty list for root path.
+   * The current path in the data tree. Empty list for root path.
    */
   const currentPath: Ref<Path> = ref<Path>([]);
+  /**
+   * The current selected element in the data tree.
+   */
   const currentSelectedElement: Ref<Path> = ref<Path>([]);
+  /**
+   * All elements that are currently expanded in the data tree.
+   * The key is the path as a string, the value is true if the element is expanded.
+   */
   const currentExpandedElements: Ref<Record<string, boolean>> = ref({});
+  /**
+   * The current search results. Empty, if there is currently no search.
+   */
   const currentSearchResults: Ref<SearchResult[]> = ref<SearchResult[]>([]);
-
+  /**
+   * Selected options for oneOf in the schema.
+   * Key is the path as a string, value is the selected option.
+   */
   const currentSelectedOneOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(
     new Map<string, OneOfAnyOfSelectionOption>([])
   );
+  /**
+   * Selected options for anyOf in the schema.
+   * Key is the path as a string, value is an array of selected options.
+   */
   const currentSelectedAnyOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption[]>> = ref(
     new Map<string, OneOfAnyOfSelectionOption[]>([])
   );
 
+  /**
+   * The current mode of the application.
+   */
   const currentMode: Ref<SessionMode> = ref<SessionMode>(SessionMode.FileEditor);
+
+  /**
+   * The last responsible for a change in the data.
+   */
   const lastChangeResponsible: Ref<ChangeResponsible> = ref<ChangeResponsible>(
     ChangeResponsible.None
   );
+
+  /**
+   * Wrapper for the code editor.
+   */
   const currentEditorWrapper: Ref<CodeEditorWrapper> = ref(new CodeEditorWrapperUninitialized());
+
   /**
    * The error message of the schema, or null if there is no error.
    * This is the result of the last validation of the schema, not the data.
    */
   const schemaErrorMessage: Ref<string | null> = ref<string | null>(null);
+
+  /**
+   * The results of the last validation of the data.
+   */
   const dataValidationResults: Ref<ValidationResults> = ref<ValidationResults>(
     new ValidationResults([])
   );
 
-  // TODO consider one variable for each page
+  /**
+   * The content of the editor as a string.
+   */
   const editorContentUnparsed: Ref<string> = ref('');
 
+  /**
+   * The data of the current file, schema, or settings, depending on the current mode.
+   */
   const fileData: WritableComputedRef<any> = computed({
     // getter
     get() {
@@ -108,6 +154,9 @@ export const useSessionStore = defineStore('commonStore', () => {
     },
   });
 
+  /**
+   * The schema of the current file, schema, or settings, depending on the current mode.
+   */
   const fileSchema: ComputedRef<TopLevelJsonSchema> = computed(() => {
     switch (currentMode.value) {
       case SessionMode.FileEditor:
@@ -124,6 +173,9 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
+  /**
+   * The preprocessed schema of the current file, schema, or settings, depending on the current mode.
+   */
   const fileSchemaDataPreprocessed: ComputedRef<JsonSchemaType> = computed(() => {
     switch (currentMode.value) {
       case SessionMode.FileEditor:
@@ -140,6 +192,9 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
+  /**
+   * The raw schema of the current file, schema, or settings, depending on the current mode.
+   */
   const fileSchemaData = computed(() => {
     switch (currentMode.value) {
       case SessionMode.FileEditor:
@@ -156,12 +211,23 @@ export const useSessionStore = defineStore('commonStore', () => {
     }
   });
 
+  /**
+   * Validation service for the current schema.
+   */
   const validationService = ref(new ValidationService(fileSchemaDataPreprocessed.value));
+
+  /**
+   * Run the validation service with a debounce.
+   */
   const validateDebounced = useDebounceFn(
     data => validationService.value.validate(data),
     GuiConstants.SCHEMA_VALIDATION_DEBOUNCE_TIME
   );
 
+  /**
+   * Run the validation service with the given data.
+   * @param newData The data to validate.
+   */
   function runValidation(newData: any) {
     validateDebounced(newData)
       .then(validationResults => {
@@ -172,6 +238,9 @@ export const useSessionStore = defineStore('commonStore', () => {
       .catch(e => errorService.onError(e));
   }
 
+  /**
+   * Reload the validation service with the current schema.
+   */
   function refreshValidationService() {
     try {
       validationService.value = new ValidationService(fileSchemaDataPreprocessed.value);
@@ -196,16 +265,28 @@ export const useSessionStore = defineStore('commonStore', () => {
     {immediate: true}
   );
 
+  /**
+   * Update the validation service when the schema changes.
+   */
   watch(fileSchemaData, () => {
     refreshValidationService();
   });
 
+  /**
+   * Returns the schema at the given path.
+   */
   function schemaAtPath(path: Path): JsonSchema {
     return fileSchema.value.subSchemaAt(path) ?? new JsonSchema({});
   }
 
+  /**
+   * Return the schema at the current path.
+   */
   const schemaAtCurrentPath: Ref<JsonSchema> = computed(() => schemaAtPath(currentPath.value));
 
+  /**
+   * Returns the effective schema at the given path, i.e., the schema that resolved data dependent keywords.
+   */
   function effectiveSchemaAtPath(path: Path): EffectiveSchema {
     let currentEffectiveSchema: EffectiveSchema = calculateEffectiveSchema(
       fileSchema.value,
