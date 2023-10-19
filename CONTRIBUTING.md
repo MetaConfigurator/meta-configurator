@@ -1,6 +1,6 @@
-# Contributing to Config Assistant
+# Contributing to MetaConfigurator
 
-Welcome to the Config Assistant project! We appreciate your interest in contributing.
+Welcome to the MetaConfigurator project! We appreciate your interest in contributing.
 Note that this project is part of graded student projects and thus contributions to the code can only be accepted if the supervisor of the project agrees to it.
 If you want to contribute to the project, please contact one of the developers first, e.g., by opening an issue.
 

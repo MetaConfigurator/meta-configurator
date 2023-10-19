@@ -30,7 +30,7 @@ More details can be found in [our paper](paper/main_paper.pdf) and our [user gui
 
 ## Screenshot
 
-![Screenshot 1](resources/fileeditor%20view.png)
+![Screenshot 1](figs/screenshot_file_editor.png)
 
 ## Development
 
