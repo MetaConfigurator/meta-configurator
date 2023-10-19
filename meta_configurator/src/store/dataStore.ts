@@ -9,6 +9,9 @@ import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import type {JsonSchemaType} from '@/model/JsonSchemaType';
 
+/**
+ * The store that contains the data of the current file and the current schema.
+ */
 export const useDataStore = defineStore('dataStore', () => {
   /**
    * The configuration file that the user can modify
@@ -48,6 +51,9 @@ export const useDataStore = defineStore('dataStore', () => {
     immediate: true,
   });
 
+  /**
+   * Reloads the schema from the schema editor, i.e., reruns the schema preprocessor.
+   */
   function reloadSchema() {
     if (useSessionStore().currentMode === SessionMode.FileEditor) {
       const preprocessedSchema = preprocessOneTime(schemaData.value);
