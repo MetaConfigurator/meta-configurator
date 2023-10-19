@@ -394,12 +394,10 @@ function convertAnyTypeToOneOf(schema: JsonSchemaType | undefined): JsonSchemaTy
       {
         title: 'object',
         type: 'object',
-        additionalProperties: {},
       },
       {
         title: 'array',
         type: 'array',
-        items: true,
       },
       {
         title: 'null',
