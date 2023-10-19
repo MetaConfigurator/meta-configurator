@@ -62,8 +62,7 @@ export class ConfigManipulatorJson implements ConfigManipulator {
 
   determinePath(editorContent: string, targetCharacter: number): Path {
     const cst: CstDocument = parse(editorContent);
-    const result = this.determinePathStep(cst.root, targetCharacter) || [];
-    return result;
+    return this.determinePathStep(cst.root, targetCharacter) || [];
   }
 
   private determinePathStep(currentNode: CstNode, targetCharacter: number): Path | undefined {

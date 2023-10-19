@@ -1,3 +1,4 @@
+<!-- This component is used to select a oneOf sub-schema for a property -->
 <script setup lang="ts">
 import type {WritableComputedRef} from 'vue';
 import {computed, onMounted} from 'vue';

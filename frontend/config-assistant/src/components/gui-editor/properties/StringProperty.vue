@@ -1,3 +1,4 @@
+<!-- Text input for string properties -->
 <script setup lang="ts">
 import {computed, ref} from 'vue';
 import InputText from 'primevue/inputtext';

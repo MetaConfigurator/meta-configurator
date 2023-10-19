@@ -1,3 +1,7 @@
+<!--
+Wrapper component that contains the actual component that allows the user to edit the value of a property.
+The component is chosen based on the type of the property, see resolveCorrespondingComponent.
+-->
 <script setup lang="ts">
 import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
 import type {Path} from '@/model/path';
@@ -45,6 +49,8 @@ function shouldShowRemove(): boolean {
       :is="resolveCorrespondingComponent(nodeData)"
       @update:propertyData="(newValue: any) => propagateUpdateValueEvent(newValue)"
       @update:tree="() => propagateUpdateTreeEvent()" />
+
+    <!-- x button to remove the property -->
     <Button
       class="h-full"
       style="width: 10%"

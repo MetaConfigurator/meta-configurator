@@ -1,3 +1,4 @@
+<!-- Dialog to select the initial schema -->
 <script setup lang="ts">
 import {defineEmits, ref, watch} from 'vue';
 import RadioButton from 'primevue/radiobutton';
@@ -12,7 +13,7 @@ const categories = ref<Array<{name: string; key: 'Example' | 'JsonStore' | 'File
   {name: 'Load Schema from URL', key: 'URL'},
 ]);
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'user_selected_option', option: 'Example' | 'JsonStore' | 'File' | 'URL'): void;
 }>();
 
@@ -25,12 +26,14 @@ function openDialog() {
 function hideDialog() {
   showDialog.value = false;
 }
+
 // Watch for changes in selectedCategory and close the dialog if it's not null
 watch(selectedCategory, newValue => {
   if (newValue !== null) {
     hideDialog();
   }
 });
+
 defineExpose({show: openDialog, close: hideDialog});
 </script>
 

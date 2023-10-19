@@ -3,26 +3,25 @@ import {Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
-import {TopMenuBar} from '@/components/toolbar/TopMenuBar';
+import {MenuItems} from '@/components/toolbar/menuItems';
 import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/example-schemas/SchemaCollection';
-import {useToast} from 'primevue/usetoast';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
-import InitialSchemaSelectionDialog from '@/components/toolbar/InitialSchemaSelectionDialog.vue';
+import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
 
 import InputText from 'primevue/inputtext';
 
 import {storeToRefs} from 'pinia';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
-import {fetchWebSchemas} from '@/components/toolbar/fetchWebSchemas';
+import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJSONSchemaStore';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
-import {fetchExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
+import {loadExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema, searchResultToMenuItem} from '@/utility/search';
 import {focus} from '@/utility/focusUtils';
@@ -46,14 +45,8 @@ const showAboutDialog = ref(false);
 const showUrlInputDialog = ref(false);
 const schemaUrl = ref('');
 const menu = ref();
-const toast = useToast();
 
-const topMenuBar = new TopMenuBar(
-  toast,
-  handleFromWebClick,
-  handleFromOurExampleClick,
-  showUrlDialog
-);
+const topMenuBar = new MenuItems(handleFromWebClick, handleFromOurExampleClick, showUrlDialog);
 
 function getPageName(): string {
   switch (props.currentMode) {
@@ -135,7 +128,7 @@ function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
 async function handleFromWebClick(): Promise<void> {
   try {
     // Wait for the fetch to complete
-    topMenuBar.fetchedSchemas = await fetchWebSchemas();
+    topMenuBar.fetchedSchemas = await fetchSchemasFromJSONSchemaStore();
     showFetchedSchemas.value = true;
     topMenuBar.showDialog.value = true;
   } catch (error) {
@@ -154,19 +147,19 @@ watch(selectedSchema, async newSelectedSchema => {
   }
   if (newSelectedSchema.url) {
     try {
-      await fetchSchemaFromUrl(newSelectedSchema.url, toast);
+      await fetchSchemaFromUrl(newSelectedSchema.url);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to clear current config data ?');
+      newEmptyFile('Do you want to clear the current contents of the File Editor?');
     } catch (error) {
       errorService.onError(error);
     }
   } else if (newSelectedSchema.key) {
     try {
-      await fetchExampleSchema(newSelectedSchema.key, toast); // Call the fetchExampleSchema method with the schema key
+      loadExampleSchema(newSelectedSchema.key);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to clear current config data ?');
+      newEmptyFile('Do you want to clear the current contents of the File Editor?');
     } catch (error) {
       errorService.onError(error);
     }
@@ -180,7 +173,7 @@ function hideUrlDialog() {
   showUrlInputDialog.value = false;
 }
 async function fetchSchemaFromSelectedUrl() {
-  await fetchSchemaFromUrl(schemaUrl.value!, toast);
+  await fetchSchemaFromUrl(schemaUrl.value!);
   hideUrlDialog();
 }
 
@@ -313,8 +306,9 @@ const showSearchResultsMenu = event => {
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
     @user_selected_option="option => handleUserSelection(option)" />
+
+  <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
-    <!-- Dialog content goes here -->
     <div class="card flex justify-content-center">
       <div class="listbox-container" style="width: 300px">
         <Listbox
@@ -337,7 +331,6 @@ const showSearchResultsMenu = event => {
         <InputText v-model="schemaUrl" id="urlInput" />
       </div>
       <div class="p-dialog-footer">
-        <!-- Wrap the buttons in a div and add margin to it -->
         <div class="button-container">
           <Button label="Cancel" @click="hideUrlDialog" class="dialog-button" />
           <Button label="Fetch Schema" @click="fetchSchemaFromSelectedUrl" class="dialog-button" />
@@ -350,7 +343,9 @@ const showSearchResultsMenu = event => {
     :visible="showAboutDialog"
     @update:visible="newValue => (showAboutDialog = newValue)" />
 
+  <!-- Toolbar -->
   <Toolbar class="h-10 no-padding">
+    <!-- Page switch menu  -->
     <template #start>
       <Menu ref="menu" :model="items" :popup="true">
         <template #itemicon="slotProps">
@@ -365,6 +360,7 @@ const showSearchResultsMenu = event => {
         {{ getPageName() }}
       </Button>
 
+      <!-- menu items -->
       <div v-for="item in getMenuItems()" :key="item.label">
         <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
         <Button
@@ -408,6 +404,7 @@ const showSearchResultsMenu = event => {
           @blur="() => searchResultMenu.value?.hide()"
           id="searchBar" />
       </span>
+      <!-- search results menu -->
       <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems">
         <template #item="slotProps">
           <div class="px-3 py-2">
@@ -428,6 +425,7 @@ const showSearchResultsMenu = event => {
           <p class="font-semibold text-lg">ConfigAssistant</p>
         </div>
 
+        <!-- button to open the about dialog -->
         <Button
           circular
           text

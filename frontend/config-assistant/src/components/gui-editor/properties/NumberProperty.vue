@@ -1,3 +1,4 @@
+<!-- Numeric input for number and integer properties -->
 <script setup lang="ts">
 import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
@@ -17,10 +18,6 @@ const emit = defineEmits<{
   (e: 'update:propertyData', newValue: number | undefined): void;
 }>();
 
-const stepValue = computed(() => {
-  return props.propertySchema.multipleOf ?? 1;
-});
-
 const valueProperty = computed({
   get() {
     return props.propertyData;
@@ -39,6 +36,10 @@ function isValid(): boolean {
 function isInteger(): boolean {
   return props.propertySchema.hasType('integer');
 }
+
+const stepValue = computed(() => {
+  return props.propertySchema.multipleOf ?? 1;
+});
 </script>
 
 <template>

@@ -1,3 +1,10 @@
+<!--
+This is the heart of the GUI editor.
+It contains the tree table that displays the properties of the current path.
+It also contains the logic for adding, removing and renaming properties.
+
+TODO: This component is too big. Some of the logic should be moved to other files.
+-->
 <script setup lang="ts">
 import type {Ref} from 'vue';
 import {ref, watch} from 'vue';
@@ -8,7 +15,7 @@ import Button from 'primevue/button';
 import {JsonSchema} from '@/schema/JsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
-import {ConfigTreeNodeResolver} from '@/components/gui-editor/ConfigTreeNodeResolver';
+import {ConfigTreeNodeResolver} from '@/components/gui-editor/configTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
 import {
@@ -41,6 +48,7 @@ const emit = defineEmits<{
 
 const sessionStore = storeToRefs(useSessionStore());
 
+// update tree when the file data changes
 watch(
   () => useSessionStore().fileData,
   () => {
@@ -48,6 +56,7 @@ watch(
   }
 );
 
+// scroll to the current selected element when it changes
 watch(
   sessionStore.currentSelectedElement,
   () => {
@@ -67,10 +76,12 @@ watch(
   {deep: true}
 );
 
+// update tree when the file schema changes
 watch(storeToRefs(useSessionStore()).fileSchema, () => {
   updateTree();
 });
 
+// update tree when the current path changes
 watch(sessionStore.currentPath, () => {
   updateTree();
   focusOnFirstProperty();
@@ -86,6 +97,9 @@ const treeTableFilters = ref<Record<string, string>>({});
 
 const currentTree = ref({});
 
+/**
+ * Compute the tree that should be displayed and expand all nodes that were expanded before.
+ */
 function computeTree() {
   currentTree.value = treeNodeResolver.createTreeNodeOfProperty(
     props.currentSchema,
@@ -115,6 +129,9 @@ function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
   }
 }
 
+/**
+ * Update the tree and the nodes to display.
+ */
 function updateTree() {
   loading.value = true;
   window.setTimeout(() => {
@@ -125,6 +142,14 @@ function updateTree() {
 
 const nodesToDisplay: Ref<TreeNode[]> = ref(determineNodesToDisplay(computeTree()));
 
+/**
+ * Determine the nodes that should be displayed in the tree.
+ * If the root node has anyOf or oneOf, the root node is displayed.
+ * If the root node is an object or array, the children of the root node are displayed.
+ * Otherwise, the root node is displayed.
+ * This way, the tree is displayed in a way that makes sense for the user.
+ * Displaying the root node for objects and arrays would be redundant.
+ */
 function determineNodesToDisplay(root: TreeNode): TreeNode[] {
   const rootSchema = root?.data?.schema;
   if (!rootSchema) {
@@ -139,6 +164,9 @@ function determineNodesToDisplay(root: TreeNode): TreeNode[] {
   return [root];
 }
 
+/**
+ * Emits an event to update the data at the given path.
+ */
 function updateData(subPath: Path, newValue: any) {
   const completePath = props.currentPath.concat(subPath);
   emit('update_data', completePath, newValue);
@@ -270,12 +298,14 @@ function addEmptyArrayEntry(relativePath: Path) {
   const arraySchema = props.currentSchema.subSchemaAt(relativePath.slice(0, -1));
 
   if (!arraySchema?.items) {
-    // TODO: handle this case
     addItem(relativePath, '');
   }
   addItem(relativePath, arraySchema?.items?.initialValue());
 }
 
+/**
+ * Adds a new property to the current object.
+ */
 function addEmptyProperty(relativePath: Path, absolutePath: Path) {
   allowShowOverlay.value = false;
   const objectSchema = props.currentSchema.subSchemaAt(relativePath);
@@ -499,6 +529,7 @@ function zoomIntoPath(path: Path) {
             @stop_editing_property_name="() => (allowShowOverlay = true)" />
         </span>
 
+        <!-- data nodes, actual edit fields for the data -->
         <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 50%" class="w-full">
           <PropertyData
             class="w-full"

@@ -1,3 +1,6 @@
+<!--
+Code editor panel, using the Ace Editor
+-->
 <script setup lang="ts">
 import {computed, onMounted, Ref, ref, watch, watchEffect} from 'vue';
 import {storeToRefs} from 'pinia';
@@ -12,11 +15,9 @@ import 'brace/theme/monokai';
 import _ from 'lodash';
 import {useDebounceFn, watchArray} from '@vueuse/core';
 import type {Path} from '@/model/path';
-import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
-import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
+import {createConfigManipulator} from '@/components/code-editor/ConfigManipulator';
 import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {useSettingsStore} from '@/store/settingsStore';
@@ -29,10 +30,72 @@ const props = defineProps<{
   dataFormat: string;
 }>();
 
+const manipulator = createConfigManipulator(props.dataFormat);
+
+// update editor content when the unparsed content changes
+watch(
+  computed(() => sessionStore.editorContentUnparsed),
+  content => {
+    if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
+      editor.value.setValue(content, -1);
+    }
+  }
+);
+
+// update annotations when validation results change
+watchArray(
+  computed(() => sessionStore.dataValidationResults.errors),
+  errors => {
+    // Do not attempt to display schema validation errors when the text does not have valid syntax
+    // (would otherwise result in errors when trying to parse CST)
+    if (!manipulator.isValidSyntax(editor.value.getValue())) {
+      return;
+    }
+
+    let annotations = [];
+    for (const error of errors) {
+      const instancePath = error.instancePath;
+      const instancePathTranslated = convertAjvPathToPath(instancePath);
+      const relatedRow =
+        determineCursorPosition(editor.value.getValue(), instancePathTranslated).row - 1;
+      annotations.push({
+        row: relatedRow,
+        column: 0,
+        text: error.message,
+        type: 'error',
+      });
+      editor.value.getSession().setAnnotations(annotations);
+    }
+  }
+);
+
+// Listen to changes in store and update content accordingly
+watch(
+  fileData,
+  newVal => {
+    if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+      editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
+    }
+  },
+  {deep: true}
+);
+
+// Listen to changes in current path and update cursor accordingly
+watch(
+  currentSelectedElement,
+  (newSelectedElement: Path) => {
+    if (editor.value && sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+      currentChangeForcedFromOutside = true;
+      updateCursorPositionBasedOnPath(editor.value.getValue(), newSelectedElement);
+      currentChangeForcedFromOutside = false;
+    }
+  },
+  {deep: true}
+);
+
 let editor: Ref<Editor>;
 
 let currentChangeForcedFromOutside = false;
-const manipulator = createConfigManipulator(props.dataFormat);
 
 let editorWrapper: CodeEditorWrapper;
 
@@ -40,14 +103,6 @@ let editorWrapper: CodeEditorWrapper;
  * Debounce time for writing changes to store in ms
  */
 const WRITE_DEBOUNCE_TIME = 100;
-
-function createConfigManipulator(dataFormat: string): ConfigManipulator {
-  if (dataFormat == 'json') {
-    return new ConfigManipulatorJson();
-  } else if (dataFormat == 'yaml') {
-    return new ConfigManipulatorYaml();
-  }
-}
 
 const editorDiv = ref();
 
@@ -92,14 +147,6 @@ onMounted(() => {
     editor.value.getSession().setMode('ace/mode/yaml');
   }
 
-  watchEffect(() => {
-    const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
-
-    if (editor.value && fontSize) {
-      editor.value.setFontSize(fontSize.toString());
-    }
-  });
-
   editor.value.setOptions({
     autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
   });
@@ -109,6 +156,15 @@ onMounted(() => {
   // Feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
   editor.value.getSession().setUndoManager(new ace.UndoManager());
+
+  // update editor font size when settings change
+  watchEffect(() => {
+    const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
+
+    if (editor.value && fontSize) {
+      editor.value.setFontSize(fontSize.toString());
+    }
+  });
 
   // Listen to changes on AceEditor and update store accordingly
   editor.value.on(
@@ -137,41 +193,6 @@ onMounted(() => {
     )
   );
 
-  watch(
-    computed(() => sessionStore.editorContentUnparsed),
-    content => {
-      if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
-        editor.value.setValue(content, -1);
-      }
-    }
-  );
-
-  watchArray(
-    computed(() => sessionStore.dataValidationResults.errors),
-    errors => {
-      // Do not attempt to display schema validation errors when the text does not have valid syntax
-      // (would otherwise result in errors when trying to parse CST)
-      if (!manipulator.isValidSyntax(editor.value.getValue())) {
-        return;
-      }
-
-      let annotations = [];
-      for (const error of errors) {
-        const instancePath = error.instancePath;
-        const instancePathTranslated = convertAjvPathToPath(instancePath);
-        const relatedRow =
-          determineCursorPosition(editor.value.getValue(), instancePathTranslated).row - 1;
-        annotations.push({
-          row: relatedRow,
-          column: 0,
-          text: error.message,
-          type: 'error',
-        });
-        editor.value.getSession().setAnnotations(annotations);
-      }
-    }
-  );
-
   editor.value.on('changeSelection', () => {
     if (currentChangeForcedFromOutside) {
       // we do not need to consider the event and send updates if the selection was forced from outside
@@ -187,29 +208,6 @@ onMounted(() => {
       /* empty */
     }
   });
-
-  // Listen to changes in store and update content accordingly
-  watch(
-    fileData,
-    newVal => {
-      if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-        editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
-      }
-    },
-    {deep: true}
-  );
-  // Listen to changes in current path and update cursor accordingly
-  watch(
-    currentSelectedElement,
-    (newSelectedElement: Path) => {
-      if (editor.value && sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-        currentChangeForcedFromOutside = true;
-        updateCursorPositionBasedOnPath(editor.value.getValue(), newSelectedElement);
-        currentChangeForcedFromOutside = false;
-      }
-    },
-    {deep: true}
-  );
 });
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {

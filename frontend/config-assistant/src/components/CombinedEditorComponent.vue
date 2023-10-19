@@ -1,3 +1,7 @@
+<!--
+Main component of the application.
+Combines the code editor and the gui editor.
+-->
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import 'primeicons/primeicons.css';

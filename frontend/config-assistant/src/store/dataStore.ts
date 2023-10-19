@@ -7,6 +7,7 @@ import {watchDebounced} from '@vueuse/core';
 import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import type {JsonSchemaType} from '@/model/JsonSchemaType';
 
 export const useDataStore = defineStore('dataStore', () => {
   /**
@@ -17,7 +18,7 @@ export const useDataStore = defineStore('dataStore', () => {
   /**
    * The json schema as a plain object
    */
-  const schemaData = ref({
+  const schemaData: Ref<JsonSchemaType> = ref({
     title: 'No schema loaded',
     description: 'Go to the schema editor to load a schema.',
   });

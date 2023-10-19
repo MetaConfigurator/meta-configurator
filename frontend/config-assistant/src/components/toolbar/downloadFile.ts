@@ -1,6 +1,10 @@
 import {useSessionStore} from '@/store/sessionStore';
 import {useSettingsStore} from '@/store/settingsStore';
 
+/**
+ * Downloads the current config file as a JSON or YAML file.
+ * @param fileNamePrefix The prefix for the filename
+ */
 export function downloadFile(fileNamePrefix: string): void {
   const configData: string = useSessionStore().editorContentUnparsed;
 
