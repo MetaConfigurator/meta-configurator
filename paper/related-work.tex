@@ -115,17 +115,17 @@ By inherently adhering to the schema structure (in most cases), editing data wit
 Users who are not very familiar with the configuration schema profit most from the GUI assistance, but even experienced users benefit from it.
 
 \begin{figure}[htb]
-\centering
-\includegraphics[width=2.5in]{figures/gui_advantage_autocomplete}
-\caption{Auto-Completion}
-\label{fig:gui_advantage_autocomplete}
+    \centering
+    \includegraphics[width=2.5in]{figures/gui_advantage_autocomplete}
+    \caption{Auto-Completion}
+    \label{fig:gui_advantage_autocomplete}
 \end{figure}
 
 \begin{figure}[htb]
-\centering
-\includegraphics[width=2.5in]{figures/gui_advantage_choiceselection}
-\caption{Choice Selection}
-\label{fig:gui_advantage_choiceselection}
+    \centering
+    \includegraphics[width=2.5in]{figures/gui_advantage_choiceselection}
+    \caption{Choice Selection}
+    \label{fig:gui_advantage_choiceselection}
 \end{figure}
 
 %paul
@@ -201,16 +201,16 @@ These tools are not web-based and not open-source.
 Furthermore, they do not focus on editing a JSON document based on a schema,
 but rather only on editing the schema itself.
 \begin{figure}[htb]
-	\centering
-	\includegraphics[width=3in]{figures/jsoneditoronline}
-	\caption{JSON Editor Online}
-	\label{fig:jsoneditoronline}
+    \centering
+    \includegraphics[width=3in]{figures/jsoneditoronline}
+    \caption{JSON Editor Online}
+    \label{fig:jsoneditoronline}
 \end{figure}
 \begin{figure}[htb]
-	\centering
-	\includegraphics[width=3in]{figures/jsoneditoronline-table}
-	\caption{JSON Editor Online, table view}
-	\label{fig:jsoneditoronline_table}
+    \centering
+    \includegraphics[width=3in]{figures/jsoneditoronline-table}
+    \caption{JSON Editor Online, table view}
+    \label{fig:jsoneditoronline_table}
 \end{figure}
 
 
@@ -219,7 +219,7 @@ Generating a GUI from a schema is related to schema visualization, for which sev
 However, the focus of schema visualization is on providing a static visual representation of the schema
 and not on providing a GUI for editing the schema.
 Thus, we do not consider schema visualization approaches in this work.
-However, future work could investigate how such techniques could be embedded in our approach.
+However, future work can investigate how such techniques could be embedded in our approach.
 
 
 \section{Evaluation of Schema Languages}\label{sec:evaluation-of-schema-languages}
@@ -228,13 +228,13 @@ However, future work could investigate how such techniques could be embedded in 
 We evaluate the schema languages mentioned in section~\ref{subsec:schemalanguages} to determine which is the most suitable one for this work.
 
 
-\subsection{Evaluation criteria}\label{subsec:evaluation-criteria} % evaluation by paul, some criteria ideas by felix
+\subsection{Evaluation Criteria}\label{subsec:evaluation-criteria} % evaluation by paul, some criteria ideas by felix
 
 Ideally, the schema language of \toolname{} is both popular and supported by numerous tools and libraries as well as expressive enough to express the features we need.
 We use the following criteria and metrics:
 \begin{enumerate}
 % metric: Stackoverflow question # with schema language as tag
-    \item \textbf{Practical usage} --- Ideally our approach uses a schema language that already known by many developers.
+    \item \textbf{Practical usage} --- Ideally our approach uses a schema language that is already known by many developers.
     As indicator of the practical usage we use the approximate search results on stackoverflow.com as metric.
     We acquire the results by querying the google search engine with the name of the schema language and ``site:stackoverflow.com'', which limits the search results to stackoverflow.com.
     This metric might also correlate with the complexity of the schema language as a more complex to use schema language will likely lead to more questions asked on the site.
@@ -243,15 +243,15 @@ We use the following criteria and metrics:
     Additionally, we investigate how well the schema languages are supported by IDEs and code libraries:
     \begin{enumerate}
         \item \textit{Tool support} --- We used the 10 most popular IDEs\cite{mostpopularides} and checked if the IDE supports the schema language either natively or by a plugin.
-        Support here means that either the IDE is capable of validating documents against a schema in the schema language or supports creating schema files, e.g., by using syntax highlighting for the schema language.
+        Here, support means that either the IDE is capable of validating documents against a schema in the schema language or supports creating schema files, e.g., by using syntax highlighting for the schema language.
         % # node modules with schema language keyword....
-        \item \textit{Library support} --- As we implement a web-based tool, we JavaScript or TypeScript bases tools are helpful for our approach, e.g., so we can reuse a package for schema validation.
-        We investigate the number of node modules exist that are related to the schema languages by querying the node module search on \url{www.npmjs.com} with the name of the schema language.
+        \item \textit{Library support} --- As we implement a web-based tool, JavaScript or TypeScript based tools are helpful for our approach, e.g., so we can reuse a package for schema validation.
+        We investigate the number of node modules existing that are related to the schema languages by querying the node module search on \url{www.npmjs.com} with the name of the schema language.
 
     \end{enumerate}
 
     % # of cases fulfilled from below
-    \item \textbf{Expressiveness} --- We evaluate how expressive each of the schema languages are, i.e., what possible constructs the language is able to express.
+    \item \textbf{Expressiveness} --- We evaluate how expressive each of the schema languages is, i.e., what possible constructs the language is able to express.
     We define eight requirements on the language features that we consider helpful for our approach.
     The number of requirements a schema language fulfills is our metric that indicates how expressive the language is.
     Table~\ref{tab:comparison} reports the results.
@@ -266,11 +266,11 @@ We use the following criteria and metrics:
         \item \textit{Examples} --- This is fulfilled if the schema language provides the possibility to add example values.
         This is helpful in our approach as the example values can serve as placeholders in the GUI editor.
         \item \textit{Default values} --- This is fulfilled if the schema language provides the possibility to add default values which are assumed in an absence of a value.
-        This often helpful information can be displayed to the user or used as placeholder values.
+        This helpful information can be displayed to the user or used as placeholder values.
         \item \textit{Optional values} --- This is fulfilled if the schema language provides the possibility to declare values as optional or required.
         Often it is not necessary to provide all values in a configuration file, so it is helpful to mark fields as required or optional in the GUI editor.
         \item \textit{Constraints} --- This is fulfilled if the schema language provides the possibility to constrain values of fields, e.g., maximum length of strings.
-        To be exact, for this evaluation we required that at least two of the following constrained can be expressed by the schema language:
+        To be exact, for this evaluation we require that at least two of the following constraints can be expressed by the schema language:
         \begin{itemize}
             \item The length of strings can be limited.
             \item The range of numeric types can be limited, e.g., to only positive values.
@@ -279,7 +279,7 @@ We use the following criteria and metrics:
         \end{itemize}
         This is a helpful feature for our approach as often not all possible values are valid for specific fields in configuration files.
         \item \textit{Conditions} --- This is fulfilled if the schema language provides the possibility to define conditional dependencies between fields.
-        This is a advanced feature that is helpful because it allows to express for example that a particular field must be given only if another field has a specific value.
+        This is an advanced feature that is helpful because it allows to express that a particular field must be given only if another field has a specific value.
         \item \textit{References} --- This is fulfilled if the schema language provides the possibility to define reusable subschemas that can be referenced in other parts of the schema.
         This is often useful in practice to reuse common data structures.
 
@@ -292,31 +292,31 @@ We use the following criteria and metrics:
 \end{enumerate}
 
 
-    \begin{table*}[]
+\begin{table*}[]
     \centering
     \caption{Evaluation of different schema languages\label{tab:all}}
-        \begin{tabular}{@{}lrrrr@{}}
+    \begin{tabular}{@{}lrrrr@{}}
         \toprule
         \textbf{Schema language} &
-          \textbf{\# Search results } &
-          \textbf{IDE support} &
-          \textbf{\# Node packages} &
-          \textbf{Expressiveness} \\ \midrule
+        \textbf{\# Search results } &
+        \textbf{IDE support} &
+        \textbf{\# Node packages} &
+        \textbf{Expressiveness} \\ \midrule
         JSON schema &
-          245.000 &
-          8 / 10 &
-          4.536 & 9 /9 \\
+        245.000 &
+        8 / 10 &
+        4.536 & 9 /9 \\
         XSD & 151.000 & 8 / 10 & 116 & 8 / 9 \\
         DTD & 69.700 & 9 / 10 & 34 & 6 / 9 \\
         CUE & 10.500 & 4 / 10 & 97 &   8 / 9 \\
         Avro & 20.000 & 8 / 10 & 211 &  5 / 9 \\
         JSON Type Definition (JTD) &  109 & 0 / 10 &  17 & 5 / 9 \\
         TypeSchema &  8.450 & 0 / 10 & 5 & 8 / 9 \\
-        protobuf &  44.800 & 9 / 10 & 1.210 & 4 / 9 \\
+        Protobuf &  44.800 & 9 / 10 & 1.210 & 4 / 9 \\
         GraphQl schema & 31.000 & 7 / 10 & 1.509 & 6 / 9\\ \bottomrule
-        \end{tabular}
-    \end{table*}
-    %\label{fig:my_label}
+    \end{tabular}
+\end{table*}
+%\label{fig:my_label}
 %\end{figure}
 
 % IDE                | JSON schema | XSD | DTD | CUE | Avro | protobuf | GraphQL schema |
@@ -340,107 +340,107 @@ We use the following criteria and metrics:
     \begin{tabular}{@{}llllllllllr@{}}
         \toprule
         \textbf{Schema language} &
-          \thead{Simple \\ types} &
-          \thead{Complex \\ types} &
-          \thead{Descriptions} &
-          \thead{Example \\ values} &
-          \thead{Default \\ values} &
-          \thead{Optional \\ values} &
-          \thead{Constraints} &
-          \thead{Conditions}  &
-          \thead{References}  &
-          \thead{Result}\\ \midrule
+        \thead{Simple \\ types} &
+        \thead{Complex \\ types} &
+        \thead{Descriptions} &
+        \thead{Example \\ values} &
+        \thead{Default \\ values} &
+        \thead{Optional \\ values} &
+        \thead{Constraints} &
+        \thead{Conditions}  &
+        \thead{References}  &
+        \thead{Result}\\ \midrule
         JSON schema &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          \checkmark & 9 / 9\\
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark & 9 / 9\\
         XSD &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          x &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          \checkmark &
-          \checkmark & 8 / 9 \\
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        x &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark & 8 / 9 \\
         DTD &
-         \checkmark &
-         \checkmark &
-         x &
-         x &
-         \checkmark &
-         \checkmark &
-         x &
-         \checkmark &
-         \checkmark & 6 / 9\\
-        CUE &
-         \checkmark &
-         \checkmark &
-         \checkmark &
-         \checkmark &
-         x &
-         \checkmark &
-         \checkmark &
-         \checkmark &
-         \checkmark & 8 / 9\\
-        Avro &
-         \checkmark &
-         \checkmark &
-         x &
-         x &
-         \checkmark &
-         \checkmark &
-         x &
-         x &
-         \checkmark & 5 / 9\\
-        JTD &
-         \checkmark &
-         \checkmark &
-         x &
-         x &
-         x &
-         \checkmark &
-         x &
-         \checkmark &
-         \checkmark & 5 / 9\\
-        TypeSchema &
-         \checkmark &
-         \checkmark &
-         \checkmark &
-         x &
-         \checkmark &
-         \checkmark &
-         \checkmark &
-         \checkmark &
-         \checkmark & 8 / 9\\
-        protobuf &
-            \checkmark &
-            \checkmark &
-            x &
-            x &
-            x &
-            \checkmark &
-            x &
-            x &
-            \checkmark & 4 / 9 \\
-        GraphQL schema &
-         \checkmark &
-         \checkmark &
-         \checkmark &
-         x &
-         \checkmark &
-         \checkmark &
-         x &
-         x &
+        \checkmark &
+        \checkmark &
+        x &
+        x &
+        \checkmark &
+        \checkmark &
+        x &
+        \checkmark &
         \checkmark & 6 / 9\\
-          \bottomrule
+        CUE &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        x &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark & 8 / 9\\
+        Avro &
+        \checkmark &
+        \checkmark &
+        x &
+        x &
+        \checkmark &
+        \checkmark &
+        x &
+        x &
+        \checkmark & 5 / 9\\
+        JTD &
+        \checkmark &
+        \checkmark &
+        x &
+        x &
+        x &
+        \checkmark &
+        x &
+        \checkmark &
+        \checkmark & 5 / 9\\
+        TypeSchema &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        x &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        \checkmark & 8 / 9\\
+        protobuf &
+        \checkmark &
+        \checkmark &
+        x &
+        x &
+        x &
+        \checkmark &
+        x &
+        x &
+        \checkmark & 4 / 9 \\
+        GraphQL schema &
+        \checkmark &
+        \checkmark &
+        \checkmark &
+        x &
+        \checkmark &
+        \checkmark &
+        x &
+        x &
+        \checkmark & 6 / 9\\
+        \bottomrule
     \end{tabular}
 \end{table*}
 
