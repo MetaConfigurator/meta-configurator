@@ -169,7 +169,7 @@ export class MenuItems {
       {
         label: 'Save settings file',
         icon: 'fa-regular fa-floppy-disk',
-        command: () => downloadFile('configAssistantSettings'),
+        command: () => downloadFile('metaConfiguratorSettings'),
       },
       {
         separator: true,
