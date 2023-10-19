@@ -3,7 +3,7 @@
  *
  * @param data the data to convert, of any type
  * @param currentDepth internal parameter that takes care of not using too deeply nested data in
- * the string representation. Should not be used by the caller.
+ * the string representation. Can be used to limit the depth of the string representation.
  * @param limit max number of character to describe the data
  */
 export function dataToString(data: any, currentDepth = 0, limit?: number): string {

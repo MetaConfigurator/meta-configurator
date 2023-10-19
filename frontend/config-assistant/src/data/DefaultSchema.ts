@@ -196,6 +196,7 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
           description: 'More info about the address',
           deprecated: true,
           properties: {
+            anyThing: true,
             info: {
               type: 'string',
               description: 'Some info',

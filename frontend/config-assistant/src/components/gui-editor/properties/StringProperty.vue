@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/helpers/propertyPlaceholderGenerator';
@@ -17,6 +17,16 @@ const emit = defineEmits<{
   (e: 'update:propertyData', newValue: string | undefined): void;
 }>();
 
+const polishedPropertyData = computed(() => {
+  if (props.propertyData === undefined) {
+    return '';
+  }
+  if (typeof props.propertyData === 'object') {
+    return JSON.stringify(props.propertyData);
+  }
+  return props.propertyData;
+});
+
 // new reference to the property data, so that we can emit the update event
 // only when the user is done editing and not on every keystroke
 const newPropertyData = ref(props.propertyData);
@@ -30,7 +40,7 @@ function updateValue() {
   <InputText
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     class="h-8 tableInput"
-    :model-value="props.propertyData"
+    :model-value="polishedPropertyData"
     @update:model-value="value => (newPropertyData = value)"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     @blur="updateValue"
