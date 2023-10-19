@@ -22,6 +22,10 @@ const valueProperty = computed({
     return valueToSelectionOption(props.propertyData);
   },
   set(newValue: {name: string; value: any} | undefined) {
+    if (typeof newValue !== 'object') {
+      emit('update:propertyData', newValue);
+      return;
+    }
     emit('update:propertyData', newValue?.value);
   },
 });
@@ -33,6 +37,9 @@ const valueProperty = computed({
 function valueToSelectionOption(value: any): any {
   if (value === undefined) {
     return undefined;
+  }
+  if (!props.possibleValues.includes(value)) {
+    return value;
   }
   let formattedValue = `${value}`;
   if (value === null) {
