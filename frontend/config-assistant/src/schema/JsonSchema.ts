@@ -144,6 +144,11 @@ export class JsonSchema {
     return _.isEmpty(this.jsonSchema);
   }
 
+  /**
+   * Returns true if the schema is always false. This does not check if the schema
+   * contains contradictions and thus cannot be satisfied, but only if it is
+   * explicitly set to false.
+   */
   get isAlwaysFalse(): boolean {
     return this.jsonSchema === undefined;
   }
@@ -258,7 +263,6 @@ export class JsonSchema {
    *
    * Here implemented in a way that it returns an empty array if the keyword is not present.
    *
-   * @todo we have to this consider this keyword for basically all other keywords
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.1.2
    */
   get anyOf(): JsonSchema[] {
@@ -274,7 +278,6 @@ export class JsonSchema {
    * An instance validates successfully against this keyword if it validates successfully against
    * exactly one schema defined by this keyword's value.
    *
-   * @todo we have to this consider this keyword for basically all other keywords
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.1.3
    */
   get oneOf(): JsonSchema[] {
