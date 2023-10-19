@@ -1,7 +1,7 @@
 <!--
-Code Editor component based on Ace Editor. Supports different data formats.
-Synchronized with file data from the store.
--->
+ Code Editor component based on Ace Editor. Supports different data formats.
+ Synchronized with file data from the store.
+ -->
 <script setup lang="ts">
 import {computed, onMounted, Ref, ref, watch, watchEffect} from 'vue';
 import {storeToRefs} from 'pinia';
@@ -16,9 +16,11 @@ import 'brace/theme/monokai';
 import _ from 'lodash';
 import {useDebounceFn, watchArray} from '@vueuse/core';
 import type {Path} from '@/model/path';
+import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
 
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {createConfigManipulator} from '@/components/code-editor/ConfigManipulator';
+import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
+import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
 import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import {useSettingsStore} from '@/store/settingsStore';
@@ -31,72 +33,10 @@ const props = defineProps<{
   dataFormat: string;
 }>();
 
-const manipulator = createConfigManipulator(props.dataFormat);
-
-// update editor content when the unparsed content changes
-watch(
-  computed(() => sessionStore.editorContentUnparsed),
-  content => {
-    if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
-      editor.value.setValue(content, -1);
-    }
-  }
-);
-
-// update annotations when validation results change
-watchArray(
-  computed(() => sessionStore.dataValidationResults.errors),
-  errors => {
-    // Do not attempt to display schema validation errors when the text does not have valid syntax
-    // (would otherwise result in errors when trying to parse CST)
-    if (!manipulator.isValidSyntax(editor.value.getValue())) {
-      return;
-    }
-
-    let annotations = [];
-    for (const error of errors) {
-      const instancePath = error.instancePath;
-      const instancePathTranslated = convertAjvPathToPath(instancePath);
-      const relatedRow =
-        determineCursorPosition(editor.value.getValue(), instancePathTranslated).row - 1;
-      annotations.push({
-        row: relatedRow,
-        column: 0,
-        text: error.message,
-        type: 'error',
-      });
-      editor.value.getSession().setAnnotations(annotations);
-    }
-  }
-);
-
-// listen to changes in store and update the editor content accordingly
-watch(
-  fileData,
-  newVal => {
-    if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-      editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
-    }
-  },
-  {deep: true}
-);
-
-// listen to changes in current path and update cursor accordingly
-watch(
-  currentSelectedElement,
-  (newSelectedElement: Path) => {
-    if (editor.value && sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
-      currentChangeForcedFromOutside = true;
-      updateCursorPositionBasedOnPath(editor.value.getValue(), newSelectedElement);
-      currentChangeForcedFromOutside = false;
-    }
-  },
-  {deep: true}
-);
-
 let editor: Ref<Editor>;
 
 let currentChangeForcedFromOutside = false;
+const manipulator = createConfigManipulator(props.dataFormat);
 
 let editorWrapper: CodeEditorWrapper;
 
@@ -104,6 +44,14 @@ let editorWrapper: CodeEditorWrapper;
  * Debounce time for writing changes to store in ms
  */
 const WRITE_DEBOUNCE_TIME = 100;
+
+function createConfigManipulator(dataFormat: string): ConfigManipulator {
+  if (dataFormat == 'json') {
+    return new ConfigManipulatorJson();
+  } else if (dataFormat == 'yaml') {
+    return new ConfigManipulatorYaml();
+  }
+}
 
 const editorDiv = ref();
 
@@ -150,6 +98,14 @@ onMounted(() => {
     editor.value.getSession().setMode('ace/mode/yaml');
   }
 
+  watchEffect(() => {
+    const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
+
+    if (editor.value && fontSize) {
+      editor.value.setFontSize(fontSize.toString());
+    }
+  });
+
   editor.value.setOptions({
     autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
   });
@@ -159,15 +115,6 @@ onMounted(() => {
   // feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
   editor.value.getSession().setUndoManager(new ace.UndoManager());
-
-  // update editor font size when settings change
-  watchEffect(() => {
-    const fontSize = useSettingsStore().settingsData.codeEditor.fontSize;
-
-    if (editor.value && fontSize) {
-      editor.value.setFontSize(fontSize.toString() + 'px');
-    }
-  });
 
   // when the content of the editor is modified by the user, we want to update the file data in the store accordingly
   editor.value.on(
@@ -196,6 +143,41 @@ onMounted(() => {
     )
   );
 
+  watch(
+    computed(() => sessionStore.editorContentUnparsed),
+    content => {
+      if (useSessionStore().lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        editor.value.setValue(content, -1);
+      }
+    }
+  );
+
+  watchArray(
+    computed(() => sessionStore.dataValidationResults.errors),
+    errors => {
+      // do not attempt to display schema validation errors when the text does not have valid syntax
+      // (would otherwise result in errors when trying to parse CST)
+      if (!manipulator.isValidSyntax(editor.value.getValue())) {
+        return;
+      }
+
+      let annotations = [];
+      for (const error of errors) {
+        const instancePath = error.instancePath;
+        const instancePathTranslated = convertAjvPathToPath(instancePath);
+        const relatedRow =
+          determineCursorPosition(editor.value.getValue(), instancePathTranslated).row - 1;
+        annotations.push({
+          row: relatedRow,
+          column: 0,
+          text: error.message,
+          type: 'error',
+        });
+        editor.value.getSession().setAnnotations(annotations);
+      }
+    }
+  );
+
   // when the user clicks into the editor, we want to use the cursor position to determine which element from the data
   // the user clicked at. We then update the currentSelectedElement in the store accordingly.
   editor.value.on('changeSelection', () => {
@@ -213,10 +195,33 @@ onMounted(() => {
       /* empty */
     }
   });
+
+  // listen to changes in store and update the editor content accordingly
+  watch(
+    fileData,
+    newVal => {
+      if (sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        editorValueWasUpdatedFromOutside(newVal, sessionStore.currentSelectedElement);
+      }
+    },
+    {deep: true}
+  );
+  // listen to changes in current path and update cursor accordingly
+  watch(
+    currentSelectedElement,
+    (newSelectedElement: Path) => {
+      if (editor.value && sessionStore.lastChangeResponsible != ChangeResponsible.CodeEditor) {
+        currentChangeForcedFromOutside = true;
+        updateCursorPositionBasedOnPath(editor.value.getValue(), newSelectedElement);
+        currentChangeForcedFromOutside = false;
+      }
+    },
+    {deep: true}
+  );
 });
 
 function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
-  // Update value with new data and also update cursor position
+  // update value with new data and also update cursor position
   currentChangeForcedFromOutside = true;
   const newEditorContent = manipulator.stringifyContentObject(configData);
   sessionStore.currentEditorWrapper.setContent(newEditorContent);
