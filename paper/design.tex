@@ -1,5 +1,4 @@
-% TODO (but maybe not here?): explain why and how we define our own meta schema based on json schema, because we use just subset of its features and because our schema is used to generate schema editor GUI and therefore should only show what is supported. Also we want to add descriptions and maybe more. Also limit options to not overwhelm and confuse the user.
-% TODO also describe more the users perspective how users would use the tool?
+
 
 % felix
 \subsection{User Interface}\label{subsec:overview}
@@ -39,7 +38,8 @@ The GUI is based on the schema which the user provides (more on that in the next
 For example, for enum properties, the user will get a dropdown menu with the different options to choose from and for boolean properties the user will get a checkbox.
 Other features, such as tooltips that display the description and constraints of a property, further assist the user.
 
-This design combines the benefits of both a rich text code editor (efficient for many tasks, more suited for users with technical understanding of the data structure) with the benefits of a GUI (enables users without deep technical understanding to work with the data, assists also expert users).
+This design combines the benefits of both a code editor with the benefits of a GUI.
+A code editor is efficient for many tasks and more suited for users with technical understanding of the data structure, while a GUI enables users without deep technical understanding to work with the data and also assists expert users.
 
 As a schema is a \cfgfile{} itself, it can be treated as such and the tool can offer assistance accordingly.
 Note that whenever the user edits a \cfgfile{} using the tool, they do so using some underlying schema.
@@ -52,10 +52,10 @@ Table \ref{tab:schema_and_file_data_by_mode} illustrates how for the different v
 \centering
 \begin{tabular}{lll}
 \toprule
-\textbf{View} & \textbf{Effective File Data} & \textbf{Effective Schema} \\
+\textbf{View} & \textbf{File Data} & \textbf{Schema} \\
 \midrule
 File editor   & User data                    & User schema               \\
-Schema editor & User schema                  & JSON Meta Schema          \\
+Schema editor & User schema                  & JSON Schema Meta Schema          \\
 Settings      & Settings data                & Settings schema           \\
 \bottomrule
 \end{tabular}
@@ -92,7 +92,7 @@ Aim of those design decisions is to ensure modularity and maintainability of the
 
 The core of \toolname{} is a single source of truth data store that contains the current user configuration data (as a JavaScript Object).
 With this data store we can bidirectionally connect what we call ``editor panels''.
-An editor panel is a modular component that the user of the tool can access to modify the config data in an indirect way.
+An editor panel is a modular component that the user can access to modify the data in an indirect way.
 It might be implemented as a code editor, a graphical user interface or any other way in which the data can be presented to the user.
 All editor panels are independent and do only have access to the data store but not to each other.
 Every editor panel subscribes to the changes of the data store, so it can be updated accordingly whenever the data in the store is changed.
@@ -121,7 +121,7 @@ Besides the current configuration data, the store also stores the path of the cu
 % felix
 
 \subsubsection{Code Panel}\label{subsubsec:design_text_editor_panel}
-For the code panel, we embed a rich-text code editor that already supports syntax highlighting and other useful features.
+For the code panel, we embed a code editor that already supports syntax highlighting and other useful features.
 We enable validation of whether the text is well-formed according to the JSON/YAML/XML standard and add schema validation.
 The panel subscribes to the data store.
 Whenever the configuration data is changed in the store, the panel will take the new configuration data JavaScript Object, serialize it into the given data format and replace the text in the code editor with the new serialized data.
@@ -130,13 +130,12 @@ In the future, several mechanisms can be applied to avoid the loss of formatting
 
 When the user edits the text in the code editor, the text is deserialized into a JavaScript Object and sent to the data store, which then updates the configuration data object and notifies all other subscribed panels of the change.
 
-
-To enable communication with the store, for any data format that the tool should support, we need a function to stringify a JavaScript object to a string in the data format and a function to parse a string in that data format as a JavaScript object.
-
+To enable communication with the store, for any data format that the tool should support, we need a function to convert a JavaScript object to a string in the data format and a function to parse a string in that data format as a JavaScript object.
 
 To make it possible to highlight certain lines in the editor as erroneous (schema violations) or jump to certain lines (e.g. when the user selects a property in the GUI editor, we want to jump to the same property in the text editor), we need a function \texttt{determineRow(editorContent, dataPath)} that can determine the corresponding editor line, based on the configuration text and a given data path.
 
 The other way around, when the user places their cursor inside the text editor, we want to determine the path of the element that the cursor is currently at. This requires a function \texttt{determinePath(editorContent, cursorPosition)} which returns a data path based on the configuration text and a given cursor position.
+
 
 % felix
 

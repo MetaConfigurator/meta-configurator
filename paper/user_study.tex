@@ -1,12 +1,8 @@
 We conduct a qualitative user study with five participants.
-
-% TODO: maybe somewhere mention demographics of user study? Like that it was 3 prof and 2 researcher?
-During each interview, we introduce \toolname{}, give the participant tasks to execute using the tool and finish the session with open ended questions.
+During each interview, we introduce \toolname{}, give the participant tasks to execute using the tool and finish the session with open-ended questions.
 We observe how the participants work with the tool and which difficulties they have when executing the tasks.
 Additionally, we ask them for feedback and improvement suggestions.
 We also conduct a survey to gather demographic information about the participants of the user study.
-
-Note that besides the user study we have applied \toolname{} on several schemas (such as EnzymeML\cite{pyenzyme} and the Strenda schema\cite{strenda}) and \cfgfiles{} from the real world, to verify that it works and does bring benefits to the user.
 
 \subsection{Research Questions}\label{subsec:research_questions}
 We address the following research questions with the user study:
@@ -23,29 +19,35 @@ We address the following research questions with the user study:
 
 \subsection{Methodology}\label{subsec:methodology} % Minye
 
-\paragraph{Potential Users}
+Our user study is qualitative and consists of five interviews.
+We do not perform any major quantitative analysis of the results as the sample size is too small to draw any statistically significant conclusions.
+
+\subsubsection{Potential Users}
 We look for potential users to conduct the interviews.
-There are two basic standards we follow to find a potential user:
+There consider the following groups of people as potential users
 \begin{itemize}
     \item Professors and students who are interested in our application.
-    \item People who frequently use \cfgfiles and schema languages
+    \item People who frequently use \cfgfiles{} and schema languages
 \end{itemize}
+In table~\ref{tab:user_study_feedback}, the professions of the participants are listed.
 
-\paragraph{Interview Questions}
-For the interview, we created a JSON schema and \cfgfile{}, about a made-up self-driving car simulation,
+\subsubsection{Interview Questions}
+We created a JSON schema and \cfgfile{}, about a made-up self-driving car simulation.
 The interview questions deal with working with those files.
+By using a made-up example, we avoid that the participants are biased by their domain knowledge.
+We note, however, that besides the user study we have applied \toolname{} on several real-world schemas (such as EnzymeML\cite{pyenzyme} and the Strenda schema\cite{strenda}) and \cfgfiles{} from the real world, to verify that it works and does bring benefits to the user.
+
 We divide our interview tasks into four parts:
 \begin{itemize}
-    \item Setup: Open the application and open schema and \cfgfile.
+    \item Setup: We guide the participant through the setup of the tool, which involves accessing the tool via a web browser and loading the example files.
     \item Information Retrieval Questions: with increasing difficulty, the participant has to retrieve information from the \cfgfile{}.
-    \item Configuration Modifications: Different tasks that involve changing the \cfgfile{}.
-    \item Schema modifications: Making adjustments to the schema.
-    Most difficult tasks.
+    \item Configuration Modifications: The participant has to modify the given \cfgfile{} in various ways.
+    \item Schema modifications: The participant has to modify the schema file.
 \end{itemize}
 
 The interview tasks and additional files can be found in out GitHub repository\footnote{\url{https://github.com/PaulBredl/config-assistant/tree/main/paper/userstudy}}.
 
-\paragraph{Interview Process}
+\subsubsection{Interview Process}
 We proceed our interview with one interviewee each time.
 The interview lasts around one hour.
 At the beginning, the interviewee is asked about approval of recording, and they can stop participating at any time.
@@ -54,35 +56,22 @@ Then we send the participant the tasks, an example \cfgfile{} and let them work 
 During this task solving session, we provide the interviewee with some basic help if they ask specific questions about the tool.
 The interview is recorded, and we make notes of the answers, feedback and behavior of the interviewee.
 Finally, in an open dialog, we ask the interviewee about more feedback and improvement suggestions as well as their opinion on the tool.
-
-\paragraph{Survey}
-After the interview, we ask each interviewee to fill out a survey (follow-up questions).
-This survey covers the following points:
-\begin{itemize}
-    \item Occupation of the interviewee.
-    \item Experiences in software engineering,
-    \item Frequency of working with JSON/YAML files.
-    \item Domains in which people use with JSON/YAML files.
-    \item Feedback about the application after interview.
-\end{itemize}
+After the interview, we ask each interviewee to fill out a survey with some questions about their background and their opinion on the tool.
+%\paragraph{Survey}
+%This survey covers the following points:
+%\begin{itemize}
+%    \item Occupation of the interviewee.
+%    \item Experiences in software engineering,
+%    \item Frequency of working with JSON/YAML files.
+%    \item Domains in which people use with JSON/YAML files.
+%    \item Feedback about the application after interview.
+%\end{itemize}
 %Based on the survey, we could get many feedbacks which we can use in the future.
 %We analyse the results which we get from the survey and improve our application afterward.
 
 \subsection{Results}\label{subsec:results}
 
-
-\subsubsection{\textbf{RQ1:} Which aspects of the tool can be improved?}\label{subsubsec:rq1} %Keyuri
-Tables~\ref{table:user_study1}-\ref{table:user_study5} (in the appendix) show the feedback of the interviewees, as well as which measures we took based on it.
-
-% TODO: Summarize results and answer the RQ
-
-
-\subsubsection{\textbf{RQ2:} Are users able to perform the followings types of tasks using the tool?}
-Table~\ref{table:results} shows the accuracy and difficulties that the participants had when solving the tasks.
-Accuracy is determined as the ratio of tasks that were solved correctly without the need of any hints to the total number of tasks.
-With the help of hints, all tasks could be completed by every participant.
-
-\begin{table*}[!htbp]
+\begin{table*}[!hbt]
     \centering
     \caption{User Study - Task solving accuracy and difficulties} \label{table:results}
     \begin{tabular}{lp{4.5cm}p{6cm}}
@@ -126,7 +115,7 @@ With the help of hints, all tasks could be completed by every participant.
         Mistakenly thought humidity value was valid.\newline
         Did not consider red underline as an error\newline
         Task 4.2: Add new property:\newline
-        Set property name in wrong place
+        Tried to set the property name at the wrong place
         \\ \midrule
 
         User Study 4 &
@@ -154,9 +143,22 @@ With the help of hints, all tasks could be completed by every participant.
         Task 3.2: Setting Vehicle Type to the highest level: \newline
         Took some time to find the vehicle type \newline
         Task 4.2: Adding new property:\newline
-        Did not set the property type at the beginning \\ \bottomrule
+        Did not set the property type \\ \bottomrule
     \end{tabular}
 \end{table*}
+This section presents the results of the user study for each research question.
+
+\subsubsection{\textbf{RQ1:} Which aspects of the tool can be improved?}\label{subsubsec:rq1} %Keyuri
+Tables~\ref{table:user_study1}-\ref{table:user_study5} (in the appendix) show the feedback of the interviewees, as well as which measures we took based on it.
+
+
+\subsubsection{\textbf{RQ2:} Are users able to perform the followings types of tasks using the tool?}
+Table~\ref{table:results} shows the accuracy and difficulties that the participants had when solving the tasks.
+Accuracy is determined as the ratio of tasks that were solved correctly without the need of any hints to the total number of tasks.
+We note that all participants were able to solve all tasks after receiving hints from the interviewer.
+%With the help of hints, all tasks could be completed by every participant.
+
+
 \begin{itemize}
     \item \textbf{RQ2.1}: Table~\ref{table:results} shows that all
     participants were able to retrieve information related to the schema and data.
@@ -180,50 +182,63 @@ Consequently, this result suggests that there is a demand for \toolname{} in pra
 Note that we only include positive feedback in this table since criticism is already addressed in section~\ref{subsubsec:rq1}.
 
 
-\begin{table*} %keyuri, felix
+\begin{table*}[htb] %keyuri, felix
     \centering
     \caption{User Study - Would people use the tool in practice?}\label{tab:user_study_feedback}
-    \begin{tabular}{p{0.1\linewidth}p{0.1\linewidth}p{0.1\linewidth}p{0.3\linewidth}p{0.3\linewidth}}
+    \begin{tabular}{p{0.06\linewidth}p{0.1\linewidth}p{0.1\linewidth}p{0.3\linewidth}p{0.3\linewidth}}
         \toprule
-        \textbf{User Study} & \textbf{Profession} & \textbf{Would you use this tool yourself?} & \textbf{Potential Use case} & \textbf{Positive Feedback} \\
+        \textbf{User Study} & \textbf{Profession} & \textbf{Would you use this tool?} & \textbf{Potential Use case} & \textbf{Positive Feedback} \\
         \midrule
-        1 & Professor & Yes & Configuring CI and simulations & 
-        "[I think always having those two views (code panel and GUI panel) is very helpful]." 
-        
-        "[It was more comfortable to modify things using the GUI panel than the code panel]."
-        
-        "You also showed nice examples. [Without the GUI] you would need to jump back to the schema to find out what is the max value."
+        1 & Professor & Yes & Configuring CI and simulations &
+        ``[I think always having those two views (code panel and GUI panel) is very helpful].''
+
+        ``[It was more comfortable to modify things using the GUI panel than the code panel].''
+
+        ``You also showed nice examples.
+        [Without the GUI] you would need to jump back to the schema to find out what is the max value.''
         \\
         \midrule
-        2 & Professor & Yes & "I would especially recommend [the tool] to some of my project partners. "
-        
-        "I would certainly not only recommend but directly invite another partner to join in." & 
-        "I think it is very intuitive already."
-        
-        "The search [functionality] is good."
-        
-        "I really like the tool and I think it's really very intuitive to work [with the GUI panel] and it's good to have the overview on the [code panel]. The combination of both views is really helpful. Really good. I like it."\\
+        2 & Professor & Yes & ``I would especially recommend [the tool] to some of my project partners.''
+
+        ``I would certainly not only recommend but directly invite another partner to join in.'' &
+        ``I think it is very intuitive already.''
+
+        ``The search [functionality] is good.''
+
+        ``I really like the tool and I think it's really very intuitive to work [with the GUI panel] and it's good to have the overview on the [code panel].
+        The combination of both views is really helpful.
+        Really good.
+        I like it.''\\
         \midrule
-        3 & Software Engineer & Yes & "Currently I'm working with many experimental partners from different sort of chemistry and biological laboratories and the problem is that they just dump all data in some Excel sheet and it's not machine readable. [...] Much data is lost since the only person who can work with the [data] is the person who created the Excel spreadsheet. Being able [...] as a scientist [...] to define what are your important properties, your schema, and then being able to [fill in the data] while running the experiment simultaneously, that would be a really really huge advantage and the most prominent user that [comes to my mind]."
+        3 & Software Engineer & Yes & ``Currently I'm working with many experimental partners from different sort of chemistry and biological laboratories and the problem is that they just dump all data in some Excel sheet, and it's not machine-readable.
+        [\ldots] Much data is lost since the only person who can work with the [data] is the person who created the Excel spreadsheet.
+        Being able [\ldots] as a scientist [\ldots] to define what are your important properties, your schema, and then being able to [fill in the data] while running the experiment simultaneously, that would be a really, really huge advantage and the most prominent user that [comes to my mind].''
          &
-        "I understood how [the tool] works and I think it is really really nice and will help many many people in getting their data organized."
-        
-        "I think having this really clickable and intuitive way to show the structure of your schema is really really neat and it really looks pretty."
-         
-         "I really like where this project is heading. I always have this research field in mind and I think it will really have an impact on that, when we can promote it to our partners [...] it will really make a difference." \\
+        ``I understood how [the tool] works and I think it is really, really nice and will help many, many people in getting their data organized.''
+
+        ``I think having this really clickable and intuitive way to show the structure of your schema is really, really neat, and it really looks pretty.''
+
+        ``I really like where this project is heading.
+            I always have this research field in mind and I think it will really have an impact on that, when we can promote it to our partners [\ldots] it will really make a difference.'' \\
         \midrule
-        4 & Professor & Yes & Chemistry and biology field. Considers using the tool for their work. & 
+        4 & Professor & Yes & Chemistry and biology field.
+            Considers using the tool for their work.&
         We did not ask this participant for general feedback and only talked on a technical level. \\
         \midrule
-        5 & Student & Yes & "If I have to change more things [in a JSON document] it might be very nice to do it in an interface like this, especially given that it also provides the errors [...], which otherwise you would probably only get in the command line."
-        
-        "I guess I'm a big fan, like even though I know how to use Git on a command line level, I often use the GUI [for several tasks] because it's just faster for many things. And I would say [your tool] is similar to that." 
-        
-        
-        & 
-        "[I was] positively surprised, like it was super easy to [...] navigate and [for example] parsing JSON is always a bit of a pain, if I would have to go through this manually. [...] It's like comparing Word and LaTeX. This felt basically like Word. I can just change things directly in an intuitive user interface. [...] It is pretty nice, I would say." 
-        
-        "Are you going to open source this? Because it might actually be useful."\\
+        5 & Student & Yes & ``If I have to change more things [in a JSON document] it might be very nice to do it in an interface like this, especially given that it also provides the errors [\ldots], which otherwise you would probably only get in the command line.''
+
+        ``I guess I'm a big fan, like even though I know how to use Git on a command line level, I often use the GUI [for several tasks] because it's just faster for many things.
+        And I would say [your tool] is similar to that.''
+
+
+        &
+        ``[I was] positively surprised, like it was super easy to [\ldots] navigate and [for example] parsing JSON is always a bit of a pain, if I would have to go through this manually.
+        [\ldots] It's like comparing Word and LaTeX. This felt basically like Word.
+        I can just change things directly in an intuitive user interface.
+        [\ldots] It is pretty nice, I would say.''
+
+        ``Are you going to open source this?
+        Because it might actually be useful.''\\
         \bottomrule
     \end{tabular}
 \end{table*}
