@@ -92,7 +92,7 @@ The aim of those design decisions is to ensure modularity and maintainability of
 
 The core of \toolname{} is a single source of truth data store that contains the current user configuration data (as a JavaScript Object).
 With this data store, we can bidirectionally connect what we call ``editor panels''.
-An editor panel is a modular component that the user can access to modify the data .
+An editor panel is a modular component that the user can access to modify the data indirectly.
 It might be implemented as a code editor, a graphical user interface, or any other way in which the data can be presented to the user.
 All editor panels are independent and only have access in the data store but not to each other.
 Every editor panel subscribes to the changes of the data store, so it can be updated accordingly whenever the data in the store is changed.
