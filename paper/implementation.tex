@@ -5,7 +5,7 @@ Finally, we describe how we developed a new meta schema for JSON schema that is 
 
 \subsection{Technologies}\label{subsec:technologies}
 
-We use vue.js~\cite{vuejsVuejsProgressive} as the UI framework for our tool, combined with the component library PrimeVue~\cite{primevuePrimeVueComponent}.
+We use Vue.js~\cite{vuejsVuejsProgressive} as the UI framework for our tool, combined with the component library PrimeVue~\cite{primevuePrimeVueComponent}.
 A detailed list of all libraries used can be found in the wiki of our GitHub repository\footnote{\url{https://github.com/PaulBredl/meta-configurator/wiki/Libraries-we-use}}.
 % Table~\ref{tab:libraries} (appendix) shows an overview of the most important libraries used and their purpose.
 
@@ -24,7 +24,7 @@ To make our code editor more user-friendly, we implemented several features, whi
 \subsubsection{Schema Validation}
 To provide the user feedback on whether their data is valid according to the provided schema, we perform schema validation.
 We make use of the \textit{Ajv JSON schema validator}\cite{ajv-validator} library, which supports the newest JSON schema draft 2020--12.
-%Ajv firstly generates a fast validation function from the input schema.
+%Ajv first generates a fast validation function from the input schema.
 If schema violations are found, the corresponding user data lines in the code editor will be marked with a red error hint, which also describes the violation.
 
 
@@ -90,8 +90,8 @@ The user can expand the data tree by clicking on the arrow next to the key of an
 This will show the sub-properties of the object or the elements of the array.
 We limit the depth of the data tree to a configurable value, to prevent the GUI editor becoming too overwhelming.
 However, the user can also click on the property name or array index to \textit{zoom in} on that element.
-This will show the sub-properties of that element at the top level, as if that property was the root of the data tree.
-The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to upper levels of the tree.
+This will show the sub-properties of that element at the top level, as if that property were the root of the data tree.
+The breadcrumb at the top allows the user to see which path the GUI editor currently shows and to navigate back to the upper levels of the tree.
 
 
 \subsubsection{GUI implementations for JSON schema features} % Minye
@@ -173,7 +173,7 @@ Additionally, the schema information tooltip lists all schema violations, as sho
 
 To represent the schema in the GUI editor, it is necessary to preprocess the schema as for some JSON schema keywords
 it is not immediately clear how to represent them in a GUI\@.
-For example, the \texttt{type} keyword can have multiple values, which represents a type union.
+For example, the \texttt{type} keyword can have multiple values, which represent a type union.
 There is no obvious GUI component that represents this case.
 We differentiate between three ways of preprocessing:
 A one-time preprocessing step when loading the schema, an internal preprocessing that happens at every layer of the schema tree,
@@ -205,10 +205,10 @@ In the following, we describe the preprocessing steps in detail.
 \paragraph{Resolving references}
 JSON schema uses the \jskeyword{\$ref} keyword to reference other schemas.
 This can either be references to schemas in the same file (using the \jskeyword{\$defs} keyword), references to other local files,
-or references to schemas at a URL in the web.
+or references to schemas at a URL on the web.
 We currently only support references to schemas in the same file.
 These are lazily resolved as the first preprocessing step.
-Listing~\ref{lst:preprocessing-example} shows an example schema, Listing~\ref{lst:reference-resolving} shows the equivalent example after
+listing~\ref{lst:preprocessing-example} shows an example schema, listing~\ref{lst:reference-resolving} shows the equivalent example after
 this first preprocessing step.
 
 \begin{lstlisting}[language=json,firstnumber=1,caption=
@@ -269,7 +269,7 @@ As the first step, we do a recursive step by preprocessing all the schemas of th
 Then, we use the \textit{mergeAllOfs}\cite{githubGitHubMokkabonnajsonschemamergeallof} library to merge all the sub-schemas.
 Listing~\ref{lst:resolved-allof} shows the previous example schema after this step.
 It is important to note that this library only supports a few keywords of JSON schema, most notably the
-\jskeyword{properties} and \jskeyword{items} keyword.
+\jskeyword{properties} and \jskeyword{items} keywords.
 Hence, the \toolname{} has only limited support for \jskeyword{allOf} and any other keywords for which we use this library in the preprocessing.
 
 \paragraph{Converting types to oneOf}
@@ -313,7 +313,6 @@ In that case, the incompatible pair is dismissed.
 A schema may have \jskeyword{oneOf} or \jskeyword{anyOf} options that are not compatible with the schema of the property
 (e.g., sub-schemas that can never be fulfilled in combination with the property schema).
 Listing~\ref{lst:incompatible_one_ofs} provides an example of a schema with an incompatible \texttt{oneOf} option.
-% An example where this occurs is in our adjusted JSON schema meta schema, if we assign the root property the jsonSchema sub-schema, which allows objects and booleans, but then additionally restrict the root to be an object.
 For every \jskeyword{oneOf} and \jskeyword{anyOf} sub-schema, we check whether it can be merged with the schema of the property.
 The options which are not compatible are removed (see listing~\ref{lst:incompatible_one_ofs_removed}).
 
@@ -473,13 +472,13 @@ The only difference is that the schema used for generating the GUI panel is not 
 i.e., the schema that defines the structure of valid JSON schema files.
 However, applying our generic approach on the official JSON schema meta schema~\cite{jsonschemaJSONSchema} does not result in a user-friendly editor for
 creating and modifying schema files.
-In this section we discuss the reasons for that and how we developed a new meta schema that circumvents the problems of the official meta schema.
+In this section, we discuss the reasons for that and how we developed a new meta schema that circumvents the problems of the official meta schema.
 
 \subsubsection{Missing descriptions}
 With the \jskeyword{description} keyword, schema authors can give descriptions to any elements of their schema.
 This can help the user of a schema in many ways, for example, the author can specify the unit of a numeric field or give other additional information.
 The JSON schema meta schema does not provide any descriptions.
-Users, especially those without prior knowledge in JSON schema, might not understand the meaning of the fields of JSON schema.
+Users, especially those without prior knowledge of JSON schema, might not understand the meaning of the fields of JSON schema.
 Thus, we insert descriptions from the JSON schema specification~\cite{jsonschemaJSONSchema} into our modified meta-schema.
 
 \subsubsection{External references}
@@ -490,11 +489,11 @@ To circumvent that problem, we put all schemas in one schema file into the \jske
 
 \subsubsection{Use of dynamic anchors and references}
 The JSON schema meta schema uses dynamic references and dynamic anchors.
-The difference of those keywords in comparison to the \jskeyword{\$ref} keyword is that they provide a way to dynamically extend the JSON meta schema
+The difference between those keywords in comparison to the \jskeyword{\$ref} keyword is that they provide a way to dynamically extend the JSON meta schema
 at runtime.
 For example, one could combine the JSON schema meta schema with an extension that defines how fields should be serialized in XML\@.
 We do not support dynamic references and anchors yet.
-We replaced all of them by ``non-dynamic'' references using the \jskeyword{\$ref} keyword.
+We replaced all of them with ``non-dynamic'' references using the \jskeyword{\$ref} keyword.
 
 \subsubsection{Allowing each field in each context}
 The JSON schema meta schema allows each field in each context.
@@ -502,7 +501,7 @@ For example, if the \jskeyword{type} keyword is used and set to \jskeyword{strin
 even though it does not make sense in that context.
 According to the specification, any validator should ignore the fields that do not make sense in the current context.
 Consequently, if the user gets shown all fields that are allowed by the meta schema, they get overwhelmed, although many fields do not make sense in a given context.
-This is also a feedback we got from our user study.
+This is also feedback we got from our user study.
 
 \begin{lstlisting}[language=json, firstnumber=1, caption=
     {If condition for array properties. The \texttt{hasTypeArray} is valid if the current property is of type array. The \texttt{arrayProperty} schema defines the properties of an array.}, captionpos=b,label={lst:if-then-else}]
