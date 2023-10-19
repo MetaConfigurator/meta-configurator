@@ -1,5 +1,6 @@
 <!--
-Code editor panel, using the Ace Editor
+Code Editor component based on Ace Editor. Supports different data formats.
+Synchronized with file data from the store.
 -->
 <script setup lang="ts">
 import {computed, onMounted, Ref, ref, watch, watchEffect} from 'vue';
@@ -69,7 +70,7 @@ watchArray(
   }
 );
 
-// Listen to changes in store and update content accordingly
+// listen to changes in store and update the editor content accordingly
 watch(
   fileData,
   newVal => {
@@ -80,7 +81,7 @@ watch(
   {deep: true}
 );
 
-// Listen to changes in current path and update cursor accordingly
+// listen to changes in current path and update cursor accordingly
 watch(
   currentSelectedElement,
   (newSelectedElement: Path) => {
@@ -141,6 +142,8 @@ onMounted(() => {
   sessionStore.currentEditorWrapper = editorWrapper;
   editor.value.$blockScrolling = Infinity;
 
+  // change the mode depending on the data format.
+  // to support new data formats, they need to be added here too.
   if (props.dataFormat == 'json') {
     editor.value.getSession().setMode('ace/mode/json');
   } else if (props.dataFormat == 'yaml') {
@@ -153,7 +156,7 @@ onMounted(() => {
   editor.value.setTheme('ace/theme/clouds');
   editor.value.setShowPrintMargin(false);
 
-  // Feed config data from store into editor
+  // feed config data from store into editor
   editorValueWasUpdatedFromOutside(sessionStore.fileData, sessionStore.currentSelectedElement);
   editor.value.getSession().setUndoManager(new ace.UndoManager());
 
@@ -166,7 +169,7 @@ onMounted(() => {
     }
   });
 
-  // Listen to changes on AceEditor and update store accordingly
+  // when the content of the editor is modified by the user, we want to update the file data in the store accordingly
   editor.value.on(
     'change',
     useDebounceFn(
@@ -193,6 +196,8 @@ onMounted(() => {
     )
   );
 
+  // when the user clicks into the editor, we want to use the cursor position to determine which element from the data
+  // the user clicked at. We then update the currentSelectedElement in the store accordingly.
   editor.value.on('changeSelection', () => {
     if (currentChangeForcedFromOutside) {
       // we do not need to consider the event and send updates if the selection was forced from outside

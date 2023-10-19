@@ -1,6 +1,9 @@
 import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
 import type {Editor} from 'brace';
 
+/**
+ * CodeEditorWrapper implementation for AceEditor.
+ */
 export class CodeEditorWrapperAce implements CodeEditorWrapper {
   private editor: Editor;
 

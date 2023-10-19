@@ -4,6 +4,7 @@ import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorY
 
 /**
  * Interface for classes that can manipulate configuration files.
+ * Needs to be implemented for every data format that the tool should support.
  */
 export interface ConfigManipulator {
   determineCursorPosition(editorContent: string, currentPath: Path): number;

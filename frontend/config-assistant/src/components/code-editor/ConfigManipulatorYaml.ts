@@ -2,6 +2,9 @@ import type {Path} from '@/model/path';
 import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
 import YAML from 'yaml';
 
+/**
+ * ConfigManipulator implementation for the YAML data format.
+ */
 export class ConfigManipulatorYaml implements ConfigManipulator {
   constructor() {}
 
