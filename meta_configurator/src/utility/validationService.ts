@@ -18,7 +18,7 @@ export class ValidationService {
   static readonly TOP_LEVEL_SCHEMA_KEY = '$topLevelSchema';
 
   topLevelSchema: TopLevelSchema;
-  private _ajv: Ajv2020 | Ajv2019 | undefined;
+  private _ajv: Ajv2020 | Ajv2019 | Ajv | undefined;
   private _validationFunction: ValidateFunction | undefined;
 
   /**
@@ -205,7 +205,7 @@ export class ValidationService {
     return schema;
   }
 
-  private getMatchingAjvVersion(schema: JsonSchemaType): Ajv2020 | Ajv2019 {
+  private getMatchingAjvVersion(schema: JsonSchemaType): Ajv2020 | Ajv2019 | Ajv {
     const options = {
       strict: false,
       allErrors: true,
