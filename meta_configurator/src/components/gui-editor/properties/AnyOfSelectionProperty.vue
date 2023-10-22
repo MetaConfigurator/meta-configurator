@@ -53,6 +53,7 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined
     if (selectedOptions) {
       const path = pathToString(props.absolutePath);
       useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOptions);
+      useSessionStore().expand(props.absolutePath);
       emit('update:tree');
     }
   },

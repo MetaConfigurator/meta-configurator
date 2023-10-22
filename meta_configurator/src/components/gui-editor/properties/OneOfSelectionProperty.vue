@@ -53,6 +53,7 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> 
 
     if (selectedOption) {
       useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
+      useSessionStore().expand(props.absolutePath);
       applySchemaConstantsOnDataBasedOnSelection(props.absolutePath, selectedOption);
     } else {
       useSessionStore().currentSelectedOneOfOptions.delete(path);
