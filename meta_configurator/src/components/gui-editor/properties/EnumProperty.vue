@@ -4,7 +4,7 @@ List dropdown for enum properties, also used for properties with multiple exampl
 <script setup lang="ts">
 import {computed} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import {ValidationResults} from '@/utility/validationService';
+import type {ValidationResults} from '@/utility/validationService';
 
 const props = defineProps<{
   propertyName: string;
@@ -21,7 +21,7 @@ const valueProperty = computed({
   get() {
     return valueToSelectionOption(props.propertyData);
   },
-  set(newValue: {name: string; value: any} | undefined) {
+  set(newValue: {name: string; value: any} | string | undefined) {
     if (typeof newValue !== 'object') {
       emit('update:propertyData', newValue);
       return;
@@ -57,25 +57,18 @@ const allOptions = computed(() => {
 </script>
 
 <template>
-  <div>
-    <Dropdown
-      class="tableInput w-full"
-      :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
-      v-model="valueProperty"
-      editable
-      :options="allOptions"
-      optionLabel="name"
-      @keydown.stop
-      :placeholder="`Select ${props.propertyName}`" />
-  </div>
+  <Dropdown
+    class="tableInput w-full"
+    :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
+    v-model="valueProperty"
+    editable
+    :options="allOptions"
+    optionLabel="name"
+    @keydown.stop
+    :placeholder="`Select ${props.propertyName}`" />
 </template>
 
 <style scoped>
-div {
-  display: flex;
-  flex-direction: row;
-  height: 30px;
-}
 .tableInput {
   border: none;
   box-shadow: none;

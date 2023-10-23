@@ -12,7 +12,6 @@ import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import Toast from 'primevue/toast';
-import router from '@/router';
 import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
 import {useSettingsStore} from '@/store/settingsStore';
 import ConfirmDialog from 'primevue/confirmdialog';
@@ -20,6 +19,7 @@ import {useToast} from 'primevue/usetoast';
 import {useConfirm} from 'primevue/useconfirm';
 import {confirmationService} from '@/utility/confirmationService';
 import {toastService} from '@/utility/toastService';
+import {useAppRouter} from '@/router';
 
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
@@ -38,6 +38,7 @@ window.onresize = () => {
   windowWidth.value = window.innerWidth;
 };
 function updateMode(newMode: SessionMode) {
+  const router = useAppRouter();
   switch (newMode) {
     case SessionMode.FileEditor:
       router.push('/');
