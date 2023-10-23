@@ -1,11 +1,13 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/model/JsonSchemaType';
 import type {ErrorObject} from 'ajv';
+import Ajv from 'ajv';
 import type {ValidateFunction} from 'ajv/dist/2020';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import type {Path} from '@/model/path';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 import _ from 'lodash';
+import Ajv2019 from 'ajv/dist/2019';
 
 /**
  * Service for validating data against a JSON schema.
@@ -16,7 +18,7 @@ export class ValidationService {
   static readonly TOP_LEVEL_SCHEMA_KEY = '$topLevelSchema';
 
   topLevelSchema: TopLevelSchema;
-  private _ajv: Ajv2020 | undefined;
+  private _ajv: Ajv2020 | Ajv2019 | Ajv | undefined;
   private _validationFunction: ValidateFunction | undefined;
 
   /**
@@ -30,10 +32,7 @@ export class ValidationService {
   }
 
   private initValidationFunction() {
-    this._ajv = new Ajv2020({
-      strict: false,
-      allErrors: true,
-    });
+    this._ajv = this.getMatchingAjvVersion(this.topLevelSchema);
     addFormats(this._ajv);
     this._ajv.addSchema(this.topLevelSchema, this.topLevelSchemaId);
     this._validationFunction = this._ajv.getSchema(this.topLevelSchemaId);
@@ -204,6 +203,26 @@ export class ValidationService {
       delete schema.conditions;
     }
     return schema;
+  }
+
+  private getMatchingAjvVersion(schema: JsonSchemaType): Ajv2020 | Ajv2019 | Ajv {
+    const options = {
+      strict: false,
+      allErrors: true,
+    };
+    if (typeof schema !== 'object') {
+      return new Ajv(options);
+    }
+    switch (schema.$schema) {
+      case 'https://json-schema.org/draft/2020-12/schema':
+      case 'https://json-schema.org/draft/2020-12/schema#':
+        return new Ajv2020(options);
+      case 'https://json-schema.org/draft/2019-09/schema':
+      case 'https://json-schema.org/draft/2019-09/schema#':
+        return new Ajv2019(options);
+      default:
+        return new Ajv(options);
+    }
   }
 }
 
