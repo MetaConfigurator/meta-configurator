@@ -5,6 +5,8 @@ List dropdown for enum properties, also used for properties with multiple exampl
 import {computed} from 'vue';
 import Dropdown from 'primevue/dropdown';
 import type {ValidationResults} from '@/utility/validationService';
+import _ from 'lodash';
+import {dataToString} from '@/utility/dataToString';
 
 const props = defineProps<{
   propertyName: string;
@@ -38,13 +40,12 @@ function valueToSelectionOption(value: any): any {
   if (value === undefined) {
     return undefined;
   }
-  if (!props.possibleValues.includes(value)) {
-    return value;
+  // check if value is one of the possible values
+  if (!props.possibleValues.some(possibleValue => _.isEqual(possibleValue, value))) {
+    return value; // don't wrap in object if not in possible values, otherwise the dropdown cannot correctly select the value
   }
-  let formattedValue = `${value}`;
-  if (value === null) {
-    formattedValue = 'null';
-  }
+  const formattedValue = dataToString(value);
+
   return {
     name: formattedValue,
     value: value,
@@ -54,6 +55,13 @@ function valueToSelectionOption(value: any): any {
 const allOptions = computed(() => {
   return props.possibleValues.map(val => valueToSelectionOption(val));
 });
+
+function isEditable() {
+  // we only allow editing if all possible values are strings
+  // because for other types, we would need to convert the user input string to the correct type
+  // which is not necessary for enums
+  return props.possibleValues.every(val => typeof val === 'string');
+}
 </script>
 
 <template>
@@ -61,7 +69,7 @@ const allOptions = computed(() => {
     class="tableInput w-full"
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="valueProperty"
-    editable
+    :editable="isEditable()"
     :options="allOptions"
     optionLabel="name"
     @keydown.stop
