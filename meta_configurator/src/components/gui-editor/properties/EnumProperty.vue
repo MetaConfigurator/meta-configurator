@@ -4,7 +4,9 @@ List dropdown for enum properties, also used for properties with multiple exampl
 <script setup lang="ts">
 import {computed} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import {ValidationResults} from '@/utility/validationService';
+import type {ValidationResults} from '@/utility/validationService';
+import _ from 'lodash';
+import {dataToString} from '@/utility/dataToString';
 
 const props = defineProps<{
   propertyName: string;
@@ -21,7 +23,7 @@ const valueProperty = computed({
   get() {
     return valueToSelectionOption(props.propertyData);
   },
-  set(newValue: {name: string; value: any} | undefined) {
+  set(newValue: {name: string; value: any} | string | undefined) {
     if (typeof newValue !== 'object') {
       emit('update:propertyData', newValue);
       return;
@@ -38,13 +40,12 @@ function valueToSelectionOption(value: any): any {
   if (value === undefined) {
     return undefined;
   }
-  if (!props.possibleValues.includes(value)) {
-    return value;
+  // check if value is one of the possible values
+  if (!props.possibleValues.some(possibleValue => _.isEqual(possibleValue, value))) {
+    return value; // don't wrap in object if not in possible values, otherwise the dropdown cannot correctly select the value
   }
-  let formattedValue = `${value}`;
-  if (value === null) {
-    formattedValue = 'null';
-  }
+  const formattedValue = dataToString(value);
+
   return {
     name: formattedValue,
     value: value,
@@ -54,28 +55,28 @@ function valueToSelectionOption(value: any): any {
 const allOptions = computed(() => {
   return props.possibleValues.map(val => valueToSelectionOption(val));
 });
+
+function isEditable() {
+  // we only allow editing if all possible values are strings
+  // because for other types, we would need to convert the user input string to the correct type
+  // which is not necessary for enums
+  return props.possibleValues.every(val => typeof val === 'string');
+}
 </script>
 
 <template>
-  <div>
-    <Dropdown
-      class="tableInput w-full"
-      :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
-      v-model="valueProperty"
-      editable
-      :options="allOptions"
-      optionLabel="name"
-      @keydown.stop
-      :placeholder="`Select ${props.propertyName}`" />
-  </div>
+  <Dropdown
+    class="tableInput w-full"
+    :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
+    v-model="valueProperty"
+    :editable="isEditable()"
+    :options="allOptions"
+    optionLabel="name"
+    @keydown.stop
+    :placeholder="`Select ${props.propertyName}`" />
 </template>
 
 <style scoped>
-div {
-  display: flex;
-  flex-direction: row;
-  height: 30px;
-}
 .tableInput {
   border: none;
   box-shadow: none;

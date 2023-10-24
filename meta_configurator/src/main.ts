@@ -7,7 +7,7 @@ import 'primevue/resources/primevue.min.css';
 import Tooltip from 'primevue/tooltip';
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
-import router from './router';
+import {useAppRouter} from './router';
 import FileEditorView from '@/views/FileEditorView.vue';
 import ErrorService from '@/utility/errorService';
 import {registerIcons} from '@/fontawesome';
@@ -19,7 +19,7 @@ import cookiesHandler from '@/cookies/cookiesHandler';
 const app = createApp(FileEditorView);
 
 app.use(createPinia());
-app.use(router);
+app.use(useAppRouter());
 app.use(PrimeVue);
 app.use(ToastService);
 app.use(VueCookies);

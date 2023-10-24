@@ -6,7 +6,7 @@ import {openClearFileDialog} from '@/components/toolbar/clearFile';
 import {openClearSchemaDialog} from '@/components/toolbar/clearSchema';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
-import type {SchemaOption} from '@/model/SchemaOption';
+import type {SchemaOption} from '@/model/schemaOption';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 
 /**

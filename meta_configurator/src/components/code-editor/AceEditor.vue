@@ -16,13 +16,13 @@ import 'brace/theme/monokai';
 import _ from 'lodash';
 import {useDebounceFn, watchArray} from '@vueuse/core';
 import type {Path} from '@/model/path';
-import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
+import {ConfigManipulatorJson} from '@/components/code-editor/configManipulatorJson';
 
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
-import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
-import {CodeEditorWrapperAce} from '@/components/code-editor/CodeEditorWrapperAce';
-import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
+import type {ConfigManipulator} from '@/components/code-editor/configManipulator';
+import {ConfigManipulatorYaml} from '@/components/code-editor/configManipulatorYaml';
+import {CodeEditorWrapperAce} from '@/components/code-editor/codeEditorWrapperAce';
+import type {CodeEditorWrapper} from '@/components/code-editor/codeEditorWrapper';
 import {useSettingsStore} from '@/store/settingsStore';
 import {convertAjvPathToPath} from '@/utility/pathUtils';
 

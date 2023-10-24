@@ -3,12 +3,12 @@
 import type {WritableComputedRef} from 'vue';
 import {computed, onMounted} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
 import type {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/utility/pathUtils';
-import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
-import type {JsonSchemaType} from '@/model/JsonSchemaType';
+import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/oneOfAnyOfSelectionOption';
+import type {JsonSchemaType} from '@/model/jsonSchemaType';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import _ from 'lodash';
 

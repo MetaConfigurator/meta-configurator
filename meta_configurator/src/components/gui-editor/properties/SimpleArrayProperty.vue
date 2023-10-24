@@ -2,7 +2,7 @@
 Simple component that displays a preview of the array elements.
 -->
 <script setup lang="ts">
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import type {Path} from '@/model/path';
 import {dataToString} from '@/utility/dataToString';
 

@@ -1,7 +1,7 @@
-import type {JsonSchemaType} from '@/model/JsonSchemaType';
+import type {JsonSchemaType} from '@/model/jsonSchemaType';
 import pointer from 'json-pointer';
 import {useSessionStore} from '@/store/sessionStore';
-import {nonBooleanSchema} from '@/schema/SchemaUtils';
+import {nonBooleanSchema} from '@/schema/schemaUtils';
 import {
   areSchemasCompatible,
   mergeAllOfs,

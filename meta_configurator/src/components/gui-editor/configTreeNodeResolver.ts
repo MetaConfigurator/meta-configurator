@@ -1,14 +1,14 @@
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 import type {
   AddPropertyTreeNode,
   ConfigDataTreeNodeType,
   GuiEditorTreeNode,
-} from '@/model/ConfigDataTreeNode';
-import {TreeNodeType} from '@/model/ConfigDataTreeNode';
+} from '@/model/configDataTreeNode';
+import {TreeNodeType} from '@/model/configDataTreeNode';
 import type {Path} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
 import {pathToString} from '@/utility/pathUtils';
-import {PropertySorting} from '@/model/SettingsTypes';
+import {PropertySorting} from '@/model/settingsTypes';
 import {useSessionStore} from '@/store/sessionStore';
 import _ from 'lodash';
 import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';

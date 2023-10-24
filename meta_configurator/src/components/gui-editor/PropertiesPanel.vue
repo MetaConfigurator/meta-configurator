@@ -12,7 +12,7 @@ import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/components/gui-editor/configTreeNodeResolver';
@@ -23,7 +23,7 @@ import {
   ConfigTreeNodeData,
   GuiEditorTreeNode,
   TreeNodeType,
-} from '@/model/ConfigDataTreeNode';
+} from '@/model/configDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {dataAt, pathToString} from '@/utility/pathUtils';

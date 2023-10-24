@@ -63,4 +63,6 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-export default router;
+export function useAppRouter() {
+  return router;
+}

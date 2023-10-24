@@ -1,4 +1,4 @@
-import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/model/JsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/model/jsonSchemaType';
 import type {ErrorObject} from 'ajv';
 import Ajv from 'ajv';
 import type {ValidateFunction} from 'ajv/dist/2020';

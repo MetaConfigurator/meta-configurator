@@ -1,4 +1,4 @@
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
 import {dataAt} from '@/utility/pathUtils';

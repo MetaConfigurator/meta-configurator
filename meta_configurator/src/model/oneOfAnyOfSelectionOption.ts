@@ -1,4 +1,4 @@
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import {dataToString} from '@/utility/dataToString';
 
 export class OneOfAnyOfSelectionOption {

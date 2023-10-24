@@ -1,5 +1,5 @@
-import {JsonSchema} from '@/schema/JsonSchema';
-import type {TopLevelSchema} from '@/model/JsonSchemaType';
+import {JsonSchema} from '@/schema/jsonSchema';
+import type {TopLevelSchema} from '@/model/jsonSchemaType';
 
 /**
  * Like {@link JsonSchema}, but with additional properties that are only allowed at the top level of a schema.

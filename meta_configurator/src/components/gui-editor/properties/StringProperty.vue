@@ -4,7 +4,7 @@ import {computed, ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import {ValidationResults} from '@/utility/validationService';
 
 const props = defineProps<{
