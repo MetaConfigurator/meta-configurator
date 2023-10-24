@@ -1,6 +1,6 @@
-import {JsonSchema} from '@/schema/JsonSchema';
-import type {SchemaPropertyType} from '@/model/JsonSchemaType';
-import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
+import {JsonSchema} from '@/schema/jsonSchema';
+import type {SchemaPropertyType} from '@/model/jsonSchemaType';
+import {NUMBER_OF_PROPERTY_TYPES} from '@/model/jsonSchemaType';
 import type {ErrorObject} from 'ajv';
 
 /**

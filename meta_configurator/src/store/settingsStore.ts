@@ -1,8 +1,8 @@
 import {defineStore} from 'pinia';
 import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
-import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
-import {SETTINGS_SCHEMA} from '@/example-schemas/SettingsSchema';
+import {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
+import {SETTINGS_SCHEMA} from '@/example-schemas/settingsSchema';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 
 /**

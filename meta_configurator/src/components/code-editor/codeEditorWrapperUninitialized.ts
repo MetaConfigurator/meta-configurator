@@ -1,4 +1,4 @@
-import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
+import type {CodeEditorWrapper} from '@/components/code-editor/codeEditorWrapper';
 
 /**
  * Trivial CodeEditorWrapper implementation that does nothing.

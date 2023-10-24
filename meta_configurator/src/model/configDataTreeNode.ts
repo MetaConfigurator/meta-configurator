@@ -1,6 +1,6 @@
 import type {TreeNode} from 'primevue/tree';
 import type {Path, PathElement} from '@/model/path';
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 
 /**
  * Represents a node in the schema tree.

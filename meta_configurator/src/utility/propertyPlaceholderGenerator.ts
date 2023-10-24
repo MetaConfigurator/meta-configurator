@@ -1,4 +1,4 @@
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 import type {PathElement} from '@/model/path';
 
 /**

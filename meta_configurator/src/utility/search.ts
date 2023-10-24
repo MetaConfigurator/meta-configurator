@@ -1,6 +1,6 @@
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import {errorService} from '@/main';
 import type {MenuItem} from 'primevue/menuitem';
 import {pathToString} from '@/utility/pathUtils';

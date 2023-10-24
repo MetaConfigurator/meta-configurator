@@ -1,11 +1,11 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
-import type {ConfigDataTreeNodeType, GuiEditorTreeNode} from '@/model/ConfigDataTreeNode';
-import {TreeNodeType} from '@/model/ConfigDataTreeNode';
+import type {ConfigDataTreeNodeType, GuiEditorTreeNode} from '@/model/configDataTreeNode';
+import {TreeNodeType} from '@/model/configDataTreeNode';
 import type {Path, PathElement} from '@/model/path';
 import {useSettingsStore} from '@/store/settingsStore';
-import {NUMBER_OF_PROPERTY_TYPES} from '@/model/JsonSchemaType';
+import {NUMBER_OF_PROPERTY_TYPES} from '@/model/jsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
 import type {ValidationResults} from '@/utility/validationService';

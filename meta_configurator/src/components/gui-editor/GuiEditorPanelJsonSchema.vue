@@ -5,7 +5,7 @@ import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/model/path';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {computed} from 'vue';
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 
 const sessionStore = useSessionStore();
 

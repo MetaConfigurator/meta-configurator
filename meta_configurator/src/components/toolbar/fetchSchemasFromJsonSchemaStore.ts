@@ -1,4 +1,4 @@
-import type {SchemaOption} from '@/model/SchemaOption';
+import type {SchemaOption} from '@/model/schemaOption';
 import {JSON_SCHEMA_STORE_CATALOG_URL} from '@/constants';
 
 /**

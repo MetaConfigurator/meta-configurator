@@ -1,13 +1,13 @@
 import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
-import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
 // @ts-ignore
 import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
-import type {JsonSchemaType} from '@/model/JsonSchemaType';
+import type {JsonSchemaType} from '@/model/jsonSchemaType';
 
 /**
  * The store that contains the data of the current file and the current schema.

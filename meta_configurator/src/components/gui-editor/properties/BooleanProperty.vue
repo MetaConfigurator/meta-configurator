@@ -6,7 +6,7 @@ They are represented as a select button with two options: true and false.
 import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/model/path';
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import type {ValidationResults} from '@/utility/validationService';
 
 const props = defineProps<{

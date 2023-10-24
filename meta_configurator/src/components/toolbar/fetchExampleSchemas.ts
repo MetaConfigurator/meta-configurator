@@ -1,4 +1,4 @@
-import {schemaCollection} from '@/example-schemas/SchemaCollection';
+import {schemaCollection} from '@/example-schemas/schemaCollection';
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
 import {useDataStore} from '@/store/dataStore';
 import {newEmptyFile} from '@/components/toolbar/clearFile';

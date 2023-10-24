@@ -3,7 +3,7 @@
 import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
 import type {PathElement} from '@/model/path';
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import {ValidationResults} from '@/utility/validationService';
 

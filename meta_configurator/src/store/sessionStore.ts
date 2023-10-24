@@ -3,21 +3,21 @@ import {computed, ref, watch} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
 import {useDataStore} from '@/store/dataStore';
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 import {dataAt, pathToString} from '@/utility/pathUtils';
 import _ from 'lodash';
 import {useSettingsStore} from '@/store/settingsStore';
-import type {CodeEditorWrapper} from '@/components/code-editor/CodeEditorWrapper';
-import {CodeEditorWrapperUninitialized} from '@/components/code-editor/CodeEditorWrapperUninitialized';
-import type {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import type {CodeEditorWrapper} from '@/components/code-editor/codeEditorWrapper';
+import {CodeEditorWrapperUninitialized} from '@/components/code-editor/codeEditorWrapperUninitialized';
+import type {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import {ValidationResults, ValidationService} from '@/utility/validationService';
 import {useDebounceFn} from '@vueuse/core';
 import {errorService} from '@/main';
 import {GuiConstants} from '@/constants';
 import type {SearchResult} from '@/utility/search';
 import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
-import type {OneOfAnyOfSelectionOption} from '@/model/OneOfAnyOfSelectionOption';
-import type {JsonSchemaType} from '@/model/JsonSchemaType';
+import type {OneOfAnyOfSelectionOption} from '@/model/oneOfAnyOfSelectionOption';
+import type {JsonSchemaType} from '@/model/jsonSchemaType';
 
 /**
  * The current page/mode of the application.

@@ -4,7 +4,7 @@ import StringProperty from '@/components/gui-editor/properties/StringProperty.vu
 import NumberProperty from '@/components/gui-editor/properties/NumberProperty.vue';
 import SimpleObjectProperty from '@/components/gui-editor/properties/SimpleObjectProperty.vue';
 import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayProperty.vue';
-import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
+import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/configDataTreeNode';
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';

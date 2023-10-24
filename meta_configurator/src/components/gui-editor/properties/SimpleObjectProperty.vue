@@ -2,7 +2,7 @@
 Simple property component that displays a preview of the object properties.
 -->
 <script setup lang="ts">
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import type {Path, PathElement} from '@/model/path';
 import {dataToString} from '@/utility/dataToString';
 

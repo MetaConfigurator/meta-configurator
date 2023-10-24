@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
-import type {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import type {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import {useSessionStore} from '@/store/sessionStore';

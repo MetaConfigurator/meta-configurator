@@ -1,5 +1,5 @@
 import type {Path} from '@/model/path';
-import type {ConfigManipulator} from '@/components/code-editor/ConfigManipulator';
+import type {ConfigManipulator} from '@/components/code-editor/configManipulator';
 import YAML from 'yaml';
 
 /**

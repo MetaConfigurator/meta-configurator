@@ -1,4 +1,4 @@
-import type {TopLevelSchema} from '@/model/JsonSchemaType';
+import type {TopLevelSchema} from '@/model/jsonSchemaType';
 
 export interface SchemaOption {
   label: string;

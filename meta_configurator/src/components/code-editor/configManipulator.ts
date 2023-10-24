@@ -1,6 +1,6 @@
 import type {Path} from '@/model/path';
-import {ConfigManipulatorJson} from '@/components/code-editor/ConfigManipulatorJson';
-import {ConfigManipulatorYaml} from '@/components/code-editor/ConfigManipulatorYaml';
+import {ConfigManipulatorJson} from '@/components/code-editor/configManipulatorJson';
+import {ConfigManipulatorYaml} from '@/components/code-editor/configManipulatorYaml';
 
 /**
  * Interface for classes that can manipulate configuration files.

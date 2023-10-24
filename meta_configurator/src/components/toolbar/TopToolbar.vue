@@ -9,7 +9,7 @@ import SchemaEditorView from '@/views/SchemaEditorView.vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
-import {schemaCollection} from '@/example-schemas/SchemaCollection';
+import {schemaCollection} from '@/example-schemas/schemaCollection';
 import {newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
@@ -19,7 +19,7 @@ import InputText from 'primevue/inputtext';
 
 import {storeToRefs} from 'pinia';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
-import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJSONSchemaStore';
+import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
 import {loadExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
@@ -27,7 +27,7 @@ import {searchInDataAndSchema, searchResultToMenuItem} from '@/utility/search';
 import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
-import type {SchemaOption} from '@/model/SchemaOption';
+import type {SchemaOption} from '@/model/schemaOption';
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
 
 const props = defineProps<{

@@ -972,6 +972,7 @@ export const simplifiedMetaSchema = {
       },
     },
     simpleTypes: {
+      title: 'Single type',
       enum: ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string'],
       type: 'string',
     },

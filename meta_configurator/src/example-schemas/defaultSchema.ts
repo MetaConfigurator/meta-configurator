@@ -1,4 +1,4 @@
-import type {TopLevelSchema} from '@/model/JsonSchemaType';
+import type {TopLevelSchema} from '@/model/jsonSchemaType';
 
 export const DEFAULT_SCHEMA: TopLevelSchema = {
   type: 'object',
