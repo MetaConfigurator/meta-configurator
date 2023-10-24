@@ -41,7 +41,7 @@ describe('EnumProperty', () => {
       expect(wrapper.props()).toEqual(stringValuesProps);
     });
 
-    describe('dropdown is correctly initialized', () => {
+    describe('initializes dropdown correctly', () => {
       it('should have exactly one dropdown', () => {
         expect(dropdown.exists()).toBe(true);
         expect(wrapper.findAllComponents(Dropdown).length).toBe(1);
@@ -118,7 +118,7 @@ describe('EnumProperty', () => {
       expect(wrapper.props()).toEqual(numberValuesProps);
     });
 
-    describe('dropdown is correctly initialized', () => {
+    describe('initializes dropdown correctly', () => {
       it('should not be editable', () => {
         expect(dropdown.props().editable).toBe(false);
       });
@@ -174,7 +174,7 @@ describe('EnumProperty', () => {
       expect(wrapper.props()).toEqual(booleanValuesProps);
     });
 
-    describe('dropdown is correctly initialized', () => {
+    describe('initializes dropdown correctly', () => {
       it('should not be editable', () => {
         expect(dropdown.props().editable).toBe(false);
       });
@@ -230,7 +230,7 @@ describe('EnumProperty', () => {
       expect(wrapper.props()).toEqual(objectValuesProps);
     });
 
-    describe('dropdown is correctly initialized', () => {
+    describe('initializes dropdown correctly', () => {
       it('should not be editable', () => {
         expect(dropdown.props().editable).toBe(false);
       });
@@ -290,7 +290,7 @@ describe('EnumProperty', () => {
       expect(wrapper.props()).toEqual(arrayValuesProps);
     });
 
-    describe('dropdown is correctly initialized', () => {
+    describe('initializes dropdown correctly', () => {
       it('should have the correct options', () => {
         expect(dropdown.props().options).toEqual([
           {
@@ -320,6 +320,84 @@ describe('EnumProperty', () => {
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.emitted('update:propertyData')).toEqual([[['testValue2', 'testValue3']]]);
+      });
+    });
+  });
+
+  describe('with null options', () => {
+    const nullValuesProps = {
+      propertyName: 'testName',
+      possibleValues: [null],
+      propertyData: null,
+      validationResults: new ValidationResults([]),
+    };
+
+    beforeEach(() => {
+      wrapper = shallowMount(EnumProperty, {
+        props: nullValuesProps,
+      });
+      dropdown = wrapper.findComponent(Dropdown);
+    });
+    afterEach(() => {
+      wrapper.unmount();
+    });
+
+    it('should have the correct props', () => {
+      expect(wrapper.props()).toEqual(nullValuesProps);
+    });
+
+    describe('initializes dropdown correctly', () => {
+      it('should not be editable', () => {
+        expect(dropdown.props().editable).toBe(false);
+      });
+
+      it('should have the correct options', () => {
+        expect(dropdown.props().options).toEqual([
+          {
+            name: 'null',
+            value: null,
+          },
+        ]);
+      });
+
+      it('should have the correct value', () => {
+        expect(dropdown.props().modelValue).toEqual({
+          name: 'null',
+          value: null,
+        });
+      });
+    });
+  });
+
+  describe('with no selected value', () => {
+    const testProps = {
+      propertyName: 'testName',
+      possibleValues: ['testValue1', 'testValue2'],
+      propertyData: undefined,
+      validationResults: new ValidationResults([]),
+    };
+
+    beforeEach(() => {
+      wrapper = shallowMount(EnumProperty, {
+        props: testProps,
+      });
+      dropdown = wrapper.findComponent(Dropdown);
+    });
+    afterEach(() => {
+      wrapper.unmount();
+    });
+
+    it('should have the correct props', () => {
+      expect(wrapper.props()).toEqual(testProps);
+    });
+
+    describe('initializes dropdown correctly', () => {
+      it('should have the correct placeholder', () => {
+        expect(dropdown.props().placeholder).toBe('Select testName');
+      });
+
+      it('should have the correct value', () => {
+        expect(dropdown.props().modelValue).toEqual(undefined);
       });
     });
   });
