@@ -4,10 +4,7 @@ import EnumProperty from '@/components/gui-editor/properties/EnumProperty.vue';
 import {ValidationResults} from '@/utility/validationService';
 import Dropdown from 'primevue/dropdown';
 
-vi.mock('@/router', () => ({
-  useAppRouter: vi.fn(),
-}));
-
+// avoid constructing the session store through imports, it is not required for this component
 vi.mock('@/store/sessionStore', () => ({
   useSessionStore: vi.fn(),
 }));
@@ -20,6 +17,18 @@ describe('EnumProperty', () => {
   let wrapper: any;
   let dropdown: any;
 
+  function shallowMountBeforeEach(props: any) {
+    beforeEach(() => {
+      wrapper = shallowMount(EnumProperty, {
+        props: props,
+      });
+      dropdown = wrapper.findComponent(Dropdown);
+    });
+    afterEach(() => {
+      wrapper.unmount();
+    });
+  }
+
   describe('with string options', () => {
     const stringValuesProps = {
       propertyName: 'testName',
@@ -27,15 +36,7 @@ describe('EnumProperty', () => {
       propertyData: 'testValue1',
       validationResults: new ValidationResults([]),
     };
-    beforeEach(() => {
-      wrapper = shallowMount(EnumProperty, {
-        props: stringValuesProps,
-      });
-      dropdown = wrapper.findComponent(Dropdown);
-    });
-    afterEach(() => {
-      wrapper.unmount();
-    });
+    shallowMountBeforeEach(stringValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(stringValuesProps);
@@ -104,15 +105,7 @@ describe('EnumProperty', () => {
       propertyData: 1,
       validationResults: new ValidationResults([]),
     };
-    beforeEach(() => {
-      wrapper = shallowMount(EnumProperty, {
-        props: numberValuesProps,
-      });
-      dropdown = wrapper.findComponent(Dropdown);
-    });
-    afterEach(() => {
-      wrapper.unmount();
-    });
+    shallowMountBeforeEach(numberValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(numberValuesProps);
@@ -160,15 +153,7 @@ describe('EnumProperty', () => {
       propertyData: false,
       validationResults: new ValidationResults([]),
     };
-    beforeEach(() => {
-      wrapper = shallowMount(EnumProperty, {
-        props: booleanValuesProps,
-      });
-      dropdown = wrapper.findComponent(Dropdown);
-    });
-    afterEach(() => {
-      wrapper.unmount();
-    });
+    shallowMountBeforeEach(booleanValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(booleanValuesProps);
@@ -216,15 +201,7 @@ describe('EnumProperty', () => {
       propertyData: {firstName: 'testValue1'},
       validationResults: new ValidationResults([]),
     };
-    beforeEach(() => {
-      wrapper = shallowMount(EnumProperty, {
-        props: objectValuesProps,
-      });
-      dropdown = wrapper.findComponent(Dropdown);
-    });
-    afterEach(() => {
-      wrapper.unmount();
-    });
+    shallowMountBeforeEach(objectValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(objectValuesProps);
@@ -275,16 +252,7 @@ describe('EnumProperty', () => {
       propertyData: ['testValue1'],
       validationResults: new ValidationResults([]),
     };
-
-    beforeEach(() => {
-      wrapper = shallowMount(EnumProperty, {
-        props: arrayValuesProps,
-      });
-      dropdown = wrapper.findComponent(Dropdown);
-    });
-    afterEach(() => {
-      wrapper.unmount();
-    });
+    shallowMountBeforeEach(arrayValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(arrayValuesProps);
@@ -376,16 +344,7 @@ describe('EnumProperty', () => {
       propertyData: undefined,
       validationResults: new ValidationResults([]),
     };
-
-    beforeEach(() => {
-      wrapper = shallowMount(EnumProperty, {
-        props: testProps,
-      });
-      dropdown = wrapper.findComponent(Dropdown);
-    });
-    afterEach(() => {
-      wrapper.unmount();
-    });
+    shallowMountBeforeEach(testProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(testProps);

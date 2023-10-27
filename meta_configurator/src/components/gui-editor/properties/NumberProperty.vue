@@ -6,6 +6,7 @@ import type {PathElement} from '@/model/path';
 import {JsonSchema} from '@/schema/jsonSchema';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import {ValidationResults} from '@/utility/validationService';
+import {GuiConstants} from '@/constants';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -23,7 +24,7 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    if (newValue !== null) {
+    if (newValue !== null && newValue !== undefined) {
       emit('update:propertyData', newValue);
     }
   },
@@ -48,11 +49,10 @@ const stepValue = computed(() => {
     :class="{'underline decoration-wavy decoration-red-600': !isValid()}"
     v-model="valueProperty"
     value="propertyName"
-    :mode="isInteger() ? 'decimal' : undefined"
-    :input-id="isInteger() ? 'integeronly' : undefined"
+    mode="decimal"
     locale="en-US"
     :minFractionDigits="0"
-    :maxFractionDigits="isInteger() ? 0 : 20"
+    :maxFractionDigits="isInteger() ? 0 : GuiConstants.NUMBER_MAX_DECIMAL_PLACES"
     showButtons
     buttonLayout="stacked"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
