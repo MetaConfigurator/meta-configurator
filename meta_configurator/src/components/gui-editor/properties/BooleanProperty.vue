@@ -6,13 +6,11 @@ They are represented as a select button with two options: true and false.
 import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/model/path';
-import type {JsonSchema} from '@/schema/jsonSchema';
 import type {ValidationResults} from '@/utility/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: boolean | undefined;
-  parentSchema: JsonSchema | undefined;
   validationResults: ValidationResults;
 }>();
 
@@ -30,27 +28,15 @@ const valueProperty = computed({
     return props.propertyData;
   },
   set(newValue) {
-    if (newValue === null && (isRequired() || isElementOfArray())) {
-      // if the property is required or an array, we should not set it to null
-      // therefore, we flip the value instead
+    if (newValue === null || newValue === undefined) {
+      // null is used when the user deselects the select button
+      // we then switch to the other value
       emit('update:propertyData', !props.propertyData);
-      return;
-    }
-    if (newValue === null) {
-      emit('update:propertyData', undefined);
     } else {
       emit('update:propertyData', newValue);
     }
   },
 });
-
-function isRequired() {
-  return props.parentSchema?.isRequired(props.propertyName as string);
-}
-
-function isElementOfArray() {
-  return props.parentSchema?.hasType('array');
-}
 </script>
 
 <template>
@@ -71,8 +57,5 @@ function isElementOfArray() {
 }
 :deep(.p-button-label) {
   font-weight: 500;
-}
-::placeholder {
-  color: #a8a8a8;
 }
 </style>

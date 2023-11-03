@@ -42,7 +42,7 @@ function updateValue() {
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     class="h-8 tableInput"
     :model-value="polishedPropertyData"
-    @update:model-value="value => (newPropertyData = value)"
+    @update:model-value="(value: any) => (newPropertyData = value)"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     @blur="updateValue"
     @keydown.stop
