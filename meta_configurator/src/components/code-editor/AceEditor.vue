@@ -3,7 +3,7 @@
  Synchronized with file data from the store.
  -->
 <script setup lang="ts">
-import {computed, onMounted, Ref, ref, watch, watchEffect} from 'vue';
+import {computed, onMounted, type Ref, ref, watch, watchEffect} from 'vue';
 import {storeToRefs} from 'pinia';
 import type {Editor, Position} from 'brace';
 import * as ace from 'brace';
@@ -16,15 +16,13 @@ import 'brace/theme/monokai';
 import _ from 'lodash';
 import {useDebounceFn, watchArray} from '@vueuse/core';
 import type {Path} from '@/model/path';
-import {ConfigManipulatorJson} from '@/components/code-editor/configManipulatorJson';
 
 import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import type {ConfigManipulator} from '@/components/code-editor/configManipulator';
-import {ConfigManipulatorYaml} from '@/components/code-editor/configManipulatorYaml';
 import {CodeEditorWrapperAce} from '@/components/code-editor/codeEditorWrapperAce';
 import type {CodeEditorWrapper} from '@/components/code-editor/codeEditorWrapper';
 import {useSettingsStore} from '@/store/settingsStore';
 import {convertAjvPathToPath} from '@/utility/pathUtils';
+import {useDataConverter, usePathIndexLink} from '@/formats/formatRegistry';
 
 const sessionStore = useSessionStore();
 const {currentSelectedElement, fileData} = storeToRefs(sessionStore);
@@ -36,8 +34,6 @@ const props = defineProps<{
 let editor: Ref<Editor>;
 
 let currentChangeForcedFromOutside = false;
-const manipulator = createConfigManipulator(props.dataFormat);
-
 let editorWrapper: CodeEditorWrapper;
 
 /**
@@ -45,20 +41,14 @@ let editorWrapper: CodeEditorWrapper;
  */
 const WRITE_DEBOUNCE_TIME = 100;
 
-function createConfigManipulator(dataFormat: string): ConfigManipulator {
-  if (dataFormat == 'json') {
-    return new ConfigManipulatorJson();
-  } else if (dataFormat == 'yaml') {
-    return new ConfigManipulatorYaml();
-  }
-}
-
 const editorDiv = ref();
 
 function onDragOver(e: DragEvent) {
   e.stopPropagation();
   e.preventDefault();
-  e.dataTransfer.dropEffect = 'copy';
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'copy';
+  }
 }
 
 function onDragEnter() {
@@ -75,7 +65,7 @@ function onDrop(e: DragEvent) {
   e.stopPropagation();
   e.preventDefault();
   editorDiv.value.classList.remove('dragover');
-  const files = e.dataTransfer.files;
+  const files = e.dataTransfer?.files;
   if (files && files.length == 1) {
     readFile(files[0]);
   }
@@ -131,12 +121,9 @@ onMounted(() => {
         sessionStore.lastChangeResponsible = ChangeResponsible.CodeEditor;
         const fileContentString = editor.value.getValue();
 
-        try {
-          fileData.value = manipulator.parseFileContent(fileContentString);
-        } catch (e) {
-          // if file content can not be parsed, that is because of error in input
-          // Invalid JSON is already highlighted by Ace Editor -> no action needed here
-        }
+        useDataConverter().parseIfValid(fileContentString, data => {
+          sessionStore.fileData = data;
+        });
       },
       WRITE_DEBOUNCE_TIME,
       {maxWait: 10 * WRITE_DEBOUNCE_TIME}
@@ -157,7 +144,7 @@ onMounted(() => {
     errors => {
       // do not attempt to display schema validation errors when the text does not have valid syntax
       // (would otherwise result in errors when trying to parse CST)
-      if (!manipulator.isValidSyntax(editor.value.getValue())) {
+      if (!useDataConverter().isValidSyntax(editor.value.getValue())) {
         return;
       }
 
@@ -170,7 +157,7 @@ onMounted(() => {
         annotations.push({
           row: relatedRow,
           column: 0,
-          text: error.message,
+          text: error.message ?? 'Validation error',
           type: 'error',
         });
         editor.value.getSession().setAnnotations(annotations);
@@ -220,34 +207,34 @@ onMounted(() => {
   );
 });
 
-function editorValueWasUpdatedFromOutside(configData, currentPath: Path) {
+function editorValueWasUpdatedFromOutside(configData: any, currentPath: Path) {
   // update value with new data and also update cursor position
   currentChangeForcedFromOutside = true;
-  const newEditorContent = manipulator.stringifyContentObject(configData);
+  const newEditorContent = useDataConverter().stringify(configData);
   sessionStore.currentEditorWrapper.setContent(newEditorContent);
   updateCursorPositionBasedOnPath(newEditorContent, currentPath);
   // set currentChangeForcedFromOutside to false in on-change handler
 }
 
 function updateCursorPositionBasedOnPath(editorContent: string, currentPath: Path) {
-  let position = determineCursorPosition(editorContent, currentPath);
-  editor.value.gotoLine(position.row, position.column);
+  const position = determineCursorPosition(editorContent, currentPath);
+  editor.value.gotoLine(position.row + 1, position.column, true); // row is 1-based, column is 0-based
 }
 
 function determineCursorPosition(editorContent: string, currentPath: Path): Position {
-  let index = manipulator.determineCursorPosition(editorContent, currentPath);
+  const index = usePathIndexLink().determineIndexOfPath(editorContent, currentPath);
   return editor.value.session.doc.indexToPosition(index, 0);
 }
 
 function determinePath(editorContent: string, cursorPosition: Position): Path {
-  let targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
-  return manipulator.determinePath(editorContent, targetCharacter);
+  const targetCharacter = editor.value.session.doc.positionToIndex(cursorPosition, 0);
+  return usePathIndexLink().determinePathFromIndex(editorContent, targetCharacter);
 }
 
-function readFile(file) {
+function readFile(file: any) {
   const reader = new FileReader();
   reader.onload = function (evt) {
-    if (typeof evt.target.result === 'string') {
+    if (typeof evt.target?.result === 'string') {
       editor.value.setValue(evt.target.result, -1);
     } // -1 sets the cursor to the start of the editor
   };
