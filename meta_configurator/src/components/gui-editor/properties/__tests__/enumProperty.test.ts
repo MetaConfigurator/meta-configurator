@@ -337,11 +337,11 @@ describe('EnumProperty', () => {
     });
   });
 
-  describe('with no selected value', () => {
+  describe.each([undefined, null, 'notInOptions'])('with special value %s', data => {
     const testProps = {
       propertyName: 'testName',
       possibleValues: ['testValue1', 'testValue2'],
-      propertyData: undefined,
+      propertyData: data,
       validationResults: new ValidationResults([]),
     };
     shallowMountBeforeEach(testProps);
@@ -356,7 +356,7 @@ describe('EnumProperty', () => {
       });
 
       it('should have the correct value', () => {
-        expect(dropdown.props().modelValue).toEqual(undefined);
+        expect(dropdown.props().modelValue).toEqual(data);
       });
     });
   });

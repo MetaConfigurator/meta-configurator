@@ -14,6 +14,7 @@ import {registerIcons} from '@/fontawesome';
 import VueCookies from 'vue-cookies';
 
 import cookiesHandler from '@/cookies/cookiesHandler';
+import {registerDefaultDataFormats} from '@/formats/defaultFormats';
 
 // @ts-ignore
 const app = createApp(FileEditorView);
@@ -32,6 +33,7 @@ export const errorService = new ErrorService(app.config.globalProperties.$toast)
 app.config.errorHandler = (error: unknown) => errorService.onError(error);
 
 registerIcons();
+registerDefaultDataFormats();
 
 // warn the user if he closes the app
 window.addEventListener('beforeunload', event => {

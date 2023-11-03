@@ -13,6 +13,9 @@ export default mergeConfig(
       transformMode: {
         web: [/\.[jt]sx$/],
       },
+      coverage: {
+        provider: 'c8',
+      },
     },
   })
 );
