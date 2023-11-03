@@ -1,14 +1,9 @@
 import {describe, expect, it, vi} from 'vitest';
-import {DataConverterYaml} from '../dataConverter';
+import {DataConverterJson, DataConverterYaml} from '../dataConverter';
 
-// Test for the DataConverter super class
-// We do not test the concrete implementations here, as they just use the methods from the libraries,
-// which should be tested by the library itself.
-// We use the DataConverterYaml as an example here to test the super class methods.
-
-const dataConverter = new DataConverterYaml();
-
+// Basic test for DataConverterYaml and methods of the abstract superclass
 describe('DataConverter', () => {
+  const dataConverter = new DataConverterYaml();
   it('should parse data', () => {
     const data = `key: value`;
     expect(dataConverter.parse(data)).toEqual({key: 'value'});
@@ -34,5 +29,23 @@ describe('DataConverter', () => {
     const callback = vi.fn();
     dataConverter.parseIfValid(data, callback);
     expect(callback).not.toHaveBeenCalled();
+  });
+});
+
+// Small test for the concrete JSON implementation
+describe('DataConverterJson', () => {
+  const dataConverter = new DataConverterJson();
+
+  it('should parse data', () => {
+    const data = `{"key": "value"}`;
+    expect(dataConverter.parse(data)).toEqual({key: 'value'});
+  });
+  it('should stringify data', () => {
+    const data = {key: 'value'};
+    expect(dataConverter.stringify(data)).toContain(`"key": "value"`);
+  });
+  it('should handle undefined', () => {
+    const data = undefined;
+    expect(dataConverter.stringify(data)).toEqual('');
   });
 });

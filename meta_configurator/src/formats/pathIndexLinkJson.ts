@@ -13,14 +13,12 @@ import {errorService} from '@/main';
 
 export class PathIndexLinkJson implements PathIndexLink {
   determineIndexOfPath(editorContent: string, currentPath: Path): number {
-    console.log('determineIndexOfPath', currentPath);
     if (editorContent.length === 0) {
       return 0;
     }
     try {
       const cst: CstDocument = parse(editorContent);
       const index = this.determineIndexStep(cst.root, currentPath);
-      console.log('determineIndexOfPath result', index);
       return index;
     } catch (e) {
       errorService.onError(e);
@@ -149,10 +147,6 @@ export class PathIndexLinkJson implements PathIndexLink {
       return undefined;
     }
     const childPath = this.determinePathStep(currentNode.valueNode, targetCharacter);
-    let resultPath: Path = [];
-    if (childPath !== undefined) {
-      resultPath = resultPath.concat(childPath);
-    }
-    return resultPath;
+    return childPath ?? [];
   }
 }
