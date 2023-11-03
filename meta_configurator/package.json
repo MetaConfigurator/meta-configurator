@@ -13,6 +13,7 @@
     "lint": "npm run lint:ts && npm run lint:ls",
     "prettier": "prettier --write src/ --ignore-path .eslintignore",
     "test": "vitest",
+    "test:cov": "vitest --coverage",
     "preview": "vite preview",
     "prepare": "cd ../.. && husky install .husky",
     "precommit": "pretty-quick --staged"
