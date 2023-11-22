@@ -1,6 +1,6 @@
 import {shallowMount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, test, vi} from 'vitest';
-import {ValidationResults} from '@/utility/validationService';
+import {ValidationResult} from '../../../../schema/validation/validationService';
 import NumberProperty from '../NumberProperty.vue';
 import InputNumber from 'primevue/inputnumber';
 import {JsonSchema} from '@/schema/jsonSchema';
@@ -32,7 +32,7 @@ describe('NumberProperty', () => {
       const props = {
         propertyName: 'foo',
         propertyData: data,
-        validationResults: new ValidationResults([]),
+        validationResults: new ValidationResult([]),
         propertySchema: new JsonSchema({
           type: 'integer',
         }),
@@ -57,7 +57,7 @@ describe('NumberProperty', () => {
       const props = {
         propertyName: 'foo',
         propertyData: data,
-        validationResults: new ValidationResults([]),
+        validationResults: new ValidationResult([]),
         propertySchema: new JsonSchema({
           type: 'number',
           multipleOf: 0.5,
@@ -82,7 +82,7 @@ describe('NumberProperty', () => {
     shallowMountBeforeEach({
       propertyName: 'foo',
       propertyData: 1,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
       propertySchema: new JsonSchema({
         type: 'integer',
       }),

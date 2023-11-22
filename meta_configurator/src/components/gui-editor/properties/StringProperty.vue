@@ -5,13 +5,13 @@ import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import type {JsonSchema} from '@/schema/jsonSchema';
-import {ValidationResults} from '@/utility/validationService';
+import {ValidationResult} from '@/schema/validation/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: string | undefined;
   propertySchema: JsonSchema;
-  validationResults: ValidationResults;
+  validationResults: ValidationResult;
 }>();
 
 const emit = defineEmits<{

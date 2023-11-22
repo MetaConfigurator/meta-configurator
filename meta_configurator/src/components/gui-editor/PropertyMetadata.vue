@@ -8,7 +8,7 @@ import {useSettingsStore} from '@/store/settingsStore';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/jsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
-import type {ValidationResults} from '@/utility/validationService';
+import type {ValidationResult} from '@/schema/validation/validationService';
 import {pathToString} from '@/utility/pathUtils';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import 'primeicons/primeicons.css';
@@ -18,7 +18,7 @@ const props = defineProps<{
   node: GuiEditorTreeNode;
   type: ConfigDataTreeNodeType;
   highlighted: boolean;
-  validationResults: ValidationResults;
+  validationResults: ValidationResult;
 }>();
 
 const emit = defineEmits<{

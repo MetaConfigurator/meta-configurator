@@ -18,8 +18,7 @@ export class PathIndexLinkJson implements PathIndexLink {
     }
     try {
       const cst: CstDocument = parse(editorContent);
-      const index = this.determineIndexStep(cst.root, currentPath);
-      return index;
+      return this.determineIndexStep(cst.root, currentPath);
     } catch (e) {
       errorService.onError(e);
       return 0;

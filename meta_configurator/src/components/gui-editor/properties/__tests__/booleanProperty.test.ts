@@ -1,6 +1,6 @@
 import {shallowMount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, test, vi} from 'vitest';
-import {ValidationResults} from '@/utility/validationService';
+import {ValidationResult} from '../../../../schema/validation/validationService';
 import BooleanProperty from '../BooleanProperty.vue';
 import SelectButton from 'primevue/selectbutton';
 
@@ -33,7 +33,7 @@ describe('BooleanProperty', () => {
     shallowMountBeforeEach({
       propertyName: 'foo',
       propertyData: data,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
     });
 
     it('should correctly setup the select button', () => {

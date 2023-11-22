@@ -14,6 +14,7 @@ import _ from 'lodash';
 import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
+import {useCurrentDataLink} from '@/data/useDataLink';
 
 interface TreeNodeResolvingParameters {
   absolutePath: Path;
@@ -80,7 +81,7 @@ export class ConfigTreeNodeResolver {
         return true; // no user selection -> leaf node
       }
     }
-    const data = useSessionStore().dataAtPath(absolutePath);
+    const data = useCurrentDataLink().dataAt(absolutePath);
 
     return (
       (!dependsOnUserSelection && data && typeof data !== 'object') || // primitive type in data
@@ -106,7 +107,7 @@ export class ConfigTreeNodeResolver {
     }
     const effectiveSchema = calculateEffectiveSchema(
       guiEditorTreeNode.data.schema,
-      useSessionStore().dataAtPath(guiEditorTreeNode.data.absolutePath),
+      useCurrentDataLink().dataAt(guiEditorTreeNode.data.absolutePath),
       guiEditorTreeNode.data.absolutePath
     );
 
@@ -182,7 +183,7 @@ export class ConfigTreeNodeResolver {
       result.push(advanced);
     }
 
-    const data = useSessionStore().dataAtPath(parameters.absolutePath);
+    const data = useCurrentDataLink().dataAt(parameters.absolutePath);
     if (this.shouldAddAddPropertyNode(parameters.schema, data)) {
       return result.concat(this.createAddPropertyTreeNode(parameters));
     }
@@ -316,7 +317,7 @@ export class ConfigTreeNodeResolver {
     {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters,
     filter: (key: string) => boolean = () => true
   ) {
-    const data = useSessionStore().dataAtPath(absolutePath);
+    const data = useCurrentDataLink().dataAt(absolutePath);
     if (!data) {
       return [];
     }
@@ -367,7 +368,7 @@ export class ConfigTreeNodeResolver {
     schema,
     depth,
   }: TreeNodeResolvingParameters) {
-    const data = useSessionStore().dataAtPath(absolutePath);
+    const data = useCurrentDataLink().dataAt(absolutePath);
     let children: GuiEditorTreeNode[] = [];
     if (Array.isArray(data)) {
       children = data.map((value: any, index: number) => {

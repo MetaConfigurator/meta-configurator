@@ -1,7 +1,7 @@
-import {useDataStore} from '@/store/dataStore';
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import {toastService} from '@/utility/toastService';
 import {confirmationService} from '@/utility/confirmationService';
+import {useDataSource} from '@/data/dataSource';
 
 /**
  * Presents a confirmation dialog to the user and clears the schema if the user confirms.
@@ -30,8 +30,7 @@ export function newEmptySchemaFile(message: string | undefined = undefined): voi
   });
 }
 function clearSchema() {
-  useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-  useDataStore().schemaData = {};
+  useDataSource().userSchemaData.value = {};
   useSessionStore().updateCurrentPath([]);
   useSessionStore().updateCurrentSelectedElement([]);
 }

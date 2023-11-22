@@ -4,7 +4,7 @@ List dropdown for enum properties, also used for properties with multiple exampl
 <script setup lang="ts">
 import {computed} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import type {ValidationResults} from '@/utility/validationService';
+import type {ValidationResult} from '@/schema/validation/validationService';
 import _ from 'lodash';
 import {dataToString} from '@/utility/dataToString';
 
@@ -12,7 +12,7 @@ const props = defineProps<{
   propertyName: string;
   possibleValues: Array<any>;
   propertyData: any | undefined;
-  validationResults: ValidationResults;
+  validationResults: ValidationResult;
 }>();
 
 const emit = defineEmits<{

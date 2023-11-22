@@ -1,6 +1,6 @@
 import {shallowMount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {ValidationResults} from '@/utility/validationService';
+import {ValidationResult} from '../../../../schema/validation/validationService';
 import {JsonSchema} from '@/schema/jsonSchema';
 import StringProperty from '../StringProperty.vue';
 import InputText from 'primevue/inputtext';
@@ -30,7 +30,7 @@ describe('StringProperty', () => {
     shallowMountBeforeEach({
       propertyName: 'foo',
       propertyData: 'bar',
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
       propertySchema: new JsonSchema({
         type: 'string',
       }),
@@ -64,7 +64,7 @@ describe('StringProperty', () => {
     shallowMountBeforeEach({
       propertyName: 'foo',
       propertyData: 1,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
       propertySchema: new JsonSchema({
         type: 'number',
       }),
@@ -79,7 +79,7 @@ describe('StringProperty', () => {
     shallowMountBeforeEach({
       propertyName: 'foo',
       propertyData: {},
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
       propertySchema: new JsonSchema({
         type: 'object',
       }),
@@ -94,7 +94,7 @@ describe('StringProperty', () => {
     shallowMountBeforeEach({
       propertyName: 'foo',
       propertyData: [],
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
       propertySchema: new JsonSchema({
         type: 'array',
       }),
@@ -109,7 +109,7 @@ describe('StringProperty', () => {
     shallowMountBeforeEach({
       propertyName: 'foo',
       propertyData: null,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
       propertySchema: new JsonSchema({
         type: 'null',
       }),
@@ -124,7 +124,7 @@ describe('StringProperty', () => {
     shallowMountBeforeEach({
       propertyName: 'foo',
       propertyData: undefined,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
       propertySchema: new JsonSchema({}),
     });
 

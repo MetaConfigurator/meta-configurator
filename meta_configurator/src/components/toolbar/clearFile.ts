@@ -1,8 +1,8 @@
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import {toastService} from '@/utility/toastService';
 import {confirmationService} from '@/utility/confirmationService';
-import {useDataStore} from '@/store/dataStore';
 import _ from 'lodash';
+import {useCurrentDataLink} from '@/data/useDataLink';
 
 /**
  * Presents a confirmation dialog to the user and clears the file if the user confirms.
@@ -10,7 +10,7 @@ import _ from 'lodash';
  *   confirmation.
  */
 export function newEmptyFile(message: string | undefined = undefined): void {
-  if (_.isEmpty(useDataStore().fileData)) {
+  if (_.isEmpty(useCurrentDataLink().data.value)) {
     // file already is empty -> no need for clearing
     return;
   }
@@ -35,8 +35,7 @@ export function newEmptyFile(message: string | undefined = undefined): void {
   });
 }
 function clearFile() {
-  useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-  useDataStore().fileData = {};
+  useCurrentDataLink().setData({});
   useSessionStore().updateCurrentPath([]);
   useSessionStore().updateCurrentSelectedElement([]);
 }

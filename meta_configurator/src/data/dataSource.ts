@@ -1,15 +1,21 @@
-import {ref} from 'vue';
+import {shallowRef} from 'vue';
 import {defaultSettingsData} from '@/settings/defaultSettingsData';
+import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
+import {SETTINGS_SCHEMA} from '@/example-schemas/settingsSchema';
 
 const dataSource = {
   // data of the file editor
-  userData: ref<any>({}), // TODO use shallowRef
+  userData: shallowRef<any>({}), // TODO use shallowRef
   // data of the schema editor, used as the schema for the file editor
-  userSchemaData: ref<any>({
+  userSchemaData: shallowRef<any>({
     title: 'No schema loaded',
   }),
+  // meta schema of the schema editor
+  metaSchemaData: shallowRef<any>(simplifiedMetaSchema), // TODO use shallowRef
   // data of the settings editor
-  settingsData: ref<any>(defaultSettingsData), // TODO add settings type
+  settingsData: shallowRef<any>(defaultSettingsData), // TODO add settings type
+  // settings schema of the settings editor
+  settingsSchemaData: shallowRef<any>(SETTINGS_SCHEMA), // TODO add settings schema type
 };
 
 /**
