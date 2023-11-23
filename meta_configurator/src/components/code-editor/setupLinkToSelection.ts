@@ -6,6 +6,7 @@ import {watchArray} from '@vueuse/core';
 import _ from 'lodash';
 import {determinePath, updateCursorPositionBasedOnPath} from '@/components/code-editor/aceUtility';
 
+// variables to prevent updating functions to trigger each other
 let selectionChangeFromOutside = false;
 let selectionChangeFromInside = false;
 
@@ -22,6 +23,7 @@ export function setupLinkToCurrentSelection(editor: Editor) {
 function setupCursorPositionToSelectedPath(editor: Editor) {
   editor.on('changeSelection', () => {
     if (selectionChangeFromOutside) {
+      selectionChangeFromOutside = false;
       // we do not need to consider the event and send updates if the selection was forced from outside
       return;
     }
@@ -56,7 +58,6 @@ function setupSelectedPathToCursorPosition(editor: Editor) {
       }
       selectionChangeFromOutside = true;
       updateCursorPositionBasedOnPath(editor, newSelectedElement);
-      selectionChangeFromOutside = false;
     }
   );
 }

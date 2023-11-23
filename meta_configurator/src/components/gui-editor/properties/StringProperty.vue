@@ -1,6 +1,6 @@
 <!-- Text input for string properties -->
 <script setup lang="ts">
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
@@ -32,6 +32,13 @@ const polishedPropertyData = computed(() => {
 // only when the user is done editing and not on every keystroke
 const newPropertyData = ref(props.propertyData);
 
+// update the newPropertyData reference when the props change
+watch(polishedPropertyData, setNewPropertyData);
+
+function setNewPropertyData(newValue: string) {
+  newPropertyData.value = newValue;
+}
+
 function updateValue() {
   emit('update:propertyData', newPropertyData.value);
 }
@@ -42,7 +49,7 @@ function updateValue() {
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     class="h-8 tableInput"
     :model-value="polishedPropertyData"
-    @update:model-value="(value: any) => (newPropertyData = value)"
+    @update:model-value="setNewPropertyData"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     @blur="updateValue"
     @keydown.stop
@@ -54,6 +61,7 @@ function updateValue() {
 .tableInput {
   border: none;
 }
+
 ::placeholder {
   color: #a8a8a8;
 }

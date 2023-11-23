@@ -58,6 +58,22 @@ describe('StringProperty', () => {
       await wrapper.vm.$nextTick();
       expect(wrapper.emitted('update:propertyData')).toEqual([['baz']]);
     });
+
+    it('should correctly respond to external changes', async () => {
+      await wrapper.setProps({
+        propertyName: 'foo',
+        propertyData: 'newData',
+        validationResults: new ValidationResult([]),
+        propertySchema: new JsonSchema({
+          type: 'string',
+        }),
+      });
+      expect(inputField.props().modelValue).toBe('newData');
+      expect(wrapper.emitted()).toEqual({});
+      inputField.trigger('keyup', {key: 'Enter'});
+      await wrapper.vm.$nextTick();
+      expect(wrapper.emitted('update:propertyData')).toEqual([['newData']]);
+    });
   });
 
   describe('with number data', () => {
