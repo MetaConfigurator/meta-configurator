@@ -2,7 +2,7 @@ import type {Editor} from 'brace';
 import {useSessionStore} from '@/store/sessionStore';
 import {useDataConverter} from '@/formats/formatRegistry';
 import type {Path} from '@/model/path';
-import {watchArray} from '@vueuse/core';
+import {useDebounceFn, watchArray} from '@vueuse/core';
 import _ from 'lodash';
 import {determinePath, updateCursorPositionBasedOnPath} from '@/components/code-editor/aceUtility';
 
@@ -21,27 +21,30 @@ export function setupLinkToCurrentSelection(editor: Editor) {
  * @param editor the ace editor
  */
 function setupCursorPositionToSelectedPath(editor: Editor) {
-  editor.on('changeSelection', () => {
-    if (selectionChangeFromOutside) {
-      selectionChangeFromOutside = false;
-      // we do not need to consider the event and send updates if the selection was forced from outside
-      return;
-    }
-    if (!useDataConverter().isValidSyntax(editor.getValue())) {
-      // do not attempt to determine the path when the text does not have valid syntax
-      return;
-    }
-    try {
-      const newPath = determinePath(editor);
-      const sessionStore = useSessionStore();
-      if (!_.isEqual(sessionStore.currentSelectedElement, newPath)) {
-        selectionChangeFromInside = true;
-        sessionStore.currentSelectedElement = newPath;
+  editor.on(
+    'changeSelection',
+    useDebounceFn(() => {
+      if (selectionChangeFromOutside) {
+        selectionChangeFromOutside = false;
+        // we do not need to consider the event and send updates if the selection was forced from outside
+        return;
       }
-    } catch (e) {
-      /* empty */
-    }
-  });
+      if (!useDataConverter().isValidSyntax(editor.getValue())) {
+        // do not attempt to determine the path when the text does not have valid syntax
+        return;
+      }
+      try {
+        const newPath = determinePath(editor);
+        const sessionStore = useSessionStore();
+        if (!_.isEqual(sessionStore.currentSelectedElement, newPath)) {
+          selectionChangeFromInside = true;
+          sessionStore.currentSelectedElement = newPath;
+        }
+      } catch (e) {
+        /* empty */
+      }
+    }, 100)
+  );
 }
 
 /**
