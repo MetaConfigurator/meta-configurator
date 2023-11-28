@@ -1,7 +1,7 @@
 import {shallowMount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import EnumProperty from '@/components/gui-editor/properties/EnumProperty.vue';
-import {ValidationResults} from '@/utility/validationService';
+import {ValidationResult} from '../../../../schema/validation/validationService';
 import Dropdown from 'primevue/dropdown';
 
 // avoid constructing the session store through imports, it is not required for this component
@@ -34,7 +34,7 @@ describe('EnumProperty', () => {
       propertyName: 'testName',
       possibleValues: ['testValue1', 'testValue2'],
       propertyData: 'testValue1',
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
     };
     shallowMountBeforeEach(stringValuesProps);
 
@@ -103,7 +103,7 @@ describe('EnumProperty', () => {
       propertyName: 'testName',
       possibleValues: [1, 2],
       propertyData: 1,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
     };
     shallowMountBeforeEach(numberValuesProps);
 
@@ -151,7 +151,7 @@ describe('EnumProperty', () => {
       propertyName: 'testName',
       possibleValues: [true, false],
       propertyData: false,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
     };
     shallowMountBeforeEach(booleanValuesProps);
 
@@ -199,7 +199,7 @@ describe('EnumProperty', () => {
       propertyName: 'testName',
       possibleValues: [{firstName: 'testValue1'}, {firstName: 'testValue2'}],
       propertyData: {firstName: 'testValue1'},
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
     };
     shallowMountBeforeEach(objectValuesProps);
 
@@ -250,7 +250,7 @@ describe('EnumProperty', () => {
       propertyName: 'testName',
       possibleValues: [['testValue1'], ['testValue2', 'testValue3']],
       propertyData: ['testValue1'],
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
     };
     shallowMountBeforeEach(arrayValuesProps);
 
@@ -297,7 +297,7 @@ describe('EnumProperty', () => {
       propertyName: 'testName',
       possibleValues: [null],
       propertyData: null,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
     };
 
     beforeEach(() => {
@@ -342,7 +342,7 @@ describe('EnumProperty', () => {
       propertyName: 'testName',
       possibleValues: ['testValue1', 'testValue2'],
       propertyData: data,
-      validationResults: new ValidationResults([]),
+      validationResults: new ValidationResult([]),
     };
     shallowMountBeforeEach(testProps);
 

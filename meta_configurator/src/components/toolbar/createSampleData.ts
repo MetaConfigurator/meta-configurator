@@ -1,10 +1,10 @@
 import {JSONSchemaFaker} from 'json-schema-faker';
 import {confirmationService} from '@/utility/confirmationService';
 import {toastService} from '@/utility/toastService';
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {useDataStore} from '@/store/dataStore';
 import {errorService} from '@/main';
 import _ from 'lodash';
+import {useCurrentDataLink} from '@/data/useDataLink';
+import {useDataSource} from '@/data/dataSource';
 
 /**
  * Generates sample data for the given schema.
@@ -17,9 +17,8 @@ async function generateSampleData(schema: any): Promise<any> {
 }
 
 function generateSampleDataAndUseAsFileData() {
-  useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
-  generateSampleData(useDataStore().schemaData)
-    .then(data => (useDataStore().fileData = data))
+  generateSampleData(useDataSource().userSchemaData.value)
+    .then(data => (useDataSource().userSchemaData.value = data))
     .catch((error: Error) =>
       errorService.onError({
         message: 'Error generating sample data',
@@ -35,7 +34,7 @@ function generateSampleDataAndUseAsFileData() {
  *   confirmation.
  */
 function triggerDataGeneration(message: string | undefined = undefined): void {
-  if (!message || _.isEmpty(useDataStore().fileData)) {
+  if (!message || _.isEmpty(useCurrentDataLink().data.value)) {
     generateSampleDataAndUseAsFileData();
     return;
   }

@@ -11,19 +11,35 @@ import type {
 import {parse} from 'json-cst';
 import {errorService} from '@/main';
 
+/**
+ * Implementation of PathIndexLink for JSON data.
+ */
 export class PathIndexLinkJson implements PathIndexLink {
+  // cache the cst and the editor content to avoid parsing the same content multiple times
+  private _cst: CstDocument | null = null;
+  private _editorContent: string | null = null;
+
   determineIndexOfPath(editorContent: string, currentPath: Path): number {
     if (editorContent.length === 0) {
       return 0;
     }
     try {
-      const cst: CstDocument = parse(editorContent);
-      const index = this.determineIndexStep(cst.root, currentPath);
-      return index;
+      const cst = this.getCst(editorContent);
+      return this.determineIndexStep(cst.root, currentPath);
     } catch (e) {
       errorService.onError(e);
       return 0;
     }
+  }
+
+  private getCst(editorContent: string): CstDocument {
+    console.log('getCst');
+    if (this._editorContent !== editorContent || this._cst === null) {
+      console.log('parsing');
+      this._cst = parse(editorContent);
+      this._editorContent = editorContent;
+    }
+    return this._cst;
   }
 
   private determineIndexStep(currentNode: CstNode, currentPath: Path): number {
@@ -73,7 +89,7 @@ export class PathIndexLinkJson implements PathIndexLink {
   }
 
   determinePathFromIndex(editorContent: string, targetCharacter: number): Path {
-    const cst: CstDocument = parse(editorContent);
+    const cst = this.getCst(editorContent);
     return this.determinePathStep(cst.root, targetCharacter) || [];
   }
 

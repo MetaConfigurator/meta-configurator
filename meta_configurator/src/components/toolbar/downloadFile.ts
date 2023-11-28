@@ -1,12 +1,12 @@
-import {useSessionStore} from '@/store/sessionStore';
-import {useSettingsStore} from '@/store/settingsStore';
+import {useCurrentDataLink} from '@/data/useDataLink';
+import {useSettings} from '@/settings/useSettings';
 
 /**
  * Downloads the current config file as a JSON or YAML file.
  * @param fileNamePrefix The prefix for the filename
  */
 export function downloadFile(fileNamePrefix: string): void {
-  const configData: string = useSessionStore().editorContentUnparsed;
+  const configData: string = useCurrentDataLink().unparsedData.value;
 
   // Create a Blob object from the config string
   const blob: Blob = new Blob([configData], {type: 'application/json'});
@@ -22,7 +22,7 @@ export function downloadFile(fileNamePrefix: string): void {
     second: '2-digit',
   });
   const formattedDate = formatter.format(now);
-  const fileEnding = useSettingsStore().settingsData.dataFormat === 'yaml' ? 'yml' : 'json';
+  const fileEnding = useSettings().dataFormat === 'yaml' ? 'yml' : 'json';
   const fileName: string = `${fileNamePrefix}-${formattedDate}.${fileEnding}`;
 
   // Create a temporary link element

@@ -38,14 +38,14 @@ export class ValidationService {
     this._validationFunction = this._ajv.getSchema(this.topLevelSchemaId);
   }
 
-  public validate(data: any): ValidationResults {
+  public validate(data: any): ValidationResult {
     if (!this._validationFunction) {
       // schema could not be compiled because it was invalid
-      return new ValidationResults([]); // optimistic approach
+      return new ValidationResult([]); // optimistic approach
     }
     this._validationFunction(data);
     const errors = this._validationFunction.errors || [];
-    return new ValidationResults(errors);
+    return new ValidationResult(errors);
   }
 
   /**
@@ -56,7 +56,7 @@ export class ValidationService {
    * @param schema the sub schema
    * @param data the data to validate
    */
-  public validateSubSchema(schema: JsonSchemaObjectType, data: any): ValidationResults {
+  public validateSubSchema(schema: JsonSchemaObjectType, data: any): ValidationResult {
     const key = schema.$id || schema.id || undefined;
 
     if (key && this._ajv?.getSchema(key) === undefined) {
@@ -73,12 +73,12 @@ export class ValidationService {
     }
 
     if (!validationFunction) {
-      return new ValidationResults([]); // optimistic approach
+      return new ValidationResult([]); // optimistic approach
     }
 
     validationFunction(data);
     const errors = validationFunction.errors || [];
-    return new ValidationResults(errors);
+    return new ValidationResult(errors);
   }
 
   get topLevelSchemaId(): string {
@@ -229,7 +229,7 @@ export class ValidationService {
 /**
  * The result of a validation.
  */
-export class ValidationResults {
+export class ValidationResult {
   valid: boolean;
   errors: Array<ErrorObject>;
 
@@ -243,10 +243,10 @@ export class ValidationResults {
    * @param path the path
    * @returns the filtered errors
    */
-  public filterForPath(path: Path): ValidationResults {
+  public filterForPath(path: Path): ValidationResult {
     const jsonPointer = pathToJsonPointer(path);
     const filteredErrors = this.errors.filter(error => error.instancePath.startsWith(jsonPointer));
-    return new ValidationResults(filteredErrors);
+    return new ValidationResult(filteredErrors);
   }
 
   /**
@@ -254,10 +254,10 @@ export class ValidationResults {
    * @param  path the path
    * @returns the filtered errors
    */
-  public filterForExactPath(path: Path): ValidationResults {
+  public filterForExactPath(path: Path): ValidationResult {
     const jsonPointer = pathToJsonPointer(path);
     const filteredErrors = this.errors.filter(error => error.instancePath == jsonPointer);
-    return new ValidationResults(filteredErrors);
+    return new ValidationResult(filteredErrors);
   }
 
   public isValidAtPath(path: Path): boolean {

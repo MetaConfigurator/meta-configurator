@@ -6,12 +6,12 @@ They are represented as a select button with two options: true and false.
 import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/model/path';
-import type {ValidationResults} from '@/utility/validationService';
+import type {ValidationResult} from '@/schema/validation/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: boolean | undefined;
-  validationResults: ValidationResults;
+  validationResults: ValidationResult;
 }>();
 
 const emit = defineEmits<{

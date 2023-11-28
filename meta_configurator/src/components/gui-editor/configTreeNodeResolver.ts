@@ -6,7 +6,6 @@ import type {
 } from '@/model/configDataTreeNode';
 import {TreeNodeType} from '@/model/configDataTreeNode';
 import type {Path} from '@/model/path';
-import {useSettingsStore} from '@/store/settingsStore';
 import {pathToString} from '@/utility/pathUtils';
 import {PropertySorting} from '@/model/settingsTypes';
 import {useSessionStore} from '@/store/sessionStore';
@@ -14,6 +13,8 @@ import _ from 'lodash';
 import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
+import {useCurrentDataLink} from '@/data/useDataLink';
+import {useSettings} from '@/settings/useSettings';
 
 interface TreeNodeResolvingParameters {
   absolutePath: Path;
@@ -80,12 +81,12 @@ export class ConfigTreeNodeResolver {
         return true; // no user selection -> leaf node
       }
     }
-    const data = useSessionStore().dataAtPath(absolutePath);
+    const data = useCurrentDataLink().dataAt(absolutePath);
 
     return (
       (!dependsOnUserSelection && data && typeof data !== 'object') || // primitive type in data
       (!schema.hasType('object') && !schema.hasType('array')) || // primitive type in schema
-      depth >= useSettingsStore().settingsData.guiEditor.maximumDepth // maximum depth reached
+      depth >= useSettings().guiEditor.maximumDepth // maximum depth reached
     );
   }
 
@@ -106,7 +107,7 @@ export class ConfigTreeNodeResolver {
     }
     const effectiveSchema = calculateEffectiveSchema(
       guiEditorTreeNode.data.schema,
-      useSessionStore().dataAtPath(guiEditorTreeNode.data.absolutePath),
+      useCurrentDataLink().dataAt(guiEditorTreeNode.data.absolutePath),
       guiEditorTreeNode.data.absolutePath
     );
 
@@ -125,7 +126,7 @@ export class ConfigTreeNodeResolver {
     effectiveSchema: EffectiveSchema,
     depth = 0
   ): GuiEditorTreeNode[] {
-    const depthLimit = useSettingsStore().settingsData.guiEditor.maximumDepth;
+    const depthLimit = useSettings().guiEditor.maximumDepth;
     const schema = effectiveSchema.schema;
 
     let children: GuiEditorTreeNode[] = [];
@@ -162,7 +163,7 @@ export class ConfigTreeNodeResolver {
    * in the settings.
    */
   private createObjectChildrenTreeNodes(parameters: TreeNodeResolvingParameters) {
-    const propertySorting = useSettingsStore().settingsData.guiEditor.propertySorting;
+    const propertySorting = useSettings().guiEditor.propertySorting;
     let result: GuiEditorTreeNode[] = [];
 
     if (propertySorting === PropertySorting.SCHEMA_ORDER) {
@@ -182,7 +183,7 @@ export class ConfigTreeNodeResolver {
       result.push(advanced);
     }
 
-    const data = useSessionStore().dataAtPath(parameters.absolutePath);
+    const data = useCurrentDataLink().dataAt(parameters.absolutePath);
     if (this.shouldAddAddPropertyNode(parameters.schema, data)) {
       return result.concat(this.createAddPropertyTreeNode(parameters));
     }
@@ -316,7 +317,7 @@ export class ConfigTreeNodeResolver {
     {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters,
     filter: (key: string) => boolean = () => true
   ) {
-    const data = useSessionStore().dataAtPath(absolutePath);
+    const data = useCurrentDataLink().dataAt(absolutePath);
     if (!data) {
       return [];
     }
@@ -367,7 +368,7 @@ export class ConfigTreeNodeResolver {
     schema,
     depth,
   }: TreeNodeResolvingParameters) {
-    const data = useSessionStore().dataAtPath(absolutePath);
+    const data = useCurrentDataLink().dataAt(absolutePath);
     let children: GuiEditorTreeNode[] = [];
     if (Array.isArray(data)) {
       children = data.map((value: any, index: number) => {

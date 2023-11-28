@@ -5,14 +5,14 @@ import {computed} from 'vue';
 import type {PathElement} from '@/model/path';
 import {JsonSchema} from '@/schema/jsonSchema';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
-import {ValidationResults} from '@/utility/validationService';
+import {ValidationResult} from '@/schema/validation/validationService';
 import {GuiConstants} from '@/constants';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: number | undefined;
   propertySchema: JsonSchema;
-  validationResults: ValidationResults;
+  validationResults: ValidationResult;
 }>();
 
 const emit = defineEmits<{
