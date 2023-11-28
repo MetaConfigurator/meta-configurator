@@ -1,7 +1,6 @@
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
 import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
-import {useDataStore} from '@/store/dataStore';
 import {openClearFileDialog} from '@/components/toolbar/clearFile';
 import {openClearSchemaDialog} from '@/components/toolbar/clearSchema';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
@@ -58,7 +57,7 @@ export class MenuItems {
       {
         label: 'Download File',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile(useDataStore().schema.title ?? 'file'),
+        command: () => downloadFile(useCurrentDataLink().schema.title ?? 'file'),
       },
       {
         separator: true,
@@ -135,7 +134,7 @@ export class MenuItems {
       {
         label: 'Download Schema',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile('schema_' + useDataStore().schema.title ?? 'untitled'),
+        command: () => downloadFile('schema_' + useCurrentDataLink().schema.title ?? 'untitled'),
       },
       {
         separator: true,

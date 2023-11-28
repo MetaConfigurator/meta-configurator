@@ -13,7 +13,6 @@ import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import {watchImmediate} from '@vueuse/core';
-import {useSettingsStore} from '@/store/settingsStore';
 import {setupAnnotationsFromValidationErrors} from '@/components/code-editor/setupAnnotations';
 import {setupLinkToCurrentSelection} from '@/components/code-editor/setupLinkToSelection';
 import {useSettings} from '@/settings/useSettings';
@@ -58,7 +57,7 @@ function setupAceProperties(editor: Editor) {
   // ace editor starts flashing and becomes unusable
   window.setTimeout(() => {
     watchImmediate(
-      () => useSettingsStore().settingsData.codeEditor.fontSize,
+      () => useSettings().codeEditor.fontSize,
       fontSize => {
         if (editor && fontSize && fontSize > 6 && fontSize < 65) {
           editor.setFontSize(fontSize.toString() + 'px');

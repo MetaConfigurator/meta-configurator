@@ -4,7 +4,6 @@
 import type {ConfigDataTreeNodeType, GuiEditorTreeNode} from '@/model/configDataTreeNode';
 import {TreeNodeType} from '@/model/configDataTreeNode';
 import type {Path, PathElement} from '@/model/path';
-import {useSettingsStore} from '@/store/settingsStore';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/model/jsonSchemaType';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
@@ -13,6 +12,7 @@ import {pathToString} from '@/utility/pathUtils';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import 'primeicons/primeicons.css';
 import {focus, makeEditableAndSelectContents} from '@/utility/focusUtils';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -66,8 +66,7 @@ function isDeprecated(): boolean {
  * depending on if the maximum depth has been reached or not.
  */
 function onPressEnter() {
-  const settingsStore = useSettingsStore();
-  if (props.node.data.depth === settingsStore.settingsData.guiEditor.maximumDepth) {
+  if (props.node.data.depth === useSettings().guiEditor.maximumDepth) {
     zoomIntoPath();
     return;
   }

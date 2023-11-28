@@ -120,7 +120,7 @@ export const useSessionStore = defineStore('sessionStore', () => {
   });
 
   /**
-   * Update the validation service when the page changes.
+   * Reset the current selected element and expanded elements when the mode changes.
    */
   watch(
     currentMode,
@@ -159,7 +159,6 @@ export const useSessionStore = defineStore('sessionStore', () => {
       const schema = currentEffectiveSchema.schema.subSchema(key);
 
       if (schema?.oneOf) {
-        // TODO not working yet
         const oneOfSelection = currentSelectedOneOfOptions.value.get(pathToString(currentPath));
         if (oneOfSelection !== undefined) {
           currentEffectiveSchema = calculateEffectiveSchema(
@@ -167,6 +166,7 @@ export const useSessionStore = defineStore('sessionStore', () => {
             useCurrentDataLink().dataAt(currentPath),
             currentPath
           );
+          continue;
         }
       }
 
