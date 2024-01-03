@@ -1,5 +1,5 @@
 import {schemaCollection} from '@/example-schemas/schemaCollection';
-import {newEmptyFile} from '@/components/toolbar/clearFile';
+import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
 import {errorService} from '@/main';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
@@ -14,7 +14,7 @@ export function loadExampleSchema(schemaKey: string): void {
     const schemaName = selectedSchema.label || 'Unknown Schema';
     useDataSource().userSchemaData.value = selectedSchema?.schema;
 
-    newEmptyFile('Do you also want to clear the current config file?');
+    openClearFileEditorDialog();
 
     const toast = toastService;
     if (toast) {

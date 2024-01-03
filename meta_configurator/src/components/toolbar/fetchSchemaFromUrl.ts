@@ -1,4 +1,4 @@
-import {newEmptyFile} from '@/components/toolbar/clearFile';
+import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
 
@@ -10,7 +10,8 @@ export async function fetchSchemaFromUrl(schemaURL: string): Promise<void> {
   const schemaContent = await response.json();
   const schemaName = schemaContent.title || 'Unknown Schema';
   useDataSource().userSchemaData.value = schemaContent;
-  newEmptyFile('Do you also want to clear the current file in the FileEditor?');
+
+  openClearFileEditorDialog();
 
   if (toastService) {
     toastService.add({

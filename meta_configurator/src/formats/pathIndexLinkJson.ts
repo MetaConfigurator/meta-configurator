@@ -33,9 +33,7 @@ export class PathIndexLinkJson implements PathIndexLink {
   }
 
   private getCst(editorContent: string): CstDocument {
-    console.log('getCst');
     if (this._editorContent !== editorContent || this._cst === null) {
-      console.log('parsing');
       this._cst = parse(editorContent);
       this._editorContent = editorContent;
     }

@@ -1,6 +1,8 @@
 import {useFileDialog} from '@vueuse/core';
 import {readFileContentToDataLink} from '@/utility/readFileContent';
 import type {DataLink} from '@/data/dataLink';
+import {getDataLinkForMode} from '@/data/useDataLink';
+import {SessionMode} from '@/store/sessionStore';
 
 /**
  * Opens a file dialog to select a file to upload.
@@ -15,4 +17,11 @@ export function openUploadFileDialog(resultDataLink: DataLink): void {
   });
 
   open();
+}
+
+/**
+ * Opens a file dialog to select a file to upload.
+ */
+export function openUploadSchemaDialog(): void {
+  return openUploadFileDialog(getDataLinkForMode(SessionMode.SchemaEditor));
 }

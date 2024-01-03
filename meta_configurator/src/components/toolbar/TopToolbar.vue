@@ -9,7 +9,6 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
 import {schemaCollection} from '@/example-schemas/schemaCollection';
-import {newEmptyFile} from '@/components/toolbar/clearFile';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
@@ -25,7 +24,9 @@ import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
 import type {SchemaOption} from '@/model/schemaOption';
-import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
+
+import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
+import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -147,7 +148,7 @@ watch(selectedSchema, async newSelectedSchema => {
       await fetchSchemaFromUrl(newSelectedSchema.url);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to clear the current contents of the File Editor?');
+      openClearFileEditorDialog();
     } catch (error) {
       errorService.onError(error);
     }
@@ -156,7 +157,7 @@ watch(selectedSchema, async newSelectedSchema => {
       loadExampleSchema(newSelectedSchema.key);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to clear the current contents of the File Editor?');
+      openClearFileEditorDialog();
     } catch (error) {
       errorService.onError(error);
     }

@@ -1,13 +1,12 @@
-import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
-import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
+import {openUploadFileDialog, openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
-import {openClearFileDialog} from '@/components/toolbar/clearFile';
-import {openClearSchemaDialog} from '@/components/toolbar/clearSchema';
+import {openClearCurrentFileDialog, openClearSchemaDialog} from '@/components/toolbar/clearFile';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
 import type {SchemaOption} from '@/model/schemaOption';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 import {getDataLinkForMode, useCurrentDataLink} from '@/data/useDataLink';
+import {useDataSource} from '@/data/dataSource';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -39,7 +38,7 @@ export class MenuItems {
           {
             label: 'New empty File',
             icon: 'fa-regular fa-file',
-            command: openClearFileDialog,
+            command: openClearCurrentFileDialog,
           },
           {
             label: 'Generate File...',
@@ -57,7 +56,7 @@ export class MenuItems {
       {
         label: 'Download File',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile(useCurrentDataLink().schema.title ?? 'file'),
+        command: () => downloadFile(useCurrentDataLink().schema.value.title ?? 'file'),
       },
       {
         separator: true,
@@ -134,7 +133,8 @@ export class MenuItems {
       {
         label: 'Download Schema',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile('schema_' + useCurrentDataLink().schema.title ?? 'untitled'),
+        command: () =>
+          downloadFile('schema_' + (useDataSource().userSchemaData.value.title ?? 'untitled')),
       },
       {
         separator: true,
