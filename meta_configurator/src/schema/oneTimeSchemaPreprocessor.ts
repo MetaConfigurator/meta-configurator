@@ -2,7 +2,7 @@ import type {
   JsonSchemaObjectType,
   JsonSchemaType,
   SchemaPropertyType,
-} from '@/model/JsonSchemaType';
+} from '@/model/jsonSchemaType';
 import _ from 'lodash';
 import 'crypto';
 

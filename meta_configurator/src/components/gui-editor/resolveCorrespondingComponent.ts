@@ -4,12 +4,14 @@ import StringProperty from '@/components/gui-editor/properties/StringProperty.vu
 import NumberProperty from '@/components/gui-editor/properties/NumberProperty.vue';
 import SimpleObjectProperty from '@/components/gui-editor/properties/SimpleObjectProperty.vue';
 import SimpleArrayProperty from '@/components/gui-editor/properties/SimpleArrayProperty.vue';
-import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
+import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/configDataTreeNode';
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
 import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfSelectionProperty.vue';
 import AnyOfSelectionProperty from '@/components/gui-editor/properties/AnyOfSelectionProperty.vue';
+import {useCurrentDataLink} from '@/data/useDataLink';
+import {useValidationResult} from '@/schema/validation/useValidation';
 
 /**
  * Resolves the corresponding component for a given node.
@@ -20,12 +22,12 @@ export function resolveCorrespondingComponent(
 ): VNode {
   const propsObject = {
     propertyName: nodeData.name,
-    propertyData: useSessionStore().dataAtPath(nodeData.absolutePath),
+    propertyData: useCurrentDataLink().dataAt(nodeData.absolutePath),
     propertySchema: nodeData.schema,
     parentSchema: nodeData.parentSchema,
     relativePath: nodeData.relativePath,
     absolutePath: nodeData.absolutePath,
-    validationResults: useSessionStore().dataValidationResults.filterForPath(nodeData.absolutePath),
+    validationResults: useValidationResult().filterForPath(nodeData.absolutePath),
     expanded: useSessionStore().isExpanded(nodeData.absolutePath),
   };
 

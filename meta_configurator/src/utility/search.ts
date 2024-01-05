@@ -1,12 +1,13 @@
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import {errorService} from '@/main';
 import type {MenuItem} from 'primevue/menuitem';
 import {pathToString} from '@/utility/pathUtils';
 import {dataToString} from '@/utility/dataToString';
 import _ from 'lodash';
 import {MAX_SEARCH_DEPTH} from '@/constants';
+import {useCurrentDataLink} from '@/data/useDataLink';
 
 /**
  * Searches for the given search term in the data and schema.
@@ -18,7 +19,7 @@ import {MAX_SEARCH_DEPTH} from '@/constants';
 export async function searchInDataAndSchema(searchTerm: string): Promise<SearchResult[]> {
   try {
     const result: SearchResult[] = [];
-    const data = useSessionStore().fileData;
+    const data = useCurrentDataLink().data.value;
     const schema: JsonSchema = useSessionStore().fileSchema;
     await searchInDataAndSchemaRecursive(data, schema, [], searchTerm, result);
     return result;

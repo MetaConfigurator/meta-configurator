@@ -3,37 +3,32 @@ import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/model/path';
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import {computed} from 'vue';
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
+import {useCurrentDataLink} from '@/data/useDataLink';
 
 const sessionStore = useSessionStore();
 
 function updatePath(newPath: Path) {
-  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
   sessionStore.currentPath = newPath;
 }
 
 function updateData(path: Path, newValue: any) {
-  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
-  sessionStore.updateDataAtPath(path, newValue);
+  useCurrentDataLink().setDataAt(path, newValue);
 }
 
 function removeProperty(path: Path) {
-  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
-  sessionStore.removeDataAtPath(path);
-  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
+  useCurrentDataLink().removeDataAt(path);
   sessionStore.currentSelectedElement = path;
 }
 
 function zoomIntoPath(pathToAdd: Path) {
-  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
   sessionStore.currentPath = sessionStore.currentPath.concat(pathToAdd);
   sessionStore.currentSelectedElement = sessionStore.currentPath;
 }
 
 function selectPath(path: Path) {
-  sessionStore.lastChangeResponsible = ChangeResponsible.GuiEditor;
   sessionStore.currentSelectedElement = path;
 }
 

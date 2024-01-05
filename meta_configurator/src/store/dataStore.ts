@@ -1,13 +1,14 @@
 import type {Ref} from 'vue';
 import {computed, ref} from 'vue';
 import {defineStore} from 'pinia';
-import {TopLevelJsonSchema} from '@/schema/TopLevelJsonSchema';
+import {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
 // @ts-ignore
 import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
-import type {JsonSchemaType} from '@/model/JsonSchemaType';
+import type {JsonSchemaType} from '@/model/jsonSchemaType';
+import {useDataSource} from '@/data/dataSource';
 
 /**
  * The store that contains the data of the current file and the current schema.
@@ -16,15 +17,12 @@ export const useDataStore = defineStore('dataStore', () => {
   /**
    * The configuration file that the user can modify
    */
-  const fileData = ref({});
+  const fileData = useDataSource().userData;
 
   /**
    * The json schema as a plain object
    */
-  const schemaData: Ref<JsonSchemaType> = ref({
-    title: 'No schema loaded',
-    description: 'Go to the schema editor to load a schema.',
-  });
+  const schemaData: Ref<JsonSchemaType> = useDataSource().userSchemaData;
 
   const schemaDataPreprocessed = computed(() => preprocessOneTime(schemaData.value));
 

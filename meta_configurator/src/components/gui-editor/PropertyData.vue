@@ -3,12 +3,12 @@ Wrapper component that contains the actual component that allows the user to edi
 The component is chosen based on the type of the property, see resolveCorrespondingComponent.
 -->
 <script setup lang="ts">
-import type {ConfigTreeNodeData} from '@/model/ConfigDataTreeNode';
+import type {ConfigTreeNodeData} from '@/model/configDataTreeNode';
 import type {Path} from '@/model/path';
 import {resolveCorrespondingComponent} from '@/components/gui-editor/resolveCorrespondingComponent';
 import {pathToString} from '@/utility/pathUtils';
 import Button from 'primevue/button';
-import {useSessionStore} from '@/store/sessionStore';
+import {useCurrentDataLink} from '@/data/useDataLink';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -36,7 +36,7 @@ function isRequired(): boolean {
 }
 
 function shouldShowRemove(): boolean {
-  return !isRequired() && useSessionStore().dataAtPath(props.nodeData.absolutePath) !== undefined;
+  return !isRequired() && useCurrentDataLink().dataAt(props.nodeData.absolutePath) !== undefined;
 }
 </script>
 

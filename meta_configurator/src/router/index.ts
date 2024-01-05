@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
+import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import {clearPreprocessedRefSchemaCache} from '@/schema/schemaPreprocessor';
 
 /**
@@ -49,7 +49,6 @@ router.beforeEach((to, from, next) => {
   // Update the page title based on the current route
   document.title = (to.meta.title || DEFAULT_TITLE) as string;
 
-  useSessionStore().lastChangeResponsible = ChangeResponsible.Routing;
   useSessionStore().currentMode = to.meta.sessionMode as SessionMode;
   useSessionStore().currentPath = [];
   useSessionStore().currentSelectedElement = [];
@@ -63,4 +62,6 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-export default router;
+export function useAppRouter() {
+  return router;
+}

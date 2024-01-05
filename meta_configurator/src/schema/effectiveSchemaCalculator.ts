@@ -1,8 +1,8 @@
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 import type {Path} from '@/model/path';
-import {useSessionStore} from '@/store/sessionStore';
-import {dataAt} from '@/utility/pathUtils';
 import _ from 'lodash';
+import {useValidationService} from '@/schema/validation/useValidation';
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 /**
  * Wrapper around a schema and the data it was calculated for.
@@ -82,7 +82,7 @@ function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
     return schemaWrapper;
   }
 
-  const validationService = useSessionStore().validationService;
+  const validationService = useValidationService();
   const valid = validationService.validateSubSchema(schemaWrapper.if.jsonSchema, data).valid;
 
   const baseSchema = {...schemaWrapper.jsonSchema};

@@ -1,14 +1,15 @@
-import {useSessionStore} from '@/store/sessionStore';
-import {useSettingsStore} from '@/store/settingsStore';
+import {useCurrentDataLink} from '@/data/useDataLink';
+import {useSettings} from '@/settings/useSettings';
 
 /**
  * Downloads the current config file as a JSON or YAML file.
+ * TODO consider using a library for this
  * @param fileNamePrefix The prefix for the filename
  */
 export function downloadFile(fileNamePrefix: string): void {
-  const configData: string = useSessionStore().editorContentUnparsed;
+  const configData: string = useCurrentDataLink().unparsedData.value;
 
-  // Create a Blob object from the config string
+  // TODO correct type depending on the data format
   const blob: Blob = new Blob([configData], {type: 'application/json'});
 
   // Generate a unique filename for the downloaded config
@@ -22,7 +23,7 @@ export function downloadFile(fileNamePrefix: string): void {
     second: '2-digit',
   });
   const formattedDate = formatter.format(now);
-  const fileEnding = useSettingsStore().settingsData.dataFormat === 'yaml' ? 'yml' : 'json';
+  const fileEnding = useSettings().dataFormat === 'yaml' ? 'yml' : 'json';
   const fileName: string = `${fileNamePrefix}-${formattedDate}.${fileEnding}`;
 
   // Create a temporary link element

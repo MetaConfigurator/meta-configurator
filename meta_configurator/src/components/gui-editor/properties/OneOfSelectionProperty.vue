@@ -3,14 +3,15 @@
 import type {WritableComputedRef} from 'vue';
 import {computed, onMounted} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import type {JsonSchema} from '@/schema/JsonSchema';
+import type {JsonSchema} from '@/schema/jsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
 import type {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/utility/pathUtils';
-import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/OneOfAnyOfSelectionOption';
-import type {JsonSchemaType} from '@/model/JsonSchemaType';
+import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/oneOfAnyOfSelectionOption';
+import type {JsonSchemaType} from '@/model/jsonSchemaType';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import _ from 'lodash';
+import {useValidationService} from '@/schema/validation/useValidation';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -76,7 +77,7 @@ function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | 
 
 function inferOneOfUserSelection() {
   const pathAsString = pathToString(props.absolutePath);
-  const validationService = useSessionStore().validationService;
+  const validationService = useValidationService();
 
   if (useSessionStore().currentSelectedOneOfOptions.has(pathAsString)) {
     return;
@@ -87,7 +88,7 @@ function inferOneOfUserSelection() {
   let index = 0;
   for (const subSchema of props.propertySchema.oneOf) {
     const validationResult = validationService.validateSubSchema(
-      subSchema.jsonSchema,
+      subSchema.jsonSchema ?? {},
       props.propertyData
     );
 

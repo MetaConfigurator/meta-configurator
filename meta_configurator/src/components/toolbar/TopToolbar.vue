@@ -1,25 +1,21 @@
 <script setup lang="ts">
-import {Ref, ref, watch} from 'vue';
+import {type Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
 import {MenuItems} from '@/components/toolbar/menuItems';
-import {ChangeResponsible, SessionMode, useSessionStore} from '@/store/sessionStore';
-import SchemaEditorView from '@/views/SchemaEditorView.vue';
+import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
-import {schemaCollection} from '@/example-schemas/SchemaCollection';
-import {newEmptyFile} from '@/components/toolbar/clearFile';
+import {schemaCollection} from '@/example-schemas/schemaCollection';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
 
 import InputText from 'primevue/inputtext';
-
-import {storeToRefs} from 'pinia';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
-import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJSONSchemaStore';
+import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
 import {loadExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
@@ -27,8 +23,10 @@ import {searchInDataAndSchema, searchResultToMenuItem} from '@/utility/search';
 import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
-import type {SchemaOption} from '@/model/SchemaOption';
-import {openUploadSchemaDialog} from '@/components/toolbar/uploadSchema';
+import type {SchemaOption} from '@/model/schemaOption';
+
+import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
+import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -82,7 +80,7 @@ const pageSelectionMenuItems: MenuItem[] = [
     label: 'Schema Editor',
     icon: 'fa-regular fa-file-code',
     class: () => {
-      if (props.currentMode !== SchemaEditorView) {
+      if (props.currentMode !== SessionMode.SchemaEditor) {
         return 'font-normal text-lg';
       }
       return 'font-bold text-lg';
@@ -150,7 +148,7 @@ watch(selectedSchema, async newSelectedSchema => {
       await fetchSchemaFromUrl(newSelectedSchema.url);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to clear the current contents of the File Editor?');
+      openClearFileEditorDialog();
     } catch (error) {
       errorService.onError(error);
     }
@@ -159,7 +157,7 @@ watch(selectedSchema, async newSelectedSchema => {
       loadExampleSchema(newSelectedSchema.key);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      newEmptyFile('Do you want to clear the current contents of the File Editor?');
+      openClearFileEditorDialog();
     } catch (error) {
       errorService.onError(error);
     }
@@ -204,15 +202,18 @@ function setItemMenuRef(item: MenuItem, menu: Menu) {
 }
 function handleItemButtonClick(item: MenuItem, event: Event) {
   if (item.items) {
-    const menu = itemMenuRefs.value.get(getLabelOfItem(item));
-    menu.toggle(event);
+    const label = getLabelOfItem(item);
+    if (label !== undefined) {
+      const menu = itemMenuRefs.value.get(label);
+      menu.toggle(event);
+    }
   } else if (item.command) {
     item.command({item, originalEvent: event});
   }
 }
-function getLabelOfItem(item: MenuItem): string {
+function getLabelOfItem(item: MenuItem): string | undefined {
   if (!item.label) {
-    return;
+    return undefined;
   }
   if (typeof item.label === 'string') {
     return item.label;
@@ -230,7 +231,7 @@ function isDisabled(item: MenuItem) {
   return item.disabled();
 }
 
-// apparently, the primevue button cannot reactively update its disabled state
+/* // apparently, the primevue button cannot reactively update its disabled state
 // so this is a workaround to change the disabled state of the button
 watch(storeToRefs(useSessionStore()).fileData, () => {
   for (const item of getMenuItems()) {
@@ -244,7 +245,7 @@ watch(storeToRefs(useSessionStore()).fileData, () => {
       }
     }
   }
-});
+}) */
 
 const searchTerm: Ref<string> = ref('');
 
@@ -281,7 +282,6 @@ watchDebounced(
     searchInDataAndSchema(searchTerm.value)
       .then(searchResults => {
         if (searchResults.length > 0) {
-          useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
           useSessionStore().currentSelectedElement = searchResults[0].path;
         }
         useSessionStore().currentSearchResults = searchResults;

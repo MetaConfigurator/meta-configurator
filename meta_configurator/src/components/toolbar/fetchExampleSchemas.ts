@@ -1,9 +1,8 @@
-import {schemaCollection} from '@/example-schemas/SchemaCollection';
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {useDataStore} from '@/store/dataStore';
-import {newEmptyFile} from '@/components/toolbar/clearFile';
+import {schemaCollection} from '@/example-schemas/schemaCollection';
+import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
 import {errorService} from '@/main';
 import {toastService} from '@/utility/toastService';
+import {useDataSource} from '@/data/dataSource';
 
 /**
  * Loads the example schema with the given key.
@@ -12,11 +11,10 @@ import {toastService} from '@/utility/toastService';
 export function loadExampleSchema(schemaKey: string): void {
   try {
     const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
-    useSessionStore().lastChangeResponsible = ChangeResponsible.Menubar;
     const schemaName = selectedSchema.label || 'Unknown Schema';
-    useDataStore().schemaData = selectedSchema?.schema;
+    useDataSource().userSchemaData.value = selectedSchema?.schema;
 
-    newEmptyFile('Do you also want to clear the current config file?');
+    openClearFileEditorDialog();
 
     const toast = toastService;
     if (toast) {

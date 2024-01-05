@@ -12,25 +12,28 @@ import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 
-import {JsonSchema} from '@/schema/JsonSchema';
+import {JsonSchema} from '@/schema/jsonSchema';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/components/gui-editor/configTreeNodeResolver';
 import type {Path} from '@/model/path';
 import {GuiConstants} from '@/constants';
-import {
+import type {
   ConfigDataTreeNode,
   ConfigTreeNodeData,
   GuiEditorTreeNode,
-  TreeNodeType,
-} from '@/model/ConfigDataTreeNode';
+} from '@/model/configDataTreeNode';
+import {TreeNodeType} from '@/model/configDataTreeNode';
 import {storeToRefs} from 'pinia';
-import {ChangeResponsible, useSessionStore} from '@/store/sessionStore';
-import {dataAt, pathToString} from '@/utility/pathUtils';
+import {useSessionStore} from '@/store/sessionStore';
+import {pathToString} from '@/utility/pathUtils';
 import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/tree';
 import {focus, focusOnPath, makeEditableAndSelectContents} from '@/utility/focusUtils';
+import {useCurrentDataLink} from '@/data/useDataLink';
+import {useValidationResult} from '@/schema/validation/useValidation';
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 const props = defineProps<{
   currentSchema: JsonSchema;
@@ -48,21 +51,10 @@ const emit = defineEmits<{
 
 const sessionStore = storeToRefs(useSessionStore());
 
-// update tree when the file data changes
-watch(
-  () => useSessionStore().fileData,
-  () => {
-    updateTree();
-  }
-);
-
 // scroll to the current selected element when it changes
 watch(
   sessionStore.currentSelectedElement,
   () => {
-    if (useSessionStore().lastChangeResponsible == ChangeResponsible.GuiEditor) {
-      return;
-    }
     const absolutePath = useSessionStore().currentSelectedElement;
     const pathToCutOff = useSessionStore().currentPath;
     const relativePath = absolutePath.slice(pathToCutOff.length);
@@ -95,7 +87,7 @@ const loadingDebounced = refDebounced(loading, 100);
 
 const treeTableFilters = ref<Record<string, string>>({});
 
-const currentTree = ref({});
+const currentTree = ref<GuiEditorTreeNode>();
 
 /**
  * Compute the tree that should be displayed and expand all nodes that were expanded before.
@@ -175,24 +167,24 @@ function updateData(subPath: Path, newValue: any) {
 
 function clickedPropertyData(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
-  if (useSessionStore().dataAtPath(path) != undefined) {
+  if (useCurrentDataLink().dataAt(path) != undefined) {
     emit('select_path', path);
   }
 }
 
 function removeProperty(subPath: Path) {
   const completePath = props.currentPath.concat(subPath);
-  const parentPath = completePath.slice(0, -1);
-  const propertyName = completePath.slice(completePath.length - 1);
+  // const parentPath = completePath.slice(0, -1);
+  /* const propertyName: string | number = completePath.slice(completePath.length - 1);
   const dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
   delete dataAtParentPath[propertyName];
-  updateData(parentPath, dataAtParentPath);
+  updateData(parentPath, dataAtParentPath); */
 
   emit('remove_property', completePath);
   updateTree();
 }
 
-function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData) {
+function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData: any) {
   const dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
 
   if (oldData === undefined) {
@@ -211,7 +203,7 @@ function initializeNewProperty(parentPath: Path, name: string): any {
   return schema?.initialValue();
 }
 
-function updatePropertyName(subPath: Path, oldName, newName: string) {
+function updatePropertyName(subPath: Path, oldName: string, newName: string) {
   const oldData = dataAt(subPath, props.currentData);
   const parentPath = subPath.slice(0, -1);
 
@@ -257,11 +249,11 @@ function addItem(relativePath: Path, newValue: any) {
  * @param relativePath the relative path to the property to focus on
  */
 function focusOnFirstProperty(relativePath?: Path) {
-  let pathToFirstProperty = currentTree.value.children[0]?.data?.absolutePath;
+  let pathToFirstProperty = currentTree.value?.children[0]?.data?.absolutePath;
 
   if (relativePath) {
     const node = findNode(relativePath);
-    if (node) {
+    if (node !== undefined) {
       pathToFirstProperty = node.children[0]?.data?.absolutePath;
     }
   }
@@ -275,14 +267,24 @@ function focusOnFirstProperty(relativePath?: Path) {
  * @param relativePath the relative path of the node to find
  * @param root the root of the tree to search in
  */
-function findNode(relativePath, root = currentTree.value) {
+function findNode(
+  relativePath: Path,
+  root: GuiEditorTreeNode | undefined = currentTree.value
+): GuiEditorTreeNode | undefined {
   const absolutePath = pathToString(props.currentPath.concat(relativePath));
+  if (root === undefined) {
+    return undefined;
+  }
+
   if (root.key === absolutePath) {
     return root;
   }
 
+  if (root.children === undefined) {
+    return undefined;
+  }
   for (const child of root.children) {
-    const foundNode = findNode(relativePath, child);
+    const foundNode = findNode(relativePath, child as GuiEditorTreeNode);
     if (foundNode) {
       return foundNode;
     }
@@ -479,7 +481,7 @@ function isHighlighted(node: ConfigDataTreeNode) {
 }
 
 function getValidationResults(absolutePath: Path) {
-  return useSessionStore().dataValidationResults.filterForPath(absolutePath);
+  return useValidationResult().filterForPath(absolutePath);
 }
 
 function zoomIntoPath(path: Path) {
