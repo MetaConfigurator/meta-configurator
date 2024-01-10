@@ -63,6 +63,13 @@ export const useSessionStore = defineStore('sessionStore', () => {
     new Map<string, OneOfAnyOfSelectionOption>([])
   );
   /**
+   * Selected options for type unions in the schema.
+   * Key is the path as a string, value is the selected option.
+   */
+  const currentSelectedTypeUnionOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(
+    new Map<string, OneOfAnyOfSelectionOption>([])
+  );
+  /**
    * Selected options for anyOf in the schema.
    * Key is the path as a string, value is an array of selected options.
    */
@@ -234,6 +241,7 @@ export const useSessionStore = defineStore('sessionStore', () => {
     currentExpandedElements,
     currentSearchResults,
     currentSelectedOneOfOptions,
+    currentSelectedTypeUnionOptions,
     currentSelectedAnyOfOptions,
     isHighlighted,
     isExpanded,

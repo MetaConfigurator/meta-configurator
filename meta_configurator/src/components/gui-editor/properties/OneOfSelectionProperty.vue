@@ -19,7 +19,16 @@ const props = defineProps<{
   propertyData: any | undefined;
   absolutePath: Path;
   possibleSchemas: Array<JsonSchema>;
+  isTypeUnion: boolean;
 }>();
+
+function getCurrentSelectedOptions(): Map<string, OneOfAnyOfSelectionOption> {
+  if (props.isTypeUnion) {
+    return useSessionStore().currentSelectedTypeUnionOptions;
+  } else {
+    return useSessionStore().currentSelectedOneOfOptions;
+  }
+}
 
 const emit = defineEmits<{
   (e: 'update:tree'): void;
@@ -40,7 +49,7 @@ const possibleOptions = props.possibleSchemas.map(
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> = computed({
   get(): OneOfAnyOfSelectionOption | undefined {
     const path = pathToString(props.absolutePath);
-    const optionFromStore = useSessionStore().currentSelectedOneOfOptions.get(path);
+    const optionFromStore = getCurrentSelectedOptions().get(path);
     if (!optionFromStore) {
       return undefined;
     }
@@ -53,11 +62,11 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> 
     const path = pathToString(props.absolutePath);
 
     if (selectedOption) {
-      useSessionStore().currentSelectedOneOfOptions.set(path, selectedOption);
+      getCurrentSelectedOptions().set(path, selectedOption);
       useSessionStore().expand(props.absolutePath);
       applySchemaConstantsOnDataBasedOnSelection(props.absolutePath, selectedOption);
     } else {
-      useSessionStore().currentSelectedOneOfOptions.delete(path);
+      getCurrentSelectedOptions().delete(path);
     }
 
     emit('update:tree');
@@ -79,14 +88,15 @@ function inferOneOfUserSelection() {
   const pathAsString = pathToString(props.absolutePath);
   const validationService = useValidationService();
 
-  if (useSessionStore().currentSelectedOneOfOptions.has(pathAsString)) {
+  if (getCurrentSelectedOptions().has(pathAsString)) {
     return;
   }
 
   // User has not yet made a oneOf sub-schema selection for this path
   // --> auto infer a sub-schema
   let index = 0;
-  for (const subSchema of props.propertySchema.oneOf) {
+  const schemasToValidate = props.isTypeUnion ? props.possibleSchemas : props.propertySchema.oneOf;
+  for (const subSchema of schemasToValidate) {
     const validationResult = validationService.validateSubSchema(
       subSchema.jsonSchema ?? {},
       props.propertyData
@@ -95,7 +105,7 @@ function inferOneOfUserSelection() {
     if (validationResult.valid) {
       // found a oneOf subSchema for which the data is valid. Select it.
       const optionToSelect = findOptionBySubSchemaIndex(index);
-      useSessionStore().currentSelectedOneOfOptions.set(pathAsString, optionToSelect!!);
+      getCurrentSelectedOptions().set(pathAsString, optionToSelect!!);
       return;
     }
 
@@ -107,6 +117,10 @@ function applySchemaConstantsOnDataBasedOnSelection(
   path: Path,
   selectedOneOfOption: OneOfAnyOfSelectionOption
 ) {
+  if (props.isTypeUnion) {
+    return; // not relevant for type unions
+  }
+
   // Based on the user selection, a schema is created by merging the base schema
   // of the property with the selected oneOf.
   // If the merged schema contains constants, those are applied to the data.

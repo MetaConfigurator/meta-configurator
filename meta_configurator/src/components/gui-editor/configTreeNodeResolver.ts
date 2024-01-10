@@ -15,6 +15,7 @@ import {calculateEffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import {useCurrentDataLink} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
+import {typeSchema} from '@/schema/schemaUtils';
 
 interface TreeNodeResolvingParameters {
   absolutePath: Path;
@@ -48,8 +49,8 @@ export class ConfigTreeNodeResolver {
     depth: number = 0,
     nodeType: ConfigDataTreeNodeType = TreeNodeType.SCHEMA_PROPERTY
   ): GuiEditorTreeNode {
-    const name = absolutePath[absolutePath.length - 1] ?? '';
-    const parentName = absolutePath[absolutePath.length - 2] ?? '';
+    const name = absolutePath[absolutePath.length - 1] ?? schema.title ?? 'root';
+    const parentName = absolutePath[absolutePath.length - 2] ?? parentSchema?.title ?? 'root';
 
     return {
       data: {
@@ -72,12 +73,13 @@ export class ConfigTreeNodeResolver {
    * Determines whether a node is a leaf node.
    */
   private isLeaf(schema: JsonSchema, depth: number, absolutePath: Path): boolean {
-    const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
+    const dependsOnUserSelection = this.dependsOnUserSelection(schema);
     if (dependsOnUserSelection) {
       const path = pathToString(absolutePath);
       const hasUserSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.has(path);
       const hasUserSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.has(path);
-      if (!(hasUserSelectionOneOf || hasUserSelectionAnyOf)) {
+      const hasUserSelectionTypeUnion = useSessionStore().currentSelectedTypeUnionOptions.has(path);
+      if (!(hasUserSelectionOneOf || hasUserSelectionAnyOf || hasUserSelectionTypeUnion)) {
         return true; // no user selection -> leaf node
       }
     }
@@ -88,6 +90,13 @@ export class ConfigTreeNodeResolver {
       (!schema.hasType('object') && !schema.hasType('array')) || // primitive type in schema
       depth >= useSettings().guiEditor.maximumDepth // maximum depth reached
     );
+  }
+
+  /**
+   * True if the schema depends on the user selection, i.e., if it has anyOf, oneOf or multiple types.
+   */
+  private dependsOnUserSelection(schema: JsonSchema) {
+    return schema.anyOf.length > 0 || schema.oneOf.length > 0 || schema.type.length > 1;
   }
 
   /**
@@ -130,6 +139,9 @@ export class ConfigTreeNodeResolver {
     const schema = effectiveSchema.schema;
 
     let children: GuiEditorTreeNode[] = [];
+    if (schema.type.length > 1) {
+      children = this.createTypeUnionChildrenTreeNodes({absolutePath, relativePath, schema, depth});
+    }
     if (schema.oneOf.length > 0) {
       children = this.createOneOfChildrenTreeNodes({absolutePath, relativePath, schema, depth});
     }
@@ -139,8 +151,8 @@ export class ConfigTreeNodeResolver {
       );
     }
 
-    if (schema.anyOf.length > 0 || schema.oneOf.length > 0) {
-      // don't add further children for oneOf or anyOf nodes
+    if (this.dependsOnUserSelection(schema)) {
+      // no further children should be added, those children get added to the corresponding nodes
       return children;
     }
 
@@ -432,6 +444,30 @@ export class ConfigTreeNodeResolver {
       leaf: true,
     };
   }
+
+  private createTypeUnionChildrenTreeNodes({
+    absolutePath,
+    relativePath,
+    schema,
+    depth,
+  }: TreeNodeResolvingParameters) {
+    const path = pathToString(absolutePath);
+    const userSelectionOneOf = useSessionStore().currentSelectedTypeUnionOptions.get(path);
+
+    if (userSelectionOneOf !== undefined) {
+      const baseSchema = {...schema.jsonSchema};
+      delete baseSchema.type;
+      const newTypeSchema = typeSchema(schema.type[userSelectionOneOf.index]);
+      const mergedSchema = new JsonSchema({
+        allOf: [baseSchema, newTypeSchema.jsonSchema ?? {}],
+      });
+      return [
+        this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
+      ];
+    }
+    return [];
+  }
+
   private createOneOfChildrenTreeNodes({
     absolutePath,
     relativePath,

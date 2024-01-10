@@ -136,7 +136,7 @@ const nodesToDisplay: Ref<TreeNode[]> = ref(determineNodesToDisplay(computeTree(
 
 /**
  * Determine the nodes that should be displayed in the tree.
- * If the root node has anyOf or oneOf, the root node is displayed.
+ * If the root node has anyOf or oneOf or a type union, the root node is displayed.
  * If the root node is an object or array, the children of the root node are displayed.
  * Otherwise, the root node is displayed.
  * This way, the tree is displayed in a way that makes sense for the user.
@@ -147,7 +147,7 @@ function determineNodesToDisplay(root: TreeNode): TreeNode[] {
   if (!rootSchema) {
     return [];
   }
-  if (rootSchema.anyOf?.length > 0 || rootSchema.oneOf?.length > 0) {
+  if (rootSchema.anyOf?.length > 0 || rootSchema.oneOf?.length > 0 || rootSchema.type.length > 1) {
     return [root];
   }
   if (rootSchema.hasType('object') || rootSchema.hasType('array')) {

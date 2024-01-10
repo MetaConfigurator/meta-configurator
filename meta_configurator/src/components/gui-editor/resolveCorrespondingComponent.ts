@@ -8,10 +8,11 @@ import type {AddItemTreeNodeData, ConfigTreeNodeData} from '@/model/configDataTr
 import type {VNode} from 'vue';
 import {h} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
-import OneOfAnyOfSelectionProperty from '@/components/gui-editor/properties/OneOfSelectionProperty.vue';
+import OneOfSelectionProperty from '@/components/gui-editor/properties/OneOfSelectionProperty.vue';
 import AnyOfSelectionProperty from '@/components/gui-editor/properties/AnyOfSelectionProperty.vue';
 import {useCurrentDataLink} from '@/data/useDataLink';
 import {useValidationResult} from '@/schema/validation/useValidation';
+import {typeSchema} from '@/schema/schemaUtils';
 
 /**
  * Resolves the corresponding component for a given node.
@@ -20,26 +21,16 @@ import {useValidationResult} from '@/schema/validation/useValidation';
 export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData
 ): VNode {
-  const propsObject = {
-    propertyName: nodeData.name,
-    propertyData: useCurrentDataLink().dataAt(nodeData.absolutePath),
-    propertySchema: nodeData.schema,
-    parentSchema: nodeData.parentSchema,
-    relativePath: nodeData.relativePath,
-    absolutePath: nodeData.absolutePath,
-    validationResults: useValidationResult().filterForPath(nodeData.absolutePath),
-    expanded: useSessionStore().isExpanded(nodeData.absolutePath),
-  };
+  const propsObject = buildProperties(nodeData);
 
   if (nodeData.schema.oneOf.length > 0) {
-    // @ts-ignore
-    return h(OneOfAnyOfSelectionProperty, {
+    return h(OneOfSelectionProperty, {
       ...propsObject,
       possibleSchemas: nodeData.schema.oneOf,
+      isTypeUnion: false,
     });
   }
   if (nodeData.schema.anyOf.length > 0) {
-    // @ts-ignore
     return h(AnyOfSelectionProperty, {
       ...propsObject,
       possibleSchemas: nodeData.schema.anyOf,
@@ -54,8 +45,16 @@ export function resolveCorrespondingComponent(
     });
   }
 
+  if (nodeData.schema.type.length > 1) {
+    // union type
+    return h(OneOfSelectionProperty, {
+      ...propsObject,
+      possibleSchemas: nodeData.schema.type.map(type => typeSchema(type)),
+      isTypeUnion: true,
+    });
+  }
+
   if (nodeData.schema.hasType('string') && hasTwoOrMoreExamples(nodeData.schema)) {
-    // @ts-ignore
     return h(EnumProperty, {
       ...propsObject,
       possibleValues: nodeData.schema.examples,
@@ -63,32 +62,26 @@ export function resolveCorrespondingComponent(
   }
 
   if (nodeData.schema.hasType('string')) {
-    // @ts-ignore
     return h(StringProperty, propsObject);
   }
 
   if (nodeData.schema.hasType('boolean')) {
-    // @ts-ignore
     return h(BooleanProperty, propsObject);
   }
 
   if (nodeData.schema.hasType('number') || nodeData.schema.hasType('integer')) {
-    // @ts-ignore
     return h(NumberProperty, propsObject);
   }
 
   if (nodeData.schema.hasType('object')) {
-    // @ts-ignore
     return h(SimpleObjectProperty, propsObject);
   }
 
   if (nodeData.schema.hasType('array')) {
-    // @ts-ignore
     return h(SimpleArrayProperty, propsObject);
   }
 
   if (nodeData.schema.hasType('null')) {
-    // @ts-ignore
     return h(EnumProperty, {
       ...propsObject,
       possibleValues: [null],
@@ -100,4 +93,17 @@ export function resolveCorrespondingComponent(
 
 function hasTwoOrMoreExamples(schema: any): boolean {
   return schema.examples !== undefined && schema.examples.length > 1;
+}
+
+function buildProperties(nodeData: ConfigTreeNodeData | AddItemTreeNodeData) {
+  return {
+    propertyName: nodeData.name,
+    propertyData: useCurrentDataLink().dataAt(nodeData.absolutePath),
+    propertySchema: nodeData.schema,
+    parentSchema: nodeData.parentSchema,
+    relativePath: nodeData.relativePath,
+    absolutePath: nodeData.absolutePath,
+    validationResults: useValidationResult().filterForPath(nodeData.absolutePath),
+    expanded: useSessionStore().isExpanded(nodeData.absolutePath),
+  };
 }

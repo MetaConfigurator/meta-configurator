@@ -7,9 +7,10 @@ import Dropdown from 'primevue/dropdown';
 import type {ValidationResult} from '@/schema/validation/validationService';
 import _ from 'lodash';
 import {dataToString} from '@/utility/dataToString';
+import type {PathElement} from '@/model/path';
 
 const props = defineProps<{
-  propertyName: string;
+  propertyName: PathElement;
   possibleValues: Array<any>;
   propertyData: any | undefined;
   validationResults: ValidationResult;

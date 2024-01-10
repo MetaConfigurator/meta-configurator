@@ -1,4 +1,4 @@
-import type {JsonSchemaType} from '@/model/jsonSchemaType';
+import type {JsonSchemaType, SchemaPropertyType} from '@/model/jsonSchemaType';
 import {JsonSchema} from '@/schema/jsonSchema';
 
 /**
@@ -42,4 +42,13 @@ export function schemaFromObject(jsonSchema?: JsonSchemaType): JsonSchema | unde
     return undefined;
   }
   return new JsonSchema(jsonSchema);
+}
+
+/**
+ * Converts a type string into a JSON schema that only has a
+ * type constraint with the given type, i.e.,
+ * `{type: t}` for the given type `t`.
+ */
+export function typeSchema(type: SchemaPropertyType): JsonSchema {
+  return new JsonSchema({type});
 }
