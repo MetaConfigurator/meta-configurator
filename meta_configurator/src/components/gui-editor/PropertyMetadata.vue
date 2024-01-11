@@ -13,6 +13,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import 'primeicons/primeicons.css';
 import {focus, makeEditableAndSelectContents} from '@/utility/focusUtils';
 import {useSettings} from '@/settings/useSettings';
+import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -45,8 +46,10 @@ function canZoomIn(): boolean {
   const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
   if (dependsOnUserSelection) {
     const path = pathToString(props.node.data.absolutePath);
-    const hasUserSelectionOneOf = useSessionStore().currentSelectedOneOfOptions.has(path);
-    const hasUserSelectionAnyOf = useSessionStore().currentSelectedAnyOfOptions.has(path);
+    const hasUserSelectionOneOf =
+      useUserSchemaSelectionStore().currentSelectedOneOfOptions.has(path);
+    const hasUserSelectionAnyOf =
+      useUserSchemaSelectionStore().currentSelectedAnyOfOptions.has(path);
     return hasUserSelectionOneOf || hasUserSelectionAnyOf;
   }
 

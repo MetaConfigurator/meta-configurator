@@ -8,8 +8,8 @@ import MultiSelect from 'primevue/multiselect';
 import type {JsonSchema} from '@/schema/jsonSchema';
 import {useSessionStore} from '@/store/sessionStore';
 import type {Path, PathElement} from '@/model/path';
-import {pathToString} from '@/utility/pathUtils';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/oneOfAnyOfSelectionOption';
+import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -27,7 +27,7 @@ const emit = defineEmits<{
   (e: 'update:tree'): void;
 }>();
 
-function findOptionBySubSchemaIndex(index): OneOfAnyOfSelectionOption {
+function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption {
   for (let option of possibleOptions) {
     if (option.index === index) {
       return option;
@@ -38,8 +38,9 @@ function findOptionBySubSchemaIndex(index): OneOfAnyOfSelectionOption {
 
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined> = computed({
   get(): OneOfAnyOfSelectionOption[] | undefined {
-    const path = pathToString(props.absolutePath);
-    const optionsFromStore = useSessionStore().currentSelectedAnyOfOptions.get(path);
+    const optionsFromStore = useUserSchemaSelectionStore().getSelectedAnyOfOptions(
+      props.absolutePath
+    );
     if (!optionsFromStore) {
       return undefined;
     }
@@ -51,8 +52,7 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined
 
   set(selectedOptions: OneOfAnyOfSelectionOption[] | undefined) {
     if (selectedOptions) {
-      const path = pathToString(props.absolutePath);
-      useSessionStore().currentSelectedAnyOfOptions.set(path, selectedOptions);
+      useUserSchemaSelectionStore().setSelectedAnyOfOptions(props.absolutePath, selectedOptions);
       useSessionStore().expand(props.absolutePath);
       emit('update:tree');
     }

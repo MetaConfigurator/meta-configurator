@@ -12,6 +12,7 @@ import type {JsonSchemaType} from '@/model/jsonSchemaType';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import _ from 'lodash';
 import {useValidationService} from '@/schema/validation/useValidation';
+import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -24,9 +25,9 @@ const props = defineProps<{
 
 function getCurrentSelectedOptions(): Map<string, OneOfAnyOfSelectionOption> {
   if (props.isTypeUnion) {
-    return useSessionStore().currentSelectedTypeUnionOptions;
+    return useUserSchemaSelectionStore().currentSelectedTypeUnionOptions;
   } else {
-    return useSessionStore().currentSelectedOneOfOptions;
+    return useUserSchemaSelectionStore().currentSelectedOneOfOptions;
   }
 }
 

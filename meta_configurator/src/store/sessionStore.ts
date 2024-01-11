@@ -9,9 +9,9 @@ import {useSettingsStore} from '@/store/settingsStore';
 import type {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import type {SearchResult} from '@/utility/search';
 import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
-import type {OneOfAnyOfSelectionOption} from '@/model/oneOfAnyOfSelectionOption';
 import type {JsonSchemaType} from '@/model/jsonSchemaType';
 import {useCurrentDataLink} from '@/data/useDataLink';
+import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
 
 /**
  * The current page/mode of the application.
@@ -55,27 +55,6 @@ export const useSessionStore = defineStore('sessionStore', () => {
    * The current search results. Empty, if there is currently no search.
    */
   const currentSearchResults: Ref<SearchResult[]> = ref<SearchResult[]>([]);
-  /**
-   * Selected options for oneOf in the schema.
-   * Key is the path as a string, value is the selected option.
-   */
-  const currentSelectedOneOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(
-    new Map<string, OneOfAnyOfSelectionOption>([])
-  );
-  /**
-   * Selected options for type unions in the schema.
-   * Key is the path as a string, value is the selected option.
-   */
-  const currentSelectedTypeUnionOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(
-    new Map<string, OneOfAnyOfSelectionOption>([])
-  );
-  /**
-   * Selected options for anyOf in the schema.
-   * Key is the path as a string, value is an array of selected options.
-   */
-  const currentSelectedAnyOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption[]>> = ref(
-    new Map<string, OneOfAnyOfSelectionOption[]>([])
-  );
 
   /**
    * The current mode of the application.
@@ -166,7 +145,9 @@ export const useSessionStore = defineStore('sessionStore', () => {
       const schema = currentEffectiveSchema.schema.subSchema(key);
 
       if (schema?.oneOf) {
-        const oneOfSelection = currentSelectedOneOfOptions.value.get(pathToString(currentPath));
+        const oneOfSelection = useUserSchemaSelectionStore().currentSelectedOneOfOptions.get(
+          pathToString(currentPath)
+        );
         if (oneOfSelection !== undefined) {
           currentEffectiveSchema = calculateEffectiveSchema(
             schema.oneOf[oneOfSelection.index],
@@ -240,9 +221,6 @@ export const useSessionStore = defineStore('sessionStore', () => {
     currentSelectedElement,
     currentExpandedElements,
     currentSearchResults,
-    currentSelectedOneOfOptions,
-    currentSelectedTypeUnionOptions,
-    currentSelectedAnyOfOptions,
     isHighlighted,
     isExpanded,
     expand,

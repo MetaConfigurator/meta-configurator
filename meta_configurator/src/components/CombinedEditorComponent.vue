@@ -109,6 +109,7 @@ toastService.toast = useToast();
   </div>
 </template>
 
+<!--suppress CssUnusedSymbol -->
 <style scoped>
 #mainpanel.dragover::before {
   content: 'Drop files anywhere to load them';

@@ -33,5 +33,5 @@ export function schemaOptionToString(schema: JsonSchema, index: number): string 
   const schemaToDescribe = {...schema.jsonSchema};
   delete schemaToDescribe.$id;
 
-  return `${index}: ${dataToString(schemaToDescribe, 2, 60)}`;
+  return `${index}: ${dataToString(schemaToDescribe, 1, 60)}`;
 }
