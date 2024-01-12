@@ -6,7 +6,6 @@ import {
   areSchemasCompatible,
   mergeAllOfs,
   mergeSchemas,
-  safeMergeAllOfs,
   safeMergeSchemas,
 } from '@/schema/mergeAllOfs';
 
@@ -35,7 +34,6 @@ export function preprocessSchema(schema: JsonSchemaType): JsonSchemaType {
   }
 
   schemaCopy = handleAllOfs(schemaCopy);
-  convertTypesToOneOf(schemaCopy);
   removeIncompatibleOneOfs(schemaCopy);
   removeIncompatibleAnyOfs(schemaCopy);
   schemaCopy = mergeSingularOneOf(schemaCopy);
@@ -67,55 +65,6 @@ function handleAllOfs(schema: JsonSchemaType) {
     schema = mergeAllOfs(schema);
   }
   return schema;
-}
-
-function convertTypesToOneOf(schema: JsonSchemaType) {
-  if (typeof schema !== 'object') {
-    return;
-  }
-
-  if (!Array.isArray(schema.type)) {
-    return;
-  }
-
-  if (schema.type.length == 1) {
-    schema.type = schema.type[0];
-    return;
-  }
-
-  // easier scenario: no oneOfs
-  if (!hasOneOfs(schema) && schema.type.length > 1) {
-    const newOneOfs: JsonSchemaType[] = [];
-
-    schema.type.forEach(propertyType => {
-      const typeSchema = {
-        type: propertyType,
-      };
-
-      newOneOfs.push(typeSchema);
-    });
-
-    schema.oneOf = newOneOfs;
-    delete schema.type;
-  } else {
-    // more difficult scenario: oneOfs exist. Multiply original oneOfs with types
-    const newOneOfs: JsonSchemaType[] = [];
-    schema.type.forEach(propertyType => {
-      const typeSchema = {
-        type: propertyType,
-      };
-
-      schema.oneOf!.forEach((originalOneOf: JsonSchemaType) => {
-        const combinedSchema = {
-          allOf: [typeSchema, preprocessSchema(originalOneOf)],
-        };
-        const newOneOf = safeMergeAllOfs(combinedSchema);
-        newOneOfs.push(newOneOf);
-      });
-    });
-    schema.oneOf = newOneOfs;
-    delete schema.type;
-  }
 }
 
 function extractIfsOfAllOfs(schema: JsonSchemaType): JsonSchemaType {
@@ -189,6 +138,7 @@ function attemptMergeOneOfsIntoAnyOfs(schema: JsonSchemaType) {
     }
 
     if (!someAnyOfHasMultipleOneOfOptions) {
+      schema = schema as JsonSchemaObjectType; // cast necessary to mark oneOf as optional
       delete schema.oneOf;
     }
   }

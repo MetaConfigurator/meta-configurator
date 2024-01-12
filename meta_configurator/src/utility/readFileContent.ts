@@ -23,7 +23,7 @@ export async function readFileContent(file: File) {
   });
 }
 
-export async function readFileContentFromFileList(files: FileList | File[] | null) {
+async function readFileContentFromFileList(files: FileList | File[] | null) {
   if (files === null || typeof files !== 'object') {
     return Promise.resolve();
   }
@@ -34,6 +34,15 @@ export async function readFileContentFromFileList(files: FileList | File[] | nul
   return readFileContent(file);
 }
 
+/**
+ * Reads the content of the given file and sets it as the data of the given data link.
+ * This method is asynchronous, so the data link will probably not be updated immediately.
+ * If the file could not be read, an error is shown.
+ *
+ * @param files    the files to read. Will throw an error if there is more than one file.
+ *                 If null or undefined, nothing happens.
+ * @param dataLink the data link to set the data of
+ */
 export function readFileContentToDataLink(
   files: FileList | File[] | null,
   dataLink: DataLink
