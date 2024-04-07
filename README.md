@@ -5,7 +5,7 @@
 MetaConfigurator is a web app that automatically generates a GUI tailored to a given JSON schema
 to make editing configuration files, research data and schemas easier and more enjoyable.
 
-Web playground: https://paulbredl.github.io/meta-configurator/
+Web playground: https://logende.github.io/meta-configurator/
 
 ## Problem
 
