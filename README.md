@@ -46,11 +46,14 @@ To launch the application, follow these steps:
    ```shell
    git clone https://github.com/PaulBredl/config-assistant.git
    ```
-2. Install the necessary dependencies:
+2. Navigate into web application folder:
+   ```sh
+   cd meta_configurator
+3. Install the necessary dependencies:
    ```sh
    npm install
    ```
-3. Launch the application:
+4. Launch the application:
    ```sh
    npm run dev
    ```
