@@ -72,9 +72,6 @@ export const simplifiedMetaSchema = {
           $ref: '#/$defs/refProperty',
         },
         {
-          $ref: '#/$defs/conditionalSchema',
-        },
-        {
           $ref: '#/$defs/anchor',
         },
       ],
@@ -93,6 +90,68 @@ export const simplifiedMetaSchema = {
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-const',
         },
       },
+      allOf: [
+        {
+          if: {
+            $ref: '#/$defs/hasTypeArray',
+          },
+          then: {
+            properties: {
+              const: {
+                type: 'array',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeObject',
+          },
+          then: {
+            properties: {
+              const: {
+                type: 'object',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeString',
+          },
+          then: {
+            properties: {
+              const: {
+                type: 'string',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeNumberOrInteger',
+          },
+          then: {
+            properties: {
+              const: {
+                type: 'number',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeBoolean',
+          },
+          then: {
+            properties: {
+              const: {
+                type: 'boolean',
+              },
+            },
+          },
+        },
+      ],
     },
     enumProperty: {
       title: 'Enumeration',
@@ -110,6 +169,78 @@ export const simplifiedMetaSchema = {
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-enum',
         },
       },
+      allOf: [
+        {
+          if: {
+            $ref: '#/$defs/hasTypeArray',
+          },
+          then: {
+            properties: {
+              enum: {
+                items: {
+                  type: 'array',
+                },
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeObject',
+          },
+          then: {
+            properties: {
+              enum: {
+                items: {
+                  type: 'object',
+                },
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeString',
+          },
+          then: {
+            properties: {
+              enum: {
+                items: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeNumberOrInteger',
+          },
+          then: {
+            properties: {
+              enum: {
+                items: {
+                  type: 'number',
+                },
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeBoolean',
+          },
+          then: {
+            properties: {
+              enum: {
+                items: {
+                  type: 'boolean',
+                },
+              },
+            },
+          },
+        },
+      ],
     },
     schemaComposition: {
       title: 'Schema composition with "allOf", "anyOf", "oneOf", "not"',
@@ -145,64 +276,6 @@ export const simplifiedMetaSchema = {
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-oneof',
           metaConfigurator: {
             advanced: true,
-          },
-        },
-        not: {
-          description:
-            "This keyword's value MUST be a valid JSON Schema.\n" +
-            '\n' +
-            'An instance is valid against this keyword if it fails to validate successfully against the schema defined by this keyword.',
-          $ref: '#/$defs/jsonSchema',
-          $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-not',
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-      },
-    },
-    conditionalSchema: {
-      title: 'Conditional schema with "if", "then", "else"',
-      properties: {
-        if: {
-          description:
-            "This keyword's value MUST be a valid JSON Schema.\n" +
-            '\n' +
-            'This validation outcome of this keyword\'s subschema has no direct effect on the overall validation result. Rather, it controls which of the "then" or "else" keywords are evaluated.\n' +
-            '\n' +
-            'Instances that successfully validate against this keyword\'s subschema MUST also be valid against the subschema value of the "then" keyword, if present.\n' +
-            '\n' +
-            'Instances that fail to validate against this keyword\'s subschema MUST also be valid against the subschema value of the "else" keyword, if present.',
-          $ref: '#/$defs/jsonSchema',
-          $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-if',
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-      },
-      if: {
-        required: ['if'],
-      },
-      then: {
-        properties: {
-          then: {
-            description:
-              "This keyword's value MUST be a valid JSON Schema.\n" +
-              '\n' +
-              'When "if" is present, and the instance successfully validates against its subschema, then validation succeeds against this keyword if the instance also successfully validates against this keyword\'s subschema.\n' +
-              '\n' +
-              'This keyword has no effect when "if" is absent, or when the instance fails to validate against its subschema. Implementations MUST NOT evaluate the instance against this keyword, for either validation or annotation collection purposes, in such cases.',
-            $ref: '#/$defs/jsonSchema',
-            $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-then',
-          },
-          else: {
-            description:
-              "This keyword's value MUST be a valid JSON Schema.\n" +
-              '\n' +
-              'When "if" is present, and the instance fails to validate against its subschema, then validation succeeds against this keyword if the instance successfully validates against this keyword\'s subschema.\n' +
-              '\n' +
-              'This keyword has no effect when "if" is absent, or when the instance successfully validates against its subschema. Implementations MUST NOT evaluate the instance against this keyword, for either validation or annotation collection purposes, in such cases.',
-            $ref: '#/$defs/jsonSchema',
-            $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-else',
           },
         },
       },
@@ -322,6 +395,14 @@ export const simplifiedMetaSchema = {
           },
           then: {
             $ref: '#/$defs/numberProperty',
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeBoolean',
+          },
+          then: {
+            $ref: '#/$defs/booleanProperty',
           },
         },
       ],
@@ -500,6 +581,9 @@ export const simplifiedMetaSchema = {
         },
       },
     },
+    booleanProperty: {
+      title: 'Boolean property',
+    },
     stringProperty: {
       title: 'String property',
       properties: {
@@ -571,14 +655,6 @@ export const simplifiedMetaSchema = {
           type: 'string',
           $comment:
             'https://json-schema.org/draft/2020-12/json-schema-validation#name-contentmediatype',
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-        contentSchema: {
-          $ref: '#/$defs/jsonSchema',
-          $comment:
-            'https://json-schema.org/draft/2020-12/json-schema-validation#name-contentschema',
           metaConfigurator: {
             advanced: true,
           },
@@ -793,6 +869,93 @@ export const simplifiedMetaSchema = {
           },
         },
       },
+      allOf: [
+        {
+          if: {
+            $ref: '#/$defs/hasTypeArray',
+          },
+          then: {
+            properties: {
+              examples: {
+                items: {
+                  type: 'array',
+                },
+              },
+              default: {
+                type: 'array',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeObject',
+          },
+          then: {
+            properties: {
+              examples: {
+                items: {
+                  type: 'object',
+                },
+              },
+              default: {
+                type: 'object',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeString',
+          },
+          then: {
+            properties: {
+              examples: {
+                items: {
+                  type: 'string',
+                },
+              },
+              default: {
+                type: 'string',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeNumberOrInteger',
+          },
+          then: {
+            properties: {
+              examples: {
+                items: {
+                  type: 'number',
+                },
+              },
+              default: {
+                type: 'number',
+              },
+            },
+          },
+        },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeBoolean',
+          },
+          then: {
+            properties: {
+              examples: {
+                items: {
+                  type: 'boolean',
+                },
+              },
+              default: {
+                type: 'boolean',
+              },
+            },
+          },
+        },
+      ],
     },
     hasTypeArray: {
       anyOf: [
@@ -831,6 +994,28 @@ export const simplifiedMetaSchema = {
               type: 'array',
               contains: {
                 const: 'object',
+              },
+            },
+          },
+        },
+      ],
+      required: ['type'],
+    },
+    hasTypeBoolean: {
+      anyOf: [
+        {
+          properties: {
+            type: {
+              const: 'boolean',
+            },
+          },
+        },
+        {
+          properties: {
+            type: {
+              type: 'array',
+              contains: {
+                const: 'boolean',
               },
             },
           },
