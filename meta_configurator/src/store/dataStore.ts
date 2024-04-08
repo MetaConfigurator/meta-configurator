@@ -4,7 +4,7 @@ import {defineStore} from 'pinia';
 import {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
 // @ts-ignore
-import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
+import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema_restricted';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import type {JsonSchemaType} from '@/model/jsonSchemaType';
