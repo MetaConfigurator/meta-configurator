@@ -11,5 +11,8 @@ export const defaultSettingsData = {
     maximumDepth: 20,
     propertySorting: 'schemaOrder',
   },
+  metaSchema: {
+    simplified: true,
+  },
   debuggingActive: false,
 };

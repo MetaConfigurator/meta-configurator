@@ -45,6 +45,9 @@ export class ValidationService {
     }
     this._validationFunction(data);
     const errors = this._validationFunction.errors || [];
+    if (errors.length > 0) {
+      console.log('Validation errors:', errors);
+    }
     return new ValidationResult(errors);
   }
 

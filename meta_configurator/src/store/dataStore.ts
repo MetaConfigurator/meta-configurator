@@ -5,6 +5,7 @@ import {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
 // @ts-ignore
 import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
+import {simplifiedMetaSchemaRestricted} from '../../resources/json-schema/simplifiedMetaSchemaRestricted';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import type {JsonSchemaType} from '@/model/jsonSchemaType';
@@ -37,10 +38,21 @@ export const useDataStore = defineStore('dataStore', () => {
   const metaSchemaData = ref(preprocessOneTime(simplifiedMetaSchema));
 
   /**
+   * The json schema meta schema (restricted) as a plain object
+   */
+  const metaSchemaRestrictedData = ref(preprocessOneTime(simplifiedMetaSchemaRestricted));
+
+  /**
    * The json schema meta schema as a TopLevelJsonSchema object
    */
   const metaSchema: Ref<TopLevelJsonSchema> = computed(
     () => new TopLevelJsonSchema(metaSchemaData.value)
+  );
+  /**
+   * The json schema meta schema (restricted) as a TopLevelJsonSchema object
+   */
+  const metaSchemaRestricted: Ref<TopLevelJsonSchema> = computed(
+    () => new TopLevelJsonSchema(metaSchemaRestrictedData.value)
   );
 
   // make sure that the schema is not preprocessed too often
@@ -65,7 +77,9 @@ export const useDataStore = defineStore('dataStore', () => {
     schemaData,
     schemaDataPreprocessed,
     metaSchema,
+    metaSchemaRestricted,
     metaSchemaData,
+    metaSchemaRestrictedData,
     reloadSchema,
   };
 });

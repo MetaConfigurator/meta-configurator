@@ -52,6 +52,19 @@ export const SETTINGS_SCHEMA: any = {
       },
       additionalProperties: false,
     },
+    metaSchema: {
+      type: 'object',
+      description: 'Meta Schema related settings belong here.',
+      properties: {
+        simplified: {
+          type: 'boolean',
+          description:
+            'Whether to use the simplified meta schema. The simplified meta schema is a subset of the full meta schema and is easier to understand and use. It is recommended for beginners, however, it does not support all features of the full meta schema. This setting affects the complexity and expressiveness of the GUI editor too.',
+          default: true,
+        },
+      },
+      additionalProperties: false,
+    },
     debuggingActive: {
       type: 'boolean',
       description: 'If enabled, the internal application state is shown.',
