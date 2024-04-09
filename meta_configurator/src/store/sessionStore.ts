@@ -76,7 +76,7 @@ export const useSessionStore = defineStore('sessionStore', () => {
         return useDataStore().schema;
 
       case SessionMode.SchemaEditor:
-        if (true) {
+        if (useSettingsStore().settingsData.metaSchema.simplified) {
           return useDataStore().metaSchemaRestricted;
         } else {
           return useDataStore().metaSchema;
