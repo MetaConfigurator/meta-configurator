@@ -86,9 +86,6 @@ export const simplifiedMetaSchema = {
           $ref: '#/$defs/refProperty',
         },
         {
-          $ref: '#/$defs/conditionalSchema',
-        },
-        {
           $ref: '#/$defs/anchor',
         },
       ],
@@ -260,7 +257,7 @@ export const simplifiedMetaSchema = {
       ],
     },
     schemaComposition: {
-      title: 'Schema composition with "allOf", "anyOf", "oneOf", "not"',
+      title: 'Schema composition with "allOf", "anyOf", "oneOf"',
       properties: {
         allOf: {
           description:
@@ -293,64 +290,6 @@ export const simplifiedMetaSchema = {
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-oneof',
           metaConfigurator: {
             advanced: true,
-          },
-        },
-        not: {
-          description:
-            "This keyword's value MUST be a valid JSON Schema.\n" +
-            '\n' +
-            'An instance is valid against this keyword if it fails to validate successfully against the schema defined by this keyword.',
-          $ref: '#/$defs/jsonSchema',
-          $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-not',
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-      },
-    },
-    conditionalSchema: {
-      title: 'Conditional schema with "if", "then", "else"',
-      properties: {
-        if: {
-          description:
-            "This keyword's value MUST be a valid JSON Schema.\n" +
-            '\n' +
-            'This validation outcome of this keyword\'s subschema has no direct effect on the overall validation result. Rather, it controls which of the "then" or "else" keywords are evaluated.\n' +
-            '\n' +
-            'Instances that successfully validate against this keyword\'s subschema MUST also be valid against the subschema value of the "then" keyword, if present.\n' +
-            '\n' +
-            'Instances that fail to validate against this keyword\'s subschema MUST also be valid against the subschema value of the "else" keyword, if present.',
-          $ref: '#/$defs/jsonSchema',
-          $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-if',
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-      },
-      if: {
-        required: ['if'],
-      },
-      then: {
-        properties: {
-          then: {
-            description:
-              "This keyword's value MUST be a valid JSON Schema.\n" +
-              '\n' +
-              'When "if" is present, and the instance successfully validates against its subschema, then validation succeeds against this keyword if the instance also successfully validates against this keyword\'s subschema.\n' +
-              '\n' +
-              'This keyword has no effect when "if" is absent, or when the instance fails to validate against its subschema. Implementations MUST NOT evaluate the instance against this keyword, for either validation or annotation collection purposes, in such cases.',
-            $ref: '#/$defs/jsonSchema',
-            $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-then',
-          },
-          else: {
-            description:
-              "This keyword's value MUST be a valid JSON Schema.\n" +
-              '\n' +
-              'When "if" is present, and the instance fails to validate against its subschema, then validation succeeds against this keyword if the instance successfully validates against this keyword\'s subschema.\n' +
-              '\n' +
-              'This keyword has no effect when "if" is absent, or when the instance successfully validates against its subschema. Implementations MUST NOT evaluate the instance against this keyword, for either validation or annotation collection purposes, in such cases.',
-            $ref: '#/$defs/jsonSchema',
-            $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-else',
           },
         },
       },
@@ -1289,4 +1228,5 @@ export const simplifiedMetaSchema = {
       default: [],
     },
   },
+  additionalProperties: false,
 };
