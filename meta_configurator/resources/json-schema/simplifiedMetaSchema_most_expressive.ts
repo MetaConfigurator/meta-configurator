@@ -21,7 +21,7 @@ export const simplifiedMetaSchema = {
           $ref: '#/$defs/core',
         },
         {
-          $ref: '#/$defs/rootObjectSubSchema',
+          $ref: '#/$defs/objectSubSchema',
         },
       ],
     },
@@ -44,21 +44,6 @@ export const simplifiedMetaSchema = {
       ],
       $comment:
         'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
-    },
-    rootObjectSubSchema: {
-      title: 'Root Subschema',
-      type: 'object',
-      allOf: [
-        {
-          $ref: '#/$defs/typeDefinition',
-        },
-        {
-          $ref: '#/$defs/typeSpecificFields',
-        },
-        {
-          $ref: '#/$defs/rootMeta-data',
-        },
-      ],
     },
     objectSubSchema: {
       title: 'Subschema',
@@ -107,68 +92,6 @@ export const simplifiedMetaSchema = {
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-const',
         },
       },
-      allOf: [
-        {
-          if: {
-            $ref: '#/$defs/hasTypeArray',
-          },
-          then: {
-            properties: {
-              const: {
-                type: 'array',
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeObject',
-          },
-          then: {
-            properties: {
-              const: {
-                type: 'object',
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeString',
-          },
-          then: {
-            properties: {
-              const: {
-                type: 'string',
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeNumberOrInteger',
-          },
-          then: {
-            properties: {
-              const: {
-                type: 'number',
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeBoolean',
-          },
-          then: {
-            properties: {
-              const: {
-                type: 'boolean',
-              },
-            },
-          },
-        },
-      ],
     },
     enumProperty: {
       title: 'Enumeration',
@@ -186,78 +109,6 @@ export const simplifiedMetaSchema = {
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-enum',
         },
       },
-      allOf: [
-        {
-          if: {
-            $ref: '#/$defs/hasTypeArray',
-          },
-          then: {
-            properties: {
-              enum: {
-                items: {
-                  type: 'array',
-                },
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeObject',
-          },
-          then: {
-            properties: {
-              enum: {
-                items: {
-                  type: 'object',
-                },
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeString',
-          },
-          then: {
-            properties: {
-              enum: {
-                items: {
-                  type: 'string',
-                },
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeNumberOrInteger',
-          },
-          then: {
-            properties: {
-              enum: {
-                items: {
-                  type: 'number',
-                },
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeBoolean',
-          },
-          then: {
-            properties: {
-              enum: {
-                items: {
-                  type: 'boolean',
-                },
-              },
-            },
-          },
-        },
-      ],
     },
     schemaComposition: {
       title: 'Schema composition with "allOf", "anyOf", "oneOf", "not"',
@@ -286,9 +137,9 @@ export const simplifiedMetaSchema = {
         },
         oneOf: {
           description:
-              "This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON Schema.\n" +
-              '\n' +
-              "An instance validates successfully against this keyword if it validates successfully against exactly one schema defined by this keyword's value.",
+            "This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON Schema.\n" +
+            '\n' +
+            "An instance validates successfully against this keyword if it validates successfully against exactly one schema defined by this keyword's value.",
           $ref: '#/$defs/schemaArray',
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-oneof',
           metaConfigurator: {
@@ -471,14 +322,6 @@ export const simplifiedMetaSchema = {
             $ref: '#/$defs/numberProperty',
           },
         },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeBoolean',
-          },
-          then: {
-            $ref: '#/$defs/booleanProperty',
-          },
-        },
       ],
     },
     numberProperty: {
@@ -532,27 +375,6 @@ export const simplifiedMetaSchema = {
           metaConfigurator: {
             advanced: true,
           },
-        },
-      },
-    },
-    metaObjectProperty: {
-      title: 'Meta Object property',
-      properties: {
-        properties: {
-          type: 'object',
-          description:
-              'The value of "properties" MUST be an object. Each value of this object MUST be a valid JSON Schema.\n' +
-              '\n' +
-              "Validation succeeds if, for each name that appears in both the instance and as a name within this keyword's value, the child instance for that name successfully validates against the corresponding schema.\n" +
-              '\n' +
-              'The annotation result of this keyword is the set of instance property names matched by this keyword. This annotation affects the behavior of "additionalProperties" (in this vocabulary) and "unevaluatedProperties" in the Unevaluated vocabulary.\n' +
-              '\n' +
-              'Omitting this keyword has the same assertion behavior as an empty object.',
-          additionalProperties: {
-            $ref: '#/$defs/jsonSchema',
-          },
-          $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-properties',
-          default: {},
         },
       },
     },
@@ -706,9 +528,6 @@ export const simplifiedMetaSchema = {
           },
         },
       },
-    },
-    booleanProperty: {
-      title: 'Boolean property',
     },
     stringProperty: {
       title: 'String property',
@@ -923,20 +742,6 @@ export const simplifiedMetaSchema = {
         },
       },
     },
-    'rootMeta-data': {
-      properties: {
-        title: {
-          type: 'string',
-          $comment:
-              'https://json-schema.org/draft/2020-12/json-schema-validation#name-title-and-description',
-        },
-        description: {
-          type: 'string',
-          $comment:
-              'https://json-schema.org/draft/2020-12/json-schema-validation#name-title-and-description',
-        },
-      },
-    },
     'meta-data': {
       properties: {
         title: {
@@ -1003,93 +808,6 @@ export const simplifiedMetaSchema = {
           },
         },
       },
-      allOf: [
-        {
-          if: {
-            $ref: '#/$defs/hasTypeArray',
-          },
-          then: {
-            properties: {
-              examples: {
-                items: {
-                  type: 'array',
-                },
-              },
-              default: {
-                type: 'array',
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeObject',
-          },
-          then: {
-            properties: {
-              examples: {
-                items: {
-                  type: 'object',
-                },
-              },
-              default: {
-                type: 'object',
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeString',
-          },
-          then: {
-            properties: {
-              examples: {
-                items: {
-                  type: 'string',
-                },
-              },
-              default: {
-                type: 'string',
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeNumberOrInteger',
-          },
-          then: {
-            properties: {
-              examples: {
-                items: {
-                  type: 'number',
-                },
-              },
-              default: {
-                type: 'number',
-              },
-            },
-          },
-        },
-        {
-          if: {
-            $ref: '#/$defs/hasTypeBoolean',
-          },
-          then: {
-            properties: {
-              examples: {
-                items: {
-                  type: 'boolean',
-                },
-              },
-              default: {
-                type: 'boolean',
-              },
-            },
-          },
-        },
-      ],
     },
     hasTypeArray: {
       anyOf: [
@@ -1128,28 +846,6 @@ export const simplifiedMetaSchema = {
               type: 'array',
               contains: {
                 const: 'object',
-              },
-            },
-          },
-        },
-      ],
-      required: ['type'],
-    },
-    hasTypeBoolean: {
-      anyOf: [
-        {
-          properties: {
-            type: {
-              const: 'boolean',
-            },
-          },
-        },
-        {
-          properties: {
-            type: {
-              type: 'array',
-              contains: {
-                const: 'boolean',
               },
             },
           },
