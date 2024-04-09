@@ -46,13 +46,13 @@ export const useDataStore = defineStore('dataStore', () => {
    * The json schema meta schema as a TopLevelJsonSchema object
    */
   const metaSchema: Ref<TopLevelJsonSchema> = computed(
-      () => new TopLevelJsonSchema(metaSchemaData.value)
+    () => new TopLevelJsonSchema(metaSchemaData.value)
   );
   /**
    * The json schema meta schema (restricted) as a TopLevelJsonSchema object
    */
   const metaSchemaRestricted: Ref<TopLevelJsonSchema> = computed(
-      () => new TopLevelJsonSchema(metaSchemaRestrictedData.value)
+    () => new TopLevelJsonSchema(metaSchemaRestrictedData.value)
   );
 
   // make sure that the schema is not preprocessed too often
