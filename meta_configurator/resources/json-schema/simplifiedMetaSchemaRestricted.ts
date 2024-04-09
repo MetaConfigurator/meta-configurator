@@ -8,12 +8,12 @@
  */
 export const simplifiedMetaSchemaRestricted = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
-  $id: 'com.github.meta_configurator.simplified-meta-schema',
-  title: 'Json schema (simplified)',
+  $id: 'com.github.meta_configurator.simplified-meta-schema-restricted',
+  title: 'Json schema (simplified and restricted)',
   $ref: '#/$defs/jsonMetaSchema',
   $defs: {
     jsonMetaSchema: {
-      title: 'Json meta-schema',
+      title: 'Json meta-schema (simplified and restricted)',
       allOf: [
         {
           $ref: '#/$defs/core',
