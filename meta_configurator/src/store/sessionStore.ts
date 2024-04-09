@@ -76,7 +76,11 @@ export const useSessionStore = defineStore('sessionStore', () => {
         return useDataStore().schema;
 
       case SessionMode.SchemaEditor:
-        return useDataStore().metaSchema;
+        if (true) {
+          return useDataStore().metaSchemaRestricted;
+        } else {
+          return useDataStore().metaSchema;
+        }
 
       case SessionMode.Settings:
         return useSettingsStore().settingsSchema;
@@ -95,7 +99,11 @@ export const useSessionStore = defineStore('sessionStore', () => {
         return useDataStore().schemaDataPreprocessed;
 
       case SessionMode.SchemaEditor:
-        return useDataStore().metaSchemaData; // no difference between preprocessed and unprocessed meta schema
+        if (useSettingsStore().settingsData.metaSchema.simplified) {
+          return useDataStore().metaSchemaRestrictedData; // no difference between preprocessed and unprocessed meta schema
+        } else {
+          return useDataStore().metaSchemaData; // no difference between preprocessed and unprocessed meta schema
+        }
 
       case SessionMode.Settings:
         return useSettingsStore().settingsSchemaData; // no difference between preprocessed and unprocessed settings schema
