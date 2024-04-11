@@ -10,9 +10,10 @@ const dataSource = useDataSource();
 
 const managedUserData = new ManagedData(dataSource.userData);
 const managedSchemaData = new ManagedData(dataSource.userSchemaData);
-const managedSettingsData = new ManagedData(dataSource.userData);
+const managedSettingsData = new ManagedData(dataSource.settingsData);
 const managedUserSchema = new ManagedSchema(dataSource.userSchemaData, true);
-const managedMetaSchema = new ManagedSchema(dataSource.metaSchemaData, true);
+const managedMetaSchema = new ManagedSchema(dataSource.metaSchemaData, false);
+const managedMetaSchemaRestricted = new ManagedSchema(dataSource.metaSchemaRestrictedData, false);
 const managedSettingsSchema = new ManagedSchema(dataSource.settingsSchemaData, false);
 
 /**
@@ -38,7 +39,11 @@ export function getSchemaForMode(mode: SessionMode): ManagedSchema {
     case SessionMode.FileEditor:
       return managedUserSchema;
     case SessionMode.SchemaEditor:
-      return managedMetaSchema;
+      if (getDataForMode(SessionMode.Settings).dataAt(['metaSchema', 'simplified']) as boolean) {
+        return managedMetaSchemaRestricted;
+      } else {
+        return managedMetaSchema;
+      }
     case SessionMode.Settings:
       return managedSettingsSchema;
     default:
