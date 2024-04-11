@@ -1,4 +1,4 @@
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {
   AddPropertyTreeNode,
   ConfigDataTreeNodeType,
@@ -20,18 +20,18 @@ import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
 interface TreeNodeResolvingParameters {
   absolutePath: Path;
   relativePath: Path;
-  schema: JsonSchema;
+  schema: JsonSchemaWrapper;
   depth: number;
 }
 
 /**
- * Creates a {@link GuiEditorTreeNode} from a {@link JsonSchema}.
+ * Creates a {@link GuiEditorTreeNode} from a {@link JsonSchemaWrapper}.
  *
  * This will not create the children of the nodes, but only the node itself.
  */
 export class ConfigTreeNodeResolver {
   /**
-   * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchema} and
+   * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchemaWrapper} and
    * the corresponding data.
    *
    * @param schema The schema of the node.
@@ -42,8 +42,8 @@ export class ConfigTreeNodeResolver {
    * @param nodeType The type of the node, e.g. {@link TreeNodeType.SCHEMA_PROPERTY} by default.
    */
   public createTreeNodeOfProperty(
-    schema: JsonSchema,
-    parentSchema?: JsonSchema,
+    schema: JsonSchemaWrapper,
+    parentSchema?: JsonSchemaWrapper,
     absolutePath: Path = [],
     relativePath: Path = [],
     depth: number = 0,
@@ -72,7 +72,7 @@ export class ConfigTreeNodeResolver {
   /**
    * Determines whether a node is a leaf node.
    */
-  private isLeaf(schema: JsonSchema, depth: number, absolutePath: Path): boolean {
+  private isLeaf(schema: JsonSchemaWrapper, depth: number, absolutePath: Path): boolean {
     const dependsOnUserSelection = this.dependsOnUserSelection(schema);
     if (dependsOnUserSelection) {
       const path = pathToString(absolutePath);
@@ -98,7 +98,7 @@ export class ConfigTreeNodeResolver {
   /**
    * True if the schema depends on the user selection, i.e., if it has anyOf, oneOf or multiple types.
    */
-  private dependsOnUserSelection(schema: JsonSchema) {
+  private dependsOnUserSelection(schema: JsonSchemaWrapper) {
     return schema.anyOf.length > 0 || schema.oneOf.length > 0 || schema.type.length > 1;
   }
 
@@ -417,7 +417,7 @@ export class ConfigTreeNodeResolver {
         relativePath: relativePath,
         schema:
           schema.additionalProperties ||
-          new JsonSchema({}, useCurrentSchema().schemaDataPreprocessed, false), // not used
+          new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed, false), // not used
         parentSchema: schema,
         name: '', // name is not used for add property node, but we keep it for easier type checking
         depth: depth,
@@ -464,13 +464,13 @@ export class ConfigTreeNodeResolver {
       delete baseSchema.type;
       const newTypeSchema = typeSchema(
         schema.type[userSelectionOneOf.index],
-        useCurrentSchema().schemaDataPreprocessed
+        useCurrentSchema().schemaPreprocessed
       );
-      const mergedSchema = new JsonSchema(
+      const mergedSchema = new JsonSchemaWrapper(
         {
           allOf: [baseSchema, newTypeSchema.jsonSchema ?? {}],
         },
-        useCurrentSchema().schemaDataPreprocessed
+        useCurrentSchema().schemaPreprocessed
       );
       return [
         this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
@@ -491,11 +491,11 @@ export class ConfigTreeNodeResolver {
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.oneOf;
       const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
-      const mergedSchema = new JsonSchema(
+      const mergedSchema = new JsonSchemaWrapper(
         {
           allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
         },
-        useCurrentSchema().schemaDataPreprocessed
+        useCurrentSchema().schemaPreprocessed
       );
       return [
         this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
@@ -525,7 +525,7 @@ export class ConfigTreeNodeResolver {
       }
       return [
         this.createTreeNodeOfProperty(
-          new JsonSchema(mergedSchema, useCurrentSchema().schemaDataPreprocessed),
+          new JsonSchemaWrapper(mergedSchema, useCurrentSchema().schemaPreprocessed),
           schema,
           absolutePath,
           relativePath,
@@ -539,7 +539,7 @@ export class ConfigTreeNodeResolver {
   /**
    * Determines whether an "add property" node should be added to the tree.
    */
-  private shouldAddAddPropertyNode(schema: JsonSchema, data: any) {
+  private shouldAddAddPropertyNode(schema: JsonSchemaWrapper, data: any) {
     if (Array.isArray(data)) {
       return false;
     }
@@ -556,7 +556,7 @@ export class ConfigTreeNodeResolver {
   /**
    * Determines whether an "add item" node should be added to the tree.
    */
-  private shouldAddAddItemNode(schema: JsonSchema, data: any) {
+  private shouldAddAddItemNode(schema: JsonSchemaWrapper, data: any) {
     if (data !== undefined && !Array.isArray(data)) {
       return false;
     }

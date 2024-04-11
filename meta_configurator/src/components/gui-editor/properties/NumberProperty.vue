@@ -3,7 +3,7 @@
 import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
 import type {PathElement} from '@/model/path';
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import {ValidationResult} from '@/schema/validation/validationService';
 import {GuiConstants} from '@/constants';
@@ -11,7 +11,7 @@ import {GuiConstants} from '@/constants';
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: number | undefined;
-  propertySchema: JsonSchema;
+  propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
 

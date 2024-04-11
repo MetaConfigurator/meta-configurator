@@ -1,6 +1,6 @@
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
-import type {JsonSchema} from '@/schema/jsonSchema';
+import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {errorService} from '@/main';
 import type {MenuItem} from 'primevue/menuitem';
 import {pathToString} from '@/utility/pathUtils';
@@ -20,7 +20,7 @@ export async function searchInDataAndSchema(searchTerm: string): Promise<SearchR
   try {
     const result: SearchResult[] = [];
     const data = useCurrentData().data.value;
-    const schema: JsonSchema = useCurrentSchema().schemaProcessed.value;
+    const schema: JsonSchemaWrapper = useCurrentSchema().schemaWrapper.value;
     await searchInDataAndSchemaRecursive(data, schema, [], searchTerm, result);
     return result;
   } catch (e) {
@@ -31,7 +31,7 @@ export async function searchInDataAndSchema(searchTerm: string): Promise<SearchR
 
 async function searchInDataAndSchemaRecursive(
   data: any | undefined,
-  schema: JsonSchema | undefined,
+  schema: JsonSchemaWrapper | undefined,
   path: Path,
   searchTerm: string,
   result: SearchResult[],
@@ -94,7 +94,7 @@ async function searchInDataAndSchemaRecursive(
 function addToResult(
   path: Path,
   data: any | undefined,
-  schema: JsonSchema | undefined,
+  schema: JsonSchemaWrapper | undefined,
   searchTerm: string,
   result: SearchResult[]
 ): void {
@@ -109,11 +109,11 @@ function addToResult(
   }
 }
 
-function getPropertyNamesFromDataAndSchema(data: any, schema: JsonSchema | undefined) {
+function getPropertyNamesFromDataAndSchema(data: any, schema: JsonSchemaWrapper | undefined) {
   return new Set(Object.keys(data ?? {}).concat(Object.keys(schema?.properties ?? {})));
 }
 
-function descriptionOrTitleMatches(schema: JsonSchema | undefined, searchTerm: string) {
+function descriptionOrTitleMatches(schema: JsonSchemaWrapper | undefined, searchTerm: string) {
   return (
     (schema?.title !== undefined && matchesSearchTerm(schema.title, searchTerm)) ||
     (schema?.description !== undefined && matchesSearchTerm(schema.description, searchTerm))
@@ -138,7 +138,7 @@ function isObject(data: any) {
 export interface SearchResult {
   path: Path;
   data: any | undefined;
-  schema: JsonSchema | undefined;
+  schema: JsonSchemaWrapper | undefined;
   searchTerm: string;
 }
 

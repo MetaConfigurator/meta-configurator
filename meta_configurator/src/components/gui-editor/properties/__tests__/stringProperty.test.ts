@@ -1,7 +1,7 @@
 import {shallowMount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {ValidationResult} from '../../../../schema/validation/validationService';
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '../../../../schema/jsonSchemaWrapper';
 import StringProperty from '../StringProperty.vue';
 import InputText from 'primevue/inputtext';
 
@@ -31,7 +31,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: 'bar',
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema(
+      propertySchema: new JsonSchemaWrapper(
         {
           type: 'string',
         },
@@ -68,7 +68,7 @@ describe('StringProperty', () => {
         propertyName: 'foo',
         propertyData: 'newData',
         validationResults: new ValidationResult([]),
-        propertySchema: new JsonSchema(
+        propertySchema: new JsonSchemaWrapper(
           {
             type: 'string',
           },
@@ -89,7 +89,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: 1,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema(
+      propertySchema: new JsonSchemaWrapper(
         {
           type: 'number',
         },
@@ -108,7 +108,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: {},
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema(
+      propertySchema: new JsonSchemaWrapper(
         {
           type: 'object',
         },
@@ -127,7 +127,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: [],
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema(
+      propertySchema: new JsonSchemaWrapper(
         {
           type: 'array',
         },
@@ -146,7 +146,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: null,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema(
+      propertySchema: new JsonSchemaWrapper(
         {
           type: 'null',
         },
@@ -165,7 +165,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: undefined,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema({}, {}, false),
+      propertySchema: new JsonSchemaWrapper({}, {}, false),
     });
 
     it('should correctly setup the input field', () => {

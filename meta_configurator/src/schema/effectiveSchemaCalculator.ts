@@ -1,4 +1,4 @@
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {Path} from '@/model/path';
 import _ from 'lodash';
 import {useValidationService} from '@/schema/validation/useValidation';
@@ -9,7 +9,7 @@ import {useCurrentSchema} from '@/data/useDataLink';
  * Wrapper around a schema and the data it was calculated for.
  */
 export class EffectiveSchema {
-  constructor(public schema: JsonSchema, public data: any, public path: Path) {}
+  constructor(public schema: JsonSchemaWrapper, public data: any, public path: Path) {}
 }
 
 /**
@@ -27,11 +27,11 @@ export class EffectiveSchema {
  * @returns the effective schema
  */
 export function calculateEffectiveSchema(
-  schema: JsonSchema | undefined,
+  schema: JsonSchemaWrapper | undefined,
   data: any,
   path: Path
 ): EffectiveSchema {
-  let result = schema ?? new JsonSchema({}, useCurrentSchema().schemaDataPreprocessed, false);
+  let result = schema ?? new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed, false);
   let iteration = 0;
 
   while (result.isDataDependent && iteration < 1000) {
@@ -58,7 +58,7 @@ export function calculateEffectiveSchema(
   return new EffectiveSchema(result, data, path);
 }
 
-function resolveDependentRequired(schemaWrapper: JsonSchema, data: any) {
+function resolveDependentRequired(schemaWrapper: JsonSchemaWrapper, data: any) {
   // new required = required + dependentRequired
 
   const newRequired: string[] = schemaWrapper.required;
@@ -72,16 +72,16 @@ function resolveDependentRequired(schemaWrapper: JsonSchema, data: any) {
   const baseSchema = {...schemaWrapper.jsonSchema};
   delete baseSchema.dependentRequired;
 
-  return new JsonSchema(
+  return new JsonSchemaWrapper(
     {
       ...baseSchema,
       required: _.union(newRequired),
     },
-    useCurrentSchema().schemaDataPreprocessed
+    useCurrentSchema().schemaPreprocessed
   );
 }
 
-function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
+function resolveIfThenElse(schemaWrapper: JsonSchemaWrapper, data: any) {
   if (!schemaWrapper.if || !schemaWrapper.if.jsonSchema) {
     return schemaWrapper;
   }
@@ -98,10 +98,10 @@ function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
   const elseSchema = schemaWrapper.else?.jsonSchema ?? {};
 
   const newSchema = {allOf: [baseSchema, valid ? thenSchema : elseSchema]};
-  return new JsonSchema(newSchema, useCurrentSchema().schemaDataPreprocessed);
+  return new JsonSchemaWrapper(newSchema, useCurrentSchema().schemaPreprocessed);
 }
 
-function resolveConditions(result: JsonSchema, data: any) {
+function resolveConditions(result: JsonSchemaWrapper, data: any) {
   const resolvedConditions = result.conditions?.map(condition => {
     return resolveIfThenElse(condition, data);
   });
@@ -114,10 +114,10 @@ function resolveConditions(result: JsonSchema, data: any) {
       ...(resolvedConditions?.map(condition => condition.jsonSchema ?? {}) ?? []),
     ],
   };
-  return new JsonSchema(newSchema, useCurrentSchema().schemaDataPreprocessed);
+  return new JsonSchemaWrapper(newSchema, useCurrentSchema().schemaPreprocessed);
 }
 
-function resolveDependentSchemas(schemaWrapper: JsonSchema, data: any): JsonSchema {
+function resolveDependentSchemas(schemaWrapper: JsonSchemaWrapper, data: any): JsonSchemaWrapper {
   const dependentSchemas = Object.entries(schemaWrapper.dependentSchemas ?? {})
     // data is present --> add dependent schema
     .filter(([key]) => dataAt([key], data) !== undefined)
@@ -131,5 +131,5 @@ function resolveDependentSchemas(schemaWrapper: JsonSchema, data: any): JsonSche
   const newSchema = {
     allOf: [baseSchema, ...dependentSchemas],
   };
-  return new JsonSchema(newSchema, useCurrentSchema().schemaDataPreprocessed);
+  return new JsonSchemaWrapper(newSchema, useCurrentSchema().schemaPreprocessed);
 }

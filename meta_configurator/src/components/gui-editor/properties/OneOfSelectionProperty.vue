@@ -3,7 +3,7 @@
 import type {WritableComputedRef} from 'vue';
 import {computed, onMounted} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import type {JsonSchema} from '@/schema/jsonSchema';
+import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {useSessionStore} from '@/store/sessionStore';
 import type {Path, PathElement} from '@/model/path';
 import {pathToString} from '@/utility/pathUtils';
@@ -17,10 +17,10 @@ import {useCurrentSchema} from '@/data/useDataLink';
 
 const props = defineProps<{
   propertyName: PathElement;
-  propertySchema: JsonSchema;
+  propertySchema: JsonSchemaWrapper;
   propertyData: any | undefined;
   absolutePath: Path;
-  possibleSchemas: Array<JsonSchema>;
+  possibleSchemas: Array<JsonSchemaWrapper>;
   isTypeUnion: boolean;
 }>();
 

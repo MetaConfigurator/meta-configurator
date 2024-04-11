@@ -50,7 +50,7 @@ export function resolveCorrespondingComponent(
     return h(OneOfSelectionProperty, {
       ...propsObject,
       possibleSchemas: nodeData.schema.type.map(type =>
-        typeSchema(type, useCurrentSchema().schemaDataPreprocessed)
+        typeSchema(type, useCurrentSchema().schemaPreprocessed)
       ),
       isTypeUnion: true,
     });

@@ -1,6 +1,6 @@
 import type {TreeNode} from 'primevue/tree';
 import type {Path, PathElement} from '@/model/path';
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 
 /**
  * Represents a node in the schema tree.
@@ -39,8 +39,8 @@ export enum TreeNodeType {
 }
 
 export interface AddItemTreeNodeData {
-  schema: JsonSchema; // schema of the items
-  parentSchema?: JsonSchema;
+  schema: JsonSchemaWrapper; // schema of the items
+  parentSchema?: JsonSchemaWrapper;
   parentName?: PathElement;
   depth: number;
   relativePath: Path;
@@ -50,8 +50,8 @@ export interface AddItemTreeNodeData {
 
 export interface ConfigTreeNodeData {
   name: PathElement;
-  schema: JsonSchema;
-  parentSchema?: JsonSchema;
+  schema: JsonSchemaWrapper;
+  parentSchema?: JsonSchemaWrapper;
   parentName?: PathElement;
   relativePath: Path;
   absolutePath: Path;
@@ -60,8 +60,8 @@ export interface ConfigTreeNodeData {
 
 export interface AddPropertyTreeData {
   name: PathElement;
-  schema: JsonSchema;
-  parentSchema: JsonSchema;
+  schema: JsonSchemaWrapper;
+  parentSchema: JsonSchemaWrapper;
   parentName?: PathElement;
   relativePath: Path;
   absolutePath: Path;

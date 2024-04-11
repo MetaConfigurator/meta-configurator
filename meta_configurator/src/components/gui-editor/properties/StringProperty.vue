@@ -4,13 +4,13 @@ import {computed, ref, watch} from 'vue';
 import InputText from 'primevue/inputtext';
 import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
-import type {JsonSchema} from '@/schema/jsonSchema';
+import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {ValidationResult} from '@/schema/validation/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: string | undefined;
-  propertySchema: JsonSchema;
+  propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
 

@@ -16,7 +16,7 @@ function getFileData() {
 }
 
 function getSchema() {
-  return JSON.stringify(useCurrentSchema().schemaProcessed.value);
+  return JSON.stringify(useCurrentSchema().schemaWrapper.value);
 }
 
 function getDataAtCurrentPath() {

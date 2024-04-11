@@ -1,7 +1,12 @@
-import type {JsonSchemaType, SchemaPropertyType} from '@/model/jsonSchemaType';
+import type {
+  JsonSchemaObjectType,
+  JsonSchemaType,
+  JsonSchemaTypePreprocessed,
+  SchemaPropertyType,
+} from '@/model/jsonSchemaType';
 import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/schemaUtils';
 import type {Path, PathElement} from '@/model/path';
-import {preprocessSchema} from '@/schema/schemaPreprocessor';
+import {resolveAndTransform} from '@/schema/schemaLazyResolver';
 import _ from 'lodash';
 import {assert} from '@vueuse/core';
 
@@ -11,43 +16,34 @@ import {assert} from '@vueuse/core';
  * Especially, it provides a way to access the schema at a given path and
  * null-safe access to the schema's properties.
  */
-export class JsonSchema {
-  readonly jsonSchema?;
-  readonly referenceSchemaPreprocessed: JsonSchemaType;
-  private _additionalProperties?: JsonSchema;
-  private _allOf?: JsonSchema[];
-  private _anyOf?: JsonSchema[];
-  private _oneOf?: JsonSchema[];
-  private _not?: JsonSchema;
-  private _items?: JsonSchema;
-  private _contains?: JsonSchema;
-  private _properties?: Record<string, JsonSchema>;
-  private _patternProperties?: Record<string, JsonSchema>;
-  private _dependentSchemas?: Record<string, JsonSchema>;
-  private _propertyNames?: JsonSchema;
-  private _prefixItems?: JsonSchema[];
-  private _unevaluatedItems?: JsonSchema;
-  private _unevaluatedProperties?: JsonSchema;
-  private _if?: JsonSchema;
-  private _then?: JsonSchema;
-  private _else?: JsonSchema;
-  private _contentSchema?: JsonSchema;
+export class JsonSchemaWrapper {
+  readonly jsonSchema?: JsonSchemaObjectType;
+  readonly rootSchema: JsonSchemaTypePreprocessed;
+  private _additionalProperties?: JsonSchemaWrapper;
+  private _allOf?: JsonSchemaWrapper[];
+  private _anyOf?: JsonSchemaWrapper[];
+  private _oneOf?: JsonSchemaWrapper[];
+  private _not?: JsonSchemaWrapper;
+  private _items?: JsonSchemaWrapper;
+  private _contains?: JsonSchemaWrapper;
+  private _properties?: Record<string, JsonSchemaWrapper>;
+  private _patternProperties?: Record<string, JsonSchemaWrapper>;
+  private _dependentSchemas?: Record<string, JsonSchemaWrapper>;
+  private _propertyNames?: JsonSchemaWrapper;
+  private _prefixItems?: JsonSchemaWrapper[];
+  private _unevaluatedItems?: JsonSchemaWrapper;
+  private _unevaluatedProperties?: JsonSchemaWrapper;
+  private _if?: JsonSchemaWrapper;
+  private _then?: JsonSchemaWrapper;
+  private _else?: JsonSchemaWrapper;
+  private _contentSchema?: JsonSchemaWrapper;
 
-  constructor(
-    jsonSchema: JsonSchemaType,
-    referenceSchemaPreprocessed: JsonSchemaType,
-    preprocess = true
-  ) {
-    assert(
-      referenceSchemaPreprocessed !== undefined,
-      'referenceSchemaPreprocessed must be defined'
-    );
-    this.referenceSchemaPreprocessed = referenceSchemaPreprocessed;
+  constructor(jsonSchema: JsonSchemaType, rootSchema: JsonSchemaTypePreprocessed, resolve = true) {
+    assert(rootSchema !== undefined, 'rootSchema must be defined');
+    this.rootSchema = rootSchema;
     this.jsonSchema = nonBooleanSchema(jsonSchema);
-    if (preprocess && this.jsonSchema !== undefined) {
-      this.jsonSchema = nonBooleanSchema(
-        preprocessSchema(this.jsonSchema, this.referenceSchemaPreprocessed)
-      );
+    if (resolve && this.jsonSchema !== undefined) {
+      this.jsonSchema = nonBooleanSchema(resolveAndTransform(this.jsonSchema, this.rootSchema));
     }
   }
 
@@ -87,12 +83,12 @@ export class JsonSchema {
     return this.required?.includes(key) ?? false;
   }
 
-  public subSchemaAt(relativePath: Path): JsonSchema | undefined {
+  public subSchemaAt(relativePath: Path): JsonSchemaWrapper | undefined {
     if (relativePath.length === 0) {
       return this;
     }
 
-    let schema: JsonSchema | undefined = this;
+    let schema: JsonSchemaWrapper | undefined = this;
     for (const element of relativePath) {
       schema = schema.subSchema(element);
       if (schema === undefined) {
@@ -108,7 +104,7 @@ export class JsonSchema {
    * @param subElement The name of the property or the index of the item.
    * @returns The schema at the given property or item, or undefined, if there is none.
    */
-  public subSchema(subElement: PathElement): JsonSchema | undefined {
+  public subSchema(subElement: PathElement): JsonSchemaWrapper | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
@@ -120,7 +116,7 @@ export class JsonSchema {
     return this.subItem(subElement);
   }
 
-  subProperty(subElement: string): JsonSchema | undefined {
+  subProperty(subElement: string): JsonSchemaWrapper | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
@@ -139,7 +135,7 @@ export class JsonSchema {
     return this.additionalProperties;
   }
 
-  subItem(subElement: number): JsonSchema | undefined {
+  subItem(subElement: number): JsonSchemaWrapper | undefined {
     if (this.jsonSchema === undefined) {
       return undefined;
     }
@@ -241,11 +237,11 @@ export class JsonSchema {
    *
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.3.2.3
    */
-  get additionalProperties(): JsonSchema {
+  get additionalProperties(): JsonSchemaWrapper {
     if (this._additionalProperties === undefined) {
-      this._additionalProperties = new JsonSchema(
+      this._additionalProperties = new JsonSchemaWrapper(
         this.jsonSchema?.additionalProperties ?? true,
-        this.referenceSchemaPreprocessed
+        this.rootSchema
       );
     }
     return this._additionalProperties;
@@ -262,9 +258,9 @@ export class JsonSchema {
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.1.1
    * @todo we have to this consider this keyword for basically all other keywords
    */
-  get allOf(): JsonSchema[] {
+  get allOf(): JsonSchemaWrapper[] {
     if (this._allOf === undefined) {
-      this._allOf = schemaArray(this.jsonSchema?.allOf, this.referenceSchemaPreprocessed);
+      this._allOf = schemaArray(this.jsonSchema?.allOf, this.rootSchema);
     }
     return this._allOf;
   }
@@ -281,9 +277,9 @@ export class JsonSchema {
    *
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.1.2
    */
-  get anyOf(): JsonSchema[] {
+  get anyOf(): JsonSchemaWrapper[] {
     if (this._anyOf === undefined) {
-      this._anyOf = schemaArray(this.jsonSchema?.anyOf, this.referenceSchemaPreprocessed!);
+      this._anyOf = schemaArray(this.jsonSchema?.anyOf, this.rootSchema!);
     }
     return this._anyOf;
   }
@@ -296,9 +292,9 @@ export class JsonSchema {
    *
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.1.3
    */
-  get oneOf(): JsonSchema[] {
+  get oneOf(): JsonSchemaWrapper[] {
     if (this._oneOf === undefined) {
-      this._oneOf = schemaArray(this.jsonSchema?.oneOf, this.referenceSchemaPreprocessed!);
+      this._oneOf = schemaArray(this.jsonSchema?.oneOf, this.rootSchema!);
     }
     return this._oneOf;
   }
@@ -313,9 +309,9 @@ export class JsonSchema {
    *
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.1.4
    */
-  get not(): JsonSchema | undefined {
+  get not(): JsonSchemaWrapper | undefined {
     if (this._not === undefined) {
-      this._not = schemaFromObject(this.jsonSchema?.not, this.referenceSchemaPreprocessed);
+      this._not = schemaFromObject(this.jsonSchema?.not, this.rootSchema);
     }
     return this._not;
   }
@@ -323,8 +319,8 @@ export class JsonSchema {
   /**
    * Custom field that potentially contains all if-then-else conditions of the allOfs.
    */
-  get conditions(): JsonSchema[] {
-    return schemaArray(this.jsonSchema?.conditions, this.referenceSchemaPreprocessed);
+  get conditions(): JsonSchemaWrapper[] {
+    return schemaArray(this.jsonSchema?.conditions, this.rootSchema);
   }
 
   /**
@@ -350,12 +346,9 @@ export class JsonSchema {
    *
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.3.1.3
    */
-  get contains(): JsonSchema | undefined {
+  get contains(): JsonSchemaWrapper | undefined {
     if (this._contains === undefined) {
-      this._contains = schemaFromObject(
-        this.jsonSchema?.contains,
-        this.referenceSchemaPreprocessed
-      );
+      this._contains = schemaFromObject(this.jsonSchema?.contains, this.rootSchema);
     }
     return this._contains;
   }
@@ -389,12 +382,9 @@ export class JsonSchema {
    * The value of this property MUST be a valid JSON schema. It SHOULD be ignored if
    * "contentMediaType" is not present.
    */
-  get contentSchema(): JsonSchema | undefined {
+  get contentSchema(): JsonSchemaWrapper | undefined {
     if (this._contentSchema === undefined) {
-      this._contentSchema = schemaFromObject(
-        this.jsonSchema?.contentSchema,
-        this.referenceSchemaPreprocessed
-      );
+      this._contentSchema = schemaFromObject(this.jsonSchema?.contentSchema, this.rootSchema);
     }
     return this._contentSchema;
   }
@@ -436,15 +426,12 @@ export class JsonSchema {
    *
    * Omitting this keyword has the same behavior as an empty object.
    */
-  get dependentSchemas(): Record<string, JsonSchema> | undefined {
+  get dependentSchemas(): Record<string, JsonSchemaWrapper> | undefined {
     if (this._dependentSchemas === undefined) {
       if (this.jsonSchema?.dependentSchemas === undefined) {
         return undefined;
       }
-      this._dependentSchemas = schemaRecord(
-        this.jsonSchema?.dependentSchemas,
-        this.referenceSchemaPreprocessed
-      );
+      this._dependentSchemas = schemaRecord(this.jsonSchema?.dependentSchemas, this.rootSchema);
     }
     return this._dependentSchemas;
   }
@@ -471,9 +458,9 @@ export class JsonSchema {
   /**
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.2
    */
-  get else(): JsonSchema | undefined {
+  get else(): JsonSchemaWrapper | undefined {
     if (this._else === undefined) {
-      this._else = schemaFromObject(this.jsonSchema?.else, this.referenceSchemaPreprocessed);
+      this._else = schemaFromObject(this.jsonSchema?.else, this.rootSchema);
     }
     return this._else;
   }
@@ -536,9 +523,9 @@ export class JsonSchema {
   /**
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.2
    */
-  get if(): JsonSchema | undefined {
+  get if(): JsonSchemaWrapper | undefined {
     if (this._if === undefined) {
-      this._if = schemaFromObject(this.jsonSchema?.if, this.referenceSchemaPreprocessed);
+      this._if = schemaFromObject(this.jsonSchema?.if, this.rootSchema);
     }
     return this._if;
   }
@@ -546,12 +533,12 @@ export class JsonSchema {
   /**
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.3.1.2
    */
-  get items(): JsonSchema {
+  get items(): JsonSchemaWrapper {
     if (this._items === undefined) {
       this._items = schemaFromObject(
         this.jsonSchema?.items ?? true,
-        this.referenceSchemaPreprocessed
-      ) as JsonSchema;
+        this.rootSchema
+      ) as JsonSchemaWrapper;
     }
     return this._items;
   }
@@ -683,12 +670,9 @@ export class JsonSchema {
   /**
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.3.2.2
    */
-  get patternProperties(): Record<string, JsonSchema> {
+  get patternProperties(): Record<string, JsonSchemaWrapper> {
     if (this._patternProperties === undefined) {
-      this._patternProperties = schemaRecord(
-        this.jsonSchema?.patternProperties,
-        this.referenceSchemaPreprocessed
-      );
+      this._patternProperties = schemaRecord(this.jsonSchema?.patternProperties, this.rootSchema);
     }
     return this._patternProperties;
   }
@@ -698,32 +682,26 @@ export class JsonSchema {
    *
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#name-prefixitems
    */
-  get prefixItems(): JsonSchema[] {
+  get prefixItems(): JsonSchemaWrapper[] {
     if (this._prefixItems === undefined) {
-      this._prefixItems = schemaArray(
-        this.jsonSchema?.prefixItems,
-        this.referenceSchemaPreprocessed
-      );
+      this._prefixItems = schemaArray(this.jsonSchema?.prefixItems, this.rootSchema);
     }
     return this._prefixItems;
   }
 
-  get properties(): Record<string, JsonSchema> {
+  get properties(): Record<string, JsonSchemaWrapper> {
     if (this._properties === undefined) {
-      this._properties = schemaRecord(
-        this.jsonSchema?.properties,
-        this.referenceSchemaPreprocessed
-      );
+      this._properties = schemaRecord(this.jsonSchema?.properties, this.rootSchema);
     }
     return this._properties;
   }
 
-  get propertyNames(): JsonSchema {
+  get propertyNames(): JsonSchemaWrapper {
     if (this._propertyNames === undefined) {
       this._propertyNames = schemaFromObject(
         this.jsonSchema?.propertyNames ?? true,
-        this.referenceSchemaPreprocessed
-      ) as JsonSchema;
+        this.rootSchema
+      ) as JsonSchemaWrapper;
     }
     return this._propertyNames;
   }
@@ -745,9 +723,9 @@ export class JsonSchema {
   /**
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-10.2.2
    */
-  get then(): JsonSchema | undefined {
+  get then(): JsonSchemaWrapper | undefined {
     if (this._then === undefined) {
-      this._then = schemaFromObject(this.jsonSchema?.then, this.referenceSchemaPreprocessed);
+      this._then = schemaFromObject(this.jsonSchema?.then, this.rootSchema);
     }
     return this._then;
   }
@@ -786,12 +764,12 @@ export class JsonSchema {
   /**
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-11.2
    */
-  get unevaluatedItems(): JsonSchema {
+  get unevaluatedItems(): JsonSchemaWrapper {
     if (this._unevaluatedItems === undefined) {
       this._unevaluatedItems = schemaFromObject(
         this.jsonSchema?.unevaluatedItems ?? true,
-        this.referenceSchemaPreprocessed!
-      ) as JsonSchema;
+        this.rootSchema!
+      ) as JsonSchemaWrapper;
     }
     return this._unevaluatedItems;
   }
@@ -799,12 +777,12 @@ export class JsonSchema {
   /**
    * @see https://json-schema.org/draft/2020-12/json-schema-core.html#section-11.3
    */
-  get unevaluatedProperties(): JsonSchema {
+  get unevaluatedProperties(): JsonSchemaWrapper {
     if (this._unevaluatedProperties === undefined) {
       this._unevaluatedProperties = schemaFromObject(
         this.jsonSchema?.unevaluatedProperties ?? true,
-        this.referenceSchemaPreprocessed!
-      ) as JsonSchema;
+        this.rootSchema!
+      ) as JsonSchemaWrapper;
     }
     return this._unevaluatedProperties;
   }

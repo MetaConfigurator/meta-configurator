@@ -3,7 +3,7 @@ import {afterEach, beforeEach, describe, expect, it, test, vi} from 'vitest';
 import {ValidationResult} from '../../../../schema/validation/validationService';
 import NumberProperty from '../NumberProperty.vue';
 import InputNumber from 'primevue/inputnumber';
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '../../../../schema/jsonSchemaWrapper';
 import {GuiConstants} from '@/constants';
 
 // avoid constructing the session store through imports, it is not required for this component
@@ -33,7 +33,7 @@ describe('NumberProperty', () => {
         propertyName: 'foo',
         propertyData: data,
         validationResults: new ValidationResult([]),
-        propertySchema: new JsonSchema(
+        propertySchema: new JsonSchemaWrapper(
           {
             type: 'integer',
           },
@@ -62,7 +62,7 @@ describe('NumberProperty', () => {
         propertyName: 'foo',
         propertyData: data,
         validationResults: new ValidationResult([]),
-        propertySchema: new JsonSchema(
+        propertySchema: new JsonSchemaWrapper(
           {
             type: 'number',
             multipleOf: 0.5,
@@ -91,7 +91,7 @@ describe('NumberProperty', () => {
       propertyName: 'foo',
       propertyData: 1,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema(
+      propertySchema: new JsonSchemaWrapper(
         {
           type: 'integer',
         },

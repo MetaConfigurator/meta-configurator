@@ -1,14 +1,14 @@
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {TopLevelSchema} from '@/model/jsonSchemaType';
 
 /**
- * Like {@link JsonSchema}, but with additional properties that are only allowed at the top level of a schema.
+ * Like {@link JsonSchemaWrapper}, but with additional properties that are only allowed at the top level of a schema.
  */
-export class TopLevelJsonSchema extends JsonSchema {
+export class TopLevelJsonSchemaWrapper extends JsonSchemaWrapper {
   private readonly _$schema?: string;
   private _$id?: string;
   private _$vocabulary?: Record<string, boolean>;
-  private _$defs?: Record<string, JsonSchema>;
+  private _$defs?: Record<string, JsonSchemaWrapper>;
 
   constructor(schema: TopLevelSchema) {
     super(schema, schema);
@@ -27,7 +27,7 @@ export class TopLevelJsonSchema extends JsonSchema {
     return this._$vocabulary;
   }
 
-  get $defs(): Record<string, JsonSchema> | undefined {
+  get $defs(): Record<string, JsonSchemaWrapper> | undefined {
     return this._$defs;
   }
 }

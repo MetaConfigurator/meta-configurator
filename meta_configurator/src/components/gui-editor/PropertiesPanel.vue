@@ -12,7 +12,7 @@ import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/components/gui-editor/configTreeNodeResolver';
@@ -36,7 +36,7 @@ import {useValidationResult} from '@/schema/validation/useValidation';
 import {dataAt} from '@/utility/resolveDataAtPath';
 
 const props = defineProps<{
-  currentSchema: JsonSchema;
+  currentSchema: JsonSchemaWrapper;
   currentData: any;
   currentPath: Path;
 }>();
@@ -69,7 +69,7 @@ watch(
 );
 
 // update tree when the file schema changes
-watch(useCurrentSchema().schemaProcessed, () => {
+watch(useCurrentSchema().schemaWrapper, () => {
   updateTree();
 });
 
@@ -98,7 +98,7 @@ function computeTree() {
     undefined,
     props.currentPath
   );
-  currentTree.value.children = treeNodeResolver.createChildNodesOfNode(currentTree.value);
+  currentTree.value.children = treeNodeResolver.createChildNodesOfNode(currentTree.value!);
 
   expandPreviouslyExpandedElements(currentTree.value.children as Array<GuiEditorTreeNode>);
 
@@ -320,7 +320,7 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
   const treeData: ConfigTreeNodeData = {
     absolutePath: absolutePath.concat(name),
     relativePath: relativePath.concat(name),
-    schema: new JsonSchema({}, useCurrentSchema().schemaDataPreprocessed, false),
+    schema: new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed, false),
     parentSchema: objectSchema,
     depth: ((objectNode?.data?.depth as number) ?? 0) + 1,
     name: name,
@@ -344,7 +344,7 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
   }
 }
 
-function findNameForNewProperty(objectSchema: JsonSchema | undefined, data: any) {
+function findNameForNewProperty(objectSchema: JsonSchemaWrapper | undefined, data: any) {
   if (objectSchema === undefined || data === undefined) {
     return 'yourNewProperty';
   }

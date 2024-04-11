@@ -2,12 +2,12 @@
 Simple property component that displays a preview of the object properties.
 -->
 <script setup lang="ts">
-import type {JsonSchema} from '@/schema/jsonSchema';
+import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {dataToString} from '@/utility/dataToString';
 import {computed} from 'vue';
 
 const props = defineProps<{
-  propertySchema: JsonSchema;
+  propertySchema: JsonSchemaWrapper;
   propertyData: Object | undefined;
   expanded: boolean;
 }>();

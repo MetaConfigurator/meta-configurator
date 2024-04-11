@@ -5,7 +5,7 @@ Component for selecting one or more sub-schemas of an anyOf property.
 import type {WritableComputedRef} from 'vue';
 import {computed} from 'vue';
 import MultiSelect from 'primevue/multiselect';
-import type {JsonSchema} from '@/schema/jsonSchema';
+import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {useSessionStore} from '@/store/sessionStore';
 import type {Path, PathElement} from '@/model/path';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/oneOfAnyOfSelectionOption';
@@ -13,10 +13,10 @@ import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
 
 const props = defineProps<{
   propertyName: PathElement;
-  propertySchema: JsonSchema;
+  propertySchema: JsonSchemaWrapper;
   propertyData: any | undefined;
   absolutePath: Path;
-  possibleSchemas: Array<JsonSchema>;
+  possibleSchemas: Array<JsonSchemaWrapper>;
 }>();
 
 const possibleOptions = props.possibleSchemas.map(

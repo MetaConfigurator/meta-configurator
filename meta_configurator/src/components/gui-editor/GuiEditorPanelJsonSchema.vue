@@ -5,7 +5,7 @@ import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
 import {computed} from 'vue';
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getSchemaForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 import {SessionMode} from '@/model/sessionMode';
 
@@ -36,7 +36,7 @@ function selectPath(path: Path) {
 const currentSchema = computed(() => {
   const schema = useSessionStore().effectiveSchemaAtCurrentPath?.schema;
   if (!schema) {
-    return new JsonSchema({}, useCurrentSchema().schemaDataPreprocessed, false);
+    return new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed, false);
   }
   return schema;
 });
@@ -44,9 +44,9 @@ const currentSchema = computed(() => {
 
 <template>
   <div class="p-5 space-y-3 flex flex-col">
-    <SchemaInfoPanel :schema="getSchemaForMode(SessionMode.FileEditor).schemaProcessed" />
+    <SchemaInfoPanel :schema="getSchemaForMode(SessionMode.FileEditor).schemaWrapper" />
     <CurrentPathBreadcrumb
-      :root-name="getSchemaForMode(SessionMode.FileEditor).schemaProcessed?.value.title ?? 'root'"
+      :root-name="getSchemaForMode(SessionMode.FileEditor).schemaWrapper?.value.title ?? 'root'"
       :path="sessionStore.currentPath"
       @update:path="newPath => updatePath(newPath)" />
     <div class="flex-grow overflow-y-auto">

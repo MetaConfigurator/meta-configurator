@@ -4,9 +4,9 @@ import type {Path} from '@/model/path';
 import {pathToString} from '@/utility/pathUtils';
 import {watchDebounced} from '@vueuse/core';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
-import {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
-import type {JsonSchemaType} from '@/model/jsonSchemaType';
-import {JsonSchema} from '@/schema/jsonSchema';
+import {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
+import type {JsonSchemaType, JsonSchemaTypePreprocessed} from '@/model/jsonSchemaType';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {useCurrentData} from '@/data/useDataLink';
 import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
@@ -16,48 +16,48 @@ import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
  */
 export class ManagedSchema {
   /**
-   * @param _shallowSchemaRef the shallow ref to the schema
+   * @param _schemaRaw the shallow ref to the original schema object
    * @param watchSchemaChanges whether to watch for changes in schema data and reprocess the schema accordingly
    */
-  constructor(private _shallowSchemaRef: ShallowRef, watchSchemaChanges: boolean) {
-    this._schemaDataPreprocessed = ref(preprocessOneTime(this._shallowSchemaRef.value));
-    this._schemaProcessed = ref(new TopLevelJsonSchema(this._schemaDataPreprocessed.value));
+  constructor(private _schemaRaw: ShallowRef<JsonSchemaType>, watchSchemaChanges: boolean) {
+    this._schemaPreprocessed = ref(preprocessOneTime(this._schemaRaw.value));
+    this._schemaWrapper = ref(new TopLevelJsonSchemaWrapper(this._schemaPreprocessed.value));
 
     if (watchSchemaChanges) {
       // make sure that the schema is not preprocessed too often
-      watchDebounced(this.schemaData, () => this.reloadSchema(), {
+      watchDebounced(this.schemaRaw, () => this.reloadSchema(), {
         debounce: 1000,
         immediate: true,
       });
     }
   }
 
-  private _schemaDataPreprocessed: Ref<JsonSchemaType>;
+  private _schemaPreprocessed: Ref<JsonSchemaTypePreprocessed>;
 
   /**
    * The json schema as a TopLevelJsonSchema object
    */
-  private readonly _schemaProcessed: Ref<TopLevelJsonSchema>;
+  private readonly _schemaWrapper: Ref<TopLevelJsonSchemaWrapper>;
 
-  get schemaDataPreprocessed(): Ref<JsonSchemaType> {
-    return this._schemaDataPreprocessed;
+  get schemaPreprocessed(): Ref<JsonSchemaTypePreprocessed> {
+    return this._schemaPreprocessed;
   }
 
-  get schemaProcessed(): Ref<TopLevelJsonSchema> {
-    return this._schemaProcessed!;
+  get schemaWrapper(): Ref<TopLevelJsonSchemaWrapper> {
+    return this._schemaWrapper!;
   }
 
-  get schemaData(): Ref<any> {
-    return this._shallowSchemaRef;
+  get schemaRaw(): Ref<JsonSchemaType> {
+    return this._schemaRaw;
   }
 
   /**
    * Returns the schema at the given path.
    */
-  public schemaAtPath(path: Path): JsonSchema {
+  public schemaAtPath(path: Path): JsonSchemaWrapper {
     return (
-      this.schemaProcessed.value.subSchemaAt(path) ??
-      new JsonSchema({}, this._schemaDataPreprocessed, false)
+      this.schemaWrapper.value.subSchemaAt(path) ??
+      new JsonSchemaWrapper({}, this._schemaPreprocessed, false)
     );
   }
 
@@ -66,7 +66,7 @@ export class ManagedSchema {
    */
   public effectiveSchemaAtPath(path: Path): EffectiveSchema {
     let currentEffectiveSchema: EffectiveSchema = calculateEffectiveSchema(
-      this.schemaProcessed.value,
+      this.schemaWrapper.value,
       useCurrentData().data.value,
       []
     );
@@ -100,8 +100,7 @@ export class ManagedSchema {
   }
 
   public reloadSchema() {
-    console.log('reload schema');
-    this._schemaDataPreprocessed = ref(preprocessOneTime(this._shallowSchemaRef.value));
-    this._schemaProcessed.value = new TopLevelJsonSchema(this.schemaDataPreprocessed.value);
+    this._schemaPreprocessed = ref(preprocessOneTime(this._schemaRaw.value));
+    this._schemaWrapper.value = new TopLevelJsonSchemaWrapper(this.schemaPreprocessed.value);
   }
 }

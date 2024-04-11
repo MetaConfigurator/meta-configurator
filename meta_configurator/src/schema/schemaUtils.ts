@@ -1,11 +1,15 @@
-import type {JsonSchemaType, SchemaPropertyType} from '@/model/jsonSchemaType';
-import {JsonSchema} from '@/schema/jsonSchema';
+import type {
+  JsonSchemaObjectType,
+  JsonSchemaType,
+  SchemaPropertyType,
+} from '@/model/jsonSchemaType';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 
 /**
  * @returns the schema if it is not a boolean, otherwise
  * returns an empty object if the schema is true, or undefined if the schema is false
  */
-export function nonBooleanSchema(schema: JsonSchemaType) {
+export function nonBooleanSchema(schema: JsonSchemaType): JsonSchemaObjectType | undefined {
   if (schema === true) {
     return {};
   }
@@ -21,8 +25,8 @@ export function nonBooleanSchema(schema: JsonSchemaType) {
 export function schemaArray(
   schema: JsonSchemaType[] | undefined,
   referenceSchemaPreprocessed: JsonSchemaType
-): JsonSchema[] {
-  return schema?.map(s => new JsonSchema(s, referenceSchemaPreprocessed)) ?? [];
+): JsonSchemaWrapper[] {
+  return schema?.map(s => new JsonSchemaWrapper(s, referenceSchemaPreprocessed)) ?? [];
 }
 
 /**
@@ -31,11 +35,11 @@ export function schemaArray(
 export function schemaRecord(
   schemaRecord: Record<string, JsonSchemaType> | undefined,
   referenceSchemaPreprocessed: JsonSchemaType
-): Record<string, JsonSchema> {
+): Record<string, JsonSchemaWrapper> {
   return Object.fromEntries(
     Object.entries(schemaRecord ?? {}).map(([key, value]) => [
       key,
-      new JsonSchema(value, referenceSchemaPreprocessed),
+      new JsonSchemaWrapper(value, referenceSchemaPreprocessed),
     ])
   );
 }
@@ -47,11 +51,11 @@ export function schemaRecord(
 export function schemaFromObject(
   jsonSchema: JsonSchemaType | undefined,
   referenceSchemaPreprocessed: JsonSchemaType
-): JsonSchema | undefined {
+): JsonSchemaWrapper | undefined {
   if (!jsonSchema) {
     return undefined;
   }
-  return new JsonSchema(jsonSchema, referenceSchemaPreprocessed);
+  return new JsonSchemaWrapper(jsonSchema, referenceSchemaPreprocessed);
 }
 
 /**
@@ -62,6 +66,6 @@ export function schemaFromObject(
 export function typeSchema(
   type: SchemaPropertyType,
   referenceSchemaPreprocessed: JsonSchemaType
-): JsonSchema {
-  return new JsonSchema({type}, referenceSchemaPreprocessed, false);
+): JsonSchemaWrapper {
+  return new JsonSchemaWrapper({type}, referenceSchemaPreprocessed, false);
 }

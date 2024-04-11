@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
-import type {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
+import type {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import {useSessionStore} from '@/store/sessionStore';
 
 const props = defineProps<{
-  schema: ref<TopLevelJsonSchema>;
+  schema: ref<TopLevelJsonSchemaWrapper>;
 }>();
 
 const schemaInformation = computed(() => {

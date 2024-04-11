@@ -1,6 +1,7 @@
 import type {
   JsonSchemaObjectType,
   JsonSchemaType,
+  JsonSchemaTypePreprocessed,
   SchemaPropertyType,
 } from '@/model/jsonSchemaType';
 import _ from 'lodash';
@@ -17,8 +18,9 @@ import 'crypto';
  * - inject types of enum to types property
  *
  * @param schema the schema to preprocess
+ * @returns preprocessed schema
  */
-export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaType {
+export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaTypePreprocessed {
   if (typeof schema !== 'object') {
     return schema;
   }

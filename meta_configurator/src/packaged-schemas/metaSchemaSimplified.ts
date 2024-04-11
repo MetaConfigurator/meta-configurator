@@ -21,7 +21,7 @@ export const META_SCHEMA_SIMPLIFIED = {
           $ref: '#/$defs/core',
         },
         {
-          $ref: '#/$defs/objectSubSchema',
+          $ref: '#/$defs/rootObjectSubSchema',
         },
       ],
     },
@@ -44,6 +44,49 @@ export const META_SCHEMA_SIMPLIFIED = {
       ],
       $comment:
         'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
+    },
+    rootObjectSubSchema: {
+      title: 'Root Subschema',
+      type: 'object',
+      allOf: [
+        {
+          $ref: '#/$defs/objectSubSchema',
+        },
+        {
+          properties: {
+            examples: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            type: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            default: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            enum: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            const: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            additionalProperties: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+          },
+        },
+      ],
     },
     objectSubSchema: {
       title: 'Subschema',

@@ -1,4 +1,4 @@
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {PathElement} from '@/model/path';
 
 /**
@@ -10,7 +10,7 @@ import type {PathElement} from '@/model/path';
  * @param schema the schema of the property
  * @param propertyName the name of the property
  */
-export function generatePlaceholderText(schema: JsonSchema, propertyName: PathElement) {
+export function generatePlaceholderText(schema: JsonSchemaWrapper, propertyName: PathElement) {
   if (schema.examples && schema.examples.length > 0) {
     return `e.g. ${schema.examples.join(', ')}`;
   } else if (schema.default !== undefined) {

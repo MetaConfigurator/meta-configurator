@@ -1,7 +1,7 @@
 import {mount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import SimpleObjectProperty from '../SimpleObjectProperty.vue';
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '../../../../schema/jsonSchemaWrapper';
 
 // avoid constructing the session store through imports, it is not required for this component
 vi.mock('@/store/sessionStore', () => ({
@@ -46,7 +46,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar'},
-        propertySchema: new JsonSchema({}, {}, false),
+        propertySchema: new JsonSchemaWrapper({}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -62,7 +62,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar', baz: 'qux'},
-        propertySchema: new JsonSchema({}, {}, false),
+        propertySchema: new JsonSchemaWrapper({}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -78,7 +78,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {},
-        propertySchema: new JsonSchema({}, {}, false),
+        propertySchema: new JsonSchemaWrapper({}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -94,7 +94,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar', baz: 'qux'},
-        propertySchema: new JsonSchema({properties: {foo: {}}}, {}, false),
+        propertySchema: new JsonSchemaWrapper({properties: {foo: {}}}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -110,7 +110,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar'},
-        propertySchema: new JsonSchema({properties: {foo: {}, baz: {}}}, {}, false),
+        propertySchema: new JsonSchemaWrapper({properties: {foo: {}, baz: {}}}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -126,7 +126,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: undefined,
-        propertySchema: new JsonSchema({}, {}, false),
+        propertySchema: new JsonSchemaWrapper({}, {}, false),
       });
 
       it('should show the correct description', () => {

@@ -1,4 +1,4 @@
-import type {JsonSchema} from '@/schema/jsonSchema';
+import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {dataToString} from '@/utility/dataToString';
 
 export class OneOfAnyOfSelectionOption {
@@ -21,7 +21,7 @@ export class OneOfAnyOfSelectionOption {
  * @param schema the schema to describe
  * @param index  the index of the schema in the list of schemas
  */
-export function schemaOptionToString(schema: JsonSchema, index: number): string {
+export function schemaOptionToString(schema: JsonSchemaWrapper, index: number): string {
   if (schema.title) {
     return `${index}: ${schema.title}`;
   }

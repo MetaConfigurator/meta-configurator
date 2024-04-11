@@ -10,21 +10,21 @@ It emits the following events:
   - Emitted when the panel is closed
 -->
 <script setup lang="ts">
-import {JsonSchema} from '@/schema/jsonSchema';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import OverlayPanel from 'primevue/overlaypanel';
 import {computed, Ref, ref} from 'vue';
 import {describeSchema} from '@/schema/schemaDescriptor';
 import type {ErrorObject} from 'ajv';
 import {useCurrentSchema} from '@/data/useDataLink';
 
-const schemaRef: Ref<JsonSchema | undefined> = ref();
+const schemaRef: Ref<JsonSchemaWrapper | undefined> = ref();
 const propertyNameRef: Ref<String> = ref('');
-const parentSchemaRef: Ref<JsonSchema | undefined> = ref();
+const parentSchemaRef: Ref<JsonSchemaWrapper | undefined> = ref();
 const validationErrorsRef: Ref<ErrorObject[]> = ref([]);
 
 const schemaDescription = computed(() =>
   describeSchema(
-    schemaRef.value ?? new JsonSchema(true, useCurrentSchema().schemaDataPreprocessed, false),
+    schemaRef.value ?? new JsonSchemaWrapper(true, useCurrentSchema().schemaPreprocessed, false),
     propertyNameRef.value,
     parentSchemaRef.value,
     true,
@@ -42,9 +42,9 @@ const panelRef = ref();
 const keepOpen = ref(false);
 
 const showPanel = (
-  schema: JsonSchema,
+  schema: JsonSchemaWrapper,
   propertyName: string,
-  parentSchema: JsonSchema,
+  parentSchema: JsonSchemaWrapper,
   validationErrors: ErrorObject[],
   event
 ) => {

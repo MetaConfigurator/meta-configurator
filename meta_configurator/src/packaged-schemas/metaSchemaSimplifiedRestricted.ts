@@ -34,13 +34,41 @@ export const META_SCHEMA_SIMPLIFIED_RESTRICTED = {
       type: 'object',
       allOf: [
         {
-          $ref: '#/$defs/typeDefinition',
+          $ref: '#/$defs/objectSubSchema',
         },
         {
-          $ref: '#/$defs/typeSpecificFields',
-        },
-        {
-          $ref: '#/$defs/rootMeta-data',
+          properties: {
+            examples: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            type: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            default: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            enum: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            const: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+            additionalProperties: {
+              metaConfigurator: {
+                advanced: true,
+              },
+            },
+          },
         },
       ],
     },
@@ -531,20 +559,6 @@ export const META_SCHEMA_SIMPLIFIED_RESTRICTED = {
             advanced: true,
           },
         },
-        additionalProperties: {
-          description:
-            'The value of "additionalProperties" MUST be a valid JSON Schema.\n' +
-            '\n' +
-            'The behavior of this keyword depends on the presence and annotation results of "properties" and "patternProperties" within the same schema object. Validation with "additionalProperties" applies only to the child values of instance names that do not appear in the annotation results of either "properties" or "patternProperties".\n' +
-            '\n' +
-            'For all such properties, validation succeeds if the child instance validates against the "additionalProperties" schema.\n' +
-            '\n' +
-            'The annotation result of this keyword is the set of instance property names validated by this keyword\'s subschema. This annotation affects the behavior of "unevaluatedProperties" in the Unevaluated vocabulary.\n' +
-            '\n' +
-            'Omitting this keyword has the same assertion behavior as an empty schema.',
-          $ref: '#/$defs/jsonSchema',
-          $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-patternproperties',
-        },
         maxProperties: {
           description:
             'The value of this keyword MUST be a non-negative integer.\n' +
@@ -567,63 +581,6 @@ export const META_SCHEMA_SIMPLIFIED_RESTRICTED = {
           $ref: '#/$defs/nonNegativeIntegerDefault0',
           $comment:
             'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-minproperties',
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-        propertyNames: {
-          description:
-            'The value of "propertyNames" MUST be a valid JSON Schema.\n' +
-            '\n' +
-            'If the instance is an object, this keyword validates if every property name in the instance validates against the provided schema. Note the property name that the schema is testing will always be a string.\n' +
-            '\n' +
-            'Omitting this keyword has the same behavior as an empty schema.',
-          $ref: '#/$defs/jsonSchema',
-          $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-propertynames',
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-        dependentRequired: {
-          type: 'object',
-          description:
-            'The value of this keyword MUST be an object. Properties in this object, if any, MUST be arrays. Elements in each array, if any, MUST be strings, and MUST be unique.\n' +
-            '\n' +
-            'This keyword specifies properties that are required if a specific other property is present. Their requirement is dependent on the presence of the other property.\n' +
-            '\n' +
-            "Validation succeeds if, for each name that appears in both the instance and as a name within this keyword's value, every item in the corresponding array is also the name of a property in the instance.\n" +
-            '\n' +
-            'Omitting this keyword has the same behavior as an empty object.',
-          additionalProperties: {
-            $ref: '#/$defs/stringArray',
-          },
-          $comment:
-            'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-dependentrequired',
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-        dependentSchemas: {
-          type: 'object',
-          additionalProperties: {
-            $ref: '#/$defs/jsonSchema',
-          },
-          description:
-            'This keyword specifies subschemas that are evaluated if the instance is an object and contains a certain property.\n' +
-            '\n' +
-            "This keyword's value MUST be an object. Each value in the object MUST be a valid JSON Schema.\n" +
-            '\n' +
-            'If the object key is a property in the instance, the entire instance must validate against the subschema. Its use is dependent on the presence of the property.\n' +
-            '\n' +
-            'Omitting this keyword has the same behavior as an empty object.',
-          $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-dependentschemas',
-          default: {},
-          metaConfigurator: {
-            advanced: true,
-          },
-        },
-        unevaluatedProperties: {
-          $ref: '#/$defs/jsonSchema',
           metaConfigurator: {
             advanced: true,
           },
@@ -812,12 +769,6 @@ export const META_SCHEMA_SIMPLIFIED_RESTRICTED = {
           $comment:
             'https://json-schema.org/draft/2020-12/json-schema-validation.html#name-uniqueitems',
           default: false,
-        },
-        unevaluatedItems: {
-          $ref: '#/$defs/jsonSchema',
-          metaConfigurator: {
-            advanced: true,
-          },
         },
       },
     },

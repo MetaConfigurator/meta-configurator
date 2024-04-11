@@ -57,7 +57,7 @@ export class MenuItems {
       {
         label: 'Download File',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile(useCurrentSchema().schemaData.value.title ?? 'file'),
+        command: () => downloadFile(useCurrentSchema().schemaRaw.value.title ?? 'file'),
       },
       {
         separator: true,

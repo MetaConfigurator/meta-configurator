@@ -4,7 +4,7 @@ import {computed} from 'vue';
 import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 
 const currentValidationService = computed(() => {
-  const schema = useCurrentSchema().schemaData.value;
+  const schema = useCurrentSchema().schemaRaw.value;
   return new ValidationService(schema ?? {});
 });
 
