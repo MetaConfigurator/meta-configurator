@@ -1,12 +1,13 @@
 import {openUploadFileDialog, openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {openClearCurrentFileDialog, openClearSchemaDialog} from '@/components/toolbar/clearFile';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
 import type {SchemaOption} from '@/model/schemaOption';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
-import {getDataLinkForMode, useCurrentDataLink} from '@/data/useDataLink';
+import {getDataForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 import {useDataSource} from '@/data/dataSource';
+import {SessionMode} from '@/model/sessionMode';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -51,12 +52,12 @@ export class MenuItems {
       {
         label: 'Open File',
         icon: 'fa-regular fa-folder-open',
-        command: () => openUploadFileDialog(getDataLinkForMode(SessionMode.FileEditor)),
+        command: () => openUploadFileDialog(getDataForMode(SessionMode.FileEditor)),
       },
       {
         label: 'Download File',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile(useCurrentDataLink().schema.value.title ?? 'file'),
+        command: () => downloadFile(useCurrentSchema().schemaData.value.title ?? 'file'),
       },
       {
         separator: true,
@@ -66,17 +67,17 @@ export class MenuItems {
         icon: 'fa-solid fa-rotate-left',
         key: 'undo',
         command: () => {
-          useCurrentDataLink().undoManager.undo();
+          useCurrentData().undoManager.undo();
         },
-        disabled: () => !useCurrentDataLink().undoManager.canUndo,
+        disabled: () => !useCurrentData().undoManager.canUndo,
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
         command: () => {
-          useCurrentDataLink().undoManager.redo();
+          useCurrentData().undoManager.redo();
         },
-        disabled: () => !useCurrentDataLink().undoManager.canRedo,
+        disabled: () => !useCurrentData().undoManager.canRedo,
         key: 'redo',
       },
     ];
@@ -143,18 +144,18 @@ export class MenuItems {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
         command: () => {
-          useCurrentDataLink().undoManager.undo();
+          useCurrentData().undoManager.undo();
         },
-        disabled: () => !useCurrentDataLink().undoManager.canUndo,
+        disabled: () => !useCurrentData().undoManager.canUndo,
         key: 'schema_undo',
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
         command: () => {
-          useCurrentDataLink().undoManager.redo();
+          useCurrentData().undoManager.redo();
         },
-        disabled: () => !useCurrentDataLink().undoManager.canRedo,
+        disabled: () => !useCurrentData().undoManager.canRedo,
         key: 'schema_redo',
       },
     ];
@@ -182,18 +183,18 @@ export class MenuItems {
         label: 'Undo',
         icon: 'fa-solid fa-rotate-left',
         command: () => {
-          useCurrentDataLink().undoManager.undo();
+          useCurrentData().undoManager.undo();
         },
-        disabled: () => !useCurrentDataLink().undoManager.canUndo,
+        disabled: () => !useCurrentData().undoManager.canUndo,
         key: 'settings_undo',
       },
       {
         label: 'Redo',
         icon: 'fa-solid fa-rotate-right',
         command: () => {
-          useCurrentDataLink().undoManager.redo();
+          useCurrentData().undoManager.redo();
         },
-        disabled: () => !useCurrentDataLink().undoManager.canRedo,
+        disabled: () => !useCurrentData().undoManager.canRedo,
         key: 'settings_redo',
       },
     ];

@@ -18,18 +18,25 @@ export function nonBooleanSchema(schema: JsonSchemaType) {
 /**
  * Coverts an array of schemas to an array of JsonSchema objects.
  */
-export function schemaArray(schema?: JsonSchemaType[]): JsonSchema[] {
-  return schema?.map(s => new JsonSchema(s)) ?? [];
+export function schemaArray(
+  schema: JsonSchemaType[] | undefined,
+  referenceSchemaPreprocessed: JsonSchemaType
+): JsonSchema[] {
+  return schema?.map(s => new JsonSchema(s, referenceSchemaPreprocessed)) ?? [];
 }
 
 /**
  * Converts a record of schemas to a record of JsonSchema objects.
  */
 export function schemaRecord(
-  schemaRecord?: Record<string, JsonSchemaType>
+  schemaRecord: Record<string, JsonSchemaType> | undefined,
+  referenceSchemaPreprocessed: JsonSchemaType
 ): Record<string, JsonSchema> {
   return Object.fromEntries(
-    Object.entries(schemaRecord ?? {}).map(([key, value]) => [key, new JsonSchema(value)])
+    Object.entries(schemaRecord ?? {}).map(([key, value]) => [
+      key,
+      new JsonSchema(value, referenceSchemaPreprocessed),
+    ])
   );
 }
 
@@ -37,11 +44,14 @@ export function schemaRecord(
  * Creates a JsonSchema object from a JsonSchemaType.
  * In contrast to the JsonSchema constructor, this function also handles undefined values.
  */
-export function schemaFromObject(jsonSchema?: JsonSchemaType): JsonSchema | undefined {
+export function schemaFromObject(
+  jsonSchema: JsonSchemaType | undefined,
+  referenceSchemaPreprocessed: JsonSchemaType
+): JsonSchema | undefined {
   if (!jsonSchema) {
     return undefined;
   }
-  return new JsonSchema(jsonSchema);
+  return new JsonSchema(jsonSchema, referenceSchemaPreprocessed);
 }
 
 /**
@@ -49,6 +59,9 @@ export function schemaFromObject(jsonSchema?: JsonSchemaType): JsonSchema | unde
  * type constraint with the given type, i.e.,
  * `{type: t}` for the given type `t`.
  */
-export function typeSchema(type: SchemaPropertyType): JsonSchema {
-  return new JsonSchema({type});
+export function typeSchema(
+  type: SchemaPropertyType,
+  referenceSchemaPreprocessed: JsonSchemaType
+): JsonSchema {
+  return new JsonSchema({type}, referenceSchemaPreprocessed, false);
 }

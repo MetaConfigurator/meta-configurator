@@ -4,11 +4,10 @@ import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
 import {MenuItems} from '@/components/toolbar/menuItems';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
-import {schemaCollection} from '@/example-schemas/schemaCollection';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
@@ -27,6 +26,8 @@ import type {SchemaOption} from '@/model/schemaOption';
 
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
+import {SessionMode} from '@/model/sessionMode';
+import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 
 const props = defineProps<{
   currentMode: SessionMode;

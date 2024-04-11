@@ -11,7 +11,7 @@ export class TopLevelJsonSchema extends JsonSchema {
   private _$defs?: Record<string, JsonSchema>;
 
   constructor(schema: TopLevelSchema) {
-    super(schema);
+    super(schema, schema);
     this._$schema = schema.$schema;
   }
 

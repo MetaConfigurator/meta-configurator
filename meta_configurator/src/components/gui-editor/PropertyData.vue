@@ -8,7 +8,7 @@ import type {Path} from '@/model/path';
 import {resolveCorrespondingComponent} from '@/components/gui-editor/resolveCorrespondingComponent';
 import {pathToString} from '@/utility/pathUtils';
 import Button from 'primevue/button';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData} from '@/data/useDataLink';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -36,7 +36,7 @@ function isRequired(): boolean {
 }
 
 function shouldShowRemove(): boolean {
-  return !isRequired() && useCurrentDataLink().dataAt(props.nodeData.absolutePath) !== undefined;
+  return !isRequired() && useCurrentData().dataAt(props.nodeData.absolutePath) !== undefined;
 }
 </script>
 

@@ -1,7 +1,7 @@
 /**
  * The default settings data.
  */
-export const defaultSettingsData = {
+export const SETTINGS_DATA_DEFAULT = {
   dataFormat: 'json',
   guiEditorOnRightSide: true,
   codeEditor: {

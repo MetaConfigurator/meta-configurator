@@ -7,7 +7,7 @@ import {pathToString} from '@/utility/pathUtils';
 import {dataToString} from '@/utility/dataToString';
 import _ from 'lodash';
 import {MAX_SEARCH_DEPTH} from '@/constants';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 
 /**
  * Searches for the given search term in the data and schema.
@@ -19,8 +19,8 @@ import {useCurrentDataLink} from '@/data/useDataLink';
 export async function searchInDataAndSchema(searchTerm: string): Promise<SearchResult[]> {
   try {
     const result: SearchResult[] = [];
-    const data = useCurrentDataLink().data.value;
-    const schema: JsonSchema = useSessionStore().fileSchema;
+    const data = useCurrentData().data.value;
+    const schema: JsonSchema = useCurrentSchema().schemaProcessed.value;
     await searchInDataAndSchemaRecursive(data, schema, [], searchTerm, result);
     return result;
   } catch (e) {

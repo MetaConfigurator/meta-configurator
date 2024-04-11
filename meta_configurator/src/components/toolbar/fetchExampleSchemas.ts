@@ -1,8 +1,8 @@
-import {schemaCollection} from '@/example-schemas/schemaCollection';
 import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
 import {errorService} from '@/main';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
+import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 
 /**
  * Loads the example schema with the given key.

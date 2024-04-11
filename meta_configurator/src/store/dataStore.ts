@@ -4,12 +4,13 @@ import {defineStore} from 'pinia';
 import {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import {watchDebounced} from '@vueuse/core';
 // @ts-ignore
-import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
-import {simplifiedMetaSchemaRestricted} from '../../resources/json-schema/simplifiedMetaSchemaRestricted';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import type {JsonSchemaType} from '@/model/jsonSchemaType';
 import {useDataSource} from '@/data/dataSource';
+import {SessionMode} from '@/model/sessionMode';
+import {META_SCHEMA_SIMPLIFIED} from '@/packaged-schemas/metaSchemaSimplified';
+import {META_SCHEMA_SIMPLIFIED_RESTRICTED} from '@/packaged-schemas/metaSchemaSimplifiedRestricted';
 
 /**
  * The store that contains the data of the current file and the current schema.
@@ -35,12 +36,12 @@ export const useDataStore = defineStore('dataStore', () => {
   /**
    * The json schema meta schema as a plain object
    */
-  const metaSchemaData = ref(preprocessOneTime(simplifiedMetaSchema));
+  const metaSchemaData = ref(preprocessOneTime(META_SCHEMA_SIMPLIFIED));
 
   /**
    * The json schema meta schema (restricted) as a plain object
    */
-  const metaSchemaRestrictedData = ref(preprocessOneTime(simplifiedMetaSchemaRestricted));
+  const metaSchemaRestrictedData = ref(preprocessOneTime(META_SCHEMA_SIMPLIFIED_RESTRICTED));
 
   /**
    * The json schema meta schema as a TopLevelJsonSchema object

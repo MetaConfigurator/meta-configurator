@@ -12,7 +12,7 @@ import _ from 'lodash';
 import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
 import {typeSchema} from '@/schema/schemaUtils';
 import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
@@ -86,7 +86,7 @@ export class ConfigTreeNodeResolver {
         return true; // no user selection -> leaf node
       }
     }
-    const data = useCurrentDataLink().dataAt(absolutePath);
+    const data = useCurrentData().dataAt(absolutePath);
 
     return (
       (!dependsOnUserSelection && data && typeof data !== 'object') || // primitive type in data
@@ -119,7 +119,7 @@ export class ConfigTreeNodeResolver {
     }
     const effectiveSchema = calculateEffectiveSchema(
       guiEditorTreeNode.data.schema,
-      useCurrentDataLink().dataAt(guiEditorTreeNode.data.absolutePath),
+      useCurrentData().dataAt(guiEditorTreeNode.data.absolutePath),
       guiEditorTreeNode.data.absolutePath
     );
 
@@ -198,7 +198,7 @@ export class ConfigTreeNodeResolver {
       result.push(advanced);
     }
 
-    const data = useCurrentDataLink().dataAt(parameters.absolutePath);
+    const data = useCurrentData().dataAt(parameters.absolutePath);
     if (this.shouldAddAddPropertyNode(parameters.schema, data)) {
       return result.concat(this.createAddPropertyTreeNode(parameters));
     }
@@ -332,7 +332,7 @@ export class ConfigTreeNodeResolver {
     {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters,
     filter: (key: string) => boolean = () => true
   ) {
-    const data = useCurrentDataLink().dataAt(absolutePath);
+    const data = useCurrentData().dataAt(absolutePath);
     if (!data) {
       return [];
     }
@@ -383,7 +383,7 @@ export class ConfigTreeNodeResolver {
     schema,
     depth,
   }: TreeNodeResolvingParameters) {
-    const data = useCurrentDataLink().dataAt(absolutePath);
+    const data = useCurrentData().dataAt(absolutePath);
     let children: GuiEditorTreeNode[] = [];
     if (Array.isArray(data)) {
       children = data.map((value: any, index: number) => {
@@ -415,7 +415,9 @@ export class ConfigTreeNodeResolver {
       data: {
         absolutePath: absolutePath,
         relativePath: relativePath,
-        schema: schema.additionalProperties || new JsonSchema({}), // not used
+        schema:
+          schema.additionalProperties ||
+          new JsonSchema({}, useCurrentSchema().schemaDataPreprocessed, false), // not used
         parentSchema: schema,
         name: '', // name is not used for add property node, but we keep it for easier type checking
         depth: depth,
@@ -460,10 +462,16 @@ export class ConfigTreeNodeResolver {
     if (userSelectionOneOf !== undefined) {
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.type;
-      const newTypeSchema = typeSchema(schema.type[userSelectionOneOf.index]);
-      const mergedSchema = new JsonSchema({
-        allOf: [baseSchema, newTypeSchema.jsonSchema ?? {}],
-      });
+      const newTypeSchema = typeSchema(
+        schema.type[userSelectionOneOf.index],
+        useCurrentSchema().schemaDataPreprocessed
+      );
+      const mergedSchema = new JsonSchema(
+        {
+          allOf: [baseSchema, newTypeSchema.jsonSchema ?? {}],
+        },
+        useCurrentSchema().schemaDataPreprocessed
+      );
       return [
         this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
       ];
@@ -483,9 +491,12 @@ export class ConfigTreeNodeResolver {
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.oneOf;
       const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
-      const mergedSchema = new JsonSchema({
-        allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
-      });
+      const mergedSchema = new JsonSchema(
+        {
+          allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
+        },
+        useCurrentSchema().schemaDataPreprocessed
+      );
       return [
         this.createTreeNodeOfProperty(mergedSchema, schema, absolutePath, relativePath, depth + 1),
       ];
@@ -514,7 +525,7 @@ export class ConfigTreeNodeResolver {
       }
       return [
         this.createTreeNodeOfProperty(
-          new JsonSchema(mergedSchema),
+          new JsonSchema(mergedSchema, useCurrentSchema().schemaDataPreprocessed),
           schema,
           absolutePath,
           relativePath,

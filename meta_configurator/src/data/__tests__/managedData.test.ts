@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {shallowRef, triggerRef} from 'vue';
-import {DataLink} from '../dataLink';
+import {ManagedData} from '../managedData';
 
 vi.mock('@/formats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -9,19 +9,15 @@ vi.mock('@/formats/formatRegistry', () => ({
   }),
 }));
 
-describe('DataLink', () => {
-  let dataLink: DataLink;
+describe('ManagedData', () => {
+  let dataLink: ManagedData;
 
   beforeEach(() => {
     const testDataRef = shallowRef({
       test: 'value',
       nested: {test: 'value'},
     });
-    const testSchemaRef = shallowRef({
-      type: 'object',
-      properties: {test: {type: 'string'}},
-    });
-    dataLink = new DataLink(testDataRef, testSchemaRef);
+    dataLink = new ManagedData(testDataRef);
   });
 
   it('should correctly setup the data', () => {

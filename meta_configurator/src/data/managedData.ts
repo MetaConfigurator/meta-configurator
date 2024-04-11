@@ -1,4 +1,4 @@
-import type {Ref, ShallowRef, WritableComputedRef} from 'vue';
+import type {Ref, ComputedRef, ShallowRef, WritableComputedRef} from 'vue';
 import {computed, ref, triggerRef} from 'vue';
 import {useDataConverter} from '@/formats/formatRegistry';
 import type {Path} from '@/model/path';
@@ -9,21 +9,21 @@ import {useDebouncedRefHistory} from '@vueuse/core';
 import type {UndoManager} from '@/data/undoManager';
 
 /**
- * This class represents the link between the data, the string representation of the data and the schema
- * object. It keeps the data and the string representation in sync.
+ * This class manages the data and keeps the data and the string representation in sync.
  */
-export class DataLink {
+export class ManagedData {
   /**
    * @param shallowDataRef   the shallow ref to the data
-   * @param shallowSchemaRef the shallow ref to the schema
    */
-  constructor(public shallowDataRef: ShallowRef<any>, public shallowSchemaRef: ShallowRef<any>) {
+  constructor(public shallowDataRef: ShallowRef<any>) {
     this.data.value = shallowDataRef.value;
   }
 
   // variable that stores the string representation in the case that it could not be parsed
   // this is null if the string representation is valid
   private readonly unparseableDataString: Ref<string | null> = ref(null);
+
+  private history: UndoManager | null = null;
 
   /**
    * The data. This is a computed property that keeps the data and the string representation in sync.
@@ -63,10 +63,6 @@ export class DataLink {
       }
     },
   });
-
-  public get schema(): Ref<any> {
-    return this.shallowSchemaRef;
-  }
 
   /**
    * This function updates the data using the given updater function and triggers the shallow data ref.
@@ -145,8 +141,6 @@ export class DataLink {
   public dataAt(path: Path): any | undefined {
     return dataAt(path, this.data.value);
   }
-
-  private history: UndoManager | null = null;
 
   public get undoManager(): UndoManager {
     if (this.history === null) {

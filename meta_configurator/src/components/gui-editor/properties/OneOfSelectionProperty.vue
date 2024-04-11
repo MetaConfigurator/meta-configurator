@@ -13,6 +13,7 @@ import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import _ from 'lodash';
 import {useValidationService} from '@/schema/validation/useValidation';
 import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
+import {useCurrentSchema} from '@/data/useDataLink';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -131,7 +132,7 @@ function applySchemaConstantsOnDataBasedOnSelection(
   // even without a new oneOf selection by the user, due to JSON schema features
   // such as if and else.
 
-  const schemaAtPath = useSessionStore().effectiveSchemaAtPath(path).schema;
+  const schemaAtPath = useCurrentSchema().effectiveSchemaAtPath(path).schema;
   const baseSchema = {...schemaAtPath.jsonSchema};
   delete baseSchema.oneOf;
   const mergedSchema = safeMergeSchemas(

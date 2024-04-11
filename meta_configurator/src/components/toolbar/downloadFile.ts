@@ -1,4 +1,4 @@
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
 
 /**
@@ -7,7 +7,7 @@ import {useSettings} from '@/settings/useSettings';
  * @param fileNamePrefix The prefix for the filename
  */
 export function downloadFile(fileNamePrefix: string): void {
-  const configData: string = useCurrentDataLink().unparsedData.value;
+  const configData: string = useCurrentData().unparsedData.value;
 
   // TODO correct type depending on the data format
   const blob: Blob = new Blob([configData], {type: 'application/json'});

@@ -1,15 +1,15 @@
 import {useFileDialog} from '@vueuse/core';
 import {readFileContentToDataLink} from '@/utility/readFileContent';
-import type {DataLink} from '@/data/dataLink';
-import {getDataLinkForMode} from '@/data/useDataLink';
-import {SessionMode} from '@/store/sessionStore';
+import {getDataForMode} from '@/data/useDataLink';
+import type {ManagedData} from '@/data/managedData';
+import {SessionMode} from '@/model/sessionMode';
 
 /**
  * Opens a file dialog to select a file to upload.
  *
  * @param resultDataLink The DataLink to which the file content should be written
  */
-export function openUploadFileDialog(resultDataLink: DataLink): void {
+export function openUploadFileDialog(resultDataLink: ManagedData): void {
   const {open, onChange} = useFileDialog();
 
   onChange((files: FileList | null) => {
@@ -23,5 +23,5 @@ export function openUploadFileDialog(resultDataLink: DataLink): void {
  * Opens a file dialog to select a file to upload.
  */
 export function openUploadSchemaDialog(): void {
-  return openUploadFileDialog(getDataLinkForMode(SessionMode.SchemaEditor));
+  return openUploadFileDialog(getDataForMode(SessionMode.SchemaEditor));
 }

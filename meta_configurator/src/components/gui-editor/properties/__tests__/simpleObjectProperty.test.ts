@@ -46,7 +46,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar'},
-        propertySchema: new JsonSchema({}),
+        propertySchema: new JsonSchema({}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -62,7 +62,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar', baz: 'qux'},
-        propertySchema: new JsonSchema({}),
+        propertySchema: new JsonSchema({}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -78,7 +78,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {},
-        propertySchema: new JsonSchema({}),
+        propertySchema: new JsonSchema({}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -94,7 +94,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar', baz: 'qux'},
-        propertySchema: new JsonSchema({properties: {foo: {}}}),
+        propertySchema: new JsonSchema({properties: {foo: {}}}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -110,7 +110,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar'},
-        propertySchema: new JsonSchema({properties: {foo: {}, baz: {}}}),
+        propertySchema: new JsonSchema({properties: {foo: {}, baz: {}}}, {}, false),
       });
 
       it('should show the correct description', () => {
@@ -126,7 +126,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: undefined,
-        propertySchema: new JsonSchema({}),
+        propertySchema: new JsonSchema({}, {}, false),
       });
 
       it('should show the correct description', () => {

@@ -4,7 +4,7 @@ Panel for debugging purposes
 <script setup lang="ts">
 import {computed} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 
 const store = useSessionStore();
 
@@ -12,11 +12,11 @@ const fileData = computed(() => getFileData());
 const schemaContent = computed(() => getSchema());
 const dataAtCurrentPathContent = computed(() => getDataAtCurrentPath());
 function getFileData() {
-  return useCurrentDataLink().unparsedData.value;
+  return useCurrentData().unparsedData.value;
 }
 
 function getSchema() {
-  return JSON.stringify(useCurrentDataLink().schema.value);
+  return JSON.stringify(useCurrentSchema().schemaProcessed.value);
 }
 
 function getDataAtCurrentPath() {

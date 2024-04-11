@@ -1,6 +1,6 @@
 import {Editor} from 'brace';
 import {useDebounceFn, watchImmediate} from '@vueuse/core/index';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData} from '@/data/useDataLink';
 
 let currentChangeFromOutside = false;
 let currentChangeFromInside = false;
@@ -12,7 +12,7 @@ export function setupLinkToData(editor: Editor) {
 
 function setupUpdateContentWhenDataChanges(editor: Editor) {
   watchImmediate(
-    () => useCurrentDataLink().unparsedData.value,
+    () => useCurrentData().unparsedData.value,
     (dataString: string) => {
       if (currentChangeFromInside) {
         currentChangeFromInside = false; // reset flag
@@ -41,7 +41,7 @@ function setupPropagationOfEditorContentChanges(editor: Editor) {
       }
 
       currentChangeFromInside = true;
-      useCurrentDataLink().unparsedData.value = editor.getValue();
+      useCurrentData().unparsedData.value = editor.getValue();
     }, 100)
   );
 }

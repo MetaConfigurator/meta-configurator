@@ -33,9 +33,13 @@ describe('NumberProperty', () => {
         propertyName: 'foo',
         propertyData: data,
         validationResults: new ValidationResult([]),
-        propertySchema: new JsonSchema({
-          type: 'integer',
-        }),
+        propertySchema: new JsonSchema(
+          {
+            type: 'integer',
+          },
+          {},
+          false
+        ),
       };
       shallowMountBeforeEach(props);
 
@@ -58,10 +62,14 @@ describe('NumberProperty', () => {
         propertyName: 'foo',
         propertyData: data,
         validationResults: new ValidationResult([]),
-        propertySchema: new JsonSchema({
-          type: 'number',
-          multipleOf: 0.5,
-        }),
+        propertySchema: new JsonSchema(
+          {
+            type: 'number',
+            multipleOf: 0.5,
+          },
+          {},
+          false
+        ),
       };
       shallowMountBeforeEach(props);
 
@@ -83,9 +91,13 @@ describe('NumberProperty', () => {
       propertyName: 'foo',
       propertyData: 1,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema({
-        type: 'integer',
-      }),
+      propertySchema: new JsonSchema(
+        {
+          type: 'integer',
+        },
+        {},
+        false
+      ),
     });
 
     test('on value change to 0', async () => {

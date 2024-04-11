@@ -1,37 +1,12 @@
-import type {ComputedRef, Ref} from 'vue';
+import type {Ref} from 'vue';
 import {computed, ref, watch} from 'vue';
 import type {Path} from '@/model/path';
 import {defineStore} from 'pinia';
-import {useDataStore} from '@/store/dataStore';
-import {JsonSchema} from '@/schema/jsonSchema';
 import {pathToString} from '@/utility/pathUtils';
-import {useSettingsStore} from '@/store/settingsStore';
-import type {TopLevelJsonSchema} from '@/schema/topLevelJsonSchema';
 import type {SearchResult} from '@/utility/search';
-import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
-import type {JsonSchemaType} from '@/model/jsonSchemaType';
-import {useCurrentDataLink} from '@/data/useDataLink';
-import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
-
-/**
- * The current page/mode of the application.
- */
-export enum SessionMode {
-  FileEditor = 'file_editor',
-  SchemaEditor = 'schema_editor',
-  Settings = 'settings',
-}
-
-/**
- * The last responsible for a change in the data.
- */
-export enum ChangeResponsible {
-  None = 'none',
-  CodeEditor = 'code_editor',
-  GuiEditor = 'gui_editor',
-  Routing = 'routing',
-  Menubar = 'menubar',
-}
+import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
+import {SessionMode} from '@/model/sessionMode';
+import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 
 /**
  * Store that manages all data that is specific to the current session,
@@ -68,52 +43,6 @@ export const useSessionStore = defineStore('sessionStore', () => {
   const schemaErrorMessage: Ref<string | null> = ref<string | null>(null);
 
   /**
-   * The schema of the current file, schema, or settings, depending on the current mode.
-   */
-  const fileSchema: ComputedRef<TopLevelJsonSchema> = computed(() => {
-    switch (currentMode.value) {
-      case SessionMode.FileEditor:
-        return useDataStore().schema;
-
-      case SessionMode.SchemaEditor:
-        if (useSettingsStore().settingsData.metaSchema.simplified) {
-          return useDataStore().metaSchemaRestricted;
-        } else {
-          return useDataStore().metaSchema;
-        }
-
-      case SessionMode.Settings:
-        return useSettingsStore().settingsSchema;
-
-      default:
-        throw new Error('Invalid mode');
-    }
-  });
-
-  /**
-   * The preprocessed schema of the current file, schema, or settings, depending on the current mode.
-   */
-  const fileSchemaDataPreprocessed: ComputedRef<JsonSchemaType> = computed(() => {
-    switch (currentMode.value) {
-      case SessionMode.FileEditor:
-        return useDataStore().schemaDataPreprocessed;
-
-      case SessionMode.SchemaEditor:
-        if (useSettingsStore().settingsData.metaSchema.simplified) {
-          return useDataStore().metaSchemaRestrictedData; // no difference between preprocessed and unprocessed meta schema
-        } else {
-          return useDataStore().metaSchemaData; // no difference between preprocessed and unprocessed meta schema
-        }
-
-      case SessionMode.Settings:
-        return useSettingsStore().settingsSchemaData; // no difference between preprocessed and unprocessed settings schema
-
-      default:
-        throw new Error('Invalid mode');
-    }
-  });
-
-  /**
    * Reset the current selected element and expanded elements when the mode changes.
    */
   watch(
@@ -123,60 +52,6 @@ export const useSessionStore = defineStore('sessionStore', () => {
       currentSelectedElement.value = [];
     },
     {immediate: true}
-  );
-
-  /**
-   * Returns the schema at the given path.
-   */
-  function schemaAtPath(path: Path): JsonSchema {
-    return fileSchema.value.subSchemaAt(path) ?? new JsonSchema({});
-  }
-
-  /**
-   * Return the schema at the current path.
-   */
-  const schemaAtCurrentPath: Ref<JsonSchema> = computed(() => schemaAtPath(currentPath.value));
-
-  /**
-   * Returns the effective schema at the given path, i.e., the schema that resolved data dependent keywords.
-   */
-  function effectiveSchemaAtPath(path: Path): EffectiveSchema {
-    let currentEffectiveSchema: EffectiveSchema = calculateEffectiveSchema(
-      fileSchema.value,
-      useCurrentDataLink().data.value,
-      []
-    );
-
-    const currentPath = [];
-    for (const key of path) {
-      currentPath.push(key);
-      const schema = currentEffectiveSchema.schema.subSchema(key);
-
-      if (schema?.oneOf) {
-        const oneOfSelection = useUserSchemaSelectionStore().currentSelectedOneOfOptions.get(
-          pathToString(currentPath)
-        );
-        if (oneOfSelection !== undefined) {
-          currentEffectiveSchema = calculateEffectiveSchema(
-            schema.oneOf[oneOfSelection.index],
-            useCurrentDataLink().dataAt(currentPath),
-            currentPath
-          );
-          continue;
-        }
-      }
-
-      currentEffectiveSchema = calculateEffectiveSchema(
-        schema,
-        useCurrentDataLink().dataAt(currentPath),
-        currentPath
-      );
-    }
-    return currentEffectiveSchema;
-  }
-
-  const effectiveSchemaAtCurrentPath: Ref<EffectiveSchema> = computed(() =>
-    effectiveSchemaAtPath(currentPath.value)
   );
 
   function updateCurrentPath(proposedPath: Path): void {
@@ -211,20 +86,13 @@ export const useSessionStore = defineStore('sessionStore', () => {
     return currentSearchResults.value.some(p => pathToString(p.path) === pathToString(path));
   }
 
-  function reloadSchema() {
-    useDataStore().reloadSchema();
-  }
+  const effectiveSchemaAtCurrentPath: Ref<EffectiveSchema> = computed(() =>
+    useCurrentSchema().effectiveSchemaAtPath(currentPath.value)
+  );
 
   return {
     currentMode,
-    fileSchema,
-    fileSchemaDataPreprocessed,
-    schemaAtPath,
-    schemaAtCurrentPath,
-    effectiveSchemaAtPath,
-    effectiveSchemaAtCurrentPath,
     schemaErrorMessage,
-    dataAtCurrentPath: computed(() => useCurrentDataLink().dataAt(currentPath.value)),
     currentPath,
     currentSelectedElement,
     currentExpandedElements,
@@ -235,6 +103,8 @@ export const useSessionStore = defineStore('sessionStore', () => {
     collapse,
     updateCurrentPath,
     updateCurrentSelectedElement,
-    reloadSchema,
+    dataAtCurrentPath: computed(() => useCurrentData().dataAt(currentPath.value)),
+    schemaAtCurrentPath: computed(() => useCurrentSchema().schemaAtPath(currentPath.value)),
+    effectiveSchemaAtCurrentPath,
   };
 });

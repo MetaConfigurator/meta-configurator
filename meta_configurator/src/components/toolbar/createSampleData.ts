@@ -3,7 +3,7 @@ import {confirmationService} from '@/utility/confirmationService';
 import {toastService} from '@/utility/toastService';
 import {errorService} from '@/main';
 import _ from 'lodash';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData} from '@/data/useDataLink';
 import {useDataSource} from '@/data/dataSource';
 
 /**
@@ -34,7 +34,7 @@ function generateSampleDataAndUseAsFileData() {
  *   confirmation.
  */
 function triggerDataGeneration(message: string | undefined = undefined): void {
-  if (!message || _.isEmpty(useCurrentDataLink().data.value)) {
+  if (!message || _.isEmpty(useCurrentData().data.value)) {
     generateSampleDataAndUseAsFileData();
     return;
   }

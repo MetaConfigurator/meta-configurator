@@ -31,9 +31,13 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: 'bar',
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema({
-        type: 'string',
-      }),
+      propertySchema: new JsonSchema(
+        {
+          type: 'string',
+        },
+        {},
+        false
+      ),
     });
 
     it('should correctly setup the input field', () => {
@@ -64,9 +68,13 @@ describe('StringProperty', () => {
         propertyName: 'foo',
         propertyData: 'newData',
         validationResults: new ValidationResult([]),
-        propertySchema: new JsonSchema({
-          type: 'string',
-        }),
+        propertySchema: new JsonSchema(
+          {
+            type: 'string',
+          },
+          {},
+          false
+        ),
       });
       expect(inputField.props().modelValue).toBe('newData');
       expect(wrapper.emitted()).toEqual({});
@@ -81,9 +89,13 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: 1,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema({
-        type: 'number',
-      }),
+      propertySchema: new JsonSchema(
+        {
+          type: 'number',
+        },
+        {},
+        false
+      ),
     });
 
     it('should correctly setup the input field', () => {
@@ -96,9 +108,13 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: {},
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema({
-        type: 'object',
-      }),
+      propertySchema: new JsonSchema(
+        {
+          type: 'object',
+        },
+        {},
+        false
+      ),
     });
 
     it('should correctly setup the input field', () => {
@@ -111,9 +127,13 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: [],
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema({
-        type: 'array',
-      }),
+      propertySchema: new JsonSchema(
+        {
+          type: 'array',
+        },
+        {},
+        false
+      ),
     });
 
     it('should correctly setup the input field', () => {
@@ -126,9 +146,13 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: null,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema({
-        type: 'null',
-      }),
+      propertySchema: new JsonSchema(
+        {
+          type: 'null',
+        },
+        {},
+        false
+      ),
     });
 
     it('should correctly setup the input field', () => {
@@ -141,7 +165,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: undefined,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchema({}),
+      propertySchema: new JsonSchema({}, {}, false),
     });
 
     it('should correctly setup the input field', () => {

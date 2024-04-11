@@ -15,6 +15,7 @@ import OverlayPanel from 'primevue/overlaypanel';
 import {computed, Ref, ref} from 'vue';
 import {describeSchema} from '@/schema/schemaDescriptor';
 import type {ErrorObject} from 'ajv';
+import {useCurrentSchema} from '@/data/useDataLink';
 
 const schemaRef: Ref<JsonSchema | undefined> = ref();
 const propertyNameRef: Ref<String> = ref('');
@@ -23,7 +24,7 @@ const validationErrorsRef: Ref<ErrorObject[]> = ref([]);
 
 const schemaDescription = computed(() =>
   describeSchema(
-    schemaRef.value ?? new JsonSchema(true),
+    schemaRef.value ?? new JsonSchema(true, useCurrentSchema().schemaDataPreprocessed, false),
     propertyNameRef.value,
     parentSchemaRef.value,
     true,

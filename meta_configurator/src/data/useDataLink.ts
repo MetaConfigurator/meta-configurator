@@ -1,39 +1,66 @@
-import {DataLink} from '@/data/dataLink';
 import {useDataSource} from '@/data/dataSource';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import type {ComputedRef} from 'vue';
 import {computed} from 'vue';
+import {ManagedData} from '@/data/managedData';
+import {ManagedSchema} from '@/data/managedSchema';
+import {SessionMode} from '@/model/sessionMode';
 
 const dataSource = useDataSource();
-const fileEditorDataLink = new DataLink(dataSource.userData, dataSource.userSchemaData);
-const schemaEditorDataLink = new DataLink(dataSource.userSchemaData, dataSource.metaSchemaData);
-const settingsEditorDataLink = new DataLink(dataSource.settingsData, dataSource.settingsSchemaData);
+
+const managedUserData = new ManagedData(dataSource.userData);
+const managedSchemaData = new ManagedData(dataSource.userSchemaData);
+const managedSettingsData = new ManagedData(dataSource.userData);
+const managedUserSchema = new ManagedSchema(dataSource.userSchemaData, true);
+const managedMetaSchema = new ManagedSchema(dataSource.metaSchemaData, true);
+const managedSettingsSchema = new ManagedSchema(dataSource.settingsSchemaData, false);
 
 /**
  * Returns the data link for the given mode
  * @param mode the mode
  * @throws Error if the mode is unknown
  */
-export function getDataLinkForMode(mode: SessionMode): DataLink {
+export function getDataForMode(mode: SessionMode): ManagedData {
   switch (mode) {
     case SessionMode.FileEditor:
-      return fileEditorDataLink;
+      return managedUserData;
     case SessionMode.SchemaEditor:
-      return schemaEditorDataLink;
+      return managedSchemaData;
     case SessionMode.Settings:
-      return settingsEditorDataLink;
+      return managedSettingsData;
     default:
       throw new Error(`Unknown mode ${mode}`);
   }
 }
 
-const currentEditorDataLink: ComputedRef<DataLink> = computed(() =>
-  getDataLinkForMode(useSessionStore().currentMode)
+export function getSchemaForMode(mode: SessionMode): ManagedSchema {
+  switch (mode) {
+    case SessionMode.FileEditor:
+      return managedUserSchema;
+    case SessionMode.SchemaEditor:
+      return managedMetaSchema;
+    case SessionMode.Settings:
+      return managedSettingsSchema;
+    default:
+      throw new Error(`Unknown mode ${mode}`);
+  }
+}
+
+const currentEditorData: ComputedRef<ManagedData> = computed(() =>
+  getDataForMode(useSessionStore().currentMode)
+);
+
+const currentEditorSchema: ComputedRef<ManagedSchema> = computed(() =>
+  getSchemaForMode(useSessionStore().currentMode)
 );
 
 /**
  * Returns the data link for the currently active editor.
  */
-export function useCurrentDataLink() {
-  return currentEditorDataLink.value;
+export function useCurrentData() {
+  return currentEditorData.value;
+}
+
+export function useCurrentSchema() {
+  return currentEditorSchema.value;
 }

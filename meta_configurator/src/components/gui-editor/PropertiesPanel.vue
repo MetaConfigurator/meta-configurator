@@ -31,7 +31,7 @@ import SchemaInfoOverlay from '@/components/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/tree';
 import {focus, focusOnPath, makeEditableAndSelectContents} from '@/utility/focusUtils';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 import {useValidationResult} from '@/schema/validation/useValidation';
 import {dataAt} from '@/utility/resolveDataAtPath';
 
@@ -69,7 +69,7 @@ watch(
 );
 
 // update tree when the file schema changes
-watch(storeToRefs(useSessionStore()).fileSchema, () => {
+watch(useCurrentSchema().schemaProcessed, () => {
   updateTree();
 });
 
@@ -167,7 +167,7 @@ function updateData(subPath: Path, newValue: any) {
 
 function clickedPropertyData(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
-  if (useCurrentDataLink().dataAt(path) != undefined) {
+  if (useCurrentData().dataAt(path) != undefined) {
     emit('select_path', path);
   }
 }
@@ -320,7 +320,7 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
   const treeData: ConfigTreeNodeData = {
     absolutePath: absolutePath.concat(name),
     relativePath: relativePath.concat(name),
-    schema: new JsonSchema({}),
+    schema: new JsonSchema({}, useCurrentSchema().schemaDataPreprocessed, false),
     parentSchema: objectSchema,
     depth: ((objectNode?.data?.depth as number) ?? 0) + 1,
     name: name,

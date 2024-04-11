@@ -3,6 +3,7 @@ import type {Path} from '@/model/path';
 import _ from 'lodash';
 import {useValidationService} from '@/schema/validation/useValidation';
 import {dataAt} from '@/utility/resolveDataAtPath';
+import {useCurrentSchema} from '@/data/useDataLink';
 
 /**
  * Wrapper around a schema and the data it was calculated for.
@@ -30,7 +31,7 @@ export function calculateEffectiveSchema(
   data: any,
   path: Path
 ): EffectiveSchema {
-  let result = schema ?? new JsonSchema({});
+  let result = schema ?? new JsonSchema({}, useCurrentSchema().schemaDataPreprocessed, false);
   let iteration = 0;
 
   while (result.isDataDependent && iteration < 1000) {
@@ -71,10 +72,13 @@ function resolveDependentRequired(schemaWrapper: JsonSchema, data: any) {
   const baseSchema = {...schemaWrapper.jsonSchema};
   delete baseSchema.dependentRequired;
 
-  return new JsonSchema({
-    ...baseSchema,
-    required: _.union(newRequired),
-  });
+  return new JsonSchema(
+    {
+      ...baseSchema,
+      required: _.union(newRequired),
+    },
+    useCurrentSchema().schemaDataPreprocessed
+  );
 }
 
 function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
@@ -94,7 +98,7 @@ function resolveIfThenElse(schemaWrapper: JsonSchema, data: any) {
   const elseSchema = schemaWrapper.else?.jsonSchema ?? {};
 
   const newSchema = {allOf: [baseSchema, valid ? thenSchema : elseSchema]};
-  return new JsonSchema(newSchema);
+  return new JsonSchema(newSchema, useCurrentSchema().schemaDataPreprocessed);
 }
 
 function resolveConditions(result: JsonSchema, data: any) {
@@ -110,7 +114,7 @@ function resolveConditions(result: JsonSchema, data: any) {
       ...(resolvedConditions?.map(condition => condition.jsonSchema ?? {}) ?? []),
     ],
   };
-  return new JsonSchema(newSchema);
+  return new JsonSchema(newSchema, useCurrentSchema().schemaDataPreprocessed);
 }
 
 function resolveDependentSchemas(schemaWrapper: JsonSchema, data: any): JsonSchema {
@@ -127,5 +131,5 @@ function resolveDependentSchemas(schemaWrapper: JsonSchema, data: any): JsonSche
   const newSchema = {
     allOf: [baseSchema, ...dependentSchemas],
   };
-  return new JsonSchema(newSchema);
+  return new JsonSchema(newSchema, useCurrentSchema().schemaDataPreprocessed);
 }

@@ -10,7 +10,7 @@ import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
 import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
 import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import Toast from 'primevue/toast';
 import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
 import ConfirmDialog from 'primevue/confirmdialog';
@@ -21,8 +21,9 @@ import {toastService} from '@/utility/toastService';
 import {useAppRouter} from '@/router';
 import {useDropZone, useWindowSize} from '@vueuse/core/index';
 import {readFileContentToDataLink} from '@/utility/readFileContent';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
+import {SessionMode} from '@/model/sessionMode';
 
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];
@@ -75,7 +76,7 @@ watch(isOverDropZone, isOverDropZone => {
 });
 
 function onDrop(files: File[] | null) {
-  readFileContentToDataLink(files, useCurrentDataLink());
+  readFileContentToDataLink(files, useCurrentData());
 }
 
 confirmationService.confirm = useConfirm();

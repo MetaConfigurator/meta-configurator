@@ -1,5 +1,5 @@
 import {errorService} from '@/main';
-import type {DataLink} from '@/data/dataLink';
+import type {ManagedData} from '@/data/managedData';
 
 /**
  * Reads the content of a file as a string.
@@ -45,7 +45,7 @@ async function readFileContentFromFileList(files: FileList | File[] | null) {
  */
 export function readFileContentToDataLink(
   files: FileList | File[] | null,
-  dataLink: DataLink
+  dataLink: ManagedData
 ): void {
   readFileContentFromFileList(files)
     .then(contents => {

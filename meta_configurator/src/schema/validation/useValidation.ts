@@ -1,10 +1,10 @@
 import type {ValidationResult} from '@/schema/validation/validationService';
 import {ValidationService} from '@/schema/validation/validationService';
 import {computed} from 'vue';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 
 const currentValidationService = computed(() => {
-  const schema = useCurrentDataLink().schema.value;
+  const schema = useCurrentSchema().schemaData.value;
   return new ValidationService(schema ?? {});
 });
 
@@ -13,7 +13,7 @@ export function useValidationService() {
 }
 
 const currentValidationResult = computed(() => {
-  return useValidationService().validate(useCurrentDataLink().data.value);
+  return useValidationService().validate(useCurrentData().data.value);
 });
 
 export function useValidationResult(): ValidationResult {

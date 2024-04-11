@@ -8,7 +8,7 @@
  * - usage of $ref instead of anchors because we don't support anchors and dynamic anchors
  * - added examples to some fields
  */
-export const simplifiedMetaSchema = {
+export const META_SCHEMA_SIMPLIFIED = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   $id: 'com.github.meta_configurator.simplified-meta-schema',
   title: 'Json schema (simplified)',

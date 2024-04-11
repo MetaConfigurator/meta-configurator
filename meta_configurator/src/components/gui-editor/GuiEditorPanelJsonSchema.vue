@@ -6,7 +6,8 @@ import type {Path} from '@/model/path';
 import {useSessionStore} from '@/store/sessionStore';
 import {computed} from 'vue';
 import {JsonSchema} from '@/schema/jsonSchema';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {getSchemaForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLink';
+import {SessionMode} from '@/model/sessionMode';
 
 const sessionStore = useSessionStore();
 
@@ -15,11 +16,11 @@ function updatePath(newPath: Path) {
 }
 
 function updateData(path: Path, newValue: any) {
-  useCurrentDataLink().setDataAt(path, newValue);
+  useCurrentData().setDataAt(path, newValue);
 }
 
 function removeProperty(path: Path) {
-  useCurrentDataLink().removeDataAt(path);
+  useCurrentData().removeDataAt(path);
   sessionStore.currentSelectedElement = path;
 }
 
@@ -33,9 +34,9 @@ function selectPath(path: Path) {
 }
 
 const currentSchema = computed(() => {
-  const schema = sessionStore.effectiveSchemaAtCurrentPath?.schema;
+  const schema = useSessionStore().effectiveSchemaAtCurrentPath?.schema;
   if (!schema) {
-    return new JsonSchema({});
+    return new JsonSchema({}, useCurrentSchema().schemaDataPreprocessed, false);
   }
   return schema;
 });
@@ -43,16 +44,16 @@ const currentSchema = computed(() => {
 
 <template>
   <div class="p-5 space-y-3 flex flex-col">
-    <SchemaInfoPanel :schema="sessionStore.fileSchema" />
+    <SchemaInfoPanel :schema="getSchemaForMode(SessionMode.FileEditor).schemaProcessed" />
     <CurrentPathBreadcrumb
-      :root-name="sessionStore.fileSchema?.title ?? 'root'"
+      :root-name="getSchemaForMode(SessionMode.FileEditor).schemaProcessed?.value.title ?? 'root'"
       :path="sessionStore.currentPath"
       @update:path="newPath => updatePath(newPath)" />
     <div class="flex-grow overflow-y-auto">
       <PropertiesPanel
         :currentSchema="currentSchema"
         :currentPath="sessionStore.currentPath"
-        :currentData="sessionStore.dataAtCurrentPath"
+        :currentData="useSessionStore().dataAtCurrentPath"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
         @remove_property="removeProperty"
         @select_path="selectedPath => selectPath(selectedPath)"
