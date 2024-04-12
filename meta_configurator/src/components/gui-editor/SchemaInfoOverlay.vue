@@ -24,7 +24,8 @@ const validationErrorsRef: Ref<ErrorObject[]> = ref([]);
 
 const schemaDescription = computed(() =>
   describeSchema(
-    schemaRef.value ?? new JsonSchemaWrapper(true, useCurrentSchema().schemaPreprocessed, false),
+    schemaRef.value ??
+      new JsonSchemaWrapper(true, useCurrentSchema().schemaPreprocessed.value, false),
     propertyNameRef.value,
     parentSchemaRef.value,
     true,

@@ -1,10 +1,10 @@
-import type {DataFormatDefinition} from '@/formats/dataFormatDefinition';
+import type {DataFormatDefinition} from '@/dataformats/dataFormatDefinition';
 import {useSettings} from '@/settings/useSettings';
-import {DataConverter} from '@/formats/dataConverter';
-import type {PathIndexLink} from '@/formats/pathIndexLink';
-import {noPathIndexLink} from '@/formats/pathIndexLink';
+import {DataConverter} from '@/dataformats/dataConverter';
+import type {PathIndexLink} from '@/dataformats/pathIndexLink';
+import {noPathIndexLink} from '@/dataformats/pathIndexLink';
 import {computed} from 'vue';
-import {jsonFormat} from '@/formats/defaultFormats';
+import {jsonFormat} from '@/dataformats/defaultFormats';
 
 /**
  * The format registry serves as a central place to register and retrieve data formats definitions,

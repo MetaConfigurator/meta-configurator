@@ -2,7 +2,7 @@ import type {
   JsonSchemaObjectType,
   JsonSchemaType,
   SchemaPropertyType,
-} from '@/model/jsonSchemaType';
+} from '@/schema/jsonSchemaType';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 
 /**

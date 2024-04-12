@@ -13,6 +13,7 @@ describe('SimpleArrayProperty', () => {
   let spanWithCount: any;
   function mountBeforeEach(props: any) {
     beforeEach(() => {
+      // @ts-ignore
       wrapper = mount(SimpleArrayProperty, {
         props: props,
       });

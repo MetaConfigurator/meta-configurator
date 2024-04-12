@@ -2,7 +2,7 @@ import type {
   JsonSchemaObjectType,
   JsonSchemaType,
   JsonSchemaTypePreprocessed,
-} from '@/model/jsonSchemaType';
+} from '@/schema/jsonSchemaType';
 import pointer from 'json-pointer';
 import {nonBooleanSchema} from '@/schema/schemaUtils';
 import {
@@ -24,6 +24,7 @@ const preprocessedRefSchemas: Map<string, JsonSchemaType> = new Map();
  * - If it is possible: merges oneOfs into anyOfs
  *
  * @param schema the schema to preprocess
+ * @param rootSchema used for resolving references
  * @returns the preprocessed schema
  */
 export function resolveAndTransform(

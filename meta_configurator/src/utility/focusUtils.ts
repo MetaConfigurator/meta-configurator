@@ -1,5 +1,5 @@
 import {pathToString} from '@/utility/pathUtils';
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 
 /**
  * Focuses the element with the given id.

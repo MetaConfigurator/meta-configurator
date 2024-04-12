@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {PathIndexLinkJson} from '../pathIndexLinkJson';
-import type {Path} from '../../model/path';
+import type {Path} from '../../utility/path';
 
 vi.mock('@/main', () => ({
   errorService: {},

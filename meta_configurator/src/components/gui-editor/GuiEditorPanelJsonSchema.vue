@@ -2,12 +2,11 @@
 import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 import {useSessionStore} from '@/store/sessionStore';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {getSchemaForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLink';
-import {SessionMode} from '@/model/sessionMode';
+import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 
 const sessionStore = useSessionStore();
 
@@ -36,7 +35,7 @@ function selectPath(path: Path) {
 const currentSchema = computed(() => {
   const schema = useSessionStore().effectiveSchemaAtCurrentPath?.schema;
   if (!schema) {
-    return new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed, false);
+    return new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed.value, false);
   }
   return schema;
 });
@@ -44,9 +43,9 @@ const currentSchema = computed(() => {
 
 <template>
   <div class="p-5 space-y-3 flex flex-col">
-    <SchemaInfoPanel :schema="getSchemaForMode(SessionMode.FileEditor).schemaWrapper" />
+    <SchemaInfoPanel :mode="useSessionStore().currentMode" />
     <CurrentPathBreadcrumb
-      :root-name="getSchemaForMode(SessionMode.FileEditor).schemaWrapper?.value.title ?? 'root'"
+      :root-name="'document root'"
       :path="sessionStore.currentPath"
       @update:path="newPath => updatePath(newPath)" />
     <div class="flex-grow overflow-y-auto">

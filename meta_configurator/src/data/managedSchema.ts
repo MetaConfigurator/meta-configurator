@@ -1,15 +1,17 @@
 import type {Ref, ShallowRef} from 'vue';
 import {ref} from 'vue';
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
 import {watchDebounced} from '@vueuse/core';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
-import type {JsonSchemaType, JsonSchemaTypePreprocessed} from '@/model/jsonSchemaType';
+import type {JsonSchemaType, JsonSchemaTypePreprocessed} from '@/schema/jsonSchemaType';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {useCurrentData} from '@/data/useDataLink';
 import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
+import {SessionMode} from '@/store/sessionMode';
+import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
 
 /**
  * This class manages the schema and provides easy access to its content.
@@ -18,14 +20,19 @@ export class ManagedSchema {
   /**
    * @param _schemaRaw the shallow ref to the original schema object
    * @param watchSchemaChanges whether to watch for changes in schema data and reprocess the schema accordingly
+   * @param mode the corresponding session mode. Useful to determine corresponding data
    */
-  constructor(private _schemaRaw: ShallowRef<JsonSchemaType>, watchSchemaChanges: boolean) {
+  constructor(
+    private _schemaRaw: ShallowRef<JsonSchemaType>,
+    watchSchemaChanges: boolean,
+    public mode: SessionMode
+  ) {
     this._schemaPreprocessed = ref(preprocessOneTime(this._schemaRaw.value));
     this._schemaWrapper = ref(new TopLevelJsonSchemaWrapper(this._schemaPreprocessed.value));
 
     if (watchSchemaChanges) {
       // make sure that the schema is not preprocessed too often
-      watchDebounced(this.schemaRaw, () => this.reloadSchema(), {
+      watchDebounced(this._schemaRaw, () => this.reloadSchema(), {
         debounce: 1000,
         immediate: true,
       });
@@ -57,7 +64,7 @@ export class ManagedSchema {
   public schemaAtPath(path: Path): JsonSchemaWrapper {
     return (
       this.schemaWrapper.value.subSchemaAt(path) ??
-      new JsonSchemaWrapper({}, this._schemaPreprocessed, false)
+      new JsonSchemaWrapper({}, this._schemaPreprocessed.value, false)
     );
   }
 
@@ -100,7 +107,8 @@ export class ManagedSchema {
   }
 
   public reloadSchema() {
+    clearPreprocessedRefSchemaCache();
     this._schemaPreprocessed = ref(preprocessOneTime(this._schemaRaw.value));
-    this._schemaWrapper.value = new TopLevelJsonSchemaWrapper(this.schemaPreprocessed.value);
+    this._schemaWrapper.value = new TopLevelJsonSchemaWrapper(this._schemaPreprocessed.value);
   }
 }

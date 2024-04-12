@@ -1,4 +1,4 @@
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 import {useSessionStore} from '@/store/sessionStore';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {errorService} from '@/main';

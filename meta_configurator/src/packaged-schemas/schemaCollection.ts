@@ -1,4 +1,4 @@
-import type {SchemaOption} from '@/model/schemaOption';
+import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 import {DEFAULT_SCHEMA} from '@/packaged-schemas/defaultSchema';
 import {STRENDA_SCHEMA} from '@/packaged-schemas/strendaSchema';
 import {ENZYMEML_SCHEMA} from '@/packaged-schemas/enzymemlSchema';

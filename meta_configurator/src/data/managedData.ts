@@ -1,12 +1,13 @@
-import type {Ref, ComputedRef, ShallowRef, WritableComputedRef} from 'vue';
+import type {Ref, ShallowRef, WritableComputedRef} from 'vue';
 import {computed, ref, triggerRef} from 'vue';
-import {useDataConverter} from '@/formats/formatRegistry';
-import type {Path} from '@/model/path';
+import {useDataConverter} from '@/dataformats/formatRegistry';
+import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import {pathToString} from '@/utility/pathUtils';
 import _ from 'lodash';
 import {useDebouncedRefHistory} from '@vueuse/core';
 import type {UndoManager} from '@/data/undoManager';
+import type {SessionMode} from '@/store/sessionMode';
 
 /**
  * This class manages the data and keeps the data and the string representation in sync.
@@ -14,8 +15,9 @@ import type {UndoManager} from '@/data/undoManager';
 export class ManagedData {
   /**
    * @param shallowDataRef   the shallow ref to the data
+   * @param mode the corresponding session mode. Useful to determine corresponding schema
    */
-  constructor(public shallowDataRef: ShallowRef<any>) {
+  constructor(public shallowDataRef: ShallowRef<any>, public mode: SessionMode) {
     this.data.value = shallowDataRef.value;
   }
 

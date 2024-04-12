@@ -1,4 +1,4 @@
-import type {TopLevelSchema} from '@/model/jsonSchemaType';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 
 export const ENZYMEML_SCHEMA: TopLevelSchema = {
   title: 'EnzymeMLDocument',

@@ -1,7 +1,7 @@
 import type {Editor} from 'brace';
 import {useSessionStore} from '@/store/sessionStore';
-import {useDataConverter} from '@/formats/formatRegistry';
-import type {Path} from '@/model/path';
+import {useDataConverter} from '@/dataformats/formatRegistry';
+import type {Path} from '@/utility/path';
 import {useDebounceFn, watchArray} from '@vueuse/core';
 import _ from 'lodash';
 import {determinePath, updateCursorPositionBasedOnPath} from '@/components/code-editor/aceUtility';

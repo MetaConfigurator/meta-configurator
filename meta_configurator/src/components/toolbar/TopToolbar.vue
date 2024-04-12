@@ -22,11 +22,11 @@ import {searchInDataAndSchema, searchResultToMenuItem} from '@/utility/search';
 import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
-import type {SchemaOption} from '@/model/schemaOption';
+import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
-import {SessionMode} from '@/model/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 
 const props = defineProps<{

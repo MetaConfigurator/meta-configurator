@@ -1,8 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {shallowRef, triggerRef} from 'vue';
 import {ManagedData} from '../managedData';
+import {SessionMode} from '../../store/sessionMode';
 
-vi.mock('@/formats/formatRegistry', () => ({
+vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
     stringify: (data: any) => JSON.stringify(data),
     parse: (data: string) => JSON.parse(data),
@@ -17,7 +18,7 @@ describe('ManagedData', () => {
       test: 'value',
       nested: {test: 'value'},
     });
-    dataLink = new ManagedData(testDataRef);
+    dataLink = new ManagedData(testDataRef, SessionMode.FileEditor);
   });
 
   it('should correctly setup the data', () => {

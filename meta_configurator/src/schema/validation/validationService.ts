@@ -1,10 +1,10 @@
-import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/model/jsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {ErrorObject} from 'ajv';
 import Ajv from 'ajv';
 import type {ValidateFunction} from 'ajv/dist/2020';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 import _ from 'lodash';
 import Ajv2019 from 'ajv/dist/2019';

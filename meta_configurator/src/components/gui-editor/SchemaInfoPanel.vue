@@ -1,27 +1,29 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
-import type {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
+import {computed} from 'vue';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import {useSessionStore} from '@/store/sessionStore';
+import type {SessionMode} from '@/store/sessionMode';
+import {getSchemaForMode} from '@/data/useDataLink';
 
 const props = defineProps<{
-  schema: ref<TopLevelJsonSchemaWrapper>;
+  mode: SessionMode;
 }>();
 
 const schemaInformation = computed(() => {
+  let schema = getSchemaForMode(props.mode).schemaWrapper.value;
   return [
     {
       title: 'Title',
-      value: props.schema?.title ?? 'Untitled schema',
+      value: schema?.title ?? 'Untitled schema',
     },
     {
       title: 'Source',
-      value: props.schema?.$id,
+      value: schema?.$id,
     },
     {
       title: 'Description',
-      value: props.schema?.description,
+      value: schema?.description,
     },
   ];
 });
@@ -29,7 +31,10 @@ const schemaInformation = computed(() => {
 
 <template>
   <Accordion :activeIndex="1">
-    <AccordionTab :header="'Schema: ' + (schema?.title ?? 'Untitled schema')">
+    <AccordionTab
+      :header="
+        'Schema: ' + (getSchemaForMode(props.mode).schemaWrapper.value?.title ?? 'Untitled schema')
+      ">
       <p v-for="info in schemaInformation" :key="info.title">
         <span class="font-semibold">{{ info.title }}: </span>
         {{ info.value }}

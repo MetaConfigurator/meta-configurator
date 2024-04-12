@@ -19,6 +19,7 @@ describe('EnumProperty', () => {
 
   function shallowMountBeforeEach(props: any) {
     beforeEach(() => {
+      // @ts-ignore
       wrapper = shallowMount(EnumProperty, {
         props: props,
       });
@@ -301,6 +302,7 @@ describe('EnumProperty', () => {
     };
 
     beforeEach(() => {
+      // @ts-ignore
       wrapper = shallowMount(EnumProperty, {
         props: nullValuesProps,
       });

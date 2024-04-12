@@ -14,7 +14,7 @@ import {registerIcons} from '@/fontawesome';
 import VueCookies from 'vue-cookies';
 
 import cookiesHandler from '@/cookies/cookiesHandler';
-import {registerDefaultDataFormats} from '@/formats/defaultFormats';
+import {registerDefaultDataFormats} from '@/dataformats/defaultFormats';
 
 // @ts-ignore
 const app = createApp(FileEditorView);

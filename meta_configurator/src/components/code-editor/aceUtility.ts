@@ -1,6 +1,6 @@
 import {Editor, type Position} from 'brace';
-import type {Path} from '@/model/path';
-import {usePathIndexLink} from '@/formats/formatRegistry';
+import type {Path} from '@/utility/path';
+import {usePathIndexLink} from '@/dataformats/formatRegistry';
 
 /**
  * Determines the cursor position for the given path.

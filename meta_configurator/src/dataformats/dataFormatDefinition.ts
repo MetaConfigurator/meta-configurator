@@ -1,5 +1,5 @@
-import type {DataConverter} from '@/formats/dataConverter';
-import type {PathIndexLink} from '@/formats/pathIndexLink';
+import type {DataConverter} from '@/dataformats/dataConverter';
+import type {PathIndexLink} from '@/dataformats/pathIndexLink';
 
 /**
  * Definition of a data format.

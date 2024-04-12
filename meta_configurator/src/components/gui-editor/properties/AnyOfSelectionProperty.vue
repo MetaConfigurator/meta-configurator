@@ -7,8 +7,8 @@ import {computed} from 'vue';
 import MultiSelect from 'primevue/multiselect';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {useSessionStore} from '@/store/sessionStore';
-import type {Path, PathElement} from '@/model/path';
-import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/model/oneOfAnyOfSelectionOption';
+import type {Path, PathElement} from '@/utility/path';
+import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/store/oneOfAnyOfSelectionOption';
 import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
 
 const props = defineProps<{

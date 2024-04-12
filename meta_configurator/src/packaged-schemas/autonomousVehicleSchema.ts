@@ -1,4 +1,4 @@
-import type {TopLevelSchema} from '@/model/jsonSchemaType';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 
 export const AUTONOMOUS_VEHICLE_SCHEMA: TopLevelSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',

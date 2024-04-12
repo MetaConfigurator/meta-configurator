@@ -15,6 +15,7 @@ describe('SimpleObjectProperty', () => {
 
   function mountBeforeEach(props: any) {
     beforeEach(() => {
+      // @ts-ignore
       wrapper = mount(SimpleObjectProperty, {
         props: props,
       });

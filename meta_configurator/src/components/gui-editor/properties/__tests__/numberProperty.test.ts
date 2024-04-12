@@ -17,6 +17,7 @@ describe('NumberProperty', () => {
 
   function shallowMountBeforeEach(props: any) {
     beforeEach(() => {
+      // @ts-ignore
       wrapper = shallowMount(NumberProperty, {
         props: props,
       });

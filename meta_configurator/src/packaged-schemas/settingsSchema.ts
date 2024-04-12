@@ -1,4 +1,6 @@
-export const SETTINGS_SCHEMA: any = {
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+
+export const SETTINGS_SCHEMA: TopLevelSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   title: 'Settings',
   description: 'MetaConfigurator settings',
@@ -56,10 +58,10 @@ export const SETTINGS_SCHEMA: any = {
       type: 'object',
       description: 'Meta Schema related settings belong here.',
       properties: {
-        simplified: {
+        restricted: {
           type: 'boolean',
           description:
-            'Whether to use the simplified meta schema. The simplified meta schema is a subset of the full meta schema and is easier to understand and use. It is recommended for beginners, however, it does not support all features of the full meta schema. This setting affects the complexity and expressiveness of the GUI editor too.',
+            'Whether to use the restricted meta schema. The restricted meta schema is a subset of the full meta schema and is easier to understand and use. It is recommended for beginners, however, it does not support all features of the full meta schema. This setting affects the complexity and expressiveness of the GUI editor too.',
           default: true,
         },
       },

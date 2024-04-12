@@ -1,4 +1,4 @@
-import type {JsonSchemaType} from '@/model/jsonSchemaType';
+import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 // @ts-ignore
 import mergeAllOf from 'json-schema-merge-allof';
 

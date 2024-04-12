@@ -4,17 +4,34 @@ import type {ComputedRef} from 'vue';
 import {computed} from 'vue';
 import {ManagedData} from '@/data/managedData';
 import {ManagedSchema} from '@/data/managedSchema';
-import {SessionMode} from '@/model/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
+import {useSettings} from '@/settings/useSettings';
 
 const dataSource = useDataSource();
 
-const managedUserData = new ManagedData(dataSource.userData);
-const managedSchemaData = new ManagedData(dataSource.userSchemaData);
-const managedSettingsData = new ManagedData(dataSource.settingsData);
-const managedUserSchema = new ManagedSchema(dataSource.userSchemaData, true);
-const managedMetaSchema = new ManagedSchema(dataSource.metaSchemaData, false);
-const managedMetaSchemaRestricted = new ManagedSchema(dataSource.metaSchemaRestrictedData, false);
-const managedSettingsSchema = new ManagedSchema(dataSource.settingsSchemaData, false);
+const managedUserData = new ManagedData(dataSource.userData, SessionMode.FileEditor);
+const managedSchemaData = new ManagedData(dataSource.userSchemaData, SessionMode.SchemaEditor);
+const managedSettingsData = new ManagedData(dataSource.settingsData, SessionMode.FileEditor);
+const managedUserSchema = new ManagedSchema(
+  dataSource.userSchemaData,
+  true,
+  SessionMode.FileEditor
+);
+const managedMetaSchema = new ManagedSchema(
+  dataSource.metaSchemaData,
+  true,
+  SessionMode.SchemaEditor
+);
+const managedMetaSchemaRestricted = new ManagedSchema(
+  dataSource.metaSchemaRestrictedData,
+  true,
+  SessionMode.SchemaEditor
+);
+const managedSettingsSchema = new ManagedSchema(
+  dataSource.settingsSchemaData,
+  false,
+  SessionMode.Settings
+);
 
 /**
  * Returns the data link for the given mode
@@ -39,7 +56,7 @@ export function getSchemaForMode(mode: SessionMode): ManagedSchema {
     case SessionMode.FileEditor:
       return managedUserSchema;
     case SessionMode.SchemaEditor:
-      if (getDataForMode(SessionMode.Settings).dataAt(['metaSchema', 'simplified']) as boolean) {
+      if (useSettings().metaSchema.restricted) {
         return managedMetaSchemaRestricted;
       } else {
         return managedMetaSchema;

@@ -1,6 +1,6 @@
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import type {SchemaPropertyType} from '@/model/jsonSchemaType';
-import {NUMBER_OF_PROPERTY_TYPES} from '@/model/jsonSchemaType';
+import type {SchemaPropertyType} from '@/schema/jsonSchemaType';
+import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {ErrorObject} from 'ajv';
 
 /**

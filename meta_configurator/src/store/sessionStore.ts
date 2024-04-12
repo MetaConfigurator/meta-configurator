@@ -1,11 +1,11 @@
 import type {Ref} from 'vue';
 import {computed, ref, watch} from 'vue';
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 import {defineStore} from 'pinia';
 import {pathToString} from '@/utility/pathUtils';
 import type {SearchResult} from '@/utility/search';
 import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
-import {SessionMode} from '@/model/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 
 /**

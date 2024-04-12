@@ -23,7 +23,7 @@ import {useDropZone, useWindowSize} from '@vueuse/core/index';
 import {readFileContentToDataLink} from '@/utility/readFileContent';
 import {useCurrentData} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
-import {SessionMode} from '@/model/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 
 const panels = computed(() => {
   let result = [CodeEditorPanel, GuiEditorPanel];

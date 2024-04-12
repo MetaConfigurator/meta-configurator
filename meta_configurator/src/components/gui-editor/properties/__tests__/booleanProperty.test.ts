@@ -15,6 +15,7 @@ describe('BooleanProperty', () => {
 
   function shallowMountBeforeEach(props: any) {
     beforeEach(() => {
+      // @ts-ignore
       wrapper = shallowMount(BooleanProperty, {
         props: props,
       });

@@ -2,7 +2,7 @@ import {useFileDialog} from '@vueuse/core';
 import {readFileContentToDataLink} from '@/utility/readFileContent';
 import {getDataForMode} from '@/data/useDataLink';
 import type {ManagedData} from '@/data/managedData';
-import {SessionMode} from '@/model/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 
 /**
  * Opens a file dialog to select a file to upload.

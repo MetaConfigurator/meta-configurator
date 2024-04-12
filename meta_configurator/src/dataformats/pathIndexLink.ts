@@ -1,4 +1,4 @@
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 
 /**
  * Interface that determines the index of a path in a data string and vice versa.

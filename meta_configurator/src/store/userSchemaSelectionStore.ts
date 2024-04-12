@@ -1,8 +1,8 @@
-import type {OneOfAnyOfSelectionOption} from '@/model/oneOfAnyOfSelectionOption';
+import type {OneOfAnyOfSelectionOption} from '@/store/oneOfAnyOfSelectionOption';
 import {defineStore} from 'pinia';
 import type {Ref} from 'vue';
 import {ref} from 'vue';
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
 
 /**

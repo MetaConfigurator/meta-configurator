@@ -3,7 +3,7 @@ import type {ErrorObject} from 'ajv';
 import {jsonPointerToPath} from '@/utility/pathUtils';
 import {determineCursorPosition} from '@/components/code-editor/aceUtility';
 import {computed} from 'vue';
-import {useDataConverter} from '@/formats/formatRegistry';
+import {useDataConverter} from '@/dataformats/formatRegistry';
 import {useValidationResult} from '@/schema/validation/useValidation';
 import {watchDebounced} from '@vueuse/core';
 

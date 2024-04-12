@@ -5,7 +5,7 @@ and allowing the user to jump to a parent path.
 <script setup lang="ts">
 import ChevronRight from '@/components/icons/ChevronRight.vue';
 import {computed} from 'vue';
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 
 const props = defineProps<{
   path: Path;

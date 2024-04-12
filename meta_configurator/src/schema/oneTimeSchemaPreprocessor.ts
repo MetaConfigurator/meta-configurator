@@ -3,7 +3,7 @@ import type {
   JsonSchemaType,
   JsonSchemaTypePreprocessed,
   SchemaPropertyType,
-} from '@/model/jsonSchemaType';
+} from '@/schema/jsonSchemaType';
 import _ from 'lodash';
 import 'crypto';
 

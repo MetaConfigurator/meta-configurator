@@ -1,5 +1,5 @@
-import type {PathIndexLink} from '@/formats/pathIndexLink';
-import type {Path} from '@/model/path';
+import type {PathIndexLink} from '@/dataformats/pathIndexLink';
+import type {Path} from '@/utility/path';
 import type {
   CstDocument,
   CstNode,

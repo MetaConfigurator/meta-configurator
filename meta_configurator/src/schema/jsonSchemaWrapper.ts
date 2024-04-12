@@ -3,9 +3,9 @@ import type {
   JsonSchemaType,
   JsonSchemaTypePreprocessed,
   SchemaPropertyType,
-} from '@/model/jsonSchemaType';
+} from '@/schema/jsonSchemaType';
 import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/schemaUtils';
-import type {Path, PathElement} from '@/model/path';
+import type {Path, PathElement} from '@/utility/path';
 import {resolveAndTransform} from '@/schema/schemaLazyResolver';
 import _ from 'lodash';
 import {assert} from '@vueuse/core';

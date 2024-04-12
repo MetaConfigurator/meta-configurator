@@ -16,14 +16,14 @@ import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import PropertyData from '@/components/gui-editor/PropertyData.vue';
 import PropertyMetadata from '@/components/gui-editor/PropertyMetadata.vue';
 import {ConfigTreeNodeResolver} from '@/components/gui-editor/configTreeNodeResolver';
-import type {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 import {GuiConstants} from '@/constants';
 import type {
   ConfigDataTreeNode,
   ConfigTreeNodeData,
   GuiEditorTreeNode,
-} from '@/model/configDataTreeNode';
-import {TreeNodeType} from '@/model/configDataTreeNode';
+} from '@/components/gui-editor/configDataTreeNode';
+import {TreeNodeType} from '@/components/gui-editor/configDataTreeNode';
 import {storeToRefs} from 'pinia';
 import {useSessionStore} from '@/store/sessionStore';
 import {pathToString} from '@/utility/pathUtils';
@@ -34,6 +34,7 @@ import {focus, focusOnPath, makeEditableAndSelectContents} from '@/utility/focus
 import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 import {useValidationResult} from '@/schema/validation/useValidation';
 import {dataAt} from '@/utility/resolveDataAtPath';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -320,7 +321,7 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
   const treeData: ConfigTreeNodeData = {
     absolutePath: absolutePath.concat(name),
     relativePath: relativePath.concat(name),
-    schema: new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed, false),
+    schema: new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed.value, false),
     parentSchema: objectSchema,
     depth: ((objectNode?.data?.depth as number) ?? 0) + 1,
     name: name,
