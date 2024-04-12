@@ -26,7 +26,7 @@ Our tool has the following advantages:
 - It is flexible and can be used for any JSON schema (we currently support draft-2020-12)
 - Less error-prone than manually editing configuration files
 
-More details can be found in [our paper](paper/main_paper.pdf) and our [user guide](https://github.com/PaulBredl/meta-configurator/wiki/User-Guide).
+More details can be found in [our paper](paper/paper_main_extended.pdf) and our [user guide](https://github.com/PaulBredl/meta-configurator/wiki/User-Guide).
 
 ## Screenshot
 
