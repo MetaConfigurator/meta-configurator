@@ -56,7 +56,7 @@ export function getSchemaForMode(mode: SessionMode): ManagedSchema {
     case SessionMode.FileEditor:
       return managedUserSchema;
     case SessionMode.SchemaEditor:
-      if (useSettings().metaSchema.restricted) {
+      if (useSettings().metaSchema.simple) {
         return managedMetaSchemaRestricted;
       } else {
         return managedMetaSchema;

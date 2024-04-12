@@ -7,9 +7,11 @@
 export type JsonSchemaType = boolean | JsonSchemaObjectType;
 
 /**
- * Structurally identical to JsonSchemaType, but to be used to distinguish between preprocessed and non-preprocessed schemas.
+ * Used to distinguish between preprocessed and non-preprocessed schemas.
  */
-export type JsonSchemaTypePreprocessed = JsonSchemaType;
+export type JsonSchemaTypePreprocessed = JsonSchemaType & {
+  $preprocessed: true;
+};
 
 export type JsonSchemaObjectType = {
   $ref?: string;

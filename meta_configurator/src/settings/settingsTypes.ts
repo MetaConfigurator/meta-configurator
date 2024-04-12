@@ -17,7 +17,7 @@ export interface SettingsInterfaceGuiEditor {
 }
 
 export interface SettingsInterfaceMetaSchema {
-  restricted: boolean;
+  simple: boolean;
 }
 
 export enum PropertySorting {

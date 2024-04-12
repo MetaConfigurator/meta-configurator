@@ -22,7 +22,7 @@ import 'crypto';
  */
 export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaTypePreprocessed {
   if (typeof schema !== 'object') {
-    return schema;
+    return markAsPreprocessed(schema);
   }
 
   // clone schema so the original schema (of the user) is not modified
@@ -32,7 +32,14 @@ export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaTypePreproc
 
   preprocessOneTimeRecursive(schemaCopy, id);
 
-  return schemaCopy;
+  return markAsPreprocessed(schemaCopy);
+}
+
+function markAsPreprocessed(schema: JsonSchemaType): JsonSchemaTypePreprocessed {
+  return {
+    ...(schema as object),
+    $preprocessed: true
+  }
 }
 
 function preprocessOneTimeRecursive(schema: JsonSchemaType | undefined, schemaPath: string): void {

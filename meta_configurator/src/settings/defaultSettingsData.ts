@@ -12,7 +12,7 @@ export const SETTINGS_DATA_DEFAULT = {
     propertySorting: 'schemaOrder',
   },
   metaSchema: {
-    restricted: true,
+    simple: true,
   },
   debuggingActive: false,
 };

@@ -15,7 +15,7 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
   $id: 'com.github.meta_configurator.simplified-meta-schema',
   $defs: {
     jsonMetaSchema: {
-      title: 'Json meta-schema',
+      title: 'Json meta-schema (expressive)',
       $schema: 'https://json-schema.org/draft/2020-12/schema',
       description:
         'This schema represents a simplified version of the json schema meta schema, to be used to edit schemas within MetaConfigurator.',
