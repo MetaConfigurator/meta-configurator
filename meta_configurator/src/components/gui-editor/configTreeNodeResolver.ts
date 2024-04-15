@@ -561,6 +561,10 @@ export class ConfigTreeNodeResolver {
     if (schema.maxProperties !== undefined && Object.keys(data).length >= schema.maxProperties) {
       return false;
     }
+    if (schema.metaConfigurator?.hideAddPropertyButton) {
+      return false;
+    }
+
     return !_.isEmpty(schema.patternProperties) || !schema.additionalProperties.isAlwaysFalse;
   }
 

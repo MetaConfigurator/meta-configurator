@@ -102,6 +102,11 @@ export const META_SCHEMA_SIMPLIFIED_RESTRICTED: TopLevelSchema = {
         {
           $ref: '#/$defs/anchor',
         },
+        {
+          metaConfigurator: {
+            hideAddPropertyButton: true,
+          }
+        }
       ],
     },
     constProperty: {
