@@ -38,8 +38,8 @@ export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaTypePreproc
 function markAsPreprocessed(schema: JsonSchemaType): JsonSchemaTypePreprocessed {
   return {
     ...(schema as object),
-    $preprocessed: true
-  }
+    $preprocessed: true,
+  };
 }
 
 function preprocessOneTimeRecursive(schema: JsonSchemaType | undefined, schemaPath: string): void {
