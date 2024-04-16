@@ -15,7 +15,7 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
   $id: 'com.github.meta_configurator.simplified-meta-schema',
   $defs: {
     jsonMetaSchema: {
-      title: 'Json meta-schema (expressive)',
+      title: 'Json meta-schema',
       $schema: 'https://json-schema.org/draft/2020-12/schema',
       description:
         'This schema represents a simplified version of the json schema meta schema, to be used to edit schemas within MetaConfigurator.',
@@ -363,6 +363,14 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
             $ref: '#/$defs/numberProperty',
           },
         },
+        {
+          if: {
+            $ref: '#/$defs/hasTypeBoolean',
+          },
+          then: {
+            $ref: '#/$defs/booleanProperty',
+          },
+        },
       ],
     },
     numberProperty: {
@@ -569,6 +577,9 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
           },
         },
       },
+    },
+    booleanProperty: {
+      title: 'Boolean property',
     },
     stringProperty: {
       title: 'String property',
@@ -909,6 +920,28 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
               type: 'array',
               contains: {
                 const: 'string',
+              },
+            },
+          },
+        },
+      ],
+      required: ['type'],
+    },
+    hasTypeBoolean: {
+      anyOf: [
+        {
+          properties: {
+            type: {
+              const: 'boolean',
+            },
+          },
+        },
+        {
+          properties: {
+            type: {
+              type: 'array',
+              contains: {
+                const: 'boolean',
               },
             },
           },

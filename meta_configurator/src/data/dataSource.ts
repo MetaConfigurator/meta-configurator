@@ -1,9 +1,10 @@
-import {shallowRef} from 'vue';
+import {computed, shallowRef, watch} from 'vue';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
-import {META_SCHEMA_SIMPLIFIED} from '@/packaged-schemas/metaSchemaSimplified';
 import {SETTINGS_SCHEMA} from '@/packaged-schemas/settingsSchema';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {META_SCHEMA_SIMPLIFIED_RESTRICTED} from '@/packaged-schemas/metaSchemaSimplifiedRestricted';
+import {buildMetaSchema} from '@/schema/metaSchemaBuilder';
+import {getSchemaForMode} from '@/data/useDataLink';
+import {SessionMode} from '@/store/sessionMode';
 
 const dataSource = {
   // data of the file editor
@@ -12,14 +13,14 @@ const dataSource = {
   userSchemaData: shallowRef<any>({
     title: 'No schema loaded',
   }),
-  // meta schema of the schema editor
-  metaSchemaData: shallowRef<TopLevelSchema>(META_SCHEMA_SIMPLIFIED),
-
-  // restricted meta schema of the schema editor
-  metaSchemaRestrictedData: shallowRef<TopLevelSchema>(META_SCHEMA_SIMPLIFIED_RESTRICTED),
 
   // data of the settings editor
   settingsData: shallowRef<any>(SETTINGS_DATA_DEFAULT), // TODO add settings type
+};
+
+const schemaSource = {
+  // restricted meta schema of the schema editor
+  metaSchemaData: computed(() => buildMetaSchema(dataSource.settingsData.value.metaSchema)),
 
   // settings schema of the settings editor
   settingsSchemaData: shallowRef<TopLevelSchema>(SETTINGS_SCHEMA), // TODO add settings schema type
@@ -34,4 +35,8 @@ const dataSource = {
  */
 export function useDataSource() {
   return dataSource;
+}
+
+export function useSchemaSource() {
+  return schemaSource;
 }

@@ -1,4 +1,4 @@
-import {useDataSource} from '@/data/dataSource';
+import {useDataSource, useSchemaSource} from '@/data/dataSource';
 import {useSessionStore} from '@/store/sessionStore';
 import type {ComputedRef} from 'vue';
 import {computed} from 'vue';
@@ -8,6 +8,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 
 const dataSource = useDataSource();
+const schemaSource = useSchemaSource();
 
 const managedUserData = new ManagedData(dataSource.userData, SessionMode.FileEditor);
 const managedSchemaData = new ManagedData(dataSource.userSchemaData, SessionMode.SchemaEditor);
@@ -18,17 +19,12 @@ const managedUserSchema = new ManagedSchema(
   SessionMode.FileEditor
 );
 const managedMetaSchema = new ManagedSchema(
-  dataSource.metaSchemaData,
-  true,
-  SessionMode.SchemaEditor
-);
-const managedMetaSchemaRestricted = new ManagedSchema(
-  dataSource.metaSchemaRestrictedData,
+  schemaSource.metaSchemaData,
   true,
   SessionMode.SchemaEditor
 );
 const managedSettingsSchema = new ManagedSchema(
-  dataSource.settingsSchemaData,
+  schemaSource.settingsSchemaData,
   false,
   SessionMode.Settings
 );
@@ -56,11 +52,7 @@ export function getSchemaForMode(mode: SessionMode): ManagedSchema {
     case SessionMode.FileEditor:
       return managedUserSchema;
     case SessionMode.SchemaEditor:
-      if (useSettings().metaSchema.simple) {
-        return managedMetaSchemaRestricted;
-      } else {
-        return managedMetaSchema;
-      }
+      return managedMetaSchema;
     case SessionMode.Settings:
       return managedSettingsSchema;
     default:

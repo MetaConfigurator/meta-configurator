@@ -809,7 +809,7 @@ export class JsonSchemaWrapper {
   /**
    * Meta configurator specific properties.
    */
-  get metaConfigurator(): {advanced?: boolean, hideAddPropertyButton?: boolean} | undefined {
+  get metaConfigurator(): {advanced?: boolean; hideAddPropertyButton?: boolean} | undefined {
     return this.jsonSchema?.metaConfigurator;
   }
 }

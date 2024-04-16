@@ -56,12 +56,39 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     metaSchema: {
       type: 'object',
-      description: 'Meta Schema related settings belong here.',
+      description:
+        'Meta Schema related settings belong here. They affect the functionality of the schema editor. By making the meta schema more expressive (e.g., by allowing multiple data types for a property), the schema editor will be more powerful but also more complicated.',
       properties: {
-        simple: {
+        allowBooleanSchema: {
           type: 'boolean',
           description:
-            'Whether to use the simplified meta schema. It is a subset of the full meta schema and is easier to understand and use. It is recommended for beginners, however, it does not support all features of the full meta schema. This setting affects the complexity and expressiveness of the GUI editor too.',
+            "Whether a JSON Schema definition can also be just 'true' or 'false'. Having this option enabled will increase the choices that have to be made when defining a sub-schema in the schema editor.",
+          default: false,
+        },
+        allowMultipleTypes: {
+          type: 'boolean',
+          description:
+            "Whether an object property can be assigned to multiple types (e.g., string and number). Having this this option enabled will increase the choices that have to be made when defining the type of an object property in the schema editor, but also allows more flexibility. An alternative to defining multiple types directly is using the 'anyOf' or 'oneOf' keywords.",
+          default: false,
+        },
+        showAdditionalPropertiesButton: {
+          type: 'boolean',
+          description:
+            "Most schemas allow additional properties (e.g., adding properties to the data that are not defined in the schema). To support this in the schema editor, it would always provide an 'Add Property' button to allow adding properties unknown to the schema. In practice, this option is not used much, but it can confuse the user. For example, they might try adding new fields for their schema by using this button, although that does not have any effect on the schema.",
+          default: false,
+        },
+        objectTypesComfort: {
+          type: 'boolean',
+          $comment:
+            "Warning: due to incompatibility, this option will disable schema editor support for conditionals, 'not' and a few other advanced keywords.",
+          description:
+            'This is a comfort feature: the original JSON Meta Schema allows properties of a particular type to have example values, constant values, default values or enum values of different types. For example, a field for numbers could have a string as a default value. This meta schema option forces the same type for all these values. This enables the tool to auto-select the corresponding type in the schema editor, avoiding the need for the user to manually select the types. ',
+          default: true,
+        },
+        rootMustBeObject: {
+          type: 'boolean',
+          description:
+            'The original JSON Meta Schema allows a JSON schema to also be of other types than an object. Because any non-trivial schema is an object, this option forces the root schema to be an object, to avoid showing the user unusual schema options.',
           default: true,
         },
       },

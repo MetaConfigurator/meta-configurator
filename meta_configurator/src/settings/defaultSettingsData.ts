@@ -12,7 +12,11 @@ export const SETTINGS_DATA_DEFAULT = {
     propertySorting: 'schemaOrder',
   },
   metaSchema: {
-    simple: true,
+    allowBooleanSchema: false,
+    allowMultipleTypes: false,
+    showAdditionalPropertiesButton: false,
+    objectTypesComfort: true,
+    rootMustBeObject: true,
   },
   debuggingActive: false,
 };
