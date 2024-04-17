@@ -1,8 +1,9 @@
-import {createRouter, createWebHistory} from 'vue-router';
+import {createMemoryHistory, createRouter, createWebHistory} from 'vue-router';
 import {useSessionStore} from '@/store/sessionStore';
-import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
-import {useCurrentSchema} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
+import SchemaEditorView from '@/views/SchemaEditorView.vue';
+import FileEditorView from '@/views/FileEditorView.vue';
+import SettingsEditorView from '@/views/SettingsEditorView.vue';
 
 /**
  * The router of the application.
@@ -14,7 +15,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'file',
-      component: () => import('../views/FileEditorView.vue'),
+      component: FileEditorView,
       meta: {
         title: 'FileEditor',
         sessionMode: SessionMode.FileEditor,
@@ -23,7 +24,7 @@ const router = createRouter({
     {
       path: '/schema',
       name: 'schema',
-      component: () => import('../views/SchemaEditorView.vue'),
+      component: SchemaEditorView,
       meta: {
         title: 'SchemaEditor',
         sessionMode: SessionMode.SchemaEditor,
@@ -32,7 +33,7 @@ const router = createRouter({
     {
       path: '/settings',
       name: 'settings',
-      component: () => import('../views/SettingsEditorView.vue'),
+      component: SettingsEditorView,
       meta: {
         title: 'SettingEditor',
         sessionMode: SessionMode.Settings,
@@ -43,23 +44,11 @@ const router = createRouter({
 
 const DEFAULT_TITLE = 'MetaConfigurator';
 
-/**
- * We make sure that important session variables are reset when the
- * user switches between the different views.
- */
 router.beforeEach((to, from, next) => {
   // Update the page title based on the current route
   document.title = (to.meta.title || DEFAULT_TITLE) as string;
 
   useSessionStore().currentMode = to.meta.sessionMode as SessionMode;
-  useSessionStore().currentPath = [];
-  useSessionStore().currentSelectedElement = [];
-  useSessionStore().currentExpandedElements = {};
-  useSessionStore().currentSearchResults = [];
-
-  useCurrentSchema().reloadSchema();
-
-  clearPreprocessedRefSchemaCache();
 
   next();
 });

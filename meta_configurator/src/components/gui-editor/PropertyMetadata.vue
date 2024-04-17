@@ -8,21 +8,22 @@ import type {
 import {TreeNodeType} from '@/components/gui-editor/configDataTreeNode';
 import type {Path, PathElement} from '@/utility/path';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
-import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
-import type {ValidationResult} from '@/schema/validation/validationService';
 import {pathToString} from '@/utility/pathUtils';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import 'primeicons/primeicons.css';
 import {focus, makeEditableAndSelectContents} from '@/utility/focusUtils';
 import {useSettings} from '@/settings/useSettings';
-import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
+import type {SessionMode} from '@/store/sessionMode';
+import {getSessionForMode, getUserSelectionForMode} from '@/data/useDataLink';
+import type {ValidationResult} from '@/schema/validationService';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
   type: ConfigDataTreeNodeType;
   highlighted: boolean;
   validationResults: ValidationResult;
+  sessionMode: SessionMode;
 }>();
 
 const emit = defineEmits<{
@@ -49,10 +50,12 @@ function canZoomIn(): boolean {
   const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
   if (dependsOnUserSelection) {
     const path = pathToString(props.node.data.absolutePath);
-    const hasUserSelectionOneOf =
-      useUserSchemaSelectionStore().currentSelectedOneOfOptions.has(path);
-    const hasUserSelectionAnyOf =
-      useUserSchemaSelectionStore().currentSelectedAnyOfOptions.has(path);
+    const hasUserSelectionOneOf = getUserSelectionForMode(
+      props.sessionMode
+    ).currentSelectedOneOfOptions.value.has(path);
+    const hasUserSelectionAnyOf = getUserSelectionForMode(
+      props.sessionMode
+    ).currentSelectedAnyOfOptions.value.has(path);
     return hasUserSelectionOneOf || hasUserSelectionAnyOf;
   }
 
@@ -77,11 +80,11 @@ function onPressEnter() {
     return;
   }
 
-  const store = useSessionStore();
-  if (store.isExpanded(props.node.data.absolutePath)) {
-    store.collapse(props.node.data.absolutePath);
+  const session = getSessionForMode(props.sessionMode);
+  if (session.isExpanded(props.node.data.absolutePath)) {
+    session.collapse(props.node.data.absolutePath);
   } else {
-    store.expand(props.node.data.absolutePath);
+    session.expand(props.node.data.absolutePath);
   }
 }
 

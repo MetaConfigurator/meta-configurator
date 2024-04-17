@@ -3,39 +3,44 @@ import SchemaInfoPanel from '@/components/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/gui-editor/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
-import {useSessionStore} from '@/store/sessionStore';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
+import type {SessionMode} from '@/store/sessionMode';
 
-const sessionStore = useSessionStore();
+const props = defineProps<{
+  sessionMode: SessionMode;
+}>();
+
+const session = getSessionForMode(props.sessionMode);
+const data = getDataForMode(props.sessionMode);
 
 function updatePath(newPath: Path) {
-  sessionStore.currentPath = newPath;
+  session.updateCurrentPath(newPath);
 }
 
 function updateData(path: Path, newValue: any) {
-  useCurrentData().setDataAt(path, newValue);
+  data.setDataAt(path, newValue);
 }
 
 function removeProperty(path: Path) {
-  useCurrentData().removeDataAt(path);
-  sessionStore.currentSelectedElement = path;
+  data.removeDataAt(path);
+  session.updateCurrentSelectedElement(path);
 }
 
 function zoomIntoPath(pathToAdd: Path) {
-  sessionStore.currentPath = sessionStore.currentPath.concat(pathToAdd);
-  sessionStore.currentSelectedElement = sessionStore.currentPath;
+  session.updateCurrentPath(session.currentPath.value.concat(pathToAdd));
+  session.updateCurrentSelectedElement(session.currentPath.value);
 }
 
 function selectPath(path: Path) {
-  sessionStore.currentSelectedElement = path;
+  session.updateCurrentSelectedElement(path);
 }
 
 const currentSchema = computed(() => {
-  const schema = useSessionStore().effectiveSchemaAtCurrentPath?.schema;
+  const schema = session.effectiveSchemaAtCurrentPath?.value.schema;
   if (!schema) {
-    return new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed.value, false);
+    return new JsonSchemaWrapper({}, props.sessionMode, false);
   }
   return schema;
 });
@@ -43,16 +48,17 @@ const currentSchema = computed(() => {
 
 <template>
   <div class="p-5 space-y-3 flex flex-col">
-    <SchemaInfoPanel :mode="useSessionStore().currentMode" />
+    <SchemaInfoPanel :sessionMode="props.sessionMode" />
     <CurrentPathBreadcrumb
       :root-name="'document root'"
-      :path="sessionStore.currentPath"
+      :path="session.currentPath.value"
       @update:path="newPath => updatePath(newPath)" />
     <div class="flex-grow overflow-y-auto">
       <PropertiesPanel
         :currentSchema="currentSchema"
-        :currentPath="sessionStore.currentPath"
-        :currentData="useSessionStore().dataAtCurrentPath"
+        :currentPath="session.currentPath.value"
+        :currentData="session.dataAtCurrentPath.value"
+        :sessionMode="props.sessionMode"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
         @remove_property="removeProperty"
         @select_path="selectedPath => selectPath(selectedPath)"

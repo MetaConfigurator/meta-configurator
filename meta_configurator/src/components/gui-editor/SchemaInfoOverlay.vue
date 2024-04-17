@@ -16,6 +16,7 @@ import {computed, Ref, ref} from 'vue';
 import {describeSchema} from '@/schema/schemaDescriptor';
 import type {ErrorObject} from 'ajv';
 import {useCurrentSchema} from '@/data/useDataLink';
+import {useSessionStore} from '@/store/sessionStore';
 
 const schemaRef: Ref<JsonSchemaWrapper | undefined> = ref();
 const propertyNameRef: Ref<String> = ref('');
@@ -24,8 +25,7 @@ const validationErrorsRef: Ref<ErrorObject[]> = ref([]);
 
 const schemaDescription = computed(() =>
   describeSchema(
-    schemaRef.value ??
-      new JsonSchemaWrapper(true, useCurrentSchema().schemaPreprocessed.value, false),
+    schemaRef.value ?? new JsonSchemaWrapper(true, useSessionStore().currentMode, false),
     propertyNameRef.value,
     parentSchemaRef.value,
     true,

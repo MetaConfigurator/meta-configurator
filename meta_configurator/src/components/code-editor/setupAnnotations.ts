@@ -4,14 +4,15 @@ import {jsonPointerToPath} from '@/utility/pathUtils';
 import {determineCursorPosition} from '@/components/code-editor/aceUtility';
 import {computed} from 'vue';
 import {useDataConverter} from '@/dataformats/formatRegistry';
-import {useValidationResult} from '@/schema/validation/useValidation';
 import {watchDebounced} from '@vueuse/core';
+import type {SessionMode} from '@/store/sessionMode';
+import {getValidationForMode} from '@/data/useDataLink';
 
 /**
  * Sets up the editor to show validation errors.
  * @param editor the ace editor
  */
-export function setupAnnotationsFromValidationErrors(editor: Editor) {
+export function setupAnnotationsFromValidationErrors(editor: Editor, mode: SessionMode) {
   const validationAnnotations = computed(() => {
     // do not attempt to display schema validation errors when the text does not have valid syntax
     // (would otherwise result in errors when trying to parse CST)
@@ -19,7 +20,7 @@ export function setupAnnotationsFromValidationErrors(editor: Editor) {
       return [];
     }
 
-    const {errors} = useValidationResult();
+    const {errors} = getValidationForMode(mode).currentValidationResult.value;
     return errors.map(error => validationErrorToAnnotation(editor, error));
   });
 

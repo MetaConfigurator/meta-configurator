@@ -1,5 +1,5 @@
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import type {PathElement} from '@/model/path';
+import type {PathElement} from '@/utility/path';
 
 /**
  * Generates placeholder text for a property.

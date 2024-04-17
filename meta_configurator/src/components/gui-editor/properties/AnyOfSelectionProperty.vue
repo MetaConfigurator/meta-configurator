@@ -6,10 +6,10 @@ import type {WritableComputedRef} from 'vue';
 import {computed} from 'vue';
 import MultiSelect from 'primevue/multiselect';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {useSessionStore} from '@/store/sessionStore';
 import type {Path, PathElement} from '@/utility/path';
-import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/store/oneOfAnyOfSelectionOption';
-import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
+import type {SessionMode} from '@/store/sessionMode';
+import {getSessionForMode, getUserSelectionForMode} from '@/data/useDataLink';
+import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/data/oneOfAnyOfSelectionOption';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -17,6 +17,7 @@ const props = defineProps<{
   propertyData: any | undefined;
   absolutePath: Path;
   possibleSchemas: Array<JsonSchemaWrapper>;
+  sessionMode: SessionMode;
 }>();
 
 const possibleOptions = props.possibleSchemas.map(
@@ -38,7 +39,7 @@ function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption {
 
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined> = computed({
   get(): OneOfAnyOfSelectionOption[] | undefined {
-    const optionsFromStore = useUserSchemaSelectionStore().getSelectedAnyOfOptions(
+    const optionsFromStore = getUserSelectionForMode(props.sessionMode).getSelectedAnyOfOptions(
       props.absolutePath
     );
     if (!optionsFromStore) {
@@ -52,8 +53,11 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined
 
   set(selectedOptions: OneOfAnyOfSelectionOption[] | undefined) {
     if (selectedOptions) {
-      useUserSchemaSelectionStore().setSelectedAnyOfOptions(props.absolutePath, selectedOptions);
-      useSessionStore().expand(props.absolutePath);
+      getUserSelectionForMode(props.sessionMode).setSelectedAnyOfOptions(
+        props.absolutePath,
+        selectedOptions
+      );
+      getSessionForMode(props.sessionMode).expand(props.absolutePath);
       emit('update:tree');
     }
   },

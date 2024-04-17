@@ -8,8 +8,7 @@ import {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
 import type {JsonSchemaType, JsonSchemaTypePreprocessed} from '@/schema/jsonSchemaType';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
-import {useCurrentData} from '@/data/useDataLink';
-import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
+import {getDataForMode, getUserSelectionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
 
@@ -28,7 +27,6 @@ export class ManagedSchema {
     public mode: SessionMode
   ) {
     this._schemaPreprocessed = ref(preprocessOneTime(this._schemaRaw.value));
-    this._schemaWrapper = ref(new TopLevelJsonSchemaWrapper(this._schemaPreprocessed.value));
 
     if (watchSchemaChanges) {
       // make sure that the schema is not preprocessed too often
@@ -44,13 +42,18 @@ export class ManagedSchema {
   /**
    * The json schema as a TopLevelJsonSchema object
    */
-  private readonly _schemaWrapper: Ref<TopLevelJsonSchemaWrapper>;
+  private _schemaWrapper?: Ref<TopLevelJsonSchemaWrapper>;
 
   get schemaPreprocessed(): Ref<JsonSchemaTypePreprocessed> {
     return this._schemaPreprocessed;
   }
 
   get schemaWrapper(): Ref<TopLevelJsonSchemaWrapper> {
+    if (this._schemaWrapper === undefined) {
+      this._schemaWrapper = ref(
+        new TopLevelJsonSchemaWrapper(this._schemaPreprocessed.value, this.mode)
+      );
+    }
     return this._schemaWrapper!;
   }
 
@@ -63,8 +66,7 @@ export class ManagedSchema {
    */
   public schemaAtPath(path: Path): JsonSchemaWrapper {
     return (
-      this.schemaWrapper.value.subSchemaAt(path) ??
-      new JsonSchemaWrapper({}, this._schemaPreprocessed.value, false)
+      this.schemaWrapper.value.subSchemaAt(path) ?? new JsonSchemaWrapper({}, this.mode, false)
     );
   }
 
@@ -74,7 +76,7 @@ export class ManagedSchema {
   public effectiveSchemaAtPath(path: Path): EffectiveSchema {
     let currentEffectiveSchema: EffectiveSchema = calculateEffectiveSchema(
       this.schemaWrapper.value,
-      useCurrentData().data.value,
+      getDataForMode(this.mode).data.value,
       []
     );
 
@@ -84,13 +86,13 @@ export class ManagedSchema {
       const schema = currentEffectiveSchema.schema.subSchema(key);
 
       if (schema?.oneOf) {
-        const oneOfSelection = useUserSchemaSelectionStore().currentSelectedOneOfOptions.get(
-          pathToString(currentPath)
-        );
+        const oneOfSelection = getUserSelectionForMode(
+          this.mode
+        ).currentSelectedOneOfOptions.value.get(pathToString(currentPath));
         if (oneOfSelection !== undefined) {
           currentEffectiveSchema = calculateEffectiveSchema(
             schema.oneOf[oneOfSelection.index],
-            useCurrentData().dataAt(currentPath),
+            getDataForMode(this.mode).dataAt(currentPath),
             currentPath
           );
           continue;
@@ -99,7 +101,7 @@ export class ManagedSchema {
 
       currentEffectiveSchema = calculateEffectiveSchema(
         schema,
-        useCurrentData().dataAt(currentPath),
+        getDataForMode(this.mode).dataAt(currentPath),
         currentPath
       );
     }
@@ -109,6 +111,9 @@ export class ManagedSchema {
   public reloadSchema() {
     clearPreprocessedRefSchemaCache();
     this._schemaPreprocessed = ref(preprocessOneTime(this._schemaRaw.value));
-    this._schemaWrapper.value = new TopLevelJsonSchemaWrapper(this._schemaPreprocessed.value);
+    this.schemaWrapper.value = new TopLevelJsonSchemaWrapper(
+      this._schemaPreprocessed.value,
+      this.mode
+    );
   }
 }

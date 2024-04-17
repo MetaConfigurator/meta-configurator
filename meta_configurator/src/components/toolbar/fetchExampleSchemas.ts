@@ -10,7 +10,8 @@ import {schemaCollection} from '@/packaged-schemas/schemaCollection';
  */
 export function loadExampleSchema(schemaKey: string): void {
   try {
-    const selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+    let selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+    selectedSchema = structuredClone(selectedSchema);
     const schemaName = selectedSchema.label || 'Unknown Schema';
     useDataSource().userSchemaData.value = selectedSchema?.schema;
 

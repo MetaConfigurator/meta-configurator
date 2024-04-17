@@ -2,10 +2,14 @@
 
 ## 0.1.1
 
-* More user-friendly meta schema (optional)
-  * removed unusual parameters from root level of schema
-  * enforcing *const*, *examples*, *enum* and *default* values to have same type as the field
-  * removed *if* and *not* support due to conflict with other simplifications
+* Make meta schema more configurable
+  * put unusual options in schema root level into advanced category
+  * option: disable boolean schemas
+  * option: disable multiple types for a field
+  * option: enforce schema root to be an object
+  * option: hide the button to create additional (by schema unknown) properties
+* big modifications in architecture. Now data and schema of different modes can be loaded simultaneously and shown in the same view
+* option to configure which panels are shown in the different modes
 
 
 ## 0.1.0

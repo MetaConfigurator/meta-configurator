@@ -1,13 +1,20 @@
 import {shallowMount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {ValidationResult} from '../../../../schema/validation/validationService';
-import {JsonSchemaWrapper} from '../../../../schema/jsonSchemaWrapper';
 import StringProperty from '../StringProperty.vue';
 import InputText from 'primevue/inputtext';
+import {ValidationResult} from '@/schema/validationService';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
+import {SessionMode} from '@/store/sessionMode';
 
-// avoid constructing the session store through imports, it is not required for this component
-vi.mock('@/store/sessionStore', () => ({
-  useSessionStore: vi.fn(),
+// avoid constructing useDataLink store through imports, it is not required for this component
+vi.mock('@/data/useDataLink', () => ({
+  getSchemaForMode: vi.fn(),
+  getDataForMode: vi.fn(),
+  useCurrentData: vi.fn(),
+  useCurrentSchema: vi.fn(),
+  getUserSelectionForMode: vi.fn(),
+  getValidationForMode: vi.fn(),
+  getSessionForMode: vi.fn(),
 }));
 
 describe('StringProperty', () => {
@@ -36,7 +43,7 @@ describe('StringProperty', () => {
         {
           type: 'string',
         },
-        {},
+        SessionMode.FileEditor,
         false
       ),
     });
@@ -73,7 +80,7 @@ describe('StringProperty', () => {
           {
             type: 'string',
           },
-          {},
+          SessionMode.FileEditor,
           false
         ),
       });
@@ -94,7 +101,7 @@ describe('StringProperty', () => {
         {
           type: 'number',
         },
-        {},
+        SessionMode.FileEditor,
         false
       ),
     });
@@ -113,7 +120,7 @@ describe('StringProperty', () => {
         {
           type: 'object',
         },
-        {},
+        SessionMode.FileEditor,
         false
       ),
     });
@@ -132,7 +139,7 @@ describe('StringProperty', () => {
         {
           type: 'array',
         },
-        {},
+        SessionMode.FileEditor,
         false
       ),
     });
@@ -151,7 +158,7 @@ describe('StringProperty', () => {
         {
           type: 'null',
         },
-        {},
+        SessionMode.FileEditor,
         false
       ),
     });
@@ -166,7 +173,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: undefined,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchemaWrapper({}, {}, false),
+      propertySchema: new JsonSchemaWrapper({}, SessionMode.FileEditor, false),
     });
 
     it('should correctly setup the input field', () => {

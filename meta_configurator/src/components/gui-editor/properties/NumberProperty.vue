@@ -2,11 +2,11 @@
 <script setup lang="ts">
 import InputNumber from 'primevue/inputnumber';
 import {computed} from 'vue';
-import type {PathElement} from '@/model/path';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
-import {ValidationResult} from '@/schema/validation/validationService';
 import {GuiConstants} from '@/constants';
+import type {ValidationResult} from '@/schema/validationService';
+import type {PathElement} from '@/utility/path';
 
 const props = defineProps<{
   propertyName: PathElement;

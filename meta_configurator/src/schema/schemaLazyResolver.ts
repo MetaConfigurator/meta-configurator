@@ -1,8 +1,4 @@
-import type {
-  JsonSchemaObjectType,
-  JsonSchemaType,
-  JsonSchemaTypePreprocessed,
-} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import pointer from 'json-pointer';
 import {nonBooleanSchema} from '@/schema/schemaUtils';
 import {
@@ -11,8 +7,12 @@ import {
   mergeSchemas,
   safeMergeSchemas,
 } from '@/schema/mergeAllOfs';
+import {SessionMode} from '@/store/sessionMode';
+import {getSchemaForMode} from '@/data/useDataLink';
 
-const preprocessedRefSchemas: Map<string, JsonSchemaType> = new Map();
+const preprocessedRefSchemasMap: Map<SessionMode, Map<string, JsonSchemaType>> = new Map(
+  Object.values(SessionMode).map(mode => [mode, new Map()])
+);
 
 /**
  * Resolves and transforms the schema:
@@ -27,27 +27,24 @@ const preprocessedRefSchemas: Map<string, JsonSchemaType> = new Map();
  * @param rootSchema used for resolving references
  * @returns the preprocessed schema
  */
-export function resolveAndTransform(
-  schema: JsonSchemaType,
-  rootSchema: JsonSchemaTypePreprocessed
-): JsonSchemaType {
+export function resolveAndTransform(schema: JsonSchemaType, mode: SessionMode): JsonSchemaType {
   if (typeof schema !== 'object') {
     return schema;
   }
   let schemaCopy: JsonSchemaType = {...schema};
 
   if (hasRef(schemaCopy)) {
-    schemaCopy = resolveReference(schemaCopy, rootSchema);
+    schemaCopy = resolveReference(schemaCopy, mode);
   }
 
-  schemaCopy = handleAllOfs(schemaCopy, rootSchema);
+  schemaCopy = handleAllOfs(schemaCopy, mode);
   removeIncompatibleOneOfs(schemaCopy);
   removeIncompatibleAnyOfs(schemaCopy);
-  schemaCopy = mergeSingularOneOf(schemaCopy, rootSchema);
-  schemaCopy = mergeSingularAnyOf(schemaCopy, rootSchema);
+  schemaCopy = mergeSingularOneOf(schemaCopy, mode);
+  schemaCopy = mergeSingularAnyOf(schemaCopy, mode);
   attemptMergeOneOfsIntoAnyOfs(schemaCopy);
-  preprocessOneOfs(schemaCopy, rootSchema);
-  preprocessAnyOfs(schemaCopy, rootSchema);
+  preprocessOneOfs(schemaCopy, mode);
+  preprocessAnyOfs(schemaCopy, mode);
   // TODO: deal with case where there is anyOf and oneOf --> show both options in GUI?
 
   return schemaCopy;
@@ -60,24 +57,21 @@ function hasRef(schema: JsonSchemaType): schema is {$ref: string} & JsonSchemaOb
   return schema.$ref !== undefined;
 }
 
-function handleAllOfs(schema: JsonSchemaType, rootSchema: JsonSchemaTypePreprocessed) {
+function handleAllOfs(schema: JsonSchemaType, mode: SessionMode) {
   if (typeof schema !== 'object') {
     return schema;
   }
 
   if (hasAllOfs(schema)) {
-    schema.allOf = schema.allOf!.map(subSchema => resolveAndTransform(subSchema, rootSchema));
+    schema.allOf = schema.allOf!.map(subSchema => resolveAndTransform(subSchema, mode));
 
-    schema = extractIfsOfAllOfs(schema, rootSchema);
+    schema = extractIfsOfAllOfs(schema, mode);
     schema = mergeAllOfs(schema);
   }
   return schema;
 }
 
-function extractIfsOfAllOfs(
-  schema: JsonSchemaType,
-  rootSchema: JsonSchemaTypePreprocessed
-): JsonSchemaType {
+function extractIfsOfAllOfs(schema: JsonSchemaType, mode: SessionMode): JsonSchemaType {
   if (typeof schema !== 'object') {
     return schema;
   }
@@ -87,14 +81,14 @@ function extractIfsOfAllOfs(
   const conditions: JsonSchemaType[] = [];
   schema.allOf.forEach(allOf => {
     if (typeof allOf == 'object' && allOf.if) {
-      const newIf = resolveAndTransform(allOf.if, rootSchema);
+      const newIf = resolveAndTransform(allOf.if, mode);
       let newThen: JsonSchemaType | undefined;
       let newElse: JsonSchemaType | undefined;
       if (allOf.then) {
-        newThen = resolveAndTransform(allOf.then, rootSchema);
+        newThen = resolveAndTransform(allOf.then, mode);
       }
       if (allOf.else) {
-        newElse = resolveAndTransform(allOf.else, rootSchema);
+        newElse = resolveAndTransform(allOf.else, mode);
       }
       conditions.push({
         if: newIf,
@@ -154,24 +148,24 @@ function attemptMergeOneOfsIntoAnyOfs(schema: JsonSchemaType) {
   }
 }
 
-function preprocessAnyOfs(schema: JsonSchemaType, rootSchema: JsonSchemaTypePreprocessed) {
+function preprocessAnyOfs(schema: JsonSchemaType, mode: SessionMode) {
   if (typeof schema !== 'object') {
     return;
   }
   if (hasAnyOfs(schema)) {
     schema.anyOf = schema.anyOf?.map(subSchema => {
-      return resolveAndTransform(subSchema, rootSchema);
+      return resolveAndTransform(subSchema, mode);
     });
   }
 }
 
-function preprocessOneOfs(schema: JsonSchemaType, rootSchema: JsonSchemaTypePreprocessed) {
+function preprocessOneOfs(schema: JsonSchemaType, mode: SessionMode) {
   if (typeof schema !== 'object') {
     return;
   }
   if (hasOneOfs(schema)) {
     schema.oneOf = schema.oneOf?.map(subSchema => {
-      return resolveAndTransform(subSchema, rootSchema);
+      return resolveAndTransform(subSchema, mode);
     });
   }
 }
@@ -215,10 +209,7 @@ function removeIncompatibleOneOfs(schema: JsonSchemaType) {
 }
 
 // if oneOf has just one entry: merge into parent
-function mergeSingularOneOf(
-  schema: JsonSchemaType,
-  rootSchema: JsonSchemaTypePreprocessed
-): JsonSchemaType {
+function mergeSingularOneOf(schema: JsonSchemaType, mode: SessionMode): JsonSchemaType {
   if (typeof schema !== 'object') {
     return schema;
   }
@@ -227,8 +218,8 @@ function mergeSingularOneOf(
       const copiedSchema: JsonSchemaObjectType = {...schema};
       delete copiedSchema.oneOf;
       return mergeSchemas(
-        resolveAndTransform(schema.oneOf![0], rootSchema),
-        resolveAndTransform(copiedSchema, rootSchema)
+        resolveAndTransform(schema.oneOf![0], mode),
+        resolveAndTransform(copiedSchema, mode)
       );
     } else if (schema.oneOf!!.length == 0) {
       throw Error('oneOf array has zero entries for schema ' + JSON.stringify(schema));
@@ -239,10 +230,7 @@ function mergeSingularOneOf(
 }
 
 // if anyOf has just one entry: merge into parent
-function mergeSingularAnyOf(
-  schema: JsonSchemaType,
-  rootSchema: JsonSchemaTypePreprocessed
-): JsonSchemaType {
+function mergeSingularAnyOf(schema: JsonSchemaType, mode: SessionMode): JsonSchemaType {
   if (typeof schema !== 'object') {
     return schema;
   }
@@ -252,8 +240,8 @@ function mergeSingularAnyOf(
       const copiedSchema: JsonSchemaObjectType = {...schema};
       delete copiedSchema.anyOf;
       return mergeSchemas(
-        resolveAndTransform(schema.anyOf!![0], rootSchema),
-        resolveAndTransform(copiedSchema, rootSchema)
+        resolveAndTransform(schema.anyOf!![0], mode),
+        resolveAndTransform(copiedSchema, mode)
       );
     } else if (schema.anyOf!!.length == 0) {
       throw Error('anyOf array has zero entries for schema ' + JSON.stringify(schema));
@@ -265,17 +253,24 @@ function mergeSingularAnyOf(
 
 function resolveReference(
   schema: {$ref: string} & JsonSchemaObjectType,
-  rootSchema: JsonSchemaTypePreprocessed
+  mode: SessionMode
 ): JsonSchemaType {
   // remove leading # from ref if present
   const refString = schema.$ref.startsWith('#') ? schema.$ref.substring(1) : schema.$ref;
 
+  let preprocessedRefSchemas = preprocessedRefSchemasMap.get(mode)!;
   let refSchema: any;
   if (preprocessedRefSchemas.has(refString)) {
     refSchema = preprocessedRefSchemas.get(refString);
   } else {
-    refSchema = pointer.get(nonBooleanSchema(rootSchema ?? {}) ?? {}, refString);
-    refSchema = resolveAndTransform(refSchema, rootSchema);
+    let rootSchema = getSchemaForMode(mode).schemaPreprocessed.value;
+    try {
+      refSchema = pointer.get(nonBooleanSchema(rootSchema ?? {}) ?? {}, refString);
+    } catch (e) {
+      throw e;
+      refSchema = {};
+    }
+    refSchema = resolveAndTransform(refSchema, mode);
     preprocessedRefSchemas.set(refString, refSchema);
   }
 
@@ -317,5 +312,7 @@ function hasAnyOfs(
  * Clears the cache of preprocessed schemas.
  */
 export function clearPreprocessedRefSchemaCache() {
-  preprocessedRefSchemas.clear();
+  for (let preprocessedSchemas of preprocessedRefSchemasMap.values()) {
+    preprocessedSchemas.clear();
+  }
 }

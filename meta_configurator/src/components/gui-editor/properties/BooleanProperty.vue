@@ -5,8 +5,8 @@ They are represented as a select button with two options: true and false.
 <script setup lang="ts">
 import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
-import type {PathElement} from '@/model/path';
-import type {ValidationResult} from '@/schema/validation/validationService';
+import type {PathElement} from '@/utility/path';
+import type {ValidationResult} from '@/schema/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;

@@ -1,5 +1,6 @@
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {SessionMode} from '@/store/sessionMode';
 
 /**
  * Like {@link JsonSchemaWrapper}, but with additional properties that are only allowed at the top level of a schema.
@@ -10,8 +11,8 @@ export class TopLevelJsonSchemaWrapper extends JsonSchemaWrapper {
   private _$vocabulary?: Record<string, boolean>;
   private _$defs?: Record<string, JsonSchemaWrapper>;
 
-  constructor(schema: TopLevelSchema) {
-    super(schema, schema);
+  constructor(schema: TopLevelSchema, mode: SessionMode) {
+    super(schema, mode);
     this._$schema = schema.$schema;
   }
 

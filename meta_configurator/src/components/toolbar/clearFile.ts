@@ -2,7 +2,7 @@ import {useSessionStore} from '@/store/sessionStore';
 import {toastService} from '@/utility/toastService';
 import {confirmationService} from '@/utility/confirmationService';
 import _ from 'lodash';
-import {getDataForMode, useCurrentData} from '@/data/useDataLink';
+import {getDataForMode, getSessionForMode, useCurrentData} from '@/data/useDataLink';
 import type {ManagedData} from '@/data/managedData';
 import {SessionMode} from '@/store/sessionMode';
 
@@ -52,8 +52,9 @@ function newEmptyFile({
 
 function clearFile(dataLink: ManagedData) {
   dataLink.setData({});
-  useSessionStore().updateCurrentPath([]); // todo introduce reset method
-  useSessionStore().updateCurrentSelectedElement([]);
+  let mode = useSessionStore().currentMode;
+  getSessionForMode(mode).updateCurrentPath([]); // todo introduce reset method
+  getSessionForMode(mode).updateCurrentSelectedElement([]);
 }
 
 /**

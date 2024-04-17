@@ -2,10 +2,10 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
 import InputText from 'primevue/inputtext';
-import type {PathElement} from '@/model/path';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {ValidationResult} from '@/schema/validation/validationService';
+import type {PathElement} from '@/utility/path';
+import type {ValidationResult} from '@/schema/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;

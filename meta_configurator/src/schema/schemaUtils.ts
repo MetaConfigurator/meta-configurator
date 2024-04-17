@@ -4,6 +4,7 @@ import type {
   SchemaPropertyType,
 } from '@/schema/jsonSchemaType';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
+import type {SessionMode} from '@/store/sessionMode';
 
 /**
  * @returns the schema if it is not a boolean, otherwise
@@ -24,9 +25,9 @@ export function nonBooleanSchema(schema: JsonSchemaType): JsonSchemaObjectType |
  */
 export function schemaArray(
   schema: JsonSchemaType[] | undefined,
-  referenceSchemaPreprocessed: JsonSchemaType
+  mode: SessionMode
 ): JsonSchemaWrapper[] {
-  return schema?.map(s => new JsonSchemaWrapper(s, referenceSchemaPreprocessed)) ?? [];
+  return schema?.map(s => new JsonSchemaWrapper(s, mode)) ?? [];
 }
 
 /**
@@ -34,12 +35,12 @@ export function schemaArray(
  */
 export function schemaRecord(
   schemaRecord: Record<string, JsonSchemaType> | undefined,
-  referenceSchemaPreprocessed: JsonSchemaType
+  mode: SessionMode
 ): Record<string, JsonSchemaWrapper> {
   return Object.fromEntries(
     Object.entries(schemaRecord ?? {}).map(([key, value]) => [
       key,
-      new JsonSchemaWrapper(value, referenceSchemaPreprocessed),
+      new JsonSchemaWrapper(value, mode),
     ])
   );
 }
@@ -50,12 +51,12 @@ export function schemaRecord(
  */
 export function schemaFromObject(
   jsonSchema: JsonSchemaType | undefined,
-  referenceSchemaPreprocessed: JsonSchemaType
+  mode: SessionMode
 ): JsonSchemaWrapper | undefined {
   if (!jsonSchema) {
     return undefined;
   }
-  return new JsonSchemaWrapper(jsonSchema, referenceSchemaPreprocessed);
+  return new JsonSchemaWrapper(jsonSchema, mode);
 }
 
 /**
@@ -63,9 +64,6 @@ export function schemaFromObject(
  * type constraint with the given type, i.e.,
  * `{type: t}` for the given type `t`.
  */
-export function typeSchema(
-  type: SchemaPropertyType,
-  referenceSchemaPreprocessed: JsonSchemaType
-): JsonSchemaWrapper {
-  return new JsonSchemaWrapper({type}, referenceSchemaPreprocessed, false);
+export function typeSchema(type: SchemaPropertyType, mode: SessionMode): JsonSchemaWrapper {
+  return new JsonSchemaWrapper({type}, mode, false);
 }

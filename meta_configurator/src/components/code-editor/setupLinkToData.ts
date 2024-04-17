@@ -1,19 +1,20 @@
 import {Editor} from 'brace';
 // @ts-ignore
 import {useDebounceFn, watchImmediate} from '@vueuse/core/index';
-import {useCurrentData} from '@/data/useDataLink';
+import {getDataForMode} from '@/data/useDataLink';
+import type {SessionMode} from '@/store/sessionMode';
 
 let currentChangeFromOutside = false;
 let currentChangeFromInside = false;
 
-export function setupLinkToData(editor: Editor) {
-  setupUpdateContentWhenDataChanges(editor);
-  setupPropagationOfEditorContentChanges(editor);
+export function setupLinkToData(editor: Editor, mode: SessionMode) {
+  setupUpdateContentWhenDataChanges(editor, mode);
+  setupPropagationOfEditorContentChanges(editor, mode);
 }
 
-function setupUpdateContentWhenDataChanges(editor: Editor) {
+function setupUpdateContentWhenDataChanges(editor: Editor, mode: SessionMode) {
   watchImmediate(
-    () => useCurrentData().unparsedData.value,
+    () => getDataForMode(mode).unparsedData.value,
     (dataString: string) => {
       if (currentChangeFromInside) {
         currentChangeFromInside = false; // reset flag
@@ -32,7 +33,7 @@ function setupUpdateContentWhenDataChanges(editor: Editor) {
  * When the content of the editor is modified by the user, we want to update the file data accordingly
  * @param editor the ace editor
  */
-function setupPropagationOfEditorContentChanges(editor: Editor) {
+function setupPropagationOfEditorContentChanges(editor: Editor, mode: SessionMode) {
   editor.on(
     'change',
     useDebounceFn(() => {
@@ -42,7 +43,7 @@ function setupPropagationOfEditorContentChanges(editor: Editor) {
       }
 
       currentChangeFromInside = true;
-      useCurrentData().unparsedData.value = editor.getValue();
+      getDataForMode(mode).unparsedData.value = editor.getValue();
     }, 100)
   );
 }

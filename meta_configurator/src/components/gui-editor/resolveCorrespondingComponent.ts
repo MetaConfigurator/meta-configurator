@@ -10,21 +10,21 @@ import type {
 } from '@/components/gui-editor/configDataTreeNode';
 import type {VNode} from 'vue';
 import {h} from 'vue';
-import {useSessionStore} from '@/store/sessionStore';
 import OneOfSelectionProperty from '@/components/gui-editor/properties/OneOfSelectionProperty.vue';
 import AnyOfSelectionProperty from '@/components/gui-editor/properties/AnyOfSelectionProperty.vue';
-import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
-import {useValidationResult} from '@/schema/validation/useValidation';
+import {getDataForMode, getSessionForMode, getValidationForMode} from '@/data/useDataLink';
 import {typeSchema} from '@/schema/schemaUtils';
+import type {SessionMode} from '@/store/sessionMode';
 
 /**
  * Resolves the corresponding component for a given node.
  * The component is determined by the schema of the node.
  */
 export function resolveCorrespondingComponent(
-  nodeData: ConfigTreeNodeData | AddItemTreeNodeData
+  nodeData: ConfigTreeNodeData | AddItemTreeNodeData,
+  mode: SessionMode
 ): VNode {
-  const propsObject = buildProperties(nodeData);
+  const propsObject = buildProperties(nodeData, mode);
 
   if (nodeData.schema.oneOf.length > 0) {
     // @ts-ignore
@@ -55,9 +55,7 @@ export function resolveCorrespondingComponent(
     // @ts-ignore
     return h(OneOfSelectionProperty, {
       ...propsObject,
-      possibleSchemas: nodeData.schema.type.map(type =>
-        typeSchema(type, useCurrentSchema().schemaPreprocessed)
-      ),
+      possibleSchemas: nodeData.schema.type.map(type => typeSchema(type, mode)),
       isTypeUnion: true,
     });
   }
@@ -110,15 +108,17 @@ function hasTwoOrMoreExamples(schema: any): boolean {
   return schema.examples !== undefined && schema.examples.length > 1;
 }
 
-function buildProperties(nodeData: ConfigTreeNodeData | AddItemTreeNodeData) {
+function buildProperties(nodeData: ConfigTreeNodeData | AddItemTreeNodeData, mode: SessionMode) {
   return {
     propertyName: nodeData.name,
-    propertyData: useCurrentData().dataAt(nodeData.absolutePath),
+    propertyData: getDataForMode(mode).dataAt(nodeData.absolutePath),
     propertySchema: nodeData.schema,
     parentSchema: nodeData.parentSchema,
     relativePath: nodeData.relativePath,
     absolutePath: nodeData.absolutePath,
-    validationResults: useValidationResult().filterForPath(nodeData.absolutePath),
-    expanded: useSessionStore().isExpanded(nodeData.absolutePath),
+    validationResults: getValidationForMode(mode).currentValidationResult.value.filterForPath(
+      nodeData.absolutePath
+    ),
+    expanded: getSessionForMode(mode).isExpanded(nodeData.absolutePath),
   };
 }

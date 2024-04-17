@@ -1,14 +1,21 @@
 import {shallowMount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, test, vi} from 'vitest';
-import {ValidationResult} from '../../../../schema/validation/validationService';
 import NumberProperty from '../NumberProperty.vue';
 import InputNumber from 'primevue/inputnumber';
 import {JsonSchemaWrapper} from '../../../../schema/jsonSchemaWrapper';
 import {GuiConstants} from '@/constants';
+import {SessionMode} from '../../../../store/sessionMode';
+import {ValidationResult} from '../../../../schema/validationService';
 
-// avoid constructing the session store through imports, it is not required for this component
-vi.mock('@/store/sessionStore', () => ({
-  useSessionStore: vi.fn(),
+// avoid constructing useDataLink store through imports, it is not required for this component
+vi.mock('@/data/useDataLink', () => ({
+  getSchemaForMode: vi.fn(),
+  getDataForMode: vi.fn(),
+  useCurrentData: vi.fn(),
+  useCurrentSchema: vi.fn(),
+  getUserSelectionForMode: vi.fn(),
+  getValidationForMode: vi.fn(),
+  getSessionForMode: vi.fn(),
 }));
 
 describe('NumberProperty', () => {
@@ -38,7 +45,7 @@ describe('NumberProperty', () => {
           {
             type: 'integer',
           },
-          {},
+          SessionMode.FileEditor,
           false
         ),
       };
@@ -68,7 +75,7 @@ describe('NumberProperty', () => {
             type: 'number',
             multipleOf: 0.5,
           },
-          {},
+          SessionMode.FileEditor,
           false
         ),
       };
@@ -96,7 +103,7 @@ describe('NumberProperty', () => {
         {
           type: 'integer',
         },
-        {},
+        SessionMode.FileEditor,
         false
       ),
     });

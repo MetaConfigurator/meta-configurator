@@ -17,22 +17,30 @@ import {setupAnnotationsFromValidationErrors} from '@/components/code-editor/set
 import {setupLinkToCurrentSelection} from '@/components/code-editor/setupLinkToSelection';
 import {useSettings} from '@/settings/useSettings';
 import {setupLinkToData} from '@/components/code-editor/setupLinkToData';
+import {SessionMode} from '@/store/sessionMode';
+
+const props = defineProps<{
+  sessionMode: SessionMode;
+}>();
+
+// random id is used to enable multiple Ace Editors on the same page
+const editor_id = 'code-editor-' + Math.random();
 
 onMounted(() => {
-  const editor: Editor = ace.edit('code-editor');
-  setupMode(editor);
+  const editor: Editor = ace.edit(editor_id);
+  setupAceMode(editor);
   setupAceProperties(editor);
 
-  setupLinkToData(editor);
-  setupLinkToCurrentSelection(editor);
-  setupAnnotationsFromValidationErrors(editor);
+  setupLinkToData(editor, props.sessionMode);
+  setupLinkToCurrentSelection(editor, props.sessionMode);
+  setupAnnotationsFromValidationErrors(editor, props.sessionMode);
 });
 
 /**
  * change the mode depending on the data format.
  * to support new data formats, they need to be added here too.
  */
-function setupMode(editor: Editor) {
+function setupAceMode(editor: Editor) {
   watchImmediate(
     () => useSettings().dataFormat,
     format => {
@@ -69,7 +77,7 @@ function setupAceProperties(editor: Editor) {
 </script>
 
 <template>
-  <div class="h-full" id="code-editor" />
+  <div class="h-full" :id="editor_id" />
 </template>
 
 <style scoped></style>

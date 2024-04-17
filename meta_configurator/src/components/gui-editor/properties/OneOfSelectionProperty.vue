@@ -4,16 +4,20 @@ import type {WritableComputedRef} from 'vue';
 import {computed, onMounted} from 'vue';
 import Dropdown from 'primevue/dropdown';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {useSessionStore} from '@/store/sessionStore';
 import type {Path, PathElement} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
-import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/store/oneOfAnyOfSelectionOption';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import _ from 'lodash';
-import {useValidationService} from '@/schema/validation/useValidation';
-import {useUserSchemaSelectionStore} from '@/store/userSchemaSelectionStore';
-import {useCurrentSchema} from '@/data/useDataLink';
+import {
+  getSchemaForMode,
+  getSessionForMode,
+  getUserSelectionForMode,
+  getValidationForMode,
+} from '@/data/useDataLink';
+import type {SessionMode} from '@/store/sessionMode';
+import {OneOfAnyOfSelectionOption} from '@/data/oneOfAnyOfSelectionOption';
+import {schemaOptionToString} from '@/data/oneOfAnyOfSelectionOption';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -22,13 +26,14 @@ const props = defineProps<{
   absolutePath: Path;
   possibleSchemas: Array<JsonSchemaWrapper>;
   isTypeUnion: boolean;
+  sessionMode: SessionMode;
 }>();
 
 function getCurrentSelectedOptions(): Map<string, OneOfAnyOfSelectionOption> {
   if (props.isTypeUnion) {
-    return useUserSchemaSelectionStore().currentSelectedTypeUnionOptions;
+    return getUserSelectionForMode(props.sessionMode).currentSelectedTypeUnionOptions.value;
   } else {
-    return useUserSchemaSelectionStore().currentSelectedOneOfOptions;
+    return getUserSelectionForMode(props.sessionMode).currentSelectedOneOfOptions.value;
   }
 }
 
@@ -65,7 +70,7 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption | undefined> 
 
     if (selectedOption) {
       getCurrentSelectedOptions().set(path, selectedOption);
-      useSessionStore().expand(props.absolutePath);
+      getSessionForMode(props.sessionMode).expand(props.absolutePath);
       applySchemaConstantsOnDataBasedOnSelection(props.absolutePath, selectedOption);
     } else {
       getCurrentSelectedOptions().delete(path);
@@ -88,7 +93,7 @@ function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | 
 
 function inferOneOfUserSelection() {
   const pathAsString = pathToString(props.absolutePath);
-  const validationService = useValidationService();
+  const validationService = getValidationForMode(props.sessionMode).currentValidationService.value;
 
   if (getCurrentSelectedOptions().has(pathAsString)) {
     return;
@@ -132,7 +137,7 @@ function applySchemaConstantsOnDataBasedOnSelection(
   // even without a new oneOf selection by the user, due to JSON schema features
   // such as if and else.
 
-  const schemaAtPath = useCurrentSchema().effectiveSchemaAtPath(path).schema;
+  const schemaAtPath = getSchemaForMode(props.sessionMode).effectiveSchemaAtPath(path).schema;
   const baseSchema = {...schemaAtPath.jsonSchema};
   delete baseSchema.oneOf;
   const mergedSchema = safeMergeSchemas(

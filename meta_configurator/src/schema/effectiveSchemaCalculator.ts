@@ -1,9 +1,9 @@
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {Path} from '@/utility/path';
 import _ from 'lodash';
-import {useValidationService} from '@/schema/validation/useValidation';
 import {dataAt} from '@/utility/resolveDataAtPath';
-import {useCurrentSchema} from '@/data/useDataLink';
+import {useSessionStore} from '@/store/sessionStore';
+import {getValidationForMode} from '@/data/useDataLink';
 
 /**
  * Wrapper around a schema and the data it was calculated for.
@@ -31,8 +31,7 @@ export function calculateEffectiveSchema(
   data: any,
   path: Path
 ): EffectiveSchema {
-  let result =
-    schema ?? new JsonSchemaWrapper({}, useCurrentSchema().schemaPreprocessed.value, false);
+  let result = schema ?? new JsonSchemaWrapper({}, useSessionStore().currentMode, false);
   let iteration = 0;
 
   while (result.isDataDependent && iteration < 1000) {
@@ -78,7 +77,7 @@ function resolveDependentRequired(schemaWrapper: JsonSchemaWrapper, data: any) {
       ...baseSchema,
       required: _.union(newRequired),
     },
-    useCurrentSchema().schemaPreprocessed.value
+    schemaWrapper.mode
   );
 }
 
@@ -87,7 +86,7 @@ function resolveIfThenElse(schemaWrapper: JsonSchemaWrapper, data: any) {
     return schemaWrapper;
   }
 
-  const validationService = useValidationService();
+  const validationService = getValidationForMode(schemaWrapper.mode).currentValidationService.value;
   const valid = validationService.validateSubSchema(schemaWrapper.if.jsonSchema, data).valid;
 
   const baseSchema = {...schemaWrapper.jsonSchema};
@@ -99,7 +98,7 @@ function resolveIfThenElse(schemaWrapper: JsonSchemaWrapper, data: any) {
   const elseSchema = schemaWrapper.else?.jsonSchema ?? {};
 
   const newSchema = {allOf: [baseSchema, valid ? thenSchema : elseSchema]};
-  return new JsonSchemaWrapper(newSchema, useCurrentSchema().schemaPreprocessed.value);
+  return new JsonSchemaWrapper(newSchema, schemaWrapper.mode);
 }
 
 function resolveConditions(result: JsonSchemaWrapper, data: any) {
@@ -115,7 +114,7 @@ function resolveConditions(result: JsonSchemaWrapper, data: any) {
       ...(resolvedConditions?.map(condition => condition.jsonSchema ?? {}) ?? []),
     ],
   };
-  return new JsonSchemaWrapper(newSchema, useCurrentSchema().schemaPreprocessed.value);
+  return new JsonSchemaWrapper(newSchema, result.mode);
 }
 
 function resolveDependentSchemas(schemaWrapper: JsonSchemaWrapper, data: any): JsonSchemaWrapper {
@@ -132,5 +131,5 @@ function resolveDependentSchemas(schemaWrapper: JsonSchemaWrapper, data: any): J
   const newSchema = {
     allOf: [baseSchema, ...dependentSchemas],
   };
-  return new JsonSchemaWrapper(newSchema, useCurrentSchema().schemaPreprocessed);
+  return new JsonSchemaWrapper(newSchema, schemaWrapper.mode);
 }

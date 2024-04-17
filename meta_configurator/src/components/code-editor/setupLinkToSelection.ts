@@ -5,14 +5,16 @@ import type {Path} from '@/utility/path';
 import {useDebounceFn, watchArray} from '@vueuse/core';
 import _ from 'lodash';
 import {determinePath, updateCursorPositionBasedOnPath} from '@/components/code-editor/aceUtility';
+import type {SessionMode} from '@/store/sessionMode';
+import {getSessionForMode} from '@/data/useDataLink';
 
 // variables to prevent updating functions to trigger each other
 let selectionChangeFromOutside = false;
 let selectionChangeFromInside = false;
 
-export function setupLinkToCurrentSelection(editor: Editor) {
-  setupCursorPositionToSelectedPath(editor);
-  setupSelectedPathToCursorPosition(editor);
+export function setupLinkToCurrentSelection(editor: Editor, mode: SessionMode) {
+  setupCursorPositionToSelectedPath(editor, mode);
+  setupSelectedPathToCursorPosition(editor, mode);
 }
 
 /**
@@ -20,7 +22,7 @@ export function setupLinkToCurrentSelection(editor: Editor) {
  * the user clicked at. We then update the currentSelectedElement in the store accordingly.
  * @param editor the ace editor
  */
-function setupCursorPositionToSelectedPath(editor: Editor) {
+function setupCursorPositionToSelectedPath(editor: Editor, mode: SessionMode) {
   editor.on(
     'changeSelection',
     useDebounceFn(() => {
@@ -35,10 +37,10 @@ function setupCursorPositionToSelectedPath(editor: Editor) {
       }
       try {
         const newPath = determinePath(editor);
-        const sessionStore = useSessionStore();
-        if (!_.isEqual(sessionStore.currentSelectedElement, newPath)) {
+        const session = getSessionForMode(mode);
+        if (!_.isEqual(session.currentSelectedElement.value, newPath)) {
           selectionChangeFromInside = true;
-          sessionStore.currentSelectedElement = newPath;
+          session.currentSelectedElement.value = newPath;
         }
       } catch (e) {
         /* empty */
@@ -51,9 +53,9 @@ function setupCursorPositionToSelectedPath(editor: Editor) {
  * Listens to changes in the currentSelectedElement and update the cursor position accordingly.
  * @param editor the ace editor
  */
-function setupSelectedPathToCursorPosition(editor: Editor) {
+function setupSelectedPathToCursorPosition(editor: Editor, mode: SessionMode) {
   watchArray(
-    () => useSessionStore().currentSelectedElement,
+    () => getSessionForMode(mode).currentSelectedElement.value,
     (newSelectedElement: Path) => {
       if (selectionChangeFromInside) {
         selectionChangeFromInside = false;

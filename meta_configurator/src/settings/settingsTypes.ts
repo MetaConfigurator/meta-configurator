@@ -1,10 +1,13 @@
+import type {PanelType} from '@/components/panelType';
+import type {SessionMode} from '@/store/sessionMode';
+
 export interface SettingsInterfaceRoot {
-  debuggingActive: boolean;
   guiEditorOnRightSide: boolean;
   dataFormat: DataFormat;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
   metaSchema: SettingsInterfaceMetaSchema;
+  panels: SettingsInterfacePanels;
 }
 
 export interface SettingsInterfaceCodeEditor {
@@ -14,6 +17,16 @@ export interface SettingsInterfaceCodeEditor {
 export interface SettingsInterfaceGuiEditor {
   maximumDepth: number;
   propertySorting: PropertySorting;
+}
+export interface SettingsInterfacePanels {
+  text_editor: SettingsInterfacePanel[];
+  gui_editor: SettingsInterfacePanel[];
+  settings: SettingsInterfacePanel[];
+}
+
+export interface SettingsInterfacePanel {
+  panelType: PanelType;
+  mode: SessionMode;
 }
 
 export interface SettingsInterfaceMetaSchema {

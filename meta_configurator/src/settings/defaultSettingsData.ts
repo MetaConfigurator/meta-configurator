@@ -15,8 +15,39 @@ export const SETTINGS_DATA_DEFAULT = {
     allowBooleanSchema: false,
     allowMultipleTypes: false,
     showAdditionalPropertiesButton: false,
-    objectTypesComfort: true,
+    objectTypesComfort: false,
     rootMustBeObject: true,
   },
-  debuggingActive: false,
+  panels: {
+    file_editor: [
+      {
+        panelType: 'text_editor',
+        mode: 'file_editor',
+      },
+      {
+        panelType: 'gui_editor',
+        mode: 'file_editor',
+      },
+    ],
+    schema_editor: [
+      {
+        panelType: 'text_editor',
+        mode: 'schema_editor',
+      },
+      {
+        panelType: 'gui_editor',
+        mode: 'schema_editor',
+      },
+    ],
+    settings: [
+      {
+        panelType: 'text_editor',
+        mode: 'settings',
+      },
+      {
+        panelType: 'gui_editor',
+        mode: 'settings',
+      },
+    ],
+  },
 };

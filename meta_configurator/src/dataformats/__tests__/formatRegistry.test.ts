@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {FormatRegistry, useDataConverter, usePathIndexLink} from '../formatRegistry';
 import {DataConverterJson, DataConverterYaml} from '../dataConverter';
-import {useDataSource} from '../../data/dataSource';
+import {useDataSource} from '@/data/dataSource';
 import {triggerRef} from 'vue';
 import {jsonFormat, registerDefaultDataFormats} from '../defaultFormats';
 import {PathIndexLinkJson} from '../pathIndexLinkJson';

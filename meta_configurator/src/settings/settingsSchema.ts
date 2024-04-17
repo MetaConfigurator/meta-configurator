@@ -5,6 +5,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   title: 'Settings',
   description: 'MetaConfigurator settings',
   type: 'object',
+  required: [
+    'dataFormat',
+    'guiEditorOnRightSide',
+    'codeEditor',
+    'guiEditor',
+    'metaSchema',
+    'panels',
+  ],
   additionalProperties: false,
   properties: {
     dataFormat: {
@@ -21,6 +29,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     codeEditor: {
       type: 'object',
+      required: ['fontSize'],
+      additionalProperties: false,
       description: 'Settings of the code editor.',
       properties: {
         fontSize: {
@@ -34,6 +44,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     guiEditor: {
       type: 'object',
+      required: ['maximumDepth', 'propertySorting'],
+      additionalProperties: false,
       description: 'GUI Editor related settings belong here.',
       properties: {
         maximumDepth: {
@@ -52,10 +64,17 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           enum: ['priorityOrder', 'schemaOrder', 'dataOrder'],
         },
       },
-      additionalProperties: false,
     },
     metaSchema: {
       type: 'object',
+      required: [
+        'allowBooleanSchema',
+        'allowMultipleTypes',
+        'showAdditionalPropertiesButton',
+        'objectTypesComfort',
+        'rootMustBeObject',
+      ],
+      additionalProperties: false,
       description:
         'Meta Schema related settings belong here. They affect the functionality of the schema editor. By making the meta schema more expressive (e.g., by allowing multiple data types for a property), the schema editor will be more powerful but also more complicated.',
       properties: {
@@ -92,12 +111,53 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: true,
         },
       },
-      additionalProperties: false,
     },
-    debuggingActive: {
-      type: 'boolean',
-      description: 'If enabled, the internal application state is shown.',
-      default: false,
+    panels: {
+      required: ['file_editor', 'schema_editor', 'settings'],
+      title: 'Panels',
+      type: 'object',
+      additionalProperties: false,
+      description:
+        'In this setting the view can be customized: which panels to show in the different modes.',
+      properties: {
+        file_editor: {
+          $ref: '#/$defs/panels',
+        },
+        schema_editor: {
+          $ref: '#/$defs/panels',
+        },
+        settings: {
+          $ref: '#/$defs/panels',
+        },
+      },
+    },
+  },
+  $defs: {
+    panels: {
+      type: 'array',
+      title: 'Panels',
+      description: 'Which panels to show in the editor and their order.',
+      items: {
+        type: 'object',
+        required: ['panelType', 'mode'],
+        additionalProperties: false,
+        title: 'Panel',
+        description: 'Panel type and tool mode.',
+        properties: {
+          panelType: {
+            type: 'string',
+            enum: ['gui_editor', 'text_editor'],
+            title: 'Panel Type',
+            description: 'Type of panel to display.',
+          },
+          mode: {
+            type: 'string',
+            title: 'Mode',
+            description: 'The mode determines which kind of data and schema the panel uses.',
+            enum: ['schema_editor', 'file_editor', 'settings'],
+          },
+        },
+      },
     },
   },
 };

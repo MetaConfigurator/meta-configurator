@@ -1,13 +1,13 @@
 import type {
   JsonSchemaObjectType,
   JsonSchemaType,
-  JsonSchemaTypePreprocessed,
   SchemaPropertyType,
 } from '@/schema/jsonSchemaType';
 import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/schemaUtils';
 import type {Path, PathElement} from '@/utility/path';
 import {resolveAndTransform} from '@/schema/schemaLazyResolver';
 import _ from 'lodash';
+import {SessionMode} from '@/store/sessionMode';
 import {assert} from '@vueuse/core';
 
 /**
@@ -18,7 +18,7 @@ import {assert} from '@vueuse/core';
  */
 export class JsonSchemaWrapper {
   readonly jsonSchema?: JsonSchemaObjectType;
-  readonly rootSchema: JsonSchemaTypePreprocessed;
+  readonly mode: SessionMode;
   private _additionalProperties?: JsonSchemaWrapper;
   private _allOf?: JsonSchemaWrapper[];
   private _anyOf?: JsonSchemaWrapper[];
@@ -38,12 +38,12 @@ export class JsonSchemaWrapper {
   private _else?: JsonSchemaWrapper;
   private _contentSchema?: JsonSchemaWrapper;
 
-  constructor(jsonSchema: JsonSchemaType, rootSchema: JsonSchemaTypePreprocessed, resolve = true) {
-    assert(rootSchema !== undefined, 'rootSchema must be defined');
-    this.rootSchema = rootSchema;
+  constructor(jsonSchema: JsonSchemaType, mode: SessionMode, resolve = true) {
+    assert(Object.values(SessionMode).includes(mode), 'Invalid session mode ', mode);
+    this.mode = mode;
     this.jsonSchema = nonBooleanSchema(jsonSchema);
     if (resolve && this.jsonSchema !== undefined) {
-      this.jsonSchema = nonBooleanSchema(resolveAndTransform(this.jsonSchema, this.rootSchema));
+      this.jsonSchema = nonBooleanSchema(resolveAndTransform(this.jsonSchema, this.mode));
     }
   }
 
@@ -241,7 +241,7 @@ export class JsonSchemaWrapper {
     if (this._additionalProperties === undefined) {
       this._additionalProperties = new JsonSchemaWrapper(
         this.jsonSchema?.additionalProperties ?? true,
-        this.rootSchema
+        this.mode
       );
     }
     return this._additionalProperties;
@@ -260,7 +260,7 @@ export class JsonSchemaWrapper {
    */
   get allOf(): JsonSchemaWrapper[] {
     if (this._allOf === undefined) {
-      this._allOf = schemaArray(this.jsonSchema?.allOf, this.rootSchema);
+      this._allOf = schemaArray(this.jsonSchema?.allOf, this.mode);
     }
     return this._allOf;
   }
@@ -279,7 +279,7 @@ export class JsonSchemaWrapper {
    */
   get anyOf(): JsonSchemaWrapper[] {
     if (this._anyOf === undefined) {
-      this._anyOf = schemaArray(this.jsonSchema?.anyOf, this.rootSchema!);
+      this._anyOf = schemaArray(this.jsonSchema?.anyOf, this.mode);
     }
     return this._anyOf;
   }
@@ -294,7 +294,7 @@ export class JsonSchemaWrapper {
    */
   get oneOf(): JsonSchemaWrapper[] {
     if (this._oneOf === undefined) {
-      this._oneOf = schemaArray(this.jsonSchema?.oneOf, this.rootSchema!);
+      this._oneOf = schemaArray(this.jsonSchema?.oneOf, this.mode);
     }
     return this._oneOf;
   }
@@ -311,7 +311,7 @@ export class JsonSchemaWrapper {
    */
   get not(): JsonSchemaWrapper | undefined {
     if (this._not === undefined) {
-      this._not = schemaFromObject(this.jsonSchema?.not, this.rootSchema);
+      this._not = schemaFromObject(this.jsonSchema?.not, this.mode);
     }
     return this._not;
   }
@@ -320,7 +320,7 @@ export class JsonSchemaWrapper {
    * Custom field that potentially contains all if-then-else conditions of the allOfs.
    */
   get conditions(): JsonSchemaWrapper[] {
-    return schemaArray(this.jsonSchema?.conditions, this.rootSchema);
+    return schemaArray(this.jsonSchema?.conditions, this.mode);
   }
 
   /**
@@ -348,7 +348,7 @@ export class JsonSchemaWrapper {
    */
   get contains(): JsonSchemaWrapper | undefined {
     if (this._contains === undefined) {
-      this._contains = schemaFromObject(this.jsonSchema?.contains, this.rootSchema);
+      this._contains = schemaFromObject(this.jsonSchema?.contains, this.mode);
     }
     return this._contains;
   }
@@ -384,7 +384,7 @@ export class JsonSchemaWrapper {
    */
   get contentSchema(): JsonSchemaWrapper | undefined {
     if (this._contentSchema === undefined) {
-      this._contentSchema = schemaFromObject(this.jsonSchema?.contentSchema, this.rootSchema);
+      this._contentSchema = schemaFromObject(this.jsonSchema?.contentSchema, this.mode);
     }
     return this._contentSchema;
   }
@@ -431,7 +431,7 @@ export class JsonSchemaWrapper {
       if (this.jsonSchema?.dependentSchemas === undefined) {
         return undefined;
       }
-      this._dependentSchemas = schemaRecord(this.jsonSchema?.dependentSchemas, this.rootSchema);
+      this._dependentSchemas = schemaRecord(this.jsonSchema?.dependentSchemas, this.mode);
     }
     return this._dependentSchemas;
   }
@@ -460,7 +460,7 @@ export class JsonSchemaWrapper {
    */
   get else(): JsonSchemaWrapper | undefined {
     if (this._else === undefined) {
-      this._else = schemaFromObject(this.jsonSchema?.else, this.rootSchema);
+      this._else = schemaFromObject(this.jsonSchema?.else, this.mode);
     }
     return this._else;
   }
@@ -525,7 +525,7 @@ export class JsonSchemaWrapper {
    */
   get if(): JsonSchemaWrapper | undefined {
     if (this._if === undefined) {
-      this._if = schemaFromObject(this.jsonSchema?.if, this.rootSchema);
+      this._if = schemaFromObject(this.jsonSchema?.if, this.mode);
     }
     return this._if;
   }
@@ -537,7 +537,7 @@ export class JsonSchemaWrapper {
     if (this._items === undefined) {
       this._items = schemaFromObject(
         this.jsonSchema?.items ?? true,
-        this.rootSchema
+        this.mode
       ) as JsonSchemaWrapper;
     }
     return this._items;
@@ -672,7 +672,7 @@ export class JsonSchemaWrapper {
    */
   get patternProperties(): Record<string, JsonSchemaWrapper> {
     if (this._patternProperties === undefined) {
-      this._patternProperties = schemaRecord(this.jsonSchema?.patternProperties, this.rootSchema);
+      this._patternProperties = schemaRecord(this.jsonSchema?.patternProperties, this.mode);
     }
     return this._patternProperties;
   }
@@ -684,14 +684,14 @@ export class JsonSchemaWrapper {
    */
   get prefixItems(): JsonSchemaWrapper[] {
     if (this._prefixItems === undefined) {
-      this._prefixItems = schemaArray(this.jsonSchema?.prefixItems, this.rootSchema);
+      this._prefixItems = schemaArray(this.jsonSchema?.prefixItems, this.mode);
     }
     return this._prefixItems;
   }
 
   get properties(): Record<string, JsonSchemaWrapper> {
     if (this._properties === undefined) {
-      this._properties = schemaRecord(this.jsonSchema?.properties, this.rootSchema);
+      this._properties = schemaRecord(this.jsonSchema?.properties, this.mode);
     }
     return this._properties;
   }
@@ -700,7 +700,7 @@ export class JsonSchemaWrapper {
     if (this._propertyNames === undefined) {
       this._propertyNames = schemaFromObject(
         this.jsonSchema?.propertyNames ?? true,
-        this.rootSchema
+        this.mode
       ) as JsonSchemaWrapper;
     }
     return this._propertyNames;
@@ -725,7 +725,7 @@ export class JsonSchemaWrapper {
    */
   get then(): JsonSchemaWrapper | undefined {
     if (this._then === undefined) {
-      this._then = schemaFromObject(this.jsonSchema?.then, this.rootSchema);
+      this._then = schemaFromObject(this.jsonSchema?.then, this.mode);
     }
     return this._then;
   }
@@ -768,7 +768,7 @@ export class JsonSchemaWrapper {
     if (this._unevaluatedItems === undefined) {
       this._unevaluatedItems = schemaFromObject(
         this.jsonSchema?.unevaluatedItems ?? true,
-        this.rootSchema!
+        this.mode
       ) as JsonSchemaWrapper;
     }
     return this._unevaluatedItems;
@@ -781,7 +781,7 @@ export class JsonSchemaWrapper {
     if (this._unevaluatedProperties === undefined) {
       this._unevaluatedProperties = schemaFromObject(
         this.jsonSchema?.unevaluatedProperties ?? true,
-        this.rootSchema!
+        this.mode
       ) as JsonSchemaWrapper;
     }
     return this._unevaluatedProperties;

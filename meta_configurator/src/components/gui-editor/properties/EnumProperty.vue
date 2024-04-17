@@ -4,10 +4,10 @@ List dropdown for enum properties, also used for properties with multiple exampl
 <script setup lang="ts">
 import {computed} from 'vue';
 import Dropdown from 'primevue/dropdown';
-import type {ValidationResult} from '@/schema/validation/validationService';
 import _ from 'lodash';
 import {dataToString} from '@/utility/dataToString';
-import type {PathElement} from '@/model/path';
+import type {PathElement} from '@/utility/path';
+import type {ValidationResult} from '@/schema/validationService';
 
 const props = defineProps<{
   propertyName: PathElement;
