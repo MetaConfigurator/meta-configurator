@@ -12,7 +12,6 @@ import ErrorService from '@/utility/errorService';
 import {registerIcons} from '@/fontawesome';
 import VueCookies from 'vue-cookies';
 
-import cookiesHandler from '@/cookies/cookiesHandler';
 import {registerDefaultDataFormats} from '@/dataformats/defaultFormats';
 import App from '@/views/App.vue';
 
@@ -28,7 +27,6 @@ app.use(VueCookies);
 app.use(ConfirmationService);
 
 app.directive('tooltip', Tooltip);
-cookiesHandler.initializeFromCookies();
 export const errorService = new ErrorService(app.config.globalProperties.$toast);
 app.config.errorHandler = (error: unknown) => errorService.onError(error);
 

@@ -3,7 +3,12 @@ import type {
   JsonSchemaType,
   SchemaPropertyType,
 } from '@/schema/jsonSchemaType';
-import {nonBooleanSchema, schemaArray, schemaFromObject, schemaRecord} from '@/schema/schemaUtils';
+import {
+  nonBooleanSchema,
+  schemaArray,
+  schemaFromObject,
+  schemaRecord,
+} from '@/schema/schemaProcessingUtils';
 import type {Path, PathElement} from '@/utility/path';
 import {resolveAndTransform} from '@/schema/schemaLazyResolver';
 import _ from 'lodash';

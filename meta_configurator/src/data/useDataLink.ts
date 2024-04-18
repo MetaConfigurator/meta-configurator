@@ -4,7 +4,7 @@ import type {ComputedRef} from 'vue';
 import {computed} from 'vue';
 import {SessionMode} from '@/store/sessionMode';
 import {ManagedData} from '@/data/managedData';
-import {ManagedSchema} from '@/data/managedSchema';
+import {ManagedJsonSchema} from '@/data/managedJsonSchema';
 import {ManagedSession} from '@/data/managedSession';
 import {ManagedValidation} from '@/data/managedValidation';
 import {ManagedUserSchemaSelection} from '@/data/managedUserSchemaSelection';
@@ -18,10 +18,10 @@ const dataList: ManagedData[] = [
   new ManagedData(dataSource.settingsData, SessionMode.Settings),
 ];
 
-const schemaList: ManagedSchema[] = [
-  new ManagedSchema(dataSource.userSchemaData, true, SessionMode.FileEditor),
-  new ManagedSchema(schemaSource.metaSchemaData, true, SessionMode.SchemaEditor),
-  new ManagedSchema(schemaSource.settingsSchemaData, false, SessionMode.Settings),
+const schemaList: ManagedJsonSchema[] = [
+  new ManagedJsonSchema(dataSource.userSchemaData, true, SessionMode.FileEditor),
+  new ManagedJsonSchema(schemaSource.metaSchemaData, true, SessionMode.SchemaEditor),
+  new ManagedJsonSchema(schemaSource.settingsSchemaData, false, SessionMode.Settings),
 ];
 
 const sessionList: ManagedSession[] = [
@@ -56,7 +56,7 @@ export function getDataForMode(mode: SessionMode): ManagedData {
   throw new Error(`Unknown mode ${mode}`);
 }
 
-export function getSchemaForMode(mode: SessionMode): ManagedSchema {
+export function getSchemaForMode(mode: SessionMode): ManagedJsonSchema {
   for (const schema of schemaList) {
     if (schema.mode === mode) {
       return schema;
@@ -96,7 +96,7 @@ const currentEditorData: ComputedRef<ManagedData> = computed(() =>
   getDataForMode(useSessionStore().currentMode)
 );
 
-const currentEditorSchema: ComputedRef<ManagedSchema> = computed(() =>
+const currentEditorSchema: ComputedRef<ManagedJsonSchema> = computed(() =>
   getSchemaForMode(useSessionStore().currentMode)
 );
 

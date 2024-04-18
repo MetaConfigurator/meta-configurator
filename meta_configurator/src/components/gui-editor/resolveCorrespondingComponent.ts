@@ -13,7 +13,7 @@ import {h} from 'vue';
 import OneOfSelectionProperty from '@/components/gui-editor/properties/OneOfSelectionProperty.vue';
 import AnyOfSelectionProperty from '@/components/gui-editor/properties/AnyOfSelectionProperty.vue';
 import {getDataForMode, getSessionForMode, getValidationForMode} from '@/data/useDataLink';
-import {typeSchema} from '@/schema/schemaUtils';
+import {typeSchema} from '@/schema/schemaProcessingUtils';
 import type {SessionMode} from '@/store/sessionMode';
 
 /**

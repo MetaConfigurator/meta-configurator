@@ -5,14 +5,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   title: 'Settings',
   description: 'MetaConfigurator settings',
   type: 'object',
-  required: [
-    'dataFormat',
-    'guiEditorOnRightSide',
-    'codeEditor',
-    'guiEditor',
-    'metaSchema',
-    'panels',
-  ],
+  required: ['dataFormat', 'codeEditor', 'guiEditor', 'metaSchema', 'panels'],
   additionalProperties: false,
   properties: {
     dataFormat: {
@@ -20,12 +13,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'The data format to use for the configuration files.',
       default: 'json',
       enum: ['json', 'yaml'],
-    },
-    guiEditorOnRightSide: {
-      type: 'boolean',
-      description:
-        'If enabled, the GUI editor will be on the right side and the code editor on the left. Otherwise, it will be the opposite way.',
-      default: true,
     },
     codeEditor: {
       type: 'object',
@@ -127,7 +114,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           $ref: '#/$defs/panels',
         },
         settings: {
-          $ref: '#/$defs/panels',
+          allOf: [
+            {
+              $ref: '#/$defs/panels',
+            },
+            {
+              readOnly: true,
+            },
+          ],
         },
       },
     },

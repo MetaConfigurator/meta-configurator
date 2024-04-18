@@ -23,8 +23,8 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
-// random id is used to enable multiple Ace Editors on the same page
-const editor_id = 'code-editor-' + Math.random();
+// random id is used to enable multiple Ace Editors of same sessionMode on the same page
+const editor_id = 'code-editor-' + props.sessionMode + '-' + +Math.random();
 
 onMounted(() => {
   const editor: Editor = ace.edit(editor_id);

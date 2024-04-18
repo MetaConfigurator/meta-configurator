@@ -6,6 +6,7 @@ import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
+import {isReadOnly} from '@/components/gui-editor/configTreeNodeReadingUtils';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -51,6 +52,7 @@ function updateValue() {
     :model-value="polishedPropertyData"
     @update:model-value="setNewPropertyData"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
+    :disabled="isReadOnly(props.propertySchema)"
     @blur="updateValue"
     @keydown.stop
     @keyup.enter="updateValue" />

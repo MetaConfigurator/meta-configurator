@@ -8,6 +8,7 @@ import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 import {getDataForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLink';
 import {useDataSource} from '@/data/dataSource';
 import {SessionMode} from '@/store/sessionMode';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -196,6 +197,17 @@ export class MenuItems {
         },
         disabled: () => !useCurrentData().undoManager.canRedo,
         key: 'settings_redo',
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Restore default settings',
+        icon: 'fa-solid fa-trash-arrow-up',
+        command: () => {
+          getDataForMode(SessionMode.Settings).setData(SETTINGS_DATA_DEFAULT);
+        },
+        key: 'settings_restore',
       },
     ];
   }

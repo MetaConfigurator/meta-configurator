@@ -22,7 +22,6 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
   }
   if (metaSchemaSettings.rootMustBeObject) {
     metaSchema.$defs.rootObjectSubSchema!.allOf.push({
-      required: ['type'],
       properties: {
         type: {
           const: 'object',

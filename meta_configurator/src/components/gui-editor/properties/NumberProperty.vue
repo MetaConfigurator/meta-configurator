@@ -7,6 +7,7 @@ import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import {GuiConstants} from '@/constants';
 import type {ValidationResult} from '@/schema/validationService';
 import type {PathElement} from '@/utility/path';
+import {isReadOnly} from '@/components/gui-editor/configTreeNodeReadingUtils';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -57,6 +58,7 @@ const stepValue = computed(() => {
     buttonLayout="stacked"
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     :step="stepValue"
+    :disabled="isReadOnly(props.propertySchema)"
     @keydown.stop
     increment-button-class="p-button-text p-button-secondary"
     decrement-button-class="p-button-text p-button-secondary" />

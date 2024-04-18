@@ -187,7 +187,9 @@ function removeProperty(subPath: Path) {
 }
 
 function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData: any) {
-  const dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
+  // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
+  let dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
+  dataAtParentPath = structuredClone(dataAtParentPath);
 
   if (oldData === undefined) {
     oldData = initializeNewProperty(parentPath, newName);
@@ -221,7 +223,6 @@ function updatePropertyName(subPath: Path, oldName: string, newName: string) {
     window.setTimeout(() => {
       focusOnFirstProperty(newRelativePath);
     }, 0);
-    return;
   }
 }
 

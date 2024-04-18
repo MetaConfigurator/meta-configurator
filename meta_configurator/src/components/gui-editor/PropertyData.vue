@@ -10,6 +10,7 @@ import {pathToString} from '@/utility/pathUtils';
 import Button from 'primevue/button';
 import {getDataForMode} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
+import {isRequiredProperty} from '@/components/gui-editor/configTreeNodeReadingUtils';
 
 const props = defineProps<{
   nodeData: ConfigTreeNodeData;
@@ -33,14 +34,11 @@ function removeProperty() {
   emit('remove_property', props.nodeData.relativePath);
 }
 
-function isRequired(): boolean {
-  return props.nodeData.parentSchema?.isRequired(props.nodeData.name as string) || false;
-}
-
 function shouldShowRemove(): boolean {
   return (
-    !isRequired() &&
-    getDataForMode(props.sessionMode).dataAt(props.nodeData.absolutePath) !== undefined
+    !isRequiredProperty(props.nodeData) &&
+    getDataForMode(props.sessionMode).dataAt(props.nodeData.absolutePath) !== undefined &&
+    !props.nodeData.schema.readOnly
   );
 }
 </script>

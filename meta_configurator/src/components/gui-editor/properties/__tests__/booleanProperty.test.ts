@@ -3,10 +3,18 @@ import {afterEach, beforeEach, describe, expect, it, test, vi} from 'vitest';
 import BooleanProperty from '../BooleanProperty.vue';
 import SelectButton from 'primevue/selectbutton';
 import {ValidationResult} from '../../../../schema/validationService';
+import {JsonSchemaWrapper} from '../../../../schema/jsonSchemaWrapper';
+import {SessionMode} from '../../../../store/sessionMode';
 
-// avoid constructing the session store through imports, it is not required for this component
-vi.mock('@/store/sessionStore', () => ({
-  useSessionStore: vi.fn(),
+// avoid constructing useDataLink store through imports, it is not required for this component
+vi.mock('@/data/useDataLink', () => ({
+  getSchemaForMode: vi.fn(),
+  getDataForMode: vi.fn(),
+  useCurrentData: vi.fn(),
+  useCurrentSchema: vi.fn(),
+  getUserSelectionForMode: vi.fn(),
+  getValidationForMode: vi.fn(),
+  getSessionForMode: vi.fn(),
 }));
 
 describe('BooleanProperty', () => {
@@ -35,6 +43,13 @@ describe('BooleanProperty', () => {
       propertyName: 'foo',
       propertyData: data,
       validationResults: new ValidationResult([]),
+      propertySchema: new JsonSchemaWrapper(
+        {
+          type: 'boolean',
+        },
+        SessionMode.FileEditor,
+        false
+      ),
     });
 
     it('should correctly setup the select button', () => {

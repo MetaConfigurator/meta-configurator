@@ -15,7 +15,7 @@ import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
 /**
  * This class manages the schema and provides easy access to its content.
  */
-export class ManagedSchema {
+export class ManagedJsonSchema {
   /**
    * @param _schemaRaw the shallow ref to the original schema object
    * @param watchSchemaChanges whether to watch for changes in schema data and reprocess the schema accordingly

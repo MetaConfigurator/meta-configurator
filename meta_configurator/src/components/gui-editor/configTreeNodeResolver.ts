@@ -13,7 +13,7 @@ import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import {useSettings} from '@/settings/useSettings';
-import {typeSchema} from '@/schema/schemaUtils';
+import {typeSchema} from '@/schema/schemaProcessingUtils';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getUserSelectionForMode} from '@/data/useDataLink';
 

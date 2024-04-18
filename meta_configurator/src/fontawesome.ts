@@ -20,6 +20,7 @@ import {
   faSearch,
   faShareNodes,
   faTriangleExclamation,
+  faTrashArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -53,4 +54,5 @@ export function registerIcons() {
   library.add(faFontAwesome);
   library.add(faSearch);
   library.add(faTriangleExclamation);
+  library.add(faTrashArrowUp);
 }

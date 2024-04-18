@@ -7,10 +7,13 @@ import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
+import {isReadOnly} from '@/components/gui-editor/configTreeNodeReadingUtils';
 
 const props = defineProps<{
   propertyName: PathElement;
   propertyData: boolean | undefined;
+  propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
 
@@ -45,6 +48,7 @@ const valueProperty = computed({
       :class="{'p-invalid': !props.validationResults.valid}"
       v-model="valueProperty"
       :options="options"
+      :disabled="isReadOnly(props.propertySchema)"
       @keydown.stop
       option-label="name"
       option-value="value" />
