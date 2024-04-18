@@ -100,6 +100,10 @@ const currentEditorSchema: ComputedRef<ManagedJsonSchema> = computed(() =>
   getSchemaForMode(useSessionStore().currentMode)
 );
 
+const currentSession: ComputedRef<ManagedSession> = computed(() =>
+  getSessionForMode(useSessionStore().currentMode)
+);
+
 /**
  * Returns the data link for the currently active editor.
  */
@@ -109,4 +113,8 @@ export function useCurrentData() {
 
 export function useCurrentSchema() {
   return currentEditorSchema.value;
+}
+
+export function useCurrentSession() {
+  return currentSession.value;
 }

@@ -1,5 +1,4 @@
 import type {Path} from '@/utility/path';
-import {useSessionStore} from '@/store/sessionStore';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {errorService} from '@/main';
 import type {MenuItem} from 'primevue/menuitem';
@@ -7,7 +6,7 @@ import {pathToString} from '@/utility/pathUtils';
 import {dataToString} from '@/utility/dataToString';
 import _ from 'lodash';
 import {MAX_SEARCH_DEPTH} from '@/constants';
-import {useCurrentData, useCurrentSchema} from '@/data/useDataLink';
+import {useCurrentData, useCurrentSchema, useCurrentSession} from '@/data/useDataLink';
 
 /**
  * Searches for the given search term in the data and schema.
@@ -37,7 +36,7 @@ async function searchInDataAndSchemaRecursive(
   result: SearchResult[],
   depth = 0
 ): Promise<void> {
-  if (depth > MAX_SEARCH_DEPTH) {
+  if (depth > MAX_SEARCH_DEPTH || data === undefined) {
     return; // prevent potential infinite recursion in circular schemas
   }
 
@@ -151,7 +150,7 @@ export function searchResultToMenuItem(searchResult: SearchResult): MenuItem {
     label: dataToString(pathString || searchResult.schema?.title || 'Root', 0, 35),
     data: dataToString(searchResult.data, 1, 80) ?? '',
     command: () => {
-      useSessionStore().currentSelectedElement = searchResult.path;
+      useCurrentSession().currentSelectedElement.value = searchResult.path;
     },
   };
 }
