@@ -1,0 +1,28 @@
+
+\subsubsection{User Interface}\label{subsec:overview}
+The design of \toolname{} is inspired by another tool\cite{githubBspEditor} by one of the authors, which is a GUI program that assists users in editing configuration files of BossShopPro\cite{bossshoppro}.
+That tool provides the user a code panel for editing configuration files of that domain in a text editor, as well as a GUI panel, where the user can edit their configuration file using GUI components.
+\toolname{} differs from that tool by being generic, instead of being bound to a certain domain, by having a much more expressive schema language, a schema editor, and many other features that improve the user experience, such as a search functionality.
+%TODO: maybe move to related work?
+
+Before we dive into the architecture and detailed design of \toolname{}, this section provides an overview from the view of the user.
+
+The user interface has three distinct views:
+\begin{enumerate}
+	\item File editor (figure \ref{fig:fileeditor}): In this view, the user can modify their \cfgfile{}, based on a schema.
+	\item Schema editor (figure \ref{fig:schemaeditor}): In this view, the user can modify their schema.
+	\item Settings (figure \ref{fig:settings} in appendix): In this view, the user can adjust parameters of the tool.
+\end{enumerate}
+
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/fileeditor}
+    \caption{UI of file editor view. Different components highlighted in red: 1) button to switch to other view (e.g. to Schema Editor view), 2) Toolbar with various functionality, 3) Code panel, 4) GUI panel}
+    \label{fig:fileeditor}
+\end{figure*}
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/schemaeditor}
+    \caption{UI of schema editor view}
+    \label{fig:schemaeditor}
+\end{figure*}
