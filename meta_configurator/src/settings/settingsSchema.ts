@@ -59,7 +59,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'allowMultipleTypes',
         'showAdditionalPropertiesButton',
         'objectTypesComfort',
-        'rootMustBeObject',
       ],
       additionalProperties: false,
       description:
@@ -74,7 +73,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         allowMultipleTypes: {
           type: 'boolean',
           description:
-            "Whether an object property can be assigned to multiple types (e.g., string and number). Having this this option enabled will increase the choices that have to be made when defining the type of an object property in the schema editor, but also allows more flexibility. An alternative to defining multiple types directly is using the 'anyOf' or 'oneOf' keywords.",
+            "Whether an object property can be assigned to multiple types (e.g., string and number). Having this option enabled will increase the choices that have to be made when defining the type of an object property in the schema editor, but also allows more flexibility. An alternative to defining multiple types directly is using the 'anyOf' or 'oneOf' keywords.",
           default: false,
         },
         showAdditionalPropertiesButton: {
@@ -86,16 +85,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         objectTypesComfort: {
           type: 'boolean',
           $comment:
-            "Warning: due to incompatibility, this option will disable schema editor support for conditionals, 'not' and a few other advanced keywords.",
+            "Warning: due to incompatibility, this option will disable schema editor support for defining the items of an array, as well as support for many advanced keywords, such as conditionals and 'not'.",
           description:
             'This is a comfort feature: the original JSON Meta Schema allows properties of a particular type to have example values, constant values, default values or enum values of different types. For example, a field for numbers could have a string as a default value. This meta schema option forces the same type for all these values. This enables the tool to auto-select the corresponding type in the schema editor, avoiding the need for the user to manually select the types. ',
           default: true,
-        },
-        rootMustBeObject: {
-          type: 'boolean',
-          description:
-            'The original JSON Meta Schema allows a JSON schema to also be of other types than an object. Because any non-trivial schema is an object, this option forces the root schema to be an object, to avoid showing the user unusual schema options.',
-          default: true,
+          metaConfigurator: {
+            advanced: true,
+          },
         },
       },
     },
@@ -149,6 +145,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             title: 'Mode',
             description: 'The mode determines which kind of data and schema the panel uses.',
             enum: ['schema_editor', 'file_editor', 'settings'],
+          },
+          size: {
+            type: 'number',
+            title: 'Size',
+            description: 'The size of the panel in percent of the total width of the editor.',
+            minimum: 10,
           },
         },
       },

@@ -2,7 +2,6 @@ import type {PanelType} from '@/components/panelType';
 import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
-  guiEditorOnRightSide: boolean;
   dataFormat: DataFormat;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
@@ -19,14 +18,15 @@ export interface SettingsInterfaceGuiEditor {
   propertySorting: PropertySorting;
 }
 export interface SettingsInterfacePanels {
-  text_editor: SettingsInterfacePanel[];
-  gui_editor: SettingsInterfacePanel[];
+  file_editor: SettingsInterfacePanel[];
+  schema_editor: SettingsInterfacePanel[];
   settings: SettingsInterfacePanel[];
 }
 
 export interface SettingsInterfacePanel {
   panelType: PanelType;
   mode: SessionMode;
+  size: number;
 }
 
 export interface SettingsInterfaceMetaSchema {
@@ -34,7 +34,6 @@ export interface SettingsInterfaceMetaSchema {
   allowBooleanSchema: boolean;
   allowMultipleTypes: boolean;
   objectTypesComfort: boolean;
-  rootMustBeObject: boolean;
 }
 
 export enum PropertySorting {

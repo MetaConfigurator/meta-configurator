@@ -33,6 +33,7 @@ const panels = computed(() => {
     return {
       component: getComponentByPanelType(panel.panelType),
       sessionMode: panel.mode,
+      size: panel.size,
     };
   });
   return result;
@@ -101,11 +102,12 @@ toastService.toast = useToast();
         :current-mode="props.sessionMode"
         @mode-selected="updateMode" />
       <div class="flex-grow overflow-hidden" ref="mainPanel" id="mainpanel">
-        <Splitter class="h-full" :layout="width < 600 ? 'vertical' : 'horizontal'">
+        <Splitter class="h-full" :layout="width < 600 ? 'vertical' : 'horizontal'" :key="panels">
           <SplitterPanel
             v-for="(panel, index) in panels"
-            :key="index"
+            :key="index + panel"
             :min-size="10"
+            :size="panel.size"
             :resizable="true">
             <component :is="panel.component" :sessionMode="panel.sessionMode" />
           </SplitterPanel>

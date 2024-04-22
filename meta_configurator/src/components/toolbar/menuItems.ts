@@ -9,6 +9,9 @@ import {getDataForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLi
 import {useDataSource} from '@/data/dataSource';
 import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
+import {useSettings} from '@/settings/useSettings';
+import {PanelType} from '@/components/panelType';
+import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -31,7 +34,7 @@ export class MenuItems {
     this.handleFromURLClick = onFromURLClick;
   }
 
-  get fileEditorMenuItems() {
+  public getFileEditorMenuItems(settings: SettingsInterfaceRoot) {
     return [
       {
         label: 'New File',
@@ -84,8 +87,8 @@ export class MenuItems {
     ];
   }
 
-  get schemaEditorMenuItems() {
-    return [
+  public getSchemaEditorMenuItems(settings: SettingsInterfaceRoot) {
+    let result = [
       {
         label: 'New empty Schema',
         icon: 'fa-regular fa-file',
@@ -159,10 +162,76 @@ export class MenuItems {
         disabled: () => !useCurrentData().undoManager.canRedo,
         key: 'schema_redo',
       },
+      {
+        separator: true,
+      },
     ];
+    if (
+      useSettings().panels.schema_editor.find(
+        panel => panel.panelType === 'gui_editor' && panel.mode === 'file_editor'
+      )
+    ) {
+      result.push({
+        label: 'Hide preview of resulting GUI',
+        icon: 'fa-regular fa-eye',
+        command: () => {
+          const panels = useSettings().panels;
+          panels.schema_editor = panels.schema_editor.filter(
+            panel =>
+              !(panel.panelType === PanelType.GuiEditor && panel.mode === SessionMode.FileEditor)
+          );
+        },
+      });
+    } else {
+      result.push({
+        label: 'Show preview of resulting GUI',
+        icon: 'fa-solid fa-eye',
+        command: () => {
+          const panels = settings.panels;
+          panels.schema_editor.push({
+            panelType: PanelType.GuiEditor,
+            mode: SessionMode.FileEditor,
+            size: 40,
+          });
+        },
+      });
+    }
+
+    if (
+      !useSettings().metaSchema.allowBooleanSchema ||
+      !useSettings().metaSchema.allowMultipleTypes ||
+      useSettings().metaSchema.objectTypesComfort ||
+      !useSettings().metaSchema.showAdditionalPropertiesButton
+    ) {
+      result.push({
+        label: 'Enable advanced schema options',
+        icon: 'fa-solid fa-gauge-high',
+        command: () => {
+          const metaSchema = useSettings().metaSchema;
+          metaSchema.allowBooleanSchema = true;
+          metaSchema.allowMultipleTypes = true;
+          metaSchema.objectTypesComfort = false;
+          metaSchema.showAdditionalPropertiesButton = true;
+        },
+      });
+    } else {
+      result.push({
+        label: 'Disable advanced schema options',
+        icon: 'fa-solid fa-gauge-simple',
+        command: () => {
+          const metaSchema = useSettings().metaSchema;
+          metaSchema.allowBooleanSchema = false;
+          metaSchema.allowMultipleTypes = false;
+          metaSchema.objectTypesComfort = true;
+          metaSchema.showAdditionalPropertiesButton = false;
+        },
+      });
+    }
+
+    return result;
   }
 
-  get settingsMenuItems() {
+  public getSettingsMenuItems(settings: SettingsInterfaceRoot) {
     return [
       {
         label: 'Open settings file',
@@ -205,7 +274,7 @@ export class MenuItems {
         label: 'Restore default settings',
         icon: 'fa-solid fa-trash-arrow-up',
         command: () => {
-          getDataForMode(SessionMode.Settings).setData(SETTINGS_DATA_DEFAULT);
+          getDataForMode(SessionMode.Settings).setData(structuredClone(SETTINGS_DATA_DEFAULT));
         },
         key: 'settings_restore',
       },

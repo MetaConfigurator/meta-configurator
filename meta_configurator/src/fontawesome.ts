@@ -21,12 +21,16 @@ import {
   faShareNodes,
   faTriangleExclamation,
   faTrashArrowUp,
+  faEye,
+  faGaugeHigh,
+  faGaugeSimple,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
   faFileCode,
   faFloppyDisk as faFloppyDiskRegular,
   faFolderOpen as faFolderOpenRegular,
+  faEye as faEyeRegular,
 } from '@fortawesome/free-regular-svg-icons';
 
 /**
@@ -55,4 +59,8 @@ export function registerIcons() {
   library.add(faSearch);
   library.add(faTriangleExclamation);
   library.add(faTrashArrowUp);
+  library.add(faEye);
+  library.add(faEyeRegular);
+  library.add(faGaugeSimple);
+  library.add(faGaugeHigh);
 }

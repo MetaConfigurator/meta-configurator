@@ -20,15 +20,7 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
       advanced: true,
     };
   }
-  if (metaSchemaSettings.rootMustBeObject) {
-    metaSchema.$defs.rootObjectSubSchema!.allOf.push({
-      properties: {
-        type: {
-          const: 'object',
-        },
-      },
-    });
-  }
+
   if (metaSchemaSettings.objectTypesComfort) {
     metaSchema.$defs.enumProperty.allOf = ALL_OF_ENUM_PROPERTY;
     metaSchema.$defs['meta-data'].allOf = ALL_OF_META_DATA;
@@ -42,8 +34,15 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
     delete metaSchema.$defs.objectProperty.properties.dependentSchemas;
     delete metaSchema.$defs.objectProperty.properties.unevaluatedProperties;
     delete metaSchema.$defs.arrayProperty.properties.unevaluatedItems;
+    delete metaSchema.$defs.arrayProperty.properties.items;
+  }
 
-    //TODO: seems like even items in an array does not work with this!
+  const simplified =
+    !metaSchemaSettings.allowBooleanSchema ||
+    !metaSchemaSettings.allowMultipleTypes ||
+    metaSchemaSettings.objectTypesComfort;
+  if (simplified) {
+    metaSchema.$defs.jsonMetaSchema.title = 'Simplified JSON Meta Schema';
   }
 
   return metaSchema;

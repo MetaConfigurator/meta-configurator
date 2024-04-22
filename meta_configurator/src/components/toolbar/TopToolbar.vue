@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {type Ref, ref, watch} from 'vue';
+import {computed, type Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
@@ -29,6 +29,8 @@ import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
 import {SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {getSessionForMode} from '@/data/useDataLink';
+import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -177,22 +179,22 @@ async function fetchSchemaFromSelectedUrl() {
   hideUrlDialog();
 }
 
-const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
-const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
-const settingsMenuItems = topMenuBar.settingsMenuItems;
-
-function getMenuItems(): MenuItem[] {
+function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
   switch (props.currentMode) {
     case SessionMode.FileEditor:
-      return fileEditorMenuItems;
+      return topMenuBar.getFileEditorMenuItems(settings);
     case SessionMode.SchemaEditor:
-      return schemaEditorMenuItems;
+      return topMenuBar.getSchemaEditorMenuItems(settings);
     case SessionMode.Settings:
-      return settingsMenuItems;
+      return topMenuBar.getSettingsMenuItems(settings);
     default:
       return [];
   }
 }
+
+// computed property function to get menu items to allow for updating of the menu items
+const menuItems = computed(() => getMenuItems(useSettings()));
+
 const toggle = event => {
   menu.value.toggle(event);
 };
@@ -366,7 +368,7 @@ const showSearchResultsMenu = event => {
       </Button>
 
       <!-- menu items -->
-      <div v-for="item in getMenuItems()" :key="item.label">
+      <div v-for="item in menuItems" :key="item.label">
         <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
         <Button
           v-else
