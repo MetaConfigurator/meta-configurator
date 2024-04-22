@@ -7,7 +7,7 @@ The original design features a single source of truth store, which is responsibl
 There can only be one schema and \cfgfile{} loaded at any given time.
 When the user changes the tool \textit{mode} $\in$ \{\textit{File editor}, \textit{Schema editor}, \textit{Settings}\}, the schema and \cfgfile{} in the store are replaced accordingly.
 Table \ref{tab:schema_and_file_data_by_mode} illustrates which file data and schema are used for the different modes.
-Due to that design decision, within all subcomponents of the tool, the central store can be accessed directly, instead of having to pass the current schema and file through the complete component hierarchy. 
+Therefore, within most subcomponents of the tool, the central store is accessed directly, instead of passing the current schema and file through the component hierarchy. 
 This comes with one major drawback: it is not possible to have the schema and data of different views loaded at the same time.
 However, being able to simultaneously show content of different modes could significantly help the user.
 For example, in the schema editor view, the file editor GUI could be shown too, giving the user a preview of the GUI that their schema will result in.
@@ -37,8 +37,60 @@ This architecture allows us to arrange panels of different types and different m
 
 
 \subsubsection{Dynamic panel arrangement}
-TODO
+The \textit{GUI editor} (todo: reference) or \textit{file editor} (todo: reference) are what we call \textit{panels}.
+They have access to the \textit{schema} and \textit{file data} and visualize them in a particular manner.
+They can also update the \textit{file data} or the \textit{currently selected element}, which are synchronized across all panels.
+\toolname{} can be extended by more panels.
+Table \ref{tab:panels_by_mode} shows which panels are used for the different tool modes, and their assigned panel modes (which data and schema to use).
+As a result, for every mode, \toolname{} provides a text editor panel and a GUI editor panel, both using the data and schema of the corresponding mode.
 
+\begin{table}[!t]
+\caption{Panels and their data sources for the different modes}
+\label{tab:panels_by_mode}
+\centering\scriptsize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Tool Mode} & \textbf{Panel 1: type(mode)} & \textbf{Panel 2: type(mode)} \\ \midrule
+File editor        & Text editor(file editor)     & GUI editor(file editor)      \\
+Schema editor      & Text editor(schema editor)   & GUI editor(schema editor)    \\
+Settings           & Text editor(settings)        & GUI editor(settings)         \\ \bottomrule
+\end{tabular}
+\end{table}
+
+To allow for more variation in the panels configuration (arrangement), we turn it into a setting.
+This setting can be adjusted by the user (see figure \ref{fig:panels_definition_file_editor}) or by \toolname{} itself.
+Table \ref{tab:panels_by_mode_schema_editor_with_preview} shows an alternative configuration for the panels of the schema editor.
+It contains an additional GUI editor panel, which uses the data and schema from file editor mode. 
+This configuration results in a schema editor, where the user gets a (functional) preview of the GUI that their schema will generate, see figure \ref{fig:panels_for_modified_schema_editor_config}.
+
+
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/panels_definition_file_editor}
+    \caption{Settings GUI editor view with panels configuration for \textit{file editor} mode}
+    \label{fig:panels_definition_file_editor}
+\end{figure}
+
+
+\begin{table}[!t]
+\caption{Modified schema editor panel configuration}
+\label{tab:panels_by_mode_schema_editor_with_preview}
+\centering\tiny
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Tool Mode} & \textbf{Panel 1: type(mode)} & \textbf{Panel 2: type(mode)}& \textbf{Panel 3: type(mode)} \\ \midrule
+Schema editor      & Text editor(schema editor)   & GUI editor(schema editor)   & GUI editor(file editor)    
+  \\ \bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{figures/panels_for_modified_schema_editor_config}
+    \caption{Schema editor with a preview of the resulting GUI on the right}
+    \label{fig:panels_for_modified_schema_editor_config}
+\end{figure*}
 
 
 
