@@ -222,7 +222,8 @@ export class MenuItems {
           const metaSchema = useSettings().metaSchema;
           metaSchema.allowBooleanSchema = false;
           metaSchema.allowMultipleTypes = false;
-          metaSchema.objectTypesComfort = true;
+          // do not activate objectTypesComfort, because many features are not compatible with it
+          // metaSchema.objectTypesComfort = true;
           metaSchema.showAdditionalPropertiesButton = false;
         },
       });

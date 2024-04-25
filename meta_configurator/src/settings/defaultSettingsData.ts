@@ -3,6 +3,7 @@
  */
 export const SETTINGS_DATA_DEFAULT = {
   dataFormat: 'json',
+  toolbarTitle: 'MetaConfigurator',
   codeEditor: {
     fontSize: 14,
   },

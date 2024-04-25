@@ -1,9 +1,10 @@
-import {createMemoryHistory, createRouter, createWebHistory} from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import {useSessionStore} from '@/store/sessionStore';
 import {SessionMode} from '@/store/sessionMode';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
 import FileEditorView from '@/views/FileEditorView.vue';
 import SettingsEditorView from '@/views/SettingsEditorView.vue';
+import FetchView from '@/views/FetchView.vue';
 
 /**
  * The router of the application.
@@ -37,6 +38,16 @@ const router = createRouter({
       meta: {
         title: 'SettingEditor',
         sessionMode: SessionMode.Settings,
+      },
+    },
+    {
+      path: '/fetch',
+      name: 'dynamic',
+      component: FetchView,
+      props: true,
+      meta: {
+        title: 'FileEditor',
+        sessionMode: SessionMode.FileEditor,
       },
     },
   ],

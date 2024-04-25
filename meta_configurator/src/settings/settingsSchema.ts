@@ -8,6 +8,11 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   required: ['dataFormat', 'codeEditor', 'guiEditor', 'metaSchema', 'panels'],
   additionalProperties: false,
   properties: {
+    toolbarTitle: {
+      type: 'string',
+      description: 'The title of the editor, shown in the toolbar.',
+      default: 'MetaConfigurator',
+    },
     dataFormat: {
       type: 'string',
       description: 'The data format to use for the configuration files.',

@@ -429,7 +429,7 @@ const showSearchResultsMenu = event => {
       <div class="flex space-x-5 mr-3">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
-          <p class="font-semibold text-lg">MetaConfigurator</p>
+          <p class="font-semibold text-lg">{{ useSettings().toolbarTitle }}</p>
         </div>
 
         <!-- button to open the about dialog -->
