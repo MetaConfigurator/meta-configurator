@@ -18,6 +18,8 @@ jobs:
           cd meta_configurator
           npm ci
           npm run build
+          cd dist
+          cp index.html 404.html
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
