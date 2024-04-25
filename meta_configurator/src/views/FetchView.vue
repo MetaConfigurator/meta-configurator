@@ -55,7 +55,7 @@ onMounted(() => {
       });
   }
 
-  useAppRouter().push('/file');
+  // useAppRouter().push('/file');
 });
 </script>
 
