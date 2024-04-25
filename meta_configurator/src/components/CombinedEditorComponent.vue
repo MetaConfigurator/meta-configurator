@@ -45,7 +45,7 @@ function updateMode(newMode: SessionMode) {
   const router = useAppRouter();
   switch (newMode) {
     case SessionMode.FileEditor:
-      router.push('/');
+      router.push('/file');
       break;
     case SessionMode.SchemaEditor:
       router.push('/schema');

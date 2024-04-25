@@ -14,7 +14,7 @@ const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: '/file',
       name: 'file',
       component: FileEditorView,
       meta: {
@@ -41,8 +41,8 @@ const router = createRouter({
       },
     },
     {
-      path: '/fetch',
-      name: 'dynamic',
+      path: '/',
+      name: 'fetch',
       component: FetchView,
       props: true,
       meta: {

@@ -55,15 +55,12 @@ onMounted(() => {
       });
   }
 
-  useAppRouter().push('/');
+  useAppRouter().push('/file');
 });
 </script>
 
 <template>
-  <label
-    >Fetching settings from params {{ useAppRouter().currentRoute.value.params }} and query
-    {{ useAppRouter().currentRoute.value.query }}</label
-  >
+  <label>Fetching data from query {{ useAppRouter().currentRoute.value.query }}</label>
 </template>
 
 <style scoped></style>
