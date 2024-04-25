@@ -93,16 +93,16 @@ Schema editor      & Text editor(schema editor)   & GUI editor(schema editor)   
 
 
 
-\subsubsection{Decoupling}
-Having a single source of truth store that can be accessed from anywhere can be tempting.
-However, a component that uses the store depends on the store too.
-Sometimes, this dependency is not required and not even desired either.
-For example, the JSON schema preprocessing function is called with a JSON schema or sub-schema that is supposed to be preprocessed (e.g., references are resolved in a lazy manner).
-For reference resolving, the function requires all definitions of the properties to be resolved. 
-When only a sub-schema is provided to the function (this is the case when an object is expanded in the GUI editor), this sub-schema does usually not contain the definitions of the referenced data structures.
-To deal with this, \toolname{} accesses the store to receive the current schema, based on which it resolves the references.
-This, however, introduces the limitation that the function can only preprocess schemas which are currently loaded in the store and assigned to one of the modes.
-We decouple the function from the store, by introducing a second function parameter \textit{rootSchema}, which expects the root schema to use. 
-As a result, the function can take in any sub-schema and root schema, regardless of whether they are loaded in the store or not.
+%\subsubsection{Decoupling}
+%Having a single source of truth store that can be accessed from anywhere can be tempting.
+%However, a component that uses the store depends on the store too.
+%Sometimes, this dependency is not required and not even desired either.
+%For example, the JSON schema preprocessing function is called with a JSON schema or sub-schema that is supposed to be preprocessed (e.g., references are resolved in a lazy manner).
+%For reference resolving, the function requires all definitions of the properties to be resolved. 
+%When only a sub-schema is provided to the function (this is the case when an object is expanded in the GUI editor), this sub-schema does usually not contain the definitions of the referenced data structures.
+%To deal with this, \toolname{} accesses the store to receive the current schema, based on which it resolves the references.
+%This, however, introduces the limitation that the function can only preprocess schemas which are currently loaded in the store and assigned to one of the modes.
+%We decouple the function from the store, by introducing a second function parameter \textit{rootSchema}, which expects the root schema to use. 
+%As a result, the function can take in any sub-schema and root schema, regardless of whether they are loaded in the store or not.
 
 % TODO: not true, it is actually not implemented yet
