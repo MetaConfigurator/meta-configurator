@@ -18,7 +18,7 @@ describe('ManagedData', () => {
       test: 'value',
       nested: {test: 'value'},
     });
-    dataLink = new ManagedData(testDataRef, SessionMode.FileEditor);
+    dataLink = new ManagedData(testDataRef, SessionMode.DataEditor);
   });
 
   it('should correctly setup the data', () => {

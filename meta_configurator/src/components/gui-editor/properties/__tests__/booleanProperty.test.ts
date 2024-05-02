@@ -47,7 +47,7 @@ describe('BooleanProperty', () => {
         {
           type: 'boolean',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     });

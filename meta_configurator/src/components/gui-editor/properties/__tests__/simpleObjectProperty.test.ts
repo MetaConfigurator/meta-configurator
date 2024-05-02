@@ -54,7 +54,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar'},
-        propertySchema: new JsonSchemaWrapper({}, SessionMode.FileEditor, false),
+        propertySchema: new JsonSchemaWrapper({}, SessionMode.DataEditor, false),
       });
 
       it('should show the correct description', () => {
@@ -70,7 +70,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {foo: 'bar', baz: 'qux'},
-        propertySchema: new JsonSchemaWrapper({}, SessionMode.FileEditor, false),
+        propertySchema: new JsonSchemaWrapper({}, SessionMode.DataEditor, false),
       });
 
       it('should show the correct description', () => {
@@ -86,7 +86,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: {},
-        propertySchema: new JsonSchemaWrapper({}, SessionMode.FileEditor, false),
+        propertySchema: new JsonSchemaWrapper({}, SessionMode.DataEditor, false),
       });
 
       it('should show the correct description', () => {
@@ -104,7 +104,7 @@ describe('SimpleObjectProperty', () => {
         propertyData: {foo: 'bar', baz: 'qux'},
         propertySchema: new JsonSchemaWrapper(
           {properties: {foo: {}}},
-          SessionMode.FileEditor,
+          SessionMode.DataEditor,
           false
         ),
       });
@@ -124,7 +124,7 @@ describe('SimpleObjectProperty', () => {
         propertyData: {foo: 'bar'},
         propertySchema: new JsonSchemaWrapper(
           {properties: {foo: {}, baz: {}}},
-          SessionMode.FileEditor,
+          SessionMode.DataEditor,
           false
         ),
       });
@@ -142,7 +142,7 @@ describe('SimpleObjectProperty', () => {
       mountBeforeEach({
         expanded: false,
         propertyData: undefined,
-        propertySchema: new JsonSchemaWrapper({}, SessionMode.FileEditor, false),
+        propertySchema: new JsonSchemaWrapper({}, SessionMode.DataEditor, false),
       });
 
       it('should show the correct description', () => {

@@ -6,7 +6,7 @@ import {SETTINGS_SCHEMA} from '@/settings/settingsSchema';
 import {useLocalStorage} from '@vueuse/core';
 
 const dataSource = {
-  // data of the file editor
+  // data of the data editor
   userData: shallowRef<any>({}),
   // data of the schema editor, used as the schema for the file editor
   userSchemaData: shallowRef<any>({

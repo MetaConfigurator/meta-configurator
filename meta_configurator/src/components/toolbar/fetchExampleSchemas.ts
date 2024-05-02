@@ -1,4 +1,4 @@
-import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
+import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {errorService} from '@/main';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
@@ -15,7 +15,7 @@ export function loadExampleSchema(schemaKey: string): void {
     const schemaName = selectedSchema.label || 'Unknown Schema';
     useDataSource().userSchemaData.value = selectedSchema?.schema;
 
-    openClearFileEditorDialog();
+    openClearDataEditorDialog();
 
     const toast = toastService;
     if (toast) {

@@ -84,7 +84,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         showAdditionalPropertiesButton: {
           type: 'boolean',
           description:
-            "Most schemas allow additional properties (e.g., adding properties to the data that are not defined in the schema). To support this in the schema editor, it would always provide an 'Add Property' button to allow adding properties unknown to the schema. In practice, this option is not used much, but it can confuse the user. For example, they might try adding new fields for their schema by using this button, although that does not have any effect on the schema.",
+            "Most schemas allow additional properties (e.g., adding properties to the data that are not defined in the schema). To resemble this in the editor, it would always provide an 'Add Property' button to allow adding properties unknown to the schema. In practice, this option is not used much, but it can confuse the user.",
           default: false,
         },
         objectTypesComfort: {
@@ -100,15 +100,21 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    hideSchemaEditor: {
+      type: 'boolean',
+      description:
+          'If set to true, the complete schema editor view will be hidden.',
+      default: false,
+    },
     panels: {
-      required: ['file_editor', 'schema_editor', 'settings'],
+      required: ['data_editor', 'schema_editor', 'settings'],
       title: 'Panels',
       type: 'object',
       additionalProperties: false,
       description:
         'In this setting the view can be customized: which panels to show in the different modes.',
       properties: {
-        file_editor: {
+        data_editor: {
           $ref: '#/$defs/panels',
         },
         schema_editor: {
@@ -149,7 +155,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             type: 'string',
             title: 'Mode',
             description: 'The mode determines which kind of data and schema the panel uses.',
-            enum: ['schema_editor', 'file_editor', 'settings'],
+            enum: ['schema_editor', 'data_editor', 'settings'],
           },
           size: {
             type: 'number',

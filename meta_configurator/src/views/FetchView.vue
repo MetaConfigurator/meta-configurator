@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useAppRouter} from '../router/router';
+import {useAppRouter} from '@/router/router';
 import {onMounted} from 'vue';
 import {useDataSource} from '@/data/dataSource';
 import {useSessionStore} from '@/store/sessionStore';
@@ -42,10 +42,10 @@ onMounted(() => {
       });
   }
 
-  if ('file' in query) {
-    const file_url = query.file as string;
-    console.debug('Received file URL ', file_url, ' from query.');
-    fetch(file_url)
+  if ('data' in query) {
+    const data_url = query.file as string;
+    console.debug('Received data URL ', data_url, ' from query.');
+    fetch(data_url)
       .then(function (response) {
         return response.json();
       })
@@ -55,7 +55,7 @@ onMounted(() => {
       });
   }
 
-  useAppRouter().push('/file');
+  useAppRouter().push('/data');
 });
 </script>
 

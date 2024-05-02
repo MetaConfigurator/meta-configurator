@@ -4,7 +4,7 @@ import {SessionMode} from '@/store/sessionMode';
 </script>
 
 <template>
-  <CombinedEditorComponent :sessionMode="SessionMode.FileEditor" />
+  <CombinedEditorComponent :sessionMode="SessionMode.DataEditor" />
 </template>
 
 <style scoped></style>

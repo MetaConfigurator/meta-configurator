@@ -25,7 +25,7 @@ import {GuiConstants} from '@/constants';
 import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
-import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
+import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {getSessionForMode} from '@/data/useDataLink';
@@ -52,8 +52,8 @@ const topMenuBar = new MenuItems(handleFromWebClick, handleFromOurExampleClick, 
 
 function getPageName(): string {
   switch (props.currentMode) {
-    case SessionMode.FileEditor:
-      return 'File Editor';
+    case SessionMode.DataEditor:
+      return 'Data Editor';
     case SessionMode.SchemaEditor:
       return 'Schema Editor';
     case SessionMode.Settings:
@@ -66,49 +66,58 @@ function getPageName(): string {
 /**
  * Menu items of the page selection menu.
  */
-const pageSelectionMenuItems: MenuItem[] = [
-  {
-    label: 'File Editor',
-    icon: 'fa-regular fa-file',
-    class: () => {
-      if (props.currentMode !== SessionMode.FileEditor) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
-    command: () => {
-      emit('mode-selected', SessionMode.FileEditor);
-    },
-  },
-  {
-    label: 'Schema Editor',
-    icon: 'fa-regular fa-file-code',
-    class: () => {
-      if (props.currentMode !== SessionMode.SchemaEditor) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
-    command: () => {
-      emit('mode-selected', SessionMode.SchemaEditor);
-    },
-  },
-  {
-    label: 'Settings',
-    icon: 'fa-solid fa-cog',
-    class: () => {
-      if (props.currentMode !== SessionMode.Settings) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
-    command: () => {
-      emit('mode-selected', SessionMode.Settings);
-    },
-  },
-];
+function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
+    const dataEditorItem: MenuItem = {
+        label: 'Data Editor',
+        icon: 'fa-regular fa-file',
+        class: () => {
+            if (props.currentMode !== SessionMode.DataEditor) {
+                return 'font-normal text-lg';
+            }
+            return 'font-bold text-lg';
+        },
+        command: () => {
+            emit('mode-selected', SessionMode.DataEditor);
+        },
+    };
+    const schemaEditorItem: MenuItem = {
+        label: 'Schema Editor',
+        icon: 'fa-regular fa-file-code',
+        class: () => {
+            if (props.currentMode !== SessionMode.SchemaEditor) {
+                return 'font-normal text-lg';
+            }
+            return 'font-bold text-lg';
+        },
+        command: () => {
+            emit('mode-selected', SessionMode.SchemaEditor);
+        },
+    };
+    const settingsItem: MenuItem = {
+        label: 'Settings',
+        icon: 'fa-solid fa-cog',
+        class: () => {
+            if (props.currentMode !== SessionMode.Settings) {
+                return 'font-normal text-lg';
+            }
+            return 'font-bold text-lg';
+        },
+        command: () => {
+            emit('mode-selected', SessionMode.Settings);
+        },
+    };
 
-const items = ref(pageSelectionMenuItems);
+    if (settings.hideSchemaEditor) {
+        return [dataEditorItem, settingsItem];
+    } else {
+        return [dataEditorItem, schemaEditorItem, settingsItem];
+    }
+
+}
+
+
+const items = computed(() => getPageSelectionMenuItems(useSettings()));
+
 
 function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
@@ -152,7 +161,7 @@ watch(selectedSchema, async newSelectedSchema => {
       await fetchSchemaFromUrl(newSelectedSchema.url);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      openClearFileEditorDialog();
+      openClearDataEditorDialog();
     } catch (error) {
       errorService.onError(error);
     }
@@ -161,7 +170,7 @@ watch(selectedSchema, async newSelectedSchema => {
       loadExampleSchema(newSelectedSchema.key);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      openClearFileEditorDialog();
+      openClearDataEditorDialog();
     } catch (error) {
       errorService.onError(error);
     }
@@ -181,8 +190,8 @@ async function fetchSchemaFromSelectedUrl() {
 
 function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
   switch (props.currentMode) {
-    case SessionMode.FileEditor:
-      return topMenuBar.getFileEditorMenuItems(settings);
+    case SessionMode.DataEditor:
+      return topMenuBar.getDataEditorMenuItems(settings);
     case SessionMode.SchemaEditor:
       return topMenuBar.getSchemaEditorMenuItems(settings);
     case SessionMode.Settings:

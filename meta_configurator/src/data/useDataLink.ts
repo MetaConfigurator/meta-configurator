@@ -13,31 +13,31 @@ const dataSource = useDataSource();
 const schemaSource = useSchemaSource();
 
 const dataList: ManagedData[] = [
-  new ManagedData(dataSource.userData, SessionMode.FileEditor),
+  new ManagedData(dataSource.userData, SessionMode.DataEditor),
   new ManagedData(dataSource.userSchemaData, SessionMode.SchemaEditor),
   new ManagedData(dataSource.settingsData, SessionMode.Settings),
 ];
 
 const schemaList: ManagedJsonSchema[] = [
-  new ManagedJsonSchema(dataSource.userSchemaData, true, SessionMode.FileEditor),
+  new ManagedJsonSchema(dataSource.userSchemaData, true, SessionMode.DataEditor),
   new ManagedJsonSchema(schemaSource.metaSchemaData, true, SessionMode.SchemaEditor),
   new ManagedJsonSchema(schemaSource.settingsSchemaData, false, SessionMode.Settings),
 ];
 
 const sessionList: ManagedSession[] = [
-  new ManagedSession(SessionMode.FileEditor),
+  new ManagedSession(SessionMode.DataEditor),
   new ManagedSession(SessionMode.SchemaEditor),
   new ManagedSession(SessionMode.Settings),
 ];
 
 const validationList: ManagedValidation[] = [
-  new ManagedValidation(SessionMode.FileEditor),
+  new ManagedValidation(SessionMode.DataEditor),
   new ManagedValidation(SessionMode.SchemaEditor),
   new ManagedValidation(SessionMode.Settings),
 ];
 
 const userSelectionList: ManagedUserSchemaSelection[] = [
-  new ManagedUserSchemaSelection(SessionMode.FileEditor),
+  new ManagedUserSchemaSelection(SessionMode.DataEditor),
   new ManagedUserSchemaSelection(SessionMode.SchemaEditor),
   new ManagedUserSchemaSelection(SessionMode.Settings),
 ];

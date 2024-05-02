@@ -80,13 +80,13 @@ export function openClearSchemaDialog() {
 }
 
 /**
- * Shows a confirmation dialog to the user and clears the file in the FileEditor if the user confirms.
+ * Shows a confirmation dialog to the user and clears the file in the DataEditor if the user confirms.
  */
-export function openClearFileEditorDialog() {
+export function openClearDataEditorDialog() {
   newEmptyFile({
     message:
-      'Do you also want to create a new empty file in the FileEditor? (The current file will be deleted)',
-    dataLink: getDataForMode(SessionMode.FileEditor),
-    confirmMessage: 'New empty file created in the FileEditor.',
+      'Do you also want to create a new empty file in the DataEditor? (The current file will be deleted)',
+    dataLink: getDataForMode(SessionMode.DataEditor),
+    confirmMessage: 'New empty file created in the DataEditor.',
   });
 }

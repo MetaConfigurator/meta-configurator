@@ -1,8 +1,8 @@
-import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import {useSessionStore} from '@/store/sessionStore';
 import {SessionMode} from '@/store/sessionMode';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
-import FileEditorView from '@/views/FileEditorView.vue';
+import DataEditorView from '@/views/DataEditorView.vue';
 import SettingsEditorView from '@/views/SettingsEditorView.vue';
 import FetchView from '@/views/FetchView.vue';
 
@@ -11,15 +11,15 @@ import FetchView from '@/views/FetchView.vue';
  * It defines the routes and the corresponding components.
  */
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/file',
-      name: 'file',
-      component: FileEditorView,
+      path: '/data',
+      name: 'data',
+      component: DataEditorView,
       meta: {
-        title: 'FileEditor',
-        sessionMode: SessionMode.FileEditor,
+        title: 'DataEditor',
+        sessionMode: SessionMode.DataEditor,
       },
     },
     {
@@ -46,8 +46,8 @@ const router = createRouter({
       component: FetchView,
       props: true,
       meta: {
-        title: 'FileEditor',
-        sessionMode: SessionMode.FileEditor,
+        title: 'DataEditor',
+        sessionMode: SessionMode.DataEditor,
       },
     },
   ],

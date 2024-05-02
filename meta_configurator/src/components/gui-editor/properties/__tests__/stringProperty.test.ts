@@ -43,7 +43,7 @@ describe('StringProperty', () => {
         {
           type: 'string',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     });
@@ -80,7 +80,7 @@ describe('StringProperty', () => {
           {
             type: 'string',
           },
-          SessionMode.FileEditor,
+          SessionMode.DataEditor,
           false
         ),
       });
@@ -101,7 +101,7 @@ describe('StringProperty', () => {
         {
           type: 'number',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     });
@@ -120,7 +120,7 @@ describe('StringProperty', () => {
         {
           type: 'object',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     });
@@ -139,7 +139,7 @@ describe('StringProperty', () => {
         {
           type: 'array',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     });
@@ -158,7 +158,7 @@ describe('StringProperty', () => {
         {
           type: 'null',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     });
@@ -173,7 +173,7 @@ describe('StringProperty', () => {
       propertyName: 'foo',
       propertyData: undefined,
       validationResults: new ValidationResult([]),
-      propertySchema: new JsonSchemaWrapper({}, SessionMode.FileEditor, false),
+      propertySchema: new JsonSchemaWrapper({}, SessionMode.DataEditor, false),
     });
 
     it('should correctly setup the input field', () => {

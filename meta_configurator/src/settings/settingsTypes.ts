@@ -7,6 +7,7 @@ export interface SettingsInterfaceRoot {
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
   metaSchema: SettingsInterfaceMetaSchema;
+  hideSchemaEditor: boolean;
   panels: SettingsInterfacePanels;
 }
 
@@ -19,7 +20,7 @@ export interface SettingsInterfaceGuiEditor {
   propertySorting: PropertySorting;
 }
 export interface SettingsInterfacePanels {
-  file_editor: SettingsInterfacePanel[];
+  data_editor: SettingsInterfacePanel[];
   schema_editor: SettingsInterfacePanel[];
   settings: SettingsInterfacePanel[];
 }

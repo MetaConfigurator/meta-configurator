@@ -45,7 +45,7 @@ describe('NumberProperty', () => {
           {
             type: 'integer',
           },
-          SessionMode.FileEditor,
+          SessionMode.DataEditor,
           false
         ),
       };
@@ -75,7 +75,7 @@ describe('NumberProperty', () => {
             type: 'number',
             multipleOf: 0.5,
           },
-          SessionMode.FileEditor,
+          SessionMode.DataEditor,
           false
         ),
       };
@@ -103,7 +103,7 @@ describe('NumberProperty', () => {
         {
           type: 'integer',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     });

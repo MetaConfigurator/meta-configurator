@@ -34,19 +34,19 @@ export class MenuItems {
     this.handleFromURLClick = onFromURLClick;
   }
 
-  public getFileEditorMenuItems(settings: SettingsInterfaceRoot) {
+  public getDataEditorMenuItems(settings: SettingsInterfaceRoot) {
     return [
       {
-        label: 'New File',
+        label: 'New Data...',
         icon: 'fa-regular fa-file',
         items: [
           {
-            label: 'New empty File',
+            label: 'Clear Data',
             icon: 'fa-regular fa-file',
             command: openClearCurrentFileDialog,
           },
           {
-            label: 'Generate File...',
+            label: 'Generate Data...',
             icon: 'fa-solid fa-gears',
             command: openGenerateDataDialog,
             disabled: true, // currently not working in the deployed version
@@ -54,12 +54,12 @@ export class MenuItems {
         ],
       },
       {
-        label: 'Open File',
+        label: 'Open Data',
         icon: 'fa-regular fa-folder-open',
-        command: () => openUploadFileDialog(getDataForMode(SessionMode.FileEditor)),
+        command: () => openUploadFileDialog(getDataForMode(SessionMode.DataEditor)),
       },
       {
-        label: 'Download File',
+        label: 'Download Data',
         icon: 'fa-solid fa-download',
         command: () => downloadFile(useCurrentSchema().schemaRaw.value.title ?? 'file'),
       },
@@ -168,7 +168,7 @@ export class MenuItems {
     ];
     if (
       useSettings().panels.schema_editor.find(
-        panel => panel.panelType === 'gui_editor' && panel.mode === 'file_editor'
+        panel => panel.panelType === 'gui_editor' && panel.mode === 'data_editor'
       )
     ) {
       result.push({
@@ -178,7 +178,7 @@ export class MenuItems {
           const panels = useSettings().panels;
           panels.schema_editor = panels.schema_editor.filter(
             panel =>
-              !(panel.panelType === PanelType.GuiEditor && panel.mode === SessionMode.FileEditor)
+              !(panel.panelType === PanelType.GuiEditor && panel.mode === SessionMode.DataEditor)
           );
         },
       });
@@ -190,7 +190,7 @@ export class MenuItems {
           const panels = settings.panels;
           panels.schema_editor.push({
             panelType: PanelType.GuiEditor,
-            mode: SessionMode.FileEditor,
+            mode: SessionMode.DataEditor,
             size: 40,
           });
         },

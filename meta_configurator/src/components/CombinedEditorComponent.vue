@@ -44,8 +44,8 @@ let {width} = useWindowSize();
 function updateMode(newMode: SessionMode) {
   const router = useAppRouter();
   switch (newMode) {
-    case SessionMode.FileEditor:
-      router.push('/file');
+    case SessionMode.DataEditor:
+      router.push('/data');
       break;
     case SessionMode.SchemaEditor:
       router.push('/schema');

@@ -48,7 +48,7 @@ describe('EnumProperty', () => {
         {
           type: 'string',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     };
@@ -124,7 +124,7 @@ describe('EnumProperty', () => {
         {
           type: 'string',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     };
@@ -179,7 +179,7 @@ describe('EnumProperty', () => {
         {
           type: 'string',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     };
@@ -234,7 +234,7 @@ describe('EnumProperty', () => {
         {
           type: 'string',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     };
@@ -292,7 +292,7 @@ describe('EnumProperty', () => {
         {
           type: 'string',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     };
@@ -346,7 +346,7 @@ describe('EnumProperty', () => {
         {
           type: 'string',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     };
@@ -399,7 +399,7 @@ describe('EnumProperty', () => {
         {
           type: 'string',
         },
-        SessionMode.FileEditor,
+        SessionMode.DataEditor,
         false
       ),
     };
