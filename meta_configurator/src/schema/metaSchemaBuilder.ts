@@ -17,7 +17,8 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
       hideAddPropertyButton: true,
       // this is needed, because otherwise it would overwrite the advanced status of other properties, making
       // them not advanced anymore (such as the 'if' and 'not' properties)
-      advanced: true,
+      //TODO: BUT it has negative effect of making other normal properties, such as items in an array advanced
+      //advanced: true,
     };
   }
 
