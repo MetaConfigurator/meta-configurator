@@ -48,7 +48,8 @@ We introduce the following boolean parameters:
 	Warning: due to incompatibility, this option will disable schema editor support for defining the items of an array, as well as support for many advanced keywords, such as conditionals and \texttt{not}.
 \end{itemize}
 The customizability of the schema editor is achieved by a component, which we call \textit{meta schema builder}.
-Based on the meta schema parameters, it creates a custom JSON meta schema, which is then used to create the schema editor GUI.
+Based on the meta schema parameters, it builds a custom JSON meta schema, which is then used to create the schema editor GUI.
+%It starts with our original (advanced) JSON meta schema, and based on the parameters, applies transformations on this meta schema, to simplify it.
 We add a button to the schema editor (figure \ref{fig:schema_editor_advanced_mode_button}), which allows the user to toggle between an advanced meta schema (boolean schema and multiple types allowed, no object types comfort feature and showing the button to add additional properties) and a simple one (opposite configuration).
 Furthermore, in the settings menu, the user can set the values for the individual parameters.
 Figure \ref{fig:schema_editor_simple_choose_type} shows the drop-down menu for defining the type of a property, when using the simplified meta schema.
