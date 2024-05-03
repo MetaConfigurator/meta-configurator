@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from 'vue-router';
+import {createRouter, createWebHashHistory} from 'vue-router';
 import {useSessionStore} from '@/store/sessionStore';
 import {SessionMode} from '@/store/sessionMode';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';
@@ -11,7 +11,7 @@ import FetchView from '@/views/FetchView.vue';
  * It defines the routes and the corresponding components.
  */
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/data',
