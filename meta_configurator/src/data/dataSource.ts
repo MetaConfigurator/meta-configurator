@@ -14,7 +14,7 @@ const dataSource = {
   }),
 
   // data of the settings editor
-  settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT)), // TODO add settings type
+  settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT)),
 };
 
 // Schema source and data source are separated, because metaSchemaData accesses the settingsData, which it could not do if they were defined within the same object.
@@ -23,7 +23,7 @@ const schemaSource = {
   metaSchemaData: computed(() => buildMetaSchema(dataSource.settingsData.value.metaSchema)),
 
   // settings schema of the settings editor
-  settingsSchemaData: shallowRef<TopLevelSchema>(SETTINGS_SCHEMA), // TODO add settings schema type
+  settingsSchemaData: shallowRef<TopLevelSchema>(SETTINGS_SCHEMA),
 };
 
 /**

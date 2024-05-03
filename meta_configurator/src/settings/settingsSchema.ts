@@ -102,8 +102,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     hideSchemaEditor: {
       type: 'boolean',
-      description:
-          'If set to true, the complete schema editor view will be hidden.',
+      description: 'If set to true, the complete schema editor view will be hidden.',
       default: false,
     },
     panels: {

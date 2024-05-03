@@ -21,10 +21,10 @@ export function mergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
           hideAddPropertyButton: false,
         };
         for (const value of values) {
-          if (("advanced" in value) && value.advanced) {
+          if ('advanced' in value && value.advanced) {
             result.advanced = true;
           }
-          if (("hideAddPropertyButton" in value) && value.hideAddPropertyButton) {
+          if ('hideAddPropertyButton' in value && value.hideAddPropertyButton) {
             result.hideAddPropertyButton = true;
           }
         }
