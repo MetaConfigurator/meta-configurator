@@ -23,6 +23,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {useSessionStore} from '@/store/sessionStore';
 import {getComponentByPanelType} from '@/components/panelType';
 import type {SettingsInterfacePanels, SettingsInterfaceRoot} from '@/settings/settingsTypes';
+import {SETTINGS_DATA_DEFAULT} from "@/settings/defaultSettingsData";
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -40,6 +41,12 @@ watchImmediate(
     if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition)) {
       panelsDefinition = panels;
     }
+    // fix panels if they are not defined
+      for (let mode of Object.values(SessionMode)) {
+        if (!panels[mode]) {
+          panels[mode] = structuredClone(SETTINGS_DATA_DEFAULT.panels[mode]);
+        }
+      }
   }
 );
 
@@ -125,8 +132,7 @@ toastService.toast = useToast();
             :resizable="true">
             <component
               :is="panel.component"
-              :sessionMode="panel.sessionMode"
-              :color="panel.color" />
+              :sessionMode="panel.sessionMode"/>
           </SplitterPanel>
         </Splitter>
       </div>
