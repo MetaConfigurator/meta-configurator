@@ -110,7 +110,7 @@ export class ManagedJsonSchema {
 
   public reloadSchema() {
     clearPreprocessedRefSchemaCache();
-    this._schemaPreprocessed = ref(preprocessOneTime(this._schemaRaw.value));
+    this._schemaPreprocessed.value = preprocessOneTime(this._schemaRaw.value);
     this.schemaWrapper.value = new TopLevelJsonSchemaWrapper(
       this._schemaPreprocessed.value,
       this.mode

@@ -146,7 +146,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['gui_editor', 'text_editor'],
+            enum: ['gui_editor', 'text_editor', 'schema_diagram'],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },
@@ -161,6 +161,20 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             title: 'Size',
             description: 'The size of the panel in percent of the total width of the editor.',
             minimum: 10,
+          },
+        },
+        if: {
+          properties: {
+            panelType: {
+              const: 'schema_diagram',
+            },
+          },
+        },
+        then: {
+          properties: {
+            mode: {
+              const: 'data_editor',
+            },
           },
         },
       },

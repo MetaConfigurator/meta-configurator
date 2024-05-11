@@ -22,8 +22,10 @@ import {
   faTriangleExclamation,
   faTrashArrowUp,
   faEye,
-  faGaugeHigh,
-  faGaugeSimple,
+  faDiagramProject,
+  faGear,
+  faTextSlash,
+  faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -49,6 +51,7 @@ export function registerIcons() {
   library.add(faShareNodes);
   library.add(faDownload);
   library.add(faGears);
+  library.add(faGear);
   library.add(faDatabase);
   library.add(faGlobe);
   library.add(faMagicWandSparkles);
@@ -61,6 +64,7 @@ export function registerIcons() {
   library.add(faTrashArrowUp);
   library.add(faEye);
   library.add(faEyeRegular);
-  library.add(faGaugeSimple);
-  library.add(faGaugeHigh);
+  library.add(faDiagramProject);
+  library.add(faTextSlash);
+  library.add(faWrench);
 }

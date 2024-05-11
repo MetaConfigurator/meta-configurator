@@ -5,9 +5,7 @@ import type {
   ConfigDataTreeNodeType,
   GuiEditorTreeNode,
 } from '@/components/gui-editor/configDataTreeNode';
-import {TreeNodeType} from '@/components/gui-editor/configDataTreeNode';
-import type {Path, PathElement} from '@/utility/path';
-import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
+import type {Path} from '@/utility/path';
 import {ref} from 'vue';
 import {pathToString} from '@/utility/pathUtils';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -19,14 +17,12 @@ import {getSessionForMode, getUserSelectionForMode} from '@/data/useDataLink';
 import type {ValidationResult} from '@/schema/validationService';
 import {
   getDisplayNameOfNode,
-  getTypeDescription,
-  isAdditionalProperty,
   isDeprecated,
-  isPatternProperty,
   isPropertyNameEditable,
   isRequiredProperty,
   isUseItalicFont,
 } from './configTreeNodeReadingUtils';
+import {getTypeDescription} from '../../schema/schemaReadingUtils';
 
 const props = defineProps<{
   node: GuiEditorTreeNode;
@@ -173,7 +169,7 @@ function focusOnPropertyLabel(): void {
       <span class="text-red-600">{{ isRequiredProperty(node.data) ? '*' : '' }}</span>
     </span>
 
-    <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription(node.data) }}</span>
+    <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription(node.data.schema) }}</span>
     <span
       class="pi pi-pencil ml-3 text-indigo-700"
       v-if="isPropertyNameEditable(props.type) && showPencil"

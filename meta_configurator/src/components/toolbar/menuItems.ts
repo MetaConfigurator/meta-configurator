@@ -166,37 +166,60 @@ export class MenuItems {
         separator: true,
       },
     ];
-    if (
-      useSettings().panels.schema_editor.find(
-        panel => panel.panelType === 'gui_editor' && panel.mode === 'data_editor'
-      )
-    ) {
-      result.push({
-        label: 'Hide preview of resulting GUI',
-        icon: 'fa-regular fa-eye',
-        command: () => {
-          const panels = useSettings().panels;
-          panels.schema_editor = panels.schema_editor.filter(
-            panel =>
-              !(panel.panelType === PanelType.GuiEditor && panel.mode === SessionMode.DataEditor)
-          );
-        },
-      });
-    } else {
-      result.push({
-        label: 'Show preview of resulting GUI',
-        icon: 'fa-solid fa-eye',
-        command: () => {
-          const panels = settings.panels;
-          panels.schema_editor.push({
-            panelType: PanelType.GuiEditor,
-            mode: SessionMode.DataEditor,
-            size: 40,
-          });
-        },
-      });
-    }
 
+    // toggle between showing and hiding the text editor
+    result.push(
+      this.generateTogglePanelButton(
+        SessionMode.SchemaEditor,
+        PanelType.TextEditor,
+        SessionMode.SchemaEditor,
+        'fa-solid fa-text-slash',
+        'fa-solid fa-text-slash',
+        'schema text editor'
+      )
+    );
+
+    // toggle between showing and hiding the GUI editor
+    result.push(
+      this.generateTogglePanelButton(
+        SessionMode.SchemaEditor,
+        PanelType.GuiEditor,
+        SessionMode.SchemaEditor,
+        'fa-solid fa-wrench',
+        'fa-solid fa-wrench',
+        'schema GUI editor'
+      )
+    );
+
+    // toggle between showing and hiding the GUI preview
+    result.push(
+      this.generateTogglePanelButton(
+        SessionMode.SchemaEditor,
+        PanelType.GuiEditor,
+        SessionMode.DataEditor,
+        'fa-regular fa-eye',
+        'fa-solid fa-eye',
+        'preview of resulting GUI'
+      )
+    );
+
+    // toggle between showing and hiding the schema diagram
+    result.push(
+      this.generateTogglePanelButton(
+        SessionMode.SchemaEditor,
+        PanelType.SchemaDiagram,
+        SessionMode.DataEditor,
+        'fa-solid fa-diagram-project',
+        'fa-solid fa-diagram-project',
+        'schema diagram'
+      )
+    );
+
+    result.push({
+      separator: true,
+    });
+
+    // toggle between advanced and simple schema options
     if (
       !useSettings().metaSchema.allowBooleanSchema ||
       !useSettings().metaSchema.allowMultipleTypes ||
@@ -205,7 +228,7 @@ export class MenuItems {
     ) {
       result.push({
         label: 'Enable advanced schema options',
-        icon: 'fa-solid fa-gauge-high',
+        icon: 'fa-solid fa-gear',
         command: () => {
           const metaSchema = useSettings().metaSchema;
           metaSchema.allowBooleanSchema = true;
@@ -217,7 +240,7 @@ export class MenuItems {
     } else {
       result.push({
         label: 'Disable advanced schema options',
-        icon: 'fa-solid fa-gauge-simple',
+        icon: 'fa-solid fa-gear',
         command: () => {
           const metaSchema = useSettings().metaSchema;
           metaSchema.allowBooleanSchema = false;
@@ -230,6 +253,45 @@ export class MenuItems {
     }
 
     return result;
+  }
+
+  private generateTogglePanelButton(
+    buttonMode: SessionMode,
+    panelType: PanelType,
+    panelMode: SessionMode,
+    iconNameEnabled: string,
+    iconNameDisabled: string,
+    description: string
+  ) {
+    if (
+      useSettings().panels[buttonMode].find(
+        panel => panel.panelType === panelType && panel.mode === panelMode
+      )
+    ) {
+      return {
+        label: `Hide ${description}`,
+        icon: iconNameDisabled,
+        command: () => {
+          const panels = useSettings().panels;
+          panels[buttonMode] = panels[buttonMode].filter(
+            panel => !(panel.panelType === panelType && panel.mode === panelMode)
+          );
+        },
+      };
+    } else {
+      return {
+        label: `Show ${description}`,
+        icon: iconNameEnabled,
+        command: () => {
+          const panels = useSettings().panels;
+          panels[buttonMode].push({
+            panelType: panelType,
+            mode: panelMode,
+            size: 40,
+          });
+        },
+      };
+    }
   }
 
   public getSettingsMenuItems(settings: SettingsInterfaceRoot) {

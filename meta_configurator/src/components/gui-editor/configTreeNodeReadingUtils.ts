@@ -4,7 +4,6 @@ import type {
 } from '@/components/gui-editor/configDataTreeNode';
 import type {GuiEditorTreeNode} from '@/components/gui-editor/configDataTreeNode';
 import type {PathElement} from '@/utility/path';
-import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import {TreeNodeType} from '@/components/gui-editor/configDataTreeNode';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 
@@ -22,33 +21,6 @@ export function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
   }
   // array index
   return (node.data.parentName || node.data.parentSchema?.title || 'element') + '[' + name + ']';
-}
-
-/**
- * Returns a string representation of the type of the property.
- * This does not necessarily match one of the JSON schema types,
- * e.g, it returns 'enum' if the property has an enum.
- */
-export function getTypeDescription(nodeData: ConfigTreeNodeData): string {
-  if (nodeData.schema.enum) {
-    return 'enum';
-  }
-  if (nodeData.schema.oneOf.length > 0) {
-    return 'oneOf';
-  }
-  if (nodeData.schema.anyOf.length > 0) {
-    return 'anyOf';
-  }
-
-  const type = nodeData.schema.type;
-  if (Array.isArray(type)) {
-    if (type.length === NUMBER_OF_PROPERTY_TYPES) {
-      return 'any';
-    }
-    return type.join(', ');
-  }
-
-  return type;
 }
 
 export function isAdditionalProperty(nodeType: ConfigDataTreeNodeType): boolean {
