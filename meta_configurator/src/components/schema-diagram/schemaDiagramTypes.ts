@@ -1,12 +1,8 @@
-import type {Path, PathElement} from '@/utility/path';
+import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
 import {useLayout} from '@/components/schema-diagram/useLayout';
 import {MarkerType} from '@vue-flow/core';
-import type {
-  JsonSchemaObjectType,
-  JsonSchemaType,
-  SchemaPropertyTypes,
-} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
 
 export class SchemaGraph {
   public constructor(public nodes: SchemaObjectNodeData[], public edges: EdgeData[]) {}
