@@ -24,7 +24,7 @@ import {
   faEye,
   faDiagramProject,
   faGear,
-  faTextSlash,
+  faCode,
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -65,6 +65,6 @@ export function registerIcons() {
   library.add(faEye);
   library.add(faEyeRegular);
   library.add(faDiagramProject);
-  library.add(faTextSlash);
+  library.add(faCode);
   library.add(faWrench);
 }

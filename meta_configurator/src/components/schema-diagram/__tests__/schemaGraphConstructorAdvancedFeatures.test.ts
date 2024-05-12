@@ -277,5 +277,7 @@ describe('test schema graph constructor with objects and attributes with advance
     expect(graph.edges[7].end.absolutePath).toEqual(['then']);
     expect(graph.edges[7].edgeType).toEqual(EdgeType.THEN);
     expect(graph.edges[7].label).toEqual(EdgeType.THEN);
+
+    // TODO: add a test for disconnected objects
   });
 });

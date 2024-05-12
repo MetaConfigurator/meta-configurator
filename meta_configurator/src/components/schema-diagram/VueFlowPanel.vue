@@ -9,6 +9,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
 import type {Edge, Node} from '@/components/schema-diagram/schemaDiagramTypes';
+import SchemaEnumNode from '@/components/schema-diagram/SchemaEnumNode.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -59,6 +60,9 @@ async function layoutGraph(direction) {
     <VueFlow :nodes="currentNodes" :edges="currentEdges" @nodes-initialized="layoutGraph('TB')">
       <template #node-schemaobject="props">
         <SchemaObjectNode :data="props.data" />
+      </template>
+      <template #node-schemaenum="props">
+        <SchemaEnumNode :data="props.data" />
       </template>
     </VueFlow>
   </div>

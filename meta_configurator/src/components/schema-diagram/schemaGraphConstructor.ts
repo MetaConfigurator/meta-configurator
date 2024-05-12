@@ -2,6 +2,7 @@ import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schem
 import {
   EdgeData,
   EdgeType,
+  SchemaEnumNodeData,
   SchemaGraph,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
@@ -35,7 +36,7 @@ export function constructSchemaGraph(rootSchema: TopLevelSchema): SchemaGraph {
   for (const [path, node] of objectDefs.entries()) {
     schemaGraph.nodes.push(node);
 
-    if (node.schema.type == 'object') {
+    if (isObjectSchema(node.schema)) {
       node.attributes = generateObjectAttributes(node.absolutePath, node.schema, objectDefs);
       generateAttributeEdges(node, objectDefs, schemaGraph);
       generateObjectSpecialPropertyEdges(node, objectDefs, schemaGraph);
@@ -152,7 +153,16 @@ function injectTypeObjectIntoSchema(schema: JsonSchemaType) {
 }
 
 function generateInitialNode(path: Path, schema: JsonSchemaObjectType): SchemaObjectNodeData {
-  return new SchemaObjectNodeData(generateObjectTitle(path, schema), path, schema, []);
+  if (!isEnumSchema(schema)) {
+    return new SchemaObjectNodeData(generateObjectTitle(path, schema), path, schema, []);
+  } else {
+    return new SchemaEnumNodeData(
+      generateObjectTitle(path, schema),
+      path,
+      schema,
+      generateEnumValues(schema)
+    );
+  }
 }
 
 export function generateObjectTitle(path: Path, schema?: JsonSchemaObjectType): string {
@@ -202,6 +212,23 @@ export function generateObjectAttributes(
   return attributes;
 }
 
+function generateEnumValues(schema: JsonSchemaObjectType): string[] {
+  if (schema.enum) {
+    // @ts-ignore
+    let result = schema.enum.map(value => value.toString());
+    // TODO: make this a parameter
+    if (result.length > 10) {
+      result = result.slice(0, 10);
+      result.push('...');
+    }
+    return result;
+  }
+  if (schema.const) {
+    return [schema.const.toString()];
+  }
+  return [];
+}
+
 export function generateAttributeTypeDescription(
   path: Path,
   schema: JsonSchemaObjectType,
@@ -226,14 +253,14 @@ export function generateAttributeTypeDescription(
         typeDescription = getTypeDescription(arrayItemObject.schema) + '[]';
       }
     } else {
-      if (typeof schema.items === 'object') {
-        typeDescription = getTypeDescription(schema.items) + '[]';
+      if (isObjectSchema(schema.items)) {
+        typeDescription = getTypeDescription(schema.items as JsonSchemaObjectType) + '[]';
       }
     }
   }
 
   // if data type is an object, overwrite with actual name of the object definition
-  if (schema.type == 'object') {
+  if (isObjectSchema(schema)) {
     const attributeNode = resolveObjectAttributeNode(path, schema, objectDefs);
     if (attributeNode) {
       typeDescription = attributeNode.name;
@@ -267,7 +294,7 @@ export function generateAttributeEdges(
       }
     }
 
-    if (attrSchema.type == 'object') {
+    if (isObjectSchema(attrSchema) || isEnumSchema(attrSchema)) {
       if (!attributeNode) {
         attributeNode = resolveObjectAttributeNode(attribute.absolutePath, attrSchema, objectDefs);
       }
@@ -327,7 +354,7 @@ function resolveObjectAttributeNode(
   schema: JsonSchemaObjectType,
   objectDefs: Map<string, SchemaObjectNodeData>
 ): SchemaObjectNodeData | undefined {
-  if (schema.type == 'object') {
+  if (isObjectSchema(schema)) {
     return objectDefs.get(pathToString(path));
   }
   return undefined;
@@ -411,6 +438,35 @@ export function generateObjectSpecialPropertyEdges(
   }
 }
 
+function isObjectSchema(schema: JsonSchemaType): boolean {
+  if (schema === true || schema === false) {
+    return false;
+  }
+  if (schema.type == 'object') {
+    return true;
+  }
+  // check if schema.type itself is a list of types, that contains the 'object' string
+  if (Array.isArray(schema.type)) {
+    return schema.type.includes('object');
+  }
+
+  if (schema.type === undefined) {
+    return schema.properties !== undefined;
+  }
+
+  return false;
+}
+
+function isEnumSchema(schema: JsonSchemaType): boolean {
+  if (schema === true || schema === false) {
+    return false;
+  }
+  if (schema.enum || schema.const) {
+    return true;
+  }
+  return false;
+}
+
 function generateObjectSubSchemasEdge(
   node: SchemaObjectNodeData,
   subSchemas: JsonSchemaType[],
@@ -457,5 +513,8 @@ export function trimGraph(graph: SchemaGraph) {
   });
 }
 function isNodeConnectedByEdge(node: SchemaObjectNodeData, graph: SchemaGraph): boolean {
-  return graph.edges.find(edge => edge.start == node || edge.end == node) !== undefined;
+  return (
+    graph.edges.find(edge => edge.start == node || edge.end == node) !== undefined ||
+    node.schema.type == 'object'
+  );
 }

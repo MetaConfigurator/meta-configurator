@@ -173,8 +173,8 @@ export class MenuItems {
         SessionMode.SchemaEditor,
         PanelType.TextEditor,
         SessionMode.SchemaEditor,
-        'fa-solid fa-text-slash',
-        'fa-solid fa-text-slash',
+        'fa-solid fa-code',
+        'fa-solid fa-code',
         'schema text editor'
       )
     );

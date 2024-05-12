@@ -21,7 +21,7 @@ export class SchemaGraph {
         id: pathToNodeId(data.absolutePath),
         position: {x: Math.random() * 500, y: Math.random() * 500},
         label: data.name,
-        type: 'schemaobject',
+        type: data.getNodeType(),
         data: data,
       };
     });
@@ -138,6 +138,24 @@ export class SchemaObjectNodeData {
     public schema: JsonSchemaObjectType,
     public attributes: SchemaObjectAttributeData[]
   ) {}
+
+  public getNodeType() {
+    return 'schemaobject';
+  }
+}
+
+export class SchemaEnumNodeData extends SchemaObjectNodeData {
+  public constructor(
+    public name: string,
+    public absolutePath: Path,
+    public schema: JsonSchemaObjectType,
+    public values: string[]
+  ) {
+    super(name, absolutePath, schema, []);
+  }
+  public getNodeType() {
+    return 'schemaenum';
+  }
 }
 
 export class SchemaObjectAttributeData {
