@@ -1,6 +1,6 @@
-import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
-import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
-import SchemaDiagramPanel from '@/components/schema-diagram/SchemaDiagramPanel.vue';
+import CodeEditorPanel from '@/components/panels/code-editor/CodeEditorPanel.vue';
+import GuiEditorPanel from '@/components/panels/gui-editor/GuiEditorPanel.vue';
+import SchemaDiagramPanel from '@/components/panels/schema-diagram/SchemaDiagramPanel.vue';
 
 export enum PanelType {
   GuiEditor = 'gui_editor',

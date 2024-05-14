@@ -6,6 +6,7 @@ export interface SettingsInterfaceRoot {
   dataFormat: DataFormat;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
+  schemaDiagram: SettingsInterfaceSchemaDiagram;
   metaSchema: SettingsInterfaceMetaSchema;
   hideSchemaEditor: boolean;
   panels: SettingsInterfacePanels;
@@ -19,6 +20,18 @@ export interface SettingsInterfaceGuiEditor {
   maximumDepth: number;
   propertySorting: PropertySorting;
 }
+
+export interface SettingsInterfaceSchemaDiagram {
+  vertical: boolean;
+  showAttributes: boolean;
+  showEnumValues: boolean;
+  maxAttributesToShow: number;
+  maxEnumValuesToShow: number;
+  moveViewToSelectedElement: boolean;
+  automaticZoomMaxValue: number;
+  automaticZoomMinValue: number;
+}
+
 export interface SettingsInterfacePanels {
   data_editor: SettingsInterfacePanel[];
   schema_editor: SettingsInterfacePanel[];
@@ -32,7 +45,6 @@ export interface SettingsInterfacePanel {
 }
 
 export interface SettingsInterfaceMetaSchema {
-  showAdditionalPropertiesButton: boolean;
   allowBooleanSchema: boolean;
   allowMultipleTypes: boolean;
   objectTypesComfort: boolean;

@@ -6,7 +6,7 @@ import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import type {SearchResult} from '@/utility/search';
 import {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
-import type {ConfigDataTreeNode} from '@/components/gui-editor/configDataTreeNode';
+import type {ConfigDataTreeNode} from '@/components/panels/gui-editor/configDataTreeNode';
 
 export class ManagedSession {
   constructor(public mode: SessionMode) {}
