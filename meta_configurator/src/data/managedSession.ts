@@ -97,6 +97,6 @@ export class ManagedSession {
   );
 
   public schemaAtCurrentPath: any = computed(() =>
-    getSchemaForMode(this.mode).schemaAtPath(this._currentPath.value)
+    getSchemaForMode(this.mode).schemaWrapperAtPath(this._currentPath.value)
   );
 }

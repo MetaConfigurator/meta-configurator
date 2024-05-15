@@ -12,26 +12,15 @@ import '@vue-flow/core/dist/style.css';
 import '@vue-flow/core/dist/theme-default.css';
 import VueFlowPanel from '@/components/panels/schema-diagram/VueFlowPanel.vue';
 
-const props = defineProps<{}>();
-
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
-const dataSession = getSessionForMode(SessionMode.DataEditor);
 
-const currentSchema = computed(() => {
-  const schema = dataSession.effectiveSchemaAtCurrentPath?.value.schema;
-  if (!schema) {
-    return new JsonSchemaWrapper({}, dataSession.mode, false);
-  }
-  return schema;
-});
-
-function zoomIntoPath(pathToAdd: Path) {
-  schemaSession.updateCurrentPath(schemaSession.currentPath.value.concat(pathToAdd));
-  schemaSession.updateCurrentSelectedElement(schemaSession.currentPath.value);
+function zoomIntoPath(pathAbsolute: Path) {
+  schemaSession.updateCurrentPath(pathAbsolute);
+  schemaSession.updateCurrentSelectedElement(pathAbsolute);
 }
 
-function selectPath(path: Path) {
-  schemaSession.updateCurrentSelectedElement(path);
+function selectPath(pathAbsolute: Path) {
+  schemaSession.updateCurrentSelectedElement(pathAbsolute);
 }
 </script>
 
@@ -39,9 +28,8 @@ function selectPath(path: Path) {
   <div class="p-5 space-y-3 flex flex-col">
     <div class="flex-grow overflow-y-auto">
       <VueFlowPanel
-        :currentPath="schemaSession.currentPath.value"
-        @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
-        @select_path="selectedPath => selectPath(selectedPath)" />
+        @zoom_into_path_absolute="path => zoomIntoPath(path)"
+        @select_path_absolute="path => selectPath(path)" />
     </div>
   </div>
 </template>

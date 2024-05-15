@@ -14,9 +14,13 @@ export function findBestMatchingNode(nodes: Node[], selectedPath: Path): Node | 
   );
   if (matchingNode) {
     return matchingNode;
-  } else {
+  }
+
+  if (selectedPath.length > 0) {
     return findBestMatchingNode(nodes, selectedPath.slice(0, -1));
   }
+
+  return undefined;
 }
 
 export function findBestMatchingData(

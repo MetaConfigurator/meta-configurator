@@ -1,11 +1,10 @@
 import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
-import {useLayout} from '@/components/panels/schema-diagram/useLayout';
 import {MarkerType} from '@vue-flow/core';
 import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
 
 export class SchemaGraph {
-  public constructor(public nodes: SchemaElementData[], public edges: EdgeData[]) {}
+  public constructor(public nodes: SchemaNodeData[], public edges: EdgeData[]) {}
 
   public findNode(path: Path | string): SchemaElementData | undefined {
     if (typeof path !== 'string') {
@@ -59,7 +58,7 @@ export class SchemaGraph {
       }
 
       return {
-        id: pathsToEdgeId(data.start.absolutePath, data.end.absolutePath),
+        id: pathsToEdgeId(data.start.absolutePath, data.end.absolutePath, data.label, data.isArray),
         source: pathToNodeId(data.start.absolutePath),
         target: pathToNodeId(data.end.absolutePath),
         type: type,
@@ -81,10 +80,6 @@ export class SchemaGraph {
 
 export class VueFlowGraph {
   public constructor(public nodes: Node[], public edges: Edge[]) {}
-
-  public updateLayout(direction: string) {
-    this.nodes = useLayout().layout(this.nodes, this.edges, direction);
-  }
 }
 
 export interface Node {
@@ -104,8 +99,8 @@ export interface Edge {
   animated: boolean;
 }
 
-export function pathsToEdgeId(start: Path, end: Path): string {
-  return '- ' + pathToNodeId(start) + ' - ' + pathToNodeId(end) + ' ->';
+export function pathsToEdgeId(start: Path, end: Path, label: string, isArray: boolean): string {
+  return pathToNodeId(start) + '--[' + label + isArray ? '_array' : '' + ']-->' + pathToNodeId(end);
 }
 
 export function pathToNodeId(path: Path): string {

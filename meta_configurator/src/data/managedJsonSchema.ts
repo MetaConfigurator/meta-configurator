@@ -64,7 +64,7 @@ export class ManagedJsonSchema {
   /**
    * Returns the schema at the given path.
    */
-  public schemaAtPath(path: Path): JsonSchemaWrapper {
+  public schemaWrapperAtPath(path: Path): JsonSchemaWrapper {
     return (
       this.schemaWrapper.value.subSchemaAt(path) ?? new JsonSchemaWrapper({}, this.mode, false)
     );

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  Node,
   SchemaElementData,
   SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
@@ -18,10 +17,15 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
+  (e: 'zoom_into_element', path: Path): void;
 }>();
 
 function clickedNode() {
   emit('select_element', props.data.absolutePath);
+}
+
+function doubleClickedNode() {
+  emit('zoom_into_element', props.data.absolutePath);
 }
 
 function clickedAttribute(path: Path) {
@@ -36,7 +40,8 @@ function isHighlighted() {
 <template>
   <div
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaobject': !isHighlighted}"
-    @click="clickedNode()">
+    @click="clickedNode()"
+    @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
     <!--small><i>{{ props.data.absolutePath }}</i></small-->
     <b>{{ props.data.name }}</b>
