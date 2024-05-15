@@ -7,8 +7,11 @@ import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
 export class SchemaGraph {
   public constructor(public nodes: SchemaElementData[], public edges: EdgeData[]) {}
 
-  public findNode(path: Path): SchemaElementData | undefined {
-    return this.nodes.find(node => pathToString(node.absolutePath) === pathToString(path));
+  public findNode(path: Path | string): SchemaElementData | undefined {
+    if (typeof path !== 'string') {
+      path = pathToString(path);
+    }
+    return this.nodes.find(node => pathToString(node.absolutePath) === path);
   }
 
   private toVueFlowNodes(): Node[] {
@@ -31,8 +34,6 @@ export class SchemaGraph {
 
       switch (data.edgeType) {
         case EdgeType.ATTRIBUTE:
-          break;
-        case EdgeType.ARRAY_ATTRIBUTE:
           break;
         case EdgeType.ALL_OF:
           color = 'seagreen';
@@ -127,7 +128,13 @@ export class SchemaElementData {
   }
 }
 
-export class SchemaObjectNodeData extends SchemaElementData {
+export class SchemaNodeData extends SchemaElementData {
+  public constructor(name: string, absolutePath: Path, schema: JsonSchemaObjectType) {
+    super(name, absolutePath, schema);
+  }
+}
+
+export class SchemaObjectNodeData extends SchemaNodeData {
   public constructor(
     name: string,
     absolutePath: Path,
@@ -142,7 +149,7 @@ export class SchemaObjectNodeData extends SchemaElementData {
   }
 }
 
-export class SchemaEnumNodeData extends SchemaElementData {
+export class SchemaEnumNodeData extends SchemaNodeData {
   public constructor(
     public name: string,
     public absolutePath: Path,
@@ -160,6 +167,7 @@ export class SchemaObjectAttributeData extends SchemaElementData {
   public constructor(
     name: string,
     public typeDescription: string,
+    public propertyType: 'properties' | 'patternProperties',
     absolutePath: Path,
     public deprecated: boolean,
     public required: boolean,
@@ -171,16 +179,16 @@ export class SchemaObjectAttributeData extends SchemaElementData {
 
 export class EdgeData {
   public constructor(
-    public start: SchemaObjectNodeData,
-    public end: SchemaObjectNodeData,
+    public start: SchemaNodeData,
+    public end: SchemaNodeData,
     public edgeType: EdgeType,
+    public isArray: boolean,
     public label: string
   ) {}
 }
 
 export enum EdgeType {
   ATTRIBUTE = 'attribute',
-  ARRAY_ATTRIBUTE = 'array_attribute',
   ALL_OF = 'allOf',
   ANY_OF = 'anyOf',
   ONE_OF = 'oneOf',
@@ -188,4 +196,5 @@ export enum EdgeType {
   THEN = 'then',
   ELSE = 'else',
   ADDITIONAL_PROPERTIES = 'additionalProperties',
+  PATTERN_PROPERTIES = 'patternProperties',
 }

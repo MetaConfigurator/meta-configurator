@@ -12,8 +12,8 @@ import type {Edge, Node} from '@/components/panels/schema-diagram/schemaDiagramT
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
 import {
-  identifyBestMatchingData,
-  identifyBestMatchingNode,
+  findBestMatchingData,
+  findBestMatchingNode,
 } from '@/components/panels/schema-diagram/schemaDiagramHelper';
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 
@@ -59,9 +59,9 @@ watch(
   schemaSession.currentSelectedElement,
   () => {
     const absolutePath = schemaSession.currentSelectedElement.value;
-    const bestMatchingNode = identifyBestMatchingNode(currentNodes.value, absolutePath);
+    const bestMatchingNode = findBestMatchingNode(currentNodes.value, absolutePath);
     selectedNode.value = bestMatchingNode;
-    selectedData.value = identifyBestMatchingData(bestMatchingNode, absolutePath);
+    selectedData.value = findBestMatchingData(bestMatchingNode, absolutePath);
     if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
       nextTick(() => {
         fitView({

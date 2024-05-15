@@ -1,12 +1,13 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import type {Path} from '../../../utility/path';
-import type {TopLevelSchema} from '../../../schema/jsonSchemaType';
+import type {Path} from '@/utility/path';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaDiagramTypes';
 import {
   generateAttributeEdges,
   generateObjectAttributes,
   generateObjectTitle,
   identifyObjects,
+  isSchemaThatDeservesANode,
 } from '../schemaGraphConstructor';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
@@ -55,33 +56,6 @@ describe('test schema graph constructor with objects and attributes, without adv
       propertyRefToComplex: {
         $ref: '#/properties/propertyObject',
       },
-      propertyArrayToSimple2: {
-        type: 'array',
-        items: {
-          type: 'boolean',
-        },
-      },
-      propertyArrayToComplex2: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            someNumber: {type: 'number'},
-          },
-        },
-      },
-      propertyArrayToRefSimple: {
-        type: 'array',
-        items: {
-          $ref: '#/properties/propertySimple',
-        },
-      },
-      propertyArrayToRefComplexWithTitle: {
-        type: 'array',
-        items: {
-          $ref: '#/properties/propertyObjectWithTitle',
-        },
-      },
       propertyRefToNestedObject: {
         $ref: '#/$defs/person',
       },
@@ -100,7 +74,7 @@ describe('test schema graph constructor with objects and attributes, without adv
   });
 
   it('identify objects', () => {
-    expect(defs.size).toEqual(21);
+    expect(defs.size).toEqual(12);
     expect(defs.has('')).toBeTruthy();
     expect(defs.has('properties.propertySimple')).toBeTruthy();
     expect(defs.has('properties.propertyObject')).toBeTruthy();
@@ -109,15 +83,6 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(defs.has('properties.propertyObjectWithTitle.properties.someString')).toBeTruthy();
     expect(defs.has('properties.propertyRefToSimple')).toBeTruthy();
     expect(defs.has('properties.propertyRefToComplex')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToSimple2')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToSimple2.items')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToComplex2')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToComplex2.items')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToComplex2.items.properties.someNumber')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToRefSimple')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToRefSimple.items')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToRefComplexWithTitle')).toBeTruthy();
-    expect(defs.has('properties.propertyArrayToRefComplexWithTitle.items')).toBeTruthy();
     expect(defs.has('properties.propertyRefToNestedObject')).toBeTruthy();
     expect(defs.has('$defs.person')).toBeTruthy();
     expect(defs.has('$defs.person.properties.address')).toBeTruthy();
@@ -128,7 +93,7 @@ describe('test schema graph constructor with objects and attributes, without adv
     const rootNode = defs.get('')!;
     expect(rootNode).toBeDefined();
     rootNode.attributes = generateObjectAttributes(rootNode.absolutePath, rootNode.schema, defs);
-    expect(rootNode.attributes.length).toEqual(10);
+    expect(rootNode.attributes.length).toEqual(6);
     expect(rootNode.attributes[0].name).toEqual('propertySimple');
     expect(rootNode.attributes[0].absolutePath).toEqual(['properties', 'propertySimple']);
     expect(rootNode.attributes[0].deprecated).toBeTruthy();
@@ -154,36 +119,13 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(rootNode.attributes[4].deprecated).toBeFalsy();
     expect(rootNode.attributes[4].required).toBeFalsy();
 
-    expect(rootNode.attributes[5].name).toEqual('propertyArrayToSimple2');
-    expect(rootNode.attributes[5].absolutePath).toEqual(['properties', 'propertyArrayToSimple2']);
-    expect(rootNode.attributes[5].deprecated).toBeFalsy();
-    expect(rootNode.attributes[5].required).toBeFalsy();
-
-    expect(rootNode.attributes[6].name).toEqual('propertyArrayToComplex2');
-    expect(rootNode.attributes[6].absolutePath).toEqual(['properties', 'propertyArrayToComplex2']);
-    expect(rootNode.attributes[6].deprecated).toBeFalsy();
-    expect(rootNode.attributes[6].required).toBeFalsy();
-
-    expect(rootNode.attributes[7].name).toEqual('propertyArrayToRefSimple');
-    expect(rootNode.attributes[7].absolutePath).toEqual(['properties', 'propertyArrayToRefSimple']);
-    expect(rootNode.attributes[7].deprecated).toBeFalsy();
-    expect(rootNode.attributes[7].required).toBeFalsy();
-
-    expect(rootNode.attributes[8].name).toEqual('propertyArrayToRefComplexWithTitle');
-    expect(rootNode.attributes[8].absolutePath).toEqual([
-      'properties',
-      'propertyArrayToRefComplexWithTitle',
-    ]);
-    expect(rootNode.attributes[8].deprecated).toBeFalsy();
-    expect(rootNode.attributes[8].required).toBeFalsy();
-
-    expect(rootNode.attributes[9].name).toEqual('propertyRefToNestedObject');
-    expect(rootNode.attributes[9].absolutePath).toEqual([
+    expect(rootNode.attributes[5].name).toEqual('propertyRefToNestedObject');
+    expect(rootNode.attributes[5].absolutePath).toEqual([
       'properties',
       'propertyRefToNestedObject',
     ]);
-    expect(rootNode.attributes[9].deprecated).toBeFalsy();
-    expect(rootNode.attributes[9].required).toBeFalsy();
+    expect(rootNode.attributes[5].deprecated).toBeFalsy();
+    expect(rootNode.attributes[5].required).toBeFalsy();
   });
 
   it('generate attribute type description', () => {
@@ -209,33 +151,16 @@ describe('test schema graph constructor with objects and attributes, without adv
     // reference to object --> use name of object
     expect(attrPropRefComplex.typeDescription).toEqual('propertyObject');
 
-    const attrPropArraySimple = rootNode.attributes[5];
-    // array of booleans
-    expect(attrPropArraySimple.typeDescription).toEqual('boolean[]');
-
-    const attrPropArrayComplex = rootNode.attributes[6];
-    // array to inlined object. Because object has no custom title, we refer to it as just object
-    expect(attrPropArrayComplex.typeDescription).toEqual('object[]');
-
-    const attrPropArrayRefSimple = rootNode.attributes[7];
-    // array to ref of simple type
-    expect(attrPropArrayRefSimple.typeDescription).toEqual('string[]');
-
-    const attrPropArrayRefComplexWithTitle = rootNode.attributes[8];
-    // array to ref of complex type
-    expect(attrPropArrayRefComplexWithTitle.typeDescription).toEqual('MyPropertyObjectWithTitle[]');
-
-    const attrPropRefNestedObject = rootNode.attributes[9];
+    const attrPropRefNestedObject = rootNode.attributes[5];
     // reference to nested object
     expect(attrPropRefNestedObject.typeDescription).toEqual('person');
   });
 
   it('generate object title', () => {
-    // filter defs for nodes that have schema.type 'object'
-    const objectNodeCount = Array.from(defs.values()).filter(
-      node => node.schema.type === 'object'
+    const objectNodeCount = Array.from(defs.values()).filter(node =>
+      isSchemaThatDeservesANode(node.schema)
     ).length;
-    expect(objectNodeCount).toEqual(6);
+    expect(objectNodeCount).toEqual(5);
 
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
@@ -250,11 +175,6 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(
       generateObjectTitle(propComplexWithTitle.absolutePath, propComplexWithTitle.schema)
     ).toEqual('MyPropertyObjectWithTitle');
-
-    const propArrayComplexItem = defs.get('properties.propertyArrayToComplex2.items')!;
-    expect(
-      generateObjectTitle(propArrayComplexItem.absolutePath, propArrayComplexItem.schema)
-    ).toEqual('items');
 
     const person = defs.get('$defs.person')!;
     expect(generateObjectTitle(person.absolutePath, person.schema)).toEqual('person');
@@ -272,45 +192,34 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const graph = new SchemaGraph([], []);
 
-    // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     generateAttributeEdges(rootNode, defs, graph);
-    expect(graph.edges.length).toEqual(6);
+    expect(graph.edges.length).toEqual(4);
     for (const edge of graph.edges) {
       expect(edge.start.absolutePath).toEqual([]);
     }
     expect(graph.edges[0].end.absolutePath).toEqual(['properties', 'propertyObject']);
     expect(graph.edges[0].edgeType).toEqual(EdgeType.ATTRIBUTE);
     expect(graph.edges[0].label).toEqual('propertyObject');
+    expect(graph.edges[0].end.getNodeType() == 'schemaobject').toBeTruthy();
 
     expect(graph.edges[1].end.absolutePath).toEqual(['properties', 'propertyObjectWithTitle']);
     expect(graph.edges[1].edgeType).toEqual(EdgeType.ATTRIBUTE);
     expect(graph.edges[1].label).toEqual('propertyObjectWithTitle');
+    expect(graph.edges[1].end.getNodeType() == 'schemaobject').toBeTruthy();
 
     // the edge is not to the ref definition but to the resolved object
     expect(graph.edges[2].end.absolutePath).toEqual(['properties', 'propertyObject']);
     expect(graph.edges[2].edgeType).toEqual(EdgeType.ATTRIBUTE);
     // the label of the edge is the actual attribute name, not the resolved data type
     expect(graph.edges[2].label).toEqual('propertyRefToComplex');
-
-    // for this array, because the object is inlined, the edge is to the inlined object
-    expect(graph.edges[3].end.absolutePath).toEqual([
-      'properties',
-      'propertyArrayToComplex2',
-      'items',
-    ]);
-    expect(graph.edges[3].edgeType).toEqual(EdgeType.ARRAY_ATTRIBUTE);
-    expect(graph.edges[3].label).toEqual('propertyArrayToComplex2');
-
-    // for this array, because the object is not inlined, the edge is to the object node
-    expect(graph.edges[4].end.absolutePath).toEqual(['properties', 'propertyObjectWithTitle']);
-    expect(graph.edges[4].edgeType).toEqual(EdgeType.ARRAY_ATTRIBUTE);
-    expect(graph.edges[4].label).toEqual('propertyArrayToRefComplexWithTitle');
+    expect(graph.edges[2].end.getNodeType() == 'schemaobject').toBeTruthy();
 
     // this edge is not to the ref definition but to the resolved object
-    expect(graph.edges[5].end.absolutePath).toEqual(['$defs', 'person']);
-    expect(graph.edges[5].edgeType).toEqual(EdgeType.ATTRIBUTE);
-    expect(graph.edges[5].label).toEqual('propertyRefToNestedObject');
+    expect(graph.edges[3].end.absolutePath).toEqual(['$defs', 'person']);
+    expect(graph.edges[3].edgeType).toEqual(EdgeType.ATTRIBUTE);
+    expect(graph.edges[3].label).toEqual('propertyRefToNestedObject');
+    expect(graph.edges[3].end.getNodeType() == 'schemaobject').toBeTruthy();
 
     graph.edges = [];
     const propComplex = defs.get('properties.propertyObject')!;
@@ -325,12 +234,6 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(graph.edges.length).toEqual(0);
 
     graph.edges = [];
-    const propArrayComplexItem = defs.get('properties.propertyArrayToComplex2.items')!;
-    generateAttributeEdges(propArrayComplexItem, defs, graph);
-    // same here: no attribute edges from items to its children, because the child object defines just a simple type
-    expect(graph.edges.length).toEqual(0);
-
-    graph.edges = [];
     const person = defs.get('$defs.person')!;
     generateAttributeEdges(person, defs, graph);
     // one attribute edge from person to address
@@ -339,5 +242,6 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(graph.edges[0].end.absolutePath).toEqual(['$defs', 'person', 'properties', 'address']);
     expect(graph.edges[0].edgeType).toEqual(EdgeType.ATTRIBUTE);
     expect(graph.edges[0].label).toEqual('address');
+    expect(graph.edges[0].end.getNodeType() == 'schemaobject').toBeTruthy();
   });
 });

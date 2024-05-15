@@ -68,6 +68,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'moveViewToSelectedElement',
         'automaticZoomMaxValue',
         'automaticZoomMinValue',
+        'mergeAllOfs',
       ],
       additionalProperties: false,
       description: 'Settings of the schema diagram.',
@@ -120,6 +121,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description:
             'The minimum zoom level of the automatic zoom in the schema diagram, which happens whenever the view moves to a selected element.',
           default: 0.5,
+        },
+        mergeAllOfs: {
+          type: 'boolean',
+          description:
+            'If set to true, allOf schemas will be merged in the schema diagram. This can make the diagram more readable, but sometimes also is not desired, because some information gets lost.',
+          default: true,
         },
       },
     },

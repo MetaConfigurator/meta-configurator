@@ -7,7 +7,3 @@ import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 export function useSettings(): SettingsInterfaceRoot {
   return useDataSource().settingsData.value;
 }
-
-export function setSettings(settings: SettingsInterfaceRoot): void {
-  useDataSource().settingsData.value = settings;
-}
