@@ -31,6 +31,7 @@ export interface SettingsInterfaceSchemaDiagram {
   automaticZoomMaxValue: number;
   automaticZoomMinValue: number;
   mergeAllOfs: boolean;
+  showOptionsPanel: boolean;
 }
 
 export interface SettingsInterfacePanels {

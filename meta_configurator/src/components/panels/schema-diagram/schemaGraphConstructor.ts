@@ -556,7 +556,9 @@ function generateObjectSubSchemaEdge(
 ) {
   const [edgeTargetNode, isArray] = resolveEdgeTarget(node, subSchema, subSchemaPath, objectDefs);
   if (edgeTargetNode) {
-    graph.edges.push(new EdgeData(node, edgeTargetNode, edgeType, isArray, edgeType));
+    graph.edges.push(
+      new EdgeData(node, edgeTargetNode, edgeType, isArray, edgeType + (isArray ? ' to array' : ''))
+    );
   }
 }
 

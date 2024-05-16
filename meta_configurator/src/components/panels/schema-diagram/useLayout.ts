@@ -34,7 +34,9 @@ export function useLayout() {
     }
 
     for (const edge of edges) {
-      dagreGraph.setEdge(edge.source, edge.target);
+      dagreGraph.setEdge(edge.source, edge.target, {
+        width: 80,
+      });
     }
 
     dagre.layout(dagreGraph);

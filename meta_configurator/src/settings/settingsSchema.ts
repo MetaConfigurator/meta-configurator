@@ -128,6 +128,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'If set to true, allOf schemas will be merged in the schema diagram. This can make the diagram more readable, but sometimes also is not desired, because some information gets lost.',
           default: true,
         },
+        showOptionsPanel: {
+          type: 'boolean',
+          description:
+            'If set to true, an options panel will be shown in the schema diagram, where the user can configure the settings of the schema diagram.',
+          default: false,
+        },
       },
     },
     metaSchema: {

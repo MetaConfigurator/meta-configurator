@@ -243,7 +243,9 @@ function addItem(relativePath: Path, newValue: any) {
 
   // focus on "add item" element (which id is the path of the array + 1
   // on the last element of the path)
-  const pathToAddItem = relativePath.slice(0, -1).concat(relativePath[relativePath.length - 1] + 1);
+  const pathToAddItem = relativePath
+    .slice(0, -1)
+    .concat((relativePath[relativePath.length - 1] as number) + 1);
   focusOnPath(props.currentPath.concat(pathToAddItem));
 }
 
@@ -396,12 +398,12 @@ function expandElementsByPath(relativePath: Path) {
     const relativePathToExpand = relativePath.slice(0, relativePathToExpandLength);
     const absolutePathToExpand = pathToString(props.currentPath.concat(relativePathToExpand));
 
-    let childNodeToExpand = undefined;
+    let childNodeToExpand: GuiEditorTreeNode | undefined = undefined;
 
     // search child node to expand
-    for (const child of currentNode!.children) {
+    for (const child of currentNode!.children!) {
       if (child.key === absolutePathToExpand) {
-        childNodeToExpand = child;
+        childNodeToExpand = child as GuiEditorTreeNode;
         break;
       }
     }
@@ -410,7 +412,7 @@ function expandElementsByPath(relativePath: Path) {
     }
 
     expandElementChildren(childNodeToExpand);
-    session.expand([childNodeToExpand.key]);
+    session.expand([childNodeToExpand.key!]);
 
     // update current node, so the next iteration which is one level deeper will use this node to search next child
     currentNode = childNodeToExpand;
@@ -452,13 +454,16 @@ const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: Mous
     event
   );
 };
-const showInfoOverlayPanelDebounced = useDebounceFn((nodeData: ConfigTreeNodeData, event) => {
-  if (allowShowOverlay.value && overlayShowScheduled.value) {
-    showInfoOverlayPanelInstantly(nodeData, event);
-  }
-}, 1000);
+const showInfoOverlayPanelDebounced = useDebounceFn(
+  (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
+    if (allowShowOverlay.value && overlayShowScheduled.value) {
+      showInfoOverlayPanelInstantly(nodeData, event);
+    }
+  },
+  1000
+);
 
-function showInfoOverlayPanel(nodeData: ConfigTreeNodeData, event) {
+function showInfoOverlayPanel(nodeData: ConfigTreeNodeData, event: MouseEvent) {
   overlayShowScheduled.value = true;
   showInfoOverlayPanelDebounced(nodeData, event);
 }

@@ -28,8 +28,8 @@ function selectPath(pathAbsolute: Path) {
   <div class="p-5 space-y-3 flex flex-col">
     <div class="flex-grow overflow-y-auto">
       <VueFlowPanel
-        @zoom_into_path_absolute="path => zoomIntoPath(path)"
-        @select_path_absolute="path => selectPath(path)" />
+        @update_current_path="path => zoomIntoPath(path)"
+        @select_path="path => selectPath(path)" />
     </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SchemaInfoPanel from '@/components/panels/gui-editor/SchemaInfoPanel.vue';
-import CurrentPathBreadcrumb from '@/components/panels/gui-editor/CurrentPathBreadcrump.vue';
+import CurrentPathBreadcrumb from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
 import {computed} from 'vue';

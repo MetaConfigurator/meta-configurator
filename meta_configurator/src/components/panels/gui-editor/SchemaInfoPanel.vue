@@ -33,7 +33,7 @@ const schemaInformation = computed(() => {
   <Accordion :activeIndex="1">
     <AccordionTab
       :header="
-        'Schema: ' +
+        'GUI Schema: ' +
         (getSchemaForMode(props.sessionMode).schemaWrapper.value?.title ?? 'Untitled schema')
       ">
       <p v-for="info in schemaInformation" :key="info.title">

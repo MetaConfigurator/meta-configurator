@@ -3,6 +3,7 @@ import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import type {Ref} from 'vue';
 
 import {useVueFlow, VueFlow} from '@vue-flow/core';
+import Divider from 'primevue/divider';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGraphConstructor';
@@ -19,10 +20,12 @@ import {
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
+import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
+import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 
 const emit = defineEmits<{
-  (e: 'zoom_into_path_absolute', path_to_add: Path): void;
-  (e: 'select_path_absolute', path: Path): void;
+  (e: 'update_current_path', path: Path): void;
+  (e: 'select_path', path: Path): void;
 }>();
 
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
@@ -64,24 +67,36 @@ watch(
     selectedNode.value = bestMatchingNode;
     selectedData.value = findBestMatchingData(bestMatchingNode, absolutePath);
     if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
-      nextTick(() => {
-        fitView({
-          nodes: [bestMatchingNode.id],
-          duration: 1000,
-          padding: 1,
-          maxZoom: useSettings().schemaDiagram.automaticZoomMaxValue,
-          minZoom: useSettings().schemaDiagram.automaticZoomMinValue,
-        });
-      });
+      fitViewForNodes([bestMatchingNode]);
     }
   },
   {deep: true}
 );
 
-function updateGraph() {
+function fitViewForCurrentlySelectedElement(otherwiseAll: boolean = true) {
+  if (selectedNode.value) {
+    fitViewForNodes([selectedNode.value]);
+  } else if (otherwiseAll) {
+    fitViewForNodes(activeNodes.value);
+  }
+}
+
+function fitViewForNodes(nodes: Node[]) {
+  nextTick(() => {
+    fitView({
+      nodes: nodes.map(node => node.id),
+      duration: 1000,
+      padding: 1,
+      maxZoom: useSettings().schemaDiagram.automaticZoomMaxValue,
+      minZoom: useSettings().schemaDiagram.automaticZoomMinValue,
+    });
+  });
+}
+
+function updateGraph(forceRebuild: boolean = false) {
   const schema = dataSchema.schemaPreprocessed.value;
   const graph = constructSchemaGraph(schema);
-  let graphNeedsLayouting = false;
+  let graphNeedsLayouting = forceRebuild;
 
   const vueFlowGraph = graph.toVueFlowGraph();
   if (wasNodeAdded(activeNodes.value, vueFlowGraph.nodes)) {
@@ -109,6 +124,8 @@ function updateGraph() {
       layoutGraph(graphDirection.value);
     });
   }
+
+  fitViewForCurrentlySelectedElement(true);
 }
 
 function updateToSubgraph(path: Path) {
@@ -137,16 +154,27 @@ async function layoutGraph(direction: string) {
 
 function selectElement(path: Path) {
   if (schemaData.dataAt(path) != undefined) {
-    emit('select_path_absolute', path);
+    emit('select_path', path);
   }
 }
 
-function zoomIntoElement(path: Path) {
-  emit('zoom_into_path_absolute', path);
+function updateCurrentPath(path: Path) {
+  emit('update_current_path', path);
 }
 </script>
 
 <template>
+  <DiagramOptionsPanel
+    @rebuild_graph="updateGraph(true)"
+    @fit_view="fitViewForCurrentlySelectedElement"
+    v-if="useSettings().schemaDiagram.showOptionsPanel" />
+
+  <CurrentPathBreadcrump
+    :path="schemaSession.currentPath.value"
+    root-name="document root"
+    @update:path="updateCurrentPath"></CurrentPathBreadcrump>
+
+  <Divider />
   <div class="layout-flow">
     <VueFlow
       :nodes="activeNodes"
@@ -158,7 +186,7 @@ function zoomIntoElement(path: Path) {
         <SchemaObjectNode
           :data="props.data"
           @select_element="selectElement"
-          @zoom_into_element="zoomIntoElement"
+          @zoom_into_element="updateCurrentPath"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />
