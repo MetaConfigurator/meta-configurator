@@ -240,22 +240,15 @@ function isDisabled(item: MenuItem) {
   }
   return item.disabled();
 }
-
-/* // apparently, the primevue button cannot reactively update its disabled state
-// so this is a workaround to change the disabled state of the button
-watch(storeToRefs(useSessionStore()).fileData, () => {
-  for (const item of getMenuItems()) {
-    if (item.key) {
-      if (isDisabled(item)) {
-        document.getElementById(item.key)?.setAttribute('disabled', '');
-        document.getElementById(item.key)?.classList.add('p-disabled');
-      } else {
-        document.getElementById(item.key)?.removeAttribute('disabled');
-        document.getElementById(item.key)?.classList.remove('p-disabled');
-      }
-    }
+function isHighlighted(item: MenuItem) {
+  if (!item.highlighted) {
+    return false;
   }
-}) */
+  if (typeof item.highlighted === 'boolean') {
+    return item.highlighted;
+  }
+  return item.highlighted();
+}
 
 const searchTerm: Ref<string> = ref('');
 
@@ -380,7 +373,7 @@ const showSearchResultsMenu = event => {
           v-else
           circular
           text
-          class="toolbar-button"
+          :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
           size="small"
           v-tooltip.bottom="item.label"
           :id="item.key ?? ''"
@@ -485,5 +478,9 @@ const showSearchResultsMenu = event => {
   font-size: large;
   color: #495057;
   padding: 0.35rem !important;
+}
+
+.highlighted-icon {
+  color: var(--primary-color);
 }
 </style>

@@ -267,7 +267,7 @@ export class MenuItems {
       return {
         label: `Hide ${description}`,
         icon: iconNameDisabled,
-        style: {color: 'red', background: 'green'},
+        highlighted: true,
         command: () => {
           const panels = useSettings().panels;
           panels[buttonMode] = panels[buttonMode].filter(
