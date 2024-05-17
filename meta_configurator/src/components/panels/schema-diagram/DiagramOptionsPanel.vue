@@ -3,7 +3,6 @@ import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import InputSwitch from 'primevue/inputswitch';
 import {useSettings} from '@/settings/useSettings';
-import Splitter from 'primevue/splitter';
 import Button from 'primevue/button';
 
 const emit = defineEmits<{
@@ -20,14 +19,15 @@ function fitView() {
 }
 </script>
 
-<!-- TODO: Make it look better! -->
 <template>
-  <Accordion :activeIndex="1">
+  <Accordion :activeIndex="1" class="options-element">
     <AccordionTab header="Schema Diagram Options">
       <div>
         <label
           >Graph direction vertical
-          <InputSwitch v-model="useSettings().schemaDiagram.vertical" label="Vertical" />
+          <InputSwitch
+            v-model="useSettings().schemaDiagram.vertical"
+            class="options-input-switch" />
         </label>
       </div>
       <div>
@@ -35,36 +35,41 @@ function fitView() {
           >Show attributes
           <InputSwitch
             v-model="useSettings().schemaDiagram.showAttributes"
-            label="Automatic zoom" />
+            label="Automatic zoom"
+            class="options-input-switch" />
         </label>
       </div>
       <div>
         <label
           >Show enum values
-          <InputSwitch v-model="useSettings().schemaDiagram.showEnumValues" />
+          <InputSwitch
+            v-model="useSettings().schemaDiagram.showEnumValues"
+            class="options-input-switch" />
         </label>
       </div>
       <div>
         <label
           >Move view on element selection
-          <InputSwitch v-model="useSettings().schemaDiagram.moveViewToSelectedElement" />
+          <InputSwitch
+            v-model="useSettings().schemaDiagram.moveViewToSelectedElement"
+            class="options-input-switch" />
         </label>
       </div>
       <div>
         <label
           >Merge allOfs
-          <InputSwitch v-model="useSettings().schemaDiagram.mergeAllOfs" />
+          <InputSwitch
+            v-model="useSettings().schemaDiagram.mergeAllOfs"
+            class="options-input-switch" />
         </label>
       </div>
 
-      <Splitter />
-
       <div class="container">
         <div>
-          <Button label="Rebuild Graph" @click="rebuildGraph" class="" />
+          <Button label="Rebuild Graph" @click="rebuildGraph" class="options-element" />
         </div>
         <div>
-          <Button label="Fit View" @click="fitView" class="" />
+          <Button label="Fit View" @click="fitView" class="options-element" />
         </div>
       </div>
     </AccordionTab>
@@ -74,5 +79,16 @@ function fitView() {
 <style scoped>
 .container {
   display: flex;
+  justify-content: space-between;
+}
+.options-element {
+  font-size: 11px;
+  position: relative;
+  border: 4px;
+  padding: 6px;
+}
+
+.options-input-switch {
+  height: 15px;
 }
 </style>

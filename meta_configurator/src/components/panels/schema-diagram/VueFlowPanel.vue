@@ -164,24 +164,25 @@ function updateCurrentPath(path: Path) {
 </script>
 
 <template>
-  <DiagramOptionsPanel
-    @rebuild_graph="updateGraph(true)"
-    @fit_view="fitViewForCurrentlySelectedElement"
-    v-if="useSettings().schemaDiagram.showOptionsPanel" />
-
-  <CurrentPathBreadcrump
-    :path="schemaSession.currentPath.value"
-    root-name="document root"
-    @update:path="updateCurrentPath"></CurrentPathBreadcrump>
-
-  <Divider />
   <div class="layout-flow">
     <VueFlow
       :nodes="activeNodes"
       :edges="activeEdges"
       @nodes-initialized="layoutGraph(graphDirection)"
+      fit-view-on-init
       :max-zoom="4"
       :min-zoom="0.1">
+      <div class="controls">
+        <DiagramOptionsPanel
+          @rebuild_graph="updateGraph(true)"
+          @fit_view="fitViewForCurrentlySelectedElement" />
+
+        <CurrentPathBreadcrump
+          :path="schemaSession.currentPath.value"
+          root-name="document root"
+          @update:path="updateCurrentPath"></CurrentPathBreadcrump>
+      </div>
+
       <template #node-schemaobject="props">
         <SchemaObjectNode
           :data="props.data"
@@ -208,5 +209,24 @@ function updateCurrentPath(path: Path) {
   background-color: white;
   height: 100%;
   width: 100%;
+}
+
+.controls {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  background-color: lightgray;
+  padding: 8px;
+}
+.controls .label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.controls .label input {
+  cursor: pointer;
 }
 </style>
