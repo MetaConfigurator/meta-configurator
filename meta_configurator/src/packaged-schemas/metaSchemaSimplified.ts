@@ -323,9 +323,6 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
           },
           deprecated: true,
           default: {},
-          metaConfigurator: {
-            advanced: true,
-          },
         },
       },
     },

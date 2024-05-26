@@ -68,9 +68,6 @@ function fitView() {
         <div>
           <Button label="Rebuild Graph" @click="rebuildGraph" class="options-element" />
         </div>
-        <div>
-          <Button label="Fit View" @click="fitView" class="options-element" />
-        </div>
       </div>
     </AccordionTab>
   </Accordion>
