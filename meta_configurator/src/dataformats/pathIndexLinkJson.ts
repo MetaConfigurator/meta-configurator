@@ -50,11 +50,11 @@ export class PathIndexLinkJson implements PathIndexLink {
       case 'array-element':
         return this.determineIndexStep(currentNode.valueNode, currentPath);
       case 'string':
-        return currentNode.range.end - 1; // before the closing quote
+        return currentNode.range.start;
       case 'number':
       case 'literal':
       default:
-        return currentNode.range.end; // after the value
+        return currentNode.range.start; // after the value
     }
   }
 
@@ -65,7 +65,7 @@ export class PathIndexLinkJson implements PathIndexLink {
       return this.determineIndexStep(childNode, currentPath.slice(1));
     }
     // node has fewer children than the index
-    return this.getPositionAfterLastChild(currentNode);
+    return currentNode.range.start;
   }
 
   private determineIndexInObjectNode(currentNode: CstNodeObject, currentPath: Path): number {
@@ -76,14 +76,7 @@ export class PathIndexLinkJson implements PathIndexLink {
       }
     }
     // node not found or it has no children
-    return this.getPositionAfterLastChild(currentNode);
-  }
-
-  private getPositionAfterLastChild(currentNode: CstNodeObject | CstNodeArray): number {
-    if (currentNode.whitespaceAfterChildren) {
-      return currentNode.whitespaceAfterChildren.offset;
-    }
-    return currentNode.range.end - 1; // before the closing brace
+    return currentNode.range.start;
   }
 
   determinePathFromIndex(editorContent: string, targetCharacter: number): Path {
