@@ -1,4 +1,4 @@
-import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
+import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
 
@@ -11,7 +11,7 @@ export async function fetchSchemaFromUrl(schemaURL: string): Promise<void> {
   const schemaName = schemaContent.title || 'Unknown Schema';
   useDataSource().userSchemaData.value = schemaContent;
 
-  openClearFileEditorDialog();
+  openClearDataEditorDialog();
 
   if (toastService) {
     toastService.add({

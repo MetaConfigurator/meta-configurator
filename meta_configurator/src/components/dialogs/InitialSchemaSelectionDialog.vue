@@ -38,7 +38,6 @@ defineExpose({show: openDialog, close: hideDialog});
 </script>
 
 <template>
-  <!-- Render your radio buttons here, using v-for -->
   <Dialog v-model:visible="showDialog" header="Select a Schema">
     <div class="flex flex-column gap-3 bigger-dialog-content">
       <div v-for="category in categories" :key="category.key" class="flex align-items-center">

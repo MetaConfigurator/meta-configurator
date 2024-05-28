@@ -1,4 +1,4 @@
-import type {Path, PathElement} from '@/model/path';
+import type {Path, PathElement} from '@/utility/path';
 import pointer from 'json-pointer';
 
 /**

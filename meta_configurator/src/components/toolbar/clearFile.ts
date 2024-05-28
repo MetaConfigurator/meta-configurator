@@ -1,9 +1,10 @@
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import {toastService} from '@/utility/toastService';
 import {confirmationService} from '@/utility/confirmationService';
 import _ from 'lodash';
-import {getDataLinkForMode, useCurrentDataLink} from '@/data/useDataLink';
-import type {DataLink} from '@/data/dataLink';
+import {getDataForMode, getSessionForMode, useCurrentData} from '@/data/useDataLink';
+import type {ManagedData} from '@/data/managedData';
+import {SessionMode} from '@/store/sessionMode';
 
 /**
  * Presents a confirmation dialog to the user and clears the file if the user confirms.
@@ -15,11 +16,11 @@ import type {DataLink} from '@/data/dataLink';
  */
 function newEmptyFile({
   message = null,
-  dataLink = useCurrentDataLink(),
+  dataLink = useCurrentData(),
   confirmMessage = null,
 }: {
   message?: string | null;
-  dataLink?: DataLink;
+  dataLink?: ManagedData;
   confirmMessage?: string | null;
 }): void {
   if (_.isEmpty(dataLink.data.value)) {
@@ -49,10 +50,11 @@ function newEmptyFile({
   });
 }
 
-function clearFile(dataLink: DataLink) {
+function clearFile(dataLink: ManagedData) {
   dataLink.setData({});
-  useSessionStore().updateCurrentPath([]); // todo introduce reset method
-  useSessionStore().updateCurrentSelectedElement([]);
+  let mode = useSessionStore().currentMode;
+  getSessionForMode(mode).updateCurrentPath([]); // todo introduce reset method
+  getSessionForMode(mode).updateCurrentSelectedElement([]);
 }
 
 /**
@@ -61,7 +63,7 @@ function clearFile(dataLink: DataLink) {
 export function openClearCurrentFileDialog() {
   newEmptyFile({
     message: 'This will delete the current file. Are you sure you want to continue?',
-    dataLink: useCurrentDataLink(),
+    dataLink: useCurrentData(),
     confirmMessage: null,
   });
 }
@@ -73,18 +75,18 @@ export function openClearSchemaDialog() {
   newEmptyFile({
     message: 'This will delete the current schema. Are you sure you want to continue?',
     confirmMessage: null,
-    dataLink: getDataLinkForMode(SessionMode.SchemaEditor),
+    dataLink: getDataForMode(SessionMode.SchemaEditor),
   });
 }
 
 /**
- * Shows a confirmation dialog to the user and clears the file in the FileEditor if the user confirms.
+ * Shows a confirmation dialog to the user and clears the file in the DataEditor if the user confirms.
  */
-export function openClearFileEditorDialog() {
+export function openClearDataEditorDialog() {
   newEmptyFile({
     message:
-      'Do you also want to create a new empty file in the FileEditor? (The current file will be deleted)',
-    dataLink: getDataLinkForMode(SessionMode.FileEditor),
-    confirmMessage: 'New empty file created in the FileEditor.',
+      'Do you also want to create a new empty file in the DataEditor? (The current file will be deleted)',
+    dataLink: getDataForMode(SessionMode.DataEditor),
+    confirmMessage: 'New empty file created in the DataEditor.',
   });
 }

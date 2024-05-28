@@ -1,8 +1,9 @@
 import type {
   JsonSchemaObjectType,
   JsonSchemaType,
+  JsonSchemaTypePreprocessed,
   SchemaPropertyType,
-} from '@/model/jsonSchemaType';
+} from '@/schema/jsonSchemaType';
 import _ from 'lodash';
 import 'crypto';
 
@@ -17,10 +18,11 @@ import 'crypto';
  * - inject types of enum to types property
  *
  * @param schema the schema to preprocess
+ * @returns preprocessed schema
  */
-export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaType {
+export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaTypePreprocessed {
   if (typeof schema !== 'object') {
-    return schema;
+    return markAsPreprocessed(schema);
   }
 
   // clone schema so the original schema (of the user) is not modified
@@ -30,7 +32,14 @@ export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaType {
 
   preprocessOneTimeRecursive(schemaCopy, id);
 
-  return schemaCopy;
+  return markAsPreprocessed(schemaCopy);
+}
+
+function markAsPreprocessed(schema: JsonSchemaType): JsonSchemaTypePreprocessed {
+  return {
+    ...(schema as object),
+    $preprocessed: true,
+  };
 }
 
 function preprocessOneTimeRecursive(schema: JsonSchemaType | undefined, schemaPath: string): void {

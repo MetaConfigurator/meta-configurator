@@ -1,4 +1,4 @@
-import type {JsonSchemaType} from '@/model/jsonSchemaType';
+import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 // @ts-ignore
 import mergeAllOf from 'json-schema-merge-allof';
 
@@ -14,6 +14,21 @@ export function mergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
       // add additional resolvers here, most of the keywords are NOT supported by default
       conditions: function (values: any[][]) {
         return values.flat(); // just merge all conditions
+      },
+      metaConfigurator: function (values: any[][]) {
+        let result = {
+          advanced: false,
+          hideAddPropertyButton: false,
+        };
+        for (const value of values) {
+          if ('advanced' in value && value.advanced) {
+            result.advanced = true;
+          }
+          if ('hideAddPropertyButton' in value && value.hideAddPropertyButton) {
+            result.hideAddPropertyButton = true;
+          }
+        }
+        return result;
       },
     },
   });

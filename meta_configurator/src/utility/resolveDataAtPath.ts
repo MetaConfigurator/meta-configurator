@@ -1,4 +1,4 @@
-import {Path} from '@/model/path';
+import type {Path} from '@/utility/path';
 
 /**
  * Returns the data at the given path. If no data is found, undefined is returned.

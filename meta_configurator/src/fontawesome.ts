@@ -20,12 +20,22 @@ import {
   faSearch,
   faShareNodes,
   faTriangleExclamation,
+  faTrashArrowUp,
+  faEye,
+  faDiagramProject,
+  faGear,
+  faCode,
+  faWrench,
+  faFileImport,
+  faTable,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
   faFileCode,
+  faCircleCheck,
   faFloppyDisk as faFloppyDiskRegular,
   faFolderOpen as faFolderOpenRegular,
+  faEye as faEyeRegular,
 } from '@fortawesome/free-regular-svg-icons';
 
 /**
@@ -39,11 +49,13 @@ export function registerIcons() {
   library.add(faFloppyDiskRegular);
   library.add(faFolderOpen);
   library.add(faFolderOpenRegular);
+  library.add(faFileImport);
   library.add(faRotateLeft);
   library.add(faRotateRight);
   library.add(faShareNodes);
   library.add(faDownload);
   library.add(faGears);
+  library.add(faGear);
   library.add(faDatabase);
   library.add(faGlobe);
   library.add(faMagicWandSparkles);
@@ -53,4 +65,12 @@ export function registerIcons() {
   library.add(faFontAwesome);
   library.add(faSearch);
   library.add(faTriangleExclamation);
+  library.add(faTrashArrowUp);
+  library.add(faEye);
+  library.add(faEyeRegular);
+  library.add(faDiagramProject);
+  library.add(faCode);
+  library.add(faWrench);
+  library.add(faCircleCheck);
+  library.add(faTable);
 }

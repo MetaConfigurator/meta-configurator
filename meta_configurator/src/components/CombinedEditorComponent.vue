@@ -6,33 +6,59 @@ Combines the code editor and the gui editor.
 import {computed, onMounted, ref, watch} from 'vue';
 import 'primeicons/primeicons.css';
 import SplitterPanel from 'primevue/splitterpanel';
-import CodeEditorPanel from '@/components/code-editor/CodeEditorPanel.vue';
-import GuiEditorPanel from '@/components/gui-editor/GuiEditorPanel.vue';
 import Splitter from 'primevue/splitter';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
 import Toast from 'primevue/toast';
-import PanelDataCurrentPath from '@/components/DebuggingPanel.vue';
 import ConfirmDialog from 'primevue/confirmdialog';
 import {useToast} from 'primevue/usetoast';
 import {useConfirm} from 'primevue/useconfirm';
 import {confirmationService} from '@/utility/confirmationService';
 import {toastService} from '@/utility/toastService';
-import {useAppRouter} from '@/router';
-import {useDropZone, useWindowSize} from '@vueuse/core/index';
+import {useAppRouter} from '@/router/router';
+import {useDropZone, useWindowSize, watchImmediate} from '@vueuse/core/index';
 import {readFileContentToDataLink} from '@/utility/readFileContent';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {getDataForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
+import {SessionMode} from '@/store/sessionMode';
+import {useSessionStore} from '@/store/sessionStore';
+import {getComponentByPanelType} from '@/components/panelType';
+import type {SettingsInterfacePanels, SettingsInterfaceRoot} from '@/settings/settingsTypes';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
+import {addDefaultsForSettings} from '@/utility/settingsUpdater';
+
+const props = defineProps<{
+  sessionMode: SessionMode;
+}>();
+
+let panelsDefinition: SettingsInterfacePanels = useSettings().panels;
+
+// update panelsDefinition only when underlying data changes. Otherwise, all panels will be rebuilt every time
+// any setting is changed, which is not necessary and leads to Ace Editor becoming blank if settings were modified via
+// Ace Editor
+watchImmediate(
+  () => useSettings(),
+  (settings: SettingsInterfaceRoot) => {
+    let panels = settings.panels;
+    if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition)) {
+      panelsDefinition = panels;
+    }
+    // fix panels if they are not defined
+    for (let mode of Object.values(SessionMode)) {
+      if (!panels[mode]) {
+        panels[mode] = structuredClone(SETTINGS_DATA_DEFAULT.panels[mode]);
+      }
+    }
+  }
+);
 
 const panels = computed(() => {
-  let result = [CodeEditorPanel, GuiEditorPanel];
-  if (!useSettings().guiEditorOnRightSide) {
-    result = result.reverse();
-  }
-  if (useSettings().debuggingActive) {
-    result.push(PanelDataCurrentPath);
-  }
-  return result;
+  return panelsDefinition[props.sessionMode].map(panel => {
+    return {
+      component: getComponentByPanelType(panel.panelType),
+      sessionMode: panel.mode,
+      size: panel.size,
+    };
+  });
 });
 
 let {width} = useWindowSize();
@@ -40,8 +66,8 @@ let {width} = useWindowSize();
 function updateMode(newMode: SessionMode) {
   const router = useAppRouter();
   switch (newMode) {
-    case SessionMode.FileEditor:
-      router.push('/');
+    case SessionMode.DataEditor:
+      router.push('/data');
       break;
     case SessionMode.SchemaEditor:
       router.push('/schema');
@@ -56,7 +82,13 @@ const topToolbarRef = ref();
 const mainPanel = ref();
 
 onMounted(() => {
-  topToolbarRef.value?.showInitialSchemaDialog();
+  if (!useSessionStore().hasShownInitialDialog) {
+    topToolbarRef.value?.showInitialSchemaDialog();
+    useSessionStore().hasShownInitialDialog = true;
+
+    // update user settings by adding default value for missing fields
+    addDefaultsForSettings();
+  }
 });
 
 const {isOverDropZone} = useDropZone(mainPanel, {
@@ -75,7 +107,7 @@ watch(isOverDropZone, isOverDropZone => {
 });
 
 function onDrop(files: File[] | null) {
-  readFileContentToDataLink(files, useCurrentDataLink());
+  readFileContentToDataLink(files, getDataForMode(props.sessionMode));
 }
 
 confirmationService.confirm = useConfirm();
@@ -92,16 +124,17 @@ toastService.toast = useToast();
       <TopToolbar
         ref="topToolbarRef"
         class="h-12 flex-none"
-        :current-mode="useSessionStore().currentMode"
+        :current-mode="props.sessionMode"
         @mode-selected="updateMode" />
       <div class="flex-grow overflow-hidden" ref="mainPanel" id="mainpanel">
-        <Splitter class="h-full" :layout="width < 600 ? 'vertical' : 'horizontal'">
+        <Splitter class="h-full" :layout="width < 600 ? 'vertical' : 'horizontal'" :key="panels">
           <SplitterPanel
             v-for="(panel, index) in panels"
-            :key="index"
+            :key="index + panel"
             :min-size="10"
+            :size="panel.size"
             :resizable="true">
-            <component :is="panel" />
+            <component :is="panel.component" :sessionMode="panel.sessionMode" />
           </SplitterPanel>
         </Splitter>
       </div>

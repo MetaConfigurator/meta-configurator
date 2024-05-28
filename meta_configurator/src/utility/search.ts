@@ -1,13 +1,12 @@
-import type {Path} from '@/model/path';
-import {useSessionStore} from '@/store/sessionStore';
-import type {JsonSchema} from '@/schema/jsonSchema';
+import type {Path} from '@/utility/path';
+import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {errorService} from '@/main';
 import type {MenuItem} from 'primevue/menuitem';
 import {pathToString} from '@/utility/pathUtils';
 import {dataToString} from '@/utility/dataToString';
 import _ from 'lodash';
 import {MAX_SEARCH_DEPTH} from '@/constants';
-import {useCurrentDataLink} from '@/data/useDataLink';
+import {useCurrentData, useCurrentSchema, useCurrentSession} from '@/data/useDataLink';
 
 /**
  * Searches for the given search term in the data and schema.
@@ -19,8 +18,8 @@ import {useCurrentDataLink} from '@/data/useDataLink';
 export async function searchInDataAndSchema(searchTerm: string): Promise<SearchResult[]> {
   try {
     const result: SearchResult[] = [];
-    const data = useCurrentDataLink().data.value;
-    const schema: JsonSchema = useSessionStore().fileSchema;
+    const data = useCurrentData().data.value;
+    const schema: JsonSchemaWrapper = useCurrentSchema().schemaWrapper.value;
     await searchInDataAndSchemaRecursive(data, schema, [], searchTerm, result);
     return result;
   } catch (e) {
@@ -31,13 +30,13 @@ export async function searchInDataAndSchema(searchTerm: string): Promise<SearchR
 
 async function searchInDataAndSchemaRecursive(
   data: any | undefined,
-  schema: JsonSchema | undefined,
+  schema: JsonSchemaWrapper | undefined,
   path: Path,
   searchTerm: string,
   result: SearchResult[],
   depth = 0
 ): Promise<void> {
-  if (depth > MAX_SEARCH_DEPTH) {
+  if (depth > MAX_SEARCH_DEPTH || data === undefined) {
     return; // prevent potential infinite recursion in circular schemas
   }
 
@@ -94,7 +93,7 @@ async function searchInDataAndSchemaRecursive(
 function addToResult(
   path: Path,
   data: any | undefined,
-  schema: JsonSchema | undefined,
+  schema: JsonSchemaWrapper | undefined,
   searchTerm: string,
   result: SearchResult[]
 ): void {
@@ -109,11 +108,11 @@ function addToResult(
   }
 }
 
-function getPropertyNamesFromDataAndSchema(data: any, schema: JsonSchema | undefined) {
+function getPropertyNamesFromDataAndSchema(data: any, schema: JsonSchemaWrapper | undefined) {
   return new Set(Object.keys(data ?? {}).concat(Object.keys(schema?.properties ?? {})));
 }
 
-function descriptionOrTitleMatches(schema: JsonSchema | undefined, searchTerm: string) {
+function descriptionOrTitleMatches(schema: JsonSchemaWrapper | undefined, searchTerm: string) {
   return (
     (schema?.title !== undefined && matchesSearchTerm(schema.title, searchTerm)) ||
     (schema?.description !== undefined && matchesSearchTerm(schema.description, searchTerm))
@@ -138,7 +137,7 @@ function isObject(data: any) {
 export interface SearchResult {
   path: Path;
   data: any | undefined;
-  schema: JsonSchema | undefined;
+  schema: JsonSchemaWrapper | undefined;
   searchTerm: string;
 }
 
@@ -151,7 +150,7 @@ export function searchResultToMenuItem(searchResult: SearchResult): MenuItem {
     label: dataToString(pathString || searchResult.schema?.title || 'Root', 0, 35),
     data: dataToString(searchResult.data, 1, 80) ?? '',
     command: () => {
-      useSessionStore().currentSelectedElement = searchResult.path;
+      useCurrentSession().currentSelectedElement.value = searchResult.path;
     },
   };
 }

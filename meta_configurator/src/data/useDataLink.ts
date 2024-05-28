@@ -1,39 +1,120 @@
-import {DataLink} from '@/data/dataLink';
-import {useDataSource} from '@/data/dataSource';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useDataSource, useSchemaSource} from '@/data/dataSource';
+import {useSessionStore} from '@/store/sessionStore';
 import type {ComputedRef} from 'vue';
 import {computed} from 'vue';
+import {SessionMode} from '@/store/sessionMode';
+import {ManagedData} from '@/data/managedData';
+import {ManagedJsonSchema} from '@/data/managedJsonSchema';
+import {ManagedSession} from '@/data/managedSession';
+import {ManagedValidation} from '@/data/managedValidation';
+import {ManagedUserSchemaSelection} from '@/data/managedUserSchemaSelection';
 
 const dataSource = useDataSource();
-const fileEditorDataLink = new DataLink(dataSource.userData, dataSource.userSchemaData);
-const schemaEditorDataLink = new DataLink(dataSource.userSchemaData, dataSource.metaSchemaData);
-const settingsEditorDataLink = new DataLink(dataSource.settingsData, dataSource.settingsSchemaData);
+const schemaSource = useSchemaSource();
+
+const dataList: ManagedData[] = [
+  new ManagedData(dataSource.userData, SessionMode.DataEditor),
+  new ManagedData(dataSource.userSchemaData, SessionMode.SchemaEditor),
+  new ManagedData(dataSource.settingsData, SessionMode.Settings),
+];
+
+const schemaList: ManagedJsonSchema[] = [
+  new ManagedJsonSchema(dataSource.userSchemaData, true, SessionMode.DataEditor),
+  new ManagedJsonSchema(schemaSource.metaSchemaData, true, SessionMode.SchemaEditor),
+  new ManagedJsonSchema(schemaSource.settingsSchemaData, false, SessionMode.Settings),
+];
+
+const sessionList: ManagedSession[] = [
+  new ManagedSession(SessionMode.DataEditor),
+  new ManagedSession(SessionMode.SchemaEditor),
+  new ManagedSession(SessionMode.Settings),
+];
+
+const validationList: ManagedValidation[] = [
+  new ManagedValidation(SessionMode.DataEditor),
+  new ManagedValidation(SessionMode.SchemaEditor),
+  new ManagedValidation(SessionMode.Settings),
+];
+
+const userSelectionList: ManagedUserSchemaSelection[] = [
+  new ManagedUserSchemaSelection(SessionMode.DataEditor),
+  new ManagedUserSchemaSelection(SessionMode.SchemaEditor),
+  new ManagedUserSchemaSelection(SessionMode.Settings),
+];
 
 /**
  * Returns the data link for the given mode
  * @param mode the mode
  * @throws Error if the mode is unknown
  */
-export function getDataLinkForMode(mode: SessionMode): DataLink {
-  switch (mode) {
-    case SessionMode.FileEditor:
-      return fileEditorDataLink;
-    case SessionMode.SchemaEditor:
-      return schemaEditorDataLink;
-    case SessionMode.Settings:
-      return settingsEditorDataLink;
-    default:
-      throw new Error(`Unknown mode ${mode}`);
+export function getDataForMode(mode: SessionMode): ManagedData {
+  for (const data of dataList) {
+    if (data.mode === mode) {
+      return data;
+    }
   }
+  throw new Error(`Unknown mode ${mode}`);
 }
 
-const currentEditorDataLink: ComputedRef<DataLink> = computed(() =>
-  getDataLinkForMode(useSessionStore().currentMode)
+export function getSchemaForMode(mode: SessionMode): ManagedJsonSchema {
+  for (const schema of schemaList) {
+    if (schema.mode === mode) {
+      return schema;
+    }
+  }
+  throw new Error(`Unknown mode ${mode}`);
+}
+
+export function getSessionForMode(mode: SessionMode): ManagedSession {
+  for (const session of sessionList) {
+    if (session.mode === mode) {
+      return session;
+    }
+  }
+  throw new Error(`Unknown mode ${mode}`);
+}
+
+export function getValidationForMode(mode: SessionMode): ManagedValidation {
+  for (const validation of validationList) {
+    if (validation.mode === mode) {
+      return validation;
+    }
+  }
+  throw new Error(`Unknown mode ${mode}`);
+}
+
+export function getUserSelectionForMode(mode: SessionMode): ManagedUserSchemaSelection {
+  for (const userSelection of userSelectionList) {
+    if (userSelection.mode === mode) {
+      return userSelection;
+    }
+  }
+  throw new Error(`Unknown mode ${mode}`);
+}
+
+const currentEditorData: ComputedRef<ManagedData> = computed(() =>
+  getDataForMode(useSessionStore().currentMode)
+);
+
+const currentEditorSchema: ComputedRef<ManagedJsonSchema> = computed(() =>
+  getSchemaForMode(useSessionStore().currentMode)
+);
+
+const currentSession: ComputedRef<ManagedSession> = computed(() =>
+  getSessionForMode(useSessionStore().currentMode)
 );
 
 /**
  * Returns the data link for the currently active editor.
  */
-export function useCurrentDataLink() {
-  return currentEditorDataLink.value;
+export function useCurrentData() {
+  return currentEditorData.value;
+}
+
+export function useCurrentSchema() {
+  return currentEditorSchema.value;
+}
+
+export function useCurrentSession() {
+  return currentSession.value;
 }

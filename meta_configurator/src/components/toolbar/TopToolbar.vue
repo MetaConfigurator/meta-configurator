@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import {type Ref, ref, watch} from 'vue';
+import {computed, type Ref, ref, watch} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
 import {MenuItems} from '@/components/toolbar/menuItems';
-import {SessionMode, useSessionStore} from '@/store/sessionStore';
+import {useSessionStore} from '@/store/sessionStore';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Listbox from 'primevue/listbox';
-import {schemaCollection} from '@/example-schemas/schemaCollection';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
@@ -23,10 +22,16 @@ import {searchInDataAndSchema, searchResultToMenuItem} from '@/utility/search';
 import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
-import type {SchemaOption} from '@/model/schemaOption';
+import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
-import {openClearFileEditorDialog} from '@/components/toolbar/clearFile';
+import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
+import {SessionMode} from '@/store/sessionMode';
+import {schemaCollection} from '@/packaged-schemas/schemaCollection';
+import {getSessionForMode} from '@/data/useDataLink';
+import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
+import {useSettings} from '@/settings/useSettings';
+import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -44,12 +49,17 @@ const showUrlInputDialog = ref(false);
 const schemaUrl = ref('');
 const menu = ref();
 
-const topMenuBar = new MenuItems(handleFromWebClick, handleFromOurExampleClick, showUrlDialog);
+const topMenuBar = new MenuItems(
+  handleFromWebClick,
+  handleFromOurExampleClick,
+  showUrlDialog,
+  showCsvImportDialog
+);
 
 function getPageName(): string {
   switch (props.currentMode) {
-    case SessionMode.FileEditor:
-      return 'File Editor';
+    case SessionMode.DataEditor:
+      return 'Data Editor';
     case SessionMode.SchemaEditor:
       return 'Schema Editor';
     case SessionMode.Settings:
@@ -62,21 +72,21 @@ function getPageName(): string {
 /**
  * Menu items of the page selection menu.
  */
-const pageSelectionMenuItems: MenuItem[] = [
-  {
-    label: 'File Editor',
+function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
+  const dataEditorItem: MenuItem = {
+    label: 'Data Editor',
     icon: 'fa-regular fa-file',
     class: () => {
-      if (props.currentMode !== SessionMode.FileEditor) {
+      if (props.currentMode !== SessionMode.DataEditor) {
         return 'font-normal text-lg';
       }
       return 'font-bold text-lg';
     },
     command: () => {
-      emit('mode-selected', SessionMode.FileEditor);
+      emit('mode-selected', SessionMode.DataEditor);
     },
-  },
-  {
+  };
+  const schemaEditorItem: MenuItem = {
     label: 'Schema Editor',
     icon: 'fa-regular fa-file-code',
     class: () => {
@@ -88,8 +98,8 @@ const pageSelectionMenuItems: MenuItem[] = [
     command: () => {
       emit('mode-selected', SessionMode.SchemaEditor);
     },
-  },
-  {
+  };
+  const settingsItem: MenuItem = {
     label: 'Settings',
     icon: 'fa-solid fa-cog',
     class: () => {
@@ -101,10 +111,16 @@ const pageSelectionMenuItems: MenuItem[] = [
     command: () => {
       emit('mode-selected', SessionMode.Settings);
     },
-  },
-];
+  };
 
-const items = ref(pageSelectionMenuItems);
+  if (settings.hideSchemaEditor) {
+    return [dataEditorItem, settingsItem];
+  } else {
+    return [dataEditorItem, schemaEditorItem, settingsItem];
+  }
+}
+
+const items = computed(() => getPageSelectionMenuItems(useSettings()));
 
 function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
@@ -148,7 +164,7 @@ watch(selectedSchema, async newSelectedSchema => {
       await fetchSchemaFromUrl(newSelectedSchema.url);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      openClearFileEditorDialog();
+      openClearDataEditorDialog();
     } catch (error) {
       errorService.onError(error);
     }
@@ -157,7 +173,7 @@ watch(selectedSchema, async newSelectedSchema => {
       loadExampleSchema(newSelectedSchema.key);
       showFetchedSchemas.value = true;
       topMenuBar.showDialog.value = false;
-      openClearFileEditorDialog();
+      openClearDataEditorDialog();
     } catch (error) {
       errorService.onError(error);
     }
@@ -175,22 +191,22 @@ async function fetchSchemaFromSelectedUrl() {
   hideUrlDialog();
 }
 
-const fileEditorMenuItems = topMenuBar.fileEditorMenuItems;
-const schemaEditorMenuItems = topMenuBar.schemaEditorMenuItems;
-const settingsMenuItems = topMenuBar.settingsMenuItems;
-
-function getMenuItems(): MenuItem[] {
+function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
   switch (props.currentMode) {
-    case SessionMode.FileEditor:
-      return fileEditorMenuItems;
+    case SessionMode.DataEditor:
+      return topMenuBar.getDataEditorMenuItems(settings);
     case SessionMode.SchemaEditor:
-      return schemaEditorMenuItems;
+      return topMenuBar.getSchemaEditorMenuItems(settings);
     case SessionMode.Settings:
-      return settingsMenuItems;
+      return topMenuBar.getSettingsMenuItems(settings);
     default:
       return [];
   }
 }
+
+// computed property function to get menu items to allow for updating of the menu items
+const menuItems = computed(() => getMenuItems(useSettings()));
+
 const toggle = event => {
   menu.value.toggle(event);
 };
@@ -230,22 +246,15 @@ function isDisabled(item: MenuItem) {
   }
   return item.disabled();
 }
-
-/* // apparently, the primevue button cannot reactively update its disabled state
-// so this is a workaround to change the disabled state of the button
-watch(storeToRefs(useSessionStore()).fileData, () => {
-  for (const item of getMenuItems()) {
-    if (item.key) {
-      if (isDisabled(item)) {
-        document.getElementById(item.key)?.setAttribute('disabled', '');
-        document.getElementById(item.key)?.classList.add('p-disabled');
-      } else {
-        document.getElementById(item.key)?.removeAttribute('disabled');
-        document.getElementById(item.key)?.classList.remove('p-disabled');
-      }
-    }
+function isHighlighted(item: MenuItem) {
+  if (!item.highlighted) {
+    return false;
   }
-}) */
+  if (typeof item.highlighted === 'boolean') {
+    return item.highlighted;
+  }
+  return item.highlighted();
+}
 
 const searchTerm: Ref<string> = ref('');
 
@@ -254,6 +263,12 @@ const initialSchemaSelectionDialog = ref();
 const showInitialSchemaDialog = () => {
   initialSchemaSelectionDialog.value?.show();
 };
+
+const csvImportDialog = ref();
+
+function showCsvImportDialog() {
+  csvImportDialog.value?.show();
+}
 
 defineExpose({
   showInitialSchemaDialog,
@@ -274,17 +289,20 @@ const searchResultItems = ref<MenuItem[]>([]);
 watchDebounced(
   [searchTerm],
   () => {
+    let mode = useSessionStore().currentMode;
+    let session = getSessionForMode(mode);
+
     if (!searchTerm.value) {
-      useSessionStore().currentSearchResults = [];
+      session.currentSearchResults.value = [];
       searchResultItems.value = [];
       return;
     }
     searchInDataAndSchema(searchTerm.value)
       .then(searchResults => {
         if (searchResults.length > 0) {
-          useSessionStore().currentSelectedElement = searchResults[0].path;
+          session.currentSelectedElement.value = searchResults[0].path;
         }
-        useSessionStore().currentSearchResults = searchResults;
+        session.currentSearchResults.value = searchResults;
         searchResultItems.value = searchResults
           .map(res => searchResultToMenuItem(res))
           .slice(0, GuiConstants.MAX_SEARCH_RESULTS);
@@ -306,6 +324,8 @@ const showSearchResultsMenu = event => {
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
     @user_selected_option="option => handleUserSelection(option)" />
+
+  <ImportCsvDialog ref="csvImportDialog" />
 
   <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
@@ -361,13 +381,13 @@ const showSearchResultsMenu = event => {
       </Button>
 
       <!-- menu items -->
-      <div v-for="item in getMenuItems()" :key="item.label">
+      <div v-for="item in menuItems" :key="item.label">
         <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
         <Button
           v-else
           circular
           text
-          class="toolbar-button"
+          :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
           size="small"
           v-tooltip.bottom="item.label"
           :id="item.key ?? ''"
@@ -422,7 +442,7 @@ const showSearchResultsMenu = event => {
       <div class="flex space-x-5 mr-3">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
-          <p class="font-semibold text-lg">MetaConfigurator</p>
+          <p class="font-semibold text-lg">{{ useSettings().toolbarTitle }}</p>
         </div>
 
         <!-- button to open the about dialog -->
@@ -472,5 +492,9 @@ const showSearchResultsMenu = event => {
   font-size: large;
   color: #495057;
   padding: 0.35rem !important;
+}
+
+.highlighted-icon {
+  color: var(--primary-color);
 }
 </style>

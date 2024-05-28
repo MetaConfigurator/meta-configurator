@@ -1,6 +1,6 @@
-import {JsonSchema} from '@/schema/jsonSchema';
-import type {SchemaPropertyType} from '@/model/jsonSchemaType';
-import {NUMBER_OF_PROPERTY_TYPES} from '@/model/jsonSchemaType';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
+import type {SchemaPropertyType} from '@/schema/jsonSchemaType';
+import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {ErrorObject} from 'ajv';
 
 /**
@@ -42,9 +42,9 @@ import type {ErrorObject} from 'ajv';
  * @param validationErrors optional validation errors to display
  */
 export function describeSchema(
-  schema: JsonSchema,
+  schema: JsonSchemaWrapper,
   propertyName?: string,
-  parentSchema?: JsonSchema,
+  parentSchema?: JsonSchemaWrapper,
   deep: boolean = false,
   indentation = 0,
   validationErrors: ErrorObject[] = []
@@ -66,9 +66,9 @@ export function describeSchema(
 }
 
 function describeObjectSchema(
-  schema: JsonSchema,
+  schema: JsonSchemaWrapper,
   propertyName?: string,
-  parentSchema?: JsonSchema,
+  parentSchema?: JsonSchemaWrapper,
   deep: boolean = false,
   indentation = 0,
   validationErrors: ErrorObject[] = []
@@ -130,7 +130,7 @@ function describeObjectSchema(
   return `<div>${result}</div>`;
 }
 
-function describeRequired(propertyName?: string, parentSchema?: JsonSchema): string {
+function describeRequired(propertyName?: string, parentSchema?: JsonSchemaWrapper): string {
   if (!propertyName) {
     return '';
   }
@@ -145,7 +145,7 @@ function describeRequired(propertyName?: string, parentSchema?: JsonSchema): str
   return paragraph(`This property is ${bold('required')}.`);
 }
 
-function describeType(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeType(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.type.length === NUMBER_OF_PROPERTY_TYPES) {
     return '';
   }
@@ -158,14 +158,17 @@ function describeType(schema: JsonSchema, validationErrors: ErrorObject[]): stri
   return '';
 }
 
-function describeTitle(schema: JsonSchema): string {
+function describeTitle(schema: JsonSchemaWrapper): string {
   if (schema.title) {
     return paragraph(bold(schema.title));
   }
   return '';
 }
 
-function describeRequiredProperties(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeRequiredProperties(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[]
+): string {
   if (schema.required && schema.required.length > 0) {
     return paragraph(`The following properties are ${formatAsErrorIfInvalid(
       bold('required'),
@@ -177,7 +180,7 @@ function describeRequiredProperties(schema: JsonSchema, validationErrors: ErrorO
   return '';
 }
 
-function describeProperties(schema: JsonSchema): string {
+function describeProperties(schema: JsonSchemaWrapper): string {
   if (schema.properties) {
     const optionalProperties = schema.required
       ? Object.keys(schema.properties).filter(p => !schema.required?.includes(p))
@@ -190,7 +193,7 @@ function describeProperties(schema: JsonSchema): string {
   return '';
 }
 
-function describePropertyNames(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describePropertyNames(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.hasType('object') && schema.propertyNames && !schema.propertyNames.isAlwaysTrue) {
     return paragraph(
       `The ${formatAsErrorIfInvalid(bold('property names'), 'propertyNames', validationErrors)} 
@@ -200,7 +203,7 @@ function describePropertyNames(schema: JsonSchema, validationErrors: ErrorObject
   return '';
 }
 
-function describePatternProperties(schema: JsonSchema): string {
+function describePatternProperties(schema: JsonSchemaWrapper): string {
   if (schema.patternProperties) {
     let result = '';
     for (const [pattern, patternSchema] of Object.entries(schema.patternProperties)) {
@@ -220,7 +223,7 @@ function describePatternProperties(schema: JsonSchema): string {
   return '';
 }
 
-function describeMultipleOf(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeMultipleOf(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.multipleOf) {
     const multipleOf = `The value must be ${formatAsErrorIfInvalid(
       bold('divisible') + ' by ' + formatValue(schema.multipleOf),
@@ -232,7 +235,7 @@ function describeMultipleOf(schema: JsonSchema, validationErrors: ErrorObject[])
   return '';
 }
 
-function describeItems(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeItems(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.hasType('array') && schema.items && !schema.items.isAlwaysTrue) {
     const minItems = schema.minItems ?? 0;
     const maxItems = schema.maxItems;
@@ -267,7 +270,7 @@ function describeItems(schema: JsonSchema, validationErrors: ErrorObject[]): str
   return '';
 }
 
-function describeStringLength(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeStringLength(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   const min = schema.minLength;
   const max = schema.maxLength;
 
@@ -298,7 +301,10 @@ function describeStringLength(schema: JsonSchema, validationErrors: ErrorObject[
   return paragraph(result);
 }
 
-function describeMinimumAndMaximum(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeMinimumAndMaximum(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[]
+): string {
   const min = schema.minimum;
   const max = schema.maximum;
   const exclusiveMin = schema.exclusiveMinimum;
@@ -352,14 +358,14 @@ function describeMinimumAndMaximum(schema: JsonSchema, validationErrors: ErrorOb
   return paragraph(result + '.');
 }
 
-function describeExamples(schema: JsonSchema): string {
+function describeExamples(schema: JsonSchemaWrapper): string {
   if (schema.examples.length > 0) {
     return `Examples: ${ul(schema.examples.map(e => formatValue(e)))}`;
   }
   return '';
 }
 
-function describeEnum(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeEnum(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.enum && schema.enum.length > 0) {
     return (
       `The value must be ${formatAsErrorIfInvalid(
@@ -372,21 +378,21 @@ function describeEnum(schema: JsonSchema, validationErrors: ErrorObject[]): stri
   return '';
 }
 
-function describeDescription(schema: JsonSchema): string {
+function describeDescription(schema: JsonSchemaWrapper): string {
   if (schema.description) {
     return paragraph(italic(schema.description));
   }
   return '';
 }
 
-function describeDeprecated(schema: JsonSchema): string {
+function describeDeprecated(schema: JsonSchemaWrapper): string {
   if (schema.deprecated) {
     return paragraph(bold('Deprecated.'));
   }
   return '';
 }
 
-function describeDefault(schema: JsonSchema): string {
+function describeDefault(schema: JsonSchemaWrapper): string {
   if (schema.default) {
     const defaultString = JSON.stringify(schema.default);
     if (!isBlank(defaultString)) {
@@ -396,7 +402,7 @@ function describeDefault(schema: JsonSchema): string {
   return '';
 }
 
-function describeContains(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeContains(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.contains) {
     const min = schema.minContains ?? 1;
     const max = schema.maxContains;
@@ -428,7 +434,7 @@ function describeContains(schema: JsonSchema, validationErrors: ErrorObject[]): 
   return '';
 }
 
-function describeConst(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeConst(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.const) {
     const constString = `The value must be ${formatValue(schema.const)}.`;
     return paragraph(formatAsErrorIfInvalid(constString, 'const', validationErrors));
@@ -436,7 +442,7 @@ function describeConst(schema: JsonSchema, validationErrors: ErrorObject[]): str
   return '';
 }
 
-function describeNot(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeNot(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.not) {
     const not = `The following schema must ${bold('not')} be fulfilled: `;
     return paragraph(
@@ -447,14 +453,14 @@ function describeNot(schema: JsonSchema, validationErrors: ErrorObject[]): strin
   return '';
 }
 
-function describeAllOf(schema: JsonSchema): string {
+function describeAllOf(schema: JsonSchemaWrapper): string {
   if (schema.allOf && schema.allOf.length > 0) {
     return 'All of the following schemas must be fulfilled: ' + schemaDescriptionList(schema.allOf);
   }
   return '';
 }
 
-function describeAnyOf(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeAnyOf(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.anyOf && schema.anyOf.length > 0) {
     return (
       'At least ' +
@@ -466,7 +472,7 @@ function describeAnyOf(schema: JsonSchema, validationErrors: ErrorObject[]): str
   return '';
 }
 
-function describeOneOf(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeOneOf(schema: JsonSchemaWrapper, validationErrors: ErrorObject[]): string {
   if (schema.oneOf && schema.oneOf.length > 0) {
     return (
       'Exactly ' +
@@ -478,7 +484,10 @@ function describeOneOf(schema: JsonSchema, validationErrors: ErrorObject[]): str
   return '';
 }
 
-function describeAdditionalProperties(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeAdditionalProperties(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[]
+): string {
   if (!schema.hasType('object')) {
     return '';
   }
@@ -507,14 +516,17 @@ function describeAdditionalProperties(schema: JsonSchema, validationErrors: Erro
   );
 }
 
-function describeComment(schema: JsonSchema): string {
+function describeComment(schema: JsonSchemaWrapper): string {
   if (schema.$comment && !isBlank(schema.$comment)) {
     return paragraph(`${italic(schema.$comment)}`);
   }
   return '';
 }
 
-function describeFormatAndPattern(schema: JsonSchema, validationErrors: ErrorObject[]): string {
+function describeFormatAndPattern(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[]
+): string {
   if (schema.format) {
     let format = `The value must be ${formatValue(schema.format)}`;
     switch (schema.format) {
@@ -629,11 +641,15 @@ function formatError(error: string): string {
   return `<span class='text-red-600'>${error}</span>`;
 }
 
-function schemaDescriptionList(schemas: JsonSchema[]): string {
+function schemaDescriptionList(schemas: JsonSchemaWrapper[]): string {
   return ul(schemas.map(s => describeSubSchema(s, undefined, undefined)));
 }
 
-function describeSubSchema(schema: JsonSchema, key?: string, parentSchema?: JsonSchema): string {
+function describeSubSchema(
+  schema: JsonSchemaWrapper,
+  key?: string,
+  parentSchema?: JsonSchemaWrapper
+): string {
   let result = describeSchema(schema, key, parentSchema, false, 1);
   if (isBlank(result)) {
     result = describeSchema(schema, key, parentSchema, true, 1);

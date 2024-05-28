@@ -1,21 +1,29 @@
-import {shallowRef} from 'vue';
-import {defaultSettingsData} from '@/settings/defaultSettingsData';
-import {simplifiedMetaSchema} from '../../resources/json-schema/simplifiedMetaSchema';
-import {SETTINGS_SCHEMA} from '@/example-schemas/settingsSchema';
+import {computed, shallowRef} from 'vue';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import {buildMetaSchema} from '@/schema/metaSchemaBuilder';
+import {SETTINGS_SCHEMA} from '@/settings/settingsSchema';
+import {useLocalStorage} from '@vueuse/core';
 
 const dataSource = {
-  // data of the file editor
-  userData: shallowRef<any>({}), // TODO use shallowRef
+  // data of the data editor
+  userData: shallowRef<any>({}),
   // data of the schema editor, used as the schema for the file editor
   userSchemaData: shallowRef<any>({
     title: 'No schema loaded',
   }),
-  // meta schema of the schema editor
-  metaSchemaData: shallowRef<any>(simplifiedMetaSchema), // TODO use shallowRef
+
   // data of the settings editor
-  settingsData: shallowRef<any>(defaultSettingsData), // TODO add settings type
+  settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT)),
+};
+
+// Schema source and data source are separated, because metaSchemaData accesses the settingsData, which it could not do if they were defined within the same object.
+const schemaSource = {
+  // restricted meta schema of the schema editor
+  metaSchemaData: computed(() => buildMetaSchema(dataSource.settingsData.value.metaSchema)),
+
   // settings schema of the settings editor
-  settingsSchemaData: shallowRef<any>(SETTINGS_SCHEMA), // TODO add settings schema type
+  settingsSchemaData: shallowRef<TopLevelSchema>(SETTINGS_SCHEMA),
 };
 
 /**
@@ -27,4 +35,8 @@ const dataSource = {
  */
 export function useDataSource() {
   return dataSource;
+}
+
+export function useSchemaSource() {
+  return schemaSource;
 }
