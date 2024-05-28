@@ -2,12 +2,24 @@
 
 ## Description
 
-MetaConfigurator is a web app that automatically generates a GUI tailored to a given JSON schema
-to make editing configuration files, research data and schemas easier and more enjoyable.
+MetaConfigurator is a form generator and schema editor for JSON schema,
+making editing configuration files, research data and schemas easier and more enjoyable.
 
 Web playground: https://logende.github.io/meta-configurator/
 
-## Problem
+
+### Generated form for assisted editing of the JSON file
+![graphical_editor](figs/graphical_editor.gif)
+
+### Schema Editor
+![schema_editor](figs/schema_editor.gif)
+
+### Interactive Schema Diagram
+![schema_diagram](figs/schema_diagram.gif)
+
+
+## Motivation
+### Problem
 
 Creating and managing files that have to conform to a specific format or structure can be a challenging task with a simple text editor,
 especially if you are not familiar with the specific file formats or syntax.
@@ -15,7 +27,7 @@ For example, if you want to create a GitHub Actions workflow file, you have to f
 This structure is defined in a JSON schema, which is a JSON document that describes the structure of another JSON document.
 But how to make sure that the file you created is valid and conforms to the schema?
 
-## Solution
+### Solution
 
 The project offers a GUI-based solution that simplifies the creation and maintenance of configuration files and schemas.
 Users can interact with a user-friendly interface that provides intuitive controls and abstracts away the complexities
@@ -27,10 +39,6 @@ Our tool has the following advantages:
 - Less error-prone than manually editing configuration files
 
 More details can be found in [our paper](paper/paper_main_extended.pdf) and our [user guide](https://github.com/PaulBredl/meta-configurator/wiki/User-Guide).
-
-## Screenshot
-
-![Screenshot 1](figs/screenshot_file_editor.png)
 
 ## Development
 
