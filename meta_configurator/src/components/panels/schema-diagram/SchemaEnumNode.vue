@@ -47,13 +47,13 @@ function isHighlighted() {
 
 <style>
 .vue-flow__node-schemaenum {
-  background: lightcyan;
-  color: black;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  border: 1px solid #ddd;
 
-  border: 1px solid lightcyan;
-  border-radius: 4px;
-  box-shadow: 0 0 0 3px lightcyan;
-  padding: 0px;
+  color: #536878;
+  background: linear-gradient(135deg, #e9f5ff 0%, #ffffff 100%);
 }
 
 .vue-flow__handle {

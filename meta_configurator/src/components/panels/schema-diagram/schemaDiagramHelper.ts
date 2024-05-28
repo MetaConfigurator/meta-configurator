@@ -40,6 +40,10 @@ export function findBestMatchingData(
     if (matchingAttribute) {
       return matchingAttribute;
     }
+
+    if (selectedPath.length > 0) {
+      return findBestMatchingData(selectedNode, selectedPath.slice(0, -1));
+    }
   }
 
   return selectedNode!.data;

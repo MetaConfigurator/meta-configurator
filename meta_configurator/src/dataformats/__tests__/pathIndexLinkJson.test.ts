@@ -42,34 +42,44 @@ describe('pathIndexLinkJson', () => {
       it('should return the correct index of empty object property', () => {
         const data = `{"e": {}}`;
         const indexBeforeObjectDefinition = 6;
-        expect(pathIndexLinkJson.determineIndexOfPath(data, ['e'])).toBe(indexBeforeObjectDefinition);
+        expect(pathIndexLinkJson.determineIndexOfPath(data, ['e'])).toBe(
+          indexBeforeObjectDefinition
+        );
       });
       it('should return the correct index of nested object property', () => {
         const data = `{"f": {"g": 1}}`;
         const indexBeforeObjectDefinition = 6;
-        expect(pathIndexLinkJson.determineIndexOfPath(data, ['f'])).toBe(indexBeforeObjectDefinition);
+        expect(pathIndexLinkJson.determineIndexOfPath(data, ['f'])).toBe(
+          indexBeforeObjectDefinition
+        );
       });
       it('should return the correct index of nested property with formatting', () => {
         const data = `{ "f":\n\t\t { "g": 1 }}`;
         const indexBeforeObjectDefinition = 10;
-        expect(pathIndexLinkJson.determineIndexOfPath(data, ['f'])).toBe(indexBeforeObjectDefinition);
+        expect(pathIndexLinkJson.determineIndexOfPath(data, ['f'])).toBe(
+          indexBeforeObjectDefinition
+        );
       });
       it('should return the correct index of deeply nested object property', () => {
         const data = `{"h": {"i": {"unrelated": 3, "j": 1, "other": 2}}}`;
         const indexAtStartOfDeeplyNestedObject = 6;
         expect(pathIndexLinkJson.determineIndexOfPath(data, ['h'])).toBe(
-            indexAtStartOfDeeplyNestedObject
+          indexAtStartOfDeeplyNestedObject
         );
       });
       it('should return the correct index of an array', () => {
         const data = `{"k": [1, 2, 3]}`;
         const indexBeforeArrayDefinition = 6;
-        expect(pathIndexLinkJson.determineIndexOfPath(data, ['k'])).toBe(indexBeforeArrayDefinition);
+        expect(pathIndexLinkJson.determineIndexOfPath(data, ['k'])).toBe(
+          indexBeforeArrayDefinition
+        );
       });
       it('should return the correct index of an array with formatting', () => {
         const data = `{"k":\n\t [ 1, 2, 3 ]}`;
         const indexBeforeArrayDefinition = 8;
-        expect(pathIndexLinkJson.determineIndexOfPath(data, ['k'])).toBe(indexBeforeArrayDefinition);
+        expect(pathIndexLinkJson.determineIndexOfPath(data, ['k'])).toBe(
+          indexBeforeArrayDefinition
+        );
       });
     });
 
@@ -78,7 +88,7 @@ describe('pathIndexLinkJson', () => {
         const data = `{"test": {"a": {"b": {"c": "test2", "d": "test3", "e": "test4"}}}}`;
         const indexBeforeTest3 = 41;
         expect(pathIndexLinkJson.determineIndexOfPath(data, ['test', 'a', 'b', 'd'])).toBe(
-            indexBeforeTest3
+          indexBeforeTest3
         );
       });
       it('should determine the correct index in nested arrays', () => {
@@ -90,7 +100,7 @@ describe('pathIndexLinkJson', () => {
         const data = `{"test": {"a": [1, 2, {"b": {"c": [null, true, "test"]}}]}}`;
         const indexBeforeNull = 35;
         expect(pathIndexLinkJson.determineIndexOfPath(data, ['test', 'a', 2, 'b', 'c', 0])).toBe(
-            indexBeforeNull
+          indexBeforeNull
         );
       });
       it('should determine the correct index in nested arrays and objects in formatted JSON', () => {

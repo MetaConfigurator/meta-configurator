@@ -58,13 +58,17 @@ function isHighlighted() {
 
 <style>
 .vue-flow__node-schemaobject {
-  background: lightblue;
-  color: black;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  border: 1px solid #ddd;
+  color: #2e3d49;
+  background: linear-gradient(135deg, #fafcff 0%, #ffffff 100%);
+}
 
-  border: 1px solid lightblue;
-  border-radius: 4px;
-  box-shadow: 0 0 0 3px lightblue;
-  padding: 0px;
+.vue-flow__node-schemaobject:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 .vue-flow__handle {

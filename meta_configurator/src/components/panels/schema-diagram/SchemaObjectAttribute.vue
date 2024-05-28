@@ -3,16 +3,12 @@ import {
   SchemaElementData,
   SchemaObjectAttributeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
-import {getSessionForMode} from '@/data/useDataLink';
-import {SessionMode} from '@/store/sessionMode';
-import {Path} from '@/utility/path';
+import type {Path} from '@/utility/path';
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;
   selectedData?: SchemaElementData;
 }>();
-
-const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
@@ -34,12 +30,16 @@ function isHighlighted() {
     v-on:click.stop>
     <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
     <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
-    <span>: {{ props.data.typeDescription }}</span>
+    <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
   </div>
 </template>
 
 <style>
 .vue-flow__node-schemaattribute {
-  padding: 0px;
+  padding: 0;
+}
+.vue-flow__node-schemaattribute-type {
+  font-size: 0.8em;
+  color: gray;
 }
 </style>

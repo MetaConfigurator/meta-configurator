@@ -25,14 +25,18 @@ export class MenuItems {
   private readonly onFromWebClick: () => Promise<void>;
   private readonly onFromOurExampleClick: () => void;
   private readonly handleFromURLClick: () => void;
+  private readonly importCsvDocument: () => void;
+
   constructor(
     onFromSchemaStoreClick: () => Promise<void>,
     onFromOurExampleClick: () => void,
-    onFromURLClick: () => void
+    onFromURLClick: () => void,
+    importCsvDocument: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
     this.handleFromURLClick = onFromURLClick;
+    this.importCsvDocument = importCsvDocument;
   }
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
@@ -58,6 +62,17 @@ export class MenuItems {
         label: 'Open Data',
         icon: 'fa-regular fa-folder-open',
         command: () => openUploadFileDialog(getDataForMode(SessionMode.DataEditor)),
+      },
+      {
+        label: 'Import Data...',
+        icon: 'fa-solid fa-file-import',
+        items: [
+          {
+            label: 'Import CSV Data',
+            icon: 'fa-solid fa-table',
+            command: this.importCsvDocument,
+          },
+        ],
       },
       {
         label: 'Download Data',

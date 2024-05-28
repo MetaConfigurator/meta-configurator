@@ -3,7 +3,6 @@ import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import type {Ref} from 'vue';
 
 import {useVueFlow, VueFlow} from '@vue-flow/core';
-import Divider from 'primevue/divider';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGraphConstructor';
