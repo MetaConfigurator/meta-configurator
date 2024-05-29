@@ -9,6 +9,8 @@ Web playground: https://logende.github.io/meta-configurator/
 
 
 ### Generated form for assisted editing of the JSON file
+![import_schema](figs/load_schema.gif)
+
 ![graphical_editor](figs/graphical_editor.gif)
 
 ### Schema Editor
@@ -19,7 +21,6 @@ Web playground: https://logende.github.io/meta-configurator/
 
 
 ## Motivation
-### Problem
 
 Creating and managing files that have to conform to a specific format or structure can be a challenging task with a simple text editor,
 especially if you are not familiar with the specific file formats or syntax.
