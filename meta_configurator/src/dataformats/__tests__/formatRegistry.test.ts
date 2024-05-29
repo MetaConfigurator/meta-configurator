@@ -6,6 +6,7 @@ import {triggerRef} from 'vue';
 import {jsonFormat, registerDefaultDataFormats} from '../defaultFormats';
 import {PathIndexLinkJson} from '../pathIndexLinkJson';
 import {noPathIndexLink} from '../pathIndexLink';
+import {PathIndexLinkYaml} from '../pathIndexLinkYaml';
 
 function setDataFormat(format: string | undefined) {
   useDataSource().settingsData.value.dataFormat = format;
@@ -75,12 +76,12 @@ describe('usePathIndexLink', () => {
   });
   it('should return the json path index link if the data format is yaml', () => {
     setDataFormat('yaml');
-    expect(usePathIndexLink()).toBe(noPathIndexLink); // not implemented yet
+    expect(usePathIndexLink()).toBeInstanceOf(PathIndexLinkYaml);
   });
   it('should be reactive', () => {
     setDataFormat('json');
     expect(usePathIndexLink()).toBeInstanceOf(PathIndexLinkJson);
     setDataFormat('yaml');
-    expect(usePathIndexLink()).toBe(noPathIndexLink);
+    expect(usePathIndexLink()).toBeInstanceOf(PathIndexLinkYaml);
   });
 });
