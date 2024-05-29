@@ -42,6 +42,7 @@ Our tool has the following advantages:
 
 More details can be found in [our paper](paper/paper_main_extended.pdf) and our [user guide](https://github.com/PaulBredl/meta-configurator/wiki/User-Guide).
 
+
 ## Development
 
 The project relies on [Node Js](https://nodejs.org/en/download/).
