@@ -10,7 +10,6 @@ import ConfirmationService from 'primevue/confirmationservice';
 import {useAppRouter} from './router/router';
 import ErrorService from '@/utility/errorService';
 import {registerIcons} from '@/fontawesome';
-import VueCookies from 'vue-cookies';
 
 import {registerDefaultDataFormats} from '@/dataformats/defaultFormats';
 import App from '@/views/App.vue';
@@ -22,7 +21,6 @@ app.use(createPinia());
 app.use(useAppRouter());
 app.use(PrimeVue);
 app.use(ToastService);
-app.use(VueCookies);
 
 app.use(ConfirmationService);
 

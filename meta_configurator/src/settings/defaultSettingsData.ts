@@ -26,6 +26,8 @@ export const SETTINGS_DATA_DEFAULT = {
     allowBooleanSchema: false,
     allowMultipleTypes: false,
     objectTypesComfort: false,
+    showAdditionalPropertiesButton: false,
+    showJsonLdFields: false,
   },
   hideSchemaEditor: false,
   panels: {
@@ -65,5 +67,8 @@ export const SETTINGS_DATA_DEFAULT = {
         size: 50,
       },
     ],
+  },
+  rdf: {
+    sparqlEndpointUrl: 'https://dbpedia.org/sparql',
   },
 };

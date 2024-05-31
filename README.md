@@ -69,9 +69,26 @@ To launch the application, follow these steps:
    ```sh
    npm run dev
    ```
+   
+
+## Citing MetaConfigurator
+
+To cite MetaConfigurator in your publications, please use the following BibTeX entry:
+
+```bibtex
+@article{metaconfigurator2024, 
+year = {2024}, 
+title = {{MetaConfigurator: A User-Friendly Tool for Editing Structured Data Files}}, 
+author = {Neubauer, Felix and Bredl, Paul and Xu, Minye and Patel, Keyuriben and Pleiss, Jürgen and Uekermann, Benjamin}, 
+journal = {Datenbank-Spektrum}, 
+issn = {1618-2162}, 
+doi = {10.1007/s13222-024-00472-7}, 
+abstract = {{Textual formats to structure data, such as JSON, XML, and YAML, are widely used for structuring data in various domains, from configuration files to research data. However, manually editing data in these formats can be complex and time-consuming. Graphical user interfaces (GUIs) can significantly reduce manual efforts and assist the user in editing the files, but developing a file-format-specific GUI requires substantial development and maintenance efforts. To address this challenge, we introduce MetaConfigurator: an open-source web application that generates its GUI depending on a given schema. Our approach differs from other schema-to-UI approaches in three key ways: 1) It offers a unified view that combines the benefits of both GUIs and text editors, 2) it enables schema editing within the same tool, and 3) it supports advanced schema features, including conditions and constraints. In this paper, we discuss the design and implementation of MetaConfigurator, backed by insights from a small-scale qualitative user study. The results indicate the effectiveness of our approach in retrieving information from data and schemas and in editing them.}}, 
+pages = {1--9}
+}
+```
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
 For more information, see the LICENSE file.
-

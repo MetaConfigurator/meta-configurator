@@ -11,7 +11,6 @@ export const DEFAULT_SCHEMA: TopLevelSchema = {
     name: {
       type: 'string',
       description: 'Last name',
-      examples: ['Doe'],
     },
     circular: {
       title: 'Circular',

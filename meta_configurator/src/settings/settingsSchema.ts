@@ -160,6 +160,17 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             advanced: true,
           },
         },
+        showAdditionalPropertiesButton: {
+          type: 'boolean',
+          description:
+            'Most schemas allow additional properties (e.g., adding properties to the data, which are not defined in the schema). To support this in the schema editor, it would always provide an "Add Property" button to allow adding properties unknown to the schema. In practice, this option is not used much, but it can confuse the user. For example, they might try adding new fields for their schema by using this button, although that does not have any effect on the schema.',
+          default: false,
+        },
+        showJsonLdFields: {
+          type: 'boolean',
+          description: 'If set to true, the fields for JSON-LD will be shown in the schema editor.',
+          default: false,
+        },
       },
     },
     hideSchemaEditor: {
@@ -190,6 +201,20 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
               readOnly: true,
             },
           ],
+        },
+      },
+    },
+    rdf: {
+      type: 'object',
+      required: ['sparqlEndpointUrl'],
+      additionalProperties: false,
+      description: 'Settings for RDF data.',
+      properties: {
+        sparqlEndpointUrl: {
+          type: 'string',
+          description: 'The SPARQL endpoint to use for querying RDF data.',
+          default: 'https://dbpedia.org/sparql',
+          format: 'uri',
         },
       },
     },

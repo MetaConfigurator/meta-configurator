@@ -15,6 +15,7 @@ import AnyOfSelectionProperty from '@/components/panels/gui-editor/properties/An
 import {getDataForMode, getSessionForMode, getValidationForMode} from '@/data/useDataLink';
 import {typeSchema} from '@/schema/schemaProcessingUtils';
 import type {SessionMode} from '@/store/sessionMode';
+import OntologyUriProperty from '@/components/panels/gui-editor/properties/OntologyUriProperty.vue';
 
 /**
  * Resolves the corresponding component for a given node.
@@ -68,6 +69,13 @@ export function resolveCorrespondingComponent(
     });
   }
 
+  if (nodeData.schema.hasType('string') && isOntologyUri(nodeData.schema)) {
+    // @ts-ignore
+    return h(OntologyUriProperty, {
+      ...propsObject,
+    });
+  }
+
   if (nodeData.schema.hasType('string')) {
     // @ts-ignore
     return h(StringProperty, propsObject);
@@ -106,6 +114,14 @@ export function resolveCorrespondingComponent(
 
 function hasTwoOrMoreExamples(schema: any): boolean {
   return schema.examples !== undefined && schema.examples.length > 1;
+}
+
+function isOntologyUri(schema: any): boolean {
+  return (
+    schema.metaConfigurator !== undefined &&
+    schema.metaConfigurator.ontology !== undefined &&
+    schema.metaConfigurator.ontology.mustBeUri
+  );
 }
 
 function buildProperties(nodeData: ConfigTreeNodeData | AddItemTreeNodeData, mode: SessionMode) {
