@@ -236,33 +236,48 @@ export class MenuItems {
     });
 
     // toggle between advanced and simple schema options
-    if (
-      !useSettings().metaSchema.allowBooleanSchema ||
-      !useSettings().metaSchema.allowMultipleTypes ||
-      useSettings().metaSchema.objectTypesComfort
-    ) {
-      result.push({
-        label: 'Enable advanced schema options',
-        icon: 'fa-solid fa-gear',
-        command: () => {
+    result.push(
+      this.generateToggleButton(
+        () =>
+          useSettings().metaSchema.allowBooleanSchema &&
+          useSettings().metaSchema.allowMultipleTypes &&
+          !useSettings().metaSchema.objectTypesComfort,
+        () => {
           const metaSchema = useSettings().metaSchema;
           metaSchema.allowBooleanSchema = true;
           metaSchema.allowMultipleTypes = true;
           metaSchema.objectTypesComfort = false;
         },
-      });
-    } else {
-      result.push({
-        label: 'Disable advanced schema options',
-        highlighted: true,
-        icon: 'fa-solid fa-gear',
-        command: () => {
+        () => {
           const metaSchema = useSettings().metaSchema;
           metaSchema.allowBooleanSchema = false;
           metaSchema.allowMultipleTypes = false;
         },
-      });
-    }
+        'fa-solid fa-gear',
+        'fa-solid fa-gear',
+        'Enable advanced schema options',
+        'Disable advanced schema options'
+      )
+    );
+
+    // toggle to activate/deactivate JSON-LD support
+    result.push(
+      this.generateToggleButton(
+        () => useSettings().metaSchema.showJsonLdFields,
+        () => {
+          const metaSchema = useSettings().metaSchema;
+          metaSchema.showJsonLdFields = true;
+        },
+        () => {
+          const metaSchema = useSettings().metaSchema;
+          metaSchema.showJsonLdFields = false;
+        },
+        'fa-solid fa-circle-nodes',
+        'fa-solid fa-circle-nodes',
+        'Enable JSON-LD fields',
+        'Disable JSON-LD fields'
+      )
+    );
 
     return result;
   }
@@ -275,34 +290,53 @@ export class MenuItems {
     iconNameDisabled: string,
     description: string
   ): MenuItem {
-    if (
-      useSettings().panels[buttonMode].find(
-        panel => panel.panelType === panelType && panel.mode === panelMode
-      )
-    ) {
+    return this.generateToggleButton(
+      () =>
+        useSettings().panels[buttonMode].find(
+          panel => panel.panelType === panelType && panel.mode === panelMode
+        ) !== undefined,
+      () => {
+        const panels = useSettings().panels;
+        panels[buttonMode].push({
+          panelType: panelType,
+          mode: panelMode,
+          size: 40,
+        });
+      },
+      () => {
+        const panels = useSettings().panels;
+        panels[buttonMode] = panels[buttonMode].filter(
+          panel => !(panel.panelType === panelType && panel.mode === panelMode)
+        );
+      },
+      iconNameEnabled,
+      iconNameDisabled,
+      `Show ${description}`,
+      `Hide ${description}`
+    );
+  }
+
+  private generateToggleButton(
+    conditionActive: () => boolean,
+    actionActivate: () => void,
+    actionDeactivate: () => void,
+    iconNameEnabled: string,
+    iconNameDisabled: string,
+    descriptionActivate: string,
+    descriptionDeactivate: string
+  ): MenuItem {
+    if (conditionActive()) {
       return {
-        label: `Hide ${description}`,
+        label: descriptionDeactivate,
         icon: iconNameDisabled,
         highlighted: true,
-        command: () => {
-          const panels = useSettings().panels;
-          panels[buttonMode] = panels[buttonMode].filter(
-            panel => !(panel.panelType === panelType && panel.mode === panelMode)
-          );
-        },
+        command: actionDeactivate,
       };
     } else {
       return {
-        label: `Show ${description}`,
+        label: descriptionActivate,
         icon: iconNameEnabled,
-        command: () => {
-          const panels = useSettings().panels;
-          panels[buttonMode].push({
-            panelType: panelType,
-            mode: panelMode,
-            size: 40,
-          });
-        },
+        command: actionActivate,
       };
     }
   }

@@ -1,9 +1,9 @@
 <!--
-List dropdown for enum properties, also used for properties with multiple examples.
+Ontology Uri Property: user can select a prefix and a uri value for a property
 -->
 <script setup lang="ts">
 import {computed, type ComputedRef, type Ref, ref} from 'vue';
-import Dropdown from 'primevue/dropdown';
+import AutoComplete from 'primevue/autocomplete';
 import _ from 'lodash';
 import {dataToString} from '@/utility/dataToString';
 import type {PathElement} from '@/utility/path';
@@ -156,26 +156,27 @@ const allPrefixOptions = computed(() => {
 </script>
 
 <template>
-  <Dropdown
-    class="tableInput w-full"
+  <AutoComplete
+    class="tableInput w-full prefix-autocomplete"
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="valuePropertyPrefix"
     :editable="true"
-    :options="allPrefixOptions"
+    :suggestions="allPrefixOptions"
     :disabled="isReadOnly(props.propertySchema)"
     optionLabel="name"
+    :input-style="{width: '100px'}"
     @keydown.stop
-    :placeholder="`Select ${props.propertyName} prefix`" />
-  <Dropdown
+    placeholder="prefix" />
+  <AutoComplete
     class="tableInput w-full"
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="valueProperty"
     :editable="true"
-    :options="allOptions"
+    :suggestions="allOptions"
     :disabled="isReadOnly(props.propertySchema)"
     optionLabel="name"
     @keydown.stop
-    :placeholder="`Select ${props.propertyName}`" />
+    placeholder="uri" />
 </template>
 
 <style scoped>
@@ -185,5 +186,8 @@ const allPrefixOptions = computed(() => {
 }
 ::placeholder {
   color: #a8a8a8;
+}
+.prefix-autocomplete {
+  width: 100px;
 }
 </style>

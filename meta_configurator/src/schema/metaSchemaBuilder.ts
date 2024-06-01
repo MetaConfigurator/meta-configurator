@@ -260,17 +260,16 @@ const JSON_LD_DEFS = {
     oneOf: [
       {
         type: 'string',
-        title: 'Context element',
+        title: 'URI',
         format: 'uri',
       },
       {
-        title: 'Context object',
         $ref: '#/$defs/jsonLdCommon',
       },
     ],
   },
   jsonLdCommon: {
-    title: 'JsonLdCommon',
+    title: 'JSON-LD object',
     type: 'object',
     properties: {
       '@id': {
@@ -285,19 +284,6 @@ const JSON_LD_DEFS = {
           },
         },
       },
-      '@value': {
-        description:
-          'Used to specify the data that is associated with a particular property in the graph.',
-        type: ['string', 'boolean', 'number'],
-      },
-      /*'@language': {
-        description:
-          'Used to specify the language for a particular string value or the default language of a JSON-LD document.',
-        type: ['string'],
-        metaConfigurator: {
-          advanced: true,
-        },
-      },*/
       '@type': {
         description: 'Used to set the data type of a node or typed value.',
         type: ['string', 'array'],
@@ -315,12 +301,24 @@ const JSON_LD_DEFS = {
           },
         },
       },
+      '@value': {
+        description:
+          'Used to specify the data that is associated with a particular property in the graph.',
+        type: ['string', 'boolean', 'number'],
+        metaConfigurator: {
+          advanced: true,
+        },
+      },
+
       '@container': {
         description: 'Used to set the default container type for a term.',
         type: ['string'],
         enum: ['@language', '@list', '@index', '@set'],
-      },
-      /*'@list': {
+        metaConfigurator: {
+          advanced: true,
+        },
+      } /*
+      '@list': {
         description: 'Used to express an ordered set of data.',
         type: 'array',
         items: {
@@ -381,6 +379,14 @@ const JSON_LD_DEFS = {
           advanced: true,
         },
       },
+      '@language': {
+        description:
+            'Used to specify the language for a particular string value or the default language of a JSON-LD document.',
+        type: ['string'],
+        metaConfigurator: {
+          advanced: true,
+        },
+      },
       '@base': {
         description: 'Used to set the base IRI against which relative IRIs are resolved',
         type: ['string'],
@@ -396,7 +402,7 @@ const JSON_LD_DEFS = {
         metaConfigurator: {
           advanced: true,
         },
-      },*/
+      },*/,
     },
   },
 };
