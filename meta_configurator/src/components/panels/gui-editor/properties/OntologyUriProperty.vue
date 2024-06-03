@@ -73,7 +73,7 @@ const valuePropertyPrefix = computed({
 
 function determinePrefix(fullValue: any) {
   if (typeof fullValue === 'string') {
-    if (fullValue.includes(':')) {
+    if (hasPrefix(fullValue)) {
       return fullValue.split(':')[0];
     }
   }
@@ -82,13 +82,22 @@ function determinePrefix(fullValue: any) {
 
 function determineValue(fullValue: any) {
   if (typeof fullValue === 'string') {
-    if (fullValue.includes(':')) {
+    if (hasPrefix(fullValue)) {
       return fullValue.split(':')[1];
     } else {
       return fullValue;
     }
   }
   return undefined;
+}
+
+function hasPrefix(fullValue: string): boolean {
+  // do not consider it a prefix, if the value is an url
+  return (
+    fullValue.replace('://', '').includes(':') &&
+    !fullValue.startsWith('http:') &&
+    !fullValue.startsWith('https:')
+  );
 }
 
 function determinePrefixMeaning(prefix: string) {
@@ -157,23 +166,24 @@ const allPrefixOptions = computed(() => {
 
 <template>
   <AutoComplete
-    class="tableInput w-full prefix-autocomplete"
+    class="tableInput w-full prefix-autocomplete widthThird"
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="valuePropertyPrefix"
     :editable="true"
     :suggestions="allPrefixOptions"
     :disabled="isReadOnly(props.propertySchema)"
     optionLabel="name"
-    :input-style="{width: '100px'}"
+    :input-style="{width: '100%'}"
     @keydown.stop
     placeholder="prefix" />
   <AutoComplete
-    class="tableInput w-full"
+    class="tableInput w-full value-autocomplete widthTwoThirds"
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="valueProperty"
     :editable="true"
     :suggestions="allOptions"
     :disabled="isReadOnly(props.propertySchema)"
+    :input-style="{width: '100%'}"
     optionLabel="name"
     @keydown.stop
     placeholder="uri" />
@@ -187,7 +197,10 @@ const allPrefixOptions = computed(() => {
 ::placeholder {
   color: #a8a8a8;
 }
-.prefix-autocomplete {
-  width: 100px;
+.widthThird {
+  width: 33%;
+}
+.widthTwoThirds {
+  width: 66%;
 }
 </style>

@@ -9,6 +9,10 @@ Web playground: https://paulbredl.github.io/meta-configurator/
 
 Web playground experimental: https://logende.github.io/meta-configurator/
 
+<img src="figs/metaconfigurator_diagram.png" width="460">
+
+<details>
+<summary>Expand to see animated screen captures of MetaConfigurator. </summary>
 
 ### Generated form for assisted editing of the JSON file
 ![import_schema](figs/load_schema.gif)
@@ -20,6 +24,7 @@ Web playground experimental: https://logende.github.io/meta-configurator/
 
 ### Interactive Schema Diagram
 ![schema_diagram](figs/schema_diagram.gif)
+</details>
 
 
 ## Motivation
