@@ -24,6 +24,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@jsonhero/schema-infer": "^0.1.5",
     "@vue-flow/core": "^1.33.6",
     "@vueuse/core": "^10.6.0",
     "ajv": "^8.12.0",

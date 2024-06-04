@@ -28,10 +28,17 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import {getSessionForMode} from '@/data/useDataLink';
+import {
+  getDataForMode,
+  getSchemaForMode,
+  getSessionForMode,
+  useCurrentData,
+  useCurrentSchema,
+} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
+import {inferJsonSchema} from '@/schema/inferJsonSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -53,7 +60,8 @@ const topMenuBar = new MenuItems(
   handleFromWebClick,
   handleFromOurExampleClick,
   showUrlDialog,
-  showCsvImportDialog
+  showCsvImportDialog,
+  inferSchemaFromSampleData
 );
 
 function getPageName(): string {
@@ -189,6 +197,14 @@ function hideUrlDialog() {
 async function fetchSchemaFromSelectedUrl() {
   await fetchSchemaFromUrl(schemaUrl.value!);
   hideUrlDialog();
+}
+
+function inferSchemaFromSampleData() {
+  const data = getDataForMode(SessionMode.DataEditor).data.value;
+  const inferredSchema = inferJsonSchema(data);
+  if (inferredSchema) {
+    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferredSchema;
+  }
 }
 
 function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {

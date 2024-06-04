@@ -26,17 +26,20 @@ export class MenuItems {
   private readonly onFromOurExampleClick: () => void;
   private readonly handleFromURLClick: () => void;
   private readonly importCsvDocument: () => void;
+  private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
     onFromSchemaStoreClick: () => Promise<void>,
     onFromOurExampleClick: () => void,
     onFromURLClick: () => void,
-    importCsvDocument: () => void
+    importCsvDocument: () => void,
+    inferJsonSchemaFromSampleData: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
     this.handleFromURLClick = onFromURLClick;
     this.importCsvDocument = importCsvDocument;
+    this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
   }
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
@@ -115,12 +118,9 @@ export class MenuItems {
             command: openClearSchemaDialog,
           },
           {
-            label: 'Infer Schema',
+            label: 'Infer Schema from data',
             icon: 'fa-solid fa-wand-magic-sparkles',
-            command: () => {
-              throw new Error('Not implemented yet');
-            },
-            disabled: true,
+            command: this.inferJsonSchemaFromSampleData,
           },
         ],
       },

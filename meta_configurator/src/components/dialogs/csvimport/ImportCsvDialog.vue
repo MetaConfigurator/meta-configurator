@@ -61,10 +61,9 @@ defineExpose({show: openDialog, close: hideDialog});
   <Dialog v-model:visible="showDialog" header="Import CSV">
     <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
       <p>
-        The import will insert the CSV data into your current document, overwriting existing data in
-        case of a conflict.
+        The import will insert the CSV data into your current document, overwriting existing data
+        for paths with a conflict.
       </p>
-      <p>Other data will remain unchanged</p>
 
       <div class="flex align-items-center vertical-center">
         <label for="delimiter" class="mr-2">Delimiter in the CSV document:</label>
