@@ -118,7 +118,7 @@ export class MenuItems {
             command: openClearSchemaDialog,
           },
           {
-            label: 'Infer Schema from data',
+            label: 'Infer Schema from Data',
             icon: 'fa-solid fa-wand-magic-sparkles',
             command: this.inferJsonSchemaFromSampleData,
           },
