@@ -6,7 +6,7 @@ export const SETTINGS_DATA_DEFAULT = {
   toolbarTitle: 'MetaConfigurator',
   uiColors: {
     schemaEditor: 'olivedrab',
-    dataEditor: 'darkgray',
+    dataEditor: 'black',
     settings: 'darkmagenta',
   },
   codeEditor: {

@@ -28,7 +28,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         dataEditor: {
           type: 'string',
           description: 'The color associated with panels that represent file data.',
-          default: 'darkgray',
+          default: 'black',
           format: 'color',
         },
         settings: {
