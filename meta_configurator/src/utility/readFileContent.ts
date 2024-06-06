@@ -59,41 +59,40 @@ export function readFileContentToDataLink(
     .catch(error => errorService.onError(error));
 }
 
-export function readFileContentCsvToRef(
-  files: FileList | File[] | null,
-  delimiter: string,
-  resultRef: Ref<any[]>
+export async function readFileContentCsvToRef(
+    files: FileList | File[] | null,
+    delimiter: string,
+    resultRef: Ref<any[]>
 ) {
-  return readFileContentFromFileList(files)
-    .then(contents => {
-      if (contents === undefined) {
+    try {
+        let contents = await readFileContentFromFileList(files);
+        if (contents === undefined) {
+            return;
+        }
+
+        const parseCsv = (csvString: string, delimiter: string = ',') => {
+            parse(
+                csvString,
+                {
+                    delimiter: delimiter,
+                    columns: true,
+                    skip_empty_lines: true,
+                    cast: true,
+                    trim: true,
+                },
+                (error: CsvError | undefined, records: any) => {
+                    if (error) {
+                        errorService.onError(error);
+                    } else {
+                        resultRef.value = records;
+                    }
+                }
+            );
+        };
+
+        parseCsv(contents, delimiter);
+    } catch (error1) {
+        errorService.onError(error1);
         return;
-      }
-
-      const parseCsv = (csvString: string, delimiter: string = ',') => {
-        parse(
-          csvString,
-          {
-            delimiter: delimiter,
-            columns: true,
-            skip_empty_lines: true,
-            cast: true,
-            trim: true,
-          },
-          (error: CsvError | undefined, records: any) => {
-            if (error) {
-              errorService.onError(error);
-            } else {
-              resultRef.value = records;
-            }
-          }
-        );
-      };
-
-      parseCsv(contents, delimiter);
-    })
-    .catch(error => {
-      errorService.onError(error);
-      return;
-    });
+    }
 }

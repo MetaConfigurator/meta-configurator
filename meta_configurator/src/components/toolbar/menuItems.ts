@@ -1,6 +1,6 @@
 import {openUploadFileDialog, openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
-import {openClearCurrentFileDialog, openClearSchemaDialog} from '@/components/toolbar/clearFile';
+import {clearCurrentFile} from '@/components/toolbar/clearFile';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
 import type {SchemaOption} from '@/packaged-schemas/schemaOption';
@@ -51,7 +51,7 @@ export class MenuItems {
           {
             label: 'Clear Data',
             icon: 'fa-regular fa-file',
-            command: openClearCurrentFileDialog,
+            command: clearCurrentFile,
           },
           {
             label: 'Generate Data...',
@@ -115,7 +115,7 @@ export class MenuItems {
           {
             label: 'New empty Schema',
             icon: 'fa-regular fa-file',
-            command: openClearSchemaDialog,
+            command: clearCurrentFile,
           },
           {
             label: 'Infer Schema from Data',
