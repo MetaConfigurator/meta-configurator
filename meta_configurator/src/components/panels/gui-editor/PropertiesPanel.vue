@@ -186,6 +186,8 @@ function removeProperty(subPath: Path) {
   updateTree();
 }
 
+// TODO: add setting to synchronize schema changes in GUI with data: if property renamed/deleted, do same with data
+
 function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData: any) {
   // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
   let dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
