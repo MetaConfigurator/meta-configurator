@@ -81,6 +81,7 @@ function getPageName(): string {
  * Menu items of the page selection menu.
  */
 function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
+  // TODO: make the text actually have the given uiColors. Somehow currently the color in the style has no effect
   const dataEditorItem: MenuItem = {
     label: 'Data Editor',
     icon: 'fa-regular fa-file',
