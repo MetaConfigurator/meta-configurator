@@ -22,19 +22,19 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         schemaEditor: {
           type: 'string',
           description: 'The color associated with panels that represent schema data.',
-          default: '#2196F3',
+          default: 'olivedrab',
           format: 'color',
         },
         dataEditor: {
           type: 'string',
           description: 'The color associated with panels that represent file data.',
-          default: '#4CAF50',
+          default: 'darkgray',
           format: 'color',
         },
         settings: {
           type: 'string',
           description: 'The color associated with panels that represent settings data.',
-          default: '#FFC107',
+          default: 'darkmagenta',
           format: 'color',
         },
       },

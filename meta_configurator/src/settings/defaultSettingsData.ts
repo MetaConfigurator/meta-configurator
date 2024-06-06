@@ -5,9 +5,9 @@ export const SETTINGS_DATA_DEFAULT = {
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
   uiColors: {
-    schemaEditor: 'blue',
-    dataEditor: 'red',
-    settings: 'green',
+    schemaEditor: 'olivedrab',
+    dataEditor: 'darkgray',
+    settings: 'darkmagenta',
   },
   codeEditor: {
     fontSize: 14,
