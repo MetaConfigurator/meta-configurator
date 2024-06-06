@@ -274,7 +274,7 @@ export class MenuItems {
         },
         'fa-solid fa-circle-nodes',
         'fa-solid fa-circle-nodes',
-        'Enable JSON-LD fields',
+        'Enable JSON-LD fields\n(You can specify the SPARQL endpoint in the settings)',
         'Disable JSON-LD fields'
       )
     );
