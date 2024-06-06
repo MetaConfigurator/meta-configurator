@@ -2,11 +2,12 @@ import CodeEditorPanel from '@/components/panels/code-editor/CodeEditorPanel.vue
 import GuiEditorPanel from '@/components/panels/gui-editor/GuiEditorPanel.vue';
 import SchemaDiagramPanel from '@/components/panels/schema-diagram/SchemaDiagramPanel.vue';
 import DebugPanel from '@/components/panels/debug-panel/DebugPanel.vue';
+import {errorService} from "@/main";
 
 export enum PanelType {
-  GuiEditor = 'gui_editor',
-  TextEditor = 'text_editor',
-  SchemaDiagram = 'schema_diagram',
+  GuiEditor = 'guiEditor',
+  TextEditor = 'textEditor',
+  SchemaDiagram = 'schemaDiagram',
   Debug = 'debug',
 }
 
@@ -21,5 +22,6 @@ export function getComponentByPanelType(panelType: PanelType) {
     case PanelType.Debug:
       return DebugPanel;
   }
-  throw new Error(`Unknown panel type: ${panelType}`);
+  errorService.onError(new Error(`Unknown panel type: ${panelType}`));
+  return CodeEditorPanel;
 }

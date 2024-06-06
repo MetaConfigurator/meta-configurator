@@ -1,5 +1,5 @@
 export enum SessionMode {
-  DataEditor = 'data_editor',
-  SchemaEditor = 'schema_editor',
+  DataEditor = 'dataEditor',
+  SchemaEditor = 'schemaEditor',
   Settings = 'settings',
 }

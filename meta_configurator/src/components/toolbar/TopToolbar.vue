@@ -84,12 +84,11 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const dataEditorItem: MenuItem = {
     label: 'Data Editor',
     icon: 'fa-regular fa-file',
-    class: () => {
-      if (props.currentMode !== SessionMode.DataEditor) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
+    style:
+       (props.currentMode !== SessionMode.DataEditor) ?
+         'color: ' + settings.uiColors.dataEditor :
+      'font-weight: bold; color: ' + settings.uiColors.dataEditor
+    ,
     command: () => {
       emit('mode-selected', SessionMode.DataEditor);
     },
@@ -97,12 +96,11 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const schemaEditorItem: MenuItem = {
     label: 'Schema Editor',
     icon: 'fa-regular fa-file-code',
-    class: () => {
-      if (props.currentMode !== SessionMode.SchemaEditor) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
+    style:
+        (props.currentMode !== SessionMode.SchemaEditor) ?
+            'color: ' + settings.uiColors.schemaEditor  :
+            'font-weight: bold; color: ' + settings.uiColors.schemaEditor
+    ,
     command: () => {
       emit('mode-selected', SessionMode.SchemaEditor);
     },
@@ -110,12 +108,11 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const settingsItem: MenuItem = {
     label: 'Settings',
     icon: 'fa-solid fa-cog',
-    class: () => {
-      if (props.currentMode !== SessionMode.Settings) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
+    style:
+        (props.currentMode !== SessionMode.Settings) ?
+            'color: ' + settings.uiColors.settings :
+            'font-weight: bold; color: ' + settings.uiColors.settings
+    ,
     command: () => {
       emit('mode-selected', SessionMode.Settings);
     },

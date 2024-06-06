@@ -4,6 +4,11 @@
 export const SETTINGS_DATA_DEFAULT = {
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
+  uiColors: {
+    schemaEditor: 'blue',
+    dataEditor: 'red',
+    settings: 'green',
+  },
   codeEditor: {
     fontSize: 14,
   },
@@ -31,38 +36,38 @@ export const SETTINGS_DATA_DEFAULT = {
   },
   hideSchemaEditor: false,
   panels: {
-    data_editor: [
+    dataEditor: [
       {
-        panelType: 'text_editor',
-        mode: 'data_editor',
+        panelType: 'textEditor',
+        mode: 'dataEditor',
         size: 50,
       },
       {
-        panelType: 'gui_editor',
-        mode: 'data_editor',
+        panelType: 'guiEditor',
+        mode: 'dataEditor',
         size: 50,
       },
     ],
-    schema_editor: [
+    schemaEditor: [
       {
-        panelType: 'text_editor',
-        mode: 'schema_editor',
+        panelType: 'textEditor',
+        mode: 'schemaEditor',
         size: 50,
       },
       {
-        panelType: 'gui_editor',
-        mode: 'schema_editor',
+        panelType: 'guiEditor',
+        mode: 'schemaEditor',
         size: 50,
       },
     ],
     settings: [
       {
-        panelType: 'text_editor',
+        panelType: 'textEditor',
         mode: 'settings',
         size: 50,
       },
       {
-        panelType: 'gui_editor',
+        panelType: 'guiEditor',
         mode: 'settings',
         size: 50,
       },

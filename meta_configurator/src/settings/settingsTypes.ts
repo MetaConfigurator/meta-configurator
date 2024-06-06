@@ -3,6 +3,11 @@ import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
   toolbarTitle: string;
+  uiColors: {
+    schemaEditor: string;
+    dataEditor: string;
+    settings: string;
+  }
   dataFormat: DataFormat;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
@@ -35,8 +40,8 @@ export interface SettingsInterfaceSchemaDiagram {
 }
 
 export interface SettingsInterfacePanels {
-  data_editor: SettingsInterfacePanel[];
-  schema_editor: SettingsInterfacePanel[];
+  dataEditor: SettingsInterfacePanel[];
+  schemaEditor: SettingsInterfacePanel[];
   settings: SettingsInterfacePanel[];
 }
 

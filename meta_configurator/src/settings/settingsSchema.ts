@@ -13,6 +13,32 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'The title of the editor, shown in the toolbar.',
       default: 'MetaConfigurator',
     },
+    uiColors: {
+      type: 'object',
+      required: ['schemaEditor', 'dataEditor', 'settings'],
+      additionalProperties: false,
+      description: 'The colors associated with the different panels.',
+      properties: {
+        schemaEditor: {
+          type: 'string',
+          description: 'The color associated with panels that represent schema data.',
+          default: '#2196F3',
+          format: 'color',
+        },
+        dataEditor: {
+          type: 'string',
+          description: 'The color associated with panels that represent file data.',
+          default: '#4CAF50',
+          format: 'color',
+        },
+        settings: {
+          type: 'string',
+          description: 'The color associated with panels that represent settings data.',
+          default: '#FFC107',
+          format: 'color',
+        },
+      },
+    },
     dataFormat: {
       type: 'string',
       description: 'The data format to use for the configuration files.',
@@ -179,17 +205,17 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       default: false,
     },
     panels: {
-      required: ['data_editor', 'schema_editor', 'settings'],
+      required: ['dataEditor', 'schemaEditor', 'settings'],
       title: 'Panels',
       type: 'object',
       additionalProperties: false,
       description:
         'In this setting the view can be customized: which panels to show in the different modes.',
       properties: {
-        data_editor: {
+        dataEditor: {
           $ref: '#/$defs/panels',
         },
-        schema_editor: {
+        schemaEditor: {
           $ref: '#/$defs/panels',
         },
         settings: {
@@ -233,7 +259,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['gui_editor', 'text_editor', 'schema_diagram'],
+            enum: ['guiEditor', 'textEditor', 'schemaDiagram'],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },
@@ -241,7 +267,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             type: 'string',
             title: 'Mode',
             description: 'The mode determines which kind of data and schema the panel uses.',
-            enum: ['schema_editor', 'data_editor', 'settings'],
+            enum: ['schemaEditor', 'dataEditor', 'settings'],
           },
           size: {
             type: 'number',
@@ -253,14 +279,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         if: {
           properties: {
             panelType: {
-              const: 'schema_diagram',
+              const: 'schemaDiagram',
             },
           },
         },
         then: {
           properties: {
             mode: {
-              const: 'schema_editor',
+              const: 'schemaEditor',
             },
           },
         },
