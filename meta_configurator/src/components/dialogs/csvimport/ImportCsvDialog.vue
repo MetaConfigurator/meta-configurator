@@ -19,6 +19,7 @@ import _ from 'lodash';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import type {CsvError} from "csv-parse/browser/esm";
 import {parse} from "csv-parse/browser/esm";
+import {computeMostUsedDelimiterAndDecimalSeparator} from "@/components/dialogs/csvimport/delimiterAndSeparatorMetrics";
 
 const showDialog = ref(false);
 
@@ -90,8 +91,16 @@ function addCustomTitleToSchemaProperty(inferredSchema: any, column: CsvImportCo
 }
 
 
-watch([currentUserDataString, decimalSeparator, delimiter], newValue => {
-  loadCsvFromInput()
+watch(currentUserDataString, newValue => {
+  const {delimiterSuggestion, decimalSeparatorSuggestion} = computeMostUsedDelimiterAndDecimalSeparator(currentUserDataString.value);
+  delimiter.value = delimiterSuggestion;
+  decimalSeparator.value = decimalSeparatorSuggestion;
+    loadCsvFromInput();
+});
+watch([decimalSeparator, delimiter], newValue => {
+  if (decimalSeparator.value.length > 0 && delimiter.value.length > 0) {
+    loadCsvFromInput();
+  }
 });
 
 function loadCsvFromInput() {
@@ -173,7 +182,7 @@ defineExpose({show: openDialog, close: hideDialog});
           <InputText id="decimalSeparator" v-model="decimalSeparator" class="small-input" />
         </div>
 
-        <p style="color: darkred; white-space: pre-line">{{errorMessage}}</p>
+        <p v-if="errorMessage.length>0" style="color: red; white-space: pre-line">{{errorMessage}}</p>
 
       </div>
 
