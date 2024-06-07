@@ -7,7 +7,7 @@ import Divider from 'primevue/divider';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
 import {useFileDialog} from '@vueuse/core';
-import {readFileContentCsvToRef} from '@/utility/readFileContent';
+import {readFileContentToRef} from '@/utility/readFileContent';
 import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {writeCsvToData} from '@/components/dialogs/csvimport/writeCsvToData';
@@ -17,12 +17,18 @@ import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {dataPathToSchemaPath, jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import _ from 'lodash';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
-import type {JsonSchemaType} from '@/schema/jsonSchemaType';
+import type {CsvError} from "csv-parse/browser/esm";
+import {parse} from "csv-parse/browser/esm";
 
 const showDialog = ref(false);
+
+const currentUserDataString: Ref<string> = ref('');
 const currentUserCsv: Ref<any[]> = ref([]);
+const errorMessage: Ref<string> = ref('');
 
 const delimiter: Ref<string> = ref(',');
+const decimalSeparator: Ref<string> = ref('.'); // todo: auto infer initial value
+
 const isInferSchema: Ref<boolean> = ref(false);
 const pathBeforeRowIndex: Ref<string> = ref('myTableName');
 const currentColumnMapping: Ref<CsvImportColumnMappingData[]> = ref([]);
@@ -39,7 +45,7 @@ function requestUploadFile() {
   const {open, onChange} = useFileDialog();
 
   onChange((files: FileList | null) => {
-    readFileContentCsvToRef(files, delimiter.value, currentUserCsv);
+    readFileContentToRef(files,currentUserDataString);
   });
   open();
 }
@@ -83,6 +89,42 @@ function addCustomTitleToSchemaProperty(inferredSchema: any, column: CsvImportCo
   _.set(inferredSchema, titlePathString, column.titleInSchema);
 }
 
+
+watch([currentUserDataString, decimalSeparator, delimiter], newValue => {
+  loadCsvFromInput()
+});
+
+function loadCsvFromInput() {
+  if (currentUserDataString.value.length > 0) {
+
+    parse(
+        currentUserDataString.value,
+        {
+          delimiter: delimiter.value,
+          columns: true,
+          skip_empty_lines: true,
+          cast: true,
+          trim: true,
+        },
+        (error: CsvError | undefined, records: any) => {
+          if (error) {
+            errorMessage.value = "With the given delimiter and decimal separator, the CSV could not be parsed. " +
+               "\nPlease check the settings. " +
+                "\nError: " + error.message;
+            currentUserCsv.value = [];
+          } else {
+            errorMessage.value = "";
+            currentUserCsv.value = records;
+          }
+        }
+    );
+
+    } else {
+    currentUserCsv.value = [];
+  }
+}
+
+
 // Watch for changes in currentUserCsv and update fields shown to user accordingly
 watch(currentUserCsv, newValue => {
   if (currentUserCsv.value.length > 0) {
@@ -107,11 +149,6 @@ defineExpose({show: openDialog, close: hideDialog});
         for paths with a conflict.
       </p>
 
-      <div class="flex align-items-center vertical-center">
-        <label for="delimiter" class="mr-2"><b>Delimiter in the CSV document:</b></label>
-        <InputText id="delimiter" v-model="delimiter" class="small-input" />
-      </div>
-
       <div class="flex align-items-center">
         <Button
           label="Select CSV Document"
@@ -122,6 +159,24 @@ defineExpose({show: openDialog, close: hideDialog});
           icon="fa-regular fa-circle-check"
           class="text-green-500 ml-2" />
       </div>
+
+      <div v-if="currentUserDataString.length > 0">
+
+        <div class="flex align-items-center vertical-center">
+          <label for="delimiter" class="mr-2"><b>Delimiter in the CSV document:</b></label>
+          <InputText id="delimiter" v-model="delimiter" class="small-input" />
+        </div>
+
+
+        <div class="flex align-items-center vertical-center">
+          <label for="decimalSeparator" class="mr-2"><b>Decimal Separator in the CSV document:</b></label>
+          <InputText id="decimalSeparator" v-model="decimalSeparator" class="small-input" />
+        </div>
+
+        <p style="color: darkred; white-space: pre-line">{{errorMessage}}</p>
+
+      </div>
+
 
       <div
         v-if="currentUserCsv.length > 0"
