@@ -13,6 +13,32 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'The title of the editor, shown in the toolbar.',
       default: 'MetaConfigurator',
     },
+    uiColors: {
+      type: 'object',
+      required: ['schemaEditor', 'dataEditor', 'settings'],
+      additionalProperties: false,
+      description: 'The colors associated with the different panels.',
+      properties: {
+        schemaEditor: {
+          type: 'string',
+          description: 'The color associated with panels that represent schema data.',
+          default: 'olivedrab',
+          format: 'color',
+        },
+        dataEditor: {
+          type: 'string',
+          description: 'The color associated with panels that represent file data.',
+          default: 'black',
+          format: 'color',
+        },
+        settings: {
+          type: 'string',
+          description: 'The color associated with panels that represent settings data.',
+          default: 'darkmagenta',
+          format: 'color',
+        },
+      },
+    },
     dataFormat: {
       type: 'string',
       description: 'The data format to use for the configuration files.',
@@ -160,6 +186,17 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             advanced: true,
           },
         },
+        showAdditionalPropertiesButton: {
+          type: 'boolean',
+          description:
+            'Most schemas allow additional properties (e.g., adding properties to the data, which are not defined in the schema). To support this in the schema editor, it would always provide an "Add Property" button to allow adding properties unknown to the schema. In practice, this option is not used much, but it can confuse the user. For example, they might try adding new fields for their schema by using this button, although that does not have any effect on the schema.',
+          default: false,
+        },
+        showJsonLdFields: {
+          type: 'boolean',
+          description: 'If set to true, the fields for JSON-LD will be shown in the schema editor.',
+          default: false,
+        },
       },
     },
     hideSchemaEditor: {
@@ -168,17 +205,17 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       default: false,
     },
     panels: {
-      required: ['data_editor', 'schema_editor', 'settings'],
+      required: ['dataEditor', 'schemaEditor', 'settings'],
       title: 'Panels',
       type: 'object',
       additionalProperties: false,
       description:
         'In this setting the view can be customized: which panels to show in the different modes.',
       properties: {
-        data_editor: {
+        dataEditor: {
           $ref: '#/$defs/panels',
         },
-        schema_editor: {
+        schemaEditor: {
           $ref: '#/$defs/panels',
         },
         settings: {
@@ -190,6 +227,20 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
               readOnly: true,
             },
           ],
+        },
+      },
+    },
+    rdf: {
+      type: 'object',
+      required: ['sparqlEndpointUrl'],
+      additionalProperties: false,
+      description: 'Settings for RDF data.',
+      properties: {
+        sparqlEndpointUrl: {
+          type: 'string',
+          description: 'The SPARQL endpoint to use for querying RDF data.',
+          default: 'https://dbpedia.org/sparql',
+          format: 'uri',
         },
       },
     },
@@ -208,7 +259,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['gui_editor', 'text_editor', 'schema_diagram'],
+            enum: ['guiEditor', 'textEditor', 'schemaDiagram'],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },
@@ -216,7 +267,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             type: 'string',
             title: 'Mode',
             description: 'The mode determines which kind of data and schema the panel uses.',
-            enum: ['schema_editor', 'data_editor', 'settings'],
+            enum: ['schemaEditor', 'dataEditor', 'settings'],
           },
           size: {
             type: 'number',
@@ -228,14 +279,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         if: {
           properties: {
             panelType: {
-              const: 'schema_diagram',
+              const: 'schemaDiagram',
             },
           },
         },
         then: {
           properties: {
             mode: {
-              const: 'schema_editor',
+              const: 'schemaEditor',
             },
           },
         },

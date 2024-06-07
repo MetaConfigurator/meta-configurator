@@ -4,6 +4,11 @@
 export const SETTINGS_DATA_DEFAULT = {
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
+  uiColors: {
+    schemaEditor: 'olivedrab',
+    dataEditor: 'black',
+    settings: 'darkmagenta',
+  },
   codeEditor: {
     fontSize: 14,
   },
@@ -15,8 +20,8 @@ export const SETTINGS_DATA_DEFAULT = {
     vertical: true,
     showAttributes: true,
     showEnumValues: true,
-    maxAttributesToShow: 8,
-    maxEnumValuesToShow: 5,
+    maxAttributesToShow: 14,
+    maxEnumValuesToShow: 10,
     moveViewToSelectedElement: true,
     automaticZoomMaxValue: 1,
     automaticZoomMinValue: 0.5,
@@ -26,44 +31,49 @@ export const SETTINGS_DATA_DEFAULT = {
     allowBooleanSchema: false,
     allowMultipleTypes: false,
     objectTypesComfort: false,
+    showAdditionalPropertiesButton: false,
+    showJsonLdFields: false,
   },
   hideSchemaEditor: false,
   panels: {
-    data_editor: [
+    dataEditor: [
       {
-        panelType: 'text_editor',
-        mode: 'data_editor',
+        panelType: 'textEditor',
+        mode: 'dataEditor',
         size: 50,
       },
       {
-        panelType: 'gui_editor',
-        mode: 'data_editor',
+        panelType: 'guiEditor',
+        mode: 'dataEditor',
         size: 50,
       },
     ],
-    schema_editor: [
+    schemaEditor: [
       {
-        panelType: 'text_editor',
-        mode: 'schema_editor',
+        panelType: 'textEditor',
+        mode: 'schemaEditor',
         size: 50,
       },
       {
-        panelType: 'gui_editor',
-        mode: 'schema_editor',
+        panelType: 'guiEditor',
+        mode: 'schemaEditor',
         size: 50,
       },
     ],
     settings: [
       {
-        panelType: 'text_editor',
+        panelType: 'textEditor',
         mode: 'settings',
         size: 50,
       },
       {
-        panelType: 'gui_editor',
+        panelType: 'guiEditor',
         mode: 'settings',
         size: 50,
       },
     ],
+  },
+  rdf: {
+    sparqlEndpointUrl: 'https://dbpedia.org/sparql',
   },
 };

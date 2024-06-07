@@ -814,7 +814,13 @@ export class JsonSchemaWrapper {
   /**
    * Meta configurator specific properties.
    */
-  get metaConfigurator(): {advanced?: boolean; hideAddPropertyButton?: boolean} | undefined {
+  get metaConfigurator():
+    | {
+        hideAddPropertyButton?: boolean;
+        advanced?: boolean;
+        ontology?: {mustBeUri?: boolean; mustBeClassOrProperty?: boolean};
+      }
+    | undefined {
     return this.jsonSchema?.metaConfigurator;
   }
 }

@@ -95,6 +95,7 @@ export type JsonSchemaObjectType = {
   metaConfigurator?: {
     hideAddPropertyButton?: boolean;
     advanced?: boolean;
+    ontology?: {mustBeUri?: boolean; mustBeClassOrProperty?: boolean};
   };
 
   [k: string]: any;

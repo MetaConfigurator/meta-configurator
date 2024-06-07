@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Neubauer"
+  given-names: "Felix"
+  orcid: "https://orcid.org/0009-0008-5367-2034"
+- family-names: "Bredl"
+  given-names: "Paul"
+  orcid: "https://orcid.org/0009-0007-2887-784X"
+- family-names: "Xu"
+  given-names: "Minye"
+- family-names: "Patel"
+  given-names: "Keyuriben"
+- family-names: "Pleiss"
+  given-names: "Juergen"
+- family-names: "Uekermann"
+  given-names: "Benjamin"
+  orcid: "https://orcid.org/0000-0002-1314-9969"
+title: "MetaConfigurator: A User-Friendly Tool for Editing Structured Data Files"
+version: 1.0.0
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Neubauer"
+    given-names: "Felix"
+    orcid: "https://orcid.org/0009-0008-5367-2034"
+  - family-names: "Bredl"
+    given-names: "Paul"
+    orcid: "https://orcid.org/0009-0007-2887-784X"
+  - family-names: "Xu"
+    given-names: "Minye"
+  - family-names: "Patel"
+    given-names: "Keyuriben"
+  - family-names: "Pleiss"
+    given-names: "Juergen"
+  - family-names: "Uekermann"
+    given-names: "Benjamin"
+  doi: "10.1007/s13222-024-00472-7"
+  journal: "Datenbank-Spektrum"
+  month: 5
+  start: 1 # First page number
+  end: 9 # Last page number
+  title: "MetaConfigurator: A User-Friendly Tool for Editing Structured Data Files"
+  year: 2024

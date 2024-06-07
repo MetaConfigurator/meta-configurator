@@ -3,6 +3,11 @@ import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
   toolbarTitle: string;
+  uiColors: {
+    schemaEditor: string;
+    dataEditor: string;
+    settings: string;
+  };
   dataFormat: DataFormat;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
@@ -10,6 +15,7 @@ export interface SettingsInterfaceRoot {
   metaSchema: SettingsInterfaceMetaSchema;
   hideSchemaEditor: boolean;
   panels: SettingsInterfacePanels;
+  rdf: SettingsInterfaceRdf;
 }
 
 export interface SettingsInterfaceCodeEditor {
@@ -34,8 +40,8 @@ export interface SettingsInterfaceSchemaDiagram {
 }
 
 export interface SettingsInterfacePanels {
-  data_editor: SettingsInterfacePanel[];
-  schema_editor: SettingsInterfacePanel[];
+  dataEditor: SettingsInterfacePanel[];
+  schemaEditor: SettingsInterfacePanel[];
   settings: SettingsInterfacePanel[];
 }
 
@@ -49,6 +55,8 @@ export interface SettingsInterfaceMetaSchema {
   allowBooleanSchema: boolean;
   allowMultipleTypes: boolean;
   objectTypesComfort: boolean;
+  showAdditionalPropertiesButton: boolean;
+  showJsonLdFields: boolean;
 }
 
 export enum PropertySorting {
@@ -60,4 +68,8 @@ export enum PropertySorting {
 export enum DataFormat {
   JSON = 'json',
   YAML = 'yaml',
+}
+
+export interface SettingsInterfaceRdf {
+  sparqlEndpointUrl: string;
 }

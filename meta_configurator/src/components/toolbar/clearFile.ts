@@ -58,24 +58,13 @@ function clearFile(dataLink: ManagedData) {
 }
 
 /**
- * Opens a confirmation dialog to the user and clears the file if the user confirms.
+ * Clears the current file data (depending on current mode) without confirmation.
  */
-export function openClearCurrentFileDialog() {
+export function clearCurrentFile() {
   newEmptyFile({
-    message: 'This will delete the current file. Are you sure you want to continue?',
+    message: null,
     dataLink: useCurrentData(),
     confirmMessage: null,
-  });
-}
-
-/**
- * Opens a confirmation dialog to the user and clears the schema if the user confirms.
- */
-export function openClearSchemaDialog() {
-  newEmptyFile({
-    message: 'This will delete the current schema. Are you sure you want to continue?',
-    confirmMessage: null,
-    dataLink: getDataForMode(SessionMode.SchemaEditor),
   });
 }
 
@@ -84,8 +73,7 @@ export function openClearSchemaDialog() {
  */
 export function openClearDataEditorDialog() {
   newEmptyFile({
-    message:
-      'Do you also want to create a new empty file in the DataEditor? (The current file will be deleted)',
+    message: 'Do you also want to clear the data in the Data Editor?',
     dataLink: getDataForMode(SessionMode.DataEditor),
     confirmMessage: 'New empty file created in the DataEditor.',
   });

@@ -177,6 +177,7 @@ function updateCurrentPath(path: Path) {
           @fit_view="fitViewForCurrentlySelectedElement" />
 
         <CurrentPathBreadcrump
+          :session-mode="SessionMode.SchemaEditor"
           :path="schemaSession.currentPath.value"
           root-name="document root"
           @update:path="updateCurrentPath"></CurrentPathBreadcrump>

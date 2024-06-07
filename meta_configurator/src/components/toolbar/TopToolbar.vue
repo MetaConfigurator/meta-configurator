@@ -28,10 +28,17 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import {getSessionForMode} from '@/data/useDataLink';
+import {
+  getDataForMode,
+  getSchemaForMode,
+  getSessionForMode,
+  useCurrentData,
+  useCurrentSchema,
+} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
+import {inferJsonSchema} from '@/schema/inferJsonSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -53,7 +60,8 @@ const topMenuBar = new MenuItems(
   handleFromWebClick,
   handleFromOurExampleClick,
   showUrlDialog,
-  showCsvImportDialog
+  showCsvImportDialog,
+  inferSchemaFromSampleData
 );
 
 function getPageName(): string {
@@ -73,15 +81,14 @@ function getPageName(): string {
  * Menu items of the page selection menu.
  */
 function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
+  // TODO: make the text actually have the given uiColors. Somehow currently the color in the style has no effect
   const dataEditorItem: MenuItem = {
     label: 'Data Editor',
     icon: 'fa-regular fa-file',
-    class: () => {
-      if (props.currentMode !== SessionMode.DataEditor) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
+    style:
+      props.currentMode !== SessionMode.DataEditor
+        ? 'color: ' + settings.uiColors.dataEditor
+        : 'font-weight: bold; color: ' + settings.uiColors.dataEditor,
     command: () => {
       emit('mode-selected', SessionMode.DataEditor);
     },
@@ -89,12 +96,10 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const schemaEditorItem: MenuItem = {
     label: 'Schema Editor',
     icon: 'fa-regular fa-file-code',
-    class: () => {
-      if (props.currentMode !== SessionMode.SchemaEditor) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
+    style:
+      props.currentMode !== SessionMode.SchemaEditor
+        ? 'color: ' + settings.uiColors.schemaEditor
+        : 'font-weight: bold; color: ' + settings.uiColors.schemaEditor,
     command: () => {
       emit('mode-selected', SessionMode.SchemaEditor);
     },
@@ -102,12 +107,10 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const settingsItem: MenuItem = {
     label: 'Settings',
     icon: 'fa-solid fa-cog',
-    class: () => {
-      if (props.currentMode !== SessionMode.Settings) {
-        return 'font-normal text-lg';
-      }
-      return 'font-bold text-lg';
-    },
+    style:
+      props.currentMode !== SessionMode.Settings
+        ? 'color: ' + settings.uiColors.settings
+        : 'font-weight: bold; color: ' + settings.uiColors.settings,
     command: () => {
       emit('mode-selected', SessionMode.Settings);
     },
@@ -189,6 +192,14 @@ function hideUrlDialog() {
 async function fetchSchemaFromSelectedUrl() {
   await fetchSchemaFromUrl(schemaUrl.value!);
   hideUrlDialog();
+}
+
+function inferSchemaFromSampleData() {
+  const data = getDataForMode(SessionMode.DataEditor).data.value;
+  const inferredSchema = inferJsonSchema(data);
+  if (inferredSchema) {
+    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferredSchema;
+  }
 }
 
 function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {

@@ -31,6 +31,16 @@ export function jsonPointerToPath(jsonPointer: string): string[] {
   return pointer.parse(jsonPointer);
 }
 
+export function jsonPointerToPathTyped(jsonPointer: string): Path {
+  return jsonPointerToPath(jsonPointer).map((element: string) => {
+    if (element.match(/^\d+$/)) {
+      return parseInt(element);
+    } else {
+      return element;
+    }
+  });
+}
+
 /**
  * Converts a path to a json pointer.
  * Example: [1, 'foo', 2] -> '/1/foo/2'
@@ -38,4 +48,19 @@ export function jsonPointerToPath(jsonPointer: string): string[] {
  */
 export function pathToJsonPointer(path: Path): string {
   return pointer.compile(path.map((element: PathElement) => element.toString()));
+}
+
+export function dataPathToSchemaPath(dataPath: Path): Path {
+  const schemaPath: Path = [];
+
+  for (const element of dataPath) {
+    if (typeof element === 'number') {
+      schemaPath.push('items');
+    } else {
+      schemaPath.push('properties');
+      schemaPath.push(element);
+    }
+  }
+
+  return schemaPath;
 }
