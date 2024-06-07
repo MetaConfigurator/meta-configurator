@@ -73,8 +73,7 @@ export function clearCurrentFile() {
  */
 export function openClearDataEditorDialog() {
   newEmptyFile({
-    message:
-      'Do you also want to clear the data in the Data Editor?',
+    message: 'Do you also want to clear the data in the Data Editor?',
     dataLink: getDataForMode(SessionMode.DataEditor),
     confirmMessage: 'New empty file created in the DataEditor.',
   });

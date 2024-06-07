@@ -2,7 +2,7 @@ import CodeEditorPanel from '@/components/panels/code-editor/CodeEditorPanel.vue
 import GuiEditorPanel from '@/components/panels/gui-editor/GuiEditorPanel.vue';
 import SchemaDiagramPanel from '@/components/panels/schema-diagram/SchemaDiagramPanel.vue';
 import DebugPanel from '@/components/panels/debug-panel/DebugPanel.vue';
-import {errorService} from "@/main";
+import {errorService} from '@/main';
 
 export enum PanelType {
   GuiEditor = 'guiEditor',

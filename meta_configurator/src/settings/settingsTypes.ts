@@ -7,7 +7,7 @@ export interface SettingsInterfaceRoot {
     schemaEditor: string;
     dataEditor: string;
     settings: string;
-  }
+  };
   dataFormat: DataFormat;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;

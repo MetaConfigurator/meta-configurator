@@ -50,7 +50,7 @@ const currentSchema = computed(() => {
   <div class="p-5 space-y-3 flex flex-col">
     <SchemaInfoPanel :sessionMode="props.sessionMode" />
     <CurrentPathBreadcrumb
-        :session-mode="props.sessionMode"
+      :session-mode="props.sessionMode"
       :root-name="'document root'"
       :path="session.currentPath.value"
       @update:path="newPath => updatePath(newPath)" />

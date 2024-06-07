@@ -86,10 +86,9 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     label: 'Data Editor',
     icon: 'fa-regular fa-file',
     style:
-       (props.currentMode !== SessionMode.DataEditor) ?
-         'color: ' + settings.uiColors.dataEditor :
-      'font-weight: bold; color: ' + settings.uiColors.dataEditor
-    ,
+      props.currentMode !== SessionMode.DataEditor
+        ? 'color: ' + settings.uiColors.dataEditor
+        : 'font-weight: bold; color: ' + settings.uiColors.dataEditor,
     command: () => {
       emit('mode-selected', SessionMode.DataEditor);
     },
@@ -98,10 +97,9 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     label: 'Schema Editor',
     icon: 'fa-regular fa-file-code',
     style:
-        (props.currentMode !== SessionMode.SchemaEditor) ?
-            'color: ' + settings.uiColors.schemaEditor  :
-            'font-weight: bold; color: ' + settings.uiColors.schemaEditor
-    ,
+      props.currentMode !== SessionMode.SchemaEditor
+        ? 'color: ' + settings.uiColors.schemaEditor
+        : 'font-weight: bold; color: ' + settings.uiColors.schemaEditor,
     command: () => {
       emit('mode-selected', SessionMode.SchemaEditor);
     },
@@ -110,10 +108,9 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     label: 'Settings',
     icon: 'fa-solid fa-cog',
     style:
-        (props.currentMode !== SessionMode.Settings) ?
-            'color: ' + settings.uiColors.settings :
-            'font-weight: bold; color: ' + settings.uiColors.settings
-    ,
+      props.currentMode !== SessionMode.Settings
+        ? 'color: ' + settings.uiColors.settings
+        : 'font-weight: bold; color: ' + settings.uiColors.settings,
     command: () => {
       emit('mode-selected', SessionMode.Settings);
     },

@@ -6,9 +6,9 @@ and allowing the user to jump to a parent path.
 import ChevronRight from '@/components/icons/ChevronRight.vue';
 import {computed} from 'vue';
 import type {Path} from '@/utility/path';
-import type {SessionMode} from "@/store/sessionMode";
-import {getColorForMode} from "@/components/panels/shared-components/sharedComponentUtils";
-import {useSettings} from "@/settings/useSettings";
+import type {SessionMode} from '@/store/sessionMode';
+import {getColorForMode} from '@/components/panels/shared-components/sharedComponentUtils';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   path: Path;
@@ -46,7 +46,7 @@ function jumpToLevel(index: number) {
         <div
           class="inline-flex items-center text-sm font-medium text-gray-700"
           :style="{
-          'color': getColorForMode(props.sessionMode, useSettings())
+            color: getColorForMode(props.sessionMode, useSettings()),
           }"
           :class="{
             'hover:underline underline-offset-2 hover:text-slate-800 cursor-pointer':
