@@ -149,9 +149,9 @@ defineExpose({show: openDialog, close: hideDialog});
         <table>
           <thead>
             <tr>
-              <th>Column Name</th>
-              <th>Identifier</th>
-              <th v-if="isInferSchema">Title</th>
+              <th>CSV Column</th>
+              <th>JSON Property Identifier</th>
+              <th v-if="isInferSchema">Property Schema Title</th>
             </tr>
           </thead>
           <tbody>
