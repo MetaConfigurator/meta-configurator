@@ -41,7 +41,7 @@ const decimalSeparator: Ref<LabelledValue> = ref({
   value: 'not set',
 });
 
-const isInferSchema: Ref<boolean> = ref(isSchemaEmpty(useCurrentSchema().schemaRaw.value));
+const isInferSchema: Ref<boolean> = ref(false);
 
 const pathBeforeRowIndex: Ref<string> = ref('myTableName');
 const currentColumnMapping: Ref<CsvImportColumnMappingData[]> = ref([]);
@@ -63,6 +63,7 @@ watch(currentUserDataString, newValue => {
     computeMostUsedDelimiterAndDecimalSeparator(currentUserDataString.value);
   delimiter.value = delimiterSuggestion;
   decimalSeparator.value = decimalSeparatorSuggestion;
+  isInferSchema.value = isSchemaEmpty(useCurrentSchema().schemaRaw.value);
   loadCsvFromInput();
 });
 watch([decimalSeparator, delimiter], newValue => {
