@@ -10,7 +10,6 @@ const dataSource = {
   userData: shallowRef<any>({}),
   // data of the schema editor, used as the schema for the file editor
   userSchemaData: shallowRef<any>({
-    title: 'No schema loaded',
   }),
 
   // data of the settings editor
