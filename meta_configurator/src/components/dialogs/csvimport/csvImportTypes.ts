@@ -1,7 +1,7 @@
 import {ref, type Ref} from 'vue';
 import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 import type {Path} from '@/utility/path';
-import {userStringToIdentifier} from "@/components/dialogs/csvimport/importCsvUtils";
+import {userStringToIdentifier} from '@/components/dialogs/csvimport/importCsvUtils';
 
 export class CsvImportColumnMappingData {
   constructor(public index: number, public name: string, pathBeforeRowIndex: Ref<string>) {

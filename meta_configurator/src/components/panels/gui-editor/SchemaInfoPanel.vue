@@ -5,12 +5,11 @@ import AccordionTab from 'primevue/accordiontab';
 import {useSessionStore} from '@/store/sessionStore';
 import type {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
-import {isSchemaEmpty} from "@/schema/schemaReadingUtils";
+import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
-
 
 const schemaInformation = computed(() => {
   const schema = getSchemaForMode(props.sessionMode);
@@ -40,11 +39,7 @@ const schemaInformation = computed(() => {
 
 <template>
   <Accordion :activeIndex="1">
-    <AccordionTab
-      :header="
-        'GUI Schema: ' +
-        (schemaInformation[0].value)
-      ">
+    <AccordionTab :header="'GUI Schema: ' + schemaInformation[0].value">
       <p v-for="info in schemaInformation" :key="info.title">
         <span class="font-semibold">{{ info.title }}: </span>
         {{ info.value }}

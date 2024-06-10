@@ -35,5 +35,5 @@ export function isSchemaEmpty(schema: JsonSchemaType): boolean {
   if (schema == true || schema == false) {
     return false;
   }
-    return Object.keys(schema).length === 0;
+  return Object.keys(schema).length === 0;
 }

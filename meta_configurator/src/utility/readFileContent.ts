@@ -66,7 +66,6 @@ export async function readFileContentToRef(
     if (contents !== undefined) {
       resultRef.value = contents;
     }
-
   } catch (error) {
     errorService.onError(error);
   }

@@ -9,8 +9,7 @@ const dataSource = {
   // data of the data editor
   userData: shallowRef<any>({}),
   // data of the schema editor, used as the schema for the file editor
-  userSchemaData: shallowRef<any>({
-  }),
+  userSchemaData: shallowRef<any>({}),
 
   // data of the settings editor
   settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT)),
