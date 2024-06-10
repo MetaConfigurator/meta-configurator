@@ -1,4 +1,4 @@
-import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 
 /**
@@ -26,4 +26,16 @@ export function getTypeDescription(schema: JsonSchemaObjectType): string {
   }
 
   return type;
+}
+
+export function isSchemaEmpty(schema: JsonSchemaType): boolean {
+  if (schema === undefined || schema === null) {
+    return true;
+  }
+  if (schema == true || schema == false) {
+    return false;
+  }
+  if (typeof schema === 'object') {
+    return Object.keys(schema).length === 0;
+  }
 }

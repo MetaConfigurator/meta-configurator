@@ -11,7 +11,7 @@ import {readFileContentToRef} from '@/utility/readFileContent';
 import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {writeCsvToData} from '@/components/dialogs/csvimport/writeCsvToData';
-import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, useCurrentSchema} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {dataPathToSchemaPath, jsonPointerToPath, pathToString} from '@/utility/pathUtils';
@@ -19,7 +19,11 @@ import _ from 'lodash';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import type {CsvError} from "csv-parse/browser/esm";
 import {parse} from "csv-parse/browser/esm";
-import {computeMostUsedDelimiterAndDecimalSeparator} from "@/components/dialogs/csvimport/delimiterAndSeparatorMetrics";
+import {
+  computeMostUsedDelimiterAndDecimalSeparator,
+  replaceDecimalSeparator
+} from "@/components/dialogs/csvimport/delimiterSeparatorUtils";
+import {isSchemaEmpty} from "@/schema/schemaReadingUtils";
 
 const showDialog = ref(false);
 
@@ -28,9 +32,10 @@ const currentUserCsv: Ref<any[]> = ref([]);
 const errorMessage: Ref<string> = ref('');
 
 const delimiter: Ref<string> = ref(',');
-const decimalSeparator: Ref<string> = ref('.'); // todo: auto infer initial value
+const decimalSeparator: Ref<string> = ref('.');
 
-const isInferSchema: Ref<boolean> = ref(false);
+const isInferSchema: Ref<boolean> = ref(isSchemaEmpty(useCurrentSchema().schemaRaw.value));
+
 const pathBeforeRowIndex: Ref<string> = ref('myTableName');
 const currentColumnMapping: Ref<CsvImportColumnMappingData[]> = ref([]);
 
@@ -106,8 +111,13 @@ watch([decimalSeparator, delimiter], newValue => {
 function loadCsvFromInput() {
   if (currentUserDataString.value.length > 0) {
 
+    let inputString = currentUserDataString.value;
+    if (decimalSeparator.value !== '.') {
+      inputString = replaceDecimalSeparator(inputString, delimiter.value, decimalSeparator.value, '.')
+    }
+
     parse(
-        currentUserDataString.value,
+        inputString,
         {
           delimiter: delimiter.value,
           columns: true,
