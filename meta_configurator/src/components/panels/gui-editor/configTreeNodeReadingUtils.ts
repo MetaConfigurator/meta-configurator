@@ -20,7 +20,7 @@ export function getDisplayNameOfNode(node: GuiEditorTreeNode): string {
     return name;
   }
   // array index
-  return (node.data.parentName || node.data.parentSchema?.title || 'element') + '[' + name + ']';
+  return "Item " + (name + 1);
 }
 
 export function isAdditionalProperty(nodeType: ConfigDataTreeNodeType): boolean {
