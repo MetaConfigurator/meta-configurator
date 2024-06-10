@@ -12,11 +12,14 @@ import type {CsvImportColumnMappingData} from "@/components/dialogs/csvimport/cs
 import {type LabelledValue, replaceDecimalSeparator} from "@/components/dialogs/csvimport/delimiterSeparatorUtils";
 import {type CsvError, parse} from "csv-parse/browser/esm";
 
-export function requestUploadFileToRef(resultString: Ref<string>) {
+export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
     const {open, onChange} = useFileDialog();
 
     onChange((files: FileList | null) => {
-        readFileContentToRef(files,resultString);
+        if (files && files.length > 0) {
+            resultTableName.value = userStringToIdentifier(files[0].name, true); // Get the name of the first file
+            readFileContentToRef(files, resultString);
+        }
     });
     open();
 }
@@ -123,3 +126,17 @@ export const decimalSeparatorOptions: LabelledValue[] = [
         value: ',',
     },
 ];
+
+
+export function userStringToIdentifier(input: string, cutExtension: boolean = false): string {
+    if (cutExtension) {
+        input = input.replace(/\.[^/.]+$/, "")
+    }
+
+    // remove special characters, trim whitespaces outside and replace whitespaces inside with underscores. Also transform to lower case.
+    return input
+        .replace(/[^a-zA-Z0-9 ]/g, '')
+        .trim()
+        .replace(/\s/g, '_')
+        .toLowerCase();
+}

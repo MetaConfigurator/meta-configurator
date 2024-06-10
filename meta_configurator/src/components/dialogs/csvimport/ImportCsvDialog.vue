@@ -52,7 +52,7 @@ function hideDialog() {
 }
 
 function requestUploadFile() {
-  requestUploadFileToRef(currentUserDataString)
+  requestUploadFileToRef(currentUserDataString, pathBeforeRowIndex)
 }
 
 

@@ -63,13 +63,11 @@ export async function readFileContentToRef(
 ) {
   try {
     let contents = await readFileContentFromFileList(files);
-    if (contents === undefined) {
-      return;
+    if (contents !== undefined) {
+      resultRef.value = contents;
     }
 
-    resultRef.value = contents;
-  } catch (error1) {
-    errorService.onError(error1);
-    return;
+  } catch (error) {
+    errorService.onError(error);
   }
 }
