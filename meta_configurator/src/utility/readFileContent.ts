@@ -1,7 +1,5 @@
 import {errorService} from '@/main';
 import type {ManagedData} from '@/data/managedData';
-import type {CsvError} from 'csv-parse/browser/esm';
-import {parse} from 'csv-parse/browser/esm';
 import type {Ref} from 'vue';
 /**
  * Reads the content of a file as a string.
@@ -59,40 +57,16 @@ export function readFileContentToDataLink(
     .catch(error => errorService.onError(error));
 }
 
-export async function readFileContentCsvToRef(
+export async function readFileContentToRef(
   files: FileList | File[] | null,
-  delimiter: string,
-  resultRef: Ref<any[]>
+  resultRef: Ref<string>
 ) {
   try {
     let contents = await readFileContentFromFileList(files);
-    if (contents === undefined) {
-      return;
+    if (contents !== undefined) {
+      resultRef.value = contents;
     }
-
-    const parseCsv = (csvString: string, delimiter: string = ',') => {
-      parse(
-        csvString,
-        {
-          delimiter: delimiter,
-          columns: true,
-          skip_empty_lines: true,
-          cast: true,
-          trim: true,
-        },
-        (error: CsvError | undefined, records: any) => {
-          if (error) {
-            errorService.onError(error);
-          } else {
-            resultRef.value = records;
-          }
-        }
-      );
-    };
-
-    parseCsv(contents, delimiter);
-  } catch (error1) {
-    errorService.onError(error1);
-    return;
+  } catch (error) {
+    errorService.onError(error);
   }
 }

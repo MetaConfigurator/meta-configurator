@@ -5,25 +5,33 @@ import AccordionTab from 'primevue/accordiontab';
 import {useSessionStore} from '@/store/sessionStore';
 import type {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
+import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
 const schemaInformation = computed(() => {
-  let schema = getSchemaForMode(props.sessionMode).schemaWrapper.value;
+  const schema = getSchemaForMode(props.sessionMode);
+  const schemaWrapper = schema.schemaWrapper.value;
+  // for title, use schemaWrapper because it resolved references, etc.
+  let title = schemaWrapper.title ?? 'Untitled schema';
+  // for check of empty schema, use raw schema
+  if (isSchemaEmpty(schema.schemaRaw.value)) {
+    title = 'No schema loaded';
+  }
   return [
     {
       title: 'Title',
-      value: schema?.title ?? 'Untitled schema',
+      value: title,
     },
     {
       title: 'Source',
-      value: schema?.$id,
+      value: schemaWrapper.$id,
     },
     {
       title: 'Description',
-      value: schema?.description,
+      value: schemaWrapper.description,
     },
   ];
 });
@@ -31,11 +39,7 @@ const schemaInformation = computed(() => {
 
 <template>
   <Accordion :activeIndex="1">
-    <AccordionTab
-      :header="
-        'GUI Schema: ' +
-        (getSchemaForMode(props.sessionMode).schemaWrapper.value?.title ?? 'Untitled schema')
-      ">
+    <AccordionTab :header="'GUI Schema: ' + schemaInformation[0].value">
       <p v-for="info in schemaInformation" :key="info.title">
         <span class="font-semibold">{{ info.title }}: </span>
         {{ info.value }}

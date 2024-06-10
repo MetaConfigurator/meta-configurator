@@ -1,11 +1,12 @@
 import {ref, type Ref} from 'vue';
 import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 import type {Path} from '@/utility/path';
+import {userStringToIdentifier} from '@/components/dialogs/csvimport/importCsvUtils';
 
 export class CsvImportColumnMappingData {
   constructor(public index: number, public name: string, pathBeforeRowIndex: Ref<string>) {
     this.pathBeforeRowIndex = pathBeforeRowIndex;
-    this.pathAfterRowIndex = ref(columnNameToElementId(this.name));
+    this.pathAfterRowIndex = ref(userStringToIdentifier(this.name, false));
     this.titleInSchema = ref(this.name);
   }
 
@@ -18,13 +19,4 @@ export class CsvImportColumnMappingData {
       '/' + this.pathBeforeRowIndex + '/' + rowIndex + '/' + this.pathAfterRowIndex
     );
   }
-}
-
-function columnNameToElementId(columnName: string): string {
-  // remove special characters, trim whitespaces outside and replace whitespaces inside with underscores. Also transform to lower case.
-  return columnName
-    .replace(/[^a-zA-Z0-9 ]/g, '')
-    .trim()
-    .replace(/\s/g, '_')
-    .toLowerCase();
 }
