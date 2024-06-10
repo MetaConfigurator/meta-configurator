@@ -1,29 +1,27 @@
 <!-- Dialog to import CSV data -->
 <script setup lang="ts">
-import {type Ref, ref, watch} from 'vue';
+import {computed, type Ref, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
+import Dropdown from "primevue/dropdown";
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
-import {useFileDialog} from '@vueuse/core';
-import {readFileContentToRef} from '@/utility/readFileContent';
 import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {writeCsvToData} from '@/components/dialogs/csvimport/writeCsvToData';
-import {getDataForMode, getSchemaForMode, useCurrentSchema} from '@/data/useDataLink';
+import {getDataForMode, useCurrentSchema} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import {inferJsonSchema} from '@/schema/inferJsonSchema';
-import {dataPathToSchemaPath, jsonPointerToPath, pathToString} from '@/utility/pathUtils';
-import _ from 'lodash';
-import {mergeAllOfs} from '@/schema/mergeAllOfs';
-import type {CsvError} from "csv-parse/browser/esm";
-import {parse} from "csv-parse/browser/esm";
+import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 import {
-  computeMostUsedDelimiterAndDecimalSeparator,
-  replaceDecimalSeparator
+  computeMostUsedDelimiterAndDecimalSeparator, type LabelledValue,
 } from "@/components/dialogs/csvimport/delimiterSeparatorUtils";
 import {isSchemaEmpty} from "@/schema/schemaReadingUtils";
+import {
+  decimalSeparatorOptions, delimiterOptions,
+  inferSchemaForNewDataAndMergeIntoCurrentSchema, loadCsvFromUserString,
+  requestUploadFileToRef
+} from "@/components/dialogs/csvimport/importCsvUtils";
 
 const showDialog = ref(false);
 
@@ -31,8 +29,14 @@ const currentUserDataString: Ref<string> = ref('');
 const currentUserCsv: Ref<any[]> = ref([]);
 const errorMessage: Ref<string> = ref('');
 
-const delimiter: Ref<string> = ref(',');
-const decimalSeparator: Ref<string> = ref('.');
+const delimiter: Ref<LabelledValue> = ref({
+  label: 'not set',
+  value: 'not set'
+});
+const decimalSeparator: Ref<LabelledValue> = ref({
+  label: 'not set',
+  value: 'not set'
+});
 
 const isInferSchema: Ref<boolean> = ref(isSchemaEmpty(useCurrentSchema().schemaRaw.value));
 
@@ -48,51 +52,7 @@ function hideDialog() {
 }
 
 function requestUploadFile() {
-  const {open, onChange} = useFileDialog();
-
-  onChange((files: FileList | null) => {
-    readFileContentToRef(files,currentUserDataString);
-  });
-  open();
-}
-
-function submitImport() {
-  writeCsvToData(currentUserCsv.value, currentColumnMapping.value);
-  if (isInferSchema.value) {
-    addInferredSchema();
-  }
-  hideDialog();
-}
-
-function addInferredSchema() {
-  const data = getDataForMode(SessionMode.DataEditor);
-  const newDataPath = jsonPointerToPath('/' + pathBeforeRowIndex.value);
-  const newData = data.dataAt(newDataPath);
-  // we want to obtain an object which contains only the new data, in its proper path
-  const dataWithOnlyNew = _.set({}, pathToString(newDataPath), newData);
-
-  const inferredSchema = inferJsonSchema(dataWithOnlyNew);
-  if (inferredSchema) {
-    for (const column of currentColumnMapping.value) {
-      addCustomTitleToSchemaProperty(inferredSchema, column);
-    }
-
-    const schema = getSchemaForMode(SessionMode.DataEditor);
-    const currentSchema = schema.schemaRaw.value;
-    // then we merge the new schema into the current one
-    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
-      allOf: [currentSchema, inferredSchema],
-    });
-  }
-}
-
-function addCustomTitleToSchemaProperty(inferredSchema: any, column: CsvImportColumnMappingData) {
-  const propertySchemaTitlePath = [
-    ...dataPathToSchemaPath(column.getPathForJsonDocument(0)),
-    'title',
-  ];
-  const titlePathString = pathToString(propertySchemaTitlePath);
-  _.set(inferredSchema, titlePathString, column.titleInSchema);
+  requestUploadFileToRef(currentUserDataString)
 }
 
 
@@ -103,44 +63,11 @@ watch(currentUserDataString, newValue => {
     loadCsvFromInput();
 });
 watch([decimalSeparator, delimiter], newValue => {
-  if (decimalSeparator.value.length > 0 && delimiter.value.length > 0) {
     loadCsvFromInput();
-  }
 });
 
 function loadCsvFromInput() {
-  if (currentUserDataString.value.length > 0) {
-
-    let inputString = currentUserDataString.value;
-    if (decimalSeparator.value !== '.') {
-      inputString = replaceDecimalSeparator(inputString, delimiter.value, decimalSeparator.value, '.')
-    }
-
-    parse(
-        inputString,
-        {
-          delimiter: delimiter.value,
-          columns: true,
-          skip_empty_lines: true,
-          cast: true,
-          trim: true,
-        },
-        (error: CsvError | undefined, records: any) => {
-          if (error) {
-            errorMessage.value = "With the given delimiter and decimal separator, the CSV could not be parsed. " +
-               "\nPlease check the settings. " +
-                "\nError: " + error.message;
-            currentUserCsv.value = [];
-          } else {
-            errorMessage.value = "";
-            currentUserCsv.value = records;
-          }
-        }
-    );
-
-    } else {
-    currentUserCsv.value = [];
-  }
+  loadCsvFromUserString(currentUserDataString, currentUserCsv, delimiter.value.value, decimalSeparator.value.value, errorMessage);
 }
 
 
@@ -156,6 +83,25 @@ watch(currentUserCsv, newValue => {
     currentColumnMapping.value = [];
   }
 });
+
+
+function submitImport() {
+  writeCsvToData(currentUserCsv.value, currentColumnMapping.value);
+  if (isInferSchema.value) {
+    addInferredSchema();
+  }
+  hideDialog();
+}
+
+function addInferredSchema() {
+  const data = getDataForMode(SessionMode.DataEditor);
+  const newDataPath = jsonPointerToPathTyped('/' + pathBeforeRowIndex.value);
+  const newData = data.dataAt(newDataPath);
+  inferSchemaForNewDataAndMergeIntoCurrentSchema(newData, newDataPath, currentColumnMapping.value)
+}
+
+
+
 
 defineExpose({show: openDialog, close: hideDialog});
 </script>
@@ -183,13 +129,17 @@ defineExpose({show: openDialog, close: hideDialog});
 
         <div class="flex align-items-center vertical-center">
           <label for="delimiter" class="mr-2"><b>Delimiter in the CSV document:</b></label>
-          <InputText id="delimiter" v-model="delimiter" class="small-input" />
+          <Dropdown id="delimiter" v-model="delimiter" :options="delimiterOptions"
+                    :option-label="option => option.label"
+          />
         </div>
 
 
         <div class="flex align-items-center vertical-center">
           <label for="decimalSeparator" class="mr-2"><b>Decimal Separator in the CSV document:</b></label>
-          <InputText id="decimalSeparator" v-model="decimalSeparator" class="small-input" />
+          <Dropdown id="decimalSeparator" v-model="decimalSeparator" class="small-input" :options="decimalSeparatorOptions"
+                    :option-label="option => option.label"
+          />
         </div>
 
         <p v-if="errorMessage.length>0" style="color: red; white-space: pre-line">{{errorMessage}}</p>
@@ -258,9 +208,6 @@ defineExpose({show: openDialog, close: hideDialog});
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-.small-input {
-  width: 50px;
 }
 .vertical-center {
   display: flex;
