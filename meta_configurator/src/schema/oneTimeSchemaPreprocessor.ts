@@ -5,7 +5,6 @@ import type {
   SchemaPropertyType,
 } from '@/schema/jsonSchemaType';
 import _ from 'lodash';
-import 'crypto';
 
 /**
  * One time schema preprocessor.
@@ -28,7 +27,7 @@ export function preprocessOneTime(schema: JsonSchemaType): JsonSchemaTypePreproc
   // clone schema so the original schema (of the user) is not modified
   const schemaCopy = _.cloneDeep(schema);
 
-  const id = schemaCopy.$id || schemaCopy.id || crypto.randomUUID();
+  const id = schemaCopy.$id || schemaCopy.id || Math.random();
 
   preprocessOneTimeRecursive(schemaCopy, id);
 
