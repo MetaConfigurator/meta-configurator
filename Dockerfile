@@ -1,5 +1,5 @@
 # Use the official Node.js image to build the Vue frontend
-FROM node:16 AS builder
+FROM node:21 AS builder
 
 # Set the working directory in the container
 WORKDIR /app
