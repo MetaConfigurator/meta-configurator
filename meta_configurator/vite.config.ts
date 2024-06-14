@@ -10,6 +10,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['ajv-formats'],
   },
+  build: {
+    minify: false,
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
