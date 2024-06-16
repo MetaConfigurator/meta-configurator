@@ -43,7 +43,7 @@ onMounted(() => {
   }
 
   if ('data' in query) {
-    const data_url = query.file as string;
+    const data_url = query.data as string;
     console.debug('Received data URL ', data_url, ' from query.');
     fetch(data_url)
       .then(function (response) {
