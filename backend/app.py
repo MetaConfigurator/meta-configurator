@@ -2,13 +2,24 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
 import uuid
+import os
 
 app = Flask(__name__)
 CORS(app)
 
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get MongoDB credentials and connection info from environment variables
+MONGO_USER = os.getenv('MONGO_USER', 'root')
+MONGO_PASS = os.getenv('MONGO_PASS', 'example')
+MONGO_HOST = os.getenv('MONGO_HOST', 'mongo')
+MONGO_PORT = os.getenv('MONGO_PORT', '27017')
+MONGO_DB = os.getenv('MONGO_DB', 'metaconfigurator')
+
 # MongoDB connection
-client = MongoClient('mongodb://mongo:27017/')
-db = client['metaconfigurator']
+client = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}')
+db = client[MONGO_DB]
 
 MAX_FILE_LENGTH = 500000  # 500,000 bytes = 500 KB
 

@@ -20,6 +20,12 @@ services:
       - mongo
     networks:
       - app-network
+    environment:
+      - MONGO_USER=root
+      - MONGO_PASS=example
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - MONGO_DB=metaconfigurator
 
   mongo:
     image: mongo:latest
