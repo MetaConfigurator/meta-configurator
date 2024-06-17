@@ -5,7 +5,7 @@ FROM node:21 AS builder
 WORKDIR /app
 
 # Copy the source code into the container
-COPY /meta_configurator /app
+COPY / /app
 
 # Install dependencies and build the frontend
 RUN npm ci
