@@ -1,10 +1,10 @@
 <!-- Dialog to import CSV data -->
 <script setup lang="ts">
-import { type Ref, ref } from 'vue';
+import {type Ref, ref} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
-import {storeCurrentSession} from "@/utility/backend/backendApi";
+import {storeCurrentSession} from '@/utility/backend/backendApi';
 
 const showDialog = ref(false);
 
@@ -40,8 +40,7 @@ defineExpose({show: openDialog, close: hideDialog});
           class="p-button-raised p-button-rounded"></Button>
       </div>
 
-      <div
-        class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
+      <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
         <Divider />
         <p>
           The current session can be restored with the following URL:

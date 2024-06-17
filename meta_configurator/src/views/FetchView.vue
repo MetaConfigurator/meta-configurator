@@ -3,7 +3,7 @@ import {useAppRouter} from '@/router/router';
 import {onMounted} from 'vue';
 import {useDataSource} from '@/data/dataSource';
 import {useSessionStore} from '@/store/sessionStore';
-import {restoreSession} from "@/utility/backend/backendApi";
+import {restoreSession} from '@/utility/backend/backendApi';
 
 defineProps({
   settings_url: String,

@@ -28,16 +28,12 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import {
-  getDataForMode,
-  getSchemaForMode,
-  getSessionForMode,
-} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
-import SaveSessionDialog from "@/components/dialogs/save-session/SaveSessionDialog.vue";
+import SaveSessionDialog from '@/components/dialogs/save-session/SaveSessionDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -285,7 +281,6 @@ function showCsvImportDialog() {
 function showSaveSessionDialog() {
   saveSessionDialog.value?.show();
 }
-
 
 defineExpose({
   showInitialSchemaDialog,
