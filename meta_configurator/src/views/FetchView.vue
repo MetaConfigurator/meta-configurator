@@ -13,8 +13,8 @@ onMounted(() => {
   const query = route.query;
 
   if ('settings' in query) {
-    const settings_url = query.settings as string;
-    console.info('Received settings URL ', settings_url, ' from query string "' + query + '".');
+    const settings_url = query.settings as (string);
+    console.info('Received settings URL ', settings_url, ' from query string "', query, '".');
     fetch(settings_url)
       .then(function (response) {
         return response.json();
@@ -29,8 +29,8 @@ onMounted(() => {
     console.debug('skip initial schema selection dialog');
     useSessionStore().hasShownInitialDialog = true;
 
-    const schema_url = query.schema as string;
-    console.info('Received schema URL ', schema_url, ' from query string "' + query + '".');
+    const schema_url = query.schema as (string);
+    console.info('Received schema URL ', schema_url, ' from query string "', query, '".');
     fetch(schema_url)
       .then(function (response) {
         return response.json();
@@ -43,8 +43,8 @@ onMounted(() => {
   }
 
   if ('data' in query) {
-    const data_url = query.data as string;
-    console.info('Received data URL ', data_url, ' from query string "' + query + '".');
+    const data_url = query.data as (string);
+    console.info('Received data URL ', data_url, ' from query string "', query, '".');
     fetch(data_url)
       .then(function (response) {
         return response.json();
