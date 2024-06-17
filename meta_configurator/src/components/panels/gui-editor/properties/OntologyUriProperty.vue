@@ -10,8 +10,8 @@ import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
-import {findSuggestionsForSearchTerm} from '@/rdf/findSuggestionsForSearchTerm';
-import {findJsonLdPrefixes} from '@/rdf/findJsonLdPrefixes';
+import {findSuggestionsForSearchTerm} from '@/utility/rdf/findSuggestionsForSearchTerm';
+import {findJsonLdPrefixes} from '@/utility/rdf/findJsonLdPrefixes';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
 
