@@ -13,14 +13,8 @@ onMounted(() => {
   const query = route.query;
 
   if ('settings' in query) {
-    const settings_url = query.settings as string | undefined;
-    if (settings_url === undefined) {
-      console.error(
-        'Received settings URL but it is undefined, having query string "' + query + '"'
-      );
-      return;
-    }
-    console.info('Received settings URL ', settings_url, ' from query.');
+    const settings_url = query.settings as (string);
+    console.info('Received settings URL ', settings_url, ' from query string "' + query + '".');
     fetch(settings_url)
       .then(function (response) {
         return response.json();
@@ -35,12 +29,8 @@ onMounted(() => {
     console.debug('skip initial schema selection dialog');
     useSessionStore().hasShownInitialDialog = true;
 
-    const schema_url = query.schema as string | undefined;
-    if (schema_url === undefined) {
-      console.error('Received schema URL but it is undefined, having query string "' + query + '"');
-      return;
-    }
-    console.info('Received schema URL ', schema_url, ' from query.');
+    const schema_url = query.schema as (string);
+    console.info('Received schema URL ', schema_url, ' from query string "' + query + '".');
     fetch(schema_url)
       .then(function (response) {
         return response.json();
@@ -53,12 +43,8 @@ onMounted(() => {
   }
 
   if ('data' in query) {
-    const data_url = query.data as string | undefined;
-    if (data_url === undefined) {
-      console.error('Received data URL but it is undefined, having query string "' + query + '"');
-      return;
-    }
-    console.info('Received data URL ', data_url, ' from query.');
+    const data_url = query.data as (string);
+    console.info('Received data URL ', data_url, ' from query string "' + query + '".');
     fetch(data_url)
       .then(function (response) {
         return response.json();
