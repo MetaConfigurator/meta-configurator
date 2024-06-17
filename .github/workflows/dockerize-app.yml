@@ -27,4 +27,4 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ghcr.io/metaconfigurator/meta_configurator:latest
           push: true
-          context: "meta_configurator"
+          file: "meta_configurator/Dockerfile"
