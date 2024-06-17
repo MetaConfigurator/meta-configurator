@@ -22,7 +22,7 @@ MONGO_DB = os.getenv('MONGO_DB', 'metaconfigurator')
 app.logger.debug(f'Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}')
 
 # MongoDB connection
-client = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}')
+client = MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER, password=MONGO_PASS, authSource="admin")
 db = client[MONGO_DB]
 
 MAX_FILE_LENGTH = 500000  # 500,000 bytes = 500 KB
