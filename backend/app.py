@@ -18,6 +18,9 @@ MONGO_HOST = os.getenv('MONGO_HOST', 'mongo')
 MONGO_PORT = os.getenv('MONGO_PORT', '27017')
 MONGO_DB = os.getenv('MONGO_DB', 'metaconfigurator')
 
+# Log connection string for debugging purposes
+app.logger.debug(f'Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}')
+
 # MongoDB connection
 client = MongoClient(f'mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}')
 db = client[MONGO_DB]
