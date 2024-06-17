@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [vue(), vueJsx()],
   build: {
     outDir: 'dist',
-    minify: true,
+    minify: false,
   },
   resolve: {
     alias: {
