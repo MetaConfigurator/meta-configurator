@@ -18,7 +18,7 @@ async function storeSession(data: any, schema: any, settings: any) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({data, schema, settings}),
+    body: JSON.stringify({'data': data, 'schema': schema, 'settings': settings}),
   });
   return response.json();
 }
