@@ -32,13 +32,12 @@ import {
   getDataForMode,
   getSchemaForMode,
   getSessionForMode,
-  useCurrentData,
-  useCurrentSchema,
 } from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
+import SaveSessionDialog from "@/components/dialogs/save-session/SaveSessionDialog.vue";
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -61,6 +60,7 @@ const topMenuBar = new MenuItems(
   handleFromOurExampleClick,
   showUrlDialog,
   showCsvImportDialog,
+  showSaveSessionDialog,
   inferSchemaFromSampleData
 );
 
@@ -276,10 +276,16 @@ const showInitialSchemaDialog = () => {
 };
 
 const csvImportDialog = ref();
+const saveSessionDialog = ref();
 
 function showCsvImportDialog() {
   csvImportDialog.value?.show();
 }
+
+function showSaveSessionDialog() {
+  saveSessionDialog.value?.show();
+}
+
 
 defineExpose({
   showInitialSchemaDialog,
@@ -337,6 +343,8 @@ const showSearchResultsMenu = event => {
     @user_selected_option="option => handleUserSelection(option)" />
 
   <ImportCsvDialog ref="csvImportDialog" />
+
+  <SaveSessionDialog ref="saveSessionDialog" />
 
   <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">

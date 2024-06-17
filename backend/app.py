@@ -10,9 +10,16 @@ CORS(app)
 client = MongoClient('mongodb://mongo:27017/')
 db = client['metaconfigurator']
 
+MAX_FILE_LENGTH = 500000  # 500,000 bytes = 500 KB
+
+def is_file_length_valid(file_content):
+    return len(str(file_content)) <= MAX_FILE_LENGTH
+
 @app.route('/file', methods=['POST'])
 def add_file():
     file_content = request.json
+    if not is_file_length_valid(file_content):
+        return jsonify({'error': 'File too large'}), 413
     file_id = str(uuid.uuid4())
     collection = db['files']
     collection.insert_one({'_id': file_id, 'file': file_content})
@@ -35,6 +42,9 @@ def add_session():
 
     if not all([data, schema, settings]):
         return jsonify({'error': 'Missing data, schema, or settings'}), 400
+
+    if not all(map(is_file_length_valid, [data, schema, settings])):
+        return jsonify({'error': 'One or more files too large'}), 413
 
     # Generate UUIDs for each file and the session
     data_id = str(uuid.uuid4())
