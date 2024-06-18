@@ -16,7 +16,7 @@ export async function storeCurrentSession(resultRef: Ref<string>) {
 }
 
 async function storeSession(data: any, schema: any, settings: any) {
-  const response = await fetch(`${BASE_URL}/session`, {
+  const response = await fetch(`${BASE_URL.value}/session`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
