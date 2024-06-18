@@ -244,6 +244,20 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    frontend: {
+      type: 'object',
+      required: ['hostname'],
+      additionalProperties: false,
+      description: 'Settings for the frontend.',
+      properties: {
+        hostname: {
+          type: 'string',
+          description: 'The hostname of the frontend server.',
+          default: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+          format: 'uri',
+        },
+      },
+    },
     backend: {
       type: 'object',
       required: ['hostname', 'port'],

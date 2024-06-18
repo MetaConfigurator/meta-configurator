@@ -16,6 +16,7 @@ export interface SettingsInterfaceRoot {
   hideSchemaEditor: boolean;
   panels: SettingsInterfacePanels;
   rdf: SettingsInterfaceRdf;
+    frontend: SettingsInterfacFrontend;
   backend: SettingsInterfaceBackend;
 }
 
@@ -78,4 +79,8 @@ export interface SettingsInterfaceRdf {
 export interface SettingsInterfaceBackend {
   hostname: string;
   port: number;
+}
+
+export interface SettingsInterfacFrontend {
+  hostname: string;
 }

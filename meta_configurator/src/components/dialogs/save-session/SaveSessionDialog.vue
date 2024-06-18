@@ -42,7 +42,7 @@ defineExpose({show: openDialog, close: hideDialog});
 
       <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
         <Divider />
-        <p>
+        <p v-if="resultString.length>0">
           The current session can be restored with the following URL:
           <br />
           <a :href="resultString" target="_blank">{{ resultString }}</a>

@@ -76,6 +76,9 @@ export const SETTINGS_DATA_DEFAULT = {
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
   },
+  frontend: {
+    hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+  },
   backend: {
     hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
     port: 5000,
