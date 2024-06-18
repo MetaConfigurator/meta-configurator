@@ -75,13 +75,13 @@ def add_session():
         app.logger.info('Received request to add session with data: %s', request_data)
         if not request_data:
             return jsonify({'error': 'Missing request data'}), 400
+        if 'data' not in request_data or 'schema' not in request_data or 'settings' not in request_data:
+            return jsonify({'error': 'Missing data, schema, or settings'}), 400
+
         data = request_data.get('data')
         schema = request_data.get('schema')
         settings = request_data.get('settings')
         session_id = request_data.get('session_id')
-
-        if not all([data, schema, settings]):
-            return jsonify({'error': 'Missing data, schema, or settings'}), 400
 
         if not all(map(is_file_length_valid, [data, schema, settings])):
             return jsonify({'error': 'One or more files too large'}), 413
