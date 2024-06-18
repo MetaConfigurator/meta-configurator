@@ -77,5 +77,5 @@ export interface SettingsInterfaceRdf {
 
 export interface SettingsInterfaceBackend {
   hostname: string;
-    port: number;
+  port: number;
 }

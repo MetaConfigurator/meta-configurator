@@ -1,8 +1,7 @@
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {computed, type Ref} from 'vue';
-import {useSettings} from "@/settings/useSettings";
-
+import {useSettings} from '@/settings/useSettings';
 
 const BASE_URL = computed(() => {
   return useSettings().backend.hostname + ':' + useSettings().backend.port;

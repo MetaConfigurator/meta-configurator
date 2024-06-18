@@ -79,5 +79,5 @@ export const SETTINGS_DATA_DEFAULT = {
   backend: {
     hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
     port: 5000,
-  }
+  },
 };
