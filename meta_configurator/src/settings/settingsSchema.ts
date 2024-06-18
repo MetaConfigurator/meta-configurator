@@ -244,6 +244,27 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    backend: {
+      type: 'object',
+      required: ['hostname', 'port'],
+        additionalProperties: false,
+        description: 'Settings for the backend.',
+        properties: {
+          hostname: {
+            type: 'string',
+            description: 'The hostname of the backend server.',
+            default: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+            format: 'uri',
+          },
+          port: {
+            type: 'integer',
+            description: 'The port of the backend server.',
+            default: 5000,
+            minimum: 1,
+            maximum: 65535,
+          },
+        },
+    }
   },
   $defs: {
     panels: {

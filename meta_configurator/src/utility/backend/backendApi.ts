@@ -1,8 +1,12 @@
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import type {Ref} from 'vue';
+import {computed, type Ref} from 'vue';
+import {useSettings} from "@/settings/useSettings";
 
-const BASE_URL = 'http://metaconfigurator.informatik.uni-stuttgart.de:5000';
+
+const BASE_URL = computed(() => {
+  return useSettings().backend.hostname + ':' + useSettings().backend.port;
+});
 
 export async function storeCurrentSession(resultRef: Ref<string>) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
