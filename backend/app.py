@@ -4,6 +4,7 @@ from pymongo import MongoClient
 import uuid
 import logging
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -30,80 +31,131 @@ MAX_FILE_LENGTH = 500000  # 500,000 bytes = 500 KB
 def is_file_length_valid(file_content):
     return len(str(file_content)) <= MAX_FILE_LENGTH
 
+
 @app.route('/file', methods=['POST'])
 def add_file():
-    file_content = request.json
-    if not is_file_length_valid(file_content):
-        return jsonify({'error': 'File too large'}), 413
-    file_id = str(uuid.uuid4())
-    collection = db['files']
-    collection.insert_one({'_id': file_id, 'file': file_content})
-    return jsonify({'uuid': file_id}), 201
+    try:
+        file_content = request.json
+        if not is_file_length_valid(file_content):
+            return jsonify({'error': 'File too large'}), 413
 
-@app.route('/file/<uuid>', methods=['GET'])
-def get_file(uuid):
-    collection = db['files']
-    result = collection.find_one({'_id': uuid}, {'_id': False})
-    if not result:
-        return jsonify({'error': 'File not found'}), 404
+        file_id = str(uuid.uuid4())
+        creation_date = datetime.utcnow().isoformat()
+        collection = db['files']
+        collection.insert_one({
+            '_id': file_id,
+            'file': file_content,
+            'metadata': {
+                'creationDate': creation_date
+            }
+        })
+        return jsonify({'uuid': file_id}), 201
+    except Exception as e:
+        return jsonify({'error': 'Internal server error'}), 500
 
-    return jsonify(result['file'])
+@app.route('/file/<id>', methods=['GET'])
+def get_file(id):
+    try:
+        collection = db['files']
+        result = collection.find_one({'_id': id}, {'_id': False})
+        if not result:
+            return jsonify({'error': 'File not found'}), 404
+
+        return jsonify(result['file'])
+    except Exception as e:
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/session', methods=['POST'])
 def add_session():
-    data = request.json.get('data')
-    schema = request.json.get('schema')
-    settings = request.json.get('settings')
+    try:
+        data = request.json.get('data')
+        schema = request.json.get('schema')
+        settings = request.json.get('settings')
+        session_id = request.json.get('session_id')
 
-    if not all([data, schema, settings]):
-        return jsonify({'error': 'Missing data, schema, or settings'}), 400
+        if not all([data, schema, settings]):
+            return jsonify({'error': 'Missing data, schema, or settings'}), 400
 
-    if not all(map(is_file_length_valid, [data, schema, settings])):
-        return jsonify({'error': 'One or more files too large'}), 413
+        if not all(map(is_file_length_valid, [data, schema, settings])):
+            return jsonify({'error': 'One or more files too large'}), 413
 
-    # Generate UUIDs for each file and the session
-    data_id = str(uuid.uuid4())
-    schema_id = str(uuid.uuid4())
-    settings_id = str(uuid.uuid4())
-    session_id = str(uuid.uuid4())
+        # Check if session ID already exists
+        if session_id and db['sessions'].find_one({'_id': session_id}):
+            return jsonify({'error': 'Session ID already exists'}), 409
 
-    # Store each file
-    files_collection = db['files']
-    files_collection.insert_one({'_id': data_id, 'file': data})
-    files_collection.insert_one({'_id': schema_id, 'file': schema})
-    files_collection.insert_one({'_id': settings_id, 'file': settings})
+        # Generate UUIDs for each file and the session if not provided
+        data_id = str(uuid.uuid4())
+        schema_id = str(uuid.uuid4())
+        settings_id = str(uuid.uuid4())
+        if not session_id:
+            session_id = str(uuid.uuid4())
 
-    # Store the session
-    sessions_collection = db['sessions']
-    sessions_collection.insert_one({
-        '_id': session_id,
-        'data_id': data_id,
-        'schema_id': schema_id,
-        'settings_id': settings_id
-    })
+        creation_date = datetime.utcnow().isoformat()
 
-    return jsonify({'session_uuid': session_id}), 201
+        # Store each file
+        files_collection = db['files']
+        files_collection.insert_one({
+            '_id': data_id,
+            'file': data,
+            'metadata': {
+                'creationDate': creation_date
+            }
+        })
+        files_collection.insert_one({
+            '_id': schema_id,
+            'file': schema,
+            'metadata': {
+                'creationDate': creation_date
+            }
+        })
+        files_collection.insert_one({
+            '_id': settings_id,
+            'file': settings,
+            'metadata': {
+                'creationDate': creation_date
+            }
+        })
 
-@app.route('/session/<uuid>', methods=['GET'])
-def get_session(uuid):
-    sessions_collection = db['sessions']
-    session = sessions_collection.find_one({'_id': uuid})
-    if not session:
-        return jsonify({'error': 'Session not found'}), 404
+        # Store the session
+        sessions_collection = db['sessions']
+        sessions_collection.insert_one({
+            '_id': session_id,
+            'data_id': data_id,
+            'schema_id': schema_id,
+            'settings_id': settings_id,
+            'metadata': {
+                'creationDate': creation_date
+            }
+        })
 
-    files_collection = db['files']
-    data = files_collection.find_one({'_id': session['data_id']}, {'_id': False})
-    schema = files_collection.find_one({'_id': session['schema_id']}, {'_id': False})
-    settings = files_collection.find_one({'_id': session['settings_id']}, {'_id': False})
+        return jsonify({'session_id': session_id}), 201
+    except Exception as e:
+        return jsonify({'error': 'Internal server error'}), 500
 
-    if not all([data, schema, settings]):
-        return jsonify({'error': 'One or more files not found'}), 404
+@app.route('/session/<id>', methods=['GET'])
+def get_session(id):
+    try:
+        sessions_collection = db['sessions']
+        session = sessions_collection.find_one({'_id': id})
+        if not session:
+            app.logger.error('Session not found: %s', id)
+            return jsonify({'error': 'Session not found'}), 404
 
-    return jsonify({
-        'data': data['file'],
-        'schema': schema['file'],
-        'settings': settings['file']
-    })
+        files_collection = db['files']
+        data = files_collection.find_one({'_id': session['data_id']}, {'_id': False})
+        schema = files_collection.find_one({'_id': session['schema_id']}, {'_id': False})
+        settings = files_collection.find_one({'_id': session['settings_id']}, {'_id': False})
+
+        if not all([data, schema, settings]):
+            return jsonify({'error': 'One or more files not found'}), 404
+
+        return jsonify({
+            'data': data['file'],
+            'schema': schema['file'],
+            'settings': settings['file']
+        })
+    except Exception as e:
+        return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
