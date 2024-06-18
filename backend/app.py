@@ -53,7 +53,6 @@ def add_file():
         })
         return jsonify({'uuid': file_id}), 201
     except Exception as e:
-        app.logger.error(f"Error in add_file: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/file/<id>', methods=['GET'])
@@ -72,7 +71,6 @@ def get_file(id):
 def add_session():
     try:
         request_data = request.json
-        app.logger.info('Received request to add session with data: %s', request_data)
         if not request_data:
             return jsonify({'error': 'Missing request data'}), 400
         if 'data' not in request_data or 'schema' not in request_data or 'settings' not in request_data:
@@ -145,7 +143,6 @@ def get_session(id):
         sessions_collection = db['sessions']
         session = sessions_collection.find_one({'_id': id})
         if not session:
-            app.logger.error('Session not found: %s', id)
             return jsonify({'error': 'Session not found'}), 404
 
         files_collection = db['files']
