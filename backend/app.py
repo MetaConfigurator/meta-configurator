@@ -72,6 +72,7 @@ def get_file(id):
 def add_session():
     try:
         request_data = request.json
+        app.logger.info('Received request to add session with data: %s', request_data)
         if not request_data:
             return jsonify({'error': 'Missing request data'}), 400
         data = request_data.get('data')
