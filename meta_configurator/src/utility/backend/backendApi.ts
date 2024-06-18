@@ -23,6 +23,11 @@ async function storeSession(data: any, schema: any, settings: any) {
     },
     body: JSON.stringify({data: data, schema: schema, settings: settings}),
   });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
   return response.json();
 }
 

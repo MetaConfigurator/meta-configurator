@@ -36,6 +36,8 @@ def is_file_length_valid(file_content):
 def add_file():
     try:
         file_content = request.json
+        if not file_content:
+            return jsonify({'error': 'Missing file content'}), 400
         if not is_file_length_valid(file_content):
             return jsonify({'error': 'File too large'}), 413
 
@@ -51,6 +53,7 @@ def add_file():
         })
         return jsonify({'uuid': file_id}), 201
     except Exception as e:
+        app.logger.error(f"Error in add_file: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/file/<id>', methods=['GET'])
@@ -68,10 +71,13 @@ def get_file(id):
 @app.route('/session', methods=['POST'])
 def add_session():
     try:
-        data = request.json.get('data')
-        schema = request.json.get('schema')
-        settings = request.json.get('settings')
-        session_id = request.json.get('session_id')
+        request_data = request.json
+        if not request_data:
+            return jsonify({'error': 'Missing request data'}), 400
+        data = request_data.get('data')
+        schema = request_data.get('schema')
+        settings = request_data.get('settings')
+        session_id = request_data.get('session_id')
 
         if not all([data, schema, settings]):
             return jsonify({'error': 'Missing data, schema, or settings'}), 400
