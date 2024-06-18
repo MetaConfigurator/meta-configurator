@@ -16,7 +16,7 @@ export interface SettingsInterfaceRoot {
   hideSchemaEditor: boolean;
   panels: SettingsInterfacePanels;
   rdf: SettingsInterfaceRdf;
-    frontend: SettingsInterfacFrontend;
+  frontend: SettingsInterfacFrontend;
   backend: SettingsInterfaceBackend;
 }
 

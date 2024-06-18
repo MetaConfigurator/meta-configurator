@@ -8,7 +8,7 @@ const BACKEND_URL = computed(() => {
 });
 
 const FRONTEND_URL = computed(() => {
-    return useSettings().frontend.hostname;
+  return useSettings().frontend.hostname;
 });
 
 export async function storeCurrentSession(resultRef: Ref<string>) {
@@ -40,7 +40,6 @@ async function getSession(sessionId: string) {
   const response = await fetch(`${BACKEND_URL.value}/session/${sessionId}`, {
     method: 'GET',
   });
-
 
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
