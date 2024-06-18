@@ -12,7 +12,7 @@ export async function storeCurrentSession(resultRef: Ref<string>) {
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;
   const result = await storeSession(data, schema, settings);
-  resultRef.value = result['session_uuid'];
+  resultRef.value = result['session_id'];
 }
 
 async function storeSession(data: any, schema: any, settings: any) {
