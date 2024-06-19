@@ -189,7 +189,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         markMoreFieldsAsAdvanced: {
           type: 'boolean',
           description:
-              'If set to true, more fields (e.g., default values, const, enum, examples, string length) will be marked as advanced in the schema editor. This can make the schema editor less cluttered, but also hides some fields that might be needed. Recommended for users who are not familiar with JSON Schema.',
+            'If set to true, more fields (e.g., default values, const, enum, examples, string length) will be marked as advanced in the schema editor. This can make the schema editor less cluttered, but also hides some fields that might be needed. Recommended for users who are not familiar with JSON Schema.',
           default: true,
         },
         showAdditionalPropertiesButton: {
