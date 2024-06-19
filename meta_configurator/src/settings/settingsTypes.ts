@@ -16,6 +16,8 @@ export interface SettingsInterfaceRoot {
   hideSchemaEditor: boolean;
   panels: SettingsInterfacePanels;
   rdf: SettingsInterfaceRdf;
+  frontend: SettingsInterfacFrontend;
+  backend: SettingsInterfaceBackend;
 }
 
 export interface SettingsInterfaceCodeEditor {
@@ -72,4 +74,13 @@ export enum DataFormat {
 
 export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
+}
+
+export interface SettingsInterfaceBackend {
+  hostname: string;
+  port: number;
+}
+
+export interface SettingsInterfacFrontend {
+  hostname: string;
 }

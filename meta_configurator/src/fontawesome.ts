@@ -29,6 +29,7 @@ import {
   faFileImport,
   faTable,
   faCircleNodes,
+  faFileExport,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -45,6 +46,7 @@ import {
 export function registerIcons() {
   library.add(faBars);
   library.add(faFile);
+  library.add(faFileExport);
   library.add(faFileCirclePlus);
   library.add(faFloppyDisk);
   library.add(faFloppyDiskRegular);

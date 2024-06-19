@@ -25,20 +25,23 @@ export class MenuItems {
   private readonly onFromWebClick: () => Promise<void>;
   private readonly onFromOurExampleClick: () => void;
   private readonly handleFromURLClick: () => void;
-  private readonly importCsvDocument: () => void;
+  private readonly showImportCsvDialog: () => void;
+  private readonly showSnapshotDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
     onFromSchemaStoreClick: () => Promise<void>,
     onFromOurExampleClick: () => void,
     onFromURLClick: () => void,
-    importCsvDocument: () => void,
+    showImportCsvDialog: () => void,
+    showSnapshotDialog: () => void,
     inferJsonSchemaFromSampleData: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
     this.handleFromURLClick = onFromURLClick;
-    this.importCsvDocument = importCsvDocument;
+    this.showImportCsvDialog = showImportCsvDialog;
+    this.showSnapshotDialog = showSnapshotDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
   }
 
@@ -73,7 +76,7 @@ export class MenuItems {
           {
             label: 'Import CSV Data',
             icon: 'fa-solid fa-table',
-            command: this.importCsvDocument,
+            command: this.showImportCsvDialog,
           },
         ],
       },
@@ -387,6 +390,12 @@ export class MenuItems {
           getDataForMode(SessionMode.Settings).setData(structuredClone(SETTINGS_DATA_DEFAULT));
         },
         key: 'settings_restore',
+      },
+      {
+        label: 'Create sharable snapshot',
+        icon: 'fa-solid fa-file-export',
+        command: this.showSnapshotDialog,
+        key: 'snapshot',
       },
     ];
   }

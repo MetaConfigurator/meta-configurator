@@ -28,17 +28,12 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import {
-  getDataForMode,
-  getSchemaForMode,
-  getSessionForMode,
-  useCurrentData,
-  useCurrentSchema,
-} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
+import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -61,6 +56,7 @@ const topMenuBar = new MenuItems(
   handleFromOurExampleClick,
   showUrlDialog,
   showCsvImportDialog,
+  showSnapshotDialog,
   inferSchemaFromSampleData
 );
 
@@ -276,9 +272,14 @@ const showInitialSchemaDialog = () => {
 };
 
 const csvImportDialog = ref();
+const snapshotDialog = ref();
 
 function showCsvImportDialog() {
   csvImportDialog.value?.show();
+}
+
+function showSnapshotDialog() {
+  snapshotDialog.value?.show();
 }
 
 defineExpose({
@@ -337,6 +338,8 @@ const showSearchResultsMenu = event => {
     @user_selected_option="option => handleUserSelection(option)" />
 
   <ImportCsvDialog ref="csvImportDialog" />
+
+  <SaveSnapshotDialog ref="snapshotDialog" />
 
   <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
