@@ -57,6 +57,7 @@ export interface SettingsInterfaceMetaSchema {
   allowBooleanSchema: boolean;
   allowMultipleTypes: boolean;
   objectTypesComfort: boolean;
+  markMoreFieldsAsAdvanced: boolean;
   showAdditionalPropertiesButton: boolean;
   showJsonLdFields: boolean;
 }
