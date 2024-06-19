@@ -31,6 +31,7 @@ export const SETTINGS_DATA_DEFAULT = {
     allowBooleanSchema: false,
     allowMultipleTypes: false,
     objectTypesComfort: false,
+    markMoreFieldsAsAdvanced: true,
     showAdditionalPropertiesButton: false,
     showJsonLdFields: false,
   },
