@@ -26,7 +26,7 @@ export class MenuItems {
   private readonly onFromOurExampleClick: () => void;
   private readonly handleFromURLClick: () => void;
   private readonly showImportCsvDialog: () => void;
-  private readonly showSaveSessionDialog: () => void;
+  private readonly showSnapshotDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
@@ -34,14 +34,14 @@ export class MenuItems {
     onFromOurExampleClick: () => void,
     onFromURLClick: () => void,
     showImportCsvDialog: () => void,
-    showSaveSessionDialog: () => void,
+    showSnapshotDialog: () => void,
     inferJsonSchemaFromSampleData: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
     this.handleFromURLClick = onFromURLClick;
     this.showImportCsvDialog = showImportCsvDialog;
-    this.showSaveSessionDialog = showSaveSessionDialog;
+    this.showSnapshotDialog = showSnapshotDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
   }
 
@@ -392,10 +392,10 @@ export class MenuItems {
         key: 'settings_restore',
       },
       {
-        label: 'Save current settings',
+        label: 'Create sharable snapshot',
         icon: 'fa-solid fa-file-export',
-        command: this.showSaveSessionDialog,
-        key: 'settings_save',
+        command: this.showSnapshotDialog,
+        key: 'snapshot',
       },
     ];
   }

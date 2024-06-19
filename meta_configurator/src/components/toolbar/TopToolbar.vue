@@ -33,7 +33,7 @@ import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
-import SaveSessionDialog from '@/components/dialogs/save-session/SaveSessionDialog.vue';
+import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -56,7 +56,7 @@ const topMenuBar = new MenuItems(
   handleFromOurExampleClick,
   showUrlDialog,
   showCsvImportDialog,
-  showSaveSessionDialog,
+  showSnapshotDialog,
   inferSchemaFromSampleData
 );
 
@@ -272,14 +272,14 @@ const showInitialSchemaDialog = () => {
 };
 
 const csvImportDialog = ref();
-const saveSessionDialog = ref();
+const snapshotDialog = ref();
 
 function showCsvImportDialog() {
   csvImportDialog.value?.show();
 }
 
-function showSaveSessionDialog() {
-  saveSessionDialog.value?.show();
+function showSnapshotDialog() {
+  snapshotDialog.value?.show();
 }
 
 defineExpose({
@@ -339,7 +339,7 @@ const showSearchResultsMenu = event => {
 
   <ImportCsvDialog ref="csvImportDialog" />
 
-  <SaveSessionDialog ref="saveSessionDialog" />
+  <SaveSnapshotDialog ref="snapshotDialog" />
 
   <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">

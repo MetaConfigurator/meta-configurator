@@ -67,8 +67,8 @@ def get_file(id):
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
 
-@app.route('/session', methods=['POST'])
-def add_session():
+@app.route('/snapshot', methods=['POST'])
+def add_snapshot():
     try:
         request_data = request.json
         if not request_data:
@@ -79,21 +79,21 @@ def add_session():
         data = request_data.get('data')
         schema = request_data.get('schema')
         settings = request_data.get('settings')
-        session_id = request_data.get('session_id')
+        snapshot_id = request_data.get('snapshot_id')
 
         if not all(map(is_file_length_valid, [data, schema, settings])):
             return jsonify({'error': 'One or more files too large'}), 413
 
-        # Check if session ID already exists
-        if session_id and db['sessions'].find_one({'_id': session_id}):
-            return jsonify({'error': 'Session ID already exists'}), 409
+        # Check if snapshot ID already exists
+        if snapshot_id and db['snapshots'].find_one({'_id': snapshot_id}):
+            return jsonify({'error': 'Snapshot ID already exists'}), 409
 
-        # Generate UUIDs for each file and the session if not provided
+        # Generate UUIDs for each file and the snapshot if not provided
         data_id = str(uuid.uuid4())
         schema_id = str(uuid.uuid4())
         settings_id = str(uuid.uuid4())
-        if not session_id:
-            session_id = str(uuid.uuid4())
+        if not snapshot_id:
+            snapshot_id = str(uuid.uuid4())
 
         creation_date = datetime.utcnow().isoformat()
 
@@ -121,10 +121,10 @@ def add_session():
             }
         })
 
-        # Store the session
-        sessions_collection = db['sessions']
-        sessions_collection.insert_one({
-            '_id': session_id,
+        # Store the snapshot
+        snapshots_collection = db['snapshots']
+        snapshots_collection.insert_one({
+            '_id': snapshot_id,
             'data_id': data_id,
             'schema_id': schema_id,
             'settings_id': settings_id,
@@ -133,22 +133,22 @@ def add_session():
             }
         })
 
-        return jsonify({'session_id': session_id}), 201
+        return jsonify({'snapshot_id': snapshot_id}), 201
     except Exception as e:
         return jsonify({'error': 'Internal server error'}), 500
 
-@app.route('/session/<id>', methods=['GET'])
-def get_session(id):
+@app.route('/snapshot/<id>', methods=['GET'])
+def get_snapshot(id):
     try:
-        sessions_collection = db['sessions']
-        session = sessions_collection.find_one({'_id': id})
-        if not session:
-            return jsonify({'error': 'Session not found'}), 404
+        snapshots_collection = db['snapshots']
+        snapshot = snapshots_collection.find_one({'_id': id})
+        if not snapshot:
+            return jsonify({'error': 'Snapshot not found'}), 404
 
         files_collection = db['files']
-        data = files_collection.find_one({'_id': session['data_id']}, {'_id': False})
-        schema = files_collection.find_one({'_id': session['schema_id']}, {'_id': False})
-        settings = files_collection.find_one({'_id': session['settings_id']}, {'_id': False})
+        data = files_collection.find_one({'_id': snapshot['data_id']}, {'_id': False})
+        schema = files_collection.find_one({'_id': snapshot['schema_id']}, {'_id': False})
+        settings = files_collection.find_one({'_id': snapshot['settings_id']}, {'_id': False})
 
         if not all([data, schema, settings]):
             return jsonify({'error': 'One or more files not found'}), 404

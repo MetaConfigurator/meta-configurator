@@ -3,7 +3,7 @@ import {useAppRouter} from '@/router/router';
 import {onMounted} from 'vue';
 import {useDataSource} from '@/data/dataSource';
 import {useSessionStore} from '@/store/sessionStore';
-import {restoreSession} from '@/utility/backend/backendApi';
+import {restoreSnapshot} from '@/utility/backend/backendApi';
 
 defineProps({
   settings_url: String,
@@ -56,10 +56,10 @@ onMounted(() => {
       });
   }
 
-  if ('session' in query) {
-    const sessionId = query.session as string;
-    console.info('Received session ID ', sessionId, ' from query string "', query, '".');
-    restoreSession(sessionId);
+  if ('snapshot' in query) {
+    const snapshotId = query.session as string;
+    console.info('Received snapshot ID ', snapshotId, ' from query string "', query, '".');
+    restoreSnapshot(snapshotId);
   }
 
   useAppRouter().push('/data');

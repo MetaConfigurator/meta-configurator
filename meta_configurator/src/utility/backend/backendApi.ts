@@ -11,17 +11,17 @@ const FRONTEND_URL = computed(() => {
   return useSettings().frontend.hostname;
 });
 
-export async function storeCurrentSession(resultRef: Ref<string>) {
+export async function storeCurrentSnapshot(resultRef: Ref<string>) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;
-  const result = await storeSession(data, schema, settings);
-  const sessionId = result['session_id'];
-  resultRef.value = `${FRONTEND_URL.value}/?session=${sessionId}`;
+  const result = await storeSnapshot(data, schema, settings);
+  const snapshotId = result['snapshot_id'];
+  resultRef.value = `${FRONTEND_URL.value}/?snapshot=${snapshotId}`;
 }
 
-async function storeSession(data: any, schema: any, settings: any) {
-  const response = await fetch(`${BACKEND_URL.value}/session`, {
+async function storeSnapshot(data: any, schema: any, settings: any) {
+  const response = await fetch(`${BACKEND_URL.value}/snapshot`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -36,8 +36,8 @@ async function storeSession(data: any, schema: any, settings: any) {
   return response.json();
 }
 
-async function getSession(sessionId: string) {
-  const response = await fetch(`${BACKEND_URL.value}/session/${sessionId}`, {
+async function getSnapshot(snapshotId: string) {
+  const response = await fetch(`${BACKEND_URL.value}/snapshot/${snapshotId}`, {
     method: 'GET',
   });
 
@@ -50,13 +50,13 @@ async function getSession(sessionId: string) {
   return response.json();
 }
 
-export async function restoreSession(sessionId: string) {
-  const result = await getSession(sessionId);
+export async function restoreSnapshot(snapshotId: string) {
+  const result = await getSnapshot(snapshotId);
   if ('error' in result) {
-    throw new Error('Error for session with ID ' + sessionId + ': ' + result['error'] + '.');
+    throw new Error('Error for snapshot with ID ' + snapshotId + ': ' + result['error'] + '.');
   }
   if (!('data' in result) || !('schema' in result) || !('settings' in result)) {
-    throw new Error('Invalid session data for ID ' + sessionId + ' received from backend.');
+    throw new Error('Invalid snapshot data for ID ' + snapshotId + ' received from backend.');
   }
   const data = result['data'];
   const schema = result['schema'];

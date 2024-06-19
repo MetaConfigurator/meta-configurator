@@ -4,7 +4,7 @@ import {type Ref, ref} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
-import {storeCurrentSession} from '@/utility/backend/backendApi';
+import {storeCurrentSnapshot} from '@/utility/backend/backendApi';
 
 const showDialog = ref(false);
 
@@ -18,8 +18,8 @@ function hideDialog() {
   showDialog.value = false;
 }
 
-function requestSaveSession() {
-  storeCurrentSession(resultString);
+function requestSaveSnapshot() {
+  storeCurrentSnapshot(resultString);
 }
 
 defineExpose({show: openDialog, close: hideDialog});
@@ -36,7 +36,7 @@ defineExpose({show: openDialog, close: hideDialog});
       <div class="flex align-items-center">
         <Button
           label="Save Session"
-          @click="requestSaveSession"
+          @click="requestSaveSnapshot"
           class="p-button-raised p-button-rounded"></Button>
       </div>
 
