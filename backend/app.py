@@ -5,12 +5,21 @@ import uuid
 import logging
 import os
 from datetime import datetime
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 CORS(app)
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
+
+# Initialize Flask-Limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
 
 # Get MongoDB credentials and connection info from environment variables
 MONGO_USER = os.getenv('MONGO_USER', 'root')
@@ -34,6 +43,7 @@ def is_file_length_valid(file_content):
 
 
 @app.route('/file', methods=['POST'])
+@limiter.limit("6 per minute")
 def add_file():
     try:
         file_content = request.json
@@ -58,6 +68,7 @@ def add_file():
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/file/<id>', methods=['GET'])
+@limiter.limit("30 per minute")
 def get_file(id):
     try:
         collection = db['files']
@@ -71,6 +82,7 @@ def get_file(id):
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/snapshot', methods=['POST'])
+@limiter.limit("2 per minute")
 def add_snapshot():
     try:
         request_data = request.json
@@ -146,6 +158,7 @@ def add_snapshot():
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/snapshot/<id>', methods=['GET'])
+@limiter.limit("20 per minute")
 def get_snapshot(id):
     try:
         snapshots_collection = db['snapshots']
