@@ -11,7 +11,11 @@ const FRONTEND_URL = computed(() => {
   return useSettings().frontend.hostname;
 });
 
-export async function storeCurrentSnapshot(resultRef: Ref<string>, editPassword: string, author: string | null = null) {
+export async function storeCurrentSnapshot(
+  resultRef: Ref<string>,
+  editPassword: string,
+  author: string | null = null
+) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;

@@ -4,7 +4,7 @@ import {type Ref, ref} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
-import InputText from "primevue/inputtext";
+import InputText from 'primevue/inputtext';
 import {storeCurrentSnapshot} from '@/utility/backend/backendApi';
 
 const showDialog = ref(false);
