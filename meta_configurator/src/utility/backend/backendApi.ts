@@ -77,7 +77,11 @@ async function getSnapshot(snapshotId: string) {
 export async function restoreSnapshot(snapshotId: string) {
   const result = await getSnapshot(snapshotId);
   if ('error' in result) {
-    const errorMessage = 'Error while fetching snapshot data for ID ' + snapshotId + ' from backend: ' + result['error'];
+    const errorMessage =
+      'Error while fetching snapshot data for ID ' +
+      snapshotId +
+      ' from backend: ' +
+      result['error'];
     errorService.onError(errorMessage);
     throw new Error(errorMessage);
   }
