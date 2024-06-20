@@ -5,7 +5,7 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import InputText from 'primevue/inputtext';
-import InputSwitch from "primevue/inputswitch";
+import InputSwitch from 'primevue/inputswitch';
 import {publishProjectLink, storeCurrentSnapshot} from '@/utility/backend/backendApi';
 
 const showDialog = ref(false);
@@ -28,14 +28,17 @@ function hideDialog() {
 function requestSaveSnapshot() {
   resultString.value = '';
   storeCurrentSnapshot(resultString, errorString).then((snapshotId: string) => {
-
     if (publishProject.value) {
-      publishProjectLink(projectId.value, editPassword.value, snapshotId, resultString, errorString);
+      publishProjectLink(
+        projectId.value,
+        editPassword.value,
+        snapshotId,
+        resultString,
+        errorString
+      );
     }
-
   });
 }
-
 
 defineExpose({show: openDialog, close: hideDialog});
 </script>
@@ -45,8 +48,8 @@ defineExpose({show: openDialog, close: hideDialog});
     <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
       <p>
         This will store the current data, schema and settings in the backend and provide a URL to
-        restore the session later.
-        A snapshot is only valid for a limited time and will be deleted after not being accessed for 45 days.
+        restore the session later. A snapshot is only valid for a limited time and will be deleted
+        after not being accessed for 45 days.
       </p>
 
       <div class="flex align-items-center">
@@ -62,10 +65,11 @@ defineExpose({show: openDialog, close: hideDialog});
       </div>
 
       <div v-if="publishProject">
-
         <InputText v-model="projectId" placeholder="Project ID" class="fixed-width" />
-        <InputText v-model="editPassword" placeholder="Password for future edits" class="fixed-width" />
-
+        <InputText
+          v-model="editPassword"
+          placeholder="Password for future edits"
+          class="fixed-width" />
       </div>
 
       <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">

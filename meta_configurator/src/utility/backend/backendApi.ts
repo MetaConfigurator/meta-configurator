@@ -12,7 +12,13 @@ const FRONTEND_URL = computed(() => {
   return useSettings().frontend.hostname;
 });
 
-export async function publishProjectLink(projectId: string, editPassword: string, snapshotId: string, resultRef: Ref<String>, errorRef: Ref<string>) {
+export async function publishProjectLink(
+  projectId: string,
+  editPassword: string,
+  snapshotId: string,
+  resultRef: Ref<String>,
+  errorRef: Ref<string>
+) {
   const response = await fetch(`${BACKEND_URL.value}/project`, {
     method: 'POST',
     headers: {
@@ -69,7 +75,7 @@ async function getSnapshot(snapshotId: string, isProject: boolean = false) {
   const response = await fetch(`${BACKEND_URL.value}/${path}/${snapshotId}`, {
     method: 'GET',
   });
-  handleErrors(response, null)
+  handleErrors(response, null);
 
   return response.json();
 }
@@ -98,8 +104,7 @@ export async function restoreSnapshot(snapshotId: string, isProject: boolean = f
   getDataForMode(SessionMode.Settings).setData(settings);
 }
 
-
-function handleErrors(response: Response, errorRef: Ref<string>|null) {
+function handleErrors(response: Response, errorRef: Ref<string> | null) {
   if (response.status === 429) {
     throwError('Rate limit exceeded. Please try again later.', errorRef);
   }
@@ -113,10 +118,10 @@ function handleErrors(response: Response, errorRef: Ref<string>|null) {
   }
 }
 
-function throwError(errorMessage: string, errorRef: Ref<string>|null) {
-    if (errorRef) {
-        errorRef.value = errorMessage;
-    }
-    errorService.onError(errorMessage);
-    throw new Error(errorMessage);
+function throwError(errorMessage: string, errorRef: Ref<string> | null) {
+  if (errorRef) {
+    errorRef.value = errorMessage;
+  }
+  errorService.onError(errorMessage);
+  throw new Error(errorMessage);
 }
