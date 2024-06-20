@@ -4,3 +4,4 @@ flask-cors
 uuid
 flask-limiter
 gunicorn
+redis

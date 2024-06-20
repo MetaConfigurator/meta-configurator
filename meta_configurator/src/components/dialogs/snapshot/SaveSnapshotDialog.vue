@@ -34,11 +34,12 @@ defineExpose({show: openDialog, close: hideDialog});
       <p>
         This will store the current data, schema and settings in the backend and provide a URL to
         restore the session later.
+        A snapshot is only valid for a limited time and will be deleted after not being accessed for 45 days.
       </p>
 
       <div class="flex align-items-center">
         <Button
-          label="Save Session"
+          label="Save Snapshot"
           @click="requestSaveSnapshot"
           class="p-button-raised p-button-rounded"></Button>
       </div>

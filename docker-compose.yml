@@ -18,6 +18,7 @@ services:
       - "5000:5000"
     depends_on:
       - mongo
+      - redis
     networks:
       - app-network
     environment:
@@ -27,6 +28,7 @@ services:
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       MONGO_DB: metaconfigurator
+      REDIS_URL: redis://redis:6379/0
 
   mongo:
     image: mongo:latest
@@ -41,6 +43,11 @@ services:
       - mongo-data:/data/db
     networks:
       - app-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
 
 networks:
   app-network:

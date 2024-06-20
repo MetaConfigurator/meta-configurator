@@ -8,19 +8,13 @@ import os
 from datetime import datetime, timedelta
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import redis
 
 app = Flask(__name__)
 CORS(app)
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
-
-# Initialize Flask-Limiter
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["200 per day", "50 per hour"]
-)
 
 # Get MongoDB credentials and connection info from environment variables
 MONGO_USER = os.getenv('MONGO_USER', 'root')
@@ -33,11 +27,26 @@ MONGO_DB = os.getenv('MONGO_DB', 'metaconfigurator')
 app.logger.debug(f'Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}')
 
 # MongoDB connection
-client = MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER, password=MONGO_PASS, authSource="admin")
+client = MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER, password=MONGO_PASS,
+                     authSource="admin")
 db = client[MONGO_DB]
 
+# Set up Redis connection
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+redis_client = redis.Redis.from_url(REDIS_URL)
+
+# Set up Flask-Limiter with Redis
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    storage_uri=REDIS_URL
+)
+
+# Constants
 MAX_FILE_LENGTH = 500000  # 500,000 bytes = 500 KB
-RETENTION_PERIOD = timedelta(days=30)  # Snapshots not accessed for 30 days will be deleted
+RETENTION_PERIOD = timedelta(days=45)  # Snapshots not accessed for 45 days will be deleted
+CHECK_INTERVAL = 86400  # 1 day in seconds
+
 
 def is_file_length_valid(file_content):
     return len(str(file_content)) <= MAX_FILE_LENGTH
@@ -68,12 +77,13 @@ def add_file():
         app.logger.error(f'Error adding file: {e}')
         return jsonify({'error': 'Internal server error'}), 500
 
-@app.route('/file/<id>', methods=['GET'])
+
+@app.route('/file/<file_id>', methods=['GET'])
 @limiter.limit("30 per minute")
-def get_file(id):
+def get_file(file_id):
     try:
         collection = db['files']
-        result = collection.find_one({'_id': id}, {'_id': False})
+        result = collection.find_one({'_id': file_id}, {'_id': False})
         if not result:
             return jsonify({'error': 'File not found'}), 404
 
@@ -81,6 +91,7 @@ def get_file(id):
     except Exception as e:
         app.logger.error(f'Error getting file: {e}')
         return jsonify({'error': 'Internal server error'}), 500
+
 
 @app.route('/snapshot', methods=['POST'])
 @limiter.limit("2 per minute")
@@ -156,12 +167,13 @@ def add_snapshot():
         app.logger.error(f'Error adding snapshot: {e}')
         return jsonify({'error': 'Internal server error'}), 500
 
-@app.route('/snapshot/<id>', methods=['GET'])
+
+@app.route('/snapshot/<snapshot_id>', methods=['GET'])
 @limiter.limit("30 per minute")
-def get_snapshot(id):
+def get_snapshot(snapshot_id):
     try:
         snapshots_collection = db['snapshots']
-        snapshot = snapshots_collection.find_one({'_id': id})
+        snapshot = snapshots_collection.find_one({'_id': snapshot_id})
         if not snapshot:
             return jsonify({'error': 'Snapshot not found'}), 404
 
@@ -175,7 +187,7 @@ def get_snapshot(id):
 
         # Update the last accessed time and increment access count
         snapshots_collection.update_one(
-            {'_id': id},
+            {'_id': snapshot_id},
             {'$set': {'metadata.lastAccessed': datetime.utcnow().isoformat()}, '$inc': {'metadata.accessCount': 1}}
         )
 
@@ -209,7 +221,8 @@ def cleanup_old_snapshots():
         snapshots_collection.delete_many({'_id': {'$in': old_snapshot_ids}})
 
         # Delete files not linked to any snapshot
-        linked_file_ids = snapshots_collection.distinct('data_id') + snapshots_collection.distinct('schema_id') + snapshots_collection.distinct('settings_id')
+        linked_file_ids = snapshots_collection.distinct('data_id') + snapshots_collection.distinct(
+            'schema_id') + snapshots_collection.distinct('settings_id')
         unlinked_files = files_collection.find({'_id': {'$nin': linked_file_ids}})
         unlinked_file_ids = [file['_id'] for file in unlinked_files]
         files_collection.delete_many({'_id': {'$in': unlinked_file_ids}})
@@ -223,6 +236,7 @@ def schedule_cleanup():
     cleanup_old_snapshots()
     # Schedule the next run
     threading.Timer(86400, schedule_cleanup).start()
+
 
 if __name__ == '__main__':
     # Start the cleanup scheduler
