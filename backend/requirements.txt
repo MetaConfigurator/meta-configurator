@@ -5,3 +5,4 @@ uuid
 flask-limiter
 gunicorn
 redis
+werkzeug
