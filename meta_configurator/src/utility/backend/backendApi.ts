@@ -2,6 +2,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {computed, type Ref} from 'vue';
 import {useSettings} from '@/settings/useSettings';
+import {errorService} from "@/main";
 
 const BACKEND_URL = computed(() => {
   return useSettings().backend.hostname + ':' + useSettings().backend.port;
@@ -13,28 +14,22 @@ const FRONTEND_URL = computed(() => {
 
 export async function storeCurrentSnapshot(
   resultRef: Ref<string>,
-  editPassword: string,
-  author: string | null = null
+  errorRef: Ref<string>,
 ) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;
-  const result = await storeSnapshot(data, schema, settings, author);
+  const result = await storeSnapshot(data, schema, settings, errorRef);
   const snapshotId = result['snapshot_id'];
   resultRef.value = `${FRONTEND_URL.value}/?snapshot=${snapshotId}`;
 }
 
-async function storeSnapshot(data: any, schema: any, settings: any, author: string | null = null) {
+async function storeSnapshot(data: any, schema: any, settings: any, errorRef: Ref<string>) {
   const body: any = {
     data: data,
     schema: schema,
     settings: settings,
-    author: author || 'anonymous',
   };
-
-  if (author) {
-    body['author'] = author;
-  }
 
   const response = await fetch(`${BACKEND_URL.value}/snapshot`, {
     method: 'POST',
@@ -45,12 +40,18 @@ async function storeSnapshot(data: any, schema: any, settings: any, author: stri
   });
 
   if (response.status === 429) {
-    throw new Error('Rate limit exceeded. Please try again later.');
+    const errorMessage = 'Rate limit exceeded. Please try again later.';
+    errorRef.value = errorMessage;
+    throw new Error(errorMessage);
   }
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const errorMessage = `HTTP error! status: ${response.status}`;
+    errorRef.value = errorMessage;
+    throw new Error(errorMessage);
   }
+
+  errorRef.value = '';
 
   return response.json();
 }
@@ -61,13 +62,15 @@ async function getSnapshot(snapshotId: string) {
   });
 
   if (response.status === 429) {
-    throw new Error('Rate limit exceeded. Please try again later.');
+    errorService.onError('Rate limit exceeded. Please try again later.');
+    return {};
   }
 
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
     const errorText = await response.text();
-    throw new Error(`Unexpected response from server: ${errorText}`);
+    errorService.onError(`Unexpected response from server: ${errorText}`);
+    return {};
   }
 
   return response.json();
@@ -76,10 +79,10 @@ async function getSnapshot(snapshotId: string) {
 export async function restoreSnapshot(snapshotId: string) {
   const result = await getSnapshot(snapshotId);
   if ('error' in result) {
-    throw new Error('Error for snapshot with ID ' + snapshotId + ': ' + result['error'] + '.');
+    errorService.onError('Error while fetching snapshot data from backend: ' + result['error']);
   }
   if (!('data' in result) || !('schema' in result) || !('settings' in result)) {
-    throw new Error('Invalid snapshot data for ID ' + snapshotId + ' received from backend.');
+    errorService.onError('Invalid snapshot data for ID ' + snapshotId + ' received from backend.');
   }
   const data = result['data'];
   const schema = result['schema'];

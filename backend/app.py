@@ -44,7 +44,7 @@ def is_file_length_valid(file_content):
 
 
 @app.route('/file', methods=['POST'])
-@limiter.limit("10 per minute")
+@limiter.limit("3 per minute")
 def add_file():
     try:
         file_content = request.json
@@ -83,7 +83,7 @@ def get_file(id):
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/snapshot', methods=['POST'])
-@limiter.limit("10 per minute")
+@limiter.limit("2 per minute")
 def add_snapshot():
     try:
         request_data = request.json
@@ -96,7 +96,6 @@ def add_snapshot():
         schema = request_data.get('schema')
         settings = request_data.get('settings')
         snapshot_id = request_data.get('snapshot_id')
-        author = request_data.get('author')
 
         if not all(map(is_file_length_valid, [data, schema, settings])):
             return jsonify({'error': 'One or more files too large'}), 413
@@ -148,8 +147,7 @@ def add_snapshot():
             'metadata': {
                 'creationDate': creation_date,
                 'lastAccessDate': creation_date,
-                'accessCount': 0,
-                'author': author
+                'accessCount': 0
             }
         })
 
@@ -186,9 +184,6 @@ def get_snapshot(id):
             'schema': schema['file'],
             'settings': settings['file']
         }
-
-        if 'author' in snapshot['metadata']:
-            response['author'] = snapshot['metadata']['author']
 
         return jsonify(response)
 
