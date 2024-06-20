@@ -59,15 +59,16 @@ async function getSnapshot(snapshotId: string) {
   });
 
   if (response.status === 429) {
-    errorService.onError('Rate limit exceeded. Please try again later.');
-    return {};
+    const errorMessage = 'Rate limit exceeded. Please try again later.';
+    errorService.onError(errorMessage);
+    throw new Error(errorMessage);
   }
 
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
-    const errorText = await response.text();
-    errorService.onError(`Unexpected response from server: ${errorText}`);
-    return {};
+    const errorMessage = 'Invalid content type received from backend.';
+    errorService.onError(errorMessage);
+    throw new Error(errorMessage);
   }
 
   return response.json();
@@ -76,10 +77,14 @@ async function getSnapshot(snapshotId: string) {
 export async function restoreSnapshot(snapshotId: string) {
   const result = await getSnapshot(snapshotId);
   if ('error' in result) {
-    errorService.onError('Error while fetching snapshot data from backend: ' + result['error']);
+    const errorMessage = 'Error while fetching snapshot data for ID ' + snapshotId + ' from backend: ' + result['error'];
+    errorService.onError(errorMessage);
+    throw new Error(errorMessage);
   }
   if (!('data' in result) || !('schema' in result) || !('settings' in result)) {
-    errorService.onError('Invalid snapshot data for ID ' + snapshotId + ' received from backend.');
+    const errorMessage = 'Invalid snapshot data received from backend.';
+    errorService.onError(errorMessage);
+    throw new Error(errorMessage);
   }
   const data = result['data'];
   const schema = result['schema'];

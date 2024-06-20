@@ -57,7 +57,7 @@ onMounted(() => {
   }
 
   if ('snapshot' in query) {
-    const snapshotId = query.session as string;
+    const snapshotId = query.snapshot as string;
     console.info('Received snapshot ID ', snapshotId, ' from query string "', query, '".');
     restoreSnapshot(snapshotId);
   }
