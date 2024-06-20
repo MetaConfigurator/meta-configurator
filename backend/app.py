@@ -44,7 +44,7 @@ def is_file_length_valid(file_content):
 
 
 @app.route('/file', methods=['POST'])
-@limiter.limit("6 per minute")
+@limiter.limit("10 per minute")
 def add_file():
     try:
         file_content = request.json
@@ -83,7 +83,7 @@ def get_file(id):
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/snapshot', methods=['POST'])
-@limiter.limit("2 per minute")
+@limiter.limit("10 per minute")
 def add_snapshot():
     try:
         request_data = request.json
@@ -159,7 +159,7 @@ def add_snapshot():
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/snapshot/<id>', methods=['GET'])
-@limiter.limit("20 per minute")
+@limiter.limit("30 per minute")
 def get_snapshot(id):
     try:
         snapshots_collection = db['snapshots']
