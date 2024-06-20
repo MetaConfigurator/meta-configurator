@@ -2,7 +2,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {computed, type Ref} from 'vue';
 import {useSettings} from '@/settings/useSettings';
-import {errorService} from "@/main";
+import {errorService} from '@/main';
 
 const BACKEND_URL = computed(() => {
   return useSettings().backend.hostname + ':' + useSettings().backend.port;
@@ -12,10 +12,7 @@ const FRONTEND_URL = computed(() => {
   return useSettings().frontend.hostname;
 });
 
-export async function storeCurrentSnapshot(
-  resultRef: Ref<string>,
-  errorRef: Ref<string>,
-) {
+export async function storeCurrentSnapshot(resultRef: Ref<string>, errorRef: Ref<string>) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;

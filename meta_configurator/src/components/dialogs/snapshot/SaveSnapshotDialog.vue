@@ -49,10 +49,8 @@ defineExpose({show: openDialog, close: hideDialog});
           <a :href="resultString" target="_blank">{{ resultString }}</a>
         </Message>
 
-        <Message v-if="errorString.length > 0" severity="error">{{errorString}}</Message>
-
+        <Message v-if="errorString.length > 0" severity="error">{{ errorString }}</Message>
       </div>
-
     </div>
   </Dialog>
 </template>
