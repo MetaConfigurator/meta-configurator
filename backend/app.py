@@ -5,8 +5,6 @@ import uuid
 import logging
 import os
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
-from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 CORS(app)
@@ -85,21 +83,14 @@ def add_snapshot():
         schema = request_data.get('schema')
         settings = request_data.get('settings')
         snapshot_id = request_data.get('snapshot_id')
-        edit_password = request_data.get('edit_password')
-        author = request_data.get('author', None)  # Get author if provided, else None
+        author = request_data.get('author', 'unknown')  # Get author if provided, default to 'unknown'
 
         if not all(map(is_file_length_valid, [data, schema, settings])):
             return jsonify({'error': 'One or more files too large'}), 413
 
-        snapshots_collection = db['snapshots']
-        snapshot = snapshots_collection.find_one({'_id': snapshot_id}) if snapshot_id else None
-
         # Check if snapshot ID already exists
-        if snapshot:
-            if not check_password_hash(snapshot['edit_password'], edit_password):
-                return jsonify({'error': 'Snapshot ID already exists with a different password'}), 409
-            # Overwrite the existing snapshot
-            snapshots_collection.delete_one({'_id': snapshot_id})
+        if snapshot_id and db['snapshots'].find_one({'_id': snapshot_id}):
+            return jsonify({'error': 'Snapshot ID already exists'}), 409
 
         # Generate UUIDs for each file and the snapshot if not provided
         data_id = str(uuid.uuid4())
@@ -134,23 +125,20 @@ def add_snapshot():
             }
         })
 
-
         # Store the snapshot
-        snapshot_document = {
+        snapshots_collection = db['snapshots']
+        snapshots_collection.insert_one({
             '_id': snapshot_id,
             'data_id': data_id,
             'schema_id': schema_id,
             'settings_id': settings_id,
-            'edit_password': generate_password_hash(edit_password),
             'metadata': {
-                'creationDate': creation_date
-                'lastAccessed': creation_date,
-                'accessCount': 0
+                'creationDate': creation_date,
+                'lastAccessDate': creation_date,
+                'accessCount': 0,
+                'author': author
             }
-        }
-        if author:
-            snapshot_document['metadata']['author'] = author
-        snapshots_collection.insert_one(snapshot_document)
+        })
 
         return jsonify({'snapshot_id': snapshot_id}), 201
     except Exception as e:
@@ -222,11 +210,12 @@ def cleanup_old_snapshots():
         app.logger.error(f'Error during cleanup: {e}')
 
 
-# Schedule the cleanup job to run once per day
-scheduler = BackgroundScheduler()
-scheduler.add_job(cleanup_old_snapshots, 'interval', days=1)
-scheduler.start()
-
+def schedule_cleanup():
+    cleanup_old_snapshots()
+    # Schedule the next run
+    threading.Timer(86400, schedule_cleanup).start()
 
 if __name__ == '__main__':
+    # Start the cleanup scheduler
+    schedule_cleanup()
     app.run(host='0.0.0.0', port=5000)
