@@ -1,16 +1,26 @@
+import threading
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
 import uuid
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 CORS(app)
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
+
+# Initialize Flask-Limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
 
 # Get MongoDB credentials and connection info from environment variables
 MONGO_USER = os.getenv('MONGO_USER', 'root')
@@ -27,12 +37,14 @@ client = MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER,
 db = client[MONGO_DB]
 
 MAX_FILE_LENGTH = 500000  # 500,000 bytes = 500 KB
+RETENTION_PERIOD = timedelta(days=30)  # Snapshots not accessed for 30 days will be deleted
 
 def is_file_length_valid(file_content):
     return len(str(file_content)) <= MAX_FILE_LENGTH
 
 
 @app.route('/file', methods=['POST'])
+@limiter.limit("3 per minute")
 def add_file():
     try:
         file_content = request.json
@@ -53,9 +65,11 @@ def add_file():
         })
         return jsonify({'uuid': file_id}), 201
     except Exception as e:
+        app.logger.error(f'Error adding file: {e}')
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/file/<id>', methods=['GET'])
+@limiter.limit("30 per minute")
 def get_file(id):
     try:
         collection = db['files']
@@ -65,9 +79,11 @@ def get_file(id):
 
         return jsonify(result['file'])
     except Exception as e:
+        app.logger.error(f'Error getting file: {e}')
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/snapshot', methods=['POST'])
+@limiter.limit("2 per minute")
 def add_snapshot():
     try:
         request_data = request.json
@@ -129,15 +145,19 @@ def add_snapshot():
             'schema_id': schema_id,
             'settings_id': settings_id,
             'metadata': {
-                'creationDate': creation_date
+                'creationDate': creation_date,
+                'lastAccessDate': creation_date,
+                'accessCount': 0
             }
         })
 
         return jsonify({'snapshot_id': snapshot_id}), 201
     except Exception as e:
+        app.logger.error(f'Error adding snapshot: {e}')
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/snapshot/<id>', methods=['GET'])
+@limiter.limit("30 per minute")
 def get_snapshot(id):
     try:
         snapshots_collection = db['snapshots']
@@ -153,13 +173,58 @@ def get_snapshot(id):
         if not all([data, schema, settings]):
             return jsonify({'error': 'One or more files not found'}), 404
 
-        return jsonify({
+        # Update the last accessed time and increment access count
+        snapshots_collection.update_one(
+            {'_id': id},
+            {'$set': {'metadata.lastAccessed': datetime.utcnow().isoformat()}, '$inc': {'metadata.accessCount': 1}}
+        )
+
+        response = {
             'data': data['file'],
             'schema': schema['file'],
             'settings': settings['file']
-        })
+        }
+
+        return jsonify(response)
+
     except Exception as e:
+        app.logger.error(f'Error getting snapshot: {e}')
         return jsonify({'error': 'Internal server error'}), 500
 
+
+def cleanup_old_snapshots():
+    try:
+        cutoff_date = datetime.utcnow() - RETENTION_PERIOD
+        snapshots_collection = db['snapshots']
+        files_collection = db['files']
+
+        # Delete snapshots not accessed in the last X days
+        old_snapshots = snapshots_collection.find({'metadata.lastAccessed': {'$lt': cutoff_date.isoformat()}})
+        old_snapshot_ids = [snapshot['_id'] for snapshot in old_snapshots]
+        old_file_ids = []
+
+        for snapshot in old_snapshots:
+            old_file_ids.extend([snapshot['data_id'], snapshot['schema_id'], snapshot['settings_id']])
+
+        snapshots_collection.delete_many({'_id': {'$in': old_snapshot_ids}})
+
+        # Delete files not linked to any snapshot
+        linked_file_ids = snapshots_collection.distinct('data_id') + snapshots_collection.distinct('schema_id') + snapshots_collection.distinct('settings_id')
+        unlinked_files = files_collection.find({'_id': {'$nin': linked_file_ids}})
+        unlinked_file_ids = [file['_id'] for file in unlinked_files]
+        files_collection.delete_many({'_id': {'$in': unlinked_file_ids}})
+
+        app.logger.info('Cleanup completed successfully.')
+    except Exception as e:
+        app.logger.error(f'Error during cleanup: {e}')
+
+
+def schedule_cleanup():
+    cleanup_old_snapshots()
+    # Schedule the next run
+    threading.Timer(86400, schedule_cleanup).start()
+
 if __name__ == '__main__':
+    # Start the cleanup scheduler
+    schedule_cleanup()
     app.run(host='0.0.0.0', port=5000)

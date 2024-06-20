@@ -3,12 +3,14 @@
 import {type Ref, ref} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
-import Divider from 'primevue/divider';
+import Message from 'primevue/message';
+import InputText from 'primevue/inputtext';
 import {storeCurrentSnapshot} from '@/utility/backend/backendApi';
 
 const showDialog = ref(false);
 
 const resultString: Ref<string> = ref('');
+const errorString: Ref<string> = ref('');
 
 function openDialog() {
   showDialog.value = true;
@@ -19,7 +21,8 @@ function hideDialog() {
 }
 
 function requestSaveSnapshot() {
-  storeCurrentSnapshot(resultString);
+  resultString.value = '';
+  storeCurrentSnapshot(resultString, errorString);
 }
 
 defineExpose({show: openDialog, close: hideDialog});
@@ -41,12 +44,12 @@ defineExpose({show: openDialog, close: hideDialog});
       </div>
 
       <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-        <Divider />
-        <p v-if="resultString.length > 0">
+        <Message v-if="resultString.length > 0" severity="success">
           The current session can be restored with the following URL:
-          <br />
           <a :href="resultString" target="_blank">{{ resultString }}</a>
-        </p>
+        </Message>
+
+        <Message v-if="errorString.length > 0" severity="error">{{ errorString }}</Message>
       </div>
     </div>
   </Dialog>

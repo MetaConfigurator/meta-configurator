@@ -2,3 +2,5 @@ Flask
 pymongo
 flask-cors
 uuid
+flask-limiter
+gunicorn
