@@ -2,3 +2,5 @@ Flask
 pymongo
 flask-cors
 uuid
+werkzeug
+appscheduler
