@@ -27,7 +27,7 @@ client = MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER,
 db = client[MONGO_DB]
 
 MAX_FILE_LENGTH = 500000  # 500,000 bytes = 500 KB
-RETENTION_PERIOD = timedelta(days=60)  # Snapshots not accessed for 60 days will be deleted
+RETENTION_PERIOD = timedelta(days=30)  # Snapshots not accessed for 30 days will be deleted
 
 def is_file_length_valid(file_content):
     return len(str(file_content)) <= MAX_FILE_LENGTH
@@ -83,7 +83,7 @@ def add_snapshot():
         schema = request_data.get('schema')
         settings = request_data.get('settings')
         snapshot_id = request_data.get('snapshot_id')
-        author = request_data.get('author', 'unknown')  # Get author if provided, default to 'unknown'
+        author = request_data.get('author')
 
         if not all(map(is_file_length_valid, [data, schema, settings])):
             return jsonify({'error': 'One or more files too large'}), 413

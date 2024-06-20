@@ -11,22 +11,33 @@ const FRONTEND_URL = computed(() => {
   return useSettings().frontend.hostname;
 });
 
-export async function storeCurrentSnapshot(resultRef: Ref<string>) {
+export async function storeCurrentSnapshot(resultRef: Ref<string>, editPassword: string, author: string | null = null) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;
-  const result = await storeSnapshot(data, schema, settings);
+  const result = await storeSnapshot(data, schema, settings, author);
   const snapshotId = result['snapshot_id'];
   resultRef.value = `${FRONTEND_URL.value}/?snapshot=${snapshotId}`;
 }
 
-async function storeSnapshot(data: any, schema: any, settings: any) {
+async function storeSnapshot(data: any, schema: any, settings: any, author: string | null = null) {
+  const body: any = {
+    data: data,
+    schema: schema,
+    settings: settings,
+    author: author || 'anonymous',
+  };
+
+  if (author) {
+    body['author'] = author;
+  }
+
   const response = await fetch(`${BACKEND_URL.value}/snapshot`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({data: data, schema: schema, settings: settings}),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {

@@ -4,11 +4,13 @@ import {type Ref, ref} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
+import InputText from "primevue/inputtext";
 import {storeCurrentSnapshot} from '@/utility/backend/backendApi';
 
 const showDialog = ref(false);
 
 const resultString: Ref<string> = ref('');
+const authorName: Ref<string> = ref('');
 
 function openDialog() {
   showDialog.value = true;
@@ -19,7 +21,7 @@ function hideDialog() {
 }
 
 function requestSaveSnapshot() {
-  storeCurrentSnapshot(resultString);
+  storeCurrentSnapshot(resultString, authorName.value);
 }
 
 defineExpose({show: openDialog, close: hideDialog});
@@ -32,6 +34,8 @@ defineExpose({show: openDialog, close: hideDialog});
         This will store the current data, schema and settings in the backend and provide a URL to
         restore the session later.
       </p>
+
+      <InputText v-model="authorName" placeholder="Author Name" class="fixed-width" />
 
       <div class="flex align-items-center">
         <Button
