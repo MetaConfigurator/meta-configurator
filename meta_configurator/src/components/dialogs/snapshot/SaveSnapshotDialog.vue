@@ -5,12 +5,17 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import InputText from 'primevue/inputtext';
-import {storeCurrentSnapshot} from '@/utility/backend/backendApi';
+import InputSwitch from "primevue/inputswitch";
+import {publishProjectLink, storeCurrentSnapshot} from '@/utility/backend/backendApi';
 
 const showDialog = ref(false);
 
 const resultString: Ref<string> = ref('');
 const errorString: Ref<string> = ref('');
+
+const publishProject = ref(false);
+const projectId = ref('');
+const editPassword = ref('');
 
 function openDialog() {
   showDialog.value = true;
@@ -22,8 +27,15 @@ function hideDialog() {
 
 function requestSaveSnapshot() {
   resultString.value = '';
-  storeCurrentSnapshot(resultString, errorString);
+  storeCurrentSnapshot(resultString, errorString).then((snapshotId: string) => {
+
+    if (publishProject.value) {
+      publishProjectLink(projectId.value, editPassword.value, snapshotId, resultString, errorString);
+    }
+
+  });
 }
+
 
 defineExpose({show: openDialog, close: hideDialog});
 </script>
@@ -42,6 +54,18 @@ defineExpose({show: openDialog, close: hideDialog});
           label="Save Snapshot"
           @click="requestSaveSnapshot"
           class="p-button-raised p-button-rounded"></Button>
+      </div>
+
+      <div class="flex align-items-center vertical-center">
+        <label for="delimiter" class="mr-2"><b>Publish project:</b></label>
+        <InputSwitch id="delimiter" v-model="publishProject" class="small-input" />
+      </div>
+
+      <div v-if="publishProject">
+
+        <InputText v-model="projectId" placeholder="Project ID" class="fixed-width" />
+        <InputText v-model="editPassword" placeholder="Password for future edits" class="fixed-width" />
+
       </div>
 
       <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">

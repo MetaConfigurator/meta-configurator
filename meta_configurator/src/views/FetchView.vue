@@ -61,6 +61,11 @@ onMounted(() => {
     console.info('Received snapshot ID ', snapshotId, ' from query string "', query, '".');
     restoreSnapshot(snapshotId);
   }
+  if ('project' in query) {
+    const projectId = query.project as string;
+    console.info('Received project ID ', projectId, ' from query string "', query, '".');
+    restoreSnapshot(projectId, true);
+  }
 
   useAppRouter().push('/data');
 });

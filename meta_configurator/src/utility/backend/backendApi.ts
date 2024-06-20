@@ -12,6 +12,27 @@ const FRONTEND_URL = computed(() => {
   return useSettings().frontend.hostname;
 });
 
+export async function publishProjectLink(projectId: string, editPassword: string, snapshotId: string, resultRef: Ref<String>, errorRef: Ref<string>) {
+  const response = await fetch(`${BACKEND_URL.value}/project`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      project_id: projectId,
+      snapshot_id: snapshotId,
+      edit_password: editPassword,
+    }),
+  });
+
+  handleErrors(response, errorRef);
+
+  errorRef.value = '';
+  resultRef.value = `${FRONTEND_URL.value}/?project=${projectId}`;
+
+  return response.json();
+}
+
 export async function storeCurrentSnapshot(resultRef: Ref<string>, errorRef: Ref<string>) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
@@ -19,6 +40,7 @@ export async function storeCurrentSnapshot(resultRef: Ref<string>, errorRef: Ref
   const result = await storeSnapshot(data, schema, settings, errorRef);
   const snapshotId = result['snapshot_id'];
   resultRef.value = `${FRONTEND_URL.value}/?snapshot=${snapshotId}`;
+  return snapshotId;
 }
 
 async function storeSnapshot(data: any, schema: any, settings: any, errorRef: Ref<string>) {
@@ -35,46 +57,24 @@ async function storeSnapshot(data: any, schema: any, settings: any, errorRef: Re
     },
     body: JSON.stringify(body),
   });
-
-  if (response.status === 429) {
-    const errorMessage = 'Rate limit exceeded. Please try again later.';
-    errorRef.value = errorMessage;
-    throw new Error(errorMessage);
-  }
-
-  if (!response.ok) {
-    const errorMessage = `HTTP error! status: ${response.status}`;
-    errorRef.value = errorMessage;
-    throw new Error(errorMessage);
-  }
+  handleErrors(response, errorRef);
 
   errorRef.value = '';
 
   return response.json();
 }
 
-async function getSnapshot(snapshotId: string) {
-  const response = await fetch(`${BACKEND_URL.value}/snapshot/${snapshotId}`, {
+async function getSnapshot(snapshotId: string, isProject: boolean = false) {
+  const path = isProject ? 'project' : 'snapshot';
+  const response = await fetch(`${BACKEND_URL.value}/${path}/${snapshotId}`, {
     method: 'GET',
   });
-
-  if (response.status === 429) {
-    const errorMessage = 'Rate limit exceeded. Please try again later.';
-    errorService.onError(errorMessage);
-    throw new Error(errorMessage);
-  }
-
-  const contentType = response.headers.get('content-type');
-  if (!contentType || !contentType.includes('application/json')) {
-    const errorMessage = 'Invalid content type received from backend.';
-    errorService.onError(errorMessage);
-    throw new Error(errorMessage);
-  }
+  handleErrors(response, null)
 
   return response.json();
 }
 
-export async function restoreSnapshot(snapshotId: string) {
+export async function restoreSnapshot(snapshotId: string, isProject: boolean = false) {
   const result = await getSnapshot(snapshotId);
   if ('error' in result) {
     const errorMessage =
@@ -96,4 +96,27 @@ export async function restoreSnapshot(snapshotId: string) {
   getDataForMode(SessionMode.DataEditor).setData(data);
   getDataForMode(SessionMode.SchemaEditor).setData(schema);
   getDataForMode(SessionMode.Settings).setData(settings);
+}
+
+
+function handleErrors(response: Response, errorRef: Ref<string>|null) {
+  if (response.status === 429) {
+    throwError('Rate limit exceeded. Please try again later.', errorRef);
+  }
+
+  if (!response.ok) {
+    throwError(`HTTP error! status: ${response.status}`, errorRef);
+  }
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    throwError('Invalid content type received from backend.', errorRef);
+  }
+}
+
+function throwError(errorMessage: string, errorRef: Ref<string>|null) {
+    if (errorRef) {
+        errorRef.value = errorMessage;
+    }
+    errorService.onError(errorMessage);
+    throw new Error(errorMessage);
 }
