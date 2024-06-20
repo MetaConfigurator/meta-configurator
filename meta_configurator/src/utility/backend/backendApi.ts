@@ -40,6 +40,10 @@ async function storeSnapshot(data: any, schema: any, settings: any, author: stri
     body: JSON.stringify(body),
   });
 
+  if (response.status === 429) {
+    throw new Error('Rate limit exceeded. Please try again later.');
+  }
+
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -51,6 +55,10 @@ async function getSnapshot(snapshotId: string) {
   const response = await fetch(`${BACKEND_URL.value}/snapshot/${snapshotId}`, {
     method: 'GET',
   });
+
+  if (response.status === 429) {
+    throw new Error('Rate limit exceeded. Please try again later.');
+  }
 
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
