@@ -1,21 +1,25 @@
 <!-- Dialog to import CSV data -->
 <script setup lang="ts">
-import {type Ref, ref} from 'vue';
+import {computed, type Ref, ref} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
+import Password from 'primevue/password';
 import {publishProjectLink, storeCurrentSnapshot} from '@/utility/backend/backendApi';
 
 const showDialog = ref(false);
 
-const resultString: Ref<string> = ref('');
+const resultSnapshotLink: Ref<string> = ref('');
+const resultProjectLink: Ref<string> = ref('');
 const errorString: Ref<string> = ref('');
 
 const publishProject = ref(false);
 const projectId = ref('');
 const editPassword = ref('');
+const editPasswordConfirm = ref('');
+
 
 function openDialog() {
   showDialog.value = true;
@@ -26,14 +30,23 @@ function hideDialog() {
 }
 
 function requestSaveSnapshot() {
-  resultString.value = '';
-  storeCurrentSnapshot(resultString, errorString).then((snapshotId: string) => {
+  if (editPassword.value !== editPasswordConfirm.value) {
+    errorString.value = 'Passwords do not match.';
+    return;
+  }
+  if (editPassword.value.length < 8) {
+    errorString.value = 'Password must be at least 8 characters.';
+    return;
+  }
+  resultSnapshotLink.value = '';
+  resultProjectLink.value = '';
+  storeCurrentSnapshot(resultSnapshotLink, errorString).then((snapshotId: string) => {
     if (publishProject.value) {
       publishProjectLink(
         projectId.value,
         editPassword.value,
         snapshotId,
-        resultString,
+        resultProjectLink,
         errorString
       );
     }
@@ -48,8 +61,8 @@ defineExpose({show: openDialog, close: hideDialog});
     <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
       <p>
         This will store the current data, schema and settings in the backend and provide a URL to
-        restore the session later. A snapshot is only valid for a limited time and will be deleted
-        after not being accessed for 45 days.
+        restore the session later. A snapshot will be deleted
+        after not being accessed for 30 days.
       </p>
 
       <div class="flex align-items-center">
@@ -65,17 +78,25 @@ defineExpose({show: openDialog, close: hideDialog});
       </div>
 
       <div v-if="publishProject">
+        <p>
+          When publishing a project, you can choose the name of the project and set a password for future edits.
+          Projects will be deleted after not being accessed for 90 days.
+        </p>
         <InputText v-model="projectId" placeholder="Project ID" class="fixed-width" />
-        <InputText
-          v-model="editPassword"
-          placeholder="Password for future edits"
-          class="fixed-width" />
+        <Password v-model="editPassword" placeholder="Password for future edits" class="fixed-width" :feedback="false" />
+        <Password v-model="editPasswordConfirm" placeholder="Confirm password" class="fixed-width" :feedback="false" />
       </div>
 
       <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-        <Message v-if="resultString.length > 0" severity="success">
-          The current session can be restored with the following URL:
-          <a :href="resultString" target="_blank">{{ resultString }}</a>
+        <Message v-if="resultProjectLink.length > 0 || resultSnapshotLink.length > 0" severity="success">
+          <p v-if="resultSnapshotLink.length > 0">
+            Snapshot:
+            <a :href="resultSnapshotLink" target="_blank">{{ resultSnapshotLink }}</a>
+          </p>
+          <p v-if="resultProjectLink.length > 0">
+            Project:
+            <a :href="resultProjectLink" target="_blank">{{ resultProjectLink }}</a>
+          </p>
         </Message>
 
         <Message v-if="errorString.length > 0" severity="error">{{ errorString }}</Message>

@@ -16,7 +16,7 @@ export async function publishProjectLink(
   projectId: string,
   editPassword: string,
   snapshotId: string,
-  resultRef: Ref<String>,
+  resultProjectLink: Ref<String>,
   errorRef: Ref<string>
 ) {
   const response = await fetch(`${BACKEND_URL.value}/project`, {
@@ -34,18 +34,18 @@ export async function publishProjectLink(
   handleErrors(response, errorRef);
 
   errorRef.value = '';
-  resultRef.value = `${FRONTEND_URL.value}/?project=${projectId}`;
+  resultProjectLink.value = `${FRONTEND_URL.value}/?project=${projectId}`;
 
   return response.json();
 }
 
-export async function storeCurrentSnapshot(resultRef: Ref<string>, errorRef: Ref<string>) {
+export async function storeCurrentSnapshot(resultSnapshotLink: Ref<string>, errorRef: Ref<string>) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;
   const result = await storeSnapshot(data, schema, settings, errorRef);
   const snapshotId = result['snapshot_id'];
-  resultRef.value = `${FRONTEND_URL.value}/?snapshot=${snapshotId}`;
+  resultSnapshotLink.value = `${FRONTEND_URL.value}/?snapshot=${snapshotId}`;
   return snapshotId;
 }
 
@@ -104,24 +104,27 @@ export async function restoreSnapshot(snapshotId: string, isProject: boolean = f
   getDataForMode(SessionMode.Settings).setData(settings);
 }
 
-function handleErrors(response: Response, errorRef: Ref<string> | null) {
+async function handleErrors(response: Response, errorRef: Ref<string> | null) {
   if (response.status === 429) {
     throwError('Rate limit exceeded. Please try again later.', errorRef);
-  }
-
-  if (!response.ok) {
-    throwError(`HTTP error! status: ${response.status}`, errorRef);
   }
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
     throwError('Invalid content type received from backend.', errorRef);
+  }
+  if (!response.ok) {
+    const json = await response.json();
+    if (json['error']) {
+      throwError(json['error'], errorRef);
+    }
   }
 }
 
 function throwError(errorMessage: string, errorRef: Ref<string> | null) {
   if (errorRef) {
     errorRef.value = errorMessage;
+  } else {
+    errorService.onError(errorMessage);
   }
-  errorService.onError(errorMessage);
   throw new Error(errorMessage);
 }
