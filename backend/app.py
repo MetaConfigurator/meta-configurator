@@ -43,6 +43,10 @@ limiter = Limiter(
     storage_uri=REDIS_URL
 )
 
+# Set up logging to print to a file
+logging.basicConfig(filename='cleanup.log', level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
 # Constants
 MAX_FILE_LENGTH = 500000  # 500,000 bytes = 500 KB
 PROJECT_EXPIRY_DAYS = timedelta(days=90)  # Projects not accessed for 90 days will be deleted
@@ -255,13 +259,17 @@ def cleanup_old_snapshots():
         old_projects = projects_collection.find({'metadata.lastAccessDate': {'$lt': project_cutoff_date.isoformat()}})
 
         old_project_ids = [project['_id'] for project in old_projects]
+        logging.info(f'Found {len(old_project_ids)} projects to delete.')
+
         for project_id in old_project_ids:
             project = projects_collection.find_one({'_id': project_id})
             if project:
                 projects_collection.delete_one({'_id': project_id})
+                logging.info(f'Deleted project with ID: {project_id}')
 
         # Collect snapshots for all projects that still exist
         snapshot_ids_linked_to_recent_projects = set()
+        logging.info(f'Found {len(snapshot_ids_linked_to_recent_projects)} snapshots linked to recent projects.')
         for project in projects_collection.find():
             snapshot_ids_linked_to_recent_projects.add(project['snapshot_id'])
 
@@ -271,6 +279,8 @@ def cleanup_old_snapshots():
 
         # Delete old snapshots if not linked to any recent projects
         old_snapshot_ids = [snapshot['_id'] for snapshot in old_snapshots if snapshot['_id'] not in snapshot_ids_linked_to_recent_projects]
+        logging.info(f'Found {len(old_snapshot_ids)} snapshots to delete.')
+
         for snapshot_id in old_snapshot_ids:
             snapshot = snapshots_collection.find_one({'_id': snapshot_id})
             if snapshot:
@@ -283,11 +293,12 @@ def cleanup_old_snapshots():
 
         all_files = set(files_collection.distinct('_id'))
         unused_files = all_files - all_snapshot_files
+        logging.info(f'Found {len(unused_files)} files to delete.')
 
         for file_id in unused_files:
             files_collection.delete_one({'_id': file_id})
 
-        app.logger.info(f'Deleted {len(old_snapshot_ids)} old snapshots and {len(unused_files)} unused files')
+        logging.info(f'Deleted {len(old_project_ids)} projects, {len(old_snapshot_ids)} snapshots, and {len(unused_files)} files.')
     except Exception as e:
         app.logger.error(f'Error deleting cleanup: {e}')
 
