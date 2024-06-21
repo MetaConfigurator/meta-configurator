@@ -57,34 +57,42 @@ defineExpose({show: openDialog, close: hideDialog});
 </script>
 
 <template>
-  <Dialog v-model:visible="showDialog" header="Save current Session">
+  <Dialog v-model:visible="showDialog" header="Save current Snapshot">
     <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
       <p>
         This will store the current data, schema and settings in the backend and provide a URL to
-        restore the session later. A snapshot will be deleted
-        after not being accessed for 30 days.
+        restore the session later.
+        <br>
+        A snapshot will be deleted after not being accessed for 30 days.
       </p>
-
-      <div class="flex align-items-center">
-        <Button
-          label="Save Snapshot"
-          @click="requestSaveSnapshot"
-          class="p-button-raised p-button-rounded"></Button>
-      </div>
 
       <div class="flex align-items-center vertical-center">
         <label for="delimiter" class="mr-2"><b>Publish project:</b></label>
         <InputSwitch id="delimiter" v-model="publishProject" class="small-input" />
       </div>
 
-      <div v-if="publishProject">
+     <div v-if="publishProject" class="vertical-layout">
         <p>
           When publishing a project, you can choose the name of the project and set a password for future edits.
+          <br>
           Projects will be deleted after not being accessed for 90 days.
         </p>
-        <InputText v-model="projectId" placeholder="Project ID" class="fixed-width" />
-        <Password v-model="editPassword" placeholder="Password for future edits" class="fixed-width" :feedback="false" />
-        <Password v-model="editPasswordConfirm" placeholder="Confirm password" class="fixed-width" :feedback="false" />
+       <div class="flex align-items-center vertical-center">
+         <label class="mr-2"><b>Project Identifier:</b></label>
+         <InputText v-model="projectId" placeholder="Project ID" />
+       </div>
+       <div class="flex align-items-center vertical-center">
+         <label class="mr-2"><b>Password:</b></label>
+         <Password v-model="editPassword" placeholder="Password for future edits" class=" mb-2 mt-2 mr-1" :feedback="false" />
+         <Password v-model="editPasswordConfirm" placeholder="Confirm password" :feedback="false" />
+       </div>
+      </div>
+
+      <div class="flex align-items-center">
+        <Button
+            :label="publishProject ? 'Save Project' : 'Save Snapshot'"
+            @click="requestSaveSnapshot"
+            class="p-button-raised p-button-rounded"></Button>
       </div>
 
       <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
@@ -115,6 +123,12 @@ defineExpose({show: openDialog, close: hideDialog});
   display: flex;
   align-items: center;
 }
+.vertical-layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
 table {
   width: 100%;
@@ -133,7 +147,4 @@ th {
   font-weight: bold;
 }
 
-.fixed-width {
-  width: 200px;
-}
 </style>
