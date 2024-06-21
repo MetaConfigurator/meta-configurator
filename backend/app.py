@@ -25,7 +25,6 @@ MONGO_PORT = os.getenv('MONGO_PORT', '27017')
 MONGO_DB = os.getenv('MONGO_DB', 'metaconfigurator')
 
 app.logger.debug(f'Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}')
-app.logger.debug(f'Connecting to Redis at {REDIS_URL}')
 
 # MongoDB connection
 client = MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER, password=MONGO_PASS,
