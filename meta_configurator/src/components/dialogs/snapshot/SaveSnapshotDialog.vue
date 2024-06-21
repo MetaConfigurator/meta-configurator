@@ -20,7 +20,6 @@ const projectId = ref('');
 const editPassword = ref('');
 const editPasswordConfirm = ref('');
 
-
 function openDialog() {
   showDialog.value = true;
 }
@@ -62,7 +61,7 @@ defineExpose({show: openDialog, close: hideDialog});
       <p>
         This will store the current data, schema and settings in the backend and provide a URL to
         restore the session later.
-        <br>
+        <br />
         A snapshot will be deleted after not being accessed for 30 days.
       </p>
 
@@ -71,32 +70,42 @@ defineExpose({show: openDialog, close: hideDialog});
         <InputSwitch id="delimiter" v-model="publishProject" class="small-input" />
       </div>
 
-     <div v-if="publishProject" class="vertical-layout">
+      <div v-if="publishProject" class="vertical-layout">
         <p>
-          When publishing a project, you can choose the name of the project and set a password for future edits.
-          <br>
+          When publishing a project, you can choose the name of the project and set a password for
+          future edits.
+          <br />
           Projects will be deleted after not being accessed for 90 days.
         </p>
-       <div class="flex align-items-center vertical-center">
-         <label class="mr-2"><b>Project Identifier:</b></label>
-         <InputText v-model="projectId" placeholder="Project ID" />
-       </div>
-       <div class="flex align-items-center vertical-center">
-         <label class="mr-2"><b>Password:</b></label>
-         <Password v-model="editPassword" placeholder="Password for future edits" class=" mb-2 mt-2 mr-1" :feedback="false" />
-         <Password v-model="editPasswordConfirm" placeholder="Confirm password" :feedback="false" />
-       </div>
+        <div class="flex align-items-center vertical-center">
+          <label class="mr-2"><b>Project Identifier:</b></label>
+          <InputText v-model="projectId" placeholder="Project ID" />
+        </div>
+        <div class="flex align-items-center vertical-center">
+          <label class="mr-2"><b>Password:</b></label>
+          <Password
+            v-model="editPassword"
+            placeholder="Password for future edits"
+            class="mb-2 mt-2 mr-1"
+            :feedback="false" />
+          <Password
+            v-model="editPasswordConfirm"
+            placeholder="Confirm password"
+            :feedback="false" />
+        </div>
       </div>
 
       <div class="flex align-items-center">
         <Button
-            :label="publishProject ? 'Save Project' : 'Save Snapshot'"
-            @click="requestSaveSnapshot"
-            class="p-button-raised p-button-rounded"></Button>
+          :label="publishProject ? 'Save Project' : 'Save Snapshot'"
+          @click="requestSaveSnapshot"
+          class="p-button-raised p-button-rounded"></Button>
       </div>
 
       <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-        <Message v-if="resultProjectLink.length > 0 || resultSnapshotLink.length > 0" severity="success">
+        <Message
+          v-if="resultProjectLink.length > 0 || resultSnapshotLink.length > 0"
+          severity="success">
           <p v-if="resultSnapshotLink.length > 0">
             Snapshot:
             <a :href="resultSnapshotLink" target="_blank">{{ resultSnapshotLink }}</a>
@@ -146,5 +155,4 @@ th {
   background-color: #f0f0f0;
   font-weight: bold;
 }
-
 </style>
