@@ -29,6 +29,7 @@ function hideDialog() {
 }
 
 function requestSaveSnapshot() {
+  errorString.value = '';
   if (publishProject.value) {
     if (projectId.value.length < 3) {
       errorString.value = 'Project ID must be at least 3 characters.';
