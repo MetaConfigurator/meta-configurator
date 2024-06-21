@@ -81,7 +81,7 @@ async function getSnapshot(snapshotId: string, isProject: boolean = false) {
 }
 
 export async function restoreSnapshot(snapshotId: string, isProject: boolean = false) {
-  const result = await getSnapshot(snapshotId);
+  const result = await getSnapshot(snapshotId, isProject);
   if ('error' in result) {
     const errorMessage =
       'Error while fetching snapshot data for ID ' +
