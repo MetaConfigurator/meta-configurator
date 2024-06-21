@@ -24,8 +24,8 @@ MONGO_HOST = os.getenv('MONGO_HOST', 'mongo')
 MONGO_PORT = os.getenv('MONGO_PORT', '27017')
 MONGO_DB = os.getenv('MONGO_DB', 'metaconfigurator')
 
-# Log connection string for debugging purposes
 app.logger.debug(f'Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}')
+app.logger.debug(f'Connecting to Redis at {REDIS_URL}')
 
 # MongoDB connection
 client = MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER, password=MONGO_PASS,
@@ -178,6 +178,13 @@ def publish_project():
         project_id = request_data['project_id']
         snapshot_id = request_data['snapshot_id']
         edit_password = request_data['edit_password']
+
+        # Validate project_id and edit_password lengths
+        if len(project_id) < 3:
+            return jsonify({'error': 'project_id must be at least 3 characters long'}), 400
+        if len(edit_password) < 8:
+            return jsonify({'error': 'edit_password must be at least 8 characters long'}), 400
+
         hashed_password = generate_password_hash(edit_password)
         last_access_date = datetime.utcnow().isoformat()
 

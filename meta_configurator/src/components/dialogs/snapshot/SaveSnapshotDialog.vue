@@ -29,13 +29,19 @@ function hideDialog() {
 }
 
 function requestSaveSnapshot() {
-  if (editPassword.value !== editPasswordConfirm.value) {
-    errorString.value = 'Passwords do not match.';
-    return;
-  }
-  if (editPassword.value.length < 8) {
-    errorString.value = 'Password must be at least 8 characters.';
-    return;
+  if (publishProject.value) {
+    if (projectId.value.length < 3) {
+      errorString.value = 'Project ID must be at least 3 characters.';
+      return;
+    }
+    if (editPassword.value !== editPasswordConfirm.value) {
+      errorString.value = 'Passwords do not match.';
+      return;
+    }
+    if (editPassword.value.length < 8) {
+      errorString.value = 'Password must be at least 8 characters.';
+      return;
+    }
   }
   resultSnapshotLink.value = '';
   resultProjectLink.value = '';
