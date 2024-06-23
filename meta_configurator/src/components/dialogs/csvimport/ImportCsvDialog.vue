@@ -1,6 +1,6 @@
 <!-- Dialog to import CSV data -->
 <script setup lang="ts">
-import {type Ref, ref, watch} from 'vue';
+import { type Ref, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
@@ -10,12 +10,12 @@ import RadioButton from "primevue/radiobutton";
 import InputSwitch from 'primevue/inputswitch';
 import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {writeCsvToData} from '@/components/dialogs/csvimport/writeCsvToData';
+import {expandCsvDataIntoTable, writeCsvToData} from '@/components/dialogs/csvimport/writeCsvToData';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
 import {
-  computeMostUsedDelimiterAndDecimalSeparator,
+  computeMostUsedDelimiterAndDecimalSeparator, type LabelledPath,
   type LabelledValue,
 } from '@/components/dialogs/csvimport/delimiterSeparatorUtils';
 import {
@@ -27,7 +27,8 @@ import {
   loadCsvFromUserString,
   requestUploadFileToRef,
 } from '@/components/dialogs/csvimport/importCsvUtils';
-import type {Path} from "@/utility/path";
+
+const emptyPathOption: LabelledPath = {label: 'not set', value: []};
 
 const showDialog = ref(false);
 
@@ -51,11 +52,12 @@ const isExpandWithLookupTables: Ref<boolean> = ref(false);
 const pathBeforeRowIndex: Ref<string> = ref('myTableName');
 
 // options for expansion with lookup table
-const possiblePreviousTables: Ref<{label: string, value: Path }[]> = ref([]);
-const tableToExpand: Ref<Path> = ref([]);
-const possibleForeignKeyProps: Ref<string[]> = ref([]);
-const foreignKeyName: Ref<string> = ref('todo');
-const primaryKeyProp: Ref<string> = ref('todo');
+const possiblePreviousTables: Ref<LabelledPath[]> = ref([]);
+const tableToExpand: Ref<LabelledPath> = ref(emptyPathOption);
+const possiblePrimaryKeyProps: Ref<LabelledValue[]> = ref([]);
+const primaryKeyProp: Ref<LabelledValue> = ref(emptyPathOption);
+const possibleForeignKeyProps: Ref<LabelledValue[]> = ref([]);
+const foreignKey: Ref<LabelledValue> = ref(emptyPathOption);
 
 // attribute mapping
 const currentColumnMapping: Ref<CsvImportColumnMappingData[]> = ref([]);
@@ -108,21 +110,55 @@ watch(currentUserCsv, newValue => {
 
   possiblePreviousTables.value = detectPossibleTablesInJson(getDataForMode(SessionMode.DataEditor).data.value).map(path => {
     return {
-     label: pathToJsonPointer(path),
+     label: pathToJsonPointer(path).slice(1), // cut off the first slash in json pointer, because it is auto-filled later (treated same as user input, where the user also does not write the slash themselves)
      value: path
    };
   });
+
+  // by default, select the first table to expand
+  if (possiblePreviousTables.value.length > 0) {
+    tableToExpand.value = possiblePreviousTables.value[0];
+  }
+
+  possiblePrimaryKeyProps.value = currentColumnMapping.value.map(column =>
+  {
+    return {
+      label: column.name,
+      value: column.name
+    }
+  });
+  if (possiblePrimaryKeyProps.value.length > 0) {
+    primaryKeyProp.value = possiblePrimaryKeyProps.value[0];
+  }
+
 });
 
 // when user selected a table to expand, update the possible foreign key properties
 watch(tableToExpand, newValue => {
-  possibleForeignKeyProps.value = detectPropertiesOfTableInJson(getDataForMode(SessionMode.DataEditor).data.value, tableToExpand.value);
+  possibleForeignKeyProps.value = detectPropertiesOfTableInJson(getDataForMode(SessionMode.DataEditor).data.value,newValue.value).map(prop => {
+    return {
+      label: prop,
+      value: prop
+    };
+  });
+  // by default, select the first property as foreign key
+  // TODO: clever algorithm to see for which foreign key there is most matches in the data
+  if (possibleForeignKeyProps.value.length > 0) {
+    foreignKey.value = possibleForeignKeyProps.value[0];
+  }
+  // update pathBeforeRowIndex to the table path
+  pathBeforeRowIndex.value = pathToJsonPointer(newValue.value).slice(1);
 });
 
+
 function submitImport() {
-  writeCsvToData(currentUserCsv.value, currentColumnMapping.value);
-  if (isInferSchema.value) {
-    addInferredSchema();
+  if (!isExpandWithLookupTables.value) {
+    writeCsvToData(currentUserCsv.value, currentColumnMapping.value);
+    if (isInferSchema.value) {
+      addInferredSchema();
+    }
+  } else {
+    expandCsvDataIntoTable(currentUserCsv.value, foreignKey.value.value, primaryKeyProp.value.value, currentColumnMapping.value);
   }
   hideDialog();
 }
@@ -216,6 +252,14 @@ defineExpose({show: openDialog, close: hideDialog});
 
           <div class="flex align-items-center vertical-center">
             <label class="mr-2">
+              <b>Primary key in new CSV:</b>
+            </label>
+            <Dropdown
+                id="tableToExpand" v-model="primaryKeyProp" class="fixed-width" :options="possiblePrimaryKeyProps"
+                :option-label="option => option.label"/>
+          </div>
+          <div class="flex align-items-center vertical-center">
+            <label class="mr-2">
               <b>Table to expand:</b>
             </label>
             <Dropdown
@@ -227,14 +271,8 @@ defineExpose({show: openDialog, close: hideDialog});
               <b>Foreign key in existing data:</b>
             </label>
             <Dropdown
-                id="foreignKeyName" v-model="foreignKeyName" class="fixed-width" :options="possibleForeignKeyProps"
+                id="foreignKeyName" v-model="foreignKey" class="fixed-width" :options="possibleForeignKeyProps"
                 :option-label="option => option.label"/>
-          </div>
-          <div class="flex align-items-center vertical-center">
-            <label class="mr-2">
-              <b>Primary key property in new CSV:</b>
-            </label>
-            <InputText v-model="primaryKeyProp" class="fixed-width" />
           </div>
         </div>
 
@@ -265,6 +303,7 @@ defineExpose({show: openDialog, close: hideDialog});
               <td>{{ column.name }}</td>
               <td>
                 <span class="text-xs">/{{ column.pathBeforeRowIndex }}/ROW_INDEX/</span>
+                <span class="text-xs" v-if="isExpandWithLookupTables">{{foreignKey.value}}/</span>
                 <InputText v-model="column.pathAfterRowIndex" class="fixed-width" />
               </td>
               <td v-if="isInferSchema">

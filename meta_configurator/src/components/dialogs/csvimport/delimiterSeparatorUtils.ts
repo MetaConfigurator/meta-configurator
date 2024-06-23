@@ -2,6 +2,7 @@ import {
   decimalSeparatorOptions,
   delimiterOptions,
 } from '@/components/dialogs/csvimport/importCsvUtils';
+import type {Path} from "@/utility/path";
 
 function generateFloatRegexFull(delimiter: string, decimalSeparator: string): RegExp {
   const regexInside = generateFloatRegexForOneCell(decimalSeparator).source;
@@ -72,3 +73,5 @@ export type LabelledValue = {
   label: string;
   value: string;
 };
+
+export type LabelledPath = {label: string, value: Path};

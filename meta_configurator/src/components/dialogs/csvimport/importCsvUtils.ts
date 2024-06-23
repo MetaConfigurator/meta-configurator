@@ -7,7 +7,7 @@ import {dataPathToSchemaPath, pathToString} from '@/utility/pathUtils';
 import _ from 'lodash';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
-import type {Path} from '@/utility/path';
+import type {Path, PathElement} from '@/utility/path';
 import type {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {
   type LabelledValue,
