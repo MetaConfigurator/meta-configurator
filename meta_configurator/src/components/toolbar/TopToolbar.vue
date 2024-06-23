@@ -112,11 +112,14 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     },
   };
 
-  if (settings.hideSchemaEditor) {
-    return [dataEditorItem, settingsItem];
-  } else {
-    return [dataEditorItem, schemaEditorItem, settingsItem];
+  const items = [dataEditorItem];
+  if (!settings.hideSchemaEditor) {
+    items.push(schemaEditorItem);
   }
+  if (!settings.hideSettings) {
+    items.push(settingsItem);
+  }
+  return items;
 }
 
 const items = computed(() => getPageSelectionMenuItems(useSettings()));
