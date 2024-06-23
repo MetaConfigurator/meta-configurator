@@ -8,10 +8,26 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   required: ['dataFormat', 'codeEditor', 'guiEditor', 'schemaDiagram', 'metaSchema', 'panels'],
   additionalProperties: false,
   properties: {
+    dataFormat: {
+      type: 'string',
+      description: 'The data format to use for the configuration files.',
+      default: 'json',
+      enum: ['json', 'yaml'],
+    },
     toolbarTitle: {
       type: 'string',
       description: 'The title of the editor, shown in the toolbar.',
       default: 'MetaConfigurator',
+    },
+    hideSchemaEditor: {
+      type: 'boolean',
+      description: 'If set to true, the complete schema editor view will be hidden.',
+      default: false,
+    },
+    hideSettings: {
+      type: 'boolean',
+      description: 'If set to true, the complete settings view will be hidden.',
+      default: false,
     },
     uiColors: {
       type: 'object',
@@ -38,12 +54,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           format: 'color',
         },
       },
-    },
-    dataFormat: {
-      type: 'string',
-      description: 'The data format to use for the configuration files.',
-      default: 'json',
-      enum: ['json', 'yaml'],
     },
     codeEditor: {
       type: 'object',
@@ -204,11 +214,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: false,
         },
       },
-    },
-    hideSchemaEditor: {
-      type: 'boolean',
-      description: 'If set to true, the complete schema editor view will be hidden.',
-      default: false,
     },
     panels: {
       required: ['dataEditor', 'schemaEditor', 'settings'],

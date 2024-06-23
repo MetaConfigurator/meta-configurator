@@ -4,6 +4,8 @@
 export const SETTINGS_DATA_DEFAULT = {
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
+  hideSchemaEditor: false,
+  hideSettings: false,
   uiColors: {
     schemaEditor: 'olivedrab',
     dataEditor: 'black',
@@ -35,7 +37,6 @@ export const SETTINGS_DATA_DEFAULT = {
     showAdditionalPropertiesButton: false,
     showJsonLdFields: false,
   },
-  hideSchemaEditor: false,
   panels: {
     dataEditor: [
       {
