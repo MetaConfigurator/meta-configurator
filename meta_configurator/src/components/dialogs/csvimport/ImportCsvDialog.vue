@@ -1,21 +1,25 @@
 <!-- Dialog to import CSV data -->
 <script setup lang="ts">
-import { type Ref, ref, watch} from 'vue';
+import {type Ref, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
-import RadioButton from "primevue/radiobutton";
+import RadioButton from 'primevue/radiobutton';
 import InputSwitch from 'primevue/inputswitch';
 import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {expandCsvDataIntoTable, writeCsvToData} from '@/components/dialogs/csvimport/writeCsvToData';
+import {
+  expandCsvDataIntoTable,
+  writeCsvToData,
+} from '@/components/dialogs/csvimport/writeCsvToData';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
 import {
-  computeMostUsedDelimiterAndDecimalSeparator, type LabelledPath,
+  computeMostUsedDelimiterAndDecimalSeparator,
+  type LabelledPath,
   type LabelledValue,
 } from '@/components/dialogs/csvimport/delimiterSeparatorUtils';
 import {
@@ -108,11 +112,13 @@ watch(currentUserCsv, newValue => {
     currentColumnMapping.value = [];
   }
 
-  possiblePreviousTables.value = detectPossibleTablesInJson(getDataForMode(SessionMode.DataEditor).data.value).map(path => {
+  possiblePreviousTables.value = detectPossibleTablesInJson(
+    getDataForMode(SessionMode.DataEditor).data.value
+  ).map(path => {
     return {
-     label: pathToJsonPointer(path).slice(1), // cut off the first slash in json pointer, because it is auto-filled later (treated same as user input, where the user also does not write the slash themselves)
-     value: path
-   };
+      label: pathToJsonPointer(path).slice(1), // cut off the first slash in json pointer, because it is auto-filled later (treated same as user input, where the user also does not write the slash themselves)
+      value: path,
+    };
   });
 
   // by default, select the first table to expand
@@ -120,25 +126,26 @@ watch(currentUserCsv, newValue => {
     tableToExpand.value = possiblePreviousTables.value[0];
   }
 
-  possiblePrimaryKeyProps.value = currentColumnMapping.value.map(column =>
-  {
+  possiblePrimaryKeyProps.value = currentColumnMapping.value.map(column => {
     return {
       label: column.name,
-      value: column.name
-    }
+      value: column.name,
+    };
   });
   if (possiblePrimaryKeyProps.value.length > 0) {
     primaryKeyProp.value = possiblePrimaryKeyProps.value[0];
   }
-
 });
 
 // when user selected a table to expand, update the possible foreign key properties
 watch(tableToExpand, newValue => {
-  possibleForeignKeyProps.value = detectPropertiesOfTableInJson(getDataForMode(SessionMode.DataEditor).data.value,newValue.value).map(prop => {
+  possibleForeignKeyProps.value = detectPropertiesOfTableInJson(
+    getDataForMode(SessionMode.DataEditor).data.value,
+    newValue.value
+  ).map(prop => {
     return {
       label: prop,
-      value: prop
+      value: prop,
     };
   });
   // by default, select the first property as foreign key
@@ -150,7 +157,6 @@ watch(tableToExpand, newValue => {
   pathBeforeRowIndex.value = pathToJsonPointer(newValue.value).slice(1);
 });
 
-
 function submitImport() {
   if (!isExpandWithLookupTables.value) {
     writeCsvToData(currentUserCsv.value, currentColumnMapping.value);
@@ -158,7 +164,12 @@ function submitImport() {
       addInferredSchema();
     }
   } else {
-    expandCsvDataIntoTable(currentUserCsv.value, foreignKey.value.value, primaryKeyProp.value.value, currentColumnMapping.value);
+    expandCsvDataIntoTable(
+      currentUserCsv.value,
+      foreignKey.value.value,
+      primaryKeyProp.value.value,
+      currentColumnMapping.value
+    );
   }
   hideDialog();
 }
@@ -222,17 +233,24 @@ defineExpose({show: openDialog, close: hideDialog});
       <div
         v-if="currentUserCsv.length > 0"
         class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-
         <Divider />
 
         <div class="flex flex-wrap gap-4">
           <div class="flex items-center">
-            <RadioButton v-model="isExpandWithLookupTables" inputId="independentTable" name="independentTable" :value=false />
+            <RadioButton
+              v-model="isExpandWithLookupTables"
+              inputId="independentTable"
+              name="independentTable"
+              :value="false" />
             <label for="independentTable" class="ml-2">Independent Table</label>
           </div>
           <div class="flex items-center">
-            <RadioButton v-model="isExpandWithLookupTables" inputId="expandWithLookupTable" name="expandWithLookupTable" :value=true
-            :disabled="possiblePreviousTables.length==0"/>
+            <RadioButton
+              v-model="isExpandWithLookupTables"
+              inputId="expandWithLookupTable"
+              name="expandWithLookupTable"
+              :value="true"
+              :disabled="possiblePreviousTables.length == 0" />
             <label for="expand" class="ml-2">Expand with Lookup Table</label>
           </div>
         </div>
@@ -245,34 +263,45 @@ defineExpose({show: openDialog, close: hideDialog});
             </label>
             <InputText v-model="pathBeforeRowIndex" class="fixed-width" />
           </div>
-
         </div>
         <div v-else>
-          <span>Use this CSV to expand an existing table by matching foreign keys with primary keys from the lookup table.</span>
+          <span
+            >Use this CSV to expand an existing table by matching foreign keys with primary keys
+            from the lookup table.</span
+          >
 
           <div class="flex align-items-center vertical-center">
             <label class="mr-2">
               <b>Primary key in new CSV:</b>
             </label>
             <Dropdown
-                id="tableToExpand" v-model="primaryKeyProp" class="fixed-width" :options="possiblePrimaryKeyProps"
-                :option-label="option => option.label"/>
+              id="tableToExpand"
+              v-model="primaryKeyProp"
+              class="fixed-width"
+              :options="possiblePrimaryKeyProps"
+              :option-label="option => option.label" />
           </div>
           <div class="flex align-items-center vertical-center">
             <label class="mr-2">
               <b>Table to expand:</b>
             </label>
             <Dropdown
-                id="tableToExpand" v-model="tableToExpand" class="fixed-width" :options="possiblePreviousTables"
-                      :option-label="option => option.label"/>
+              id="tableToExpand"
+              v-model="tableToExpand"
+              class="fixed-width"
+              :options="possiblePreviousTables"
+              :option-label="option => option.label" />
           </div>
           <div class="flex align-items-center vertical-center">
             <label class="mr-2">
               <b>Foreign key in existing data:</b>
             </label>
             <Dropdown
-                id="foreignKeyName" v-model="foreignKey" class="fixed-width" :options="possibleForeignKeyProps"
-                :option-label="option => option.label"/>
+              id="foreignKeyName"
+              v-model="foreignKey"
+              class="fixed-width"
+              :options="possibleForeignKeyProps"
+              :option-label="option => option.label" />
           </div>
         </div>
 
@@ -282,7 +311,6 @@ defineExpose({show: openDialog, close: hideDialog});
           <label for="delimiter" class="mr-2"><b>Infer and generate schema for the data:</b></label>
           <InputSwitch id="delimiter" v-model="isInferSchema" class="small-input" />
         </div>
-
 
         <p>
           CSV file has {{ currentUserCsv.length }} rows and
@@ -303,7 +331,7 @@ defineExpose({show: openDialog, close: hideDialog});
               <td>{{ column.name }}</td>
               <td>
                 <span class="text-xs">/{{ column.pathBeforeRowIndex }}/ROW_INDEX/</span>
-                <span class="text-xs" v-if="isExpandWithLookupTables">{{foreignKey.value}}/</span>
+                <span class="text-xs" v-if="isExpandWithLookupTables">{{ foreignKey.value }}/</span>
                 <InputText v-model="column.pathAfterRowIndex" class="fixed-width" />
               </td>
               <td v-if="isInferSchema">
