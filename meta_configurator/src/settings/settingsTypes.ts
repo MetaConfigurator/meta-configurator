@@ -2,18 +2,19 @@ import type {PanelType} from '@/components/panelType';
 import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
+  dataFormat: DataFormat;
   toolbarTitle: string;
+  hideSchemaEditor: boolean;
+  hideSettings: boolean;
   uiColors: {
     schemaEditor: string;
     dataEditor: string;
     settings: string;
   };
-  dataFormat: DataFormat;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
   schemaDiagram: SettingsInterfaceSchemaDiagram;
   metaSchema: SettingsInterfaceMetaSchema;
-  hideSchemaEditor: boolean;
   panels: SettingsInterfacePanels;
   rdf: SettingsInterfaceRdf;
   frontend: SettingsInterfacFrontend;
