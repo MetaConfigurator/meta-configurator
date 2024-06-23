@@ -146,3 +146,29 @@ export function userStringToIdentifier(input: string, cutExtension: boolean = fa
     .replace(/\s/g, '_')
     .toLowerCase();
 }
+
+// note that this function does not look for a table within a table
+export function detectPossibleTablesInJson(json: any, path: Path = []): Path[] {
+  const tables: Path[] = [];
+  for (const key in json) {
+    if (json.hasOwnProperty(key)) {
+      const newPath = path ? [...path, key] : [key];
+      if (Array.isArray(json[key])) {
+        tables.push(newPath);
+      } else if (typeof json[key] === 'object' && json[key] !== null) {
+        tables.push(...detectPossibleTablesInJson(json[key], newPath));
+      }
+    }
+  }
+  return tables;
+}
+
+export function detectPropertiesOfTableInJson(json: any, tablePath: Path): string[] {
+  const table = _.get(json, pathToString(tablePath));
+  if (Array.isArray(table)) {
+    if (table.length > 0) {
+      return Object.keys(table[0]);
+    }
+  }
+  return [];
+}

@@ -1,30 +1,33 @@
 <!-- Dialog to import CSV data -->
 <script setup lang="ts">
-import {computed, type Ref, ref, watch} from 'vue';
+import {type Ref, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
+import RadioButton from "primevue/radiobutton";
 import InputSwitch from 'primevue/inputswitch';
 import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {writeCsvToData} from '@/components/dialogs/csvimport/writeCsvToData';
-import {getDataForMode, useCurrentSchema} from '@/data/useDataLink';
+import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import {jsonPointerToPathTyped} from '@/utility/pathUtils';
+import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
 import {
   computeMostUsedDelimiterAndDecimalSeparator,
   type LabelledValue,
 } from '@/components/dialogs/csvimport/delimiterSeparatorUtils';
-import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
 import {
   decimalSeparatorOptions,
   delimiterOptions,
+  detectPossibleTablesInJson,
+  detectPropertiesOfTableInJson,
   inferSchemaForNewDataAndMergeIntoCurrentSchema,
   loadCsvFromUserString,
   requestUploadFileToRef,
 } from '@/components/dialogs/csvimport/importCsvUtils';
+import type {Path} from "@/utility/path";
 
 const showDialog = ref(false);
 
@@ -41,9 +44,20 @@ const decimalSeparator: Ref<LabelledValue> = ref({
   value: 'not set',
 });
 
-const isInferSchema: Ref<boolean> = ref(false);
+const isInferSchema: Ref<boolean> = ref(true);
+const isExpandWithLookupTables: Ref<boolean> = ref(false);
 
+// options for import of standalone table
 const pathBeforeRowIndex: Ref<string> = ref('myTableName');
+
+// options for expansion with lookup table
+const possiblePreviousTables: Ref<{label: string, value: Path }[]> = ref([]);
+const tableToExpand: Ref<Path> = ref([]);
+const possibleForeignKeyProps: Ref<string[]> = ref([]);
+const foreignKeyName: Ref<string> = ref('todo');
+const primaryKeyProp: Ref<string> = ref('todo');
+
+// attribute mapping
 const currentColumnMapping: Ref<CsvImportColumnMappingData[]> = ref([]);
 
 function openDialog() {
@@ -63,7 +77,7 @@ watch(currentUserDataString, newValue => {
     computeMostUsedDelimiterAndDecimalSeparator(currentUserDataString.value);
   delimiter.value = delimiterSuggestion;
   decimalSeparator.value = decimalSeparatorSuggestion;
-  isInferSchema.value = isSchemaEmpty(useCurrentSchema().schemaRaw.value);
+  // isInferSchema.value = isSchemaEmpty(useCurrentSchema().schemaRaw.value);
   loadCsvFromInput();
 });
 watch([decimalSeparator, delimiter], newValue => {
@@ -91,6 +105,18 @@ watch(currentUserCsv, newValue => {
   } else {
     currentColumnMapping.value = [];
   }
+
+  possiblePreviousTables.value = detectPossibleTablesInJson(getDataForMode(SessionMode.DataEditor).data.value).map(path => {
+    return {
+     label: pathToJsonPointer(path),
+     value: path
+   };
+  });
+});
+
+// when user selected a table to expand, update the possible foreign key properties
+watch(tableToExpand, newValue => {
+  possibleForeignKeyProps.value = detectPropertiesOfTableInJson(getDataForMode(SessionMode.DataEditor).data.value, tableToExpand.value);
 });
 
 function submitImport() {
@@ -160,6 +186,58 @@ defineExpose({show: openDialog, close: hideDialog});
       <div
         v-if="currentUserCsv.length > 0"
         class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
+
+        <Divider />
+
+        <div class="flex flex-wrap gap-4">
+          <div class="flex items-center">
+            <RadioButton v-model="isExpandWithLookupTables" inputId="independentTable" name="independentTable" :value=false />
+            <label for="independentTable" class="ml-2">Independent Table</label>
+          </div>
+          <div class="flex items-center">
+            <RadioButton v-model="isExpandWithLookupTables" inputId="expandWithLookupTable" name="expandWithLookupTable" :value=true
+            :disabled="possiblePreviousTables.length==0"/>
+            <label for="expand" class="ml-2">Expand with Lookup Table</label>
+          </div>
+        </div>
+        <div v-if="!isExpandWithLookupTables">
+          <span>Import this CSV as a standalone table.</span>
+
+          <div class="flex align-items-center vertical-center">
+            <label for="delimiter" class="mr-2">
+              <b>Path for the resulting array in the document:</b>
+            </label>
+            <InputText v-model="pathBeforeRowIndex" class="fixed-width" />
+          </div>
+
+        </div>
+        <div v-else>
+          <span>Use this CSV to expand an existing table by matching foreign keys with primary keys from the lookup table.</span>
+
+          <div class="flex align-items-center vertical-center">
+            <label class="mr-2">
+              <b>Table to expand:</b>
+            </label>
+            <Dropdown
+                id="tableToExpand" v-model="tableToExpand" class="fixed-width" :options="possiblePreviousTables"
+                      :option-label="option => option.label"/>
+          </div>
+          <div class="flex align-items-center vertical-center">
+            <label class="mr-2">
+              <b>Foreign key in existing data:</b>
+            </label>
+            <Dropdown
+                id="foreignKeyName" v-model="foreignKeyName" class="fixed-width" :options="possibleForeignKeyProps"
+                :option-label="option => option.label"/>
+          </div>
+          <div class="flex align-items-center vertical-center">
+            <label class="mr-2">
+              <b>Primary key property in new CSV:</b>
+            </label>
+            <InputText v-model="primaryKeyProp" class="fixed-width" />
+          </div>
+        </div>
+
         <Divider />
 
         <div class="flex align-items-center vertical-center">
@@ -167,12 +245,6 @@ defineExpose({show: openDialog, close: hideDialog});
           <InputSwitch id="delimiter" v-model="isInferSchema" class="small-input" />
         </div>
 
-        <div class="flex align-items-center vertical-center">
-          <label for="delimiter" class="mr-2"
-            ><b>Path for the resulting array in the document:</b></label
-          >
-          <InputText v-model="pathBeforeRowIndex" class="fixed-width" />
-        </div>
 
         <p>
           CSV file has {{ currentUserCsv.length }} rows and
