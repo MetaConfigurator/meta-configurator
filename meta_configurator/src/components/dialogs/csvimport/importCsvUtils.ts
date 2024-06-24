@@ -14,7 +14,7 @@ import {
   replaceDecimalSeparator,
 } from '@/components/dialogs/csvimport/delimiterSeparatorUtils';
 import {type CsvError, parse} from 'csv-parse/browser/esm';
-import type {JsonSchemaType} from "@/schema/jsonSchemaType";
+import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
   const {open, onChange} = useFileDialog();
@@ -38,18 +38,18 @@ export function inferSchemaForNewDataAndMergeIntoCurrentSchema(
 
   const inferredSchema = inferJsonSchema(dataWithOnlyNew);
   if (!inferredSchema) {
-    throw Error("Unable to infer schema for the given data.")
+    throw Error('Unable to infer schema for the given data.');
   }
-    //for (const column of currentColumnMapping) {
-    //  addCustomTitleToSchemaProperty(inferredSchema, column);
-    //}
+  //for (const column of currentColumnMapping) {
+  //  addCustomTitleToSchemaProperty(inferredSchema, column);
+  //}
 
-    const schema = getSchemaForMode(SessionMode.DataEditor);
-    const currentSchema = schema.schemaRaw.value;
-    // then we merge the new schema into the current one
-    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
-      allOf: [currentSchema, inferredSchema],
-    });
+  const schema = getSchemaForMode(SessionMode.DataEditor);
+  const currentSchema = schema.schemaRaw.value;
+  // then we merge the new schema into the current one
+  getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
+    allOf: [currentSchema, inferredSchema],
+  });
 }
 
 // temporarily removed to reduce complexity for the user
@@ -176,7 +176,12 @@ export function detectPropertiesOfTableInJson(json: any, tablePath: Path): strin
   return [];
 }
 
-export function findBestMatchingForeignKeyAttribute(arrayPath: Path, lookupCsv: any[], foreignKeyAttributeChoices: string[], primaryKeyColumn: string) {
+export function findBestMatchingForeignKeyAttribute(
+  arrayPath: Path,
+  lookupCsv: any[],
+  foreignKeyAttributeChoices: string[],
+  primaryKeyColumn: string
+) {
   const currentData = getDataForMode(SessionMode.DataEditor);
   const arrayData: any[] = currentData.dataAt(arrayPath);
 
@@ -188,10 +193,19 @@ export function findBestMatchingForeignKeyAttribute(arrayPath: Path, lookupCsv: 
   return foreignKeyAttributeChoices[bestMatchingIndex];
 }
 
-
-function countKeyMatches(arrayData: any[], lookupCsv: any[], foreignKeyAttribute: string, primaryKeyColumn: string, maxElementsToCheck: number = 100) {
+function countKeyMatches(
+  arrayData: any[],
+  lookupCsv: any[],
+  foreignKeyAttribute: string,
+  primaryKeyColumn: string,
+  maxElementsToCheck: number = 100
+) {
   let result = 0;
-  for (let arrayIndex = 0; arrayIndex < Math.min(arrayData.length, (maxElementsToCheck + 1)); arrayIndex++) {
+  for (
+    let arrayIndex = 0;
+    arrayIndex < Math.min(arrayData.length, maxElementsToCheck + 1);
+    arrayIndex++
+  ) {
     const arrayElement = arrayData[arrayIndex];
     const primaryKeyValue = arrayElement[foreignKeyAttribute];
     const matchingLookupRow = lookupValuesInCsv(lookupCsv, primaryKeyColumn, primaryKeyValue);
@@ -202,46 +216,61 @@ function countKeyMatches(arrayData: any[], lookupCsv: any[], foreignKeyAttribute
   return result;
 }
 
-export function lookupValuesInCsv(lookupCsv: any[], primaryKeyColumn: string, primaryKeyValue: string) {
+export function lookupValuesInCsv(
+  lookupCsv: any[],
+  primaryKeyColumn: string,
+  primaryKeyValue: string
+) {
   return lookupCsv.find(row => row[primaryKeyColumn] === primaryKeyValue);
 }
 
-export function inferExpansionSchema(tableData: any, tablePath: Path, expandedProperty: string, currentColumnMapping: CsvImportColumnMappingData[]) {
+export function inferExpansionSchema(
+  tableData: any,
+  tablePath: Path,
+  expandedProperty: string,
+  currentColumnMapping: CsvImportColumnMappingData[]
+) {
   const onlyTableData = _.set({}, pathToString(tablePath), tableData);
   const tableSchema: JsonSchemaType = inferJsonSchema(onlyTableData);
   if (!tableSchema) {
-    throw Error("Unable to infer schema for the given data.")
+    throw Error('Unable to infer schema for the given data.');
   }
 
   const expansionPropSchemaPath = dataPathToSchemaPath([...tablePath, 0, expandedProperty]);
-    const expansionPropSchema = _.get(tableSchema, pathToString(expansionPropSchemaPath));
+  const expansionPropSchema = _.get(tableSchema, pathToString(expansionPropSchemaPath));
 
-    if (!expansionPropSchema) {
-        throw Error("Unable to access expansion schema of the inferred table schema.")
-    }
+  if (!expansionPropSchema) {
+    throw Error('Unable to access expansion schema of the inferred table schema.');
+  }
 
-      // Does not yet work because the addCustomTitle function is not yet adjusted to deal with expansion properties
-      //for (const column of currentColumnMapping) {
-      //  addCustomTitleToSchemaProperty(expansionPropSchema, column);
-      //}
+  // Does not yet work because the addCustomTitle function is not yet adjusted to deal with expansion properties
+  //for (const column of currentColumnMapping) {
+  //  addCustomTitleToSchemaProperty(expansionPropSchema, column);
+  //}
 
-      // after having inferred expansion schema by using whole table as basis, we remove the other table props from the schema
+  // after having inferred expansion schema by using whole table as basis, we remove the other table props from the schema
   // this way, we overwrite only the expansion property and not also the other table properties
   const objectWithOnlyExpandedProp: any = {};
   objectWithOnlyExpandedProp[expandedProperty] = expansionPropSchema;
   const tableSchemaPath = dataPathToSchemaPath(tablePath);
-  _.set(tableSchema as any, pathToString([...tableSchemaPath, 'items', 'properties']), objectWithOnlyExpandedProp);
+  _.set(
+    tableSchema as any,
+    pathToString([...tableSchemaPath, 'items', 'properties']),
+    objectWithOnlyExpandedProp
+  );
 
   const schema = getSchemaForMode(SessionMode.DataEditor);
   const currentSchema = schema.schemaRaw.value;
 
   // in currentSchema, remove the expanded property, because it conflicts with the new schema
-  _.set(currentSchema as any, pathToString([...dataPathToSchemaPath(tablePath), 'items', 'properties', expandedProperty]), undefined);
+  _.set(
+    currentSchema as any,
+    pathToString([...dataPathToSchemaPath(tablePath), 'items', 'properties', expandedProperty]),
+    undefined
+  );
 
-    // then we merge the new schema into the current one
-    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
-      allOf: [currentSchema, tableSchema],
-    });
-
-
+  // then we merge the new schema into the current one
+  getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
+    allOf: [currentSchema, tableSchema],
+  });
 }

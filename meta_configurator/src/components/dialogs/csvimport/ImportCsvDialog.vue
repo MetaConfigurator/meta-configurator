@@ -26,12 +26,14 @@ import {
   decimalSeparatorOptions,
   delimiterOptions,
   detectPossibleTablesInJson,
-  detectPropertiesOfTableInJson, findBestMatchingForeignKeyAttribute, inferExpansionSchema,
+  detectPropertiesOfTableInJson,
+  findBestMatchingForeignKeyAttribute,
+  inferExpansionSchema,
   inferSchemaForNewDataAndMergeIntoCurrentSchema,
   loadCsvFromUserString,
   requestUploadFileToRef,
 } from '@/components/dialogs/csvimport/importCsvUtils';
-import { table } from 'console';
+import {table} from 'console';
 
 const emptyPathOption: LabelledPath = {label: 'not set', value: []};
 const emptyValueOption: LabelledValue = {label: 'not set', value: 'not set'};
@@ -152,12 +154,17 @@ watch(tableToExpand, newValue => {
   });
   // select the best matching foreign key property
   if (possibleForeignKeyProps.value.length > 0 && currentColumnMapping.value.length > 0) {
-    const arrayPath = jsonPointerToPathTyped('/' + tableToExpand.value.value)
-    const bestMatchingForeignKey = findBestMatchingForeignKeyAttribute(arrayPath, currentUserCsv.value, possibleForeignKeyProps.value.map(prop => prop.value), primaryKeyProp.value.value);
+    const arrayPath = jsonPointerToPathTyped('/' + tableToExpand.value.value);
+    const bestMatchingForeignKey = findBestMatchingForeignKeyAttribute(
+      arrayPath,
+      currentUserCsv.value,
+      possibleForeignKeyProps.value.map(prop => prop.value),
+      primaryKeyProp.value.value
+    );
     foreignKey.value = {
       label: bestMatchingForeignKey,
-      value: bestMatchingForeignKey
-    }
+      value: bestMatchingForeignKey,
+    };
   }
   // update pathBeforeRowIndex to the table path
   pathBeforeRowIndex.value = pathToJsonPointer(newValue.value).slice(1);
@@ -189,11 +196,20 @@ function addInferredSchema() {
   if (!isExpandWithLookupTables.value) {
     const newDataPath = jsonPointerToPathTyped('/' + pathBeforeRowIndex.value);
     const newData = data.dataAt(newDataPath);
-    inferSchemaForNewDataAndMergeIntoCurrentSchema(newData, newDataPath, currentColumnMapping.value);
+    inferSchemaForNewDataAndMergeIntoCurrentSchema(
+      newData,
+      newDataPath,
+      currentColumnMapping.value
+    );
   } else {
     const tableDataPath = jsonPointerToPathTyped('/' + tableToExpand.value.value);
     const tableData = data.dataAt(tableDataPath);
-    inferExpansionSchema(tableData, tableDataPath, foreignKey.value.value, currentColumnMapping.value);
+    inferExpansionSchema(
+      tableData,
+      tableDataPath,
+      foreignKey.value.value,
+      currentColumnMapping.value
+    );
   }
 }
 
