@@ -26,11 +26,12 @@ import {
   decimalSeparatorOptions,
   delimiterOptions,
   detectPossibleTablesInJson,
-  detectPropertiesOfTableInJson, findBestMatchingForeignKeyAttribute,
+  detectPropertiesOfTableInJson, findBestMatchingForeignKeyAttribute, inferExpansionSchema,
   inferSchemaForNewDataAndMergeIntoCurrentSchema,
   loadCsvFromUserString,
   requestUploadFileToRef,
 } from '@/components/dialogs/csvimport/importCsvUtils';
+import { table } from 'console';
 
 const emptyPathOption: LabelledPath = {label: 'not set', value: []};
 const emptyValueOption: LabelledValue = {label: 'not set', value: 'not set'};
@@ -163,11 +164,9 @@ watch(tableToExpand, newValue => {
 });
 
 function submitImport() {
+  // write data
   if (!isExpandWithLookupTables.value) {
     writeCsvToData(currentUserCsv.value, currentColumnMapping.value);
-    if (isInferSchema.value) {
-      addInferredSchema();
-    }
   } else {
     expandCsvDataIntoTable(
       currentUserCsv.value,
@@ -176,14 +175,26 @@ function submitImport() {
       currentColumnMapping.value
     );
   }
+
+  // optionally infer schema
+  if (isInferSchema.value) {
+    addInferredSchema();
+  }
   hideDialog();
 }
 
 function addInferredSchema() {
   const data = getDataForMode(SessionMode.DataEditor);
-  const newDataPath = jsonPointerToPathTyped('/' + pathBeforeRowIndex.value);
-  const newData = data.dataAt(newDataPath);
-  inferSchemaForNewDataAndMergeIntoCurrentSchema(newData, newDataPath, currentColumnMapping.value);
+
+  if (!isExpandWithLookupTables.value) {
+    const newDataPath = jsonPointerToPathTyped('/' + pathBeforeRowIndex.value);
+    const newData = data.dataAt(newDataPath);
+    inferSchemaForNewDataAndMergeIntoCurrentSchema(newData, newDataPath, currentColumnMapping.value);
+  } else {
+    const tableDataPath = jsonPointerToPathTyped('/' + tableToExpand.value.value);
+    const tableData = data.dataAt(tableDataPath);
+    inferExpansionSchema(tableData, tableDataPath, foreignKey.value.value, currentColumnMapping.value);
+  }
 }
 
 defineExpose({show: openDialog, close: hideDialog});
@@ -328,7 +339,7 @@ defineExpose({show: openDialog, close: hideDialog});
             <tr>
               <th>CSV Column</th>
               <th>JSON Property Identifier</th>
-              <th v-if="isInferSchema">Property Schema Title</th>
+              <!--th v-if="isInferSchema">Property Schema Title</--th-->
             </tr>
           </thead>
           <tbody>
@@ -339,9 +350,9 @@ defineExpose({show: openDialog, close: hideDialog});
                 <span class="text-xs" v-if="isExpandWithLookupTables">{{ foreignKey.value }}/</span>
                 <InputText v-model="column.pathAfterRowIndex" class="fixed-width" />
               </td>
-              <td v-if="isInferSchema">
+              <!--td v-if="isInferSchema">
                 <InputText v-model="column.titleInSchema" class="fixed-width" />
-              </td>
+              </td-->
             </tr>
           </tbody>
         </table>
