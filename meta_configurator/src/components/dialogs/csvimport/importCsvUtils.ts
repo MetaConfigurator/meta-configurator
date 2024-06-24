@@ -1,10 +1,10 @@
 import {useFileDialog} from '@vueuse/core';
 import {readFileContentToRef} from '@/utility/readFileContent';
 import type {Ref} from 'vue';
-import {getSchemaForMode} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {dataPathToSchemaPath, pathToString} from '@/utility/pathUtils';
-import _ from 'lodash';
+import _, {min} from 'lodash';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import type {Path, PathElement} from '@/utility/path';
@@ -171,4 +171,34 @@ export function detectPropertiesOfTableInJson(json: any, tablePath: Path): strin
     }
   }
   return [];
+}
+
+export function findBestMatchingForeignKeyAttribute(arrayPath: Path, lookupCsv: any[], foreignKeyAttributeChoices: string[], primaryKeyColumn: string) {
+  const currentData = getDataForMode(SessionMode.DataEditor);
+  const arrayData: any[] = currentData.dataAt(arrayPath);
+
+  const matchingCounts = foreignKeyAttributeChoices.map(foreignKeyAttribute => {
+    return countKeyMatches(arrayData, lookupCsv, foreignKeyAttribute, primaryKeyColumn);
+  });
+  const maxCount = Math.max(...matchingCounts);
+  const bestMatchingIndex = matchingCounts.indexOf(maxCount);
+  return foreignKeyAttributeChoices[bestMatchingIndex];
+}
+
+
+function countKeyMatches(arrayData: any[], lookupCsv: any[], foreignKeyAttribute: string, primaryKeyColumn: string, maxElementsToCheck: number = 100) {
+  let result = 0;
+  for (let arrayIndex = 0; arrayIndex < Math.min(arrayData.length, (maxElementsToCheck + 1)); arrayIndex++) {
+    const arrayElement = arrayData[arrayIndex];
+    const primaryKeyValue = arrayElement[foreignKeyAttribute];
+    const matchingLookupRow = lookupValuesInCsv(lookupCsv, primaryKeyColumn, primaryKeyValue);
+    if (matchingLookupRow) {
+      result += 1;
+    }
+  }
+  return result;
+}
+
+export function lookupValuesInCsv(lookupCsv: any[], primaryKeyColumn: string, primaryKeyValue: string) {
+  return lookupCsv.find(row => row[primaryKeyColumn] === primaryKeyValue);
 }

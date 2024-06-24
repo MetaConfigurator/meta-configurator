@@ -26,13 +26,14 @@ import {
   decimalSeparatorOptions,
   delimiterOptions,
   detectPossibleTablesInJson,
-  detectPropertiesOfTableInJson,
+  detectPropertiesOfTableInJson, findBestMatchingForeignKeyAttribute,
   inferSchemaForNewDataAndMergeIntoCurrentSchema,
   loadCsvFromUserString,
   requestUploadFileToRef,
 } from '@/components/dialogs/csvimport/importCsvUtils';
 
 const emptyPathOption: LabelledPath = {label: 'not set', value: []};
+const emptyValueOption: LabelledValue = {label: 'not set', value: 'not set'};
 
 const showDialog = ref(false);
 
@@ -59,9 +60,9 @@ const pathBeforeRowIndex: Ref<string> = ref('myTableName');
 const possiblePreviousTables: Ref<LabelledPath[]> = ref([]);
 const tableToExpand: Ref<LabelledPath> = ref(emptyPathOption);
 const possiblePrimaryKeyProps: Ref<LabelledValue[]> = ref([]);
-const primaryKeyProp: Ref<LabelledValue> = ref(emptyPathOption);
+const primaryKeyProp: Ref<LabelledValue> = ref(emptyValueOption);
 const possibleForeignKeyProps: Ref<LabelledValue[]> = ref([]);
-const foreignKey: Ref<LabelledValue> = ref(emptyPathOption);
+const foreignKey: Ref<LabelledValue> = ref(emptyValueOption);
 
 // attribute mapping
 const currentColumnMapping: Ref<CsvImportColumnMappingData[]> = ref([]);
@@ -148,10 +149,14 @@ watch(tableToExpand, newValue => {
       value: prop,
     };
   });
-  // by default, select the first property as foreign key
-  // TODO: clever algorithm to see for which foreign key there is most matches in the data
-  if (possibleForeignKeyProps.value.length > 0) {
-    foreignKey.value = possibleForeignKeyProps.value[0];
+  // select the best matching foreign key property
+  if (possibleForeignKeyProps.value.length > 0 && currentColumnMapping.value.length > 0) {
+    const arrayPath = jsonPointerToPathTyped('/' + tableToExpand.value.value)
+    const bestMatchingForeignKey = findBestMatchingForeignKeyAttribute(arrayPath, currentUserCsv.value, possibleForeignKeyProps.value.map(prop => prop.value), primaryKeyProp.value.value);
+    foreignKey.value = {
+      label: bestMatchingForeignKey,
+      value: bestMatchingForeignKey
+    }
   }
   // update pathBeforeRowIndex to the table path
   pathBeforeRowIndex.value = pathToJsonPointer(newValue.value).slice(1);

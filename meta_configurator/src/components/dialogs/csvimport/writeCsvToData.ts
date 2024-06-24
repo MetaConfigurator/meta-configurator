@@ -1,7 +1,8 @@
 import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
+import { jsonPointerToPathTyped, pathToJsonPointer} from "@/utility/pathUtils";
+import {lookupValuesInCsv} from "@/components/dialogs/csvimport/importCsvUtils";
 
 export function writeCsvToData(csv: any[], columnMapping: CsvImportColumnMappingData[]) {
   const currentData = getDataForMode(SessionMode.DataEditor);
@@ -18,41 +19,26 @@ export function writeCsvToData(csv: any[], columnMapping: CsvImportColumnMapping
   });
 }
 
-export function expandCsvDataIntoTable(
-  lookupCsv: any[],
-  foreignKeyAttribute: string,
-  primaryKeyColumn: string,
-  columnMapping: CsvImportColumnMappingData[]
-) {
+export function expandCsvDataIntoTable(lookupCsv: any[], foreignKeyAttribute: string, primaryKeyColumn: string, columnMapping: CsvImportColumnMappingData[]) {
   const currentData = getDataForMode(SessionMode.DataEditor);
 
   const arrayPath = columnMapping[0].getTablePathForJsonDocument();
-  const arrayData: any[] = currentData.dataAt(arrayPath);
-  for (let arrayIndex = 0; arrayIndex < arrayData.length; arrayIndex++) {
-    const arrayElement = arrayData[arrayIndex];
-    const primaryKeyValue = arrayElement[foreignKeyAttribute];
-    const matchingLookupRow = lookupValuesInCsv(lookupCsv, primaryKeyColumn, primaryKeyValue);
+    const arrayData: any[] = currentData.dataAt(arrayPath);
+    for (let arrayIndex = 0; arrayIndex < arrayData.length; arrayIndex++) {
+      const arrayElement = arrayData[arrayIndex];
+      const primaryKeyValue = arrayElement[foreignKeyAttribute];
+      const matchingLookupRow = lookupValuesInCsv(lookupCsv, primaryKeyColumn, primaryKeyValue);
 
-    if (matchingLookupRow) {
-      const pathToExpandRowInto = [...arrayPath, arrayIndex, foreignKeyAttribute];
-      const pathToExpandRowIntoJsonPointer = pathToJsonPointer(pathToExpandRowInto);
-      // insert empty object into the path
-      currentData.setDataAt(pathToExpandRowInto, {});
-      // now fill the object with the data from the lookup row
-      columnMapping.forEach(column => {
-        const pathToInsert = jsonPointerToPathTyped(
-          pathToExpandRowIntoJsonPointer + '/' + column.pathAfterRowIndex
-        );
-        currentData.setDataAt(pathToInsert, matchingLookupRow[column.name]);
-      });
+      if (matchingLookupRow ) {
+        const pathToExpandRowInto = [...arrayPath, arrayIndex, foreignKeyAttribute];
+        const pathToExpandRowIntoJsonPointer = pathToJsonPointer(pathToExpandRowInto);
+        // insert empty object into the path
+        currentData.setDataAt(pathToExpandRowInto, {});
+        // now fill the object with the data from the lookup row
+        columnMapping.forEach(column => {
+          const pathToInsert = jsonPointerToPathTyped(pathToExpandRowIntoJsonPointer + '/' + column.pathAfterRowIndex)
+          currentData.setDataAt(pathToInsert, matchingLookupRow[column.name]);
+        });
+      }
     }
-  }
-}
-
-export function lookupValuesInCsv(
-  lookupCsv: any[],
-  primaryKeyColumn: string,
-  primaryKeyValue: string
-) {
-  return lookupCsv.find(row => row[primaryKeyColumn] === primaryKeyValue);
 }
