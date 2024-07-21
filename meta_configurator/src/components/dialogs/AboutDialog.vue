@@ -19,8 +19,8 @@ defineEmits<{
     :visible="visible"
     @update:visible="newValue => $emit('update:visible', newValue)">
     <p>
-      MetaConfigurator is a tool to help you create and edit configuration files for your
-      applications.
+      MetaConfigurator is a form generator and schema editor for JSON schema, making editing configuration files,
+      research data and schemas easier and more enjoyable.
     </p>
     <p>It is currently in alpha stage, so expect bugs and missing features.</p>
     <p>MetaConfigurator is open source and licensed under the MIT license.</p>
@@ -28,13 +28,17 @@ defineEmits<{
       Check our
       <a
         class="underline text-violet-950"
-        href="https://github.com/PaulBredl/config-assistant"
+        href="https://github.com/MetaConfigurator/meta-configurator"
         target="_blank"
         rel="noopener noreferrer">
         <span class="pi pi-github mr-1" />GitHub
       </a>
       for more information
     </p>
+    <hr class="my-2" />
+    <p>Felix Neubauer, Paul Bredl, Minye Xu, Keyuriben Patel, Jürgen Pleiss, Benjamin Uekermann</p>
+    <p>Institute for Visualization and Interactive Systems, University of Stuttgart</p>
+    <p>Universitätsstrasse 38D, 70569 Stuttgart, Germany</p>
     <hr class="my-2" />
     <p>Icons by FontAwesome <FontAwesomeIcon icon="fa-solid fa-font-awesome" /></p>
     <p>
