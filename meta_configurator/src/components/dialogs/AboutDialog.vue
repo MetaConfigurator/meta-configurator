@@ -19,8 +19,8 @@ defineEmits<{
     :visible="visible"
     @update:visible="newValue => $emit('update:visible', newValue)">
     <p>
-      MetaConfigurator is a form generator and schema editor for JSON schema, making editing configuration files,
-      research data and schemas easier and more enjoyable.
+      MetaConfigurator is a form generator and schema editor for JSON schema, making editing
+      configuration files, research data and schemas easier and more enjoyable.
     </p>
     <p>It is currently in alpha stage, so expect bugs and missing features.</p>
     <p>MetaConfigurator is open source and licensed under the MIT license.</p>
