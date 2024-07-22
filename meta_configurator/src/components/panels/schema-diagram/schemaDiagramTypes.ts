@@ -25,7 +25,7 @@ export class SchemaGraph {
     });
   }
 
-  private toVueFlowEdges(): Edge[] {
+  private toVueFlowEdges(individualAttributeHandles: boolean): Edge[] {
     return this.edges.map(data => {
       let type = 'default';
       let color = 'black';
@@ -61,7 +61,7 @@ export class SchemaGraph {
         id: pathsToEdgeId(data.start.absolutePath, data.end.absolutePath, data.label, data.isArray),
         source: pathToNodeId(data.start.absolutePath),
         target: pathToNodeId(data.end.absolutePath),
-        sourceHandle: data.startHandle,
+        sourceHandle: individualAttributeHandles ? data.startHandle : 'main',
         type: type,
         label: data.label,
         data: data,
@@ -72,9 +72,9 @@ export class SchemaGraph {
     });
   }
 
-  public toVueFlowGraph(): VueFlowGraph {
+  public toVueFlowGraph(individualAttributeEdges: boolean): VueFlowGraph {
     const nodes = this.toVueFlowNodes();
-    const edges = this.toVueFlowEdges();
+    const edges = this.toVueFlowEdges(individualAttributeEdges);
     return new VueFlowGraph(nodes, edges);
   }
 }

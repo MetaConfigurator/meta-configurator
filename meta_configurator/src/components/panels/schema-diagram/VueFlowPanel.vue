@@ -97,7 +97,7 @@ function updateGraph(forceRebuild: boolean = false) {
   const graph = constructSchemaGraph(schema);
   let graphNeedsLayouting = forceRebuild;
 
-  const vueFlowGraph = graph.toVueFlowGraph();
+  const vueFlowGraph = graph.toVueFlowGraph(useSettings().schemaDiagram.vertical);
   if (wasNodeAdded(activeNodes.value, vueFlowGraph.nodes)) {
     // node was added -> it is needed to update whole graph
     activeNodes.value = vueFlowGraph.nodes;

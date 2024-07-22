@@ -55,12 +55,8 @@ function isHighlighted() {
       :data="attribute!"
       :selected-data="props.selectedData"
       @select_element="clickedAttribute"></SchemaObjectAttribute>
-    <Handle
-      id="main"
-      type="source"
-      :position="props.sourcePosition!"
-      class="vue-flow__handle"
-      style="top: 10px"></Handle>
+    <Handle id="main" type="source" :position="props.sourcePosition!" class="vue-flow__handle"></Handle>
+
   </div>
 </template>
 
