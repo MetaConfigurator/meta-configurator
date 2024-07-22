@@ -294,7 +294,14 @@ export function generateAttributeEdges(
     );
     if (edgeTargetNode) {
       graph.edges.push(
-        new EdgeData(node, "source-" + attributeData.name, edgeTargetNode, EdgeType.ATTRIBUTE, isArray, attributeData.name)
+        new EdgeData(
+          node,
+          'source-' + attributeData.name,
+          edgeTargetNode,
+          EdgeType.ATTRIBUTE,
+          isArray,
+          attributeData.name
+        )
       );
     }
   }
@@ -560,7 +567,14 @@ function generateObjectSubSchemaEdge(
   const [edgeTargetNode, isArray] = resolveEdgeTarget(node, subSchema, subSchemaPath, objectDefs);
   if (edgeTargetNode) {
     graph.edges.push(
-      new EdgeData(node, null, edgeTargetNode, edgeType, isArray, edgeType + (isArray ? ' to array' : ''))
+      new EdgeData(
+        node,
+        null,
+        edgeTargetNode,
+        edgeType,
+        isArray,
+        edgeType + (isArray ? ' to array' : '')
+      )
     );
   }
 }
@@ -591,7 +605,7 @@ export function trimNodeChildren(graph: SchemaGraph) {
             [...nodeDataObject.absolutePath, 'properties'],
             false,
             false,
-              maxAttributesToShow,
+            maxAttributesToShow,
             {}
           )
         );

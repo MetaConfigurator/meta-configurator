@@ -4,7 +4,7 @@ import {
   SchemaObjectAttributeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
-import {Handle, Position} from "@vue-flow/core";
+import {Handle, Position} from '@vue-flow/core';
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;
@@ -34,20 +34,23 @@ function getHandleTop() {
 
   return `${val}px`;
 }
-
 </script>
 
 <template>
-    <div
-        :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted}"
-        @click="clickedAttribute"
-        v-on:click.stop>
-      <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
-      <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
-      <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
-      <Handle :id="getHandleId()" type="source" :position="Position.Right" class="vue-flow__attribute_handle"
-              :style="{'top': getHandleTop()}"></Handle>
-    </div>
+  <div
+    :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted}"
+    @click="clickedAttribute"
+    v-on:click.stop>
+    <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
+    <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
+    <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
+    <Handle
+      :id="getHandleId()"
+      type="source"
+      :position="Position.Right"
+      class="vue-flow__attribute_handle"
+      :style="{top: getHandleTop()}"></Handle>
+  </div>
 </template>
 
 <style>
@@ -66,5 +69,4 @@ function getHandleTop() {
   background: transparent;
   font-size: 12px;
 }
-
 </style>
