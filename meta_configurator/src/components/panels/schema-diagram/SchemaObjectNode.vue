@@ -43,6 +43,9 @@ function isHighlighted() {
     @click="clickedNode()"
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
+
+    <!--Handle id="source-a" type="source" :position="Position.Right" style="top: 10px" /-->
+    <!--Handle id="source-b" type="source" :position="Position.Right" style="bottom: 10px; top: auto;" /-->
     <!--small><i>{{ props.data.absolutePath }}</i></small-->
     <b>{{ props.data.name }}</b>
     <hr />
@@ -52,7 +55,8 @@ function isHighlighted() {
       :data="attribute!"
       :selected-data="props.selectedData"
       @select_element="clickedAttribute"></SchemaObjectAttribute>
-    <Handle type="source" :position="props.sourcePosition!" class="vue-flow__handle"></Handle>
+    <Handle id="main" type="source" :position="props.sourcePosition!" class="vue-flow__handle" style="top: 10px"></Handle>
+
   </div>
 </template>
 
@@ -72,10 +76,10 @@ function isHighlighted() {
 }
 
 .vue-flow__handle {
+  font-size: 12px;
   border: none;
   height: unset;
   width: unset;
   background: transparent;
-  font-size: 12px;
 }
 </style>

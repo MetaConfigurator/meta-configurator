@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {SessionMode} from '@/store/sessionMode';
-import JsonSchemaDiagramPanel from '@/components/panels/schema-diagram/JsonSchemaDiagramPanel.vue';
+import JsonSchemaDiagramPanel from "@/components/panels/schema-diagram/JsonSchemaDiagramPanel.vue";
 
 const props = defineProps<{
   sessionMode: SessionMode;

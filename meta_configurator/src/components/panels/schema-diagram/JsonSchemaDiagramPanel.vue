@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type {Path} from '@/utility/path';
-import {computed} from 'vue';
-import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 

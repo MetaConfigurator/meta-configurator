@@ -61,6 +61,7 @@ export class SchemaGraph {
         id: pathsToEdgeId(data.start.absolutePath, data.end.absolutePath, data.label, data.isArray),
         source: pathToNodeId(data.start.absolutePath),
         target: pathToNodeId(data.end.absolutePath),
+        sourceHandle: data.startHandle,
         type: type,
         label: data.label,
         data: data,
@@ -166,6 +167,7 @@ export class SchemaObjectAttributeData extends SchemaElementData {
     absolutePath: Path,
     public deprecated: boolean,
     public required: boolean,
+    public index: number,
     schema: JsonSchemaObjectType
   ) {
     super(name, absolutePath, schema);
@@ -175,6 +177,7 @@ export class SchemaObjectAttributeData extends SchemaElementData {
 export class EdgeData {
   public constructor(
     public start: SchemaNodeData,
+    public startHandle: string|null,
     public end: SchemaNodeData,
     public edgeType: EdgeType,
     public isArray: boolean,

@@ -3,8 +3,6 @@ import {
   SchemaElementData,
   SchemaEnumNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
-import {getSessionForMode} from '@/data/useDataLink';
-import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
