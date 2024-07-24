@@ -81,7 +81,7 @@ export function identifyObjects(
   // It can be that simple types, such as strings with enum constraint, have their own definition.
   // We allow generating a node for this, so it can be referred to by other objects.
   // But we do not visualize those nodes for simple types.
-  defs.set(pathToString(currentPath), generateInitialNode(currentPath, schema, hasUserDefinedName));
+  defs.set(pathToString(currentPath), generateInitialNode(currentPath, hasUserDefinedName, schema));
 
   if (schema.properties) {
     for (const [key, value] of Object.entries(schema.properties)) {
@@ -152,7 +152,7 @@ export function identifyObjects(
   }
 }
 
-function generateInitialNode(path: Path, schema: JsonSchemaObjectType, hasUserDefinedName: boolean): SchemaElementData {
+function generateInitialNode(path: Path, hasUserDefinedName: boolean, schema: JsonSchemaObjectType): SchemaElementData {
   if (!isEnumSchema(schema)) {
     return new SchemaObjectNodeData(generateObjectTitle(path, hasUserDefinedName, schema), hasUserDefinedName, path, schema, []);
   } else {

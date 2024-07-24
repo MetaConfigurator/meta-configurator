@@ -67,10 +67,10 @@ describe('test schema graph constructor with objects and attributes with enums',
   beforeEach(() => {
     currentPath = [];
     defs = new Map();
-    identifyObjects(currentPath, schema, defs);
+    identifyObjects(currentPath, schema, defs, false);
     // @ts-ignore
     for (const [key, value] of Object.entries(schema.$defs)) {
-      identifyObjects(['$defs', key], value, defs);
+      identifyObjects(['$defs', key], value, defs, true);
     }
   });
 

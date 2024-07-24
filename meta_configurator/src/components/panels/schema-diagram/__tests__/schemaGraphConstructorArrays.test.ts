@@ -1,5 +1,4 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import type {Path} from '@/utility/path';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaDiagramTypes';
 import {
@@ -18,7 +17,6 @@ vi.mock('@/dataformats/formatRegistry', () => ({
 }));
 
 describe('test schema graph constructor with objects and attributes, without advanced keywords such as oneOf', () => {
-  let currentPath: Path;
   let schema: TopLevelSchema = {
     type: 'object',
     required: ['propertyObject'],
@@ -91,7 +89,6 @@ describe('test schema graph constructor with objects and attributes, without adv
   let defs: Map<string, SchemaObjectNodeData>;
 
   beforeEach(() => {
-    currentPath = [];
     defs = identifyAllObjects(schema);
   });
 
@@ -200,25 +197,25 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
-    expect(generateObjectTitle(rootNode.absolutePath, rootNode.schema)).toEqual('root');
+    expect(generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)).toEqual('root');
 
     const propArrayComplexItem = defs.get('properties.propertyArrayToComplex.items')!;
     expect(
-      generateObjectTitle(propArrayComplexItem.absolutePath, propArrayComplexItem.schema)
+      generateObjectTitle(propArrayComplexItem.absolutePath, propArrayComplexItem.hasUserDefinedName, propArrayComplexItem.schema)
     ).toEqual('items');
 
     const defsArrayPropItem = defs.get('$defs.arrayObjectProperty.items')!;
-    expect(generateObjectTitle(defsArrayPropItem.absolutePath, defsArrayPropItem.schema)).toEqual(
+    expect(generateObjectTitle(defsArrayPropItem.absolutePath, defsArrayPropItem.hasUserDefinedName, defsArrayPropItem.schema)).toEqual(
       'items'
     );
 
     const defsArrayObjectPropItem = defs.get('$defs.arrayObjectProperty.items')!;
     expect(
-      generateObjectTitle(defsArrayObjectPropItem.absolutePath, defsArrayObjectPropItem.schema)
+      generateObjectTitle(defsArrayObjectPropItem.absolutePath, defsArrayObjectPropItem.hasUserDefinedName, defsArrayObjectPropItem.schema)
     ).toEqual('items');
 
     const person = defs.get('$defs.person')!;
-    expect(generateObjectTitle(person.absolutePath, person.schema)).toEqual('person');
+    expect(generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)).toEqual('person');
   });
 
   it('generate attribute edges', () => {
