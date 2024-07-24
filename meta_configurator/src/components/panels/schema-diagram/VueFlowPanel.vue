@@ -13,12 +13,15 @@ import type {Edge, Node} from '@/components/panels/schema-diagram/schemaDiagramT
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
-import {findBestMatchingData, findBestMatchingNode,} from '@/components/panels/schema-diagram/schemaDiagramHelper';
+import {
+  findBestMatchingData,
+  findBestMatchingNode,
+} from '@/components/panels/schema-diagram/schemaDiagramHelper';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
-import {replacePropertyNameUtils} from "@/components/panels/shared-components/sharedComponentUtils";
+import {replacePropertyNameUtils} from '@/components/panels/shared-components/sharedComponentUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -29,7 +32,7 @@ const emit = defineEmits<{
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const dataSchema = getSchemaForMode(SessionMode.DataEditor);
-const schemaSchema = getSchemaForMode(SessionMode.SchemaEditor)
+const schemaSchema = getSchemaForMode(SessionMode.SchemaEditor);
 const currentPath: Ref<Path> = computed(() => schemaSession.currentPath.value);
 
 const activeNodes: Ref<Node[]> = ref<Node[]>([]);
@@ -171,12 +174,18 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
   // that a new node was added (because different name) and then rebuild whole graph.
   objectData.name = newName;
 
-  objectData.absolutePath = replacePropertyNameUtils(objectData.absolutePath, oldName, newName, schemaData.data.value, schemaSchema.schemaWrapper.value, updateData);
+  objectData.absolutePath = replacePropertyNameUtils(
+    objectData.absolutePath,
+    oldName,
+    newName,
+    schemaData.data.value,
+    schemaSchema.schemaWrapper.value,
+    updateData
+  );
   // TODO: when renaming happens, also force update in the GUI
 
   selectElement(objectData.absolutePath);
 }
-
 </script>
 
 <template>

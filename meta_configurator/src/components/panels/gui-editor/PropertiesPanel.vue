@@ -36,7 +36,7 @@ import {
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
-import {replacePropertyNameUtils} from "@/components/panels/shared-components/sharedComponentUtils";
+import {replacePropertyNameUtils} from '@/components/panels/shared-components/sharedComponentUtils';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -188,9 +188,15 @@ function removeProperty(subPath: Path) {
 }
 
 function replacePropertyName(subPath: Path, oldName: string, newName: string): Path {
-  return replacePropertyNameUtils(subPath, oldName, newName, props.currentData, props.currentSchema, updateData);
+  return replacePropertyNameUtils(
+    subPath,
+    oldName,
+    newName,
+    props.currentData,
+    props.currentSchema,
+    updateData
+  );
 }
-
 
 function updatePropertyName(subPath: Path, oldName: string, newName: string) {
   const newRelativePath = replacePropertyName(subPath, oldName, newName);

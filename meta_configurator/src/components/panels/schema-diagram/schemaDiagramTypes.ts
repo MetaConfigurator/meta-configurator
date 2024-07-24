@@ -2,9 +2,7 @@ import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
 import {MarkerType} from '@vue-flow/core';
 import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
-import {pathsToEdgeId, pathToNodeId} from "@/components/panels/schema-diagram/schemaDiagramHelper";
-
-
+import {pathsToEdgeId, pathToNodeId} from '@/components/panels/schema-diagram/schemaDiagramHelper';
 
 export class SchemaGraph {
   public constructor(public nodes: SchemaNodeData[], public edges: EdgeData[]) {}
@@ -103,7 +101,6 @@ export interface Edge {
   animated: boolean;
 }
 
-
 export class SchemaElementData {
   public constructor(
     public name: string,
@@ -118,7 +115,12 @@ export class SchemaElementData {
 }
 
 export class SchemaNodeData extends SchemaElementData {
-  public constructor(name: string, hasUserDefinedName: boolean, absolutePath: Path, schema: JsonSchemaObjectType) {
+  public constructor(
+    name: string,
+    hasUserDefinedName: boolean,
+    absolutePath: Path,
+    schema: JsonSchemaObjectType
+  ) {
     super(name, hasUserDefinedName, absolutePath, schema);
   }
 }

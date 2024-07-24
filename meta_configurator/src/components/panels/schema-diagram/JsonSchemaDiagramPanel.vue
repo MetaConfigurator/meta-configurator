@@ -25,7 +25,6 @@ function selectPath(pathAbsolute: Path) {
 function updateData(path: Path, newValue: any) {
   schemaData.setDataAt(path, newValue);
 }
-
 </script>
 
 <template>
@@ -34,7 +33,7 @@ function updateData(path: Path, newValue: any) {
       <VueFlowPanel
         @update_current_path="path => zoomIntoPath(path)"
         @select_path="path => selectPath(path)"
-      @update_data="(path, newValue) => updateData(path, newValue)"/>
+        @update_data="(path, newValue) => updateData(path, newValue)" />
     </div>
   </div>
 </template>

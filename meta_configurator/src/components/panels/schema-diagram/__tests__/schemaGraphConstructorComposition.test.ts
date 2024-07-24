@@ -195,21 +195,33 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
-    expect(generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)).toEqual('root');
+    expect(
+      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)
+    ).toEqual('root');
 
     const person = defs.get('$defs.person')!;
-    expect(generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)).toEqual('person');
+    expect(
+      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)
+    ).toEqual('person');
 
     const animal = defs.get('$defs.animal')!;
-    expect(generateObjectTitle(animal.absolutePath, animal.hasUserDefinedName, animal.schema)).toEqual('animal');
+    expect(
+      generateObjectTitle(animal.absolutePath, animal.hasUserDefinedName, animal.schema)
+    ).toEqual('animal');
 
     const researcher = defs.get('$defs.researcher')!;
-    expect(generateObjectTitle(researcher.absolutePath, researcher.hasUserDefinedName, researcher.schema)).toEqual('researcher');
+    expect(
+      generateObjectTitle(researcher.absolutePath, researcher.hasUserDefinedName, researcher.schema)
+    ).toEqual('researcher');
 
     const livingBeing = defs.get('$defs.livingBeing')!;
-    expect(generateObjectTitle(livingBeing.absolutePath, livingBeing.hasUserDefinedName, livingBeing.schema)).toEqual(
-      'livingBeing'
-    );
+    expect(
+      generateObjectTitle(
+        livingBeing.absolutePath,
+        livingBeing.hasUserDefinedName,
+        livingBeing.schema
+      )
+    ).toEqual('livingBeing');
 
     const compositionalWithoutObjectType = defs.get('$defs.compositionalWithoutObjectType')!;
     expect(
@@ -222,16 +234,24 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     const inlineCompositional = defs.get('properties.propertyArrayInlineCompositional.items')!;
     expect(
-      generateObjectTitle(inlineCompositional.absolutePath, inlineCompositional.hasUserDefinedName, inlineCompositional.schema)
+      generateObjectTitle(
+        inlineCompositional.absolutePath,
+        inlineCompositional.hasUserDefinedName,
+        inlineCompositional.schema
+      )
     ).toEqual('items');
 
     const allOf1 = defs.get('allOf[1]')!;
     // allOf element at index 1 has no title, so we use the index as title
-    expect(generateObjectTitle(allOf1.absolutePath, allOf1.hasUserDefinedName, allOf1.schema)).toEqual('allOf[1]');
+    expect(
+      generateObjectTitle(allOf1.absolutePath, allOf1.hasUserDefinedName, allOf1.schema)
+    ).toEqual('allOf[1]');
 
     const oneOf1 = defs.get('oneOf[1]')!;
     // oneOf element at index 1 has a title, so we use it
-    expect(generateObjectTitle(oneOf1.absolutePath, allOf1.hasUserDefinedName, oneOf1.schema)).toEqual('Farmer');
+    expect(
+      generateObjectTitle(oneOf1.absolutePath, allOf1.hasUserDefinedName, oneOf1.schema)
+    ).toEqual('Farmer');
   });
 
   it('generate special property edges', () => {

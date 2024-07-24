@@ -24,10 +24,10 @@ function fitView() {
     <AccordionTab header="Schema Diagram Options">
       <div>
         <label
-        >Edit Mode
+          >Edit Mode
           <InputSwitch
-              v-model="useSettings().schemaDiagram.editMode"
-              class="options-input-switch" />
+            v-model="useSettings().schemaDiagram.editMode"
+            class="options-input-switch" />
         </label>
       </div>
       <div>

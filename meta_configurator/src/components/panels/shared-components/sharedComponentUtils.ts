@@ -1,19 +1,23 @@
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
-import type {Path} from "@/utility/path";
-import {dataAt} from "@/utility/resolveDataAtPath";
-import type {JsonSchemaWrapper} from "@/schema/jsonSchemaWrapper";
-import {pathToJsonPointer} from "@/utility/pathUtils";
+import type {Path} from '@/utility/path';
+import {dataAt} from '@/utility/resolveDataAtPath';
+import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
+import {pathToJsonPointer} from '@/utility/pathUtils';
 
 export function getColorForMode(mode: string, settings: SettingsInterfaceRoot): string {
   const settingsAsAny: any = settings;
   return settingsAsAny.uiColors[mode];
 }
 
-
-
-
 // TODO: add setting to synchronize schema changes in GUI with data: if property renamed/deleted, do same with data
-export function replacePropertyNameUtils(subPath: Path, oldName: string, newName: string, currentData: any, currentSchema: JsonSchemaWrapper, updateDataFct: (subPath: Path, newValue: any) => void): Path{
+export function replacePropertyNameUtils(
+  subPath: Path,
+  oldName: string,
+  newName: string,
+  currentData: any,
+  currentSchema: JsonSchemaWrapper,
+  updateDataFct: (subPath: Path, newValue: any) => void
+): Path {
   if (oldName === newName) {
     return subPath;
   }
@@ -33,13 +37,23 @@ export function replacePropertyNameUtils(subPath: Path, oldName: string, newName
   dataAtParentPath[newName] = oldPropertyData;
 
   updateDataFct(parentPath, dataAtParentPath);
-  updateReferences(parentPath.concat([oldName]), parentPath.concat([newName]), currentData, updateDataFct);
+  updateReferences(
+    parentPath.concat([oldName]),
+    parentPath.concat([newName]),
+    currentData,
+    updateDataFct
+  );
 
   const newRelativePath = parentPath.concat([newName]);
-  return newRelativePath
+  return newRelativePath;
 }
 
-function updateReferences(oldPath: Path, newPath: Path, currentData: any, updateDataFct: (subPath: Path, newValue: any) => void) {
+function updateReferences(
+  oldPath: Path,
+  newPath: Path,
+  currentData: any,
+  updateDataFct: (subPath: Path, newValue: any) => void
+) {
   const oldPathStr = pathToJsonPointer(oldPath);
   const newPathStr = pathToJsonPointer(newPath);
 
@@ -58,13 +72,18 @@ function findReferences(oldPath: string, currentData: any): any[] {
   return references;
 }
 
-function findReferencesRecursive(searchReference: string, currentData: any, currentPath: Path, references: any[]) {
+function findReferencesRecursive(
+  searchReference: string,
+  currentData: any,
+  currentPath: Path,
+  references: any[]
+) {
   if (typeof currentData === 'object') {
     for (const key in currentData) {
       const value = currentData[key];
       const newPath = currentPath.concat([key]);
       if (typeof value === 'string') {
-        if (value.includes(searchReference) && key === "$ref") {
+        if (value.includes(searchReference) && key === '$ref') {
           references.push({path: newPath, value: value});
         }
       } else {
@@ -74,7 +93,11 @@ function findReferencesRecursive(searchReference: string, currentData: any, curr
   }
 }
 
-function initializeNewProperty(parentPath: Path, name: string, currentSchema: JsonSchemaWrapper): any {
+function initializeNewProperty(
+  parentPath: Path,
+  name: string,
+  currentSchema: JsonSchemaWrapper
+): any {
   const schema = currentSchema.subSchemaAt(parentPath.concat([name]));
   return schema?.initialValue();
 }

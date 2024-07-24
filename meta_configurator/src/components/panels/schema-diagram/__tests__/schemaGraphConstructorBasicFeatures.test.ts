@@ -164,25 +164,41 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
-    expect(generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)).toEqual('root');
+    expect(
+      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)
+    ).toEqual('root');
 
     const propComplex = defs.get('properties.propertyObject')!;
-    expect(generateObjectTitle(propComplex.absolutePath, propComplex.hasUserDefinedName, propComplex.schema)).toEqual(
-      'propertyObject'
-    );
+    expect(
+      generateObjectTitle(
+        propComplex.absolutePath,
+        propComplex.hasUserDefinedName,
+        propComplex.schema
+      )
+    ).toEqual('propertyObject');
 
     const propComplexWithTitle = defs.get('properties.propertyObjectWithTitle')!;
     expect(
-      generateObjectTitle(propComplexWithTitle.absolutePath, propComplexWithTitle.hasUserDefinedName, propComplexWithTitle.schema)
+      generateObjectTitle(
+        propComplexWithTitle.absolutePath,
+        propComplexWithTitle.hasUserDefinedName,
+        propComplexWithTitle.schema
+      )
     ).toEqual('propertyObjectWithTitle');
 
     const person = defs.get('$defs.person')!;
-    expect(generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)).toEqual('person');
+    expect(
+      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)
+    ).toEqual('person');
 
     const personAddress = defs.get('$defs.person.properties.address')!;
-    expect(generateObjectTitle(personAddress.absolutePath, personAddress.hasUserDefinedName, personAddress.schema)).toEqual(
-      'address'
-    );
+    expect(
+      generateObjectTitle(
+        personAddress.absolutePath,
+        personAddress.hasUserDefinedName,
+        personAddress.schema
+      )
+    ).toEqual('address');
   });
 
   it('generate attribute edges', () => {

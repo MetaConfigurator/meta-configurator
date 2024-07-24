@@ -147,14 +147,29 @@ export function identifyObjects(
   }
   if (schema.additionalProperties) {
     if (typeof schema.additionalProperties === 'object') {
-      identifyObjects([...currentPath, 'additionalProperties'], schema.additionalProperties, defs, false);
+      identifyObjects(
+        [...currentPath, 'additionalProperties'],
+        schema.additionalProperties,
+        defs,
+        false
+      );
     }
   }
 }
 
-function generateInitialNode(path: Path, hasUserDefinedName: boolean, schema: JsonSchemaObjectType): SchemaElementData {
+function generateInitialNode(
+  path: Path,
+  hasUserDefinedName: boolean,
+  schema: JsonSchemaObjectType
+): SchemaElementData {
   if (!isEnumSchema(schema)) {
-    return new SchemaObjectNodeData(generateObjectTitle(path, hasUserDefinedName, schema), hasUserDefinedName, path, schema, []);
+    return new SchemaObjectNodeData(
+      generateObjectTitle(path, hasUserDefinedName, schema),
+      hasUserDefinedName,
+      path,
+      schema,
+      []
+    );
   } else {
     return new SchemaEnumNodeData(
       generateObjectTitle(path, hasUserDefinedName, schema),
@@ -166,7 +181,11 @@ function generateInitialNode(path: Path, hasUserDefinedName: boolean, schema: Js
   }
 }
 
-export function generateObjectTitle(path: Path, hasUserDefinedName: boolean, schema?: JsonSchemaObjectType): string {
+export function generateObjectTitle(
+  path: Path,
+  hasUserDefinedName: boolean,
+  schema?: JsonSchemaObjectType
+): string {
   if (schema && schema.title && !hasUserDefinedName) {
     return schema.title;
   }

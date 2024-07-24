@@ -5,10 +5,10 @@ import {
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaObjectAttribute from '@/components/panels/schema-diagram/SchemaObjectAttribute.vue';
 import type {Path} from '@/utility/path';
-import InputText from "primevue/inputtext";
+import InputText from 'primevue/inputtext';
 import {Position, Handle} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
-import {computed, ref} from "vue";
+import {computed, ref} from 'vue';
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
@@ -60,15 +60,17 @@ function isHighlighted() {
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
-    <b
-    v-if="!isNameEditable">
+    <b v-if="!isNameEditable">
       {{ props.data.name }}
     </b>
 
-    <InputText v-if="isNameEditable" type="text" v-model="objectName"
-               @blur="updateObjectName"
-               @keydown.stop
-               @keyup.enter="updateObjectName"/>
+    <InputText
+      v-if="isNameEditable"
+      type="text"
+      v-model="objectName"
+      @blur="updateObjectName"
+      @keydown.stop
+      @keyup.enter="updateObjectName" />
 
     <hr />
     <SchemaObjectAttribute
@@ -77,9 +79,12 @@ function isHighlighted() {
       :data="attribute!"
       :selected-data="props.selectedData"
       @select_element="clickedAttribute"></SchemaObjectAttribute>
-    <Handle id="main" type="source" :position="props.sourcePosition!" class="vue-flow__handle"
-            style="bottom: 10px"></Handle>
-
+    <Handle
+      id="main"
+      type="source"
+      :position="props.sourcePosition!"
+      class="vue-flow__handle"
+      style="bottom: 10px"></Handle>
   </div>
 </template>
 

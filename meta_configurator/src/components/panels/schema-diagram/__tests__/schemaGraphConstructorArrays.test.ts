@@ -197,25 +197,41 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
-    expect(generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)).toEqual('root');
+    expect(
+      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)
+    ).toEqual('root');
 
     const propArrayComplexItem = defs.get('properties.propertyArrayToComplex.items')!;
     expect(
-      generateObjectTitle(propArrayComplexItem.absolutePath, propArrayComplexItem.hasUserDefinedName, propArrayComplexItem.schema)
+      generateObjectTitle(
+        propArrayComplexItem.absolutePath,
+        propArrayComplexItem.hasUserDefinedName,
+        propArrayComplexItem.schema
+      )
     ).toEqual('items');
 
     const defsArrayPropItem = defs.get('$defs.arrayObjectProperty.items')!;
-    expect(generateObjectTitle(defsArrayPropItem.absolutePath, defsArrayPropItem.hasUserDefinedName, defsArrayPropItem.schema)).toEqual(
-      'items'
-    );
+    expect(
+      generateObjectTitle(
+        defsArrayPropItem.absolutePath,
+        defsArrayPropItem.hasUserDefinedName,
+        defsArrayPropItem.schema
+      )
+    ).toEqual('items');
 
     const defsArrayObjectPropItem = defs.get('$defs.arrayObjectProperty.items')!;
     expect(
-      generateObjectTitle(defsArrayObjectPropItem.absolutePath, defsArrayObjectPropItem.hasUserDefinedName, defsArrayObjectPropItem.schema)
+      generateObjectTitle(
+        defsArrayObjectPropItem.absolutePath,
+        defsArrayObjectPropItem.hasUserDefinedName,
+        defsArrayObjectPropItem.schema
+      )
     ).toEqual('items');
 
     const person = defs.get('$defs.person')!;
-    expect(generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)).toEqual('person');
+    expect(
+      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)
+    ).toEqual('person');
   });
 
   it('generate attribute edges', () => {

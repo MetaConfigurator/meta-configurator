@@ -1,13 +1,7 @@
-import { describe, expect, it, vi} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {
-  SchemaGraph,
-} from '../schemaDiagramTypes';
-import {
-  identifyAllObjects,
-  populateGraph,
-  trimGraph,
-} from '../schemaGraphConstructor';
+import {SchemaGraph} from '../schemaDiagramTypes';
+import {identifyAllObjects, populateGraph, trimGraph} from '../schemaGraphConstructor';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
