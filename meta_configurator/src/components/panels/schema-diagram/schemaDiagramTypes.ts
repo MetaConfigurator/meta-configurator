@@ -4,6 +4,8 @@ import {MarkerType} from '@vue-flow/core';
 import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
 import {pathsToEdgeId, pathToNodeId} from "@/components/panels/schema-diagram/schemaDiagramHelper";
 
+
+
 export class SchemaGraph {
   public constructor(public nodes: SchemaNodeData[], public edges: EdgeData[]) {}
 

@@ -45,11 +45,7 @@ function updateObjectName() {
   if (newName.length == 0) {
     return;
   }
-  const oldName = props.data.name;
-  // change name in node before emitting event. Otherwise, when the schema change is detected, it would also compute
-  // that a new node was added (because different name) and then rebuild whole graph.
-  props.data.name = newName;
-  emit('update_object_name', props.data, oldName, newName);
+  emit('update_object_name', props.data, props.data.name, newName);
 }
 
 function isHighlighted() {

@@ -187,15 +187,13 @@ function removeProperty(subPath: Path) {
   updateTree();
 }
 
-function replacePropertyName(subPath: Path, oldName: string, newName: string) {
-  replacePropertyNameUtils(subPath, oldName, newName, props.currentData, props.currentSchema, updateData);
+function replacePropertyName(subPath: Path, oldName: string, newName: string): Path {
+  return replacePropertyNameUtils(subPath, oldName, newName, props.currentData, props.currentSchema, updateData);
 }
 
 
 function updatePropertyName(subPath: Path, oldName: string, newName: string) {
-  replacePropertyName(subPath, oldName, newName);
-  const parentPath = subPath.slice(0, -1);
-  const newRelativePath = parentPath.concat([newName]);
+  const newRelativePath = replacePropertyName(subPath, oldName, newName);
   const newAbsolutePath = props.currentPath.concat(newRelativePath);
   focusOnPath(newAbsolutePath);
   const subSchema = props.currentSchema.subSchemaAt(newRelativePath);

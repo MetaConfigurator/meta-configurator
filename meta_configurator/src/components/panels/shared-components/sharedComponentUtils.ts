@@ -12,9 +12,9 @@ export function getColorForMode(mode: string, settings: SettingsInterfaceRoot): 
 
 
 // TODO: add setting to synchronize schema changes in GUI with data: if property renamed/deleted, do same with data
-export function replacePropertyNameUtils(subPath: Path, oldName: string, newName: string, currentData: any, currentSchema: JsonSchemaWrapper, updateDataFct: (subPath: Path, newValue: any) => void){
+export function replacePropertyNameUtils(subPath: Path, oldName: string, newName: string, currentData: any, currentSchema: JsonSchemaWrapper, updateDataFct: (subPath: Path, newValue: any) => void): Path{
   if (oldName === newName) {
-    return;
+    return subPath;
   }
   let oldPropertyData = dataAt(subPath, currentData);
   const parentPath = subPath.slice(0, -1);
@@ -32,6 +32,9 @@ export function replacePropertyNameUtils(subPath: Path, oldName: string, newName
   dataAtParentPath[newName] = oldPropertyData;
 
   updateDataFct(parentPath, dataAtParentPath);
+
+  const newRelativePath = parentPath.concat([newName]);
+  return newRelativePath
 }
 
 function initializeNewProperty(parentPath: Path, name: string, currentSchema: JsonSchemaWrapper): any {

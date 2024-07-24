@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import type {Ref} from 'vue';
+import {computed, nextTick, onMounted, ref, watch} from 'vue';
 
 import {useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
@@ -10,13 +10,10 @@ import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
 import type {Edge, Node} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
-import {
-  findBestMatchingData,
-  findBestMatchingNode,
-} from '@/components/panels/schema-diagram/schemaDiagramHelper';
-import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {findBestMatchingData, findBestMatchingNode,} from '@/components/panels/schema-diagram/schemaDiagramHelper';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
@@ -170,9 +167,15 @@ function updateData(absolutePath: Path, newValue: any) {
 }
 
 function updateObjectName(objectData: SchemaElementData, oldName: string, newName: string) {
-  replacePropertyNameUtils(objectData.absolutePath, oldName, newName, schemaData.data.value, schemaSchema.schemaWrapper.value, updateData);
+  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
+  // that a new node was added (because different name) and then rebuild whole graph.
+  objectData.name = newName;
+
+  objectData.absolutePath = replacePropertyNameUtils(objectData.absolutePath, oldName, newName, schemaData.data.value, schemaSchema.schemaWrapper.value, updateData);
   // TODO: adjust connections to updated name
   // TODO: when renaming happens, also force update in the GUI
+
+  selectElement(objectData.absolutePath);
 }
 
 </script>
