@@ -69,10 +69,10 @@ describe('test schema graph constructor with conditionals', () => {
     currentPath = [];
     defs = new Map();
 
-    identifyObjects(currentPath, schema, defs);
+    identifyObjects(currentPath, schema, defs, false);
     // @ts-ignore
     for (const [key, value] of Object.entries(schema.$defs)) {
-      identifyObjects(['$defs', key], value, defs);
+      identifyObjects(['$defs', key], value, defs, true);
     }
   });
 
@@ -124,23 +124,37 @@ describe('test schema graph constructor with conditionals', () => {
 
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
-    expect(generateObjectTitle(rootNode.absolutePath, rootNode.schema)).toEqual('root');
+    expect(
+      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)
+    ).toEqual('root');
 
     const propComplex = defs.get('properties.propertyObject')!;
-    expect(generateObjectTitle(propComplex.absolutePath, propComplex.schema)).toEqual(
-      'propertyObject'
-    );
+    expect(
+      generateObjectTitle(
+        propComplex.absolutePath,
+        propComplex.hasUserDefinedName,
+        propComplex.schema
+      )
+    ).toEqual('propertyObject');
 
     const researcher = defs.get('$defs.researcher')!;
-    expect(generateObjectTitle(researcher.absolutePath, researcher.schema)).toEqual('researcher');
+    expect(
+      generateObjectTitle(researcher.absolutePath, researcher.hasUserDefinedName, researcher.schema)
+    ).toEqual('researcher');
 
     const thenNode = defs.get('then')!;
-    expect(generateObjectTitle(thenNode.absolutePath, thenNode.schema)).toEqual('then');
+    expect(
+      generateObjectTitle(thenNode.absolutePath, thenNode.hasUserDefinedName, thenNode.schema)
+    ).toEqual('then');
 
     const thenNodeObject = defs.get('then.properties.propertyObject')!;
-    expect(generateObjectTitle(thenNodeObject.absolutePath, thenNodeObject.schema)).toEqual(
-      'propertyObject'
-    );
+    expect(
+      generateObjectTitle(
+        thenNodeObject.absolutePath,
+        thenNodeObject.hasUserDefinedName,
+        thenNodeObject.schema
+      )
+    ).toEqual('propertyObject');
   });
 
   it('generate special property edges', () => {

@@ -2,6 +2,7 @@ import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
 import {MarkerType} from '@vue-flow/core';
 import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
+import {pathsToEdgeId, pathToNodeId} from '@/components/panels/schema-diagram/schemaDiagramHelper';
 
 export class SchemaGraph {
   public constructor(public nodes: SchemaNodeData[], public edges: EdgeData[]) {}
@@ -25,7 +26,7 @@ export class SchemaGraph {
     });
   }
 
-  private toVueFlowEdges(): Edge[] {
+  private toVueFlowEdges(individualAttributeHandles: boolean): Edge[] {
     return this.edges.map(data => {
       let type = 'default';
       let color = 'black';
@@ -61,6 +62,7 @@ export class SchemaGraph {
         id: pathsToEdgeId(data.start.absolutePath, data.end.absolutePath, data.label, data.isArray),
         source: pathToNodeId(data.start.absolutePath),
         target: pathToNodeId(data.end.absolutePath),
+        sourceHandle: individualAttributeHandles ? data.startHandle : 'main',
         type: type,
         label: data.label,
         data: data,
@@ -71,9 +73,9 @@ export class SchemaGraph {
     });
   }
 
-  public toVueFlowGraph(): VueFlowGraph {
+  public toVueFlowGraph(individualAttributeEdges: boolean): VueFlowGraph {
     const nodes = this.toVueFlowNodes();
-    const edges = this.toVueFlowEdges();
+    const edges = this.toVueFlowEdges(individualAttributeEdges);
     return new VueFlowGraph(nodes, edges);
   }
 }
@@ -99,21 +101,10 @@ export interface Edge {
   animated: boolean;
 }
 
-export function pathsToEdgeId(start: Path, end: Path, label: string, isArray: boolean): string {
-  return pathToNodeId(start) + '--[' + label + isArray ? '_array' : '' + ']-->' + pathToNodeId(end);
-}
-
-export function pathToNodeId(path: Path): string {
-  if (path.length == 0) {
-    return 'root';
-  } else {
-    return pathToString(path);
-  }
-}
-
 export class SchemaElementData {
   public constructor(
     public name: string,
+    public hasUserDefinedName: boolean,
     public absolutePath: Path,
     public schema: JsonSchemaObjectType
   ) {}
@@ -124,19 +115,25 @@ export class SchemaElementData {
 }
 
 export class SchemaNodeData extends SchemaElementData {
-  public constructor(name: string, absolutePath: Path, schema: JsonSchemaObjectType) {
-    super(name, absolutePath, schema);
+  public constructor(
+    name: string,
+    hasUserDefinedName: boolean,
+    absolutePath: Path,
+    schema: JsonSchemaObjectType
+  ) {
+    super(name, hasUserDefinedName, absolutePath, schema);
   }
 }
 
 export class SchemaObjectNodeData extends SchemaNodeData {
   public constructor(
     name: string,
+    hasUserDefinedName: boolean,
     absolutePath: Path,
     schema: JsonSchemaObjectType,
     public attributes: SchemaObjectAttributeData[]
   ) {
-    super(name, absolutePath, schema);
+    super(name, hasUserDefinedName, absolutePath, schema);
   }
 
   public getNodeType() {
@@ -147,11 +144,12 @@ export class SchemaObjectNodeData extends SchemaNodeData {
 export class SchemaEnumNodeData extends SchemaNodeData {
   public constructor(
     public name: string,
+    public hasUserDefinedName: boolean,
     public absolutePath: Path,
     public schema: JsonSchemaObjectType,
     public values: string[]
   ) {
-    super(name, absolutePath, schema);
+    super(name, hasUserDefinedName, absolutePath, schema);
   }
   public getNodeType() {
     return 'schemaenum';
@@ -166,15 +164,17 @@ export class SchemaObjectAttributeData extends SchemaElementData {
     absolutePath: Path,
     public deprecated: boolean,
     public required: boolean,
+    public index: number,
     schema: JsonSchemaObjectType
   ) {
-    super(name, absolutePath, schema);
+    super(name, true, absolutePath, schema);
   }
 }
 
 export class EdgeData {
   public constructor(
     public start: SchemaNodeData,
+    public startHandle: string | null,
     public end: SchemaNodeData,
     public edgeType: EdgeType,
     public isArray: boolean,

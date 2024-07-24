@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import type {Ref} from 'vue';
+import {computed, nextTick, onMounted, ref, watch} from 'vue';
 
 import {useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
@@ -10,26 +10,30 @@ import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
 import type {Edge, Node} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
 import {
   findBestMatchingData,
   findBestMatchingNode,
 } from '@/components/panels/schema-diagram/schemaDiagramHelper';
-import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
+import {replacePropertyNameUtils} from '@/components/panels/shared-components/sharedComponentUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
   (e: 'select_path', path: Path): void;
+  (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const dataSchema = getSchemaForMode(SessionMode.DataEditor);
+const schemaSchema = getSchemaForMode(SessionMode.SchemaEditor);
+const currentPath: Ref<Path> = computed(() => schemaSession.currentPath.value);
 
 const activeNodes: Ref<Node[]> = ref<Node[]>([]);
 const activeEdges: Ref<Edge[]> = ref<Edge[]>([]);
@@ -97,7 +101,7 @@ function updateGraph(forceRebuild: boolean = false) {
   const graph = constructSchemaGraph(schema);
   let graphNeedsLayouting = forceRebuild;
 
-  const vueFlowGraph = graph.toVueFlowGraph();
+  const vueFlowGraph = graph.toVueFlowGraph(useSettings().schemaDiagram.vertical);
   if (wasNodeAdded(activeNodes.value, vueFlowGraph.nodes)) {
     // node was added -> it is needed to update whole graph
     activeNodes.value = vueFlowGraph.nodes;
@@ -160,6 +164,28 @@ function selectElement(path: Path) {
 function updateCurrentPath(path: Path) {
   emit('update_current_path', path);
 }
+
+function updateData(absolutePath: Path, newValue: any) {
+  emit('update_data', absolutePath, newValue);
+}
+
+function updateObjectName(objectData: SchemaElementData, oldName: string, newName: string) {
+  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
+  // that a new node was added (because different name) and then rebuild whole graph.
+  objectData.name = newName;
+
+  objectData.absolutePath = replacePropertyNameUtils(
+    objectData.absolutePath,
+    oldName,
+    newName,
+    schemaData.data.value,
+    schemaSchema.schemaWrapper.value,
+    updateData
+  );
+  // TODO: when renaming happens, also force update in the GUI
+
+  selectElement(objectData.absolutePath);
+}
 </script>
 
 <template>
@@ -188,6 +214,7 @@ function updateCurrentPath(path: Path) {
           :data="props.data"
           @select_element="selectElement"
           @zoom_into_element="updateCurrentPath"
+          @update_object_name="updateObjectName"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />

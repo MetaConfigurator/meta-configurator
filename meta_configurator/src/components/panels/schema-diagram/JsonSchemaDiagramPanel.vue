@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type {Path} from '@/utility/path';
-import {computed} from 'vue';
-import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {getSessionForMode} from '@/data/useDataLink';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 
 /* these are necessary styles for vue flow */
@@ -13,6 +11,7 @@ import '@vue-flow/core/dist/theme-default.css';
 import VueFlowPanel from '@/components/panels/schema-diagram/VueFlowPanel.vue';
 
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
+const schemaData = getDataForMode(SessionMode.SchemaEditor);
 
 function zoomIntoPath(pathAbsolute: Path) {
   schemaSession.updateCurrentPath(pathAbsolute);
@@ -22,6 +21,10 @@ function zoomIntoPath(pathAbsolute: Path) {
 function selectPath(pathAbsolute: Path) {
   schemaSession.updateCurrentSelectedElement(pathAbsolute);
 }
+
+function updateData(path: Path, newValue: any) {
+  schemaData.setDataAt(path, newValue);
+}
 </script>
 
 <template>
@@ -29,7 +32,8 @@ function selectPath(pathAbsolute: Path) {
     <div class="flex-grow overflow-y-auto">
       <VueFlowPanel
         @update_current_path="path => zoomIntoPath(path)"
-        @select_path="path => selectPath(path)" />
+        @select_path="path => selectPath(path)"
+        @update_data="(path, newValue) => updateData(path, newValue)" />
     </div>
   </div>
 </template>

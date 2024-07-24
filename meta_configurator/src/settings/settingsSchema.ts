@@ -164,6 +164,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'If set to true, allOf schemas will be merged in the schema diagram. This can make the diagram more readable, but sometimes also is not desired, because some information gets lost.',
           default: true,
         },
+        editMode: {
+          type: 'boolean',
+          description:
+            'If set to true, the schema diagram will be in edit mode. This allows to change the schema directly in the diagram.',
+          default: false,
+        },
       },
     },
     metaSchema: {
