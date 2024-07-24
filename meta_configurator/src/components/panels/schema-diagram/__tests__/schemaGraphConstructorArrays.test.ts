@@ -181,7 +181,7 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const attrPropArrayRefComplexWithTitle = rootNode.attributes[3];
     // array to ref of complex type
-    expect(attrPropArrayRefComplexWithTitle.typeDescription).toEqual('PersonTitle[]');
+    expect(attrPropArrayRefComplexWithTitle.typeDescription).toEqual('person[]');
 
     const attrPropRefToArraySimple = rootNode.attributes[4];
     // reference to array of booleans
@@ -218,7 +218,7 @@ describe('test schema graph constructor with objects and attributes, without adv
     ).toEqual('items');
 
     const person = defs.get('$defs.person')!;
-    expect(generateObjectTitle(person.absolutePath, person.schema)).toEqual('PersonTitle');
+    expect(generateObjectTitle(person.absolutePath, person.schema)).toEqual('person');
   });
 
   it('generate attribute edges', () => {

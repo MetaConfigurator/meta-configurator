@@ -141,7 +141,7 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const attrPropComplexWithTitle = rootNode.attributes[2];
     // if the object has a title, we use it. Otherwise, we use the attribute name in the schema
-    expect(attrPropComplexWithTitle.typeDescription).toEqual('MyPropertyObjectWithTitle');
+    expect(attrPropComplexWithTitle.typeDescription).toEqual('propertyObjectWithTitle');
 
     const attrPropRefSimple = rootNode.attributes[3];
     // if there is a ref to a simple type, we use the name of the simple type
@@ -174,7 +174,7 @@ describe('test schema graph constructor with objects and attributes, without adv
     const propComplexWithTitle = defs.get('properties.propertyObjectWithTitle')!;
     expect(
       generateObjectTitle(propComplexWithTitle.absolutePath, propComplexWithTitle.schema)
-    ).toEqual('MyPropertyObjectWithTitle');
+    ).toEqual('propertyObjectWithTitle');
 
     const person = defs.get('$defs.person')!;
     expect(generateObjectTitle(person.absolutePath, person.schema)).toEqual('person');
