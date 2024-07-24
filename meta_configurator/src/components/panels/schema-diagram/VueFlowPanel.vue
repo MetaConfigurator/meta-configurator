@@ -21,15 +21,19 @@ import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diag
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
+import {replacePropertyNameUtils} from "@/components/panels/shared-components/sharedComponentUtils";
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
   (e: 'select_path', path: Path): void;
+  (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const dataSchema = getSchemaForMode(SessionMode.DataEditor);
+const schemaSchema = getSchemaForMode(SessionMode.SchemaEditor)
+const currentPath: Ref<Path> = computed(() => schemaSession.currentPath.value);
 
 const activeNodes: Ref<Node[]> = ref<Node[]>([]);
 const activeEdges: Ref<Edge[]> = ref<Edge[]>([]);
@@ -160,6 +164,17 @@ function selectElement(path: Path) {
 function updateCurrentPath(path: Path) {
   emit('update_current_path', path);
 }
+
+function updateData(absolutePath: Path, newValue: any) {
+  emit('update_data', absolutePath, newValue);
+}
+
+function updateObjectName(objectData: SchemaElementData, oldName: string, newName: string) {
+  replacePropertyNameUtils(objectData.absolutePath, oldName, newName, schemaData.data.value, schemaSchema.schemaWrapper.value, updateData);
+  // TODO: adjust connections to updated name
+  // TODO: when renaming happens, also force update in the GUI
+}
+
 </script>
 
 <template>
@@ -188,6 +203,7 @@ function updateCurrentPath(path: Path) {
           :data="props.data"
           @select_element="selectElement"
           @zoom_into_element="updateCurrentPath"
+          @update_object_name="updateObjectName"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />

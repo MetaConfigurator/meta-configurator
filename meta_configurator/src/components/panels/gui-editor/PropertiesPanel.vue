@@ -36,6 +36,7 @@ import {
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
+import {replacePropertyNameUtils} from "@/components/panels/shared-components/sharedComponentUtils";
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -186,35 +187,14 @@ function removeProperty(subPath: Path) {
   updateTree();
 }
 
-// TODO: add setting to synchronize schema changes in GUI with data: if property renamed/deleted, do same with data
-
-function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData: any) {
-  // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
-  let dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
-  dataAtParentPath = structuredClone(dataAtParentPath);
-
-  if (oldData === undefined) {
-    oldData = initializeNewProperty(parentPath, newName);
-  } else {
-    delete dataAtParentPath[oldName];
-  }
-
-  dataAtParentPath[newName] = oldData;
-
-  updateData(parentPath, dataAtParentPath);
+function replacePropertyName(subPath: Path, oldName: string, newName: string) {
+  replacePropertyNameUtils(subPath, oldName, newName, props.currentData, props.currentSchema, updateData);
 }
 
-function initializeNewProperty(parentPath: Path, name: string): any {
-  const schema = props.currentSchema.subSchemaAt(parentPath.concat([name]));
-  return schema?.initialValue();
-}
 
 function updatePropertyName(subPath: Path, oldName: string, newName: string) {
-  const oldData = dataAt(subPath, props.currentData);
+  replacePropertyName(subPath, oldName, newName);
   const parentPath = subPath.slice(0, -1);
-
-  replacePropertyName(parentPath, oldName, newName, oldData);
-  updateTree();
   const newRelativePath = parentPath.concat([newName]);
   const newAbsolutePath = props.currentPath.concat(newRelativePath);
   focusOnPath(newAbsolutePath);

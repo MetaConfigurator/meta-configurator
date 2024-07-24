@@ -2,6 +2,7 @@ import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
 import {MarkerType} from '@vue-flow/core';
 import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
+import {pathsToEdgeId, pathToNodeId} from "@/components/panels/schema-diagram/schemaDiagramHelper";
 
 export class SchemaGraph {
   public constructor(public nodes: SchemaNodeData[], public edges: EdgeData[]) {}
@@ -100,21 +101,11 @@ export interface Edge {
   animated: boolean;
 }
 
-export function pathsToEdgeId(start: Path, end: Path, label: string, isArray: boolean): string {
-  return pathToNodeId(start) + '--[' + label + isArray ? '_array' : '' + ']-->' + pathToNodeId(end);
-}
-
-export function pathToNodeId(path: Path): string {
-  if (path.length == 0) {
-    return 'root';
-  } else {
-    return pathToString(path);
-  }
-}
 
 export class SchemaElementData {
   public constructor(
     public name: string,
+    public hasUserDefinedName: boolean,
     public absolutePath: Path,
     public schema: JsonSchemaObjectType
   ) {}
@@ -125,19 +116,20 @@ export class SchemaElementData {
 }
 
 export class SchemaNodeData extends SchemaElementData {
-  public constructor(name: string, absolutePath: Path, schema: JsonSchemaObjectType) {
-    super(name, absolutePath, schema);
+  public constructor(name: string, hasUserDefinedName: boolean, absolutePath: Path, schema: JsonSchemaObjectType) {
+    super(name, hasUserDefinedName, absolutePath, schema);
   }
 }
 
 export class SchemaObjectNodeData extends SchemaNodeData {
   public constructor(
     name: string,
+    hasUserDefinedName: boolean,
     absolutePath: Path,
     schema: JsonSchemaObjectType,
     public attributes: SchemaObjectAttributeData[]
   ) {
-    super(name, absolutePath, schema);
+    super(name, hasUserDefinedName, absolutePath, schema);
   }
 
   public getNodeType() {
@@ -148,11 +140,12 @@ export class SchemaObjectNodeData extends SchemaNodeData {
 export class SchemaEnumNodeData extends SchemaNodeData {
   public constructor(
     public name: string,
+    public hasUserDefinedName: boolean,
     public absolutePath: Path,
     public schema: JsonSchemaObjectType,
     public values: string[]
   ) {
-    super(name, absolutePath, schema);
+    super(name, hasUserDefinedName, absolutePath, schema);
   }
   public getNodeType() {
     return 'schemaenum';
@@ -170,7 +163,7 @@ export class SchemaObjectAttributeData extends SchemaElementData {
     public index: number,
     schema: JsonSchemaObjectType
   ) {
-    super(name, absolutePath, schema);
+    super(name, true, absolutePath, schema);
   }
 }
 

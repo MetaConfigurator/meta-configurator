@@ -5,8 +5,10 @@ import {
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaObjectAttribute from '@/components/panels/schema-diagram/SchemaObjectAttribute.vue';
 import type {Path} from '@/utility/path';
+import InputText from "primevue/inputtext";
 import {Position, Handle} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
+import {computed, ref} from "vue";
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
@@ -18,7 +20,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
   (e: 'zoom_into_element', path: Path): void;
+  (e: 'update_object_name', objectData: SchemaElementData, oldName: string, newName: string): void;
 }>();
+
+const objectName = ref(props.data.name);
+const isNameEditable = computed(() => {
+  return useSettings().schemaDiagram.editMode && props.data.hasUserDefinedName;
+});
 
 function clickedNode() {
   emit('select_element', props.data.absolutePath);
@@ -30,6 +38,18 @@ function doubleClickedNode() {
 
 function clickedAttribute(path: Path) {
   emit('select_element', path);
+}
+
+function updateObjectName() {
+  const newName = objectName.value.trim();
+  if (newName.length == 0) {
+    return;
+  }
+  const oldName = props.data.name;
+  // change name in node before emitting event. Otherwise, when the schema change is detected, it would also compute
+  // that a new node was added (because different name) and then rebuild whole graph.
+  props.data.name = newName;
+  emit('update_object_name', props.data, oldName, newName);
 }
 
 function isHighlighted() {
@@ -44,10 +64,16 @@ function isHighlighted() {
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
-    <!--Handle id="source-a" type="source" :position="Position.Right" style="top: 10px" /-->
-    <!--Handle id="source-b" type="source" :position="Position.Right" style="bottom: 10px; top: auto;" /-->
-    <!--small><i>{{ props.data.absolutePath }}</i></small-->
-    <b>{{ props.data.name }}</b>
+    <b
+    v-if="!isNameEditable">
+      {{ props.data.name }}
+    </b>
+
+    <InputText v-if="isNameEditable" type="text" v-model="objectName"
+               @blur="updateObjectName"
+               @keydown.stop
+               @keyup.enter="updateObjectName"/>
+
     <hr />
     <SchemaObjectAttribute
       v-if="useSettings().schemaDiagram.showAttributes"
@@ -55,11 +81,9 @@ function isHighlighted() {
       :data="attribute!"
       :selected-data="props.selectedData"
       @select_element="clickedAttribute"></SchemaObjectAttribute>
-    <Handle
-      id="main"
-      type="source"
-      :position="props.sourcePosition!"
-      class="vue-flow__handle"></Handle>
+    <Handle id="main" type="source" :position="props.sourcePosition!" class="vue-flow__handle"
+            style="bottom: 10px"></Handle>
+
   </div>
 </template>
 
