@@ -2,6 +2,7 @@ import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {Path} from "@/utility/path";
 import {dataAt} from "@/utility/resolveDataAtPath";
 import type {JsonSchemaWrapper} from "@/schema/jsonSchemaWrapper";
+import {pathToJsonPointer} from "@/utility/pathUtils";
 
 export function getColorForMode(mode: string, settings: SettingsInterfaceRoot): string {
   const settingsAsAny: any = settings;
@@ -32,9 +33,45 @@ export function replacePropertyNameUtils(subPath: Path, oldName: string, newName
   dataAtParentPath[newName] = oldPropertyData;
 
   updateDataFct(parentPath, dataAtParentPath);
+  updateReferences(parentPath.concat([oldName]), parentPath.concat([newName]), currentData, updateDataFct);
 
   const newRelativePath = parentPath.concat([newName]);
   return newRelativePath
+}
+
+function updateReferences(oldPath: Path, newPath: Path, currentData: any, updateDataFct: (subPath: Path, newValue: any) => void) {
+  const oldPathStr = pathToJsonPointer(oldPath);
+  const newPathStr = pathToJsonPointer(newPath);
+
+  const references = findReferences(oldPathStr, currentData);
+  references.forEach((ref: any) => {
+    const refPath = ref.path;
+    const refValue = ref.value;
+    const updatedRefValue = refValue.replace(oldPathStr, newPathStr);
+    updateDataFct(refPath, updatedRefValue);
+  });
+}
+
+function findReferences(oldPath: string, currentData: any): any[] {
+  const references: any[] = [];
+  findReferencesRecursive(oldPath, currentData, [], references);
+  return references;
+}
+
+function findReferencesRecursive(searchReference: string, currentData: any, currentPath: Path, references: any[]) {
+  if (typeof currentData === 'object') {
+    for (const key in currentData) {
+      const value = currentData[key];
+      const newPath = currentPath.concat([key]);
+      if (typeof value === 'string') {
+        if (value.includes(searchReference) && key === "$ref") {
+          references.push({path: newPath, value: value});
+        }
+      } else {
+        findReferencesRecursive(searchReference, value, newPath, references);
+      }
+    }
+  }
 }
 
 function initializeNewProperty(parentPath: Path, name: string, currentSchema: JsonSchemaWrapper): any {

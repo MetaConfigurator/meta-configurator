@@ -172,7 +172,6 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
   objectData.name = newName;
 
   objectData.absolutePath = replacePropertyNameUtils(objectData.absolutePath, oldName, newName, schemaData.data.value, schemaSchema.schemaWrapper.value, updateData);
-  // TODO: adjust connections to updated name
   // TODO: when renaming happens, also force update in the GUI
 
   selectElement(objectData.absolutePath);
