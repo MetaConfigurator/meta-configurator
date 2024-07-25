@@ -12,11 +12,9 @@ const emit = defineEmits<{
 
 function rebuildGraph() {
   emit('rebuild_graph');
-}
-
-function fitView() {
   emit('fit_view');
 }
+
 </script>
 
 <template>

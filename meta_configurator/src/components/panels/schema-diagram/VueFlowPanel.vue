@@ -13,10 +13,7 @@ import type {Edge, Node} from '@/components/panels/schema-diagram/schemaDiagramT
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
-import {
-  findBestMatchingData,
-  findBestMatchingNode,
-} from '@/components/panels/schema-diagram/schemaDiagramHelper';
+import {findBestMatchingData, findBestMatchingNode,} from '@/components/panels/schema-diagram/schemaDiagramHelper';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
@@ -34,6 +31,8 @@ const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const dataSchema = getSchemaForMode(SessionMode.DataEditor);
 const schemaSchema = getSchemaForMode(SessionMode.SchemaEditor);
 const currentPath: Ref<Path> = computed(() => schemaSession.currentPath.value);
+
+const forceFitView = ref(true);
 
 const activeNodes: Ref<Node[]> = ref<Node[]>([]);
 const activeEdges: Ref<Edge[]> = ref<Edge[]>([]);
@@ -59,6 +58,10 @@ watch(schemaSession.currentPath, () => {
 
 onMounted(() => {
   updateGraph();
+
+  nextTick(() => {
+    fitView();
+  });
 });
 
 // scroll to the current selected element when it changes
@@ -66,17 +69,25 @@ watch(
   schemaSession.currentSelectedElement,
   () => {
     const absolutePath = schemaSession.currentSelectedElement.value;
-    const bestMatchingNode = findBestMatchingNode(activeNodes.value, absolutePath);
-    selectedNode.value = bestMatchingNode;
-    selectedData.value = findBestMatchingData(bestMatchingNode, absolutePath);
-    if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
-      fitViewForNodes([bestMatchingNode]);
-    }
+    fitViewForElementByPath(absolutePath);
   },
   {deep: true}
 );
 
-function fitViewForCurrentlySelectedElement(otherwiseAll: boolean = true) {
+function fitViewForElementByPath(path: Path) {
+  const bestMatchingNode = findBestMatchingNode(activeNodes.value, path);
+  selectedNode.value = bestMatchingNode;
+  selectedData.value = findBestMatchingData(bestMatchingNode, path);
+  if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
+    fitViewForNodes([bestMatchingNode]);
+  }
+}
+
+function fitViewForCurrentlySelectedElement(otherwiseAll: boolean = true, useCachedNode: boolean = true) {
+  if (!useCachedNode && selectedNode.value) {
+    selectedNode.value = findBestMatchingNode(activeNodes.value, selectedNode.value.data.absolutePath);
+  }
+
   if (selectedNode.value) {
     fitViewForNodes([selectedNode.value]);
   } else if (otherwiseAll) {
@@ -122,13 +133,10 @@ function updateGraph(forceRebuild: boolean = false) {
     updateToSubgraph(currentPath);
   }
 
-  if (graphNeedsLayouting) {
-    nextTick(() => {
-      layoutGraph(graphDirection.value);
-    });
+  if (!graphNeedsLayouting) {
+    fitViewForCurrentlySelectedElement(true);
   }
 
-  fitViewForCurrentlySelectedElement(true);
 }
 
 function updateToSubgraph(path: Path) {
@@ -148,11 +156,25 @@ function updateToSubgraph(path: Path) {
 const {layout} = useLayout();
 const {fitView} = useVueFlow();
 
-async function layoutGraph(direction: string) {
+async function layoutGraph(direction: string, nodesInitialised: boolean) {
   activeNodes.value = layout(activeNodes.value, activeEdges.value, direction);
-  nextTick(() => {
-    fitView();
-  });
+  if (nodesInitialised && activeNodes.value.length > 0) {
+
+    if (forceFitView.value) {
+      nextTick(() => {
+        fitView();
+      });
+      forceFitView.value = false;
+
+    } else {
+      nextTick(() => {
+      if (selectedNode.value) {
+        fitViewForElementByPath(selectedNode.value.data.absolutePath);
+      }
+      });
+    }
+
+  }
 }
 
 function selectElement(path: Path) {
@@ -184,7 +206,6 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
   );
   // TODO: when renaming happens, also force update in the GUI
 
-  selectElement(objectData.absolutePath);
 }
 </script>
 
@@ -193,14 +214,14 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
     <VueFlow
       :nodes="activeNodes"
       :edges="activeEdges"
-      @nodes-initialized="layoutGraph(graphDirection)"
+      @nodes-initialized="layoutGraph(graphDirection, true)"
       fit-view-on-init
       :max-zoom="4"
       :min-zoom="0.1">
       <div class="controls">
         <DiagramOptionsPanel
           @rebuild_graph="updateGraph(true)"
-          @fit_view="fitViewForCurrentlySelectedElement" />
+          @fit_view="fitView()" />
 
         <CurrentPathBreadcrump
           :session-mode="SessionMode.SchemaEditor"
