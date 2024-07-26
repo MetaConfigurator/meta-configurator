@@ -55,6 +55,7 @@ export class ManagedSession {
   }
 
   public updateCurrentSelectedElement(proposedElement: Path): void {
+    console.log("updateCurrentSelectedElement", proposedElement)
     this._currentSelectedElement.value = proposedElement;
   }
 

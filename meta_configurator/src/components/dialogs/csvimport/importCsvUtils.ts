@@ -4,10 +4,10 @@ import type {Ref} from 'vue';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {dataPathToSchemaPath, pathToString} from '@/utility/pathUtils';
-import _, {min} from 'lodash';
+import _ from 'lodash';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
-import type {Path, PathElement} from '@/utility/path';
+import type {Path} from '@/utility/path';
 import type {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {
   type LabelledValue,

@@ -18,7 +18,7 @@ function zoomIntoPath(pathAbsolute: Path) {
   schemaSession.updateCurrentSelectedElement(pathAbsolute);
 }
 
-function selectPath(pathAbsolute: Path) {
+function selectElement(pathAbsolute: Path) {
   schemaSession.updateCurrentSelectedElement(pathAbsolute);
 }
 
@@ -32,7 +32,7 @@ function updateData(path: Path, newValue: any) {
     <div class="flex-grow overflow-y-auto">
       <VueFlowPanel
         @update_current_path="path => zoomIntoPath(path)"
-        @select_path="path => selectPath(path)"
+        @select_element="path => selectElement(path)"
         @update_data="(path, newValue) => updateData(path, newValue)" />
     </div>
   </div>

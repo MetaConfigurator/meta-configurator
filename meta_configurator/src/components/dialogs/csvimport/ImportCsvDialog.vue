@@ -95,6 +95,10 @@ watch([decimalSeparator, delimiter], newValue => {
 });
 
 function loadCsvFromInput() {
+  if(currentUserDataString.value.length == 0) {
+    currentUserCsv.value = [];
+    return;
+  }
   loadCsvFromUserString(
     currentUserDataString,
     currentUserCsv,
@@ -188,6 +192,7 @@ function submitImport() {
     addInferredSchema();
   }
   hideDialog();
+  currentUserDataString.value = '';
 }
 
 function addInferredSchema() {
