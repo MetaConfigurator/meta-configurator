@@ -158,10 +158,7 @@ export class MenuItems {
         label: 'Download Schema',
         icon: 'fa-solid fa-download',
         command: () =>
-          downloadFile(
-            'schema_' + (useDataSource().userSchemaData.value.title ?? 'untitled'),
-            true
-          ),
+          downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
       },
       {
         separator: true,
