@@ -13,6 +13,7 @@ export const SETTINGS_DATA_DEFAULT = {
   },
   codeEditor: {
     fontSize: 14,
+    tabSize: 2,
   },
   guiEditor: {
     maximumDepth: 20,

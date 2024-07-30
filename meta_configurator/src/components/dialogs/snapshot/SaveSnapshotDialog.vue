@@ -14,6 +14,7 @@ const showDialog = ref(false);
 const resultSnapshotLink: Ref<string> = ref('');
 const resultProjectLink: Ref<string> = ref('');
 const errorString: Ref<string> = ref('');
+const infoString: Ref<string> = ref('');
 
 const publishProject = ref(false);
 const projectId = ref('');
@@ -46,13 +47,14 @@ function requestSaveSnapshot() {
   }
   resultSnapshotLink.value = '';
   resultProjectLink.value = '';
-  storeCurrentSnapshot(resultSnapshotLink, errorString).then((snapshotId: string) => {
+  storeCurrentSnapshot(resultSnapshotLink, infoString, errorString).then((snapshotId: string) => {
     if (publishProject.value) {
       publishProjectLink(
         projectId.value,
         editPassword.value,
         snapshotId,
         resultProjectLink,
+        infoString,
         errorString
       );
     }
@@ -124,6 +126,7 @@ defineExpose({show: openDialog, close: hideDialog});
         </Message>
 
         <Message v-if="errorString.length > 0" severity="error">{{ errorString }}</Message>
+        <Message v-else-if="infoString.length > 0" severity="info">{{ infoString }}</Message>
       </div>
     </div>
   </Dialog>

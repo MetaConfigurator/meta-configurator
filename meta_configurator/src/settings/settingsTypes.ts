@@ -23,6 +23,7 @@ export interface SettingsInterfaceRoot {
 
 export interface SettingsInterfaceCodeEditor {
   fontSize: number;
+  tabSize: number;
 }
 
 export interface SettingsInterfaceGuiEditor {

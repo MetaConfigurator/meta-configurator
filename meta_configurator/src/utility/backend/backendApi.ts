@@ -17,8 +17,10 @@ export async function publishProjectLink(
   editPassword: string,
   snapshotId: string,
   resultProjectLink: Ref<String>,
+  infoRef: Ref<string>,
   errorRef: Ref<string>
 ) {
+  infoRef.value = 'Publishing project...';
   const response = await fetch(`${BACKEND_URL.value}/project`, {
     method: 'POST',
     headers: {
@@ -34,27 +36,40 @@ export async function publishProjectLink(
   handleErrors(response, errorRef);
 
   errorRef.value = '';
+  infoRef.value = '';
   resultProjectLink.value = `${FRONTEND_URL.value}/?project=${projectId}`;
 
   return response.json();
 }
 
-export async function storeCurrentSnapshot(resultSnapshotLink: Ref<string>, errorRef: Ref<string>) {
+export async function storeCurrentSnapshot(
+  resultSnapshotLink: Ref<string>,
+  infoRef: Ref<string>,
+  errorRef: Ref<string>
+) {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;
-  const result = await storeSnapshot(data, schema, settings, errorRef);
+  const result = await storeSnapshot(data, schema, settings, infoRef, errorRef);
   const snapshotId = result['snapshot_id'];
   resultSnapshotLink.value = `${FRONTEND_URL.value}/?snapshot=${snapshotId}`;
   return snapshotId;
 }
 
-async function storeSnapshot(data: any, schema: any, settings: any, errorRef: Ref<string>) {
+async function storeSnapshot(
+  data: any,
+  schema: any,
+  settings: any,
+  infoRef: Ref<string>,
+  errorRef: Ref<string>
+) {
   const body: any = {
     data: data,
     schema: schema,
     settings: settings,
   };
+
+  infoRef.value = 'Storing snapshot...';
 
   const response = await fetch(`${BACKEND_URL.value}/snapshot`, {
     method: 'POST',
@@ -65,6 +80,7 @@ async function storeSnapshot(data: any, schema: any, settings: any, errorRef: Re
   });
   handleErrors(response, errorRef);
 
+  infoRef.value = '';
   errorRef.value = '';
 
   return response.json();
