@@ -69,12 +69,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           maximum: 40,
         },
         tabSize: {
-            type: 'integer',
-            description: 'The tab size of the code editor.',
-            default: 2,
-            minimum: 1,
-            maximum: 8,
-        }
+          type: 'integer',
+          description: 'The tab size of the code editor.',
+          default: 2,
+          minimum: 1,
+          maximum: 8,
+        },
       },
     },
     guiEditor: {

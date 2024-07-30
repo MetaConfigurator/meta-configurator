@@ -1,5 +1,5 @@
 import YAML from 'yaml';
-import {useSettings} from "@/settings/useSettings";
+import {useSettings} from '@/settings/useSettings';
 
 /**
  * Abstract super class for converters that can parse and stringify data.
@@ -86,9 +86,8 @@ export class DataConverterYaml extends DataConverter {
   }
 
   override stringify(data: any): string {
-    return YAML.stringify(data,
-        {
-          indent: useSettings().codeEditor.tabSize
-        });
+    return YAML.stringify(data, {
+      indent: useSettings().codeEditor.tabSize,
+    });
   }
 }

@@ -13,7 +13,10 @@ import type {Edge, Node} from '@/components/panels/schema-diagram/schemaDiagramT
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
-import {findBestMatchingData, findBestMatchingNode,} from '@/components/panels/schema-diagram/schemaDiagramHelper';
+import {
+  findBestMatchingData,
+  findBestMatchingNode,
+} from '@/components/panels/schema-diagram/schemaDiagramHelper';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
@@ -49,7 +52,12 @@ const selectedData: Ref<SchemaElementData | undefined> = ref(undefined);
 const currentRootNodePath: Ref<Path> = ref([]);
 
 watch(getSchemaForMode(SessionMode.DataEditor).schemaPreprocessed, () => {
-  console.log("received update in schema. Having selected node " + selectedNode.value?.data.absolutePath + " and currentSelectedElement" + schemaSession.currentSelectedElement.value);
+  console.log(
+    'received update in schema. Having selected node ' +
+      selectedNode.value?.data.absolutePath +
+      ' and currentSelectedElement' +
+      schemaSession.currentSelectedElement.value
+  );
   updateGraph();
 });
 
@@ -61,7 +69,7 @@ onMounted(() => {
   updateGraph();
 
   nextTick(() => {
-    console.log("mounted fitView")
+    console.log('mounted fitView');
     fitView();
   });
 });
@@ -71,47 +79,82 @@ watch(
   schemaSession.currentSelectedElement,
   () => {
     const absolutePath = schemaSession.currentSelectedElement.value;
-    console.log("fitViewForElementByPath" + absolutePath + " because of update of currentSelectedElement with new selected element ", absolutePath);
+    console.log(
+      'fitViewForElementByPath' +
+        absolutePath +
+        ' because of update of currentSelectedElement with new selected element ',
+      absolutePath
+    );
     fitViewForElementByPath(absolutePath);
   },
   {deep: true}
 );
 
 function fitViewForElementByPath(path: Path) {
-  console.log("fit view for element by path " + path );
+  console.log('fit view for element by path ' + path);
   const bestMatchingNode = findBestMatchingNode(activeNodes.value, path);
-  console.log("selectedNode.value " + selectedNode.value?.data.absolutePath + " with node id " + selectedNode.value?.id);
-  console.log("new bestMatchingNode " + bestMatchingNode?.data.absolutePath + " with node id " + bestMatchingNode?.id);
+  console.log(
+    'selectedNode.value ' +
+      selectedNode.value?.data.absolutePath +
+      ' with node id ' +
+      selectedNode.value?.id
+  );
+  console.log(
+    'new bestMatchingNode ' +
+      bestMatchingNode?.data.absolutePath +
+      ' with node id ' +
+      bestMatchingNode?.id
+  );
   selectedNode.value = bestMatchingNode;
   selectedData.value = findBestMatchingData(bestMatchingNode, path);
-  console.log("bestMatchingData " + selectedData.value?.absolutePath)
+  console.log('bestMatchingData ' + selectedData.value?.absolutePath);
   if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
-    console.log("found new bestMatchingNode and fitting view on it")
+    console.log('found new bestMatchingNode and fitting view on it');
     fitViewForNodes([bestMatchingNode]);
   }
 }
 
-function fitViewForCurrentlySelectedElement(otherwiseAll: boolean = true, useCachedNode: boolean = true) {
-  console.log("fit view for currently selected element")
+function fitViewForCurrentlySelectedElement(
+  otherwiseAll: boolean = true,
+  useCachedNode: boolean = true
+) {
+  console.log('fit view for currently selected element');
   if (!useCachedNode && selectedNode.value) {
-    console.log("old selected node " + selectedNode.value.data.absolutePath + " with node id " + selectedNode.value.id);
-    selectedNode.value = findBestMatchingNode(activeNodes.value, selectedNode.value.data.absolutePath);
-    console.log("new selected node " + selectedNode.value?.data.absolutePath +  " with node id " + selectedNode.value?.id);
+    console.log(
+      'old selected node ' +
+        selectedNode.value.data.absolutePath +
+        ' with node id ' +
+        selectedNode.value.id
+    );
+    selectedNode.value = findBestMatchingNode(
+      activeNodes.value,
+      selectedNode.value.data.absolutePath
+    );
+    console.log(
+      'new selected node ' +
+        selectedNode.value?.data.absolutePath +
+        ' with node id ' +
+        selectedNode.value?.id
+    );
   }
 
   if (selectedNode.value) {
-    console.log("fit view for selected node " + selectedNode.value.data.absolutePath + " because has node selected")
+    console.log(
+      'fit view for selected node ' +
+        selectedNode.value.data.absolutePath +
+        ' because has node selected'
+    );
     fitViewForNodes([selectedNode.value]);
   } else if (otherwiseAll) {
-    console.log("fit view for all nodes")
+    console.log('fit view for all nodes');
     fitViewForNodes(activeNodes.value);
   }
 }
 
 function fitViewForNodes(nodes: Node[]) {
-  console.log("fit view for nodes " + nodes.length + " nodes in next tick");
+  console.log('fit view for nodes ' + nodes.length + ' nodes in next tick');
   nextTick(() => {
-    console.log("fit view for nodes with nodes ", nodes);
+    console.log('fit view for nodes with nodes ', nodes);
     fitView({
       nodes: nodes.map(node => node.id),
       duration: 1000,
@@ -123,7 +166,7 @@ function fitViewForNodes(nodes: Node[]) {
 }
 
 function updateGraph(forceRebuild: boolean = false) {
-  console.log("update graph")
+  console.log('update graph');
   const schema = dataSchema.schemaPreprocessed.value;
   const graph = constructSchemaGraph(schema);
   let graphNeedsLayouting = forceRebuild;
@@ -135,7 +178,7 @@ function updateGraph(forceRebuild: boolean = false) {
     activeEdges.value = vueFlowGraph.edges;
     currentRootNodePath.value = [];
     graphNeedsLayouting = true;
-    console.log("node was added");
+    console.log('node was added');
   } else {
     // only data updated or nodes removed
     const nodesToRemove = updateNodeData(activeNodes.value, vueFlowGraph.nodes);
@@ -147,15 +190,14 @@ function updateGraph(forceRebuild: boolean = false) {
   // if not on root level but current path is set: show only subgraph
   const currentPath: Path = schemaSession.currentPath.value;
   if (currentPath.length > 0) {
-    console.log("update to subgraph because current path is set")
+    console.log('update to subgraph because current path is set');
     updateToSubgraph(currentPath);
   }
 
   if (!graphNeedsLayouting) {
-    console.log("graph needs layouting")
+    console.log('graph needs layouting');
     fitViewForCurrentlySelectedElement(true);
   }
-
 }
 
 function updateToSubgraph(path: Path) {
@@ -176,29 +218,31 @@ const {layout} = useLayout();
 const {fitView} = useVueFlow();
 
 async function layoutGraph(direction: string, nodesInitialised: boolean) {
-  console.log("layout graph with " + activeNodes.value.length + " nodes")
+  console.log('layout graph with ' + activeNodes.value.length + ' nodes');
   activeNodes.value = layout(activeNodes.value, activeEdges.value, direction);
   if (nodesInitialised && activeNodes.value.length > 0) {
-    console.log("nodes initialised and active nodes > 0")
+    console.log('nodes initialised and active nodes > 0');
 
     if (forceFitView.value) {
-      console.log("forceFitView")
+      console.log('forceFitView');
       nextTick(() => {
-        console.log("fitView (that was forced)")
+        console.log('fitView (that was forced)');
         fitView();
       });
       forceFitView.value = false;
-
     } else {
-      console.log("no forceFitView")
+      console.log('no forceFitView');
       nextTick(() => {
-      if (selectedNode.value) {
-        console.log("fitViewForElementByPath" + selectedNode.value.data.absolutePath + " because of selected node")
-        fitViewForElementByPath(selectedNode.value.data.absolutePath);
-      }
+        if (selectedNode.value) {
+          console.log(
+            'fitViewForElementByPath' +
+              selectedNode.value.data.absolutePath +
+              ' because of selected node'
+          );
+          fitViewForElementByPath(selectedNode.value.data.absolutePath);
+        }
       });
     }
-
   }
 }
 
@@ -221,7 +265,7 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
   // that a new node was added (because different name) and then rebuild whole graph.
   objectData.name = newName;
 
-  console.log("update object name from " + oldName + " to " + newName);
+  console.log('update object name from ' + oldName + ' to ' + newName);
 
   objectData.absolutePath = replacePropertyNameUtils(
     objectData.absolutePath,
@@ -232,7 +276,6 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
     updateData
   );
   // TODO: when renaming happens, also force update in the GUI
-
 }
 </script>
 
@@ -246,9 +289,7 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
       :max-zoom="4"
       :min-zoom="0.1">
       <div class="controls">
-        <DiagramOptionsPanel
-          @rebuild_graph="updateGraph(true)"
-          @fit_view="fitView()" />
+        <DiagramOptionsPanel @rebuild_graph="updateGraph(true)" @fit_view="fitView()" />
 
         <CurrentPathBreadcrump
           :session-mode="SessionMode.SchemaEditor"

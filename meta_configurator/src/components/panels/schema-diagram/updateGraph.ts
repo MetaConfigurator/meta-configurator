@@ -16,11 +16,7 @@ export function updateNodeData(oldNodes: Node[], newNodes: Node[]): string[] {
 
 export function wasNodeAdded(oldNodes: Node[], newNodes: Node[]): boolean {
   for (const newNode of newNodes) {
-    if (
-      !oldNodes.find(
-        node => node.id === newNode.id
-      )
-    ) {
+    if (!oldNodes.find(node => node.id === newNode.id)) {
       return true;
     }
   }

@@ -60,7 +60,7 @@ function setupAceProperties(editor: Editor) {
   });
   editor.setTheme('ace/theme/clouds');
   editor.setShowPrintMargin(false);
-  editor.getSession().setTabSize(useSettings().codeEditor.tabSize)
+  editor.getSession().setTabSize(useSettings().codeEditor.tabSize);
 
   // it's not clear why timeout is needed here, but without it the
   // ace editor starts flashing and becomes unusable

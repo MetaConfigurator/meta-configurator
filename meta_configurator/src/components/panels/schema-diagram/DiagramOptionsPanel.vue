@@ -14,7 +14,6 @@ function rebuildGraph() {
   emit('rebuild_graph');
   emit('fit_view');
 }
-
 </script>
 
 <template>

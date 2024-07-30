@@ -95,7 +95,7 @@ watch([decimalSeparator, delimiter], newValue => {
 });
 
 function loadCsvFromInput() {
-  if(currentUserDataString.value.length == 0) {
+  if (currentUserDataString.value.length == 0) {
     currentUserCsv.value = [];
     return;
   }
