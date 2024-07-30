@@ -57,11 +57,17 @@ onMounted(() => {
   }
 
   if ('snapshot' in query) {
+    console.debug('skip initial schema selection dialog');
+    useSessionStore().hasShownInitialDialog = true;
+
     const snapshotId = query.snapshot as string;
     console.info('Received snapshot ID ', snapshotId, ' from query string "', query, '".');
     restoreSnapshot(snapshotId);
   }
   if ('project' in query) {
+    console.debug('skip initial schema selection dialog');
+    useSessionStore().hasShownInitialDialog = true;
+
     const projectId = query.project as string;
     console.info('Received project ID ', projectId, ' from query string "', query, '".');
     restoreSnapshot(projectId, true);
