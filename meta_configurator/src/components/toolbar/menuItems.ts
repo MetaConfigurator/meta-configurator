@@ -83,7 +83,7 @@ export class MenuItems {
       {
         label: 'Download Data',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile(useCurrentSchema().schemaRaw.value.title ?? 'file'),
+        command: () => downloadFile(useCurrentSchema().schemaRaw.value.title ?? 'file', false),
       },
       {
         separator: true,
@@ -158,7 +158,7 @@ export class MenuItems {
         label: 'Download Schema',
         icon: 'fa-solid fa-download',
         command: () =>
-          downloadFile('schema_' + (useDataSource().userSchemaData.value.title ?? 'untitled')),
+          downloadFile('schema_' + (useDataSource().userSchemaData.value.title ?? 'untitled'), true),
       },
       {
         separator: true,
@@ -360,7 +360,7 @@ export class MenuItems {
       {
         label: 'Save settings file',
         icon: 'fa-regular fa-floppy-disk',
-        command: () => downloadFile('metaConfiguratorSettings'),
+        command: () => downloadFile('metaConfiguratorSettings', false),
       },
       {
         separator: true,
