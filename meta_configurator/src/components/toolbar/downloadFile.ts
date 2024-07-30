@@ -24,7 +24,8 @@ export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
     second: '2-digit',
   });
   const formattedDate = formatter.format(now);
-  const fileEnding = (isSchema ? "schema." : "") + useSettings().dataFormat === 'yaml' ? 'yml' : 'json';
+  const fileEnding =
+    (isSchema ? 'schema.' : '') + useSettings().dataFormat === 'yaml' ? 'yml' : 'json';
   const fileName: string = `${fileNamePrefix}-${formattedDate}.${fileEnding}`;
 
   // Create a temporary link element
