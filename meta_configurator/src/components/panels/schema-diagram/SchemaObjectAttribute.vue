@@ -5,6 +5,9 @@ import {
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
+import {computed, ref} from "vue";
+import {useSettings} from "@/settings/useSettings";
+import InputText from "primevue/inputtext";
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;
@@ -13,10 +16,23 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
+  (e: 'update_attribute_name', attributeData: SchemaObjectAttributeData, oldName: string, newName: string): void;
 }>();
+
+const attrName = ref(props.data.name);
+const isNameEditable = computed(() => {
+  return useSettings().schemaDiagram.editMode;
+});
 
 function clickedAttribute() {
   emit('select_element', props.data.absolutePath);
+}
+function updateAttributeName() {
+  const newName = attrName.value.trim();
+  if (newName.length == 0) {
+    return;
+  }
+  emit('update_attribute_name', props.data, props.data.name, newName);
 }
 
 function isHighlighted() {
@@ -41,9 +57,17 @@ function getHandleTop() {
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted}"
     @click="clickedAttribute"
     v-on:click.stop>
-    <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
+    <span v-if="!isNameEditable" :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
+    <InputText
+        v-if="isNameEditable"
+        type="text"
+        v-model="attrName"
+        @blur="updateAttributeName"
+        @keydown.stop
+        @keyup.enter="updateAttributeName" />
     <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
     <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
+
     <Handle
       :id="getHandleId()"
       type="source"

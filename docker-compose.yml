@@ -16,6 +16,7 @@ services:
     build: ./backend
     ports:
       - "5000:5000"
+    restart: unless-stopped
     depends_on:
       - mongo
       - redis
@@ -35,6 +36,7 @@ services:
     container_name: mongo
     ports:
       - "27017:27017"
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
@@ -48,6 +50,7 @@ services:
     image: redis:latest
     ports:
       - "6379:6379"
+    restart: unless-stopped
     networks:
       - app-network
 

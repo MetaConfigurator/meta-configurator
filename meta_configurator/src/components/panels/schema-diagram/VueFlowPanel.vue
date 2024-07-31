@@ -9,7 +9,7 @@ import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGra
 import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
-import type {Edge, Node} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {type Edge, type Node, SchemaObjectAttributeData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
@@ -268,12 +268,30 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
   console.log('update object name from ' + oldName + ' to ' + newName);
 
   objectData.absolutePath = replacePropertyNameUtils(
-    objectData.absolutePath,
-    oldName,
-    newName,
-    schemaData.data.value,
-    schemaSchema.schemaWrapper.value,
-    updateData
+      objectData.absolutePath,
+      oldName,
+      newName,
+      schemaData.data.value,
+      schemaSchema.schemaWrapper.value,
+      updateData
+  );
+  // TODO: when renaming happens, also force update in the GUI
+}
+
+function updateAttributeName(attributeData: SchemaObjectAttributeData, oldName: string, newName: string) {
+  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
+  // that a new node was added (because different name) and then rebuild whole graph.
+  attributeData.name = newName;
+
+  console.log('update attribute name from ' + oldName + ' to ' + newName);
+
+  attributeData.absolutePath = replacePropertyNameUtils(
+      attributeData.absolutePath,
+      oldName,
+      newName,
+      schemaData.data.value,
+      schemaSchema.schemaWrapper.value,
+      updateData
   );
   // TODO: when renaming happens, also force update in the GUI
 }
@@ -304,6 +322,7 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
           @select_element="selectElement"
           @zoom_into_element="updateCurrentPath"
           @update_object_name="updateObjectName"
+          @update_attribute_name="updateAttributeName"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />
