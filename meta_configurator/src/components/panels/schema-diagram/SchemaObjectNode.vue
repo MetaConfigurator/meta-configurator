@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-  SchemaElementData, SchemaObjectAttributeData,
+  SchemaElementData,
+  SchemaObjectAttributeData,
   SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaObjectAttribute from '@/components/panels/schema-diagram/SchemaObjectAttribute.vue';
@@ -21,7 +22,12 @@ const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
   (e: 'zoom_into_element', path: Path): void;
   (e: 'update_object_name', objectData: SchemaElementData, oldName: string, newName: string): void;
-  (e: 'update_attribute_name', attributeData: SchemaObjectAttributeData, oldName: string, newName: string): void;
+  (
+    e: 'update_attribute_name',
+    attributeData: SchemaObjectAttributeData,
+    oldName: string,
+    newName: string
+  ): void;
 }>();
 
 const objectName = ref(props.data.name);
@@ -48,7 +54,11 @@ function updateObjectName() {
   }
   emit('update_object_name', props.data, props.data.name, newName);
 }
-function updateAttributeName(attributeData: SchemaObjectAttributeData, oldName: string, newName: string) {
+function updateAttributeName(
+  attributeData: SchemaObjectAttributeData,
+  oldName: string,
+  newName: string
+) {
   emit('update_attribute_name', attributeData, oldName, newName);
 }
 
@@ -83,7 +93,7 @@ function isHighlighted() {
       :data="attribute!"
       :selected-data="props.selectedData"
       @select_element="clickedAttribute"
-    @update_attribute_name="updateAttributeName"></SchemaObjectAttribute>
+      @update_attribute_name="updateAttributeName"></SchemaObjectAttribute>
     <Handle
       id="main"
       type="source"
