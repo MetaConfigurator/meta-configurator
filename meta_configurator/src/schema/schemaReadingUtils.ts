@@ -1,5 +1,6 @@
 import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
+import type {Path} from "@/utility/path";
 
 /**
  * Returns a string representation of the type of the property.
@@ -36,4 +37,23 @@ export function isSchemaEmpty(schema: JsonSchemaType): boolean {
     return false;
   }
   return Object.keys(schema).length === 0;
+}
+
+export function collectObjectDefinitionPaths(schema: JsonSchemaType): Path[] {
+    if (schema == true || schema == false) {
+        return [];
+    }
+
+    const result: Path[] = [];
+    if (schema.definitions) {
+        for (const [key, value] of Object.entries(schema.definitions)) {
+            result.push(['definitions', key]);
+        }
+    }
+    if (schema.$defs) {
+        for (const [key, value] of Object.entries(schema.$defs)) {
+            result.push(['$defs', key])
+        }
+    }
+    return result;
 }
