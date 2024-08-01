@@ -21,7 +21,7 @@ import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diag
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
-import {replacePropertyNameUtils} from '@/components/panels/shared-components/sharedComponentUtils';
+import {replacePropertyNameUtils} from "@/components/panels/shared-components/renameUtils";
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -275,6 +275,7 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
       schemaSchema.schemaWrapper.value,
       updateData
   );
+
   // TODO: when renaming happens, also force update in the GUI
 }
 
@@ -293,6 +294,7 @@ function updateAttributeName(attributeData: SchemaObjectAttributeData, oldName: 
       schemaSchema.schemaWrapper.value,
       updateData
   );
+
   // TODO: when renaming happens, also force update in the GUI
 }
 </script>
