@@ -305,8 +305,6 @@ function updateAttributeName(
 
   // TODO: when renaming happens, also force update in the GUI
 }
-
-
 </script>
 
 <template>
