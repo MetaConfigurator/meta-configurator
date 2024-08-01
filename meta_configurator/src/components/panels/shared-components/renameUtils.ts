@@ -3,7 +3,6 @@ import {dataAt} from '@/utility/resolveDataAtPath';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 
-
 // TODO: add setting to synchronize schema changes in GUI with data: if property renamed/deleted, do same with data
 export function replacePropertyNameUtils2(
   subPath: Path,
@@ -43,15 +42,13 @@ export function replacePropertyNameUtils2(
 }
 
 export function replacePropertyNameUtils(
-    subPath: Path,
-    oldName: string,
-    newName: string,
-    currentData: any,
-    currentSchema: JsonSchemaWrapper,
-    updateDataFct: (subPath: Path, newValue: any) => void
+  subPath: Path,
+  oldName: string,
+  newName: string,
+  currentData: any,
+  currentSchema: JsonSchemaWrapper,
+  updateDataFct: (subPath: Path, newValue: any) => void
 ) {
-
-
   const parentPath = subPath.slice(0, -1);
   let dataAtParentPath = dataAt(parentPath, currentData) ?? {};
   // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
@@ -60,25 +57,23 @@ export function replacePropertyNameUtils(
 
   updateDataFct(parentPath, dataAtParentPath);
   updateReferences(
-      parentPath.concat([oldName]),
-      parentPath.concat([newName]),
-      currentData,
-      updateDataFct
+    parentPath.concat([oldName]),
+    parentPath.concat([newName]),
+    currentData,
+    updateDataFct
   );
 
   return parentPath.concat([newName]);
 }
 
 function updateKeyName(object: any, oldKey: string, newKey: string): any {
-  let modifiedObj: any = {}
+  let modifiedObj: any = {};
 
   for (let [k, v] of Object.entries(object))
-    if (k === oldKey)
-      modifiedObj[newKey] = v
-    else
-      modifiedObj[k] = v
+    if (k === oldKey) modifiedObj[newKey] = v;
+    else modifiedObj[k] = v;
 
-  return modifiedObj
+  return modifiedObj;
 }
 
 function updateReferences(

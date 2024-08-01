@@ -9,7 +9,11 @@ import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGra
 import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
-import {type Edge, type Node, SchemaObjectAttributeData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {
+  type Edge,
+  type Node,
+  SchemaObjectAttributeData,
+} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
@@ -21,7 +25,7 @@ import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diag
 import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
-import {replacePropertyNameUtils} from "@/components/panels/shared-components/renameUtils";
+import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -268,18 +272,22 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
   console.log('update object name from ' + oldName + ' to ' + newName);
 
   objectData.absolutePath = replacePropertyNameUtils(
-      objectData.absolutePath,
-      oldName,
-      newName,
-      schemaData.data.value,
-      schemaSchema.schemaWrapper.value,
-      updateData
+    objectData.absolutePath,
+    oldName,
+    newName,
+    schemaData.data.value,
+    schemaSchema.schemaWrapper.value,
+    updateData
   );
 
   // TODO: when renaming happens, also force update in the GUI
 }
 
-function updateAttributeName(attributeData: SchemaObjectAttributeData, oldName: string, newName: string) {
+function updateAttributeName(
+  attributeData: SchemaObjectAttributeData,
+  oldName: string,
+  newName: string
+) {
   // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
   // that a new node was added (because different name) and then rebuild whole graph.
   attributeData.name = newName;
@@ -287,12 +295,12 @@ function updateAttributeName(attributeData: SchemaObjectAttributeData, oldName: 
   console.log('update attribute name from ' + oldName + ' to ' + newName);
 
   attributeData.absolutePath = replacePropertyNameUtils(
-      attributeData.absolutePath,
-      oldName,
-      newName,
-      schemaData.data.value,
-      schemaSchema.schemaWrapper.value,
-      updateData
+    attributeData.absolutePath,
+    oldName,
+    newName,
+    schemaData.data.value,
+    schemaSchema.schemaWrapper.value,
+    updateData
   );
 
   // TODO: when renaming happens, also force update in the GUI
