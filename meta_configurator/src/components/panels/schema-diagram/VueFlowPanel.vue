@@ -306,27 +306,7 @@ function updateAttributeName(
   // TODO: when renaming happens, also force update in the GUI
 }
 
-function updateAttributeName(
-  attributeData: SchemaObjectAttributeData,
-  oldName: string,
-  newName: string
-) {
-  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
-  // that a new node was added (because different name) and then rebuild whole graph.
-  attributeData.name = newName;
 
-  console.log('update attribute name from ' + oldName + ' to ' + newName);
-
-  attributeData.absolutePath = replacePropertyNameUtils(
-    attributeData.absolutePath,
-    oldName,
-    newName,
-    schemaData.data.value,
-    schemaSchema.schemaWrapper.value,
-    updateData
-  );
-  // TODO: when renaming happens, also force update in the GUI
-}
 </script>
 
 <template>

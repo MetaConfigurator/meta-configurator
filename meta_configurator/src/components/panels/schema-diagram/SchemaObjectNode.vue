@@ -81,6 +81,7 @@ function isHighlighted() {
     <InputText
       v-if="isNameEditable"
       type="text"
+      class="vue-flow-object-name-inputtext"
       v-model="objectName"
       @blur="updateObjectName"
       @keydown.stop
@@ -125,5 +126,11 @@ function isHighlighted() {
   height: unset;
   width: unset;
   background: transparent;
+}
+
+.vue-flow-object-name-inputtext {
+  height: 26px;
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>

@@ -68,6 +68,7 @@ function getHandleTop() {
     <InputText
       v-if="isNameEditable"
       type="text"
+      class="vue-flow-attribute-name-inputtext"
       v-model="attrName"
       @blur="updateAttributeName"
       @keydown.stop
@@ -99,5 +100,12 @@ function getHandleTop() {
   width: unset;
   background: transparent;
   font-size: 12px;
+}
+
+
+
+.vue-flow-attribute-name-inputtext {
+  height: 18px;
+  font-size: 10px;
 }
 </style>
