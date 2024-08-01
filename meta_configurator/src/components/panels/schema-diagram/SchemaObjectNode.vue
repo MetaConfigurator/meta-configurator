@@ -91,6 +91,7 @@ function isHighlighted() {
       v-if="useSettings().schemaDiagram.showAttributes"
       v-for="attribute in props.data!.attributes"
       :data="attribute!"
+      :key="attribute!.name + attribute.index + attribute.typeDescription"
       :selected-data="props.selectedData"
       @select_element="clickedAttribute"
       @update_attribute_name="updateAttributeName"></SchemaObjectAttribute>
