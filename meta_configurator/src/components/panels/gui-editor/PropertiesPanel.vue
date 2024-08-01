@@ -36,7 +36,7 @@ import {
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
-import {replacePropertyNameUtils} from '@/components/panels/shared-components/sharedComponentUtils';
+import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
