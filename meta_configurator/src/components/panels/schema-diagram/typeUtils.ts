@@ -1,15 +1,14 @@
-import {computed, type ComputedRef} from "vue";
 import type {JsonSchemaObjectType, SchemaPropertyTypes} from "@/schema/jsonSchemaType";
-import {collectObjectDefinitionPaths} from "@/schema/schemaReadingUtils";
-import {getSchemaForMode} from "@/data/useDataLink";
-import {SessionMode} from "@/store/sessionMode";
 import {pathToJsonPointer} from "@/utility/pathUtils";
+import type {SchemaObjectNodeData} from "@/components/panels/schema-diagram/schemaDiagramTypes";
+import type {Path} from "@/utility/path";
 
 
 
 export type AttributeTypeChoice = {label: string, schema: JsonSchemaObjectType};
 
-export const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
+
+export function collectTypeChoices(objectsNodesData: SchemaObjectNodeData[]): AttributeTypeChoice[] {
   const simpleTypes: SchemaPropertyTypes = [
     'string',
     'number',
@@ -45,7 +44,8 @@ export const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
 
   });
 
-  const objectDefs = collectObjectDefinitionPaths(getSchemaForMode(SessionMode.DataEditor).schemaRaw.value)
+  //const objectDefs = collectObjectDefinitionPaths(getSchemaForMode(SessionMode.DataEditor).schemaRaw.value)
+    const objectDefs = collectObjectDefinitionPathsFromNodes(objectsNodesData);
 
   objectDefs.forEach((def) => {
     const objectName: string = (def[def.length - 1]).toString();
@@ -72,12 +72,16 @@ export const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
 
 
   return result;
-});
+}
+
+function collectObjectDefinitionPathsFromNodes(objectsNodesData: SchemaObjectNodeData[]): Path[] {
+    const result: Path[] = [];
+
+    return result;
+}
 
 
-export function determineTypeChoiceBySchema(schema: JsonSchemaObjectType): AttributeTypeChoice|undefined {
-    const choices = typeChoices.value;
-
+export function determineTypeChoiceBySchema(choices: AttributeTypeChoice[], schema: JsonSchemaObjectType): AttributeTypeChoice|undefined {
     for (const choice of choices) {
         if (isSchemaMatchingTypeChoice(schema, choice.schema)) {
             return choice;

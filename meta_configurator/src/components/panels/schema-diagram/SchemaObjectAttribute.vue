@@ -12,12 +12,12 @@ import Dropdown from "primevue/dropdown";
 import {
   type AttributeTypeChoice,
   determineTypeChoiceBySchema,
-  typeChoices
 } from "@/components/panels/schema-diagram/typeUtils";
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;
   selectedData?: SchemaElementData;
+  typeChoices: AttributeTypeChoice[];
 }>();
 
 const emit = defineEmits<{
@@ -36,7 +36,7 @@ const emit = defineEmits<{
 }>();
 
 const attrName = ref(props.data.name);
-const selectedType: Ref<AttributeTypeChoice|undefined> = ref(determineTypeChoiceBySchema(props.data.schema));
+const selectedType: Ref<AttributeTypeChoice|undefined> = ref(determineTypeChoiceBySchema(props.typeChoices, props.data.schema));
 
 
 watch(selectedType, () => {
@@ -83,11 +83,11 @@ function getHandleTop() {
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted}"
     @click="clickedAttribute"
     v-on:click.stop>
-    <span v-if="!isNameEditable" :class="{'line-through': props.data.deprecated}">{{
+    <span v-if="!isHighlighted()" :class="{'line-through': props.data.deprecated}">{{
       props.data.name
     }}</span>
     <InputText
-      v-if="isNameEditable"
+      v-if="isHighlighted()"
       type="text"
       class="vue-flow-attribute-input-dimensions"
       v-model="attrName"
@@ -96,9 +96,9 @@ function getHandleTop() {
       @keyup.enter="updateAttributeName" />
     <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
-    <span v-if="!isNameEditable" class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
+    <span v-if="!isHighlighted()" class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
     <Dropdown
-        v-if="isNameEditable"
+        v-if="isHighlighted()"
         class=""
         v-model="selectedType"
         :options="typeChoices"

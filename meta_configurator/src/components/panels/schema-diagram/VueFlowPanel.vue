@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {Ref} from 'vue';
+import type {ComputedRef, Ref} from 'vue';
 import {computed, nextTick, onMounted, ref, watch} from 'vue';
 
 import {useVueFlow, VueFlow} from '@vue-flow/core';
@@ -12,7 +12,7 @@ import {useLayout} from './useLayout';
 import {
   type Edge,
   type Node,
-  SchemaObjectAttributeData,
+  SchemaObjectAttributeData, SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
@@ -26,7 +26,7 @@ import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/u
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
-import {applyNewType, type AttributeTypeChoice} from "@/components/panels/schema-diagram/typeUtils";
+import {applyNewType, type AttributeTypeChoice, collectTypeChoices} from "@/components/panels/schema-diagram/typeUtils";
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -55,6 +55,10 @@ const selectedNode: Ref<Node | undefined> = ref(undefined);
 const selectedData: Ref<SchemaElementData | undefined> = ref(undefined);
 
 const currentRootNodePath: Ref<Path> = ref([]);
+
+const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
+  return collectTypeChoices(activeNodes.value.filter(node => node.data.getNodeType() === 'schemaobject').map(node => node.data as SchemaObjectNodeData));
+});
 
 watch(getSchemaForMode(SessionMode.DataEditor).schemaPreprocessed, () => {
   updateGraph();
@@ -280,7 +284,8 @@ function updateAttributeType(attributeData: SchemaObjectAttributeData, newType: 
           @update_attribute_type="updateAttributeType"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
-          :selected-data="selectedData" />
+          :selected-data="selectedData"
+        :type-choices="typeChoices"/>
       </template>
       <template #node-schemaenum="props">
         <SchemaEnumNode

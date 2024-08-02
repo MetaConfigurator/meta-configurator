@@ -17,6 +17,7 @@ const props = defineProps<{
   targetPosition?: Position;
   sourcePosition?: Position;
   selectedData?: SchemaElementData;
+  typeChoices: AttributeTypeChoice[];
 }>();
 
 const emit = defineEmits<{
@@ -84,12 +85,12 @@ function isHighlighted() {
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
-    <b v-if="!isNameEditable">
+    <b v-if="!isHighlighted()">
       {{ props.data.name }}
     </b>
 
     <InputText
-      v-if="isNameEditable"
+      v-if="isHighlighted()"
       type="text"
       class="vue-flow-object-name-inputtext"
       v-model="objectName"
@@ -104,6 +105,7 @@ function isHighlighted() {
       :data="attribute!"
       :key="attribute!.name + attribute.index + attribute.typeDescription"
       :selected-data="props.selectedData"
+      :type-choices="props.typeChoices"
       @select_element="clickedAttribute"
       @update_attribute_name="updateAttributeName"
     @update_attribute_type="updateAttributeType"></SchemaObjectAttribute>
