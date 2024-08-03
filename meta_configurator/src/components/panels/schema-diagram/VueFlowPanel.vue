@@ -28,6 +28,7 @@ import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptio
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 import {applyNewType, type AttributeTypeChoice, collectTypeChoices} from "@/components/panels/schema-diagram/typeUtils";
 import Button from "primevue/button";
+import {pathToJsonPointer} from "@/utility/pathUtils";
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -58,6 +59,7 @@ const selectedData: Ref<SchemaElementData | undefined> = ref(undefined);
 const currentRootNodePath: Ref<Path> = ref([]);
 
 const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
+  // TODO: the graph should also show enums without connection to root, so that they can be created and afterwards connected
   return collectTypeChoices(activeNodes.value.filter(node => node.data.getNodeType() === 'schemaobject' || node.data.getNodeType() === 'schemaenum').map(node => node.data as (SchemaObjectNodeData | SchemaEnumNodeData)));
 });
 
@@ -275,6 +277,13 @@ function findAvailableId(prefix: string): Path{
 }
 
 function addObject() {
+  const rawData = schemaData.data.value;
+
+  // set type of root element to object if not done yet
+  if (rawData.type !== 'object') {
+    rawData.type = 'object';
+  }
+
   const objectPath = findAvailableId("object")
   schemaData.setDataAt(objectPath, {
     type: 'object',
@@ -284,6 +293,15 @@ function addObject() {
       }
     }
   })
+
+  // make connection from root element to new node
+  const objectName = objectPath[objectPath.length-1]
+  if (rawData.properties === undefined || objectName !in rawData.properties) {
+    const referenceToNewObject = '#' + pathToJsonPointer(objectPath)
+    schemaData.setDataAt(['properties', objectName], {
+      $ref: referenceToNewObject
+    })
+  }
 }
 
 function addEnum() {
