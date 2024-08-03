@@ -75,9 +75,11 @@ export function collectTypeChoices(objectsNodesData: SchemaObjectNodeData[]): At
 }
 
 function collectObjectDefinitionPathsFromNodes(objectsNodesData: SchemaObjectNodeData[]): Path[] {
-    const result: Path[] = [];
+    let result =  objectsNodesData.map( (data) => data.absolutePath);
 
-    return result;
+    result = result.filter( (path) => path.length > 0)
+
+    return result
 }
 
 
