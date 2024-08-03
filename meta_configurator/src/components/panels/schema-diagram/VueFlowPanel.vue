@@ -260,15 +260,41 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   schemaData.setDataAt(enumData.absolutePath, enumSchema);
 }
 
+function findAvailableId(prefix: string): Path{
+  let num: number = 1;
+  let success = false;
+  while (num <= 10000) {
+   const id = prefix + num;
+   const path = ['$defs', id]
+   success = schemaData.dataAt(path) === undefined;
+   if (success) {
+     return path;
+   }
+  }
+  throw Error("Could not find available id, tried until " + prefix + num + ".")
+}
+
 function addObject() {
-  const objectId = "todo";
-  schemaData.setDataAt(["$defs", objectId], {
+  const objectPath = findAvailableId("object")
+  schemaData.setDataAt(objectPath, {
     type: 'object',
     properties: {
       propertyA: {
         type: 'string'
       }
     }
+  })
+}
+
+function addEnum() {
+  const enumPath = findAvailableId("enum")
+  schemaData.setDataAt(enumPath, {
+    type: 'string',
+    enum: [
+        'APPLE',
+        'BANANA',
+        'ORANGE'
+    ]
   })
 }
 
@@ -294,6 +320,7 @@ function addObject() {
           @update:path="updateCurrentPath"></CurrentPathBreadcrump>
 
         <Button label="Add Object" @click="addObject" class="main-options-element" />
+        <Button label="Add Enum" @click="addEnum" class="main-options-element" />
       </div>
 
       <template #node-schemaobject="props">
