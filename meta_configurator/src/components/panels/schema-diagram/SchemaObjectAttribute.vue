@@ -46,9 +46,9 @@ watch(selectedType, () => {
 });
 
 
-const isNameEditable = computed(() => {
-  return useSettings().schemaDiagram.editMode;
-});
+function isNameEditable() {
+ return isHighlighted();
+}
 
 function clickedAttribute() {
   emit('select_element', props.data.absolutePath);
@@ -87,7 +87,7 @@ function getHandleTop() {
       props.data.name
     }}</span>
     <InputText
-      v-if="isHighlighted()"
+      v-if="isNameEditable()"
       type="text"
       class="vue-flow-attribute-input-dimensions"
       v-model="attrName"
@@ -96,7 +96,7 @@ function getHandleTop() {
       @keyup.enter="updateAttributeName" />
     <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
-    <span v-if="!isHighlighted()" class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
+    <span v-if="!isNameEditable()" class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
     <Dropdown
         v-if="isHighlighted()"
         class=""

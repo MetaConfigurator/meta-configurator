@@ -38,9 +38,10 @@ const emit = defineEmits<{
 }>();
 
 const objectName = ref(props.data.name);
-const isNameEditable = computed(() => {
-  return useSettings().schemaDiagram.editMode && props.data.hasUserDefinedName;
-});
+
+function isNameEditable() {
+  return isHighlighted() && props.data.hasUserDefinedName;
+}
 
 function clickedNode() {
   emit('select_element', props.data.absolutePath);
@@ -85,12 +86,12 @@ function isHighlighted() {
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
-    <b v-if="!isHighlighted()">
+    <b v-if="!isNameEditable()">
       {{ props.data.name }}
     </b>
 
     <InputText
-      v-if="isHighlighted()"
+      v-if="isNameEditable()"
       type="text"
       class="vue-flow-object-name-inputtext"
       v-model="objectName"
