@@ -27,6 +27,7 @@ import CurrentPathBreadcrump from '@/components/panels/shared-components/Current
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 import {applyNewType, type AttributeTypeChoice, collectTypeChoices} from "@/components/panels/schema-diagram/typeUtils";
+import Button from "primevue/button";
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -57,7 +58,7 @@ const selectedData: Ref<SchemaElementData | undefined> = ref(undefined);
 const currentRootNodePath: Ref<Path> = ref([]);
 
 const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
-  return collectTypeChoices(activeNodes.value.filter(node => node.data.getNodeType() === 'schemaobject').map(node => node.data as SchemaObjectNodeData));
+  return collectTypeChoices(activeNodes.value.filter(node => node.data.getNodeType() === 'schemaobject' || node.data.getNodeType() === 'schemaenum').map(node => node.data as (SchemaObjectNodeData | SchemaEnumNodeData)));
 });
 
 watch(getSchemaForMode(SessionMode.DataEditor).schemaPreprocessed, () => {
@@ -259,6 +260,18 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   schemaData.setDataAt(enumData.absolutePath, enumSchema);
 }
 
+function addObject() {
+  const objectId = "todo";
+  schemaData.setDataAt(["$defs", objectId], {
+    type: 'object',
+    properties: {
+      propertyA: {
+        type: 'string'
+      }
+    }
+  })
+}
+
 
 </script>
 
@@ -279,6 +292,8 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
           :path="schemaSession.currentPath.value"
           root-name="document root"
           @update:path="updateCurrentPath"></CurrentPathBreadcrump>
+
+        <Button label="Add Object" @click="addObject" class="main-options-element" />
       </div>
 
       <template #node-schemaobject="props">
@@ -332,5 +347,11 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
 }
 .controls .label input {
   cursor: pointer;
+}
+.main-options-element {
+  font-size: 11px;
+  position: relative;
+  border: 4px;
+  padding: 6px;
 }
 </style>

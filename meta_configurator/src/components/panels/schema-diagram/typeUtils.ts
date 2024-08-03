@@ -1,6 +1,6 @@
 import type {JsonSchemaObjectType, SchemaPropertyTypes} from "@/schema/jsonSchemaType";
 import {pathToJsonPointer} from "@/utility/pathUtils";
-import type {SchemaObjectNodeData} from "@/components/panels/schema-diagram/schemaDiagramTypes";
+import {SchemaNodeData, type SchemaObjectNodeData} from "@/components/panels/schema-diagram/schemaDiagramTypes";
 import type {Path} from "@/utility/path";
 
 
@@ -8,7 +8,7 @@ import type {Path} from "@/utility/path";
 export type AttributeTypeChoice = {label: string, schema: JsonSchemaObjectType};
 
 
-export function collectTypeChoices(objectsNodesData: SchemaObjectNodeData[]): AttributeTypeChoice[] {
+export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeChoice[] {
   const simpleTypes: SchemaPropertyTypes = [
     'string',
     'number',
@@ -44,8 +44,7 @@ export function collectTypeChoices(objectsNodesData: SchemaObjectNodeData[]): At
 
   });
 
-  //const objectDefs = collectObjectDefinitionPaths(getSchemaForMode(SessionMode.DataEditor).schemaRaw.value)
-    const objectDefs = collectObjectDefinitionPathsFromNodes(objectsNodesData);
+    const objectDefs = collectObjectAndEnumDefinitionPathsFromNodes(nodesData);
 
   objectDefs.forEach((def) => {
     const objectName: string = (def[def.length - 1]).toString();
@@ -74,8 +73,8 @@ export function collectTypeChoices(objectsNodesData: SchemaObjectNodeData[]): At
   return result;
 }
 
-function collectObjectDefinitionPathsFromNodes(objectsNodesData: SchemaObjectNodeData[]): Path[] {
-    let result =  objectsNodesData.map( (data) => data.absolutePath);
+function collectObjectAndEnumDefinitionPathsFromNodes(nodesData: SchemaNodeData[]): Path[] {
+    let result =  nodesData.map( (data) => data.absolutePath);
 
     result = result.filter( (path) => path.length > 0)
 
