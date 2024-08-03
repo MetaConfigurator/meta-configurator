@@ -11,7 +11,7 @@ import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
 import {
   type Edge,
-  type Node, SchemaEnumNodeData,
+  type Node, SchemaEnumNodeData, SchemaNodeData,
   SchemaObjectAttributeData, SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
@@ -206,7 +206,7 @@ function updateData(absolutePath: Path, newValue: any) {
   emit('update_data', absolutePath, newValue);
 }
 
-function updateObjectName(objectData: SchemaElementData, oldName: string, newName: string) {
+function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, newName: string) {
   // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
   // that a new node was added (because different name) and then rebuild whole graph.
   objectData.name = newName;
@@ -224,7 +224,7 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
 }
 
 function updateAttributeName(
-  attributeData: SchemaObjectAttributeData,
+  attributeData: SchemaNodeData,
   oldName: string,
   newName: string
 ) {
@@ -251,6 +251,7 @@ function updateAttributeType(attributeData: SchemaObjectAttributeData, newType: 
   applyNewType(attributeSchema, newType.schema);
   schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
 }
+
 
 function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   const enumSchema = structuredClone(schemaData.dataAt(enumData.absolutePath));
@@ -285,7 +286,7 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
           :data="props.data"
           @select_element="selectElement"
           @zoom_into_element="updateCurrentPath"
-          @update_object_name="updateObjectName"
+          @update_object_name="updateObjectOrEnumName"
           @update_attribute_name="updateAttributeName"
           @update_attribute_type="updateAttributeType"
           :source-position="props.sourcePosition"
@@ -297,6 +298,7 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
         <SchemaEnumNode
           :data="props.data"
           @select_element="selectElement"
+          @update_enum_name="updateObjectOrEnumName"
           @update_enum_values="updateEnumValues"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"

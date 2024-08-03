@@ -9,7 +9,7 @@ import type {Path} from '@/utility/path';
 import InputText from 'primevue/inputtext';
 import {Position, Handle} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
-import {computed, ref} from 'vue';
+import { ref} from 'vue';
 import type {AttributeTypeChoice} from "@/components/panels/schema-diagram/typeUtils";
 
 const props = defineProps<{
