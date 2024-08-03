@@ -6,6 +6,9 @@ import {
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
+import {type Ref, ref} from "vue";
+import InputText from "primevue/inputtext";
+
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -14,17 +17,32 @@ const props = defineProps<{
   selectedData?: SchemaElementData;
 }>();
 
+// todo: create copy of array
+const enumValues: Ref<string[]> = ref(props.data.values)
+
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
+  (e: 'update_enum_values', data: SchemaEnumNodeData, newValues: string[]): void;
 }>();
 
 function clickedNode() {
   emit('select_element', props.data.absolutePath);
 }
 
+
+function isNameEditable() {
+  return isHighlighted();
+}
+
 function isHighlighted() {
   return props.selectedData && props.selectedData == props.data;
 }
+
+
+function updateEnumValues() {
+  emit('update_enum_values', props.data, enumValues.value);
+}
+
 </script>
 
 <template>
@@ -33,12 +51,26 @@ function isHighlighted() {
     @click="clickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
     <p>&lt;enumeration&gt;</p>
-    <!--small><i>{{ props.data.absolutePath }}</i></small-->
     <b>{{ props.data.name }}</b>
     <hr />
-    <p v-if="useSettings().schemaDiagram.showEnumValues" v-for="value in props.data!.values">
+    <p v-if="useSettings().schemaDiagram.showEnumValues && !isNameEditable()" v-for="value in props.data!.values">
       {{ value }}
     </p>
+    <!--TODO: for loop only until given index based on maxItemsToShow. Instead of trimming beforehand, dynamically show only what is needed. This way, on edit mode all can be shown. and also on clicking the dots it can be expanded-->
+
+    <InputText v-if="useSettings().schemaDiagram.showEnumValues && isNameEditable()" v-for="(value, index) in props.data!.values"
+
+               type="text"
+               class="vue-flow-object-name-inputtext"
+               v-model="enumValues[index]"
+               @blur="updateEnumValues"
+               @keydown.stop
+               @keyup.enter="updateEnumValues"
+
+    >
+      {{ value }}
+    </InputText>
+
     <Handle type="target" :position="props.sourcePosition!" class="vue-flow__handle"></Handle>
   </div>
 </template>

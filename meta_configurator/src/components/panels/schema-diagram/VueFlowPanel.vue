@@ -11,7 +11,7 @@ import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
 import {
   type Edge,
-  type Node,
+  type Node, SchemaEnumNodeData,
   SchemaObjectAttributeData, SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
@@ -252,6 +252,12 @@ function updateAttributeType(attributeData: SchemaObjectAttributeData, newType: 
   schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
 }
 
+function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
+  const enumSchema = structuredClone(schemaData.dataAt(enumData.absolutePath));
+  enumSchema.enum = newValues;
+  schemaData.setDataAt(enumData.absolutePath, enumSchema);
+}
+
 
 </script>
 
@@ -291,6 +297,7 @@ function updateAttributeType(attributeData: SchemaObjectAttributeData, newType: 
         <SchemaEnumNode
           :data="props.data"
           @select_element="selectElement"
+          @update_enum_values="updateEnumValues"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />
