@@ -21,14 +21,6 @@ function rebuildGraph() {
     <AccordionTab header="Schema Diagram Options">
       <div>
         <label
-          >Edit Mode
-          <InputSwitch
-            v-model="useSettings().schemaDiagram.editMode"
-            class="options-input-switch" />
-        </label>
-      </div>
-      <div>
-        <label
           >Graph direction vertical
           <InputSwitch
             v-model="useSettings().schemaDiagram.vertical"
