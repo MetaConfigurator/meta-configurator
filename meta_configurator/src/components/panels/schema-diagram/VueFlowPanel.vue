@@ -265,12 +265,14 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
 function findAvailableId(prefix: string): Path{
   let num: number = 1;
   let success = false;
-  while (num <= 10000) {
+  while (num <= 100) {
    const id = prefix + num;
    const path = ['$defs', id]
    success = schemaData.dataAt(path) === undefined;
    if (success) {
      return path;
+   } else {
+     num++;
    }
   }
   throw Error("Could not find available id, tried until " + prefix + num + ".")
