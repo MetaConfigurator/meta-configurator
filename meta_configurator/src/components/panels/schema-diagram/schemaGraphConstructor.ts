@@ -604,7 +604,7 @@ export function trimGraph(graph: SchemaGraph) {
   //});
 
   graph.nodes = graph.nodes.filter(node => {
-    return isNodeConnectedByEdge(node, graph) || node.schema.type == 'object';
+    return isNodeConnectedByEdge(node, graph) || node.schema.type == 'object' || node.schema.enum;
   });
 }
 
@@ -630,11 +630,11 @@ export function trimNodeChildren(graph: SchemaGraph) {
         );
       }
     } else if (nodeData.getNodeType() == 'schemaenum') {
-      const nodeDataEnum = nodeData as SchemaEnumNodeData;
+      /* const nodeDataEnum = nodeData as SchemaEnumNodeData;
       if (nodeDataEnum.values.length > maxEnumValuesToShow) {
         nodeDataEnum.values = nodeDataEnum.values.slice(0, maxEnumValuesToShow - 1);
         nodeDataEnum.values.push('...');
-      }
+      }*/
     }
   }
 }

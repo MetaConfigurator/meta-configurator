@@ -1,5 +1,4 @@
 import type {Editor} from 'brace';
-import {useSessionStore} from '@/store/sessionStore';
 import {useDataConverter} from '@/dataformats/formatRegistry';
 import type {Path} from '@/utility/path';
 import {useDebounceFn, watchArray} from '@vueuse/core';
@@ -9,11 +8,15 @@ import {
   updateCursorPositionBasedOnPath,
 } from '@/components/panels/code-editor/aceUtility';
 import type {SessionMode} from '@/store/sessionMode';
-import {getSessionForMode} from '@/data/useDataLink';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
+import {watchImmediate} from '@vueuse/core/index';
 
 // variables to prevent updating functions to trigger each other
 let selectionChangeFromOutside = false;
 let selectionChangeFromInside = false;
+
+let currentChangeFromOutside = false;
+let currentChangeFromInside = false;
 
 export function setupLinkToCurrentSelection(editor: Editor, mode: SessionMode) {
   setupCursorPositionToSelectedPath(editor, mode);
@@ -67,5 +70,48 @@ function setupSelectedPathToCursorPosition(editor: Editor, mode: SessionMode) {
       selectionChangeFromOutside = true;
       updateCursorPositionBasedOnPath(editor, newSelectedElement);
     }
+  );
+}
+
+export function setupLinkToData(editor: Editor, mode: SessionMode) {
+  setupUpdateContentWhenDataChanges(editor, mode);
+  setupPropagationOfEditorContentChanges(editor, mode);
+}
+
+function setupUpdateContentWhenDataChanges(editor: Editor, mode: SessionMode) {
+  watchImmediate(
+    () => getDataForMode(mode).unparsedData.value,
+    (dataString: string) => {
+      if (currentChangeFromInside) {
+        currentChangeFromInside = false; // reset flag
+        return;
+      }
+
+      if (dataString != editor.getValue()) {
+        currentChangeFromOutside = true;
+        selectionChangeFromOutside = true;
+        // TODO: check if every setValue will lead to selection change, or change data without changing selection
+        editor.setValue(dataString, -1);
+      }
+    }
+  );
+}
+
+/**
+ * When the content of the editor is modified by the user, we want to update the file data accordingly
+ * @param editor the ace editor
+ */
+function setupPropagationOfEditorContentChanges(editor: Editor, mode: SessionMode) {
+  editor.on(
+    'change',
+    useDebounceFn(() => {
+      if (currentChangeFromOutside) {
+        currentChangeFromOutside = false; // reset flag
+        return;
+      }
+
+      currentChangeFromInside = true;
+      getDataForMode(mode).unparsedData.value = editor.getValue();
+    }, 100)
   );
 }

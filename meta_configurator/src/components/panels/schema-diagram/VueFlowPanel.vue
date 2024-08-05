@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {Ref} from 'vue';
+import type {ComputedRef, Ref} from 'vue';
 import {computed, nextTick, onMounted, ref, watch} from 'vue';
 
 import {useVueFlow, VueFlow} from '@vue-flow/core';
@@ -12,7 +12,10 @@ import {useLayout} from './useLayout';
 import {
   type Edge,
   type Node,
+  SchemaEnumNodeData,
+  SchemaNodeData,
   SchemaObjectAttributeData,
+  SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
@@ -26,6 +29,13 @@ import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/u
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
+import {
+  applyNewType,
+  type AttributeTypeChoice,
+  collectTypeChoices,
+} from '@/components/panels/schema-diagram/typeUtils';
+import Button from 'primevue/button';
+import {pathToJsonPointer} from '@/utility/pathUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -55,13 +65,19 @@ const selectedData: Ref<SchemaElementData | undefined> = ref(undefined);
 
 const currentRootNodePath: Ref<Path> = ref([]);
 
-watch(getSchemaForMode(SessionMode.DataEditor).schemaPreprocessed, () => {
-  console.log(
-    'received update in schema. Having selected node ' +
-      selectedNode.value?.data.absolutePath +
-      ' and currentSelectedElement' +
-      schemaSession.currentSelectedElement.value
+const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
+  // TODO: the graph should also show enums without connection to root, so that they can be created and afterwards connected
+  return collectTypeChoices(
+    activeNodes.value
+      .filter(
+        node =>
+          node.data.getNodeType() === 'schemaobject' || node.data.getNodeType() === 'schemaenum'
+      )
+      .map(node => node.data as SchemaObjectNodeData | SchemaEnumNodeData)
   );
+});
+
+watch(getSchemaForMode(SessionMode.DataEditor).schemaPreprocessed, () => {
   updateGraph();
 });
 
@@ -73,7 +89,6 @@ onMounted(() => {
   updateGraph();
 
   nextTick(() => {
-    console.log('mounted fitView');
     fitView();
   });
 });
@@ -83,37 +98,16 @@ watch(
   schemaSession.currentSelectedElement,
   () => {
     const absolutePath = schemaSession.currentSelectedElement.value;
-    console.log(
-      'fitViewForElementByPath' +
-        absolutePath +
-        ' because of update of currentSelectedElement with new selected element ',
-      absolutePath
-    );
     fitViewForElementByPath(absolutePath);
   },
   {deep: true}
 );
 
 function fitViewForElementByPath(path: Path) {
-  console.log('fit view for element by path ' + path);
   const bestMatchingNode = findBestMatchingNode(activeNodes.value, path);
-  console.log(
-    'selectedNode.value ' +
-      selectedNode.value?.data.absolutePath +
-      ' with node id ' +
-      selectedNode.value?.id
-  );
-  console.log(
-    'new bestMatchingNode ' +
-      bestMatchingNode?.data.absolutePath +
-      ' with node id ' +
-      bestMatchingNode?.id
-  );
   selectedNode.value = bestMatchingNode;
   selectedData.value = findBestMatchingData(bestMatchingNode, path);
-  console.log('bestMatchingData ' + selectedData.value?.absolutePath);
   if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
-    console.log('found new bestMatchingNode and fitting view on it');
     fitViewForNodes([bestMatchingNode]);
   }
 }
@@ -122,43 +116,22 @@ function fitViewForCurrentlySelectedElement(
   otherwiseAll: boolean = true,
   useCachedNode: boolean = true
 ) {
-  console.log('fit view for currently selected element');
   if (!useCachedNode && selectedNode.value) {
-    console.log(
-      'old selected node ' +
-        selectedNode.value.data.absolutePath +
-        ' with node id ' +
-        selectedNode.value.id
-    );
     selectedNode.value = findBestMatchingNode(
       activeNodes.value,
       selectedNode.value.data.absolutePath
     );
-    console.log(
-      'new selected node ' +
-        selectedNode.value?.data.absolutePath +
-        ' with node id ' +
-        selectedNode.value?.id
-    );
   }
 
   if (selectedNode.value) {
-    console.log(
-      'fit view for selected node ' +
-        selectedNode.value.data.absolutePath +
-        ' because has node selected'
-    );
     fitViewForNodes([selectedNode.value]);
   } else if (otherwiseAll) {
-    console.log('fit view for all nodes');
     fitViewForNodes(activeNodes.value);
   }
 }
 
 function fitViewForNodes(nodes: Node[]) {
-  console.log('fit view for nodes ' + nodes.length + ' nodes in next tick');
   nextTick(() => {
-    console.log('fit view for nodes with nodes ', nodes);
     fitView({
       nodes: nodes.map(node => node.id),
       duration: 1000,
@@ -170,7 +143,6 @@ function fitViewForNodes(nodes: Node[]) {
 }
 
 function updateGraph(forceRebuild: boolean = false) {
-  console.log('update graph');
   const schema = dataSchema.schemaPreprocessed.value;
   const graph = constructSchemaGraph(schema);
   let graphNeedsLayouting = forceRebuild;
@@ -182,7 +154,6 @@ function updateGraph(forceRebuild: boolean = false) {
     activeEdges.value = vueFlowGraph.edges;
     currentRootNodePath.value = [];
     graphNeedsLayouting = true;
-    console.log('node was added');
   } else {
     // only data updated or nodes removed
     const nodesToRemove = updateNodeData(activeNodes.value, vueFlowGraph.nodes);
@@ -194,12 +165,10 @@ function updateGraph(forceRebuild: boolean = false) {
   // if not on root level but current path is set: show only subgraph
   const currentPath: Path = schemaSession.currentPath.value;
   if (currentPath.length > 0) {
-    console.log('update to subgraph because current path is set');
     updateToSubgraph(currentPath);
   }
 
   if (!graphNeedsLayouting) {
-    console.log('graph needs layouting');
     fitViewForCurrentlySelectedElement(true);
   }
 }
@@ -222,27 +191,16 @@ const {layout} = useLayout();
 const {fitView} = useVueFlow();
 
 async function layoutGraph(direction: string, nodesInitialised: boolean) {
-  console.log('layout graph with ' + activeNodes.value.length + ' nodes');
   activeNodes.value = layout(activeNodes.value, activeEdges.value, direction);
   if (nodesInitialised && activeNodes.value.length > 0) {
-    console.log('nodes initialised and active nodes > 0');
-
     if (forceFitView.value) {
-      console.log('forceFitView');
       nextTick(() => {
-        console.log('fitView (that was forced)');
         fitView();
       });
       forceFitView.value = false;
     } else {
-      console.log('no forceFitView');
       nextTick(() => {
         if (selectedNode.value) {
-          console.log(
-            'fitViewForElementByPath' +
-              selectedNode.value.data.absolutePath +
-              ' because of selected node'
-          );
           fitViewForElementByPath(selectedNode.value.data.absolutePath);
         }
       });
@@ -264,12 +222,10 @@ function updateData(absolutePath: Path, newValue: any) {
   emit('update_data', absolutePath, newValue);
 }
 
-function updateObjectName(objectData: SchemaElementData, oldName: string, newName: string) {
+function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, newName: string) {
   // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
   // that a new node was added (because different name) and then rebuild whole graph.
   objectData.name = newName;
-
-  console.log('update object name from ' + oldName + ' to ' + newName);
 
   objectData.absolutePath = replacePropertyNameUtils(
     objectData.absolutePath,
@@ -283,16 +239,10 @@ function updateObjectName(objectData: SchemaElementData, oldName: string, newNam
   // TODO: when renaming happens, also force update in the GUI
 }
 
-function updateAttributeName(
-  attributeData: SchemaObjectAttributeData,
-  oldName: string,
-  newName: string
-) {
+function updateAttributeName(attributeData: SchemaNodeData, oldName: string, newName: string) {
   // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
   // that a new node was added (because different name) and then rebuild whole graph.
   attributeData.name = newName;
-
-  console.log('update attribute name from ' + oldName + ' to ' + newName);
 
   attributeData.absolutePath = replacePropertyNameUtils(
     attributeData.absolutePath,
@@ -306,26 +256,72 @@ function updateAttributeName(
   // TODO: when renaming happens, also force update in the GUI
 }
 
-function updateAttributeName(
+function updateAttributeType(
   attributeData: SchemaObjectAttributeData,
-  oldName: string,
-  newName: string
+  newType: AttributeTypeChoice
 ) {
-  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
-  // that a new node was added (because different name) and then rebuild whole graph.
-  attributeData.name = newName;
+  //attributeData.typeDescription = newType.label;
+  const attributeSchema = structuredClone(schemaData.dataAt(attributeData.absolutePath));
+  applyNewType(attributeSchema, newType.schema);
+  schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
+}
 
-  console.log('update attribute name from ' + oldName + ' to ' + newName);
+function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
+  const enumSchema = structuredClone(schemaData.dataAt(enumData.absolutePath));
+  enumSchema.enum = newValues;
+  schemaData.setDataAt(enumData.absolutePath, enumSchema);
+}
 
-  attributeData.absolutePath = replacePropertyNameUtils(
-    attributeData.absolutePath,
-    oldName,
-    newName,
-    schemaData.data.value,
-    schemaSchema.schemaWrapper.value,
-    updateData
-  );
-  // TODO: when renaming happens, also force update in the GUI
+function findAvailableId(prefix: string): Path {
+  let num: number = 1;
+  let success = false;
+  while (num <= 100) {
+    const id = prefix + num;
+    const path = ['$defs', id];
+    success = schemaData.dataAt(path) === undefined;
+    if (success) {
+      return path;
+    } else {
+      num++;
+    }
+  }
+  throw Error('Could not find available id, tried until ' + prefix + num + '.');
+}
+
+function addObject() {
+  const rawData = schemaData.data.value;
+
+  // set type of root element to object if not done yet
+  if (rawData.type !== 'object') {
+    rawData.type = 'object';
+  }
+
+  const objectPath = findAvailableId('object');
+  schemaData.setDataAt(objectPath, {
+    type: 'object',
+    properties: {
+      propertyA: {
+        type: 'string',
+      },
+    },
+  });
+
+  // make connection from root element to new node
+  const objectName = objectPath[objectPath.length - 1];
+  if (rawData.properties === undefined || objectName! in rawData.properties) {
+    const referenceToNewObject = '#' + pathToJsonPointer(objectPath);
+    schemaData.setDataAt(['properties', objectName], {
+      $ref: referenceToNewObject,
+    });
+  }
+}
+
+function addEnum() {
+  const enumPath = findAvailableId('enum');
+  schemaData.setDataAt(enumPath, {
+    type: 'string',
+    enum: ['APPLE', 'BANANA', 'ORANGE'],
+  });
 }
 </script>
 
@@ -346,6 +342,9 @@ function updateAttributeName(
           :path="schemaSession.currentPath.value"
           root-name="document root"
           @update:path="updateCurrentPath"></CurrentPathBreadcrump>
+
+        <Button label="Add Object" @click="addObject" class="main-options-element" />
+        <Button label="Add Enum" @click="addEnum" class="main-options-element" />
       </div>
 
       <template #node-schemaobject="props">
@@ -353,16 +352,20 @@ function updateAttributeName(
           :data="props.data"
           @select_element="selectElement"
           @zoom_into_element="updateCurrentPath"
-          @update_object_name="updateObjectName"
+          @update_object_name="updateObjectOrEnumName"
           @update_attribute_name="updateAttributeName"
+          @update_attribute_type="updateAttributeType"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
-          :selected-data="selectedData" />
+          :selected-data="selectedData"
+          :type-choices="typeChoices" />
       </template>
       <template #node-schemaenum="props">
         <SchemaEnumNode
           :data="props.data"
           @select_element="selectElement"
+          @update_enum_name="updateObjectOrEnumName"
+          @update_enum_values="updateEnumValues"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />
@@ -395,5 +398,11 @@ function updateAttributeName(
 }
 .controls .label input {
   cursor: pointer;
+}
+.main-options-element {
+  font-size: 11px;
+  position: relative;
+  border: 4px;
+  padding: 6px;
 }
 </style>

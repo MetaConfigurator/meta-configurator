@@ -9,13 +9,15 @@ import type {Path} from '@/utility/path';
 import InputText from 'primevue/inputtext';
 import {Position, Handle} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
-import {computed, ref} from 'vue';
+import {ref} from 'vue';
+import type {AttributeTypeChoice} from '@/components/panels/schema-diagram/typeUtils';
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
   targetPosition?: Position;
   sourcePosition?: Position;
   selectedData?: SchemaElementData;
+  typeChoices: AttributeTypeChoice[];
 }>();
 
 const emit = defineEmits<{
@@ -28,12 +30,18 @@ const emit = defineEmits<{
     oldName: string,
     newName: string
   ): void;
+  (
+    e: 'update_attribute_type',
+    attributeData: SchemaObjectAttributeData,
+    newType: AttributeTypeChoice
+  ): void;
 }>();
 
 const objectName = ref(props.data.name);
-const isNameEditable = computed(() => {
-  return useSettings().schemaDiagram.editMode && props.data.hasUserDefinedName;
-});
+
+function isNameEditable() {
+  return isHighlighted() && props.data.hasUserDefinedName;
+}
 
 function clickedNode() {
   emit('select_element', props.data.absolutePath);
@@ -62,6 +70,13 @@ function updateAttributeName(
   emit('update_attribute_name', attributeData, oldName, newName);
 }
 
+function updateAttributeType(
+  attributeData: SchemaObjectAttributeData,
+  newType: AttributeTypeChoice
+) {
+  emit('update_attribute_type', attributeData, newType);
+}
+
 function isHighlighted() {
   return props.selectedData && props.selectedData == props.data;
 }
@@ -74,13 +89,14 @@ function isHighlighted() {
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
-    <b v-if="!isNameEditable">
+    <b v-if="!isNameEditable()">
       {{ props.data.name }}
     </b>
 
     <InputText
-      v-if="isNameEditable"
+      v-if="isNameEditable()"
       type="text"
+      class="vue-flow-object-name-inputtext"
       v-model="objectName"
       @blur="updateObjectName"
       @keydown.stop
@@ -91,9 +107,12 @@ function isHighlighted() {
       v-if="useSettings().schemaDiagram.showAttributes"
       v-for="attribute in props.data!.attributes"
       :data="attribute!"
+      :key="attribute!.name + attribute.index + attribute.typeDescription"
       :selected-data="props.selectedData"
+      :type-choices="props.typeChoices"
       @select_element="clickedAttribute"
-      @update_attribute_name="updateAttributeName"></SchemaObjectAttribute>
+      @update_attribute_name="updateAttributeName"
+      @update_attribute_type="updateAttributeType"></SchemaObjectAttribute>
     <Handle
       id="main"
       type="source"
@@ -124,5 +143,11 @@ function isHighlighted() {
   height: unset;
   width: unset;
   background: transparent;
+}
+
+.vue-flow-object-name-inputtext {
+  height: 26px;
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>

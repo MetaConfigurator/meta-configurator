@@ -33,7 +33,6 @@ import {
   loadCsvFromUserString,
   requestUploadFileToRef,
 } from '@/components/dialogs/csvimport/importCsvUtils';
-import {table} from 'console';
 
 const emptyPathOption: LabelledPath = {label: 'not set', value: []};
 const emptyValueOption: LabelledValue = {label: 'not set', value: 'not set'};
