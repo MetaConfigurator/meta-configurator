@@ -111,7 +111,8 @@ export function applyNewType(
       currentSchema.items === true ||
       currentSchema.items === false
     ) {
-      currentSchema.items = typeSchema.items;
+      // JSON stringify and parse turns Proxy(Array) into raw Array. otherwise it would write the proxy
+      currentSchema.items = JSON.parse(JSON.stringify(typeSchema.items));
     } else {
       applyNewType(currentSchema.items, typeSchema.items as JsonSchemaObjectType);
     }
