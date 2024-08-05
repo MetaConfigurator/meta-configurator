@@ -5,19 +5,15 @@ import {
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
-import {computed, type ComputedRef, ref} from 'vue';
+import {computed, type Ref, ref, watch} from 'vue';
 import {useSettings} from '@/settings/useSettings';
 import InputText from 'primevue/inputtext';
-import {collectObjectDefinitionPaths} from '@/schema/schemaReadingUtils';
-import {getSchemaForMode} from '@/data/useDataLink';
-import {SessionMode} from '@/store/sessionMode';
-import {pathToJsonPointer} from '@/utility/pathUtils';
-import Dropdown from 'primevue/dropdown';
-import type {JsonSchemaObjectType, SchemaPropertyTypes} from '@/schema/jsonSchemaType';
+import Dropdown from "primevue/dropdown";
 import {
+  type AttributeTypeChoice,
   determineTypeChoiceBySchema,
-  typeChoices,
-} from '@/components/panels/schema-diagram/typeUtils';
+  typeChoices
+} from "@/components/panels/schema-diagram/typeUtils";
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;
@@ -27,15 +23,28 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
   (
-    e: 'update_attribute_name',
-    attributeData: SchemaObjectAttributeData,
-    oldName: string,
-    newName: string
+      e: 'update_attribute_name',
+      attributeData: SchemaObjectAttributeData,
+      oldName: string,
+      newName: string
+  ): void;
+  (
+      e: 'update_attribute_type',
+      attributeData: SchemaObjectAttributeData,
+      newType: AttributeTypeChoice,
   ): void;
 }>();
 
 const attrName = ref(props.data.name);
-const selectedType = ref(determineTypeChoiceBySchema(props.data.schema));
+const selectedType: Ref<AttributeTypeChoice|undefined> = ref(determineTypeChoiceBySchema(props.data.schema));
+
+
+watch(selectedType, () => {
+  if (selectedType.value != undefined) {
+    emit("update_attribute_type", props.data, selectedType.value)
+  }
+});
+
 
 const isNameEditable = computed(() => {
   return useSettings().schemaDiagram.editMode;
@@ -80,22 +89,22 @@ function getHandleTop() {
     <InputText
       v-if="isNameEditable"
       type="text"
-      class="vue-flow-attribute-name-inputtext"
+      class="vue-flow-attribute-input-dimensions"
       v-model="attrName"
       @blur="updateAttributeName"
       @keydown.stop
       @keyup.enter="updateAttributeName" />
     <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
-    <span v-if="!isNameEditable" class="vue-flow__node-schemaattribute-type"
-      >: {{ props.data.typeDescription }}</span
-    >
+    <span v-if="!isNameEditable" class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
     <Dropdown
-      v-model="selectedType"
-      :options="typeChoices"
-      optionLabel="label"
-      @keydown.stop
-      placeholder="Select Type" />
+        v-if="isNameEditable"
+        class=""
+        v-model="selectedType"
+        :options="typeChoices"
+        optionLabel="label"
+        @keydown.stop
+        placeholder="Select Type" />
 
     <Handle
       :id="getHandleId()"
@@ -123,7 +132,9 @@ function getHandleTop() {
   font-size: 12px;
 }
 
-.vue-flow-attribute-name-inputtext {
+
+
+.vue-flow-attribute-input-dimensions {
   height: 18px;
   font-size: 10px;
 }
