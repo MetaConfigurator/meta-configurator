@@ -3,44 +3,6 @@ import {dataAt} from '@/utility/resolveDataAtPath';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 
-// TODO: add setting to synchronize schema changes in GUI with data: if property renamed/deleted, do same with data
-export function replacePropertyNameUtils2(
-  subPath: Path,
-  oldName: string,
-  newName: string,
-  currentData: any,
-  currentSchema: JsonSchemaWrapper,
-  updateDataFct: (subPath: Path, newValue: any) => void
-): Path {
-  if (oldName === newName) {
-    return subPath;
-  }
-  let oldPropertyData = dataAt(subPath, currentData);
-  const parentPath = subPath.slice(0, -1);
-
-  // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
-  let dataAtParentPath = dataAt(parentPath, currentData) ?? {};
-  dataAtParentPath = structuredClone(dataAtParentPath);
-
-  if (oldPropertyData === undefined) {
-    oldPropertyData = initializeNewProperty(parentPath, newName, currentSchema);
-  } else {
-    delete dataAtParentPath[oldName];
-  }
-
-  dataAtParentPath[newName] = oldPropertyData;
-
-  updateDataFct(parentPath, dataAtParentPath);
-  updateReferences(
-    parentPath.concat([oldName]),
-    parentPath.concat([newName]),
-    currentData,
-    updateDataFct
-  );
-
-  return parentPath.concat([newName]);
-}
-
 export function replacePropertyNameUtils(
   subPath: Path,
   oldName: string,
@@ -54,6 +16,10 @@ export function replacePropertyNameUtils(
   // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
   dataAtParentPath = structuredClone(dataAtParentPath);
   dataAtParentPath = updateKeyName(dataAtParentPath, oldName, newName);
+
+  if (dataAt([newName], dataAtParentPath) === undefined) {
+      dataAtParentPath[newName] = initializeNewProperty(parentPath, newName, currentSchema);
+  }
 
   updateDataFct(parentPath, dataAtParentPath);
   updateReferences(
