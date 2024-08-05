@@ -8,6 +8,7 @@ import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
 import {type Ref, ref} from 'vue';
 import InputText from 'primevue/inputtext';
+import {pathToString} from "@/utility/pathUtils";
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -36,7 +37,7 @@ function isEnumEditable() {
 }
 
 function isHighlighted() {
-  return props.selectedData && props.selectedData == props.data;
+  return props.selectedData && pathToString(props.selectedData.absolutePath) === pathToString(props.data.absolutePath);
 }
 
 function updateEnumName() {
