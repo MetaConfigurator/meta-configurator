@@ -18,7 +18,7 @@ export function replacePropertyNameUtils(
   dataAtParentPath = updateKeyName(dataAtParentPath, oldName, newName);
 
   if (dataAt([newName], dataAtParentPath) === undefined) {
-      dataAtParentPath[newName] = initializeNewProperty(parentPath, newName, currentSchema);
+    dataAtParentPath[newName] = initializeNewProperty(parentPath, newName, currentSchema);
   }
 
   updateDataFct(parentPath, dataAtParentPath);

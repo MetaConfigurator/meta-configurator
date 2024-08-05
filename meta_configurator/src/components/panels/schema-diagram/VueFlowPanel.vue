@@ -111,9 +111,7 @@ function fitViewForElementByPath(path: Path) {
   }
 }
 
-function fitViewForCurrentlySelectedElement(
-  otherwiseAll: boolean = true
-) {
+function fitViewForCurrentlySelectedElement(otherwiseAll: boolean = true) {
   if (selectedNode.value) {
     fitViewForNodes([selectedNode.value]);
   } else if (otherwiseAll) {
@@ -159,8 +157,8 @@ function updateGraph(forceRebuild: boolean = false) {
     updateToSubgraph(currentPath);
   }
 
-  if (!graphNeedsLayouting &&  selectedData.value) {
-    fitViewForElementByPath(selectedData.value?.absolutePath)
+  if (!graphNeedsLayouting && selectedData.value) {
+    fitViewForElementByPath(selectedData.value?.absolutePath);
   }
 }
 

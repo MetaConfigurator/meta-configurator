@@ -1,8 +1,6 @@
 import type {JsonSchemaObjectType, SchemaPropertyTypes} from '@/schema/jsonSchemaType';
 import {pathToJsonPointer} from '@/utility/pathUtils';
-import {
-  SchemaNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {SchemaNodeData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 
 export type AttributeTypeChoice = {label: string; schema: JsonSchemaObjectType};
