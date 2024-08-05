@@ -2,7 +2,6 @@ import type {JsonSchemaObjectType, SchemaPropertyTypes} from '@/schema/jsonSchem
 import {pathToJsonPointer} from '@/utility/pathUtils';
 import {
   SchemaNodeData,
-  type SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 

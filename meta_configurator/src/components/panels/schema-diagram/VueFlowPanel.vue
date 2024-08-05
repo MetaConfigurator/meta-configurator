@@ -66,7 +66,6 @@ const selectedData: Ref<SchemaElementData | undefined> = ref(undefined);
 const currentRootNodePath: Ref<Path> = ref([]);
 
 const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
-  // TODO: the graph should also show enums without connection to root, so that they can be created and afterwards connected
   return collectTypeChoices(
     activeNodes.value
       .filter(
@@ -268,7 +267,10 @@ function updateAttributeType(
 
 function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   const enumSchema = structuredClone(schemaData.dataAt(enumData.absolutePath));
-  enumSchema.enum = newValues;
+
+  // this turns Proxy(Array) into raw Array. Otherwise, when again updating the enum values, it will throw an error
+  // when trying to create structured clone, because cannot do for a Proxy
+  enumSchema.enum = JSON.parse(JSON.stringify(newValues));
   schemaData.setDataAt(enumData.absolutePath, enumSchema);
 }
 
@@ -404,5 +406,6 @@ function addEnum() {
   position: relative;
   border: 4px;
   padding: 6px;
+  margin-right: 4px;
 }
 </style>

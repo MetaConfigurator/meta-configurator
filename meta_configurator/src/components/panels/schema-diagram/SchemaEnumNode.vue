@@ -17,7 +17,7 @@ const props = defineProps<{
 }>();
 
 // todo: create copy of array
-const enumValues: Ref<string[]> = ref(props.data.values);
+const enumValues: Ref<string[]> = ref(props.data.values.slice());
 
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
