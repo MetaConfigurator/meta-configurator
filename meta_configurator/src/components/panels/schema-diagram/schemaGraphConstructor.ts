@@ -604,7 +604,7 @@ export function trimGraph(graph: SchemaGraph) {
   //});
 
   graph.nodes = graph.nodes.filter(node => {
-    return isNodeConnectedByEdge(node, graph) || node.schema.type == 'object';
+    return isNodeConnectedByEdge(node, graph) || node.schema.type == 'object' || node.schema.enum;
   });
 }
 
