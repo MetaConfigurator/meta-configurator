@@ -58,24 +58,23 @@ export function collectObjectDefinitionPaths(schema: JsonSchemaType): Path[] {
   return result;
 }
 
-
 export function collectObjectDefinitionPathsRecursively(schema: JsonSchemaType): Path[] {
-    if (schema == true || schema == false) {
-        return [];
-    }
+  if (schema == true || schema == false) {
+    return [];
+  }
 
-    const result: Path[] = [];
-    if (schema.definitions) {
-        for (const [key, value] of Object.entries(schema.definitions)) {
-            result.push(['definitions', key]);
-            result.push(...collectObjectDefinitionPathsRecursively(value));
-        }
+  const result: Path[] = [];
+  if (schema.definitions) {
+    for (const [key, value] of Object.entries(schema.definitions)) {
+      result.push(['definitions', key]);
+      result.push(...collectObjectDefinitionPathsRecursively(value));
     }
-    if (schema.$defs) {
-        for (const [key, value] of Object.entries(schema.$defs)) {
-            result.push(['$defs', key])
-            result.push(...collectObjectDefinitionPathsRecursively(value));
-        }
+  }
+  if (schema.$defs) {
+    for (const [key, value] of Object.entries(schema.$defs)) {
+      result.push(['$defs', key]);
+      result.push(...collectObjectDefinitionPathsRecursively(value));
     }
-    return result;
+  }
+  return result;
 }

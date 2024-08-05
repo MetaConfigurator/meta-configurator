@@ -9,7 +9,7 @@ import {
 } from '@/components/panels/code-editor/aceUtility';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
-import {watchImmediate} from "@vueuse/core/index";
+import {watchImmediate} from '@vueuse/core/index';
 
 // variables to prevent updating functions to trigger each other
 let selectionChangeFromOutside = false;
@@ -73,29 +73,28 @@ function setupSelectedPathToCursorPosition(editor: Editor, mode: SessionMode) {
   );
 }
 
-
 export function setupLinkToData(editor: Editor, mode: SessionMode) {
-    setupUpdateContentWhenDataChanges(editor, mode);
-    setupPropagationOfEditorContentChanges(editor, mode);
+  setupUpdateContentWhenDataChanges(editor, mode);
+  setupPropagationOfEditorContentChanges(editor, mode);
 }
 
 function setupUpdateContentWhenDataChanges(editor: Editor, mode: SessionMode) {
-    watchImmediate(
-        () => getDataForMode(mode).unparsedData.value,
-        (dataString: string) => {
-            if (currentChangeFromInside) {
-                currentChangeFromInside = false; // reset flag
-                return;
-            }
+  watchImmediate(
+    () => getDataForMode(mode).unparsedData.value,
+    (dataString: string) => {
+      if (currentChangeFromInside) {
+        currentChangeFromInside = false; // reset flag
+        return;
+      }
 
-            if (dataString != editor.getValue()) {
-                currentChangeFromOutside = true;
-                selectionChangeFromOutside = true;
-                // TODO: check if every setValue will lead to selection change, or change data without changing selection
-                editor.setValue(dataString, -1);
-            }
-        }
-    );
+      if (dataString != editor.getValue()) {
+        currentChangeFromOutside = true;
+        selectionChangeFromOutside = true;
+        // TODO: check if every setValue will lead to selection change, or change data without changing selection
+        editor.setValue(dataString, -1);
+      }
+    }
+  );
 }
 
 /**
@@ -103,16 +102,16 @@ function setupUpdateContentWhenDataChanges(editor: Editor, mode: SessionMode) {
  * @param editor the ace editor
  */
 function setupPropagationOfEditorContentChanges(editor: Editor, mode: SessionMode) {
-    editor.on(
-        'change',
-        useDebounceFn(() => {
-            if (currentChangeFromOutside) {
-                currentChangeFromOutside = false; // reset flag
-                return;
-            }
+  editor.on(
+    'change',
+    useDebounceFn(() => {
+      if (currentChangeFromOutside) {
+        currentChangeFromOutside = false; // reset flag
+        return;
+      }
 
-            currentChangeFromInside = true;
-            getDataForMode(mode).unparsedData.value = editor.getValue();
-        }, 100)
-    );
+      currentChangeFromInside = true;
+      getDataForMode(mode).unparsedData.value = editor.getValue();
+    }, 100)
+  );
 }

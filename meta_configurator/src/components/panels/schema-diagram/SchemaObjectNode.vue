@@ -9,8 +9,8 @@ import type {Path} from '@/utility/path';
 import InputText from 'primevue/inputtext';
 import {Position, Handle} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
-import { ref} from 'vue';
-import type {AttributeTypeChoice} from "@/components/panels/schema-diagram/typeUtils";
+import {ref} from 'vue';
+import type {AttributeTypeChoice} from '@/components/panels/schema-diagram/typeUtils';
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
@@ -31,9 +31,9 @@ const emit = defineEmits<{
     newName: string
   ): void;
   (
-      e: 'update_attribute_type',
-      attributeData: SchemaObjectAttributeData,
-      newType: AttributeTypeChoice,
+    e: 'update_attribute_type',
+    attributeData: SchemaObjectAttributeData,
+    newType: AttributeTypeChoice
   ): void;
 }>();
 
@@ -70,8 +70,11 @@ function updateAttributeName(
   emit('update_attribute_name', attributeData, oldName, newName);
 }
 
-function updateAttributeType(attributeData: SchemaObjectAttributeData, newType: AttributeTypeChoice) {
-  emit('update_attribute_type', attributeData, newType)
+function updateAttributeType(
+  attributeData: SchemaObjectAttributeData,
+  newType: AttributeTypeChoice
+) {
+  emit('update_attribute_type', attributeData, newType);
 }
 
 function isHighlighted() {
@@ -109,7 +112,7 @@ function isHighlighted() {
       :type-choices="props.typeChoices"
       @select_element="clickedAttribute"
       @update_attribute_name="updateAttributeName"
-    @update_attribute_type="updateAttributeType"></SchemaObjectAttribute>
+      @update_attribute_type="updateAttributeType"></SchemaObjectAttribute>
     <Handle
       id="main"
       type="source"

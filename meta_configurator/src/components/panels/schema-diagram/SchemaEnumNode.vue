@@ -6,9 +6,8 @@ import {
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
-import {type Ref, ref} from "vue";
-import InputText from "primevue/inputtext";
-
+import {type Ref, ref} from 'vue';
+import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -18,7 +17,7 @@ const props = defineProps<{
 }>();
 
 // todo: create copy of array
-const enumValues: Ref<string[]> = ref(props.data.values)
+const enumValues: Ref<string[]> = ref(props.data.values);
 
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
@@ -28,11 +27,9 @@ const emit = defineEmits<{
 
 const enumName = ref(props.data.name);
 
-
 function clickedNode() {
   emit('select_element', props.data.absolutePath);
 }
-
 
 function isEnumEditable() {
   return isHighlighted();
@@ -53,7 +50,6 @@ function updateEnumName() {
 function updateEnumValues() {
   emit('update_enum_values', props.data, enumValues.value);
 }
-
 </script>
 
 <template>
@@ -68,29 +64,30 @@ function updateEnumValues() {
     </b>
 
     <InputText
-        v-if="isEnumEditable()"
-        type="text"
-        class="vue-flow-object-name-inputtext"
-        v-model="enumName"
-        @blur="updateEnumName"
-        @keydown.stop
-        @keyup.enter="updateEnumName" />
+      v-if="isEnumEditable()"
+      type="text"
+      class="vue-flow-object-name-inputtext"
+      v-model="enumName"
+      @blur="updateEnumName"
+      @keydown.stop
+      @keyup.enter="updateEnumName" />
 
     <hr />
-    <p v-if="useSettings().schemaDiagram.showEnumValues && !isEnumEditable()" v-for="value in props.data!.values">
+    <p
+      v-if="useSettings().schemaDiagram.showEnumValues && !isEnumEditable()"
+      v-for="value in props.data!.values">
       {{ value }}
     </p>
     <!--TODO: for loop only until given index based on maxItemsToShow. Instead of trimming beforehand, dynamically show only what is needed. This way, on edit mode all can be shown. and also on clicking the dots it can be expanded-->
 
-    <InputText v-if="useSettings().schemaDiagram.showEnumValues && isEnumEditable()" v-for="(value, index) in props.data!.values"
-
-               type="text"
-               v-model="enumValues[index]"
-               @blur="updateEnumValues"
-               @keydown.stop
-               @keyup.enter="updateEnumValues"
-
-    >
+    <InputText
+      v-if="useSettings().schemaDiagram.showEnumValues && isEnumEditable()"
+      v-for="(value, index) in props.data!.values"
+      type="text"
+      v-model="enumValues[index]"
+      @blur="updateEnumValues"
+      @keydown.stop
+      @keyup.enter="updateEnumValues">
       {{ value }}
     </InputText>
 

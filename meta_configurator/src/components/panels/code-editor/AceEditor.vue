@@ -14,7 +14,10 @@ import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
 import {watchImmediate} from '@vueuse/core';
 import {setupAnnotationsFromValidationErrors} from '@/components/panels/code-editor/setupAnnotations';
-import {setupLinkToCurrentSelection, setupLinkToData} from '@/components/panels/code-editor/setupLinkToSelectionAndData';
+import {
+  setupLinkToCurrentSelection,
+  setupLinkToData,
+} from '@/components/panels/code-editor/setupLinkToSelectionAndData';
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 

@@ -11,8 +11,11 @@ import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
 import {
   type Edge,
-  type Node, SchemaEnumNodeData, SchemaNodeData,
-  SchemaObjectAttributeData, SchemaObjectNodeData,
+  type Node,
+  SchemaEnumNodeData,
+  SchemaNodeData,
+  SchemaObjectAttributeData,
+  SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
@@ -26,9 +29,13 @@ import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/u
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
-import {applyNewType, type AttributeTypeChoice, collectTypeChoices} from "@/components/panels/schema-diagram/typeUtils";
-import Button from "primevue/button";
-import {pathToJsonPointer} from "@/utility/pathUtils";
+import {
+  applyNewType,
+  type AttributeTypeChoice,
+  collectTypeChoices,
+} from '@/components/panels/schema-diagram/typeUtils';
+import Button from 'primevue/button';
+import {pathToJsonPointer} from '@/utility/pathUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -60,7 +67,14 @@ const currentRootNodePath: Ref<Path> = ref([]);
 
 const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
   // TODO: the graph should also show enums without connection to root, so that they can be created and afterwards connected
-  return collectTypeChoices(activeNodes.value.filter(node => node.data.getNodeType() === 'schemaobject' || node.data.getNodeType() === 'schemaenum').map(node => node.data as (SchemaObjectNodeData | SchemaEnumNodeData)));
+  return collectTypeChoices(
+    activeNodes.value
+      .filter(
+        node =>
+          node.data.getNodeType() === 'schemaobject' || node.data.getNodeType() === 'schemaenum'
+      )
+      .map(node => node.data as SchemaObjectNodeData | SchemaEnumNodeData)
+  );
 });
 
 watch(getSchemaForMode(SessionMode.DataEditor).schemaPreprocessed, () => {
@@ -179,7 +193,6 @@ const {fitView} = useVueFlow();
 async function layoutGraph(direction: string, nodesInitialised: boolean) {
   activeNodes.value = layout(activeNodes.value, activeEdges.value, direction);
   if (nodesInitialised && activeNodes.value.length > 0) {
-
     if (forceFitView.value) {
       nextTick(() => {
         fitView();
@@ -226,11 +239,7 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
   // TODO: when renaming happens, also force update in the GUI
 }
 
-function updateAttributeName(
-  attributeData: SchemaNodeData,
-  oldName: string,
-  newName: string
-) {
+function updateAttributeName(attributeData: SchemaNodeData, oldName: string, newName: string) {
   // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
   // that a new node was added (because different name) and then rebuild whole graph.
   attributeData.name = newName;
@@ -247,14 +256,15 @@ function updateAttributeName(
   // TODO: when renaming happens, also force update in the GUI
 }
 
-
-function updateAttributeType(attributeData: SchemaObjectAttributeData, newType: AttributeTypeChoice) {
+function updateAttributeType(
+  attributeData: SchemaObjectAttributeData,
+  newType: AttributeTypeChoice
+) {
   //attributeData.typeDescription = newType.label;
   const attributeSchema = structuredClone(schemaData.dataAt(attributeData.absolutePath));
   applyNewType(attributeSchema, newType.schema);
   schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
 }
-
 
 function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   const enumSchema = structuredClone(schemaData.dataAt(enumData.absolutePath));
@@ -262,20 +272,20 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   schemaData.setDataAt(enumData.absolutePath, enumSchema);
 }
 
-function findAvailableId(prefix: string): Path{
+function findAvailableId(prefix: string): Path {
   let num: number = 1;
   let success = false;
   while (num <= 100) {
-   const id = prefix + num;
-   const path = ['$defs', id]
-   success = schemaData.dataAt(path) === undefined;
-   if (success) {
-     return path;
-   } else {
-     num++;
-   }
+    const id = prefix + num;
+    const path = ['$defs', id];
+    success = schemaData.dataAt(path) === undefined;
+    if (success) {
+      return path;
+    } else {
+      num++;
+    }
   }
-  throw Error("Could not find available id, tried until " + prefix + num + ".")
+  throw Error('Could not find available id, tried until ' + prefix + num + '.');
 }
 
 function addObject() {
@@ -286,39 +296,33 @@ function addObject() {
     rawData.type = 'object';
   }
 
-  const objectPath = findAvailableId("object")
+  const objectPath = findAvailableId('object');
   schemaData.setDataAt(objectPath, {
     type: 'object',
     properties: {
       propertyA: {
-        type: 'string'
-      }
-    }
-  })
+        type: 'string',
+      },
+    },
+  });
 
   // make connection from root element to new node
-  const objectName = objectPath[objectPath.length-1]
-  if (rawData.properties === undefined || objectName !in rawData.properties) {
-    const referenceToNewObject = '#' + pathToJsonPointer(objectPath)
+  const objectName = objectPath[objectPath.length - 1];
+  if (rawData.properties === undefined || objectName! in rawData.properties) {
+    const referenceToNewObject = '#' + pathToJsonPointer(objectPath);
     schemaData.setDataAt(['properties', objectName], {
-      $ref: referenceToNewObject
-    })
+      $ref: referenceToNewObject,
+    });
   }
 }
 
 function addEnum() {
-  const enumPath = findAvailableId("enum")
+  const enumPath = findAvailableId('enum');
   schemaData.setDataAt(enumPath, {
     type: 'string',
-    enum: [
-        'APPLE',
-        'BANANA',
-        'ORANGE'
-    ]
-  })
+    enum: ['APPLE', 'BANANA', 'ORANGE'],
+  });
 }
-
-
 </script>
 
 <template>
@@ -354,7 +358,7 @@ function addEnum() {
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData"
-        :type-choices="typeChoices"/>
+          :type-choices="typeChoices" />
       </template>
       <template #node-schemaenum="props">
         <SchemaEnumNode

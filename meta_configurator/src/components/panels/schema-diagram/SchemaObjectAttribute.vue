@@ -8,11 +8,11 @@ import {Handle, Position} from '@vue-flow/core';
 import {computed, type Ref, ref, watch} from 'vue';
 import {useSettings} from '@/settings/useSettings';
 import InputText from 'primevue/inputtext';
-import Dropdown from "primevue/dropdown";
+import Dropdown from 'primevue/dropdown';
 import {
   type AttributeTypeChoice,
   determineTypeChoiceBySchema,
-} from "@/components/panels/schema-diagram/typeUtils";
+} from '@/components/panels/schema-diagram/typeUtils';
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;
@@ -23,31 +23,31 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
   (
-      e: 'update_attribute_name',
-      attributeData: SchemaObjectAttributeData,
-      oldName: string,
-      newName: string
+    e: 'update_attribute_name',
+    attributeData: SchemaObjectAttributeData,
+    oldName: string,
+    newName: string
   ): void;
   (
-      e: 'update_attribute_type',
-      attributeData: SchemaObjectAttributeData,
-      newType: AttributeTypeChoice,
+    e: 'update_attribute_type',
+    attributeData: SchemaObjectAttributeData,
+    newType: AttributeTypeChoice
   ): void;
 }>();
 
 const attrName = ref(props.data.name);
-const selectedType: Ref<AttributeTypeChoice|undefined> = ref(determineTypeChoiceBySchema(props.typeChoices, props.data.schema));
-
+const selectedType: Ref<AttributeTypeChoice | undefined> = ref(
+  determineTypeChoiceBySchema(props.typeChoices, props.data.schema)
+);
 
 watch(selectedType, () => {
   if (selectedType.value != undefined) {
-    emit("update_attribute_type", props.data, selectedType.value)
+    emit('update_attribute_type', props.data, selectedType.value);
   }
 });
 
-
 function isNameEditable() {
- return isHighlighted();
+  return isHighlighted();
 }
 
 function clickedAttribute() {
@@ -96,15 +96,17 @@ function getHandleTop() {
       @keyup.enter="updateAttributeName" />
     <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
-    <span v-if="!isNameEditable()" class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
+    <span v-if="!isNameEditable()" class="vue-flow__node-schemaattribute-type"
+      >: {{ props.data.typeDescription }}</span
+    >
     <Dropdown
-        v-if="isHighlighted()"
-        class=""
-        v-model="selectedType"
-        :options="typeChoices"
-        optionLabel="label"
-        @keydown.stop
-        placeholder="Select Type" />
+      v-if="isHighlighted()"
+      class=""
+      v-model="selectedType"
+      :options="typeChoices"
+      optionLabel="label"
+      @keydown.stop
+      placeholder="Select Type" />
 
     <Handle
       :id="getHandleId()"
@@ -131,8 +133,6 @@ function getHandleTop() {
   background: transparent;
   font-size: 12px;
 }
-
-
 
 .vue-flow-attribute-input-dimensions {
   height: 18px;
