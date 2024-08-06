@@ -112,7 +112,6 @@ function isAttributeHighlighted() {
   }
   return false;
 }
-
 </script>
 
 <template>
