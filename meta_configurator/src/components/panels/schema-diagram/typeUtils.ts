@@ -1,9 +1,6 @@
 import type {JsonSchemaObjectType, SchemaPropertyTypes} from '@/schema/jsonSchemaType';
 import {pathToJsonPointer} from '@/utility/pathUtils';
-import {
-  SchemaNodeData,
-  type SchemaObjectNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {SchemaNodeData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 
 export type AttributeTypeChoice = {label: string; schema: JsonSchemaObjectType};
@@ -112,7 +109,8 @@ export function applyNewType(
       currentSchema.items === true ||
       currentSchema.items === false
     ) {
-      currentSchema.items = typeSchema.items;
+      // JSON stringify and parse turns Proxy(Array) into raw Array. otherwise it would write the proxy
+      currentSchema.items = JSON.parse(JSON.stringify(typeSchema.items));
     } else {
       applyNewType(currentSchema.items, typeSchema.items as JsonSchemaObjectType);
     }

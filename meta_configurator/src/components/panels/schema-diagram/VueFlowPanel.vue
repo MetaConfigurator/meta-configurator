@@ -66,7 +66,6 @@ const selectedData: Ref<SchemaElementData | undefined> = ref(undefined);
 const currentRootNodePath: Ref<Path> = ref([]);
 
 const typeChoices: ComputedRef<AttributeTypeChoice[]> = computed(() => {
-  // TODO: the graph should also show enums without connection to root, so that they can be created and afterwards connected
   return collectTypeChoices(
     activeNodes.value
       .filter(
@@ -112,17 +111,7 @@ function fitViewForElementByPath(path: Path) {
   }
 }
 
-function fitViewForCurrentlySelectedElement(
-  otherwiseAll: boolean = true,
-  useCachedNode: boolean = true
-) {
-  if (!useCachedNode && selectedNode.value) {
-    selectedNode.value = findBestMatchingNode(
-      activeNodes.value,
-      selectedNode.value.data.absolutePath
-    );
-  }
-
+function fitViewForCurrentlySelectedElement(otherwiseAll: boolean = true) {
   if (selectedNode.value) {
     fitViewForNodes([selectedNode.value]);
   } else if (otherwiseAll) {
@@ -168,8 +157,8 @@ function updateGraph(forceRebuild: boolean = false) {
     updateToSubgraph(currentPath);
   }
 
-  if (!graphNeedsLayouting) {
-    fitViewForCurrentlySelectedElement(true);
+  if (!graphNeedsLayouting && selectedData.value) {
+    fitViewForElementByPath(selectedData.value?.absolutePath);
   }
 }
 
@@ -266,21 +255,35 @@ function updateAttributeType(
   schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
 }
 
+function deleteElement(objectData: SchemaElementData) {
+  schemaData.removeDataAt(objectData.absolutePath);
+}
+
+function addAttribute(objectData: SchemaElementData) {
+  const attributePath = findAvailableId([...objectData.absolutePath, 'properties'], 'property');
+  schemaData.setDataAt(attributePath, {
+    type: 'string',
+  });
+}
+
 function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   const enumSchema = structuredClone(schemaData.dataAt(enumData.absolutePath));
-  enumSchema.enum = newValues;
+
+  // this turns Proxy(Array) into raw Array. Otherwise, when again updating the enum values, it will throw an error
+  // when trying to create structured clone, because cannot do for a Proxy
+  enumSchema.enum = JSON.parse(JSON.stringify(newValues));
   schemaData.setDataAt(enumData.absolutePath, enumSchema);
 }
 
-function findAvailableId(prefix: string): Path {
+function findAvailableId(path: Path, prefix: string): Path {
   let num: number = 1;
   let success = false;
   while (num <= 100) {
     const id = prefix + num;
-    const path = ['$defs', id];
-    success = schemaData.dataAt(path) === undefined;
+    const fullPath = [...path, id];
+    success = schemaData.dataAt(fullPath) === undefined;
     if (success) {
-      return path;
+      return fullPath;
     } else {
       num++;
     }
@@ -296,11 +299,11 @@ function addObject() {
     rawData.type = 'object';
   }
 
-  const objectPath = findAvailableId('object');
+  const objectPath = findAvailableId(['$defs'], 'object');
   schemaData.setDataAt(objectPath, {
     type: 'object',
     properties: {
-      propertyA: {
+      property1: {
         type: 'string',
       },
     },
@@ -317,7 +320,7 @@ function addObject() {
 }
 
 function addEnum() {
-  const enumPath = findAvailableId('enum');
+  const enumPath = findAvailableId(['$defs'], 'enum');
   schemaData.setDataAt(enumPath, {
     type: 'string',
     enum: ['APPLE', 'BANANA', 'ORANGE'],
@@ -355,6 +358,8 @@ function addEnum() {
           @update_object_name="updateObjectOrEnumName"
           @update_attribute_name="updateAttributeName"
           @update_attribute_type="updateAttributeType"
+          @delete_element="deleteElement"
+          @add_attribute="addAttribute"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData"
@@ -404,5 +409,6 @@ function addEnum() {
   position: relative;
   border: 4px;
   padding: 6px;
+  margin-left: 4px;
 }
 </style>

@@ -90,7 +90,7 @@ function setupUpdateContentWhenDataChanges(editor: Editor, mode: SessionMode) {
       if (dataString != editor.getValue()) {
         currentChangeFromOutside = true;
         selectionChangeFromOutside = true;
-        // TODO: check if every setValue will lead to selection change, or change data without changing selection
+        // TODO: update cursor position not to -1 but compute actual cursor position based on current path
         editor.setValue(dataString, -1);
       }
     }
