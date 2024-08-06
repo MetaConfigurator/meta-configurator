@@ -5,14 +5,15 @@ import {
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
-import {computed, type Ref, ref, watch} from 'vue';
-import {useSettings} from '@/settings/useSettings';
+import { type Ref, ref, watch} from 'vue';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import {
   type AttributeTypeChoice,
   determineTypeChoiceBySchema,
 } from '@/components/panels/schema-diagram/typeUtils';
+import Button from "primevue/button";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;
@@ -33,6 +34,7 @@ const emit = defineEmits<{
     attributeData: SchemaObjectAttributeData,
     newType: AttributeTypeChoice
   ): void;
+  (e: 'delete_element', objectData: SchemaElementData): void;
 }>();
 
 const attrName = ref(props.data.name);
@@ -46,10 +48,6 @@ watch(selectedType, () => {
   }
 });
 
-function isNameEditable() {
-  return isHighlighted();
-}
-
 function clickedAttribute() {
   emit('select_element', props.data.absolutePath);
 }
@@ -59,6 +57,10 @@ function updateAttributeName() {
     return;
   }
   emit('update_attribute_name', props.data, props.data.name, newName);
+}
+
+function deleteAttribute() {
+  emit('delete_element', props.data);
 }
 
 function isHighlighted() {
@@ -83,30 +85,44 @@ function getHandleTop() {
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted}"
     @click="clickedAttribute"
     v-on:click.stop>
-    <span v-if="!isHighlighted()" :class="{'line-through': props.data.deprecated}">{{
-      props.data.name
-    }}</span>
+
+    <div v-if="!isHighlighted()">
+
+    <span :class="{'line-through': props.data.deprecated}">{{
+        props.data.name
+      }}</span>
+      <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
+
+    </div>
+
+
+    <div v-if="isHighlighted()">
+
     <InputText
-      v-if="isNameEditable()"
       type="text"
       class="vue-flow-attribute-input-dimensions"
       v-model="attrName"
       @blur="updateAttributeName"
       @keydown.stop
-      @keyup.enter="updateAttributeName" />
+      @keyup.enter="updateAttributeName"
+    />
     <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
-    <span v-if="!isNameEditable()" class="vue-flow__node-schemaattribute-type"
-      >: {{ props.data.typeDescription }}</span
-    >
     <Dropdown
-      v-if="isHighlighted()"
       class=""
       v-model="selectedType"
       :options="typeChoices"
       optionLabel="label"
       @keydown.stop
       placeholder="Select Type" />
+
+      <Button
+          size="small"
+          v-tooltip.bottom="'Delete Property'"
+          @click="_ => deleteAttribute()">
+        <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
+      </Button>
+    </div>
 
     <Handle
       :id="getHandleId()"
@@ -137,5 +153,13 @@ function getHandleTop() {
 .vue-flow-attribute-input-dimensions {
   height: 18px;
   font-size: 10px;
+}
+
+.vue-flow-attribute-button {
+  font-size: 11px;
+  position: relative;
+  border: 4px;
+  padding: 6px;
+  margin-right: 4px;
 }
 </style>

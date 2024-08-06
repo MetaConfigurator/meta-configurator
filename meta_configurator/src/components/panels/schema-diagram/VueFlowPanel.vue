@@ -255,6 +255,17 @@ function updateAttributeType(
   schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
 }
 
+function deleteElement(objectData: SchemaElementData) {
+  schemaData.removeDataAt(objectData.absolutePath);
+}
+
+function addAttribute(objectData: SchemaElementData) {
+  const attributePath = findAvailableId([...objectData.absolutePath, 'properties'], 'property');
+  schemaData.setDataAt(attributePath, {
+    type: 'string',
+  });
+}
+
 function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   const enumSchema = structuredClone(schemaData.dataAt(enumData.absolutePath));
 
@@ -264,15 +275,15 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   schemaData.setDataAt(enumData.absolutePath, enumSchema);
 }
 
-function findAvailableId(prefix: string): Path {
+function findAvailableId(path: Path, prefix: string): Path {
   let num: number = 1;
   let success = false;
   while (num <= 100) {
     const id = prefix + num;
-    const path = ['$defs', id];
-    success = schemaData.dataAt(path) === undefined;
+    const fullPath = [...path, id];
+    success = schemaData.dataAt(fullPath) === undefined;
     if (success) {
-      return path;
+      return fullPath;
     } else {
       num++;
     }
@@ -288,11 +299,11 @@ function addObject() {
     rawData.type = 'object';
   }
 
-  const objectPath = findAvailableId('object');
+  const objectPath = findAvailableId(['$defs'], 'object');
   schemaData.setDataAt(objectPath, {
     type: 'object',
     properties: {
-      propertyA: {
+      property1: {
         type: 'string',
       },
     },
@@ -309,7 +320,7 @@ function addObject() {
 }
 
 function addEnum() {
-  const enumPath = findAvailableId('enum');
+  const enumPath = findAvailableId(['$defs'], 'enum');
   schemaData.setDataAt(enumPath, {
     type: 'string',
     enum: ['APPLE', 'BANANA', 'ORANGE'],
@@ -347,6 +358,8 @@ function addEnum() {
           @update_object_name="updateObjectOrEnumName"
           @update_attribute_name="updateAttributeName"
           @update_attribute_type="updateAttributeType"
+          @delete_element="deleteElement"
+          @add_attribute="addAttribute"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData"
@@ -396,6 +409,6 @@ function addEnum() {
   position: relative;
   border: 4px;
   padding: 6px;
-  margin-right: 4px;
+  margin-left: 4px;
 }
 </style>

@@ -11,6 +11,8 @@ import {Position, Handle} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
 import {ref} from 'vue';
 import type {AttributeTypeChoice} from '@/components/panels/schema-diagram/typeUtils';
+import Button from "primevue/button";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
@@ -23,7 +25,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
   (e: 'zoom_into_element', path: Path): void;
-  (e: 'update_object_name', objectData: SchemaElementData, oldName: string, newName: string): void;
+  (e: 'delete_element', objectData: SchemaElementData): void;
+  (e: 'update_object_name', objectData: SchemaObjectNodeData, oldName: string, newName: string): void;
   (
     e: 'update_attribute_name',
     attributeData: SchemaObjectAttributeData,
@@ -35,6 +38,7 @@ const emit = defineEmits<{
     attributeData: SchemaObjectAttributeData,
     newType: AttributeTypeChoice
   ): void;
+  (e: 'add_attribute', objectData: SchemaObjectNodeData): void;
 }>();
 
 const objectName = ref(props.data.name);
@@ -77,6 +81,18 @@ function updateAttributeType(
   emit('update_attribute_type', attributeData, newType);
 }
 
+function deleteObject() {
+  deleteElement(props.data)
+}
+
+function deleteElement(data: SchemaElementData) {
+  emit("delete_element", data);
+}
+
+function addAttribute() {
+  emit('add_attribute', props.data)
+}
+
 function isHighlighted() {
   return props.selectedData && props.selectedData == props.data;
 }
@@ -89,18 +105,28 @@ function isHighlighted() {
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
-    <b v-if="!isNameEditable()">
-      {{ props.data.name }}
-    </b>
+    <div v-if="!isNameEditable()">
+      <b>
+        {{ props.data.name }}
+      </b>
+    </div>
 
-    <InputText
-      v-if="isNameEditable()"
-      type="text"
-      class="vue-flow-object-name-inputtext"
-      v-model="objectName"
-      @blur="updateObjectName"
-      @keydown.stop
-      @keyup.enter="updateObjectName" />
+    <div v-if="isNameEditable()">
+      <InputText
+          type="text"
+          class="vue-flow-object-name-inputtext"
+          v-model="objectName"
+          @blur="updateObjectName"
+          @keydown.stop
+          @keyup.enter="updateObjectName" />
+      <Button
+          size="small"
+          v-tooltip.bottom="'Delete Object'"
+          @click="_ => deleteObject()">
+        <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
+      </Button>
+    </div>
+
 
     <hr />
     <SchemaObjectAttribute
@@ -112,7 +138,22 @@ function isHighlighted() {
       :type-choices="props.typeChoices"
       @select_element="clickedAttribute"
       @update_attribute_name="updateAttributeName"
-      @update_attribute_type="updateAttributeType"></SchemaObjectAttribute>
+      @update_attribute_type="updateAttributeType"
+      @delete_element="deleteElement"
+    />
+
+    <div v-if="isHighlighted()">
+      <Button
+          size="small"
+          v-tooltip.bottom="'Add Property'"
+          @click="_ => addAttribute()"
+          class="vue-flow-object-button"
+      >
+        <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
+      </Button>
+    </div>
+
+
     <Handle
       id="main"
       type="source"
@@ -149,5 +190,12 @@ function isHighlighted() {
   height: 26px;
   font-size: 14px;
   font-weight: bold;
+}
+.vue-flow-object-button {
+  font-size: 11px;
+  position: relative;
+  border: 4px;
+  padding: 6px;
+  margin-right: 4px;
 }
 </style>
