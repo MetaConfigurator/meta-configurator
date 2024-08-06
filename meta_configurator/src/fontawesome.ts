@@ -29,7 +29,9 @@ import {
   faFileImport,
   faTable,
   faCircleNodes,
-  faFileExport, faTrash, faPlus,
+  faFileExport,
+  faTrash,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,

@@ -9,8 +9,8 @@ import {useSettings} from '@/settings/useSettings';
 import {type Ref, ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import {pathToString} from '@/utility/pathUtils';
-import Button from "primevue/button";
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import Button from 'primevue/button';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -66,7 +66,6 @@ function addEnumItem() {
   enumValues.value.push('NEW_ITEM');
   emit('update_enum_values', props.data, enumValues.value);
 }
-
 </script>
 
 <template>
@@ -77,67 +76,48 @@ function addEnumItem() {
     <p>&lt;enumeration&gt;</p>
 
     <div v-if="!isEnumEditable()">
-
       <b>
         {{ props.data.name }}
       </b>
 
-      <hr/>
+      <hr />
 
-      <p
-          v-if="useSettings().schemaDiagram.showEnumValues"
-          v-for="value in props.data!.values">
+      <p v-if="useSettings().schemaDiagram.showEnumValues" v-for="value in props.data!.values">
         {{ value }}
       </p>
     </div>
 
-
     <div v-if="isEnumEditable()">
-
       <InputText
-          type="text"
-          class="vue-flow-object-name-inputtext"
-          v-model="enumName"
-          @blur="updateEnumName"
-          @keydown.stop
-          @keyup.enter="updateEnumName" />
+        type="text"
+        class="vue-flow-object-name-inputtext"
+        v-model="enumName"
+        @blur="updateEnumName"
+        @keydown.stop
+        @keyup.enter="updateEnumName" />
 
       <hr />
 
-      <div
-          v-if="useSettings().schemaDiagram.showEnumValues"
-          v-for="(_, index) in enumValues"
-      >
-
+      <div v-if="useSettings().schemaDiagram.showEnumValues" v-for="(_, index) in enumValues">
         <InputText
-            type="text"
-            v-model="enumValues[index]"
-            @blur="updateEnumValues"
-            @keydown.stop
-            @keyup.enter="updateEnumValues">
+          type="text"
+          v-model="enumValues[index]"
+          @blur="updateEnumValues"
+          @keydown.stop
+          @keyup.enter="updateEnumValues">
         </InputText>
 
-        <Button
-            size="small"
-            v-tooltip.bottom="'Delete Item'"
-            @click="_ => deleteEnumItem(index)">
+        <Button size="small" v-tooltip.bottom="'Delete Item'" @click="_ => deleteEnumItem(index)">
           <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
         </Button>
-
       </div>
 
-
-      <Button
-          size="small"
-          v-tooltip.bottom="'Add Item'"
-          @click="_ => addEnumItem()">
+      <Button size="small" v-tooltip.bottom="'Add Item'" @click="_ => addEnumItem()">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
       </Button>
-
     </div>
 
     <!--TODO: for loop only until given index based on maxItemsToShow. Instead of trimming beforehand, dynamically show only what is needed. This way, on edit mode all can be shown. and also on clicking the dots it can be expanded-->
-
 
     <Handle type="target" :position="props.sourcePosition!" class="vue-flow__handle"></Handle>
   </div>

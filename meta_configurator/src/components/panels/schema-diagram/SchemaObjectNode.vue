@@ -11,8 +11,8 @@ import {Position, Handle} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
 import {ref} from 'vue';
 import type {AttributeTypeChoice} from '@/components/panels/schema-diagram/typeUtils';
-import Button from "primevue/button";
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import Button from 'primevue/button';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
@@ -26,7 +26,12 @@ const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
   (e: 'zoom_into_element', path: Path): void;
   (e: 'delete_element', objectData: SchemaElementData): void;
-  (e: 'update_object_name', objectData: SchemaObjectNodeData, oldName: string, newName: string): void;
+  (
+    e: 'update_object_name',
+    objectData: SchemaObjectNodeData,
+    oldName: string,
+    newName: string
+  ): void;
   (
     e: 'update_attribute_name',
     attributeData: SchemaObjectAttributeData,
@@ -82,15 +87,15 @@ function updateAttributeType(
 }
 
 function deleteObject() {
-  deleteElement(props.data)
+  deleteElement(props.data);
 }
 
 function deleteElement(data: SchemaElementData) {
-  emit("delete_element", data);
+  emit('delete_element', data);
 }
 
 function addAttribute() {
-  emit('add_attribute', props.data)
+  emit('add_attribute', props.data);
 }
 
 function isHighlighted() {
@@ -113,20 +118,16 @@ function isHighlighted() {
 
     <div v-if="isNameEditable()">
       <InputText
-          type="text"
-          class="vue-flow-object-name-inputtext"
-          v-model="objectName"
-          @blur="updateObjectName"
-          @keydown.stop
-          @keyup.enter="updateObjectName" />
-      <Button
-          size="small"
-          v-tooltip.bottom="'Delete Object'"
-          @click="_ => deleteObject()">
+        type="text"
+        class="vue-flow-object-name-inputtext"
+        v-model="objectName"
+        @blur="updateObjectName"
+        @keydown.stop
+        @keyup.enter="updateObjectName" />
+      <Button size="small" v-tooltip.bottom="'Delete Object'" @click="_ => deleteObject()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
     </div>
-
 
     <hr />
     <SchemaObjectAttribute
@@ -139,20 +140,17 @@ function isHighlighted() {
       @select_element="clickedAttribute"
       @update_attribute_name="updateAttributeName"
       @update_attribute_type="updateAttributeType"
-      @delete_element="deleteElement"
-    />
+      @delete_element="deleteElement" />
 
     <div v-if="isHighlighted()">
       <Button
-          size="small"
-          v-tooltip.bottom="'Add Property'"
-          @click="_ => addAttribute()"
-          class="vue-flow-object-button"
-      >
+        size="small"
+        v-tooltip.bottom="'Add Property'"
+        @click="_ => addAttribute()"
+        class="vue-flow-object-button">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
       </Button>
     </div>
-
 
     <Handle
       id="main"

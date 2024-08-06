@@ -266,7 +266,6 @@ function addAttribute(objectData: SchemaElementData) {
   });
 }
 
-
 function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   const enumSchema = structuredClone(schemaData.dataAt(enumData.absolutePath));
 
