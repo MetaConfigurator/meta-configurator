@@ -101,6 +101,18 @@ function addAttribute() {
 function isHighlighted() {
   return props.selectedData && props.selectedData == props.data;
 }
+
+function isAttributeHighlighted() {
+  if (props.selectedData) {
+    for (const attribute of props.data.attributes) {
+      if (props.selectedData == attribute) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 </script>
 
 <template>
@@ -142,7 +154,7 @@ function isHighlighted() {
       @update_attribute_type="updateAttributeType"
       @delete_element="deleteElement" />
 
-    <div v-if="isHighlighted()">
+    <div v-if="isHighlighted() || isAttributeHighlighted()">
       <Button
         size="small"
         v-tooltip.bottom="'Add Property'"
