@@ -80,6 +80,9 @@ function isSchemaMatchingTypeChoice(
   schema: JsonSchemaObjectType,
   typeChoiceSchema: JsonSchemaObjectType
 ): boolean {
+  if (schema === undefined || typeChoiceSchema === undefined) {
+    return false;
+  }
   if (schema.type !== typeChoiceSchema.type) {
     return false;
   }

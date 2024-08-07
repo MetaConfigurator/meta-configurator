@@ -82,7 +82,7 @@ function getHandleTop() {
 
 <template>
   <div
-    :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted}"
+    :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted()}"
     @click="clickedAttribute"
     v-on:click.stop>
     <div v-if="!isHighlighted()">

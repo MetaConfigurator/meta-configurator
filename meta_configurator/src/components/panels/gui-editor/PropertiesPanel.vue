@@ -75,7 +75,7 @@ watch(
 
 // update tree when the file schema changes
 watch(getSchemaForMode(props.sessionMode).schemaWrapper, () => {
-  updateTree();
+  updateTree(true);
 });
 
 // update tree when the current path changes
@@ -130,13 +130,40 @@ function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
   }
 }
 
+function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePath: Path) {
+  if (node.children === undefined) {
+    return;
+  }
+
+  if (!node.leaf && node.type === TreeNodeType.SCHEMA_PROPERTY) {
+    const userData = dataAt(nodePath, props.currentData);
+    const isEmptyArray = Array.isArray(userData) && userData.length === 0;
+    const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
+    if (userData === undefined || isEmptyArray || isEmptyObject) {
+      expandElementsByPath(nodePath);
+    }
+  }
+
+    for (const child of node.children) {
+      if (child.key === undefined || child.key.length === 0) {
+        expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, nodePath);
+      } else {
+        expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, [...nodePath, child.key]);
+      }
+    }
+}
+
+
 /**
  * Update the tree and the nodes to display.
  */
-function updateTree() {
+function updateTree(initial: boolean = false) {
   loading.value = true;
   window.setTimeout(() => {
     nodesToDisplay.value = determineNodesToDisplay(computeTree());
+    if (initial) {
+      expandEmptyArraysAndObjectsRecursively(currentTree.value!, props.currentPath);
+    }
     loading.value = false;
   }, 0);
 }
