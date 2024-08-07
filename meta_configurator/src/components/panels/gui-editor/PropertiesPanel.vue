@@ -144,15 +144,14 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
     }
   }
 
-    for (const child of node.children) {
-      if (child.key === undefined || child.key.length === 0) {
-        expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, nodePath);
-      } else {
-        expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, [...nodePath, child.key]);
-      }
+  for (const child of node.children) {
+    if (child.key === undefined || child.key.length === 0) {
+      expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, nodePath);
+    } else {
+      expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, [...nodePath, child.key]);
     }
+  }
 }
-
 
 /**
  * Update the tree and the nodes to display.
