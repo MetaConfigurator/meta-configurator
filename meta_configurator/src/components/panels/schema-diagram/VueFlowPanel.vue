@@ -371,6 +371,7 @@ function addEnum() {
           @select_element="selectElement"
           @update_enum_name="updateObjectOrEnumName"
           @update_enum_values="updateEnumValues"
+          @delete_element="deleteElement"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />

@@ -26,6 +26,7 @@ const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
   (e: 'update_enum_name', objectData: SchemaElementData, oldName: string, newName: string): void;
   (e: 'update_enum_values', data: SchemaEnumNodeData, newValues: string[]): void;
+  (e: 'delete_element', objectData: SchemaElementData): void;
 }>();
 
 const enumName = ref(props.data.name);
@@ -55,6 +56,10 @@ function updateEnumName() {
 
 function updateEnumValues() {
   emit('update_enum_values', props.data, enumValues.value);
+}
+
+function deleteEnum() {
+  emit('delete_element', props.data);
 }
 
 function deleteEnumItem(index: number) {
@@ -95,6 +100,9 @@ function addEnumItem() {
         @blur="updateEnumName"
         @keydown.stop
         @keyup.enter="updateEnumName" />
+      <Button size="small" v-tooltip.bottom="'Delete Enum'" @click="_ => deleteEnum()">
+        <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
+      </Button>
 
       <hr />
 

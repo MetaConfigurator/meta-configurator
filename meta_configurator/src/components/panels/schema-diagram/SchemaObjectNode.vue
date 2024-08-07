@@ -121,13 +121,13 @@ function isAttributeHighlighted() {
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
-    <div v-if="!isNameEditable()">
+    <div v-if="!isNameEditable() && !isAttributeHighlighted()">
       <b>
         {{ props.data.name }}
       </b>
     </div>
 
-    <div v-if="isNameEditable()">
+    <div v-if="isNameEditable() || isAttributeHighlighted()">
       <InputText
         type="text"
         class="vue-flow-object-name-inputtext"
