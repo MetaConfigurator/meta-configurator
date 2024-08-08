@@ -612,7 +612,6 @@ export class ConfigTreeNodeResolver {
     }
     if (useSettings().guiEditor.hideAddPropertyButton && schema.additionalProperties.isAlwaysTrue) {
       return false;
-
     }
 
     return !_.isEmpty(schema.patternProperties) || !schema.additionalProperties.isAlwaysFalse;
