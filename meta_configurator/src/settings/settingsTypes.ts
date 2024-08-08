@@ -29,6 +29,7 @@ export interface SettingsInterfaceCodeEditor {
 export interface SettingsInterfaceGuiEditor {
   maximumDepth: number;
   propertySorting: PropertySorting;
+    hideAddPropertyButton: boolean;
 }
 
 export interface SettingsInterfaceSchemaDiagram {

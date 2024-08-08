@@ -18,6 +18,7 @@ export const SETTINGS_DATA_DEFAULT = {
   guiEditor: {
     maximumDepth: 20,
     propertySorting: 'schemaOrder',
+    hideAddPropertyButton: true,
   },
   schemaDiagram: {
     vertical: true,
