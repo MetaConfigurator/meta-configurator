@@ -229,6 +229,8 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
     updateData
   );
 
+  selectElement(objectData.absolutePath)
+
   // TODO: when renaming happens, also force update in the GUI
 }
 
@@ -245,6 +247,8 @@ function updateAttributeName(attributeData: SchemaNodeData, oldName: string, new
     schemaSchema.schemaWrapper.value,
     updateData
   );
+
+  selectElement(attributeData.absolutePath)
 
   // TODO: when renaming happens, also force update in the GUI
 }
@@ -323,6 +327,8 @@ function addObject() {
       $ref: referenceToNewObject,
     });
   }
+
+  selectElement(objectPath);
 }
 
 function addEnum() {
@@ -331,6 +337,7 @@ function addEnum() {
     type: 'string',
     enum: ['APPLE', 'BANANA', 'ORANGE'],
   });
+  selectElement(enumPath);
 }
 </script>
 
