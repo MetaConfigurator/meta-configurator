@@ -143,9 +143,11 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
   if (!node.leaf && node.type === TreeNodeType.SCHEMA_PROPERTY) {
     const userData = dataAt(nodePath, props.currentData);
     const isEmptyArray = Array.isArray(userData) && userData.length === 0;
-    const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
-    if (userData === undefined || isEmptyArray || isEmptyObject) {
+    //const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
+    if (userData === undefined || isEmptyArray /*|| isEmptyObject*/) {
+      if (node.data.schema.type.includes('array')) {
         expandElementsByPath(nodePath);
+      }
     }
   }
 
