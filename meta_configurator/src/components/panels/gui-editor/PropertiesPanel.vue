@@ -145,7 +145,7 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
   }
 
   for (const child of node.children) {
-    if (child.type === TreeNodeType.ADVANCED_PROPERTY)  {
+    if (child.type === TreeNodeType.ADVANCED_PROPERTY) {
       // do not expand advanced property children
       continue;
     }
