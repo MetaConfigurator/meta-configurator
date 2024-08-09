@@ -57,11 +57,10 @@ export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeCh
 }
 
 function collectObjectAndEnumDefinitionPathsFromNodes(nodesData: SchemaNodeData[]): Path[] {
-  let result = nodesData.map(data => data.absolutePath);
-
-  result = result.filter(path => path.length > 0);
-
-  return result;
+  const filteredNodesData = nodesData.filter(data => {
+    return data.absolutePath.length > 0 && data.hasUserDefinedName;
+  })
+  return filteredNodesData.map(data => data.absolutePath);
 }
 
 export function determineTypeChoiceBySchema(

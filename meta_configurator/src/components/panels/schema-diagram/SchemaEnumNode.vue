@@ -94,12 +94,12 @@ function addEnumItem() {
     <div v-if="isEnumEditable()">
       <InputText
         type="text"
-        class="vue-flow-object-name-inputtext"
+        class="vue-flow-enum-name-inputtext"
         v-model="enumName"
         @blur="updateEnumName"
         @keydown.stop
         @keyup.enter="updateEnumName" />
-      <Button size="small" v-tooltip.bottom="'Delete Enum'" @click="_ => deleteEnum()">
+      <Button class="vue-flow-enum-button" size="small" v-tooltip.bottom="'Delete Enum'" @click="_ => deleteEnum()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
 
@@ -107,6 +107,7 @@ function addEnumItem() {
 
       <div v-if="useSettings().schemaDiagram.showEnumValues" v-for="(_, index) in enumValues">
         <InputText
+            class="vue-flow-enumitem-input-dimensions"
           type="text"
           v-model="enumValues[index]"
           @blur="updateEnumValues"
@@ -114,12 +115,12 @@ function addEnumItem() {
           @keyup.enter="updateEnumValues">
         </InputText>
 
-        <Button size="small" v-tooltip.bottom="'Delete Item'" @click="_ => deleteEnumItem(index)">
+        <Button class="vue-flow-enum-button vue-flow-enumitem-input-dimensions" size="small" v-tooltip.bottom="'Delete Item'" @click="_ => deleteEnumItem(index)">
           <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
         </Button>
       </div>
 
-      <Button size="small" v-tooltip.bottom="'Add Item'" @click="_ => addEnumItem()">
+      <Button class="vue-flow-enum-button" size="small" v-tooltip.bottom="'Add Item'" @click="_ => addEnumItem()">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
       </Button>
     </div>
@@ -147,5 +148,25 @@ function addEnumItem() {
   width: unset;
   background: transparent;
   font-size: 12px;
+}
+
+.vue-flow-enum-name-inputtext {
+  height: 26px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.vue-flow-enum-button {
+  font-size: 11px;
+  position: relative;
+  border: none; /* Remove border */
+  background: none; /* Remove background */
+  padding: 0; /* Remove padding */
+  margin: 0;
+  color: black;
+}
+
+.vue-flow-enumitem-input-dimensions {
+  height: 18px;
+  font-size: 10px;
 }
 </style>
