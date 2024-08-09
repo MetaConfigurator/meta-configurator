@@ -59,7 +59,7 @@ export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeCh
 function collectObjectAndEnumDefinitionPathsFromNodes(nodesData: SchemaNodeData[]): Path[] {
   const filteredNodesData = nodesData.filter(data => {
     return data.absolutePath.length > 0 && data.hasUserDefinedName;
-  })
+  });
   return filteredNodesData.map(data => data.absolutePath);
 }
 
@@ -105,13 +105,12 @@ export function applyNewType(
   typeSchema: JsonSchemaObjectType
 ) {
   if (typeSchema.type !== undefined) {
-
     currentSchema.type = typeSchema.type;
     if (typeSchema.type === 'array') {
       if (
-          currentSchema.items === undefined ||
-          currentSchema.items === true ||
-          currentSchema.items === false
+        currentSchema.items === undefined ||
+        currentSchema.items === true ||
+        currentSchema.items === false
       ) {
         // JSON stringify and parse turns Proxy(Array) into raw Array. otherwise it would write the proxy
         currentSchema.items = JSON.parse(JSON.stringify(typeSchema.items));
@@ -121,7 +120,6 @@ export function applyNewType(
     } else {
       delete currentSchema.items;
     }
-
   } else {
     delete currentSchema.type;
   }

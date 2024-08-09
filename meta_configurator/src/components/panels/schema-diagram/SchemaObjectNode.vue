@@ -135,7 +135,11 @@ function isAttributeHighlighted() {
         @blur="updateObjectName"
         @keydown.stop
         @keyup.enter="updateObjectName" />
-      <Button class="vue-flow-object-button" size="small" v-tooltip.bottom="'Delete Object'" @click="_ => deleteObject()">
+      <Button
+        class="vue-flow-object-button"
+        size="small"
+        v-tooltip.bottom="'Delete Object'"
+        @click="_ => deleteObject()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
     </div>
@@ -209,7 +213,4 @@ function isAttributeHighlighted() {
   margin: 0;
   color: black;
 }
-
-
-
 </style>

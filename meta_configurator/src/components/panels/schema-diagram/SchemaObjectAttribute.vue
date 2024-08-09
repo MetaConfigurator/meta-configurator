@@ -109,7 +109,11 @@ function getHandleTop() {
         @keydown.stop
         placeholder="Select Type" />
 
-      <Button class="vue-flow-attribute-button vue-flow-attribute-input-dimensions" size="small" v-tooltip.bottom="'Delete Property'" @click="_ => deleteAttribute()">
+      <Button
+        class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
+        size="small"
+        v-tooltip.bottom="'Delete Property'"
+        @click="_ => deleteAttribute()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
     </div>

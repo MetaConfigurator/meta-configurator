@@ -99,7 +99,11 @@ function addEnumItem() {
         @blur="updateEnumName"
         @keydown.stop
         @keyup.enter="updateEnumName" />
-      <Button class="vue-flow-enum-button" size="small" v-tooltip.bottom="'Delete Enum'" @click="_ => deleteEnum()">
+      <Button
+        class="vue-flow-enum-button"
+        size="small"
+        v-tooltip.bottom="'Delete Enum'"
+        @click="_ => deleteEnum()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
 
@@ -107,7 +111,7 @@ function addEnumItem() {
 
       <div v-if="useSettings().schemaDiagram.showEnumValues" v-for="(_, index) in enumValues">
         <InputText
-            class="vue-flow-enumitem-input-dimensions"
+          class="vue-flow-enumitem-input-dimensions"
           type="text"
           v-model="enumValues[index]"
           @blur="updateEnumValues"
@@ -115,12 +119,20 @@ function addEnumItem() {
           @keyup.enter="updateEnumValues">
         </InputText>
 
-        <Button class="vue-flow-enum-button vue-flow-enumitem-input-dimensions" size="small" v-tooltip.bottom="'Delete Item'" @click="_ => deleteEnumItem(index)">
+        <Button
+          class="vue-flow-enum-button vue-flow-enumitem-input-dimensions"
+          size="small"
+          v-tooltip.bottom="'Delete Item'"
+          @click="_ => deleteEnumItem(index)">
           <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
         </Button>
       </div>
 
-      <Button class="vue-flow-enum-button" size="small" v-tooltip.bottom="'Add Item'" @click="_ => addEnumItem()">
+      <Button
+        class="vue-flow-enum-button"
+        size="small"
+        v-tooltip.bottom="'Add Item'"
+        @click="_ => addEnumItem()">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
       </Button>
     </div>
