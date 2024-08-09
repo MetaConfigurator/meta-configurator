@@ -133,6 +133,7 @@ function isAttributeHighlighted() {
         class="vue-flow-object-name-inputtext"
         v-model="objectName"
         @blur="updateObjectName"
+        @mousedown.stop
         @keydown.stop
         @keyup.enter="updateObjectName" />
       <Button

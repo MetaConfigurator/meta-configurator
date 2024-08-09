@@ -97,6 +97,7 @@ function addEnumItem() {
         class="vue-flow-enum-name-inputtext"
         v-model="enumName"
         @blur="updateEnumName"
+        @mousedown.stop
         @keydown.stop
         @keyup.enter="updateEnumName" />
       <Button
@@ -115,6 +116,7 @@ function addEnumItem() {
           type="text"
           v-model="enumValues[index]"
           @blur="updateEnumValues"
+          @mousedown.stop
           @keydown.stop
           @keyup.enter="updateEnumValues">
         </InputText>

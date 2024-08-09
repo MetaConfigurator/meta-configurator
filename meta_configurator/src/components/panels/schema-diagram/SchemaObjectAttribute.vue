@@ -97,6 +97,7 @@ function getHandleTop() {
         class="vue-flow-attribute-input-dimensions"
         v-model="attrName"
         @blur="updateAttributeName"
+        @mousedown.stop
         @keydown.stop
         @keyup.enter="updateAttributeName" />
       <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
@@ -106,6 +107,7 @@ function getHandleTop() {
         v-model="selectedType"
         :options="typeChoices"
         optionLabel="label"
+        @mousedown.stop
         @keydown.stop
         placeholder="Select Type" />
 
