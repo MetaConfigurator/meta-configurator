@@ -118,12 +118,12 @@ export function applyNewType(
       applyNewType(currentSchema.items, typeSchema.items as JsonSchemaObjectType);
     }
   } else {
-    currentSchema.items = undefined;
+    delete currentSchema.items
   }
 
   if (typeSchema.$ref) {
     currentSchema.$ref = typeSchema.$ref;
   } else {
-    currentSchema.$ref = undefined;
+    delete currentSchema.$ref
   }
 }
