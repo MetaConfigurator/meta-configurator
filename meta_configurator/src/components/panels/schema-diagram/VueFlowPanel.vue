@@ -264,6 +264,7 @@ function addAttribute(objectData: SchemaElementData) {
   schemaData.setDataAt(attributePath, {
     type: 'string',
   });
+  selectElement(attributePath);
 }
 
 function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
