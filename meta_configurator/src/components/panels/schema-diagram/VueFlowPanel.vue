@@ -157,6 +157,10 @@ function updateGraph(forceRebuild: boolean = false) {
     updateToSubgraph(currentPath);
   }
 
+  if (graphNeedsLayouting && forceRebuild) {
+    layoutGraph(graphDirection.value, false);
+  }
+
   if (!graphNeedsLayouting && schemaSession.currentSelectedElement.value) {
     fitViewForElementByPath(schemaSession.currentSelectedElement.value);
   }
