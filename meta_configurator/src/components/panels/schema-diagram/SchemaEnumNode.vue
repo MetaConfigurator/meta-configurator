@@ -104,6 +104,8 @@ function addEnumItem() {
         class="vue-flow-enum-button"
         size="small"
         v-tooltip.bottom="'Delete Enum'"
+        @mousedown.stop
+        @click.stop
         @click="_ => deleteEnum()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
@@ -125,6 +127,8 @@ function addEnumItem() {
           class="vue-flow-enum-button vue-flow-enumitem-input-dimensions"
           size="small"
           v-tooltip.bottom="'Delete Item'"
+          @mousedown.stop
+          @click.stop
           @click="_ => deleteEnumItem(index)">
           <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
         </Button>
@@ -134,6 +138,8 @@ function addEnumItem() {
         class="vue-flow-enum-button"
         size="small"
         v-tooltip.bottom="'Add Item'"
+        @mousedown.stop
+        @click.stop
         @click="_ => addEnumItem()">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
       </Button>

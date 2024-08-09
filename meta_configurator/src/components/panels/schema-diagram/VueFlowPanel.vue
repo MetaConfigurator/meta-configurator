@@ -157,8 +157,8 @@ function updateGraph(forceRebuild: boolean = false) {
     updateToSubgraph(currentPath);
   }
 
-  if (!graphNeedsLayouting && selectedData.value) {
-    fitViewForElementByPath(selectedData.value?.absolutePath);
+  if (!graphNeedsLayouting && schemaSession.currentSelectedElement.value) {
+    fitViewForElementByPath(schemaSession.currentSelectedElement.value);
   }
 }
 
@@ -189,8 +189,8 @@ async function layoutGraph(direction: string, nodesInitialised: boolean) {
       forceFitView.value = false;
     } else {
       nextTick(() => {
-        if (selectedNode.value) {
-          fitViewForElementByPath(selectedNode.value.data.absolutePath);
+        if (schemaSession.currentSelectedElement.value) {
+          fitViewForElementByPath(schemaSession.currentSelectedElement.value);
         }
       });
     }
@@ -266,7 +266,6 @@ function addAttribute(objectData: SchemaElementData) {
   });
   // todo: make selection of attribute work
   selectElement(attributePath);
-  //fitViewForElementByPath(attributePath);
 }
 
 function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {

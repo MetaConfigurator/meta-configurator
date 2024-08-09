@@ -140,6 +140,8 @@ function isAttributeHighlighted() {
         class="vue-flow-object-button"
         size="small"
         v-tooltip.bottom="'Delete Object'"
+        @mousedown.stop
+        @click.stop
         @click="_ => deleteObject()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
@@ -163,6 +165,8 @@ function isAttributeHighlighted() {
         size="small"
         v-tooltip.bottom="'Add Property'"
         @click="_ => addAttribute()"
+        @click.stop
+        @mousedown.stop
         class="vue-flow-object-button">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
       </Button>

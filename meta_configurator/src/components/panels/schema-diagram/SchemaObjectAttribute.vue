@@ -115,6 +115,8 @@ function getHandleTop() {
         class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
         size="small"
         v-tooltip.bottom="'Delete Property'"
+        @mousedown.stop
+        @click.stop
         @click="_ => deleteAttribute()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
