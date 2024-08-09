@@ -86,6 +86,7 @@ export class ManagedSession {
       .map(searchResult => searchResult.path)
       .map(path => pathToString(path))
       .some(path => node.key && path.startsWith(node.key));
+    // TODO: also highlight, when node is currentSelectedElement
   }
 
   public effectiveSchemaAtCurrentPath: Ref<EffectiveSchema> = computed(() =>
