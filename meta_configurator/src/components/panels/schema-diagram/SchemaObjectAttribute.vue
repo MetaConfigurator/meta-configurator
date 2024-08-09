@@ -144,15 +144,18 @@ function getHandleTop() {
   height: 18px;
   font-size: 10px;
 }
-
 .vue-flow-attribute-button {
+  width: 18px; /* Set fixed width */
+  height: 18px; /* Set fixed height */
   font-size: 11px;
   position: relative;
   border: none; /* Remove border */
   background: none; /* Remove background */
   padding: 0; /* Remove padding */
-  margin: 0;
+  margin: 0; /* Remove margin */
   color: black;
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
 }
 .vue-flow-attribute-dropdown {
   height: 18px; /* Adjust height */
