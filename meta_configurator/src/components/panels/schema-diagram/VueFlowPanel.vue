@@ -229,7 +229,7 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
     updateData
   );
 
-  selectElement(objectData.absolutePath)
+  selectElement(objectData.absolutePath);
 
   // TODO: when renaming happens, also force update in the GUI
 }
@@ -248,7 +248,7 @@ function updateAttributeName(attributeData: SchemaNodeData, oldName: string, new
     updateData
   );
 
-  selectElement(attributeData.absolutePath)
+  selectElement(attributeData.absolutePath);
 
   // TODO: when renaming happens, also force update in the GUI
 }
