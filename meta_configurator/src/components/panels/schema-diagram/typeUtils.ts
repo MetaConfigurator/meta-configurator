@@ -104,25 +104,31 @@ export function applyNewType(
   currentSchema: JsonSchemaObjectType,
   typeSchema: JsonSchemaObjectType
 ) {
-  currentSchema.type = typeSchema.type;
-  if (typeSchema.type === 'array') {
-    if (
-      currentSchema.items === undefined ||
-      currentSchema.items === true ||
-      currentSchema.items === false
-    ) {
-      // JSON stringify and parse turns Proxy(Array) into raw Array. otherwise it would write the proxy
-      currentSchema.items = JSON.parse(JSON.stringify(typeSchema.items));
+  if (typeSchema.type !== undefined) {
+
+    currentSchema.type = typeSchema.type;
+    if (typeSchema.type === 'array') {
+      if (
+          currentSchema.items === undefined ||
+          currentSchema.items === true ||
+          currentSchema.items === false
+      ) {
+        // JSON stringify and parse turns Proxy(Array) into raw Array. otherwise it would write the proxy
+        currentSchema.items = JSON.parse(JSON.stringify(typeSchema.items));
+      } else {
+        applyNewType(currentSchema.items, typeSchema.items as JsonSchemaObjectType);
+      }
     } else {
-      applyNewType(currentSchema.items, typeSchema.items as JsonSchemaObjectType);
+      delete currentSchema.items;
     }
+
   } else {
-    delete currentSchema.items
+    delete currentSchema.type;
   }
 
   if (typeSchema.$ref) {
     currentSchema.$ref = typeSchema.$ref;
   } else {
-    delete currentSchema.$ref
+    delete currentSchema.$ref;
   }
 }
