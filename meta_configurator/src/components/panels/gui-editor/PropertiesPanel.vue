@@ -6,7 +6,7 @@ It also contains the logic for adding, removing and renaming properties.
 TODO: This component is too big. Some of the logic should be moved to other files.
 -->
 <script setup lang="ts">
-import type {Ref} from 'vue';
+import {onMounted, type Ref} from 'vue';
 import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
@@ -37,6 +37,7 @@ import {
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
+import _ from 'lodash';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -75,6 +76,11 @@ watch(
 
 // update tree when the file schema changes
 watch(getSchemaForMode(props.sessionMode).schemaWrapper, () => {
+  updateTree(true);
+});
+
+// update tree when mounted (e.g., when mode changes)
+onMounted(() => {
   updateTree(true);
 });
 
@@ -140,7 +146,14 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
     const isEmptyArray = Array.isArray(userData) && userData.length === 0;
     const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
     if (userData === undefined || isEmptyArray || isEmptyObject) {
-      expandElementsByPath(nodePath);
+      const schema = node.data.schema;
+      // expand empty arrays and objects with no predefined properties (will be expected to have addProperty button)
+      if (
+        schema.type.includes('array') ||
+        (schema.type.includes('object') && _.isEmpty(schema.properties))
+      ) {
+        expandElementsByPath(nodePath);
+      }
     }
   }
 
