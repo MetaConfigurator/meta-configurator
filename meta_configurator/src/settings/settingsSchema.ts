@@ -98,6 +98,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: 'schemaOrder',
           enum: ['priorityOrder', 'schemaOrder', 'dataOrder'],
         },
+        hideAddPropertyButton: {
+          type: 'boolean',
+          description:
+            'If set to true, the button for adding custom (not defined by the schema) properties in the GUI editor will be hidden. By default, every schema object allows any additional properties, however, showing this option in the GUI is often not desired as it would only confuse the user. If a particular schema is defined for additional properties, other than "true", then the button will not be hidden.',
+          default: true,
+        },
       },
     },
     schemaDiagram: {

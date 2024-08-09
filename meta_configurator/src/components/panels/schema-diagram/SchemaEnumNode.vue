@@ -19,13 +19,13 @@ const props = defineProps<{
   selectedData?: SchemaElementData;
 }>();
 
-// todo: create copy of array
 const enumValues: Ref<string[]> = ref(props.data.values.slice());
 
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
   (e: 'update_enum_name', objectData: SchemaElementData, oldName: string, newName: string): void;
   (e: 'update_enum_values', data: SchemaEnumNodeData, newValues: string[]): void;
+  (e: 'delete_element', objectData: SchemaElementData): void;
 }>();
 
 const enumName = ref(props.data.name);
@@ -55,6 +55,10 @@ function updateEnumName() {
 
 function updateEnumValues() {
   emit('update_enum_values', props.data, enumValues.value);
+}
+
+function deleteEnum() {
+  emit('delete_element', props.data);
 }
 
 function deleteEnumItem(index: number) {
@@ -90,16 +94,24 @@ function addEnumItem() {
     <div v-if="isEnumEditable()">
       <InputText
         type="text"
-        class="vue-flow-object-name-inputtext"
+        class="vue-flow-enum-name-inputtext"
         v-model="enumName"
         @blur="updateEnumName"
         @keydown.stop
         @keyup.enter="updateEnumName" />
+      <Button
+        class="vue-flow-enum-button"
+        size="small"
+        v-tooltip.bottom="'Delete Enum'"
+        @click="_ => deleteEnum()">
+        <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
+      </Button>
 
       <hr />
 
       <div v-if="useSettings().schemaDiagram.showEnumValues" v-for="(_, index) in enumValues">
         <InputText
+          class="vue-flow-enumitem-input-dimensions"
           type="text"
           v-model="enumValues[index]"
           @blur="updateEnumValues"
@@ -107,12 +119,20 @@ function addEnumItem() {
           @keyup.enter="updateEnumValues">
         </InputText>
 
-        <Button size="small" v-tooltip.bottom="'Delete Item'" @click="_ => deleteEnumItem(index)">
+        <Button
+          class="vue-flow-enum-button vue-flow-enumitem-input-dimensions"
+          size="small"
+          v-tooltip.bottom="'Delete Item'"
+          @click="_ => deleteEnumItem(index)">
           <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
         </Button>
       </div>
 
-      <Button size="small" v-tooltip.bottom="'Add Item'" @click="_ => addEnumItem()">
+      <Button
+        class="vue-flow-enum-button"
+        size="small"
+        v-tooltip.bottom="'Add Item'"
+        @click="_ => addEnumItem()">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
       </Button>
     </div>
@@ -140,5 +160,29 @@ function addEnumItem() {
   width: unset;
   background: transparent;
   font-size: 12px;
+}
+
+.vue-flow-enum-name-inputtext {
+  height: 26px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.vue-flow-enum-button {
+  width: 18px; /* Set fixed width */
+  height: 18px; /* Set fixed height */
+  font-size: 11px;
+  position: relative;
+  border: none; /* Remove border */
+  background: none; /* Remove background */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margin */
+  color: black;
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
+}
+
+.vue-flow-enumitem-input-dimensions {
+  height: 18px;
+  font-size: 10px;
 }
 </style>

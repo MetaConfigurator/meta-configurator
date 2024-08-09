@@ -49,7 +49,7 @@ const emit = defineEmits<{
 const objectName = ref(props.data.name);
 
 function isNameEditable() {
-  return isHighlighted() && props.data.hasUserDefinedName;
+  return (isHighlighted() || isAttributeHighlighted()) && props.data.hasUserDefinedName;
 }
 
 function clickedNode() {
@@ -135,7 +135,11 @@ function isAttributeHighlighted() {
         @blur="updateObjectName"
         @keydown.stop
         @keyup.enter="updateObjectName" />
-      <Button size="small" v-tooltip.bottom="'Delete Object'" @click="_ => deleteObject()">
+      <Button
+        class="vue-flow-object-button"
+        size="small"
+        v-tooltip.bottom="'Delete Object'"
+        @click="_ => deleteObject()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
     </div>
@@ -203,8 +207,10 @@ function isAttributeHighlighted() {
 .vue-flow-object-button {
   font-size: 11px;
   position: relative;
-  border: 4px;
-  padding: 6px;
-  margin-right: 4px;
+  border: none; /* Remove border */
+  background: none; /* Remove background */
+  padding: 0; /* Remove padding */
+  margin: 0;
+  color: black;
 }
 </style>

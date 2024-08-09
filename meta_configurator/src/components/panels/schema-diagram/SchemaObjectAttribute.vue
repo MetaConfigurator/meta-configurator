@@ -82,11 +82,12 @@ function getHandleTop() {
 
 <template>
   <div
-    :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted}"
+    :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted()}"
     @click="clickedAttribute"
     v-on:click.stop>
     <div v-if="!isHighlighted()">
       <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
+      <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
       <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
     </div>
 
@@ -101,14 +102,18 @@ function getHandleTop() {
       <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
       <Dropdown
-        class=""
+        class="vue-flow-attribute-dropdown"
         v-model="selectedType"
         :options="typeChoices"
         optionLabel="label"
         @keydown.stop
         placeholder="Select Type" />
 
-      <Button size="small" v-tooltip.bottom="'Delete Property'" @click="_ => deleteAttribute()">
+      <Button
+        class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
+        size="small"
+        v-tooltip.bottom="'Delete Property'"
+        @click="_ => deleteAttribute()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
     </div>
@@ -143,12 +148,26 @@ function getHandleTop() {
   height: 18px;
   font-size: 10px;
 }
-
 .vue-flow-attribute-button {
+  width: 18px; /* Set fixed width */
+  height: 18px; /* Set fixed height */
   font-size: 11px;
   position: relative;
-  border: 4px;
-  padding: 6px;
-  margin-right: 4px;
+  border: none; /* Remove border */
+  background: none; /* Remove background */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margin */
+  color: black;
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
+}
+.vue-flow-attribute-dropdown {
+  height: 18px; /* Adjust height */
+  font-size: 10px; /* Adjust font size */
+  padding: 0 4px; /* Adjust padding to ensure text is inside the box */
+  line-height: 18px; /* Adjust line-height to match the height */
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Center items vertically */
+  box-sizing: border-box; /* Ensure padding is included in the height */
 }
 </style>

@@ -57,11 +57,10 @@ export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeCh
 }
 
 function collectObjectAndEnumDefinitionPathsFromNodes(nodesData: SchemaNodeData[]): Path[] {
-  let result = nodesData.map(data => data.absolutePath);
-
-  result = result.filter(path => path.length > 0);
-
-  return result;
+  const filteredNodesData = nodesData.filter(data => {
+    return data.absolutePath.length > 0 && data.hasUserDefinedName;
+  });
+  return filteredNodesData.map(data => data.absolutePath);
 }
 
 export function determineTypeChoiceBySchema(
@@ -80,6 +79,9 @@ function isSchemaMatchingTypeChoice(
   schema: JsonSchemaObjectType,
   typeChoiceSchema: JsonSchemaObjectType
 ): boolean {
+  if (schema === undefined || typeChoiceSchema === undefined) {
+    return false;
+  }
   if (schema.type !== typeChoiceSchema.type) {
     return false;
   }
@@ -102,25 +104,29 @@ export function applyNewType(
   currentSchema: JsonSchemaObjectType,
   typeSchema: JsonSchemaObjectType
 ) {
-  currentSchema.type = typeSchema.type;
-  if (typeSchema.type === 'array') {
-    if (
-      currentSchema.items === undefined ||
-      currentSchema.items === true ||
-      currentSchema.items === false
-    ) {
-      // JSON stringify and parse turns Proxy(Array) into raw Array. otherwise it would write the proxy
-      currentSchema.items = JSON.parse(JSON.stringify(typeSchema.items));
+  if (typeSchema.type !== undefined) {
+    currentSchema.type = typeSchema.type;
+    if (typeSchema.type === 'array') {
+      if (
+        currentSchema.items === undefined ||
+        currentSchema.items === true ||
+        currentSchema.items === false
+      ) {
+        // JSON stringify and parse turns Proxy(Array) into raw Array. otherwise it would write the proxy
+        currentSchema.items = JSON.parse(JSON.stringify(typeSchema.items));
+      } else {
+        applyNewType(currentSchema.items, typeSchema.items as JsonSchemaObjectType);
+      }
     } else {
-      applyNewType(currentSchema.items, typeSchema.items as JsonSchemaObjectType);
+      delete currentSchema.items;
     }
   } else {
-    currentSchema.items = undefined;
+    delete currentSchema.type;
   }
 
   if (typeSchema.$ref) {
     currentSchema.$ref = typeSchema.$ref;
   } else {
-    currentSchema.$ref = undefined;
+    delete currentSchema.$ref;
   }
 }

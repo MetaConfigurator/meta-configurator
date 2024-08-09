@@ -610,6 +610,9 @@ export class ConfigTreeNodeResolver {
     if (schema.metaConfigurator?.hideAddPropertyButton) {
       return false;
     }
+    if (useSettings().guiEditor.hideAddPropertyButton && schema.additionalProperties.isAlwaysTrue) {
+      return false;
+    }
 
     return !_.isEmpty(schema.patternProperties) || !schema.additionalProperties.isAlwaysFalse;
   }
