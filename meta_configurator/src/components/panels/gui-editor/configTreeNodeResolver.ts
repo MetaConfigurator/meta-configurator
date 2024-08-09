@@ -612,7 +612,11 @@ export class ConfigTreeNodeResolver {
     }
 
     // if the user has not specified a custom schema for additional properties, we can hide the button
-    if (useSettings().guiEditor.hideAddPropertyButton && schema.additionalProperties.isAlwaysTrue && _.isEmpty(schema.patternProperties)) {
+    if (
+      useSettings().guiEditor.hideAddPropertyButton &&
+      schema.additionalProperties.isAlwaysTrue &&
+      _.isEmpty(schema.patternProperties)
+    ) {
       return false;
     }
 

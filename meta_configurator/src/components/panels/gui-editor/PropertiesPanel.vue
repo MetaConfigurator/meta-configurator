@@ -37,7 +37,7 @@ import {
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
-import _ from "lodash";
+import _ from 'lodash';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -148,7 +148,10 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
     if (userData === undefined || isEmptyArray || isEmptyObject) {
       const schema = node.data.schema;
       // expand empty arrays and objects with no predefined properties (will be expected to have addProperty button)
-      if (schema.type.includes('array') || (schema.type.includes('object') && _.isEmpty(schema.properties))) {
+      if (
+        schema.type.includes('array') ||
+        (schema.type.includes('object') && _.isEmpty(schema.properties))
+      ) {
         expandElementsByPath(nodePath);
       }
     }
