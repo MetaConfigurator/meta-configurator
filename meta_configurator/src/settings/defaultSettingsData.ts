@@ -56,12 +56,17 @@ export const SETTINGS_DATA_DEFAULT = {
       {
         panelType: 'textEditor',
         mode: 'schemaEditor',
-        size: 50,
+        size: 33,
+      },
+      {
+        panelType: 'schemaDiagram',
+        mode: 'schemaEditor',
+        size: 33,
       },
       {
         panelType: 'guiEditor',
         mode: 'schemaEditor',
-        size: 50,
+        size: 33,
       },
     ],
     settings: [

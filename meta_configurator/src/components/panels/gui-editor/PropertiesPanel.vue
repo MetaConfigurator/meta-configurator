@@ -145,6 +145,10 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
   }
 
   for (const child of node.children) {
+    if (child.type === TreeNodeType.ADVANCED_PROPERTY) {
+      // do not expand advanced property children
+      continue;
+    }
     if (child.key === undefined || child.key.length === 0) {
       expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, nodePath);
     } else {
