@@ -6,7 +6,7 @@ It also contains the logic for adding, removing and renaming properties.
 TODO: This component is too big. Some of the logic should be moved to other files.
 -->
 <script setup lang="ts">
-import type {Ref} from 'vue';
+import {onMounted, type Ref} from 'vue';
 import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
@@ -78,6 +78,11 @@ watch(getSchemaForMode(props.sessionMode).schemaWrapper, () => {
   updateTree(true);
 });
 
+// update tree when mounted (e.g., when mode changes)
+onMounted(() => {
+  updateTree(true);
+});
+
 // update tree when the current path changes
 watch(session.currentPath, () => {
   updateTree();
@@ -140,7 +145,7 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
     const isEmptyArray = Array.isArray(userData) && userData.length === 0;
     const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
     if (userData === undefined || isEmptyArray || isEmptyObject) {
-      expandElementsByPath(nodePath);
+        expandElementsByPath(nodePath);
     }
   }
 
