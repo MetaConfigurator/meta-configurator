@@ -91,7 +91,7 @@ function getHandleTop() {
       <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
     </div>
 
-    <div v-if="isHighlighted()">
+    <div v-else>
       <InputText
         type="text"
         class="vue-flow-attribute-input-dimensions"

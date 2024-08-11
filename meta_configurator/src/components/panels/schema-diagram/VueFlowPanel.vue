@@ -36,6 +36,7 @@ import {
 } from '@/components/panels/schema-diagram/typeUtils';
 import Button from 'primevue/button';
 import {pathToJsonPointer} from '@/utility/pathUtils';
+import {dataAt} from "@/utility/resolveDataAtPath";
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -234,6 +235,19 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
   // TODO: when renaming happens, also force update in the GUI
 }
 
+function extractInlinedElement(elementData: SchemaObjectNodeData|SchemaEnumNodeData) {
+  const oldElementPath = elementData.absolutePath;
+  const dataAtPath = dataAt(oldElementPath, schemaData.data.value)
+  const newElementId = findAvailableId(['$defs'], elementData.name, true)
+  schemaData.setDataAt(newElementId, dataAtPath)
+  const referenceToNewElement = '#' + pathToJsonPointer(newElementId);
+  schemaData.setDataAt(oldElementPath, {
+    $ref: referenceToNewElement,
+  })
+  elementData.absolutePath = newElementId;
+  selectElement(newElementId);
+}
+
 function updateAttributeName(attributeData: SchemaNodeData, oldName: string, newName: string) {
   // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
   // that a new node was added (because different name) and then rebuild whole graph.
@@ -285,11 +299,11 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   schemaData.setDataAt(enumData.absolutePath, enumSchema);
 }
 
-function findAvailableId(path: Path, prefix: string): Path {
+function findAvailableId(path: Path, prefix: string, preferWithoutNumber: boolean = false): Path {
   let num: number = 1;
   let success = false;
   while (num <= 100) {
-    const id = prefix + num;
+    const id = (num == 1 && preferWithoutNumber) ? prefix :  prefix + num;
     const fullPath = [...path, id];
     success = schemaData.dataAt(fullPath) === undefined;
     if (success) {
@@ -373,6 +387,7 @@ function addEnum() {
           @update_attribute_type="updateAttributeType"
           @delete_element="deleteElement"
           @add_attribute="addAttribute"
+          @extract_inlined_element="extractInlinedElement"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData"
@@ -385,6 +400,7 @@ function addEnum() {
           @update_enum_name="updateObjectOrEnumName"
           @update_enum_values="updateEnumValues"
           @delete_element="deleteElement"
+          @extract_inlined_element="extractInlinedElement"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />
