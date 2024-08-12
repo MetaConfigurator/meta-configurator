@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-  SchemaElementData, SchemaEnumNodeData,
+  SchemaElementData,
+  SchemaEnumNodeData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
@@ -28,10 +29,10 @@ const emit = defineEmits<{
   (e: 'delete_element', objectData: SchemaElementData): void;
   (e: 'extract_inlined_element', objectData: SchemaObjectNodeData): void;
   (
-      e: 'update_object_name',
-      objectData: SchemaObjectNodeData,
-      oldName: string,
-      newName: string
+    e: 'update_object_name',
+    objectData: SchemaObjectNodeData,
+    oldName: string,
+    newName: string
   ): void;
   (
     e: 'update_attribute_name',
@@ -57,8 +58,8 @@ function isDefinedInDefinitions() {
   if (props.data.absolutePath.length < 2) {
     return false;
   }
-  const parentKey = props.data.absolutePath[props.data.absolutePath.length-2];
-  return parentKey === "$defs" || parentKey === "definitions";
+  const parentKey = props.data.absolutePath[props.data.absolutePath.length - 2];
+  return parentKey === '$defs' || parentKey === 'definitions';
 }
 
 function clickedNode() {
@@ -100,7 +101,7 @@ function deleteObject() {
 }
 
 function extractInlinedObject() {
-  emit('extract_inlined_element', props.data)
+  emit('extract_inlined_element', props.data);
 }
 
 function deleteElement(data: SchemaElementData) {
@@ -139,13 +140,13 @@ function isAttributeHighlighted() {
         {{ props.data.name }}
       </b>
       <Button
-          v-if="!isDefinedInDefinitions() && (isHighlighted() || isAttributeHighlighted())"
-          class="vue-flow-object-button"
-          size="small"
-          v-tooltip.bottom="'Extract inlined Object to definitions (will enable renaming and more)'"
-          @mousedown.stop
-          @click.stop
-          @click="_ => extractInlinedObject()">
+        v-if="!isDefinedInDefinitions() && (isHighlighted() || isAttributeHighlighted())"
+        class="vue-flow-object-button"
+        size="small"
+        v-tooltip.bottom="'Extract inlined Object to definitions (will enable renaming and more)'"
+        @mousedown.stop
+        @click.stop
+        @click="_ => extractInlinedObject()">
         <FontAwesomeIcon :icon="'fa-wrench fa-solid'" />
       </Button>
     </div>
@@ -160,16 +161,15 @@ function isAttributeHighlighted() {
         @keydown.stop
         @keyup.enter="updateObjectName" />
       <Button
-          class="vue-flow-object-button"
-          size="small"
-          v-tooltip.bottom="'Delete Object'"
-          @mousedown.stop
-          @click.stop
-          @click="_ => deleteObject()">
+        class="vue-flow-object-button"
+        size="small"
+        v-tooltip.bottom="'Delete Object'"
+        @mousedown.stop
+        @click.stop
+        @click="_ => deleteObject()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
     </div>
-
 
     <hr />
     <SchemaObjectAttribute

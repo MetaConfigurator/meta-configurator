@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {
   SchemaElementData,
-  SchemaEnumNodeData, SchemaObjectNodeData,
+  SchemaEnumNodeData,
+  SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
@@ -43,12 +44,12 @@ function isDefinedInDefinitions() {
   if (props.data.absolutePath.length < 2) {
     return false;
   }
-  const parentKey = props.data.absolutePath[props.data.absolutePath.length-2];
-  return parentKey === "$defs" || parentKey === "definitions";
+  const parentKey = props.data.absolutePath[props.data.absolutePath.length - 2];
+  return parentKey === '$defs' || parentKey === 'definitions';
 }
 
 function isHighlighted() {
-  return props.selectedData && props.selectedData == props.data
+  return props.selectedData && props.selectedData == props.data;
 }
 
 function updateEnumName() {
@@ -68,7 +69,7 @@ function deleteEnum() {
 }
 
 function extractInlinedObject() {
-  emit('extract_inlined_element', props.data)
+  emit('extract_inlined_element', props.data);
 }
 
 function deleteEnumItem(index: number) {
@@ -95,13 +96,13 @@ function addEnumItem() {
       </b>
 
       <Button
-          v-if="!isDefinedInDefinitions() && (isHighlighted())"
-          class="vue-flow-object-button"
-          size="small"
-          v-tooltip.bottom="'Extract inlined Object to definitions (will enable renaming and more)'"
-          @mousedown.stop
-          @click.stop
-          @click="_ => extractInlinedObject()">
+        v-if="!isDefinedInDefinitions() && isHighlighted()"
+        class="vue-flow-object-button"
+        size="small"
+        v-tooltip.bottom="'Extract inlined Object to definitions (will enable renaming and more)'"
+        @mousedown.stop
+        @click.stop
+        @click="_ => extractInlinedObject()">
         <FontAwesomeIcon :icon="'fa-wrench fa-solid'" />
       </Button>
 

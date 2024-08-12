@@ -36,7 +36,7 @@ import {
 } from '@/components/panels/schema-diagram/typeUtils';
 import Button from 'primevue/button';
 import {pathToJsonPointer} from '@/utility/pathUtils';
-import {dataAt} from "@/utility/resolveDataAtPath";
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -230,20 +230,20 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
     updateData
   );
 
-  selectElement(objectData.absolutePath)
+  selectElement(objectData.absolutePath);
 
   // TODO: when renaming happens, also force update in the GUI
 }
 
-function extractInlinedElement(elementData: SchemaObjectNodeData|SchemaEnumNodeData) {
+function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNodeData) {
   const oldElementPath = elementData.absolutePath;
-  const dataAtPath = dataAt(oldElementPath, schemaData.data.value)
-  const newElementId = findAvailableId(['$defs'], elementData.name, true)
-  schemaData.setDataAt(newElementId, dataAtPath)
+  const dataAtPath = dataAt(oldElementPath, schemaData.data.value);
+  const newElementId = findAvailableId(['$defs'], elementData.name, true);
+  schemaData.setDataAt(newElementId, dataAtPath);
   const referenceToNewElement = '#' + pathToJsonPointer(newElementId);
   schemaData.setDataAt(oldElementPath, {
     $ref: referenceToNewElement,
-  })
+  });
   elementData.absolutePath = newElementId;
   selectElement(newElementId);
 }
@@ -262,7 +262,7 @@ function updateAttributeName(attributeData: SchemaNodeData, oldName: string, new
     updateData
   );
 
-  selectElement(attributeData.absolutePath)
+  selectElement(attributeData.absolutePath);
 
   // TODO: when renaming happens, also force update in the GUI
 }
@@ -303,7 +303,7 @@ function findAvailableId(path: Path, prefix: string, preferWithoutNumber: boolea
   let num: number = 1;
   let success = false;
   while (num <= 100) {
-    const id = (num == 1 && preferWithoutNumber) ? prefix :  prefix + num;
+    const id = num == 1 && preferWithoutNumber ? prefix : prefix + num;
     const fullPath = [...path, id];
     success = schemaData.dataAt(fullPath) === undefined;
     if (success) {
