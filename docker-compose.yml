@@ -77,3 +77,4 @@ networks:
 
 volumes:
   mongo-data:
+  redis:
