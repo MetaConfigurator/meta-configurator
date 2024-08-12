@@ -32,7 +32,14 @@ client = MongoClient(host=MONGO_HOST, port=int(MONGO_PORT), username=MONGO_USER,
 db = client[MONGO_DB]
 
 # Set up Redis connection
-REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+REDIS_PASS = os.getenv('REDIS_PASS', None)
+
+# Construct the Redis URL including the password
+REDIS_URL = f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0"
+
+# Initialize Redis client
 redis_client = redis.Redis.from_url(REDIS_URL)
 
 # Set up Flask-Limiter with Redis
