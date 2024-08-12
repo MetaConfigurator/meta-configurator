@@ -31,6 +31,8 @@ services:
       MONGO_DB: metaconfigurator
       REDIS_URL: redis://redis:6379/0
       REDIS_PASS: ${REDIS_PASSWORD}
+    env_file:
+      - .env.prod
 
   mongo:
     image: mongo:latest
@@ -42,6 +44,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
       MONGO_INITDB_DATABASE: metaconfigurator
+    env_file:
+      - .env.prod
     volumes:
       - mongo-data:/data/db
     networks:
