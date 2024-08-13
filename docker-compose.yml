@@ -1,11 +1,36 @@
 version: '3.8'
 
 services:
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    depends_on:
+      - web
+      - backend
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: /bin/sh -c
+    command: |
+      crontab -l | { cat; echo "0 0 * * * certbot renew --webroot -w /var/www/certbot --post-hook 'nginx -s reload'"; } | crontab -
+      crond -f
+    networks:
+      - app-network
+
   web:
     image: ghcr.io/metaconfigurator/meta_configurator:latest
-    ports:
-      - "80:80"    # Map port 80 on the host to port 80 in the container
-      - "443:443"  # Map port 443 on the host to port 443 in the container, if using HTTPS
     restart: unless-stopped
     depends_on:
       - backend
@@ -14,8 +39,6 @@ services:
 
   backend:
     build: ./backend
-    ports:
-      - "5000:5000"
     restart: unless-stopped
     depends_on:
       - mongo
