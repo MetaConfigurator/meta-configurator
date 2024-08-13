@@ -10,6 +10,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
+      - ./web_data:/usr/share/nginx/html
     depends_on:
       - web
       - backend
@@ -31,8 +32,10 @@ services:
 
   web:
     container_name: web
-    image: ghcr.io/metaconfigurator/meta_configurator:latest
+    build: ./meta_configurator
     restart: unless-stopped
+    volumes:
+      - ./web_data:/usr/share/nginx/html
     depends_on:
       - backend
     networks:

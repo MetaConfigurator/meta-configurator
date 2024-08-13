@@ -10,3 +10,6 @@ COPY / /app
 # Install dependencies and build the frontend
 RUN npm ci
 RUN npm run build
+
+# Copy the built frontend files from the builder stage to the Nginx server
+COPY --from=builder /app/dist /usr/share/nginx/html
