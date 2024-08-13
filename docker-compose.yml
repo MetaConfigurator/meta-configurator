@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   nginx:
@@ -18,7 +16,7 @@ services:
       - app-network
 
   certbot:
-    image: certbot/certbot
+    image: certbot/certbot:latest
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
