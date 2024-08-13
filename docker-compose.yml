@@ -1,6 +1,7 @@
 services:
 
   nginx:
+    container_name: nginx
     image: nginx:latest
     ports:
       - "80:80"
@@ -16,6 +17,7 @@ services:
       - app-network
 
   certbot:
+    container_name: certbot
     image: certbot/certbot:latest
     volumes:
       - ./certbot/www:/var/www/certbot
@@ -28,6 +30,7 @@ services:
       - app-network
 
   web:
+    container_name: web
     image: ghcr.io/metaconfigurator/meta_configurator:latest
     restart: unless-stopped
     depends_on:
@@ -37,6 +40,7 @@ services:
 
   backend:
     build: ./backend
+    container_name: backend
     restart: unless-stopped
     depends_on:
       - mongo
