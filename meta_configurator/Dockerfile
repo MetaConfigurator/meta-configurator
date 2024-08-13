@@ -11,5 +11,8 @@ COPY / /app
 RUN npm ci
 RUN npm run build
 
+RUN ls -la /app
+RUN ls -la /app/dist
+
 # Copy the built frontend files from the builder stage to the Nginx server
 COPY /app/dist /usr/share/nginx/html
