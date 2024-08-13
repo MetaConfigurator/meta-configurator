@@ -1,5 +1,5 @@
 # Use the official Node.js image to build the Vue frontend
-FROM node:21 AS builder
+FROM node:21
 
 # Set the working directory in the container
 WORKDIR /app
@@ -12,4 +12,4 @@ RUN npm ci
 RUN npm run build
 
 # Copy the built frontend files from the builder stage to the Nginx server
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY /app/dist /usr/share/nginx/html
