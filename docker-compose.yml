@@ -1,24 +1,8 @@
 services:
 
-  nginx:
-    container_name: nginx
-    build: ./nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-      - ./web_data:/usr/share/nginx/html
-    depends_on:
-      - web
-      - backend
-    networks:
-      - app-network
-
   certbot:
     container_name: certbot
+    restart: unless-stopped
     image: certbot/certbot:latest
     volumes:
       - ./certbot/www:/var/www/certbot
@@ -34,8 +18,13 @@ services:
     container_name: web
     build: ./meta_configurator
     restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./web_data:/usr/share/nginx/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
     depends_on:
       - backend
     networks:
