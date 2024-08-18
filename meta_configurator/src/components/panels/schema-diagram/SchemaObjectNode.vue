@@ -143,7 +143,7 @@ function isAttributeHighlighted() {
         v-if="!isDefinedInDefinitions() && (isHighlighted() || isAttributeHighlighted())"
         class="vue-flow-object-button"
         size="small"
-        v-tooltip.bottom="'Extract inlined Object to definitions (will enable renaming and more)'"
+        v-tooltip.bottom="'Extract inlined object schema to definitions (will enable renaming and more)'"
         @mousedown.stop
         @click.stop
         @dblclick.stop
