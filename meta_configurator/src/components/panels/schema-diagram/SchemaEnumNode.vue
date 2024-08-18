@@ -108,9 +108,12 @@ function addEnumItem() {
 
       <hr />
 
-      <p v-if="useSettings().schemaDiagram.showEnumValues" v-for="value in props.data!.values">
+      <div v-if="useSettings().schemaDiagram.showEnumValues" v-for="(value,index) in props.data!.values">
+      <p v-if="index < useSettings().schemaDiagram.maxEnumValuesToShow">
         {{ value }}
       </p>
+      </div>
+
     </div>
 
     <div v-else>
