@@ -201,7 +201,7 @@ function isAttributeHighlighted() {
       type="source"
       :position="props.sourcePosition!"
       class="vue-flow__handle"
-      :style="[ props.sourcePosition==Position.Right ? {top: '14px'} : {} ]"></Handle>
+      :style="[props.sourcePosition == Position.Right ? {top: '14px'} : {}]"></Handle>
   </div>
 </template>
 
