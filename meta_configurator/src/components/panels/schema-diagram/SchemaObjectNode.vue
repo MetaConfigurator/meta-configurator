@@ -146,6 +146,7 @@ function isAttributeHighlighted() {
         v-tooltip.bottom="'Extract inlined Object to definitions (will enable renaming and more)'"
         @mousedown.stop
         @click.stop
+        @dblclick.stop
         @click="_ => extractInlinedObject()">
         <FontAwesomeIcon :icon="'fa-wrench fa-solid'" />
       </Button>
@@ -158,6 +159,8 @@ function isAttributeHighlighted() {
         v-model="objectName"
         @blur="updateObjectName"
         @mousedown.stop
+        @click.stop
+        @dblclick.stop
         @keydown.stop
         @keyup.enter="updateObjectName" />
       <Button
@@ -166,6 +169,7 @@ function isAttributeHighlighted() {
         v-tooltip.bottom="'Delete Object'"
         @mousedown.stop
         @click.stop
+        @dblclick.stop
         @click="_ => deleteObject()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
@@ -190,6 +194,7 @@ function isAttributeHighlighted() {
         v-tooltip.bottom="'Add Property'"
         @click="_ => addAttribute()"
         @click.stop
+        @dblclick.stop
         @mousedown.stop
         class="vue-flow-object-button">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
