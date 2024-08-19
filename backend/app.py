@@ -140,7 +140,7 @@ def add_snapshot():
 
 
 @app.route('/snapshot/<snapshot_id>', methods=['GET'])
-@limiter.limit("30 per minute")
+@limiter.limit("20 per minute")
 def get_snapshot(snapshot_id):
     try:
         snapshots_collection = db['snapshots']
