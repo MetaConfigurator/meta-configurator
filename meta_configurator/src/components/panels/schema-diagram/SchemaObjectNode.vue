@@ -143,7 +143,9 @@ function isAttributeHighlighted() {
         v-if="!isDefinedInDefinitions() && (isHighlighted() || isAttributeHighlighted())"
         class="vue-flow-object-button"
         size="small"
-        v-tooltip.bottom="'Extract inlined object schema to definitions (will enable renaming and more)'"
+        v-tooltip.bottom="
+          'Extract inlined object schema to definitions (will enable renaming and more)'
+        "
         @mousedown.stop
         @click.stop
         @dblclick.stop
@@ -206,7 +208,7 @@ function isAttributeHighlighted() {
       type="source"
       :position="props.sourcePosition!"
       class="vue-flow__handle"
-      :style="[ props.sourcePosition==Position.Right ? {top: '14px'} : {} ]"></Handle>
+      :style="[props.sourcePosition == Position.Right ? {top: '14px'} : {}]"></Handle>
   </div>
 </template>
 
