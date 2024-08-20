@@ -6,7 +6,7 @@ import type {Path} from '@/utility/path';
 export type AttributeTypeChoice = {label: string; schema: JsonSchemaObjectType};
 
 export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeChoice[] {
-  const simpleTypes: SchemaPropertyTypes = ['string', 'number', 'boolean', 'null'];
+  const simpleTypes: SchemaPropertyTypes = ['string', 'number', 'integer', 'boolean', 'null'];
 
   const result: AttributeTypeChoice[] = [];
 

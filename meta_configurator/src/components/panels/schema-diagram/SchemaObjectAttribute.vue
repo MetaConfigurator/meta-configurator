@@ -98,6 +98,8 @@ function getHandleTop() {
         v-model="attrName"
         @blur="updateAttributeName"
         @mousedown.stop
+        @click.stop
+        @dblclick.stop
         @keydown.stop
         @keyup.enter="updateAttributeName" />
       <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
@@ -109,6 +111,8 @@ function getHandleTop() {
         optionLabel="label"
         @mousedown.stop
         @keydown.stop
+        @click.stop
+        @dblclick.stop
         placeholder="Select Type" />
 
       <Button
@@ -117,6 +121,7 @@ function getHandleTop() {
         v-tooltip.bottom="'Delete Property'"
         @mousedown.stop
         @click.stop
+        @dblclick.stop
         @click="_ => deleteAttribute()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>

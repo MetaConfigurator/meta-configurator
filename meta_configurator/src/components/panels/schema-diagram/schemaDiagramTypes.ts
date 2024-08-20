@@ -31,6 +31,7 @@ export class SchemaGraph {
       let type = 'default';
       let color = 'black';
       const markerEnd = MarkerType.Arrow;
+      const sourceHandle = individualAttributeHandles ? data.startHandle : null;
 
       switch (data.edgeType) {
         case EdgeType.ATTRIBUTE:
@@ -62,7 +63,7 @@ export class SchemaGraph {
         id: pathsToEdgeId(data.start.absolutePath, data.end.absolutePath, data.label, data.isArray),
         source: pathToNodeId(data.start.absolutePath),
         target: pathToNodeId(data.end.absolutePath),
-        sourceHandle: individualAttributeHandles ? data.startHandle : 'main',
+        sourceHandle: sourceHandle ? sourceHandle : 'main',
         type: type,
         label: data.label,
         data: data,

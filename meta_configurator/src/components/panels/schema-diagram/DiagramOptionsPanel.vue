@@ -52,15 +52,6 @@ function rebuildGraph() {
             class="options-input-switch" />
         </label>
       </div>
-      <div>
-        <label
-          >Merge allOfs
-          <InputSwitch
-            v-model="useSettings().schemaDiagram.mergeAllOfs"
-            class="options-input-switch" />
-        </label>
-      </div>
-
       <div class="container">
         <div>
           <Button label="Rebuild Graph" @click="rebuildGraph" class="options-element" />

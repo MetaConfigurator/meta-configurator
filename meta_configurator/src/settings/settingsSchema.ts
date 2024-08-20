@@ -175,7 +175,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'boolean',
           description:
             'If set to true, allOf schemas will be merged in the schema diagram. This can make the diagram more readable, but sometimes also is not desired, because some information gets lost.',
-          default: true,
+          $comment:
+            'Warning: has undefined behavior when merging multiple allOfs using the "$ref" keyword.',
+          default: false,
         },
       },
     },

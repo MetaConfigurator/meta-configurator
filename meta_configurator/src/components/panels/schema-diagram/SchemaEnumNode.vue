@@ -102,15 +102,20 @@ function addEnumItem() {
         v-tooltip.bottom="'Extract inlined Object to definitions (will enable renaming and more)'"
         @mousedown.stop
         @click.stop
+        @dblclick.stop
         @click="_ => extractInlinedObject()">
         <FontAwesomeIcon :icon="'fa-wrench fa-solid'" />
       </Button>
 
       <hr />
 
-      <p v-if="useSettings().schemaDiagram.showEnumValues" v-for="value in props.data!.values">
-        {{ value }}
-      </p>
+      <div
+        v-if="useSettings().schemaDiagram.showEnumValues"
+        v-for="(value,index) in props.data!.values">
+        <p v-if="index < useSettings().schemaDiagram.maxEnumValuesToShow">
+          {{ value }}
+        </p>
+      </div>
     </div>
 
     <div v-else>
@@ -120,6 +125,8 @@ function addEnumItem() {
         v-model="enumName"
         @blur="updateEnumName"
         @mousedown.stop
+        @click.stop
+        @dblclick.stop
         @keydown.stop
         @keyup.enter="updateEnumName" />
       <Button
@@ -128,6 +135,7 @@ function addEnumItem() {
         v-tooltip.bottom="'Delete Enum'"
         @mousedown.stop
         @click.stop
+        @dblclick.stop
         @click="_ => deleteEnum()">
         <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
       </Button>
@@ -141,6 +149,8 @@ function addEnumItem() {
           v-model="enumValues[index]"
           @blur="updateEnumValues"
           @mousedown.stop
+          @click.stop
+          @dblclick.stop
           @keydown.stop
           @keyup.enter="updateEnumValues">
         </InputText>
@@ -151,6 +161,7 @@ function addEnumItem() {
           v-tooltip.bottom="'Delete Item'"
           @mousedown.stop
           @click.stop
+          @dblclick.stop
           @click="_ => deleteEnumItem(index)">
           <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
         </Button>
@@ -162,6 +173,7 @@ function addEnumItem() {
         v-tooltip.bottom="'Add Item'"
         @mousedown.stop
         @click.stop
+        @dblclick.stop
         @click="_ => addEnumItem()">
         <FontAwesomeIcon :icon="'fa-plus fa-solid'" />
       </Button>
