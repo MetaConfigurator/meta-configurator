@@ -158,7 +158,7 @@ function updateGraph(forceRebuild: boolean = false) {
     updateToSubgraph(currentPath);
   }
 
-  if (graphNeedsLayouting && forceRebuild) {
+  if (graphNeedsLayouting || forceRebuild) {
     layoutGraph(graphDirection.value, false);
   }
 
