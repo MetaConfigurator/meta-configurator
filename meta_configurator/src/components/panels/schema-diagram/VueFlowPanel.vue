@@ -2,7 +2,7 @@
 import type {ComputedRef, Ref} from 'vue';
 import {computed, nextTick, onMounted, ref, watch} from 'vue';
 
-import {getRectOfNodes, type GraphNode, useVueFlow, VueFlow} from '@vue-flow/core';
+import {getNodesInside, getRectOfNodes, type GraphNode, useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGraphConstructor';
@@ -135,12 +135,17 @@ function fitViewForNodes(nodes: Node[]) {
 }
 
 function areNodesAlreadyWithinViewport(nodes: Node[]) {
-  const allGraphNodes = useVueFlow().nodes.value;
+  const state = useVueFlow();
+  const allGraphNodes = state.nodes.value;
   const relevantGraphNodes = allGraphNodes.filter(node => nodes.some(n => n.id === node.id));
-  const nodesRect = getRectOfNodes(relevantGraphNodes);
-  const viewPortRect = useVueFlow().getViewport();
-  // TODO
-  return true;
+  const nodesInside = getNodesInside(relevantGraphNodes, {
+    x: 0,
+    y: 0,
+    width: state.dimensions.value.width,
+    height: state.dimensions.value.height
+  }, state.viewport.value, true);
+  // TODO somehow state.nodes is empty array???
+  return nodesInside.length == relevantGraphNodes.length;
 }
 
 function updateGraph(forceRebuild: boolean = false) {

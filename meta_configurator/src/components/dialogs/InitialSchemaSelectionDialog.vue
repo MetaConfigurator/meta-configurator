@@ -1,7 +1,7 @@
 <!-- Dialog to select the initial schema -->
 <script setup lang="ts">
 import {defineEmits, ref, watch} from 'vue';
-import RadioButton from 'primevue/radiobutton';
+import Button from "primevue/button";
 import Dialog from 'primevue/dialog';
 
 const showDialog = ref(false);
@@ -41,13 +41,16 @@ defineExpose({show: openDialog, close: hideDialog});
   <Dialog v-model:visible="showDialog" header="Select a Schema">
     <div class="flex flex-column gap-3 bigger-dialog-content">
       <div v-for="category in categories" :key="category.key" class="flex align-items-center">
-        <RadioButton
+        <Button
           v-model="selectedCategory"
+          :label="category.name"
           :inputId="category.key"
           name="category"
           :value="category.name"
-          @click="() => $emit('user_selected_option', category.key)" />
-        <label :for="category.key" class="ml-2">{{ category.name }}</label>
+          @click="() => {
+            $emit('user_selected_option', category.key)
+            hideDialog();
+          }" />
       </div>
     </div>
   </Dialog>
