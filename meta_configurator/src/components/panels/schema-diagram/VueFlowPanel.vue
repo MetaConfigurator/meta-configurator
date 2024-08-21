@@ -2,7 +2,7 @@
 import type {ComputedRef, Ref} from 'vue';
 import {computed, nextTick, onMounted, ref, watch} from 'vue';
 
-import {useVueFlow, VueFlow} from '@vue-flow/core';
+import {getRectOfNodes, type GraphNode, useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGraphConstructor';
@@ -48,6 +48,7 @@ const schemaData = getDataForMode(SessionMode.SchemaEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const dataSchema = getSchemaForMode(SessionMode.DataEditor);
 const schemaSchema = getSchemaForMode(SessionMode.SchemaEditor);
+
 const currentPath: Ref<Path> = computed(() => schemaSession.currentPath.value);
 
 const forceFitView = ref(true);
@@ -105,18 +106,19 @@ watch(
 
 function fitViewForElementByPath(path: Path) {
   const bestMatchingNode = findBestMatchingNode(activeNodes.value, path);
+  const previousBestMatchingNode = selectedNode.value;
   selectedNode.value = bestMatchingNode;
   selectedData.value = findBestMatchingData(bestMatchingNode, path);
   if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
-    fitViewForNodes([bestMatchingNode]);
-  }
-}
 
-function fitViewForCurrentlySelectedElement(otherwiseAll: boolean = true) {
-  if (selectedNode.value) {
-    fitViewForNodes([selectedNode.value]);
-  } else if (otherwiseAll) {
-    fitViewForNodes(activeNodes.value);
+    if (previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) {
+      // if the node is already within the viewport, do not move the view
+      if (areNodesAlreadyWithinViewport([bestMatchingNode])) {
+        return;
+      }
+    }
+
+    fitViewForNodes([bestMatchingNode]);
   }
 }
 
@@ -130,6 +132,15 @@ function fitViewForNodes(nodes: Node[]) {
       minZoom: useSettings().schemaDiagram.automaticZoomMinValue,
     });
   });
+}
+
+function areNodesAlreadyWithinViewport(nodes: Node[]) {
+  const allGraphNodes = useVueFlow().nodes.value;
+  const relevantGraphNodes = allGraphNodes.filter(node => nodes.some(n => n.id === node.id));
+  const nodesRect = getRectOfNodes(relevantGraphNodes);
+  const viewPortRect = useVueFlow().getViewport();
+  // TODO
+  return true;
 }
 
 function updateGraph(forceRebuild: boolean = false) {
