@@ -34,6 +34,7 @@ export class ConfigTreeNodeResolver {
    * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchemaWrapper} and
    * the corresponding data.
    *
+   * @param mode
    * @param schema The schema of the node.
    * @param parentSchema The schema of the parent node.
    * @param absolutePath The path of the parent node.

@@ -20,6 +20,7 @@ const emit = defineEmits<{
   (e: 'update:path', newPath: Path): void;
 }>();
 
+const settings = useSettings();
 const pathWithRoot = computed(() => [props.rootName, ...props.path]);
 
 function isNotLast(index: number) {
@@ -46,7 +47,7 @@ function jumpToLevel(index: number) {
         <div
           class="inline-flex items-center text-sm font-medium text-gray-700"
           :style="{
-            color: getColorForMode(props.sessionMode, useSettings()),
+            color: getColorForMode(props.sessionMode, settings),
           }"
           :class="{
             'hover:underline underline-offset-2 hover:text-slate-800 cursor-pointer':

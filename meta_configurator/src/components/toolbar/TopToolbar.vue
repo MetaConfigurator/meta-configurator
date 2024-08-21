@@ -43,6 +43,7 @@ const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
 
+const settings = useSettings();
 const selectedSchema = ref<SchemaOption | null>(null);
 
 const showFetchedSchemas = ref(false);
@@ -122,7 +123,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   return items;
 }
 
-const items = computed(() => getPageSelectionMenuItems(useSettings()));
+const items = computed(() => getPageSelectionMenuItems(settings));
 
 function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
@@ -215,7 +216,7 @@ function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
 }
 
 // computed property function to get menu items to allow for updating of the menu items
-const menuItems = computed(() => getMenuItems(useSettings()));
+const menuItems = computed(() => getMenuItems(settings));
 
 const toggle = event => {
   menu.value.toggle(event);
@@ -460,7 +461,7 @@ const showSearchResultsMenu = event => {
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
           <p class="font-semibold text-lg">
-            {{ useSettings().toolbarTitle || 'MetaConfigurator' }}
+            {{ settings.toolbarTitle || 'MetaConfigurator' }}
           </p>
         </div>
 
