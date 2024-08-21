@@ -124,10 +124,10 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'Settings of the schema diagram.',
       properties: {
         editMode: {
-            type: 'boolean',
-            description:
-                'If set to true, the schema diagram will be in edit mode, allowing the user to change the schema by clicking on the elements. If set to false, the schema diagram will be in view mode, showing the schema without the possibility to change it.',
-            default: true,
+          type: 'boolean',
+          description:
+            'If set to true, the schema diagram will be in edit mode, allowing the user to change the schema by clicking on the elements. If set to false, the schema diagram will be in view mode, showing the schema without the possibility to change it.',
+          default: true,
         },
         vertical: {
           type: 'boolean',

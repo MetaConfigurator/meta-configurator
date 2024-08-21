@@ -14,7 +14,7 @@ import {
 } from '@/components/panels/schema-diagram/typeUtils';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {useSettings} from "@/settings/useSettings";
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;

@@ -14,7 +14,6 @@ function rebuildGraph() {
   emit('rebuild_graph');
   emit('fit_view');
 }
-
 </script>
 
 <template>
@@ -22,10 +21,10 @@ function rebuildGraph() {
     <AccordionTab header="Schema Diagram Options">
       <div>
         <label
-        >Edit Mode
+          >Edit Mode
           <InputSwitch
-              v-model="useSettings().schemaDiagram.editMode"
-              class="options-input-switch" />
+            v-model="useSettings().schemaDiagram.editMode"
+            class="options-input-switch" />
         </label>
       </div>
       <div>

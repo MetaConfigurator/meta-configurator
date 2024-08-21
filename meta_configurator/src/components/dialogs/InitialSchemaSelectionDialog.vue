@@ -1,7 +1,7 @@
 <!-- Dialog to select the initial schema -->
 <script setup lang="ts">
 import {defineEmits, ref, watch} from 'vue';
-import Button from "primevue/button";
+import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 
 const showDialog = ref(false);
@@ -47,10 +47,12 @@ defineExpose({show: openDialog, close: hideDialog});
           :inputId="category.key"
           name="category"
           :value="category.name"
-          @click="() => {
-            $emit('user_selected_option', category.key)
-            hideDialog();
-          }" />
+          @click="
+            () => {
+              $emit('user_selected_option', category.key);
+              hideDialog();
+            }
+          " />
       </div>
     </div>
   </Dialog>

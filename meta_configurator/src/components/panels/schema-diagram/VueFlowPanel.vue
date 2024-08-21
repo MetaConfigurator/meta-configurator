@@ -110,7 +110,6 @@ function fitViewForElementByPath(path: Path) {
   selectedNode.value = bestMatchingNode;
   selectedData.value = findBestMatchingData(bestMatchingNode, path);
   if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
-
     if (previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) {
       // if the node is already within the viewport, do not move the view
       if (areNodesAlreadyWithinViewport([bestMatchingNode])) {
@@ -138,12 +137,17 @@ function areNodesAlreadyWithinViewport(nodes: Node[]) {
   const state = useVueFlow();
   const allGraphNodes = state.nodes.value;
   const relevantGraphNodes = allGraphNodes.filter(node => nodes.some(n => n.id === node.id));
-  const nodesInside = getNodesInside(relevantGraphNodes, {
-    x: 0,
-    y: 0,
-    width: state.dimensions.value.width,
-    height: state.dimensions.value.height
-  }, state.viewport.value, true);
+  const nodesInside = getNodesInside(
+    relevantGraphNodes,
+    {
+      x: 0,
+      y: 0,
+      width: state.dimensions.value.width,
+      height: state.dimensions.value.height,
+    },
+    state.viewport.value,
+    true
+  );
   // TODO somehow state.nodes is empty array???
   return nodesInside.length == relevantGraphNodes.length;
 }
@@ -369,7 +373,6 @@ function addEnum() {
   });
   selectElement(enumPath);
 }
-
 </script>
 
 <template>

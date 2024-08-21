@@ -50,7 +50,7 @@ const emit = defineEmits<{
 const objectName = ref(props.data.name);
 
 function isObjectEditable() {
-return  (isHighlighted() || isAttributeHighlighted()) && useSettings().schemaDiagram.editMode
+  return (isHighlighted() || isAttributeHighlighted()) && useSettings().schemaDiagram.editMode;
 }
 
 function isNameEditable() {

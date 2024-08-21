@@ -33,7 +33,7 @@ export interface SettingsInterfaceGuiEditor {
 }
 
 export interface SettingsInterfaceSchemaDiagram {
-    editMode: boolean;
+  editMode: boolean;
   vertical: boolean;
   showAttributes: boolean;
   showEnumValues: boolean;
