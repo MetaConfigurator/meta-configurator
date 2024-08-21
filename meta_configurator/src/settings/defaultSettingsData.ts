@@ -21,6 +21,7 @@ export const SETTINGS_DATA_DEFAULT = {
     hideAddPropertyButton: true,
   },
   schemaDiagram: {
+    editMode: true,
     vertical: true,
     showAttributes: true,
     showEnumValues: true,

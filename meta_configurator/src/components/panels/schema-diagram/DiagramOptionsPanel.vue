@@ -14,11 +14,20 @@ function rebuildGraph() {
   emit('rebuild_graph');
   emit('fit_view');
 }
+
 </script>
 
 <template>
   <Accordion :activeIndex="1" class="options-element">
     <AccordionTab header="Schema Diagram Options">
+      <div>
+        <label
+        >Edit Mode
+          <InputSwitch
+              v-model="useSettings().schemaDiagram.editMode"
+              class="options-input-switch" />
+        </label>
+      </div>
       <div>
         <label
           >Graph direction vertical

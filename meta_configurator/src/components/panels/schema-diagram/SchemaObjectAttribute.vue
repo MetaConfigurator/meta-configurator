@@ -14,6 +14,7 @@ import {
 } from '@/components/panels/schema-diagram/typeUtils';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {useSettings} from "@/settings/useSettings";
 
 const props = defineProps<{
   data: SchemaObjectAttributeData;
@@ -63,6 +64,10 @@ function deleteAttribute() {
   emit('delete_element', props.data);
 }
 
+function isEditable() {
+  return isHighlighted() && useSettings().schemaDiagram.editMode;
+}
+
 function isHighlighted() {
   return props.selectedData && props.selectedData == props.data;
 }
@@ -85,7 +90,7 @@ function getHandleTop() {
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted()}"
     @click="clickedAttribute"
     v-on:click.stop>
-    <div v-if="!isHighlighted()">
+    <div v-if="!isEditable()">
       <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
       <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
       <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>

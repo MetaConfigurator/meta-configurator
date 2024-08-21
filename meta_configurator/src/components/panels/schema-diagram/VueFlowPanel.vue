@@ -364,6 +364,7 @@ function addEnum() {
   });
   selectElement(enumPath);
 }
+
 </script>
 
 <template>

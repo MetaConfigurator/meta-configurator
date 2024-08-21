@@ -37,7 +37,7 @@ function clickedNode() {
 }
 
 function isEnumEditable() {
-  return isHighlighted();
+  return isHighlighted() && useSettings().schemaDiagram.editMode;
 }
 
 function isDefinedInDefinitions() {
