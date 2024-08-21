@@ -585,7 +585,7 @@ function zoomIntoPath(path: Path) {
           @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
-            <span class="pl-2">Add item</span>
+            <span class="pl-2">{{ slotProps.node.data.label }}</span>
           </Button>
         </span>
 

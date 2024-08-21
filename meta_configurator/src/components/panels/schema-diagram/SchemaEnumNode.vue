@@ -20,6 +20,7 @@ const props = defineProps<{
   selectedData?: SchemaElementData;
 }>();
 
+const settings = useSettings();
 const enumValues: Ref<string[]> = ref(props.data.values.slice());
 
 const emit = defineEmits<{
@@ -37,7 +38,7 @@ function clickedNode() {
 }
 
 function isEnumEditable() {
-  return isHighlighted();
+  return isHighlighted() && settings.schemaDiagram.editMode;
 }
 
 function isDefinedInDefinitions() {
@@ -109,10 +110,8 @@ function addEnumItem() {
 
       <hr />
 
-      <div
-        v-if="useSettings().schemaDiagram.showEnumValues"
-        v-for="(value,index) in props.data!.values">
-        <p v-if="index < useSettings().schemaDiagram.maxEnumValuesToShow">
+      <div v-if="settings.schemaDiagram.showEnumValues" v-for="(value,index) in props.data!.values">
+        <p v-if="index < settings.schemaDiagram.maxEnumValuesToShow">
           {{ value }}
         </p>
       </div>
@@ -142,7 +141,7 @@ function addEnumItem() {
 
       <hr />
 
-      <div v-if="useSettings().schemaDiagram.showEnumValues" v-for="(_, index) in enumValues">
+      <div v-if="settings.schemaDiagram.showEnumValues" v-for="(_, index) in enumValues">
         <InputText
           class="vue-flow-enumitem-input-dimensions"
           type="text"

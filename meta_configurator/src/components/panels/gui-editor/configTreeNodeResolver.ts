@@ -34,6 +34,7 @@ export class ConfigTreeNodeResolver {
    * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchemaWrapper} and
    * the corresponding data.
    *
+   * @param mode
    * @param schema The schema of the node.
    * @param parentSchema The schema of the parent node.
    * @param absolutePath The path of the parent node.
@@ -486,6 +487,12 @@ export class ConfigTreeNodeResolver {
   ): GuiEditorTreeNode {
     const pathWithIndex = relativePath.concat(children.length);
     const absolutePathWithIndex = absolutePath.concat(children.length);
+    let label = 'Add item';
+    if (schema.items.title) {
+      label = 'Add ' + schema.items.title;
+    } else if (absolutePath.length > 0) {
+      label = 'Add item (' + absolutePath[absolutePath.length - 1] + ')';
+    }
     return {
       data: {
         schema: schema.items,
@@ -493,6 +500,7 @@ export class ConfigTreeNodeResolver {
         relativePath: pathWithIndex,
         absolutePath: absolutePathWithIndex,
         name: children.length,
+        label: label,
       },
       type: TreeNodeType.ADD_ITEM,
       key: pathToString(absolutePathWithIndex),

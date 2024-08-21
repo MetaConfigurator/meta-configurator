@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   SchemaElementData,
-  SchemaEnumNodeData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
@@ -50,8 +49,12 @@ const emit = defineEmits<{
 
 const objectName = ref(props.data.name);
 
+function isObjectEditable() {
+  return (isHighlighted() || isAttributeHighlighted()) && useSettings().schemaDiagram.editMode;
+}
+
 function isNameEditable() {
-  return (isHighlighted() || isAttributeHighlighted()) && props.data.hasUserDefinedName;
+  return isObjectEditable() && props.data.hasUserDefinedName;
 }
 
 function isDefinedInDefinitions() {
@@ -140,7 +143,7 @@ function isAttributeHighlighted() {
         {{ props.data.name }}
       </b>
       <Button
-        v-if="!isDefinedInDefinitions() && (isHighlighted() || isAttributeHighlighted())"
+        v-if="!isDefinedInDefinitions() && isObjectEditable()"
         class="vue-flow-object-button"
         size="small"
         v-tooltip.bottom="
@@ -190,7 +193,7 @@ function isAttributeHighlighted() {
       @update_attribute_type="updateAttributeType"
       @delete_element="deleteElement" />
 
-    <div v-if="isHighlighted() || isAttributeHighlighted()">
+    <div v-if="isObjectEditable()">
       <Button
         size="small"
         v-tooltip.bottom="'Add Property'"

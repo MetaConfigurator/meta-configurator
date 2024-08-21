@@ -30,13 +30,14 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
-let panelsDefinition: SettingsInterfacePanels = useSettings().panels;
+const settings = useSettings();
+let panelsDefinition: SettingsInterfacePanels = settings.panels;
 
 // update panelsDefinition only when underlying data changes. Otherwise, all panels will be rebuilt every time
 // any setting is changed, which is not necessary and leads to Ace Editor becoming blank if settings were modified via
 // Ace Editor
 watchImmediate(
-  () => useSettings(),
+  () => settings,
   (settings: SettingsInterfaceRoot) => {
     let panels = settings.panels;
     if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition)) {

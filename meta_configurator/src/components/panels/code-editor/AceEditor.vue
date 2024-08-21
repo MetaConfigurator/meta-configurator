@@ -25,6 +25,8 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
+const settings = useSettings();
+
 // random id is used to enable multiple Ace Editors of same sessionMode on the same page
 const editor_id = 'code-editor-' + props.sessionMode + '-' + Math.random();
 
@@ -44,7 +46,7 @@ onMounted(() => {
  */
 function setupAceMode(editor: Editor) {
   watchImmediate(
-    () => useSettings().dataFormat,
+    () => settings.dataFormat,
     format => {
       if (format == 'json') {
         editor.getSession().setMode('ace/mode/json');
@@ -62,13 +64,13 @@ function setupAceProperties(editor: Editor) {
   });
   editor.setTheme('ace/theme/clouds');
   editor.setShowPrintMargin(false);
-  editor.getSession().setTabSize(useSettings().codeEditor.tabSize);
+  editor.getSession().setTabSize(settings.codeEditor.tabSize);
 
   // it's not clear why timeout is needed here, but without it the
   // ace editor starts flashing and becomes unusable
   window.setTimeout(() => {
     watchImmediate(
-      () => useSettings().codeEditor.fontSize,
+      () => settings.codeEditor.fontSize,
       fontSize => {
         if (editor && fontSize && fontSize > 6 && fontSize < 65) {
           editor.setFontSize(fontSize.toString() + 'px');
