@@ -27,7 +27,7 @@ export const SETTINGS_DATA_DEFAULT = {
     showEnumValues: true,
     maxAttributesToShow: 30,
     maxEnumValuesToShow: 10,
-    moveViewToSelectedElement: true,
+    moveViewToSelectedElement: false,
     automaticZoomMaxValue: 1,
     automaticZoomMinValue: 0.5,
     mergeAllOfs: true,

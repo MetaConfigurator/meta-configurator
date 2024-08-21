@@ -2,7 +2,7 @@
 import type {ComputedRef, Ref} from 'vue';
 import {computed, nextTick, onMounted, ref, watch} from 'vue';
 
-import {getNodesInside, getRectOfNodes, type GraphNode, useVueFlow, VueFlow} from '@vue-flow/core';
+import {getNodesInside, useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGraphConstructor';
@@ -44,12 +44,16 @@ const emit = defineEmits<{
   (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
+const vueFlowInstance = useVueFlow()
+const {layout} = useLayout();
+const {fitView} = useVueFlow();
+
+const settings = useSettings()
+
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const dataSchema = getSchemaForMode(SessionMode.DataEditor);
 const schemaSchema = getSchemaForMode(SessionMode.SchemaEditor);
-
-const currentPath: Ref<Path> = computed(() => schemaSession.currentPath.value);
 
 const forceFitView = ref(true);
 
@@ -59,7 +63,7 @@ const activeEdges: Ref<Edge[]> = ref<Edge[]>([]);
 const graphDirection = computed(() => {
   // note that having edges from left ro right will usually lead to a more vertical graph, because usually it is
   // not very deeply nested, but there exist many nodes on the same levels
-  return useSettings().schemaDiagram.vertical ? 'LR' : 'TB';
+  return settings.schemaDiagram.vertical ? 'LR' : 'TB';
 });
 
 const selectedNode: Ref<Node | undefined> = ref(undefined);
@@ -109,8 +113,9 @@ function fitViewForElementByPath(path: Path) {
   const previousBestMatchingNode = selectedNode.value;
   selectedNode.value = bestMatchingNode;
   selectedData.value = findBestMatchingData(bestMatchingNode, path);
-  if (bestMatchingNode && useSettings().schemaDiagram.moveViewToSelectedElement) {
-    if (previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) {
+  if (bestMatchingNode) {
+
+    if ((previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) || !settings.schemaDiagram.moveViewToSelectedElement) {
       // if the node is already within the viewport, do not move the view
       if (areNodesAlreadyWithinViewport([bestMatchingNode])) {
         return;
@@ -127,28 +132,22 @@ function fitViewForNodes(nodes: Node[]) {
       nodes: nodes.map(node => node.id),
       duration: 1000,
       padding: 1,
-      maxZoom: useSettings().schemaDiagram.automaticZoomMaxValue,
-      minZoom: useSettings().schemaDiagram.automaticZoomMinValue,
+      maxZoom: settings.schemaDiagram.automaticZoomMaxValue,
+      minZoom: settings.schemaDiagram.automaticZoomMinValue,
     });
   });
 }
 
 function areNodesAlreadyWithinViewport(nodes: Node[]) {
-  const state = useVueFlow();
+  const state = vueFlowInstance;
   const allGraphNodes = state.nodes.value;
   const relevantGraphNodes = allGraphNodes.filter(node => nodes.some(n => n.id === node.id));
-  const nodesInside = getNodesInside(
-    relevantGraphNodes,
-    {
-      x: 0,
-      y: 0,
-      width: state.dimensions.value.width,
-      height: state.dimensions.value.height,
-    },
-    state.viewport.value,
-    true
-  );
-  // TODO somehow state.nodes is empty array???
+  const nodesInside = getNodesInside(relevantGraphNodes, {
+    x: 0,
+    y: 0,
+    width: state.dimensions.value.width,
+    height: state.dimensions.value.height
+  }, state.viewport.value, false);
   return nodesInside.length == relevantGraphNodes.length;
 }
 
@@ -157,7 +156,7 @@ function updateGraph(forceRebuild: boolean = false) {
   const graph = constructSchemaGraph(schema);
   let graphNeedsLayouting = forceRebuild;
 
-  const vueFlowGraph = graph.toVueFlowGraph(useSettings().schemaDiagram.vertical);
+  const vueFlowGraph = graph.toVueFlowGraph(settings.schemaDiagram.vertical);
   if (wasNodeAdded(activeNodes.value, vueFlowGraph.nodes)) {
     // node was added -> it is needed to update whole graph
     activeNodes.value = vueFlowGraph.nodes;
@@ -201,8 +200,6 @@ function updateToSubgraph(path: Path) {
   }
 }
 
-const {layout} = useLayout();
-const {fitView} = useVueFlow();
 
 async function layoutGraph(direction: string, nodesInitialised: boolean) {
   activeNodes.value = layout(activeNodes.value, activeEdges.value, direction);
@@ -373,6 +370,7 @@ function addEnum() {
   });
   selectElement(enumPath);
 }
+
 </script>
 
 <template>
