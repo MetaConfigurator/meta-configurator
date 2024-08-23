@@ -149,8 +149,17 @@ It would also be a valid choice to move the `metal_salt_mass_unit`, `metal_salt_
 The same applies for the `linker_name` and `metal_salt_name` properties.
 They could also be fully removed, as the `cid` attribute will be used to identify the compounds (exception: if no corresponding molecule is found in PubChem, then information would be lost).
 
-Now, let's write a Python script to enrich the data with the additional metadata.
-The script is provided in the [enrich_data.py](enrich_data.py) file.
+Now, let's write a Python script to enrich the data with the additional metadata: [enrich_data.py](enrich_data.py).
+Run the script using Python and from the same folder where the `ecmofsynthesis.json` file is located.
+
+```bash
+python enrich_data.py
+```
+or
+```bash
+python3 enrich_data.py
+```
+
 The resulting JSON file is provided in the [ecmofsynthesis_enriched.json](ecmofsynthesis_enriched.json) file.
 
 If we load the enriched data into MetaConfigurator (using the 'Import Data' button), we can see that the `metal_salt` and `linker` properties now have the additional metadata.
