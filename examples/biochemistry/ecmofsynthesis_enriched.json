@@ -1,0 +1,531 @@
+{
+    "ecmofsynthesis": [
+        {
+            "vial_no": "S-1",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 60,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": true,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-2",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 80,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": true,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-3",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 100,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": true,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-4",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "Dry DMF",
+            "temperature": 120,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": true,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-5",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 120,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": true,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-6",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 120,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "hour",
+            "place": "microwave",
+            "phase_purity": true,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-7",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 140,
+            "temperature_unit": "deg C",
+            "time": 2,
+            "time_unit": "hour",
+            "place": "microwave",
+            "phase_purity": true,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-8",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF, NaOH",
+            "temperature": 120,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-9",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3",
+            "metal_salt_mass": 16,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF, HCI",
+            "temperature": 120,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 24380,
+                "inchi_code": "InChI=1S/3ClH.Fe/h3*1H;/q;;;+3/p-3",
+                "smiles_code": "Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron",
+                "molecular_weight": 162.2
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-10",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3.6H2O",
+            "metal_salt_mass": 27,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 60,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 16211236,
+                "inchi_code": "InChI=1S/3ClH.Fe.6H2O/h3*1H;;6*1H2/q;;;+3;;;;;;/p-3",
+                "smiles_code": "O.O.O.O.O.O.Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron;hexahydrate",
+                "molecular_weight": 270.29
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-11",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3.6H2O",
+            "metal_salt_mass": 27,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 80,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 16211236,
+                "inchi_code": "InChI=1S/3ClH.Fe.6H2O/h3*1H;;6*1H2/q;;;+3;;;;;;/p-3",
+                "smiles_code": "O.O.O.O.O.O.Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron;hexahydrate",
+                "molecular_weight": 270.29
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-12",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3.6H2O",
+            "metal_salt_mass": 27,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 100,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 16211236,
+                "inchi_code": "InChI=1S/3ClH.Fe.6H2O/h3*1H;;6*1H2/q;;;+3;;;;;;/p-3",
+                "smiles_code": "O.O.O.O.O.O.Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron;hexahydrate",
+                "molecular_weight": 270.29
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-13",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3.6H2O",
+            "metal_salt_mass": 27,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 120,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 16211236,
+                "inchi_code": "InChI=1S/3ClH.Fe.6H2O/h3*1H;;6*1H2/q;;;+3;;;;;;/p-3",
+                "smiles_code": "O.O.O.O.O.O.Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron;hexahydrate",
+                "molecular_weight": 270.29
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-14",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3.6H2O",
+            "metal_salt_mass": 27,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF",
+            "temperature": 140,
+            "temperature_unit": "deg C",
+            "time": 2,
+            "time_unit": "hour",
+            "place": "microwave",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 16211236,
+                "inchi_code": "InChI=1S/3ClH.Fe.6H2O/h3*1H;;6*1H2/q;;;+3;;;;;;/p-3",
+                "smiles_code": "O.O.O.O.O.O.Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron;hexahydrate",
+                "molecular_weight": 270.29
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-15",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3.6H2O",
+            "metal_salt_mass": 27,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF, NaOH",
+            "temperature": 120,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 16211236,
+                "inchi_code": "InChI=1S/3ClH.Fe.6H2O/h3*1H;;6*1H2/q;;;+3;;;;;;/p-3",
+                "smiles_code": "O.O.O.O.O.O.Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron;hexahydrate",
+                "molecular_weight": 270.29
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-16",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3.6H2O",
+            "metal_salt_mass": 27,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF, HCI",
+            "temperature": 90,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 16211236,
+                "inchi_code": "InChI=1S/3ClH.Fe.6H2O/h3*1H;;6*1H2/q;;;+3;;;;;;/p-3",
+                "smiles_code": "O.O.O.O.O.O.Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron;hexahydrate",
+                "molecular_weight": 270.29
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        },
+        {
+            "vial_no": "S-17",
+            "date": "01.02.2024",
+            "metal_salt_name": "FeCl3.6H2O",
+            "metal_salt_mass": 27,
+            "metal_salt_mass_unit": "mg",
+            "linker_name": "Benzene-1,4-dicarboxylic acid",
+            "linker_mass": 16,
+            "linker_mass_unit": "mg",
+            "solvent": "DMF, HCI",
+            "temperature": 120,
+            "temperature_unit": "deg C",
+            "time": 1,
+            "time_unit": "day",
+            "place": "oven",
+            "phase_purity": false,
+            "metal_salt": {
+                "cid": 16211236,
+                "inchi_code": "InChI=1S/3ClH.Fe.6H2O/h3*1H;;6*1H2/q;;;+3;;;;;;/p-3",
+                "smiles_code": "O.O.O.O.O.O.Cl[Fe](Cl)Cl",
+                "iupac_name": "trichloroiron;hexahydrate",
+                "molecular_weight": 270.29
+            },
+            "linker": {
+                "cid": 7489,
+                "inchi_code": "InChI=1S/C8H6O4/c9-7(10)5-1-2-6(4-3-5)8(11)12/h1-4H,(H,9,10)(H,11,12)",
+                "smiles_code": "C1=CC(=CC=C1C(=O)O)C(=O)O",
+                "iupac_name": "terephthalic acid",
+                "molecular_weight": 166.13
+            }
+        }
+    ]
+}

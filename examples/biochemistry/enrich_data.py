@@ -5,15 +5,25 @@ from rdkit import Chem
 from rdkit.Chem import Draw
 import pubchempy as pcp
 
+# Partially copied and adapted from https://github.com/FAIRChemistry/substance-query/blob/main/substancewidget
+# /substancewidget.py
+
+# Regular expressions to differentiate between smiles code, inchi, and inchikey
 RE_SMILES = re.compile(r"/^([^J][a-z0-9@+\-\[\]\(\)\\\/%=#$]{6,})$/ig")
 RE_INCHI = re.compile(
     r"/^((InChI=)?[^J][0-9BCOHNSOPrIFla+\-\(\)\\\/,pqbtmsih]{6,})$/ig"
 )
 RE_INCHIKEY = re.compile(r"/^([0-9A-Z\-]+)$/")
 
+# This data structure will store the PubChem compounds that have been queried, so that we don't have to query them again
 cached_compounds = {}
 
+
 def queryCompoundFromPubChem(query: str) -> pcp.Compound | None:
+    """
+    Query a compound using the PubChemPy library. The query can be a CID, SMILES, InChI, or InChIKey.
+    :param query: The query string
+    """
     if query in cached_compounds:
         return cached_compounds[query]
 
@@ -39,7 +49,13 @@ def queryCompoundFromPubChem(query: str) -> pcp.Compound | None:
     cached_compounds[query] = None
     return None
 
-def collectMetadata(compoundName: str, mass: float, mass_unit: str):
+
+def collectMetadata(compoundName: str):
+    """
+    Collect metadata for a compound from PubChem
+    :param compoundName: The name of the compound
+    :return: A dictionary with metadata
+    """
     compound = queryCompoundFromPubChem(compoundName)
     if compound is None:
         print('Error: Could not find molecule in PubChem: ' + compoundName)
@@ -48,14 +64,10 @@ def collectMetadata(compoundName: str, mass: float, mass_unit: str):
     # Append metadata
     compoundMetadata = {
         'cid': compound.cid,
-        'inchi': compound.inchi,
-        'inchikey': compound.inchikey,
-        'smiles': compound.isomeric_smiles,
-        'canonical_smiles': compound.canonical_smiles,
+        'inchi_code': compound.inchi,
+        'smiles_code': compound.isomeric_smiles,
         'iupac_name': compound.iupac_name,
-        'molecular_weight': compound.molecular_weight,
-        # 'mass': mass,
-        # 'mass_unit': mass_unit,
+        'molecular_weight': float(compound.molecular_weight)
     }
 
     return compoundMetadata
@@ -71,14 +83,10 @@ result_data = []
 for index, entry in enumerate(data[('ecmofsynthesis')]):
 
     metalSaltName = entry['metal_salt_name']
-    metalSaltMass = entry['metal_salt_mass']
-    metalSaltMassUnit = entry['metal_salt_mass_unit']
-    metalSaltMetadata = collectMetadata(metalSaltName, metalSaltMass, metalSaltMassUnit)
+    metalSaltMetadata = collectMetadata(metalSaltName)
 
     linkerName = entry['linker_name']
-    linkerMass = entry['linker_mass']
-    linkerMassUnit = entry['linker_mass_unit']
-    linkerMetadata = collectMetadata(linkerName, linkerMass, linkerMassUnit)
+    linkerMetadata = collectMetadata(linkerName)
 
     # draw both molecules and save to disk
     if 'smiles' in metalSaltMetadata:
@@ -95,5 +103,8 @@ for index, entry in enumerate(data[('ecmofsynthesis')]):
     result_data.append(result_entry)
 
 # Save the result data
-with open('ecmofsynthesis_result.json', 'w') as f:
-    json.dump(result_data, f, indent=4)
+full_result = {
+    'ecmofsynthesis': result_data
+}
+with open('ecmofsynthesis_enriched.json', 'w') as f:
+    json.dump(full_result, f, indent=4)

@@ -98,7 +98,7 @@
       "temperature": 120,
       "temperature_unit": "deg C",
       "time": 1,
-      "time_unit": "hours",
+      "time_unit": "hour",
       "place": "microwave",
       "phase_purity": true
     },
@@ -115,7 +115,7 @@
       "temperature": 140,
       "temperature_unit": "deg C",
       "time": 2,
-      "time_unit": "hours",
+      "time_unit": "hour",
       "place": "microwave",
       "phase_purity": true
     },
@@ -156,7 +156,7 @@
     {
       "vial_no": "S-10",
       "date": "01.02.2024",
-      "metal_salt_name": "FeCl3�6H2O",
+      "metal_salt_name": "FeCl3.6H2O",
       "metal_salt_mass": 27,
       "metal_salt_mass_unit": "mg",
       "linker_name": "Benzene-1,4-dicarboxylic acid",
@@ -173,7 +173,7 @@
     {
       "vial_no": "S-11",
       "date": "01.02.2024",
-      "metal_salt_name": "FeCl3�6H2O",
+      "metal_salt_name": "FeCl3.6H2O",
       "metal_salt_mass": 27,
       "metal_salt_mass_unit": "mg",
       "linker_name": "Benzene-1,4-dicarboxylic acid",
@@ -190,7 +190,7 @@
     {
       "vial_no": "S-12",
       "date": "01.02.2024",
-      "metal_salt_name": "FeCl3�6H2O",
+      "metal_salt_name": "FeCl3.6H2O",
       "metal_salt_mass": 27,
       "metal_salt_mass_unit": "mg",
       "linker_name": "Benzene-1,4-dicarboxylic acid",
@@ -207,7 +207,7 @@
     {
       "vial_no": "S-13",
       "date": "01.02.2024",
-      "metal_salt_name": "FeCl3�6H2O",
+      "metal_salt_name": "FeCl3.6H2O",
       "metal_salt_mass": 27,
       "metal_salt_mass_unit": "mg",
       "linker_name": "Benzene-1,4-dicarboxylic acid",
@@ -224,7 +224,7 @@
     {
       "vial_no": "S-14",
       "date": "01.02.2024",
-      "metal_salt_name": "FeCl3�6H2O",
+      "metal_salt_name": "FeCl3.6H2O",
       "metal_salt_mass": 27,
       "metal_salt_mass_unit": "mg",
       "linker_name": "Benzene-1,4-dicarboxylic acid",
@@ -234,14 +234,14 @@
       "temperature": 140,
       "temperature_unit": "deg C",
       "time": 2,
-      "time_unit": "hours",
+      "time_unit": "hour",
       "place": "microwave",
       "phase_purity": false
     },
     {
       "vial_no": "S-15",
       "date": "01.02.2024",
-      "metal_salt_name": "FeCl3�6H2O",
+      "metal_salt_name": "FeCl3.6H2O",
       "metal_salt_mass": 27,
       "metal_salt_mass_unit": "mg",
       "linker_name": "Benzene-1,4-dicarboxylic acid",
@@ -258,7 +258,7 @@
     {
       "vial_no": "S-16",
       "date": "01.02.2024",
-      "metal_salt_name": "FeCl3�6H2O",
+      "metal_salt_name": "FeCl3.6H2O",
       "metal_salt_mass": 27,
       "metal_salt_mass_unit": "mg",
       "linker_name": "Benzene-1,4-dicarboxylic acid",
@@ -275,7 +275,7 @@
     {
       "vial_no": "S-17",
       "date": "01.02.2024",
-      "metal_salt_name": "FeCl3�6H2O",
+      "metal_salt_name": "FeCl3.6H2O",
       "metal_salt_mass": 27,
       "metal_salt_mass_unit": "mg",
       "linker_name": "Benzene-1,4-dicarboxylic acid",
