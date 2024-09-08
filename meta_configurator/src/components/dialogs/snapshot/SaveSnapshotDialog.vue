@@ -1,6 +1,6 @@
 <!-- Dialog to import CSV data -->
 <script setup lang="ts">
-import {computed, type Ref, ref} from 'vue';
+import { type Ref, ref} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
