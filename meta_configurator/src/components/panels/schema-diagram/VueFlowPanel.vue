@@ -371,6 +371,11 @@ function addEnum() {
   selectElement(enumPath);
 }
 
+function unselectElement() {
+  selectedNode.value = undefined;
+  selectedData.value = undefined;
+}
+
 </script>
 
 <template>
@@ -379,16 +384,19 @@ function addEnum() {
       :nodes="activeNodes"
       :edges="activeEdges"
       @nodes-initialized="layoutGraph(graphDirection, true)"
+      @click="unselectElement()"
       fit-view-on-init
       :max-zoom="4"
       :min-zoom="0.1">
       <div class="controls">
-        <DiagramOptionsPanel @rebuild_graph="updateGraph(true)" @fit_view="fitView()" />
+        <DiagramOptionsPanel @rebuild_graph="updateGraph(true)" @fit_view="fitView()"
+                             @click.stop/>
 
         <CurrentPathBreadcrump
           :session-mode="SessionMode.SchemaEditor"
           :path="schemaSession.currentPath.value"
           root-name="document root"
+          @click.stop
           @update:path="updateCurrentPath"></CurrentPathBreadcrump>
 
         <Button label="Add Object" @click="addObject" class="main-options-element" />
