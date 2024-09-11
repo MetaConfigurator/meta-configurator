@@ -87,7 +87,8 @@ function addEnumItem() {
 <template>
   <div
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaenum': !isHighlighted}"
-    @click="clickedNode()">
+    @click="clickedNode()"
+    @click.stop>
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
     <p>&lt;enumeration&gt;</p>
 

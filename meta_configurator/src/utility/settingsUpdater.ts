@@ -10,7 +10,7 @@ function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
       userFile[key] = defaultsFile[key];
 
       // element itself was existing, but maybe it has some missing fields
-    } else if (typeof defaultsFile[key] === 'object') {
+    } else if (typeof defaultsFile[key] === 'object' && !Array.isArray(defaultsFile[key])) {
       addDefaultsForMissingFields(userFile[key], defaultsFile[key]);
     }
   }

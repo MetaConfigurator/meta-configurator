@@ -104,7 +104,7 @@ Notice, that in the GUI preview, the `metal_salt_mass_unit` and `linker_mass_uni
 
 ![Result of attribute type change to enum](figs/change_attribute_type_to_enum_result.png)
 
-In the same manner, create a new enum `time_unit` with the values `second`, `minute`, `hour`, `day` and `week`.
+In the same manner, create a new enum `time_unit` with the values `s`, `min`, `h`, `day` and `week`.
 To the `time_unit` attribute, change the type to the new enumeration.
 
 Also do the same for the `temperature_unit` attribute, with the values `K`, `deg C` and `deg F`.

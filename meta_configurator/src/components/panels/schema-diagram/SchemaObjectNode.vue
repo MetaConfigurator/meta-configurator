@@ -135,6 +135,7 @@ function isAttributeHighlighted() {
   <div
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaobject': !isHighlighted}"
     @click="clickedNode()"
+    @click.stop
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
