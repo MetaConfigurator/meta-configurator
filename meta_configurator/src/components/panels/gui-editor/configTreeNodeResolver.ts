@@ -489,9 +489,9 @@ export class ConfigTreeNodeResolver {
     const absolutePathWithIndex = absolutePath.concat(children.length);
     let label = 'Add item';
     if (schema.items.title) {
-        label = 'Add ' + schema.items.title;
+      label = 'Add ' + schema.items.title;
     } else if (absolutePath.length > 0) {
-        label = 'Add item (' + absolutePath[absolutePath.length - 1] + ')';
+      label = 'Add item (' + absolutePath[absolutePath.length - 1] + ')';
     }
     return {
       data: {

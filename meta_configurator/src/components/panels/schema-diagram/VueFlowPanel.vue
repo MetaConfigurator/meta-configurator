@@ -44,11 +44,11 @@ const emit = defineEmits<{
   (e: 'update_data', path: Path, newValue: any): void;
 }>();
 
-const vueFlowInstance = useVueFlow()
+const vueFlowInstance = useVueFlow();
 const {layout} = useLayout();
 const {fitView} = useVueFlow();
 
-const settings = useSettings()
+const settings = useSettings();
 
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
@@ -114,8 +114,10 @@ function fitViewForElementByPath(path: Path) {
   selectedNode.value = bestMatchingNode;
   selectedData.value = findBestMatchingData(bestMatchingNode, path);
   if (bestMatchingNode) {
-
-    if ((previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) || !settings.schemaDiagram.moveViewToSelectedElement) {
+    if (
+      (previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) ||
+      !settings.schemaDiagram.moveViewToSelectedElement
+    ) {
       // if the node is already within the viewport, do not move the view
       if (areNodesAlreadyWithinViewport([bestMatchingNode])) {
         return;
@@ -142,12 +144,17 @@ function areNodesAlreadyWithinViewport(nodes: Node[]) {
   const state = vueFlowInstance;
   const allGraphNodes = state.nodes.value;
   const relevantGraphNodes = allGraphNodes.filter(node => nodes.some(n => n.id === node.id));
-  const nodesInside = getNodesInside(relevantGraphNodes, {
-    x: 0,
-    y: 0,
-    width: state.dimensions.value.width,
-    height: state.dimensions.value.height
-  }, state.viewport.value, false);
+  const nodesInside = getNodesInside(
+    relevantGraphNodes,
+    {
+      x: 0,
+      y: 0,
+      width: state.dimensions.value.width,
+      height: state.dimensions.value.height,
+    },
+    state.viewport.value,
+    false
+  );
   return nodesInside.length == relevantGraphNodes.length;
 }
 
@@ -199,7 +206,6 @@ function updateToSubgraph(path: Path) {
     currentRootNodePath.value = bestMatchingNode.data.absolutePath;
   }
 }
-
 
 async function layoutGraph(direction: string, nodesInitialised: boolean) {
   activeNodes.value = layout(activeNodes.value, activeEdges.value, direction);
@@ -375,7 +381,6 @@ function unselectElement() {
   selectedNode.value = undefined;
   selectedData.value = undefined;
 }
-
 </script>
 
 <template>
@@ -389,8 +394,7 @@ function unselectElement() {
       :max-zoom="4"
       :min-zoom="0.1">
       <div class="controls">
-        <DiagramOptionsPanel @rebuild_graph="updateGraph(true)" @fit_view="fitView()"
-                             @click.stop/>
+        <DiagramOptionsPanel @rebuild_graph="updateGraph(true)" @fit_view="fitView()" @click.stop />
 
         <CurrentPathBreadcrump
           :session-mode="SessionMode.SchemaEditor"
