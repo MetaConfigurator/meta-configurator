@@ -4,6 +4,7 @@ import {type Ref, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
+import Panel from 'primevue/panel';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import RadioButton from 'primevue/radiobutton';
@@ -239,7 +240,9 @@ defineExpose({show: openDialog, close: hideDialog});
           class="text-green-500 ml-2" />
       </div>
 
-      <div v-if="currentUserDataString.length > 0">
+      <Panel v-if="currentUserDataString.length > 0" header="Import Options" toggleable :collapsed="true">
+
+      <div >
         <div class="flex align-items-center vertical-center">
           <label for="delimiter" class="mr-2"><b>Delimiter in the CSV document:</b></label>
           <Dropdown
@@ -376,14 +379,14 @@ defineExpose({show: openDialog, close: hideDialog});
             </tr>
           </tbody>
         </table>
+      </div>
 
-        <Divider />
+      </Panel>
 
-        <Button
+        <Button v-if="currentUserCsv.length > 0"
           @click="submitImport"
           class="p-button-raised p-button-rounded"
           label="Import"></Button>
-      </div>
     </div>
   </Dialog>
 </template>
