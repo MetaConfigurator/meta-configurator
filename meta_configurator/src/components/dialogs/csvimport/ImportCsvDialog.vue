@@ -240,153 +240,160 @@ defineExpose({show: openDialog, close: hideDialog});
           class="text-green-500 ml-2" />
       </div>
 
-      <Panel v-if="currentUserDataString.length > 0" header="Import Options" toggleable :collapsed="true">
-
-      <div >
-        <div class="flex align-items-center vertical-center">
-          <label for="delimiter" class="mr-2"><b>Delimiter in the CSV document:</b></label>
-          <Dropdown
-            id="delimiter"
-            v-model="delimiter"
-            :options="delimiterOptions"
-            :option-label="option => option.label" />
-        </div>
-
-        <div class="flex align-items-center vertical-center">
-          <label for="decimalSeparator" class="mr-2"
-            ><b>Decimal Separator in the CSV document:</b></label
-          >
-          <Dropdown
-            id="decimalSeparator"
-            v-model="decimalSeparator"
-            class="small-input"
-            :options="decimalSeparatorOptions"
-            :option-label="option => option.label" />
-        </div>
-
-        <p v-if="errorMessage.length > 0" style="color: red; white-space: pre-line">
-          {{ errorMessage }}
-        </p>
-      </div>
-
-      <div
-        v-if="currentUserCsv.length > 0"
-        class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-        <Divider />
-
-        <div class="flex flex-wrap gap-4">
-          <div class="flex items-center">
-            <RadioButton
-              v-model="isExpandWithLookupTables"
-              inputId="independentTable"
-              name="independentTable"
-              :value="false" />
-            <label for="independentTable" class="ml-2">Independent Table</label>
-          </div>
-          <div class="flex items-center">
-            <RadioButton
-              v-model="isExpandWithLookupTables"
-              inputId="expandWithLookupTable"
-              name="expandWithLookupTable"
-              :value="true"
-              :disabled="possiblePreviousTables.length == 0" />
-            <label for="expand" class="ml-2">Expand with Lookup Table</label>
-          </div>
-        </div>
-        <div v-if="!isExpandWithLookupTables">
-          <span>Import this CSV as a standalone table.</span>
-
+      <Panel
+        v-if="currentUserDataString.length > 0"
+        header="Import Options"
+        toggleable
+        :collapsed="true">
+        <div>
           <div class="flex align-items-center vertical-center">
-            <label for="delimiter" class="mr-2">
-              <b>Path for the resulting array in the document:</b>
-            </label>
-            <InputText v-model="pathBeforeRowIndex" class="fixed-width" />
-          </div>
-        </div>
-        <div v-else>
-          <span
-            >Use this CSV to expand an existing table by matching foreign keys with primary keys
-            from the lookup table.</span
-          >
-
-          <div class="flex align-items-center vertical-center">
-            <label class="mr-2">
-              <b>Primary key in new CSV:</b>
-            </label>
+            <label for="delimiter" class="mr-2"><b>Delimiter in the CSV document:</b></label>
             <Dropdown
-              id="tableToExpand"
-              v-model="primaryKeyProp"
-              class="fixed-width"
-              :options="possiblePrimaryKeyProps"
+              id="delimiter"
+              v-model="delimiter"
+              :options="delimiterOptions"
               :option-label="option => option.label" />
           </div>
+
           <div class="flex align-items-center vertical-center">
-            <label class="mr-2">
-              <b>Table to expand:</b>
-            </label>
+            <label for="decimalSeparator" class="mr-2"
+              ><b>Decimal Separator in the CSV document:</b></label
+            >
             <Dropdown
-              id="tableToExpand"
-              v-model="tableToExpand"
-              class="fixed-width"
-              :options="possiblePreviousTables"
+              id="decimalSeparator"
+              v-model="decimalSeparator"
+              class="small-input"
+              :options="decimalSeparatorOptions"
               :option-label="option => option.label" />
           </div>
-          <div class="flex align-items-center vertical-center">
-            <label class="mr-2">
-              <b>Foreign key in existing data:</b>
-            </label>
-            <Dropdown
-              id="foreignKeyName"
-              v-model="foreignKey"
-              class="fixed-width"
-              :options="possibleForeignKeyProps"
-              :option-label="option => option.label" />
+
+          <p v-if="errorMessage.length > 0" style="color: red; white-space: pre-line">
+            {{ errorMessage }}
+          </p>
+        </div>
+
+        <div
+          v-if="currentUserCsv.length > 0"
+          class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
+          <Divider />
+
+          <div class="flex flex-wrap gap-4">
+            <div class="flex items-center">
+              <RadioButton
+                v-model="isExpandWithLookupTables"
+                inputId="independentTable"
+                name="independentTable"
+                :value="false" />
+              <label for="independentTable" class="ml-2">Independent Table</label>
+            </div>
+            <div class="flex items-center">
+              <RadioButton
+                v-model="isExpandWithLookupTables"
+                inputId="expandWithLookupTable"
+                name="expandWithLookupTable"
+                :value="true"
+                :disabled="possiblePreviousTables.length == 0" />
+              <label for="expand" class="ml-2">Expand with Lookup Table</label>
+            </div>
           </div>
-        </div>
+          <div v-if="!isExpandWithLookupTables">
+            <span>Import this CSV as a standalone table.</span>
 
-        <Divider />
+            <div class="flex align-items-center vertical-center">
+              <label for="delimiter" class="mr-2">
+                <b>Path for the resulting array in the document:</b>
+              </label>
+              <InputText v-model="pathBeforeRowIndex" class="fixed-width" />
+            </div>
+          </div>
+          <div v-else>
+            <span
+              >Use this CSV to expand an existing table by matching foreign keys with primary keys
+              from the lookup table.</span
+            >
 
-        <div class="flex align-items-center vertical-center">
-          <label for="delimiter" class="mr-2"><b>Infer and generate schema for the data:</b></label>
-          <InputSwitch id="delimiter" v-model="isInferSchema" class="small-input" />
-        </div>
+            <div class="flex align-items-center vertical-center">
+              <label class="mr-2">
+                <b>Primary key in new CSV:</b>
+              </label>
+              <Dropdown
+                id="tableToExpand"
+                v-model="primaryKeyProp"
+                class="fixed-width"
+                :options="possiblePrimaryKeyProps"
+                :option-label="option => option.label" />
+            </div>
+            <div class="flex align-items-center vertical-center">
+              <label class="mr-2">
+                <b>Table to expand:</b>
+              </label>
+              <Dropdown
+                id="tableToExpand"
+                v-model="tableToExpand"
+                class="fixed-width"
+                :options="possiblePreviousTables"
+                :option-label="option => option.label" />
+            </div>
+            <div class="flex align-items-center vertical-center">
+              <label class="mr-2">
+                <b>Foreign key in existing data:</b>
+              </label>
+              <Dropdown
+                id="foreignKeyName"
+                v-model="foreignKey"
+                class="fixed-width"
+                :options="possibleForeignKeyProps"
+                :option-label="option => option.label" />
+            </div>
+          </div>
 
-        <p>
-          CSV file has {{ currentUserCsv.length }} rows and
-          {{ currentColumnMapping.length }} columns (attributes).
-        </p>
-        <p>Define the mapping from the CSV to the JSON document for each attribute.</p>
+          <Divider />
 
-        <table>
-          <thead>
-            <tr>
-              <th>CSV Column</th>
-              <th>JSON Property Identifier</th>
-              <!--th v-if="isInferSchema">Property Schema Title</--th-->
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="column in currentColumnMapping">
-              <td>{{ column.name }}</td>
-              <td>
-                <span class="text-xs">/{{ column.pathBeforeRowIndex }}/ROW_INDEX/</span>
-                <span class="text-xs" v-if="isExpandWithLookupTables">{{ foreignKey.value }}/</span>
-                <InputText v-model="column.pathAfterRowIndex" class="fixed-width" />
-              </td>
-              <!--td v-if="isInferSchema">
+          <div class="flex align-items-center vertical-center">
+            <label for="delimiter" class="mr-2"
+              ><b>Infer and generate schema for the data:</b></label
+            >
+            <InputSwitch id="delimiter" v-model="isInferSchema" class="small-input" />
+          </div>
+
+          <p>
+            CSV file has {{ currentUserCsv.length }} rows and
+            {{ currentColumnMapping.length }} columns (attributes).
+          </p>
+          <p>Define the mapping from the CSV to the JSON document for each attribute.</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>CSV Column</th>
+                <th>JSON Property Identifier</th>
+                <!--th v-if="isInferSchema">Property Schema Title</--th-->
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="column in currentColumnMapping">
+                <td>{{ column.name }}</td>
+                <td>
+                  <span class="text-xs">/{{ column.pathBeforeRowIndex }}/ROW_INDEX/</span>
+                  <span class="text-xs" v-if="isExpandWithLookupTables"
+                    >{{ foreignKey.value }}/</span
+                  >
+                  <InputText v-model="column.pathAfterRowIndex" class="fixed-width" />
+                </td>
+                <!--td v-if="isInferSchema">
                 <InputText v-model="column.titleInSchema" class="fixed-width" />
               </td-->
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </Panel>
 
-        <Button v-if="currentUserCsv.length > 0"
-          @click="submitImport"
-          class="p-button-raised p-button-rounded"
-          label="Import"></Button>
+      <Button
+        v-if="currentUserCsv.length > 0"
+        @click="submitImport"
+        class="p-button-raised p-button-rounded"
+        label="Import"></Button>
     </div>
   </Dialog>
 </template>
