@@ -3,12 +3,11 @@ import {computed, ref, triggerRef} from 'vue';
 import {useDataConverter} from '@/dataformats/formatRegistry';
 import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
-import {dataPathToSchemaPath, pathToString} from '@/utility/pathUtils';
+import { pathToString} from '@/utility/pathUtils';
 import _ from 'lodash';
 import {useDebouncedRefHistory} from '@vueuse/core';
 import type {UndoManager} from '@/data/undoManager';
 import type {SessionMode} from '@/store/sessionMode';
-import {getSchemaForMode} from "@/data/useDataLink";
 
 /**
  * This class manages the data and keeps the data and the string representation in sync.
@@ -98,41 +97,6 @@ export class ManagedData {
     if (_.isEqual(dataAtPath, value)) {
       // nothing to do if the value is the same
       return;
-    }
-
-    if (dataAtPath == null) {
-      // if the element is new, we add it to the parent object in a sorted way
-      const parentPath = path.slice(0, path.length - 1);
-      const parentSchemaPath = dataPathToSchemaPath(parentPath);
-      const parentSchemaProps = getSchemaForMode(this.mode).effectiveSchemaAtPath(parentSchemaPath).schema.properties;
-      const parentData = structuredClone(this.dataAt(parentPath));
-      if (!_.isEmpty(parentSchemaProps) && !_.isEmpty(parentData)) {
-        // only proceed with property sorting when parent schema and data are not empty
-        // warning: this function only works for normal properties, not for composition, conditionals and other advanced features
-        // for those advanced features, the new property will be added at the end of the object
-        // TODO: implement sorting for advanced features. This will be more complicated and will require a lot of testing
-        const schemaKeys = Object.keys(parentSchemaProps);
-        const dataKeys = Object.keys(parentData);
-        const newElementKey = path[path.length - 1];
-        parentData[newElementKey] = value; // Add the new property
-
-        // sort the document properties based on the order of schema properties
-        const sortedProperties: { [key: string]: any } = {};
-        schemaKeys.forEach((key) => {
-          if (dataKeys.includes(key) || key === newElementKey) {
-            sortedProperties[key] = parentData[key];
-          }
-        });
-        // after adding properties from the schema in proper order, add the rest of the properties
-        dataKeys.forEach((key) => {
-            if (!schemaKeys.includes(key)) {
-                sortedProperties[key] = parentData[key];
-            }
-        });
-
-        this.setDataAt(parentPath, sortedProperties);
-        return;
-      }
     }
 
     this.updateData(data => {
