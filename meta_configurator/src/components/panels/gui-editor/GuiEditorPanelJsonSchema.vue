@@ -5,8 +5,9 @@ import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue'
 import type {Path} from '@/utility/path';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
+import {getDataForMode, getSessionForMode, useCurrentSchema} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
+import {dataPathToSchemaPath} from "@/utility/pathUtils";
 
 const props = defineProps<{
   sessionMode: SessionMode;
