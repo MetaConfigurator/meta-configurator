@@ -5,10 +5,15 @@ import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue'
 import type {Path} from '@/utility/path';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {getDataForMode, getSchemaForMode, getSessionForMode, useCurrentSchema} from '@/data/useDataLink';
+import {
+  getDataForMode,
+  getSchemaForMode,
+  getSessionForMode,
+  useCurrentSchema,
+} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
-import {dataPathToSchemaPath} from "@/utility/pathUtils";
-import _ from "lodash";
+import {dataPathToSchemaPath} from '@/utility/pathUtils';
+import _ from 'lodash';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -23,14 +28,15 @@ function updatePath(newPath: Path) {
 
 function updateData(path: Path, newValue: any) {
   if (path.length > 0) {
-
     const dataAtPath = data.dataAt(path);
 
     if (dataAtPath == null) {
       // if the element is new, we add it to the parent object in a sorted way
       const parentPath = path.slice(0, path.length - 1);
       const parentSchemaPath = dataPathToSchemaPath(parentPath);
-      const parentSchemaProps = getSchemaForMode(props.sessionMode).effectiveSchemaAtPath(parentSchemaPath).schema.properties;
+      const parentSchemaProps = getSchemaForMode(props.sessionMode).effectiveSchemaAtPath(
+        parentSchemaPath
+      ).schema.properties;
       const parentData = structuredClone(data.dataAt(parentPath));
       if (!_.isEmpty(parentSchemaProps) && !_.isEmpty(parentData)) {
         // only proceed with property sorting when parent schema and data are not empty
@@ -43,14 +49,14 @@ function updateData(path: Path, newValue: any) {
         parentData[newElementKey] = newValue; // Add the new property
 
         // sort the document properties based on the order of schema properties
-        const sortedProperties: { [key: string]: any } = {};
-        schemaKeys.forEach((key) => {
+        const sortedProperties: {[key: string]: any} = {};
+        schemaKeys.forEach(key => {
           if (dataKeys.includes(key) || key === newElementKey) {
             sortedProperties[key] = parentData[key];
           }
         });
         // after adding properties from the schema in proper order, add the rest of the properties
-        dataKeys.forEach((key) => {
+        dataKeys.forEach(key => {
           if (!schemaKeys.includes(key)) {
             sortedProperties[key] = parentData[key];
           }

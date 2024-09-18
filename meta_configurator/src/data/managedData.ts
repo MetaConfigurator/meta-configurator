@@ -3,7 +3,7 @@ import {computed, ref, triggerRef} from 'vue';
 import {useDataConverter} from '@/dataformats/formatRegistry';
 import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
-import { pathToString} from '@/utility/pathUtils';
+import {pathToString} from '@/utility/pathUtils';
 import _ from 'lodash';
 import {useDebouncedRefHistory} from '@vueuse/core';
 import type {UndoManager} from '@/data/undoManager';

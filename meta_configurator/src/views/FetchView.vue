@@ -9,8 +9,7 @@ defineProps({
   settings_url: String,
 });
 
-
-function processUrl(url: string) : string {
+function processUrl(url: string): string {
   // if url is Github URL, convert to raw source code URL
   if (url.includes('github.com')) {
     const parts = url.split('/');
