@@ -174,7 +174,9 @@ function updateGraph(forceRebuild: boolean = false) {
     // only data updated or nodes removed
     const nodesToRemove = updateNodeData(activeNodes.value, vueFlowGraph.nodes);
     activeNodes.value = activeNodes.value.filter(node => !nodesToRemove.includes(node.id));
+
     // we still update edges, because they might have changed
+    // todo: check if the edges are updated and only then trigger layouting
     activeEdges.value = vueFlowGraph.edges;
     graphNeedsLayouting = true;
   }
