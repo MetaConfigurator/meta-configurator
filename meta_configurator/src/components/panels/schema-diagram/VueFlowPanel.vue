@@ -176,6 +176,7 @@ function updateGraph(forceRebuild: boolean = false) {
     activeNodes.value = activeNodes.value.filter(node => !nodesToRemove.includes(node.id));
     // we still update edges, because they might have changed
     activeEdges.value = vueFlowGraph.edges;
+    graphNeedsLayouting = true;
   }
 
   // if not on root level but current path is set: show only subgraph
@@ -188,8 +189,10 @@ function updateGraph(forceRebuild: boolean = false) {
     layoutGraph(graphDirection.value, false);
   }
 
-  if (!graphNeedsLayouting && schemaSession.currentSelectedElement.value) {
-    fitViewForElementByPath(schemaSession.currentSelectedElement.value);
+  if (schemaSession.currentSelectedElement.value) {
+    nextTick(() => {
+      fitViewForElementByPath(schemaSession.currentSelectedElement.value);
+    });
   }
 }
 
