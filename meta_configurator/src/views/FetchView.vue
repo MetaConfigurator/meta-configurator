@@ -9,12 +9,21 @@ defineProps({
   settings_url: String,
 });
 
+function processUrl(url: string): string {
+  // if url is GitHub URL, convert to raw source code URL
+  if (url.includes('github.com')) {
+    return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+  }
+
+  return url;
+}
+
 onMounted(() => {
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
 
   if ('settings' in query) {
-    const settingsUrl = query.settings as string;
+    const settingsUrl = processUrl(query.settings as string);
     console.info('Received settings URL ', settingsUrl, ' from query string "', query, '".');
     fetch(settingsUrl)
       .then(function (response) {
@@ -30,7 +39,7 @@ onMounted(() => {
     console.debug('skip initial schema selection dialog');
     useSessionStore().hasShownInitialDialog = true;
 
-    const schemaUrl = query.schema as string;
+    const schemaUrl = processUrl(query.schema as string);
     console.info('Received schema URL ', schemaUrl, ' from query string "', query, '".');
     fetch(schemaUrl)
       .then(function (response) {
@@ -44,7 +53,7 @@ onMounted(() => {
   }
 
   if ('data' in query) {
-    const dataUrl = query.data as string;
+    const dataUrl = processUrl(query.data as string);
     console.info('Received data URL ', dataUrl, ' from query string "', query, '".');
     fetch(dataUrl)
       .then(function (response) {
