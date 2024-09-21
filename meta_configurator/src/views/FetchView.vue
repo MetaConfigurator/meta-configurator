@@ -9,11 +9,10 @@ defineProps({
   settings_url: String,
 });
 
-
-function processUrl(url: string) : string {
+function processUrl(url: string): string {
   // if url is GitHub URL, convert to raw source code URL
   if (url.includes('github.com')) {
-    return url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
+    return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
   }
 
   return url;
