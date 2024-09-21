@@ -16,7 +16,7 @@ import {
   trimNodeChildren,
 } from '../schemaGraphConstructor';
 import {useSettings} from '@/settings/useSettings';
-import {ref} from "vue";
+import {ref} from 'vue';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -141,6 +141,8 @@ describe('test schema graph constructor with objects and attributes with enums',
 
     trimNodeChildren(schemaGraph);
 
-    expect(enumIntNode.values.length).toEqual(useSettings().value.schemaDiagram.maxEnumValuesToShow);
+    expect(enumIntNode.values.length).toEqual(
+      useSettings().value.schemaDiagram.maxEnumValuesToShow
+    );
   });
 });

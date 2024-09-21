@@ -3,9 +3,9 @@ import {useAppRouter} from '@/router/router';
 import {onMounted} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
 import {restoreSnapshot} from '@/utility/backend/backendApi';
-import {getDataForMode} from "@/data/useDataLink";
-import {SessionMode} from "@/store/sessionMode";
-import {useSettings} from "@/settings/useSettings";
+import {getDataForMode} from '@/data/useDataLink';
+import {SessionMode} from '@/store/sessionMode';
+import {useSettings} from '@/settings/useSettings';
 
 defineProps({
   settings_url: String,
@@ -14,10 +14,10 @@ defineProps({
 const sessionStore = useSessionStore();
 const settings = useSettings();
 
-function processUrl(url: string) : string {
+function processUrl(url: string): string {
   // if url is GitHub URL, convert to raw source code URL
   if (url.includes('github.com')) {
-    return url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
+    return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
   }
 
   return url;
@@ -33,13 +33,13 @@ onMounted(() => {
     console.info('Received settings URL ', settingsUrl, ' from query string "', query, '".');
     usesCustomSettings = true;
     fetch(settingsUrl)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (jsonData) {
-          console.info('Fetched provided settings file and parsed as json.', jsonData);
-          getDataForMode(SessionMode.Settings).setData(jsonData);
-        });
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonData) {
+        console.info('Fetched provided settings file and parsed as json.', jsonData);
+        getDataForMode(SessionMode.Settings).setData(jsonData);
+      });
   }
 
   if ('schema' in query) {
@@ -49,26 +49,26 @@ onMounted(() => {
     const schemaUrl = processUrl(query.schema as string);
     console.info('Received schema URL ', schemaUrl, ' from query string "', query, '".');
     fetch(schemaUrl)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (jsonData) {
-          console.info('Fetched provided schema file and parsed as json.', jsonData);
-          getDataForMode(SessionMode.SchemaEditor).setData(jsonData);
-        });
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonData) {
+        console.info('Fetched provided schema file and parsed as json.', jsonData);
+        getDataForMode(SessionMode.SchemaEditor).setData(jsonData);
+      });
   }
 
   if ('data' in query) {
     const dataUrl = processUrl(query.data as string);
     console.info('Received data URL ', dataUrl, ' from query string "', query, '".');
     fetch(dataUrl)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (jsonData) {
-          console.info('Fetched provided file and parsed as json.', jsonData);
-          getDataForMode(SessionMode.DataEditor).setData(jsonData);
-        });
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonData) {
+        console.info('Fetched provided file and parsed as json.', jsonData);
+        getDataForMode(SessionMode.DataEditor).setData(jsonData);
+      });
   }
 
   if ('snapshot' in query) {

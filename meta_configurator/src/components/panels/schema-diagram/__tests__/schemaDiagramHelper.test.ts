@@ -1,13 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {
-  SchemaGraph,
-} from '../schemaDiagramTypes';
-import {
-  constructSchemaGraph,
-} from '../schemaGraphConstructor';
+import {SchemaGraph} from '../schemaDiagramTypes';
+import {constructSchemaGraph} from '../schemaGraphConstructor';
 import {findBestMatchingNode} from '../schemaDiagramHelper';
-import {ref} from "vue";
+import {ref} from 'vue';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({

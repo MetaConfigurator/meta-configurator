@@ -1,7 +1,6 @@
 import {useSettings} from '@/settings/useSettings';
 import {errorService} from '@/main';
 
-
 const settings = useSettings();
 
 export async function findSuggestionsForSearchTerm(

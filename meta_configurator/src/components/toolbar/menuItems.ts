@@ -193,7 +193,7 @@ export class MenuItems {
         'fa-solid fa-code',
         'fa-solid fa-code',
         'schema text editor',
-          settings
+        settings
       )
     );
 
@@ -206,7 +206,7 @@ export class MenuItems {
         'fa-solid fa-wrench',
         'fa-solid fa-wrench',
         'schema GUI editor',
-          settings
+        settings
       )
     );
 
@@ -219,7 +219,7 @@ export class MenuItems {
         'fa-regular fa-eye',
         'fa-solid fa-eye',
         'preview of resulting GUI',
-          settings
+        settings
       )
     );
 
@@ -232,7 +232,7 @@ export class MenuItems {
         'fa-solid fa-diagram-project',
         'fa-solid fa-diagram-project',
         'schema diagram',
-          settings
+        settings
       )
     );
 

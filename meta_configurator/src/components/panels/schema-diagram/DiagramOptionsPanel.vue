@@ -16,7 +16,6 @@ function rebuildGraph() {
 }
 
 const settings = useSettings();
-
 </script>
 
 <template>
@@ -25,17 +24,13 @@ const settings = useSettings();
       <div>
         <label
           >Edit Mode
-          <InputSwitch
-            v-model="settings.schemaDiagram.editMode"
-            class="options-input-switch" />
+          <InputSwitch v-model="settings.schemaDiagram.editMode" class="options-input-switch" />
         </label>
       </div>
       <div>
         <label
           >Graph direction vertical
-          <InputSwitch
-            v-model="settings.schemaDiagram.vertical"
-            class="options-input-switch" />
+          <InputSwitch v-model="settings.schemaDiagram.vertical" class="options-input-switch" />
         </label>
       </div>
       <div>

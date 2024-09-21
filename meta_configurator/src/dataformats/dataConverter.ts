@@ -1,8 +1,6 @@
 import YAML from 'yaml';
 import {useSettings} from '@/settings/useSettings';
 
-
-
 /**
  * Abstract super class for converters that can parse and stringify data.
  */
