@@ -3,7 +3,7 @@ Main component of the application.
 Combines the code editor and the gui editor.
 -->
 <script lang="ts" setup>
-import {computed, onMounted, ref, watch} from 'vue';
+import {computed, onMounted, type Ref, ref, watch} from 'vue';
 import 'primeicons/primeicons.css';
 import SplitterPanel from 'primevue/splitterpanel';
 import Splitter from 'primevue/splitter';
@@ -31,15 +31,15 @@ const props = defineProps<{
 }>();
 
 const settings = useSettings();
-let panelsDefinition: SettingsInterfacePanels = settings.panels;
+let panelsDefinition: SettingsInterfacePanels = settings.value.panels;
 
 // update panelsDefinition only when underlying data changes. Otherwise, all panels will be rebuilt every time
 // any setting is changed, which is not necessary and leads to Ace Editor becoming blank if settings were modified via
 // Ace Editor
 watchImmediate(
   () => settings,
-  (settings: SettingsInterfaceRoot) => {
-    let panels = settings.panels;
+  (settings: Ref<SettingsInterfaceRoot>) => {
+    let panels = settings.value.panels;
     if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition)) {
       panelsDefinition = panels;
     }

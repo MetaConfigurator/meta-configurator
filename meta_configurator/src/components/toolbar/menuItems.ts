@@ -9,7 +9,6 @@ import {getDataForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLi
 import {useDataSource} from '@/data/dataSource';
 import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
-import {useSettings} from '@/settings/useSettings';
 import {PanelType} from '@/components/panelType';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
@@ -193,7 +192,8 @@ export class MenuItems {
         SessionMode.SchemaEditor,
         'fa-solid fa-code',
         'fa-solid fa-code',
-        'schema text editor'
+        'schema text editor',
+        settings
       )
     );
 
@@ -205,7 +205,8 @@ export class MenuItems {
         SessionMode.SchemaEditor,
         'fa-solid fa-wrench',
         'fa-solid fa-wrench',
-        'schema GUI editor'
+        'schema GUI editor',
+        settings
       )
     );
 
@@ -217,7 +218,8 @@ export class MenuItems {
         SessionMode.DataEditor,
         'fa-regular fa-eye',
         'fa-solid fa-eye',
-        'preview of resulting GUI'
+        'preview of resulting GUI',
+        settings
       )
     );
 
@@ -229,7 +231,8 @@ export class MenuItems {
         SessionMode.SchemaEditor,
         'fa-solid fa-diagram-project',
         'fa-solid fa-diagram-project',
-        'schema diagram'
+        'schema diagram',
+        settings
       )
     );
 
@@ -241,19 +244,19 @@ export class MenuItems {
     result.push(
       this.generateToggleButton(
         () =>
-          useSettings().metaSchema.allowBooleanSchema &&
-          useSettings().metaSchema.allowMultipleTypes &&
-          !useSettings().metaSchema.objectTypesComfort &&
-          !useSettings().metaSchema.markMoreFieldsAsAdvanced,
+          settings.metaSchema.allowBooleanSchema &&
+          settings.metaSchema.allowMultipleTypes &&
+          !settings.metaSchema.objectTypesComfort &&
+          !settings.metaSchema.markMoreFieldsAsAdvanced,
         () => {
-          const metaSchema = useSettings().metaSchema;
+          const metaSchema = settings.metaSchema;
           metaSchema.allowBooleanSchema = true;
           metaSchema.allowMultipleTypes = true;
           metaSchema.objectTypesComfort = false;
           metaSchema.markMoreFieldsAsAdvanced = false;
         },
         () => {
-          const metaSchema = useSettings().metaSchema;
+          const metaSchema = settings.metaSchema;
           metaSchema.allowBooleanSchema = false;
           metaSchema.allowMultipleTypes = false;
           metaSchema.markMoreFieldsAsAdvanced = true;
@@ -268,13 +271,13 @@ export class MenuItems {
     // toggle to activate/deactivate JSON-LD support
     result.push(
       this.generateToggleButton(
-        () => useSettings().metaSchema.showJsonLdFields,
+        () => settings.metaSchema.showJsonLdFields,
         () => {
-          const metaSchema = useSettings().metaSchema;
+          const metaSchema = settings.metaSchema;
           metaSchema.showJsonLdFields = true;
         },
         () => {
-          const metaSchema = useSettings().metaSchema;
+          const metaSchema = settings.metaSchema;
           metaSchema.showJsonLdFields = false;
         },
         'fa-solid fa-circle-nodes',
@@ -293,15 +296,16 @@ export class MenuItems {
     panelMode: SessionMode,
     iconNameEnabled: string,
     iconNameDisabled: string,
-    description: string
+    description: string,
+    settings: SettingsInterfaceRoot
   ): MenuItem {
     return this.generateToggleButton(
       () =>
-        useSettings().panels[buttonMode].find(
+        settings.panels[buttonMode].find(
           panel => panel.panelType === panelType && panel.mode === panelMode
         ) !== undefined,
       () => {
-        const panels = useSettings().panels;
+        const panels = settings.panels;
         panels[buttonMode].push({
           panelType: panelType,
           mode: panelMode,
@@ -309,7 +313,7 @@ export class MenuItems {
         });
       },
       () => {
-        const panels = useSettings().panels;
+        const panels = settings.panels;
         panels[buttonMode] = panels[buttonMode].filter(
           panel => !(panel.panelType === panelType && panel.mode === panelMode)
         );

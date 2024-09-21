@@ -74,7 +74,7 @@ function canZoomIn(): boolean {
  * depending on if the maximum depth has been reached or not.
  */
 function onPressEnter() {
-  if (props.node.data.depth === settings.guiEditor.maximumDepth) {
+  if (props.node.data.depth === settings.value.guiEditor.maximumDepth) {
     zoomIntoPath();
     return;
   }

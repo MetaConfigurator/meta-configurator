@@ -16,6 +16,8 @@ import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useSettings} from '@/settings/useSettings';
 
+const settings = useSettings();
+
 const props = defineProps<{
   data: SchemaObjectAttributeData;
   selectedData?: SchemaElementData;
@@ -65,7 +67,7 @@ function deleteAttribute() {
 }
 
 function isEditable() {
-  return isHighlighted() && useSettings().schemaDiagram.editMode;
+  return isHighlighted() && settings.value.schemaDiagram.editMode;
 }
 
 function isHighlighted() {

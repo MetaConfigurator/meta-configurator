@@ -15,8 +15,10 @@ import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 
+const settings = useSettings();
+
 export function constructSchemaGraph(rootSchema: TopLevelSchema): SchemaGraph {
-  if (useSettings().schemaDiagram.mergeAllOfs) {
+  if (settings.value.schemaDiagram.mergeAllOfs) {
     // duplicate root schema to avoid modifying the original schema
     rootSchema = JSON.parse(JSON.stringify(rootSchema));
 
@@ -609,8 +611,8 @@ export function trimGraph(graph: SchemaGraph) {
 }
 
 export function trimNodeChildren(graph: SchemaGraph) {
-  const maxEnumValuesToShow = useSettings().schemaDiagram.maxEnumValuesToShow;
-  const maxAttributesToShow = useSettings().schemaDiagram.maxAttributesToShow;
+  const maxEnumValuesToShow = settings.value.schemaDiagram.maxEnumValuesToShow;
+  const maxAttributesToShow = settings.value.schemaDiagram.maxAttributesToShow;
   for (const nodeData of graph.nodes) {
     if (nodeData.getNodeType() == 'schemaobject') {
       const nodeDataObject = nodeData as SchemaObjectNodeData;

@@ -2,14 +2,12 @@
 import {
   SchemaElementData,
   SchemaEnumNodeData,
-  SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
 import {type Ref, ref} from 'vue';
 import InputText from 'primevue/inputtext';
-import {pathToString} from '@/utility/pathUtils';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
@@ -38,7 +36,7 @@ function clickedNode() {
 }
 
 function isEnumEditable() {
-  return isHighlighted() && settings.schemaDiagram.editMode;
+  return isHighlighted() && settings.value.schemaDiagram.editMode;
 }
 
 function isDefinedInDefinitions() {
