@@ -9,19 +9,11 @@ defineProps({
   settings_url: String,
 });
 
-function processUrl(url: string): string {
-  // if url is Github URL, convert to raw source code URL
+
+function processUrl(url: string) : string {
+  // if url is GitHub URL, convert to raw source code URL
   if (url.includes('github.com')) {
-    const parts = url.split('/');
-    if (parts.length < 8) {
-      console.error('Invalid Github URL: ', url);
-      return url;
-    }
-    const user = parts[3];
-    const repo = parts[4];
-    const branch = parts[6];
-    const path = parts.slice(7).join('/');
-    return `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${path}`;
+    return url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
   }
 
   return url;
