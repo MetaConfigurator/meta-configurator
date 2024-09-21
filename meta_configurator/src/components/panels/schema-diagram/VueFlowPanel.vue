@@ -63,7 +63,7 @@ const activeEdges: Ref<Edge[]> = ref<Edge[]>([]);
 const graphDirection = computed(() => {
   // note that having edges from left ro right will usually lead to a more vertical graph, because usually it is
   // not very deeply nested, but there exist many nodes on the same levels
-  return settings.schemaDiagram.vertical ? 'LR' : 'TB';
+  return settings.value.schemaDiagram.vertical ? 'LR' : 'TB';
 });
 
 const selectedNode: Ref<Node | undefined> = ref(undefined);
@@ -116,7 +116,7 @@ function fitViewForElementByPath(path: Path) {
   if (bestMatchingNode) {
     if (
       (previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) ||
-      !settings.schemaDiagram.moveViewToSelectedElement
+      !settings.value.schemaDiagram.moveViewToSelectedElement
     ) {
       // if the node is already within the viewport, do not move the view
       if (areNodesAlreadyWithinViewport([bestMatchingNode])) {
@@ -134,8 +134,8 @@ function fitViewForNodes(nodes: Node[]) {
       nodes: nodes.map(node => node.id),
       duration: 1000,
       padding: 1,
-      maxZoom: settings.schemaDiagram.automaticZoomMaxValue,
-      minZoom: settings.schemaDiagram.automaticZoomMinValue,
+      maxZoom: settings.value.schemaDiagram.automaticZoomMaxValue,
+      minZoom: settings.value.schemaDiagram.automaticZoomMinValue,
     });
   });
 }
@@ -163,7 +163,7 @@ function updateGraph(forceRebuild: boolean = false) {
   const graph = constructSchemaGraph(schema);
   let graphNeedsLayouting = forceRebuild;
 
-  const vueFlowGraph = graph.toVueFlowGraph(settings.schemaDiagram.vertical);
+  const vueFlowGraph = graph.toVueFlowGraph(settings.value.schemaDiagram.vertical);
   if (wasNodeAdded(activeNodes.value, vueFlowGraph.nodes)) {
     // node was added -> it is needed to update whole graph
     activeNodes.value = vueFlowGraph.nodes;

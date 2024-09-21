@@ -16,6 +16,7 @@ import {
   trimNodeChildren,
 } from '../schemaGraphConstructor';
 import {useSettings} from '@/settings/useSettings';
+import {ref} from "vue";
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -23,14 +24,14 @@ vi.mock('@/dataformats/formatRegistry', () => ({
     parse: (data: string) => JSON.parse(data),
   }),
   useSettings() {
-    return {
+    return ref({
       schemaDiagram: {
         showEnumValues: true,
         maxEnumValuesToShow: 5,
         showAttributes: true,
         maxAttributesToShow: 5,
       },
-    };
+    });
   },
 }));
 

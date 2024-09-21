@@ -46,7 +46,7 @@ onMounted(() => {
  */
 function setupAceMode(editor: Editor) {
   watchImmediate(
-    () => settings.dataFormat,
+    () => settings.value.dataFormat,
     format => {
       if (format == 'json') {
         editor.getSession().setMode('ace/mode/json');
@@ -64,13 +64,13 @@ function setupAceProperties(editor: Editor) {
   });
   editor.setTheme('ace/theme/clouds');
   editor.setShowPrintMargin(false);
-  editor.getSession().setTabSize(settings.codeEditor.tabSize);
+  editor.getSession().setTabSize(settings.value.codeEditor.tabSize);
 
   // it's not clear why timeout is needed here, but without it the
   // ace editor starts flashing and becomes unusable
   window.setTimeout(() => {
     watchImmediate(
-      () => settings.codeEditor.fontSize,
+      () => settings.value.codeEditor.fontSize,
       fontSize => {
         if (editor && fontSize && fontSize > 6 && fontSize < 65) {
           editor.setFontSize(fontSize.toString() + 'px');

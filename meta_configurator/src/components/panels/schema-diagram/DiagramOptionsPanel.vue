@@ -14,6 +14,9 @@ function rebuildGraph() {
   emit('rebuild_graph');
   emit('fit_view');
 }
+
+const settings = useSettings();
+
 </script>
 
 <template>
@@ -23,7 +26,7 @@ function rebuildGraph() {
         <label
           >Edit Mode
           <InputSwitch
-            v-model="useSettings().schemaDiagram.editMode"
+            v-model="settings.schemaDiagram.editMode"
             class="options-input-switch" />
         </label>
       </div>
@@ -31,7 +34,7 @@ function rebuildGraph() {
         <label
           >Graph direction vertical
           <InputSwitch
-            v-model="useSettings().schemaDiagram.vertical"
+            v-model="settings.schemaDiagram.vertical"
             class="options-input-switch" />
         </label>
       </div>
@@ -39,7 +42,7 @@ function rebuildGraph() {
         <label
           >Show attributes
           <InputSwitch
-            v-model="useSettings().schemaDiagram.showAttributes"
+            v-model="settings.schemaDiagram.showAttributes"
             label="Automatic zoom"
             class="options-input-switch" />
         </label>
@@ -48,7 +51,7 @@ function rebuildGraph() {
         <label
           >Show enum values
           <InputSwitch
-            v-model="useSettings().schemaDiagram.showEnumValues"
+            v-model="settings.schemaDiagram.showEnumValues"
             class="options-input-switch" />
         </label>
       </div>
@@ -56,7 +59,7 @@ function rebuildGraph() {
         <label
           >Move view on element selection
           <InputSwitch
-            v-model="useSettings().schemaDiagram.moveViewToSelectedElement"
+            v-model="settings.schemaDiagram.moveViewToSelectedElement"
             class="options-input-switch" />
         </label>
       </div>
