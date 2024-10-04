@@ -23,25 +23,25 @@ Note that the data was originally in an Excel file and was exported to the CSV f
  
 Open MetaConfigurator and click on the "Import Data..." button (not to be confused with the "Open Data" button).
 
-![Import Data](figs/import_data.png)
+<img alt="Import Data" src="figs/import_data.png" width="200"/>
 
 Select the "Import CSV Data" option and choose the `ec-mof-synthesis.csv` file.
 
-![Import CSV Data](figs/import_csv_data.png)
+<img alt="Import CSV Data" src="figs/import_csv_data.png" width="200"/>
 
-![Select CSV Document](figs/select_csv_document.png)
+<img alt="Select CSV Document" src="figs/select_csv_document.png" width="400"/>
 
 Keep the "Independent Table" and "Infer and generate schema for the data" options selected.
 
-![Import Options](figs/import_options.png)
+<img alt="Import Options" src="figs/import_options.png" width="300"/>
 
 Press the "Import" button to import the data and generate the schema.
 
-![Import Button](figs/import_button.png)
+<img alt="Import Button" src="figs/import_button.png" width="300"/>
 
 Now the data is successfully imported and the schema is generated.
 
-![Imported Data](figs/imported_data.png)
+<img alt="Imported Data" src="figs/imported_data.png" width="600"/>
 
 
 ## Step 2: Making changes to the schema
@@ -51,7 +51,7 @@ Notice, that the `phase_purity` attribute is inferred as a string, but it should
 
 First, let's navigate to the Schema Editor tab, by clicking the "Data Editor" button on the top left and then selecting the "Schema Editor" tab.
 
-![Schema Editor](figs/change_to_schema_editor.png)
+<img alt="Schema Editor" src="figs/change_to_schema_editor.png" width="200"/>
 
 This tab has different available views.
 The text view shows the schema in its raw text form in JSON format.
@@ -63,46 +63,46 @@ For our example, the diagram view is sufficient.
 Hence, let's hide the other views and open only the diagram view.
 This can be done using the top toolbar.
 
-![Schema View](figs/schema_view_1.png)
+<img alt="Schema View" src="figs/schema_view_1.png" width="800"/>
 
 Click on the buttons to hide the text editor and the GUI editor.
 Afterward, only the diagram view should be visible.
 
-![Schema View with only diagram](figs/schema_view_2.png)
+<img alt="Schema View with only diagram" src="figs/schema_view_2.png" width="200"/>
 
 In the diagram, click on the `phase_purity` attribute to edit it.
 Then, change the type to "boolean".
 
-![Changing attribute type](figs/changing_attribute_type.png)
+<img alt="Changing attribute type" src="figs/changing_attribute_type.png" width="300"/>
 
 In the top menu bar, ckick the "Show Preview of resulting GUI" button to see how the schema will look like in the GUI view.
 
-![Show Preview](figs/show_preview.png)
+<img alt="Show Preview" src="figs/show_preview.png" width="200"/>
 
 In the GUI view, the `phase_purity` attribute is now represented as a checkbox instead of a text field.
 Todo: auto-convert yes and no values?
 
-![Result of attribute type change](figs/changing_attribute_type_result.png)
+<img alt="Result of attribute type change" src="figs/changing_attribute_type_result.png" width="500"/>
 
 In our data, we also notice that `metal_salt_mass_unit` and `linker_mass_unit` both seem to be the same unit.
 Rather than allowing an arbitrary string for these fields, we can define a common unit type, which is used by both attributes.
 This can be done by adding a new enum to the schema, by clicking on the "Add Enum" button in the diagram view.
 
-![Add Enum](figs/add_enum.png)
+<img alt="Add Enum" src="figs/add_enum.png" width="300"/>
 
 A new dummy enumeration will be added to the schema.
 Change the name of the enumeration to `mass_unit` and add the possible values `kg`, `g` and `mg`.
 
-![Mass Unit Enum](figs/mass_unit_enum.png)
+<img alt="Mass Unit Enum" src="figs/mass_unit_enum.png" width="200"/>
 
 Now, change the type of the `metal_salt_mass_unit` and `linker_mass_unit` attributes to the newly defined `mass_unit` enumeration.
 
-![Change attribute type to enum](figs/change_attribute_type_to_enum.png)
+<img alt="Change attribute type to enum" src="figs/change_attribute_type_to_enum.png" width="350"/>
 
 This will automatically create new edges from the attributes to the enumeration in the diagram.
 Notice, that in the GUI preview, the `metal_salt_mass_unit` and `linker_mass_unit` attributes are now represented as dropdowns with the possible values.
 
-![Result of attribute type change to enum](figs/change_attribute_type_to_enum_result.png)
+<img alt="Result of attribute type change to enum" src="figs/change_attribute_type_to_enum_result.png" width="300"/>
 
 In the same manner, create a new enum `time_unit` with the values `s`, `min`, `h`, `day` and `week`.
 To the `time_unit` attribute, change the type to the new enumeration.
@@ -112,7 +112,7 @@ Also do the same for the `temperature_unit` attribute, with the values `K`, `deg
 The resulting schema is provided in the [ecmofsynthesis.schema.json](ecmofsynthesis.schema.json) file.
 The data is provided in the [ecmofsynthesis.json](ecmofsynthesis.json) file.
 
-![Schema Result 1](figs/schema_result_1.png)
+<img alt="Schema Result 1" src="figs/schema_result_1.png" width="400"/>
 
 ## Step 3: Enriching the data with additional metadata
 
@@ -133,12 +133,12 @@ Add the following attributes:
 - `molecular_weight` (number)
 - `cid` (number)
 
-![Compound Object Node](figs/compound_node.png)
+<img alt="Compound Object Node" src="figs/compound_node.png" width="200"/>
 
 Now, we can introduce a new property `metal_salt` of type `compound` to the schema.
 Let's do the same for the `linker` property.
 
-![Schema Result 2](figs/schema_result_2.png)
+<img alt="Schema Result 2" src="figs/schema_result_2.png" width="400"/>
 
 The resulting schema is provided in the [ecmofsynthesis_enriched.schema.json](ecmofsynthesis_enriched.schema.json) file.
 
@@ -164,7 +164,7 @@ The resulting JSON file is provided in the [ecmofsynthesis_enriched.json](ecmofs
 
 If we load the enriched data into MetaConfigurator (using the 'Import Data' button), we can see that the `metal_salt` and `linker` properties now have the additional metadata.
 
-![Enriched Data](figs/enriched_data.png)
+<img alt="Enriched Data" src="figs/enriched_data.png" width="600"/>
 
 ## Takeaways
 
