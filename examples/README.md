@@ -1,6 +1,6 @@
 # Examples and Documentation
 
-# Tutorials
+## Tutorials
 * [Biochemistry Example](biochemistry/README.md) (CSV Import, Schema Generation, Schema Editing, Data Editing, JSON Export)
 
 ## Load a Schema
