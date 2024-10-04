@@ -20,7 +20,7 @@ This applies for any kind of data: once it is in a machine-readable format, any 
 
 Download the [ec-mof-synthesis.csv](ec-mof-synthesis.csv) file.
 Note that the data was originally in an Excel file and was exported to the CSV format already.
-
+ 
 Open MetaConfigurator and click on the "Import Data..." button (not to be confused with the "Open Data" button).
 
 ![Import Data](figs/import_data.png)
