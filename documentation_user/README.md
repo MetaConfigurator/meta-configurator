@@ -1,7 +1,7 @@
 # Examples and Documentation
 
 ## Tutorials
-* [Biochemistry Example](biochemistry/README.md) (CSV Import, Schema Generation, Schema Editing, Data Editing, JSON Export)
+* [MOF Synthesis Example](examples/mof_synthesis/README.md) (CSV Import, Schema Generation, Schema Editing, Data Editing, JSON Export)
 
 ## Load a Schema
 

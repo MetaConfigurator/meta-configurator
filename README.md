@@ -44,35 +44,12 @@ Our tool has the following advantages:
 - It is flexible and can be used for any JSON schema (we currently support draft-2020-12)
 - Less error-prone than manually editing configuration files
 
-More details can be found in [our paper](paper/paper_main_extended.pdf) and our [user guide](https://github.com/PaulBredl/meta-configurator/wiki/User-Guide).
+More details can be found in [our paper](paper/paper_main_extended.pdf) and our [user guide](documentation_user/README.md).
 
 
 ## Development
 
-The project relies on [Node Js](https://nodejs.org/en/download/).
-
-We use [vue.js](https://vuejs.org/) as a frontend framework and [PrimeVue](https://www.primefaces.org/primevue/) for the UI components.
-
-### Installation
-
-To launch the application, follow these steps:
-
-1. Clone the repository to your local machine:
-   ```shell
-   git clone https://github.com/PaulBredl/config-assistant.git
-   ```
-2. Navigate into web application folder:
-   ```sh
-   cd meta_configurator
-3. Install the necessary dependencies:
-   ```sh
-   npm install
-   ```
-4. Launch the application:
-   ```sh
-   npm run dev
-   ```
-   
+Check out the [documentation for developers](documentation_developer/README.md).
 
 ## Citing MetaConfigurator
 
