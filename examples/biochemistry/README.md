@@ -1,5 +1,8 @@
 # Biochemistry Example
 
+
+[![Demonstration Video](https://img.youtube.com/vi/1HT0Xb8tGUI/0.jpg)](https://www.youtube.com/watch?v=1HT0Xb8tGUI)
+
 This hands-on example demonstrates how to:
 
 1. Import a table from Excel/CSV into MetaConfigurator
