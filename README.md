@@ -44,7 +44,7 @@ Our tool has the following advantages:
 - It is flexible and can be used for any JSON schema (we currently support draft-2020-12)
 - Less error-prone than manually editing configuration files
 
-More details can be found in [our paper](paper/paper_main_extended.pdf) and our [user guide](documentation_user/README.md).
+More details can be found in [our paper](paper/2023_10_paper_main_extended.pdf) and our [user guide](documentation_user/README.md).
 
 
 ## Development
