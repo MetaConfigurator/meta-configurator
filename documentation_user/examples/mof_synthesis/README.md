@@ -1,9 +1,9 @@
-# Biochemistry Example
+# MOF Synthesis Example
 
 
 [![Demonstration Video](https://img.youtube.com/vi/1HT0Xb8tGUI/0.jpg)](https://www.youtube.com/watch?v=1HT0Xb8tGUI)
 
-*Click the image to get to a Youtube Video performing the steps of this example*
+*Click the image to get to a YouTube Video performing the steps of this example*
 
 
 This hands-on example demonstrates how to:
