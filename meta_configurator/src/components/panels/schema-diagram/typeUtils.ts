@@ -130,3 +130,7 @@ export function applyNewType(
     delete currentSchema.$ref;
   }
 }
+
+export function isSimpleType(typeDescription: string): boolean {
+  return ['string', 'number', 'integer', 'boolean', 'null', 'string[]', 'number[]', 'integer[]', 'boolean[]', 'null[]'].includes(typeDescription);
+}
