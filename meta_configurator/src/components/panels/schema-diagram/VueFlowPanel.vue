@@ -25,7 +25,10 @@ import {
   findBestMatchingNode,
 } from '@/components/panels/schema-diagram/schemaDiagramHelper';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
-import {updateNodeData, wasNodeAddedOrEdgesChanged} from '@/components/panels/schema-diagram/updateGraph';
+import {
+  updateNodeData,
+  wasNodeAddedOrEdgesChanged,
+} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';

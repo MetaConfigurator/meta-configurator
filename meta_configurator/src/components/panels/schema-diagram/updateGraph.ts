@@ -1,5 +1,8 @@
-import {type Node, SchemaObjectNodeData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
-import {isSimpleType} from "@/components/panels/schema-diagram/typeUtils";
+import {
+  type Node,
+  SchemaObjectNodeData,
+} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {isSimpleType} from '@/components/panels/schema-diagram/typeUtils';
 
 // updates the data of the old nodes with the data of the new nodes and returns the ids of the nodes to be removed
 export function updateNodeData(oldNodes: Node[], newNodes: Node[]): string[] {
@@ -23,23 +26,26 @@ export function wasNodeAddedOrEdgesChanged(oldNodes: Node[], newNodes: Node[]): 
     }
     if (oldNode.data.getNodeType() !== newNode.data.getNodeType()) {
       // if new node somehow is of a different type: also update
-        return true;
+      return true;
     }
     if (oldNode.data.getNodeType() === 'schemaobject') {
       // if it is a schema object node, we need to check if the attributes have changed in a way that changes the edges
-        const newAttributes = (newNode.data as SchemaObjectNodeData).attributes;
-        const oldAttributes = (oldNode.data as SchemaObjectNodeData).attributes;
-        if (newAttributes.length !== oldAttributes.length) {
-          return true;
-        }
-        // edges changed only if an attribute type changed and the new or old value was a schema object instead of a simple type
-        for (let i = 0; i < newAttributes.length; i++) {
-          if (newAttributes[i].typeDescription !== oldAttributes[i].typeDescription) {
-            if (!isSimpleType(newAttributes[i].typeDescription) || !isSimpleType(oldAttributes[i].typeDescription)) {
-              return true;
-            }
+      const newAttributes = (newNode.data as SchemaObjectNodeData).attributes;
+      const oldAttributes = (oldNode.data as SchemaObjectNodeData).attributes;
+      if (newAttributes.length !== oldAttributes.length) {
+        return true;
+      }
+      // edges changed only if an attribute type changed and the new or old value was a schema object instead of a simple type
+      for (let i = 0; i < newAttributes.length; i++) {
+        if (newAttributes[i].typeDescription !== oldAttributes[i].typeDescription) {
+          if (
+            !isSimpleType(newAttributes[i].typeDescription) ||
+            !isSimpleType(oldAttributes[i].typeDescription)
+          ) {
+            return true;
           }
         }
+      }
     }
   }
   return false;

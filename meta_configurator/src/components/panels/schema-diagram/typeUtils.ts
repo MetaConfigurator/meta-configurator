@@ -132,5 +132,16 @@ export function applyNewType(
 }
 
 export function isSimpleType(typeDescription: string): boolean {
-  return ['string', 'number', 'integer', 'boolean', 'null', 'string[]', 'number[]', 'integer[]', 'boolean[]', 'null[]'].includes(typeDescription);
+  return [
+    'string',
+    'number',
+    'integer',
+    'boolean',
+    'null',
+    'string[]',
+    'number[]',
+    'integer[]',
+    'boolean[]',
+    'null[]',
+  ].includes(typeDescription);
 }
