@@ -5,7 +5,7 @@ import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue'
 import type {Path} from '@/utility/path';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {getDataForMode, getSchemaForMode, getSessionForMode,} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
 import {dataPathToSchemaPath} from '@/utility/pathUtils';
 import _ from 'lodash';
@@ -30,7 +30,7 @@ function updateData(path: Path, newValue: any) {
       const parentPath = path.slice(0, path.length - 1);
       const parentSchemaPath = dataPathToSchemaPath(parentPath);
       const parentSchemaProps = getSchemaForMode(props.sessionMode).effectiveSchemaAtPath(
-          parentSchemaPath
+        parentSchemaPath
       ).schema.properties;
       const parentData = structuredClone(data.dataAt(parentPath));
       if (!_.isEmpty(parentSchemaProps) && !_.isEmpty(parentData) && !Array.isArray(parentData)) {
