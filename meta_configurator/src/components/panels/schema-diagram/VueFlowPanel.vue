@@ -25,7 +25,10 @@ import {
   findBestMatchingNode,
 } from '@/components/panels/schema-diagram/schemaDiagramHelper';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
-import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
+import {
+  updateNodeData,
+  wasNodeAddedOrEdgesChanged,
+} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
@@ -164,7 +167,7 @@ function updateGraph(forceRebuild: boolean = false) {
   let graphNeedsLayouting = forceRebuild;
 
   const vueFlowGraph = graph.toVueFlowGraph(settings.value.schemaDiagram.vertical);
-  if (wasNodeAdded(activeNodes.value, vueFlowGraph.nodes)) {
+  if (wasNodeAddedOrEdgesChanged(activeNodes.value, vueFlowGraph.nodes)) {
     // node was added -> it is needed to update whole graph
     activeNodes.value = vueFlowGraph.nodes;
     activeEdges.value = vueFlowGraph.edges;
@@ -174,11 +177,6 @@ function updateGraph(forceRebuild: boolean = false) {
     // only data updated or nodes removed
     const nodesToRemove = updateNodeData(activeNodes.value, vueFlowGraph.nodes);
     activeNodes.value = activeNodes.value.filter(node => !nodesToRemove.includes(node.id));
-
-    // we still update edges, because they might have changed
-    // todo: check if the edges are updated and only then trigger layouting
-    activeEdges.value = vueFlowGraph.edges;
-    graphNeedsLayouting = true;
   }
 
   // if not on root level but current path is set: show only subgraph
@@ -232,7 +230,13 @@ async function layoutGraph(direction: string, nodesInitialised: boolean) {
 
 function selectElement(path: Path) {
   if (schemaData.dataAt(path) != undefined) {
-    emit('select_element', path);
+    if (schemaSession.currentSelectedElement.value != path) {
+      // if the currently selected element differs: update the current selected element
+      emit('select_element', path);
+    } else if (selectedNode.value == undefined) {
+      // if the currently selected element is the same, but the selected node is not set, then fit the view
+      fitViewForElementByPath(path);
+    }
   }
 }
 

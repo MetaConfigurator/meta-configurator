@@ -5,12 +5,7 @@ import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue'
 import type {Path} from '@/utility/path';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {
-  getDataForMode,
-  getSchemaForMode,
-  getSessionForMode,
-  useCurrentSchema,
-} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
 import {dataPathToSchemaPath} from '@/utility/pathUtils';
 import _ from 'lodash';
@@ -38,8 +33,8 @@ function updateData(path: Path, newValue: any) {
         parentSchemaPath
       ).schema.properties;
       const parentData = structuredClone(data.dataAt(parentPath));
-      if (!_.isEmpty(parentSchemaProps) && !_.isEmpty(parentData)) {
-        // only proceed with property sorting when parent schema and data are not empty
+      if (!_.isEmpty(parentSchemaProps) && !_.isEmpty(parentData) && !Array.isArray(parentData)) {
+        // only proceed with property sorting when parent schema and data are not empty and the parent schema is of type object (not array!)
         // warning: this function only works for normal properties, not for composition, conditionals and other advanced features
         // for those advanced features, the new property will be added at the end of the object
         // TODO: implement sorting for advanced features. This will be more complicated and will require a lot of testing
