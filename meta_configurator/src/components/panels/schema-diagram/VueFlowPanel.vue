@@ -230,7 +230,16 @@ async function layoutGraph(direction: string, nodesInitialised: boolean) {
 
 function selectElement(path: Path) {
   if (schemaData.dataAt(path) != undefined) {
-    emit('select_element', path);
+
+    if (schemaSession.currentSelectedElement.value != path) {
+      // if the currently selected element differs: update the current selected element
+      emit('select_element', path);
+
+    } else if (selectedNode.value == undefined) {
+      // if the currently selected element is the same, but the selected node is not set, then fit the view
+      fitViewForElementByPath(path);
+    }
+
   }
 }
 
