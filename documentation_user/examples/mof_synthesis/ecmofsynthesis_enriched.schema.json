@@ -23,7 +23,9 @@
           "time",
           "time_unit",
           "place",
-          "phase_purity"
+          "phase_purity",
+          "metal_salt",
+          "linker"
         ],
         "properties": {
           "vial_no": {
