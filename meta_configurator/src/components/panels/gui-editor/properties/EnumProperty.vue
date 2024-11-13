@@ -10,6 +10,7 @@ import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
+import InputText from "primevue/inputtext";
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -77,7 +78,10 @@ function isEditable() {
     :options="allOptions"
     :disabled="isReadOnly(props.propertySchema)"
     optionLabel="name"
-    @keydown.stop
+    @keydown.down.stop
+    @keydown.up.stop
+    @keydown.left.stop
+    @keydown.right.stop
     :placeholder="`Select ${props.propertyName}`" />
 </template>
 
