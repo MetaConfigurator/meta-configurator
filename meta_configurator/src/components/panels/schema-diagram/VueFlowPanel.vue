@@ -211,7 +211,6 @@ function updateToSubgraph(path: Path) {
 }
 
 async function layoutGraph(direction: string, nodesInitialised: boolean) {
-  console.log('layouting graph with active nodes and edges', activeNodes.value, activeEdges.value);
   activeNodes.value = layout(activeNodes.value, activeEdges.value, direction);
   if (nodesInitialised && activeNodes.value.length > 0) {
     if (forceFitView.value) {
