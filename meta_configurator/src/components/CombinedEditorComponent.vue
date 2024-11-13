@@ -114,8 +114,6 @@ function onDrop(files: File[] | null) {
 confirmationService.confirm = useConfirm();
 toastService.toast = useToast();
 
-
-
 function undo() {
   getDataForMode(props.sessionMode).undoManager.undo();
 }
@@ -123,9 +121,6 @@ function undo() {
 function redo() {
   getDataForMode(props.sessionMode).undoManager.redo();
 }
-
-
-
 
 function isMacOS() {
   if ('userAgentData' in navigator) {
@@ -135,16 +130,17 @@ function isMacOS() {
   }
 }
 
-
 // Function to handle keydown events
 function handleKeydown(event: KeyboardEvent) {
   const isMac = isMacOS();
-  const undoKeys = isMac ? (event.metaKey && event.key === 'z') : (event.ctrlKey && event.key === 'z');
-  const redoKeys = isMac ? (event.metaKey && event.shiftKey && event.key === 'z') : (event.ctrlKey && event.key === 'y');
+  const undoKeys = isMac ? event.metaKey && event.key === 'z' : event.ctrlKey && event.key === 'z';
+  const redoKeys = isMac
+    ? event.metaKey && event.shiftKey && event.key === 'z'
+    : event.ctrlKey && event.key === 'y';
 
-  console.log("is mac ", isMac, " undo keys ", undoKeys, " redo keys ", redoKeys);
+  console.log('is mac ', isMac, ' undo keys ', undoKeys, ' redo keys ', redoKeys);
 
-  if (undoKeys &&! redoKeys) {
+  if (undoKeys && !redoKeys) {
     event.preventDefault();
     undo();
   } else if (redoKeys) {
@@ -161,7 +157,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown);
 });
-
 </script>
 
 <template>

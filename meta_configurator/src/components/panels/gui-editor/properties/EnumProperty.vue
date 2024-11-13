@@ -10,7 +10,7 @@ import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
-import InputText from "primevue/inputtext";
+import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
   propertyName: PathElement;
