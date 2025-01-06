@@ -1,6 +1,5 @@
 import YAML from 'yaml';
 import {useSettings} from '@/settings/useSettings';
-import { parse_model, validate, convert_to } from 'mdmodels-core';
 
 /**
  * Abstract super class for converters that can parse and stringify data.
@@ -90,20 +89,5 @@ export class DataConverterYaml extends DataConverter {
     return YAML.stringify(data, {
       indent: useSettings().value.codeEditor.tabSize,
     });
-  }
-}
-
-
-/**
- * DataConverter implementation for Markdown.
- * Note that Markdown conversion works for the schema only, not for data.
- */
-export class DataConverterMarkdown extends DataConverter {
-  override parse(data: string): any {
-    return parse_model(data);
-  }
-
-  override stringify(data: any): string {
-    return "todo";
   }
 }

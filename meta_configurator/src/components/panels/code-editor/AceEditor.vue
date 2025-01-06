@@ -6,9 +6,9 @@
 import {onMounted} from 'vue';
 import type {Editor} from 'brace';
 import * as ace from 'brace';
+import 'brace/mode/javascript';
 import 'brace/mode/json';
 import 'brace/mode/yaml';
-import 'brace/mode/markdown';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
@@ -20,11 +20,9 @@ import {
 } from '@/components/panels/code-editor/setupLinkToSelectionAndData';
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
-import type {DataFormat} from "@/settings/settingsTypes";
 
 const props = defineProps<{
   sessionMode: SessionMode;
-  dataFormat: DataFormat;
 }>();
 
 const settings = useSettings();
@@ -39,7 +37,7 @@ onMounted(() => {
 
   setupLinkToData(editor, props.sessionMode);
   setupLinkToCurrentSelection(editor, props.sessionMode);
-  setupAnnotationsFromValidationErrors(editor, props.sessionMode, props.dataFormat);
+  setupAnnotationsFromValidationErrors(editor, props.sessionMode);
 });
 
 /**
@@ -48,14 +46,12 @@ onMounted(() => {
  */
 function setupAceMode(editor: Editor) {
   watchImmediate(
-    () => props.dataFormat,
+    () => settings.value.dataFormat,
     format => {
       if (format == 'json') {
         editor.getSession().setMode('ace/mode/json');
       } else if (format == 'yaml') {
         editor.getSession().setMode('ace/mode/yaml');
-      } else if (format == 'markdown') {
-        editor.getSession().setMode('ace/mode/markdown');
       }
     }
   );

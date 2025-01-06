@@ -3,11 +3,13 @@ import GuiEditorPanel from '@/components/panels/gui-editor/GuiEditorPanel.vue';
 import SchemaDiagramPanel from '@/components/panels/schema-diagram/SchemaDiagramPanel.vue';
 import DebugPanel from '@/components/panels/debug-panel/DebugPanel.vue';
 import {errorService} from '@/main';
+import MarkdownSchemaEditorPanel from "@/components/panels/markdown-schema-editor/MarkdownSchemaEditorPanel.vue";
 
 export enum PanelType {
   GuiEditor = 'guiEditor',
   TextEditor = 'textEditor',
   SchemaDiagram = 'schemaDiagram',
+  MarkdownSchema = 'markdownSchema',
   Debug = 'debug',
 }
 
@@ -19,6 +21,8 @@ export function getComponentByPanelType(panelType: PanelType) {
       return CodeEditorPanel;
     case PanelType.SchemaDiagram:
       return SchemaDiagramPanel;
+    case PanelType.MarkdownSchema:
+      return MarkdownSchemaEditorPanel;
     case PanelType.Debug:
       return DebugPanel;
   }

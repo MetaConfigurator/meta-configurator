@@ -5,7 +5,6 @@ import type {PathIndexLink} from '@/dataformats/pathIndexLink';
 import {noPathIndexLink} from '@/dataformats/pathIndexLink';
 import {computed} from 'vue';
 import {jsonFormat} from '@/dataformats/defaultFormats';
-import type {DataFormat} from "@/settings/settingsTypes";
 
 const settings = useSettings();
 
@@ -50,21 +49,13 @@ const currentDataFormatRef = computed(() => {
 /**
  * Returns the data converter for the currently selected data format.
  */
-export function useDataConverter(dataFormat?: DataFormat): DataConverter {
-  if (!dataFormat) {
-    return currentDataFormatRef.value.dataConverter;
-  } else {
-    return formatRegistry.getFormat(dataFormat).dataConverter;
-  }
+export function useDataConverter(): DataConverter {
+  return currentDataFormatRef.value.dataConverter;
 }
 
 /**
  * Returns the path index link for the currently selected data format.
  */
-export function usePathIndexLink(dataFormat?: DataFormat): PathIndexLink {
-  if (!dataFormat) {
-    return currentDataFormatRef.value.pathIndexLink ?? noPathIndexLink;
-  } else {
-    return formatRegistry.getFormat(dataFormat).pathIndexLink ?? noPathIndexLink;
-  }
+export function usePathIndexLink(): PathIndexLink {
+  return currentDataFormatRef.value.pathIndexLink ?? noPathIndexLink;
 }

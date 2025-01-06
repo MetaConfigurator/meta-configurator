@@ -57,7 +57,6 @@ const panels = computed(() => {
     return {
       component: getComponentByPanelType(panel.panelType),
       sessionMode: panel.mode,
-      dataFormat: panel.dataFormat,
       size: panel.size,
     };
   });
@@ -179,7 +178,7 @@ onUnmounted(() => {
             :min-size="10"
             :size="panel.size"
             :resizable="true">
-            <component :is="panel.component" :sessionMode="panel.sessionMode" :dataFormat="panel.dataFormat" />
+            <component :is="panel.component" :sessionMode="panel.sessionMode" />
           </SplitterPanel>
         </Splitter>
       </div>
