@@ -10,6 +10,7 @@ import {
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {watchImmediate} from '@vueuse/core/index';
+import type {DataFormat} from "@/settings/settingsTypes";
 
 // variables to prevent updating functions to trigger each other
 let selectionChangeFromOutside = false;
@@ -18,8 +19,8 @@ let selectionChangeFromInside = false;
 let currentChangeFromOutside = false;
 let currentChangeFromInside = false;
 
-export function setupLinkToCurrentSelection(editor: Editor, mode: SessionMode) {
-  setupCursorPositionToSelectedPath(editor, mode);
+export function setupLinkToCurrentSelection(editor: Editor, mode: SessionMode, dataFormat?: DataFormat) {
+  setupCursorPositionToSelectedPath(editor, mode, dataFormat);
   setupSelectedPathToCursorPosition(editor, mode);
 }
 
@@ -28,8 +29,9 @@ export function setupLinkToCurrentSelection(editor: Editor, mode: SessionMode) {
  * the user clicked at. We then update the currentSelectedElement in the store accordingly.
  * @param editor the ace editor
  * @param mode
+ * @param dataFormat
  */
-function setupCursorPositionToSelectedPath(editor: Editor, mode: SessionMode) {
+function setupCursorPositionToSelectedPath(editor: Editor, mode: SessionMode, dataFormat?: DataFormat) {
   editor.on(
     'changeSelection',
     useDebounceFn(() => {
@@ -38,7 +40,7 @@ function setupCursorPositionToSelectedPath(editor: Editor, mode: SessionMode) {
         // we do not need to consider the event and send updates if the selection was forced from outside
         return;
       }
-      if (!useDataConverter().isValidSyntax(editor.getValue())) {
+      if (!useDataConverter(dataFormat).isValidSyntax(editor.getValue())) {
         // do not attempt to determine the path when the text does not have valid syntax
         return;
       }

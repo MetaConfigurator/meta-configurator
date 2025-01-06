@@ -57,6 +57,7 @@ const panels = computed(() => {
     return {
       component: getComponentByPanelType(panel.panelType),
       sessionMode: panel.mode,
+      dataFormat: panel.dataFormat,
       size: panel.size,
     };
   });
@@ -174,11 +175,11 @@ onUnmounted(() => {
         <Splitter class="h-full" :layout="width < 600 ? 'vertical' : 'horizontal'" :key="panels">
           <SplitterPanel
             v-for="(panel, index) in panels"
-            :key="index + panel"
+            :key="'key' + index + panel"
             :min-size="10"
             :size="panel.size"
             :resizable="true">
-            <component :is="panel.component" :sessionMode="panel.sessionMode" />
+            <component :is="panel.component" :sessionMode="panel.sessionMode" :dataFormat="panel.dataFormat" />
           </SplitterPanel>
         </Splitter>
       </div>

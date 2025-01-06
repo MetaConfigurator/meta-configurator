@@ -7,16 +7,18 @@ import {useDataConverter} from '@/dataformats/formatRegistry';
 import {watchDebounced} from '@vueuse/core';
 import type {SessionMode} from '@/store/sessionMode';
 import {getValidationForMode} from '@/data/useDataLink';
+import type {DataFormat} from "@/settings/settingsTypes";
 
 /**
  * Sets up the editor to show validation errors.
  * @param editor the ace editor
+ * @param mode
  */
-export function setupAnnotationsFromValidationErrors(editor: Editor, mode: SessionMode) {
+export function setupAnnotationsFromValidationErrors(editor: Editor, mode: SessionMode, dataFormat?: DataFormat) {
   const validationAnnotations = computed(() => {
     // do not attempt to display schema validation errors when the text does not have valid syntax
     // (would otherwise result in errors when trying to parse CST)
-    if (!useDataConverter().isValidSyntax(editor.getValue())) {
+    if (!useDataConverter(dataFormat).isValidSyntax(editor.getValue())) {
       return [];
     }
 

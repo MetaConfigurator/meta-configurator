@@ -54,6 +54,7 @@ export interface SettingsInterfacePanels {
 export interface SettingsInterfacePanel {
   panelType: PanelType;
   mode: SessionMode;
+  dataFormat?: DataFormat;
   size: number;
 }
 
