@@ -13,6 +13,8 @@ import {registerIcons} from '@/fontawesome';
 
 import {registerDefaultDataFormats} from '@/dataformats/defaultFormats';
 import App from '@/views/App.vue';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
+import {SessionMode} from '@/store/sessionMode';
 
 // @ts-ignore
 const app = createApp(App);
@@ -33,7 +35,13 @@ registerDefaultDataFormats();
 
 // warn the user if he closes the app
 window.addEventListener('beforeunload', event => {
-  event.returnValue = null;
+  // check if user made any changes and only then warn user
+  if (
+    Object.keys(getDataForMode(SessionMode.DataEditor).data.value).length > 0 ||
+    Object.keys(getDataForMode(SessionMode.SchemaEditor).data.value).length > 0
+  ) {
+    event.returnValue = null;
+  }
 });
 
 app.mount('#app');

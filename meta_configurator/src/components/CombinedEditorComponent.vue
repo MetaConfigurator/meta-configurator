@@ -138,8 +138,6 @@ function handleKeydown(event: KeyboardEvent) {
     ? event.metaKey && event.shiftKey && event.key === 'z'
     : event.ctrlKey && event.key === 'y';
 
-  console.log('is mac ', isMac, ' undo keys ', undoKeys, ' redo keys ', redoKeys);
-
   if (undoKeys && !redoKeys) {
     event.preventDefault();
     undo();
