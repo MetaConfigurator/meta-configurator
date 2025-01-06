@@ -75,6 +75,7 @@ export enum PropertySorting {
 export enum DataFormat {
   JSON = 'json',
   YAML = 'yaml',
+  MARKDOWN = 'markdown',
 }
 
 export interface SettingsInterfaceRdf {

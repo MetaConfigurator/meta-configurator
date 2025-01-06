@@ -6,9 +6,9 @@
 import {onMounted} from 'vue';
 import type {Editor} from 'brace';
 import * as ace from 'brace';
-import 'brace/mode/javascript';
 import 'brace/mode/json';
 import 'brace/mode/yaml';
+import 'brace/mode/markdown';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
@@ -52,6 +52,8 @@ function setupAceMode(editor: Editor) {
         editor.getSession().setMode('ace/mode/json');
       } else if (format == 'yaml') {
         editor.getSession().setMode('ace/mode/yaml');
+      } else if (format == 'markdown') {
+        editor.getSession().setMode('ace/mode/markdown');
       }
     }
   );
