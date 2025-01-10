@@ -16,6 +16,7 @@ export interface SettingsInterfaceRoot {
   schemaDiagram: SettingsInterfaceSchemaDiagram;
   metaSchema: SettingsInterfaceMetaSchema;
   panels: SettingsInterfacePanels;
+  openApiKey: string;
   rdf: SettingsInterfaceRdf;
   frontend: SettingsInterfacFrontend;
   backend: SettingsInterfaceBackend;

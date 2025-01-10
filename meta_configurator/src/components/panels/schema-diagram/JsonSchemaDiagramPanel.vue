@@ -25,6 +25,7 @@ function selectElement(pathAbsolute: Path) {
 function updateData(path: Path, newValue: any) {
   schemaData.setDataAt(path, newValue);
 }
+
 </script>
 
 <template>

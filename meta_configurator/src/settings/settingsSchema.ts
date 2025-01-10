@@ -263,6 +263,11 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    openApiKey: {
+        type: 'string',
+        description: 'The API key to use for the OpenAPI integration.',
+        default: '',
+    },
     rdf: {
       type: 'object',
       required: ['sparqlEndpointUrl'],

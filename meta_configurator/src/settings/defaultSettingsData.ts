@@ -83,6 +83,7 @@ export const SETTINGS_DATA_DEFAULT = {
       },
     ],
   },
+  openApiKey: '',
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
   },
