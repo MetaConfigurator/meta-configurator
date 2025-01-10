@@ -54,16 +54,16 @@ def collectMetadata(compoundName: str):
     """
     compound = queryCompoundFromPubChem(compoundName)
     if compound is None:
-        print('Error: Could not find molecule in PubChem: ' + compoundName)
+        print("Error: Could not find molecule in PubChem: " + compoundName)
         return {}
 
     # Append metadata
     compoundMetadata = {
-        'cid': compound.cid,
-        'inchi_code': compound.inchi,
-        'smiles_code': compound.isomeric_smiles,
-        'iupac_name': compound.iupac_name,
-        'molecular_weight': float(compound.molecular_weight)
+        "cid": compound.cid,
+        "inchi_code": compound.inchi,
+        "smiles_code": compound.isomeric_smiles,
+        "iupac_name": compound.iupac_name,
+        "molecular_weight": float(compound.molecular_weight),
     }
 
     return compoundMetadata
