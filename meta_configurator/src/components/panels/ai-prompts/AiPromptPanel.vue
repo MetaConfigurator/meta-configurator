@@ -34,6 +34,10 @@ const availablePaths: Ref<Array<string>> = computed(() => {
 const newDocument: Ref<string> = ref('{}');
 
 
+// props sessionMode
+defineProps({
+  sessionMode: SessionMode
+});
 
 onMounted(() => {
   const editor: Editor = ace.edit(editor_id);
@@ -112,7 +116,7 @@ function submitPromptModifySchema() {
   const openApiKey = settings.value.openApiKey;
   const relevantSchema = schemaData.dataAt(sessionData.currentSelectedElement.value);
   isLoadingAnswer.value = true;
-  const response = querySchemaModification(openApiKey, promptCreateSchema.value, JSON.stringify(relevantSchema));
+  const response = querySchemaModification(openApiKey, promptModifySchema.value, JSON.stringify(relevantSchema));
   response.then((value) => {
     newDocument.value = value;
 
@@ -156,6 +160,10 @@ function fixAndParseGeneratedSchema(schema: string): any {
   }
 }
 
+function selectWholeSchema() {
+  sessionData.updateCurrentSelectedElement([]);
+}
+
 function isSchemaEmpty() {
   return _.isEmpty(schemaData.data.value);
 }
@@ -174,8 +182,9 @@ function isSchemaEmpty() {
     <div class="flex flex-col" v-else>
       <span>
       <label>Prompt to modify </label>
-      <label v-if="pathWhereToModify.length==0">the complete schema</label>
-      <label v-else>{{pathWhereToModify}}</label>
+      <b v-if="pathWhereToModify.length==0">the complete schema</b>
+      <b v-else>{{pathWhereToModify}}</b>
+        <label> and all child properties</label>
       </span>
       <Textarea v-model="promptModifySchema"/>
       <Button @click="submitPromptModifySchema()">Modify Schema</Button>
