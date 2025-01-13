@@ -125,6 +125,9 @@ function fitViewForElementByPath(path: Path) {
       if (areNodesAlreadyWithinViewport([bestMatchingNode])) {
         return;
       }
+      if (path.length == 0) {
+        return;
+      }
     }
 
     fitViewForNodes([bestMatchingNode]);
@@ -389,6 +392,7 @@ function addEnum() {
 function unselectElement() {
   selectedNode.value = undefined;
   selectedData.value = undefined;
+  schemaSession.currentSelectedElement.value = [];
 }
 </script>
 
