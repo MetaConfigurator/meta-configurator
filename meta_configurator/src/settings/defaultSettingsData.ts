@@ -98,5 +98,5 @@ export const SETTINGS_DATA_DEFAULT = {
     maxTokens: 5000,
     temperature: 0.3,
     endpoint: '/chat/completions',
-  }
+  },
 };

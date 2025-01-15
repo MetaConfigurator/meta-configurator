@@ -92,8 +92,8 @@ export interface SettingsInterfaceRdf {
 }
 
 export interface SettingsInterfaceOpenAi {
-    model: string;
-    maxTokens: number;
-    temperature: number;
-    endpoint: string;
+  model: string;
+  maxTokens: number;
+  temperature: number;
+  endpoint: string;
 }

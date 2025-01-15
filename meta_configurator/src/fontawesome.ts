@@ -31,8 +31,9 @@ import {
   faCircleNodes,
   faFileExport,
   faTrash,
-  faPlus, faInfo,
-    faRobot
+  faPlus,
+  faInfo,
+  faRobot,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,

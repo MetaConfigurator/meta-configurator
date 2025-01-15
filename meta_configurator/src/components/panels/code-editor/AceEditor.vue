@@ -20,7 +20,7 @@ import {
 } from '@/components/panels/code-editor/setupLinkToSelectionAndData';
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
-import {setupAceMode, setupAceProperties} from "@/components/panels/shared-components/aceUtils";
+import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -40,7 +40,6 @@ onMounted(() => {
   setupLinkToCurrentSelection(editor, props.sessionMode);
   setupAnnotationsFromValidationErrors(editor, props.sessionMode);
 });
-
 </script>
 
 <template>

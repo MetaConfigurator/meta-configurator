@@ -21,8 +21,8 @@ export function getComponentByPanelType(panelType: PanelType) {
       return CodeEditorPanel;
     case PanelType.SchemaDiagram:
       return SchemaDiagramPanel;
-      case PanelType.AiPrompts:
-        return AiPromptsPanel;
+    case PanelType.AiPrompts:
+      return AiPromptsPanel;
     case PanelType.Debug:
       return DebugPanel;
   }

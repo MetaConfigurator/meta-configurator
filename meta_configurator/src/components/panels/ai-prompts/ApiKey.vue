@@ -5,9 +5,8 @@ and allowing the user to jump to a parent path.
 <script setup lang="ts">
 import {onMounted, type Ref, ref, watch} from 'vue';
 import Password from 'primevue/password';
-import Panel from "primevue/panel";
-import SelectButton from "primevue/selectbutton";
-
+import Panel from 'primevue/panel';
+import SelectButton from 'primevue/selectbutton';
 
 const apiKey: Ref<string> = ref('');
 const isPersistKey: Ref<boolean> = ref(true);
@@ -25,45 +24,42 @@ onMounted(() => {
   }
 });
 
-
 const persistOptions = ref([
   {name: 'true', value: true},
   {name: 'false', value: false},
 ]);
 
-
-watch(apiKey, (newValue) => {
+watch(apiKey, newValue => {
   if (isPersistKey.value) {
     localStorage.setItem('openai_api_key', newValue);
   }
 });
 
-watch(isPersistKey, (newValue) => {
+watch(isPersistKey, newValue => {
   localStorage.setItem('openai_persist_key', newValue.toString());
   if (!newValue) {
     localStorage.removeItem('openai_api_key');
   }
 });
-
 </script>
 
 <template>
-
-  <Panel
-      header="OpenAI API Key"
-      toggleable
-      :collapsed="true">
-  <span class="api-key-container">
-    <span>Key:</span>
-    <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false"/>
-    <span v-show="isShowPersistOption">Persist:</span>
-    <SelectButton v-show="isShowPersistOption" v-model="isPersistKey" :options="persistOptions" option-label="name" option-value="value"/>
-  </span>
+  <Panel header="OpenAI API Key" toggleable :collapsed="true">
+    <span class="api-key-container">
+      <span>Key:</span>
+      <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false" />
+      <span v-show="isShowPersistOption">Persist:</span>
+      <SelectButton
+        v-show="isShowPersistOption"
+        v-model="isPersistKey"
+        :options="persistOptions"
+        option-label="name"
+        option-value="value" />
+    </span>
   </Panel>
 </template>
 
 <style scoped>
-
 .api-key-container {
   display: flex;
   align-items: center;

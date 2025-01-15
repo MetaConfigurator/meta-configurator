@@ -107,49 +107,47 @@ export class MenuItems {
       },
       {
         separator: true,
-      }
+      },
     ];
-
 
     // toggle between showing and hiding the text editor
     result.push(
-        this.generateTogglePanelButton(
-            SessionMode.DataEditor,
-            PanelType.TextEditor,
-            SessionMode.DataEditor,
-            'fa-solid fa-code',
-            'fa-solid fa-code',
-            'data text editor',
-            settings
-        )
+      this.generateTogglePanelButton(
+        SessionMode.DataEditor,
+        PanelType.TextEditor,
+        SessionMode.DataEditor,
+        'fa-solid fa-code',
+        'fa-solid fa-code',
+        'data text editor',
+        settings
+      )
     );
 
     // toggle between showing and hiding the GUI editor
     result.push(
-        this.generateTogglePanelButton(
-            SessionMode.DataEditor,
-            PanelType.GuiEditor,
-            SessionMode.DataEditor,
-            'fa-solid fa-wrench',
-            'fa-solid fa-wrench',
-            'data GUI editor',
-            settings
-        )
+      this.generateTogglePanelButton(
+        SessionMode.DataEditor,
+        PanelType.GuiEditor,
+        SessionMode.DataEditor,
+        'fa-solid fa-wrench',
+        'fa-solid fa-wrench',
+        'data GUI editor',
+        settings
+      )
     );
 
     // toggle between showing and hiding the aiPrompts panel
     result.push(
-        this.generateTogglePanelButton(
-            SessionMode.DataEditor,
-            PanelType.AiPrompts,
-            SessionMode.DataEditor,
-            'fa-solid fa-robot',
-            'fa-solid fa-robot',
-            'ai prompts',
-            settings
-        )
+      this.generateTogglePanelButton(
+        SessionMode.DataEditor,
+        PanelType.AiPrompts,
+        SessionMode.DataEditor,
+        'fa-solid fa-robot',
+        'fa-solid fa-robot',
+        'ai prompts',
+        settings
+      )
     );
-
 
     return result;
   }
@@ -271,28 +269,28 @@ export class MenuItems {
 
     // toggle between showing and hiding the schema diagram
     result.push(
-        this.generateTogglePanelButton(
-            SessionMode.SchemaEditor,
-            PanelType.SchemaDiagram,
-            SessionMode.SchemaEditor,
-            'fa-solid fa-diagram-project',
-            'fa-solid fa-diagram-project',
-            'schema diagram',
-            settings
-        )
+      this.generateTogglePanelButton(
+        SessionMode.SchemaEditor,
+        PanelType.SchemaDiagram,
+        SessionMode.SchemaEditor,
+        'fa-solid fa-diagram-project',
+        'fa-solid fa-diagram-project',
+        'schema diagram',
+        settings
+      )
     );
 
     // toggle between showing and hiding the aiPrompts panel
     result.push(
-        this.generateTogglePanelButton(
-            SessionMode.SchemaEditor,
-            PanelType.AiPrompts,
-            SessionMode.SchemaEditor,
-            'fa-solid fa-robot',
-            'fa-solid fa-robot',
-            'ai prompts',
-            settings
-        )
+      this.generateTogglePanelButton(
+        SessionMode.SchemaEditor,
+        PanelType.AiPrompts,
+        SessionMode.SchemaEditor,
+        'fa-solid fa-robot',
+        'fa-solid fa-robot',
+        'ai prompts',
+        settings
+      )
     );
 
     result.push({

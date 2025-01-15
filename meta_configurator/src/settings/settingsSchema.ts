@@ -313,37 +313,37 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       },
     },
     openAi: {
-        type: 'object',
-        required: ['model', 'maxTokens', 'temperature', 'endpoint'],
-        additionalProperties: false,
-        description: 'Settings for OpenAI API.',
-        properties: {
-          model: {
-            type: 'string',
-            description: 'The model to use for the OpenAI API.',
-            default: 'gpt-4o-mini',
-            examples: ['gpt-4o-mini', 'gpt-4o'],
-          },
-          maxTokens: {
-            type: 'integer',
-            description: 'The maximum number of tokens to generate.',
-            default: 5000,
-            minimum: 1,
-          },
-          temperature: {
-            type: 'number',
-            description: 'The sampling temperature for the OpenAI API.',
-            default: 0.3,
-            minimum: 0.0,
-            maximum: 1.0,
-          },
-          endpoint: {
-            type: 'string',
-            description: 'The endpoint to use for the OpenAI API.',
-            default: '/chat/completions',
-          },
+      type: 'object',
+      required: ['model', 'maxTokens', 'temperature', 'endpoint'],
+      additionalProperties: false,
+      description: 'Settings for OpenAI API.',
+      properties: {
+        model: {
+          type: 'string',
+          description: 'The model to use for the OpenAI API.',
+          default: 'gpt-4o-mini',
+          examples: ['gpt-4o-mini', 'gpt-4o'],
         },
-    }
+        maxTokens: {
+          type: 'integer',
+          description: 'The maximum number of tokens to generate.',
+          default: 5000,
+          minimum: 1,
+        },
+        temperature: {
+          type: 'number',
+          description: 'The sampling temperature for the OpenAI API.',
+          default: 0.3,
+          minimum: 0.0,
+          maximum: 1.0,
+        },
+        endpoint: {
+          type: 'string',
+          description: 'The endpoint to use for the OpenAI API.',
+          default: '/chat/completions',
+        },
+      },
+    },
   },
   $defs: {
     panels: {
