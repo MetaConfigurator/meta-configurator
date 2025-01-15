@@ -55,13 +55,11 @@ onMounted(() => {
   );
 });
 
-
 function submitPromptModifySettings() {
   const currentElement = settingsSession.currentSelectedElement.value;
   const openApiKey = getApiKey();
   const relevantSettings = settingsData.dataAt(currentElement);
-  const relevantSchema = settingsSchema.effectiveSchemaAtPath(currentElement)
-    .schema.jsonSchema;
+  const relevantSchema = settingsSchema.effectiveSchemaAtPath(currentElement).schema.jsonSchema;
   isLoadingAnswer.value = true;
   errorMessage.value = '';
   const response = querySettingsModification(
@@ -119,7 +117,6 @@ function applyResultSettings() {
     throw e;
   }
 }
-
 </script>
 
 <template>

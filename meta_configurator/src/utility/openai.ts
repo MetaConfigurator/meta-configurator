@@ -91,17 +91,15 @@ export const queryDataModification = async (
   ]);
 };
 
-
-
 export const querySettingsModification = async (
-    apiKey: string,
-    settingsChangeDescriptionNaturalLanguage: string,
-    currentSettings: string,
-    settingsSchema: string
+  apiKey: string,
+  settingsChangeDescriptionNaturalLanguage: string,
+  currentSettings: string,
+  settingsSchema: string
 ) => {
   const systemMessage = `Modify the provided settings based on the settings change description by the user. Return no other text than a fully valid JSON document. The settings to modify are: ${currentSettings}. The resulting JSON document needs to satisfy the JSON schema ${settingsSchema}`;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: settingsChangeDescriptionNaturalLanguage},
   ]);
-}
+};

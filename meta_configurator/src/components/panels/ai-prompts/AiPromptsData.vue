@@ -91,8 +91,7 @@ function submitPromptModifyData() {
   const currentElement = dataSession.currentSelectedElement.value;
   const openApiKey = getApiKey();
   const relevantData = dataData.dataAt(currentElement);
-  const relevantSchema = dataSchema.effectiveSchemaAtPath(currentElement)
-    .schema.jsonSchema;
+  const relevantSchema = dataSchema.effectiveSchemaAtPath(currentElement).schema.jsonSchema;
   isLoadingAnswer.value = true;
   errorMessage.value = '';
   const response = queryDataModification(
