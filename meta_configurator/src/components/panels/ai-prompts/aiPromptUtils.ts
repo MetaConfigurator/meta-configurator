@@ -12,6 +12,13 @@ export function fixAndParseGeneratedJson(json: string): any {
       catch (e) {
         throw e;
       }
+    } else {
+        throw e;
     }
   }
+}
+
+
+export function getApiKey(): string {
+  return localStorage.getItem('openai_api_key') || '';
 }

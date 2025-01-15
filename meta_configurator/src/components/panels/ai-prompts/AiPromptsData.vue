@@ -3,8 +3,6 @@ import {computed, onMounted, ref, type Ref} from "vue";
 import {
   queryDataConversion,
   queryDataModification,
-  querySchemaCreation,
-  querySchemaModification
 } from "@/utility/openai";
 import {useSettings} from "@/settings/useSettings";
 import Textarea from "primevue/textarea";
@@ -22,7 +20,9 @@ import {pathToJsonPointer} from "@/utility/pathUtils";
 import type {Path} from "@/utility/path";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {setupAceMode, setupAceProperties} from "@/components/panels/shared-components/aceUtils";
-import {fixAndParseGeneratedJson} from "@/components/panels/ai-prompts/aiPromptUtils";
+import {fixAndParseGeneratedJson, getApiKey} from "@/components/panels/ai-prompts/aiPromptUtils";
+import ApiKey from "@/components/panels/ai-prompts/ApiKey.vue";
+import Divider from "primevue/divider";
 
 const settings = useSettings();
 const dataData = getDataForMode(SessionMode.DataEditor);
@@ -40,6 +40,7 @@ const pathWhereToModify: Ref<string> = computed(() => {
   return pathToJsonPointer(dataSession.currentSelectedElement.value);
 });
 const isLoadingAnswer: Ref<boolean> = ref(false);
+const errorMessage: Ref<string> = ref('');
 
 // the proposed new document. Only used if it is not valid JSON, otherwise changes are made directly to the data
 const newDocument: Ref<string> = ref('');
@@ -63,8 +64,9 @@ onMounted(() => {
 
 
 function submitPromptCreateData() {
-  const openApiKey = settings.value.openApiKey;
+  const openApiKey = getApiKey();
   isLoadingAnswer.value = true;
+  errorMessage.value = '';
   const response = queryDataConversion(openApiKey, promptCreateData.value, JSON.stringify(dataSchema.schemaRaw.value));
   response.then((value) => {
 
@@ -72,20 +74,24 @@ function submitPromptCreateData() {
     try {
       const json = fixAndParseGeneratedJson(value);
       processResult(value, true, json, []);
-      isLoadingAnswer.value = false;
     } catch (e) {
       console.error('Failed to parse JSON', e);
       processResult(value, false, null, []);
-      isLoadingAnswer.value = false;
     }
+  }).catch((e) => {
+    console.error('Invalid response', e);
+    errorMessage.value = e.message;
+  }).finally(() => {
+    isLoadingAnswer.value = false;
   });
 }
 
 function submitPromptModifyData() {
-  const openApiKey = settings.value.openApiKey;
+  const openApiKey = getApiKey();
   const relevantData = dataData.dataAt(dataSession.currentSelectedElement.value);
   const relevantSchema = dataSchema.effectiveSchemaAtPath(dataSession.currentSelectedElement.value).schema.jsonSchema;
   isLoadingAnswer.value = true;
+  errorMessage.value = '';
   const response = queryDataModification(openApiKey, promptModifyData.value, JSON.stringify(relevantData), JSON.stringify(relevantSchema));
   response.then((value) => {
 
@@ -93,12 +99,15 @@ function submitPromptModifyData() {
     try {
       const json = fixAndParseGeneratedJson(value);
       processResult(value, true, json, dataSession.currentSelectedElement.value);
-      isLoadingAnswer.value = false;
     } catch (e) {
       console.error('Failed to parse JSON', e);
       processResult(value, false, null, dataSession.currentSelectedElement.value);
-      isLoadingAnswer.value = false;
     }
+  }).catch((e) => {
+    console.error('Invalid response', e);
+    errorMessage.value = e.message;
+  }).finally(() => {
+    isLoadingAnswer.value = false;
   });
 }
 
@@ -117,10 +126,14 @@ function processResult(response: string, validJson: boolean, responseObject: any
 function applyResultData() {
   try {
     const dataFormat = settings.value.dataFormat;
-    const data = formatRegistry.getFormat(dataFormat).dataConverter.parse(newDocument.value);
+    const editorContent = ace.edit(editor_id).getValue();
+    const data = formatRegistry.getFormat(dataFormat).dataConverter.parse(editorContent);
     dataData.setDataAt(newDocumentPath.value, data);
+    newDocument.value = "";
+    newDocumentPath.value = [];
   } catch (e) {
     console.error('Failed to parse JSON', e);
+    throw e;
   }
 }
 
@@ -132,7 +145,12 @@ function isDataEmpty() {
 </script>
 
 <template>
-  <label class="heading">AI Prompts (Data)</label>
+  <div class="container">
+
+    <ApiKey class="api-key-top"/>
+    <Divider />
+  <label class="heading">AI Prompts</label>
+    <Message severity="error" v-if="errorMessage.length>0">{{errorMessage}}</Message>
   <div class="p-5 space-y-3">
     <div class="flex flex-col space-y-4" v-if="isDataEmpty()">
       <label>Prompt to convert Data to satisfy the Schema.</label>
@@ -141,6 +159,7 @@ function isDataEmpty() {
       <ProgressSpinner v-if="isLoadingAnswer" />
     </div>
     <div class="flex flex-col space-y-4" v-else>
+      <ApiKey/>
       <span>
       <label>Prompt to modify </label>
       <b v-if="pathWhereToModify.length==0">the complete document</b>
@@ -162,13 +181,14 @@ function isDataEmpty() {
       <ProgressSpinner v-if="isLoadingAnswer" />
     </div>
     <div v-show="newDocument.length > 0 ">
-      <b>Resulting Schema</b>
-      <Message severity="warn">Generated Data is not valid JSON. Please fix the errors before applying the change.</Message>
+      <b>Resulting Data</b>
+      <Message severity="error">Generated Data is not valid JSON. Please fix the errors before applying the change.</Message>
       <div class="parent-container">
         <div class="h-full editor" :id="editor_id" />
       </div>
       <Button @click="applyResultData()">Apply Data</Button>
     </div>
+  </div>
   </div>
 </template>
 

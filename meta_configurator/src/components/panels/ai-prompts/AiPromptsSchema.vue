@@ -6,6 +6,7 @@ import Textarea from "primevue/textarea";
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from "primevue/progressspinner";
+import Divider from "primevue/divider";
 import {type Editor} from "brace";
 import * as ace from "brace";
 import {watchImmediate} from "@vueuse/core";
@@ -17,7 +18,8 @@ import {pathToJsonPointer} from "@/utility/pathUtils";
 import type {Path} from "@/utility/path";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {setupAceMode, setupAceProperties} from "@/components/panels/shared-components/aceUtils";
-import {fixAndParseGeneratedJson} from "@/components/panels/ai-prompts/aiPromptUtils";
+import {fixAndParseGeneratedJson, getApiKey} from "@/components/panels/ai-prompts/aiPromptUtils";
+import ApiKey from "@/components/panels/ai-prompts/ApiKey.vue";
 
 const settings = useSettings();
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
@@ -33,6 +35,7 @@ const pathWhereToModify: Ref<string> = computed(() => {
   return pathToJsonPointer(schemaSession.currentSelectedElement.value);
 });
 const isLoadingAnswer: Ref<boolean> = ref(false);
+const errorMessage: Ref<string> = ref('');
 
 // the proposed new document. Only used if it is not valid JSON, otherwise changes are made directly to the schema
 const newDocument: Ref<string> = ref('');
@@ -56,8 +59,9 @@ onMounted(() => {
 
 
 function submitPromptCreateSchema() {
-  const openApiKey = settings.value.openApiKey;
+  const openApiKey = getApiKey();
   isLoadingAnswer.value = true;
+  errorMessage.value = '';
   const response = querySchemaCreation(openApiKey, promptCreateSchema.value);
   response.then((value) => {
 
@@ -65,19 +69,23 @@ function submitPromptCreateSchema() {
     try {
       const json = fixAndParseGeneratedJson(value);
       processResult(value, true, json, []);
-      isLoadingAnswer.value = false;
     } catch (e) {
       console.error('Failed to parse JSON', e);
       processResult(value, false, null, []);
-      isLoadingAnswer.value = false;
     }
+  }).catch((e) => {
+    console.error('Invalid response', e);
+    errorMessage.value = e.message;
+  }).finally(() => {
+    isLoadingAnswer.value = false;
   });
 }
 
 function submitPromptModifySchema() {
-  const openApiKey = settings.value.openApiKey;
+  const openApiKey = getApiKey();
   const relevantSchema = schemaData.dataAt(schemaSession.currentSelectedElement.value);
   isLoadingAnswer.value = true;
+  errorMessage.value = '';
   const response = querySchemaModification(openApiKey, promptModifySchema.value, JSON.stringify(relevantSchema));
   response.then((value) => {
 
@@ -85,12 +93,15 @@ function submitPromptModifySchema() {
     try {
       const json = fixAndParseGeneratedJson(value);
       processResult(value, true, json, schemaSession.currentSelectedElement.value);
-      isLoadingAnswer.value = false;
     } catch (e) {
       console.error('Failed to parse JSON', e);
       processResult(value, false, null, schemaSession.currentSelectedElement.value);
-      isLoadingAnswer.value = false;
     }
+  }).catch((e) => {
+    console.error('Invalid response', e);
+    errorMessage.value = e.message;
+  }).finally(() => {
+    isLoadingAnswer.value = false;
   });
 }
 
@@ -109,8 +120,11 @@ function processResult(response: string, validJson: boolean, responseObject: any
 function applyResultSchema() {
   try {
     const dataFormat = settings.value.dataFormat;
-    const data = formatRegistry.getFormat(dataFormat).dataConverter.parse(newDocument.value);
+    const editorContent = ace.edit(editor_id).getValue();
+    const data = formatRegistry.getFormat(dataFormat).dataConverter.parse(editorContent);
     schemaData.setDataAt(newDocumentPath.value, data);
+    newDocument.value = "";
+    newDocumentPath.value = [];
   } catch (e) {
     console.error('Failed to parse JSON', e);
   }
@@ -124,7 +138,13 @@ function isSchemaEmpty() {
 </script>
 
 <template>
-  <label class="heading">AI Prompts (Schema)</label>
+  <div class="container">
+
+    <ApiKey class="api-key-top"/>
+    <Divider />
+
+  <label class="heading">AI Prompts</label>
+    <Message severity="error" v-if="errorMessage.length>0">{{errorMessage}}</Message>
   <div class="p-5 space-y-3">
     <div class="flex flex-col space-y-4" v-if="isSchemaEmpty()">
       <label>Prompt to create a schema</label>
@@ -155,12 +175,13 @@ function isSchemaEmpty() {
     </div>
     <div v-show="newDocument.length > 0 ">
       <b>Resulting Schema</b>
-      <Message severity="warn">Generated Schema is not valid JSON. Please fix the errors before applying the schema.</Message>
+      <Message severity="error">Generated Schema is not valid JSON. Please fix the errors before applying the schema.</Message>
       <div class="parent-container">
       <div class="h-full editor" :id="editor_id" />
       </div>
       <Button @click="applyResultSchema()">Apply Schema</Button>
     </div>
+  </div>
   </div>
 </template>
 
@@ -182,5 +203,10 @@ function isSchemaEmpty() {
   text-align: center; /* Center the text horizontally */
   display: block; /* Ensure the label behaves like a block element */
   margin-bottom: 10px; /* Add some space below the label */
+}
+
+
+.api-key-top{
+  margin-bottom: auto;
 }
 </style>

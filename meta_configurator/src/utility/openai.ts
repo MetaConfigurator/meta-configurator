@@ -20,7 +20,7 @@ export const queryOpenAI = async (apiKey: string, messages: { role: 'system'|'us
                 },
             }
         );
-        const resultSchema = response.data.choices[0].message.content;
+        const resultSchema: string = response.data.choices[0].message.content;
         console.log("Result schema from AI prompt:", resultSchema, "based on messages:", messages);
         return resultSchema;
     } catch (error) {
@@ -42,7 +42,8 @@ export const querySchemaModification = async (apiKey: string, schemaChangeDescri
 
 
 export const queryDataConversion = async (apiKey: string, dataInOtherFormat: string, schema: string, model: string = 'gpt-4o-mini', max_tokens: number = 5000, temperature: number = 0.3, endpoint: string = '/chat/completions') => {
-    const systemMessage = `Convert the data input provided by the user (in any format) into a JSON document which satisfies the following schema: ${schema}. Return no other text than a fully valid JSON schema document. No other explanation or words. `;
+    const systemMessage = `Convert the data input provided by the user (in any format) into a JSON document which satisfies the following schema: ${schema}. Return no other text than a fully valid JSON schema document. No other explanation or words.`;
+    return "abcsdfsdf"
     return queryOpenAI(apiKey, [{role: 'system', content: systemMessage}, {role: 'user', content: dataInOtherFormat}], model, max_tokens, temperature, endpoint);
 }
 
