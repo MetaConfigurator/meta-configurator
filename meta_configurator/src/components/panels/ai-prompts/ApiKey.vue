@@ -7,6 +7,7 @@ import {onMounted, type Ref, ref, watch} from 'vue';
 import Password from 'primevue/password';
 import Panel from 'primevue/panel';
 import SelectButton from 'primevue/selectbutton';
+import Message from "primevue/message";
 
 const apiKey: Ref<string> = ref('');
 const isPersistKey: Ref<boolean> = ref(true);
@@ -57,6 +58,7 @@ watch(isPersistKey, newValue => {
         option-value="value" />
     </span>
   </Panel>
+  <Message severity="warn" v-if="apiKey.length <= 1">Please enter your API key.</Message>
 </template>
 
 <style scoped>

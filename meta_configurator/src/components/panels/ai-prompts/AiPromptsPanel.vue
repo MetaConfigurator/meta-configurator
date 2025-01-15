@@ -2,6 +2,7 @@
 import {SessionMode} from '@/store/sessionMode';
 import AiPromptsSchema from '@/components/panels/ai-prompts/AiPromptsSchema.vue';
 import AiPromptsData from '@/components/panels/ai-prompts/AiPromptsData.vue';
+import AiPromptsSettings from "@/components/panels/ai-prompts/AiPromptsSettings.vue";
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -11,7 +12,7 @@ const props = defineProps<{
 <template>
   <AiPromptsSchema v-if="props.sessionMode == SessionMode.SchemaEditor" />
   <AiPromptsData v-else-if="props.sessionMode == SessionMode.DataEditor" />
-  <label v-if="props.sessionMode == SessionMode.Settings">TODO</label>
+  <AiPromptsSettings v-else-if="props.sessionMode == SessionMode.Settings" />
 </template>
 
 <style scoped></style>

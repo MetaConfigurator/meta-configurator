@@ -82,8 +82,9 @@ function submitPromptCreateSchema() {
 }
 
 function submitPromptModifySchema() {
+  const currentElement = schemaSession.currentSelectedElement.value;
   const openApiKey = getApiKey();
-  const relevantSchema = schemaData.dataAt(schemaSession.currentSelectedElement.value);
+  const relevantSchema = schemaData.dataAt(currentElement);
   isLoadingAnswer.value = true;
   errorMessage.value = '';
   const response = querySchemaModification(
@@ -93,13 +94,12 @@ function submitPromptModifySchema() {
   );
   response
     .then(value => {
-      // attempt to format the schema nicely
       try {
         const json = fixAndParseGeneratedJson(value);
-        processResult(value, true, json, schemaSession.currentSelectedElement.value);
+        processResult(value, true, json, currentElement);
       } catch (e) {
         console.error('Failed to parse JSON', e);
-        processResult(value, false, null, schemaSession.currentSelectedElement.value);
+        processResult(value, false, null, currentElement);
       }
     })
     .catch(e => {
