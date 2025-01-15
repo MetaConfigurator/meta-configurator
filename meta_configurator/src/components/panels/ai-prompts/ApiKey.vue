@@ -5,13 +5,14 @@ and allowing the user to jump to a parent path.
 <script setup lang="ts">
 import {onMounted, type Ref, ref, watch} from 'vue';
 import Password from 'primevue/password';
-import Checkbox from 'primevue/checkbox';
 import Panel from "primevue/panel";
 import SelectButton from "primevue/selectbutton";
 
 
 const apiKey: Ref<string> = ref('');
-const isPersistKey: Ref<boolean> = ref(false);
+const isPersistKey: Ref<boolean> = ref(true);
+
+const isShowPersistOption = false; // currently the option of whether to persist the key is not shown because without persistence the key currently can not be accessed
 
 onMounted(() => {
   const storedApiKey = localStorage.getItem('openai_api_key');
@@ -49,14 +50,14 @@ watch(isPersistKey, (newValue) => {
 <template>
 
   <Panel
-      header="API Key"
+      header="OpenAI API Key"
       toggleable
       :collapsed="true">
   <span class="api-key-container">
     <span>Key:</span>
     <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false"/>
-    <span>Persist:</span>
-    <SelectButton v-model="isPersistKey" :options="persistOptions" option-label="name" option-value="value"/>
+    <span v-show="isShowPersistOption">Persist:</span>
+    <SelectButton v-show="isShowPersistOption" v-model="isPersistKey" :options="persistOptions" option-label="name" option-value="value"/>
   </span>
   </Panel>
 </template>

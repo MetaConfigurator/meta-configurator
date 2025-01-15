@@ -83,9 +83,6 @@ export const SETTINGS_DATA_DEFAULT = {
       },
     ],
   },
-  rdf: {
-    sparqlEndpointUrl: 'https://dbpedia.org/sparql',
-  },
   frontend: {
     hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
   },
@@ -93,4 +90,13 @@ export const SETTINGS_DATA_DEFAULT = {
     hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
     port: 5000,
   },
+  rdf: {
+    sparqlEndpointUrl: 'https://dbpedia.org/sparql',
+  },
+  openAi: {
+    model: 'gpt-4o-mini',
+    maxTokens: 5000,
+    temperature: 0.3,
+    endpoint: '/chat/completions',
+  }
 };

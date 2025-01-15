@@ -263,20 +263,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
-    rdf: {
-      type: 'object',
-      required: ['sparqlEndpointUrl'],
-      additionalProperties: false,
-      description: 'Settings for RDF data.',
-      properties: {
-        sparqlEndpointUrl: {
-          type: 'string',
-          description: 'The SPARQL endpoint to use for querying RDF data.',
-          default: 'https://dbpedia.org/sparql',
-          format: 'uri',
-        },
-      },
-    },
     frontend: {
       type: 'object',
       required: ['hostname'],
@@ -312,6 +298,52 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    rdf: {
+      type: 'object',
+      required: ['sparqlEndpointUrl'],
+      additionalProperties: false,
+      description: 'Settings for RDF data.',
+      properties: {
+        sparqlEndpointUrl: {
+          type: 'string',
+          description: 'The SPARQL endpoint to use for querying RDF data.',
+          default: 'https://dbpedia.org/sparql',
+          format: 'uri',
+        },
+      },
+    },
+    openAi: {
+        type: 'object',
+        required: ['model', 'maxTokens', 'temperature', 'endpoint'],
+        additionalProperties: false,
+        description: 'Settings for OpenAI API.',
+        properties: {
+          model: {
+            type: 'string',
+            description: 'The model to use for the OpenAI API.',
+            default: 'gpt-4o-mini',
+            examples: ['gpt-4o-mini', 'gpt-4o'],
+          },
+          maxTokens: {
+            type: 'integer',
+            description: 'The maximum number of tokens to generate.',
+            default: 5000,
+            minimum: 1,
+          },
+          temperature: {
+            type: 'number',
+            description: 'The sampling temperature for the OpenAI API.',
+            default: 0.3,
+            minimum: 0.0,
+            maximum: 1.0,
+          },
+          endpoint: {
+            type: 'string',
+            description: 'The endpoint to use for the OpenAI API.',
+            default: '/chat/completions',
+          },
+        },
+    }
   },
   $defs: {
     panels: {
@@ -327,7 +359,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['guiEditor', 'textEditor', 'schemaDiagram'],
+            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts'],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },
