@@ -55,14 +55,26 @@ export const querySchemaCreation = async (
 };
 
 export const querySchemaModification = async (
-  apiKey: string,
-  schemaChangeDescriptionNaturalLanguage: string,
-  fullSchema: string
+    apiKey: string,
+    schemaChangeDescriptionNaturalLanguage: string,
+    fullSchema: string
 ) => {
   const systemMessage = `Modify the provided JSON schema based on the schema change description by the user. Return no other text than a fully valid JSON schema document. No other explanation or words. The schema to modify is: ${fullSchema}`;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: schemaChangeDescriptionNaturalLanguage},
+  ]);
+};
+
+export const querySchemaQuestion = async (
+    apiKey: string,
+    schemaQueryNaturalLanguage: string,
+    fullSchema: string
+) => {
+  const systemMessage = `Explain/summarize/query the provided JSON schema based on the prompt by the user. The schema to query is: ${fullSchema}. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: schemaQueryNaturalLanguage},
   ]);
 };
 
@@ -79,15 +91,28 @@ export const queryDataConversion = async (
 };
 
 export const queryDataModification = async (
-  apiKey: string,
-  dataChangeDescriptionNaturalLanguage: string,
-  data: string,
-  schema: string
+    apiKey: string,
+    dataChangeDescriptionNaturalLanguage: string,
+    data: string,
+    schema: string
 ) => {
   const systemMessage = `Modify the provided JSON document based on the data change description by the user. Return no other text than a fully valid JSON document. The document to modify is: ${data}. The resulting JSON document needs to satisfy the JSON schema ${schema}`;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: dataChangeDescriptionNaturalLanguage},
+  ]);
+};
+
+export const queryDataQuestion = async (
+    apiKey: string,
+    dataQuestionNaturalLanguage: string,
+    data: string,
+    schema: string
+) => {
+  const systemMessage = `Explain/summarize/query the provided JSON document based on the prompt by the user. The document to query is: ${data}. The JSON schema for the document is ${schema}. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: dataQuestionNaturalLanguage},
   ]);
 };
 
@@ -101,5 +126,18 @@ export const querySettingsModification = async (
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: settingsChangeDescriptionNaturalLanguage},
+  ]);
+};
+
+export const querySettingsQuestion = async (
+    apiKey: string,
+    settingsQuestionNaturalLanguage: string,
+    data: string,
+    schema: string
+) => {
+  const systemMessage = `Explain/summarize/query the user settings of the MetaConfigurator web app based on the prompt by the user. The settings to query is: ${data}. The JSON schema for the settings is ${schema}. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: settingsQuestionNaturalLanguage},
   ]);
 };

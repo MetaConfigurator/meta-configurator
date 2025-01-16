@@ -24,16 +24,23 @@ const props = defineProps<{
   sessionMode: SessionMode;
   defaultTextCreateDocument: string;
   defaultTextModifyDocument: string;
+  defaultTextQuestionDocument: string;
   labelDocumentType: string;
   labelModifyInfo: string | undefined;
   functionQueryDocumentCreation:
     | ((apiKey: string, prompt: string, schema: string) => Promise<string>)
     | undefined;
   functionQueryDocumentModification: (
-    apiKey: string,
-    prompt: string,
-    currentData: string,
-    schema: string
+      apiKey: string,
+      prompt: string,
+      currentData: string,
+      schema: string
+  ) => Promise<string>;
+  functionQueryDocumentQuestion: (
+      apiKey: string,
+      prompt: string,
+      currentData: string,
+      schema: string
   ) => Promise<string>;
 }>();
 
@@ -48,6 +55,7 @@ const editor_id = 'ai-prompts-' + Math.random();
 
 const promptCreateDocument: Ref<string> = ref(props.defaultTextCreateDocument);
 const promptModifyDocument: Ref<string> = ref(props.defaultTextModifyDocument);
+const promptQuestionDocument: Ref<string> = ref(props.defaultTextQuestionDocument);
 
 const currentElement: Ref<Path> = computed(() => {
   return session.currentSelectedElement.value;
@@ -56,8 +64,10 @@ const currentElementString: Ref<string> = computed(() => {
   return pathToJsonPointer(currentElement.value);
 });
 
-const isLoadingAnswer: Ref<boolean> = ref(false);
+const isLoadingChangeAnswer: Ref<boolean> = ref(false);
+const isLoadingQuestionAnswer: Ref<boolean> = ref(false);
 const errorMessage: Ref<string> = ref('');
+const questionResponse: Ref<string> = ref('');
 
 // the proposed new document. Only used if it is not valid JSON, otherwise changes are made directly to the document
 const newDocument: Ref<string> = ref('');
@@ -80,7 +90,7 @@ onMounted(() => {
 
 function submitPromptCreateDocument() {
   const openApiKey = getApiKey();
-  isLoadingAnswer.value = true;
+  isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
   const response = props.functionQueryDocumentCreation!(
     openApiKey,
@@ -102,14 +112,14 @@ function submitPromptCreateDocument() {
       errorMessage.value = e.message;
     })
     .finally(() => {
-      isLoadingAnswer.value = false;
+      isLoadingChangeAnswer.value = false;
     });
 }
 
 function submitPromptModifyDocument() {
   const openApiKey = getApiKey();
   const relevantSubDocument = data.dataAt(currentElement.value);
-  isLoadingAnswer.value = true;
+  isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
   const response = props.functionQueryDocumentModification(
     openApiKey,
@@ -133,7 +143,7 @@ function submitPromptModifyDocument() {
       errorMessage.value = e.message;
     })
     .finally(() => {
-      isLoadingAnswer.value = false;
+      isLoadingChangeAnswer.value = false;
     });
 }
 
@@ -168,9 +178,41 @@ function applyEditorDocument() {
   }
 }
 
+
+function submitPromptQuestionDocument() {
+  const openApiKey = getApiKey();
+  const relevantSubDocument = data.dataAt(currentElement.value);
+  isLoadingQuestionAnswer.value = true;
+  errorMessage.value = '';
+  questionResponse.value = '';
+  const response = props.functionQueryDocumentQuestion(
+      openApiKey,
+      promptQuestionDocument.value,
+      JSON.stringify(relevantSubDocument),
+      JSON.stringify(schema.schemaRaw.value)
+  );
+
+  response
+      .then(value => {
+        questionResponse.value = value;
+      })
+      .catch(e => {
+        console.error('Invalid response', e);
+        errorMessage.value = e.message;
+      })
+      .finally(() => {
+        isLoadingQuestionAnswer.value = false;
+      });
+}
+
 function isDocumentEmpty() {
   return _.isEmpty(data.data.value);
 }
+
+function selectRootElement() {
+  session.currentSelectedElement.value = [];
+}
+
 </script>
 
 <template>
@@ -181,26 +223,40 @@ function isDocumentEmpty() {
     <label class="heading">AI Prompts</label>
     <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
     <div class="p-5 space-y-3">
+
       <div
         class="flex flex-col space-y-4"
         v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
         <label>Prompt to Create {{ props.labelDocumentType }}</label>
         <Textarea v-model="promptCreateDocument" />
         <Button @click="submitPromptCreateDocument()">Create {{ props.labelDocumentType }}</Button>
-        <ProgressSpinner v-if="isLoadingAnswer" />
+        <ProgressSpinner v-if="isLoadingChangeAnswer" />
       </div>
+
       <div class="flex flex-col space-y-4" v-else>
         <span>
-          <label>Prompt to Modify </label>
-          <b v-if="currentElementString.length == 0">the complete {{ props.labelDocumentType }}</b>
-          <b v-else>{{ currentElementString }}</b>
+          <label>Prompt to</label>
+          <b> Modify </b>
+          <i v-if="currentElementString.length == 0">the complete {{ props.labelDocumentType }}</i>
+          <span v-else>
+          <i>{{ currentElementString }} (</i>
+            <Button
+                circular
+                text
+                size="small"
+                class="special-button"
+                v-tooltip="'Unselect element'"
+                @click="selectRootElement()">
+            <FontAwesomeIcon icon="fa-solid fa-xmark" />
+          </Button>
+            <i>)</i>
+          </span>
           <label> and all child properties</label>
-
           <Button
             circular
             text
-            class="toolbar-button"
             size="small"
+            class="special-button"
             v-tooltip="props.labelModifyInfo"
             v-if="props.labelModifyInfo !== undefined">
             <FontAwesomeIcon icon="fa-solid fa-circle-info" />
@@ -208,8 +264,9 @@ function isDocumentEmpty() {
         </span>
         <Textarea v-model="promptModifyDocument" />
         <Button @click="submitPromptModifyDocument()">Modify {{ props.labelDocumentType }}</Button>
-        <ProgressSpinner v-if="isLoadingAnswer" />
+        <ProgressSpinner v-if="isLoadingChangeAnswer" />
       </div>
+
       <div v-show="newDocument.length > 0">
         <b>Resulting {{ props.labelDocumentType }}</b>
         <Message severity="error"
@@ -221,6 +278,36 @@ function isDocumentEmpty() {
         </div>
         <Button @click="applyEditorDocument()">Apply {{ props.labelDocumentType }}</Button>
       </div>
+
+      <div
+          class="flex flex-col space-y-4"
+          v-if="!isDocumentEmpty()">
+        <Divider/>
+        <span>
+        <label>Prompt to</label>
+          <b> Query </b>
+        <i v-if="currentElementString.length == 0">the complete {{ props.labelDocumentType }}</i>
+          <span v-else>
+          <i>{{ currentElementString }} (</i>
+            <Button
+                circular
+                text
+                size="small"
+                class="special-button"
+                v-tooltip="'Unselect element'"
+                @click="selectRootElement()">
+            <FontAwesomeIcon icon="fa-solid fa-xmark" />
+          </Button>
+            <i>)</i>
+          </span>
+        <label> and all child properties</label>
+          </span>
+        <Textarea v-model="promptQuestionDocument" />
+        <Button @click="submitPromptQuestionDocument()">Query {{ props.labelDocumentType }}</Button>
+        <ProgressSpinner v-if="isLoadingQuestionAnswer" />
+        <Message v-if="questionResponse.length > 0">{{ questionResponse }}</Message>
+      </div>
+
     </div>
   </div>
 </template>
@@ -247,5 +334,9 @@ function isDocumentEmpty() {
 
 .api-key-top {
   margin-bottom: auto;
+}
+
+.special-button {
+  padding: 2px;
 }
 </style>
