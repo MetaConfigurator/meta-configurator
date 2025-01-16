@@ -21,10 +21,10 @@ import {getDataForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 import {useSessionStore} from '@/store/sessionStore';
-import {getComponentByPanelType} from '@/components/panelType';
 import type {SettingsInterfacePanels, SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import {addDefaultsForSettings} from '@/utility/settingsUpdater';
+import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -55,7 +55,7 @@ watchImmediate(
 const panels = computed(() => {
   return panelsDefinition[props.sessionMode].map(panel => {
     return {
-      component: getComponentByPanelType(panel.panelType),
+      component: panelTypeRegistry.getPanelTypeDefinition(panel.panelType).getComponent(),
       sessionMode: panel.mode,
       size: panel.size,
     };

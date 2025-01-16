@@ -66,6 +66,18 @@ export const querySchemaModification = async (
   ]);
 };
 
+export const querySchemaQuestion = async (
+  apiKey: string,
+  schemaQueryNaturalLanguage: string,
+  fullSchema: string
+) => {
+  const systemMessage = `Explain/summarize/query the provided JSON schema based on the prompt by the user. The schema to query is: ${fullSchema}. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: schemaQueryNaturalLanguage},
+  ]);
+};
+
 export const queryDataConversion = async (
   apiKey: string,
   dataInOtherFormat: string,
@@ -91,17 +103,41 @@ export const queryDataModification = async (
   ]);
 };
 
-
+export const queryDataQuestion = async (
+  apiKey: string,
+  dataQuestionNaturalLanguage: string,
+  data: string,
+  schema: string
+) => {
+  const systemMessage = `Explain/summarize/query the provided JSON document based on the prompt by the user. The document to query is: ${data}. The JSON schema for the document is ${schema}. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: dataQuestionNaturalLanguage},
+  ]);
+};
 
 export const querySettingsModification = async (
-    apiKey: string,
-    settingsChangeDescriptionNaturalLanguage: string,
-    currentSettings: string,
-    settingsSchema: string
+  apiKey: string,
+  settingsChangeDescriptionNaturalLanguage: string,
+  currentSettings: string,
+  settingsSchema: string
 ) => {
   const systemMessage = `Modify the provided settings based on the settings change description by the user. Return no other text than a fully valid JSON document. The settings to modify are: ${currentSettings}. The resulting JSON document needs to satisfy the JSON schema ${settingsSchema}`;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: settingsChangeDescriptionNaturalLanguage},
   ]);
-}
+};
+
+export const querySettingsQuestion = async (
+  apiKey: string,
+  settingsQuestionNaturalLanguage: string,
+  data: string,
+  schema: string
+) => {
+  const systemMessage = `Explain/summarize/query the user settings of the MetaConfigurator web app based on the prompt by the user. The settings to query is: ${data}. The JSON schema for the settings is ${schema}. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: settingsQuestionNaturalLanguage},
+  ]);
+};

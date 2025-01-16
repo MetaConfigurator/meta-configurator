@@ -34,6 +34,7 @@ import {
   faPlus,
   faInfo,
   faRobot,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -85,4 +86,5 @@ export function registerIcons() {
   library.add(faPlus);
   library.add(faInfo);
   library.add(faRobot);
+  library.add(faXmark);
 }

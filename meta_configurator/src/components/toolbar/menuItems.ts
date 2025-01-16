@@ -9,9 +9,10 @@ import {getDataForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLi
 import {useDataSource} from '@/data/dataSource';
 import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
-import {PanelType} from '@/components/panelType';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
+import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
+import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -110,44 +111,7 @@ export class MenuItems {
       },
     ];
 
-    // toggle between showing and hiding the text editor
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.DataEditor,
-        PanelType.TextEditor,
-        SessionMode.DataEditor,
-        'fa-solid fa-code',
-        'fa-solid fa-code',
-        'data text editor',
-        settings
-      )
-    );
-
-    // toggle between showing and hiding the GUI editor
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.DataEditor,
-        PanelType.GuiEditor,
-        SessionMode.DataEditor,
-        'fa-solid fa-wrench',
-        'fa-solid fa-wrench',
-        'data GUI editor',
-        settings
-      )
-    );
-
-    // toggle between showing and hiding the aiPrompts panel
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.DataEditor,
-        PanelType.AiPrompts,
-        SessionMode.DataEditor,
-        'fa-solid fa-robot',
-        'fa-solid fa-robot',
-        'ai prompts',
-        settings
-      )
-    );
+    result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.DataEditor, settings));
 
     return result;
   }
@@ -228,67 +192,17 @@ export class MenuItems {
       },
     ];
 
-    // toggle between showing and hiding the text editor
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.SchemaEditor,
-        PanelType.TextEditor,
-        SessionMode.SchemaEditor,
-        'fa-solid fa-code',
-        'fa-solid fa-code',
-        'schema text editor',
-        settings
-      )
-    );
-
-    // toggle between showing and hiding the GUI editor
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.SchemaEditor,
-        PanelType.GuiEditor,
-        SessionMode.SchemaEditor,
-        'fa-solid fa-wrench',
-        'fa-solid fa-wrench',
-        'schema GUI editor',
-        settings
-      )
-    );
+    result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.SchemaEditor, settings));
 
     // toggle between showing and hiding the GUI preview
     result.push(
       this.generateTogglePanelButton(
         SessionMode.SchemaEditor,
-        PanelType.GuiEditor,
+        panelTypeGuiEditor.name,
         SessionMode.DataEditor,
         'fa-regular fa-eye',
         'fa-solid fa-eye',
         'preview of resulting GUI',
-        settings
-      )
-    );
-
-    // toggle between showing and hiding the schema diagram
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.SchemaEditor,
-        PanelType.SchemaDiagram,
-        SessionMode.SchemaEditor,
-        'fa-solid fa-diagram-project',
-        'fa-solid fa-diagram-project',
-        'schema diagram',
-        settings
-      )
-    );
-
-    // toggle between showing and hiding the aiPrompts panel
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.SchemaEditor,
-        PanelType.AiPrompts,
-        SessionMode.SchemaEditor,
-        'fa-solid fa-robot',
-        'fa-solid fa-robot',
-        'ai prompts',
         settings
       )
     );
@@ -347,68 +261,8 @@ export class MenuItems {
     return result;
   }
 
-  private generateTogglePanelButton(
-    buttonMode: SessionMode,
-    panelType: PanelType,
-    panelMode: SessionMode,
-    iconNameEnabled: string,
-    iconNameDisabled: string,
-    description: string,
-    settings: SettingsInterfaceRoot
-  ): MenuItem {
-    return this.generateToggleButton(
-      () =>
-        settings.panels[buttonMode].find(
-          panel => panel.panelType === panelType && panel.mode === panelMode
-        ) !== undefined,
-      () => {
-        const panels = settings.panels;
-        panels[buttonMode].push({
-          panelType: panelType,
-          mode: panelMode,
-          size: 40,
-        });
-      },
-      () => {
-        const panels = settings.panels;
-        panels[buttonMode] = panels[buttonMode].filter(
-          panel => !(panel.panelType === panelType && panel.mode === panelMode)
-        );
-      },
-      iconNameEnabled,
-      iconNameDisabled,
-      `Show ${description}`,
-      `Hide ${description}`
-    );
-  }
-
-  private generateToggleButton(
-    conditionActive: () => boolean,
-    actionActivate: () => void,
-    actionDeactivate: () => void,
-    iconNameEnabled: string,
-    iconNameDisabled: string,
-    descriptionActivate: string,
-    descriptionDeactivate: string
-  ): MenuItem {
-    if (conditionActive()) {
-      return {
-        label: descriptionDeactivate,
-        icon: iconNameDisabled,
-        highlighted: true,
-        command: actionDeactivate,
-      };
-    } else {
-      return {
-        label: descriptionActivate,
-        icon: iconNameEnabled,
-        command: actionActivate,
-      };
-    }
-  }
-
   public getSettingsMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-    return [
+    let result: MenuItem[] = [
       {
         label: 'Open settings file',
         icon: 'fa-regular fa-folder-open',
@@ -460,6 +314,100 @@ export class MenuItems {
         command: this.showSnapshotDialog,
         key: 'snapshot',
       },
+      {
+        separator: true,
+      },
     ];
+
+    result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.Settings, settings));
+
+    return result;
+  }
+
+  private generateModeSpecificPanelToggleButtons(
+    mode: SessionMode,
+    settings: SettingsInterfaceRoot
+  ): MenuItem[] {
+    let result: MenuItem[] = [];
+
+    for (const panelTypeName of panelTypeRegistry.getPanelTypeNames()) {
+      const panelTypeDefinition = panelTypeRegistry.getPanelTypeDefinition(panelTypeName);
+      if (panelTypeDefinition.supportedModes.includes(mode)) {
+        // toggle between showing and hiding the panel
+        result.push(
+          this.generateTogglePanelButton(
+            mode,
+            panelTypeName,
+            mode,
+            panelTypeDefinition.icon,
+            panelTypeDefinition.icon,
+            panelTypeDefinition.label,
+            settings
+          )
+        );
+      }
+    }
+
+    return result;
+  }
+
+  private generateTogglePanelButton(
+    buttonMode: SessionMode,
+    panelTypeName: string,
+    panelMode: SessionMode,
+    iconNameEnabled: string,
+    iconNameDisabled: string,
+    description: string,
+    settings: SettingsInterfaceRoot
+  ): MenuItem {
+    return this.generateToggleButton(
+      () =>
+        settings.panels[buttonMode].find(
+          panel => panel.panelType === panelTypeName && panel.mode === panelMode
+        ) !== undefined,
+      () => {
+        const panels = settings.panels;
+        panels[buttonMode].push({
+          panelType: panelTypeName,
+          mode: panelMode,
+          size: 40,
+        });
+      },
+      () => {
+        const panels = settings.panels;
+        panels[buttonMode] = panels[buttonMode].filter(
+          panel => !(panel.panelType === panelTypeName && panel.mode === panelMode)
+        );
+      },
+      iconNameEnabled,
+      iconNameDisabled,
+      `Show ${description}`,
+      `Hide ${description}`
+    );
+  }
+
+  private generateToggleButton(
+    conditionActive: () => boolean,
+    actionActivate: () => void,
+    actionDeactivate: () => void,
+    iconNameEnabled: string,
+    iconNameDisabled: string,
+    descriptionActivate: string,
+    descriptionDeactivate: string
+  ): MenuItem {
+    if (conditionActive()) {
+      return {
+        label: descriptionDeactivate,
+        icon: iconNameDisabled,
+        highlighted: true,
+        command: actionDeactivate,
+      };
+    } else {
+      return {
+        label: descriptionActivate,
+        icon: iconNameEnabled,
+        command: actionActivate,
+      };
+    }
   }
 }
