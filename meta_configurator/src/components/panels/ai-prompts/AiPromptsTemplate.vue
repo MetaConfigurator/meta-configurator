@@ -20,16 +20,21 @@ import {setupAceMode, setupAceProperties} from '@/components/panels/shared-compo
 import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 
-
-
 const props = defineProps<{
   sessionMode: SessionMode;
   defaultTextCreateDocument: string;
   defaultTextModifyDocument: string;
   labelDocumentType: string;
   labelModifyInfo: string | undefined;
-  functionQueryDocumentCreation: ( (apiKey: string, prompt: string, schema: string) => Promise<string> ) | undefined;
-  functionQueryDocumentModification: (apiKey: string, prompt: string, currentData: string, schema: string) => Promise<string>;
+  functionQueryDocumentCreation:
+    | ((apiKey: string, prompt: string, schema: string) => Promise<string>)
+    | undefined;
+  functionQueryDocumentModification: (
+    apiKey: string,
+    prompt: string,
+    currentData: string,
+    schema: string
+  ) => Promise<string>;
 }>();
 
 const settings = useSettings();
@@ -51,7 +56,6 @@ const currentElementString: Ref<string> = computed(() => {
   return pathToJsonPointer(currentElement.value);
 });
 
-
 const isLoadingAnswer: Ref<boolean> = ref(false);
 const errorMessage: Ref<string> = ref('');
 
@@ -66,11 +70,11 @@ onMounted(() => {
 
   // watch changes to newDocument and update the data in the editor accordingly
   watchImmediate(
-      () => newDocument.value,
-      newValue => {
-        editor.setValue(newValue);
-        editor.clearSelection();
-      }
+    () => newDocument.value,
+    newValue => {
+      editor.setValue(newValue);
+      editor.clearSelection();
+    }
   );
 });
 
@@ -78,24 +82,28 @@ function submitPromptCreateDocument() {
   const openApiKey = getApiKey();
   isLoadingAnswer.value = true;
   errorMessage.value = '';
-  const response = props.functionQueryDocumentCreation!(openApiKey, promptCreateDocument.value, JSON.stringify(schema.schemaRaw.value));
+  const response = props.functionQueryDocumentCreation!(
+    openApiKey,
+    promptCreateDocument.value,
+    JSON.stringify(schema.schemaRaw.value)
+  );
   response
-      .then(value => {
-        try {
-          const json = fixAndParseGeneratedJson(value);
-          processResult(value, true, json, []);
-        } catch (e) {
-          console.error('Failed to parse JSON', e);
-          processResult(value, false, null, []);
-        }
-      })
-      .catch(e => {
-        console.error('Invalid response', e);
-        errorMessage.value = e.message;
-      })
-      .finally(() => {
-        isLoadingAnswer.value = false;
-      });
+    .then(value => {
+      try {
+        const json = fixAndParseGeneratedJson(value);
+        processResult(value, true, json, []);
+      } catch (e) {
+        console.error('Failed to parse JSON', e);
+        processResult(value, false, null, []);
+      }
+    })
+    .catch(e => {
+      console.error('Invalid response', e);
+      errorMessage.value = e.message;
+    })
+    .finally(() => {
+      isLoadingAnswer.value = false;
+    });
 }
 
 function submitPromptModifyDocument() {
@@ -103,32 +111,37 @@ function submitPromptModifyDocument() {
   const relevantSubDocument = data.dataAt(currentElement.value);
   isLoadingAnswer.value = true;
   errorMessage.value = '';
-  const response = props.functionQueryDocumentModification(openApiKey, promptModifyDocument.value, JSON.stringify(relevantSubDocument), JSON.stringify(schema.schemaRaw.value));
+  const response = props.functionQueryDocumentModification(
+    openApiKey,
+    promptModifyDocument.value,
+    JSON.stringify(relevantSubDocument),
+    JSON.stringify(schema.schemaRaw.value)
+  );
 
   response
-      .then(value => {
-        try {
-          const json = fixAndParseGeneratedJson(value);
-          processResult(value, true, json, currentElement.value);
-        } catch (e) {
-          console.error('Failed to parse JSON', e);
-          processResult(value, false, null, currentElement.value);
-        }
-      })
-      .catch(e => {
-        console.error('Invalid response', e);
-        errorMessage.value = e.message;
-      })
-      .finally(() => {
-        isLoadingAnswer.value = false;
-      });
+    .then(value => {
+      try {
+        const json = fixAndParseGeneratedJson(value);
+        processResult(value, true, json, currentElement.value);
+      } catch (e) {
+        console.error('Failed to parse JSON', e);
+        processResult(value, false, null, currentElement.value);
+      }
+    })
+    .catch(e => {
+      console.error('Invalid response', e);
+      errorMessage.value = e.message;
+    })
+    .finally(() => {
+      isLoadingAnswer.value = false;
+    });
 }
 
 function processResult(
-    response: string,
-    validJson: boolean,
-    responseObject: any,
-    pathForResponse: Path
+  response: string,
+  validJson: boolean,
+  responseObject: any,
+  pathForResponse: Path
 ) {
   if (validJson) {
     // if the response is valid, it is applied directly
@@ -168,7 +181,9 @@ function isDocumentEmpty() {
     <label class="heading">AI Prompts</label>
     <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
     <div class="p-5 space-y-3">
-      <div class="flex flex-col space-y-4" v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
+      <div
+        class="flex flex-col space-y-4"
+        v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
         <label>Prompt to Create {{ props.labelDocumentType }}</label>
         <Textarea v-model="promptCreateDocument" />
         <Button @click="submitPromptCreateDocument()">Create {{ props.labelDocumentType }}</Button>
@@ -182,13 +197,12 @@ function isDocumentEmpty() {
           <label> and all child properties</label>
 
           <Button
-              circular
-              text
-              class="toolbar-button"
-              size="small"
-              v-tooltip="props.labelModifyInfo"
-          v-if="props.labelModifyInfo !== undefined"
-          >
+            circular
+            text
+            class="toolbar-button"
+            size="small"
+            v-tooltip="props.labelModifyInfo"
+            v-if="props.labelModifyInfo !== undefined">
             <FontAwesomeIcon icon="fa-solid fa-circle-info" />
           </Button>
         </span>
@@ -199,8 +213,8 @@ function isDocumentEmpty() {
       <div v-show="newDocument.length > 0">
         <b>Resulting {{ props.labelDocumentType }}</b>
         <Message severity="error"
-        >Generated {{ props.labelDocumentType }} is not valid JSON. Please fix the errors before applying the
-          change.</Message
+          >Generated {{ props.labelDocumentType }} is not valid JSON. Please fix the errors before
+          applying the change.</Message
         >
         <div class="parent-container">
           <div class="h-full editor" :id="editor_id" />

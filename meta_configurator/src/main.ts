@@ -13,9 +13,9 @@ import {registerIcons} from '@/fontawesome';
 
 import {registerDefaultDataFormats} from '@/dataformats/defaultFormats';
 import App from '@/views/App.vue';
-import {getDataForMode } from '@/data/useDataLink';
+import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import {registerDefaultPanelTypes} from "@/components/panels/defaultPanelTypes";
+import {registerDefaultPanelTypes} from '@/components/panels/defaultPanelTypes';
 
 // @ts-ignore
 const app = createApp(App);
@@ -33,7 +33,7 @@ app.config.errorHandler = (error: unknown) => errorService.onError(error);
 
 registerIcons();
 registerDefaultDataFormats();
-registerDefaultPanelTypes()
+registerDefaultPanelTypes();
 
 // warn the user if he closes the app
 window.addEventListener('beforeunload', event => {

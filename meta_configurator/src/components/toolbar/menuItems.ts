@@ -11,8 +11,8 @@ import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
-import {panelTypeRegistry} from "@/components/panels/panelTypeRegistry";
-import {panelTypeGuiEditor} from "@/components/panels/defaultPanelTypes";
+import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
+import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -261,7 +261,6 @@ export class MenuItems {
     return result;
   }
 
-
   public getSettingsMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
     let result: MenuItem[] = [
       {
@@ -317,7 +316,7 @@ export class MenuItems {
       },
       {
         separator: true,
-      }
+      },
     ];
 
     result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.Settings, settings));
@@ -325,9 +324,10 @@ export class MenuItems {
     return result;
   }
 
-
-
-  private generateModeSpecificPanelToggleButtons(mode: SessionMode, settings: SettingsInterfaceRoot): MenuItem[] {
+  private generateModeSpecificPanelToggleButtons(
+    mode: SessionMode,
+    settings: SettingsInterfaceRoot
+  ): MenuItem[] {
     let result: MenuItem[] = [];
 
     for (const panelTypeName of panelTypeRegistry.getPanelTypeNames()) {
@@ -335,15 +335,16 @@ export class MenuItems {
       if (panelTypeDefinition.supportedModes.includes(mode)) {
         // toggle between showing and hiding the panel
         result.push(
-            this.generateTogglePanelButton(
-                mode,
-                panelTypeName,
-                mode,
-                panelTypeDefinition.icon,
-                panelTypeDefinition.icon,
-                panelTypeDefinition.label,
-                settings
-            ));
+          this.generateTogglePanelButton(
+            mode,
+            panelTypeName,
+            mode,
+            panelTypeDefinition.icon,
+            panelTypeDefinition.icon,
+            panelTypeDefinition.label,
+            settings
+          )
+        );
       }
     }
 
@@ -351,48 +352,48 @@ export class MenuItems {
   }
 
   private generateTogglePanelButton(
-      buttonMode: SessionMode,
-      panelTypeName: string,
-      panelMode: SessionMode,
-      iconNameEnabled: string,
-      iconNameDisabled: string,
-      description: string,
-      settings: SettingsInterfaceRoot
+    buttonMode: SessionMode,
+    panelTypeName: string,
+    panelMode: SessionMode,
+    iconNameEnabled: string,
+    iconNameDisabled: string,
+    description: string,
+    settings: SettingsInterfaceRoot
   ): MenuItem {
     return this.generateToggleButton(
-        () =>
-            settings.panels[buttonMode].find(
-                panel => panel.panelType === panelTypeName && panel.mode === panelMode
-            ) !== undefined,
-        () => {
-          const panels = settings.panels;
-          panels[buttonMode].push({
-            panelType: panelTypeName,
-            mode: panelMode,
-            size: 40,
-          });
-        },
-        () => {
-          const panels = settings.panels;
-          panels[buttonMode] = panels[buttonMode].filter(
-              panel => !(panel.panelType === panelTypeName && panel.mode === panelMode)
-          );
-        },
-        iconNameEnabled,
-        iconNameDisabled,
-        `Show ${description}`,
-        `Hide ${description}`
+      () =>
+        settings.panels[buttonMode].find(
+          panel => panel.panelType === panelTypeName && panel.mode === panelMode
+        ) !== undefined,
+      () => {
+        const panels = settings.panels;
+        panels[buttonMode].push({
+          panelType: panelTypeName,
+          mode: panelMode,
+          size: 40,
+        });
+      },
+      () => {
+        const panels = settings.panels;
+        panels[buttonMode] = panels[buttonMode].filter(
+          panel => !(panel.panelType === panelTypeName && panel.mode === panelMode)
+        );
+      },
+      iconNameEnabled,
+      iconNameDisabled,
+      `Show ${description}`,
+      `Hide ${description}`
     );
   }
 
   private generateToggleButton(
-      conditionActive: () => boolean,
-      actionActivate: () => void,
-      actionDeactivate: () => void,
-      iconNameEnabled: string,
-      iconNameDisabled: string,
-      descriptionActivate: string,
-      descriptionDeactivate: string
+    conditionActive: () => boolean,
+    actionActivate: () => void,
+    actionDeactivate: () => void,
+    iconNameEnabled: string,
+    iconNameDisabled: string,
+    descriptionActivate: string,
+    descriptionDeactivate: string
   ): MenuItem {
     if (conditionActive()) {
       return {

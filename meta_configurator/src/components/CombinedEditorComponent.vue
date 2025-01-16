@@ -24,7 +24,7 @@ import {useSessionStore} from '@/store/sessionStore';
 import type {SettingsInterfacePanels, SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import {addDefaultsForSettings} from '@/utility/settingsUpdater';
-import {panelTypeRegistry} from "@/components/panels/panelTypeRegistry";
+import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 
 const props = defineProps<{
   sessionMode: SessionMode;

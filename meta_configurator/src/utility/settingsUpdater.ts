@@ -2,7 +2,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/settingsTypes';
-import {panelTypeRegistry} from "@/components/panels/panelTypeRegistry";
+import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 
 function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
   for (const key in defaultsFile) {

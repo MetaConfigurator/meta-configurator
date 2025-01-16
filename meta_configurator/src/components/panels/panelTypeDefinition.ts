@@ -1,10 +1,9 @@
-import type {SessionMode} from "@/store/sessionMode";
+import type {SessionMode} from '@/store/sessionMode';
 
 /**
  * Definition of a panel type.
  */
 export interface PanelTypeDefinition {
-
   getComponent(): any;
 
   supportedModes: SessionMode[];
