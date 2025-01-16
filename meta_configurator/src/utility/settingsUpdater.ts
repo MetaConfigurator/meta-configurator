@@ -2,7 +2,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/settingsTypes';
-import {PanelType} from '@/components/panelType';
+import {panelTypeRegistry} from "@/components/panels/panelTypeRegistry";
 
 function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
   for (const key in defaultsFile) {
@@ -23,7 +23,7 @@ function fixPanels(userData: SettingsInterfaceRoot, defaultData: SettingsInterfa
   for (const mode of Object.values(SessionMode)) {
     const modePanels: SettingsInterfacePanel[] = userPanels[mode];
     for (const panel of modePanels) {
-      if (!panel.panelType || !Object.values(PanelType).includes(panel.panelType)) {
+      if (!panel.panelType || !panelTypeRegistry.getPanelTypeNames().includes(panel.panelType)) {
         panelsAreMessedUp = true;
       }
       if (!panel.mode || !Object.values(SessionMode).includes(panel.mode)) {

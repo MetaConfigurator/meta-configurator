@@ -1,4 +1,3 @@
-import type {PanelType} from '@/components/panelType';
 import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
@@ -53,7 +52,7 @@ export interface SettingsInterfacePanels {
 }
 
 export interface SettingsInterfacePanel {
-  panelType: PanelType;
+  panelType: string;
   mode: SessionMode;
   size: number;
 }
