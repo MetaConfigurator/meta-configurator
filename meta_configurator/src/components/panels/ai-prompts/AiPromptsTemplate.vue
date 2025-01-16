@@ -31,16 +31,16 @@ const props = defineProps<{
     | ((apiKey: string, prompt: string, schema: string) => Promise<string>)
     | undefined;
   functionQueryDocumentModification: (
-      apiKey: string,
-      prompt: string,
-      currentData: string,
-      schema: string
+    apiKey: string,
+    prompt: string,
+    currentData: string,
+    schema: string
   ) => Promise<string>;
   functionQueryDocumentQuestion: (
-      apiKey: string,
-      prompt: string,
-      currentData: string,
-      schema: string
+    apiKey: string,
+    prompt: string,
+    currentData: string,
+    schema: string
   ) => Promise<string>;
 }>();
 
@@ -178,7 +178,6 @@ function applyEditorDocument() {
   }
 }
 
-
 function submitPromptQuestionDocument() {
   const openApiKey = getApiKey();
   const relevantSubDocument = data.dataAt(currentElement.value);
@@ -186,23 +185,23 @@ function submitPromptQuestionDocument() {
   errorMessage.value = '';
   questionResponse.value = '';
   const response = props.functionQueryDocumentQuestion(
-      openApiKey,
-      promptQuestionDocument.value,
-      JSON.stringify(relevantSubDocument),
-      JSON.stringify(schema.schemaRaw.value)
+    openApiKey,
+    promptQuestionDocument.value,
+    JSON.stringify(relevantSubDocument),
+    JSON.stringify(schema.schemaRaw.value)
   );
 
   response
-      .then(value => {
-        questionResponse.value = value;
-      })
-      .catch(e => {
-        console.error('Invalid response', e);
-        errorMessage.value = e.message;
-      })
-      .finally(() => {
-        isLoadingQuestionAnswer.value = false;
-      });
+    .then(value => {
+      questionResponse.value = value;
+    })
+    .catch(e => {
+      console.error('Invalid response', e);
+      errorMessage.value = e.message;
+    })
+    .finally(() => {
+      isLoadingQuestionAnswer.value = false;
+    });
 }
 
 function isDocumentEmpty() {
@@ -212,7 +211,6 @@ function isDocumentEmpty() {
 function selectRootElement() {
   session.currentSelectedElement.value = [];
 }
-
 </script>
 
 <template>
@@ -223,7 +221,6 @@ function selectRootElement() {
     <label class="heading">AI Prompts</label>
     <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
     <div class="p-5 space-y-3">
-
       <div
         class="flex flex-col space-y-4"
         v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
@@ -239,16 +236,16 @@ function selectRootElement() {
           <b> Modify </b>
           <i v-if="currentElementString.length == 0">the complete {{ props.labelDocumentType }}</i>
           <span v-else>
-          <i>{{ currentElementString }} (</i>
+            <i>{{ currentElementString }} (</i>
             <Button
-                circular
-                text
-                size="small"
-                class="special-button"
-                v-tooltip="'Unselect element'"
-                @click="selectRootElement()">
-            <FontAwesomeIcon icon="fa-solid fa-xmark" />
-          </Button>
+              circular
+              text
+              size="small"
+              class="special-button"
+              v-tooltip="'Unselect element'"
+              @click="selectRootElement()">
+              <FontAwesomeIcon icon="fa-solid fa-xmark" />
+            </Button>
             <i>)</i>
           </span>
           <label> and all child properties</label>
@@ -279,35 +276,32 @@ function selectRootElement() {
         <Button @click="applyEditorDocument()">Apply {{ props.labelDocumentType }}</Button>
       </div>
 
-      <div
-          class="flex flex-col space-y-4"
-          v-if="!isDocumentEmpty()">
-        <Divider/>
+      <div class="flex flex-col space-y-4" v-if="!isDocumentEmpty()">
+        <Divider />
         <span>
-        <label>Prompt to</label>
+          <label>Prompt to</label>
           <b> Query </b>
-        <i v-if="currentElementString.length == 0">the complete {{ props.labelDocumentType }}</i>
+          <i v-if="currentElementString.length == 0">the complete {{ props.labelDocumentType }}</i>
           <span v-else>
-          <i>{{ currentElementString }} (</i>
+            <i>{{ currentElementString }} (</i>
             <Button
-                circular
-                text
-                size="small"
-                class="special-button"
-                v-tooltip="'Unselect element'"
-                @click="selectRootElement()">
-            <FontAwesomeIcon icon="fa-solid fa-xmark" />
-          </Button>
+              circular
+              text
+              size="small"
+              class="special-button"
+              v-tooltip="'Unselect element'"
+              @click="selectRootElement()">
+              <FontAwesomeIcon icon="fa-solid fa-xmark" />
+            </Button>
             <i>)</i>
           </span>
-        <label> and all child properties</label>
-          </span>
+          <label> and all child properties</label>
+        </span>
         <Textarea v-model="promptQuestionDocument" />
         <Button @click="submitPromptQuestionDocument()">Query {{ props.labelDocumentType }}</Button>
         <ProgressSpinner v-if="isLoadingQuestionAnswer" />
         <Message v-if="questionResponse.length > 0">{{ questionResponse }}</Message>
       </div>
-
     </div>
   </div>
 </template>

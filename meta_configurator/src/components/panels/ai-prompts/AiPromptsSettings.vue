@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AiPromptsTemplate from '@/components/panels/ai-prompts/AiPromptsTemplate.vue';
-import { querySettingsModification, querySettingsQuestion} from '@/utility/openai';
+import {querySettingsModification, querySettingsQuestion} from '@/utility/openai';
 import {SessionMode} from '@/store/sessionMode';
 
 function queryDocumentModification(
@@ -12,11 +12,14 @@ function queryDocumentModification(
   return querySettingsModification(apiKey, prompt, currentData, schema);
 }
 
-
-function queryDocumentQuestion(apiKey: string, prompt: string, currentData: string, schema: string): Promise<string> {
+function queryDocumentQuestion(
+  apiKey: string,
+  prompt: string,
+  currentData: string,
+  schema: string
+): Promise<string> {
   return querySettingsQuestion(apiKey, prompt, currentData, schema);
 }
-
 </script>
 
 <template>
@@ -29,7 +32,7 @@ function queryDocumentQuestion(apiKey: string, prompt: string, currentData: stri
     :label-modify-info="undefined"
     :function-query-document-creation="undefined"
     :function-query-document-modification="queryDocumentModification"
-  :function-query-document-question="queryDocumentQuestion"/>
+    :function-query-document-question="queryDocumentQuestion" />
 </template>
 
 <style scoped></style>

@@ -16,10 +16,14 @@ function queryDocumentModification(
   return queryDataModification(apiKey, prompt, currentData, schema);
 }
 
-function queryDocumentQuestion(apiKey: string, prompt: string, currentData: string, schema: string): Promise<string> {
+function queryDocumentQuestion(
+  apiKey: string,
+  prompt: string,
+  currentData: string,
+  schema: string
+): Promise<string> {
   return queryDataQuestion(apiKey, prompt, currentData, schema);
 }
-
 </script>
 
 <template>
@@ -32,7 +36,7 @@ function queryDocumentQuestion(apiKey: string, prompt: string, currentData: stri
     label-modify-info="When the complete document is selected for modification, the complete document will be processed by the AI to apply the modification. If you want a modification only for a specific entity or attribute, selecting that element will help reduce the processing time for the modification and increase the quality of the result. Especially for large documents, it is not recommended to use the complete document for generating modifications."
     :function-query-document-creation="queryDocumentCreation"
     :function-query-document-modification="queryDocumentModification"
-  :function-query-document-question="queryDocumentQuestion"/>
+    :function-query-document-question="queryDocumentQuestion" />
 </template>
 
 <style scoped></style>

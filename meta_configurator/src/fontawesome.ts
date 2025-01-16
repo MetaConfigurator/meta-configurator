@@ -33,7 +33,8 @@ import {
   faTrash,
   faPlus,
   faInfo,
-  faRobot, faXmark,
+  faRobot,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
