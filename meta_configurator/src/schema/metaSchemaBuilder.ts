@@ -18,6 +18,42 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
     };
   }
 
+  if (metaSchemaSettings.markMoreFieldsAsAdvanced) {
+    metaSchema.$defs!.constProperty!.properties!.const.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!.enumProperty!.properties!.enum.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!.objectProperty!.properties!.additionalProperties.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!.stringProperty!.properties!.maxLength.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!.stringProperty!.properties!.minLength.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!.stringProperty!.properties!.pattern.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!.arrayProperty!.properties!.minItems.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!.arrayProperty!.properties!.maxItems.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!.arrayProperty!.properties!.uniqueItems.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!['meta-data']!.properties!.examples.metaConfigurator = {
+      advanced: true,
+    };
+    metaSchema.$defs!['meta-data']!.properties!.default.metaConfigurator = {
+      advanced: true,
+    };
+  }
+
   if (metaSchemaSettings.objectTypesComfort) {
     metaSchema.$defs.enumProperty.allOf = ALL_OF_ENUM_PROPERTY;
     metaSchema.$defs['meta-data'].allOf = ALL_OF_META_DATA;

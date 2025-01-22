@@ -8,10 +8,26 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   required: ['dataFormat', 'codeEditor', 'guiEditor', 'schemaDiagram', 'metaSchema', 'panels'],
   additionalProperties: false,
   properties: {
+    dataFormat: {
+      type: 'string',
+      description: 'The data format to use for the configuration files.',
+      default: 'json',
+      enum: ['json', 'yaml'],
+    },
     toolbarTitle: {
       type: 'string',
       description: 'The title of the editor, shown in the toolbar.',
       default: 'MetaConfigurator',
+    },
+    hideSchemaEditor: {
+      type: 'boolean',
+      description: 'If set to true, the complete schema editor view will be hidden.',
+      default: false,
+    },
+    hideSettings: {
+      type: 'boolean',
+      description: 'If set to true, the complete settings view will be hidden.',
+      default: false,
     },
     uiColors: {
       type: 'object',
@@ -39,12 +55,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
-    dataFormat: {
-      type: 'string',
-      description: 'The data format to use for the configuration files.',
-      default: 'json',
-      enum: ['json', 'yaml'],
-    },
     codeEditor: {
       type: 'object',
       required: ['fontSize'],
@@ -57,6 +67,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: 14,
           minimum: 10,
           maximum: 40,
+        },
+        tabSize: {
+          type: 'integer',
+          description: 'The tab size of the code editor.',
+          default: 2,
+          minimum: 1,
+          maximum: 8,
         },
       },
     },
@@ -81,11 +98,18 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: 'schemaOrder',
           enum: ['priorityOrder', 'schemaOrder', 'dataOrder'],
         },
+        hideAddPropertyButton: {
+          type: 'boolean',
+          description:
+            'If set to true, the button for adding custom (not defined by the schema) properties in the GUI editor will be hidden. By default, every schema object allows any additional properties, however, showing this option in the GUI is often not desired as it would only confuse the user. If a particular schema is defined for additional properties, other than "true", then the button will not be hidden.',
+          default: true,
+        },
       },
     },
     schemaDiagram: {
       type: 'object',
       required: [
+        'editMode',
         'vertical',
         'showAttributes',
         'showEnumValues',
@@ -99,6 +123,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       additionalProperties: false,
       description: 'Settings of the schema diagram.',
       properties: {
+        editMode: {
+          type: 'boolean',
+          description:
+            'If set to true, the schema diagram will be in edit mode, allowing the user to change the schema by clicking on the elements. If set to false, the schema diagram will be in view mode, showing the schema without the possibility to change it.',
+          default: true,
+        },
         vertical: {
           type: 'boolean',
           description: 'If set to true, the schema diagram will be displayed vertically.',
@@ -152,7 +182,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'boolean',
           description:
             'If set to true, allOf schemas will be merged in the schema diagram. This can make the diagram more readable, but sometimes also is not desired, because some information gets lost.',
-          default: true,
+          $comment:
+            'Warning: has undefined behavior when merging multiple allOfs using the "$ref" keyword.',
+          default: false,
         },
       },
     },
@@ -181,10 +213,16 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             "Warning: due to incompatibility, this option will disable schema editor support for defining the items of an array, as well as support for many advanced keywords, such as conditionals and 'not'.",
           description:
             'This is a comfort feature: the original JSON Meta Schema allows properties of a particular type to have example values, constant values, default values or enum values of different types. For example, a field for numbers could have a string as a default value. This meta schema option forces the same type for all these values. This enables the tool to auto-select the corresponding type in the schema editor, avoiding the need for the user to manually select the types. ',
-          default: true,
+          default: false,
           metaConfigurator: {
             advanced: true,
           },
+        },
+        markMoreFieldsAsAdvanced: {
+          type: 'boolean',
+          description:
+            'If set to true, more fields (e.g., default values, const, enum, examples, string length) will be marked as advanced in the schema editor. This can make the schema editor less cluttered, but also hides some fields that might be needed. Recommended for users who are not familiar with JSON Schema.',
+          default: true,
         },
         showAdditionalPropertiesButton: {
           type: 'boolean',
@@ -198,11 +236,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: false,
         },
       },
-    },
-    hideSchemaEditor: {
-      type: 'boolean',
-      description: 'If set to true, the complete schema editor view will be hidden.',
-      default: false,
     },
     panels: {
       required: ['dataEditor', 'schemaEditor', 'settings'],
@@ -230,6 +263,41 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    frontend: {
+      type: 'object',
+      required: ['hostname'],
+      additionalProperties: false,
+      description: 'Settings for the frontend.',
+      properties: {
+        hostname: {
+          type: 'string',
+          description: 'The hostname of the frontend server.',
+          default: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+          format: 'uri',
+        },
+      },
+    },
+    backend: {
+      type: 'object',
+      required: ['hostname', 'port'],
+      additionalProperties: false,
+      description: 'Settings for the backend.',
+      properties: {
+        hostname: {
+          type: 'string',
+          description: 'The hostname of the backend server.',
+          default: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+          format: 'uri',
+        },
+        port: {
+          type: 'integer',
+          description: 'The port of the backend server.',
+          default: 5000,
+          minimum: 1,
+          maximum: 65535,
+        },
+      },
+    },
     rdf: {
       type: 'object',
       required: ['sparqlEndpointUrl'],
@@ -241,6 +309,38 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description: 'The SPARQL endpoint to use for querying RDF data.',
           default: 'https://dbpedia.org/sparql',
           format: 'uri',
+        },
+      },
+    },
+    openAi: {
+      type: 'object',
+      required: ['model', 'maxTokens', 'temperature', 'endpoint'],
+      additionalProperties: false,
+      description: 'Settings for OpenAI API.',
+      properties: {
+        model: {
+          type: 'string',
+          description: 'The model to use for the OpenAI API.',
+          default: 'gpt-4o-mini',
+          examples: ['gpt-4o-mini', 'gpt-4o'],
+        },
+        maxTokens: {
+          type: 'integer',
+          description: 'The maximum number of tokens to generate.',
+          default: 5000,
+          minimum: 1,
+        },
+        temperature: {
+          type: 'number',
+          description: 'The sampling temperature for the OpenAI API.',
+          default: 0.3,
+          minimum: 0.0,
+          maximum: 1.0,
+        },
+        endpoint: {
+          type: 'string',
+          description: 'The endpoint to use for the OpenAI API.',
+          default: '/chat/completions',
         },
       },
     },
@@ -259,7 +359,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['guiEditor', 'textEditor', 'schemaDiagram'],
+            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts'],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },

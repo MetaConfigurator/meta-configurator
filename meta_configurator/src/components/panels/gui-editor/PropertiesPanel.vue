@@ -6,7 +6,7 @@ It also contains the logic for adding, removing and renaming properties.
 TODO: This component is too big. Some of the logic should be moved to other files.
 -->
 <script setup lang="ts">
-import type {Ref} from 'vue';
+import {onMounted, type Ref} from 'vue';
 import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
@@ -36,6 +36,8 @@ import {
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
+import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
+import _ from 'lodash';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -74,7 +76,12 @@ watch(
 
 // update tree when the file schema changes
 watch(getSchemaForMode(props.sessionMode).schemaWrapper, () => {
-  updateTree();
+  updateTree(true);
+});
+
+// update tree when mounted (e.g., when mode changes)
+onMounted(() => {
+  updateTree(true);
 });
 
 // update tree when the current path changes
@@ -129,13 +136,50 @@ function expandPreviouslyExpandedElements(nodes: Array<GuiEditorTreeNode>) {
   }
 }
 
+function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePath: Path) {
+  if (node.children === undefined) {
+    return;
+  }
+
+  if (!node.leaf && node.type === TreeNodeType.SCHEMA_PROPERTY) {
+    const userData = dataAt(nodePath, props.currentData);
+    const isEmptyArray = Array.isArray(userData) && userData.length === 0;
+    const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
+    if (userData === undefined || isEmptyArray || isEmptyObject) {
+      const schema = node.data.schema;
+      // expand empty arrays and objects with no predefined properties (will be expected to have addProperty button)
+      if (
+        schema.type.includes('array') ||
+        (schema.type.includes('object') && _.isEmpty(schema.properties))
+      ) {
+        expandElementsByPath(nodePath);
+      }
+    }
+  }
+
+  for (const child of node.children) {
+    if (child.type === TreeNodeType.ADVANCED_PROPERTY) {
+      // do not expand advanced property children
+      continue;
+    }
+    if (child.key === undefined || child.key.length === 0) {
+      expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, nodePath);
+    } else {
+      expandEmptyArraysAndObjectsRecursively(child as GuiEditorTreeNode, [...nodePath, child.key]);
+    }
+  }
+}
+
 /**
  * Update the tree and the nodes to display.
  */
-function updateTree() {
+function updateTree(initial: boolean = false) {
   loading.value = true;
   window.setTimeout(() => {
     nodesToDisplay.value = determineNodesToDisplay(computeTree());
+    if (initial) {
+      expandEmptyArraysAndObjectsRecursively(currentTree.value!, props.currentPath);
+    }
     loading.value = false;
   }, 0);
 }
@@ -186,36 +230,19 @@ function removeProperty(subPath: Path) {
   updateTree();
 }
 
-// TODO: add setting to synchronize schema changes in GUI with data: if property renamed/deleted, do same with data
-
-function replacePropertyName(parentPath: Path, oldName: string, newName: string, oldData: any) {
-  // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
-  let dataAtParentPath = dataAt(parentPath, props.currentData) ?? {};
-  dataAtParentPath = structuredClone(dataAtParentPath);
-
-  if (oldData === undefined) {
-    oldData = initializeNewProperty(parentPath, newName);
-  } else {
-    delete dataAtParentPath[oldName];
-  }
-
-  dataAtParentPath[newName] = oldData;
-
-  updateData(parentPath, dataAtParentPath);
-}
-
-function initializeNewProperty(parentPath: Path, name: string): any {
-  const schema = props.currentSchema.subSchemaAt(parentPath.concat([name]));
-  return schema?.initialValue();
+function replacePropertyName(subPath: Path, oldName: string, newName: string): Path {
+  return replacePropertyNameUtils(
+    subPath,
+    oldName,
+    newName,
+    props.currentData,
+    props.currentSchema,
+    updateData
+  );
 }
 
 function updatePropertyName(subPath: Path, oldName: string, newName: string) {
-  const oldData = dataAt(subPath, props.currentData);
-  const parentPath = subPath.slice(0, -1);
-
-  replacePropertyName(parentPath, oldName, newName, oldData);
-  updateTree();
-  const newRelativePath = parentPath.concat([newName]);
+  const newRelativePath = replacePropertyName(subPath, oldName, newName);
   const newAbsolutePath = props.currentPath.concat(newRelativePath);
   focusOnPath(newAbsolutePath);
   const subSchema = props.currentSchema.subSchemaAt(newRelativePath);
@@ -558,7 +585,7 @@ function zoomIntoPath(path: Path) {
           @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
-            <span class="pl-2">Add item</span>
+            <span class="pl-2">{{ slotProps.node.data.label }}</span>
           </Button>
         </span>
 

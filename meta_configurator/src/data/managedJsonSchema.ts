@@ -85,7 +85,7 @@ export class ManagedJsonSchema {
       currentPath.push(key);
       const schema = currentEffectiveSchema.schema.subSchema(key);
 
-      if (schema?.oneOf) {
+      if (schema?.oneOf && schema.oneOf.length > 0) {
         const oneOfSelection = getUserSelectionForMode(
           this.mode
         ).currentSelectedOneOfOptions.value.get(pathToString(currentPath));

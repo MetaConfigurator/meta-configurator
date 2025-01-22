@@ -1,0 +1,134 @@
+{
+  "type": "object",
+  "required": [
+    "ecmofsynthesis"
+  ],
+  "properties": {
+    "ecmofsynthesis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "vial_no",
+          "date",
+          "metal_salt_name",
+          "metal_salt_mass",
+          "metal_salt_mass_unit",
+          "linker_name",
+          "linker_mass",
+          "linker_mass_unit",
+          "solvent",
+          "temperature",
+          "temperature_unit",
+          "time",
+          "time_unit",
+          "place",
+          "phase_purity",
+          "metal_salt",
+          "linker"
+        ],
+        "properties": {
+          "vial_no": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "metal_salt_name": {
+            "type": "string"
+          },
+          "metal_salt_mass": {
+            "type": "integer"
+          },
+          "metal_salt_mass_unit": {
+            "$ref": "#/$defs/weight_unit"
+          },
+          "linker_name": {
+            "type": "string"
+          },
+          "linker_mass": {
+            "type": "integer"
+          },
+          "linker_mass_unit": {
+            "$ref": "#/$defs/weight_unit"
+          },
+          "solvent": {
+            "type": "string"
+          },
+          "temperature": {
+            "type": "integer"
+          },
+          "temperature_unit": {
+            "$ref": "#/$defs/temperature_unit"
+          },
+          "time": {
+            "type": "integer"
+          },
+          "time_unit": {
+            "$ref": "#/$defs/time_unit"
+          },
+          "place": {
+            "type": "string"
+          },
+          "phase_purity": {
+            "type": "boolean"
+          },
+          "linker": {
+            "$ref": "#/$defs/compound"
+          },
+          "metal_salt": {
+            "$ref": "#/$defs/compound"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "weight_unit": {
+      "type": "string",
+      "enum": [
+        "mg",
+        "g",
+        "kg",
+        "ug"
+      ]
+    },
+    "temperature_unit": {
+      "type": "string",
+      "enum": [
+        "deg C",
+        "deg F",
+        "K"
+      ]
+    },
+    "time_unit": {
+      "type": "string",
+      "enum": [
+        "month",
+        "week",
+        "day",
+        "hour",
+        "minute",
+        "second",
+        "millisecond"
+      ]
+    },
+    "compound": {
+      "type": "object",
+      "properties": {
+        "inchi_code": {
+          "type": "string"
+        },
+        "smiles_code": {
+          "type": "string"
+        },
+        "molecular_weight": {
+          "type": "number"
+        },
+        "cid": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

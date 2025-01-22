@@ -39,6 +39,7 @@ const emit = defineEmits<{
   (e: 'stop_editing_property_name'): void;
 }>();
 
+const settings = useSettings();
 const isEditingPropertyName = ref(false);
 const showPencil = ref(true);
 
@@ -73,7 +74,7 @@ function canZoomIn(): boolean {
  * depending on if the maximum depth has been reached or not.
  */
 function onPressEnter() {
-  if (props.node.data.depth === useSettings().guiEditor.maximumDepth) {
+  if (props.node.data.depth === settings.value.guiEditor.maximumDepth) {
     zoomIntoPath();
     return;
   }

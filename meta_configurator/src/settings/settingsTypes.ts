@@ -1,33 +1,39 @@
-import type {PanelType} from '@/components/panelType';
 import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
+  dataFormat: DataFormat;
   toolbarTitle: string;
+  hideSchemaEditor: boolean;
+  hideSettings: boolean;
   uiColors: {
     schemaEditor: string;
     dataEditor: string;
     settings: string;
   };
-  dataFormat: DataFormat;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
   schemaDiagram: SettingsInterfaceSchemaDiagram;
   metaSchema: SettingsInterfaceMetaSchema;
-  hideSchemaEditor: boolean;
   panels: SettingsInterfacePanels;
+  frontend: SettingsInterfacFrontend;
+  backend: SettingsInterfaceBackend;
   rdf: SettingsInterfaceRdf;
+  openAi: SettingsInterfaceOpenAi;
 }
 
 export interface SettingsInterfaceCodeEditor {
   fontSize: number;
+  tabSize: number;
 }
 
 export interface SettingsInterfaceGuiEditor {
   maximumDepth: number;
   propertySorting: PropertySorting;
+  hideAddPropertyButton: boolean;
 }
 
 export interface SettingsInterfaceSchemaDiagram {
+  editMode: boolean;
   vertical: boolean;
   showAttributes: boolean;
   showEnumValues: boolean;
@@ -46,7 +52,7 @@ export interface SettingsInterfacePanels {
 }
 
 export interface SettingsInterfacePanel {
-  panelType: PanelType;
+  panelType: string;
   mode: SessionMode;
   size: number;
 }
@@ -55,6 +61,7 @@ export interface SettingsInterfaceMetaSchema {
   allowBooleanSchema: boolean;
   allowMultipleTypes: boolean;
   objectTypesComfort: boolean;
+  markMoreFieldsAsAdvanced: boolean;
   showAdditionalPropertiesButton: boolean;
   showJsonLdFields: boolean;
 }
@@ -70,6 +77,22 @@ export enum DataFormat {
   YAML = 'yaml',
 }
 
+export interface SettingsInterfaceBackend {
+  hostname: string;
+  port: number;
+}
+
+export interface SettingsInterfacFrontend {
+  hostname: string;
+}
+
 export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
+}
+
+export interface SettingsInterfaceOpenAi {
+  model: string;
+  maxTokens: number;
+  temperature: number;
+  endpoint: string;
 }

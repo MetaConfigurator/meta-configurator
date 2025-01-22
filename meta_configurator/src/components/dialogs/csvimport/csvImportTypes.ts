@@ -19,4 +19,8 @@ export class CsvImportColumnMappingData {
       '/' + this.pathBeforeRowIndex + '/' + rowIndex + '/' + this.pathAfterRowIndex
     );
   }
+
+  public getTablePathForJsonDocument(): Path {
+    return jsonPointerToPathTyped('/' + this.pathBeforeRowIndex);
+  }
 }

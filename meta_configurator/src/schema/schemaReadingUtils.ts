@@ -1,5 +1,6 @@
 import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
+import type {Path} from '@/utility/path';
 
 /**
  * Returns a string representation of the type of the property.

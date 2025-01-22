@@ -28,17 +28,12 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import {
-  getDataForMode,
-  getSchemaForMode,
-  getSessionForMode,
-  useCurrentData,
-  useCurrentSchema,
-} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
+import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -48,6 +43,7 @@ const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
 
+const settings = useSettings();
 const selectedSchema = ref<SchemaOption | null>(null);
 
 const showFetchedSchemas = ref(false);
@@ -61,6 +57,7 @@ const topMenuBar = new MenuItems(
   handleFromOurExampleClick,
   showUrlDialog,
   showCsvImportDialog,
+  showSnapshotDialog,
   inferSchemaFromSampleData
 );
 
@@ -116,14 +113,17 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     },
   };
 
-  if (settings.hideSchemaEditor) {
-    return [dataEditorItem, settingsItem];
-  } else {
-    return [dataEditorItem, schemaEditorItem, settingsItem];
+  const items = [dataEditorItem];
+  if (!settings.hideSchemaEditor) {
+    items.push(schemaEditorItem);
   }
+  if (!settings.hideSettings) {
+    items.push(settingsItem);
+  }
+  return items;
 }
 
-const items = computed(() => getPageSelectionMenuItems(useSettings()));
+const items = computed(() => getPageSelectionMenuItems(settings.value));
 
 function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
@@ -216,7 +216,7 @@ function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
 }
 
 // computed property function to get menu items to allow for updating of the menu items
-const menuItems = computed(() => getMenuItems(useSettings()));
+const menuItems = computed(() => getMenuItems(settings.value));
 
 const toggle = event => {
   menu.value.toggle(event);
@@ -276,9 +276,14 @@ const showInitialSchemaDialog = () => {
 };
 
 const csvImportDialog = ref();
+const snapshotDialog = ref();
 
 function showCsvImportDialog() {
   csvImportDialog.value?.show();
+}
+
+function showSnapshotDialog() {
+  snapshotDialog.value?.show();
 }
 
 defineExpose({
@@ -337,6 +342,8 @@ const showSearchResultsMenu = event => {
     @user_selected_option="option => handleUserSelection(option)" />
 
   <ImportCsvDialog ref="csvImportDialog" />
+
+  <SaveSnapshotDialog ref="snapshotDialog" />
 
   <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
@@ -453,7 +460,9 @@ const showSearchResultsMenu = event => {
       <div class="flex space-x-5 mr-3">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
-          <p class="font-semibold text-lg">{{ useSettings().toolbarTitle }}</p>
+          <p class="font-semibold text-lg">
+            {{ settings.toolbarTitle || 'MetaConfigurator' }}
+          </p>
         </div>
 
         <!-- button to open the about dialog -->
