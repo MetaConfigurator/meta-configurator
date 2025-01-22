@@ -8,6 +8,7 @@ import {GuiConstants} from '@/constants';
 import type {ValidationResult} from '@/schema/validationService';
 import type {PathElement} from '@/utility/path';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
+import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -59,7 +60,10 @@ const stepValue = computed(() => {
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     :step="stepValue"
     :disabled="isReadOnly(props.propertySchema)"
-    @keydown.stop
+    @keydown.down.stop
+    @keydown.up.stop
+    @keydown.left.stop
+    @keydown.right.stop
     increment-button-class="p-button-text p-button-secondary"
     decrement-button-class="p-button-text p-button-secondary" />
 </template>
