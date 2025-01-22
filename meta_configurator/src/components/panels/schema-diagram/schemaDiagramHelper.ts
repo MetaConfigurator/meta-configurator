@@ -6,6 +6,18 @@ import {
   SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
 
+export function pathsToEdgeId(start: Path, end: Path, label: string, isArray: boolean): string {
+  return pathToNodeId(start) + '--[' + label + isArray ? '_array' : '' + ']-->' + pathToNodeId(end);
+}
+
+export function pathToNodeId(path: Path): string {
+  if (path.length == 0) {
+    return 'root';
+  } else {
+    return pathToString(path);
+  }
+}
+
 export function findBestMatchingNode(nodes: Node[], selectedPath: Path): Node | undefined {
   const selectedPathString = pathToString(selectedPath);
 

@@ -4,6 +4,8 @@
 export const SETTINGS_DATA_DEFAULT = {
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
+  hideSchemaEditor: false,
+  hideSettings: false,
   uiColors: {
     schemaEditor: 'olivedrab',
     dataEditor: 'black',
@@ -11,18 +13,21 @@ export const SETTINGS_DATA_DEFAULT = {
   },
   codeEditor: {
     fontSize: 14,
+    tabSize: 2,
   },
   guiEditor: {
     maximumDepth: 20,
     propertySorting: 'schemaOrder',
+    hideAddPropertyButton: true,
   },
   schemaDiagram: {
+    editMode: true,
     vertical: true,
     showAttributes: true,
     showEnumValues: true,
-    maxAttributesToShow: 14,
+    maxAttributesToShow: 30,
     maxEnumValuesToShow: 10,
-    moveViewToSelectedElement: true,
+    moveViewToSelectedElement: false,
     automaticZoomMaxValue: 1,
     automaticZoomMinValue: 0.5,
     mergeAllOfs: true,
@@ -31,10 +36,10 @@ export const SETTINGS_DATA_DEFAULT = {
     allowBooleanSchema: false,
     allowMultipleTypes: false,
     objectTypesComfort: false,
+    markMoreFieldsAsAdvanced: true,
     showAdditionalPropertiesButton: false,
     showJsonLdFields: false,
   },
-  hideSchemaEditor: false,
   panels: {
     dataEditor: [
       {
@@ -52,12 +57,17 @@ export const SETTINGS_DATA_DEFAULT = {
       {
         panelType: 'textEditor',
         mode: 'schemaEditor',
-        size: 50,
+        size: 33,
+      },
+      {
+        panelType: 'schemaDiagram',
+        mode: 'schemaEditor',
+        size: 33,
       },
       {
         panelType: 'guiEditor',
         mode: 'schemaEditor',
-        size: 50,
+        size: 33,
       },
     ],
     settings: [
@@ -73,7 +83,20 @@ export const SETTINGS_DATA_DEFAULT = {
       },
     ],
   },
+  frontend: {
+    hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+  },
+  backend: {
+    hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+    port: 5000,
+  },
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
+  },
+  openAi: {
+    model: 'gpt-4o-mini',
+    maxTokens: 5000,
+    temperature: 0.3,
+    endpoint: '/chat/completions',
   },
 };

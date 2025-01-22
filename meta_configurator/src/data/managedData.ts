@@ -88,13 +88,17 @@ export class ManagedData {
    */
   public setDataAt(path: Path, value: any): void {
     if (path.length === 0) {
+      // if the path is empty, we set the data directly
       this.setData(value);
       return;
     }
+
     const dataAtPath = this.dataAt(path);
     if (_.isEqual(dataAtPath, value)) {
-      return; // nothing to do
+      // nothing to do if the value is the same
+      return;
     }
+
     this.updateData(data => {
       _.set(data, pathToString(path), value);
     });

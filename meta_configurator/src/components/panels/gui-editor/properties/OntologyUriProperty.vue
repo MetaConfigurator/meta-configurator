@@ -10,10 +10,11 @@ import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
-import {findSuggestionsForSearchTerm} from '@/rdf/findSuggestionsForSearchTerm';
-import {findJsonLdPrefixes} from '@/rdf/findJsonLdPrefixes';
+import {findSuggestionsForSearchTerm} from '@/utility/rdf/findSuggestionsForSearchTerm';
+import {findJsonLdPrefixes} from '@/utility/rdf/findJsonLdPrefixes';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
+import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -174,7 +175,10 @@ const allPrefixOptions = computed(() => {
     :disabled="isReadOnly(props.propertySchema)"
     optionLabel="name"
     :input-style="{width: '100%'}"
-    @keydown.stop
+    @keydown.down.stop
+    @keydown.up.stop
+    @keydown.left.stop
+    @keydown.right.stop
     placeholder="prefix" />
   <AutoComplete
     class="tableInput w-full value-autocomplete widthTwoThirds"
@@ -185,7 +189,10 @@ const allPrefixOptions = computed(() => {
     :disabled="isReadOnly(props.propertySchema)"
     :input-style="{width: '100%'}"
     optionLabel="name"
-    @keydown.stop
+    @keydown.down.stop
+    @keydown.up.stop
+    @keydown.left.stop
+    @keydown.right.stop
     placeholder="uri" />
 </template>
 

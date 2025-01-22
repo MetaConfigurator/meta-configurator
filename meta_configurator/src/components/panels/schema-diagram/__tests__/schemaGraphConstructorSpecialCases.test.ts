@@ -1,22 +1,7 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
-import type {Path} from '@/utility/path';
+import {describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {
-  EdgeType,
-  SchemaEnumNodeData,
-  SchemaGraph,
-  SchemaObjectNodeData,
-} from '../schemaDiagramTypes';
-import {
-  generateAttributeEdges,
-  generateObjectAttributes,
-  identifyAllObjects,
-  identifyObjects,
-  populateGraph,
-  trimGraph,
-  trimNodeChildren,
-} from '../schemaGraphConstructor';
-import {useSettings} from '@/settings/useSettings';
+import {SchemaGraph} from '../schemaDiagramTypes';
+import {identifyAllObjects, populateGraph, trimGraph} from '../schemaGraphConstructor';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({

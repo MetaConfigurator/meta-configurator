@@ -24,6 +24,8 @@ interface TreeNodeResolvingParameters {
   depth: number;
 }
 
+const settings = useSettings();
+
 /**
  * Creates a {@link GuiEditorTreeNode} from a {@link JsonSchemaWrapper}.
  *
@@ -34,6 +36,7 @@ export class ConfigTreeNodeResolver {
    * Creates a tree of {@link GuiEditorTreeNode}s from a {@link JsonSchemaWrapper} and
    * the corresponding data.
    *
+   * @param mode
    * @param schema The schema of the node.
    * @param parentSchema The schema of the parent node.
    * @param absolutePath The path of the parent node.
@@ -97,7 +100,7 @@ export class ConfigTreeNodeResolver {
     return (
       (!dependsOnUserSelection && data && typeof data !== 'object') || // primitive type in data
       (!schema.hasType('object') && !schema.hasType('array')) || // primitive type in schema
-      depth >= useSettings().guiEditor.maximumDepth // maximum depth reached
+      depth >= settings.value.guiEditor.maximumDepth // maximum depth reached
     );
   }
 
@@ -110,6 +113,7 @@ export class ConfigTreeNodeResolver {
 
   /**
    * Creates the children of a {@link GuiEditorTreeNode}.
+   * @param mode
    * @param guiEditorTreeNode The node for which the children should be created.
    */
   public createChildNodesOfNode(
@@ -149,7 +153,7 @@ export class ConfigTreeNodeResolver {
     effectiveSchema: EffectiveSchema,
     depth = 0
   ): GuiEditorTreeNode[] {
-    const depthLimit = useSettings().guiEditor.maximumDepth;
+    const depthLimit = settings.value.guiEditor.maximumDepth;
     const schema = effectiveSchema.schema;
 
     let children: GuiEditorTreeNode[] = [];
@@ -202,7 +206,7 @@ export class ConfigTreeNodeResolver {
     mode: SessionMode,
     parameters: TreeNodeResolvingParameters
   ) {
-    const propertySorting = useSettings().guiEditor.propertySorting;
+    const propertySorting = settings.value.guiEditor.propertySorting;
     let result: GuiEditorTreeNode[] = [];
 
     if (propertySorting === PropertySorting.SCHEMA_ORDER) {
@@ -486,6 +490,12 @@ export class ConfigTreeNodeResolver {
   ): GuiEditorTreeNode {
     const pathWithIndex = relativePath.concat(children.length);
     const absolutePathWithIndex = absolutePath.concat(children.length);
+    let label = 'Add item';
+    if (schema.items.title) {
+      label = 'Add ' + schema.items.title;
+    } else if (absolutePath.length > 0) {
+      label = 'Add item (' + absolutePath[absolutePath.length - 1] + ')';
+    }
     return {
       data: {
         schema: schema.items,
@@ -493,6 +503,7 @@ export class ConfigTreeNodeResolver {
         relativePath: pathWithIndex,
         absolutePath: absolutePathWithIndex,
         name: children.length,
+        label: label,
       },
       type: TreeNodeType.ADD_ITEM,
       key: pathToString(absolutePathWithIndex),
@@ -608,6 +619,15 @@ export class ConfigTreeNodeResolver {
       return false;
     }
     if (schema.metaConfigurator?.hideAddPropertyButton) {
+      return false;
+    }
+
+    // if the user has not specified a custom schema for additional properties, we can hide the button
+    if (
+      settings.value.guiEditor.hideAddPropertyButton &&
+      schema.additionalProperties.isAlwaysTrue &&
+      _.isEmpty(schema.patternProperties)
+    ) {
       return false;
     }
 

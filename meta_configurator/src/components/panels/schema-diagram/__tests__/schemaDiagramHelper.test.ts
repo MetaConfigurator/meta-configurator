@@ -1,23 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import type {Path} from '@/utility/path';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {
-  EdgeType,
-  SchemaEnumNodeData,
-  SchemaGraph,
-  SchemaObjectNodeData,
-} from '../schemaDiagramTypes';
-import {
-  constructSchemaGraph,
-  generateAttributeEdges,
-  generateObjectAttributes,
-  identifyObjects,
-  populateGraph,
-  trimGraph,
-  trimNodeChildren,
-} from '../schemaGraphConstructor';
-import {useSettings} from '@/settings/useSettings';
+import {SchemaGraph} from '../schemaDiagramTypes';
+import {constructSchemaGraph} from '../schemaGraphConstructor';
 import {findBestMatchingNode} from '../schemaDiagramHelper';
+import {ref} from 'vue';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -25,14 +11,14 @@ vi.mock('@/dataformats/formatRegistry', () => ({
     parse: (data: string) => JSON.parse(data),
   }),
   useSettings() {
-    return {
+    return ref({
       schemaDiagram: {
         showEnumValues: true,
         maxEnumValuesToShow: 5,
         showAttributes: true,
         maxAttributesToShow: 5,
       },
-    };
+    });
   },
 }));
 

@@ -9,10 +9,10 @@ import {getDataForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLi
 import {useDataSource} from '@/data/dataSource';
 import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
-import {useSettings} from '@/settings/useSettings';
-import {PanelType} from '@/components/panelType';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
+import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
+import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -25,25 +25,28 @@ export class MenuItems {
   private readonly onFromWebClick: () => Promise<void>;
   private readonly onFromOurExampleClick: () => void;
   private readonly handleFromURLClick: () => void;
-  private readonly importCsvDocument: () => void;
+  private readonly showImportCsvDialog: () => void;
+  private readonly showSnapshotDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
     onFromSchemaStoreClick: () => Promise<void>,
     onFromOurExampleClick: () => void,
     onFromURLClick: () => void,
-    importCsvDocument: () => void,
+    showImportCsvDialog: () => void,
+    showSnapshotDialog: () => void,
     inferJsonSchemaFromSampleData: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
     this.handleFromURLClick = onFromURLClick;
-    this.importCsvDocument = importCsvDocument;
+    this.showImportCsvDialog = showImportCsvDialog;
+    this.showSnapshotDialog = showSnapshotDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
   }
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-    return [
+    let result: MenuItem[] = [
       {
         label: 'New Data...',
         icon: 'fa-regular fa-file',
@@ -73,14 +76,14 @@ export class MenuItems {
           {
             label: 'Import CSV Data',
             icon: 'fa-solid fa-table',
-            command: this.importCsvDocument,
+            command: this.showImportCsvDialog,
           },
         ],
       },
       {
         label: 'Download Data',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile(useCurrentSchema().schemaRaw.value.title ?? 'file'),
+        command: () => downloadFile(useCurrentSchema().schemaRaw.value.title ?? 'file', false),
       },
       {
         separator: true,
@@ -103,7 +106,14 @@ export class MenuItems {
         disabled: () => !useCurrentData().undoManager.canRedo.value,
         key: 'redo',
       },
+      {
+        separator: true,
+      },
     ];
+
+    result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.DataEditor, settings));
+
+    return result;
   }
 
   public getSchemaEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
@@ -154,8 +164,7 @@ export class MenuItems {
       {
         label: 'Download Schema',
         icon: 'fa-solid fa-download',
-        command: () =>
-          downloadFile('schema_' + (useDataSource().userSchemaData.value.title ?? 'untitled')),
+        command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
       },
       {
         separator: true,
@@ -183,51 +192,18 @@ export class MenuItems {
       },
     ];
 
-    // toggle between showing and hiding the text editor
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.SchemaEditor,
-        PanelType.TextEditor,
-        SessionMode.SchemaEditor,
-        'fa-solid fa-code',
-        'fa-solid fa-code',
-        'schema text editor'
-      )
-    );
-
-    // toggle between showing and hiding the GUI editor
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.SchemaEditor,
-        PanelType.GuiEditor,
-        SessionMode.SchemaEditor,
-        'fa-solid fa-wrench',
-        'fa-solid fa-wrench',
-        'schema GUI editor'
-      )
-    );
+    result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.SchemaEditor, settings));
 
     // toggle between showing and hiding the GUI preview
     result.push(
       this.generateTogglePanelButton(
         SessionMode.SchemaEditor,
-        PanelType.GuiEditor,
+        panelTypeGuiEditor.name,
         SessionMode.DataEditor,
         'fa-regular fa-eye',
         'fa-solid fa-eye',
-        'preview of resulting GUI'
-      )
-    );
-
-    // toggle between showing and hiding the schema diagram
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.SchemaEditor,
-        PanelType.SchemaDiagram,
-        SessionMode.SchemaEditor,
-        'fa-solid fa-diagram-project',
-        'fa-solid fa-diagram-project',
-        'schema diagram'
+        'preview of resulting GUI',
+        settings
       )
     );
 
@@ -239,19 +215,22 @@ export class MenuItems {
     result.push(
       this.generateToggleButton(
         () =>
-          useSettings().metaSchema.allowBooleanSchema &&
-          useSettings().metaSchema.allowMultipleTypes &&
-          !useSettings().metaSchema.objectTypesComfort,
+          settings.metaSchema.allowBooleanSchema &&
+          settings.metaSchema.allowMultipleTypes &&
+          !settings.metaSchema.objectTypesComfort &&
+          !settings.metaSchema.markMoreFieldsAsAdvanced,
         () => {
-          const metaSchema = useSettings().metaSchema;
+          const metaSchema = settings.metaSchema;
           metaSchema.allowBooleanSchema = true;
           metaSchema.allowMultipleTypes = true;
           metaSchema.objectTypesComfort = false;
+          metaSchema.markMoreFieldsAsAdvanced = false;
         },
         () => {
-          const metaSchema = useSettings().metaSchema;
+          const metaSchema = settings.metaSchema;
           metaSchema.allowBooleanSchema = false;
           metaSchema.allowMultipleTypes = false;
+          metaSchema.markMoreFieldsAsAdvanced = true;
         },
         'fa-solid fa-gear',
         'fa-solid fa-gear',
@@ -263,13 +242,13 @@ export class MenuItems {
     // toggle to activate/deactivate JSON-LD support
     result.push(
       this.generateToggleButton(
-        () => useSettings().metaSchema.showJsonLdFields,
+        () => settings.metaSchema.showJsonLdFields,
         () => {
-          const metaSchema = useSettings().metaSchema;
+          const metaSchema = settings.metaSchema;
           metaSchema.showJsonLdFields = true;
         },
         () => {
-          const metaSchema = useSettings().metaSchema;
+          const metaSchema = settings.metaSchema;
           metaSchema.showJsonLdFields = false;
         },
         'fa-solid fa-circle-nodes',
@@ -282,67 +261,8 @@ export class MenuItems {
     return result;
   }
 
-  private generateTogglePanelButton(
-    buttonMode: SessionMode,
-    panelType: PanelType,
-    panelMode: SessionMode,
-    iconNameEnabled: string,
-    iconNameDisabled: string,
-    description: string
-  ): MenuItem {
-    return this.generateToggleButton(
-      () =>
-        useSettings().panels[buttonMode].find(
-          panel => panel.panelType === panelType && panel.mode === panelMode
-        ) !== undefined,
-      () => {
-        const panels = useSettings().panels;
-        panels[buttonMode].push({
-          panelType: panelType,
-          mode: panelMode,
-          size: 40,
-        });
-      },
-      () => {
-        const panels = useSettings().panels;
-        panels[buttonMode] = panels[buttonMode].filter(
-          panel => !(panel.panelType === panelType && panel.mode === panelMode)
-        );
-      },
-      iconNameEnabled,
-      iconNameDisabled,
-      `Show ${description}`,
-      `Hide ${description}`
-    );
-  }
-
-  private generateToggleButton(
-    conditionActive: () => boolean,
-    actionActivate: () => void,
-    actionDeactivate: () => void,
-    iconNameEnabled: string,
-    iconNameDisabled: string,
-    descriptionActivate: string,
-    descriptionDeactivate: string
-  ): MenuItem {
-    if (conditionActive()) {
-      return {
-        label: descriptionDeactivate,
-        icon: iconNameDisabled,
-        highlighted: true,
-        command: actionDeactivate,
-      };
-    } else {
-      return {
-        label: descriptionActivate,
-        icon: iconNameEnabled,
-        command: actionActivate,
-      };
-    }
-  }
-
   public getSettingsMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-    return [
+    let result: MenuItem[] = [
       {
         label: 'Open settings file',
         icon: 'fa-regular fa-folder-open',
@@ -354,7 +274,7 @@ export class MenuItems {
       {
         label: 'Save settings file',
         icon: 'fa-regular fa-floppy-disk',
-        command: () => downloadFile('metaConfiguratorSettings'),
+        command: () => downloadFile('metaConfiguratorSettings', false),
       },
       {
         separator: true,
@@ -388,6 +308,106 @@ export class MenuItems {
         },
         key: 'settings_restore',
       },
+      {
+        label: 'Create sharable snapshot',
+        icon: 'fa-solid fa-file-export',
+        command: this.showSnapshotDialog,
+        key: 'snapshot',
+      },
+      {
+        separator: true,
+      },
     ];
+
+    result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.Settings, settings));
+
+    return result;
+  }
+
+  private generateModeSpecificPanelToggleButtons(
+    mode: SessionMode,
+    settings: SettingsInterfaceRoot
+  ): MenuItem[] {
+    let result: MenuItem[] = [];
+
+    for (const panelTypeName of panelTypeRegistry.getPanelTypeNames()) {
+      const panelTypeDefinition = panelTypeRegistry.getPanelTypeDefinition(panelTypeName);
+      if (panelTypeDefinition.supportedModes.includes(mode)) {
+        // toggle between showing and hiding the panel
+        result.push(
+          this.generateTogglePanelButton(
+            mode,
+            panelTypeName,
+            mode,
+            panelTypeDefinition.icon,
+            panelTypeDefinition.icon,
+            panelTypeDefinition.label,
+            settings
+          )
+        );
+      }
+    }
+
+    return result;
+  }
+
+  private generateTogglePanelButton(
+    buttonMode: SessionMode,
+    panelTypeName: string,
+    panelMode: SessionMode,
+    iconNameEnabled: string,
+    iconNameDisabled: string,
+    description: string,
+    settings: SettingsInterfaceRoot
+  ): MenuItem {
+    return this.generateToggleButton(
+      () =>
+        settings.panels[buttonMode].find(
+          panel => panel.panelType === panelTypeName && panel.mode === panelMode
+        ) !== undefined,
+      () => {
+        const panels = settings.panels;
+        panels[buttonMode].push({
+          panelType: panelTypeName,
+          mode: panelMode,
+          size: 40,
+        });
+      },
+      () => {
+        const panels = settings.panels;
+        panels[buttonMode] = panels[buttonMode].filter(
+          panel => !(panel.panelType === panelTypeName && panel.mode === panelMode)
+        );
+      },
+      iconNameEnabled,
+      iconNameDisabled,
+      `Show ${description}`,
+      `Hide ${description}`
+    );
+  }
+
+  private generateToggleButton(
+    conditionActive: () => boolean,
+    actionActivate: () => void,
+    actionDeactivate: () => void,
+    iconNameEnabled: string,
+    iconNameDisabled: string,
+    descriptionActivate: string,
+    descriptionDeactivate: string
+  ): MenuItem {
+    if (conditionActive()) {
+      return {
+        label: descriptionDeactivate,
+        icon: iconNameDisabled,
+        highlighted: true,
+        command: actionDeactivate,
+      };
+    } else {
+      return {
+        label: descriptionActivate,
+        icon: iconNameEnabled,
+        command: actionActivate,
+      };
+    }
   }
 }

@@ -12,11 +12,10 @@ const emit = defineEmits<{
 
 function rebuildGraph() {
   emit('rebuild_graph');
-}
-
-function fitView() {
   emit('fit_view');
 }
+
+const settings = useSettings();
 </script>
 
 <template>
@@ -24,17 +23,21 @@ function fitView() {
     <AccordionTab header="Schema Diagram Options">
       <div>
         <label
+          >Edit Mode
+          <InputSwitch v-model="settings.schemaDiagram.editMode" class="options-input-switch" />
+        </label>
+      </div>
+      <div>
+        <label
           >Graph direction vertical
-          <InputSwitch
-            v-model="useSettings().schemaDiagram.vertical"
-            class="options-input-switch" />
+          <InputSwitch v-model="settings.schemaDiagram.vertical" class="options-input-switch" />
         </label>
       </div>
       <div>
         <label
           >Show attributes
           <InputSwitch
-            v-model="useSettings().schemaDiagram.showAttributes"
+            v-model="settings.schemaDiagram.showAttributes"
             label="Automatic zoom"
             class="options-input-switch" />
         </label>
@@ -43,7 +46,7 @@ function fitView() {
         <label
           >Show enum values
           <InputSwitch
-            v-model="useSettings().schemaDiagram.showEnumValues"
+            v-model="settings.schemaDiagram.showEnumValues"
             class="options-input-switch" />
         </label>
       </div>
@@ -51,19 +54,10 @@ function fitView() {
         <label
           >Move view on element selection
           <InputSwitch
-            v-model="useSettings().schemaDiagram.moveViewToSelectedElement"
+            v-model="settings.schemaDiagram.moveViewToSelectedElement"
             class="options-input-switch" />
         </label>
       </div>
-      <div>
-        <label
-          >Merge allOfs
-          <InputSwitch
-            v-model="useSettings().schemaDiagram.mergeAllOfs"
-            class="options-input-switch" />
-        </label>
-      </div>
-
       <div class="container">
         <div>
           <Button label="Rebuild Graph" @click="rebuildGraph" class="options-element" />

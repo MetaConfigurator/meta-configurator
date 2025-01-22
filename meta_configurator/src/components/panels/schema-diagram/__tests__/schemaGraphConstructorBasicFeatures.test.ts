@@ -68,7 +68,7 @@ describe('test schema graph constructor with objects and attributes, without adv
     currentPath = [];
     defs = new Map();
 
-    identifyObjects(currentPath, schema, defs);
+    identifyObjects(currentPath, schema, defs, false);
     // @ts-ignore
     identifyObjects(['$defs', 'person'], schema.$defs.person, defs);
   });
@@ -141,7 +141,7 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const attrPropComplexWithTitle = rootNode.attributes[2];
     // if the object has a title, we use it. Otherwise, we use the attribute name in the schema
-    expect(attrPropComplexWithTitle.typeDescription).toEqual('MyPropertyObjectWithTitle');
+    expect(attrPropComplexWithTitle.typeDescription).toEqual('propertyObjectWithTitle');
 
     const attrPropRefSimple = rootNode.attributes[3];
     // if there is a ref to a simple type, we use the name of the simple type
@@ -164,25 +164,41 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
-    expect(generateObjectTitle(rootNode.absolutePath, rootNode.schema)).toEqual('root');
+    expect(
+      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)
+    ).toEqual('root');
 
     const propComplex = defs.get('properties.propertyObject')!;
-    expect(generateObjectTitle(propComplex.absolutePath, propComplex.schema)).toEqual(
-      'propertyObject'
-    );
+    expect(
+      generateObjectTitle(
+        propComplex.absolutePath,
+        propComplex.hasUserDefinedName,
+        propComplex.schema
+      )
+    ).toEqual('propertyObject');
 
     const propComplexWithTitle = defs.get('properties.propertyObjectWithTitle')!;
     expect(
-      generateObjectTitle(propComplexWithTitle.absolutePath, propComplexWithTitle.schema)
-    ).toEqual('MyPropertyObjectWithTitle');
+      generateObjectTitle(
+        propComplexWithTitle.absolutePath,
+        propComplexWithTitle.hasUserDefinedName,
+        propComplexWithTitle.schema
+      )
+    ).toEqual('propertyObjectWithTitle');
 
     const person = defs.get('$defs.person')!;
-    expect(generateObjectTitle(person.absolutePath, person.schema)).toEqual('person');
+    expect(
+      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)
+    ).toEqual('person');
 
     const personAddress = defs.get('$defs.person.properties.address')!;
-    expect(generateObjectTitle(personAddress.absolutePath, personAddress.schema)).toEqual(
-      'address'
-    );
+    expect(
+      generateObjectTitle(
+        personAddress.absolutePath,
+        personAddress.hasUserDefinedName,
+        personAddress.schema
+      )
+    ).toEqual('address');
   });
 
   it('generate attribute edges', () => {
