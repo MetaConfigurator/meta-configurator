@@ -123,7 +123,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   return items;
 }
 
-const items = computed(() => getPageSelectionMenuItems(settings));
+const items = computed(() => getPageSelectionMenuItems(settings.value));
 
 function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
@@ -216,7 +216,7 @@ function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
 }
 
 // computed property function to get menu items to allow for updating of the menu items
-const menuItems = computed(() => getMenuItems(settings));
+const menuItems = computed(() => getMenuItems(settings.value));
 
 const toggle = event => {
   menu.value.toggle(event);

@@ -25,7 +25,10 @@ import {
   findBestMatchingNode,
 } from '@/components/panels/schema-diagram/schemaDiagramHelper';
 import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
-import {updateNodeData, wasNodeAdded} from '@/components/panels/schema-diagram/updateGraph';
+import {
+  updateNodeData,
+  wasNodeAddedOrEdgesChanged,
+} from '@/components/panels/schema-diagram/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
@@ -63,7 +66,7 @@ const activeEdges: Ref<Edge[]> = ref<Edge[]>([]);
 const graphDirection = computed(() => {
   // note that having edges from left ro right will usually lead to a more vertical graph, because usually it is
   // not very deeply nested, but there exist many nodes on the same levels
-  return settings.schemaDiagram.vertical ? 'LR' : 'TB';
+  return settings.value.schemaDiagram.vertical ? 'LR' : 'TB';
 });
 
 const selectedNode: Ref<Node | undefined> = ref(undefined);
@@ -116,10 +119,13 @@ function fitViewForElementByPath(path: Path) {
   if (bestMatchingNode) {
     if (
       (previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) ||
-      !settings.schemaDiagram.moveViewToSelectedElement
+      !settings.value.schemaDiagram.moveViewToSelectedElement
     ) {
       // if the node is already within the viewport, do not move the view
       if (areNodesAlreadyWithinViewport([bestMatchingNode])) {
+        return;
+      }
+      if (path.length == 0) {
         return;
       }
     }
@@ -134,8 +140,8 @@ function fitViewForNodes(nodes: Node[]) {
       nodes: nodes.map(node => node.id),
       duration: 1000,
       padding: 1,
-      maxZoom: settings.schemaDiagram.automaticZoomMaxValue,
-      minZoom: settings.schemaDiagram.automaticZoomMinValue,
+      maxZoom: settings.value.schemaDiagram.automaticZoomMaxValue,
+      minZoom: settings.value.schemaDiagram.automaticZoomMinValue,
     });
   });
 }
@@ -163,8 +169,8 @@ function updateGraph(forceRebuild: boolean = false) {
   const graph = constructSchemaGraph(schema);
   let graphNeedsLayouting = forceRebuild;
 
-  const vueFlowGraph = graph.toVueFlowGraph(settings.schemaDiagram.vertical);
-  if (wasNodeAdded(activeNodes.value, vueFlowGraph.nodes)) {
+  const vueFlowGraph = graph.toVueFlowGraph(settings.value.schemaDiagram.vertical);
+  if (wasNodeAddedOrEdgesChanged(activeNodes.value, vueFlowGraph.nodes)) {
     // node was added -> it is needed to update whole graph
     activeNodes.value = vueFlowGraph.nodes;
     activeEdges.value = vueFlowGraph.edges;
@@ -174,8 +180,6 @@ function updateGraph(forceRebuild: boolean = false) {
     // only data updated or nodes removed
     const nodesToRemove = updateNodeData(activeNodes.value, vueFlowGraph.nodes);
     activeNodes.value = activeNodes.value.filter(node => !nodesToRemove.includes(node.id));
-    // we still update edges, because they might have changed
-    activeEdges.value = vueFlowGraph.edges;
   }
 
   // if not on root level but current path is set: show only subgraph
@@ -188,8 +192,10 @@ function updateGraph(forceRebuild: boolean = false) {
     layoutGraph(graphDirection.value, false);
   }
 
-  if (!graphNeedsLayouting && schemaSession.currentSelectedElement.value) {
-    fitViewForElementByPath(schemaSession.currentSelectedElement.value);
+  if (schemaSession.currentSelectedElement.value) {
+    nextTick(() => {
+      fitViewForElementByPath(schemaSession.currentSelectedElement.value);
+    });
   }
 }
 
@@ -227,7 +233,13 @@ async function layoutGraph(direction: string, nodesInitialised: boolean) {
 
 function selectElement(path: Path) {
   if (schemaData.dataAt(path) != undefined) {
-    emit('select_element', path);
+    if (schemaSession.currentSelectedElement.value != path) {
+      // if the currently selected element differs: update the current selected element
+      emit('select_element', path);
+    } else if (selectedNode.value == undefined) {
+      // if the currently selected element is the same, but the selected node is not set, then fit the view
+      fitViewForElementByPath(path);
+    }
   }
 }
 
@@ -376,6 +388,12 @@ function addEnum() {
   });
   selectElement(enumPath);
 }
+
+function unselectElement() {
+  selectedNode.value = undefined;
+  selectedData.value = undefined;
+  schemaSession.currentSelectedElement.value = [];
+}
 </script>
 
 <template>
@@ -384,16 +402,18 @@ function addEnum() {
       :nodes="activeNodes"
       :edges="activeEdges"
       @nodes-initialized="layoutGraph(graphDirection, true)"
+      @click="unselectElement()"
       fit-view-on-init
       :max-zoom="4"
       :min-zoom="0.1">
       <div class="controls">
-        <DiagramOptionsPanel @rebuild_graph="updateGraph(true)" @fit_view="fitView()" />
+        <DiagramOptionsPanel @rebuild_graph="updateGraph(true)" @fit_view="fitView()" @click.stop />
 
         <CurrentPathBreadcrump
           :session-mode="SessionMode.SchemaEditor"
           :path="schemaSession.currentPath.value"
           root-name="document root"
+          @click.stop
           @update:path="updateCurrentPath"></CurrentPathBreadcrump>
 
         <Button label="Add Object" @click="addObject" class="main-options-element" />

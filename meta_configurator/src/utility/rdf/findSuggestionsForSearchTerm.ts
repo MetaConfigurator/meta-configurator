@@ -1,12 +1,14 @@
 import {useSettings} from '@/settings/useSettings';
 import {errorService} from '@/main';
 
+const settings = useSettings();
+
 export async function findSuggestionsForSearchTerm(
   searchTerm: string,
   prefix?: string,
   mustBeClassOrProperty: boolean = true
 ) {
-  const endpointUrl = useSettings().rdf.sparqlEndpointUrl;
+  const endpointUrl = settings.value.rdf.sparqlEndpointUrl;
 
   try {
     let results = await performSparqlQueryForSearchTerm(

@@ -48,9 +48,10 @@ const emit = defineEmits<{
 }>();
 
 const objectName = ref(props.data.name);
+const settings = useSettings();
 
 function isObjectEditable() {
-  return (isHighlighted() || isAttributeHighlighted()) && useSettings().schemaDiagram.editMode;
+  return (isHighlighted() || isAttributeHighlighted()) && settings.value.schemaDiagram.editMode;
 }
 
 function isNameEditable() {
@@ -135,6 +136,7 @@ function isAttributeHighlighted() {
   <div
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaobject': !isHighlighted}"
     @click="clickedNode()"
+    @click.stop
     @dblclick="doubleClickedNode()">
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
@@ -182,7 +184,7 @@ function isAttributeHighlighted() {
 
     <hr />
     <SchemaObjectAttribute
-      v-if="useSettings().schemaDiagram.showAttributes"
+      v-if="settings.schemaDiagram.showAttributes"
       v-for="attribute in props.data!.attributes"
       :data="attribute!"
       :key="attribute!.name + attribute.index + attribute.typeDescription"

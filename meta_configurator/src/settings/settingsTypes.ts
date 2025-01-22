@@ -1,4 +1,3 @@
-import type {PanelType} from '@/components/panelType';
 import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
@@ -16,9 +15,10 @@ export interface SettingsInterfaceRoot {
   schemaDiagram: SettingsInterfaceSchemaDiagram;
   metaSchema: SettingsInterfaceMetaSchema;
   panels: SettingsInterfacePanels;
-  rdf: SettingsInterfaceRdf;
   frontend: SettingsInterfacFrontend;
   backend: SettingsInterfaceBackend;
+  rdf: SettingsInterfaceRdf;
+  openAi: SettingsInterfaceOpenAi;
 }
 
 export interface SettingsInterfaceCodeEditor {
@@ -52,7 +52,7 @@ export interface SettingsInterfacePanels {
 }
 
 export interface SettingsInterfacePanel {
-  panelType: PanelType;
+  panelType: string;
   mode: SessionMode;
   size: number;
 }
@@ -77,10 +77,6 @@ export enum DataFormat {
   YAML = 'yaml',
 }
 
-export interface SettingsInterfaceRdf {
-  sparqlEndpointUrl: string;
-}
-
 export interface SettingsInterfaceBackend {
   hostname: string;
   port: number;
@@ -88,4 +84,15 @@ export interface SettingsInterfaceBackend {
 
 export interface SettingsInterfacFrontend {
   hostname: string;
+}
+
+export interface SettingsInterfaceRdf {
+  sparqlEndpointUrl: string;
+}
+
+export interface SettingsInterfaceOpenAi {
+  model: string;
+  maxTokens: number;
+  temperature: number;
+  endpoint: string;
 }

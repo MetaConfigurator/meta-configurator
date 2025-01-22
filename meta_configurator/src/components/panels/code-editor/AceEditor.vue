@@ -20,6 +20,7 @@ import {
 } from '@/components/panels/code-editor/setupLinkToSelectionAndData';
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
+import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -32,53 +33,13 @@ const editor_id = 'code-editor-' + props.sessionMode + '-' + Math.random();
 
 onMounted(() => {
   const editor: Editor = ace.edit(editor_id);
-  setupAceMode(editor);
-  setupAceProperties(editor);
+  setupAceMode(editor, settings.value);
+  setupAceProperties(editor, settings.value);
 
   setupLinkToData(editor, props.sessionMode);
   setupLinkToCurrentSelection(editor, props.sessionMode);
   setupAnnotationsFromValidationErrors(editor, props.sessionMode);
 });
-
-/**
- * change the mode depending on the data format.
- * to support new data formats, they need to be added here too.
- */
-function setupAceMode(editor: Editor) {
-  watchImmediate(
-    () => settings.dataFormat,
-    format => {
-      if (format == 'json') {
-        editor.getSession().setMode('ace/mode/json');
-      } else if (format == 'yaml') {
-        editor.getSession().setMode('ace/mode/yaml');
-      }
-    }
-  );
-}
-
-function setupAceProperties(editor: Editor) {
-  editor.$blockScrolling = Infinity;
-  editor.setOptions({
-    autoScrollEditorIntoView: true, // this is needed if editor is inside scrollable page
-  });
-  editor.setTheme('ace/theme/clouds');
-  editor.setShowPrintMargin(false);
-  editor.getSession().setTabSize(settings.codeEditor.tabSize);
-
-  // it's not clear why timeout is needed here, but without it the
-  // ace editor starts flashing and becomes unusable
-  window.setTimeout(() => {
-    watchImmediate(
-      () => settings.codeEditor.fontSize,
-      fontSize => {
-        if (editor && fontSize && fontSize > 6 && fontSize < 65) {
-          editor.setFontSize(fontSize.toString() + 'px');
-        }
-      }
-    );
-  }, 0);
-}
 </script>
 
 <template>

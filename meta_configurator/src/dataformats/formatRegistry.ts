@@ -6,6 +6,8 @@ import {noPathIndexLink} from '@/dataformats/pathIndexLink';
 import {computed} from 'vue';
 import {jsonFormat} from '@/dataformats/defaultFormats';
 
+const settings = useSettings();
+
 /**
  * The format registry serves as a central place to register and retrieve data formats definitions,
  * which contain the required implementations for a specific data format.
@@ -40,7 +42,7 @@ export class FormatRegistry {
 export const formatRegistry = new FormatRegistry();
 
 const currentDataFormatRef = computed(() => {
-  const dataFormat = useSettings().dataFormat ?? 'json';
+  const dataFormat = settings.value.dataFormat ?? 'json';
   return formatRegistry.getFormat(dataFormat);
 });
 

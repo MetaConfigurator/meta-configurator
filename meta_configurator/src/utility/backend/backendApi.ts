@@ -4,12 +4,14 @@ import {computed, type Ref} from 'vue';
 import {useSettings} from '@/settings/useSettings';
 import {errorService} from '@/main';
 
+const settings = useSettings();
+
 const BACKEND_URL = computed(() => {
-  return useSettings().backend.hostname + ':' + useSettings().backend.port;
+  return settings.value.backend.hostname + ':' + settings.value.backend.port;
 });
 
 const FRONTEND_URL = computed(() => {
-  return useSettings().frontend.hostname;
+  return settings.value.frontend.hostname;
 });
 
 export async function publishProjectLink(

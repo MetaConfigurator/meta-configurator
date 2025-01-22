@@ -54,7 +54,10 @@ function updateValue() {
     :placeholder="generatePlaceholderText(props.propertySchema, props.propertyName)"
     :disabled="isReadOnly(props.propertySchema)"
     @blur="updateValue"
-    @keydown.stop
+    @keydown.down.stop
+    @keydown.up.stop
+    @keydown.left.stop
+    @keydown.right.stop
     @keyup.enter="updateValue" />
 </template>
 
