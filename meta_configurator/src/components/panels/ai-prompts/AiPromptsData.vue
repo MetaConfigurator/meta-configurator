@@ -2,10 +2,10 @@
 import AiPromptsTemplate from '@/components/panels/ai-prompts/AiPromptsTemplate.vue';
 import {queryDataConversion, queryDataModification, queryDataQuestion} from '@/utility/openai';
 import {SessionMode} from '@/store/sessionMode';
-import {getDataForMode} from "@/data/useDataLink";
+import {getDataForMode} from '@/data/useDataLink';
 import _ from 'lodash';
-import ApiKey from "@/components/panels/ai-prompts/ApiKey.vue";
-import Divider from "primevue/divider";
+import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
+import Divider from 'primevue/divider';
 
 function queryDocumentCreation(apiKey: string, prompt: string, schema: string): Promise<string> {
   return queryDataConversion(apiKey, prompt, schema);
@@ -30,12 +30,13 @@ function queryDocumentQuestion(
 }
 
 function isSchemaEmpty() {
-  return _.isEmpty(getDataForMode(SessionMode.SchemaEditor).data.value)
+  return _.isEmpty(getDataForMode(SessionMode.SchemaEditor).data.value);
 }
 </script>
 
 <template>
-  <AiPromptsTemplate v-if="!isSchemaEmpty()"
+  <AiPromptsTemplate
+    v-if="!isSchemaEmpty()"
     :session-mode="SessionMode.DataEditor"
     default-text-create-document="Enter or describe your Data in any format"
     default-text-modify-document="How do you want your Data to be modified?"
@@ -46,19 +47,18 @@ function isSchemaEmpty() {
     :function-query-document-modification="queryDocumentModification"
     :function-query-document-question="queryDocumentQuestion" />
   <div v-else>
-
     <ApiKey class="api-key-top" />
     <Divider />
 
     <label class="heading">AI Prompts</label>
     <span>
-    Before using the AI prompts to generate data, please create or select a schema in the Schema Editor tab.
+      Before using the AI prompts to generate data, please create or select a schema in the Schema
+      Editor tab.
     </span>
   </div>
 </template>
 
 <style scoped></style>
-
 
 <style scoped>
 .heading {
