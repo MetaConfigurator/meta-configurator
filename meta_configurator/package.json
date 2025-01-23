@@ -23,7 +23,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
-    "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
     "@jsonhero/schema-infer": "^0.1.5",
     "@vue-flow/core": "^1.33.6",
     "@vueuse/core": "^10.6.0",
@@ -37,7 +37,7 @@
     "js-yaml": "^4.1.0",
     "json-cst": "^1.2.0",
     "json-pointer": "^0.6.2",
-    "json-schema-faker": "^0.5.3",
+    "json-schema-faker": "^0.5.8",
     "json-schema-merge-allof": "^0.8.1",
     "json-schema-resolver": "^2.0.0",
     "json-schema-to-typescript": "^13.0.1",
@@ -46,12 +46,12 @@
     "pinia": "^2.0.36",
     "primeicons": "^7.0.0",
     "primevue": "^3.29.2",
-    "vue": "^3.3.2",
+    "vue": "^3.5.13",
     "vue-router": "^4.3.2",
     "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "@ls-lint/ls-lint": "^1.11.2",
+    "@ls-lint/ls-lint": "^2.2.3",
     "@rushstack/eslint-patch": "^1.2.0",
     "@tsconfig/node18": "^18.2.4",
     "@types/jsdom": "^21.1.1",
@@ -86,7 +86,7 @@
     "typescript": "^5.0.4",
     "vite": "^4.5.9",
     "vitest": "^0.30.1",
-    "vue-tsc": "^1.6.4"
+    "vue-tsc": "^2.2.0"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix",
