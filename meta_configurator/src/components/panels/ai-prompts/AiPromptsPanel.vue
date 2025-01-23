@@ -10,9 +10,15 @@ const props = defineProps<{
 </script>
 
 <template>
-  <AiPromptsSchema v-if="props.sessionMode == SessionMode.SchemaEditor" />
-  <AiPromptsData v-else-if="props.sessionMode == SessionMode.DataEditor" />
-  <AiPromptsSettings v-else-if="props.sessionMode == SessionMode.Settings" />
+  <AiPromptsSchema
+    :session-mode="props.sessionMode"
+    v-if="props.sessionMode == SessionMode.SchemaEditor" />
+  <AiPromptsData
+    :session-mode="props.sessionMode"
+    v-else-if="props.sessionMode == SessionMode.DataEditor" />
+  <AiPromptsSettings
+    :session-mode="props.sessionMode"
+    v-else-if="props.sessionMode == SessionMode.Settings" />
 </template>
 
 <style scoped></style>

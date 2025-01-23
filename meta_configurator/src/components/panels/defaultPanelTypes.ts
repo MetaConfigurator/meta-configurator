@@ -42,7 +42,7 @@ export const panelTypeAiPrompts: PanelTypeDefinition = {
 export const panelTypeDebug: PanelTypeDefinition = {
   getComponent: () => DebugPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
-  label: '',
+  label: 'Debug',
   icon: '',
   name: 'debug',
 };

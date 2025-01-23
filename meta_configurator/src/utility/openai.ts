@@ -83,7 +83,7 @@ export const queryDataConversion = async (
   dataInOtherFormat: string,
   schema: string
 ) => {
-  const systemMessage = `Convert the data input provided by the user (in any format) into a JSON document which satisfies the following schema: ${schema}. Return no other text than a fully valid JSON schema document. No other explanation or words.`;
+  const systemMessage = `Convert the data input provided by the user (in any format) into a JSON document which satisfies the following schema: ${schema}. Return no other text than a fully valid JSON document satisfying the schema. No other explanation or words.`;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: dataInOtherFormat},

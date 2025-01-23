@@ -332,7 +332,10 @@ export class MenuItems {
 
     for (const panelTypeName of panelTypeRegistry.getPanelTypeNames()) {
       const panelTypeDefinition = panelTypeRegistry.getPanelTypeDefinition(panelTypeName);
-      if (panelTypeDefinition.supportedModes.includes(mode)) {
+      if (
+        panelTypeDefinition.supportedModes.includes(mode) &&
+        panelTypeDefinition.icon.length > 0
+      ) {
         // toggle between showing and hiding the panel
         result.push(
           this.generateTogglePanelButton(

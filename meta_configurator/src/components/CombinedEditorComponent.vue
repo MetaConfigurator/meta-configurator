@@ -75,6 +75,7 @@ function updateMode(newMode: SessionMode) {
       break;
     case SessionMode.Settings:
       router.push('/settings');
+      router.push('/settings');
       break;
   }
 }
@@ -166,7 +167,6 @@ onUnmounted(() => {
       <!-- toolbar -->
       <TopToolbar
         ref="topToolbarRef"
-        class="h-12 flex-none"
         :current-mode="props.sessionMode"
         @mode-selected="updateMode" />
       <div class="flex-grow overflow-hidden" ref="mainPanel" id="mainpanel">

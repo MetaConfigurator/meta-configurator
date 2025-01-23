@@ -215,7 +215,7 @@ function selectRootElement() {
 
 <template>
   <div class="container">
-    <ApiKey class="api-key-top" />
+    <ApiKey />
     <Divider />
 
     <label class="heading">AI Prompts</label>
@@ -324,10 +324,6 @@ function selectRootElement() {
   text-align: center; /* Center the text horizontally */
   display: block; /* Ensure the label behaves like a block element */
   margin-bottom: 10px; /* Add some space below the label */
-}
-
-.api-key-top {
-  margin-bottom: auto;
 }
 
 .special-button {
