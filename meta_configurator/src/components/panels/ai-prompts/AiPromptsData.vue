@@ -11,7 +11,6 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
-
 function queryDocumentCreation(apiKey: string, prompt: string, schema: string): Promise<string> {
   return queryDataConversion(apiKey, prompt, schema);
 }

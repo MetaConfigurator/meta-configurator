@@ -7,7 +7,6 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
-
 function queryDocumentModification(
   apiKey: string,
   prompt: string,

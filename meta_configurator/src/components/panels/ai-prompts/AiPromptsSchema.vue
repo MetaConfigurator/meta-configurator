@@ -3,12 +3,9 @@ import AiPromptsTemplate from '@/components/panels/ai-prompts/AiPromptsTemplate.
 import {querySchemaCreation, querySchemaModification, querySchemaQuestion} from '@/utility/openai';
 import {SessionMode} from '@/store/sessionMode';
 
-
-
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
-
 
 function queryDocumentCreation(apiKey: string, prompt: string, schema: string): Promise<string> {
   return querySchemaCreation(apiKey, prompt);
