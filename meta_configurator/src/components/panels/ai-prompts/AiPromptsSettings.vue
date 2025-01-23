@@ -3,6 +3,11 @@ import AiPromptsTemplate from '@/components/panels/ai-prompts/AiPromptsTemplate.
 import {querySettingsModification, querySettingsQuestion} from '@/utility/openai';
 import {SessionMode} from '@/store/sessionMode';
 
+const props = defineProps<{
+  sessionMode: SessionMode;
+}>();
+
+
 function queryDocumentModification(
   apiKey: string,
   prompt: string,
@@ -24,7 +29,7 @@ function queryDocumentQuestion(
 
 <template>
   <AiPromptsTemplate
-    :session-mode="SessionMode.Settings"
+    :session-mode="props.sessionMode"
     default-text-create-document=""
     default-text-modify-document="How do you want your Settings to be modified?"
     default-text-question-document="Ask a question about your Settings"

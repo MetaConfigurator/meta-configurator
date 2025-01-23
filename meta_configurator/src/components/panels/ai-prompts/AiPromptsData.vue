@@ -7,6 +7,11 @@ import _ from 'lodash';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import Divider from 'primevue/divider';
 
+const props = defineProps<{
+  sessionMode: SessionMode;
+}>();
+
+
 function queryDocumentCreation(apiKey: string, prompt: string, schema: string): Promise<string> {
   return queryDataConversion(apiKey, prompt, schema);
 }
@@ -37,7 +42,7 @@ function isSchemaEmpty() {
 <template>
   <AiPromptsTemplate
     v-if="!isSchemaEmpty()"
-    :session-mode="SessionMode.DataEditor"
+    :session-mode="props.sessionMode"
     default-text-create-document="Enter or describe your Data in any format"
     default-text-modify-document="How do you want your Data to be modified?"
     default-text-question-document="Ask a question about your Data"
