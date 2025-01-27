@@ -25,6 +25,7 @@ const props = defineProps<{
   defaultTextCreateDocument: string;
   defaultTextModifyDocument: string;
   defaultTextQuestionDocument: string;
+  defaultTextExportDocument: string;
   labelDocumentType: string;
   labelModifyInfo: string | undefined;
   functionQueryDocumentCreation:
@@ -37,11 +38,17 @@ const props = defineProps<{
     schema: string
   ) => Promise<string>;
   functionQueryDocumentQuestion: (
-    apiKey: string,
-    prompt: string,
-    currentData: string,
-    schema: string
+      apiKey: string,
+      prompt: string,
+      currentData: string,
+      schema: string
   ) => Promise<string>;
+  functionQueryDocumentExport: ( (
+      apiKey: string,
+      prompt: string,
+      currentData: string,
+      schema: string
+  ) => Promise<string> ) | undefined;
 }>();
 
 const settings = useSettings();
@@ -49,13 +56,16 @@ const data = getDataForMode(props.sessionMode);
 const schema = getSchemaForMode(props.sessionMode);
 const session = getSessionForMode(props.sessionMode);
 
+
 // random id is used to enable multiple Ace Editors of same sessionMode on the same page
 // the editor only is a fallback option if the returned response by the AI is not valid JSON
 const editor_id = 'ai-prompts-' + Math.random();
+const editor_id_export = 'ai-prompts-export-' + Math.random();
 
 const promptCreateDocument: Ref<string> = ref(props.defaultTextCreateDocument);
 const promptModifyDocument: Ref<string> = ref(props.defaultTextModifyDocument);
 const promptQuestionDocument: Ref<string> = ref(props.defaultTextQuestionDocument);
+const promptExportDocument: Ref<string> = ref(props.defaultTextExportDocument);
 
 const currentElement: Ref<Path> = computed(() => {
   return session.currentSelectedElement.value;
@@ -66,12 +76,14 @@ const currentElementString: Ref<string> = computed(() => {
 
 const isLoadingChangeAnswer: Ref<boolean> = ref(false);
 const isLoadingQuestionAnswer: Ref<boolean> = ref(false);
+const isLoadingExportAnswer: Ref<boolean> = ref(false);
 const errorMessage: Ref<string> = ref('');
 const questionResponse: Ref<string> = ref('');
 
 // the proposed new document. Only used if it is not valid JSON, otherwise changes are made directly to the document
 const newDocument: Ref<string> = ref('');
 const newDocumentPath: Ref<Path> = ref([]);
+const exportedDocument: Ref<string> = ref('');
 
 onMounted(() => {
   const editor: Editor = ace.edit(editor_id);
@@ -85,6 +97,17 @@ onMounted(() => {
       editor.setValue(newValue);
       editor.clearSelection();
     }
+  );
+
+
+  const editor_export: Editor = ace.edit(editor_id_export);
+  setupAceProperties(editor_export, settings.value);
+  watchImmediate(
+      () => exportedDocument.value,
+      newValue => {
+        editor_export.setValue(newValue);
+        editor_export.clearSelection();
+      }
   );
 });
 
@@ -204,8 +227,36 @@ function submitPromptQuestionDocument() {
     });
 }
 
+
+function submitPromptExportDocument() {
+  const openApiKey = getApiKey();
+  isLoadingExportAnswer.value = true;
+  errorMessage.value = '';
+  const response = props.functionQueryDocumentExport!(
+      openApiKey,
+      promptExportDocument.value,
+      JSON.stringify(data.data.value),
+      JSON.stringify(schema.schemaRaw.value)
+  );
+
+  response
+      .then(value => {
+        exportedDocument.value = value;
+      })
+      .catch(e => {
+        console.error('Invalid response', e);
+        errorMessage.value = e.message;
+      })
+      .finally(() => {
+        isLoadingExportAnswer.value = false;
+      });
+}
+
 function isDocumentEmpty() {
   return _.isEmpty(data.data.value);
+}
+function isSchemaEmpty() {
+  return _.isEmpty(schema.schemaRaw.value);
 }
 
 function selectRootElement() {
@@ -302,7 +353,26 @@ function selectRootElement() {
         <ProgressSpinner v-if="isLoadingQuestionAnswer" />
         <Message v-if="questionResponse.length > 0">{{ questionResponse }}</Message>
       </div>
+
+    <div class="flex flex-col space-y-4" v-if="!isSchemaEmpty() && !isDocumentEmpty() && props.functionQueryDocumentExport !== undefined">
+      <Divider />
+        <span>
+          <label>Prompt to <b>Export</b> document to other format</label>
+        </span>
+      <Textarea v-model="promptExportDocument" />
+      <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
+      <ProgressSpinner v-if="isLoadingExportAnswer" />
     </div>
+    <div v-show="exportedDocument.length > 0">
+      <b>Resulting Document in Target Format</b>
+      <div class="parent-container">
+        <div class="h-full editor" :id="editor_id_export" />
+      </div>
+    </div>
+
+
+    </div>
+
   </div>
 </template>
 
