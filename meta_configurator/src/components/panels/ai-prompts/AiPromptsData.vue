@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import AiPromptsTemplate from '@/components/panels/ai-prompts/AiPromptsTemplate.vue';
-import {queryDataConversion, queryDataModification, queryDataQuestion} from '@/utility/openai';
+import {
+  queryDataConversionFromJson,
+  queryDataConversionToJson,
+  queryDataModification,
+  queryDataQuestion,
+} from '@/utility/openai';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
 import _ from 'lodash';
@@ -12,25 +17,34 @@ const props = defineProps<{
 }>();
 
 function queryDocumentCreation(apiKey: string, prompt: string, schema: string): Promise<string> {
-  return queryDataConversion(apiKey, prompt, schema);
+  return queryDataConversionToJson(apiKey, prompt, schema);
 }
 
 function queryDocumentModification(
-  apiKey: string,
-  prompt: string,
-  currentData: string,
-  schema: string
+    apiKey: string,
+    prompt: string,
+    currentData: string,
+    schema: string
 ): Promise<string> {
   return queryDataModification(apiKey, prompt, currentData, schema);
 }
 
 function queryDocumentQuestion(
-  apiKey: string,
-  prompt: string,
-  currentData: string,
-  schema: string
+    apiKey: string,
+    prompt: string,
+    currentData: string,
+    schema: string
 ): Promise<string> {
   return queryDataQuestion(apiKey, prompt, currentData, schema);
+}
+
+function queryDocumentExport(
+    apiKey: string,
+    prompt: string,
+    currentData: string,
+    schema: string
+): Promise<string> {
+  return queryDataConversionFromJson(apiKey, prompt, currentData, schema);
 }
 
 function isSchemaEmpty() {
@@ -40,20 +54,21 @@ function isSchemaEmpty() {
 
 <template>
   <AiPromptsTemplate
-    v-if="!isSchemaEmpty()"
-    :session-mode="props.sessionMode"
-    default-text-create-document="Enter or describe your Data in any format"
-    default-text-modify-document="How do you want your Data to be modified?"
-    default-text-question-document="Ask a question about your Data"
-    label-document-type="Data"
-    label-modify-info="When the complete document is selected for modification, the complete document will be processed by the AI to apply the modification. If you want a modification only for a specific entity or attribute, selecting that element will help reduce the processing time for the modification and increase the quality of the result. Especially for large documents, it is not recommended to use the complete document for generating modifications."
-    :function-query-document-creation="queryDocumentCreation"
-    :function-query-document-modification="queryDocumentModification"
-    :function-query-document-question="queryDocumentQuestion" />
+      v-if="!isSchemaEmpty()"
+      :session-mode="props.sessionMode"
+      default-text-create-document="Enter or describe your Data in any format"
+      default-text-modify-document="How do you want your Data to be modified?"
+      default-text-question-document="Ask a question about your Data"
+      default-text-export-document="Enter an example file in your desired Target Format or describe the Format."
+      label-document-type="Data"
+      label-modify-info="When the complete document is selected for modification, the complete document will be processed by the AI to apply the modification. If you want a modification only for a specific entity or attribute, selecting that element will help reduce the processing time for the modification and increase the quality of the result. Especially for large documents, it is not recommended to use the complete document for generating modifications."
+      :function-query-document-creation="queryDocumentCreation"
+      :function-query-document-modification="queryDocumentModification"
+      :function-query-document-question="queryDocumentQuestion"
+      :function-query-document-export="queryDocumentExport" />
   <div v-else>
     <ApiKey class="api-key-top" />
     <Divider />
-
     <label class="heading">AI Prompts</label>
     <span>
       Before using the AI prompts to generate data, please create or select a schema in the Schema

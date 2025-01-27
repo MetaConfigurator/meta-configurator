@@ -25,23 +25,27 @@ const props = defineProps<{
   defaultTextCreateDocument: string;
   defaultTextModifyDocument: string;
   defaultTextQuestionDocument: string;
+  defaultTextExportDocument: string;
   labelDocumentType: string;
   labelModifyInfo: string | undefined;
   functionQueryDocumentCreation:
-    | ((apiKey: string, prompt: string, schema: string) => Promise<string>)
-    | undefined;
+      | ((apiKey: string, prompt: string, schema: string) => Promise<string>)
+      | undefined;
   functionQueryDocumentModification: (
-    apiKey: string,
-    prompt: string,
-    currentData: string,
-    schema: string
+      apiKey: string,
+      prompt: string,
+      currentData: string,
+      schema: string
   ) => Promise<string>;
   functionQueryDocumentQuestion: (
-    apiKey: string,
-    prompt: string,
-    currentData: string,
-    schema: string
+      apiKey: string,
+      prompt: string,
+      currentData: string,
+      schema: string
   ) => Promise<string>;
+  functionQueryDocumentExport:
+      | ((apiKey: string, prompt: string, currentData: string, schema: string) => Promise<string>)
+      | undefined;
 }>();
 
 const settings = useSettings();
@@ -52,10 +56,12 @@ const session = getSessionForMode(props.sessionMode);
 // random id is used to enable multiple Ace Editors of same sessionMode on the same page
 // the editor only is a fallback option if the returned response by the AI is not valid JSON
 const editor_id = 'ai-prompts-' + Math.random();
+const editor_id_export = 'ai-prompts-export-' + Math.random();
 
 const promptCreateDocument: Ref<string> = ref(props.defaultTextCreateDocument);
 const promptModifyDocument: Ref<string> = ref(props.defaultTextModifyDocument);
 const promptQuestionDocument: Ref<string> = ref(props.defaultTextQuestionDocument);
+const promptExportDocument: Ref<string> = ref(props.defaultTextExportDocument);
 
 const currentElement: Ref<Path> = computed(() => {
   return session.currentSelectedElement.value;
@@ -66,12 +72,14 @@ const currentElementString: Ref<string> = computed(() => {
 
 const isLoadingChangeAnswer: Ref<boolean> = ref(false);
 const isLoadingQuestionAnswer: Ref<boolean> = ref(false);
+const isLoadingExportAnswer: Ref<boolean> = ref(false);
 const errorMessage: Ref<string> = ref('');
 const questionResponse: Ref<string> = ref('');
 
 // the proposed new document. Only used if it is not valid JSON, otherwise changes are made directly to the document
 const newDocument: Ref<string> = ref('');
 const newDocumentPath: Ref<Path> = ref([]);
+const exportedDocument: Ref<string> = ref('');
 
 onMounted(() => {
   const editor: Editor = ace.edit(editor_id);
@@ -80,11 +88,21 @@ onMounted(() => {
 
   // watch changes to newDocument and update the data in the editor accordingly
   watchImmediate(
-    () => newDocument.value,
-    newValue => {
-      editor.setValue(newValue);
-      editor.clearSelection();
-    }
+      () => newDocument.value,
+      newValue => {
+        editor.setValue(newValue);
+        editor.clearSelection();
+      }
+  );
+
+  const editor_export: Editor = ace.edit(editor_id_export);
+  setupAceProperties(editor_export, settings.value);
+  watchImmediate(
+      () => exportedDocument.value,
+      newValue => {
+        editor_export.setValue(newValue);
+        editor_export.clearSelection();
+      }
   );
 });
 
@@ -93,27 +111,27 @@ function submitPromptCreateDocument() {
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
   const response = props.functionQueryDocumentCreation!(
-    openApiKey,
-    promptCreateDocument.value,
-    JSON.stringify(schema.schemaRaw.value)
+      openApiKey,
+      promptCreateDocument.value,
+      JSON.stringify(schema.schemaRaw.value)
   );
   response
-    .then(value => {
-      try {
-        const json = fixAndParseGeneratedJson(value);
-        processResult(value, true, json, []);
-      } catch (e) {
-        console.error('Failed to parse JSON', e);
-        processResult(value, false, null, []);
-      }
-    })
-    .catch(e => {
-      console.error('Invalid response', e);
-      errorMessage.value = e.message;
-    })
-    .finally(() => {
-      isLoadingChangeAnswer.value = false;
-    });
+      .then(value => {
+        try {
+          const json = fixAndParseGeneratedJson(value);
+          processResult(value, true, json, []);
+        } catch (e) {
+          console.error('Failed to parse JSON', e);
+          processResult(value, false, null, []);
+        }
+      })
+      .catch(e => {
+        console.error('Invalid response', e);
+        errorMessage.value = e.message;
+      })
+      .finally(() => {
+        isLoadingChangeAnswer.value = false;
+      });
 }
 
 function submitPromptModifyDocument() {
@@ -122,36 +140,36 @@ function submitPromptModifyDocument() {
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
   const response = props.functionQueryDocumentModification(
-    openApiKey,
-    promptModifyDocument.value,
-    JSON.stringify(relevantSubDocument),
-    JSON.stringify(schema.schemaRaw.value)
+      openApiKey,
+      promptModifyDocument.value,
+      JSON.stringify(relevantSubDocument),
+      JSON.stringify(schema.schemaRaw.value)
   );
 
   response
-    .then(value => {
-      try {
-        const json = fixAndParseGeneratedJson(value);
-        processResult(value, true, json, currentElement.value);
-      } catch (e) {
-        console.error('Failed to parse JSON', e);
-        processResult(value, false, null, currentElement.value);
-      }
-    })
-    .catch(e => {
-      console.error('Invalid response', e);
-      errorMessage.value = e.message;
-    })
-    .finally(() => {
-      isLoadingChangeAnswer.value = false;
-    });
+      .then(value => {
+        try {
+          const json = fixAndParseGeneratedJson(value);
+          processResult(value, true, json, currentElement.value);
+        } catch (e) {
+          console.error('Failed to parse JSON', e);
+          processResult(value, false, null, currentElement.value);
+        }
+      })
+      .catch(e => {
+        console.error('Invalid response', e);
+        errorMessage.value = e.message;
+      })
+      .finally(() => {
+        isLoadingChangeAnswer.value = false;
+      });
 }
 
 function processResult(
-  response: string,
-  validJson: boolean,
-  responseObject: any,
-  pathForResponse: Path
+    response: string,
+    validJson: boolean,
+    responseObject: any,
+    pathForResponse: Path
 ) {
   if (validJson) {
     // if the response is valid, it is applied directly
@@ -185,27 +203,54 @@ function submitPromptQuestionDocument() {
   errorMessage.value = '';
   questionResponse.value = '';
   const response = props.functionQueryDocumentQuestion(
-    openApiKey,
-    promptQuestionDocument.value,
-    JSON.stringify(relevantSubDocument),
-    JSON.stringify(schema.schemaRaw.value)
+      openApiKey,
+      promptQuestionDocument.value,
+      JSON.stringify(relevantSubDocument),
+      JSON.stringify(schema.schemaRaw.value)
   );
 
   response
-    .then(value => {
-      questionResponse.value = value;
-    })
-    .catch(e => {
-      console.error('Invalid response', e);
-      errorMessage.value = e.message;
-    })
-    .finally(() => {
-      isLoadingQuestionAnswer.value = false;
-    });
+      .then(value => {
+        questionResponse.value = value;
+      })
+      .catch(e => {
+        console.error('Invalid response', e);
+        errorMessage.value = e.message;
+      })
+      .finally(() => {
+        isLoadingQuestionAnswer.value = false;
+      });
+}
+
+function submitPromptExportDocument() {
+  const openApiKey = getApiKey();
+  isLoadingExportAnswer.value = true;
+  errorMessage.value = '';
+  const response = props.functionQueryDocumentExport!(
+      openApiKey,
+      promptExportDocument.value,
+      JSON.stringify(data.data.value),
+      JSON.stringify(schema.schemaRaw.value)
+  );
+
+  response
+      .then(value => {
+        exportedDocument.value = value;
+      })
+      .catch(e => {
+        console.error('Invalid response', e);
+        errorMessage.value = e.message;
+      })
+      .finally(() => {
+        isLoadingExportAnswer.value = false;
+      });
 }
 
 function isDocumentEmpty() {
   return _.isEmpty(data.data.value);
+}
+function isSchemaEmpty() {
+  return _.isEmpty(schema.schemaRaw.value);
 }
 
 function selectRootElement() {
@@ -222,8 +267,8 @@ function selectRootElement() {
     <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
     <div class="p-5 space-y-3">
       <div
-        class="flex flex-col space-y-4"
-        v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
+          class="flex flex-col space-y-4"
+          v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
         <label>Prompt to Create {{ props.labelDocumentType }}</label>
         <Textarea v-model="promptCreateDocument" />
         <Button @click="submitPromptCreateDocument()">Create {{ props.labelDocumentType }}</Button>
@@ -238,24 +283,24 @@ function selectRootElement() {
           <span v-else>
             <i>{{ currentElementString }} (</i>
             <Button
-              circular
-              text
-              size="small"
-              class="special-button"
-              v-tooltip="'Unselect element'"
-              @click="selectRootElement()">
+                circular
+                text
+                size="small"
+                class="special-button"
+                v-tooltip="'Unselect element'"
+                @click="selectRootElement()">
               <FontAwesomeIcon icon="fa-solid fa-xmark" />
             </Button>
             <i>)</i>
           </span>
           <label> and all child properties</label>
           <Button
-            circular
-            text
-            size="small"
-            class="special-button"
-            v-tooltip="props.labelModifyInfo"
-            v-if="props.labelModifyInfo !== undefined">
+              circular
+              text
+              size="small"
+              class="special-button"
+              v-tooltip="props.labelModifyInfo"
+              v-if="props.labelModifyInfo !== undefined">
             <FontAwesomeIcon icon="fa-solid fa-circle-info" />
           </Button>
         </span>
@@ -267,7 +312,7 @@ function selectRootElement() {
       <div v-show="newDocument.length > 0">
         <b>Resulting {{ props.labelDocumentType }}</b>
         <Message severity="error"
-          >Generated {{ props.labelDocumentType }} is not valid JSON. Please fix the errors before
+        >Generated {{ props.labelDocumentType }} is not valid JSON. Please fix the errors before
           applying the change.</Message
         >
         <div class="parent-container">
@@ -285,12 +330,12 @@ function selectRootElement() {
           <span v-else>
             <i>{{ currentElementString }} (</i>
             <Button
-              circular
-              text
-              size="small"
-              class="special-button"
-              v-tooltip="'Unselect element'"
-              @click="selectRootElement()">
+                circular
+                text
+                size="small"
+                class="special-button"
+                v-tooltip="'Unselect element'"
+                @click="selectRootElement()">
               <FontAwesomeIcon icon="fa-solid fa-xmark" />
             </Button>
             <i>)</i>
@@ -301,6 +346,26 @@ function selectRootElement() {
         <Button @click="submitPromptQuestionDocument()">Query {{ props.labelDocumentType }}</Button>
         <ProgressSpinner v-if="isLoadingQuestionAnswer" />
         <Message v-if="questionResponse.length > 0">{{ questionResponse }}</Message>
+      </div>
+
+      <div
+          class="flex flex-col space-y-4"
+          v-if="
+          !isSchemaEmpty() && !isDocumentEmpty() && props.functionQueryDocumentExport !== undefined
+        ">
+        <Divider />
+        <span>
+          <label>Prompt to <b>Export</b> document to other format</label>
+        </span>
+        <Textarea v-model="promptExportDocument" />
+        <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
+        <ProgressSpinner v-if="isLoadingExportAnswer" />
+      </div>
+      <div v-show="exportedDocument.length > 0">
+        <b>Resulting Document in Target Format</b>
+        <div class="parent-container">
+          <div class="h-full editor" :id="editor_id_export" />
+        </div>
       </div>
     </div>
   </div>
