@@ -4,16 +4,13 @@ import {
   queryDataConversionFromJson,
   querySchemaCreation,
   querySchemaModification,
-  querySchemaQuestion
+  querySchemaQuestion,
 } from '@/utility/openai';
 import {SessionMode} from '@/store/sessionMode';
-
-
 
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
-
 
 function queryDocumentCreation(apiKey: string, prompt: string, schema: string): Promise<string> {
   return querySchemaCreation(apiKey, prompt);
@@ -37,10 +34,14 @@ function queryDocumentQuestion(
   return querySchemaQuestion(apiKey, prompt, currentData);
 }
 
-function queryDocumentExport(apiKey: string, prompt: string, currentData: string, schema: string): Promise<string> {
+function queryDocumentExport(
+  apiKey: string,
+  prompt: string,
+  currentData: string,
+  schema: string
+): Promise<string> {
   return queryDataConversionFromJson(apiKey, prompt, currentData, schema);
 }
-
 </script>
 
 <template>
@@ -55,7 +56,7 @@ function queryDocumentExport(apiKey: string, prompt: string, currentData: string
     :function-query-document-creation="queryDocumentCreation"
     :function-query-document-modification="queryDocumentModification"
     :function-query-document-question="queryDocumentQuestion"
-  :function-query-document-export="queryDocumentExport"/>
+    :function-query-document-export="queryDocumentExport" />
 </template>
 
 <style scoped></style>

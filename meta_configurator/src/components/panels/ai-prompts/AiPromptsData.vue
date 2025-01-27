@@ -4,7 +4,7 @@ import {
   queryDataConversionFromJson,
   queryDataConversionToJson,
   queryDataModification,
-  queryDataQuestion
+  queryDataQuestion,
 } from '@/utility/openai';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
@@ -15,10 +15,6 @@ import Divider from 'primevue/divider';
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
-
-
-
-
 
 function queryDocumentCreation(apiKey: string, prompt: string, schema: string): Promise<string> {
   return queryDataConversionToJson(apiKey, prompt, schema);
@@ -42,18 +38,18 @@ function queryDocumentQuestion(
   return queryDataQuestion(apiKey, prompt, currentData, schema);
 }
 
-function queryDocumentExport(apiKey: string, prompt: string, currentData: string, schema: string): Promise<string> {
+function queryDocumentExport(
+  apiKey: string,
+  prompt: string,
+  currentData: string,
+  schema: string
+): Promise<string> {
   return queryDataConversionFromJson(apiKey, prompt, currentData, schema);
 }
-
-
 
 function isSchemaEmpty() {
   return _.isEmpty(getDataForMode(SessionMode.SchemaEditor).data.value);
 }
-
-
-
 </script>
 
 <template>
@@ -69,7 +65,7 @@ function isSchemaEmpty() {
     :function-query-document-creation="queryDocumentCreation"
     :function-query-document-modification="queryDocumentModification"
     :function-query-document-question="queryDocumentQuestion"
-  :function-query-document-export="queryDocumentExport"/>
+    :function-query-document-export="queryDocumentExport" />
   <div v-else>
     <ApiKey class="api-key-top" />
     <Divider />
@@ -79,8 +75,6 @@ function isSchemaEmpty() {
       Editor tab.
     </span>
   </div>
-
-
 </template>
 
 <style scoped></style>

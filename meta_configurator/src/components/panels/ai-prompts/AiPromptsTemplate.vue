@@ -38,24 +38,20 @@ const props = defineProps<{
     schema: string
   ) => Promise<string>;
   functionQueryDocumentQuestion: (
-      apiKey: string,
-      prompt: string,
-      currentData: string,
-      schema: string
+    apiKey: string,
+    prompt: string,
+    currentData: string,
+    schema: string
   ) => Promise<string>;
-  functionQueryDocumentExport: ( (
-      apiKey: string,
-      prompt: string,
-      currentData: string,
-      schema: string
-  ) => Promise<string> ) | undefined;
+  functionQueryDocumentExport:
+    | ((apiKey: string, prompt: string, currentData: string, schema: string) => Promise<string>)
+    | undefined;
 }>();
 
 const settings = useSettings();
 const data = getDataForMode(props.sessionMode);
 const schema = getSchemaForMode(props.sessionMode);
 const session = getSessionForMode(props.sessionMode);
-
 
 // random id is used to enable multiple Ace Editors of same sessionMode on the same page
 // the editor only is a fallback option if the returned response by the AI is not valid JSON
@@ -99,15 +95,14 @@ onMounted(() => {
     }
   );
 
-
   const editor_export: Editor = ace.edit(editor_id_export);
   setupAceProperties(editor_export, settings.value);
   watchImmediate(
-      () => exportedDocument.value,
-      newValue => {
-        editor_export.setValue(newValue);
-        editor_export.clearSelection();
-      }
+    () => exportedDocument.value,
+    newValue => {
+      editor_export.setValue(newValue);
+      editor_export.clearSelection();
+    }
   );
 });
 
@@ -227,29 +222,28 @@ function submitPromptQuestionDocument() {
     });
 }
 
-
 function submitPromptExportDocument() {
   const openApiKey = getApiKey();
   isLoadingExportAnswer.value = true;
   errorMessage.value = '';
   const response = props.functionQueryDocumentExport!(
-      openApiKey,
-      promptExportDocument.value,
-      JSON.stringify(data.data.value),
-      JSON.stringify(schema.schemaRaw.value)
+    openApiKey,
+    promptExportDocument.value,
+    JSON.stringify(data.data.value),
+    JSON.stringify(schema.schemaRaw.value)
   );
 
   response
-      .then(value => {
-        exportedDocument.value = value;
-      })
-      .catch(e => {
-        console.error('Invalid response', e);
-        errorMessage.value = e.message;
-      })
-      .finally(() => {
-        isLoadingExportAnswer.value = false;
-      });
+    .then(value => {
+      exportedDocument.value = value;
+    })
+    .catch(e => {
+      console.error('Invalid response', e);
+      errorMessage.value = e.message;
+    })
+    .finally(() => {
+      isLoadingExportAnswer.value = false;
+    });
 }
 
 function isDocumentEmpty() {
@@ -354,25 +348,26 @@ function selectRootElement() {
         <Message v-if="questionResponse.length > 0">{{ questionResponse }}</Message>
       </div>
 
-    <div class="flex flex-col space-y-4" v-if="!isSchemaEmpty() && !isDocumentEmpty() && props.functionQueryDocumentExport !== undefined">
-      <Divider />
+      <div
+        class="flex flex-col space-y-4"
+        v-if="
+          !isSchemaEmpty() && !isDocumentEmpty() && props.functionQueryDocumentExport !== undefined
+        ">
+        <Divider />
         <span>
           <label>Prompt to <b>Export</b> document to other format</label>
         </span>
-      <Textarea v-model="promptExportDocument" />
-      <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
-      <ProgressSpinner v-if="isLoadingExportAnswer" />
-    </div>
-    <div v-show="exportedDocument.length > 0">
-      <b>Resulting Document in Target Format</b>
-      <div class="parent-container">
-        <div class="h-full editor" :id="editor_id_export" />
+        <Textarea v-model="promptExportDocument" />
+        <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
+        <ProgressSpinner v-if="isLoadingExportAnswer" />
+      </div>
+      <div v-show="exportedDocument.length > 0">
+        <b>Resulting Document in Target Format</b>
+        <div class="parent-container">
+          <div class="h-full editor" :id="editor_id_export" />
+        </div>
       </div>
     </div>
-
-
-    </div>
-
   </div>
 </template>
 

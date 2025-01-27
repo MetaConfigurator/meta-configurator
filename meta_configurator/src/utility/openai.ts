@@ -79,9 +79,9 @@ export const querySchemaQuestion = async (
 };
 
 export const queryDataConversionToJson = async (
-    apiKey: string,
-    dataInOtherFormat: string,
-    schema: string
+  apiKey: string,
+  dataInOtherFormat: string,
+  schema: string
 ) => {
   const systemMessage = `Convert the data input provided by the user (in any format) into a JSON document which satisfies the following schema: \`\`\`${schema}\`\`\`. Return no other text than a fully valid JSON document satisfying the schema. No other explanation or words.`;
   return queryOpenAI(apiKey, [
@@ -91,10 +91,10 @@ export const queryDataConversionToJson = async (
 };
 
 export const queryDataConversionFromJson = async (
-    apiKey: string,
-    descriptionOrDataInOtherFormat: string,
-    jsonData: string,
-    schema: string
+  apiKey: string,
+  descriptionOrDataInOtherFormat: string,
+  jsonData: string,
+  schema: string
 ) => {
   const systemMessage = `Convert the JSON document \`\`\`${jsonData}\`\`\` into the format provided by the user. The user will provide a format description or an example file with different data of the target format. The JSON document follows the schema \`\`\`${schema}\`\`\`. Return no other text than a document matching the user provided example or description. No other explanation or words.`;
   return queryOpenAI(apiKey, [

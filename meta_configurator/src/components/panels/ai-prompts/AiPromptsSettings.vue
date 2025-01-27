@@ -7,7 +7,6 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
-
 function queryDocumentModification(
   apiKey: string,
   prompt: string,
@@ -39,7 +38,7 @@ function queryDocumentQuestion(
     :function-query-document-creation="undefined"
     :function-query-document-modification="queryDocumentModification"
     :function-query-document-question="queryDocumentQuestion"
-  :function-query-document-export="undefined"/>
+    :function-query-document-export="undefined" />
 </template>
 
 <style scoped></style>
