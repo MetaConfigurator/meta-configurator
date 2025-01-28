@@ -8,7 +8,6 @@ making editing configuration files, research data and schemas easier and more en
 
 Try it out: https://www.metaconfigurator.org
 
-Experimental Web playground: https://metaconfigurator.github.io/meta-configurator/
 
 <img src="figs/metaconfigurator_diagram.png" width="460">
 
