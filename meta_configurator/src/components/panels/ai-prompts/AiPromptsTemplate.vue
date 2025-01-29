@@ -21,6 +21,7 @@ import {setupAceMode, setupAceProperties} from '@/components/panels/shared-compo
 import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {fetchExternalContent, fetchExternalContentText} from "@/utility/fetchExternalContent";
+import Panel from "primevue/panel";
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -299,6 +300,8 @@ function selectRootElement() {
     <label class="heading">AI Prompts</label>
     <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
     <div class="p-5 space-y-3">
+
+      <!-- Create Document Prompt -->
       <div
         class="flex flex-col space-y-4"
         v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
@@ -308,6 +311,7 @@ function selectRootElement() {
         <ProgressSpinner v-if="isLoadingChangeAnswer" />
       </div>
 
+      <!-- Modify Document Prompt -->
       <div class="flex flex-col space-y-4" v-else>
         <span>
           <label>Prompt to</label>
@@ -342,6 +346,7 @@ function selectRootElement() {
         <ProgressSpinner v-if="isLoadingChangeAnswer" />
       </div>
 
+      <!-- Preview of resulting document, if not valid JSON; can be fixed and submitted by user -->
       <div v-show="newDocument.length > 0">
         <b>Resulting {{ props.labelDocumentType }}</b>
         <Message severity="error"
@@ -354,8 +359,9 @@ function selectRootElement() {
         <Button @click="applyEditorDocument()">Apply {{ props.labelDocumentType }}</Button>
       </div>
 
-      <div class="flex flex-col space-y-4" v-if="!isDocumentEmpty()">
-        <Divider />
+      <!-- Query Document Prompt -->
+      <Panel header="Query Document" toggleable :collapsed="true" v-if="!isDocumentEmpty()">
+      <div class="flex flex-col space-y-4">
         <span>
           <label>Prompt to</label>
           <b> Query </b>
@@ -380,30 +386,29 @@ function selectRootElement() {
         <ProgressSpinner v-if="isLoadingQuestionAnswer" />
         <Message v-if="questionResponse.length > 0">{{ questionResponse }}</Message>
       </div>
+      </Panel>
 
+      <!-- Export Document Prompt based on user input -->
+      <Panel header="Export Document" toggleable :collapsed="true"
+             v-show="
+          !isSchemaEmpty() && !isDocumentEmpty() && props.functionQueryDocumentExport !== undefined"
+      >
       <div
           class="flex flex-col space-y-4"
-          v-if="
-          !isSchemaEmpty() && !isDocumentEmpty() && props.functionQueryDocumentExport !== undefined && documentExportFormats === undefined
+          v-show="documentExportFormats === undefined
         ">
-        <Divider />
-        <span>
           <label>Prompt to <b>Export</b> document to other format</label>
-        </span>
         <Textarea v-model="promptExportDocument" />
         <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
         <ProgressSpinner v-if="isLoadingExportAnswer" />
       </div>
 
+      <!-- Export Document based on pre-defined formats -->
       <div
           class="flex flex-col space-y-4"
-          v-if="
-            !isSchemaEmpty() && !isDocumentEmpty() && props.functionQueryDocumentExport !== undefined && documentExportFormats !== undefined
+          v-show="documentExportFormats !== undefined
           ">
-        <Divider />
-       <span>
             <label><b>Export</b> document to other formats</label>
-          </span>
         <SelectButton v-model="selectedExportFormat" :options="documentExportFormatNames" />
         <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
         <ProgressSpinner v-if="isLoadingExportAnswer" />
@@ -414,6 +419,7 @@ function selectRootElement() {
           <div class="h-full editor" :id="editor_id_export" />
         </div>
       </div>
+      </Panel>
 
     </div>
 
