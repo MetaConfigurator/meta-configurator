@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {useSettings} from '@/settings/useSettings';
+import type {JsonSchemaType} from "@/schema/jsonSchemaType";
 
 const BASE_URL = 'https://api.openai.com/v1';
 
@@ -18,7 +19,7 @@ export const queryOpenAI = async (
   if (!endpoint) endpoint = settings.endpoint;
 
   try {
-    console.log('Querying OpenAI with messages:', messages);
+    console.log('Querying OpenAI with messages: ', ...messages);
     const response = await axios.post(
       `${BASE_URL}/${endpoint}`,
       {
@@ -153,4 +154,5 @@ export const querySettingsQuestion = async (
     {role: 'system', content: systemMessage},
     {role: 'user', content: settingsQuestionNaturalLanguage},
   ]);
+  
 };
