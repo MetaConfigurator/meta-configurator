@@ -117,6 +117,9 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
         {
           $ref: '#/$defs/anchor',
         },
+        {
+          $ref: '#/$defs/metaConfiguratorFields',
+        },
       ],
     },
     constProperty: {
@@ -196,6 +199,25 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-not',
           metaConfigurator: {
             advanced: true,
+          },
+        },
+      },
+    },
+    metaConfiguratorFields: {
+      properties: {
+        metaConfigurator: {
+          title:
+            'Schema Metadata specific for MetaConfigurator, altering how the tool should render the schema',
+          type: 'object',
+          metaConfigurator: {
+            advanced: true,
+          },
+          properties: {
+            advanced: {
+              description:
+                "All properties of an object which are marked as advanced will be grouped into a separate 'advanced' section in the MetaConfigurator UI. Advanced properties will not be shown to the user by default, but can be expanded by the user with a click.",
+              type: 'boolean',
+            },
           },
         },
       },

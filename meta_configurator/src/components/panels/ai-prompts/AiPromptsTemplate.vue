@@ -6,6 +6,7 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import Divider from 'primevue/divider';
+import SelectButton from 'primevue/selectbutton';
 import {type Editor} from 'brace';
 import * as ace from 'brace';
 import {watchImmediate} from '@vueuse/core';
@@ -19,6 +20,8 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
+import {fetchExternalContent, fetchExternalContentText} from '@/utility/fetchExternalContent';
+import Panel from 'primevue/panel';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -53,6 +56,26 @@ const data = getDataForMode(props.sessionMode);
 const schema = getSchemaForMode(props.sessionMode);
 const session = getSessionForMode(props.sessionMode);
 
+// available export formats might be defined in the schema. Then, instead of a field for the user to describe the target format, a dropdown with the available formats is shown
+const documentExportFormats: Ref<
+  | {
+      [k: string]: string;
+    }
+  | undefined
+> = computed(() => {
+  const schemaValue = schema.schemaRaw.value;
+  if (schemaValue !== true && schemaValue !== false) {
+    if (schemaValue.metaConfigurator) {
+      return schemaValue.metaConfigurator.aiExportFormats;
+    }
+  }
+  return undefined;
+});
+
+const documentExportFormatNames: Ref<string[]> = computed(() => {
+  return documentExportFormats.value ? Object.keys(documentExportFormats.value) : [];
+});
+
 // random id is used to enable multiple Ace Editors of same sessionMode on the same page
 // the editor only is a fallback option if the returned response by the AI is not valid JSON
 const editor_id = 'ai-prompts-' + Math.random();
@@ -62,6 +85,7 @@ const promptCreateDocument: Ref<string> = ref(props.defaultTextCreateDocument);
 const promptModifyDocument: Ref<string> = ref(props.defaultTextModifyDocument);
 const promptQuestionDocument: Ref<string> = ref(props.defaultTextQuestionDocument);
 const promptExportDocument: Ref<string> = ref(props.defaultTextExportDocument);
+const selectedExportFormat: Ref<string> = ref('');
 
 const currentElement: Ref<Path> = computed(() => {
   return session.currentSelectedElement.value;
@@ -222,13 +246,24 @@ function submitPromptQuestionDocument() {
     });
 }
 
-function submitPromptExportDocument() {
+async function submitPromptExportDocument() {
   const openApiKey = getApiKey();
-  isLoadingExportAnswer.value = true;
   errorMessage.value = '';
+
+  let userPrompt = promptExportDocument.value;
+
+  // if the schema defines export formats, the user prompt is ignored and the selected export format is used
+  if (documentExportFormatNames.value.length > 0) {
+    const exportFormatName = selectedExportFormat.value;
+    const exportFormatUrl = documentExportFormats.value![exportFormatName];
+    // download content from URL
+    userPrompt = await fetchExternalContentText(exportFormatUrl);
+  }
+
+  isLoadingExportAnswer.value = true;
   const response = props.functionQueryDocumentExport!(
     openApiKey,
-    promptExportDocument.value,
+    userPrompt,
     JSON.stringify(data.data.value),
     JSON.stringify(schema.schemaRaw.value)
   );
@@ -266,6 +301,7 @@ function selectRootElement() {
     <label class="heading">AI Prompts</label>
     <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
     <div class="p-5 space-y-3">
+      <!-- Create Document Prompt -->
       <div
         class="flex flex-col space-y-4"
         v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
@@ -275,6 +311,7 @@ function selectRootElement() {
         <ProgressSpinner v-if="isLoadingChangeAnswer" />
       </div>
 
+      <!-- Modify Document Prompt -->
       <div class="flex flex-col space-y-4" v-else>
         <span>
           <label>Prompt to</label>
@@ -309,6 +346,7 @@ function selectRootElement() {
         <ProgressSpinner v-if="isLoadingChangeAnswer" />
       </div>
 
+      <!-- Preview of resulting document, if not valid JSON; can be fixed and submitted by user -->
       <div v-show="newDocument.length > 0">
         <b>Resulting {{ props.labelDocumentType }}</b>
         <Message severity="error"
@@ -321,52 +359,68 @@ function selectRootElement() {
         <Button @click="applyEditorDocument()">Apply {{ props.labelDocumentType }}</Button>
       </div>
 
-      <div class="flex flex-col space-y-4" v-if="!isDocumentEmpty()">
-        <Divider />
-        <span>
-          <label>Prompt to</label>
-          <b> Query </b>
-          <i v-if="currentElementString.length == 0">the complete {{ props.labelDocumentType }}</i>
-          <span v-else>
-            <i>{{ currentElementString }} (</i>
-            <Button
-              circular
-              text
-              size="small"
-              class="special-button"
-              v-tooltip="'Unselect element'"
-              @click="selectRootElement()">
-              <FontAwesomeIcon icon="fa-solid fa-xmark" />
-            </Button>
-            <i>)</i>
+      <!-- Query Document Prompt -->
+      <Panel header="Query Document" toggleable :collapsed="true" v-if="!isDocumentEmpty()">
+        <div class="flex flex-col space-y-4">
+          <span>
+            <label>Prompt to</label>
+            <b> Query </b>
+            <i v-if="currentElementString.length == 0"
+              >the complete {{ props.labelDocumentType }}</i
+            >
+            <span v-else>
+              <i>{{ currentElementString }} (</i>
+              <Button
+                circular
+                text
+                size="small"
+                class="special-button"
+                v-tooltip="'Unselect element'"
+                @click="selectRootElement()">
+                <FontAwesomeIcon icon="fa-solid fa-xmark" />
+              </Button>
+              <i>)</i>
+            </span>
+            <label> and all child properties</label>
           </span>
-          <label> and all child properties</label>
-        </span>
-        <Textarea v-model="promptQuestionDocument" />
-        <Button @click="submitPromptQuestionDocument()">Query {{ props.labelDocumentType }}</Button>
-        <ProgressSpinner v-if="isLoadingQuestionAnswer" />
-        <Message v-if="questionResponse.length > 0">{{ questionResponse }}</Message>
-      </div>
+          <Textarea v-model="promptQuestionDocument" />
+          <Button @click="submitPromptQuestionDocument()"
+            >Query {{ props.labelDocumentType }}</Button
+          >
+          <ProgressSpinner v-if="isLoadingQuestionAnswer" />
+          <Message v-if="questionResponse.length > 0">{{ questionResponse }}</Message>
+        </div>
+      </Panel>
 
-      <div
-        class="flex flex-col space-y-4"
-        v-if="
+      <!-- Export Document Prompt based on user input -->
+      <Panel
+        header="Export Document"
+        toggleable
+        :collapsed="true"
+        v-show="
           !isSchemaEmpty() && !isDocumentEmpty() && props.functionQueryDocumentExport !== undefined
         ">
-        <Divider />
-        <span>
+        <div class="flex flex-col space-y-4" v-show="documentExportFormats === undefined">
           <label>Prompt to <b>Export</b> document to other format</label>
-        </span>
-        <Textarea v-model="promptExportDocument" />
-        <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
-        <ProgressSpinner v-if="isLoadingExportAnswer" />
-      </div>
-      <div v-show="exportedDocument.length > 0">
-        <b>Resulting Document in Target Format</b>
-        <div class="parent-container">
-          <div class="h-full editor" :id="editor_id_export" />
+          <Textarea v-model="promptExportDocument" />
+          <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
+          <ProgressSpinner v-if="isLoadingExportAnswer" />
         </div>
-      </div>
+
+        <!-- Export Document based on pre-defined formats -->
+        <div class="flex flex-col space-y-4" v-show="documentExportFormats !== undefined">
+          <label><b>Export</b> document to other formats</label>
+          <SelectButton v-model="selectedExportFormat" :options="documentExportFormatNames" />
+          <Button @click="submitPromptExportDocument()">Export to Target Format</Button>
+          <ProgressSpinner v-if="isLoadingExportAnswer" />
+        </div>
+        <div v-show="exportedDocument.length > 0">
+          <b>Resulting Document in Target Format</b>
+          <div class="parent-container">
+            <div class="h-full editor" :id="editor_id_export" />
+          </div>
+        </div>
+      </Panel>
     </div>
   </div>
 </template>
