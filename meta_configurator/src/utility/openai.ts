@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {useSettings} from '@/settings/useSettings';
-import type {JsonSchemaType} from "@/schema/jsonSchemaType";
+import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 
 const BASE_URL = 'https://api.openai.com/v1';
 
@@ -154,5 +154,4 @@ export const querySettingsQuestion = async (
     {role: 'system', content: systemMessage},
     {role: 'user', content: settingsQuestionNaturalLanguage},
   ]);
-  
 };

@@ -6,7 +6,7 @@ import {restoreSnapshot} from '@/utility/backend/backendApi';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
-import {fetchExternalContent} from "@/utility/fetchExternalContent";
+import {fetchExternalContent} from '@/utility/fetchExternalContent';
 
 defineProps({
   settings_url: String,
@@ -15,14 +15,13 @@ defineProps({
 const sessionStore = useSessionStore();
 const settings = useSettings();
 
-
 onMounted(() => {
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
   let usesCustomSettings = false;
 
   if ('settings' in query) {
-    const settingsUrl = query.settings as string
+    const settingsUrl = query.settings as string;
     console.info('Received settings URL ', settingsUrl, ' from query string "', query, '".');
     usesCustomSettings = true;
     fetchExternalContent(settingsUrl)

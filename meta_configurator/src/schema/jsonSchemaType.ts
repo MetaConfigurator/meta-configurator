@@ -98,8 +98,8 @@ export type JsonSchemaObjectType = {
     ontology?: {mustBeUri?: boolean; mustBeClassOrProperty?: boolean};
     aiExportFormats?: {
       // The key is the format name, the value is a URL to an example export file or the format description
-      [k: string]: string
-    }
+      [k: string]: string;
+    };
   };
 
   [k: string]: any;

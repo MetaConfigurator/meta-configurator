@@ -159,9 +159,9 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
       properties: {
         allOf: {
           description:
-              "This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON Schema.\n" +
-              '\n' +
-              "An instance validates successfully against this keyword if it validates successfully against all schemas defined by this keyword's value.",
+            "This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON Schema.\n" +
+            '\n' +
+            "An instance validates successfully against this keyword if it validates successfully against all schemas defined by this keyword's value.",
           $ref: '#/$defs/schemaArray',
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-allof',
           metaConfigurator: {
@@ -171,9 +171,9 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
         anyOf: {
           $ref: '#/$defs/schemaArray',
           description:
-              "This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON Schema.\n" +
-              '\n' +
-              "An instance validates successfully against this keyword if it validates successfully against at least one schema defined by this keyword's value. Note that when annotations are being collected, all subschemas MUST be examined so that annotations are collected from each subschema that validates successfully.",
+            "This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON Schema.\n" +
+            '\n' +
+            "An instance validates successfully against this keyword if it validates successfully against at least one schema defined by this keyword's value. Note that when annotations are being collected, all subschemas MUST be examined so that annotations are collected from each subschema that validates successfully.",
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-anyof',
           metaConfigurator: {
             advanced: true,
@@ -181,9 +181,9 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
         },
         oneOf: {
           description:
-              "This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON Schema.\n" +
-              '\n' +
-              "An instance validates successfully against this keyword if it validates successfully against exactly one schema defined by this keyword's value.",
+            "This keyword's value MUST be a non-empty array. Each item of the array MUST be a valid JSON Schema.\n" +
+            '\n' +
+            "An instance validates successfully against this keyword if it validates successfully against exactly one schema defined by this keyword's value.",
           $ref: '#/$defs/schemaArray',
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-oneof',
           metaConfigurator: {
@@ -192,9 +192,9 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
         },
         not: {
           description:
-              "This keyword's value MUST be a valid JSON Schema.\n" +
-              '\n' +
-              'An instance is valid against this keyword if it fails to validate successfully against the schema defined by this keyword.',
+            "This keyword's value MUST be a valid JSON Schema.\n" +
+            '\n' +
+            'An instance is valid against this keyword if it fails to validate successfully against the schema defined by this keyword.',
           $ref: '#/$defs/jsonSchema',
           $comment: 'https://json-schema.org/draft/2020-12/json-schema-core#name-not',
           metaConfigurator: {
@@ -206,19 +206,20 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
     metaConfiguratorFields: {
       properties: {
         metaConfigurator: {
-            title: 'Schema Metadata specific for MetaConfigurator, altering how the tool should render the schema',
-            type: 'object',
-            metaConfigurator: {
-              advanced: true,
+          title:
+            'Schema Metadata specific for MetaConfigurator, altering how the tool should render the schema',
+          type: 'object',
+          metaConfigurator: {
+            advanced: true,
+          },
+          properties: {
+            advanced: {
+              description:
+                "All properties of an object which are marked as advanced will be grouped into a separate 'advanced' section in the MetaConfigurator UI. Advanced properties will not be shown to the user by default, but can be expanded by the user with a click.",
+              type: 'boolean',
             },
-            properties: {
-                advanced: {
-                description:
-                    "All properties of an object which are marked as advanced will be grouped into a separate 'advanced' section in the MetaConfigurator UI. Advanced properties will not be shown to the user by default, but can be expanded by the user with a click.",
-                  type: 'boolean'
-                },
-            },
-        }
+          },
+        },
       },
     },
     conditionalSchema: {

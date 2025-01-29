@@ -8,7 +8,7 @@ import Password from 'primevue/password';
 import Panel from 'primevue/panel';
 import SelectButton from 'primevue/selectbutton';
 import Message from 'primevue/message';
-import {useSettings} from "../../../settings/useSettings";
+import {useSettings} from '../../../settings/useSettings';
 
 const apiKey: Ref<string> = ref('');
 const isPersistKey: Ref<boolean> = ref(true);
@@ -47,16 +47,18 @@ watch(isPersistKey, newValue => {
 
 <template>
   <Panel header="OpenAI API Key" toggleable :collapsed="true">
-    Generate your API Key <a href="https://platform.openai.com/account/api-keys" target = "_blank">here</a>.
-    Usage of the OpenAI API normally requires balance on the OpenAI account.
-    One-time purchase of balance is possible without permanently connecting your credit card with your account.
-    Check this <a href="https://platform.openai.com/docs/pricing" target = "_blank">link</a> for pricing.
-    <br/>
-    <br/>
-    MetaConfigurator by default uses the gpt-4o-mini model, which has very low cost. For improved results you can change to more performant models in the settings tab.
-    <br/>
-    <br/>
-    Currently selected model: <b>{{useSettings().value.openAi.model}}</b>
+    Generate your API Key
+    <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>. Usage of the
+    OpenAI API normally requires balance on the OpenAI account. One-time purchase of balance is
+    possible without permanently connecting your credit card with your account. Check this
+    <a href="https://platform.openai.com/docs/pricing" target="_blank">link</a> for pricing.
+    <br />
+    <br />
+    MetaConfigurator by default uses the gpt-4o-mini model, which has very low cost. For improved
+    results you can change to more performant models in the settings tab.
+    <br />
+    <br />
+    Currently selected model: <b>{{ useSettings().value.openAi.model }}</b>
     <span class="api-key-container">
       <span>Key:</span>
       <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false" />
