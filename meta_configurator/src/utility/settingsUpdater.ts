@@ -18,7 +18,7 @@ function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
 
 function overwriteSettingsValues(userFile: any, replaceFile: any) {
   for (const key in replaceFile) {
-      userFile[key] = replaceFile[key];
+    userFile[key] = replaceFile[key];
   }
 }
 
@@ -49,7 +49,6 @@ export function addDefaultsForSettings() {
 
   fixPanels(userSettings, defaultSettings);
 }
-
 
 export function overwriteSettings(replaceFile: any) {
   // overwrites the settings with the values from the replace file. Keeps all other values
