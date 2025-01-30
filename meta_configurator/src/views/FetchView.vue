@@ -7,7 +7,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
-import {overwriteSettings} from "@/utility/settingsUpdater";
+import {overwriteSettings} from '@/utility/settingsUpdater';
 
 defineProps({
   settings_url: String,
