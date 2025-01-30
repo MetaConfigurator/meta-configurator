@@ -7,7 +7,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
-import {addDefaultsForSettings} from "@/utility/settingsUpdater";
+import {overwriteSettings} from "@/utility/settingsUpdater";
 
 defineProps({
   settings_url: String,
@@ -31,8 +31,7 @@ onMounted(() => {
       })
       .then(function (jsonData) {
         console.info('Fetched provided settings file and parsed as json.', jsonData);
-        getDataForMode(SessionMode.Settings).setData(jsonData);
-        addDefaultsForSettings()
+        overwriteSettings(jsonData);
       });
   }
 
