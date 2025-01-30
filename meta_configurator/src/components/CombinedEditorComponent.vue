@@ -75,7 +75,6 @@ function updateMode(newMode: SessionMode) {
       break;
     case SessionMode.Settings:
       router.push('/settings');
-      router.push('/settings');
       break;
   }
 }
