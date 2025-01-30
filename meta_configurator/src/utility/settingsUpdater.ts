@@ -3,6 +3,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
+import {useDataSource} from '@/data/dataSource';
 
 function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
   for (const key in defaultsFile) {
@@ -18,7 +19,15 @@ function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
 
 function overwriteSettingsValues(userFile: any, replaceFile: any) {
   for (const key in replaceFile) {
-    userFile[key] = replaceFile[key];
+    if (!(key in userFile)) {
+      userFile[key] = replaceFile[key];
+    } else if (typeof replaceFile[key] === 'object' && !Array.isArray(replaceFile[key])) {
+      overwriteSettingsValues(userFile[key], replaceFile[key]);
+    } else {
+      // element is in both files and is not an object
+      // overwrite the value
+      userFile[key] = replaceFile[key];
+    }
   }
 }
 
@@ -52,6 +61,6 @@ export function addDefaultsForSettings() {
 
 export function overwriteSettings(replaceFile: any) {
   // overwrites the settings with the values from the replace file. Keeps all other values
-  const userSettings = getDataForMode(SessionMode.Settings).data.value;
+  const userSettings = useDataSource().settingsData.value;
   overwriteSettingsValues(userSettings, replaceFile);
 }
