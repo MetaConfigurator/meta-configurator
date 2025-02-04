@@ -6,6 +6,7 @@ import GuiEditorPanel from '@/components/panels/gui-editor/GuiEditorPanel.vue';
 import SchemaDiagramPanel from '@/components/panels/schema-diagram/SchemaDiagramPanel.vue';
 import DebugPanel from '@/components/panels/debug-panel/DebugPanel.vue';
 import AiPromptsPanel from '@/components/panels/ai-prompts/AiPromptsPanel.vue';
+import ListAnalysisPanel from './list-analysis/ListAnalysisPanel.vue';
 
 export const panelTypeTextEditor: PanelTypeDefinition = {
   getComponent: () => CodeEditorPanel,
@@ -39,6 +40,14 @@ export const panelTypeAiPrompts: PanelTypeDefinition = {
   name: 'aiPrompts',
 };
 
+export const panelTypeListAnalysis: PanelTypeDefinition = {
+  getComponent: () => ListAnalysisPanel,
+  supportedModes: [SessionMode.DataEditor],
+  label: 'List Analysis',
+  icon: 'fa-solid fa-table',
+  name: 'listAnalysis',
+};
+
 export const panelTypeDebug: PanelTypeDefinition = {
   getComponent: () => DebugPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
@@ -55,5 +64,6 @@ export function registerDefaultPanelTypes() {
   panelTypeRegistry.registerPanelType('guiEditor', panelTypeGuiEditor);
   panelTypeRegistry.registerPanelType('schemaDiagram', panelTypeSchemaDiagram);
   panelTypeRegistry.registerPanelType('aiPrompts', panelTypeAiPrompts);
+    panelTypeRegistry.registerPanelType('listAnalysis', panelTypeListAnalysis);
   panelTypeRegistry.registerPanelType('debug', panelTypeDebug);
 }
