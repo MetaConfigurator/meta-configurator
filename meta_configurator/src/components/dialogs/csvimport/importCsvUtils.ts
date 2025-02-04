@@ -15,7 +15,7 @@ import {
 } from '@/components/dialogs/csvimport/delimiterSeparatorUtils';
 import {type CsvError, parse} from 'csv-parse/browser/esm';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
-import {identifyArraysInJson} from "@/utility/arrayPathUtils";
+import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
   const {open, onChange} = useFileDialog();

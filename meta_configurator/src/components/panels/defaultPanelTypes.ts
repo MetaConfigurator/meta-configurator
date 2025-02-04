@@ -64,6 +64,6 @@ export function registerDefaultPanelTypes() {
   panelTypeRegistry.registerPanelType('guiEditor', panelTypeGuiEditor);
   panelTypeRegistry.registerPanelType('schemaDiagram', panelTypeSchemaDiagram);
   panelTypeRegistry.registerPanelType('aiPrompts', panelTypeAiPrompts);
-    panelTypeRegistry.registerPanelType('listAnalysis', panelTypeListAnalysis);
+  panelTypeRegistry.registerPanelType('listAnalysis', panelTypeListAnalysis);
   panelTypeRegistry.registerPanelType('debug', panelTypeDebug);
 }
