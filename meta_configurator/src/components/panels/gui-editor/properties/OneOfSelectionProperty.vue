@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import type {WritableComputedRef} from 'vue';
 import {computed, onMounted} from 'vue';
-import Dropdown from 'primevue/dropdown';
+import Select from 'primevue/select';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {Path, PathElement} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
@@ -181,7 +181,7 @@ function applySchemaConstantsOnData(schema: JsonSchemaType, data: any): any {
 
 <template>
   <div>
-    <Dropdown
+    <Select
       class="tableInput w-full"
       v-model="valueProperty"
       :options="possibleOptions"

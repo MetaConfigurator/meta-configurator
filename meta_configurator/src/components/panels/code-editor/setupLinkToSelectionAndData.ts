@@ -9,7 +9,7 @@ import {
 } from '@/components/panels/code-editor/aceUtility';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
-import {watchImmediate} from '@vueuse/core/index';
+import {watchImmediate} from "@vueuse/core/index";
 
 // variables to prevent updating functions to trigger each other
 let selectionChangeFromOutside = false;
@@ -27,6 +27,7 @@ export function setupLinkToCurrentSelection(editor: Editor, mode: SessionMode) {
  * When the user clicks into the editor, we want to use the cursor position to determine which element from the data
  * the user clicked at. We then update the currentSelectedElement in the store accordingly.
  * @param editor the ace editor
+ * @param mode
  */
 function setupCursorPositionToSelectedPath(editor: Editor, mode: SessionMode) {
   editor.on(
@@ -58,6 +59,7 @@ function setupCursorPositionToSelectedPath(editor: Editor, mode: SessionMode) {
 /**
  * Listens to changes in the currentSelectedElement and update the cursor position accordingly.
  * @param editor the ace editor
+ * @param mode
  */
 function setupSelectedPathToCursorPosition(editor: Editor, mode: SessionMode) {
   watchArray(
@@ -100,6 +102,7 @@ function setupUpdateContentWhenDataChanges(editor: Editor, mode: SessionMode) {
 /**
  * When the content of the editor is modified by the user, we want to update the file data accordingly
  * @param editor the ace editor
+ * @param mode
  */
 function setupPropagationOfEditorContentChanges(editor: Editor, mode: SessionMode) {
   editor.on(

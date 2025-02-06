@@ -1,7 +1,7 @@
 import {shallowMount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import EnumProperty from '@/components/panels/gui-editor/properties/EnumProperty.vue';
-import Dropdown from 'primevue/dropdown';
+import Select from 'primevue/select';
 import {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {SessionMode} from '@/store/sessionMode';
@@ -31,7 +31,7 @@ describe('EnumProperty', () => {
       wrapper = shallowMount(EnumProperty, {
         props: props,
       });
-      dropdown = wrapper.findComponent(Dropdown);
+      dropdown = wrapper.findComponent(Select);
     });
     afterEach(() => {
       wrapper.unmount();
@@ -61,7 +61,7 @@ describe('EnumProperty', () => {
     describe('initializes dropdown correctly', () => {
       it('should have exactly one dropdown', () => {
         expect(dropdown.exists()).toBe(true);
-        expect(wrapper.findAllComponents(Dropdown).length).toBe(1);
+        expect(wrapper.findAllComponents(Select).length).toBe(1);
       });
 
       it('should have the correct placeholder', () => {
@@ -356,7 +356,7 @@ describe('EnumProperty', () => {
       wrapper = shallowMount(EnumProperty, {
         props: nullValuesProps,
       });
-      dropdown = wrapper.findComponent(Dropdown);
+      dropdown = wrapper.findComponent(Select);
     });
     afterEach(() => {
       wrapper.unmount();

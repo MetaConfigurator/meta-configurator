@@ -5,7 +5,7 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import InputText from 'primevue/inputtext';
-import InputSwitch from 'primevue/inputswitch';
+import ToggleSwitch from 'primevue/toggleswitch';
 import Password from 'primevue/password';
 import {publishProjectLink, storeCurrentSnapshot} from '@/utility/backend/backendApi';
 
@@ -76,7 +76,7 @@ defineExpose({show: openDialog, close: hideDialog});
 
       <div class="flex align-items-center vertical-center">
         <label for="delimiter" class="mr-2"><b>Publish project:</b></label>
-        <InputSwitch id="delimiter" v-model="publishProject" class="small-input" />
+        <ToggleSwitch id="delimiter" v-model="publishProject" class="small-input" />
       </div>
 
       <div v-if="publishProject" class="vertical-layout">

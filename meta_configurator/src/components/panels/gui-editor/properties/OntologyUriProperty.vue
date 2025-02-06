@@ -14,7 +14,6 @@ import {findSuggestionsForSearchTerm} from '@/utility/rdf/findSuggestionsForSear
 import {findJsonLdPrefixes} from '@/utility/rdf/findJsonLdPrefixes';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
-import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
   propertyName: PathElement;

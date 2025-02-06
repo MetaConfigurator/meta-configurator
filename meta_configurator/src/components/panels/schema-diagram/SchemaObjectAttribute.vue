@@ -7,7 +7,7 @@ import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {type Ref, ref, watch} from 'vue';
 import InputText from 'primevue/inputtext';
-import Dropdown from 'primevue/dropdown';
+import Select from 'primevue/select';
 import {
   type AttributeTypeChoice,
   determineTypeChoiceBySchema,
@@ -111,7 +111,7 @@ function getHandleTop() {
         @keyup.enter="updateAttributeName" />
       <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
-      <Dropdown
+      <Select
         class="vue-flow-attribute-dropdown"
         v-model="selectedType"
         :options="typeChoices"
@@ -172,7 +172,7 @@ function getHandleTop() {
   border: none; /* Remove border */
   background: none; /* Remove background */
   padding: 0; /* Remove padding */
-  margin: 0; /* Remove margin */
+  margin-left: 5px;
   color: black;
   justify-content: center; /* Center items horizontally */
   align-items: center; /* Center items vertically */

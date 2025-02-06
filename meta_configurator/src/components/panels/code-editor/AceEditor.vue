@@ -12,7 +12,6 @@ import 'brace/mode/yaml';
 import 'brace/theme/clouds';
 import 'brace/theme/ambiance';
 import 'brace/theme/monokai';
-import {watchImmediate} from '@vueuse/core';
 import {setupAnnotationsFromValidationErrors} from '@/components/panels/code-editor/setupAnnotations';
 import {
   setupLinkToCurrentSelection,

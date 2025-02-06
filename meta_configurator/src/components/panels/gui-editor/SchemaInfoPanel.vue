@@ -2,7 +2,6 @@
 import {computed} from 'vue';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
-import {useSessionStore} from '@/store/sessionStore';
 import type {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {isSchemaEmpty} from '@/schema/schemaReadingUtils';

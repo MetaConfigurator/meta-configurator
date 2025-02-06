@@ -92,26 +92,29 @@ function updatePossibleArrays(newData: any) {
     </div>
 
     <div v-if="tableData">
-      <ScrollPanel style="width: 100%; height: 100%" aria-orientation="horizontal">
+
+      <div style="overflow: auto; width: 100%; min-width: 0; max-width: 20%; display: flex;">
         <DataTable
           :value="selectedArray"
           :paginator="true"
           :rows="20"
-          tableStyle="min-width: 50rem"
           showGridlines
           stripedRows
           removable-sort
           scrollable
           scrollHeight="flex"
+          scrollWidth="max-content"
           class="flex-grow"
+          max-width="100%"
           size="small">
           <Column
             v-for="columnName in tableData.columnNames"
             :field="columnName"
             :header="columnName"
-            :sortable="true" />
+            :sortable="true"
+          />
         </DataTable>
-      </ScrollPanel>
+      </div>
     </div>
   </div>
 </template>

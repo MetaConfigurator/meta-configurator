@@ -1,13 +1,10 @@
 import type {Path} from '@/utility/path';
 import type {Node} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {SchemaElementData, SchemaObjectNodeData,} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {pathToString} from '@/utility/pathUtils';
-import {
-  SchemaElementData,
-  SchemaObjectNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 
 export function pathsToEdgeId(start: Path, end: Path, label: string, isArray: boolean): string {
-  return pathToNodeId(start) + '--[' + label + isArray ? '_array' : '' + ']-->' + pathToNodeId(end);
+  return pathToNodeId(start) + '--[' + label + (isArray ? '_array' : '') + ']-->' + pathToNodeId(end);
 }
 
 export function pathToNodeId(path: Path): string {

@@ -43,7 +43,7 @@ export const panelTypeAiPrompts: PanelTypeDefinition = {
 export const panelTypeListAnalysis: PanelTypeDefinition = {
   getComponent: () => ListAnalysisPanel,
   supportedModes: [SessionMode.DataEditor],
-  label: 'List Analysis',
+  label: 'Table View',
   icon: 'fa-solid fa-table',
   name: 'listAnalysis',
 };

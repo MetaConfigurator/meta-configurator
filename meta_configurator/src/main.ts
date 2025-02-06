@@ -1,9 +1,8 @@
 import {createApp} from 'vue';
 import {createPinia} from 'pinia';
 import PrimeVue from 'primevue/config';
+import Lara from '@primevue/themes/lara';
 
-import 'primevue/resources/themes/lara-light-indigo/theme.css';
-import 'primevue/resources/primevue.min.css';
 import Tooltip from 'primevue/tooltip';
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
@@ -16,13 +15,42 @@ import App from '@/views/App.vue';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {registerDefaultPanelTypes} from '@/components/panels/defaultPanelTypes';
+import {definePreset} from "@primevue/themes";
 
 // @ts-ignore
 const app = createApp(App);
 
+const indigoPreset = definePreset(Lara, {
+  semantic: {
+    primary: {
+      50: '{indigo.50}',
+      100: '{indigo.100}',
+      200: '{indigo.200}',
+      300: '{indigo.300}',
+      400: '{indigo.400}',
+      500: '{indigo.500}',
+      600: '{indigo.600}',
+      700: '{indigo.700}',
+      800: '{indigo.800}',
+      900: '{indigo.900}',
+      950: '{indigo.950}'
+    }
+  }
+});
+
 app.use(createPinia());
 app.use(useAppRouter());
-app.use(PrimeVue);
+app.use(PrimeVue, {
+  // Default theme configuration
+  theme: {
+    preset: indigoPreset,
+    options: {
+      prefix: 'p',
+      darkModeSelector: 'system',
+      cssLayer: false,
+    }
+  }
+});
 app.use(ToastService);
 
 app.use(ConfirmationService);

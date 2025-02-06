@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
-import InputSwitch from 'primevue/inputswitch';
+import ToggleSwitch from 'primevue/toggleswitch';
 import {useSettings} from '@/settings/useSettings';
 import Button from 'primevue/button';
 
@@ -24,19 +24,19 @@ const settings = useSettings();
       <div>
         <label
           >Edit Mode
-          <InputSwitch v-model="settings.schemaDiagram.editMode" class="options-input-switch" />
+          <ToggleSwitch v-model="settings.schemaDiagram.editMode" class="options-input-switch" />
         </label>
       </div>
       <div>
         <label
           >Graph direction vertical
-          <InputSwitch v-model="settings.schemaDiagram.vertical" class="options-input-switch" />
+          <ToggleSwitch v-model="settings.schemaDiagram.vertical" class="options-input-switch" />
         </label>
       </div>
       <div>
         <label
           >Show attributes
-          <InputSwitch
+          <ToggleSwitch
             v-model="settings.schemaDiagram.showAttributes"
             label="Automatic zoom"
             class="options-input-switch" />
@@ -45,7 +45,7 @@ const settings = useSettings();
       <div>
         <label
           >Show enum values
-          <InputSwitch
+          <ToggleSwitch
             v-model="settings.schemaDiagram.showEnumValues"
             class="options-input-switch" />
         </label>
@@ -53,7 +53,7 @@ const settings = useSettings();
       <div>
         <label
           >Move view on element selection
-          <InputSwitch
+          <ToggleSwitch
             v-model="settings.schemaDiagram.moveViewToSelectedElement"
             class="options-input-switch" />
         </label>
