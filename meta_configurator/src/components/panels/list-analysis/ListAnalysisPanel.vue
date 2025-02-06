@@ -50,7 +50,6 @@ const tableData: ComputedRef<null | {rows: any[]; columnNames: string[]}> = comp
   return createItemsRowsObjectsFromJson(currentData);
 });
 
-
 // function to update the possible arrays based on the data
 function updatePossibleArrays(newData: any) {
   possibleArrays.value = identifyArraysInJson(newData, [], true, true).map((path: Path) => {
@@ -65,14 +64,15 @@ function updatePossibleArrays(newData: any) {
   }
 }
 
-
 function exportTableAsCsv() {
   if (tableData.value == null) {
     return;
   }
   const itemRowsArrays = createItemRowsArraysFromObjects(tableData.value.rows);
-  const csvContent = tableData.value.columnNames.join(',') + '\n' +
-      itemRowsArrays.map(row => row.join(',')).join('\n');
+  const csvContent =
+    tableData.value.columnNames.join(',') +
+    '\n' +
+    itemRowsArrays.map(row => row.join(',')).join('\n');
   const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -81,7 +81,6 @@ function exportTableAsCsv() {
   a.click();
   URL.revokeObjectURL(url);
 }
-
 </script>
 
 <template>
@@ -97,14 +96,13 @@ function exportTableAsCsv() {
       </div>
       <div v-else>
         <label for="arrayPath">Select an array to analyze:</label>
-        <br/>
+        <br />
         <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
       </div>
     </div>
 
     <div v-if="tableData" class="mt-3">
-
-      <div style="overflow: auto; min-width: 0; max-width: 90%; min-height: 0; max-height: 50%;" >
+      <div style="overflow: auto; min-width: 0; max-width: 90%; min-height: 0; max-height: 50%">
         <DataTable
           :value="selectedArray"
           showGridlines
@@ -117,8 +115,7 @@ function exportTableAsCsv() {
             v-for="columnName in tableData.columnNames"
             :field="columnName"
             :header="columnName"
-            :sortable="true"
-          />
+            :sortable="true" />
         </DataTable>
       </div>
 
@@ -139,5 +136,4 @@ function exportTableAsCsv() {
   display: block; /* Ensure the label behaves like a block element */
   margin-bottom: 10px; /* Add some space below the label */
 }
-
 </style>

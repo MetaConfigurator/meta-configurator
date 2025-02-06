@@ -6,12 +6,11 @@ import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {GuiConstants} from '@/constants';
 import {SessionMode} from '@/store/sessionMode';
 import {ValidationResult} from '@/schema/validationService';
-import { config } from '@vue/test-utils';
-import { defaultOptions } from 'primevue/config';
-
+import {config} from '@vue/test-utils';
+import {defaultOptions} from 'primevue/config';
 
 config.global.mocks['$primevue'] = {
-  config: defaultOptions
+  config: defaultOptions,
 };
 
 // avoid constructing useDataLink store through imports, it is not required for this component

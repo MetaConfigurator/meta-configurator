@@ -432,7 +432,7 @@ const showSearchResultsMenu = event => {
 
       <!-- search bar -->
       <span class="p-input-icon-left ml-5" style="width: 20rem">
-        <i class="pi " style="font-size: 0.9rem" />
+        <i class="pi" style="font-size: 0.9rem" />
         <InputText
           show-clear
           class="h-7 w-full"
@@ -515,6 +515,6 @@ const showSearchResultsMenu = event => {
 }
 
 .highlighted-icon {
-  color: #5457CDFF;
+  color: #5457cdff;
 }
 </style>

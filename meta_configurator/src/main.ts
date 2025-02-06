@@ -15,7 +15,7 @@ import App from '@/views/App.vue';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {registerDefaultPanelTypes} from '@/components/panels/defaultPanelTypes';
-import {definePreset} from "@primevue/themes";
+import {definePreset} from '@primevue/themes';
 
 // @ts-ignore
 const app = createApp(App);
@@ -33,9 +33,9 @@ const indigoPreset = definePreset(Lara, {
       700: '{indigo.700}',
       800: '{indigo.800}',
       900: '{indigo.900}',
-      950: '{indigo.950}'
-    }
-  }
+      950: '{indigo.950}',
+    },
+  },
 });
 
 app.use(createPinia());
@@ -48,8 +48,8 @@ app.use(PrimeVue, {
       prefix: 'p',
       darkModeSelector: 'system',
       cssLayer: false,
-    }
-  }
+    },
+  },
 });
 app.use(ToastService);
 

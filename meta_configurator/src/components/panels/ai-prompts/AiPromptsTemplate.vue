@@ -20,7 +20,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
-import { fetchExternalContentText} from '@/utility/fetchExternalContent';
+import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
 
 const props = defineProps<{

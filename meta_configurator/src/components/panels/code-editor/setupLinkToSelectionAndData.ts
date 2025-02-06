@@ -9,7 +9,7 @@ import {
 } from '@/components/panels/code-editor/aceUtility';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
-import {watchImmediate} from "@vueuse/core/index";
+import {watchImmediate} from '@vueuse/core/index';
 
 // variables to prevent updating functions to trigger each other
 let selectionChangeFromOutside = false;
