@@ -1,10 +1,17 @@
-import {shallowMount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import StringProperty from '../StringProperty.vue';
 import InputText from 'primevue/inputtext';
 import {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {SessionMode} from '@/store/sessionMode';
+import { config } from '@vue/test-utils';
+import { defaultOptions } from 'primevue/config';
+
+
+config.global.mocks['$primevue'] = {
+  config: defaultOptions
+};
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
@@ -21,10 +28,10 @@ describe('StringProperty', () => {
   let wrapper: any;
   let inputField: any;
 
-  function shallowMountBeforeEach(props: any) {
+  function mountBeforeEach(props: any) {
     beforeEach(() => {
       // @ts-ignore
-      wrapper = shallowMount(StringProperty, {
+      wrapper = mount(StringProperty, {
         props: props,
       });
       inputField = wrapper.findComponent(InputText);
@@ -35,7 +42,7 @@ describe('StringProperty', () => {
   }
 
   describe('with string data', () => {
-    shallowMountBeforeEach({
+    mountBeforeEach({
       propertyName: 'foo',
       propertyData: 'bar',
       validationResults: new ValidationResult([]),
@@ -93,7 +100,7 @@ describe('StringProperty', () => {
   });
 
   describe('with number data', () => {
-    shallowMountBeforeEach({
+    mountBeforeEach({
       propertyName: 'foo',
       propertyData: 1,
       validationResults: new ValidationResult([]),
@@ -112,7 +119,7 @@ describe('StringProperty', () => {
   });
 
   describe('with object data', () => {
-    shallowMountBeforeEach({
+    mountBeforeEach({
       propertyName: 'foo',
       propertyData: {},
       validationResults: new ValidationResult([]),
@@ -131,7 +138,7 @@ describe('StringProperty', () => {
   });
 
   describe('with array data', () => {
-    shallowMountBeforeEach({
+    mountBeforeEach({
       propertyName: 'foo',
       propertyData: [],
       validationResults: new ValidationResult([]),
@@ -150,7 +157,7 @@ describe('StringProperty', () => {
   });
 
   describe('with null data', () => {
-    shallowMountBeforeEach({
+    mountBeforeEach({
       propertyName: 'foo',
       propertyData: null,
       validationResults: new ValidationResult([]),
@@ -169,7 +176,7 @@ describe('StringProperty', () => {
   });
 
   describe('with undefined data', () => {
-    shallowMountBeforeEach({
+    mountBeforeEach({
       propertyName: 'foo',
       propertyData: undefined,
       validationResults: new ValidationResult([]),

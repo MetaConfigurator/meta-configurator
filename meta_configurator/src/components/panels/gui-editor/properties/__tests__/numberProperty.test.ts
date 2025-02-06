@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, test, vi} from 'vitest';
 import NumberProperty from '../NumberProperty.vue';
 import InputNumber from 'primevue/inputnumber';
@@ -6,6 +6,13 @@ import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {GuiConstants} from '@/constants';
 import {SessionMode} from '@/store/sessionMode';
 import {ValidationResult} from '@/schema/validationService';
+import { config } from '@vue/test-utils';
+import { defaultOptions } from 'primevue/config';
+
+
+config.global.mocks['$primevue'] = {
+  config: defaultOptions
+};
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
@@ -22,10 +29,10 @@ describe('NumberProperty', () => {
   let wrapper: any;
   let inputNumber: any;
 
-  function shallowMountBeforeEach(props: any) {
+  function mountBeforeEach(props: any) {
     beforeEach(() => {
       // @ts-ignore
-      wrapper = shallowMount(NumberProperty, {
+      wrapper = mount(NumberProperty, {
         props: props,
       });
       inputNumber = wrapper.findComponent(InputNumber);
@@ -49,10 +56,10 @@ describe('NumberProperty', () => {
           false
         ),
       };
-      shallowMountBeforeEach(props);
+      mountBeforeEach(props);
 
       it('should correctly setup the input number', () => {
-        expect(inputNumber.props().modelValue).toBe(data ?? null); // primeVue converts undefined to null
+        expect(inputNumber.props().modelValue).toBe(data);
         expect(inputNumber.props().minFractionDigits).toBe(0);
         expect(inputNumber.props().maxFractionDigits).toBe(0);
         expect(inputNumber.props().step).toBe(1);
@@ -79,10 +86,10 @@ describe('NumberProperty', () => {
           false
         ),
       };
-      shallowMountBeforeEach(props);
+      mountBeforeEach(props);
 
       it('should correctly setup the input number', () => {
-        expect(inputNumber.props().modelValue).toBe(data ?? null); // primeVue converts undefined to null
+        expect(inputNumber.props().modelValue).toBe(data);
         expect(inputNumber.props().minFractionDigits).toBe(0);
         expect(inputNumber.props().maxFractionDigits).toBe(GuiConstants.NUMBER_MAX_DECIMAL_PLACES);
         expect(inputNumber.props().step).toBe(0.5);
@@ -95,7 +102,7 @@ describe('NumberProperty', () => {
   });
 
   describe('emits the correct event', () => {
-    shallowMountBeforeEach({
+    mountBeforeEach({
       propertyName: 'foo',
       propertyData: 1,
       validationResults: new ValidationResult([]),
