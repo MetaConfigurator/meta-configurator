@@ -162,14 +162,18 @@ onUnmounted(() => {
   <ConfirmDialog />
 
   <div class="w-full h-full flex" style="max-height: 100%">
-    <main class="flex flex-col">
+    <main class="flex flex-col w-full h-full">
       <!-- toolbar -->
       <TopToolbar
         ref="topToolbarRef"
         :current-mode="props.sessionMode"
         @mode-selected="updateMode" />
       <div class="flex-grow overflow-hidden" ref="mainPanel" id="mainpanel">
-        <Splitter class="h-full" :layout="width < 600 ? 'vertical' : 'horizontal'" :key="panels">
+        <Splitter
+          class="h-full"
+          style="min-width: 0"
+          :layout="width < 600 ? 'vertical' : 'horizontal'"
+          :key="panels">
           <SplitterPanel
             v-for="(panel, index) in panels"
             :key="index + panel"

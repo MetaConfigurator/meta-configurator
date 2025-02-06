@@ -251,7 +251,7 @@ function isAttributeHighlighted() {
   border: none; /* Remove border */
   background: none; /* Remove background */
   padding: 0; /* Remove padding */
-  margin: 0;
+  margin-left: 5px;
   color: black;
 }
 </style>

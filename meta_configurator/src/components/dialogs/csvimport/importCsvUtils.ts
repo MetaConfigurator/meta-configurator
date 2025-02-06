@@ -15,6 +15,7 @@ import {
 } from '@/components/dialogs/csvimport/delimiterSeparatorUtils';
 import {type CsvError, parse} from 'csv-parse/browser/esm';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
+import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
   const {open, onChange} = useFileDialog();
@@ -152,18 +153,7 @@ export function userStringToIdentifier(input: string, cutExtension: boolean = fa
 
 // note that this function does not look for a table within a table
 export function detectPossibleTablesInJson(json: any, path: Path = []): Path[] {
-  const tables: Path[] = [];
-  for (const key in json) {
-    if (json.hasOwnProperty(key)) {
-      const newPath = path ? [...path, key] : [key];
-      if (Array.isArray(json[key])) {
-        tables.push(newPath);
-      } else if (typeof json[key] === 'object' && json[key] !== null) {
-        tables.push(...detectPossibleTablesInJson(json[key], newPath));
-      }
-    }
-  }
-  return tables;
+  return identifyArraysInJson(json, path, false, true);
 }
 
 export function detectPropertiesOfTableInJson(json: any, tablePath: Path): string[] {

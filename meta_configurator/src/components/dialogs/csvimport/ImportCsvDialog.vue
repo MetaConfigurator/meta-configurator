@@ -5,10 +5,10 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import Panel from 'primevue/panel';
-import Dropdown from 'primevue/dropdown';
+import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
 import RadioButton from 'primevue/radiobutton';
-import InputSwitch from 'primevue/inputswitch';
+import ToggleSwitch from 'primevue/toggleswitch';
 import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {
@@ -248,7 +248,7 @@ defineExpose({show: openDialog, close: hideDialog});
         <div>
           <div class="flex align-items-center vertical-center">
             <label for="delimiter" class="mr-2"><b>Delimiter in the CSV document:</b></label>
-            <Dropdown
+            <Select
               id="delimiter"
               v-model="delimiter"
               :options="delimiterOptions"
@@ -259,7 +259,7 @@ defineExpose({show: openDialog, close: hideDialog});
             <label for="decimalSeparator" class="mr-2"
               ><b>Decimal Separator in the CSV document:</b></label
             >
-            <Dropdown
+            <Select
               id="decimalSeparator"
               v-model="decimalSeparator"
               class="small-input"
@@ -316,7 +316,7 @@ defineExpose({show: openDialog, close: hideDialog});
               <label class="mr-2">
                 <b>Primary key in new CSV:</b>
               </label>
-              <Dropdown
+              <Select
                 id="tableToExpand"
                 v-model="primaryKeyProp"
                 class="fixed-width"
@@ -327,7 +327,7 @@ defineExpose({show: openDialog, close: hideDialog});
               <label class="mr-2">
                 <b>Table to expand:</b>
               </label>
-              <Dropdown
+              <Select
                 id="tableToExpand"
                 v-model="tableToExpand"
                 class="fixed-width"
@@ -338,7 +338,7 @@ defineExpose({show: openDialog, close: hideDialog});
               <label class="mr-2">
                 <b>Foreign key in existing data:</b>
               </label>
-              <Dropdown
+              <Select
                 id="foreignKeyName"
                 v-model="foreignKey"
                 class="fixed-width"
@@ -353,7 +353,7 @@ defineExpose({show: openDialog, close: hideDialog});
             <label for="delimiter" class="mr-2"
               ><b>Infer and generate schema for the data:</b></label
             >
-            <InputSwitch id="delimiter" v-model="isInferSchema" class="small-input" />
+            <ToggleSwitch id="delimiter" v-model="isInferSchema" class="small-input" />
           </div>
 
           <p>

@@ -11,11 +11,10 @@ It emits the following events:
 -->
 <script setup lang="ts">
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import OverlayPanel from 'primevue/overlaypanel';
-import {computed, Ref, ref} from 'vue';
+import Popover from 'primevue/popover';
+import {computed, type Ref, ref} from 'vue';
 import {describeSchema} from '@/schema/schemaDescriptor';
 import type {ErrorObject} from 'ajv';
-import {useCurrentSchema} from '@/data/useDataLink';
 import {useSessionStore} from '@/store/sessionStore';
 
 const schemaRef: Ref<JsonSchemaWrapper | undefined> = ref();
@@ -68,7 +67,7 @@ defineEmits<{hide: void}>();
 </script>
 
 <template>
-  <OverlayPanel
+  <Popover
     ref="panelRef"
     style="max-height: 30vmax"
     class="w-1/3 leading-normal"
@@ -84,7 +83,7 @@ defineEmits<{hide: void}>();
       v-html="schemaDescription"
       class="overflow-y-auto whitespace-pre-line"
       style="max-height: 28vmax"></div>
-  </OverlayPanel>
+  </Popover>
 </template>
 
 <style scoped></style>

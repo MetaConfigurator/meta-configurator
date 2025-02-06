@@ -1,10 +1,16 @@
-import {shallowMount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import EnumProperty from '@/components/panels/gui-editor/properties/EnumProperty.vue';
-import Dropdown from 'primevue/dropdown';
+import Select from 'primevue/select';
 import {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {SessionMode} from '@/store/sessionMode';
+import {config} from '@vue/test-utils';
+import {defaultOptions} from 'primevue/config';
+
+config.global.mocks['$primevue'] = {
+  config: defaultOptions,
+};
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
@@ -25,13 +31,13 @@ describe('EnumProperty', () => {
   let wrapper: any;
   let dropdown: any;
 
-  function shallowMountBeforeEach(props: any) {
+  function mountBeforeEach(props: any) {
     beforeEach(() => {
       // @ts-ignore
-      wrapper = shallowMount(EnumProperty, {
+      wrapper = mount(EnumProperty, {
         props: props,
       });
-      dropdown = wrapper.findComponent(Dropdown);
+      dropdown = wrapper.findComponent(Select);
     });
     afterEach(() => {
       wrapper.unmount();
@@ -52,7 +58,7 @@ describe('EnumProperty', () => {
         false
       ),
     };
-    shallowMountBeforeEach(stringValuesProps);
+    mountBeforeEach(stringValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(stringValuesProps);
@@ -61,7 +67,7 @@ describe('EnumProperty', () => {
     describe('initializes dropdown correctly', () => {
       it('should have exactly one dropdown', () => {
         expect(dropdown.exists()).toBe(true);
-        expect(wrapper.findAllComponents(Dropdown).length).toBe(1);
+        expect(wrapper.findAllComponents(Select).length).toBe(1);
       });
 
       it('should have the correct placeholder', () => {
@@ -128,7 +134,7 @@ describe('EnumProperty', () => {
         false
       ),
     };
-    shallowMountBeforeEach(numberValuesProps);
+    mountBeforeEach(numberValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(numberValuesProps);
@@ -183,7 +189,7 @@ describe('EnumProperty', () => {
         false
       ),
     };
-    shallowMountBeforeEach(booleanValuesProps);
+    mountBeforeEach(booleanValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(booleanValuesProps);
@@ -238,7 +244,7 @@ describe('EnumProperty', () => {
         false
       ),
     };
-    shallowMountBeforeEach(objectValuesProps);
+    mountBeforeEach(objectValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(objectValuesProps);
@@ -296,7 +302,7 @@ describe('EnumProperty', () => {
         false
       ),
     };
-    shallowMountBeforeEach(arrayValuesProps);
+    mountBeforeEach(arrayValuesProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(arrayValuesProps);
@@ -353,10 +359,10 @@ describe('EnumProperty', () => {
 
     beforeEach(() => {
       // @ts-ignore
-      wrapper = shallowMount(EnumProperty, {
+      wrapper = mount(EnumProperty, {
         props: nullValuesProps,
       });
-      dropdown = wrapper.findComponent(Dropdown);
+      dropdown = wrapper.findComponent(Select);
     });
     afterEach(() => {
       wrapper.unmount();
@@ -403,7 +409,7 @@ describe('EnumProperty', () => {
         false
       ),
     };
-    shallowMountBeforeEach(testProps);
+    mountBeforeEach(testProps);
 
     it('should have the correct props', () => {
       expect(wrapper.props()).toEqual(testProps);

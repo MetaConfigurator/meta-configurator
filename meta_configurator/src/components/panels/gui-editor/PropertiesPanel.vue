@@ -26,7 +26,7 @@ import {TreeNodeType} from '@/components/panels/gui-editor/configDataTreeNode';
 import {pathToString} from '@/utility/pathUtils';
 import SchemaInfoOverlay from '@/components/panels/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
-import type {TreeNode} from 'primevue/tree';
+import type {TreeNode} from 'primevue/treenode';
 import {focus, focusOnPath, makeEditableAndSelectContents} from '@/utility/focusUtils';
 import {
   getDataForMode,

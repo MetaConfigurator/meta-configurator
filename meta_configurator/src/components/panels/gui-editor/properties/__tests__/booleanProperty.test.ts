@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, test, vi} from 'vitest';
 import BooleanProperty from '../BooleanProperty.vue';
 import SelectButton from 'primevue/selectbutton';
@@ -21,10 +21,10 @@ describe('BooleanProperty', () => {
   let wrapper: any;
   let selectButton: any;
 
-  function shallowMountBeforeEach(props: any) {
+  function mountBeforeEach(props: any) {
     beforeEach(() => {
       // @ts-ignore
-      wrapper = shallowMount(BooleanProperty, {
+      wrapper = mount(BooleanProperty, {
         props: props,
       });
       selectButton = wrapper.findComponent(SelectButton);
@@ -39,7 +39,7 @@ describe('BooleanProperty', () => {
     ['false', false],
     ['undefined', undefined],
   ])(`with value %s`, (type, data) => {
-    shallowMountBeforeEach({
+    mountBeforeEach({
       propertyName: 'foo',
       propertyData: data,
       validationResults: new ValidationResult([]),

@@ -645,7 +645,7 @@ export class ConfigTreeNodeResolver {
       return false;
     }
     if (schema.items.isAlwaysFalse) {
-      return data?.length < schema.prefixItems?.length ?? 0;
+      return data?.length < (schema.prefixItems?.length ?? 0);
     }
     return true;
   }

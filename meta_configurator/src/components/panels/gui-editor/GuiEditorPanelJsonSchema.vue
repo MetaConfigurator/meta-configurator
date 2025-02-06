@@ -50,7 +50,7 @@ function updateData(path: Path, newValue: any) {
             sortedProperties[key] = parentData[key];
           }
         });
-        // after adding properties from the schema in proper order, add the rest of the properties
+        // after adding properties from the schema in proper order, add the rest of the properties f
         dataKeys.forEach(key => {
           if (!schemaKeys.includes(key)) {
             sortedProperties[key] = parentData[key];

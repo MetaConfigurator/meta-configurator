@@ -3,14 +3,13 @@ List dropdown for enum properties, also used for properties with multiple exampl
 -->
 <script setup lang="ts">
 import {computed} from 'vue';
-import Dropdown from 'primevue/dropdown';
+import Select from 'primevue/select';
 import _ from 'lodash';
 import {dataToString} from '@/utility/dataToString';
 import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
-import InputText from 'primevue/inputtext';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -70,7 +69,7 @@ function isEditable() {
 </script>
 
 <template>
-  <Dropdown
+  <Select
     class="tableInput w-full"
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="valueProperty"

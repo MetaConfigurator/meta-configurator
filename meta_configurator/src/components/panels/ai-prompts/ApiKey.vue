@@ -8,7 +8,7 @@ import Password from 'primevue/password';
 import Panel from 'primevue/panel';
 import SelectButton from 'primevue/selectbutton';
 import Message from 'primevue/message';
-import {useSettings} from '../../../settings/useSettings';
+import {useSettings} from '@/settings/useSettings';
 
 const apiKey: Ref<string> = ref('');
 const isPersistKey: Ref<boolean> = ref(true);
