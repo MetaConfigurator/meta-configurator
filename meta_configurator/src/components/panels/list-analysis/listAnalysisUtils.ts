@@ -2,7 +2,7 @@ import _ from 'lodash';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 
-export function createItemsRowsFromJson(itemsJson: any): {rows: any[]; columnNames: string[]} {
+export function createItemsRowsObjectsFromJson(itemsJson: any): {rows: any[]; columnNames: string[]} {
   const columnNames = collectItemColumnNames(itemsJson);
 
   const rows = itemsJson.map((itemJson: any) => {
@@ -31,6 +31,20 @@ export function createItemRow(itemJson: any, columnNames: Set<string>): any {
   }
 
   return row;
+}
+
+export function createItemRowsArraysFromObjects(itemsRowsObjects: any[]): any[][] {
+    const columnNames = Object.keys(itemsRowsObjects[0]);
+
+  return itemsRowsObjects.map((itemRow: any) => {
+      return createItemRowArray(itemRow, columnNames);
+    });
+}
+
+function createItemRowArray(itemRow: any, columnNames: string[]): any[] {
+  return columnNames.map((columnName: string) => {
+    return itemRow[columnName];
+  });
 }
 
 // collect all properties of the items, including nested properties

@@ -8,14 +8,11 @@ import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
-import ScrollPanel from 'primevue/scrollpanel';
 import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
 import {
-  createItemsRowsFromJson,
-  formatJsonPointerAsPropertyName,
-  formatJsonPointerForUser,
+  createItemRowsArraysFromObjects,
+  createItemsRowsObjectsFromJson,
 } from '@/components/panels/list-analysis/listAnalysisUtils';
-import TreeTable from 'primevue/treetable';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -44,18 +41,15 @@ const selectedArray: Ref<any | null> = computed(() => {
   return data.dataAt(selectedArrayPath.value);
 });
 
+// rows is an array of objects, each objects having an attribute for each column, with the name as given in the columnNames
 const tableData: ComputedRef<null | {rows: any[]; columnNames: string[]}> = computed(() => {
   if (selectedArrayPath.value == null) {
     return null;
   }
   const currentData = data.dataAt(selectedArrayPath.value);
-  return createItemsRowsFromJson(currentData);
+  return createItemsRowsObjectsFromJson(currentData);
 });
 
-const itemRows = computed(() => {
-  console.log('itemRows computed' + tableData.value?.rows);
-  return tableData.value?.rows;
-});
 
 // function to update the possible arrays based on the data
 function updatePossibleArrays(newData: any) {
@@ -69,14 +63,30 @@ function updatePossibleArrays(newData: any) {
   } else {
     // if there are multiple arrays, we do not change the selection
   }
-
-  console.log('tableData ', tableData.value);
 }
+
+
+function exportTableAsCsv() {
+  if (tableData.value == null) {
+    return;
+  }
+  const itemRowsArrays = createItemRowsArraysFromObjects(tableData.value.rows);
+  const csvContent = tableData.value.columnNames.join(',') + '\n' +
+      itemRowsArrays.map(row => row.join(',')).join('\n');
+  const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'array_data.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 </script>
 
 <template>
-  <div>
-    <label class="heading">Array Analysis</label>
+  <div class="ml-5 h-full">
+    <label class="heading">Table View</label>
     <Button
       label="Update Data"
       icon="pi pi-refresh"
@@ -87,25 +97,21 @@ function updatePossibleArrays(newData: any) {
       </div>
       <div v-else>
         <label for="arrayPath">Select an array to analyze:</label>
+        <br/>
         <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
       </div>
     </div>
 
-    <div v-if="tableData">
+    <div v-if="tableData" class="mt-3">
 
-      <div style="overflow: auto; width: 100%; min-width: 0; max-width: 20%; display: flex;">
+      <div style="overflow: auto; min-width: 0; max-width: 90%; min-height: 0; max-height: 50%;" >
         <DataTable
           :value="selectedArray"
-          :paginator="true"
-          :rows="20"
           showGridlines
           stripedRows
           removable-sort
           scrollable
           scrollHeight="flex"
-          scrollWidth="max-content"
-          class="flex-grow"
-          max-width="100%"
           size="small">
           <Column
             v-for="columnName in tableData.columnNames"
@@ -115,6 +121,12 @@ function updatePossibleArrays(newData: any) {
           />
         </DataTable>
       </div>
+
+      <Button
+        label="Export table as CSV"
+        icon="pi pi-download"
+        @click="exportTableAsCsv"
+        class="mt-3" />
     </div>
   </div>
 </template>
@@ -127,4 +139,5 @@ function updatePossibleArrays(newData: any) {
   display: block; /* Ensure the label behaves like a block element */
   margin-bottom: 10px; /* Add some space below the label */
 }
+
 </style>
