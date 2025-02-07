@@ -44,7 +44,7 @@ function jumpToLevel(index: number) {
         class="inline-flex items-center space-x-3">
         <!-- the path element, clickable if it is not the last element -->
         <div
-          class="inline-flex items-center text-sm font-medium text-gray-700"
+          class="inline-flex items-center text-sm font-medium breadcrump-text"
           :class="{
             'hover:underline underline-offset-2 hover:text-slate-800 cursor-pointer':
               isNotLast(index),
@@ -53,10 +53,16 @@ function jumpToLevel(index: number) {
           {{ pathItem }}
         </div>
         <!-- chevron right if it is not the last element -->
-        <ChevronRight v-if="isNotLast(index)" class="text-gray-600" />
+        <ChevronRight v-if="isNotLast(index)" class="breadcrump-text" />
       </li>
     </ol>
   </nav>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+.breadcrump-text {
+  color: var(--p-primary-hover-color);
+}
+
+</style>

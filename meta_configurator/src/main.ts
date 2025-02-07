@@ -22,19 +22,48 @@ const app = createApp(App);
 
 const indigoPreset = definePreset(Lara, {
   semantic: {
-    primary: {
-      50: '{indigo.50}',
-      100: '{indigo.100}',
-      200: '{indigo.200}',
-      300: '{indigo.300}',
-      400: '{indigo.400}',
-      500: '{indigo.500}',
-      600: '{indigo.600}',
-      700: '{indigo.700}',
-      800: '{indigo.800}',
-      900: '{indigo.900}',
-      950: '{indigo.950}',
-    },
+
+      primary: {
+        50: '{indigo.50}',
+        100: '{indigo.100}',
+        200: '{indigo.200}',
+        300: '{indigo.300}',
+        400: '{indigo.400}',
+        500: '{indigo.500}',
+        600: '{indigo.600}',
+        700: '{indigo.700}',
+        800: '{indigo.800}',
+        900: '{indigo.900}',
+        950: '{indigo.950}',
+      },
+
+      colorScheme: {
+        light: {
+          primary: {
+            color: '{indigo.500}',
+            hoverColor: '{indigo.900}',
+            activeColor: 'black'
+          },
+          highlight: {
+            color: '{indigo.500}',
+            focusColor: '#ffffff'
+          }
+        },
+        dark: {
+          primary: {
+            color: '{indigo.50}',
+            hoverColor: '{indigo.100}',
+            activeColor: 'white'
+          },
+          highlight: {
+            background: '{indigo.950}',
+            focusBackground: '{indigo.700}',
+            color: '{indigo.300}',
+            focusColor: 'rgba(255,255,255,.87)'
+          }
+        }
+    }
+
   },
 });
 

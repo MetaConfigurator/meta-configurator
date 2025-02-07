@@ -3,6 +3,7 @@ import {pathToString} from '@/utility/pathUtils';
 import {MarkerType} from '@vue-flow/core';
 import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
 import {pathsToEdgeId, pathToNodeId} from '@/components/panels/schema-diagram/schemaDiagramHelper';
+import {isDarkMode} from "@/utility/darkModeUtils";
 
 export class SchemaGraph {
   public constructor(public nodes: SchemaNodeData[], public edges: EdgeData[]) {}
@@ -29,7 +30,7 @@ export class SchemaGraph {
   private toVueFlowEdges(individualAttributeHandles: boolean): Edge[] {
     return this.edges.map(data => {
       let type = 'default';
-      let color = 'black';
+      let color = isDarkMode? 'white' : 'black';
       const markerEnd = MarkerType.Arrow;
       const sourceHandle = individualAttributeHandles ? data.startHandle : null;
       const label = data.isArray ? data.label + '[]' : data.label;
