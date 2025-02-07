@@ -81,10 +81,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const dataEditorItem: MenuItem = {
     label: 'Data Editor',
     icon: 'fa-regular fa-file',
-    style:
-      props.currentMode !== SessionMode.DataEditor
-        ? ''
-        : 'font-weight: bold;',
+    style: props.currentMode !== SessionMode.DataEditor ? '' : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.DataEditor);
     },
@@ -92,10 +89,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const schemaEditorItem: MenuItem = {
     label: 'Schema Editor',
     icon: 'fa-regular fa-file-code',
-    style:
-      props.currentMode !== SessionMode.SchemaEditor
-        ? ''
-        : 'font-weight: bold;',
+    style: props.currentMode !== SessionMode.SchemaEditor ? '' : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.SchemaEditor);
     },
@@ -103,10 +97,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const settingsItem: MenuItem = {
     label: 'Settings',
     icon: 'fa-solid fa-cog',
-    style:
-      props.currentMode !== SessionMode.Settings
-        ? ''
-        : 'font-weight: bold;',
+    style: props.currentMode !== SessionMode.Settings ? '' : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.Settings);
     },
