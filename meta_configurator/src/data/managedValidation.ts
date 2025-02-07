@@ -1,5 +1,5 @@
 import {computed} from 'vue';
-import {getSchemaForMode, useCurrentData} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, useCurrentData} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {ValidationService} from '@/schema/validationService';
 
@@ -12,6 +12,6 @@ export class ManagedValidation {
   });
 
   public currentValidationResult = computed(() => {
-    return this.currentValidationService.value.validate(useCurrentData().data.value);
+    return this.currentValidationService.value.validate(getDataForMode(this.mode).data.value);
   });
 }
