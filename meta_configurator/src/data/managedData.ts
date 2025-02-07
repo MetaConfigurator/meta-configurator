@@ -77,6 +77,7 @@ export class ManagedData {
     const updated = updater(this.data.value);
     if (updated !== false) {
       triggerRef(this.shallowDataRef);
+      triggerRef(this.data);
     }
   }
 
@@ -137,6 +138,7 @@ export class ManagedData {
    */
   public setData(data: any): void {
     this.data.value = data;
+    triggerRef(this.shallowDataRef);
   }
 
   /**
