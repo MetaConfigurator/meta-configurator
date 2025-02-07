@@ -63,6 +63,8 @@ const tableData: ComputedRef<null | {rows: any[]; columnNames: string[]}> = comp
 });
 
 
+
+
 function exportTableAsCsv() {
   if (tableData.value == null) {
     return;
@@ -90,13 +92,12 @@ function exportTableAsCsv() {
         <b>No object arrays available.</b>
       </div>
       <div v-else>
-        <br />
         <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
       </div>
     </div>
 
     <div v-if="tableData" class="mt-3">
-      <div style="overflow: auto; min-width: 0; max-width: 90%; min-height: 0; max-height: 50%">
+      <div style="overflow: auto; min-width: 0; max-width: 90%; min-height: 0; max-height: 580px">
         <DataTable
           :value="selectedArray"
           showGridlines
@@ -130,4 +131,5 @@ function exportTableAsCsv() {
   display: block; /* Ensure the label behaves like a block element */
   margin-bottom: 10px; /* Add some space below the label */
 }
+
 </style>
