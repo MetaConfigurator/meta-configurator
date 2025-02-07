@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {SessionMode} from '@/store/sessionMode';
-import {computed, type ComputedRef, onMounted, ref, type Ref} from 'vue';
+import {computed, type ComputedRef, onMounted, ref, type Ref, watch} from 'vue';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import type {Path} from '@/utility/path';
 import {getDataForMode} from '@/data/useDataLink';
@@ -22,6 +22,11 @@ const data = getDataForMode(props.sessionMode);
 
 onMounted(() => {
   updatePossibleArrays(data.data.value);
+});
+
+// watch changes of sata and then update the possible arrays
+watch(() => data.data.value, (newData) => {
+  updatePossibleArrays(newData);
 });
 
 const possibleArrays: Ref<string[]> = ref([]);
@@ -86,16 +91,11 @@ function exportTableAsCsv() {
 <template>
   <div class="ml-5 h-full">
     <label class="heading">Table View</label>
-    <Button
-      label="Update Data"
-      icon="pi pi-refresh"
-      @click="updatePossibleArrays(data.data.value)" />
     <div class="mt-3">
       <div v-if="possibleArrays.length == 0">
-        <b>No arrays available.</b>
+        <b>No object arrays available.</b>
       </div>
       <div v-else>
-        <label for="arrayPath">Select an array to analyze:</label>
         <br />
         <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
       </div>
