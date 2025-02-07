@@ -1,5 +1,5 @@
 import {computed} from 'vue';
-import {getDataForMode, getSchemaForMode, useCurrentData} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode } from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {ValidationService} from '@/schema/validationService';
 
