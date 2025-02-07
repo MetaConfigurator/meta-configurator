@@ -20,7 +20,6 @@ const props = defineProps<{
 
 const data = getDataForMode(props.sessionMode);
 
-
 const possibleArrays: Ref<string[]> = computed(() => {
   return identifyArraysInJson(data.data.value, [], true, true).map((path: Path) => {
     return pathToJsonPointer(path);
@@ -61,9 +60,6 @@ const tableData: ComputedRef<null | {rows: any[]; columnNames: string[]}> = comp
   const currentData = data.dataAt(selectedArrayPath.value);
   return createItemsRowsObjectsFromJson(currentData);
 });
-
-
-
 
 function exportTableAsCsv() {
   if (tableData.value == null) {
@@ -131,5 +127,4 @@ function exportTableAsCsv() {
   display: block; /* Ensure the label behaves like a block element */
   margin-bottom: 10px; /* Add some space below the label */
 }
-
 </style>
