@@ -5,11 +5,6 @@ export interface SettingsInterfaceRoot {
   toolbarTitle: string;
   hideSchemaEditor: boolean;
   hideSettings: boolean;
-  uiColors: {
-    schemaEditor: string;
-    dataEditor: string;
-    settings: string;
-  };
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
   schemaDiagram: SettingsInterfaceSchemaDiagram;

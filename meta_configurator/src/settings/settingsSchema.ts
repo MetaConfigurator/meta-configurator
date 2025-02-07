@@ -29,32 +29,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'If set to true, the complete settings view will be hidden.',
       default: false,
     },
-    uiColors: {
-      type: 'object',
-      required: ['schemaEditor', 'dataEditor', 'settings'],
-      additionalProperties: false,
-      description: 'The colors associated with the different panels.',
-      properties: {
-        schemaEditor: {
-          type: 'string',
-          description: 'The color associated with panels that represent schema data.',
-          default: 'olivedrab',
-          format: 'color',
-        },
-        dataEditor: {
-          type: 'string',
-          description: 'The color associated with panels that represent file data.',
-          default: 'black',
-          format: 'color',
-        },
-        settings: {
-          type: 'string',
-          description: 'The color associated with panels that represent settings data.',
-          default: 'darkmagenta',
-          format: 'color',
-        },
-      },
-    },
     codeEditor: {
       type: 'object',
       required: ['fontSize'],

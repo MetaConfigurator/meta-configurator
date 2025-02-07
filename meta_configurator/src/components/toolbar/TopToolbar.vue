@@ -78,14 +78,13 @@ function getPageName(): string {
  * Menu items of the page selection menu.
  */
 function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-  // TODO: make the text actually have the given uiColors. Somehow currently the color in the style has no effect
   const dataEditorItem: MenuItem = {
     label: 'Data Editor',
     icon: 'fa-regular fa-file',
     style:
       props.currentMode !== SessionMode.DataEditor
-        ? 'color: ' + settings.uiColors.dataEditor
-        : 'font-weight: bold; color: ' + settings.uiColors.dataEditor,
+        ? ''
+        : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.DataEditor);
     },
@@ -95,8 +94,8 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     icon: 'fa-regular fa-file-code',
     style:
       props.currentMode !== SessionMode.SchemaEditor
-        ? 'color: ' + settings.uiColors.schemaEditor
-        : 'font-weight: bold; color: ' + settings.uiColors.schemaEditor,
+        ? ''
+        : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.SchemaEditor);
     },
@@ -106,8 +105,8 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     icon: 'fa-solid fa-cog',
     style:
       props.currentMode !== SessionMode.Settings
-        ? 'color: ' + settings.uiColors.settings
-        : 'font-weight: bold; color: ' + settings.uiColors.settings,
+        ? ''
+        : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.Settings);
     },
@@ -222,9 +221,9 @@ const toggle = event => {
   menu.value.toggle(event);
 };
 
-const itemMenuRefs = ref(new Map<string, Menu>());
+const itemMenuRefs = ref(new Map<string, typeof Menu>());
 
-function setItemMenuRef(item: MenuItem, menu: Menu) {
+function setItemMenuRef(item: MenuItem, menu: typeof Menu) {
   itemMenuRefs.value.set(getLabelOfItem(item), menu);
 }
 function handleItemButtonClick(item: MenuItem, event: Event) {

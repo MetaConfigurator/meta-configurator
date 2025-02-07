@@ -6,11 +6,6 @@ export const SETTINGS_DATA_DEFAULT = {
   toolbarTitle: 'MetaConfigurator',
   hideSchemaEditor: false,
   hideSettings: false,
-  uiColors: {
-    schemaEditor: 'olivedrab',
-    dataEditor: 'black',
-    settings: 'darkmagenta',
-  },
   codeEditor: {
     fontSize: 14,
     tabSize: 2,

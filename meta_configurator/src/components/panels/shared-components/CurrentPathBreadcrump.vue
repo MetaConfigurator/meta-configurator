@@ -7,7 +7,6 @@ import ChevronRight from '@/components/icons/ChevronRight.vue';
 import {computed} from 'vue';
 import type {Path} from '@/utility/path';
 import type {SessionMode} from '@/store/sessionMode';
-import {getColorForMode} from '@/components/panels/shared-components/sharedComponentUtils';
 import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
@@ -46,9 +45,6 @@ function jumpToLevel(index: number) {
         <!-- the path element, clickable if it is not the last element -->
         <div
           class="inline-flex items-center text-sm font-medium text-gray-700"
-          :style="{
-            color: getColorForMode(props.sessionMode, settings),
-          }"
           :class="{
             'hover:underline underline-offset-2 hover:text-slate-800 cursor-pointer':
               isNotLast(index),
