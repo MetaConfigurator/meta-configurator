@@ -20,16 +20,23 @@ const props = defineProps<{
 
 const data = getDataForMode(props.sessionMode);
 
-onMounted(() => {
-  updatePossibleArrays(data.data.value);
+
+const possibleArrays: Ref<string[]> = computed(() => {
+  return identifyArraysInJson(data.data.value, [], true, true).map((path: Path) => {
+    return pathToJsonPointer(path);
+  });
 });
 
-// watch changes of sata and then update the possible arrays
-watch(() => data.data.value, (newData) => {
-  updatePossibleArrays(newData);
+// watch possible arrays and update selection based on it
+watch(possibleArrays, (newPossibleArrays: string[]) => {
+  if (newPossibleArrays.length == 0) {
+    selectedArrayPointer.value = null;
+  } else if (newPossibleArrays.length == 1) {
+    selectedArrayPointer.value = possibleArrays.value[0];
+  } else {
+    // if there are multiple arrays, we do not change the selection
+  }
 });
-
-const possibleArrays: Ref<string[]> = ref([]);
 
 const selectedArrayPointer: Ref<string | null> = ref(null);
 const selectedArrayPath = computed(() => {
@@ -55,19 +62,6 @@ const tableData: ComputedRef<null | {rows: any[]; columnNames: string[]}> = comp
   return createItemsRowsObjectsFromJson(currentData);
 });
 
-// function to update the possible arrays based on the data
-function updatePossibleArrays(newData: any) {
-  possibleArrays.value = identifyArraysInJson(newData, [], true, true).map((path: Path) => {
-    return pathToJsonPointer(path);
-  });
-  if (possibleArrays.value.length == 0) {
-    selectedArrayPointer.value = null;
-  } else if (possibleArrays.value.length == 1) {
-    selectedArrayPointer.value = possibleArrays.value[0];
-  } else {
-    // if there are multiple arrays, we do not change the selection
-  }
-}
 
 function exportTableAsCsv() {
   if (tableData.value == null) {
