@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {SessionMode} from '@/store/sessionMode';
-import {computed, type ComputedRef, onMounted, ref, type Ref} from 'vue';
+import {computed, type ComputedRef, onMounted, ref, type Ref, watch} from 'vue';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import type {Path} from '@/utility/path';
 import {getDataForMode} from '@/data/useDataLink';
@@ -20,11 +20,22 @@ const props = defineProps<{
 
 const data = getDataForMode(props.sessionMode);
 
-onMounted(() => {
-  updatePossibleArrays(data.data.value);
+const possibleArrays: Ref<string[]> = computed(() => {
+  return identifyArraysInJson(data.data.value, [], true, true).map((path: Path) => {
+    return pathToJsonPointer(path);
+  });
 });
 
-const possibleArrays: Ref<string[]> = ref([]);
+// watch possible arrays and update selection based on it
+watch(possibleArrays, (newPossibleArrays: string[]) => {
+  if (newPossibleArrays.length == 0) {
+    selectedArrayPointer.value = null;
+  } else if (newPossibleArrays.length == 1) {
+    selectedArrayPointer.value = possibleArrays.value[0];
+  } else {
+    // if there are multiple arrays, we do not change the selection
+  }
+});
 
 const selectedArrayPointer: Ref<string | null> = ref(null);
 const selectedArrayPath = computed(() => {
@@ -50,20 +61,6 @@ const tableData: ComputedRef<null | {rows: any[]; columnNames: string[]}> = comp
   return createItemsRowsObjectsFromJson(currentData);
 });
 
-// function to update the possible arrays based on the data
-function updatePossibleArrays(newData: any) {
-  possibleArrays.value = identifyArraysInJson(newData, [], true, true).map((path: Path) => {
-    return pathToJsonPointer(path);
-  });
-  if (possibleArrays.value.length == 0) {
-    selectedArrayPointer.value = null;
-  } else if (possibleArrays.value.length == 1) {
-    selectedArrayPointer.value = possibleArrays.value[0];
-  } else {
-    // if there are multiple arrays, we do not change the selection
-  }
-}
-
 function exportTableAsCsv() {
   if (tableData.value == null) {
     return;
@@ -86,23 +83,17 @@ function exportTableAsCsv() {
 <template>
   <div class="ml-5 h-full">
     <label class="heading">Table View</label>
-    <Button
-      label="Update Data"
-      icon="pi pi-refresh"
-      @click="updatePossibleArrays(data.data.value)" />
     <div class="mt-3">
       <div v-if="possibleArrays.length == 0">
-        <b>No arrays available.</b>
+        <b>No object arrays available.</b>
       </div>
       <div v-else>
-        <label for="arrayPath">Select an array to analyze:</label>
-        <br />
         <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
       </div>
     </div>
 
     <div v-if="tableData" class="mt-3">
-      <div style="overflow: auto; min-width: 0; max-width: 90%; min-height: 0; max-height: 50%">
+      <div style="overflow: auto; min-width: 0; max-width: 90%; min-height: 0; max-height: 580px">
         <DataTable
           :value="selectedArray"
           showGridlines
