@@ -1,3 +1,3 @@
-import {computed} from "vue";
+import {computed} from 'vue';
 
-export const isDarkMode = computed(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
+export const isDarkMode = computed(() => window.matchMedia('(prefers-color-scheme: dark)').matches);

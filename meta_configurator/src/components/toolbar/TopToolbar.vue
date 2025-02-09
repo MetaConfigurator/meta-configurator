@@ -384,7 +384,7 @@ const showSearchResultsMenu = event => {
       </Menu>
 
       <Button outlined text class="main-menu-button" @click="toggle">
-        <FontAwesomeIcon icon="fa-solid fa-bars" class="mr-3 " />
+        <FontAwesomeIcon icon="fa-solid fa-bars" class="mr-3" />
         {{ getPageName() }}
       </Button>
 
@@ -504,7 +504,6 @@ const showSearchResultsMenu = event => {
   color: var(--p-primary-active-color);
   padding: 0.35rem !important;
 }
-
 
 .highlighted-icon {
   color: var(--p-highlight-color) !important;

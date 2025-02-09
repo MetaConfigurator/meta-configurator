@@ -60,9 +60,7 @@ function jumpToLevel(index: number) {
 </template>
 
 <style scoped>
-
 .breadcrump-text {
   color: var(--p-primary-hover-color);
 }
-
 </style>

@@ -1,11 +1,7 @@
 import type {Editor} from 'brace';
 import {watchImmediate} from '@vueuse/core';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
-import {isDarkMode} from "@/utility/darkModeUtils";
-
-
-
-
+import {isDarkMode} from '@/utility/darkModeUtils';
 
 /**
  * change the mode depending on the data format.
@@ -32,7 +28,7 @@ export function setupAceProperties(editor: Editor, settings: SettingsInterfaceRo
   if (isDarkMode.value) {
     editor.setTheme('ace/theme/clouds_midnight');
   } else {
-      editor.setTheme('ace/theme/clouds');
+    editor.setTheme('ace/theme/clouds');
   }
   editor.setShowPrintMargin(false);
   editor.getSession().setTabSize(settings.codeEditor.tabSize);
