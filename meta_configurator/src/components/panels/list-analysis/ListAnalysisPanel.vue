@@ -98,6 +98,7 @@ function exportTableAsCsv() {
           :value="selectedArray"
           showGridlines
           stripedRows
+          resizable-columns
           removable-sort
           scrollable
           scrollHeight="flex"

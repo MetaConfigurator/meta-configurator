@@ -562,7 +562,7 @@ function zoomIntoPath(path: Path) {
         </span>
 
         <!-- data nodes, actual edit fields for the data -->
-        <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 50%" class="w-full">
+        <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 47%" class="w-full">
           <PropertyData
             class="w-full"
             :nodeData="slotProps.node.data"
@@ -609,9 +609,15 @@ function zoomIntoPath(path: Path) {
         <span
           v-if="slotProps.node.type === TreeNodeType.ADVANCED_PROPERTY"
           class="text-gray-500"
-          style="width: 100%; min-width: 100%"
+          style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
           Advanced
+        </span>
+        <span
+          v-if="slotProps.node.type === TreeNodeType.ADVANCED_PROPERTY"
+          class="w-full"
+          style="max-width: 47%"
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
         </span>
       </template>
     </Column>
