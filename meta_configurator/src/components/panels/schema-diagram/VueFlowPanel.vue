@@ -459,6 +459,13 @@ function unselectElement() {
   width: 100%;
 }
 
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .layout-flow {
+    background-color: #121212;
+  }
+}
+
 .controls {
   position: absolute;
   left: 0;

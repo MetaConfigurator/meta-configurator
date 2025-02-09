@@ -35,6 +35,33 @@ const indigoPreset = definePreset(Lara, {
       900: '{indigo.900}',
       950: '{indigo.950}',
     },
+
+    colorScheme: {
+      light: {
+        primary: {
+          color: '{indigo.500}',
+          hoverColor: '{indigo.900}',
+          activeColor: 'black',
+        },
+        highlight: {
+          color: '{indigo.500}',
+          focusColor: '#ffffff',
+        },
+      },
+      dark: {
+        primary: {
+          color: '{indigo.50}',
+          hoverColor: '{indigo.100}',
+          activeColor: 'white',
+        },
+        highlight: {
+          background: '{indigo.950}',
+          focusBackground: '{indigo.700}',
+          color: '{indigo.300}',
+          focusColor: 'rgba(255,255,255,.87)',
+        },
+      },
+    },
   },
 });
 

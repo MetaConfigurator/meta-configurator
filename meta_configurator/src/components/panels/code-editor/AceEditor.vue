@@ -10,8 +10,7 @@ import 'brace/mode/javascript';
 import 'brace/mode/json';
 import 'brace/mode/yaml';
 import 'brace/theme/clouds';
-import 'brace/theme/ambiance';
-import 'brace/theme/monokai';
+import 'brace/theme/clouds_midnight';
 import {setupAnnotationsFromValidationErrors} from '@/components/panels/code-editor/setupAnnotations';
 import {
   setupLinkToCurrentSelection,

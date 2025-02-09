@@ -78,14 +78,10 @@ function getPageName(): string {
  * Menu items of the page selection menu.
  */
 function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-  // TODO: make the text actually have the given uiColors. Somehow currently the color in the style has no effect
   const dataEditorItem: MenuItem = {
     label: 'Data Editor',
     icon: 'fa-regular fa-file',
-    style:
-      props.currentMode !== SessionMode.DataEditor
-        ? 'color: ' + settings.uiColors.dataEditor
-        : 'font-weight: bold; color: ' + settings.uiColors.dataEditor,
+    style: props.currentMode !== SessionMode.DataEditor ? '' : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.DataEditor);
     },
@@ -93,10 +89,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const schemaEditorItem: MenuItem = {
     label: 'Schema Editor',
     icon: 'fa-regular fa-file-code',
-    style:
-      props.currentMode !== SessionMode.SchemaEditor
-        ? 'color: ' + settings.uiColors.schemaEditor
-        : 'font-weight: bold; color: ' + settings.uiColors.schemaEditor,
+    style: props.currentMode !== SessionMode.SchemaEditor ? '' : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.SchemaEditor);
     },
@@ -104,10 +97,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
   const settingsItem: MenuItem = {
     label: 'Settings',
     icon: 'fa-solid fa-cog',
-    style:
-      props.currentMode !== SessionMode.Settings
-        ? 'color: ' + settings.uiColors.settings
-        : 'font-weight: bold; color: ' + settings.uiColors.settings,
+    style: props.currentMode !== SessionMode.Settings ? '' : 'font-weight: bold;',
     command: () => {
       emit('mode-selected', SessionMode.Settings);
     },
@@ -222,9 +212,9 @@ const toggle = event => {
   menu.value.toggle(event);
 };
 
-const itemMenuRefs = ref(new Map<string, Menu>());
+const itemMenuRefs = ref(new Map<string, typeof Menu>());
 
-function setItemMenuRef(item: MenuItem, menu: Menu) {
+function setItemMenuRef(item: MenuItem, menu: typeof Menu) {
   itemMenuRefs.value.set(getLabelOfItem(item), menu);
 }
 function handleItemButtonClick(item: MenuItem, event: Event) {
@@ -501,20 +491,21 @@ const showSearchResultsMenu = event => {
 .main-menu-button {
   font-weight: bold;
   font-size: large;
-  color: #495057;
+  color: var(--p-primary-active-color);
   padding-left: 1rem !important;
   padding-top: 0.3rem !important;
   padding-bottom: 0.3rem !important;
   min-width: 13rem !important;
 }
+
 .toolbar-button {
   font-weight: bold;
   font-size: large;
-  color: #495057;
+  color: var(--p-primary-active-color);
   padding: 0.35rem !important;
 }
 
 .highlighted-icon {
-  color: #5457cdff;
+  color: var(--p-highlight-color) !important;
 }
 </style>
