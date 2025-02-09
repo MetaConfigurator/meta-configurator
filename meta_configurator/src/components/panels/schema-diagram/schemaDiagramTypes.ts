@@ -30,7 +30,7 @@ export class SchemaGraph {
   private toVueFlowEdges(individualAttributeHandles: boolean): Edge[] {
     return this.edges.map(data => {
       let type = 'default';
-      let color = isDarkMode ? 'white' : 'black';
+      let color = isDarkMode.value ? 'white' : 'black';
       const markerEnd = MarkerType.Arrow;
       const sourceHandle = individualAttributeHandles ? data.startHandle : null;
       const label = data.isArray ? data.label + '[]' : data.label;
