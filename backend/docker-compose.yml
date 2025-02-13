@@ -11,6 +11,9 @@ services:
       - redis
     networks:
       - app-network
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
     environment:
       FLASK_ENV: development
       MONGO_USER: root
@@ -54,6 +57,20 @@ services:
     networks:
       - app-network
 
+
+  certbot:
+    container_name: certbot
+    restart: unless-stopped
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: /bin/sh -c
+    command: |
+      crontab -l | { cat; echo "0 0 * * * certbot renew --webroot -w /var/www/certbot --post-hook 'nginx -s reload'"; } | crontab -
+      crond -f
+    networks:
+      - app-network
 
 networks:
   app-network:
