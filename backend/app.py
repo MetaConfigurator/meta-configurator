@@ -8,11 +8,15 @@ import os
 from datetime import datetime, timedelta
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
 import redis
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 CORS(app)
+
+# Enforce HTTPS (for Flask only)
+Talisman(app, force_https=True)
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -48,6 +52,13 @@ REDIS_URL = f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0"
 
 # Initialize Redis client
 redis_client = redis.Redis.from_url(REDIS_URL)
+
+try:
+    redis_client.ping()
+    print("Redis connected successfully")
+except redis.ConnectionError as e:
+    print(f"Redis connection failed: {e}")
+
 
 # Set up Flask-Limiter with Redis
 limiter = Limiter(get_remote_address, app=app, storage_uri=REDIS_URL)
