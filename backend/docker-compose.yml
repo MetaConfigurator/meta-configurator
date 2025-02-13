@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
 
   backend:
@@ -48,7 +50,6 @@ services:
       - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
     volumes:
       - redis:/var/lib/redis/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
     restart: unless-stopped
     env_file:
     - .env.prod
