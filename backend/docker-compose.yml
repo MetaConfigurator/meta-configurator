@@ -1,19 +1,8 @@
-version: '3.8'
-
 services:
-  web:
-    image: ghcr.io/metaconfigurator/meta_configurator:latest
-    ports:
-      - "80:80"    # Map port 80 on the host to port 80 in the container
-      - "443:443"  # Map port 443 on the host to port 443 in the container, if using HTTPS
-    restart: unless-stopped
-    depends_on:
-      - backend
-    networks:
-      - app-network
 
   backend:
-    build: ./backend
+    container_name: backend
+    build: .
     ports:
       - "5000:5000"
     restart: unless-stopped
@@ -25,31 +14,43 @@ services:
     environment:
       FLASK_ENV: development
       MONGO_USER: root
-      MONGO_PASS: ${MONGO_PASSWORD}
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       MONGO_DB: metaconfigurator
       REDIS_URL: redis://redis:6379/0
-      REDIS_PASS: ${REDIS_PASSWORD}
+    env_file:
+      - .env.prod
 
   mongo:
     image: mongo:latest
     container_name: mongo
     restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: metaconfigurator
-    volumes:
-      - mongo-data:/data/db
     networks:
       - app-network
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_DATABASE: metaconfigurator
+    env_file:
+      - .env.prod
 
   redis:
     image: redis:latest
     container_name: redis
+    command:
+      - /bin/sh
+      - -c
+      # - Double dollars, so that the variable is not expanded by Docker Compose
+      # - Surround by quotes, so that the shell does not split the password
+      # - The ${variable:?message} syntax causes shell to exit with a non-zero
+      #   code and print a message, when the variable is not set or empty
+      - redis-server --requirepass "$${REDIS_PASS:?REDIS_PASS variable is not set}"
+    volumes:
+      - redis:/var/lib/redis/data
     restart: unless-stopped
-    command: redis-server --requirepass ${REDIS_PASSWORD} --bind 0.0.0.0
+    env_file:
+    - .env.prod
     networks:
       - app-network
 
@@ -59,3 +60,4 @@ networks:
 
 volumes:
   mongo-data:
+  redis:

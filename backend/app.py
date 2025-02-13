@@ -39,7 +39,7 @@ client = MongoClient(
 db = client[MONGO_DB]
 
 # Set up Redis connection
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)
 REDIS_PASS = os.getenv("REDIS_PASS", None)
 
@@ -48,6 +48,13 @@ REDIS_URL = f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0"
 
 # Initialize Redis client
 redis_client = redis.Redis.from_url(REDIS_URL)
+
+try:
+    redis_client.ping()
+    print("Redis connected successfully")
+except redis.ConnectionError as e:
+    print(f"Redis connection failed: {e}")
+
 
 # Set up Flask-Limiter with Redis
 limiter = Limiter(get_remote_address, app=app, storage_uri=REDIS_URL)
@@ -377,4 +384,5 @@ def schedule_cleanup():
 if __name__ == "__main__":
     # Start the cleanup scheduler
     schedule_cleanup()
-    app.run(host="0.0.0.0", port=5000)
+    context = ("local.crt", "local.key")
+    app.run(port=5000, ssl_context=context)

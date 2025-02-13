@@ -1,8 +1,8 @@
 Flask
 pymongo
-flask-cors
+flask_cors
 uuid
-flask-limiter
+flask_limiter
 gunicorn
 redis
 werkzeug
