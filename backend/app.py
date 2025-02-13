@@ -39,7 +39,7 @@ client = MongoClient(
 db = client[MONGO_DB]
 
 # Set up Redis connection
-REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)
 REDIS_PASS = os.getenv("REDIS_PASS", None)
 
