@@ -12,9 +12,24 @@ MONGO_PASS=your_mongo_password
 MONGO_INITDB_ROOT_PASSWORD=your_mongo_password
 ```
 
-## Starting the containers
 
-Navigate to the meta_configurator/backend folder on the server and run the following command:
+## Navigate to the backend folder
+```bash
+cd backend
+```
+
+## Stopping the running containers and volumes
+```bash
+docker-compose down -v
+```
+
+## Building the backend container
+```bash
+docker compose build --no-cache
+```
+
+
+## Starting the containers
 
 ```bash
 docker compose up --force-recreate --no-deps -d
