@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   backend:
@@ -15,12 +13,10 @@ services:
     environment:
       FLASK_ENV: development
       MONGO_USER: root
-      MONGO_PASS: ${MONGO_PASSWORD}
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       MONGO_DB: metaconfigurator
       REDIS_URL: redis://redis:6379/0
-      REDIS_PASS: ${REDIS_PASSWORD}
     env_file:
       - .env.prod
 
@@ -34,7 +30,6 @@ services:
       - mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
       MONGO_INITDB_DATABASE: metaconfigurator
     env_file:
       - .env.prod
@@ -49,7 +44,7 @@ services:
       # - Surround by quotes, so that the shell does not split the password
       # - The ${variable:?message} syntax causes shell to exit with a non-zero
       #   code and print a message, when the variable is not set or empty
-      - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+      - redis-server --requirepass "$${REDIS_PASS:?REDIS_PASS variable is not set}"
     volumes:
       - redis:/var/lib/redis/data
     restart: unless-stopped
