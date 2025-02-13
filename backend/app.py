@@ -8,7 +8,6 @@ import os
 from datetime import datetime, timedelta
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_talisman import Talisman
 import redis
 from werkzeug.security import generate_password_hash, check_password_hash
 
