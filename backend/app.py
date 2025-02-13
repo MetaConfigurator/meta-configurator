@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Get MongoDB credentials and connection info from environment variables
 MONGO_USER = os.getenv("MONGO_USER", "root")
-MONGO_PASS = os.getenv("MONGO_PASSWORD", "example")
+MONGO_PASS = os.getenv("MONGO_PASS", "example")
 MONGO_HOST = os.getenv("MONGO_HOST", "mongo")
 MONGO_PORT = os.getenv("MONGO_PORT", "27017")
 MONGO_DB = os.getenv("MONGO_DB", "metaconfigurator")
@@ -41,7 +41,7 @@ db = client[MONGO_DB]
 # Set up Redis connection
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)
-REDIS_PASS = os.getenv("REDIS_PASSWORD", None)
+REDIS_PASS = os.getenv("REDIS_PASS", None)
 
 # Construct the Redis URL including the password
 REDIS_URL = f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0"
