@@ -45,7 +45,7 @@ services:
       # - Surround by quotes, so that the shell does not split the password
       # - The ${variable:?message} syntax causes shell to exit with a non-zero
       #   code and print a message, when the variable is not set or empty
-      - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+      - redis-server --requirepass "$${REDIS_PASS:?REDIS_PASS variable is not set}"
     volumes:
       - redis:/var/lib/redis/data
     restart: unless-stopped
