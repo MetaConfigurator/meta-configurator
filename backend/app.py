@@ -15,9 +15,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 CORS(app)
 
-# Enforce HTTPS (for Flask only)
-Talisman(app, force_https=True)
-
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -388,4 +385,4 @@ def schedule_cleanup():
 if __name__ == "__main__":
     # Start the cleanup scheduler
     schedule_cleanup()
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, ssl_context="adhoc")

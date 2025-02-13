@@ -3,7 +3,7 @@ pymongo
 flask_cors
 uuid
 flask_limiter
-flask_talisman
 gunicorn
 redis
 werkzeug
+pyopenssl
