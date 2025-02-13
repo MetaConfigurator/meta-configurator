@@ -35,8 +35,6 @@ services:
   mongo:
     image: mongo:latest
     container_name: mongo
-    ports:
-      - "27017:27017"
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -49,11 +47,9 @@ services:
 
   redis:
     image: redis:latest
-    ports:
-      - "6379:6379"
+    container_name: redis
     restart: unless-stopped
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD} --bind 0.0.0.0
     networks:
       - app-network
 
