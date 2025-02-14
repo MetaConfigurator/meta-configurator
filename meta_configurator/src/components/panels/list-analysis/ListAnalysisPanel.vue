@@ -10,6 +10,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
 import {
+  convertToCSV,
   createItemRowsArraysFromObjects,
   createItemsRowsObjectsFromJson,
 } from '@/components/panels/list-analysis/listAnalysisUtils';
@@ -66,10 +67,8 @@ function exportTableAsCsv() {
     return;
   }
   const itemRowsArrays = createItemRowsArraysFromObjects(tableData.value.rows);
-  const csvContent =
-    tableData.value.columnNames.join(',') +
-    '\n' +
-    itemRowsArrays.map(row => row.join(',')).join('\n');
+  const allRowsForCsv = [tableData.value.columnNames].concat(itemRowsArrays);
+  const csvContent = convertToCSV(allRowsForCsv);
   const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
