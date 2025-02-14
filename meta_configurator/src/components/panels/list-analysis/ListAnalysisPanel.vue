@@ -21,7 +21,7 @@ const props = defineProps<{
 const data = getDataForMode(props.sessionMode);
 
 const possibleArrays: Ref<string[]> = computed(() => {
-  return identifyArraysInJson(data.data.value, [], true, true).map((path: Path) => {
+  return identifyArraysInJson(data.data.value, [], false, true).map((path: Path) => {
     return pathToJsonPointer(path);
   });
 });
