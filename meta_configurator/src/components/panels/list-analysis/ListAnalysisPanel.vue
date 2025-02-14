@@ -100,6 +100,7 @@ function exportTableAsCsv() {
           stripedRows
           resizable-columns
           removable-sort
+          paginator :rows="30"
           scrollable
           scrollHeight="flex"
           size="small">
@@ -107,6 +108,7 @@ function exportTableAsCsv() {
             v-for="columnName in tableData.columnNames"
             :field="columnName"
             :header="columnName"
+            :style="{ maxWidth: '200px' }"
             :sortable="true" />
         </DataTable>
       </div>
