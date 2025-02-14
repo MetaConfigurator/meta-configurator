@@ -38,10 +38,10 @@ function updateData(path: Path, newValue: any) {
         // warning: this function only works for normal properties, not for composition, conditionals and other advanced features
         // for those advanced features, the new property will be added at the end of the object
         // TODO: implement sorting for advanced features. This will be more complicated and will require a lot of testing
-        const schemaKeys = Object.keys(parentSchemaProps);
-        const dataKeys = Object.keys(parentData);
         const newElementKey = path[path.length - 1];
         parentData[newElementKey] = newValue; // Add the new property
+        const schemaKeys = Object.keys(parentSchemaProps);
+        const dataKeys = Object.keys(parentData);
 
         // sort the document properties based on the order of schema properties
         const sortedProperties: {[key: string]: any} = {};
