@@ -98,9 +98,9 @@ function setupUpdateContentWhenDataChanges(editor: Editor, mode: SessionMode) {
     }
   );
   // the immediate watch is necessary to update the editor content when the data is loaded. It will, however, also result in currentChangeFromOutside and currentSelectionFromOutside being set to true.
-    // This is why we need to reset the flags after the initial change.
-    currentChangeFromOutside = false;
-    selectionChangeFromOutside = false;
+  // This is why we need to reset the flags after the initial change.
+  currentChangeFromOutside = false;
+  selectionChangeFromOutside = false;
 }
 
 /**
