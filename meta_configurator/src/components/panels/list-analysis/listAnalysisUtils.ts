@@ -96,7 +96,7 @@ export function convertToCSV(data: (string | number | boolean | null | undefined
                 const strValue = String(value); // Convert any value to string
                 // Ensure values containing commas, quotes, or newlines are escaped
                 if (strValue.includes(',') || strValue.includes('"') || strValue.includes('\n')) {
-                  return `"${strValue.replace(/"/g, '""')}"`; // Escape double quotes
+                    return `"${strValue.replace(/"/g, '""')}"`; // Escape double quotes by doubling them
                 }
                 return strValue;
               })
