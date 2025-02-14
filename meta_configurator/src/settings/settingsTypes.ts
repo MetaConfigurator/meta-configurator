@@ -44,6 +44,7 @@ export interface SettingsInterfacePanels {
   dataEditor: SettingsInterfacePanel[];
   schemaEditor: SettingsInterfacePanel[];
   settings: SettingsInterfacePanel[];
+  hidden: string[];
 }
 
 export interface SettingsInterfacePanel {

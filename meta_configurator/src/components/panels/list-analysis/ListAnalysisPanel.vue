@@ -10,6 +10,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
 import {
+  convertToCSV,
   createItemRowsArraysFromObjects,
   createItemsRowsObjectsFromJson,
 } from '@/components/panels/list-analysis/listAnalysisUtils';
@@ -21,7 +22,7 @@ const props = defineProps<{
 const data = getDataForMode(props.sessionMode);
 
 const possibleArrays: Ref<string[]> = computed(() => {
-  return identifyArraysInJson(data.data.value, [], true, true).map((path: Path) => {
+  return identifyArraysInJson(data.data.value, [], false, true).map((path: Path) => {
     return pathToJsonPointer(path);
   });
 });
@@ -66,10 +67,8 @@ function exportTableAsCsv() {
     return;
   }
   const itemRowsArrays = createItemRowsArraysFromObjects(tableData.value.rows);
-  const csvContent =
-    tableData.value.columnNames.join(',') +
-    '\n' +
-    itemRowsArrays.map(row => row.join(',')).join('\n');
+  const allRowsForCsv = [tableData.value.columnNames].concat(itemRowsArrays);
+  const csvContent = convertToCSV(allRowsForCsv);
   const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -100,6 +99,8 @@ function exportTableAsCsv() {
           stripedRows
           resizable-columns
           removable-sort
+          paginator
+          :rows="30"
           scrollable
           scrollHeight="flex"
           size="small">
@@ -107,6 +108,7 @@ function exportTableAsCsv() {
             v-for="columnName in tableData.columnNames"
             :field="columnName"
             :header="columnName"
+            :style="{maxWidth: '200px'}"
             :sortable="true" />
         </DataTable>
       </div>

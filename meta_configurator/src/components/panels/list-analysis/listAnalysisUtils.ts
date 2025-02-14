@@ -85,3 +85,21 @@ export function formatJsonPointerForUser(pointer: string): string {
   // remove first slash and replace others by dot
   return pointer.substring(1).replaceAll('/', '.');
 }
+
+export function convertToCSV(data: (string | number | boolean | null | undefined)[][]): string {
+  return data
+    .map(row =>
+      row
+        .map(value => {
+          if (value === null || value === undefined) return ''; // Convert null/undefined to empty string
+          const strValue = String(value); // Convert any value to string
+          // Ensure values containing commas, quotes, or newlines are escaped
+          if (strValue.includes(',') || strValue.includes('"') || strValue.includes('\n')) {
+            return `"${strValue.replace(/"/g, '""')}"`; // Escape double quotes by doubling them
+          }
+          return strValue;
+        })
+        .join(',')
+    )
+    .join('\n');
+}

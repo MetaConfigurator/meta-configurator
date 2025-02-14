@@ -77,6 +77,7 @@ export const SETTINGS_DATA_DEFAULT = {
         size: 50,
       },
     ],
+    hidden: ['aiPrompts', 'debug'],
   },
   frontend: {
     hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',

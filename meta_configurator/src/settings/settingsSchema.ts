@@ -235,6 +235,16 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             },
           ],
         },
+        hidden: {
+          type: 'array',
+          title: 'Hide Panels',
+          description:
+            'Panels that should be hidden in the editor and not shown to the user. By default, this section contains debugging and experimental panels.',
+          items: {
+            type: 'string',
+            enum: ['aiPrompts', 'debug'],
+          },
+        },
       },
     },
     frontend: {
@@ -333,7 +343,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts'],
+            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts', 'tableView'],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },

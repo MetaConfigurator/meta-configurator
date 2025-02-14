@@ -267,7 +267,9 @@ defineExpose({show: openDialog, close: hideDialog});
               :option-label="option => option.label" />
           </div>
 
-          <p v-if="errorMessage.length > 0" style="color: red; white-space: pre-line">
+          <p
+            v-if="errorMessage.length > 0"
+            style="color: red; white-space: pre-line; max-width: 1000px">
             {{ errorMessage }}
           </p>
         </div>
