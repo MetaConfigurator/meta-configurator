@@ -334,7 +334,7 @@ export class MenuItems {
       const panelTypeDefinition = panelTypeRegistry.getPanelTypeDefinition(panelTypeName);
       if (
         panelTypeDefinition.supportedModes.includes(mode) &&
-        panelTypeDefinition.icon.length > 0
+        panelTypeDefinition.icon.length > 0 && !settings.panels.hidden.includes(panelTypeName)
       ) {
         // toggle between showing and hiding the panel
         result.push(

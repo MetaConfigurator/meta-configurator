@@ -45,14 +45,14 @@ export const panelTypeListAnalysis: PanelTypeDefinition = {
   supportedModes: [SessionMode.DataEditor],
   label: 'Table View',
   icon: 'fa-solid fa-table',
-  name: 'listAnalysis',
+  name: 'tableView',
 };
 
 export const panelTypeDebug: PanelTypeDefinition = {
   getComponent: () => DebugPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
   label: 'Debug',
-  icon: '',
+  icon: 'fa-solid fa-bug',
   name: 'debug',
 };
 
@@ -64,6 +64,6 @@ export function registerDefaultPanelTypes() {
   panelTypeRegistry.registerPanelType('guiEditor', panelTypeGuiEditor);
   panelTypeRegistry.registerPanelType('schemaDiagram', panelTypeSchemaDiagram);
   panelTypeRegistry.registerPanelType('aiPrompts', panelTypeAiPrompts);
-  panelTypeRegistry.registerPanelType('listAnalysis', panelTypeListAnalysis);
+  panelTypeRegistry.registerPanelType('tableView', panelTypeListAnalysis);
   panelTypeRegistry.registerPanelType('debug', panelTypeDebug);
 }
