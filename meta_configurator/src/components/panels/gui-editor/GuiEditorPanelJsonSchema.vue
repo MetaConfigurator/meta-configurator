@@ -32,7 +32,7 @@ function updateData(path: Path, newValue: any) {
       const parentSchemaProps = getSchemaForMode(props.sessionMode).effectiveSchemaAtPath(
         parentSchemaPath
       ).schema.properties;
-      const parentData = structuredClone(data.dataAt(parentPath));
+      const parentData = data.dataAt(parentPath);
       if (!_.isEmpty(parentSchemaProps) && !_.isEmpty(parentData) && !Array.isArray(parentData)) {
         // only proceed with property sorting when parent schema and data are not empty and the parent schema is of type object (not array!)
         // warning: this function only works for normal properties, not for composition, conditionals and other advanced features

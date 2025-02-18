@@ -242,7 +242,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'Panels that should be hidden in the editor and not shown to the user. By default, this section contains debugging and experimental panels.',
           items: {
             type: 'string',
-            enum: ['aiPrompts', 'debug'],
+            enum: ['aiPrompts', 'debug', 'schemaDiagram', 'guiEditor', 'textEditor'],
           },
         },
       },

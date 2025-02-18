@@ -23,7 +23,7 @@ import type {
   GuiEditorTreeNode,
 } from '@/components/panels/gui-editor/configDataTreeNode';
 import {TreeNodeType} from '@/components/panels/gui-editor/configDataTreeNode';
-import {pathToString} from '@/utility/pathUtils';
+import {arePathsEqual, pathToString} from '@/utility/pathUtils';
 import SchemaInfoOverlay from '@/components/panels/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/treenode';
@@ -57,10 +57,20 @@ const emit = defineEmits<{
 const session = getSessionForMode(props.sessionMode);
 const data = getDataForMode(props.sessionMode);
 
-// scroll to the current selected element when it changes
+// when the user clicks on a property, the path of the selected element is changed.
+// when the path of the selected element is changed, this panel scrolls to the position accordingly
+// to avoid scrolling on a click in the GUI itself, we remember the last path clicked by the user in the GUI and do not scroll when the user clicks on the same path again
+const lastClickedElement = ref<Path>([]);
+
 watch(
   session.currentSelectedElement,
   () => {
+    if (arePathsEqual(lastClickedElement.value, session.currentSelectedElement.value)) {
+      return;
+    }
+    // if something else is selected, unselect the last clicked element
+    lastClickedElement.value = [];
+
     const absolutePath = session.currentSelectedElement.value;
     const pathToCutOff = session.currentPath.value;
     const relativePath = absolutePath.slice(pathToCutOff.length);
@@ -220,6 +230,7 @@ function updateData(subPath: Path, newValue: any) {
 function clickedPropertyData(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
   if (data.dataAt(path) != undefined) {
+    lastClickedElement.value = path;
     emit('select_path', path);
   }
 }
