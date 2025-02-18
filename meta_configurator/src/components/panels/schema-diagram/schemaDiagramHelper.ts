@@ -4,7 +4,7 @@ import {
   SchemaElementData,
   SchemaObjectNodeData,
 } from '@/components/panels/schema-diagram/schemaDiagramTypes';
-import {pathToString} from '@/utility/pathUtils';
+import {arePathsEqual, pathToString} from '@/utility/pathUtils';
 
 export function pathsToEdgeId(start: Path, end: Path, label: string, isArray: boolean): string {
   return (
@@ -21,10 +21,8 @@ export function pathToNodeId(path: Path): string {
 }
 
 export function findBestMatchingNode(nodes: Node[], selectedPath: Path): Node | undefined {
-  const selectedPathString = pathToString(selectedPath);
-
   const matchingNode = nodes.find(
-    node => pathToString(node.data.absolutePath) === selectedPathString
+    node => arePathsEqual(node.data.absolutePath, selectedPath)
   );
   if (matchingNode) {
     return matchingNode;
@@ -45,11 +43,9 @@ export function findBestMatchingData(
     return undefined;
   }
 
-  const selectedPathString = pathToString(selectedPath);
-
   if (selectedNode.data.getNodeType() === 'schemaobject') {
     const matchingAttribute = (selectedNode.data as SchemaObjectNodeData).attributes.find(
-      attribute => pathToString(attribute.absolutePath) === selectedPathString
+      attribute => arePathsEqual(attribute.absolutePath, selectedPath)
     );
     if (matchingAttribute) {
       return matchingAttribute;
