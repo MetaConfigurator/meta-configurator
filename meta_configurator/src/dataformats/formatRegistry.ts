@@ -34,14 +34,12 @@ export class FormatRegistry {
     return format;
   }
 
-
   /**
    * Return a list of all registered data format names.
    */
-    public getFormatNames(): string[] {
+  public getFormatNames(): string[] {
     return Array.from(this.formats.keys());
   }
-
 }
 
 /**

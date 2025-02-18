@@ -69,7 +69,7 @@ watch(
       return;
     }
     // if something else is selected, unselect the last clicked element
-    lastClickedElement.value = []
+    lastClickedElement.value = [];
 
     const absolutePath = session.currentSelectedElement.value;
     const pathToCutOff = session.currentPath.value;

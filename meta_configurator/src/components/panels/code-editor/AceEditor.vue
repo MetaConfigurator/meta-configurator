@@ -19,8 +19,8 @@ import {
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
-import Select from "primevue/select";
-import {formatRegistry} from "@/dataformats/formatRegistry";
+import Select from 'primevue/select';
+import {formatRegistry} from '@/dataformats/formatRegistry';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -46,21 +46,15 @@ onMounted(() => {
 
 <template>
   <div class="format-switch-container">
-  <Select
-      :options="dataFormatOptions"
-      v-model="settings.dataFormat"
-      size="small"
-      />
+    <Select :options="dataFormatOptions" v-model="settings.dataFormat" size="small" />
   </div>
   <div class="h-full" :id="editor_id" />
 </template>
 
 <style scoped>
-
 .format-switch-container {
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-
 </style>

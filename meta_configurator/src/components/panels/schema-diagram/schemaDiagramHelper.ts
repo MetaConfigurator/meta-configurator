@@ -21,9 +21,7 @@ export function pathToNodeId(path: Path): string {
 }
 
 export function findBestMatchingNode(nodes: Node[], selectedPath: Path): Node | undefined {
-  const matchingNode = nodes.find(
-    node => arePathsEqual(node.data.absolutePath, selectedPath)
-  );
+  const matchingNode = nodes.find(node => arePathsEqual(node.data.absolutePath, selectedPath));
   if (matchingNode) {
     return matchingNode;
   }
