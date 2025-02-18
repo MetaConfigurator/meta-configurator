@@ -45,7 +45,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="format-switch-container">
+  <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
     <Select :options="dataFormatOptions" v-model="settings.dataFormat" size="small" />
   </div>
   <div class="h-full" :id="editor_id" />

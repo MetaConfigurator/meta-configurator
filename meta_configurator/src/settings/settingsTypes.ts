@@ -19,6 +19,7 @@ export interface SettingsInterfaceRoot {
 export interface SettingsInterfaceCodeEditor {
   fontSize: number;
   tabSize: number;
+  showFormatSelector: boolean;
 }
 
 export interface SettingsInterfaceGuiEditor {
