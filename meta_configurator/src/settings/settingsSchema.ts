@@ -50,11 +50,11 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           maximum: 8,
         },
         showFormatSelector: {
-            type: 'boolean',
-            description:
-                'If set to true, a dropdown for selecting the format (JSON or YAML) will be shown in the code editor.',
-            default: true,
-        }
+          type: 'boolean',
+          description:
+            'If set to true, a dropdown for selecting the format (JSON or YAML) will be shown in the code editor.',
+          default: true,
+        },
       },
     },
     guiEditor: {
