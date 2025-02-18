@@ -64,3 +64,17 @@ export function dataPathToSchemaPath(dataPath: Path): Path {
 
   return schemaPath;
 }
+
+export function arePathsEqual(path1: Path, path2: Path): boolean {
+  if (path1.length !== path2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < path1.length; i++) {
+    if (path1[i] !== path2[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
