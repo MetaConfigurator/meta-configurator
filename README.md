@@ -6,7 +6,11 @@ MetaConfigurator is a form generator and schema editor for JSON schema,
 making editing configuration files, research data and schemas easier and more enjoyable.
 
 
-Try it out: https://www.metaconfigurator.org
+*Try it out:* 
+
+* Stable Release: https://www.metaconfigurator.org
+* Experimental Version: https://metaconfigurator.github.io/meta-configurator/
+
 
 
 <img src="figs/metaconfigurator_diagram.png" width="460">
