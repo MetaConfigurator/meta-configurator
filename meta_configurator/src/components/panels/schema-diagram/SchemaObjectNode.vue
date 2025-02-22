@@ -145,7 +145,7 @@ function isAttributeHighlighted() {
         {{ props.data.name }}
       </b>
       <Button
-        v-if="!isDefinedInDefinitions() && isObjectEditable()"
+        v-if="!isDefinedInDefinitions() && isNameEditable()"
         class="vue-flow-object-button"
         size="small"
         v-tooltip.bottom="
