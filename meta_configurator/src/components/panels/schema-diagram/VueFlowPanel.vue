@@ -384,7 +384,7 @@ function addEnum() {
   const enumPath = findAvailableId(['$defs'], 'enum');
   schemaData.setDataAt(enumPath, {
     type: 'string',
-    enum: ['APPLE', 'BANANA', 'ORANGE'],
+    enum: ['VAL_1', 'VAL_2'],
   });
   selectElement(enumPath);
 }
