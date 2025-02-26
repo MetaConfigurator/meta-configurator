@@ -1,0 +1,179 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MOF Synthesis Schema",
+  "type": "object",
+  "properties": {
+    "mofSynthesis": {
+      "type": "object",
+      "properties": {
+        "mofName": {
+          "type": "string",
+          "description": "The name of the Metal-Organic Framework (MOF)."
+        },
+        "synthesisMethod": {
+          "type": "string",
+          "enum": [
+            "Solvothermal",
+            "Hydrothermal",
+            "Microwave-assisted",
+            "Electrochemical",
+            "Gels",
+            "Other"
+          ],
+          "description": "The method used for synthesizing the MOF."
+        },
+        "metalSource": {
+          "type": "object",
+          "properties": {
+            "metalType": {
+              "type": "string",
+              "description": "Type of metal used in the synthesis."
+            },
+            "metalSalt": {
+              "type": "string",
+              "description": "The specific metal salt used."
+            },
+            "concentration": {
+              "type": "number",
+              "description": "Concentration of the metal source in mol/L."
+            }
+          },
+          "required": [
+            "metalType",
+            "metalSalt",
+            "concentration"
+          ]
+        },
+        "organicLinker": {
+          "type": "object",
+          "properties": {
+            "linkerType": {
+              "type": "string",
+              "description": "Type of organic linker used."
+            },
+            "linkerMolecularWeight": {
+              "type": "number",
+              "description": "Molecular weight of the organic linker in g/mol."
+            },
+            "linkerConcentration": {
+              "type": "number",
+              "description": "Concentration of the organic linker in mol/L."
+            }
+          },
+          "required": [
+            "linkerType",
+            "linkerMolecularWeight",
+            "linkerConcentration"
+          ]
+        },
+        "solvent": {
+          "type": "object",
+          "properties": {
+            "solventType": {
+              "type": "string",
+              "description": "Type of solvent used in the synthesis."
+            },
+            "solventVolume": {
+              "type": "number",
+              "description": "Volume of the solvent used in mL."
+            }
+          },
+          "required": [
+            "solventType",
+            "solventVolume"
+          ]
+        },
+        "temperature": {
+          "type": "object",
+          "properties": {
+            "synthesisTemperature": {
+              "type": "number",
+              "description": "Temperature at which the synthesis is conducted in Celsius."
+            },
+            "duration": {
+              "type": "number",
+              "description": "Duration of the synthesis in hours."
+            }
+          },
+          "required": [
+            "synthesisTemperature",
+            "duration"
+          ]
+        },
+        "postSynthesisTreatment": {
+          "type": "object",
+          "properties": {
+            "activationMethod": {
+              "type": "string",
+              "description": "Method used for activating the MOF after synthesis."
+            },
+            "activationDuration": {
+              "type": "number",
+              "description": "Duration of the activation process in hours."
+            },
+            "activationTemperature": {
+              "type": "number",
+              "description": "Temperature during activation in Celsius."
+            }
+          },
+          "required": [
+            "activationMethod",
+            "activationDuration",
+            "activationTemperature"
+          ]
+        },
+        "characterization": {
+          "type": "object",
+          "properties": {
+            "techniques": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Characterization techniques used."
+              }
+            },
+            "results": {
+              "type": "object",
+              "properties": {
+                "surfaceArea": {
+                  "type": "number",
+                  "description": "Surface area of the synthesized MOF in m²/g."
+                },
+                "poreVolume": {
+                  "type": "number",
+                  "description": "Pore volume of the synthesized MOF in cm³/g."
+                },
+                "crystalStructure": {
+                  "type": "string",
+                  "description": "Crystal structure of the synthesized MOF."
+                }
+              },
+              "required": [
+                "surfaceArea",
+                "poreVolume",
+                "crystalStructure"
+              ]
+            }
+          },
+          "required": [
+            "techniques",
+            "results"
+          ]
+        }
+      },
+      "required": [
+        "mofName",
+        "synthesisMethod",
+        "metalSource",
+        "organicLinker",
+        "solvent",
+        "temperature",
+        "postSynthesisTreatment",
+        "characterization"
+      ]
+    }
+  },
+  "required": [
+    "mofSynthesis"
+  ]
+}
