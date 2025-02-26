@@ -22,8 +22,8 @@ Each of these parameters is optional, allowing flexibility in what gets preloade
 ### Example
 
 
-```https://metaconfigurator.github.io/meta-configurator/?schema=https://github.com/MetaConfigurator/meta-configurator/blob/feature/more-documentation/documentation_user/examples/configurator_building/synthesis.schema.json&settings=https://github.com/MetaConfigurator/meta-configurator/blob/feature/more-documentation/documentation_user/examples/configurator_building/configurator_settings.json```
-This URL will open MetaConfigurator with the provided schema, data, and settings preloaded. Try here: [Open MetaConfigurator with Preloaded Schema and Settings](https://metaconfigurator.github.io/meta-configurator/?schema=https://github.com/MetaConfigurator/meta-configurator/blob/feature/more-documentation/documentation_user/examples/configurator_building/synthesis.schema.json&settings=https://github.com/MetaConfigurator/meta-configurator/blob/feature/more-documentation/documentation_user/examples/configurator_building/configurator_settings.json)
+```https://metaconfigurator.github.io/meta-configurator/?schema=https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/configurator_building/synthesis.schema.json&settings=https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/configurator_building/configurator_settings.json```
+This URL will open MetaConfigurator with the provided schema, data, and settings preloaded. Try here: [Open MetaConfigurator with Preloaded Schema and Settings](https://metaconfigurator.github.io/meta-configurator/?schema=https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/configurator_building/synthesis.schema.json&settings=https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/configurator_building/configurator_settings.json)
 
 Customizing the User Interface
 ------------------------------
