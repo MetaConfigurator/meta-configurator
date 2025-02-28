@@ -13,7 +13,7 @@ export interface SettingsInterfaceRoot {
   frontend: SettingsInterfacFrontend;
   backend: SettingsInterfaceBackend;
   rdf: SettingsInterfaceRdf;
-  openAi: SettingsInterfaceOpenAi;
+  aiIntegration: SettingsInterfaceAiIntegraton;
 }
 
 export interface SettingsInterfaceCodeEditor {
@@ -87,7 +87,7 @@ export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
 }
 
-export interface SettingsInterfaceOpenAi {
+export interface SettingsInterfaceAiIntegraton {
   model: string;
   maxTokens: number;
   temperature: number;

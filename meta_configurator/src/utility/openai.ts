@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {useSettings} from '@/settings/useSettings';
-import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 
 const BASE_URL = 'https://api.openai.com/v1';
 
@@ -12,16 +11,24 @@ export const queryOpenAI = async (
   temperature: number | undefined = undefined,
   endpoint: string | undefined = undefined
 ) => {
-  const settings = useSettings().value.openAi;
+  const settings = useSettings().value.aiIntegration;
   if (!model) model = settings.model;
   if (!max_tokens) max_tokens = settings.maxTokens;
   if (!temperature) temperature = settings.temperature;
   if (!endpoint) endpoint = settings.endpoint;
 
+  if (!endpoint.startsWith("https://")) {
+    endpoint = `${BASE_URL}/${endpoint}`;
+  }
+  if (!endpoint.endsWith("/chat/completions")) {
+    endpoint = `${endpoint}chat/completions`;
+  }
+
+
   try {
     console.log('Querying OpenAI with messages: ', ...messages);
     const response = await axios.post(
-      `${BASE_URL}/${endpoint}`,
+      endpoint,
       {
         model,
         messages,
