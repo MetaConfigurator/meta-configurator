@@ -22,6 +22,7 @@ import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompt
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
+import {removeCustomFieldsFromSchema} from "@/components/panels/ai-prompts/schemaProcessor";
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -137,7 +138,7 @@ function submitPromptCreateDocument() {
   const response = props.functionQueryDocumentCreation!(
     openApiKey,
     promptCreateDocument.value,
-    JSON.stringify(schema.schemaRaw.value)
+    JSON.stringify(removeCustomFieldsFromSchema(schema.schemaRaw.value))
   );
   response
     .then(value => {
@@ -167,7 +168,7 @@ function submitPromptModifyDocument() {
     openApiKey,
     promptModifyDocument.value,
     JSON.stringify(relevantSubDocument),
-    JSON.stringify(schema.schemaRaw.value)
+    JSON.stringify(removeCustomFieldsFromSchema(schema.schemaRaw.value))
   );
 
   response
