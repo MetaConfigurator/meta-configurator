@@ -2,6 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
+  settingsVersion: '1.0.0',
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
   hideSchemaEditor: false,

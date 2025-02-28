@@ -8,6 +8,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   required: ['dataFormat', 'codeEditor', 'guiEditor', 'schemaDiagram', 'metaSchema', 'panels'],
   additionalProperties: false,
   properties: {
+    settingsVersion: {
+        type: 'string',
+        description: 'The version of the settings file.',
+        default: '1.0.0',
+      enum: ['1.0.0'],
+      readOnly: true,
+    },
     dataFormat: {
       type: 'string',
       description: 'The data format to use for the configuration files.',
