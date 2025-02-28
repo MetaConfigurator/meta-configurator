@@ -312,7 +312,8 @@ function selectRootElement() {
       </div>
 
       <!-- Modify Document Prompt -->
-      <div class="flex flex-col space-y-4" v-else>
+      <Panel header="Modify Document" toggleable :collapsed="false" v-else>
+      <div class="flex flex-col space-y-4" >
         <span>
           <label>Prompt to</label>
           <b> Modify </b>
@@ -345,6 +346,7 @@ function selectRootElement() {
         <Button @click="submitPromptModifyDocument()">Modify {{ props.labelDocumentType }}</Button>
         <ProgressSpinner v-if="isLoadingChangeAnswer" />
       </div>
+      </Panel>
 
       <!-- Preview of resulting document, if not valid JSON; can be fixed and submitted by user -->
       <div v-show="newDocument.length > 0">
@@ -360,11 +362,11 @@ function selectRootElement() {
       </div>
 
       <!-- Query Document Prompt -->
-      <Panel header="Query Document" toggleable :collapsed="true" v-if="!isDocumentEmpty()">
+      <Panel header="Ask Questions about Document" toggleable :collapsed="true" v-if="!isDocumentEmpty()">
         <div class="flex flex-col space-y-4">
           <span>
             <label>Prompt to</label>
-            <b> Query </b>
+            <b> Ask Questions about </b>
             <i v-if="currentElementString.length == 0"
               >the complete {{ props.labelDocumentType }}</i
             >
