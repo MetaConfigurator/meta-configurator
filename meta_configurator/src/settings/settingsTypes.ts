@@ -1,6 +1,8 @@
 import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
+  settingsVersion: string;
+  preferencesSelected: boolean;
   dataFormat: DataFormat;
   toolbarTitle: string;
   hideSchemaEditor: boolean;
@@ -13,7 +15,7 @@ export interface SettingsInterfaceRoot {
   frontend: SettingsInterfacFrontend;
   backend: SettingsInterfaceBackend;
   rdf: SettingsInterfaceRdf;
-  openAi: SettingsInterfaceOpenAi;
+  aiIntegration: SettingsInterfaceAiIntegraton;
 }
 
 export interface SettingsInterfaceCodeEditor {
@@ -87,7 +89,7 @@ export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
 }
 
-export interface SettingsInterfaceOpenAi {
+export interface SettingsInterfaceAiIntegraton {
   model: string;
   maxTokens: number;
   temperature: number;

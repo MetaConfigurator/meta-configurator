@@ -8,6 +8,19 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   required: ['dataFormat', 'codeEditor', 'guiEditor', 'schemaDiagram', 'metaSchema', 'panels'],
   additionalProperties: false,
   properties: {
+    settingsVersion: {
+      type: 'string',
+      description: 'The version of the settings file.',
+      default: '1.0.0',
+      enum: ['1.0.0'],
+      readOnly: true,
+    },
+    preferencesSelected: {
+      type: 'boolean',
+      description:
+        'If set to true, the preferences of the user have been selected. When opening the tool and the preferences have not yet been selected, a preference selection dialog is shown to the user to determine the initial settings and open panels.',
+      default: false,
+    },
     dataFormat: {
       type: 'string',
       description: 'The data format to use for the configuration files.',
@@ -248,7 +261,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'Panels that should be hidden in the editor and not shown to the user. By default, this section contains debugging and experimental panels.',
           items: {
             type: 'string',
-            enum: ['aiPrompts', 'debug', 'schemaDiagram', 'guiEditor', 'textEditor'],
+            enum: ['aiPrompts', 'debug', 'schemaDiagram', 'guiEditor', 'textEditor', 'tableView'],
           },
         },
       },
@@ -302,15 +315,15 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
-    openAi: {
+    aiIntegration: {
       type: 'object',
       required: ['model', 'maxTokens', 'temperature', 'endpoint'],
       additionalProperties: false,
-      description: 'Settings for OpenAI API.',
+      description: 'Settings for AI API.',
       properties: {
         model: {
           type: 'string',
-          description: 'The model to use for the OpenAI API.',
+          description: 'The model to use for the AI API.',
           default: 'gpt-4o-mini',
           examples: ['gpt-4o-mini', 'gpt-4o'],
         },
@@ -322,15 +335,20 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
         temperature: {
           type: 'number',
-          description: 'The sampling temperature for the OpenAI API.',
-          default: 0.3,
+          description: 'The sampling temperature for the AI API.',
+          default: 0.0,
           minimum: 0.0,
           maximum: 1.0,
         },
         endpoint: {
           type: 'string',
-          description: 'The endpoint to use for the OpenAI API.',
-          default: '/chat/completions',
+          description:
+            'The endpoint to use for the AI API. Must follow the OpenAI API specification.',
+          default: 'https://api.openai.com/v1/',
+          examples: [
+            'https://api.openai.com/v1/',
+            'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+          ],
         },
       },
     },

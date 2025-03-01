@@ -11,6 +11,7 @@ import Listbox from 'primevue/listbox';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
+import PreferenceDialog from '@/components/dialogs/PreferenceDialog.vue';
 
 import InputText from 'primevue/inputtext';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
@@ -115,7 +116,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
 
 const items = computed(() => getPageSelectionMenuItems(settings.value));
 
-function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
+function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
     case 'Example':
       handleFromOurExampleClick();
@@ -260,9 +261,15 @@ function isHighlighted(item: MenuItem) {
 const searchTerm: Ref<string> = ref('');
 
 const initialSchemaSelectionDialog = ref();
+const preferencesDialog = ref();
+
 // Function to show the category selection dialog
 const showInitialSchemaDialog = () => {
   initialSchemaSelectionDialog.value?.show();
+};
+
+const showPreferencesDialog = () => {
+  preferencesDialog.value?.show();
 };
 
 const csvImportDialog = ref();
@@ -278,6 +285,7 @@ function showSnapshotDialog() {
 
 defineExpose({
   showInitialSchemaDialog,
+  showPreferencesDialog,
 });
 
 useMagicKeys({
@@ -327,9 +335,11 @@ const showSearchResultsMenu = event => {
 </script>
 
 <template>
+  <PreferenceDialog :open-schema-selection-fct="showInitialSchemaDialog" ref="preferencesDialog" />
+
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
-    @user_selected_option="option => handleUserSelection(option)" />
+    @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
 
   <ImportCsvDialog ref="csvImportDialog" />
 
