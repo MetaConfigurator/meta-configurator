@@ -15,6 +15,11 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       enum: ['1.0.0'],
       readOnly: true,
     },
+    preferencesSelected: {
+      type: 'boolean',
+      description: 'If set to true, the preferences of the user have been selected. When opening the tool and the preferences have not yet been selected, a preference selection dialog is shown to the user to determine the initial settings and open panels.',
+      default: false,
+    },
     dataFormat: {
       type: 'string',
       description: 'The data format to use for the configuration files.',
