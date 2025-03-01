@@ -61,7 +61,11 @@ watch(isPersistKey, newValue => {
     results you can change to more performant models in the settings tab.
     <br />
     <br />
-    Currently selected model and endpoint: <b>{{ useSettings().value.aiIntegration.model }}, {{ useSettings().value.aiIntegration.endpoint}}</b>
+    Currently selected model and endpoint:
+    <b
+      >{{ useSettings().value.aiIntegration.model }},
+      {{ useSettings().value.aiIntegration.endpoint }}</b
+    >
     <span class="api-key-container">
       <span>Key:</span>
       <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false" />

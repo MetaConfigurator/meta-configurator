@@ -17,13 +17,12 @@ export const queryOpenAI = async (
   if (!temperature) temperature = settings.temperature;
   if (!endpoint) endpoint = settings.endpoint;
 
-  if (!endpoint.startsWith("https://")) {
+  if (!endpoint.startsWith('https://')) {
     endpoint = `${BASE_URL}/${endpoint}`;
   }
-  if (!endpoint.endsWith("/chat/completions")) {
+  if (!endpoint.endsWith('/chat/completions')) {
     endpoint = `${endpoint}chat/completions`;
   }
-
 
   try {
     console.log('Querying OpenAI with messages: ', ...messages);

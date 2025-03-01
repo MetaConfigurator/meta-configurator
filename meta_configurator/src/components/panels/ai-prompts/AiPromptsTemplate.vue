@@ -22,7 +22,7 @@ import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompt
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
-import {removeCustomFieldsFromSchema} from "@/components/panels/ai-prompts/schemaProcessor";
+import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schemaProcessor';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -314,39 +314,43 @@ function selectRootElement() {
 
       <!-- Modify Document Prompt -->
       <Panel header="Modify Document" toggleable :collapsed="false" v-else>
-      <div class="flex flex-col space-y-4" >
-        <span>
-          <label>Prompt to</label>
-          <b> Modify </b>
-          <i v-if="currentElementString.length == 0">the complete {{ props.labelDocumentType }}</i>
-          <span v-else>
-            <i>{{ currentElementString }} (</i>
+        <div class="flex flex-col space-y-4">
+          <span>
+            <label>Prompt to</label>
+            <b> Modify </b>
+            <i v-if="currentElementString.length == 0"
+              >the complete {{ props.labelDocumentType }}</i
+            >
+            <span v-else>
+              <i>{{ currentElementString }} (</i>
+              <Button
+                circular
+                text
+                size="small"
+                class="special-button"
+                v-tooltip="'Unselect element'"
+                @click="selectRootElement()">
+                <FontAwesomeIcon icon="fa-solid fa-xmark" />
+              </Button>
+              <i>)</i>
+            </span>
+            <label> and all child properties</label>
             <Button
               circular
               text
               size="small"
               class="special-button"
-              v-tooltip="'Unselect element'"
-              @click="selectRootElement()">
-              <FontAwesomeIcon icon="fa-solid fa-xmark" />
+              v-tooltip="props.labelModifyInfo"
+              v-if="props.labelModifyInfo !== undefined">
+              <FontAwesomeIcon icon="fa-solid fa-circle-info" />
             </Button>
-            <i>)</i>
           </span>
-          <label> and all child properties</label>
-          <Button
-            circular
-            text
-            size="small"
-            class="special-button"
-            v-tooltip="props.labelModifyInfo"
-            v-if="props.labelModifyInfo !== undefined">
-            <FontAwesomeIcon icon="fa-solid fa-circle-info" />
-          </Button>
-        </span>
-        <Textarea v-model="promptModifyDocument" />
-        <Button @click="submitPromptModifyDocument()">Modify {{ props.labelDocumentType }}</Button>
-        <ProgressSpinner v-if="isLoadingChangeAnswer" />
-      </div>
+          <Textarea v-model="promptModifyDocument" />
+          <Button @click="submitPromptModifyDocument()"
+            >Modify {{ props.labelDocumentType }}</Button
+          >
+          <ProgressSpinner v-if="isLoadingChangeAnswer" />
+        </div>
       </Panel>
 
       <!-- Preview of resulting document, if not valid JSON; can be fixed and submitted by user -->
@@ -363,7 +367,11 @@ function selectRootElement() {
       </div>
 
       <!-- Query Document Prompt -->
-      <Panel header="Ask Questions about Document" toggleable :collapsed="true" v-if="!isDocumentEmpty()">
+      <Panel
+        header="Ask Questions about Document"
+        toggleable
+        :collapsed="true"
+        v-if="!isDocumentEmpty()">
         <div class="flex flex-col space-y-4">
           <span>
             <label>Prompt to</label>

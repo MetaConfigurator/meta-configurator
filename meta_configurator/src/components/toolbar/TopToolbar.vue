@@ -11,7 +11,7 @@ import Listbox from 'primevue/listbox';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
-import PreferenceDialog from "@/components/dialogs/PreferenceDialog.vue";
+import PreferenceDialog from '@/components/dialogs/PreferenceDialog.vue';
 
 import InputText from 'primevue/inputtext';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
@@ -132,7 +132,6 @@ function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File
       break;
   }
 }
-
 
 async function handleFromWebClick(): Promise<void> {
   try {
@@ -271,7 +270,7 @@ const showInitialSchemaDialog = () => {
 
 const showPreferencesDialog = () => {
   preferencesDialog.value?.show();
-}
+};
 
 const csvImportDialog = ref();
 const snapshotDialog = ref();
@@ -286,7 +285,7 @@ function showSnapshotDialog() {
 
 defineExpose({
   showInitialSchemaDialog,
-  showPreferencesDialog
+  showPreferencesDialog,
 });
 
 useMagicKeys({
@@ -336,17 +335,11 @@ const showSearchResultsMenu = event => {
 </script>
 
 <template>
-
-  <PreferenceDialog :open-schema-selection-fct="showInitialSchemaDialog"
-      ref="preferencesDialog"/>
-
+  <PreferenceDialog :open-schema-selection-fct="showInitialSchemaDialog" ref="preferencesDialog" />
 
   <InitialSchemaSelectionDialog
-      ref="initialSchemaSelectionDialog"
-      @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
-
-
-
+    ref="initialSchemaSelectionDialog"
+    @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
 
   <ImportCsvDialog ref="csvImportDialog" />
 

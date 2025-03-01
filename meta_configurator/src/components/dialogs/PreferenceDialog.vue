@@ -1,12 +1,11 @@
 <!-- Dialog to select the initial schema -->
 <script setup lang="ts">
-import { ref} from 'vue';
+import {ref} from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import RadioButton from "primevue/radiobutton";
-import {useSettings} from "@/settings/useSettings";
-import {useAppRouter} from "@/router/router";
-
+import RadioButton from 'primevue/radiobutton';
+import {useSettings} from '@/settings/useSettings';
+import {useAppRouter} from '@/router/router';
 
 const props = defineProps<{
   openSchemaSelectionFct: () => void;
@@ -35,12 +34,20 @@ function updateSettings() {
 
   if (!knowsJson.value) {
     // hide the text editor panels
-    settings.panels.dataEditor = settings.panels.dataEditor.filter(panel => panel.panelType !== 'textEditor');
-    settings.panels.schemaEditor = settings.panels.schemaEditor.filter(panel => panel.panelType !== 'textEditor');
-    settings.panels.settings = settings.panels.settings.filter(panel => panel.panelType !== 'textEditor');
+    settings.panels.dataEditor = settings.panels.dataEditor.filter(
+      panel => panel.panelType !== 'textEditor'
+    );
+    settings.panels.schemaEditor = settings.panels.schemaEditor.filter(
+      panel => panel.panelType !== 'textEditor'
+    );
+    settings.panels.settings = settings.panels.settings.filter(
+      panel => panel.panelType !== 'textEditor'
+    );
 
     // a user who does not know JSON will also not use advanced features from the GUI editor
-    settings.panels.schemaEditor = settings.panels.schemaEditor.filter(panel => panel.panelType !== 'guiEditor');
+    settings.panels.schemaEditor = settings.panels.schemaEditor.filter(
+      panel => panel.panelType !== 'guiEditor'
+    );
   }
 
   if (isFocusSchemaEditing.value) {
@@ -54,24 +61,20 @@ function updateSettings() {
   props.openSchemaSelectionFct();
 }
 
-
 defineExpose({show: openDialog, close: hideDialog, visible: isVisible});
-
-
 </script>
 
 <template>
   <Dialog v-model:visible="showDialog" header="Select your Preferences">
     <div class="dialog-content">
-
       <h2>Do you understand the file format <b>JSON</b>?</h2>
 
       <div class="flex flex-col gap-2">
         <RadioButtonGroup name="knowsJson" class="flex flex-wrap gap-4">
-      <RadioButton v-model="knowsJson" name="knowsJson" :value="true" inputId="yes" />
-      <label for="yes">Yes</label>
-      <RadioButton v-model="knowsJson" name="knowsJson" :value="false" inputId="no" />
-      <label for="no">No</label>
+          <RadioButton v-model="knowsJson" name="knowsJson" :value="true" inputId="yes" />
+          <label for="yes">Yes</label>
+          <RadioButton v-model="knowsJson" name="knowsJson" :value="false" inputId="no" />
+          <label for="no">No</label>
         </RadioButtonGroup>
       </div>
 
@@ -79,22 +82,30 @@ defineExpose({show: openDialog, close: hideDialog, visible: isVisible});
 
       <div class="flex flex-col gap-2">
         <RadioButtonGroup name="isFocusSchemaEditing" class="flex flex-wrap gap-4">
-      <RadioButton v-model="isFocusSchemaEditing" name="isFocusSchemaEditing" :value="true" inputId="yes" />
-      <label for="yes"><b>Create</b>, <b>Modify</b> or <b>Explore</b> a <b>Schema</b></label>
-      <RadioButton v-model="isFocusSchemaEditing" name="isFocusSchemaEditing" :value="false" inputId="no" />
+          <RadioButton
+            v-model="isFocusSchemaEditing"
+            name="isFocusSchemaEditing"
+            :value="true"
+            inputId="yes" />
+          <label for="yes"><b>Create</b>, <b>Modify</b> or <b>Explore</b> a <b>Schema</b></label>
+          <RadioButton
+            v-model="isFocusSchemaEditing"
+            name="isFocusSchemaEditing"
+            :value="false"
+            inputId="no" />
           <label for="no"><b>Edit Data</b> based on a Schema</label>
         </RadioButtonGroup>
       </div>
 
-        <Button
-            type="submit"  label="Submit"
-            @click="
-            () => {
-              updateSettings();
-              hideDialog();
-            }
-          " />
-
+      <Button
+        type="submit"
+        label="Submit"
+        @click="
+          () => {
+            updateSettings();
+            hideDialog();
+          }
+        " />
     </div>
   </Dialog>
 </template>

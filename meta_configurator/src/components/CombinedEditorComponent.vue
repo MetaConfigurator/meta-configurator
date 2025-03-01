@@ -84,7 +84,6 @@ const mainPanel = ref();
 
 onMounted(() => {
   if (!useSessionStore().hasShownInitialDialog) {
-
     if (!useSettings().value.preferencesSelected) {
       topToolbarRef.value?.showPreferencesDialog();
     } else {

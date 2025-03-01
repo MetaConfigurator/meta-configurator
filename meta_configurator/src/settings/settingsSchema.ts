@@ -9,15 +9,16 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   additionalProperties: false,
   properties: {
     settingsVersion: {
-        type: 'string',
-        description: 'The version of the settings file.',
-        default: '1.0.0',
+      type: 'string',
+      description: 'The version of the settings file.',
+      default: '1.0.0',
       enum: ['1.0.0'],
       readOnly: true,
     },
     preferencesSelected: {
       type: 'boolean',
-      description: 'If set to true, the preferences of the user have been selected. When opening the tool and the preferences have not yet been selected, a preference selection dialog is shown to the user to determine the initial settings and open panels.',
+      description:
+        'If set to true, the preferences of the user have been selected. When opening the tool and the preferences have not yet been selected, a preference selection dialog is shown to the user to determine the initial settings and open panels.',
       default: false,
     },
     dataFormat: {
@@ -341,9 +342,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
         endpoint: {
           type: 'string',
-          description: 'The endpoint to use for the AI API. Must follow the OpenAI API specification.',
+          description:
+            'The endpoint to use for the AI API. Must follow the OpenAI API specification.',
           default: 'https://api.openai.com/v1/',
-          examples: ['https://api.openai.com/v1/', 'https://api.helmholtz-blablador.fz-juelich.de/v1/'],
+          examples: [
+            'https://api.openai.com/v1/',
+            'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+          ],
         },
       },
     },
