@@ -1,65 +1,89 @@
-# MetaConfigurator
+MetaConfigurator
+================
 
-## Description
+🚀 What is MetaConfigurator?
+----------------------------
 
-MetaConfigurator is a form generator and schema editor for JSON schema,
-making editing configuration files, research data and schemas easier and more enjoyable.
+MetaConfigurator is a powerful, user-friendly schema editor and form generator for JSON Schema. It simplifies the process of creating and editing structured data files such as configuration files and research data, making it accessible to both technical and non-technical users.
 
+🔗 **Try it out now:**
 
-*Try it out:* 
+*   **Stable Release:** [www.metaconfigurator.org](https://www.metaconfigurator.org/)
 
-* Stable Release: https://www.metaconfigurator.org
-* Experimental Version: https://metaconfigurator.github.io/meta-configurator/
-
-
-
-<img src="figs/metaconfigurator_diagram.png" width="460">
-
-<details>
-<summary>Expand to see animated screen captures of MetaConfigurator. </summary>
-
-### Generated form for assisted editing of the JSON file
-![import_schema](figs/load_schema.gif)
-
-![graphical_editor](figs/graphical_editor.gif)
-
-### Schema Editor
-![schema_editor](figs/schema_editor.gif)
-
-### Interactive Schema Diagram
-![schema_diagram](figs/schema_diagram.gif)
-</details>
+*   **Experimental Version:** [metaconfigurator.github.io/meta-configurator](https://metaconfigurator.github.io/meta-configurator/)
 
 
-## Motivation
+### 🎯 What Can MetaConfigurator Do?
 
-Creating and managing files that have to conform to a specific format or structure can be a challenging task with a simple text editor,
-especially if you are not familiar with the specific file formats or syntax.
-For example, if you want to create a GitHub Actions workflow file, you have to follow the specified structure.
-This structure is defined in a JSON schema, which is a JSON document that describes the structure of another JSON document.
-But how to make sure that the file you created is valid and conforms to the schema?
+MetaConfigurator is a versatile tool that can be used for:
 
-### Solution
+*   **Schema & Data Model Creation or Editing** – Design and modify JSON Schema structures using an intuitive graphical editor.
 
-The project offers a GUI-based solution that simplifies the creation and maintenance of configuration files and schemas.
-Users can interact with a user-friendly interface that provides intuitive controls and abstracts away the complexities
-of file formats and syntax, making it accessible to users with limited technical knowledge.
-Our tool has the following advantages:
+*   **Assisted Data Editing** – Edit JSON and YAML files efficiently with structured guidance based on schemas.
 
-- It is easy to use and does not require knowledge of the underlying file schema
-- It is flexible and can be used for any JSON schema (we currently support draft-2020-12)
-- Less error-prone than manually editing configuration files
-
-More details can be found in [our paper](paper/2023_10_paper_main_extended.pdf) and our [user guide](documentation_user).
+*   **Configurator Builder** – Generate custom configurators that can be shared with others via pre-configured links.
 
 
-## Development
+🌟 Why Use MetaConfigurator?
+----------------------------
 
-Check out the [documentation for developers](documentation_developer).
+Creating structured data files (or schemas) manually can be complex and error-prone. MetaConfigurator removes this friction by providing an intuitive UI for editing JSON and YAML files based on a schema. It’s perfect for both beginners and experts who need a powerful yet easy-to-use tool.
 
-## Citing MetaConfigurator
+### ✅ Features & Benefits
 
-To cite MetaConfigurator in your publications, please use the following BibTeX entry:
+*   **Visual Schema Editor** – Create and edit JSON schemas using a graphical UI.
+
+*   **Flexible Data Editing** – Edit data using both a GUI and text editor, ensuring maximum flexibility.
+
+*   **Schema Inference & CSV Import** – Automatically generate schemas from CSV files.
+
+*   **Snapshot Sharing** – Share pre-configured links with preloaded schema, data, and settings.
+
+*   **Ontology Integration** – Auto-complete URIs for structured data.
+
+*   **Schema Diagram View** – Visually explore and modify complex schemas.
+
+*   **Custom UI Modes** – Adjust the interface to suit different user levels (beginner & advanced modes).
+
+*   **Pre-configured Configurators** – Generate shareable links that open MetaConfigurator with preloaded settings, acting as a tailor-made configuration tool.
+
+*   **Support for JSON Schema Draft-2020-12** – Ensuring compatibility with modern schema definitions.
+
+
+🛠️ Development
+---------------
+
+MetaConfigurator is built with **Vue.js** and **PrimeVue** for an intuitive user experience.
+
+### 🔧 Getting Started
+
+1.  git clone https://github.com/MetaConfigurator/meta-configurator.git
+
+2.  `cd meta-configurator`
+
+3.  `npm install`
+
+4.  `npm run dev`
+
+
+For more details, check out the [Developer Documentation](./documentation_developer).
+
+📖 User Guide & Examples
+------------------------
+
+Explore how to use MetaConfigurator with real-world examples:
+
+*   **[MOF Synthesis Example](./documentation_user/examples/mof_synthesis)** – Demonstrates schema generation, CSV import, and JSON export.
+
+*   **[Configurator Builder](./documentation_user/examples/configurator_building)** – Learn how to create and share pre-configured MetaConfigurator URLs.
+
+
+📚 Read the full [User Documentation](./documentation_user).
+
+📄 Citing MetaConfigurator
+--------------------------
+
+If MetaConfigurator is useful for your research, please cite it using the following BibTeX entry:
 
 ```bibtex
 @article{metaconfigurator2024, 
@@ -74,7 +98,11 @@ pages = {1--9}
 }
 ```
 
-## License
 
-This project is licensed under the [MIT License](LICENSE).
-For more information, see the LICENSE file.
+📝 License
+----------
+
+MetaConfigurator is open-source software licensed under the **[MIT License](LICENSE)**.
+See the LICENSE file for more details.
+
+🔗 **Join the Community & Contribute!** If you have feature requests, bug reports, or contributions, feel free to open an issue or submit a pull request on GitHub. 🚀

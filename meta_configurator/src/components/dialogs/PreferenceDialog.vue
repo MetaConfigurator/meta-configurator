@@ -67,7 +67,7 @@ defineExpose({show: openDialog, close: hideDialog, visible: isVisible});
 <template>
   <Dialog v-model:visible="showDialog" header="Select your Preferences">
     <div class="dialog-content">
-      <h2>Do you understand the file format <b>JSON</b>?</h2>
+      <h2>Do you understand the file format <b>JSON</b> or <b>YAML</b>?</h2>
 
       <div class="flex flex-col gap-2">
         <RadioButtonGroup name="knowsJson" class="flex flex-wrap gap-4">
