@@ -14,8 +14,8 @@ const props = defineProps<{
 
 const showDialog = ref(false);
 
-const knowsJson = ref(false);
-const isFocusSchemaEditing = ref(false);
+const knowsJson = ref(true);
+const isFocusSchemaEditing = ref(true);
 
 function openDialog() {
   showDialog.value = true;
@@ -80,7 +80,7 @@ defineExpose({show: openDialog, close: hideDialog, visible: isVisible});
       <div class="flex flex-col gap-2">
         <RadioButtonGroup name="isFocusSchemaEditing" class="flex flex-wrap gap-4">
       <RadioButton v-model="isFocusSchemaEditing" name="isFocusSchemaEditing" :value="true" inputId="yes" />
-      <label for="yes"><b>Create</b>, <b>Modify</b> or <b>Explore</b> <b>Schema</b></label>
+      <label for="yes"><b>Create</b>, <b>Modify</b> or <b>Explore</b> a <b>Schema</b></label>
       <RadioButton v-model="isFocusSchemaEditing" name="isFocusSchemaEditing" :value="false" inputId="no" />
           <label for="no"><b>Edit Data</b> based on a Schema</label>
         </RadioButtonGroup>
