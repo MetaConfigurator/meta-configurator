@@ -66,6 +66,14 @@ function isDefinedInDefinitions() {
   return parentKey === '$defs' || parentKey === 'definitions';
 }
 
+function isRootObject() {
+  return props.data.absolutePath.length == 0;
+}
+
+function isExtractable() {
+  return !isDefinedInDefinitions() && isObjectEditable() && !isRootObject();
+}
+
 function clickedNode() {
   emit('select_element', props.data.absolutePath);
 }
@@ -145,7 +153,7 @@ function isAttributeHighlighted() {
         {{ props.data.name }}
       </b>
       <Button
-        v-if="!isDefinedInDefinitions() && isNameEditable()"
+        v-if="isExtractable()"
         class="vue-flow-object-button"
         size="small"
         v-tooltip.bottom="
