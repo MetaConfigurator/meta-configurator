@@ -1,4 +1,5 @@
 import YAML from 'yaml';
+import {XMLParser, XMLBuilder} from 'fast-xml-parser';
 import {useSettings} from '@/settings/useSettings';
 
 /**
@@ -89,5 +90,29 @@ export class DataConverterYaml extends DataConverter {
     return YAML.stringify(data, {
       indent: useSettings().value.codeEditor.tabSize,
     });
+  }
+}
+
+/**
+ * DataConverter implementation for XML.
+ */
+export class DataConverterXml extends DataConverter {
+  override parse(data: string): any {
+    const parser: XMLParser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '_',
+    });
+    return parser.parse(data);
+  }
+
+  override stringify(data: any): string {
+    const builder: XMLBuilder = new XMLBuilder({
+      ignoreAttributes: false,
+      attributeNamePrefix: '_',
+      format: true,
+      commentPropName: '_comment',
+    });
+
+    return builder.build(data);
   }
 }

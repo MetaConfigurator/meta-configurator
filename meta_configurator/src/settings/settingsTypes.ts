@@ -74,6 +74,7 @@ export enum PropertySorting {
 export enum DataFormat {
   JSON = 'json',
   YAML = 'yaml',
+  XML = 'xml',
 }
 
 export interface SettingsInterfaceBackend {

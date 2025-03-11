@@ -15,6 +15,8 @@ export function setupAceMode(editor: Editor, settings: SettingsInterfaceRoot) {
         editor.getSession().setMode('ace/mode/json');
       } else if (format == 'yaml') {
         editor.getSession().setMode('ace/mode/yaml');
+      } else if (format == 'xml') {
+        editor.getSession().setMode('ace/mode/xml');
       }
     }
   );
