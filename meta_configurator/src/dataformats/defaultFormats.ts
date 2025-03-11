@@ -16,7 +16,7 @@ const yamlFormat: DataFormatDefinition = {
 
 const xmlFormat: DataFormatDefinition = {
   dataConverter: new DataConverterXml(),
-    pathIndexLink: null
+  pathIndexLink: null,
 };
 
 /**
