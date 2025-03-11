@@ -9,6 +9,7 @@ import * as ace from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/json';
 import 'brace/mode/yaml';
+import 'brace/mode/xml';
 import 'brace/theme/clouds';
 import 'brace/theme/clouds_midnight';
 import {setupAnnotationsFromValidationErrors} from '@/components/panels/code-editor/setupAnnotations';

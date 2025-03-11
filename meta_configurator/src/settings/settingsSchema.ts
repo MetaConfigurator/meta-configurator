@@ -25,7 +25,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       type: 'string',
       description: 'The data format to use for the configuration files.',
       default: 'json',
-      enum: ['json', 'yaml'],
+      enum: ['json', 'yaml', 'xml'],
     },
     toolbarTitle: {
       type: 'string',
