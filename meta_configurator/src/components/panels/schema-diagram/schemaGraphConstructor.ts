@@ -14,6 +14,8 @@ import {getTypeDescription} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
+import {TopLevelJsonSchemaWrapper} from "@/schema/topLevelJsonSchemaWrapper";
+import {SessionMode} from "@/store/sessionMode";
 
 const settings = useSettings();
 
@@ -53,17 +55,19 @@ export function populateGraph(
 }
 
 export function identifyAllObjects(rootSchema: TopLevelSchema): Map<string, SchemaObjectNodeData> {
+  const rootSchemaWrapper = new TopLevelJsonSchemaWrapper(rootSchema, SessionMode.DataEditor); // mode is DataEditor because it is the schema of DataEditor
+
   const objectDefs = new Map<string, SchemaObjectNodeData>();
-  identifyObjects([], rootSchema, objectDefs, false);
+  identifyObjects([], rootSchema, objectDefs, false, rootSchemaWrapper);
 
   if (rootSchema.$defs) {
     for (const [key, value] of Object.entries(rootSchema.$defs)) {
-      identifyObjects(['$defs', key], value, objectDefs, true);
+      identifyObjects(['$defs', key], value, objectDefs, true, rootSchemaWrapper);
     }
   }
   if (rootSchema.definitions) {
     for (const [key, value] of Object.entries(rootSchema.definitions)) {
-      identifyObjects(['definitions', key], value, objectDefs, true);
+      identifyObjects(['definitions', key], value, objectDefs, true, rootSchemaWrapper);
     }
   }
 
@@ -74,7 +78,8 @@ export function identifyObjects(
   currentPath: Path,
   schema: JsonSchemaType,
   defs: Map<string, SchemaElementData>,
-  hasUserDefinedName: boolean
+  hasUserDefinedName: boolean,
+  rootSchemaWrapper: TopLevelJsonSchemaWrapper
 ) {
   if (schema === true || schema === false) {
     return;
@@ -83,13 +88,13 @@ export function identifyObjects(
   // It can be that simple types, such as strings with enum constraint, have their own definition.
   // We allow generating a node for this, so it can be referred to by other objects.
   // But we do not visualize those nodes for simple types.
-  defs.set(pathToString(currentPath), generateInitialNode(currentPath, hasUserDefinedName, schema));
+  defs.set(pathToString(currentPath), generateInitialNode(currentPath, hasUserDefinedName, schema, rootSchemaWrapper));
 
   if (schema.properties) {
     for (const [key, value] of Object.entries(schema.properties)) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'properties', key];
-        identifyObjects(childPath, value, defs, true);
+        identifyObjects(childPath, value, defs, true, rootSchemaWrapper);
       }
     }
   }
@@ -97,14 +102,14 @@ export function identifyObjects(
     for (const [key, value] of Object.entries(schema.patternProperties)) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'patternProperties', key];
-        identifyObjects(childPath, value, defs, true);
+        identifyObjects(childPath, value, defs, true, rootSchemaWrapper);
       }
     }
   }
   if (schema.items) {
     if (typeof schema.items === 'object') {
       const childPath = [...currentPath, 'items'];
-      identifyObjects(childPath, schema.items, defs, false);
+      identifyObjects(childPath, schema.items, defs, false, rootSchemaWrapper);
     }
   }
 
@@ -112,7 +117,7 @@ export function identifyObjects(
     for (const [index, value] of schema.oneOf.entries()) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'oneOf', index];
-        identifyObjects(childPath, value, defs, false);
+        identifyObjects(childPath, value, defs, false, rootSchemaWrapper);
       }
     }
   }
@@ -120,7 +125,7 @@ export function identifyObjects(
     for (const [index, value] of schema.anyOf.entries()) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'anyOf', index];
-        identifyObjects(childPath, value, defs, false);
+        identifyObjects(childPath, value, defs, false, rootSchemaWrapper);
       }
     }
   }
@@ -128,23 +133,23 @@ export function identifyObjects(
     for (const [index, value] of schema.allOf.entries()) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'allOf', index];
-        identifyObjects(childPath, value, defs, false);
+        identifyObjects(childPath, value, defs, false, rootSchemaWrapper);
       }
     }
   }
   if (schema.if) {
     if (typeof schema.if === 'object') {
-      identifyObjects([...currentPath, 'if'], schema.if, defs, false);
+      identifyObjects([...currentPath, 'if'], schema.if, defs, false, rootSchemaWrapper);
     }
   }
   if (schema.then) {
     if (typeof schema.then === 'object') {
-      identifyObjects([...currentPath, 'then'], schema.then, defs, false);
+      identifyObjects([...currentPath, 'then'], schema.then, defs, false, rootSchemaWrapper);
     }
   }
   if (schema.else) {
     if (typeof schema.else === 'object') {
-      identifyObjects([...currentPath, 'else'], schema.else, defs, false);
+      identifyObjects([...currentPath, 'else'], schema.else, defs, false, rootSchemaWrapper);
     }
   }
   if (schema.additionalProperties) {
@@ -153,7 +158,8 @@ export function identifyObjects(
         [...currentPath, 'additionalProperties'],
         schema.additionalProperties,
         defs,
-        false
+        false,
+          rootSchemaWrapper
       );
     }
   }
@@ -162,11 +168,12 @@ export function identifyObjects(
 function generateInitialNode(
   path: Path,
   hasUserDefinedName: boolean,
-  schema: JsonSchemaObjectType
+  schema: JsonSchemaObjectType,
+  rootSchemaWrapper: TopLevelJsonSchemaWrapper
 ): SchemaElementData {
   if (!isEnumSchema(schema)) {
     return new SchemaObjectNodeData(
-      generateObjectTitle(path, hasUserDefinedName, schema),
+      generateObjectTitle(path, hasUserDefinedName, schema, rootSchemaWrapper),
       hasUserDefinedName,
       path,
       schema,
@@ -174,7 +181,7 @@ function generateInitialNode(
     );
   } else {
     return new SchemaEnumNodeData(
-      generateObjectTitle(path, hasUserDefinedName, schema),
+      generateObjectTitle(path, hasUserDefinedName, schema, rootSchemaWrapper),
       hasUserDefinedName,
       path,
       schema,
@@ -186,24 +193,44 @@ function generateInitialNode(
 export function generateObjectTitle(
   path: Path,
   hasUserDefinedName: boolean,
-  schema?: JsonSchemaObjectType
+  schema: JsonSchemaObjectType,
+  rootSchemaWrapper: TopLevelJsonSchemaWrapper
 ): string {
-  if (schema && schema.title && !hasUserDefinedName) {
+  // if schema has a title, use it as the name
+  if (schema.title && !hasUserDefinedName) {
     return schema.title;
   }
+    // if path is empty, we are at the root
   if (path.length == 0) {
     return 'root';
   }
+
+  // if object is definition for items in an array, use the array name
+    if (path.length >= 2 && path[path.length - 1] == 'items') {
+        const parentSchema = rootSchemaWrapper.subSchemaAt(path.slice(0, path.length - 1));
+        if (parentSchema?.hasType('array')) {
+          const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName, parentSchema, rootSchemaWrapper);
+        return titleOfParent + ' entry';
+        }
+    }
+
+    // if object is definition for properties in an object, use the object name
   const lastElement = path[path.length - 1];
   if (typeof lastElement === 'string') {
     return lastElement;
   }
+
+  // if last element in path is not a string (e.g. an array index), use an array format for the title, based on the parent if possible
   if (path.length >= 2) {
-    const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName);
-    return titleOfParent + '[' + lastElement + ']';
-  } else {
-    return 'element[' + lastElement + ']';
+    const parentSchema = rootSchemaWrapper.subSchemaAt(path.slice(0, path.length - 1));
+    if (parentSchema) {
+      const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName, parentSchema, rootSchemaWrapper);
+      return titleOfParent + '[' + lastElement + ']';
+    }
   }
+
+    return 'element[' + lastElement + ']';
+
 }
 
 export function generateObjectAttributes(
@@ -643,4 +670,8 @@ export function trimNodeChildren(graph: SchemaGraph) {
 
 function isNodeConnectedByEdge(node: SchemaElementData, graph: SchemaGraph): boolean {
   return graph.edges.find(edge => edge.start == node || edge.end == node) !== undefined;
+}
+
+function getSubSchema(rootSchema: TopLevelSchema, path: Path) {
+
 }
