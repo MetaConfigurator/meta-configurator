@@ -12,7 +12,6 @@ import {
   generateObjectAttributes,
   identifyObjects,
   populateGraph,
-  trimGraph,
   trimNodeChildren,
 } from '../schemaGraphConstructor';
 import {useSettings} from '@/settings/useSettings';
@@ -68,10 +67,10 @@ describe('test schema graph constructor with objects and attributes with enums',
   beforeEach(() => {
     currentPath = [];
     defs = new Map();
-    identifyObjects(currentPath, schema, defs, false);
+    identifyObjects(currentPath, schema, defs, false, schema);
     // @ts-ignore
     for (const [key, value] of Object.entries(schema.$defs)) {
-      identifyObjects(['$defs', key], value, defs, true);
+      identifyObjects(['$defs', key], value, defs, true, schema);
     }
   });
 

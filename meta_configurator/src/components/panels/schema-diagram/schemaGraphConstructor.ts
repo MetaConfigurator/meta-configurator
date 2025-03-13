@@ -14,8 +14,7 @@ import {getTypeDescription} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
-import {TopLevelJsonSchemaWrapper} from "@/schema/topLevelJsonSchemaWrapper";
-import {SessionMode} from "@/store/sessionMode";
+import {dataAt} from "@/utility/resolveDataAtPath";
 
 const settings = useSettings();
 
@@ -55,19 +54,18 @@ export function populateGraph(
 }
 
 export function identifyAllObjects(rootSchema: TopLevelSchema): Map<string, SchemaObjectNodeData> {
-  const rootSchemaWrapper = new TopLevelJsonSchemaWrapper(rootSchema, SessionMode.DataEditor); // mode is DataEditor because it is the schema of DataEditor
 
   const objectDefs = new Map<string, SchemaObjectNodeData>();
-  identifyObjects([], rootSchema, objectDefs, false, rootSchemaWrapper);
+  identifyObjects([], rootSchema, objectDefs, false, rootSchema);
 
   if (rootSchema.$defs) {
     for (const [key, value] of Object.entries(rootSchema.$defs)) {
-      identifyObjects(['$defs', key], value, objectDefs, true, rootSchemaWrapper);
+      identifyObjects(['$defs', key], value, objectDefs, true, rootSchema);
     }
   }
   if (rootSchema.definitions) {
     for (const [key, value] of Object.entries(rootSchema.definitions)) {
-      identifyObjects(['definitions', key], value, objectDefs, true, rootSchemaWrapper);
+      identifyObjects(['definitions', key], value, objectDefs, true, rootSchema);
     }
   }
 
@@ -79,7 +77,7 @@ export function identifyObjects(
   schema: JsonSchemaType,
   defs: Map<string, SchemaElementData>,
   hasUserDefinedName: boolean,
-  rootSchemaWrapper: TopLevelJsonSchemaWrapper
+  rootSchema: TopLevelSchema
 ) {
   if (schema === true || schema === false) {
     return;
@@ -88,13 +86,13 @@ export function identifyObjects(
   // It can be that simple types, such as strings with enum constraint, have their own definition.
   // We allow generating a node for this, so it can be referred to by other objects.
   // But we do not visualize those nodes for simple types.
-  defs.set(pathToString(currentPath), generateInitialNode(currentPath, hasUserDefinedName, schema, rootSchemaWrapper));
+  defs.set(pathToString(currentPath), generateInitialNode(currentPath, hasUserDefinedName, schema, rootSchema));
 
   if (schema.properties) {
     for (const [key, value] of Object.entries(schema.properties)) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'properties', key];
-        identifyObjects(childPath, value, defs, true, rootSchemaWrapper);
+        identifyObjects(childPath, value, defs, true, rootSchema);
       }
     }
   }
@@ -102,14 +100,14 @@ export function identifyObjects(
     for (const [key, value] of Object.entries(schema.patternProperties)) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'patternProperties', key];
-        identifyObjects(childPath, value, defs, true, rootSchemaWrapper);
+        identifyObjects(childPath, value, defs, true, rootSchema);
       }
     }
   }
   if (schema.items) {
     if (typeof schema.items === 'object') {
       const childPath = [...currentPath, 'items'];
-      identifyObjects(childPath, schema.items, defs, false, rootSchemaWrapper);
+      identifyObjects(childPath, schema.items, defs, false, rootSchema);
     }
   }
 
@@ -117,7 +115,7 @@ export function identifyObjects(
     for (const [index, value] of schema.oneOf.entries()) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'oneOf', index];
-        identifyObjects(childPath, value, defs, false, rootSchemaWrapper);
+        identifyObjects(childPath, value, defs, false, rootSchema);
       }
     }
   }
@@ -125,7 +123,7 @@ export function identifyObjects(
     for (const [index, value] of schema.anyOf.entries()) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'anyOf', index];
-        identifyObjects(childPath, value, defs, false, rootSchemaWrapper);
+        identifyObjects(childPath, value, defs, false, rootSchema);
       }
     }
   }
@@ -133,23 +131,23 @@ export function identifyObjects(
     for (const [index, value] of schema.allOf.entries()) {
       if (typeof value === 'object') {
         const childPath = [...currentPath, 'allOf', index];
-        identifyObjects(childPath, value, defs, false, rootSchemaWrapper);
+        identifyObjects(childPath, value, defs, false, rootSchema);
       }
     }
   }
   if (schema.if) {
     if (typeof schema.if === 'object') {
-      identifyObjects([...currentPath, 'if'], schema.if, defs, false, rootSchemaWrapper);
+      identifyObjects([...currentPath, 'if'], schema.if, defs, false, rootSchema);
     }
   }
   if (schema.then) {
     if (typeof schema.then === 'object') {
-      identifyObjects([...currentPath, 'then'], schema.then, defs, false, rootSchemaWrapper);
+      identifyObjects([...currentPath, 'then'], schema.then, defs, false, rootSchema);
     }
   }
   if (schema.else) {
     if (typeof schema.else === 'object') {
-      identifyObjects([...currentPath, 'else'], schema.else, defs, false, rootSchemaWrapper);
+      identifyObjects([...currentPath, 'else'], schema.else, defs, false, rootSchema);
     }
   }
   if (schema.additionalProperties) {
@@ -159,7 +157,7 @@ export function identifyObjects(
         schema.additionalProperties,
         defs,
         false,
-          rootSchemaWrapper
+          rootSchema
       );
     }
   }
@@ -169,11 +167,11 @@ function generateInitialNode(
   path: Path,
   hasUserDefinedName: boolean,
   schema: JsonSchemaObjectType,
-  rootSchemaWrapper: TopLevelJsonSchemaWrapper
+  rootSchema: TopLevelSchema
 ): SchemaElementData {
   if (!isEnumSchema(schema)) {
     return new SchemaObjectNodeData(
-      generateObjectTitle(path, hasUserDefinedName, schema, rootSchemaWrapper),
+      generateObjectTitle(path, hasUserDefinedName, schema, rootSchema),
       hasUserDefinedName,
       path,
       schema,
@@ -181,7 +179,7 @@ function generateInitialNode(
     );
   } else {
     return new SchemaEnumNodeData(
-      generateObjectTitle(path, hasUserDefinedName, schema, rootSchemaWrapper),
+      generateObjectTitle(path, hasUserDefinedName, schema, rootSchema),
       hasUserDefinedName,
       path,
       schema,
@@ -194,7 +192,7 @@ export function generateObjectTitle(
   path: Path,
   hasUserDefinedName: boolean,
   schema: JsonSchemaObjectType,
-  rootSchemaWrapper: TopLevelJsonSchemaWrapper
+  rootSchema: TopLevelSchema
 ): string {
   // if schema has a title, use it as the name
   if (schema.title && !hasUserDefinedName) {
@@ -207,9 +205,10 @@ export function generateObjectTitle(
 
   // if object is definition for items in an array, use the array name
     if (path.length >= 2 && path[path.length - 1] == 'items') {
-        const parentSchema = rootSchemaWrapper.subSchemaAt(path.slice(0, path.length - 1));
-        if (parentSchema?.hasType('array')) {
-          const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName, parentSchema, rootSchemaWrapper);
+        const parentSchema = dataAt(path.slice(0, path.length - 1), rootSchema);
+        const parentSchemaType = parentSchema?.type || 'array';
+        if (parentSchemaType === 'array' || parentSchemaType.includes('array') || parentSchemaType.length === 0) {
+          const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName, parentSchema, rootSchema);
         return titleOfParent + ' entry';
         }
     }
@@ -222,9 +221,9 @@ export function generateObjectTitle(
 
   // if last element in path is not a string (e.g. an array index), use an array format for the title, based on the parent if possible
   if (path.length >= 2) {
-    const parentSchema = rootSchemaWrapper.subSchemaAt(path.slice(0, path.length - 1));
+    const parentSchema = dataAt(path.slice(0, path.length - 1), rootSchema);
     if (parentSchema) {
-      const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName, parentSchema, rootSchemaWrapper);
+      const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName, parentSchema, rootSchema);
       return titleOfParent + '[' + lastElement + ']';
     }
   }
