@@ -68,7 +68,7 @@ describe('test schema graph constructor with objects and attributes, without adv
     currentPath = [];
     defs = new Map();
 
-    identifyObjects(currentPath, schema, defs, false);
+    identifyObjects(currentPath, schema, defs, false, schema);
     // @ts-ignore
     identifyObjects(['$defs', 'person'], schema.$defs.person, defs);
   });
@@ -165,7 +165,12 @@ describe('test schema graph constructor with objects and attributes, without adv
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)
+      generateObjectTitle(
+        rootNode.absolutePath,
+        rootNode.hasUserDefinedName,
+        rootNode.schema,
+        schema
+      )
     ).toEqual('root');
 
     const propComplex = defs.get('properties.propertyObject')!;
@@ -173,7 +178,8 @@ describe('test schema graph constructor with objects and attributes, without adv
       generateObjectTitle(
         propComplex.absolutePath,
         propComplex.hasUserDefinedName,
-        propComplex.schema
+        propComplex.schema,
+        schema
       )
     ).toEqual('propertyObject');
 
@@ -182,13 +188,14 @@ describe('test schema graph constructor with objects and attributes, without adv
       generateObjectTitle(
         propComplexWithTitle.absolutePath,
         propComplexWithTitle.hasUserDefinedName,
-        propComplexWithTitle.schema
+        propComplexWithTitle.schema,
+        schema
       )
     ).toEqual('propertyObjectWithTitle');
 
     const person = defs.get('$defs.person')!;
     expect(
-      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)
+      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema, schema)
     ).toEqual('person');
 
     const personAddress = defs.get('$defs.person.properties.address')!;
@@ -196,7 +203,8 @@ describe('test schema graph constructor with objects and attributes, without adv
       generateObjectTitle(
         personAddress.absolutePath,
         personAddress.hasUserDefinedName,
-        personAddress.schema
+        personAddress.schema,
+        schema
       )
     ).toEqual('address');
   });

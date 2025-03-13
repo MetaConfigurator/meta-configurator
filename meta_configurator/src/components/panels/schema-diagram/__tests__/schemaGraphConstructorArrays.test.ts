@@ -198,7 +198,12 @@ describe('test schema graph constructor with objects and attributes, without adv
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)
+      generateObjectTitle(
+        rootNode.absolutePath,
+        rootNode.hasUserDefinedName,
+        rootNode.schema,
+        schema
+      )
     ).toEqual('root');
 
     const propArrayComplexItem = defs.get('properties.propertyArrayToComplex.items')!;
@@ -206,31 +211,34 @@ describe('test schema graph constructor with objects and attributes, without adv
       generateObjectTitle(
         propArrayComplexItem.absolutePath,
         propArrayComplexItem.hasUserDefinedName,
-        propArrayComplexItem.schema
+        propArrayComplexItem.schema,
+        schema
       )
-    ).toEqual('items');
+    ).toEqual('propertyArrayToComplex entry');
 
     const defsArrayPropItem = defs.get('$defs.arrayObjectProperty.items')!;
     expect(
       generateObjectTitle(
         defsArrayPropItem.absolutePath,
         defsArrayPropItem.hasUserDefinedName,
-        defsArrayPropItem.schema
+        defsArrayPropItem.schema,
+        schema
       )
-    ).toEqual('items');
+    ).toEqual('arrayObjectProperty entry');
 
     const defsArrayObjectPropItem = defs.get('$defs.arrayObjectProperty.items')!;
     expect(
       generateObjectTitle(
         defsArrayObjectPropItem.absolutePath,
         defsArrayObjectPropItem.hasUserDefinedName,
-        defsArrayObjectPropItem.schema
+        defsArrayObjectPropItem.schema,
+        schema
       )
-    ).toEqual('items');
+    ).toEqual('arrayObjectProperty entry');
 
     const person = defs.get('$defs.person')!;
     expect(
-      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)
+      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema, schema)
     ).toEqual('person');
   });
 

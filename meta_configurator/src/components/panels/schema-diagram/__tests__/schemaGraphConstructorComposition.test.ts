@@ -118,10 +118,10 @@ describe('test schema graph constructor with objects and compositional keywords'
     currentPath = [];
     defs = new Map();
 
-    identifyObjects(currentPath, schema, defs, false);
+    identifyObjects(currentPath, schema, defs, false, schema);
     // @ts-ignore
     for (const [key, value] of Object.entries(schema.$defs)) {
-      identifyObjects(['$defs', key], value, defs, true);
+      identifyObjects(['$defs', key], value, defs, true, schema);
     }
   });
 
@@ -196,22 +196,32 @@ describe('test schema graph constructor with objects and compositional keywords'
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema)
+      generateObjectTitle(
+        rootNode.absolutePath,
+        rootNode.hasUserDefinedName,
+        rootNode.schema,
+        schema
+      )
     ).toEqual('root');
 
     const person = defs.get('$defs.person')!;
     expect(
-      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema)
+      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema, schema)
     ).toEqual('person');
 
     const animal = defs.get('$defs.animal')!;
     expect(
-      generateObjectTitle(animal.absolutePath, animal.hasUserDefinedName, animal.schema)
+      generateObjectTitle(animal.absolutePath, animal.hasUserDefinedName, animal.schema, schema)
     ).toEqual('animal');
 
     const researcher = defs.get('$defs.researcher')!;
     expect(
-      generateObjectTitle(researcher.absolutePath, researcher.hasUserDefinedName, researcher.schema)
+      generateObjectTitle(
+        researcher.absolutePath,
+        researcher.hasUserDefinedName,
+        researcher.schema,
+        schema
+      )
     ).toEqual('researcher');
 
     const livingBeing = defs.get('$defs.livingBeing')!;
@@ -219,7 +229,8 @@ describe('test schema graph constructor with objects and compositional keywords'
       generateObjectTitle(
         livingBeing.absolutePath,
         livingBeing.hasUserDefinedName,
-        livingBeing.schema
+        livingBeing.schema,
+        schema
       )
     ).toEqual('livingBeing');
 
@@ -228,7 +239,8 @@ describe('test schema graph constructor with objects and compositional keywords'
       generateObjectTitle(
         compositionalWithoutObjectType.absolutePath,
         compositionalWithoutObjectType.hasUserDefinedName,
-        compositionalWithoutObjectType.schema
+        compositionalWithoutObjectType.schema,
+        schema
       )
     ).toEqual('compositionalWithoutObjectType');
 
@@ -237,26 +249,27 @@ describe('test schema graph constructor with objects and compositional keywords'
       generateObjectTitle(
         inlineCompositional.absolutePath,
         inlineCompositional.hasUserDefinedName,
-        inlineCompositional.schema
+        inlineCompositional.schema,
+        schema
       )
-    ).toEqual('items');
+    ).toEqual('propertyArrayInlineCompositional entry');
 
     const allOf1 = defs.get('allOf[1]')!;
     // allOf element at index 1 has no title, so we use the index as title
     expect(
-      generateObjectTitle(allOf1.absolutePath, allOf1.hasUserDefinedName, allOf1.schema)
+      generateObjectTitle(allOf1.absolutePath, allOf1.hasUserDefinedName, allOf1.schema, schema)
     ).toEqual('allOf[1]');
 
     const oneOf1 = defs.get('oneOf[1]')!;
     // oneOf element at index 1 has a title, so we use it
     expect(
-      generateObjectTitle(oneOf1.absolutePath, allOf1.hasUserDefinedName, oneOf1.schema)
+      generateObjectTitle(oneOf1.absolutePath, allOf1.hasUserDefinedName, oneOf1.schema, schema)
     ).toEqual('Farmer');
   });
 
   it('generate special property edges', () => {
     for (const node of defs.values()) {
-      node.attributes = generateObjectAttributes(node.absolutePath, node.schema, defs);
+      node.attributes = generateObjectAttributes(node.absolutePath, node.schema, defs, schema);
     }
 
     const graph = new SchemaGraph([], []);
