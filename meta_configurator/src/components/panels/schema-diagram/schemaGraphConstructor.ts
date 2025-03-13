@@ -14,7 +14,7 @@ import {getTypeDescription} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
-import {dataAt} from "@/utility/resolveDataAtPath";
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 const settings = useSettings();
 
@@ -54,7 +54,6 @@ export function populateGraph(
 }
 
 export function identifyAllObjects(rootSchema: TopLevelSchema): Map<string, SchemaObjectNodeData> {
-
   const objectDefs = new Map<string, SchemaObjectNodeData>();
   identifyObjects([], rootSchema, objectDefs, false, rootSchema);
 
@@ -86,7 +85,10 @@ export function identifyObjects(
   // It can be that simple types, such as strings with enum constraint, have their own definition.
   // We allow generating a node for this, so it can be referred to by other objects.
   // But we do not visualize those nodes for simple types.
-  defs.set(pathToString(currentPath), generateInitialNode(currentPath, hasUserDefinedName, schema, rootSchema));
+  defs.set(
+    pathToString(currentPath),
+    generateInitialNode(currentPath, hasUserDefinedName, schema, rootSchema)
+  );
 
   if (schema.properties) {
     for (const [key, value] of Object.entries(schema.properties)) {
@@ -157,7 +159,7 @@ export function identifyObjects(
         schema.additionalProperties,
         defs,
         false,
-          rootSchema
+        rootSchema
       );
     }
   }
@@ -198,22 +200,31 @@ export function generateObjectTitle(
   if (schema.title && !hasUserDefinedName) {
     return schema.title;
   }
-    // if path is empty, we are at the root
+  // if path is empty, we are at the root
   if (path.length == 0) {
     return 'root';
   }
 
   // if object is definition for items in an array, use the array name
-    if (path.length >= 2 && path[path.length - 1] == 'items') {
-        const parentSchema = dataAt(path.slice(0, path.length - 1), rootSchema);
-        const parentSchemaType = parentSchema?.type || 'array';
-        if (parentSchemaType === 'array' || parentSchemaType.includes('array') || parentSchemaType.length === 0) {
-          const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName, parentSchema, rootSchema);
-        return titleOfParent + ' entry';
-        }
+  if (path.length >= 2 && path[path.length - 1] == 'items') {
+    const parentSchema = dataAt(path.slice(0, path.length - 1), rootSchema);
+    const parentSchemaType = parentSchema?.type || 'array';
+    if (
+      parentSchemaType === 'array' ||
+      parentSchemaType.includes('array') ||
+      parentSchemaType.length === 0
+    ) {
+      const titleOfParent = generateObjectTitle(
+        path.slice(0, path.length - 1),
+        hasUserDefinedName,
+        parentSchema,
+        rootSchema
+      );
+      return titleOfParent + ' entry';
     }
+  }
 
-    // if object is definition for properties in an object, use the object name
+  // if object is definition for properties in an object, use the object name
   const lastElement = path[path.length - 1];
   if (typeof lastElement === 'string') {
     return lastElement;
@@ -223,13 +234,17 @@ export function generateObjectTitle(
   if (path.length >= 2) {
     const parentSchema = dataAt(path.slice(0, path.length - 1), rootSchema);
     if (parentSchema) {
-      const titleOfParent = generateObjectTitle(path.slice(0, path.length - 1), hasUserDefinedName, parentSchema, rootSchema);
+      const titleOfParent = generateObjectTitle(
+        path.slice(0, path.length - 1),
+        hasUserDefinedName,
+        parentSchema,
+        rootSchema
+      );
       return titleOfParent + '[' + lastElement + ']';
     }
   }
 
-    return 'element[' + lastElement + ']';
-
+  return 'element[' + lastElement + ']';
 }
 
 export function generateObjectAttributes(
@@ -671,6 +686,4 @@ function isNodeConnectedByEdge(node: SchemaElementData, graph: SchemaGraph): boo
   return graph.edges.find(edge => edge.start == node || edge.end == node) !== undefined;
 }
 
-function getSubSchema(rootSchema: TopLevelSchema, path: Path) {
-
-}
+function getSubSchema(rootSchema: TopLevelSchema, path: Path) {}

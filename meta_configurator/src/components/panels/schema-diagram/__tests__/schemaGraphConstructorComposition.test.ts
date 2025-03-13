@@ -196,7 +196,12 @@ describe('test schema graph constructor with objects and compositional keywords'
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema, schema)
+      generateObjectTitle(
+        rootNode.absolutePath,
+        rootNode.hasUserDefinedName,
+        rootNode.schema,
+        schema
+      )
     ).toEqual('root');
 
     const person = defs.get('$defs.person')!;
@@ -211,7 +216,12 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     const researcher = defs.get('$defs.researcher')!;
     expect(
-      generateObjectTitle(researcher.absolutePath, researcher.hasUserDefinedName, researcher.schema, schema)
+      generateObjectTitle(
+        researcher.absolutePath,
+        researcher.hasUserDefinedName,
+        researcher.schema,
+        schema
+      )
     ).toEqual('researcher');
 
     const livingBeing = defs.get('$defs.livingBeing')!;
@@ -220,7 +230,7 @@ describe('test schema graph constructor with objects and compositional keywords'
         livingBeing.absolutePath,
         livingBeing.hasUserDefinedName,
         livingBeing.schema,
-          schema
+        schema
       )
     ).toEqual('livingBeing');
 
@@ -230,7 +240,7 @@ describe('test schema graph constructor with objects and compositional keywords'
         compositionalWithoutObjectType.absolutePath,
         compositionalWithoutObjectType.hasUserDefinedName,
         compositionalWithoutObjectType.schema,
-          schema
+        schema
       )
     ).toEqual('compositionalWithoutObjectType');
 
@@ -240,7 +250,7 @@ describe('test schema graph constructor with objects and compositional keywords'
         inlineCompositional.absolutePath,
         inlineCompositional.hasUserDefinedName,
         inlineCompositional.schema,
-          schema
+        schema
       )
     ).toEqual('propertyArrayInlineCompositional entry');
 

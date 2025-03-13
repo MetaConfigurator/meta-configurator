@@ -125,7 +125,12 @@ describe('test schema graph constructor with conditionals', () => {
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema, schema)
+      generateObjectTitle(
+        rootNode.absolutePath,
+        rootNode.hasUserDefinedName,
+        rootNode.schema,
+        schema
+      )
     ).toEqual('root');
 
     const propComplex = defs.get('properties.propertyObject')!;
@@ -134,18 +139,28 @@ describe('test schema graph constructor with conditionals', () => {
         propComplex.absolutePath,
         propComplex.hasUserDefinedName,
         propComplex.schema,
-          schema
+        schema
       )
     ).toEqual('propertyObject');
 
     const researcher = defs.get('$defs.researcher')!;
     expect(
-      generateObjectTitle(researcher.absolutePath, researcher.hasUserDefinedName, researcher.schema, schema)
+      generateObjectTitle(
+        researcher.absolutePath,
+        researcher.hasUserDefinedName,
+        researcher.schema,
+        schema
+      )
     ).toEqual('researcher');
 
     const thenNode = defs.get('then')!;
     expect(
-      generateObjectTitle(thenNode.absolutePath, thenNode.hasUserDefinedName, thenNode.schema, schema)
+      generateObjectTitle(
+        thenNode.absolutePath,
+        thenNode.hasUserDefinedName,
+        thenNode.schema,
+        schema
+      )
     ).toEqual('then');
 
     const thenNodeObject = defs.get('then.properties.propertyObject')!;
@@ -154,7 +169,7 @@ describe('test schema graph constructor with conditionals', () => {
         thenNodeObject.absolutePath,
         thenNodeObject.hasUserDefinedName,
         thenNodeObject.schema,
-          schema
+        schema
       )
     ).toEqual('propertyObject');
   });

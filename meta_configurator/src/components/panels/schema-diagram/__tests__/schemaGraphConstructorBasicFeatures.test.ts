@@ -165,7 +165,12 @@ describe('test schema graph constructor with objects and attributes, without adv
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(rootNode.absolutePath, rootNode.hasUserDefinedName, rootNode.schema, schema)
+      generateObjectTitle(
+        rootNode.absolutePath,
+        rootNode.hasUserDefinedName,
+        rootNode.schema,
+        schema
+      )
     ).toEqual('root');
 
     const propComplex = defs.get('properties.propertyObject')!;
@@ -174,7 +179,7 @@ describe('test schema graph constructor with objects and attributes, without adv
         propComplex.absolutePath,
         propComplex.hasUserDefinedName,
         propComplex.schema,
-          schema
+        schema
       )
     ).toEqual('propertyObject');
 
@@ -184,7 +189,7 @@ describe('test schema graph constructor with objects and attributes, without adv
         propComplexWithTitle.absolutePath,
         propComplexWithTitle.hasUserDefinedName,
         propComplexWithTitle.schema,
-          schema
+        schema
       )
     ).toEqual('propertyObjectWithTitle');
 
@@ -199,7 +204,7 @@ describe('test schema graph constructor with objects and attributes, without adv
         personAddress.absolutePath,
         personAddress.hasUserDefinedName,
         personAddress.schema,
-          schema
+        schema
       )
     ).toEqual('address');
   });
