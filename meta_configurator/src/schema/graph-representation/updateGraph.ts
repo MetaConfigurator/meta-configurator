@@ -1,8 +1,8 @@
 import {
   type Node,
   SchemaObjectNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
-import {isSimpleType} from '@/components/panels/schema-diagram/typeUtils';
+} from '@/schema/graph-representation/schemaGraphTypes'
+import {isSimpleType} from '@/schema/graph-representation/typeUtils';
 
 // updates the data of the old nodes with the data of the new nodes and returns the ids of the nodes to be removed
 export function updateNodeData(oldNodes: Node[], newNodes: Node[]): string[] {

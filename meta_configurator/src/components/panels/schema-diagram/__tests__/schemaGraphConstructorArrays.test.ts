@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaDiagramTypes';
+import {EdgeType, SchemaDiagramGraph, SchemaObjectNodeData} from '../schemaDiagramTypes';
 import {
   generateAttributeEdges,
   generateObjectAttributes,
@@ -247,7 +247,7 @@ describe('test schema graph constructor with objects and attributes, without adv
       node.attributes = generateObjectAttributes(node.absolutePath, node.schema, defs);
     }
 
-    const graph = new SchemaGraph([], []);
+    const graph = new SchemaDiagramGraph([], []);
 
     const rootNode = defs.get('')!;
     generateAttributeEdges(rootNode, defs, graph);

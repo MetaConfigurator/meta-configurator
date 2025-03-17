@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {Path} from '@/utility/path';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaDiagramTypes';
+import {EdgeType, SchemaDiagramGraph, SchemaObjectNodeData} from '../schemaDiagramTypes';
 import {
   generateAttributeEdges,
   generateObjectAttributes,
@@ -272,7 +272,7 @@ describe('test schema graph constructor with objects and compositional keywords'
       node.attributes = generateObjectAttributes(node.absolutePath, node.schema, defs, schema);
     }
 
-    const graph = new SchemaGraph([], []);
+    const graph = new SchemaDiagramGraph([], []);
 
     for (const node of defs.values()) {
       if (isObjectSchema(node.schema)) {

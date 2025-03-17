@@ -2,7 +2,7 @@
 import {
   SchemaElementData,
   SchemaObjectAttributeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+} from '@/schema/graph-representation/schemaGraphTypes'
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {type Ref, ref, watch} from 'vue';
@@ -11,7 +11,7 @@ import Select from 'primevue/select';
 import {
   type AttributeTypeChoice,
   determineTypeChoiceBySchema,
-} from '@/components/panels/schema-diagram/typeUtils';
+} from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useSettings} from '@/settings/useSettings';

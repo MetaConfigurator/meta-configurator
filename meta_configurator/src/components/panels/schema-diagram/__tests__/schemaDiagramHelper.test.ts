@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {SchemaGraph} from '../schemaDiagramTypes';
+import {SchemaDiagramGraph} from '../schemaDiagramTypes';
 import {constructSchemaGraph} from '../schemaGraphConstructor';
 import {findBestMatchingNode} from '../schemaDiagramHelper';
 import {ref} from 'vue';
@@ -23,7 +23,7 @@ vi.mock('@/dataformats/formatRegistry', () => ({
 }));
 
 describe('test schema graph constructor with objects and attributes with enums', () => {
-  let graph: SchemaGraph;
+  let graph: SchemaDiagramGraph;
   let schema: TopLevelSchema = {
     type: 'object',
     $defs: {

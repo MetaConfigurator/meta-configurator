@@ -56,3 +56,11 @@ export function findAvailableSchemaId(schemaData: ManagedData, path: Path, prefi
   }
   throw Error('Could not find available id, tried until ' + prefix + num + '.');
 }
+
+export function isSubSchemaDefinedInDefinitions(absolutePath: Path) {
+  if (absolutePath.length < 2) {
+    return false;
+  }
+  const parentKey = absolutePath[absolutePath.length - 2];
+  return parentKey === '$defs' || parentKey === 'definitions';
+}

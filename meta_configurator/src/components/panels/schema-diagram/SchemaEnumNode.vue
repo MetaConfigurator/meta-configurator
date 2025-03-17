@@ -2,7 +2,7 @@
 import {
   SchemaElementData,
   SchemaEnumNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+} from '@/schema/graph-representation/schemaGraphTypes'
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
@@ -10,6 +10,7 @@ import {type Ref, ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {isSubSchemaDefinedInDefinitions} from "@/schema/schemaReadingUtils";
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -40,11 +41,7 @@ function isEnumEditable() {
 }
 
 function isDefinedInDefinitions() {
-  if (props.data.absolutePath.length < 2) {
-    return false;
-  }
-  const parentKey = props.data.absolutePath[props.data.absolutePath.length - 2];
-  return parentKey === '$defs' || parentKey === 'definitions';
+  return isSubSchemaDefinedInDefinitions(props.data.absolutePath);
 }
 
 function isHighlighted() {

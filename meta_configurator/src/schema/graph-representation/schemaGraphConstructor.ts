@@ -1,20 +1,16 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
-import {
-  EdgeData,
-  EdgeType,
-  SchemaEnumNodeData,
-  SchemaGraph,
-  SchemaElementData,
-  SchemaObjectAttributeData,
-  SchemaObjectNodeData,
-  SchemaNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 import {getTypeDescription} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import {dataAt} from '@/utility/resolveDataAtPath';
+import {
+  EdgeData, EdgeType,
+  SchemaElementData,
+  SchemaEnumNodeData, SchemaGraph, SchemaNodeData, SchemaObjectAttributeData,
+  SchemaObjectNodeData
+} from "@/schema/graph-representation/schemaGraphTypes";
 
 const settings = useSettings();
 

@@ -3,7 +3,19 @@ import {pathToJsonPointer} from "@/utility/pathUtils";
 import type {Path} from "@/utility/path";
 import {findAvailableSchemaId} from "@/schema/schemaReadingUtils";
 import type {ManagedData} from "@/data/managedData";
+import type {TopLevelSchema} from "@/schema/jsonSchemaType";
+import {getDataForMode, getSchemaForMode} from "@/data/useDataLink";
+import {SessionMode} from "@/store/sessionMode";
+import {constructSchemaGraph} from "@/schema/graph-representation/schemaGraphConstructor";
 
+
+export function extractAllInlinedSchemaElements() {
+    const schemaData = getDataForMode(SessionMode.SchemaEditor);
+    const dataSchema = getSchemaForMode(SessionMode.DataEditor);
+    const schemaPreprocessed = dataSchema.schemaPreprocessed.value;
+
+    const graph = constructSchemaGraph(schemaPreprocessed)
+}
 
 export function extractInlinedSchemaElement(absoluteElementPath: Path, schemaData: ManagedData, elementName: string): Path {
     const dataAtPath = dataAt(absoluteElementPath, schemaData.data.value);

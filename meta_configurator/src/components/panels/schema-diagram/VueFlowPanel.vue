@@ -5,7 +5,7 @@ import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import {getNodesInside, useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
-import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGraphConstructor';
+import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphConstructor';
 import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
@@ -16,19 +16,19 @@ import {
   SchemaNodeData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
-import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+    SchemaElementData
+} from '@/schema/graph-representation/schemaGraphTypes'
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
 import {
   findBestMatchingData,
   findBestMatchingNode,
-} from '@/components/panels/schema-diagram/schemaDiagramHelper';
-import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
+} from '@/schema/graph-representation/graphUtils';
+import {findForwardConnectedNodesAndEdges} from '@/schema/graph-representation/findConnectedNodes';
 import {
   updateNodeData,
   wasNodeAddedOrEdgesChanged,
-} from '@/components/panels/schema-diagram/updateGraph';
+} from '@/schema/graph-representation/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
@@ -36,10 +36,11 @@ import {
   applyNewType,
   type AttributeTypeChoice,
   collectTypeChoices,
-} from '@/components/panels/schema-diagram/typeUtils';
+} from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
 import {findAvailableSchemaId} from "@/schema/schemaReadingUtils";
 import {addSchemaEnum, addSchemaObject, extractInlinedSchemaElement} from "@/schema/schemaManipulationUtils";
+import {schemaGraphToVueFlowGraph} from "@/components/panels/schema-diagram/schemaDiagramTypes";
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -169,7 +170,7 @@ function updateGraph(forceRebuild: boolean = false) {
   const graph = constructSchemaGraph(schema);
   let graphNeedsLayouting = forceRebuild;
 
-  const vueFlowGraph = graph.toVueFlowGraph(settings.value.schemaDiagram.vertical);
+  const vueFlowGraph = schemaGraphToVueFlowGraph(graph, settings.value.schemaDiagram.vertical);
   if (wasNodeAddedOrEdgesChanged(activeNodes.value, vueFlowGraph.nodes)) {
     // node was added -> it is needed to update whole graph
     activeNodes.value = vueFlowGraph.nodes;
