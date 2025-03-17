@@ -9,24 +9,23 @@ const showDialog = ref(false);
 // files can be either a JSON/XML/YAML document or the URL to such a file
 // start with two example JSON documents
 const inputFiles: Ref<string[]> = ref([
-    "{\n" +
-    "  \"diet\": \"carnivore\",\n" +
-    "  \"name\": \"Wolf\",\n" +
-    "  \"habitat\": \"forest\",\n" +
-    "  \"prey\": \"Deer\"\n" +
-    "}",
-    "{\n" +
-    "  \"diet\": \"herbivore\",\n" +
-    "  \"name\": \"Cow\",\n" +
-    "  \"habitat\": \"grassland\",\n" +
-    "  \"plants\": [\n" +
-    "    \"Grass\",\n" +
-    "    \"Hay\",\n" +
-    "    \"Corn\"\n" +
-    "  ]\n" +
-    "}"
+  '{\n' +
+    '  "diet": "carnivore",\n' +
+    '  "name": "Wolf",\n' +
+    '  "habitat": "forest",\n' +
+    '  "prey": "Deer"\n' +
+    '}',
+  '{\n' +
+    '  "diet": "herbivore",\n' +
+    '  "name": "Cow",\n' +
+    '  "habitat": "grassland",\n' +
+    '  "plants": [\n' +
+    '    "Grass",\n' +
+    '    "Hay",\n' +
+    '    "Corn"\n' +
+    '  ]\n' +
+    '}',
 ]);
-
 
 function openDialog() {
   showDialog.value = true;
@@ -37,7 +36,6 @@ function hideDialog() {
 }
 
 function requestInferSchema() {
-
   const schema = inferSchema(inputFiles.value);
   if (schema) {
     infoString.value = 'Schema successfully inferred';
@@ -48,7 +46,6 @@ function requestInferSchema() {
     infoString.value = '';
     resultSchema.value = '';
   }
-
 }
 
 defineExpose({show: openDialog, close: hideDialog});
@@ -56,9 +53,7 @@ defineExpose({show: openDialog, close: hideDialog});
 
 <template>
   <Dialog v-model:visible="showDialog" header="Infer Schema From Multiple Files">
-    <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-
-    </div>
+    <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content"></div>
   </Dialog>
 </template>
 <style scoped>
