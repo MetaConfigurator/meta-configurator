@@ -19,6 +19,11 @@ export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeCh
       },
     });
 
+    if (type === 'null') {
+      // no need for a null array
+        return;
+    }
+
     // push simple type in array
     result.push({
       label: type + '[]',
