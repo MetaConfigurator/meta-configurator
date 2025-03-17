@@ -17,7 +17,7 @@ export function extractInlinedSchemaElement(absoluteElementPath: Path, schemaDat
 }
 
 
-export function addSchemaObject(schemaData: ManagedData, connectWithRoot: boolean) {
+export function addSchemaObject(schemaData: ManagedData) {
     const rawData = schemaData.data.value;
 
     // set type of root element to object if not done yet
@@ -35,15 +35,13 @@ export function addSchemaObject(schemaData: ManagedData, connectWithRoot: boolea
         },
     });
 
-    if (connectWithRoot) {
-        // make connection from root element to new object
-        const objectName = objectPath[objectPath.length - 1];
-        if (rawData.properties === undefined || objectName! in rawData.properties) {
+        // make connection from root element to new object if root has no properties yet
+        if (rawData.properties === undefined) {
+            const objectName = objectPath[objectPath.length - 1];
             const referenceToNewObject = '#' + pathToJsonPointer(objectPath);
             schemaData.setDataAt(['properties', objectName], {
                 $ref: referenceToNewObject,
             });
-        }
     }
 
     return objectPath;

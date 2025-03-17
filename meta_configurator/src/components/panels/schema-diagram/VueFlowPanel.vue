@@ -328,7 +328,7 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
 }
 
 function addObject() {
-  const objectPath = addSchemaObject(schemaData, true);
+  const objectPath = addSchemaObject(schemaData);
   selectElement(objectPath);
 }
 
