@@ -3,18 +3,14 @@ import {pathToJsonPointer} from "@/utility/pathUtils";
 import type {Path} from "@/utility/path";
 import {findAvailableSchemaId, isSubSchemaDefinedInDefinitions} from "@/schema/schemaReadingUtils";
 import type {ManagedData} from "@/data/managedData";
-import {getDataForMode, getSchemaForMode} from "@/data/useDataLink";
-import {SessionMode} from "@/store/sessionMode";
 import {constructSchemaGraph} from "@/schema/graph-representation/schemaGraphConstructor";
 import type {SchemaNodeData} from "@/schema/graph-representation/schemaGraphTypes";
+import type {ManagedJsonSchema} from "@/data/managedJsonSchema";
 
 
-export function extractAllInlinedSchemaElements(extractRootElement: boolean, extractEnums: boolean): number {
-    const schemaData = getDataForMode(SessionMode.SchemaEditor);
-    const dataSchema = getSchemaForMode(SessionMode.DataEditor);
-    const schemaPreprocessed = dataSchema.schemaPreprocessed.value;
 
-    const graph = constructSchemaGraph(schemaPreprocessed)
+export function extractAllInlinedSchemaElements(schemaData: ManagedData, schema: ManagedJsonSchema, extractRootElement: boolean, extractEnums: boolean): number {
+    const graph = constructSchemaGraph(schema.schemaPreprocessed.value)
     // filter by nodes which are inlined and an object node
     const nodedFiltered = graph.nodes.filter(
         node => !isSubSchemaDefinedInDefinitions(node.absolutePath) && (extractRootElement || node.absolutePath.length > 1) && (extractEnums && node.getNodeType() == "schemaenum" || node.getNodeType() == "schemaobject")
