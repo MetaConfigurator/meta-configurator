@@ -1,20 +1,42 @@
 import {dataAt} from "@/utility/resolveDataAtPath";
 import {pathToJsonPointer} from "@/utility/pathUtils";
 import type {Path} from "@/utility/path";
-import {findAvailableSchemaId} from "@/schema/schemaReadingUtils";
+import {findAvailableSchemaId, isSubSchemaDefinedInDefinitions} from "@/schema/schemaReadingUtils";
 import type {ManagedData} from "@/data/managedData";
-import type {TopLevelSchema} from "@/schema/jsonSchemaType";
 import {getDataForMode, getSchemaForMode} from "@/data/useDataLink";
 import {SessionMode} from "@/store/sessionMode";
 import {constructSchemaGraph} from "@/schema/graph-representation/schemaGraphConstructor";
+import type {SchemaNodeData} from "@/schema/graph-representation/schemaGraphTypes";
 
 
-export function extractAllInlinedSchemaElements() {
+export function extractAllInlinedSchemaElements(extractRootElement: boolean, extractEnums: boolean): number {
     const schemaData = getDataForMode(SessionMode.SchemaEditor);
     const dataSchema = getSchemaForMode(SessionMode.DataEditor);
     const schemaPreprocessed = dataSchema.schemaPreprocessed.value;
 
     const graph = constructSchemaGraph(schemaPreprocessed)
+    // filter by nodes which are inlined and an object node
+    const nodedFiltered = graph.nodes.filter(
+        node => !isSubSchemaDefinedInDefinitions(node.absolutePath) && (extractRootElement || node.absolutePath.length > 1) && (extractEnums && node.getNodeType() == "schemaenum" || node.getNodeType() == "schemaobject")
+    );
+
+    // sort nodes by path depth, so that we can extract the deepest nodes first, to avoid a node being moved before its children and then not being able to find the children anymore
+    const nodesSorted = sortNodesByPathDepthDescending(nodedFiltered);
+
+    let nodesExtracted = 0;
+
+    nodesSorted.forEach(node => {
+
+            extractInlinedSchemaElement(node.absolutePath, schemaData, node.name);
+            nodesExtracted++;
+
+    })
+
+    return nodesExtracted;
+}
+
+function sortNodesByPathDepthDescending(nodes: SchemaNodeData[]): SchemaNodeData[] {
+    return nodes.sort((a, b) => b.absolutePath.length - a.absolutePath.length);
 }
 
 export function extractInlinedSchemaElement(absoluteElementPath: Path, schemaData: ManagedData, elementName: string): Path {
