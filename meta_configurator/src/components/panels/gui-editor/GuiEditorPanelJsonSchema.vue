@@ -5,10 +5,8 @@ import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue'
 import type {Path} from '@/utility/path';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
-import {dataPathToSchemaPath} from '@/utility/pathUtils';
-import _ from 'lodash';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -49,8 +47,8 @@ const currentSchema = computed(() => {
 </script>
 
 <template>
+  <SchemaInfoPanel :sessionMode="props.sessionMode" />
   <div class="p-5 space-y-3 flex flex-col">
-    <SchemaInfoPanel :sessionMode="props.sessionMode" />
     <CurrentPathBreadcrumb
       :session-mode="props.sessionMode"
       :root-name="'document root'"

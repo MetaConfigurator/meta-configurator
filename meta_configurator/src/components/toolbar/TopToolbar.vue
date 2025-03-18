@@ -35,6 +35,8 @@ import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
+import Select from "primevue/select";
+import {formatRegistry} from "@/dataformats/formatRegistry";
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -46,6 +48,7 @@ const emit = defineEmits<{
 
 const settings = useSettings();
 const selectedSchema = ref<SchemaOption | null>(null);
+const dataFormatOptions = formatRegistry.getFormatNames();
 
 const showFetchedSchemas = ref(false);
 const showAboutDialog = ref(false);
@@ -430,13 +433,19 @@ const showSearchResultsMenu = event => {
         </Menu>
       </div>
 
+
+      <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
+        <Select :options="dataFormatOptions" v-model="settings.dataFormat" size="small"
+                class="custom-select"/>
+      </div>
+
       <!-- search bar -->
-      <span class="p-input-icon-left ml-5" style="width: 20rem">
+      <span class="p-input-icon-left ml-5" style="width: 14rem">
         <i class="pi" style="font-size: 0.9rem" />
         <InputText
           show-clear
           class="h-7 w-full"
-          placeholder="Search for data or properties..."
+          placeholder="Search for data or property"
           v-model="searchTerm"
           @focus="showSearchResultsMenu"
           @blur="() => searchResultMenu.value?.hide()"
@@ -517,5 +526,11 @@ const showSearchResultsMenu = event => {
 
 .highlighted-icon {
   color: var(--p-highlight-color) !important;
+}
+
+.custom-select {
+  height: 1.75rem;
+  line-height: 0.7rem;
+  padding: 0;
 }
 </style>

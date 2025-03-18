@@ -5,6 +5,7 @@ import AccordionTab from 'primevue/accordiontab';
 import type {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
+import Panel from "primevue/panel";
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -37,8 +38,7 @@ const schemaInformation = computed(() => {
 </script>
 
 <template>
-  <Accordion :activeIndex="1">
-    <AccordionTab :header="'GUI Schema: ' + schemaInformation[0].value">
+  <Panel :header="'GUI Editor Schema: ' + schemaInformation[0].value" toggleable :collapsed="true">
       <p v-for="info in schemaInformation" :key="info.title">
         <span class="font-semibold">{{ info.title }}: </span>
         {{ info.value }}
@@ -48,6 +48,5 @@ const schemaInformation = computed(() => {
         class="text-red-700">
         Schema Error: {{ getSessionForMode(props.sessionMode).schemaErrorMessage.value }}
       </p>
-    </AccordionTab>
-  </Accordion>
+  </Panel>
 </template>

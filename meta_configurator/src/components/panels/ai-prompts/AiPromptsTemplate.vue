@@ -297,9 +297,7 @@ function selectRootElement() {
 <template>
   <div class="container">
     <ApiKey />
-    <Divider />
 
-    <label class="heading">AI Prompts</label>
     <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
     <div class="p-5 space-y-3">
       <!-- Create Document Prompt -->
