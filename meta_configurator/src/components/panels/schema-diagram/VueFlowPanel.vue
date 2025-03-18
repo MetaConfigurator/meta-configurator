@@ -5,7 +5,7 @@ import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import {getNodesInside, useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
-import {constructSchemaGraph} from '@/components/panels/schema-diagram/schemaGraphConstructor';
+import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphConstructor';
 import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {useLayout} from './useLayout';
@@ -16,19 +16,16 @@ import {
   SchemaNodeData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
-import {SchemaElementData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+  SchemaElementData,
+} from '@/schema/graph-representation/schemaGraphTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
-import {
-  findBestMatchingData,
-  findBestMatchingNode,
-} from '@/components/panels/schema-diagram/schemaDiagramHelper';
-import {findForwardConnectedNodesAndEdges} from '@/components/panels/schema-diagram/findConnectedNodes';
+import {findBestMatchingData, findBestMatchingNode} from '@/schema/graph-representation/graphUtils';
+import {findForwardConnectedNodesAndEdges} from '@/schema/graph-representation/findConnectedNodes';
 import {
   updateNodeData,
   wasNodeAddedOrEdgesChanged,
-} from '@/components/panels/schema-diagram/updateGraph';
+} from '@/schema/graph-representation/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
@@ -36,10 +33,15 @@ import {
   applyNewType,
   type AttributeTypeChoice,
   collectTypeChoices,
-} from '@/components/panels/schema-diagram/typeUtils';
+} from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
-import {pathToJsonPointer} from '@/utility/pathUtils';
-import {dataAt} from '@/utility/resolveDataAtPath';
+import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
+import {
+  addSchemaEnum,
+  addSchemaObject,
+  extractInlinedSchemaElement,
+} from '@/schema/schemaManipulationUtils';
+import {schemaGraphToVueFlowGraph} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -166,10 +168,10 @@ function areNodesAlreadyWithinViewport(nodes: Node[]) {
 
 function updateGraph(forceRebuild: boolean = false) {
   const schema = dataSchema.schemaPreprocessed.value;
-  const graph = constructSchemaGraph(schema);
+  const graph = constructSchemaGraph(schema, settings.value.schemaDiagram.mergeAllOfs);
   let graphNeedsLayouting = forceRebuild;
 
-  const vueFlowGraph = graph.toVueFlowGraph(settings.value.schemaDiagram.vertical);
+  const vueFlowGraph = schemaGraphToVueFlowGraph(graph, settings.value.schemaDiagram.vertical);
   if (wasNodeAddedOrEdgesChanged(activeNodes.value, vueFlowGraph.nodes)) {
     // node was added -> it is needed to update whole graph
     activeNodes.value = vueFlowGraph.nodes;
@@ -271,14 +273,11 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
 }
 
 function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNodeData) {
-  const oldElementPath = elementData.absolutePath;
-  const dataAtPath = dataAt(oldElementPath, schemaData.data.value);
-  const newElementId = findAvailableId(['$defs'], elementData.name, true);
-  schemaData.setDataAt(newElementId, dataAtPath);
-  const referenceToNewElement = '#' + pathToJsonPointer(newElementId);
-  schemaData.setDataAt(oldElementPath, {
-    $ref: referenceToNewElement,
-  });
+  const newElementId = extractInlinedSchemaElement(
+    elementData.absolutePath,
+    schemaData,
+    elementData.name
+  );
   elementData.absolutePath = newElementId;
   selectElement(newElementId);
 }
@@ -317,7 +316,11 @@ function deleteElement(objectData: SchemaElementData) {
 }
 
 function addAttribute(objectData: SchemaElementData) {
-  const attributePath = findAvailableId([...objectData.absolutePath, 'properties'], 'property');
+  const attributePath = findAvailableSchemaId(
+    schemaData,
+    [...objectData.absolutePath, 'properties'],
+    'property'
+  );
   schemaData.setDataAt(attributePath, {
     type: 'string',
   });
@@ -334,58 +337,13 @@ function updateEnumValues(enumData: SchemaEnumNodeData, newValues: string[]) {
   schemaData.setDataAt(enumData.absolutePath, enumSchema);
 }
 
-function findAvailableId(path: Path, prefix: string, preferWithoutNumber: boolean = false): Path {
-  let num: number = 1;
-  let success = false;
-  while (num <= 100) {
-    const id = num == 1 && preferWithoutNumber ? prefix : prefix + num;
-    const fullPath = [...path, id];
-    success = schemaData.dataAt(fullPath) === undefined;
-    if (success) {
-      return fullPath;
-    } else {
-      num++;
-    }
-  }
-  throw Error('Could not find available id, tried until ' + prefix + num + '.');
-}
-
 function addObject() {
-  const rawData = schemaData.data.value;
-
-  // set type of root element to object if not done yet
-  if (rawData.type !== 'object') {
-    rawData.type = 'object';
-  }
-
-  const objectPath = findAvailableId(['$defs'], 'object');
-  schemaData.setDataAt(objectPath, {
-    type: 'object',
-    properties: {
-      property1: {
-        type: 'string',
-      },
-    },
-  });
-
-  // make connection from root element to new node
-  const objectName = objectPath[objectPath.length - 1];
-  if (rawData.properties === undefined || objectName! in rawData.properties) {
-    const referenceToNewObject = '#' + pathToJsonPointer(objectPath);
-    schemaData.setDataAt(['properties', objectName], {
-      $ref: referenceToNewObject,
-    });
-  }
-
+  const objectPath = addSchemaObject(schemaData);
   selectElement(objectPath);
 }
 
 function addEnum() {
-  const enumPath = findAvailableId(['$defs'], 'enum');
-  schemaData.setDataAt(enumPath, {
-    type: 'string',
-    enum: ['VAL_1', 'VAL_2'],
-  });
+  const enumPath = addSchemaEnum(schemaData);
   selectElement(enumPath);
 }
 

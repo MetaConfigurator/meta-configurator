@@ -3,16 +3,17 @@ import {
   SchemaElementData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+} from '@/schema/graph-representation/schemaGraphTypes';
 import SchemaObjectAttribute from '@/components/panels/schema-diagram/SchemaObjectAttribute.vue';
 import type {Path} from '@/utility/path';
 import InputText from 'primevue/inputtext';
 import {Position, Handle} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
 import {ref} from 'vue';
-import type {AttributeTypeChoice} from '@/components/panels/schema-diagram/typeUtils';
+import type {AttributeTypeChoice} from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
@@ -59,11 +60,7 @@ function isNameEditable() {
 }
 
 function isDefinedInDefinitions() {
-  if (props.data.absolutePath.length < 2) {
-    return false;
-  }
-  const parentKey = props.data.absolutePath[props.data.absolutePath.length - 2];
-  return parentKey === '$defs' || parentKey === 'definitions';
+  return isSubSchemaDefinedInDefinitions(props.data.absolutePath);
 }
 
 function isRootObject() {

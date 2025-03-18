@@ -1,6 +1,6 @@
 import type {JsonSchemaObjectType, SchemaPropertyTypes} from '@/schema/jsonSchemaType';
 import {pathToJsonPointer} from '@/utility/pathUtils';
-import {SchemaNodeData} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import type {Path} from '@/utility/path';
 
 export type AttributeTypeChoice = {label: string; schema: JsonSchemaObjectType};
@@ -18,6 +18,11 @@ export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeCh
         type: type,
       },
     });
+
+    if (type === 'null') {
+      // no need for a null array
+      return;
+    }
 
     // push simple type in array
     result.push({

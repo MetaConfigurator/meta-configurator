@@ -1,25 +1,28 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
-import {
-  EdgeData,
-  EdgeType,
-  SchemaEnumNodeData,
-  SchemaGraph,
-  SchemaElementData,
-  SchemaObjectAttributeData,
-  SchemaObjectNodeData,
-  SchemaNodeData,
-} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import type {Path} from '@/utility/path';
 import {getTypeDescription} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import {dataAt} from '@/utility/resolveDataAtPath';
+import {
+  EdgeData,
+  EdgeType,
+  SchemaElementData,
+  SchemaEnumNodeData,
+  SchemaGraph,
+  SchemaNodeData,
+  SchemaObjectAttributeData,
+  SchemaObjectNodeData,
+} from '@/schema/graph-representation/schemaGraphTypes';
 
 const settings = useSettings();
 
-export function constructSchemaGraph(rootSchema: TopLevelSchema): SchemaGraph {
-  if (settings.value.schemaDiagram.mergeAllOfs) {
+export function constructSchemaGraph(
+  rootSchema: TopLevelSchema,
+  shouldMergeAllOfs: boolean
+): SchemaGraph {
+  if (shouldMergeAllOfs) {
     // duplicate root schema to avoid modifying the original schema
     rootSchema = JSON.parse(JSON.stringify(rootSchema));
 

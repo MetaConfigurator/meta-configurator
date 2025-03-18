@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {SchemaGraph} from '../schemaDiagramTypes';
+import {SchemaGraph} from '../schemaGraphTypes';
 import {identifyAllObjects, populateGraph, trimGraph} from '../schemaGraphConstructor';
 
 vi.mock('@/dataformats/formatRegistry', () => ({

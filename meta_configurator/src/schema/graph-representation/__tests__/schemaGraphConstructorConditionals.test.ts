@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {Path} from '@/utility/path';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaDiagramTypes';
+import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaGraphTypes';
 import {
   generateObjectAttributes,
   generateObjectSpecialPropertyEdges,
