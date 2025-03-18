@@ -5,12 +5,11 @@ import {findAvailableSchemaId, isSubSchemaDefinedInDefinitions} from "@/schema/s
 import type {ManagedData} from "@/data/managedData";
 import {constructSchemaGraph} from "@/schema/graph-representation/schemaGraphConstructor";
 import type {SchemaNodeData} from "@/schema/graph-representation/schemaGraphTypes";
-import type {ManagedJsonSchema} from "@/data/managedJsonSchema";
 
 
 
-export function extractAllInlinedSchemaElements(schemaData: ManagedData, schema: ManagedJsonSchema, extractRootElement: boolean, extractEnums: boolean): number {
-    const graph = constructSchemaGraph(schema.schemaPreprocessed.value)
+export function extractAllInlinedSchemaElements(schemaData: ManagedData, extractRootElement: boolean, extractEnums: boolean): number {
+    const graph = constructSchemaGraph(schemaData.data.value, false)
     // filter by nodes which are inlined and an object node
     const nodedFiltered = graph.nodes.filter(
         node => !isSubSchemaDefinedInDefinitions(node.absolutePath) && (extractRootElement || node.absolutePath.length > 1) && (extractEnums && node.getNodeType() == "schemaenum" || node.getNodeType() == "schemaobject")

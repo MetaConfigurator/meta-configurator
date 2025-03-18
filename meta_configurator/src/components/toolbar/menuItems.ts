@@ -13,6 +13,7 @@ import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
+import {openImportSchemaDialog} from "@/components/toolbar/importFile";
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -119,7 +120,7 @@ export class MenuItems {
   public getSchemaEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
     let result: MenuItem[] = [
       {
-        label: 'New empty Schema',
+        label: 'New Schema...',
         icon: 'fa-regular fa-file',
         items: [
           {
@@ -135,7 +136,7 @@ export class MenuItems {
         ],
       },
       {
-        label: 'Open Schema',
+        label: 'Open JSON Schema...',
         icon: 'fa-regular fa-folder-open',
         items: [
           {
@@ -158,6 +159,16 @@ export class MenuItems {
             label: 'Example Schemas',
             icon: 'fa-solid fa-database',
             command: this.onFromOurExampleClick,
+          },
+        ],
+      },
+      {
+        label: 'Import Schema...',
+        icon: 'fa-solid fa-file-import',
+        items: [
+          {
+            label: 'Import JSON Schema',
+            command: openImportSchemaDialog,
           },
         ],
       },

@@ -14,8 +14,8 @@ import {
 
 const settings = useSettings();
 
-export function constructSchemaGraph(rootSchema: TopLevelSchema): SchemaGraph {
-  if (settings.value.schemaDiagram.mergeAllOfs) {
+export function constructSchemaGraph(rootSchema: TopLevelSchema, shouldMergeAllOfs: boolean): SchemaGraph {
+  if (shouldMergeAllOfs) {
     // duplicate root schema to avoid modifying the original schema
     rootSchema = JSON.parse(JSON.stringify(rootSchema));
 

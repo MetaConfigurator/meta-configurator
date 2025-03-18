@@ -4,10 +4,6 @@ import AccordionTab from 'primevue/accordiontab';
 import ToggleSwitch from 'primevue/toggleswitch';
 import {useSettings} from '@/settings/useSettings';
 import Button from 'primevue/button';
-import {extractAllInlinedSchemaElements} from "@/schema/schemaManipulationUtils";
-import {getDataForMode, getSchemaForMode} from "@/data/useDataLink";
-import {SessionMode} from "@/store/sessionMode";
-
 const emit = defineEmits<{
   (e: 'rebuild_graph'): void;
   (e: 'fit_view'): void;
@@ -18,11 +14,6 @@ function rebuildGraph() {
   emit('fit_view');
 }
 
-function extractAllInlinedElements() {
-  const schemaData = getDataForMode(SessionMode.SchemaEditor);
-  const schema = getSchemaForMode(SessionMode.DataEditor);
-  extractAllInlinedSchemaElements(schemaData, schema,false, true);
-}
 
 const settings = useSettings();
 </script>
@@ -70,11 +61,6 @@ const settings = useSettings();
       <div class="container">
         <div>
           <Button label="Rebuild Graph" @click="rebuildGraph" class="options-element" />
-        </div>
-      </div>
-      <div class="container">
-        <div>
-          <Button label="Extract All Inlined Elements" @click="extractAllInlinedElements" class="options-element" />
         </div>
       </div>
     </AccordionTab>

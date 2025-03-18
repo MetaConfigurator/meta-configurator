@@ -39,7 +39,11 @@ import {
 } from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
 import {findAvailableSchemaId} from "@/schema/schemaReadingUtils";
-import {addSchemaEnum, addSchemaObject, extractInlinedSchemaElement} from "@/schema/schemaManipulationUtils";
+import {
+  addSchemaEnum,
+  addSchemaObject,
+  extractInlinedSchemaElement
+} from "@/schema/schemaManipulationUtils";
 import {schemaGraphToVueFlowGraph} from "@/components/panels/schema-diagram/schemaDiagramTypes";
 
 const emit = defineEmits<{
@@ -167,7 +171,7 @@ function areNodesAlreadyWithinViewport(nodes: Node[]) {
 
 function updateGraph(forceRebuild: boolean = false) {
   const schema = dataSchema.schemaPreprocessed.value;
-  const graph = constructSchemaGraph(schema);
+  const graph = constructSchemaGraph(schema, settings.value.schemaDiagram.mergeAllOfs);
   let graphNeedsLayouting = forceRebuild;
 
   const vueFlowGraph = schemaGraphToVueFlowGraph(graph, settings.value.schemaDiagram.vertical);
