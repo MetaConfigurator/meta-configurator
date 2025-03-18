@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {SchemaDiagramGraph} from '../schemaDiagramTypes';
+import {SchemaGraph} from '../schemaGraphTypes';
 import {identifyAllObjects, populateGraph, trimGraph} from '../schemaGraphConstructor';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
@@ -44,7 +44,7 @@ describe('tests for more difficult scenarios and special cases that result as a 
     };
 
     const defs = identifyAllObjects(schema);
-    const graph = new SchemaDiagramGraph([], []);
+    const graph = new SchemaGraph([], []);
     populateGraph(defs, graph);
     trimGraph(graph);
 

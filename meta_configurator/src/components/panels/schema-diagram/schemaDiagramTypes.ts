@@ -74,7 +74,7 @@ export class VueFlowGraph {
     });
   }
 
-  export function schemaGraphToVueFlowGraph(graph: SchemaGraph, individualAttributeEdges: boolean): VueFlowGraph {
+  export function schemaGraphToVueFlowGraph(graph: SchemaGraph, individualAttributeEdges: boolean = true): VueFlowGraph {
     const nodes = schemaGraphToVueFlowNodes(graph);
     const edges = schemaGraphToVueFlowEdges(graph, individualAttributeEdges);
     return new VueFlowGraph(nodes, edges);

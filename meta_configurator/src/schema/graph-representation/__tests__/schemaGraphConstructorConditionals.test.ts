@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {Path} from '@/utility/path';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {EdgeType, SchemaDiagramGraph, SchemaObjectNodeData} from '../schemaDiagramTypes';
+import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaGraphTypes';
 import {
   generateObjectAttributes,
   generateObjectSpecialPropertyEdges,
@@ -179,7 +179,7 @@ describe('test schema graph constructor with conditionals', () => {
       node.attributes = generateObjectAttributes(node.absolutePath, node.schema, defs);
     }
 
-    const graph = new SchemaDiagramGraph([], []);
+    const graph = new SchemaGraph([], []);
 
     const rootNode = defs.get('')!;
     generateObjectSpecialPropertyEdges(rootNode, defs, graph);
@@ -199,7 +199,7 @@ describe('test schema graph constructor with conditionals', () => {
   });
 
   it('trim graph', () => {
-    const schemaGraph = new SchemaDiagramGraph([], []);
+    const schemaGraph = new SchemaGraph([], []);
     populateGraph(defs, schemaGraph);
 
     expect(schemaGraph.nodes.length).toEqual(10);

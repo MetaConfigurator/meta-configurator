@@ -1,9 +1,10 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {SchemaDiagramGraph} from '../schemaDiagramTypes';
+import {SchemaGraph} from '../schemaGraphTypes';
 import {constructSchemaGraph} from '../schemaGraphConstructor';
-import {findBestMatchingNode} from '../schemaDiagramHelper';
+import {findBestMatchingNode} from '../graphUtils';
 import {ref} from 'vue';
+import {schemaGraphToVueFlowGraph} from "../../../components/panels/schema-diagram/schemaDiagramTypes";
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -23,7 +24,7 @@ vi.mock('@/dataformats/formatRegistry', () => ({
 }));
 
 describe('test schema graph constructor with objects and attributes with enums', () => {
-  let graph: SchemaDiagramGraph;
+  let graph: SchemaGraph;
   let schema: TopLevelSchema = {
     type: 'object',
     $defs: {
@@ -90,11 +91,11 @@ describe('test schema graph constructor with objects and attributes with enums',
   };
 
   beforeEach(() => {
-    graph = constructSchemaGraph(schema);
+    graph = constructSchemaGraph(schema, false);
   });
 
   it('identify best matching node', () => {
-    const nodes = graph.toVueFlowGraph().nodes;
+    const nodes = schemaGraphToVueFlowGraph(graph).nodes;
 
     // root path should lead to root node
     expect(findBestMatchingNode(nodes, [])!.data).toEqual(graph.findNode(''));

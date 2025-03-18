@@ -4,9 +4,9 @@ import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {
   EdgeType,
   SchemaEnumNodeData,
-  SchemaDiagramGraph,
+  SchemaGraph,
   SchemaObjectNodeData,
-} from '../schemaDiagramTypes';
+} from '../schemaGraphTypes';
 import {
   generateAttributeEdges,
   generateObjectAttributes,
@@ -105,7 +105,7 @@ describe('test schema graph constructor with objects and attributes with enums',
       node.attributes = generateObjectAttributes(node.absolutePath, node.schema, defs);
     }
 
-    const graph = new SchemaDiagramGraph([], []);
+    const graph = new SchemaGraph([], []);
 
     const rootNode = defs.get('')!;
     generateAttributeEdges(rootNode, defs, graph);
@@ -130,7 +130,7 @@ describe('test schema graph constructor with objects and attributes with enums',
   });
 
   it('trim enum values', () => {
-    const schemaGraph = new SchemaDiagramGraph([], []);
+    const schemaGraph = new SchemaGraph([], []);
     populateGraph(defs, schemaGraph);
 
     // @ts-ignore
