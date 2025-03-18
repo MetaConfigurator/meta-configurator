@@ -35,8 +35,8 @@ import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
-import Select from "primevue/select";
-import {formatRegistry} from "@/dataformats/formatRegistry";
+import Select from 'primevue/select';
+import {formatRegistry} from '@/dataformats/formatRegistry';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -433,10 +433,12 @@ const showSearchResultsMenu = event => {
         </Menu>
       </div>
 
-
       <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
-        <Select :options="dataFormatOptions" v-model="settings.dataFormat" size="small"
-                class="custom-select"/>
+        <Select
+          :options="dataFormatOptions"
+          v-model="settings.dataFormat"
+          size="small"
+          class="custom-select" />
       </div>
 
       <!-- search bar -->

@@ -35,7 +35,8 @@ import {
   faInfo,
   faRobot,
   faXmark,
-  faBug, faListUl,
+  faBug,
+  faListUl,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,

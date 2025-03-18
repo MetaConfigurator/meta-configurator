@@ -45,5 +45,4 @@ onMounted(() => {
   <div class="h-full" :id="editor_id" />
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -35,7 +35,7 @@ function jumpToLevel(index: number) {
 </script>
 
 <template>
-  <nav class="flex h-8" aria-label="Breadcrumb" v-if="props.path.length>0">
+  <nav class="flex h-8" aria-label="Breadcrumb" v-if="props.path.length > 0">
     <ol class="inline-flex items-center space-x-1 md:space-x-1 h-full">
       <li
         v-for="(pathItem, index) in pathWithRoot"
