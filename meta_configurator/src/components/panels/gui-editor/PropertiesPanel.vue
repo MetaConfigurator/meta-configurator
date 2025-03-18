@@ -548,7 +548,7 @@ function zoomIntoPath(path: Path) {
     v-model:expandedKeys="session.currentExpandedElements.value"
     @nodeExpand="expandElementChildren"
     :filters="treeTableFilters">
-    <Column field="name" header="Property" :sortable="true" expander>
+    <Column field="name" expander>
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->
         <span
