@@ -20,16 +20,12 @@ import {
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
-import Select from 'primevue/select';
-import {formatRegistry} from '@/dataformats/formatRegistry';
 
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
 const settings = useSettings();
-
-const dataFormatOptions = formatRegistry.getFormatNames();
 
 // random id is used to enable multiple Ace Editors of same sessionMode on the same page
 const editor_id = 'code-editor-' + props.sessionMode + '-' + Math.random();
@@ -46,16 +42,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
-    <Select :options="dataFormatOptions" v-model="settings.dataFormat" size="small" />
-  </div>
   <div class="h-full" :id="editor_id" />
 </template>
 
-<style scoped>
-.format-switch-container {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-</style>
+<style scoped></style>

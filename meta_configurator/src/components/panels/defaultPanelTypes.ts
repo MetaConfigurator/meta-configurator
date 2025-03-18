@@ -20,7 +20,7 @@ export const panelTypeGuiEditor: PanelTypeDefinition = {
   getComponent: () => GuiEditorPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
   label: 'GUI Editor',
-  icon: 'fa-solid fa-wrench',
+  icon: 'fa-solid fa-list-ul',
   name: 'guiEditor',
 };
 
