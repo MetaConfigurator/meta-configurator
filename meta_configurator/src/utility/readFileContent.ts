@@ -58,8 +58,8 @@ export function readFileContentToDataLink(
 }
 
 export async function readFileContentToRef(
-    files: FileList | File[] | null,
-    resultRef: Ref<string>
+  files: FileList | File[] | null,
+  resultRef: Ref<string>
 ) {
   try {
     let contents = await readFileContentFromFileList(files);
@@ -71,18 +71,15 @@ export async function readFileContentToRef(
   }
 }
 
-  export function readFileContentForFunction(
-      files: FileList | File[] | null, fct: (content: string) => void
-  ) {
-
-
-    readFileContentFromFileList(files)
-        .then(contents => {
-            if (contents !== undefined) {
-                fct(contents);
-            }
-        })
-        .catch(error => errorService.onError(error));
-
-  }
-
+export function readFileContentForFunction(
+  files: FileList | File[] | null,
+  fct: (content: string) => void
+) {
+  readFileContentFromFileList(files)
+    .then(contents => {
+      if (contents !== undefined) {
+        fct(contents);
+      }
+    })
+    .catch(error => errorService.onError(error));
+}

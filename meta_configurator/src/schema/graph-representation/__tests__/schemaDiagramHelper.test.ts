@@ -4,7 +4,7 @@ import {SchemaGraph} from '../schemaGraphTypes';
 import {constructSchemaGraph} from '../schemaGraphConstructor';
 import {findBestMatchingNode} from '../graphUtils';
 import {ref} from 'vue';
-import {schemaGraphToVueFlowGraph} from "../../../components/panels/schema-diagram/schemaDiagramTypes";
+import {schemaGraphToVueFlowGraph} from '../../../components/panels/schema-diagram/schemaDiagramTypes';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({

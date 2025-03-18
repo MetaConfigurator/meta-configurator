@@ -16,14 +16,11 @@ import {
   SchemaNodeData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
-    SchemaElementData
-} from '@/schema/graph-representation/schemaGraphTypes'
+  SchemaElementData,
+} from '@/schema/graph-representation/schemaGraphTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
-import {
-  findBestMatchingData,
-  findBestMatchingNode,
-} from '@/schema/graph-representation/graphUtils';
+import {findBestMatchingData, findBestMatchingNode} from '@/schema/graph-representation/graphUtils';
 import {findForwardConnectedNodesAndEdges} from '@/schema/graph-representation/findConnectedNodes';
 import {
   updateNodeData,
@@ -38,13 +35,13 @@ import {
   collectTypeChoices,
 } from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
-import {findAvailableSchemaId} from "@/schema/schemaReadingUtils";
+import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
 import {
   addSchemaEnum,
   addSchemaObject,
-  extractInlinedSchemaElement
-} from "@/schema/schemaManipulationUtils";
-import {schemaGraphToVueFlowGraph} from "@/components/panels/schema-diagram/schemaDiagramTypes";
+  extractInlinedSchemaElement,
+} from '@/schema/schemaManipulationUtils';
+import {schemaGraphToVueFlowGraph} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -276,7 +273,11 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
 }
 
 function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNodeData) {
-  const newElementId = extractInlinedSchemaElement(elementData.absolutePath, schemaData, elementData.name);
+  const newElementId = extractInlinedSchemaElement(
+    elementData.absolutePath,
+    schemaData,
+    elementData.name
+  );
   elementData.absolutePath = newElementId;
   selectElement(newElementId);
 }
@@ -315,7 +316,11 @@ function deleteElement(objectData: SchemaElementData) {
 }
 
 function addAttribute(objectData: SchemaElementData) {
-  const attributePath = findAvailableSchemaId(schemaData, [...objectData.absolutePath, 'properties'], 'property');
+  const attributePath = findAvailableSchemaId(
+    schemaData,
+    [...objectData.absolutePath, 'properties'],
+    'property'
+  );
   schemaData.setDataAt(attributePath, {
     type: 'string',
   });

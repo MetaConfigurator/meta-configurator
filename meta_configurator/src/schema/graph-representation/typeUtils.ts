@@ -21,7 +21,7 @@ export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeCh
 
     if (type === 'null') {
       // no need for a null array
-        return;
+      return;
     }
 
     // push simple type in array

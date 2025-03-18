@@ -1,6 +1,10 @@
 import type {Path} from '@/utility/path';
 import {arePathsEqual, pathToString} from '@/utility/pathUtils';
-import {type Node, SchemaElementData, type SchemaObjectNodeData} from "@/schema/graph-representation/schemaGraphTypes";
+import {
+  type Node,
+  SchemaElementData,
+  type SchemaObjectNodeData,
+} from '@/schema/graph-representation/schemaGraphTypes';
 
 export function pathsToEdgeId(start: Path, end: Path, label: string, isArray: boolean): string {
   return (

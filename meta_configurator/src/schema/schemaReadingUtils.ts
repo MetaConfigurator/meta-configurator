@@ -1,7 +1,7 @@
 import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
-import type {ManagedData} from "@/data/managedData";
+import type {ManagedData} from '@/data/managedData';
 
 /**
  * Returns a string representation of the type of the property.
@@ -40,8 +40,12 @@ export function isSchemaEmpty(schema: JsonSchemaType): boolean {
   return Object.keys(schema).length === 0;
 }
 
-
-export function findAvailableSchemaId(schemaData: ManagedData, path: Path, prefix: string, preferWithoutNumber: boolean = false): Path {
+export function findAvailableSchemaId(
+  schemaData: ManagedData,
+  path: Path,
+  prefix: string,
+  preferWithoutNumber: boolean = false
+): Path {
   let num: number = 1;
   let success = false;
   while (num <= 100) {

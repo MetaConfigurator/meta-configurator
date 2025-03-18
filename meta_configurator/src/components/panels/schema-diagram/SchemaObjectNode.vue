@@ -3,7 +3,7 @@ import {
   SchemaElementData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
-} from '@/schema/graph-representation/schemaGraphTypes'
+} from '@/schema/graph-representation/schemaGraphTypes';
 import SchemaObjectAttribute from '@/components/panels/schema-diagram/SchemaObjectAttribute.vue';
 import type {Path} from '@/utility/path';
 import InputText from 'primevue/inputtext';
@@ -13,7 +13,7 @@ import {ref} from 'vue';
 import type {AttributeTypeChoice} from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {isSubSchemaDefinedInDefinitions} from "@/schema/schemaReadingUtils";
+import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
 
 const props = defineProps<{
   data: SchemaObjectNodeData;

@@ -2,7 +2,7 @@
 import {
   SchemaElementData,
   SchemaObjectAttributeData,
-} from '@/schema/graph-representation/schemaGraphTypes'
+} from '@/schema/graph-representation/schemaGraphTypes';
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {type Ref, ref, watch} from 'vue';

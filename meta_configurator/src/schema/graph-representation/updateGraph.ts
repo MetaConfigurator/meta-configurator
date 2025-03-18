@@ -1,7 +1,4 @@
-import {
-  type Node,
-  SchemaObjectNodeData,
-} from '@/schema/graph-representation/schemaGraphTypes'
+import {type Node, SchemaObjectNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import {isSimpleType} from '@/schema/graph-representation/typeUtils';
 
 // updates the data of the old nodes with the data of the new nodes and returns the ids of the nodes to be removed

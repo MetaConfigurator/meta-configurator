@@ -13,7 +13,7 @@ import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
-import {openImportSchemaDialog} from "@/components/toolbar/importFile";
+import {openImportSchemaDialog} from '@/components/toolbar/importFile';
 
 /**
  * Helper class that contains the menu items for the top menu bar.

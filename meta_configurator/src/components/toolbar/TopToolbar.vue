@@ -59,7 +59,7 @@ const topMenuBar = new MenuItems(
   showUrlDialog,
   showCsvImportDialog,
   showSnapshotDialog,
-  inferSchemaFromSampleData,
+  inferSchemaFromSampleData
 );
 
 function getPageName(): string {

@@ -6,15 +6,22 @@ import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import {
-  EdgeData, EdgeType,
+  EdgeData,
+  EdgeType,
   SchemaElementData,
-  SchemaEnumNodeData, SchemaGraph, SchemaNodeData, SchemaObjectAttributeData,
-  SchemaObjectNodeData
-} from "@/schema/graph-representation/schemaGraphTypes";
+  SchemaEnumNodeData,
+  SchemaGraph,
+  SchemaNodeData,
+  SchemaObjectAttributeData,
+  SchemaObjectNodeData,
+} from '@/schema/graph-representation/schemaGraphTypes';
 
 const settings = useSettings();
 
-export function constructSchemaGraph(rootSchema: TopLevelSchema, shouldMergeAllOfs: boolean): SchemaGraph {
+export function constructSchemaGraph(
+  rootSchema: TopLevelSchema,
+  shouldMergeAllOfs: boolean
+): SchemaGraph {
   if (shouldMergeAllOfs) {
     // duplicate root schema to avoid modifying the original schema
     rootSchema = JSON.parse(JSON.stringify(rootSchema));

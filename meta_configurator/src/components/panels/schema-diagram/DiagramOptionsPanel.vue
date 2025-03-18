@@ -14,7 +14,6 @@ function rebuildGraph() {
   emit('fit_view');
 }
 
-
 const settings = useSettings();
 </script>
 

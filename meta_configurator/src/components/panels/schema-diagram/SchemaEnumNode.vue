@@ -2,7 +2,7 @@
 import {
   SchemaElementData,
   SchemaEnumNodeData,
-} from '@/schema/graph-representation/schemaGraphTypes'
+} from '@/schema/graph-representation/schemaGraphTypes';
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
@@ -10,7 +10,7 @@ import {type Ref, ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {isSubSchemaDefinedInDefinitions} from "@/schema/schemaReadingUtils";
+import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
 
 const props = defineProps<{
   data: SchemaEnumNodeData;

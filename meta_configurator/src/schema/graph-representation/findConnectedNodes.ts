@@ -1,4 +1,4 @@
-import {type Edge, type Node} from "@/schema/graph-representation/schemaGraphTypes";
+import {type Edge, type Node} from '@/schema/graph-representation/schemaGraphTypes';
 
 export function findForwardConnectedNodesAndEdges(
   allNodes: Node[],
