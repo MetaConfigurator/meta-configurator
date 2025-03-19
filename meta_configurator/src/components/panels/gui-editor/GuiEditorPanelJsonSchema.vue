@@ -54,7 +54,7 @@ const currentSchema = computed(() => {
       :root-name="'document root'"
       :path="session.currentPath.value"
       @update:path="newPath => updatePath(newPath)" />
-    <div class="flex-grow overflow-y-auto">
+    <div class="flex-grow overflow-y-scroll">
       <PropertiesPanel
         :currentSchema="currentSchema"
         :currentPath="session.currentPath.value"
