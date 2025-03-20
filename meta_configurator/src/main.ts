@@ -65,7 +65,6 @@ const indigoPreset = definePreset(Lara, {
   },
 });
 
-
 app.use(createPinia());
 app.use(useAppRouter());
 app.use(PrimeVue, {
