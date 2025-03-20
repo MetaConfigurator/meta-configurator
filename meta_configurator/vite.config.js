@@ -25,6 +25,5 @@ export default defineConfig({
   },
   define: {
     'process.env': {}, // Mock process.env
-    'global': {}, // Mock process.env
   },
 });
