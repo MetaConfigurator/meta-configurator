@@ -11,8 +11,8 @@ import {calculateEffectiveSchema, EffectiveSchema} from '@/schema/effectiveSchem
 import {getDataForMode, getUserSelectionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
-import {writeSchemaRequiredDefaultsToData} from "@/schema/writeDefaultsToData";
-import {useDataSource} from "@/data/dataSource";
+import {writeSchemaRequiredDefaultsToData} from '@/schema/writeDefaultsToData';
+import {useDataSource} from '@/data/dataSource';
 
 /**
  * This class manages the schema and provides easy access to its content.
@@ -122,7 +122,7 @@ export class ManagedJsonSchema {
       // add defaults to user data, but only when new schema was fetched, not after every schema edit
       const data = getDataForMode(this.mode);
       writeSchemaRequiredDefaultsToData(data, [], this.schemaWrapper.value);
-        useDataSource().newSchemaWasFetched.value = false;
+      useDataSource().newSchemaWasFetched.value = false;
     }
   }
 }
