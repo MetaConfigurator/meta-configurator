@@ -11,6 +11,7 @@ export async function fetchSchemaFromUrl(schemaURL: string): Promise<void> {
   const schemaContent = await response.json();
   const schemaName = schemaContent.title || 'Unknown Schema';
   useDataSource().userSchemaData.value = schemaContent;
+  useDataSource().newSchemaWasFetched.value = true;
 
   openClearDataEditorDialog();
 
