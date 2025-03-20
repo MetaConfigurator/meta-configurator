@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import GuiEditorPanelJsonSchema from '@/components/panels/gui-editor/GuiEditorPanelJsonSchema.vue';
 import type {SessionMode} from '@/store/sessionMode';
-import {ScrollPanel} from "primevue";
+import {ScrollPanel} from 'primevue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
