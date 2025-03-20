@@ -14,7 +14,7 @@ import {
   createItemRowsArraysFromObjects,
   createItemsRowsObjectsFromJson,
 } from '@/components/panels/list-analysis/listAnalysisUtils';
-import {ScrollPanel} from 'primevue';
+import {ScrollPanel} from "primevue";
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -84,48 +84,50 @@ function exportTableAsCsv() {
   <div class="ml-5 h-full">
     <label class="heading">Table View</label>
 
+
     <ScrollPanel
-      style="width: 100%; height: 100%"
-      :dt="{
+        style="width:100%; height: 100%"
+        :dt="{
         bar: {
-          background: '{primary.color}',
-        },
-      }">
-      <div class="mt-3">
-        <div v-if="possibleArrays.length == 0">
-          <b>No object arrays available.</b>
-        </div>
-        <div v-else>
-          <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
-        </div>
+            background: '{primary.color}'
+        }
+    }"
+    >
+    <div class="mt-3">
+      <div v-if="possibleArrays.length == 0">
+        <b>No object arrays available.</b>
+      </div>
+      <div v-else>
+        <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
+      </div>
+    </div>
+
+    <div v-if="tableData" class="mt-3">
+      <div style="overflow: auto; min-width: 0; max-width: 90%;">
+        <DataTable
+          :value="selectedArray"
+          showGridlines
+          stripedRows
+          resizable-columns
+          removable-sort
+          paginator
+          :rows="30"
+          size="small">
+          <Column
+            v-for="columnName in tableData.columnNames"
+            :field="columnName"
+            :header="columnName"
+            :style="{maxWidth: '200px'}"
+            :sortable="true" />
+        </DataTable>
       </div>
 
-      <div v-if="tableData" class="mt-3">
-        <div style="overflow: auto; min-width: 0; max-width: 90%">
-          <DataTable
-            :value="selectedArray"
-            showGridlines
-            stripedRows
-            resizable-columns
-            removable-sort
-            paginator
-            :rows="30"
-            size="small">
-            <Column
-              v-for="columnName in tableData.columnNames"
-              :field="columnName"
-              :header="columnName"
-              :style="{maxWidth: '200px'}"
-              :sortable="true" />
-          </DataTable>
-        </div>
-
-        <Button
-          label="Export table as CSV"
-          icon="pi pi-download"
-          @click="exportTableAsCsv"
-          class="mt-3" />
-      </div>
+      <Button
+        label="Export table as CSV"
+        icon="pi pi-download"
+        @click="exportTableAsCsv"
+        class="mt-3" />
+    </div>
     </ScrollPanel>
   </div>
 </template>
