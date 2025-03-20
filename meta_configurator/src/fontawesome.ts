@@ -37,14 +37,15 @@ import {
   faXmark,
   faBug,
   faListUl,
+  faFileCode,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
-  faFileCode,
   faCircleCheck,
   faFloppyDisk as faFloppyDiskRegular,
   faFolderOpen as faFolderOpenRegular,
   faEye as faEyeRegular,
+  faFileCode as faFileCodeRegular,
 } from '@fortawesome/free-regular-svg-icons';
 
 /**
@@ -91,4 +92,6 @@ export function registerIcons() {
   library.add(faXmark);
   library.add(faBug);
   library.add(faListUl);
+  library.add(faFileCode);
+  library.add(faFileCodeRegular);
 }

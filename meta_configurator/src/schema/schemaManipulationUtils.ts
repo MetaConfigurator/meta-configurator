@@ -40,9 +40,25 @@ function sortNodesByPathDepthDescending(nodes: SchemaNodeData[]): SchemaNodeData
 export function extractInlinedSchemaElement(
   absoluteElementPath: Path,
   schemaData: ManagedData,
-  elementName: string
+  elementName: string,
+  forgetIfDuplicateExists: boolean = false
 ): Path {
   const dataAtPath = dataAt(absoluteElementPath, schemaData.data.value);
+
+  if (forgetIfDuplicateExists) {
+    const existingElementDefPath = ['$defs', elementName];
+    const existingElementDef = dataAt(existingElementDefPath, schemaData.data.value);
+    if (existingElementDef) {
+      if (JSON.stringify(existingElementDef) === JSON.stringify(dataAtPath)) {
+        const referenceToNewElement = '#' + pathToJsonPointer(existingElementDefPath);
+        schemaData.setDataAt(absoluteElementPath, {
+          $ref: referenceToNewElement,
+        });
+        return existingElementDefPath;
+      }
+    }
+  }
+
   const newElementId = findAvailableSchemaId(schemaData, ['$defs'], elementName, true);
   schemaData.setDataAt(newElementId, dataAtPath);
   const referenceToNewElement = '#' + pathToJsonPointer(newElementId);
