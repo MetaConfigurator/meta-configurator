@@ -5,7 +5,6 @@ import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
-import Divider from 'primevue/divider';
 import SelectButton from 'primevue/selectbutton';
 import {type Editor} from 'brace';
 import * as ace from 'brace';

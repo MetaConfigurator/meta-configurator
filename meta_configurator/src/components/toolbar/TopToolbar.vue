@@ -37,6 +37,7 @@ import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
 import Select from 'primevue/select';
 import {formatRegistry} from '@/dataformats/formatRegistry';
+import CodeGenerationDialog from "@/components/dialogs/code-generation/CodeGenerationDialog.vue";
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -62,6 +63,7 @@ const topMenuBar = new MenuItems(
   showUrlDialog,
   showCsvImportDialog,
   showSnapshotDialog,
+  showCodeGenerationDialog,
   inferSchemaFromSampleData
 );
 
@@ -277,6 +279,7 @@ const showPreferencesDialog = () => {
 
 const csvImportDialog = ref();
 const snapshotDialog = ref();
+const codeGenerationDialog = ref();
 
 function showCsvImportDialog() {
   csvImportDialog.value?.show();
@@ -284,6 +287,15 @@ function showCsvImportDialog() {
 
 function showSnapshotDialog() {
   snapshotDialog.value?.show();
+}
+
+function showCodeGenerationDialog(schemaMode: boolean) {
+  if (schemaMode) {
+    codeGenerationDialog.value?.activateSchemaMode();
+  } else {
+    codeGenerationDialog.value?.activateDataMode();
+  }
+  codeGenerationDialog.value?.show();
 }
 
 defineExpose({
@@ -347,6 +359,8 @@ const showSearchResultsMenu = event => {
   <ImportCsvDialog ref="csvImportDialog" />
 
   <SaveSnapshotDialog ref="snapshotDialog" />
+
+  <CodeGenerationDialog ref="codeGenerationDialog"/>
 
   <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
