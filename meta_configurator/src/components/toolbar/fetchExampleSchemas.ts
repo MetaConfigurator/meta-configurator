@@ -14,6 +14,7 @@ export function loadExampleSchema(schemaKey: string): void {
     selectedSchema = structuredClone(selectedSchema);
     const schemaName = selectedSchema.label || 'Unknown Schema';
     useDataSource().userSchemaData.value = selectedSchema?.schema;
+    useDataSource().newSchemaWasFetched.value = true;
 
     openClearDataEditorDialog();
 
