@@ -52,6 +52,8 @@ function openDialog() {
 
 function hideDialog() {
   showDialog.value = false;
+  generatedCode.value = '';
+  selectedProgrammingLanguage.value = '';
 }
 
 function activateSchemaMode() {
