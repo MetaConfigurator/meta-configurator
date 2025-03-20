@@ -55,7 +55,11 @@ defineEmits<{
     <p>Code Generation via quicktype</p>
     <p>
       Licensed under
-      <a class="underline text-violet-950" href="https://github.com/glideapps/quicktype/blob/master/LICENSE">Apache License 2.0</a>
+      <a
+        class="underline text-violet-950"
+        href="https://github.com/glideapps/quicktype/blob/master/LICENSE"
+        >Apache License 2.0</a
+      >
     </p>
   </Dialog>
 </template>

@@ -37,7 +37,7 @@ import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
 import Select from 'primevue/select';
 import {formatRegistry} from '@/dataformats/formatRegistry';
-import CodeGenerationDialog from "@/components/dialogs/code-generation/CodeGenerationDialog.vue";
+import CodeGenerationDialog from '@/components/dialogs/code-generation/CodeGenerationDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -360,7 +360,7 @@ const showSearchResultsMenu = event => {
 
   <SaveSnapshotDialog ref="snapshotDialog" />
 
-  <CodeGenerationDialog ref="codeGenerationDialog"/>
+  <CodeGenerationDialog ref="codeGenerationDialog" />
 
   <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">

@@ -14,14 +14,13 @@ const props = defineProps<{
 
 <template>
   <ScrollPanel
-  style="width:100%; height: 100%"
-  :dt="{
-        bar: {
-            background: '{primary.color}'
-        }
-    }"
-  >
-  <GuiEditorPanelJsonSchema class="h-full" :sessionMode="props.sessionMode" />
+    style="width: 100%; height: 100%"
+    :dt="{
+      bar: {
+        background: '{primary.color}',
+      },
+    }">
+    <GuiEditorPanelJsonSchema class="h-full" :sessionMode="props.sessionMode" />
   </ScrollPanel>
 </template>
 

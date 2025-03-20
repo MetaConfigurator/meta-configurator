@@ -49,13 +49,13 @@ export function extractInlinedSchemaElement(
     const existingElementDefPath = ['$defs', elementName];
     const existingElementDef = dataAt(existingElementDefPath, schemaData.data.value);
     if (existingElementDef) {
-        if (JSON.stringify(existingElementDef) === JSON.stringify(dataAtPath)) {
-          const referenceToNewElement = '#' + pathToJsonPointer(existingElementDefPath);
-          schemaData.setDataAt(absoluteElementPath, {
-            $ref: referenceToNewElement,
-          });
-            return existingElementDefPath;
-        }
+      if (JSON.stringify(existingElementDef) === JSON.stringify(dataAtPath)) {
+        const referenceToNewElement = '#' + pathToJsonPointer(existingElementDefPath);
+        schemaData.setDataAt(absoluteElementPath, {
+          $ref: referenceToNewElement,
+        });
+        return existingElementDefPath;
+      }
     }
   }
 

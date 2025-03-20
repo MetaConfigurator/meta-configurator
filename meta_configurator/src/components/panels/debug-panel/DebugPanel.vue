@@ -2,13 +2,12 @@
 import {SessionMode} from '@/store/sessionMode';
 import DebugInfoForMode from '@/components/panels/debug-panel/DebugInfoForMode.vue';
 import Button from 'primevue/button';
-import {extractAllInlinedSchemaElements} from "@/schema/schemaManipulationUtils";
-import {getDataForMode} from "@/data/useDataLink";
-
+import {extractAllInlinedSchemaElements} from '@/schema/schemaManipulationUtils';
+import {getDataForMode} from '@/data/useDataLink';
 
 function extractAllSchemaElements() {
   const schemaData = getDataForMode(SessionMode.SchemaEditor);
-  extractAllInlinedSchemaElements(schemaData, false, true)
+  extractAllInlinedSchemaElements(schemaData, false, true);
 }
 </script>
 
