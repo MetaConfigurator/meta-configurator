@@ -34,7 +34,4 @@ export default defineConfig({
   test: {
     // add test config here
   },
-  define: {
-    'process.env': {}, // Mock process.env
-  },
 });
