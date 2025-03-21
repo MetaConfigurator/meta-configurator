@@ -38,6 +38,7 @@ import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 import _ from 'lodash';
+import {writeSchemaRequiredDefaultsToData} from "@/schema/writeDefaultsToData";
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -346,8 +347,10 @@ function addEmptyArrayEntry(relativePath: Path) {
 
   if (!arraySchema?.items) {
     addItem(relativePath, '');
+  } else {
+    const itemsSchema = arraySchema.items;
+    addItem(relativePath, itemsSchema.initialValue());
   }
-  addItem(relativePath, arraySchema?.items?.initialValue());
 }
 
 /**

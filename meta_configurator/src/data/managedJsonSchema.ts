@@ -121,7 +121,11 @@ export class ManagedJsonSchema {
     if (useDataSource().newSchemaWasFetched) {
       // add defaults to user data, but only when new schema was fetched, not after every schema edit
       const data = getDataForMode(this.mode);
-      writeSchemaRequiredDefaultsToData(data, [], this.schemaWrapper.value);
+      const writeDataFct = (path: Path, newValue: any) => {
+        data.setDataAt(path, newValue);
+      }
+
+      writeSchemaRequiredDefaultsToData(data.data.value, [], this.schemaWrapper.value, writeDataFct);
       useDataSource().newSchemaWasFetched.value = false;
     }
   }
