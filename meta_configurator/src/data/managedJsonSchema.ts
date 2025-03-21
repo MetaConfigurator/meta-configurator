@@ -123,9 +123,14 @@ export class ManagedJsonSchema {
       const data = getDataForMode(this.mode);
       const writeDataFct = (path: Path, newValue: any) => {
         data.setDataAt(path, newValue);
-      }
+      };
 
-      writeSchemaRequiredDefaultsToData(data.data.value, [], this.schemaWrapper.value, writeDataFct);
+      writeSchemaRequiredDefaultsToData(
+        data.data.value,
+        [],
+        this.schemaWrapper.value,
+        writeDataFct
+      );
       useDataSource().newSchemaWasFetched.value = false;
     }
   }
