@@ -518,6 +518,9 @@ const showSearchResultsMenu = event => {
   width: 100%;
 }
 .button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
   margin-top: 1rem;
 }
 .no-padding {
