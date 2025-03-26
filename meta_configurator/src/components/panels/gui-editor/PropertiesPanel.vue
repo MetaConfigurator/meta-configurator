@@ -38,7 +38,7 @@ import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
 import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 import _ from 'lodash';
-import {writeSchemaRequiredDefaultsToData} from "@/schema/writeDefaultsToData";
+import {writeSchemaRequiredDefaultsToData} from '@/schema/writeDefaultsToData';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;

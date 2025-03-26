@@ -93,36 +93,34 @@ export class DataConverterYaml extends DataConverter {
   }
 }
 
-
-
 const xmlOptions: X2jOptions = {
-  attributeNamePrefix: "",   // Attributes are already distinguished by preserveOrder: true
-  attributesGroupName: false,  //Attributes are already grouped by preserveOrder: true
-  textNodeName: "#text",       // Preserve text nodes explicitly
-  ignoreAttributes: false,     // Ensure attributes are parsed
-  removeNSPrefix: false,       // Keep XML namespaces intact
-  allowBooleanAttributes: true,// Allow attributes without values
-  parseTagValue: false,        // Preserve values as strings
-  parseAttributeValue: false,  // Preserve attribute values as strings
-  trimValues: true,           // Trim whitespace
-  cdataPropName: "#cdata",     // Store CDATA separately
-  commentPropName: "#comment", // Store comments explicitly
-  alwaysCreateTextNode: true,  // Ensure text nodes are always present
-  processEntities: true,       // Convert entities like `&amp;`
-  preserveOrder: true,         // Maintain the order of elements
+  attributeNamePrefix: '', // Attributes are already distinguished by preserveOrder: true
+  attributesGroupName: false, //Attributes are already grouped by preserveOrder: true
+  textNodeName: '#text', // Preserve text nodes explicitly
+  ignoreAttributes: false, // Ensure attributes are parsed
+  removeNSPrefix: false, // Keep XML namespaces intact
+  allowBooleanAttributes: true, // Allow attributes without values
+  parseTagValue: false, // Preserve values as strings
+  parseAttributeValue: false, // Preserve attribute values as strings
+  trimValues: true, // Trim whitespace
+  cdataPropName: '#cdata', // Store CDATA separately
+  commentPropName: '#comment', // Store comments explicitly
+  alwaysCreateTextNode: true, // Ensure text nodes are always present
+  processEntities: true, // Convert entities like `&amp;`
+  preserveOrder: true, // Maintain the order of elements
 };
 
 const xmlBuilderOptions: XmlBuilderOptions = {
-  attributeNamePrefix: "",   // Attributes are already distinguished by preserveOrder: true
-  attributesGroupName: false,  //Attributes are already grouped by preserveOrder: true
-  textNodeName: "#text",       // Preserve text nodes explicitly
-  ignoreAttributes: false,     // Ensure attributes are parsed
-  cdataPropName: "#cdata",     // Store CDATA separately
-  commentPropName: "#comment", // Store comments explicitly
-  processEntities: true,       // Convert entities like `&amp;`
-  preserveOrder: true,         // Maintain the order of elements
+  attributeNamePrefix: '', // Attributes are already distinguished by preserveOrder: true
+  attributesGroupName: false, //Attributes are already grouped by preserveOrder: true
+  textNodeName: '#text', // Preserve text nodes explicitly
+  ignoreAttributes: false, // Ensure attributes are parsed
+  cdataPropName: '#cdata', // Store CDATA separately
+  commentPropName: '#comment', // Store comments explicitly
+  processEntities: true, // Convert entities like `&amp;`
+  preserveOrder: true, // Maintain the order of elements
   format: true, // Pretty-prints the output for readability
-  indentBy: "  ", // Uses two spaces for indentation
+  indentBy: '  ', // Uses two spaces for indentation
   arrayNodeName: undefined, // Keeps array structures as they appear in the XML
   suppressEmptyNode: true, // If a node does not have children, it should be written in a self-closing tag
   suppressUnpairedNode: false, // Preserves unpaired tags
@@ -136,18 +134,13 @@ const xmlBuilderOptions: XmlBuilderOptions = {
  * DataConverter implementation for XML.
  */
 export class DataConverterXml extends DataConverter {
-
   override parse(data: string): any {
-    const parser: XMLParser = new XMLParser(
-        xmlOptions
-    );
+    const parser: XMLParser = new XMLParser(xmlOptions);
     return parser.parse(data);
   }
 
   override stringify(data: any): string {
-    const builder: XMLBuilder = new XMLBuilder(
-        xmlBuilderOptions
-    );
+    const builder: XMLBuilder = new XMLBuilder(xmlBuilderOptions);
     return builder.build(data);
   }
 }

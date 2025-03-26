@@ -1,6 +1,6 @@
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {Path} from '@/utility/path';
-import {dataAt} from "@/utility/resolveDataAtPath";
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 export function writeSchemaRequiredDefaultsToData(
   data: any,
@@ -29,14 +29,19 @@ export function writeSchemaRequiredDefaultsToData(
             updateDataFct(path.concat(propertyName), property.default);
           } else {
             if (property.hasType('object')) {
-              writeSchemaRequiredDefaultsToData(data, path.concat(propertyName), property, updateDataFct);
+              writeSchemaRequiredDefaultsToData(
+                data,
+                path.concat(propertyName),
+                property,
+                updateDataFct
+              );
             } else if (property.hasType('array')) {
               if (property.items && property.minItems > 0) {
                 writeSchemaRequiredDefaultsToData(
                   data,
                   path.concat(propertyName, '0'),
                   property.items,
-                    updateDataFct
+                  updateDataFct
                 );
               }
             }
