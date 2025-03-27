@@ -69,19 +69,18 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: true,
         },
         xml: {
-            type: 'object',
-            required: ['attributeNamePrefix'],
-            additionalProperties: false,
-            description: 'Settings for the XML format  in the code editor.',
-            properties: {
-              attributeNamePrefix: {
-                type: 'string',
-                description:
-                    'The prefix for attributes in the XML format.',
-                default: '_',
-              }
-            }
-        }
+          type: 'object',
+          required: ['attributeNamePrefix'],
+          additionalProperties: false,
+          description: 'Settings for the XML format  in the code editor.',
+          properties: {
+            attributeNamePrefix: {
+              type: 'string',
+              description: 'The prefix for attributes in the XML format.',
+              default: '_',
+            },
+          },
+        },
       },
     },
     guiEditor: {

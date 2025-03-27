@@ -18,7 +18,7 @@ const props = defineProps<{
     :dt="{
       bar: {
         background: '{primary.color}',
-      }
+      },
     }">
     <GuiEditorPanelJsonSchema :sessionMode="props.sessionMode" />
   </ScrollPanel>

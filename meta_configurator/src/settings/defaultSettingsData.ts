@@ -14,7 +14,7 @@ export const SETTINGS_DATA_DEFAULT = {
     showFormatSelector: true,
     xml: {
       attributeNamePrefix: '_',
-    }
+    },
   },
   guiEditor: {
     maximumDepth: 20,
