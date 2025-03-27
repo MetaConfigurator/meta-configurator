@@ -22,6 +22,10 @@ export interface SettingsInterfaceCodeEditor {
   fontSize: number;
   tabSize: number;
   showFormatSelector: boolean;
+    xml: SettingsCodeEditorXml;
+}
+export interface SettingsCodeEditorXml {
+  attributeNamePrefix: string;
 }
 
 export interface SettingsInterfaceGuiEditor {
@@ -29,6 +33,7 @@ export interface SettingsInterfaceGuiEditor {
   propertySorting: PropertySorting;
   hideAddPropertyButton: boolean;
 }
+
 
 export interface SettingsInterfaceSchemaDiagram {
   editMode: boolean;

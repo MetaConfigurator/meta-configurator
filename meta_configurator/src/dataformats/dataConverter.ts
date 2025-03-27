@@ -1,5 +1,5 @@
 import YAML from 'yaml';
-import {XMLParser, XMLBuilder, type X2jOptions, type XmlBuilderOptions} from 'fast-xml-parser';
+import {type X2jOptions, XMLBuilder, type XmlBuilderOptions, XMLParser} from 'fast-xml-parser';
 import {useSettings} from '@/settings/useSettings';
 
 /**
@@ -107,7 +107,7 @@ const xmlOptions: X2jOptions = {
   commentPropName: '#comment', // Store comments explicitly
   alwaysCreateTextNode: true, // Ensure text nodes are always present
   processEntities: true, // Convert entities like `&amp;`
-  preserveOrder: true, // Maintain the order of elements
+  preserveOrder: false, // Maintain the order of elements
 };
 
 const xmlBuilderOptions: XmlBuilderOptions = {
@@ -118,7 +118,7 @@ const xmlBuilderOptions: XmlBuilderOptions = {
   cdataPropName: '#cdata', // Store CDATA separately
   commentPropName: '#comment', // Store comments explicitly
   processEntities: true, // Convert entities like `&amp;`
-  preserveOrder: true, // Maintain the order of elements
+  preserveOrder: false, // Maintain the order of elements
   format: true, // Pretty-prints the output for readability
   indentBy: '  ', // Uses two spaces for indentation
   arrayNodeName: undefined, // Keeps array structures as they appear in the XML
@@ -135,11 +135,17 @@ const xmlBuilderOptions: XmlBuilderOptions = {
  */
 export class DataConverterXml extends DataConverter {
   override parse(data: string): any {
+    const settings = useSettings().value.codeEditor.xml;
+    xmlOptions.attributeNamePrefix = settings.attributeNamePrefix;
+
     const parser: XMLParser = new XMLParser(xmlOptions);
     return parser.parse(data);
   }
 
   override stringify(data: any): string {
+    const settings = useSettings().value.codeEditor.xml;
+    xmlBuilderOptions.attributeNamePrefix = settings.attributeNamePrefix;
+
     const builder: XMLBuilder = new XMLBuilder(xmlBuilderOptions);
     return builder.build(data);
   }
