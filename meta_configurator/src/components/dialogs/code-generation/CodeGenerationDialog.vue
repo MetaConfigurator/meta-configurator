@@ -47,13 +47,13 @@ watch(selectedProgrammingLanguage, newValue => {
 });
 
 function openDialog() {
+  generatedCode.value = '';
+  selectedProgrammingLanguage.value = '';
   showDialog.value = true;
 }
 
 function hideDialog() {
   showDialog.value = false;
-  generatedCode.value = '';
-  selectedProgrammingLanguage.value = '';
 }
 
 function activateSchemaMode() {

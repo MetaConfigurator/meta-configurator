@@ -20,7 +20,7 @@ const props = defineProps<{
         background: '{primary.color}',
       },
     }">
-    <GuiEditorPanelJsonSchema class="h-full" :sessionMode="props.sessionMode" />
+    <GuiEditorPanelJsonSchema :sessionMode="props.sessionMode" />
   </ScrollPanel>
 </template>
 

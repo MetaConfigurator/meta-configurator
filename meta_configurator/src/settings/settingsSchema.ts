@@ -68,6 +68,19 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'If set to true, a dropdown for selecting the format (JSON or YAML) will be shown in the code editor.',
           default: true,
         },
+        xml: {
+          type: 'object',
+          required: ['attributeNamePrefix'],
+          additionalProperties: false,
+          description: 'Settings for the XML format  in the code editor.',
+          properties: {
+            attributeNamePrefix: {
+              type: 'string',
+              description: 'The prefix for attributes in the XML format.',
+              default: '_',
+            },
+          },
+        },
       },
     },
     guiEditor: {

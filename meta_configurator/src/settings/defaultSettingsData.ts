@@ -12,6 +12,9 @@ export const SETTINGS_DATA_DEFAULT = {
     fontSize: 14,
     tabSize: 2,
     showFormatSelector: true,
+    xml: {
+      attributeNamePrefix: '_',
+    },
   },
   guiEditor: {
     maximumDepth: 20,
