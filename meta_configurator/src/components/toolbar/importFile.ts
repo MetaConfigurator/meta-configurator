@@ -18,8 +18,7 @@ export function openImportSchemaDialog(): void {
   open();
 }
 
-function importSchema(schemaString: string) {
-  const importedSchema = JSON.parse(schemaString);
+function importSchema(importedSchema: any) {
   const currentUserSchema = getDataForMode(SessionMode.SchemaEditor);
 
   copyDefinitionsToUserSchema(currentUserSchema, importedSchema, '$defs');
