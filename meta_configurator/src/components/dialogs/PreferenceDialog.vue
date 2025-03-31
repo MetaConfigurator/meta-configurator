@@ -4,7 +4,6 @@ import {ref} from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import RadioButton from 'primevue/radiobutton';
-import {RadioButtonGroup} from 'primevue';
 import {useSettings} from '@/settings/useSettings';
 import {useAppRouter} from '@/router/router';
 
@@ -71,18 +70,18 @@ defineExpose({show: openDialog, close: hideDialog, visible: isVisible});
       <h2>Do you understand the file format <b>JSON</b> or <b>YAML</b>?</h2>
 
       <div class="flex flex-col gap-2">
-        <RadioButtonGroup name="knowsJson" class="flex flex-wrap gap-4">
+        <div class="flex flex-wrap gap-4">
           <RadioButton v-model="knowsJson" name="knowsJson" :value="true" inputId="yes" />
           <label for="yes">Yes</label>
           <RadioButton v-model="knowsJson" name="knowsJson" :value="false" inputId="no" />
           <label for="no">No</label>
-        </RadioButtonGroup>
+        </div>
       </div>
 
       <h2>What do you want to do?</h2>
 
       <div class="flex flex-col gap-2">
-        <RadioButtonGroup name="isFocusSchemaEditing" class="flex flex-wrap gap-4">
+        <div class="flex flex-wrap gap-4">
           <RadioButton
             v-model="isFocusSchemaEditing"
             name="isFocusSchemaEditing"
@@ -95,7 +94,7 @@ defineExpose({show: openDialog, close: hideDialog, visible: isVisible});
             :value="false"
             inputId="no" />
           <label for="no"><b>Edit Data</b> based on a Schema</label>
-        </RadioButtonGroup>
+        </div>
       </div>
 
       <Button

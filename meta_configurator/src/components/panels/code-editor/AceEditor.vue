@@ -18,7 +18,7 @@ import {
   setupLinkToData,
 } from '@/components/panels/code-editor/setupLinkToSelectionAndData';
 import {useSettings} from '@/settings/useSettings';
-import {SessionMode} from '@/store/sessionMode';
+import {modeToDocumentTypeDescription, SessionMode} from '@/store/sessionMode';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 import Message from 'primevue/message';
 
@@ -58,15 +58,18 @@ function isEditorReadOnly(): boolean {
   const dataFormat = settings.value.dataFormat;
   const mode = props.sessionMode;
 
-  // if the editor is in schema mode, XML is in read only because it will mess up the structure
-  return mode === SessionMode.SchemaEditor && dataFormat === 'xml';
+  // if the editor is in schema/settings mode, XML is in read only because it will mess up the structure otherwise
+  return (
+    (mode === SessionMode.SchemaEditor || mode === SessionMode.Settings) && dataFormat === 'xml'
+  );
 }
 </script>
 
 <template>
   <Message v-if="isEditorReadOnly()" severity="warn"
-    >Read-Only Mode: Schema Text Editor does not support XML, because it will lead to unwanted
-    changes in the structure.</Message
+    >Read-Only Mode: Making changes to XML in the text editor might lead to unwanted changes in the
+    underlying JSON {{ modeToDocumentTypeDescription(props.sessionMode) }} document, because of
+    ambiguity and technical restrictions in XML to JSON conversion.</Message
   >
   <div class="h-full" :id="editor_id" />
 </template>
