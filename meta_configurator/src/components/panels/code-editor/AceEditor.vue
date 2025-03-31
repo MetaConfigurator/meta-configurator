@@ -3,7 +3,7 @@
  Synchronized with file data from the store.
  -->
 <script setup lang="ts">
-import {onMounted} from 'vue';
+import {onMounted, watch} from 'vue';
 import type {Editor} from 'brace';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
@@ -20,6 +20,7 @@ import {
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
+import Message from 'primevue/message';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -38,10 +39,35 @@ onMounted(() => {
   setupLinkToData(editor, props.sessionMode);
   setupLinkToCurrentSelection(editor, props.sessionMode);
   setupAnnotationsFromValidationErrors(editor, props.sessionMode);
+
+  if (isEditorReadOnly()) {
+    editor.setReadOnly(true);
+  }
 });
+
+// watch for changes in the data format and update the editor accordingly
+watch(
+  () => settings.value.dataFormat,
+  _ => {
+    const editor: Editor = ace.edit(editor_id);
+    editor.setReadOnly(isEditorReadOnly());
+  }
+);
+
+function isEditorReadOnly(): boolean {
+  const dataFormat = settings.value.dataFormat;
+  const mode = props.sessionMode;
+
+  // if the editor is in schema mode, XML is in read only because it will mess up the structure
+  return mode === SessionMode.SchemaEditor && dataFormat === 'xml';
+}
 </script>
 
 <template>
+  <Message v-if="isEditorReadOnly()" severity="warn"
+    >Read-Only Mode: Schema Text Editor does not support XML, because it will lead to unwanted
+    changes in the structure.</Message
+  >
   <div class="h-full" :id="editor_id" />
 </template>
 

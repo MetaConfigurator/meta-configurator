@@ -94,7 +94,6 @@ export class DataConverterYaml extends DataConverter {
 }
 
 const xmlOptions: X2jOptions = {
-  attributeNamePrefix: '', // Attributes are already distinguished by preserveOrder: true
   attributesGroupName: false, //Attributes are already grouped by preserveOrder: true
   textNodeName: '#text', // Preserve text nodes explicitly
   ignoreAttributes: false, // Ensure attributes are parsed
@@ -105,13 +104,12 @@ const xmlOptions: X2jOptions = {
   trimValues: true, // Trim whitespace
   cdataPropName: '#cdata', // Store CDATA separately
   commentPropName: '#comment', // Store comments explicitly
-  alwaysCreateTextNode: true, // Ensure text nodes are always present
+  alwaysCreateTextNode: false, // Do not always create text nodes to allow JSON 2 XML and then back works
   processEntities: true, // Convert entities like `&amp;`
   preserveOrder: false, // Maintain the order of elements
 };
 
 const xmlBuilderOptions: XmlBuilderOptions = {
-  attributeNamePrefix: '', // Attributes are already distinguished by preserveOrder: true
   attributesGroupName: false, //Attributes are already grouped by preserveOrder: true
   textNodeName: '#text', // Preserve text nodes explicitly
   ignoreAttributes: false, // Ensure attributes are parsed

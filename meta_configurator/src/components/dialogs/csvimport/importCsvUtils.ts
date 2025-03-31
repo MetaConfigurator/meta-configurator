@@ -1,5 +1,5 @@
 import {useFileDialog} from '@vueuse/core';
-import {readFileContentToRef} from '@/utility/readFileContent';
+import {readFileContentToStringRef} from '@/utility/readFileContent';
 import type {Ref} from 'vue';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
@@ -23,7 +23,7 @@ export function requestUploadFileToRef(resultString: Ref<string>, resultTableNam
   onChange((files: FileList | null) => {
     if (files && files.length > 0) {
       resultTableName.value = userStringToIdentifier(files[0].name, true); // Get the name of the first file
-      readFileContentToRef(files, resultString);
+      readFileContentToStringRef(files, resultString);
     }
   });
   open();
