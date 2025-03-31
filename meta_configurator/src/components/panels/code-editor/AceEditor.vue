@@ -20,7 +20,7 @@ import {
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
-import Message from "primevue/message";
+import Message from 'primevue/message';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -46,11 +46,13 @@ onMounted(() => {
 });
 
 // watch for changes in the data format and update the editor accordingly
-watch(() => settings.value.dataFormat, (_) => {
-  const editor: Editor = ace.edit(editor_id);
-  editor.setReadOnly(isEditorReadOnly());
-});
-
+watch(
+  () => settings.value.dataFormat,
+  _ => {
+    const editor: Editor = ace.edit(editor_id);
+    editor.setReadOnly(isEditorReadOnly());
+  }
+);
 
 function isEditorReadOnly(): boolean {
   const dataFormat = settings.value.dataFormat;
@@ -59,12 +61,13 @@ function isEditorReadOnly(): boolean {
   // if the editor is in schema mode, XML is in read only because it will mess up the structure
   return mode === SessionMode.SchemaEditor && dataFormat === 'xml';
 }
-
-
 </script>
 
 <template>
-  <Message v-if="isEditorReadOnly()" severity="warn">Read-Only Mode: Schema Text Editor does not support XML, because it will lead to unwanted changes in the structure.</Message>
+  <Message v-if="isEditorReadOnly()" severity="warn"
+    >Read-Only Mode: Schema Text Editor does not support XML, because it will lead to unwanted
+    changes in the structure.</Message
+  >
   <div class="h-full" :id="editor_id" />
 </template>
 

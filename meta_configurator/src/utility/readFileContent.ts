@@ -1,7 +1,7 @@
 import {errorService} from '@/main';
 import type {ManagedData} from '@/data/managedData';
 import type {Ref} from 'vue';
-import {formatRegistry} from "@/dataformats/formatRegistry";
+import {formatRegistry} from '@/dataformats/formatRegistry';
 /**
  * Reads the content of a file as a string.
  * @param file the file
@@ -24,7 +24,10 @@ export async function readFileContent(file: File) {
   });
 }
 
-async function readFileContentFromFileList(files: FileList | File[] | null, parseInput: boolean): Promise<any | void | string> {
+async function readFileContentFromFileList(
+  files: FileList | File[] | null,
+  parseInput: boolean
+): Promise<any | void | string> {
   if (files === null || typeof files !== 'object') {
     return Promise.resolve();
   }
@@ -43,7 +46,6 @@ async function readFileContentFromFileList(files: FileList | File[] | null, pars
       }
     }
     throw new Error(`Unknown file format: ${fileName}`);
-
   } else {
     return fileContentAsString;
   }
@@ -77,7 +79,7 @@ export async function readFileContentToStringRef(
   resultRef: Ref<string>
 ) {
   try {
-    let contents = await readFileContentFromFileList(files, false) as string|void;
+    let contents = (await readFileContentFromFileList(files, false)) as string | void;
     if (contents !== undefined) {
       resultRef.value = contents;
     }
