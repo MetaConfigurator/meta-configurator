@@ -60,15 +60,16 @@ function isEditorReadOnly(): boolean {
 
   // if the editor is in schema/settings mode, XML is in read only because it will mess up the structure otherwise
   return (
-    (mode === SessionMode.SchemaEditor || mode === SessionMode.Settings) &&
-    dataFormat === 'xml'
+    (mode === SessionMode.SchemaEditor || mode === SessionMode.Settings) && dataFormat === 'xml'
   );
 }
 </script>
 
 <template>
   <Message v-if="isEditorReadOnly()" severity="warn"
-    >Read-Only Mode: Making changes to XML in the text editor might lead to unwanted changes in the underlying JSON {{modeToDocumentTypeDescription(props.sessionMode)}} document, because of ambiguity and technical restrictions in XML to JSON conversion.</Message
+    >Read-Only Mode: Making changes to XML in the text editor might lead to unwanted changes in the
+    underlying JSON {{ modeToDocumentTypeDescription(props.sessionMode) }} document, because of
+    ambiguity and technical restrictions in XML to JSON conversion.</Message
   >
   <div class="h-full" :id="editor_id" />
 </template>

@@ -4,7 +4,6 @@ export enum SessionMode {
   Settings = 'settings',
 }
 
-
 export function modeToDocumentTypeDescription(mode: SessionMode): string {
   switch (mode) {
     case SessionMode.DataEditor:
