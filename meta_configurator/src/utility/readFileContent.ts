@@ -42,11 +42,11 @@ async function readFileContentFromFileList(files: FileList | File[] | null, pars
         return formatRegistry.getFormat(formatName).dataConverter.parse(await fileContentAsString);
       }
     }
+    throw new Error(`Unknown file format: ${fileName}`);
+
   } else {
     return fileContentAsString;
   }
-
-  return;
 }
 
 /**
