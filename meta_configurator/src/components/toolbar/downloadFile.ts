@@ -8,7 +8,9 @@ import {useSettings} from '@/settings/useSettings';
  * @param isSchema Whether the file is a schema file
  */
 export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
-  const configData: string = isSchema? JSON.stringify(useCurrentData().data.value) : useCurrentData().unparsedData.value;
+  const configData: string = isSchema
+    ? JSON.stringify(useCurrentData().data.value)
+    : useCurrentData().unparsedData.value;
 
   // TODO correct type depending on the data format
   const blob: Blob = new Blob([configData], {type: 'application/json'});
