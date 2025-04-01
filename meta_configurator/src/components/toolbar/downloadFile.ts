@@ -8,24 +8,15 @@ import {useSettings} from '@/settings/useSettings';
  * @param isSchema Whether the file is a schema file
  */
 export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
-  const configData: string = useCurrentData().unparsedData.value;
+  const configData: string = isSchema
+    ? JSON.stringify(useCurrentData().data.value)
+    : useCurrentData().unparsedData.value;
 
   // TODO correct type depending on the data format
   const blob: Blob = new Blob([configData], {type: 'application/json'});
 
-  // Generate a unique filename for the downloaded config
-  const now = new Date();
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-  const formattedDate = formatter.format(now);
-  const fileEnding = (isSchema ? 'schema.' : '') + useSettings().value.dataFormat;
-  const fileName: string = `${fileNamePrefix}-${formattedDate}.${fileEnding}`;
+  const fileEnding = isSchema ? 'schema.json' : useSettings().value.dataFormat;
+  const fileName: string = `${fileNamePrefix}.${fileEnding}`;
 
   // Create a temporary link element
   const link: HTMLAnchorElement = document.createElement('a');
