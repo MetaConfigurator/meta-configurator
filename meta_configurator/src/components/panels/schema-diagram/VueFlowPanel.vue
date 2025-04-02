@@ -41,8 +41,8 @@ import {
   extractInlinedSchemaElement,
 } from '@/schema/schemaManipulationUtils';
 import {schemaGraphToVueFlowGraph} from '@/components/panels/schema-diagram/schemaDiagramTypes';
-import {deleteSchemaElement} from "@/utility/deleteUtils";
-import {replacePropertyNameUtils} from "@/utility/renameUtils";
+import {deleteSchemaElement} from '@/utility/deleteUtils';
+import {replacePropertyNameUtils} from '@/utility/renameUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;

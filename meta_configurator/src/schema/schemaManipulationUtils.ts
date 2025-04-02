@@ -5,7 +5,7 @@ import {findAvailableSchemaId, isSubSchemaDefinedInDefinitions} from '@/schema/s
 import type {ManagedData} from '@/data/managedData';
 import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphConstructor';
 import type {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
-import {updateReferences} from "@/utility/renameUtils";
+import {updateReferences} from '@/utility/renameUtils';
 
 export function extractAllInlinedSchemaElements(
   schemaData: ManagedData,
@@ -48,7 +48,7 @@ export function extractInlinedSchemaElement(
 
   const updateDataFct: (path: Path, newValue: any) => void = (path, newValue) => {
     schemaData.setDataAt(path, newValue);
-  }
+  };
 
   if (forgetIfDuplicateExists) {
     // if an existing definition exists with the same content, we can just reference that
@@ -60,7 +60,12 @@ export function extractInlinedSchemaElement(
         schemaData.setDataAt(absoluteElementPath, {
           $ref: referenceToNewElement,
         });
-        updateReferences(absoluteElementPath, existingElementDefPath, schemaData.data.value, updateDataFct);
+        updateReferences(
+          absoluteElementPath,
+          existingElementDefPath,
+          schemaData.data.value,
+          updateDataFct
+        );
         return existingElementDefPath;
       }
     }

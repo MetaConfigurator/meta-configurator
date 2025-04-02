@@ -2,7 +2,7 @@ import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pathUtils';
-import {SessionMode} from "@/store/sessionMode";
+import {SessionMode} from '@/store/sessionMode';
 
 export function replacePropertyNameUtils(
   subPath: Path,
@@ -47,15 +47,26 @@ function updateKeyName(object: any, oldKey: string, newKey: string): any {
   return modifiedObj;
 }
 
-export function updateParentRequiredPropsValue(schemaData: any, parentPath: Path, oldPropertyName: string, newPropertyName: string, updateDataFct: (subPath: Path, newValue: any) => void) {
-  const parentRequiredPropsPath = getParentElementRequiredPropsPath(schemaData, parentPath.concat([oldPropertyName]));
+export function updateParentRequiredPropsValue(
+  schemaData: any,
+  parentPath: Path,
+  oldPropertyName: string,
+  newPropertyName: string,
+  updateDataFct: (subPath: Path, newValue: any) => void
+) {
+  const parentRequiredPropsPath = getParentElementRequiredPropsPath(
+    schemaData,
+    parentPath.concat([oldPropertyName])
+  );
   if (parentRequiredPropsPath) {
     const requiredProps = dataAt(parentRequiredPropsPath, schemaData) ?? [];
     const requiredIndex = requiredProps.indexOf(oldPropertyName);
     if (requiredIndex !== -1) {
-      const updatedRequiredProps = requiredProps.filter((_: string, index: number) => index !== requiredIndex);
+      const updatedRequiredProps = requiredProps.filter(
+        (_: string, index: number) => index !== requiredIndex
+      );
       updatedRequiredProps.push(newPropertyName);
-        updateDataFct(parentRequiredPropsPath, updatedRequiredProps);
+      updateDataFct(parentRequiredPropsPath, updatedRequiredProps);
     }
   }
 }

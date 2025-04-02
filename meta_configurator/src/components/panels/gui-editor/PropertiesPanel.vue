@@ -37,7 +37,7 @@ import {
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
 import _ from 'lodash';
-import {replacePropertyNameUtils} from "@/utility/renameUtils";
+import {replacePropertyNameUtils} from '@/utility/renameUtils';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
