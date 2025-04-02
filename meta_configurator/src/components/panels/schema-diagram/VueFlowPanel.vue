@@ -28,7 +28,6 @@ import {
 } from '@/schema/graph-representation/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
-import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 import {
   applyNewType,
   type AttributeTypeChoice,
@@ -42,6 +41,8 @@ import {
   extractInlinedSchemaElement,
 } from '@/schema/schemaManipulationUtils';
 import {schemaGraphToVueFlowGraph} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import {deleteSchemaElement} from '@/utility/deleteUtils';
+import {replacePropertyNameUtils} from '@/utility/renameUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -312,7 +313,7 @@ function updateAttributeType(
 }
 
 function deleteElement(objectData: SchemaElementData) {
-  schemaData.removeDataAt(objectData.absolutePath);
+  deleteSchemaElement(schemaData, objectData.absolutePath);
 }
 
 function addAttribute(objectData: SchemaElementData) {

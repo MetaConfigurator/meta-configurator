@@ -5,6 +5,7 @@ import {findAvailableSchemaId, isSubSchemaDefinedInDefinitions} from '@/schema/s
 import type {ManagedData} from '@/data/managedData';
 import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphConstructor';
 import type {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
+import {updateReferences} from '@/utility/renameUtils';
 
 export function extractAllInlinedSchemaElements(
   schemaData: ManagedData,
@@ -45,7 +46,12 @@ export function extractInlinedSchemaElement(
 ): Path {
   const dataAtPath = dataAt(absoluteElementPath, schemaData.data.value);
 
+  const updateDataFct: (path: Path, newValue: any) => void = (path, newValue) => {
+    schemaData.setDataAt(path, newValue);
+  };
+
   if (forgetIfDuplicateExists) {
+    // if an existing definition exists with the same content, we can just reference that
     const existingElementDefPath = ['$defs', elementName];
     const existingElementDef = dataAt(existingElementDefPath, schemaData.data.value);
     if (existingElementDef) {
@@ -54,6 +60,12 @@ export function extractInlinedSchemaElement(
         schemaData.setDataAt(absoluteElementPath, {
           $ref: referenceToNewElement,
         });
+        updateReferences(
+          absoluteElementPath,
+          existingElementDefPath,
+          schemaData.data.value,
+          updateDataFct
+        );
         return existingElementDefPath;
       }
     }
@@ -65,6 +77,7 @@ export function extractInlinedSchemaElement(
   schemaData.setDataAt(absoluteElementPath, {
     $ref: referenceToNewElement,
   });
+  updateReferences(absoluteElementPath, newElementId, schemaData.data.value, updateDataFct);
   return newElementId;
 }
 

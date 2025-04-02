@@ -1,5 +1,6 @@
 import type {Path, PathElement} from '@/utility/path';
 import pointer from 'json-pointer';
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 /**
  * Converts a path to a string.
@@ -63,6 +64,26 @@ export function dataPathToSchemaPath(dataPath: Path): Path {
   }
 
   return schemaPath;
+}
+
+export function getParentElementRequiredPropsPath(
+  schema: any,
+  absolutePath: Path
+): Path | undefined {
+  if (absolutePath.length < 2) {
+    return undefined;
+  }
+  if (absolutePath[absolutePath.length - 2] !== 'properties') {
+    return undefined;
+  }
+
+  const parentObjectPath = absolutePath.slice(0, -2);
+  const parentObject = dataAt(parentObjectPath, schema);
+  if (parentObject.required) {
+    return parentObjectPath.concat('required');
+  }
+
+  return undefined;
 }
 
 export function arePathsEqual(path1: Path, path2: Path): boolean {
