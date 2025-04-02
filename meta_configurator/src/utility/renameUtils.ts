@@ -1,7 +1,8 @@
 import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {pathToJsonPointer} from '@/utility/pathUtils';
+import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pathUtils';
+import {SessionMode} from "@/store/sessionMode";
 
 export function replacePropertyNameUtils(
   subPath: Path,
@@ -29,6 +30,10 @@ export function replacePropertyNameUtils(
     updateDataFct
   );
 
+  if (currentSchema.mode == SessionMode.SchemaEditor) {
+    updateParentRequiredPropsValue(currentData, parentPath, oldName, newName, updateDataFct);
+  }
+
   return parentPath.concat([newName]);
 }
 
@@ -42,7 +47,20 @@ function updateKeyName(object: any, oldKey: string, newKey: string): any {
   return modifiedObj;
 }
 
-function updateReferences(
+export function updateParentRequiredPropsValue(schemaData: any, parentPath: Path, oldPropertyName: string, newPropertyName: string, updateDataFct: (subPath: Path, newValue: any) => void) {
+  const parentRequiredPropsPath = getParentElementRequiredPropsPath(schemaData, parentPath.concat([oldPropertyName]));
+  if (parentRequiredPropsPath) {
+    const requiredProps = dataAt(parentRequiredPropsPath, schemaData) ?? [];
+    const requiredIndex = requiredProps.indexOf(oldPropertyName);
+    if (requiredIndex !== -1) {
+      const updatedRequiredProps = requiredProps.filter((_: string, index: number) => index !== requiredIndex);
+      updatedRequiredProps.push(newPropertyName);
+        updateDataFct(parentRequiredPropsPath, updatedRequiredProps);
+    }
+  }
+}
+
+export function updateReferences(
   oldPath: Path,
   newPath: Path,
   currentData: any,

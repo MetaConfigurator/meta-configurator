@@ -36,9 +36,8 @@ import {
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
-import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 import _ from 'lodash';
-import {writeSchemaRequiredDefaultsToData} from '@/schema/writeDefaultsToData';
+import {replacePropertyNameUtils} from "@/utility/renameUtils";
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
