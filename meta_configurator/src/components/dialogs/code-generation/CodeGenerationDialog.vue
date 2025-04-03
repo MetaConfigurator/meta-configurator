@@ -10,25 +10,27 @@ import Button from 'primevue/button';
 
 const showDialog = ref(false);
 
-const programmingLanguageChoices = ref([
-  'python',
-  'typescript',
-  'javascript',
-  'rust',
-  'java',
-  'kotlin',
-  'swift',
-  'dart',
-  'go',
-  'c++',
-  'csharp',
-  'php',
-  'ruby',
-  'scala',
+const programmingLanguageChoices = ref(
+  [
+    'python',
+    'typescript',
+    'javascript',
+    'rust',
+    'java',
+    'kotlin',
+    'swift',
+    'dart',
+    'go',
+    'c++',
+    'csharp',
+    'php',
+    'ruby',
+    'scala',
     'flow',
     'elm',
-    'objc'
-].sort((a, b) => a.localeCompare(b)));
+    'objc',
+  ].sort((a, b) => a.localeCompare(b))
+);
 
 const selectedProgrammingLanguage = ref('');
 
