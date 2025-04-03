@@ -49,6 +49,7 @@ Creating structured data files (or schemas) manually can be complex and error-pr
 
 *   **Support for JSON Schema Draft-2020-12** – Ensuring compatibility with modern schema definitions.
 
+*   **Code Generation** – Generate source code from JSON schemas in multiple programming languages (Python, Rust, TypeScript, C++, Java, etc.) using [quicktype](https://github.com/glideapps/quicktype/).
 
 🛠️ Development
 ---------------
@@ -76,6 +77,9 @@ Explore how to use MetaConfigurator with real-world examples:
 *   **[MOF Synthesis Example](./documentation_user/examples/mof_synthesis)** – Demonstrates schema generation, CSV import, and JSON export.
 
 *   **[Configurator Builder](./documentation_user/examples/configurator_building)** – Learn how to create and share pre-configured MetaConfigurator URLs.
+
+*   **[Code Generation](./documentation_user/examples/code_generation)** – Learn how to generate code in multiple programming languages from JSON schemas.
+
 
 
 📚 Read the full [User Documentation](./documentation_user).
