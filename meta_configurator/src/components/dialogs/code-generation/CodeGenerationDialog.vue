@@ -12,16 +12,23 @@ const showDialog = ref(false);
 
 const programmingLanguageChoices = ref([
   'python',
-  'java',
   'typescript',
-  'swift',
-  'kotlin',
+  'javascript',
   'rust',
+  'java',
+  'kotlin',
+  'swift',
   'dart',
   'go',
-  'csharp',
   'c++',
-]);
+  'csharp',
+  'php',
+  'ruby',
+  'scala',
+    'flow',
+    'elm',
+    'objc'
+].sort((a, b) => a.localeCompare(b)));
 
 const selectedProgrammingLanguage = ref('');
 

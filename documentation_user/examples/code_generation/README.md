@@ -9,16 +9,23 @@ This feature allows users to generate structured, type-safe representations of t
 
 You can generate code in the following languages:
 
-* Python
-* Rust
-* TypeScript
 * C++
-* Java
-* Go
 * C#
-* Swift
 * Dart
+* Elm
+* Flow
+* Go
+* Java
+* JavaScript
 * Kotlin
+* Objective-C
+* PHP
+* Python
+* Ruby
+* Rust
+* Scala
+* Swift
+* TypeScript
 
 ## How to Use Code Generation in MetaConfigurator
 
