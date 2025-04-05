@@ -21,6 +21,16 @@ export function pathToString(path: Path): string {
         .slice(1);
 }
 
+
+/**
+ * Converts a path to a json pointer.
+ * Example: [1, 'foo', 2] -> '/1/foo/2'
+ * @param path the path to convert
+ */
+export function pathToJsonPointer(path: Path): string {
+  return pointer.compile(path.map((element: PathElement) => element.toString()));
+}
+
 /**
  * Converts a json pointer to a path.
  * As JsonPointer cannot distinguish between array and object indices,
@@ -42,14 +52,6 @@ export function jsonPointerToPathTyped(jsonPointer: string): Path {
   });
 }
 
-/**
- * Converts a path to a json pointer.
- * Example: [1, 'foo', 2] -> '/1/foo/2'
- * @param path the path to convert
- */
-export function pathToJsonPointer(path: Path): string {
-  return pointer.compile(path.map((element: PathElement) => element.toString()));
-}
 
 export function dataPathToSchemaPath(dataPath: Path): Path {
   const schemaPath: Path = [];

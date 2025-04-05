@@ -5,7 +5,7 @@ import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/set
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {useDataSource} from '@/data/dataSource';
 
-function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
+export function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
   for (const key in defaultsFile) {
     if (!(key in userFile)) {
       userFile[key] = defaultsFile[key];
@@ -31,7 +31,7 @@ function overwriteSettingsValues(userFile: any, replaceFile: any) {
   }
 }
 
-function fixPanels(userData: SettingsInterfaceRoot, defaultData: SettingsInterfaceRoot) {
+export function fixPanels(userData: SettingsInterfaceRoot, defaultData: SettingsInterfaceRoot) {
   let panelsAreMessedUp = false;
 
   const userPanels = userData.panels;

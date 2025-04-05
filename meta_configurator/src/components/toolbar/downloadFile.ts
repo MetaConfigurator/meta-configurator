@@ -9,7 +9,7 @@ import {useSettings} from '@/settings/useSettings';
  */
 export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
   const configData: string = isSchema
-    ? JSON.stringify(useCurrentData().data.value)
+    ? JSON.stringify(useCurrentData().data.value, null, 2)
     : useCurrentData().unparsedData.value;
 
   // TODO correct type depending on the data format
