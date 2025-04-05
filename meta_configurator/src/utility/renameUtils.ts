@@ -5,7 +5,7 @@ import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pa
 import {SessionMode} from '@/store/sessionMode';
 
 export function replacePropertyNameUtils(
-    // relative or absolute path (depending on the provided data) to the property to rename
+  // relative or absolute path (depending on the provided data) to the property to rename
   path: Path,
   oldName: string,
   newName: string,
@@ -89,10 +89,7 @@ export function updateReferences(
     // for example: if oldPathStr is #/properties/a and the refValue is #/properties/a1
     // then we should not replace it, because otherwise we would replace a1 with {newPathStr}1
     // we solve this using regex
-    const updatedRefValue = refValue.replace(
-        new RegExp(oldPathStr + '(\\b|$)', 'g'),
-        newPathStr
-        );
+    const updatedRefValue = refValue.replace(new RegExp(oldPathStr + '(\\b|$)', 'g'), newPathStr);
     updateDataFct(refPath, updatedRefValue);
   });
 }

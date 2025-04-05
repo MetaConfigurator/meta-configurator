@@ -21,7 +21,6 @@ export function pathToString(path: Path): string {
         .slice(1);
 }
 
-
 /**
  * Converts a path to a json pointer.
  * Example: [1, 'foo', 2] -> '/1/foo/2'
@@ -51,7 +50,6 @@ export function jsonPointerToPathTyped(jsonPointer: string): Path {
     }
   });
 }
-
 
 export function dataPathToSchemaPath(dataPath: Path): Path {
   const schemaPath: Path = [];
