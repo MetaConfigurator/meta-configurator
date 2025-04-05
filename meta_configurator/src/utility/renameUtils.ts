@@ -5,14 +5,15 @@ import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pa
 import {SessionMode} from '@/store/sessionMode';
 
 export function replacePropertyNameUtils(
-  subPath: Path,
+  // relative or absolute path (depending on the provided data) to the property to rename
+  path: Path,
   oldName: string,
   newName: string,
   currentData: any,
   currentSchema: JsonSchemaWrapper,
   updateDataFct: (subPath: Path, newValue: any) => void
 ) {
-  const parentPath = subPath.slice(0, -1);
+  const parentPath = path.slice(0, -1);
   let dataAtParentPath = dataAt(parentPath, currentData) ?? {};
   // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
   dataAtParentPath = structuredClone(dataAtParentPath);
@@ -84,7 +85,11 @@ export function updateReferences(
   references.forEach((ref: any) => {
     const refPath = ref.path;
     const refValue = ref.value;
-    const updatedRefValue = refValue.replace(oldPathStr, newPathStr);
+    // instead of replacing oldPathStr with newPathStr always, we should only do so if in refValue the oldPathStr ends with a / or ends fully. Because there could be other references that have the same starting as oldPathStr but are not the same.
+    // for example: if oldPathStr is #/properties/a and the refValue is #/properties/a1
+    // then we should not replace it, because otherwise we would replace a1 with {newPathStr}1
+    // we solve this using regex
+    const updatedRefValue = refValue.replace(new RegExp(oldPathStr + '(\\b|$)', 'g'), newPathStr);
     updateDataFct(refPath, updatedRefValue);
   });
 }
