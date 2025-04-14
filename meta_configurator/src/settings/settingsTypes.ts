@@ -2,7 +2,6 @@ import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
   settingsVersion: string;
-  preferencesSelected: boolean;
   dataFormat: DataFormat;
   toolbarTitle: string;
   hideSchemaEditor: boolean;

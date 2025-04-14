@@ -84,12 +84,8 @@ const mainPanel = ref();
 
 onMounted(() => {
   if (!useSessionStore().hasShownInitialDialog) {
-    if (!useSettings().value.preferencesSelected) {
-      topToolbarRef.value?.showPreferencesDialog();
-    } else {
       topToolbarRef.value?.showInitialSchemaDialog();
       useSessionStore().hasShownInitialDialog = true;
-    }
 
     // update user settings by adding default value for missing fields
     addDefaultsForSettings();
