@@ -14,7 +14,7 @@
     "prettier": "prettier --write src/ --ignore-path .eslintignore",
     "test": "vitest",
     "test:cov": "vitest --coverage",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --reporter=html",
     "test:e2e:ui": "playwright test --headed",
     "preview": "vite preview",
     "prepare": "cd ../.. && husky install .husky",
