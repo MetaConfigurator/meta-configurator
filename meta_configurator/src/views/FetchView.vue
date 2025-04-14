@@ -20,8 +20,10 @@ onMounted(() => {
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
   let usesCustomSettings = false;
+  let isAnythingPreloaded = false;
 
   if ('settings' in query) {
+    isAnythingPreloaded = true;
     const settingsUrl = query.settings as string;
     console.info('Received settings URL ', settingsUrl, ' from query string "', query, '".');
     usesCustomSettings = true;
@@ -36,8 +38,7 @@ onMounted(() => {
   }
 
   if ('schema' in query) {
-    console.debug('skip initial schema selection dialog');
-    sessionStore.hasShownInitialDialog = true;
+    isAnythingPreloaded = true;
 
     const schemaUrl = query.schema as string;
     console.info('Received schema URL ', schemaUrl, ' from query string "', query, '".');
@@ -52,6 +53,7 @@ onMounted(() => {
   }
 
   if ('data' in query) {
+    isAnythingPreloaded = true;
     const dataUrl = query.data as string;
     console.info('Received data URL ', dataUrl, ' from query string "', query, '".');
     fetchExternalContent(dataUrl)
@@ -65,8 +67,7 @@ onMounted(() => {
   }
 
   if ('snapshot' in query) {
-    console.debug('skip initial schema selection dialog');
-    sessionStore.hasShownInitialDialog = true;
+    isAnythingPreloaded = true;
 
     const snapshotId = query.snapshot as string;
     console.info('Received snapshot ID ', snapshotId, ' from query string "', query, '".');
@@ -74,8 +75,7 @@ onMounted(() => {
     restoreSnapshot(snapshotId);
   }
   if ('project' in query) {
-    console.debug('skip initial schema selection dialog');
-    useSessionStore().hasShownInitialDialog = true;
+    isAnythingPreloaded = true;
 
     const projectId = query.project as string;
     console.info('Received project ID ', projectId, ' from query string "', query, '".');
@@ -87,6 +87,10 @@ onMounted(() => {
     settings.value.hideSettings = false;
     settings.value.hideSchemaEditor = false;
     settings.value.toolbarTitle = 'MetaConfigurator';
+  }
+  if (isAnythingPreloaded) {
+    // if we have preloaded something, we can skip the initial dialog
+    useSessionStore().hasShownInitialDialog = true;
   }
 
   useAppRouter().push('/data');
