@@ -14,3 +14,14 @@ export function modeToDocumentTypeDescription(mode: SessionMode): string {
       return 'settings';
   }
 }
+
+export function modeToMenuTitle(mode: SessionMode): string {
+  switch (mode) {
+    case SessionMode.DataEditor:
+      return 'Data Editor';
+    case SessionMode.SchemaEditor:
+      return 'Schema Editor';
+    case SessionMode.Settings:
+      return 'Settings';
+  }
+}

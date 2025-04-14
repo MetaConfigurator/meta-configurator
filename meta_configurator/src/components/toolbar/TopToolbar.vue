@@ -26,7 +26,7 @@ import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
-import {SessionMode} from '@/store/sessionMode';
+import {modeToMenuTitle, SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
@@ -84,7 +84,7 @@ function getPageName(): string {
  */
 function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
   const dataEditorItem: MenuItem = {
-    label: 'Data Editor',
+    label: modeToMenuTitle(SessionMode.DataEditor),
     icon: 'fa-regular fa-file',
     style: props.currentMode !== SessionMode.DataEditor ? '' : 'font-weight: bold;',
     command: () => {
@@ -92,7 +92,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     },
   };
   const schemaEditorItem: MenuItem = {
-    label: 'Schema Editor',
+    label: modeToMenuTitle(SessionMode.SchemaEditor),
     icon: 'fa-regular fa-file-code',
     style: props.currentMode !== SessionMode.SchemaEditor ? '' : 'font-weight: bold;',
     command: () => {
@@ -100,7 +100,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     },
   };
   const settingsItem: MenuItem = {
-    label: 'Settings',
+    label: modeToMenuTitle(SessionMode.Settings),
     icon: 'fa-solid fa-cog',
     style: props.currentMode !== SessionMode.Settings ? '' : 'font-weight: bold;',
     command: () => {
