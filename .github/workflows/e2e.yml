@@ -26,8 +26,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+            meta_configurator/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('meta_configurator/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
@@ -60,4 +60,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: ${{ github.workspace }}/playwright-report/
+          path: ${{ github.workspace }}/meta_configurator/playwright-report/
