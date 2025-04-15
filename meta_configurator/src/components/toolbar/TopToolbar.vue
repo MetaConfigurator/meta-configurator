@@ -343,7 +343,6 @@ const showSearchResultsMenu = event => {
 </script>
 
 <template>
-
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
     @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
@@ -394,8 +393,7 @@ const showSearchResultsMenu = event => {
   <Toolbar class="h-10 no-padding">
     <!-- Page switch menu  -->
     <template #start>
-      <Menu ref="menu" :model="items" :popup="true"
-      >
+      <Menu ref="menu" :model="items" :popup="true">
         <template #itemicon="slotProps">
           <div v-if="slotProps.item.icon !== undefined" data-testid="page-selection-menu">
             <FontAwesomeIcon :icon="slotProps.item.icon" style="min-width: 1rem" class="mr-3" />
@@ -446,7 +444,7 @@ const showSearchResultsMenu = event => {
           v-model="settings.dataFormat"
           size="small"
           class="custom-select"
-        data-testid="format-selector"/>
+          data-testid="format-selector" />
       </div>
 
       <!-- search bar -->
