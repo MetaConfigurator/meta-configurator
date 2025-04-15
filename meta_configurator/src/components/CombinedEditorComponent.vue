@@ -19,7 +19,7 @@ import {useDropZone, useWindowSize, watchImmediate} from '@vueuse/core/index';
 import {readFileContentToDataLink} from '@/utility/readFileContent';
 import {getDataForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
-import {SessionMode} from '@/store/sessionMode';
+import {modeToRoute, SessionMode} from '@/store/sessionMode';
 import {useSessionStore} from '@/store/sessionStore';
 import type {SettingsInterfacePanels, SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
@@ -66,17 +66,8 @@ let {width} = useWindowSize();
 
 function updateMode(newMode: SessionMode) {
   const router = useAppRouter();
-  switch (newMode) {
-    case SessionMode.DataEditor:
-      router.push('/data');
-      break;
-    case SessionMode.SchemaEditor:
-      router.push('/schema');
-      break;
-    case SessionMode.Settings:
-      router.push('/settings');
-      break;
-  }
+  const route = modeToRoute(newMode);
+  router.push(route);
 }
 
 const topToolbarRef = ref();
@@ -84,12 +75,8 @@ const mainPanel = ref();
 
 onMounted(() => {
   if (!useSessionStore().hasShownInitialDialog) {
-    if (!useSettings().value.preferencesSelected) {
-      topToolbarRef.value?.showPreferencesDialog();
-    } else {
-      topToolbarRef.value?.showInitialSchemaDialog();
-      useSessionStore().hasShownInitialDialog = true;
-    }
+    topToolbarRef.value?.showInitialSchemaDialog();
+    useSessionStore().hasShownInitialDialog = true;
 
     // update user settings by adding default value for missing fields
     addDefaultsForSettings();

@@ -11,7 +11,6 @@ import Listbox from 'primevue/listbox';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
-import PreferenceDialog from '@/components/dialogs/PreferenceDialog.vue';
 
 import InputText from 'primevue/inputtext';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
@@ -27,7 +26,7 @@ import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
-import {SessionMode} from '@/store/sessionMode';
+import {modeToMenuTitle, SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
@@ -85,7 +84,7 @@ function getPageName(): string {
  */
 function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
   const dataEditorItem: MenuItem = {
-    label: 'Data Editor',
+    label: modeToMenuTitle(SessionMode.DataEditor),
     icon: 'fa-regular fa-file',
     style: props.currentMode !== SessionMode.DataEditor ? '' : 'font-weight: bold;',
     command: () => {
@@ -93,7 +92,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     },
   };
   const schemaEditorItem: MenuItem = {
-    label: 'Schema Editor',
+    label: modeToMenuTitle(SessionMode.SchemaEditor),
     icon: 'fa-regular fa-file-code',
     style: props.currentMode !== SessionMode.SchemaEditor ? '' : 'font-weight: bold;',
     command: () => {
@@ -101,7 +100,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     },
   };
   const settingsItem: MenuItem = {
-    label: 'Settings',
+    label: modeToMenuTitle(SessionMode.Settings),
     icon: 'fa-solid fa-cog',
     style: props.currentMode !== SessionMode.Settings ? '' : 'font-weight: bold;',
     command: () => {
@@ -266,15 +265,10 @@ function isHighlighted(item: MenuItem) {
 const searchTerm: Ref<string> = ref('');
 
 const initialSchemaSelectionDialog = ref();
-const preferencesDialog = ref();
 
 // Function to show the category selection dialog
 const showInitialSchemaDialog = () => {
   initialSchemaSelectionDialog.value?.show();
-};
-
-const showPreferencesDialog = () => {
-  preferencesDialog.value?.show();
 };
 
 const csvImportDialog = ref();
@@ -300,7 +294,6 @@ function showCodeGenerationDialog(schemaMode: boolean) {
 
 defineExpose({
   showInitialSchemaDialog,
-  showPreferencesDialog,
 });
 
 useMagicKeys({
@@ -350,8 +343,6 @@ const showSearchResultsMenu = event => {
 </script>
 
 <template>
-  <PreferenceDialog :open-schema-selection-fct="showInitialSchemaDialog" ref="preferencesDialog" />
-
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
     @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
@@ -404,7 +395,7 @@ const showSearchResultsMenu = event => {
     <template #start>
       <Menu ref="menu" :model="items" :popup="true">
         <template #itemicon="slotProps">
-          <div v-if="slotProps.item.icon !== undefined">
+          <div v-if="slotProps.item.icon !== undefined" data-testid="page-selection-menu">
             <FontAwesomeIcon :icon="slotProps.item.icon" style="min-width: 1rem" class="mr-3" />
           </div>
         </template>
@@ -452,7 +443,8 @@ const showSearchResultsMenu = event => {
           :options="dataFormatOptions"
           v-model="settings.dataFormat"
           size="small"
-          class="custom-select" />
+          class="custom-select"
+          data-testid="format-selector" />
       </div>
 
       <!-- search bar -->

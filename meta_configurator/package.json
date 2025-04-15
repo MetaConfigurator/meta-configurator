@@ -14,8 +14,11 @@
     "prettier": "prettier --write src/ --ignore-path .eslintignore",
     "test": "vitest",
     "test:cov": "vitest --coverage",
-    "test:e2e": "playwright test --reporter=html",
-    "test:e2e:ui": "playwright test --headed",
+    "prepare:e2e": "cp -r e2e/test-fixtures public",
+    "test:e2e": "npm-run-all prepare:e2e test:e2e:run",
+    "test:e2e:ui": "npm-run-all prepare:e2e test:e2e:run:ui",
+    "test:e2e:run": "playwright test --reporter=html",
+    "test:e2e:run:ui": "playwright test --headed",
     "preview": "vite preview",
     "prepare": "cd ../.. && husky install .husky",
     "precommit": "pretty-quick --staged"

@@ -20,6 +20,7 @@ onMounted(() => {
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
   let usesCustomSettings = false;
+  let skipSchemaDialog = false;
 
   if ('settings' in query) {
     const settingsUrl = query.settings as string;
@@ -36,8 +37,7 @@ onMounted(() => {
   }
 
   if ('schema' in query) {
-    console.debug('skip initial schema selection dialog');
-    sessionStore.hasShownInitialDialog = true;
+    skipSchemaDialog = true;
 
     const schemaUrl = query.schema as string;
     console.info('Received schema URL ', schemaUrl, ' from query string "', query, '".');
@@ -65,8 +65,7 @@ onMounted(() => {
   }
 
   if ('snapshot' in query) {
-    console.debug('skip initial schema selection dialog');
-    sessionStore.hasShownInitialDialog = true;
+    skipSchemaDialog = true;
 
     const snapshotId = query.snapshot as string;
     console.info('Received snapshot ID ', snapshotId, ' from query string "', query, '".');
@@ -74,8 +73,7 @@ onMounted(() => {
     restoreSnapshot(snapshotId);
   }
   if ('project' in query) {
-    console.debug('skip initial schema selection dialog');
-    useSessionStore().hasShownInitialDialog = true;
+    skipSchemaDialog = true;
 
     const projectId = query.project as string;
     console.info('Received project ID ', projectId, ' from query string "', query, '".');
@@ -87,6 +85,9 @@ onMounted(() => {
     settings.value.hideSettings = false;
     settings.value.hideSchemaEditor = false;
     settings.value.toolbarTitle = 'MetaConfigurator';
+  }
+  if (skipSchemaDialog) {
+    sessionStore.hasShownInitialDialog = true;
   }
 
   useAppRouter().push('/data');

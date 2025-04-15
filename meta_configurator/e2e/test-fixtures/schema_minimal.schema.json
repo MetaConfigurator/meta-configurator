@@ -1,0 +1,14 @@
+{
+  "title": "Person",
+  "type": "object",
+  "properties": {
+    "age": {
+      "type": "number",
+      "minimum": 0
+    },
+    "name": {
+      "type": "string"
+    }
+  }
+
+}
