@@ -571,7 +571,9 @@ function zoomIntoPath(path: Path) {
                 updatePropertyName(slotProps.node.data.relativePath, oldName, newName)
             "
             @start_editing_property_name="() => (allowShowOverlay = false)"
-            @stop_editing_property_name="() => (allowShowOverlay = true)" />
+            @stop_editing_property_name="() => (allowShowOverlay = true)"
+            :data-testid="'property_metadata-' + pathToString(slotProps.node.data.absolutePath)"
+          />
         </span>
 
         <!-- data nodes, actual edit fields for the data -->
@@ -585,7 +587,8 @@ function zoomIntoPath(path: Path) {
             @update_tree="updateTree"
             @click="() => clickedPropertyData(slotProps.node.data)"
             bodyClass="w-full"
-            @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />
+            @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)"
+            :data-testid="'property_data-' + pathToString(slotProps.node.data.absolutePath)"/>
         </span>
 
         <!-- special tree nodes -->
@@ -595,7 +598,9 @@ function zoomIntoPath(path: Path) {
           style="width: 100%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
           @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
-          @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
+          @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)"
+          :data-testid="'add_item-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))"
+        >
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{ slotProps.node.data.label }}</span>
@@ -612,7 +617,10 @@ function zoomIntoPath(path: Path) {
           "
           @keyup.enter="
             addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-          ">
+          "
+
+          :data-testid="'add_property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))"
+        >
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">New property</span>
@@ -623,7 +631,9 @@ function zoomIntoPath(path: Path) {
           v-if="slotProps.node.type === TreeNodeType.ADVANCED_PROPERTY"
           class="text-gray-500"
           style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          :data-testid="'advanced_property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))"
+        >
           Advanced
         </span>
         <span

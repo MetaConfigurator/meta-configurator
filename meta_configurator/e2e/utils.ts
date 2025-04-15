@@ -75,6 +75,8 @@ export async function checkToolbarTitleForText(page: Page, text: string) {
 }
 
 export async function selectInitialSchemaFromExamples(page: Page, schemaName: string) {
+    await expect(page.getByText('Select a Schema')).toBeVisible()
+
     // Wait for the page to load and select the "Example Schema" from the dropdown
     await page.getByRole('button', { name: 'Example Schema' }).click();
 
