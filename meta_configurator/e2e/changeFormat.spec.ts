@@ -5,7 +5,7 @@ import {
     getCurrentDataFormat,
     openApp,
     selectInitialSchemaFromExamples
-} from "./e2eUtils";
+} from "./utils";
 import {SessionMode} from "../src/store/sessionMode";
 
 

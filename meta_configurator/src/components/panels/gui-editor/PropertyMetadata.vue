@@ -167,7 +167,9 @@ function focusOnPropertyLabel(): void {
         {{ getDisplayNameOfNode(props.node) }}
       </span>
       <!--Show red star after text if property is required -->
-      <span class="text-red-600">{{ isRequiredProperty(node.data) ? '*' : '' }}</span>
+      <span class="text-red-600" data-testid="required-star">{{
+        isRequiredProperty(node.data) ? '*' : ''
+      }}</span>
     </span>
 
     <span class="text-xs text-gray-400">:&nbsp;{{ getTypeDescription(node.data.schema) }}</span>
@@ -175,7 +177,7 @@ function focusOnPropertyLabel(): void {
       class="pi pi-pencil ml-3 text-indigo-700"
       v-if="isPropertyNameEditable(props.type) && showPencil"
       @click="focusOnPropertyLabel()"></span>
-    <span class="text-red-600 ml-3" v-if="isInvalid()">
+    <span class="text-red-600 ml-3" v-if="isInvalid()" data-testid="validation-error-icon">
       <FontAwesomeIcon icon="triangle-exclamation" />
     </span>
   </span>
