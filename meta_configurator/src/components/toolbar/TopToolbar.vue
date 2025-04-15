@@ -394,9 +394,10 @@ const showSearchResultsMenu = event => {
   <Toolbar class="h-10 no-padding">
     <!-- Page switch menu  -->
     <template #start>
-      <Menu ref="menu" :model="items" :popup="true">
+      <Menu ref="menu" :model="items" :popup="true"
+      >
         <template #itemicon="slotProps">
-          <div v-if="slotProps.item.icon !== undefined">
+          <div v-if="slotProps.item.icon !== undefined" data-testid="page-selection-menu">
             <FontAwesomeIcon :icon="slotProps.item.icon" style="min-width: 1rem" class="mr-3" />
           </div>
         </template>
@@ -444,7 +445,8 @@ const showSearchResultsMenu = event => {
           :options="dataFormatOptions"
           v-model="settings.dataFormat"
           size="small"
-          class="custom-select" />
+          class="custom-select"
+        data-testid="format-selector"/>
       </div>
 
       <!-- search bar -->

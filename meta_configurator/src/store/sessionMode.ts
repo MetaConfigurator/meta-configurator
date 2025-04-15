@@ -25,3 +25,14 @@ export function modeToMenuTitle(mode: SessionMode): string {
       return 'Settings';
   }
 }
+
+export function modeToRoute(mode: SessionMode): string {
+  switch (mode) {
+    case SessionMode.DataEditor:
+      return '/data';
+    case SessionMode.SchemaEditor:
+      return '/schema';
+    case SessionMode.Settings:
+      return '/settings';
+  }
+}
