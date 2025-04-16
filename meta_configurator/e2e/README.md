@@ -1,7 +1,7 @@
 # End to End (E2E) Testing
 
-This directory contains the end-to-end (E2E) tests for the Meta Configurator, also known as UI tests.
-These tests are designed to verify the functionality of the Meta Configurator by simulating user interactions with the UI.
+This directory contains the end-to-end (E2E) tests for the MetaConfigurator, also known as UI tests.
+These tests are designed to verify the functionality of MetaConfigurator by simulating user interactions with the UI.
 The tests are written in TypeScript and utilize the [Playwright library](https://playwright.dev/) for browser automation.
 
 # Running the Tests
