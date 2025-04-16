@@ -24,6 +24,10 @@ vi.mock('@/data/useDataLink', () => ({
 
 describe('test pathUtils', () => {
   it('should correctly convert from path to string', () => {
+    const pathRoot: Path = [];
+    const expectedResultRoot = '';
+    expect(pathToString(pathRoot)).toEqual(expectedResultRoot);
+
     const path: Path = ['properties', 'foo', 0, 'bar'];
     const expectedResult = 'properties.foo[0].bar';
     expect(pathToString(path)).toEqual(expectedResult);
@@ -34,6 +38,10 @@ describe('test pathUtils', () => {
   });
 
   it('should correctly convert from path to json pointer', () => {
+    const pathRoot: Path = [];
+    const expectedResultRoot = '';
+    expect(pathToJsonPointer(pathRoot)).toEqual(expectedResultRoot);
+
     const path: Path = ['properties', 'foo', 0, 'bar'];
     const expectedResult = '/properties/foo/0/bar';
     expect(pathToJsonPointer(path)).toEqual(expectedResult);
@@ -44,6 +52,10 @@ describe('test pathUtils', () => {
   });
 
   it('should correctly convert from json pointer to path (without using numbers for array index)', () => {
+    const jsonPointerRoot = '';
+    const expectedResultRoot: Path = [];
+    expect(jsonPointerToPath(jsonPointerRoot)).toEqual(expectedResultRoot);
+
     const jsonPointer = '/properties/foo/0/bar';
     const expectedResult = ['properties', 'foo', '0', 'bar'];
     expect(jsonPointerToPath(jsonPointer)).toEqual(expectedResult);
@@ -54,6 +66,10 @@ describe('test pathUtils', () => {
   });
 
   it('should correctly convert from json pointer to typed path (with using numbers for array index)', () => {
+    const jsonPointerRoot = '';
+    const expectedResultRoot: Path = [];
+    expect(jsonPointerToPathTyped(jsonPointerRoot)).toEqual(expectedResultRoot);
+
     const jsonPointer = '/properties/foo/0/bar';
     const expectedResult = ['properties', 'foo', 0, 'bar'];
     expect(jsonPointerToPathTyped(jsonPointer)).toEqual(expectedResult);
@@ -64,6 +80,10 @@ describe('test pathUtils', () => {
   });
 
   it('should correctly convert from data path to schema path', () => {
+    const dataPathRoot: Path = [];
+    const expectedResultRoot: Path = [];
+    expect(dataPathToSchemaPath(dataPathRoot)).toEqual(expectedResultRoot);
+
     const dataPath: Path = ['foo', 0, 'bar'];
     const expectedResult = ['properties', 'foo', 'items', 'properties', 'bar'];
     expect(dataPathToSchemaPath(dataPath)).toEqual(expectedResult);

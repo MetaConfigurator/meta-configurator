@@ -477,7 +477,7 @@ const showSearchResultsMenu = event => {
       <div class="flex space-x-5 mr-3">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
-          <p class="font-semibold text-lg">
+          <p class="font-semibold text-lg" data-testid="toolbar-title">
             {{ settings.toolbarTitle || 'MetaConfigurator' }}
           </p>
         </div>

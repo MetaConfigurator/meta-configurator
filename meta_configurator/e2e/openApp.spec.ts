@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 import {
-    checkCodeEditorForText,
+    checkSchemaTitleForText,
     checkToolbarTitleForText,
     getCurrentEditorMode,
-    getSchemaTitle,
     openApp,
     openAppWithMode
 } from "./utils";
 import {SessionMode} from "../src/store/sessionMode";
+import {tpGetData} from "./utilsTestPanel";
 
 test('Open the app and check that the initial mode is Data Editor', async ({ page }) => {
     // Go to the app
@@ -40,24 +40,24 @@ test('Open the app in the settings mode and check that the initial mode is Setti
 
 test('Open the app with pre-loaded data, schema and settings', async ({ page }) => {
     // Go to the app with pre-loaded data, schema and settings
-    await openApp(page, 'settings_normal.json', 'data_minimal.json', 'schema_minimal.schema.json')
+    await openApp(page, 'settings_testpanel.json', 'data_minimal.json', 'schema_minimal.schema.json')
 
     // Wait for the app to load
-    await page.waitForTimeout(1000)
+    await page.waitForTimeout(2000)
 
     // Check that the current mode is Data Editor
     const currentMode = await getCurrentEditorMode(page)
     expect(currentMode).toBe(SessionMode.DataEditor)
 
     // Check that the data is loaded correctly
-    await checkCodeEditorForText(page, '{ "name": "Alex", "age": 25}', SessionMode.DataEditor);
+    const currentData = await tpGetData(page, SessionMode.DataEditor);
+    expect(currentData).toEqual({ name: 'Alex', age: 25 });
 
     // Check that the correct schema is loaded via the schema title
-    const schemaTitle = await getSchemaTitle(page);
-    expect(schemaTitle).toBe('Person');
+    await checkSchemaTitleForText(page, 'Person');
 
     // Check that the settings are loaded correctly using the toolbar title
-    await checkToolbarTitleForText(page, 'Test - Settings Normal');
+    await checkToolbarTitleForText(page, 'Test');
 });
 
 test('Go through the initial schema selection dialog', async ({ page }) => {
