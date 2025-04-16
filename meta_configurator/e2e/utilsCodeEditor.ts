@@ -31,8 +31,11 @@ export async function forceCodeEditorText(page: Page, text: string, mode: Sessio
 
     await codeEditor.press('Enter');
 
-    // click somewhere else to trigger the change event
-    await page.getByTestId('toolbar-title').click();
+    // click on the very top right of the page to remove focus from the code editor
+    // this is needed to trigger the change event
+    const x = page.viewportSize()?.width || 0;
+    const y = page.viewportSize()?.height || 0;
+    await page.mouse.click(x - 10, y - 10);
 
     // wait 1 second
     await page.waitForTimeout(1000);
