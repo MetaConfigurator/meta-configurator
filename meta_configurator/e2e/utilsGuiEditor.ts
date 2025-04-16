@@ -2,6 +2,7 @@ import {Page} from "playwright";
 import {expect} from "@playwright/test";
 import {Path, PathElement} from "../src/utility/path";
 import {pathToString} from "../src/utility/pathUtils";
+import {selectAll} from "./utils";
 
 
 export async function checkPropertyExistence(page: Page, propertyPath: Path, shouldBeVisible: boolean) {
@@ -39,7 +40,7 @@ export async function editNumberOrIntProperty(page: Page, propertyPath: Path, va
     const pathAsString = pathToString(propertyPath);
     const spinButton = page.getByTestId(`property-data-${pathAsString}`).getByRole('spinbutton')
     await spinButton.click();
-    await spinButton.press('Control+A'); // or 'Meta+A' on macOS
+    await selectAll(page);
     await spinButton.press('Backspace');
 
     // Simulate real typing

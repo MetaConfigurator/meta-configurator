@@ -1,6 +1,7 @@
 import {modeToMenuTitle, modeToRoute, SessionMode} from "../src/store/sessionMode";
 import {Page} from "playwright";
 import {expect} from "@playwright/test";
+import * as os from "node:os";
 
 const dataFormats = [ 'json', 'yaml', 'xml' ];
 
@@ -93,4 +94,10 @@ export async function forceDataFormat(page: Page, newFormat: string) {
         await formatSelector.getByRole('combobox', { name: currentFormat }).click();
         await page.getByRole('option', { name: newFormat }).click();
     }
+}
+
+export async function selectAll(page: Page) {
+    const isMac = os.platform() === 'darwin';
+    const modifier = isMac ? 'Meta' : 'Control';
+    await page.keyboard.press(`${modifier}+A`);
 }

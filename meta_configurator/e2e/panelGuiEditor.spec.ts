@@ -11,7 +11,8 @@ import {
     editStringProperty, expandOrCollapseProperty
 } from "./utilsGuiEditor";
 import {SessionMode} from "../src/store/sessionMode";
-import {tpForceCurrentSelectedElement, tpGetCurrentSelectedElement, tpGetData} from "./utilsTestPanel";
+import {tpForceCurrentSelectedElement, tpForceData, tpGetCurrentSelectedElement, tpGetData} from "./utilsTestPanel";
+import {checkCodeEditorForText} from "./utilsCodeEditor";
 
 test('Edit the feature testing example schema using the GUI Editor, testing basic editing and schema violations', async ({ page }) => {
     // Go to the app, pre-loading the test settings
@@ -101,4 +102,45 @@ test('Test whether selecting an element, of which the parent is collapsed in the
     await tpForceCurrentSelectedElement(page, SessionMode.SchemaEditor, elementOfInterest);
     // Expect that the elementOfInterest is now visible
     await checkPropertyExistence(page, elementOfInterest, true)
+});
+
+
+
+test('Change the internal data and check if the GUI editor is updated properly', async ({ page }) => {
+    // Go to the app, pre-loading the schema
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+
+    // Expand the address property
+    await expandOrCollapseProperty(page, 'address')
+
+    // Confirm that the initial name and city both are empty strings
+    await checkStringProperty(page, ['name'], '')
+    await checkStringProperty(page, ['address', 'city'], '')
+
+    // Update the data to {"properties": {"address": {"city": "Berlin"}}}
+    const dataBerlin = {"address": {"city": "Berlin"}};
+    await tpForceData(page, SessionMode.DataEditor, dataBerlin);
+    // Validate that the name is still empty but the city now has the value Berlin
+    await checkStringProperty(page, ['name'], '')
+    await checkStringProperty(page, ['address', 'city'], 'Berlin')
+});
+
+test('Change the GUI editor content and check if the internal data is updated properly', async ({ page }) => {
+    // Go to the app, pre-loading the schema
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+
+    // Expand the address property
+    await expandOrCollapseProperty(page, 'address')
+
+    // Confirm that the initial internal data is an empty object
+    const dataInitial = await tpGetData(page, SessionMode.DataEditor);
+    expect(dataInitial).toEqual({});
+
+    // Change the GUI editor content
+    await editStringProperty(page, ['name'], 'Alex')
+    await editStringProperty(page, ['address', 'city'], 'Berlin')
+
+    // Validate that the internal data is updated correctly
+    const dataAfterNameEnter = await tpGetData(page, SessionMode.DataEditor);
+    expect(dataAfterNameEnter).toEqual({ name: 'Alex', address: { city: 'Berlin' } });
 });

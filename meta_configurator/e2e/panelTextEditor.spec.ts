@@ -6,7 +6,8 @@ import {
     selectInitialSchemaFromExamples
 } from "./utils";
 import {SessionMode} from "../src/store/sessionMode";
-import {checkCodeEditorForText} from "./utilsCodeEditor";
+import {checkCodeEditorForText, forceCodeEditorText} from "./utilsCodeEditor";
+import {tpForceData, tpGetData} from "./utilsTestPanel";
 
 
 test('Select an example schema, enter some value and change the data format. Then check the code editor content for the data in the new format.', async ({ page }) => {
@@ -52,4 +53,33 @@ test('Select an example schema, enter some value and change the data format. The
 
     // Check that the code editor shows the correct JSON data
     await checkCodeEditorForText(page, '{ "SimulationName": "Sim_2"}', SessionMode.DataEditor);
+});
+
+
+test('Change the internal data and check if the code editor is updated properly', async ({ page }) => {
+    // Go to the app, pre-loading the schema
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+
+    // Confirm that the initial data is an empty object
+    await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
+
+    // Update the data to {"properties": {"address": {"city": "Berlin"}}}
+    const dataBerlin = {"address": {"city": "Berlin"}};
+    await tpForceData(page, SessionMode.DataEditor, dataBerlin);
+    // Validate that the data is set correctly
+    await checkCodeEditorForText(page, '{ "address": { "city": "Berlin" }}', SessionMode.DataEditor);
+});
+
+test('Change the code editor content and check if the internal data is updated properly', async ({ page }) => {
+    // Go to the app, pre-loading the schema
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+
+    // Confirm that the initial data is an empty object
+    await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
+
+    // Change the code editor content
+    await forceCodeEditorText(page, '{ "name": "Alex" }', SessionMode.DataEditor);
+    // Validate that the internal data is updated correctly
+    const dataAfterNameEnter = await tpGetData(page, SessionMode.DataEditor);
+    expect(dataAfterNameEnter).toEqual({ name: 'Alex' });
 });
