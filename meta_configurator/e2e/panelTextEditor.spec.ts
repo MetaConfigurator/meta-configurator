@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
 import {
-    checkCodeEditorForText,
     forceDataFormat,
     getCurrentDataFormat,
     openApp,
     selectInitialSchemaFromExamples
 } from "./utils";
 import {SessionMode} from "../src/store/sessionMode";
+import {checkCodeEditorForText} from "./utilsCodeEditor";
 
 
 test('Select an example schema, enter some value and change the data format. Then check the code editor content for the data in the new format.', async ({ page }) => {

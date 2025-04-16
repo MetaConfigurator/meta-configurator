@@ -49,19 +49,6 @@ export async function openAppWithMode(page: Page, mode: SessionMode) {
     await page.goto(url.toString());
 }
 
-export async function readCodeEditorText(page: Page, mode: SessionMode|""="") {
-    const codeEditor = getCodeEditor(page, mode);
-    return await codeEditor.innerText();
-}
-
-export async function checkCodeEditorForText(page: Page, text: string, mode: SessionMode|""="") {
-    return await expect(getCodeEditor(page, mode)).toContainText(text);
-}
-
-export function getCodeEditor(page: Page, mode: SessionMode|""="") {
-    return page.locator(`[id^="code-editor-${mode}"]`);
-}
-
 export async function getSchemaTitle(page: Page) {
     // this is an example of how to access the component when the schema is called Person: await page.getByText('GUI Editor Schema: Person')
     const schemaTitle = page.getByText('GUI Editor Schema:');
@@ -70,8 +57,13 @@ export async function getSchemaTitle(page: Page) {
     return schemaTitleTextArray[1].trim();
 }
 
+export async function checkSchemaTitleForText(page: Page, text: string) {
+    const schemaTitle = page.getByText('GUI Editor Schema:');
+    await expect(schemaTitle).toContainText(text);
+}
+
 export async function checkToolbarTitleForText(page: Page, text: string) {
-    await expect(page.getByRole('paragraph')).toContainText(text);
+    await expect(page.getByTestId('toolbar-title')).toContainText(text);
 }
 
 export async function selectInitialSchemaFromExamples(page: Page, schemaName: string) {

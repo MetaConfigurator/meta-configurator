@@ -1,0 +1,32 @@
+{
+  "title": "Person",
+  "type": "object",
+  "properties": {
+    "age": {
+      "type": "number",
+      "minimum": 0
+    },
+    "name": {
+      "type": "string"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        }
+      },
+      "required": ["street", "city", "state", "zip"]
+    }
+  }
+
+}
