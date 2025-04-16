@@ -8,7 +8,6 @@ import {getDataForMode} from '@/data/useDataLink';
  * This panel is intended for e2e testing purposes only.
  * It provides direct ways to call functions and influence the internal state.
  */
-
 </script>
 
 <template>

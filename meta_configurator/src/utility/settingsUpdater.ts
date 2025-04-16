@@ -67,14 +67,13 @@ export function overwriteSettings(replaceFile: any) {
   migrateSettingsVersion(userSettings);
 }
 
-
 function migrateSettingsVersion(userSettings: any) {
   if (userSettings.settingsVersion === '1.0.0') {
     // migrate from 1.0.0 to 1.0.1
-    userSettings.settingsVersion = "1.0.1";
+    userSettings.settingsVersion = '1.0.1';
     const hiddenPanels = userSettings.panels.hidden;
-    if (!hiddenPanels.includes("test")) {
-      userSettings.panels.hidden.push("test")
+    if (!hiddenPanels.includes('test')) {
+      userSettings.panels.hidden.push('test');
     }
   }
 }

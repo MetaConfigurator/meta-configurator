@@ -7,7 +7,7 @@ import SchemaDiagramPanel from '@/components/panels/schema-diagram/SchemaDiagram
 import DebugPanel from '@/components/panels/debug-panel/DebugPanel.vue';
 import AiPromptsPanel from '@/components/panels/ai-prompts/AiPromptsPanel.vue';
 import ListAnalysisPanel from './list-analysis/ListAnalysisPanel.vue';
-import TestPanel from "@/components/panels/test-panel/TestPanel.vue";
+import TestPanel from '@/components/panels/test-panel/TestPanel.vue';
 
 export const panelTypeTextEditor: PanelTypeDefinition = {
   getComponent: () => CodeEditorPanel,

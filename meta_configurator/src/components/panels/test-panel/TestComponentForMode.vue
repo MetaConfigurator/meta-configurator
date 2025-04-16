@@ -2,10 +2,10 @@
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import Divider from 'primevue/divider';
-import InputText from "primevue/inputtext";
-import Button from "primevue/button";
-import {jsonPointerToPathTyped, pathToJsonPointer} from "@/utility/pathUtils";
-import {computed, type Ref, ref} from "vue";
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
+import {computed, type Ref, ref} from 'vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -56,76 +56,61 @@ function submitSchema(schemaText: string) {
   <div class="flex-grow overflow-y-auto" :data-testid="`test-component-${props.sessionMode}`">
     <div>
       <p data-testid="current-selected-element">
-        {{formattedCurrentSelectedElement}}
+        {{ formattedCurrentSelectedElement }}
       </p>
       <p data-testid="current-path">
-        {{formattedCurrentPath}}
+        {{ formattedCurrentPath }}
       </p>
 
       <p data-testid="data">
-        {{JSON.stringify(data.data.value)}}
+        {{ JSON.stringify(data.data.value) }}
       </p>
 
       <p data-testid="schema">
-        {{JSON.stringify(schema.schemaRaw.value)}}
+        {{ JSON.stringify(schema.schemaRaw.value) }}
       </p>
 
       <InputText
         v-model="currentPathInput"
         data-testid="current-path-input"
-        placeholder="Current Path"
-        />
+        placeholder="Current Path" />
 
       <Button
         data-testid="submit-current-path"
         :label="'Submit Current Path'"
         :icon="'pi pi-check'"
         class="p-button-success"
-        @click="submitCurrentPath(currentPathInput)"
-      />
+        @click="submitCurrentPath(currentPathInput)" />
 
       <InputText
         v-model="currentSelectedElementInput"
         data-testid="current-selected-element-input"
-        placeholder="Current Selected Element"
-        />
+        placeholder="Current Selected Element" />
 
       <Button
         data-testid="submit-current-selected-element"
         :label="'Submit Current Selected Element'"
         :icon="'pi pi-check'"
         class="p-button-success"
-        @click="submitCurrentSelectedElement(currentSelectedElementInput)"
-      />
+        @click="submitCurrentSelectedElement(currentSelectedElementInput)" />
 
-      <InputText
-        v-model="dataInput"
-        data-testid="data-input"
-        placeholder="Data"
-        />
+      <InputText v-model="dataInput" data-testid="data-input" placeholder="Data" />
 
       <Button
         data-testid="submit-data"
         :label="'Submit Data'"
         :icon="'pi pi-check'"
         class="p-button-success"
-        @click="submitData(dataInput)"
-      />
+        @click="submitData(dataInput)" />
 
-      <InputText
-        v-model="schemaInput"
-        data-testid="schema-input"
-        placeholder="Schema"
-        />
+      <InputText v-model="schemaInput" data-testid="schema-input" placeholder="Schema" />
 
       <Button
         data-testid="submit-schema"
         :label="'Submit Schema'"
         :icon="'pi pi-check'"
         class="p-button-success"
-        @click="submitSchema(schemaInput)"
-      />
-
+        @click="submitSchema(schemaInput)" />
 
       <Divider />
     </div>
