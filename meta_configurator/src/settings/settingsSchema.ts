@@ -11,8 +11,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     settingsVersion: {
       type: 'string',
       description: 'The version of the settings file.',
-      default: '1.0.0',
-      enum: ['1.0.0'],
+      default: '1.0.1',
+      enum: ['1.0.0', '1.0.1'],
       readOnly: true,
     },
     dataFormat: {
@@ -268,7 +268,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'Panels that should be hidden in the editor and not shown to the user. By default, this section contains debugging and experimental panels.',
           items: {
             type: 'string',
-            enum: ['aiPrompts', 'debug', 'schemaDiagram', 'guiEditor', 'textEditor', 'tableView'],
+            enum: ['aiPrompts', 'debug', 'test', 'schemaDiagram', 'guiEditor', 'textEditor', 'tableView'],
           },
         },
       },

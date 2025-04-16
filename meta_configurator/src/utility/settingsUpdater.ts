@@ -57,10 +57,24 @@ export function addDefaultsForSettings() {
   addDefaultsForMissingFields(userSettings, defaultSettings);
 
   fixPanels(userSettings, defaultSettings);
+  migrateSettingsVersion(userSettings);
 }
 
 export function overwriteSettings(replaceFile: any) {
   // overwrites the settings with the values from the replace file. Keeps all other values
   const userSettings = useDataSource().settingsData.value;
   overwriteSettingsValues(userSettings, replaceFile);
+  migrateSettingsVersion(userSettings);
+}
+
+
+function migrateSettingsVersion(userSettings: any) {
+  if (userSettings.settingsVersion === '1.0.0') {
+    // migrate from 1.0.0 to 1.0.1
+    userSettings.settingsVersion = "1.0.1";
+    const hiddenPanels = userSettings.panels.hidden;
+    if (!hiddenPanels.includes("test")) {
+      userSettings.panels.hidden.push("test")
+    }
+  }
 }

@@ -2,7 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
-  settingsVersion: '1.0.0',
+  settingsVersion: '1.0.1',
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
   hideSchemaEditor: false,
@@ -82,7 +82,7 @@ export const SETTINGS_DATA_DEFAULT = {
         size: 50,
       },
     ],
-    hidden: ['aiPrompts', 'debug'],
+    hidden: ['aiPrompts', 'debug', 'test'],
   },
   frontend: {
     hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',

@@ -7,6 +7,7 @@ import SchemaDiagramPanel from '@/components/panels/schema-diagram/SchemaDiagram
 import DebugPanel from '@/components/panels/debug-panel/DebugPanel.vue';
 import AiPromptsPanel from '@/components/panels/ai-prompts/AiPromptsPanel.vue';
 import ListAnalysisPanel from './list-analysis/ListAnalysisPanel.vue';
+import TestPanel from "@/components/panels/test-panel/TestPanel.vue";
 
 export const panelTypeTextEditor: PanelTypeDefinition = {
   getComponent: () => CodeEditorPanel,
@@ -56,6 +57,14 @@ export const panelTypeDebug: PanelTypeDefinition = {
   name: 'debug',
 };
 
+export const panelTypeTest: PanelTypeDefinition = {
+  getComponent: () => TestPanel,
+  supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
+  label: 'Test (for automated E2E Testing, not for human use)',
+  icon: 'fa-solid fa-bug',
+  name: 'test',
+};
+
 /**
  * Registers the default panel types, which are GuiEditor, TextEditor, Schema Diagram, Ai Prompts and Debug.
  */
@@ -66,4 +75,5 @@ export function registerDefaultPanelTypes() {
   panelTypeRegistry.registerPanelType('aiPrompts', panelTypeAiPrompts);
   panelTypeRegistry.registerPanelType('tableView', panelTypeListAnalysis);
   panelTypeRegistry.registerPanelType('debug', panelTypeDebug);
+  panelTypeRegistry.registerPanelType('test', panelTypeTest);
 }
