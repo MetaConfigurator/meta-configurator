@@ -52,6 +52,7 @@ export async function tpGetData(page: Page, mode: SessionMode): Promise<any> {
     }
 }
 
+
 export async function tpGetSchema(page: Page, mode: SessionMode): Promise<any> {
     const testComponent = await getTestComponentForMode(page, mode);
     const currentSchema = testComponent.getByTestId('schema');

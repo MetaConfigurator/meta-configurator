@@ -11,8 +11,7 @@ import {
     editStringProperty, expandOrCollapseProperty
 } from "./utilsGuiEditor";
 import {SessionMode} from "../src/store/sessionMode";
-import {tpForceCurrentSelectedElement, tpForceData, tpGetCurrentSelectedElement, tpGetData} from "./utilsTestPanel";
-import {checkCodeEditorForText} from "./utilsCodeEditor";
+import {tpForceCurrentSelectedElement, tpForceData, tpGetData} from "./utilsTestPanel";
 
 test('Edit the feature testing example schema using the GUI Editor, testing basic editing and schema violations', async ({ page }) => {
     // Go to the app, pre-loading the test settings

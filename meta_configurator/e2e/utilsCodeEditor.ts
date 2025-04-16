@@ -33,4 +33,7 @@ export async function forceCodeEditorText(page: Page, text: string, mode: Sessio
 
     // click somewhere else to trigger the change event
     await page.getByTestId('toolbar-title').click();
+
+    // wait 1 second
+    await page.waitForTimeout(1000);
 }

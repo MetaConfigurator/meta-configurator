@@ -79,6 +79,7 @@ test('Change the code editor content and check if the internal data is updated p
 
     // Change the code editor content
     await forceCodeEditorText(page, '{ "name": "Alex" }', SessionMode.DataEditor);
+
     // Validate that the internal data is updated correctly
     const dataAfterNameEnter = await tpGetData(page, SessionMode.DataEditor);
     expect(dataAfterNameEnter).toEqual({ name: 'Alex' });
