@@ -3,14 +3,8 @@
  Synchronized with file data from the store.
  -->
 <script setup lang="ts">
-import {onMounted, ref, type Ref} from 'vue';
-import { parse_model, validate } from 'mdmodels-core';
-import {watchImmediate} from '@vueuse/core';
-import {setupAnnotationsFromValidationErrors} from '@/components/panels/code-editor/setupAnnotations';
-import {
-  setupLinkToCurrentSelection,
-  setupLinkToData,
-} from '@/components/panels/code-editor/setupLinkToSelectionAndData';
+import {onMounted, ref, type Ref, watch} from 'vue';
+import { from_json_schema, convert_to, Templates} from 'mdmodels';
 import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from "@/data/useDataLink";
@@ -22,25 +16,43 @@ const props = defineProps<{
 const settings = useSettings();
 const modelText: Ref<string> = ref('');
 
+const changeOrigin = ref(0); // 0: no change. Negative: change through the markdown editor. Positive: change through the JSON schema
+
+// watch modelText and update the data in the store if it changes
+watch(modelText, (mdModelText) => {
+  changeOrigin.value--;
+  console.log('modelText', mdModelText);
+  if (!mdModelText || changeOrigin.value == 0) {
+    return;
+  }
+  const jsonSchemaString = convert_to(mdModelText, Templates.JsonSchema);
+  console.log('jsonSchema', jsonSchemaString);
+  getDataForMode(SessionMode.SchemaEditor).setData(JSON.parse(jsonSchemaString));
+});
+
+
+// watch current schema and update the modelText if it changes
+watch(getDataForMode(SessionMode.SchemaEditor).data, (jsonSchema) => {
+  changeOrigin.value++;
+  console.log('schema', jsonSchema);
+  if (!jsonSchema || changeOrigin.value == 0) {
+    return;
+  }
+  const dataModel = from_json_schema(jsonSchema);
+  const mdModelText = convert_to(dataModel, Templates.Markdown);
+  modelText.value = mdModelText;
+});
 
 onMounted(() => {
 });
 
 
-function handleModelChange(e: any) {
-  const newText = e.target.value;
-  modelText.value = newText;
-  const jsonSchema = parse_model(newText);
-  getDataForMode(SessionMode.SchemaEditor).setData(jsonSchema);
-
-};
 
 </script>
 
 <template>
       <textarea
-          :value=modelText
-          :onChange=handleModelChange
+          v-model="modelText"
           :style="{ width: '50%', height: '200px' }"
   />
 </template>
