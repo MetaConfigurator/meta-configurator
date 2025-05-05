@@ -90,9 +90,10 @@ export async function readFileContentToStringRef(
 
 export function readFileContentForFunction(
   files: FileList | File[] | null,
-  fct: (content: any) => void
+  fct: (content: any) => void,
+  parseInput: boolean = true
 ) {
-  readFileContentFromFileList(files, true)
+  readFileContentFromFileList(files, parseInput)
     .then(contents => {
       if (contents !== undefined) {
         fct(contents as any);

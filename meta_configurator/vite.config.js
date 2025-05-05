@@ -4,6 +4,7 @@ import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import {nodePolyfills} from "vite-plugin-node-polyfills";
+import wasm from 'vite-plugin-wasm';
 
 // Use process.env.USE_BASE_PATH to determine if base path should be included
 const useMetaConfiguratorBasePath = process.env.USE_META_CONFIGURATOR_BASE_PATH === 'true';
@@ -11,7 +12,7 @@ const useMetaConfiguratorBasePath = process.env.USE_META_CONFIGURATOR_BASE_PATH 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: useMetaConfiguratorBasePath ? '/meta-configurator/' : '/',
-  plugins: [vue(), vueJsx(),
+  plugins: [vue(), vueJsx(), wasm(),
 
   nodePolyfills({
     globals: {

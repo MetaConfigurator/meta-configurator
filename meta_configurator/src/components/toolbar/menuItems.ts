@@ -1,5 +1,5 @@
 import {openUploadFileDialog, openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
-import {downloadFile} from '@/components/toolbar/downloadFile';
+import {downloadFile, downloadSchemaAsMarkdown} from '@/components/toolbar/downloadFile';
 import {clearCurrentFile} from '@/components/toolbar/clearFile';
 import {useSessionStore} from '@/store/sessionStore';
 import {ref} from 'vue';
@@ -13,7 +13,7 @@ import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
-import {openImportSchemaDialog} from '@/components/toolbar/importFile';
+import {openImportSchemaDialog, openImportSchemaFromMarkdownDialog} from '@/components/toolbar/importFile';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -166,24 +166,44 @@ export class MenuItems {
         ],
       },
       {
-        label: 'Import Schema...',
+        label: 'Import...',
         icon: 'fa-solid fa-file-import',
         items: [
           {
-            label: 'Import JSON Schema',
+            label: 'JSON Schema',
             command: openImportSchemaDialog,
+          },
+          {
+            label: 'Markdown Schema (md-models)',
+            command: openImportSchemaFromMarkdownDialog,
           },
         ],
       },
       {
-        label: 'Download Schema',
-        icon: 'fa-solid fa-download',
-        command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
-      },
-      {
-        label: 'Generate Source Code...',
-        icon: 'fa-solid fa-file-code',
-        command: () => this.showCodeGenerationDialog(true),
+        label: 'Export...',
+        icon: 'fa-solid fa-file-export',
+        items: [
+          {
+            label: 'JSON Schema',
+            icon: 'fa-solid fa-download',
+            command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
+          },
+          {
+            label: 'Markdown Schema',
+            icon: 'fa-solid fa-download',
+            command: () => downloadSchemaAsMarkdown(useDataSource().userSchemaData.value.title ?? 'untitled'),
+          },
+          {
+            label: 'Data Structure Source Code...',
+            icon: 'fa-solid fa-file-code',
+            command: () => this.showCodeGenerationDialog(true),
+          },
+          {
+            label: 'Validation Source Code...',
+            icon: 'fa-solid fa-file-code',
+            disabled: true,
+          },
+        ]
       },
       {
         separator: true,

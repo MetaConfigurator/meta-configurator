@@ -1,5 +1,6 @@
 import {useCurrentData} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
+import {exportSchemaToMarkdown} from "@/utility/markdownSchemaUtils";
 
 /**
  * Downloads the current config file as a JSON or YAML file.
@@ -17,6 +18,27 @@ export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
 
   const fileEnding = isSchema ? 'schema.json' : useSettings().value.dataFormat;
   const fileName: string = `${fileNamePrefix}.${fileEnding}`;
+
+  // Create a temporary link element
+  const link: HTMLAnchorElement = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+
+  // Append the link to the document body and click it programmatically to trigger the download
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up by removing the link element and revoking the object URL
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+}
+
+
+export function downloadSchemaAsMarkdown(fileNamePrefix: string): void {
+  const configData: any = useCurrentData().data;
+  const configDataMarkdown = exportSchemaToMarkdown(configData);
+  const blob: Blob = new Blob([configDataMarkdown], {type: 'text/markdown'});
+  const fileName: string = `${fileNamePrefix}.md`;
 
   // Create a temporary link element
   const link: HTMLAnchorElement = document.createElement('a');

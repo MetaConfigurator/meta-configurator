@@ -4,6 +4,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import type {ManagedData} from '@/data/managedData';
 import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
+import {importSchemaFromMarkdown} from "@/utility/markdownSchemaUtils";
 
 /**
  * Opens a file dialog to select a JSON schema to import.
@@ -18,8 +19,24 @@ export function openImportSchemaDialog(): void {
   open();
 }
 
-function importSchema(importedSchema: any) {
+export function openImportSchemaFromMarkdownDialog(): void {
+    const {open, onChange} = useFileDialog();
+
+    onChange((files: FileList | null) => {
+        readFileContentForFunction(files, importSchemaFromMarkdown, false);
+    });
+
+    open();
+}
+
+export function importSchema(importedSchema: any) {
   const currentUserSchema = getDataForMode(SessionMode.SchemaEditor);
+
+  // if the current user schema is an empty object or null, set the imported schema as the current user schema
+    if (currentUserSchema.data.value === null || Object.keys(currentUserSchema.data.value).length === 0) {
+        currentUserSchema.setData(importedSchema);
+        return;
+    }
 
   copyDefinitionsToUserSchema(currentUserSchema, importedSchema, '$defs');
   copyDefinitionsToUserSchema(currentUserSchema, importedSchema, 'definitions');
