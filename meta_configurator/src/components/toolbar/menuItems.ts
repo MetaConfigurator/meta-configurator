@@ -87,7 +87,7 @@ export class MenuItems {
       {
         label: 'Download Data',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile(useCurrentSchema().schemaRaw.value.title ?? 'file', false),
+        command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
       },
       {
         separator: true,
@@ -170,7 +170,7 @@ export class MenuItems {
         icon: 'fa-solid fa-file-import',
         items: [
           {
-            label: 'Import JSON Schema',
+            label: 'JSON Schema',
             command: openImportSchemaDialog,
           },
         ],

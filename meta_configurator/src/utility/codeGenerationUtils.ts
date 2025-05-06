@@ -1,10 +1,31 @@
 import {
-  quicktype,
+  FetchingJSONSchemaStore,
   InputData,
   jsonInputForTargetLanguage,
   JSONSchemaInput,
-  FetchingJSONSchemaStore,
+  quicktype,
 } from 'quicktype-core/dist/';
+
+
+export const SUPPORTED_LANGUAGES = [
+  'python',
+  'typescript',
+  'javascript',
+  'rust',
+  'java',
+  'kotlin',
+  'swift',
+  'dart',
+  'go',
+  'c++',
+  'csharp',
+  'php',
+  'ruby',
+  'scala',
+  'flow',
+  'elm',
+  'objc'
+].sort((a, b) => a.localeCompare(b));
 
 export async function quicktypeJSON(targetLanguage: string, typeName: string, jsonString: string) {
   const jsonInput = jsonInputForTargetLanguage(targetLanguage);
@@ -44,4 +65,36 @@ export async function quicktypeJSONSchema(
     inputData,
     lang: targetLanguage,
   });
+}
+
+
+export async function generateValidationCode(language: string, schemaFileName: string, instanceFileName: string) {
+  const languageAlphaNumerical = formatLanguagesToOnlyAlphaNumerical(language);
+  const template = await loadValidationTemplate(languageAlphaNumerical);
+    if (!template) {
+        return undefined;
+    }
+  return template.replaceAll("{{SCHEMA_FILE}}", schemaFileName).replaceAll("{{INSTANCE_FILE}}", instanceFileName);
+}
+
+
+
+async function loadValidationTemplate(language: string): Promise<string|undefined> {
+  try {
+    const response = await fetch(`/public/validation-templates/${language}.txt`);
+    if (!response.ok) {
+      // File not found or server error
+      return undefined;
+    }
+    return await response.text();
+  } catch (error) {
+    // Network or other unexpected error
+    return undefined;
+  }
+}
+
+
+function formatLanguagesToOnlyAlphaNumerical(language: string): string {
+  // replace C++ with cpp
+  return language.toLowerCase().replace(/c\+\+/, "cpp")
 }

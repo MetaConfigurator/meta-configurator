@@ -1,0 +1,24 @@
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "os"
+    "github.com/xeipuuv/gojsonschema"
+)
+
+func main() {
+    schemaLoader := gojsonschema.NewReferenceLoader("file://{{SCHEMA_FILE}}")
+    documentLoader := gojsonschema.NewReferenceLoader("file://{{INSTANCE_FILE}}")
+
+    result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+    if err != nil {
+        panic(err)
+    }
+
+    if result.Valid() {
+        fmt.Println("Valid JSON")
+    } else {
+        fmt.Println("Invalid JSON")
+    }
+}

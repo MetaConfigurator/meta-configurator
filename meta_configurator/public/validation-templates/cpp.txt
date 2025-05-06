@@ -1,0 +1,18 @@
+#include <iostream>
+#include <fstream>
+#include <nlohmann/json.hpp>
+#include <json-schema.hpp>
+
+int main() {
+    std::ifstream schemaStream("{{SCHEMA_FILE}}");
+    std::ifstream dataStream("{{INSTANCE_FILE}}");
+
+    nlohmann::json schema, data;
+    schemaStream >> schema;
+    dataStream >> data;
+
+    json_schema::json_validator validator;
+    validator.set_root_schema(schema);
+    validator.validate(data);
+    std::cout << "Valid JSON" << std::endl;
+}
