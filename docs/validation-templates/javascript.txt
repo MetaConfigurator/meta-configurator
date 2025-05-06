@@ -1,8 +1,8 @@
 const Ajv = require("ajv");
 const fs = require("fs");
 
-const schema = JSON.parse(fs.readFileSync("{{SCHEMA_FILENAME}}"));
-const data = JSON.parse(fs.readFileSync("{{DATA_FILENAME}}"));
+const schema = JSON.parse(fs.readFileSync("{{SCHEMA_FILE}}"));
+const data = JSON.parse(fs.readFileSync("{{INSTANCE_FILE}}"));
 
 const ajv = new Ajv();
 const validate = ajv.compile(schema);

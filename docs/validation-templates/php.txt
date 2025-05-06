@@ -3,8 +3,8 @@ require 'vendor/autoload.php'; // composer require opis/json-schema
 
 use Opis\JsonSchema\Validator;
 
-$schema = json_decode(file_get_contents('{{SCHEMA_FILENAME}}'));
-$data = json_decode(file_get_contents('{{DATA_FILENAME}}'));
+$schema = json_decode(file_get_contents('{{SCHEMA_FILE}}'));
+$data = json_decode(file_get_contents('{{INSTANCE_FILE}}'));
 
 $validator = new Validator();
 $result = $validator->schemaValidation($data, $schema);
