@@ -1,8 +1,8 @@
 require 'json'
 require 'json-schema'
 
-schema = JSON.parse(File.read('{{SCHEMA_FILENAME}}'))
-data = JSON.parse(File.read('{{DATA_FILENAME}}'))
+schema = JSON.parse(File.read('{{SCHEMA_FILE}}'))
+data = JSON.parse(File.read('{{INSTANCE_FILE}}'))
 
 begin
   JSON::Validator.validate!(schema, data)

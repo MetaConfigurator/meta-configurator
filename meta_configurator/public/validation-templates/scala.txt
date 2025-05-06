@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode
 val mapper = new ObjectMapper()
 val schemaFactory = JsonSchemaFactory.byDefault()
 
-val schemaStr = Source.fromFile("{{SCHEMA_FILENAME}}").mkString
-val dataStr = Source.fromFile("{{DATA_FILENAME}}").mkString
+val schemaStr = Source.fromFile("{{SCHEMA_FILE}}").mkString
+val dataStr = Source.fromFile("{{INSTANCE_FILE}}").mkString
 
 val schemaNode: JsonNode = mapper.readTree(schemaStr)
 val dataNode: JsonNode = mapper.readTree(dataStr)
