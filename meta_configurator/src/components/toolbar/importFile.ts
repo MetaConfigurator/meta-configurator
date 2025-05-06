@@ -21,6 +21,13 @@ export function openImportSchemaDialog(): void {
 function importSchema(importedSchema: any) {
   const currentUserSchema = getDataForMode(SessionMode.SchemaEditor);
 
+  // if the current user schema is an empty object or null, set the imported schema as the current user schema
+  if (currentUserSchema.data.value === null || Object.keys(currentUserSchema.data.value).length === 0) {
+    currentUserSchema.setData(importedSchema);
+    return;
+  }
+
+  // otherwise, move everything into the definitions sections
   copyDefinitionsToUserSchema(currentUserSchema, importedSchema, '$defs');
   copyDefinitionsToUserSchema(currentUserSchema, importedSchema, 'definitions');
 
