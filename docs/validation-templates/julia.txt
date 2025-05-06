@@ -1,0 +1,8 @@
+using JSON3
+using JSONSchema
+
+schema = JSON3.read(read("{{SCHEMA_FILE}}", String))
+instance = JSON3.read(read("{{INSTANCE_FILE}}", String))
+
+result = JSONSchema.validate(instance, schema)
+println(result)

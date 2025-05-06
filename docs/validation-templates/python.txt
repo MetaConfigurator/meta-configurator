@@ -1,0 +1,11 @@
+import json
+import jsonschema
+
+with open("{{INSTANCE_FILE}}") as f:
+    data = json.load(f)
+
+with open("{{SCHEMA_FILE}}") as f:
+    schema = json.load(f)
+
+jsonschema.validate(instance=data, schema=schema)
+print("Valid JSON")

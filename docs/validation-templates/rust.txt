@@ -1,0 +1,15 @@
+use jsonschema::{Draft, JSONSchema};
+use std::fs;
+
+fn main() {
+    let schema_str = fs::read_to_string("{{SCHEMA_FILE}}").unwrap();
+    let instance_str = fs::read_to_string("{{INSTANCE_FILE}}").unwrap();
+
+    let schema_json: serde_json::Value = serde_json::from_str(&schema_str).unwrap();
+    let instance_json: serde_json::Value = serde_json::from_str(&instance_str).unwrap();
+
+    let compiled = JSONSchema::compile(&schema_json).unwrap();
+    if compiled.is_valid(&instance_json) {
+        println!("Valid JSON");
+    }
+}
