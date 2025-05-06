@@ -31,7 +31,6 @@ export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
   URL.revokeObjectURL(link.href);
 }
 
-
 export function generateFileName(prefix: string, isSchema: boolean): string {
   const fileEnding = isSchema ? 'schema.json' : useSettings().value.dataFormat;
   return `${prefix}.${fileEnding}`;

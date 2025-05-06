@@ -6,7 +6,6 @@ import {
   quicktype,
 } from 'quicktype-core/dist/';
 
-
 export const SUPPORTED_LANGUAGES = [
   'python',
   'typescript',
@@ -24,7 +23,7 @@ export const SUPPORTED_LANGUAGES = [
   'scala',
   'flow',
   'elm',
-  'objc'
+  'objc',
 ].sort((a, b) => a.localeCompare(b));
 
 export async function quicktypeJSON(targetLanguage: string, typeName: string, jsonString: string) {
@@ -67,19 +66,22 @@ export async function quicktypeJSONSchema(
   });
 }
 
-
-export async function generateValidationCode(language: string, schemaFileName: string, instanceFileName: string) {
+export async function generateValidationCode(
+  language: string,
+  schemaFileName: string,
+  instanceFileName: string
+) {
   const languageAlphaNumerical = formatLanguagesToOnlyAlphaNumerical(language);
   const template = await loadValidationTemplate(languageAlphaNumerical);
-    if (!template) {
-        return undefined;
-    }
-  return template.replaceAll("{{SCHEMA_FILE}}", schemaFileName).replaceAll("{{INSTANCE_FILE}}", instanceFileName);
+  if (!template) {
+    return undefined;
+  }
+  return template
+    .replaceAll('{{SCHEMA_FILE}}', schemaFileName)
+    .replaceAll('{{INSTANCE_FILE}}', instanceFileName);
 }
 
-
-
-async function loadValidationTemplate(language: string): Promise<string|undefined> {
+async function loadValidationTemplate(language: string): Promise<string | undefined> {
   try {
     const response = await fetch(`/public/validation-templates/${language}.txt`);
     if (!response.ok) {
@@ -93,8 +95,7 @@ async function loadValidationTemplate(language: string): Promise<string|undefine
   }
 }
 
-
 function formatLanguagesToOnlyAlphaNumerical(language: string): string {
   // replace C++ with cpp
-  return language.toLowerCase().replace(/c\+\+/, "cpp")
+  return language.toLowerCase().replace(/c\+\+/, 'cpp');
 }

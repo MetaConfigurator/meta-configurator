@@ -2,13 +2,17 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
-import {generateValidationCode, quicktypeJSONSchema, SUPPORTED_LANGUAGES} from '@/utility/codeGenerationUtils';
+import {
+  generateValidationCode,
+  quicktypeJSONSchema,
+  SUPPORTED_LANGUAGES,
+} from '@/utility/codeGenerationUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
 import Select from 'primevue/select';
 import Button from 'primevue/button';
-import {useDataSource} from "@/data/dataSource";
-import {generateFileName} from "@/components/toolbar/downloadFile";
+import {useDataSource} from '@/data/dataSource';
+import {generateFileName} from '@/components/toolbar/downloadFile';
 
 const showDialog = ref(false);
 
@@ -24,7 +28,6 @@ const schemaMode = ref(true);
 
 // watch the selected programming language and generate code accordingly
 watch(selectedProgrammingLanguage, newLanguage => {
-
   if (SUPPORTED_LANGUAGES.indexOf(newLanguage) === -1) {
     generatedCodeDataStructure.value = '';
     generatedCodeValidation.value = '';
@@ -100,18 +103,21 @@ defineExpose({show: openDialog, close: hideDialog, activateSchemaMode, activateD
         placeholder="Select a programming language"
         class="w-1/2" />
 
-
       <div class="code-container" v-if="generatedCodeValidation.length > 0">
         <pre><code>{{ generatedCodeValidation }}</code></pre>
       </div>
 
-      <Button @click="copyToClipboardValidation()" v-if="generatedCodeValidation.length > 0">Copy validation code to clipboard</Button>
+      <Button @click="copyToClipboardValidation()" v-if="generatedCodeValidation.length > 0"
+        >Copy validation code to clipboard</Button
+      >
 
       <div class="code-container" v-if="generatedCodeDataStructure.length > 0">
         <pre><code>{{ generatedCodeDataStructure }}</code></pre>
       </div>
 
-      <Button @click="copyToClipboardDataStructure()" v-if="generatedCodeDataStructure.length > 0">Copy data structure code to clipboard</Button>
+      <Button @click="copyToClipboardDataStructure()" v-if="generatedCodeDataStructure.length > 0"
+        >Copy data structure code to clipboard</Button
+      >
     </div>
   </Dialog>
 </template>
