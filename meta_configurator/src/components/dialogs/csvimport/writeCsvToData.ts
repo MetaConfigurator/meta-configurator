@@ -10,10 +10,10 @@ export function writeCsvToData(csv: any[], columnMapping: CsvImportColumnMapping
   let rowIndexOffset = 0;
   const arrayPath = columnMapping[0].getTablePathForJsonDocument();
   // if there already exists an array at the path, append the new data to it, by setting the rowIndexOffset
-    const dataAtPath = currentData.dataAt(arrayPath);
-    if (Array.isArray(dataAtPath)) {
-        rowIndexOffset = dataAtPath.length;
-    }
+  const dataAtPath = currentData.dataAt(arrayPath);
+  if (Array.isArray(dataAtPath)) {
+    rowIndexOffset = dataAtPath.length;
+  }
 
   // loop through csv with row and index
   csv.forEach((row, rowIndex) => {

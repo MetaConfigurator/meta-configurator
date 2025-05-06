@@ -224,7 +224,6 @@ defineExpose({show: openDialog, close: hideDialog});
 <template>
   <Dialog v-model:visible="showDialog" header="Import CSV">
     <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-
       <div class="flex align-items-center">
         <Button
           label="Select CSV Document"
