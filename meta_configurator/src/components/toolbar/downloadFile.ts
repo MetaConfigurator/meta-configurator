@@ -15,8 +15,7 @@ export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
   // TODO correct type depending on the data format
   const blob: Blob = new Blob([configData], {type: 'application/json'});
 
-  const fileEnding = isSchema ? 'schema.json' : useSettings().value.dataFormat;
-  const fileName: string = `${fileNamePrefix}.${fileEnding}`;
+  const fileName: string = generateFileName(fileNamePrefix, isSchema);
 
   // Create a temporary link element
   const link: HTMLAnchorElement = document.createElement('a');
@@ -30,4 +29,9 @@ export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
   // Clean up by removing the link element and revoking the object URL
   document.body.removeChild(link);
   URL.revokeObjectURL(link.href);
+}
+
+export function generateFileName(prefix: string, isSchema: boolean): string {
+  const fileEnding = isSchema ? 'schema.json' : useSettings().value.dataFormat;
+  return `${prefix}.${fileEnding}`;
 }

@@ -2,45 +2,38 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
-import {quicktypeJSONSchema} from '@/utility/codeGenerationUtils';
+import {
+  generateValidationCode,
+  quicktypeJSONSchema,
+  SUPPORTED_LANGUAGES,
+} from '@/utility/codeGenerationUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
 import Select from 'primevue/select';
 import Button from 'primevue/button';
+import {useDataSource} from '@/data/dataSource';
+import {generateFileName} from '@/components/toolbar/downloadFile';
 
 const showDialog = ref(false);
 
-const programmingLanguageChoices = ref(
-  [
-    'python',
-    'typescript',
-    'javascript',
-    'rust',
-    'java',
-    'kotlin',
-    'swift',
-    'dart',
-    'go',
-    'c++',
-    'csharp',
-    'php',
-    'ruby',
-    'scala',
-    'flow',
-    'elm',
-    'objc',
-  ].sort((a, b) => a.localeCompare(b))
-);
+const programmingLanguageChoices = ref(SUPPORTED_LANGUAGES);
 
 const selectedProgrammingLanguage = ref('');
 
-const generatedCode = ref('');
+const generatedCodeDataStructure = ref('');
+const generatedCodeValidation = ref('');
 
 // true: schema mode, false: data mode
 const schemaMode = ref(true);
 
 // watch the selected programming language and generate code accordingly
-watch(selectedProgrammingLanguage, newValue => {
+watch(selectedProgrammingLanguage, newLanguage => {
+  if (SUPPORTED_LANGUAGES.indexOf(newLanguage) === -1) {
+    generatedCodeDataStructure.value = '';
+    generatedCodeValidation.value = '';
+    return;
+  }
+
   let document: any;
   let documentTitle: string;
   if (schemaMode.value) {
@@ -50,13 +43,24 @@ watch(selectedProgrammingLanguage, newValue => {
     document = getDataForMode(SessionMode.DataEditor).data.value;
     documentTitle = 'Data';
   }
-  quicktypeJSONSchema(newValue, documentTitle, JSON.stringify(document)).then(code => {
-    generatedCode.value = code.lines.join('\n');
+  quicktypeJSONSchema(newLanguage, documentTitle, JSON.stringify(document)).then(code => {
+    generatedCodeDataStructure.value = code.lines.join('\n');
+  });
+
+  const fileNamePrefix = useDataSource().userSchemaData.value.title ?? 'untitled';
+  const schemaFileName = generateFileName(fileNamePrefix, true);
+  const dataFileName = generateFileName(fileNamePrefix, false);
+  generateValidationCode(newLanguage, schemaFileName, dataFileName).then(code => {
+    if (!code) {
+      generatedCodeValidation.value = '';
+      return;
+    }
+    generatedCodeValidation.value = code;
   });
 });
 
 function openDialog() {
-  generatedCode.value = '';
+  generatedCodeDataStructure.value = '';
   selectedProgrammingLanguage.value = '';
   showDialog.value = true;
 }
@@ -73,8 +77,13 @@ function activateDataMode() {
   schemaMode.value = false;
 }
 
-function copyToClipboard() {
-  navigator.clipboard.writeText(generatedCode.value).then(() => {
+function copyToClipboardDataStructure() {
+  navigator.clipboard.writeText(generatedCodeDataStructure.value).then(() => {
+    alert('Code copied to clipboard');
+  });
+}
+function copyToClipboardValidation() {
+  navigator.clipboard.writeText(generatedCodeValidation.value).then(() => {
     alert('Code copied to clipboard');
   });
 }
@@ -94,11 +103,21 @@ defineExpose({show: openDialog, close: hideDialog, activateSchemaMode, activateD
         placeholder="Select a programming language"
         class="w-1/2" />
 
-      <div class="code-container" v-if="generatedCode.length > 0">
-        <pre><code>{{ generatedCode }}</code></pre>
+      <div class="code-container" v-if="generatedCodeValidation.length > 0">
+        <pre><code>{{ generatedCodeValidation }}</code></pre>
       </div>
 
-      <Button @click="copyToClipboard()" v-if="generatedCode.length > 0">Copy to clipboard</Button>
+      <Button @click="copyToClipboardValidation()" v-if="generatedCodeValidation.length > 0"
+        >Copy validation code to clipboard</Button
+      >
+
+      <div class="code-container" v-if="generatedCodeDataStructure.length > 0">
+        <pre><code>{{ generatedCodeDataStructure }}</code></pre>
+      </div>
+
+      <Button @click="copyToClipboardDataStructure()" v-if="generatedCodeDataStructure.length > 0"
+        >Copy data structure code to clipboard</Button
+      >
     </div>
   </Dialog>
 </template>
@@ -111,7 +130,7 @@ defineExpose({show: openDialog, close: hideDialog, activateSchemaMode, activateD
 }
 
 .code-container {
-  max-height: 350px;
+  max-height: 200px;
   max-width: 90%;
   overflow: auto;
   background: var(--p-primary-background); /* Dark background */

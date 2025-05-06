@@ -1,0 +1,16 @@
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class Validate {
+    public static void main(String[] args) throws Exception {
+        String schemaContent = new String(Files.readAllBytes(Paths.get("{{SCHEMA_FILE}}")));
+        String dataContent = new String(Files.readAllBytes(Paths.get("{{INSTANCE_FILE}}")));
+
+        Schema schema = SchemaLoader.load(new JSONObject(schemaContent));
+        schema.validate(new JSONObject(dataContent));
+        System.out.println("Valid JSON");
+    }
+}
