@@ -83,7 +83,8 @@ export async function generateValidationCode(
 
 async function loadValidationTemplate(language: string): Promise<string | undefined> {
   try {
-    const response = await fetch(`/validation-templates/${language}.txt`);
+    const base = import.meta.env.BASE_URL || '/';
+    const response = await fetch(`${base}validation-templates/${language}.txt`);
     if (!response.ok) {
       // File not found or server error
       return undefined;
