@@ -7,12 +7,20 @@ import {lookupValuesInCsv} from '@/components/dialogs/csvimport/importCsvUtils';
 export function writeCsvToData(csv: any[], columnMapping: CsvImportColumnMappingData[]) {
   const currentData = getDataForMode(SessionMode.DataEditor);
 
+  let rowIndexOffset = 0;
+  const arrayPath = columnMapping[0].getTablePathForJsonDocument();
+  // if there already exists an array at the path, append the new data to it, by setting the rowIndexOffset
+    const dataAtPath = currentData.dataAt(arrayPath);
+    if (Array.isArray(dataAtPath)) {
+        rowIndexOffset = dataAtPath.length;
+    }
+
   // loop through csv with row and index
   csv.forEach((row, rowIndex) => {
     // loop through columnMapping
     columnMapping.forEach(column => {
       // get the mapping for the current row
-      const path = column.getPathForJsonDocument(rowIndex);
+      const path = column.getPathForJsonDocument(rowIndex + rowIndexOffset);
       // set the value in the data
       currentData.setDataAt(path, row[column.name]);
     });
