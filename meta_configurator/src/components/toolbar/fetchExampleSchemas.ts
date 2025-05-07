@@ -3,6 +3,7 @@ import {errorService} from '@/main';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
+import {adaptComplexitySettingsToLoadedSchema} from "@/utility/settingsUpdater";
 
 /**
  * Loads the example schema with the given key.
@@ -15,6 +16,8 @@ export function loadExampleSchema(schemaKey: string): void {
     const schemaName = selectedSchema.label || 'Unknown Schema';
     useDataSource().userSchemaData.value = selectedSchema?.schema;
     useDataSource().newSchemaWasFetched.value = true;
+    // this will adapt the meta schema settings to enable/disable multiple types, boolean schema support, etc.
+    adaptComplexitySettingsToLoadedSchema(selectedSchema?.schema);
 
     openClearDataEditorDialog();
 
