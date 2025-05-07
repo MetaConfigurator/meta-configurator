@@ -3,7 +3,7 @@ import {errorService} from '@/main';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import {adaptComplexitySettingsToLoadedSchema} from "@/utility/settingsUpdater";
+import {adaptComplexitySettingsToLoadedSchema} from '@/utility/settingsUpdater';
 
 /**
  * Loads the example schema with the given key.

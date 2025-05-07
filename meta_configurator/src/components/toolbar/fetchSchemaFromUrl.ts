@@ -2,7 +2,7 @@ import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
-import {adaptComplexitySettingsToLoadedSchema} from "@/utility/settingsUpdater";
+import {adaptComplexitySettingsToLoadedSchema} from '@/utility/settingsUpdater';
 
 /**
  * Fetches the schema from the given URL and sets it as the current schema.
