@@ -4,6 +4,8 @@ import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {useDataSource} from '@/data/dataSource';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import {detectSchemaFeatures} from '@/schema/detectSchemaFeatures';
 
 export function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
   for (const key in defaultsFile) {
@@ -76,4 +78,12 @@ function migrateSettingsVersion(userSettings: any) {
       userSettings.panels.hidden.push('test');
     }
   }
+}
+
+export function adaptComplexitySettingsToLoadedSchema(schema: TopLevelSchema) {
+  const usedSchemaFeatures = detectSchemaFeatures(schema);
+  const metaSchemaSettings = useDataSource().settingsData.value.metaSchema;
+
+  metaSchemaSettings.allowBooleanSchema = usedSchemaFeatures.booleanSchemas;
+  metaSchemaSettings.allowMultipleTypes = usedSchemaFeatures.multipleTypes;
 }
