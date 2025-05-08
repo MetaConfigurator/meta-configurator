@@ -17,7 +17,8 @@ services:
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       MONGO_DB: metaconfigurator
-      REDIS_URL: redis://redis:6379/0
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     env_file:
       - .env.prod
 
