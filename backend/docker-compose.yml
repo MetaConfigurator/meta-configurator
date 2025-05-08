@@ -3,8 +3,8 @@ services:
   backend:
     container_name: backend
     build: .
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     restart: unless-stopped
     depends_on:
       - mongo
@@ -12,6 +12,10 @@ services:
     networks:
       - app-network
     environment:
+      VIRTUAL_HOST: metaconfigurator.informatik.uni-stuttgart.de
+      VIRTUAL_PORT: 5000
+      LETSENCRYPT_HOST: metaconfigurator.informatik.uni-stuttgart.de
+      LETSENCRYPT_EMAIL: felix.neubauer@ipvs.uni-stuttgart.de
       FLASK_ENV: development
       MONGO_USER: root
       MONGO_HOST: mongo
@@ -19,6 +23,7 @@ services:
       MONGO_DB: metaconfigurator
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      FLASK_ENABLE_SSL: "false"
     env_file:
       - .env.prod
 
@@ -55,6 +60,38 @@ services:
     networks:
       - app-network
 
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-letsencrypt
+    depends_on:
+      - nginx-proxy
+    environment:
+      NGINX_PROXY_CONTAINER: nginx-proxy
+      DEFAULT_EMAIL: felix.neubauer@ipvs.uni-stuttgart.de
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+    networks:
+      - app-network
+    restart: unless-stopped
+
 networks:
   app-network:
     driver: bridge
@@ -62,3 +99,4 @@ networks:
 volumes:
   mongo-data:
   redis:
+  acme-challenges:

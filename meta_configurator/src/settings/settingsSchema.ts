@@ -11,8 +11,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     settingsVersion: {
       type: 'string',
       description: 'The version of the settings file.',
-      default: '1.0.1',
-      enum: ['1.0.0', '1.0.1'],
+      default: '1.0.2',
+      enum: ['1.0.0', '1.0.1', '1.0.2'],
       readOnly: true,
     },
     dataFormat: {
@@ -290,29 +290,22 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         hostname: {
           type: 'string',
           description: 'The hostname of the frontend server.',
-          default: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+          default: 'https://metaconfigurator.github.io/meta-configurator/',
           format: 'uri',
         },
       },
     },
     backend: {
       type: 'object',
-      required: ['hostname', 'port'],
+      required: ['hostname'],
       additionalProperties: false,
       description: 'Settings for the backend.',
       properties: {
         hostname: {
           type: 'string',
           description: 'The hostname of the backend server.',
-          default: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+          default: 'https://metaconfigurator.informatik.uni-stuttgart.de',
           format: 'uri',
-        },
-        port: {
-          type: 'integer',
-          description: 'The port of the backend server.',
-          default: 5000,
-          minimum: 1,
-          maximum: 65535,
         },
       },
     },

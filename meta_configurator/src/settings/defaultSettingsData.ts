@@ -2,7 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
-  settingsVersion: '1.0.1',
+  settingsVersion: '1.0.2',
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
   hideSchemaEditor: false,
@@ -85,11 +85,10 @@ export const SETTINGS_DATA_DEFAULT = {
     hidden: ['aiPrompts', 'debug', 'test'],
   },
   frontend: {
-    hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
+    hostname: 'https://metaconfigurator.github.io/meta-configurator',
   },
   backend: {
-    hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
-    port: 5000,
+    hostname: 'https://metaconfigurator.informatik.uni-stuttgart.de',
   },
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
