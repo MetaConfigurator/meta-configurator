@@ -14,14 +14,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 
 # Allow requests from your frontend origin
-CORS(app, origins=[
-
-    "http://localhost:5173",  # local dev server
-    "https://metaconfigurator.github.io",  # experimental GitHub Pages
-    "https://logende.github.io",  # prod stable release and other accesses by Logende GitHub account
-    "www.metaconfigurator.org"  # prod stable release
-
-])
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "http://localhost:5173",  # local dev server
+            "https://metaconfigurator.github.io",  # experimental GitHub Pages
+            "https://logende.github.io",  # prod stable release and other accesses by Logende GitHub account
+            "www.metaconfigurator.org"  # prod stable release
+        ],
+        "supports_credentials": True
+    }
+})
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
