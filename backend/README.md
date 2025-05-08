@@ -25,12 +25,12 @@ docker-compose down -v
 
 ## Building the backend container
 ```bash
-docker compose build --no-cache
+docker-compose build --no-cache
 ```
 
 
 ## Starting the containers
 
 ```bash
-docker compose up --force-recreate --no-deps -d
+docker-compose up --force-recreate --no-deps -d
 ```
