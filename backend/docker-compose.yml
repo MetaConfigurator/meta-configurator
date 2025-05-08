@@ -23,6 +23,7 @@ services:
       MONGO_DB: metaconfigurator
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      FLASK_ENABLE_SSL: "false"
     env_file:
       - .env.prod
 

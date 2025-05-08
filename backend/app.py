@@ -10,8 +10,24 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import redis
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
+
+# Check if we need SSL directly in the app
+# When behind nginx-proxy, this should be False
+enable_ssl = os.environ.get('FLASK_ENABLE_SSL', 'true').lower() == 'true'
+
+# Common proxy fix - tell Flask to trust the X-Forwarded headers
+app.config['PREFERRED_URL_SCHEME'] = 'https'
+app.config['PROXY_FIX_X_FOR'] = 1
+app.config['PROXY_FIX_X_PROTO'] = 1
+app.config['PROXY_FIX_X_HOST'] = 1
+
+# Apply ProxyFix middleware to handle proxy headers correctly
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1
+)
 
 # Allow requests from your frontend origin
 CORS(app, resources={
@@ -396,5 +412,5 @@ def schedule_cleanup():
 if __name__ == "__main__":
     # Start the cleanup scheduler
     schedule_cleanup()
-    context = ("local.crt", "local.key")
-    app.run(port=5000, ssl_context=context)
+    # Run without SSL when behind nginx-proxy (it handles SSL)
+    app.run(host='0.0.0.0', port=5000, ssl_context=None if not enable_ssl else 'adhoc')
