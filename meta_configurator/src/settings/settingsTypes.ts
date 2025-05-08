@@ -82,7 +82,6 @@ export enum DataFormat {
 
 export interface SettingsInterfaceBackend {
   hostname: string;
-  port: number;
 }
 
 export interface SettingsInterfacFrontend {

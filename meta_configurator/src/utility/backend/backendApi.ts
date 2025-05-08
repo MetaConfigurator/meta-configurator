@@ -7,7 +7,7 @@ import {errorService} from '@/main';
 const settings = useSettings();
 
 const BACKEND_URL = computed(() => {
-  return settings.value.backend.hostname + ':' + settings.value.backend.port;
+  return settings.value.backend.hostname;
 });
 
 const FRONTEND_URL = computed(() => {
