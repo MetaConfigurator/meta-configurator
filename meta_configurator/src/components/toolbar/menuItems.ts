@@ -88,7 +88,13 @@ export class MenuItems {
         label: 'Download Data',
         icon: 'fa-solid fa-download',
         command: () =>
-          downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
+            downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
+      },
+      {
+        label: 'Share Snapshot',
+        icon: 'fa-solid fa-share',
+        command: this.showSnapshotDialog,
+        key: 'snapshot',
       },
       {
         separator: true,
@@ -185,6 +191,12 @@ export class MenuItems {
         label: 'Generate Source Code...',
         icon: 'fa-solid fa-file-code',
         command: () => this.showCodeGenerationDialog(true),
+      },
+      {
+        label: 'Share Snapshot',
+        icon: 'fa-solid fa-share',
+        command: this.showSnapshotDialog,
+        key: 'snapshot',
       },
       {
         separator: true,
@@ -327,12 +339,6 @@ export class MenuItems {
           getDataForMode(SessionMode.Settings).setData(structuredClone(SETTINGS_DATA_DEFAULT));
         },
         key: 'settings_restore',
-      },
-      {
-        label: 'Create sharable snapshot',
-        icon: 'fa-solid fa-file-export',
-        command: this.showSnapshotDialog,
-        key: 'snapshot',
       },
       {
         separator: true,
