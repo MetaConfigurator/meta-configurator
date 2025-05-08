@@ -67,7 +67,7 @@ services:
       - "443:443"
     volumes:
       - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
+      - acme-challenges:/usr/share/nginx/html
       - ./certs:/etc/nginx/certs
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
@@ -86,7 +86,7 @@ services:
       - ./certs:/etc/nginx/certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
+      - acme-challenges:/usr/share/nginx/html
     networks:
       - app-network
     restart: unless-stopped
@@ -98,3 +98,4 @@ networks:
 volumes:
   mongo-data:
   redis:
+  acme-challenges:
