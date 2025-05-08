@@ -8,11 +8,18 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   required: ['dataFormat', 'codeEditor', 'guiEditor', 'schemaDiagram', 'metaSchema', 'panels'],
   additionalProperties: false,
   properties: {
+    settingsVersion: {
+      type: 'string',
+      description: 'The version of the settings file.',
+      default: '1.0.1',
+      enum: ['1.0.0', '1.0.1'],
+      readOnly: true,
+    },
     dataFormat: {
       type: 'string',
       description: 'The data format to use for the configuration files.',
       default: 'json',
-      enum: ['json', 'yaml'],
+      enum: ['json', 'yaml', 'xml'],
     },
     toolbarTitle: {
       type: 'string',
@@ -48,6 +55,25 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: 2,
           minimum: 1,
           maximum: 8,
+        },
+        showFormatSelector: {
+          type: 'boolean',
+          description:
+            'If set to true, a dropdown for selecting the format (JSON or YAML) will be shown in the code editor.',
+          default: true,
+        },
+        xml: {
+          type: 'object',
+          required: ['attributeNamePrefix'],
+          additionalProperties: false,
+          description: 'Settings for the XML format  in the code editor.',
+          properties: {
+            attributeNamePrefix: {
+              type: 'string',
+              description: 'The prefix for attributes in the XML format.',
+              default: '_',
+            },
+          },
         },
       },
     },
@@ -235,6 +261,24 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             },
           ],
         },
+        hidden: {
+          type: 'array',
+          title: 'Hide Panels',
+          description:
+            'Panels that should be hidden in the editor and not shown to the user. By default, this section contains debugging and experimental panels.',
+          items: {
+            type: 'string',
+            enum: [
+              'aiPrompts',
+              'debug',
+              'test',
+              'schemaDiagram',
+              'guiEditor',
+              'textEditor',
+              'tableView',
+            ],
+          },
+        },
       },
     },
     frontend: {
@@ -286,15 +330,15 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
-    openAi: {
+    aiIntegration: {
       type: 'object',
       required: ['model', 'maxTokens', 'temperature', 'endpoint'],
       additionalProperties: false,
-      description: 'Settings for OpenAI API.',
+      description: 'Settings for AI API.',
       properties: {
         model: {
           type: 'string',
-          description: 'The model to use for the OpenAI API.',
+          description: 'The model to use for the AI API.',
           default: 'gpt-4o-mini',
           examples: ['gpt-4o-mini', 'gpt-4o'],
         },
@@ -306,15 +350,20 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
         temperature: {
           type: 'number',
-          description: 'The sampling temperature for the OpenAI API.',
-          default: 0.3,
+          description: 'The sampling temperature for the AI API.',
+          default: 0.0,
           minimum: 0.0,
           maximum: 1.0,
         },
         endpoint: {
           type: 'string',
-          description: 'The endpoint to use for the OpenAI API.',
-          default: '/chat/completions',
+          description:
+            'The endpoint to use for the AI API. Must follow the OpenAI API specification.',
+          default: 'https://api.openai.com/v1/',
+          examples: [
+            'https://api.openai.com/v1/',
+            'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+          ],
         },
       },
     },
@@ -333,7 +382,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts'],
+            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts', 'tableView'],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },

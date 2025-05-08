@@ -1,0 +1,13 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
+using System.IO;
+
+var schemaJson = File.ReadAllText("{{SCHEMA_FILE}}");
+var dataJson = File.ReadAllText("{{INSTANCE_FILE}}");
+
+JSchema schema = JSchema.Parse(schemaJson);
+JObject data = JObject.Parse(dataJson);
+
+bool valid = data.IsValid(schema, out IList<string> errors);
+Console.WriteLine(valid ? "Valid JSON" : string.Join("\n", errors));

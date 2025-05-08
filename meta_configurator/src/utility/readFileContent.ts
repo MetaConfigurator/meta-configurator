@@ -1,6 +1,7 @@
 import {errorService} from '@/main';
 import type {ManagedData} from '@/data/managedData';
 import type {Ref} from 'vue';
+import {formatRegistry} from '@/dataformats/formatRegistry';
 /**
  * Reads the content of a file as a string.
  * @param file the file
@@ -23,7 +24,10 @@ export async function readFileContent(file: File) {
   });
 }
 
-async function readFileContentFromFileList(files: FileList | File[] | null) {
+async function readFileContentFromFileList(
+  files: FileList | File[] | null,
+  parseInput: boolean
+): Promise<any | void | string> {
   if (files === null || typeof files !== 'object') {
     return Promise.resolve();
   }
@@ -31,7 +35,20 @@ async function readFileContentFromFileList(files: FileList | File[] | null) {
     return Promise.reject(new Error('Please select exactly one file'));
   }
   const file = files[0];
-  return readFileContent(file);
+  const fileContentAsString = readFileContent(file);
+
+  if (parseInput) {
+    // parse the file content depending on the file suffix
+    const fileName = file.name;
+    for (const formatName of formatRegistry.getFormatNames()) {
+      if (fileName.endsWith(formatName)) {
+        return formatRegistry.getFormat(formatName).dataConverter.parse(await fileContentAsString);
+      }
+    }
+    throw new Error(`Unknown file format: ${fileName}`);
+  } else {
+    return fileContentAsString;
+  }
 }
 
 /**
@@ -47,26 +64,39 @@ export function readFileContentToDataLink(
   files: FileList | File[] | null,
   dataLink: ManagedData
 ): void {
-  readFileContentFromFileList(files)
+  readFileContentFromFileList(files, true)
     .then(contents => {
       if (contents === undefined) {
         return;
       }
-      dataLink.unparsedData.value = contents;
+      dataLink.setData(contents as any);
     })
     .catch(error => errorService.onError(error));
 }
 
-export async function readFileContentToRef(
+export async function readFileContentToStringRef(
   files: FileList | File[] | null,
   resultRef: Ref<string>
 ) {
   try {
-    let contents = await readFileContentFromFileList(files);
+    let contents = (await readFileContentFromFileList(files, false)) as string | void;
     if (contents !== undefined) {
       resultRef.value = contents;
     }
   } catch (error) {
     errorService.onError(error);
   }
+}
+
+export function readFileContentForFunction(
+  files: FileList | File[] | null,
+  fct: (content: any) => void
+) {
+  readFileContentFromFileList(files, true)
+    .then(contents => {
+      if (contents !== undefined) {
+        fct(contents as any);
+      }
+    })
+    .catch(error => errorService.onError(error));
 }

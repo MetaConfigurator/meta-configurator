@@ -1,0 +1,18 @@
+import scala.io.Source
+import com.github.fge.jsonschema.main.{JsonSchemaFactory, JsonValidator}
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.JsonNode
+
+val mapper = new ObjectMapper()
+val schemaFactory = JsonSchemaFactory.byDefault()
+
+val schemaStr = Source.fromFile("{{SCHEMA_FILE}}").mkString
+val dataStr = Source.fromFile("{{INSTANCE_FILE}}").mkString
+
+val schemaNode: JsonNode = mapper.readTree(schemaStr)
+val dataNode: JsonNode = mapper.readTree(dataStr)
+
+val schema = schemaFactory.getJsonSchema(schemaNode)
+val report = schema.validate(dataNode)
+
+if (report.isSuccess) println("Valid!") else println(report)

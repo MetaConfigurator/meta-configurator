@@ -23,7 +23,7 @@ import type {
   GuiEditorTreeNode,
 } from '@/components/panels/gui-editor/configDataTreeNode';
 import {TreeNodeType} from '@/components/panels/gui-editor/configDataTreeNode';
-import {pathToString} from '@/utility/pathUtils';
+import {arePathsEqual, pathToString} from '@/utility/pathUtils';
 import SchemaInfoOverlay from '@/components/panels/gui-editor/SchemaInfoOverlay.vue';
 import {refDebounced, useDebounceFn} from '@vueuse/core';
 import type {TreeNode} from 'primevue/treenode';
@@ -36,8 +36,8 @@ import {
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
-import {replacePropertyNameUtils} from '@/components/panels/shared-components/renameUtils';
 import _ from 'lodash';
+import {replacePropertyNameUtils} from '@/utility/renameUtils';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -57,10 +57,20 @@ const emit = defineEmits<{
 const session = getSessionForMode(props.sessionMode);
 const data = getDataForMode(props.sessionMode);
 
-// scroll to the current selected element when it changes
+// when the user clicks on a property, the path of the selected element is changed.
+// when the path of the selected element is changed, this panel scrolls to the position accordingly
+// to avoid scrolling on a click in the GUI itself, we remember the last path clicked by the user in the GUI and do not scroll when the user clicks on the same path again
+const lastClickedElement = ref<Path>([]);
+
 watch(
   session.currentSelectedElement,
   () => {
+    if (arePathsEqual(lastClickedElement.value, session.currentSelectedElement.value)) {
+      return;
+    }
+    // if something else is selected, unselect the last clicked element
+    lastClickedElement.value = [];
+
     const absolutePath = session.currentSelectedElement.value;
     const pathToCutOff = session.currentPath.value;
     const relativePath = absolutePath.slice(pathToCutOff.length);
@@ -220,6 +230,7 @@ function updateData(subPath: Path, newValue: any) {
 function clickedPropertyData(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
   if (data.dataAt(path) != undefined) {
+    lastClickedElement.value = path;
     emit('select_path', path);
   }
 }
@@ -335,8 +346,10 @@ function addEmptyArrayEntry(relativePath: Path) {
 
   if (!arraySchema?.items) {
     addItem(relativePath, '');
+  } else {
+    const itemsSchema = arraySchema.items;
+    addItem(relativePath, itemsSchema.initialValue());
   }
-  addItem(relativePath, arraySchema?.items?.initialValue());
 }
 
 /**
@@ -537,7 +550,7 @@ function zoomIntoPath(path: Path) {
     v-model:expandedKeys="session.currentExpandedElements.value"
     @nodeExpand="expandElementChildren"
     :filters="treeTableFilters">
-    <Column field="name" header="Property" :sortable="true" expander>
+    <Column field="name" expander>
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->
         <span
@@ -558,7 +571,8 @@ function zoomIntoPath(path: Path) {
                 updatePropertyName(slotProps.node.data.relativePath, oldName, newName)
             "
             @start_editing_property_name="() => (allowShowOverlay = false)"
-            @stop_editing_property_name="() => (allowShowOverlay = true)" />
+            @stop_editing_property_name="() => (allowShowOverlay = true)"
+            :data-testid="'property-metadata-' + pathToString(slotProps.node.data.absolutePath)" />
         </span>
 
         <!-- data nodes, actual edit fields for the data -->
@@ -572,7 +586,8 @@ function zoomIntoPath(path: Path) {
             @update_tree="updateTree"
             @click="() => clickedPropertyData(slotProps.node.data)"
             bodyClass="w-full"
-            @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)" />
+            @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)"
+            :data-testid="'property-data-' + pathToString(slotProps.node.data.absolutePath)" />
         </span>
 
         <!-- special tree nodes -->
@@ -582,7 +597,8 @@ function zoomIntoPath(path: Path) {
           style="width: 100%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
           @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
-          @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)">
+          @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)"
+          :data-testid="'add-item-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{ slotProps.node.data.label }}</span>
@@ -599,7 +615,8 @@ function zoomIntoPath(path: Path) {
           "
           @keyup.enter="
             addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
-          ">
+          "
+          :data-testid="'add-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">New property</span>
@@ -610,7 +627,8 @@ function zoomIntoPath(path: Path) {
           v-if="slotProps.node.type === TreeNodeType.ADVANCED_PROPERTY"
           class="text-gray-500"
           style="width: 50%; min-width: 50%"
-          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)">
+          :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          :data-testid="'advanced-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
           Advanced
         </span>
         <span

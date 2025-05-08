@@ -13,6 +13,7 @@ import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
+import {openImportSchemaDialog} from '@/components/toolbar/importFile';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -27,6 +28,7 @@ export class MenuItems {
   private readonly handleFromURLClick: () => void;
   private readonly showImportCsvDialog: () => void;
   private readonly showSnapshotDialog: () => void;
+  private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
@@ -35,6 +37,7 @@ export class MenuItems {
     onFromURLClick: () => void,
     showImportCsvDialog: () => void,
     showSnapshotDialog: () => void,
+    showCodeGenerationDialog: (schemaMode: boolean) => void,
     inferJsonSchemaFromSampleData: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
@@ -42,6 +45,7 @@ export class MenuItems {
     this.handleFromURLClick = onFromURLClick;
     this.showImportCsvDialog = showImportCsvDialog;
     this.showSnapshotDialog = showSnapshotDialog;
+    this.showCodeGenerationDialog = showCodeGenerationDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
   }
 
@@ -83,7 +87,8 @@ export class MenuItems {
       {
         label: 'Download Data',
         icon: 'fa-solid fa-download',
-        command: () => downloadFile(useCurrentSchema().schemaRaw.value.title ?? 'file', false),
+        command: () =>
+          downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
       },
       {
         separator: true,
@@ -119,7 +124,7 @@ export class MenuItems {
   public getSchemaEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
     let result: MenuItem[] = [
       {
-        label: 'New empty Schema',
+        label: 'New Schema...',
         icon: 'fa-regular fa-file',
         items: [
           {
@@ -135,7 +140,7 @@ export class MenuItems {
         ],
       },
       {
-        label: 'Open Schema',
+        label: 'Open JSON Schema...',
         icon: 'fa-regular fa-folder-open',
         items: [
           {
@@ -162,9 +167,24 @@ export class MenuItems {
         ],
       },
       {
+        label: 'Import Schema...',
+        icon: 'fa-solid fa-file-import',
+        items: [
+          {
+            label: 'JSON Schema',
+            command: openImportSchemaDialog,
+          },
+        ],
+      },
+      {
         label: 'Download Schema',
         icon: 'fa-solid fa-download',
         command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
+      },
+      {
+        label: 'Generate Source Code...',
+        icon: 'fa-solid fa-file-code',
+        command: () => this.showCodeGenerationDialog(true),
       },
       {
         separator: true,
@@ -334,7 +354,8 @@ export class MenuItems {
       const panelTypeDefinition = panelTypeRegistry.getPanelTypeDefinition(panelTypeName);
       if (
         panelTypeDefinition.supportedModes.includes(mode) &&
-        panelTypeDefinition.icon.length > 0
+        panelTypeDefinition.icon.length > 0 &&
+        !settings.panels.hidden.includes(panelTypeName)
       ) {
         // toggle between showing and hiding the panel
         result.push(

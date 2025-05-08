@@ -224,11 +224,6 @@ defineExpose({show: openDialog, close: hideDialog});
 <template>
   <Dialog v-model:visible="showDialog" header="Import CSV">
     <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-      <p>
-        The import will insert the CSV data into your current document, overwriting existing data
-        for paths with a conflict.
-      </p>
-
       <div class="flex align-items-center">
         <Button
           label="Select CSV Document"
@@ -267,7 +262,9 @@ defineExpose({show: openDialog, close: hideDialog});
               :option-label="option => option.label" />
           </div>
 
-          <p v-if="errorMessage.length > 0" style="color: red; white-space: pre-line">
+          <p
+            v-if="errorMessage.length > 0"
+            style="color: red; white-space: pre-line; max-width: 1000px">
             {{ errorMessage }}
           </p>
         </div>

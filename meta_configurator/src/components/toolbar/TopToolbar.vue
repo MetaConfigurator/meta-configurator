@@ -26,7 +26,7 @@ import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
-import {SessionMode} from '@/store/sessionMode';
+import {modeToMenuTitle, SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
@@ -34,6 +34,9 @@ import {useSettings} from '@/settings/useSettings';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
+import Select from 'primevue/select';
+import {formatRegistry} from '@/dataformats/formatRegistry';
+import CodeGenerationDialog from '@/components/dialogs/code-generation/CodeGenerationDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -45,6 +48,7 @@ const emit = defineEmits<{
 
 const settings = useSettings();
 const selectedSchema = ref<SchemaOption | null>(null);
+const dataFormatOptions = formatRegistry.getFormatNames();
 
 const showFetchedSchemas = ref(false);
 const showAboutDialog = ref(false);
@@ -58,6 +62,7 @@ const topMenuBar = new MenuItems(
   showUrlDialog,
   showCsvImportDialog,
   showSnapshotDialog,
+  showCodeGenerationDialog,
   inferSchemaFromSampleData
 );
 
@@ -79,7 +84,7 @@ function getPageName(): string {
  */
 function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
   const dataEditorItem: MenuItem = {
-    label: 'Data Editor',
+    label: modeToMenuTitle(SessionMode.DataEditor),
     icon: 'fa-regular fa-file',
     style: props.currentMode !== SessionMode.DataEditor ? '' : 'font-weight: bold;',
     command: () => {
@@ -87,7 +92,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     },
   };
   const schemaEditorItem: MenuItem = {
-    label: 'Schema Editor',
+    label: modeToMenuTitle(SessionMode.SchemaEditor),
     icon: 'fa-regular fa-file-code',
     style: props.currentMode !== SessionMode.SchemaEditor ? '' : 'font-weight: bold;',
     command: () => {
@@ -95,7 +100,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
     },
   };
   const settingsItem: MenuItem = {
-    label: 'Settings',
+    label: modeToMenuTitle(SessionMode.Settings),
     icon: 'fa-solid fa-cog',
     style: props.currentMode !== SessionMode.Settings ? '' : 'font-weight: bold;',
     command: () => {
@@ -115,7 +120,7 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
 
 const items = computed(() => getPageSelectionMenuItems(settings.value));
 
-function handleUserSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
+function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
     case 'Example':
       handleFromOurExampleClick();
@@ -260,6 +265,7 @@ function isHighlighted(item: MenuItem) {
 const searchTerm: Ref<string> = ref('');
 
 const initialSchemaSelectionDialog = ref();
+
 // Function to show the category selection dialog
 const showInitialSchemaDialog = () => {
   initialSchemaSelectionDialog.value?.show();
@@ -267,6 +273,7 @@ const showInitialSchemaDialog = () => {
 
 const csvImportDialog = ref();
 const snapshotDialog = ref();
+const codeGenerationDialog = ref();
 
 function showCsvImportDialog() {
   csvImportDialog.value?.show();
@@ -274,6 +281,15 @@ function showCsvImportDialog() {
 
 function showSnapshotDialog() {
   snapshotDialog.value?.show();
+}
+
+function showCodeGenerationDialog(schemaMode: boolean) {
+  if (schemaMode) {
+    codeGenerationDialog.value?.activateSchemaMode();
+  } else {
+    codeGenerationDialog.value?.activateDataMode();
+  }
+  codeGenerationDialog.value?.show();
 }
 
 defineExpose({
@@ -329,11 +345,13 @@ const showSearchResultsMenu = event => {
 <template>
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
-    @user_selected_option="option => handleUserSelection(option)" />
+    @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
 
   <ImportCsvDialog ref="csvImportDialog" />
 
   <SaveSnapshotDialog ref="snapshotDialog" />
+
+  <CodeGenerationDialog ref="codeGenerationDialog" />
 
   <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
   <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
@@ -377,7 +395,7 @@ const showSearchResultsMenu = event => {
     <template #start>
       <Menu ref="menu" :model="items" :popup="true">
         <template #itemicon="slotProps">
-          <div v-if="slotProps.item.icon !== undefined">
+          <div v-if="slotProps.item.icon !== undefined" data-testid="page-selection-menu">
             <FontAwesomeIcon :icon="slotProps.item.icon" style="min-width: 1rem" class="mr-3" />
           </div>
         </template>
@@ -420,13 +438,22 @@ const showSearchResultsMenu = event => {
         </Menu>
       </div>
 
+      <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
+        <Select
+          :options="dataFormatOptions"
+          v-model="settings.dataFormat"
+          size="small"
+          class="custom-select"
+          data-testid="format-selector" />
+      </div>
+
       <!-- search bar -->
-      <span class="p-input-icon-left ml-5" style="width: 20rem">
+      <span class="p-input-icon-left ml-5" style="width: 14rem">
         <i class="pi" style="font-size: 0.9rem" />
         <InputText
           show-clear
           class="h-7 w-full"
-          placeholder="Search for data or properties..."
+          placeholder="Search for data or property"
           v-model="searchTerm"
           @focus="showSearchResultsMenu"
           @blur="() => searchResultMenu.value?.hide()"
@@ -450,7 +477,7 @@ const showSearchResultsMenu = event => {
       <div class="flex space-x-5 mr-3">
         <div class="flex space-x-2">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
-          <p class="font-semibold text-lg">
+          <p class="font-semibold text-lg" data-testid="toolbar-title">
             {{ settings.toolbarTitle || 'MetaConfigurator' }}
           </p>
         </div>
@@ -483,6 +510,9 @@ const showSearchResultsMenu = event => {
   width: 100%;
 }
 .button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
   margin-top: 1rem;
 }
 .no-padding {
@@ -507,5 +537,11 @@ const showSearchResultsMenu = event => {
 
 .highlighted-icon {
   color: var(--p-highlight-color) !important;
+}
+
+.custom-select {
+  height: 1.75rem;
+  line-height: 0.7rem;
+  padding: 0;
 }
 </style>

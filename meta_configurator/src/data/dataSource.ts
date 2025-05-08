@@ -10,6 +10,7 @@ const dataSource = {
   userData: shallowRef<any>({}),
   // data of the schema editor, used as the schema for the file editor
   userSchemaData: shallowRef<any>({}),
+  newSchemaWasFetched: shallowRef<boolean>(false),
 
   // data of the settings editor
   settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT)),

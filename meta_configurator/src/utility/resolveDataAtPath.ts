@@ -9,7 +9,7 @@ import type {Path} from '@/utility/path';
 export function dataAt(path: Path, data: any): any {
   let currentData: any = data;
 
-  if (currentData === undefined) {
+  if (currentData === undefined || currentData === null) {
     return undefined;
   }
 

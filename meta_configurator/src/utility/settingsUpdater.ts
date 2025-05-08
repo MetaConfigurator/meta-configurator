@@ -4,8 +4,10 @@ import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {useDataSource} from '@/data/dataSource';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import {detectSchemaFeatures} from '@/schema/detectSchemaFeatures';
 
-function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
+export function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
   for (const key in defaultsFile) {
     if (!(key in userFile)) {
       userFile[key] = defaultsFile[key];
@@ -31,7 +33,7 @@ function overwriteSettingsValues(userFile: any, replaceFile: any) {
   }
 }
 
-function fixPanels(userData: SettingsInterfaceRoot, defaultData: SettingsInterfaceRoot) {
+export function fixPanels(userData: SettingsInterfaceRoot, defaultData: SettingsInterfaceRoot) {
   let panelsAreMessedUp = false;
 
   const userPanels = userData.panels;
@@ -57,10 +59,31 @@ export function addDefaultsForSettings() {
   addDefaultsForMissingFields(userSettings, defaultSettings);
 
   fixPanels(userSettings, defaultSettings);
+  migrateSettingsVersion(userSettings);
 }
 
 export function overwriteSettings(replaceFile: any) {
   // overwrites the settings with the values from the replace file. Keeps all other values
   const userSettings = useDataSource().settingsData.value;
   overwriteSettingsValues(userSettings, replaceFile);
+  migrateSettingsVersion(userSettings);
+}
+
+function migrateSettingsVersion(userSettings: any) {
+  if (userSettings.settingsVersion === '1.0.0') {
+    // migrate from 1.0.0 to 1.0.1
+    userSettings.settingsVersion = '1.0.1';
+    const hiddenPanels = userSettings.panels.hidden;
+    if (!hiddenPanels.includes('test')) {
+      userSettings.panels.hidden.push('test');
+    }
+  }
+}
+
+export function adaptComplexitySettingsToLoadedSchema(schema: TopLevelSchema) {
+  const usedSchemaFeatures = detectSchemaFeatures(schema);
+  const metaSchemaSettings = useDataSource().settingsData.value.metaSchema;
+
+  metaSchemaSettings.allowBooleanSchema = usedSchemaFeatures.booleanSchemas;
+  metaSchemaSettings.allowMultipleTypes = usedSchemaFeatures.multipleTypes;
 }

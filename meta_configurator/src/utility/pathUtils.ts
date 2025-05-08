@@ -1,5 +1,6 @@
 import type {Path, PathElement} from '@/utility/path';
 import pointer from 'json-pointer';
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 /**
  * Converts a path to a string.
@@ -18,6 +19,15 @@ export function pathToString(path: Path): string {
           ''
         )
         .slice(1);
+}
+
+/**
+ * Converts a path to a json pointer.
+ * Example: [1, 'foo', 2] -> '/1/foo/2'
+ * @param path the path to convert
+ */
+export function pathToJsonPointer(path: Path): string {
+  return pointer.compile(path.map((element: PathElement) => element.toString()));
 }
 
 /**
@@ -41,15 +51,6 @@ export function jsonPointerToPathTyped(jsonPointer: string): Path {
   });
 }
 
-/**
- * Converts a path to a json pointer.
- * Example: [1, 'foo', 2] -> '/1/foo/2'
- * @param path the path to convert
- */
-export function pathToJsonPointer(path: Path): string {
-  return pointer.compile(path.map((element: PathElement) => element.toString()));
-}
-
 export function dataPathToSchemaPath(dataPath: Path): Path {
   const schemaPath: Path = [];
 
@@ -63,4 +64,38 @@ export function dataPathToSchemaPath(dataPath: Path): Path {
   }
 
   return schemaPath;
+}
+
+export function getParentElementRequiredPropsPath(
+  schema: any,
+  absolutePath: Path
+): Path | undefined {
+  if (absolutePath.length < 2) {
+    return undefined;
+  }
+  if (absolutePath[absolutePath.length - 2] !== 'properties') {
+    return undefined;
+  }
+
+  const parentObjectPath = absolutePath.slice(0, -2);
+  const parentObject = dataAt(parentObjectPath, schema);
+  if (parentObject.required) {
+    return parentObjectPath.concat('required');
+  }
+
+  return undefined;
+}
+
+export function arePathsEqual(path1: Path, path2: Path): boolean {
+  if (path1.length !== path2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < path1.length; i++) {
+    if (path1[i] !== path2[i]) {
+      return false;
+    }
+  }
+
+  return true;
 }

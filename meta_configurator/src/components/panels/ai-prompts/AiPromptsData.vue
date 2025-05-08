@@ -68,8 +68,6 @@ function isSchemaEmpty() {
     :function-query-document-export="queryDocumentExport" />
   <div v-else>
     <ApiKey class="api-key-top" />
-    <Divider />
-    <label class="heading">AI Prompts</label>
     <span>
       Before using the AI prompts to generate data, please create or select a schema in the Schema
       Editor tab.

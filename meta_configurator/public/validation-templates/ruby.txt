@@ -1,0 +1,12 @@
+require 'json'
+require 'json-schema'
+
+schema = JSON.parse(File.read('{{SCHEMA_FILE}}'))
+data = JSON.parse(File.read('{{INSTANCE_FILE}}'))
+
+begin
+  JSON::Validator.validate!(schema, data)
+  puts "Valid!"
+rescue JSON::Schema::ValidationError => e
+  puts "Invalid: #{e.message}"
+end

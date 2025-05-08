@@ -1,7 +1,7 @@
 import dagre from 'dagrejs';
 import {Position, useVueFlow} from '@vue-flow/core';
 import {ref} from 'vue';
-import type {Edge, Node} from '@/components/panels/schema-diagram/schemaDiagramTypes';
+import type {Edge, Node} from '@/schema/graph-representation/schemaGraphTypes';
 
 // Taken and adapted from https://vueflow.dev/examples/layout.html
 

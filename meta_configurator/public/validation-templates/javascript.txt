@@ -1,0 +1,15 @@
+const Ajv = require("ajv");
+const fs = require("fs");
+
+const schema = JSON.parse(fs.readFileSync("{{SCHEMA_FILE}}"));
+const data = JSON.parse(fs.readFileSync("{{INSTANCE_FILE}}"));
+
+const ajv = new Ajv();
+const validate = ajv.compile(schema);
+const valid = validate(data);
+
+if (!valid) {
+  console.error(validate.errors);
+} else {
+  console.log("Valid!");
+}

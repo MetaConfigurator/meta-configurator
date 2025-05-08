@@ -4,7 +4,6 @@ import AccordionTab from 'primevue/accordiontab';
 import ToggleSwitch from 'primevue/toggleswitch';
 import {useSettings} from '@/settings/useSettings';
 import Button from 'primevue/button';
-
 const emit = defineEmits<{
   (e: 'rebuild_graph'): void;
   (e: 'fit_view'): void;

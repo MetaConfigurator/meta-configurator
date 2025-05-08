@@ -1,0 +1,57 @@
+{
+  "toolbarTitle": "Test - Settings Normal",
+  "panels": {
+    "dataEditor": [
+      {
+        "panelType": "textEditor",
+        "mode": "dataEditor",
+        "size": 50
+      },
+      {
+        "panelType": "guiEditor",
+        "mode": "dataEditor",
+        "size": 50
+      },
+      {
+        "panelType": "test",
+        "mode": "dataEditor",
+        "size": 50
+      }
+    ],
+    "schemaEditor": [
+        {
+            "panelType": "textEditor",
+            "mode": "schemaEditor",
+            "size": 50
+        },
+        {
+            "panelType": "guiEditor",
+            "mode": "schemaEditor",
+            "size": 50
+        },
+        {
+            "panelType": "test",
+            "mode": "schemaEditor",
+            "size": 50
+        }
+    ],
+    "settings": [
+        {
+            "panelType": "textEditor",
+            "mode": "settings",
+            "size": 50
+        },
+        {
+            "panelType": "guiEditor",
+            "mode": "settings",
+            "size": 50
+        },
+        {
+            "panelType": "test",
+            "mode": "settings",
+            "size": 50
+        }
+    ],
+    "hidden": ["aiPrompts", "debug"]
+  }
+}

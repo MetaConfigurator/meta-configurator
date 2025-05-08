@@ -2,6 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
+  settingsVersion: '1.0.1',
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
   hideSchemaEditor: false,
@@ -9,6 +10,10 @@ export const SETTINGS_DATA_DEFAULT = {
   codeEditor: {
     fontSize: 14,
     tabSize: 2,
+    showFormatSelector: true,
+    xml: {
+      attributeNamePrefix: '_',
+    },
   },
   guiEditor: {
     maximumDepth: 20,
@@ -77,6 +82,7 @@ export const SETTINGS_DATA_DEFAULT = {
         size: 50,
       },
     ],
+    hidden: ['aiPrompts', 'debug', 'test'],
   },
   frontend: {
     hostname: 'http://metaconfigurator.informatik.uni-stuttgart.de',
@@ -88,10 +94,10 @@ export const SETTINGS_DATA_DEFAULT = {
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
   },
-  openAi: {
+  aiIntegration: {
     model: 'gpt-4o-mini',
     maxTokens: 5000,
-    temperature: 0.3,
-    endpoint: '/chat/completions',
+    temperature: 0.0,
+    endpoint: 'https://api.openai.com/v1/chat/completions',
   },
 };

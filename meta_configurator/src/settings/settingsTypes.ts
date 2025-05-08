@@ -1,6 +1,7 @@
 import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
+  settingsVersion: string;
   dataFormat: DataFormat;
   toolbarTitle: string;
   hideSchemaEditor: boolean;
@@ -13,12 +14,17 @@ export interface SettingsInterfaceRoot {
   frontend: SettingsInterfacFrontend;
   backend: SettingsInterfaceBackend;
   rdf: SettingsInterfaceRdf;
-  openAi: SettingsInterfaceOpenAi;
+  aiIntegration: SettingsInterfaceAiIntegraton;
 }
 
 export interface SettingsInterfaceCodeEditor {
   fontSize: number;
   tabSize: number;
+  showFormatSelector: boolean;
+  xml: SettingsCodeEditorXml;
+}
+export interface SettingsCodeEditorXml {
+  attributeNamePrefix: string;
 }
 
 export interface SettingsInterfaceGuiEditor {
@@ -44,6 +50,7 @@ export interface SettingsInterfacePanels {
   dataEditor: SettingsInterfacePanel[];
   schemaEditor: SettingsInterfacePanel[];
   settings: SettingsInterfacePanel[];
+  hidden: string[];
 }
 
 export interface SettingsInterfacePanel {
@@ -70,6 +77,7 @@ export enum PropertySorting {
 export enum DataFormat {
   JSON = 'json',
   YAML = 'yaml',
+  XML = 'xml',
 }
 
 export interface SettingsInterfaceBackend {
@@ -85,7 +93,7 @@ export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
 }
 
-export interface SettingsInterfaceOpenAi {
+export interface SettingsInterfaceAiIntegraton {
   model: string;
   maxTokens: number;
   temperature: number;

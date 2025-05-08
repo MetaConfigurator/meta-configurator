@@ -8,25 +8,14 @@ import {useSettings} from '@/settings/useSettings';
  * @param isSchema Whether the file is a schema file
  */
 export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
-  const configData: string = useCurrentData().unparsedData.value;
+  const configData: string = isSchema
+    ? JSON.stringify(useCurrentData().data.value, null, 2)
+    : useCurrentData().unparsedData.value;
 
   // TODO correct type depending on the data format
   const blob: Blob = new Blob([configData], {type: 'application/json'});
 
-  // Generate a unique filename for the downloaded config
-  const now = new Date();
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-  const formattedDate = formatter.format(now);
-  const fileEnding =
-    (isSchema ? 'schema.' : '') + (useSettings().value.dataFormat === 'yaml' ? 'yml' : 'json');
-  const fileName: string = `${fileNamePrefix}-${formattedDate}.${fileEnding}`;
+  const fileName: string = generateFileName(fileNamePrefix, isSchema);
 
   // Create a temporary link element
   const link: HTMLAnchorElement = document.createElement('a');
@@ -40,4 +29,9 @@ export function downloadFile(fileNamePrefix: string, isSchema: boolean): void {
   // Clean up by removing the link element and revoking the object URL
   document.body.removeChild(link);
   URL.revokeObjectURL(link.href);
+}
+
+export function generateFileName(prefix: string, isSchema: boolean): string {
+  const fileEnding = isSchema ? 'schema.json' : useSettings().value.dataFormat;
+  return `${prefix}.${fileEnding}`;
 }

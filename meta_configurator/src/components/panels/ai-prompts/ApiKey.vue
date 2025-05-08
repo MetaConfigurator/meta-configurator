@@ -46,8 +46,11 @@ watch(isPersistKey, newValue => {
 </script>
 
 <template>
-  <Panel header="OpenAI API Key" toggleable :collapsed="true">
-    Generate your API Key
+  <Panel header="AI Prompts - API Key" toggleable :collapsed="true">
+    MetaConfigurator supports the OpenAI API (including other AI endpoints using the same API).
+    Define your endpoint in the settings.
+    <br />
+    For OpenAI, generate your API Key
     <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>. Usage of the
     OpenAI API normally requires balance on the OpenAI account. One-time purchase of balance is
     possible without permanently connecting your credit card with your account. Check this
@@ -58,7 +61,11 @@ watch(isPersistKey, newValue => {
     results you can change to more performant models in the settings tab.
     <br />
     <br />
-    Currently selected model: <b>{{ useSettings().value.openAi.model }}</b>
+    Currently selected model and endpoint:
+    <b
+      >{{ useSettings().value.aiIntegration.model }},
+      {{ useSettings().value.aiIntegration.endpoint }}</b
+    >
     <span class="api-key-container">
       <span>Key:</span>
       <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false" />

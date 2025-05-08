@@ -14,25 +14,43 @@ jobs:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
       contents: write
+
     defaults:
       run:
         working-directory: ./meta_configurator
+
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            meta_configurator/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('meta_configurator/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install dependencies
         run: npm ci
+
       - name: Build
         run: npm run build --if-present
+
       - name: Lint
         run: npm run lint
+
       - name: Test
         run: npm test
+
       - name: Prettier
         run: npm run prettier
+
       - name: Commit format changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:

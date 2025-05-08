@@ -54,14 +54,32 @@ export class JsonSchemaWrapper {
 
   /**
    * Returns an empty, initial value that matches the type of
-   * the schema (this is NOT the default value).
+   * the schema if no defaults are defined. Otherwise, it returns the default value, or for objects an initial object with all required properties and for arrays an initial array with the minimum amount of required items.
    */
   public initialValue(): any {
+    if (this.default) {
+      return this.default;
+    }
     if (this.hasType('object')) {
-      return {};
+      const result: any = {};
+      const requiredProperties = this.required ?? [];
+      for (const key of Object.keys(this.properties)) {
+        if (requiredProperties.includes(key)) {
+          result[key] = this.properties[key].initialValue();
+        }
+      }
+      return result;
     }
     if (this.hasType('array')) {
-      return [];
+      const result = [];
+
+      if (this.items && this.minLength > 0) {
+        for (let i = 0; i < this.minLength; i++) {
+          result.push(this.items.initialValue());
+        }
+      }
+
+      return result;
     }
     if (this.hasType('string')) {
       return '';

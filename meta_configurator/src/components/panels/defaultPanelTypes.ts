@@ -7,6 +7,7 @@ import SchemaDiagramPanel from '@/components/panels/schema-diagram/SchemaDiagram
 import DebugPanel from '@/components/panels/debug-panel/DebugPanel.vue';
 import AiPromptsPanel from '@/components/panels/ai-prompts/AiPromptsPanel.vue';
 import ListAnalysisPanel from './list-analysis/ListAnalysisPanel.vue';
+import TestPanel from '@/components/panels/test-panel/TestPanel.vue';
 
 export const panelTypeTextEditor: PanelTypeDefinition = {
   getComponent: () => CodeEditorPanel,
@@ -20,7 +21,7 @@ export const panelTypeGuiEditor: PanelTypeDefinition = {
   getComponent: () => GuiEditorPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
   label: 'GUI Editor',
-  icon: 'fa-solid fa-wrench',
+  icon: 'fa-solid fa-list-ul',
   name: 'guiEditor',
 };
 
@@ -45,15 +46,23 @@ export const panelTypeListAnalysis: PanelTypeDefinition = {
   supportedModes: [SessionMode.DataEditor],
   label: 'Table View',
   icon: 'fa-solid fa-table',
-  name: 'listAnalysis',
+  name: 'tableView',
 };
 
 export const panelTypeDebug: PanelTypeDefinition = {
   getComponent: () => DebugPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
   label: 'Debug',
-  icon: '',
+  icon: 'fa-solid fa-bug',
   name: 'debug',
+};
+
+export const panelTypeTest: PanelTypeDefinition = {
+  getComponent: () => TestPanel,
+  supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
+  label: 'Test (for automated E2E Testing, not for human use)',
+  icon: 'fa-solid fa-bug',
+  name: 'test',
 };
 
 /**
@@ -64,6 +73,7 @@ export function registerDefaultPanelTypes() {
   panelTypeRegistry.registerPanelType('guiEditor', panelTypeGuiEditor);
   panelTypeRegistry.registerPanelType('schemaDiagram', panelTypeSchemaDiagram);
   panelTypeRegistry.registerPanelType('aiPrompts', panelTypeAiPrompts);
-  panelTypeRegistry.registerPanelType('listAnalysis', panelTypeListAnalysis);
+  panelTypeRegistry.registerPanelType('tableView', panelTypeListAnalysis);
   panelTypeRegistry.registerPanelType('debug', panelTypeDebug);
+  panelTypeRegistry.registerPanelType('test', panelTypeTest);
 }
