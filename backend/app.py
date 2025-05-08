@@ -12,7 +12,16 @@ import redis
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-CORS(app)
+
+# Allow requests from your frontend origin
+CORS(app, origins=[
+
+    "http://localhost:5173",  # local dev server
+    "https://metaconfigurator.github.io",  # experimental GitHub Pages
+    "https://logende.github.io",  # prod stable release and other accesses by Logende GitHub account
+    "www.metaconfigurator.org"  # prod stable release
+
+])
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
