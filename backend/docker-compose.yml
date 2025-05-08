@@ -13,6 +13,7 @@ services:
       - app-network
     environment:
       VIRTUAL_HOST: metaconfigurator.informatik.uni-stuttgart.de
+      VIRTUAL_PORT: 5000
       LETSENCRYPT_HOST: metaconfigurator.informatik.uni-stuttgart.de
       LETSENCRYPT_EMAIL: felix.neubauer@ipvs.uni-stuttgart.de
       FLASK_ENV: development
