@@ -37,7 +37,8 @@ import {
   faXmark,
   faBug,
   faListUl,
-  faFileCode, faShare,
+  faFileCode,
+  faShare,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
