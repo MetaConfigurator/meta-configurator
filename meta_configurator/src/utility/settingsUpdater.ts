@@ -79,14 +79,14 @@ function migrateSettingsVersion(userSettings: any) {
     }
   }
 
-    if (userSettings.settingsVersion === '1.0.1') {
-        // migrate from 1.0.1 to 1.0.2
-        userSettings.settingsVersion = '1.0.2';
-        // update backend and frontend hostname to new default values
-        userSettings.frontend.hostname = 'https://metaconfigurator.github.io/meta-configurator';
-        delete userSettings.backend.port
-        userSettings.backend.hostname = 'https://metaconfigurator.informatik.uni-stuttgart.de';
-    }
+  if (userSettings.settingsVersion === '1.0.1') {
+    // migrate from 1.0.1 to 1.0.2
+    userSettings.settingsVersion = '1.0.2';
+    // update backend and frontend hostname to new default values
+    userSettings.frontend.hostname = 'https://metaconfigurator.github.io/meta-configurator';
+    delete userSettings.backend.port;
+    userSettings.backend.hostname = 'https://metaconfigurator.informatik.uni-stuttgart.de';
+  }
 }
 
 export function adaptComplexitySettingsToLoadedSchema(schema: TopLevelSchema) {
