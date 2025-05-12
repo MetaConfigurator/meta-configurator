@@ -7,7 +7,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
-import {overwriteSettings} from '@/utility/settingsUpdater';
+import {addDefaultsForSettings, overwriteSettings} from '@/utility/settingsUpdater';
 
 defineProps({
   settings_url: String,
@@ -17,6 +17,12 @@ const sessionStore = useSessionStore();
 const settings = useSettings();
 
 onMounted(() => {
+  // update user settings by adding default value for missing fields
+  // also performs settings migration in case of outdated settings
+  // this is needed here, because, for example, loading snapshots involves reading the backend address from the settings
+  addDefaultsForSettings();
+
+
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
   let usesCustomSettings = false;

@@ -79,6 +79,7 @@ onMounted(() => {
     useSessionStore().hasShownInitialDialog = true;
 
     // update user settings by adding default value for missing fields
+    // also performs settings migration in case of outdated settings
     addDefaultsForSettings();
   }
 });
