@@ -7,7 +7,7 @@ import {computed, onMounted, onUnmounted, type Ref, ref, watch} from 'vue';
 import 'primeicons/primeicons.css';
 import SplitterPanel from 'primevue/splitterpanel';
 import Splitter from 'primevue/splitter';
-import TopToolbar from '@/components/toolbar/TopToolbar.vue';
+import Toolbar from '@/components/toolbar/Toolbar.vue';
 import Toast from 'primevue/toast';
 import ConfirmDialog from 'primevue/confirmdialog';
 import {useToast} from 'primevue/usetoast';
@@ -70,12 +70,12 @@ function updateMode(newMode: SessionMode) {
   router.push(route);
 }
 
-const topToolbarRef = ref();
+const toolbarRef = ref();
 const mainPanel = ref();
 
 onMounted(() => {
   if (!useSessionStore().hasShownInitialDialog) {
-    topToolbarRef.value?.showInitialSchemaDialog();
+    toolbarRef.value?.showInitialSchemaDialog();
     useSessionStore().hasShownInitialDialog = true;
 
     // update user settings by adding default value for missing fields
@@ -156,10 +156,7 @@ onUnmounted(() => {
   <div class="w-full h-full flex" style="max-height: 100%">
     <main class="flex flex-col w-full h-full">
       <!-- toolbar -->
-      <TopToolbar
-        ref="topToolbarRef"
-        :current-mode="props.sessionMode"
-        @mode-selected="updateMode" />
+      <Toolbar ref="toolbarRef" :current-mode="props.sessionMode" @mode-selected="updateMode" />
       <div class="flex-grow overflow-hidden" ref="mainPanel" id="mainpanel">
         <Splitter
           class="h-full"
