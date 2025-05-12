@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref} from 'vue';
+import {ref} from 'vue';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -74,7 +74,6 @@ useMagicKeys({
     }
   },
 });
-
 </script>
 
 <template>
