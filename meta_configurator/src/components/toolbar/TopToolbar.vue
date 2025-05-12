@@ -1,39 +1,26 @@
 <script setup lang="ts">
-import {computed, type Ref, ref} from 'vue';
+import {type Ref, ref} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
-import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
-import {MenuItems} from '@/components/toolbar/menuItems';
 import {useSessionStore} from '@/store/sessionStore';
 import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
-import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
 
-import InputText from 'primevue/inputtext';
-import AboutDialog from '@/components/dialogs/AboutDialog.vue';
-import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
-import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema, searchResultToMenuItem} from '@/utility/search';
 import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
 
-import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
-import {modeToMenuTitle, SessionMode} from '@/store/sessionMode';
-import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
-import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
+import { SessionMode} from '@/store/sessionMode';
+import { getSessionForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
-import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
-import {inferJsonSchema} from '@/schema/inferJsonSchema';
-import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
 import Select from 'primevue/select';
 import {formatRegistry} from '@/dataformats/formatRegistry';
-import CodeGenerationDialog from '@/components/dialogs/code-generation/CodeGenerationDialog.vue';
-import FetchedSchemasSelectionDialog from "@/components/dialogs/FetchedSchemasSelectionDialog.vue";
+import ModeSelector from "@/components/toolbar/ModeSelector.vue";
+import TopToolbarMenuButtons from "@/components/toolbar/TopToolbarMenuButtons.vue";
+import SearchBar from "@/components/toolbar/SearchBar.vue";
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -41,230 +28,57 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
+  (e: 'show-url-dialog'): void;
+  (e: 'show-example-schemas-dialog'): void;
+  (e: 'show-schemastore-dialog'): void;
+  (e: 'show-import-csv-dialog'): void;
+  (e: 'show-snapshot-dialog'): void;
+  (e: 'show-about-dialog'): void;
+  (e: 'show-codegen-dialog', schemaMode: boolean): void;
 }>();
 
 const settings = useSettings();
 const dataFormatOptions = formatRegistry.getFormatNames();
 
-const showAboutDialog = ref(false);
-const showUrlInputDialog = ref(false);
-const schemaUrl = ref('');
-const menu = ref();
 
-const topMenuBar = new MenuItems(
-  handleFromWebClick,
-  handleFromOurExampleClick,
-  showUrlDialog,
-  showCsvImportDialog,
-  showSnapshotDialog,
-  showCodeGenerationDialog,
-  inferSchemaFromSampleData
-);
 
-function getPageName(): string {
-  switch (props.currentMode) {
-    case SessionMode.DataEditor:
-      return 'Data Editor';
-    case SessionMode.SchemaEditor:
-      return 'Schema Editor';
-    case SessionMode.Settings:
-      return 'Settings';
-    default:
-      return 'Unknown';
-  }
+async function showSchemaStoreDialog() {
+  emit("show-schemastore-dialog")
 }
 
-/**
- * Menu items of the page selection menu.
- */
-function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-  const dataEditorItem: MenuItem = {
-    label: modeToMenuTitle(SessionMode.DataEditor),
-    icon: 'fa-regular fa-file',
-    style: props.currentMode !== SessionMode.DataEditor ? '' : 'font-weight: bold;',
-    command: () => {
-      emit('mode-selected', SessionMode.DataEditor);
-    },
-  };
-  const schemaEditorItem: MenuItem = {
-    label: modeToMenuTitle(SessionMode.SchemaEditor),
-    icon: 'fa-regular fa-file-code',
-    style: props.currentMode !== SessionMode.SchemaEditor ? '' : 'font-weight: bold;',
-    command: () => {
-      emit('mode-selected', SessionMode.SchemaEditor);
-    },
-  };
-  const settingsItem: MenuItem = {
-    label: modeToMenuTitle(SessionMode.Settings),
-    icon: 'fa-solid fa-cog',
-    style: props.currentMode !== SessionMode.Settings ? '' : 'font-weight: bold;',
-    command: () => {
-      emit('mode-selected', SessionMode.Settings);
-    },
-  };
-
-  const items = [dataEditorItem];
-  if (!settings.hideSchemaEditor) {
-    items.push(schemaEditorItem);
-  }
-  if (!settings.hideSettings) {
-    items.push(settingsItem);
-  }
-  return items;
+function showExampleSchemasDialog() {
+  emit("show-example-schemas-dialog")
 }
-
-const items = computed(() => getPageSelectionMenuItems(settings.value));
-
-function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
-  switch (option) {
-    case 'Example':
-      handleFromOurExampleClick();
-      break;
-    case 'JsonStore':
-      handleFromWebClick();
-      break;
-    case 'File':
-      openUploadSchemaDialog();
-      break;
-    case 'URL':
-      showUrlDialog();
-      break;
-  }
-}
-
-async function handleFromWebClick(): Promise<void> {
-  try {
-    // Wait for the fetch to complete
-    fetchedSchemasSelectionDialog.value.setSchemas(await fetchSchemasFromJSONSchemaStore());
-    fetchedSchemasSelectionDialog.value.show();
-  } catch (error) {
-    errorService.onError(error);
-  }
-}
-function handleFromOurExampleClick() {
-  fetchedSchemasSelectionDialog.value.setSchemas(schemaCollection);
-  fetchedSchemasSelectionDialog.value.show();
-}
-
 
 function showUrlDialog() {
-  showUrlInputDialog.value = true;
+  emit('show-url-dialog');
 }
-function hideUrlDialog() {
-  showUrlInputDialog.value = false;
-}
-async function fetchSchemaFromSelectedUrl() {
-  await fetchSchemaFromUrl(schemaUrl.value!);
-  hideUrlDialog();
-}
-
-function inferSchemaFromSampleData() {
-  const data = getDataForMode(SessionMode.DataEditor).data.value;
-  const inferredSchema = inferJsonSchema(data);
-  if (inferredSchema) {
-    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferredSchema;
-  }
-}
-
-function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-  switch (props.currentMode) {
-    case SessionMode.DataEditor:
-      return topMenuBar.getDataEditorMenuItems(settings);
-    case SessionMode.SchemaEditor:
-      return topMenuBar.getSchemaEditorMenuItems(settings);
-    case SessionMode.Settings:
-      return topMenuBar.getSettingsMenuItems(settings);
-    default:
-      return [];
-  }
-}
-
-// computed property function to get menu items to allow for updating of the menu items
-const menuItems = computed(() => getMenuItems(settings.value));
-
-const toggle = event => {
-  menu.value.toggle(event);
-};
-
-const itemMenuRefs = ref(new Map<string, typeof Menu>());
-
-function setItemMenuRef(item: MenuItem, menu: typeof Menu) {
-  itemMenuRefs.value.set(getLabelOfItem(item), menu);
-}
-function handleItemButtonClick(item: MenuItem, event: Event) {
-  if (item.items) {
-    const label = getLabelOfItem(item);
-    if (label !== undefined) {
-      const menu = itemMenuRefs.value.get(label);
-      menu.toggle(event);
-    }
-  } else if (item.command) {
-    item.command({item, originalEvent: event});
-  }
-}
-function getLabelOfItem(item: MenuItem): string | undefined {
-  if (!item.label) {
-    return undefined;
-  }
-  if (typeof item.label === 'string') {
-    return item.label;
-  }
-  return item.label();
-}
-
-function isDisabled(item: MenuItem) {
-  if (!item.disabled) {
-    return false;
-  }
-  if (typeof item.disabled === 'boolean') {
-    return item.disabled;
-  }
-  return item.disabled();
-}
-function isHighlighted(item: MenuItem) {
-  if (!item.highlighted) {
-    return false;
-  }
-  if (typeof item.highlighted === 'boolean') {
-    return item.highlighted;
-  }
-  return item.highlighted();
-}
-
-const searchTerm: Ref<string> = ref('');
-
-const initialSchemaSelectionDialog = ref();
-
-// Function to show the category selection dialog
-const showInitialSchemaDialog = () => {
-  initialSchemaSelectionDialog.value?.show();
-};
-
-const csvImportDialog = ref();
-const snapshotDialog = ref();
-const codeGenerationDialog = ref();
-const fetchedSchemasSelectionDialog = ref();
 
 function showCsvImportDialog() {
-  csvImportDialog.value?.show();
+  emit('show-import-csv-dialog');
 }
 
 function showSnapshotDialog() {
-  snapshotDialog.value?.show();
+  emit('show-snapshot-dialog');
+}
+
+function showAboutDialog() {
+  emit('show-url-dialog');
 }
 
 function showCodeGenerationDialog(schemaMode: boolean) {
-  if (schemaMode) {
-    codeGenerationDialog.value?.activateSchemaMode();
-  } else {
-    codeGenerationDialog.value?.activateDataMode();
-  }
-  codeGenerationDialog.value?.show();
+  emit('show-codegen-dialog', schemaMode);
 }
 
-defineExpose({
-  showInitialSchemaDialog,
-});
+function selectedMode(newMode: SessionMode) {
+  emit('mode-selected', newMode);
+}
+
+
+const searchTerm: Ref<string> = ref('');
+const modeSelector = ref();
+
+
 
 useMagicKeys({
   passive: false,
@@ -313,85 +127,20 @@ const showSearchResultsMenu = event => {
 </script>
 
 <template>
-  <InitialSchemaSelectionDialog
-    ref="initialSchemaSelectionDialog"
-    @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
 
-  <ImportCsvDialog ref="csvImportDialog" />
-
-  <SaveSnapshotDialog ref="snapshotDialog" />
-
-  <CodeGenerationDialog ref="codeGenerationDialog" />
-
-  <FetchedSchemasSelectionDialog ref="fetchedSchemasSelectionDialog" />
-
-  <Dialog v-model:visible="showUrlInputDialog">
-    <div class="p-fluid">
-      <div class="p-field">
-        <label for="urlInput">Enter the URL of the schema:</label>
-        <InputText v-model="schemaUrl" id="urlInput" />
-      </div>
-      <div class="p-dialog-footer">
-        <div class="button-container">
-          <Button label="Cancel" @click="hideUrlDialog" class="dialog-button" />
-          <Button label="Fetch Schema" @click="fetchSchemaFromSelectedUrl" class="dialog-button" />
-        </div>
-      </div>
-    </div>
-  </Dialog>
-
-  <AboutDialog
-    :visible="showAboutDialog"
-    @update:visible="newValue => (showAboutDialog = newValue)" />
-
-  <!-- Toolbar -->
   <Toolbar class="h-10 no-padding">
-    <!-- Page switch menu  -->
     <template #start>
-      <Menu ref="menu" :model="items" :popup="true">
-        <template #itemicon="slotProps">
-          <div v-if="slotProps.item.icon !== undefined" data-testid="page-selection-menu">
-            <FontAwesomeIcon :icon="slotProps.item.icon" style="min-width: 1rem" class="mr-3" />
-          </div>
-        </template>
-      </Menu>
+      <ModeSelector ref="modeSelector" :current-mode="props.currentMode" @mode-selected="newMode => selectedMode(newMode)"/>
 
-      <Button outlined text class="main-menu-button" @click="toggle">
-        <FontAwesomeIcon icon="fa-solid fa-bars" class="mr-3" />
-        {{ getPageName() }}
-      </Button>
+      <TopToolbarMenuButtons :current-mode="props.currentMode"
+                             @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
+                              @show-url-dialog="() => showUrlDialog()"
+                             @show-example-schemas-dialog="() => showExampleSchemasDialog()"
+                              @show-import-csv-dialog="() => showCsvImportDialog()"
+                              @show-schemastore-dialog="() => showSchemaStoreDialog()"
+                              @show-snapshot-dialog="() => showSnapshotDialog()"
 
-      <!-- menu items -->
-      <div v-for="item in menuItems" :key="item.label">
-        <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
-        <Button
-          v-else
-          circular
-          text
-          :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
-          size="small"
-          v-tooltip.bottom="item.label"
-          :id="item.key ?? ''"
-          :disabled="isDisabled(item)"
-          @click="event => handleItemButtonClick(item, event)">
-          <FontAwesomeIcon :icon="item.icon!!" />
-        </Button>
-
-        <Menu
-          v-if="item.items"
-          :model="item.items"
-          :popup="true"
-          :ref="itemMenu => setItemMenuRef(item, itemMenu)">
-          <template #itemicon="slotProps">
-            <div v-if="slotProps.item.icon !== undefined">
-              <FontAwesomeIcon
-                :icon="slotProps.item.icon ?? []"
-                style="min-width: 1.5rem"
-                class="mr-3" />
-            </div>
-          </template>
-        </Menu>
-      </div>
+      />
 
       <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
         <Select
@@ -402,30 +151,7 @@ const showSearchResultsMenu = event => {
           data-testid="format-selector" />
       </div>
 
-      <!-- search bar -->
-      <span class="p-input-icon-left ml-5" style="width: 14rem">
-        <i class="pi" style="font-size: 0.9rem" />
-        <InputText
-          show-clear
-          class="h-7 w-full"
-          placeholder="Search for data or property"
-          v-model="searchTerm"
-          @focus="showSearchResultsMenu"
-          @blur="() => searchResultMenu.value?.hide()"
-          id="searchBar" />
-      </span>
-      <!-- search results menu -->
-      <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems">
-        <template #item="slotProps">
-          <div class="px-3 py-2">
-            <div class="font-bold">{{ slotProps.item.label }}</div>
-            <div class="text-xs">{{ slotProps.item.data }}</div>
-          </div>
-        </template>
-      </Menu>
-      <Button class="toolbar-button" text :disabled="!searchTerm" @click="() => (searchTerm = '')">
-        <i class="pi pi-times" />
-      </Button>
+      <SearchBar />
     </template>
 
     <template #end>
@@ -444,7 +170,7 @@ const showSearchResultsMenu = event => {
           class="toolbar-button"
           size="small"
           v-tooltip.bottom="'About'"
-          @click="() => (showAboutDialog = true)">
+          @click="() => (showAboutDialog())">
           <FontAwesomeIcon icon="fa-solid fa-circle-info" />
         </Button>
 
@@ -461,28 +187,9 @@ const showSearchResultsMenu = event => {
 </template>
 
 <style scoped>
-.listbox-container {
-  width: 100%;
-}
-.button-container {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 1rem;
-}
 .no-padding {
   padding: 0 !important;
 }
-.main-menu-button {
-  font-weight: bold;
-  font-size: large;
-  color: var(--p-primary-active-color);
-  padding-left: 1rem !important;
-  padding-top: 0.3rem !important;
-  padding-bottom: 0.3rem !important;
-  min-width: 13rem !important;
-}
-
 .toolbar-button {
   font-weight: bold;
   font-size: large;
@@ -490,9 +197,6 @@ const showSearchResultsMenu = event => {
   padding: 0.35rem !important;
 }
 
-.highlighted-icon {
-  color: var(--p-highlight-color) !important;
-}
 
 .custom-select {
   height: 1.75rem;

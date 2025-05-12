@@ -1,7 +1,6 @@
 <!-- Dialog to select the initial schema -->
 <script setup lang="ts">
-import {defineEmits, type Ref, ref, watch} from 'vue';
-import Button from 'primevue/button';
+import {type Ref, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Listbox from "primevue/listbox";
 import type {SchemaOption} from "@/packaged-schemas/schemaOption";
@@ -77,7 +76,8 @@ defineExpose({show: openDialog, close: hideDialog, setSchemas: setFetchedSchemas
 
 </template>
 <style scoped>
-.bigger-dialog-content {
-  padding: 20px;
+
+.listbox-container {
+  width: 100%;
 }
 </style>
