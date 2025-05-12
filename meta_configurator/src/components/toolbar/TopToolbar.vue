@@ -1,20 +1,11 @@
 <script setup lang="ts">
-import {type Ref, ref} from 'vue';
-import type {MenuItem} from 'primevue/menuitem';
+import { ref} from 'vue';
 import Toolbar from 'primevue/toolbar';
-import {useSessionStore} from '@/store/sessionStore';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {errorService} from '@/main';
-
-import {useMagicKeys, watchDebounced} from '@vueuse/core';
-import {searchInDataAndSchema, searchResultToMenuItem} from '@/utility/search';
+import {useMagicKeys} from '@vueuse/core';
 import {focus} from '@/utility/focusUtils';
-
-import {GuiConstants} from '@/constants';
-
 import {SessionMode} from '@/store/sessionMode';
-import {getSessionForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
 import Select from 'primevue/select';
 import {formatRegistry} from '@/dataformats/formatRegistry';
@@ -72,7 +63,6 @@ function selectedMode(newMode: SessionMode) {
   emit('mode-selected', newMode);
 }
 
-const searchTerm: Ref<string> = ref('');
 const modeSelector = ref();
 
 useMagicKeys({
@@ -84,41 +74,7 @@ useMagicKeys({
     }
   },
 });
-const searchResultMenu = ref();
-const searchResultItems = ref<MenuItem[]>([]);
 
-watchDebounced(
-  [searchTerm],
-  () => {
-    let mode = useSessionStore().currentMode;
-    let session = getSessionForMode(mode);
-
-    if (!searchTerm.value) {
-      session.currentSearchResults.value = [];
-      searchResultItems.value = [];
-      return;
-    }
-    searchInDataAndSchema(searchTerm.value)
-      .then(searchResults => {
-        if (searchResults.length > 0) {
-          session.currentSelectedElement.value = searchResults[0].path;
-        }
-        session.currentSearchResults.value = searchResults;
-        searchResultItems.value = searchResults
-          .map(res => searchResultToMenuItem(res))
-          .slice(0, GuiConstants.MAX_SEARCH_RESULTS);
-      })
-      .catch(error => {
-        errorService.onError(error);
-      });
-  },
-  {debounce: 500}
-);
-
-const showSearchResultsMenu = event => {
-  searchResultMenu.value?.show(event, event.target);
-  focus('searchBar');
-};
 </script>
 
 <template>
