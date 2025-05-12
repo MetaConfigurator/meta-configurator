@@ -22,7 +22,6 @@ onMounted(() => {
   // this is needed here, because, for example, loading snapshots involves reading the backend address from the settings
   addDefaultsForSettings();
 
-
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
   let usesCustomSettings = false;
