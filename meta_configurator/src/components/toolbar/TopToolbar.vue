@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, type Ref, ref, watch} from 'vue';
+import {computed, type Ref, ref} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import Toolbar from 'primevue/toolbar';
@@ -7,7 +7,6 @@ import {MenuItems} from '@/components/toolbar/menuItems';
 import {useSessionStore} from '@/store/sessionStore';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import Listbox from 'primevue/listbox';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {errorService} from '@/main';
 import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
@@ -16,16 +15,13 @@ import InputText from 'primevue/inputtext';
 import AboutDialog from '@/components/dialogs/AboutDialog.vue';
 import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
-import {loadExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
 import {searchInDataAndSchema, searchResultToMenuItem} from '@/utility/search';
 import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
-import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
-import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {modeToMenuTitle, SessionMode} from '@/store/sessionMode';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
@@ -37,6 +33,7 @@ import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog
 import Select from 'primevue/select';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import CodeGenerationDialog from '@/components/dialogs/code-generation/CodeGenerationDialog.vue';
+import FetchedSchemasSelectionDialog from "@/components/dialogs/FetchedSchemasSelectionDialog.vue";
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -47,10 +44,8 @@ const emit = defineEmits<{
 }>();
 
 const settings = useSettings();
-const selectedSchema = ref<SchemaOption | null>(null);
 const dataFormatOptions = formatRegistry.getFormatNames();
 
-const showFetchedSchemas = ref(false);
 const showAboutDialog = ref(false);
 const showUrlInputDialog = ref(false);
 const schemaUrl = ref('');
@@ -140,43 +135,17 @@ function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File
 async function handleFromWebClick(): Promise<void> {
   try {
     // Wait for the fetch to complete
-    topMenuBar.fetchedSchemas = await fetchSchemasFromJSONSchemaStore();
-    showFetchedSchemas.value = true;
-    topMenuBar.showDialog.value = true;
+    fetchedSchemasSelectionDialog.value.setSchemas(await fetchSchemasFromJSONSchemaStore());
+    fetchedSchemasSelectionDialog.value.show();
   } catch (error) {
     errorService.onError(error);
   }
 }
 function handleFromOurExampleClick() {
-  topMenuBar.fetchedSchemas = schemaCollection;
-  showFetchedSchemas.value = true;
-  topMenuBar.showDialog.value = true;
+  fetchedSchemasSelectionDialog.value.setSchemas(schemaCollection);
+  fetchedSchemasSelectionDialog.value.show();
 }
 
-watch(selectedSchema, async newSelectedSchema => {
-  if (!newSelectedSchema) {
-    return;
-  }
-  if (newSelectedSchema.url) {
-    try {
-      await fetchSchemaFromUrl(newSelectedSchema.url);
-      showFetchedSchemas.value = true;
-      topMenuBar.showDialog.value = false;
-      openClearDataEditorDialog();
-    } catch (error) {
-      errorService.onError(error);
-    }
-  } else if (newSelectedSchema.key) {
-    try {
-      loadExampleSchema(newSelectedSchema.key);
-      showFetchedSchemas.value = true;
-      topMenuBar.showDialog.value = false;
-      openClearDataEditorDialog();
-    } catch (error) {
-      errorService.onError(error);
-    }
-  }
-});
 
 function showUrlDialog() {
   showUrlInputDialog.value = true;
@@ -274,6 +243,7 @@ const showInitialSchemaDialog = () => {
 const csvImportDialog = ref();
 const snapshotDialog = ref();
 const codeGenerationDialog = ref();
+const fetchedSchemasSelectionDialog = ref();
 
 function showCsvImportDialog() {
   csvImportDialog.value?.show();
@@ -353,22 +323,7 @@ const showSearchResultsMenu = event => {
 
   <CodeGenerationDialog ref="codeGenerationDialog" />
 
-  <!-- Dialog to select a schema from JSON Schema Store, TODO: move to separate component -->
-  <Dialog v-model:visible="topMenuBar.showDialog.value" header="Select a Schema">
-    <div class="card flex justify-content-center">
-      <div class="listbox-container" style="width: 300px">
-        <Listbox
-          listStyle="max-height: 250px"
-          v-model="selectedSchema"
-          :options="topMenuBar.fetchedSchemas"
-          v-show="showFetchedSchemas"
-          filter
-          optionLabel="label"
-          class="overflow-hidden">
-        </Listbox>
-      </div>
-    </div>
-  </Dialog>
+  <FetchedSchemasSelectionDialog ref="fetchedSchemasSelectionDialog" />
 
   <Dialog v-model:visible="showUrlInputDialog">
     <div class="p-fluid">

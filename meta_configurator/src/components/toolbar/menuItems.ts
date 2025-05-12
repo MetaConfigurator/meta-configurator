@@ -20,8 +20,6 @@ import {openImportSchemaDialog} from '@/components/toolbar/importFile';
  */
 export class MenuItems {
   sessionStore = useSessionStore();
-  public fetchedSchemas: SchemaOption[] = [];
-  public showDialog = ref(false);
 
   private readonly onFromWebClick: () => Promise<void>;
   private readonly onFromOurExampleClick: () => void;
