@@ -156,10 +156,7 @@ onUnmounted(() => {
   <div class="w-full h-full flex" style="max-height: 100%">
     <main class="flex flex-col w-full h-full">
       <!-- toolbar -->
-      <Toolbar
-        ref="toolbarRef"
-        :current-mode="props.sessionMode"
-        @mode-selected="updateMode" />
+      <Toolbar ref="toolbarRef" :current-mode="props.sessionMode" @mode-selected="updateMode" />
       <div class="flex-grow overflow-hidden" ref="mainPanel" id="mainpanel">
         <Splitter
           class="h-full"

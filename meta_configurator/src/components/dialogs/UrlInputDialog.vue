@@ -3,13 +3,12 @@
 import {ref} from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import {fetchSchemaFromUrl} from "@/components/toolbar/fetchSchemaFromUrl";
-import InputText from "primevue/inputtext";
+import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
+import InputText from 'primevue/inputtext';
 
 const showDialog = ref(false);
 
 const schemaUrl = ref('');
-
 
 function openDialog() {
   showDialog.value = true;
@@ -19,14 +18,12 @@ function hideDialog() {
   showDialog.value = false;
 }
 
-
 async function fetchSchemaFromSelectedUrl() {
   await fetchSchemaFromUrl(schemaUrl.value!);
   hideDialog();
 }
 
-
-defineExpose({show: openDialog, close: hideDialog });
+defineExpose({show: openDialog, close: hideDialog});
 </script>
 
 <template>
@@ -44,16 +41,12 @@ defineExpose({show: openDialog, close: hideDialog });
       </div>
     </div>
   </Dialog>
-
-
 </template>
 <style scoped>
-
 .button-container {
   display: flex;
   justify-content: center;
   gap: 20px;
   margin-top: 1rem;
 }
-
 </style>

@@ -12,9 +12,9 @@ import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
 import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
 import CodeGenerationDialog from '@/components/dialogs/code-generation/CodeGenerationDialog.vue';
-import FetchedSchemasSelectionDialog from "@/components/dialogs/FetchedSchemasSelectionDialog.vue";
-import UrlInputDialog from "@/components/dialogs/UrlInputDialog.vue";
-import TopToolbar from "@/components/toolbar/TopToolbar.vue";
+import FetchedSchemasSelectionDialog from '@/components/dialogs/FetchedSchemasSelectionDialog.vue';
+import UrlInputDialog from '@/components/dialogs/UrlInputDialog.vue';
+import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -24,10 +24,7 @@ const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
 }>();
 
-
 const showAboutDialog = ref(false);
-
-
 
 function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
@@ -60,12 +57,9 @@ function showExampleSchemasDialog() {
   fetchedSchemasSelectionDialog.value.show();
 }
 
-
 function showUrlDialog() {
   urlInputDialog.value?.show();
 }
-
-
 
 const initialSchemaSelectionDialog = ref();
 
@@ -80,12 +74,9 @@ const codeGenerationDialog = ref();
 const fetchedSchemasSelectionDialog = ref();
 const urlInputDialog = ref();
 
-
 defineExpose({
   showInitialSchemaDialog,
 });
-
-
 </script>
 
 <template>
@@ -107,20 +98,16 @@ defineExpose({
     :visible="showAboutDialog"
     @update:visible="newValue => (showAboutDialog = newValue)" />
 
-  <TopToolbar :current-mode="props.currentMode"
-              @show-url-dialog="() => showUrlDialog()"
-              @show-about-dialog="() => showAboutDialog = true"
-              @show-example-schemas-dialog="() => showExampleSchemasDialog()"
-              @show-codegen-dialog="schemaMode => codeGenerationDialog.value?.show(schemaMode)"
-              @show-schemastore-dialog="() => showSchemaStoreDialog()"
-              @show-import-csv-dialog="() => csvImportDialog.value?.show()"
-              @show-snapshot-dialog="() => snapshotDialog.value?.show()"
-              @mode-selected="newMode => emit('mode-selected', newMode)"
-
-
-
-/>
+  <TopToolbar
+    :current-mode="props.currentMode"
+    @show-url-dialog="() => showUrlDialog()"
+    @show-about-dialog="() => (showAboutDialog = true)"
+    @show-example-schemas-dialog="() => showExampleSchemasDialog()"
+    @show-codegen-dialog="schemaMode => codeGenerationDialog.value?.show(schemaMode)"
+    @show-schemastore-dialog="() => showSchemaStoreDialog()"
+    @show-import-csv-dialog="() => csvImportDialog.value?.show()"
+    @show-snapshot-dialog="() => snapshotDialog.value?.show()"
+    @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

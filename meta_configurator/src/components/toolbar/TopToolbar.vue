@@ -13,14 +13,14 @@ import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
 
-import { SessionMode} from '@/store/sessionMode';
-import { getSessionForMode} from '@/data/useDataLink';
+import {SessionMode} from '@/store/sessionMode';
+import {getSessionForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
 import Select from 'primevue/select';
 import {formatRegistry} from '@/dataformats/formatRegistry';
-import ModeSelector from "@/components/toolbar/ModeSelector.vue";
-import TopToolbarMenuButtons from "@/components/toolbar/TopToolbarMenuButtons.vue";
-import SearchBar from "@/components/toolbar/SearchBar.vue";
+import ModeSelector from '@/components/toolbar/ModeSelector.vue';
+import TopToolbarMenuButtons from '@/components/toolbar/TopToolbarMenuButtons.vue';
+import SearchBar from '@/components/toolbar/SearchBar.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -40,14 +40,12 @@ const emit = defineEmits<{
 const settings = useSettings();
 const dataFormatOptions = formatRegistry.getFormatNames();
 
-
-
 async function showSchemaStoreDialog() {
-  emit("show-schemastore-dialog")
+  emit('show-schemastore-dialog');
 }
 
 function showExampleSchemasDialog() {
-  emit("show-example-schemas-dialog")
+  emit('show-example-schemas-dialog');
 }
 
 function showUrlDialog() {
@@ -74,11 +72,8 @@ function selectedMode(newMode: SessionMode) {
   emit('mode-selected', newMode);
 }
 
-
 const searchTerm: Ref<string> = ref('');
 const modeSelector = ref();
-
-
 
 useMagicKeys({
   passive: false,
@@ -127,20 +122,21 @@ const showSearchResultsMenu = event => {
 </script>
 
 <template>
-
   <Toolbar class="h-10 no-padding">
     <template #start>
-      <ModeSelector ref="modeSelector" :current-mode="props.currentMode" @mode-selected="newMode => selectedMode(newMode)"/>
+      <ModeSelector
+        ref="modeSelector"
+        :current-mode="props.currentMode"
+        @mode-selected="newMode => selectedMode(newMode)" />
 
-      <TopToolbarMenuButtons :current-mode="props.currentMode"
-                             @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
-                              @show-url-dialog="() => showUrlDialog()"
-                             @show-example-schemas-dialog="() => showExampleSchemasDialog()"
-                              @show-import-csv-dialog="() => showCsvImportDialog()"
-                              @show-schemastore-dialog="() => showSchemaStoreDialog()"
-                              @show-snapshot-dialog="() => showSnapshotDialog()"
-
-      />
+      <TopToolbarMenuButtons
+        :current-mode="props.currentMode"
+        @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
+        @show-url-dialog="() => showUrlDialog()"
+        @show-example-schemas-dialog="() => showExampleSchemasDialog()"
+        @show-import-csv-dialog="() => showCsvImportDialog()"
+        @show-schemastore-dialog="() => showSchemaStoreDialog()"
+        @show-snapshot-dialog="() => showSnapshotDialog()" />
 
       <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
         <Select
@@ -170,7 +166,7 @@ const showSearchResultsMenu = event => {
           class="toolbar-button"
           size="small"
           v-tooltip.bottom="'About'"
-          @click="() => (showAboutDialog())">
+          @click="() => showAboutDialog()">
           <FontAwesomeIcon icon="fa-solid fa-circle-info" />
         </Button>
 
@@ -196,7 +192,6 @@ const showSearchResultsMenu = event => {
   color: var(--p-primary-active-color);
   padding: 0.35rem !important;
 }
-
 
 .custom-select {
   height: 1.75rem;

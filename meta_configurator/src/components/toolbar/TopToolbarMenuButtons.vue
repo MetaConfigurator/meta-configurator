@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {computed,  ref} from 'vue';
+import {computed, ref} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import {MenuItems} from '@/components/toolbar/menuItems';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
-import { SessionMode} from '@/store/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
@@ -36,13 +36,12 @@ const topMenuBar = new MenuItems(
   inferSchemaFromSampleData
 );
 
-
 async function handleFromWebClick() {
-  emit("show-schemastore-dialog")
+  emit('show-schemastore-dialog');
 }
 
 function handleFromOurExampleClick() {
-  emit("show-example-schemas-dialog")
+  emit('show-example-schemas-dialog');
 }
 
 function showUrlDialog() {
@@ -129,41 +128,40 @@ function isHighlighted(item: MenuItem) {
   }
   return item.highlighted();
 }
-
 </script>
 
 <template>
-      <!-- menu items -->
-      <div v-for="item in menuItems" :key="item.label">
-        <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
-        <Button
-          v-else
-          circular
-          text
-          :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
-          size="small"
-          v-tooltip.bottom="item.label"
-          :id="item.key ?? ''"
-          :disabled="isDisabled(item)"
-          @click="event => handleItemButtonClick(item, event)">
-          <FontAwesomeIcon :icon="item.icon!!" />
-        </Button>
+  <!-- menu items -->
+  <div v-for="item in menuItems" :key="item.label">
+    <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
+    <Button
+      v-else
+      circular
+      text
+      :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
+      size="small"
+      v-tooltip.bottom="item.label"
+      :id="item.key ?? ''"
+      :disabled="isDisabled(item)"
+      @click="event => handleItemButtonClick(item, event)">
+      <FontAwesomeIcon :icon="item.icon!!" />
+    </Button>
 
-        <Menu
-          v-if="item.items"
-          :model="item.items"
-          :popup="true"
-          :ref="itemMenu => setItemMenuRef(item, itemMenu)">
-          <template #itemicon="slotProps">
-            <div v-if="slotProps.item.icon !== undefined">
-              <FontAwesomeIcon
-                :icon="slotProps.item.icon ?? []"
-                style="min-width: 1.5rem"
-                class="mr-3" />
-            </div>
-          </template>
-        </Menu>
-      </div>
+    <Menu
+      v-if="item.items"
+      :model="item.items"
+      :popup="true"
+      :ref="itemMenu => setItemMenuRef(item, itemMenu)">
+      <template #itemicon="slotProps">
+        <div v-if="slotProps.item.icon !== undefined">
+          <FontAwesomeIcon
+            :icon="slotProps.item.icon ?? []"
+            style="min-width: 1.5rem"
+            class="mr-3" />
+        </div>
+      </template>
+    </Menu>
+  </div>
 </template>
 
 <style scoped>
@@ -177,5 +175,4 @@ function isHighlighted(item: MenuItem) {
 .highlighted-icon {
   color: var(--p-highlight-color) !important;
 }
-
 </style>

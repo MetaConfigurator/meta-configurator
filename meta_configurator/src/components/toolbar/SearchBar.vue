@@ -13,10 +13,9 @@ import {focus} from '@/utility/focusUtils';
 
 import {GuiConstants} from '@/constants';
 
-import { getSessionForMode} from '@/data/useDataLink';
+import {getSessionForMode} from '@/data/useDataLink';
 
 const searchTerm: Ref<string> = ref('');
-
 
 useMagicKeys({
   passive: false,
@@ -65,32 +64,30 @@ const showSearchResultsMenu = event => {
 </script>
 
 <template>
-
-      <span class="p-input-icon-left ml-5" style="width: 14rem">
-        <i class="pi" style="font-size: 0.9rem" />
-        <InputText
-          show-clear
-          class="h-7 w-full"
-          placeholder="Search for data or property"
-          v-model="searchTerm"
-          @focus="showSearchResultsMenu"
-          @blur="() => searchResultMenu.value?.hide()"
-          id="searchBar" />
-      </span>
-      <!-- search results menu -->
-      <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems">
-        <template #item="slotProps">
-          <div class="px-3 py-2">
-            <div class="font-bold">{{ slotProps.item.label }}</div>
-            <div class="text-xs">{{ slotProps.item.data }}</div>
-          </div>
-        </template>
-      </Menu>
-      <Button class="toolbar-button" text :disabled="!searchTerm" @click="() => (searchTerm = '')">
-        <i class="pi pi-times" />
-      </Button>
+  <span class="p-input-icon-left ml-5" style="width: 14rem">
+    <i class="pi" style="font-size: 0.9rem" />
+    <InputText
+      show-clear
+      class="h-7 w-full"
+      placeholder="Search for data or property"
+      v-model="searchTerm"
+      @focus="showSearchResultsMenu"
+      @blur="() => searchResultMenu.value?.hide()"
+      id="searchBar" />
+  </span>
+  <!-- search results menu -->
+  <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems">
+    <template #item="slotProps">
+      <div class="px-3 py-2">
+        <div class="font-bold">{{ slotProps.item.label }}</div>
+        <div class="text-xs">{{ slotProps.item.data }}</div>
+      </div>
+    </template>
+  </Menu>
+  <Button class="toolbar-button" text :disabled="!searchTerm" @click="() => (searchTerm = '')">
+    <i class="pi pi-times" />
+  </Button>
 </template>
-
 
 <style scoped>
 .toolbar-button {
@@ -99,5 +96,4 @@ const showSearchResultsMenu = event => {
   color: var(--p-primary-active-color);
   padding: 0.35rem !important;
 }
-
 </style>

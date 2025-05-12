@@ -73,33 +73,27 @@ function getPageSelectionMenuItems(settings: SettingsInterfaceRoot): MenuItem[] 
 const items = computed(() => getPageSelectionMenuItems(settings.value));
 const menu = ref();
 
-
 const toggle = event => {
   menu.value.toggle(event);
 };
-
-
 </script>
 
 <template>
-
-      <Menu ref="menu" :model="items" :popup="true">
-        <template #itemicon="slotProps">
-          <div v-if="slotProps.item.icon !== undefined" data-testid="page-selection-menu">
-            <FontAwesomeIcon :icon="slotProps.item.icon" style="min-width: 1rem" class="mr-3" />
-          </div>
-        </template>
-      </Menu>
+  <Menu ref="menu" :model="items" :popup="true">
+    <template #itemicon="slotProps">
+      <div v-if="slotProps.item.icon !== undefined" data-testid="page-selection-menu">
+        <FontAwesomeIcon :icon="slotProps.item.icon" style="min-width: 1rem" class="mr-3" />
+      </div>
+    </template>
+  </Menu>
 
   <Button outlined text class="main-menu-button" @click="toggle">
     <FontAwesomeIcon icon="fa-solid fa-bars" class="mr-3" />
     {{ getPageName() }}
   </Button>
-
 </template>
 
 <style scoped>
-
 .main-menu-button {
   font-weight: bold;
   font-size: large;
