@@ -43,6 +43,23 @@ function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File
   }
 }
 
+function showCodeGenerationDialog(schemaMode: boolean) {
+  if (schemaMode) {
+    codeGenerationDialog.value?.activateSchemaMode();
+  } else {
+    codeGenerationDialog.value?.activateDataMode();
+  }
+  codeGenerationDialog.value?.show();
+}
+
+function showCsvImportDialog() {
+  csvImportDialog.value?.show();
+}
+
+function showSnapshotDialog() {
+  snapshotDialog.value?.show();
+}
+
 async function showSchemaStoreDialog(): Promise<void> {
   try {
     // Wait for the fetch to complete
@@ -103,10 +120,10 @@ defineExpose({
     @show-url-dialog="() => showUrlDialog()"
     @show-about-dialog="() => (showAboutDialog = true)"
     @show-example-schemas-dialog="() => showExampleSchemasDialog()"
-    @show-codegen-dialog="schemaMode => codeGenerationDialog.value?.show(schemaMode)"
+    @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
     @show-schemastore-dialog="() => showSchemaStoreDialog()"
-    @show-import-csv-dialog="() => csvImportDialog.value?.show()"
-    @show-snapshot-dialog="() => snapshotDialog.value?.show()"
+    @show-import-csv-dialog="() => showCsvImportDialog()"
+    @show-snapshot-dialog="() => showSnapshotDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 
