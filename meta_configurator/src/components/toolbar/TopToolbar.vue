@@ -52,7 +52,7 @@ function showSnapshotDialog() {
 }
 
 function showAboutDialog() {
-  emit('show-url-dialog');
+  emit('show-about-dialog');
 }
 
 function showCodeGenerationDialog(schemaMode: boolean) {
