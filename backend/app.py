@@ -36,7 +36,7 @@ CORS(app, resources={
             "http://localhost:5173",  # local dev server
             "https://metaconfigurator.github.io",  # experimental GitHub Pages
             "https://logende.github.io",  # prod stable release and other accesses by Logende GitHub account
-            "www.metaconfigurator.org"  # prod stable release
+            "https://www.metaconfigurator.org"  # prod stable release
         ],
         "supports_credentials": True
     }
