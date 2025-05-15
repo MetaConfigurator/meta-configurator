@@ -3,6 +3,11 @@ MetaConfigurator as a Configurator Builder
 
 MetaConfigurator can be used as a **Configurator Builder**, allowing users to create and share URLs that open MetaConfigurator with preloaded schema, data, and settings. This enables a customized experience tailored to a specific use case.
 
+Note that this section describes creating such a shareable URL by hand. Instead, you can also simply click the 'Share Snapshot" button in the top menu bar in the data/schema editor to create a snapshot of 'data', 'schema' and 'settings' which will be stored on the University of Stuttgart server. 
+Additionally, a unique shareable URL will be created that leads to MetaConfigurator with the snapshot preloaded.
+Creating your own URL instead comes with the benefit of storing the files in any location of your choice and it does not rely on the university server to be up and running.
+Otherwise, clicking the button 'Share Snapshot' to auto-generate the URL is easier and more convenient.
+
 Constructing a Preloaded URL
 ----------------------------
 
