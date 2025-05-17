@@ -5,7 +5,7 @@ import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaGraphTypes';
 import {
   generateObjectAttributes,
   generateObjectSpecialPropertyEdges,
-  generateObjectTitle,
+  generateObjectFallbackDisplayName,
   identifyObjects,
   isObjectSchema,
   populateGraph,
@@ -99,9 +99,11 @@ describe('test schema graph constructor with conditionals', () => {
 
     expect(rootNode.attributes.length).toEqual(2);
     expect(rootNode.attributes[0].name).toEqual('propertySimple');
+    expect(rootNode.attributes[0].title).toEqual(undefined);
     expect(rootNode.attributes[0].absolutePath).toEqual(['properties', 'propertySimple']);
 
     expect(rootNode.attributes[1].name).toEqual('propertyObject');
+    expect(rootNode.attributes[1].title).toEqual(undefined);
     expect(rootNode.attributes[1].absolutePath).toEqual(['properties', 'propertyObject']);
   });
 
@@ -112,6 +114,7 @@ describe('test schema graph constructor with conditionals', () => {
 
     expect(thenNode.attributes.length).toEqual(1);
     expect(thenNode.attributes[0].name).toEqual('propertyObject');
+    expect(thenNode.attributes[0].title).toEqual(undefined);
     expect(thenNode.attributes[0].absolutePath).toEqual(['then', 'properties', 'propertyObject']);
   });
 
@@ -125,7 +128,7 @@ describe('test schema graph constructor with conditionals', () => {
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         rootNode.absolutePath,
         rootNode.hasUserDefinedName,
         rootNode.schema,
@@ -135,7 +138,7 @@ describe('test schema graph constructor with conditionals', () => {
 
     const propComplex = defs.get('properties.propertyObject')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         propComplex.absolutePath,
         propComplex.hasUserDefinedName,
         propComplex.schema,
@@ -145,7 +148,7 @@ describe('test schema graph constructor with conditionals', () => {
 
     const researcher = defs.get('$defs.researcher')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         researcher.absolutePath,
         researcher.hasUserDefinedName,
         researcher.schema,
@@ -155,7 +158,7 @@ describe('test schema graph constructor with conditionals', () => {
 
     const thenNode = defs.get('then')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         thenNode.absolutePath,
         thenNode.hasUserDefinedName,
         thenNode.schema,
@@ -165,7 +168,7 @@ describe('test schema graph constructor with conditionals', () => {
 
     const thenNodeObject = defs.get('then.properties.propertyObject')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         thenNodeObject.absolutePath,
         thenNodeObject.hasUserDefinedName,
         thenNodeObject.schema,

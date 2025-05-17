@@ -86,12 +86,15 @@ describe('test schema graph constructor with objects and attributes with enums',
 
     expect(rootNode.attributes.length).toEqual(3);
     expect(rootNode.attributes[0].name).toEqual('propertyEnum');
+    expect(rootNode.attributes[0].title).toEqual(undefined);
     expect(rootNode.attributes[0].absolutePath).toEqual(['properties', 'propertyEnum']);
 
     expect(rootNode.attributes[1].name).toEqual('propertyEnumRef1');
+    expect(rootNode.attributes[1].title).toEqual(undefined);
     expect(rootNode.attributes[1].absolutePath).toEqual(['properties', 'propertyEnumRef1']);
 
     expect(rootNode.attributes[2].name).toEqual('propertyEnumRef2');
+    expect(rootNode.attributes[2].title).toEqual(undefined);
     expect(rootNode.attributes[2].absolutePath).toEqual(['properties', 'propertyEnumRef2']);
   });
 
