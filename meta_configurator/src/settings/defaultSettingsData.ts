@@ -86,8 +86,8 @@ export const SETTINGS_DATA_DEFAULT = {
   },
   frontend: {
     hostname:
-        import.meta.env.VITE_FRONTEND_HOSTNAME ||
-        'https://metaconfigurator.github.io/meta-configurator',
+      import.meta.env.VITE_FRONTEND_HOSTNAME ||
+      'https://metaconfigurator.github.io/meta-configurator',
   },
   backend: {
     hostname: 'https://metaconfigurator.informatik.uni-stuttgart.de',
