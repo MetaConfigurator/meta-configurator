@@ -14,7 +14,8 @@ import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
 import {openImportSchemaDialog} from '@/components/toolbar/importFile';
-import {extractAllInlinedSchemaElements} from '@/schema/schemaManipulationUtils';
+import {extractAllInlinedSchemaElements} from "@/schema/schemaManipulationUtils";
+import {extractInlinedSchemaDefinitions} from "@/components/toolbar/extractSchemaDefinitions";
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -193,15 +194,10 @@ export class MenuItems {
         items: [
           {
             label: 'Extract All Inlined Schema Elements',
-            icon: 'fa-solid fa-gears',
-            command: () =>
-              extractAllInlinedSchemaElements(
-                getDataForMode(SessionMode.SchemaEditor),
-                false,
-                true
-              ),
+            icon: 'fa-solid fa-scissors',
+            command: extractInlinedSchemaDefinitions,
           },
-        ],
+        ]
       },
       {
         label: 'Generate Source Code...',

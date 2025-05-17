@@ -1,25 +1,20 @@
-import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {toastService} from '@/utility/toastService';
-import {useDataSource} from '@/data/dataSource';
-import {fetchExternalContent} from '@/utility/fetchExternalContent';
+import {extractAllInlinedSchemaElements} from "@/schema/schemaManipulationUtils";
+import {getDataForMode} from "@/data/useDataLink";
+import {SessionMode} from "@/store/sessionMode";
 
 /**
  * Goes through the schema and extracts all sub-schema definitions into the $defs section.
  */
-export async function fetchSchemaFromUrl(schemaURL: string): Promise<void> {
-  const response = await fetchExternalContent(schemaURL);
-  const schemaContent = await response.json();
-  const schemaName = schemaContent.title || 'Unknown Schema';
-  useDataSource().userSchemaData.value = schemaContent;
-
-  openClearDataEditorDialog();
+export async function extractInlinedSchemaDefinitions(): Promise<void> {
+  const extractedElementCount = extractAllInlinedSchemaElements(getDataForMode(SessionMode.SchemaEditor), false, true)
 
   if (toastService) {
     toastService.add({
       severity: 'info',
       summary: 'Info',
-      detail: `"${schemaName}" fetched successfully`,
-      life: 3000,
+      detail: `"Extracted ${extractedElementCount}" inlined schema elements into the $defs section.`,
+      life: 5000,
     });
   }
 }
