@@ -1,6 +1,6 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
-import {getTypeDescription} from '@/schema/schemaReadingUtils';
+import {getTypeDescription, isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
@@ -176,7 +176,9 @@ function generateInitialNode(
 ): SchemaElementData {
   if (!isEnumSchema(schema)) {
     return new SchemaObjectNodeData(
-      generateObjectTitle(path, hasUserDefinedName, schema, rootSchema),
+      readObjectNameFromPath(path),
+      schema.title,
+      generateObjectFallbackDisplayName(path, hasUserDefinedName, schema, rootSchema),
       hasUserDefinedName,
       path,
       schema,
@@ -184,7 +186,9 @@ function generateInitialNode(
     );
   } else {
     return new SchemaEnumNodeData(
-      generateObjectTitle(path, hasUserDefinedName, schema, rootSchema),
+      readObjectNameFromPath(path),
+      schema.title,
+      generateObjectFallbackDisplayName(path, hasUserDefinedName, schema, rootSchema),
       hasUserDefinedName,
       path,
       schema,
@@ -193,13 +197,25 @@ function generateInitialNode(
   }
 }
 
-export function generateObjectTitle(
+function readObjectNameFromPath(path: Path): string | undefined {
+  if (path.length > 0) {
+    const lastElement = path[path.length - 1];
+    if (typeof lastElement === 'string') {
+      return lastElement;
+    }
+  }
+  return undefined;
+}
+
+export function generateObjectFallbackDisplayName(
   path: Path,
   hasUserDefinedName: boolean,
   schema: JsonSchemaObjectType,
   rootSchema: TopLevelSchema
 ): string {
   // if schema has a title, use it as the name
+  // we are checking for title here because this function will be called recursively also for parents
+  // even though if an object itself will not use fallback name if it has a title, the parent object will be checked too
   if (schema.title && !hasUserDefinedName) {
     return schema.title;
   }
@@ -211,13 +227,17 @@ export function generateObjectTitle(
   // if object is definition for items in an array, use the array name
   if (path.length >= 2 && path[path.length - 1] == 'items') {
     const parentSchema = dataAt(path.slice(0, path.length - 1), rootSchema);
-    const parentSchemaType = parentSchema?.type || 'array';
+    let parentSchemaType = parentSchema?.type || 'array';
+    // if parentSchemaType is not a string or an array but an object because a user has defined a 'type' property in the schema, then set type to 'object'
+    if (typeof parentSchemaType !== 'string' && !Array.isArray(parentSchemaType)) {
+      parentSchemaType = 'object';
+    }
     if (
       parentSchemaType === 'array' ||
       parentSchemaType.includes('array') ||
       parentSchemaType.length === 0
     ) {
-      const titleOfParent = generateObjectTitle(
+      const titleOfParent = generateObjectFallbackDisplayName(
         path.slice(0, path.length - 1),
         hasUserDefinedName,
         parentSchema,
@@ -237,7 +257,7 @@ export function generateObjectTitle(
   if (path.length >= 2) {
     const parentSchema = dataAt(path.slice(0, path.length - 1), rootSchema);
     if (parentSchema) {
-      const titleOfParent = generateObjectTitle(
+      const titleOfParent = generateObjectFallbackDisplayName(
         path.slice(0, path.length - 1),
         hasUserDefinedName,
         parentSchema,
@@ -248,6 +268,26 @@ export function generateObjectTitle(
   }
 
   return 'element[' + lastElement + ']';
+}
+
+export function getObjectDisplayName(
+  name: string | undefined,
+  title: string | undefined,
+  fallbackDisplayName: string,
+  isNameEditable: boolean
+) {
+  if (!isNameEditable) {
+    if (title && title.length > 0) {
+      return title;
+    }
+    return fallbackDisplayName;
+  } else {
+    if (name) {
+      return name;
+    } else {
+      throw new Error('If name is editable it must exist!');
+    }
+  }
 }
 
 export function generateObjectAttributes(
@@ -315,7 +355,12 @@ export function generateAttributeTypeDescription(
   // if data type has a reference, overwrite with the object behind the reference
   const referenceObject = resolveReferenceNode(schema, objectDefs);
   if (referenceObject) {
-    typeDescription = referenceObject.name;
+    typeDescription = getObjectDisplayName(
+      referenceObject.name,
+      referenceObject.title,
+      referenceObject.fallbackDisplayName,
+      true
+    );
   }
 
   // if data type is an array, overwrite with the type of the array items
@@ -323,7 +368,7 @@ export function generateAttributeTypeDescription(
     const arrayItemObject = resolveArrayItemNode(path, schema, objectDefs);
     if (arrayItemObject) {
       if (arrayItemObject.schema.title) {
-        typeDescription = arrayItemObject.name + '[]';
+        typeDescription = arrayItemObject.title + '[]';
       } else {
         typeDescription = getTypeDescription(arrayItemObject.schema) + '[]';
       }
@@ -338,7 +383,12 @@ export function generateAttributeTypeDescription(
   if (isObjectSchema(schema)) {
     const attributeNode = resolveObjectAttributeNode(path, schema, objectDefs);
     if (attributeNode) {
-      typeDescription = attributeNode.name;
+      typeDescription = getObjectDisplayName(
+        attributeNode.name,
+        attributeNode.title,
+        attributeNode.fallbackDisplayName,
+        true
+      );
     }
   }
 
@@ -365,7 +415,12 @@ export function generateAttributeEdges(
           edgeTargetNode,
           EdgeType.ATTRIBUTE,
           isArray,
-          attributeData.name
+          getObjectDisplayName(
+            attributeData.name,
+            attributeData.title,
+            attributeData.fallbackDisplayName,
+            isSubSchemaDefinedInDefinitions(attributeData.absolutePath)
+          )
         )
       );
     }

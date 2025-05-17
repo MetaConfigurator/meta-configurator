@@ -4,7 +4,7 @@ import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaGraphTypes';
 import {
   generateAttributeEdges,
   generateObjectAttributes,
-  generateObjectTitle,
+  generateObjectFallbackDisplayName,
   identifyAllObjects,
   isSchemaThatDeservesANode,
 } from '../schemaGraphConstructor';
@@ -123,21 +123,25 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(rootNode.attributes.length).toEqual(6);
 
     expect(rootNode.attributes[0].name).toEqual('propertyArrayToSimple');
+    expect(rootNode.attributes[0].title).toEqual(undefined);
     expect(rootNode.attributes[0].absolutePath).toEqual(['properties', 'propertyArrayToSimple']);
     expect(rootNode.attributes[0].deprecated).toBeFalsy();
     expect(rootNode.attributes[0].required).toBeFalsy();
 
     expect(rootNode.attributes[1].name).toEqual('propertyArrayToComplex');
+    expect(rootNode.attributes[1].title).toEqual(undefined);
     expect(rootNode.attributes[1].absolutePath).toEqual(['properties', 'propertyArrayToComplex']);
     expect(rootNode.attributes[1].deprecated).toBeFalsy();
     expect(rootNode.attributes[1].required).toBeFalsy();
 
     expect(rootNode.attributes[2].name).toEqual('propertyArrayToRefSimple');
+    expect(rootNode.attributes[2].title).toEqual(undefined);
     expect(rootNode.attributes[2].absolutePath).toEqual(['properties', 'propertyArrayToRefSimple']);
     expect(rootNode.attributes[2].deprecated).toBeFalsy();
     expect(rootNode.attributes[2].required).toBeFalsy();
 
     expect(rootNode.attributes[3].name).toEqual('propertyArrayToRefComplexWithTitle');
+    expect(rootNode.attributes[3].title).toEqual(undefined);
     expect(rootNode.attributes[3].absolutePath).toEqual([
       'properties',
       'propertyArrayToRefComplexWithTitle',
@@ -146,11 +150,13 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(rootNode.attributes[3].required).toBeFalsy();
 
     expect(rootNode.attributes[4].name).toEqual('propertyRefToArraySimple');
+    expect(rootNode.attributes[4].title).toEqual(undefined);
     expect(rootNode.attributes[4].absolutePath).toEqual(['properties', 'propertyRefToArraySimple']);
     expect(rootNode.attributes[4].deprecated).toBeFalsy();
     expect(rootNode.attributes[4].required).toBeFalsy();
 
     expect(rootNode.attributes[5].name).toEqual('propertyRefToArrayComplex');
+    expect(rootNode.attributes[5].title).toEqual(undefined);
     expect(rootNode.attributes[5].absolutePath).toEqual([
       'properties',
       'propertyRefToArrayComplex',
@@ -178,7 +184,7 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const attrPropArrayRefComplexWithTitle = rootNode.attributes[3];
     // array to ref of complex type
-    expect(attrPropArrayRefComplexWithTitle.typeDescription).toEqual('person[]');
+    expect(attrPropArrayRefComplexWithTitle.typeDescription).toEqual('PersonTitle[]');
 
     const attrPropRefToArraySimple = rootNode.attributes[4];
     // reference to array of booleans
@@ -189,7 +195,7 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(attrPropRefToArrayComplex.typeDescription).toEqual('arrayObjectProperty');
   });
 
-  it('generate object title', () => {
+  it('generate object fallback display name', () => {
     const objectNodeCount = Array.from(defs.values()).filter(node =>
       isSchemaThatDeservesANode(node.schema)
     ).length;
@@ -198,7 +204,7 @@ describe('test schema graph constructor with objects and attributes, without adv
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         rootNode.absolutePath,
         rootNode.hasUserDefinedName,
         rootNode.schema,
@@ -208,7 +214,7 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const propArrayComplexItem = defs.get('properties.propertyArrayToComplex.items')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         propArrayComplexItem.absolutePath,
         propArrayComplexItem.hasUserDefinedName,
         propArrayComplexItem.schema,
@@ -218,7 +224,7 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const defsArrayPropItem = defs.get('$defs.arrayObjectProperty.items')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         defsArrayPropItem.absolutePath,
         defsArrayPropItem.hasUserDefinedName,
         defsArrayPropItem.schema,
@@ -228,7 +234,7 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const defsArrayObjectPropItem = defs.get('$defs.arrayObjectProperty.items')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         defsArrayObjectPropItem.absolutePath,
         defsArrayObjectPropItem.hasUserDefinedName,
         defsArrayObjectPropItem.schema,
@@ -238,7 +244,12 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const person = defs.get('$defs.person')!;
     expect(
-      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema, schema)
+      generateObjectFallbackDisplayName(
+        person.absolutePath,
+        person.hasUserDefinedName,
+        person.schema,
+        schema
+      )
     ).toEqual('person');
   });
 

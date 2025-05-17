@@ -6,6 +6,7 @@ import type {ManagedData} from '@/data/managedData';
 import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphConstructor';
 import type {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import {updateReferences} from '@/utility/renameUtils';
+import {stringToIdentifier} from '@/utility/stringToIdentifier';
 
 export function extractAllInlinedSchemaElements(
   schemaData: ManagedData,
@@ -27,7 +28,12 @@ export function extractAllInlinedSchemaElements(
   let nodesExtracted = 0;
 
   nodesSorted.forEach(node => {
-    extractInlinedSchemaElement(node.absolutePath, schemaData, node.name);
+    const newIdentifier = createIdentifierForExtractedElement(
+      node.name,
+      node.title,
+      node.fallbackDisplayName
+    );
+    extractInlinedSchemaElement(node.absolutePath, schemaData, newIdentifier);
     nodesExtracted++;
   });
 
@@ -79,6 +85,27 @@ export function extractInlinedSchemaElement(
   });
   updateReferences(absoluteElementPath, newElementId, schemaData.data.value, updateDataFct);
   return newElementId;
+}
+
+export function createIdentifierForExtractedElement(
+  name: string | undefined,
+  title: string | undefined,
+  fallbackDisplayName: string
+) {
+  let identifier = name;
+  // if the name is a json schema keyword which has a json schema as a value (except via additionalProperties, where the user then can define the name for their property), then do not use it (e.g. 'items', 'not', 'if', 'then', 'else'), we instead want a more suitable name
+  // note that the current implementation here will not catch each of these keywords but only the most common ones
+  if (identifier !== undefined && ['items', 'not', 'if', 'then', 'else'].includes(identifier)) {
+    identifier = undefined;
+  }
+
+  if (identifier === undefined && title !== undefined) {
+    identifier = stringToIdentifier(title, false);
+  }
+  if (identifier === undefined) {
+    identifier = stringToIdentifier(fallbackDisplayName, false);
+  }
+  return identifier;
 }
 
 export function addSchemaObject(schemaData: ManagedData) {

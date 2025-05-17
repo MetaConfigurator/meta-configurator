@@ -16,13 +16,14 @@ import {
 import {type CsvError, parse} from 'csv-parse/browser/esm';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
+import {stringToIdentifier} from '@/utility/stringToIdentifier';
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
   const {open, onChange} = useFileDialog();
 
   onChange((files: FileList | null) => {
     if (files && files.length > 0) {
-      resultTableName.value = userStringToIdentifier(files[0].name, true); // Get the name of the first file
+      resultTableName.value = stringToIdentifier(files[0].name, true); // Get the name of the first file
       readFileContentToStringRef(files, resultString);
     }
   });
@@ -137,19 +138,6 @@ export const decimalSeparatorOptions: LabelledValue[] = [
     value: ',',
   },
 ];
-
-export function userStringToIdentifier(input: string, cutExtension: boolean = false): string {
-  if (cutExtension) {
-    input = input.replace(/\.[^/.]+$/, '');
-  }
-
-  // remove special characters, trim whitespaces outside and replace whitespaces inside with underscores. Also transform to lower case.
-  return input
-    .replace(/[^a-zA-Z0-9 ]/g, '')
-    .trim()
-    .replace(/\s/g, '_')
-    .toLowerCase();
-}
 
 // note that this function does not look for a table within a table
 export function detectPossibleTablesInJson(json: any, path: Path = []): Path[] {

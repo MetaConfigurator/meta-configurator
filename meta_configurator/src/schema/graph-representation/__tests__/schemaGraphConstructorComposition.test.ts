@@ -6,7 +6,7 @@ import {
   generateAttributeEdges,
   generateObjectAttributes,
   generateObjectSpecialPropertyEdges,
-  generateObjectTitle,
+  generateObjectFallbackDisplayName,
   identifyObjects,
   isObjectSchema,
   isSchemaThatDeservesANode,
@@ -165,21 +165,25 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     expect(rootNode.attributes.length).toEqual(4);
     expect(rootNode.attributes[0].name).toEqual('propertySimple');
+    expect(rootNode.attributes[0].title).toEqual(undefined);
     expect(rootNode.attributes[0].absolutePath).toEqual(['properties', 'propertySimple']);
 
     expect(rootNode.attributes[1].name).toEqual('propertyRefToCompositional');
+    expect(rootNode.attributes[1].title).toEqual(undefined);
     expect(rootNode.attributes[1].absolutePath).toEqual([
       'properties',
       'propertyRefToCompositional',
     ]);
 
     expect(rootNode.attributes[2].name).toEqual('propertyArrayToCompositional');
+    expect(rootNode.attributes[2].title).toEqual(undefined);
     expect(rootNode.attributes[2].absolutePath).toEqual([
       'properties',
       'propertyArrayToCompositional',
     ]);
 
     expect(rootNode.attributes[3].name).toEqual('propertyArrayInlineCompositional');
+    expect(rootNode.attributes[3].title).toEqual(undefined);
     expect(rootNode.attributes[3].absolutePath).toEqual([
       'properties',
       'propertyArrayInlineCompositional',
@@ -196,7 +200,7 @@ describe('test schema graph constructor with objects and compositional keywords'
     // We care about titles of nodes that define objects only
     const rootNode = defs.get('')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         rootNode.absolutePath,
         rootNode.hasUserDefinedName,
         rootNode.schema,
@@ -206,17 +210,27 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     const person = defs.get('$defs.person')!;
     expect(
-      generateObjectTitle(person.absolutePath, person.hasUserDefinedName, person.schema, schema)
+      generateObjectFallbackDisplayName(
+        person.absolutePath,
+        person.hasUserDefinedName,
+        person.schema,
+        schema
+      )
     ).toEqual('person');
 
     const animal = defs.get('$defs.animal')!;
     expect(
-      generateObjectTitle(animal.absolutePath, animal.hasUserDefinedName, animal.schema, schema)
+      generateObjectFallbackDisplayName(
+        animal.absolutePath,
+        animal.hasUserDefinedName,
+        animal.schema,
+        schema
+      )
     ).toEqual('animal');
 
     const researcher = defs.get('$defs.researcher')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         researcher.absolutePath,
         researcher.hasUserDefinedName,
         researcher.schema,
@@ -226,7 +240,7 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     const livingBeing = defs.get('$defs.livingBeing')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         livingBeing.absolutePath,
         livingBeing.hasUserDefinedName,
         livingBeing.schema,
@@ -236,7 +250,7 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     const compositionalWithoutObjectType = defs.get('$defs.compositionalWithoutObjectType')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         compositionalWithoutObjectType.absolutePath,
         compositionalWithoutObjectType.hasUserDefinedName,
         compositionalWithoutObjectType.schema,
@@ -246,7 +260,7 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     const inlineCompositional = defs.get('properties.propertyArrayInlineCompositional.items')!;
     expect(
-      generateObjectTitle(
+      generateObjectFallbackDisplayName(
         inlineCompositional.absolutePath,
         inlineCompositional.hasUserDefinedName,
         inlineCompositional.schema,
@@ -257,13 +271,23 @@ describe('test schema graph constructor with objects and compositional keywords'
     const allOf1 = defs.get('allOf[1]')!;
     // allOf element at index 1 has no title, so we use the index as title
     expect(
-      generateObjectTitle(allOf1.absolutePath, allOf1.hasUserDefinedName, allOf1.schema, schema)
+      generateObjectFallbackDisplayName(
+        allOf1.absolutePath,
+        allOf1.hasUserDefinedName,
+        allOf1.schema,
+        schema
+      )
     ).toEqual('allOf[1]');
 
     const oneOf1 = defs.get('oneOf[1]')!;
     // oneOf element at index 1 has a title, so we use it
     expect(
-      generateObjectTitle(oneOf1.absolutePath, allOf1.hasUserDefinedName, oneOf1.schema, schema)
+      generateObjectFallbackDisplayName(
+        oneOf1.absolutePath,
+        allOf1.hasUserDefinedName,
+        oneOf1.schema,
+        schema
+      )
     ).toEqual('Farmer');
   });
 

@@ -71,7 +71,6 @@ export function updateParentRequiredPropsValue(
     }
   }
 }
-
 export function updateReferences(
   oldPath: Path,
   newPath: Path,
@@ -81,17 +80,23 @@ export function updateReferences(
   const oldPathStr = pathToJsonPointer(oldPath);
   const newPathStr = pathToJsonPointer(newPath);
 
+  const oldRef = '#' + oldPathStr;
+  const newRef = '#' + newPathStr;
+
   const references = findReferences(oldPathStr, currentData);
   references.forEach((ref: any) => {
     const refPath = ref.path;
     const refValue = ref.value;
-    // instead of replacing oldPathStr with newPathStr always, we should only do so if in refValue the oldPathStr ends with a / or ends fully. Because there could be other references that have the same starting as oldPathStr but are not the same.
-    // for example: if oldPathStr is #/properties/a and the refValue is #/properties/a1
-    // then we should not replace it, because otherwise we would replace a1 with {newPathStr}1
-    // we solve this using regex
-    const updatedRefValue = refValue.replace(new RegExp(oldPathStr + '(\\b|$)', 'g'), newPathStr);
+    const updatedRefValue = refValue.replace(
+      new RegExp(escapeRegex(oldRef) + '(\\b|$)', 'g'),
+      newRef
+    );
     updateDataFct(refPath, updatedRefValue);
   });
+}
+
+function escapeRegex(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function findReferences(oldPath: string, currentData: any): any[] {

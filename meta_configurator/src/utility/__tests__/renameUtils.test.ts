@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
-import {replacePropertyNameUtils} from '../renameUtils';
+import {replacePropertyNameUtils, updateReferences} from '../renameUtils';
 import {META_SCHEMA_SIMPLIFIED} from '../../packaged-schemas/metaSchemaSimplified';
 import {type Path} from '../path';
 import _ from 'lodash';
@@ -147,6 +147,63 @@ describe('test renameUtils', () => {
           type: 'string',
           // when a gets renamed, we want to update the references to a, but not the references to a_other_word_starting_with_a
           $ref: '#/properties/a_other_word_starting_with_a',
+        },
+      },
+    });
+  });
+
+  it('test reference update for a case where the updated property does not start with a hashtag but the reference does', () => {
+    const oldPath = ['$defs', 'SimulationSettings'];
+    const oldName = 'SimulationSettings';
+    const newName = 'SimulationSettingsRenamed';
+    const currentData = {
+      $defs: {
+        SimulationSettings: {
+          type: 'object',
+          properties: {
+            a: {type: 'string'},
+          },
+        },
+      },
+      type: 'object',
+      properties: {
+        simulationSettings: {
+          $ref: '#/$defs/SimulationSettings',
+        },
+      },
+    };
+
+    const updateDataFct = (subPath: Path, newValue: any) => {
+      _.set(currentData, subPath, newValue);
+    };
+
+    // rename property which triggers reference update
+    const result = replacePropertyNameUtils(
+      oldPath,
+      oldName,
+      newName,
+      currentData,
+      metaSchemaWrapper,
+      updateDataFct
+    );
+
+    // result is the new path of the renamed property
+    expect(result).toEqual(['$defs', 'SimulationSettingsRenamed']);
+
+    // check if the data was updated correctly
+    expect(currentData).toEqual({
+      $defs: {
+        SimulationSettingsRenamed: {
+          type: 'object',
+          properties: {
+            a: {type: 'string'},
+          },
+        },
+      },
+      type: 'object',
+      properties: {
+        simulationSettings: {
+          $ref: '#/$defs/SimulationSettingsRenamed',
         },
       },
     });
