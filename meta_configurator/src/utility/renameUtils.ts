@@ -72,10 +72,10 @@ export function updateParentRequiredPropsValue(
   }
 }
 export function updateReferences(
-    oldPath: Path,
-    newPath: Path,
-    currentData: any,
-    updateDataFct: (subPath: Path, newValue: any) => void
+  oldPath: Path,
+  newPath: Path,
+  currentData: any,
+  updateDataFct: (subPath: Path, newValue: any) => void
 ) {
   const oldPathStr = pathToJsonPointer(oldPath);
   const newPathStr = pathToJsonPointer(newPath);
@@ -88,8 +88,8 @@ export function updateReferences(
     const refPath = ref.path;
     const refValue = ref.value;
     const updatedRefValue = refValue.replace(
-        new RegExp(escapeRegex(oldRef) + '(\\b|$)', 'g'),
-        newRef
+      new RegExp(escapeRegex(oldRef) + '(\\b|$)', 'g'),
+      newRef
     );
     updateDataFct(refPath, updatedRefValue);
   });

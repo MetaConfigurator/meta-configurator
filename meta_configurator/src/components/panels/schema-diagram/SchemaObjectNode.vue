@@ -14,7 +14,7 @@ import type {AttributeTypeChoice} from '@/schema/graph-representation/typeUtils'
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
-import {getObjectDisplayName} from "@/schema/graph-representation/schemaGraphConstructor";
+import {getObjectDisplayName} from '@/schema/graph-representation/schemaGraphConstructor';
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
@@ -49,7 +49,7 @@ const emit = defineEmits<{
   (e: 'add_attribute', objectData: SchemaObjectNodeData): void;
 }>();
 
-const objectName = ref(props.data.name || "");
+const objectName = ref(props.data.name || '');
 
 const settings = useSettings();
 
@@ -154,7 +154,14 @@ function isAttributeHighlighted() {
 
     <div v-if="!isNameEditable() || !isDefinedInDefinitions()">
       <b>
-        {{ getObjectDisplayName(props.data.name, props.data.title, props.data.fallbackDisplayName, isDefinedInDefinitions()) }}
+        {{
+          getObjectDisplayName(
+            props.data.name,
+            props.data.title,
+            props.data.fallbackDisplayName,
+            isDefinedInDefinitions()
+          )
+        }}
       </b>
       <Button
         v-if="isExtractable()"

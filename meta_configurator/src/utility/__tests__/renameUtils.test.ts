@@ -153,9 +153,9 @@ describe('test renameUtils', () => {
   });
 
   it('test reference update for a case where the updated property does not start with a hashtag but the reference does', () => {
-    const oldPath = ['$defs', "SimulationSettings"]
-    const oldName = "SimulationSettings";
-    const newName = "SimulationSettingsRenamed";
+    const oldPath = ['$defs', 'SimulationSettings'];
+    const oldName = 'SimulationSettings';
+    const newName = 'SimulationSettingsRenamed';
     const currentData = {
       $defs: {
         SimulationSettings: {
@@ -166,11 +166,11 @@ describe('test renameUtils', () => {
         },
       },
       type: 'object',
-        properties: {
-            simulationSettings: {
-            $ref: '#/$defs/SimulationSettings',
-            },
+      properties: {
+        simulationSettings: {
+          $ref: '#/$defs/SimulationSettings',
         },
+      },
     };
 
     const updateDataFct = (subPath: Path, newValue: any) => {
@@ -179,12 +179,12 @@ describe('test renameUtils', () => {
 
     // rename property which triggers reference update
     const result = replacePropertyNameUtils(
-        oldPath,
-        oldName,
-        newName,
-        currentData,
-        metaSchemaWrapper,
-        updateDataFct
+      oldPath,
+      oldName,
+      newName,
+      currentData,
+      metaSchemaWrapper,
+      updateDataFct
     );
 
     // result is the new path of the renamed property
@@ -201,12 +201,11 @@ describe('test renameUtils', () => {
         },
       },
       type: 'object',
-        properties: {
-            simulationSettings: {
-            $ref: '#/$defs/SimulationSettingsRenamed',
-            },
+      properties: {
+        simulationSettings: {
+          $ref: '#/$defs/SimulationSettingsRenamed',
         },
+      },
     });
-
   });
 });

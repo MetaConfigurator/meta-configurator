@@ -11,7 +11,7 @@ import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
-import {getObjectDisplayName} from "../../../schema/graph-representation/schemaGraphConstructor";
+import {getObjectDisplayName} from '../../../schema/graph-representation/schemaGraphConstructor';
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -56,7 +56,7 @@ function updateEnumName() {
   }
   if (!props.data.name) {
     throw new Error(
-        'Enum name is not defined. This should not happen. Only enum with a name should allow edits of the name. Please report this issue.'
+      'Enum name is not defined. This should not happen. Only enum with a name should allow edits of the name. Please report this issue.'
     );
   }
   emit('update_enum_name', props.data, props.data.name, newName);
@@ -95,7 +95,14 @@ function addEnumItem() {
 
     <div v-if="!isEnumEditable() || !isDefinedInDefinitions()">
       <b>
-        {{ getObjectDisplayName(props.data.name, props.data.title, props.data.fallbackDisplayName, isDefinedInDefinitions()) }}
+        {{
+          getObjectDisplayName(
+            props.data.name,
+            props.data.title,
+            props.data.fallbackDisplayName,
+            isDefinedInDefinitions()
+          )
+        }}
       </b>
 
       <Button

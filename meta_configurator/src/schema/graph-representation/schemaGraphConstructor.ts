@@ -176,8 +176,8 @@ function generateInitialNode(
 ): SchemaElementData {
   if (!isEnumSchema(schema)) {
     return new SchemaObjectNodeData(
-        readObjectNameFromPath(path),
-        schema.title,
+      readObjectNameFromPath(path),
+      schema.title,
       generateObjectFallbackDisplayName(path, hasUserDefinedName, schema, rootSchema),
       hasUserDefinedName,
       path,
@@ -186,8 +186,8 @@ function generateInitialNode(
     );
   } else {
     return new SchemaEnumNodeData(
-        readObjectNameFromPath(path),
-        schema.title,
+      readObjectNameFromPath(path),
+      schema.title,
       generateObjectFallbackDisplayName(path, hasUserDefinedName, schema, rootSchema),
       hasUserDefinedName,
       path,
@@ -197,14 +197,14 @@ function generateInitialNode(
   }
 }
 
-function readObjectNameFromPath(path: Path): string|undefined{
-    if (path.length > 0) {
-        const lastElement = path[path.length - 1];
-        if (typeof lastElement === 'string') {
-        return lastElement;
-        }
+function readObjectNameFromPath(path: Path): string | undefined {
+  if (path.length > 0) {
+    const lastElement = path[path.length - 1];
+    if (typeof lastElement === 'string') {
+      return lastElement;
     }
-    return undefined;
+  }
+  return undefined;
 }
 
 export function generateObjectFallbackDisplayName(
@@ -270,7 +270,12 @@ export function generateObjectFallbackDisplayName(
   return 'element[' + lastElement + ']';
 }
 
-export function getObjectDisplayName(name: string|undefined, title: string|undefined, fallbackDisplayName: string, isNameEditable: boolean) {
+export function getObjectDisplayName(
+  name: string | undefined,
+  title: string | undefined,
+  fallbackDisplayName: string,
+  isNameEditable: boolean
+) {
   if (!isNameEditable) {
     if (title && title.length > 0) {
       return title;
@@ -280,10 +285,9 @@ export function getObjectDisplayName(name: string|undefined, title: string|undef
     if (name) {
       return name;
     } else {
-      throw new Error("If name is editable it must exist!")
+      throw new Error('If name is editable it must exist!');
     }
   }
-
 }
 
 export function generateObjectAttributes(
@@ -351,7 +355,12 @@ export function generateAttributeTypeDescription(
   // if data type has a reference, overwrite with the object behind the reference
   const referenceObject = resolveReferenceNode(schema, objectDefs);
   if (referenceObject) {
-    typeDescription = getObjectDisplayName(referenceObject.name, referenceObject.title, referenceObject.fallbackDisplayName, true);
+    typeDescription = getObjectDisplayName(
+      referenceObject.name,
+      referenceObject.title,
+      referenceObject.fallbackDisplayName,
+      true
+    );
   }
 
   // if data type is an array, overwrite with the type of the array items
@@ -374,7 +383,12 @@ export function generateAttributeTypeDescription(
   if (isObjectSchema(schema)) {
     const attributeNode = resolveObjectAttributeNode(path, schema, objectDefs);
     if (attributeNode) {
-      typeDescription = getObjectDisplayName(attributeNode.name, attributeNode.title, attributeNode.fallbackDisplayName, true);
+      typeDescription = getObjectDisplayName(
+        attributeNode.name,
+        attributeNode.title,
+        attributeNode.fallbackDisplayName,
+        true
+      );
     }
   }
 
@@ -401,7 +415,12 @@ export function generateAttributeEdges(
           edgeTargetNode,
           EdgeType.ATTRIBUTE,
           isArray,
-            getObjectDisplayName(attributeData.name, attributeData.title, attributeData.fallbackDisplayName, isSubSchemaDefinedInDefinitions(attributeData.absolutePath))
+          getObjectDisplayName(
+            attributeData.name,
+            attributeData.title,
+            attributeData.fallbackDisplayName,
+            isSubSchemaDefinedInDefinitions(attributeData.absolutePath)
+          )
         )
       );
     }

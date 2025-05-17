@@ -32,8 +32,8 @@ export interface Edge {
 
 export class SchemaElementData {
   public constructor(
-      public name: string|undefined,
-      public title: string|undefined,
+    public name: string | undefined,
+    public title: string | undefined,
     public fallbackDisplayName: string,
     public hasUserDefinedName: boolean,
     public absolutePath: Path,
@@ -47,9 +47,9 @@ export class SchemaElementData {
 
 export class SchemaNodeData extends SchemaElementData {
   public constructor(
-       name: string|undefined,
-       title: string|undefined,
-       fallbackDisplayName: string,
+    name: string | undefined,
+    title: string | undefined,
+    fallbackDisplayName: string,
     hasUserDefinedName: boolean,
     absolutePath: Path,
     schema: JsonSchemaObjectType
@@ -60,9 +60,9 @@ export class SchemaNodeData extends SchemaElementData {
 
 export class SchemaObjectNodeData extends SchemaNodeData {
   public constructor(
-      name: string|undefined,
-      title: string|undefined,
-      fallbackDisplayName: string,
+    name: string | undefined,
+    title: string | undefined,
+    fallbackDisplayName: string,
     hasUserDefinedName: boolean,
     absolutePath: Path,
     schema: JsonSchemaObjectType,
@@ -78,9 +78,9 @@ export class SchemaObjectNodeData extends SchemaNodeData {
 
 export class SchemaEnumNodeData extends SchemaNodeData {
   public constructor(
-      name: string|undefined,
-      title: string|undefined,
-      fallbackDisplayName: string,
+    name: string | undefined,
+    title: string | undefined,
+    fallbackDisplayName: string,
     public hasUserDefinedName: boolean,
     public absolutePath: Path,
     public schema: JsonSchemaObjectType,
@@ -95,7 +95,7 @@ export class SchemaEnumNodeData extends SchemaNodeData {
 
 export class SchemaObjectAttributeData extends SchemaElementData {
   public constructor(
-      public name: string,
+    public name: string,
     public typeDescription: string,
     public propertyType: 'properties' | 'patternProperties',
     absolutePath: Path,

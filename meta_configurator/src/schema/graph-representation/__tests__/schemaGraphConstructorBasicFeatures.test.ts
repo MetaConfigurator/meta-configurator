@@ -200,7 +200,12 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const person = defs.get('$defs.person')!;
     expect(
-      generateObjectFallbackDisplayName(person.absolutePath, person.hasUserDefinedName, person.schema, schema)
+      generateObjectFallbackDisplayName(
+        person.absolutePath,
+        person.hasUserDefinedName,
+        person.schema,
+        schema
+      )
     ).toEqual('person');
 
     const personAddress = defs.get('$defs.person.properties.address')!;

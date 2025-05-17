@@ -210,12 +210,22 @@ describe('test schema graph constructor with objects and compositional keywords'
 
     const person = defs.get('$defs.person')!;
     expect(
-      generateObjectFallbackDisplayName(person.absolutePath, person.hasUserDefinedName, person.schema, schema)
+      generateObjectFallbackDisplayName(
+        person.absolutePath,
+        person.hasUserDefinedName,
+        person.schema,
+        schema
+      )
     ).toEqual('person');
 
     const animal = defs.get('$defs.animal')!;
     expect(
-      generateObjectFallbackDisplayName(animal.absolutePath, animal.hasUserDefinedName, animal.schema, schema)
+      generateObjectFallbackDisplayName(
+        animal.absolutePath,
+        animal.hasUserDefinedName,
+        animal.schema,
+        schema
+      )
     ).toEqual('animal');
 
     const researcher = defs.get('$defs.researcher')!;
@@ -261,13 +271,23 @@ describe('test schema graph constructor with objects and compositional keywords'
     const allOf1 = defs.get('allOf[1]')!;
     // allOf element at index 1 has no title, so we use the index as title
     expect(
-      generateObjectFallbackDisplayName(allOf1.absolutePath, allOf1.hasUserDefinedName, allOf1.schema, schema)
+      generateObjectFallbackDisplayName(
+        allOf1.absolutePath,
+        allOf1.hasUserDefinedName,
+        allOf1.schema,
+        schema
+      )
     ).toEqual('allOf[1]');
 
     const oneOf1 = defs.get('oneOf[1]')!;
     // oneOf element at index 1 has a title, so we use it
     expect(
-      generateObjectFallbackDisplayName(oneOf1.absolutePath, allOf1.hasUserDefinedName, oneOf1.schema, schema)
+      generateObjectFallbackDisplayName(
+        oneOf1.absolutePath,
+        allOf1.hasUserDefinedName,
+        oneOf1.schema,
+        schema
+      )
     ).toEqual('Farmer');
   });
 

@@ -16,7 +16,7 @@ import {
 import {type CsvError, parse} from 'csv-parse/browser/esm';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
-import {stringToIdentifier} from "@/utility/stringToIdentifier";
+import {stringToIdentifier} from '@/utility/stringToIdentifier';
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
   const {open, onChange} = useFileDialog();
@@ -138,7 +138,6 @@ export const decimalSeparatorOptions: LabelledValue[] = [
     value: ',',
   },
 ];
-
 
 // note that this function does not look for a table within a table
 export function detectPossibleTablesInJson(json: any, path: Path = []): Path[] {
