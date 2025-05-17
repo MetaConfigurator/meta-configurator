@@ -16,6 +16,7 @@ jobs:
       - name: Install and Build
         env:
           USE_META_CONFIGURATOR_BASE_PATH: true  # Set to true for GitHub Pages deployment
+          FRONTEND_HOSTNAME: https://metaconfigurator.github.io/meta-configurator
         run: |
           cd meta_configurator
           npm ci

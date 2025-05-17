@@ -290,7 +290,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         hostname: {
           type: 'string',
           description: 'The hostname of the frontend server.',
-          default: 'https://metaconfigurator.github.io/meta-configurator/',
+          default:
+            process.env.FRONTEND_HOSTNAME || 'https://metaconfigurator.github.io/meta-configurator',
           format: 'uri',
         },
       },

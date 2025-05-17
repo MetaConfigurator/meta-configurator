@@ -2,10 +2,8 @@ import {openUploadFileDialog, openUploadSchemaDialog} from '@/components/toolbar
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {clearCurrentFile} from '@/components/toolbar/clearFile';
 import {useSessionStore} from '@/store/sessionStore';
-import {ref} from 'vue';
-import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
-import {getDataForMode, useCurrentData, useCurrentSchema} from '@/data/useDataLink';
+import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import {useDataSource} from '@/data/dataSource';
 import {SessionMode} from '@/store/sessionMode';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
@@ -14,6 +12,7 @@ import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
 import {openImportSchemaDialog} from '@/components/toolbar/importFile';
+import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchemaDefinitions';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -184,6 +183,18 @@ export class MenuItems {
         label: 'Download Schema',
         icon: 'fa-solid fa-download',
         command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
+      },
+      {
+        label: 'Utility',
+        icon: 'fa-solid fa-wrench',
+        key: 'utility',
+        items: [
+          {
+            label: 'Extract All Inlined Schema Elements',
+            icon: 'fa-solid fa-scissors',
+            command: extractInlinedSchemaDefinitions,
+          },
+        ],
       },
       {
         label: 'Generate Source Code...',
