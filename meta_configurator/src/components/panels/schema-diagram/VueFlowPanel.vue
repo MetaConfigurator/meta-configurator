@@ -37,7 +37,7 @@ import Button from 'primevue/button';
 import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
 import {
   addSchemaEnum,
-  addSchemaObject,
+  addSchemaObject, createIdentifierForExtractedElement,
   extractInlinedSchemaElement,
 } from '@/schema/schemaManipulationUtils';
 import {schemaGraphToVueFlowGraph} from '@/components/panels/schema-diagram/schemaDiagramTypes';
@@ -274,10 +274,11 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
 }
 
 function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNodeData) {
+  const newIdentifier = createIdentifierForExtractedElement(elementData.name, elementData.title, elementData.fallbackDisplayName);
   const newElementId = extractInlinedSchemaElement(
     elementData.absolutePath,
     schemaData,
-    elementData.name
+      newIdentifier
   );
   elementData.absolutePath = newElementId;
   selectElement(newElementId);

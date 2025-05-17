@@ -14,6 +14,7 @@ import type {AttributeTypeChoice} from '@/schema/graph-representation/typeUtils'
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
+import {getObjectDisplayName} from "@/schema/graph-representation/schemaGraphConstructor";
 
 const props = defineProps<{
   data: SchemaObjectNodeData;
@@ -48,7 +49,8 @@ const emit = defineEmits<{
   (e: 'add_attribute', objectData: SchemaObjectNodeData): void;
 }>();
 
-const objectName = ref(props.data.name);
+const objectName = ref(props.data.name || "");
+
 const settings = useSettings();
 
 function isObjectEditable() {
@@ -87,6 +89,11 @@ function updateObjectName() {
   const newName = objectName.value.trim();
   if (newName.length == 0) {
     return;
+  }
+  if (!props.data.name) {
+    throw new Error(
+      'Object name is not defined. This should not happen. Only objects with a name should allow edits of the name. Please report this issue.'
+    );
   }
   emit('update_object_name', props.data, props.data.name, newName);
 }
@@ -147,7 +154,7 @@ function isAttributeHighlighted() {
 
     <div v-if="!isNameEditable() || !isDefinedInDefinitions()">
       <b>
-        {{ props.data.name }}
+        {{ getObjectDisplayName(props.data.name, props.data.title, props.data.fallbackDisplayName, isDefinedInDefinitions()) }}
       </b>
       <Button
         v-if="isExtractable()"

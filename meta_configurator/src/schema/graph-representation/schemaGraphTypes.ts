@@ -32,7 +32,9 @@ export interface Edge {
 
 export class SchemaElementData {
   public constructor(
-    public name: string,
+      public name: string|undefined,
+      public title: string|undefined,
+    public fallbackDisplayName: string,
     public hasUserDefinedName: boolean,
     public absolutePath: Path,
     public schema: JsonSchemaObjectType
@@ -45,24 +47,28 @@ export class SchemaElementData {
 
 export class SchemaNodeData extends SchemaElementData {
   public constructor(
-    name: string,
+       name: string|undefined,
+       title: string|undefined,
+       fallbackDisplayName: string,
     hasUserDefinedName: boolean,
     absolutePath: Path,
     schema: JsonSchemaObjectType
   ) {
-    super(name, hasUserDefinedName, absolutePath, schema);
+    super(name, title, fallbackDisplayName, hasUserDefinedName, absolutePath, schema);
   }
 }
 
 export class SchemaObjectNodeData extends SchemaNodeData {
   public constructor(
-    name: string,
+      name: string|undefined,
+      title: string|undefined,
+      fallbackDisplayName: string,
     hasUserDefinedName: boolean,
     absolutePath: Path,
     schema: JsonSchemaObjectType,
     public attributes: SchemaObjectAttributeData[]
   ) {
-    super(name, hasUserDefinedName, absolutePath, schema);
+    super(name, title, fallbackDisplayName, hasUserDefinedName, absolutePath, schema);
   }
 
   public getNodeType() {
@@ -72,13 +78,15 @@ export class SchemaObjectNodeData extends SchemaNodeData {
 
 export class SchemaEnumNodeData extends SchemaNodeData {
   public constructor(
-    public name: string,
+      name: string|undefined,
+      title: string|undefined,
+      fallbackDisplayName: string,
     public hasUserDefinedName: boolean,
     public absolutePath: Path,
     public schema: JsonSchemaObjectType,
     public values: string[]
   ) {
-    super(name, hasUserDefinedName, absolutePath, schema);
+    super(name, title, fallbackDisplayName, hasUserDefinedName, absolutePath, schema);
   }
   public getNodeType() {
     return 'schemaenum';
@@ -87,7 +95,7 @@ export class SchemaEnumNodeData extends SchemaNodeData {
 
 export class SchemaObjectAttributeData extends SchemaElementData {
   public constructor(
-    name: string,
+      public name: string,
     public typeDescription: string,
     public propertyType: 'properties' | 'patternProperties',
     absolutePath: Path,
@@ -96,7 +104,7 @@ export class SchemaObjectAttributeData extends SchemaElementData {
     public index: number,
     schema: JsonSchemaObjectType
   ) {
-    super(name, true, absolutePath, schema);
+    super(name, undefined, name, true, absolutePath, schema);
   }
 }
 
