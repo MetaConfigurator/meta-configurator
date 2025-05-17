@@ -12,7 +12,7 @@ import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
 import {openImportSchemaDialog} from '@/components/toolbar/importFile';
-import {extractInlinedSchemaDefinitions} from "@/components/toolbar/extractSchemaDefinitions";
+import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchemaDefinitions';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -194,7 +194,7 @@ export class MenuItems {
             icon: 'fa-solid fa-scissors',
             command: extractInlinedSchemaDefinitions,
           },
-        ]
+        ],
       },
       {
         label: 'Generate Source Code...',
