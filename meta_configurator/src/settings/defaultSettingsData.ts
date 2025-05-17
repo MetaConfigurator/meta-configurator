@@ -85,7 +85,7 @@ export const SETTINGS_DATA_DEFAULT = {
     hidden: ['aiPrompts', 'debug', 'test'],
   },
   frontend: {
-    hostname: 'https://metaconfigurator.github.io/meta-configurator',
+    hostname: process.env.FRONTEND_HOSTNAME || 'https://metaconfigurator.github.io/meta-configurator',
   },
   backend: {
     hostname: 'https://metaconfigurator.informatik.uni-stuttgart.de',
