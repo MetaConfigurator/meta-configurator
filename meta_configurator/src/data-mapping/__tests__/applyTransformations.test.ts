@@ -51,17 +51,17 @@ describe('test transformations for data mapping', () => {
     const transformations: Transformation[] = [
         {
             operationType: "mathFormula",
-            inputDocumentPath: "/people/%INDEX_A%/age",
+            sourcePath: "/people/%INDEX_A%/age",
             formula: "x + 1"
         },
         {
             operationType: "stringOperation",
-            inputDocumentPath: "/people/%INDEX_A%/name",
+            sourcePath: "/people/%INDEX_A%/name",
             string: "uppercase"
         },
         {
             operationType: "valueMapping",
-            inputDocumentPath: "/books/%INDEX_B%/title",
+            sourcePath: "/books/%INDEX_B%/title",
             valueMapping: {
                 "Book 1": "First Book",
                 "Book 2": "Second Book"

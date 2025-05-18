@@ -26,6 +26,7 @@ export class MenuItems {
   private readonly showImportCsvDialog: () => void;
   private readonly showSnapshotDialog: () => void;
   private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
+    private readonly showDataMappingDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
@@ -35,7 +36,8 @@ export class MenuItems {
     showImportCsvDialog: () => void,
     showSnapshotDialog: () => void,
     showCodeGenerationDialog: (schemaMode: boolean) => void,
-    inferJsonSchemaFromSampleData: () => void
+    showDataMappingDialog: () => void,
+    inferJsonSchemaFromSampleData: () => void,
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
     this.onFromOurExampleClick = onFromOurExampleClick;
@@ -43,6 +45,7 @@ export class MenuItems {
     this.showImportCsvDialog = showImportCsvDialog;
     this.showSnapshotDialog = showSnapshotDialog;
     this.showCodeGenerationDialog = showCodeGenerationDialog;
+    this.showDataMappingDialog = showDataMappingDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
   }
 
@@ -86,6 +89,18 @@ export class MenuItems {
         icon: 'fa-solid fa-download',
         command: () =>
           downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
+      },
+      {
+        label: 'Utility',
+        icon: 'fa-solid fa-wrench',
+        key: 'utility',
+        items: [
+          {
+            label: 'Transform Data to match the Schema',
+            icon: 'fa-solid fa-wand-magic-sparkles',
+            command: this.showDataMappingDialog,
+          },
+        ],
       },
       {
         label: 'Share Snapshot',

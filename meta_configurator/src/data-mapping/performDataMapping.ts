@@ -1,4 +1,4 @@
-import type {DataMappingConfig} from "@/data-mapping/dataMappingTypes";
+import type {DataMappingConfig, Transformation} from "@/data-mapping/dataMappingTypes";
 import _ from "lodash";
 import {dataAt} from "@/utility/resolveDataAtPath";
 import {jsonPointerToPathTyped} from "@/utility/pathUtils";
@@ -61,6 +61,8 @@ function recursiveMap(
 }
 
 export function performDataMapping(inputData: any, mappingConfig: DataMappingConfig): any {
+    normalizeInputConfig(mappingConfig);
+
     const outputData: any = {};
 
     // first, apply the transformations to the complete input data
@@ -79,4 +81,32 @@ export function performDataMapping(inputData: any, mappingConfig: DataMappingCon
     }
 
     return outputData;
+}
+
+function normalizeInputConfig(inputConfig: DataMappingConfig) {
+    // for each path, if it starts with a hashtag, remove the hashtag. In the mappings and also transformations
+    // if the path starts without a slash '/', then add a '/' at the beginning
+    inputConfig.mappings.forEach(mapping => {
+        if (mapping.sourcePath.startsWith("#")) {
+            mapping.sourcePath = mapping.sourcePath.slice(1);
+        }
+        if (mapping.targetPath.startsWith("#")) {
+            mapping.targetPath = mapping.targetPath.slice(1);
+        }
+        if (!mapping.sourcePath.startsWith("/")) {
+            mapping.sourcePath = "/" + mapping.sourcePath;
+        }
+        if (!mapping.targetPath.startsWith("/")) {
+            mapping.targetPath = "/" + mapping.targetPath;
+        }
+    });
+    inputConfig.transformations.forEach(transformation => {
+        if (transformation.sourcePath.startsWith("#")) {
+            transformation.sourcePath = transformation.sourcePath.slice(1);
+        }
+        if (!transformation.sourcePath.startsWith("/")) {
+            transformation.sourcePath = "/" + transformation.sourcePath;
+        }
+    });
+
 }

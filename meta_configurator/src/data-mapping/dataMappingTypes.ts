@@ -12,7 +12,7 @@ export type Mapping = {
 
 export type Transformation = {
     operationType: "mathFormula" | "stringOperation" | "valueMapping";
-    inputDocumentPath: string;
+    sourcePath: string;
     formula?: string;
     string?: string;
     valueMapping?: Record<string, any>;

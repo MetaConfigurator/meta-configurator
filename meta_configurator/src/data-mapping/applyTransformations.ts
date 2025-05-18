@@ -8,7 +8,7 @@ export function applyTransformations(inputData: any, transformations: Transforma
     const outputData = JSON.parse(JSON.stringify(inputData)); // Deep clone input data
 
     for (const transformation of transformations) {
-        const sourcePathDef = transformation.inputDocumentPath;
+        const sourcePathDef = transformation.sourcePath;
         const sourcePathsWhichMatchDef = findMatchingPaths(inputData, sourcePathDef);
 
         for (const sourcePath of sourcePathsWhichMatchDef) {

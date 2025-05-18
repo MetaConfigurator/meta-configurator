@@ -97,17 +97,17 @@ describe('test performing data mappings on a given input file, based on a mappin
         transformations: [
             {
                 operationType: "mathFormula",
-                inputDocumentPath: "/people/%INDEX_A%/age",
+                sourcePath: "/people/%INDEX_A%/age",
                 formula: "x + 1"
             },
             {
                 operationType: "stringOperation",
-                inputDocumentPath: "/people/%INDEX_A%/name",
+                sourcePath: "/people/%INDEX_A%/name",
                 string: "uppercase"
             },
             {
                 operationType: "valueMapping",
-                inputDocumentPath: "/books/%INDEX_A%/title",
+                sourcePath: "/books/%INDEX_A%/title",
                 valueMapping: {
                     "Book 1": "First Book",
                     "Book 2": "Second Book"

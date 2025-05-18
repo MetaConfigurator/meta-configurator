@@ -129,7 +129,7 @@ export const queryDataQuestion = async (
   data: string,
   schema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Explain/summarize/query the provided JSON document based on the prompt by the user. The document to query is: ${data}. The JSON schema for the document is ${schema}. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
+  const systemMessage = `You are a JSON schema expert. Explain/summarize/query the provided JSON document based on the prompt by the user. The document to query is: \`\`\`${data}\`\`\`. The JSON schema for the document is \`\`\`${schema}\`\`\`. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: dataQuestionNaturalLanguage},
@@ -142,7 +142,7 @@ export const querySettingsModification = async (
   currentSettings: string,
   settingsSchema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Modify the provided settings based on the settings change description by the user. Return no other text than a fully valid JSON document. The settings to modify are: ${currentSettings}. The resulting JSON document needs to satisfy the JSON schema ${settingsSchema}`;
+  const systemMessage = `You are a JSON schema expert. Modify the provided settings based on the settings change description by the user. Return no other text than a fully valid JSON document. The settings to modify are: \`\`\`${currentSettings}\`\`\`. The resulting JSON document needs to satisfy the JSON schema \`\`\`${settingsSchema}\`\`\``;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: settingsChangeDescriptionNaturalLanguage},
@@ -155,9 +155,42 @@ export const querySettingsQuestion = async (
   data: string,
   schema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Explain/summarize/query the user settings of the MetaConfigurator web app based on the prompt by the user. The settings to query is: ${data}. The JSON schema for the settings is ${schema}. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
+  const systemMessage = `You are a JSON schema expert. Explain/summarize/query the user settings of the MetaConfigurator web app based on the prompt by the user. The settings to query is: \`\`\`${data}\`\`\`. The JSON schema for the settings is \`\`\`${schema}\`\`\`. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: settingsQuestionNaturalLanguage},
   ]);
+};
+
+  export const queryDataMappingConfig = async (
+    apiKey: string,
+    dataMappingConfigSchema: string,
+    dataMappingConfigExample: string,
+    inputFileSchema: string,
+    targetSchema: string,
+    inputFileSubset: string,
+    userComments: string) => {
+    const systemMessage = `You are a JSON expert. Your task is to generate a data mapping configuration JSON document.
+
+This document must be a valid *instance* that follows the schema defined by \`\`\`${dataMappingConfigSchema}\`\`\`.
+
+You must NOT output a JSON Schema or include any \`$schema\`, \`type\`, \`properties\`, or similar schema-related keywords. 
+The result must only be a concrete instance, like the following example: \`\`\`${dataMappingConfigExample}\`\`\`.
+
+The configuration maps data from an input file (with known schema and example subset) to match the structure of a target schema.
+
+Return ONLY a valid JSON object (no surrounding text or explanation).`;
+
+    let userMessage = `The input file follows this schema: \`\`\`${inputFileSchema}\`\`\`.  
+The goal is to map it to match this target schema: \`\`\`${targetSchema}\`\`\`.  
+To help with the mapping, here is a subset of the input file: \`\`\`${inputFileSubset}\`\`\`.`;
+
+    if (userComments && userComments.length > 0) {
+      userMessage += `  
+User comments for clarification: \`\`\`${userComments}\`\`\``;
+    }
+    return queryOpenAI(apiKey, [
+      {role: 'system', content: systemMessage},
+      {role: 'user', content: userMessage},
+    ]);
 };
