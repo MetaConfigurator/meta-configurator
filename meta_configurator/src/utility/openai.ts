@@ -169,6 +169,7 @@ export const querySettingsQuestion = async (
     inputFileSchema: string,
     targetSchema: string,
     inputFileSubset: string,
+    possibleSourcePaths: string[],
     userComments: string) => {
     const systemMessage = `You are a JSON expert. Your task is to generate a data mapping configuration JSON document.
 
@@ -183,7 +184,8 @@ Return ONLY a valid JSON object (no surrounding text or explanation).`;
 
     let userMessage = `The input file follows this schema: \`\`\`${inputFileSchema}\`\`\`.  
 The goal is to map it to match this target schema: \`\`\`${targetSchema}\`\`\`.  
-To help with the mapping, here is a subset of the input file: \`\`\`${inputFileSubset}\`\`\`.`;
+To help with the mapping, here is a subset of the input file: \`\`\`${inputFileSubset}\`\`\`.
+Here is a list of possible source paths to use in the mapping config: \`\`\`${possibleSourcePaths.join(', ')}\`\`\``;
 
     if (userComments && userComments.length > 0) {
       userMessage += `  

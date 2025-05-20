@@ -164,4 +164,51 @@ describe('test performing data mappings on a given input file, based on a mappin
     });
 
 
+    it('test the data mapping for a scenario where not all array elements have all expected fields to be mapped', () => {
+        // create copy of input data and modify it, removing name of first hobby of John and age of Jane
+        // also remove full book list
+        const modifiedInputData = JSON.parse(JSON.stringify(inputData));
+        delete modifiedInputData.people[0].hobbies[0].name;
+        delete modifiedInputData.people[1].age;
+        delete modifiedInputData.books;
+
+        const result = performDataMapping(modifiedInputData, mappingConfig);
+
+        // expect all data was mapped properly and the missing fields simply ignored
+        expect(result).toEqual({
+            person: [
+                {
+                    fullName: 'JOHN DOE',
+                    age: 31,
+                    activities: [
+                        {
+                            hobbyType: 'indoor'
+                        },
+                        {
+                            hobbyName: 'gaming',
+                            hobbyType: 'indoor'
+                        }
+                    ]
+                },
+                {
+                    fullName: 'JANE SMITH',
+                    activities: [
+                        {
+                            hobbyName: 'cooking',
+                            hobbyType: 'indoor'
+                        },
+                        {
+                            hobbyName: 'traveling',
+                            hobbyType: 'outdoor'
+                        }
+                    ]
+                }
+            ],
+            year: 2050
+        });
+
+
+    });
+
+
 });

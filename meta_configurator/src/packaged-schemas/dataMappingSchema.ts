@@ -16,13 +16,13 @@ export const DATA_MAPPING_SCHEMA: TopLevelSchema = {
                         type: "string",
                         title: "Path to the source data, a JSON pointer.",
                         description: "The path to the source data in the input JSON document. The path should be a valid JSON pointer, and it can include array indices using the format %INDEX_[A-Z]%. For example, /people/%INDEX_A%/firstName. The %INDEX_A% placeholder represents a path that is an array and the index will be replaced with the actual index of the item in the array during the data conversion.",
-                        pattern: "^#/[^/]+(/%INDEX_[A-Z]+)?(/[^/]+(/%INDEX_[A-Z]+)*)*$"
+                        pattern: "^#?/[^/]+(/%INDEX_[A-Z]+)?(/[^/]+(/%INDEX_[A-Z]+)*)*$"
                     },
                     targetPath: {
                         type: "string",
                         title: "Path to the target data, a JSON pointer.",
                         description: "The path to the target data in the output JSON document. The path should be a valid JSON pointer, and it can include array indices using the format %INDEX_[A-Z]%. For example, /person/%INDEX_A%/given_name. The %INDEX_A% placeholder represents a path that is an array and the index will be replaced with the actual index of the item in the array during the data conversion.",
-                        pattern: "^#/[^/]+(/%INDEX_[A-Z]+)?(/[^/]+(/%INDEX_[A-Z]+)*)*$"
+                        pattern: "^#?/[^/]+(/%INDEX_[A-Z]+)?(/[^/]+(/%INDEX_[A-Z]+)*)*$"
                     }
                 },
                 required: [
@@ -48,7 +48,7 @@ export const DATA_MAPPING_SCHEMA: TopLevelSchema = {
                     },
                     sourcePath: {
                         type: "string",
-                        pattern: "^#/[^/]+(/%INDEX_[A-Z]+)?(/[^/]+(/%INDEX_[A-Z]+)*)*$"
+                        pattern: "^#?/[^/]+(/%INDEX_[A-Z]+)?(/[^/]+(/%INDEX_[A-Z]+)*)*$"
                     },
                     formula: {
                         type: "string",

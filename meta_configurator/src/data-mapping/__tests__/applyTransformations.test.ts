@@ -61,7 +61,7 @@ describe('test transformations for data mapping', () => {
         },
         {
             operationType: "valueMapping",
-            sourcePath: "/books/%INDEX_B%/title",
+            sourcePath: "/books/%INDEX_A%/title",
             valueMapping: {
                 "Book 1": "First Book",
                 "Book 2": "Second Book"
