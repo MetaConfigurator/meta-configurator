@@ -34,8 +34,8 @@ const topMenuBar = new MenuItems(
   showCsvImportDialog,
   showSnapshotDialog,
   showCodeGenerationDialog,
-    showDataMappingDialog,
-  inferSchemaFromSampleData,
+  showDataMappingDialog,
+  inferSchemaFromSampleData
 );
 
 async function handleFromWebClick() {

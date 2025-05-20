@@ -97,8 +97,7 @@ useMagicKeys({
         @show-import-csv-dialog="() => showCsvImportDialog()"
         @show-schemastore-dialog="() => showSchemaStoreDialog()"
         @show-snapshot-dialog="() => showSnapshotDialog()"
-        @show-data-mapping-dialog="() => showDataMappingDialog()"
-      />
+        @show-data-mapping-dialog="() => showDataMappingDialog()" />
 
       <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
         <Select

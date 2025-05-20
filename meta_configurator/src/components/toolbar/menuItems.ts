@@ -26,7 +26,7 @@ export class MenuItems {
   private readonly showImportCsvDialog: () => void;
   private readonly showSnapshotDialog: () => void;
   private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
-    private readonly showDataMappingDialog: () => void;
+  private readonly showDataMappingDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
@@ -37,7 +37,7 @@ export class MenuItems {
     showSnapshotDialog: () => void,
     showCodeGenerationDialog: (schemaMode: boolean) => void,
     showDataMappingDialog: () => void,
-    inferJsonSchemaFromSampleData: () => void,
+    inferJsonSchemaFromSampleData: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
     this.onFromOurExampleClick = onFromOurExampleClick;

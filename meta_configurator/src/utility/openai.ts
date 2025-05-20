@@ -162,16 +162,17 @@ export const querySettingsQuestion = async (
   ]);
 };
 
-  export const queryDataMappingConfig = async (
-    apiKey: string,
-    dataMappingConfigSchema: string,
-    dataMappingConfigExample: string,
-    inputFileSchema: string,
-    targetSchema: string,
-    inputFileSubset: string,
-    possibleSourcePaths: string[],
-    userComments: string) => {
-    const systemMessage = `You are a JSON expert. Your task is to generate a data mapping configuration JSON document.
+export const queryDataMappingConfig = async (
+  apiKey: string,
+  dataMappingConfigSchema: string,
+  dataMappingConfigExample: string,
+  inputFileSchema: string,
+  targetSchema: string,
+  inputFileSubset: string,
+  possibleSourcePaths: string[],
+  userComments: string
+) => {
+  const systemMessage = `You are a JSON expert. Your task is to generate a data mapping configuration JSON document.
 
 This document must be a valid *instance* that follows the schema defined by \`\`\`${dataMappingConfigSchema}\`\`\`.
 
@@ -182,17 +183,19 @@ The configuration maps data from an input file (with known schema and example su
 
 Return ONLY a valid JSON object (no surrounding text or explanation).`;
 
-    let userMessage = `The input file follows this schema: \`\`\`${inputFileSchema}\`\`\`.  
+  let userMessage = `The input file follows this schema: \`\`\`${inputFileSchema}\`\`\`.  
 The goal is to map it to match this target schema: \`\`\`${targetSchema}\`\`\`.  
 To help with the mapping, here is a subset of the input file: \`\`\`${inputFileSubset}\`\`\`.
-Here is a list of possible source paths to use in the mapping config: \`\`\`${possibleSourcePaths.join(', ')}\`\`\``;
+Here is a list of possible source paths to use in the mapping config: \`\`\`${possibleSourcePaths.join(
+    ', '
+  )}\`\`\``;
 
-    if (userComments && userComments.length > 0) {
-      userMessage += `  
+  if (userComments && userComments.length > 0) {
+    userMessage += `  
 User comments for clarification: \`\`\`${userComments}\`\`\``;
-    }
-    return queryOpenAI(apiKey, [
-      {role: 'system', content: systemMessage},
-      {role: 'user', content: userMessage},
-    ]);
+  }
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: userMessage},
+  ]);
 };

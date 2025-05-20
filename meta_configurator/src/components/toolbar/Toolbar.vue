@@ -15,7 +15,7 @@ import CodeGenerationDialog from '@/components/dialogs/code-generation/CodeGener
 import FetchedSchemasSelectionDialog from '@/components/dialogs/FetchedSchemasSelectionDialog.vue';
 import UrlInputDialog from '@/components/dialogs/UrlInputDialog.vue';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
-import DataMappingDialog from "@/components/dialogs/data-mapping/DataMappingDialog.vue";
+import DataMappingDialog from '@/components/dialogs/data-mapping/DataMappingDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
