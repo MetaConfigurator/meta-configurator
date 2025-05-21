@@ -1,43 +1,32 @@
-import type {Path} from '@/utility/path';
-import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 
-export function pathToNormalizedJsonPointer(
-  path: Path,
-  replaceIndexByPlaceholder: boolean
-): string {
-  let resultPath = path;
-  if (replaceIndexByPlaceholder) {
-    // replace all array indices (numbers in the path) by a %INDEX_A%, %INDEX_B%,... placeholder
-    // first array index is %INDEX_A%, second %INDEX_B%, third %INDEX_C% and so on
-    let arrayIndex = 0;
-    resultPath = resultPath.map(seg => {
-      if (typeof seg === 'number') {
-        const placeholder = String.fromCharCode(65 + arrayIndex); // 65 is ASCII for 'A'
-        arrayIndex++;
-        return `%INDEX_${placeholder}%`;
-      }
-      return seg;
-    });
-  }
+export function cutDataToNEntriesPerArray(data: any, n: number): any {
+    // data will be a json object or array with an arbitrary hierarchy and anywhere could be arrays
+    // we want to cut each array to have only n entries
 
-  // then convert path to json pointer
-  // note that we do not use the library call here, because the library does not support the %INDEX_X% placeholders
-  return '/' + resultPath.join('/');
-}
+    // check if data is an array. Even then, children could be objects or arrays. Apply same algorithm recursively on each array item
+    if (Array.isArray(data)) {
+        const newArray = [];
+        let i = 0;
+        for (const item of data) {
+            // if the array has more than n entries, cut it to n entries
+            if (i < n) {
+                i++;
+            } else {
+                break;
+            }
+            newArray.push(cutDataToNEntriesPerArray(item, n));
+        }
+        return newArray;
+    }
 
-export function normalizeJsonPointer(
-  jsonPointer: string,
-  replaceIndexByPlaceholder: boolean
-): string {
-  // for each path, if it starts with a hashtag, remove the hashtag. In the mappings and also transformations
-  // if the path starts without a slash '/', then add a '/' at the beginning
-  if (jsonPointer.startsWith('#')) {
-    jsonPointer = jsonPointer.slice(1);
-  }
-  if (!jsonPointer.startsWith('/')) {
-    jsonPointer = '/' + jsonPointer;
-  }
-
-  const pathTyped = jsonPointerToPathTyped(jsonPointer);
-  return pathToNormalizedJsonPointer(pathTyped, replaceIndexByPlaceholder);
+    // if data is an object, we need to traverse the object and cut each array to have only 3 entries
+    if (typeof data === 'object' && data !== null) {
+        const newObject: any = {};
+        for (const key in data) {
+            newObject[key] = cutDataToNEntriesPerArray(data[key], n);
+        }
+        return newObject;
+    }
+    // if data is not an object or array, return it as is
+    return data;
 }

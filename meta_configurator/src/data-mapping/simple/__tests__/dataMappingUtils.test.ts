@@ -1,5 +1,4 @@
 import {describe, expect, it, vi} from 'vitest';
-import {extractSuitableSourcePaths} from '../extractPathsFromDocument';
 import {normalizeJsonPointer, pathToNormalizedJsonPointer} from '../dataMappingUtils';
 
 // avoid constructing useDataLink store through imports, it is not required for this component

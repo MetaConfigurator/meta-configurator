@@ -1,8 +1,9 @@
-import type {DataMappingConfig} from '@/data-mapping/dataMappingTypes';
-import {ValidationService} from '@/schema/validationService';
-import {DATA_MAPPING_SCHEMA} from '@/packaged-schemas/dataMappingSchema';
-import {normalizeInputConfig} from '@/data-mapping/performDataMapping';
-import {extractInvalidSourcePathsFromConfig} from '@/data-mapping/extractPathsFromDocument';
+import {normalizeInputConfig} from "@/data-mapping/simple/performDataMapping";
+import {ValidationService} from "@/schema/validationService";
+import {DATA_MAPPING_SCHEMA} from "@/data-mapping/simple/dataMappingSchema";
+import type {DataMappingConfig} from "@/data-mapping/simple/dataMappingTypes";
+import {extractInvalidSourcePathsFromConfig} from "@/data-mapping/simple/extractPathsFromDocument";
+
 
 export function sanitizeMappingConfiguration(config: any, inputFile: any): string {
   normalizeInputConfig(config);

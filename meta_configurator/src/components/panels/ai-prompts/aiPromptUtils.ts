@@ -1,7 +1,5 @@
 export function fixAndParseGeneratedJson(json: string): any {
-  if (json.startsWith('```json\n') && json.endsWith('```')) {
-    json = json.substring(8, json.length - 3);
-  }
+  json = fixGeneratedExpression(json);
 
   try {
     return JSON.parse(json);
@@ -14,6 +12,16 @@ export function fixAndParseGeneratedJson(json: string): any {
       throw e;
     }
   }
+}
+
+export function fixGeneratedExpression(json: string, expressionType: string = 'json'): string {
+  if (json.toLowerCase().startsWith(`\`\`\`${expressionType}`) && json.endsWith('```')) {
+    json = json.substring(3 + expressionType.length, json.length - 3);
+  }
+  if (json.startsWith('```') && json.endsWith('```')) {
+    json = json.substring(3, json.length - 3);
+  }
+  return json;
 }
 
 function hasMoreOpeningBrackets(input: string): boolean {

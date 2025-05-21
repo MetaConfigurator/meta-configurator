@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
-import {performDataMapping} from '../performDataMapping';
 import {type DataMappingConfig} from '../dataMappingTypes';
+import {performSimpleDataMapping} from "../performDataMapping";
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
@@ -117,7 +117,7 @@ describe('test performing data mappings on a given input file, based on a mappin
   };
 
   it('test the complete mapping', () => {
-    const result = performDataMapping(inputData, mappingConfig);
+    const result = performSimpleDataMapping(inputData, mappingConfig);
 
     expect(result).toEqual({
       person: [
@@ -170,7 +170,7 @@ describe('test performing data mappings on a given input file, based on a mappin
     delete modifiedInputData.people[1].age;
     delete modifiedInputData.books;
 
-    const result = performDataMapping(modifiedInputData, mappingConfig);
+    const result = performSimpleDataMapping(modifiedInputData, mappingConfig);
 
     // expect all data was mapped properly and the missing fields simply ignored
     expect(result).toEqual({

@@ -1,159 +1,130 @@
 <!-- Dialog to convert data to target schema using hybrid approach with AI -->
-<script setup lang="ts">
-import {type Ref, ref} from 'vue';
+<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
+import {computed, onMounted, type Ref, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import Select from 'primevue/select';
+import Divider from 'primevue/divider';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
-import {inferJsonSchema} from '@/schema/inferJsonSchema';
-import {queryDataMappingConfig} from '@/utility/openai';
-import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
-import {
-  DATA_MAPPING_EXAMPLE_CONFIG,
-  DATA_MAPPING_SCHEMA,
-} from '@/packaged-schemas/dataMappingSchema';
-import {performDataMapping} from '@/data-mapping/performDataMapping';
-import type {DataMappingConfig} from '@/data-mapping/dataMappingTypes';
-import {sanitizeMappingConfiguration} from '@/data-mapping/sanitizeMappingConfiguration';
-import {extractSuitableSourcePaths} from '@/data-mapping/extractPathsFromDocument';
+import type {DataMappingService} from "@/data-mapping/dataMappingService";
+import {DataMappingServiceSimple} from "@/data-mapping/simple/dataMappingServiceSimple";
+import {DataMappingServiceJSONata} from "@/data-mapping/jsonata/dataMappingServiceJSONata";
+import {type Editor} from "brace";
+import * as ace from "brace";
+import { setupAceProperties} from "@/components/panels/shared-components/aceUtils";
+import {useSettings} from "@/settings/useSettings";
 
 const showDialog = ref(false);
+const editor_id = 'data-mapping-' + Math.random();
+const editorInitialized: Ref<boolean> = ref(false);
+const editor : Ref<Editor | null> = ref(null);
+
+const settings = useSettings();
 
 const statusMessage: Ref<string> = ref('');
 const errorMessage: Ref<string> = ref('');
 const userComments: Ref<string> = ref('');
 
-const resultMapping: Ref<any> = ref({});
-const resultMappingStr: Ref<string> = ref('');
+const mappingServiceTypes = [
+    "Simple",
+    "Advanced (JSONata)",
+];
+
+const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]);
+const mappingService: Ref<DataMappingService> = computed(() => {
+  if (selectedMappingServiceType.value === 'Simple') {
+    return new DataMappingServiceSimple();
+  }
+  if (selectedMappingServiceType.value === 'Advanced (JSONata)') {
+    return new DataMappingServiceJSONata();
+  }
+  // Add other mapping service types here
+  throw new Error('Invalid mapping service type');
+});
+
+
+const input: Ref<any> = ref({});
+const result: Ref<string> = ref('');
 
 function openDialog() {
+  resetDialog();
   showDialog.value = true;
 }
+
+function resetDialog() {
+  statusMessage.value = '';
+  errorMessage.value = '';
+  userComments.value = '';
+  input.value = {};
+  result.value = '';
+}
+
+function initializeEditor() {
+  if (editorInitialized.value) {
+    return;
+  }
+
+  editor.value = ace.edit(editor_id);
+  editorInitialized.value = true;
+  // do not call setupAceMode because we do not want to restrain to a specific data format
+  setupAceProperties(editor.value, settings.value);
+}
+
+onMounted(() => {
+  // watch changes to newDocument and update the data in the editor accordingly
+  watch(
+      () => result.value,
+      newValue => {
+        if (newValue.length > 0) {
+          initializeEditor()
+          const editor: Editor = ace.edit(editor_id);
+          editor.setValue(newValue);
+          editor.clearSelection();
+        }
+      }
+  );
+});
 
 function hideDialog() {
   showDialog.value = false;
 }
 
 function generateMappingSuggestion() {
-  const inputData = getDataForMode(SessionMode.DataEditor).data.value;
+  input.value = getDataForMode(SessionMode.DataEditor).data.value;
   const targetSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
 
-  statusMessage.value = 'Reducing input data for efficiency...';
-  const inputDataSubset = cutDataTo3EntriesPerArray(inputData);
-  console.log(
-    'Reduced input data from ' +
-      JSON.stringify(inputData).length / 1024 +
-      ' KB to ' +
-      JSON.stringify(inputDataSubset).length / 1024 +
-      ' KB'
-  );
+  input.value = mappingService.value.sanitizeInputDocument(input.value);
 
-  // infer schema for input data
-  statusMessage.value = 'Inferring schema for input data...';
-  const inputFileSchema = inferJsonSchema(inputDataSubset);
+  mappingService.value.generateMappingSuggestion(input.value, targetSchema, statusMessage, errorMessage, userComments.value).then( (res) => {
+    result.value = res;
+  })
+ }
 
-  const apiKey = getApiKey();
-  statusMessage.value = 'Generating data mapping suggestion...';
 
-  const possibleSourcePaths = extractSuitableSourcePaths(inputData);
+function performMapping() {
+  const editorContent = editor.value?.getValue();
+  if (!editorContent) {
+    errorMessage.value = 'No mapping configuration found for performing the mapping.';
+    statusMessage.value = '';
+    return;
+  }
 
-  const dataMappingSchemaStr = JSON.stringify(DATA_MAPPING_SCHEMA);
-  const dataMappingExampleStr = JSON.stringify(DATA_MAPPING_EXAMPLE_CONFIG);
-  const inputFileSchemaStr = JSON.stringify(inputFileSchema);
-  const targetSchemaStr = JSON.stringify(targetSchema);
-  const inputDataSubsetStr = JSON.stringify(inputDataSubset);
-  console.log(
-    'Sizes of the different input files in KB:' +
-      ' dataMappingSchema: ' +
-      (dataMappingSchemaStr.length / 1024).toFixed(2) +
-      ' inputFileSchema: ' +
-      (inputFileSchemaStr.length / 1024).toFixed(2) +
-      ' targetSchema: ' +
-      (targetSchemaStr.length / 1024).toFixed(2) +
-      ' inputDataSubset: ' +
-      (inputDataSubsetStr.length / 1024).toFixed(2)
-  );
-  const resultPromise = queryDataMappingConfig(
-    apiKey,
-    dataMappingSchemaStr,
-    dataMappingExampleStr,
-    inputFileSchemaStr,
-    targetSchemaStr,
-    inputDataSubsetStr,
-    possibleSourcePaths,
-    userComments.value
-  );
-
-  resultPromise.then(responseStr => {
-    const responseJson = fixAndParseGeneratedJson(responseStr); // TODO: move out fixAndParse to a generic library place or even update whole aiUtils file
-    // write the response to the resultMapping variable, also prettify it
-    resultMapping.value = responseJson;
-
-    const inputData = getDataForMode(SessionMode.DataEditor).data.value;
-    const validationResult = sanitizeMappingConfiguration(resultMapping.value, inputData);
-    if (validationResult.length == 0) {
-      resultMappingStr.value = JSON.stringify(responseJson, null, 2);
-      statusMessage.value = 'Data mapping suggestion generated successfully.';
-    } else {
-      resultMappingStr.value = '';
-      statusMessage.value = validationResult;
+  mappingService.value.performDataMapping(input.value, editorContent, statusMessage, errorMessage).then( (resultData) => {
+    if (resultData === undefined) {
+      // error message should be printed by corresponding mapping service
+      return;
     }
+    // write the result data to the data editor
+    getDataForMode(SessionMode.DataEditor).setData(resultData);
+    hideDialog();
   });
 }
 
-function cutDataTo3EntriesPerArray(data: any): any {
-  // data will be a json object or array with an arbitrary hierarchy and anywhere could be arrays
-  // we want to cut each array to have only 3 entries
 
-  // check if data is an array. Even then, children coudl be objects or arrays. Apply same algorithm recursively on each array item
-  if (Array.isArray(data)) {
-    const newArray = [];
-    let i = 0;
-    for (const item of data) {
-      // if the array has more than 3 entries, cut it to 3 entries
-      if (i < 3) {
-        i++;
-      } else {
-        break;
-      }
-      newArray.push(cutDataTo3EntriesPerArray(item));
-    }
-    return newArray;
-  }
-
-  // if data is an object, we need to traverse the object and cut each array to have only 3 entries
-  if (typeof data === 'object' && data !== null) {
-    const newObject: any = {};
-    for (const key in data) {
-      newObject[key] = cutDataTo3EntriesPerArray(data[key]);
-    }
-    return newObject;
-  }
-  // if data is not an object or array, return it as is
-  return data;
-}
-
-function isResultMappingValid() {
-  return resultMappingStr.value.length > 0;
-}
-
-function performMapping() {
-  if (!isResultMappingValid()) {
-    throw new Error('Can not perform data mapping with invalid mapping config.');
-  }
-
-  statusMessage.value = 'Performing data mapping...';
-
-  const mapping = resultMapping.value as DataMappingConfig;
-  const resultData = performDataMapping(getDataForMode(SessionMode.DataEditor).data.value, mapping);
-  // write the result data to the data editor
-  getDataForMode(SessionMode.DataEditor).setData(resultData);
-  statusMessage.value = 'Data mapping performed successfully.';
-  hideDialog();
-}
 
 defineExpose({show: openDialog, close: hideDialog});
 </script>
@@ -162,28 +133,41 @@ defineExpose({show: openDialog, close: hideDialog});
   <Dialog v-model:visible="showDialog" header="Convert Data to Target Schema">
     <ApiKey />
 
+    <p>
+      This will convert the data in the Data Editor tab to satisfy the schema defined in the Schema Editor tab using AI.
+      <br/>
+      To increase the success rate, you can provide additional rules or hints for the mapping in the text field below.
+    </p>
+
     <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
+        <label for="userComments" class="font-bold">Additional rules or hints for the mapping:</label>
+        <InputText id="userComments" v-model="userComments" class="ml-2" style="width: 90%"/>
+
       <p>
-        This will convert the data to the target schema using a hybrid approach with AI. The AI will
-        suggest a mapping between the input data and the target schema.
+        The simple method supports only mappings from path A to path B and simple transformations of a value.
+        The advanced method (JSONata) supports more complex transformations and mappings but has a higher chance of creating invalid mapping configurations that need to be fixed manually.
       </p>
       <div class="vertical-center">
-        <label for="userComments">Data Mapping Remarks:</label>
-        <InputText id="userComments" v-model="userComments" class="ml-2" />
-        <Button label="Generate Mapping Suggestion" @click="generateMappingSuggestion" />
+        <label class="font-bold">Data Mapping Method:</label>
+        <Select v-model="selectedMappingServiceType" :options="mappingServiceTypes" class="ml-2"/>
       </div>
 
-      <div v-if="resultMappingStr.length > 0">
-        <Message severity="success">
-          <p>Data Mapping Suggestion:</p>
-          <pre>{{ resultMappingStr }}</pre>
-        </Message>
+      <Button label="Generate Mapping Suggestion" @click="generateMappingSuggestion" />
 
+
+      <div v-show="result.length > 0" class="justify-content-center gap-3 bigger-dialog-content">
+        <Divider />
+        <label :for="editor_id" class="font-bold">Suggested Mapping Configuration:</label>
+        <div class="parent-container">
+          <div class="h-full editor" :id="editor_id" />
+        </div>
         <Button label="Perform Mapping" @click="performMapping" />
       </div>
 
       <Message severity="info" v-if="statusMessage.length > 0">{{ statusMessage }}</Message>
-      <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
+      <Message severity="error" v-if="errorMessage.length > 0">
+        <span v-html="errorMessage"></span>
+      </Message>
     </div>
   </Dialog>
 </template>
@@ -216,7 +200,15 @@ th {
   font-weight: bold;
 }
 
-.fixed-width {
-  width: 200px;
+.editor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+.parent-container {
+  position: relative;
+  width: 500px;
+  height: 300px;
 }
 </style>

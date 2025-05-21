@@ -1,9 +1,10 @@
-import type {DataMappingConfig} from '@/data-mapping/dataMappingTypes';
+
 import _ from 'lodash';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import {jsonPointerToPathTyped} from '@/utility/pathUtils';
-import {applyTransformations} from '@/data-mapping/applyTransformations';
-import {normalizeJsonPointer} from '@/data-mapping/dataMappingUtils';
+import type {DataMappingConfig} from "@/data-mapping/simple/dataMappingTypes";
+import {applyTransformations} from "@/data-mapping/simple/applyTransformations";
+import {normalizeJsonPointer} from "@/data-mapping/simple/dataMappingUtils";
 
 // Utility Functions
 function getIndexPlaceholders(path: string): string[] {
@@ -75,7 +76,7 @@ function recursiveMap(
   }
 }
 
-export function performDataMapping(inputData: any, mappingConfig: DataMappingConfig): any {
+export function performSimpleDataMapping(inputData: any, mappingConfig: DataMappingConfig): any {
   const outputData: any = {};
 
   // first, apply the transformations to the complete input data
