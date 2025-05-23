@@ -228,7 +228,8 @@ export const queryJsonataExpression = async (
 
   let userMessage = `Real input file subset: \`\`\`${inputFileSubset}\`\`\`.  
   Input file schema: \`\`\`${inputFileSchema}\`\`\`.
-  The goal is to generate an expression to make JSONata transform the input to satisfy this output schema: \`\`\`${targetSchema}\`\`\`. Keep it simple and conservative. Avoid adding new values that do not exist or using overly complex JSONata features.`
+  The goal is to generate an expression to make JSONata transform the input to satisfy this output schema: \`\`\`${targetSchema}\`\`\`. Keep it simple and conservative. Avoid adding new values that do not exist or using overly complex JSONata features.
+  Return a prettified, multi-line JSONata expression, with no extra text or explanation.`;
 
   if (userComments && userComments.length > 0) {
     userMessage += `  

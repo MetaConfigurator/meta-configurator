@@ -11,7 +11,7 @@ import {
     JSONATA_INPUT_EXAMPLE_SCHEMA, JSONATA_OUTPUT_EXAMPLE, JSONATA_OUTPUT_EXAMPLE_SCHEMA,
     JSONATA_REFERENCE_GUIDE
 } from "@/data-mapping/jsonata/jsonataExamples";
-import jsonata, {type JsonataError} from "jsonata";
+import jsonata from "jsonata";
 import {cloneDeep} from "lodash";
 
 export class DataMappingServiceJSONata implements DataMappingService {
@@ -73,13 +73,14 @@ export class DataMappingServiceJSONata implements DataMappingService {
 
         const responseStr = await resultPromise
         statusRef.value = 'Data mapping suggestion generated successfully.';
-        return fixGeneratedExpression(responseStr, 'jsonata');
+        return fixGeneratedExpression(responseStr, ['jsonata', 'json']);
 
 
     }
 
     async performDataMapping(input: any, config: string, statusRef: Ref<string>, errorRef: Ref<string>): Promise<any|undefined> {
         statusRef.value = 'Performing data mapping...';
+        errorRef.value = '';
 
         try {
             const result = await jsonata(config).evaluate(input);
@@ -89,12 +90,10 @@ export class DataMappingServiceJSONata implements DataMappingService {
             return result;
 
         } catch (e) {
+            statusRef.value = '';
+            errorRef.value = 'Data mapping failed. Please check the mapping configuration. Use <a href="https://try.jsonata.org/" target="_blank">https://try.jsonata.org/</a> to validate and fix your JSONata expression.';
+            return undefined;
         }
-
-        statusRef.value = '';
-        errorRef.value = 'Data mapping failed. Please check the mapping configuration. Use <a href="https://try.jsonata.org/" target="_blank">https://try.jsonata.org/</a> to validate and fix your JSONata expression.';
-        return undefined;
-
     }
 
     sanitizeInputDocument(input: any): any {
@@ -108,10 +107,26 @@ export class DataMappingServiceJSONata implements DataMappingService {
         // TODO
     }
 
-    sanitizeMappingConfig(config: string, input: any): { result: string, error: string} {
-        // TODO
-        return { result : config, error: ''}
+    sanitizeMappingConfig(config: string, input: any): string {
+        return config; // TODO
     }
+
+    validateMappingConfig(config: string, input: any): { valid: boolean; error: string | undefined } {
+        const inputDataSubset = cutDataToNEntriesPerArray(input, 3);
+        try {
+            jsonata(config).evaluate(inputDataSubset);
+            return { valid: true, error: undefined};
+        } catch (error) {
+
+            if (error && typeof error === 'object' && 'position' in error && 'code' in error) {
+                return { valid: false, error: 'Error reason: at ' + error.position + " with code " + error.code + " " + JSON.stringify(error) };
+            } else {
+                return { valid: false, error: 'Unknown error' };
+            }
+        }
+
+    }
+
 
 
 

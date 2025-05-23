@@ -1,40 +1,44 @@
-<!-- Dialog to convert data to target schema using hybrid approach with AI -->
-<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
-import {computed, onMounted, type Ref, ref, watch} from 'vue';
+
+<script setup lang="ts">
+import { ref, computed, watch, type Ref, onMounted } from 'vue';
 import Dialog from 'primevue/dialog';
-import Message from 'primevue/message';
-import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 import Select from 'primevue/select';
 import Divider from 'primevue/divider';
+import Message from 'primevue/message';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
-import {SessionMode} from '@/store/sessionMode';
-import {getDataForMode} from '@/data/useDataLink';
-import type {DataMappingService} from "@/data-mapping/dataMappingService";
-import {DataMappingServiceSimple} from "@/data-mapping/simple/dataMappingServiceSimple";
-import {DataMappingServiceJSONata} from "@/data-mapping/jsonata/dataMappingServiceJSONata";
-import {type Editor} from "brace";
-import * as ace from "brace";
-import { setupAceProperties} from "@/components/panels/shared-components/aceUtils";
-import {useSettings} from "@/settings/useSettings";
+import { SessionMode } from '@/store/sessionMode';
+import { getDataForMode } from '@/data/useDataLink';
+import { DataMappingServiceSimple } from '@/data-mapping/simple/dataMappingServiceSimple';
+import { DataMappingServiceJSONata } from '@/data-mapping/jsonata/dataMappingServiceJSONata';
+import type { DataMappingService } from '@/data-mapping/dataMappingService';
+import type { Editor } from 'brace';
+import * as ace from 'brace';
+import { setupAceProperties } from '@/components/panels/shared-components/aceUtils';
+import { useSettings } from '@/settings/useSettings';
+import {useDebounceFn} from "@vueuse/core";
 
 const showDialog = ref(false);
 const editor_id = 'data-mapping-' + Math.random();
 const editorInitialized: Ref<boolean> = ref(false);
-const editor : Ref<Editor | null> = ref(null);
+const editor: Ref<Editor | null> = ref(null);
+const input = ref({});
+const result = ref('');
+const resultIsValid = ref(false);
+const statusMessage = ref('');
+const errorMessage = ref('');
+const userComments = ref('');
 
 const settings = useSettings();
 
-const statusMessage: Ref<string> = ref('');
-const errorMessage: Ref<string> = ref('');
-const userComments: Ref<string> = ref('');
-
 const mappingServiceTypes = [
-    "Simple",
-    "Advanced (JSONata)",
+  'Simple',
+  'Advanced (JSONata)'
 ];
 
 const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]);
+
 const mappingService: Ref<DataMappingService> = computed(() => {
   if (selectedMappingServiceType.value === 'Simple') {
     return new DataMappingServiceSimple();
@@ -45,10 +49,6 @@ const mappingService: Ref<DataMappingService> = computed(() => {
   // Add other mapping service types here
   throw new Error('Invalid mapping service type');
 });
-
-
-const input: Ref<any> = ref({});
-const result: Ref<string> = ref('');
 
 function openDialog() {
   resetDialog();
@@ -61,32 +61,48 @@ function resetDialog() {
   userComments.value = '';
   input.value = {};
   result.value = '';
+  resultIsValid.value = false;
 }
 
 function initializeEditor() {
-  if (editorInitialized.value) {
-    return;
-  }
+  if (!editorInitialized.value) {
+    editor.value = ace.edit(editor_id);
+    setupAceProperties(editor.value, settings.value);
+    editorInitialized.value = true;
 
-  editor.value = ace.edit(editor_id);
-  editorInitialized.value = true;
-  // do not call setupAceMode because we do not want to restrain to a specific data format
-  setupAceProperties(editor.value, settings.value);
+
+    // TODO: watch editor changes to perform validation
+
+    editor.value.on(
+        'change',
+        useDebounceFn(() => {
+
+          const editorContent = editor.value?.getValue();
+          // validate mapping config
+          if (editorContent) {
+
+            const validationResult = mappingService.value.validateMappingConfig(editorContent, input.value);
+            if (!validationResult.valid) {
+              errorMessage.value = validationResult.error!;
+              statusMessage.value = '';
+            } else {
+              errorMessage.value = '';
+              resultIsValid.value = true;
+            }
+          }
+
+        }, 100))
+  }
 }
 
 onMounted(() => {
-  // watch changes to newDocument and update the data in the editor accordingly
-  watch(
-      () => result.value,
-      newValue => {
-        if (newValue.length > 0) {
-          initializeEditor()
-          const editor: Editor = ace.edit(editor_id);
-          editor.setValue(newValue);
-          editor.clearSelection();
-        }
-      }
-  );
+  watch(() => result.value, (newValue) => {
+    if (newValue.length > 0) {
+      initializeEditor();
+      editor.value = ace.edit(editor_id);
+      editor.value?.setValue(newValue, -1);
+    }
+  });
 });
 
 function hideDialog() {
@@ -96,24 +112,22 @@ function hideDialog() {
 function generateMappingSuggestion() {
   input.value = getDataForMode(SessionMode.DataEditor).data.value;
   const targetSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
-
   input.value = mappingService.value.sanitizeInputDocument(input.value);
-
-  mappingService.value.generateMappingSuggestion(input.value, targetSchema, statusMessage, errorMessage, userComments.value).then( (res) => {
-    result.value = res;
-  })
- }
-
+  mappingService.value.generateMappingSuggestion(input.value, targetSchema, statusMessage, errorMessage, userComments.value)
+      .then(res => {
+        result.value = res;
+      });
+}
 
 function performMapping() {
-  const editorContent = editor.value?.getValue();
-  if (!editorContent) {
-    errorMessage.value = 'No mapping configuration found for performing the mapping.';
+  const config = editor.value?.getValue();
+  if (!config) {
+    errorMessage.value = 'No mapping configuration available.';
     statusMessage.value = '';
     return;
   }
 
-  mappingService.value.performDataMapping(input.value, editorContent, statusMessage, errorMessage).then( (resultData) => {
+  mappingService.value.performDataMapping(input.value, config, statusMessage, errorMessage).then( (resultData) => {
     if (resultData === undefined) {
       // error message should be printed by corresponding mapping service
       return;
@@ -124,91 +138,51 @@ function performMapping() {
   });
 }
 
-
-
-defineExpose({show: openDialog, close: hideDialog});
+defineExpose({ show: openDialog, close: hideDialog });
 </script>
 
 <template>
-  <Dialog v-model:visible="showDialog" header="Convert Data to Target Schema">
-    <ApiKey />
+  <Dialog v-model:visible="showDialog" header="Convert Data to Target Schema" :modal="true" :style="{ width: '50vw' }">
+    <div class="space-y-4">
+      <ApiKey />
 
-    <p>
-      This will convert the data in the Data Editor tab to satisfy the schema defined in the Schema Editor tab using AI.
-      <br/>
-      To increase the success rate, you can provide additional rules or hints for the mapping in the text field below.
-    </p>
-
-    <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
-        <label for="userComments" class="font-bold">Additional rules or hints for the mapping:</label>
-        <InputText id="userComments" v-model="userComments" class="ml-2" style="width: 90%"/>
-
-      <p>
-        The simple method supports only mappings from path A to path B and simple transformations of a value.
-        The advanced method (JSONata) supports more complex transformations and mappings but has a higher chance of creating invalid mapping configurations that need to be fixed manually.
+      <p class="text-sm text-gray-700">
+        This tool converts the data from the <strong>Data Editor</strong> to match the schema defined in the <strong>Schema Editor</strong>.
+        You can optionally provide extra instructions below to guide the mapping.
       </p>
-      <div class="vertical-center">
-        <label class="font-bold">Data Mapping Method:</label>
-        <Select v-model="selectedMappingServiceType" :options="mappingServiceTypes" class="ml-2"/>
+
+      <div>
+        <label for="userComments" class="block font-semibold mb-1">Additional Mapping Hints</label>
+        <InputText id="userComments" v-model="userComments" class="w-full" placeholder="e.g., rename fields, format dates..."/>
       </div>
 
-      <Button label="Generate Mapping Suggestion" @click="generateMappingSuggestion" />
+      <div class="flex items-center gap-2">
+        <label class="font-semibold">Mapping Method</label>
+        <Select v-model="selectedMappingServiceType" :options="mappingServiceTypes" class="flex-1"/>
+      </div>
 
+      <Button label="Generate Suggestion" icon="pi pi-wand" @click="generateMappingSuggestion" class="w-full"/>
 
-      <div v-show="result.length > 0" class="justify-content-center gap-3 bigger-dialog-content">
+      <div v-show="result.length > 0" class="mt-6">
         <Divider />
-        <label :for="editor_id" class="font-bold">Suggested Mapping Configuration:</label>
-        <div class="parent-container">
-          <div class="h-full editor" :id="editor_id" />
+        <label :for="editor_id" class="block font-semibold mb-2">Suggested Mapping Configuration</label>
+        <div class="border rounded h-72 overflow-hidden">
+          <div :id="editor_id" class="h-full w-full" />
         </div>
-        <Button label="Perform Mapping" @click="performMapping" />
+        <Button v-if="resultIsValid" label="Perform Mapping" icon="pi pi-play" class="mt-4 w-full" @click="performMapping"/>
       </div>
 
-      <Message severity="info" v-if="statusMessage.length > 0">{{ statusMessage }}</Message>
-      <Message severity="error" v-if="errorMessage.length > 0">
+      <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
+      <Message severity="error" v-if="errorMessage.length">
         <span v-html="errorMessage"></span>
       </Message>
     </div>
   </Dialog>
 </template>
+
+
 <style scoped>
-.bigger-dialog-content {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.vertical-center {
-  display: flex;
-  align-items: center;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  border: 1px solid black;
-  padding: 10px;
-  text-align: center;
-}
-
-th {
-  background-color: #f0f0f0;
-  font-weight: bold;
-}
-
-.editor {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-}
-.parent-container {
-  position: relative;
-  width: 500px;
-  height: 300px;
+label {
+  font-size: 0.9rem;
 }
 </style>

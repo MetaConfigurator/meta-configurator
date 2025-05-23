@@ -4,7 +4,8 @@ import type {Ref} from "vue";
 export interface DataMappingService {
 
 
-    sanitizeMappingConfig(config: string, input: any): { result: string, error: string};
+    sanitizeMappingConfig(config: string, input: any): string;
+    validateMappingConfig(config: string, input: any): { valid: boolean, error: string|undefined};
     sanitizeInputDocument(input: any): any
     generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, statusRef: Ref<string>, errorRef: Ref<string>, userComments: string): Promise<string>
     performDataMapping(input: any, config: string, statusRef: Ref<string>, errorRef: Ref<string>): Promise<any|undefined>

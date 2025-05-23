@@ -14,9 +14,11 @@ export function fixAndParseGeneratedJson(json: string): any {
   }
 }
 
-export function fixGeneratedExpression(json: string, expressionType: string = 'json'): string {
-  if (json.toLowerCase().startsWith(`\`\`\`${expressionType}`) && json.endsWith('```')) {
-    json = json.substring(3 + expressionType.length, json.length - 3);
+export function fixGeneratedExpression(json: string, expressionTypes: string|string[] = 'json'): string {
+  for (const expressionType of (Array.isArray(expressionTypes) ? expressionTypes : [expressionTypes])) {
+    if (json.toLowerCase().startsWith(`\`\`\`${expressionType}`) && json.endsWith('```')) {
+      json = json.substring(3 + expressionType.length, json.length - 3);
+    }
   }
   if (json.startsWith('```') && json.endsWith('```')) {
     json = json.substring(3, json.length - 3);

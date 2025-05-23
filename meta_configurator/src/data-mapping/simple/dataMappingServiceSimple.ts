@@ -5,11 +5,15 @@ import {fixAndParseGeneratedJson, getApiKey} from "@/components/panels/ai-prompt
 import {queryDataMappingConfig} from "@/utility/openai";
 import type {Ref} from "vue";
 import {cutDataToNEntriesPerArray} from "@/data-mapping/dataMappingUtils";
-import {extractSuitableSourcePaths} from "@/data-mapping/simple/extractPathsFromDocument";
+import {
+    extractInvalidSourcePathsFromConfig,
+    extractSuitableSourcePaths
+} from "@/data-mapping/simple/extractPathsFromDocument";
 import {DATA_MAPPING_EXAMPLE_CONFIG, DATA_MAPPING_SCHEMA} from "@/data-mapping/simple/dataMappingSchema";
-import {sanitizeMappingConfiguration} from "@/data-mapping/simple/sanitizeMappingConfiguration";
 import type {DataMappingConfig} from "@/data-mapping/simple/dataMappingTypes";
-import {performSimpleDataMapping} from "@/data-mapping/simple/performDataMapping";
+import {normalizeInputConfig, performSimpleDataMapping} from "@/data-mapping/simple/performDataMapping";
+import {ValidationService} from "@/schema/validationService";
+import * as console from "node:console";
 
 export class DataMappingServiceSimple implements DataMappingService {
 
@@ -66,18 +70,9 @@ export class DataMappingServiceSimple implements DataMappingService {
         );
 
         const responseStr = await resultPromise;
-
-        const sanitizationResponse = this.sanitizeMappingConfig(responseStr, input)
-        const validationError = sanitizationResponse.error;
-        if (validationError.length == 0) {
+        const sanitizedConfig = this.sanitizeMappingConfig(responseStr, input)
             statusRef.value = 'Data mapping suggestion generated successfully.';
-            return sanitizationResponse.result;
-        } else {
-            statusRef.value = '';
-            errorRef.value = validationError;
-            return '';
-        }
-
+            return sanitizedConfig;
     }
 
     performDataMapping(input: any, config: string, statusRef: Ref<string>, errorRef: Ref<string>): Promise<any> {
@@ -87,18 +82,56 @@ export class DataMappingServiceSimple implements DataMappingService {
         console.log("parsed mapping is: ", mapping)
         const result = performSimpleDataMapping(input, mapping);
         statusRef.value = 'Data mapping performed successfully.';
-        return result;
+
+        // still return promise because this is expected
+        return new Promise((resolve) => {
+            resolve(result);
+        });
     }
 
     sanitizeInputDocument(input: any): any {
         return input;
     }
 
-    sanitizeMappingConfig(config: string, input: any): { result: string, error: string} {
+    sanitizeMappingConfig(config: string, input: any): string {
         const configObj = fixAndParseGeneratedJson(config);
-        const validationError = sanitizeMappingConfiguration(configObj, input)
-        return {result: JSON.stringify(configObj, null, 2), error: validationError};
+        const configValidated: DataMappingConfig = configObj as DataMappingConfig;
+
+        // normalize
+        normalizeInputConfig(configObj);
+
+        // remove invalid path mappings or transformations
+        const invalidUsedSourcePaths = extractInvalidSourcePathsFromConfig(configValidated, input);
+        if (invalidUsedSourcePaths.length > 0) {
+            console.log(
+                `The following source paths are not valid in the input file: ${invalidUsedSourcePaths.join(
+                    ', '
+                )}. They will be removed from the configuration.`
+            );
+        }
+        configValidated.mappings = configValidated.mappings.filter(mapping => {
+            return !invalidUsedSourcePaths.includes(mapping.sourcePath);
+        });
+
+        return JSON.stringify(configObj, null, 2);
     }
+
+    validateMappingConfig(config: string, input: any): { valid: boolean; error: string|undefined } {
+        const configSchemaValidator = new ValidationService(DATA_MAPPING_SCHEMA);
+        const configValidationResult = configSchemaValidator.validate(config);
+        if (configValidationResult.errors.length > 0) {
+            const formattedErrors = configValidationResult.errors
+                .map(error => {
+                    return '' + error.message + ' at ' + error.instancePath + ' in ' + error.schemaPath;
+                })
+                .join('\n ');
+            return {valid: false, error: `The data mapping configuration is invalid: ${formattedErrors}`}; // TODO: automated error recovery
+        }
+
+        return {valid: true, error: undefined};
+    }
+
+
 
 
 
