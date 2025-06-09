@@ -30,7 +30,7 @@ export const SETTINGS_DATA_DEFAULT = {
     moveViewToSelectedElement: false,
     automaticZoomMaxValue: 1,
     automaticZoomMinValue: 0.5,
-    mergeAllOfs: true,
+    mergeAllOfs: false,
   },
   metaSchema: {
     allowBooleanSchema: false,
