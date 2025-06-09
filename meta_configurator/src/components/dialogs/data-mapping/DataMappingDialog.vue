@@ -71,8 +71,6 @@ function initializeEditor() {
     editorInitialized.value = true;
 
 
-    // TODO: watch editor changes to perform validation
-
     editor.value.on(
         'change',
         useDebounceFn(() => {
@@ -80,18 +78,24 @@ function initializeEditor() {
           const editorContent = editor.value?.getValue();
           // validate mapping config
           if (editorContent) {
-
-            const validationResult = mappingService.value.validateMappingConfig(editorContent, input.value);
-            if (!validationResult.valid) {
-              errorMessage.value = validationResult.error!;
-              statusMessage.value = '';
-            } else {
-              errorMessage.value = '';
-              resultIsValid.value = true;
-            }
+            validateConfig(editorContent, input.value);
           }
 
         }, 100))
+  }
+}
+
+function validateConfig(config: string, input: any) {
+  const validationResult = mappingService.value.validateMappingConfig(config, input);
+  console.log('Validation Result:', validationResult);
+  console.log('config used for validation:', config);
+  if (!validationResult.success) {
+    errorMessage.value = validationResult.message;
+    statusMessage.value = '';
+    resultIsValid.value = false;
+  } else {
+    errorMessage.value = '';
+    resultIsValid.value = true;
   }
 }
 
@@ -113,9 +117,17 @@ function generateMappingSuggestion() {
   input.value = getDataForMode(SessionMode.DataEditor).data.value;
   const targetSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
   input.value = mappingService.value.sanitizeInputDocument(input.value);
-  mappingService.value.generateMappingSuggestion(input.value, targetSchema, statusMessage, errorMessage, userComments.value)
+  mappingService.value.generateMappingSuggestion(input.value, targetSchema, userComments.value)
       .then(res => {
-        result.value = res;
+        result.value = res.config;
+        if (res.success) {
+          statusMessage.value = res.message;
+          errorMessage.value = '';
+        } else {
+          statusMessage.value = '';
+          errorMessage.value = res.message;
+        }
+        validateConfig(res.config, input.value);
       });
 }
 
@@ -127,14 +139,17 @@ function performMapping() {
     return;
   }
 
-  mappingService.value.performDataMapping(input.value, config, statusMessage, errorMessage).then( (resultData) => {
-    if (resultData === undefined) {
-      // error message should be printed by corresponding mapping service
-      return;
+  mappingService.value.performDataMapping(input.value, config).then( (res) => {
+    if (res.success) {
+      statusMessage.value = res.message;
+      errorMessage.value = '';
+      // write the result data to the data editor
+      getDataForMode(SessionMode.DataEditor).setData(res.resultData);
+      hideDialog();
+    } else {
+      statusMessage.value = '';
+      errorMessage.value = res.message;
     }
-    // write the result data to the data editor
-    getDataForMode(SessionMode.DataEditor).setData(resultData);
-    hideDialog();
   });
 }
 
@@ -163,9 +178,9 @@ defineExpose({ show: openDialog, close: hideDialog });
 
       <Button label="Generate Suggestion" icon="pi pi-wand" @click="generateMappingSuggestion" class="w-full"/>
 
-      <div v-show="result.length > 0" class="mt-6">
+      <div class="mt-6">
         <Divider />
-        <label :for="editor_id" class="block font-semibold mb-2">Suggested Mapping Configuration</label>
+        <label :for="editor_id" class="block font-semibold mb-2">Mapping Configuration</label>
         <div class="border rounded h-72 overflow-hidden">
           <div :id="editor_id" class="h-full w-full" />
         </div>

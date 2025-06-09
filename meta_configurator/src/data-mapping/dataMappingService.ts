@@ -5,9 +5,9 @@ export interface DataMappingService {
 
 
     sanitizeMappingConfig(config: string, input: any): string;
-    validateMappingConfig(config: string, input: any): { valid: boolean, error: string|undefined};
+    validateMappingConfig(config: string, input: any): { success: boolean, message: string};
     sanitizeInputDocument(input: any): any
-    generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, statusRef: Ref<string>, errorRef: Ref<string>, userComments: string): Promise<string>
-    performDataMapping(input: any, config: string, statusRef: Ref<string>, errorRef: Ref<string>): Promise<any|undefined>
+    generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, userComments: string): Promise< { config: string, success: boolean, message: string}>
+    performDataMapping(input: any, config: string): Promise< { resultData: any, success: boolean, message: string} >
 
 }

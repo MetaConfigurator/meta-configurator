@@ -3,7 +3,6 @@ import type {TopLevelSchema} from "@/schema/jsonSchemaType";
 import {inferJsonSchema} from "@/schema/inferJsonSchema";
 import { fixGeneratedExpression, getApiKey} from "@/components/panels/ai-prompts/aiPromptUtils";
 import { queryJsonataExpression} from "@/utility/openai";
-import type {Ref} from "vue";
 import {cutDataToNEntriesPerArray} from "@/data-mapping/dataMappingUtils";
 import {
     JSONATA_EXPRESSION,
@@ -17,9 +16,7 @@ import {cloneDeep} from "lodash";
 export class DataMappingServiceJSONata implements DataMappingService {
 
 
-    async generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, statusRef: Ref<string>, errorRef: Ref<string>, userComments: string): Promise<string> {
-
-        statusRef.value = 'Reducing input data for efficiency...';
+    async generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, userComments: string): Promise< { config: string, success: boolean, message: string} > {
         const cuttingN = ((JSON.stringify(input).length / 1024) > 50) ? 2 : 3;
         const inputDataSubset = cutDataToNEntriesPerArray(input, cuttingN);
         console.log(
@@ -31,11 +28,8 @@ export class DataMappingServiceJSONata implements DataMappingService {
         );
 
         // infer schema for input data
-        statusRef.value = 'Inferring schema for input data...';
         const inputFileSchema = inferJsonSchema(inputDataSubset);
-
         const apiKey = getApiKey();
-        statusRef.value = 'Generating data mapping suggestion...';
 
         const jsonataReferenceStr = JSON.stringify(JSONATA_REFERENCE_GUIDE);
         const jsonataInputExampleStr = JSON.stringify(JSONATA_INPUT_EXAMPLE);
@@ -72,27 +66,42 @@ export class DataMappingServiceJSONata implements DataMappingService {
         );
 
         const responseStr = await resultPromise
-        statusRef.value = 'Data mapping suggestion generated successfully.';
-        return fixGeneratedExpression(responseStr, ['jsonata', 'json']);
+
+        try {
+            const fixedExpression = fixGeneratedExpression(responseStr, ['jsonata', 'json']);
+            return {
+                config: fixedExpression,
+                success: true,
+                message: 'Data mapping suggestion generated successfully.'
+            }
+        } catch (e) {
+            console.error("Error generating mapping suggestion: ", e);
+            return {
+                config: responseStr,
+                success: false,
+                message: 'Failed to generate data mapping suggestion. Please check the console for more details.'
+            }
+        }
 
 
     }
 
-    async performDataMapping(input: any, config: string, statusRef: Ref<string>, errorRef: Ref<string>): Promise<any|undefined> {
-        statusRef.value = 'Performing data mapping...';
-        errorRef.value = '';
-
+    async performDataMapping(input: any, config: string): Promise< { resultData: any, success: boolean, message: string} > {
         try {
             const result = await jsonata(config).evaluate(input);
-            if (result && typeof result === 'object') {
-                statusRef.value = 'Data mapping performed successfully.';
+            return {
+                resultData: result,
+                success: true,
+                message: 'Data mapping performed successfully.'
             }
-            return result;
 
         } catch (e) {
-            statusRef.value = '';
-            errorRef.value = 'Data mapping failed. Please check the mapping configuration. Use <a href="https://try.jsonata.org/" target="_blank">https://try.jsonata.org/</a> to validate and fix your JSONata expression.';
-            return undefined;
+            console.error("Error performing data mapping: ", e);
+            return {
+                resultData: {},
+                success: false,
+                message: `Data mapping failed. Please check the mapping configuration. Use <a href="https://try.jsonata.org/" target="_blank">https://try.jsonata.org/</a> to validate and fix your JSONata expression. Reason: ${e.message}.`
+            }
         }
     }
 
@@ -111,20 +120,38 @@ export class DataMappingServiceJSONata implements DataMappingService {
         return config; // TODO
     }
 
-    validateMappingConfig(config: string, input: any): { valid: boolean; error: string | undefined } {
+    validateMappingConfig(config: string, input: any): { success: boolean, message: string } {
         const inputDataSubset = cutDataToNEntriesPerArray(input, 3);
         try {
             jsonata(config).evaluate(inputDataSubset);
-            return { valid: true, error: undefined};
+            return { success: true, message: 'Mapping configuration is valid.' };
         } catch (error) {
 
-            if (error && typeof error === 'object' && 'position' in error && 'code' in error) {
-                return { valid: false, error: 'Error reason: at ' + error.position + " with code " + error.code + " " + JSON.stringify(error) };
+            if (error && typeof error === 'object' && 'position' in error && 'code' in error && 'message' in error) {
+                const cursorPosition = this.convertTextPositionToCursorPosition( config, error.position as number);
+                return { success: false, message: 'Error reason: ' + error.message + " (row " + (cursorPosition.row+1) + ")."};
             } else {
-                return { valid: false, error: 'Unknown error' };
+                return { success: false, message: 'Unknown error' };
             }
         }
 
+    }
+
+
+    convertTextPositionToCursorPosition(text: string, position: number): { row: number, column: number } {
+        const lines = text.split('\n');
+        let row = 0;
+        let column = position;
+
+        for (let i = 0; i < lines.length; i++) {
+            if (column < lines[i].length) {
+                row = i;
+                break;
+            }
+            column -= lines[i].length + 1; // +1 for the newline character
+        }
+
+        return { row, column };
     }
 
 

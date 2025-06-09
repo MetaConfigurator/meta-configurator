@@ -3,7 +3,6 @@ import type {TopLevelSchema} from "@/schema/jsonSchemaType";
 import {inferJsonSchema} from "@/schema/inferJsonSchema";
 import {fixAndParseGeneratedJson, getApiKey} from "@/components/panels/ai-prompts/aiPromptUtils";
 import {queryDataMappingConfig} from "@/utility/openai";
-import type {Ref} from "vue";
 import {cutDataToNEntriesPerArray} from "@/data-mapping/dataMappingUtils";
 import {
     extractInvalidSourcePathsFromConfig,
@@ -18,10 +17,8 @@ import * as console from "node:console";
 export class DataMappingServiceSimple implements DataMappingService {
 
 
-    async generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, statusRef: Ref<string>,  errorRef: Ref<string>, userComments: string): Promise<string> {
+    async generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, userComments: string): Promise< { config: string, success: boolean, message: string} > {
 
-        statusRef.value = 'Reducing input data for efficiency...';
-        errorRef.value = ''
         console.log("input is: ", input)
         const cuttingN = ((JSON.stringify(input).length / 1024) > 50) ? 2 : 3;
         const inputDataSubset = cutDataToNEntriesPerArray(input, cuttingN);
@@ -34,12 +31,8 @@ export class DataMappingServiceSimple implements DataMappingService {
         );
 
         // infer schema for input data
-        statusRef.value = 'Inferring schema for input data...';
         const inputFileSchema = inferJsonSchema(inputDataSubset);
-
         const apiKey = getApiKey();
-        statusRef.value = 'Generating data mapping suggestion...';
-
         const possibleSourcePaths = extractSuitableSourcePaths(input);
 
         const dataMappingSchemaStr = JSON.stringify(DATA_MAPPING_SCHEMA);
@@ -70,23 +63,41 @@ export class DataMappingServiceSimple implements DataMappingService {
         );
 
         const responseStr = await resultPromise;
-        const sanitizedConfig = this.sanitizeMappingConfig(responseStr, input)
-            statusRef.value = 'Data mapping suggestion generated successfully.';
-            return sanitizedConfig;
+        try {
+            const sanitizedConfig = this.sanitizeMappingConfig(responseStr, input)
+            return {
+                config: sanitizedConfig,
+                success: true,
+                message: 'Data mapping suggestion generated successfully.'
+            }
+        } catch (e) {
+            console.error("Error sanitizing mapping config: ", e);
+            return {
+                config: responseStr,
+                success: false,
+                message: 'Error sanitizing data mapping suggestion: ' + e.message
+            }
+        }
     }
 
-    performDataMapping(input: any, config: string, statusRef: Ref<string>, errorRef: Ref<string>): Promise<any> {
-        statusRef.value = 'Performing data mapping...';
-
+    async performDataMapping(input: any, config: string): Promise< { resultData: any, success: boolean, message: string} > {
         const mapping =  JSON.parse(config) as DataMappingConfig;
         console.log("parsed mapping is: ", mapping)
-        const result = performSimpleDataMapping(input, mapping);
-        statusRef.value = 'Data mapping performed successfully.';
-
-        // still return promise because this is expected
-        return new Promise((resolve) => {
-            resolve(result);
-        });
+        try {
+            const result = performSimpleDataMapping(input, mapping);
+            return {
+                resultData: result,
+                success: true,
+                message: 'Data mapping performed successfully.'
+            }
+        } catch (e) {
+            console.error("Error performing data mapping: ", e);
+            return {
+                resultData: {},
+                success: false,
+                message: 'Error performing data mapping: ' + e.message
+            }
+        }
     }
 
     sanitizeInputDocument(input: any): any {
@@ -116,19 +127,28 @@ export class DataMappingServiceSimple implements DataMappingService {
         return JSON.stringify(configObj, null, 2);
     }
 
-    validateMappingConfig(config: string, input: any): { valid: boolean; error: string|undefined } {
+    validateMappingConfig(config: string, input: any): { success: boolean, message: string } {
         const configSchemaValidator = new ValidationService(DATA_MAPPING_SCHEMA);
-        const configValidationResult = configSchemaValidator.validate(config);
+
+        let configJson: any;
+        // parse config to JSON
+        try {
+            configJson = JSON.parse(config);
+        } catch (e) {
+            return {success: false, message: 'The data mapping configuration is not valid JSON. Please check the syntax and try again.'};
+        }
+
+        const configValidationResult = configSchemaValidator.validate(configJson);
         if (configValidationResult.errors.length > 0) {
             const formattedErrors = configValidationResult.errors
                 .map(error => {
-                    return '' + error.message + ' at ' + error.instancePath + ' in ' + error.schemaPath;
+                    return '' + error.message + ' at path "' + error.instancePath + '" (schema path: "' + error.schemaPath + '").';
                 })
                 .join('\n ');
-            return {valid: false, error: `The data mapping configuration is invalid: ${formattedErrors}`}; // TODO: automated error recovery
+            return {success: false, message: `The data mapping configuration is invalid: ${formattedErrors}`}; // TODO: automated error recovery
         }
 
-        return {valid: true, error: undefined};
+        return {success: true, message: 'The data mapping configuration is valid.'};
     }
 
 
