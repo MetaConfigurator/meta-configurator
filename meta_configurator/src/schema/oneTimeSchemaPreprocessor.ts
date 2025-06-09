@@ -75,7 +75,7 @@ function preprocessOneTimeRecursive(schema: JsonSchemaType | undefined, schemaPa
   preprocessOneTimeRecursive(schema.contentSchema, `${schemaPath}/contentSchema`);
 
   // this is useful for the schema diagram, because then it can render required properties even if there is no further definition
-  createEmptyPropertiesIfRequiredButMissing(schema)
+  createEmptyPropertiesIfRequiredButMissing(schema);
 }
 
 function preprocessSchemaArray(
@@ -156,8 +156,6 @@ function injectTypesOfEnum(schema: JsonSchemaObjectType): void {
   }
 }
 
-
-
 function createEmptyPropertiesIfRequiredButMissing(schema: JsonSchemaObjectType): void {
   if (schema.required) {
     for (const propertyName of schema.required) {
@@ -166,10 +164,9 @@ function createEmptyPropertiesIfRequiredButMissing(schema: JsonSchemaObjectType)
   }
 }
 
-
 function createEmptyPropertyIfRequiredButMissing(
-    schema: JsonSchemaObjectType,
-    propertyName: string
+  schema: JsonSchemaObjectType,
+  propertyName: string
 ): void {
   if (schema.properties === undefined) {
     schema.properties = {};
