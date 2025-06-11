@@ -11,9 +11,8 @@ export type Mapping = {
 };
 
 export type Transformation = {
-  operationType: 'mathFormula' | 'stringOperation' | 'valueMapping';
+  operationType: 'function' | 'valueMapping';
   sourcePath: string;
-  formula?: string;
-  string?: string;
+  function?: string;
   valueMapping?: Record<string, any>;
 };

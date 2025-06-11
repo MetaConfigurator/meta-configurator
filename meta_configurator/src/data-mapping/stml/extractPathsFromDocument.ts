@@ -1,7 +1,7 @@
 import type {Path} from '@/utility/path';
 
-import {normalizeJsonPointer, pathToNormalizedJsonPointer} from "@/data-mapping/simple/dataMappingUtils";
-import type {DataMappingConfig} from "@/data-mapping/simple/dataMappingTypes";
+import {normalizeJsonPointer, pathToNormalizedJsonPointer} from "@/data-mapping/stml/dataMappingUtilsStml";
+import type {DataMappingConfig} from "@/data-mapping/stml/dataMappingTypes";
 
 export function extractSuitableSourcePaths(inputData: any): string[] {
   // finds all leafs in the input json document

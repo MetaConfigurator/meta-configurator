@@ -3,25 +3,24 @@ import type {TopLevelSchema} from "@/schema/jsonSchemaType";
 import {inferJsonSchema} from "@/schema/inferJsonSchema";
 import {fixAndParseGeneratedJson, getApiKey} from "@/components/panels/ai-prompts/aiPromptUtils";
 import {queryDataMappingConfig} from "@/utility/openai";
-import {cutDataToNEntriesPerArray} from "@/data-mapping/dataMappingUtils";
+import {cutDataToMaxSize} from "@/data-mapping/dataMappingUtils";
 import {
     extractInvalidSourcePathsFromConfig,
     extractSuitableSourcePaths
-} from "@/data-mapping/simple/extractPathsFromDocument";
-import {DATA_MAPPING_EXAMPLE_CONFIG, DATA_MAPPING_SCHEMA} from "@/data-mapping/simple/dataMappingSchema";
-import type {DataMappingConfig} from "@/data-mapping/simple/dataMappingTypes";
-import {normalizeInputConfig, performSimpleDataMapping} from "@/data-mapping/simple/performDataMapping";
+} from "@/data-mapping/stml/extractPathsFromDocument";
+import {DATA_MAPPING_EXAMPLE_CONFIG, DATA_MAPPING_SCHEMA} from "@/data-mapping/stml/dataMappingSchema";
+import type {DataMappingConfig} from "@/data-mapping/stml/dataMappingTypes";
+import {normalizeInputConfig, performSimpleDataMapping} from "@/data-mapping/stml/performDataMapping";
 import {ValidationService} from "@/schema/validationService";
 import * as console from "node:console";
 
-export class DataMappingServiceSimple implements DataMappingService {
+export class DataMappingServiceStml implements DataMappingService {
 
 
     async generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, userComments: string): Promise< { config: string, success: boolean, message: string} > {
 
         console.log("input is: ", input)
-        const cuttingN = ((JSON.stringify(input).length / 1024) > 50) ? 2 : 3;
-        const inputDataSubset = cutDataToNEntriesPerArray(input, cuttingN);
+        const inputDataSubset = cutDataToMaxSize(input);
         console.log(
             'Reduced input data from ' +
             JSON.stringify(input).length / 1024 +

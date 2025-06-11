@@ -50,14 +50,14 @@ describe('test transformations for data mapping', () => {
 
   const transformations: Transformation[] = [
     {
-      operationType: 'mathFormula',
+      operationType: 'function',
       sourcePath: '/people/%INDEX_A%/age',
-      formula: 'x + 1',
+      function: 'x + 1',
     },
     {
-      operationType: 'stringOperation',
+      operationType: 'function',
       sourcePath: '/people/%INDEX_A%/name',
-      string: 'uppercase',
+      function: 'x.toUpperCase()',
     },
     {
       operationType: 'valueMapping',

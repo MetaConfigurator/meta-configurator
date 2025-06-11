@@ -77,6 +77,10 @@ describe('test pathUtils', () => {
     const jsonPointer2 = '/properties/foo/bar';
     const expectedResult2 = ['properties', 'foo', 'bar'];
     expect(jsonPointerToPathTyped(jsonPointer2)).toEqual(expectedResult2);
+
+    const jsonPointer3 = '/3/foo/bar';
+    const expectedResult3 = [3, 'foo', 'bar'];
+    expect(jsonPointerToPathTyped(jsonPointer3)).toEqual(expectedResult3);
   });
 
   it('should correctly convert from data path to schema path', () => {

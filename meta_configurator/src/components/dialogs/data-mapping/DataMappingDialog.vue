@@ -10,7 +10,7 @@ import Message from 'primevue/message';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import { SessionMode } from '@/store/sessionMode';
 import { getDataForMode } from '@/data/useDataLink';
-import { DataMappingServiceSimple } from '@/data-mapping/simple/dataMappingServiceSimple';
+import { DataMappingServiceStml } from '@/data-mapping/stml/dataMappingServiceStml';
 import { DataMappingServiceJSONata } from '@/data-mapping/jsonata/dataMappingServiceJSONata';
 import type { DataMappingService } from '@/data-mapping/dataMappingService';
 import type { Editor } from 'brace';
@@ -33,21 +33,31 @@ const userComments = ref('');
 const settings = useSettings();
 
 const mappingServiceTypes = [
-  'Simple',
-  'Advanced (JSONata)'
+  'Advanced (JSONata)',
+  'SimpleTransformationMappingLanguage (STML)',
+];
+
+const mappingServiceWarnings = [
+  'The JSONata mapping service is very expressive flexible, but may generate invalid mappings for complex inputs, which have to manually be corrected.',
+  'The STML mapping service usually generates valid mappings, but it can perform only simple source to target path mappings and value transformations. WARNING: It supports executing arbitrary JavaScript functions as transformations, which may lead to security issues if the input is not properly sanitized.',
 ];
 
 const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]);
 
 const mappingService: Ref<DataMappingService> = computed(() => {
-  if (selectedMappingServiceType.value === 'Simple') {
-    return new DataMappingServiceSimple();
+  if (selectedMappingServiceType.value === 'SimpleTransformationMappingLanguage (STML)') {
+    return new DataMappingServiceStml();
   }
   if (selectedMappingServiceType.value === 'Advanced (JSONata)') {
     return new DataMappingServiceJSONata();
   }
   // Add other mapping service types here
   throw new Error('Invalid mapping service type');
+});
+
+const mappingServiceWarning: Ref<string> = computed(() => {
+  const index = mappingServiceTypes.indexOf(selectedMappingServiceType.value);
+  return mappingServiceWarnings[index] || '';
 });
 
 function openDialog() {
@@ -160,6 +170,10 @@ defineExpose({ show: openDialog, close: hideDialog });
   <Dialog v-model:visible="showDialog" header="Convert Data to Target Schema" :modal="true" :style="{ width: '50vw' }">
     <div class="space-y-4">
       <ApiKey />
+
+      <Message severity="warn" v-if="mappingServiceWarning.length">
+        <span v-html="mappingServiceWarning"></span>
+      </Message>
 
       <p class="text-sm text-gray-700">
         This tool converts the data from the <strong>Data Editor</strong> to match the schema defined in the <strong>Schema Editor</strong>.

@@ -1,8 +1,8 @@
 
 import {dataAt} from '@/utility/resolveDataAtPath';
 import _ from 'lodash';
-import {findMatchingPaths} from "@/data-mapping/simple/findMatchingPaths";
-import type {Transformation} from "@/data-mapping/simple/dataMappingTypes";
+import {findMatchingPaths} from "@/data-mapping/stml/findMatchingPaths";
+import type {Transformation} from "@/data-mapping/stml/dataMappingTypes";
 
 export function applyTransformations(inputData: any, transformations: Transformation[]): any {
   const outputData = JSON.parse(JSON.stringify(inputData)); // Deep clone input data
@@ -28,32 +28,14 @@ function applyTransformationsOnValue(value: any, transformations: Transformation
 
   for (const transformation of transformations) {
     switch (transformation.operationType) {
-      case 'mathFormula':
-        if (typeof transformation.formula === 'string') {
+      case 'function':
+        if (typeof transformation.function === 'string') {
           try {
             // Simple formula evaluator using Function (make sure input is trusted or sandboxed!)
-            const func = new Function('x', `return ${transformation.formula}`);
-            value = func(Number(value));
+            const func = new Function('x', `return ${transformation.function}`);
+            value = func(value);
           } catch (e) {
-            console.warn(`Failed to evaluate math formula "${transformation.formula}":`, e);
-          }
-        }
-        break;
-
-      case 'stringOperation':
-        if (typeof transformation.string === 'string') {
-          switch (transformation.string) {
-            case 'uppercase':
-              value = String(value).toUpperCase();
-              break;
-            case 'lowercase':
-              value = String(value).toLowerCase();
-              break;
-            case 'trim':
-              value = String(value).trim();
-              break;
-            default:
-              console.warn(`Unknown string operation: ${transformation.string}`);
+            console.warn(`Failed to evaluate function "${transformation.function}":`, e);
           }
         }
         break;

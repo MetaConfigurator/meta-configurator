@@ -41,20 +41,15 @@ export const DATA_MAPPING_SCHEMA: TopLevelSchema = {
         properties: {
           operationType: {
             type: 'string',
-            enum: ['mathFormula', 'stringOperation', 'valueMapping'],
+            enum: ['function', 'valueMapping'],
           },
           sourcePath: {
             type: 'string',
             pattern: '^#?/[^/]+(/%INDEX_[A-Z]+)?(/[^/]+(/%INDEX_[A-Z]+)*)*$',
           },
-          formula: {
+          function: {
             type: 'string',
             maxLength: 255,
-          },
-          string: {
-            type: 'string',
-            maxLength: 255,
-            pattern: '%VALUE%',
           },
           valueMapping: {
             type: 'object',
@@ -64,18 +59,12 @@ export const DATA_MAPPING_SCHEMA: TopLevelSchema = {
         required: ['operationType', 'sourcePath'],
         anyOf: [
           {
-            required: ['formula'],
+            description: 'Any JavaScript function. The original value is provided as variable "x".',
+            examples: ['x + 1', 'x * 2', 'x.toUpperCase()'],
+            required: ['function'],
             properties: {
               operationType: {
-                const: 'mathFormula',
-              },
-            },
-          },
-          {
-            required: ['string'],
-            properties: {
-              operationType: {
-                const: 'stringOperation',
+                const: 'function',
               },
             },
           },
@@ -117,7 +106,7 @@ export const DATA_MAPPING_EXAMPLE_CONFIG = {
     {
       operationType: 'mathFormula',
       sourcePath: '/people/%INDEX_A%/age',
-      formula: 'x + 1',
+      function: 'x + 1',
     },
     {
       operationType: 'valueMapping',

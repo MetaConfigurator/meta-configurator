@@ -1,4 +1,24 @@
 
+export function cutDataToMaxSize(data: any, maxSizeInKb: number = 64): any {
+    // initial n is 20
+    let n = 64;
+
+    // cut data to n entries and check size. If it is not yet reached, divide n by 2 and repeat.
+    // minimum n is 2
+    while (true) {
+        const cutData = cutDataToNEntriesPerArray(data, n);
+        const sizeInBytes = new TextEncoder().encode(JSON.stringify(cutData)).length;
+        const sizeInKb = sizeInBytes / 1024; // convert to KB
+        if (sizeInKb <= maxSizeInKb || n <= 2) {
+            return cutData; // return the cut data if size is within limit or n is too small
+        }
+
+        n = Math.floor(n / 2); // reduce n by half
+    }
+}
+
+
+
 export function cutDataToNEntriesPerArray(data: any, n: number): any {
     // data will be a json object or array with an arbitrary hierarchy and anywhere could be arrays
     // we want to cut each array to have only n entries
