@@ -15,7 +15,7 @@ import Ajv2019 from 'ajv/dist/2019';
  * It also supports validating against sub schemas of the top level schema.
  */
 export class ValidationService {
-  static readonly TOP_LEVEL_SCHEMA_KEY = '$topLevelSchema';
+  static readonly TOP_LEVEL_SCHEMA_KEY = 'topLevelSchema';
 
   topLevelSchema: TopLevelSchema;
   private _ajv: Ajv2020 | Ajv2019 | Ajv | undefined;
@@ -107,7 +107,7 @@ export class ValidationService {
     }
 
     if (result.$ref !== undefined) {
-      result.$ref = this.topLevelSchema.$id + result.$ref;
+      result.$ref = this.topLevelSchemaId + result.$ref;
     }
 
     if (result.if) {
