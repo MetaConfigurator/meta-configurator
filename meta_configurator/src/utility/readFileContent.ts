@@ -99,6 +99,6 @@ export function readFileContentForFunction(
       }
     })
     .catch(error => {
-      errorService.onError(error)
+      errorService.onError(error);
     });
 }

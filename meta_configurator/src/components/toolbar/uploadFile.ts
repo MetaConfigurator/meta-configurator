@@ -12,8 +12,8 @@ import {SessionMode} from '@/store/sessionMode';
 export function openUploadFileDialog(resultDataLink: ManagedData): void {
   const {open, onChange, reset} = useFileDialog({
     // accept only json, schema.json, yaml, yml, xml and xsd files
-    accept: ".json, .yaml, .yml, .xml, .schema.json",
-    multiple: false
+    accept: '.json, .yaml, .yml, .xml, .schema.json',
+    multiple: false,
   });
 
   onChange((files: FileList | null) => {
@@ -23,8 +23,8 @@ export function openUploadFileDialog(resultDataLink: ManagedData): void {
 
   // opening it with a small delay might fix the issue of the dialog opening but onChange never triggering
   setTimeout(() => {
-    open()
-  }, 3)
+    open();
+  }, 3);
 }
 
 /**

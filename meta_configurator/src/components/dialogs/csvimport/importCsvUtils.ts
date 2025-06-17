@@ -21,8 +21,8 @@ import {stringToIdentifier} from '@/utility/stringToIdentifier';
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
   const {open, onChange, reset} = useFileDialog({
     // accept only json, schema.json, yaml, yml, xml and xsd files
-    accept: ".csv",
-    multiple: false
+    accept: '.csv',
+    multiple: false,
   });
 
   onChange((files: FileList | null) => {
@@ -35,8 +35,8 @@ export function requestUploadFileToRef(resultString: Ref<string>, resultTableNam
 
   // opening it with a small delay might fix the issue of the dialog opening but onChange never triggering
   setTimeout(() => {
-    open()
-  }, 3)
+    open();
+  }, 3);
 }
 
 export function inferSchemaForNewDataAndMergeIntoCurrentSchema(
