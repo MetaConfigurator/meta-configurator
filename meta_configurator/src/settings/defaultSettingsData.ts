@@ -7,6 +7,11 @@ export const SETTINGS_DATA_DEFAULT = {
   toolbarTitle: 'MetaConfigurator',
   hideSchemaEditor: false,
   hideSettings: false,
+  performance: {
+    maxDocumentSizeForValidation: 1000000, // 1 MB
+    maxDocumentSizeForCursorSynchronization: 1000000, // 1 MB
+    maximumShownChildrenInGuiEditor: 50,
+  },
   codeEditor: {
     fontSize: 14,
     tabSize: 2,
