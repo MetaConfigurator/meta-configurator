@@ -79,7 +79,7 @@ function setupSelectedPathToCursorPosition(editor: Editor, mode: SessionMode) {
       selectionChangeFromOutside = true;
 
 
-        if (sizeof(editor.getValue()) > useSettings().value.performance.maxDocumentSizeForCursorSynchronization) {
+        if (sizeOf(editor.getValue()) > useSettings().value.performance.maxDocumentSizeForCursorSynchronization) {
             // do not determine and update the cursor position when the document is exceeding the maximum size
             return;
         }
