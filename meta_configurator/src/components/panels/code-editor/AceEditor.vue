@@ -3,7 +3,7 @@
  Synchronized with file data from the store.
  -->
 <script setup lang="ts">
-import {onMounted, watch} from 'vue';
+import {computed, onMounted, type Ref, ref, watch} from 'vue';
 import type {Editor} from 'brace';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
@@ -21,6 +21,7 @@ import {useSettings} from '@/settings/useSettings';
 import {modeToDocumentTypeDescription, SessionMode} from '@/store/sessionMode';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 import Message from 'primevue/message';
+import {sizeOf} from '@/utility/sizeOf';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -30,18 +31,19 @@ const settings = useSettings();
 
 // random id is used to enable multiple Ace Editors of same sessionMode on the same page
 const editor_id = 'code-editor-' + props.sessionMode + '-' + Math.random();
+let editor: Ref<Editor | undefined> = ref(undefined);
 
 onMounted(() => {
-  const editor: Editor = ace.edit(editor_id);
-  setupAceMode(editor, settings.value);
-  setupAceProperties(editor, settings.value);
+  editor.value = ace.edit(editor_id);
+  setupAceMode(editor.value, settings.value);
+  setupAceProperties(editor.value, settings.value);
 
-  setupLinkToData(editor, props.sessionMode);
-  setupLinkToCurrentSelection(editor, props.sessionMode);
-  setupAnnotationsFromValidationErrors(editor, props.sessionMode);
+  setupLinkToData(editor.value, props.sessionMode);
+  setupLinkToCurrentSelection(editor.value, props.sessionMode);
+  setupAnnotationsFromValidationErrors(editor.value, props.sessionMode);
 
   if (isEditorReadOnly()) {
-    editor.setReadOnly(true);
+    editor.value.setReadOnly(true);
   }
 });
 
@@ -49,8 +51,9 @@ onMounted(() => {
 watch(
   () => settings.value.dataFormat,
   _ => {
-    const editor: Editor = ace.edit(editor_id);
-    editor.setReadOnly(isEditorReadOnly());
+    if (editor.value) {
+      editor.value.setReadOnly(isEditorReadOnly());
+    }
   }
 );
 
@@ -63,6 +66,18 @@ function isEditorReadOnly(): boolean {
     (mode === SessionMode.SchemaEditor || mode === SessionMode.Settings) && dataFormat === 'xml'
   );
 }
+
+const featuresDisabledForPerformance = computed(() => {
+  if (!editor.value) {
+    return false;
+  }
+  const performanceSettings = settings.value.performance;
+  const editorContentSize = sizeOf(editor.value.getValue());
+  return (
+    editorContentSize > performanceSettings.maxDocumentSizeForValidation ||
+    editorContentSize > performanceSettings.maxDocumentSizeForCursorSynchronization
+  );
+});
 </script>
 
 <template>
@@ -70,6 +85,10 @@ function isEditorReadOnly(): boolean {
     >Read-Only Mode: Making changes to XML in the text editor might lead to unwanted changes in the
     underlying JSON {{ modeToDocumentTypeDescription(props.sessionMode) }} document, because of
     ambiguity and technical restrictions in XML to JSON conversion.</Message
+  >
+  <Message v-if="featuresDisabledForPerformance" severity="warn"
+    >Some editor features are disabled for performance reasons due to the large size of the
+    document.</Message
   >
   <div class="h-full" :id="editor_id" />
 </template>

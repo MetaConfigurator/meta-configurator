@@ -36,6 +36,35 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'If set to true, the complete settings view will be hidden.',
       default: false,
     },
+    performance: {
+      type: 'object',
+      required: ['maxDocumentSizeForValidation', 'maxDocumentSizeForCursorSynchronization'],
+      additionalProperties: false,
+      description: 'Performance related settings belong here.',
+      properties: {
+        maxDocumentSizeForValidation: {
+          type: 'integer',
+          description:
+            'The maximum size of the document to validate in bytes. If the document is larger, it will not be validated.',
+          default: 1000000, // 1 MB
+          minimum: 1000,
+        },
+        maxDocumentSizeForCursorSynchronization: {
+          type: 'integer',
+          description:
+            'The maximum size of the document to synchronize the cursor position in bytes. If the document is larger, the cursor position will not be synchronized.',
+          default: 1000000, // 1 MB
+          minimum: 1000,
+        },
+        maximumShownChildrenInGuiEditor: {
+          type: 'integer',
+          description:
+            'The maximum amount of child nodes to be shown in the GUI editor per parent node. If the document has more children than this value, those will not be shown in the GUI editor, but still exist in the document and can be edited by other panels.',
+          default: 50,
+          minimum: 5,
+        },
+      },
+    },
     codeEditor: {
       type: 'object',
       required: ['fontSize'],
