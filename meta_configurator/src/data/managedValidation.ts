@@ -2,9 +2,8 @@ import {computed} from 'vue';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {ValidationResult, ValidationService} from '@/schema/validationService';
-import {useSettings} from "@/settings/useSettings";
-import {sizeOf} from "@/utility/sizeOf";
-
+import {useSettings} from '@/settings/useSettings';
+import {sizeOf} from '@/utility/sizeOf';
 
 export class ManagedValidation {
   constructor(public mode: SessionMode) {}
