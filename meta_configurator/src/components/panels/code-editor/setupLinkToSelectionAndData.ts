@@ -10,8 +10,8 @@ import {
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {watchImmediate} from '@vueuse/core/index';
-import {useSettings} from "@/settings/useSettings";
-import {sizeOf} from "@/utility/sizeOf";
+import {useSettings} from '@/settings/useSettings';
+import {sizeOf} from '@/utility/sizeOf';
 
 // variables to prevent updating functions to trigger each other
 let selectionChangeFromOutside = false;
@@ -44,10 +44,13 @@ function setupCursorPositionToSelectedPath(editor: Editor, mode: SessionMode) {
         // do not attempt to determine the path when the text does not have valid syntax
         return;
       }
-        if (sizeOf(editor.getValue()) > useSettings().value.performance.maxDocumentSizeForCursorSynchronization) {
-            // do not determine the path when the document is exceeding the maximum size
-            return;
-        }
+      if (
+        sizeOf(editor.getValue()) >
+        useSettings().value.performance.maxDocumentSizeForCursorSynchronization
+      ) {
+        // do not determine the path when the document is exceeding the maximum size
+        return;
+      }
 
       try {
         const newPath = determinePath(editor);
@@ -78,11 +81,13 @@ function setupSelectedPathToCursorPosition(editor: Editor, mode: SessionMode) {
       }
       selectionChangeFromOutside = true;
 
-
-        if (sizeof(editor.getValue()) > useSettings().value.performance.maxDocumentSizeForCursorSynchronization) {
-            // do not determine and update the cursor position when the document is exceeding the maximum size
-            return;
-        }
+      if (
+        sizeof(editor.getValue()) >
+        useSettings().value.performance.maxDocumentSizeForCursorSynchronization
+      ) {
+        // do not determine and update the cursor position when the document is exceeding the maximum size
+        return;
+      }
       updateCursorPositionBasedOnPath(editor, newSelectedElement);
     }
   );
