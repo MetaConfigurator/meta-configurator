@@ -19,15 +19,24 @@ import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
-  const {open, onChange} = useFileDialog();
+  const {open, onChange, reset} = useFileDialog({
+    // accept only json, schema.json, yaml, yml, xml and xsd files
+    accept: '.csv',
+    multiple: false,
+  });
 
   onChange((files: FileList | null) => {
     if (files && files.length > 0) {
       resultTableName.value = stringToIdentifier(files[0].name, true); // Get the name of the first file
       readFileContentToStringRef(files, resultString);
     }
+    reset(); // Reset the file dialog after selection
   });
-  open();
+
+  // opening it with a small delay might fix the issue of the dialog opening but onChange never triggering
+  setTimeout(() => {
+    open();
+  }, 3);
 }
 
 export function inferSchemaForNewDataAndMergeIntoCurrentSchema(
