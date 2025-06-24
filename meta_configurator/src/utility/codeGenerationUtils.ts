@@ -8,6 +8,7 @@ import {
 
 export const SUPPORTED_LANGUAGES = [
   'python',
+  'python (pydantic)',
   'typescript',
   'javascript',
   'rust',
@@ -62,7 +63,8 @@ export async function quicktypeJSONSchema(
 
   return await quicktype({
     inputData,
-    lang: targetLanguage,
+    lang: removeParametersFromLanguage(targetLanguage),
+    rendererOptions: getRendererOptions(targetLanguage),
   });
 }
 
@@ -71,8 +73,8 @@ export async function generateValidationCode(
   schemaFileName: string,
   instanceFileName: string
 ) {
-  const languageAlphaNumerical = formatLanguagesToOnlyAlphaNumerical(language);
-  const template = await loadValidationTemplate(languageAlphaNumerical);
+  const languageId = formatLanguagesToOnlyAlphaNumerical(removeParametersFromLanguage(language));
+  const template = await loadValidationTemplate(languageId);
   if (!template) {
     return undefined;
   }
@@ -99,4 +101,21 @@ async function loadValidationTemplate(language: string): Promise<string | undefi
 function formatLanguagesToOnlyAlphaNumerical(language: string): string {
   // replace C++ with cpp
   return language.toLowerCase().replace(/c\+\+/, 'cpp');
+}
+
+function removeParametersFromLanguage(language: string): string {
+  // remove everything after the first space
+  const index = language.indexOf(' ');
+  if (index !== -1) {
+    return language.substring(0, index);
+  }
+  return language;
+}
+
+function getRendererOptions(language: string): any {
+  const rendererOptions: any = {};
+  if (language.includes('pydantic')) {
+    rendererOptions['pydantic-base-model'] = true;
+  }
+  return rendererOptions;
 }
