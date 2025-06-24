@@ -61,7 +61,6 @@ export async function quicktypeJSONSchema(
   const inputData = new InputData();
   inputData.addInput(schemaInput);
 
-
   return await quicktype({
     inputData,
     lang: removeParametersFromLanguage(targetLanguage),
@@ -115,7 +114,7 @@ function removeParametersFromLanguage(language: string): string {
 
 function getRendererOptions(language: string): any {
   const rendererOptions: any = {};
-  if (language.includes("pydantic")) {
+  if (language.includes('pydantic')) {
     rendererOptions['pydantic-base-model'] = true;
   }
   return rendererOptions;
