@@ -21,6 +21,7 @@ You can generate code in the following languages:
 * Objective-C
 * PHP
 * Python
+* Python (pydantic)
 * Ruby
 * Rust
 * Scala
