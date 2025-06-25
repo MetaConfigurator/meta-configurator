@@ -38,7 +38,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     performance: {
       type: 'object',
-      required: ['maxDocumentSizeForValidation', 'maxDocumentSizeForCursorSynchronization', 'maxDocumentSizeForSchemaInference', 'minObjectPropertyCountToPreserve', 'maxShownChildrenInGuiEditor'],
+      required: [
+        'maxDocumentSizeForValidation',
+        'maxDocumentSizeForCursorSynchronization',
+        'maxDocumentSizeForSchemaInference',
+        'minObjectPropertyCountToPreserve',
+        'maxShownChildrenInGuiEditor',
+      ],
       additionalProperties: false,
       description: 'Performance related settings belong here.',
       properties: {
@@ -59,7 +65,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         maxDocumentSizeForSchemaInference: {
           type: 'integer',
           description:
-              'The maximum size of the document to infer the schema from in bytes. If the document is larger, a smart algorithm is used to trim the document first and then infer the schema from the smaller, trimmed input document.',
+            'The maximum size of the document to infer the schema from in bytes. If the document is larger, a smart algorithm is used to trim the document first and then infer the schema from the smaller, trimmed input document.',
           default: 250000, // 250 KB
           minimum: 1000,
         },
