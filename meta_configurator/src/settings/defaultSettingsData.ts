@@ -8,9 +8,10 @@ export const SETTINGS_DATA_DEFAULT = {
   hideSchemaEditor: false,
   hideSettings: false,
   performance: {
-    maxDocumentSizeForValidation: 1000000, // 1 MB
-    maxDocumentSizeForCursorSynchronization: 1000000, // 1 MB
-    maximumShownChildrenInGuiEditor: 50,
+    maxDocumentSizeForValidation: 1024000, // 1 MiB
+    maxDocumentSizeForCursorSynchronization: 1240000, // 1 MiB
+    maxDocumentSizeForSchemaInference: 40960, // 40 KiB
+    maxShownChildrenInGuiEditor: 50,
   },
   codeEditor: {
     fontSize: 14,

@@ -38,7 +38,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     performance: {
       type: 'object',
-      required: ['maxDocumentSizeForValidation', 'maxDocumentSizeForCursorSynchronization'],
+      required: ['maxDocumentSizeForValidation', 'maxDocumentSizeForCursorSynchronization', 'maxDocumentSizeForSchemaInference', 'maxShownChildrenInGuiEditor'],
       additionalProperties: false,
       description: 'Performance related settings belong here.',
       properties: {
@@ -56,7 +56,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: 1000000, // 1 MB
           minimum: 1000,
         },
-        maximumShownChildrenInGuiEditor: {
+        maxDocumentSizeForSchemaInference: {
+          type: 'integer',
+          description:
+              'The maximum size of the document to infer the schema from in bytes. If the document is larger, a smart algorithm is used to trim the document first and then infer the schema from the smaller, trimmed input document.',
+          default: 250000, // 250 KB
+          minimum: 1000,
+        },
+        maxShownChildrenInGuiEditor: {
           type: 'integer',
           description:
             'The maximum amount of child nodes to be shown in the GUI editor per parent node. If the document has more children than this value, those will not be shown in the GUI editor, but still exist in the document and can be edited by other panels.',

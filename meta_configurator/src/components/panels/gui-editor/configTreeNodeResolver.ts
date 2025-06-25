@@ -196,8 +196,8 @@ export class ConfigTreeNodeResolver {
       );
     }
 
-    if (children.length > settings.value.performance.maximumShownChildrenInGuiEditor) {
-      children = children.slice(0, settings.value.performance.maximumShownChildrenInGuiEditor);
+    if (children.length > settings.value.performance.maxShownChildrenInGuiEditor) {
+      children = children.slice(0, settings.value.performance.maxShownChildrenInGuiEditor);
     }
 
     return children;
@@ -462,8 +462,8 @@ export class ConfigTreeNodeResolver {
       });
     }
     let exceedsChildrenLimit = false;
-    if (children.length > settings.value.performance.maximumShownChildrenInGuiEditor) {
-      children = children.slice(0, settings.value.performance.maximumShownChildrenInGuiEditor);
+    if (children.length > settings.value.performance.maxShownChildrenInGuiEditor) {
+      children = children.slice(0, settings.value.performance.maxShownChildrenInGuiEditor);
       exceedsChildrenLimit = true;
     }
     if (this.shouldAddAddItemNode(schema, data) && !exceedsChildrenLimit) {
