@@ -21,7 +21,9 @@ export interface SettingsInterfaceRoot {
 export interface SettingsInterfacePerformance {
   maxDocumentSizeForValidation: number; // in bytes
   maxDocumentSizeForCursorSynchronization: number; // in bytes
-  maximumShownChildrenInGuiEditor: number;
+  maxDocumentSizeForSchemaInference: number; // in bytes
+  minObjectPropertyCountToPreserve: number; // when large document is trimmed, this is minimum count of object properties to be preserved
+  maxShownChildrenInGuiEditor: number;
 }
 
 export interface SettingsInterfaceCodeEditor {
