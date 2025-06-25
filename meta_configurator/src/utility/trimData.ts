@@ -1,15 +1,15 @@
 
-export function trimDataToMaxSize(data: any, maxSizeInKiB: number = 64): any {
+export function trimDataToMaxSize(data: any, maxSizeInKiB: number = 64, minObjectPropertyCountToPreserve: number = 16): any {
     let n = 64;
 
     // cut data to n entries and check size. If it is not yet reached, divide n by 2 and repeat.
     // minimum n is 2
     while (true) {
         const dataTrimmedArrays = trimDataToNEntriesPerArray(data, n);
-        // we trim object properties to n*8, because even in the minimum case we want to preserve at least 16 properties.
+        // we trim object properties to n*8, because even in the minimum case we want to preserve at least 16 properties (or more, if defined in the parameter minObjectPropertyCountToPreserve).
         // properties normally should not be cut at all, except the schema uses patternProperties or additionalProperties and the user has hundreds or millions of same-looking objects
         // therefore, trim object properties very conservatively only, but do it if necessary.
-        const dataTrimmedBoth = trimDataToNPropertiesPerObject(dataTrimmedArrays, n * 8);
+        const dataTrimmedBoth = trimDataToNPropertiesPerObject(dataTrimmedArrays, Math.max(n * 8, minObjectPropertyCountToPreserve));
         const sizeInBytes = new TextEncoder().encode(JSON.stringify(dataTrimmedBoth)).length;
         const sizeInKiB = sizeInBytes / 1024; // convert to KiB
         if (sizeInKiB <= maxSizeInKiB || n <= 2) {
