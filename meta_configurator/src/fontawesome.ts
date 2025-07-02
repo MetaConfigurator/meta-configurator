@@ -39,7 +39,7 @@ import {
   faListUl,
   faFileCode,
   faShare,
-  faScissors,
+  faScissors, faBook,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -98,4 +98,5 @@ export function registerIcons() {
   library.add(faFileCodeRegular);
   library.add(faShare);
   library.add(faScissors);
+  library.add(faBook);
 }
