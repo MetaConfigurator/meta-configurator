@@ -4,8 +4,8 @@ import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {ErrorObject} from 'ajv';
 
 export enum OutputFormat {
-    HTML = 'html',
-    Markdown = 'markdown'
+  HTML = 'html',
+  Markdown = 'markdown',
 }
 
 /**
@@ -54,7 +54,7 @@ export function describeSchema(
   deep: boolean = false,
   indentation = 0,
   validationErrors: ErrorObject[] = [],
-    outputFormat: OutputFormat = OutputFormat.HTML
+  outputFormat: OutputFormat = OutputFormat.HTML
 ): string {
   if (schema.isAlwaysTrue) {
     return paragraph(`This schema is ${bold('always', outputFormat)} valid.`, outputFormat);
@@ -79,7 +79,7 @@ function describeObjectSchema(
   deep: boolean = false,
   indentation = 0,
   validationErrors: ErrorObject[] = [],
-    outputFormat: OutputFormat = OutputFormat.HTML
+  outputFormat: OutputFormat = OutputFormat.HTML
 ): string {
   let result = '';
   if (deep) {
@@ -136,7 +136,11 @@ function describeObjectSchema(
   return div(result, outputFormat, undefined, false);
 }
 
-function describeRequired(outputFormat: OutputFormat, propertyName?: string, parentSchema?: JsonSchemaWrapper): string {
+function describeRequired(
+  outputFormat: OutputFormat,
+  propertyName?: string,
+  parentSchema?: JsonSchemaWrapper
+): string {
   if (!propertyName) {
     return '';
   }
@@ -151,7 +155,11 @@ function describeRequired(outputFormat: OutputFormat, propertyName?: string, par
   return paragraph(`This property is ${bold('required', outputFormat)}.`, outputFormat);
 }
 
-function describeType(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeType(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.type.length === NUMBER_OF_PROPERTY_TYPES) {
     return '';
   }
@@ -177,12 +185,18 @@ function describeRequiredProperties(
   outputFormat: OutputFormat
 ): string {
   if (schema.required && schema.required.length > 0) {
-    return paragraph(`The following properties are ${formatAsErrorIfInvalid(
-      bold('required', outputFormat),
-      'required',
-      validationErrors
-    )}: 
-          ${ul(schema.required.map(p => formatValue(p)), outputFormat)}`, outputFormat);
+    return paragraph(
+      `The following properties are ${formatAsErrorIfInvalid(
+        bold('required', outputFormat),
+        'required',
+        validationErrors
+      )}: 
+          ${ul(
+            schema.required.map(p => formatValue(p)),
+            outputFormat
+          )}`,
+      outputFormat
+    );
   }
   return '';
 }
@@ -193,18 +207,33 @@ function describeProperties(schema: JsonSchemaWrapper, outputFormat: OutputForma
       ? Object.keys(schema.properties).filter(p => !schema.required?.includes(p))
       : Object.keys(schema.properties);
     if (optionalProperties.length > 0) {
-      return paragraph(`The following properties are optional: 
-              ${ul(optionalProperties.map(p => formatValue(p)), outputFormat)}`, outputFormat);
+      return paragraph(
+        `The following properties are optional: 
+              ${ul(
+                optionalProperties.map(p => formatValue(p)),
+                outputFormat
+              )}`,
+        outputFormat
+      );
     }
   }
   return '';
 }
 
-function describePropertyNames(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describePropertyNames(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.hasType('object') && schema.propertyNames && !schema.propertyNames.isAlwaysTrue) {
     return paragraph(
-      `The ${formatAsErrorIfInvalid(bold('property names', outputFormat), 'propertyNames', validationErrors)} 
-      must match the following schema: ${describeSubSchema(schema.propertyNames)}`, outputFormat
+      `The ${formatAsErrorIfInvalid(
+        bold('property names', outputFormat),
+        'propertyNames',
+        validationErrors
+      )} 
+      must match the following schema: ${describeSubSchema(schema.propertyNames)}`,
+      outputFormat
     );
   }
   return '';
@@ -230,7 +259,11 @@ function describePatternProperties(schema: JsonSchemaWrapper, outputFormat: Outp
   return '';
 }
 
-function describeMultipleOf(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeMultipleOf(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.multipleOf) {
     const multipleOf = `The value must be ${formatAsErrorIfInvalid(
       bold('divisible', outputFormat) + ' by ' + formatValue(schema.multipleOf),
@@ -242,7 +275,11 @@ function describeMultipleOf(schema: JsonSchemaWrapper, validationErrors: ErrorOb
   return '';
 }
 
-function describeItems(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeItems(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.hasType('array') && schema.items && !schema.items.isAlwaysTrue) {
     const minItems = schema.minItems ?? 0;
     const maxItems = schema.maxItems;
@@ -262,7 +299,8 @@ function describeItems(schema: JsonSchemaWrapper, validationErrors: ErrorObject[
       result += formatAsErrorIfInvalid(atMost, 'maxItems', validationErrors);
     }
     if (uniqueItems) {
-      result += ' ' + formatAsErrorIfInvalid(bold('unique', outputFormat), 'uniqueItems', validationErrors);
+      result +=
+        ' ' + formatAsErrorIfInvalid(bold('unique', outputFormat), 'uniqueItems', validationErrors);
     }
     result += ' items ';
     if (typeof schema.items === 'object' && schema.items.type && schema.items.type.length > 0) {
@@ -277,7 +315,11 @@ function describeItems(schema: JsonSchemaWrapper, validationErrors: ErrorObject[
   return '';
 }
 
-function describeStringLength(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeStringLength(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   const min = schema.minLength;
   const max = schema.maxLength;
 
@@ -310,7 +352,8 @@ function describeStringLength(schema: JsonSchemaWrapper, validationErrors: Error
 
 function describeMinimumAndMaximum(
   schema: JsonSchemaWrapper,
-  validationErrors: ErrorObject[], outputFormat: OutputFormat
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
 ): string {
   const min = schema.minimum;
   const max = schema.maximum;
@@ -367,19 +410,30 @@ function describeMinimumAndMaximum(
 
 function describeExamples(schema: JsonSchemaWrapper, outputFormat: OutputFormat): string {
   if (schema.examples.length > 0) {
-    return `Examples: ${ul(schema.examples.map(e => formatValue(e)), outputFormat)}`;
+    return `Examples: ${ul(
+      schema.examples.map(e => formatValue(e)),
+      outputFormat
+    )}`;
   }
   return '';
 }
 
-function describeEnum(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeEnum(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.enum && schema.enum.length > 0) {
     return (
       `The value must be ${formatAsErrorIfInvalid(
         'one of the following values:',
         'enum',
         validationErrors
-      )}` + ul(schema.enum.map(e => formatValue(e)), outputFormat)
+      )}` +
+      ul(
+        schema.enum.map(e => formatValue(e)),
+        outputFormat
+      )
     );
   }
   return '';
@@ -409,7 +463,11 @@ function describeDefault(schema: JsonSchemaWrapper, outputFormat: OutputFormat):
   return '';
 }
 
-function describeContains(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeContains(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.contains) {
     const min = schema.minContains ?? 1;
     const max = schema.maxContains;
@@ -426,7 +484,8 @@ function describeContains(schema: JsonSchemaWrapper, validationErrors: ErrorObje
           bold('at most ' + formatValue(max), outputFormat),
           'maxContains',
           validationErrors
-        )}`, outputFormat
+        )}`,
+        outputFormat
       );
     }
     return paragraph(
@@ -436,13 +495,17 @@ function describeContains(schema: JsonSchemaWrapper, validationErrors: ErrorObje
         validationErrors
       )}
        ${describeSubSchema(schema.contains, undefined, schema)}`,
-        outputFormat
+      outputFormat
     );
   }
   return '';
 }
 
-function describeConst(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeConst(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.const) {
     const constString = `The value must be ${formatValue(schema.const)}.`;
     return paragraph(formatAsErrorIfInvalid(constString, 'const', validationErrors), outputFormat);
@@ -450,13 +513,17 @@ function describeConst(schema: JsonSchemaWrapper, validationErrors: ErrorObject[
   return '';
 }
 
-function describeNot(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeNot(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.not) {
     const not = `The following schema must ${bold('not', outputFormat)} be fulfilled: `;
     return paragraph(
       formatAsErrorIfInvalid(not, 'not', validationErrors) +
         `<br> ${describeSubSchema(schema.not, undefined, schema)}`,
-        outputFormat
+      outputFormat
     );
   }
   return '';
@@ -464,12 +531,19 @@ function describeNot(schema: JsonSchemaWrapper, validationErrors: ErrorObject[],
 
 function describeAllOf(schema: JsonSchemaWrapper, outputFormat: OutputFormat): string {
   if (schema.allOf && schema.allOf.length > 0) {
-    return 'All of the following schemas must be fulfilled: ' + schemaDescriptionList(schema.allOf, outputFormat);
+    return (
+      'All of the following schemas must be fulfilled: ' +
+      schemaDescriptionList(schema.allOf, outputFormat)
+    );
   }
   return '';
 }
 
-function describeAnyOf(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeAnyOf(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.anyOf && schema.anyOf.length > 0) {
     return (
       'At least ' +
@@ -481,7 +555,11 @@ function describeAnyOf(schema: JsonSchemaWrapper, validationErrors: ErrorObject[
   return '';
 }
 
-function describeOneOf(schema: JsonSchemaWrapper, validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeOneOf(
+  schema: JsonSchemaWrapper,
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   if (schema.oneOf && schema.oneOf.length > 0) {
     return (
       'Exactly ' +
@@ -495,7 +573,8 @@ function describeOneOf(schema: JsonSchemaWrapper, validationErrors: ErrorObject[
 
 function describeAdditionalProperties(
   schema: JsonSchemaWrapper,
-  validationErrors: ErrorObject[], outputFormat: OutputFormat
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
 ): string {
   if (!schema.hasType('object')) {
     return '';
@@ -510,7 +589,7 @@ function describeAdditionalProperties(
         'additionalProperties',
         validationErrors
       )} are allowed.`,
-        outputFormat
+      outputFormat
     );
   }
   return paragraph(
@@ -523,7 +602,7 @@ function describeAdditionalProperties(
       undefined,
       schema
     )}`,
-      outputFormat
+    outputFormat
   );
 }
 
@@ -536,7 +615,8 @@ function describeComment(schema: JsonSchemaWrapper, outputFormat: OutputFormat):
 
 function describeFormatAndPattern(
   schema: JsonSchemaWrapper,
-  validationErrors: ErrorObject[], outputFormat: OutputFormat
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
 ): string {
   if (schema.format) {
     let format = `The value must be ${formatValue(schema.format)}`;
@@ -602,11 +682,16 @@ function describeFormatAndPattern(
   return '';
 }
 
-function describeSchemaValidationErrors(validationErrors: ErrorObject[], outputFormat: OutputFormat): string {
+function describeSchemaValidationErrors(
+  validationErrors: ErrorObject[],
+  outputFormat: OutputFormat
+): string {
   return paragraph(
     `The following validation errors were found: ${ul(
-      validationErrors.map(e => formatError((e.message ?? '') + ' (at ' + e.instancePath + ')')), outputFormat
-    )}`, outputFormat
+      validationErrors.map(e => formatError((e.message ?? '') + ' (at ' + e.instancePath + ')')),
+      outputFormat
+    )}`,
+    outputFormat
   );
 }
 
@@ -626,7 +711,7 @@ function formatType(type: SchemaPropertyType[]): string {
 function formatAsErrorIfInvalid(
   display: string,
   keyword: string,
-  validationErrors: ErrorObject[],
+  validationErrors: ErrorObject[]
 ): string {
   const relevantErrors = validationErrors.filter(e => e.keyword === keyword);
   if (relevantErrors.length === 0) {
@@ -645,14 +730,17 @@ function formatError(error: string): string {
 }
 
 function schemaDescriptionList(schemas: JsonSchemaWrapper[], outputFormat: OutputFormat): string {
-  return ul(schemas.map(s => describeSubSchema(s, undefined, undefined)), outputFormat);
+  return ul(
+    schemas.map(s => describeSubSchema(s, undefined, undefined)),
+    outputFormat
+  );
 }
 
 function describeSubSchema(
   schema: JsonSchemaWrapper,
   key?: string,
   parentSchema?: JsonSchemaWrapper,
-    outputFormat: OutputFormat = OutputFormat.HTML
+  outputFormat: OutputFormat = OutputFormat.HTML
 ): string {
   let result = describeSchema(schema, key, parentSchema, false, 1);
   if (isBlank(result)) {
@@ -680,7 +768,9 @@ function ul(elements: any[], outputFormat: OutputFormat): string {
 }
 
 function bold(text: any, outputFormat: OutputFormat): string {
-  return outputFormat === OutputFormat.Markdown ? `**${text}**` : `<b class='font-bold'>${text}</b>`;
+  return outputFormat === OutputFormat.Markdown
+    ? `**${text}**`
+    : `<b class='font-bold'>${text}</b>`;
 }
 
 function italic(text: any, outputFormat: OutputFormat): string {
@@ -691,7 +781,12 @@ function isBlank(str: string): boolean {
   return !str || /^\s*$/.test(str);
 }
 
-function div(text: string, outputFormat: OutputFormat, indentation?: number, isInlineListItem: boolean = false): string {
+function div(
+  text: string,
+  outputFormat: OutputFormat,
+  indentation?: number,
+  isInlineListItem: boolean = false
+): string {
   if (outputFormat === OutputFormat.Markdown) {
     const margin = indentation ? ' '.repeat(indentation * 2) : '';
     return `${margin}${text}\n\n`;
