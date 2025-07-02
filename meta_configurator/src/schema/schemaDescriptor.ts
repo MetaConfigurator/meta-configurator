@@ -130,12 +130,10 @@ function describeObjectSchema(
   }
 
   if (indentation > 0) {
-    return `<div style="margin-left: ${indentation * 2}rem; display: inline-list-item">
-                  ${result}
-              </div>`;
+    return div(result, outputFormat, indentation, true);
   }
 
-  return `<div>${result}</div>`;
+  return div(result, outputFormat, undefined, false);
 }
 
 function describeRequired(outputFormat: OutputFormat, propertyName?: string, parentSchema?: JsonSchemaWrapper): string {
@@ -628,7 +626,7 @@ function formatType(type: SchemaPropertyType[]): string {
 function formatAsErrorIfInvalid(
   display: string,
   keyword: string,
-  validationErrors: ErrorObject[]
+  validationErrors: ErrorObject[],
 ): string {
   const relevantErrors = validationErrors.filter(e => e.keyword === keyword);
   if (relevantErrors.length === 0) {
@@ -653,16 +651,15 @@ function schemaDescriptionList(schemas: JsonSchemaWrapper[], outputFormat: Outpu
 function describeSubSchema(
   schema: JsonSchemaWrapper,
   key?: string,
-  parentSchema?: JsonSchemaWrapper
+  parentSchema?: JsonSchemaWrapper,
+    outputFormat: OutputFormat = OutputFormat.HTML
 ): string {
   let result = describeSchema(schema, key, parentSchema, false, 1);
   if (isBlank(result)) {
     result = describeSchema(schema, key, parentSchema, true, 1);
   }
   if (isBlank(result)) {
-    result = `<div style="margin-left: 2rem;">
-                 There are no constraints on this property.
-              </div>`;
+    result = div('There are no constraints on this property.', outputFormat, 1);
   }
   return result;
 }
@@ -692,4 +689,15 @@ function italic(text: any, outputFormat: OutputFormat): string {
 
 function isBlank(str: string): boolean {
   return !str || /^\s*$/.test(str);
+}
+
+function div(text: string, outputFormat: OutputFormat, indentation?: number, isInlineListItem: boolean = false): string {
+  if (outputFormat === OutputFormat.Markdown) {
+    const margin = indentation ? ' '.repeat(indentation * 2) : '';
+    return `${margin}${text}\n\n`;
+  } else {
+    const marginStyle = indentation ? `margin-left: ${indentation * 2}rem;` : '';
+    const displayStyle = isInlineListItem ? 'display: inline-list-item;' : '';
+    return `<div style="${marginStyle} ${displayStyle}">${text}</div>`;
+  }
 }
