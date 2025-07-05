@@ -1,6 +1,12 @@
 MetaConfigurator
 ================
 
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MetaConfigurator/meta-configurator/e2e.yml?label=End%20to%20End%20Tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MetaConfigurator/meta-configurator/npm-test.yml?label=Unit%20Tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MetaConfigurator/meta-configurator/github-pages.yml?label=Github%20Pages%20Build)
+![GitHub License](https://img.shields.io/github/license/MetaConfigurator/meta-configurator)
+
+
 🚀 What is MetaConfigurator?
 ----------------------------
 

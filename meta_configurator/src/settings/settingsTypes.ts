@@ -6,6 +6,7 @@ export interface SettingsInterfaceRoot {
   toolbarTitle: string;
   hideSchemaEditor: boolean;
   hideSettings: boolean;
+  performance: SettingsInterfacePerformance;
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
   schemaDiagram: SettingsInterfaceSchemaDiagram;
@@ -15,6 +16,14 @@ export interface SettingsInterfaceRoot {
   backend: SettingsInterfaceBackend;
   rdf: SettingsInterfaceRdf;
   aiIntegration: SettingsInterfaceAiIntegraton;
+}
+
+export interface SettingsInterfacePerformance {
+  maxDocumentSizeForValidation: number; // in bytes
+  maxDocumentSizeForCursorSynchronization: number; // in bytes
+  maxDocumentSizeForSchemaInference: number; // in bytes
+  minObjectPropertyCountToPreserve: number; // when large document is trimmed, this is minimum count of object properties to be preserved
+  maxShownChildrenInGuiEditor: number;
 }
 
 export interface SettingsInterfaceCodeEditor {

@@ -7,6 +7,13 @@ export const SETTINGS_DATA_DEFAULT = {
   toolbarTitle: 'MetaConfigurator',
   hideSchemaEditor: false,
   hideSettings: false,
+  performance: {
+    maxDocumentSizeForValidation: 1024000, // 1 MiB
+    maxDocumentSizeForCursorSynchronization: 1240000, // 1 MiB
+    maxDocumentSizeForSchemaInference: 40960, // 40 KiB
+    minObjectPropertyCountToPreserve: 16, // when large document is trimmed, this is minimum count of object properties to be preserved
+    maxShownChildrenInGuiEditor: 50,
+  },
   codeEditor: {
     fontSize: 14,
     tabSize: 2,
@@ -30,7 +37,7 @@ export const SETTINGS_DATA_DEFAULT = {
     moveViewToSelectedElement: false,
     automaticZoomMaxValue: 1,
     automaticZoomMinValue: 0.5,
-    mergeAllOfs: true,
+    mergeAllOfs: false,
   },
   metaSchema: {
     allowBooleanSchema: false,

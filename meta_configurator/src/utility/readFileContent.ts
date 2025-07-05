@@ -41,7 +41,7 @@ async function readFileContentFromFileList(
     // parse the file content depending on the file suffix
     const fileName = file.name;
     for (const formatName of formatRegistry.getFormatNames()) {
-      if (fileName.endsWith(formatName)) {
+      if (fileName.toLowerCase().endsWith(formatName.toLowerCase())) {
         return formatRegistry.getFormat(formatName).dataConverter.parse(await fileContentAsString);
       }
     }
@@ -98,5 +98,7 @@ export function readFileContentForFunction(
         fct(contents as any);
       }
     })
-    .catch(error => errorService.onError(error));
+    .catch(error => {
+      errorService.onError(error);
+    });
 }

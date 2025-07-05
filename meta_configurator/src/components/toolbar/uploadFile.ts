@@ -10,13 +10,21 @@ import {SessionMode} from '@/store/sessionMode';
  * @param resultDataLink The DataLink to which the file content should be written
  */
 export function openUploadFileDialog(resultDataLink: ManagedData): void {
-  const {open, onChange} = useFileDialog();
+  const {open, onChange, reset} = useFileDialog({
+    // accept only json, schema.json, yaml, yml, xml and xsd files
+    accept: '.json, .yaml, .yml, .xml, .schema.json',
+    multiple: false,
+  });
 
   onChange((files: FileList | null) => {
     readFileContentToDataLink(files, resultDataLink);
+    reset(); // Reset the file dialog after selection
   });
 
-  open();
+  // opening it with a small delay might fix the issue of the dialog opening but onChange never triggering
+  setTimeout(() => {
+    open();
+  }, 3);
 }
 
 /**

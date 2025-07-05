@@ -195,6 +195,11 @@ export class ConfigTreeNodeResolver {
         this.createObjectChildrenTreeNodes(mode, {absolutePath, relativePath, schema, depth})
       );
     }
+
+    if (children.length > settings.value.performance.maxShownChildrenInGuiEditor) {
+      children = children.slice(0, settings.value.performance.maxShownChildrenInGuiEditor);
+    }
+
     return children;
   }
 
@@ -456,7 +461,12 @@ export class ConfigTreeNodeResolver {
         );
       });
     }
-    if (this.shouldAddAddItemNode(schema, data)) {
+    let exceedsChildrenLimit = false;
+    if (children.length > settings.value.performance.maxShownChildrenInGuiEditor) {
+      children = children.slice(0, settings.value.performance.maxShownChildrenInGuiEditor);
+      exceedsChildrenLimit = true;
+    }
+    if (this.shouldAddAddItemNode(schema, data) && !exceedsChildrenLimit) {
       return children.concat(
         this.createAddItemTreeNode({absolutePath, relativePath, schema, depth: depth + 1}, children)
       );

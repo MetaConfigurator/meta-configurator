@@ -66,7 +66,8 @@ function handleAllOfs(schema: JsonSchemaType, mode: SessionMode) {
     schema.allOf = schema.allOf!.map(subSchema => resolveAndTransform(subSchema, mode));
 
     schema = extractIfsOfAllOfs(schema, mode);
-    schema = mergeAllOfs(schema);
+    // do not merge deeply, as this could merge and mess up conditions of children properties
+    schema = mergeAllOfs(schema, false);
   }
   return schema;
 }

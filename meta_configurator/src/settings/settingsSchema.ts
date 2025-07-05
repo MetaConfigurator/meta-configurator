@@ -36,6 +36,55 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'If set to true, the complete settings view will be hidden.',
       default: false,
     },
+    performance: {
+      type: 'object',
+      required: [
+        'maxDocumentSizeForValidation',
+        'maxDocumentSizeForCursorSynchronization',
+        'maxDocumentSizeForSchemaInference',
+        'minObjectPropertyCountToPreserve',
+        'maxShownChildrenInGuiEditor',
+      ],
+      additionalProperties: false,
+      description: 'Performance related settings belong here.',
+      properties: {
+        maxDocumentSizeForValidation: {
+          type: 'integer',
+          description:
+            'The maximum size of the document to validate in bytes. If the document is larger, it will not be validated.',
+          default: 1000000, // 1 MB
+          minimum: 1000,
+        },
+        maxDocumentSizeForCursorSynchronization: {
+          type: 'integer',
+          description:
+            'The maximum size of the document to synchronize the cursor position in bytes. If the document is larger, the cursor position will not be synchronized.',
+          default: 1000000, // 1 MB
+          minimum: 1000,
+        },
+        maxDocumentSizeForSchemaInference: {
+          type: 'integer',
+          description:
+            'The maximum size of the document to infer the schema from in bytes. If the document is larger, a smart algorithm is used to trim the document first and then infer the schema from the smaller, trimmed input document.',
+          default: 250000, // 250 KB
+          minimum: 1000,
+        },
+        minObjectPropertyCountToPreserve: {
+          type: 'integer',
+          description:
+            'When large documents are trimmed, this is the minimum count of object properties to be preserved. This is used to avoid trimming too much data from objects with many properties. The value can be increased in this setting if in your application more properties are cut than desired during the performance optimization.',
+          default: 16,
+          minimum: 16,
+        },
+        maxShownChildrenInGuiEditor: {
+          type: 'integer',
+          description:
+            'The maximum amount of child nodes to be shown in the GUI editor per parent node. If the document has more children than this value, those will not be shown in the GUI editor, but still exist in the document and can be edited by other panels.',
+          default: 50,
+          minimum: 5,
+        },
+      },
+    },
     codeEditor: {
       type: 'object',
       required: ['fontSize'],
