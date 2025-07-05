@@ -134,6 +134,13 @@ export class MenuItems {
       },
     ];
 
+    if (settings.panels.hidden.includes("aiPrompts")) {
+      result = result.filter( menuItem => {
+        // exclude the "Utility" menu item
+        return !(menuItem.label === "Utility")
+      })
+    }
+
     result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.DataEditor, settings));
 
     return result;

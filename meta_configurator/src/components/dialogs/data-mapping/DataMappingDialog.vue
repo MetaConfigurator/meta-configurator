@@ -1,6 +1,6 @@
 
 <script setup lang="ts">
-import { ref, computed, watch, type Ref, onMounted } from 'vue';
+import {ref, computed, watch, type Ref, onMounted, nextTick} from 'vue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -18,6 +18,7 @@ import * as ace from 'brace';
 import { setupAceProperties } from '@/components/panels/shared-components/aceUtils';
 import { useSettings } from '@/settings/useSettings';
 import {useDebounceFn} from "@vueuse/core";
+import ProgressSpinner from "primevue/progressspinner";
 
 const showDialog = ref(false);
 const editor_id = 'data-mapping-' + Math.random();
@@ -29,6 +30,7 @@ const resultIsValid = ref(false);
 const statusMessage = ref('');
 const errorMessage = ref('');
 const userComments = ref('');
+const isLoadingMapping = ref(false);
 
 const settings = useSettings();
 
@@ -60,9 +62,39 @@ const mappingServiceWarning: Ref<string> = computed(() => {
   return mappingServiceWarnings[index] || '';
 });
 
+
+onMounted(() => {
+  // when a new result is generated: replace the editor content with it
+  watch(() => result.value, (newValue) => {
+    if (newValue.length > 0) {
+      editor.value = ace.edit(editor_id);
+      editor.value?.setValue(newValue, -1);
+    }
+  });
+});
+
+watch(showDialog, async (visible) => {
+  // when the dialog turns visible, initialize the editor
+  if (visible) {
+    await nextTick(); // Wait until dialog content is rendered
+    initializeEditor();
+
+    if (result.value.length > 0) {
+      editor.value?.setValue(result.value, -1);
+    }
+  }
+});
+
 function openDialog() {
+  // when the dialog is opened, reset old values and load the current input data into the component, sanitize it
   resetDialog();
+  input.value = getDataForMode(SessionMode.DataEditor).data.value;
+  input.value = mappingService.value.sanitizeInputDocument(input.value);
   showDialog.value = true;
+}
+
+function hideDialog() {
+  showDialog.value = false;
 }
 
 function resetDialog() {
@@ -75,30 +107,39 @@ function resetDialog() {
 }
 
 function initializeEditor() {
-  if (!editorInitialized.value) {
-    editor.value = ace.edit(editor_id);
-    setupAceProperties(editor.value, settings.value);
-    editorInitialized.value = true;
+  const container = document.getElementById(editor_id);
 
-
-    editor.value.on(
-        'change',
-        useDebounceFn(() => {
-
-          const editorContent = editor.value?.getValue();
-          // validate mapping config
-          if (editorContent) {
-            validateConfig(editorContent, input.value);
-          }
-
-        }, 100))
+  if (!container) {
+    console.log("Unable to initialize editor because element is not found.");
+    return;
   }
+
+  // Destroy any existing editor if present
+  if (editor.value) {
+    editor.value.destroy();
+    editor.value.container.innerHTML = ''; // Clean up old editor DOM
+    editor.value = null;
+    editorInitialized.value = false;
+  }
+
+  editor.value = ace.edit(editor_id);
+  setupAceProperties(editor.value, settings.value);
+
+  editorInitialized.value = true;
+
+  editor.value.on(
+      'change',
+      useDebounceFn(() => {
+        const editorContent = editor.value?.getValue();
+        if (editorContent) {
+          validateConfig(editorContent, input.value);
+        }
+      }, 100)
+  );
 }
 
 function validateConfig(config: string, input: any) {
   const validationResult = mappingService.value.validateMappingConfig(config, input);
-  console.log('Validation Result:', validationResult);
-  console.log('config used for validation:', config);
   if (!validationResult.success) {
     errorMessage.value = validationResult.message;
     statusMessage.value = '';
@@ -109,24 +150,11 @@ function validateConfig(config: string, input: any) {
   }
 }
 
-onMounted(() => {
-  watch(() => result.value, (newValue) => {
-    if (newValue.length > 0) {
-      initializeEditor();
-      editor.value = ace.edit(editor_id);
-      editor.value?.setValue(newValue, -1);
-    }
-  });
-});
 
-function hideDialog() {
-  showDialog.value = false;
-}
 
 function generateMappingSuggestion() {
-  input.value = getDataForMode(SessionMode.DataEditor).data.value;
+  isLoadingMapping.value = true;
   const targetSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
-  input.value = mappingService.value.sanitizeInputDocument(input.value);
   mappingService.value.generateMappingSuggestion(input.value, targetSchema, userComments.value)
       .then(res => {
         result.value = res.config;
@@ -137,6 +165,7 @@ function generateMappingSuggestion() {
           statusMessage.value = '';
           errorMessage.value = res.message;
         }
+        isLoadingMapping.value = false;
         validateConfig(res.config, input.value);
       });
 }
@@ -191,6 +220,7 @@ defineExpose({ show: openDialog, close: hideDialog });
       </div>
 
       <Button label="Generate Suggestion" icon="pi pi-wand" @click="generateMappingSuggestion" class="w-full"/>
+      <ProgressSpinner v-if="isLoadingMapping" />
 
       <div class="mt-6">
         <Divider />
