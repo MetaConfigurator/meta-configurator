@@ -200,19 +200,18 @@ User comments for clarification: \`\`\`${userComments}\`\`\``;
   ]);
 };
 
-
 export const queryJsonataExpression = async (
-    apiKey: string,
-    jsonataReferenceGuide: string,
-    exampleInput: string,
-    exampleInputSchema: string,
-    exampleOutput: string,
-    exampleOutputSchema: string,
-    exampleExpression: string,
-    inputFileSubset: string,
-    inputFileSchema: string,
-    targetSchema: string,
-    userComments: string
+  apiKey: string,
+  jsonataReferenceGuide: string,
+  exampleInput: string,
+  exampleInputSchema: string,
+  exampleOutput: string,
+  exampleOutputSchema: string,
+  exampleExpression: string,
+  inputFileSubset: string,
+  inputFileSchema: string,
+  targetSchema: string,
+  userComments: string
 ) => {
   const systemMessage = `You are a JSON and JSONata Data Mapping expert. Your task is to generate a JSONata expression for transforming the user input document to satisfy the given output JSON schema.
   Only output **valid JSONata**, which is a single JSON-like expression. Do not use multi-line functions, JavaScript-style blocks, or function declarations like "function($x) {...}". JSONata only supports inline expressions, conditionals, filters, maps, and built-in functions.

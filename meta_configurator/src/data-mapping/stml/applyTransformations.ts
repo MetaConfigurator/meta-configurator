@@ -1,8 +1,7 @@
-
 import {dataAt} from '@/utility/resolveDataAtPath';
 import _ from 'lodash';
-import {findMatchingPaths} from "@/data-mapping/stml/findMatchingPaths";
-import type {Transformation} from "@/data-mapping/stml/dataMappingTypes";
+import {findMatchingPaths} from '@/data-mapping/stml/findMatchingPaths';
+import type {Transformation} from '@/data-mapping/stml/dataMappingTypes';
 
 export function applyTransformations(inputData: any, transformations: Transformation[]): any {
   const outputData = JSON.parse(JSON.stringify(inputData)); // Deep clone input data
