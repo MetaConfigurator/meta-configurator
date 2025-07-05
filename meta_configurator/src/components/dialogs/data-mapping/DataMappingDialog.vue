@@ -11,7 +11,7 @@ import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import { SessionMode } from '@/store/sessionMode';
 import { getDataForMode } from '@/data/useDataLink';
 import { DataMappingServiceStml } from '@/data-mapping/stml/dataMappingServiceStml';
-import { DataMappingServiceJSONata } from '@/data-mapping/jsonata/dataMappingServiceJSONata';
+import { DataMappingServiceJsonata } from '@/data-mapping/jsonata/dataMappingServiceJsonata';
 import type { DataMappingService } from '@/data-mapping/dataMappingService';
 import type { Editor } from 'brace';
 import * as ace from 'brace';
@@ -51,7 +51,7 @@ const mappingService: Ref<DataMappingService> = computed(() => {
     return new DataMappingServiceStml();
   }
   if (selectedMappingServiceType.value === 'Advanced (JSONata)') {
-    return new DataMappingServiceJSONata();
+    return new DataMappingServiceJsonata();
   }
   // Add other mapping service types here
   throw new Error('Invalid mapping service type');

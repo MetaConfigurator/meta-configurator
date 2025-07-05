@@ -13,7 +13,7 @@ import jsonata from "jsonata";
 import {cloneDeep} from "lodash";
 import {trimDataToMaxSize} from "@/utility/trimData";
 
-export class DataMappingServiceJSONata implements DataMappingService {
+export class DataMappingServiceJsonata implements DataMappingService {
 
 
     async generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, userComments: string): Promise< { config: string, success: boolean, message: string} > {
