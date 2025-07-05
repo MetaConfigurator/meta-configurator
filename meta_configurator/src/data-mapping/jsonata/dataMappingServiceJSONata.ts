@@ -3,7 +3,6 @@ import type {TopLevelSchema} from "@/schema/jsonSchemaType";
 import {inferJsonSchema} from "@/schema/inferJsonSchema";
 import { fixGeneratedExpression, getApiKey} from "@/components/panels/ai-prompts/aiPromptUtils";
 import { queryJsonataExpression} from "@/utility/openai";
-import {cutDataToMaxSize} from "@/data-mapping/dataMappingUtils";
 import {
     JSONATA_EXPRESSION,
     JSONATA_INPUT_EXAMPLE,
@@ -12,12 +11,13 @@ import {
 } from "@/data-mapping/jsonata/jsonataExamples";
 import jsonata from "jsonata";
 import {cloneDeep} from "lodash";
+import {trimDataToMaxSize} from "@/utility/trimData";
 
 export class DataMappingServiceJSONata implements DataMappingService {
 
 
     async generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, userComments: string): Promise< { config: string, success: boolean, message: string} > {
-        const inputDataSubset = cutDataToMaxSize(input);
+        const inputDataSubset = trimDataToMaxSize(input);
         console.log(
             'Reduced input data from ' +
             JSON.stringify(input).length / 1024 +
@@ -120,7 +120,7 @@ export class DataMappingServiceJSONata implements DataMappingService {
     }
 
     validateMappingConfig(config: string, input: any): { success: boolean, message: string } {
-        const inputDataSubset = cutDataToMaxSize(input);
+        const inputDataSubset = trimDataToMaxSize(input);
         try {
             jsonata(config).evaluate(inputDataSubset);
             return { success: true, message: 'Mapping configuration is valid.' };

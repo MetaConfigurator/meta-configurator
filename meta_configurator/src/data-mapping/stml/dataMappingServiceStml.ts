@@ -3,7 +3,6 @@ import type {TopLevelSchema} from "@/schema/jsonSchemaType";
 import {inferJsonSchema} from "@/schema/inferJsonSchema";
 import {fixAndParseGeneratedJson, getApiKey} from "@/components/panels/ai-prompts/aiPromptUtils";
 import {queryDataMappingConfig} from "@/utility/openai";
-import {cutDataToMaxSize} from "@/data-mapping/dataMappingUtils";
 import {
     extractInvalidSourcePathsFromConfig,
     extractSuitableSourcePaths
@@ -13,6 +12,7 @@ import type {DataMappingConfig} from "@/data-mapping/stml/dataMappingTypes";
 import {normalizeInputConfig, performSimpleDataMapping} from "@/data-mapping/stml/performDataMapping";
 import {ValidationService} from "@/schema/validationService";
 import * as console from "node:console";
+import {trimDataToMaxSize} from "@/utility/trimData";
 
 export class DataMappingServiceStml implements DataMappingService {
 
@@ -20,7 +20,7 @@ export class DataMappingServiceStml implements DataMappingService {
     async generateMappingSuggestion(input: any, targetSchema: TopLevelSchema, userComments: string): Promise< { config: string, success: boolean, message: string} > {
 
         console.log("input is: ", input)
-        const inputDataSubset = cutDataToMaxSize(input);
+        const inputDataSubset = trimDataToMaxSize(input);
         console.log(
             'Reduced input data from ' +
             JSON.stringify(input).length / 1024 +
