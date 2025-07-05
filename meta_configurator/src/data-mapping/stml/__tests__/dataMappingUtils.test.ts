@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
-import {normalizeJsonPointer, pathToNormalizedJsonPointer} from '../dataMappingUtils';
+import {normalizeJsonPointer, pathToNormalizedJsonPointer} from '../dataMappingUtilsStml';
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
