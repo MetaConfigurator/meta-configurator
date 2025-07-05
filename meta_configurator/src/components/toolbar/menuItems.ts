@@ -26,6 +26,7 @@ export class MenuItems {
   private readonly showImportCsvDialog: () => void;
   private readonly showSnapshotDialog: () => void;
   private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
+  private readonly showDataMappingDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
@@ -35,6 +36,7 @@ export class MenuItems {
     showImportCsvDialog: () => void,
     showSnapshotDialog: () => void,
     showCodeGenerationDialog: (schemaMode: boolean) => void,
+    showDataMappingDialog: () => void,
     inferJsonSchemaFromSampleData: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
@@ -43,6 +45,7 @@ export class MenuItems {
     this.showImportCsvDialog = showImportCsvDialog;
     this.showSnapshotDialog = showSnapshotDialog;
     this.showCodeGenerationDialog = showCodeGenerationDialog;
+    this.showDataMappingDialog = showDataMappingDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
   }
 
@@ -88,6 +91,18 @@ export class MenuItems {
           downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
       },
       {
+        label: 'Utility',
+        icon: 'fa-solid fa-wrench',
+        key: 'utility',
+        items: [
+          {
+            label: 'Transform Data to match the Schema',
+            icon: 'fa-solid fa-wand-magic-sparkles',
+            command: this.showDataMappingDialog,
+          },
+        ],
+      },
+      {
         label: 'Share Snapshot',
         icon: 'fa-solid fa-share',
         command: this.showSnapshotDialog,
@@ -118,6 +133,13 @@ export class MenuItems {
         separator: true,
       },
     ];
+
+    if (settings.panels.hidden.includes('aiPrompts')) {
+      result = result.filter(menuItem => {
+        // exclude the "Utility" menu item
+        return !(menuItem.label === 'Utility');
+      });
+    }
 
     result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.DataEditor, settings));
 

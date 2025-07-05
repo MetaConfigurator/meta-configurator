@@ -48,6 +48,7 @@
     "json-schema-merge-allof": "^0.8.1",
     "json-schema-resolver": "^2.0.0",
     "json-schema-to-typescript": "^13.0.1",
+    "jsonata": "^2.0.6",
     "lodash": "^4.17.21",
     "node-fetch": "^3.3.1",
     "pinia": "^2.0.36",
