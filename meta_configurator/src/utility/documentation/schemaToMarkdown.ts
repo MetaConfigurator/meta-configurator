@@ -9,7 +9,7 @@ export function schemaToMarkdown(schemaData: any) {
     const graph = constructSchemaGraph(schemaData, true);
     const md: string[] = [];
 
-    md.push("## **Table of Contents**");
+    md.push("## Table of Contents");
     md.push("");
 
     const addedAnchors = new Set<string>();
@@ -18,10 +18,11 @@ export function schemaToMarkdown(schemaData: any) {
         if (!["schemaobject", "schemaenum"].includes(node.getNodeType())) return;
 
         const name = node.title ?? node.name ?? "Unnamed";
-        const anchor = toAnchor(name);
+        const cleanName = name.replace(/\*\*/g, "").trim();
+        const anchor = toAnchor(cleanName);
 
         if (!addedAnchors.has(anchor)) {
-            md.push(`- [${name.trim()}](#${anchor})`);
+            md.push(`- [${cleanName}](#${anchor})`);
             addedAnchors.add(anchor);
         }
     });
@@ -30,17 +31,24 @@ export function schemaToMarkdown(schemaData: any) {
         const nodeType = node.getNodeType();
         if (!["schemaobject", "schemaenum"].includes(nodeType)) return;
 
-        const name = node.title ?? node.name ?? "Unnamed";
+        const rawName = node.title ?? node.name ?? "Unnamed";
+        const name = rawName.replace(/\*\*/g, "").trim();
         const description = node.description ?? "";
 
+        md.push("");
         md.push("---");
-        md.push(`## **${name}**`);
-        if (description) md.push(`*${description}*`);
+        md.push("");
+        md.push(`## ${name}`);
+        if (description) {
+            md.push("");
+            md.push(`*${description}*`);
+        }
 
         if (nodeType === "schemaobject") {
             const objectNode = node as SchemaObjectNodeData;
 
             if (Array.isArray(objectNode.attributes) && objectNode.attributes.length > 0) {
+                md.push("");
                 md.push("### Properties");
                 md.push("");
                 md.push("| Name | Type | Required | Description | Default | Example |");
@@ -49,7 +57,9 @@ export function schemaToMarkdown(schemaData: any) {
                 objectNode.attributes.forEach((attr: SchemaObjectAttributeData) => {
                     const name = attr.name ?? "-";
                     const type = attr.typeDescription ?? "-";
-                    const required = attr.required ? '<span style="color:lightblue">true</span>' : '<span style="color:salmon">false</span>';
+                    const required = attr.required
+                        ? '<span style="color:lightblue">true</span>'
+                        : '<span style="color:salmon">false</span>';
                     const desc = attr.schema?.description ?? "-";
 
                     const defValue = generateDefaultValue(attr.schema);
@@ -65,7 +75,8 @@ export function schemaToMarkdown(schemaData: any) {
             }
 
             if (objectNode.example) {
-                md.push("### **Example**");
+                md.push("");
+                md.push("### Example");
                 md.push("");
                 md.push("```json");
                 md.push(JSON.stringify(objectNode.example, null, 2));
@@ -81,7 +92,7 @@ export function schemaToMarkdown(schemaData: any) {
             md.push("### Values");
             md.push("");
             enumNode.values.forEach((val) => {
-                md.push(`- ${val}`);
+                md.push(`- \`${val}\``);
             });
             md.push("");
         }
@@ -119,6 +130,7 @@ function generateDefaultValue(schema: any): any {
             return `{${schema.type ?? "value"}}`;
     }
 }
+
 function toAnchor(text: string): string {
     return text
         .toLowerCase()
