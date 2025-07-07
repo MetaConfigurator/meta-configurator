@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {type DataMappingConfig} from '../dataMappingTypes';
-import {performSimpleDataMapping} from "../performDataMapping";
+import {performSimpleDataMapping} from '../performDataMapping';
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
@@ -207,62 +207,55 @@ describe('test performing data mappings on a given input file, based on a mappin
   });
 });
 
-
-
 // there used to be a bug that for a target array at root level the array indexes are confused for object keys
-  describe('test performing data mappings when the root element is an array', () => {
-    const inputDataArrayRoot = [
+describe('test performing data mappings when the root element is an array', () => {
+  const inputDataArrayRoot = [
+    {
+      name: 'John Doe',
+      age: 30,
+      address: {
+        street: '123 Main St',
+        city: 'Anytown',
+        zip: '12345',
+      },
+    },
+    {
+      name: 'Jane Smith',
+      age: 25,
+      address: {
+        street: '456 Elm St',
+        city: 'Othertown',
+        zip: '67890',
+      },
+    },
+  ];
+
+  const mappingConfigArrayRoot: DataMappingConfig = {
+    mappings: [
       {
-        name: 'John Doe',
+        sourcePath: '/%INDEX_A%/name',
+        targetPath: '/%INDEX_A%/fullName',
+      },
+      {
+        sourcePath: '/%INDEX_A%/age',
+        targetPath: '/%INDEX_A%/age',
+      },
+    ],
+    transformations: [],
+  };
+
+  it('test the complete mapping with array root', () => {
+    const result = performSimpleDataMapping(inputDataArrayRoot, mappingConfigArrayRoot);
+
+    expect(result).toEqual([
+      {
+        fullName: 'John Doe',
         age: 30,
-        address: {
-          street: '123 Main St',
-          city: 'Anytown',
-          zip: '12345',
-        },
       },
       {
-        name: 'Jane Smith',
+        fullName: 'Jane Smith',
         age: 25,
-        address: {
-          street: '456 Elm St',
-          city: 'Othertown',
-          zip: '67890',
-        },
       },
-    ];
-
-    const mappingConfigArrayRoot: DataMappingConfig = {
-      mappings: [
-        {
-          sourcePath: '/%INDEX_A%/name',
-          targetPath: '/%INDEX_A%/fullName',
-        },
-        {
-          sourcePath: '/%INDEX_A%/age',
-          targetPath: '/%INDEX_A%/age',
-        },
-      ],
-      transformations: [],
-    };
-
-    it('test the complete mapping with array root', () => {
-      const result = performSimpleDataMapping(inputDataArrayRoot, mappingConfigArrayRoot);
-
-      expect(result).toEqual(
-        [
-          {
-            fullName: 'John Doe',
-            age: 30,
-          },
-          {
-            fullName: 'Jane Smith',
-            age: 25,
-          },
-        ],
-      );
-    });
-
+    ]);
   });
-
-
+});

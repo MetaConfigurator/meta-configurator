@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import {ref, computed, watch, type Ref, onMounted, nextTick} from 'vue';
 import Dialog from 'primevue/dialog';
@@ -8,17 +7,17 @@ import Select from 'primevue/select';
 import Divider from 'primevue/divider';
 import Message from 'primevue/message';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
-import { SessionMode } from '@/store/sessionMode';
-import { getDataForMode } from '@/data/useDataLink';
-import { DataMappingServiceStml } from '@/data-mapping/stml/dataMappingServiceStml';
-import { DataMappingServiceJsonata } from '@/data-mapping/jsonata/dataMappingServiceJsonata';
-import type { DataMappingService } from '@/data-mapping/dataMappingService';
-import type { Editor } from 'brace';
+import {SessionMode} from '@/store/sessionMode';
+import {getDataForMode} from '@/data/useDataLink';
+import {DataMappingServiceStml} from '@/data-mapping/stml/dataMappingServiceStml';
+import {DataMappingServiceJsonata} from '@/data-mapping/jsonata/dataMappingServiceJsonata';
+import type {DataMappingService} from '@/data-mapping/dataMappingService';
+import type {Editor} from 'brace';
 import * as ace from 'brace';
-import { setupAceProperties } from '@/components/panels/shared-components/aceUtils';
-import { useSettings } from '@/settings/useSettings';
-import {useDebounceFn} from "@vueuse/core";
-import ProgressSpinner from "primevue/progressspinner";
+import {setupAceProperties} from '@/components/panels/shared-components/aceUtils';
+import {useSettings} from '@/settings/useSettings';
+import {useDebounceFn} from '@vueuse/core';
+import ProgressSpinner from 'primevue/progressspinner';
 
 const showDialog = ref(false);
 const editor_id = 'data-mapping-' + Math.random();
@@ -34,10 +33,7 @@ const isLoadingMapping = ref(false);
 
 const settings = useSettings();
 
-const mappingServiceTypes = [
-  'Advanced (JSONata)',
-  'SimpleTransformationMappingLanguage (STML)',
-];
+const mappingServiceTypes = ['Advanced (JSONata)', 'SimpleTransformationMappingLanguage (STML)'];
 
 const mappingServiceWarnings = [
   'The JSONata mapping service is very expressive flexible, but may generate invalid mappings for complex inputs, which have to manually be corrected.',
@@ -62,18 +58,20 @@ const mappingServiceWarning: Ref<string> = computed(() => {
   return mappingServiceWarnings[index] || '';
 });
 
-
 onMounted(() => {
   // when a new result is generated: replace the editor content with it
-  watch(() => result.value, (newValue) => {
-    if (newValue.length > 0) {
-      editor.value = ace.edit(editor_id);
-      editor.value?.setValue(newValue, -1);
+  watch(
+    () => result.value,
+    newValue => {
+      if (newValue.length > 0) {
+        editor.value = ace.edit(editor_id);
+        editor.value?.setValue(newValue, -1);
+      }
     }
-  });
+  );
 });
 
-watch(showDialog, async (visible) => {
+watch(showDialog, async visible => {
   // when the dialog turns visible, initialize the editor
   if (visible) {
     await nextTick(); // Wait until dialog content is rendered
@@ -110,7 +108,7 @@ function initializeEditor() {
   const container = document.getElementById(editor_id);
 
   if (!container) {
-    console.log("Unable to initialize editor because element is not found.");
+    console.log('Unable to initialize editor because element is not found.');
     return;
   }
 
@@ -128,13 +126,13 @@ function initializeEditor() {
   editorInitialized.value = true;
 
   editor.value.on(
-      'change',
-      useDebounceFn(() => {
-        const editorContent = editor.value?.getValue();
-        if (editorContent) {
-          validateConfig(editorContent, input.value);
-        }
-      }, 100)
+    'change',
+    useDebounceFn(() => {
+      const editorContent = editor.value?.getValue();
+      if (editorContent) {
+        validateConfig(editorContent, input.value);
+      }
+    }, 100)
   );
 }
 
@@ -150,24 +148,23 @@ function validateConfig(config: string, input: any) {
   }
 }
 
-
-
 function generateMappingSuggestion() {
   isLoadingMapping.value = true;
   const targetSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
-  mappingService.value.generateMappingSuggestion(input.value, targetSchema, userComments.value)
-      .then(res => {
-        result.value = res.config;
-        if (res.success) {
-          statusMessage.value = res.message;
-          errorMessage.value = '';
-        } else {
-          statusMessage.value = '';
-          errorMessage.value = res.message;
-        }
-        isLoadingMapping.value = false;
-        validateConfig(res.config, input.value);
-      });
+  mappingService.value
+    .generateMappingSuggestion(input.value, targetSchema, userComments.value)
+    .then(res => {
+      result.value = res.config;
+      if (res.success) {
+        statusMessage.value = res.message;
+        errorMessage.value = '';
+      } else {
+        statusMessage.value = '';
+        errorMessage.value = res.message;
+      }
+      isLoadingMapping.value = false;
+      validateConfig(res.config, input.value);
+    });
 }
 
 function performMapping() {
@@ -178,7 +175,7 @@ function performMapping() {
     return;
   }
 
-  mappingService.value.performDataMapping(input.value, config).then( (res) => {
+  mappingService.value.performDataMapping(input.value, config).then(res => {
     if (res.success) {
       statusMessage.value = res.message;
       errorMessage.value = '';
@@ -192,11 +189,15 @@ function performMapping() {
   });
 }
 
-defineExpose({ show: openDialog, close: hideDialog });
+defineExpose({show: openDialog, close: hideDialog});
 </script>
 
 <template>
-  <Dialog v-model:visible="showDialog" header="Convert Data to Target Schema" :modal="true" :style="{ width: '50vw' }">
+  <Dialog
+    v-model:visible="showDialog"
+    header="Convert Data to Target Schema"
+    :modal="true"
+    :style="{width: '50vw'}">
     <div class="space-y-4">
       <ApiKey />
 
@@ -205,21 +206,33 @@ defineExpose({ show: openDialog, close: hideDialog });
       </Message>
 
       <p class="text-sm text-gray-700">
-        This tool converts the data from the <strong>Data Editor</strong> to match the schema defined in the <strong>Schema Editor</strong>.
-        You can optionally provide extra instructions below to guide the mapping.
+        This tool converts the data from the <strong>Data Editor</strong> to match the schema
+        defined in the <strong>Schema Editor</strong>. You can optionally provide extra instructions
+        below to guide the mapping.
       </p>
 
       <div>
         <label for="userComments" class="block font-semibold mb-1">Additional Mapping Hints</label>
-        <InputText id="userComments" v-model="userComments" class="w-full" placeholder="e.g., rename fields, format dates..."/>
+        <InputText
+          id="userComments"
+          v-model="userComments"
+          class="w-full"
+          placeholder="e.g., rename fields, format dates..." />
       </div>
 
       <div class="flex items-center gap-2">
         <label class="font-semibold">Mapping Method</label>
-        <Select v-model="selectedMappingServiceType" :options="mappingServiceTypes" class="flex-1"/>
+        <Select
+          v-model="selectedMappingServiceType"
+          :options="mappingServiceTypes"
+          class="flex-1" />
       </div>
 
-      <Button label="Generate Suggestion" icon="pi pi-wand" @click="generateMappingSuggestion" class="w-full"/>
+      <Button
+        label="Generate Suggestion"
+        icon="pi pi-wand"
+        @click="generateMappingSuggestion"
+        class="w-full" />
       <ProgressSpinner v-if="isLoadingMapping" />
 
       <div class="mt-6">
@@ -228,7 +241,12 @@ defineExpose({ show: openDialog, close: hideDialog });
         <div class="border rounded h-72 overflow-hidden">
           <div :id="editor_id" class="h-full w-full" />
         </div>
-        <Button v-if="resultIsValid" label="Perform Mapping" icon="pi pi-play" class="mt-4 w-full" @click="performMapping"/>
+        <Button
+          v-if="resultIsValid"
+          label="Perform Mapping"
+          icon="pi pi-play"
+          class="mt-4 w-full"
+          @click="performMapping" />
       </div>
 
       <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
@@ -238,7 +256,6 @@ defineExpose({ show: openDialog, close: hideDialog });
     </div>
   </Dialog>
 </template>
-
 
 <style scoped>
 label {

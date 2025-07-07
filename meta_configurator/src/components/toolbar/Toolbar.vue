@@ -117,7 +117,7 @@ defineExpose({
 
   <UrlInputDialog ref="urlInputDialog" />
 
-  <DataMappingDialog ref="dataMappingDialog"/>
+  <DataMappingDialog ref="dataMappingDialog" />
 
   <AboutDialog
     :visible="showAboutDialog"

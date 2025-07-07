@@ -1,10 +1,9 @@
-
 import _ from 'lodash';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import {jsonPointerToPathTyped} from '@/utility/pathUtils';
-import type {DataMappingConfig} from "@/data-mapping/stml/dataMappingTypes";
-import {applyTransformations} from "@/data-mapping/stml/applyTransformations";
-import {normalizeJsonPointer} from "@/data-mapping/stml/dataMappingUtilsStml";
+import type {DataMappingConfig} from '@/data-mapping/stml/dataMappingTypes';
+import {applyTransformations} from '@/data-mapping/stml/applyTransformations';
+import {normalizeJsonPointer} from '@/data-mapping/stml/dataMappingUtilsStml';
 
 // Utility Functions
 function getIndexPlaceholders(path: string): string[] {
@@ -103,18 +102,19 @@ export function performSimpleDataMapping(inputData: any, mappingConfig: DataMapp
   return turnArrayLikeObjectIntoArray(outputData);
 }
 
-
-function turnArrayLikeObjectIntoArray(obj: any): any|any[] {
+function turnArrayLikeObjectIntoArray(obj: any): any | any[] {
   // if the object has only keys that are numbers from 1 to n, turn it into an array, keeping the order
-    if (typeof obj === 'object' && obj !== null) {
-        const keys = Object.keys(obj).map(Number).sort((a, b) => a - b);
-        // check also that there is no gap in the keys
-        if (keys.length > 0 && keys[0] === 0 && keys.every((key, index) => key === index)) {
-            return keys.map(key => obj[key]);
-        }
+  if (typeof obj === 'object' && obj !== null) {
+    const keys = Object.keys(obj)
+      .map(Number)
+      .sort((a, b) => a - b);
+    // check also that there is no gap in the keys
+    if (keys.length > 0 && keys[0] === 0 && keys.every((key, index) => key === index)) {
+      return keys.map(key => obj[key]);
     }
+  }
 
-    return obj;
+  return obj;
 }
 
 export function normalizeInputConfig(inputConfig: DataMappingConfig) {
