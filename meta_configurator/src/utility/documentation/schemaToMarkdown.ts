@@ -4,7 +4,6 @@ import type {
     SchemaObjectAttributeData,
     SchemaEnumNodeData,
 } from "@/schema/graph-representation/schemaGraphTypes";
-import { describeSchema, OutputFormat } from "@/schema/schemaDescriptor";
 
 export function schemaToMarkdown(schemaData: any) {
     const graph = constructSchemaGraph(schemaData, true);
@@ -33,12 +32,10 @@ export function schemaToMarkdown(schemaData: any) {
 
         const name = node.title ?? node.name ?? "Unnamed";
         const description = node.description ?? "";
-        const anchor = toAnchor(name);
 
         md.push("---");
         md.push(`## **${name}**`);
         if (description) md.push(`*${description}*`);
-
 
         if (nodeType === "schemaobject") {
             const objectNode = node as SchemaObjectNodeData;
