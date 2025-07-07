@@ -54,7 +54,7 @@ export const querySchemaCreation = async (
   apiKey: string,
   schemaDescriptionNaturalLanguage: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Create a JSON schema based on the schema description by the user. Return no other text than a fully valid JSON schema document.`;
+  const systemMessage = `You are a JSON schema expert. Create a JSON schema based on the schema description by the user. Return no other text than a fully valid JSON schema document. When appropriate, put sub-schema definitions into the $defs section. `;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: schemaDescriptionNaturalLanguage},
@@ -66,7 +66,7 @@ export const querySchemaModification = async (
   schemaChangeDescriptionNaturalLanguage: string,
   fullSchema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Modify the provided JSON schema based on the schema change description by the user. Return no other text than a fully valid JSON schema document. No other explanation or words. The schema to modify is: \`\`\`${fullSchema}\`\`\``;
+  const systemMessage = `You are a JSON schema expert. Modify the provided JSON schema based on the schema change description by the user. Return no other text than a fully valid JSON schema document. No other explanation or words. When appropriate, put sub-schema definitions into the $defs section. The schema to modify is: \`\`\`${fullSchema}\`\`\``;
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},
     {role: 'user', content: schemaChangeDescriptionNaturalLanguage},
