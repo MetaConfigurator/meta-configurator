@@ -70,7 +70,10 @@ export function isSubSchemaDefinedInDefinitions(absolutePath: Path) {
 }
 
 export function doesSchemaHaveType(schema: JsonSchemaType, type: SchemaPropertyType, mustBeExplicit: boolean = false): boolean {
-  if (schema == true) {
+  if (schema === undefined) {
+    return false;
+  }
+  if (schema === true) {
     return !mustBeExplicit;
   } else if (schema == false) {
     return false;

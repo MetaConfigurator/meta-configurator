@@ -62,6 +62,8 @@ function writeTableOfContents(md: string[], graph: SchemaGraph, rootSchema: TopL
     const tocLinks: string[] = [];
 
     // TODO: for future, it would be better if in table of contents the hierarchy of definitions is already shown
+    // also, by building such a hierarchy, it is easier to determine which nodes to show and which to hide.
+    // unconnected nodes or conditionals, etc. should be hidden
 
     graph.nodes.forEach((node) => {
         if (!["schemaobject", "schemaenum"].includes(node.getNodeType())) return;
@@ -142,7 +144,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
                     md.push(`- <u>[${title}](#${anchor})</u>`)
                 } else {
                     const anchor = toAnchor(optionPath, rootSchema);
-                    md.push(`- <u>Option[${optionIndex}](#${anchor})</u>`)
+                    md.push(`- <u>[Option ${optionIndex}](#${anchor})</u>`)
                 }
             }
         }
@@ -151,13 +153,21 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
 
 
     const combinators = [ "if", "then", "else", "not", "dependentSchemas"];
-    combinators.forEach((keyword) => {
-        if (node.schema[keyword]) {
-            md.push(`#### ${keyword}`);
-            const content = JSON.stringify(node.schema[keyword], null, 2);
-            md.push("```json\n" + content + "\n```\n");
-        }
-    });
+    const containsCombinator = combinators.some(keyword => node.schema[keyword] !== undefined);
+    if (containsCombinator) {
+        md.push(`<details>`)
+        md.push(`<summary>Conditionals</summary>`)
+
+        combinators.forEach((keyword) => {
+            if (node.schema[keyword]) {
+                md.push(`#### ${keyword}`);
+                const content = JSON.stringify(node.schema[keyword], null, 2);
+                md.push("```json\n" + content + "\n```\n");
+            }
+        });
+
+        md.push(`</details>`)
+    }
 
     const instance = generateSchemaInstance(resolveReferences(node.schema, rootSchema), rootSchema);
     if (instance) {
@@ -204,9 +214,14 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
 
 function writeEnumNode(md: string[], node: SchemaEnumNodeData) {
     const enumNode = node as SchemaEnumNodeData;
-    md.push("#### Values\n");
+
+    md.push(`<details>`)
+    md.push(`<summary>Enumeration Values</summary>`)
+
     enumNode.values.forEach((val) => {
         md.push(`- \`${String(val)}\``);
     });
+
+    md.push(`</details>`)
     md.push("");
 }

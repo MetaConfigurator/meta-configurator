@@ -86,7 +86,7 @@ export function generateSchemaInstance(schema: any, rootSchema: TopLevelSchema, 
 export function extractConstraints(schema: any): string {
     if (!schema) return "-";
     const constraints: string[] = [];
-    const keys = ["minLength", "maxLength", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "pattern", "format", "enum", "const", "multipleOf"];
+    const keys = ["minLength", "maxLength", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "pattern", "format", "const", "multipleOf"];
     for (const key of keys) {
         if (key in schema) {
             constraints.push(`${key}: ${JSON.stringify(schema[key])}`);
