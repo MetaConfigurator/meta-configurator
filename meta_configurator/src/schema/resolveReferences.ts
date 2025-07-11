@@ -1,9 +1,10 @@
-import type {TopLevelSchema} from "@/schema/jsonSchemaType";
+import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from "@/schema/jsonSchemaType";
 import {dataAt} from "@/utility/resolveDataAtPath";
 import {jsonPointerToPath, jsonPointerToPathTyped} from "@/utility/pathUtils";
 import {cloneDeep} from "lodash";
 import {mergeAllOfs} from "@/schema/mergeAllOfs";
 import type {Path} from "@/utility/path";
+import {doesSchemaHaveType} from "@/schema/schemaReadingUtils";
 
 export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): any {
     if (subSchema.$ref) {
@@ -38,12 +39,19 @@ export function collectReferences(subSchema: any, rootSchema: TopLevelSchema): S
 }
 
 // recursively go down the refs until a path without ref is found, return that path
-export function findTargetPath(path: Path, rootSchema: TopLevelSchema): Path {
-    const schemaAtPath = dataAt(path, rootSchema)
+export function findTargetPath(path: Path, rootSchema: TopLevelSchema, goThroughArray: boolean): Path {
+    const schemaAtPath: JsonSchemaObjectType = dataAt(path, rootSchema)
     if (schemaAtPath && schemaAtPath.$ref) {
         const newPath = jsonPointerToPathTyped(schemaAtPath.$ref);
-        return findTargetPath(newPath, rootSchema);
-    } else {
-        return path;
+        return findTargetPath(newPath, rootSchema, goThroughArray);
     }
+
+    if (goThroughArray && doesSchemaHaveType(schemaAtPath, "array", true)) {
+        const itemsSchema = schemaAtPath.items;
+        if (itemsSchema) {
+            return findTargetPath([...path, "items"], rootSchema, goThroughArray)
+        }
+    }
+
+    return path;
 }

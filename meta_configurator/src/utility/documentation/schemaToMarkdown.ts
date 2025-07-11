@@ -26,7 +26,8 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema) {
     graph.nodes.forEach((node) => {
         if (!["schemaobject", "schemaenum"].includes(node.getNodeType())) return;
 
-        const name = (node.title ?? node.name ?? "Unnamed").replace(/[#*`]/g, "").trim();
+        const rawName = node.title ?? node.fallbackDisplayName;
+        const name = escapeMarkdown(rawName);
         const anchor = toAnchor(node, rootSchema);
 
         if (["if", "then", "else"].includes(name.toLowerCase())) return;
@@ -45,8 +46,8 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema) {
         const nodeType = node.getNodeType();
         if (!["schemaobject", "schemaenum"].includes(nodeType)) return;
 
-        const rawName = node.title ?? node.name ?? "Unnamed";
-        const name = rawName.replace(/[#*`]/g, "").trim();
+        const rawName = node.title ?? node.fallbackDisplayName;
+        const name = escapeMarkdown(rawName);
         const anchor = toAnchor(node, rootSchema);
         const description = node.schema.description ?? "";
 
@@ -71,14 +72,10 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema) {
                 md.push(`|${header.map(() => "------").join("|")}|`);
 
                 attributes.forEach((attr: SchemaObjectAttributeData) => {
-                    const cleanAttrName = (attr.name ?? "-").replace(/[#*`]/g, "").trim();
-                    let type = attr.typeDescription ?? "-";
+                    const cleanAttrName = escapeMarkdown(attr.name ?? "-");
+                    let type = escapeMarkdown(attr.typeDescription ?? "-");
                     const required = attr.required ? '<span style="color:lightblue">true</span>' : '<span style="color:salmon">false</span>';
-
-                    let desc = attr.schema?.description ?? "-";
-                    if (attr.schema?.deprecated) {
-                        desc = `${desc} ⚠️ Deprecated`;
-                    }
+                    let description = escapeMarkdown(attr.schema?.description ?? "-");
 
                     const defaults = getDefaultValues(attr.schema).map( def => {
                         JSON.stringify(def)
@@ -91,14 +88,14 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema) {
                         cleanAttrName,
                         type,
                         required,
-                        desc,
+                        description,
                         defaults,
                         constraints,
                     ];
                     if (hasAnyExample) {
                         if (hasExample(attr.schema)) {
                             const example = JSON.stringify(attr.schema!.examples![0]);
-                            row.push(example);
+                            row.push(escapeMarkdown(example));
                         } else {
                             row.push("-")
                         }
@@ -113,23 +110,20 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema) {
                     const edgeTarget = edgeTargetResult[0]
                     const isArray = edgeTargetResult[1]
                     if (edgeTarget) {
-                        const type = edgeTarget.title || edgeTarget.fallbackDisplayName;
+                        const type = escapeMarkdown(edgeTarget.title || edgeTarget.fallbackDisplayName);
                         const required = '<span style="color:salmon">false</span>'
 
-                        let desc = edgeTarget.schema.description ?? "-";
-                        if (edgeTarget.schema?.deprecated) {
-                            desc = `${desc} ⚠️ Deprecated`;
-                        }
+                        let description = escapeMarkdown(edgeTarget.schema.description ?? "-");
 
                         const defaults = getDefaultValues(edgeTarget.schema).map(def => {
-                            JSON.stringify(def)
+                            escapeMarkdown(JSON.stringify(def))
                         }).join(", ") || "-";
                         const constraints = extractConstraints(edgeTarget.schema);
                         const row = [
                             `{string}`,
                             `[${type}](#${toAnchor(edgeTarget, rootSchema)})`,
                             required,
-                            desc,
+                            description,
                             defaults,
                             constraints,
                         ];
@@ -236,7 +230,7 @@ function generateSchemaInstance(schema: any, rootSchema: TopLevelSchema, visited
         if (type === "object") {
             const props = resolvedSchema.properties ?? {};
             const patternProps = resolvedSchema.patternProperties ?? {};
-            const additionalProps = resolvedSchema.additionalProperties ?? {};
+            const additionalProps = resolvedSchema.additionalProperties ?? true;
             const required = resolvedSchema.required ?? [];
             const result: any = {};
             for (const key in props) {
@@ -253,7 +247,7 @@ function generateSchemaInstance(schema: any, rootSchema: TopLevelSchema, visited
                 if (key in required || propertyRefIsNotAlreadyVisited)
                     result[key] = generateSchemaInstance(propertySchema, rootSchema, visitedReferences);
             }
-            if (additionalProps && additionalProps !== true) {
+            if (additionalProps && additionalProps != true) {
                 result["additionalProp"] = generateSchemaInstance(additionalProps, rootSchema, visitedReferences);
             }
             return result;
@@ -270,13 +264,29 @@ function extractConstraints(schema: any): string {
             constraints.push(`${key}: ${JSON.stringify(schema[key])}`);
         }
     }
-    return constraints.length ? constraints.join(", ") : "-";
+    const deprecated = schema.deprecated == true;
+
+    if (deprecated) {
+        return constraints.length ? constraints.join(", ") + ". Deprecated." : "Deprecated.";
+    } else {
+        return constraints.length ? constraints.join(", ") : "-";
+    }
 }
 
 function toAnchor(node: SchemaNodeData, rootSchema: TopLevelSchema): string {
-    const resolvedPath = findTargetPath(node.absolutePath, rootSchema)
+    const resolvedPath = findTargetPath(node.absolutePath, rootSchema, true)
     return pathToString(resolvedPath)
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^\w\-]+/g, "");
+}
+
+function escapeMarkdown(text: string | undefined | null): string {
+    if (!text) return "-";
+    return text
+        .replace(/\\/g, '\\\\')     // Escape backslashes
+        .replace(/([_*[\]()#+\-!`>])/g, '\\$1') // Escape Markdown symbols
+        .replace(/</g, '&lt;')       // Escape angle brackets
+        .replace(/>/g, '&gt;')       // Escape angle brackets
+        .trim();
 }
