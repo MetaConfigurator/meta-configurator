@@ -1,15 +1,20 @@
-import { constructSchemaGraph } from "@/schema/graph-representation/schemaGraphConstructor";
-import type {
-    SchemaObjectNodeData,
-    SchemaObjectAttributeData,
-    SchemaEnumNodeData,
+import {
+    constructSchemaGraph,
+    nodesToObjectDefs,
+    resolveEdgeTarget
+} from "@/schema/graph-representation/schemaGraphConstructor";
+import {
+    type SchemaObjectNodeData,
+    type SchemaObjectAttributeData,
+    type SchemaEnumNodeData, SchemaNodeData, SchemaGraph,
 } from "@/schema/graph-representation/schemaGraphTypes";
-import { JsonSchemaWrapper } from "@/schema/jsonSchemaWrapper";
-import { SessionMode } from "@/store/sessionMode";
-import { describeSchema, OutputFormat } from "@/schema/schemaDescriptor";
+import type {JsonSchemaObjectType, TopLevelSchema} from "@/schema/jsonSchemaType";
+import {collectReferences, findTargetPath, resolveReferences} from "@/schema/resolveReferences";
+import {pathToString} from "@/utility/pathUtils";
+import {hasOutgoingEdge} from "@/schema/graph-representation/graphUtils";
 
-export function schemaToMarkdown(schemaData: any) {
-    const graph = constructSchemaGraph(schemaData, true);
+export function schemaToMarkdown(rootSchema: TopLevelSchema) {
+    const graph = constructSchemaGraph(rootSchema, true);
     const md: string[] = [];
 
     md.push(`<div class="toc-wrapper">`);
@@ -22,7 +27,7 @@ export function schemaToMarkdown(schemaData: any) {
         if (!["schemaobject", "schemaenum"].includes(node.getNodeType())) return;
 
         const name = (node.title ?? node.name ?? "Unnamed").replace(/[#*`]/g, "").trim();
-        const anchor = toAnchor(name);
+        const anchor = toAnchor(node, rootSchema);
 
         if (["if", "then", "else"].includes(name.toLowerCase())) return;
 
@@ -42,8 +47,8 @@ export function schemaToMarkdown(schemaData: any) {
 
         const rawName = node.title ?? node.name ?? "Unnamed";
         const name = rawName.replace(/[#*`]/g, "").trim();
-        const anchor = toAnchor(name);
-        const description = node.description ?? "";
+        const anchor = toAnchor(node, rootSchema);
+        const description = node.schema.description ?? "";
 
         if (["if", "then", "else"].includes(name.toLowerCase())) return;
 
@@ -56,7 +61,7 @@ export function schemaToMarkdown(schemaData: any) {
             const attributes = objectNode.attributes ?? [];
             const hasAnyExample = attributes.some(attr => hasExample(attr.schema));
 
-            if (attributes.length > 0 || objectNode.patternProperties?.length || objectNode.additionalPropertiesSchema) {
+            if (attributes.length > 0 || objectNode.schema.patternProperties?.length || objectNode.schema.additionalProperties) {
                 md.push("#### Properties\n");
 
                 const header = ["Name", "Type", "Required", "Description", "Default", "Constraints"];
@@ -67,7 +72,7 @@ export function schemaToMarkdown(schemaData: any) {
 
                 attributes.forEach((attr: SchemaObjectAttributeData) => {
                     const cleanAttrName = (attr.name ?? "-").replace(/[#*`]/g, "").trim();
-                    const type = attr.typeDescription ?? "-";
+                    let type = attr.typeDescription ?? "-";
                     const required = attr.required ? '<span style="color:lightblue">true</span>' : '<span style="color:salmon">false</span>';
 
                     let desc = attr.schema?.description ?? "-";
@@ -75,55 +80,73 @@ export function schemaToMarkdown(schemaData: any) {
                         desc = `${desc} ⚠️ Deprecated`;
                     }
 
-                    const def = JSON.stringify(generateDefaultValue(attr.schema));
+                    const defaults = getDefaultValues(attr.schema).map( def => {
+                        JSON.stringify(def)
+                    }).join(", ") || "-";
                     const constraints = extractConstraints(attr.schema);
+                   if (hasOutgoingEdge(attr, graph) ) {
+                       type = `<u>[${type}](#${toAnchor(attr, rootSchema)})</u>`;
+                   }
                     const row = [
-                        `[${cleanAttrName}](#${toAnchor(cleanAttrName)})`,
+                        cleanAttrName,
                         type,
                         required,
                         desc,
-                        def,
+                        defaults,
                         constraints,
                     ];
                     if (hasAnyExample) {
-                        const example = JSON.stringify(generateExampleValue(attr.schema));
-                        row.push(example);
+                        if (hasExample(attr.schema)) {
+                            const example = JSON.stringify(attr.schema!.examples![0]);
+                            row.push(example);
+                        } else {
+                            row.push("-")
+                        }
                     }
                     md.push(`| ${row.join(" | ")} |`);
-
-                    try {
-                        const longDesc = describeSchema(
-                            new JsonSchemaWrapper(attr.schema, SessionMode.SchemaEditor),
-                            attr.name,
-                            new JsonSchemaWrapper(objectNode.schema, SessionMode.SchemaEditor),
-                            true,
-                            0,
-                            [],
-                            OutputFormat.Markdown
-                        ).trim();
-
-                        if (longDesc) {
-                            md.push("");
-                            md.push(`> ${longDesc.replace(/\n/g, "\n> ")}`);
-                            md.push("");
-                        }
-                    } catch {}
                 });
+
+
+                if (objectNode.schema.additionalProperties) {
+                    const objectDefs = nodesToObjectDefs(graph.nodes);
+                    const edgeTargetResult = resolveEdgeTarget(objectNode, objectNode.schema.additionalProperties, [...objectNode.absolutePath, 'additionalProperties'], objectDefs)
+                    const edgeTarget = edgeTargetResult[0]
+                    const isArray = edgeTargetResult[1]
+                    if (edgeTarget) {
+                        const type = edgeTarget.title || edgeTarget.fallbackDisplayName;
+                        const required = '<span style="color:salmon">false</span>'
+
+                        let desc = edgeTarget.schema.description ?? "-";
+                        if (edgeTarget.schema?.deprecated) {
+                            desc = `${desc} ⚠️ Deprecated`;
+                        }
+
+                        const defaults = getDefaultValues(edgeTarget.schema).map(def => {
+                            JSON.stringify(def)
+                        }).join(", ") || "-";
+                        const constraints = extractConstraints(edgeTarget.schema);
+                        const row = [
+                            `{string}`,
+                            `[${type}](#${toAnchor(edgeTarget, rootSchema)})`,
+                            required,
+                            desc,
+                            defaults,
+                            constraints,
+                        ];
+                        if (hasAnyExample) {
+                            if (hasExample(edgeTarget.schema)) {
+                                const example = JSON.stringify(edgeTarget.schema!.examples![0]);
+                                row.push(example);
+                            } else {
+                                row.push("-")
+                            }
+                        }
+                        md.push(`| ${row.join(" | ")} |`);
+                    }
+                }
+
+
                 md.push("");
-
-                if (objectNode.patternProperties?.length) {
-                    md.push("#### Pattern Properties\n");
-                    objectNode.patternProperties.forEach((pattern) => {
-                        md.push(`- \`${pattern.regex}\`: ${pattern.schema.description ?? "(no description)"}`);
-                    });
-                    md.push("");
-                }
-
-                if (objectNode.additionalPropertiesSchema) {
-                    md.push("#### Additional Properties\n");
-                    md.push("This object allows additional properties with the following schema:");
-                    md.push("```json\n" + JSON.stringify(objectNode.additionalPropertiesSchema, null, 2) + "\n```\n");
-                }
             }
 
             const combinators = ["oneOf", "anyOf", "allOf", "if", "then", "else", "not", "dependentSchemas"];
@@ -135,7 +158,7 @@ export function schemaToMarkdown(schemaData: any) {
                 }
             });
 
-            const instance = generateSchemaInstance(objectNode.schema);
+            const instance = generateSchemaInstance(resolveReferences(objectNode.schema, rootSchema), rootSchema);
             if (instance) {
                 md.push("#### Example\n");
                 md.push("```json");
@@ -157,58 +180,85 @@ export function schemaToMarkdown(schemaData: any) {
     return md.join("\n");
 }
 
+
+
 function hasExample(schema: any): boolean {
     return schema && Array.isArray(schema.examples) && schema.examples.length > 0;
 }
 
-function generateExampleValue(schema: any): any {
-    try {
-        const wrapper = schema instanceof JsonSchemaWrapper ? schema : new JsonSchemaWrapper(schema, SessionMode.SchemaEditor);
-        if (schema?.const !== undefined) return schema.const;
-        return wrapper.initialValue();
-    } catch {
-        const type = schema?.type ?? "any";
-        if (type === "string") return "`{string}`";
-        if (type === "number") return "`{number}`";
-        if (type === "integer") return "`{integer}`";
-        if (type === "boolean") return "`{boolean}`";
-        if (type === "array") return ["`{array-item}`"];
-        if (type === "object") return { key: "`{value}`" };
-        return "`{value}`";
+
+function getDefaultValues(schema: any): any[] {
+    if (schema.defaults && schema.defaults.length > 0) {
+        return schema.defaults;
     }
+    return []
 }
 
-function generateDefaultValue(schema: any): any {
-    try {
-        const wrapper = schema instanceof JsonSchemaWrapper ? schema : new JsonSchemaWrapper(schema, SessionMode.SchemaEditor);
-        return wrapper.initialValue();
-    } catch {
-        return undefined;
+function generateSchemaInstance(schema: any, rootSchema: TopLevelSchema, visitedReferences: Set<string>|undefined = undefined): any {
+    // if the schema has example values, take the first example
+    if (schema.examples && schema.examples.length > 0) {
+        return schema.examples[0];
     }
-}
 
-function generateSchemaInstance(schema: any): any {
-    try {
-        const wrapper = schema instanceof JsonSchemaWrapper ? schema : new JsonSchemaWrapper(schema, SessionMode.SchemaEditor);
-        if (schema?.const !== undefined) return schema.const;
-        return wrapper.initialValue();
-    } catch {
-        const type = schema?.type ?? "any";
-        if (type === "string") return "`{string}`";
-        if (type === "number") return "`{number}`";
-        if (type === "integer") return "`{integer}`";
-        if (type === "boolean") return "`{boolean}`";
-        if (type === "array") return ["`{array-item}`"];
+    // otherwise, if the schema has a default, also take it
+    if (schema.defaults && schema.defaults.length > 0) {
+        return schema.defaults[0];
+    }
+
+    // if there is a constant value defined, take it
+    if (schema.const) {
+        return schema.const;
+    }
+
+    if (visitedReferences == undefined) {
+        visitedReferences = new Set();
+    }
+    // mark the current schema as visited so children will not visit it again if not required
+    visitedReferences = visitedReferences.union(collectReferences(schema, rootSchema));
+
+    // resolve the references of the current schema if needed
+    const resolvedSchema: JsonSchemaObjectType = resolveReferences(schema, rootSchema)
+
+        const type = resolvedSchema?.type ?? "any";
+        if (type === "string") return "{string}";
+        if (type === "number") return "{number}";
+        if (type === "integer") return "{integer}";
+        if (type === "boolean") return "{boolean}";
+        if (type === "array") {
+            const arrayItemInstance = generateSchemaInstance(resolvedSchema.items, rootSchema, visitedReferences);
+            const itemCount = Math.max(schema.minItems || 0, 1);
+            const resultArray: any[] = []
+            for (let i = 0; i < itemCount; i++) {
+                resultArray.push(arrayItemInstance)
+            }
+            return resultArray as any;
+        }
         if (type === "object") {
-            const props = schema.properties ?? {};
+            const props = resolvedSchema.properties ?? {};
+            const patternProps = resolvedSchema.patternProperties ?? {};
+            const additionalProps = resolvedSchema.additionalProperties ?? {};
+            const required = resolvedSchema.required ?? [];
             const result: any = {};
             for (const key in props) {
-                result[key] = generateSchemaInstance(props[key]);
+                const propertySchema = props[key];
+                const propertyReferences = collectReferences(propertySchema, rootSchema);
+                const propertyRefIsNotAlreadyVisited = propertyReferences.isDisjointFrom(visitedReferences);
+                if (required.includes(key) || propertyRefIsNotAlreadyVisited)
+                    result[key] = generateSchemaInstance(propertySchema, rootSchema, visitedReferences);
+            }
+            for (const key in patternProps) {
+                const propertySchema = patternProps[key];
+                const propertyReferences = collectReferences(propertySchema, rootSchema);
+                const propertyRefIsNotAlreadyVisited = propertyReferences.isDisjointFrom(propertyReferences);
+                if (key in required || propertyRefIsNotAlreadyVisited)
+                    result[key] = generateSchemaInstance(propertySchema, rootSchema, visitedReferences);
+            }
+            if (additionalProps && additionalProps !== true) {
+                result["additionalProp"] = generateSchemaInstance(additionalProps, rootSchema, visitedReferences);
             }
             return result;
         }
-        return "`{value}`";
-    }
+        return "{value}";
 }
 
 function extractConstraints(schema: any): string {
@@ -223,8 +273,9 @@ function extractConstraints(schema: any): string {
     return constraints.length ? constraints.join(", ") : "-";
 }
 
-function toAnchor(text: string): string {
-    return text
+function toAnchor(node: SchemaNodeData, rootSchema: TopLevelSchema): string {
+    const resolvedPath = findTargetPath(node.absolutePath, rootSchema)
+    return pathToString(resolvedPath)
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^\w\-]+/g, "");

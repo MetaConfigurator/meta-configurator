@@ -38,6 +38,10 @@ export function pathToJsonPointer(path: Path): string {
  * @param jsonPointer The json pointer to convert.
  */
 export function jsonPointerToPath(jsonPointer: string): string[] {
+  // if it starts with hashtag, remove that hashtag
+  if (jsonPointer.startsWith("#")) {
+    jsonPointer = jsonPointer.substring(1);
+  }
   return pointer.parse(jsonPointer);
 }
 

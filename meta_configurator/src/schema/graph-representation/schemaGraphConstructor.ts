@@ -411,6 +411,7 @@ export function generateAttributeEdges(
       graph.edges.push(
         new EdgeData(
           node,
+          attributeData,
           'source-' + attributeData.name,
           edgeTargetNode,
           EdgeType.ATTRIBUTE,
@@ -427,7 +428,13 @@ export function generateAttributeEdges(
   }
 }
 
-function resolveEdgeTarget(
+export function nodesToObjectDefs(nodes: SchemaNodeData[]) {
+  return new Map(nodes.map( node => {
+    return [ pathToString(node.absolutePath), node]
+  }))
+}
+
+export function resolveEdgeTarget(
   node: SchemaObjectNodeData,
   subSchema: JsonSchemaType,
   subSchemaPath: Path,
@@ -690,6 +697,7 @@ function generateObjectSubSchemaEdge(
       new EdgeData(
         node,
         null,
+        null,
         edgeTargetNode,
         edgeType,
         isArray,
@@ -744,4 +752,3 @@ function isNodeConnectedByEdge(node: SchemaElementData, graph: SchemaGraph): boo
   return graph.edges.find(edge => edge.start == node || edge.end == node) !== undefined;
 }
 
-function getSubSchema(rootSchema: TopLevelSchema, path: Path) {}
