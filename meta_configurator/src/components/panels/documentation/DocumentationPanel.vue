@@ -65,6 +65,15 @@ function handleDownloadClick() {
   background-color: var(--p-primary-background);
   white-space: normal;
   font-family: 'Segoe UI', sans-serif;
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+.rendered-docs h1[id],
+.rendered-docs h2[id],
+.rendered-docs h3[id],
+.rendered-docs h4[id] {
+  scroll-margin-top: 80px;
 }
 
 .rendered-docs h1,
@@ -82,6 +91,8 @@ function handleDownloadClick() {
 .rendered-docs h3,
 .rendered-docs h4 {
   font-weight: bold;
+  display: block;
+  margin-top: 1.25em;
 }
 
 .rendered-docs h1 {
@@ -102,6 +113,38 @@ function handleDownloadClick() {
 .rendered-docs h4 {
   font-size: 18px;
   margin: 1.25rem 0 0.5rem;
+}
+
+.rendered-docs .toc-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.rendered-docs .toc-wrapper h3 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.rendered-docs .toc-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 0.5;
+}
+
+.rendered-docs .toc-links a {
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--p-primary-active-color);
+}
+
+.rendered-docs .toc-links a:hover {
+  text-decoration: underline;
 }
 
 .rendered-docs hr {
@@ -136,7 +179,7 @@ function handleDownloadClick() {
 }
 
 .rendered-docs pre {
-  background-color: var(--p-primary-hover-color);
+  background-color: var(--p-highlight-background, var(--p-primary-hover-color));
   color: var(--p-primary-active-color);
   padding: 12px;
   border-radius: 4px;
