@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { SessionMode } from '@/store/sessionMode';
-import { computed } from 'vue';
-import { getDataForMode } from '@/data/useDataLink';
+import {computed, onMounted, onUnmounted, onUpdated, ref, watch} from 'vue';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import { schemaToMarkdown } from '@/utility/documentation/schemaToMarkdown';
 import { downloadMarkdown } from '@/components/panels/documentation/downloadMarkdown';
 import showdown from 'showdown';
+import type {Path} from '@/utility/path';
+import {toAnchor} from '@/utility/documentation/documentationUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
-
+const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const markdown = computed(() => schemaToMarkdown(schemaData.data.value));
 
 const converter = new showdown.Converter({
@@ -20,11 +22,37 @@ const converter = new showdown.Converter({
   requireSpaceBeforeHeadingText: true,
 });
 const renderedHtml = computed(() => converter.makeHtml(markdown.value));
+const docsContainer = ref<HTMLElement | null>(null);
+
+
+
+// scroll to the current selected element when it changes
+watch(
+  schemaSession.currentSelectedElement,
+  () => {
+    const absolutePath = schemaSession.currentSelectedElement.value;
+    scrollToPath(absolutePath);
+  },
+  {deep: true}
+);
+
+
 
 function handleDownloadClick() {
   const markdownText = schemaToMarkdown(schemaData.data.value);
   downloadMarkdown(markdownText);
 }
+
+function scrollToPath(path: Path) {
+  const anchorId = toAnchor(path, schemaData.data.value);
+  const element = document.getElementById(anchorId);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+
+
 </script>
 
 <template>

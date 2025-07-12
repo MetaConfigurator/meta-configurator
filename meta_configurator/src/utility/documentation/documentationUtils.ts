@@ -110,6 +110,9 @@ export function extractConstraints(schema: any): string {
 }
 
 export function toAnchor(nodePath: Path, rootSchema: TopLevelSchema): string {
+  if( nodePath.length === 0) {
+    return "root";
+  }
     const resolvedPath = findTargetPath(nodePath, rootSchema, true)
     return pathToString(resolvedPath)
         .toLowerCase()

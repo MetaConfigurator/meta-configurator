@@ -20,7 +20,6 @@ import {
 } from '@/utility/documentation/documentationUtils';
 import {useSettings} from "@/settings/useSettings";
 
-const settings = useSettings();
 
 export function schemaToMarkdown(rootSchema: TopLevelSchema) {
     const graph = constructSchemaGraph(rootSchema, true);
@@ -157,7 +156,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
         combinators.forEach((keyword) => {
             if (node.schema[keyword]) {
                 md.push(`#### ${keyword}`);
-                const content = formatDocumentExample(node.schema[keyword], settings.value.dataFormat);
+                const content = formatDocumentExample(node.schema[keyword], useSettings().value.dataFormat);
                 md.push("```json\n" + content + "\n```\n");
             }
         });
@@ -169,27 +168,32 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
     if (instance) {
         md.push("#### Example\n");
         md.push("```json");
-        md.push(formatDocumentExample(instance, settings.value.dataFormat));
+        md.push(formatDocumentExample(instance, useSettings().value.dataFormat));
         md.push("```");
     }
 }
 
 
 function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDescription: string, required: boolean, propertySchema: JsonSchemaObjectType, nodeData: SchemaNodeData, graph: SchemaGraph, rootSchema: TopLevelSchema, tableIncludesExamples: boolean) {
-    const cleanAttrName = escapeMarkdown(propertyName);
+    let attributeName = escapeMarkdown(propertyName);
     let type = escapeMarkdown(propertyTypeDescription);
     const requiredDesc = required ? '<span style="color:lightblue">true</span>' : '<span style="color:salmon">false</span>';
     let description = escapeMarkdown(propertySchema.description ?? "-");
+    const anchor = toAnchor(nodeData.absolutePath, rootSchema);
+  const constraints = extractConstraints(propertySchema);
 
     const defaults = getDefaultValues(propertySchema).map( def => {
-        formatDocumentExample(def, settings.value.dataFormat)
+        formatDocumentExample(def, useSettings().value.dataFormat)
     }).join(", ") || "-";
-    const constraints = extractConstraints(propertySchema);
     if (hasOutgoingEdge(nodeData, graph) ) {
         type = `<u>[${type}](#${toAnchor(nodeData.absolutePath, rootSchema)})</u>`;
+    } else {
+      // no outgoing edge, so it is not a reference to another schema.
+      // this means we can give it its own id
+      attributeName = `<a id="${anchor}"></a>${attributeName}`;
     }
     const row = [
-        cleanAttrName,
+       attributeName,
         type,
         requiredDesc,
         description,
@@ -198,7 +202,7 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
     ];
     if (tableIncludesExamples) {
         if (hasExample(propertySchema)) {
-            const example = formatDocumentExample(propertySchema.examples![0], settings.value.dataFormat);
+            const example = formatDocumentExample(propertySchema.examples![0], useSettings().value.dataFormat);
             row.push(escapeMarkdown(example));
         } else {
             row.push("-")
@@ -210,7 +214,7 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
 
 function writeEnumNode(md: string[], node: SchemaEnumNodeData) {
     const enumNode = node as SchemaEnumNodeData;
-    const hideInSpoiler = node.values.length > settings.value.documentation.enumMaxCountToShowWithoutSpoiler;
+    const hideInSpoiler = node.values.length > useSettings().value.documentation.enumMaxCountToShowWithoutSpoiler;
 
     if (hideInSpoiler) {
       md.push(`<details>`)
