@@ -13,14 +13,14 @@ import { resolveReferences} from "@/schema/resolveReferences";
 import {hasOutgoingEdge} from "@/schema/graph-representation/graphUtils";
 import {
   escapeMarkdown,
-  extractConstraints,
+  extractConstraints, formatDocumentExample,
   generateSchemaInstance, getDefaultValues,
   hasExample, shouldIncludeNodeInDocumentation,
   toAnchor,
 } from '@/utility/documentation/documentationUtils';
 import {useSettings} from "@/settings/useSettings";
 
-const settings = useSettings().value;
+const settings = useSettings();
 
 export function schemaToMarkdown(rootSchema: TopLevelSchema) {
     const graph = constructSchemaGraph(rootSchema, true);
@@ -157,7 +157,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
         combinators.forEach((keyword) => {
             if (node.schema[keyword]) {
                 md.push(`#### ${keyword}`);
-                const content = JSON.stringify(node.schema[keyword], null, 2);
+                const content = formatDocumentExample(node.schema[keyword], settings.value.dataFormat);
                 md.push("```json\n" + content + "\n```\n");
             }
         });
@@ -169,7 +169,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
     if (instance) {
         md.push("#### Example\n");
         md.push("```json");
-        md.push(JSON.stringify(instance, null, 2));
+        md.push(formatDocumentExample(instance, settings.value.dataFormat));
         md.push("```");
     }
 }
@@ -182,7 +182,7 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
     let description = escapeMarkdown(propertySchema.description ?? "-");
 
     const defaults = getDefaultValues(propertySchema).map( def => {
-        JSON.stringify(def)
+        formatDocumentExample(def, settings.value.dataFormat)
     }).join(", ") || "-";
     const constraints = extractConstraints(propertySchema);
     if (hasOutgoingEdge(nodeData, graph) ) {
@@ -198,7 +198,7 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
     ];
     if (tableIncludesExamples) {
         if (hasExample(propertySchema)) {
-            const example = JSON.stringify(propertySchema.examples![0]);
+            const example = formatDocumentExample(propertySchema.examples![0], settings.value.dataFormat);
             row.push(escapeMarkdown(example));
         } else {
             row.push("-")
@@ -210,7 +210,7 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
 
 function writeEnumNode(md: string[], node: SchemaEnumNodeData) {
     const enumNode = node as SchemaEnumNodeData;
-    const hideInSpoiler = node.values.length > settings.documentation.enumMaxCountToShowWithoutSpoiler;
+    const hideInSpoiler = node.values.length > settings.value.documentation.enumMaxCountToShowWithoutSpoiler;
 
     if (hideInSpoiler) {
       md.push(`<details>`)

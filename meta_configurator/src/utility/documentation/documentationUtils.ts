@@ -2,6 +2,7 @@ import type {JsonSchemaObjectType, TopLevelSchema} from "@/schema/jsonSchemaType
 import {collectReferences, findTargetPath, resolveReferences} from "@/schema/resolveReferences";
 import type {Path} from "@/utility/path";
 import {pathToString} from "@/utility/pathUtils";
+import {formatRegistry} from '@/dataformats/formatRegistry';
 
 export function shouldIncludeNodeInDocumentation(propertyName: string) {
   if (["if", "then", "else"].includes(propertyName.toLowerCase())) {
@@ -124,4 +125,9 @@ export function escapeMarkdown(text: string | undefined | null): string {
         .replace(/</g, '&lt;')       // Escape angle brackets
         .replace(/>/g, '&gt;')       // Escape angle brackets
         .trim();
+}
+
+export function formatDocumentExample(data: any, dataFormat: string): string {
+  const formatDef = formatRegistry.getFormat(dataFormat);
+  return formatDef.dataConverter.stringify(data);
 }
