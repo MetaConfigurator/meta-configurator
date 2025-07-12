@@ -402,7 +402,6 @@ export function generateAttributeEdges(
 ) {
   for (const attributeData of node.attributes) {
     const [edgeTargetNode, isArray] = resolveEdgeTarget(
-      node,
       attributeData.schema,
       attributeData.absolutePath,
       objectDefs
@@ -411,6 +410,7 @@ export function generateAttributeEdges(
       graph.edges.push(
         new EdgeData(
           node,
+          attributeData.absolutePath,
           'source-' + attributeData.name,
           edgeTargetNode,
           EdgeType.ATTRIBUTE,
@@ -427,8 +427,15 @@ export function generateAttributeEdges(
   }
 }
 
-function resolveEdgeTarget(
-  node: SchemaObjectNodeData,
+export function nodesToObjectDefs(nodes: SchemaNodeData[]) {
+  return new Map(
+    nodes.map(node => {
+      return [pathToString(node.absolutePath), node];
+    })
+  );
+}
+
+export function resolveEdgeTarget(
   subSchema: JsonSchemaType,
   subSchemaPath: Path,
   objectDefs: Map<string, SchemaNodeData>
@@ -670,9 +677,7 @@ function generateObjectSubSchemasEdge(
 ) {
   for (const [index, subSchema] of subSchemas.entries()) {
     const subSchemaPath = [...subSchemasPath, index];
-    if (typeof subSchema === 'object') {
-      generateObjectSubSchemaEdge(node, subSchema, subSchemaPath, edgeType, objectDefs, graph);
-    }
+    generateObjectSubSchemaEdge(node, subSchema, subSchemaPath, edgeType, objectDefs, graph);
   }
 }
 
@@ -684,11 +689,12 @@ function generateObjectSubSchemaEdge(
   objectDefs: Map<string, SchemaNodeData>,
   graph: SchemaGraph
 ) {
-  const [edgeTargetNode, isArray] = resolveEdgeTarget(node, subSchema, subSchemaPath, objectDefs);
+  const [edgeTargetNode, isArray] = resolveEdgeTarget(subSchema, subSchemaPath, objectDefs);
   if (edgeTargetNode) {
     graph.edges.push(
       new EdgeData(
         node,
+        subSchemaPath,
         null,
         edgeTargetNode,
         edgeType,
@@ -743,5 +749,3 @@ export function trimNodeChildren(graph: SchemaGraph) {
 function isNodeConnectedByEdge(node: SchemaElementData, graph: SchemaGraph): boolean {
   return graph.edges.find(edge => edge.start == node || edge.end == node) !== undefined;
 }
-
-function getSubSchema(rootSchema: TopLevelSchema, path: Path) {}

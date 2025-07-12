@@ -10,6 +10,7 @@ export interface SettingsInterfaceRoot {
   codeEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
   schemaDiagram: SettingsInterfaceSchemaDiagram;
+  documentation: SettingsInterfaceDocumentation;
   metaSchema: SettingsInterfaceMetaSchema;
   panels: SettingsInterfacePanels;
   frontend: SettingsInterfacFrontend;
@@ -53,6 +54,12 @@ export interface SettingsInterfaceSchemaDiagram {
   automaticZoomMaxValue: number;
   automaticZoomMinValue: number;
   mergeAllOfs: boolean;
+}
+
+export interface SettingsInterfaceDocumentation {
+  mergeAllOfs: boolean;
+  enumMaxCountToShowWithoutSpoiler: number;
+  repeatMultipleOccurrencesInTableOfContents: boolean;
 }
 
 export interface SettingsInterfacePanels {
