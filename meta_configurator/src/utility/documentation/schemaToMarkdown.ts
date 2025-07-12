@@ -29,6 +29,11 @@ import {
 export function schemaToMarkdown(rootSchema: TopLevelSchema) {
     const graph = constructSchemaGraph(rootSchema, useSettings().value.documentation.mergeAllOfs);
     const hierarchy = graphRepresentationToHierarchy(graph, true);
+
+    if (!hierarchy.graphNode) {
+        return "No schema elements found.";
+    }
+
     const flattenedHierarchy = flattenHierarchy(hierarchy);
     const md: string[] = [];
 
