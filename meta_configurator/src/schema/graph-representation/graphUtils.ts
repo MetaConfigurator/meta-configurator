@@ -61,9 +61,6 @@ export function findBestMatchingData(
 
 export function hasOutgoingEdge(node: SchemaNodeData, graph: SchemaGraph): boolean {
   return graph.edges.some( edge => {
-    if (edge.startAttribute == undefined) {
-      return false;
-    }
-    return pathToString(edge.startAttribute.absolutePath) == pathToString(node.absolutePath);
+    return pathToString(edge.startSchemaPath) == pathToString(node.absolutePath);
   })
 }

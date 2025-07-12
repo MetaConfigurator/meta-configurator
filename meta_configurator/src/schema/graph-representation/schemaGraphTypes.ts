@@ -111,7 +111,8 @@ export class SchemaObjectAttributeData extends SchemaElementData {
 export class EdgeData {
   public constructor(
     public start: SchemaNodeData,
-    public startAttribute: SchemaObjectAttributeData|null,
+    // can be schema of the start node or also sub schema/attribute schema of it
+    public startSchemaPath: Path,
     public startHandle: string | null,
     public end: SchemaNodeData,
     public edgeType: EdgeType,

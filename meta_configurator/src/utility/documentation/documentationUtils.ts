@@ -3,6 +3,13 @@ import {collectReferences, findTargetPath, resolveReferences} from "@/schema/res
 import type {Path} from "@/utility/path";
 import {pathToString} from "@/utility/pathUtils";
 
+export function shouldIncludeNodeInDocumentation(propertyName: string) {
+  if (["if", "then", "else"].includes(propertyName.toLowerCase())) {
+    return false;
+  }
+
+  return true;
+}
 
 export function hasExample(schema: any): boolean {
     return schema && Array.isArray(schema.examples) && schema.examples.length > 0;

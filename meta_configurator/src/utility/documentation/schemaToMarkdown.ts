@@ -12,12 +12,12 @@ import type {JsonSchemaObjectType, TopLevelSchema} from "@/schema/jsonSchemaType
 import { resolveReferences} from "@/schema/resolveReferences";
 import {hasOutgoingEdge} from "@/schema/graph-representation/graphUtils";
 import {
-    escapeMarkdown,
-    extractConstraints,
-    generateSchemaInstance, getDefaultValues,
-    hasExample,
-    toAnchor
-} from "@/utility/documentation/documentationUtils";
+  escapeMarkdown,
+  extractConstraints,
+  generateSchemaInstance, getDefaultValues,
+  hasExample, shouldIncludeNodeInDocumentation,
+  toAnchor,
+} from '@/utility/documentation/documentationUtils';
 import {useSettings} from "@/settings/useSettings";
 
 const settings = useSettings().value;
@@ -88,13 +88,6 @@ function writeTableOfContents(md: string[], graph: SchemaGraph, rootSchema: TopL
     md.push("");
 }
 
-function shouldIncludeNodeInDocumentation(propertyName: string) {
-    if (["if", "then", "else"].includes(propertyName.toLowerCase())) {
-        return false;
-    }
-
-    return true;
-}
 
 function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelSchema, node: SchemaObjectNodeData) {
 
@@ -232,6 +225,7 @@ function writeEnumNode(md: string[], node: SchemaEnumNodeData) {
 
     if (hideInSpoiler) {
       md.push(`</details>`)
-      md.push("");
     }
+
+  md.push("");
 }

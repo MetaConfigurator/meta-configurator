@@ -411,7 +411,7 @@ export function generateAttributeEdges(
       graph.edges.push(
         new EdgeData(
           node,
-          attributeData,
+          attributeData.absolutePath,
           'source-' + attributeData.name,
           edgeTargetNode,
           EdgeType.ATTRIBUTE,
@@ -696,7 +696,7 @@ function generateObjectSubSchemaEdge(
     graph.edges.push(
       new EdgeData(
         node,
-        null,
+        subSchemaPath,
         null,
         edgeTargetNode,
         edgeType,
