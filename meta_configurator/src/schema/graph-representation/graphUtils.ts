@@ -2,7 +2,9 @@ import type {Path} from '@/utility/path';
 import {arePathsEqual, pathToString} from '@/utility/pathUtils';
 import {
   type Node,
-  SchemaElementData, SchemaGraph, SchemaNodeData,
+  SchemaElementData,
+  SchemaGraph,
+  SchemaNodeData,
   type SchemaObjectNodeData,
 } from '@/schema/graph-representation/schemaGraphTypes';
 
@@ -57,10 +59,8 @@ export function findBestMatchingData(
   return selectedNode!.data;
 }
 
-
-
 export function hasOutgoingEdge(node: SchemaNodeData, graph: SchemaGraph): boolean {
-  return graph.edges.some( edge => {
+  return graph.edges.some(edge => {
     return pathToString(edge.startSchemaPath) == pathToString(node.absolutePath);
-  })
+  });
 }

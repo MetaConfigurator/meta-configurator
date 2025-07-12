@@ -39,7 +39,7 @@ export function pathToJsonPointer(path: Path): string {
  */
 export function jsonPointerToPath(jsonPointer: string): string[] {
   // if it starts with hashtag, remove that hashtag
-  if (jsonPointer.startsWith("#")) {
+  if (jsonPointer.startsWith('#')) {
     jsonPointer = jsonPointer.substring(1);
   }
   return pointer.parse(jsonPointer);

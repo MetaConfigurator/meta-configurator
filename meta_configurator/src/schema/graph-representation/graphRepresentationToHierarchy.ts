@@ -14,21 +14,32 @@ export interface HierarchyNode {
   depth: number;
 }
 
-
-
-export function graphRepresentationToHierarchy(graph: SchemaGraph, noConditionalSubschemas: boolean): HierarchyNode {
-  const graphRootNode = graph.findNode([])
+export function graphRepresentationToHierarchy(
+  graph: SchemaGraph,
+  noConditionalSubschemas: boolean
+): HierarchyNode {
+  const graphRootNode = graph.findNode([]);
   const hierarchyRootNode: HierarchyNode = {
     graphNode: graphRootNode!,
     children: [],
     parent: undefined,
-    depth: 0
-  }
-  hierarchyRootNode.children = findHierarchyNodeChildren(hierarchyRootNode, graph, noConditionalSubschemas, new Set<SchemaElementData>());
+    depth: 0,
+  };
+  hierarchyRootNode.children = findHierarchyNodeChildren(
+    hierarchyRootNode,
+    graph,
+    noConditionalSubschemas,
+    new Set<SchemaElementData>()
+  );
   return hierarchyRootNode;
 }
 
-function findHierarchyNodeChildren(node: HierarchyNode, graph: SchemaGraph, noSpecialSubSchemas: boolean, alreadyVisitedNodes: Set<SchemaElementData>): HierarchyNode[] {
+function findHierarchyNodeChildren(
+  node: HierarchyNode,
+  graph: SchemaGraph,
+  noSpecialSubSchemas: boolean,
+  alreadyVisitedNodes: Set<SchemaElementData>
+): HierarchyNode[] {
   const children: HierarchyNode[] = [];
 
   for (const edge of graph.edges) {
@@ -36,7 +47,6 @@ function findHierarchyNodeChildren(node: HierarchyNode, graph: SchemaGraph, noSp
       const targetNode = graph.findNode(edge.end.absolutePath);
 
       if (targetNode) {
-
         if (noSpecialSubSchemas) {
           if ([EdgeType.IF, EdgeType.ELSE, EdgeType.THEN].includes(edge.edgeType)) {
             // skip edges that are not attributes, pattern properties or additional properties
@@ -51,15 +61,18 @@ function findHierarchyNodeChildren(node: HierarchyNode, graph: SchemaGraph, noSp
           alreadyVisitedNodes.add(targetNode);
         }
 
-
-
         const childNode: HierarchyNode = {
           graphNode: targetNode,
           children: [],
           parent: node,
-          depth: node.depth + 1
+          depth: node.depth + 1,
         };
-        childNode.children = findHierarchyNodeChildren(childNode, graph, noSpecialSubSchemas, new Set(alreadyVisitedNodes));
+        childNode.children = findHierarchyNodeChildren(
+          childNode,
+          graph,
+          noSpecialSubSchemas,
+          new Set(alreadyVisitedNodes)
+        );
         children.push(childNode);
       }
     }
@@ -67,7 +80,6 @@ function findHierarchyNodeChildren(node: HierarchyNode, graph: SchemaGraph, noSp
 
   return children;
 }
-
 
 export function flattenHierarchy(rootNode: HierarchyNode): HierarchyNode[] {
   const flatList: HierarchyNode[] = [];

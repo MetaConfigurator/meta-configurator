@@ -240,7 +240,11 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     documentation: {
       description: 'Settings of the documentation view.',
       type: 'object',
-      required: ['mergeAllOfs', 'enumMaxCountToShowWithoutSpoiler', `repeatMultipleOccurrencesInTableOfContents`],
+      required: [
+        'mergeAllOfs',
+        'enumMaxCountToShowWithoutSpoiler',
+        `repeatMultipleOccurrencesInTableOfContents`,
+      ],
       properties: {
         mergeAllOfs: {
           type: 'boolean',
@@ -253,7 +257,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         enumMaxCountToShowWithoutSpoiler: {
           type: 'integer',
           description:
-              'For an enumeration, when the number of values exceeds this maximum, instead of showing all enum values directly, they are hidden behind a spoiler and can be expanded/collapsed.',
+            'For an enumeration, when the number of values exceeds this maximum, instead of showing all enum values directly, they are hidden behind a spoiler and can be expanded/collapsed.',
           default: 10,
           minimum: 0,
         },
@@ -263,7 +267,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'If set to true, the table of contents will show multiple occurrences of the same schema element. Some schemas refer to the same sub-schema multiple times, and this option allows the table of contents to show each occurrence separately. If set to false, only the first occurrence will be shown in the table of contents.',
           default: true,
         },
-      }
+      },
     },
     metaSchema: {
       type: 'object',
@@ -353,7 +357,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
               'guiEditor',
               'textEditor',
               'tableView',
-              'documentation'
+              'documentation',
             ],
           },
         },
@@ -454,7 +458,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts', 'tableView', 'documentation'],
+            enum: [
+              'guiEditor',
+              'textEditor',
+              'schemaDiagram',
+              'aiPrompts',
+              'tableView',
+              'documentation',
+            ],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },

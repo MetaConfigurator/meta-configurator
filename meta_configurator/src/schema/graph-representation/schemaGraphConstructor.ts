@@ -401,7 +401,11 @@ export function generateAttributeEdges(
   graph: SchemaGraph
 ) {
   for (const attributeData of node.attributes) {
-    const [edgeTargetNode, isArray] = resolveEdgeTarget(attributeData.schema, attributeData.absolutePath, objectDefs);
+    const [edgeTargetNode, isArray] = resolveEdgeTarget(
+      attributeData.schema,
+      attributeData.absolutePath,
+      objectDefs
+    );
     if (edgeTargetNode) {
       graph.edges.push(
         new EdgeData(
@@ -424,15 +428,17 @@ export function generateAttributeEdges(
 }
 
 export function nodesToObjectDefs(nodes: SchemaNodeData[]) {
-  return new Map(nodes.map( node => {
-    return [ pathToString(node.absolutePath), node]
-  }))
+  return new Map(
+    nodes.map(node => {
+      return [pathToString(node.absolutePath), node];
+    })
+  );
 }
 
 export function resolveEdgeTarget(
   subSchema: JsonSchemaType,
   subSchemaPath: Path,
-  objectDefs: Map<string, SchemaNodeData>,
+  objectDefs: Map<string, SchemaNodeData>
 ): [SchemaNodeData | undefined, boolean] {
   if (subSchema === true || subSchema === false) {
     return [undefined, false];
@@ -671,7 +677,7 @@ function generateObjectSubSchemasEdge(
 ) {
   for (const [index, subSchema] of subSchemas.entries()) {
     const subSchemaPath = [...subSchemasPath, index];
-      generateObjectSubSchemaEdge(node, subSchema, subSchemaPath, edgeType, objectDefs, graph);
+    generateObjectSubSchemaEdge(node, subSchema, subSchemaPath, edgeType, objectDefs, graph);
   }
 }
 
@@ -743,4 +749,3 @@ export function trimNodeChildren(graph: SchemaGraph) {
 function isNodeConnectedByEdge(node: SchemaElementData, graph: SchemaGraph): boolean {
   return graph.edges.find(edge => edge.start == node || edge.end == node) !== undefined;
 }
-

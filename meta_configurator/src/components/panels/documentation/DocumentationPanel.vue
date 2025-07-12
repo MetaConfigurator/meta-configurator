@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { SessionMode } from '@/store/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 import {computed, watch} from 'vue';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
-import { schemaToMarkdown } from '@/utility/documentation/schemaToMarkdown';
-import { downloadMarkdown } from '@/components/panels/documentation/downloadMarkdown';
+import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
+import {downloadMarkdown} from '@/components/panels/documentation/downloadMarkdown';
 import showdown from 'showdown';
 import type {Path} from '@/utility/path';
 import {toAnchor} from '@/utility/documentation/documentationUtils';
@@ -24,8 +24,6 @@ const converter = new showdown.Converter({
 });
 const renderedHtml = computed(() => converter.makeHtml(markdown.value));
 
-
-
 // scroll to the current selected element when it changes
 watch(
   schemaSession.currentSelectedElement,
@@ -36,8 +34,6 @@ watch(
   {deep: true}
 );
 
-
-
 function handleDownloadClick() {
   const markdownText = schemaToMarkdown(schemaData.data.value);
   downloadMarkdown(markdownText);
@@ -47,19 +43,16 @@ function scrollToPath(path: Path) {
   const anchorId = toAnchor(path, schemaData.data.value);
   const element = document.getElementById(anchorId);
   if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "start" });
+    element.scrollIntoView({behavior: 'smooth', block: 'start'});
   }
 }
-
-
-
 </script>
 
 <template>
   <div class="documentation-panel">
-    <DocumentationSettingsPanel/>
+    <DocumentationSettingsPanel />
     <div class="rendered-docs" v-html="renderedHtml"></div>
-    <div style="text-align: center; margin-top: 1rem;">
+    <div style="text-align: center; margin-top: 1rem">
       <button class="download-btn" @click="handleDownloadClick">Download as Markdown</button>
     </div>
   </div>
@@ -179,7 +172,6 @@ function scrollToPath(path: Path) {
 .rendered-docs li a:hover {
   text-decoration: underline;
 }
-
 
 .rendered-docs hr {
   border: none;

@@ -1,4 +1,8 @@
-import type {JsonSchemaObjectType, JsonSchemaType, SchemaPropertyType} from '@/schema/jsonSchemaType';
+import type {
+  JsonSchemaObjectType,
+  JsonSchemaType,
+  SchemaPropertyType,
+} from '@/schema/jsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
 import type {ManagedData} from '@/data/managedData';
@@ -69,7 +73,11 @@ export function isSubSchemaDefinedInDefinitions(absolutePath: Path) {
   return parentKey === '$defs' || parentKey === 'definitions';
 }
 
-export function doesSchemaHaveType(schema: JsonSchemaType, type: SchemaPropertyType, mustBeExplicit: boolean = false): boolean {
+export function doesSchemaHaveType(
+  schema: JsonSchemaType,
+  type: SchemaPropertyType,
+  mustBeExplicit: boolean = false
+): boolean {
   if (schema === undefined) {
     return false;
   }
@@ -87,7 +95,7 @@ export function doesSchemaHaveType(schema: JsonSchemaType, type: SchemaPropertyT
     return types.includes(type);
 
     // else: type is actually one string
-  } else if (typeof(types) === 'string') {
+  } else if (typeof types === 'string') {
     return type === types;
   }
   return false;
