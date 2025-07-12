@@ -19,16 +19,24 @@ import {
   toAnchor,
 } from '@/utility/documentation/documentationUtils';
 import {useSettings} from "@/settings/useSettings";
+import {
+  flattenHierarchy,
+  graphRepresentationToHierarchy,
+  type HierarchyNode,
+} from '@/schema/graph-representation/graphRepresentationToHierarchy';
 
 
 export function schemaToMarkdown(rootSchema: TopLevelSchema) {
-    const graph = constructSchemaGraph(rootSchema, true);
+    const graph = constructSchemaGraph(rootSchema, useSettings().value.documentation.mergeAllOfs);
+    const hierarchy = graphRepresentationToHierarchy(graph, true);
+    const flattenedHierarchy = flattenHierarchy(hierarchy);
     const md: string[] = [];
 
-    writeTableOfContents(md, graph, rootSchema);
+    writeTableOfContents(md, flattenedHierarchy, rootSchema, useSettings().value.documentation.repeatMultipleOccurrencesInTableOfContents);
 
+    flattenedHierarchy.forEach(hierarchyNode => {
+        const node = hierarchyNode.graphNode;
 
-    graph.nodes.forEach((node) => {
         const nodeType = node.getNodeType();
         // write down only schema objects or enums
         if (!["schemaobject", "schemaenum"].includes(nodeType)) return;
@@ -51,40 +59,43 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema) {
         if (nodeType === "schemaenum") {
             writeEnumNode(md, node as SchemaEnumNodeData);
         }
-    });
+    })
+
 
     return md.join("\n");
 }
 
-function writeTableOfContents(md: string[], graph: SchemaGraph, rootSchema: TopLevelSchema) {
-    md.push(`<div class="toc-wrapper">`);
-    md.push(`<h3>Table of Contents</h3>`);
+function writeTableOfContents(md: string[], flattenedHierarchy: HierarchyNode[], rootSchema: TopLevelSchema, repeatEntries: boolean) {
+  md.push(`### Table of Contents`);
+  md.push(""); // Ensure proper Markdown block separation
 
-    const addedAnchors = new Set<string>();
-    const tocLinks: string[] = [];
+  const usedAnchors = new Set<string>();
 
-    // TODO: for future, it would be better if in table of contents the hierarchy of definitions is already shown
-    // also, by building such a hierarchy, it is easier to determine which nodes to show and which to hide.
-    // unconnected nodes or conditionals, etc. should be hidden
+  let currentDepth = 0;
+  const tocLines: string[] = [];
 
-    graph.nodes.forEach((node) => {
-        if (!["schemaobject", "schemaenum"].includes(node.getNodeType())) return;
+  flattenedHierarchy.forEach((hierarchyNode) => {
+    const node = hierarchyNode.graphNode;
+    if (!["schemaobject", "schemaenum"].includes(node.getNodeType())) return;
 
-        const rawName = node.title ?? node.fallbackDisplayName;
-        const name = escapeMarkdown(rawName);
-        const anchor = toAnchor(node.absolutePath, rootSchema);
+    const rawName = node.title ?? node.fallbackDisplayName;
+    const name = escapeMarkdown(rawName);
+    const anchor = toAnchor(node.absolutePath, rootSchema);
 
-        if (!shouldIncludeNodeInDocumentation(name)) return;
+    if (!shouldIncludeNodeInDocumentation(name) || (!repeatEntries && usedAnchors.has(anchor))) return;
 
-        if (!addedAnchors.has(anchor)) {
-            tocLinks.push(`<a href="#${anchor}">${name}</a>`);
-            addedAnchors.add(anchor);
-        }
-    });
+    const depth = hierarchyNode.depth;
+    const indent = "    ".repeat(depth); // Markdown nested list indentation
+    tocLines.push(`${indent}- [${name}](#${anchor})`);
 
-    md.push(`<div class="toc-links">${tocLinks.join("<br>")}</div>`);
-    md.push(`</div>`);
-    md.push("");
+    usedAnchors.add(anchor);
+  });
+
+// Only push if there are actual TOC entries
+  if (tocLines.length > 0) {
+    md.push(...tocLines);
+    md.push(""); // Ensure spacing after list
+  }
 }
 
 
@@ -111,7 +122,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
 
         if (node.schema.additionalProperties) {
             const objectDefs = nodesToObjectDefs(graph.nodes);
-            const edgeTargetResult = resolveEdgeTarget(node, node.schema.additionalProperties, [...node.absolutePath, 'additionalProperties'], objectDefs)
+            const edgeTargetResult = resolveEdgeTarget(node.schema.additionalProperties, [...node.absolutePath, 'additionalProperties'], objectDefs)
             const edgeTarget = edgeTargetResult[0]
             if (edgeTarget) {
                 const type = edgeTarget.title || edgeTarget.fallbackDisplayName;
@@ -123,7 +134,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
         md.push("");
     }
 
-    const compositionKeywords = ["oneOf", "anyOf"] // allOf should not occur because we merge all allOfs!
+    const compositionKeywords = ["oneOf", "anyOf", "allOf"]
     compositionKeywords.forEach((keyword) => {
         if (node.schema[keyword]) {
             md.push(`#### ${keyword}`);
@@ -131,15 +142,24 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
             // create a list in markdown with the different options to select from.
             // iterate through options with index because index is needed to create the absolute path of the option
             for (let optionIndex = 0; optionIndex < compositionOptions.length; optionIndex++) {
+                md.push(`<b>Option ${optionIndex + 1}</b>`);
+
                 const optionPath = [...node.absolutePath, keyword, optionIndex]
-                const optionNode = graph.findNode(optionPath)
+                let optionNode = graph.findNode(optionPath)
+
+                const resolvedOptionTarget = resolveEdgeTarget(compositionOptions[optionIndex], optionPath, nodesToObjectDefs(graph.nodes))[0];
+                if (resolvedOptionTarget) {
+                    optionNode = resolvedOptionTarget;
+                }
+
                 if (optionNode) {
                     const title = optionNode.title ?? optionNode.fallbackDisplayName;
                     const anchor = toAnchor(optionPath, rootSchema);
-                    md.push(`- <u>[${title}](#${anchor})</u>`)
+                    md.push(`##### <u>[${title}](#${anchor})</u>`)
                 } else {
-                    const anchor = toAnchor(optionPath, rootSchema);
-                    md.push(`- <u>[Option ${optionIndex}](#${anchor})</u>`)
+                    md.push("```" + useSettings().value.dataFormat);
+                    md.push(formatDocumentExample(compositionOptions[optionIndex], useSettings().value.dataFormat));
+                    md.push("```");
                 }
             }
         }
@@ -157,7 +177,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
             if (node.schema[keyword]) {
                 md.push(`#### ${keyword}`);
                 const content = formatDocumentExample(node.schema[keyword], useSettings().value.dataFormat);
-                md.push("```json\n" + content + "\n```\n");
+                md.push("```" + useSettings().value.dataFormat + "\n" + content + "\n```\n");
             }
         });
 
@@ -167,7 +187,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
     const instance = generateSchemaInstance(resolveReferences(node.schema, rootSchema), rootSchema);
     if (instance) {
         md.push("#### Example\n");
-        md.push("```json");
+        md.push("```" + useSettings().value.dataFormat);
         md.push(formatDocumentExample(instance, useSettings().value.dataFormat));
         md.push("```");
     }

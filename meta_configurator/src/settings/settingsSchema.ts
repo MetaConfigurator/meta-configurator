@@ -240,15 +240,29 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     documentation: {
       description: 'Settings of the documentation view.',
       type: 'object',
-      required: ['enumMaxCountToShowWithoutSpoiler'],
+      required: ['mergeAllOfs', 'enumMaxCountToShowWithoutSpoiler', `repeatMultipleOccurrencesInTableOfContents`],
       properties: {
+        mergeAllOfs: {
+          type: 'boolean',
+          description:
+            'If set to true, allOf schemas will be merged in the documentation view. This can make the documentation more readable, but sometimes also is not desired, because some information gets lost.',
+          $comment:
+            'Warning: has undefined behavior when merging multiple allOfs using the "$ref" keyword.',
+          default: true,
+        },
         enumMaxCountToShowWithoutSpoiler: {
           type: 'integer',
           description:
               'For an enumeration, when the number of values exceeds this maximum, instead of showing all enum values directly, they are hidden behind a spoiler and can be expanded/collapsed.',
           default: 10,
           minimum: 0,
-        }
+        },
+        repeatMultipleOccurrencesInTableOfContents: {
+          type: 'boolean',
+          description:
+            'If set to true, the table of contents will show multiple occurrences of the same schema element. Some schemas refer to the same sub-schema multiple times, and this option allows the table of contents to show each occurrence separately. If set to false, only the first occurrence will be shown in the table of contents.',
+          default: true,
+        },
       }
     },
     metaSchema: {

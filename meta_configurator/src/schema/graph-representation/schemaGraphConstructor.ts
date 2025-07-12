@@ -401,12 +401,7 @@ export function generateAttributeEdges(
   graph: SchemaGraph
 ) {
   for (const attributeData of node.attributes) {
-    const [edgeTargetNode, isArray] = resolveEdgeTarget(
-      node,
-      attributeData.schema,
-      attributeData.absolutePath,
-      objectDefs
-    );
+    const [edgeTargetNode, isArray] = resolveEdgeTarget(attributeData.schema, attributeData.absolutePath, objectDefs);
     if (edgeTargetNode) {
       graph.edges.push(
         new EdgeData(
@@ -435,10 +430,9 @@ export function nodesToObjectDefs(nodes: SchemaNodeData[]) {
 }
 
 export function resolveEdgeTarget(
-  node: SchemaObjectNodeData,
   subSchema: JsonSchemaType,
   subSchemaPath: Path,
-  objectDefs: Map<string, SchemaNodeData>
+  objectDefs: Map<string, SchemaNodeData>,
 ): [SchemaNodeData | undefined, boolean] {
   if (subSchema === true || subSchema === false) {
     return [undefined, false];
@@ -691,7 +685,7 @@ function generateObjectSubSchemaEdge(
   objectDefs: Map<string, SchemaNodeData>,
   graph: SchemaGraph
 ) {
-  const [edgeTargetNode, isArray] = resolveEdgeTarget(node, subSchema, subSchemaPath, objectDefs);
+  const [edgeTargetNode, isArray] = resolveEdgeTarget(subSchema, subSchemaPath, objectDefs);
   if (edgeTargetNode) {
     graph.edges.push(
       new EdgeData(

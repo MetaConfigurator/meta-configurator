@@ -57,7 +57,9 @@ export interface SettingsInterfaceSchemaDiagram {
 }
 
 export interface SettingsInterfaceDocumentation {
+  mergeAllOfs: boolean;
   enumMaxCountToShowWithoutSpoiler: number;
+  repeatMultipleOccurrencesInTableOfContents: boolean;
 }
 
 export interface SettingsInterfacePanels {

@@ -40,7 +40,9 @@ export const SETTINGS_DATA_DEFAULT = {
     mergeAllOfs: false,
   },
   documentation: {
+    mergeAllOfs: true,
     enumMaxCountToShowWithoutSpoiler: 10,
+    repeatMultipleOccurrencesInTableOfContents: true,
   },
   metaSchema: {
     allowBooleanSchema: false,

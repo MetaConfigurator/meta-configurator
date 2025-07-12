@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SessionMode } from '@/store/sessionMode';
-import {computed, onMounted, onUnmounted, onUpdated, ref, watch} from 'vue';
+import {computed, watch} from 'vue';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import { schemaToMarkdown } from '@/utility/documentation/schemaToMarkdown';
 import { downloadMarkdown } from '@/components/panels/documentation/downloadMarkdown';
@@ -22,7 +22,6 @@ const converter = new showdown.Converter({
   requireSpaceBeforeHeadingText: true,
 });
 const renderedHtml = computed(() => converter.makeHtml(markdown.value));
-const docsContainer = ref<HTMLElement | null>(null);
 
 
 
@@ -142,38 +141,44 @@ function scrollToPath(path: Path) {
   font-size: 18px;
   margin: 1.25rem 0 0.5rem;
 }
-
-.rendered-docs .toc-wrapper {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
+/* Style for all unordered lists in rendered docs */
+.rendered-docs ul {
+  list-style-type: disc;
+  margin: 0.8em 0 0.8em 1.5em; /* vertical spacing and indentation */
+  padding-left: 0;
 }
 
-.rendered-docs .toc-wrapper h3 {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+/* Nested unordered lists get increased indentation and different bullet style */
+.rendered-docs ul ul {
+  list-style-type: circle;
+  margin-left: 1.5em;
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
 }
 
-.rendered-docs .toc-links {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  line-height: 0.5;
+.rendered-docs ul ul ul {
+  list-style-type: square;
+  margin-left: 1.5em;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
 }
 
-.rendered-docs .toc-links a {
-  white-space: nowrap;
-  text-decoration: none;
+/* List items spacing */
+.rendered-docs li {
+  margin: 0.2em 0;
+  line-height: 1.4;
+}
+
+/* Links inside list items */
+.rendered-docs li a {
   color: var(--p-primary-active-color);
+  text-decoration: none;
 }
 
-.rendered-docs .toc-links a:hover {
+.rendered-docs li a:hover {
   text-decoration: underline;
 }
+
 
 .rendered-docs hr {
   border: none;
