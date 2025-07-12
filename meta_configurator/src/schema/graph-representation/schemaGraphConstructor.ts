@@ -671,9 +671,7 @@ function generateObjectSubSchemasEdge(
 ) {
   for (const [index, subSchema] of subSchemas.entries()) {
     const subSchemaPath = [...subSchemasPath, index];
-    if (typeof subSchema === 'object') {
       generateObjectSubSchemaEdge(node, subSchema, subSchemaPath, edgeType, objectDefs, graph);
-    }
   }
 }
 
