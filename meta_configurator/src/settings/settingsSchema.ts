@@ -353,6 +353,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
               'guiEditor',
               'textEditor',
               'tableView',
+              'documentation'
             ],
           },
         },
@@ -453,7 +454,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         properties: {
           panelType: {
             type: 'string',
-            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts', 'tableView'],
+            enum: ['guiEditor', 'textEditor', 'schemaDiagram', 'aiPrompts', 'tableView', 'documentation'],
             title: 'Panel Type',
             description: 'Type of panel to display.',
           },
