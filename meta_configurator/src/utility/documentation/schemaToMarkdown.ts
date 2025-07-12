@@ -90,8 +90,6 @@ function writeTableOfContents(
   md.push(''); // Ensure proper Markdown block separation
 
   const usedAnchors = new Set<string>();
-
-  let currentDepth = 0;
   const tocLines: string[] = [];
 
   flattenedHierarchy.forEach(hierarchyNode => {
