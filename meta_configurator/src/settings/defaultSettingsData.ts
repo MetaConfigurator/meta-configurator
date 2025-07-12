@@ -39,6 +39,9 @@ export const SETTINGS_DATA_DEFAULT = {
     automaticZoomMinValue: 0.5,
     mergeAllOfs: false,
   },
+  documentation: {
+    enumMaxCountToShowWithoutSpoiler: 10,
+  },
   metaSchema: {
     allowBooleanSchema: false,
     allowMultipleTypes: false,

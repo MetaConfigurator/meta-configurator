@@ -237,6 +237,20 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    documentation: {
+      description: 'Settings of the documentation view.',
+      type: 'object',
+      required: ['enumMaxCountToShowWithoutSpoiler'],
+      properties: {
+        enumMaxCountToShowWithoutSpoiler: {
+          type: 'integer',
+          description:
+              'For an enumeration, when the number of values exceeds this maximum, instead of showing all enum values directly, they are hidden behind a spoiler and can be expanded/collapsed.',
+          default: 10,
+          minimum: 0,
+        }
+      }
+    },
     metaSchema: {
       type: 'object',
       required: ['allowBooleanSchema', 'allowMultipleTypes', 'objectTypesComfort'],

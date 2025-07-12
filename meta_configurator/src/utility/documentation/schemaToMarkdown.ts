@@ -18,6 +18,9 @@ import {
     hasExample,
     toAnchor
 } from "@/utility/documentation/documentationUtils";
+import {useSettings} from "@/settings/useSettings";
+
+const settings = useSettings().value;
 
 export function schemaToMarkdown(rootSchema: TopLevelSchema) {
     const graph = constructSchemaGraph(rootSchema, true);
@@ -214,14 +217,21 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
 
 function writeEnumNode(md: string[], node: SchemaEnumNodeData) {
     const enumNode = node as SchemaEnumNodeData;
+    const hideInSpoiler = node.values.length > settings.documentation.enumMaxCountToShowWithoutSpoiler;
 
-    md.push(`<details>`)
-    md.push(`<summary>Enumeration Values</summary>`)
+    if (hideInSpoiler) {
+      md.push(`<details>`)
+      md.push(`<summary>Enumeration Values</summary>`)
+    } else {
+      md.push(`#### Enumeration Values`);
+    }
 
     enumNode.values.forEach((val) => {
         md.push(`- \`${String(val)}\``);
     });
 
-    md.push(`</details>`)
-    md.push("");
+    if (hideInSpoiler) {
+      md.push(`</details>`)
+      md.push("");
+    }
 }
