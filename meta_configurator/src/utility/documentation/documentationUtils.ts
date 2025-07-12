@@ -13,16 +13,20 @@ export function shouldIncludeNodeInDocumentation(propertyName: string) {
 }
 
 export function hasExample(schema: any): boolean {
-    return schema && Array.isArray(schema.examples) && schema.examples.length > 0;
+  return schema && Array.isArray(schema.examples) && schema.examples.length > 0;
 }
 
-
-export function getDefaultValues(schema: any): any[] {
-    if (schema.defaults && schema.defaults.length > 0) {
-        return schema.defaults;
-    }
-    return []
+export function hasDefault(schema: any): boolean {
+  return schema && schema.default;
 }
+
+export function getExampleValues(schema: any): any[] {
+  if (schema.examples && schema.examples.length > 0) {
+    return schema.examples;
+  }
+  return [];
+}
+
 
 export function generateSchemaInstance(schema: any, rootSchema: TopLevelSchema, visitedReferences: Set<string>|undefined = undefined): any {
     // if the schema has example values, take the first example

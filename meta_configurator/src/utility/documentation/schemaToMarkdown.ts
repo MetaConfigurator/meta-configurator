@@ -12,11 +12,11 @@ import type {JsonSchemaObjectType, TopLevelSchema} from "@/schema/jsonSchemaType
 import { resolveReferences} from "@/schema/resolveReferences";
 import {hasOutgoingEdge} from "@/schema/graph-representation/graphUtils";
 import {
-  escapeMarkdown,
-  extractConstraints, formatDocumentExample,
-  generateSchemaInstance, getDefaultValues,
-  hasExample, shouldIncludeNodeInDocumentation,
-  toAnchor,
+    escapeMarkdown,
+    extractConstraints, formatDocumentExample,
+    generateSchemaInstance, getExampleValues, hasDefault,
+    hasExample, shouldIncludeNodeInDocumentation,
+    toAnchor,
 } from '@/utility/documentation/documentationUtils';
 import {useSettings} from "@/settings/useSettings";
 import {
@@ -107,13 +107,15 @@ function writeTableOfContents(md: string[], flattenedHierarchy: HierarchyNode[],
 function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelSchema, node: SchemaObjectNodeData) {
 
     const attributes = node.attributes ?? [];
-    const hasAnyExample = attributes.some(attr => hasExample(attr.schema));
+    const hasAnyExample = attributes.some(attr => hasExample(attr.schema)) || hasExample(node.schema.additionalProperties);
+    const hasAnyDefault = attributes.some(attr => hasDefault(attr.schema)) || hasDefault(node.schema.additionalProperties);
 
     if (attributes.length > 0 || node.schema.patternProperties?.length || node.schema.additionalProperties) {
         md.push("#### Properties\n");
 
-        const header = ["Name", "Type", "Required", "Description", "Default", "Constraints"];
-        if (hasAnyExample) header.push("Example");
+        const header = ["Name", "Type", "Required", "Description", "Constraints"];
+        if (hasAnyExample) header.push("Examples");
+        if (hasAnyDefault) header.push("Default");
 
         md.push(`| ${header.join(" | ")} |`);
         md.push(`|${header.map(() => "------").join("|")}|`);
@@ -121,7 +123,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
         attributes.forEach((attr: SchemaObjectAttributeData) => {
             const attributeName = attr.name ?? "-";
             let type = attr.typeDescription ?? "-";
-            writeObjectAttribute(md, attributeName, type, attr.required, attr.schema, attr, graph, rootSchema, hasAnyExample);
+            writeObjectAttribute(md, attributeName, type, attr.required, attr.schema, attr, graph, rootSchema, hasAnyExample, hasAnyDefault);
         });
 
 
@@ -131,7 +133,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
             const edgeTarget = edgeTargetResult[0]
             if (edgeTarget) {
                 const type = edgeTarget.title || edgeTarget.fallbackDisplayName;
-                writeObjectAttribute(md, "{string}", type, false, edgeTarget.schema, edgeTarget, graph, rootSchema, hasAnyExample);
+                writeObjectAttribute(md, "{string}", type, false, edgeTarget.schema, edgeTarget, graph, rootSchema, hasAnyExample, hasAnyDefault);
             }
         }
 
@@ -199,7 +201,7 @@ function writeObjectNode(md: string[], graph: SchemaGraph, rootSchema: TopLevelS
 }
 
 
-function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDescription: string, required: boolean, propertySchema: JsonSchemaObjectType, nodeData: SchemaNodeData, graph: SchemaGraph, rootSchema: TopLevelSchema, tableIncludesExamples: boolean) {
+function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDescription: string, required: boolean, propertySchema: JsonSchemaObjectType, nodeData: SchemaNodeData, graph: SchemaGraph, rootSchema: TopLevelSchema, tableIncludesExamples: boolean, tableIncludesDefaults: boolean) {
     let attributeName = escapeMarkdown(propertyName);
     let type = escapeMarkdown(propertyTypeDescription);
     const requiredDesc = required ? '<span style="color:lightblue">true</span>' : '<span style="color:salmon">false</span>';
@@ -207,9 +209,6 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
     const anchor = toAnchor(nodeData.absolutePath, rootSchema);
   const constraints = escapeMarkdown(extractConstraints(propertySchema));
 
-    const defaults = getDefaultValues(propertySchema).map( def => {
-        formatDocumentExample(def, useSettings().value.dataFormat)
-    }).join(", ") || "-";
     if (hasOutgoingEdge(nodeData, graph) ) {
         type = `<u>[${type}](#${toAnchor(nodeData.absolutePath, rootSchema)})</u>`;
     } else {
@@ -222,15 +221,24 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
         type,
         requiredDesc,
         description,
-        defaults,
         constraints,
     ];
     if (tableIncludesExamples) {
         if (hasExample(propertySchema)) {
-            const example = formatDocumentExample(propertySchema.examples![0], useSettings().value.dataFormat);
-            row.push(escapeMarkdown(example));
+            const examples = getExampleValues(propertySchema).map( example => {
+                return formatDocumentExample(example, useSettings().value.dataFormat);
+            }).join(", ") || "-";
+            row.push(escapeMarkdown(examples));
         } else {
             row.push("-")
+        }
+    }
+    if (tableIncludesDefaults) {
+        if (hasDefault(propertySchema)) {
+            const def = formatDocumentExample(propertySchema.default, useSettings().value.dataFormat);
+            row.push(escapeMarkdown(def));
+        } else {
+            row.push("-");
         }
     }
     md.push(`| ${row.join(" | ")} |`);
