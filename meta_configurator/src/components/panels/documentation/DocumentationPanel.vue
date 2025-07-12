@@ -7,6 +7,7 @@ import { downloadMarkdown } from '@/components/panels/documentation/downloadMark
 import showdown from 'showdown';
 import type {Path} from '@/utility/path';
 import {toAnchor} from '@/utility/documentation/documentationUtils';
+import DocumentationSettingsPanel from '@/components/panels/documentation/DocumentationSettingsPanel.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -56,7 +57,7 @@ function scrollToPath(path: Path) {
 
 <template>
   <div class="documentation-panel">
-    <label class="heading">Documentation View</label>
+    <DocumentationSettingsPanel/>
     <div class="rendered-docs" v-html="renderedHtml"></div>
     <div style="text-align: center; margin-top: 1rem;">
       <button class="download-btn" @click="handleDownloadClick">Download as Markdown</button>
