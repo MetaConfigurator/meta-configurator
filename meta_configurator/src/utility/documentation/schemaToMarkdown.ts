@@ -180,7 +180,7 @@ function writeObjectAttribute(md: string[], propertyName: string, propertyTypeDe
     const requiredDesc = required ? '<span style="color:lightblue">true</span>' : '<span style="color:salmon">false</span>';
     let description = escapeMarkdown(propertySchema.description ?? "-");
     const anchor = toAnchor(nodeData.absolutePath, rootSchema);
-  const constraints = extractConstraints(propertySchema);
+  const constraints = escapeMarkdown(extractConstraints(propertySchema));
 
     const defaults = getDefaultValues(propertySchema).map( def => {
         formatDocumentExample(def, useSettings().value.dataFormat)

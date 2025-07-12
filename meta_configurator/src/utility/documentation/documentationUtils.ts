@@ -124,7 +124,7 @@ export function escapeMarkdown(text: string | undefined | null): string {
     if (!text) return "-";
     return text
         .replace(/\\/g, '\\\\')     // Escape backslashes
-        .replace(/([_*[\]()#+\-!`>])/g, '\\$1') // Escape Markdown symbols
+      .replace(/([|_*[\]()#+\-!`>])/g, '\\$1') // Escape Markdown symbols including |
         .replace(/</g, '&lt;')       // Escape angle brackets
         .replace(/>/g, '&gt;')       // Escape angle brackets
         .trim();
