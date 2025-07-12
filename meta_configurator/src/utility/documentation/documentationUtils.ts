@@ -4,12 +4,26 @@ import type {Path} from "@/utility/path";
 import {pathToString} from "@/utility/pathUtils";
 import {formatRegistry} from '@/dataformats/formatRegistry';
 
+
+const CONSTRAINTS_KEYS = [ "minLength", "maxLength", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "pattern", "format", "const", "multipleOf" ];
+
+
 export function shouldIncludeNodeInDocumentation(propertyName: string) {
   if (["if", "then", "else"].includes(propertyName.toLowerCase())) {
     return false;
   }
 
   return true;
+}
+
+export function hasConstraints(schema: any): boolean {
+  if (!schema) return false;
+  for (const key of CONSTRAINTS_KEYS) {
+    if (key in schema) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export function hasExample(schema: any): boolean {
@@ -98,8 +112,7 @@ export function generateSchemaInstance(schema: any, rootSchema: TopLevelSchema, 
 export function extractConstraints(schema: any): string {
     if (!schema) return "-";
     const constraints: string[] = [];
-    const keys = ["minLength", "maxLength", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "pattern", "format", "const", "multipleOf"];
-    for (const key of keys) {
+    for (const key of CONSTRAINTS_KEYS) {
         if (key in schema) {
             constraints.push(`${key}: ${JSON.stringify(schema[key])}`);
         }
