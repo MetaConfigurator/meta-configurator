@@ -93,7 +93,7 @@ export function generateSchemaInstance(
   if (type === 'boolean') return '{boolean}';
   if (type === 'array') {
     const itemsReferences = collectReferences(resolvedSchema.items, rootSchema);
-    const itemsRefIsNotAlreadyVisited = itemsReferences.isDisjointFrom(visitedReferences);
+    const itemsRefIsNotAlreadyVisited = isDisjoint(itemsReferences, visitedReferences)
     if (itemsRefIsNotAlreadyVisited) {
       const arrayItemInstance = generateSchemaInstance(
           resolvedSchema.items,
@@ -116,14 +116,14 @@ export function generateSchemaInstance(
     for (const key in props) {
       const propertySchema = props[key];
       const propertyReferences = collectReferences(propertySchema, rootSchema);
-      const propertyRefIsNotAlreadyVisited = propertyReferences.isDisjointFrom(visitedReferences);
+      const propertyRefIsNotAlreadyVisited = isDisjoint(propertyReferences, visitedReferences)
       if (propertyRefIsNotAlreadyVisited)
         result[key] = generateSchemaInstance(propertySchema, rootSchema, visitedReferences);
     }
     for (const key in patternProps) {
       const propertySchema = patternProps[key];
       const propertyReferences = collectReferences(propertySchema, rootSchema);
-      const propertyRefIsNotAlreadyVisited = propertyReferences.isDisjointFrom(visitedReferences);
+      const propertyRefIsNotAlreadyVisited = isDisjoint(propertyReferences, visitedReferences)
       if (propertyRefIsNotAlreadyVisited)
         result[key] = generateSchemaInstance(propertySchema, rootSchema, visitedReferences);
     }
@@ -204,4 +204,13 @@ export function cleanMarkdownContent(markdown: string): string {
     .replace(/<[^>]+>/g, '') // all other tags
     .replace(/&nbsp;/g, ' ') // replace non-breaking spaces
     .replace(/\r\n/g, '\n'); // normalize line endings
+}
+
+
+// we implement this function ourselves as the built-in Set.isDisjoint is not available in all environments
+function isDisjoint(setA: Set<any>, setB: Set<any>): boolean {
+  for (const item of setA) {
+    if (setB.has(item)) return false;
+  }
+  return true;
 }
