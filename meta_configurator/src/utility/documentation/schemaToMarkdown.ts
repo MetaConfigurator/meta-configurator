@@ -35,6 +35,7 @@ import {
 export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string) {
   const graph = constructSchemaGraph(rootSchema, useSettings().value.documentation.mergeAllOfs);
   const hierarchy = graphRepresentationToHierarchy(graph, true);
+  const repeatEntries = useSettings().value.documentation.repeatMultipleOccurrencesInTableOfContents;
 
   if (!hierarchy.graphNode) {
     return 'No schema elements found.';
@@ -49,8 +50,10 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string
     md,
     flattenedHierarchy,
     rootSchema,
-    useSettings().value.documentation.repeatMultipleOccurrencesInTableOfContents
+    repeatEntries
   );
+
+  const usedAnchors = new Set<string>();
 
   flattenedHierarchy.forEach(hierarchyNode => {
     const node = hierarchyNode.graphNode;
@@ -62,11 +65,15 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string
     const rawName = node.title ?? node.fallbackDisplayName;
     const name = escapeMarkdown(rawName);
     const description = node.schema.description ?? '';
+    const anchor = toAnchor(node.absolutePath, rootSchema);
 
-    if (!shouldIncludeNodeInDocumentation(name)) return;
+    if (!shouldIncludeNodeInDocumentation(name) || (!repeatEntries && usedAnchors.has(anchor)))
+      return;
 
     md.push('---');
     md.push(`### ${toAnchorId(name, node.absolutePath, rootSchema, true)}`);
+    usedAnchors.add(anchor);
+
     if (description) md.push(`*${description}*\n`);
 
     if (nodeType === 'schemaobject') {
