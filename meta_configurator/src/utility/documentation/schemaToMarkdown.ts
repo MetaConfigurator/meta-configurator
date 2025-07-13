@@ -23,7 +23,7 @@ import {
   hasDefault,
   hasExample,
   shouldIncludeNodeInDocumentation,
-  toAnchor,
+  toAnchor, toAnchorId, toAnchorLink,
 } from '@/utility/documentation/documentationUtils';
 import {useSettings} from '@/settings/useSettings';
 import {
@@ -61,13 +61,12 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string
 
     const rawName = node.title ?? node.fallbackDisplayName;
     const name = escapeMarkdown(rawName);
-    const anchor = toAnchor(node.absolutePath, rootSchema);
     const description = node.schema.description ?? '';
 
     if (!shouldIncludeNodeInDocumentation(name)) return;
 
     md.push('---');
-    md.push(`### <a id="${anchor}"></a>${name}`);
+    md.push(`### ${toAnchorId(name, node.absolutePath, rootSchema)}`);
     if (description) md.push(`*${description}*\n`);
 
     if (nodeType === 'schemaobject') {
@@ -107,7 +106,7 @@ function writeTableOfContents(
 
     const depth = hierarchyNode.depth;
     const indent = '    '.repeat(depth); // Markdown nested list indentation
-    tocLines.push(`${indent}- [${name}](#${anchor})`);
+    tocLines.push(`${indent}- ${toAnchorLink(name, node.absolutePath, rootSchema)}`);
 
     usedAnchors.add(anchor);
   });
@@ -222,8 +221,7 @@ function writeObjectNode(
 
         if (optionNode) {
           const title = optionNode.title ?? optionNode.fallbackDisplayName;
-          const anchor = toAnchor(optionPath, rootSchema);
-          md.push(`##### <u>[${title}](#${anchor})</u>`);
+          md.push(`##### <u>${toAnchorLink(title, optionPath, rootSchema)}</u>`);
         } else {
           md.push('```' + useSettings().value.dataFormat);
           md.push(
@@ -280,14 +278,13 @@ function writeObjectAttribute(
     ? '<span style="color:lightblue">true</span>'
     : '<span style="color:salmon">false</span>';
   let description = escapeMarkdown(propertySchema.description ?? '-');
-  const anchor = toAnchor(nodeData.absolutePath, rootSchema);
 
   if (hasOutgoingEdge(nodeData, graph)) {
-    type = `<u>[${type}](#${toAnchor(nodeData.absolutePath, rootSchema)})</u>`;
+    type = `<u>${toAnchorLink(type, nodeData.absolutePath, rootSchema)}</u>`;
   } else {
     // no outgoing edge, so it is not a reference to another schema.
     // this means we can give it its own id
-    attributeName = `<a id="${anchor}"></a>${attributeName}`;
+    attributeName = toAnchorId(attributeName, nodeData.absolutePath, rootSchema);
   }
   const row = [attributeName, type, requiredDesc, description];
   if (tableIncludesConstraints) {

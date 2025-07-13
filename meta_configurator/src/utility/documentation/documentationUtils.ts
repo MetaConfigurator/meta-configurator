@@ -146,6 +146,14 @@ export function extractConstraints(schema: any): string {
   }
 }
 
+export function toAnchorLink(label: string, nodePath: Path, rootSchema: TopLevelSchema): string {
+  return `[${label}](#${toAnchor(nodePath, rootSchema)})`
+}
+
+export function toAnchorId(label: string, nodePath: Path, rootSchema: TopLevelSchema): string {
+  return `<a id="${toAnchor(nodePath, rootSchema)}"></a>${label}`
+}
+
 export function toAnchor(nodePath: Path, rootSchema: TopLevelSchema): string {
   if (nodePath.length === 0) {
     return 'root';
