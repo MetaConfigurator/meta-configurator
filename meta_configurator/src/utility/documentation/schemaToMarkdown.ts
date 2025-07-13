@@ -50,7 +50,8 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string
   md.push(`# ${schemaTitle}`);
 
   writeTableOfContents(md, flattenedHierarchy, rootSchema, repeatEntries);
-  writeContents(md, graph, flattenedHierarchy, rootSchema, repeatEntries);
+  // do never repeat entries in the main content as this would bloat the document and also because currently anchors would always lead to the first occurrence
+  writeContents(md, graph, flattenedHierarchy, rootSchema, false);
   return md.join('\n');
 }
 

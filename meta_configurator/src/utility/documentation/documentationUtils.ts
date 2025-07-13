@@ -1,7 +1,7 @@
 import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {collectReferences, findTargetPath, resolveReferences} from '@/schema/resolveReferences';
 import type {Path} from '@/utility/path';
-import {pathToAscii, pathToString} from '@/utility/pathUtils';
+import {pathToAscii} from '@/utility/pathUtils';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 
 const CONSTRAINTS_KEYS = [
