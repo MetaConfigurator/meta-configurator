@@ -81,7 +81,7 @@ export function generateSchemaInstance(
     visitedReferences = new Set();
   }
   // mark the current schema as visited so children will not visit it again if not required
-  visitedReferences = visitedReferences.union(collectReferences(schema, rootSchema));
+  visitedReferences = new Set([...visitedReferences, ...collectReferences(schema, rootSchema)]);
 
   // resolve the references of the current schema if needed
   const resolvedSchema: JsonSchemaObjectType = resolveReferences(schema, rootSchema);
