@@ -1,0 +1,36 @@
+{
+  "title": "Conditionals Schema",
+  "type": "object",
+  "properties": {
+    "Person": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "married": {
+          "type": "boolean"
+        }
+      },
+      "if": {
+        "type": "object",
+        "properties": {
+          "married": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "married"
+        ]
+      },
+      "then": {
+        "properties": {
+          "partnerName": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
