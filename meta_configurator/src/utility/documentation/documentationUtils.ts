@@ -55,6 +55,9 @@ export function generateSchemaInstance(
   rootSchema: TopLevelSchema,
   visitedReferences: Set<string> | undefined = undefined
 ): any {
+  if (!schema) {
+    return undefined;
+  }
   // if the schema has example values, take the first example
   if (schema.examples && schema.examples.length > 0) {
     return schema.examples[0];
@@ -85,36 +88,39 @@ export function generateSchemaInstance(
   if (type === 'integer') return '{integer}';
   if (type === 'boolean') return '{boolean}';
   if (type === 'array') {
-    const arrayItemInstance = generateSchemaInstance(
-      resolvedSchema.items,
-      rootSchema,
-      visitedReferences
-    );
-    const itemCount = Math.max(schema.minItems || 0, 1);
-    const resultArray: any[] = [];
-    for (let i = 0; i < itemCount; i++) {
-      resultArray.push(arrayItemInstance);
+    const itemsReferences = collectReferences(resolvedSchema.items, rootSchema);
+    const itemsRefIsNotAlreadyVisited = itemsReferences.isDisjointFrom(visitedReferences);
+    if (itemsRefIsNotAlreadyVisited) {
+      const arrayItemInstance = generateSchemaInstance(
+          resolvedSchema.items,
+          rootSchema,
+          visitedReferences
+      );
+      const itemCount = Math.max(schema.minItems || 0, 1);
+      const resultArray: any[] = [];
+      for (let i = 0; i < itemCount; i++) {
+        resultArray.push(arrayItemInstance);
+      }
+      return resultArray as any;
     }
-    return resultArray as any;
   }
   if (type === 'object') {
     const props = resolvedSchema.properties ?? {};
     const patternProps = resolvedSchema.patternProperties ?? {};
     const additionalProps = resolvedSchema.additionalProperties ?? true;
-    const required = resolvedSchema.required ?? [];
     const result: any = {};
     for (const key in props) {
       const propertySchema = props[key];
       const propertyReferences = collectReferences(propertySchema, rootSchema);
       const propertyRefIsNotAlreadyVisited = propertyReferences.isDisjointFrom(visitedReferences);
-      if (required.includes(key) || propertyRefIsNotAlreadyVisited)
+      if (propertyRefIsNotAlreadyVisited)
         result[key] = generateSchemaInstance(propertySchema, rootSchema, visitedReferences);
     }
     for (const key in patternProps) {
       const propertySchema = patternProps[key];
       const propertyReferences = collectReferences(propertySchema, rootSchema);
-      const propertyRefIsNotAlreadyVisited = propertyReferences.isDisjointFrom(propertyReferences);
-      if (key in required || propertyRefIsNotAlreadyVisited)
+      const propertyRefIsNotAlreadyVisited = propertyReferences.isDisjointFrom(visitedReferences);
+      if (propertyRefIsNotAlreadyVisited)
         result[key] = generateSchemaInstance(propertySchema, rootSchema, visitedReferences);
     }
     if (additionalProps && additionalProps != true) {
