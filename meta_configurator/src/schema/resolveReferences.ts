@@ -7,6 +7,9 @@ import type {Path} from '@/utility/path';
 import {doesSchemaHaveType} from '@/schema/schemaReadingUtils';
 
 export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): any {
+  if (!subSchema) {
+    return new Set();
+  }
   if (subSchema.$ref) {
     const refJsonPointer = subSchema.$ref;
     const refPath = jsonPointerToPathTyped(refJsonPointer);
@@ -21,6 +24,9 @@ export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): a
 
 // collects all the references in the sub schema and possibly referred schemas
 export function collectReferences(subSchema: any, rootSchema: TopLevelSchema): Set<string> {
+  if (!subSchema) {
+    return new Set();
+  }
   if (subSchema.$ref) {
     const refJsonPointer = subSchema.$ref;
     const refPath = jsonPointerToPathTyped(refJsonPointer);
