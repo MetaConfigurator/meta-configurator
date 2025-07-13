@@ -20,9 +20,7 @@
             "const": true
           }
         },
-        "required": [
-          "married"
-        ]
+        "required": ["married"]
       },
       "then": {
         "properties": {

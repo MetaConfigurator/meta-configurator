@@ -28,15 +28,8 @@
     },
     "diet": {
       "type": "string",
-      "enum": [
-        "herbivore",
-        "carnivore",
-        "omnivore"
-      ]
+      "enum": ["herbivore", "carnivore", "omnivore"]
     }
   },
-  "required": [
-    "country",
-    "diet"
-  ]
+  "required": ["country", "diet"]
 }

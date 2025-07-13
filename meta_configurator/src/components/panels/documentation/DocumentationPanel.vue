@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {SessionMode} from '@/store/sessionMode';
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
-import { getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
+import {getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import {downloadMarkdown} from '@/components/panels/documentation/downloadMarkdown';
 import showdown from 'showdown';
