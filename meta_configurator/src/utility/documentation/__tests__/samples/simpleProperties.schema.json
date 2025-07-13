@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "numberProperty": {
+      "type": "number"
+    },
+    "stringProperty": {
+      "type": "string"
+    },
+    "integerProperty": {
+      "type": "integer"
+    },
+    "booleanProperty": {
+      "type": "boolean"
+    },
+    "nullProperty": {
+      "type": "null"
+    }
+  }
+}

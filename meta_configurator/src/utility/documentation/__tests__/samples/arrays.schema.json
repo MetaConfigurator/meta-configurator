@@ -1,0 +1,49 @@
+{
+  "title": "My Schema",
+  "type": "object",
+  "properties": {
+    "numberArrayProperty": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "objectArrayProperty": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "booleanProperty": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "nestedArraysProperty": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nestedArraysAndObjectsProperty": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "arrayProp": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

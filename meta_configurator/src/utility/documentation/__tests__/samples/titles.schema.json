@@ -1,0 +1,61 @@
+{
+  "title": "References Schema",
+  "type": "object",
+  "$defs": {
+    "person": {
+      "title": "PersonObject",
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Full Name",
+          "type": "string"
+        },
+        "age": {
+          "type": "integer"
+        },
+        "bestFriend": {
+          "$ref": "#/$defs/person"
+        }
+      }
+    },
+    "people": {
+      "title": "PeopleArray",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/person"
+      }
+    }
+  },
+  "properties": {
+    "Plant": {
+      "title": "PlantObject",
+      "type": "object",
+      "properties": {
+        "species": {
+          "type": "string"
+        }
+      }
+    },
+    "person1": {
+      "type": "object",
+      "$ref": "#/$defs/person"
+    },
+    "person2": {
+      "type": "object",
+      "$ref": "#/$defs/person"
+    },
+    "people1": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/person"
+      }
+    },
+    "people2": {
+      "type": "array",
+      "$ref": "#/$defs/people"
+    },
+    "people3": {
+      "$ref": "#/$defs/people"
+    }
+  }
+}

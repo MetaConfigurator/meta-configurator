@@ -1,7 +1,12 @@
-import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
+import type {
+  JsonSchemaObjectType,
+  JsonSchemaType,
+  SchemaPropertyType,
+} from '@/schema/jsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
 import type {ManagedData} from '@/data/managedData';
+import type {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
 
 /**
  * Returns a string representation of the type of the property.
@@ -67,4 +72,36 @@ export function isSubSchemaDefinedInDefinitions(absolutePath: Path) {
   }
   const parentKey = absolutePath[absolutePath.length - 2];
   return parentKey === '$defs' || parentKey === 'definitions';
+}
+
+export function doesSchemaHaveType(
+  schema: JsonSchemaType,
+  type: SchemaPropertyType,
+  mustBeExplicit: boolean = false
+): boolean {
+  if (schema === undefined) {
+    return false;
+  }
+  if (schema === true) {
+    return !mustBeExplicit;
+  } else if (schema == false) {
+    return false;
+  }
+  const types = schema.type;
+  if (types === undefined) {
+    return !mustBeExplicit;
+  }
+
+  if (Array.isArray(types) && type.length > 0) {
+    return types.includes(type);
+
+    // else: type is actually one string
+  } else if (typeof types === 'string') {
+    return type === types;
+  }
+  return false;
+}
+
+export function getSchemaTitle(schema: TopLevelJsonSchemaWrapper) {
+  return schema.title || 'Untitled schema';
 }
