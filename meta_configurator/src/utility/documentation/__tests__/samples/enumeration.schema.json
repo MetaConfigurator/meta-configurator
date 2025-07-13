@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "properties": {
+    "country": {
+      "type": "string",
+      "enum": [
+        "United States",
+        "Canada",
+        "Mexico",
+        "Brazil",
+        "Argentina",
+        "United Kingdom",
+        "Germany",
+        "France",
+        "Italy",
+        "Spain",
+        "Australia",
+        "New Zealand",
+        "India",
+        "China",
+        "Japan",
+        "South Korea",
+        "South Africa",
+        "Russia",
+        "Saudi Arabia",
+        "United Arab Emirates"
+      ]
+    },
+    "diet": {
+      "type": "string",
+      "enum": ["herbivore", "carnivore", "omnivore"]
+    }
+  },
+  "required": ["country", "diet"]
+}

@@ -1,0 +1,40 @@
+{
+  "title": "Composition Schema",
+  "type": "object",
+  "properties": {
+    "Person": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "oneOf": [
+        {
+          "title": "Student",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "Student"
+            },
+            "currentSemester": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "Graduate"
+            },
+            "avgGrade": {
+              "type": "number"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

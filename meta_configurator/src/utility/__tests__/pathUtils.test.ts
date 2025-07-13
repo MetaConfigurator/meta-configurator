@@ -2,10 +2,12 @@ import {describe, expect, it, vi} from 'vitest';
 import type {Path} from '../path';
 import {
   arePathsEqual,
+  asciiToPath,
   dataPathToSchemaPath,
   getParentElementRequiredPropsPath,
   jsonPointerToPath,
   jsonPointerToPathTyped,
+  pathToAscii,
   pathToJsonPointer,
   pathToString,
 } from '../pathUtils';
@@ -132,5 +134,25 @@ describe('test pathUtils', () => {
     const path4 = ['properties', 'foo', 'properties', 'bar', 'baz'];
     const expectedResult3 = false;
     expect(arePathsEqual(path1, path4)).toEqual(expectedResult3);
+  });
+
+  it('should correctly detect convert from path to ascii and then back', () => {
+    const pathRoot: Path = [];
+    const expectedResultRoot = 'root';
+    const asciiRoot = pathToAscii(pathRoot);
+    expect(asciiRoot).toEqual(expectedResultRoot);
+    expect(asciiToPath(asciiRoot)).toEqual(pathRoot);
+
+    const path: Path = ['properties', 'foo', 0, 'bar'];
+    const expectedResult = '%2Fproperties%2Ffoo%2F0%2Fbar';
+    const ascii = pathToAscii(path);
+    expect(ascii).toEqual(expectedResult);
+    expect(asciiToPath(ascii)).toEqual(path);
+
+    const path2: Path = ['person1', 'name', 'Alex'];
+    const expectedResult2 = '%2Fperson1%2Fname%2FAlex';
+    const ascii2 = pathToAscii(path2);
+    expect(ascii2).toEqual(expectedResult2);
+    expect(asciiToPath(ascii2)).toEqual(path2);
   });
 });

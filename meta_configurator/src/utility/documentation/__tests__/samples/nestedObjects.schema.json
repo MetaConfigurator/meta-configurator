@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "objectPropertyDepth1": {
+      "type": "object",
+      "properties": {
+        "objectPropertyDepth2": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

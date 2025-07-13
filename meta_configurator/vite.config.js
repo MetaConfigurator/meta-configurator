@@ -25,6 +25,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     minify: true,
+
+    // prevent Rollup from trying to bundle showdown
+    rollupOptions: {
+      external: ['showdown'],
+    },
   },
   resolve: {
     alias: {
