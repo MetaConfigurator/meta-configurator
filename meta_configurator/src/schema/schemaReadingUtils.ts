@@ -103,5 +103,5 @@ export function doesSchemaHaveType(
 }
 
 export function getSchemaTitle(schema: TopLevelJsonSchemaWrapper) {
-  return schema.title ||  'Untitled schema';
+  return schema.title || 'Untitled schema';
 }

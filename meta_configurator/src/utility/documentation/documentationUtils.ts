@@ -147,15 +147,20 @@ export function extractConstraints(schema: any): string {
 }
 
 export function toAnchorLink(label: string, nodePath: Path, rootSchema: TopLevelSchema): string {
-  return `[${label}](#${toAnchor(nodePath, rootSchema)})`
+  return `[${label}](#${toAnchor(nodePath, rootSchema)})`;
 }
 
-export function toAnchorId(label: string, nodePath: Path, rootSchema: TopLevelSchema, selfReferring: boolean=false): string {
+export function toAnchorId(
+  label: string,
+  nodePath: Path,
+  rootSchema: TopLevelSchema,
+  selfReferring: boolean = false
+): string {
   if (!selfReferring) {
-    return `<a id="${toAnchor(nodePath, rootSchema)}"></a>${label}`
+    return `<a id="${toAnchor(nodePath, rootSchema)}"></a>${label}`;
   } else {
     const anchor = toAnchor(nodePath, rootSchema);
-    return `<a id="${anchor}"></a>[${label}](#${anchor})`
+    return `<a id="${anchor}"></a>[${label}](#${anchor})`;
   }
 }
 
@@ -180,4 +185,13 @@ export function escapeMarkdown(text: string | undefined | null): string {
 export function formatDocumentExample(data: any, dataFormat: string): string {
   const formatDef = formatRegistry.getFormat(dataFormat);
   return formatDef.dataConverter.stringify(data);
+}
+
+export function cleanMarkdownContent(markdown: string): string {
+  // Remove HTML tags but keep inner text (e.g., remove <div>, <span>, <a id="...">)
+  return markdown
+    .replace(/<a\s+id="[^"]*"><\/a>/g, '') // anchor IDs
+    .replace(/<[^>]+>/g, '') // all other tags
+    .replace(/&nbsp;/g, ' ') // replace non-breaking spaces
+    .replace(/\r\n/g, '\n'); // normalize line endings
 }

@@ -17,7 +17,9 @@ const props = defineProps<{
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
 const schema = getSchemaForMode(SessionMode.DataEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
-const markdown = computed(() => schemaToMarkdown(schemaData.data.value, getSchemaTitle(schema.schemaWrapper.value)));
+const markdown = computed(() =>
+  schemaToMarkdown(schemaData.data.value, getSchemaTitle(schema.schemaWrapper.value))
+);
 
 const converter = new showdown.Converter({
   tables: true,

@@ -23,7 +23,9 @@ import {
   hasDefault,
   hasExample,
   shouldIncludeNodeInDocumentation,
-  toAnchor, toAnchorId, toAnchorLink,
+  toAnchor,
+  toAnchorId,
+  toAnchorLink,
 } from '@/utility/documentation/documentationUtils';
 import {useSettings} from '@/settings/useSettings';
 import {
@@ -35,7 +37,8 @@ import {
 export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string) {
   const graph = constructSchemaGraph(rootSchema, useSettings().value.documentation.mergeAllOfs);
   const hierarchy = graphRepresentationToHierarchy(graph, true);
-  const repeatEntries = useSettings().value.documentation.repeatMultipleOccurrencesInTableOfContents;
+  const repeatEntries =
+    useSettings().value.documentation.repeatMultipleOccurrencesInTableOfContents;
 
   if (!hierarchy.graphNode) {
     return 'No schema elements found.';
@@ -46,45 +49,8 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string
 
   md.push(`# ${schemaTitle}`);
 
-  writeTableOfContents(
-    md,
-    flattenedHierarchy,
-    rootSchema,
-    repeatEntries
-  );
-
-  const usedAnchors = new Set<string>();
-
-  flattenedHierarchy.forEach(hierarchyNode => {
-    const node = hierarchyNode.graphNode;
-
-    const nodeType = node.getNodeType();
-    // write down only schema objects or enums
-    if (!['schemaobject', 'schemaenum'].includes(nodeType)) return;
-
-    const rawName = node.title ?? node.fallbackDisplayName;
-    const name = escapeMarkdown(rawName);
-    const description = node.schema.description ?? '';
-    const anchor = toAnchor(node.absolutePath, rootSchema);
-
-    if (!shouldIncludeNodeInDocumentation(name) || (!repeatEntries && usedAnchors.has(anchor)))
-      return;
-
-    md.push('---');
-    md.push(`### ${toAnchorId(name, node.absolutePath, rootSchema, true)}`);
-    usedAnchors.add(anchor);
-
-    if (description) md.push(`*${description}*\n`);
-
-    if (nodeType === 'schemaobject') {
-      writeObjectNode(md, graph, rootSchema, node as SchemaObjectNodeData);
-    }
-
-    if (nodeType === 'schemaenum') {
-      writeEnumNode(md, node as SchemaEnumNodeData);
-    }
-  });
-
+  writeTableOfContents(md, flattenedHierarchy, rootSchema, repeatEntries);
+  writeContents(md, graph, flattenedHierarchy, rootSchema, repeatEntries);
   return md.join('\n');
 }
 
@@ -123,6 +89,46 @@ function writeTableOfContents(
     md.push(...tocLines);
     md.push(''); // Ensure spacing after list
   }
+}
+
+function writeContents(
+  md: string[],
+  graph: SchemaGraph,
+  flattenedHierarchy: HierarchyNode[],
+  rootSchema: TopLevelSchema,
+  repeatEntries: boolean
+) {
+  const usedAnchors = new Set<string>();
+
+  flattenedHierarchy.forEach(hierarchyNode => {
+    const node = hierarchyNode.graphNode;
+
+    const nodeType = node.getNodeType();
+    // write down only schema objects or enums
+    if (!['schemaobject', 'schemaenum'].includes(nodeType)) return;
+
+    const rawName = node.title ?? node.fallbackDisplayName;
+    const name = escapeMarkdown(rawName);
+    const description = node.schema.description ?? '';
+    const anchor = toAnchor(node.absolutePath, rootSchema);
+
+    if (!shouldIncludeNodeInDocumentation(name) || (!repeatEntries && usedAnchors.has(anchor)))
+      return;
+
+    md.push('---');
+    md.push(`### ${toAnchorId(name, node.absolutePath, rootSchema, true)}`);
+    usedAnchors.add(anchor);
+
+    if (description) md.push(`*${description}*\n`);
+
+    if (nodeType === 'schemaobject') {
+      writeObjectNode(md, graph, rootSchema, node as SchemaObjectNodeData);
+    }
+
+    if (nodeType === 'schemaenum') {
+      writeEnumNode(md, node as SchemaEnumNodeData);
+    }
+  });
 }
 
 function writeObjectNode(

@@ -1,3 +1,5 @@
+import {cleanMarkdownContent} from '@/utility/documentation/documentationUtils';
+
 /**
  * Downloads given Markdown content as a .md file.
  * Strips HTML tags (like <div>, <span>, <a id=...>) if cleanMode is enabled.
@@ -10,12 +12,7 @@ export function downloadMarkdown(
   let content = markdown;
 
   if (cleanMode) {
-    // Remove HTML tags but keep inner text (e.g., remove <div>, <span>, <a id="...">)
-    content = content
-      .replace(/<a\s+id="[^"]*"><\/a>/g, '') // anchor IDs
-      .replace(/<[^>]+>/g, '') // all other tags
-      .replace(/&nbsp;/g, ' ')
-      .replace(/\r\n/g, '\n'); // normalize line endings
+    content = cleanMarkdownContent(markdown);
   }
 
   const blob = new Blob([content], {type: 'text/plain;charset=utf-8'});
