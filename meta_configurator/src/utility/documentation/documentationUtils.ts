@@ -150,8 +150,13 @@ export function toAnchorLink(label: string, nodePath: Path, rootSchema: TopLevel
   return `[${label}](#${toAnchor(nodePath, rootSchema)})`
 }
 
-export function toAnchorId(label: string, nodePath: Path, rootSchema: TopLevelSchema): string {
-  return `<a id="${toAnchor(nodePath, rootSchema)}"></a>${label}`
+export function toAnchorId(label: string, nodePath: Path, rootSchema: TopLevelSchema, selfReferring: boolean=false): string {
+  if (!selfReferring) {
+    return `<a id="${toAnchor(nodePath, rootSchema)}"></a>${label}`
+  } else {
+    const anchor = toAnchor(nodePath, rootSchema);
+    return `<a id="${anchor}"></a>[${label}](#${anchor})`
+  }
 }
 
 export function toAnchor(nodePath: Path, rootSchema: TopLevelSchema): string {

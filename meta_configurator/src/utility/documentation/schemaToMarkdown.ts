@@ -66,7 +66,7 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string
     if (!shouldIncludeNodeInDocumentation(name)) return;
 
     md.push('---');
-    md.push(`### ${toAnchorId(name, node.absolutePath, rootSchema)}`);
+    md.push(`### ${toAnchorId(name, node.absolutePath, rootSchema, true)}`);
     if (description) md.push(`*${description}*\n`);
 
     if (nodeType === 'schemaobject') {
