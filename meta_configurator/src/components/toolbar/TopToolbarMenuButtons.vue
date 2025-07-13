@@ -23,6 +23,7 @@ const emit = defineEmits<{
   (e: 'show-import-csv-dialog'): void;
   (e: 'show-snapshot-dialog'): void;
   (e: 'show-codegen-dialog', schemaMode: boolean): void;
+  (e: 'show-data-mapping-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -33,6 +34,7 @@ const topMenuBar = new MenuItems(
   showCsvImportDialog,
   showSnapshotDialog,
   showCodeGenerationDialog,
+  showDataMappingDialog,
   inferSchemaFromSampleData
 );
 
@@ -58,6 +60,10 @@ function showSnapshotDialog() {
 
 function showCodeGenerationDialog(schemaMode: boolean) {
   emit('show-codegen-dialog', schemaMode);
+}
+
+function showDataMappingDialog() {
+  emit('show-data-mapping-dialog');
 }
 
 function inferSchemaFromSampleData() {

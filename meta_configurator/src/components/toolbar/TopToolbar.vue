@@ -26,6 +26,7 @@ const emit = defineEmits<{
   (e: 'show-snapshot-dialog'): void;
   (e: 'show-about-dialog'): void;
   (e: 'show-codegen-dialog', schemaMode: boolean): void;
+  (e: 'show-data-mapping-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -57,6 +58,10 @@ function showAboutDialog() {
 
 function showCodeGenerationDialog(schemaMode: boolean) {
   emit('show-codegen-dialog', schemaMode);
+}
+
+function showDataMappingDialog() {
+  emit('show-data-mapping-dialog');
 }
 
 function selectedMode(newMode: SessionMode) {
@@ -91,7 +96,8 @@ useMagicKeys({
         @show-example-schemas-dialog="() => showExampleSchemasDialog()"
         @show-import-csv-dialog="() => showCsvImportDialog()"
         @show-schemastore-dialog="() => showSchemaStoreDialog()"
-        @show-snapshot-dialog="() => showSnapshotDialog()" />
+        @show-snapshot-dialog="() => showSnapshotDialog()"
+        @show-data-mapping-dialog="() => showDataMappingDialog()" />
 
       <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
         <Select

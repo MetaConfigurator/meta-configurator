@@ -15,6 +15,7 @@ import CodeGenerationDialog from '@/components/dialogs/code-generation/CodeGener
 import FetchedSchemasSelectionDialog from '@/components/dialogs/FetchedSchemasSelectionDialog.vue';
 import UrlInputDialog from '@/components/dialogs/UrlInputDialog.vue';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
+import DataMappingDialog from '@/components/dialogs/data-mapping/DataMappingDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -60,6 +61,10 @@ function showSnapshotDialog() {
   snapshotDialog.value?.show();
 }
 
+function showDataMappingDialog() {
+  dataMappingDialog.value?.show();
+}
+
 async function showSchemaStoreDialog(): Promise<void> {
   try {
     // Wait for the fetch to complete
@@ -90,6 +95,7 @@ const snapshotDialog = ref();
 const codeGenerationDialog = ref();
 const fetchedSchemasSelectionDialog = ref();
 const urlInputDialog = ref();
+const dataMappingDialog = ref();
 
 defineExpose({
   showInitialSchemaDialog,
@@ -111,6 +117,8 @@ defineExpose({
 
   <UrlInputDialog ref="urlInputDialog" />
 
+  <DataMappingDialog ref="dataMappingDialog" />
+
   <AboutDialog
     :visible="showAboutDialog"
     @update:visible="newValue => (showAboutDialog = newValue)" />
@@ -124,6 +132,7 @@ defineExpose({
     @show-schemastore-dialog="() => showSchemaStoreDialog()"
     @show-import-csv-dialog="() => showCsvImportDialog()"
     @show-snapshot-dialog="() => showSnapshotDialog()"
+    @show-data-mapping-dialog="() => showDataMappingDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 
