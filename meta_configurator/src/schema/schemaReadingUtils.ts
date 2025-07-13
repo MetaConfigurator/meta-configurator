@@ -6,6 +6,7 @@ import type {
 import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
 import type {ManagedData} from '@/data/managedData';
+import type {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
 
 /**
  * Returns a string representation of the type of the property.
@@ -99,4 +100,8 @@ export function doesSchemaHaveType(
     return type === types;
   }
   return false;
+}
+
+export function getSchemaTitle(schema: TopLevelJsonSchemaWrapper) {
+  return schema.title ||  'Untitled schema';
 }

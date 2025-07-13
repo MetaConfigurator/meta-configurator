@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import {SessionMode} from '@/store/sessionMode';
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
-import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import {downloadMarkdown} from '@/components/panels/documentation/downloadMarkdown';
 import showdown from 'showdown';
 import type {Path} from '@/utility/path';
 import DocumentationSettingsPanel from '@/components/panels/documentation/DocumentationSettingsPanel.vue';
 import {asciiToPath, pathToAscii} from '@/utility/pathUtils';
+import {getSchemaTitle} from '@/schema/schemaReadingUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
 const schemaData = getDataForMode(SessionMode.SchemaEditor);
+const schema = getSchemaForMode(SessionMode.DataEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
-const markdown = computed(() => schemaToMarkdown(schemaData.data.value));
+const markdown = computed(() => schemaToMarkdown(schemaData.data.value, getSchemaTitle(schema.schemaWrapper.value)));
 
 const converter = new showdown.Converter({
   tables: true,

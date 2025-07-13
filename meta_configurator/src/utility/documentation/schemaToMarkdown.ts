@@ -32,7 +32,7 @@ import {
   type HierarchyNode,
 } from '@/schema/graph-representation/graphRepresentationToHierarchy';
 
-export function schemaToMarkdown(rootSchema: TopLevelSchema) {
+export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string) {
   const graph = constructSchemaGraph(rootSchema, useSettings().value.documentation.mergeAllOfs);
   const hierarchy = graphRepresentationToHierarchy(graph, true);
 
@@ -42,6 +42,8 @@ export function schemaToMarkdown(rootSchema: TopLevelSchema) {
 
   const flattenedHierarchy = flattenHierarchy(hierarchy);
   const md: string[] = [];
+
+  md.push(`# ${schemaTitle}`);
 
   writeTableOfContents(
     md,
