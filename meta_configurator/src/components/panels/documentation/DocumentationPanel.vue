@@ -18,7 +18,7 @@ const schemaData = getDataForMode(SessionMode.SchemaEditor);
 const schema = getSchemaForMode(SessionMode.DataEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const markdown = computed(() =>
-  schemaToMarkdown(schemaData.data.value, getSchemaTitle(schema.schemaWrapper.value))
+  schemaToMarkdown(schema.schemaPreprocessed.value, getSchemaTitle(schema.schemaWrapper.value))
 );
 
 const converter = new showdown.Converter({

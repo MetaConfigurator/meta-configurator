@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {cleanMarkdownContent} from '@/utility/documentation/documentationUtils';
+import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 
 // resolve current directory since __dirname is not available in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -60,8 +61,9 @@ describe('schemaToMarkdown samples coverage', async () => {
       ]);
 
       const schema: TopLevelSchema = JSON.parse(schemaJson);
-      const title = schema.title ?? 'Untitled schema';
-      const actualMd = cleanMarkdownContent(schemaToMarkdown(schema, title).trimEnd());
+      const schemaPreprocessed = preprocessOneTime(schema);
+      const title = schemaPreprocessed.title ?? 'Untitled schema';
+      const actualMd = cleanMarkdownContent(schemaToMarkdown(schemaPreprocessed, title).trimEnd());
       const expected = cleanMarkdownContent(expectedMd.trimEnd()); // ignore trailing newline diffs
 
       expect(actualMd).toBe(expected);

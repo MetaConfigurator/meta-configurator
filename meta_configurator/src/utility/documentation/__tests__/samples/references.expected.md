@@ -5,17 +5,17 @@
     - [person](#%2F%24defs%2Fperson)
 
 ---
-### <a id="root"></a>[References Schema](#root)
+### [References Schema](#root)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| person1 | <u>[person1](#%2F%24defs%2Fperson)</u> | <span style="color:salmon">false</span> | \- |
-| person2 | <u>[person2](#%2F%24defs%2Fperson)</u> | <span style="color:salmon">false</span> | \- |
-| person3 | <u>[person3](#%2F%24defs%2Fperson)</u> | <span style="color:salmon">false</span> | \- |
-| people1 | <u>[object\[\]](#%2F%24defs%2Fperson)</u> | <span style="color:salmon">false</span> | \- |
-| people2 | <u>[people](#%2F%24defs%2Fperson)</u> | <span style="color:salmon">false</span> | \- |
-| people3 | <u>[people](#%2F%24defs%2Fperson)</u> | <span style="color:salmon">false</span> | \- |
+| person1 | [person1](#%2F%24defs%2Fperson) | false | \- |
+| person2 | [person2](#%2F%24defs%2Fperson) | false | \- |
+| person3 | [person3](#%2F%24defs%2Fperson) | false | \- |
+| people1 | [person\[\]](#%2F%24defs%2Fperson) | false | \- |
+| people2 | [people](#%2F%24defs%2Fperson) | false | \- |
+| people3 | [people](#%2F%24defs%2Fperson) | false | \- |
 
 #### Example
 
@@ -54,14 +54,14 @@
 }
 ```
 ---
-### <a id="%2F%24defs%2Fperson"></a>[person](#%2F%24defs%2Fperson)
+### [person](#%2F%24defs%2Fperson)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| <a id="%2F%24defs%2Fperson%2Fproperties%2Fname"></a>name | string | <span style="color:salmon">false</span> | \- |
-| <a id="%2F%24defs%2Fperson%2Fproperties%2Fage"></a>age | integer | <span style="color:salmon">false</span> | \- |
-| bestFriend | <u>[person](#%2F%24defs%2Fperson)</u> | <span style="color:salmon">false</span> | \- |
+| name | string | false | \- |
+| age | integer | false | \- |
+| bestFriend | [person](#%2F%24defs%2Fperson) | false | \- |
 
 #### Example
 

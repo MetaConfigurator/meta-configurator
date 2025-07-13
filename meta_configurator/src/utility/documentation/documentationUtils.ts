@@ -72,6 +72,10 @@ export function generateSchemaInstance(
   if (schema.const) {
     return schema.const;
   }
+  // if there is an enum with a single value, take it
+  if (schema.enum && schema.enum.length === 1) {
+    return schema.enum[0];
+  }
 
   if (visitedReferences == undefined) {
     visitedReferences = new Set();

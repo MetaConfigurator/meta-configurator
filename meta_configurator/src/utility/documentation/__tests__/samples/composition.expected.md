@@ -2,19 +2,19 @@
 ### Table of Contents
 
 - [Composition Schema](#root)
-  - [Person](#%2Fproperties%2FPerson)
-    - [Student](#%2Fproperties%2FPerson%2FoneOf%2F0)
-      - [type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype)
-    - [oneOf\[1\]](#%2Fproperties%2FPerson%2FoneOf%2F1)
-      - [type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)
+    - [Person](#%2Fproperties%2FPerson)
+        - [Student](#%2Fproperties%2FPerson%2FoneOf%2F0)
+            - [type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype)
+        - [oneOf\[1\]](#%2Fproperties%2FPerson%2FoneOf%2F1)
+            - [type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)
 
 ---
-### <a id="root"></a>[Composition Schema](#root)
+### [Composition Schema](#root)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| Person | <u>[Person](#%2Fproperties%2FPerson)</u> | <span style="color:salmon">false</span> | \- |
+| Person | [Person](#%2Fproperties%2FPerson) | false | \- |
 
 #### Example
 
@@ -26,18 +26,18 @@
 }
 ```
 ---
-### <a id="%2Fproperties%2FPerson"></a>[Person](#%2Fproperties%2FPerson)
+### [Person](#%2Fproperties%2FPerson)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| <a id="%2Fproperties%2FPerson%2Fproperties%2Fname"></a>name | string | <span style="color:salmon">false</span> | \- |
+| name | string | false | \- |
 
 #### oneOf
-<b>Option 1</b>
-##### <u>[Student](#%2Fproperties%2FPerson%2FoneOf%2F0)</u>
-<b>Option 2</b>
-##### <u>[oneOf[1]](#%2Fproperties%2FPerson%2FoneOf%2F1)</u>
+Option 1
+##### [Student](#%2Fproperties%2FPerson%2FoneOf%2F0)
+Option 2
+##### [oneOf[1]](#%2Fproperties%2FPerson%2FoneOf%2F1)
 #### Example
 
 ```json
@@ -46,13 +46,13 @@
 }
 ```
 ---
-### <a id="%2Fproperties%2FPerson%2FoneOf%2F0"></a>[Student](#%2Fproperties%2FPerson%2FoneOf%2F0)
+### [Student](#%2Fproperties%2FPerson%2FoneOf%2F0)
 #### Properties
 
-| Name | Type | Required | Description | Constraints |
-|------|------|------|------|------|
-| type | <u>[string](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype)</u> | <span style="color:salmon">false</span> | \- | const: "Student" |
-| <a id="%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2FcurrentSemester"></a>currentSemester | integer | <span style="color:salmon">false</span> | \- | \- |
+| Name | Type | Required | Description |
+|------|------|------|------|
+| type | [enum](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype) | false | \- |
+| currentSemester | integer | false | \- |
 
 #### Example
 
@@ -63,18 +63,18 @@
 }
 ```
 ---
-### <a id="%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype"></a>[type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype)
+### [type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype)
 #### Enumeration Values
 - `Student`
 
 ---
-### <a id="%2Fproperties%2FPerson%2FoneOf%2F1"></a>[oneOf\[1\]](#%2Fproperties%2FPerson%2FoneOf%2F1)
+### [oneOf\[1\]](#%2Fproperties%2FPerson%2FoneOf%2F1)
 #### Properties
 
-| Name | Type | Required | Description | Constraints |
-|------|------|------|------|------|
-| type | <u>[undefined](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)</u> | <span style="color:salmon">false</span> | \- | const: "Graduate" |
-| <a id="%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2FavgGrade"></a>avgGrade | number | <span style="color:salmon">false</span> | \- | \- |
+| Name | Type | Required | Description |
+|------|------|------|------|
+| type | [enum](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype) | false | \- |
+| avgGrade | number | false | \- |
 
 #### Example
 
@@ -85,6 +85,6 @@
 }
 ```
 ---
-### <a id="%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype"></a>[type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)
+### [type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)
 #### Enumeration Values
 - `Graduate`

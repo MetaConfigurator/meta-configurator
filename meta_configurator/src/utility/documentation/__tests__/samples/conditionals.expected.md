@@ -5,12 +5,12 @@
     - [Person](#%2Fproperties%2FPerson)
 
 ---
-### <a id="root"></a>[Conditionals Schema](#root)
+### [Conditionals Schema](#root)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| Person | <u>[Person](#%2Fproperties%2FPerson)</u> | <span style="color:salmon">false</span> | \- |
+| Person | [Person](#%2Fproperties%2FPerson) | false | \- |
 
 #### Example
 
@@ -23,16 +23,16 @@
 }
 ```
 ---
-### <a id="%2Fproperties%2FPerson"></a>[Person](#%2Fproperties%2FPerson)
+### [Person](#%2Fproperties%2FPerson)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| <a id="%2Fproperties%2FPerson%2Fproperties%2Fname"></a>name | string | <span style="color:salmon">false</span> | \- |
-| <a id="%2Fproperties%2FPerson%2Fproperties%2Fmarried"></a>married | boolean | <span style="color:salmon">false</span> | \- |
+| name | string | false | \- |
+| married | boolean | false | \- |
 
-<details>
-<summary>Conditionals</summary>
+
+Conditionals
 #### if
 ```json
 {
@@ -40,7 +40,10 @@
   "properties": {
     "married": {
       "type": "boolean",
-      "const": true
+      "title": "married",
+      "enum": [
+        true
+      ]
     }
   },
   "required": [
@@ -54,13 +57,14 @@
 {
   "properties": {
     "partnerName": {
-      "type": "string"
+      "type": "string",
+      "title": "partnerName"
     }
   }
 }
 ```
 
-</details>
+
 #### Example
 
 ```json
