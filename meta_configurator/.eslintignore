@@ -2,3 +2,4 @@
 node_modules
 .vscode
 dist
+src/utility/documentation/__tests__/**/*.md
