@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {SessionMode} from '@/store/sessionMode';
-import {computed, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import {downloadMarkdown} from '@/components/panels/documentation/downloadMarkdown';
 import showdown from 'showdown';
 import type {Path} from '@/utility/path';
-import {toAnchor} from '@/utility/documentation/documentationUtils';
 import DocumentationSettingsPanel from '@/components/panels/documentation/DocumentationSettingsPanel.vue';
+import {asciiToPath, pathToAscii} from '@/utility/pathUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -24,34 +24,53 @@ const converter = new showdown.Converter({
 });
 const renderedHtml = computed(() => converter.makeHtml(markdown.value));
 
-// scroll to the current selected element when it changes
+// DOM ref for rendered markdown
+const docsRef = ref<HTMLElement | null>(null);
+
+// scroll when selection changes
 watch(
-  schemaSession.currentSelectedElement,
-  () => {
-    const absolutePath = schemaSession.currentSelectedElement.value;
-    scrollToPath(absolutePath);
-  },
+  () => schemaSession.currentSelectedElement.value,
+  path => scrollToPath(path),
   {deep: true}
 );
 
-function handleDownloadClick() {
-  const markdownText = schemaToMarkdown(schemaData.data.value);
-  downloadMarkdown(markdownText);
+function scrollToPath(path: Path | null) {
+  if (!path) return;
+  const anchorId = pathToAscii(path);
+  const el = document.getElementById(anchorId);
+  el?.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 
-function scrollToPath(path: Path) {
-  const anchorId = toAnchor(path, schemaData.data.value);
-  const element = document.getElementById(anchorId);
-  if (element) {
-    element.scrollIntoView({behavior: 'smooth', block: 'start'});
+function handleDownloadClick() {
+  downloadMarkdown(markdown.value);
+}
+
+// anchor click handler
+function onAnchorClick(evt: MouseEvent) {
+  const target = evt.target as HTMLElement;
+  if (target.tagName !== 'A') return;
+  const href = (target as HTMLAnchorElement).getAttribute('href');
+  if (!href?.startsWith('#')) return;
+
+  evt.preventDefault(); // stop browser default jump
+  const id = href.slice(1); // remove '#'
+  try {
+    const path = asciiToPath(id); // reverse mapping
+    schemaSession.currentSelectedElement.value = path; // sync to other view
+    scrollToPath(path); // smooth scroll (optional)
+  } catch (e) {
+    console.warn('Invalid anchor id:', id, e);
   }
 }
+
+onMounted(() => docsRef.value?.addEventListener('click', onAnchorClick));
+onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
 </script>
 
 <template>
   <div class="documentation-panel">
     <DocumentationSettingsPanel />
-    <div class="rendered-docs" v-html="renderedHtml"></div>
+    <div ref="docsRef" class="rendered-docs" v-html="renderedHtml"></div>
     <div style="text-align: center; margin-top: 1rem">
       <button class="download-btn" @click="handleDownloadClick">Download as Markdown</button>
     </div>
