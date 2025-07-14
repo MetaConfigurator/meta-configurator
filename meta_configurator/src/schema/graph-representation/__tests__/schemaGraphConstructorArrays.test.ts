@@ -175,8 +175,8 @@ describe('test schema graph constructor with objects and attributes, without adv
     expect(attrPropArraySimple.typeDescription).toEqual('boolean[]');
 
     const attrPropArrayComplex = rootNode.attributes[1];
-    // array to inlined object. Because object has no custom title, we refer to it as just object
-    expect(attrPropArrayComplex.typeDescription).toEqual('object[]');
+    // array to inlined object.
+    expect(attrPropArrayComplex.typeDescription).toEqual('propertyArrayToComplex entry[]');
 
     const attrPropArrayRefSimple = rootNode.attributes[2];
     // array to ref of simple type

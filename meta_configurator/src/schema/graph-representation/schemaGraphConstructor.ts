@@ -1,6 +1,10 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
-import {getTypeDescription, isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
+import {
+  doesSchemaHaveType,
+  getTypeDescription,
+  isSubSchemaDefinedInDefinitions,
+} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
@@ -369,11 +373,19 @@ export function generateAttributeTypeDescription(
     if (arrayItemObject) {
       if (arrayItemObject.schema.title) {
         typeDescription = arrayItemObject.title + '[]';
+      } else if (
+        doesSchemaHaveType(arrayItemObject.schema, 'object', true) ||
+        doesSchemaHaveType(arrayItemObject.schema, 'array', true)
+      ) {
+        // if the array item is of type object or array, use the fallback display name
+        typeDescription = arrayItemObject.fallbackDisplayName + '[]';
       } else {
+        // otherwise, use the type description of the array item
         typeDescription = getTypeDescription(arrayItemObject.schema) + '[]';
       }
     } else {
       if (isObjectSchema(schema.items)) {
+        // if there is no corresponding node for the array item, use the type description of the items
         typeDescription = getTypeDescription(schema.items as JsonSchemaObjectType) + '[]';
       }
     }
@@ -389,6 +401,14 @@ export function generateAttributeTypeDescription(
         attributeNode.fallbackDisplayName,
         true
       );
+    }
+  }
+
+  // if data type is an enum, overwrite with title of the enum if existing
+  // else, leave the type description as is
+  if (isEnumSchema(schema)) {
+    if (schema.title && schema.title.length > 0) {
+      typeDescription = schema.title;
     }
   }
 
