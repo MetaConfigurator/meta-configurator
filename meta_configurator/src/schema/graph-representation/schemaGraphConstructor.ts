@@ -1,6 +1,10 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
-import {doesSchemaHaveType, getTypeDescription, isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
+import {
+  doesSchemaHaveType,
+  getTypeDescription,
+  isSubSchemaDefinedInDefinitions,
+} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
@@ -369,7 +373,10 @@ export function generateAttributeTypeDescription(
     if (arrayItemObject) {
       if (arrayItemObject.schema.title) {
         typeDescription = arrayItemObject.title + '[]';
-      } else if (doesSchemaHaveType(arrayItemObject.schema, "object", true) || doesSchemaHaveType(arrayItemObject.schema, "array", true)) {
+      } else if (
+        doesSchemaHaveType(arrayItemObject.schema, 'object', true) ||
+        doesSchemaHaveType(arrayItemObject.schema, 'array', true)
+      ) {
         // if the array item is of type object or array, use the fallback display name
         typeDescription = arrayItemObject.fallbackDisplayName + '[]';
       } else {
