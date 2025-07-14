@@ -262,7 +262,7 @@ Conditionals
 | timeZone | [timeZone](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FtimeZone) | false | Time zone |
 | booleanArray | boolean\[\] | false | Boolean array |
 | numbers | number\[\] | false | Numbers |
-| objects | [object\[\]](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems) | false | Objects |
+| objects | [objects entry\[\]](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems) | false | Objects |
 
 #### Example
 
