@@ -392,6 +392,14 @@ export function generateAttributeTypeDescription(
     }
   }
 
+  // if data type is an enum, overwrite with title of the enum if existing
+  // else, leave the type description as is
+  if (isEnumSchema(schema)) {
+    if (schema.title && schema.title.length > 0) {
+      typeDescription = schema.title;
+    }
+  }
+
   return typeDescription;
 }
 

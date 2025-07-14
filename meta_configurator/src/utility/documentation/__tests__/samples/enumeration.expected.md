@@ -6,13 +6,13 @@
     - [diet](#%2Fproperties%2Fdiet)
 
 ---
-### <a id="root"></a>[root](#root)
+### [root](#root)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| country | <u>[enum](#%2Fproperties%2Fcountry)</u> | <span style="color:lightblue">true</span> | \- |
-| diet | <u>[enum](#%2Fproperties%2Fdiet)</u> | <span style="color:lightblue">true</span> | \- |
+| country | [country](#%2Fproperties%2Fcountry) | true | \- |
+| diet | [diet](#%2Fproperties%2Fdiet) | true | \- |
 
 #### Example
 
@@ -23,9 +23,9 @@
 }
 ```
 ---
-### <a id="%2Fproperties%2Fcountry"></a>[country](#%2Fproperties%2Fcountry)
-<details>
-<summary>Enumeration Values</summary>
+### [country](#%2Fproperties%2Fcountry)
+
+Enumeration Values
 - `United States`
 - `Canada`
 - `Mexico`
@@ -46,10 +46,10 @@
 - `Russia`
 - `Saudi Arabia`
 - `United Arab Emirates`
-</details>
+
 
 ---
-### <a id="%2Fproperties%2Fdiet"></a>[diet](#%2Fproperties%2Fdiet)
+### [diet](#%2Fproperties%2Fdiet)
 #### Enumeration Values
 - `herbivore`
 - `carnivore`

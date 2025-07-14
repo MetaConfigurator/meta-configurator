@@ -160,7 +160,7 @@ Conditionals
 |------|------|------|------|------|
 | city | string | false | City name | - |
 | zipCode | string | false | Zip code | "12345" |
-| country | [enum](#%2Fproperties%2Faddress%2Fproperties%2Fcountry) | false | Country name | - |
+| country | [country](#%2Fproperties%2Faddress%2Fproperties%2Fcountry) | false | Country name | - |
 | moreInfo | [moreInfo](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo) | false | More info about the address | - |
 | street | string | false | Street name | "Main Street" |
 | number | number | false | \- | - |
@@ -259,7 +259,7 @@ Conditionals
 |------|------|------|------|
 | info | string | false | Some info |
 | neighborhood | string | false | Neighborhood name |
-| timeZone | [enum](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FtimeZone) | false | Time zone |
+| timeZone | [timeZone](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FtimeZone) | false | Time zone |
 | booleanArray | boolean\[\] | false | Boolean array |
 | numbers | number\[\] | false | Numbers |
 | objects | [object\[\]](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems) | false | Objects |

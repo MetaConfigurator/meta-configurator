@@ -51,7 +51,7 @@ Option 2
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| type | [enum](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype) | false | \- |
+| type | [type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype) | false | \- |
 | currentSemester | integer | false | \- |
 
 #### Example
@@ -73,7 +73,7 @@ Option 2
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| type | [enum](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype) | false | \- |
+| type | [type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype) | false | \- |
 | avgGrade | number | false | \- |
 
 #### Example
