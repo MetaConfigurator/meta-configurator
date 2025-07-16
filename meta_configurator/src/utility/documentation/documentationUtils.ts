@@ -78,21 +78,15 @@ export function generateSchemaInstance(
     return schema.enum[0];
   }
 
-  if (schema.oneOf){
+  if (schema.oneOf) {
     schema = mergeAllOfs({
-      allOf:
-        [
-          schema,
-          schema.oneOf[0]
-        ] })
+      allOf: [schema, schema.oneOf[0]],
+    });
   }
-  if (schema.anyOf){
+  if (schema.anyOf) {
     schema = mergeAllOfs({
-      allOf:
-        [
-          schema,
-          schema.anyOf[0]
-        ] })
+      allOf: [schema, schema.anyOf[0]],
+    });
   }
 
   if (visitedReferences == undefined) {
