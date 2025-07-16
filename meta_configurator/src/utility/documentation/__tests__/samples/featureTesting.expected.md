@@ -12,26 +12,26 @@
         - [No Partner](#%2Fproperties%2Fpartner%2FoneOf%2F0)
 
 ---
-### [Person](#root)
+### <a id="root"></a>[Person](#root)
 *A person schema*
 
 #### Properties
 
 | Name | Type | Required | Description | Constraints | Examples |
 |------|------|------|------|------|------|
-| circular | [circular](#%2F%24defs%2Fcircular) | false | \- | \- | - |
-| name | name | true | \- | \- | - |
-| firstName | string | true | First name | Deprecated. | "John" |
-| nickNames | string\[\] | false | Nick names | \- | - |
-| isMarried | boolean | false | Marital Status | \- | - |
-| telephoneNumber | integer | false | phone number | maximum: 159, exclusiveMinimum: 149 | - |
-| heightInMeter | number | false | Height | maximum: 2.3, exclusiveMinimum: 1.2, multipleOf: 0.01 | - |
-| address | [address](#%2Fproperties%2Faddress) | false | Address of the person | \- | - |
-| partner | [partner](#%2Fproperties%2Fpartner) | false | \- | \- | - |
-| ^Number.\* | number | false | Any number property | \- | - |
+| circular | <u>[circular](#%2F%24defs%2Fcircular)</u> | <span style="color:salmon">false</span> | \- | \- | - |
+| <a id="%2F%24defs%2Fname"></a>name | name | <span style="color:lightblue">true</span> | \- | \- | - |
+| <a id="%2Fproperties%2FfirstName"></a>firstName | string | <span style="color:lightblue">true</span> | First name | Deprecated. | "John" |
+| <a id="%2Fproperties%2FnickNames%2Fitems"></a>nickNames | string\[\] | <span style="color:salmon">false</span> | Nick names | \- | - |
+| <a id="%2Fproperties%2FisMarried"></a>isMarried | boolean | <span style="color:salmon">false</span> | Marital Status | \- | - |
+| <a id="%2Fproperties%2FtelephoneNumber"></a>telephoneNumber | integer | <span style="color:salmon">false</span> | phone number | maximum: 159, exclusiveMinimum: 149 | - |
+| <a id="%2Fproperties%2FheightInMeter"></a>heightInMeter | number | <span style="color:salmon">false</span> | Height | maximum: 2.3, exclusiveMinimum: 1.2, multipleOf: 0.01 | - |
+| address | <u>[address](#%2Fproperties%2Faddress)</u> | <span style="color:salmon">false</span> | Address of the person | \- | - |
+| partner | <u>[partner](#%2Fproperties%2Fpartner)</u> | <span style="color:salmon">false</span> | \- | \- | - |
+| <a id="%2FpatternProperties%2F%5ENumber.*"></a>^Number.\* | number | <span style="color:salmon">false</span> | Any number property | \- | - |
 
-
-Conditionals
+<details>
+<summary>Conditionals</summary>
 #### if
 ```json
 {
@@ -43,7 +43,8 @@ Conditionals
   },
   "required": [
     "isMarried"
-  ]
+  ],
+  "type": "object"
 }
 ```
 
@@ -67,7 +68,8 @@ Conditionals
       },
       "title": "spouse"
     }
-  }
+  },
+  "type": "object"
 }
 ```
 
@@ -81,12 +83,13 @@ Conditionals
         "description": "Preferred nick name",
         "title": "preferredNickName"
       }
-    }
+    },
+    "type": "object"
   }
 }
 ```
 
-
+</details>
 #### Example
 
 ```json
@@ -127,18 +130,18 @@ Conditionals
     "street": "Main Street",
     "number": "{number}"
   },
-  "partner": "{value}",
+  "partner": "{boolean}",
   "^Number.*": "{number}"
 }
 ```
 ---
-### [Circular](#%2F%24defs%2Fcircular)
+### <a id="%2F%24defs%2Fcircular"></a>[Circular](#%2F%24defs%2Fcircular)
 #### Properties
 
 | Name | Type | Required | Description | Constraints |
 |------|------|------|------|------|
-| name | name | false | \- | minLength: 23 |
-| circular | [circular](#%2F%24defs%2Fcircular) | false | \- | \- |
+| <a id="%2F%24defs%2Fname"></a>name | name | <span style="color:salmon">false</span> | \- | minLength: 23 |
+| circular | <u>[circular](#%2F%24defs%2Fcircular)</u> | <span style="color:salmon">false</span> | \- | \- |
 
 #### Example
 
@@ -151,22 +154,22 @@ Conditionals
 }
 ```
 ---
-### [address](#%2Fproperties%2Faddress)
+### <a id="%2Fproperties%2Faddress"></a>[address](#%2Fproperties%2Faddress)
 *Address of the person*
 
 #### Properties
 
 | Name | Type | Required | Description | Examples |
 |------|------|------|------|------|
-| city | string | false | City name | - |
-| zipCode | string | false | Zip code | "12345" |
-| country | [country](#%2Fproperties%2Faddress%2Fproperties%2Fcountry) | false | Country name | - |
-| moreInfo | [moreInfo](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo) | false | More info about the address | - |
-| street | string | false | Street name | "Main Street" |
-| number | number | false | \- | - |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2Fcity"></a>city | string | <span style="color:salmon">false</span> | City name | - |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2FzipCode"></a>zipCode | string | <span style="color:salmon">false</span> | Zip code | "12345" |
+| country | <u>[country](#%2Fproperties%2Faddress%2Fproperties%2Fcountry)</u> | <span style="color:salmon">false</span> | Country name | - |
+| moreInfo | <u>[moreInfo](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo)</u> | <span style="color:salmon">false</span> | More info about the address | - |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2Fstreet"></a>street | string | <span style="color:salmon">false</span> | Street name | "Main Street" |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2Fnumber"></a>number | number | <span style="color:salmon">false</span> | \- | - |
 
-
-Conditionals
+<details>
+<summary>Conditionals</summary>
 #### if
 ```json
 {
@@ -178,7 +181,8 @@ Conditionals
   },
   "required": [
     "number"
-  ]
+  ],
+  "type": "object"
 }
 ```
 
@@ -190,7 +194,8 @@ Conditionals
       "description": "Even street number",
       "title": "number"
     }
-  }
+  },
+  "type": "object"
 }
 ```
 
@@ -202,11 +207,12 @@ Conditionals
       "description": "Odd street number",
       "title": "number"
     }
-  }
+  },
+  "type": "object"
 }
 ```
 
-
+</details>
 #### Example
 
 ```json
@@ -237,7 +243,7 @@ Conditionals
 }
 ```
 ---
-### [country](#%2Fproperties%2Faddress%2Fproperties%2Fcountry)
+### <a id="%2Fproperties%2Faddress%2Fproperties%2Fcountry"></a>[country](#%2Fproperties%2Faddress%2Fproperties%2Fcountry)
 *Country name*
 
 #### Enumeration Values
@@ -250,19 +256,19 @@ Conditionals
 - `France`
 
 ---
-### [moreInfo](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo)
+### <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo"></a>[moreInfo](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo)
 *More info about the address*
 
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| info | string | false | Some info |
-| neighborhood | string | false | Neighborhood name |
-| timeZone | [timeZone](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FtimeZone) | false | Time zone |
-| booleanArray | boolean\[\] | false | Boolean array |
-| numbers | number\[\] | false | Numbers |
-| objects | [objects entry\[\]](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems) | false | Objects |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Finfo"></a>info | string | <span style="color:salmon">false</span> | Some info |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fneighborhood"></a>neighborhood | string | <span style="color:salmon">false</span> | Neighborhood name |
+| timeZone | <u>[timeZone](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FtimeZone)</u> | <span style="color:salmon">false</span> | Time zone |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FbooleanArray%2Fitems"></a>booleanArray | boolean\[\] | <span style="color:salmon">false</span> | Boolean array |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fnumbers%2Fitems"></a>numbers | number\[\] | <span style="color:salmon">false</span> | Numbers |
+| objects | <u>[objects entry\[\]](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems)</u> | <span style="color:salmon">false</span> | Objects |
 
 #### Example
 
@@ -287,20 +293,20 @@ Conditionals
 }
 ```
 ---
-### [timeZone](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FtimeZone)
+### <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FtimeZone"></a>[timeZone](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2FtimeZone)
 *Time zone*
 
 #### Enumeration Values
 - `UTC`
 
 ---
-### [objects entry](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems)
+### <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems"></a>[objects entry](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| name | string | false | \- |
-| age | number | false | \- |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems%2Fproperties%2Fname"></a>name | string | <span style="color:salmon">false</span> | \- |
+| <a id="%2Fproperties%2Faddress%2Fproperties%2FmoreInfo%2Fproperties%2Fobjects%2Fitems%2Fproperties%2Fage"></a>age | number | <span style="color:salmon">false</span> | \- |
 
 #### Example
 
@@ -311,11 +317,11 @@ Conditionals
 }
 ```
 ---
-### [partner](#%2Fproperties%2Fpartner)
+### <a id="%2Fproperties%2Fpartner"></a>[partner](#%2Fproperties%2Fpartner)
 #### oneOf
-Option 1
-##### [No Partner](#%2Fproperties%2Fpartner%2FoneOf%2F0)
-Option 2
+<b>Option 1</b>
+##### <u>[No Partner](#%2Fproperties%2Fpartner%2FoneOf%2F0)</u>
+<b>Option 2</b>
 ```json
 {
   "type": "string",
@@ -325,9 +331,9 @@ Option 2
 #### Example
 
 ```json
-"{value}"
+"{boolean}"
 ```
 ---
-### [No Partner](#%2Fproperties%2Fpartner%2FoneOf%2F0)
+### <a id="%2Fproperties%2Fpartner%2FoneOf%2F0"></a>[No Partner](#%2Fproperties%2Fpartner%2FoneOf%2F0)
 #### Enumeration Values
 - `false`

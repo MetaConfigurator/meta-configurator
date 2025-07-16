@@ -5,12 +5,12 @@
     - [Person](#%2Fproperties%2FPerson)
 
 ---
-### [Conditionals Schema](#root)
+### <a id="root"></a>[Conditionals Schema](#root)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| Person | [Person](#%2Fproperties%2FPerson) | false | \- |
+| Person | <u>[Person](#%2Fproperties%2FPerson)</u> | <span style="color:salmon">false</span> | \- |
 
 #### Example
 
@@ -23,16 +23,16 @@
 }
 ```
 ---
-### [Person](#%2Fproperties%2FPerson)
+### <a id="%2Fproperties%2FPerson"></a>[Person](#%2Fproperties%2FPerson)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| name | string | false | \- |
-| married | boolean | false | \- |
+| <a id="%2Fproperties%2FPerson%2Fproperties%2Fname"></a>name | string | <span style="color:salmon">false</span> | \- |
+| <a id="%2Fproperties%2FPerson%2Fproperties%2Fmarried"></a>married | boolean | <span style="color:salmon">false</span> | \- |
 
-
-Conditionals
+<details>
+<summary>Conditionals</summary>
 #### if
 ```json
 {
@@ -60,11 +60,12 @@ Conditionals
       "type": "string",
       "title": "partnerName"
     }
-  }
+  },
+  "type": "object"
 }
 ```
 
-
+</details>
 #### Example
 
 ```json
