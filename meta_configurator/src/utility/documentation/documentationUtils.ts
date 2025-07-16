@@ -3,6 +3,7 @@ import {collectReferences, findTargetPath, resolveReferences} from '@/schema/res
 import type {Path} from '@/utility/path';
 import {pathToAscii} from '@/utility/pathUtils';
 import {formatRegistry} from '@/dataformats/formatRegistry';
+import {mergeAllOfs} from '@/schema/mergeAllOfs';
 
 const CONSTRAINTS_KEYS = [
   'minLength',
@@ -75,6 +76,23 @@ export function generateSchemaInstance(
   // if there is an enum with a single value, take it
   if (schema.enum && schema.enum.length === 1) {
     return schema.enum[0];
+  }
+
+  if (schema.oneOf){
+    schema = mergeAllOfs({
+      allOf:
+        [
+          schema,
+          schema.oneOf[0]
+        ] })
+  }
+  if (schema.anyOf){
+    schema = mergeAllOfs({
+      allOf:
+        [
+          schema,
+          schema.anyOf[0]
+        ] })
   }
 
   if (visitedReferences == undefined) {

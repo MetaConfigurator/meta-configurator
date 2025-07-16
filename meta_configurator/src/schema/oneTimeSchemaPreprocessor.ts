@@ -47,6 +47,7 @@ function preprocessOneTimeRecursive(schema: JsonSchemaType | undefined, schemaPa
   }
 
   induceTitles(schema);
+  induceTypeByProperties(schema);
 
   convertConstToEnum(schema);
   injectTypesOfEnum(schema);
@@ -97,6 +98,13 @@ function preprocessSchemaRecord(
     for (const [key, value] of Object.entries(schemaRecord)) {
       preprocessOneTimeRecursive(value, `${schemaPath}/${key}`);
     }
+  }
+}
+
+function induceTypeByProperties(schema: JsonSchemaObjectType): void {
+  // if the type is not defined but the schema has the "properties" field, then we can assume that the type is "object"
+  if (schema.type === undefined && schema.properties !== undefined) {
+    schema.type = 'object';
   }
 }
 

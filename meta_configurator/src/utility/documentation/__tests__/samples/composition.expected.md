@@ -9,50 +9,54 @@
             - [type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)
 
 ---
-### [Composition Schema](#root)
+### <a id="root"></a>[Composition Schema](#root)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| Person | [Person](#%2Fproperties%2FPerson) | false | \- |
+| Person | <u>[Person](#%2Fproperties%2FPerson)</u> | <span style="color:salmon">false</span> | \- |
 
 #### Example
 
 ```json
 {
   "Person": {
-    "name": "{string}"
+    "name": "{string}",
+    "type": "Student",
+    "currentSemester": "{integer}"
   }
 }
 ```
 ---
-### [Person](#%2Fproperties%2FPerson)
+### <a id="%2Fproperties%2FPerson"></a>[Person](#%2Fproperties%2FPerson)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| name | string | false | \- |
+| <a id="%2Fproperties%2FPerson%2Fproperties%2Fname"></a>name | string | <span style="color:salmon">false</span> | \- |
 
 #### oneOf
-Option 1
-##### [Student](#%2Fproperties%2FPerson%2FoneOf%2F0)
-Option 2
-##### [oneOf[1]](#%2Fproperties%2FPerson%2FoneOf%2F1)
+<b>Option 1</b>
+##### <u>[Student](#%2Fproperties%2FPerson%2FoneOf%2F0)</u>
+<b>Option 2</b>
+##### <u>[oneOf[1]](#%2Fproperties%2FPerson%2FoneOf%2F1)</u>
 #### Example
 
 ```json
 {
-  "name": "{string}"
+  "name": "{string}",
+  "type": "Student",
+  "currentSemester": "{integer}"
 }
 ```
 ---
-### [Student](#%2Fproperties%2FPerson%2FoneOf%2F0)
+### <a id="%2Fproperties%2FPerson%2FoneOf%2F0"></a>[Student](#%2Fproperties%2FPerson%2FoneOf%2F0)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| type | [type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype) | false | \- |
-| currentSemester | integer | false | \- |
+| type | <u>[type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype)</u> | <span style="color:salmon">false</span> | \- |
+| <a id="%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2FcurrentSemester"></a>currentSemester | integer | <span style="color:salmon">false</span> | \- |
 
 #### Example
 
@@ -63,18 +67,18 @@ Option 2
 }
 ```
 ---
-### [type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype)
+### <a id="%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype"></a>[type](#%2Fproperties%2FPerson%2FoneOf%2F0%2Fproperties%2Ftype)
 #### Enumeration Values
 - `Student`
 
 ---
-### [oneOf\[1\]](#%2Fproperties%2FPerson%2FoneOf%2F1)
+### <a id="%2Fproperties%2FPerson%2FoneOf%2F1"></a>[oneOf\[1\]](#%2Fproperties%2FPerson%2FoneOf%2F1)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| type | [type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype) | false | \- |
-| avgGrade | number | false | \- |
+| type | <u>[type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)</u> | <span style="color:salmon">false</span> | \- |
+| <a id="%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2FavgGrade"></a>avgGrade | number | <span style="color:salmon">false</span> | \- |
 
 #### Example
 
@@ -85,6 +89,6 @@ Option 2
 }
 ```
 ---
-### [type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)
+### <a id="%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype"></a>[type](#%2Fproperties%2FPerson%2FoneOf%2F1%2Fproperties%2Ftype)
 #### Enumeration Values
 - `Graduate`
