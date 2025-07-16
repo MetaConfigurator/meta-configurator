@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Multi-Step Registration Form",
+  "description": "Schema for a dynamic, multi-step registration process supporting conditional logic and custom metadata.",
+  "type": "object",
+  "properties": {
+    "account": {
+      "type": "object",
+      "description": "User account credentials.",
+      "properties": {
+        "username": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 16,
+          "pattern": "^[a-zA-Z0-9_]+$",
+          "description": "Unique username (alphanumeric + underscore)."
+        },
+        "password": {
+          "type": "string",
+          "minLength": 8,
+          "description": "Password with at least 8 characters."
+        }
+      },
+      "required": ["username", "password"]
+    },
+
+    "personal": {
+      "type": "object",
+      "description": "User personal information.",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "description": "User's full legal name."
+        },
+        "age": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "User's age in years."
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of residence."
+        },
+        "newsletter": {
+          "type": "boolean",
+          "default": false,
+          "description": "Subscribe to newsletter?"
+        }
+      },
+      "required": ["fullName", "age", "country"]
+    },
+
+    "payment": {
+      "description": "Preferred payment method.",
+      "type": "object",
+      "oneOf": [
+        {
+          "title": "Credit Card",
+          "properties": {
+            "method": {"const": "card"},
+            "cardNumber": {
+              "type": "string",
+              "pattern": "^[0-9]{16}$",
+              "description": "Card number (16 digits)."
+            },
+            "expiration": {
+              "type": "string",
+              "pattern": "^(0[1-9]|1[0-2])\\/\\d{2}$",
+              "description": "Expiration date (MM/YY)."
+            }
+          },
+          "required": ["method", "cardNumber", "expiration"]
+        },
+        {
+          "title": "SEPA Direct Debit",
+          "properties": {
+            "method": {"const": "sepa"},
+            "iban": {
+              "type": "string",
+              "pattern": "^[A-Z]{2}\\d{2}[A-Z0-9]{1,30}$",
+              "description": "IBAN format"
+            }
+          },
+          "required": ["method", "iban"]
+        }
+      ]
+    },
+
+    "preferences": {
+      "type": "object",
+      "description": "User-configurable preferences.",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark", "system"],
+          "default": "system"
+        },
+        "language": {
+          "type": "string",
+          "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+          "default": "en",
+          "description": "Language code (e.g., en, de-DE)."
+        }
+      }
+    },
+
+    "extraData": {
+      "type": "object",
+      "description": "Custom vendor metadata.",
+      "patternProperties": {
+        "^x-[a-zA-Z0-9_]+$": {
+          "type": "string",
+          "description": "Custom key/value metadata prefixed with 'x-'."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "parentalConsent": {
+      "type": "object",
+      "description": "Parental consent section (for users under 18).",
+      "properties": {
+        "guardianName": {"type": "string"},
+        "guardianEmail": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "required": ["guardianName", "guardianEmail"]
+    }
+  },
+
+  "required": ["account", "personal", "payment"],
+
+  "if": {
+    "properties": {
+      "personal": {
+        "properties": {
+          "age": {"maximum": 17}
+        }
+      }
+    },
+    "required": ["personal"]
+  },
+  "then": {
+    "required": ["parentalConsent"]
+  },
+
+  "examples": [
+    {
+      "account": {
+        "username": "mert_dev",
+        "password": "hunter42"
+      },
+      "personal": {
+        "fullName": "Mert Ali Barlas",
+        "age": 17,
+        "country": "DE",
+        "newsletter": true
+      },
+      "payment": {
+        "method": "sepa",
+        "iban": "DE89370400440532013000"
+      },
+      "preferences": {
+        "theme": "dark",
+        "language": "de-DE"
+      },
+      "extraData": {
+        "x-referral": "FRIEND2025"
+      },
+      "parentalConsent": {
+        "guardianName": "Ali Barlas",
+        "guardianEmail": "parent@example.com"
+      }
+    }
+  ]
+}
