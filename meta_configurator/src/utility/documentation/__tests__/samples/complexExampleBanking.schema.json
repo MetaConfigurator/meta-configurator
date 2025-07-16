@@ -57,7 +57,7 @@
         {
           "title": "Credit Card",
           "properties": {
-            "method": { "const": "card" },
+            "method": {"const": "card"},
             "cardNumber": {
               "type": "string",
               "pattern": "^[0-9]{16}$",
@@ -74,7 +74,7 @@
         {
           "title": "SEPA Direct Debit",
           "properties": {
-            "method": { "const": "sepa" },
+            "method": {"const": "sepa"},
             "iban": {
               "type": "string",
               "pattern": "^[A-Z]{2}\\d{2}[A-Z0-9]{1,30}$",
@@ -120,7 +120,7 @@
       "type": "object",
       "description": "Parental consent section (for users under 18).",
       "properties": {
-        "guardianName": { "type": "string" },
+        "guardianName": {"type": "string"},
         "guardianEmail": {
           "type": "string",
           "format": "email"
@@ -136,7 +136,7 @@
     "properties": {
       "personal": {
         "properties": {
-          "age": { "maximum": 17 }
+          "age": {"maximum": 17}
         }
       }
     },
