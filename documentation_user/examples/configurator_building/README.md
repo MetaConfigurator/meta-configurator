@@ -38,7 +38,7 @@ The settings file allows fine-grained control over the MetaConfigurator interfac
 
 *   **Custom Title**: Define a custom title displayed in the menu bar.
 
-*   **Font and UI Styles**: Adjust fonts and layout settings.
+*   **Font and UI Styles**: Adjust font size and other layout settings.
 
 *   **Visible Panels**: Choose which panels are shown (e.g., GUI view, text view, schema diagram).
 
@@ -49,12 +49,6 @@ The settings file allows fine-grained control over the MetaConfigurator interfac
 
 To ensure a consistent user experience, simply configure the interface by opening the panels you want, then copy the settings.
 The settings file will store the currently visible panels and UI configurations, ensuring the same view when shared.
-
-Use Case: Hiding Schema Complexity
-----------------------------------
-
-This approach allows users to interact only with the data view while keeping the schema editor hidden.
-By doing so, MetaConfigurator acts as a custom configurator for a specific domain, making it more user-friendly for non-technical users.
 
 Sharing and Shortening URLs
 ---------------------------
