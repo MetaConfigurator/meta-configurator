@@ -619,7 +619,9 @@ function zoomIntoPath(path: Path) {
           :data-testid="'add-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
-            <span class="pl-2">New property</span>
+            <span class="pl-2">{{
+              'New ' + (slotProps.node.data.schema.title ?? 'property')
+            }}</span>
           </Button>
         </span>
 
