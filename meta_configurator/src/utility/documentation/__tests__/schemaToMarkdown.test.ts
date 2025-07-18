@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {readdir, readFile} from 'node:fs/promises';
-import {join, dirname } from 'node:path';
+import {join, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
@@ -65,8 +65,13 @@ describe('schemaToMarkdown samples coverage', async () => {
       const schema: TopLevelSchema = JSON.parse(schemaJson);
       const schemaPreprocessed = preprocessOneTime(schema);
       const title = schemaPreprocessed.title ?? 'Untitled schema';
-      const schemaGraph = constructSchemaGraph(schemaPreprocessed, useSettings().value.documentation.mergeAllOfs);
-      const actualMd = cleanMarkdownContent(schemaToMarkdown(schemaPreprocessed, title, schemaGraph).trimEnd());
+      const schemaGraph = constructSchemaGraph(
+        schemaPreprocessed,
+        useSettings().value.documentation.mergeAllOfs
+      );
+      const actualMd = cleanMarkdownContent(
+        schemaToMarkdown(schemaPreprocessed, title, schemaGraph).trimEnd()
+      );
       const expected = cleanMarkdownContent(expectedMd.trimEnd()); // ignore trailing newline diffs
 
       expect(actualMd).toBe(expected);

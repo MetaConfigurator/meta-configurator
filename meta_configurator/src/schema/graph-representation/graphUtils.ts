@@ -22,9 +22,10 @@ export function pathToNodeId(path: Path): string {
   }
 }
 
-
-
-export function findBestMatchingNodeData(nodesData: SchemaNodeData[], selectedPath: Path): SchemaElementData | undefined {
+export function findBestMatchingNodeData(
+  nodesData: SchemaNodeData[],
+  selectedPath: Path
+): SchemaElementData | undefined {
   const matchingNode = nodesData.find(node => arePathsEqual(node.absolutePath, selectedPath));
   if (matchingNode) {
     return matchingNode;
@@ -36,8 +37,6 @@ export function findBestMatchingNodeData(nodesData: SchemaNodeData[], selectedPa
 
   return undefined;
 }
-
-
 
 export function findBestMatchingNode(nodes: Node[], selectedPath: Path): Node | undefined {
   const matchingNode = nodes.find(node => arePathsEqual(node.data.absolutePath, selectedPath));

@@ -9,7 +9,10 @@ import type {Path} from '@/utility/path';
 import DocumentationSettingsPanel from '@/components/panels/documentation/DocumentationSettingsPanel.vue';
 import {asciiToPath, pathToAscii} from '@/utility/pathUtils';
 import {getSchemaTitle} from '@/schema/schemaReadingUtils';
-import {findBestMatchingData, findBestMatchingNodeData} from '@/schema/graph-representation/graphUtils';
+import {
+  findBestMatchingData,
+  findBestMatchingNodeData,
+} from '@/schema/graph-representation/graphUtils';
 import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphConstructor';
 import {useSettings} from '@/settings/useSettings';
 
@@ -20,9 +23,15 @@ const props = defineProps<{
 const schema = getSchemaForMode(SessionMode.DataEditor);
 const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const schemaPreprocessed = computed(() => schema.schemaPreprocessed.value);
-const schemaGraph = computed(() => constructSchemaGraph(schemaPreprocessed.value, useSettings().value.documentation.mergeAllOfs));
+const schemaGraph = computed(() =>
+  constructSchemaGraph(schemaPreprocessed.value, useSettings().value.documentation.mergeAllOfs)
+);
 const markdown = computed(() =>
-  schemaToMarkdown(schemaPreprocessed.value, getSchemaTitle(schema.schemaWrapper.value), schemaGraph.value)
+  schemaToMarkdown(
+    schemaPreprocessed.value,
+    getSchemaTitle(schema.schemaWrapper.value),
+    schemaGraph.value
+  )
 );
 
 const converter = new showdown.Converter({
@@ -40,13 +49,12 @@ watch(
   () => schemaSession.currentSelectedElement.value,
   path => {
     const targetNode = findBestMatchingNodeData(schemaGraph.value.nodes, path);
-    const targetData = findBestMatchingData(targetNode, path)
+    const targetData = findBestMatchingData(targetNode, path);
     if (targetData) {
       // if target data is found, update the path to the node
       path = targetData.absolutePath;
-
     }
-    scrollToPath(path)
+    scrollToPath(path);
   },
   {deep: true}
 );
