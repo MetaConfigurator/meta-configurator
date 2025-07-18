@@ -119,7 +119,7 @@ function fitViewForElementByPath(path: Path) {
   const bestMatchingNode = findBestMatchingNode(activeNodes.value, path);
   const previousBestMatchingNode = selectedNode.value;
   selectedNode.value = bestMatchingNode;
-  selectedData.value = findBestMatchingData(bestMatchingNode, path);
+  selectedData.value = findBestMatchingData(bestMatchingNode?.data, path);
   if (bestMatchingNode) {
     if (
       (previousBestMatchingNode && previousBestMatchingNode.id === bestMatchingNode.id) ||
