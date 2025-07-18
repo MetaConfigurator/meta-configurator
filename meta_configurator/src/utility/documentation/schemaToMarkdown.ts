@@ -34,8 +34,11 @@ import {
   type HierarchyNode,
 } from '@/schema/graph-representation/graphRepresentationToHierarchy';
 
-export function schemaToMarkdown(rootSchema: TopLevelSchema, schemaTitle: string) {
-  const graph = constructSchemaGraph(rootSchema, useSettings().value.documentation.mergeAllOfs);
+export function schemaToMarkdown(
+  rootSchema: TopLevelSchema,
+  schemaTitle: string,
+  graph: SchemaGraph
+) {
   const hierarchy = graphRepresentationToHierarchy(graph, true);
   const repeatEntries =
     useSettings().value.documentation.repeatMultipleOccurrencesInTableOfContents;

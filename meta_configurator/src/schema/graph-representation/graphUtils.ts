@@ -22,6 +22,22 @@ export function pathToNodeId(path: Path): string {
   }
 }
 
+export function findBestMatchingNodeData(
+  nodesData: SchemaNodeData[],
+  selectedPath: Path
+): SchemaElementData | undefined {
+  const matchingNode = nodesData.find(node => arePathsEqual(node.absolutePath, selectedPath));
+  if (matchingNode) {
+    return matchingNode;
+  }
+
+  if (selectedPath.length > 0) {
+    return findBestMatchingNodeData(nodesData, selectedPath.slice(0, -1));
+  }
+
+  return undefined;
+}
+
 export function findBestMatchingNode(nodes: Node[], selectedPath: Path): Node | undefined {
   const matchingNode = nodes.find(node => arePathsEqual(node.data.absolutePath, selectedPath));
   if (matchingNode) {
@@ -36,15 +52,15 @@ export function findBestMatchingNode(nodes: Node[], selectedPath: Path): Node | 
 }
 
 export function findBestMatchingData(
-  selectedNode: Node | undefined,
+  selectedNodeData: SchemaElementData | undefined,
   selectedPath: Path
 ): SchemaElementData | undefined {
-  if (!selectedNode) {
+  if (!selectedNodeData) {
     return undefined;
   }
 
-  if (selectedNode.data.getNodeType() === 'schemaobject') {
-    const matchingAttribute = (selectedNode.data as SchemaObjectNodeData).attributes.find(
+  if (selectedNodeData.getNodeType() === 'schemaobject') {
+    const matchingAttribute = (selectedNodeData as SchemaObjectNodeData).attributes.find(
       attribute => arePathsEqual(attribute.absolutePath, selectedPath)
     );
     if (matchingAttribute) {
@@ -52,11 +68,11 @@ export function findBestMatchingData(
     }
 
     if (selectedPath.length > 0) {
-      return findBestMatchingData(selectedNode, selectedPath.slice(0, -1));
+      return findBestMatchingData(selectedNodeData, selectedPath.slice(0, -1));
     }
   }
 
-  return selectedNode!.data;
+  return selectedNodeData;
 }
 
 export function hasOutgoingEdge(node: SchemaNodeData, graph: SchemaGraph): boolean {

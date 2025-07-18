@@ -1,11 +1,13 @@
 import {describe, expect, it, vi} from 'vitest';
 import {readdir, readFile} from 'node:fs/promises';
-import {join, dirname, basename} from 'node:path';
+import {join, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {cleanMarkdownContent} from '@/utility/documentation/documentationUtils';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
+import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphConstructor';
+import {useSettings} from '@/settings/useSettings';
 
 // resolve current directory since __dirname is not available in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -63,7 +65,13 @@ describe('schemaToMarkdown samples coverage', async () => {
       const schema: TopLevelSchema = JSON.parse(schemaJson);
       const schemaPreprocessed = preprocessOneTime(schema);
       const title = schemaPreprocessed.title ?? 'Untitled schema';
-      const actualMd = cleanMarkdownContent(schemaToMarkdown(schemaPreprocessed, title).trimEnd());
+      const schemaGraph = constructSchemaGraph(
+        schemaPreprocessed,
+        useSettings().value.documentation.mergeAllOfs
+      );
+      const actualMd = cleanMarkdownContent(
+        schemaToMarkdown(schemaPreprocessed, title, schemaGraph).trimEnd()
+      );
       const expected = cleanMarkdownContent(expectedMd.trimEnd()); // ignore trailing newline diffs
 
       expect(actualMd).toBe(expected);
