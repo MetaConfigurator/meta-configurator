@@ -7,7 +7,8 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
-import {addDefaultsForSettings, overwriteSettings} from '@/utility/settingsUpdater';
+import {updateSettingsWithDefaults, overwriteSettings} from '@/settings/settingsUpdater';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 defineProps({
   settings_url: String,
@@ -20,7 +21,9 @@ onMounted(() => {
   // update user settings by adding default value for missing fields
   // also performs settings migration in case of outdated settings
   // this is needed here, because, for example, loading snapshots involves reading the backend address from the settings
-  addDefaultsForSettings();
+  const userSettings = getDataForMode(SessionMode.Settings).data.value;
+  const defaultSettings: any = structuredClone(SETTINGS_DATA_DEFAULT);
+  updateSettingsWithDefaults(userSettings, defaultSettings);
 
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
@@ -37,7 +40,8 @@ onMounted(() => {
       })
       .then(function (jsonData) {
         console.info('Fetched provided settings file and parsed as json.', jsonData);
-        overwriteSettings(jsonData);
+        const userSettings = getDataForMode(SessionMode.Settings).data.value;
+        overwriteSettings(userSettings, jsonData);
       });
   }
 

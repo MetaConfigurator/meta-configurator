@@ -23,7 +23,7 @@ import {modeToRoute, SessionMode} from '@/store/sessionMode';
 import {useSessionStore} from '@/store/sessionStore';
 import type {SettingsInterfacePanels, SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
-import {addDefaultsForSettings} from '@/utility/settingsUpdater';
+import {updateSettingsWithDefaults} from '@/settings/settingsUpdater';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 
 const props = defineProps<{
@@ -80,7 +80,9 @@ onMounted(() => {
 
     // update user settings by adding default value for missing fields
     // also performs settings migration in case of outdated settings
-    addDefaultsForSettings();
+    const userSettings = getDataForMode(SessionMode.Settings).data.value;
+    const defaultSettings: any = structuredClone(SETTINGS_DATA_DEFAULT);
+    updateSettingsWithDefaults(userSettings, defaultSettings);
   }
 });
 
