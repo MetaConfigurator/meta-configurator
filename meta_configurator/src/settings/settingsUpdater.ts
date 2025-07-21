@@ -50,7 +50,6 @@ export function fixPanels(userData: SettingsInterfaceRoot, defaultData: Settings
   }
 }
 
-
 export function updateSettingsWithDefaults(settings: any, defaultSettings: any): any {
   addDefaultsForMissingFields(settings, defaultSettings);
   fixPanels(settings, defaultSettings);

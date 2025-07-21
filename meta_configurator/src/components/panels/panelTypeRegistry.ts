@@ -21,7 +21,7 @@ export class PanelTypeRegistry {
   public getPanelTypeDefinition(name: string): PanelTypeDefinition {
     const type = this.types.get(name);
     if (type === undefined) {
-      return this.types.get("textEditor")!; // we use textEditor as fallback to avoid errors
+      return this.types.get('textEditor')!; // we use textEditor as fallback to avoid errors
     }
     return type;
   }
