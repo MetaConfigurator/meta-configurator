@@ -3,7 +3,9 @@ import {errorService} from '@/main';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import {adaptComplexitySettingsToLoadedSchema} from '@/utility/settingsUpdater';
+import {adaptComplexitySettingsToLoadedSchema} from '@/settings/settingsUpdater';
+import {getDataForMode} from '@/data/useDataLink';
+import {SessionMode} from '@/store/sessionMode';
 
 /**
  * Loads the example schema with the given key.
@@ -17,7 +19,8 @@ export function loadExampleSchema(schemaKey: string): void {
     useDataSource().userSchemaData.value = selectedSchema?.schema;
     useDataSource().newSchemaWasFetched.value = true;
     // this will adapt the meta schema settings to enable/disable multiple types, boolean schema support, etc.
-    adaptComplexitySettingsToLoadedSchema(selectedSchema?.schema);
+    const userSettings = getDataForMode(SessionMode.Settings).data.value;
+    adaptComplexitySettingsToLoadedSchema(userSettings, selectedSchema?.schema);
 
     openClearDataEditorDialog();
 

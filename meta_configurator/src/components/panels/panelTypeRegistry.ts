@@ -1,5 +1,4 @@
 import type {PanelTypeDefinition} from '@/components/panels/panelTypeDefinition';
-import {panelTypeTextEditor} from '@/components/panels/defaultPanelTypes';
 
 /**
  * The panel type registry serves as a central place to register and retrieve panel types,
@@ -22,7 +21,7 @@ export class PanelTypeRegistry {
   public getPanelTypeDefinition(name: string): PanelTypeDefinition {
     const type = this.types.get(name);
     if (type === undefined) {
-      return panelTypeTextEditor; // we use textEditor as fallback to avoid errors
+      return this.types.get('textEditor')!; // we use textEditor as fallback to avoid errors
     }
     return type;
   }

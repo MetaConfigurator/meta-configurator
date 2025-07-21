@@ -1,10 +1,17 @@
 import type {SettingsInterfaceMetaSchema} from '@/settings/settingsTypes';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {META_SCHEMA_SIMPLIFIED} from '@/packaged-schemas/metaSchemaSimplified';
+import {updateSettingsWithDefaults} from '@/settings/settingsUpdater';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 // TODO: auto-suggest or enable features if user loads a schema that requires them
 export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema): TopLevelSchema {
   let metaSchema = structuredClone(META_SCHEMA_SIMPLIFIED);
+
+  if (!metaSchemaSettings) {
+    // if no settings are provided, use the default settings
+    metaSchemaSettings = structuredClone(SETTINGS_DATA_DEFAULT.metaSchema);
+  }
 
   if (!metaSchemaSettings.allowBooleanSchema) {
     metaSchema.$defs!.jsonSchema = DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA;

@@ -1,9 +1,6 @@
-import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
-import {useDataSource} from '@/data/dataSource';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {detectSchemaFeatures} from '@/schema/detectSchemaFeatures';
 
@@ -53,18 +50,14 @@ export function fixPanels(userData: SettingsInterfaceRoot, defaultData: Settings
   }
 }
 
-export function addDefaultsForSettings() {
-  const userSettings = getDataForMode(SessionMode.Settings).data.value;
-  const defaultSettings: any = structuredClone(SETTINGS_DATA_DEFAULT);
-  addDefaultsForMissingFields(userSettings, defaultSettings);
-
-  fixPanels(userSettings, defaultSettings);
-  migrateSettingsVersion(userSettings);
+export function updateSettingsWithDefaults(settings: any, defaultSettings: any): any {
+  addDefaultsForMissingFields(settings, defaultSettings);
+  fixPanels(settings, defaultSettings);
+  migrateSettingsVersion(settings);
+  return settings;
 }
 
-export function overwriteSettings(replaceFile: any) {
-  // overwrites the settings with the values from the replace file. Keeps all other values
-  const userSettings = useDataSource().settingsData.value;
+export function overwriteSettings(userSettings: any, replaceFile: any) {
   overwriteSettingsValues(userSettings, replaceFile);
   migrateSettingsVersion(userSettings);
 }
@@ -89,9 +82,9 @@ function migrateSettingsVersion(userSettings: any) {
   }
 }
 
-export function adaptComplexitySettingsToLoadedSchema(schema: TopLevelSchema) {
+export function adaptComplexitySettingsToLoadedSchema(userSettings: any, schema: TopLevelSchema) {
   const usedSchemaFeatures = detectSchemaFeatures(schema);
-  const metaSchemaSettings = useDataSource().settingsData.value.metaSchema;
+  const metaSchemaSettings = userSettings.metaSchema;
 
   metaSchemaSettings.allowBooleanSchema = usedSchemaFeatures.booleanSchemas;
   metaSchemaSettings.allowMultipleTypes = usedSchemaFeatures.multipleTypes;
