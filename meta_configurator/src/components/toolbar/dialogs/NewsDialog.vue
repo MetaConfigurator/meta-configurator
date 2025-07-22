@@ -15,24 +15,22 @@ defineEmits<{
 }>();
 
 const dontShowAgain = ref(false);
-
 </script>
 
 <template>
   <Dialog
-    :header=CURRENT_NEWS_HEADER
+    :header="CURRENT_NEWS_HEADER"
     :visible="visible"
     @update:visible="newValue => $emit('update:visible', newValue, dontShowAgain)">
     <div class="rendered-news" v-html="CURRENT_NEWS"></div>
     <div class="dont-show-again">
-      <Checkbox v-model="dontShowAgain" input-id="dont-show-again" binary/>
+      <Checkbox v-model="dontShowAgain" input-id="dont-show-again" binary />
       <label for="dont-show-again">Don't show again</label>
     </div>
   </Dialog>
 </template>
 
 <style>
-
 .rendered-news {
   flex: 1;
   overflow-y: auto;
@@ -66,5 +64,4 @@ const dontShowAgain = ref(false);
   font-size: 15px;
   color: #555;
 }
-
 </style>

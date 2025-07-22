@@ -89,7 +89,7 @@ const initialSchemaSelectionDialog = ref();
 
 // Function to show the category selection dialog
 const showSchemaSelectionDialog = () => {
-   initialSchemaSelectionDialog.value?.show();
+  initialSchemaSelectionDialog.value?.show();
 };
 
 const showInitialDialog = () => {
@@ -99,7 +99,7 @@ const showInitialDialog = () => {
   } else {
     showSchemaSelectionDialog();
   }
-}
+};
 
 const csvImportDialog = ref();
 const snapshotDialog = ref();
@@ -114,21 +114,22 @@ defineExpose({
 </script>
 
 <template>
-  <NewsDialog :visible="showNewsDialog"
-              @update:visible="(newValue, dontShowAgain) => {
-                showNewsDialog = newValue;
+  <NewsDialog
+    :visible="showNewsDialog"
+    @update:visible="
+      (newValue, dontShowAgain) => {
+        showNewsDialog = newValue;
 
-                if (!newValue) {
-                  showSchemaSelectionDialog();
+        if (!newValue) {
+          showSchemaSelectionDialog();
 
-                  if (dontShowAgain) {
-                    const settings = useSettings().value;
-                    setCurrentNewsHash(settings);
-                  }
-
-                }
-
-              }"/>
+          if (dontShowAgain) {
+            const settings = useSettings().value;
+            setCurrentNewsHash(settings);
+          }
+        }
+      }
+    " />
 
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
