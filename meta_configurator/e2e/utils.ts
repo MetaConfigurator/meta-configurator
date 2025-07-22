@@ -36,7 +36,7 @@ export async function openApp(page: Page, initialSettings: string|null = null, i
         url.searchParams.append('settings', testFilesPath + '/' + initialSettings);
     } else {
         // if no initial settings are provided, use the default settings
-        url.searchParams.append('settings', testFilesPath + '/settings_no_news.json');
+        url.searchParams.append('settings', testFilesPath + "/" + 'settings_no_news.json');
     }
     if (initialData) {
         url.searchParams.append('data', testFilesPath + '/' + initialData);
@@ -44,6 +44,7 @@ export async function openApp(page: Page, initialSettings: string|null = null, i
     if (initialSchema) {
         url.searchParams.append('schema', testFilesPath + '/' + initialSchema);
     }
+    console.log("go to url: " + url.toString());
     await page.goto(url.toString());
 }
 

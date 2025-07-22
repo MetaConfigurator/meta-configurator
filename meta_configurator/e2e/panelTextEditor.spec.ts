@@ -17,6 +17,7 @@ test('Select an example schema, enter some value and change the data format. The
     // Select the "Autonomous Vehicle Schema" from the example schema options
     await selectInitialSchemaFromExamples(page, 'Autonomous Vehicle Schema');
 
+
     // Enter some values in the textboxes
     await page.getByRole('textbox', { name: 'SimulationName' }).click();
     await page.getByRole('textbox', { name: 'SimulationName' }).fill('TestName');
