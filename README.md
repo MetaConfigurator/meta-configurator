@@ -61,7 +61,7 @@ Creating structured data files (or schemas) manually can be complex and error-pr
 
 *   **Code Generation** – Generate source code from JSON schemas in multiple programming languages (Python, Rust, TypeScript, C++, Java, etc.) using [quicktype](https://github.com/glideapps/quicktype/).
 
-*   **Documentation Generation** (experimental) – Generate documentation from JSON schemas, with export to a Markdown file.
+*   **Documentation Generation** – Generate documentation from JSON schemas, with export to a Markdown file.
 
 🛠️ Development
 ---------------
