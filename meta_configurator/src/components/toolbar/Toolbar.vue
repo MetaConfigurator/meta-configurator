@@ -4,6 +4,8 @@ import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {errorService} from '@/main';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
+import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
+import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import InitialSchemaSelectionDialog from '@/components/toolbar/dialogs/InitialSchemaSelectionDialog.vue';
 import AboutDialog from '@/components/toolbar/dialogs/AboutDialog.vue';
 import DataMappingDialog from '@/components/toolbar/dialogs/data-mapping/DataMappingDialog.vue';
@@ -12,8 +14,9 @@ import SaveSnapshotDialog from '@/components/toolbar/dialogs/snapshot/SaveSnapsh
 import CodeGenerationDialog from '@/components/toolbar/dialogs/code-generation/CodeGenerationDialog.vue';
 import FetchedSchemasSelectionDialog from '@/components/toolbar/dialogs/FetchedSchemasSelectionDialog.vue';
 import UrlInputDialog from '@/components/toolbar/dialogs/UrlInputDialog.vue';
-import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
-import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
+import NewsDialog from '@/components/toolbar/dialogs/NewsDialog.vue';
+import {useSettings} from '@/settings/useSettings';
+import {hasCurrentNewsChanged, setCurrentNewsHash} from '@/components/toolbar/currentNews';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -24,6 +27,7 @@ const emit = defineEmits<{
 }>();
 
 const showAboutDialog = ref(false);
+const showNewsDialog = ref(false);
 
 function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
   switch (option) {
@@ -84,9 +88,18 @@ function showUrlDialog() {
 const initialSchemaSelectionDialog = ref();
 
 // Function to show the category selection dialog
-const showInitialSchemaDialog = () => {
-  initialSchemaSelectionDialog.value?.show();
+const showSchemaSelectionDialog = () => {
+   initialSchemaSelectionDialog.value?.show();
 };
+
+const showInitialDialog = () => {
+  const settings = useSettings().value;
+  if (hasCurrentNewsChanged(settings.latestNewsHash)) {
+    showNewsDialog.value = true;
+  } else {
+    showSchemaSelectionDialog();
+  }
+}
 
 const csvImportDialog = ref();
 const snapshotDialog = ref();
@@ -96,11 +109,27 @@ const urlInputDialog = ref();
 const dataMappingDialog = ref();
 
 defineExpose({
-  showInitialSchemaDialog,
+  showInitialSchemaDialog: showInitialDialog,
 });
 </script>
 
 <template>
+  <NewsDialog :visible="showNewsDialog"
+              @update:visible="(newValue, dontShowAgain) => {
+                showNewsDialog = newValue;
+
+                if (!newValue) {
+                  showSchemaSelectionDialog();
+
+                  if (dontShowAgain) {
+                    const settings = useSettings().value;
+                    setCurrentNewsHash(settings);
+                  }
+
+                }
+
+              }"/>
+
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
     @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
