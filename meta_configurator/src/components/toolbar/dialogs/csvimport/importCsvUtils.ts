@@ -8,11 +8,11 @@ import _ from 'lodash';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import type {Path} from '@/utility/path';
-import type {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
+import type {CsvImportColumnMappingData} from '@/components/toolbar/dialogs/csvimport/csvImportTypes';
 import {
   type LabelledValue,
   replaceDecimalSeparator,
-} from '@/components/dialogs/csvimport/delimiterSeparatorUtils';
+} from '@/components/toolbar/dialogs/csvimport/delimiterSeparatorUtils';
 import {type CsvError, parse} from 'csv-parse/browser/esm';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';

@@ -9,12 +9,12 @@ import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
 import RadioButton from 'primevue/radiobutton';
 import ToggleSwitch from 'primevue/toggleswitch';
-import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
+import {CsvImportColumnMappingData} from '@/components/toolbar/dialogs/csvimport/csvImportTypes';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {
   expandCsvDataIntoTable,
   writeCsvToData,
-} from '@/components/dialogs/csvimport/writeCsvToData';
+} from '@/components/toolbar/dialogs/csvimport/writeCsvToData';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
@@ -22,7 +22,7 @@ import {
   computeMostUsedDelimiterAndDecimalSeparator,
   type LabelledPath,
   type LabelledValue,
-} from '@/components/dialogs/csvimport/delimiterSeparatorUtils';
+} from '@/components/toolbar/dialogs/csvimport/delimiterSeparatorUtils';
 import {
   decimalSeparatorOptions,
   delimiterOptions,
@@ -33,7 +33,7 @@ import {
   inferSchemaForNewDataAndMergeIntoCurrentSchema,
   loadCsvFromUserString,
   requestUploadFileToRef,
-} from '@/components/dialogs/csvimport/importCsvUtils';
+} from '@/components/toolbar/dialogs/csvimport/importCsvUtils';
 
 const emptyPathOption: LabelledPath = {label: 'not set', value: []};
 const emptyValueOption: LabelledValue = {label: 'not set', value: 'not set'};

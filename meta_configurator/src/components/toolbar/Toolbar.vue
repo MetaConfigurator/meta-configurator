@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import {errorService} from '@/main';
-import InitialSchemaSelectionDialog from '@/components/dialogs/InitialSchemaSelectionDialog.vue';
-
-import AboutDialog from '@/components/dialogs/AboutDialog.vue';
-import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
-
-import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
-import {SessionMode} from '@/store/sessionMode';
-import {schemaCollection} from '@/packaged-schemas/schemaCollection';
-import ImportCsvDialog from '@/components/dialogs/csvimport/ImportCsvDialog.vue';
-import SaveSnapshotDialog from '@/components/dialogs/snapshot/SaveSnapshotDialog.vue';
-import CodeGenerationDialog from '@/components/dialogs/code-generation/CodeGenerationDialog.vue';
-import FetchedSchemasSelectionDialog from '@/components/dialogs/FetchedSchemasSelectionDialog.vue';
-import UrlInputDialog from '@/components/dialogs/UrlInputDialog.vue';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
-import DataMappingDialog from '@/components/dialogs/data-mapping/DataMappingDialog.vue';
+import {SessionMode} from '@/store/sessionMode';
+import {errorService} from '@/main';
+import {schemaCollection} from '@/packaged-schemas/schemaCollection';
+import InitialSchemaSelectionDialog from '@/components/toolbar/dialogs/InitialSchemaSelectionDialog.vue';
+import AboutDialog from '@/components/toolbar/dialogs/AboutDialog.vue';
+import DataMappingDialog from '@/components/toolbar/dialogs/data-mapping/DataMappingDialog.vue';
+import ImportCsvDialog from '@/components/toolbar/dialogs/csvimport/ImportCsvDialog.vue';
+import SaveSnapshotDialog from '@/components/toolbar/dialogs/snapshot/SaveSnapshotDialog.vue';
+import CodeGenerationDialog from '@/components/toolbar/dialogs/code-generation/CodeGenerationDialog.vue';
+import FetchedSchemasSelectionDialog from '@/components/toolbar/dialogs/FetchedSchemasSelectionDialog.vue';
+import UrlInputDialog from '@/components/toolbar/dialogs/UrlInputDialog.vue';
+import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
+import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 
 const props = defineProps<{
   currentMode: SessionMode;
