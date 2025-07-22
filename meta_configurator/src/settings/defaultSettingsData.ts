@@ -3,6 +3,7 @@
  */
 export const SETTINGS_DATA_DEFAULT = {
   settingsVersion: '1.0.2',
+  latestNewsHash: 0,
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
   hideSchemaEditor: false,

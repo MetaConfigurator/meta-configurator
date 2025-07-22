@@ -1,8 +1,8 @@
-import {CsvImportColumnMappingData} from '@/components/dialogs/csvimport/csvImportTypes';
+import {CsvImportColumnMappingData} from '@/components/toolbar/dialogs/csvimport/csvImportTypes';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
-import {lookupValuesInCsv} from '@/components/dialogs/csvimport/importCsvUtils';
+import {lookupValuesInCsv} from '@/components/toolbar/dialogs/csvimport/importCsvUtils';
 
 export function writeCsvToData(csv: any[], columnMapping: CsvImportColumnMappingData[]) {
   const currentData = getDataForMode(SessionMode.DataEditor);

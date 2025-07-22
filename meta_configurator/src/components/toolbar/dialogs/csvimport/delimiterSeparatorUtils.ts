@@ -1,7 +1,7 @@
 import {
   decimalSeparatorOptions,
   delimiterOptions,
-} from '@/components/dialogs/csvimport/importCsvUtils';
+} from '@/components/toolbar/dialogs/csvimport/importCsvUtils';
 import type {Path} from '@/utility/path';
 
 function generateFloatRegexFull(delimiter: string, decimalSeparator: string): RegExp {

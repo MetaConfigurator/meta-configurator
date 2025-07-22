@@ -15,6 +15,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       enum: ['1.0.0', '1.0.1', '1.0.2'],
       readOnly: true,
     },
+    latestNewsHash: {
+      type: 'integer',
+      description:
+        'The hash of the current news. This is used to determine if the news has changed since the last time the settings were loaded.',
+      default: 0,
+      readOnly: true,
+    },
     dataFormat: {
       type: 'string',
       description: 'The data format to use for the configuration files.',

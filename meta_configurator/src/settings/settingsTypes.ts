@@ -2,6 +2,7 @@ import type {SessionMode} from '@/store/sessionMode';
 
 export interface SettingsInterfaceRoot {
   settingsVersion: string;
+  latestNewsHash: number;
   dataFormat: DataFormat;
   toolbarTitle: string;
   hideSchemaEditor: boolean;
