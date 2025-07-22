@@ -13,8 +13,8 @@ function getCurrentNewsHash(): number {
   return simpleHash(CURRENT_NEWS);
 }
 
-export function hasCurrentNewsChanged(latestNewsHash: number): boolean {
-  return latestNewsHash !== getCurrentNewsHash();
+export function hasCurrentNewsChanged(latestSeenNewsHash: number): boolean {
+  return latestSeenNewsHash !== getCurrentNewsHash() && latestSeenNewsHash !== -1;
 }
 
 export function setCurrentNewsHash(settings: SettingsInterfaceRoot) {
