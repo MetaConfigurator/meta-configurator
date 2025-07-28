@@ -51,7 +51,6 @@ describe('tests for more difficult scenarios and special cases that result as a 
     expect(graph.nodes.length).toBe(3);
   });
 
-
   it('array of oneOf options should lead to proper edges in the graph', () => {
     // json schema with an propery oneOfArray that is an array of oneOf options.
     let schema: TopLevelSchema = {
@@ -67,10 +66,7 @@ describe('tests for more difficult scenarios and special cases that result as a 
               {type: 'null'},
             ],
             // this is the important part: it used to be that setting the type to a simple type and not having an enum directly, but only in the oneOf, would lead to the enum not being connected to the root node.
-            type: [
-              "string",
-              "null"
-            ]
+            type: ['string', 'null'],
           },
         },
       },
@@ -82,9 +78,5 @@ describe('tests for more difficult scenarios and special cases that result as a 
     trimGraph(graph);
     expect(graph.nodes.length).toBe(3); // one for the root node, one for the array entry and one for the enum node
     expect(graph.edges.length).toBe(2); // one edge from the root node to the array entry node and one edge from the array entry node to the enum node
-
   });
-
-
 });
-

@@ -41,7 +41,7 @@ describe('test schema graph constructor with objects and attributes with enums',
       enumInt: {
         type: 'integer',
         enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      }
+      },
     },
     properties: {
       propertyEnum: {
@@ -50,7 +50,7 @@ describe('test schema graph constructor with objects and attributes with enums',
       },
       propertyEnumMixed: {
         type: 'string',
-        enum: ['valueA', 1, 3.5, { key: 'value' }, null],
+        enum: ['valueA', 1, 3.5, {key: 'value'}, null],
       },
       propertyEnumRef1: {
         $ref: '#/$defs/enumString',

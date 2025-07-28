@@ -345,7 +345,7 @@ function generateEnumValues(schema: JsonSchemaObjectType): string[] {
     // @ts-ignore
     return schema.enum.map(value => {
       if (value) {
-        return value.toString()
+        return value.toString();
       } else if (value === null) {
         return 'null';
       } else if (value === undefined) {
@@ -645,36 +645,39 @@ export function isSchemaThatDeservesANode(schema: JsonSchemaType): boolean {
   if (schema === true || schema === false) {
     return false;
   }
-  if (isObjectSchema(schema) || isEnumSchema(schema) ) {
+  if (isObjectSchema(schema) || isEnumSchema(schema)) {
     return true;
   }
   if (isCompositionalSchema(schema)) {
     if (schema.oneOf) {
-      if (schema.oneOf.some( subSchema => isSchemaThatDeservesANode(subSchema))) {
+      if (schema.oneOf.some(subSchema => isSchemaThatDeservesANode(subSchema))) {
         return true;
       }
     }
     if (schema.anyOf) {
-      if (schema.anyOf.some( subSchema => isSchemaThatDeservesANode(subSchema))) {
+      if (schema.anyOf.some(subSchema => isSchemaThatDeservesANode(subSchema))) {
         return true;
       }
     }
     if (schema.allOf) {
-      if (schema.allOf.some( subSchema => isSchemaThatDeservesANode(subSchema))) {
+      if (schema.allOf.some(subSchema => isSchemaThatDeservesANode(subSchema))) {
         return true;
       }
     }
   }
 
   if (isConditionalSchema(schema)) {
-    if (isSchemaThatDeservesANode(schema.if ?? false) || isSchemaThatDeservesANode(schema.then ?? false) || isSchemaThatDeservesANode(schema.else ?? false)) {
+    if (
+      isSchemaThatDeservesANode(schema.if ?? false) ||
+      isSchemaThatDeservesANode(schema.then ?? false) ||
+      isSchemaThatDeservesANode(schema.else ?? false)
+    ) {
       return true;
     }
   }
 
   return false;
 }
-
 
 export function isObjectSchema(schema: JsonSchemaType): boolean {
   if (schema === true || schema === false) {
