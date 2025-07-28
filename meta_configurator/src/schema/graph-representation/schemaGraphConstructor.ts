@@ -340,7 +340,15 @@ function generateObjectAttributesForType(
 function generateEnumValues(schema: JsonSchemaObjectType): string[] {
   if (schema.enum) {
     // @ts-ignore
-    return schema.enum.map(value => value.toString());
+    return schema.enum.map(value => {
+      if (value) {
+        return value.toString()
+      } else if (value === null) {
+        return 'null';
+      } else if (value === undefined) {
+        return 'undefined';
+      }
+    });
   }
   if (schema.const) {
     return [schema.const.toString()];
