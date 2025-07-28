@@ -336,4 +336,4 @@
 ---
 ### <a id="%2Fproperties%2Fpartner%2FoneOf%2F0"></a>[No Partner](#%2Fproperties%2Fpartner%2FoneOf%2F0)
 #### Enumeration Values
-- `false`
+- `undefined`
