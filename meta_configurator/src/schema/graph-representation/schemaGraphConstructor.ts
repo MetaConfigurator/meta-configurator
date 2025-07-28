@@ -56,6 +56,9 @@ export function populateGraph(
       node.attributes = generateObjectAttributes(node.absolutePath, node.schema, objectDefs);
       generateAttributeEdges(node, objectDefs, schemaGraph);
       generateObjectSpecialPropertyEdges(node, objectDefs, schemaGraph);
+    } else if (isCompositionalSchema(node.schema) || isConditionalSchema(node.schema)) {
+      // if the node is a compositional schema, generate edges for its sub-schemas even if it is not an object schema
+      generateObjectSpecialPropertyEdges(node, objectDefs, schemaGraph);
     }
   }
 }
@@ -639,8 +642,39 @@ export function generateObjectSpecialPropertyEdges(
 }
 
 export function isSchemaThatDeservesANode(schema: JsonSchemaType): boolean {
-  return isObjectSchema(schema) || isEnumSchema(schema);
+  if (schema === true || schema === false) {
+    return false;
+  }
+  if (isObjectSchema(schema) || isEnumSchema(schema) ) {
+    return true;
+  }
+  if (isCompositionalSchema(schema)) {
+    if (schema.oneOf) {
+      if (schema.oneOf.some( subSchema => isSchemaThatDeservesANode(subSchema))) {
+        return true;
+      }
+    }
+    if (schema.anyOf) {
+      if (schema.anyOf.some( subSchema => isSchemaThatDeservesANode(subSchema))) {
+        return true;
+      }
+    }
+    if (schema.allOf) {
+      if (schema.allOf.some( subSchema => isSchemaThatDeservesANode(subSchema))) {
+        return true;
+      }
+    }
+  }
+
+  if (isConditionalSchema(schema)) {
+    if (isSchemaThatDeservesANode(schema.if ?? false) || isSchemaThatDeservesANode(schema.then ?? false) || isSchemaThatDeservesANode(schema.else ?? false)) {
+      return true;
+    }
+  }
+
+  return false;
 }
+
 
 export function isObjectSchema(schema: JsonSchemaType): boolean {
   if (schema === true || schema === false) {
