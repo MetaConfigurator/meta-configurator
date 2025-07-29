@@ -114,6 +114,16 @@ pages = {1--9}
 }
 ```
 
+❓ FAQ
+------
+
+### 🔒 What happens to the data I type into MetaConfigurator?
+
+MetaConfigurator runs entirely **inside your browser** - it does **not** send your schemas, data, or anything you type to any server. The website itself is just a static page delivered by GitHub Pages (like downloading a PDF or image), and all the work happens locally on your computer.
+
+The only exception is if you **click the “Share Snapshot” button**. Then, and only then, the snapshot you create is sent to a **University of Stuttgart** server so you can share a unique link with others.
+
+📜 **See our [full Privacy Policy](PRIVACY.md)** for more information.
 
 📝 License
 ----------
