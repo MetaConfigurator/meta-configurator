@@ -165,7 +165,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description:
             'If set to true, the input fields in the GUI editor will have a border around them. This can make the GUI editor more readable, but also can make it look cluttered.',
           default: false,
-        }
+        },
       },
     },
     schemaDiagram: {

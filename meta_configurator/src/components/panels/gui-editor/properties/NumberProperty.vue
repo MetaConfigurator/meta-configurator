@@ -75,10 +75,11 @@ const stepValue = computed(() => {
    remove the box shadow, otherwise it looks buggy */
 :deep(.p-inputtext) {
   box-shadow: none !important;
-  border: v-bind("settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'") !important;
+  border: v-bind(
+    "settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'"
+  ) !important;
 }
 ::placeholder {
   color: #a8a8a8;
 }
-
 </style>
