@@ -31,21 +31,27 @@ function hideDialog() {
 
 function copyToClipboardProjectLink() {
   if (resultProjectLink.value.length > 0) {
-    navigator.clipboard.writeText(resultProjectLink.value).then(() => {
-      infoString.value = 'Project URL copied to clipboard.';
-    }).catch(() => {
-      errorString.value = 'Failed to copy project URL to clipboard.';
-    });
+    navigator.clipboard
+      .writeText(resultProjectLink.value)
+      .then(() => {
+        infoString.value = 'Project URL copied to clipboard.';
+      })
+      .catch(() => {
+        errorString.value = 'Failed to copy project URL to clipboard.';
+      });
   }
 }
 
 function copyToClipboardSnapshotLink() {
   if (resultSnapshotLink.value.length > 0) {
-    navigator.clipboard.writeText(resultSnapshotLink.value).then(() => {
-      infoString.value = 'Snapshot URL copied to clipboard.';
-    }).catch(() => {
-      errorString.value = 'Failed to copy snapshot URL to clipboard.';
-    });
+    navigator.clipboard
+      .writeText(resultSnapshotLink.value)
+      .then(() => {
+        infoString.value = 'Snapshot URL copied to clipboard.';
+      })
+      .catch(() => {
+        errorString.value = 'Failed to copy snapshot URL to clipboard.';
+      });
   }
 }
 
@@ -145,10 +151,10 @@ defineExpose({show: openDialog, close: hideDialog});
           </p>
         </Message>
         <Button @click="copyToClipboardProjectLink()" v-if="resultProjectLink.length > 0"
-        >Copy project URL to clipboard</Button
+          >Copy project URL to clipboard</Button
         >
         <Button @click="copyToClipboardSnapshotLink()" v-if="resultSnapshotLink.length > 0"
-        >Copy snapshot URL to clipboard</Button
+          >Copy snapshot URL to clipboard</Button
         >
 
         <Message v-if="errorString.length > 0" severity="error">{{ errorString }}</Message>
