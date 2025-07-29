@@ -141,21 +141,27 @@ defineExpose({show: openDialog, close: hideDialog});
         <Message
           v-if="resultProjectLink.length > 0 || resultSnapshotLink.length > 0"
           severity="success">
-          <p v-if="resultSnapshotLink.length > 0">
+          <p v-if="resultSnapshotLink.length > 0" class="snapshot-container">
+          Snapshot:
+          <a :href="resultSnapshotLink" target="_blank">{{ resultSnapshotLink }}</a>
+          <Button
+            class="copy-btn"
+            @click="copyToClipboardSnapshotLink()"
+            v-if="resultSnapshotLink.length > 0">
+            Copy snapshot URL to clipboard
+          </Button>
+        </p>
+          <p v-if="resultProjectLink.length > 0" class="snapshot-container">
             Snapshot:
-            <a :href="resultSnapshotLink" target="_blank">{{ resultSnapshotLink }}</a>
-          </p>
-          <p v-if="resultProjectLink.length > 0">
-            Project:
             <a :href="resultProjectLink" target="_blank">{{ resultProjectLink }}</a>
+            <Button
+              class="copy-btn"
+              @click="copyToClipboardProjectLink()"
+              v-if="resultProjectLink.length > 0">
+              Copy project URL to clipboard
+            </Button>
           </p>
         </Message>
-        <Button @click="copyToClipboardProjectLink()" v-if="resultProjectLink.length > 0"
-          >Copy project URL to clipboard</Button
-        >
-        <Button @click="copyToClipboardSnapshotLink()" v-if="resultSnapshotLink.length > 0"
-          >Copy snapshot URL to clipboard</Button
-        >
 
         <Message v-if="errorString.length > 0" severity="error">{{ errorString }}</Message>
         <Message v-else-if="infoString.length > 0" severity="info">{{ infoString }}</Message>
@@ -197,4 +203,22 @@ th {
   background-color: #f0f0f0;
   font-weight: bold;
 }
+
+.snapshot-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.snapshot-container a {
+  margin-right: 15px; /* space between link and button */
+}
+
+.copy-btn {
+  font-size: 0.8rem;       /* smaller text */
+  padding: 4px 8px;        /* less padding to make button smaller */
+  border-radius: 6px;      /* slightly rounded edges */
+  border: 1px solid #ccc;  /* subtle border */
+}
+
 </style>
