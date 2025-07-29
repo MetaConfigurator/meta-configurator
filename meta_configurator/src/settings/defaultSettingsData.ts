@@ -27,6 +27,7 @@ export const SETTINGS_DATA_DEFAULT = {
     maximumDepth: 20,
     propertySorting: 'schemaOrder',
     hideAddPropertyButton: true,
+    showBorderAroundInputFields: false,
   },
   schemaDiagram: {
     editMode: true,

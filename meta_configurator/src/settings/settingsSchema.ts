@@ -160,6 +160,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'If set to true, the button for adding custom (not defined by the schema) properties in the GUI editor will be hidden. By default, every schema object allows any additional properties, however, showing this option in the GUI is often not desired as it would only confuse the user. If a particular schema is defined for additional properties, other than "true", then the button will not be hidden.',
           default: true,
         },
+        showBorderAroundInputFields: {
+          type: 'boolean',
+          description:
+            'If set to true, the input fields in the GUI editor will have a border around them. This can make the GUI editor more readable, but also can make it look cluttered.',
+          default: false,
+        },
       },
     },
     schemaDiagram: {

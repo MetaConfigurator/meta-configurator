@@ -18,6 +18,7 @@ import {
 import type {SessionMode} from '@/store/sessionMode';
 import {OneOfAnyOfSelectionOption} from '@/data/oneOfAnyOfSelectionOption';
 import {schemaOptionToString} from '@/data/oneOfAnyOfSelectionOption';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -28,6 +29,8 @@ const props = defineProps<{
   isTypeUnion: boolean;
   sessionMode: SessionMode;
 }>();
+
+const settings = useSettings();
 
 function getCurrentSelectedOptions(): Map<string, OneOfAnyOfSelectionOption> {
   if (props.isTypeUnion) {
@@ -197,7 +200,7 @@ div {
   line-height: 10px;
 }
 .tableInput {
-  border: none;
+  border: v-bind("settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'");
   box-shadow: none;
 }
 ::placeholder {

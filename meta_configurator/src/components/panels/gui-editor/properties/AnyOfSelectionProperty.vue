@@ -10,6 +10,7 @@ import type {Path, PathElement} from '@/utility/path';
 import type {SessionMode} from '@/store/sessionMode';
 import {getSessionForMode, getUserSelectionForMode} from '@/data/useDataLink';
 import {OneOfAnyOfSelectionOption, schemaOptionToString} from '@/data/oneOfAnyOfSelectionOption';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -19,6 +20,8 @@ const props = defineProps<{
   possibleSchemas: Array<JsonSchemaWrapper>;
   sessionMode: SessionMode;
 }>();
+
+const settings = useSettings();
 
 const possibleOptions = props.possibleSchemas.map(
   (subSchema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(subSchema, index), index)
@@ -82,7 +85,7 @@ div {
   line-height: 10px;
 }
 .tableInput {
-  border: none;
+  border: v-bind("settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'");
   box-shadow: none;
 }
 ::placeholder {
