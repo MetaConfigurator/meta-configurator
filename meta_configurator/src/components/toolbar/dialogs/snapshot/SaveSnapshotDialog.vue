@@ -142,15 +142,15 @@ defineExpose({show: openDialog, close: hideDialog});
           v-if="resultProjectLink.length > 0 || resultSnapshotLink.length > 0"
           severity="success">
           <p v-if="resultSnapshotLink.length > 0" class="snapshot-container">
-          Snapshot:
-          <a :href="resultSnapshotLink" target="_blank">{{ resultSnapshotLink }}</a>
-          <Button
-            class="copy-btn"
-            @click="copyToClipboardSnapshotLink()"
-            v-if="resultSnapshotLink.length > 0">
-            Copy snapshot URL to clipboard
-          </Button>
-        </p>
+            Snapshot:
+            <a :href="resultSnapshotLink" target="_blank">{{ resultSnapshotLink }}</a>
+            <Button
+              class="copy-btn"
+              @click="copyToClipboardSnapshotLink()"
+              v-if="resultSnapshotLink.length > 0">
+              Copy snapshot URL to clipboard
+            </Button>
+          </p>
           <p v-if="resultProjectLink.length > 0" class="snapshot-container">
             Snapshot:
             <a :href="resultProjectLink" target="_blank">{{ resultProjectLink }}</a>
@@ -215,10 +215,9 @@ th {
 }
 
 .copy-btn {
-  font-size: 0.8rem;       /* smaller text */
-  padding: 4px 8px;        /* less padding to make button smaller */
-  border-radius: 6px;      /* slightly rounded edges */
-  border: 1px solid #ccc;  /* subtle border */
+  font-size: 0.8rem; /* smaller text */
+  padding: 4px 8px; /* less padding to make button smaller */
+  border-radius: 6px; /* slightly rounded edges */
+  border: 1px solid #ccc; /* subtle border */
 }
-
 </style>
