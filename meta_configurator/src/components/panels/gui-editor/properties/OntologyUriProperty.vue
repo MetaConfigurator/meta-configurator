@@ -14,6 +14,7 @@ import {findSuggestionsForSearchTerm} from '@/utility/rdf/findSuggestionsForSear
 import {findJsonLdPrefixes} from '@/utility/rdf/findJsonLdPrefixes';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -22,6 +23,8 @@ const props = defineProps<{
   validationResults: ValidationResult;
   sessionMode: SessionMode;
 }>();
+
+const settings = useSettings();
 
 const emit = defineEmits<{
   (e: 'update:propertyData', newValue: any): void;
@@ -197,7 +200,7 @@ const allPrefixOptions = computed(() => {
 
 <style scoped>
 .tableInput {
-  border: none;
+  border: v-bind("settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'");
   box-shadow: none;
 }
 ::placeholder {

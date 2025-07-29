@@ -7,6 +7,7 @@ import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -14,6 +15,8 @@ const props = defineProps<{
   propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
+
+const settings = useSettings();
 
 const emit = defineEmits<{
   (e: 'update:propertyData', newValue: string | undefined): void;
@@ -64,10 +67,11 @@ function updateValue() {
 <style scoped>
 /* remove border so it fits the look of the table better */
 .tableInput {
-  border: none;
+  border:  v-bind("settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'")
 }
 
 ::placeholder {
   color: #a8a8a8;
 }
+
 </style>

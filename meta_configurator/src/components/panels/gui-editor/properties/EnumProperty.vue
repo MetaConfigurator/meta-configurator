@@ -10,6 +10,7 @@ import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationService';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -18,6 +19,8 @@ const props = defineProps<{
   propertyData: any | undefined;
   validationResults: ValidationResult;
 }>();
+
+const settings = useSettings();
 
 const emit = defineEmits<{
   (e: 'update:propertyData', newValue: any): void;
@@ -86,10 +89,11 @@ function isEditable() {
 
 <style scoped>
 .tableInput {
-  border: none;
   box-shadow: none;
+  border: v-bind("settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'");
 }
 ::placeholder {
   color: #a8a8a8;
 }
+
 </style>

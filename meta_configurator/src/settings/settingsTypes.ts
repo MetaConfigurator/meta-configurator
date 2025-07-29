@@ -42,6 +42,7 @@ export interface SettingsInterfaceGuiEditor {
   maximumDepth: number;
   propertySorting: PropertySorting;
   hideAddPropertyButton: boolean;
+  showBorderAroundInputFields: boolean;
 }
 
 export interface SettingsInterfaceSchemaDiagram {
