@@ -80,7 +80,7 @@ async function storeSnapshot(
     },
     body: JSON.stringify(body),
   });
-  handleErrors(response, errorRef);
+  await handleErrors(response, errorRef);
 
   infoRef.value = '';
   errorRef.value = '';
@@ -93,7 +93,7 @@ async function getSnapshot(snapshotId: string, isProject: boolean = false) {
   const response = await fetch(`${BACKEND_URL.value}/${path}/${snapshotId}`, {
     method: 'GET',
   });
-  handleErrors(response, null);
+  await handleErrors(response, null);
 
   return response.json();
 }
