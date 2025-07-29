@@ -29,6 +29,26 @@ function hideDialog() {
   showDialog.value = false;
 }
 
+function copyToClipboardProjectLink() {
+  if (resultProjectLink.value.length > 0) {
+    navigator.clipboard.writeText(resultProjectLink.value).then(() => {
+      infoString.value = 'Project URL copied to clipboard.';
+    }).catch(() => {
+      errorString.value = 'Failed to copy project URL to clipboard.';
+    });
+  }
+}
+
+function copyToClipboardSnapshotLink() {
+  if (resultSnapshotLink.value.length > 0) {
+    navigator.clipboard.writeText(resultSnapshotLink.value).then(() => {
+      infoString.value = 'Snapshot URL copied to clipboard.';
+    }).catch(() => {
+      errorString.value = 'Failed to copy snapshot URL to clipboard.';
+    });
+  }
+}
+
 function requestSaveSnapshot() {
   errorString.value = '';
   if (publishProject.value) {
@@ -124,6 +144,12 @@ defineExpose({show: openDialog, close: hideDialog});
             <a :href="resultProjectLink" target="_blank">{{ resultProjectLink }}</a>
           </p>
         </Message>
+        <Button @click="copyToClipboardProjectLink()" v-if="resultProjectLink.length > 0"
+        >Copy project URL to clipboard</Button
+        >
+        <Button @click="copyToClipboardSnapshotLink()" v-if="resultSnapshotLink.length > 0"
+        >Copy snapshot URL to clipboard</Button
+        >
 
         <Message v-if="errorString.length > 0" severity="error">{{ errorString }}</Message>
         <Message v-else-if="infoString.length > 0" severity="info">{{ infoString }}</Message>
