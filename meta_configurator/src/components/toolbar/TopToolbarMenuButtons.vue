@@ -14,6 +14,7 @@ import {inferJsonSchema} from '@/schema/inferJsonSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
+  showBottomMenu: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -74,21 +75,34 @@ function inferSchemaFromSampleData() {
   }
 }
 
-function getMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
+function getMenuItems(settings: SettingsInterfaceRoot, positionBottom: boolean): MenuItem[] {
+  let result: MenuItem[];
+
   switch (props.currentMode) {
     case SessionMode.DataEditor:
-      return topMenuBar.getDataEditorMenuItems(settings);
+      result = topMenuBar.getDataEditorMenuItems(settings);
+      break;
     case SessionMode.SchemaEditor:
-      return topMenuBar.getSchemaEditorMenuItems(settings);
+      result = topMenuBar.getSchemaEditorMenuItems(settings);
+      break;
     case SessionMode.Settings:
-      return topMenuBar.getSettingsMenuItems(settings);
+      result = topMenuBar.getSettingsMenuItems(settings);
+      break;
     default:
       return [];
   }
+  result = result.filter(menuItem => {
+    let itemIsForBottom = true;
+    if (menuItem.position && menuItem.position == 'top') {
+      itemIsForBottom = false;
+    }
+    return itemIsForBottom === positionBottom;
+  });
+  return result;
 }
 
 // computed property function to get menu items to allow for updating of the menu items
-const menuItems = computed(() => getMenuItems(settings.value));
+const menuItems = computed(() => getMenuItems(settings.value, props.showBottomMenu));
 
 const itemMenuRefs = ref(new Map<string, typeof Menu>());
 
@@ -146,7 +160,7 @@ function isHighlighted(item: MenuItem) {
       text
       :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
       size="small"
-      v-tooltip.bottom="item.label"
+      v-tooltip.right="item.label"
       :id="item.key ?? ''"
       :disabled="isDisabled(item)"
       @click="event => handleItemButtonClick(item, event)">

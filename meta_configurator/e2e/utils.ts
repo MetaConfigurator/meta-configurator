@@ -7,25 +7,26 @@ const dataFormats = [ 'json', 'yaml', 'xml' ];
 
 
 export async function getCurrentEditorMode(page: Page): Promise<SessionMode> {
-    const text = await page.getByRole('toolbar').innerText();
+  // the page contains :data-testid="'mode-active-' + (item.index === activeIndex ? 'true' : 'false')" and as child the active mode button
 
-    for (const mode of Object.values(SessionMode)) {
-        if (text.includes(modeToMenuTitle(mode))) {
-            return mode;
-        }
+  const activeModeButton = await page.getByTestId('mode-active-true');
+  const activeModeText = await activeModeButton.innerText();
+  for (let mode of Object.values(SessionMode)) {
+    const modeTitle = modeToMenuTitle(mode);
+    if (activeModeText.includes(modeTitle)) {
+      return mode;
     }
+  }
     throw new Error('Unable to detect editor mode');
 }
 
 export async function forceEditorMode(page: Page, newMode: SessionMode) {
     const currentMode = await getCurrentEditorMode(page);
     const newModeTitle = modeToMenuTitle(newMode);
-    const currentModeTitle = modeToMenuTitle(currentMode);
 
     if (currentMode !== newMode) {
 
-        await page.getByRole('button', { name: currentModeTitle }).click();
-        await page.getByRole('menuitem', { name: newModeTitle }).locator('a').click();
+      await page.locator('a').filter({ hasText: newModeTitle }).click();
     }
 }
 
