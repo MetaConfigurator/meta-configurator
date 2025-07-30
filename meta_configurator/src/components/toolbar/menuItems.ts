@@ -251,19 +251,6 @@ export class MenuItems {
 
     result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.SchemaEditor, settings));
 
-    // toggle between showing and hiding the GUI preview
-    result.push(
-      this.generateTogglePanelButton(
-        SessionMode.SchemaEditor,
-        panelTypeGuiEditor.name,
-        SessionMode.DataEditor,
-        'fa-regular fa-eye',
-        'fa-solid fa-eye',
-        'preview of resulting GUI',
-        settings
-      )
-    );
-
     result.push({
       position: 'top',
       separator: true,
