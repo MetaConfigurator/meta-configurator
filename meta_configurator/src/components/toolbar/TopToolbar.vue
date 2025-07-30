@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useMagicKeys} from '@vueuse/core';
@@ -12,6 +11,7 @@ import {formatRegistry} from '@/dataformats/formatRegistry';
 import ModeSelector from '@/components/toolbar/ModeSelector.vue';
 import TopToolbarMenuButtons from '@/components/toolbar/TopToolbarMenuButtons.vue';
 import SearchBar from '@/components/toolbar/SearchBar.vue';
+import Divider from 'primevue/divider';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -82,45 +82,48 @@ useMagicKeys({
 </script>
 
 <template>
-  <Toolbar class="h-10 no-padding">
-    <template #start>
-      <ModeSelector
-        ref="modeSelector"
-        :current-mode="props.currentMode"
-        @mode-selected="newMode => selectedMode(newMode)" />
+  <div class="toolbar-wrapper">
+    <!--  First row -->
+    <div class="toolbar-row toolbar-top">
+      <!-- LEFT: ModeSelector -->
+      <div class="left-section">
+        <ModeSelector
+          ref="modeSelector"
+          :current-mode="props.currentMode"
+          @mode-selected="newMode => selectedMode(newMode)"
+          data-testid="mode-selector"/>
 
-      <TopToolbarMenuButtons
-        :current-mode="props.currentMode"
-        @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
-        @show-url-dialog="() => showUrlDialog()"
-        @show-example-schemas-dialog="() => showExampleSchemasDialog()"
-        @show-import-csv-dialog="() => showCsvImportDialog()"
-        @show-schemastore-dialog="() => showSchemaStoreDialog()"
-        @show-snapshot-dialog="() => showSnapshotDialog()"
-        @show-data-mapping-dialog="() => showDataMappingDialog()" />
+        <Divider layout="vertical"/>
 
-      <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
-        <Select
-          :options="dataFormatOptions"
-          v-model="settings.dataFormat"
-          size="small"
-          class="custom-select"
-          data-testid="format-selector" />
+        <TopToolbarMenuButtons
+          :show-bottom-menu="false"
+          :current-mode="props.currentMode"
+          @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
+          @show-url-dialog="() => showUrlDialog()"
+          @show-example-schemas-dialog="() => showExampleSchemasDialog()"
+          @show-import-csv-dialog="() => showCsvImportDialog()"
+          @show-schemastore-dialog="() => showSchemaStoreDialog()"
+          @show-snapshot-dialog="() => showSnapshotDialog()"
+          @show-data-mapping-dialog="() => showDataMappingDialog()" />
+
+        <Divider layout="vertical"/>
+
+        <SearchBar />
       </div>
 
-      <SearchBar />
-    </template>
+      <!-- CENTER: TopToolbarMenuButtons + SearchBar -->
+      <div class="center-section">
+      </div>
 
-    <template #end>
-      <div class="flex space-x-5 mr-3">
-        <div class="flex space-x-2">
+      <!-- RIGHT: Logo + title + buttons -->
+      <div class="right-section">
+        <div class="flex space-x-2 items-center">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
           <p class="font-semibold text-lg" data-testid="toolbar-title">
             {{ settings.toolbarTitle || 'MetaConfigurator' }}
           </p>
         </div>
 
-        <!-- button to open the about dialog -->
         <Button
           circular
           text
@@ -131,22 +134,99 @@ useMagicKeys({
           <FontAwesomeIcon icon="fa-solid fa-circle-info" />
         </Button>
 
-        <!-- link to our github, opens in a new tab -->
         <a
-          href="https://github.com/PaulBredl/config-assistant"
+          href="https://github.com/MetaConfigurator/meta-configurator"
           target="_blank"
           rel="noopener noreferrer"
           class="pi pi-github hover:scale-110 text-gray-600"
           style="font-size: 1.7rem" />
       </div>
-    </template>
-  </Toolbar>
+    </div>
+
+    <!-- Second row -->
+    <div class="toolbar-row toolbar-bottom">
+      <!-- LEFT side: menu buttons -->
+      <div class="bottom-left">
+        <TopToolbarMenuButtons
+          :show-bottom-menu="true"
+          :current-mode="props.currentMode"
+          @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
+          @show-url-dialog="() => showUrlDialog()"
+          @show-example-schemas-dialog="() => showExampleSchemasDialog()"
+          @show-import-csv-dialog="() => showCsvImportDialog()"
+          @show-schemastore-dialog="() => showSchemaStoreDialog()"
+          @show-snapshot-dialog="() => showSnapshotDialog()"
+          @show-data-mapping-dialog="() => showDataMappingDialog()" />
+      </div>
+
+      <!-- RIGHT side: format selector -->
+      <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
+        <Select
+          :options="dataFormatOptions"
+          v-model="settings.dataFormat"
+          size="small"
+          class="custom-select"
+          data-testid="format-selector" />
+      </div>
+    </div>
+
+  </div>
 </template>
 
 <style scoped>
-.no-padding {
-  padding: 0 !important;
+.toolbar-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
+
+/* Shared styling for both rows */
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+}
+
+/* Top row should spread items across */
+.toolbar-top {
+  border-bottom: 1px solid var(--surface-border);
+  justify-content: space-between;
+}
+
+/* Bottom row: spread left & right */
+.toolbar-bottom {
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* Left section in bottom row */
+.bottom-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Sections inside the top row */
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+.center-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1; /* take all available space */
+  gap: 0.5rem;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Custom button style */
 .toolbar-button {
   font-weight: bold;
   font-size: large;

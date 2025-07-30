@@ -18,9 +18,9 @@ export function modeToDocumentTypeDescription(mode: SessionMode): string {
 export function modeToMenuTitle(mode: SessionMode): string {
   switch (mode) {
     case SessionMode.DataEditor:
-      return 'Data Editor';
+      return 'Data';
     case SessionMode.SchemaEditor:
-      return 'Schema Editor';
+      return 'Schema';
     case SessionMode.Settings:
       return 'Settings';
   }

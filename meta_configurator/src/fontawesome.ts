@@ -40,7 +40,7 @@ import {
   faFileCode,
   faShare,
   faScissors,
-  faBook,
+  faBook, faLockOpen,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -50,6 +50,7 @@ import {
   faEye as faEyeRegular,
   faFileCode as faFileCodeRegular,
 } from '@fortawesome/free-regular-svg-icons';
+import {faLock} from '@fortawesome/free-solid-svg-icons/faLock';
 
 /**
  * Registers all icons used in the application.
@@ -100,4 +101,6 @@ export function registerIcons() {
   library.add(faShare);
   library.add(faScissors);
   library.add(faBook);
+  library.add(faLock);
+  library.add(faLockOpen);
 }

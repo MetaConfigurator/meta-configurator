@@ -129,9 +129,6 @@ export class MenuItems {
         disabled: () => !useCurrentData().undoManager.canRedo.value,
         key: 'redo',
       },
-      {
-        separator: true,
-      },
     ];
 
     if (settings.panels.hidden.includes('aiPrompts')) {
@@ -250,9 +247,6 @@ export class MenuItems {
         disabled: () => !useCurrentData().undoManager.canRedo.value,
         key: 'schema_redo',
       },
-      {
-        separator: true,
-      },
     ];
 
     result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.SchemaEditor, settings));
@@ -271,6 +265,7 @@ export class MenuItems {
     );
 
     result.push({
+      position: 'top',
       separator: true,
     });
 
@@ -295,8 +290,8 @@ export class MenuItems {
           metaSchema.allowMultipleTypes = false;
           metaSchema.markMoreFieldsAsAdvanced = true;
         },
-        'fa-solid fa-gear',
-        'fa-solid fa-gear',
+        'fa-solid fa-lock',
+        'fa-solid fa-lock-open',
         'Enable advanced schema options',
         'Disable advanced schema options'
       )
@@ -370,10 +365,7 @@ export class MenuItems {
           getDataForMode(SessionMode.Settings).setData(structuredClone(SETTINGS_DATA_DEFAULT));
         },
         key: 'settings_restore',
-      },
-      {
-        separator: true,
-      },
+      }
     ];
 
     result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.Settings, settings));
@@ -458,6 +450,7 @@ export class MenuItems {
   ): MenuItem {
     if (conditionActive()) {
       return {
+        position: "top",
         label: descriptionDeactivate,
         icon: iconNameDisabled,
         highlighted: true,
@@ -465,6 +458,7 @@ export class MenuItems {
       };
     } else {
       return {
+        position: "top",
         label: descriptionActivate,
         icon: iconNameEnabled,
         command: actionActivate,
