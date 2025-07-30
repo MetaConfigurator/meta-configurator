@@ -81,7 +81,7 @@ function onTabChange(event) {
     <template #item="{item, props}">
       <a
         v-bind="props.action"
-        class="flex align-items-center gap-2"
+        class="page-tab"
         :data-testid="'mode-active-' + (item.index === activeIndex ? 'true' : 'false')">
         <FontAwesomeIcon :icon="item.icon!!" />
         <span class="font-bold">{{ item.label }}</span>
@@ -93,10 +93,14 @@ function onTabChange(event) {
 <style scoped>
 .page-tabmenu .p-tabmenu {
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 0.1rem;
 }
 .page-tabmenu .p-tabmenuitem-link {
   display: flex;
   align-items: center;
+}
+
+.page-tab {
+  padding: 0.4rem 1rem;
 }
 </style>
