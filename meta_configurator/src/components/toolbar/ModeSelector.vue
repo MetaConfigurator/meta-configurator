@@ -83,7 +83,6 @@ function onTabChange(event) {
         v-bind="props.action"
         class="page-tab"
         :data-testid="'mode-active-' + (item.index === activeIndex ? 'true' : 'false')">
-        <FontAwesomeIcon :icon="item.icon!!" />
         <span class="font-bold">{{ item.label }}</span>
       </a>
     </template>
