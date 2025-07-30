@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import type { MenuItem } from 'primevue/menuitem';
+import {computed, ref, watch} from 'vue';
+import type {MenuItem} from 'primevue/menuitem';
 import TabMenu from 'primevue/tabmenu';
-import { modeToMenuTitle, SessionMode } from '@/store/sessionMode';
-import { useSettings } from '@/settings/useSettings';
+import {modeToMenuTitle, SessionMode} from '@/store/sessionMode';
+import {useSettings} from '@/settings/useSettings';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
@@ -54,13 +54,13 @@ const activeIndex = ref(0);
 // sync initial index
 watch(
   () => props.currentMode,
-  (mode) => {
-    const idx = tabs.value.findIndex((t, i) =>
-      t.command && tabs.value[i].label === modeToMenuTitle(mode)
+  mode => {
+    const idx = tabs.value.findIndex(
+      (t, i) => t.command && tabs.value[i].label === modeToMenuTitle(mode)
     );
     if (idx >= 0) activeIndex.value = idx;
   },
-  { immediate: true }
+  {immediate: true}
 );
 
 function onTabChange(event) {
@@ -70,7 +70,6 @@ function onTabChange(event) {
     item.command(event);
   }
 }
-
 </script>
 
 <template>
@@ -78,13 +77,14 @@ function onTabChange(event) {
     v-model:activeIndex="activeIndex"
     :model="tabs"
     @tab-change="onTabChange"
-    class="page-tabmenu"
-  >
-    <template #item="{ item, props }">
-      <a v-bind="props.action" class="flex align-items-center gap-2" :data-testid="'mode-active-' + (item.index === activeIndex ? 'true' : 'false')">
+    class="page-tabmenu">
+    <template #item="{item, props}">
+      <a
+        v-bind="props.action"
+        class="flex align-items-center gap-2"
+        :data-testid="'mode-active-' + (item.index === activeIndex ? 'true' : 'false')">
         <FontAwesomeIcon :icon="item.icon!!" />
-        <span class="font-bold"
-        >{{ item.label }}</span>
+        <span class="font-bold">{{ item.label }}</span>
       </a>
     </template>
   </TabMenu>

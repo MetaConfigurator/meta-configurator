@@ -91,9 +91,9 @@ function getMenuItems(settings: SettingsInterfaceRoot, positionBottom: boolean):
     default:
       return [];
   }
-  result = result.filter( menuItem => {
+  result = result.filter(menuItem => {
     let itemIsForBottom = true;
-    if (menuItem.position && menuItem.position == "top") {
+    if (menuItem.position && menuItem.position == 'top') {
       itemIsForBottom = false;
     }
     return itemIsForBottom === positionBottom;

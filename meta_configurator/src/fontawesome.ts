@@ -40,7 +40,8 @@ import {
   faFileCode,
   faShare,
   faScissors,
-  faBook, faLockOpen,
+  faBook,
+  faLockOpen,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,

@@ -365,7 +365,7 @@ export class MenuItems {
           getDataForMode(SessionMode.Settings).setData(structuredClone(SETTINGS_DATA_DEFAULT));
         },
         key: 'settings_restore',
-      }
+      },
     ];
 
     result.push(...this.generateModeSpecificPanelToggleButtons(SessionMode.Settings, settings));
@@ -450,7 +450,7 @@ export class MenuItems {
   ): MenuItem {
     if (conditionActive()) {
       return {
-        position: "top",
+        position: 'top',
         label: descriptionDeactivate,
         icon: iconNameDisabled,
         highlighted: true,
@@ -458,7 +458,7 @@ export class MenuItems {
       };
     } else {
       return {
-        position: "top",
+        position: 'top',
         label: descriptionActivate,
         icon: iconNameEnabled,
         command: actionActivate,

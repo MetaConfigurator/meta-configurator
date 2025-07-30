@@ -67,11 +67,10 @@ function updateValue() {
 <style scoped>
 /* remove border so it fits the look of the table better */
 .tableInput {
-  border:  v-bind("settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'")
+  border: v-bind("settings.guiEditor.showBorderAroundInputFields ? '1px solid #d1d5db' : 'none'");
 }
 
 ::placeholder {
   color: #a8a8a8;
 }
-
 </style>

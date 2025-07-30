@@ -95,5 +95,4 @@ function isEditable() {
 ::placeholder {
   color: #a8a8a8;
 }
-
 </style>

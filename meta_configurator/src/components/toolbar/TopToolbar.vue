@@ -91,9 +91,9 @@ useMagicKeys({
           ref="modeSelector"
           :current-mode="props.currentMode"
           @mode-selected="newMode => selectedMode(newMode)"
-          data-testid="mode-selector"/>
+          data-testid="mode-selector" />
 
-        <Divider layout="vertical"/>
+        <Divider layout="vertical" />
 
         <TopToolbarMenuButtons
           :show-bottom-menu="false"
@@ -106,14 +106,13 @@ useMagicKeys({
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()" />
 
-        <Divider layout="vertical"/>
+        <Divider layout="vertical" />
 
         <SearchBar />
       </div>
 
       <!-- CENTER: TopToolbarMenuButtons + SearchBar -->
-      <div class="center-section">
-      </div>
+      <div class="center-section"></div>
 
       <!-- RIGHT: Logo + title + buttons -->
       <div class="right-section">
@@ -169,7 +168,6 @@ useMagicKeys({
           data-testid="format-selector" />
       </div>
     </div>
-
   </div>
 </template>
 
