@@ -38,7 +38,7 @@ const schemaInformation = computed(() => {
 </script>
 
 <template>
-  <Panel :header="'GUI Editor Schema: ' + schemaInformation[0].value" toggleable :collapsed="true">
+  <Panel header="GUI View" toggleable :collapsed="true">
     <p v-for="info in schemaInformation" :key="info.title">
       <span class="font-semibold">{{ info.title }}: </span>
       {{ info.value }}

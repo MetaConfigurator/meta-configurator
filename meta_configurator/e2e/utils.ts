@@ -61,17 +61,9 @@ export async function openAppWithMode(page: Page, mode: SessionMode) {
     await page.goto(url.toString());
 }
 
-export async function getSchemaTitle(page: Page) {
-    // this is an example of how to access the component when the schema is called Person: await page.getByText('GUI Editor Schema: Person')
-    const schemaTitle = page.getByText('GUI Editor Schema:');
-    const schemaTitleText = await schemaTitle.innerText();
-    const schemaTitleTextArray = schemaTitleText.split(':');
-    return schemaTitleTextArray[1].trim();
-}
-
 export async function checkSchemaTitleForText(page: Page, text: string) {
-    const schemaTitle = page.getByText('GUI Editor Schema:');
-    await expect(schemaTitle).toContainText(text);
+    const guiSpoiler = page.getByText('GUI View Title:');
+    await expect(guiSpoiler).toContainText(text);
 }
 
 export async function checkToolbarTitleForText(page: Page, text: string) {
