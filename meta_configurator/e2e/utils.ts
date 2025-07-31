@@ -26,7 +26,13 @@ export async function forceEditorMode(page: Page, newMode: SessionMode) {
 
     if (currentMode !== newMode) {
 
-      await page.locator('a').filter({ hasText: newModeTitle }).click();
+      // special case for Settings mode, where we need to click on the settings button
+      if (newMode === SessionMode.Settings) {
+          await page.getByTestId('mode-settings-button').click();
+      } else {
+        await page.locator('a').filter({ hasText: newModeTitle }).click();
+      }
+
     }
 }
 

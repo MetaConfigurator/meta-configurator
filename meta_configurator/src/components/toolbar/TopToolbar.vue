@@ -125,6 +125,7 @@ useMagicKeys({
         size="small"
         v-if="!settings.hideSettings"
         v-tooltip.bottom="'Settings'"
+        data-testid="mode-settings-button"
         @click="() => selectedMode(SessionMode.Settings)">
         <FontAwesomeIcon icon="fa-solid fa-gear" />
       </Button>
