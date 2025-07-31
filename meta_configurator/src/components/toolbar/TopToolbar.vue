@@ -116,7 +116,10 @@ useMagicKeys({
 
       <!-- RIGHT: Logo + title + buttons -->
       <Button
-        :class="{'toolbar-button': true, 'highlighted-icon': props.currentMode=== SessionMode.Settings}"
+        :class="{
+          'toolbar-button': true,
+          'highlighted-icon': props.currentMode === SessionMode.Settings,
+        }"
         circular
         text
         size="small"
@@ -153,7 +156,6 @@ useMagicKeys({
           class="pi pi-github hover:scale-110 text-gray-600"
           style="font-size: 1.7rem" />
       </div>
-
     </div>
 
     <!-- Second row -->
