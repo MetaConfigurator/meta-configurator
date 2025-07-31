@@ -13,7 +13,7 @@ import DocumentationPanel from '@/components/panels/documentation/DocumentationP
 export const panelTypeTextEditor: PanelTypeDefinition = {
   getComponent: () => CodeEditorPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
-  label: 'Text Editor',
+  label: 'Text View',
   icon: 'fa-solid fa-code',
   name: 'textEditor',
 };
@@ -21,7 +21,7 @@ export const panelTypeTextEditor: PanelTypeDefinition = {
 export const panelTypeGuiEditor: PanelTypeDefinition = {
   getComponent: () => GuiEditorPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
-  label: 'GUI Editor',
+  label: 'GUI View',
   icon: 'fa-solid fa-list-ul',
   name: 'guiEditor',
 };
@@ -29,7 +29,7 @@ export const panelTypeGuiEditor: PanelTypeDefinition = {
 export const panelTypeSchemaDiagram: PanelTypeDefinition = {
   getComponent: () => SchemaDiagramPanel,
   supportedModes: [SessionMode.SchemaEditor],
-  label: 'Schema Diagram',
+  label: 'Diagram View',
   icon: 'fa-solid fa-project-diagram',
   name: 'schemaDiagram',
 };
@@ -37,7 +37,7 @@ export const panelTypeSchemaDiagram: PanelTypeDefinition = {
 export const panelTypeAiPrompts: PanelTypeDefinition = {
   getComponent: () => AiPromptsPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
-  label: 'AI Prompts',
+  label: 'AI Prompts View',
   icon: 'fa-solid fa-robot',
   name: 'aiPrompts',
 };
@@ -53,7 +53,7 @@ export const panelTypeListAnalysis: PanelTypeDefinition = {
 export const panelTypeDebug: PanelTypeDefinition = {
   getComponent: () => DebugPanel,
   supportedModes: [SessionMode.DataEditor, SessionMode.SchemaEditor, SessionMode.Settings],
-  label: 'Debug',
+  label: 'Debug View',
   icon: 'fa-solid fa-bug',
   name: 'debug',
 };
@@ -69,7 +69,7 @@ export const panelTypeTest: PanelTypeDefinition = {
 export const panelTypeDocementation: PanelTypeDefinition = {
   getComponent: () => DocumentationPanel,
   supportedModes: [SessionMode.SchemaEditor],
-  label: 'Markdown documentation of the schema',
+  label: 'Documentation View',
   icon: 'fa-solid fa-book',
   name: 'documentation',
 };

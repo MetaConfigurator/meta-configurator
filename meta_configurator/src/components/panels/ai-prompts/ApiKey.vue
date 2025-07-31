@@ -46,7 +46,7 @@ watch(isPersistKey, newValue => {
 </script>
 
 <template>
-  <Panel header="AI Prompts - API Key" toggleable :collapsed="true">
+  <Panel header="AI Prompts View" toggleable :collapsed="true">
     MetaConfigurator supports the OpenAI API (including other AI endpoints using the same API).
     Define your endpoint in the settings.
     <br />
