@@ -115,6 +115,19 @@ useMagicKeys({
       <div class="center-section"></div>
 
       <!-- RIGHT: Logo + title + buttons -->
+      <Button
+        :class="{'toolbar-button': true, 'highlighted-icon': props.currentMode=== SessionMode.Settings}"
+        circular
+        text
+        size="small"
+        v-if="!settings.hideSettings"
+        v-tooltip.bottom="'Settings'"
+        @click="() => selectedMode(SessionMode.Settings)">
+        <FontAwesomeIcon icon="fa-solid fa-gear" />
+      </Button>
+
+      <Divider layout="vertical" />
+
       <div class="right-section">
         <div class="flex space-x-2 items-center">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
@@ -140,6 +153,7 @@ useMagicKeys({
           class="pi pi-github hover:scale-110 text-gray-600"
           style="font-size: 1.7rem" />
       </div>
+
     </div>
 
     <!-- Second row -->
@@ -195,6 +209,10 @@ useMagicKeys({
 .toolbar-bottom {
   justify-content: space-between;
   gap: 0.5rem;
+}
+
+.highlighted-icon {
+  color: var(--p-highlight-color) !important;
 }
 
 /* Left section in bottom row */
