@@ -4,7 +4,6 @@ import type {MenuItem} from 'primevue/menuitem';
 import TabMenu from 'primevue/tabmenu';
 import {modeToMenuTitle, SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -40,6 +39,7 @@ function getTabs(settings): MenuItem[] {
       label: modeToMenuTitle(SessionMode.Settings),
       icon: 'fa-solid fa-cog',
       index: 2,
+      hidden: true, // hide by default from the mode selector, because it is accessible via the settings button at another place
       command: () => emit('mode-selected', SessionMode.Settings),
     });
   }
@@ -80,6 +80,7 @@ function onTabChange(event) {
     class="page-tabmenu">
     <template #item="{item, props}">
       <a
+        v-show="(item.hidden ?? false) !== true"
         v-bind="props.action"
         class="page-tab"
         :data-testid="'mode-active-' + (item.index === activeIndex ? 'true' : 'false')">
