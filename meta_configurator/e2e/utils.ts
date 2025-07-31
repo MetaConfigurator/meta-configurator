@@ -61,9 +61,10 @@ export async function openAppWithMode(page: Page, mode: SessionMode) {
     await page.goto(url.toString());
 }
 
+
 export async function checkSchemaTitleForText(page: Page, text: string) {
-    const guiSpoiler = page.getByText('GUI View Title:');
-    await expect(guiSpoiler).toContainText(text);
+    const schemaTitle = page.getByText('GUI View');
+    await expect(schemaTitle).toContainText(text);
 }
 
 export async function checkToolbarTitleForText(page: Page, text: string) {
