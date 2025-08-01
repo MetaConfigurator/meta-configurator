@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import SchemaInfoPanel from '@/components/panels/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
@@ -7,7 +6,6 @@ import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
-import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;

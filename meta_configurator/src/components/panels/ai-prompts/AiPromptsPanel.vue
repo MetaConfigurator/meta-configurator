@@ -5,7 +5,6 @@ import AiPromptsData from '@/components/panels/ai-prompts/AiPromptsData.vue';
 import AiPromptsSettings from '@/components/panels/ai-prompts/AiPromptsSettings.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
-import Panel from 'primevue/panel';
 
 const props = defineProps<{
   sessionMode: SessionMode;

@@ -7,7 +7,6 @@ import {onMounted, type Ref, ref, watch} from 'vue';
 import Password from 'primevue/password';
 import SelectButton from 'primevue/selectbutton';
 import Message from 'primevue/message';
-import {useSettings} from '@/settings/useSettings';
 
 const apiKey: Ref<string> = ref('');
 const isPersistKey: Ref<boolean> = ref(true);

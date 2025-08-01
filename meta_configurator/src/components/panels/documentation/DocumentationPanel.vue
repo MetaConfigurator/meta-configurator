@@ -6,7 +6,6 @@ import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import {downloadMarkdown} from '@/components/panels/documentation/downloadMarkdown';
 import showdown from 'showdown';
 import type {Path} from '@/utility/path';
-import DocumentationSettingsPanel from '@/components/panels/documentation/DocumentationSettingsPanel.vue';
 import {asciiToPath, pathToAscii} from '@/utility/pathUtils';
 import {getSchemaTitle} from '@/schema/schemaReadingUtils';
 import {
