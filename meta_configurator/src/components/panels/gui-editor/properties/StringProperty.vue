@@ -28,7 +28,7 @@ const polishedPropertyData = computed(() => {
   }
   if (typeof props.propertyData === 'object') {
     // if the property data is an empty object, we return an empty string
-    if (Object.keys(props.propertyData).length === 0) {
+    if (props.propertyData !== null && Object.keys(props.propertyData).length === 0) {
       return '';
     }
     // if the property data is an object with properties, we stringify it to display it in the input field

@@ -51,7 +51,7 @@ function valueToSelectionOption(value: any): any {
   if (!props.possibleValues.some(possibleValue => _.isEqual(possibleValue, value))) {
 
     // if the value is an empty object and the schema expects a string, we return an empty string
-    if (typeof value === 'object' && Object.keys(value).length === 0 && props.propertySchema.hasType('string')) {
+    if (value !== null && typeof value === 'object' && Object.keys(value).length === 0 && props.propertySchema.hasType('string')) {
       return '';
     }
 

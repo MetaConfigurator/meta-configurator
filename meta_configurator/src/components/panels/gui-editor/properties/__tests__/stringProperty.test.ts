@@ -132,7 +132,7 @@ describe('StringProperty', () => {
     });
 
     it('should correctly setup the input field', () => {
-      expect(inputField.props().modelValue).toBe('{}');
+      expect(inputField.props().modelValue).toBe('');
     });
   });
 
@@ -151,7 +151,7 @@ describe('StringProperty', () => {
     });
 
     it('should correctly setup the input field', () => {
-      expect(inputField.props().modelValue).toBe('[]');
+      expect(inputField.props().modelValue).toBe('');
     });
   });
 
