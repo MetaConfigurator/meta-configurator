@@ -44,7 +44,7 @@ const newPropertyData = ref(props.propertyData);
 // update the newPropertyData reference when the props change
 watch(polishedPropertyData, setNewPropertyData);
 
-function setNewPropertyData(newValue: string|undefined) {
+function setNewPropertyData(newValue: string | undefined) {
   newPropertyData.value = newValue;
 }
 
