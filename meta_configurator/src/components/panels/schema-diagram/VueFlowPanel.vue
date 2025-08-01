@@ -379,7 +379,7 @@ function unselectElement() {
           @click.stop
           @update:path="updateCurrentPath"></CurrentPathBreadcrump>
 
-          <Button label="Rebuild Graph" @click="() => updateGraph(true)" class="options-element" />
+        <Button label="Rebuild Graph" @click="() => updateGraph(true)" class="options-element" />
         <Button label="Add Object" @click="addObject" class="main-options-element" />
         <Button label="Add Enum" @click="addEnum" class="main-options-element" />
       </div>
@@ -435,8 +435,9 @@ function unselectElement() {
   left: 0;
   top: 0;
   z-index: 4;
-  background-color: lightgray;
-  padding: 8px;
+  padding: 16px 8px; /* More vertical padding */
+  display: flex;
+  gap: 8px; /* Space between buttons */
 }
 .controls .label {
   display: flex;
