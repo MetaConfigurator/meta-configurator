@@ -539,7 +539,7 @@ function zoomIntoPath(path: Path) {
   <SchemaInfoOverlay ref="schemaInfoOverlay" @hide="overlayShowScheduled = false" />
   <TreeTable
     :value="nodesToDisplay"
-    :class="{ 'scroll-pt-16' : true, 'no-header-style': !tableHeader }"
+    :class="{'scroll-pt-16': true, 'no-header-style': !tableHeader}"
     filter-mode="lenient"
     removable-sort
     resizable-columns
