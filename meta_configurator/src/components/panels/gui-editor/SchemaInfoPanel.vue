@@ -36,10 +36,19 @@ const schemaInformation = computed(() => {
 
 <template>
     <div v-for="info in schemaInformation" :key="info.title" >
-      <p v-if="info.value">
-        <span class="font-semibold">{{ info.title }}: </span>
-        {{ info.value }}
-      </p>
+      <div v-if="info.value">
+
+        <p v-if="info.title=='Schema'">
+          <span class="font-semibold">{{ info.title }}: </span>
+          <span data-testid="current-schema">{{ info.value }}</span>
+        </p>
+
+        <p v-else>
+          <span class="font-semibold">{{ info.title }}: </span>
+          {{ info.value }}
+        </p>
+
+      </div>
     </div>
     <p
       v-if="getSessionForMode(props.sessionMode).schemaErrorMessage.value != null"

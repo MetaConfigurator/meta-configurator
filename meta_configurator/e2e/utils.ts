@@ -63,7 +63,7 @@ export async function openAppWithMode(page: Page, mode: SessionMode) {
 
 
 export async function checkSchemaTitleForText(page: Page, text: string) {
-    const schemaTitle = page.getByText('GUI View');
+    const schemaTitle = page.getByTestId('current-schema');
     await expect(schemaTitle).toContainText(text);
 }
 
