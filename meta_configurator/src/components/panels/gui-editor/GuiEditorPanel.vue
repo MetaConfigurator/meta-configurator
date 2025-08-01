@@ -6,6 +6,8 @@
 import GuiEditorPanelJsonSchema from '@/components/panels/gui-editor/GuiEditorPanelJsonSchema.vue';
 import type {SessionMode} from '@/store/sessionMode';
 import {ScrollPanel} from 'primevue';
+import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
+import SchemaInfoPanel from '@/components/panels/gui-editor/SchemaInfoPanel.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -13,6 +15,21 @@ const props = defineProps<{
 </script>
 
 <template>
+  <PanelSettings panel-name="GUI View" :panel-settings-path="['guiEditor']">
+    <p>
+      This panel allows you to view and edit the current document in a GUI format. You can navigate
+      through the document tree, view properties, and modify data directly.
+    </p>
+    <br />
+    <p>
+      Hint: Click on a object property name to navigate into that object or expand it to view its
+      properties.
+    </p>
+    <br />
+    <p>The GUI is generated based on the following schema:</p>
+    <SchemaInfoPanel :sessionMode="props.sessionMode" />
+  </PanelSettings>
+
   <ScrollPanel
     style="width: 100%; height: 100%"
     :dt="{

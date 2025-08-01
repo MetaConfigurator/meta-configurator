@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import SchemaInfoPanel from '@/components/panels/gui-editor/SchemaInfoPanel.vue';
 import CurrentPathBreadcrumb from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
@@ -47,7 +46,6 @@ const currentSchema = computed(() => {
 </script>
 
 <template>
-  <SchemaInfoPanel :sessionMode="props.sessionMode" />
   <div class="p-5 space-y-3 flex flex-col">
     <CurrentPathBreadcrumb
       :session-mode="props.sessionMode"
@@ -60,6 +58,7 @@ const currentSchema = computed(() => {
         :currentPath="session.currentPath.value"
         :currentData="session.dataAtCurrentPath.value"
         :sessionMode="props.sessionMode"
+        :table-header="undefined"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
         @remove_property="removeProperty"
         @select_path="selectedPath => selectPath(selectedPath)"

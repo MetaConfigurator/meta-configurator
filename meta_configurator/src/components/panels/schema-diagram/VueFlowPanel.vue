@@ -27,7 +27,6 @@ import {
   wasNodeAddedOrEdgesChanged,
 } from '@/schema/graph-representation/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
-import DiagramOptionsPanel from '@/components/panels/schema-diagram/DiagramOptionsPanel.vue';
 import {
   applyNewType,
   type AttributeTypeChoice,
@@ -372,8 +371,6 @@ function unselectElement() {
       :max-zoom="4"
       :min-zoom="0.1">
       <div class="controls">
-        <DiagramOptionsPanel @rebuild_graph="updateGraph(true)" @fit_view="fitView()" @click.stop />
-
         <CurrentPathBreadcrump
           :session-mode="SessionMode.SchemaEditor"
           :path="schemaSession.currentPath.value"
@@ -381,6 +378,7 @@ function unselectElement() {
           @click.stop
           @update:path="updateCurrentPath"></CurrentPathBreadcrump>
 
+        <Button label="Rebuild Graph" @click="() => updateGraph(true)" class="options-element" />
         <Button label="Add Object" @click="addObject" class="main-options-element" />
         <Button label="Add Enum" @click="addEnum" class="main-options-element" />
       </div>
@@ -436,8 +434,9 @@ function unselectElement() {
   left: 0;
   top: 0;
   z-index: 4;
-  background-color: lightgray;
-  padding: 8px;
+  padding: 16px 8px; /* More vertical padding */
+  display: flex;
+  gap: 8px; /* Space between buttons */
 }
 .controls .label {
   display: flex;

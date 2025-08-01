@@ -44,6 +44,7 @@ const props = defineProps<{
   sessionMode: SessionMode;
   currentData: any;
   currentPath: Path;
+  tableHeader?: string;
 }>();
 
 const emit = defineEmits<{
@@ -550,7 +551,7 @@ function zoomIntoPath(path: Path) {
     v-model:expandedKeys="session.currentExpandedElements.value"
     @nodeExpand="expandElementChildren"
     :filters="treeTableFilters">
-    <Column field="name" expander>
+    <Column field="name" :header="tableHeader" expander>
       <template #body="slotProps">
         <!-- data nodes, note: wrapping in another span breaks the styling completely -->
         <span

@@ -15,6 +15,7 @@ import {
   createItemsRowsObjectsFromJson,
 } from '@/components/panels/list-analysis/listAnalysisUtils';
 import {ScrollPanel} from 'primevue';
+import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -81,9 +82,14 @@ function exportTableAsCsv() {
 </script>
 
 <template>
-  <div class="ml-5 h-full">
-    <label class="heading">Table View</label>
+  <PanelSettings panel-name="Table View" :panel-settings-path="['listAnalysis']">
+    <p>
+      This panel allows you to analyze object arrays in the current document. Select an object array
+      to view its contents in a table format.
+    </p>
+  </PanelSettings>
 
+  <div class="ml-5 h-full">
     <ScrollPanel
       style="width: 100%; height: 100%"
       :dt="{

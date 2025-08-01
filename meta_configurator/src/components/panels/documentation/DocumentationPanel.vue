@@ -6,7 +6,6 @@ import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import {downloadMarkdown} from '@/components/panels/documentation/downloadMarkdown';
 import showdown from 'showdown';
 import type {Path} from '@/utility/path';
-import DocumentationSettingsPanel from '@/components/panels/documentation/DocumentationSettingsPanel.vue';
 import {asciiToPath, pathToAscii} from '@/utility/pathUtils';
 import {getSchemaTitle} from '@/schema/schemaReadingUtils';
 import {
@@ -15,6 +14,7 @@ import {
 } from '@/schema/graph-representation/graphUtils';
 import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphConstructor';
 import {useSettings} from '@/settings/useSettings';
+import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -93,8 +93,17 @@ onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
 </script>
 
 <template>
+  <PanelSettings panel-name="Documentation View" :panel-settings-path="['documentation']">
+    <p>
+      This panel provides documentation for the current schema. It is generated from the schema
+      itself and includes details about properties, types, and descriptions.
+    </p>
+    <p>
+      The schema documentation is generated in Markdown format and rendered as HTML. It can also be
+      downloaded as a Markdown file for offline viewing or sharing.
+    </p>
+  </PanelSettings>
   <div class="documentation-panel">
-    <DocumentationSettingsPanel />
     <div ref="docsRef" class="rendered-docs" v-html="renderedHtml"></div>
     <div style="text-align: center; margin-top: 1rem">
       <button class="download-btn" @click="handleDownloadClick">Download as Markdown</button>

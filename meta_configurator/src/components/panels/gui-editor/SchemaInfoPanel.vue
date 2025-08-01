@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import {computed} from 'vue';
-import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
 import type {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {getSchemaTitle, isSchemaEmpty} from '@/schema/schemaReadingUtils';
-import Panel from 'primevue/panel';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -22,7 +19,7 @@ const schemaInformation = computed(() => {
   }
   return [
     {
-      title: 'Title',
+      title: 'Schema',
       value: title,
     },
     {
@@ -38,15 +35,22 @@ const schemaInformation = computed(() => {
 </script>
 
 <template>
-  <Panel :header="'GUI View (' + schemaInformation[0].value + ')'" toggleable :collapsed="true">
-    <p v-for="info in schemaInformation" :key="info.title">
-      <span class="font-semibold">{{ info.title }}: </span>
-      {{ info.value }}
-    </p>
-    <p
-      v-if="getSessionForMode(props.sessionMode).schemaErrorMessage.value != null"
-      class="text-red-700">
-      Schema Error: {{ getSessionForMode(props.sessionMode).schemaErrorMessage.value }}
-    </p>
-  </Panel>
+  <div v-for="info in schemaInformation" :key="info.title">
+    <div v-if="info.value">
+      <p v-if="info.title == 'Schema'">
+        <span class="font-semibold">{{ info.title }}: </span>
+        <span data-testid="current-schema">{{ info.value }}</span>
+      </p>
+
+      <p v-else>
+        <span class="font-semibold">{{ info.title }}: </span>
+        {{ info.value }}
+      </p>
+    </div>
+  </div>
+  <p
+    v-if="getSessionForMode(props.sessionMode).schemaErrorMessage.value != null"
+    class="text-red-700">
+    Invalid Schema: {{ getSessionForMode(props.sessionMode).schemaErrorMessage.value }}
+  </p>
 </template>
