@@ -27,6 +27,11 @@ const polishedPropertyData = computed(() => {
     return '';
   }
   if (typeof props.propertyData === 'object') {
+    // if the property data is an empty object, we return an empty string
+    if (Object.keys(props.propertyData).length === 0) {
+      return '';
+    }
+    // if the property data is an object with properties, we stringify it to display it in the input field
     return JSON.stringify(props.propertyData);
   }
   return props.propertyData;
@@ -39,7 +44,7 @@ const newPropertyData = ref(props.propertyData);
 // update the newPropertyData reference when the props change
 watch(polishedPropertyData, setNewPropertyData);
 
-function setNewPropertyData(newValue: string) {
+function setNewPropertyData(newValue: string|undefined) {
   newPropertyData.value = newValue;
 }
 
