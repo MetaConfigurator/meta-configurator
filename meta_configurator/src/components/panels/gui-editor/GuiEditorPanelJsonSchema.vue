@@ -7,6 +7,7 @@ import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
+import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -47,7 +48,6 @@ const currentSchema = computed(() => {
 </script>
 
 <template>
-  <SchemaInfoPanel :sessionMode="props.sessionMode" />
   <div class="p-5 space-y-3 flex flex-col">
     <CurrentPathBreadcrumb
       :session-mode="props.sessionMode"
@@ -60,6 +60,7 @@ const currentSchema = computed(() => {
         :currentPath="session.currentPath.value"
         :currentData="session.dataAtCurrentPath.value"
         :sessionMode="props.sessionMode"
+        :table-header="undefined"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
         @remove_property="removeProperty"
         @select_path="selectedPath => selectPath(selectedPath)"

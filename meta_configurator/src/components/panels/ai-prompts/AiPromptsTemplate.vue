@@ -295,8 +295,6 @@ function selectRootElement() {
 
 <template>
   <div class="container">
-    <ApiKey />
-
     <Message severity="error" v-if="errorMessage.length > 0">{{ errorMessage }}</Message>
     <div class="p-5 space-y-3">
       <!-- Create Document Prompt -->

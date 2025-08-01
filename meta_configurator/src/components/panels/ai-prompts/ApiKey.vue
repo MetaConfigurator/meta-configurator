@@ -5,7 +5,6 @@ and allowing the user to jump to a parent path.
 <script setup lang="ts">
 import {onMounted, type Ref, ref, watch} from 'vue';
 import Password from 'primevue/password';
-import Panel from 'primevue/panel';
 import SelectButton from 'primevue/selectbutton';
 import Message from 'primevue/message';
 import {useSettings} from '@/settings/useSettings';
@@ -46,7 +45,6 @@ watch(isPersistKey, newValue => {
 </script>
 
 <template>
-  <Panel header="AI Prompts View" toggleable :collapsed="true">
     MetaConfigurator supports the OpenAI API (including other AI endpoints using the same API).
     Define your endpoint in the settings.
     <br />
@@ -59,13 +57,6 @@ watch(isPersistKey, newValue => {
     <br />
     MetaConfigurator by default uses the gpt-4o-mini model, which has very low cost. For improved
     results you can change to more performant models in the settings tab.
-    <br />
-    <br />
-    Currently selected model and endpoint:
-    <b
-      >{{ useSettings().value.aiIntegration.model }},
-      {{ useSettings().value.aiIntegration.endpoint }}</b
-    >
     <span class="api-key-container">
       <span>Key:</span>
       <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false" />
@@ -77,7 +68,6 @@ watch(isPersistKey, newValue => {
         option-label="name"
         option-value="value" />
     </span>
-  </Panel>
   <Message severity="warn" v-if="apiKey.length <= 1">Please enter your API key.</Message>
 </template>
 
