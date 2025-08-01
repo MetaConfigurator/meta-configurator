@@ -25,8 +25,7 @@ const currentSchema = computed(() => {
     return new JsonSchemaWrapper({}, SessionMode.Settings, false);
   }
   return currSchema;
-})
-
+});
 
 function updateData(path: Path, newValue: any) {
   data.setDataAt(path, newValue);
@@ -36,12 +35,9 @@ function removeProperty(path: Path) {
   data.removeDataAt(path);
 }
 
-
 const emit = defineEmits<{
   (e: 'update:path', newPath: Path): void;
 }>();
-
-
 </script>
 
 <template>
@@ -49,17 +45,20 @@ const emit = defineEmits<{
     <slot></slot>
 
     <div class="properties-panel-container">
-    <PropertiesPanel
-      v-if="currentSchema.jsonSchema"
-      :table-header="panelName + ' Settings'"
-      :currentSchema="currentSchema"
-      :currentPath="props.panelSettingsPath"
-      :currentData="data.dataAt(props.panelSettingsPath)"
-      :sessionMode="SessionMode.Settings"
-      @remove_property="{removeProperty}"
-      @update_data="updateData" />
+      <PropertiesPanel
+        v-if="currentSchema.jsonSchema"
+        :table-header="panelName + ' Settings'"
+        :currentSchema="currentSchema"
+        :currentPath="props.panelSettingsPath"
+        :currentData="data.dataAt(props.panelSettingsPath)"
+        :sessionMode="SessionMode.Settings"
+        @remove_property="
+          {
+            removeProperty;
+          }
+        "
+        @update_data="updateData" />
     </div>
-
   </Panel>
 </template>
 

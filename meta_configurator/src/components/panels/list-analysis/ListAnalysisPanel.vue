@@ -90,7 +90,6 @@ function exportTableAsCsv() {
   </PanelSettings>
 
   <div class="ml-5 h-full">
-
     <ScrollPanel
       style="width: 100%; height: 100%"
       :dt="{

@@ -35,24 +35,22 @@ const schemaInformation = computed(() => {
 </script>
 
 <template>
-    <div v-for="info in schemaInformation" :key="info.title" >
-      <div v-if="info.value">
+  <div v-for="info in schemaInformation" :key="info.title">
+    <div v-if="info.value">
+      <p v-if="info.title == 'Schema'">
+        <span class="font-semibold">{{ info.title }}: </span>
+        <span data-testid="current-schema">{{ info.value }}</span>
+      </p>
 
-        <p v-if="info.title=='Schema'">
-          <span class="font-semibold">{{ info.title }}: </span>
-          <span data-testid="current-schema">{{ info.value }}</span>
-        </p>
-
-        <p v-else>
-          <span class="font-semibold">{{ info.title }}: </span>
-          {{ info.value }}
-        </p>
-
-      </div>
+      <p v-else>
+        <span class="font-semibold">{{ info.title }}: </span>
+        {{ info.value }}
+      </p>
     </div>
-    <p
-      v-if="getSessionForMode(props.sessionMode).schemaErrorMessage.value != null"
-      class="text-red-700">
-      Invalid Schema: {{ getSessionForMode(props.sessionMode).schemaErrorMessage.value }}
-    </p>
+  </div>
+  <p
+    v-if="getSessionForMode(props.sessionMode).schemaErrorMessage.value != null"
+    class="text-red-700">
+    Invalid Schema: {{ getSessionForMode(props.sessionMode).schemaErrorMessage.value }}
+  </p>
 </template>

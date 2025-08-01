@@ -4,8 +4,8 @@
 <template>
   <PanelSettings panel-name="Text View" :panel-settings-path="['codeEditor']">
     <p>
-      This panel allows you to view and edit the raw JSON/YAML/XML data of the current document. It is useful for
-      advanced users who want to directly manipulate the data structure.
+      This panel allows you to view and edit the raw JSON/YAML/XML data of the current document. It
+      is useful for advanced users who want to directly manipulate the data structure.
     </p>
   </PanelSettings>
   <AceEditor :sessionMode="props.sessionMode" />

@@ -44,29 +44,29 @@ watch(isPersistKey, newValue => {
 </script>
 
 <template>
-    MetaConfigurator supports the OpenAI API (including other AI endpoints using the same API).
-    Define your endpoint in the settings.
-    <br />
-    For OpenAI, generate your API Key
-    <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>. Usage of the
-    OpenAI API normally requires balance on the OpenAI account. One-time purchase of balance is
-    possible without permanently connecting your credit card with your account. Check this
-    <a href="https://platform.openai.com/docs/pricing" target="_blank">link</a> for pricing.
-    <br />
-    <br />
-    MetaConfigurator by default uses the gpt-4o-mini model, which has very low cost. For improved
-    results you can change to more performant models in the settings tab.
-    <span class="api-key-container">
-      <span>Key:</span>
-      <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false" />
-      <span v-show="isShowPersistOption">Persist:</span>
-      <SelectButton
-        v-show="isShowPersistOption"
-        v-model="isPersistKey"
-        :options="persistOptions"
-        option-label="name"
-        option-value="value" />
-    </span>
+  MetaConfigurator supports the OpenAI API (including other AI endpoints using the same API). Define
+  your endpoint in the settings.
+  <br />
+  For OpenAI, generate your API Key
+  <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>. Usage of the
+  OpenAI API normally requires balance on the OpenAI account. One-time purchase of balance is
+  possible without permanently connecting your credit card with your account. Check this
+  <a href="https://platform.openai.com/docs/pricing" target="_blank">link</a> for pricing.
+  <br />
+  <br />
+  MetaConfigurator by default uses the gpt-4o-mini model, which has very low cost. For improved
+  results you can change to more performant models in the settings tab.
+  <span class="api-key-container">
+    <span>Key:</span>
+    <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false" />
+    <span v-show="isShowPersistOption">Persist:</span>
+    <SelectButton
+      v-show="isShowPersistOption"
+      v-model="isPersistKey"
+      :options="persistOptions"
+      option-label="name"
+      option-value="value" />
+  </span>
   <Message severity="warn" v-if="apiKey.length <= 1">Please enter your API key.</Message>
 </template>
 

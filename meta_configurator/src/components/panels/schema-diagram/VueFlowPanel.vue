@@ -361,7 +361,6 @@ function unselectElement() {
 </script>
 
 <template>
-
   <div class="layout-flow">
     <VueFlow
       :nodes="activeNodes"
