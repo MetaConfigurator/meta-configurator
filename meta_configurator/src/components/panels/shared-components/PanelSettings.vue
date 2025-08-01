@@ -49,7 +49,7 @@ const emit = defineEmits<{
     <slot></slot>
 
     <div class="properties-panel-container">
-    <PropertiesPanel class="properties-panel"
+    <PropertiesPanel
       v-if="currentSchema.jsonSchema"
       :table-header="panelName + ' Settings'"
       :currentSchema="currentSchema"
