@@ -28,6 +28,7 @@ export const SETTINGS_DATA_DEFAULT = {
     propertySorting: 'schemaOrder',
     hideAddPropertyButton: true,
     showBorderAroundInputFields: false,
+    showSchemaTitleAsHeader: true,
   },
   schemaDiagram: {
     editMode: true,
