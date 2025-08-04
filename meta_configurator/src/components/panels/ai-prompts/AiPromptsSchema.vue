@@ -5,7 +5,7 @@ import {
   querySchemaCreation,
   querySchemaModification,
   querySchemaQuestion,
-} from '@/utility/openai';
+} from '@/utility/ai/aiEndpoint';
 import {SessionMode} from '@/store/sessionMode';
 
 const props = defineProps<{
