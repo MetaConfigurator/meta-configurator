@@ -51,7 +51,7 @@ const tableHeader = computed(() => {
   if (settings.value.guiEditor.showSchemaTitleAsHeader) {
     return schema.schemaWrapper.value.title; // for empty schemas no header is shown
   }
-   return undefined;
+  return undefined;
 });
 </script>
 

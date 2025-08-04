@@ -171,7 +171,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description:
             'If set to true, the title of the schema will be shown as a header in the GUI editor.',
           default: true,
-        }
+        },
       },
     },
     schemaDiagram: {
