@@ -12,7 +12,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       type: 'string',
       description: 'The version of the settings file.',
       default: '1.0.2',
-      enum: ['1.0.0', '1.0.1', '1.0.2'],
+      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3'],
       readOnly: true,
     },
     latestNewsHash: {
@@ -164,7 +164,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'boolean',
           description:
             'If set to true, the input fields in the GUI editor will have a border around them. This can make the GUI editor more readable, but also can make it look cluttered.',
-          default: false,
+          default: true,
         },
         showSchemaTitleAsHeader: {
           type: 'boolean',
