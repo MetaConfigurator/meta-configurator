@@ -6,11 +6,13 @@ import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
+const settings = useSettings();
 const session = getSessionForMode(props.sessionMode);
 const schema = getSchemaForMode(props.sessionMode);
 const data = getDataForMode(props.sessionMode);
@@ -44,6 +46,13 @@ const currentSchema = computed(() => {
   }
   return currSchema;
 });
+
+const tableHeader = computed(() => {
+  if (settings.value.guiEditor.showSchemaTitleAsHeader) {
+    return schema.schemaWrapper.value.title; // for empty schemas no header is shown
+  }
+   return undefined;
+});
 </script>
 
 <template>
@@ -59,7 +68,7 @@ const currentSchema = computed(() => {
         :currentPath="session.currentPath.value"
         :currentData="session.dataAtCurrentPath.value"
         :sessionMode="props.sessionMode"
-        :table-header="schema.schemaWrapper.value.title"
+        :table-header="tableHeader"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
         @remove_property="removeProperty"
         @select_path="selectedPath => selectPath(selectedPath)"

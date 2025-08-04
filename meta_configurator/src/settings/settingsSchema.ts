@@ -166,6 +166,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'If set to true, the input fields in the GUI editor will have a border around them. This can make the GUI editor more readable, but also can make it look cluttered.',
           default: false,
         },
+        showSchemaTitleAsHeader: {
+          type: 'boolean',
+          description:
+            'If set to true, the title of the schema will be shown as a header in the GUI editor.',
+          default: true,
+        }
       },
     },
     schemaDiagram: {

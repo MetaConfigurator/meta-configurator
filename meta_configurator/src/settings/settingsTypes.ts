@@ -43,6 +43,7 @@ export interface SettingsInterfaceGuiEditor {
   propertySorting: PropertySorting;
   hideAddPropertyButton: boolean;
   showBorderAroundInputFields: boolean;
+  showSchemaTitleAsHeader: boolean;
 }
 
 export interface SettingsInterfaceSchemaDiagram {
