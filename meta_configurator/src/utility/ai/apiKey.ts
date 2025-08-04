@@ -4,7 +4,6 @@ const initialized: Ref<boolean> = ref(false);
 const apiKey: Ref<string> = ref('');
 const isPersistKey: Ref<boolean> = ref(true);
 
-
 export function iniApiKey() {
   if (initialized.value) {
     return;

@@ -21,7 +21,7 @@ const props = defineProps<{
     <br />
     <ApiKey />
   </PanelSettings>
-  <ApiKeyWarning/>
+  <ApiKeyWarning />
   <AiPromptsSchema
     :session-mode="props.sessionMode"
     v-if="props.sessionMode == SessionMode.SchemaEditor" />

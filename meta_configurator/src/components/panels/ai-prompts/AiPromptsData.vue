@@ -67,7 +67,7 @@ function isSchemaEmpty() {
     :function-query-document-question="queryDocumentQuestion"
     :function-query-document-export="queryDocumentExport" />
   <div v-else>
-    <br/>
+    <br />
     <span>
       Before using the AI prompts to generate data, please create or select a schema in the Schema
       Editor tab.

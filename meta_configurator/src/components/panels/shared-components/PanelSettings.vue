@@ -43,12 +43,11 @@ const settingsName = computed(() => {
   if (!props.panelName || props.panelName === '') {
     return 'Settings';
   }
-  if (props.panelName.toLowerCase().includes("settings")) {
+  if (props.panelName.toLowerCase().includes('settings')) {
     return props.panelName;
   }
   return props.panelName + ' Settings';
-})
-
+});
 </script>
 
 <template>

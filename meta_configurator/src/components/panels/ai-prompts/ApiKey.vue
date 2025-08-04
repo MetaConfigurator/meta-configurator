@@ -7,7 +7,6 @@ import Password from 'primevue/password';
 import SelectButton from 'primevue/selectbutton';
 import {getApiKeyRef, getIsPersistKeyRef} from '@/utility/ai/apiKey';
 
-
 const isShowPersistOption = false; // currently the option of whether to persist the key is not shown because without persistence the key currently can not be accessed
 
 const apiKey: Ref<string> = getApiKeyRef();
@@ -17,7 +16,6 @@ const persistOptions = ref([
   {name: 'true', value: true},
   {name: 'false', value: false},
 ]);
-
 </script>
 
 <template>

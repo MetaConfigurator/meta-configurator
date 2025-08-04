@@ -201,11 +201,13 @@ defineExpose({show: openDialog, close: hideDialog});
     :modal="true"
     :style="{width: '50vw'}">
     <div class="space-y-4">
-
-      <PanelSettings panel-name="API Key and AI Settings" settings-header="AI Settings" :panel-settings-path="['aiIntegration']">
+      <PanelSettings
+        panel-name="API Key and AI Settings"
+        settings-header="AI Settings"
+        :panel-settings-path="['aiIntegration']">
         <ApiKey />
       </PanelSettings>
-      <ApiKeyWarning/>
+      <ApiKeyWarning />
 
       <Message severity="warn" v-if="mappingServiceWarning.length">
         <span v-html="mappingServiceWarning"></span>
