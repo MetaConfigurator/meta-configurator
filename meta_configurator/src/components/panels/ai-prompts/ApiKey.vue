@@ -1,46 +1,21 @@
 <!--
-Component for displaying the current path in the GUI editor
-and allowing the user to jump to a parent path.
+Component for displaying the OpenAI API key input.
 -->
 <script setup lang="ts">
-import {onMounted, type Ref, ref, watch} from 'vue';
+import {type Ref, ref} from 'vue';
 import Password from 'primevue/password';
 import SelectButton from 'primevue/selectbutton';
-import Message from 'primevue/message';
-
-const apiKey: Ref<string> = ref('');
-const isPersistKey: Ref<boolean> = ref(true);
+import {getApiKeyRef, getIsPersistKeyRef} from '@/utility/ai/apiKey';
 
 const isShowPersistOption = false; // currently the option of whether to persist the key is not shown because without persistence the key currently can not be accessed
 
-onMounted(() => {
-  const storedApiKey = localStorage.getItem('openai_api_key');
-  if (storedApiKey) {
-    apiKey.value = storedApiKey;
-  }
-  const storedPersistKey = localStorage.getItem('openai_persist_key');
-  if (storedPersistKey) {
-    isPersistKey.value = storedPersistKey === 'true';
-  }
-});
+const apiKey: Ref<string> = getApiKeyRef();
+const isPersistKey: Ref<boolean> = getIsPersistKeyRef();
 
 const persistOptions = ref([
   {name: 'true', value: true},
   {name: 'false', value: false},
 ]);
-
-watch(apiKey, newValue => {
-  if (isPersistKey.value) {
-    localStorage.setItem('openai_api_key', newValue);
-  }
-});
-
-watch(isPersistKey, newValue => {
-  localStorage.setItem('openai_persist_key', newValue.toString());
-  if (!newValue) {
-    localStorage.removeItem('openai_api_key');
-  }
-});
 </script>
 
 <template>
@@ -67,7 +42,6 @@ watch(isPersistKey, newValue => {
       option-label="name"
       option-value="value" />
   </span>
-  <Message severity="warn" v-if="apiKey.length <= 1">Please enter your API key.</Message>
 </template>
 
 <style scoped>
@@ -81,6 +55,6 @@ watch(isPersistKey, newValue => {
 
 a {
   text-decoration: none;
-  color: var(--primary-500);
+  color: var(--p-primary-500);
 }
 </style>

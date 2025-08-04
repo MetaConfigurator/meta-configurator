@@ -18,6 +18,8 @@ import {setupAceProperties} from '@/components/panels/shared-components/aceUtils
 import {useSettings} from '@/settings/useSettings';
 import {useDebounceFn} from '@vueuse/core';
 import ProgressSpinner from 'primevue/progressspinner';
+import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
+import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 
 const showDialog = ref(false);
 const editor_id = 'data-mapping-' + Math.random();
@@ -199,7 +201,13 @@ defineExpose({show: openDialog, close: hideDialog});
     :modal="true"
     :style="{width: '50vw'}">
     <div class="space-y-4">
-      <ApiKey />
+      <PanelSettings
+        panel-name="API Key and AI Settings"
+        settings-header="AI Settings"
+        :panel-settings-path="['aiIntegration']">
+        <ApiKey />
+      </PanelSettings>
+      <ApiKeyWarning />
 
       <Message severity="warn" v-if="mappingServiceWarning.length">
         <span v-html="mappingServiceWarning"></span>

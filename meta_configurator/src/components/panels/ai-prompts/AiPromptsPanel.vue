@@ -5,6 +5,7 @@ import AiPromptsData from '@/components/panels/ai-prompts/AiPromptsData.vue';
 import AiPromptsSettings from '@/components/panels/ai-prompts/AiPromptsSettings.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
+import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -20,6 +21,7 @@ const props = defineProps<{
     <br />
     <ApiKey />
   </PanelSettings>
+  <ApiKeyWarning />
   <AiPromptsSchema
     :session-mode="props.sessionMode"
     v-if="props.sessionMode == SessionMode.SchemaEditor" />

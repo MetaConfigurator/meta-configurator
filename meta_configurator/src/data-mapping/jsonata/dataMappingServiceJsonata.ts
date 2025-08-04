@@ -2,7 +2,7 @@ import type {DataMappingService} from '@/data-mapping/dataMappingService';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
-import {queryJsonataExpression} from '@/utility/openai';
+import {queryJsonataExpression} from '@/utility/ai/aiEndpoint';
 import {
   JSONATA_EXPRESSION,
   JSONATA_INPUT_EXAMPLE,

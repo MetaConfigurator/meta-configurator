@@ -2,7 +2,7 @@ import type {DataMappingService} from '@/data-mapping/dataMappingService';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
-import {queryDataMappingConfig} from '@/utility/openai';
+import {queryDataMappingConfig} from '@/utility/ai/aiEndpoint';
 import {
   extractInvalidSourcePathsFromConfig,
   extractSuitableSourcePaths,

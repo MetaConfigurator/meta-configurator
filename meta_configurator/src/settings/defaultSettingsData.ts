@@ -2,7 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
-  settingsVersion: '1.0.2',
+  settingsVersion: '1.0.3',
   latestNewsHash: 0,
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
@@ -96,7 +96,7 @@ export const SETTINGS_DATA_DEFAULT = {
         size: 50,
       },
     ],
-    hidden: ['aiPrompts', 'debug', 'test'],
+    hidden: ['debug', 'test'],
   },
   frontend: {
     hostname:

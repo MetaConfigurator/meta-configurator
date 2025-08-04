@@ -5,7 +5,7 @@ import {
   queryDataConversionToJson,
   queryDataModification,
   queryDataQuestion,
-} from '@/utility/openai';
+} from '@/utility/ai/aiEndpoint';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
 import _ from 'lodash';
@@ -67,7 +67,7 @@ function isSchemaEmpty() {
     :function-query-document-question="queryDocumentQuestion"
     :function-query-document-export="queryDocumentExport" />
   <div v-else>
-    <ApiKey class="api-key-top" />
+    <br />
     <span>
       Before using the AI prompts to generate data, please create or select a schema in the Schema
       Editor tab.

@@ -13,6 +13,7 @@ import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 
 const props = defineProps<{
   panelName: string;
+  settingsHeader?: string;
   panelSettingsPath: Path;
 }>();
 
@@ -35,9 +36,18 @@ function removeProperty(path: Path) {
   data.removeDataAt(path);
 }
 
-const emit = defineEmits<{
-  (e: 'update:path', newPath: Path): void;
-}>();
+const settingsName = computed(() => {
+  if (props.settingsHeader && props.settingsHeader !== '') {
+    return props.settingsHeader;
+  }
+  if (!props.panelName || props.panelName === '') {
+    return 'Settings';
+  }
+  if (props.panelName.toLowerCase().includes('settings')) {
+    return props.panelName;
+  }
+  return props.panelName + ' Settings';
+});
 </script>
 
 <template>
@@ -47,16 +57,12 @@ const emit = defineEmits<{
     <div class="properties-panel-container">
       <PropertiesPanel
         v-if="currentSchema.jsonSchema"
-        :table-header="panelName + ' Settings'"
+        :table-header="settingsName"
         :currentSchema="currentSchema"
         :currentPath="props.panelSettingsPath"
         :currentData="data.dataAt(props.panelSettingsPath)"
         :sessionMode="SessionMode.Settings"
-        @remove_property="
-          {
-            removeProperty;
-          }
-        "
+        @remove_property="removeProperty"
         @update_data="updateData" />
     </div>
   </Panel>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AiPromptsTemplate from '@/components/panels/ai-prompts/AiPromptsTemplate.vue';
-import {querySettingsModification, querySettingsQuestion} from '@/utility/openai';
+import {querySettingsModification, querySettingsQuestion} from '@/utility/ai/aiEndpoint';
 import {SessionMode} from '@/store/sessionMode';
 
 const props = defineProps<{

@@ -80,6 +80,19 @@ function migrateSettingsVersion(userSettings: any) {
     delete userSettings.backend.port;
     userSettings.backend.hostname = 'https://metaconfigurator.informatik.uni-stuttgart.de';
   }
+
+  if (userSettings.settingsVersion === '1.0.2') {
+    // migrate from 1.0.2 to 1.0.3
+    userSettings.settingsVersion = '1.0.3';
+    // unhide ai prompts panel
+    const hiddenPanels: string[] = userSettings.panels.hidden;
+    if (hiddenPanels.includes('aiPrompts')) {
+      const index = hiddenPanels.indexOf('aiPrompts');
+      if (index > -1) {
+        hiddenPanels.splice(index, 1);
+      }
+    }
+  }
 }
 
 export function adaptComplexitySettingsToLoadedSchema(userSettings: any, schema: TopLevelSchema) {
