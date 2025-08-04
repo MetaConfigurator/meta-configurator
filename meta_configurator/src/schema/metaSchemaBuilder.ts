@@ -102,7 +102,7 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
     !metaSchemaSettings.allowMultipleTypes ||
     metaSchemaSettings.objectTypesComfort;
   if (simplified) {
-    metaSchema.$defs.jsonMetaSchema.title = 'Simplified JSON Meta Schema';
+    metaSchema.$defs.jsonMetaSchema.title = 'Simplified JSON Schema Meta Schema';
   }
 
   return metaSchema;
