@@ -15,6 +15,7 @@ const props = defineProps<{
 </script>
 
 <template>
+  <div class="gui-panel">
   <PanelSettings panel-name="GUI View" :panel-settings-path="['guiEditor']">
     <p>
       This panel allows you to view and edit the current document in a GUI format. You can navigate
@@ -39,6 +40,15 @@ const props = defineProps<{
     }">
     <GuiEditorPanelJsonSchema :sessionMode="props.sessionMode" />
   </ScrollPanel>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+.gui-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+</style>
