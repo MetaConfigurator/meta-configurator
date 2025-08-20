@@ -6,6 +6,7 @@ import AiPromptsSettings from '@/components/panels/ai-prompts/AiPromptsSettings.
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
+import {ScrollPanel} from 'primevue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -22,15 +23,24 @@ const props = defineProps<{
     <ApiKey />
   </PanelSettings>
   <ApiKeyWarning />
-  <AiPromptsSchema
-    :session-mode="props.sessionMode"
-    v-if="props.sessionMode == SessionMode.SchemaEditor" />
-  <AiPromptsData
-    :session-mode="props.sessionMode"
-    v-else-if="props.sessionMode == SessionMode.DataEditor" />
-  <AiPromptsSettings
-    :session-mode="props.sessionMode"
-    v-else-if="props.sessionMode == SessionMode.Settings" />
+
+  <ScrollPanel
+    style="width: 100%; height: 100%"
+    :dt="{
+      bar: {
+        background: '{primary.color}',
+      },
+    }">
+    <AiPromptsSchema
+      :session-mode="props.sessionMode"
+      v-if="props.sessionMode == SessionMode.SchemaEditor" />
+    <AiPromptsData
+      :session-mode="props.sessionMode"
+      v-else-if="props.sessionMode == SessionMode.DataEditor" />
+    <AiPromptsSettings
+      :session-mode="props.sessionMode"
+      v-else-if="props.sessionMode == SessionMode.Settings" />
+  </ScrollPanel>
 </template>
 
 <style scoped></style>

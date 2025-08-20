@@ -93,17 +93,17 @@ onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
 </script>
 
 <template>
-  <PanelSettings panel-name="Documentation View" :panel-settings-path="['documentation']">
-    <p>
-      This panel provides documentation for the current schema. It is generated from the schema
-      itself and includes details about properties, types, and descriptions.
-    </p>
-    <p>
-      The schema documentation is generated in Markdown format and rendered as HTML. It can also be
-      downloaded as a Markdown file for offline viewing or sharing.
-    </p>
-  </PanelSettings>
   <div class="documentation-panel">
+    <PanelSettings panel-name="Documentation View" :panel-settings-path="['documentation']">
+      <p>
+        This panel provides documentation for the current schema. It is generated from the schema
+        itself and includes details about properties, types, and descriptions.
+      </p>
+      <p>
+        The schema documentation is generated in Markdown format and rendered as HTML. It can also
+        be downloaded as a Markdown file for offline viewing or sharing.
+      </p>
+    </PanelSettings>
     <div ref="docsRef" class="rendered-docs" v-html="renderedHtml"></div>
     <div style="text-align: center; margin-top: 1rem">
       <button class="download-btn" @click="handleDownloadClick">Download as Markdown</button>

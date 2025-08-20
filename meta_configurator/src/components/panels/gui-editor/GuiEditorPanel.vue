@@ -15,30 +15,39 @@ const props = defineProps<{
 </script>
 
 <template>
-  <PanelSettings panel-name="GUI View" :panel-settings-path="['guiEditor']">
-    <p>
-      This panel allows you to view and edit the current document in a GUI format. You can navigate
-      through the document tree, view properties, and modify data directly.
-    </p>
-    <br />
-    <p>
-      Hint: Click on a object property name to navigate into that object or expand it to view its
-      properties.
-    </p>
-    <br />
-    <p>The GUI is generated based on the following schema:</p>
-    <SchemaInfoPanel :sessionMode="props.sessionMode" />
-  </PanelSettings>
+  <div class="gui-panel">
+    <PanelSettings panel-name="GUI View" :panel-settings-path="['guiEditor']">
+      <p>
+        This panel allows you to view and edit the current document in a GUI format. You can
+        navigate through the document tree, view properties, and modify data directly.
+      </p>
+      <br />
+      <p>
+        Hint: Click on a object property name to navigate into that object or expand it to view its
+        properties.
+      </p>
+      <br />
+      <p>The GUI is generated based on the following schema:</p>
+      <SchemaInfoPanel :sessionMode="props.sessionMode" />
+    </PanelSettings>
 
-  <ScrollPanel
-    style="width: 100%; height: 100%"
-    :dt="{
-      bar: {
-        background: '{primary.color}',
-      },
-    }">
-    <GuiEditorPanelJsonSchema :sessionMode="props.sessionMode" />
-  </ScrollPanel>
+    <ScrollPanel
+      style="width: 100%; height: 100%"
+      :dt="{
+        bar: {
+          background: '{primary.color}',
+        },
+      }">
+      <GuiEditorPanelJsonSchema :sessionMode="props.sessionMode" />
+    </ScrollPanel>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.gui-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+</style>
