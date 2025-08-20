@@ -31,15 +31,15 @@ const props = defineProps<{
         background: '{primary.color}',
       },
     }">
-  <AiPromptsSchema
-    :session-mode="props.sessionMode"
-    v-if="props.sessionMode == SessionMode.SchemaEditor" />
-  <AiPromptsData
-    :session-mode="props.sessionMode"
-    v-else-if="props.sessionMode == SessionMode.DataEditor" />
-  <AiPromptsSettings
-    :session-mode="props.sessionMode"
-    v-else-if="props.sessionMode == SessionMode.Settings" />
+    <AiPromptsSchema
+      :session-mode="props.sessionMode"
+      v-if="props.sessionMode == SessionMode.SchemaEditor" />
+    <AiPromptsData
+      :session-mode="props.sessionMode"
+      v-else-if="props.sessionMode == SessionMode.DataEditor" />
+    <AiPromptsSettings
+      :session-mode="props.sessionMode"
+      v-else-if="props.sessionMode == SessionMode.Settings" />
   </ScrollPanel>
 </template>
 

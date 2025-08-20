@@ -100,8 +100,8 @@ onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
         itself and includes details about properties, types, and descriptions.
       </p>
       <p>
-        The schema documentation is generated in Markdown format and rendered as HTML. It can also be
-        downloaded as a Markdown file for offline viewing or sharing.
+        The schema documentation is generated in Markdown format and rendered as HTML. It can also
+        be downloaded as a Markdown file for offline viewing or sharing.
       </p>
     </PanelSettings>
     <div ref="docsRef" class="rendered-docs" v-html="renderedHtml"></div>
