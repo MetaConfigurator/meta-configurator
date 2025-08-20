@@ -287,6 +287,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: true,
         },
       },
+      additionalProperties: false,
     },
     metaSchema: {
       type: 'object',
