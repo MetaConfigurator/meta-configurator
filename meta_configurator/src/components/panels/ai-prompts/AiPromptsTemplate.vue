@@ -268,7 +268,6 @@ async function submitPromptExportDocument() {
       // otherwise, it is an object with url and description
       const exampleFile = await fetchExternalContentText(exportFormatDef.url);
       userPrompt = exportFormatDef.description + '\n\n Example File: ' + exampleFile;
-
     }
   }
 
