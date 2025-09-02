@@ -6,8 +6,8 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import SelectButton from 'primevue/selectbutton';
-import {type Editor} from 'brace';
 import * as ace from 'brace';
+import {type Editor} from 'brace';
 import {watchImmediate} from '@vueuse/core';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
@@ -17,8 +17,11 @@ import {pathToJsonPointer} from '@/utility/pathUtils';
 import type {Path} from '@/utility/path';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
-import {fixAndParseGeneratedJson, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
-import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
+import {
+  fixAndParseGeneratedJson,
+  fixGeneratedExpression,
+  getApiKey,
+} from '@/components/panels/ai-prompts/aiPromptUtils';
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
 import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schemaProcessor';
@@ -57,9 +60,11 @@ const schema = getSchemaForMode(props.sessionMode);
 const session = getSessionForMode(props.sessionMode);
 
 // available export formats might be defined in the schema. Then, instead of a field for the user to describe the target format, a dropdown with the available formats is shown
+// an export format is a mapping from a name to a URL where the format description can be found
+// alternatively it can also map to an object with an url for an example file, as well as a textual description
 const documentExportFormats: Ref<
   | {
-      [k: string]: string;
+      [k: string]: string | {url: string; description: string};
     }
   | undefined
 > = computed(() => {
@@ -255,11 +260,19 @@ async function submitPromptExportDocument() {
   // if the schema defines export formats, the user prompt is ignored and the selected export format is used
   if (documentExportFormatNames.value.length > 0) {
     const exportFormatName = selectedExportFormat.value;
-    const exportFormatUrl = documentExportFormats.value![exportFormatName];
-    // download content from URL
-    userPrompt = await fetchExternalContentText(exportFormatUrl);
+    const exportFormatDef = documentExportFormats.value![exportFormatName];
+    // if export format is just a string, it is the URL
+    if (typeof exportFormatDef === 'string') {
+      userPrompt = await fetchExternalContentText(exportFormatDef);
+    } else {
+      // otherwise, it is an object with url and description
+      const exampleFile = await fetchExternalContentText(exportFormatDef.url);
+      userPrompt = exportFormatDef.description + '\n\n Example File: ' + exampleFile;
+
+    }
   }
 
+  // download content from URL
   isLoadingExportAnswer.value = true;
   const response = props.functionQueryDocumentExport!(
     openApiKey,
@@ -270,7 +283,7 @@ async function submitPromptExportDocument() {
 
   response
     .then(value => {
-      exportedDocument.value = value;
+      exportedDocument.value = fixGeneratedExpression(value);
     })
     .catch(e => {
       console.error('Invalid response', e);
