@@ -282,7 +282,7 @@ async function submitPromptExportDocument() {
 
   response
     .then(value => {
-      exportedDocument.value = fixGeneratedExpression(value);
+      exportedDocument.value = fixGeneratedExpression(value, ['json', 'yaml', 'xml', 'plaintext']);
     })
     .catch(e => {
       console.error('Invalid response', e);
