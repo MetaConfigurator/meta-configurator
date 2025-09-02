@@ -268,6 +268,7 @@ async function submitPromptExportDocument() {
       // otherwise, it is an object with url and description
       const exampleFile = await fetchExternalContentText(exportFormatDef.url);
       userPrompt = exportFormatDef.description + '\n\n Example File: ' + exampleFile;
+
     }
   }
 
@@ -282,7 +283,7 @@ async function submitPromptExportDocument() {
 
   response
     .then(value => {
-      exportedDocument.value = fixGeneratedExpression(value);
+      exportedDocument.value = fixGeneratedExpression(value, ['json', 'yaml', 'xml', 'plaintext']);
     })
     .catch(e => {
       console.error('Invalid response', e);
