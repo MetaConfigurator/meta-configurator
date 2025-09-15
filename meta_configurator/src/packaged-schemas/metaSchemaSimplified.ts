@@ -905,6 +905,7 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
     hasTypeObject: {
       anyOf: [
         {
+          required: ['type'],
           properties: {
             type: {
               const: 'object',
@@ -912,6 +913,7 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
           },
         },
         {
+          required: ['type'],
           properties: {
             type: {
               type: 'array',
@@ -921,8 +923,16 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
             },
           },
         },
+        {
+          required: ['properties'],
+          properties: {
+            properties: {
+              type: 'object',
+              description: 'If "properties" is present, the instance is validated as an object.',
+            },
+          },
+        },
       ],
-      required: ['type'],
     },
     hasTypeString: {
       anyOf: [
