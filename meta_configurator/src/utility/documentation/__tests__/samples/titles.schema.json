@@ -1,5 +1,5 @@
 {
-  "title": "References Schema",
+  "title": "Titles Schema",
   "type": "object",
   "$defs": {
     "person": {
