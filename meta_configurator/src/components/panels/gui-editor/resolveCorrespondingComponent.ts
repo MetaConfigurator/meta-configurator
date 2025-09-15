@@ -91,7 +91,7 @@ export function resolveCorrespondingComponent(
     return h(NumberProperty, propsObject);
   }
 
-  if (nodeData.schema.hasType('object')) {
+  if (nodeData.schema.hasType('object') || nodeData.schema.properties !== undefined) {
     // @ts-ignore
     return h(SimpleObjectProperty, propsObject);
   }
