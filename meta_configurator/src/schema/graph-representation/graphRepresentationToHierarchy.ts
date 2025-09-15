@@ -6,6 +6,7 @@ import {
   SchemaObjectNodeData,
 } from '@/schema/graph-representation/schemaGraphTypes';
 import {pathToString} from '@/utility/pathUtils';
+import type {Path} from '@/utility/path';
 
 export interface HierarchyNode {
   graphNode: SchemaNodeData;
@@ -29,7 +30,7 @@ export function graphRepresentationToHierarchy(
     hierarchyRootNode,
     graph,
     noConditionalSubschemas,
-    new Set<SchemaElementData>()
+    new Set<string>()
   );
   return hierarchyRootNode;
 }
@@ -38,13 +39,19 @@ function findHierarchyNodeChildren(
   node: HierarchyNode,
   graph: SchemaGraph,
   noSpecialSubSchemas: boolean,
-  alreadyVisitedNodes: Set<SchemaElementData>
+  alreadyVisitedEdges: Set<string> // set of tuples of (startPath, endPath)
 ): HierarchyNode[] {
   const children: HierarchyNode[] = [];
 
   for (const edge of graph.edges) {
     if (pathToString(edge.start.absolutePath) === pathToString(node.graphNode.absolutePath)) {
       const targetNode = graph.findNode(edge.end.absolutePath);
+      const edgeId =
+        pathToString(edge.start.absolutePath) +
+        ':' +
+        edge.label +
+        '->' +
+        pathToString(edge.end.absolutePath);
 
       if (targetNode) {
         if (noSpecialSubSchemas) {
@@ -54,11 +61,11 @@ function findHierarchyNodeChildren(
           }
         }
 
-        if (alreadyVisitedNodes.has(targetNode)) {
+        if (alreadyVisitedEdges.has(edgeId)) {
           // to break cyclic dependencies, we stop traversing this branch
           break;
         } else {
-          alreadyVisitedNodes.add(targetNode);
+          alreadyVisitedEdges.add(edgeId);
         }
 
         const childNode: HierarchyNode = {
@@ -71,7 +78,7 @@ function findHierarchyNodeChildren(
           childNode,
           graph,
           noSpecialSubSchemas,
-          new Set(alreadyVisitedNodes)
+          new Set(alreadyVisitedEdges)
         );
         children.push(childNode);
       }

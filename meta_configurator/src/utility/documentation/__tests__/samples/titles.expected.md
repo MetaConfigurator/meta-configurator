@@ -1,12 +1,23 @@
-# References Schema
+# Titles Schema
 ### Table of Contents
 
-- [References Schema](#root)
+- [Titles Schema](#root)
     - [PlantObject](#%2Fproperties%2FPlant)
     - [PersonObject](#%2F%24defs%2Fperson)
+        - [PersonObject](#%2F%24defs%2Fperson)
+    - [person1](#%2F%24defs%2Fperson)
+    - [PersonObject](#%2F%24defs%2Fperson)
+        - [PersonObject](#%2F%24defs%2Fperson)
+    - [person2](#%2F%24defs%2Fperson)
+    - [PersonObject](#%2F%24defs%2Fperson)
+        - [PersonObject](#%2F%24defs%2Fperson)
+    - [PersonObject](#%2F%24defs%2Fperson)
+        - [PersonObject](#%2F%24defs%2Fperson)
+    - [PersonObject](#%2F%24defs%2Fperson)
+        - [PersonObject](#%2F%24defs%2Fperson)
 
 ---
-### <a id="root"></a>[References Schema](#root)
+### <a id="root"></a>[Titles Schema](#root)
 #### Properties
 
 | Name | Type | Required | Description |

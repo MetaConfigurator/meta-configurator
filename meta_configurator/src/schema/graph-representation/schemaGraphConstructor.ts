@@ -432,12 +432,14 @@ export function generateAttributeEdges(
   graph: SchemaGraph
 ) {
   for (const attributeData of node.attributes) {
-    const [edgeTargetNode, isArray] = resolveEdgeTarget(
+    const edgeTargetNodesRes = resolveEdgeTargets(
       attributeData.schema,
       attributeData.absolutePath,
       objectDefs
     );
-    if (edgeTargetNode) {
+    for (const edgeTargetNodeRes of edgeTargetNodesRes) {
+      const edgeTargetNode = edgeTargetNodeRes[0];
+      const isArray = edgeTargetNodeRes[1];
       graph.edges.push(
         new EdgeData(
           node,
@@ -505,6 +507,64 @@ export function resolveEdgeTarget(
   }
 
   return [undefined, false];
+}
+
+/**
+ * Resolve the target node(s) for an edge from a sub-schema.
+ * Usually, this will be a single node, but sometimes it can be multiple nodes (e.g, it has a reference and also defines its own schema at the same time).
+ * @param subSchema The sub-schema to resolve the edge target(s) from.
+ * @param subSchemaPath The path to the sub-schema in the overall schema.
+ * @param objectDefs A map of all object definitions in the schema, keyed by their path as a string.
+ * @return An array of target nodes (empty if no target node could be resolved) and a boolean indicating if the target is an array.
+ */
+export function resolveEdgeTargets(
+  subSchema: JsonSchemaType,
+  subSchemaPath: Path,
+  objectDefs: Map<string, SchemaNodeData>
+): [SchemaNodeData, boolean][] {
+  if (subSchema === true || subSchema === false) {
+    return [];
+  }
+
+  // list of currently resolved target nodes and their sub schema
+  let result = new Array<[SchemaNodeData, boolean]>();
+
+  // if it has a reference, resolve it first
+  if (subSchema.$ref) {
+    const referenceObject = resolveReferenceNode(subSchema, objectDefs);
+    if (referenceObject) {
+      if (isSchemaThatDeservesANode(referenceObject.schema)) {
+        result.push([referenceObject, false]);
+      } else if (referenceObject.schema.type == 'array') {
+        const arrayItemNode = resolveArrayItemNode(
+          referenceObject.absolutePath,
+          referenceObject.schema,
+          objectDefs
+        );
+        if (arrayItemNode && isSchemaThatDeservesANode(arrayItemNode.schema)) {
+          result.push([arrayItemNode, true]);
+        }
+      }
+    } else {
+      console.warn(
+        'Unable to find reference node for attribute ' + ' with path ' + pathToString(subSchemaPath)
+      );
+    }
+  }
+
+  if (isSchemaThatDeservesANode(subSchema)) {
+    const edgeTargetNode = resolveObjectAttributeNode(subSchemaPath, subSchema, objectDefs);
+    if (edgeTargetNode) {
+      result.push([edgeTargetNode, false]);
+    }
+  } else if (subSchema.type == 'array') {
+    const arrayItemNode = resolveArrayItemNode(subSchemaPath, subSchema, objectDefs);
+    if (arrayItemNode && isSchemaThatDeservesANode(arrayItemNode.schema)) {
+      result.push([arrayItemNode, true]);
+    }
+  }
+
+  return result;
 }
 
 function resolveReferenceNode(
@@ -754,8 +814,10 @@ function generateObjectSubSchemaEdge(
   objectDefs: Map<string, SchemaNodeData>,
   graph: SchemaGraph
 ) {
-  const [edgeTargetNode, isArray] = resolveEdgeTarget(subSchema, subSchemaPath, objectDefs);
-  if (edgeTargetNode) {
+  const edgeTargetNodesRes = resolveEdgeTargets(subSchema, subSchemaPath, objectDefs);
+  for (const edgeTargetNodeRes of edgeTargetNodesRes) {
+    const edgeTargetNode = edgeTargetNodeRes[0];
+    const isArray = edgeTargetNodeRes[1];
     graph.edges.push(
       new EdgeData(
         node,

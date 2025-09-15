@@ -1,7 +1,7 @@
 import {
-  constructSchemaGraph,
   nodesToObjectDefs,
   resolveEdgeTarget,
+  resolveEdgeTargets,
 } from '@/schema/graph-representation/schemaGraphConstructor';
 import {
   type SchemaObjectNodeData,
@@ -187,13 +187,13 @@ function writeObjectNode(
 
     if (node.schema.additionalProperties) {
       const objectDefs = nodesToObjectDefs(graph.nodes);
-      const edgeTargetResult = resolveEdgeTarget(
+      const edgeTargetsRes = resolveEdgeTargets(
         node.schema.additionalProperties,
         [...node.absolutePath, 'additionalProperties'],
         objectDefs
       );
-      const edgeTarget = edgeTargetResult[0];
-      if (edgeTarget) {
+      for (const edgeTargetRes of edgeTargetsRes) {
+        const edgeTarget = edgeTargetRes[0];
         const type = edgeTarget.title || edgeTarget.fallbackDisplayName;
         writeObjectAttribute(
           md,

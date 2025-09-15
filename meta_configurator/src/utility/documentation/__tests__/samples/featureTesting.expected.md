@@ -3,6 +3,7 @@
 
 - [Person](#root)
     - [Circular](#%2F%24defs%2Fcircular)
+        - [Circular](#%2F%24defs%2Fcircular)
     - [address](#%2Fproperties%2Faddress)
         - [country](#%2Fproperties%2Faddress%2Fproperties%2Fcountry)
         - [moreInfo](#%2Fproperties%2Faddress%2Fproperties%2FmoreInfo)
