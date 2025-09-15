@@ -80,66 +80,55 @@ describe('tests for more difficult scenarios and special cases that result as a 
     expect(graph.edges.length).toBe(2); // one edge from the root node to the array entry node and one edge from the array entry node to the enum node
   });
 
-
   it('object property has a reference but also defines its own things and both nodes (referenced sub-schema and own definition of sub-schema) should be connected with an edge', () => {
-
     let schema: TopLevelSchema = {
       $defs: {
         HardwareComponents: {},
         Quantity: {
           properties: {
             Unit: {
-              enum: [
-                "gram",
-                "mole",
-                "celsius",
-                "kelvin",
-                "pascal",
-                "bar"
-              ],
-              type: "string"
+              enum: ['gram', 'mole', 'celsius', 'kelvin', 'pascal', 'bar'],
+              type: 'string',
             },
             Value: {
-              type: "number"
-            }
+              type: 'number',
+            },
           },
-          type: "object"
+          type: 'object',
         },
         StepEntry: {
-          title: "Step Entry",
+          title: 'Step Entry',
           properties: {
             _amount: {
-              $ref: "#/$defs/Quantity"
+              $ref: '#/$defs/Quantity',
             },
             _pressure: {
-              title: "Pressure in Pascal",
-              $ref: "#/$defs/Quantity",
+              title: 'Pressure in Pascal',
+              $ref: '#/$defs/Quantity',
               properties: {
                 Unit: {
-                  const: "pascal"
+                  const: 'pascal',
                 },
                 Value: {
-                  minimum: 0
-                }
-              }
-            }
-          }
-        }
+                  minimum: 0,
+                },
+              },
+            },
+          },
+        },
       },
       properties: {
         Steps: {
           items: {
-            $ref: "#/$defs/StepEntry"
+            $ref: '#/$defs/StepEntry',
           },
-          type: "array"
-        }
+          type: 'array',
+        },
       },
-      required: [
-        "Steps"
-      ],
-      title: "Procedure",
-      type: "object"
-    }
+      required: ['Steps'],
+      title: 'Procedure',
+      type: 'object',
+    };
 
     const defs = identifyAllObjects(schema);
     const graph = new SchemaGraph([], []);
@@ -149,12 +138,11 @@ describe('tests for more difficult scenarios and special cases that result as a 
     // collect edges outgoing from the StepEntry node pressure attribute
     const stepEntryNode = graph.nodes.find(n => n.name === 'StepEntry');
     expect(stepEntryNode).toBeDefined();
-    const outgoingEdges = graph.edges.filter(e => e.start === stepEntryNode && e.startSchemaPath.includes("_pressure"));
+    const outgoingEdges = graph.edges.filter(
+      e => e.start === stepEntryNode && e.startSchemaPath.includes('_pressure')
+    );
 
     // there should be two edges: one to the Quantity node (the $ref) and one to the inline definition of the properties
     expect(outgoingEdges.length).toBe(2);
-
-  })
-
-
+  });
 });

@@ -1,5 +1,6 @@
 import {
-  nodesToObjectDefs, resolveEdgeTarget,
+  nodesToObjectDefs,
+  resolveEdgeTarget,
   resolveEdgeTargets,
 } from '@/schema/graph-representation/schemaGraphConstructor';
 import {

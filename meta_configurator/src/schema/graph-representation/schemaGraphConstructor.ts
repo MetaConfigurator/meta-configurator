@@ -1,6 +1,10 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
-import {doesSchemaHaveType, getTypeDescription, isSubSchemaDefinedInDefinitions,} from '@/schema/schemaReadingUtils';
+import {
+  doesSchemaHaveType,
+  getTypeDescription,
+  isSubSchemaDefinedInDefinitions,
+} from '@/schema/schemaReadingUtils';
 import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
@@ -434,8 +438,8 @@ export function generateAttributeEdges(
       objectDefs
     );
     for (const edgeTargetNodeRes of edgeTargetNodesRes) {
-      const edgeTargetNode = edgeTargetNodeRes[0]
-      const isArray = edgeTargetNodeRes[1]
+      const edgeTargetNode = edgeTargetNodeRes[0];
+      const isArray = edgeTargetNodeRes[1];
       graph.edges.push(
         new EdgeData(
           node,
@@ -505,7 +509,6 @@ export function resolveEdgeTarget(
   return [undefined, false];
 }
 
-
 /**
  * Resolve the target node(s) for an edge from a sub-schema.
  * Usually, this will be a single node, but sometimes it can be multiple nodes (e.g, it has a reference and also defines its own schema at the same time).
@@ -518,7 +521,7 @@ export function resolveEdgeTargets(
   subSchema: JsonSchemaType,
   subSchemaPath: Path,
   objectDefs: Map<string, SchemaNodeData>
-): [SchemaNodeData , boolean][] {
+): [SchemaNodeData, boolean][] {
   if (subSchema === true || subSchema === false) {
     return [];
   }
@@ -533,7 +536,11 @@ export function resolveEdgeTargets(
       if (isSchemaThatDeservesANode(referenceObject.schema)) {
         result.push([referenceObject, false]);
       } else if (referenceObject.schema.type == 'array') {
-        const arrayItemNode = resolveArrayItemNode(referenceObject.absolutePath, referenceObject.schema, objectDefs);
+        const arrayItemNode = resolveArrayItemNode(
+          referenceObject.absolutePath,
+          referenceObject.schema,
+          objectDefs
+        );
         if (arrayItemNode && isSchemaThatDeservesANode(arrayItemNode.schema)) {
           result.push([arrayItemNode, true]);
         }
@@ -548,7 +555,7 @@ export function resolveEdgeTargets(
   if (isSchemaThatDeservesANode(subSchema)) {
     const edgeTargetNode = resolveObjectAttributeNode(subSchemaPath, subSchema, objectDefs);
     if (edgeTargetNode) {
-        result.push([edgeTargetNode, false]);
+      result.push([edgeTargetNode, false]);
     }
   } else if (subSchema.type == 'array') {
     const arrayItemNode = resolveArrayItemNode(subSchemaPath, subSchema, objectDefs);
@@ -557,7 +564,7 @@ export function resolveEdgeTargets(
     }
   }
 
-  return result
+  return result;
 }
 
 function resolveReferenceNode(
@@ -809,8 +816,8 @@ function generateObjectSubSchemaEdge(
 ) {
   const edgeTargetNodesRes = resolveEdgeTargets(subSchema, subSchemaPath, objectDefs);
   for (const edgeTargetNodeRes of edgeTargetNodesRes) {
-    const edgeTargetNode = edgeTargetNodeRes[0]
-    const isArray = edgeTargetNodeRes[1]
+    const edgeTargetNode = edgeTargetNodeRes[0];
+    const isArray = edgeTargetNodeRes[1];
     graph.edges.push(
       new EdgeData(
         node,

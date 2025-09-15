@@ -46,7 +46,12 @@ function findHierarchyNodeChildren(
   for (const edge of graph.edges) {
     if (pathToString(edge.start.absolutePath) === pathToString(node.graphNode.absolutePath)) {
       const targetNode = graph.findNode(edge.end.absolutePath);
-      const edgeId = pathToString(edge.start.absolutePath) + ":" + edge.label + "->" + pathToString(edge.end.absolutePath);
+      const edgeId =
+        pathToString(edge.start.absolutePath) +
+        ':' +
+        edge.label +
+        '->' +
+        pathToString(edge.end.absolutePath);
 
       if (targetNode) {
         if (noSpecialSubSchemas) {
