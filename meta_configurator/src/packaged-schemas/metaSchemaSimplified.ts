@@ -927,11 +927,11 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
           required: ['properties'],
           properties: {
             properties: {
-                type: 'object',
-                description: 'If "properties" is present, the instance is validated as an object.',
+              type: 'object',
+              description: 'If "properties" is present, the instance is validated as an object.',
             },
-          }
-        }
+          },
+        },
       ],
     },
     hasTypeString: {
