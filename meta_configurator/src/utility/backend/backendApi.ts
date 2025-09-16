@@ -3,6 +3,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {computed, type Ref} from 'vue';
 import {useSettings} from '@/settings/useSettings';
 import {errorService} from '@/main';
+import {stringToIdentifier} from '@/utility/stringToIdentifier';
 
 const settings = useSettings();
 
@@ -23,13 +24,16 @@ export async function publishProjectLink(
   errorRef: Ref<string>
 ) {
   infoRef.value = 'Publishing project...';
+
+  const normalizedProjectId = stringToIdentifier(projectId);
+
   const response = await fetch(`${BACKEND_URL.value}/project`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      project_id: projectId,
+      project_id: normalizedProjectId,
       snapshot_id: snapshotId,
       edit_password: editPassword,
     }),
@@ -39,7 +43,7 @@ export async function publishProjectLink(
 
   errorRef.value = '';
   infoRef.value = '';
-  resultProjectLink.value = `${FRONTEND_URL.value}/?project=${projectId}`;
+  resultProjectLink.value = `${FRONTEND_URL.value}/?project=${normalizedProjectId}`;
 
   return response.json();
 }
