@@ -459,6 +459,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           examples: [
             'https://api.openai.com/v1/',
             'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+            'https://chat-ai.academiccloud.de/v1/',
           ],
         },
       },
