@@ -86,6 +86,8 @@ For more details, check out the [Developer Documentation](./documentation_develo
 
 Explore how to use MetaConfigurator with real-world examples:
 
+*   **[Schema Creation](./documentation_user/examples/schema_creation)** – Learn how to create and edit JSON schemas using different methods (inference from data, exploring existing schemas, manual editing).
+
 *   **[MOF Synthesis Example](./documentation_user/examples/mof_synthesis)** – Demonstrates schema generation, CSV import, and JSON export.
 
 *   **[Configurator Builder](./documentation_user/examples/configurator_building)** – Learn how to create and share pre-configured MetaConfigurator URLs.
