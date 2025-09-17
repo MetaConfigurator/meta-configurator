@@ -92,12 +92,20 @@ defineExpose({show: openDialog, close: hideDialog});
 
 <template>
   <Dialog v-model:visible="showDialog" header="Save current Snapshot">
-    <div class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
+    <div class="dialog flex flex-wrap justify-content-center gap-3 bigger-dialog-content">
       <p>
         This will store the current data, schema and settings in the backend and provide a URL to
         restore the session later.
         <br />
         A snapshot will be deleted after not being accessed for 30 days.
+        <br />
+        <br />
+        For a permanent storage of snapshots or permanent link to a custom "configurator", see our
+        <a
+          target="”_blank”"
+          href="https://github.com/MetaConfigurator/meta-configurator/tree/main/documentation_user/examples/configurator_building"
+          >documentation</a
+        >.
       </p>
 
       <div class="flex align-items-center vertical-center">
@@ -219,5 +227,16 @@ th {
   padding: 4px 8px; /* less padding to make button smaller */
   border-radius: 6px; /* slightly rounded edges */
   border: 1px solid #ccc; /* subtle border */
+}
+
+.dialog a {
+  color: var(--p-primary-color);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.dialog a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 </style>
