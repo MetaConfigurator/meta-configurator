@@ -100,7 +100,12 @@ defineExpose({show: openDialog, close: hideDialog});
         A snapshot will be deleted after not being accessed for 30 days.
         <br />
         <br />
-        For a permanent storage of snapshots or permanent link to a custom "configurator", see our <a  target=”_blank” href="https://github.com/MetaConfigurator/meta-configurator/tree/main/documentation_user/examples/configurator_building">documentation</a>.
+        For a permanent storage of snapshots or permanent link to a custom "configurator", see our
+        <a
+          target="”_blank”"
+          href="https://github.com/MetaConfigurator/meta-configurator/tree/main/documentation_user/examples/configurator_building"
+          >documentation</a
+        >.
       </p>
 
       <div class="flex align-items-center vertical-center">
