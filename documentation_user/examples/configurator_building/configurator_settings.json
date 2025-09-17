@@ -1,44 +1,4 @@
 {
-  "dataFormat": "json",
   "toolbarTitle": "MOF Synthesis",
-  "hideSchemaEditor": true,
-  "hideSettings": true,
-  "panels": {
-    "dataEditor": [
-      {
-        "panelType": "textEditor",
-        "mode": "dataEditor",
-        "size": 40
-      },
-      {
-        "panelType": "guiEditor",
-        "mode": "dataEditor",
-        "size": 40
-      }
-    ],
-    "schemaEditor": [
-      {
-        "panelType": "aiPrompts",
-        "mode": "schemaEditor",
-        "size": 40
-      },
-      {
-        "panelType": "schemaDiagram",
-        "mode": "schemaEditor",
-        "size": 40
-      }
-    ],
-    "settings": [
-      {
-        "panelType": "textEditor",
-        "mode": "settings",
-        "size": 50
-      },
-      {
-        "panelType": "guiEditor",
-        "mode": "settings",
-        "size": 50
-      }
-    ]
-  }
+  "hideSchemaEditor": true
 }
