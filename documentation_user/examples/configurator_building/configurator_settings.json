@@ -3,36 +3,6 @@
   "toolbarTitle": "MOF Synthesis",
   "hideSchemaEditor": true,
   "hideSettings": true,
-  "codeEditor": {
-    "fontSize": 14,
-    "tabSize": 2,
-    "showFormatSelector": true
-  },
-  "guiEditor": {
-    "maximumDepth": 20,
-    "propertySorting": "schemaOrder",
-    "hideAddPropertyButton": true
-  },
-  "schemaDiagram": {
-    "editMode": true,
-    "vertical": true,
-    "showAttributes": true,
-    "showEnumValues": true,
-    "maxAttributesToShow": 30,
-    "maxEnumValuesToShow": 10,
-    "moveViewToSelectedElement": false,
-    "automaticZoomMaxValue": 1,
-    "automaticZoomMinValue": 0.5,
-    "mergeAllOfs": true
-  },
-  "metaSchema": {
-    "allowBooleanSchema": false,
-    "allowMultipleTypes": false,
-    "objectTypesComfort": false,
-    "markMoreFieldsAsAdvanced": true,
-    "showAdditionalPropertiesButton": false,
-    "showJsonLdFields": false
-  },
   "panels": {
     "dataEditor": [
       {
@@ -69,27 +39,6 @@
         "mode": "settings",
         "size": 50
       }
-    ],
-    "hidden": [
-      "debug",
-      "aiPrompts",
-      "tableView"
     ]
-  },
-  "frontend": {
-    "hostname": "http://metaconfigurator.informatik.uni-stuttgart.de"
-  },
-  "backend": {
-    "hostname": "http://metaconfigurator.informatik.uni-stuttgart.de",
-    "port": 5000
-  },
-  "rdf": {
-    "sparqlEndpointUrl": "https://dbpedia.org/sparql"
-  },
-  "openAi": {
-    "model": "gpt-4o-mini",
-    "maxTokens": 5000,
-    "temperature": 0.3,
-    "endpoint": "/chat/completions"
   }
 }
