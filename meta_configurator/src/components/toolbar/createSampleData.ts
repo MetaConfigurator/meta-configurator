@@ -1,4 +1,3 @@
-import {JSONSchemaFaker} from 'json-schema-faker';
 import {confirmationService} from '@/utility/confirmationService';
 import {toastService} from '@/utility/toastService';
 import {errorService} from '@/main';
@@ -10,10 +9,19 @@ import {useDataSource} from '@/data/dataSource';
  * Generates sample data for the given schema.
  */
 async function generateSampleData(schema: any): Promise<any> {
-  JSONSchemaFaker.option('alwaysFakeOptionals', true);
-  JSONSchemaFaker.option('minItems', 1);
-  JSONSchemaFaker.option('failOnInvalidFormat', false);
-  return JSONSchemaFaker.resolve(schema);
+  try {
+    // Use dynamic import for better bundling compatibility
+    const {JSONSchemaFaker} = await import('json-schema-faker');
+
+    JSONSchemaFaker.option('alwaysFakeOptionals', true);
+    JSONSchemaFaker.option('minItems', 1);
+    JSONSchemaFaker.option('failOnInvalidFormat', false);
+
+    return await JSONSchemaFaker.resolve(schema);
+  } catch (error) {
+    console.error('Error loading json-schema-faker:', error);
+    throw new Error('Failed to load schema faker dependencies');
+  }
 }
 
 function generateSampleDataAndUseAsFileData() {
