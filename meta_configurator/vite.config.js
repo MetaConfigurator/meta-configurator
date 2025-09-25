@@ -41,7 +41,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: [
-      "json-schema-faker",
+      "json-schema-faker", // ensure ESM build is pre-bundled for dev
     ],
   },
   test: {
