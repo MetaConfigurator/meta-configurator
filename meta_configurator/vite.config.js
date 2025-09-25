@@ -25,24 +25,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     minify: true,
-    rollupOptions: {
-      // Don't externalize json-schema-faker - ensure it gets bundled
-      external: [],
-    },
   },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-  },
-  optimizeDeps: {
-    include: [
-      "json-schema-faker", // ensure ESM build is pre-bundled for dev
-    ],
-  },
-  // Define global for runtime
-  define: {
-    global: 'globalThis',
   },
   test: {
     // add test config here
