@@ -11,7 +11,7 @@ import {useDataSource} from '@/data/dataSource';
 async function generateSampleData(schema: any): Promise<any> {
   try {
     // Use dynamic import for better bundling compatibility
-    const { JSONSchemaFaker } = await import('json-schema-faker');
+    const {JSONSchemaFaker} = await import('json-schema-faker');
 
     JSONSchemaFaker.option('alwaysFakeOptionals', true);
     JSONSchemaFaker.option('minItems', 1);
