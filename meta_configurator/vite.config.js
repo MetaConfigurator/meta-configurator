@@ -31,6 +31,11 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  optimizeDeps: {
+    include: [
+      "json-schema-faker", // ensure ESM build is pre-bundled for dev
+    ],
+  },
   test: {
     // add test config here
   },
