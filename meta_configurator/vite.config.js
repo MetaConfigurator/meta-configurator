@@ -25,6 +25,14 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     minify: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Isolate json-schema-faker to minimize minification issues
+          'vendor-jsf': ['json-schema-faker']
+        }
+      }
+    }
   },
   resolve: {
     alias: {
