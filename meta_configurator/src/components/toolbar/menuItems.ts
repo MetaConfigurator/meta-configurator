@@ -64,7 +64,6 @@ export class MenuItems {
             label: 'Generate Data...',
             icon: 'fa-solid fa-gears',
             command: openGenerateDataDialog,
-            disabled: true, // currently not working in the deployed version
           },
         ],
       },

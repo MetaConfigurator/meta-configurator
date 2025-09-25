@@ -18,7 +18,7 @@ async function generateSampleData(schema: any): Promise<any> {
 
 function generateSampleDataAndUseAsFileData() {
   generateSampleData(useDataSource().userSchemaData.value)
-    .then(data => (useDataSource().userSchemaData.value = data))
+    .then(data => (useDataSource().userData.value = data))
     .catch((error: Error) =>
       errorService.onError({
         message: 'Error generating sample data',
