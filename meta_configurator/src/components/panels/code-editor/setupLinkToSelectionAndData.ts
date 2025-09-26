@@ -40,20 +40,21 @@ function setupCursorPositionToSelectedPath(editor: Editor, mode: SessionMode) {
         // we do not need to consider the event and send updates if the selection was forced from outside
         return;
       }
-      if (!useDataConverter().isValidSyntax(editor.getValue())) {
-        // do not attempt to determine the path when the text does not have valid syntax
-        return;
-      }
+      const editorContent = editor.getValue();
       if (
-        sizeOf(editor.getValue()) >
+        sizeOf(editorContent) >
         useSettings().value.performance.maxDocumentSizeForCursorSynchronization
       ) {
         // do not determine the path when the document is exceeding the maximum size
         return;
       }
+      if (!useDataConverter().isValidSyntax(editorContent)) {
+        // do not attempt to determine the path when the text does not have valid syntax
+        return;
+      }
 
       try {
-        const newPath = determinePath(editor);
+        const newPath = determinePath(editor, editorContent);
         const session = getSessionForMode(mode);
         if (!_.isEqual(session.currentSelectedElement.value, newPath)) {
           selectionChangeFromInside = true;
@@ -81,14 +82,16 @@ function setupSelectedPathToCursorPosition(editor: Editor, mode: SessionMode) {
       }
       selectionChangeFromOutside = true;
 
+      const editorContent = editor.getValue();
+
       if (
-        sizeOf(editor.getValue()) >
+        sizeOf(editorContent) >
         useSettings().value.performance.maxDocumentSizeForCursorSynchronization
       ) {
         // do not determine and update the cursor position when the document is exceeding the maximum size
         return;
       }
-      updateCursorPositionBasedOnPath(editor, newSelectedElement);
+      updateCursorPositionBasedOnPath(editor, editorContent, newSelectedElement);
     }
   );
 }

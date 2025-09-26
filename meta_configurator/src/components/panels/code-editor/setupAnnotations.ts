@@ -7,6 +7,7 @@ import {useDataConverter} from '@/dataformats/formatRegistry';
 import {watchDebounced} from '@vueuse/core';
 import type {SessionMode} from '@/store/sessionMode';
 import {getValidationForMode} from '@/data/useDataLink';
+import {useSettings} from '@/settings/useSettings';
 
 /**
  * Sets up the editor to show validation errors.
@@ -20,7 +21,11 @@ export function setupAnnotationsFromValidationErrors(editor: Editor, mode: Sessi
       return [];
     }
 
-    const {errors} = getValidationForMode(mode).currentValidationResult.value;
+    let {errors} = getValidationForMode(mode).currentValidationResult.value;
+    const maxErrorsToShow = useSettings().value.performance.maxErrorsToShow;
+    if (errors.length > maxErrorsToShow) {
+      errors = errors.slice(0, maxErrorsToShow);
+    }
     return errors.map(error => validationErrorToAnnotation(editor, error));
   });
 
@@ -33,7 +38,7 @@ export function setupAnnotationsFromValidationErrors(editor: Editor, mode: Sessi
 
 function validationErrorToAnnotation(editor: Editor, error: ErrorObject): Annotation {
   const instancePathTranslated = jsonPointerToPath(error.instancePath);
-  const position = determineCursorPosition(editor, instancePathTranslated);
+  const position = determineCursorPosition(editor, editor.getValue(), instancePathTranslated);
   return {
     row: position.row,
     column: position.column,
