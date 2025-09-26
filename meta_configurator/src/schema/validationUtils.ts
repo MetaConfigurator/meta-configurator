@@ -5,7 +5,6 @@ import Ajv, {type ErrorObject} from 'ajv';
 import type {Path} from '@/utility/path';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 
-
 const TOP_LEVEL_SCHEMA_KEY = 'topLevelSchema';
 
 export function getMatchingAjvVersion(schema: JsonSchemaType): Ajv2020 | Ajv2019 | Ajv {
@@ -28,14 +27,9 @@ export function getMatchingAjvVersion(schema: JsonSchemaType): Ajv2020 | Ajv2019
   }
 }
 
-
 export function getTopLevelSchemaId(schema: TopLevelSchema): string {
   return schema.$id ?? TOP_LEVEL_SCHEMA_KEY;
 }
-
-
-
-
 
 /**
  * The result of a validation.

@@ -9,7 +9,11 @@ import {usePathIndexLink} from '@/dataformats/formatRegistry';
  * @param editorContent the current value of the editor content
  * @param currentPath the path to determine the cursor position for
  */
-export function determineCursorPosition(editor: Editor, editorContent: string, currentPath: Path): Position {
+export function determineCursorPosition(
+  editor: Editor,
+  editorContent: string,
+  currentPath: Path
+): Position {
   const index = usePathIndexLink().determineIndexOfPath(editorContent, currentPath);
   return editor.session.doc.indexToPosition(index, 0);
 }
@@ -20,7 +24,11 @@ export function determineCursorPosition(editor: Editor, editorContent: string, c
  * @param editorContent the current value of the editor content
  * @param currentPath the path to update the cursor position to
  */
-export function updateCursorPositionBasedOnPath(editor: Editor, editorContent: string, currentPath: Path) {
+export function updateCursorPositionBasedOnPath(
+  editor: Editor,
+  editorContent: string,
+  currentPath: Path
+) {
   const position = determineCursorPosition(editor, editorContent, currentPath);
   editor.gotoLine(position.row + 1, position.column, true); // row is 1-based, column is 0-based
 }

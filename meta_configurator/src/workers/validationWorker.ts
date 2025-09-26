@@ -17,17 +17,15 @@ interface ValidationWorkerResponse {
   taskId: string;
 }
 
-
- import Ajv from 'ajv';
+import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import {ValidationResult} from '@/schema/validationUtils';
 
-self.onmessage = function(e: MessageEvent<ValidationWorkerMessage>) {
-  const { type, data, schema, taskId } = e.data;
+self.onmessage = function (e: MessageEvent<ValidationWorkerMessage>) {
+  const {type, data, schema, taskId} = e.data;
 
   if (type === 'VALIDATE') {
     try {
-
       const ajv = getMatchingAjvVersion(schema);
       addFormats(ajv);
       const topLevelSchemaId = getTopLevelSchemaId(schema);
@@ -38,7 +36,7 @@ self.onmessage = function(e: MessageEvent<ValidationWorkerMessage>) {
         const response: ValidationWorkerResponse = {
           type: 'VALIDATION_ERROR',
           error: 'Invalid schema provided',
-          taskId: taskId
+          taskId: taskId,
         };
 
         self.postMessage(response);
@@ -54,16 +52,15 @@ self.onmessage = function(e: MessageEvent<ValidationWorkerMessage>) {
       const response: ValidationWorkerResponse = {
         type: 'VALIDATION_COMPLETE',
         result: result,
-        taskId: taskId
+        taskId: taskId,
       };
 
       self.postMessage(response);
-
     } catch (error) {
       const response: ValidationWorkerResponse = {
         type: 'VALIDATION_ERROR',
         error: error instanceof Error ? error.message : 'Unknown validation error',
-        taskId: taskId
+        taskId: taskId,
       };
 
       self.postMessage(response);
@@ -72,6 +69,6 @@ self.onmessage = function(e: MessageEvent<ValidationWorkerMessage>) {
 };
 
 // Handle worker errors
-self.onerror = function(error) {
+self.onerror = function (error) {
   console.error('Worker error:', error);
 };

@@ -5,7 +5,11 @@ import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import _ from 'lodash';
 import Ajv2019 from 'ajv/dist/2019';
-import {getMatchingAjvVersion, getTopLevelSchemaId, ValidationResult} from '@/schema/validationUtils';
+import {
+  getMatchingAjvVersion,
+  getTopLevelSchemaId,
+  ValidationResult,
+} from '@/schema/validationUtils';
 
 /**
  * Service for validating data against a JSON schema.
@@ -13,7 +17,6 @@ import {getMatchingAjvVersion, getTopLevelSchemaId, ValidationResult} from '@/sc
  * It also supports validating against sub schemas of the top level schema.
  */
 export class ValidationService {
-
   topLevelSchema: TopLevelSchema;
   private _ajv: Ajv2020 | Ajv2019 | Ajv | undefined;
   private _validationFunction: ValidateFunction | undefined;
@@ -81,7 +84,6 @@ export class ValidationService {
     const errors = validationFunction.errors || [];
     return new ValidationResult(errors);
   }
-
 
   /**
    * Updates all references in the given schema to point to the top level schema.
@@ -202,5 +204,4 @@ export class ValidationService {
     }
     return schema;
   }
-
 }

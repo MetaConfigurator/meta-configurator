@@ -17,7 +17,7 @@ export class ManagedValidation {
     this.worker = new ValidationWorker();
 
     this.worker.onmessage = (e: MessageEvent) => {
-      const { type, result, error, taskId } = e.data;
+      const {type, result, error, taskId} = e.data;
       const resolver = this.pendingTasks.get(taskId);
       if (!resolver) return;
 
@@ -40,7 +40,6 @@ export class ManagedValidation {
     });
   }
 
-
   // this service is used by other components, to validate for example conditionals
   public currentValidationService = computed(() => {
     const schema = getSchemaForMode(this.mode).schemaRaw.value;
@@ -55,9 +54,9 @@ export class ManagedValidation {
 
   private async validateWithWorker(data: any, schema: any): Promise<ValidationResult> {
     const taskId = crypto.randomUUID(); // unique ID per validation
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.pendingTasks.set(taskId, resolve);
-      this.worker.postMessage({ type: 'VALIDATE', data, schema, taskId });
+      this.worker.postMessage({type: 'VALIDATE', data, schema, taskId});
     });
   }
 
