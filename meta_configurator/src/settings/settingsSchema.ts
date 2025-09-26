@@ -51,6 +51,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'maxDocumentSizeForSchemaInference',
         'minObjectPropertyCountToPreserve',
         'maxShownChildrenInGuiEditor',
+        'maxErrorsToShow',
       ],
       additionalProperties: false,
       description: 'Performance related settings belong here.',
@@ -89,6 +90,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'The maximum amount of child nodes to be shown in the GUI editor per parent node. If the document has more children than this value, those will not be shown in the GUI editor, but still exist in the document and can be edited by other panels.',
           default: 50,
           minimum: 5,
+        },
+        maxErrorsToShow: {
+          type: 'integer',
+          description:
+            'The maximum number of validation errors to show. If there are more errors, only the first ones will be shown. This is because for huge documents the computation of the position of errors in the document can be expensive.',
+          default: 15,
+          minimum: 1,
         },
       },
     },

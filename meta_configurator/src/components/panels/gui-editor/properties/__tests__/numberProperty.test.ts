@@ -5,7 +5,7 @@ import InputNumber from 'primevue/inputnumber';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {GuiConstants} from '@/constants';
 import {SessionMode} from '@/store/sessionMode';
-import {ValidationResult} from '@/schema/validationService';
+import {ValidationResult} from '@/schema/validationUtils';
 import {config} from '@vue/test-utils';
 import {defaultOptions} from 'primevue/config';
 

@@ -14,6 +14,7 @@ export const SETTINGS_DATA_DEFAULT = {
     maxDocumentSizeForSchemaInference: 40960, // 40 KiB
     minObjectPropertyCountToPreserve: 16, // when large document is trimmed, this is minimum count of object properties to be preserved
     maxShownChildrenInGuiEditor: 50,
+    maxErrorsToShow: 15,
   },
   codeEditor: {
     fontSize: 14,

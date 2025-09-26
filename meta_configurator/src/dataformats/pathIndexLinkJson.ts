@@ -28,6 +28,7 @@ export class PathIndexLinkJson implements PathIndexLink {
       return this.determineIndexStep(cst.root, currentPath);
     } catch (e) {
       errorService.onError(e);
+      errorService.onError(e);
       return 0;
     }
   }
