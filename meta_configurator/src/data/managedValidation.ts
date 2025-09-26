@@ -7,7 +7,7 @@ import {useSettings} from '@/settings/useSettings';
 import {sizeOf} from '@/utility/sizeOf';
 
 // Import worker as ESM
-import ValidationWorker from '@/workers/validation.worker?worker';
+import ValidationWorker from '@/workers/validationWorker?worker';
 
 export class ManagedValidation {
   private worker: Worker;
