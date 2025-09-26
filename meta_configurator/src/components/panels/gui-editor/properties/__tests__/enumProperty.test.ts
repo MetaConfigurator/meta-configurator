@@ -2,7 +2,7 @@ import {mount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import EnumProperty from '@/components/panels/gui-editor/properties/EnumProperty.vue';
 import Select from 'primevue/select';
-import {ValidationResult} from '@/schema/validationService';
+import {ValidationResult} from '@/schema/validationUtils';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {SessionMode} from '@/store/sessionMode';
 import {config} from '@vue/test-utils';
