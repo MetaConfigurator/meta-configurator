@@ -166,13 +166,14 @@ function submitPromptCreateDocument() {
 function submitPromptModifyDocument() {
   const openApiKey = getApiKey();
   const relevantSubDocument = data.dataAt(currentElement.value);
+  const relevantSubSchema = schema.schemaWrapperAtPath(currentElement.value).jsonSchema!;
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
   const response = props.functionQueryDocumentModification(
     openApiKey,
     promptModifyDocument.value,
     JSON.stringify(relevantSubDocument),
-    JSON.stringify(removeCustomFieldsFromSchema(schema.schemaRaw.value))
+    JSON.stringify(removeCustomFieldsFromSchema(relevantSubSchema))
   );
 
   response
