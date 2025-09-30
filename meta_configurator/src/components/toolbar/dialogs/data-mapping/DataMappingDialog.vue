@@ -240,8 +240,7 @@ defineExpose({show: openDialog, close: hideDialog});
         icon="pi pi-wand"
         @click="generateMappingSuggestion"
         class="w-full"
-        :loading="isLoadingMapping"
-      />
+        :loading="isLoadingMapping" />
 
       <div class="mt-6">
         <Divider />

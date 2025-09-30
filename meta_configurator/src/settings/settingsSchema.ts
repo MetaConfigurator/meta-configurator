@@ -446,23 +446,23 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: 'gpt-4o-mini',
           examples: [
             // OpenAI
-            "gpt-4o-mini",
-            "gpt-4o",
-            "gpt-4o-pro",
-            "gpt-4.1",
-            "gpt-3.5-turbo",
+            'gpt-4o-mini',
+            'gpt-4o',
+            'gpt-4o-pro',
+            'gpt-4.1',
+            'gpt-3.5-turbo',
             // Perplexity (Sonar)
-            "sonar",
-            "sonar-pro",
+            'sonar',
+            'sonar-pro',
             // OpenRouter (provider/model format)
-            "openai/gpt-3.5-turbo",
-            "openai/gpt-4o-mini",
-            "anthropic/claude-3.5-sonnet",
-            "anthropic/claude-sonnet-4.5",
-            "mistral/mistral-7b-instruct",
-            "deepseek/deepseek-v3.2-exp",
-            "x-ai/grok-4-fast",
-            "x-ai/grok-4-fast:free"
+            'openai/gpt-3.5-turbo',
+            'openai/gpt-4o-mini',
+            'anthropic/claude-3.5-sonnet',
+            'anthropic/claude-sonnet-4.5',
+            'mistral/mistral-7b-instruct',
+            'deepseek/deepseek-v3.2-exp',
+            'x-ai/grok-4-fast',
+            'x-ai/grok-4-fast:free',
           ],
         },
         maxTokens: {
@@ -485,16 +485,16 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: 'https://api.openai.com/v1/',
           examples: [
             // OpenAI official
-            "https://api.openai.com/v1/",
+            'https://api.openai.com/v1/',
             // Perplexity (OpenAI-compatible)
-            "https://api.perplexity.ai/",
+            'https://api.perplexity.ai/',
             // OpenRouter (aggregator, OpenAI-compatible)
-            "https://api.openrouter.ai/v1/",
+            'https://api.openrouter.ai/v1/',
             // Academic / institutional deployments (OpenAI-compatible)
-            "https://chat-ai.academiccloud.de/v1/",
-            "https://api.helmholtz-blablador.fz-juelich.de/v1/",
+            'https://chat-ai.academiccloud.de/v1/',
+            'https://api.helmholtz-blablador.fz-juelich.de/v1/',
             // Custom/self-hosted proxy
-            "https://my-llm-proxy.example.com/v1/"
+            'https://my-llm-proxy.example.com/v1/',
           ],
         },
       },
