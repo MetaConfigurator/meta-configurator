@@ -26,7 +26,7 @@ export class MenuItems {
   private readonly showImportCsvDialog: () => void;
   private readonly showSnapshotDialog: () => void;
   private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
-  private readonly showDataExportDialog:  (schemaMode: boolean) => void;
+  private readonly showDataExportDialog: (schemaMode: boolean) => void;
   private readonly showDataMappingDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 

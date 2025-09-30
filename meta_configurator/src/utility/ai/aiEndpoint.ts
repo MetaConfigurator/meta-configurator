@@ -240,8 +240,6 @@ User comments for clarification: \`\`\`${userComments}\`\`\``;
   ]);
 };
 
-
-
 export const queryHandlebarsTemplate = async (
   apiKey: string,
   exampleInput: string,
@@ -258,7 +256,7 @@ export const queryHandlebarsTemplate = async (
   Example input schema: \`\`\`${exampleInputSchema}\`\`\`.
   Example output: \`\`\`${exampleOutput}\`\`\`.
   For these examples you should generate the following Template: \`\`\`${exampleExpression}\`\`\`.
-  The output description can also be natural language texts or other data structures (e.g., XML, or other formats), but the output must always be a text document.`
+  The output description can also be natural language texts or other data structures (e.g., XML, or other formats), but the output must always be a text document.`;
 
   let userMessage = `Input file subset: \`\`\`${inputFileSubset}\`\`\`.  
   Input file schema: \`\`\`${inputFileSchema}\`\`\`.

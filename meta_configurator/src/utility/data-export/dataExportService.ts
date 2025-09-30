@@ -2,7 +2,6 @@ import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {Ref} from 'vue';
 
 export interface DataExportService {
-
   generateMappingSuggestion(
     input: any,
     inputSchema: TopLevelSchema,

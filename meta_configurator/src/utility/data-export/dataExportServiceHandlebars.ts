@@ -7,10 +7,9 @@ import {queryHandlebarsTemplate} from '@/utility/ai/aiEndpoint';
 import {
   HANDLEBARS_INPUT_EXAMPLE,
   HANDLEBARS_INPUT_SCHEMA,
-  HANDLEBARS_MAPPING_EXAMPLE, HANDLEBARS_OUTPUT_EXAMPLE,
+  HANDLEBARS_MAPPING_EXAMPLE,
+  HANDLEBARS_OUTPUT_EXAMPLE,
 } from '@/utility/data-export/handlebarsExamples';
-
-
 
 Handlebars.registerHelper('default', (value: any, defaultValue: any) =>
   value !== undefined && value !== null && value !== '' ? value : defaultValue
@@ -23,46 +22,56 @@ Handlebars.registerHelper('exists', function (value: any, options: any) {
     : options.inverse(currentContext);
 });
 
-Handlebars.registerHelper('compare', function (
-  left: any,
-  operator: string,
-  right: any,
-  options: any
-) {
-  const currentContext: any = this;
-  let result = false;
-  switch (operator) {
-    case '==': result = left == right; break;
-    case '===': result = left === right; break;
-    case '!=': result = left != right; break;
-    case '!==': result = left !== right; break;
-    case '<': result = left < right; break;
-    case '<=': result = left <= right; break;
-    case '>': result = left > right; break;
-    case '>=': result = left >= right; break;
-    default: throw new Error('Unknown operator ' + operator);
+Handlebars.registerHelper(
+  'compare',
+  function (left: any, operator: string, right: any, options: any) {
+    const currentContext: any = this;
+    let result = false;
+    switch (operator) {
+      case '==':
+        result = left == right;
+        break;
+      case '===':
+        result = left === right;
+        break;
+      case '!=':
+        result = left != right;
+        break;
+      case '!==':
+        result = left !== right;
+        break;
+      case '<':
+        result = left < right;
+        break;
+      case '<=':
+        result = left <= right;
+        break;
+      case '>':
+        result = left > right;
+        break;
+      case '>=':
+        result = left >= right;
+        break;
+      default:
+        throw new Error('Unknown operator ' + operator);
+    }
+    return result ? options.fn(currentContext) : options.inverse(currentContext);
   }
-  return result ? options.fn(currentContext) : options.inverse(currentContext);
-});
-
-
+);
 
 export class DataExportServiceHandlebars implements DataExportService {
-
-
   async generateMappingSuggestion(
     input: any,
     inputSchema: any,
     outputDescription: string
   ): Promise<{config: string; success: boolean; message: string}> {
-
     const inputDataSubset = trimDataToMaxSize(input);
     console.log(
       'Reduced input data from ' +
-      JSON.stringify(input).length / 1024 +
-      ' KB to ' +
-      JSON.stringify(inputDataSubset).length / 1024 +
-      ' KB'
+        JSON.stringify(input).length / 1024 +
+        ' KB to ' +
+        JSON.stringify(inputDataSubset).length / 1024 +
+        ' KB'
     );
 
     // if no input schema provided, infer schema for input data
@@ -102,15 +111,11 @@ export class DataExportServiceHandlebars implements DataExportService {
           'Failed to generate data mapping suggestion. Please check the console for more details.',
       };
     }
-
-
-
   }
   async performDataMapping(
     input: any,
     config: string
   ): Promise<{resultData: any; success: boolean; message: string}> {
-
     try {
       const compiled = Handlebars.compile(config);
       const result = compiled(input);
@@ -119,7 +124,6 @@ export class DataExportServiceHandlebars implements DataExportService {
         success: true,
         message: 'Data export performed successfully.',
       };
-
     } catch (err: any) {
       console.error('Error performing data export: ', err);
       return {
@@ -128,8 +132,5 @@ export class DataExportServiceHandlebars implements DataExportService {
         message: 'Template Error: ' + err.message,
       };
     }
-
   }
-
-
 }
