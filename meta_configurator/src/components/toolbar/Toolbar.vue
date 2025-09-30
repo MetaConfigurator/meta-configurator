@@ -17,6 +17,7 @@ import UrlInputDialog from '@/components/toolbar/dialogs/UrlInputDialog.vue';
 import NewsDialog from '@/components/toolbar/dialogs/NewsDialog.vue';
 import {useSettings} from '@/settings/useSettings';
 import {hasCurrentNewsChanged, setCurrentNewsHash} from '@/components/toolbar/currentNews';
+import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExportDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -53,6 +54,15 @@ function showCodeGenerationDialog(schemaMode: boolean) {
     codeGenerationDialog.value?.activateDataMode();
   }
   codeGenerationDialog.value?.show();
+}
+
+function showDataExportDialog(schemaMode: boolean) {
+  if (schemaMode) {
+    dataExportDialog.value?.activateSchemaMode();
+  } else {
+    dataExportDialog.value?.activateDataMode();
+  }
+  dataExportDialog.value?.show();
 }
 
 function showCsvImportDialog() {
@@ -104,6 +114,7 @@ const showInitialDialog = () => {
 const csvImportDialog = ref();
 const snapshotDialog = ref();
 const codeGenerationDialog = ref();
+const dataExportDialog = ref();
 const fetchedSchemasSelectionDialog = ref();
 const urlInputDialog = ref();
 const dataMappingDialog = ref();
@@ -141,6 +152,8 @@ defineExpose({
 
   <CodeGenerationDialog ref="codeGenerationDialog" />
 
+  <DataExportDialog ref="dataExportDialog" />
+
   <FetchedSchemasSelectionDialog ref="fetchedSchemasSelectionDialog" />
 
   <UrlInputDialog ref="urlInputDialog" />
@@ -157,6 +170,7 @@ defineExpose({
     @show-about-dialog="() => (showAboutDialog = true)"
     @show-example-schemas-dialog="() => showExampleSchemasDialog()"
     @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
+    @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
     @show-schemastore-dialog="() => showSchemaStoreDialog()"
     @show-import-csv-dialog="() => showCsvImportDialog()"
     @show-snapshot-dialog="() => showSnapshotDialog()"

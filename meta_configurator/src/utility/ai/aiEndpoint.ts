@@ -239,3 +239,31 @@ User comments for clarification: \`\`\`${userComments}\`\`\``;
     {role: 'user', content: userMessage},
   ]);
 };
+
+export const queryHandlebarsTemplate = async (
+  apiKey: string,
+  exampleInput: string,
+  exampleInputSchema: string,
+  exampleOutput: string,
+  exampleExpression: string,
+  inputFileSubset: string,
+  inputFileSchema: string,
+  outputDescription: string
+) => {
+  const systemMessage = `You are a JSON and Handlebars Text Templating expert. Your task is to generate a Handlebars Template for transforming the user input JSON document to a text document as desired by the user.
+  Only output **valid Handlebars** template syntax. Do not use any other templating language or surrounding text.
+  Example input file: \`\`\`${exampleInput}\`\`\`.
+  Example input schema: \`\`\`${exampleInputSchema}\`\`\`.
+  Example output: \`\`\`${exampleOutput}\`\`\`.
+  For these examples you should generate the following Template: \`\`\`${exampleExpression}\`\`\`.
+  The output description can also be natural language texts or other data structures (e.g., XML, or other formats), but the output must always be a text document.`;
+
+  let userMessage = `Input file subset: \`\`\`${inputFileSubset}\`\`\`.  
+  Input file schema: \`\`\`${inputFileSchema}\`\`\`.
+  The goal is to generate a handlebars Template. Description or example of the desired output document: \`\`\`${outputDescription}\`\`\`. Keep it simple and conservative. Avoid adding new values that do not exist.`;
+
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: userMessage},
+  ]);
+};
