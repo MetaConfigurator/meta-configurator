@@ -26,6 +26,7 @@ const emit = defineEmits<{
   (e: 'show-snapshot-dialog'): void;
   (e: 'show-about-dialog'): void;
   (e: 'show-codegen-dialog', schemaMode: boolean): void;
+  (e: 'show-data-export-dialog', schemaMode: boolean): void;
   (e: 'show-data-mapping-dialog'): void;
 }>();
 
@@ -58,6 +59,10 @@ function showAboutDialog() {
 
 function showCodeGenerationDialog(schemaMode: boolean) {
   emit('show-codegen-dialog', schemaMode);
+}
+
+function showDataExportDialog(schemaMode: boolean) {
+  emit('show-data-export-dialog', schemaMode);
 }
 
 function showDataMappingDialog() {
@@ -99,6 +104,7 @@ useMagicKeys({
           :show-bottom-menu="false"
           :current-mode="props.currentMode"
           @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
+          @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
           @show-url-dialog="() => showUrlDialog()"
           @show-example-schemas-dialog="() => showExampleSchemasDialog()"
           @show-import-csv-dialog="() => showCsvImportDialog()"
@@ -167,6 +173,7 @@ useMagicKeys({
           :show-bottom-menu="true"
           :current-mode="props.currentMode"
           @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
+          @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
           @show-url-dialog="() => showUrlDialog()"
           @show-example-schemas-dialog="() => showExampleSchemasDialog()"
           @show-import-csv-dialog="() => showCsvImportDialog()"
