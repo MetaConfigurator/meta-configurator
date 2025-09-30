@@ -17,7 +17,6 @@ import * as ace from 'brace';
 import {setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 import {useSettings} from '@/settings/useSettings';
 import {useDebounceFn} from '@vueuse/core';
-import ProgressSpinner from 'primevue/progressspinner';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 
@@ -240,8 +239,8 @@ defineExpose({show: openDialog, close: hideDialog});
         label="Generate Suggestion"
         icon="pi pi-wand"
         @click="generateMappingSuggestion"
-        class="w-full" />
-      <ProgressSpinner v-if="isLoadingMapping" />
+        class="w-full"
+        :loading="isLoadingMapping" />
 
       <div class="mt-6">
         <Divider />

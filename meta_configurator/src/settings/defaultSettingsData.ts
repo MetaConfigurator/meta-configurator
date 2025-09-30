@@ -115,6 +115,6 @@ export const SETTINGS_DATA_DEFAULT = {
     model: 'gpt-4o-mini',
     maxTokens: 5000,
     temperature: 0.0,
-    endpoint: 'https://api.openai.com/v1/chat/completions',
+    endpoint: 'https://api.openai.com/v1/',
   },
 };

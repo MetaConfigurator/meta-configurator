@@ -5,7 +5,6 @@ import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
 import Panel from 'primevue/panel';
-import ProgressSpinner from 'primevue/progressspinner';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {DataExportServiceHandlebars} from '@/utility/data-export/dataExportServiceHandlebars';
