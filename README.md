@@ -63,6 +63,11 @@ Creating structured data files (or schemas) manually can be complex and error-pr
 
 *   **Documentation Generation** – Generate documentation from JSON schemas, with export to a Markdown file.
 
+*  **AI-Assisted Schema/Data Creation and Editing** – Use AI to help create or edit schemas and instance data with natural language inputs.
+
+* **AI-Assisted Transformation of Instance Data** – Automatically transform existing instance data to conform to the target schema using AI-generated mappings, which are then applied deterministically. This also works for very large documents.
+  
+
 🛠️ Development
 ---------------
 
