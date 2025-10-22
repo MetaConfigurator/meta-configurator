@@ -14,6 +14,7 @@ import {resolveAndTransform} from '@/schema/schemaLazyResolver';
 import _ from 'lodash';
 import {SessionMode} from '@/store/sessionMode';
 import {assert} from '@vueuse/core';
+import {errorService} from '@/main';
 
 /**
  * This is a wrapper class for a JSON schema. It provides some utility functions
@@ -48,7 +49,11 @@ export class JsonSchemaWrapper {
     this.mode = mode;
     this.jsonSchema = nonBooleanSchema(jsonSchema);
     if (resolve && this.jsonSchema !== undefined) {
-      this.jsonSchema = nonBooleanSchema(resolveAndTransform(this.jsonSchema, this.mode));
+      try {
+        this.jsonSchema = nonBooleanSchema(resolveAndTransform(this.jsonSchema, this.mode));
+      } catch (e) {
+        errorService.onError(e);
+      }
     }
   }
 
