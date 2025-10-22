@@ -497,7 +497,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             // Perplexity (OpenAI-compatible)
             'https://api.perplexity.ai/',
             // OpenRouter (aggregator, OpenAI-compatible)
-            'https://api.openrouter.ai/v1/',
+            // 'https://api.openrouter.ai/v1/', seems to not support this kind of authentication
             // Academic / institutional deployments (OpenAI-compatible)
             'https://chat-ai.academiccloud.de/v1/',
             'https://api.helmholtz-blablador.fz-juelich.de/v1/',
