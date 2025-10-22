@@ -123,7 +123,7 @@ const ALL_OF_ENUM_PROPERTY = [
         enum: {
           items: {
             type: 'array',
-          }
+          },
         },
       },
     },
@@ -137,7 +137,7 @@ const ALL_OF_ENUM_PROPERTY = [
         enum: {
           items: {
             type: 'object',
-          }
+          },
         },
       },
     },
@@ -151,7 +151,7 @@ const ALL_OF_ENUM_PROPERTY = [
         enum: {
           items: {
             type: 'string',
-          }
+          },
         },
       },
     },
@@ -165,7 +165,7 @@ const ALL_OF_ENUM_PROPERTY = [
         enum: {
           items: {
             type: 'number',
-          }
+          },
         },
       },
     },
@@ -179,13 +179,12 @@ const ALL_OF_ENUM_PROPERTY = [
         enum: {
           items: {
             type: 'boolean',
-          }
+          },
         },
       },
     },
   },
 ];
-
 
 const ALL_OF_CONST_PROPERTY = [
   {
