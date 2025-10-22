@@ -1,5 +1,5 @@
 import type {PathIndexLink} from '@/dataformats/pathIndexLink';
-import type {Path} from '@/utility/path';
+import {type Path} from '@/utility/path';
 import type {
   CstDocument,
   CstNode,
@@ -10,6 +10,7 @@ import type {
 } from 'json-cst';
 import {parse} from 'json-cst';
 import {errorService} from '@/main';
+import {pathToJsonPointer, pathToString} from '@/utility/pathUtils';
 
 /**
  * Implementation of PathIndexLink for JSON data.
@@ -27,7 +28,6 @@ export class PathIndexLinkJson implements PathIndexLink {
       const cst = this.getCst(editorContent);
       return this.determineIndexStep(cst.root, currentPath);
     } catch (e) {
-      errorService.onError(e);
       errorService.onError(e);
       return 0;
     }
@@ -157,4 +157,63 @@ export class PathIndexLinkJson implements PathIndexLink {
     const childPath = this.determinePathStep(currentNode.valueNode, targetCharacter);
     return childPath ?? [];
   }
+
+
+
+  // performance optimization to avoid multiple calls to determineIndexOfPath
+  determineIndexesOfPaths(editorContent: string, paths: Path[]): {[pathKey: string]: number} {
+    if (editorContent.length === 0) {
+      return {};
+    }
+    try {
+      const cst = this.getCst(editorContent);
+      const result = {};
+      // transform paths into a set of path keys for faster lookup
+      const pathSet = new Set<string>();
+      for (const path of paths) {
+        pathSet.add(pathToJsonPointer(path));
+      }
+      this.traverseCstForIndexesForPaths(cst.root, pathSet, [], result);
+      return result;
+    } catch (e) {
+      errorService.onError(e);
+      return {};
+    }
+  }
+
+  // traverses the complete cst, always keeping track of the current path. When having a match with one of the requested paths, the index is stored in the result object.
+  // only ends when end of cst is reached or all paths have been found
+  private traverseCstForIndexesForPaths(currentNode: CstNode, paths: Set<string>, currentPath: Path, result: {[pathKey: string]: number}) {
+    const pathKey = pathToJsonPointer(currentPath);
+    if (paths.has(pathKey) && !(pathKey in result)) {
+      result[pathKey] = currentNode.range.start;
+      if (Object.keys(result).length === paths.size) {
+        return; // all paths found
+      }
+    }
+    switch (currentNode.kind) {
+      case 'object':
+        for (const childNode of currentNode.children) {
+          this.traverseCstForIndexesForPaths(childNode, paths, currentPath.concat([childNode.key]), result);
+        }
+        break;
+      case 'object-property':
+        this.traverseCstForIndexesForPaths(currentNode.valueNode, paths, currentPath, result);
+        break;
+      case 'array':
+        let index = 0;
+        for (const childNode of currentNode.children) {
+          this.traverseCstForIndexesForPaths(childNode, paths, currentPath.concat([index]), result);
+          index++;
+        }
+        break;
+      case 'array-element':
+        this.traverseCstForIndexesForPaths(currentNode.valueNode, paths, currentPath, result);
+        break;
+      default:
+        // do nothing for primitive nodes
+        break;
+    }
+  }
+
 }

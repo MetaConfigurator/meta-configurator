@@ -15,6 +15,7 @@ export const SETTINGS_DATA_DEFAULT = {
     minObjectPropertyCountToPreserve: 16, // when large document is trimmed, this is minimum count of object properties to be preserved
     maxShownChildrenInGuiEditor: 50,
     maxErrorsToShow: 15,
+    maxErrorsToShowBulkValidation: 200,
   },
   codeEditor: {
     fontSize: 14,

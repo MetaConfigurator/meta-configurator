@@ -52,6 +52,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'minObjectPropertyCountToPreserve',
         'maxShownChildrenInGuiEditor',
         'maxErrorsToShow',
+        'maxErrorsToShowBulkValidation',
       ],
       additionalProperties: false,
       description: 'Performance related settings belong here.',
@@ -96,6 +97,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description:
             'The maximum number of validation errors to show. If there are more errors, only the first ones will be shown. This is because for huge documents the computation of the position of errors in the document can be expensive.',
           default: 15,
+          minimum: 1,
+        },
+        maxErrorsToShowBulkValidation: {
+          type: 'integer',
+          description:
+            'The maximum number of validation errors to show in case of internal use of bulk validation, which is supported only for some data formats.',
+          default: 200,
           minimum: 1,
         },
       },
