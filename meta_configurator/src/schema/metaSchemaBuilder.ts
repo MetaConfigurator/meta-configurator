@@ -63,18 +63,8 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
 
   if (metaSchemaSettings.objectTypesComfort) {
     metaSchema.$defs.enumProperty.allOf = ALL_OF_ENUM_PROPERTY;
+    metaSchema.$defs.constProperty.allOf = ALL_OF_CONST_PROPERTY;
     metaSchema.$defs['meta-data'].allOf = ALL_OF_META_DATA;
-
-    // delete properties that are not compatible with this option
-    delete metaSchema.$defs.schemaComposition.properties.not;
-    metaSchema.$defs.conditionalSchema = {};
-    delete metaSchema.$defs.objectProperty.properties.additionalProperties;
-    delete metaSchema.$defs.objectProperty.properties.propertyNames;
-    delete metaSchema.$defs.objectProperty.properties.dependentRequired;
-    delete metaSchema.$defs.objectProperty.properties.dependentSchemas;
-    delete metaSchema.$defs.objectProperty.properties.unevaluatedProperties;
-    delete metaSchema.$defs.arrayProperty.properties.unevaluatedItems;
-    delete metaSchema.$defs.arrayProperty.properties.items;
   }
 
   if (metaSchemaSettings.showJsonLdFields) {
@@ -124,6 +114,79 @@ const DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES = {
 };
 
 const ALL_OF_ENUM_PROPERTY = [
+  {
+    if: {
+      $ref: '#/$defs/hasTypeArray',
+    },
+    then: {
+      properties: {
+        enum: {
+          items: {
+            type: 'array',
+          },
+        },
+      },
+    },
+  },
+  {
+    if: {
+      $ref: '#/$defs/hasTypeObject',
+    },
+    then: {
+      properties: {
+        enum: {
+          items: {
+            type: 'object',
+          },
+        },
+      },
+    },
+  },
+  {
+    if: {
+      $ref: '#/$defs/hasTypeString',
+    },
+    then: {
+      properties: {
+        enum: {
+          items: {
+            type: 'string',
+          },
+        },
+      },
+    },
+  },
+  {
+    if: {
+      $ref: '#/$defs/hasTypeNumberOrInteger',
+    },
+    then: {
+      properties: {
+        enum: {
+          items: {
+            type: 'number',
+          },
+        },
+      },
+    },
+  },
+  {
+    if: {
+      $ref: '#/$defs/hasTypeBoolean',
+    },
+    then: {
+      properties: {
+        enum: {
+          items: {
+            type: 'boolean',
+          },
+        },
+      },
+    },
+  },
+];
+
+const ALL_OF_CONST_PROPERTY = [
   {
     if: {
       $ref: '#/$defs/hasTypeArray',

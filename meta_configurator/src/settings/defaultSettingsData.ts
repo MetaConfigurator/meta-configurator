@@ -52,7 +52,7 @@ export const SETTINGS_DATA_DEFAULT = {
   metaSchema: {
     allowBooleanSchema: false,
     allowMultipleTypes: false,
-    objectTypesComfort: false,
+    objectTypesComfort: true,
     markMoreFieldsAsAdvanced: true,
     showAdditionalPropertiesButton: false,
     showJsonLdFields: false,

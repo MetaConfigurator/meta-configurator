@@ -326,11 +326,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
         objectTypesComfort: {
           type: 'boolean',
-          $comment:
-            "Warning: due to incompatibility, this option will disable schema editor support for defining the items of an array, as well as support for many advanced keywords, such as conditionals and 'not'.",
           description:
             'This is a comfort feature: the original JSON Meta Schema allows properties of a particular type to have example values, constant values, default values or enum values of different types. For example, a field for numbers could have a string as a default value. This meta schema option forces the same type for all these values. This enables the tool to auto-select the corresponding type in the schema editor, avoiding the need for the user to manually select the types. ',
-          default: false,
+          default: true,
           metaConfigurator: {
             advanced: true,
           },
