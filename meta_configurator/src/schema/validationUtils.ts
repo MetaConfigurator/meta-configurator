@@ -50,7 +50,13 @@ export class ValidationResult {
    */
   public filterForPath(path: Path): ValidationResult {
     const jsonPointer = pathToJsonPointer(path);
-    const filteredErrors = this.errors.filter(error => error.instancePath.startsWith(jsonPointer));
+    const filteredErrors = this.errors.filter(error => {
+      const instancePath = error.instancePath;
+      return (
+        instancePath === jsonPointer ||
+        instancePath.startsWith(jsonPointer + "/")
+      );
+    });
     return new ValidationResult(filteredErrors);
   }
 

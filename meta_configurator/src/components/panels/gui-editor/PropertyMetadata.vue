@@ -14,7 +14,7 @@ import {focus, makeEditableAndSelectContents} from '@/utility/focusUtils';
 import {useSettings} from '@/settings/useSettings';
 import type {SessionMode} from '@/store/sessionMode';
 import {getSessionForMode, getUserSelectionForMode} from '@/data/useDataLink';
-import type {ValidationResult} from '@/schema/validationService';
+import type {ValidationResult} from '@/schema/validationUtils';
 import {
   getDisplayNameOfNode,
   isDeprecated,
