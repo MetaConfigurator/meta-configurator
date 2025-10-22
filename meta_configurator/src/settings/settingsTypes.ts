@@ -27,6 +27,7 @@ export interface SettingsInterfacePerformance {
   minObjectPropertyCountToPreserve: number; // when large document is trimmed, this is minimum count of object properties to be preserved
   maxShownChildrenInGuiEditor: number;
   maxErrorsToShow: number;
+  maxErrorsToShowBulkValidation: number;
 }
 
 export interface SettingsInterfaceCodeEditor {

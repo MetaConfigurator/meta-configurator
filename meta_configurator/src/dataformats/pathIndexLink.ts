@@ -15,6 +15,17 @@ export interface PathIndexLink {
   determineIndexOfPath(dataString: string, path: Path): number;
 
   /**
+   * (Optional) Determines the indexes of the first character of the data at the given paths.
+   * This method can be implemented for performance optimization to avoid multiple calls to
+   * `determineIndexOfPath`.
+   *
+   * @param dataString the unparsed data
+   * @param paths      the paths to determine the cursor positions for
+   * @return an object which represents the mappings from path to index
+   */
+  determineIndexesOfPaths?(dataString: string, paths: Path[]): {[pathKey: string]: number};
+
+  /**
    * Determines the path for the data that is at the given index of the data string.
    *
    * @param dataString  the unparsed data
