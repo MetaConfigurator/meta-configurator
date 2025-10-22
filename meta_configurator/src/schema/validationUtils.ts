@@ -52,10 +52,7 @@ export class ValidationResult {
     const jsonPointer = pathToJsonPointer(path);
     const filteredErrors = this.errors.filter(error => {
       const instancePath = error.instancePath;
-      return (
-        instancePath === jsonPointer ||
-        instancePath.startsWith(jsonPointer + "/")
-      );
+      return instancePath === jsonPointer || instancePath.startsWith(jsonPointer + '/');
     });
     return new ValidationResult(filteredErrors);
   }

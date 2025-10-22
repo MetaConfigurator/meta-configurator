@@ -1,6 +1,6 @@
 import {type Annotation, Editor} from 'brace';
 import type {ErrorObject} from 'ajv';
-import {jsonPointerToPath, pathToJsonPointer } from '@/utility/pathUtils';
+import {jsonPointerToPath, pathToJsonPointer} from '@/utility/pathUtils';
 import {determineCursorPosition} from '@/components/panels/code-editor/aceUtility';
 import {computed} from 'vue';
 import {useDataConverter, usePathIndexLink} from '@/dataformats/formatRegistry';
@@ -26,7 +26,9 @@ export function setupAnnotationsFromValidationErrors(editor: Editor, mode: Sessi
 
     const supportsBulkPathDetermination = usePathIndexLink().determineIndexesOfPaths !== undefined;
 
-    const maxErrorsToShow = supportsBulkPathDetermination ? useSettings().value.performance.maxErrorsToShowBulkValidation : useSettings().value.performance.maxErrorsToShow;
+    const maxErrorsToShow = supportsBulkPathDetermination
+      ? useSettings().value.performance.maxErrorsToShowBulkValidation
+      : useSettings().value.performance.maxErrorsToShow;
     if (errors.length > maxErrorsToShow) {
       errors = errors.slice(0, maxErrorsToShow);
     }
@@ -35,8 +37,7 @@ export function setupAnnotationsFromValidationErrors(editor: Editor, mode: Sessi
       return validationErrorsToAnnotations(editor, errors);
     } else {
       return errors.map(error => validationErrorToAnnotation(editor, error));
-
-  }
+    }
   });
 
   watchDebounced(
@@ -60,12 +61,14 @@ function validationErrorToAnnotation(editor: Editor, error: ErrorObject): Annota
 // optimized version that uses bulk path index determination
 function validationErrorsToAnnotations(editor: Editor, errors: ErrorObject[]): Annotation[] {
   const result: Annotation[] = [];
-  const positions = usePathIndexLink().determineIndexesOfPaths!(editor.getValue(), errors.map(error => jsonPointerToPath(error.instancePath)));
+  const positions = usePathIndexLink().determineIndexesOfPaths!(
+    editor.getValue(),
+    errors.map(error => jsonPointerToPath(error.instancePath))
+  );
 
-  const cachedPositionsForIndices: {[index: number]: {row: number, column: number}} = {};
+  const cachedPositionsForIndices: {[index: number]: {row: number; column: number}} = {};
 
   for (const error of errors) {
-
     const instancePathTranslated = jsonPointerToPath(error.instancePath);
     // note that we use our own pathToJsonPointer here, to ensure consistent serialization
     const instancePathKey = pathToJsonPointer(instancePathTranslated);
@@ -78,7 +81,7 @@ function validationErrorsToAnnotations(editor: Editor, errors: ErrorObject[]): A
     if (index in cachedPositionsForIndices) {
       position = cachedPositionsForIndices[index];
     } else {
-      position = editor.session.doc.indexToPosition(index, 0)
+      position = editor.session.doc.indexToPosition(index, 0);
       cachedPositionsForIndices[index] = position;
     }
 

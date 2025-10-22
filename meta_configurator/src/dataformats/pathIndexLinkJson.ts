@@ -158,8 +158,6 @@ export class PathIndexLinkJson implements PathIndexLink {
     return childPath ?? [];
   }
 
-
-
   // performance optimization to avoid multiple calls to determineIndexOfPath
   determineIndexesOfPaths(editorContent: string, paths: Path[]): {[pathKey: string]: number} {
     if (editorContent.length === 0) {
@@ -183,7 +181,12 @@ export class PathIndexLinkJson implements PathIndexLink {
 
   // traverses the complete cst, always keeping track of the current path. When having a match with one of the requested paths, the index is stored in the result object.
   // only ends when end of cst is reached or all paths have been found
-  private traverseCstForIndexesForPaths(currentNode: CstNode, paths: Set<string>, currentPath: Path, result: {[pathKey: string]: number}) {
+  private traverseCstForIndexesForPaths(
+    currentNode: CstNode,
+    paths: Set<string>,
+    currentPath: Path,
+    result: {[pathKey: string]: number}
+  ) {
     const pathKey = pathToJsonPointer(currentPath);
     if (paths.has(pathKey) && !(pathKey in result)) {
       result[pathKey] = currentNode.range.start;
@@ -194,7 +197,12 @@ export class PathIndexLinkJson implements PathIndexLink {
     switch (currentNode.kind) {
       case 'object':
         for (const childNode of currentNode.children) {
-          this.traverseCstForIndexesForPaths(childNode, paths, currentPath.concat([childNode.key]), result);
+          this.traverseCstForIndexesForPaths(
+            childNode,
+            paths,
+            currentPath.concat([childNode.key]),
+            result
+          );
         }
         break;
       case 'object-property':
@@ -215,5 +223,4 @@ export class PathIndexLinkJson implements PathIndexLink {
         break;
     }
   }
-
 }
