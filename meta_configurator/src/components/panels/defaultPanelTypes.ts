@@ -9,6 +9,7 @@ import AiPromptsPanel from '@/components/panels/ai-prompts/AiPromptsPanel.vue';
 import ListAnalysisPanel from './list-analysis/ListAnalysisPanel.vue';
 import TestPanel from '@/components/panels/test-panel/TestPanel.vue';
 import DocumentationPanel from '@/components/panels/documentation/DocumentationPanel.vue';
+import RdfPanel from '@/components/panels/rdf/RdfPanel.vue';
 
 export const panelTypeTextEditor: PanelTypeDefinition = {
   getComponent: () => CodeEditorPanel,
@@ -74,8 +75,16 @@ export const panelTypeDocementation: PanelTypeDefinition = {
   name: 'documentation',
 };
 
+export const panelTypeRdf: PanelTypeDefinition = {
+  getComponent: () => RdfPanel,
+  supportedModes: [SessionMode.DataEditor],
+  label: 'Rdf View',
+  icon: 'fa-solid fa-globe',
+  name: 'rdf',
+};
+
 /**
- * Registers the default panel types, which are GuiEditor, TextEditor, Schema Diagram, Ai Prompts and Debug.
+ * Registers the default panel types, which are GuiEditor, TextEditor, Schema Diagram, Ai Prompts, Debug, and RDF.
  */
 export function registerDefaultPanelTypes() {
   panelTypeRegistry.registerPanelType('textEditor', panelTypeTextEditor);
@@ -86,4 +95,5 @@ export function registerDefaultPanelTypes() {
   panelTypeRegistry.registerPanelType('debug', panelTypeDebug);
   panelTypeRegistry.registerPanelType('test', panelTypeTest);
   panelTypeRegistry.registerPanelType('documentation', panelTypeDocementation);
+  panelTypeRegistry.registerPanelType('rdf', panelTypeRdf);
 }
