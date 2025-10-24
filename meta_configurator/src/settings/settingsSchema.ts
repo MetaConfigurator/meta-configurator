@@ -110,7 +110,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     codeEditor: {
       type: 'object',
-      required: ['fontSize'],
+      required: ['fontSize', 'tabSize', 'showFormatSelector', 'xml'],
       additionalProperties: false,
       description: 'Settings of the code editor.',
       properties: {
