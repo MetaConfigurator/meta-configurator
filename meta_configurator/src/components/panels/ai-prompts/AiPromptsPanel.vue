@@ -14,6 +14,7 @@ const props = defineProps<{
 </script>
 
 <template>
+  <div class="panel-container">
   <PanelSettings panel-name="AI Prompts View" :panel-settings-path="['aiIntegration']">
     <p>
       This panel allows you to manage AI prompts for the current document. You can define prompts
@@ -23,7 +24,7 @@ const props = defineProps<{
     <ApiKey />
   </PanelSettings>
   <ApiKeyWarning />
-
+<div class="panel-content">
   <ScrollPanel
     style="width: 100%; height: 100%"
     :dt="{
@@ -41,6 +42,23 @@ const props = defineProps<{
       :session-mode="props.sessionMode"
       v-else-if="props.sessionMode == SessionMode.Settings" />
   </ScrollPanel>
+</div>
+  </div>
 </template>
 
-<style scoped></style>
+
+<style scoped>
+.panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.panel-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+</style>

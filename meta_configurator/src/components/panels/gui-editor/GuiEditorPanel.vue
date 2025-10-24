@@ -15,6 +15,7 @@ const props = defineProps<{
 </script>
 
 <template>
+  <div class="panel-container">
   <div class="gui-panel">
     <PanelSettings panel-name="GUI View" :panel-settings-path="['guiEditor']">
       <p>
@@ -31,6 +32,7 @@ const props = defineProps<{
       <SchemaInfoPanel :sessionMode="props.sessionMode" />
     </PanelSettings>
 
+    <div class="panel-content">
     <ScrollPanel
       style="width: 100%; height: 100%"
       :dt="{
@@ -41,6 +43,8 @@ const props = defineProps<{
       <GuiEditorPanelJsonSchema :sessionMode="props.sessionMode" />
     </ScrollPanel>
   </div>
+  </div>
+  </div>
 </template>
 
 <style scoped>
@@ -48,6 +52,20 @@ const props = defineProps<{
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+ .panel-container {
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   width: 100%;
+   overflow: hidden;
+ }
+
+.panel-content {
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 </style>

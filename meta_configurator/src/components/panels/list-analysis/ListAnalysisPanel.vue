@@ -82,6 +82,7 @@ function exportTableAsCsv() {
 </script>
 
 <template>
+  <div class="panel-container">
   <PanelSettings panel-name="Table View" :panel-settings-path="['listAnalysis']">
     <p>
       This panel allows you to analyze object arrays in the current document. Select an object array
@@ -89,6 +90,7 @@ function exportTableAsCsv() {
     </p>
   </PanelSettings>
 
+    <div class="panel-content">
   <div class="ml-5 h-full">
     <ScrollPanel
       style="width: 100%; height: 100%"
@@ -134,6 +136,8 @@ function exportTableAsCsv() {
       </div>
     </ScrollPanel>
   </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -144,4 +148,20 @@ function exportTableAsCsv() {
   display: block; /* Ensure the label behaves like a block element */
   margin-bottom: 10px; /* Add some space below the label */
 }
+
+
+.panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.panel-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 </style>
