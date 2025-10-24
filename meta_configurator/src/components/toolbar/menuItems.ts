@@ -269,13 +269,11 @@ export class MenuItems {
         () =>
           settings.metaSchema.allowBooleanSchema &&
           settings.metaSchema.allowMultipleTypes &&
-          !settings.metaSchema.objectTypesComfort &&
           !settings.metaSchema.markMoreFieldsAsAdvanced,
         () => {
           const metaSchema = settings.metaSchema;
           metaSchema.allowBooleanSchema = true;
           metaSchema.allowMultipleTypes = true;
-          metaSchema.objectTypesComfort = false;
           metaSchema.markMoreFieldsAsAdvanced = false;
         },
         () => {
@@ -283,6 +281,7 @@ export class MenuItems {
           metaSchema.allowBooleanSchema = false;
           metaSchema.allowMultipleTypes = false;
           metaSchema.markMoreFieldsAsAdvanced = true;
+          metaSchema.objectTypesComfort = true;
         },
         'fa-solid fa-lock',
         'fa-solid fa-lock-open',
