@@ -5,7 +5,21 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   title: 'Settings',
   description: 'MetaConfigurator settings',
   type: 'object',
-  required: ['dataFormat', 'toolbarTitle', 'performance', 'codeEditor', 'guiEditor', 'schemaDiagram', 'documentation', 'metaSchema', 'panels', 'frontend', 'backend', 'rdf', 'aiIntegration'],
+  required: [
+    'dataFormat',
+    'toolbarTitle',
+    'performance',
+    'codeEditor',
+    'guiEditor',
+    'schemaDiagram',
+    'documentation',
+    'metaSchema',
+    'panels',
+    'frontend',
+    'backend',
+    'rdf',
+    'aiIntegration',
+  ],
   additionalProperties: false,
   properties: {
     settingsVersion: {
@@ -151,7 +165,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     guiEditor: {
       type: 'object',
-      required: ['maximumDepth', 'propertySorting', 'hideAddPropertyButton', 'showBorderAroundInputFields', 'showSchemaTitleAsHeader'],
+      required: [
+        'maximumDepth',
+        'propertySorting',
+        'hideAddPropertyButton',
+        'showBorderAroundInputFields',
+        'showSchemaTitleAsHeader',
+      ],
       additionalProperties: false,
       description: 'GUI Editor related settings belong here.',
       properties: {
