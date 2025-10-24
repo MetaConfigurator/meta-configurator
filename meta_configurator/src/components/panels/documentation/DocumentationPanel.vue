@@ -106,25 +106,23 @@ onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
       </p>
     </PanelSettings>
     <div class="panel-content">
-
       <ScrollPanel
         style="width: 100%; height: 100%"
         :dt="{
-        bar: {
-          background: '{primary.color}',
-        },
-      }">
-    <div ref="docsRef" class="rendered-docs" v-html="renderedHtml"></div>
-    <div style="text-align: center; margin-top: 1rem; margin-bottom: 1rem;">
-      <button class="download-btn" @click="handleDownloadClick">Download as Markdown</button>
-    </div>
+          bar: {
+            background: '{primary.color}',
+          },
+        }">
+        <div ref="docsRef" class="rendered-docs" v-html="renderedHtml"></div>
+        <div style="text-align: center; margin-top: 1rem; margin-bottom: 1rem">
+          <button class="download-btn" @click="handleDownloadClick">Download as Markdown</button>
+        </div>
       </ScrollPanel>
     </div>
   </div>
 </template>
 
 <style>
-
 .heading {
   font-size: 24px;
   font-weight: bold;
@@ -287,18 +285,17 @@ onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
   background-color: var(--p-highlight-color);
 }
 
- .panel-container {
-   display: flex;
-   flex-direction: column;
-   height: 100%;
-   width: 100%;
-   overflow: hidden;
- }
+.panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
 
 .panel-content {
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
-
 </style>

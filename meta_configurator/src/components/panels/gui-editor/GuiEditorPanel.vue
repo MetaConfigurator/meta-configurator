@@ -16,34 +16,34 @@ const props = defineProps<{
 
 <template>
   <div class="panel-container">
-  <div class="gui-panel">
-    <PanelSettings panel-name="GUI View" :panel-settings-path="['guiEditor']">
-      <p>
-        This panel allows you to view and edit the current document in a GUI format. You can
-        navigate through the document tree, view properties, and modify data directly.
-      </p>
-      <br />
-      <p>
-        Hint: Click on a object property name to navigate into that object or expand it to view its
-        properties.
-      </p>
-      <br />
-      <p>The GUI is generated based on the following schema:</p>
-      <SchemaInfoPanel :sessionMode="props.sessionMode" />
-    </PanelSettings>
+    <div class="gui-panel">
+      <PanelSettings panel-name="GUI View" :panel-settings-path="['guiEditor']">
+        <p>
+          This panel allows you to view and edit the current document in a GUI format. You can
+          navigate through the document tree, view properties, and modify data directly.
+        </p>
+        <br />
+        <p>
+          Hint: Click on a object property name to navigate into that object or expand it to view
+          its properties.
+        </p>
+        <br />
+        <p>The GUI is generated based on the following schema:</p>
+        <SchemaInfoPanel :sessionMode="props.sessionMode" />
+      </PanelSettings>
 
-    <div class="panel-content">
-    <ScrollPanel
-      style="width: 100%; height: 100%"
-      :dt="{
-        bar: {
-          background: '{primary.color}',
-        },
-      }">
-      <GuiEditorPanelJsonSchema :sessionMode="props.sessionMode" />
-    </ScrollPanel>
-  </div>
-  </div>
+      <div class="panel-content">
+        <ScrollPanel
+          style="width: 100%; height: 100%"
+          :dt="{
+            bar: {
+              background: '{primary.color}',
+            },
+          }">
+          <GuiEditorPanelJsonSchema :sessionMode="props.sessionMode" />
+        </ScrollPanel>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -55,13 +55,13 @@ const props = defineProps<{
   overflow: hidden;
 }
 
- .panel-container {
-   display: flex;
-   flex-direction: column;
-   height: 100%;
-   width: 100%;
-   overflow: hidden;
- }
+.panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
 
 .panel-content {
   flex: 1;
