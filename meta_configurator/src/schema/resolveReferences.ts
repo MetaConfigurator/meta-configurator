@@ -1,10 +1,11 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {dataAt} from '@/utility/resolveDataAtPath';
-import {jsonPointerToPath, jsonPointerToPathTyped} from '@/utility/pathUtils';
+import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 import {cloneDeep} from 'lodash';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import type {Path} from '@/utility/path';
 import {doesSchemaHaveType} from '@/schema/schemaReadingUtils';
+import {errorService} from '@/main';
 
 export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): any {
   if (!subSchema) {
@@ -17,7 +18,13 @@ export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): a
     // copy subSchema
     const subSchemaWithoutRef = cloneDeep(subSchema);
     delete subSchemaWithoutRef.$ref;
-    return mergeAllOfs([subSchemaWithoutRef, resolveReferences(schemaAtRef, rootSchema)]);
+    const resolvedSchema = resolveReferences(schemaAtRef, rootSchema);
+    try {
+      return mergeAllOfs([subSchemaWithoutRef, resolvedSchema]);
+    } catch (error) {
+      errorService.onError(error);
+      return resolvedSchema;
+    }
   }
   return subSchema;
 }

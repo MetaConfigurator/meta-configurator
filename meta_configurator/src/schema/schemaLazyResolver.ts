@@ -9,6 +9,7 @@ import {
 } from '@/schema/mergeAllOfs';
 import {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode} from '@/data/useDataLink';
+import {errorService} from '@/main';
 
 const preprocessedRefSchemasMap: Map<SessionMode, Map<string, JsonSchemaType>> = new Map(
   Object.values(SessionMode).map(mode => [mode, new Map()])
@@ -67,7 +68,11 @@ function handleAllOfs(schema: JsonSchemaType, mode: SessionMode) {
 
     schema = extractIfsOfAllOfs(schema, mode);
     // do not merge deeply, as this could merge and mess up conditions of children properties
-    schema = mergeAllOfs(schema, false);
+    try {
+        schema = mergeAllOfs(schema, false);
+      } catch (error) {
+        errorService.onError(error);
+      }
   }
   return schema;
 }

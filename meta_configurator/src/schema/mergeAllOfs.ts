@@ -1,3 +1,4 @@
+import { errorService } from '@/main';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 // @ts-ignore
 import mergeAllOf from 'json-schema-merge-allof';
@@ -57,5 +58,10 @@ export function mergeSchemas(...schemas: JsonSchemaType[]): JsonSchemaType {
   const combinedSchema = {
     allOf: [...schemas],
   };
-  return mergeAllOfs(combinedSchema);
+  try {
+      return mergeAllOfs(combinedSchema);
+    } catch (error) {
+      errorService.onError(error);
+      return combinedSchema;
+    }
 }

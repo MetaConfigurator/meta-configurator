@@ -17,6 +17,7 @@ import {type CsvError, parse} from 'csv-parse/browser/esm';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
+import {errorService} from '@/main';
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
   const {open, onChange, reset} = useFileDialog({
@@ -58,9 +59,13 @@ export function inferSchemaForNewDataAndMergeIntoCurrentSchema(
   const schema = getSchemaForMode(SessionMode.DataEditor);
   const currentSchema = schema.schemaRaw.value;
   // then we merge the new schema into the current one
-  getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
-    allOf: [currentSchema, inferredSchema],
-  });
+  try {
+    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
+      allOf: [currentSchema, inferredSchema],
+    });
+  } catch (error) {
+    errorService.onError(error);
+  }
 }
 
 // temporarily removed to reduce complexity for the user
@@ -256,8 +261,11 @@ export function inferExpansionSchema(
     undefined
   );
 
-  // then we merge the new schema into the current one
-  getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
-    allOf: [currentSchema, tableSchema],
-  });
+  try {
+    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
+      allOf: [currentSchema, tableSchema],
+    });
+  } catch (error) {
+    errorService.onError(error);
+  }
 }
