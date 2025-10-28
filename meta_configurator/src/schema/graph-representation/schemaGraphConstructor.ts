@@ -33,10 +33,10 @@ export function constructSchemaGraph(
 
     // merge allOfs
     try {
-        rootSchema = mergeAllOfs(rootSchema);
-      } catch (error) {
-        useErrorService().onError(new Error("Unable to merge allOfs in schema: " + error));
-      }
+      rootSchema = mergeAllOfs(rootSchema);
+    } catch (error) {
+      useErrorService().onError(new Error('Unable to merge allOfs in schema: ' + error));
+    }
   }
 
   const objectDefs = identifyAllObjects(rootSchema);

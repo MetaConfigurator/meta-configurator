@@ -65,7 +65,6 @@ export function inferSchemaForNewDataAndMergeIntoCurrentSchema(
   }
 }
 
-
 export function loadCsvFromUserString(
   currentUserDataString: Ref<string>,
   currentUserCsv: Ref<any[]>,

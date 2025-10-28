@@ -84,7 +84,7 @@ app.use(ToastService);
 app.use(ConfirmationService);
 
 app.directive('tooltip', Tooltip);
-initErrorService(app.config.globalProperties.$toast)
+initErrorService(app.config.globalProperties.$toast);
 app.config.errorHandler = (error: unknown) => useErrorService().onError(error);
 
 registerIcons();

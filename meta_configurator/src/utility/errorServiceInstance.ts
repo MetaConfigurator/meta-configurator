@@ -1,5 +1,5 @@
 import ErrorService from './errorService';
-import type { ToastServiceMethods } from 'primevue/toastservice';
+import type {ToastServiceMethods} from 'primevue/toastservice';
 
 let errorService: ErrorService | null = null;
 

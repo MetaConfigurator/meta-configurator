@@ -1,11 +1,7 @@
 import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import pointer from 'json-pointer';
 import {nonBooleanSchema} from '@/schema/schemaProcessingUtils';
-import {
-  areSchemasCompatible,
-  mergeAllOfs,
-  safeMergeSchemas,
-} from '@/schema/mergeAllOfs';
+import {areSchemasCompatible, mergeAllOfs, safeMergeSchemas} from '@/schema/mergeAllOfs';
 import {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode} from '@/data/useDataLink';
 import {useErrorService} from '@/utility/errorServiceInstance';
@@ -68,12 +64,12 @@ function handleAllOfs(schema: JsonSchemaType, mode: SessionMode) {
     schema = extractIfsOfAllOfs(schema, mode);
     // do not merge deeply, as this could merge and mess up conditions of children properties
     try {
-        schema = mergeAllOfs(schema, false);
-      } catch (error) {
-        useErrorService().onError(new Error("Schema is not satisfiable: " + error));
+      schema = mergeAllOfs(schema, false);
+    } catch (error) {
+      useErrorService().onError(new Error('Schema is not satisfiable: ' + error));
       // schema is not satisfiable if allOfs can not be merged
-        schema = false;
-      }
+      schema = false;
+    }
   }
   return schema;
 }
