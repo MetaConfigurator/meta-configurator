@@ -2,7 +2,6 @@
 import {ref} from 'vue';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 import {SessionMode} from '@/store/sessionMode';
-import {errorService} from '@/main';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
@@ -18,6 +17,7 @@ import NewsDialog from '@/components/toolbar/dialogs/NewsDialog.vue';
 import {useSettings} from '@/settings/useSettings';
 import {hasCurrentNewsChanged, setCurrentNewsHash} from '@/components/toolbar/currentNews';
 import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExportDialog.vue';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -83,7 +83,7 @@ async function showSchemaStoreDialog(): Promise<void> {
     fetchedSchemasSelectionDialog.value.setSchemas(await fetchSchemasFromJSONSchemaStore());
     fetchedSchemasSelectionDialog.value.show();
   } catch (error) {
-    errorService.onError(error);
+    useErrorService().onError(error);
   }
 }
 function showExampleSchemasDialog() {

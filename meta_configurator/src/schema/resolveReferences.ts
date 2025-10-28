@@ -5,7 +5,7 @@ import {cloneDeep} from 'lodash';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import type {Path} from '@/utility/path';
 import {doesSchemaHaveType} from '@/schema/schemaReadingUtils';
-import {errorService} from '@/main';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): any {
   if (!subSchema) {
@@ -22,7 +22,7 @@ export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): a
     try {
       return mergeAllOfs([subSchemaWithoutRef, resolvedSchema]);
     } catch (error) {
-      errorService.onError(error);
+      useErrorService().onError(new Error("Unable to merge schema with referenced schema: " + error));
       return resolvedSchema;
     }
   }

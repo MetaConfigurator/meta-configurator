@@ -19,7 +19,7 @@ import {
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
 } from '@/schema/graph-representation/schemaGraphTypes';
-import {errorService} from '@/main';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const settings = useSettings();
 
@@ -35,7 +35,7 @@ export function constructSchemaGraph(
     try {
         rootSchema = mergeAllOfs(rootSchema);
       } catch (error) {
-        errorService.onError(error);
+        useErrorService().onError(new Error("Unable to merge allOfs in schema: " + error));
       }
   }
 

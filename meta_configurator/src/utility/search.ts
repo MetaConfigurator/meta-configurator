@@ -1,12 +1,12 @@
 import type {Path} from '@/utility/path';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {errorService} from '@/main';
 import type {MenuItem} from 'primevue/menuitem';
 import {pathToString} from '@/utility/pathUtils';
 import {dataToString} from '@/utility/dataToString';
 import _ from 'lodash';
 import {MAX_SEARCH_DEPTH} from '@/constants';
 import {useCurrentData, useCurrentSchema, useCurrentSession} from '@/data/useDataLink';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 /**
  * Searches for the given search term in the data and schema.
@@ -23,7 +23,7 @@ export async function searchInDataAndSchema(searchTerm: string): Promise<SearchR
     await searchInDataAndSchemaRecursive(data, schema, [], searchTerm, result);
     return result;
   } catch (e) {
-    errorService.onError(e);
+    useErrorService().onError(e);
     return [];
   }
 }

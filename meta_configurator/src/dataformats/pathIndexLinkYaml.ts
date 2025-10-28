@@ -1,8 +1,7 @@
 import type {PathIndexLink} from '@/dataformats/pathIndexLink';
 import type {Path} from '@/utility/path';
-
-import {errorService} from '@/main';
 import {type Node, Document, parseDocument, visit, YAMLSeq} from 'yaml';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 /**
  * Implementation of PathIndexLink for YAML data.
@@ -23,7 +22,7 @@ export class PathIndexLinkYaml implements PathIndexLink {
         return node.range[0];
       }
     } catch (e) {
-      errorService.onError(e);
+      useErrorService().onError(e);
     }
     return 0;
   }

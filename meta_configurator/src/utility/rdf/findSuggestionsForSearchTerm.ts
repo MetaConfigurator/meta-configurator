@@ -1,5 +1,5 @@
 import {useSettings} from '@/settings/useSettings';
-import {errorService} from '@/main';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const settings = useSettings();
 
@@ -24,7 +24,7 @@ export async function findSuggestionsForSearchTerm(
     }
     return results;
   } catch (error) {
-    errorService.onError(error);
+    useErrorService().onError(error);
     return [];
   }
 }

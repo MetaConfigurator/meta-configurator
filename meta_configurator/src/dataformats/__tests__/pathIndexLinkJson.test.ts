@@ -1,10 +1,6 @@
-import {describe, expect, it, vi} from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {PathIndexLinkJson} from '../pathIndexLinkJson';
 import type {Path} from '../../utility/path';
-
-vi.mock('@/main', () => ({
-  errorService: {},
-}));
 
 describe('pathIndexLinkJson', () => {
   const pathIndexLinkJson = new PathIndexLinkJson();

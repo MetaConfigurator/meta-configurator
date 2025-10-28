@@ -6,8 +6,8 @@ import Listbox from 'primevue/listbox';
 import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
-import {errorService} from '@/main';
 import {loadExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const showDialog = ref(false);
 
@@ -24,7 +24,7 @@ watch(selectedSchema, async newSelectedSchema => {
       hideDialog();
       openClearDataEditorDialog();
     } catch (error) {
-      errorService.onError(error);
+      useErrorService().onError(error);
     }
   } else if (newSelectedSchema.key) {
     try {
@@ -32,7 +32,7 @@ watch(selectedSchema, async newSelectedSchema => {
       hideDialog();
       openClearDataEditorDialog();
     } catch (error) {
-      errorService.onError(error);
+      useErrorService().onError(error);
     }
   }
 });

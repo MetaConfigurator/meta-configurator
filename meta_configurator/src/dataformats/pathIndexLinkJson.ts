@@ -9,8 +9,8 @@ import type {
   CstNodeObjectProperty,
 } from 'json-cst';
 import {parse} from 'json-cst';
-import {errorService} from '@/main';
-import {pathToJsonPointer, pathToString} from '@/utility/pathUtils';
+import {pathToJsonPointer} from '@/utility/pathUtils';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 /**
  * Implementation of PathIndexLink for JSON data.
@@ -28,7 +28,7 @@ export class PathIndexLinkJson implements PathIndexLink {
       const cst = this.getCst(editorContent);
       return this.determineIndexStep(cst.root, currentPath);
     } catch (e) {
-      errorService.onError(e);
+      useErrorService().onError(e);
       return 0;
     }
   }
@@ -174,7 +174,7 @@ export class PathIndexLinkJson implements PathIndexLink {
       this.traverseCstForIndexesForPaths(cst.root, pathSet, [], result);
       return result;
     } catch (e) {
-      errorService.onError(e);
+      useErrorService().onError(e);
       return {};
     }
   }

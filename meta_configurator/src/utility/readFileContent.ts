@@ -1,7 +1,7 @@
-import {errorService} from '@/main';
 import type {ManagedData} from '@/data/managedData';
 import type {Ref} from 'vue';
 import {formatRegistry} from '@/dataformats/formatRegistry';
+import {useErrorService} from '@/utility/errorServiceInstance';
 /**
  * Reads the content of a file as a string.
  * @param file the file
@@ -71,7 +71,7 @@ export function readFileContentToDataLink(
       }
       dataLink.setData(contents as any);
     })
-    .catch(error => errorService.onError(error));
+    .catch(error => useErrorService().onError(error));
 }
 
 export async function readFileContentToStringRef(
@@ -84,7 +84,7 @@ export async function readFileContentToStringRef(
       resultRef.value = contents;
     }
   } catch (error) {
-    errorService.onError(error);
+    useErrorService().onError(error);
   }
 }
 

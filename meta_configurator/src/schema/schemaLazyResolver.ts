@@ -4,12 +4,11 @@ import {nonBooleanSchema} from '@/schema/schemaProcessingUtils';
 import {
   areSchemasCompatible,
   mergeAllOfs,
-  mergeSchemas,
   safeMergeSchemas,
 } from '@/schema/mergeAllOfs';
 import {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode} from '@/data/useDataLink';
-import {errorService} from '@/main';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const preprocessedRefSchemasMap: Map<SessionMode, Map<string, JsonSchemaType>> = new Map(
   Object.values(SessionMode).map(mode => [mode, new Map()])
@@ -71,7 +70,9 @@ function handleAllOfs(schema: JsonSchemaType, mode: SessionMode) {
     try {
         schema = mergeAllOfs(schema, false);
       } catch (error) {
-        errorService.onError(error);
+        useErrorService().onError(new Error("Schema is not satisfiable: " + error));
+      // schema is not satisfiable if allOfs can not be merged
+        schema = false;
       }
   }
   return schema;
@@ -223,7 +224,7 @@ function mergeSingularOneOf(schema: JsonSchemaType, mode: SessionMode): JsonSche
     if (schema.oneOf.length == 1) {
       const copiedSchema: JsonSchemaObjectType = {...schema};
       delete copiedSchema.oneOf;
-      return mergeSchemas(
+      return safeMergeSchemas(
         resolveAndTransform(schema.oneOf![0], mode),
         resolveAndTransform(copiedSchema, mode)
       );
@@ -245,7 +246,7 @@ function mergeSingularAnyOf(schema: JsonSchemaType, mode: SessionMode): JsonSche
     if (schema.anyOf.length == 1) {
       const copiedSchema: JsonSchemaObjectType = {...schema};
       delete copiedSchema.anyOf;
-      return mergeSchemas(
+      return safeMergeSchemas(
         resolveAndTransform(schema.anyOf!![0], mode),
         resolveAndTransform(copiedSchema, mode)
       );

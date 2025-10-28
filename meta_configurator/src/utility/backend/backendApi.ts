@@ -2,8 +2,8 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {computed, type Ref} from 'vue';
 import {useSettings} from '@/settings/useSettings';
-import {errorService} from '@/main';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const settings = useSettings();
 
@@ -110,12 +110,12 @@ export async function restoreSnapshot(snapshotId: string, isProject: boolean = f
       snapshotId +
       ' from backend: ' +
       result['error'];
-    errorService.onError(errorMessage);
+    useErrorService().onError(errorMessage);
     throw new Error(errorMessage);
   }
   if (!('data' in result) || !('schema' in result) || !('settings' in result)) {
     const errorMessage = 'Invalid snapshot data received from backend.';
-    errorService.onError(errorMessage);
+    useErrorService().onError(errorMessage);
     throw new Error(errorMessage);
   }
   const data = result['data'];
@@ -146,7 +146,7 @@ function throwError(errorMessage: string, errorRef: Ref<string> | null) {
   if (errorRef) {
     errorRef.value = errorMessage;
   } else {
-    errorService.onError(errorMessage);
+    useErrorService().onError(errorMessage);
   }
   throw new Error(errorMessage);
 }
