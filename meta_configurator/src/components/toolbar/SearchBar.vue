@@ -4,7 +4,6 @@ import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import {useSessionStore} from '@/store/sessionStore';
 import Button from 'primevue/button';
-import {errorService} from '@/main';
 
 import InputText from 'primevue/inputtext';
 import {useMagicKeys, watchDebounced} from '@vueuse/core';
@@ -14,6 +13,7 @@ import {focus} from '@/utility/focusUtils';
 import {GuiConstants} from '@/constants';
 
 import {getSessionForMode} from '@/data/useDataLink';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const searchTerm: Ref<string> = ref('');
 
@@ -51,7 +51,7 @@ watchDebounced(
           .slice(0, GuiConstants.MAX_SEARCH_RESULTS);
       })
       .catch(error => {
-        errorService.onError(error);
+        useErrorService().onError(error);
       });
   },
   {debounce: 500}

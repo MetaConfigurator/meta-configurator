@@ -16,6 +16,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {registerDefaultPanelTypes} from '@/components/panels/defaultPanelTypes';
 import {definePreset} from '@primevue/themes';
+import {initErrorService, useErrorService} from '@/utility/errorServiceInstance';
 
 // @ts-ignore
 const app = createApp(App);
@@ -83,8 +84,8 @@ app.use(ToastService);
 app.use(ConfirmationService);
 
 app.directive('tooltip', Tooltip);
-export const errorService = new ErrorService(app.config.globalProperties.$toast);
-app.config.errorHandler = (error: unknown) => errorService.onError(error);
+initErrorService(app.config.globalProperties.$toast);
+app.config.errorHandler = (error: unknown) => useErrorService().onError(error);
 
 registerIcons();
 registerDefaultDataFormats();

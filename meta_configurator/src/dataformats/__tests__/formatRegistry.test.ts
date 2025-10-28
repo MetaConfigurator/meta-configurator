@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it} from 'vitest';
 import {FormatRegistry, useDataConverter, usePathIndexLink} from '../formatRegistry';
 import {DataConverterJson, DataConverterYaml} from '../dataConverter';
 import {useDataSource} from '@/data/dataSource';
@@ -11,10 +11,6 @@ function setDataFormat(format: string | undefined) {
   useDataSource().settingsData.value.dataFormat = format;
   triggerRef(useDataSource().settingsData);
 }
-
-vi.mock('@/main', () => ({
-  errorService: {},
-}));
 
 describe('formatRegistry', () => {
   const formatRegistry = new FormatRegistry();

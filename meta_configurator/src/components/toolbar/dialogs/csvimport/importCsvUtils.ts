@@ -17,6 +17,7 @@ import {type CsvError, parse} from 'csv-parse/browser/esm';
 import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
   const {open, onChange, reset} = useFileDialog({
@@ -51,27 +52,18 @@ export function inferSchemaForNewDataAndMergeIntoCurrentSchema(
   if (!inferredSchema) {
     throw Error('Unable to infer schema for the given data.');
   }
-  //for (const column of currentColumnMapping) {
-  //  addCustomTitleToSchemaProperty(inferredSchema, column);
-  //}
 
   const schema = getSchemaForMode(SessionMode.DataEditor);
   const currentSchema = schema.schemaRaw.value;
   // then we merge the new schema into the current one
-  getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
-    allOf: [currentSchema, inferredSchema],
-  });
+  try {
+    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
+      allOf: [currentSchema, inferredSchema],
+    });
+  } catch (error) {
+    useErrorService().onError(error);
+  }
 }
-
-// temporarily removed to reduce complexity for the user
-/*function addCustomTitleToSchemaProperty(inferredSchema: any, column: CsvImportColumnMappingData) {
-  const propertySchemaTitlePath = [
-    ...dataPathToSchemaPath(column.getPathForJsonDocument(0)),
-    'title',
-  ];
-  const titlePathString = pathToString(propertySchemaTitlePath);
-  _.set(inferredSchema, titlePathString, column.titleInSchema);
-}*/
 
 export function loadCsvFromUserString(
   currentUserDataString: Ref<string>,
@@ -230,11 +222,6 @@ export function inferExpansionSchema(
     throw Error('Unable to access expansion schema of the inferred table schema.');
   }
 
-  // Does not yet work because the addCustomTitle function is not yet adjusted to deal with expansion properties
-  //for (const column of currentColumnMapping) {
-  //  addCustomTitleToSchemaProperty(expansionPropSchema, column);
-  //}
-
   // after having inferred expansion schema by using whole table as basis, we remove the other table props from the schema
   // this way, we overwrite only the expansion property and not also the other table properties
   const objectWithOnlyExpandedProp: any = {};
@@ -256,8 +243,11 @@ export function inferExpansionSchema(
     undefined
   );
 
-  // then we merge the new schema into the current one
-  getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
-    allOf: [currentSchema, tableSchema],
-  });
+  try {
+    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = mergeAllOfs({
+      allOf: [currentSchema, tableSchema],
+    });
+  } catch (error) {
+    useErrorService().onError(error);
+  }
 }

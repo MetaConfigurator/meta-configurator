@@ -1,10 +1,11 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {dataAt} from '@/utility/resolveDataAtPath';
-import {jsonPointerToPath, jsonPointerToPathTyped} from '@/utility/pathUtils';
+import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 import {cloneDeep} from 'lodash';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import type {Path} from '@/utility/path';
 import {doesSchemaHaveType} from '@/schema/schemaReadingUtils';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): any {
   if (!subSchema) {
@@ -17,7 +18,16 @@ export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): a
     // copy subSchema
     const subSchemaWithoutRef = cloneDeep(subSchema);
     delete subSchemaWithoutRef.$ref;
-    return mergeAllOfs([subSchemaWithoutRef, resolveReferences(schemaAtRef, rootSchema)]);
+    const resolvedSchema = resolveReferences(schemaAtRef, rootSchema);
+    try {
+      return mergeAllOfs([subSchemaWithoutRef, resolvedSchema]);
+    } catch (error) {
+      useErrorService().onError(
+        new Error('Unable to merge schema with referenced schema: ' + error)
+      );
+      // if the schemas can not be merged, they are not compatible. Hence the result is not satisfiable.
+      return false;
+    }
   }
   return subSchema;
 }

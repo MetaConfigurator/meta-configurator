@@ -1,11 +1,11 @@
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
-import {errorService} from '@/main';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {adaptComplexitySettingsToLoadedSchema} from '@/settings/settingsUpdater';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 /**
  * Loads the example schema with the given key.
@@ -34,6 +34,6 @@ export function loadExampleSchema(schemaKey: string): void {
       });
     }
   } catch (error) {
-    errorService.onError(error);
+    useErrorService().onError(error);
   }
 }

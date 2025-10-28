@@ -19,6 +19,7 @@ import {
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
 } from '@/schema/graph-representation/schemaGraphTypes';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const settings = useSettings();
 
@@ -31,7 +32,11 @@ export function constructSchemaGraph(
     rootSchema = JSON.parse(JSON.stringify(rootSchema));
 
     // merge allOfs
-    rootSchema = mergeAllOfs(rootSchema);
+    try {
+      rootSchema = mergeAllOfs(rootSchema);
+    } catch (error) {
+      useErrorService().onError(new Error('Unable to merge allOfs in schema: ' + error));
+    }
   }
 
   const objectDefs = identifyAllObjects(rootSchema);

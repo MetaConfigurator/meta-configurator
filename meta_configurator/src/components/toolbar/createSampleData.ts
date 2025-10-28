@@ -1,9 +1,9 @@
 import {confirmationService} from '@/utility/confirmationService';
 import {toastService} from '@/utility/toastService';
-import {errorService} from '@/main';
 import _ from 'lodash';
 import {useCurrentData} from '@/data/useDataLink';
 import {useDataSource} from '@/data/dataSource';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 /**
  * Generates sample data for the given schema.
@@ -28,7 +28,7 @@ function generateSampleDataAndUseAsFileData() {
   generateSampleData(useDataSource().userSchemaData.value)
     .then(data => (useDataSource().userData.value = data))
     .catch((error: Error) =>
-      errorService.onError({
+      useErrorService().onError({
         message: 'Error generating sample data',
         details: error.message,
         stack: error.stack,
