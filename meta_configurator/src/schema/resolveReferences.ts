@@ -22,10 +22,9 @@ export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): a
     try {
       return mergeAllOfs([subSchemaWithoutRef, resolvedSchema]);
     } catch (error) {
-      useErrorService().onError(
-        new Error('Unable to merge schema with referenced schema: ' + error)
-      );
-      return resolvedSchema;
+      useErrorService().onError(new Error("Unable to merge schema with referenced schema: " + error));
+      // if the schemas can not be merged, they are not compatible. Hence the result is not satisfiable.
+      return false;
     }
   }
   return subSchema;
