@@ -9,6 +9,7 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import InitialSchemaSelectionDialog from '@/components/toolbar/dialogs/InitialSchemaSelectionDialog.vue';
 import AboutDialog from '@/components/toolbar/dialogs/AboutDialog.vue';
 import DataMappingDialog from '@/components/toolbar/dialogs/data-mapping/DataMappingDialog.vue';
+import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 import ImportCsvDialog from '@/components/toolbar/dialogs/csvimport/ImportCsvDialog.vue';
 import SaveSnapshotDialog from '@/components/toolbar/dialogs/snapshot/SaveSnapshotDialog.vue';
 import CodeGenerationDialog from '@/components/toolbar/dialogs/code-generation/CodeGenerationDialog.vue';
@@ -77,6 +78,10 @@ function showDataMappingDialog() {
   dataMappingDialog.value?.show();
 }
 
+function showRmlMappingDialog() {
+  rmlMappingDialog.value?.show();
+}
+
 async function showSchemaStoreDialog(): Promise<void> {
   try {
     // Wait for the fetch to complete
@@ -118,6 +123,7 @@ const dataExportDialog = ref();
 const fetchedSchemasSelectionDialog = ref();
 const urlInputDialog = ref();
 const dataMappingDialog = ref();
+const rmlMappingDialog = ref();
 
 defineExpose({
   showInitialSchemaDialog: showInitialDialog,
@@ -160,6 +166,8 @@ defineExpose({
 
   <DataMappingDialog ref="dataMappingDialog" />
 
+  <RmlMappingDialog ref="rmlMappingDialog" />
+
   <AboutDialog
     :visible="showAboutDialog"
     @update:visible="newValue => (showAboutDialog = newValue)" />
@@ -175,6 +183,7 @@ defineExpose({
     @show-import-csv-dialog="() => showCsvImportDialog()"
     @show-snapshot-dialog="() => showSnapshotDialog()"
     @show-data-mapping-dialog="() => showDataMappingDialog()"
+    @show-rml-mapping-dialog="() => showRmlMappingDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 

@@ -28,6 +28,7 @@ const emit = defineEmits<{
   (e: 'show-codegen-dialog', schemaMode: boolean): void;
   (e: 'show-data-export-dialog', schemaMode: boolean): void;
   (e: 'show-data-mapping-dialog'): void;
+  (e: 'show-rml-mapping-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -67,6 +68,10 @@ function showDataExportDialog(schemaMode: boolean) {
 
 function showDataMappingDialog() {
   emit('show-data-mapping-dialog');
+}
+
+function showRmlMappingDialog() {
+  emit('show-rml-mapping-dialog');
 }
 
 function selectedMode(newMode: SessionMode) {
@@ -110,7 +115,8 @@ useMagicKeys({
           @show-import-csv-dialog="() => showCsvImportDialog()"
           @show-schemastore-dialog="() => showSchemaStoreDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()" />
+          @show-data-mapping-dialog="() => showDataMappingDialog()" 
+          @show-rml-mapping-dialog="() => showRmlMappingDialog()" />
 
         <Divider layout="vertical" />
 
@@ -179,7 +185,8 @@ useMagicKeys({
           @show-import-csv-dialog="() => showCsvImportDialog()"
           @show-schemastore-dialog="() => showSchemaStoreDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()" />
+          @show-data-mapping-dialog="() => showDataMappingDialog()" 
+          @show-rml-mapping-dialog="() => showRmlMappingDialog()" />
       </div>
 
       <!-- RIGHT side: format selector -->

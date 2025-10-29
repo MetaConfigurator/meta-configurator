@@ -28,6 +28,7 @@ export class MenuItems {
   private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
   private readonly showDataExportDialog: (schemaMode: boolean) => void;
   private readonly showDataMappingDialog: () => void;
+  private readonly showRMLMappingDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
@@ -39,6 +40,7 @@ export class MenuItems {
     showCodeGenerationDialog: (schemaMode: boolean) => void,
     showDataExportDialog: (schemaMode: boolean) => void,
     showDataMappingDialog: () => void,
+    showRMLMappingDialog: () => void,
     inferJsonSchemaFromSampleData: () => void
   ) {
     this.onFromWebClick = onFromSchemaStoreClick;
@@ -49,6 +51,7 @@ export class MenuItems {
     this.showCodeGenerationDialog = showCodeGenerationDialog;
     this.showDataExportDialog = showDataExportDialog;
     this.showDataMappingDialog = showDataMappingDialog;
+    this.showRMLMappingDialog = showRMLMappingDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
   }
 
@@ -106,6 +109,11 @@ export class MenuItems {
             label: 'Export Data via Text Template',
             icon: 'fa-solid fa-file-export',
             command: () => this.showDataExportDialog(false),
+          },
+          {
+            label: 'Transform JSON Data to JSON-LD',
+            icon: 'fa-solid fa-gears',
+            command: this.showRMLMappingDialog,
           },
         ],
       },

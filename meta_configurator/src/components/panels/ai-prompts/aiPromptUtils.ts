@@ -28,6 +28,8 @@ export function fixGeneratedExpression(
   if (json.startsWith('```') && json.endsWith('```')) {
     json = json.substring(3, json.length - 3);
   }
+  //Remove leading empty lines and whitespace
+  json = json.replace(/^\s*\n+/, '').trimStart();
   return json;
 }
 

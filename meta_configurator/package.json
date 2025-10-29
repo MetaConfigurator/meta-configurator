@@ -24,6 +24,7 @@
     "precommit": "pretty-quick --staged"
   },
   "dependencies": {
+    "@comake/rmlmapper-js": "^0.5.2",
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
@@ -50,12 +51,15 @@
     "json-schema-resolver": "^2.0.0",
     "json-schema-to-typescript": "^13.0.1",
     "jsonata": "^2.0.6",
+    "jsonld": "^8.3.3",
     "lodash": "^4.17.21",
+    "n3": "^1.26.0",
     "node-fetch": "^3.3.1",
     "pinia": "^2.0.36",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.5",
     "quicktype-core": "^23.0.171",
+    "rdf-validate-shacl": "^0.6.5",
     "showdown": "^2.1.0",
     "vue": "^3.5.13",
     "vue-flow": "^0.3.0",

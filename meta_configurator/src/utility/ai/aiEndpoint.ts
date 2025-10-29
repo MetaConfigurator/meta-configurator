@@ -267,3 +267,40 @@ export const queryHandlebarsTemplate = async (
     {role: 'user', content: userMessage},
   ]);
 };
+
+
+export const queryRmlMapping = async (
+  apiKey: string,
+  exampleInput: string,
+  exampleInputSchema: string,
+  exampleOutputRml: string,
+  inputFileSubset: string,
+  inputFileSchema: string,
+  targetSchema: string,
+  userComments: string
+) => {
+  const systemMessage = `You are an expert in RML (RDF Mapping Language) and Turtle syntax. 
+  Your task is to generate an RML mapping in TTL format to transform a JSON input document to RDF according to a given output schema. 
+  Only output **valid RML/Turtle**, using correct prefixes, triples, logical mappings, and references.
+  Do not add explanations, commentary, or unrelated content. Focus on accurate TTL syntax.
+  Example input JSON: \`\`\`${exampleInput}\`\`\`
+  Example input schema: \`\`\`${exampleInputSchema}\`\`\`
+  Example output RML mapping: \`\`\`${exampleOutputRml}\`\`\`
+  Use these examples to understand how the mapping relates input data to the RDF output.`;
+
+  let userMessage = `Real input JSON subset: \`\`\`${inputFileSubset}\`\`\`
+  Input file schema: \`\`\`${inputFileSchema}\`\`\`
+  The goal is to generate an RML mapping (TTL) that transforms this input to match the target RDF schema: \`\`\`${targetSchema}\`\`\`
+  Keep the mapping minimal, accurate, and only map existing fields. Avoid generating values not present in the input.
+  Return ONLY valid RML mapping in Turtle format, with proper prefixes and structure, no extra text or explanation.`;
+
+  if (userComments && userComments.length > 0) {
+    userMessage += `User comments for clarification: \`\`\`${userComments}\`\`\``;
+  }
+
+  return queryOpenAI(apiKey, [
+    { role: 'system', content: systemMessage },
+    { role: 'user', content: userMessage },
+  ]);
+};
+

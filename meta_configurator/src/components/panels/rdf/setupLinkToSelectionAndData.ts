@@ -12,7 +12,6 @@ import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {watchImmediate} from '@vueuse/core/index';
 import {useSettings} from '@/settings/useSettings';
 import {sizeOf} from '@/utility/sizeOf';
-import * as RmlMapper from '@comake/rmlmapper-js';
 
 
 const options = {
@@ -121,50 +120,6 @@ async function setupUpdateContentWhenDataChanges(editor: Editor, mode: SessionMo
         currentChangeFromOutside = true;
         selectionChangeFromOutside = true;
         // TODO: update cursor position not to -1 but compute actual cursor position based on current path
-        
-        const inputFiles = {
-          'input.json': `${dataString}`
-        };
-        // const inputFiles = {
-        //   'input.json': '{ "name":"Tom A.","age":15} '
-        // }
-        console.log('Input files:', inputFiles);
-        const turtleMapping = `
-          @prefix rr: <http://www.w3.org/ns/r2rml#> .
-@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
-@prefix schema: <https://schema.org/> .
-@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
-
-<#LOGICALSOURCE>
-  rml:source "input.json";
-  rml:referenceFormulation ql:JSONPath;
-  rml:iterator "$.persons[*]".
-
-<#Mapping>
-  rml:logicalSource <#LOGICALSOURCE>;
-
-  rr:subjectMap [
-    rr:termType rr:BlankNode;
-    rr:class schema:Person;
-  ];
-
-  rr:predicateObjectMap [
-      rr:predicate schema:name;
-      rr:objectMap [ rml:reference "name" ];
-  ];
-
-  rr:predicateObjectMap [
-      rr:predicate schema:age;
-      rr:objectMap [ rml:reference "age" ];
-  ].
-        `;
-        try {
-          const turtleMappingResult = await RmlMapper.parseTurtle(turtleMapping, inputFiles, options);
-          editor.setValue(JSON.stringify(turtleMappingResult, null, 2), -1);
-        } catch (error) {
-          console.error('Error parsing turtle mapping:', error);
-          editor.setValue('Error parsing JSON data');
-        }
       }
     }
   );

@@ -78,7 +78,7 @@ export const panelTypeDocementation: PanelTypeDefinition = {
 export const panelTypeRdf: PanelTypeDefinition = {
   getComponent: () => RdfPanel,
   supportedModes: [SessionMode.DataEditor],
-  label: 'Rdf View',
+  label: 'RDF View',
   icon: 'fa-solid fa-globe',
   name: 'rdf',
 };
