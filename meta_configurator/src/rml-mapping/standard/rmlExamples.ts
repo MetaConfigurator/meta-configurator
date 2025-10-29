@@ -126,124 +126,124 @@ export const RML_INPUT_EXAMPLE_SCHEMA =
   '}';
 
 export const RML_OUTPUT_EXAMPLE =
-'@prefix rr: <http://www.w3.org/ns/r2rml#> .\n' +
-'@prefix rml: <http://semweb.mmlab.be/ns/rml#> .\n' +
-'@prefix ql: <http://semweb.mmlab.be/ns/ql#> .\n' +
-'@prefix ex: <http://example.com/ns#> .\n' +
-'@prefix schema: <https://schema.org/> .\n' +
-'\n' +
-'<#PersonMapping>\n' +
-'  rml:logicalSource [\n' +
-'    rml:source "Data.json" ;\n' +
-'    rml:referenceFormulation ql:JSONPath ;\n' +
-'    rml:iterator "$.person"\n' +
-'  ] ;\n' +
-'\n' +
-'  rr:subjectMap [\n' +
-'    rr:template "http://example.com/person/{firstName}_{lastName}" ;\n' +
-'    rr:class schema:Person\n' +
-'  ] ;\n' +
-'\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:givenName ;\n' +
-'    rr:objectMap [ rml:reference "firstName" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:familyName ;\n' +
-'    rr:objectMap [ rml:reference "lastName" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:age ;\n' +
-'    rr:objectMap [ rml:reference "age" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:gender ;\n' +
-'    rr:objectMap [ rml:reference "gender" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:email ;\n' +
-'    rr:objectMap [ rml:reference "contact.email" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:telephone ;\n' +
-'    rr:objectMap [ rml:reference "contact.phone" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:address ;\n' +
-'    rr:objectMap [ rr:parentTriplesMap <#AddressMapping> ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate ex:hasRole ;\n' +
-'    rr:objectMap [ rml:reference "roles[*]" ]\n' +
-'  ] .\n' +
-'\n' +
-'<#AddressMapping>\n' +
-'  rml:logicalSource [\n' +
-'    rml:source "Data.json" ;\n' +
-'    rml:referenceFormulation ql:JSONPath ;\n' +
-'    rml:iterator "$.person.address"\n' +
-'  ] ;\n' +
-'\n' +
-'  rr:subjectMap [\n' +
-'    rr:template "http://example.com/address/{city}_{postalCode}" ;\n' +
-'    rr:class schema:PostalAddress\n' +
-'  ] ;\n' +
-'\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:addressLocality ;\n' +
-'    rr:objectMap [ rml:reference "city" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate schema:postalCode ;\n' +
-'    rr:objectMap [ rml:reference "postalCode" ]\n' +
-'  ] .\n' +
-'\n' +
-'<#ExperimentMapping>\n' +
-'  rml:logicalSource [\n' +
-'    rml:source "Data.json" ;\n' +
-'    rml:referenceFormulation ql:JSONPath ;\n' +
-'    rml:iterator "$.experiments[*]"\n' +
-'  ] ;\n' +
-'\n' +
-'  rr:subjectMap [\n' +
-'    rr:template "http://example.com/experiment/{id}" ;\n' +
-'    rr:class ex:Experiment\n' +
-'  ] ;\n' +
-'\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate ex:temperature ;\n' +
-'    rr:objectMap [ rml:reference "temperature" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate ex:reagentType ;\n' +
-'    rr:objectMap [ rml:reference "reagentType" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate ex:hasChemical ;\n' +
-'    rr:objectMap [ rr:parentTriplesMap <#ChemicalMapping> ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate ex:performedBy ;\n' +
-'    rr:objectMap [ rr:parentTriplesMap <#PersonMapping> ]\n' +
-'  ] .\n' +
-'\n' +
-'<#ChemicalMapping>\n' +
-'  rml:logicalSource [\n' +
-'    rml:source "Data.json" ;\n' +
-'    rml:referenceFormulation ql:JSONPath ;\n' +
-'    rml:iterator "$.experiments[*].chemicals[*]"\n' +
-'  ] ;\n' +
-'\n' +
-'  rr:subjectMap [\n' +
-'    rr:template "http://example.com/chemical/{name}" ;\n' +
-'    rr:class ex:Chemical\n' +
-'  ] ;\n' +
-'\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate ex:chemicalName ;\n' +
-'    rr:objectMap [ rml:reference "name" ]\n' +
-'  ] ;\n' +
-'  rr:predicateObjectMap [\n' +
-'    rr:predicate ex:amount ;\n' +
-'    rr:objectMap [ rml:reference "amount" ]\n' +
-'  ] .\n';
+  '@prefix rr: <http://www.w3.org/ns/r2rml#> .\n' +
+  '@prefix rml: <http://semweb.mmlab.be/ns/rml#> .\n' +
+  '@prefix ql: <http://semweb.mmlab.be/ns/ql#> .\n' +
+  '@prefix ex: <http://example.com/ns#> .\n' +
+  '@prefix schema: <https://schema.org/> .\n' +
+  '\n' +
+  '<#PersonMapping>\n' +
+  '  rml:logicalSource [\n' +
+  '    rml:source "Data.json" ;\n' +
+  '    rml:referenceFormulation ql:JSONPath ;\n' +
+  '    rml:iterator "$.person"\n' +
+  '  ] ;\n' +
+  '\n' +
+  '  rr:subjectMap [\n' +
+  '    rr:template "http://example.com/person/{firstName}_{lastName}" ;\n' +
+  '    rr:class schema:Person\n' +
+  '  ] ;\n' +
+  '\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:givenName ;\n' +
+  '    rr:objectMap [ rml:reference "firstName" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:familyName ;\n' +
+  '    rr:objectMap [ rml:reference "lastName" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:age ;\n' +
+  '    rr:objectMap [ rml:reference "age" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:gender ;\n' +
+  '    rr:objectMap [ rml:reference "gender" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:email ;\n' +
+  '    rr:objectMap [ rml:reference "contact.email" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:telephone ;\n' +
+  '    rr:objectMap [ rml:reference "contact.phone" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:address ;\n' +
+  '    rr:objectMap [ rr:parentTriplesMap <#AddressMapping> ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate ex:hasRole ;\n' +
+  '    rr:objectMap [ rml:reference "roles[*]" ]\n' +
+  '  ] .\n' +
+  '\n' +
+  '<#AddressMapping>\n' +
+  '  rml:logicalSource [\n' +
+  '    rml:source "Data.json" ;\n' +
+  '    rml:referenceFormulation ql:JSONPath ;\n' +
+  '    rml:iterator "$.person.address"\n' +
+  '  ] ;\n' +
+  '\n' +
+  '  rr:subjectMap [\n' +
+  '    rr:template "http://example.com/address/{city}_{postalCode}" ;\n' +
+  '    rr:class schema:PostalAddress\n' +
+  '  ] ;\n' +
+  '\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:addressLocality ;\n' +
+  '    rr:objectMap [ rml:reference "city" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate schema:postalCode ;\n' +
+  '    rr:objectMap [ rml:reference "postalCode" ]\n' +
+  '  ] .\n' +
+  '\n' +
+  '<#ExperimentMapping>\n' +
+  '  rml:logicalSource [\n' +
+  '    rml:source "Data.json" ;\n' +
+  '    rml:referenceFormulation ql:JSONPath ;\n' +
+  '    rml:iterator "$.experiments[*]"\n' +
+  '  ] ;\n' +
+  '\n' +
+  '  rr:subjectMap [\n' +
+  '    rr:template "http://example.com/experiment/{id}" ;\n' +
+  '    rr:class ex:Experiment\n' +
+  '  ] ;\n' +
+  '\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate ex:temperature ;\n' +
+  '    rr:objectMap [ rml:reference "temperature" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate ex:reagentType ;\n' +
+  '    rr:objectMap [ rml:reference "reagentType" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate ex:hasChemical ;\n' +
+  '    rr:objectMap [ rr:parentTriplesMap <#ChemicalMapping> ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate ex:performedBy ;\n' +
+  '    rr:objectMap [ rr:parentTriplesMap <#PersonMapping> ]\n' +
+  '  ] .\n' +
+  '\n' +
+  '<#ChemicalMapping>\n' +
+  '  rml:logicalSource [\n' +
+  '    rml:source "Data.json" ;\n' +
+  '    rml:referenceFormulation ql:JSONPath ;\n' +
+  '    rml:iterator "$.experiments[*].chemicals[*]"\n' +
+  '  ] ;\n' +
+  '\n' +
+  '  rr:subjectMap [\n' +
+  '    rr:template "http://example.com/chemical/{name}" ;\n' +
+  '    rr:class ex:Chemical\n' +
+  '  ] ;\n' +
+  '\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate ex:chemicalName ;\n' +
+  '    rr:objectMap [ rml:reference "name" ]\n' +
+  '  ] ;\n' +
+  '  rr:predicateObjectMap [\n' +
+  '    rr:predicate ex:amount ;\n' +
+  '    rr:objectMap [ rml:reference "amount" ]\n' +
+  '  ] .\n';

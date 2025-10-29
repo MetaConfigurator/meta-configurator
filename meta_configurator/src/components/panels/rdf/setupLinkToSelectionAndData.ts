@@ -13,7 +13,6 @@ import {watchImmediate} from '@vueuse/core/index';
 import {useSettings} from '@/settings/useSettings';
 import {sizeOf} from '@/utility/sizeOf';
 
-
 const options = {
   toRDF: false,
   replace: false,

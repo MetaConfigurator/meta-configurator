@@ -42,7 +42,6 @@ onMounted(() => {
   setupLinkToCurrentSelection(editor.value, props.sessionMode);
   setupAnnotationsFromValidationErrors(editor.value, props.sessionMode);
   editor.value.setReadOnly(true);
-
 });
 
 // watch for changes in the data format and update the editor accordingly
