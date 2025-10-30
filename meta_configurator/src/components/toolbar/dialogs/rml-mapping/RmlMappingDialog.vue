@@ -35,9 +35,7 @@ const settings = useSettings();
 
 const mappingServiceTypes = ['Standard (RML)'];
 
-const mappingServiceWarnings = [
-  'No warnings for the RML mapping service at the moment.',
-];
+const mappingServiceWarnings = ['No warnings for the RML mapping service at the moment.'];
 
 const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]);
 
@@ -208,8 +206,9 @@ defineExpose({show: openDialog, close: hideDialog});
       </Message>
 
       <p class="text-sm text-gray-700">
-        This tool converts the JSON data from the <strong>Data Editor</strong> to <strong>JSON-LD</strong>. You can optionally provide extra instructions
-        below to guide the mapping.
+        This tool converts the JSON data from the <strong>Data Editor</strong> to
+        <strong>JSON-LD</strong>. You can optionally provide extra instructions below to guide the
+        mapping.
       </p>
 
       <div>

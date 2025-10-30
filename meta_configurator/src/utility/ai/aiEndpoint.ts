@@ -268,7 +268,6 @@ export const queryHandlebarsTemplate = async (
   ]);
 };
 
-
 export const queryRmlMapping = async (
   apiKey: string,
   exampleInput: string,
@@ -299,8 +298,7 @@ export const queryRmlMapping = async (
   }
 
   return queryOpenAI(apiKey, [
-    { role: 'system', content: systemMessage },
-    { role: 'user', content: userMessage },
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: userMessage},
   ]);
 };
-

@@ -11,8 +11,8 @@ import {
 import {cloneDeep} from 'lodash';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import * as RmlMapper from '@comake/rmlmapper-js';
-import { Parser } from 'n3';
-import jsonld from "jsonld";
+import {Parser} from 'n3';
+import jsonld from 'jsonld';
 
 const ttl_parser = new Parser();
 const options = {
@@ -61,7 +61,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
         ' inputDataSubset: ' +
         (inputDataSubsetStr.length / 1024).toFixed(2)
     );
-  
+
     const resultPromise = queryRmlMapping(
       apiKey,
       rmlInputExampleStr,
@@ -105,7 +105,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
       const result = await RmlMapper.parseTurtle(config, inputFiles, options);
       // To-Do: How to create context ???
       const context = {
-        ex: "http://example.com/ns#"
+        ex: 'http://example.com/ns#',
       };
       const expanded = await jsonld.fromRDF(result, {format: 'application/n-quads'});
       const compacted = await jsonld.compact(expanded, context);
@@ -152,7 +152,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
         'context' in error &&
         error.context &&
         typeof error.context === 'object' &&
-        'line' in error.context 
+        'line' in error.context
       ) {
         const cursorPosition = this.convertTextPositionToCursorPosition(
           config,
@@ -160,7 +160,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
         );
         return {
           success: false,
-          message: 'Error reason: ' + error.message + ' (row ' + (cursorPosition.row) + ').',
+          message: 'Error reason: ' + error.message + ' (row ' + cursorPosition.row + ').',
         };
       } else {
         return {success: false, message: 'Unknown error'};

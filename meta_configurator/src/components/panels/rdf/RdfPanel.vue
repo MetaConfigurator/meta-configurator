@@ -4,9 +4,9 @@
 <template>
   <PanelSettings panel-name="RDF View" :panel-settings-path="['rdf']">
     <p>
-      This panel enables you to convert data in JSON or JSON-LD format into RDF.
-      If your data is in plain JSON, please first convert it to JSON-LD using the Utility Toolbar.
-      Using AI, this tool then transforms your JSON-LD data into RDF through the RML Mapping Language.
+      This panel enables you to convert data in JSON or JSON-LD format into RDF. If your data is in
+      plain JSON, please first convert it to JSON-LD using the Utility Toolbar. Using AI, this tool
+      then transforms your JSON-LD data into RDF through the RML Mapping Language.
     </p>
   </PanelSettings>
   <RdfEditorPanel :sessionMode="props.sessionMode" />

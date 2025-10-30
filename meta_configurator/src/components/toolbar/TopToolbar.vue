@@ -115,7 +115,7 @@ useMagicKeys({
           @show-import-csv-dialog="() => showCsvImportDialog()"
           @show-schemastore-dialog="() => showSchemaStoreDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()" 
+          @show-data-mapping-dialog="() => showDataMappingDialog()"
           @show-rml-mapping-dialog="() => showRmlMappingDialog()" />
 
         <Divider layout="vertical" />
@@ -185,7 +185,7 @@ useMagicKeys({
           @show-import-csv-dialog="() => showCsvImportDialog()"
           @show-schemastore-dialog="() => showSchemaStoreDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()" 
+          @show-data-mapping-dialog="() => showDataMappingDialog()"
           @show-rml-mapping-dialog="() => showRmlMappingDialog()" />
       </div>
 
