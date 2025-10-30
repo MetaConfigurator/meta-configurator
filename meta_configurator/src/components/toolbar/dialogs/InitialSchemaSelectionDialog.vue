@@ -39,14 +39,15 @@ defineExpose({show: openDialog, close: hideDialog});
 
 <template>
   <Dialog v-model:visible="showDialog" header="Select a Schema">
-    <div class="flex flex-column gap-3 bigger-dialog-content">
-      <div v-for="category in categories" :key="category.key" class="flex align-items-center">
+    <div class="flex flex-col gap-3 bigger-dialog-content">
+      <div v-for="category in categories" :key="category.key" class="flex justify-center">
         <Button
           v-model="selectedCategory"
           :label="category.name"
           :inputId="category.key"
           name="category"
           :value="category.name"
+          class="w-full"
           @click="
             () => {
               $emit('user_selected_option', category.key);
