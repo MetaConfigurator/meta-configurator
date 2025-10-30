@@ -101,6 +101,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
       const inputFiles = {
           'Data.json': `${JSON.stringify(input)}`
         };
+      console.log('Performing RML mapping with config: ', input);  
       const result = await RmlMapper.parseTurtle(config, inputFiles, options);
       // To-Do: How to create context ???
       const context = {
@@ -118,7 +119,9 @@ export class RmlMappingServiceStandard implements RmlMappingService {
       return {
         resultData: {},
         success: false,
-        message: `Data mapping failed. Please check the mapping configuration. Use <a href="https://rml.io/specs/rml/" target="_blank">https://rml.io/specs/rml/</a> to validate and fix your RML expression. Reason: ${e.message}.`,
+        message: `Data mapping failed. Please check the mapping configuration. 
+        Use <a href="https://rml.io/specs/rml/" target="_blank">https://rml.io/specs/rml/</a> 
+        to validate and fix your RML expression. Reason: ${e.message}.`,
       };
     }
   }
