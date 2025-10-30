@@ -30,15 +30,12 @@ defineExpose({show: openDialog, close: hideDialog});
   <Dialog v-model:visible="showDialog" header="Fetch Schema from URL" modal class="max-w-md w-full">
     <div class="flex flex-col gap-4 p-2">
       <div class="flex flex-col gap-2">
-        <label for="urlInput" class="font-medium text-gray-700">
-          Schema URL
-        </label>
+        <label for="urlInput" class="font-medium text-gray-700"> Schema URL </label>
         <InputText
           v-model="schemaUrl"
           id="urlInput"
           placeholder="https://json-schema.org/draft/2020-12/schema"
-          class="w-full"
-        />
+          class="w-full" />
       </div>
 
       <small class="text-gray-500">
@@ -47,7 +44,12 @@ defineExpose({show: openDialog, close: hideDialog});
 
       <div class="flex justify-end gap-3 mt-4">
         <Button label="Cancel" icon="pi pi-times" @click="hideDialog" class="p-button-text" />
-        <Button label="Fetch Schema" icon="pi pi-download" @click="fetchSchemaFromSelectedUrl" :disabled="!schemaUrl" autofocus />
+        <Button
+          label="Fetch Schema"
+          icon="pi pi-download"
+          @click="fetchSchemaFromSelectedUrl"
+          :disabled="!schemaUrl"
+          autofocus />
       </div>
     </div>
   </Dialog>
