@@ -11,9 +11,8 @@ import {
 import {cloneDeep} from 'lodash';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import * as RmlMapper from '@comake/rmlmapper-js';
-import { Parser as N3Parser } from "n3";
+import {Parser as N3Parser} from 'n3';
 import jsonld from 'jsonld';
-
 
 const options = {
   toRDF: true,
@@ -100,8 +99,8 @@ export class RmlMappingServiceStandard implements RmlMappingService {
   ): Promise<{resultData: any; success: boolean; message: string}> {
     try {
       const inputFiles = {
-          'Data.json': `${JSON.stringify(input)}`
-        };
+        'Data.json': `${JSON.stringify(input)}`,
+      };
       let prefixes: Record<string, string> = {};
       new N3Parser().parse(config, (error: any, quads: any, prefixMap: Record<string, string>) => {
         if (prefixMap) {
@@ -113,8 +112,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
       let final_jsonld = await jsonld.compact(expanded, prefixes);
       if (parameters!.compactMode) {
         final_jsonld = await jsonld.compact(expanded, prefixes);
-      }
-      else {
+      } else {
         final_jsonld = await jsonld.flatten(expanded, prefixes);
       }
       return {

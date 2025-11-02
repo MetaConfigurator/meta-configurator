@@ -174,7 +174,7 @@ function performMapping() {
 
   const parameters: Record<string, any> = {
     compactMode: compactMode.value,
-  }
+  };
   mappingService.value.performRmlMapping(input.value, config, parameters).then(res => {
     if (res.success) {
       statusMessage.value = res.message;
@@ -225,23 +225,23 @@ defineExpose({show: openDialog, close: hideDialog});
           placeholder="e.g., rename fields, format dates..." />
       </div>
 
-      <div v-if="mappingServiceTypes && mappingServiceTypes.length > 1" class="flex items-center gap-2">
+      <div
+        v-if="mappingServiceTypes && mappingServiceTypes.length > 1"
+        class="flex items-center gap-2">
         <label class="font-semibold">Mapping Method</label>
         <Select
           v-model="selectedMappingServiceType"
           :options="mappingServiceTypes"
           class="flex-1" />
       </div>
-     
+
       <div class="flex items-center gap-2">
         <InputSwitch v-model="compactMode" />
         <label class="font-semibold">Enable JSON-LD Compact Mode</label>
       </div>
 
       <div v-if="compactMode">
-        <p class="text-sm text-gray-600">
-          Merges nodes into a single object if possible.
-        </p>
+        <p class="text-sm text-gray-600">Merges nodes into a single object if possible.</p>
       </div>
       <div v-if="!compactMode">
         <p class="text-sm text-gray-600">
