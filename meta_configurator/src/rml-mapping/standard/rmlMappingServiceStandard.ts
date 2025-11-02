@@ -11,10 +11,10 @@ import {
 import {cloneDeep} from 'lodash';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import * as RmlMapper from '@comake/rmlmapper-js';
-import {Parser} from 'n3';
+import { Parser as N3Parser } from "n3";
 import jsonld from 'jsonld';
 
-const ttl_parser = new Parser();
+
 const options = {
   toRDF: true,
   replace: false,
@@ -95,22 +95,30 @@ export class RmlMappingServiceStandard implements RmlMappingService {
 
   async performRmlMapping(
     input: any,
-    config: string
+    config: string,
+    parameters?: Record<string, any>
   ): Promise<{resultData: any; success: boolean; message: string}> {
     try {
       const inputFiles = {
           'Data.json': `${JSON.stringify(input)}`
         };
-      console.log('Performing RML mapping with config: ', input);  
+      let prefixes: Record<string, string> = {};
+      new N3Parser().parse(config, (error: any, quads: any, prefixMap: Record<string, string>) => {
+        if (prefixMap) {
+          prefixes = prefixMap;
+        }
+      });
       const result = await RmlMapper.parseTurtle(config, inputFiles, options);
-      // To-Do: How to create context ???
-      const context = {
-        ex: 'http://example.com/ns#',
-      };
       const expanded = await jsonld.fromRDF(result, {format: 'application/n-quads'});
-      const compacted = await jsonld.compact(expanded, context);
+      let final_jsonld = await jsonld.compact(expanded, prefixes);
+      if (parameters!.compactMode) {
+        final_jsonld = await jsonld.compact(expanded, prefixes);
+      }
+      else {
+        final_jsonld = await jsonld.flatten(expanded, prefixes);
+      }
       return {
-        resultData: compacted,
+        resultData: final_jsonld,
         success: true,
         message: 'Data mapping performed successfully.',
       };
@@ -143,7 +151,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
 
   validateMappingConfig(config: string, input: any): {success: boolean; message: string} {
     try {
-      let _ = ttl_parser.parse(config);
+      let _ = new N3Parser().parse(config);
       return {success: true, message: 'Mapping configuration is valid.'};
     } catch (error) {
       if (

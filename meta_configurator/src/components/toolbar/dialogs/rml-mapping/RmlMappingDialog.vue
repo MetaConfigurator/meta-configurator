@@ -6,6 +6,7 @@ import Button from 'primevue/button';
 import Select from 'primevue/select';
 import Divider from 'primevue/divider';
 import Message from 'primevue/message';
+import InputSwitch from 'primevue/inputswitch';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
@@ -38,6 +39,8 @@ const mappingServiceTypes = ['Standard (RML)'];
 const mappingServiceWarnings = ['No warnings for the RML mapping service at the moment.'];
 
 const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]);
+
+const compactMode = ref(false);
 
 const mappingService: Ref<RmlMappingService> = computed(() => {
   if (selectedMappingServiceType.value === 'Standard (RML)') {
@@ -169,7 +172,10 @@ function performMapping() {
     return;
   }
 
-  mappingService.value.performRmlMapping(input.value, config).then(res => {
+  const parameters: Record<string, any> = {
+    compactMode: compactMode.value,
+  }
+  mappingService.value.performRmlMapping(input.value, config, parameters).then(res => {
     if (res.success) {
       statusMessage.value = res.message;
       errorMessage.value = '';
@@ -200,7 +206,6 @@ defineExpose({show: openDialog, close: hideDialog});
         <ApiKey />
       </PanelSettings>
       <ApiKeyWarning />
-
       <Message severity="warn" v-if="mappingServiceWarning.length">
         <span v-html="mappingServiceWarning"></span>
       </Message>
@@ -220,14 +225,29 @@ defineExpose({show: openDialog, close: hideDialog});
           placeholder="e.g., rename fields, format dates..." />
       </div>
 
-      <div class="flex items-center gap-2">
+      <div v-if="mappingServiceTypes && mappingServiceTypes.length > 1" class="flex items-center gap-2">
         <label class="font-semibold">Mapping Method</label>
         <Select
           v-model="selectedMappingServiceType"
           :options="mappingServiceTypes"
           class="flex-1" />
       </div>
+     
+      <div class="flex items-center gap-2">
+        <InputSwitch v-model="compactMode" />
+        <label class="font-semibold">Enable JSON-LD Compact Mode</label>
+      </div>
 
+      <div v-if="compactMode">
+        <p class="text-sm text-gray-600">
+          Merges nodes into a single object if possible.
+        </p>
+      </div>
+      <div v-if="!compactMode">
+        <p class="text-sm text-gray-600">
+          In final JSON-LD document, every triple is a separate node.
+        </p>
+      </div>
       <Button
         label="Generate Suggestion"
         icon="pi pi-wand"

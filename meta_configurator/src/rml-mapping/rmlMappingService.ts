@@ -11,6 +11,7 @@ export interface RmlMappingService {
   ): Promise<{config: string; success: boolean; message: string}>;
   performRmlMapping(
     input: any,
-    config: string
+    config: string,
+    parameters?: Record<string, any>
   ): Promise<{resultData: any; success: boolean; message: string}>;
 }
