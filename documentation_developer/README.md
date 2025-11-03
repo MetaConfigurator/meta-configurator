@@ -23,3 +23,31 @@ To launch the application, follow these steps:
    ```sh
    npm run dev
    ```
+
+## Formatting and Linting
+
+When you push your changes to the repository, one of the Github workflows automatically performs a linting check, as well as an automated formatting.
+To run the linting or formatting by yourself, type:
+
+```sh
+npm run lint
+npm run prettier
+```
+
+To avoid/fix merge conflicts due to the automated formatting, you can do either:
+
+1. Call `npm run prettier` locally before you push.
+2. Or before you push a second time, first pull the new formatting changes.
+3. Or `rebase` and simply overwrite all formatting changes of the remote with your current code. The formatting will anyways be executed again. 
+
+## Tests
+
+For detailed testing descriptions, see [the testing documentation](TESTING.md)
+
+In short, run unit tests and end-to-end tests the following way:
+
+
+```sh
+npm run test
+npm run test:e2e
+```
