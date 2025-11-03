@@ -12,16 +12,14 @@ import 'brace/mode/yaml';
 import 'brace/mode/xml';
 import 'brace/theme/clouds';
 import 'brace/theme/clouds_midnight';
-import {setupAnnotationsFromValidationErrors} from '@/components/panels/code-editor/setupAnnotations';
-import {
-  setupLinkToCurrentSelection,
-  setupLinkToData,
-} from '@/components/panels/rdf/setupLinkToSelectionAndData';
 import {useSettings} from '@/settings/useSettings';
 import {modeToDocumentTypeDescription, SessionMode} from '@/store/sessionMode';
 import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 import Message from 'primevue/message';
 import {sizeOf} from '@/utility/sizeOf';
+import {getDataForMode} from '@/data/useDataLink';
+import * as jsonld from 'jsonld';
+import * as N3 from 'n3';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -35,16 +33,11 @@ let editor: Ref<Editor | undefined> = ref(undefined);
 
 onMounted(() => {
   editor.value = ace.edit(editor_id);
-  // setupAceMode(editor.value, settings.value);
+  setupAceMode(editor.value, settings.value);
   setupAceProperties(editor.value, settings.value);
-
-  setupLinkToData(editor.value, props.sessionMode);
-  setupLinkToCurrentSelection(editor.value, props.sessionMode);
-  setupAnnotationsFromValidationErrors(editor.value, props.sessionMode);
   editor.value.setReadOnly(true);
 });
 
-// watch for changes in the data format and update the editor accordingly
 watch(
   () => settings.value.dataFormat,
   _ => {
@@ -53,6 +46,39 @@ watch(
     }
   }
 );
+
+watch(
+  () => getDataForMode(props.sessionMode).data.value,
+  async dataValue => {
+    try {
+      const nquads = await jsonLdToTurtle(dataValue);
+      editor.value?.setValue(nquads);
+    } catch (err) {
+      console.error('Error converting JSON-LD to RDF:', err);
+    }
+  },
+  {immediate: true}
+);
+
+async function jsonLdToTurtle(jsonLdData: any): Promise<string> {
+  try {
+    const nquads = (await jsonld.toRDF(jsonLdData, {
+      format: 'application/n-quads',
+    })) as string;
+    const parser = new N3.Parser({format: 'N-Quads'});
+    const quads = parser.parse(nquads);
+    const writer = new N3.Writer({prefixes: jsonLdData['@context'] || {}});
+    writer.addQuads(quads);
+    return new Promise((resolve, reject) => {
+      writer.end((error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      });
+    });
+  } catch (error) {
+    throw new Error(`Conversion failed: ${error}`);
+  }
+}
 
 function isEditorReadOnly(): boolean {
   const dataFormat = settings.value.dataFormat;
