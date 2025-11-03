@@ -19,6 +19,7 @@ import {useSettings} from '@/settings/useSettings';
 import {useDebounceFn} from '@vueuse/core';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
+import {errorService} from '@/main';
 
 const showDialog = ref(false);
 const editor_id = 'rml-mapping-' + Math.random();
@@ -161,6 +162,12 @@ function generateMappingSuggestion() {
       }
       isLoadingMapping.value = false;
       validateConfig(res.config, input.value);
+    })
+    .catch(error => {
+      errorService.onError(error);
+    })
+    .finally(() => {
+      isLoadingMapping.value = false;
     });
 }
 
