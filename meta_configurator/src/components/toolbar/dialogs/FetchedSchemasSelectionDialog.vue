@@ -6,7 +6,6 @@ import Listbox from 'primevue/listbox';
 import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 import {fetchSchemaFromUrl} from '@/components/toolbar/fetchSchemaFromUrl';
 import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
-import {loadExampleSchema} from '@/components/toolbar/fetchExampleSchemas';
 import {useErrorService} from '@/utility/errorServiceInstance';
 
 const showDialog = ref(false);
@@ -27,13 +26,7 @@ watch(selectedSchema, async newSelectedSchema => {
       useErrorService().onError(error);
     }
   } else if (newSelectedSchema.key) {
-    try {
-      loadExampleSchema(newSelectedSchema.key);
-      hideDialog();
-      openClearDataEditorDialog();
-    } catch (error) {
-      useErrorService().onError(error);
-    }
+    useErrorService().onError(new Error(`Fetching schema by key is currently not supported: ${newSelectedSchema.key}`));
   }
 });
 

@@ -19,9 +19,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
-  (e: 'show-url-dialog'): void;
-  (e: 'show-example-schemas-dialog'): void;
-  (e: 'show-schemastore-dialog'): void;
+  (e: 'show-schema-selection-dialog'): void;
   (e: 'show-import-csv-dialog'): void;
   (e: 'show-snapshot-dialog'): void;
   (e: 'show-about-dialog'): void;
@@ -33,16 +31,8 @@ const emit = defineEmits<{
 const settings = useSettings();
 const dataFormatOptions = formatRegistry.getFormatNames();
 
-async function showSchemaStoreDialog() {
-  emit('show-schemastore-dialog');
-}
-
-function showExampleSchemasDialog() {
-  emit('show-example-schemas-dialog');
-}
-
-function showUrlDialog() {
-  emit('show-url-dialog');
+async function showSchemaSelectionDialog() {
+  emit('show-schema-selection-dialog');
 }
 
 function showCsvImportDialog() {
@@ -105,10 +95,8 @@ useMagicKeys({
           :current-mode="props.currentMode"
           @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
           @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
-          @show-url-dialog="() => showUrlDialog()"
-          @show-example-schemas-dialog="() => showExampleSchemasDialog()"
           @show-import-csv-dialog="() => showCsvImportDialog()"
-          @show-schemastore-dialog="() => showSchemaStoreDialog()"
+          @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()" />
 
@@ -174,10 +162,8 @@ useMagicKeys({
           :current-mode="props.currentMode"
           @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
           @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
-          @show-url-dialog="() => showUrlDialog()"
-          @show-example-schemas-dialog="() => showExampleSchemasDialog()"
           @show-import-csv-dialog="() => showCsvImportDialog()"
-          @show-schemastore-dialog="() => showSchemaStoreDialog()"
+          @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()" />
       </div>

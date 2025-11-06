@@ -3,18 +3,15 @@
 import {defineEmits, ref, watch} from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
+import {SCHEMA_SELECTION_CATEGORIES} from '@/components/toolbar/schemaSelectionCategories';
 
 const showDialog = ref(false);
 
-const categories = ref<Array<{name: string; key: 'Example' | 'JsonStore' | 'File' | 'URL'}>>([
-  {name: 'Example Schema', key: 'Example'},
-  {name: 'From Json Schema Store', key: 'JsonStore'},
-  {name: 'Open Schema File', key: 'File'},
-  {name: 'Load Schema from URL', key: 'URL'},
-]);
+
 
 defineEmits<{
-  (e: 'user_selected_option', option: 'Example' | 'JsonStore' | 'File' | 'URL'): void;
+  (e: 'user_selected_default_option', option: 'JsonStore' | 'File' | 'URL'): void;
+  (e: 'user_selected_custom_option', label: string): void;
 }>();
 
 const selectedCategory = ref();
@@ -40,7 +37,7 @@ defineExpose({show: openDialog, close: hideDialog});
 <template>
   <Dialog v-model:visible="showDialog" header="Select a Schema">
     <div class="flex flex-col gap-3 bigger-dialog-content">
-      <div v-for="category in categories" :key="category.key" class="flex justify-center">
+      <div v-for="category in SCHEMA_SELECTION_CATEGORIES" :key="category.key" class="flex justify-center">
         <Button
           v-model="selectedCategory"
           :label="category.name"
@@ -50,7 +47,11 @@ defineExpose({show: openDialog, close: hideDialog});
           class="w-full"
           @click="
             () => {
-              $emit('user_selected_option', category.key);
+              if (category.key === 'Custom') {
+                $emit('user_selected_custom_option', category.name);
+              } else {
+              $emit('user_selected_default_option', category.key);
+              }
               hideDialog();
             }
           " />

@@ -2,7 +2,6 @@
 import {ref} from 'vue';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 import {SessionMode} from '@/store/sessionMode';
-import {schemaCollection} from '@/packaged-schemas/schemaCollection';
 import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
 import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import InitialSchemaSelectionDialog from '@/components/toolbar/dialogs/InitialSchemaSelectionDialog.vue';
@@ -18,6 +17,7 @@ import {useSettings} from '@/settings/useSettings';
 import {hasCurrentNewsChanged, setCurrentNewsHash} from '@/components/toolbar/currentNews';
 import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExportDialog.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {fetchExternalContent} from '@/utility/fetchExternalContent';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -30,11 +30,8 @@ const emit = defineEmits<{
 const showAboutDialog = ref(false);
 const showNewsDialog = ref(false);
 
-function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File' | 'URL') {
+function handleUserSchemaDialogSelectionDefault(option: 'JsonStore' | 'File' | 'URL') {
   switch (option) {
-    case 'Example':
-      showExampleSchemasDialog();
-      break;
     case 'JsonStore':
       showSchemaStoreDialog();
       break;
@@ -45,6 +42,35 @@ function handleUserSchemaDialogSelection(option: 'Example' | 'JsonStore' | 'File
       showUrlDialog();
       break;
   }
+}
+
+async function handleUserSchemaDialogSelectionCustom(label: string) {
+  const schemas = useSettings().value.schemaSelectionLists.find(
+    list => list.label === label,
+  )?.schemas;
+  if (!schemas) {
+    useErrorService().onError(new Error(`Could not find schema selection list with label: ${label}`));
+    return;
+  }
+  // schemas is either an URL to a JSON document that specifies the schemas, or directly an array of schemas
+  // if it is an URL, first resolve it and then proceed
+  let schemaList: {label: string, url: string}[] = [];
+  if (typeof schemas === 'string') {
+    try {
+      const fetchedContent = await fetchExternalContent(schemas);
+      schemaList = await fetchedContent.json();
+    } catch (error) {
+      useErrorService().onError(new Error(`Could not fetch schema selection list from URL: ${schemas}`));
+      return;
+    }
+  } else if (Array.isArray(schemas)) {
+    schemaList = schemas;
+  } else {
+    useErrorService().onError(new Error(`Invalid schema selection list format for label: ${label}`));
+    return;
+  }
+  fetchedSchemasSelectionDialog.value.setSchemas(schemaList);
+  fetchedSchemasSelectionDialog.value.show();
 }
 
 function showCodeGenerationDialog(schemaMode: boolean) {
@@ -85,10 +111,6 @@ async function showSchemaStoreDialog(): Promise<void> {
   } catch (error) {
     useErrorService().onError(error);
   }
-}
-function showExampleSchemasDialog() {
-  fetchedSchemasSelectionDialog.value.setSchemas(schemaCollection);
-  fetchedSchemasSelectionDialog.value.show();
 }
 
 function showUrlDialog() {
@@ -144,7 +166,8 @@ defineExpose({
 
   <InitialSchemaSelectionDialog
     ref="initialSchemaSelectionDialog"
-    @user_selected_option="option => handleUserSchemaDialogSelection(option)" />
+    @user_selected_default_option="option => handleUserSchemaDialogSelectionDefault(option)"
+    @user_selected_custom_option="label => handleUserSchemaDialogSelectionCustom(label)" />
 
   <ImportCsvDialog ref="csvImportDialog" />
 
@@ -166,12 +189,10 @@ defineExpose({
 
   <TopToolbar
     :current-mode="props.currentMode"
-    @show-url-dialog="() => showUrlDialog()"
     @show-about-dialog="() => (showAboutDialog = true)"
-    @show-example-schemas-dialog="() => showExampleSchemasDialog()"
     @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
     @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
-    @show-schemastore-dialog="() => showSchemaStoreDialog()"
+    @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
     @show-import-csv-dialog="() => showCsvImportDialog()"
     @show-snapshot-dialog="() => showSnapshotDialog()"
     @show-data-mapping-dialog="() => showDataMappingDialog()"
