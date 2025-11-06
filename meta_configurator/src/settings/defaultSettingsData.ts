@@ -118,4 +118,32 @@ export const SETTINGS_DATA_DEFAULT = {
     temperature: 0.0,
     endpoint: 'https://api.openai.com/v1/',
   },
+  schemaSelectionLists: [
+    {
+      label: 'Example Schemas',
+      schemas: [
+        {
+          label: 'Feature Testing Schema',
+          url: 'https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/schema_selection_list/example.schema.json',
+        },
+        {
+          label: 'Strenda Schema',
+          url: 'https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/schema_selection_list/strenda.schema.json',
+        },
+        {
+          label: 'EnzymeML Schema',
+          url: 'https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/schema_selection_list/enzymeMl.schema.json',
+        },
+        {
+          label: 'Autonomous Vehicle Schema',
+          url: 'https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/schema_selection_list/autonomousVehicle.schema.json',
+        },
+      ],
+    },
+    {
+      label: 'preCICE Schemas',
+      schemas:
+        'https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/schema_selection_list/preCICESchemas.json',
+    },
+  ],
 };

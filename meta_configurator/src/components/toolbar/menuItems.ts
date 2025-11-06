@@ -1,4 +1,4 @@
-import {openUploadFileDialog, openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
+import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {clearCurrentFile} from '@/components/toolbar/clearFile';
 import {useSessionStore} from '@/store/sessionStore';
@@ -10,7 +10,6 @@ import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
-import {panelTypeGuiEditor} from '@/components/panels/defaultPanelTypes';
 import {openImportSchemaDialog} from '@/components/toolbar/importFile';
 import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchemaDefinitions';
 
@@ -20,9 +19,7 @@ import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchem
 export class MenuItems {
   sessionStore = useSessionStore();
 
-  private readonly onFromWebClick: () => Promise<void>;
-  private readonly onFromOurExampleClick: () => void;
-  private readonly handleFromURLClick: () => void;
+  private readonly showSchemaSelectionDialog: () => void;
   private readonly showImportCsvDialog: () => void;
   private readonly showSnapshotDialog: () => void;
   private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
@@ -31,9 +28,7 @@ export class MenuItems {
   private readonly inferJsonSchemaFromSampleData: () => void;
 
   constructor(
-    onFromSchemaStoreClick: () => Promise<void>,
-    onFromOurExampleClick: () => void,
-    onFromURLClick: () => void,
+    showSchemaSelectionDialog: () => void,
     showImportCsvDialog: () => void,
     showSnapshotDialog: () => void,
     showCodeGenerationDialog: (schemaMode: boolean) => void,
@@ -41,9 +36,7 @@ export class MenuItems {
     showDataMappingDialog: () => void,
     inferJsonSchemaFromSampleData: () => void
   ) {
-    this.onFromWebClick = onFromSchemaStoreClick;
-    this.onFromOurExampleClick = onFromOurExampleClick;
-    this.handleFromURLClick = onFromURLClick;
+    this.showSchemaSelectionDialog = showSchemaSelectionDialog;
     this.showImportCsvDialog = showImportCsvDialog;
     this.showSnapshotDialog = showSnapshotDialog;
     this.showCodeGenerationDialog = showCodeGenerationDialog;
@@ -67,6 +60,7 @@ export class MenuItems {
             label: 'Generate Data...',
             icon: 'fa-solid fa-gears',
             command: openGenerateDataDialog,
+            disabled: true,
           },
         ],
       },
@@ -93,24 +87,24 @@ export class MenuItems {
           downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
       },
       {
-        label: 'Utility',
+        label: 'Utility...',
         icon: 'fa-solid fa-wrench',
         key: 'utility',
         items: [
           {
-            label: 'Transform Data to match the Schema',
+            label: 'Transform Data to match the Schema...',
             icon: 'fa-solid fa-wand-magic-sparkles',
             command: this.showDataMappingDialog,
           },
           {
-            label: 'Export Data via Text Template',
+            label: 'Export Data via Text Template...',
             icon: 'fa-solid fa-file-export',
             command: () => this.showDataExportDialog(false),
           },
         ],
       },
       {
-        label: 'Share Snapshot',
+        label: 'Share Snapshot...',
         icon: 'fa-solid fa-share',
         command: this.showSnapshotDialog,
         key: 'snapshot',
@@ -171,32 +165,10 @@ export class MenuItems {
       {
         label: 'Open JSON Schema...',
         icon: 'fa-regular fa-folder-open',
-        items: [
-          {
-            label: 'From File',
-            icon: 'fa-regular fa-folder-open',
-            command: openUploadSchemaDialog,
-          },
-
-          {
-            label: 'From JSON Schema Store',
-            icon: 'fa-solid fa-database',
-            command: this.onFromWebClick,
-          },
-          {
-            label: 'From URL',
-            icon: 'fa-solid fa-globe',
-            command: this.handleFromURLClick,
-          },
-          {
-            label: 'Example Schemas',
-            icon: 'fa-solid fa-database',
-            command: this.onFromOurExampleClick,
-          },
-        ],
+        command: () => this.showSchemaSelectionDialog(),
       },
       {
-        label: 'Import Schema...',
+        label: 'Insert Schema...',
         icon: 'fa-solid fa-file-import',
         items: [
           {
@@ -211,7 +183,7 @@ export class MenuItems {
         command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
       },
       {
-        label: 'Utility',
+        label: 'Utility...',
         icon: 'fa-solid fa-wrench',
         key: 'utility',
         items: [
@@ -228,7 +200,7 @@ export class MenuItems {
         command: () => this.showCodeGenerationDialog(true),
       },
       {
-        label: 'Share Snapshot',
+        label: 'Share Snapshot...',
         icon: 'fa-solid fa-share',
         command: this.showSnapshotDialog,
         key: 'snapshot',

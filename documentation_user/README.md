@@ -5,6 +5,7 @@
 * [MOF Synthesis Example](examples/mof_synthesis) (Demonstrates CSV Import, Schema Generation, Schema Editing, Data Editing, JSON Export)
 * [Configurator Building](examples/configurator_building) (Shows how to use MetaConfigurator as a Configurator Builder, allowing users to create and share URLs that open MetaConfigurator with preloaded schema, data, and settings)
 * [Code Generation](examples/code_generation) (Shows how to generate code in multiple programming languages from JSON schemas)
+* [Schema Selection List](examples/schema_selection_list) (Provide your users a pre-defined list of schemas to choose from; useful for organizations)
 
 ## Load a Schema
 

@@ -18,9 +18,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'show-url-dialog'): void;
-  (e: 'show-example-schemas-dialog'): void;
-  (e: 'show-schemastore-dialog'): void;
+  (e: 'show-schema-selection-dialog'): void;
   (e: 'show-import-csv-dialog'): void;
   (e: 'show-snapshot-dialog'): void;
   (e: 'show-codegen-dialog', schemaMode: boolean): void;
@@ -30,9 +28,7 @@ const emit = defineEmits<{
 
 const settings = useSettings();
 const topMenuBar = new MenuItems(
-  handleFromWebClick,
-  handleFromOurExampleClick,
-  showUrlDialog,
+  showSchemaSelectionDialog,
   showCsvImportDialog,
   showSnapshotDialog,
   showCodeGenerationDialog,
@@ -41,16 +37,8 @@ const topMenuBar = new MenuItems(
   inferSchemaFromSampleData
 );
 
-async function handleFromWebClick() {
-  emit('show-schemastore-dialog');
-}
-
-function handleFromOurExampleClick() {
-  emit('show-example-schemas-dialog');
-}
-
-function showUrlDialog() {
-  emit('show-url-dialog');
+function showSchemaSelectionDialog() {
+  emit('show-schema-selection-dialog');
 }
 
 function showCsvImportDialog() {

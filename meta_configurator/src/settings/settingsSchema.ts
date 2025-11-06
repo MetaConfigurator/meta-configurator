@@ -525,6 +525,63 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
+    schemaSelectionLists: {
+      type: 'array',
+      title: 'Schema Selection Lists',
+      description: 'The schema selection lists to show to the user.',
+      items: {
+        type: 'object',
+        required: ['label', 'schemas'],
+        additionalProperties: false,
+        title: 'Schema Selection List',
+        description: 'A list of schemas to select from.',
+        properties: {
+          label: {
+            type: 'string',
+            title: 'Label',
+            description: 'The label of the schema list to be shown in the schema selection dialog.',
+          },
+          schemas: {
+            type: ['string', 'array'],
+            description:
+              'List of schemas to select from. Each schema has a title and a URL to load it from. Either provide a URL to a JSON file containing an array of such schema entries, or provide the array directly.',
+            oneOf: [
+              {
+                type: 'string',
+                title: 'URL to Schema Selection List',
+                description: 'A URL to a JSON file containing an array of schema entries.',
+                format: 'uri',
+              },
+              {
+                type: 'array',
+                title: 'Schema Entries',
+                description: 'An array of schema entries.',
+                items: {
+                  type: 'object',
+                  required: ['label', 'url'],
+                  additionalProperties: false,
+                  title: 'Schema Entry',
+                  description: 'A schema entry with a title and a URL to load it from.',
+                  properties: {
+                    label: {
+                      type: 'string',
+                      title: 'Label',
+                      description: 'The label/ title of the schema.',
+                    },
+                    url: {
+                      type: 'string',
+                      title: 'URL',
+                      description: 'The URL to load the schema from.',
+                      format: 'uri',
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
   },
   $defs: {
     panels: {

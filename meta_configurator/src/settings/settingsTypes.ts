@@ -18,6 +18,7 @@ export interface SettingsInterfaceRoot {
   backend: SettingsInterfaceBackend;
   rdf: SettingsInterfaceRdf;
   aiIntegration: SettingsInterfaceAiIntegraton;
+  schemaSelectionLists: SettingsInterfaceSchemaSelectionList[];
 }
 
 export interface SettingsInterfacePerformance {
@@ -118,4 +119,14 @@ export interface SettingsInterfaceAiIntegraton {
   maxTokens: number;
   temperature: number;
   endpoint: string;
+}
+
+export interface SettingsInterfaceSchemaSelectionList {
+  label: string;
+  schemas: string | SettingsInterfaceSchemaSelectionListEntry[];
+}
+
+export interface SettingsInterfaceSchemaSelectionListEntry {
+  label: string;
+  url: string;
 }
