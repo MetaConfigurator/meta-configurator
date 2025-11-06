@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Adapter Configuration Schema",
+    "url": "https://github.com/precice/preeco-orga/blob/main/adapter-config-schema/precice_adapter_config_schema.json"
+  },
+  {
+    "label": "Topology Schema",
+    "url": "https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/schema_selection_list/topology.schema.json"
+  }
+]

@@ -1,0 +1,228 @@
+{
+  "type": "object",
+  "properties": {
+    "coupling-scheme": {
+      "type": "object",
+      "properties": {
+        "max-time": {
+          "type": "number",
+          "default": 1e-3
+        },
+        "time-window-size": {
+          "type": "number",
+          "default": 1e-3
+        },
+        "max-iterations": {
+          "type": "integer",
+          "default": 50
+        },
+        "display_standard_values": {
+          "type": "boolean",
+          "default": false
+        },
+        "coupling": {
+          "type": "string",
+          "enum": ["parallel", "serial"],
+          "default": "parallel"
+        }
+      },
+      "required": [ ],
+      "optional": [ "display_standard_values", "max-time", "time-window-size", "max-iterations", "coupling" ]
+    },
+    "acceleration": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Type of acceleration method",
+          "enum": ["constant", "aitken", "IQN-ILS", "IQN-IMVJ"],
+          "default": "IQN-ILS"
+        },
+        "initial-relaxation": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "enforce": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "additionalProperties": false,
+          "required": ["value"],
+          "description": "Initial under-relaxation factor"
+        },
+        "preconditioner": {
+          "type": "object",
+          "description": "Preconditioner configuration",
+          "properties": {
+            "freeze-after": {
+              "type": "integer",
+              "description": "Time window after which preconditioner stops updating (-1 = never)",
+              "minimum": -1,
+              "default": -1
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of preconditioner",
+              "enum": ["constant", "value", "residual", "residual-sum"]
+            }
+          },
+          "required": [ "freeze-after" ],
+          "optional": [ "type" ]
+        },
+        "filter": {
+          "type": "object",
+          "description": "QR1/2 filter configuration",
+          "properties": {
+            "limit": {
+              "type": "number",
+              "description": "Threshold for filtering singular values",
+              "exclusiveMinimum": 0,
+              "default": 1e-16
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of filtering",
+              "enum": ["QR1", "QR2"]
+            }
+          },
+          "required": [ "limit" ],
+          "optional": [ "type" ]
+        },
+        "max-used-iterations": {
+          "type": "integer",
+          "description": "Maximum number of previous iterations used for IQN methods",
+          "minimum": 0
+        },
+        "time-windows-reused": {
+          "type": "integer",
+          "description": "Number of past time windows reused for IQN methods",
+          "minimum": 0
+        },
+        "imvj-restart-mode": {
+          "type": "object",
+          "description": "Configuration for IMVJ restart mode",
+          "properties": {
+            "truncation-threshold": {
+              "type": "number",
+              "description": "Threshold for truncating singular values during restart",
+              "exclusiveMinimum": 0,
+              "default": 0.0001
+            },
+            "chunk-size": {
+              "type": "integer",
+              "description": "Number of time windows between restarts",
+              "minimum": 1,
+              "default": 8
+            },
+            "reused-time-windows-at-restart": {
+              "type": "integer",
+              "description": "Number of time windows reused after restart",
+              "minimum": 0,
+              "default": 8
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of restart mode",
+              "enum": ["no-restart", "RS-0", "RS-LS", "RS-SVD", "RS-SLIDE"],
+              "default": "RS-SVD"
+            }
+          },
+          "required": [ "truncation-threshold", "chunk-size", "reused-time-windows-at-restart","type" ],
+          "optional": [  ]
+        },
+        "display_standard_values": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [ ],
+      "optional": [ "name", "initial-relaxation", "preconditioner", "filter", "max-used-iterations", "time-windows-reused", "display_standard_values", "imvj-restart-mode" ]
+    },
+    "participants": {
+      "type": "array",
+      "description": "List of participants in the coupling simulation",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique name of the participant"
+          },
+          "solver": {
+            "type": "string",
+            "description": "Solver used by the participant"
+          },
+          "dimensionality": {
+            "type": "integer",
+            "description": "Dimensionality of the participant's problem",
+            "default": 3
+          }
+        },
+        "required": ["name", "solver"]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "exchanges": {
+      "type": "array",
+      "description": "Defines the data exchanges between participants in the coupling simulation",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Name of the source participant sending data"
+          },
+          "from-patch": {
+            "type": "string",
+            "description": "Specific interface patch or surface on the source participant from which data is sent"
+          },
+          "to": {
+            "type": "string",
+            "description": "Name of the target participant receiving data"
+          },
+          "to-patch": {
+            "type": "string",
+            "description": "Specific interface patch or surface on the target participant where data is received"
+          },
+          "data": {
+            "type": "string",
+            "description": "Type of data being exchanged (e.g., Force, Displacement, Velocity)",
+            "pattern": "^(Force|Displacement|Velocity|Pressure|Temperature|HeatTransfer).*$"
+          },
+          "data-type": {
+            "type": "string",
+            "description": "Specifies whether the data is a scalar or vector quantity",
+            "enum": ["scalar", "vector"],
+            "default": "scalar"
+          },
+          "type": {
+            "type": "string",
+            "description": "Defines the coupling type: 'strong' for tight coupling, 'weak' for loose coupling",
+            "enum": ["strong", "weak"]
+          }
+        },
+        "required": [
+          "from",
+          "from-patch",
+          "to",
+          "to-patch",
+          "data",
+          "type"
+        ],
+        "optional": [ "data-type" ]
+      }
+    }
+  },
+  "required": [
+    "coupling-scheme",
+    "participants",
+    "exchanges"
+  ],
+  "optional": [ "acceleration" ],
+  "title": "preCICE Topology Configuration",
+  "description": "JSON schema defining the topology configuration for precice-generator. Specifies participants, exchanges, and their coupling relationships."
+}
