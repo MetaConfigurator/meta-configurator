@@ -2,7 +2,7 @@
 
 ## Overview
 
-You can provide one or more lists of pre-defined JSON schemas the user can load from.
+You can provide one or more lists of pre-defined JSON schemas the user can load from in the tool settings file.
 This is especially useful for organizations to give their teams quick access to their schemas.
 The lists of schemas to show to the user can be configured in the settings, under the `schemaSelectionLists` key.
 A list of schemas can be defined by a URL to a JSON file or by an inline array of schema definitions:
