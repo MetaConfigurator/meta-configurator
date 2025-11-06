@@ -9,7 +9,8 @@ const defaultCategories = ref<Array<{name: string; key: 'Custom' | 'JsonStore' |
 ]);
 
 export const SCHEMA_SELECTION_CATEGORIES = computed(() => {
-  const additionalSchemaLists: SettingsInterfaceSchemaSelectionList[] = useSettings().value.schemaSelectionLists;
+  const additionalSchemaLists: SettingsInterfaceSchemaSelectionList[] =
+    useSettings().value.schemaSelectionLists;
   const additionalCategories = additionalSchemaLists.map(list => ({
     name: list.label,
     key: 'Custom',

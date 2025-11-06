@@ -26,7 +26,9 @@ watch(selectedSchema, async newSelectedSchema => {
       useErrorService().onError(error);
     }
   } else if (newSelectedSchema.key) {
-    useErrorService().onError(new Error(`Fetching schema by key is currently not supported: ${newSelectedSchema.key}`));
+    useErrorService().onError(
+      new Error(`Fetching schema by key is currently not supported: ${newSelectedSchema.key}`)
+    );
   }
 });
 

@@ -46,27 +46,33 @@ function handleUserSchemaDialogSelectionDefault(option: 'JsonStore' | 'File' | '
 
 async function handleUserSchemaDialogSelectionCustom(label: string) {
   const schemas = useSettings().value.schemaSelectionLists.find(
-    list => list.label === label,
+    list => list.label === label
   )?.schemas;
   if (!schemas) {
-    useErrorService().onError(new Error(`Could not find schema selection list with label: ${label}`));
+    useErrorService().onError(
+      new Error(`Could not find schema selection list with label: ${label}`)
+    );
     return;
   }
   // schemas is either an URL to a JSON document that specifies the schemas, or directly an array of schemas
   // if it is an URL, first resolve it and then proceed
-  let schemaList: {label: string, url: string}[] = [];
+  let schemaList: {label: string; url: string}[] = [];
   if (typeof schemas === 'string') {
     try {
       const fetchedContent = await fetchExternalContent(schemas);
       schemaList = await fetchedContent.json();
     } catch (error) {
-      useErrorService().onError(new Error(`Could not fetch schema selection list from URL: ${schemas}`));
+      useErrorService().onError(
+        new Error(`Could not fetch schema selection list from URL: ${schemas}`)
+      );
       return;
     }
   } else if (Array.isArray(schemas)) {
     schemaList = schemas;
   } else {
-    useErrorService().onError(new Error(`Invalid schema selection list format for label: ${label}`));
+    useErrorService().onError(
+      new Error(`Invalid schema selection list format for label: ${label}`)
+    );
     return;
   }
   fetchedSchemasSelectionDialog.value.setSchemas(schemaList);

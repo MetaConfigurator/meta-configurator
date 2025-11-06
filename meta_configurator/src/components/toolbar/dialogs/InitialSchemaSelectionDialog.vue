@@ -7,8 +7,6 @@ import {SCHEMA_SELECTION_CATEGORIES} from '@/components/toolbar/schemaSelectionC
 
 const showDialog = ref(false);
 
-
-
 defineEmits<{
   (e: 'user_selected_default_option', option: 'JsonStore' | 'File' | 'URL'): void;
   (e: 'user_selected_custom_option', label: string): void;
@@ -37,7 +35,10 @@ defineExpose({show: openDialog, close: hideDialog});
 <template>
   <Dialog v-model:visible="showDialog" header="Select a Schema">
     <div class="flex flex-col gap-3 bigger-dialog-content">
-      <div v-for="category in SCHEMA_SELECTION_CATEGORIES" :key="category.key" class="flex justify-center">
+      <div
+        v-for="category in SCHEMA_SELECTION_CATEGORIES"
+        :key="category.key"
+        class="flex justify-center">
         <Button
           v-model="selectedCategory"
           :label="category.name"
@@ -50,7 +51,7 @@ defineExpose({show: openDialog, close: hideDialog});
               if (category.key === 'Custom') {
                 $emit('user_selected_custom_option', category.name);
               } else {
-              $emit('user_selected_default_option', category.key);
+                $emit('user_selected_default_option', category.key);
               }
               hideDialog();
             }

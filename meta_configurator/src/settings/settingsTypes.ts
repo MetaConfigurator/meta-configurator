@@ -121,7 +121,6 @@ export interface SettingsInterfaceAiIntegraton {
   endpoint: string;
 }
 
-
 export interface SettingsInterfaceSchemaSelectionList {
   label: string;
   schemas: string | SettingsInterfaceSchemaSelectionListEntry[];
