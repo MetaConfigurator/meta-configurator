@@ -19,6 +19,7 @@ import {useSettings} from '@/settings/useSettings';
 import {useDebounceFn} from '@vueuse/core';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const showDialog = ref(false);
 const editor_id = 'data-mapping-' + Math.random();
@@ -163,8 +164,13 @@ function generateMappingSuggestion() {
         statusMessage.value = '';
         errorMessage.value = res.message;
       }
-      isLoadingMapping.value = false;
       validateConfig(res.config, input.value);
+    })
+    .catch(error => {
+      useErrorService().onError(error);
+    })
+    .finally(() => {
+      isLoadingMapping.value = false;
     });
 }
 
