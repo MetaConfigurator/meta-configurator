@@ -19,7 +19,7 @@ import Message from 'primevue/message';
 import {sizeOf} from '@/utility/sizeOf';
 import {getDataForMode} from '@/data/useDataLink';
 import * as jsonld from 'jsonld';
-import * as N3 from 'n3';
+import * as $rdf from 'rdflib';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -51,7 +51,7 @@ watch(
   () => getDataForMode(props.sessionMode).data.value,
   async dataValue => {
     try {
-      const nquads = await jsonLdToTurtle(dataValue);
+      const nquads = await jsonLdToRdf(dataValue);
       editor.value?.setValue(nquads);
     } catch (err) {
       console.error('Error converting JSON-LD to RDF:', err);
@@ -60,24 +60,13 @@ watch(
   {immediate: true}
 );
 
-async function jsonLdToTurtle(jsonLdData: any): Promise<string> {
-  try {
-    const nquads = (await jsonld.toRDF(jsonLdData, {
-      format: 'application/n-quads',
-    })) as string;
-    const parser = new N3.Parser({format: 'N-Quads'});
-    const quads = parser.parse(nquads);
-    const writer = new N3.Writer({prefixes: jsonLdData['@context'] || {}});
-    writer.addQuads(quads);
-    return new Promise((resolve, reject) => {
-      writer.end((error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      });
-    });
-  } catch (error) {
-    throw new Error(`Conversion failed: ${error}`);
-  }
+async function jsonLdToRdf(jsonLdString: string): Promise<string> {
+  const jsonLdDoc = JSON.parse(JSON.stringify(jsonLdString));
+  const nquads = (await jsonld.toRDF(jsonLdDoc, {
+    format: 'application/n-quads',
+  })) as string;
+
+  return nquads;
 }
 
 function isEditorReadOnly(): boolean {

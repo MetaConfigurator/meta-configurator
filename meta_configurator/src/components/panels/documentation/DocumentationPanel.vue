@@ -94,7 +94,10 @@ onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
 
 <template>
   <div class="documentation-panel">
-    <PanelSettings panel-name="Documentation View" :panel-settings-path="['documentation']">
+    <PanelSettings
+      panel-name="Documentation View"
+      :panel-settings-path="['documentation']"
+      :sessionMode="props.sessionMode">
       <p>
         This panel provides documentation for the current schema. It is generated from the schema
         itself and includes details about properties, types, and descriptions.

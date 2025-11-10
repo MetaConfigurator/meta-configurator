@@ -2,7 +2,10 @@
  of this panel. When the panel or underlying editor changes, the changes can be applied here
  and the main view does not need to know about any of that. -->
 <template>
-  <PanelSettings panel-name="Text View" :panel-settings-path="['codeEditor']">
+  <PanelSettings
+    panel-name="Text View"
+    :panel-settings-path="['codeEditor']"
+    :sessionMode="props.sessionMode">
     <p>
       This panel allows you to view and edit the raw JSON/YAML/XML data of the current document. It
       is useful for advanced users who want to directly manipulate the data structure.

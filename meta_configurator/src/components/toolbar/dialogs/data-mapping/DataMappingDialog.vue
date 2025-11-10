@@ -203,7 +203,8 @@ defineExpose({show: openDialog, close: hideDialog});
       <PanelSettings
         panel-name="API Key and AI Settings"
         settings-header="AI Settings"
-        :panel-settings-path="['aiIntegration']">
+        :panel-settings-path="['aiIntegration']"
+        :sessionMode="SessionMode.DataEditor">
         <ApiKey />
       </PanelSettings>
       <ApiKeyWarning />

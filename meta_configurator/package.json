@@ -60,6 +60,7 @@
     "primevue": "^4.2.5",
     "quicktype-core": "^23.0.171",
     "rdf-validate-shacl": "^0.6.5",
+    "rdflib": "^2.3.0",
     "showdown": "^2.1.0",
     "vue": "^3.5.13",
     "vue-flow": "^0.3.0",

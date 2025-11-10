@@ -281,7 +281,12 @@ export const queryRmlMapping = async (
   const systemMessage = `You are an expert in RML (RDF Mapping Language) and Turtle syntax. 
   Your task is to generate an RML mapping in TTL format to transform a JSON input document to RDF according to a given output schema. 
   Only output **valid RML/Turtle**, using correct prefixes, triples, logical mappings, and references.
-  Do not add explanations, commentary, or unrelated content. Focus on accurate TTL syntax.
+  Do not add explanations, commentary, or unrelated content. 
+  Creates separate triples, one-to-one map for each nested object.
+  Uses logical predicates to link parent and child structures.
+  Uses JSONPath references for nested fields.
+  Produces meaningful IRIs for resources (e.g., based on IDs or property names).
+  Focus on accurate TTL syntax. Use 'Data.json' as the only resource for JSON data references in the RML mapping.
   Example input JSON: \`\`\`${exampleInput}\`\`\`
   Example input schema: \`\`\`${exampleInputSchema}\`\`\`
   Example output RML mapping: \`\`\`${exampleOutputRml}\`\`\`

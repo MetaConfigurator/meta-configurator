@@ -9,7 +9,10 @@ const props = defineProps<{
 </script>
 
 <template>
-  <PanelSettings panel-name="Diagram View" :panel-settings-path="['schemaDiagram']">
+  <PanelSettings
+    panel-name="Diagram View"
+    :panel-settings-path="['schemaDiagram']"
+    :sessionMode="props.sessionMode">
     <p>
       This panel provides a visual representation of the current schema as a diagram. You can
       explore the structure of the schema, view relationships between different elements, and

@@ -2,7 +2,10 @@
  of this panel. When the panel or underlying editor changes, the changes can be applied here
  and the main view does not need to know about any of that. -->
 <template>
-  <PanelSettings panel-name="RDF View" :panel-settings-path="['rdf']">
+  <PanelSettings
+    panel-name="RDF View"
+    :panel-settings-path="['rdf']"
+    :sessionMode="SessionMode.DataEditor">
     <div v-if="dataIsInJsonLd">
       <p class="text-gray-600 text-sm mt-1">Your data is in JSON-LD format.</p>
     </div>

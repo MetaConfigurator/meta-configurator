@@ -16,7 +16,10 @@ const props = defineProps<{
 
 <template>
   <div class="gui-panel">
-    <PanelSettings panel-name="GUI View" :panel-settings-path="['guiEditor']">
+    <PanelSettings
+      panel-name="GUI View"
+      :panel-settings-path="['guiEditor']"
+      :sessionMode="props.sessionMode">
       <p>
         This panel allows you to view and edit the current document in a GUI format. You can
         navigate through the document tree, view properties, and modify data directly.
