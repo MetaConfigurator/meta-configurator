@@ -6,19 +6,18 @@
     panel-name="RDF View"
     :panel-settings-path="['rdf']"
     :sessionMode="SessionMode.DataEditor">
-    <div v-if="dataIsInJsonLd">
-      <p class="text-gray-600 text-sm mt-1">Your data is in JSON-LD format.</p>
-    </div>
-    <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-3 rounded mt-2">
-      To use RDF panel, your data should be in JSON-LD format. You can use
-      <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
-        JSON to JSON-LD
-      </a>
-      utility to convert it to JSON-LD.
-    </div>
   </PanelSettings>
   <RmlMappingDialog ref="rmlMappingDialog" />
-  <RdfEditorPanel :sessionMode="props.sessionMode" />
+  <div v-if="dataIsInJsonLd">
+    <RdfEditorPanel :sessionMode="props.sessionMode" />
+  </div>
+  <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
+    To use RDF panel, your data should be in JSON-LD format. You can use
+    <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
+      JSON to JSON-LD
+    </a>
+    utility to convert it to JSON-LD.
+  </div>
 </template>
 
 <script setup lang="ts">
