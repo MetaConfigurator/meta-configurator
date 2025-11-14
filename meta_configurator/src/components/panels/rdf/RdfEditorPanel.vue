@@ -18,9 +18,35 @@
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[10, 20, 50]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples">
-        <Column field="subject" header="Subject" sortable style="min-width: 12rem"></Column>
-        <Column field="predicate" header="Predicate" sortable style="min-width: 16rem"></Column>
-        <Column field="object" header="Object" sortable style="min-width: 16rem"></Column>
+        <Column field="subject" header="Subject" sortable style="min-width: 12rem">
+          <template #body="{data}">
+            <span
+              class="cursor-pointer text-blue-600 underline"
+              @click="onCellClick(data, 'subject')">
+              {{ data.subject }}
+            </span>
+          </template>
+        </Column>
+
+        <Column field="predicate" header="Predicate" sortable style="min-width: 16rem">
+          <template #body="{data}">
+            <span
+              class="cursor-pointer text-blue-600 underline"
+              @click="onCellClick(data, 'predicate')">
+              {{ data.predicate }}
+            </span>
+          </template>
+        </Column>
+
+        <Column field="object" header="Object" sortable style="min-width: 16rem">
+          <template #body="{data}">
+            <span
+              class="cursor-pointer text-blue-600 underline"
+              @click="onCellClick(data, 'object')">
+              {{ data.object }}
+            </span>
+          </template>
+        </Column>
         <Column :exportable="false" style="min-width: 12rem">
           <template #body="selectedItem">
             <Button
@@ -91,7 +117,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import {ref, watch, computed} from 'vue';
+import {ref, watch} from 'vue';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import * as jsonld from 'jsonld';
@@ -109,7 +135,7 @@ const props = defineProps<{sessionMode: SessionMode}>();
 const nodeManager = ref<JsonLdNodeManager>();
 const store = ref<$rdf.IndexedFormula | null>(null);
 const storeVersion = ref(0);
-
+const tableQuadsRef = ref<any[]>([]);
 const tripleDialog = ref(false);
 const triple = ref({
   subject: '',
@@ -133,8 +159,6 @@ const objectTypeOptions = [
   {label: 'Blank Node', value: 'BNode'},
   {label: 'Literal', value: 'Literal'},
 ];
-
-const tableQuadsRef = ref<any[]>([]);
 
 watch(
   () => storeVersion.value,
@@ -201,9 +225,10 @@ const openEditDialog = (trip: any) => {
   tripleDialog.value = true;
 };
 
-const deleteTriple = trip => {
+const deleteTriple = async trip => {
   if (!store.value) return;
   store.value.remove(trip.quad);
+  await updateNodeInJsonLd(trip.subject);
   storeVersion.value++;
 };
 
@@ -230,6 +255,12 @@ const saveTriple = async () => {
 
   tripleDialog.value = false;
 };
+
+function onCellClick(quad, field) {
+  const pos = nodeManager.value?.getQuadFieldPosition(quad, field);
+
+  console.log('Clicked cell:', field, 'at', pos);
+}
 
 async function updateNodeInJsonLd(tripId: string) {
   if (!nodeManager.value || !store.value) return;
