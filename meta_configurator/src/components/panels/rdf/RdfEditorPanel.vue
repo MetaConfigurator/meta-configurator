@@ -156,7 +156,7 @@ import Button from 'primevue/button';
 import Toolbar from 'primevue/toolbar';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
-import {JsonLdNodeManager} from './JsonLdNodeManager';
+import {JsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 
 const props = defineProps<{sessionMode: SessionMode}>();
 const nodeManager = ref<JsonLdNodeManager>();
