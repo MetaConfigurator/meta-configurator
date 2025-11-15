@@ -7,9 +7,22 @@ export class JsonLdNodeManager {
   private tree: any = null;
   private text: string = '';
   private nodePositions: {[id: string]: {index: number; node: any}} = {};
+  private context: Record<string, any> = {}; // extracted context
 
   constructor(jsonLdText: string) {
     this.text = jsonLdText;
+
+    // Extract @context from JSON-LD text
+    try {
+      const json = JSON.parse(jsonLdText);
+      if (json['@context']) {
+        this.context = json['@context'];
+      }
+    } catch (err) {
+      console.warn('Failed to parse JSON-LD text for context:', err);
+      this.context = {};
+    }
+
     const errors: ParseError[] = [];
     this.tree = parseTree(this.text, errors);
 
@@ -57,11 +70,6 @@ export class JsonLdNodeManager {
   getNodePosition(astNode: any) {
     if (!astNode) return null;
     return this.offsetToLineCol(astNode.offset, astNode.length);
-  }
-
-  /** Get node position info by @id */
-  getNode(subjectId: string) {
-    return this.nodePositions[subjectId] || null;
   }
 
   /**
@@ -124,38 +132,86 @@ export class JsonLdNodeManager {
     return this.getNodePosition(node);
   }
 
-  /** Rebuild node content using RDF store */
+  /** Rebuild node content using RDF store and internal @context */
   async rebuildNode(subjectId: string, store: $rdf.IndexedFormula) {
     const triples = store.statements.filter(st => st.subject.value === subjectId);
-    if (!triples.length) return;
-
+    if (!triples.length) {
+      this.removeNode(subjectId);
+      return;
+    }
     const nquads = triples
       .map(st => `${st.subject.toNT()} ${st.predicate.toNT()} ${st.object.toNT()} .`)
       .join('\n');
 
-    const jsonLdNodes = await jsonld.fromRDF(nquads, {format: 'application/n-quads'});
-    const updatedNode = jsonLdNodes[0];
+    let jsonLdNodes = await jsonld.fromRDF(nquads, {format: 'application/n-quads'});
+    let updatedNode = jsonLdNodes[0];
 
+    // Compact using the extracted @context
+    if (this.context) {
+      updatedNode = await jsonld.compact(updatedNode, this.context);
+    }
+    delete updatedNode['@context'];
     this.replaceNode(subjectId, updatedNode);
   }
 
   /** Replace full node object */
+  /** Replace full node object — if node not found, append it to @graph (or create @graph) */
   replaceNode(subjectId: string, newNode: any) {
     const nodeInfo = this.nodePositions[subjectId];
-    if (!nodeInfo) throw new Error(`Subject ${subjectId} not found in JSON-LD`);
 
-    const edits = modify(this.text, ['@graph', nodeInfo.index], newNode, {
+    let edits;
+    const formattingOptions = {insertSpaces: true, tabSize: 2};
+
+    if (nodeInfo) {
+      // existing node — replace in-place
+      edits = modify(this.text, ['@graph', nodeInfo.index], newNode, {
+        formattingOptions,
+      });
+    } else {
+      // node doesn't exist — append to @graph (or create @graph if missing)
+      const graphNode = findNodeAtLocation(this.tree, ['@graph']);
+
+      if (!graphNode) {
+        // no @graph property -> create @graph with an array containing the new node
+        edits = modify(this.text, ['@graph'], [newNode], {
+          formattingOptions,
+        });
+      } else {
+        // append to existing @graph array: insert at index = current length
+        const insertIndex = graphNode.children ? graphNode.children.length : 0;
+        edits = modify(this.text, ['@graph', insertIndex], newNode, {
+          formattingOptions,
+        });
+      }
+    }
+
+    // Apply edits and refresh AST + positions
+    this.text = applyEdits(this.text, edits);
+    this.tree = parseTree(this.text);
+    this.buildNodePositions();
+  }
+
+  /** Remove the node completely from @graph */
+  private removeNode(subjectId: string) {
+    const nodeInfo = this.nodePositions[subjectId];
+    if (!nodeInfo) return; // already gone
+
+    const edits = modify(this.text, ['@graph', nodeInfo.index], undefined, {
       formattingOptions: {insertSpaces: true, tabSize: 2},
     });
 
     this.text = applyEdits(this.text, edits);
 
-    // Refresh AST + node positions
+    // Refresh AST + positions
     this.tree = parseTree(this.text);
     this.buildNodePositions();
   }
 
   getText() {
     return this.text;
+  }
+
+  getNode(subjectId: string) {
+    return this.nodePositions[subjectId] || null;
   }
 }
