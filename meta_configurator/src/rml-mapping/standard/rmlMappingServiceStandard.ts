@@ -75,7 +75,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
     const responseStr = await resultPromise;
 
     try {
-      const fixedExpression = fixGeneratedExpression(responseStr, ['ttl']);
+      const fixedExpression = fixGeneratedExpression(responseStr, ['turtle']);
       return {
         config: fixedExpression,
         success: true,
@@ -94,8 +94,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
 
   async performRmlMapping(
     input: any,
-    config: string,
-    parameters?: Record<string, any>
+    config: string
   ): Promise<{resultData: any; success: boolean; message: string}> {
     try {
       const inputFiles = {
@@ -110,11 +109,6 @@ export class RmlMappingServiceStandard implements RmlMappingService {
       const result = await RmlMapper.parseTurtle(config, inputFiles, options);
       const expanded = await jsonld.fromRDF(result, {format: 'application/n-quads'});
       let final_jsonld = await jsonld.compact(expanded, prefixes);
-      if (parameters!.compactMode) {
-        final_jsonld = await jsonld.compact(expanded, prefixes);
-      } else {
-        final_jsonld = await jsonld.flatten(expanded, prefixes);
-      }
       return {
         resultData: final_jsonld,
         success: true,

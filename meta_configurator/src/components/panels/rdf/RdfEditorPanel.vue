@@ -258,7 +258,6 @@ const openEditDialog = (trip: any) => {
     objectType: trip.quad?.object?.termType,
     quad: trip.quad,
   };
-
   tripleDialog.value = true;
 };
 
