@@ -99,6 +99,8 @@ Explore how to use MetaConfigurator with real-world examples:
 
 *   **[Code Generation](./documentation_user/examples/code_generation)** – Learn how to generate code in multiple programming languages from JSON schemas.
 
+*   **[AI Assistance](./documentation_user/examples/ai_assistance)** – Learn how to use AI-assisted features for schema and data creation/editing, as well as data transformation.
+
 
 
 📚 Read the full [User Documentation](./documentation_user).

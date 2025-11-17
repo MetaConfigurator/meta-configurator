@@ -6,6 +6,7 @@
 * [Configurator Building](examples/configurator_building) (Shows how to use MetaConfigurator as a Configurator Builder, allowing users to create and share URLs that open MetaConfigurator with preloaded schema, data, and settings)
 * [Code Generation](examples/code_generation) (Shows how to generate code in multiple programming languages from JSON schemas)
 * [Schema Selection List](examples/schema_selection_list) (Provide your users a pre-defined list of schemas to choose from; useful for organizations)
+* [AI Assistance](examples/ai_assistance) (Shows how to use AI-assisted features for schema and data creation/editing, as well as data transformation)
 
 ## Load a Schema
 
