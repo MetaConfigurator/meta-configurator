@@ -1,164 +1,160 @@
 <template>
-    <div >
-      <DataTable
-        :value="tableQuadsRef"
-        v-model:filters="filters"
-        v-model:selection="selectedTriples"
-        scrollable
-        size="small"
-        scrollHeight="600px"
-        resizableColumns
-        :showGridlines="true"
-        :paginator="true"
-        @row-click="onRowClick"
-        :rows="50"
-        :stripedRows="true"
-        filterDisplay="menu"
-        @row-dblclick="openEditDialog"
-        :globalFilterFields="['subject', 'predicate', 'object']"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        :rowsPerPageOptions="[10, 20, 50]"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples">
-        <template #header>
-          <div class="flex justify-between items-center w-full">
-            <div class="flex items-center gap-1">
-              <Button label="Add" icon="pi pi-plus" variant="text" @click="openNewDialog" />
-              <Button
-                label="Delete"
-                icon="pi pi-trash"
-                severity="danger"
-                variant="text"
-                @click="confirmDeleteSelected"
-                :disabled="!selectedTriples || !selectedTriples.length" />
-            </div>
-            <IconField>
-              <Button
-                type="button"
-                icon="pi pi-filter-slash"
-                variant="text"
-                @click="clearFilter()" />
-              <InputText v-model="filters['global'].value" placeholder="Search Triples" />
-            </IconField>
+  <div>
+    <DataTable
+      :value="tableQuadsRef"
+      v-model:filters="filters"
+      v-model:selection="selectedTriples"
+      scrollable
+      size="small"
+      scrollHeight="600px"
+      resizableColumns
+      :showGridlines="true"
+      :paginator="true"
+      @row-click="onRowClick"
+      :rows="50"
+      :stripedRows="true"
+      filterDisplay="menu"
+      @row-dblclick="openEditDialog"
+      :globalFilterFields="['subject', 'predicate', 'object']"
+      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+      :rowsPerPageOptions="[10, 20, 50]"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples">
+      <template #header>
+        <div class="flex justify-between items-center w-full">
+          <div class="flex items-center gap-1">
+            <Button label="Add" icon="pi pi-plus" variant="text" @click="openNewDialog" />
+            <Button
+              label="Delete"
+              icon="pi pi-trash"
+              severity="danger"
+              variant="text"
+              @click="confirmDeleteSelected"
+              :disabled="!selectedTriples || !selectedTriples.length" />
           </div>
+          <IconField>
+            <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
+            <InputText v-model="filters['global'].value" placeholder="Search Triples" />
+          </IconField>
+        </div>
+      </template>
+      <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+      <Column field="subject" header="Subject" sortable style="min-width: 12rem">
+        <template #filter="{filterModel, filterCallback}">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            placeholder="Search by Object" />
         </template>
-        <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-        <Column field="subject" header="Subject" sortable style="min-width: 12rem">
-          <template #filter="{filterModel, filterCallback}">
+      </Column>
+      <Column field="predicate" header="Predicate" sortable style="min-width: 16rem">
+        <template #filter="{filterModel, filterCallback}">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            placeholder="Search by Object" />
+        </template>
+      </Column>
+      <Column field="object" header="Object" sortable style="min-width: 16rem">
+        <template #filter="{filterModel, filterCallback}">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            placeholder="Search by Object" />
+        </template>
+      </Column>
+    </DataTable>
+  </div>
+  <Dialog
+    v-model:visible="tripleDialog"
+    :style="{width: '800px'}"
+    header="Triple Details"
+    :modal="true">
+    <div class="flex flex-col gap-6">
+      <div>
+        <label class="block font-bold mb-3">Subject</label>
+        <div class="flex gap-2">
+          <Select
+            v-model="triple.subjectType"
+            :options="subjectTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-45" />
+          <template v-if="triple.subjectType === 'NamedNode'">
+            <Select
+              v-model="triple.subject"
+              :options="namedNodes"
+              optionLabel="label"
+              optionValue="value"
+              class="flex-1" />
             <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              placeholder="Search by Object" />
+              v-if="triple.subject === '__new__'"
+              v-model="newSubjectInput"
+              placeholder="Enter new NamedNode IRI"
+              class="flex-1" />
           </template>
-        </Column>
-        <Column field="predicate" header="Predicate" sortable style="min-width: 16rem">
-          <template #filter="{filterModel, filterCallback}">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              placeholder="Search by Object" />
+          <template v-else>
+            <InputText v-model.trim="triple.subject" required class="flex-1" />
           </template>
-        </Column>
-        <Column field="object" header="Object" sortable style="min-width: 16rem">
-          <template #filter="{filterModel, filterCallback}">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              placeholder="Search by Object" />
-          </template>
-        </Column>
-      </DataTable>
+        </div>
+      </div>
+      <div>
+        <label for="predicate" class="block font-bold mb-3">Predicate</label>
+        <div class="flex gap-2">
+          <Select
+            v-model="triple.predicateType"
+            :options="predicateTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-45" />
+          <InputText v-model.trim="triple.predicate" required class="flex-1" />
+        </div>
+      </div>
+      <div>
+        <label for="object" class="block font-bold mb-3">Object</label>
+        <div class="flex gap-2">
+          <Select
+            v-model="triple.objectType"
+            :options="objectTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-45" />
+          <InputText v-model.trim="triple.object" required class="flex-1" />
+        </div>
+      </div>
     </div>
-    <Dialog
-      v-model:visible="tripleDialog"
-      :style="{width: '800px'}"
-      header="Triple Details"
-      :modal="true">
-      <div class="flex flex-col gap-6">
-        <div>
-          <label class="block font-bold mb-3">Subject</label>
-          <div class="flex gap-2">
-            <Select
-              v-model="triple.subjectType"
-              :options="subjectTypeOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="w-45" />
-            <template v-if="triple.subjectType === 'NamedNode'">
-              <Select
-                v-model="triple.subject"
-                :options="namedNodes"
-                optionLabel="label"
-                optionValue="value"
-                class="flex-1" />
-              <InputText
-                v-if="triple.subject === '__new__'"
-                v-model="newSubjectInput"
-                placeholder="Enter new NamedNode IRI"
-                class="flex-1" />
-            </template>
-            <template v-else>
-              <InputText v-model.trim="triple.subject" required class="flex-1" />
-            </template>
-          </div>
-        </div>
-        <div>
-          <label for="predicate" class="block font-bold mb-3">Predicate</label>
-          <div class="flex gap-2">
-            <Select
-              v-model="triple.predicateType"
-              :options="predicateTypeOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="w-45" />
-            <InputText v-model.trim="triple.predicate" required class="flex-1" />
-          </div>
-        </div>
-        <div>
-          <label for="object" class="block font-bold mb-3">Object</label>
-          <div class="flex gap-2">
-            <Select
-              v-model="triple.objectType"
-              :options="objectTypeOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="w-45" />
-            <InputText v-model.trim="triple.object" required class="flex-1" />
-          </div>
-        </div>
-      </div>
-      <template #footer>
-        <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-        <Button label="Save" icon="pi pi-check" @click="saveTriple" />
-      </template>
-    </Dialog>
-    <Dialog
-      v-model:visible="deleteTriplesDialog"
-      :style="{width: '450px'}"
-      header="Confirm"
-      :modal="true">
-      <div class="flex items-center gap-4">
-        <i class="pi pi-exclamation-triangle !text-3xl" />
-        <span v-if="triple">Are you sure you want to delete the selected triples?</span>
-      </div>
-      <template #footer>
-        <Button
-          label="No"
-          icon="pi pi-times"
-          text
-          @click="deleteTriplesDialog = false"
-          severity="secondary"
-          variant="text" />
-        <Button
-          label="Yes"
-          icon="pi pi-check"
-          text
-          @click="deleteSelectedTriples"
-          severity="danger" />
-      </template>
-    </Dialog>
+    <template #footer>
+      <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
+      <Button label="Save" icon="pi pi-check" @click="saveTriple" />
+    </template>
+  </Dialog>
+  <Dialog
+    v-model:visible="deleteTriplesDialog"
+    :style="{width: '450px'}"
+    header="Confirm"
+    :modal="true">
+    <div class="flex items-center gap-4">
+      <i class="pi pi-exclamation-triangle !text-3xl" />
+      <span v-if="triple">Are you sure you want to delete the selected triples?</span>
+    </div>
+    <template #footer>
+      <Button
+        label="No"
+        icon="pi pi-times"
+        text
+        @click="deleteTriplesDialog = false"
+        severity="secondary"
+        variant="text" />
+      <Button
+        label="Yes"
+        icon="pi pi-check"
+        text
+        @click="deleteSelectedTriples"
+        severity="danger" />
+    </template>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -177,7 +173,7 @@ import Select from 'primevue/select';
 import {JsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
-import { reactive } from 'vue';
+import {reactive} from 'vue';
 
 const props = defineProps<{sessionMode: SessionMode}>();
 const nodeManager = ref<JsonLdNodeManager>();
@@ -194,7 +190,6 @@ function onRowClick(event) {
   const pos = nodeManager.value?.getQuadFieldPosition(event.data.subject);
   const p1 = reactive<Path>(['@graph', pos, '@id']);
   emit('zoom_into_path', p1);
-  
 }
 
 const deleteSelectedTriples = async () => {
