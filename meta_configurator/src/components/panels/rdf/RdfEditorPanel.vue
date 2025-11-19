@@ -1,65 +1,89 @@
 <template>
   <div>
     <div class="card">
-      <Toolbar class="mb-0">
-        <template #start>
-          <Button label="Add Triple" icon="pi pi-plus" class="mr-2" @click="openNewDialog" />
-        </template>
-      </Toolbar>
       <DataTable
         :value="tableQuadsRef"
+        v-model:filters="filters"
+        v-model:selection="selectedTriples"
         scrollable
+        selectionMode="multiple"
+        size="small"
         scroll-height="600px"
+        resizableColumns
+        :showGridlines="true"
         :paginator="true"
         :rows="50"
+        :stripedRows="true"
         rowGroupMode="rowspan"
-        groupRowsBy="subject"
+        filterDisplay="menu"
+        @row-dblclick="openEditDialog"
+        :globalFilterFields="['subject', 'predicate', 'object']"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[10, 20, 50]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples">
+        <template #header>
+          <div class="flex justify-between items-center w-full">
+            <div class="flex items-center gap-1">
+              <Button label="Add" icon="pi pi-plus" variant="text" @click="openNewDialog" />
+              <Button
+                label="Delete"
+                icon="pi pi-trash"
+                severity="danger"
+                variant="text"
+                @click="confirmDeleteSelected"
+                :disabled="!selectedTriples || !selectedTriples.length" />
+            </div>
+            <IconField>
+              <Button
+                type="button"
+                icon="pi pi-filter-slash"
+                variant="text"
+                @click="clearFilter()" />
+              <InputText v-model="filters['global'].value" placeholder="Search Triples" />
+            </IconField>
+          </div>
+        </template>
+        <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
         <Column field="subject" header="Subject" sortable style="min-width: 12rem">
+          <template #filter="{filterModel, filterCallback}">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              placeholder="Search by Object" />
+          </template>
           <template #body="{data}">
-            <span
-              class="cursor-pointer text-blue-600 underline"
-              @click="onCellClick(data, 'subject')">
+            <span @click="onCellClick(data, 'subject')">
               {{ data.subject }}
             </span>
           </template>
         </Column>
-
         <Column field="predicate" header="Predicate" sortable style="min-width: 16rem">
+          <template #filter="{filterModel, filterCallback}">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              placeholder="Search by Object" />
+          </template>
           <template #body="{data}">
-            <span
-              class="cursor-pointer text-blue-600 underline"
-              @click="onCellClick(data, 'predicate')">
+            <span @click="onCellClick(data, 'predicate')">
               {{ data.predicate }}
             </span>
           </template>
         </Column>
-
         <Column field="object" header="Object" sortable style="min-width: 16rem">
+          <template #filter="{filterModel, filterCallback}">
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              @input="filterCallback()"
+              placeholder="Search by Object" />
+          </template>
           <template #body="{data}">
-            <span
-              class="cursor-pointer text-blue-600 underline"
-              @click="onCellClick(data, 'object')">
+            <span @click="onCellClick(data, 'object')">
               {{ data.object }}
             </span>
-          </template>
-        </Column>
-        <Column :exportable="false" style="min-width: 12rem">
-          <template #body="selectedItem">
-            <Button
-              icon="pi pi-pencil"
-              variant="outlined"
-              rounded
-              class="mr-2"
-              @click="openEditDialog(selectedItem.data)" />
-            <Button
-              icon="pi pi-trash"
-              variant="outlined"
-              rounded
-              severity="danger"
-              @click="deleteTriple(selectedItem.data)" />
           </template>
         </Column>
       </DataTable>
@@ -70,44 +94,33 @@
       header="Triple Details"
       :modal="true">
       <div class="flex flex-col gap-6">
-        <!-- Subject -->
         <div>
           <label class="block font-bold mb-3">Subject</label>
           <div class="flex gap-2">
-            <!-- Subject Type (NamedNode / BlankNode) -->
             <Select
               v-model="triple.subjectType"
               :options="subjectTypeOptions"
               optionLabel="label"
               optionValue="value"
               class="w-45" />
-
-            <!-- If NamedNode -->
             <template v-if="triple.subjectType === 'NamedNode'">
-              <!-- NamedNode selection -->
               <Select
                 v-model="triple.subject"
                 :options="namedNodes"
                 optionLabel="label"
                 optionValue="value"
                 class="flex-1" />
-
-              <!-- If "Add new…" was selected -->
               <InputText
                 v-if="triple.subject === '__new__'"
                 v-model="newSubjectInput"
                 placeholder="Enter new NamedNode IRI"
                 class="flex-1" />
             </template>
-
-            <!-- If BlankNode -->
             <template v-else>
               <InputText v-model.trim="triple.subject" required class="flex-1" />
             </template>
           </div>
         </div>
-
-        <!-- Predicate -->
         <div>
           <label for="predicate" class="block font-bold mb-3">Predicate</label>
           <div class="flex gap-2">
@@ -120,8 +133,6 @@
             <InputText v-model.trim="triple.predicate" required class="flex-1" />
           </div>
         </div>
-
-        <!-- Object -->
         <div>
           <label for="object" class="block font-bold mb-3">Object</label>
           <div class="flex gap-2">
@@ -131,7 +142,6 @@
               optionLabel="label"
               optionValue="value"
               class="w-45" />
-
             <InputText v-model.trim="triple.object" required class="flex-1" />
           </div>
         </div>
@@ -141,8 +151,34 @@
         <Button label="Save" icon="pi pi-check" @click="saveTriple" />
       </template>
     </Dialog>
+    <Dialog
+      v-model:visible="deleteTriplesDialog"
+      :style="{width: '450px'}"
+      header="Confirm"
+      :modal="true">
+      <div class="flex items-center gap-4">
+        <i class="pi pi-exclamation-triangle !text-3xl" />
+        <span v-if="triple">Are you sure you want to delete the selected triples?</span>
+      </div>
+      <template #footer>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          text
+          @click="deleteTriplesDialog = false"
+          severity="secondary"
+          variant="text" />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          text
+          @click="deleteSelectedTriples"
+          severity="danger" />
+      </template>
+    </Dialog>
   </div>
 </template>
+
 <script setup lang="ts">
 import {ref, watch, computed} from 'vue';
 import {SessionMode} from '@/store/sessionMode';
@@ -152,16 +188,37 @@ import * as $rdf from 'rdflib';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
 import Button from 'primevue/button';
-import Toolbar from 'primevue/toolbar';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
 import {JsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
+import {FilterMatchMode} from '@primevue/core/api';
 
 const props = defineProps<{sessionMode: SessionMode}>();
 const nodeManager = ref<JsonLdNodeManager>();
 const store = ref<$rdf.IndexedFormula | null>(null);
 const tripleDialog = ref(false);
+
+const deleteTriplesDialog = ref(false);
+
+const confirmDeleteSelected = () => {
+  deleteTriplesDialog.value = true;
+};
+
+const deleteSelectedTriples = async () => {
+  if (!selectedTriples.value) {
+    return;
+  }
+
+  for (const triple of selectedTriples.value) {
+    store.value?.remove(triple.quad);
+    await updateNodeInJsonLd(triple.subject);
+  }
+  deleteTriplesDialog.value = false;
+  selectedTriples.value = null;
+};
+
 const triple = ref({
   subject: '',
   subjectType: 'NamedNode',
@@ -181,6 +238,22 @@ const newSubjectInput = ref('');
 
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 
+const filters = ref();
+
+const initFilters = () => {
+  filters.value = {
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+    subject: {value: null, matchMode: FilterMatchMode.CONTAINS},
+    predicate: {value: null, matchMode: FilterMatchMode.CONTAINS},
+    object: {value: null, matchMode: FilterMatchMode.CONTAINS},
+  };
+};
+
+initFilters();
+const clearFilter = () => {
+  initFilters();
+};
+
 const objectTypeOptions = [
   {label: 'Named Node', value: 'NamedNode'},
   {label: 'Blank Node', value: 'BlankNode'},
@@ -199,8 +272,7 @@ const namedNodes = computed(() => {
 
   const nodes = Array.from(nodesSet).map(n => ({label: n, value: n}));
 
-  // Add special option
-  nodes.push({label: '➕ Add new…', value: '__new__'});
+  nodes.push({label: '+ Add new', value: '__new__'});
 
   return nodes;
 });
@@ -248,7 +320,10 @@ const openNewDialog = () => {
   tripleDialog.value = true;
 };
 
-const openEditDialog = (trip: any) => {
+const selectedTriples = ref();
+
+const openEditDialog = (event: any) => {
+  const trip = event.data;
   triple.value = {
     subject: trip.subject,
     subjectType: trip.quad?.subject?.termType,
@@ -259,12 +334,6 @@ const openEditDialog = (trip: any) => {
     quad: trip.quad,
   };
   tripleDialog.value = true;
-};
-
-const deleteTriple = async trip => {
-  if (!store.value) return;
-  store.value.remove(trip.quad);
-  await updateNodeInJsonLd(trip.subject);
 };
 
 const saveTriple = async () => {
