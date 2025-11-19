@@ -44,32 +44,10 @@ export class JsonLdNodeManager {
     });
   }
 
-  /** Convert offset → line/column */
-  private offsetToLineCol(offset: number, length: number) {
-    const before = this.text.slice(0, offset);
-    const lines = before.split('\n');
-
-    const start = {
-      line: lines.length,
-      col: lines[lines.length - 1].length + 1,
-    };
-
-    const endOffset = offset + length;
-    const beforeEnd = this.text.slice(0, endOffset);
-    const endLines = beforeEnd.split('\n');
-
-    const end = {
-      line: endLines.length,
-      col: endLines[endLines.length - 1].length + 1,
-    };
-
-    return {start, end};
-  }
-
   /** Given an AST node return its line/column range */
   getNodePosition(astNode: any) {
     if (!astNode) return null;
-    return this.offsetToLineCol(astNode.offset, astNode.length);
+    return this.nodePositions[astNode];
   }
 
   /**
@@ -109,27 +87,8 @@ export class JsonLdNodeManager {
     return null;
   }
 
-  /**
-   * Return exact line/column for subject/predicate/object position.
-   * field must be "subject" | "predicate" | "object".
-   */
-  getQuadFieldPosition(
-    quad: {subject: string; predicate: string; object: string},
-    field: 'subject' | 'predicate' | 'object'
-  ) {
-    const paths = this.findPathsForQuad(quad);
-    if (!paths) return null;
-
-    const path =
-      field === 'subject'
-        ? paths.subjectPath
-        : field === 'predicate'
-        ? paths.predicatePath
-        : paths.objectPath;
-
-    if (!path) return null;
-    const node = findNodeAtLocation(this.tree, path);
-    return this.getNodePosition(node);
+  getQuadFieldPosition(subject: string) {
+    return this.nodePositions[subject]?.index;
   }
 
   /** Rebuild node content using RDF store and internal @context */

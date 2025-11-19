@@ -9,7 +9,7 @@
   </PanelSettings>
   <RmlMappingDialog ref="rmlMappingDialog" />
   <div v-if="dataIsInJsonLd">
-    <RdfEditorPanel :sessionMode="props.sessionMode" />
+    <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath"/>
   </div>
   <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
     To use RDF panel, your data should be in JSON-LD format. You can use
@@ -21,12 +21,13 @@
 </template>
 
 <script setup lang="ts">
-import {getDataForMode} from '@/data/useDataLink';
 import {ref, watch} from 'vue';
 import RdfEditorPanel from '@/components/panels/rdf/RdfEditorPanel.vue';
 import {SessionMode} from '@/store/sessionMode';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
+import type {Path} from '@/utility/path';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -35,6 +36,21 @@ const props = defineProps<{
 const rmlMappingDialog = ref();
 
 const dataIsInJsonLd = ref(false);
+
+const emit = defineEmits<{
+  (e: 'update_current_path', new_path: Path): void;
+  (e: 'zoom_into_path', path_to_add: Path): void;
+  (e: 'select_path', path: Path): void;
+  (e: 'update_data', path: Path, newValue: any): void;
+  (e: 'remove_property', path: Path): void;
+}>();
+
+const session = getSessionForMode(props.sessionMode);
+
+function zoomIntoPath(path: Path) {
+  session.updateCurrentPath(path);
+  session.updateCurrentSelectedElement(session.currentPath.value);
+}
 
 watch(
   () => getDataForMode(props.sessionMode).data.value,

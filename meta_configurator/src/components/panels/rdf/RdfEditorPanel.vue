@@ -1,20 +1,18 @@
 <template>
-  <div>
-    <div class="card">
+    <div >
       <DataTable
         :value="tableQuadsRef"
         v-model:filters="filters"
         v-model:selection="selectedTriples"
         scrollable
-        selectionMode="multiple"
         size="small"
-        scroll-height="600px"
+        scrollHeight="600px"
         resizableColumns
         :showGridlines="true"
         :paginator="true"
+        @row-click="onRowClick"
         :rows="50"
         :stripedRows="true"
-        rowGroupMode="rowspan"
         filterDisplay="menu"
         @row-dblclick="openEditDialog"
         :globalFilterFields="['subject', 'predicate', 'object']"
@@ -52,11 +50,6 @@
               @input="filterCallback()"
               placeholder="Search by Object" />
           </template>
-          <template #body="{data}">
-            <span @click="onCellClick(data, 'subject')">
-              {{ data.subject }}
-            </span>
-          </template>
         </Column>
         <Column field="predicate" header="Predicate" sortable style="min-width: 16rem">
           <template #filter="{filterModel, filterCallback}">
@@ -66,11 +59,6 @@
               @input="filterCallback()"
               placeholder="Search by Object" />
           </template>
-          <template #body="{data}">
-            <span @click="onCellClick(data, 'predicate')">
-              {{ data.predicate }}
-            </span>
-          </template>
         </Column>
         <Column field="object" header="Object" sortable style="min-width: 16rem">
           <template #filter="{filterModel, filterCallback}">
@@ -79,11 +67,6 @@
               type="text"
               @input="filterCallback()"
               placeholder="Search by Object" />
-          </template>
-          <template #body="{data}">
-            <span @click="onCellClick(data, 'object')">
-              {{ data.object }}
-            </span>
           </template>
         </Column>
       </DataTable>
@@ -176,7 +159,6 @@
           severity="danger" />
       </template>
     </Dialog>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -194,6 +176,8 @@ import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
 import {JsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
+import type {Path} from '@/utility/path';
+import { reactive } from 'vue';
 
 const props = defineProps<{sessionMode: SessionMode}>();
 const nodeManager = ref<JsonLdNodeManager>();
@@ -205,6 +189,13 @@ const deleteTriplesDialog = ref(false);
 const confirmDeleteSelected = () => {
   deleteTriplesDialog.value = true;
 };
+
+function onRowClick(event) {
+  const pos = nodeManager.value?.getQuadFieldPosition(event.data.subject);
+  const p1 = reactive<Path>(['@graph', pos, '@id']);
+  emit('zoom_into_path', p1);
+  
+}
 
 const deleteSelectedTriples = async () => {
   if (!selectedTriples.value) {
@@ -320,6 +311,13 @@ const openNewDialog = () => {
   tripleDialog.value = true;
 };
 
+const emit = defineEmits<{
+  (e: 'zoom_into_path', path_to_add: Path): void;
+  (e: 'update_property_name', old_name: string, new_name: string): void;
+  (e: 'start_editing_property_name'): void;
+  (e: 'stop_editing_property_name'): void;
+}>();
+
 const selectedTriples = ref();
 
 const openEditDialog = (event: any) => {
@@ -366,11 +364,6 @@ const saveTriple = async () => {
   tripleDialog.value = false;
 };
 
-function onCellClick(quad, field) {
-  const pos = nodeManager.value?.getQuadFieldPosition(quad, field);
-  console.log('Clicked cell:', field, 'at', pos);
-}
-
 async function updateNodeInJsonLd(tripId: string) {
   if (!nodeManager.value || !store.value) return;
   await nodeManager.value.rebuildNode(tripId, store.value);
@@ -415,12 +408,3 @@ async function jsonLdToRdfStore(jsonLdString: string) {
   return {rdfStore};
 }
 </script>
-
-<style scoped>
-.card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-</style>
