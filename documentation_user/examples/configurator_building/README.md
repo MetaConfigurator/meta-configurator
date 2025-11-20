@@ -44,6 +44,7 @@ The settings file allows fine-grained control over the MetaConfigurator interfac
 
 *   **Mode Restrictions**: Hide schema editor mode or settings editor mode to simplify the UI for end users.
 
+*   **[Schema Selection List](https://github.com/MetaConfigurator/meta-configurator/blob/main/documentation_user/examples/schema_selection_list)**: Customize the list of schemas to choose from in the schema selection dialog.
 
 ### Preserving the Interface State
 
