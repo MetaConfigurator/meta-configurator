@@ -6,6 +6,7 @@
     scrollable
     size="small"
     scrollHeight="flex"
+    removableSort
     resizableColumns
     :showGridlines="true"
     :paginator="true"

@@ -28,20 +28,6 @@
   flex-direction: column;
   overflow: hidden;
 }
-
-.panel-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-.panel-content {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
 </style>
 
 <script setup lang="ts">
