@@ -9,7 +9,7 @@
   </PanelSettings>
   <RmlMappingDialog ref="rmlMappingDialog" />
   <div v-if="dataIsInJsonLd">
-    <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath"/>
+    <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
   </div>
   <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
     To use RDF panel, your data should be in JSON-LD format. You can use
