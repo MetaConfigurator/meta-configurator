@@ -66,10 +66,7 @@
       </template>
     </Column>
   </DataTable>
-  <Dialog
-    v-model:visible="editDialog"
-    header="Triple Details"
-    :modal="true">
+  <Dialog v-model:visible="editDialog" header="Triple Details" :modal="true">
     <div class="flex flex-col gap-6">
       <label class="block font-bold mb-3">Subject</label>
       <div class="flex gap-2">
