@@ -1,24 +1,60 @@
-<!-- Facade for CodeEditorPanel. Higher level code does not need to know about any details
- of this panel. When the panel or underlying editor changes, the changes can be applied here
- and the main view does not need to know about any of that. -->
 <template>
-  <PanelSettings
-    panel-name="RDF View"
-    :panel-settings-path="['rdf']"
-    :sessionMode="SessionMode.DataEditor">
-  </PanelSettings>
-  <RmlMappingDialog ref="rmlMappingDialog" />
-  <div v-if="dataIsInJsonLd">
-    <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
-  </div>
-  <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
-    To use RDF panel, your data should be in JSON-LD format. You can use
-    <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
-      JSON to JSON-LD
-    </a>
-    utility to convert it to JSON-LD.
+  <div class="panel-container">
+    <div class="rdf-panel">
+      <PanelSettings
+        panel-name="RDF View"
+        :panel-settings-path="['rdf']"
+        :sessionMode="SessionMode.DataEditor">
+      </PanelSettings>
+      <RmlMappingDialog ref="rmlMappingDialog" />
+      <div class="panel-content">
+        <ScrollPanel
+          style="width: 100%; height: 100%"
+          :dt="{
+            bar: {
+              background: '{primary.color}',
+            },
+          }">
+          <div v-if="dataIsInJsonLd">
+            <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
+          </div>
+          <div
+            v-else
+            class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
+            To use RDF panel, your data should be in JSON-LD format. You can use
+            <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
+              JSON to JSON-LD
+            </a>
+            utility to convert it to JSON-LD.
+          </div>
+        </ScrollPanel>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.rdf-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.panel-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+</style>
 
 <script setup lang="ts">
 import {ref, watch} from 'vue';
@@ -28,6 +64,7 @@ import PanelSettings from '@/components/panels/shared-components/PanelSettings.v
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
+import {ScrollPanel} from 'primevue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
