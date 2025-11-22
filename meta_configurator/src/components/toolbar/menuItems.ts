@@ -26,6 +26,7 @@ export class MenuItems {
   private readonly showDataExportDialog: (schemaMode: boolean) => void;
   private readonly showDataMappingDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
+  private readonly showRMLMappingDialog: () => void;
 
   constructor(
     showSchemaSelectionDialog: () => void,
@@ -34,7 +35,8 @@ export class MenuItems {
     showCodeGenerationDialog: (schemaMode: boolean) => void,
     showDataExportDialog: (schemaMode: boolean) => void,
     showDataMappingDialog: () => void,
-    inferJsonSchemaFromSampleData: () => void
+    inferJsonSchemaFromSampleData: () => void,
+    showRMLMappingDialog: () => void
   ) {
     this.showSchemaSelectionDialog = showSchemaSelectionDialog;
     this.showImportCsvDialog = showImportCsvDialog;
@@ -43,6 +45,7 @@ export class MenuItems {
     this.showDataExportDialog = showDataExportDialog;
     this.showDataMappingDialog = showDataMappingDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
+    this.showRMLMappingDialog = showRMLMappingDialog;
   }
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
@@ -100,6 +103,11 @@ export class MenuItems {
             label: 'Export Data via Text Template...',
             icon: 'fa-solid fa-file-export',
             command: () => this.showDataExportDialog(false),
+          },
+          {
+            label: 'Transform JSON Data to JSON-LD',
+            icon: 'fa-solid fa-gears',
+            command: this.showRMLMappingDialog,
           },
         ],
       },

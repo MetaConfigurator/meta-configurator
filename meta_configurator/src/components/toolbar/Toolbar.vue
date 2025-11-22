@@ -18,6 +18,7 @@ import {hasCurrentNewsChanged, setCurrentNewsHash} from '@/components/toolbar/cu
 import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExportDialog.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
+import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -109,6 +110,10 @@ function showDataMappingDialog() {
   dataMappingDialog.value?.show();
 }
 
+function showRmlMappingDialog() {
+  rmlMappingDialog.value?.show();
+}
+
 async function showSchemaStoreDialog(): Promise<void> {
   try {
     // Wait for the fetch to complete
@@ -146,6 +151,7 @@ const dataExportDialog = ref();
 const fetchedSchemasSelectionDialog = ref();
 const urlInputDialog = ref();
 const dataMappingDialog = ref();
+const rmlMappingDialog = ref();
 
 defineExpose({
   showInitialSchemaDialog: showInitialDialog,
@@ -189,6 +195,8 @@ defineExpose({
 
   <DataMappingDialog ref="dataMappingDialog" />
 
+  <RmlMappingDialog ref="rmlMappingDialog" />
+
   <AboutDialog
     :visible="showAboutDialog"
     @update:visible="newValue => (showAboutDialog = newValue)" />
@@ -202,6 +210,7 @@ defineExpose({
     @show-import-csv-dialog="() => showCsvImportDialog()"
     @show-snapshot-dialog="() => showSnapshotDialog()"
     @show-data-mapping-dialog="() => showDataMappingDialog()"
+    @show-rml-mapping-dialog="() => showRmlMappingDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 
