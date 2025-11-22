@@ -7,7 +7,7 @@
         :sessionMode="SessionMode.DataEditor">
       </PanelSettings>
       <RmlMappingDialog ref="rmlMappingDialog" />
-      <div class="panel-content" style="display: flex; flex-direction: column; height: 100%;">
+      <div class="panel-content" style="display: flex; flex-direction: column; height: 100%">
         <ScrollPanel
           style="width: 100%; height: 100%"
           :dt="{
