@@ -182,7 +182,7 @@ const triple = ref({
   quad: null as any,
 });
 const emit = defineEmits<{
-  (e: 'zoom_into_path', path_to_zoom: Path): void;
+  (e: 'zoom_into_path', path: Path): void;
 }>();
 const initFilters = () => {
   filters.value = {

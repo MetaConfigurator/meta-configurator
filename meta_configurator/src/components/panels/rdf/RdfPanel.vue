@@ -7,17 +7,15 @@
         :sessionMode="SessionMode.DataEditor">
       </PanelSettings>
       <RmlMappingDialog ref="rmlMappingDialog" />
-      <div class="panel-content" style="display: flex; flex-direction: column; height: 100%">
-        <div v-if="dataIsInJsonLd">
-          <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
-        </div>
-        <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
-          To use RDF panel, your data should be in JSON-LD format. You can use
-          <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
-            JSON to JSON-LD
-          </a>
-          utility to convert it to JSON-LD.
-        </div>
+      <div v-if="dataIsInJsonLd">
+        <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
+      </div>
+      <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
+        To use RDF panel, your data should be in JSON-LD format. You can use
+        <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
+          JSON to JSON-LD
+        </a>
+        utility to convert it to JSON-LD.
       </div>
     </div>
   </div>
@@ -54,7 +52,6 @@ import PanelSettings from '@/components/panels/shared-components/PanelSettings.v
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
-import {ScrollPanel} from 'primevue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -65,11 +62,7 @@ const rmlMappingDialog = ref();
 const dataIsInJsonLd = ref(false);
 
 const emit = defineEmits<{
-  (e: 'update_current_path', new_path: Path): void;
-  (e: 'zoom_into_path', path_to_add: Path): void;
-  (e: 'select_path', path: Path): void;
-  (e: 'update_data', path: Path, newValue: any): void;
-  (e: 'remove_property', path: Path): void;
+  (e: 'zoom_into_path', path: Path): void;
 }>();
 
 const session = getSessionForMode(props.sessionMode);
@@ -83,7 +76,7 @@ watch(
   () => getDataForMode(props.sessionMode).data.value,
   async dataValue => {
     try {
-      dataIsInJsonLd.value = isJsonLD(JSON.stringify(dataValue));
+      dataIsInJsonLd.value = isValidJsonLd(JSON.stringify(dataValue));
     } catch (err) {
       dataIsInJsonLd.value = false;
     }
@@ -91,21 +84,64 @@ watch(
   {immediate: true}
 );
 
-function isJsonLD(inputData: string): boolean {
+function isValidJsonLd(input: string): boolean {
   try {
-    const data = JSON.parse(inputData);
-    if (typeof data !== 'object' || data === null) {
+    const parsed = JSON.parse(input);
+
+    if (typeof parsed !== 'object' || parsed === null) {
       return false;
     }
-    if (!data['@context']) {
-      return false;
+
+    if (Array.isArray(parsed)) {
+      return parsed.every(item => isJsonLdObject(item));
     }
-    console.log('Data is valid JSON-LD');
-    return true;
+
+    return isJsonLdObject(parsed);
   } catch (error) {
-    console.log('Data is not valid JSON-LD');
     return false;
   }
+}
+
+function isJsonLdObject(obj: any): boolean {
+  if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
+    return false;
+  }
+
+  const hasJsonLdProperty = '@context' in obj || '@id' in obj || '@type' in obj || '@graph' in obj;
+
+  if (!hasJsonLdProperty) {
+    return false;
+  }
+
+  if ('@context' in obj) {
+    const context = obj['@context'];
+    const isValidContext =
+      typeof context === 'string' ||
+      typeof context === 'object' ||
+      (Array.isArray(context) &&
+        context.every(item => typeof item === 'string' || typeof item === 'object'));
+
+    if (!isValidContext) {
+      return false;
+    }
+  }
+
+  if ('@id' in obj && typeof obj['@id'] !== 'string') {
+    return false;
+  }
+
+  if ('@type' in obj) {
+    const type = obj['@type'];
+    const isValidType =
+      typeof type === 'string' ||
+      (Array.isArray(type) && type.every(item => typeof item === 'string'));
+
+    if (!isValidType) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function showRmlMappingDialog() {
