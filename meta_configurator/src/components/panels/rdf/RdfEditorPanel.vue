@@ -68,7 +68,6 @@
   </DataTable>
   <Dialog
     v-model:visible="editDialog"
-    :style="{width: '800px'}"
     header="Triple Details"
     :modal="true">
     <div class="flex flex-col gap-6">
@@ -127,7 +126,7 @@
       <Button label="Save" icon="pi pi-check" @click="saveTriple" />
     </template>
   </Dialog>
-  <Dialog v-model:visible="deleteDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+  <Dialog v-model:visible="deleteDialog" header="Confirm" :modal="true">
     <div class="flex items-center gap-4">
       <i class="pi pi-exclamation-triangle !text-3xl" />
       <span v-if="triple">Are you sure you want to delete the selected triples?</span>

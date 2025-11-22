@@ -7,27 +7,17 @@
         :sessionMode="SessionMode.DataEditor">
       </PanelSettings>
       <RmlMappingDialog ref="rmlMappingDialog" />
-      <div class="panel-content" style="display: flex; flex-direction: column; height: 100%;">
-        <ScrollPanel
-          style="width: 100%; height: 100%"
-          :dt="{
-            bar: {
-              background: '{primary.color}',
-            },
-          }">
-          <div v-if="dataIsInJsonLd">
-            <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
-          </div>
-          <div
-            v-else
-            class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
-            To use RDF panel, your data should be in JSON-LD format. You can use
-            <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
-              JSON to JSON-LD
-            </a>
-            utility to convert it to JSON-LD.
-          </div>
-        </ScrollPanel>
+      <div class="panel-content" style="display: flex; flex-direction: column; height: 100%">
+        <div v-if="dataIsInJsonLd">
+          <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
+        </div>
+        <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt-1">
+          To use RDF panel, your data should be in JSON-LD format. You can use
+          <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
+            JSON to JSON-LD
+          </a>
+          utility to convert it to JSON-LD.
+        </div>
       </div>
     </div>
   </div>
