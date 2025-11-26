@@ -1,7 +1,7 @@
-import { parseTree, findNodeAtLocation, modify, applyEdits } from 'jsonc-parser';
+import {parseTree, findNodeAtLocation, modify, applyEdits} from 'jsonc-parser';
 import * as $rdf from 'rdflib';
 import * as jsonld from 'jsonld';
-import type { ParseError } from 'jsonc-parser';
+import type {ParseError} from 'jsonc-parser';
 
 type JSONValue = any;
 
@@ -14,7 +14,7 @@ interface ASTNode {
 export class JsonLdNodeManager {
   private tree: any = null;
   private text: string = '';
-  private nodePositions: { [id: string]: { index: number; node: any } } = {};
+  private nodePositions: {[id: string]: {index: number; node: any}} = {};
   private context: Record<string, any> = {};
 
   constructor(jsonLdText: string) {
@@ -47,7 +47,7 @@ export class JsonLdNodeManager {
     graphNode.children?.forEach((node, index) => {
       const idNode = findNodeAtLocation(node, ['@id']);
       if (idNode?.value) {
-        this.nodePositions[idNode.value] = { index, node };
+        this.nodePositions[idNode.value] = {index, node};
       }
     });
   }
@@ -63,7 +63,7 @@ export class JsonLdNodeManager {
       .map(st => `${st.subject.toNT()} ${st.predicate.toNT()} ${st.object.toNT()} .`)
       .join('\n');
 
-    let jsonLdNodes = await jsonld.fromRDF(nquads, { format: 'application/n-quads' });
+    let jsonLdNodes = await jsonld.fromRDF(nquads, {format: 'application/n-quads'});
     let updatedNode = jsonLdNodes[0];
 
     // Compact using the extracted @context
@@ -80,7 +80,7 @@ export class JsonLdNodeManager {
     const nodeInfo = this.nodePositions[subjectId];
 
     let edits;
-    const formattingOptions = { insertSpaces: true, tabSize: 2 };
+    const formattingOptions = {insertSpaces: true, tabSize: 2};
 
     if (nodeInfo) {
       // existing node — replace in-place
@@ -117,7 +117,7 @@ export class JsonLdNodeManager {
     if (!nodeInfo) return; // already gone
 
     const edits = modify(this.text, ['@graph', nodeInfo.index], undefined, {
-      formattingOptions: { insertSpaces: true, tabSize: 2 },
+      formattingOptions: {insertSpaces: true, tabSize: 2},
     });
 
     this.text = applyEdits(this.text, edits);
@@ -132,10 +132,10 @@ export class JsonLdNodeManager {
   }
 
   buildAST(value: JSONValue, path: (string | number)[] = []): ASTNode {
-    const node: ASTNode = { value, path, children: [] };
+    const node: ASTNode = {value, path, children: []};
     if (Array.isArray(value)) {
       value.forEach((it, i) => node.children.push(this.buildAST(it, [...path, i])));
-    } else if (value && typeof value === "object") {
+    } else if (value && typeof value === 'object') {
       for (const k of Object.keys(value)) {
         node.children.push(this.buildAST(value[k], [...path, k]));
       }
@@ -145,8 +145,8 @@ export class JsonLdNodeManager {
 
   // Index ALL AST nodes that have an @id (including embedded occurences)
   indexById(ast: ASTNode, map: Map<string, ASTNode[]> = new Map()) {
-    if (ast.value && typeof ast.value === "object" && "@id" in ast.value) {
-      const id = ast.value["@id"];
+    if (ast.value && typeof ast.value === 'object' && '@id' in ast.value) {
+      const id = ast.value['@id'];
       if (!map.has(id)) map.set(id, []);
       map.get(id)!.push(ast);
     }
@@ -174,20 +174,20 @@ export class JsonLdNodeManager {
         // Case A: primitive literal directly
         if (
           child.value === object ||
-          (typeof child.value !== "object" && String(child.value) === object)
+          (typeof child.value !== 'object' && String(child.value) === object)
         ) {
           return child.path.slice(); // path to literal
         }
 
         // Case B: predicate value is an object with @id
-        if (child.value && typeof child.value === "object" && "@id" in child.value) {
-          if (child.value["@id"] === object) {
+        if (child.value && typeof child.value === 'object' && '@id' in child.value) {
+          if (child.value['@id'] === object) {
             // return path to the @id inside that object
-            return [...child.path, "@id"];
+            return [...child.path, '@id'];
           }
           // maybe the @id is deeper (rare) — check child.children for @id node
           const idChild = child.children.find(
-            (gc) => gc.path[gc.path.length - 1] === "@id" && gc.value === object
+            gc => gc.path[gc.path.length - 1] === '@id' && gc.value === object
           );
           if (idChild) return idChild.path.slice();
         }
@@ -199,10 +199,10 @@ export class JsonLdNodeManager {
             // element is primitive
             if (elemNode.value === object) return elemNode.path.slice();
             // element is object with @id (either elemNode.value["@id"] or its child)
-            if (elemNode.value && typeof elemNode.value === "object") {
-              if (elemNode.value["@id"] === object) return [...elemNode.path, "@id"];
+            if (elemNode.value && typeof elemNode.value === 'object') {
+              if (elemNode.value['@id'] === object) return [...elemNode.path, '@id'];
               const idChild = elemNode.children.find(
-                (gc) => gc.path[gc.path.length - 1] === "@id" && gc.value === object
+                gc => gc.path[gc.path.length - 1] === '@id' && gc.value === object
               );
               if (idChild) return idChild.path.slice();
             }
@@ -221,11 +221,7 @@ export class JsonLdNodeManager {
   }
 
   // Use multiple subject nodes (because the same @id may appear multiple places)
-  findTriplePath(
-    subject: string,
-    predicate: string,
-    object: string
-  ): (string | number)[] | null {
+  findTriplePath(subject: string, predicate: string, object: string): (string | number)[] | null {
     const ast = this.buildAST(JSON.parse(this.text));
     const idIndex = this.indexById(ast);
     const subjectNodes = idIndex.get(subject);
@@ -236,5 +232,4 @@ export class JsonLdNodeManager {
     }
     return null;
   }
-
 }
