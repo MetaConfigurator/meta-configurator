@@ -1,13 +1,21 @@
-import {parseTree, findNodeAtLocation, modify, applyEdits, getNodeValue} from 'jsonc-parser';
+import { parseTree, findNodeAtLocation, modify, applyEdits } from 'jsonc-parser';
 import * as $rdf from 'rdflib';
 import * as jsonld from 'jsonld';
-import type {ParseError} from 'jsonc-parser';
+import type { ParseError } from 'jsonc-parser';
+
+type JSONValue = any;
+
+interface ASTNode {
+  value: JSONValue;
+  path: (string | number)[];
+  children: ASTNode[];
+}
 
 export class JsonLdNodeManager {
   private tree: any = null;
   private text: string = '';
-  private nodePositions: {[id: string]: {index: number; node: any}} = {};
-  private context: Record<string, any> = {}; // extracted context
+  private nodePositions: { [id: string]: { index: number; node: any } } = {};
+  private context: Record<string, any> = {};
 
   constructor(jsonLdText: string) {
     this.text = jsonLdText;
@@ -39,56 +47,9 @@ export class JsonLdNodeManager {
     graphNode.children?.forEach((node, index) => {
       const idNode = findNodeAtLocation(node, ['@id']);
       if (idNode?.value) {
-        this.nodePositions[idNode.value] = {index, node};
+        this.nodePositions[idNode.value] = { index, node };
       }
     });
-  }
-
-  /** Given an AST node return its line/column range */
-  getNodePosition(astNode: any) {
-    if (!astNode) return null;
-    return this.nodePositions[astNode];
-  }
-
-  /**
-   * Find the AST paths for an RDF quad component:
-   * subjectPath, predicatePath, objectPath
-   */
-  findPathsForQuad(quad: {subject: string; predicate: string; object: string}) {
-    const graphNode = findNodeAtLocation(this.tree, ['@graph']);
-    if (!graphNode || !graphNode.children) return null;
-
-    for (let i = 0; i < graphNode.children.length; i++) {
-      const nodeObj = graphNode.children[i];
-
-      // Match subject
-      const idNode = findNodeAtLocation(nodeObj, ['@id']);
-      if (!idNode) continue;
-
-      const idValue = getNodeValue(idNode);
-      if (idValue !== quad.subject) continue;
-
-      // Attempt to locate predicate
-      const predicateNode = findNodeAtLocation(nodeObj, [quad.predicate]);
-
-      let objectNode = null;
-      if (predicateNode && predicateNode.type === 'array') {
-        // Example: predicate: [ { "@value": "..."} ]
-        objectNode = predicateNode.children?.[0];
-      }
-
-      return {
-        subjectPath: ['@graph', i, '@id'],
-        predicatePath: predicateNode ? ['@graph', i, quad.predicate] : null,
-        objectPath: objectNode ? ['@graph', i, quad.predicate, 0] : null,
-      };
-    }
-
-    return null;
-  }
-
-  getQuadFieldPosition(subject: string) {
-    return this.nodePositions[subject]?.index;
   }
 
   /** Rebuild node content using RDF store and internal @context */
@@ -102,7 +63,7 @@ export class JsonLdNodeManager {
       .map(st => `${st.subject.toNT()} ${st.predicate.toNT()} ${st.object.toNT()} .`)
       .join('\n');
 
-    let jsonLdNodes = await jsonld.fromRDF(nquads, {format: 'application/n-quads'});
+    let jsonLdNodes = await jsonld.fromRDF(nquads, { format: 'application/n-quads' });
     let updatedNode = jsonLdNodes[0];
 
     // Compact using the extracted @context
@@ -119,7 +80,7 @@ export class JsonLdNodeManager {
     const nodeInfo = this.nodePositions[subjectId];
 
     let edits;
-    const formattingOptions = {insertSpaces: true, tabSize: 2};
+    const formattingOptions = { insertSpaces: true, tabSize: 2 };
 
     if (nodeInfo) {
       // existing node — replace in-place
@@ -156,7 +117,7 @@ export class JsonLdNodeManager {
     if (!nodeInfo) return; // already gone
 
     const edits = modify(this.text, ['@graph', nodeInfo.index], undefined, {
-      formattingOptions: {insertSpaces: true, tabSize: 2},
+      formattingOptions: { insertSpaces: true, tabSize: 2 },
     });
 
     this.text = applyEdits(this.text, edits);
@@ -170,7 +131,110 @@ export class JsonLdNodeManager {
     return this.text;
   }
 
-  getNode(subjectId: string) {
-    return this.nodePositions[subjectId] || null;
+  buildAST(value: JSONValue, path: (string | number)[] = []): ASTNode {
+    const node: ASTNode = { value, path, children: [] };
+    if (Array.isArray(value)) {
+      value.forEach((it, i) => node.children.push(this.buildAST(it, [...path, i])));
+    } else if (value && typeof value === "object") {
+      for (const k of Object.keys(value)) {
+        node.children.push(this.buildAST(value[k], [...path, k]));
+      }
+    }
+    return node;
   }
+
+  // Index ALL AST nodes that have an @id (including embedded occurences)
+  indexById(ast: ASTNode, map: Map<string, ASTNode[]> = new Map()) {
+    if (ast.value && typeof ast.value === "object" && "@id" in ast.value) {
+      const id = ast.value["@id"];
+      if (!map.has(id)) map.set(id, []);
+      map.get(id)!.push(ast);
+    }
+    for (const c of ast.children) this.indexById(c, map);
+    return map;
+  }
+
+  /**
+   * Search for a predicate->object match inside a subject AST node.
+   * Returns full path to the matching value:
+   *  - For literal objects: path to the literal (e.g. ["@graph",1,".../name"])
+   *  - For object-by-@id: path to the @id (e.g. ["@graph",1,".../knows","@id"])
+   */
+  searchPredicateObject(
+    node: ASTNode,
+    predicate: string,
+    object: string
+  ): (string | number)[] | null {
+    // iterate direct children - faster shallow checks first
+    for (const child of node.children) {
+      const last = child.path[child.path.length - 1];
+
+      // If this child is the predicate key
+      if (last === predicate) {
+        // Case A: primitive literal directly
+        if (
+          child.value === object ||
+          (typeof child.value !== "object" && String(child.value) === object)
+        ) {
+          return child.path.slice(); // path to literal
+        }
+
+        // Case B: predicate value is an object with @id
+        if (child.value && typeof child.value === "object" && "@id" in child.value) {
+          if (child.value["@id"] === object) {
+            // return path to the @id inside that object
+            return [...child.path, "@id"];
+          }
+          // maybe the @id is deeper (rare) — check child.children for @id node
+          const idChild = child.children.find(
+            (gc) => gc.path[gc.path.length - 1] === "@id" && gc.value === object
+          );
+          if (idChild) return idChild.path.slice();
+        }
+
+        // Case C: predicate value is an array -> check elements
+        if (Array.isArray(child.value)) {
+          // iterate the element AST nodes
+          for (const elemNode of child.children) {
+            // element is primitive
+            if (elemNode.value === object) return elemNode.path.slice();
+            // element is object with @id (either elemNode.value["@id"] or its child)
+            if (elemNode.value && typeof elemNode.value === "object") {
+              if (elemNode.value["@id"] === object) return [...elemNode.path, "@id"];
+              const idChild = elemNode.children.find(
+                (gc) => gc.path[gc.path.length - 1] === "@id" && gc.value === object
+              );
+              if (idChild) return idChild.path.slice();
+            }
+          }
+        }
+
+        // nothing matched directly under this predicate node; continue searching deeper
+      }
+
+      // Recursively search deeper in the subtree
+      const deeper = this.searchPredicateObject(child, predicate, object);
+      if (deeper) return deeper;
+    }
+
+    return null;
+  }
+
+  // Use multiple subject nodes (because the same @id may appear multiple places)
+  findTriplePath(
+    subject: string,
+    predicate: string,
+    object: string
+  ): (string | number)[] | null {
+    const ast = this.buildAST(JSON.parse(this.text));
+    const idIndex = this.indexById(ast);
+    const subjectNodes = idIndex.get(subject);
+    if (!subjectNodes) return null;
+    for (const sn of subjectNodes) {
+      const found = this.searchPredicateObject(sn, predicate, object);
+      if (found) return found;
+    }
+    return null;
+  }
+
 }
