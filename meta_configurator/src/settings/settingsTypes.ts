@@ -112,6 +112,7 @@ export interface SettingsInterfacFrontend {
 
 export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
+  compactMode: boolean;
 }
 
 export interface SettingsInterfaceAiIntegraton {

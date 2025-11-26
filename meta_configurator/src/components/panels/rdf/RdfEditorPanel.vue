@@ -192,6 +192,7 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
+import {useSettings} from '@/settings/useSettings';
 
 const props = defineProps<{sessionMode: SessionMode}>();
 const nodeManager = ref<JsonLdNodeManager>();
@@ -201,6 +202,7 @@ const deleteDialog = ref(false);
 const newSubjectInput = ref('');
 const selectedTriples = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
+const settings = useSettings();
 const filters = ref();
 const triple = ref({
   subject: '',
@@ -232,14 +234,15 @@ const subjectTypeOptions = [
   {label: 'Named Node', value: 'NamedNode'},
   {label: 'Blank Node', value: 'BlankNode'},
 ];
+
 const data = computed(() => {
   if (!store.value) return [];
 
   return store.value.statements.map((st, index) => ({
     id: index,
-    subject: st.subject.value,
-    predicate: st.predicate.value,
-    object: st.object.value,
+    subject: translateIRI(store.value, st.subject.value),
+    predicate: translateIRI(store.value, st.predicate.value),
+    object: translateIRI(store.value, st.object.value),
     quad: st,
   }));
 });
@@ -322,11 +325,11 @@ const openNewDialog = () => {
 const openEditDialog = (event: any) => {
   const trip = event.data;
   triple.value = {
-    subject: trip.subject,
+    subject: trip.quad?.subject.value,
     subjectType: trip.quad?.subject?.termType,
-    predicate: trip.predicate,
+    predicate: trip.quad?.predicate.value,
     predicateType: trip.quad?.predicate?.termType,
-    object: trip.object,
+    object: trip.quad?.object.value,
     objectType: trip.quad?.object?.termType,
     quad: trip.quad,
   };
@@ -387,6 +390,28 @@ function addQuadToStore() {
   }
 
   store.value.add($rdf.st(subjNode, predNode, objNode, $rdf.defaultGraph()));
+}
+
+function translateIRI(store, iriTerm) {
+  if (!settings.value.rdf.compactMode) {
+    return iriTerm;
+  }
+  // If the term is null/undefined, return empty string
+  if (!iriTerm) return '';
+
+  // Extract string value if the term is an rdflib object
+  const iri = typeof iriTerm === 'string' ? iriTerm : iriTerm.value;
+
+  if (!iri || typeof iri !== 'string') return iri;
+
+  // Iterate over registered prefixes
+  for (const [prefix, namespace] of Object.entries(store.namespaces)) {
+    if (typeof namespace === 'string' && iri.startsWith(namespace)) {
+      return `${prefix}:${iri.slice(namespace.length)}`;
+    }
+  }
+
+  return iri; // no match → return full IRI
 }
 
 async function jsonLdToRdfStore(jsonLdString: string) {
