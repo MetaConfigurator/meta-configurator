@@ -71,9 +71,6 @@
                   @input="filterCallback()"
                   placeholder="Search by Object" />
               </template>
-              <template #body="slotProps">
-                <span @click="onCellClick(slotProps)">{{ slotProps.data.subject }}</span>
-              </template>
             </Column>
             <Column field="predicate" header="Predicate" sortable>
               <template #filter="{filterModel, filterCallback}">
@@ -83,9 +80,6 @@
                   @input="filterCallback()"
                   placeholder="Search by Object" />
               </template>
-              <template #body="slotProps">
-                <span @click="onCellClick(slotProps)">{{ slotProps.data.predicate }}</span>
-              </template>
             </Column>
             <Column field="object" header="Object" sortable>
               <template #filter="{filterModel, filterCallback}">
@@ -94,9 +88,6 @@
                   type="text"
                   @input="filterCallback()"
                   placeholder="Search by Object" />
-              </template>
-              <template #body="slotProps">
-                <span @click="onCellClick(slotProps)">{{ slotProps.data.object }}</span>
               </template>
             </Column>
           </DataTable>
@@ -400,8 +391,14 @@ async function updateNodeInJsonLd(tripId: string) {
 }
 
 function onRowClick(event: any) {
-  // event.data is the clicked row
-  console.log('Clicked row:', event.data);
+  const subject = event.data.subject;
+  const predicate = event.data.predicate;
+  const object = event.data.object;
+
+  const path = nodeManager.value?.findTriplePath(subject, predicate, object);
+  if (path) {
+    emit('zoom_into_path', path!);
+  }
 }
 
 function addQuadToStore() {
