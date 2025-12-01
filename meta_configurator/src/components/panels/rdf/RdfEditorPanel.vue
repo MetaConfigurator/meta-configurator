@@ -257,18 +257,6 @@ const confirmDeleteSelected = () => {
   deleteDialog.value = true;
 };
 
-function onCellClick(event) {
-  const subject = event.data.subject;
-  const predicate = event.data.predicate;
-  const object = event.data.object;
-
-  const path = nodeManager.value?.findTriplePath(subject, predicate, object);
-  if (path) {
-    console.log('Emitting zoom into path:', path);
-    emit('zoom_into_path', path!);
-  }
-}
-
 const deleteSelectedTriples = async () => {
   if (!selectedTriples.value) return;
 
