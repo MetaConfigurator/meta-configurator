@@ -1,5 +1,15 @@
 <template>
   <div class="panel-tab-container">
+    <div
+      v-if="dataHasSyntaxError"
+      class="border border-red-400 bg-red-50 text-red-800 p-4 rounded m-1">
+      Your data contains syntax errors. Please correct them before proceeding.
+    </div>
+    <div
+      v-if="dataHasSemanticsError"
+      class="border border-red-400 bg-red-50 text-red-800 p-4 rounded m-1">
+      {{ semanticErrors }}
+    </div>
     <Tabs value="graph">
       <TabList>
         <Tab value="context">Context</Tab>
@@ -9,7 +19,9 @@
         <TabPanel value="context"> </TabPanel>
         <TabPanel value="graph">
           <DataTable
+            :class="{'disabled-wrapper': dataHasSyntaxError || dataHasSemanticsError}"
             :value="data"
+            @row-click="onRowClick"
             v-model:filters="filters"
             v-model:selection="selectedTriples"
             scrollable
@@ -175,7 +187,7 @@
 <script setup lang="ts">
 import {ref, watch, computed} from 'vue';
 import {SessionMode} from '@/store/sessionMode';
-import {getDataForMode, useCurrentData} from '@/data/useDataLink';
+import {getDataForMode, getValidationForMode, useCurrentData} from '@/data/useDataLink';
 import * as $rdf from 'rdflib';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -198,8 +210,11 @@ const props = defineProps<{sessionMode: SessionMode}>();
 const nodeManager = ref<JsonLdNodeManager>();
 const store = ref<$rdf.IndexedFormula | null>(null);
 const editDialog = ref(false);
+const dataHasSyntaxError = ref(false);
+const dataHasSemanticsError = ref(false);
 const deleteDialog = ref(false);
 const newSubjectInput = ref('');
+const semanticErrors = ref('');
 const selectedTriples = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 const settings = useSettings();
@@ -292,14 +307,25 @@ const namedNodes = computed(() => {
 });
 
 watch(
+  () => getDataForMode(props.sessionMode).isDataUnparseable(),
+  async dataIsUnparsable => {
+    dataHasSyntaxError.value = dataIsUnparsable;
+  },
+  {immediate: true}
+);
+
+watch(
   () => getDataForMode(props.sessionMode).data.value,
   async dataValue => {
     try {
+      semanticErrors.value = '';
+      dataHasSemanticsError.value = false;
       nodeManager.value = new JsonLdNodeManager(JSON.stringify(dataValue, null, 2));
       const {rdfStore} = await jsonLdToRdfStore(dataValue);
       store.value = rdfStore;
     } catch (err) {
-      console.error('Error converting JSON-LD to RDF:', err);
+      dataHasSemanticsError.value = true;
+      semanticErrors.value = err instanceof Error ? err.message : String(err);
     }
   },
   {immediate: true}
@@ -373,6 +399,11 @@ async function updateNodeInJsonLd(tripId: string) {
   useCurrentData().setData(JSON.parse(updatedJsonLdText));
 }
 
+function onRowClick(event: any) {
+  // event.data is the clicked row
+  console.log('Clicked row:', event.data);
+}
+
 function addQuadToStore() {
   if (!store.value) return;
   const subjNode =
@@ -442,6 +473,24 @@ initFilters();
 </script>
 
 <style scoped>
+.disabled-wrapper {
+  position: relative;
+}
+
+.disabled-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  pointer-events: auto; /* catches clicks so table can't receive them */
+}
+
+.disabled-wrapper > * {
+  pointer-events: none; /* block all interaction inside */
+  opacity: 0.5; /* visual disabled effect */
+}
+
 .panel-tab-container {
   display: flex;
   flex-direction: column;

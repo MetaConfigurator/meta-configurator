@@ -11,6 +11,11 @@ interface ASTNode {
   children: ASTNode[];
 }
 
+const PREDICATE_ALIAS_MAP: Record<string, readonly string[]> = {
+  '@type': ['rdf:type', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'],
+  '@id': ['http://www.w3.org/1999/02/22-rdf-syntax-ns#ID'],
+} as const;
+
 export class JsonLdNodeManager {
   private tree: any = null;
   private text: string = '';
@@ -143,6 +148,25 @@ export class JsonLdNodeManager {
     return node;
   }
 
+  /**
+   * Expand a compact IRI like "schema:continent" to its full IRI.
+   */
+  private expandTerm(term: string): string | null {
+    if (!term || typeof term !== 'string') return null;
+
+    const [prefix, suffix] = term.split(':');
+
+    // suffix !== undefined ensures it is "prefix:suffix" form
+    if (suffix !== undefined && this.context[prefix!]) {
+      const base = this.context[prefix!];
+      if (typeof base === 'string') {
+        return base + suffix;
+      }
+    }
+
+    return null;
+  }
+
   // Index ALL AST nodes that have an @id (including embedded occurences)
   indexById(ast: ASTNode, map: Map<string, ASTNode[]> = new Map()) {
     if (ast.value && typeof ast.value === 'object' && '@id' in ast.value) {
@@ -154,12 +178,6 @@ export class JsonLdNodeManager {
     return map;
   }
 
-  /**
-   * Search for a predicate->object match inside a subject AST node.
-   * Returns full path to the matching value:
-   *  - For literal objects: path to the literal (e.g. ["@graph",1,".../name"])
-   *  - For object-by-@id: path to the @id (e.g. ["@graph",1,".../knows","@id"])
-   */
   searchPredicateObject(
     node: ASTNode,
     predicate: string,
@@ -208,28 +226,66 @@ export class JsonLdNodeManager {
             }
           }
         }
-
-        // nothing matched directly under this predicate node; continue searching deeper
       }
-
-      // Recursively search deeper in the subtree
       const deeper = this.searchPredicateObject(child, predicate, object);
       if (deeper) return deeper;
     }
-
     return null;
   }
 
-  // Use multiple subject nodes (because the same @id may appear multiple places)
   findTriplePath(subject: string, predicate: string, object: string): (string | number)[] | null {
     const ast = this.buildAST(JSON.parse(this.text));
     const idIndex = this.indexById(ast);
     const subjectNodes = idIndex.get(subject);
     if (!subjectNodes) return null;
+    const predicateEquivs = this.getEquivalentTerms(predicate);
+    const objectEquivs = this.getEquivalentTerms(object);
     for (const sn of subjectNodes) {
-      const found = this.searchPredicateObject(sn, predicate, object);
-      if (found) return found;
+      for (const pred of predicateEquivs) {
+        for (const obj of objectEquivs) {
+          const found = this.searchPredicateObject(sn, pred, obj);
+          if (found) return found;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private compactTerm(fullIri: string): string | null {
+    if (!fullIri || typeof fullIri !== 'string') return null;
+
+    for (const prefix in this.context) {
+      const base = this.context[prefix];
+      if (typeof base === 'string' && fullIri.startsWith(base)) {
+        const local = fullIri.slice(base.length);
+        return `${prefix}:${local}`;
+      }
     }
     return null;
+  }
+
+  private getEquivalentTerms(term: string): Set<string> {
+    const out = new Set<string>();
+    out.add(term);
+    const expanded = this.expandTerm(term);
+    if (expanded) out.add(expanded);
+
+    const compact = this.compactTerm(term);
+    if (compact) out.add(compact);
+
+    if (PREDICATE_ALIAS_MAP[term]) {
+      for (const alias of PREDICATE_ALIAS_MAP[term]) out.add(alias);
+    }
+
+    for (const key in PREDICATE_ALIAS_MAP) {
+      for (const value of PREDICATE_ALIAS_MAP[key]!) {
+        if (value === term) {
+          out.add(key);
+        }
+      }
+    }
+
+    return out;
   }
 }
