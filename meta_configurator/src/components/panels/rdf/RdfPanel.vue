@@ -6,10 +6,15 @@
       :sessionMode="SessionMode.DataEditor">
     </PanelSettings>
     <RmlMappingDialog ref="rmlMappingDialog" />
+    <div
+      v-if="dataIsUnparsable"
+      class="border border-red-400 bg-red-50 text-yellow-800 p-4 rounded m-1">
+      Your data contains syntax errors. Please correct them before proceeding.
+    </div>
     <div class="panel-content" v-if="dataIsInJsonLd">
       <RdfEditorPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
     </div>
-    <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded mt">
+    <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded m-1">
       To use RDF panel, your data should be in valid JSON-LD format. If your data is in JSON, you
       can use
       <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
@@ -28,7 +33,6 @@ import PanelSettings from '@/components/panels/shared-components/PanelSettings.v
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
-import * as jsonld from 'jsonld';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -38,30 +42,34 @@ const emit = defineEmits<{
 }>();
 const session = getSessionForMode(props.sessionMode);
 const rmlMappingDialog = ref();
-const dataHasSyntaxError = ref(false);
+const dataIsUnparsable = ref(false);
 const dataIsInJsonLd = ref(false);
 
 watch(
   () => getDataForMode(props.sessionMode).isDataUnparseable(),
-  dataIsUnparsable => {
-    dataHasSyntaxError.value = dataIsUnparsable;
+  dataIsUnparsableValue => {
+    dataIsUnparsable.value = dataIsUnparsableValue;
   },
   {immediate: true}
 );
 
 watch(
   () => getDataForMode(props.sessionMode).data.value,
-  async dataValue => {
-    dataIsInJsonLd.value = await isValidJsonLd(dataValue);
+  dataValue => {
+    dataIsInJsonLd.value = hasJsonLdFormat(dataValue);
   },
   {immediate: true}
 );
 
-async function isValidJsonLd(jsonText: string): Promise<boolean> {
-  return jsonld
-    .expand(jsonText)
-    .then(() => true)
-    .catch(() => false);
+function hasJsonLdFormat(input: Object): boolean {
+  if (!input || typeof input !== 'object') return false;
+  const data = input as Record<string, unknown>;
+  if (!('@context' in data)) return false;
+  if ('@graph' in data) {
+    return Array.isArray(data['@graph']) && data['@graph'].length > 0;
+  }
+  const keys = Object.keys(data).filter(k => k !== '@context');
+  return keys.length > 0;
 }
 
 function zoomIntoPath(path: Path) {
