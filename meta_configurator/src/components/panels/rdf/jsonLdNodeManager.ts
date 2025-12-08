@@ -191,19 +191,16 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
 
   const addStatement = (statement: $rdf.Statement) => {
     _nodeManager.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
-    let path = _nodeManager.value!.findPath(
+    return _nodeManager.value.findPath(
       statement.subject.value,
       statement.predicate.value,
       statement.object.value
     ) as Path;
-    data.setDataAt(path, '');
-    return path;
   };
 
   const findPath = (subject: string, predicate: string, object: string) => {
     _nodeManager.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
-    let _path = _nodeManager.value.findPath(subject, predicate, object) as Path;
-    return _path;
+    return _nodeManager.value.findPath(subject, predicate, object) as Path;
   };
 
   return {

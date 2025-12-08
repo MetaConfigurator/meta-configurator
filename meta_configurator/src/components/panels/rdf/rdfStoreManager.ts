@@ -3,9 +3,10 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 
-type RdfChangeCallback = (deletedStatements: $rdf.Statement) => void;
+type RdfChangeCallback = (oldStore: string, newStore: string) => void;
 
 interface RdfStore {
+  readonly store: Readonly<Ref<$rdf.IndexedFormula>>;
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
   readonly namespaces: Readonly<Ref<Record<string, string>>>;
   deleteStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
@@ -16,7 +17,6 @@ export const rdfStoreManager: RdfStore & {
   onChange: (cb: RdfChangeCallback) => void;
 } = (() => {
   const callbacks: RdfChangeCallback[] = [];
-  const _currentJsonLd = ref('');
   const store = ref<$rdf.IndexedFormula | null>(null);
   const _statements = ref<$rdf.Statement[]>([]);
 
@@ -26,9 +26,7 @@ export const rdfStoreManager: RdfStore & {
   });
 
   const setJsonLdText = (jsonLdObj: any) => {
-    const text = JSON.stringify(jsonLdObj, null, 2);
-    _currentJsonLd.value = text;
-    return text;
+    return JSON.stringify(jsonLdObj, null, 2);
   };
 
   const clearStore = () => {
@@ -69,7 +67,6 @@ export const rdfStoreManager: RdfStore & {
 
     try {
       store.value.removeStatement(statement);
-      callbacks.forEach(cb => cb(statement));
       updateStatements();
       return {success: true, errorMessage: ''};
     } catch (error: any) {
@@ -116,6 +113,7 @@ export const rdfStoreManager: RdfStore & {
   return {
     statements: readonly(_statements),
     namespaces: readonly(_namespaces),
+    store: readonly(store),
     deleteStatement,
     addStatement,
     onChange,

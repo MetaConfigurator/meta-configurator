@@ -6,7 +6,9 @@
         <Tab value="graph">Graph</Tab>
       </TabList>
       <TabPanels>
-        <TabPanel value="context"> </TabPanel>
+        <TabPanel value="context">
+          <RdfEditorContextPanel @zoom_into_path="zoomIntoPath" />
+        </TabPanel>
         <TabPanel value="graph">
           <RdfEditorGraphPanel @zoom_into_path="zoomIntoPath" />
         </TabPanel>
@@ -17,6 +19,7 @@
 
 <script setup lang="ts">
 import RdfEditorGraphPanel from '@/components/panels/rdf/RdfEditorGraphPanel.vue';
+import RdfEditorContextPanel from '@/components/panels/rdf/RdfEditorContextPanel.vue';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';

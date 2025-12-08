@@ -40,7 +40,7 @@
         </div>
         <IconField>
           <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
-          <InputText v-model="filters['global'].value" placeholder="Search Triples" />
+          <InputText v-model="filters['global'].value" placeholder="Search ..." />
         </IconField>
       </div>
     </template>
@@ -134,7 +134,7 @@
   <Dialog v-model:visible="deleteDialog" header="Confirm" :modal="true">
     <div class="flex items-center gap-4">
       <i class="pi pi-exclamation-triangle !text-3xl" />
-      <span v-if="triple">Are you sure you want to delete the selected triples?</span>
+      <span v-if="triple">Are you sure you want to delete the selected item?</span>
     </div>
     <template #footer>
       <Button
@@ -164,8 +164,6 @@ import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
 import {useSettings} from '@/settings/useSettings';
-import {SessionMode} from '@/store/sessionMode';
-import {getDataForMode} from '@/data/useDataLink';
 
 const editDialog = ref(false);
 const dataHasSyntaxError = ref(false);
@@ -175,7 +173,6 @@ const newSubjectInput = ref('');
 const semanticErrors = ref('');
 const selectedTriple = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
-const settings = useSettings();
 const filters = ref();
 const triple = ref({
   subject: '',
@@ -251,18 +248,6 @@ const namedNodes = computed(() => {
   return nodes;
 });
 
-// watch(
-//   () => getDataForMode(props.sessionMode).isDataUnparseable(),
-//   async dataIsUnparsable => {
-//     dataHasSyntaxError.value = dataIsUnparsable;
-//     if (dataIsUnparsable) {
-//       dataHasSemanticsError.value = false;
-//       semanticErrors.value = '';
-//     }
-//   },
-//   {immediate: true}
-// );
-
 watch(selectedTriple, (value, _) => {
   if (value) {
     const subject = value.subject;
@@ -276,20 +261,6 @@ watch(selectedTriple, (value, _) => {
     }
   }
 });
-
-// watch(
-//   () => getDataForMode(SessionMode.DataEditor).data.value,
-//   async dataValue => {
-//     try {
-//       semanticErrors.value = '';
-//       dataHasSemanticsError.value = false;
-//     } catch (err) {
-//       dataHasSemanticsError.value = true;
-//       semanticErrors.value = err instanceof Error ? err.message : String(err);
-//     }
-//   },
-//   {immediate: true}
-// );
 
 const hideDialog = () => {
   editDialog.value = false;
@@ -327,10 +298,6 @@ const saveTriple = async () => {
     triple.value.subject = newSubjectInput.value.trim();
     newSubjectInput.value = '';
   }
-
-  // if (triple.value.statement) {
-  //   store.value?.remove(triple.value.statement);
-  // }
 
   addstatementToStore();
 
@@ -386,7 +353,7 @@ function addstatementToStore() {
   }
   const newSt = $rdf.st(subjNode, predNode, objNode, $rdf.defaultGraph());
   rdfStoreManager.addStatement(newSt);
-  // nodeManager.addStatement(newSt);
+  jsonLdNodeManager.addStatement(newSt);
 }
 
 function translateIRI(iriTerm: string) {
