@@ -8,7 +8,7 @@
       <TabPanels>
         <TabPanel value="context"> </TabPanel>
         <TabPanel value="graph">
-          <RdfEditorGraphPanel :sessionMode="props.sessionMode" @zoom_into_path="zoomIntoPath" />
+          <RdfEditorGraphPanel @zoom_into_path="zoomIntoPath" />
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -17,15 +17,12 @@
 
 <script setup lang="ts">
 import RdfEditorGraphPanel from '@/components/panels/rdf/RdfEditorGraphPanel.vue';
-import {SessionMode} from '@/store/sessionMode';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import type {Path} from '@/utility/path';
-
-const props = defineProps<{sessionMode: SessionMode}>();
 
 const emit = defineEmits<{
   (e: 'zoom_into_path', path: Path): void;

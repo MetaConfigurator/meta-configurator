@@ -6,10 +6,10 @@
   </div>
   <DataTable
     :class="{'disabled-wrapper': dataHasSyntaxError || dataHasSemanticsError}"
-    :value="data"
+    :value="items"
     @row-click="onRowClick"
     v-model:filters="filters"
-    v-model:selection="selectedTriples"
+    v-model:selection="selectedTriple"
     scrollable
     scrollHeight="flex"
     removableSort
@@ -36,7 +36,7 @@
             severity="danger"
             variant="text"
             @click="confirmDeleteSelected"
-            :disabled="!selectedTriples || !selectedTriples.length" />
+            :disabled="!selectedTriple" />
         </div>
         <IconField>
           <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
@@ -44,7 +44,7 @@
         </IconField>
       </div>
     </template>
-    <Column frozen selectionMode="multiple" headerStyle="width: 3rem"> </Column>
+    <Column frozen selectionMode="single" headerStyle="width: 3rem"> </Column>
     <Column field="subject" header="Subject" sortable>
       <template #filter="{filterModel, filterCallback}">
         <InputText
@@ -87,6 +87,7 @@
           <Select
             v-model="triple.subject"
             :options="namedNodes"
+            filter
             optionLabel="label"
             optionValue="value"
             class="flex-1" />
@@ -143,20 +144,13 @@
         @click="deleteDialog = false"
         severity="secondary"
         variant="text" />
-      <Button
-        label="Yes"
-        icon="pi pi-check"
-        text
-        @click="deleteSelectedTriples"
-        severity="danger" />
+      <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedTriple" severity="danger" />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import {ref, watch, computed} from 'vue';
-import {SessionMode} from '@/store/sessionMode';
-import {getDataForMode, useCurrentData} from '@/data/useDataLink';
+import {ref, computed, watch} from 'vue';
 import * as $rdf from 'rdflib';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -165,21 +159,21 @@ import IconField from 'primevue/iconfield';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
-import {JsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
+import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
 import {useSettings} from '@/settings/useSettings';
+import {SessionMode} from '@/store/sessionMode';
+import {getDataForMode} from '@/data/useDataLink';
 
-const props = defineProps<{sessionMode: SessionMode}>();
-const nodeManager = ref<JsonLdNodeManager>();
-const store = ref<$rdf.IndexedFormula | null>(null);
 const editDialog = ref(false);
 const dataHasSyntaxError = ref(false);
 const dataHasSemanticsError = ref(false);
 const deleteDialog = ref(false);
 const newSubjectInput = ref('');
 const semanticErrors = ref('');
-const selectedTriples = ref();
+const selectedTriple = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 const settings = useSettings();
 const filters = ref();
@@ -190,7 +184,7 @@ const triple = ref({
   predicateType: 'NamedNode',
   object: '',
   objectType: 'Literal',
-  quad: null as any,
+  statement: null as any,
 });
 const emit = defineEmits<{
   (e: 'zoom_into_path', path: Path): void;
@@ -214,31 +208,31 @@ const subjectTypeOptions = [
   {label: 'Blank Node', value: 'BlankNode'},
 ];
 
-const data = computed(() => {
-  if (!store.value) return [];
-
-  return store.value.statements.map((st, index) => ({
-    id: index,
-    subject: translateIRI(store.value, st.subject.value),
-    predicate: translateIRI(store.value, st.predicate.value),
-    object: translateIRI(store.value, st.object.value),
-    quad: st,
+const items = computed(() => {
+  return rdfStoreManager.statements.value.map((st, _) => ({
+    id: tripleId(st),
+    subject: translateIRI(st.subject.value),
+    predicate: translateIRI(st.predicate.value),
+    object: translateIRI(st.object.value),
+    statement: st,
   }));
 });
+
+function tripleId(st: $rdf.Statement) {
+  return `${st.subject.value}|${st.predicate.value}|${st.object.value}`;
+}
 
 const confirmDeleteSelected = () => {
   deleteDialog.value = true;
 };
 
-const deleteSelectedTriples = async () => {
-  if (!selectedTriples.value) return;
+const deleteSelectedTriple = () => {
+  if (!selectedTriple.value) return;
 
-  for (const triple of selectedTriples.value) {
-    store.value?.remove(triple.quad);
-    await updateNodeInJsonLd(triple.subject);
-  }
+  rdfStoreManager.deleteStatement(selectedTriple.value.statement);
+  jsonLdNodeManager.deleteStatement(selectedTriple.value.statement);
   deleteDialog.value = false;
-  selectedTriples.value = null;
+  selectedTriple.value = null;
 };
 
 const clearFilter = () => {
@@ -246,9 +240,8 @@ const clearFilter = () => {
 };
 
 const namedNodes = computed(() => {
-  if (!store.value) return [];
   const nodesSet = new Set<string>();
-  store.value.statements.forEach(st => {
+  rdfStoreManager.statements.value.forEach(st => {
     if (st.subject.termType === 'NamedNode') {
       nodesSet.add(st.subject.value);
     }
@@ -258,34 +251,45 @@ const namedNodes = computed(() => {
   return nodes;
 });
 
-watch(
-  () => getDataForMode(props.sessionMode).isDataUnparseable(),
-  async dataIsUnparsable => {
-    dataHasSyntaxError.value = dataIsUnparsable;
-    if (dataIsUnparsable) {
-      dataHasSemanticsError.value = false;
-      semanticErrors.value = '';
-    }
-  },
-  {immediate: true}
-);
+// watch(
+//   () => getDataForMode(props.sessionMode).isDataUnparseable(),
+//   async dataIsUnparsable => {
+//     dataHasSyntaxError.value = dataIsUnparsable;
+//     if (dataIsUnparsable) {
+//       dataHasSemanticsError.value = false;
+//       semanticErrors.value = '';
+//     }
+//   },
+//   {immediate: true}
+// );
 
-watch(
-  () => getDataForMode(props.sessionMode).data.value,
-  async dataValue => {
-    try {
-      semanticErrors.value = '';
-      dataHasSemanticsError.value = false;
-      nodeManager.value = new JsonLdNodeManager(JSON.stringify(dataValue, null, 2));
-      const {rdfStore} = await jsonLdToRdfStore(dataValue);
-      store.value = rdfStore;
-    } catch (err) {
-      dataHasSemanticsError.value = true;
-      semanticErrors.value = err instanceof Error ? err.message : String(err);
+watch(selectedTriple, (value, _) => {
+  if (value) {
+    const subject = value.subject;
+    const predicate = value.predicate;
+    const object = value.object;
+
+    const path = jsonLdNodeManager.findPath(subject, predicate, object);
+    if (path) {
+      console.log('Path ', path);
+      emit('zoom_into_path', path!);
     }
-  },
-  {immediate: true}
-);
+  }
+});
+
+// watch(
+//   () => getDataForMode(SessionMode.DataEditor).data.value,
+//   async dataValue => {
+//     try {
+//       semanticErrors.value = '';
+//       dataHasSemanticsError.value = false;
+//     } catch (err) {
+//       dataHasSemanticsError.value = true;
+//       semanticErrors.value = err instanceof Error ? err.message : String(err);
+//     }
+//   },
+//   {immediate: true}
+// );
 
 const hideDialog = () => {
   editDialog.value = false;
@@ -299,7 +303,7 @@ const openNewDialog = () => {
     predicateType: 'NamedNode',
     object: '',
     objectType: 'Literal',
-    quad: null,
+    statement: null,
   };
   editDialog.value = true;
 };
@@ -307,13 +311,13 @@ const openNewDialog = () => {
 const openEditDialog = (event: any) => {
   const trip = event.data;
   triple.value = {
-    subject: trip.quad?.subject.value,
-    subjectType: trip.quad?.subject?.termType,
-    predicate: trip.quad?.predicate.value,
-    predicateType: trip.quad?.predicate?.termType,
-    object: trip.quad?.object.value,
-    objectType: trip.quad?.object?.termType,
-    quad: trip.quad,
+    subject: trip.statement?.subject.value,
+    subjectType: trip.statement?.subject?.termType,
+    predicate: trip.statement?.predicate.value,
+    predicateType: trip.statement?.predicate?.termType,
+    object: trip.statement?.object.value,
+    objectType: trip.statement?.object?.termType,
+    statement: trip.statement,
   };
   editDialog.value = true;
 };
@@ -324,14 +328,14 @@ const saveTriple = async () => {
     newSubjectInput.value = '';
   }
 
-  if (triple.value.quad) {
-    store.value?.remove(triple.value.quad);
-  }
+  // if (triple.value.statement) {
+  //   store.value?.remove(triple.value.statement);
+  // }
 
-  addQuadToStore();
+  addstatementToStore();
 
-  if (triple.value.quad && triple.value.quad.subject !== triple.value.subject)
-    await updateNodeInJsonLd(triple.value.quad.subject.value);
+  if (triple.value.statement && triple.value.statement.subject !== triple.value.subject)
+    await updateNodeInJsonLd(triple.value.statement.subject.value);
 
   await updateNodeInJsonLd(triple.value.subject);
 
@@ -342,17 +346,17 @@ const saveTriple = async () => {
     predicateType: 'NamedNode',
     object: '',
     objectType: 'Literal',
-    quad: null,
+    statement: null,
   };
 
   editDialog.value = false;
 };
 
 async function updateNodeInJsonLd(tripId: string) {
-  if (!nodeManager.value || !store.value) return;
-  await nodeManager.value.rebuildNode(tripId, store.value);
-  const updatedJsonLdText = nodeManager.value.getText();
-  useCurrentData().setData(JSON.parse(updatedJsonLdText));
+  // if (!nodeManager.value || !store.value) return;
+  // await nodeManager.value.rebuildNode(tripId, store.value);
+  // const updatedJsonLdText = nodeManager.value.getText();
+  // useCurrentData().setData(JSON.parse(updatedJsonLdText));
 }
 
 function onRowClick(event: any) {
@@ -360,17 +364,16 @@ function onRowClick(event: any) {
   const predicate = event.data.predicate;
   const object = event.data.object;
 
-  const path = nodeManager.value?.findTriplePath(subject, predicate, object);
+  const path = jsonLdNodeManager.findPath(subject, predicate, object);
   if (path) {
     emit('zoom_into_path', path!);
   }
 }
 
-function addQuadToStore() {
-  if (!store.value) return;
+function addstatementToStore() {
   const subjNode =
     triple.value.subjectType === 'BlankNode'
-      ? triple.value.quad.subject
+      ? triple.value.statement.subject
       : $rdf.sym(triple.value.subject);
   const predNode = $rdf.sym(triple.value.predicate);
   let objNode;
@@ -381,54 +384,13 @@ function addQuadToStore() {
   } else {
     objNode = $rdf.sym(triple.value.object);
   }
-
-  store.value.add($rdf.st(subjNode, predNode, objNode, $rdf.defaultGraph()));
+  const newSt = $rdf.st(subjNode, predNode, objNode, $rdf.defaultGraph());
+  rdfStoreManager.addStatement(newSt);
+  // nodeManager.addStatement(newSt);
 }
 
-function translateIRI(store, iriTerm) {
-  if (!settings.value.rdf.compactMode) {
-    return iriTerm;
-  }
-  // If the term is null/undefined, return empty string
-  if (!iriTerm) return '';
-
-  // Extract string value if the term is an rdflib object
-  const iri = typeof iriTerm === 'string' ? iriTerm : iriTerm.value;
-
-  if (!iri || typeof iri !== 'string') return iri;
-
-  // Iterate over registered prefixes
-  for (const [prefix, namespace] of Object.entries(store.namespaces)) {
-    if (typeof namespace === 'string' && iri.startsWith(namespace)) {
-      return `${prefix}:${iri.slice(namespace.length)}`;
-    }
-  }
-
-  return iri; // no match → return full IRI
-}
-
-async function jsonLdToRdfStore(jsonLdString: string) {
-  const jsonLdDoc = JSON.parse(JSON.stringify(jsonLdString));
-
-  const rdfStore = $rdf.graph();
-
-  if (jsonLdDoc['@context']) {
-    for (const [prefix, ns] of Object.entries(jsonLdDoc['@context'])) {
-      if (typeof ns === 'string') {
-        rdfStore.setPrefixForURI(prefix, ns);
-      }
-    }
-  }
-
-  const baseUri = 'http://example.org/';
-
-  await new Promise<void>((resolve, reject) => {
-    $rdf.parse(JSON.stringify(jsonLdString), rdfStore, baseUri, 'application/ld+json', err =>
-      err ? reject(err) : resolve()
-    );
-  });
-
-  return {rdfStore};
+function translateIRI(iriTerm: string) {
+  return iriTerm;
 }
 
 initFilters();
