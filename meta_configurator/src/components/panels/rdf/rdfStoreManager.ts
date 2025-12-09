@@ -9,8 +9,10 @@ interface RdfStore {
   readonly store: Readonly<Ref<$rdf.IndexedFormula>>;
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
   readonly namespaces: Readonly<Ref<Record<string, string>>>;
+  readonly parseErrors: Readonly<Ref<string[]>>;
   deleteStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
   addStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
+  exportAs: (format: string) => {content: string; success: boolean; errorMessage: string};
 }
 
 export const rdfStoreManager: RdfStore & {
@@ -19,6 +21,7 @@ export const rdfStoreManager: RdfStore & {
   const callbacks: RdfChangeCallback[] = [];
   const store = ref<$rdf.IndexedFormula | null>(null);
   const _statements = ref<$rdf.Statement[]>([]);
+  const _parseErrors = ref<string[]>([]);
 
   const _namespaces = computed<Record<string, string>>(() => {
     if (!store.value) return {};
@@ -45,12 +48,25 @@ export const rdfStoreManager: RdfStore & {
 
   const parseJsonLdIntoStore = async (jsonLdText: string) => {
     const baseUri = 'http://example.org/';
-
-    await new Promise<void>((resolve, reject) => {
-      $rdf.parse(jsonLdText, store.value as $rdf.Formula, baseUri, 'application/ld+json', err =>
-        err ? reject(err) : resolve()
-      );
-    });
+    _parseErrors.value = [];
+    try {
+      await new Promise<void>((resolve, reject) => {
+        $rdf.parse(jsonLdText, store.value as $rdf.Formula, baseUri, 'application/ld+json', err => {
+          if (err) {
+            const msg = err.message || String(err);
+            _parseErrors.value.push(msg);
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    } catch (error: any) {
+      const msg = error?.message || String(error);
+      if (!_parseErrors.value.includes(msg)) {
+        _parseErrors.value.push(msg);
+      }
+    }
   };
 
   const updateStatements = () => {
@@ -91,6 +107,16 @@ export const rdfStoreManager: RdfStore & {
     }
   };
 
+  const exportAs = (
+    format: string
+  ): {content: string | undefined; success: boolean; errorMessage: string} => {
+    if (!store.value) {
+      return {content: '', success: false, errorMessage: 'Store is not initialized.'};
+    }
+    const serialized = $rdf.serialize(null, store.value, 'http://example.org/', format);
+    return {content: serialized, success: true, errorMessage: ''};
+  };
+
   const onChange = (cb: RdfChangeCallback) => {
     callbacks.push(cb);
   };
@@ -115,8 +141,10 @@ export const rdfStoreManager: RdfStore & {
     statements: readonly(_statements),
     namespaces: readonly(_namespaces),
     store: readonly(store),
+    parseErrors: readonly(_parseErrors),
     deleteStatement,
     addStatement,
     onChange,
+    exportAs,
   } as RdfStore & {onChange: (cb: RdfChangeCallback) => void};
 })();

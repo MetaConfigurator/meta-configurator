@@ -32,6 +32,12 @@
             variant="text"
             @click="confirmDeleteSelected"
             :disabled="!selectedTriple" />
+          <SplitButton
+            label="Export"
+            text
+            severity="info"
+            icon="pi pi-upload"
+            :model="exportMenuItems" />
         </div>
         <IconField>
           <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
@@ -154,15 +160,24 @@ import IconField from 'primevue/iconfield';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
+import SplitButton from 'primevue/splitbutton';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
 
+const exportMenuItems = [
+  {
+    label: 'TTL',
+    icon: 'pi pi-globe',
+    command: () => exportAsTurtle(),
+  },
+];
 const editDialog = ref(false);
 const deleteDialog = ref(false);
 const newSubjectInput = ref('');
 const selectedTriple = ref();
+const selectedExportFormat = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 const filters = ref();
 const triple = ref({
@@ -243,15 +258,10 @@ const namedNodes = computed(() => {
   return nodes;
 });
 
-watch(selectedTriple, (value, _) => {
-  if (value) {
-    const subject = value.subject;
-    const predicate = value.predicate;
-    const object = value.object;
-
-    const path = jsonLdNodeManager.findPath(subject, predicate, object);
+watch(selectedTriple, (target, _) => {
+  if (target) {
+    const path = jsonLdNodeManager.findPath(target.statement);
     if (path) {
-      console.log('Path ', path);
       emit('zoom_into_path', path!);
     }
   }
@@ -322,11 +332,7 @@ async function updateNodeInJsonLd(tripId: string) {
 }
 
 function onRowClick(event: any) {
-  const subject = event.data.subject;
-  const predicate = event.data.predicate;
-  const object = event.data.object;
-
-  const path = jsonLdNodeManager.findPath(subject, predicate, object);
+  const path = jsonLdNodeManager.findPath(event.data.statement);
   if (path) {
     emit('zoom_into_path', path!);
   }
@@ -353,6 +359,21 @@ function addstatementToStore() {
 
 function translateIRI(iriTerm: string) {
   return iriTerm;
+}
+
+function exportAsTurtle() {
+  const serialized = rdfStoreManager.exportAs('text/turtle');
+  downloadFile(serialized);
+}
+
+function downloadFile(serialized: {content: string; success: boolean; errorMessage: string}) {
+  const blob = new Blob([serialized.content], {type: 'text/turtle'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'data.ttl';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 initFilters();

@@ -113,7 +113,6 @@ const initFilters = () => {
 };
 
 const items = computed(() => {
-  console.log(rdfStoreManager.namespaces.value);
   return Object.entries(rdfStoreManager.namespaces.value).map(([prefix, iri]) => ({
     id: prefix,
     prefix: prefix,

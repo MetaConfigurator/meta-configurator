@@ -32,6 +32,7 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import type {Path} from '@/utility/path';
+import {computed} from 'vue';
 
 const props = defineProps<{
   dataIsUnparsable: boolean;

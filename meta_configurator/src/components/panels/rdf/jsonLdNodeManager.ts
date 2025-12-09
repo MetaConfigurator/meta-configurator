@@ -22,7 +22,6 @@ class JsonLdParser {
   constructor(jsonLdText: string) {
     this.text = jsonLdText;
 
-    // Extract @context from JSON-LD text
     try {
       const json = JSON.parse(jsonLdText);
       if (json['@context']) {
@@ -89,8 +88,15 @@ class JsonLdParser {
           return child.path.slice();
         }
 
+        if (child.value && typeof child.value === 'object' && '@value' in child.value) {
+          if (String(child.value['@value']) === object) {
+            return [...child.path, '@value'];
+          }
+        }
+
         if (child.value && typeof child.value === 'object' && '@id' in child.value) {
           if (child.value['@id'] === object) return [...child.path, '@id'];
+
           const idChild = child.children.find(
             gc => gc.path[gc.path.length - 1] === '@id' && gc.value === object
           );
@@ -100,8 +106,10 @@ class JsonLdParser {
         if (Array.isArray(child.value)) {
           for (const elemNode of child.children) {
             if (elemNode.value === object) return elemNode.path.slice();
+
             if (elemNode.value && typeof elemNode.value === 'object') {
               if (elemNode.value['@id'] === object) return [...elemNode.path, '@id'];
+
               const idChild = elemNode.children.find(
                 gc => gc.path[gc.path.length - 1] === '@id' && gc.value === object
               );
@@ -110,19 +118,20 @@ class JsonLdParser {
           }
         }
       }
+
       const deeper = this.searchPredicateObject(child, predicate, object);
       if (deeper) return deeper;
     }
     return null;
   }
 
-  findPath(subject: string, predicate: string, object: string): (string | number)[] | null {
+  findPath(statement: $rdf.Statement): (string | number)[] | null {
     const ast = this.buildAST(JSON.parse(this.text));
     const idIndex = this.indexById(ast);
-    const subjectNodes = idIndex.get(subject);
+    const subjectNodes = idIndex.get(statement.subject.value);
     if (!subjectNodes) return null;
-    const predicateEquivs = this.getEquivalentTerms(predicate);
-    const objectEquivs = this.getEquivalentTerms(object);
+    const predicateEquivs = this.getEquivalentTerms(statement.predicate.value);
+    const objectEquivs = this.getEquivalentTerms(statement.object.value);
     for (const sn of subjectNodes) {
       for (const pred of predicateEquivs) {
         for (const obj of objectEquivs) {
@@ -171,7 +180,7 @@ class JsonLdParser {
 interface JsonLdNodeManagerStore {
   deleteStatement: (statement: $rdf.Statement) => Path | undefined;
   addStatement: (statement: $rdf.Statement) => Path | undefined;
-  findPath: (subject: string, predicate: string, object: string) => Path | undefined;
+  findPath: (statement: $rdf.Statement) => Path | undefined;
 }
 
 export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
@@ -180,27 +189,19 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
 
   const deleteStatement = (statement: $rdf.Statement) => {
     _nodeManager.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
-    let path = _nodeManager.value!.findPath(
-      statement.subject.value,
-      statement.predicate.value,
-      statement.object.value
-    ) as Path;
+    let path = _nodeManager.value!.findPath(statement) as Path;
     data.removeDataAt(path);
     return path;
   };
 
   const addStatement = (statement: $rdf.Statement) => {
     _nodeManager.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
-    return _nodeManager.value.findPath(
-      statement.subject.value,
-      statement.predicate.value,
-      statement.object.value
-    ) as Path;
+    return _nodeManager.value.findPath(statement) as Path;
   };
 
-  const findPath = (subject: string, predicate: string, object: string) => {
+  const findPath = (statement: $rdf.Statement) => {
     _nodeManager.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
-    return _nodeManager.value.findPath(subject, predicate, object) as Path;
+    return _nodeManager.value.findPath(statement) as Path;
   };
 
   return {

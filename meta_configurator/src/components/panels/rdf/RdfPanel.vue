@@ -7,6 +7,16 @@
     </PanelSettings>
     <RmlMappingDialog ref="rmlMappingDialog" />
     <div
+      v-if="parsingErrors.length > 0"
+      class="border border-orange-400 bg-orange-50 text-orange-800 p-4 rounded m-1">
+      <p class="font-semibold">Semantic issues were detected in your JSON-LD data:</p>
+      <ul class="mt-2 list-disc list-inside">
+        <li v-for="err in parsingErrors" :key="err.id">
+          {{ err.message }}
+        </li>
+      </ul>
+    </div>
+    <div
       v-if="dataIsUnparsable"
       class="border border-red-400 bg-red-50 text-yellow-800 p-4 rounded m-1">
       Your data contains syntax errors. Please correct them before proceeding.
@@ -31,13 +41,14 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from 'vue';
+import {ref, watch, computed} from 'vue';
 import RdfEditorPanel from '@/components/panels/rdf/RdfEditorPanel.vue';
 import {SessionMode} from '@/store/sessionMode';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
+import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -49,6 +60,13 @@ const session = getSessionForMode(props.sessionMode);
 const rmlMappingDialog = ref();
 const dataIsUnparsable = ref(false);
 const dataIsInJsonLd = ref(false);
+
+const parsingErrors = computed(() => {
+  return rdfStoreManager.parseErrors.value.map((msg, index) => ({
+    id: index,
+    message: msg,
+  }));
+});
 
 watch(
   () => getDataForMode(props.sessionMode).isDataUnparseable(),
