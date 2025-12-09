@@ -11,16 +11,21 @@
       class="border border-red-400 bg-red-50 text-yellow-800 p-4 rounded m-1">
       Your data contains syntax errors. Please correct them before proceeding.
     </div>
-    <div class="panel-content" v-if="dataIsInJsonLd">
-      <RdfEditorPanel @zoom_into_path="zoomIntoPath" />
-    </div>
-    <div v-else class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded m-1">
+    <div
+      v-if="!dataIsInJsonLd"
+      class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded m-1">
       To use RDF panel, your data should be in valid JSON-LD format. If your data is in JSON, you
       can use
       <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
         JSON to JSON-LD
       </a>
       utility to convert it to JSON-LD.
+    </div>
+    <div class="panel-content">
+      <RdfEditorPanel
+        :dataIsUnparsable="dataIsUnparsable"
+        :dataIsInJsonLd="dataIsInJsonLd"
+        @zoom_into_path="zoomIntoPath" />
     </div>
   </div>
 </template>

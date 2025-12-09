@@ -7,10 +7,16 @@
       </TabList>
       <TabPanels>
         <TabPanel value="context">
-          <RdfEditorContextPanel @zoom_into_path="zoomIntoPath" />
+          <RdfEditorContextPanel
+            :dataIsUnparsable="props.dataIsUnparsable"
+            :dataIsInJsonLd="props.dataIsInJsonLd"
+            @zoom_into_path="zoomIntoPath" />
         </TabPanel>
         <TabPanel value="graph">
-          <RdfEditorGraphPanel @zoom_into_path="zoomIntoPath" />
+          <RdfEditorGraphPanel
+            :dataIsUnparsable="props.dataIsUnparsable"
+            :dataIsInJsonLd="props.dataIsInJsonLd"
+            @zoom_into_path="zoomIntoPath" />
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -26,6 +32,11 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import type {Path} from '@/utility/path';
+
+const props = defineProps<{
+  dataIsUnparsable: boolean;
+  dataIsInJsonLd: boolean;
+}>();
 
 const emit = defineEmits<{
   (e: 'zoom_into_path', path: Path): void;

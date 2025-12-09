@@ -1,11 +1,6 @@
 <template>
-  <div
-    v-if="dataHasSemanticsError"
-    class="border border-red-400 bg-red-50 text-red-800 p-4 rounded m-1">
-    {{ semanticErrors }}
-  </div>
   <DataTable
-    :class="{'disabled-wrapper': dataHasSyntaxError || dataHasSemanticsError}"
+    :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable}"
     :value="items"
     @row-click="onRowClick"
     v-model:filters="filters"
@@ -163,14 +158,10 @@ import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
-import {useSettings} from '@/settings/useSettings';
 
 const editDialog = ref(false);
-const dataHasSyntaxError = ref(false);
-const dataHasSemanticsError = ref(false);
 const deleteDialog = ref(false);
 const newSubjectInput = ref('');
-const semanticErrors = ref('');
 const selectedTriple = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 const filters = ref();
@@ -183,6 +174,10 @@ const triple = ref({
   objectType: 'Literal',
   statement: null as any,
 });
+const props = defineProps<{
+  dataIsUnparsable: boolean;
+  dataIsInJsonLd: boolean;
+}>();
 const emit = defineEmits<{
   (e: 'zoom_into_path', path: Path): void;
 }>();
