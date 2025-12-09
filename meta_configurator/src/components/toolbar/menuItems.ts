@@ -27,6 +27,7 @@ export class MenuItems {
   private readonly showDataMappingDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
   private readonly showRMLMappingDialog: () => void;
+  private readonly showImportTurtleDialog: () => void;
 
   constructor(
     showSchemaSelectionDialog: () => void,
@@ -36,7 +37,8 @@ export class MenuItems {
     showDataExportDialog: (schemaMode: boolean) => void,
     showDataMappingDialog: () => void,
     inferJsonSchemaFromSampleData: () => void,
-    showRMLMappingDialog: () => void
+    showRMLMappingDialog: () => void,
+    showImportTurtleDialog: () => void
   ) {
     this.showSchemaSelectionDialog = showSchemaSelectionDialog;
     this.showImportCsvDialog = showImportCsvDialog;
@@ -46,6 +48,7 @@ export class MenuItems {
     this.showDataMappingDialog = showDataMappingDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
     this.showRMLMappingDialog = showRMLMappingDialog;
+    this.showImportTurtleDialog = showImportTurtleDialog;
   }
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
@@ -80,6 +83,11 @@ export class MenuItems {
             label: 'Import CSV Data',
             icon: 'fa-solid fa-table',
             command: this.showImportCsvDialog,
+          },
+          {
+            label: 'Import Turtle Data',
+            icon: 'fa-solid fa-globe',
+            command: this.showImportTurtleDialog,
           },
         ],
       },

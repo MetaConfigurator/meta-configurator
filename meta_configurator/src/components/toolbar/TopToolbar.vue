@@ -27,6 +27,7 @@ const emit = defineEmits<{
   (e: 'show-data-export-dialog', schemaMode: boolean): void;
   (e: 'show-data-mapping-dialog'): void;
   (e: 'show-rml-mapping-dialog'): void;
+  (e: 'show-import-turtle-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -68,6 +69,10 @@ function showRmlMappingDialog() {
   emit('show-rml-mapping-dialog');
 }
 
+function showTurtleImportDialog() {
+  emit('show-import-turtle-dialog');
+}
+
 const modeSelector = ref();
 
 useMagicKeys({
@@ -104,7 +109,8 @@ useMagicKeys({
           @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()"
-          @show-rml-mapping-dialog="() => showRmlMappingDialog()" />
+          @show-rml-mapping-dialog="() => showRmlMappingDialog()"
+          @show-import-turtle-dialog="() => showTurtleImportDialog()" />
 
         <Divider layout="vertical" />
 
@@ -172,7 +178,8 @@ useMagicKeys({
           @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()"
-          @show-rml-mapping-dialog="() => showRmlMappingDialog()" />
+          @show-rml-mapping-dialog="() => showRmlMappingDialog()"
+          @show-import-turtle-dialog="() => showTurtleImportDialog()" />
       </div>
 
       <!-- RIGHT side: format selector -->

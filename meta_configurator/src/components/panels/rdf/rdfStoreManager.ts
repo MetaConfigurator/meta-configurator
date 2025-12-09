@@ -110,6 +110,7 @@ export const rdfStoreManager: RdfStore & {
       updateStatements();
     }
   );
+
   return {
     statements: readonly(_statements),
     namespaces: readonly(_namespaces),
