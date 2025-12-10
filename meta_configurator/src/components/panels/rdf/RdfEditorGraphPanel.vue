@@ -1,6 +1,6 @@
 <template>
   <DataTable
-    :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable}"
+    :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable || parsingErrors.length > 0}"
     :value="items"
     @row-click="onRowClick"
     v-model:filters="filters"
@@ -323,6 +323,13 @@ const saveTriple = async () => {
 
   editDialog.value = false;
 };
+
+const parsingErrors = computed(() => {
+  return rdfStoreManager.parseErrors.value.map((msg, index) => ({
+    id: index,
+    message: msg,
+  }));
+});
 
 async function updateNodeInJsonLd(tripId: string) {
   // if (!nodeManager.value || !store.value) return;

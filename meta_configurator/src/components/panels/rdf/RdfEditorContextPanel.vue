@@ -1,6 +1,6 @@
 <template>
   <DataTable
-    :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable}"
+    :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable || parsingErrors.length > 0}"
     :value="items"
     @row-click="onRowClick"
     v-model:filters="filters"
@@ -132,6 +132,13 @@ const deleteSelectedContext = () => {
   deleteDialog.value = false;
   selectedItem.value = null;
 };
+
+const parsingErrors = computed(() => {
+  return rdfStoreManager.parseErrors.value.map((msg, index) => ({
+    id: index,
+    message: msg,
+  }));
+});
 
 const clearFilter = () => {
   initFilters();
