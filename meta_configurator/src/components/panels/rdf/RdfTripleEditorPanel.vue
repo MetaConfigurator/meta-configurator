@@ -16,6 +16,7 @@
     :stripedRows="true"
     filterDisplay="menu"
     frozenHeader
+    :rowAttrs="{tabindex: 0}"
     @row-dblclick="openEditDialog"
     :globalFilterFields="['subject', 'predicate', 'object']"
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -32,12 +33,13 @@
             variant="text"
             @click="confirmDeleteSelected"
             :disabled="!selectedTriple" />
-          <SplitButton
+          <Button
             label="Export"
-            text
-            severity="info"
             icon="pi pi-upload"
-            :model="exportMenuItems" />
+            severity="info"
+            text
+            @click="toggleExportMenu" />
+          <Menu ref="exportMenu" :model="exportMenuItems" popup />
         </div>
         <IconField>
           <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
@@ -160,24 +162,39 @@ import IconField from 'primevue/iconfield';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
-import SplitButton from 'primevue/splitbutton';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
+import Menu from 'primevue/menu';
 
 const exportMenuItems = [
   {
-    label: 'TTL',
-    icon: 'pi pi-globe',
-    command: () => exportAsTurtle(),
+    label: 'Turtle',
+    icon: 'pi pi-file',
+    command: () => exportAs('text/turtle'),
+  },
+  {
+    label: 'N-Triples',
+    icon: 'pi pi-file',
+    command: () => exportAs('application/n-triples'),
+  },
+  {
+    label: 'RDF/XML',
+    icon: 'pi pi-file',
+    command: () => exportAs('application/rdf+xml'),
+  },
+  {
+    label: 'N-Quads',
+    icon: 'pi pi-file',
+    command: () => exportAs('application/n-quads'),
   },
 ];
+const exportMenu = ref();
 const editDialog = ref(false);
 const deleteDialog = ref(false);
 const newSubjectInput = ref('');
 const selectedTriple = ref();
-const selectedExportFormat = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 const filters = ref();
 const triple = ref({
@@ -216,8 +233,8 @@ const subjectTypeOptions = [
 ];
 
 const items = computed(() => {
-  return rdfStoreManager.statements.value.map((st, _) => ({
-    id: tripleId(st),
+  return rdfStoreManager.statements.value.map((st, index) => ({
+    id: index,
     subject: translateIRI(st.subject.value),
     predicate: translateIRI(st.predicate.value),
     object: translateIRI(st.object.value),
@@ -257,6 +274,10 @@ const namedNodes = computed(() => {
   nodes.push({label: '+ Add new', value: '__new__'});
   return nodes;
 });
+
+function toggleExportMenu(event: Event) {
+  exportMenu.value.toggle(event);
+}
 
 watch(selectedTriple, (target, _) => {
   if (target) {
@@ -368,25 +389,65 @@ function translateIRI(iriTerm: string) {
   return iriTerm;
 }
 
-function exportAsTurtle() {
-  const serialized = rdfStoreManager.exportAs('text/turtle');
-  downloadFile(serialized);
+function exportAs(format: string) {
+  const serialized = rdfStoreManager.exportAs(format);
+  downloadFile(serialized, format);
 }
 
-function downloadFile(serialized: {content: string; success: boolean; errorMessage: string}) {
-  const blob = new Blob([serialized.content], {type: 'text/turtle'});
+function downloadFile(
+  serialized: {content: string; success: boolean; errorMessage: string},
+  format: string
+) {
+  const blob = new Blob([serialized.content], {type: format});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'data.ttl';
+  a.download = `Data.${getFileExtension(format)}`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function getFileExtension(format: string): string {
+  switch (format) {
+    case 'text/turtle':
+      return 'ttl';
+    case 'application/n-triples':
+
+    case 'text/plain':
+      return 'nt';
+
+    case 'application/ld+json':
+      return 'jsonld';
+
+    case 'application/rdf+xml':
+      return 'rdf';
+
+    case 'application/n-quads':
+      return 'nq';
+
+    default:
+      return 'txt';
+  }
 }
 
 initFilters();
 </script>
 
 <style scoped>
+.highlighted-row {
+  animation: highlightAnim 2s ease;
+  background-color: yellow;
+}
+
+@keyframes highlightAnim {
+  from {
+    background-color: yellow;
+  }
+  to {
+    background-color: inherit;
+  }
+}
+
 .disabled-wrapper {
   position: relative;
 }

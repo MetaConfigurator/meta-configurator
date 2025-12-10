@@ -1,19 +1,19 @@
 <template>
   <div class="panel-tab-container">
-    <Tabs value="graph">
+    <Tabs value="triple">
       <TabList>
         <Tab value="context">Context</Tab>
-        <Tab value="graph">Graph</Tab>
+        <Tab value="triple">Triples</Tab>
       </TabList>
       <TabPanels>
         <TabPanel value="context">
-          <RdfEditorContextPanel
+          <RdfContextEditorPanel
             :dataIsUnparsable="props.dataIsUnparsable"
             :dataIsInJsonLd="props.dataIsInJsonLd"
             @zoom_into_path="zoomIntoPath" />
         </TabPanel>
-        <TabPanel value="graph">
-          <RdfEditorGraphPanel
+        <TabPanel value="triple">
+          <RdfTripleEditorPanel
             :dataIsUnparsable="props.dataIsUnparsable"
             :dataIsInJsonLd="props.dataIsInJsonLd"
             @zoom_into_path="zoomIntoPath" />
@@ -24,15 +24,14 @@
 </template>
 
 <script setup lang="ts">
-import RdfEditorGraphPanel from '@/components/panels/rdf/RdfEditorGraphPanel.vue';
-import RdfEditorContextPanel from '@/components/panels/rdf/RdfEditorContextPanel.vue';
+import RdfTripleEditorPanel from '@/components/panels/rdf/RdfTripleEditorPanel.vue';
+import RdfContextEditorPanel from '@/components/panels/rdf/RdfContextEditorPanel.vue';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import type {Path} from '@/utility/path';
-import {computed} from 'vue';
 
 const props = defineProps<{
   dataIsUnparsable: boolean;

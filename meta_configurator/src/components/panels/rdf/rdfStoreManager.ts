@@ -113,7 +113,12 @@ export const rdfStoreManager: RdfStore & {
     if (!store.value) {
       return {content: '', success: false, errorMessage: 'Store is not initialized.'};
     }
-    const serialized = $rdf.serialize(null, store.value, 'http://example.org/', format);
+    const serialized = $rdf.serialize(
+      null,
+      store.value as $rdf.Formula,
+      'http://example.org/',
+      format
+    );
     return {content: serialized, success: true, errorMessage: ''};
   };
 
