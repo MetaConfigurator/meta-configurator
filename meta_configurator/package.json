@@ -72,6 +72,7 @@
     "quicktype-core": "^23.0.171",
     "rdflib": "^2.3.0",
     "showdown": "^2.1.0",
+    "sparqljs": "^3.7.3",
     "vue": "^3.5.13",
     "vue-codemirror": "^6.1.1",
     "vue-flow": "^0.3.0",

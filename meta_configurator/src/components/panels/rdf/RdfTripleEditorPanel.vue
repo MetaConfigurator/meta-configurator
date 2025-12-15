@@ -14,7 +14,7 @@
     :showGridlines="true"
     :paginator="true"
     v-model:rows="rowsPerPage"
-    :stripedRows="true"
+    stripedRows
     filterDisplay="menu"
     frozenHeader
     :rowAttrs="{tabindex: 0}"
@@ -167,7 +167,8 @@
     header="SPARQL"
     modal
     maximizable
-    :style="{width: '600px', height: '600px'}">
+    :style="{width: '600px', height: '600px'}"
+    :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
     <SparqlEditor />
   </Dialog>
 </template>
@@ -191,7 +192,6 @@ import Menu from 'primevue/menu';
 import {getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
-import type {height} from '@fortawesome/free-solid-svg-icons/faLock';
 
 const first = ref(0);
 const rowsPerPage = ref(50);
