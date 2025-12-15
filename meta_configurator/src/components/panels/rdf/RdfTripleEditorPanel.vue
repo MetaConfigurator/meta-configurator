@@ -3,6 +3,7 @@
     :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable || parsingErrors.length > 0}"
     :value="items"
     @row-click="onRowClick"
+    v-model:first="first"
     v-model:filters="filters"
     v-model:selection="selectedTriple"
     scrollable
@@ -12,7 +13,7 @@
     resizableColumns
     :showGridlines="true"
     :paginator="true"
-    :rows="50"
+    v-model:rows="rowsPerPage"
     :stripedRows="true"
     filterDisplay="menu"
     frozenHeader
@@ -153,6 +154,7 @@
 </template>
 
 <script setup lang="ts">
+import {nextTick} from 'vue';
 import {ref, computed, watch} from 'vue';
 import * as $rdf from 'rdflib';
 import DataTable from 'primevue/datatable';
@@ -167,6 +169,12 @@ import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
 import Menu from 'primevue/menu';
+import {getSessionForMode} from '@/data/useDataLink';
+import {SessionMode} from '@/store/sessionMode';
+
+const first = ref(0);
+const rowsPerPage = ref(50);
+const dataSession = getSessionForMode(SessionMode.DataEditor);
 
 const exportMenuItems = [
   {
@@ -242,8 +250,20 @@ const items = computed(() => {
   }));
 });
 
-function tripleId(st: $rdf.Statement) {
-  return `${st.subject.value}|${st.predicate.value}|${st.object.value}`;
+async function selectRowByIndex(index: number) {
+  const page = Math.floor(index / rowsPerPage.value);
+  if (first.value !== page * rowsPerPage.value) {
+    first.value = page * rowsPerPage.value;
+    await nextTick();
+  }
+  const row = items.value[index];
+  if (row) {
+    selectedTriple.value = row;
+    const rowEl = document.querySelector(`tr[data-p-index="${index}"]`) as HTMLElement;
+    if (rowEl) {
+      rowEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+  }
 }
 
 const confirmDeleteSelected = () => {
@@ -352,6 +372,18 @@ const parsingErrors = computed(() => {
   }));
 });
 
+watch(
+  dataSession.currentSelectedElement,
+  async () => {
+    const absolutePath = dataSession.currentSelectedElement.value;
+    let index = rdfStoreManager.findMatchingStatementIndex(absolutePath);
+    if (index !== -1) {
+      await selectRowByIndex(index);
+    }
+  },
+  {deep: true}
+);
+
 async function updateNodeInJsonLd(tripId: string) {
   // if (!nodeManager.value || !store.value) return;
   // await nodeManager.value.rebuildNode(tripId, store.value);
@@ -434,20 +466,6 @@ initFilters();
 </script>
 
 <style scoped>
-.highlighted-row {
-  animation: highlightAnim 2s ease;
-  background-color: yellow;
-}
-
-@keyframes highlightAnim {
-  from {
-    background-color: yellow;
-  }
-  to {
-    background-color: inherit;
-  }
-}
-
 .disabled-wrapper {
   position: relative;
 }
