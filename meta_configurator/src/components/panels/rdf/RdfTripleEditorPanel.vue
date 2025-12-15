@@ -26,21 +26,32 @@
     <template #header>
       <div class="flex justify-between items-center w-full">
         <div class="flex items-center gap-1">
-          <Button label="Add" icon="pi pi-plus" variant="text" @click="openNewDialog" />
+          <Button
+            label="Add"
+            icon="pi pi-plus"
+            severity="contrast"
+            variant="text"
+            @click="openNewDialog" />
           <Button
             label="Delete"
             icon="pi pi-trash"
-            severity="danger"
+            severity="contrast"
             variant="text"
             @click="confirmDeleteSelected"
             :disabled="!selectedTriple" />
           <Button
             label="Export"
             icon="pi pi-upload"
-            severity="info"
+            severity="contrast"
             text
             @click="toggleExportMenu" />
           <Menu ref="exportMenu" :model="exportMenuItems" popup />
+          <Button
+            label="SPARQL"
+            icon="pi pi-search"
+            severity="contrast"
+            variant="text"
+            @click="openSparqlEditor" />
         </div>
         <IconField>
           <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
@@ -77,7 +88,7 @@
       </template>
     </Column>
   </DataTable>
-  <Dialog v-model:visible="editDialog" header="Triple Details" :modal="true">
+  <Dialog v-model:visible="editDialog" header="Triple Details" modal>
     <div class="flex flex-col gap-6">
       <label class="block font-bold mb-3">Subject</label>
       <div class="flex gap-2">
@@ -135,7 +146,7 @@
       <Button label="Save" icon="pi pi-check" @click="saveTriple" />
     </template>
   </Dialog>
-  <Dialog v-model:visible="deleteDialog" header="Confirm" :modal="true">
+  <Dialog v-model:visible="deleteDialog" header="Confirm" modal>
     <div class="flex items-center gap-4">
       <i class="pi pi-exclamation-triangle !text-3xl" />
       <span v-if="triple">Are you sure you want to delete the selected item?</span>
@@ -150,6 +161,14 @@
         variant="text" />
       <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedTriple" severity="danger" />
     </template>
+  </Dialog>
+  <Dialog
+    v-model:visible="sparqlDialog"
+    header="SPARQL"
+    modal
+    maximizable
+    :style="{width: '600px', height: '600px'}">
+    <SparqlEditor />
   </Dialog>
 </template>
 
@@ -171,6 +190,8 @@ import type {Path} from '@/utility/path';
 import Menu from 'primevue/menu';
 import {getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
+import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
+import type {height} from '@fortawesome/free-solid-svg-icons/faLock';
 
 const first = ref(0);
 const rowsPerPage = ref(50);
@@ -201,6 +222,7 @@ const exportMenuItems = [
 const exportMenu = ref();
 const editDialog = ref(false);
 const deleteDialog = ref(false);
+const sparqlDialog = ref(false);
 const newSubjectInput = ref('');
 const selectedTriple = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
@@ -270,9 +292,12 @@ const confirmDeleteSelected = () => {
   deleteDialog.value = true;
 };
 
+const openSparqlEditor = () => {
+  sparqlDialog.value = true;
+};
+
 const deleteSelectedTriple = () => {
   if (!selectedTriple.value) return;
-
   rdfStoreManager.deleteStatement(selectedTriple.value.statement);
   jsonLdNodeManager.deleteStatement(selectedTriple.value.statement);
   deleteDialog.value = false;
