@@ -20,7 +20,15 @@
             <div v-if="errorMessage" class="error-box">
               {{ errorMessage }}
             </div>
-            <div class="editor-footer">
+            <div
+              class="editor-footer flex items-center"
+              style="width: 100%; justify-content: space-between">
+              <Button
+                icon="pi pi-info-circle"
+                label="SPARQL limitations"
+                variant="text"
+                severity="warning"
+                @click="showLimitationsDialog = true" />
               <Button
                 label="Run Query"
                 icon="pi pi-play"
@@ -29,6 +37,31 @@
                 severity="secondary" />
             </div>
           </div>
+          <Dialog
+            v-model:visible="showLimitationsDialog"
+            header="Unsupported SPARQL Features"
+            modal
+            style="width: 500px">
+            <div class="text-sm leading-relaxed">
+              <p class="mb-2">
+                This SPARQL editor uses <b>rdflib.js</b> and supports only a subset of SPARQL 1.1.
+              </p>
+              <p class="font-semibold mb-1">The following features are not supported:</p>
+              <ul class="pl-4 list-disc mb-3">
+                <li><b>LIMIT</b>, <b>OFFSET</b>, <b>ORDER BY</b>, <b>DISTINCT</b></li>
+                <li>Aggregates: COUNT, SUM, AVG, MIN, MAX</li>
+                <li>GROUP BY, HAVING</li>
+                <li>Subqueries</li>
+                <li>Property paths (/, *, +, ?, |, ^)</li>
+                <li>VALUES</li>
+                <li>SPARQL UPDATE (INSERT, DELETE, etc.)</li>
+                <li>SERVICE (federated queries)</li>
+              </ul>
+              <Message severity="warn">
+                Queries using these features may execute but return incorrect or unexpected results.
+              </Message>
+            </div>
+          </Dialog>
         </TabPanel>
         <TabPanel value="result">
           <div class="datatable-wrapper">
@@ -79,6 +112,7 @@ import {sparql} from 'codemirror-lang-sparql';
 import {syntaxHighlighting, defaultHighlightStyle} from '@codemirror/language';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {isDarkMode} from '@/utility/darkModeUtils';
+import Message from 'primevue/message';
 import Button from 'primevue/button';
 import Tab from 'primevue/tab';
 import Tabs from 'primevue/tabs';
@@ -89,12 +123,14 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
+import Dialog from 'primevue/dialog';
 import * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {StateEffect, StateField} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
 import {FilterMatchMode} from '@primevue/core/api';
 
+const showLimitationsDialog = ref(false);
 const addErrorLine = StateEffect.define<number | null>();
 const clearErrorLines = StateEffect.define<null>();
 
