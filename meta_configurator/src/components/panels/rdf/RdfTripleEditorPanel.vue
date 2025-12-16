@@ -24,8 +24,9 @@
     :rowsPerPageOptions="[10, 20, 50]"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples">
     <template #header>
-      <div class="flex justify-between items-center w-full">
-        <div class="flex items-center gap-1">
+      <div class="flex justify-between items-center w-full flex-nowrap">
+        <!-- Left buttons -->
+        <div class="flex items-center gap-1 flex-shrink-0">
           <Button
             label="Add"
             icon="pi pi-plus"
@@ -53,7 +54,9 @@
             variant="text"
             @click="openSparqlEditor" />
         </div>
-        <IconField>
+
+        <!-- Right search + clear -->
+        <IconField class="flex items-center gap-1 flex-shrink-0">
           <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
           <InputText v-model="filters['global'].value" placeholder="Search ..." />
         </IconField>
