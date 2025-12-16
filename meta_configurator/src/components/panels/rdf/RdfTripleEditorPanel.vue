@@ -285,9 +285,6 @@ async function selectRowByIndex(index: number) {
     pageChanged = true;
     await nextTick();
   }
-  if (pageChanged) {
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
   const row = items.value[index];
   if (row) {
     selectedTriple.value = row;
