@@ -45,8 +45,10 @@
             icon="pi pi-upload"
             severity="contrast"
             text
-            @click="toggleExportMenu" />
-          <Menu ref="exportMenu" :model="exportMenuItems" popup />
+            @click="toggleExportPopover" />
+          <Popover ref="exportPopover">
+            <Menu :model="exportMenuItems" />
+          </Popover>
           <Button
             label="SPARQL"
             icon="pi pi-search"
@@ -54,8 +56,6 @@
             variant="text"
             @click="openSparqlEditor" />
         </div>
-
-        <!-- Right search + clear -->
         <IconField class="flex items-center gap-1 flex-shrink-0">
           <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
           <InputText v-model="filters['global'].value" placeholder="Search ..." />
@@ -187,6 +187,7 @@ import IconField from 'primevue/iconfield';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
+import Popover from 'primevue/popover';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
@@ -196,10 +197,18 @@ import {getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
 
+const exportPopover = ref();
 const first = ref(0);
 const rowsPerPage = ref(50);
 const dataSession = getSessionForMode(SessionMode.DataEditor);
-
+const exportMenu = ref();
+const editDialog = ref(false);
+const deleteDialog = ref(false);
+const sparqlDialog = ref(false);
+const newSubjectInput = ref('');
+const selectedTriple = ref();
+const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
+const filters = ref();
 const exportMenuItems = [
   {
     label: 'Turtle',
@@ -222,14 +231,6 @@ const exportMenuItems = [
     command: () => exportAs('application/n-quads'),
   },
 ];
-const exportMenu = ref();
-const editDialog = ref(false);
-const deleteDialog = ref(false);
-const sparqlDialog = ref(false);
-const newSubjectInput = ref('');
-const selectedTriple = ref();
-const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
-const filters = ref();
 const triple = ref({
   subject: '',
   subjectType: 'NamedNode',
@@ -254,7 +255,6 @@ const initFilters = () => {
     object: {value: null, matchMode: FilterMatchMode.CONTAINS},
   };
 };
-
 const objectTypeOptions = [
   {label: 'Named Node', value: 'NamedNode'},
   {label: 'Blank Node', value: 'BlankNode'},
@@ -264,7 +264,6 @@ const subjectTypeOptions = [
   {label: 'Named Node', value: 'NamedNode'},
   {label: 'Blank Node', value: 'BlankNode'},
 ];
-
 const items = computed(() => {
   return rdfStoreManager.statements.value.map((st, index) => ({
     id: index,
@@ -274,6 +273,10 @@ const items = computed(() => {
     statement: st,
   }));
 });
+
+const toggleExportPopover = (event: Event) => {
+  exportPopover.value.toggle(event);
+};
 
 async function selectRowByIndex(index: number) {
   const rowsPerPageValue = rowsPerPage.value;
@@ -327,10 +330,6 @@ const namedNodes = computed(() => {
   nodes.push({label: '+ Add new', value: '__new__'});
   return nodes;
 });
-
-function toggleExportMenu(event: Event) {
-  exportMenu.value.toggle(event);
-}
 
 watch(selectedTriple, (target, _) => {
   if (target) {
@@ -409,6 +408,7 @@ watch(
   dataSession.currentSelectedElement,
   async () => {
     const absolutePath = dataSession.currentSelectedElement.value;
+    console.log(absolutePath);
     let index = rdfStoreManager.findMatchingStatementIndex(absolutePath);
     if (index !== -1) {
       await selectRowByIndex(index);
@@ -515,5 +515,9 @@ initFilters();
 .disabled-wrapper > * {
   pointer-events: none;
   opacity: 0.5;
+}
+
+.p-menu {
+  border: none;
 }
 </style>

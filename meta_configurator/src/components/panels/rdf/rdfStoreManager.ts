@@ -3,7 +3,7 @@ import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Quad} from 'rdflib/lib/tf-types';
-import {sym} from 'rdflib';
+import {literal, sym} from 'rdflib';
 import type {Path} from '@/utility/path';
 
 type RdfChangeCallback = (oldStore: string, newStore: string) => void;
@@ -135,25 +135,45 @@ export const rdfStoreManager: RdfStore & {
   const findMatchingStatementIndex = (path: Path): number => {
     if (!store.value) return -1;
     const jsonld = useCurrentData().data.value;
+
     if (path[0] !== '@graph') return -1;
-    const index = path[1] as number;
+    const graphIndex = path[1] as number;
     const predKey = path[2] as string;
-    const node = jsonld['@graph'][index];
+    const objSelector = path[3];
+
+    const node = jsonld['@graph'][graphIndex];
     if (!node || !node['@id']) return -1;
+
     const subjectIRI = expandTerm(node['@id'], jsonld['@context']);
     const predicateIRI = expandTerm(predKey, jsonld['@context']);
     if (!predicateIRI) return -1;
-    const subject = sym(subjectIRI);
+
+    const subject = sym(subjectIRI!);
     const predicate = sym(predicateIRI);
-    const matches = store.value.match(subject, predicate, null, null);
-    if (matches.length === 0) return -1;
-    if (matches[0]) {
-      const index = findStatementIndexFromQuad(matches[0]);
-      if (index !== -1) {
-        return index;
+
+    let matches: any[] = [];
+
+    if (typeof objSelector === 'number') {
+      let values = node[predKey];
+      if (values === undefined) return -1;
+      if (!Array.isArray(values)) values = [values];
+      const v = values[objSelector];
+      if (v === undefined) return -1;
+
+      let object;
+      if (typeof v === 'object' && '@value' in v) {
+        object = literal(v['@value'], v['@type']);
+      } else {
+        object = literal(v);
       }
+      matches = store.value.match(subject, predicate, object, null);
+    } else {
+      matches = store.value.match(subject, predicate, null, null);
     }
-    return -1;
+
+    if (matches.length === 0) return -1;
+    const idx = findStatementIndexFromQuad(matches[0]);
+    return idx !== -1 ? idx : -1;
   };
 
   function expandTerm(term: string, context: any): string | null {
