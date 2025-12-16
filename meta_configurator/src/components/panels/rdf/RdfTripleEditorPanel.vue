@@ -276,15 +276,23 @@ const items = computed(() => {
 });
 
 async function selectRowByIndex(index: number) {
-  const page = Math.floor(index / rowsPerPage.value);
-  if (first.value !== page * rowsPerPage.value) {
-    first.value = page * rowsPerPage.value;
+  const rowsPerPageValue = rowsPerPage.value;
+  const page = Math.floor(index / rowsPerPageValue);
+  const newFirst = page * rowsPerPageValue;
+  let pageChanged = false;
+  if (first.value !== newFirst) {
+    first.value = newFirst;
+    pageChanged = true;
     await nextTick();
+  }
+  if (pageChanged) {
+    await new Promise(resolve => setTimeout(resolve, 50));
   }
   const row = items.value[index];
   if (row) {
     selectedTriple.value = row;
-    const rowEl = document.querySelector(`tr[data-p-index="${index}"]`) as HTMLElement;
+    const localIndex = index % rowsPerPageValue;
+    const rowEl = document.querySelector(`tr[data-p-index="${localIndex}"]`) as HTMLElement;
     if (rowEl) {
       rowEl.scrollIntoView({behavior: 'smooth', block: 'center'});
     }
