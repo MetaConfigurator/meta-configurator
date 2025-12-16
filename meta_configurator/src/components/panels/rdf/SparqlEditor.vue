@@ -38,8 +38,29 @@
               :value="results"
               scrollable
               stripedRows
+              paginator
+              frozenHeader
+              v-model:filters="filters"
+              filterDisplay="menu"
               scrollHeight="flex"
+              :rows="50"
+              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+              :rowsPerPageOptions="[10, 20, 50]"
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples"
               :emptyMessage="'No results yet'">
+              <template #header>
+                <div class="flex justify-between items-center w-full">
+                  <IconField>
+                    <Button
+                      type="button"
+                      icon="pi pi-filter-slash"
+                      variant="text"
+                      v-tooltip="'Clear all filters'"
+                      @click="clearFilters()" />
+                    <InputText v-model="filters['global'].value" placeholder="Search ..." />
+                  </IconField>
+                </div>
+              </template>
               <Column v-for="col in columns" :key="col" :field="col" :header="col" />
             </DataTable>
           </div>
@@ -66,10 +87,13 @@ import TabPanel from 'primevue/tabpanel';
 import TabList from 'primevue/tablist';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
 import * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {StateEffect, StateField} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
+import {FilterMatchMode} from '@primevue/core/api';
 
 const addErrorLine = StateEffect.define<number | null>();
 const clearErrorLines = StateEffect.define<null>();
@@ -100,6 +124,7 @@ const errorLineMark = Decoration.line({
   attributes: {class: 'cm-error-line'},
 });
 
+const filters = ref<Record<string, any>>({});
 const activeTab = ref('query');
 const sparqlQuery = ref(`SELECT *
 WHERE
@@ -140,6 +165,26 @@ const highlightErrorLine = (lineNumber: number | null) => {
   }
 };
 
+const clearFilters = () => {
+  Object.values(filters.value).forEach(filter => {
+    if (filter && typeof filter === 'object' && 'value' in filter) {
+      filter.value = null;
+    }
+  });
+};
+
+const initFilters = (cols: string[]) => {
+  const f: Record<string, any> = {
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+  };
+
+  cols.forEach(col => {
+    f[col] = {value: null, matchMode: FilterMatchMode.CONTAINS};
+  });
+
+  filters.value = f;
+};
+
 const runQuery = () => {
   results.value = [];
   columns.value = [];
@@ -166,6 +211,7 @@ const runQuery = () => {
         () => {
           if (results.value.length > 0) {
             columns.value = Object.keys(results.value[0]!);
+            initFilters(columns.value);
           }
         }
       );

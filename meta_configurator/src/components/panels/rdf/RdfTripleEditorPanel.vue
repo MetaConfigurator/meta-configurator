@@ -12,7 +12,7 @@
     size="small"
     resizableColumns
     :showGridlines="true"
-    :paginator="true"
+    paginator
     v-model:rows="rowsPerPage"
     stripedRows
     filterDisplay="menu"

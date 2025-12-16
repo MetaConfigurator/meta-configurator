@@ -58,20 +58,23 @@ watch(
 
 defineExpose({show: openDialog, close: hideDialog});
 </script>
-
 <template>
   <Dialog v-model:visible="showDialog" header="Import Turtle">
     <div
-      class="flex flex-wrap justify-content-center gap-3 bigger-dialog-content"
+      class="flex flex-column gap-3 bigger-dialog-content"
       :style="{cursor: isLoading ? 'wait' : 'default'}">
-      <div class="flex align-items-center">
+      <div class="warning-box">
+        ⚠️ Importing a Turtle file overwrite existing data in the text view.
+      </div>
+      <div class="flex align-items-center justify-content-center gap-2">
         <Button
-          label="Select Turtle Document"
+          label="Select File"
           @click="requestUploadFile"
           class="p-button-raised p-button-rounded"
-          :disabled="isLoading"></Button>
-        <FontAwesomeIcon icon="fa-regular" class="text-green-500 ml-2" />
+          :disabled="isLoading" />
+        <FontAwesomeIcon icon="fa-regular" class="text-green-500" />
       </div>
+
       <div v-if="isLoading" class="mt-3 text-sm text-gray-500">Importing, please wait...</div>
     </div>
   </Dialog>
@@ -87,5 +90,13 @@ defineExpose({show: openDialog, close: hideDialog});
 .vertical-center {
   display: flex;
   align-items: center;
+}
+.warning-box {
+  background-color: #fff3cd;
+  color: #664d03;
+  border: 1px solid #ffecb5;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
 }
 </style>

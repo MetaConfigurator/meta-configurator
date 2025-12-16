@@ -140,7 +140,7 @@ export const rdfStoreManager: RdfStore & {
     const predKey = path[2] as string;
     const node = jsonld['@graph'][index];
     if (!node || !node['@id']) return -1;
-    const subjectIRI = node['@id'];
+    const subjectIRI = expandTerm(node['@id'], jsonld['@context']);
     const predicateIRI = expandTerm(predKey, jsonld['@context']);
     if (!predicateIRI) return -1;
     const subject = sym(subjectIRI);

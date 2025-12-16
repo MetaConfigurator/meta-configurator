@@ -190,8 +190,9 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
   const deleteStatement = (statement: $rdf.Statement) => {
     _nodeManager.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
     let path = _nodeManager.value!.findPath(statement) as Path;
-    console.log(path);
-    data.removeDataAt(path);
+    if (path) {
+      data.removeDataAt(path);
+    }
     return path;
   };
 
