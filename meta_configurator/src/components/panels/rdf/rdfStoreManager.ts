@@ -13,6 +13,11 @@ interface RdfStore {
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
   readonly namespaces: Readonly<Ref<Record<string, string>>>;
   readonly parseErrors: Readonly<Ref<string[]>>;
+  query: (
+    sparql: string,
+    onRow: (row: Record<string, string>) => void,
+    onDone?: (columns: string[]) => void
+  ) => void;
   deleteStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
   addStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
   exportAs: (format: string) => {content: string; success: boolean; errorMessage: string};
@@ -176,6 +181,40 @@ export const rdfStoreManager: RdfStore & {
     return idx !== -1 ? idx : -1;
   };
 
+  const query = (
+    sparql: string,
+    onRow: (row: Record<string, string>) => void,
+    onDone?: (columns: string[]) => void
+  ): void => {
+    const queryObj = $rdf.SPARQLToQuery(sparql, false, store.value);
+
+    if (!queryObj) return;
+
+    const rows: Record<string, string>[] = [];
+
+    store.value!.query(
+      queryObj,
+      bindings => {
+        const row: Record<string, string> = {};
+        for (const key in bindings) {
+          row[key] = bindings[key]!.value;
+        }
+        rows.push(row);
+        onRow(row);
+      },
+      undefined,
+      () => {
+        const columns = queryObj.vars.length
+          ? queryObj.vars.map(v => `?${v.label}`)
+          : rows.length
+          ? Object.keys(rows[0]!)
+          : [];
+
+        onDone?.(columns);
+      }
+    );
+  };
+
   function expandTerm(term: string, context: any): string | null {
     if (term === undefined) return null;
     if (term === '@type') return RDF_TYPE;
@@ -244,6 +283,7 @@ export const rdfStoreManager: RdfStore & {
     namespaces: readonly(_namespaces),
     store: readonly(store),
     parseErrors: readonly(_parseErrors),
+    query,
     deleteStatement,
     addStatement,
     onChange,

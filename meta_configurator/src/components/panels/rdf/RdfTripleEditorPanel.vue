@@ -47,7 +47,7 @@
             text
             @click="toggleExportPopover" />
           <Popover ref="exportPopover">
-            <Menu :model="exportMenuItems" />
+            <Menu :style="'border: none'" :model="exportMenuItems" />
           </Popover>
           <Button
             label="SPARQL"
@@ -201,7 +201,6 @@ const exportPopover = ref();
 const first = ref(0);
 const rowsPerPage = ref(50);
 const dataSession = getSessionForMode(SessionMode.DataEditor);
-const exportMenu = ref();
 const editDialog = ref(false);
 const deleteDialog = ref(false);
 const sparqlDialog = ref(false);
@@ -331,10 +330,20 @@ const namedNodes = computed(() => {
   return nodes;
 });
 
+function arePathsEqual(a: Path, b: Path): boolean {
+  if (a.length !== b.length) return false;
+
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+
+  return true;
+}
+
 watch(selectedTriple, (target, _) => {
   if (target) {
     const path = jsonLdNodeManager.findPath(target.statement);
-    if (path) {
+    if (path && !arePathsEqual(dataSession.currentSelectedElement.value, path)) {
       emit('zoom_into_path', path!);
     }
   }
@@ -426,6 +435,8 @@ async function updateNodeInJsonLd(tripId: string) {
 
 function onRowClick(event: any) {
   const path = jsonLdNodeManager.findPath(event.data.statement);
+  console.log('PATH find:', dataSession.currentSelectedElement.value);
+  console.log('Zooming into:', path);
   if (path) {
     emit('zoom_into_path', path!);
   }
@@ -515,9 +526,5 @@ initFilters();
 .disabled-wrapper > * {
   pointer-events: none;
   opacity: 0.5;
-}
-
-.p-menu {
-  border: none;
 }
 </style>

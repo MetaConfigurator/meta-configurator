@@ -124,7 +124,6 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import Dialog from 'primevue/dialog';
-import * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {StateEffect, StateField} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
@@ -231,27 +230,15 @@ const runQuery = () => {
   try {
     const parser = new Parser();
     parser.parse(sparqlQuery.value);
-    const queryObj = $rdf.SPARQLToQuery(sparqlQuery.value, false, rdfStoreManager.store.value);
-    if (queryObj) {
-      activeTab.value = 'result';
-      rdfStoreManager.store.value.query(
-        queryObj,
-        result => {
-          const mapped: Record<string, string> = {};
-          for (const v in result) {
-            mapped[v] = result[v]!.value;
-          }
-          results.value.push(mapped);
-        },
-        undefined,
-        () => {
-          if (results.value.length > 0) {
-            columns.value = Object.keys(results.value[0]!);
-            initFilters(columns.value);
-          }
-        }
-      );
-    }
+    rdfStoreManager.query(
+      sparqlQuery.value,
+      row => results.value.push(row),
+      cols => {
+        activeTab.value = 'result';
+        columns.value = cols;
+        initFilters(cols);
+      }
+    );
   } catch (err: any) {
     errorMessage.value = err.message;
     const lineMatch = err.message.match(/line[:\s]+(\d+)/i);
