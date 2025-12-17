@@ -155,16 +155,7 @@ export const rdfStoreManager: RdfStore & {
         JSON.stringify(jsonLdObj, null, 2),
         tempStore as $rdf.Formula,
         baseUri,
-        'application/ld+json',
-        err => {
-          if (err) {
-            const msg = err.message || String(err);
-            _parseErrors.value.push(msg);
-            reject(err);
-          } else {
-            resolve();
-          }
-        }
+        'application/ld+json'
       );
     });
     if (tempStore.statements.length !== 1) {
