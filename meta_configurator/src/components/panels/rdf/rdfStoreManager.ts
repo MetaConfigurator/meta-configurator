@@ -61,15 +61,21 @@ export const rdfStoreManager: RdfStore & {
     _parseErrors.value = [];
     try {
       await new Promise<void>((resolve, reject) => {
-        $rdf.parse(jsonLdText, _store.value as $rdf.Formula, baseUri, 'application/ld+json', err => {
-          if (err) {
-            const msg = err.message || String(err);
-            _parseErrors.value.push(msg);
-            reject(err);
-          } else {
-            resolve();
+        $rdf.parse(
+          jsonLdText,
+          _store.value as $rdf.Formula,
+          baseUri,
+          'application/ld+json',
+          err => {
+            if (err) {
+              const msg = err.message || String(err);
+              _parseErrors.value.push(msg);
+              reject(err);
+            } else {
+              resolve();
+            }
           }
-        });
+        );
       });
     } catch (error: any) {
       const msg = error?.message || String(error);
