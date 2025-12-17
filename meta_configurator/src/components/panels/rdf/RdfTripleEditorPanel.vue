@@ -420,8 +420,7 @@ watch(
   dataSession.currentSelectedElement,
   async () => {
     const absolutePath = dataSession.currentSelectedElement.value;
-    console.log(absolutePath);
-    let index = rdfStoreManager.findMatchingStatementIndex(absolutePath);
+    let index = await rdfStoreManager.findMatchingStatementIndex(absolutePath);
     if (index !== -1) {
       await selectRowByIndex(index);
     }
@@ -438,8 +437,6 @@ async function updateNodeInJsonLd(tripId: string) {
 
 function onRowClick(event: any) {
   const path = jsonLdNodeManager.findPath(event.data.statement);
-  console.log('PATH find:', dataSession.currentSelectedElement.value);
-  console.log('Zooming into:', path);
   if (path) {
     emit('zoom_into_path', path!);
   }

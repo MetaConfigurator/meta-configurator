@@ -2,11 +2,14 @@ import {readonly, ref, computed, watch, type Ref} from 'vue';
 import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
-import type {Quad} from 'rdflib/lib/tf-types';
-import {literal, sym} from 'rdflib';
 import type {Path} from '@/utility/path';
 
 type RdfChangeCallback = (oldStore: string, newStore: string) => void;
+
+interface JsonLdDoc {
+  '@context': any;
+  '@graph': any[];
+}
 
 interface RdfStore {
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
@@ -20,14 +23,12 @@ interface RdfStore {
   deleteStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
   addStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
   exportAs: (format: string) => {content: string; success: boolean; errorMessage: string};
-  findMatchingStatementIndex: (path: Path) => number;
+  findMatchingStatementIndex: (path: Path) => Promise<number>;
 }
 
 export const rdfStoreManager: RdfStore & {
   onChange: (cb: RdfChangeCallback) => void;
 } = (() => {
-  const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
-
   const callbacks: RdfChangeCallback[] = [];
   const _store = ref<$rdf.IndexedFormula | null>(null);
   const _statements = ref<$rdf.Statement[]>([]);
@@ -61,15 +62,21 @@ export const rdfStoreManager: RdfStore & {
     _parseErrors.value = [];
     try {
       await new Promise<void>((resolve, reject) => {
-        $rdf.parse(jsonLdText, _store.value as $rdf.Formula, baseUri, 'application/ld+json', err => {
-          if (err) {
-            const msg = err.message || String(err);
-            _parseErrors.value.push(msg);
-            reject(err);
-          } else {
-            resolve();
+        $rdf.parse(
+          jsonLdText,
+          _store.value as $rdf.Formula,
+          baseUri,
+          'application/ld+json',
+          err => {
+            if (err) {
+              const msg = err.message || String(err);
+              _parseErrors.value.push(msg);
+              reject(err);
+            } else {
+              resolve();
+            }
           }
-        });
+        );
       });
     } catch (error: any) {
       const msg = error?.message || String(error);
@@ -136,47 +143,34 @@ export const rdfStoreManager: RdfStore & {
     callbacks.push(cb);
   };
 
-  const findMatchingStatementIndex = (path: Path): number => {
-    if (!_store.value) return -1;
-    const jsonld = useCurrentData().data.value;
-
-    if (path[0] !== '@graph') return -1;
-    const graphIndex = path[1] as number;
-    const predKey = path[2] as string;
-    const objSelector = path[3];
-
-    const node = jsonld['@graph'][graphIndex];
-    if (!node || !node['@id']) return -1;
-
-    const subjectIRI = expandTerm(node['@id'], jsonld['@context']);
-    const predicateIRI = expandTerm(predKey, jsonld['@context']);
-    if (!predicateIRI) return -1;
-
-    const subject = sym(subjectIRI!);
-    const predicate = sym(predicateIRI);
-
-    let matches: any[] = [];
-
-    if (typeof objSelector === 'number') {
-      let values = node[predKey];
-      if (values === undefined) return -1;
-      if (!Array.isArray(values)) values = [values];
-      const v = values[objSelector];
-      if (v === undefined) return -1;
-
-      let object;
-      if (typeof v === 'object' && '@value' in v) {
-        object = literal(v['@value'], v['@type']);
-      } else {
-        object = literal(v);
-      }
-      matches = _store.value.match(subject, predicate, object, null);
-    } else {
-      matches = _store.value.match(subject, predicate, null, null);
+  const findMatchingStatementIndex = async (path: Path): Promise<number> => {
+    const jsonLdObj = extractJsonLdByPath(path);
+    if (!jsonLdObj) {
+      return -1;
     }
-
-    if (matches.length === 0) return -1;
-    const idx = findStatementIndexFromQuad(matches[0]);
+    const tempStore = $rdf.graph();
+    const baseUri = 'http://example.org/';
+    await new Promise<void>((resolve, reject) => {
+      $rdf.parse(
+        JSON.stringify(jsonLdObj, null, 2),
+        tempStore as $rdf.Formula,
+        baseUri,
+        'application/ld+json',
+        err => {
+          if (err) {
+            const msg = err.message || String(err);
+            _parseErrors.value.push(msg);
+            reject(err);
+          } else {
+            resolve();
+          }
+        }
+      );
+    });
+    if (tempStore.statements.length !== 1) {
+      return -1;
+    }
+    const idx = findStatementIndex(tempStore.statements[0]!);
     return idx !== -1 ? idx : -1;
   };
 
@@ -210,49 +204,57 @@ export const rdfStoreManager: RdfStore & {
     );
   };
 
-  function expandTerm(term: string, context: any): string | null {
-    if (term === undefined) return null;
-    if (term === '@type') return RDF_TYPE;
-    if (term === '@value') return null;
-    if (term === '@id') return null;
-    if (term.startsWith('@')) return null;
+  function extractJsonLdByPath(path: Path): JsonLdDoc | undefined {
+    const jsonld = useCurrentData().data.value;
 
-    if (term.startsWith('http://') || term.startsWith('https://')) {
-      return term;
+    if (path.length < 3 || path[0] !== '@graph') {
+      return undefined;
     }
 
-    if (term.includes(':')) {
-      const [prefix, local] = term.split(':', 2);
-      if (prefix === undefined) return null;
-      const prefixDef = context?.[prefix];
-      if (typeof prefixDef === 'string') {
-        return prefixDef + local;
+    const [, graphIndex, predicate, arrayIndex] = path;
+
+    if (typeof graphIndex !== 'number' || typeof predicate !== 'string') {
+      return undefined;
+    }
+
+    const subjectNode = jsonld['@graph']?.[graphIndex];
+    if (!subjectNode) {
+      return undefined;
+    }
+
+    let value = subjectNode[predicate];
+    if (value === undefined) {
+      return undefined;
+    }
+
+    if (arrayIndex !== undefined) {
+      if (!Array.isArray(value) || typeof arrayIndex !== 'number') {
+        return undefined;
+      }
+      value = value[arrayIndex];
+      if (value === undefined) {
+        return undefined;
       }
     }
-    const def = context?.[term];
 
-    if (typeof def === 'string') {
-      return def;
-    }
-
-    if (typeof def === 'object' && '@id' in def) {
-      return def['@id'];
-    }
-
-    if (typeof context?.['@vocab'] === 'string') {
-      return context['@vocab'] + term;
-    }
-
-    return null;
+    return {
+      '@context': jsonld['@context'],
+      '@graph': [
+        {
+          '@id': subjectNode['@id'],
+          [predicate]: value,
+        },
+      ],
+    };
   }
 
-  function findStatementIndexFromQuad(quad: Quad): number {
+  function findStatementIndex(statement: $rdf.Statement): number {
     const statements = rdfStoreManager.statements.value;
     const index = statements.findIndex(
       st =>
-        st.subject.value === quad.subject.value &&
-        st.predicate.value === quad.predicate.value &&
-        st.object.value === quad.object.value
+        st.subject.value === statement.subject.value &&
+        st.predicate.value === statement.predicate.value &&
+        st.object.value === statement.object.value
     );
     return index >= 0 ? index : -1;
   }
