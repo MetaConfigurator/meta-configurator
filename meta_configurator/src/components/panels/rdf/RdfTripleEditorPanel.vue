@@ -25,7 +25,6 @@
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples">
     <template #header>
       <div class="flex justify-between items-center w-full flex-nowrap">
-        <!-- Left buttons -->
         <div class="flex items-center gap-1 flex-shrink-0">
           <Button
             label="Add"
@@ -34,12 +33,20 @@
             variant="text"
             @click="openNewDialog" />
           <Button
+            label="Edit"
+            icon="pi pi-pen-to-square"
+            severity="contrast"
+            variant="text"
+            @click="openEditDialog"
+            :disabled="!selectedTriple" />
+          <Button
             label="Delete"
             icon="pi pi-trash"
             severity="contrast"
             variant="text"
             @click="confirmDeleteSelected"
             :disabled="!selectedTriple" />
+          <Divider layout="vertical" class="mx-1" />
           <Button
             label="Export"
             icon="pi pi-upload"
@@ -170,7 +177,7 @@
     header="SPARQL"
     modal
     maximizable
-    :style="{width: '600px', height: '600px'}"
+    :style="{width: '800px', height: '800px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
     <SparqlEditor />
   </Dialog>
@@ -188,6 +195,7 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
 import Popover from 'primevue/popover';
+import Divider from 'primevue/divider';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
@@ -223,11 +231,6 @@ const exportMenuItems = [
     label: 'RDF/XML',
     icon: 'pi pi-file',
     command: () => exportAs('application/rdf+xml'),
-  },
-  {
-    label: 'N-Quads',
-    icon: 'pi pi-file',
-    command: () => exportAs('application/n-quads'),
   },
 ];
 const triple = ref({
@@ -366,8 +369,8 @@ const openNewDialog = () => {
   editDialog.value = true;
 };
 
-const openEditDialog = (event: any) => {
-  const trip = event.data;
+const openEditDialog = () => {
+  const trip = selectedTriple.value;
   triple.value = {
     subject: trip.statement?.subject.value,
     subjectType: trip.statement?.subject?.termType,
@@ -497,9 +500,6 @@ function getFileExtension(format: string): string {
 
     case 'application/rdf+xml':
       return 'rdf';
-
-    case 'application/n-quads':
-      return 'nq';
 
     default:
       return 'txt';

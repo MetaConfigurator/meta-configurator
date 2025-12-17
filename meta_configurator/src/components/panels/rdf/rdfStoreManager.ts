@@ -187,11 +187,8 @@ export const rdfStoreManager: RdfStore & {
     onDone?: (columns: string[]) => void
   ): void => {
     const queryObj = $rdf.SPARQLToQuery(sparql, false, store.value);
-
     if (!queryObj) return;
-
     const rows: Record<string, string>[] = [];
-
     store.value!.query(
       queryObj,
       bindings => {
@@ -209,7 +206,6 @@ export const rdfStoreManager: RdfStore & {
           : rows.length
           ? Object.keys(rows[0]!)
           : [];
-
         onDone?.(columns);
       }
     );

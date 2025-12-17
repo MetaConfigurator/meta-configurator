@@ -79,10 +79,10 @@
               :rows="50"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
               :rowsPerPageOptions="[10, 20, 50]"
-              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples"
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results"
               :emptyMessage="'No results yet'">
-              <template #header>
-                <div class="flex justify-between items-center w-full">
+              <template v-if="columns.length > 0" #header>
+                <div class="flex justify-end items-center w-full">
                   <IconField>
                     <Button
                       type="button"
@@ -94,7 +94,23 @@
                   </IconField>
                 </div>
               </template>
-              <Column v-for="col in columns" :key="col" :field="col" :header="col" />
+              <Column
+                v-for="col in columns"
+                :key="col"
+                :field="col"
+                :header="col"
+                sortable
+                filter
+                filterMatchMode="contains">
+                <template #filter="{filterModel, filterCallback}">
+                  <InputText
+                    v-model="filterModel.value"
+                    type="text"
+                    @input="filterCallback()"
+                    :placeholder="`Search by ${col}`"
+                    class="p-column-filter" />
+                </template>
+              </Column>
             </DataTable>
           </div>
         </TabPanel>
@@ -209,46 +225,53 @@ const clearFilters = () => {
 };
 
 const initFilters = (cols: string[]) => {
-  const f: Record<string, any> = {
+  const _filters: Record<string, any> = {
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
   };
 
   cols.forEach(col => {
-    f[col] = {value: null, matchMode: FilterMatchMode.CONTAINS};
+    _filters[col] = {value: null, matchMode: FilterMatchMode.CONTAINS};
   });
 
-  filters.value = f;
+  filters.value = _filters;
 };
 
 const runQuery = () => {
   results.value = [];
   columns.value = [];
   errorMessage.value = null;
-
   highlightErrorLine(null);
+  if (!validateSparqlSyntax()) {
+    return;
+  }
+  rdfStoreManager.query(
+    sparqlQuery.value,
+    row => {
+      activeTab.value = 'result';
+      results.value.push(row);
+    },
+    cols => {
+      columns.value = cols;
+      initFilters(cols);
+    }
+  );
+};
 
+const validateSparqlSyntax = (): boolean => {
   try {
     const parser = new Parser();
     parser.parse(sparqlQuery.value);
-    rdfStoreManager.query(
-      sparqlQuery.value,
-      row => results.value.push(row),
-      cols => {
-        activeTab.value = 'result';
-        columns.value = cols;
-        initFilters(cols);
-      }
-    );
+    return true;
   } catch (err: any) {
     errorMessage.value = err.message;
-    const lineMatch = err.message.match(/line[:\s]+(\d+)/i);
+    const lineMatch = err.message?.match(/line[:\s]+(\d+)/i);
     if (lineMatch) {
-      const lineNumber = parseInt(lineMatch[1], 10);
-      highlightErrorLine(lineNumber);
+      highlightErrorLine(parseInt(lineMatch[1], 10));
     }
-    if (err.location && err.location.start && err.location.start.line) {
+    if (err.location?.start?.line) {
       highlightErrorLine(err.location.start.line);
     }
+    return false;
   }
 };
 
