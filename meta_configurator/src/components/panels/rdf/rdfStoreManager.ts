@@ -9,7 +9,6 @@ import type {Path} from '@/utility/path';
 type RdfChangeCallback = (oldStore: string, newStore: string) => void;
 
 interface RdfStore {
-  readonly store: Readonly<Ref<$rdf.IndexedFormula>>;
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
   readonly namespaces: Readonly<Ref<Record<string, string>>>;
   readonly parseErrors: Readonly<Ref<string[]>>;
@@ -30,13 +29,13 @@ export const rdfStoreManager: RdfStore & {
   const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 
   const callbacks: RdfChangeCallback[] = [];
-  const store = ref<$rdf.IndexedFormula | null>(null);
+  const _store = ref<$rdf.IndexedFormula | null>(null);
   const _statements = ref<$rdf.Statement[]>([]);
   const _parseErrors = ref<string[]>([]);
 
   const _namespaces = computed<Record<string, string>>(() => {
-    if (!store.value) return {};
-    return {...store.value.namespaces};
+    if (!_store.value) return {};
+    return {..._store.value.namespaces};
   });
 
   const setJsonLdText = (jsonLdObj: any) => {
@@ -44,7 +43,7 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const clearStore = () => {
-    store.value = $rdf.graph();
+    _store.value = $rdf.graph();
   };
 
   const applyContextPrefixes = (parsed: any) => {
@@ -52,7 +51,7 @@ export const rdfStoreManager: RdfStore & {
 
     for (const [prefix, ns] of Object.entries(parsed['@context'])) {
       if (typeof ns === 'string') {
-        store.value!.setPrefixForURI(prefix, ns);
+        _store.value!.setPrefixForURI(prefix, ns);
       }
     }
   };
@@ -62,7 +61,7 @@ export const rdfStoreManager: RdfStore & {
     _parseErrors.value = [];
     try {
       await new Promise<void>((resolve, reject) => {
-        $rdf.parse(jsonLdText, store.value as $rdf.Formula, baseUri, 'application/ld+json', err => {
+        $rdf.parse(jsonLdText, _store.value as $rdf.Formula, baseUri, 'application/ld+json', err => {
           if (err) {
             const msg = err.message || String(err);
             _parseErrors.value.push(msg);
@@ -81,11 +80,11 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const updateStatements = () => {
-    _statements.value = [...store.value!.statements];
+    _statements.value = [..._store.value!.statements];
   };
 
   const deleteStatement = (statement: $rdf.Statement): {success: boolean; errorMessage: string} => {
-    if (!store.value) {
+    if (!_store.value) {
       return {success: false, errorMessage: 'Store is not initialized.'};
     }
     if (!statement) {
@@ -93,7 +92,7 @@ export const rdfStoreManager: RdfStore & {
     }
 
     try {
-      store.value.removeStatement(statement);
+      _store.value.removeStatement(statement);
       updateStatements();
       return {success: true, errorMessage: ''};
     } catch (error: any) {
@@ -102,7 +101,7 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const addStatement = (statement: $rdf.Statement): {success: boolean; errorMessage: string} => {
-    if (!store.value) {
+    if (!_store.value) {
       return {success: false, errorMessage: 'Store is not initialized.'};
     }
     if (!statement) {
@@ -110,7 +109,7 @@ export const rdfStoreManager: RdfStore & {
     }
 
     try {
-      store.value.add(statement);
+      _store.value.add(statement);
       updateStatements();
       return {success: true, errorMessage: ''};
     } catch (error: any) {
@@ -121,12 +120,12 @@ export const rdfStoreManager: RdfStore & {
   const exportAs = (
     format: string
   ): {content: string | undefined; success: boolean; errorMessage: string} => {
-    if (!store.value) {
+    if (!_store.value) {
       return {content: '', success: false, errorMessage: 'Store is not initialized.'};
     }
     const serialized = $rdf.serialize(
       null,
-      store.value as $rdf.Formula,
+      _store.value as $rdf.Formula,
       'http://example.org/',
       format
     );
@@ -138,7 +137,7 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const findMatchingStatementIndex = (path: Path): number => {
-    if (!store.value) return -1;
+    if (!_store.value) return -1;
     const jsonld = useCurrentData().data.value;
 
     if (path[0] !== '@graph') return -1;
@@ -171,9 +170,9 @@ export const rdfStoreManager: RdfStore & {
       } else {
         object = literal(v);
       }
-      matches = store.value.match(subject, predicate, object, null);
+      matches = _store.value.match(subject, predicate, object, null);
     } else {
-      matches = store.value.match(subject, predicate, null, null);
+      matches = _store.value.match(subject, predicate, null, null);
     }
 
     if (matches.length === 0) return -1;
@@ -186,10 +185,10 @@ export const rdfStoreManager: RdfStore & {
     onRow: (row: Record<string, string>) => void,
     onDone?: (columns: string[]) => void
   ): void => {
-    const queryObj = $rdf.SPARQLToQuery(sparql, false, store.value);
+    const queryObj = $rdf.SPARQLToQuery(sparql, false, _store.value);
     if (!queryObj) return;
     const rows: Record<string, string>[] = [];
-    store.value!.query(
+    _store.value!.query(
       queryObj,
       bindings => {
         const row: Record<string, string> = {};
@@ -277,7 +276,6 @@ export const rdfStoreManager: RdfStore & {
   return {
     statements: readonly(_statements),
     namespaces: readonly(_namespaces),
-    store: readonly(store),
     parseErrors: readonly(_parseErrors),
     query,
     deleteStatement,
