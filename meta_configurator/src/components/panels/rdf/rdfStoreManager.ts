@@ -144,6 +144,7 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const findMatchingStatementIndex = async (path: Path): Promise<number> => {
+    console.log(path);
     const jsonLdObj = extractJsonLdByPath(path);
     if (!jsonLdObj) {
       return -1;
@@ -155,7 +156,10 @@ export const rdfStoreManager: RdfStore & {
         JSON.stringify(jsonLdObj, null, 2),
         tempStore as $rdf.Formula,
         baseUri,
-        'application/ld+json'
+        'application/ld+json',
+        _ => {
+          resolve();
+        }
       );
     });
     if (tempStore.statements.length !== 1) {
@@ -202,30 +206,26 @@ export const rdfStoreManager: RdfStore & {
       return undefined;
     }
 
-    const [, graphIndex, predicate, arrayIndex] = path;
+    const [, graphIndex, predicate, object] = path;
 
     if (typeof graphIndex !== 'number' || typeof predicate !== 'string') {
       return undefined;
     }
 
     const subjectNode = jsonld['@graph']?.[graphIndex];
+
     if (!subjectNode) {
       return undefined;
     }
 
     let value = subjectNode[predicate];
+
     if (value === undefined) {
       return undefined;
     }
 
-    if (arrayIndex !== undefined) {
-      if (!Array.isArray(value) || typeof arrayIndex !== 'number') {
-        return undefined;
-      }
-      value = value[arrayIndex];
-      if (value === undefined) {
-        return undefined;
-      }
+    if (object !== undefined && typeof object === 'number') {
+      value = value[object];
     }
 
     return {
