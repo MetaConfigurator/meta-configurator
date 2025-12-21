@@ -28,7 +28,7 @@
                 label="SPARQL limitations"
                 variant="text"
                 severity="warning"
-                @click="showLimitationsDialog = true" />
+                @click="limitationsDialog = true" />
               <Button
                 label="Run Query"
                 icon="pi pi-play"
@@ -38,7 +38,7 @@
             </div>
           </div>
           <Dialog
-            v-model:visible="showLimitationsDialog"
+            v-model:visible="limitationsDialog"
             header="Unsupported SPARQL Features"
             modal
             style="width: 500px">
@@ -112,6 +112,15 @@
                 </template>
               </Column>
             </DataTable>
+            <Message v-else severity="warn">
+              No results. Please check your query and
+              <a
+                href="#"
+                @click.prevent="openLimitationsDialog"
+                class="text-blue-600 hover:underline">
+                limitations </a
+              >.
+            </Message>
           </div>
         </TabPanel>
       </TabPanels>
@@ -125,8 +134,13 @@ import {ref, shallowRef} from 'vue';
 import {Codemirror} from 'vue-codemirror';
 import {basicSetup} from 'codemirror';
 import {sparql} from 'codemirror-lang-sparql';
-import {syntaxHighlighting, defaultHighlightStyle} from '@codemirror/language';
+import {syntaxHighlighting, HighlightStyle} from '@codemirror/language';
+import {tags} from '@lezer/highlight';
 import {oneDark} from '@codemirror/theme-one-dark';
+import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+import {StateEffect, StateField} from '@codemirror/state';
+import {EditorView, Decoration} from '@codemirror/view';
+import {FilterMatchMode} from '@primevue/core/api';
 import {isDarkMode} from '@/utility/darkModeUtils';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
@@ -140,15 +154,10 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import Dialog from 'primevue/dialog';
-import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {StateEffect, StateField} from '@codemirror/state';
-import {EditorView, Decoration} from '@codemirror/view';
-import {FilterMatchMode} from '@primevue/core/api';
 
-const showLimitationsDialog = ref(false);
+const limitationsDialog = ref(false);
 const addErrorLine = StateEffect.define<number | null>();
 const clearErrorLines = StateEffect.define<null>();
-
 const errorLineField = StateField.define({
   create() {
     return Decoration.none;
@@ -170,31 +179,36 @@ const errorLineField = StateField.define({
   },
   provide: f => EditorView.decorations.from(f),
 });
-
 const errorLineMark = Decoration.line({
   attributes: {class: 'cm-error-line'},
 });
-
 const filters = ref<Record<string, any>>({});
 const activeTab = ref('query');
+const sparqlHighlightStyle = HighlightStyle.define([
+  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
+  {tag: tags.variableName, color: '#82aaff'},
+  {tag: tags.string, color: '#c3e88d'},
+  {tag: tags.number, color: '#f78c6c'},
+  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
+  {tag: tags.operator, color: '#89ddff'},
+  {tag: tags.punctuation, color: '#abb2bf'},
+]);
+const extensions = [
+  basicSetup,
+  sparql(),
+  syntaxHighlighting(sparqlHighlightStyle),
+  errorLineField,
+  ...(isDarkMode.value ? [oneDark] : []),
+];
+const view = shallowRef();
+const results = ref<Record<string, string>[]>([]);
+const columns = ref<string[]>([]);
+const errorMessage = ref<string | null>(null);
 const sparqlQuery = ref(`SELECT *
 WHERE
 {
   ?s ?p ?o .
 }`);
-
-const extensions = [
-  basicSetup,
-  sparql(),
-  syntaxHighlighting(defaultHighlightStyle),
-  errorLineField,
-  ...(isDarkMode.value ? [oneDark] : []),
-];
-
-const view = shallowRef();
-const results = ref<Record<string, string>[]>([]);
-const columns = ref<string[]>([]);
-const errorMessage = ref<string | null>(null);
 
 const highlightErrorLine = (lineNumber: number | null) => {
   if (!view.value) return;
@@ -247,12 +261,12 @@ const runQuery = () => {
   rdfStoreManager.query(
     sparqlQuery.value,
     row => {
-      activeTab.value = 'result';
       results.value.push(row);
     },
     cols => {
       columns.value = cols;
       initFilters(cols);
+      activeTab.value = 'result';
     }
   );
 };
@@ -278,6 +292,10 @@ const validateSparqlSyntax = (): boolean => {
 const handleReady = (payload: {view: any}) => {
   view.value = payload.view;
 };
+
+function openLimitationsDialog() {
+  limitationsDialog.value = true;
+}
 </script>
 
 <style scoped>
@@ -374,7 +392,6 @@ const handleReady = (payload: {view: any}) => {
 }
 
 :deep(.cm-error-line) {
-  background-color: #ffebee;
   border-left: 3px solid #f44336;
 }
 
