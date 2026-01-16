@@ -50,7 +50,7 @@ pages = {1--9}
 }
 ```
 
-5. The  [paper](./2025_03_paper_data_model_creation.pdf) within the [*BTW2025 - Datenbanksysteme für Business, Technologie und Web*](https://btw2025.gi.de) proceedings. A shortened and adapted version of the master thesis.
+5. The  [conference paper](./2025_03_paper_data_model_creation.pdf) within the [*BTW2025 - Datenbanksysteme für Business, Technologie und Web*](https://btw2025.gi.de) proceedings. A shortened and adapted version of the master thesis.
 ```bibtex
 @misc{metaconfigurator2025datamodels,
 	author = "Neubauer, Felix and Pleiss, Jürgen and Uekermann, Benjamin",
@@ -64,3 +64,37 @@ pages = {1--9}
 	abstract = "In both research and industry, significant effort is devoted to the creation of standardized data models that ensure data adheres to a specific structure, enabling the development and use of common tools. These models (also called schemas), enable data validation and facilitate collaboration by making data interoperable across various systems. Tools can assist in the creation and maintenance of data models.  One such tool is MetaConfigurator, a schema editor and form generator for JSON schema and for JSON/YAML documents. It offers a unified interface that combines a traditional text editor with a graphical user interface (GUI), supporting advanced schema features such as conditions and constraints. Still, schema editing can be complicated for novices, since MetaConfigurator shows all options of JSON schema, which is very expressive. The following improvements and functionalities have been designed and implemented to further assist the user: 1) A more user-friendly schema editor, distinguishing between an easy and an advanced mode based on a novel meta schema builder approach; 2) A CSV import feature for seamless data transition from Excel to JSON with schema inference; 3) Snapshot sharing for effortless collaboration; 4) Ontology integration for auto-completion of URIs; and 5) A novel graphical diagram-like schema view for visual schema manipulation. These new functionalities are then applied to a real-world use case in chemistry, demonstrating the usability and improved accessibility of MetaConfigurator."
 }
 ```
+
+6. The [presentation](https://zenodo.org/records/17105018) within the [preCICE workshop 2025](https://precice.org/precice-workshop-2025) about applying MetaConfigurator to standardize adapters within the multi-physics coupling library [preCICE](https://precice.org/).
+```bibtex
+@misc{neubauer2025standardizing,
+  author       = {Neubauer, Felix},
+  title        = {Standardizing preCICE Adapters with
+                   MetaConfigurator
+                  },
+  month        = sep,
+  year         = 2025,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.17105018},
+  url          = {https://doi.org/10.5281/zenodo.17105018},
+}
+```
+
+8. The [conference paper](https://ieeexplore.ieee.org/document/11273215) and [pre-print](https://arxiv.org/abs/2508.05192) from the [MODELS25](https://conf.researchr.org/home/models-2025) conference, introducing new AI-assistance capabilities of MetaConfigurator for schema editing and schema/data mapping. You can find a related video demonstration and summary [on Youtube](https://www.youtube.com/watch?v=DfS6PgMr1q0).
+```bibtex
+@INPROCEEDINGS{neubauer2025aiassisted,
+  author={Neubauer, Felix and Uekermann, Benjamin and Pleiss, Jürgen},
+  booktitle={2025 ACM/IEEE 28th International Conference on Model Driven Engineering Languages and Systems Companion (MODELS-C)}, 
+  title={AI-assisted JSON Schema Creation and Mapping}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={79-83},
+  abstract={Model-Driven Engineering (MDE) places models at the core of system and data engineering processes. In the context of research data, these models are typically expressed as schemas that define the structure and semantics of datasets. However, many domains still lack standardized models, and creating them remains a significant barrier, especially for non-experts. We present a hybrid approach that combines large language models (LLMs) with deterministic techniques to enable JSON Schema creation, modification, and schema mapping based on natural language inputs by the user. These capabilities are integrated into the open-source tool MetaConfigurator, which already provides visual model editing, validation, code generation, and form generation from models. For data integration, we generate schema mappings from heterogeneous JSON, CSV, XML, and YAML data using LLMs, while ensuring scalability and reliability through deterministic execution of generated mapping rules. The applicability of our work is demonstrated in an application example in the field of chemistry. By combining natural language interaction with deterministic safeguards, this work significantly lowers the barrier to structured data modeling and data integration for non-experts.},
+  keywords={Visualization;Chemistry;Translation;Large language models;Semantics;Data integration;XML;Data models;Model driven engineering;Context modeling;rdm;research data management;mde;model driven engineering;json;yaml;configuration;schema;data;model;editor;gui;tool;ai;llm;mapping;matching},
+  doi={10.1109/MODELS-C68889.2025.00019},
+  ISSN={},
+  month={Oct},}
+
+```
+
