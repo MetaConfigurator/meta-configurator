@@ -204,6 +204,7 @@ import Menu from 'primevue/menu';
 import {getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
+import {arePathsEqual} from '@/utility/pathUtils';
 
 const exportPopover = ref();
 const first = ref(0);
@@ -332,16 +333,6 @@ const namedNodes = computed(() => {
   nodes.push({label: '+ Add new', value: '__new__'});
   return nodes;
 });
-
-function arePathsEqual(a: Path, b: Path): boolean {
-  if (a.length !== b.length) return false;
-
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-
-  return true;
-}
 
 watch(selectedTriple, (target, _) => {
   if (target) {

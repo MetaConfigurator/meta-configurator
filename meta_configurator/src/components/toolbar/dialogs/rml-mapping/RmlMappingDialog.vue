@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, computed, watch, type Ref, onMounted, nextTick} from 'vue';
 import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import Divider from 'primevue/divider';
@@ -180,7 +180,9 @@ function performMapping() {
     if (res.success) {
       statusMessage.value = res.message;
       errorMessage.value = '';
-      // write the result data to the data editor
+      console.log('Mapping result data:');
+      console.log(res.resultData);
+      console.log('---');
       getDataForMode(SessionMode.DataEditor).setData(res.resultData);
       hideDialog();
     } else {
@@ -220,7 +222,7 @@ defineExpose({show: openDialog, close: hideDialog});
 
       <div>
         <label for="userComments" class="block font-semibold mb-1">Additional Mapping Hints</label>
-        <InputText
+        <Textarea
           id="userComments"
           v-model="userComments"
           class="w-full"

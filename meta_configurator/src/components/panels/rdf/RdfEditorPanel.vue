@@ -8,9 +8,9 @@
       <TabPanels>
         <TabPanel value="context">
           <RdfContextEditorPanel
+            :sessionMode="SessionMode.DataEditor"
             :dataIsUnparsable="props.dataIsUnparsable"
-            :dataIsInJsonLd="props.dataIsInJsonLd"
-            @zoom_into_path="zoomIntoPath" />
+            :dataIsInJsonLd="props.dataIsInJsonLd" />
         </TabPanel>
         <TabPanel value="triple">
           <RdfTripleEditorPanel
@@ -32,6 +32,7 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import type {Path} from '@/utility/path';
+import {SessionMode} from '@/store/sessionMode';
 
 const props = defineProps<{
   dataIsUnparsable: boolean;
