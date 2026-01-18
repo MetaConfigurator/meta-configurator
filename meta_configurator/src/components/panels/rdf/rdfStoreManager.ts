@@ -20,15 +20,25 @@ interface RdfStore {
     onRow: (row: Record<string, string>) => void,
     onDone?: (columns: string[]) => void
   ) => void;
-  deleteStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
-  addStatement: (stmts: $rdf.Statement) => {success: boolean; errorMessage: string};
+  editStatement: (
+    oldStatement: $rdf.Statement,
+    newStatement: $rdf.Statement
+  ) => {success: boolean; errorMessage: string};
+  deleteStatement: (statement: $rdf.Statement) => {success: boolean; errorMessage: string};
+  addStatement: (statement: $rdf.Statement) => {success: boolean; errorMessage: string};
   exportAs: (format: string) => {content: string; success: boolean; errorMessage: string};
   findMatchingStatementIndex: (path: Path) => Promise<number>;
+  statementAsJsonLd: (statement: $rdf.Statement) => string;
+  containsSubject: (statement: $rdf.Statement) => boolean;
+  containsPredicate: (statement: $rdf.Statement) => boolean;
+  getObject: (statement: $rdf.Statement) => any;
 }
 
 export const rdfStoreManager: RdfStore & {
   onChange: (cb: RdfChangeCallback) => void;
 } = (() => {
+  const _jsonLdText = ref<string>('');
+  const _jsonObject = ref<any>(null);
   const callbacks: RdfChangeCallback[] = [];
   const _store = ref<$rdf.IndexedFormula | null>(null);
   const _statements = ref<$rdf.Statement[]>([]);
@@ -38,10 +48,6 @@ export const rdfStoreManager: RdfStore & {
     if (!_store.value) return {};
     return {..._store.value.namespaces};
   });
-
-  const setJsonLdText = (jsonLdObj: any) => {
-    return JSON.stringify(jsonLdObj, null, 2);
-  };
 
   const clearStore = () => {
     _store.value = $rdf.graph();
@@ -107,6 +113,24 @@ export const rdfStoreManager: RdfStore & {
     }
   };
 
+  const editStatement = (
+    oldStatement: $rdf.Statement,
+    newStatement: $rdf.Statement
+  ): {success: boolean; errorMessage: string} => {
+    if (!_store.value) {
+      return {success: false, errorMessage: 'Store is not initialized.'};
+    }
+
+    try {
+      _store.value.removeStatement(oldStatement);
+      _store.value.add(newStatement);
+      updateStatements();
+      return {success: true, errorMessage: ''};
+    } catch (error: any) {
+      return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
+    }
+  };
+
   const addStatement = (statement: $rdf.Statement): {success: boolean; errorMessage: string} => {
     if (!_store.value) {
       return {success: false, errorMessage: 'Store is not initialized.'};
@@ -122,6 +146,41 @@ export const rdfStoreManager: RdfStore & {
     } catch (error: any) {
       return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
     }
+  };
+
+  const statementAsJsonLd = (statement: $rdf.Statement): string | undefined => {
+    if (!_store.value) {
+      return '';
+    }
+
+    const tempStore = $rdf.graph();
+
+    for (const st of _store.value.statements) {
+      if (st.subject.value === statement.subject.value) {
+        tempStore.add(st);
+      }
+    }
+
+    const namespaces: Record<string, string> = {};
+
+    if (_jsonObject.value['@context']) {
+      for (const [prefix, ns] of Object.entries(_jsonObject.value['@context'])) {
+        if (typeof ns === 'string') {
+          namespaces[prefix] = ns;
+        }
+      }
+    }
+
+    const serialized = $rdf.serialize(
+      null,
+      tempStore,
+      'http://example.org/',
+      'application/ld+json',
+      undefined,
+      {namespaces}
+    );
+
+    return serialized;
   };
 
   const exportAs = (
@@ -144,7 +203,6 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const findMatchingStatementIndex = async (path: Path): Promise<number> => {
-    console.log(path);
     const jsonLdObj = extractJsonLdByPath(path);
     if (!jsonLdObj) {
       return -1;
@@ -239,6 +297,49 @@ export const rdfStoreManager: RdfStore & {
     };
   }
 
+  const containsSubject = (statement: $rdf.Statement): boolean => {
+    if (!_store.value) {
+      return false;
+    }
+
+    return _store.value.statements.some(st => st.subject.value === statement.subject.value);
+  };
+
+  const containsPredicate = (statement: $rdf.Statement): boolean => {
+    if (!_store.value) {
+      return false;
+    }
+
+    return _store.value.statements.some(
+      st =>
+        st.subject.value === statement.subject.value &&
+        st.predicate.value === statement.predicate.value
+    );
+  };
+
+  const getObject = (statement: $rdf.Statement): string | string[] | undefined => {
+    if (!_store.value) {
+      return undefined;
+    }
+    const values = _store.value.statements
+      .filter(
+        st =>
+          st.subject.value === statement.subject.value &&
+          st.predicate.value === statement.predicate.value
+      )
+      .map(st => st.object.value);
+
+    if (values.length === 0) {
+      return undefined;
+    }
+
+    if (values.length === 1) {
+      return values[0];
+    }
+
+    return values;
+  };
+
   function findStatementIndex(statement: $rdf.Statement): number {
     const statements = rdfStoreManager.statements.value;
     const index = statements.findIndex(
@@ -255,13 +356,13 @@ export const rdfStoreManager: RdfStore & {
     async data => {
       if (!data) return;
 
-      const jsonLdText = setJsonLdText(data);
+      _jsonLdText.value = JSON.stringify(data, null, 2);
       clearStore();
 
-      const parsed = JSON.parse(jsonLdText);
-      applyContextPrefixes(parsed);
+      _jsonObject.value = JSON.parse(_jsonLdText.value);
+      applyContextPrefixes(_jsonObject.value);
 
-      await parseJsonLdIntoStore(jsonLdText);
+      await parseJsonLdIntoStore(_jsonLdText.value);
       updateStatements();
     }
   );
@@ -271,10 +372,15 @@ export const rdfStoreManager: RdfStore & {
     namespaces: readonly(_namespaces),
     parseErrors: readonly(_parseErrors),
     query,
+    editStatement,
     deleteStatement,
     addStatement,
     onChange,
     exportAs,
     findMatchingStatementIndex,
+    statementAsJsonLd,
+    containsSubject,
+    containsPredicate,
+    getObject,
   } as RdfStore & {onChange: (cb: RdfChangeCallback) => void};
 })();

@@ -98,7 +98,11 @@
       </template>
     </Column>
   </DataTable>
-  <Dialog v-model:visible="editDialog" header="Triple Details" modal>
+  <Dialog
+    v-model:visible="editDialog"
+    header="Triple Details"
+    modal
+    :style="{width: '640px', height: '520px'}">
     <div class="flex flex-col gap-6">
       <label class="block font-bold mb-3">Subject</label>
       <div class="flex gap-2">
@@ -139,8 +143,8 @@
         </div>
       </div>
       <div>
-        <label for="object" class="block font-bold mb-3">Object</label>
-        <div class="flex gap-2">
+        <label class="block font-bold mb-3">Object</label>
+        <div class="flex gap-2 mb-2">
           <Select
             v-model="triple.objectType"
             :options="objectTypeOptions"
@@ -234,15 +238,20 @@ const exportMenuItems = [
     command: () => exportAs('application/rdf+xml'),
   },
 ];
+
 const triple = ref({
   subject: '',
   subjectType: 'NamedNode',
+
   predicate: '',
   predicateType: 'NamedNode',
+
   object: '',
   objectType: 'Literal',
-  statement: null as any,
+
+  statement: null as $rdf.Statement | null,
 });
+
 const props = defineProps<{
   dataIsUnparsable: boolean;
   dataIsInJsonLd: boolean;
@@ -258,15 +267,13 @@ const initFilters = () => {
     object: {value: null, matchMode: FilterMatchMode.CONTAINS},
   };
 };
+
 const objectTypeOptions = [
   {label: 'Named Node', value: 'NamedNode'},
-  {label: 'Blank Node', value: 'BlankNode'},
   {label: 'Literal', value: 'Literal'},
 ];
-const subjectTypeOptions = [
-  {label: 'Named Node', value: 'NamedNode'},
-  {label: 'Blank Node', value: 'BlankNode'},
-];
+
+const subjectTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 const items = computed(() => {
   return rdfStoreManager.statements.value.map((st, index) => ({
     id: index,
@@ -330,18 +337,28 @@ const namedNodes = computed(() => {
     }
   });
   const nodes = Array.from(nodesSet).map(n => ({label: n, value: n}));
-  nodes.push({label: '+ Add new', value: '__new__'});
+  nodes.push({label: '+ Add new node', value: '__new__'});
   return nodes;
 });
 
-watch(selectedTriple, (target, _) => {
+watch(selectedTriple, (target, current) => {
   if (target) {
+    if (!current) return;
+    if (current && areStatementsEqual(current.statement, target.statement)) return;
     const path = jsonLdNodeManager.findPath(target.statement);
     if (path && !arePathsEqual(dataSession.currentSelectedElement.value, path)) {
       emit('zoom_into_path', path!);
     }
   }
 });
+
+const areStatementsEqual = (source: $rdf.Statement, target: $rdf.Statement) => {
+  return (
+    source.subject.value === target.subject.value &&
+    source.predicate.value === target.predicate.value &&
+    source.object.value === target.object.value
+  );
+};
 
 const hideDialog = () => {
   editDialog.value = false;
@@ -361,16 +378,17 @@ const openNewDialog = () => {
 };
 
 const openEditDialog = () => {
-  const trip = selectedTriple.value;
+  const st = selectedTriple.value.statement;
   triple.value = {
-    subject: trip.statement?.subject.value,
-    subjectType: trip.statement?.subject?.termType,
-    predicate: trip.statement?.predicate.value,
-    predicateType: trip.statement?.predicate?.termType,
-    object: trip.statement?.object.value,
-    objectType: trip.statement?.object?.termType,
-    statement: trip.statement,
+    subject: st.subject.value,
+    subjectType: st.subject.termType,
+    predicate: st.predicate.value,
+    predicateType: st.predicate.termType,
+    object: st.object.value,
+    objectType: st.object.termType,
+    statement: st,
   };
+
   editDialog.value = true;
 };
 
@@ -379,13 +397,27 @@ const saveTriple = async () => {
     triple.value.subject = newSubjectInput.value.trim();
     newSubjectInput.value = '';
   }
+  const subjNode =
+    triple.value.subjectType === 'BlankNode'
+      ? triple.value!.statement!.subject
+      : $rdf.sym(triple.value.subject);
+  const predNode = $rdf.sym(triple.value.predicate);
+  let objNode;
+  if (triple.value.objectType === 'Literal') {
+    objNode = $rdf.literal(triple.value.object);
+  } else if (triple.value.objectType === 'BlankNode') {
+    objNode = $rdf.blankNode(triple.value.object);
+  } else {
+    objNode = $rdf.sym(triple.value.object);
+  }
+  const newStatement = $rdf.st(subjNode, predNode, objNode, $rdf.defaultGraph());
 
-  addstatementToStore();
-
-  if (triple.value.statement && triple.value.statement.subject !== triple.value.subject)
-    await updateNodeInJsonLd(triple.value.statement.subject.value);
-
-  await updateNodeInJsonLd(triple.value.subject);
+  if (triple.value.statement === null) {
+    rdfStoreManager.addStatement(newStatement);
+    jsonLdNodeManager.addStatement(newStatement, true);
+  } else {
+    rdfStoreManager.editStatement(triple.value.statement, newStatement);
+  }
 
   triple.value = {
     subject: '',
@@ -408,6 +440,18 @@ const parsingErrors = computed(() => {
 });
 
 watch(
+  dataSession.dataAtCurrentPath,
+  async () => {
+    const absolutePath = dataSession.currentSelectedElement.value;
+    let index = await rdfStoreManager.findMatchingStatementIndex(absolutePath);
+    if (index !== -1) {
+      await selectRowByIndex(index);
+    }
+  },
+  {deep: true}
+);
+
+watch(
   dataSession.currentSelectedElement,
   async () => {
     const absolutePath = dataSession.currentSelectedElement.value;
@@ -419,37 +463,11 @@ watch(
   {deep: true}
 );
 
-async function updateNodeInJsonLd(tripId: string) {
-  // if (!nodeManager.value || !store.value) return;
-  // await nodeManager.value.rebuildNode(tripId, store.value);
-  // const updatedJsonLdText = nodeManager.value.getText();
-  // useCurrentData().setData(JSON.parse(updatedJsonLdText));
-}
-
 function onRowClick(event: any) {
   const path = jsonLdNodeManager.findPath(event.data.statement);
   if (path) {
     emit('zoom_into_path', path!);
   }
-}
-
-function addstatementToStore() {
-  const subjNode =
-    triple.value.subjectType === 'BlankNode'
-      ? triple.value.statement.subject
-      : $rdf.sym(triple.value.subject);
-  const predNode = $rdf.sym(triple.value.predicate);
-  let objNode;
-  if (triple.value.objectType === 'Literal') {
-    objNode = $rdf.literal(triple.value.object);
-  } else if (triple.value.objectType === 'BlankNode') {
-    objNode = $rdf.blankNode(triple.value.object);
-  } else {
-    objNode = $rdf.sym(triple.value.object);
-  }
-  const newSt = $rdf.st(subjNode, predNode, objNode, $rdf.defaultGraph());
-  rdfStoreManager.addStatement(newSt);
-  jsonLdNodeManager.addStatement(newSt);
 }
 
 function translateIRI(iriTerm: string) {
