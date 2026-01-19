@@ -25,12 +25,16 @@ interface RdfStore {
     newStatement: $rdf.Statement
   ) => {success: boolean; errorMessage: string};
   deleteStatement: (statement: $rdf.Statement) => {success: boolean; errorMessage: string};
-  addStatement: (statement: $rdf.Statement) => {success: boolean; errorMessage: string};
+  addStatement: (
+    statement: $rdf.Statement,
+    isNewNode: boolean
+  ) => {success: boolean; errorMessage: string};
   exportAs: (format: string) => {content: string; success: boolean; errorMessage: string};
   findMatchingStatementIndex: (path: Path) => Promise<number>;
-  statementAsJsonLd: (statement: $rdf.Statement) => string;
+  statementAsJsonLd: (statement: $rdf.Statement) => string | undefined;
   containsSubject: (statement: $rdf.Statement) => boolean;
   containsPredicate: (statement: $rdf.Statement) => boolean;
+  allPredicate: (statement: $rdf.Statement) => any;
   getObject: (statement: $rdf.Statement) => any;
 }
 
@@ -44,7 +48,7 @@ export const rdfStoreManager: RdfStore & {
   const _statements = ref<$rdf.Statement[]>([]);
   const _parseErrors = ref<string[]>([]);
 
-  const _namespaces = computed<Record<string, string>>(() => {
+  const namespaces = computed<Record<string, string>>(() => {
     if (!_store.value) return {};
     return {..._store.value.namespaces};
   });
@@ -131,7 +135,10 @@ export const rdfStoreManager: RdfStore & {
     }
   };
 
-  const addStatement = (statement: $rdf.Statement): {success: boolean; errorMessage: string} => {
+  const addStatement = (
+    statement: $rdf.Statement,
+    isNewNode: boolean
+  ): {success: boolean; errorMessage: string} => {
     if (!_store.value) {
       return {success: false, errorMessage: 'Store is not initialized.'};
     }
@@ -139,6 +146,11 @@ export const rdfStoreManager: RdfStore & {
       return {success: false, errorMessage: 'No statement provided.'};
     }
 
+    if (isNewNode) {
+      if (containsSubject(statement)) {
+        return {success: false, errorMessage: 'Subject already exists in the store.'};
+      }
+    }
     try {
       _store.value.add(statement);
       updateStatements();
@@ -149,35 +161,15 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const statementAsJsonLd = (statement: $rdf.Statement): string | undefined => {
-    if (!_store.value) {
-      return '';
-    }
-
     const tempStore = $rdf.graph();
-
-    for (const st of _store.value.statements) {
-      if (st.subject.value === statement.subject.value) {
-        tempStore.add(st);
-      }
-    }
-
-    const namespaces: Record<string, string> = {};
-
-    if (_jsonObject.value['@context']) {
-      for (const [prefix, ns] of Object.entries(_jsonObject.value['@context'])) {
-        if (typeof ns === 'string') {
-          namespaces[prefix] = ns;
-        }
-      }
-    }
-
+    tempStore.add(statement);
     const serialized = $rdf.serialize(
       null,
       tempStore,
-      'http://example.org/',
+      undefined,
       'application/ld+json',
       undefined,
-      {namespaces}
+      {namespaces: namespaces.value}
     );
 
     return serialized;
@@ -317,6 +309,18 @@ export const rdfStoreManager: RdfStore & {
     );
   };
 
+  const allPredicate = (statement: $rdf.Statement): any => {
+    if (!_store.value) {
+      return false;
+    }
+
+    return _store.value.statements.find(
+      st =>
+        st.subject.value === statement.subject.value &&
+        st.predicate.value === statement.predicate.value
+    );
+  };
+
   const getObject = (statement: $rdf.Statement): string | string[] | undefined => {
     if (!_store.value) {
       return undefined;
@@ -341,8 +345,7 @@ export const rdfStoreManager: RdfStore & {
   };
 
   function findStatementIndex(statement: $rdf.Statement): number {
-    const statements = rdfStoreManager.statements.value;
-    const index = statements.findIndex(
+    const index = rdfStoreManager.statements.value.findIndex(
       st =>
         st.subject.value === statement.subject.value &&
         st.predicate.value === statement.predicate.value &&
@@ -369,7 +372,7 @@ export const rdfStoreManager: RdfStore & {
 
   return {
     statements: readonly(_statements),
-    namespaces: readonly(_namespaces),
+    namespaces: readonly(namespaces),
     parseErrors: readonly(_parseErrors),
     query,
     editStatement,
@@ -381,6 +384,7 @@ export const rdfStoreManager: RdfStore & {
     statementAsJsonLd,
     containsSubject,
     containsPredicate,
+    allPredicate,
     getObject,
   } as RdfStore & {onChange: (cb: RdfChangeCallback) => void};
 })();

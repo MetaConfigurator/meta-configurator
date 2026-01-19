@@ -6,6 +6,8 @@
     v-model:first="first"
     v-model:filters="filters"
     v-model:selection="selectedTriple"
+    @row-select="onUserSelect"
+    @row-unselect="onUserUnselect"
     scrollable
     scrollHeight="flex"
     removableSort
@@ -62,6 +64,12 @@
             severity="contrast"
             variant="text"
             @click="openSparqlEditor" />
+          <Button
+            label="Visualize"
+            icon="pi pi-globe"
+            severity="contrast"
+            variant="text"
+            @click="openVisualizer" />
         </div>
         <IconField class="flex items-center gap-1 flex-shrink-0">
           <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
@@ -185,6 +193,15 @@
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
     <SparqlEditor />
   </Dialog>
+  <Dialog
+    v-model:visible="visualizerDialog"
+    header="Visualization"
+    modal
+    maximizable
+    :style="{width: '800px', height: '800px'}"
+    :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
+    <RdfVisualizer />
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -200,15 +217,17 @@ import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
 import Popover from 'primevue/popover';
 import Divider from 'primevue/divider';
+import Menu from 'primevue/menu';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
-import Menu from 'primevue/menu';
 import {getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
-import {arePathsEqual} from '@/utility/pathUtils';
+import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
+import {downloadFile} from '@/utility/rdfUtils';
+import {useErrorService} from '@/utility/errorServiceInstance';
 
 const exportPopover = ref();
 const first = ref(0);
@@ -217,7 +236,10 @@ const dataSession = getSessionForMode(SessionMode.DataEditor);
 const editDialog = ref(false);
 const deleteDialog = ref(false);
 const sparqlDialog = ref(false);
+const visualizerDialog = ref(false);
 const newSubjectInput = ref('');
+
+const isUserSelection = ref(false);
 const selectedTriple = ref();
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 const filters = ref();
@@ -288,6 +310,14 @@ const toggleExportPopover = (event: Event) => {
   exportPopover.value.toggle(event);
 };
 
+function onUserSelect() {
+  isUserSelection.value = true;
+}
+
+function onUserUnselect() {
+  isUserSelection.value = true;
+}
+
 async function selectRowByIndex(index: number) {
   const rowsPerPageValue = rowsPerPage.value;
   const page = Math.floor(index / rowsPerPageValue);
@@ -311,6 +341,10 @@ async function selectRowByIndex(index: number) {
 
 const confirmDeleteSelected = () => {
   deleteDialog.value = true;
+};
+
+const openVisualizer = () => {
+  visualizerDialog.value = true;
 };
 
 const openSparqlEditor = () => {
@@ -341,24 +375,16 @@ const namedNodes = computed(() => {
   return nodes;
 });
 
-watch(selectedTriple, (target, current) => {
-  if (target) {
-    if (!current) return;
-    if (current && areStatementsEqual(current.statement, target.statement)) return;
+watch(selectedTriple, (target, _) => {
+  if (!target) return;
+  if (isUserSelection.value) {
     const path = jsonLdNodeManager.findPath(target.statement);
-    if (path && !arePathsEqual(dataSession.currentSelectedElement.value, path)) {
-      emit('zoom_into_path', path!);
+    if (path) {
+      emit('zoom_into_path', path);
     }
   }
+  isUserSelection.value = false;
 });
-
-const areStatementsEqual = (source: $rdf.Statement, target: $rdf.Statement) => {
-  return (
-    source.subject.value === target.subject.value &&
-    source.predicate.value === target.predicate.value &&
-    source.object.value === target.object.value
-  );
-};
 
 const hideDialog = () => {
   editDialog.value = false;
@@ -393,7 +419,9 @@ const openEditDialog = () => {
 };
 
 const saveTriple = async () => {
+  let isNewNode = false;
   if (triple.value.subjectType === 'NamedNode' && triple.value.subject === '__new__') {
+    isNewNode = true;
     triple.value.subject = newSubjectInput.value.trim();
     newSubjectInput.value = '';
   }
@@ -413,8 +441,13 @@ const saveTriple = async () => {
   const newStatement = $rdf.st(subjNode, predNode, objNode, $rdf.defaultGraph());
 
   if (triple.value.statement === null) {
-    rdfStoreManager.addStatement(newStatement);
-    jsonLdNodeManager.addStatement(newStatement, true);
+    let response = rdfStoreManager.addStatement(newStatement, isNewNode);
+    if (response.success) {
+      jsonLdNodeManager.addStatement(newStatement, isNewNode);
+    } else {
+      useErrorService().onError(response.errorMessage);
+      return;
+    }
   } else {
     rdfStoreManager.editStatement(triple.value.statement, newStatement);
   }
@@ -440,24 +473,14 @@ const parsingErrors = computed(() => {
 });
 
 watch(
-  dataSession.dataAtCurrentPath,
+  [dataSession.dataAtCurrentPath, dataSession.currentSelectedElement],
   async () => {
     const absolutePath = dataSession.currentSelectedElement.value;
     let index = await rdfStoreManager.findMatchingStatementIndex(absolutePath);
     if (index !== -1) {
       await selectRowByIndex(index);
-    }
-  },
-  {deep: true}
-);
-
-watch(
-  dataSession.currentSelectedElement,
-  async () => {
-    const absolutePath = dataSession.currentSelectedElement.value;
-    let index = await rdfStoreManager.findMatchingStatementIndex(absolutePath);
-    if (index !== -1) {
-      await selectRowByIndex(index);
+    } else {
+      selectedTriple.value = null;
     }
   },
   {deep: true}
@@ -477,39 +500,6 @@ function translateIRI(iriTerm: string) {
 function exportAs(format: string) {
   const serialized = rdfStoreManager.exportAs(format);
   downloadFile(serialized, format);
-}
-
-function downloadFile(
-  serialized: {content: string; success: boolean; errorMessage: string},
-  format: string
-) {
-  const blob = new Blob([serialized.content], {type: format});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Data.${getFileExtension(format)}`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function getFileExtension(format: string): string {
-  switch (format) {
-    case 'text/turtle':
-      return 'ttl';
-    case 'application/n-triples':
-
-    case 'text/plain':
-      return 'nt';
-
-    case 'application/ld+json':
-      return 'jsonld';
-
-    case 'application/rdf+xml':
-      return 'rdf';
-
-    default:
-      return 'txt';
-  }
 }
 
 initFilters();

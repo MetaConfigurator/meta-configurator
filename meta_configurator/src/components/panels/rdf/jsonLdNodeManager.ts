@@ -33,7 +33,7 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
     const hasPredicate = rdfStoreManager.containsPredicate(statement);
 
     if (!hasSubject) {
-      data.removeDataAt(path.slice(0, -1));
+      data.removeDataAt(path.slice(0, 2));
       return;
     }
 
@@ -46,17 +46,18 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
     data.setDataAt(path.slice(0, -1), objectValue);
   };
 
-  const removeContext = (jsonLdText: string): Record<string, any> => {
-    const obj = JSON.parse(jsonLdText);
-    delete obj['@context'];
-    return obj;
-  };
-
   const addStatement = (statement: $rdf.Statement, isNewNode: boolean) => {
     parser.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
-    let newNode = rdfStoreManager.statementAsJsonLd(statement);
     if (isNewNode) {
-      console.log(newNode);
+      let jsonObject = JSON.parse(rdfStoreManager.statementAsJsonLd(statement)!);
+      for (const [prefix, iri] of Object.entries(jsonObject['@context'])) {
+        if (prefix.startsWith('@')) continue;
+        if (!rdfStoreManager.namespaces.value[prefix]) {
+          data.setDataAt(['@context', prefix], iri);
+        }
+      }
+      delete jsonObject['@context'];
+      data.setDataAt(['@graph', data.dataAt(['@graph']).length], jsonObject);
     }
   };
 

@@ -6,7 +6,7 @@ interface ASTNode {
   children: ASTNode[];
 }
 
-const PREDICATE_ALIAS_MAP: Record<string, readonly string[]> = {
+export const PREDICATE_ALIAS_MAP: Record<string, readonly string[]> = {
   '@type': ['rdf:type', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'],
   '@id': ['http://www.w3.org/1999/02/22-rdf-syntax-ns#ID'],
 } as const;
