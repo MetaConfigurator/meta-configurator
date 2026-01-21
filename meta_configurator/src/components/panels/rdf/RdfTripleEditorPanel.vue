@@ -3,6 +3,7 @@
     :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable || parsingErrors.length > 0}"
     :value="items"
     @row-click="onRowClick"
+    :loading="loading"
     v-model:first="first"
     v-model:filters="filters"
     v-model:selection="selectedTriple"
@@ -222,7 +223,7 @@ import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
-import {getSessionForMode} from '@/data/useDataLink';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
@@ -296,14 +297,20 @@ const objectTypeOptions = [
 ];
 
 const subjectTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
+
+const loading = ref(false);
+
 const items = computed(() => {
-  return rdfStoreManager.statements.value.map((st, index) => ({
+  const mappedItems = rdfStoreManager.statements.value.map((st, index) => ({
     id: index,
     subject: translateIRI(st.subject.value),
     predicate: translateIRI(st.predicate.value),
     object: translateIRI(st.object.value),
     statement: st,
   }));
+
+  loading.value = false;
+  return mappedItems;
 });
 
 const toggleExportPopover = (event: Event) => {
@@ -484,6 +491,13 @@ watch(
     }
   },
   {deep: true}
+);
+
+watch(
+  () => getDataForMode(SessionMode.DataEditor).data.value,
+  _ => {
+    loading.value = true;
+  }
 );
 
 function onRowClick(event: any) {

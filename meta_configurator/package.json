@@ -49,6 +49,7 @@
     "codemirror": "^6.0.2",
     "codemirror-lang-sparql": "^2.0.0",
     "csv-parse": "^5.5.6",
+    "cytoscape": "^3.33.1",
     "dagrejs": "^0.2.1",
     "fast-xml-parser": "^5.0.8",
     "flowbite": "^1.6.5",

@@ -5,8 +5,9 @@ import type {Path} from '@/utility/path';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
-import type {SessionMode} from '@/store/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -14,11 +15,10 @@ const props = defineProps<{
   dataIsInJsonLd: boolean;
 }>();
 
-const contextPath: Path = ['@context'];
 const settings = useSettings();
 const session = getSessionForMode(props.sessionMode);
 const schema = getSchemaForMode(props.sessionMode);
-const data = getDataForMode(props.sessionMode);
+const data = getDataForMode(props.sessionMode).dataAt(['@context']);
 
 function updatePath(newPath: Path) {
   session.updateCurrentPath(newPath);
@@ -41,6 +41,17 @@ function zoomIntoPath(pathToAdd: Path) {
 function selectPath(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
+
+const currentPath = computed(() => {
+  return ['@context'];
+});
+
+const currentData = computed(() => {
+  if (!data.value) {
+    return {};
+  }
+  return dataAt(data.value, ['@context']) ?? {};
+});
 
 const currentSchema = computed(() => {
   const currSchema = session.effectiveSchemaAtCurrentPath?.value.schema;
@@ -70,7 +81,7 @@ const tableHeader = computed(() => {
     <div class="flex-grow overflow-y-scroll">
       <PropertiesPanel
         :currentSchema="currentSchema"
-        :currentPath="session.currentPath.value"
+        :currentPath="currentPath"
         :currentData="session.dataAtCurrentPath.value"
         :sessionMode="props.sessionMode"
         :table-header="tableHeader"
