@@ -103,12 +103,13 @@
 <script setup lang="ts">
 import {ref, watch, onMounted, onUnmounted} from 'vue';
 import cytoscape from 'cytoscape';
+import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 
 const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
-
+cytoscape.use(coseBilkent);
 const container = ref<HTMLDivElement | null>(null);
 const tooltip = ref<HTMLDivElement | null>(null);
 let cy: cytoscape.Core | null = null;
@@ -328,6 +329,26 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
     cy.destroy();
   }
 
+  //   cy = cytoscape({
+  //   container: container.value,
+  //   elements,
+  //   style: [/* your styles */],
+  //   layout: {
+  //     name: 'cose-bilkent',
+  //     animate: true,       // keep nodes moving
+  //     animationDuration: 1000,
+  //     randomize: true,
+  //     idealEdgeLength: 150,
+  //     nodeRepulsion: 400000,
+  //     edgeElasticity: 100,
+  //     gravity: 80,
+  //     numIter: 1000,
+  //     tile: true,
+  //     tilingPaddingVertical: 10,
+  //     tilingPaddingHorizontal: 10,
+  //   },
+  // });
+
   cy = cytoscape({
     container: container.value,
     elements,
@@ -379,22 +400,18 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
       },
     ],
     layout: {
-      name: 'cose',
+      name: 'cose-bilkent',
+      animate: true,
+      animationDuration: 1000,
+      randomize: true,
       idealEdgeLength: 150,
-      nodeOverlap: 20,
-      refresh: 20,
-      fit: true,
-      padding: 30,
-      randomize: false,
-      componentSpacing: 100,
       nodeRepulsion: 400000,
       edgeElasticity: 100,
-      nestingFactor: 5,
       gravity: 80,
       numIter: 1000,
-      initialTemp: 200,
-      coolingFactor: 0.95,
-      minTemp: 1.0,
+      tile: true,
+      tilingPaddingVertical: 10,
+      tilingPaddingHorizontal: 10,
     },
   });
 
