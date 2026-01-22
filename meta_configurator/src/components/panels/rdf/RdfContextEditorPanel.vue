@@ -7,7 +7,6 @@ import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
-import {dataAt} from '@/utility/resolveDataAtPath';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -18,7 +17,15 @@ const props = defineProps<{
 const settings = useSettings();
 const session = getSessionForMode(props.sessionMode);
 const schema = getSchemaForMode(props.sessionMode);
-const data = getDataForMode(props.sessionMode).dataAt(['@context']);
+const data = getDataForMode(props.sessionMode);
+
+const currentSchema = computed(() => {
+  const currSchema = session.effectiveSchemaAtCurrentPath?.value.schema;
+  if (!currSchema) {
+    return new JsonSchemaWrapper({}, props.sessionMode, false);
+  }
+  return currSchema;
+});
 
 function updatePath(newPath: Path) {
   session.updateCurrentPath(newPath);
@@ -42,37 +49,24 @@ function selectPath(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
-const currentPath = computed(() => {
-  return ['@context'];
-});
-
-const currentData = computed(() => {
-  if (!data.value) {
-    return {};
-  }
-  return dataAt(data.value, ['@context']) ?? {};
-});
-
-const currentSchema = computed(() => {
-  const currSchema = session.effectiveSchemaAtCurrentPath?.value.schema;
-  if (!currSchema) {
-    return new JsonSchemaWrapper({}, props.sessionMode, false);
-  }
-  return currSchema;
-});
-
 const tableHeader = computed(() => {
   if (settings.value.guiEditor.showSchemaTitleAsHeader) {
     return schema.schemaWrapper.value.title;
   }
   return undefined;
 });
+
+const currentData = computed(() => {
+  return getDataForMode(props.sessionMode).dataAt(['@context']);
+});
 </script>
 
 <template>
   <div
-    class="p-5 space-y-3 flex flex-col"
-    :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable}">
+    :class="[
+      'p-5 space-y-3 flex flex-col',
+      {'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable},
+    ]">
     <CurrentPathBreadcrumb
       :session-mode="props.sessionMode"
       :root-name="'document root'"
@@ -81,8 +75,8 @@ const tableHeader = computed(() => {
     <div class="flex-grow overflow-y-scroll">
       <PropertiesPanel
         :currentSchema="currentSchema"
-        :currentPath="currentPath"
-        :currentData="session.dataAtCurrentPath.value"
+        :currentPath="['@context']"
+        :currentData="currentData"
         :sessionMode="props.sessionMode"
         :table-header="tableHeader"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"

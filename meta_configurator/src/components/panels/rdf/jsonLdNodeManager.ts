@@ -58,6 +58,7 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
       }
       delete jsonObject['@context'];
       data.setDataAt(['@graph', data.dataAt(['@graph']).length], jsonObject);
+    } else {
     }
   };
 

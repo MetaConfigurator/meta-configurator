@@ -7,10 +7,20 @@
       </TabList>
       <TabPanels>
         <TabPanel value="context">
-          <RdfContextEditorPanel
-            :sessionMode="SessionMode.DataEditor"
-            :dataIsUnparsable="props.dataIsUnparsable"
-            :dataIsInJsonLd="props.dataIsInJsonLd" />
+          <div class="panel-content">
+            <ScrollPanel
+              class="context-scroll"
+              :dt="{
+                bar: {
+                  background: '{primary.color}',
+                },
+              }">
+              <RdfContextEditorPanel
+                :sessionMode="SessionMode.DataEditor"
+                :dataIsUnparsable="props.dataIsUnparsable"
+                :dataIsInJsonLd="props.dataIsInJsonLd" />
+            </ScrollPanel>
+          </div>
         </TabPanel>
         <TabPanel value="triple">
           <RdfTripleEditorPanel
@@ -26,6 +36,7 @@
 <script setup lang="ts">
 import RdfTripleEditorPanel from '@/components/panels/rdf/RdfTripleEditorPanel.vue';
 import RdfContextEditorPanel from '@/components/panels/rdf/RdfContextEditorPanel.vue';
+import ScrollPanel from 'primevue/scrollpanel';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
@@ -49,6 +60,18 @@ function zoomIntoPath(path: Path) {
 </script>
 
 <style scoped>
+.panel-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.context-scroll {
+  width: 100%;
+  height: 100%;
+}
+
 .panel-tab-container {
   display: flex;
   flex-direction: column;
@@ -68,7 +91,7 @@ function zoomIntoPath(path: Path) {
   flex-shrink: 0;
 }
 
-.p-tabpanels {
+:deep(.p-tabpanels) {
   padding: 0;
   display: flex;
   flex: 1;

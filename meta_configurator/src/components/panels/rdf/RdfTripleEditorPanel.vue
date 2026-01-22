@@ -111,68 +111,107 @@
     v-model:visible="editDialog"
     header="Triple Details"
     modal
-    :style="{width: '640px', height: '520px'}">
-    <div class="flex flex-col gap-6">
-      <label class="block font-bold mb-3">Subject</label>
-      <div class="flex gap-2">
-        <Select
-          v-model="triple.subjectType"
-          :options="subjectTypeOptions"
-          optionLabel="label"
-          optionValue="value"
-          class="w-45" />
-        <template v-if="triple.subjectType === 'NamedNode'">
+    maximizable
+    :draggable="false"
+    :style="{width: '640px', height: '520px'}"
+    contentStyle="overflow-y: auto">
+    <div class="flex flex-col gap-6 w-full">
+      <div>
+        <label class="block font-bold mb-3">Subject</label>
+        <div class="flex gap-2 w-full items-center">
           <Select
-            v-model="triple.subject"
-            :options="namedNodes"
-            filter
+            v-model="triple.subjectType"
+            :options="subjectTypeOptions"
             optionLabel="label"
             optionValue="value"
-            class="flex-1" />
-          <InputText
-            v-if="triple.subject === '__new__'"
-            v-model="newSubjectInput"
-            placeholder="Enter new IRI"
-            class="flex-1" />
-        </template>
-        <template v-else>
-          <InputText v-model.trim="triple.subject" required class="flex-1" />
-        </template>
+            class="fixed-select" />
+          <template v-if="triple.subjectType === 'NamedNode'">
+            <ToggleButton
+              v-model="addNewSubject"
+              onLabel="New"
+              offLabel="Existing"
+              onIcon="pi pi-plus"
+              offIcon="pi pi-list"
+              class="fixed-toggle" />
+            <Select
+              v-if="!addNewSubject"
+              v-model="triple.subject"
+              :options="nodes"
+              filter
+              optionLabel="label"
+              optionValue="value"
+              class="flex-1 min-w-[200px]" />
+            <InputText
+              v-else
+              v-model="newSubjectInput"
+              placeholder="Enter new IRI"
+              class="flex-1 min-w-[260px]" />
+          </template>
+          <template v-else>
+            <InputText v-model.trim="triple.subject" required class="flex-1 min-w-[260px]" />
+          </template>
+        </div>
       </div>
       <div>
-        <label for="predicate" class="block font-bold mb-3">Predicate</label>
-        <div class="flex gap-2">
+        <label class="block font-bold mb-3">Predicate</label>
+        <div class="flex gap-2 w-full items-center">
           <Select
             v-model="triple.predicateType"
             :options="predicateTypeOptions"
             optionLabel="label"
             optionValue="value"
-            class="w-45" />
-          <InputText v-model.trim="triple.predicate" required class="flex-1" />
+            class="fixed-select" />
+          <InputText v-model.trim="triple.predicate" required class="flex-1 min-w-[260px]" />
         </div>
       </div>
       <div>
         <label class="block font-bold mb-3">Object</label>
-        <div class="flex gap-2 mb-2">
+        <div class="flex gap-2 w-full items-center">
           <Select
             v-model="triple.objectType"
             :options="objectTypeOptions"
             optionLabel="label"
             optionValue="value"
-            class="w-45" />
-          <InputText v-model.trim="triple.object" required class="flex-1" />
+            class="fixed-select" />
+          <template v-if="triple.objectType === 'NamedNode'">
+            <ToggleButton
+              v-model="addNewObject"
+              onLabel="New"
+              offLabel="Existing"
+              onIcon="pi pi-plus"
+              offIcon="pi pi-list"
+              class="fixed-toggle" />
+            <Select
+              v-if="!addNewObject"
+              v-model="triple.object"
+              :options="nodes"
+              filter
+              optionLabel="label"
+              optionValue="value"
+              class="flex-1 min-w-[200px]" />
+            <InputText
+              v-else
+              v-model="newObjectInput"
+              placeholder="Enter new IRI"
+              class="flex-1 min-w-[260px]" />
+          </template>
+          <template v-else>
+            <InputText v-model.trim="triple.object" required class="flex-1 min-w-[260px]" />
+          </template>
         </div>
       </div>
     </div>
     <template #footer>
-      <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-      <Button label="Save" icon="pi pi-check" @click="saveTriple" />
+      <div class="flex justify-end gap-2 pt-3">
+        <Button label="Cancel" severity="secondary" @click="editDialog = false" />
+        <Button label="Save" @click="saveTriple" />
+      </div>
     </template>
   </Dialog>
   <Dialog v-model:visible="deleteDialog" header="Confirm" modal>
     <div class="flex items-center gap-4">
       <i class="pi pi-exclamation-triangle !text-3xl" />
-      <span v-if="triple">Are you sure you want to delete the selected item?</span>
+      <span v-if="triple">Are you sure you want to delete the selected triple?</span>
     </div>
     <template #footer>
       <Button
@@ -219,6 +258,7 @@ import Select from 'primevue/select';
 import Popover from 'primevue/popover';
 import Divider from 'primevue/divider';
 import Menu from 'primevue/menu';
+import ToggleButton from 'primevue/togglebutton';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
@@ -238,6 +278,11 @@ const editDialog = ref(false);
 const deleteDialog = ref(false);
 const sparqlDialog = ref(false);
 const visualizerDialog = ref(false);
+
+const addNewSubject = ref(false);
+const addNewObject = ref(false);
+
+const newObjectInput = ref('');
 const newSubjectInput = ref('');
 
 const isUserSelection = ref(false);
@@ -370,16 +415,14 @@ const clearFilter = () => {
   initFilters();
 };
 
-const namedNodes = computed(() => {
+const nodes = computed(() => {
   const nodesSet = new Set<string>();
   rdfStoreManager.statements.value.forEach(st => {
     if (st.subject.termType === 'NamedNode') {
       nodesSet.add(st.subject.value);
     }
   });
-  const nodes = Array.from(nodesSet).map(n => ({label: n, value: n}));
-  nodes.push({label: '+ Add new node', value: '__new__'});
-  return nodes;
+  return Array.from(nodesSet).map(n => ({label: n, value: n}));
 });
 
 watch(selectedTriple, (target, _) => {
@@ -392,10 +435,6 @@ watch(selectedTriple, (target, _) => {
   }
   isUserSelection.value = false;
 });
-
-const hideDialog = () => {
-  editDialog.value = false;
-};
 
 const openNewDialog = () => {
   triple.value = {
@@ -411,6 +450,7 @@ const openNewDialog = () => {
 };
 
 const openEditDialog = () => {
+  if (!selectedTriple.value) return;
   const st = selectedTriple.value.statement;
   triple.value = {
     subject: st.subject.value,
@@ -536,5 +576,10 @@ initFilters();
 .disabled-wrapper > * {
   pointer-events: none;
   opacity: 0.5;
+}
+
+.fixed-toggle {
+  width: 110px;
+  min-width: 110px;
 }
 </style>
