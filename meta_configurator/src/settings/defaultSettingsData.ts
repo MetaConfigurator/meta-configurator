@@ -111,7 +111,7 @@ export const SETTINGS_DATA_DEFAULT = {
   },
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
-    compactMode: false,
+    preserveFormatting: false,
   },
   aiIntegration: {
     model: 'gpt-4o-mini',

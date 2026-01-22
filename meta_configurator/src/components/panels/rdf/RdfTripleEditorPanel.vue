@@ -247,7 +247,6 @@
 <script setup lang="ts">
 import {nextTick} from 'vue';
 import {ref, computed, watch} from 'vue';
-import * as $rdf from 'rdflib';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
@@ -269,24 +268,38 @@ import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 import {downloadFile} from '@/utility/rdfUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {
+  TripleEditorService,
+  type TripleTransferObject,
+} from '@/components/panels/rdf/tripleEditorService';
+
+const props = defineProps<{
+  dataIsUnparsable: boolean;
+  dataIsInJsonLd: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'zoom_into_path', path: Path): void;
+}>();
 
 const exportPopover = ref();
 const first = ref(0);
 const rowsPerPage = ref(50);
 const dataSession = getSessionForMode(SessionMode.DataEditor);
+
 const editDialog = ref(false);
 const deleteDialog = ref(false);
 const sparqlDialog = ref(false);
 const visualizerDialog = ref(false);
 
+const loading = ref(false);
 const addNewSubject = ref(false);
 const addNewObject = ref(false);
-
 const newObjectInput = ref('');
 const newSubjectInput = ref('');
-
 const isUserSelection = ref(false);
 const selectedTriple = ref();
+
 const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 const filters = ref();
 const exportMenuItems = [
@@ -307,26 +320,15 @@ const exportMenuItems = [
   },
 ];
 
-const triple = ref({
+const triple = ref<TripleTransferObject>({
   subject: '',
   subjectType: 'NamedNode',
-
   predicate: '',
   predicateType: 'NamedNode',
-
   object: '',
   objectType: 'Literal',
-
-  statement: null as $rdf.Statement | null,
 });
 
-const props = defineProps<{
-  dataIsUnparsable: boolean;
-  dataIsInJsonLd: boolean;
-}>();
-const emit = defineEmits<{
-  (e: 'zoom_into_path', path: Path): void;
-}>();
 const initFilters = () => {
   filters.value = {
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -343,15 +345,13 @@ const objectTypeOptions = [
 
 const subjectTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
 
-const loading = ref(false);
-
 const items = computed(() => {
-  const mappedItems = rdfStoreManager.statements.value.map((st, index) => ({
+  const mappedItems = rdfStoreManager.statements.value.map((statement, index) => ({
     id: index,
-    subject: translateIRI(st.subject.value),
-    predicate: translateIRI(st.predicate.value),
-    object: translateIRI(st.object.value),
-    statement: st,
+    subject: translateIRI(statement.subject.value),
+    predicate: translateIRI(statement.predicate.value),
+    object: translateIRI(statement.object.value),
+    statement: statement,
   }));
 
   loading.value = false;
@@ -405,8 +405,13 @@ const openSparqlEditor = () => {
 
 const deleteSelectedTriple = () => {
   if (!selectedTriple.value) return;
-  rdfStoreManager.deleteStatement(selectedTriple.value.statement);
-  jsonLdNodeManager.deleteStatement(selectedTriple.value.statement);
+  const result = TripleEditorService.delete(selectedTriple.value.statement);
+
+  if (!result.success) {
+    useErrorService().onError(result.errorMessage!);
+    return;
+  }
+
   deleteDialog.value = false;
   selectedTriple.value = null;
 };
@@ -444,7 +449,7 @@ const openNewDialog = () => {
     predicateType: 'NamedNode',
     object: '',
     objectType: 'Literal',
-    statement: null,
+    statement: undefined,
   };
   editDialog.value = true;
 };
@@ -459,55 +464,19 @@ const openEditDialog = () => {
     predicateType: st.predicate.termType,
     object: st.object.value,
     objectType: st.object.termType,
-    statement: st,
+    statement: selectedTriple.value.statement,
   };
 
   editDialog.value = true;
 };
 
-const saveTriple = async () => {
-  let isNewNode = false;
-  if (triple.value.subjectType === 'NamedNode' && triple.value.subject === '__new__') {
-    isNewNode = true;
-    triple.value.subject = newSubjectInput.value.trim();
-    newSubjectInput.value = '';
-  }
-  const subjNode =
-    triple.value.subjectType === 'BlankNode'
-      ? triple.value!.statement!.subject
-      : $rdf.sym(triple.value.subject);
-  const predNode = $rdf.sym(triple.value.predicate);
-  let objNode;
-  if (triple.value.objectType === 'Literal') {
-    objNode = $rdf.literal(triple.value.object);
-  } else if (triple.value.objectType === 'BlankNode') {
-    objNode = $rdf.blankNode(triple.value.object);
-  } else {
-    objNode = $rdf.sym(triple.value.object);
-  }
-  const newStatement = $rdf.st(subjNode, predNode, objNode, $rdf.defaultGraph());
+const saveTriple = () => {
+  const result = TripleEditorService.addOrEdit(triple.value);
 
-  if (triple.value.statement === null) {
-    let response = rdfStoreManager.addStatement(newStatement, isNewNode);
-    if (response.success) {
-      jsonLdNodeManager.addStatement(newStatement, isNewNode);
-    } else {
-      useErrorService().onError(response.errorMessage);
-      return;
-    }
-  } else {
-    rdfStoreManager.editStatement(triple.value.statement, newStatement);
+  if (!result.success) {
+    useErrorService().onError(result.errorMessage!);
+    return;
   }
-
-  triple.value = {
-    subject: '',
-    subjectType: 'NamedNode',
-    predicate: '',
-    predicateType: 'NamedNode',
-    object: '',
-    objectType: 'Literal',
-    statement: null,
-  };
 
   editDialog.value = false;
 };
