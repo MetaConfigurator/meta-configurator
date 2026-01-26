@@ -4,6 +4,7 @@
       <TabList>
         <Tab value="query">Query</Tab>
         <Tab value="result">Result</Tab>
+        <Tab value="visualizer" :disabled="!enableVisualization">Visualizer</Tab>
       </TabList>
       <TabPanels>
         <TabPanel value="query">
@@ -20,21 +21,30 @@
             <div v-if="errorMessage" class="error-box">
               {{ errorMessage }}
             </div>
-            <div
-              class="editor-footer flex items-center"
-              style="width: 100%; justify-content: space-between">
+            <div class="editor-footer flex items-center w-full">
               <Button
                 icon="pi pi-info-circle"
                 label="SPARQL limitations"
                 variant="text"
                 severity="warning"
                 @click="limitationsDialog = true" />
-              <Button
-                label="Run Query"
-                icon="pi pi-play"
-                @click="runQuery"
-                variant="text"
-                severity="secondary" />
+              <div class="flex items-center gap-2 ml-auto">
+                <ToggleButton
+                  v-model="enableVisualization"
+                  onLabel="Visualization On"
+                  offLabel="Visualization Off">
+                  <template #default>
+                    <i :class="enableVisualization ? 'pi pi-eye' : 'pi pi-eye-slash'" />
+                    Visualization
+                  </template>
+                </ToggleButton>
+                <Button
+                  label="Run Query"
+                  icon="pi pi-play"
+                  @click="runQuery"
+                  variant="text"
+                  severity="secondary" />
+              </div>
             </div>
           </div>
           <Dialog
@@ -123,6 +133,9 @@
             </Message>
           </div>
         </TabPanel>
+        <TabPanel value="visualizer">
+          <RdfVisualizer />
+        </TabPanel>
       </TabPanels>
     </Tabs>
   </div>
@@ -130,7 +143,7 @@
 
 <script setup lang="ts">
 import {Parser} from 'sparqljs';
-import {ref, shallowRef} from 'vue';
+import {ref, shallowRef, computed, watch} from 'vue';
 import {Codemirror} from 'vue-codemirror';
 import {basicSetup} from 'codemirror';
 import {sparql} from 'codemirror-lang-sparql';
@@ -138,10 +151,11 @@ import {syntaxHighlighting, HighlightStyle} from '@codemirror/language';
 import {tags} from '@lezer/highlight';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {StateEffect, StateField} from '@codemirror/state';
+import {StateEffect, StateField, ChangeSet, EditorState} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
 import {FilterMatchMode} from '@primevue/core/api';
 import {isDarkMode} from '@/utility/darkModeUtils';
+import ToggleButton from 'primevue/togglebutton';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
 import Tab from 'primevue/tab';
@@ -154,6 +168,7 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import Dialog from 'primevue/dialog';
+import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 
 const limitationsDialog = ref(false);
 const addErrorLine = StateEffect.define<number | null>();
@@ -193,22 +208,98 @@ const sparqlHighlightStyle = HighlightStyle.define([
   {tag: tags.operator, color: '#89ddff'},
   {tag: tags.punctuation, color: '#abb2bf'},
 ]);
-const extensions = [
-  basicSetup,
-  sparql(),
-  syntaxHighlighting(sparqlHighlightStyle),
-  errorLineField,
-  ...(isDarkMode.value ? [oneDark] : []),
-];
+
+const enableVisualization = ref(false);
 const view = shallowRef();
 const results = ref<Record<string, string>[]>([]);
 const columns = ref<string[]>([]);
 const errorMessage = ref<string | null>(null);
-const sparqlQuery = ref(`SELECT *
+const frozenStartLine = ref(1);
+const frozenEndLine = ref(3);
+
+const defaultQueryTemplate = `SELECT *
 WHERE
 {
-  ?s ?p ?o .
-}`);
+  ?subject ?predicate ?object .
+}`;
+const graphQueryTemplate = `CONSTRUCT {
+  ?subject ?predicate ?object .
+}
+WHERE
+{
+  ?subject ?predicate ?object .
+}`;
+const sparqlQuery = ref(defaultQueryTemplate);
+
+const freezeLineFilter = EditorState.transactionFilter.of(tr => {
+  if (!enableVisualization.value) return tr;
+
+  const start = frozenStartLine.value;
+  const end = frozenEndLine.value;
+
+  if (!tr.docChanged) return tr;
+
+  let shouldBlock = false;
+
+  tr.changes.iterChanges((fromA, toA) => {
+    const fromLine = tr.startState.doc.lineAt(fromA).number;
+    const toLine = tr.startState.doc.lineAt(toA).number;
+
+    if (fromLine <= end && toLine >= start) {
+      shouldBlock = true;
+    }
+  });
+
+  return shouldBlock ? [] : tr;
+});
+
+const frozenLineMark = Decoration.line({
+  attributes: {
+    class: 'cm-frozen-line',
+    title: 'This line cannot be edited',
+  },
+});
+
+const frozenLineField = StateField.define({
+  create(state) {
+    if (!enableVisualization.value) return Decoration.none;
+
+    const decorations = [];
+    const start = frozenStartLine.value;
+    const end = frozenEndLine.value;
+
+    for (let i = start; i <= end; i++) {
+      if (i <= state.doc.lines) {
+        const line = state.doc.line(i);
+        decorations.push(frozenLineMark.range(line.from));
+      }
+    }
+
+    return Decoration.set(decorations);
+  },
+
+  update(decorations, tr) {
+    if (!enableVisualization.value) return Decoration.none;
+
+    const start = frozenStartLine.value;
+    const end = frozenEndLine.value;
+
+    if (tr.docChanged) {
+      const newDecorations = [];
+      for (let i = start; i <= end; i++) {
+        if (i <= tr.state.doc.lines) {
+          const line = tr.state.doc.line(i);
+          newDecorations.push(frozenLineMark.range(line.from));
+        }
+      }
+      return Decoration.set(newDecorations);
+    }
+
+    return decorations.map(tr.changes);
+  },
+
+  provide: f => EditorView.decorations.from(f),
+});
 
 const highlightErrorLine = (lineNumber: number | null) => {
   if (!view.value) return;
@@ -229,6 +320,15 @@ const highlightErrorLine = (lineNumber: number | null) => {
     });
   }
 };
+
+const extensions = computed(() => [
+  basicSetup,
+  sparql(),
+  syntaxHighlighting(sparqlHighlightStyle),
+  errorLineField,
+  ...(enableVisualization.value ? [freezeLineFilter, frozenLineField] : []),
+  ...(isDarkMode.value ? [oneDark] : []),
+]);
 
 const clearFilters = () => {
   Object.values(filters.value).forEach(filter => {
@@ -292,6 +392,21 @@ const validateSparqlSyntax = (): boolean => {
 const handleReady = (payload: {view: any}) => {
   view.value = payload.view;
 };
+
+const setEditorText = (text: string) => {
+  sparqlQuery.value = text;
+
+  if (!view.value) return;
+
+  const state = view.value.state;
+  view.value.dispatch({
+    changes: {from: 0, to: state.doc.length, insert: text},
+  });
+};
+
+watch(enableVisualization, on => {
+  setEditorText(on ? graphQueryTemplate : defaultQueryTemplate);
+});
 
 function openLimitationsDialog() {
   limitationsDialog.value = true;
@@ -385,7 +500,6 @@ function openLimitationsDialog() {
   font-size: 0.875rem;
   border: 1px solid #d8000c;
   flex-shrink: 0;
-
   max-height: 150px;
   overflow: auto;
   white-space: pre-wrap;
@@ -397,6 +511,16 @@ function openLimitationsDialog() {
 
 :deep(.cm-error-line) {
   animation: errorPulse 0.5s ease-in-out;
+}
+
+:deep(.cm-frozen-line) {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+:deep(.dark .cm-frozen-line) {
+  background-color: #2a2a2a;
 }
 
 @keyframes errorPulse {
