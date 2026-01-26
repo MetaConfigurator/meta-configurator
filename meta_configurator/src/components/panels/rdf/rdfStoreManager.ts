@@ -18,7 +18,8 @@ interface RdfStore {
   query: (
     sparql: string,
     onRow: (row: Record<string, string>) => void,
-    onDone?: (columns: string[]) => void
+    onDone?: (columns: string[]) => void,
+    onStatementsDone?: (statements: $rdf.Statement[]) => void
   ) => void;
   editStatement: (
     oldStatement: $rdf.Statement,
@@ -222,29 +223,52 @@ export const rdfStoreManager: RdfStore & {
   const query = (
     sparql: string,
     onRow: (row: Record<string, string>) => void,
-    onDone?: (columns: string[]) => void
+    onDone?: (columns: string[]) => void,
+    onStatementsDone?: (statements: $rdf.Statement[]) => void
   ): void => {
     const queryObj = $rdf.SPARQLToQuery(sparql, false, _store.value);
     if (!queryObj) return;
+
     const rows: Record<string, string>[] = [];
+    const statements: $rdf.Statement[] = [];
+
+    const toStatementIfPossible = (bindings: any): $rdf.Statement | null => {
+      const s = bindings['?subject'];
+      const p = bindings['?predicate'];
+      const o = bindings['?object'];
+
+      if (!s || !p || !o) return null;
+      return new $rdf.Statement(s, p, o);
+    };
+
     _store.value!.query(
       queryObj,
-      bindings => {
+      (bindings: any) => {
         const row: Record<string, string> = {};
         for (const key in bindings) {
-          row[key] = bindings[key]!.value;
+          row[key] = bindings[key]?.value ?? String(bindings[key]);
         }
         rows.push(row);
         onRow(row);
+        if (onStatementsDone) {
+          const stmt = toStatementIfPossible(bindings);
+          if (stmt) {
+            statements.push(stmt);
+          }
+        }
       },
       undefined,
       () => {
-        const columns = queryObj.vars.length
-          ? queryObj.vars.map(v => `?${v.label}`)
-          : rows.length
-          ? Object.keys(rows[0]!)
-          : [];
+        const columns =
+          rows.length > 0
+            ? Object.keys(rows[0]!)
+            : queryObj.vars.length
+            ? queryObj.vars.map((v: any) => `?${v.label}`)
+            : [];
         onDone?.(columns);
+        if (onStatementsDone) {
+          onStatementsDone(statements);
+        }
       }
     );
   };

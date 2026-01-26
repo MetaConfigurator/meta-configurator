@@ -108,10 +108,16 @@ import type * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 
-const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
+const props = defineProps<{
+  statements: $rdf.Statement[];
+}>();
+
 cytoscape.use(coseBilkent);
+const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
 const container = ref<HTMLDivElement | null>(null);
 const tooltip = ref<HTMLDivElement | null>(null);
+const selectedNode = ref<SelectedNodeData | null>(null);
+
 let cy: cytoscape.Core | null = null;
 
 interface SelectedNodeData {
@@ -120,8 +126,6 @@ interface SelectedNodeData {
   literals?: Array<{predicate: string; value: string; isIRI?: boolean}>;
   position?: {x: number; y: number};
 }
-
-const selectedNode = ref<SelectedNodeData | null>(null);
 
 function isIRI(value: string): boolean {
   return (
@@ -329,26 +333,6 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
     cy.destroy();
   }
 
-  //   cy = cytoscape({
-  //   container: container.value,
-  //   elements,
-  //   style: [/* your styles */],
-  //   layout: {
-  //     name: 'cose-bilkent',
-  //     animate: true,       // keep nodes moving
-  //     animationDuration: 1000,
-  //     randomize: true,
-  //     idealEdgeLength: 150,
-  //     nodeRepulsion: 400000,
-  //     edgeElasticity: 100,
-  //     gravity: 80,
-  //     numIter: 1000,
-  //     tile: true,
-  //     tilingPaddingVertical: 10,
-  //     tilingPaddingHorizontal: 10,
-  //   },
-  // });
-
   cy = cytoscape({
     container: container.value,
     elements,
@@ -447,7 +431,7 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
 }
 
 onMounted(() => {
-  renderGraph(rdfStoreManager.statements.value);
+  renderGraph(props.statements);
 
   const resizeObserver = new ResizeObserver(() => {
     if (cy) {
@@ -468,12 +452,6 @@ onMounted(() => {
     }
   });
 });
-
-watch(
-  () => [rdfStoreManager.statements.value, rdfStoreManager.namespaces.value],
-  () => renderGraph(rdfStoreManager.statements.value),
-  {deep: false}
-);
 </script>
 
 <style scoped>

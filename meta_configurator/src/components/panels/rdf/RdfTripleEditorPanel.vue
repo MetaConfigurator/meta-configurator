@@ -240,7 +240,7 @@
     maximizable
     :style="{width: '800px', height: '800px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
-    <RdfVisualizer />
+    <RdfVisualizer :statements="[...rdfStoreManager.statements.value]" />
   </Dialog>
 </template>
 

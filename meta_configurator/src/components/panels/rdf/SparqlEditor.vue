@@ -23,12 +23,17 @@
             </div>
             <div class="editor-footer flex items-center w-full">
               <Button
-                icon="pi pi-info-circle"
+                icon="pi pi-exclamation-triangle"
                 label="SPARQL limitations"
                 variant="text"
                 severity="warning"
-                @click="limitationsDialog = true" />
+                @click="limitationsHelpDialog = true" />
               <div class="flex items-center gap-2 ml-auto">
+                <Button
+                  icon="pi pi-info-circle"
+                  variant="text"
+                  severity="warning"
+                  @click="visualizationHelpDialog = true" />
                 <ToggleButton
                   v-model="enableVisualization"
                   onLabel="Visualization On"
@@ -48,27 +53,99 @@
             </div>
           </div>
           <Dialog
-            v-model:visible="limitationsDialog"
+            v-model:visible="visualizationHelpDialog"
+            header="Visualization Notes"
+            modal
+            style="width: 500px">
+            <div class="text-sm leading-relaxed">
+              <p class="mb-2">
+                To enable <b>Visualization</b>, your query must return RDF triples in a form that
+                can be converted into <b>rdflib.js Statements</b>.
+              </p>
+              <p class="font-semibold mb-1">Required query structure:</p>
+              <ul class="pl-4 list-disc mb-3">
+                <li>The query must be a <b>SELECT</b> query</li>
+                <li>
+                  The result must include <b>exactly these variables</b>: <code>?subject</code>,
+                  <code>?predicate</code>, <code>?object</code>
+                </li>
+                <li>
+                  <code>?predicate</code> must always refer to a <b>Named Node (IRI)</b>
+                  — literals or variables bound to literals are not supported
+                </li>
+                <li><code>?subject</code> and <code>?object</code> may be IRIs or literals</li>
+              </ul>
+              <p class="font-semibold mb-1">Example (recommended):</p>
+              <pre
+                :class="[
+                  'p-2 rounded text-xs overflow-auto !bg-gray-100',
+                  isDarkMode && '!bg-gray-900',
+                ]"
+                >{{ visualizationQueryExample_1 }}
+  </pre
+              >
+              <p class="font-semibold mb-1">Filtering to a specific subject:</p>
+              <pre
+                :class="[
+                  'p-2 rounded text-xs overflow-auto !bg-gray-100',
+                  isDarkMode && '!bg-gray-900',
+                ]"
+                >{{ visualizationQueryExample_2 }}
+  </pre
+              >
+              <Message severity="warn">
+                Visualization will be disabled if the query does not return
+                <code>?subject</code>, <code>?predicate</code>, and <code>?object</code>, or if
+                <code>?predicate</code> is not a Named Node.
+              </Message>
+            </div>
+          </Dialog>
+          <Dialog
+            v-model:visible="limitationsHelpDialog"
             header="Unsupported SPARQL Features"
             modal
             style="width: 500px">
             <div class="text-sm leading-relaxed">
               <p class="mb-2">
-                This SPARQL editor uses <b>rdflib.js</b> and supports only a subset of SPARQL 1.1.
+                This SPARQL editor uses <b>rdflib.js</b> and supports only a
+                <b>very limited subset</b> of SPARQL. It is <b>not a full SPARQL 1.1 engine</b>.
               </p>
-              <p class="font-semibold mb-1">The following features are not supported:</p>
+              <p class="font-semibold mb-1">The following features are <b>not supported</b>:</p>
               <ul class="pl-4 list-disc mb-3">
+                <li>
+                  <b>CONSTRUCT</b>, <b>ASK</b>, <b>DESCRIBE</b> query forms (only <b>SELECT</b> is
+                  supported)
+                </li>
                 <li><b>LIMIT</b>, <b>OFFSET</b>, <b>ORDER BY</b>, <b>DISTINCT</b></li>
-                <li>Aggregates: COUNT, SUM, AVG, MIN, MAX</li>
-                <li>GROUP BY, HAVING</li>
-                <li>Subqueries</li>
-                <li>Property paths (/, *, +, ?, |, ^)</li>
-                <li>VALUES</li>
-                <li>SPARQL UPDATE (INSERT, DELETE, etc.)</li>
-                <li>SERVICE (federated queries)</li>
+                <li>Aggregates: <b>COUNT</b>, <b>SUM</b>, <b>AVG</b>, <b>MIN</b>, <b>MAX</b></li>
+                <li><b>GROUP BY</b>, <b>HAVING</b></li>
+                <li><b>Subqueries</b></li>
+                <li><b>UNION</b></li>
+                <li>
+                  Property paths (<code>/</code>, <code>*</code>, <code>+</code>, <code>?</code>,
+                  <code>|</code>, <code>^</code>)
+                </li>
+                <li><b>VALUES</b></li>
+                <li><b>BIND</b></li>
+                <li>
+                  Advanced <b>FILTER</b> expressions (AND, OR, IN, arithmetic, functions like STR(),
+                  LANG(), DATATYPE(), etc.)
+                </li>
+                <li><b>SPARQL UPDATE</b> (INSERT, DELETE, LOAD, CLEAR, etc.)</li>
+                <li><b>SERVICE</b> (federated queries)</li>
+              </ul>
+              <p class="font-semibold mb-1">Partially supported features:</p>
+              <ul class="pl-4 list-disc mb-3">
+                <li>
+                  <b>FILTER</b> only supports simple equality comparisons and basic
+                  <code>REGEXP</code>
+                </li>
+                <li><b>OPTIONAL</b> blocks are parsed but may not behave correctly in all cases</li>
               </ul>
               <Message severity="warn">
-                Queries using these features may execute but return incorrect or unexpected results.
+                Queries using unsupported features may fail to parse or produce incorrect or
+                unexpected results. For best results, use simple <b>SELECT</b> queries with basic
+                triple patterns.
               </Message>
             </div>
           </Dialog>
@@ -89,8 +166,7 @@
               :rows="50"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
               :rowsPerPageOptions="[10, 20, 50]"
-              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results"
-              :emptyMessage="'No results yet'">
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results">
               <template v-if="columns.length > 0" #header>
                 <div class="flex justify-end items-center w-full">
                   <IconField>
@@ -126,7 +202,7 @@
               No results. Please check your query and
               <a
                 href="#"
-                @click.prevent="openLimitationsDialog"
+                @click.prevent="openLimitationsHelpDialog"
                 class="text-blue-600 hover:underline">
                 limitations </a
               >.
@@ -134,7 +210,16 @@
           </div>
         </TabPanel>
         <TabPanel value="visualizer">
-          <RdfVisualizer />
+          <RdfVisualizer v-if="results.length" :statements="statements" />
+          <Message v-else severity="warn">
+            No results. Please check your query and
+            <a
+              href="#"
+              @click.prevent="openVisualizationHelpDialog"
+              class="text-blue-600 hover:underline">
+              notes </a
+            >.
+          </Message>
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -151,7 +236,7 @@ import {syntaxHighlighting, HighlightStyle} from '@codemirror/language';
 import {tags} from '@lezer/highlight';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {StateEffect, StateField, ChangeSet, EditorState} from '@codemirror/state';
+import {StateEffect, StateField, EditorState} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
 import {FilterMatchMode} from '@primevue/core/api';
 import {isDarkMode} from '@/utility/darkModeUtils';
@@ -168,11 +253,36 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import Dialog from 'primevue/dialog';
+import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 
-const limitationsDialog = ref(false);
+const statements = ref<$rdf.Statement[]>([]);
+const limitationsHelpDialog = ref(false);
+const visualizationHelpDialog = ref(false);
 const addErrorLine = StateEffect.define<number | null>();
 const clearErrorLines = StateEffect.define<null>();
+const enableVisualization = ref(false);
+const view = shallowRef();
+const results = ref<Record<string, string>[]>([]);
+const columns = ref<string[]>([]);
+const errorMessage = ref<string | null>(null);
+const filters = ref<Record<string, any>>({});
+const activeTab = ref('query');
+const errorLineMark = Decoration.line({
+  attributes: {class: 'cm-error-line'},
+});
+const sparqlHighlightStyle = HighlightStyle.define([
+  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
+  {tag: tags.variableName, color: '#82aaff'},
+  {tag: tags.string, color: '#c3e88d'},
+  {tag: tags.number, color: '#f78c6c'},
+  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
+  {tag: tags.operator, color: '#89ddff'},
+  {tag: tags.punctuation, color: '#abb2bf'},
+]);
+
+const priority = ['?subject', '?predicate', '?object'];
+
 const errorLineField = StateField.define({
   create() {
     return Decoration.none;
@@ -194,112 +304,53 @@ const errorLineField = StateField.define({
   },
   provide: f => EditorView.decorations.from(f),
 });
-const errorLineMark = Decoration.line({
-  attributes: {class: 'cm-error-line'},
-});
-const filters = ref<Record<string, any>>({});
-const activeTab = ref('query');
-const sparqlHighlightStyle = HighlightStyle.define([
-  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
-  {tag: tags.variableName, color: '#82aaff'},
-  {tag: tags.string, color: '#c3e88d'},
-  {tag: tags.number, color: '#f78c6c'},
-  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
-  {tag: tags.operator, color: '#89ddff'},
-  {tag: tags.punctuation, color: '#abb2bf'},
-]);
 
-const enableVisualization = ref(false);
-const view = shallowRef();
-const results = ref<Record<string, string>[]>([]);
-const columns = ref<string[]>([]);
-const errorMessage = ref<string | null>(null);
-const frozenStartLine = ref(1);
-const frozenEndLine = ref(3);
+const visualizationQueryExample_1 = `
+SELECT ?subject ?predicate ?object
+WHERE {
+  ?subject ?predicate ?object .
+}
+`.trim();
 
-const defaultQueryTemplate = `SELECT *
+const visualizationQueryExample_2 = `
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+SELECT ?subject ?predicate ?object
+WHERE {
+  ?subject ?predicate ?object .
+  FILTER(?subject = foaf:Person)
+}
+`.trim();
+
+const defaultQueryTemplate = `SELECT ?subject ?predicate ?object
 WHERE
 {
   ?subject ?predicate ?object .
-}`;
+}
+`.trim();
+
 const graphQueryTemplate = `CONSTRUCT {
   ?subject ?predicate ?object .
 }
 WHERE
 {
   ?subject ?predicate ?object .
-}`;
-const sparqlQuery = ref(defaultQueryTemplate);
+}
+`.trim();
 
-const freezeLineFilter = EditorState.transactionFilter.of(tr => {
-  if (!enableVisualization.value) return tr;
+const buildPrefixBlock = (namespaces: Record<string, string>): string => {
+  return Object.entries(namespaces)
+    .map(([prefix, iri]) => `PREFIX ${prefix}: <${iri}>`)
+    .join('\n');
+};
 
-  const start = frozenStartLine.value;
-  const end = frozenEndLine.value;
+const applyPrefixesToQuery = (queryBody: string): string => {
+  const prefixes = buildPrefixBlock(rdfStoreManager.namespaces.value);
 
-  if (!tr.docChanged) return tr;
+  return prefixes ? `${prefixes}\n\n${queryBody}` : queryBody;
+};
 
-  let shouldBlock = false;
-
-  tr.changes.iterChanges((fromA, toA) => {
-    const fromLine = tr.startState.doc.lineAt(fromA).number;
-    const toLine = tr.startState.doc.lineAt(toA).number;
-
-    if (fromLine <= end && toLine >= start) {
-      shouldBlock = true;
-    }
-  });
-
-  return shouldBlock ? [] : tr;
-});
-
-const frozenLineMark = Decoration.line({
-  attributes: {
-    class: 'cm-frozen-line',
-    title: 'This line cannot be edited',
-  },
-});
-
-const frozenLineField = StateField.define({
-  create(state) {
-    if (!enableVisualization.value) return Decoration.none;
-
-    const decorations = [];
-    const start = frozenStartLine.value;
-    const end = frozenEndLine.value;
-
-    for (let i = start; i <= end; i++) {
-      if (i <= state.doc.lines) {
-        const line = state.doc.line(i);
-        decorations.push(frozenLineMark.range(line.from));
-      }
-    }
-
-    return Decoration.set(decorations);
-  },
-
-  update(decorations, tr) {
-    if (!enableVisualization.value) return Decoration.none;
-
-    const start = frozenStartLine.value;
-    const end = frozenEndLine.value;
-
-    if (tr.docChanged) {
-      const newDecorations = [];
-      for (let i = start; i <= end; i++) {
-        if (i <= tr.state.doc.lines) {
-          const line = tr.state.doc.line(i);
-          newDecorations.push(frozenLineMark.range(line.from));
-        }
-      }
-      return Decoration.set(newDecorations);
-    }
-
-    return decorations.map(tr.changes);
-  },
-
-  provide: f => EditorView.decorations.from(f),
-});
+const sparqlQuery = ref(applyPrefixesToQuery(defaultQueryTemplate));
 
 const highlightErrorLine = (lineNumber: number | null) => {
   if (!view.value) return;
@@ -312,12 +363,6 @@ const highlightErrorLine = (lineNumber: number | null) => {
     view.value.dispatch({
       effects: addErrorLine.of(lineNumber),
     });
-
-    const line = view.value.state.doc.line(lineNumber);
-    view.value.dispatch({
-      selection: {anchor: line.from},
-      scrollIntoView: true,
-    });
   }
 };
 
@@ -326,7 +371,6 @@ const extensions = computed(() => [
   sparql(),
   syntaxHighlighting(sparqlHighlightStyle),
   errorLineField,
-  ...(enableVisualization.value ? [freezeLineFilter, frozenLineField] : []),
   ...(isDarkMode.value ? [oneDark] : []),
 ]);
 
@@ -353,21 +397,31 @@ const initFilters = (cols: string[]) => {
 const runQuery = () => {
   results.value = [];
   columns.value = [];
+  statements.value = [];
   errorMessage.value = null;
   highlightErrorLine(null);
-  if (!validateSparqlSyntax()) {
-    return;
-  }
+
+  if (!validateSparqlSyntax()) return;
+
   rdfStoreManager.query(
     sparqlQuery.value,
     row => {
       results.value.push(row);
     },
     cols => {
-      columns.value = cols;
-      initFilters(cols);
-      activeTab.value = 'result';
-    }
+      const sortedCols = [
+        ...priority.filter(c => cols.includes(c)),
+        ...cols.filter(c => !priority.includes(c)),
+      ];
+      columns.value = sortedCols;
+      initFilters(sortedCols);
+      activeTab.value = enableVisualization.value ? 'visualizer' : 'result';
+    },
+    enableVisualization.value
+      ? stmts => {
+          statements.value = stmts;
+        }
+      : undefined
   );
 };
 
@@ -394,13 +448,12 @@ const handleReady = (payload: {view: any}) => {
 };
 
 const setEditorText = (text: string) => {
-  sparqlQuery.value = text;
-
+  sparqlQuery.value = applyPrefixesToQuery(text);
   if (!view.value) return;
 
   const state = view.value.state;
   view.value.dispatch({
-    changes: {from: 0, to: state.doc.length, insert: text},
+    changes: {from: 0, to: state.doc.length, insert: sparqlQuery.value},
   });
 };
 
@@ -408,8 +461,37 @@ watch(enableVisualization, on => {
   setEditorText(on ? graphQueryTemplate : defaultQueryTemplate);
 });
 
-function openLimitationsDialog() {
-  limitationsDialog.value = true;
+let validateTimer: number | null = null;
+
+const validateLive = () => {
+  if (validateTimer) window.clearTimeout(validateTimer);
+
+  validateTimer = window.setTimeout(() => {
+    errorMessage.value = null;
+    highlightErrorLine(null);
+
+    try {
+      const parser = new Parser();
+      parser.parse(sparqlQuery.value);
+    } catch (err: any) {
+      errorMessage.value = err.message;
+      const lineMatch = err.message?.match(/line[:\s]+(\d+)/i);
+      if (lineMatch) highlightErrorLine(parseInt(lineMatch[1], 10));
+      if (err.location?.start?.line) highlightErrorLine(err.location.start.line);
+    }
+  }, 250);
+};
+
+watch(sparqlQuery, () => {
+  validateLive();
+});
+
+function openLimitationsHelpDialog() {
+  limitationsHelpDialog.value = true;
+}
+
+function openVisualizationHelpDialog() {
+  visualizationHelpDialog.value = true;
 }
 </script>
 
