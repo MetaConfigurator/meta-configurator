@@ -22,6 +22,7 @@
     frozenHeader
     :rowAttrs="{tabindex: 0}"
     @row-dblclick="openEditDialog"
+    @filter="onFilter"
     :globalFilterFields="['subject', 'predicate', 'object']"
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
     :rowsPerPageOptions="[10, 20, 50]"
@@ -240,7 +241,7 @@
     maximizable
     :style="{width: '800px', height: '800px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
-    <RdfVisualizer :statements="[...rdfStoreManager.statements.value]" />
+    <RdfVisualizer :statements="filteredStatements" />
   </Dialog>
 </template>
 
@@ -248,6 +249,7 @@
 import {nextTick} from 'vue';
 import {ref, computed, watch} from 'vue';
 import DataTable from 'primevue/datatable';
+import type {DataTableFilterEvent} from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
@@ -273,6 +275,7 @@ import {
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
 
+const filteredRows = ref<any[]>([]);
 const props = defineProps<{
   dataIsUnparsable: boolean;
   dataIsInJsonLd: boolean;
@@ -390,6 +393,14 @@ async function selectRowByIndex(index: number) {
     }
   }
 }
+
+function onFilter(e: DataTableFilterEvent) {
+  filteredRows.value = e.filteredValue ?? [];
+}
+
+const filteredStatements = computed(() =>
+  (filteredRows.value.length ? filteredRows.value : items.value).map(row => row.statement)
+);
 
 const confirmDeleteSelected = () => {
   deleteDialog.value = true;
