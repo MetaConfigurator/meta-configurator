@@ -340,7 +340,6 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
       if (!nodesMap.has(o)) {
         nodesMap.set(o, {literals: []});
       }
-
       edges.push({
         data: {
           id: `${s}-${p}-${o}`,
@@ -408,6 +407,7 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
           'target-arrow-color': '#999',
           'target-arrow-shape': 'triangle',
           'curve-style': 'bezier',
+          'control-point-step-size': 100,
           label: 'data(label)',
           'font-size': '11px',
           color: '#ffffff',
@@ -418,7 +418,7 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
     ],
     layout: {
       name: 'cose-bilkent',
-      animate: true,
+      animate: false,
       animationDuration: 1000,
       randomize: true,
       idealEdgeLength: 150,
