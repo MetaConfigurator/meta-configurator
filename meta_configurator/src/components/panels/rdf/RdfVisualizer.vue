@@ -1,11 +1,17 @@
 <template>
   <div style="width: 100%; height: 100%; position: relative">
-    <Dialog v-model:visible="showLargeGraphPrompt" header="Confirm" modal :closable="false">
+    <Dialog
+      v-model:visible="showLargeGraphPrompt"
+      header="Large graph detetced"
+      modal
+      :closable="false">
       <div class="flex items-center gap-4">
-        <i class="pi pi-exclamation-triangle !text-3xl" />
+        <i class="pi pi-exclamation-circle !text-3xl" />
         <span>
-          This graph contains <b>{{ nodeCount }}</b> nodes. Rendering may be slow. Do you want to
-          continue?
+          This graph contains <b>{{ nodeCount }}</b> nodes. Rendering may be slow for graphs with
+          more than <b>{{ MAX_NODES }}</b> nodes.
+          <br />
+          Do you want to continue?
         </span>
       </div>
       <template #footer>
