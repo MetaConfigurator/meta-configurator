@@ -2,7 +2,7 @@
 > You are using MetaConfigurator? Please [get in touch with us](https://forms.gle/MHKvrkMfdymH8TDs5)! We are currently applying for funding to turn the tool into a research infrastructure and want to prepare an overview of the existing user base. Besides, we are interested in your ideas, your feedback, and any feature requests.
 
 
-MetaConfigurator
+MetaConfigurator - A clever JSON Schema Editor and Form/Code/Documentation Generator
 ================
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MetaConfigurator/meta-configurator/e2e.yml?label=End%20to%20End%20Tests)
