@@ -14,7 +14,7 @@ MetaConfigurator
 🚀 What is MetaConfigurator?
 ----------------------------
 
-MetaConfigurator is a powerful, user-friendly schema editor and form generator for JSON Schema. It simplifies the process of creating and editing structured data files such as configuration files and research data, making it accessible to both technical and non-technical users.
+MetaConfigurator is a powerful, user-friendly JSON schema editor and form generator with AI assistance. It simplifies the process of creating and editing structured data files such as configuration files and research data, making it accessible to both technical and non-technical users.
 
 🔗 **Try it out now:**
 
