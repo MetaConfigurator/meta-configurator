@@ -1,5 +1,28 @@
 <template>
   <div style="width: 100%; height: 100%; position: relative">
+    <Dialog v-model:visible="showLargeGraphPrompt" header="Confirm" modal :closable="false">
+      <div class="flex items-center gap-4">
+        <i class="pi pi-exclamation-triangle !text-3xl" />
+        <span>
+          This graph contains <b>{{ nodeCount }}</b> nodes. Rendering may be slow. Do you want to
+          continue?
+        </span>
+      </div>
+      <template #footer>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          text
+          severity="secondary"
+          @click="confirmRender(false)" />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          text
+          severity="danger"
+          @click="confirmRender(true)" />
+      </template>
+    </Dialog>
     <div ref="container" style="width: 100%; height: 100%; border: 1px solid #ccc"></div>
     <div v-if="selectedNode" ref="tooltip" class="node-tooltip">
       <div class="tooltip-header">
@@ -101,12 +124,23 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch, onMounted, onUnmounted} from 'vue';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+import {ref, onMounted, onUnmounted} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
+
+const MAX_NODES = 5;
+
+const showLargeGraphPrompt = ref(false);
+const nodeCount = ref(0);
+
+const emit = defineEmits<{
+  (e: 'cancel-render'): void;
+}>();
 
 const props = defineProps<{
   statements: $rdf.Statement[];
@@ -125,6 +159,35 @@ interface SelectedNodeData {
   label: string;
   literals?: Array<{predicate: string; value: string; isIRI?: boolean}>;
   position?: {x: number; y: number};
+}
+
+function countNodes(statements: readonly $rdf.Statement[]): number {
+  const nodes = new Set<string>();
+
+  for (const st of statements) {
+    nodes.add(st.subject.value);
+    if (st.object.termType !== 'Literal') {
+      nodes.add(st.object.value);
+    }
+  }
+
+  return nodes.size;
+}
+
+function confirmRender(allow: boolean) {
+  showLargeGraphPrompt.value = false;
+
+  if (!allow) {
+    emit('cancel-render');
+
+    if (cy) {
+      cy.destroy();
+      cy = null;
+    }
+    return;
+  }
+
+  renderGraph(props.statements);
 }
 
 function isIRI(value: string): boolean {
@@ -431,7 +494,13 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
 }
 
 onMounted(() => {
-  renderGraph(props.statements);
+  nodeCount.value = countNodes(props.statements);
+
+  if (nodeCount.value > MAX_NODES) {
+    showLargeGraphPrompt.value = true;
+  } else {
+    renderGraph(props.statements);
+  }
 
   const resizeObserver = new ResizeObserver(() => {
     if (cy) {
@@ -625,5 +694,45 @@ onMounted(() => {
 
 .zoom-btn svg {
   color: #333;
+}
+
+.confirm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.confirm-modal {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 8px;
+  width: 320px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: 1px solid #4299e1;
+  background: #4299e1;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: white;
+  color: #333;
+  border-color: #ccc;
 }
 </style>

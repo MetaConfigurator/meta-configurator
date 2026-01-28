@@ -56,6 +56,7 @@
             icon="pi pi-upload"
             severity="contrast"
             text
+            :disabled="items.length === 0"
             @click="toggleExportPopover" />
           <Popover ref="exportPopover">
             <Menu :style="'border: none'" :model="exportMenuItems" />
@@ -65,12 +66,14 @@
             icon="pi pi-search"
             severity="contrast"
             variant="text"
+            :disabled="items.length === 0"
             @click="openSparqlEditor" />
           <Button
             label="Visualize"
             icon="pi pi-globe"
             severity="contrast"
             variant="text"
+            :disabled="filteredRows.length === 0 || items.length === 0"
             @click="openVisualizer" />
         </div>
         <IconField class="flex items-center gap-1 flex-shrink-0">
@@ -241,7 +244,7 @@
     maximizable
     :style="{width: '800px', height: '800px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
-    <RdfVisualizer :statements="filteredStatements" />
+    <RdfVisualizer :statements="filteredStatements" @cancel-render="closeVisualizer" />
   </Dialog>
 </template>
 
@@ -413,6 +416,10 @@ const openVisualizer = () => {
 const openSparqlEditor = () => {
   sparqlDialog.value = true;
 };
+
+function closeVisualizer() {
+  visualizerDialog.value = false;
+}
 
 const deleteSelectedTriple = () => {
   if (!selectedTriple.value) return;

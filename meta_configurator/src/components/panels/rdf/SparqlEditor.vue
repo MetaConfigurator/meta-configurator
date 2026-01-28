@@ -210,7 +210,10 @@
           </div>
         </TabPanel>
         <TabPanel value="visualizer">
-          <RdfVisualizer v-if="results.length" :statements="statements" />
+          <RdfVisualizer
+            v-if="results.length"
+            :statements="statements"
+            @cancel-render="visualizationCanceled" />
           <Message v-else severity="warn">
             No results. Please check your query and
             <a
@@ -492,6 +495,10 @@ function openLimitationsHelpDialog() {
 
 function openVisualizationHelpDialog() {
   visualizationHelpDialog.value = true;
+}
+
+function visualizationCanceled() {
+  activeTab.value = 'query';
 }
 </script>
 
