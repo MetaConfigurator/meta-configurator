@@ -102,6 +102,7 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const deleteStatement = (statement: $rdf.Statement): {success: boolean; errorMessage: string} => {
+    // return {success: true, errorMessage: 'Store is not initialized.'};
     if (!_store.value) {
       return {success: false, errorMessage: 'Store is not initialized.'};
     }

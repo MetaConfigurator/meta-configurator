@@ -29,27 +29,40 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
   };
 
   const deleteStatement = (statement: $rdf.Statement) => {
-    if (settings.value.rdf.preserveFormatting) {
-      parser.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
-
-      const path = parser.value.findPath(statement) as Path;
-      const hasSubject = rdfStoreManager.containsSubject(statement);
-      const hasPredicate = rdfStoreManager.containsPredicate(statement);
-
-      if (!hasSubject) {
-        data.removeDataAt(path.slice(0, 2));
-        return;
-      }
-
-      if (!hasPredicate) {
-        data.removeDataAt(path.at(-1) === '@value' ? path.slice(0, -1) : path);
-        return;
-      }
-
-      const objectValue = rdfStoreManager.getObject(statement);
-      data.setDataAt(path.slice(0, -1), objectValue);
-    } else {
+    if (!settings.value.rdf.preserveFormatting) {
       rebuildTextData();
+      return;
+    }
+
+    parser.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
+
+    const path = parser.value.findPath(statement) as Path;
+    const hasSubject = rdfStoreManager.containsSubject(statement);
+    const hasPredicate = rdfStoreManager.containsPredicate(statement);
+
+    const popTrailingZero = (p: any[]) => (p.at(-1) === 0 ? p.slice(0, -1) : p);
+    const dropLast = (p: any[]) => p.slice(0, -1);
+    const dropIfLast = (p: any[], key: string) => (p.at(-1) === key ? dropLast(p) : p);
+
+    if (!hasSubject) {
+      data.removeDataAt(path.slice(0, 2));
+      return;
+    }
+
+    if (!hasPredicate) {
+      const last = path.at(-1);
+      const base = last === '@value' || last === '@id' ? dropLast(path) : path;
+      data.removeDataAt(popTrailingZero(base));
+      return;
+    }
+
+    const objectValue = rdfStoreManager.getObject(statement);
+    const base = dropLast(path);
+
+    if (statement.object.termType === 'NamedNode') {
+      data.removeDataAt(dropIfLast(base, '@id'));
+    } else {
+      data.setDataAt(base, objectValue);
     }
   };
 
