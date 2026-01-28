@@ -2,7 +2,7 @@
   <div style="width: 100%; height: 100%; position: relative">
     <Dialog
       v-model:visible="showLargeGraphPrompt"
-      header="Large graph detetced"
+      header="Large graph detected"
       modal
       :closable="false">
       <div class="flex items-center gap-4">
@@ -45,17 +45,6 @@
             rel="noopener noreferrer"
             class="property-link">
             {{ selectedNode.id }}
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              style="margin-left: 4px">
-              <path
-                d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z" />
-              <path
-                d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z" />
-            </svg>
           </a>
           <span v-else class="property-value">{{ selectedNode.id }}</span>
         </div>
@@ -71,7 +60,7 @@
                 class="property-key property-link">
                 {{ lit.predicate }}:
               </a>
-              <span v-else class="property-key"> {{ lit.predicate }}: </span>
+              <span v-else class="property-key">{{ lit.predicate }}:</span>
               <a
                 v-if="isLinkableIRI(lit.value)"
                 :href="iriHref(lit.value)!"
@@ -79,17 +68,6 @@
                 rel="noopener noreferrer"
                 class="property-link">
                 {{ lit.value }}
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                  style="margin-left: 4px">
-                  <path
-                    d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z" />
-                  <path
-                    d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z" />
-                </svg>
               </a>
               <span v-else class="property-value">
                 {{ lit.value }}
@@ -102,28 +80,16 @@
     </div>
     <div class="zoom-controls">
       <button @click="zoomIn" class="zoom-btn" title="Zoom In">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path
-            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-        </svg>
+        <i class="pi pi-search-plus" />
       </button>
       <button @click="zoomOut" class="zoom-btn" title="Zoom Out">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z" />
-        </svg>
+        <i class="pi pi-search-minus" />
       </button>
       <button @click="zoomFit" class="zoom-btn" title="Fit to View">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path
-            d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5zM0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zm10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4z" />
-        </svg>
+        <i class="pi pi-expand" />
       </button>
       <button @click="resetZoom" class="zoom-btn" title="Reset Zoom">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
-          <path
-            d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
-        </svg>
+        <i class="pi pi-refresh" />
       </button>
     </div>
   </div>
@@ -381,6 +347,7 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
           source: s,
           target: o,
           label: getPredicateAlias(p),
+          predicateIRI: p,
         },
       });
     }
@@ -443,12 +410,9 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
           'curve-style': 'bezier',
           label: 'data(label)',
           'font-size': '11px',
-          color: '#555',
+          color: '#ffffff',
           'text-rotation': 'autorotate',
           'text-margin-y': -10,
-          'text-background-color': '#fff',
-          'text-background-opacity': 0.8,
-          'text-background-padding': '3px',
         },
       },
     ],
@@ -495,6 +459,28 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
   cy.on('tap', event => {
     if (event.target === cy) {
       closeTooltip();
+    }
+  });
+
+  cy.on('tap', 'edge', event => {
+    const edge = event.target;
+    const predicateIRI = edge.data('predicateIRI');
+
+    const href = iriHref(predicateIRI);
+    if (href) {
+      window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  });
+
+  cy.on('mouseover', 'edge', () => {
+    if (container.value) {
+      container.value.style.cursor = 'pointer';
+    }
+  });
+
+  cy.on('mouseout', 'edge', () => {
+    if (container.value) {
+      container.value.style.cursor = 'default';
     }
   });
 }
@@ -740,5 +726,33 @@ onMounted(() => {
   background: white;
   color: #333;
   border-color: #ccc;
+}
+
+/* Zoom buttons */
+.zoom-btn {
+  background: var(--surface-card, #fff);
+  border: 1px solid var(--surface-border, #ccc);
+}
+
+.zoom-btn:hover {
+  background: var(--surface-hover, #f0f0f0);
+  border-color: var(--surface-border, #999);
+}
+
+/* Icon color */
+.zoom-btn i {
+  color: var(--text-color, #333);
+}
+
+/* Tooltip */
+.node-tooltip {
+  background: var(--surface-card, #fff);
+  border: 1px solid var(--surface-border, #ccc);
+}
+
+/* Optional: tooltip header background */
+.tooltip-header {
+  background: var(--surface-section, #f8f9fa);
+  border-bottom: 1px solid var(--surface-border, #e0e0e0);
 }
 </style>
