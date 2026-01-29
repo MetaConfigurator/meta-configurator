@@ -448,7 +448,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     rdf: {
       type: 'object',
-      required: ['sparqlEndpointUrl'],
+      required: ['sparqlEndpointUrl', 'preserveFormatting'],
       additionalProperties: false,
       description: 'Settings for RDF data.',
       properties: {
@@ -457,6 +457,11 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description: 'The SPARQL endpoint to use for querying RDF data.',
           default: 'https://dbpedia.org/sparql',
           format: 'uri',
+        },
+        preserveFormatting: {
+          type: 'boolean',
+          description: 'Whether to preserve JSON-LD formatting when editing RDF data.',
+          default: true,
         },
       },
     },
