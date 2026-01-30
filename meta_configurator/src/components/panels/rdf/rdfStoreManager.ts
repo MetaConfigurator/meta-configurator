@@ -12,6 +12,7 @@ interface JsonLdDoc {
 }
 
 interface RdfStore {
+  readonly store: Readonly<Ref<$rdf.IndexedFormula | null>>;
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
   readonly namespaces: Readonly<Ref<Record<string, string>>>;
   readonly parseErrors: Readonly<Ref<string[]>>;
@@ -396,6 +397,7 @@ export const rdfStoreManager: RdfStore & {
   );
 
   return {
+    store: readonly(_store),
     statements: readonly(_statements),
     namespaces: readonly(namespaces),
     parseErrors: readonly(_parseErrors),
