@@ -345,3 +345,80 @@ export const queryRmlMapping = async (
     {role: 'user', content: userMessage},
   ]);
 };
+export const generateSparqlSuggestion = async (
+  apiKey: string,
+  jsonLdContent: string,
+  userComments: string,
+  prefixBlock: string,
+  visualizationMode: boolean = false
+) => {
+  const baseSystemMessage = `
+You are a SPARQL expert assistant.
+
+Goal:
+Generate a VALID SPARQL query for a JSON-LD/RDF dataset based on the user's intent.
+
+General rules:
+1) Do NOT invent prefixes. Use only the provided PREFIX block.
+2) Prefer patterns that exist in the input graph.
+3) If the user's request is ambiguous, make a sensible assumption and keep the query broad but safe.
+4) Do NOT output any explanation. Output ONLY the VALID SPARQL query text.
+`.trim();
+
+  const visualizationSystemRules = `
+Additional mandatory rules:
+- Output MUST be a SPARQL CONSTRUCT query.
+- The CONSTRUCT template MUST be EXACTLY:
+  CONSTRUCT { ?subject ?predicate ?object . }
+  Other construct patterns are NOT allowed.
+  DO NOT CHANGE the CONSTRUCT template. Use BIND in the WHERE clause to define ?subject, ?predicate, and ?object.
+- The WHERE clause MUST bind ?subject, ?predicate, and ?object.
+- ?predicate MUST be an IRI (NamedNode), never a literal.
+`.trim();
+
+  const selectSystemRules = `
+Additional mandatory rules:
+- Output MUST be a SPARQL SELECT query.
+`.trim();
+
+  const systemMessage = visualizationMode
+    ? `${baseSystemMessage}\n\n${visualizationSystemRules}`
+    : `${baseSystemMessage}\n\n${selectSystemRules}`;
+
+  const visualizationFallback = `
+If the user intent is unclear, use:
+CONSTRUCT { ?subject ?predicate ?object . }
+WHERE { ?subject ?predicate ?object . }
+`.trim();
+
+  const selectFallback = `
+If the user intent is unclear, use:
+SELECT * WHERE { ?s ?p ?o . } LIMIT 100
+`.trim();
+
+  const safePrefixBlock = prefixBlock?.trim() || '(empty)';
+
+  const userMessage = `
+PREFIX block (MUST be placed at the very top of your output, verbatim; remove unused final prefixes):
+\`\`\`
+${safePrefixBlock}
+\`\`\`
+
+${visualizationMode ? visualizationFallback : selectFallback}
+
+JSON-LD content (treat as the only dataset; write a query that works against it):
+\`\`\`json
+${jsonLdContent}
+\`\`\`
+
+User intent / comments:
+\`\`\`
+${(userComments ?? '').trim() || '(none)'}
+\`\`\`
+`.trim();
+
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: userMessage},
+  ]);
+};

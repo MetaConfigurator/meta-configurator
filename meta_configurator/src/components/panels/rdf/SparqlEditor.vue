@@ -9,42 +9,81 @@
       <TabPanels>
         <TabPanel value="query">
           <div class="query-panel">
-            <div class="editor-container">
-              <codemirror
-                v-model="sparqlQuery"
-                :autofocus="true"
-                :indent-with-tab="true"
-                :tab-size="2"
-                :extensions="extensions"
-                @ready="handleReady" />
-            </div>
-            <div v-if="errorMessage" class="error-box">
-              {{ errorMessage }}
-            </div>
-            <div class="editor-footer flex items-center w-full">
-              <ToggleButton
-                v-model="enableVisualization"
-                onLabel="Visualization On"
-                offLabel="Visualization Off">
-                <template #default>
-                  <i :class="enableVisualization ? 'pi pi-eye' : 'pi pi-eye-slash'" />
-                  Visualization
-                </template>
-              </ToggleButton>
-              <Button
-                icon="pi pi-info-circle"
-                variant="text"
-                severity="warning"
-                @click="visualizationHelpDialog = true" />
-              <div class="flex items-center gap-2 ml-auto">
-                <Button
-                  label="Run Query"
-                  icon="pi pi-play"
-                  @click="runQuery"
-                  variant="text"
-                  severity="secondary" />
+            <ScrollPanel
+              class="query-scrollpanel"
+              style="width: 100%; height: 100%"
+              :dt="{
+                bar: {
+                  background: '{primary.color}',
+                },
+              }">
+              <div class="space-y-4 mb-2">
+                <Accordion>
+                  <AccordionPanel value="ai">
+                    <AccordionHeader>Use AI to help generate SPARQL query</AccordionHeader>
+                    <AccordionContent>
+                      <PanelSettings
+                        panel-name="API Key and AI Settings"
+                        settings-header="AI Settings"
+                        :panel-settings-path="['aiIntegration']"
+                        :sessionMode="SessionMode.DataEditor">
+                        <ApiKey />
+                      </PanelSettings>
+                      <ApiKeyWarning />
+                      <div>
+                        <Textarea
+                          id="userComments"
+                          v-model="userComments"
+                          class="w-full mt-2 mb-2"
+                          placeholder="e.g., create a sparql query to list all cities in the JSON-LD." />
+                      </div>
+                      <Button
+                        label="Suggest SPARQL Query"
+                        icon="pi pi-wand"
+                        @click="suggestSparqlQuery"
+                        class="w-full"
+                        :loading="isLoading" />
+                    </AccordionContent>
+                  </AccordionPanel>
+                </Accordion>
               </div>
-            </div>
+              <div class="editor-container mb-2">
+                <codemirror
+                  v-model="sparqlQuery"
+                  :autofocus="true"
+                  :indent-with-tab="true"
+                  :tab-size="2"
+                  :extensions="extensions"
+                  @ready="handleReady" />
+              </div>
+              <div v-if="errorMessage" class="error-box mb-2">
+                {{ errorMessage }}
+              </div>
+              <div class="editor-footer flex items-center w-full mb-2">
+                <ToggleButton
+                  v-model="enableVisualization"
+                  onLabel="Visualization On"
+                  offLabel="Visualization Off">
+                  <template #default>
+                    <i :class="enableVisualization ? 'pi pi-eye' : 'pi pi-eye-slash'" />
+                    Visualization
+                  </template>
+                </ToggleButton>
+                <Button
+                  icon="pi pi-info-circle"
+                  variant="text"
+                  severity="warning"
+                  @click="visualizationHelpDialog = true" />
+                <div class="flex items-center gap-2 ml-auto">
+                  <Button
+                    label="Run Query"
+                    icon="pi pi-play"
+                    @click="runQuery"
+                    variant="text"
+                    severity="secondary" />
+                </div>
+              </div>
+            </ScrollPanel>
           </div>
           <Dialog
             v-model:visible="visualizationHelpDialog"
@@ -160,6 +199,15 @@
 </template>
 
 <script setup lang="ts">
+import {generateSparqlSuggestion} from '@/utility/ai/aiEndpoint';
+import {trimDataToMaxSize} from '@/utility/trimData';
+import {getDataForMode} from '@/data/useDataLink';
+import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
+import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
+import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
+import {useErrorService} from '@/utility/errorServiceInstance';
+import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
+import {SessionMode} from '@/store/sessionMode';
 import {Parser} from 'sparqljs';
 import {ref, shallowRef, computed, watch} from 'vue';
 import {Codemirror} from 'vue-codemirror';
@@ -172,7 +220,12 @@ import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {StateEffect, StateField} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
 import {FilterMatchMode} from '@primevue/core/api';
+import Accordion from 'primevue/accordion';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
 import {isDarkMode} from '@/utility/darkModeUtils';
+import Textarea from 'primevue/textarea';
 import ToggleButton from 'primevue/togglebutton';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
@@ -186,8 +239,14 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import Dialog from 'primevue/dialog';
+import {ScrollPanel} from 'primevue';
 import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
+
+const isLoading = ref(false);
+const userComments = ref('');
+const result = ref('');
+const statusMessage = ref('');
 
 const statements = ref<$rdf.Statement[]>([]);
 const visualizationHelpDialog = ref(false);
@@ -212,6 +271,62 @@ const sparqlHighlightStyle = HighlightStyle.define([
   {tag: tags.operator, color: '#89ddff'},
   {tag: tags.punctuation, color: '#abb2bf'},
 ]);
+
+async function suggestSparql(): Promise<{config: string; success: boolean; message: string}> {
+  const inputDataSubset = trimDataToMaxSize(getDataForMode(SessionMode.DataEditor).data.value);
+  const apiKey = getApiKey();
+  const inputDataSubsetStr = JSON.stringify(inputDataSubset);
+
+  const resultPromise = generateSparqlSuggestion(
+    apiKey,
+    inputDataSubsetStr,
+    userComments.value,
+    buildPrefixBlock(rdfStoreManager.namespaces.value),
+    enableVisualization.value
+  );
+
+  const responseStr = await resultPromise;
+
+  try {
+    const fixedExpression = fixGeneratedExpression(responseStr, ['sparql']);
+    return {
+      config: fixedExpression,
+      success: true,
+      message: 'Data mapping suggestion generated successfully.',
+    };
+  } catch (e) {
+    console.error('Error generating mapping suggestion: ', e);
+    return {
+      config: responseStr,
+      success: false,
+      message:
+        'Failed to generate data mapping suggestion. Please check the console for more details.',
+    };
+  }
+}
+
+function suggestSparqlQuery() {
+  isLoading.value = true;
+  suggestSparql()
+    .then(res => {
+      result.value = res.config;
+      if (res.success) {
+        statusMessage.value = res.message;
+        errorMessage.value = '';
+      } else {
+        statusMessage.value = '';
+        errorMessage.value = res.message;
+      }
+      isLoading.value = false;
+      setEditorText(res.config.trimStart(), false);
+    })
+    .catch(error => {
+      useErrorService().onError(error);
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
+}
 
 const priority = ['?subject', '?predicate', '?object'];
 
@@ -480,8 +595,8 @@ const handleReady = (payload: {view: any}) => {
   view.value = payload.view;
 };
 
-const setEditorText = (text: string) => {
-  sparqlQuery.value = applyPrefixesToQuery(text);
+const setEditorText = (text: string, applyPrefixes: boolean = true) => {
+  sparqlQuery.value = applyPrefixes ? applyPrefixesToQuery(text) : text;
   if (!view.value) return;
 
   const state = view.value.state;
@@ -662,5 +777,42 @@ function visualizationCanceled() {
   50% {
     background-color: #ffcdd2;
   }
+}
+
+:deep(.p-tabpanel[value='query']) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.query-panel {
+  flex: 1;
+  min-height: 0;
+}
+
+:deep(.query-scrollpanel) {
+  flex: 1;
+  min-height: 0;
+}
+
+:deep(.query-scrollpanel .p-scrollpanel-content) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:deep(.query-scrollpanel .p-scrollpanel-content > .space-y-4) {
+  flex-shrink: 0;
+}
+
+.editor-container {
+  flex: 1;
+  min-height: 0;
+}
+
+.error-box,
+.editor-footer {
+  flex-shrink: 0;
 }
 </style>
