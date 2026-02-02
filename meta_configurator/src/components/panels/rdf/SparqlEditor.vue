@@ -22,27 +22,21 @@
               {{ errorMessage }}
             </div>
             <div class="editor-footer flex items-center w-full">
+              <ToggleButton
+                v-model="enableVisualization"
+                onLabel="Visualization On"
+                offLabel="Visualization Off">
+                <template #default>
+                  <i :class="enableVisualization ? 'pi pi-eye' : 'pi pi-eye-slash'" />
+                  Visualization
+                </template>
+              </ToggleButton>
               <Button
-                icon="pi pi-exclamation-triangle"
-                label="SPARQL limitations"
+                icon="pi pi-info-circle"
                 variant="text"
                 severity="warning"
-                @click="limitationsHelpDialog = true" />
+                @click="visualizationHelpDialog = true" />
               <div class="flex items-center gap-2 ml-auto">
-                <Button
-                  icon="pi pi-info-circle"
-                  variant="text"
-                  severity="warning"
-                  @click="visualizationHelpDialog = true" />
-                <ToggleButton
-                  v-model="enableVisualization"
-                  onLabel="Visualization On"
-                  offLabel="Visualization Off">
-                  <template #default>
-                    <i :class="enableVisualization ? 'pi pi-eye' : 'pi pi-eye-slash'" />
-                    Visualization
-                  </template>
-                </ToggleButton>
                 <Button
                   label="Run Query"
                   icon="pi pi-play"
@@ -54,99 +48,43 @@
           </div>
           <Dialog
             v-model:visible="visualizationHelpDialog"
-            header="Visualization Notes"
+            header="Visualization Mode – Query Requirements"
             modal
             style="width: 500px">
             <div class="text-sm leading-relaxed">
-              <p class="mb-2">
-                To enable <b>Visualization</b>, your query must return RDF triples in a form that
-                can be converted into <b>rdflib.js Statements</b>.
+              <p class="mb-3">
+                <b>Visualization mode</b> works by directly consuming RDF triples. For this reason,
+                only <b>SPARQL CONSTRUCT queries</b> are supported.
               </p>
+
               <p class="font-semibold mb-1">Required query structure:</p>
               <ul class="pl-4 list-disc mb-3">
-                <li>The query must be a <b>SELECT</b> query</li>
+                <li>The query <b>must be a CONSTRUCT query</b></li>
                 <li>
-                  The result must include <b>exactly these variables</b>: <code>?subject</code>,
-                  <code>?predicate</code>, <code>?object</code>
+                  The <code>CONSTRUCT</code> template must follow this exact pattern:
+                  <pre
+                    :class="[
+                      'p-2 rounded text-xs overflow-auto !bg-gray-100',
+                      isDarkMode && '!bg-gray-900',
+                    ]"
+                    >{{ visualizationQueryExample_1 }}
+    </pre
+                  >
                 </li>
-                <li>
-                  <code>?predicate</code> must always refer to a <b>Named Node (IRI)</b>
-                  — literals or variables bound to literals are not supported
-                </li>
+                <li>The <code>WHERE</code> clause may contain any valid SPARQL pattern</li>
+                <li><code>?predicate</code> must always be a <b>Named Node (IRI)</b></li>
                 <li><code>?subject</code> and <code>?object</code> may be IRIs or literals</li>
               </ul>
-              <p class="font-semibold mb-1">Example (recommended):</p>
-              <pre
-                :class="[
-                  'p-2 rounded text-xs overflow-auto !bg-gray-100',
-                  isDarkMode && '!bg-gray-900',
-                ]"
-                >{{ visualizationQueryExample_1 }}
-  </pre
-              >
-              <p class="font-semibold mb-1">Filtering to a specific subject:</p>
+
+              <p class="font-semibold mb-1">Example:</p>
               <pre
                 :class="[
                   'p-2 rounded text-xs overflow-auto !bg-gray-100',
                   isDarkMode && '!bg-gray-900',
                 ]"
                 >{{ visualizationQueryExample_2 }}
-  </pre
+    </pre
               >
-              <Message severity="warn">
-                Visualization will be disabled if the query does not return
-                <code>?subject</code>, <code>?predicate</code>, and <code>?object</code>, or if
-                <code>?predicate</code> is not a Named Node.
-              </Message>
-            </div>
-          </Dialog>
-          <Dialog
-            v-model:visible="limitationsHelpDialog"
-            header="Unsupported SPARQL Features"
-            modal
-            style="width: 500px">
-            <div class="text-sm leading-relaxed">
-              <p class="mb-2">
-                This SPARQL editor uses <b>rdflib.js</b> and supports only a
-                <b>very limited subset</b> of SPARQL. It is <b>not a full SPARQL 1.1 engine</b>.
-              </p>
-              <p class="font-semibold mb-1">The following features are <b>not supported</b>:</p>
-              <ul class="pl-4 list-disc mb-3">
-                <li>
-                  <b>CONSTRUCT</b>, <b>ASK</b>, <b>DESCRIBE</b> query forms (only <b>SELECT</b> is
-                  supported)
-                </li>
-                <li><b>LIMIT</b>, <b>OFFSET</b>, <b>ORDER BY</b>, <b>DISTINCT</b></li>
-                <li>Aggregates: <b>COUNT</b>, <b>SUM</b>, <b>AVG</b>, <b>MIN</b>, <b>MAX</b></li>
-                <li><b>GROUP BY</b>, <b>HAVING</b></li>
-                <li><b>Subqueries</b></li>
-                <li><b>UNION</b></li>
-                <li>
-                  Property paths (<code>/</code>, <code>*</code>, <code>+</code>, <code>?</code>,
-                  <code>|</code>, <code>^</code>)
-                </li>
-                <li><b>VALUES</b></li>
-                <li><b>BIND</b></li>
-                <li>
-                  Advanced <b>FILTER</b> expressions (AND, OR, IN, arithmetic, functions like STR(),
-                  LANG(), DATATYPE(), etc.)
-                </li>
-                <li><b>SPARQL UPDATE</b> (INSERT, DELETE, LOAD, CLEAR, etc.)</li>
-                <li><b>SERVICE</b> (federated queries)</li>
-              </ul>
-              <p class="font-semibold mb-1">Partially supported features:</p>
-              <ul class="pl-4 list-disc mb-3">
-                <li>
-                  <b>FILTER</b> only supports simple equality comparisons and basic
-                  <code>REGEXP</code>
-                </li>
-                <li><b>OPTIONAL</b> blocks are parsed but may not behave correctly in all cases</li>
-              </ul>
-              <Message severity="warn">
-                Queries using unsupported features may fail to parse or produce incorrect or
-                unexpected results. For best results, use simple <b>SELECT</b> queries with basic
-                triple patterns.
-              </Message>
             </div>
           </Dialog>
         </TabPanel>
@@ -198,20 +136,12 @@
                 </template>
               </Column>
             </DataTable>
-            <Message v-else severity="warn">
-              No results. Please check your query and
-              <a
-                href="#"
-                @click.prevent="openLimitationsHelpDialog"
-                class="text-blue-600 hover:underline">
-                limitations </a
-              >.
-            </Message>
+            <Message v-else severity="warn"> No results. Please check your query. </Message>
           </div>
         </TabPanel>
         <TabPanel value="visualizer">
           <RdfVisualizer
-            v-if="results.length"
+            v-if="statements.length"
             :statements="statements"
             @cancel-render="visualizationCanceled" />
           <Message v-else severity="warn">
@@ -239,7 +169,7 @@ import {syntaxHighlighting, HighlightStyle} from '@codemirror/language';
 import {tags} from '@lezer/highlight';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {StateEffect, StateField, EditorState} from '@codemirror/state';
+import {StateEffect, StateField} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
 import {FilterMatchMode} from '@primevue/core/api';
 import {isDarkMode} from '@/utility/darkModeUtils';
@@ -260,7 +190,6 @@ import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 
 const statements = ref<$rdf.Statement[]>([]);
-const limitationsHelpDialog = ref(false);
 const visualizationHelpDialog = ref(false);
 const addErrorLine = StateEffect.define<number | null>();
 const clearErrorLines = StateEffect.define<null>();
@@ -309,19 +238,21 @@ const errorLineField = StateField.define({
 });
 
 const visualizationQueryExample_1 = `
-SELECT ?subject ?predicate ?object
-WHERE {
+CONSTRUCT {
   ?subject ?predicate ?object .
 }
 `.trim();
 
 const visualizationQueryExample_2 = `
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-
-SELECT ?subject ?predicate ?object
-WHERE {
+CONSTRUCT {
   ?subject ?predicate ?object .
-  FILTER(?subject = foaf:Person)
+}
+WHERE {
+  ?s ?p ?o .
+
+  BIND(?s AS ?subject)
+  BIND(?p AS ?predicate)
+  BIND(?o AS ?object)
 }
 `.trim();
 
@@ -332,7 +263,7 @@ WHERE
 }
 `.trim();
 
-const graphQueryTemplate = `CONSTRUCT {
+const visualizationQueryTemplate = `CONSTRUCT {
   ?subject ?predicate ?object .
 }
 WHERE
@@ -343,6 +274,7 @@ WHERE
 
 const buildPrefixBlock = (namespaces: Record<string, string>): string => {
   return Object.entries(namespaces)
+    .filter(([prefix]) => prefix !== '@vocab')
     .map(([prefix, iri]) => `PREFIX ${prefix}: <${iri}>`)
     .join('\n');
 };
@@ -397,7 +329,27 @@ const initFilters = (cols: string[]) => {
   filters.value = _filters;
 };
 
-const runQuery = () => {
+const sortColumns = (cols: string[]) => [
+  ...priority.filter(c => cols.includes(c)),
+  ...cols.filter(c => !priority.includes(c)),
+];
+
+const termToString = (term: any) =>
+  term?.termType === 'Literal' ? term.value : term?.value ?? (term ? String(term) : '');
+
+const rdfjsToRdflib = (term: any) => {
+  if (!term) return null;
+  if (term.termType === 'NamedNode') return $rdf.sym(term.value);
+  if (term.termType === 'BlankNode') return $rdf.blankNode(term.value);
+  if (term.termType === 'Literal') {
+    const langOrDt =
+      term.language || (term.datatype?.value ? $rdf.sym(term.datatype.value) : undefined);
+    return $rdf.literal(term.value, langOrDt);
+  }
+  return null;
+};
+
+const runQuery = async () => {
   results.value = [];
   columns.value = [];
   statements.value = [];
@@ -406,26 +358,104 @@ const runQuery = () => {
 
   if (!validateSparqlSyntax()) return;
 
-  rdfStoreManager.query(
-    sparqlQuery.value,
-    row => {
-      results.value.push(row);
-    },
-    cols => {
-      const sortedCols = [
-        ...priority.filter(c => cols.includes(c)),
-        ...cols.filter(c => !priority.includes(c)),
-      ];
-      columns.value = sortedCols;
-      initFilters(sortedCols);
-      activeTab.value = enableVisualization.value ? 'visualizer' : 'result';
-    },
-    enableVisualization.value
-      ? stmts => {
-          statements.value = stmts;
-        }
-      : undefined
-  );
+  const engine = new (window as any).Comunica.QueryEngine();
+  const {content} = rdfStoreManager.exportAs('application/n-triples');
+  const sources = [{type: 'serialized', value: content, mediaType: 'application/n-triples'}];
+
+  if (enableVisualization.value) {
+    if (!isValidVisualizationConstruct(sparqlQuery.value)) {
+      errorMessage.value =
+        'Invalid CONSTRUCT query for visualization. Please ensure the query follows the required structure.';
+      return;
+    }
+    await runConstructQuery(engine, sources);
+  } else {
+    await runSelectQuery(engine, sources);
+  }
+};
+
+const runConstructQuery = async (engine: any, sources: any[]) => {
+  const stmts: $rdf.Statement[] = [];
+  const computedColumns = ['?subject', '?predicate', '?object'];
+
+  const finalize = () => {
+    const sorted = sortColumns(computedColumns);
+    columns.value = sorted;
+    initFilters(sorted);
+
+    statements.value = stmts;
+    activeTab.value = 'visualizer';
+  };
+
+  const quadsStream = await engine.queryQuads(sparqlQuery.value, {sources});
+
+  quadsStream
+    .on('data', (q: any) => {
+      results.value.push({
+        '?subject': termToString(q.subject),
+        '?predicate': termToString(q.predicate),
+        '?object': termToString(q.object),
+      });
+
+      const s = rdfjsToRdflib(q.subject);
+      const p = rdfjsToRdflib(q.predicate);
+      const o = rdfjsToRdflib(q.object);
+
+      if (s && p && o && p.termType === 'NamedNode' && s.termType !== 'Literal') {
+        stmts.push(new $rdf.Statement(s as any, p as any, o as any));
+      }
+    })
+    .on('end', finalize)
+    .on('error', (e: any) => {
+      errorMessage.value = String(e?.message ?? e);
+      finalize();
+    });
+};
+
+const runSelectQuery = async (engine: any, sources: any[]) => {
+  try {
+    const bindingsStream = await engine.queryBindings(sparqlQuery.value, {sources});
+    const rows: Record<string, string>[] = [];
+
+    const computedColumns =
+      (await bindingsStream
+        .getMetadata?.()
+        .then((m: any) =>
+          (m?.variables ?? []).map(
+            (v: any) => `?${v.value ?? v.name ?? String(v).replace(/^\?/, '')}`
+          )
+        )
+        .catch(() => [])) ?? [];
+
+    const finalize = () => {
+      const cols = rows.length ? Object.keys(rows[0]!) : computedColumns;
+      const sorted = sortColumns(cols);
+
+      columns.value = sorted;
+      initFilters(sorted);
+      activeTab.value = 'result';
+    };
+
+    bindingsStream
+      .on('data', (binding: any) => {
+        const row = Object.fromEntries(
+          [...binding.keys()].map((v: any) => {
+            const name = v.value ?? v.name ?? String(v).replace(/^\?/, '');
+            return [`?${name}`, termToString(binding.get(v))];
+          })
+        ) as Record<string, string>;
+
+        rows.push(row);
+        results.value.push(row);
+      })
+      .on('end', finalize)
+      .on('error', (e: any) => {
+        errorMessage.value = String(e?.message ?? e);
+        finalize();
+      });
+  } catch (e: any) {
+    errorMessage.value = String(e?.message ?? e);
+  }
 };
 
 const validateSparqlSyntax = (): boolean => {
@@ -460,9 +490,13 @@ const setEditorText = (text: string) => {
   });
 };
 
-watch(enableVisualization, on => {
-  setEditorText(on ? graphQueryTemplate : defaultQueryTemplate);
-});
+watch(
+  enableVisualization,
+  on => {
+    setEditorText(on ? visualizationQueryTemplate : defaultQueryTemplate);
+  },
+  {immediate: true}
+);
 
 let validateTimer: number | null = null;
 
@@ -485,13 +519,21 @@ const validateLive = () => {
   }, 250);
 };
 
+function isValidVisualizationConstruct(query: string): boolean {
+  const normalized = query
+    .replace(/#[^\n]*/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+  const constructPattern = /construct\s*\{\s*\?subject\s+\?predicate\s+\?object\s*\.\s*\}/;
+
+  return constructPattern.test(normalized);
+}
+
 watch(sparqlQuery, () => {
   validateLive();
 });
-
-function openLimitationsHelpDialog() {
-  limitationsHelpDialog.value = true;
-}
 
 function openVisualizationHelpDialog() {
   visualizationHelpDialog.value = true;

@@ -16,12 +16,6 @@ interface RdfStore {
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
   readonly namespaces: Readonly<Ref<Record<string, string>>>;
   readonly parseErrors: Readonly<Ref<string[]>>;
-  query: (
-    sparql: string,
-    onRow: (row: Record<string, string>) => void,
-    onDone?: (columns: string[]) => void,
-    onStatementsDone?: (statements: $rdf.Statement[]) => void
-  ) => void;
   editStatement: (
     oldStatement: $rdf.Statement,
     newStatement: $rdf.Statement
@@ -222,59 +216,6 @@ export const rdfStoreManager: RdfStore & {
     return idx !== -1 ? idx : -1;
   };
 
-  const query = (
-    sparql: string,
-    onRow: (row: Record<string, string>) => void,
-    onDone?: (columns: string[]) => void,
-    onStatementsDone?: (statements: $rdf.Statement[]) => void
-  ): void => {
-    const queryObj = $rdf.SPARQLToQuery(sparql, false, _store.value);
-    if (!queryObj) return;
-
-    const rows: Record<string, string>[] = [];
-    const statements: $rdf.Statement[] = [];
-
-    const toStatementIfPossible = (bindings: any): $rdf.Statement | null => {
-      const s = bindings['?subject'];
-      const p = bindings['?predicate'];
-      const o = bindings['?object'];
-
-      if (!s || !p || !o) return null;
-      return new $rdf.Statement(s, p, o);
-    };
-
-    _store.value!.query(
-      queryObj,
-      (bindings: any) => {
-        const row: Record<string, string> = {};
-        for (const key in bindings) {
-          row[key] = bindings[key]?.value ?? String(bindings[key]);
-        }
-        rows.push(row);
-        onRow(row);
-        if (onStatementsDone) {
-          const stmt = toStatementIfPossible(bindings);
-          if (stmt) {
-            statements.push(stmt);
-          }
-        }
-      },
-      undefined,
-      () => {
-        const columns =
-          rows.length > 0
-            ? Object.keys(rows[0]!)
-            : queryObj.vars.length
-            ? queryObj.vars.map((v: any) => `?${v.label}`)
-            : [];
-        onDone?.(columns);
-        if (onStatementsDone) {
-          onStatementsDone(statements);
-        }
-      }
-    );
-  };
-
   function extractJsonLdByPath(path: Path): JsonLdDoc | undefined {
     const jsonld = useCurrentData().data.value;
 
@@ -401,7 +342,6 @@ export const rdfStoreManager: RdfStore & {
     statements: readonly(_statements),
     namespaces: readonly(namespaces),
     parseErrors: readonly(_parseErrors),
-    query,
     editStatement,
     deleteStatement,
     addStatement,

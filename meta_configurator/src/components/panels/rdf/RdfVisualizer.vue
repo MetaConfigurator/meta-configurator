@@ -105,7 +105,7 @@ import type * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 
-const MAX_NODES = 5;
+const MAX_NODES = 500;
 
 const showLargeGraphPrompt = ref(false);
 const nodeCount = ref(0);
