@@ -42,7 +42,7 @@
     "fast-xml-parser": "^5.0.8",
     "flowbite": "^1.6.5",
     "handlebars": "^4.7.8",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.1.1",
     "json-cst": "^1.2.0",
     "json-pointer": "^0.6.2",
     "json-schema-faker": "^0.5.8",
