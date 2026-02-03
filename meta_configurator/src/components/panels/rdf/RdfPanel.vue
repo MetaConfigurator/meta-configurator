@@ -36,9 +36,9 @@
       v-if="!dataIsInJsonLd"
       class="border border-yellow-400 bg-yellow-100 text-yellow-900 p-4 rounded-md m-1">
       <p class="font-semibold flex items-center gap-2">ℹ️ JSON-LD required</p>
-      <p class="mt-1">To use the RDF panel, your data must be in valid JSON-LD format.</p>
-      <p class="mt-2">
-        If your data is JSON, you can use
+      <p class="mt-1">
+        To use the RDF panel, your data must be in valid JSON-LD format. If your data is JSON, you
+        can use
         <a
           href="#"
           @click.prevent="showRmlMappingDialog"

@@ -63,17 +63,19 @@
                 {{ errorMessage }}
               </div>
               <div class="editor-footer flex items-center w-full mb-2">
-                <ToggleButton
-                  v-model="enableVisualization"
-                  onLabel="Visualization On"
-                  offLabel="Visualization Off">
-                  <template #default>
-                    <i :class="enableVisualization ? 'pi pi-eye' : 'pi pi-eye-slash'" />
-                    Visualization
-                  </template>
-                </ToggleButton>
+                <div class="flex items-center gap-2">
+                  <ToggleSwitch v-model="enableVisualization">
+                    <template #handle="{checked}">
+                      <i :class="['!text-xs pi', {'pi-eye': checked, 'pi-eye-slash': !checked}]" />
+                    </template>
+                  </ToggleSwitch>
+                  <span class="text-sm font-medium">
+                    {{ enableVisualization ? 'Visualization On' : 'Visualization Off' }}
+                  </span>
+                </div>
                 <Button
-                  icon="pi pi-info-circle"
+                  v-if="enableVisualization"
+                  icon="pi pi-question-circle"
                   variant="text"
                   severity="warning"
                   @click="visualizationHelpDialog = true" />
@@ -248,6 +250,7 @@ import Dialog from 'primevue/dialog';
 import {ScrollPanel} from 'primevue';
 import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
+import ToggleSwitch from 'primevue/toggleswitch';
 
 const isLoading = ref(false);
 const userComments = ref('');
