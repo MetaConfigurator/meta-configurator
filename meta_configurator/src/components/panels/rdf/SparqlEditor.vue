@@ -18,8 +18,8 @@
                 },
               }">
               <div class="space-y-4 mb-2">
-                <Accordion>
-                  <AccordionPanel value="ai">
+                <Accordion v-model:value="activeAccordion">
+                  <AccordionPanel value="aiPanel">
                     <AccordionHeader>Use AI to help generate SPARQL query</AccordionHeader>
                     <AccordionContent>
                       <PanelSettings
@@ -34,9 +34,12 @@
                         <Textarea
                           id="userComments"
                           v-model="userComments"
-                          class="w-full mt-2 mb-2"
+                          class="w-full mt-2"
                           placeholder="e.g., create a sparql query to list all cities in the JSON-LD." />
                       </div>
+                      <Message severity="warn" class="mb-2">
+                        <span>Generated SPARQL queries may require manual review.</span>
+                      </Message>
                       <Button
                         label="Suggest SPARQL Query"
                         icon="pi pi-wand"
@@ -247,6 +250,7 @@ const isLoading = ref(false);
 const userComments = ref('');
 const result = ref('');
 const statusMessage = ref('');
+const activeAccordion = ref<string | null>(null);
 
 const statements = ref<$rdf.Statement[]>([]);
 const visualizationHelpDialog = ref(false);
@@ -319,6 +323,7 @@ function suggestSparqlQuery() {
       }
       isLoading.value = false;
       setEditorText(res.config.trimStart(), false);
+      activeAccordion.value = null;
     })
     .catch(error => {
       useErrorService().onError(error);
