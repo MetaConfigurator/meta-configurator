@@ -1,5 +1,5 @@
 > [!NOTE]  
-> You are using MetaConfigurator? Please [get in touch with us](https://forms.gle/MHKvrkMfdymH8TDs5)! We are currently applying for funding to turn the tool into a research infrastructure and want to prepare an overview of the existing user base. Besides, we are interested in your ideas, your feedback, and any feature requests.
+> You are using MetaConfigurator? Please [get in touch with us and give us feedback](https://forms.gle/MHKvrkMfdymH8TDs5)!
 
 
 MetaConfigurator - A powerful JSON Schema Editor and Form/Code/Documentation Generator
