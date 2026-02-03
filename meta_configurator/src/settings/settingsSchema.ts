@@ -448,7 +448,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     rdf: {
       type: 'object',
-      required: ['sparqlEndpointUrl', 'preserveFormatting'],
+      required: ['sparqlEndpointUrl', 'preserveFormatting', 'maximumTriplesToShow'],
       additionalProperties: false,
       description: 'Settings for RDF data.',
       properties: {
@@ -462,6 +462,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'boolean',
           description: 'Whether to preserve JSON-LD formatting when editing RDF data.',
           default: true,
+        },
+        maximumTriplesToShow: {
+          type: 'integer',
+          description:
+            'The maximum number of RDF triples to show in the RDF viewer. If the number of triples exceeds this value, only a subset will be shown to avoid performance issues.',
+          default: 20,
         },
       },
     },

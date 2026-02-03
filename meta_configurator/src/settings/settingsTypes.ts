@@ -113,6 +113,7 @@ export interface SettingsInterfacFrontend {
 export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
   preserveFormatting: boolean;
+  maximumTriplesToShow: number;
 }
 
 export interface SettingsInterfaceAiIntegraton {

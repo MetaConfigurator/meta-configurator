@@ -114,8 +114,11 @@
                   >
                 </li>
                 <li>The <code>WHERE</code> clause may contain any valid SPARQL pattern</li>
-                <li><code>?predicate</code> must always be a <b>Named Node (IRI)</b></li>
-                <li><code>?subject</code> and <code>?object</code> may be IRIs or literals</li>
+                <li>
+                  <code>?subject</code> and <code>?predicate</code> must always be a
+                  <b>Named Node (IRI)</b>
+                </li>
+                <li><code>?object</code> may be IRI or literal</li>
               </ul>
 
               <p class="font-semibold mb-1">Example:</p>

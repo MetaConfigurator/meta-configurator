@@ -7,9 +7,19 @@
     </PanelSettings>
     <RmlMappingDialog ref="rmlMappingDialog" />
     <div
+      v-if="parsingWarnings.length > 0"
+      class="border border-amber-400 bg-amber-100 text-amber-900 p-4 rounded-md m-1">
+      <p class="font-semibold flex items-center gap-2">⚠️ Warnings:</p>
+      <ul class="mt-2 list-disc list-inside">
+        <li v-for="err in parsingWarnings" :key="err.id">
+          {{ err.message }}
+        </li>
+      </ul>
+    </div>
+    <div
       v-if="parsingErrors.length > 0"
-      class="border border-orange-400 bg-orange-50 text-orange-800 p-4 rounded m-1">
-      <p class="font-semibold">Semantic issues were detected in your JSON-LD data:</p>
+      class="border border-orange-500 bg-orange-100 text-orange-900 p-4 rounded-md m-1">
+      <p class="font-semibold flex items-center gap-2">❗ Semantic issues detected:</p>
       <ul class="mt-2 list-disc list-inside">
         <li v-for="err in parsingErrors" :key="err.id">
           {{ err.message }}
@@ -18,18 +28,25 @@
     </div>
     <div
       v-if="dataIsUnparsable"
-      class="border border-red-400 bg-red-50 text-yellow-800 p-4 rounded m-1">
-      Your data contains syntax errors. Please correct them before proceeding.
+      class="border border-red-500 bg-red-100 text-red-900 p-4 rounded-md m-1">
+      <p class="font-semibold flex items-center gap-2">⛔ Syntax error</p>
+      <p class="mt-1">Your data contains syntax errors. Please correct them before proceeding.</p>
     </div>
     <div
       v-if="!dataIsInJsonLd"
-      class="border border-yellow-400 bg-yellow-50 text-yellow-800 p-4 rounded m-1">
-      To use RDF panel, your data should be in valid JSON-LD format. If your data is in JSON, you
-      can use
-      <a href="#" @click.prevent="showRmlMappingDialog" class="text-blue-600 hover:underline">
-        JSON to JSON-LD
-      </a>
-      utility to convert it to JSON-LD.
+      class="border border-yellow-400 bg-yellow-100 text-yellow-900 p-4 rounded-md m-1">
+      <p class="font-semibold flex items-center gap-2">ℹ️ JSON-LD required</p>
+      <p class="mt-1">To use the RDF panel, your data must be in valid JSON-LD format.</p>
+      <p class="mt-2">
+        If your data is JSON, you can use
+        <a
+          href="#"
+          @click.prevent="showRmlMappingDialog"
+          class="font-medium text-blue-700 hover:underline">
+          JSON → JSON-LD
+        </a>
+        to convert it.
+      </p>
     </div>
     <div class="panel-content">
       <RdfEditorPanel
@@ -63,6 +80,13 @@ const dataIsInJsonLd = ref(false);
 
 const parsingErrors = computed(() => {
   return rdfStoreManager.parseErrors.value.map((msg, index) => ({
+    id: index,
+    message: msg,
+  }));
+});
+
+const parsingWarnings = computed(() => {
+  return rdfStoreManager.parseWarnings.value.map((msg, index) => ({
     id: index,
     message: msg,
   }));

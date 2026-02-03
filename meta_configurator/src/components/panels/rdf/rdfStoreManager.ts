@@ -3,6 +3,9 @@ import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
+import {useSettings} from '@/settings/useSettings';
+
+const settings = useSettings();
 
 type RdfChangeCallback = (oldStore: string, newStore: string) => void;
 
@@ -16,6 +19,7 @@ interface RdfStore {
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
   readonly namespaces: Readonly<Ref<Record<string, string>>>;
   readonly parseErrors: Readonly<Ref<string[]>>;
+  readonly parseWarnings: Readonly<Ref<string[]>>;
   editStatement: (
     oldStatement: $rdf.Statement,
     newStatement: $rdf.Statement
@@ -43,7 +47,7 @@ export const rdfStoreManager: RdfStore & {
   const _store = ref<$rdf.IndexedFormula | null>(null);
   const _statements = ref<$rdf.Statement[]>([]);
   const _parseErrors = ref<string[]>([]);
-
+  const _parseWarnings = ref<string[]>([]);
   const namespaces = computed<Record<string, string>>(() => {
     if (!_store.value) return {};
     return {..._store.value.namespaces};
@@ -93,7 +97,16 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const updateStatements = () => {
-    _statements.value = [..._store.value!.statements];
+    _parseWarnings.value = [];
+    const all = [..._store.value!.statements];
+    const max = settings.value.rdf.maximumTriplesToShow;
+    _statements.value = all.length > max ? all.slice(0, max) : all;
+    if (all.length > max) {
+      _parseWarnings.value = [
+        `The number of triples (${all.length}) exceeds the maximum limit (${max}). Only the first ${max} triples are shown.
+        You can adjust this limit in the settings.`,
+      ];
+    }
   };
 
   const deleteStatement = (statement: $rdf.Statement): {success: boolean; errorMessage: string} => {
@@ -321,19 +334,31 @@ export const rdfStoreManager: RdfStore & {
     return index >= 0 ? index : -1;
   }
 
+  const rebuildStoreFromEditorData = async (data: any) => {
+    if (!data) return;
+
+    _jsonLdText.value = JSON.stringify(data, null, 2);
+    clearStore();
+
+    _jsonObject.value = JSON.parse(_jsonLdText.value);
+    applyContextPrefixes(_jsonObject.value);
+
+    await parseJsonLdIntoStore(_jsonLdText.value);
+    updateStatements();
+  };
+
   watch(
     () => getDataForMode(SessionMode.DataEditor).data.value,
     async data => {
-      if (!data) return;
+      await rebuildStoreFromEditorData(data);
+    }
+  );
 
-      _jsonLdText.value = JSON.stringify(data, null, 2);
-      clearStore();
-
-      _jsonObject.value = JSON.parse(_jsonLdText.value);
-      applyContextPrefixes(_jsonObject.value);
-
-      await parseJsonLdIntoStore(_jsonLdText.value);
-      updateStatements();
+  watch(
+    () => settings.value.rdf.maximumTriplesToShow,
+    async () => {
+      const data = getDataForMode(SessionMode.DataEditor).data.value;
+      await rebuildStoreFromEditorData(data);
     }
   );
 
@@ -342,6 +367,7 @@ export const rdfStoreManager: RdfStore & {
     statements: readonly(_statements),
     namespaces: readonly(namespaces),
     parseErrors: readonly(_parseErrors),
+    parseWarnings: readonly(_parseWarnings),
     editStatement,
     deleteStatement,
     addStatement,
