@@ -9,7 +9,7 @@
     <div
       v-if="parsingWarnings.length > 0"
       class="border border-amber-400 bg-amber-100 text-amber-900 p-4 rounded-md m-1">
-      <p class="font-semibold flex items-center gap-2">⚠️ Warnings:</p>
+      <p class="font-semibold flex items-center gap-2">Warnings:</p>
       <ul class="mt-2 list-disc list-inside">
         <li v-for="err in parsingWarnings" :key="err.id">
           {{ err.message }}
@@ -19,7 +19,7 @@
     <div
       v-if="parsingErrors.length > 0"
       class="border border-orange-500 bg-orange-100 text-orange-900 p-4 rounded-md m-1">
-      <p class="font-semibold flex items-center gap-2">❗ Semantic issues detected:</p>
+      <p class="font-semibold flex items-center gap-2">Semantic issues detected:</p>
       <ul class="mt-2 list-disc list-inside">
         <li v-for="err in parsingErrors" :key="err.id">
           {{ err.message }}
@@ -29,13 +29,13 @@
     <div
       v-if="dataIsUnparsable"
       class="border border-red-500 bg-red-100 text-red-900 p-4 rounded-md m-1">
-      <p class="font-semibold flex items-center gap-2">⛔ Syntax error</p>
+      <p class="font-semibold flex items-center gap-2">Syntax error:</p>
       <p class="mt-1">Your data contains syntax errors. Please correct them before proceeding.</p>
     </div>
     <div
       v-if="!dataIsInJsonLd"
       class="border border-yellow-400 bg-yellow-100 text-yellow-900 p-4 rounded-md m-1">
-      <p class="font-semibold flex items-center gap-2">ℹ️ JSON-LD required</p>
+      <p class="font-semibold flex items-center gap-2">JSON-LD required:</p>
       <p class="mt-1">
         To use the RDF panel, your data must be in valid JSON-LD format. If your data is JSON, you
         can use

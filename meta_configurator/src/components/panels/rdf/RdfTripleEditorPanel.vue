@@ -102,6 +102,9 @@
       </template>
     </Column>
     <Column field="object" header="Object" sortable>
+      <template #body="{data}">
+        {{ formatCellValue(data.object) }}
+      </template>
       <template #filter="{filterModel, filterCallback}">
         <InputText
           v-model="filterModel.value"
@@ -273,6 +276,7 @@ import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 import {downloadFile} from '@/utility/rdfUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {formatCellValue} from '@/components/panels/rdf/rdfUtils';
 import {
   TripleEditorService,
   type TripleTransferObject,

@@ -4,9 +4,9 @@ import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue'
 import type {Path} from '@/utility/path';
 import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
+import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import {useSettings} from '@/settings/useSettings';
+import {defaultJsonLdSchema} from '@/components/panels/rdf/rdfUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -14,17 +14,11 @@ const props = defineProps<{
   dataIsInJsonLd: boolean;
 }>();
 
-const settings = useSettings();
 const session = getSessionForMode(props.sessionMode);
-const schema = getSchemaForMode(props.sessionMode);
 const data = getDataForMode(props.sessionMode);
 
 const currentSchema = computed(() => {
-  const currSchema = session.effectiveSchemaAtCurrentPath?.value.schema;
-  if (!currSchema) {
-    return new JsonSchemaWrapper({}, props.sessionMode, false);
-  }
-  return currSchema;
+  return new JsonSchemaWrapper(JSON.parse(defaultJsonLdSchema), props.sessionMode, false);
 });
 
 function updatePath(newPath: Path) {
@@ -49,13 +43,6 @@ function selectPath(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
-const tableHeader = computed(() => {
-  if (settings.value.guiEditor.showSchemaTitleAsHeader) {
-    return schema.schemaWrapper.value.title;
-  }
-  return undefined;
-});
-
 const currentData = computed(() => {
   return getDataForMode(props.sessionMode).dataAt(['@context']);
 });
@@ -78,7 +65,7 @@ const currentData = computed(() => {
         :currentPath="['@context']"
         :currentData="currentData"
         :sessionMode="props.sessionMode"
-        :table-header="tableHeader"
+        :table-header="undefined"
         @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
         @remove_property="removeProperty"
         @select_path="selectedPath => selectPath(selectedPath)"

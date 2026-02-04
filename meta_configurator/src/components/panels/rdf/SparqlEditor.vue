@@ -173,6 +173,9 @@
                 sortable
                 filter
                 filterMatchMode="contains">
+                <template #body="{data}">
+                  {{ formatCellValue(data[col]) }}
+                </template>
                 <template #filter="{filterModel, filterCallback}">
                   <InputText
                     v-model="filterModel.value"
@@ -234,7 +237,6 @@ import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
 import {isDarkMode} from '@/utility/darkModeUtils';
 import Textarea from 'primevue/textarea';
-import ToggleButton from 'primevue/togglebutton';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
 import Tab from 'primevue/tab';
@@ -251,6 +253,7 @@ import {ScrollPanel} from 'primevue';
 import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 import ToggleSwitch from 'primevue/toggleswitch';
+import {formatCellValue} from '@/components/panels/rdf/rdfUtils';
 
 const isLoading = ref(false);
 const userComments = ref('');
