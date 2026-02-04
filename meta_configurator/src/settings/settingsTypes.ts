@@ -114,6 +114,7 @@ export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
   preserveFormatting: boolean;
   maximumTriplesToShow: number;
+  maximumNodesToVisualize: number;
 }
 
 export interface SettingsInterfaceAiIntegraton {

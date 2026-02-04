@@ -448,7 +448,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     rdf: {
       type: 'object',
-      required: ['sparqlEndpointUrl', 'preserveFormatting', 'maximumTriplesToShow'],
+      required: [
+        'sparqlEndpointUrl',
+        'preserveFormatting',
+        'maximumTriplesToShow',
+        'maximumNodesToVisualize',
+      ],
       additionalProperties: false,
       description: 'Settings for RDF data.',
       properties: {
@@ -467,7 +472,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'integer',
           description:
             'The maximum number of RDF triples to show in the RDF viewer. If the number of triples exceeds this value, only a subset will be shown to avoid performance issues.',
-          default: 20,
+          default: 500,
+        },
+        maximumNodesToVisualize: {
+          type: 'integer',
+          description:
+            'The maximum number of nodes to visualize in the RDF graph. If the number of nodes exceeds this value, a warning will be shown to the user before rendering the graph, as rendering may be slow for large graphs.',
+          default: 50,
         },
       },
     },

@@ -9,7 +9,7 @@
         <i class="pi pi-exclamation-circle !text-3xl" />
         <span>
           This graph contains <b>{{ nodeCount }}</b> nodes. Rendering may be slow for graphs with
-          more than <b>{{ MAX_NODES }}</b> nodes.
+          more than <b>{{ settings.rdf.maximumNodesToVisualize }}</b> nodes.
           <br />
           Do you want to continue?
         </span>
@@ -104,8 +104,9 @@ import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
+import {useSettings} from '@/settings/useSettings';
 
-const MAX_NODES = 500;
+const settings = useSettings();
 
 const showLargeGraphPrompt = ref(false);
 const nodeCount = ref(0);
@@ -492,7 +493,7 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
 onMounted(() => {
   nodeCount.value = countNodes(props.statements);
 
-  if (nodeCount.value > MAX_NODES) {
+  if (nodeCount.value > settings.value.rdf.maximumNodesToVisualize) {
     showLargeGraphPrompt.value = true;
   } else {
     renderGraph(props.statements);
