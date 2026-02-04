@@ -80,12 +80,7 @@
                   severity="warning"
                   @click="visualizationHelpDialog = true" />
                 <div class="flex items-center gap-2 ml-auto">
-                  <Button
-                    label="Run Query"
-                    icon="pi pi-play"
-                    @click="runQuery"
-                    variant="text"
-                    severity="secondary" />
+                  <Button label="Run Query" icon="pi pi-play" @click="runQuery" />
                 </div>
               </div>
             </ScrollPanel>
