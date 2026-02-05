@@ -5,15 +5,14 @@
       header="Large graph detected"
       modal
       :closable="false">
-      <div class="flex items-center gap-4">
-        <i class="pi pi-exclamation-circle !text-3xl" />
-        <span>
-          This graph contains <b>{{ nodeCount }}</b> nodes. Rendering may be slow for graphs with
-          more than <b>{{ settings.rdf.maximumNodesToVisualize }}</b> nodes.
+      <Message severity="warn" :closable="false">
+        <template #default>
+          This graph contains <strong>{{ nodeCount }}</strong> nodes. Rendering may be slow for
+          graphs with more than <strong>{{ settings.rdf.maximumNodesToVisualize }}</strong> nodes.
           <br />
           Do you want to continue?
-        </span>
-      </div>
+        </template>
+      </Message>
       <template #footer>
         <Button
           label="No"
@@ -29,55 +28,57 @@
           @click="confirmRender(true)" />
       </template>
     </Dialog>
-
     <div ref="container" class="graph-container" :class="{'graph-loaded': graphLoaded}"></div>
-
-    <Transition name="slide-up">
-      <div v-if="selectedNode" class="properties-panel">
-        <div class="panel-header">
-          <div class="panel-icon">
-            <i class="pi pi-sitemap"></i>
-          </div>
-          <div class="panel-title-section">
-            <span class="panel-subtitle">Node Details</span>
-            <h4 class="panel-title">{{ selectedNode.label }}</h4>
+    <Drawer
+      v-model:visible="showPropertiesDrawer"
+      header="Node Details"
+      position="right"
+      :closeOnEscape="true"
+      @hide="closeTooltip"
+      class="properties-drawer">
+      <template #header v-if="selectedNode">
+        <div class="drawer-header-content">
+          <i class="pi pi-sitemap drawer-icon"></i>
+          <div class="drawer-title-section">
+            <span class="drawer-subtitle">Node Details</span>
+            <h4 class="drawer-title">{{ selectedNode.label }}</h4>
           </div>
         </div>
-        <div class="panel-body">
-          <div class="info-section">
-            <div class="section-label">
-              <i class="pi pi-id-card"></i>
-              <span>Identifier</span>
-            </div>
-            <div class="section-value">
-              <a
-                v-if="isIRI(selectedNode.id)"
-                :href="iriHref(selectedNode.id)!"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="value-link">
-                {{ selectedNode.id }}
-                <i class="pi pi-external-link"></i>
-              </a>
-              <span v-else class="value-text">{{ selectedNode.id }}</span>
-            </div>
+      </template>
+      <div v-if="selectedNode" class="drawer-body">
+        <div class="info-section">
+          <div class="section-label">
+            <i class="pi pi-id-card"></i>
+            <span>Identifier</span>
           </div>
-          <div
-            v-if="selectedNode.literals && selectedNode.literals.length > 0"
-            class="properties-container">
-            <div class="section-label">
-              <i class="pi pi-list"></i>
-              <span>Properties ({{ selectedNode.literals.length }})</span>
-            </div>
-
-            <div class="properties-list">
-              <div
-                v-for="(lit, idx) in selectedNode.literals"
-                :key="idx"
-                class="property-row"
-                :style="{animationDelay: `${idx * 30}ms`}">
-                <div class="property-key-row">
-                  <i class="pi pi-angle-right key-icon"></i>
+          <div class="section-value">
+            <a
+              v-if="isIRI(selectedNode.id)"
+              :href="iriHref(selectedNode.id)!"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="value-link">
+              {{ selectedNode.id }}
+              <i class="pi pi-external-link"></i>
+            </a>
+            <span v-else class="value-text">{{ selectedNode.id }}</span>
+          </div>
+        </div>
+        <div
+          v-if="selectedNode.literals && selectedNode.literals.length > 0"
+          class="properties-container">
+          <div class="section-label">
+            <i class="pi pi-list"></i>
+            <span>Properties ({{ selectedNode.literals.length }})</span>
+          </div>
+          <div class="properties-list">
+            <Card
+              v-for="(lit, idx) in selectedNode.literals"
+              :key="idx"
+              class="property-card"
+              :style="{animationDelay: `${idx * 30}ms`}">
+              <template #title>
+                <div class="property-card-title">
                   <a
                     v-if="isLinkableIRI(lit.predicate)"
                     :href="iriHref(lit.predicate)!"
@@ -88,7 +89,9 @@
                   </a>
                   <span v-else class="key-text">{{ lit.predicate }}</span>
                 </div>
-                <div class="property-value-row">
+              </template>
+              <template #content>
+                <div class="property-card-content">
                   <a
                     v-if="isLinkableIRI(lit.value)"
                     :href="iriHref(lit.value)!"
@@ -100,61 +103,45 @@
                   </a>
                   <span v-else class="value-text">{{ lit.value }}</span>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-else class="no-properties">
-            <i class="pi pi-inbox"></i>
-            <span>No properties available</span>
-          </div>
-
-          <div class="panel-actions">
-            <Button
-              label="Focus"
-              icon="pi pi-eye"
-              class="action-btn primary"
-              @click="focusOnNode" />
-
-            <Button
-              label="Close"
-              icon="pi pi-times"
-              class="action-btn secondary"
-              severity="secondary"
-              @click="closeTooltip" />
+              </template>
+            </Card>
           </div>
         </div>
+        <div v-else class="no-properties">
+          <i class="pi pi-inbox"></i>
+          <span>No properties available</span>
+        </div>
       </div>
-    </Transition>
-
-    <div class="zoom-controls">
-      <Button icon="pi pi-search-plus" text rounded v-tooltip="'Zoom In'" @click="zoomIn" />
-      <Button icon="pi pi-search-minus" text rounded v-tooltip="'Zoom Out'" @click="zoomOut" />
-      <Button icon="pi pi-expand" text rounded v-tooltip="'Fit to View'" @click="zoomFit" />
-      <Button icon="pi pi-refresh" text rounded v-tooltip="'Reset Zoom'" @click="resetZoom" />
-      <Button
-        :icon="physicsEnabled ? 'pi pi-pause' : 'pi pi-play'"
-        text
-        rounded
-        v-tooltip="'Toggle Physics'"
-        @click="togglePhysics" />
-    </div>
-
+    </Drawer>
+    <Dock :model="dockItems" position="right" class="graph-dock">
+      <template #itemicon="{item}">
+        <Button
+          class="dock-btn"
+          :icon="item.icon"
+          text
+          rounded
+          v-tooltip.left="item.label"
+          @click="item.command" />
+      </template>
+    </Dock>
     <Transition name="fade">
-      <div v-if="isLoading" class="loading-overlay">
-        <div class="loading-spinner">
-          <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
-          <p>Rendering graph...</p>
-        </div>
-      </div>
+      <ProgressSpinner
+        v-if="isLoading"
+        class="loading-overlay"
+        :stroke-width="3"
+        aria-label="Loading graph" />
     </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
+import Card from 'primevue/card';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
-import {ref, onMounted, onUnmounted} from 'vue';
+import Message from 'primevue/message';
+import Drawer from 'primevue/drawer';
+import ProgressSpinner from 'primevue/progressspinner';
+import {ref, computed, onMounted, onUnmounted} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
@@ -162,10 +149,18 @@ import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 import {useSettings} from '@/settings/useSettings';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
+import Dock from 'primevue/dock';
+
+interface SelectedNodeData {
+  id: string;
+  label: string;
+  literals?: Array<{predicate: string; value: string; isIRI?: boolean}>;
+  position?: {x: number; y: number};
+}
 
 const settings = useSettings();
-
 const showLargeGraphPrompt = ref(false);
+const showPropertiesDrawer = ref(false);
 const nodeCount = ref(0);
 const isLoading = ref(false);
 const graphLoaded = ref(false);
@@ -179,19 +174,40 @@ const props = defineProps<{
   statements: $rdf.Statement[];
 }>();
 
+const dockItems = computed(() => [
+  {
+    label: 'Zoom In',
+    icon: 'pi pi-search-plus',
+    command: () => zoomIn(),
+  },
+  {
+    label: 'Zoom Out',
+    icon: 'pi pi-search-minus',
+    command: () => zoomOut(),
+  },
+  {
+    label: 'Fit to View',
+    icon: 'pi pi-expand',
+    command: () => zoomFit(),
+  },
+  {
+    label: 'Reset Zoom',
+    icon: 'pi pi-refresh',
+    command: () => resetZoom(),
+  },
+  {
+    label: physicsEnabled.value ? 'Stop' : 'Animate',
+    icon: physicsEnabled.value ? 'pi pi-pause' : 'pi pi-play',
+    command: () => togglePhysics(),
+  },
+]);
+
 cytoscape.use(coseBilkent);
 const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
 const container = ref<HTMLDivElement | null>(null);
 const selectedNode = ref<SelectedNodeData | null>(null);
 
 let cy: cytoscape.Core | null = null;
-
-interface SelectedNodeData {
-  id: string;
-  label: string;
-  literals?: Array<{predicate: string; value: string; isIRI?: boolean}>;
-  position?: {x: number; y: number};
-}
 
 function countNodes(statements: readonly $rdf.Statement[]): number {
   const nodes = new Set<string>();
@@ -308,19 +324,7 @@ function closeTooltip() {
   }
   selectedCyNode.value = null;
   selectedNode.value = null;
-}
-
-function focusOnNode() {
-  if (!cy || !selectedCyNode.value) return;
-
-  cy.animate({
-    fit: {
-      eles: selectedCyNode.value.neighborhood().add(selectedCyNode.value),
-      padding: 100,
-    },
-    duration: 500,
-    easing: 'ease-in-out-cubic',
-  });
+  showPropertiesDrawer.value = false;
 }
 
 function showNodeTooltip(node: any, nodeData: any) {
@@ -342,6 +346,8 @@ function showNodeTooltip(node: any, nodeData: any) {
   setTimeout(() => {
     neighbors.removeClass('highlighted');
   }, 2000);
+
+  showPropertiesDrawer.value = true;
 }
 
 function getPredicateAlias(predicate: string): string {
@@ -709,34 +715,34 @@ onMounted(() => {
   opacity: 1;
 }
 
-.properties-panel {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: white;
-  border: 1px solid #cbd5e0;
-  border-radius: 12px;
-  padding: 0;
-  min-width: 320px;
-  max-width: 400px;
-  max-height: calc(100vh - 120px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+.properties-drawer :deep(.p-drawer-header) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 24px !important;
+  border: none !important;
 }
 
-.panel-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 16px;
+.properties-drawer :deep(.p-drawer-header .p-drawer-title) {
+  display: none;
+}
+
+.properties-drawer :deep(.p-drawer-content) {
+  padding: 24px !important;
+  background: white;
+}
+
+.properties-drawer :deep(.p-drawer) {
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.drawer-header-content {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: white;
+  width: 100%;
 }
 
-.panel-icon {
+.drawer-icon {
   width: 40px;
   height: 40px;
   background: rgba(255, 255, 255, 0.2);
@@ -744,16 +750,17 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
+  flex-shrink: 0;
   backdrop-filter: blur(10px);
 }
 
-.panel-title-section {
+.drawer-title-section {
   flex: 1;
   min-width: 0;
 }
 
-.panel-subtitle {
+.drawer-subtitle {
   display: block;
   font-size: 10px;
   font-weight: 500;
@@ -763,7 +770,7 @@ onMounted(() => {
   margin-bottom: 2px;
 }
 
-.panel-title {
+.drawer-title {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
@@ -771,32 +778,13 @@ onMounted(() => {
   line-height: 1.3;
 }
 
-.panel-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-}
-
-.panel-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.panel-body::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
-}
-
-.panel-body::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 3px;
-}
-
-.panel-body::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+.drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .info-section {
-  margin-bottom: 16px;
   padding-bottom: 16px;
   border-bottom: 2px solid #e2e8f0;
 }
@@ -849,7 +837,9 @@ onMounted(() => {
 }
 
 .properties-container {
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .properties-list {
@@ -865,6 +855,7 @@ onMounted(() => {
   border-radius: 6px;
   padding: 10px 12px;
   animation: fadeInLeft 0.3s ease-out backwards;
+  transition: all 0.2s;
 }
 
 @keyframes fadeInLeft {
@@ -938,9 +929,11 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 24px;
+  padding: 24px 16px;
   color: #a0aec0;
   text-align: center;
+  background: #f7fafc;
+  border-radius: 8px;
 }
 
 .no-properties i {
@@ -953,16 +946,12 @@ onMounted(() => {
   font-style: italic;
 }
 
-.panel-actions {
+.drawer-actions {
   display: flex;
   gap: 8px;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.action-btn {
-  flex: 1;
+  border-top: 2px solid #e2e8f0;
 }
 
 .zoom-controls {
@@ -978,24 +967,11 @@ onMounted(() => {
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  backdrop-filter: blur(5px);
   border-radius: 8px;
-}
-
-.loading-spinner {
-  text-align: center;
-  color: #4299e1;
-}
-
-.loading-spinner p {
-  margin-top: 16px;
-  font-size: 14px;
-  font-weight: 500;
 }
 
 .fade-enter-active,
@@ -1008,53 +984,25 @@ onMounted(() => {
   opacity: 0;
 }
 
-.slide-up-enter-active {
-  animation: slideUp 0.3s ease-out;
-}
-
-.slide-up-leave-active {
-  animation: slideDown 0.3s ease-in;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-}
-
 @media (prefers-color-scheme: dark) {
   .graph-container {
     border-color: #4a5568;
   }
 
-  .properties-panel {
-    background: #1a202c;
-    border-color: #4a5568;
+  .properties-drawer :deep(.p-drawer-content) {
+    background: #1a202c !important;
+  }
+
+  .drawer-title {
+    color: #e2e8f0;
   }
 
   .info-section {
     border-bottom-color: #4a5568;
   }
 
-  .value-text,
-  .panel-title {
-    color: #e2e8f0;
+  .value-text {
+    color: #cbd5e0;
   }
 
   .property-row {
@@ -1073,30 +1021,62 @@ onMounted(() => {
     color: #e2e8f0;
   }
 
-  .panel-actions {
+  .drawer-actions {
     border-top-color: #4a5568;
   }
 
-  .action-btn.secondary {
+  .no-properties {
     background: #2d3748;
-    color: #e2e8f0;
-    border-color: #4a5568;
-  }
-
-  .action-btn.secondary:hover {
-    background: #4a5568;
-  }
-
-  .panel-body::-webkit-scrollbar-track {
-    background: #2d3748;
-  }
-
-  .panel-body::-webkit-scrollbar-thumb {
-    background: #4a5568;
   }
 
   .loading-overlay {
     background: rgba(26, 32, 44, 0.95);
   }
+}
+
+@media (max-width: 640px) {
+  .properties-drawer :deep(.p-drawer) {
+    width: 100% !important;
+  }
+
+  .drawer-actions {
+    flex-direction: column;
+  }
+}
+
+.property-card {
+  animation: fadeInLeft 0.3s ease-out backwards;
+}
+
+.property-card-title {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.property-card-content {
+  padding-top: 6px;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.graph-dock {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  z-index: 20;
+}
+
+.graph-dock :deep(.p-dock) {
+  background: transparent;
+}
+
+.graph-dock :deep(.p-dock-list) {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
 }
 </style>
