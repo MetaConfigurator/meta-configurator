@@ -249,6 +249,7 @@ import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 import ToggleSwitch from 'primevue/toggleswitch';
 import {formatCellValue} from '@/components/panels/rdf/rdfUtils';
+import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 
 const isLoading = ref(false);
 const userComments = ref('');
@@ -459,13 +460,13 @@ const sortColumns = (cols: string[]) => [
 ];
 
 const termToString = (term: any) =>
-  term?.termType === 'Literal' ? term.value : term?.value ?? (term ? String(term) : '');
+  term?.termType === RdfTermType.Literal ? term.value : term?.value ?? (term ? String(term) : '');
 
 const rdfjsToRdflib = (term: any) => {
   if (!term) return null;
-  if (term.termType === 'NamedNode') return $rdf.sym(term.value);
-  if (term.termType === 'BlankNode') return $rdf.blankNode(term.value);
-  if (term.termType === 'Literal') {
+  if (term.termType === RdfTermType.NamedNode) return $rdf.sym(term.value);
+  if (term.termType === RdfTermType.BlankNode) return $rdf.blankNode(term.value);
+  if (term.termType === RdfTermType.Literal) {
     const langOrDt =
       term.language || (term.datatype?.value ? $rdf.sym(term.datatype.value) : undefined);
     return $rdf.literal(term.value, langOrDt);
@@ -525,7 +526,13 @@ const runConstructQuery = async (engine: any, sources: any[]) => {
       const p = rdfjsToRdflib(q.predicate);
       const o = rdfjsToRdflib(q.object);
 
-      if (s && p && o && p.termType === 'NamedNode' && s.termType !== 'Literal') {
+      if (
+        s &&
+        p &&
+        o &&
+        p.termType === RdfTermType.NamedNode &&
+        s.termType !== RdfTermType.Literal
+      ) {
         stmts.push(new $rdf.Statement(s as any, p as any, o as any));
       }
     })

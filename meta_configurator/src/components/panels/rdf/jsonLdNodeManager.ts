@@ -6,6 +6,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {JsonLdParser} from '@/components/panels/rdf/jsonLdParser';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {useSettings} from '@/settings/useSettings';
+import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 
 const settings = useSettings();
 
@@ -59,7 +60,7 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
     const objectValue = rdfStoreManager.getObject(statement);
     const base = dropLast(path);
 
-    if (statement.object.termType === 'NamedNode') {
+    if (statement.object.termType === RdfTermType.NamedNode) {
       data.removeDataAt(dropIfLast(base, '@id'));
     } else {
       data.setDataAt(base, objectValue);

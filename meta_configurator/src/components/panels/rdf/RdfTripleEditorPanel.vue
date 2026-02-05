@@ -131,7 +131,7 @@
             optionLabel="label"
             optionValue="value"
             class="fixed-select" />
-          <template v-if="triple.subjectType === 'NamedNode'">
+          <template v-if="triple.subjectType === RdfTermType.NamedNode">
             <ToggleButton
               v-model="addNewSubject"
               onLabel="New"
@@ -179,7 +179,7 @@
             optionLabel="label"
             optionValue="value"
             class="fixed-select" />
-          <template v-if="triple.objectType === 'NamedNode'">
+          <template v-if="triple.objectType === RdfTermType.NamedNode">
             <ToggleButton
               v-model="addNewObject"
               onLabel="New"
@@ -262,7 +262,6 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
 import Popover from 'primevue/popover';
-import Divider from 'primevue/divider';
 import Menu from 'primevue/menu';
 import ToggleButton from 'primevue/togglebutton';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
@@ -275,7 +274,7 @@ import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 import {downloadFile} from '@/utility/rdfUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
-import {formatCellValue} from '@/components/panels/rdf/rdfUtils';
+import {formatCellValue, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import {
   TripleEditorService,
   type TripleTransferObject,
@@ -309,7 +308,7 @@ const newSubjectInput = ref('');
 const isUserSelection = ref(false);
 const selectedTriple = ref();
 
-const predicateTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
+const predicateTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
 const filters = ref();
 const exportMenuItems = [
   {
@@ -331,11 +330,11 @@ const exportMenuItems = [
 
 const triple = ref<TripleTransferObject>({
   subject: '',
-  subjectType: 'NamedNode',
+  subjectType: RdfTermType.NamedNode,
   predicate: '',
-  predicateType: 'NamedNode',
+  predicateType: RdfTermType.NamedNode,
   object: '',
-  objectType: 'Literal',
+  objectType: RdfTermType.Literal,
 });
 
 const initFilters = () => {
@@ -348,11 +347,11 @@ const initFilters = () => {
 };
 
 const objectTypeOptions = [
-  {label: 'Named Node', value: 'NamedNode'},
-  {label: 'Literal', value: 'Literal'},
+  {label: 'Named Node', value: RdfTermType.NamedNode},
+  {label: 'Literal', value: RdfTermType.Literal},
 ];
 
-const subjectTypeOptions = [{label: 'Named Node', value: 'NamedNode'}];
+const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
 
 const items = computed(() => {
   const mappedItems = rdfStoreManager.statements.value.map((statement, index) => ({
@@ -444,7 +443,7 @@ const clearFilter = () => {
 const nodes = computed(() => {
   const nodesSet = new Set<string>();
   rdfStoreManager.statements.value.forEach(st => {
-    if (st.subject.termType === 'NamedNode') {
+    if (st.subject.termType === RdfTermType.NamedNode) {
       nodesSet.add(st.subject.value);
     }
   });
@@ -465,11 +464,11 @@ watch(selectedTriple, (target, _) => {
 const openNewDialog = () => {
   triple.value = {
     subject: '',
-    subjectType: 'NamedNode',
+    subjectType: RdfTermType.NamedNode,
     predicate: '',
-    predicateType: 'NamedNode',
+    predicateType: RdfTermType.NamedNode,
     object: '',
-    objectType: 'Literal',
+    objectType: RdfTermType.Literal,
     statement: undefined,
   };
   editDialog.value = true;

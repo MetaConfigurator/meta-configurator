@@ -1,3 +1,14 @@
+export enum RdfTermType {
+  NamedNode = 'NamedNode',
+  BlankNode = 'BlankNode',
+  Literal = 'Literal',
+  Variable = 'Variable',
+  DefaultGraph = 'DefaultGraph',
+  Quad = 'Quad',
+}
+
+export type RdfTermTypeString = `${RdfTermType}`;
+
 export const formatCellValue = (value: unknown): string => {
   if (value === null || value === undefined || value === '') {
     return '';

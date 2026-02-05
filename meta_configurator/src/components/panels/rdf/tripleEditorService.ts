@@ -2,18 +2,17 @@ import * as $rdf from 'rdflib';
 import type {NamedNode, BlankNode, Literal} from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
-
-export type TermType = 'NamedNode' | 'BlankNode' | 'Literal';
+import {RdfTermType, type RdfTermTypeString} from '@/components/panels/rdf/rdfUtils';
 
 export interface TripleTransferObject {
   subject: string;
-  subjectType: TermType;
+  subjectType: RdfTermTypeString;
 
   predicate: string;
-  predicateType: TermType;
+  predicateType: RdfTermTypeString;
 
   object: string;
-  objectType: TermType;
+  objectType: RdfTermTypeString;
 
   statement?: $rdf.Statement;
 }
@@ -24,13 +23,16 @@ export interface TripleEditorResult {
 }
 
 export class TripleEditorService {
-  private static createNode(value: string, type: TermType): NamedNode | BlankNode | Literal {
+  private static createNode(
+    value: string,
+    type: RdfTermTypeString
+  ): NamedNode | BlankNode | Literal {
     switch (type) {
-      case 'NamedNode':
+      case RdfTermType.NamedNode:
         return $rdf.sym(value);
-      case 'Literal':
+      case RdfTermType.Literal:
         return $rdf.literal(value);
-      case 'BlankNode':
+      case RdfTermType.BlankNode:
         return $rdf.blankNode();
       default:
         throw new Error(`Unknown term type: ${type}`);
@@ -39,11 +41,11 @@ export class TripleEditorService {
 
   static addOrEdit(dto: TripleTransferObject): TripleEditorResult {
     const subjectNode = this.createNode(dto.subject, dto.subjectType);
-    if (subjectNode.termType === 'Literal') {
+    if (subjectNode.termType === RdfTermType.Literal) {
       return {success: false, errorMessage: 'Subject cannot be a Literal.'};
     }
     const predicateNode = this.createNode(dto.predicate, dto.predicateType);
-    if (predicateNode.termType === 'Literal') {
+    if (predicateNode.termType === RdfTermType.Literal) {
       return {success: false, errorMessage: 'Predicate cannot be a Literal.'};
     }
     const objectNode = this.createNode(dto.object, dto.objectType);

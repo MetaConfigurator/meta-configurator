@@ -173,6 +173,7 @@ import type * as $rdf from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 import {useSettings} from '@/settings/useSettings';
+import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 
 const settings = useSettings();
 
@@ -210,7 +211,7 @@ function countNodes(statements: readonly $rdf.Statement[]): number {
 
   for (const st of statements) {
     nodes.add(st.subject.value);
-    if (st.object.termType !== 'Literal') {
+    if (st.object.termType !== RdfTermType.Literal) {
       nodes.add(st.object.value);
     }
   }
@@ -434,7 +435,7 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
     const isTypePredicate =
       typePredicates.includes(p) || p.endsWith('#type') || p.endsWith('/type');
 
-    if (st.object.termType === 'Literal') {
+    if (st.object.termType === RdfTermType.Literal) {
       nodesMap.get(s)!.literals!.push({
         predicate: getPredicateAlias(p),
         value: o,
@@ -1176,8 +1177,9 @@ onMounted(() => {
 
 .tooltip-toggle {
   position: absolute;
-  bottom: 16px;
-  left: 68px;
+  top: 16px;
+  right: 16px;
+  transform: translateY(250px);
   width: 40px;
   height: 40px;
   background: white;
@@ -1189,25 +1191,13 @@ onMounted(() => {
   justify-content: center;
   transition: all 0.3s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-.tooltip-toggle:hover {
-  background: #805ad5;
-  border-color: #6b46c1;
-  box-shadow: 0 4px 12px rgba(128, 90, 213, 0.4);
-  transform: translateY(-2px);
+  z-index: 11;
 }
 
 .tooltip-toggle.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-color: #667eea;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.tooltip-toggle:hover i,
-.tooltip-toggle.active i {
-  color: white;
 }
 
 .tooltip-toggle i {
