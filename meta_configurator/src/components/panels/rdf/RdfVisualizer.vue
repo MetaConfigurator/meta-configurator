@@ -153,31 +153,6 @@
       </div>
     </Transition>
 
-    <Transition name="slide-up">
-      <div v-if="showStats" class="stats-panel">
-        <button @click="showStats = false" class="stats-close">&times;</button>
-        <h4>Graph Statistics</h4>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-label">Nodes:</span>
-            <span class="stat-value">{{ nodeCount }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Edges:</span>
-            <span class="stat-value">{{ edgeCount }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Selected:</span>
-            <span class="stat-value">{{ selectedNode?.label || 'None' }}</span>
-          </div>
-        </div>
-      </div>
-    </Transition>
-
-    <button @click="showStats = !showStats" class="stats-toggle" title="Toggle Stats">
-      <i class="pi pi-chart-bar" />
-    </button>
-
     <button
       @click="showTooltipOnClick = !showTooltipOnClick"
       class="tooltip-toggle"
@@ -203,10 +178,8 @@ const settings = useSettings();
 
 const showLargeGraphPrompt = ref(false);
 const nodeCount = ref(0);
-const edgeCount = ref(0);
 const isLoading = ref(false);
 const graphLoaded = ref(false);
-const showStats = ref(false);
 const physicsEnabled = ref(false);
 const showTooltipOnClick = ref(false);
 
@@ -494,8 +467,6 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
       });
     }
   }
-
-  edgeCount.value = edges.length;
 
   const nodes = Array.from(nodesMap.entries()).map(([id, data]) => ({
     data: {
@@ -1203,107 +1174,6 @@ onMounted(() => {
   opacity: 0;
 }
 
-.stats-panel {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  background: white;
-  border: 1px solid #cbd5e0;
-  border-radius: 12px;
-  padding: 16px 20px;
-  min-width: 200px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-.stats-panel h4 {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #2d3748;
-}
-
-.stats-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #718096;
-  font-weight: 500;
-}
-
-.stat-value {
-  font-size: 14px;
-  color: #2d3748;
-  font-weight: 600;
-}
-
-.stats-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #718096;
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.stats-close:hover {
-  background: #edf2f7;
-  color: #2d3748;
-}
-
-.stats-toggle {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  width: 40px;
-  height: 40px;
-  background: white;
-  border: 1px solid #cbd5e0;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-.stats-toggle:hover {
-  background: #4299e1;
-  border-color: #3182ce;
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
-  transform: translateY(-2px);
-}
-
-.stats-toggle:hover i {
-  color: white;
-}
-
-.stats-toggle i {
-  color: #4a5568;
-  transition: color 0.3s;
-}
-
 .tooltip-toggle {
   position: absolute;
   bottom: 16px;
@@ -1396,29 +1266,10 @@ onMounted(() => {
   }
 
   .node-tooltip,
-  .stats-panel,
   .zoom-btn,
-  .stats-toggle {
-    background: #2d3748;
-    border-color: #4a5568;
-  }
-
   .tooltip-content,
-  .stats-panel {
-    color: #e2e8f0;
-  }
-
   .property-item {
     background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-  }
-
-  .stat-label {
-    color: #a0aec0;
-  }
-
-  .stat-value,
-  .stats-panel h4 {
-    color: #e2e8f0;
   }
 
   .loading-overlay {

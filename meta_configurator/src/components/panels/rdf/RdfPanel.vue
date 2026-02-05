@@ -6,45 +6,34 @@
       :sessionMode="SessionMode.DataEditor">
     </PanelSettings>
     <RmlMappingDialog ref="rmlMappingDialog" />
-    <div
-      v-if="parsingWarnings.length > 0"
-      class="border border-amber-400 bg-amber-100 text-amber-900 p-4 rounded-md m-1">
-      <p class="font-semibold flex items-center gap-2">Warnings:</p>
-      <ul class="mt-2 list-disc list-inside">
+    <div v-if="parsingWarnings.length > 0" class="alert alert-warning">
+      <p class="alert-title">Warnings:</p>
+      <ul class="alert-list">
         <li v-for="err in parsingWarnings" :key="err.id">
           {{ err.message }}
         </li>
       </ul>
     </div>
-    <div
-      v-if="parsingErrors.length > 0"
-      class="border border-orange-500 bg-orange-100 text-orange-900 p-4 rounded-md m-1">
-      <p class="font-semibold flex items-center gap-2">Semantic issues detected:</p>
-      <ul class="mt-2 list-disc list-inside">
+    <div v-if="parsingErrors.length > 0" class="alert alert-error">
+      <p class="alert-title">Semantic issues detected:</p>
+      <ul class="alert-list">
         <li v-for="err in parsingErrors" :key="err.id">
           {{ err.message }}
         </li>
       </ul>
     </div>
-    <div
-      v-if="dataIsUnparsable"
-      class="border border-red-500 bg-red-100 text-red-900 p-4 rounded-md m-1">
-      <p class="font-semibold flex items-center gap-2">Syntax error:</p>
-      <p class="mt-1">Your data contains syntax errors. Please correct them before proceeding.</p>
+    <div v-if="dataIsUnparsable" class="alert alert-danger">
+      <p class="alert-title">Syntax error:</p>
+      <p class="alert-text">
+        Your data contains syntax errors. Please correct them before proceeding.
+      </p>
     </div>
-    <div
-      v-if="!dataIsInJsonLd"
-      class="border border-yellow-400 bg-yellow-100 text-yellow-900 p-4 rounded-md m-1">
-      <p class="font-semibold flex items-center gap-2">JSON-LD required:</p>
-      <p class="mt-1">
+    <div v-if="!dataIsInJsonLd" class="alert alert-warning">
+      <p class="alert-title">JSON-LD required:</p>
+      <p class="alert-text">
         To use the RDF panel, your data must be in valid JSON-LD format. If your data is JSON, you
         can use
-        <a
-          href="#"
-          @click.prevent="showRmlMappingDialog"
-          class="font-medium text-blue-700 hover:underline">
-          JSON → JSON-LD
-        </a>
+        <a href="#" @click.prevent="showRmlMappingDialog" class="alert-link"> JSON → JSON-LD </a>
         to convert it.
       </p>
     </div>
@@ -136,9 +125,61 @@ function showRmlMappingDialog() {
   width: 100%;
   overflow: hidden;
 }
+
 .panel-content {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin: 0.25rem;
+  border-width: 1px;
+}
+
+.alert-warning {
+  border-color: #fbbf24;
+  background-color: #fef3c7;
+  color: #78350f;
+}
+
+.alert-error {
+  border-color: #f97316;
+  background-color: #ffedd5;
+  color: #7c2d12;
+}
+
+.alert-danger {
+  border-color: #ef4444;
+  background-color: #fee2e2;
+  color: #7f1d1d;
+}
+
+.alert-title {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alert-text {
+  margin-top: 0.25rem;
+}
+
+.alert-list {
+  margin-top: 0.5rem;
+  list-style: disc inside;
+}
+
+.alert-link {
+  font-weight: 500;
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.alert-link:hover {
+  text-decoration: underline;
 }
 </style>

@@ -50,7 +50,6 @@
             variant="text"
             @click="confirmDeleteSelected"
             :disabled="!selectedTriple" />
-          <Divider layout="vertical" class="mx-1" />
           <Button
             label="Export"
             icon="pi pi-upload"
@@ -245,7 +244,7 @@
     header="Visualization"
     modal
     maximizable
-    :style="{width: '800px', height: '800px'}"
+    :style="{width: '1000px', height: '1000px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
     <RdfVisualizer :statements="filteredStatements" @cancel-render="closeVisualizer" />
   </Dialog>
