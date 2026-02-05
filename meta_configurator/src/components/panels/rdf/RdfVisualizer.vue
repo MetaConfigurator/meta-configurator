@@ -34,7 +34,6 @@
 
     <Transition name="slide-up">
       <div v-if="selectedNode" class="properties-panel">
-        <button @click="closeTooltip" class="panel-close">&times;</button>
         <div class="panel-header">
           <div class="panel-icon">
             <i class="pi pi-sitemap"></i>
@@ -44,7 +43,6 @@
             <h4 class="panel-title">{{ selectedNode.label }}</h4>
           </div>
         </div>
-
         <div class="panel-body">
           <div class="info-section">
             <div class="section-label">
@@ -64,7 +62,6 @@
               <span v-else class="value-text">{{ selectedNode.id }}</span>
             </div>
           </div>
-
           <div
             v-if="selectedNode.literals && selectedNode.literals.length > 0"
             class="properties-container">
@@ -113,35 +110,34 @@
           </div>
 
           <div class="panel-actions">
-            <button @click="focusOnNode" class="action-btn primary">
-              <i class="pi pi-eye"></i>
-              <span>Focus</span>
-            </button>
-            <button @click="closeTooltip" class="action-btn secondary">
-              <i class="pi pi-times"></i>
-              <span>Close</span>
-            </button>
+            <Button
+              label="Focus"
+              icon="pi pi-eye"
+              class="action-btn primary"
+              @click="focusOnNode" />
+
+            <Button
+              label="Close"
+              icon="pi pi-times"
+              class="action-btn secondary"
+              severity="secondary"
+              @click="closeTooltip" />
           </div>
         </div>
       </div>
     </Transition>
 
     <div class="zoom-controls">
-      <button @click="zoomIn" class="zoom-btn" title="Zoom In">
-        <i class="pi pi-search-plus" />
-      </button>
-      <button @click="zoomOut" class="zoom-btn" title="Zoom Out">
-        <i class="pi pi-search-minus" />
-      </button>
-      <button @click="zoomFit" class="zoom-btn" title="Fit to View">
-        <i class="pi pi-expand" />
-      </button>
-      <button @click="resetZoom" class="zoom-btn" title="Reset Zoom">
-        <i class="pi pi-refresh" />
-      </button>
-      <button @click="togglePhysics" class="zoom-btn" title="Toggle Physics">
-        <i :class="physicsEnabled ? 'pi pi-pause' : 'pi pi-play'" />
-      </button>
+      <Button icon="pi pi-search-plus" text rounded v-tooltip="'Zoom In'" @click="zoomIn" />
+      <Button icon="pi pi-search-minus" text rounded v-tooltip="'Zoom Out'" @click="zoomOut" />
+      <Button icon="pi pi-expand" text rounded v-tooltip="'Fit to View'" @click="zoomFit" />
+      <Button icon="pi pi-refresh" text rounded v-tooltip="'Reset Zoom'" @click="resetZoom" />
+      <Button
+        :icon="physicsEnabled ? 'pi pi-pause' : 'pi pi-play'"
+        text
+        rounded
+        v-tooltip="'Toggle Physics'"
+        @click="togglePhysics" />
     </div>
 
     <Transition name="fade">
@@ -152,14 +148,6 @@
         </div>
       </div>
     </Transition>
-
-    <button
-      @click="showTooltipOnClick = !showTooltipOnClick"
-      class="tooltip-toggle"
-      :class="{active: showTooltipOnClick}"
-      title="Toggle Tooltip on Click">
-      <i class="pi pi-info-circle" />
-    </button>
   </div>
 </template>
 
@@ -182,7 +170,6 @@ const nodeCount = ref(0);
 const isLoading = ref(false);
 const graphLoaded = ref(false);
 const physicsEnabled = ref(false);
-const showTooltipOnClick = ref(false);
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
@@ -343,14 +330,11 @@ function showNodeTooltip(node: any, nodeData: any) {
 
   node.addClass('selected');
   selectedCyNode.value = node;
-
-  if (showTooltipOnClick.value) {
-    selectedNode.value = {
-      id: nodeData.id,
-      label: nodeData.label,
-      literals: nodeData.literals,
-    };
-  }
+  selectedNode.value = {
+    id: nodeData.id,
+    label: nodeData.label,
+    literals: nodeData.literals,
+  };
 
   const neighbors = node.neighborhood();
   neighbors.addClass('highlighted');
@@ -743,32 +727,6 @@ onMounted(() => {
   flex-direction: column;
 }
 
-.panel-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: white;
-  cursor: pointer;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-}
-
-.panel-close:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-}
-
 .panel-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 16px;
@@ -819,6 +777,24 @@ onMounted(() => {
   padding: 16px;
 }
 
+.panel-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.panel-body::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
 .info-section {
   margin-bottom: 16px;
   padding-bottom: 16px;
@@ -853,8 +829,7 @@ onMounted(() => {
   text-decoration: none;
   font-size: 12px;
   word-break: break-all;
-  transition: all 0.2s;
-  padding: 4px 0;
+  transition: color 0.2s;
 }
 
 .value-link:hover {
@@ -889,7 +864,6 @@ onMounted(() => {
   border-left: 3px solid #4299e1;
   border-radius: 6px;
   padding: 10px 12px;
-  transition: all 0.2s;
   animation: fadeInLeft 0.3s ease-out backwards;
 }
 
@@ -928,7 +902,6 @@ onMounted(() => {
   font-weight: 600;
   color: #4299e1;
   text-decoration: none;
-  transition: color 0.2s;
 }
 
 .key-link:hover {
@@ -990,62 +963,86 @@ onMounted(() => {
 
 .action-btn {
   flex: 1;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
+}
+
+.zoom-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: all 0.2s;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+  border-radius: 8px;
 }
 
-.action-btn.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.loading-spinner {
+  text-align: center;
+  color: #4299e1;
 }
 
-.action-btn.primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+.loading-spinner p {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.action-btn.secondary {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 1px solid #e2e8f0;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.action-btn.secondary:hover {
-  background: #edf2f7;
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
-.action-btn i {
-  font-size: 12px;
+.slide-up-enter-active {
+  animation: slideUp 0.3s ease-out;
 }
 
-.panel-body::-webkit-scrollbar {
-  width: 6px;
+.slide-up-leave-active {
+  animation: slideDown 0.3s ease-in;
 }
 
-.panel-body::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.panel-body::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 3px;
-}
-
-.panel-body::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(20px);
+    opacity: 0;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
+  .graph-container {
+    border-color: #4a5568;
+  }
+
   .properties-panel {
     background: #1a202c;
     border-color: #4a5568;
@@ -1097,191 +1094,9 @@ onMounted(() => {
   .panel-body::-webkit-scrollbar-thumb {
     background: #4a5568;
   }
-}
-
-.zoom-controls {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 10;
-}
-
-.zoom-btn {
-  width: 40px;
-  height: 40px;
-  background: white;
-  border: 1px solid #cbd5e0;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.zoom-btn:hover {
-  background: #4299e1;
-  border-color: #3182ce;
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
-  transform: translateY(-2px);
-}
-
-.zoom-btn:hover i {
-  color: white;
-}
-
-.zoom-btn:active {
-  transform: translateY(0) scale(0.95);
-}
-
-.zoom-btn i {
-  color: #4a5568;
-  transition: color 0.3s;
-}
-
-.loading-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  backdrop-filter: blur(5px);
-}
-
-.loading-spinner {
-  text-align: center;
-  color: #4299e1;
-}
-
-.loading-spinner p {
-  margin-top: 16px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.tooltip-toggle {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  transform: translateY(250px);
-  width: 40px;
-  height: 40px;
-  background: white;
-  border: 1px solid #cbd5e0;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 11;
-}
-
-.tooltip-toggle.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.tooltip-toggle i {
-  color: #4a5568;
-  transition: color 0.3s;
-}
-
-.tooltip-toggle.active i {
-  color: white;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-.slide-up-enter-active {
-  animation: slideUp 0.3s ease-out;
-}
-
-.slide-up-leave-active {
-  animation: slideDown 0.3s ease-in;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .graph-container {
-    border-color: #4a5568;
-  }
-
-  .node-tooltip,
-  .zoom-btn,
-  .tooltip-content,
-  .property-item {
-    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-  }
 
   .loading-overlay {
     background: rgba(26, 32, 44, 0.95);
   }
-}
-
-.tooltip-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.tooltip-content::-webkit-scrollbar-track {
-  background: #edf2f7;
-  border-radius: 3px;
-}
-
-.tooltip-content::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 3px;
-}
-
-.tooltip-content::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
 }
 </style>
