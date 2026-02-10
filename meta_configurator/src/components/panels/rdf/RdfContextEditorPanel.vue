@@ -54,22 +54,24 @@ const currentData = computed(() => {
       'p-5 space-y-3 flex flex-col',
       {'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable},
     ]">
-    <CurrentPathBreadcrumb
-      :session-mode="props.sessionMode"
-      :root-name="'document root'"
-      :path="session.currentPath.value"
-      @update:path="newPath => updatePath(newPath)" />
-    <div class="flex-grow overflow-y-scroll">
-      <PropertiesPanel
-        :currentSchema="currentSchema"
-        :currentPath="['@context']"
-        :currentData="currentData"
-        :sessionMode="props.sessionMode"
-        :table-header="undefined"
-        @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
-        @remove_property="removeProperty"
-        @select_path="selectedPath => selectPath(selectedPath)"
-        @update_data="updateData" />
+    <div v-if="dataIsInJsonLd && !dataIsUnparsable">
+      <CurrentPathBreadcrumb
+        :session-mode="props.sessionMode"
+        :root-name="'document root'"
+        :path="session.currentPath.value"
+        @update:path="newPath => updatePath(newPath)" />
+      <div class="flex-grow overflow-y-scroll">
+        <PropertiesPanel
+          :currentSchema="currentSchema"
+          :currentPath="['@context']"
+          :currentData="currentData"
+          :sessionMode="props.sessionMode"
+          :table-header="undefined"
+          @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
+          @remove_property="removeProperty"
+          @select_path="selectedPath => selectPath(selectedPath)"
+          @update_data="updateData" />
+      </div>
     </div>
   </div>
 </template>
