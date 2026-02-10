@@ -18,7 +18,7 @@ const session = getSessionForMode(props.sessionMode);
 const data = getDataForMode(props.sessionMode);
 
 const currentSchema = computed(() => {
-  return new JsonSchemaWrapper(JSON.parse(defaultJsonLdSchema), props.sessionMode, false);
+  return new JsonSchemaWrapper(JSON.parse(defaultJsonLdSchema), props.sessionMode, true);
 });
 
 function updatePath(newPath: Path) {

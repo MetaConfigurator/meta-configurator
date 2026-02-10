@@ -90,6 +90,11 @@ watch(getSchemaForMode(props.sessionMode).schemaWrapper, () => {
   updateTree(true);
 });
 
+// update tree when the data changes
+watch(getDataForMode(props.sessionMode).data, () => {
+  updateTree(true);
+});
+
 // update tree when mounted (e.g., when mode changes)
 onMounted(() => {
   updateTree(true);

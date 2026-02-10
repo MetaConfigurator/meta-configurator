@@ -659,10 +659,6 @@ onMounted(() => {
     }
   });
 
-  if (container.value) {
-    resizeObserver.observe(container.value);
-  }
-
   onUnmounted(() => {
     resizeObserver.disconnect();
     if (cy) {
