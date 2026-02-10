@@ -28,8 +28,8 @@
           @click="confirmRender(true)" />
       </template>
     </Dialog>
-    <div style="width: 100%; height: 100%; display: flex; position: relative">
-      <div class="graph-panel">
+    <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
+      <SplitterPanel class="graph-panel">
         <div class="graph-wrapper">
           <div ref="container" class="graph-container" :class="{'graph-loaded': graphLoaded}"></div>
           <Dock :model="dockItems" position="right" class="graph-dock">
@@ -47,91 +47,94 @@
             <ProgressSpinner v-if="isLoading" class="loading-overlay" />
           </Transition>
         </div>
-      </div>
-      <Transition name="slide-right">
-        <div v-if="propertiesPanelVisible" class="properties-panel-wrapper">
-          <div class="properties-content">
-            <div class="properties-body">
-              <div class="node-cards">
-                <Card class="prop-card">
-                  <template #title>
-                    <div class="card-title">
-                      <i class="pi pi-id-card" />
-                      <span>Node Identifier</span>
-                    </div>
-                  </template>
-                  <template #content>
-                    <div v-if="!selectedNode" class="card-empty">
-                      <i class="pi pi-share-alt empty-icon" />
-                      <p>Select a node to see its identifier</p>
-                    </div>
-                    <div v-else class="kv-row">
+      </SplitterPanel>
+      <SplitterPanel
+        v-if="propertiesPanelVisible"
+        class="properties-panel-wrapper"
+        :size="propertiesPanelSize"
+        :minSize="propertiesPanelMinSize"
+        :class="{'properties-hidden': !propertiesPanelVisible}">
+        <div class="properties-content">
+          <div class="properties-body">
+            <div class="node-cards">
+              <Card class="prop-card">
+                <template #title>
+                  <div class="card-title">
+                    <i class="pi pi-id-card" />
+                    <span>Node Identifier</span>
+                  </div>
+                </template>
+                <template #content>
+                  <div v-if="!selectedNode" class="card-empty">
+                    <i class="pi pi-share-alt empty-icon" />
+                    <p>Select a node to see its identifier</p>
+                  </div>
+                  <div v-else class="kv-row">
+                    <a
+                      v-if="isIRI(selectedNode.id)"
+                      class="kv-value link"
+                      :href="selectedNode.id"
+                      target="_blank"
+                      rel="noopener noreferrer">
+                      {{ selectedNode.id }}
+                    </a>
+                    <span v-else class="kv-value">
+                      {{ selectedNode.id }}
+                    </span>
+                  </div>
+                </template>
+              </Card>
+              <Card class="prop-card">
+                <template #title>
+                  <div class="card-title">
+                    <i class="pi pi-list" />
+                    <span>
+                      Properties
+                      <span v-if="selectedNode?.literals?.length" class="count-pill">
+                        ({{ selectedNode.literals.length }})
+                      </span>
+                    </span>
+                  </div>
+                </template>
+                <template #content>
+                  <div v-if="!selectedNode" class="card-empty">
+                    <i class="pi pi-info-circle empty-icon" />
+                    <p>Select a node to view its properties</p>
+                  </div>
+                  <div v-else-if="!selectedNode.literals?.length" class="card-empty">
+                    <i class="pi pi-inbox empty-icon" />
+                    <p>No properties found for this node</p>
+                  </div>
+                  <div v-else class="props-list">
+                    <div class="prop-line" v-for="(lit, idx) in selectedNode.literals" :key="idx">
                       <a
-                        v-if="isIRI(selectedNode.id)"
                         class="kv-value link"
-                        :href="selectedNode.id"
+                        :href="iriHref(lit.predicate) || lit.predicate"
                         target="_blank"
                         rel="noopener noreferrer">
-                        {{ selectedNode.id }}
+                        {{ lit.predicate }}
                       </a>
-                      <span v-else class="kv-value">
-                        {{ selectedNode.id }}
+                      <span class="prop-text">:</span>
+                      <a
+                        v-if="lit.isIRI && isLinkableIRI(lit.value)"
+                        class="prop-text link"
+                        :href="iriHref(lit.value) || undefined"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {{ lit.value }}
+                      </a>
+                      <span v-else class="prop-text">
+                        {{ lit.value }}
                       </span>
                     </div>
-                  </template>
-                </Card>
-                <Card class="prop-card">
-                  <template #title>
-                    <div class="card-title">
-                      <i class="pi pi-list" />
-                      <span>
-                        Properties
-                        <span v-if="selectedNode?.literals?.length" class="count-pill">
-                          ({{ selectedNode.literals.length }})
-                        </span>
-                      </span>
-                    </div>
-                  </template>
-                  <template #content>
-                    <div v-if="!selectedNode" class="card-empty">
-                      <i class="pi pi-info-circle empty-icon" />
-                      <p>Select a node to view its properties</p>
-                    </div>
-                    <div v-else-if="!selectedNode.literals?.length" class="card-empty">
-                      <i class="pi pi-inbox empty-icon" />
-                      <p>No properties found for this node</p>
-                    </div>
-                    <div v-else class="props-list">
-                      <div class="prop-line" v-for="(lit, idx) in selectedNode.literals" :key="idx">
-                        <a
-                          class="kv-value link"
-                          :href="iriHref(lit.predicate) || lit.predicate"
-                          target="_blank"
-                          rel="noopener noreferrer">
-                          {{ lit.predicate }}
-                        </a>
-                        <span class="prop-text">:</span>
-                        <a
-                          v-if="lit.isIRI && isLinkableIRI(lit.value)"
-                          class="prop-text link"
-                          :href="iriHref(lit.value) || undefined"
-                          target="_blank"
-                          rel="noopener noreferrer">
-                          {{ lit.value }}
-                        </a>
-                        <span v-else class="prop-text">
-                          {{ lit.value }}
-                        </span>
-                      </div>
-                    </div>
-                  </template>
-                </Card>
-              </div>
+                  </div>
+                </template>
+              </Card>
             </div>
           </div>
         </div>
-      </Transition>
-    </div>
+      </SplitterPanel>
+    </Splitter>
   </div>
 </template>
 
@@ -150,6 +153,8 @@ import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 import {useSettings} from '@/settings/useSettings';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import Dock from 'primevue/dock';
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
 
 interface SelectedNodeData {
   id: string;
@@ -164,6 +169,8 @@ const isLoading = ref(false);
 const graphLoaded = ref(false);
 const physicsEnabled = ref(false);
 const propertiesPanelVisible = ref(true);
+const propertiesPanelSize = computed(() => (propertiesPanelVisible.value ? 28 : 0));
+const propertiesPanelMinSize = computed(() => (propertiesPanelVisible.value ? 16 : 0));
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
@@ -741,8 +748,6 @@ onMounted(() => {
   background: white;
   border-left: 1px solid #e2e8f0;
   overflow: hidden;
-  width: 350px;
-  flex-shrink: 0;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -763,19 +768,9 @@ onMounted(() => {
   width: 100%;
 }
 
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.slide-right-enter-from {
-  transform: translateX(100%);
-  opacity: 0;
-}
-
-.slide-right-leave-to {
-  transform: translateX(100%);
-  opacity: 0;
+.rdf-splitter {
+  width: 100%;
+  height: 100%;
 }
 
 .node-cards {
@@ -874,6 +869,11 @@ onMounted(() => {
 .card-empty p {
   font-size: 13px;
   margin: 0;
+}
+
+.properties-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 @media (prefers-color-scheme: dark) {
