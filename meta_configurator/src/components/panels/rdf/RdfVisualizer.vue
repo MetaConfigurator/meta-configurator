@@ -87,7 +87,7 @@
                       <span>
                         Properties
                         <span v-if="selectedNode?.literals?.length" class="count-pill">
-                          {{ selectedNode.literals.length }}
+                          ({{ selectedNode.literals.length }})
                         </span>
                       </span>
                     </div>
@@ -95,7 +95,7 @@
                   <template #content>
                     <div v-if="!selectedNode" class="card-empty">
                       <i class="pi pi-info-circle empty-icon" />
-                      <p>Click a node to view its properties</p>
+                      <p>Select a node to view its properties</p>
                     </div>
                     <div v-else-if="!selectedNode.literals?.length" class="card-empty">
                       <i class="pi pi-inbox empty-icon" />
@@ -154,7 +154,7 @@ import Dock from 'primevue/dock';
 interface SelectedNodeData {
   id: string;
   label: string;
-  literals?: Array<{predicate: string; value: string; isIRI?: boolean}>;
+  literals?: Array<{predicate: string; value: string; isIRI: boolean}>;
 }
 
 interface PanelMenuItem {
@@ -173,7 +173,7 @@ const nodeCount = ref(0);
 const isLoading = ref(false);
 const graphLoaded = ref(false);
 const physicsEnabled = ref(false);
-const propertiesPanelVisible = ref(false);
+const propertiesPanelVisible = ref(true);
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
@@ -200,18 +200,13 @@ const dockItems = computed(() => [
     command: () => zoomFit(),
   },
   {
-    label: 'Reset Zoom',
-    icon: 'pi pi-refresh',
-    command: () => resetZoom(),
-  },
-  {
     label: physicsEnabled.value ? 'Stop' : 'Animate',
     icon: physicsEnabled.value ? 'pi pi-pause' : 'pi pi-play',
     command: () => togglePhysics(),
   },
   {
     label: propertiesPanelVisible.value ? 'Hide Properties' : 'Show Properties',
-    icon: propertiesPanelVisible.value ? 'pi pi-eye-slash' : 'pi pi-eye',
+    icon: propertiesPanelVisible.value ? 'pi pi-times' : 'pi pi-info-circle',
     command: () => togglePropertiesPanel(),
   },
 ]);
@@ -354,19 +349,6 @@ function zoomFit() {
   }
 }
 
-function resetZoom() {
-  if (cy) {
-    cy.animate({
-      zoom: 1,
-      center: {
-        eles: cy.nodes(),
-      },
-      duration: 300,
-      easing: 'ease-in-out-cubic',
-    });
-  }
-}
-
 function togglePhysics() {
   if (!cy) return;
 
@@ -380,8 +362,8 @@ function togglePhysics() {
       randomize: false,
       idealEdgeLength: 220,
       edgeElasticity: 100,
-      gravity: 80,
-      numIter: 2500,
+      gravity: 100,
+      numIter: 2500000,
     });
     layout.run();
   }
@@ -438,7 +420,7 @@ function expandIRI(value: string): string | null {
 }
 
 function isLinkableIRI(value: string): boolean {
-  return isIRI(value) || expandIRI(value) !== null;
+  return expandIRI(value) !== null;
 }
 
 function iriHref(value: string): string | null {
@@ -449,8 +431,12 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
   if (!container.value) return;
 
   isLoading.value = true;
+  let didInitialFit = false;
 
-  const nodesMap = new Map<string, {literals?: Array<{predicate: string; value: string}>}>();
+  const nodesMap = new Map<
+    string,
+    {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}
+  >();
   const edges: any[] = [];
 
   const typePredicates = [
@@ -615,6 +601,11 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
   cy.on('layoutstop', () => {
     isLoading.value = false;
     graphLoaded.value = true;
+    if (!didInitialFit) {
+      didInitialFit = true;
+      cy?.resize();
+      cy?.fit(undefined, 30);
+    }
   });
 
   cy.on('tap', 'node', event => {
@@ -680,7 +671,7 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
 
   cy.on('dbltap', 'node', event => {
     const node = event.target;
-    cy.animate({
+    cy!.animate({
       fit: {
         eles: node.neighborhood().add(node),
         padding: 100,
@@ -722,18 +713,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.flex {
-  display: flex;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
 .graph-panel {
   flex: 1;
   display: flex;
@@ -787,7 +766,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  border-radius: 8px;
 }
 
 .fade-enter-active,
@@ -800,7 +778,6 @@ onMounted(() => {
   opacity: 0;
 }
 
-/* Properties Panel */
 .properties-panel-wrapper {
   display: flex;
   flex-direction: column;
@@ -810,38 +787,6 @@ onMounted(() => {
   width: 350px;
   flex-shrink: 0;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-}
-
-.properties-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-
-.properties-title {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.properties-title i {
-  font-size: 16px;
-}
-
-.panel-close-btn {
-  margin-left: auto;
-}
-
-.panel-close-btn :deep(.p-button) {
-  color: white;
 }
 
 .properties-content {
@@ -861,166 +806,6 @@ onMounted(() => {
   width: 100%;
 }
 
-.node-properties-panel {
-  border: none;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.node-properties-panel :deep(.p-panelmenu) {
-  border: none;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-header > a) {
-  background: #f7fafc;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 12px 16px;
-  color: #1e293b;
-  font-weight: 600;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-  word-wrap: break-word;
-  white-space: normal;
-  overflow-wrap: break-word;
-  cursor: pointer;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-header > a:hover) {
-  background: #edf2f7;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-header.p-highlight > a) {
-  background: #667eea;
-  color: white;
-  border-bottom-color: #667eea;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content) {
-  background: #ffffff;
-  padding: 0;
-  border: none;
-  border-bottom: 1px solid #e2e8f0;
-  max-height: none;
-  overflow: visible;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu) {
-  border: none;
-  background: transparent;
-  padding: 8px 0;
-  max-height: none;
-  display: flex;
-  flex-direction: column;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem) {
-  border: none;
-  display: flex;
-  width: 100%;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem > a) {
-  padding: 10px 16px;
-  color: #475569;
-  font-size: 13px;
-  border-radius: 0;
-  transition: all 0.2s ease;
-  word-break: break-word;
-  white-space: normal;
-  overflow-wrap: break-word;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  width: 100%;
-  cursor: pointer;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem > a:hover) {
-  background: #f1f5f9;
-  color: #4299e1;
-}
-
-.node-properties-panel :deep(.p-panelmenu .p-panelmenu-item) {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.panel-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  word-break: break-word;
-}
-
-.panel-menu-icon {
-  font-size: 12px;
-  color: #667eea;
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-.panel-menu-label {
-  flex: 1;
-}
-
-.properties-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: #94a3b8;
-  padding: 24px;
-  text-align: center;
-  flex: 1;
-}
-
-.properties-empty i {
-  font-size: 48px;
-  opacity: 0.3;
-}
-
-.properties-empty p {
-  font-size: 13px;
-  margin: 0;
-  line-height: 1.5;
-}
-
-:deep(.p-splitter) {
-  background: white;
-}
-
-:deep(.p-splitter-gutter) {
-  background: #e2e8f0;
-  transition: background-color 0.3s ease;
-}
-
-:deep(.p-splitter-gutter:hover) {
-  background: #cbd5e0;
-}
-
-:deep(.p-splitter-gutter-resizing) {
-  background: #667eea;
-}
-
-:deep(.p-splitter-gutter-icon) {
-  color: #94a3b8;
-}
-
-.smooth-splitter :deep(.p-splitter-panel) {
-  transition: flex 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* Slide-right Transition */
 .slide-right-enter-active,
 .slide-right-leave-active {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1034,95 +819,6 @@ onMounted(() => {
 .slide-right-leave-to {
   transform: translateX(100%);
   opacity: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-  .graph-container {
-    background: #1a202c;
-  }
-
-  .toggle-properties-btn {
-    background: #667eea;
-  }
-
-  .toggle-properties-btn:hover {
-    background: #5568d3;
-  }
-
-  .properties-panel-wrapper {
-    background: #1a202c;
-    border-left-color: #4a5568;
-  }
-
-  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-header > a) {
-    background: #2d3748;
-    color: #e2e8f0;
-    border-bottom-color: #4a5568;
-  }
-
-  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-header > a:hover) {
-    background: #4a5568;
-  }
-
-  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-header.p-highlight > a) {
-    background: #667eea;
-    color: white;
-  }
-
-  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-content) {
-    background: #1a202c;
-    border-bottom-color: #4a5568;
-  }
-
-  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem > a) {
-    color: #cbd5e0;
-  }
-
-  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem > a:hover) {
-    background: #2d3748;
-    color: #a5b4fc;
-  }
-
-  .properties-empty {
-    color: #64748b;
-  }
-
-  .panel-menu-icon {
-    color: #a5b4fc;
-  }
-
-  :deep(.p-splitter) {
-    background: #1a202c;
-  }
-
-  :deep(.p-splitter-gutter) {
-    background: #4a5568;
-  }
-
-  :deep(.p-splitter-gutter:hover) {
-    background: #64748b;
-  }
-
-  :deep(.p-splitter-gutter-resizing) {
-    background: #667eea;
-  }
-
-  :deep(.p-splitter-gutter-icon) {
-    color: #64748b;
-  }
-}
-
-@media (max-width: 1024px) {
-}
-
-@media (max-width: 768px) {
-  :deep(.p-splitter) {
-    flex-direction: column;
-  }
-
-  .properties-panel-wrapper {
-    min-height: 200px;
-  }
 }
 
 .node-cards {
@@ -1164,7 +860,6 @@ onMounted(() => {
   border-bottom: none;
 }
 
-.kv-icon,
 .prop-icon {
   font-size: 12px;
   opacity: 0.7;
@@ -1203,25 +898,6 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-@media (prefers-color-scheme: dark) {
-  .card-title {
-    color: #e2e8f0;
-  }
-
-  .kv-value,
-  .prop-text {
-    color: #cbd5e0;
-  }
-
-  .kv-row {
-    border-bottom-color: #4a5568;
-  }
-
-  .link {
-    color: #a5b4fc;
-  }
-}
-
 .card-empty {
   display: flex;
   flex-direction: column;
@@ -1244,6 +920,32 @@ onMounted(() => {
 }
 
 @media (prefers-color-scheme: dark) {
+  .graph-container {
+    background: #1a202c;
+  }
+
+  .properties-panel-wrapper {
+    background: #1a202c;
+    border-left-color: #4a5568;
+  }
+
+  .card-title {
+    color: #e2e8f0;
+  }
+
+  .kv-value,
+  .prop-text {
+    color: #cbd5e0;
+  }
+
+  .kv-row {
+    border-bottom-color: #4a5568;
+  }
+
+  .link {
+    color: #a5b4fc;
+  }
+
   .card-empty {
     color: #64748b;
   }
