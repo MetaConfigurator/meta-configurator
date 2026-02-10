@@ -141,7 +141,7 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import Card from 'primevue/card';
 import ProgressSpinner from 'primevue/progressspinner';
-import {ref, computed, onMounted, onUnmounted, watch} from 'vue';
+import {ref, computed, onMounted, onUnmounted} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
@@ -155,16 +155,6 @@ interface SelectedNodeData {
   id: string;
   label: string;
   literals?: Array<{predicate: string; value: string; isIRI: boolean}>;
-}
-
-interface PanelMenuItem {
-  label: string;
-  icon?: string;
-  items?: PanelMenuItem[];
-  command?: () => void;
-  template?: string;
-  isLink?: boolean;
-  url?: string;
 }
 
 const settings = useSettings();
@@ -211,63 +201,12 @@ const dockItems = computed(() => [
   },
 ]);
 
-const panelMenuItems = computed(() => {
-  if (!selectedNode.value) {
-    return [];
-  }
-
-  const items: PanelMenuItem[] = [];
-
-  items.push({
-    label: 'Node Identifier',
-    icon: 'pi pi-id-card',
-    items: [
-      {
-        label: selectedNode.value.id,
-        icon: isIRI(selectedNode.value.id) ? 'pi pi-external-link' : 'pi pi-file-text',
-        isLink: isIRI(selectedNode.value.id),
-        url: isIRI(selectedNode.value.id) ? selectedNode.value.id : undefined,
-      },
-    ],
-  });
-
-  if (selectedNode.value.literals && selectedNode.value.literals.length > 0) {
-    const propertyItems: PanelMenuItem[] = selectedNode.value.literals.map(lit => ({
-      label: `${lit.predicate}: ${lit.value}`,
-      icon: lit.isIRI ? 'pi pi-link' : 'pi pi-file-text',
-      isLink: lit.isIRI && isLinkableIRI(lit.value),
-      url: lit.isIRI && isLinkableIRI(lit.value) ? iriHref(lit.value) || undefined : undefined,
-    }));
-
-    items.push({
-      label: `Properties (${propertyItems.length})`,
-      icon: 'pi pi-list',
-      items: propertyItems,
-    });
-  }
-
-  return items;
-});
-
 cytoscape.use(coseBilkent);
 const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
 const container = ref<HTMLDivElement | null>(null);
 const selectedNode = ref<SelectedNodeData | null>(null);
-const expandedKeys = ref<Record<string, boolean>>({});
 
 let cy: cytoscape.Core | null = null;
-
-watch(
-  panelMenuItems,
-  newItems => {
-    const keys: Record<string, boolean> = {};
-    newItems.forEach((item, index) => {
-      keys[index.toString()] = true;
-    });
-    expandedKeys.value = keys;
-  },
-  {deep: true}
-);
 
 function togglePropertiesPanel() {
   propertiesPanelVisible.value = !propertiesPanelVisible.value;
@@ -314,14 +253,16 @@ function isIRI(value: string): boolean {
 function zoomIn() {
   if (cy) {
     const currentZoom = cy.zoom();
-    cy.animate({
+    const selectedNodes = cy.nodes(':selected');
+    const animationConfig: any = {
       zoom: currentZoom * 1.2,
-      center: {
-        eles: cy.nodes(':selected').length > 0 ? cy.nodes(':selected') : undefined,
-      },
       duration: 300,
       easing: 'ease-in-out-cubic',
-    });
+    };
+    if (selectedNodes.length > 0) {
+      animationConfig.center = {eles: selectedNodes};
+    }
+    cy.animate(animationConfig);
   }
 }
 
@@ -427,29 +368,106 @@ function iriHref(value: string): string | null {
   return expandIRI(value);
 }
 
-function renderGraph(statements: readonly $rdf.Statement[]) {
-  if (!container.value) return;
+const TYPE_PREDICATES = [
+  'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+  'https://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+  'rdf:type',
+  '@type',
+];
 
-  isLoading.value = true;
-  let didInitialFit = false;
+const CY_STYLE: cytoscape.StylesheetCSS[] = [
+  {
+    selector: 'node',
+    css: {
+      'background-color': '#4299e1',
+      'border-width': '2',
+      'border-color': '#2c5282',
+      label: 'data(label)',
+      'text-valign': 'center',
+      'text-halign': 'center',
+      'min-width': '60',
+      'min-height': '30',
+      color: '#fff',
+      'font-size': '12px',
+      'font-weight': 'bold',
+      'text-wrap': 'wrap',
+      'text-max-width': '80px',
+      width: 'label',
+      height: '30',
+      padding: '15px',
+      shape: 'roundrectangle',
+      'transition-property': 'background-color, border-color, border-width',
+      'transition-duration': 300,
+    },
+  },
+  {
+    selector: 'node.selected',
+    css: {
+      'background-color': '#2b6cb0',
+      'border-width': '4',
+      'border-color': '#1a365d',
+    },
+  },
+  {
+    selector: 'node[hasLiterals]',
+    css: {
+      'border-color': '#f6ad55',
+      'border-width': '3',
+    },
+  },
+  {
+    selector: 'edge',
+    css: {
+      width: '2',
+      'line-color': '#a0aec0',
+      'target-arrow-color': '#a0aec0',
+      'target-arrow-shape': 'triangle',
+      'curve-style': 'bezier',
+      'control-point-step-size': 100,
+      label: 'data(label)',
+      'font-size': '12px',
+      'text-rotation': 'autorotate',
+      'text-background-color': '#f7fafc',
+      'text-background-opacity': 1,
+      'transition-property': 'line-color, width',
+      'transition-duration': 300,
+    },
+  },
+];
 
+const CY_LAYOUT: cytoscape.LayoutOptions = {
+  name: 'cose-bilkent',
+  animate: true,
+  animationDuration: 1000,
+  animationEasing: 'ease-in-out-cubic',
+  randomize: true,
+  idealEdgeLength: 220,
+  edgeElasticity: 100,
+  gravity: 80,
+  numIter: 1000000,
+  tile: true,
+  tilingPaddingVertical: 10,
+  tilingPaddingHorizontal: 10,
+  nodeDimensionsIncludeLabels: true,
+  avoidOverlap: true,
+  avoidOverlapPadding: 50,
+};
+
+function isTypePredicate(predicate: string): boolean {
+  return (
+    TYPE_PREDICATES.includes(predicate) ||
+    predicate.endsWith('#type') ||
+    predicate.endsWith('/type')
+  );
+}
+
+function buildGraphElements(statements: readonly $rdf.Statement[]) {
   const nodesMap = new Map<
     string,
     {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}
   >();
   const edges: any[] = [];
-
-  const typePredicates = [
-    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
-    'https://www.w3.org/1999/02/22-rdf-syntax-ns#type',
-    'rdf:type',
-    '@type',
-  ];
-
-  const existingSubjects = new Set<string>();
-  for (const st of statements) {
-    existingSubjects.add(st.subject.value);
-  }
+  const existingSubjects = new Set<string>(statements.map(st => st.subject.value));
 
   for (const st of statements) {
     const s = st.subject.value;
@@ -460,41 +478,37 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
       nodesMap.set(s, {literals: []});
     }
 
-    const isTypePredicate =
-      typePredicates.includes(p) || p.endsWith('#type') || p.endsWith('/type');
-
     if (st.object.termType === RdfTermType.Literal) {
       nodesMap.get(s)!.literals!.push({
         predicate: getPredicateAlias(p),
         value: o,
         isIRI: isIRI(o),
       });
-    } else if (isTypePredicate) {
-      nodesMap.get(s)!.literals!.push({
-        predicate: getPredicateAlias(p),
-        value: toPrefixed(o),
-        isIRI: isIRI(o),
-      });
-    } else if (!existingSubjects.has(o)) {
-      nodesMap.get(s)!.literals!.push({
-        predicate: getPredicateAlias(p),
-        value: toPrefixed(o),
-        isIRI: isIRI(o),
-      });
-    } else {
-      if (!nodesMap.has(o)) {
-        nodesMap.set(o, {literals: []});
-      }
-      edges.push({
-        data: {
-          id: `${s}-${p}-${o}`,
-          source: s,
-          target: o,
-          label: getPredicateAlias(p),
-          predicateIRI: p,
-        },
-      });
+      continue;
     }
+
+    if (isTypePredicate(p) || !existingSubjects.has(o)) {
+      nodesMap.get(s)!.literals!.push({
+        predicate: getPredicateAlias(p),
+        value: toPrefixed(o),
+        isIRI: isIRI(o),
+      });
+      continue;
+    }
+
+    if (!nodesMap.has(o)) {
+      nodesMap.set(o, {literals: []});
+    }
+
+    edges.push({
+      data: {
+        id: `${s}-${p}-${o}`,
+        source: s,
+        target: o,
+        label: getPredicateAlias(p),
+        predicateIRI: p,
+      },
+    });
   }
 
   const nodes = Array.from(nodesMap.entries()).map(([id, data]) => ({
@@ -507,108 +521,36 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
     },
   }));
 
-  const elements = [...nodes, ...edges];
+  return [...nodes, ...edges];
+}
+
+function setupCytoscape(elements: cytoscape.ElementDefinition[]) {
+  if (!container.value) return null;
 
   if (cy) {
     cy.destroy();
   }
 
-  cy = cytoscape({
+  return cytoscape({
     container: container.value,
     elements,
-    style: [
-      {
-        selector: 'node',
-        style: {
-          'background-color': '#4299e1',
-          'border-width': 2,
-          'border-color': '#2c5282',
-          label: 'data(label)',
-          'text-valign': 'center',
-          'text-halign': 'center',
-          'min-width': 60,
-          'min-height': 30,
-          color: '#fff',
-          'font-size': '12px',
-          'font-weight': 'bold',
-          'text-wrap': 'wrap',
-          'text-max-width': '80px',
-          width: 'label',
-          height: 30,
-          padding: '15px',
-          shape: 'roundrectangle',
-          'transition-property': 'background-color, border-color, border-width',
-          'transition-duration': '0.3s',
-        },
-      },
-      {
-        selector: 'node.selected',
-        style: {
-          'background-color': '#2b6cb0',
-          'border-width': 4,
-          'border-color': '#1a365d',
-        },
-      },
-      {
-        selector: 'node[hasLiterals]',
-        style: {
-          'border-color': '#f6ad55',
-          'border-width': 3,
-        },
-      },
-      {
-        selector: 'edge',
-        style: {
-          width: 2,
-          'line-color': '#a0aec0',
-          'target-arrow-color': '#a0aec0',
-          'target-arrow-shape': 'triangle',
-          'curve-style': 'bezier',
-          'control-point-step-size': 100,
-          label: 'data(label)',
-          'font-size': '12px',
-          'text-rotation': 'autorotate',
-          'text-background-color': '#f7fafc',
-          'text-background-opacity': 1,
-          'transition-property': 'line-color, width',
-          'transition-duration': '0.3s',
-        },
-      },
-    ],
-    layout: {
-      name: 'cose-bilkent',
-      animate: true,
-      animationDuration: 1000,
-      animationEasing: 'ease-in-out-cubic',
-      randomize: true,
-      idealEdgeLength: 220,
-      edgeElasticity: 100,
-      gravity: 80,
-      numIter: 1000000,
-      tile: true,
-      tilingPaddingVertical: 10,
-      tilingPaddingHorizontal: 10,
-      nodeDimensionsIncludeLabels: true,
-      avoidOverlap: true,
-      avoidOverlapPadding: 50,
-    },
+    style: CY_STYLE,
+    layout: CY_LAYOUT,
   });
+}
 
-  cy.userPanningEnabled(true);
-  cy.userZoomingEnabled(true);
-  cy.boxSelectionEnabled(true);
+function attachCytoscapeEvents(graph: cytoscape.Core, initialFit: () => void) {
+  graph.userPanningEnabled(true);
+  graph.userZoomingEnabled(true);
+  graph.boxSelectionEnabled(true);
 
-  cy.on('layoutstop', () => {
+  graph.on('layoutstop', () => {
     isLoading.value = false;
     graphLoaded.value = true;
-    if (!didInitialFit) {
-      didInitialFit = true;
-      cy?.resize();
-      cy?.fit(undefined, 30);
-    }
+    initialFit();
   });
 
-  cy.on('tap', 'node', event => {
+  graph.on('tap', 'node', event => {
     const node = event.target;
     const nodeData = node.data();
 
@@ -626,8 +568,8 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
     selectNode(node, nodeData);
   });
 
-  cy.on('tap', event => {
-    if (event.target === cy) {
+  graph.on('tap', event => {
+    if (event.target === graph) {
       if (selectedCyNode.value) {
         selectedCyNode.value.removeClass('selected');
       }
@@ -636,7 +578,7 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
     }
   });
 
-  cy.on('tap', 'edge', event => {
+  graph.on('tap', 'edge', event => {
     const edge = event.target;
     const predicateIRI = edge.data('predicateIRI');
 
@@ -657,21 +599,21 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
     }
   });
 
-  cy.on('mouseover', 'edge', () => {
+  graph.on('mouseover', 'edge', () => {
     if (container.value) {
       container.value.style.cursor = 'pointer';
     }
   });
 
-  cy.on('mouseout', 'edge', () => {
+  graph.on('mouseout', 'edge', () => {
     if (container.value) {
       container.value.style.cursor = 'default';
     }
   });
 
-  cy.on('dbltap', 'node', event => {
+  graph.on('dbltap', 'node', event => {
     const node = event.target;
-    cy!.animate({
+    graph.animate({
       fit: {
         eles: node.neighborhood().add(node),
         padding: 100,
@@ -679,6 +621,25 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
       duration: 500,
       easing: 'ease-in-out-cubic',
     });
+  });
+}
+
+function renderGraph(statements: readonly $rdf.Statement[]) {
+  if (!container.value) return;
+
+  isLoading.value = true;
+  let didInitialFit = false;
+  const elements = buildGraphElements(statements);
+
+  const graph = setupCytoscape(elements);
+  if (!graph) return;
+  cy = graph;
+
+  attachCytoscapeEvents(graph, () => {
+    if (didInitialFit) return;
+    didInitialFit = true;
+    graph.resize();
+    graph.fit(undefined, 30);
   });
 }
 
