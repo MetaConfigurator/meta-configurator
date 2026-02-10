@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; height: 100%; position: relative">
+  <div style="width: 100%; height: 100%; display: flex; position: relative">
     <Dialog
       v-model:visible="showLargeGraphPrompt"
       header="Large graph detected"
@@ -28,120 +28,120 @@
           @click="confirmRender(true)" />
       </template>
     </Dialog>
-    <div ref="container" class="graph-container" :class="{'graph-loaded': graphLoaded}"></div>
-    <Drawer
-      v-model:visible="showPropertiesDrawer"
-      header="Node Details"
-      position="right"
-      :closeOnEscape="true"
-      @hide="closeTooltip"
-      class="properties-drawer">
-      <template #header v-if="selectedNode">
-        <div class="drawer-header-content">
-          <i class="pi pi-sitemap drawer-icon"></i>
-          <div class="drawer-title-section">
-            <span class="drawer-subtitle">Node Details</span>
-            <h4 class="drawer-title">{{ selectedNode.label }}</h4>
-          </div>
-        </div>
-      </template>
-      <div v-if="selectedNode" class="drawer-body">
-        <div class="info-section">
-          <div class="section-label">
-            <i class="pi pi-id-card"></i>
-            <span>Identifier</span>
-          </div>
-          <div class="section-value">
-            <a
-              v-if="isIRI(selectedNode.id)"
-              :href="iriHref(selectedNode.id)!"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="value-link">
-              {{ selectedNode.id }}
-              <i class="pi pi-external-link"></i>
-            </a>
-            <span v-else class="value-text">{{ selectedNode.id }}</span>
-          </div>
-        </div>
-        <div
-          v-if="selectedNode.literals && selectedNode.literals.length > 0"
-          class="properties-container">
-          <div class="section-label">
-            <i class="pi pi-list"></i>
-            <span>Properties ({{ selectedNode.literals.length }})</span>
-          </div>
-          <div class="properties-list">
-            <Card
-              v-for="(lit, idx) in selectedNode.literals"
-              :key="idx"
-              class="property-card"
-              :style="{animationDelay: `${idx * 30}ms`}">
-              <template #title>
-                <div class="property-card-title">
-                  <a
-                    v-if="isLinkableIRI(lit.predicate)"
-                    :href="iriHref(lit.predicate)!"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="key-link">
-                    {{ lit.predicate }}
-                  </a>
-                  <span v-else class="key-text">{{ lit.predicate }}</span>
-                </div>
-              </template>
-              <template #content>
-                <div class="property-card-content">
-                  <a
-                    v-if="isLinkableIRI(lit.value)"
-                    :href="iriHref(lit.value)!"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="value-link">
-                    {{ lit.value }}
-                    <i class="pi pi-external-link"></i>
-                  </a>
-                  <span v-else class="value-text">{{ lit.value }}</span>
-                </div>
-              </template>
-            </Card>
-          </div>
-        </div>
-        <div v-else class="no-properties">
-          <i class="pi pi-inbox"></i>
-          <span>No properties available</span>
+    <div style="width: 100%; height: 100%; display: flex; position: relative">
+      <div class="graph-panel">
+        <div class="graph-wrapper">
+          <div ref="container" class="graph-container" :class="{'graph-loaded': graphLoaded}"></div>
+          <Dock :model="dockItems" position="right" class="graph-dock">
+            <template #itemicon="{item}">
+              <Button
+                class="dock-btn"
+                :icon="item.icon"
+                text
+                rounded
+                v-tooltip.left="item.label"
+                @click="item.command" />
+            </template>
+          </Dock>
+          <Transition name="fade">
+            <ProgressSpinner v-if="isLoading" class="loading-overlay" />
+          </Transition>
         </div>
       </div>
-    </Drawer>
-    <Dock :model="dockItems" position="right" class="graph-dock">
-      <template #itemicon="{item}">
-        <Button
-          class="dock-btn"
-          :icon="item.icon"
-          text
-          rounded
-          v-tooltip.left="item.label"
-          @click="item.command" />
-      </template>
-    </Dock>
-    <Transition name="fade">
-      <ProgressSpinner
-        v-if="isLoading"
-        class="loading-overlay"
-        :stroke-width="3"
-        aria-label="Loading graph" />
-    </Transition>
+      <Transition name="slide-right">
+        <div v-if="propertiesPanelVisible" class="properties-panel-wrapper">
+          <div class="properties-content">
+            <div class="properties-body">
+              <div class="node-cards">
+                <Card class="prop-card">
+                  <template #title>
+                    <div class="card-title">
+                      <i class="pi pi-id-card" />
+                      <span>Node Identifier</span>
+                    </div>
+                  </template>
+                  <template #content>
+                    <div v-if="!selectedNode" class="card-empty">
+                      <i class="pi pi-share-alt empty-icon" />
+                      <p>Select a node to see its identifier</p>
+                    </div>
+                    <div v-else class="kv-row">
+                      <a
+                        v-if="isIRI(selectedNode.id)"
+                        class="kv-value link"
+                        :href="selectedNode.id"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {{ selectedNode.id }}
+                      </a>
+                      <span v-else class="kv-value">
+                        {{ selectedNode.id }}
+                      </span>
+                    </div>
+                  </template>
+                </Card>
+                <Card class="prop-card">
+                  <template #title>
+                    <div class="card-title">
+                      <i class="pi pi-list" />
+                      <span>
+                        Properties
+                        <span v-if="selectedNode?.literals?.length" class="count-pill">
+                          {{ selectedNode.literals.length }}
+                        </span>
+                      </span>
+                    </div>
+                  </template>
+                  <template #content>
+                    <div v-if="!selectedNode" class="card-empty">
+                      <i class="pi pi-info-circle empty-icon" />
+                      <p>Click a node to view its properties</p>
+                    </div>
+                    <div v-else-if="!selectedNode.literals?.length" class="card-empty">
+                      <i class="pi pi-inbox empty-icon" />
+                      <p>No properties found for this node</p>
+                    </div>
+                    <div v-else class="props-list">
+                      <div class="prop-line" v-for="(lit, idx) in selectedNode.literals" :key="idx">
+                        <a
+                          class="kv-value link"
+                          :href="iriHref(lit.predicate) || lit.predicate"
+                          target="_blank"
+                          rel="noopener noreferrer">
+                          {{ lit.predicate }}
+                        </a>
+                        <span class="prop-text">:</span>
+                        <a
+                          v-if="lit.isIRI && isLinkableIRI(lit.value)"
+                          class="prop-text link"
+                          :href="iriHref(lit.value) || undefined"
+                          target="_blank"
+                          rel="noopener noreferrer">
+                          {{ lit.value }}
+                        </a>
+                        <span v-else class="prop-text">
+                          {{ lit.value }}
+                        </span>
+                      </div>
+                    </div>
+                  </template>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Card from 'primevue/card';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import Drawer from 'primevue/drawer';
+import Card from 'primevue/card';
 import ProgressSpinner from 'primevue/progressspinner';
-import {ref, computed, onMounted, onUnmounted} from 'vue';
+import {ref, computed, onMounted, onUnmounted, watch} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
@@ -155,16 +155,25 @@ interface SelectedNodeData {
   id: string;
   label: string;
   literals?: Array<{predicate: string; value: string; isIRI?: boolean}>;
-  position?: {x: number; y: number};
+}
+
+interface PanelMenuItem {
+  label: string;
+  icon?: string;
+  items?: PanelMenuItem[];
+  command?: () => void;
+  template?: string;
+  isLink?: boolean;
+  url?: string;
 }
 
 const settings = useSettings();
 const showLargeGraphPrompt = ref(false);
-const showPropertiesDrawer = ref(false);
 const nodeCount = ref(0);
 const isLoading = ref(false);
 const graphLoaded = ref(false);
 const physicsEnabled = ref(false);
+const propertiesPanelVisible = ref(false);
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
@@ -200,14 +209,74 @@ const dockItems = computed(() => [
     icon: physicsEnabled.value ? 'pi pi-pause' : 'pi pi-play',
     command: () => togglePhysics(),
   },
+  {
+    label: propertiesPanelVisible.value ? 'Hide Properties' : 'Show Properties',
+    icon: propertiesPanelVisible.value ? 'pi pi-eye-slash' : 'pi pi-eye',
+    command: () => togglePropertiesPanel(),
+  },
 ]);
+
+const panelMenuItems = computed(() => {
+  if (!selectedNode.value) {
+    return [];
+  }
+
+  const items: PanelMenuItem[] = [];
+
+  items.push({
+    label: 'Node Identifier',
+    icon: 'pi pi-id-card',
+    items: [
+      {
+        label: selectedNode.value.id,
+        icon: isIRI(selectedNode.value.id) ? 'pi pi-external-link' : 'pi pi-file-text',
+        isLink: isIRI(selectedNode.value.id),
+        url: isIRI(selectedNode.value.id) ? selectedNode.value.id : undefined,
+      },
+    ],
+  });
+
+  if (selectedNode.value.literals && selectedNode.value.literals.length > 0) {
+    const propertyItems: PanelMenuItem[] = selectedNode.value.literals.map(lit => ({
+      label: `${lit.predicate}: ${lit.value}`,
+      icon: lit.isIRI ? 'pi pi-link' : 'pi pi-file-text',
+      isLink: lit.isIRI && isLinkableIRI(lit.value),
+      url: lit.isIRI && isLinkableIRI(lit.value) ? iriHref(lit.value) || undefined : undefined,
+    }));
+
+    items.push({
+      label: `Properties (${propertyItems.length})`,
+      icon: 'pi pi-list',
+      items: propertyItems,
+    });
+  }
+
+  return items;
+});
 
 cytoscape.use(coseBilkent);
 const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
 const container = ref<HTMLDivElement | null>(null);
 const selectedNode = ref<SelectedNodeData | null>(null);
+const expandedKeys = ref<Record<string, boolean>>({});
 
 let cy: cytoscape.Core | null = null;
+
+watch(
+  panelMenuItems,
+  newItems => {
+    const keys: Record<string, boolean> = {};
+    newItems.forEach((item, index) => {
+      keys[index.toString()] = true;
+    });
+    expandedKeys.value = keys;
+  },
+  {deep: true}
+);
+
+function togglePropertiesPanel() {
+  propertiesPanelVisible.value = !propertiesPanelVisible.value;
+}
 
 function countNodes(statements: readonly $rdf.Statement[]): number {
   const nodes = new Set<string>();
@@ -318,36 +387,19 @@ function togglePhysics() {
   }
 }
 
-function closeTooltip() {
-  if (selectedCyNode.value) {
-    selectedCyNode.value.removeClass('selected');
-  }
-  selectedCyNode.value = null;
-  selectedNode.value = null;
-  showPropertiesDrawer.value = false;
-}
-
-function showNodeTooltip(node: any, nodeData: any) {
+function selectNode(node: any, nodeData: any) {
   if (selectedCyNode.value) {
     selectedCyNode.value.removeClass('selected');
   }
 
   node.addClass('selected');
   selectedCyNode.value = node;
+
   selectedNode.value = {
     id: nodeData.id,
     label: nodeData.label,
     literals: nodeData.literals,
   };
-
-  const neighbors = node.neighborhood();
-  neighbors.addClass('highlighted');
-
-  setTimeout(() => {
-    neighbors.removeClass('highlighted');
-  }, 2000);
-
-  showPropertiesDrawer.value = true;
 }
 
 function getPredicateAlias(predicate: string): string {
@@ -504,28 +556,11 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
         },
       },
       {
-        selector: 'node:hover',
-        style: {
-          'background-color': '#3182ce',
-          'border-width': 3,
-          'border-color': '#1a365d',
-        },
-      },
-      {
         selector: 'node.selected',
         style: {
           'background-color': '#2b6cb0',
           'border-width': 4,
           'border-color': '#1a365d',
-          'box-shadow': '0 0 20px rgba(66, 153, 225, 0.6)',
-        },
-      },
-      {
-        selector: 'node.highlighted',
-        style: {
-          'background-color': '#48bb78',
-          'border-color': '#2f855a',
-          'transition-duration': '0.5s',
         },
       },
       {
@@ -545,31 +580,12 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
           'curve-style': 'bezier',
           'control-point-step-size': 100,
           label: 'data(label)',
-          'font-size': '11px',
-          color: '#2d3748',
+          'font-size': '12px',
           'text-rotation': 'autorotate',
-          'text-margin-y': -10,
-          'text-background-color': '#ffffff',
-          'text-background-opacity': 0.8,
-          'text-background-padding': '3px',
+          'text-background-color': '#f7fafc',
+          'text-background-opacity': 1,
           'transition-property': 'line-color, width',
           'transition-duration': '0.3s',
-        },
-      },
-      {
-        selector: 'edge:hover',
-        style: {
-          'line-color': '#4299e1',
-          'target-arrow-color': '#4299e1',
-          width: 3,
-        },
-      },
-      {
-        selector: 'edge.highlighted',
-        style: {
-          'line-color': '#48bb78',
-          'target-arrow-color': '#48bb78',
-          width: 3,
         },
       },
     ],
@@ -616,12 +632,16 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
       },
     });
 
-    showNodeTooltip(node, nodeData);
+    selectNode(node, nodeData);
   });
 
   cy.on('tap', event => {
     if (event.target === cy) {
-      closeTooltip();
+      if (selectedCyNode.value) {
+        selectedCyNode.value.removeClass('selected');
+      }
+      selectedCyNode.value = null;
+      selectedNode.value = null;
     }
   });
 
@@ -702,10 +722,36 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.graph-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.graph-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 .graph-container {
   width: 100%;
   height: 100%;
-  border: 1px solid #e2e8f0;
   border-radius: 8px;
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
@@ -715,253 +761,23 @@ onMounted(() => {
   opacity: 1;
 }
 
-.properties-drawer :deep(.p-drawer-header) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 16px 24px !important;
-  border: none !important;
-}
-
-.properties-drawer :deep(.p-drawer-header .p-drawer-title) {
-  display: none;
-}
-
-.properties-drawer :deep(.p-drawer-content) {
-  padding: 24px !important;
-  background: white;
-}
-
-.properties-drawer :deep(.p-drawer) {
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
-}
-
-.drawer-header-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-}
-
-.drawer-icon {
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-  backdrop-filter: blur(10px);
-}
-
-.drawer-title-section {
-  flex: 1;
-  min-width: 0;
-}
-
-.drawer-subtitle {
-  display: block;
-  font-size: 10px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  opacity: 0.9;
-  margin-bottom: 2px;
-}
-
-.drawer-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  word-break: break-word;
-  line-height: 1.3;
-}
-
-.drawer-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.info-section {
-  padding-bottom: 16px;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.section-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #805ad5;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-}
-
-.section-label i {
-  font-size: 12px;
-}
-
-.section-value {
-  padding-left: 18px;
-}
-
-.value-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #4299e1;
-  text-decoration: none;
-  font-size: 12px;
-  word-break: break-all;
-  transition: color 0.2s;
-}
-
-.value-link:hover {
-  color: #2b6cb0;
-}
-
-.value-link i {
-  font-size: 10px;
-  opacity: 0.7;
-}
-
-.value-text {
-  font-size: 12px;
-  color: #2d3748;
-  word-break: break-all;
-  line-height: 1.5;
-}
-
-.properties-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.properties-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.property-row {
-  background: #f7fafc;
-  border-left: 3px solid #4299e1;
-  border-radius: 6px;
-  padding: 10px 12px;
-  animation: fadeInLeft 0.3s ease-out backwards;
-  transition: all 0.2s;
-}
-
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.property-row:hover {
-  background: #edf2f7;
-  transform: translateX(2px);
-  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.1);
-}
-
-.property-key-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.key-icon {
-  font-size: 10px;
-  color: #4299e1;
-  opacity: 0.7;
-}
-
-.key-link {
-  font-size: 11px;
-  font-weight: 600;
-  color: #4299e1;
-  text-decoration: none;
-}
-
-.key-link:hover {
-  color: #2b6cb0;
-  text-decoration: underline;
-}
-
-.key-text {
-  font-size: 11px;
-  font-weight: 600;
-  color: #4299e1;
-}
-
-.property-value-row {
-  padding-left: 16px;
-}
-
-.property-value-row .value-text {
-  font-size: 12px;
-  color: #4a5568;
-}
-
-.property-value-row .value-link {
-  font-size: 12px;
-  color: #2d3748;
-}
-
-.property-value-row .value-link:hover {
-  color: #4299e1;
-}
-
-.no-properties {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 24px 16px;
-  color: #a0aec0;
-  text-align: center;
-  background: #f7fafc;
-  border-radius: 8px;
-}
-
-.no-properties i {
-  font-size: 32px;
-  opacity: 0.5;
-}
-
-.no-properties span {
-  font-size: 13px;
-  font-style: italic;
-}
-
-.drawer-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 2px solid #e2e8f0;
-}
-
-.zoom-controls {
+.graph-dock {
   position: absolute;
-  top: 16px;
+  top: 50%;
   right: 16px;
+  transform: translateY(-50%);
+  z-index: 20;
+}
+
+.graph-dock :deep(.p-dock) {
+  background: transparent;
+}
+
+.graph-dock :deep(.p-dock-list) {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 10;
+  padding: 0;
 }
 
 .loading-overlay {
@@ -984,99 +800,452 @@ onMounted(() => {
   opacity: 0;
 }
 
+/* Properties Panel */
+.properties-panel-wrapper {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-left: 1px solid #e2e8f0;
+  overflow: hidden;
+  width: 350px;
+  flex-shrink: 0;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.properties-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.properties-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.properties-title i {
+  font-size: 16px;
+}
+
+.panel-close-btn {
+  margin-left: auto;
+}
+
+.panel-close-btn :deep(.p-button) {
+  color: white;
+}
+
+.properties-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.properties-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.node-properties-panel {
+  border: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.node-properties-panel :deep(.p-panelmenu) {
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-header > a) {
+  background: #f7fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+  cursor: pointer;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-header > a:hover) {
+  background: #edf2f7;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-header.p-highlight > a) {
+  background: #667eea;
+  color: white;
+  border-bottom-color: #667eea;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content) {
+  background: #ffffff;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid #e2e8f0;
+  max-height: none;
+  overflow: visible;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu) {
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem) {
+  border: none;
+  display: flex;
+  width: 100%;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem > a) {
+  padding: 10px 16px;
+  color: #475569;
+  font-size: 13px;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem > a:hover) {
+  background: #f1f5f9;
+  color: #4299e1;
+}
+
+.node-properties-panel :deep(.p-panelmenu .p-panelmenu-item) {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.panel-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  word-break: break-word;
+}
+
+.panel-menu-icon {
+  font-size: 12px;
+  color: #667eea;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.panel-menu-label {
+  flex: 1;
+}
+
+.properties-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #94a3b8;
+  padding: 24px;
+  text-align: center;
+  flex: 1;
+}
+
+.properties-empty i {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+.properties-empty p {
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+:deep(.p-splitter) {
+  background: white;
+}
+
+:deep(.p-splitter-gutter) {
+  background: #e2e8f0;
+  transition: background-color 0.3s ease;
+}
+
+:deep(.p-splitter-gutter:hover) {
+  background: #cbd5e0;
+}
+
+:deep(.p-splitter-gutter-resizing) {
+  background: #667eea;
+}
+
+:deep(.p-splitter-gutter-icon) {
+  color: #94a3b8;
+}
+
+.smooth-splitter :deep(.p-splitter-panel) {
+  transition: flex 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Slide-right Transition */
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-right-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-right-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
 @media (prefers-color-scheme: dark) {
   .graph-container {
-    border-color: #4a5568;
+    background: #1a202c;
   }
 
-  .properties-drawer :deep(.p-drawer-content) {
-    background: #1a202c !important;
+  .toggle-properties-btn {
+    background: #667eea;
   }
 
-  .drawer-title {
+  .toggle-properties-btn:hover {
+    background: #5568d3;
+  }
+
+  .properties-panel-wrapper {
+    background: #1a202c;
+    border-left-color: #4a5568;
+  }
+
+  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-header > a) {
+    background: #2d3748;
     color: #e2e8f0;
-  }
-
-  .info-section {
     border-bottom-color: #4a5568;
   }
 
-  .value-text {
-    color: #cbd5e0;
-  }
-
-  .property-row {
-    background: #2d3748;
-  }
-
-  .property-row:hover {
+  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-header > a:hover) {
     background: #4a5568;
   }
 
-  .property-value-row .value-text {
+  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-header.p-highlight > a) {
+    background: #667eea;
+    color: white;
+  }
+
+  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-content) {
+    background: #1a202c;
+    border-bottom-color: #4a5568;
+  }
+
+  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem > a) {
     color: #cbd5e0;
   }
 
-  .property-value-row .value-link {
+  .node-properties-panel :deep(.p-panelmenu .p-panelmenu-content .p-menu .p-menuitem > a:hover) {
+    background: #2d3748;
+    color: #a5b4fc;
+  }
+
+  .properties-empty {
+    color: #64748b;
+  }
+
+  .panel-menu-icon {
+    color: #a5b4fc;
+  }
+
+  :deep(.p-splitter) {
+    background: #1a202c;
+  }
+
+  :deep(.p-splitter-gutter) {
+    background: #4a5568;
+  }
+
+  :deep(.p-splitter-gutter:hover) {
+    background: #64748b;
+  }
+
+  :deep(.p-splitter-gutter-resizing) {
+    background: #667eea;
+  }
+
+  :deep(.p-splitter-gutter-icon) {
+    color: #64748b;
+  }
+}
+
+@media (max-width: 1024px) {
+}
+
+@media (max-width: 768px) {
+  :deep(.p-splitter) {
+    flex-direction: column;
+  }
+
+  .properties-panel-wrapper {
+    min-height: 200px;
+  }
+}
+
+.node-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+
+.prop-card :deep(.p-card) {
+  border-radius: 12px;
+}
+
+.prop-card :deep(.p-card-title) {
+  margin-bottom: 0;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kv-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+  word-break: break-word;
+}
+
+.kv-row:last-child {
+  border-bottom: none;
+}
+
+.kv-icon,
+.prop-icon {
+  font-size: 12px;
+  opacity: 0.7;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.kv-value,
+.prop-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.props-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prop-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  word-break: break-word;
+}
+
+.link {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-title {
     color: #e2e8f0;
   }
 
-  .drawer-actions {
-    border-top-color: #4a5568;
+  .kv-value,
+  .prop-text {
+    color: #cbd5e0;
   }
 
-  .no-properties {
-    background: #2d3748;
+  .kv-row {
+    border-bottom-color: #4a5568;
   }
 
-  .loading-overlay {
-    background: rgba(26, 32, 44, 0.95);
-  }
-}
-
-@media (max-width: 640px) {
-  .properties-drawer :deep(.p-drawer) {
-    width: 100% !important;
-  }
-
-  .drawer-actions {
-    flex-direction: column;
+  .link {
+    color: #a5b4fc;
   }
 }
 
-.property-card {
-  animation: fadeInLeft 0.3s ease-out backwards;
-}
-
-.property-card-title {
-  display: flex;
-  align-items: center;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.property-card-content {
-  padding-top: 6px;
-  font-size: 12px;
-  word-break: break-all;
-}
-
-.graph-dock {
-  position: absolute;
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
-  z-index: 20;
-}
-
-.graph-dock :deep(.p-dock) {
-  background: transparent;
-}
-
-.graph-dock :deep(.p-dock-list) {
+.card-empty {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 0;
+  padding: 20px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 28px;
+  opacity: 0.4;
+}
+
+.card-empty p {
+  font-size: 13px;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-empty {
+    color: #64748b;
+  }
 }
 </style>
