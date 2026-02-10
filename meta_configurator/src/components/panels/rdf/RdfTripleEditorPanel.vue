@@ -235,7 +235,7 @@
     header="SPARQL"
     modal
     maximizable
-    :style="{width: '800px', height: '800px'}"
+    :style="{width: '1000px', height: '1000px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
     <SparqlEditor />
   </Dialog>

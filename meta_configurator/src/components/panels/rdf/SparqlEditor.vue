@@ -34,6 +34,8 @@
                         <Textarea
                           id="userComments"
                           v-model="userComments"
+                          @click.stop
+                          @keydown.stop
                           class="w-full mt-2"
                           placeholder="e.g., create a sparql query to list all cities in the JSON-LD." />
                       </div>
@@ -57,6 +59,8 @@
                   :indent-with-tab="true"
                   :tab-size="2"
                   :extensions="extensions"
+                  @click.stop
+                  @keydown.stop
                   @ready="handleReady" />
               </div>
               <div v-if="errorMessage" class="error-box mb-2">
