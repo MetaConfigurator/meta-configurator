@@ -155,6 +155,7 @@ import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import Dock from 'primevue/dock';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
+import {isDarkMode} from '@/utility/darkModeUtils';
 
 interface SelectedNodeData {
   id: string;
@@ -382,65 +383,69 @@ const TYPE_PREDICATES = [
   '@type',
 ];
 
-const CY_STYLE: cytoscape.StylesheetCSS[] = [
-  {
-    selector: 'node',
-    css: {
-      'background-color': '#4299e1',
-      'border-width': '2',
-      'border-color': '#2c5282',
-      label: 'data(label)',
-      'text-valign': 'center',
-      'text-halign': 'center',
-      'min-width': '60',
-      'min-height': '30',
-      color: '#fff',
-      'font-size': '12px',
-      'font-weight': 'bold',
-      'text-wrap': 'wrap',
-      'text-max-width': '80px',
-      width: 'label',
-      height: '30',
-      padding: '15px',
-      shape: 'roundrectangle',
-      'transition-property': 'background-color, border-color, border-width',
-      'transition-duration': 300,
+function createCyStyle(): cytoscape.StylesheetCSS[] {
+  const edgeLabelColor = isDarkMode.value ? '#f8fafc' : '#111827';
+  return [
+    {
+      selector: 'node',
+      css: {
+        'background-color': '#4299e1',
+        'border-width': '2',
+        'border-color': '#2c5282',
+        label: 'data(label)',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'min-width': '60',
+        'min-height': '30',
+        color: '#fff',
+        'font-size': '12px',
+        'font-weight': 'bold',
+        'text-wrap': 'wrap',
+        'text-max-width': '80px',
+        width: 'label',
+        height: '30',
+        padding: '15px',
+        shape: 'roundrectangle',
+        'transition-property': 'background-color, border-color, border-width',
+        'transition-duration': 300,
+      },
     },
-  },
-  {
-    selector: 'node.selected',
-    css: {
-      'background-color': '#2b6cb0',
-      'border-width': '4',
-      'border-color': '#1a365d',
+    {
+      selector: 'node.selected',
+      css: {
+        'background-color': '#2b6cb0',
+        'border-width': '4',
+        'border-color': '#1a365d',
+      },
     },
-  },
-  {
-    selector: 'node[hasLiterals]',
-    css: {
-      'border-color': '#f6ad55',
-      'border-width': '3',
+    {
+      selector: 'node[hasLiterals]',
+      css: {
+        'border-color': '#f6ad55',
+        'border-width': '3',
+      },
     },
-  },
-  {
-    selector: 'edge',
-    css: {
-      width: '2',
-      'line-color': '#a0aec0',
-      'target-arrow-color': '#a0aec0',
-      'target-arrow-shape': 'triangle',
-      'curve-style': 'bezier',
-      'control-point-step-size': 100,
-      label: 'data(label)',
-      'font-size': '12px',
-      'text-rotation': 'autorotate',
-      'text-background-color': '#f7fafc',
-      'text-background-opacity': 1,
-      'transition-property': 'line-color, width',
-      'transition-duration': 300,
+    {
+      selector: 'edge',
+      css: {
+        width: '2',
+        'line-color': '#a0aec0',
+        'target-arrow-color': '#a0aec0',
+        'target-arrow-shape': 'triangle',
+        'curve-style': 'bezier',
+        'control-point-step-size': 100,
+        label: 'data(label)',
+        color: edgeLabelColor,
+        'font-size': '12px',
+        'text-rotation': 'autorotate',
+        'text-background-opacity': 0,
+        'text-margin-y': -12,
+        'transition-property': 'line-color, width',
+        'transition-duration': 300,
+      },
     },
-  },
-];
+  ];
+}
 
 const CY_LAYOUT: cytoscape.LayoutOptions = {
   name: 'cose-bilkent',
@@ -541,7 +546,7 @@ function setupCytoscape(elements: cytoscape.ElementDefinition[]) {
   return cytoscape({
     container: container.value,
     elements,
-    style: CY_STYLE,
+    style: createCyStyle(),
     layout: CY_LAYOUT,
   });
 }
