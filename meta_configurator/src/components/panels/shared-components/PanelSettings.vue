@@ -38,6 +38,7 @@ function removeProperty(path: Path) {
   data.removeDataAt(path);
 }
 
+
 const copyToClipboard = async () => {
   if (props.sessionMode === SessionMode.Settings) return;
 
@@ -50,7 +51,7 @@ const copyToClipboard = async () => {
 };
 
 const containsText = computed(() => {
-  return ['Text View', 'Documentation View'].includes(props.panelName);
+  return ['Text View'].includes(props.panelName);
 });
 
 const settingsName = computed(() => {
@@ -70,7 +71,7 @@ const settingsName = computed(() => {
 <template>
   <Panel :header="panelName" toggleable :collapsed="true">
     <template v-if="containsText" #icons>
-      <Button icon="pi pi-clone" @click="copyToClipboard" rounded text />
+      <Button icon="pi pi-clone" severity="secondary" @click="copyToClipboard" rounded text />
     </template>
     <slot></slot>
     <div class="properties-panel-container">
