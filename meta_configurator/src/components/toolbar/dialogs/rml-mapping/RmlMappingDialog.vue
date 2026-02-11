@@ -51,7 +51,7 @@
             <div class="step-panel">
               <Divider />
               <label class="block font-semibold mb-2">Mapping Configuration</label>
-              <div class="border rounded overflow-hidden">
+              <div class="editor-block">
                 <codemirror
                   v-model="rmlConfig"
                   class="rml-codemirror"
@@ -66,7 +66,6 @@
                 label="Perform Mapping"
                 icon="pi pi-play"
                 @click="performMapping" />
-              <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
               <div v-if="errorMessage.length" class="error-box">
                 <span v-html="errorMessage"></span>
               </div>
@@ -114,7 +113,6 @@ const result = ref('');
 const rmlConfig = ref('');
 const view = shallowRef<EditorView | null>(null);
 const resultIsValid = ref(false);
-const statusMessage = ref('');
 const errorMessage = ref('');
 const userComments = ref('');
 const isLoadingMapping = ref(false);
@@ -133,7 +131,6 @@ const rmlHighlightStyle = HighlightStyle.define([
   {tag: tags.variableName, color: '#82aaff'},
   {tag: tags.string, color: '#c3e88d'},
   {tag: tags.number, color: '#f78c6c'},
-  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
   {tag: tags.operator, color: '#89ddff'},
   {tag: tags.punctuation, color: '#abb2bf'},
   {tag: tags.typeName, color: '#f07178'},
@@ -151,12 +148,6 @@ const extensions = computed(() => [
 const handleReady = (payload: {view: EditorView}) => {
   view.value = payload.view;
 };
-
-watch([statusMessage, errorMessage, activeStep], async () => {
-  if (activeStep.value !== '2' || !view.value) return;
-  await nextTick();
-  view.value.requestMeasure?.();
-});
 
 watch(showDialog, async visible => {
   if (visible) {
@@ -176,7 +167,6 @@ function hideDialog() {
 }
 
 function resetDialog() {
-  statusMessage.value = '';
   errorMessage.value = '';
   userComments.value = '';
   input.value = {};
@@ -189,7 +179,6 @@ function validateConfig(config: string, input: any) {
   const validationResult = mappingService.value.validateMappingConfig(config, input);
   if (!validationResult.success) {
     errorMessage.value = validationResult.message;
-    statusMessage.value = '';
     resultIsValid.value = false;
   } else {
     errorMessage.value = '';
@@ -216,10 +205,8 @@ function generateMappingSuggestion() {
       rmlConfig.value = res.config;
       activeStep.value = '2';
       if (res.success) {
-        statusMessage.value = res.message;
         errorMessage.value = '';
       } else {
-        statusMessage.value = '';
         errorMessage.value = res.message;
       }
       isLoadingMapping.value = false;
@@ -237,18 +224,15 @@ function performMapping() {
   const config = rmlConfig.value;
   if (!config) {
     errorMessage.value = 'No mapping configuration available.';
-    statusMessage.value = '';
     return;
   }
 
   mappingService.value.performRmlMapping(input.value, config).then(res => {
     if (res.success) {
-      statusMessage.value = res.message;
       errorMessage.value = '';
       getDataForMode(SessionMode.DataEditor).setData(res.resultData);
       hideDialog();
     } else {
-      statusMessage.value = '';
       errorMessage.value = res.message;
     }
   });
@@ -320,27 +304,37 @@ label {
 }
 
 .editor-block {
-  flex: 1 1 0%;
+  flex: 1;
   min-height: 0;
   display: flex;
-  position: relative;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .rml-codemirror {
   flex: 1;
   min-height: 0;
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .rml-codemirror :deep(.cm-editor) {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   height: 100%;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 14px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+}
+
+.rml-codemirror :deep(.cm-content) {
+  min-height: 100%;
 }
 
 .error-box {

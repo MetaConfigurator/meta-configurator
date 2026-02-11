@@ -911,11 +911,6 @@ const toggleExportPopover = (event: Event) => {
   flex-shrink: 0;
 }
 
-.editor-container {
-  flex: 1;
-  min-height: 0;
-}
-
 .error-box,
 .editor-footer {
   flex-shrink: 0;
