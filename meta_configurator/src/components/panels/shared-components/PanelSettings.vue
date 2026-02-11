@@ -38,7 +38,6 @@ function removeProperty(path: Path) {
   data.removeDataAt(path);
 }
 
-
 const copyToClipboard = async () => {
   if (props.sessionMode === SessionMode.Settings) return;
 
