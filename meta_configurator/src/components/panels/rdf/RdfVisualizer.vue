@@ -199,7 +199,7 @@ const dockItems = computed(() => [
   },
   {
     label: 'Zoom to Selected',
-    icon: 'pi pi-map-marker',
+    icon: 'pi pi-arrow-down-left-and-arrow-up-right-to-center',
     disabled: !selectedNode.value,
     command: () => zoomToSelected(),
   },
@@ -322,19 +322,25 @@ function zoomToSelected() {
 
 function togglePhysics() {
   if (!cy) return;
-
   physicsEnabled.value = !physicsEnabled.value;
-
   if (physicsEnabled.value) {
+    const randomInRange = (min: number, max: number) => min + Math.random() * (max - min);
+    const idealEdgeLength = randomInRange(160, 280);
+    const edgeElasticity = randomInRange(70, 140);
+    const gravity = randomInRange(70, 130);
+
     const layout = cy.layout({
       name: 'cose-bilkent',
       animate: true,
       animationDuration: 1000,
-      randomize: false,
-      idealEdgeLength: 220,
-      edgeElasticity: 100,
-      gravity: 100,
-      numIter: 2500000,
+      randomize: true,
+      idealEdgeLength,
+      edgeElasticity,
+      gravity,
+      numIter: 15000,
+    });
+    layout.on('layoutstop', () => {
+      physicsEnabled.value = false;
     });
     layout.run();
   }
@@ -731,8 +737,11 @@ onMounted(() => {
   opacity: 1;
 }
 
+.graph-dock :deep(.p-dock-list-container) {
+  background: transparent !important;
+  border: none !important ;
+}
 .graph-dock {
-  position: absolute;
   top: 50%;
   right: 16px;
   transform: translateY(-50%);
