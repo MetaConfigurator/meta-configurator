@@ -4,7 +4,7 @@
     header="Convert JSON data to JSON-LD using RML"
     modal
     maximizable
-    :style="{width: '800px', height: '900px'}">
+    :style="{width: '800px', height: '800px'}">
     <div class="rml-dialog-body">
       <Message severity="warn" v-if="mappingServiceWarning.length">
         <span v-html="mappingServiceWarning"></span>
@@ -50,9 +50,15 @@
           <StepPanel value="2">
             <div class="step-panel">
               <Divider />
-              <label :for="editor_id" class="block font-semibold mb-2">Mapping Configuration</label>
-              <div class="editor-block border rounded overflow-hidden">
-                <div :id="editor_id" class="editor-host" />
+              <label class="block font-semibold mb-2">Mapping Configuration</label>
+              <div class="border rounded overflow-hidden">
+                <codemirror
+                  v-model="rmlConfig"
+                  :autofocus="false"
+                  :indent-with-tab="true"
+                  :tab-size="2"
+                  :extensions="extensions"
+                  @ready="handleReady" />
               </div>
               <Button
                 :disabled="!resultIsValid"
@@ -60,9 +66,9 @@
                 icon="pi pi-play"
                 @click="performMapping" />
               <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
-              <Message severity="error" v-if="errorMessage.length">
+              <div v-if="errorMessage.length" class="error-box">
                 <span v-html="errorMessage"></span>
-              </Message>
+              </div>
             </div>
           </StepPanel>
         </StepPanels>
@@ -72,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, watch, type Ref, onMounted, nextTick} from 'vue';
+import {ref, computed, watch, type Ref, nextTick, shallowRef} from 'vue';
 import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
@@ -83,33 +89,35 @@ import StepList from 'primevue/steplist';
 import Step from 'primevue/step';
 import StepPanels from 'primevue/steppanels';
 import StepPanel from 'primevue/steppanel';
+import {Codemirror} from 'vue-codemirror';
+import {basicSetup} from 'codemirror';
+import {syntaxHighlighting, HighlightStyle, StreamLanguage} from '@codemirror/language';
+import {tags} from '@lezer/highlight';
+import {EditorView} from '@codemirror/view';
+import {oneDark} from '@codemirror/theme-one-dark';
+import {turtle} from '@codemirror/legacy-modes/mode/turtle';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
 import {RmlMappingServiceStandard} from '@/rml-mapping/standard/rmlMappingServiceStandard';
 import type {RmlMappingService} from '@/rml-mapping/rmlMappingService';
-import type {Editor} from 'brace';
-import * as ace from 'brace';
-import {setupAceProperties} from '@/components/panels/shared-components/aceUtils';
-import {useSettings} from '@/settings/useSettings';
 import {useDebounceFn} from '@vueuse/core';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {isDarkMode} from '@/utility/darkModeUtils';
 
 const showDialog = ref(false);
-const editor_id = 'rml-mapping-' + Math.random();
-const editorInitialized: Ref<boolean> = ref(false);
-const editor: Ref<Editor | null> = ref(null);
 const input = ref({});
 const result = ref('');
+const rmlConfig = ref('');
+const view = shallowRef<EditorView | null>(null);
 const resultIsValid = ref(false);
-const statusMessage = ref('aaaa');
-const errorMessage = ref('addasass');
+const statusMessage = ref('');
+const errorMessage = ref('');
 const userComments = ref('');
 const isLoadingMapping = ref(false);
 const activeStep = ref('1');
-const settings = useSettings();
 
 const mappingService: Ref<RmlMappingService> = computed(() => {
   return new RmlMappingServiceStandard();
@@ -119,26 +127,40 @@ const mappingServiceWarning: Ref<string> = computed(() => {
   return '';
 });
 
-onMounted(() => {
-  watch(
-    () => result.value,
-    newValue => {
-      if (newValue.length > 0) {
-        editor.value = ace.edit(editor_id);
-        editor.value?.setValue(newValue, -1);
-      }
-    }
-  );
+const rmlHighlightStyle = HighlightStyle.define([
+  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
+  {tag: tags.variableName, color: '#82aaff'},
+  {tag: tags.string, color: '#c3e88d'},
+  {tag: tags.number, color: '#f78c6c'},
+  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
+  {tag: tags.operator, color: '#89ddff'},
+  {tag: tags.punctuation, color: '#abb2bf'},
+  {tag: tags.typeName, color: '#f07178'},
+  {tag: tags.propertyName, color: '#ffcb6b'},
+]);
+
+const extensions = computed(() => [
+  basicSetup,
+  StreamLanguage.define(turtle),
+  syntaxHighlighting(rmlHighlightStyle),
+  ...(isDarkMode.value ? [oneDark] : []),
+  EditorView.lineWrapping,
+]);
+
+const handleReady = (payload: {view: EditorView}) => {
+  view.value = payload.view;
+};
+
+watch([statusMessage, errorMessage, activeStep], async () => {
+  if (activeStep.value !== '2' || !view.value) return;
+  await nextTick();
+  view.value.requestMeasure?.();
 });
 
 watch(showDialog, async visible => {
   if (visible) {
     await nextTick();
-    initializeEditor();
-
-    if (result.value.length > 0) {
-      editor.value?.setValue(result.value, -1);
-    }
+    rmlConfig.value = result.value;
   }
 });
 
@@ -158,35 +180,8 @@ function resetDialog() {
   userComments.value = '';
   input.value = {};
   result.value = '';
+  rmlConfig.value = '';
   resultIsValid.value = false;
-}
-
-function initializeEditor() {
-  const container = document.getElementById(editor_id);
-
-  if (!container) return;
-
-  if (editor.value) {
-    editor.value.destroy();
-    editor.value.container.innerHTML = '';
-    editor.value = null;
-    editorInitialized.value = false;
-  }
-
-  editor.value = ace.edit(editor_id);
-  setupAceProperties(editor.value, settings.value);
-
-  editorInitialized.value = true;
-
-  editor.value.on(
-    'change',
-    useDebounceFn(() => {
-      const editorContent = editor.value?.getValue();
-      if (editorContent) {
-        validateConfig(editorContent, input.value);
-      }
-    }, 100)
-  );
 }
 
 function validateConfig(config: string, input: any) {
@@ -201,6 +196,15 @@ function validateConfig(config: string, input: any) {
   }
 }
 
+const validateLive = useDebounceFn(() => {
+  if (!rmlConfig.value) return;
+  validateConfig(rmlConfig.value, input.value);
+}, 100);
+
+watch(rmlConfig, () => {
+  validateLive();
+});
+
 function generateMappingSuggestion() {
   isLoadingMapping.value = true;
   const targetSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
@@ -208,6 +212,7 @@ function generateMappingSuggestion() {
     .generateMappingSuggestion(input.value, targetSchema, userComments.value)
     .then(res => {
       result.value = res.config;
+      rmlConfig.value = res.config;
       activeStep.value = '2';
       if (res.success) {
         statusMessage.value = res.message;
@@ -228,7 +233,7 @@ function generateMappingSuggestion() {
 }
 
 function performMapping() {
-  const config = editor.value?.getValue();
+  const config = rmlConfig.value;
   if (!config) {
     errorMessage.value = 'No mapping configuration available.';
     statusMessage.value = '';
@@ -319,14 +324,58 @@ label {
   display: flex;
 }
 
-.step-panel :deep(.p-message) {
-  flex-shrink: 0;
-}
-
-.editor-host {
+.rml-codemirror {
   flex: 1;
   min-height: 0;
   width: 100%;
+}
+
+:deep(.dark .cm-frozen-line) {
+  background-color: #2a2a2a;
+}
+
+.rml-codemirror :deep(.cm-editor) {
   height: 100%;
+  background: transparent;
+}
+
+.error-box {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: #ffe5e5;
+  color: #d8000c;
+  font-size: 0.875rem;
+  border: 1px solid #d8000c;
+  flex-shrink: 0;
+  max-height: 150px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.rml-codemirror :deep(.cm-scroller) {
+  height: 100%;
+  background: inherit;
+}
+
+.rml-codemirror :deep(.cm-content),
+.rml-codemirror :deep(.cm-line) {
+  background: inherit;
+}
+
+.rml-codemirror :deep(.cm-gutters),
+.rml-codemirror :deep(.cm-gutter) {
+  background: inherit;
+  border-right: none;
+}
+
+.rml-codemirror {
+  background: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .rml-codemirror {
+    background: #1a202c;
+  }
 }
 </style>
