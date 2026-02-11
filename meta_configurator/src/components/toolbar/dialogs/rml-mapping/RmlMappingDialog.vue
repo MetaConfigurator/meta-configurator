@@ -54,6 +54,7 @@
               <div class="border rounded overflow-hidden">
                 <codemirror
                   v-model="rmlConfig"
+                  class="rml-codemirror"
                   :autofocus="false"
                   :indent-with-tab="true"
                   :tab-size="2"
@@ -322,6 +323,7 @@ label {
   flex: 1 1 0%;
   min-height: 0;
   display: flex;
+  position: relative;
 }
 
 .rml-codemirror {
@@ -330,13 +332,15 @@ label {
   width: 100%;
 }
 
-:deep(.dark .cm-frozen-line) {
-  background-color: #2a2a2a;
-}
-
 .rml-codemirror :deep(.cm-editor) {
   height: 100%;
-  background: transparent;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .error-box {
@@ -354,28 +358,7 @@ label {
 }
 
 .rml-codemirror :deep(.cm-scroller) {
+  overflow: auto;
   height: 100%;
-  background: inherit;
-}
-
-.rml-codemirror :deep(.cm-content),
-.rml-codemirror :deep(.cm-line) {
-  background: inherit;
-}
-
-.rml-codemirror :deep(.cm-gutters),
-.rml-codemirror :deep(.cm-gutter) {
-  background: inherit;
-  border-right: none;
-}
-
-.rml-codemirror {
-  background: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  .rml-codemirror {
-    background: #1a202c;
-  }
 }
 </style>
