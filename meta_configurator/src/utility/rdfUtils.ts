@@ -39,6 +39,9 @@ function getFileExtension(format: string): string {
     case 'application/rdf+xml':
       return 'rdf';
 
+    case 'text/csv':
+      return 'csv';
+
     default:
       return 'txt';
   }

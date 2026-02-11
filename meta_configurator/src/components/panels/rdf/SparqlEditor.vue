@@ -728,7 +728,7 @@ function exportAs(format: string) {
 
 function exportAsCsv() {
   const serialized = serializeAsCsv();
-  downloadFile(serialized, 'text/csv;charset=utf-8;');
+  downloadFile(serialized, 'text/csv');
 }
 
 function isValidVisualizationConstruct(query: string): boolean {
