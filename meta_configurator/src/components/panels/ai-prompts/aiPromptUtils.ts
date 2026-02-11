@@ -28,7 +28,7 @@ export function fixGeneratedExpression(
   if (json.startsWith('```') && json.endsWith('```')) {
     json = json.substring(3, json.length - 3);
   }
-  return json;
+  return json.trim();
 }
 
 function hasMoreOpeningBrackets(input: string): boolean {

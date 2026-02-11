@@ -266,6 +266,7 @@ function isIRI(value: string): boolean {
 
 function zoomIn() {
   if (cy) {
+    cy.stop(true);
     const currentZoom = cy.zoom();
     const selectedNodes = cy.nodes(':selected');
     const animationConfig: any = {
@@ -282,6 +283,7 @@ function zoomIn() {
 
 function zoomOut() {
   if (cy) {
+    cy.stop(true);
     const currentZoom = cy.zoom();
     cy.animate({
       zoom: currentZoom / 1.2,
@@ -322,13 +324,14 @@ function zoomToSelected() {
 
 function togglePhysics() {
   if (!cy) return;
+
   physicsEnabled.value = !physicsEnabled.value;
+
   if (physicsEnabled.value) {
     const randomInRange = (min: number, max: number) => min + Math.random() * (max - min);
     const idealEdgeLength = randomInRange(160, 280);
     const edgeElasticity = randomInRange(70, 140);
     const gravity = randomInRange(70, 130);
-
     const layout = cy.layout({
       name: 'cose-bilkent',
       animate: true,
@@ -441,9 +444,9 @@ function createCyStyle(): cytoscape.StylesheetCSS[] {
     {
       selector: 'node.selected',
       css: {
-        'background-color': '#2b6cb0',
+        'background-color': '#22c55e',
         'border-width': '4',
-        'border-color': '#1a365d',
+        'border-color': '#15803d',
       },
     },
     {

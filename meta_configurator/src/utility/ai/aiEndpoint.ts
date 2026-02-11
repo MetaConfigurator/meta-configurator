@@ -324,7 +324,10 @@ export const queryRmlMapping = async (
   - Use 'ql:JSONPath' for 'rml:referenceFormulation'.
   - Ensure 'rml:reference' uses the JSON field name relative to the tripes map iterator (no leading '$.' inside 'rml:reference' value — only the property name or path within the iterator).
   - If the user supplied datatypes or language tags, include them with 'rr:datatype' or 'rr:language'.
-
+  - Remove any prefixes that are not used in the mapping, for exmaple RML-related prefixes.
+  - Output should contains @context, and @graph which should be an array.
+  - Important: Add any missing prefixes which are used in the mapping.
+  
   Example input JSON: \`\`\`${exampleInput}\`\`\`
   Example input schema: \`\`\`${exampleInputSchema}\`\`\`
   Example output RML mapping: \`\`\`${exampleOutputRml}\`\`\`

@@ -20,7 +20,7 @@
               <div class="space-y-4 mb-2">
                 <Accordion v-model:value="activeAccordion">
                   <AccordionPanel value="aiPanel">
-                    <AccordionHeader>Use AI to help generate SPARQL query</AccordionHeader>
+                    <AccordionHeader>Use AI assistance to generate SPARQL queries</AccordionHeader>
                     <AccordionContent>
                       <PanelSettings
                         panel-name="API Key and AI Settings"
@@ -30,15 +30,15 @@
                         <ApiKey />
                       </PanelSettings>
                       <ApiKeyWarning />
-                      <div>
-                        <Textarea
-                          id="userComments"
-                          v-model="userComments"
-                          @click.stop
-                          @keydown.stop
-                          class="w-full mt-2"
-                          placeholder="e.g., create a sparql query to list all cities in the JSON-LD." />
-                      </div>
+                      <Textarea
+                        id="userComments"
+                        v-model="userComments"
+                        @click.stop
+                        @keydown.stop
+                        class="w-full mt-2"
+                        placeholder="Describe the query you want. For example: 
+What is the average age of all people?" />
+
                       <Message severity="warn" class="mb-2">
                         <span>Generated SPARQL queries may require manual review.</span>
                       </Message>

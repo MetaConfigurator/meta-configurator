@@ -8,16 +8,29 @@ import {
   RML_INPUT_EXAMPLE_SCHEMA,
   RML_OUTPUT_EXAMPLE,
 } from '@/rml-mapping/standard/rmlExamples';
-import {cloneDeep} from 'lodash';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import * as RmlMapper from '@comake/rmlmapper-js';
 import {Parser as N3Parser} from 'n3';
 import jsonld from 'jsonld';
 
+const RML_ERROR_MESSAGE = (reason: string) => `
+Data mapping failed. Please check the mapping configuration. 
+Use <a href="https://rml.io/specs/rml/" target="_blank">https://rml.io/specs/rml/</a> 
+to validate and fix your RML expression. Reason: ${reason}.
+`;
+
 const options = {
   toRDF: true,
   replace: false,
 };
+
+const ignoredPrefixNames = new Set(['rr', 'rml', 'ql']);
+
+const ignoredIRIs = new Set([
+  'http://www.w3.org/ns/r2rml#',
+  'http://semweb.mmlab.be/ns/rml#',
+  'http://semweb.mmlab.be/ns/ql#',
+]);
 
 export class RmlMappingServiceStandard implements RmlMappingService {
   async generateMappingSuggestion(
@@ -34,7 +47,6 @@ export class RmlMappingServiceStandard implements RmlMappingService {
         ' KB'
     );
 
-    // infer schema for input data
     const inputFileSchema = inferJsonSchema(inputDataSubset);
     const apiKey = getApiKey();
 
@@ -44,6 +56,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
     const inputFileSchemaStr = JSON.stringify(inputFileSchema);
     const targetSchemaStr = JSON.stringify(targetSchema);
     const inputDataSubsetStr = JSON.stringify(inputDataSubset);
+
     console.log(
       'Sizes of the different input files in KB:' +
         ' rml example files: ' +
@@ -100,45 +113,40 @@ export class RmlMappingServiceStandard implements RmlMappingService {
       const inputFiles = {
         'Data.json': `${JSON.stringify(input)}`,
       };
+
       let prefixes: Record<string, string> = {};
+
       new N3Parser().parse(config, (error: any, quads: any, prefixMap: Record<string, string>) => {
         if (prefixMap) {
-          prefixes = prefixMap;
+          prefixes = Object.fromEntries(
+            Object.entries(prefixMap).filter(([name, iri]) => {
+              return !ignoredPrefixNames.has(name) && !ignoredIRIs.has(iri);
+            })
+          );
         }
       });
+
       const result = await RmlMapper.parseTurtle(config, inputFiles, options);
-      const expanded = await jsonld.fromRDF(result, {format: 'application/n-quads'});
-      let final_jsonld = await jsonld.compact(expanded, prefixes);
+
+      const expanded = await jsonld.fromRDF(result, {
+        format: 'application/n-quads',
+      });
+
+      const final_jsonld = await jsonld.compact(expanded, prefixes);
+
       return {
         resultData: final_jsonld,
         success: true,
         message: 'Data mapping performed successfully.',
       };
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error performing data mapping: ', e);
       return {
         resultData: {},
         success: false,
-        message: `Data mapping failed. Please check the mapping configuration. 
-        Use <a href="https://rml.io/specs/rml/" target="_blank">https://rml.io/specs/rml/</a> 
-        to validate and fix your RML expression. Reason: ${e.message}.`,
+        message: RML_ERROR_MESSAGE(e.message),
       };
     }
-  }
-
-  sanitizeInputDocument(input: any): any {
-    const result = cloneDeep(input);
-    // loop through nested JSON object which could also have array as children and remove all special characters from property names
-    this.removeSpecialCharactersRecursive(result);
-    return result;
-  }
-
-  removeSpecialCharactersRecursive(data: any) {
-    // TODO
-  }
-
-  sanitizeMappingConfig(config: string, input: any): string {
-    return config; // TODO
   }
 
   validateMappingConfig(config: string, input: any): {success: boolean; message: string} {
@@ -177,11 +185,11 @@ export class RmlMappingServiceStandard implements RmlMappingService {
     let column = position;
 
     for (let i = 0; i < lines.length; i++) {
-      if (column < lines[i].length) {
+      if (column < lines[i]!.length) {
         row = i;
         break;
       }
-      column -= lines[i].length + 1; // +1 for the newline character
+      column -= lines[i]!.length + 1;
     }
 
     return {row, column};

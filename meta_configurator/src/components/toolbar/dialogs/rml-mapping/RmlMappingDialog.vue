@@ -1,11 +1,88 @@
+<template>
+  <Dialog
+    v-model:visible="showDialog"
+    header="Convert JSON data to JSON-LD using RML"
+    modal
+    maximizable
+    :style="{width: '800px', height: '900px'}">
+    <div class="rml-dialog-body">
+      <Message severity="warn" v-if="mappingServiceWarning.length">
+        <span v-html="mappingServiceWarning"></span>
+      </Message>
+      <Stepper v-model:value="activeStep" class="rml-stepper">
+        <StepList>
+          <Step value="1">Generate Suggestion</Step>
+          <Step value="2">Apply Mapping</Step>
+        </StepList>
+        <StepPanels>
+          <StepPanel value="1">
+            <div class="step-panel">
+              <PanelSettings
+                panel-name="API Key and AI Settings"
+                settings-header="AI Settings"
+                :panel-settings-path="['aiIntegration']"
+                :sessionMode="SessionMode.DataEditor">
+                <ApiKey />
+              </PanelSettings>
+              <ApiKeyWarning />
+              <p class="text-sm text-gray-700">
+                This tool converts the JSON data from the <strong>Data Editor</strong> to
+                <strong>JSON-LD</strong>. You can optionally provide extra instructions below to
+                guide the mapping.
+              </p>
+              <div class="hints-block">
+                <label for="userComments" class="block font-semibold mb-1">
+                  Additional Mapping Hints
+                </label>
+                <Textarea
+                  id="userComments"
+                  v-model="userComments"
+                  class="w-full rml-hints-textarea"
+                  placeholder="e.g., rename fields, format dates..." />
+              </div>
+              <Button
+                label="Generate Suggestion"
+                icon="pi pi-wand"
+                @click="generateMappingSuggestion"
+                :loading="isLoadingMapping" />
+            </div>
+          </StepPanel>
+          <StepPanel value="2">
+            <div class="step-panel">
+              <Divider />
+              <label :for="editor_id" class="block font-semibold mb-2">Mapping Configuration</label>
+              <div class="editor-block border rounded overflow-hidden">
+                <div :id="editor_id" class="editor-host" />
+              </div>
+              <Button
+                :disabled="!resultIsValid"
+                label="Perform Mapping"
+                icon="pi pi-play"
+                @click="performMapping" />
+              <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
+              <Message severity="error" v-if="errorMessage.length">
+                <span v-html="errorMessage"></span>
+              </Message>
+            </div>
+          </StepPanel>
+        </StepPanels>
+      </Stepper>
+    </div>
+  </Dialog>
+</template>
+
 <script setup lang="ts">
 import {ref, computed, watch, type Ref, onMounted, nextTick} from 'vue';
 import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
-import Select from 'primevue/select';
 import Divider from 'primevue/divider';
 import Message from 'primevue/message';
+import Stepper from 'primevue/stepper';
+import StepList from 'primevue/steplist';
+import Step from 'primevue/step';
+import StepPanels from 'primevue/steppanels';
+import StepPanel from 'primevue/steppanel';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
@@ -27,34 +104,22 @@ const editor: Ref<Editor | null> = ref(null);
 const input = ref({});
 const result = ref('');
 const resultIsValid = ref(false);
-const statusMessage = ref('');
-const errorMessage = ref('');
+const statusMessage = ref('aaaa');
+const errorMessage = ref('addasass');
 const userComments = ref('');
 const isLoadingMapping = ref(false);
-
+const activeStep = ref('1');
 const settings = useSettings();
 
-const mappingServiceTypes = ['Standard (RML)'];
-
-const mappingServiceWarnings = ['No warnings for the RML mapping service at the moment.'];
-
-const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]);
-
 const mappingService: Ref<RmlMappingService> = computed(() => {
-  if (selectedMappingServiceType.value === 'Standard (RML)') {
-    return new RmlMappingServiceStandard();
-  }
-  // Add other mapping service types here
-  throw new Error('Invalid mapping service type');
+  return new RmlMappingServiceStandard();
 });
 
 const mappingServiceWarning: Ref<string> = computed(() => {
-  const index = mappingServiceTypes.indexOf(selectedMappingServiceType.value);
-  return mappingServiceWarnings[index] || '';
+  return '';
 });
 
 onMounted(() => {
-  // when a new result is generated: replace the editor content with it
   watch(
     () => result.value,
     newValue => {
@@ -67,9 +132,8 @@ onMounted(() => {
 });
 
 watch(showDialog, async visible => {
-  // when the dialog turns visible, initialize the editor
   if (visible) {
-    await nextTick(); // Wait until dialog content is rendered
+    await nextTick();
     initializeEditor();
 
     if (result.value.length > 0) {
@@ -79,10 +143,8 @@ watch(showDialog, async visible => {
 });
 
 function openDialog() {
-  // when the dialog is opened, reset old values and load the current input data into the component, sanitize it
   resetDialog();
   input.value = getDataForMode(SessionMode.DataEditor).data.value;
-  input.value = mappingService.value.sanitizeInputDocument(input.value);
   showDialog.value = true;
 }
 
@@ -102,15 +164,11 @@ function resetDialog() {
 function initializeEditor() {
   const container = document.getElementById(editor_id);
 
-  if (!container) {
-    console.log('Unable to initialize editor because element is not found.');
-    return;
-  }
+  if (!container) return;
 
-  // Destroy any existing editor if present
   if (editor.value) {
     editor.value.destroy();
-    editor.value.container.innerHTML = ''; // Clean up old editor DOM
+    editor.value.container.innerHTML = '';
     editor.value = null;
     editorInitialized.value = false;
   }
@@ -150,6 +208,7 @@ function generateMappingSuggestion() {
     .generateMappingSuggestion(input.value, targetSchema, userComments.value)
     .then(res => {
       result.value = res.config;
+      activeStep.value = '2';
       if (res.success) {
         statusMessage.value = res.message;
         errorMessage.value = '';
@@ -180,9 +239,6 @@ function performMapping() {
     if (res.success) {
       statusMessage.value = res.message;
       errorMessage.value = '';
-      console.log('Mapping result data:');
-      console.log(res.resultData);
-      console.log('---');
       getDataForMode(SessionMode.DataEditor).setData(res.resultData);
       hideDialog();
     } else {
@@ -195,80 +251,82 @@ function performMapping() {
 defineExpose({show: openDialog, close: hideDialog});
 </script>
 
-<template>
-  <Dialog
-    v-model:visible="showDialog"
-    header="Convert JSON data to JSON-LD using RML"
-    :modal="true"
-    :style="{width: '50vw'}">
-    <div class="space-y-4">
-      <PanelSettings
-        panel-name="API Key and AI Settings"
-        settings-header="AI Settings"
-        :panel-settings-path="['aiIntegration']"
-        :sessionMode="SessionMode.DataEditor">
-        <ApiKey />
-      </PanelSettings>
-      <ApiKeyWarning />
-      <Message severity="warn" v-if="mappingServiceWarning.length">
-        <span v-html="mappingServiceWarning"></span>
-      </Message>
-
-      <p class="text-sm text-gray-700">
-        This tool converts the JSON data from the <strong>Data Editor</strong> to
-        <strong>JSON-LD</strong>. You can optionally provide extra instructions below to guide the
-        mapping.
-      </p>
-
-      <div>
-        <label for="userComments" class="block font-semibold mb-1">Additional Mapping Hints</label>
-        <Textarea
-          id="userComments"
-          v-model="userComments"
-          class="w-full"
-          placeholder="e.g., rename fields, format dates..." />
-      </div>
-
-      <div
-        v-if="mappingServiceTypes && mappingServiceTypes.length > 1"
-        class="flex items-center gap-2">
-        <label class="font-semibold">Mapping Method</label>
-        <Select
-          v-model="selectedMappingServiceType"
-          :options="mappingServiceTypes"
-          class="flex-1" />
-      </div>
-      <Button
-        label="Generate Suggestion"
-        icon="pi pi-wand"
-        @click="generateMappingSuggestion"
-        class="w-full"
-        :loading="isLoadingMapping" />
-
-      <div class="mt-6">
-        <Divider />
-        <label :for="editor_id" class="block font-semibold mb-2">Mapping Configuration</label>
-        <div class="border rounded h-72 overflow-hidden">
-          <div :id="editor_id" class="h-full w-full" />
-        </div>
-        <Button
-          v-if="resultIsValid"
-          label="Perform Mapping"
-          icon="pi pi-play"
-          class="mt-4 w-full"
-          @click="performMapping" />
-      </div>
-
-      <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
-      <Message severity="error" v-if="errorMessage.length">
-        <span v-html="errorMessage"></span>
-      </Message>
-    </div>
-  </Dialog>
-</template>
-
 <style scoped>
 label {
   font-size: 0.9rem;
+}
+
+.rml-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  min-height: 0;
+}
+
+.rml-stepper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rml-stepper :deep(.p-steppanels),
+.rml-stepper :deep(.p-steppanel) {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.rml-stepper :deep(.p-steppanel-content) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.step-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.hints-block {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hints-block :deep(.p-textarea),
+.hints-block :deep(textarea) {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.editor-block {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+}
+
+.step-panel :deep(.p-message) {
+  flex-shrink: 0;
+}
+
+.editor-host {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>

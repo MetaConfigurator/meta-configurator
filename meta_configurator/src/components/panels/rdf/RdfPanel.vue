@@ -31,10 +31,10 @@
     <div v-if="!dataIsInJsonLd" class="alert alert-warning">
       <p class="alert-title">JSON-LD required:</p>
       <p class="alert-text">
-        To use the RDF panel, your data must be in valid JSON-LD format. If your data is JSON, you
-        can use
-        <a href="#" @click.prevent="showRmlMappingDialog" class="alert-link"> JSON → JSON-LD </a>
-        to convert it.
+        To use the RDF panel, your data must be in valid JSON-LD format. If your data is already in
+        JSON format, you can use
+        <a href="#" @click.prevent="showRmlMappingDialog" class="alert-link"> JSON to JSON-LD </a>
+        converter.
       </p>
     </div>
     <div class="panel-content">

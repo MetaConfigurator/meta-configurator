@@ -1,9 +1,7 @@
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 
 export interface RmlMappingService {
-  sanitizeMappingConfig(config: string, input: any): string;
   validateMappingConfig(config: string, input: any): {success: boolean; message: string};
-  sanitizeInputDocument(input: any): any;
   generateMappingSuggestion(
     input: any,
     targetSchema: TopLevelSchema,
