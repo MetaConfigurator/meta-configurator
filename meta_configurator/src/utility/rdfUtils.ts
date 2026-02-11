@@ -1,10 +1,7 @@
 import type {Path} from './path';
 
-export function downloadFile(
-  serialized: {content: string; success: boolean; errorMessage: string},
-  format: string
-) {
-  const blob = new Blob([serialized.content], {type: format});
+export function downloadFile(serialized: string, format: string) {
+  const blob = new Blob([serialized], {type: format});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

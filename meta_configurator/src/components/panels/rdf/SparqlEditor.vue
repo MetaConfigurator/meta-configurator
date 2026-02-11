@@ -3,7 +3,7 @@
     <Tabs v-model:value="activeTab">
       <TabList>
         <Tab value="query">Query</Tab>
-        <Tab value="result">Result</Tab>
+        <Tab value="result" :disabled="!enableResult">Result</Tab>
         <Tab value="visualizer" :disabled="!enableVisualization">Visualizer</Tab>
       </TabList>
       <TabPanels>
@@ -161,9 +161,7 @@
                       text
                       :disabled="!results.length"
                       @click="toggleExportPopover" />
-                    <Popover ref="exportPopover">
-                      <Menu :style="'border: none'" :model="exportMenuItems" />
-                    </Popover>
+                    <TieredMenu ref="exportPopover" :model="exportMenuItems" popup />
                   </div>
                   <IconField>
                     <Button
@@ -238,6 +236,7 @@ import {sparql} from 'codemirror-lang-sparql';
 import {syntaxHighlighting, HighlightStyle} from '@codemirror/language';
 import {tags} from '@lezer/highlight';
 import {oneDark} from '@codemirror/theme-one-dark';
+import TieredMenu from 'primevue/tieredmenu';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {StateEffect, StateField} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
@@ -260,25 +259,32 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import Dialog from 'primevue/dialog';
-import Popover from 'primevue/popover';
-import Menu from 'primevue/menu';
 import {ScrollPanel} from 'primevue';
 import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 import ToggleSwitch from 'primevue/toggleswitch';
 import {formatCellValue} from '@/components/panels/rdf/rdfUtils';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
+import {downloadFile} from '@/utility/rdfUtils';
 
+enum QueryResultMode {
+  CONSTRUCT = 'construct',
+  SELECT = 'select',
+}
+
+const queryMode = ref<QueryResultMode>(QueryResultMode.SELECT);
 const isLoading = ref(false);
 const userComments = ref('');
 const result = ref('');
 const statusMessage = ref('');
 const activeAccordion = ref<string | null>(null);
 
+let validateTimer: number | null = null;
 const statements = ref<$rdf.Statement[]>([]);
 const visualizationHelpDialog = ref(false);
 const addErrorLine = StateEffect.define<number | null>();
 const clearErrorLines = StateEffect.define<null>();
+const enableResult = ref(false);
 const enableVisualization = ref(false);
 const view = shallowRef();
 const results = ref<Record<string, string>[]>([]);
@@ -287,6 +293,7 @@ const exportPopover = ref();
 const errorMessage = ref<string | null>(null);
 const filters = ref<Record<string, any>>({});
 const activeTab = ref('query');
+const priority = ['?subject', '?predicate', '?object'];
 const errorLineMark = Decoration.line({
   attributes: {class: 'cm-error-line'},
 });
@@ -299,6 +306,32 @@ const sparqlHighlightStyle = HighlightStyle.define([
   {tag: tags.operator, color: '#89ddff'},
   {tag: tags.punctuation, color: '#abb2bf'},
 ]);
+
+const exportOnConstruct = [
+  {
+    label: 'Turtle',
+    icon: 'pi pi-file',
+    command: () => exportAs('text/turtle'),
+  },
+  {
+    label: 'N-Triples',
+    icon: 'pi pi-file',
+    command: () => exportAs('application/n-triples'),
+  },
+  {
+    label: 'RDF/XML',
+    icon: 'pi pi-file',
+    command: () => exportAs('application/rdf+xml'),
+  },
+];
+
+const exportOnSelect = [
+  {
+    label: 'CSV',
+    icon: 'pi pi-file',
+    command: () => exportAsCsv(),
+  },
+];
 
 async function suggestSparql(): Promise<{config: string; success: boolean; message: string}> {
   const inputDataSubset = trimDataToMaxSize(getDataForMode(SessionMode.DataEditor).data.value);
@@ -356,8 +389,6 @@ function suggestSparqlQuery() {
       isLoading.value = false;
     });
 }
-
-const priority = ['?subject', '?predicate', '?object'];
 
 const errorLineField = StateField.define({
   create() {
@@ -516,6 +547,8 @@ const runQuery = async () => {
   } else {
     await runSelectQuery(engine, sources);
   }
+
+  enableResult.value = true;
 };
 
 const runConstructQuery = async (engine: any, sources: any[]) => {
@@ -527,6 +560,7 @@ const runConstructQuery = async (engine: any, sources: any[]) => {
     columns.value = sorted;
     initFilters(sorted);
 
+    queryMode.value = QueryResultMode.CONSTRUCT;
     statements.value = stmts;
     activeTab.value = 'visualizer';
   };
@@ -581,6 +615,7 @@ const runSelectQuery = async (engine: any, sources: any[]) => {
       const cols = rows.length ? Object.keys(rows[0]!) : computedColumns;
       const sorted = sortColumns(cols);
 
+      queryMode.value = QueryResultMode.SELECT;
       columns.value = sorted;
       initFilters(sorted);
       activeTab.value = 'result';
@@ -648,8 +683,6 @@ watch(
   {immediate: true}
 );
 
-let validateTimer: number | null = null;
-
 const validateLive = () => {
   if (validateTimer) window.clearTimeout(validateTimer);
 
@@ -669,6 +702,35 @@ const validateLive = () => {
   }, 250);
 };
 
+function serializeAsCsv() {
+  if (!results.value.length || !columns.value.length) return '';
+
+  const escapeCell = (value: string) => {
+    if (value.includes('"')) value = value.replace(/"/g, '""');
+    if (/[",\n\r]/.test(value)) return `"${value}"`;
+    return value;
+  };
+
+  const rows = [
+    columns.value.join(','),
+    ...results.value.map(row =>
+      columns.value.map(col => escapeCell(String(row[col] ?? ''))).join(',')
+    ),
+  ];
+
+  return rows.join('\n');
+}
+
+function exportAs(format: string) {
+  const serialized = rdfStoreManager.exportAs(format, statements.value);
+  downloadFile(serialized.content, format);
+}
+
+function exportAsCsv() {
+  const serialized = serializeAsCsv();
+  downloadFile(serialized, 'text/csv;charset=utf-8;');
+}
+
 function isValidVisualizationConstruct(query: string): boolean {
   const normalized = query
     .replace(/#[^\n]*/g, '')
@@ -685,6 +747,10 @@ watch(sparqlQuery, () => {
   validateLive();
 });
 
+const exportMenuItems = computed(() =>
+  queryMode.value === QueryResultMode.CONSTRUCT ? exportOnConstruct : exportOnSelect
+);
+
 function openVisualizationHelpDialog() {
   visualizationHelpDialog.value = true;
 }
@@ -693,42 +759,9 @@ function visualizationCanceled() {
   activeTab.value = 'query';
 }
 
-const exportMenuItems = [
-  {
-    label: 'CSV',
-    icon: 'pi pi-file',
-    command: () => exportResultsCsv(),
-  },
-];
-
 const toggleExportPopover = (event: Event) => {
   exportPopover.value.toggle(event);
 };
-
-function exportResultsCsv() {
-  if (!results.value.length || !columns.value.length) return;
-
-  const escapeCell = (value: string) => {
-    if (value.includes('"')) value = value.replace(/"/g, '""');
-    if (/[",\n\r]/.test(value)) return `"${value}"`;
-    return value;
-  };
-
-  const rows = [
-    columns.value.join(','),
-    ...results.value.map(row =>
-      columns.value.map(col => escapeCell(String(row[col] ?? ''))).join(',')
-    ),
-  ];
-
-  const blob = new Blob([rows.join('\n')], {type: 'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'sparql-results.csv';
-  link.click();
-  URL.revokeObjectURL(url);
-}
 </script>
 
 <style scoped>
@@ -886,8 +919,5 @@ function exportResultsCsv() {
 .error-box,
 .editor-footer {
   flex-shrink: 0;
-}
-.p-popover-content {
-  padding: 0%;
 }
 </style>

@@ -29,7 +29,10 @@ interface RdfStore {
     statement: $rdf.Statement,
     isNewNode: boolean
   ) => {success: boolean; errorMessage: string};
-  exportAs: (format: string) => {content: string; success: boolean; errorMessage: string};
+  exportAs: (
+    format: string,
+    statements?: $rdf.Statement[]
+  ) => {content: string; success: boolean; errorMessage: string};
   findMatchingStatementIndex: (path: Path) => Promise<number>;
   statementAsJsonLd: (statement: $rdf.Statement) => string | undefined;
   containsSubject: (statement: $rdf.Statement) => boolean;
@@ -186,17 +189,30 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const exportAs = (
-    format: string
+    format: string,
+    statements?: $rdf.Statement[]
   ): {content: string | undefined; success: boolean; errorMessage: string} => {
+    let serialized: string | undefined = '';
     if (!_store.value) {
       return {content: '', success: false, errorMessage: 'Store is not initialized.'};
     }
-    const serialized = $rdf.serialize(
-      null,
-      _store.value as $rdf.Formula,
-      'http://example.org/',
-      format
-    );
+    if (statements) {
+      const tempStore = $rdf.graph();
+      const namespaces = _store.value.namespaces ?? {};
+      Object.entries(namespaces).forEach(([prefix, iri]) => {
+        tempStore.setPrefixForURI(prefix, iri);
+      });
+      statements.forEach(st => tempStore.add(st));
+      serialized = $rdf.serialize(null, tempStore as $rdf.Formula, 'http://example.org/', format);
+    } else {
+      serialized = $rdf.serialize(
+        null,
+        _store.value as $rdf.Formula,
+        'http://example.org/',
+        format
+      );
+    }
+
     return {content: serialized, success: true, errorMessage: ''};
   };
 

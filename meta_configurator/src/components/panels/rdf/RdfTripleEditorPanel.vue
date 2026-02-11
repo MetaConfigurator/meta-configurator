@@ -57,9 +57,7 @@
             text
             :disabled="items.length === 0"
             @click="toggleExportPopover" />
-          <Popover ref="exportPopover">
-            <Menu :style="'border: none'" :model="exportMenuItems" />
-          </Popover>
+          <TieredMenu ref="exportPopover" :model="exportMenuItems" popup />
           <Button
             label="SPARQL"
             icon="pi pi-search"
@@ -261,8 +259,7 @@ import IconField from 'primevue/iconfield';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
-import Popover from 'primevue/popover';
-import Menu from 'primevue/menu';
+import TieredMenu from 'primevue/tieredmenu';
 import ToggleButton from 'primevue/togglebutton';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
@@ -542,7 +539,7 @@ function translateIRI(iriTerm: string) {
 
 function exportAs(format: string) {
   const serialized = rdfStoreManager.exportAs(format);
-  downloadFile(serialized, format);
+  downloadFile(serialized.content, format);
 }
 
 initFilters();
