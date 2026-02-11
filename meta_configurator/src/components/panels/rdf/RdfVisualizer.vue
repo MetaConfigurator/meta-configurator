@@ -198,6 +198,12 @@ const dockItems = computed(() => [
     command: () => zoomFit(),
   },
   {
+    label: 'Zoom to Selected',
+    icon: 'pi pi-map-marker',
+    disabled: !selectedNode.value,
+    command: () => zoomToSelected(),
+  },
+  {
     label: physicsEnabled.value ? 'Stop' : 'Animate',
     icon: physicsEnabled.value ? 'pi pi-pause' : 'pi pi-play',
     command: () => togglePhysics(),
@@ -296,6 +302,22 @@ function zoomFit() {
       easing: 'ease-in-out-cubic',
     });
   }
+}
+
+function zoomToSelected() {
+  if (!cy) return;
+
+  const node = selectedCyNode.value ?? cy.nodes(':selected').first();
+  if (!node || node.length === 0) return;
+
+  cy.animate({
+    fit: {
+      eles: node,
+      padding: 80,
+    },
+    duration: 400,
+    easing: 'ease-in-out-cubic',
+  });
 }
 
 function togglePhysics() {
