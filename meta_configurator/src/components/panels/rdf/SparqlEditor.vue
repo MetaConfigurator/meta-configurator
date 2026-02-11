@@ -152,7 +152,19 @@
               :rowsPerPageOptions="[10, 20, 50]"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results">
               <template v-if="columns.length > 0" #header>
-                <div class="flex justify-end items-center w-full">
+                <div class="flex items-center justify-between w-full">
+                  <div class="flex items-center gap-2">
+                    <Button
+                      label="Export"
+                      icon="pi pi-upload"
+                      severity="contrast"
+                      text
+                      :disabled="!results.length"
+                      @click="toggleExportPopover" />
+                    <Popover ref="exportPopover">
+                      <Menu :style="'border: none'" :model="exportMenuItems" />
+                    </Popover>
+                  </div>
                   <IconField>
                     <Button
                       type="button"
@@ -248,6 +260,8 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import Dialog from 'primevue/dialog';
+import Popover from 'primevue/popover';
+import Menu from 'primevue/menu';
 import {ScrollPanel} from 'primevue';
 import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
@@ -269,6 +283,7 @@ const enableVisualization = ref(false);
 const view = shallowRef();
 const results = ref<Record<string, string>[]>([]);
 const columns = ref<string[]>([]);
+const exportPopover = ref();
 const errorMessage = ref<string | null>(null);
 const filters = ref<Record<string, any>>({});
 const activeTab = ref('query');
@@ -677,6 +692,43 @@ function openVisualizationHelpDialog() {
 function visualizationCanceled() {
   activeTab.value = 'query';
 }
+
+const exportMenuItems = [
+  {
+    label: 'CSV',
+    icon: 'pi pi-file',
+    command: () => exportResultsCsv(),
+  },
+];
+
+const toggleExportPopover = (event: Event) => {
+  exportPopover.value.toggle(event);
+};
+
+function exportResultsCsv() {
+  if (!results.value.length || !columns.value.length) return;
+
+  const escapeCell = (value: string) => {
+    if (value.includes('"')) value = value.replace(/"/g, '""');
+    if (/[",\n\r]/.test(value)) return `"${value}"`;
+    return value;
+  };
+
+  const rows = [
+    columns.value.join(','),
+    ...results.value.map(row =>
+      columns.value.map(col => escapeCell(String(row[col] ?? ''))).join(',')
+    ),
+  ];
+
+  const blob = new Blob([rows.join('\n')], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'sparql-results.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+}
 </script>
 
 <style scoped>
@@ -834,5 +886,8 @@ function visualizationCanceled() {
 .error-box,
 .editor-footer {
   flex-shrink: 0;
+}
+.p-popover-content {
+  padding: 0%;
 }
 </style>
