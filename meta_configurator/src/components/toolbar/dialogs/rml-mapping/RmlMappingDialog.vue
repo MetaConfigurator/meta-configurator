@@ -16,36 +16,38 @@
         </StepList>
         <StepPanels>
           <StepPanel value="1">
-            <div class="step-panel">
-              <PanelSettings
-                panel-name="API Key and AI Settings"
-                settings-header="AI Settings"
-                :panel-settings-path="['aiIntegration']"
-                :sessionMode="SessionMode.DataEditor">
-                <ApiKey />
-              </PanelSettings>
-              <ApiKeyWarning />
-              <p class="text-sm text-gray-700">
-                This tool converts the JSON data from the <strong>Data Editor</strong> to
-                <strong>JSON-LD</strong>. You can optionally provide extra instructions below to
-                guide the mapping.
-              </p>
-              <div class="hints-block">
-                <label for="userComments" class="block font-semibold mb-1">
-                  Additional Mapping Hints
-                </label>
-                <Textarea
-                  id="userComments"
-                  v-model="userComments"
-                  class="w-full rml-hints-textarea"
-                  placeholder="e.g., rename fields, format dates..." />
+            <ScrollPanel class="step-panel-scroll" style="width: 100%; height: 100%">
+              <div class="step-panel step-panel-fill step-panel-scroll-body">
+                <PanelSettings
+                  panel-name="API Key and AI Settings"
+                  settings-header="AI Settings"
+                  :panel-settings-path="['aiIntegration']"
+                  :sessionMode="SessionMode.DataEditor">
+                  <ApiKey />
+                </PanelSettings>
+                <ApiKeyWarning />
+                <p class="text-sm text-gray-700">
+                  This tool converts the JSON data from the <strong>Data Editor</strong> to
+                  <strong>JSON-LD</strong>. You can optionally provide extra instructions below to
+                  guide the mapping.
+                </p>
+                <div class="hints-block">
+                  <label for="userComments" class="block font-semibold mb-1">
+                    Additional Mapping Hints
+                  </label>
+                  <Textarea
+                    id="userComments"
+                    v-model="userComments"
+                    class="w-full rml-hints-textarea"
+                    placeholder="e.g., rename fields, format dates..." />
+                </div>
+                <Button
+                  label="Generate Suggestion"
+                  icon="pi pi-wand"
+                  @click="generateMappingSuggestion"
+                  :loading="isLoadingMapping" />
               </div>
-              <Button
-                label="Generate Suggestion"
-                icon="pi pi-wand"
-                @click="generateMappingSuggestion"
-                :loading="isLoadingMapping" />
-            </div>
+            </ScrollPanel>
           </StepPanel>
           <StepPanel value="2">
             <div class="step-panel">
@@ -89,6 +91,7 @@ import StepList from 'primevue/steplist';
 import Step from 'primevue/step';
 import StepPanels from 'primevue/steppanels';
 import StepPanel from 'primevue/steppanel';
+import ScrollPanel from 'primevue/scrollpanel';
 import {Codemirror} from 'vue-codemirror';
 import {basicSetup} from 'codemirror';
 import {syntaxHighlighting, HighlightStyle, StreamLanguage} from '@codemirror/language';
@@ -285,12 +288,34 @@ label {
   overflow: hidden;
 }
 
+.step-panel-fill {
+  min-height: 0;
+  flex: 1;
+}
+
+.step-panel-scroll-body {
+  min-height: 100%;
+}
+
 .hints-block {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.step-panel-scroll :deep(.p-scrollpanel-content) {
+  display: block;
+}
+
+.step-panel-scroll :deep(.p-scrollpanel-wrapper) {
+  height: 100%;
+}
+
+.step-panel-scroll {
+  flex: 1;
+  min-height: 0;
 }
 
 .hints-block :deep(.p-textarea),
