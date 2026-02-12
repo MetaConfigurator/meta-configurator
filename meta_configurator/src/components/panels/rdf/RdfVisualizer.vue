@@ -52,8 +52,7 @@
         v-if="propertiesPanelVisible"
         class="properties-panel-wrapper"
         :size="propertiesPanelSize"
-        :minSize="propertiesPanelMinSize"
-        :class="{'properties-hidden': !propertiesPanelVisible}">
+        :minSize="propertiesPanelMinSize">
         <div class="properties-content">
           <div class="properties-body">
             <div class="node-cards">
@@ -265,45 +264,16 @@ function isIRI(value: string): boolean {
 }
 
 function zoomIn() {
-  if (cy) {
-    cy.stop(true);
-    const currentZoom = cy.zoom();
-    const selectedNodes = cy.nodes(':selected');
-    const animationConfig: any = {
-      zoom: currentZoom * 1.2,
-      duration: 300,
-      easing: 'ease-in-out-cubic',
-    };
-    if (selectedNodes.length > 0) {
-      animationConfig.center = {eles: selectedNodes};
-    }
-    cy.animate(animationConfig);
-  }
+  animateZoom(1.2, true);
 }
 
 function zoomOut() {
-  if (cy) {
-    cy.stop(true);
-    const currentZoom = cy.zoom();
-    cy.animate({
-      zoom: currentZoom / 1.2,
-      duration: 300,
-      easing: 'ease-in-out-cubic',
-    });
-  }
+  animateZoom(1 / 1.2, false);
 }
 
 function zoomFit() {
-  if (cy) {
-    cy.animate({
-      fit: {
-        eles: cy.elements(),
-        padding: 30,
-      },
-      duration: 400,
-      easing: 'ease-in-out-cubic',
-    });
-  }
+  if (!cy) return;
+  animateFit(cy.elements(), 30, 400);
 }
 
 function zoomToSelected() {
@@ -312,14 +282,7 @@ function zoomToSelected() {
   const node = selectedCyNode.value ?? cy.nodes(':selected').first();
   if (!node || node.length === 0) return;
 
-  cy.animate({
-    fit: {
-      eles: node,
-      padding: 80,
-    },
-    duration: 400,
-    easing: 'ease-in-out-cubic',
-  });
+  animateFit(node, 80, 400);
 }
 
 function togglePhysics() {
@@ -328,20 +291,7 @@ function togglePhysics() {
   physicsEnabled.value = !physicsEnabled.value;
 
   if (physicsEnabled.value) {
-    const randomInRange = (min: number, max: number) => min + Math.random() * (max - min);
-    const idealEdgeLength = randomInRange(160, 280);
-    const edgeElasticity = randomInRange(70, 140);
-    const gravity = randomInRange(70, 130);
-    const layout = cy.layout({
-      name: 'cose-bilkent',
-      animate: true,
-      animationDuration: 1000,
-      randomize: true,
-      idealEdgeLength,
-      edgeElasticity,
-      gravity,
-      numIter: 15000,
-    });
+    const layout = buildPhysicsLayout();
     layout.on('layoutstop', () => {
       physicsEnabled.value = false;
     });
@@ -350,18 +300,10 @@ function togglePhysics() {
 }
 
 function selectNode(node: any, nodeData: any) {
-  if (selectedCyNode.value) {
-    selectedCyNode.value.removeClass('selected');
-  }
-
+  clearSelectedNode();
   node.addClass('selected');
   selectedCyNode.value = node;
-
-  selectedNode.value = {
-    id: nodeData.id,
-    label: nodeData.label,
-    literals: nodeData.literals,
-  };
+  selectedNode.value = toSelectedNodeData(nodeData);
 }
 
 function getPredicateAlias(predicate: string): string {
@@ -517,52 +459,24 @@ function buildGraphElements(statements: readonly $rdf.Statement[]) {
     const p = st.predicate.value;
     const o = st.object.value;
 
-    if (!nodesMap.has(s)) {
-      nodesMap.set(s, {literals: []});
-    }
+    ensureNode(nodesMap, s);
 
     if (st.object.termType === RdfTermType.Literal) {
-      nodesMap.get(s)!.literals!.push({
-        predicate: getPredicateAlias(p),
-        value: o,
-        isIRI: isIRI(o),
-      });
+      addLiteral(nodesMap, s, p, o);
       continue;
     }
 
     if (isTypePredicate(p) || !existingSubjects.has(o)) {
-      nodesMap.get(s)!.literals!.push({
-        predicate: getPredicateAlias(p),
-        value: toPrefixed(o),
-        isIRI: isIRI(o),
-      });
+      addLiteral(nodesMap, s, p, toPrefixed(o));
       continue;
     }
 
-    if (!nodesMap.has(o)) {
-      nodesMap.set(o, {literals: []});
-    }
+    ensureNode(nodesMap, o);
 
-    edges.push({
-      data: {
-        id: `${s}-${p}-${o}`,
-        source: s,
-        target: o,
-        label: getPredicateAlias(p),
-        predicateIRI: p,
-      },
-    });
+    edges.push(createEdge(s, p, o));
   }
 
-  const nodes = Array.from(nodesMap.entries()).map(([id, data]) => ({
-    data: {
-      id,
-      label: toPrefixed(id),
-      hasLiterals: data.literals && data.literals.length > 0,
-      literalCount: data.literals?.length || 0,
-      literals: data.literals,
-    },
-  }));
+  const nodes = Array.from(nodesMap.entries()).map(([id, data]) => createNode(id, data));
 
   return [...nodes, ...edges];
 }
@@ -583,88 +497,13 @@ function setupCytoscape(elements: cytoscape.ElementDefinition[]) {
 }
 
 function attachCytoscapeEvents(graph: cytoscape.Core, initialFit: () => void) {
-  graph.userPanningEnabled(true);
-  graph.userZoomingEnabled(true);
-  graph.boxSelectionEnabled(true);
-
-  graph.on('layoutstop', () => {
-    isLoading.value = false;
-    graphLoaded.value = true;
-    initialFit();
-  });
-
-  graph.on('tap', 'node', event => {
-    const node = event.target;
-    const nodeData = node.data();
-
-    node.animate({
-      style: {'border-width': 6},
-      duration: 200,
-      complete: function () {
-        node.animate({
-          style: {'border-width': 4},
-          duration: 200,
-        });
-      },
-    });
-
-    selectNode(node, nodeData);
-  });
-
-  graph.on('tap', event => {
-    if (event.target === graph) {
-      if (selectedCyNode.value) {
-        selectedCyNode.value.removeClass('selected');
-      }
-      selectedCyNode.value = null;
-      selectedNode.value = null;
-    }
-  });
-
-  graph.on('tap', 'edge', event => {
-    const edge = event.target;
-    const predicateIRI = edge.data('predicateIRI');
-
-    edge.animate({
-      style: {width: 5},
-      duration: 200,
-      complete: function () {
-        edge.animate({
-          style: {width: 2},
-          duration: 200,
-        });
-      },
-    });
-
-    const href = iriHref(predicateIRI);
-    if (href) {
-      window.open(href, '_blank', 'noopener,noreferrer');
-    }
-  });
-
-  graph.on('mouseover', 'edge', () => {
-    if (container.value) {
-      container.value.style.cursor = 'pointer';
-    }
-  });
-
-  graph.on('mouseout', 'edge', () => {
-    if (container.value) {
-      container.value.style.cursor = 'default';
-    }
-  });
-
-  graph.on('dbltap', 'node', event => {
-    const node = event.target;
-    graph.animate({
-      fit: {
-        eles: node.neighborhood().add(node),
-        padding: 100,
-      },
-      duration: 500,
-      easing: 'ease-in-out-cubic',
-    });
-  });
+  enableGraphInteractions(graph);
+  registerLayoutStop(graph, initialFit);
+  registerNodeTap(graph);
+  registerCanvasTap(graph);
+  registerEdgeTap(graph);
+  registerEdgeHover(graph);
+  registerNodeDblTap(graph);
 }
 
 function renderGraph(statements: readonly $rdf.Statement[]) {
@@ -681,9 +520,221 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
   attachCytoscapeEvents(graph, () => {
     if (didInitialFit) return;
     didInitialFit = true;
-    graph.resize();
-    graph.fit(undefined, 30);
+    resizeAndFit(graph);
   });
+}
+
+function animateZoom(factor: number, centerOnSelected: boolean) {
+  if (!cy) return;
+  cy.stop(true);
+  const currentZoom = cy.zoom();
+  const animationConfig: any = {
+    zoom: currentZoom * factor,
+    duration: 300,
+    easing: 'ease-in-out-cubic',
+  };
+  if (centerOnSelected) {
+    const selectedNodes = cy.nodes(':selected');
+    if (selectedNodes.length > 0) {
+      animationConfig.center = {eles: selectedNodes};
+    }
+  }
+  cy.animate(animationConfig);
+}
+
+function animateFit(eles: cytoscape.Collection, padding: number, duration: number) {
+  if (!cy) return;
+  cy.animate({
+    fit: {
+      eles,
+      padding,
+    },
+    duration,
+    easing: 'ease-in-out-cubic',
+  });
+}
+
+function buildPhysicsLayout() {
+  if (!cy) {
+    throw new Error('Cytoscape not initialized');
+  }
+  const randomInRange = (min: number, max: number) => min + Math.random() * (max - min);
+  return cy.layout({
+    name: 'cose-bilkent',
+    animate: true,
+    animationDuration: 1000,
+    randomize: true,
+    idealEdgeLength: randomInRange(160, 280),
+    edgeElasticity: randomInRange(70, 140),
+    gravity: randomInRange(70, 130),
+    numIter: 15000,
+  });
+}
+
+function toSelectedNodeData(nodeData: any): SelectedNodeData {
+  return {
+    id: nodeData.id,
+    label: nodeData.label,
+    literals: nodeData.literals,
+  };
+}
+
+function clearSelectedNode() {
+  if (selectedCyNode.value) {
+    selectedCyNode.value.removeClass('selected');
+  }
+  selectedCyNode.value = null;
+  selectedNode.value = null;
+}
+
+function ensureNode(
+  nodesMap: Map<string, {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}>,
+  id: string
+) {
+  if (!nodesMap.has(id)) {
+    nodesMap.set(id, {literals: []});
+  }
+}
+
+function addLiteral(
+  nodesMap: Map<string, {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}>,
+  subjectId: string,
+  predicate: string,
+  value: string
+) {
+  nodesMap.get(subjectId)!.literals!.push({
+    predicate: getPredicateAlias(predicate),
+    value,
+    isIRI: isIRI(value),
+  });
+}
+
+function createEdge(source: string, predicate: string, target: string) {
+  return {
+    data: {
+      id: `${source}-${predicate}-${target}`,
+      source,
+      target,
+      label: getPredicateAlias(predicate),
+      predicateIRI: predicate,
+    },
+  };
+}
+
+function createNode(
+  id: string,
+  data: {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}
+) {
+  return {
+    data: {
+      id,
+      label: toPrefixed(id),
+      hasLiterals: data.literals && data.literals.length > 0,
+      literalCount: data.literals?.length || 0,
+      literals: data.literals,
+    },
+  };
+}
+
+function enableGraphInteractions(graph: cytoscape.Core) {
+  graph.userPanningEnabled(true);
+  graph.userZoomingEnabled(true);
+  graph.boxSelectionEnabled(true);
+}
+
+function registerLayoutStop(graph: cytoscape.Core, initialFit: () => void) {
+  graph.on('layoutstop', () => {
+    isLoading.value = false;
+    graphLoaded.value = true;
+    initialFit();
+  });
+}
+
+function registerNodeTap(graph: cytoscape.Core) {
+  graph.on('tap', 'node', event => {
+    const node = event.target;
+    const nodeData = node.data();
+    pulseNode(node);
+    selectNode(node, nodeData);
+  });
+}
+
+function registerCanvasTap(graph: cytoscape.Core) {
+  graph.on('tap', event => {
+    if (event.target === graph) {
+      clearSelectedNode();
+    }
+  });
+}
+
+function registerEdgeTap(graph: cytoscape.Core) {
+  graph.on('tap', 'edge', event => {
+    const edge = event.target;
+    const predicateIRI = edge.data('predicateIRI');
+    pulseEdge(edge);
+    const href = iriHref(predicateIRI);
+    if (href) {
+      window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  });
+}
+
+function registerEdgeHover(graph: cytoscape.Core) {
+  graph.on('mouseover', 'edge', () => {
+    if (container.value) {
+      container.value.style.cursor = 'pointer';
+    }
+  });
+  graph.on('mouseout', 'edge', () => {
+    if (container.value) {
+      container.value.style.cursor = 'default';
+    }
+  });
+}
+
+function registerNodeDblTap(graph: cytoscape.Core) {
+  graph.on('dbltap', 'node', event => {
+    const node = event.target;
+    graph.animate({
+      fit: {
+        eles: node.neighborhood().add(node),
+        padding: 100,
+      },
+      duration: 500,
+      easing: 'ease-in-out-cubic',
+    });
+  });
+}
+
+function pulseNode(node: cytoscape.NodeSingular) {
+  node.animate({
+    style: {'border-width': 6},
+    duration: 200,
+    complete: function () {
+      node.animate({
+        style: {'border-width': 4},
+        duration: 200,
+      });
+    },
+  });
+}
+
+function pulseEdge(edge: cytoscape.EdgeSingular) {
+  edge.animate({
+    style: {width: 5},
+    duration: 200,
+    complete: function () {
+      edge.animate({
+        style: {width: 2},
+        duration: 200,
+      });
+    },
+  });
+}
+
+function resizeAndFit(graph: cytoscape.Core) {
+  graph.resize();
+  graph.fit(undefined, 30);
 }
 
 onMounted(() => {
@@ -840,13 +891,6 @@ onMounted(() => {
   border-bottom: none;
 }
 
-.prop-icon {
-  font-size: 12px;
-  opacity: 0.7;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
 .kv-value,
 .prop-text {
   font-size: 13px;
@@ -897,11 +941,6 @@ onMounted(() => {
 .card-empty p {
   font-size: 13px;
   margin: 0;
-}
-
-.properties-hidden {
-  opacity: 0;
-  pointer-events: none;
 }
 
 @media (prefers-color-scheme: dark) {
