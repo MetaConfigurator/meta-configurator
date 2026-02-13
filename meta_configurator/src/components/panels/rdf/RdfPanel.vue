@@ -46,6 +46,8 @@ const session = getSessionForMode(props.sessionMode);
 const rmlMappingDialog = ref();
 const dataIsUnparsable = ref(false);
 const dataIsInJsonLd = ref(false);
+const missingContext = ref(false);
+const missingGraph = ref(false);
 
 const parsingErrors = computed(() => {
   const baseErrors = rdfStoreManager.parseErrors.value.map((msg, index) => ({
@@ -65,15 +67,29 @@ const parsingErrors = computed(() => {
 
 const parsingWarnings = computed(() => {
   const baseWarnings = rdfStoreManager.parseWarnings.value.map((msg, index) => ({
-    id: index,
+    id: `parse-warn-${index}`,
     message: msg,
   }));
+
+  if (missingContext.value) {
+    baseWarnings.push({
+      id: 'missing-context',
+      message: 'Missing @context section in the JSON-LD data.',
+    });
+  }
+
+  if (missingGraph.value) {
+    baseWarnings.push({
+      id: 'missing-graph',
+      message: 'Missing @graph section in the JSON-LD data.',
+    });
+  }
 
   if (!dataIsInJsonLd.value) {
     baseWarnings.push({
       id: 'data-not-jsonld',
-      message:
-        'To use this panel, your data must be in valid JSON-LD format. If your data is already in JSON format, you can use <a href="#" class="alert-link" data-action="open-rml">JSON to JSON-LD</a> converter.',
+      message: `To use this panel, your data must be in expected JSON-LD format. 
+      If your data is already in JSON format, you can use <a href="#" class="alert-link" data-action="open-rml">JSON to JSON-LD</a> converter.`,
     });
   }
 
@@ -97,10 +113,21 @@ watch(
 );
 
 function hasJsonLdFormat(input: Object): boolean {
-  if (!input || typeof input !== 'object') return false;
+  if (!input || typeof input !== 'object') {
+    missingContext.value = true;
+    missingGraph.value = true;
+    return false;
+  }
   const data = input as Record<string, unknown>;
-  if (!('@context' in data)) return false;
-  if ('@graph' in data) {
+  const hasContext = '@context' in data;
+  const hasGraph = '@graph' in data;
+
+  missingContext.value = !hasContext;
+  missingGraph.value = !hasGraph;
+
+  if (!hasContext) return false;
+
+  if (hasGraph) {
     return Array.isArray(data['@graph']) && data['@graph'].length > 0;
   }
   const keys = Object.keys(data).filter(k => k !== '@context');
@@ -150,52 +177,5 @@ function handleLink(event: MouseEvent) {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-}
-
-.alert {
-  padding: 1rem;
-  border-radius: 0.375rem;
-  margin: 0.25rem;
-  border-width: 1px;
-}
-
-.alert-warning {
-  border-color: #fbbf24;
-  background-color: #fef3c7;
-  color: #78350f;
-}
-
-.alert-error {
-  border-color: #f97316;
-  background-color: #ffedd5;
-  color: #7c2d12;
-}
-
-.alert-danger {
-  border-color: #ef4444;
-  background-color: #fee2e2;
-  color: #7f1d1d;
-}
-
-.alert-title {
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.alert-text {
-  margin-top: 0.25rem;
-}
-
-.alert-link {
-  font-weight: 500;
-  color: #1d4ed8;
-  text-decoration: none;
-}
-
-.alert-link:hover {
-  text-decoration: underline;
-  color: #1d4ed8;
 }
 </style>

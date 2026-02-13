@@ -54,16 +54,18 @@
             :extensions="extensions"
             @ready="handleReady" />
         </div>
-        <Button
-          :disabled="!resultIsValid"
-          label="Perform Mapping"
-          icon="pi pi-play"
-          @click="performMapping" />
-        <div v-if="errorMessage.length" class="error-box">
-          <span v-html="errorMessage"></span>
-        </div>
       </div>
     </div>
+    <template #footer>
+      <Button
+        :disabled="!resultIsValid"
+        label="Perform Mapping"
+        icon="pi pi-play"
+        @click="performMapping" />
+      <div v-if="errorMessage.length" class="error-box">
+        <span v-html="errorMessage"></span>
+      </div>
+    </template>
   </Dialog>
 </template>
 
@@ -251,7 +253,7 @@ label {
 }
 
 .step-panel-grow {
-  flex: 1 0 auto;
+  flex: 1;
   min-height: 320px;
 }
 
@@ -274,13 +276,20 @@ label {
 }
 
 .editor-block {
-  flex: 1 0 auto;
+  flex: 1;
   min-height: 240px;
   display: flex;
   flex-direction: column;
   width: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 4px;
+  overflow: hidden;
+}
+
+:deep(.p-dialog-content) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
