@@ -5,27 +5,17 @@
       header="Large graph detected"
       modal
       :closable="false">
-      <Message severity="warn" :closable="false">
+      <Message severity="secondary" variant="simple" :closable="false">
         <template #default>
           This graph contains <strong>{{ nodeCount }}</strong> nodes. Rendering may be slow for
           graphs with more than <strong>{{ settings.rdf.maximumNodesToVisualize }}</strong> nodes.
           <br />
-          Do you want to continue?
+          You can adjust this value in the settings. Do you want to continue?
         </template>
       </Message>
       <template #footer>
-        <Button
-          label="No"
-          icon="pi pi-times"
-          text
-          severity="secondary"
-          @click="confirmRender(false)" />
-        <Button
-          label="Yes"
-          icon="pi pi-check"
-          text
-          severity="danger"
-          @click="confirmRender(true)" />
+        <Button label="No" icon="pi pi-times" text @click="confirmRender(false)" />
+        <Button label="Yes" icon="pi pi-check" text @click="confirmRender(true)" />
       </template>
     </Dialog>
     <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
@@ -59,7 +49,7 @@
               <Card class="prop-card">
                 <template #title>
                   <div class="card-title">
-                    <i class="pi pi-id-card" />
+                    <i class="pi pi-globe" />
                     <span>Node Identifier</span>
                   </div>
                 </template>
@@ -68,18 +58,30 @@
                     <i class="pi pi-share-alt empty-icon" />
                     <p>Select a node to see its identifier</p>
                   </div>
-                  <div v-else class="kv-row">
-                    <a
-                      v-if="isIRI(selectedNode.id)"
-                      class="kv-value link"
-                      :href="selectedNode.id"
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      {{ selectedNode.id }}
-                    </a>
-                    <span v-else class="kv-value">
-                      {{ selectedNode.id }}
+                  <div v-else class="kv-row kv-row-inline">
+                    <span class="kv-row-text">
+                      <a
+                        v-if="isIRI(selectedNode.id)"
+                        class="kv-value link"
+                        :href="selectedNode.id"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {{ selectedNode.id }}
+                      </a>
+                      <span v-else class="kv-value">
+                        {{ selectedNode.id }}
+                      </span>
                     </span>
+                    <Divider layout="vertical" class="action-divider action-divider-right" />
+                    <Button
+                      class="delete-node-btn"
+                      icon="pi pi-times-circle"
+                      text
+                      rounded
+                      size="small"
+                      severity="danger"
+                      v-tooltip.bottom="'Delete node'"
+                      @click="deleteSelectedNode" />
                   </div>
                 </template>
               </Card>
@@ -106,25 +108,48 @@
                   </div>
                   <div v-else class="props-list">
                     <div class="prop-line" v-for="(lit, idx) in selectedNode.literals" :key="idx">
-                      <a
-                        class="kv-value link"
-                        :href="iriHref(lit.predicate) || lit.predicate"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        {{ lit.predicate }}
-                      </a>
-                      <span class="prop-text">:</span>
-                      <a
-                        v-if="lit.isIRI && isLinkableIRI(lit.value)"
-                        class="prop-text link"
-                        :href="iriHref(lit.value) || undefined"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        {{ lit.value }}
-                      </a>
-                      <span v-else class="prop-text">
-                        {{ lit.value }}
+                      <span class="prop-text-group">
+                        <a
+                          class="kv-value link"
+                          :href="iriHref(lit.predicate) || lit.predicate"
+                          target="_blank"
+                          rel="noopener noreferrer">
+                          {{ lit.predicate }}
+                        </a>
+                        <span class="prop-text">:</span>
+                        <a
+                          v-if="lit.isIRI && (lit.href || isLinkableIRI(lit.value))"
+                          class="prop-text link"
+                          :href="lit.href || iriHref(lit.value) || undefined"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          @click="handlePropertyLinkClick(lit, $event)">
+                          {{ lit.value }}
+                        </a>
+                        <span v-else class="prop-text">
+                          {{ lit.value }}
+                        </span>
                       </span>
+                      <Divider layout="vertical" class="action-divider action-divider-right" />
+                      <div class="prop-actions">
+                        <Button
+                          class="prop-action-btn"
+                          icon="pi pi-pencil"
+                          text
+                          rounded
+                          size="small"
+                          v-tooltip.bottom="'Edit property'"
+                          @click="editProperty(lit)" />
+                        <Button
+                          class="prop-action-btn"
+                          icon="pi pi-times-circle"
+                          text
+                          rounded
+                          size="small"
+                          severity="danger"
+                          v-tooltip.bottom="'Delete property'"
+                          @click="deleteProperty(lit)" />
+                      </div>
                     </div>
                   </div>
                 </template>
@@ -152,6 +177,7 @@ import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 import {useSettings} from '@/settings/useSettings';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import Dock from 'primevue/dock';
+import Divider from 'primevue/divider';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import {isDarkMode} from '@/utility/darkModeUtils';
@@ -159,7 +185,7 @@ import {isDarkMode} from '@/utility/darkModeUtils';
 interface SelectedNodeData {
   id: string;
   label: string;
-  literals?: Array<{predicate: string; value: string; isIRI: boolean}>;
+  literals?: Array<{predicate: string; value: string; isIRI: boolean; href?: string}>;
 }
 
 const settings = useSettings();
@@ -304,6 +330,38 @@ function selectNode(node: any, nodeData: any) {
   node.addClass('selected');
   selectedCyNode.value = node;
   selectedNode.value = toSelectedNodeData(nodeData);
+}
+
+function deleteSelectedNode() {
+  if (!selectedNode.value) return;
+  console.log('Delete node requested:', selectedNode.value);
+}
+
+function deleteProperty(lit: {predicate: string; value: string; isIRI: boolean}) {
+  console.log('Delete property requested:', lit);
+}
+
+function editProperty(lit: {predicate: string; value: string; isIRI: boolean}) {
+  console.log('Edit property requested:', lit);
+}
+
+function handlePropertyLinkClick(
+  lit: {predicate: string; value: string; isIRI: boolean; href?: string},
+  event: MouseEvent
+) {
+  const iri = lit.href || iriHref(lit.value);
+  if (!iri || !cy) return;
+  const node = cy.getElementById(iri);
+  if (!node || node.length === 0) return;
+  event.preventDefault();
+  cy.animate({
+    fit: {
+      eles: node,
+      padding: 80,
+    },
+    duration: 400,
+    easing: 'ease-in-out-cubic',
+  });
 }
 
 function getPredicateAlias(predicate: string): string {
@@ -466,13 +524,14 @@ function buildGraphElements(statements: readonly $rdf.Statement[]) {
       continue;
     }
 
+    // Always show IRI/object values in the properties list (prefixed when possible).
+    addLiteral(nodesMap, s, p, toPrefixed(o), o);
+
     if (isTypePredicate(p) || !existingSubjects.has(o)) {
-      addLiteral(nodesMap, s, p, toPrefixed(o));
       continue;
     }
 
     ensureNode(nodesMap, o);
-
     edges.push(createEdge(s, p, o));
   }
 
@@ -597,15 +656,20 @@ function ensureNode(
 }
 
 function addLiteral(
-  nodesMap: Map<string, {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}>,
+  nodesMap: Map<
+    string,
+    {literals?: Array<{predicate: string; value: string; isIRI: boolean; href?: string}>}
+  >,
   subjectId: string,
   predicate: string,
-  value: string
+  value: string,
+  href?: string
 ) {
   nodesMap.get(subjectId)!.literals!.push({
     predicate: getPredicateAlias(predicate),
     value,
-    isIRI: isIRI(value),
+    isIRI: Boolean(href) || isIRI(value),
+    href,
   });
 }
 
@@ -865,6 +929,8 @@ onMounted(() => {
 
 .prop-card :deep(.p-card-title) {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .card-title {
@@ -881,10 +947,33 @@ onMounted(() => {
 .kv-row {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   padding: 8px 0;
   border-bottom: 1px solid #e2e8f0;
   word-break: break-word;
+  width: 100%;
+}
+
+.kv-row-inline {
+  align-items: center;
+}
+
+.kv-row-text {
+  min-width: 0;
+}
+
+.delete-node-btn {
+  flex-shrink: 0;
+}
+
+.action-divider {
+  flex-shrink: 0;
+  height: 14px;
+  opacity: 0;
+}
+
+.action-divider :deep(.p-divider-content) {
+  display: none;
 }
 
 .kv-row:last-child {
@@ -899,18 +988,42 @@ onMounted(() => {
   word-break: break-word;
 }
 
+.props-list .prop-text:first-of-type {
+  margin: 0 4px;
+}
+
 .props-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
+}
+
+.prop-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0px;
+  flex-shrink: 0;
+}
+
+.prop-action-btn {
+  flex-shrink: 0;
 }
 
 .prop-line {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
-  padding: 6px 0;
+  padding: 3px 0;
   word-break: break-word;
+  width: 100%;
+}
+
+.prop-text-group {
+  min-width: 0;
+}
+
+.action-divider-right {
+  margin-left: auto;
 }
 
 .link {

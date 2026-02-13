@@ -1,0 +1,182 @@
+<template>
+  <Dialog
+    v-model:visible="visible"
+    header="Triple Details"
+    modal
+    maximizable
+    :draggable="false"
+    :style="{width: '640px', height: '520px'}"
+    contentStyle="overflow-y: auto">
+    <div class="flex flex-col gap-6 w-full">
+      <div>
+        <label class="block font-bold mb-3">Subject</label>
+        <div class="flex gap-2 w-full items-center">
+          <Select
+            v-model="localTriple.subjectType"
+            :options="subjectTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="fixed-select" />
+          <template v-if="localTriple.subjectType === RdfTermType.NamedNode">
+            <ToggleButton
+              v-model="addNewSubject"
+              onLabel="New"
+              offLabel="Existing"
+              onIcon="pi pi-plus"
+              offIcon="pi pi-list"
+              class="fixed-toggle" />
+            <Select
+              v-if="!addNewSubject"
+              v-model="localTriple.subject"
+              :options="nodes"
+              filter
+              optionLabel="label"
+              optionValue="value"
+              class="flex-1 min-w-[200px]" />
+            <InputText
+              v-else
+              v-model="localTriple.subject"
+              placeholder="Enter new IRI"
+              class="flex-1 min-w-[260px]" />
+          </template>
+          <template v-else>
+            <InputText v-model.trim="localTriple.subject" required class="flex-1 min-w-[260px]" />
+          </template>
+        </div>
+      </div>
+      <div>
+        <label class="block font-bold mb-3">Predicate</label>
+        <div class="flex gap-2 w-full items-center">
+          <Select
+            v-model="localTriple.predicateType"
+            :options="predicateTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="fixed-select" />
+          <InputText v-model.trim="localTriple.predicate" required class="flex-1 min-w-[260px]" />
+        </div>
+      </div>
+      <div>
+        <label class="block font-bold mb-3">Object</label>
+        <div class="flex gap-2 w-full items-center">
+          <Select
+            v-model="localTriple.objectType"
+            :options="objectTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="fixed-select" />
+          <template v-if="localTriple.objectType === RdfTermType.NamedNode">
+            <ToggleButton
+              v-model="addNewObject"
+              onLabel="New"
+              offLabel="Existing"
+              onIcon="pi pi-plus"
+              offIcon="pi pi-list"
+              class="fixed-toggle" />
+            <Select
+              v-if="!addNewObject"
+              v-model="localTriple.object"
+              :options="nodes"
+              filter
+              optionLabel="label"
+              optionValue="value"
+              class="flex-1 min-w-[200px]" />
+            <InputText
+              v-else
+              v-model="localTriple.object"
+              placeholder="Enter new IRI"
+              class="flex-1 min-w-[260px]" />
+          </template>
+          <template v-else>
+            <InputText v-model.trim="localTriple.object" required class="flex-1 min-w-[260px]" />
+          </template>
+        </div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="flex justify-end gap-2 pt-3">
+        <Button label="Cancel" severity="secondary" @click="visible = false" />
+        <Button label="Save" @click="saveTriple" />
+      </div>
+    </template>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import {computed, ref, watch} from 'vue';
+import Dialog from 'primevue/dialog';
+import Select from 'primevue/select';
+import ToggleButton from 'primevue/togglebutton';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
+import {useErrorService} from '@/utility/errorServiceInstance';
+import {
+  TripleEditorService,
+  type TripleTransferObject,
+} from '@/components/panels/rdf/tripleEditorService';
+import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+
+const props = defineProps<{
+  triple: TripleTransferObject;
+}>();
+
+const emit = defineEmits<{
+  (e: 'saved', payload: {action: 'add' | 'edit'; triple: TripleTransferObject}): void;
+}>();
+
+const visible = ref(false);
+const addNewSubject = ref(false);
+const addNewObject = ref(false);
+
+const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
+const predicateTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
+const objectTypeOptions = [
+  {label: 'Named Node', value: RdfTermType.NamedNode},
+  {label: 'Literal', value: RdfTermType.Literal},
+];
+
+const localTriple = ref<TripleTransferObject>({...props.triple});
+
+watch(
+  () => props.triple,
+  value => {
+    localTriple.value = {...value};
+  },
+  {deep: true, immediate: true}
+);
+
+const nodes = computed(() => {
+  const nodesSet = new Set<string>();
+  rdfStoreManager.statements.value.forEach(st => {
+    if (st.subject.termType === RdfTermType.NamedNode) {
+      nodesSet.add(st.subject.value);
+    }
+  });
+  return Array.from(nodesSet).map(n => ({label: n, value: n}));
+});
+
+function open() {
+  addNewSubject.value = false;
+  addNewObject.value = false;
+  localTriple.value = {...props.triple};
+  visible.value = true;
+}
+
+function close() {
+  visible.value = false;
+}
+
+function saveTriple() {
+  const action: 'add' | 'edit' = localTriple.value.statement ? 'edit' : 'add';
+  const result = TripleEditorService.addOrEdit(localTriple.value);
+  if (!result.success) {
+    useErrorService().onError(result.errorMessage!);
+    return;
+  }
+  emit('saved', {action, triple: localTriple.value});
+  visible.value = false;
+}
+
+defineExpose({open, close});
+</script>

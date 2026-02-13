@@ -111,107 +111,7 @@
       </template>
     </Column>
   </DataTable>
-  <Dialog
-    v-model:visible="editDialog"
-    header="Triple Details"
-    modal
-    maximizable
-    :draggable="false"
-    :style="{width: '640px', height: '520px'}"
-    contentStyle="overflow-y: auto">
-    <div class="flex flex-col gap-6 w-full">
-      <div>
-        <label class="block font-bold mb-3">Subject</label>
-        <div class="flex gap-2 w-full items-center">
-          <Select
-            v-model="triple.subjectType"
-            :options="subjectTypeOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="fixed-select" />
-          <template v-if="triple.subjectType === RdfTermType.NamedNode">
-            <ToggleButton
-              v-model="addNewSubject"
-              onLabel="New"
-              offLabel="Existing"
-              onIcon="pi pi-plus"
-              offIcon="pi pi-list"
-              class="fixed-toggle" />
-            <Select
-              v-if="!addNewSubject"
-              v-model="triple.subject"
-              :options="nodes"
-              filter
-              optionLabel="label"
-              optionValue="value"
-              class="flex-1 min-w-[200px]" />
-            <InputText
-              v-else
-              v-model="newSubjectInput"
-              placeholder="Enter new IRI"
-              class="flex-1 min-w-[260px]" />
-          </template>
-          <template v-else>
-            <InputText v-model.trim="triple.subject" required class="flex-1 min-w-[260px]" />
-          </template>
-        </div>
-      </div>
-      <div>
-        <label class="block font-bold mb-3">Predicate</label>
-        <div class="flex gap-2 w-full items-center">
-          <Select
-            v-model="triple.predicateType"
-            :options="predicateTypeOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="fixed-select" />
-          <InputText v-model.trim="triple.predicate" required class="flex-1 min-w-[260px]" />
-        </div>
-      </div>
-      <div>
-        <label class="block font-bold mb-3">Object</label>
-        <div class="flex gap-2 w-full items-center">
-          <Select
-            v-model="triple.objectType"
-            :options="objectTypeOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="fixed-select" />
-          <template v-if="triple.objectType === RdfTermType.NamedNode">
-            <ToggleButton
-              v-model="addNewObject"
-              onLabel="New"
-              offLabel="Existing"
-              onIcon="pi pi-plus"
-              offIcon="pi pi-list"
-              class="fixed-toggle" />
-            <Select
-              v-if="!addNewObject"
-              v-model="triple.object"
-              :options="nodes"
-              filter
-              optionLabel="label"
-              optionValue="value"
-              class="flex-1 min-w-[200px]" />
-            <InputText
-              v-else
-              v-model="newObjectInput"
-              placeholder="Enter new IRI"
-              class="flex-1 min-w-[260px]" />
-          </template>
-          <template v-else>
-            <InputText v-model.trim="triple.object" required class="flex-1 min-w-[260px]" />
-          </template>
-        </div>
-      </div>
-    </div>
-    <template #footer>
-      <div class="flex justify-end gap-2 pt-3">
-        <Button label="Cancel" severity="secondary" @click="editDialog = false" />
-        <Button label="Save" @click="saveTriple" />
-      </div>
-    </template>
-  </Dialog>
+  <TripleDetailsDialog ref="tripleDetailsDialog" :triple="triple" @saved="handleTripleSaved" />
   <Dialog v-model:visible="deleteDialog" header="Confirm" modal>
     <div class="flex items-center gap-4">
       <i class="pi pi-exclamation-triangle !text-3xl" />
@@ -258,9 +158,7 @@ import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import Select from 'primevue/select';
 import TieredMenu from 'primevue/tieredmenu';
-import ToggleButton from 'primevue/togglebutton';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
@@ -276,6 +174,7 @@ import {
   TripleEditorService,
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
+import TripleDetailsDialog from '@/components/panels/rdf/TripleDetailsDialog.vue';
 
 const filteredRows = ref<any[]>([]);
 const props = defineProps<{
@@ -292,20 +191,15 @@ const first = ref(0);
 const rowsPerPage = ref(50);
 const dataSession = getSessionForMode(SessionMode.DataEditor);
 
-const editDialog = ref(false);
 const deleteDialog = ref(false);
 const sparqlDialog = ref(false);
 const visualizerDialog = ref(false);
 
 const loading = ref(false);
-const addNewSubject = ref(false);
-const addNewObject = ref(false);
-const newObjectInput = ref('');
-const newSubjectInput = ref('');
+const tripleDetailsDialog = ref<InstanceType<typeof TripleDetailsDialog> | null>(null);
 const isUserSelection = ref(false);
 const selectedTriple = ref();
 
-const predicateTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
 const filters = ref();
 const exportMenuItems = [
   {
@@ -342,13 +236,6 @@ const initFilters = () => {
     object: {value: null, matchMode: FilterMatchMode.CONTAINS},
   };
 };
-
-const objectTypeOptions = [
-  {label: 'Named Node', value: RdfTermType.NamedNode},
-  {label: 'Literal', value: RdfTermType.Literal},
-];
-
-const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
 
 const items = computed(() => {
   const mappedItems = rdfStoreManager.statements.value.map((statement, index) => ({
@@ -437,16 +324,6 @@ const clearFilter = () => {
   initFilters();
 };
 
-const nodes = computed(() => {
-  const nodesSet = new Set<string>();
-  rdfStoreManager.statements.value.forEach(st => {
-    if (st.subject.termType === RdfTermType.NamedNode) {
-      nodesSet.add(st.subject.value);
-    }
-  });
-  return Array.from(nodesSet).map(n => ({label: n, value: n}));
-});
-
 watch(selectedTriple, (target, _) => {
   if (!target) return;
   if (isUserSelection.value) {
@@ -468,7 +345,7 @@ const openNewDialog = () => {
     objectType: RdfTermType.Literal,
     statement: undefined,
   };
-  editDialog.value = true;
+  tripleDetailsDialog.value?.open();
 };
 
 const openEditDialog = () => {
@@ -484,19 +361,15 @@ const openEditDialog = () => {
     statement: selectedTriple.value.statement,
   };
 
-  editDialog.value = true;
+  tripleDetailsDialog.value?.open();
 };
 
-const saveTriple = () => {
-  const result = TripleEditorService.addOrEdit(triple.value);
-
-  if (!result.success) {
-    useErrorService().onError(result.errorMessage!);
-    return;
+function handleTripleSaved(payload: {action: 'add' | 'edit'; triple: TripleTransferObject}) {
+  loading.value = true;
+  if (payload.action === 'add') {
+    selectedTriple.value = null;
   }
-
-  editDialog.value = false;
-};
+}
 
 const parsingErrors = computed(() => {
   return rdfStoreManager.parseErrors.value.map((msg, index) => ({
