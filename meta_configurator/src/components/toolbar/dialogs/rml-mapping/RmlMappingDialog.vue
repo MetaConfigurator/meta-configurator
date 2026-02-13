@@ -9,72 +9,62 @@
       <Message severity="warn" v-if="mappingServiceWarning.length">
         <span v-html="mappingServiceWarning"></span>
       </Message>
-      <Stepper v-model:value="activeStep" class="rml-stepper">
-        <StepList>
-          <Step value="1">Generate Suggestion</Step>
-          <Step value="2">Apply Mapping</Step>
-        </StepList>
-        <StepPanels>
-          <StepPanel value="1">
-            <ScrollPanel class="step-panel-scroll" style="width: 100%; height: 100%">
-              <div class="step-panel step-panel-fill step-panel-scroll-body">
-                <PanelSettings
-                  panel-name="API Key and AI Settings"
-                  settings-header="AI Settings"
-                  :panel-settings-path="['aiIntegration']"
-                  :sessionMode="SessionMode.DataEditor">
-                  <ApiKey />
-                </PanelSettings>
-                <ApiKeyWarning />
-                <p class="text-sm text-gray-700">
-                  This tool converts the JSON data from the <strong>Data Editor</strong> to
-                  <strong>JSON-LD</strong>. You can optionally provide extra instructions below to
-                  guide the mapping.
-                </p>
-                <div class="hints-block">
-                  <label for="userComments" class="block font-semibold mb-1">
-                    Additional Mapping Hints
-                  </label>
-                  <Textarea
-                    id="userComments"
-                    v-model="userComments"
-                    class="w-full rml-hints-textarea"
-                    placeholder="e.g., rename fields, format dates..." />
-                </div>
-                <Button
-                  label="Generate Suggestion"
-                  icon="pi pi-wand"
-                  @click="generateMappingSuggestion"
-                  :loading="isLoadingMapping" />
-              </div>
-            </ScrollPanel>
-          </StepPanel>
-          <StepPanel value="2">
-            <div class="step-panel">
-              <Divider />
-              <label class="block font-semibold mb-2">Mapping Configuration</label>
-              <div class="editor-block">
-                <codemirror
-                  v-model="rmlConfig"
-                  class="rml-codemirror"
-                  :autofocus="false"
-                  :indent-with-tab="true"
-                  :tab-size="2"
-                  :extensions="extensions"
-                  @ready="handleReady" />
-              </div>
-              <Button
-                :disabled="!resultIsValid"
-                label="Perform Mapping"
-                icon="pi pi-play"
-                @click="performMapping" />
-              <div v-if="errorMessage.length" class="error-box">
-                <span v-html="errorMessage"></span>
-              </div>
+      <Panel header="Use AI assistance to generate RML configuration" toggleable class="rml-panel">
+        <ScrollPanel class="step-panel-scroll">
+          <div class="step-panel">
+            <PanelSettings
+              panel-name="API Key and AI Settings"
+              settings-header="AI Settings"
+              :panel-settings-path="['aiIntegration']"
+              :sessionMode="SessionMode.DataEditor">
+              <ApiKey />
+            </PanelSettings>
+            <ApiKeyWarning />
+            <p class="text-sm text-gray-700">
+              This tool converts the JSON data from the <strong>Data Editor</strong> to
+              <strong>JSON-LD</strong>. You can optionally provide extra instructions below to guide
+              the mapping.
+            </p>
+            <div class="hints-block">
+              <label for="userComments" class="block font-semibold mb-1">
+                Additional Mapping Hints
+              </label>
+              <Textarea
+                id="userComments"
+                v-model="userComments"
+                class="w-full rml-hints-textarea"
+                placeholder="e.g., rename fields, format dates..." />
             </div>
-          </StepPanel>
-        </StepPanels>
-      </Stepper>
+            <Button
+              label="Generate Suggestion"
+              icon="pi pi-wand"
+              @click="generateMappingSuggestion"
+              :loading="isLoadingMapping" />
+          </div>
+        </ScrollPanel>
+      </Panel>
+      <div class="step-panel">
+        <Divider />
+        <label class="block font-semibold mb-2">Mapping Configuration</label>
+        <div class="editor-block">
+          <codemirror
+            v-model="rmlConfig"
+            class="rml-codemirror"
+            :autofocus="false"
+            :indent-with-tab="true"
+            :tab-size="2"
+            :extensions="extensions"
+            @ready="handleReady" />
+        </div>
+        <Button
+          :disabled="!resultIsValid"
+          label="Perform Mapping"
+          icon="pi pi-play"
+          @click="performMapping" />
+        <div v-if="errorMessage.length" class="error-box">
+          <span v-html="errorMessage"></span>
+        </div>
+      </div>
     </div>
   </Dialog>
 </template>
@@ -86,11 +76,7 @@ import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import Message from 'primevue/message';
-import Stepper from 'primevue/stepper';
-import StepList from 'primevue/steplist';
-import Step from 'primevue/step';
-import StepPanels from 'primevue/steppanels';
-import StepPanel from 'primevue/steppanel';
+import Panel from 'primevue/panel';
 import ScrollPanel from 'primevue/scrollpanel';
 import {Codemirror} from 'vue-codemirror';
 import {basicSetup} from 'codemirror';
@@ -119,7 +105,6 @@ const resultIsValid = ref(false);
 const errorMessage = ref('');
 const userComments = ref('');
 const isLoadingMapping = ref(false);
-const activeStep = ref('1');
 
 const mappingService: Ref<RmlMappingService> = computed(() => {
   return new RmlMappingServiceStandard();
@@ -206,7 +191,6 @@ function generateMappingSuggestion() {
     .then(res => {
       result.value = res.config;
       rmlConfig.value = res.config;
-      activeStep.value = '2';
       if (res.success) {
         errorMessage.value = '';
       } else {
@@ -257,26 +241,8 @@ label {
   min-height: 0;
 }
 
-.rml-stepper {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.rml-stepper :deep(.p-steppanels),
-.rml-stepper :deep(.p-steppanel) {
-  flex: 1;
-  display: flex;
-  min-height: 0;
-}
-
-.rml-stepper :deep(.p-steppanel-content) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
+.rml-panel {
+  flex: 0 0 auto;
 }
 
 .step-panel {
@@ -286,15 +252,6 @@ label {
   flex-direction: column;
   gap: 1rem;
   overflow: hidden;
-}
-
-.step-panel-fill {
-  min-height: 0;
-  flex: 1;
-}
-
-.step-panel-scroll-body {
-  min-height: 100%;
 }
 
 .hints-block {
@@ -309,13 +266,8 @@ label {
   display: block;
 }
 
-.step-panel-scroll :deep(.p-scrollpanel-wrapper) {
-  height: 100%;
-}
-
 .step-panel-scroll {
-  flex: 1;
-  min-height: 0;
+  width: 100%;
 }
 
 .hints-block :deep(.p-textarea),

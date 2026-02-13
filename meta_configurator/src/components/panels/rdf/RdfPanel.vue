@@ -6,37 +6,16 @@
       :sessionMode="SessionMode.DataEditor">
     </PanelSettings>
     <RmlMappingDialog ref="rmlMappingDialog" />
-    <div v-if="parsingWarnings.length > 0" class="alert alert-warning">
-      <p class="alert-title">Warnings:</p>
-      <ul class="alert-list">
-        <li v-for="err in parsingWarnings" :key="err.id">
-          {{ err.message }}
-        </li>
-      </ul>
-    </div>
-    <div v-if="parsingErrors.length > 0" class="alert alert-error">
-      <p class="alert-title">Semantic issues detected:</p>
-      <ul class="alert-list">
-        <li v-for="err in parsingErrors" :key="err.id">
-          {{ err.message }}
-        </li>
-      </ul>
-    </div>
-    <div v-if="dataIsUnparsable" class="alert alert-danger">
-      <p class="alert-title">Syntax error:</p>
-      <p class="alert-text">
-        Your data contains syntax errors. Please correct them before proceeding.
-      </p>
-    </div>
-    <div v-if="!dataIsInJsonLd" class="alert alert-warning">
-      <p class="alert-title">JSON-LD required:</p>
-      <p class="alert-text">
-        To use the RDF panel, your data must be in valid JSON-LD format. If your data is already in
-        JSON format, you can use
-        <a href="#" @click.prevent="showRmlMappingDialog" class="alert-link"> JSON to JSON-LD </a>
-        converter.
-      </p>
-    </div>
+    <Message v-if="parsingWarnings.length > 0" severity="warn">
+      <li v-for="err in parsingWarnings" :key="err.id">
+        <span v-html="err.message" @click="handleLink"></span>
+      </li>
+    </Message>
+    <Message v-if="parsingErrors.length > 0" severity="error">
+      <li v-for="err in parsingErrors" :key="err.id">
+        <span v-html="err.message" @click="handleLink"></span>
+      </li>
+    </Message>
     <div class="panel-content">
       <RdfEditorPanel
         :dataIsUnparsable="dataIsUnparsable"
@@ -55,6 +34,7 @@ import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappin
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+import Message from 'primevue/message';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -68,17 +48,36 @@ const dataIsUnparsable = ref(false);
 const dataIsInJsonLd = ref(false);
 
 const parsingErrors = computed(() => {
-  return rdfStoreManager.parseErrors.value.map((msg, index) => ({
-    id: index,
+  const baseErrors = rdfStoreManager.parseErrors.value.map((msg, index) => ({
+    id: `parse-error-${index}`,
     message: msg,
   }));
+
+  if (dataIsUnparsable.value) {
+    baseErrors.push({
+      id: 'data-unparsable',
+      message: 'Your data contains syntax errors. Please correct them before proceeding.',
+    });
+  }
+
+  return baseErrors;
 });
 
 const parsingWarnings = computed(() => {
-  return rdfStoreManager.parseWarnings.value.map((msg, index) => ({
+  const baseWarnings = rdfStoreManager.parseWarnings.value.map((msg, index) => ({
     id: index,
     message: msg,
   }));
+
+  if (!dataIsInJsonLd.value) {
+    baseWarnings.push({
+      id: 'data-not-jsonld',
+      message:
+        'To use this panel, your data must be in valid JSON-LD format. If your data is already in JSON format, you can use <a href="#" class="alert-link" data-action="open-rml">JSON to JSON-LD</a> converter.',
+    });
+  }
+
+  return baseWarnings;
 });
 
 watch(
@@ -116,8 +115,29 @@ function zoomIntoPath(path: Path) {
 function showRmlMappingDialog() {
   rmlMappingDialog.value?.show();
 }
+
+function handleLink(event: MouseEvent) {
+  const target = event.target as HTMLElement | null;
+  if (!target) return;
+  if (target instanceof HTMLAnchorElement && target.dataset.action === 'open-rml') {
+    event.preventDefault();
+    showRmlMappingDialog();
+  }
+}
 </script>
 <style scoped>
+.alert-list :deep(.alert-link),
+:deep(.alert-link) {
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.alert-list :deep(.alert-link:hover),
+:deep(.alert-link:hover) {
+  text-decoration: underline;
+}
+
 .panel-container {
   display: flex;
   flex-direction: column;
@@ -168,11 +188,6 @@ function showRmlMappingDialog() {
   margin-top: 0.25rem;
 }
 
-.alert-list {
-  margin-top: 0.5rem;
-  list-style: disc inside;
-}
-
 .alert-link {
   font-weight: 500;
   color: #1d4ed8;
@@ -181,5 +196,6 @@ function showRmlMappingDialog() {
 
 .alert-link:hover {
   text-decoration: underline;
+  color: #1d4ed8;
 }
 </style>
