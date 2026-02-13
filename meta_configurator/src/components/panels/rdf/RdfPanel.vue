@@ -128,7 +128,7 @@ function hasJsonLdFormat(input: Object): boolean {
   if (!hasContext) return false;
 
   if (hasGraph) {
-    return Array.isArray(data['@graph']) && data['@graph'].length > 0;
+    return Array.isArray(data['@graph']);
   }
   const keys = Object.keys(data).filter(k => k !== '@context');
   return keys.length > 0;
