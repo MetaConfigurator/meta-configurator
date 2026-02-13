@@ -144,7 +144,10 @@
     maximizable
     :style="{width: '1200px', height: '1200px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
-    <RdfVisualizer :statements="filteredStatements" @cancel-render="closeVisualizer" />
+    <RdfVisualizer
+      :statements="filteredStatements"
+      @cancel-render="closeVisualizer"
+      @edit-triple="openTripleEditorFromVisualizer" />
   </Dialog>
 </template>
 
@@ -363,6 +366,26 @@ const openEditDialog = () => {
 
   tripleDetailsDialog.value?.open();
 };
+
+function openTripleEditorFromVisualizer(payload: {
+  subject: string;
+  subjectType: RdfTermType;
+  predicate: string;
+  predicateType: RdfTermType;
+  object: string;
+  objectType: RdfTermType;
+}) {
+  triple.value = {
+    subject: payload.subject,
+    subjectType: payload.subjectType,
+    predicate: payload.predicate,
+    predicateType: payload.predicateType,
+    object: payload.object,
+    objectType: payload.objectType,
+    statement: undefined,
+  };
+  tripleDetailsDialog.value?.open();
+}
 
 function handleTripleSaved(payload: {action: 'add' | 'edit'; triple: TripleTransferObject}) {
   loading.value = true;

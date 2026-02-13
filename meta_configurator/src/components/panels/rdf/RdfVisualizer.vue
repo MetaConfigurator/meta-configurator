@@ -200,6 +200,17 @@ const propertiesPanelMinSize = computed(() => (propertiesPanelVisible.value ? 16
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
+  (
+    e: 'edit-triple',
+    triple: {
+      subject: string;
+      subjectType: RdfTermType;
+      predicate: string;
+      predicateType: RdfTermType;
+      object: string;
+      objectType: RdfTermType;
+    }
+  ): void;
 }>();
 
 const props = defineProps<{
@@ -341,8 +352,16 @@ function deleteProperty(lit: {predicate: string; value: string; isIRI: boolean})
   console.log('Delete property requested:', lit);
 }
 
-function editProperty(lit: {predicate: string; value: string; isIRI: boolean}) {
-  console.log('Edit property requested:', lit);
+function editProperty(lit: {predicate: string; value: string; isIRI: boolean; href?: string}) {
+  if (!selectedNode.value) return;
+  emit('edit-triple', {
+    subject: selectedNode.value.id,
+    subjectType: RdfTermType.NamedNode,
+    predicate: expandIRI(lit.predicate) || lit.predicate,
+    predicateType: RdfTermType.NamedNode,
+    object: lit.href || expandIRI(lit.value) || lit.value,
+    objectType: lit.isIRI ? RdfTermType.NamedNode : RdfTermType.Literal,
+  });
 }
 
 function handlePropertyLinkClick(
