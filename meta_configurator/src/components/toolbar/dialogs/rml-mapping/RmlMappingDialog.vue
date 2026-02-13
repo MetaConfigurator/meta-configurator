@@ -10,40 +10,38 @@
         <span v-html="mappingServiceWarning"></span>
       </Message>
       <Panel header="Use AI assistance to generate RML configuration" toggleable class="rml-panel">
-        <ScrollPanel class="step-panel-scroll">
-          <div class="step-panel">
-            <PanelSettings
-              panel-name="API Key and AI Settings"
-              settings-header="AI Settings"
-              :panel-settings-path="['aiIntegration']"
-              :sessionMode="SessionMode.DataEditor">
-              <ApiKey />
-            </PanelSettings>
-            <ApiKeyWarning />
-            <p class="text-sm text-gray-700">
-              This tool converts the JSON data from the <strong>Data Editor</strong> to
-              <strong>JSON-LD</strong>. You can optionally provide extra instructions below to guide
-              the mapping.
-            </p>
-            <div class="hints-block">
-              <label for="userComments" class="block font-semibold mb-1">
-                Additional Mapping Hints
-              </label>
-              <Textarea
-                id="userComments"
-                v-model="userComments"
-                class="w-full rml-hints-textarea"
-                placeholder="e.g., rename fields, format dates..." />
-            </div>
-            <Button
-              label="Generate Suggestion"
-              icon="pi pi-wand"
-              @click="generateMappingSuggestion"
-              :loading="isLoadingMapping" />
+        <div class="step-panel">
+          <PanelSettings
+            panel-name="API Key and AI Settings"
+            settings-header="AI Settings"
+            :panel-settings-path="['aiIntegration']"
+            :sessionMode="SessionMode.DataEditor">
+            <ApiKey />
+          </PanelSettings>
+          <ApiKeyWarning />
+          <p class="text-sm text-gray-700">
+            This tool converts the JSON data from the <strong>Data Editor</strong> to
+            <strong>JSON-LD</strong>. You can optionally provide extra instructions below to guide
+            the mapping.
+          </p>
+          <div class="hints-block">
+            <label for="userComments" class="block font-semibold mb-1">
+              Additional Mapping Hints
+            </label>
+            <Textarea
+              id="userComments"
+              v-model="userComments"
+              class="w-full rml-hints-textarea"
+              placeholder="e.g., rename fields, format dates..." />
           </div>
-        </ScrollPanel>
+          <Button
+            label="Generate Suggestion"
+            icon="pi pi-wand"
+            @click="generateMappingSuggestion"
+            :loading="isLoadingMapping" />
+        </div>
       </Panel>
-      <div class="step-panel">
+      <div class="step-panel step-panel-grow">
         <Divider />
         <label class="block font-semibold mb-2">Mapping Configuration</label>
         <div class="editor-block">
@@ -77,7 +75,6 @@ import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import Message from 'primevue/message';
 import Panel from 'primevue/panel';
-import ScrollPanel from 'primevue/scrollpanel';
 import {Codemirror} from 'vue-codemirror';
 import {basicSetup} from 'codemirror';
 import {syntaxHighlighting, HighlightStyle, StreamLanguage} from '@codemirror/language';
@@ -239,6 +236,7 @@ label {
   gap: 1rem;
   height: 100%;
   min-height: 0;
+  overflow: auto;
 }
 
 .rml-panel {
@@ -246,12 +244,15 @@ label {
 }
 
 .step-panel {
-  flex: 1;
-  min-height: 0;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  overflow: hidden;
+}
+
+.step-panel-grow {
+  flex: 1 0 auto;
+  min-height: 320px;
 }
 
 .hints-block {
@@ -262,31 +263,22 @@ label {
   gap: 0.5rem;
 }
 
-.step-panel-scroll :deep(.p-scrollpanel-content) {
-  display: block;
-}
-
-.step-panel-scroll {
-  width: 100%;
-}
-
 .hints-block :deep(.p-textarea),
 .hints-block :deep(textarea) {
   flex: 1;
-  min-height: 0;
-  height: 100%;
+  min-height: 180px;
+  height: 180px;
   width: 100%;
   box-sizing: border-box;
   resize: none;
 }
 
 .editor-block {
-  flex: 1;
-  min-height: 0;
+  flex: 1 0 auto;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 4px;
   overflow: hidden;
