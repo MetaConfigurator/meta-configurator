@@ -140,6 +140,36 @@ function focusOnPropertyLabel(): void {
   focus(id);
   makeEditableAndSelectContents(id);
 }
+
+/**
+ * Handles keyboard events during property name editing.
+ * Prevents newline insertion on Enter and handles Escape to cancel editing.
+ */
+function handleKeyDown(event: KeyboardEvent) {
+  if (!isEditingPropertyName.value) {
+    return;
+  }
+
+  if (event.key === 'Enter') {
+    event.preventDefault(); // Prevent newline insertion
+    updatePropertyName(event);
+  } else if (event.key === 'Escape') {
+    event.preventDefault();
+    cancelPropertyNameEdit(event);
+  }
+}
+
+/**
+ * Cancels property name editing and reverts to original name.
+ */
+function cancelPropertyNameEdit(event: Event) {
+  const target = event.target as HTMLElement;
+  target.innerText = props.node.data.name;
+  isEditingPropertyName.value = false;
+  emit('stop_editing_property_name');
+  target.contentEditable = 'false';
+  showPencil.value = true;
+}
 </script>
 
 <template>
@@ -154,9 +184,8 @@ function focusOnPropertyLabel(): void {
         :contenteditable="isPropertyNameEditable(props.type) && isEditingPropertyName"
         :id="getId()"
         @focus="focusEditingLabel()"
-        @keydown.stop
+        @keydown="handleKeyDown"
         @blur="updatePropertyName"
-        @keyup.enter="updatePropertyName"
         class="scroll-my-60 snap-start"
         :class="{
           'text-indigo-700': canZoomIn(),
