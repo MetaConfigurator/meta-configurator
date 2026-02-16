@@ -145,7 +145,9 @@
     :style="{width: '1200px', height: '1200px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
     <RdfVisualizer
+      ref="visualizerRef"
       :statements="filteredStatements"
+      :readOnly="false"
       @cancel-render="closeVisualizer"
       @edit-triple="openTripleEditorFromVisualizer" />
   </Dialog>
@@ -178,6 +180,7 @@ import {
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
 import TripleDetailsDialog from '@/components/panels/rdf/TripleDetailsDialog.vue';
+import type * as $rdf from 'rdflib';
 
 const filteredRows = ref<any[]>([]);
 const props = defineProps<{
@@ -197,6 +200,7 @@ const dataSession = getSessionForMode(SessionMode.DataEditor);
 const deleteDialog = ref(false);
 const sparqlDialog = ref(false);
 const visualizerDialog = ref(false);
+const visualizerRef = ref<InstanceType<typeof RdfVisualizer> | null>(null);
 
 const loading = ref(false);
 const tripleDetailsDialog = ref<InstanceType<typeof TripleDetailsDialog> | null>(null);
@@ -374,16 +378,30 @@ function openTripleEditorFromVisualizer(payload: {
   predicateType: RdfTermType;
   object: string;
   objectType: RdfTermType;
+  statement?: $rdf.Statement;
 }) {
-  triple.value = {
-    subject: payload.subject,
-    subjectType: payload.subjectType,
-    predicate: payload.predicate,
-    predicateType: payload.predicateType,
-    object: payload.object,
-    objectType: payload.objectType,
-    statement: undefined,
-  };
+  if (payload.statement) {
+    const st = payload.statement;
+    triple.value = {
+      subject: st.subject.value,
+      subjectType: st.subject.termType,
+      predicate: st.predicate.value,
+      predicateType: st.predicate.termType,
+      object: st.object.value,
+      objectType: st.object.termType,
+      statement: st,
+    };
+  } else {
+    triple.value = {
+      subject: payload.subject,
+      subjectType: payload.subjectType,
+      predicate: payload.predicate,
+      predicateType: payload.predicateType,
+      object: payload.object,
+      objectType: payload.objectType,
+      statement: undefined,
+    };
+  }
   tripleDetailsDialog.value?.open();
 }
 
@@ -392,6 +410,7 @@ function handleTripleSaved(payload: {action: 'add' | 'edit'; triple: TripleTrans
   if (payload.action === 'add') {
     selectedTriple.value = null;
   }
+  visualizerRef.value?.refreshSelectedNodeFromStore();
 }
 
 const parsingErrors = computed(() => {

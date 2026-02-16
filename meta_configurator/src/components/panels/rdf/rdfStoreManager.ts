@@ -25,6 +25,11 @@ interface RdfStore {
     newStatement: $rdf.Statement
   ) => {success: boolean; errorMessage: string};
   deleteStatement: (statement: $rdf.Statement) => {success: boolean; errorMessage: string};
+  deleteStatementsBySubject: (subjectId: string) => {
+    success: boolean;
+    errorMessage: string;
+    deleted: $rdf.Statement[];
+  };
   addStatement: (
     statement: $rdf.Statement,
     isNewNode: boolean
@@ -39,6 +44,7 @@ interface RdfStore {
   containsPredicate: (statement: $rdf.Statement) => boolean;
   allPredicate: (statement: $rdf.Statement) => any;
   getObject: (statement: $rdf.Statement) => any;
+  getStatementsBySubject: (subjectId: string) => $rdf.Statement[];
 }
 
 export const rdfStoreManager: RdfStore & {
@@ -127,6 +133,36 @@ export const rdfStoreManager: RdfStore & {
       return {success: true, errorMessage: ''};
     } catch (error: any) {
       return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
+    }
+  };
+
+  const deleteStatementsBySubject = (
+    subjectId: string
+  ): {success: boolean; errorMessage: string; deleted: $rdf.Statement[]} => {
+    if (!_store.value) {
+      return {success: false, errorMessage: 'Store is not initialized.', deleted: []};
+    }
+    if (!subjectId) {
+      return {success: false, errorMessage: 'No subject provided.', deleted: []};
+    }
+
+    const toDelete = _store.value.statements.filter(st => st.subject.value === subjectId);
+    if (toDelete.length === 0) {
+      return {success: true, errorMessage: '', deleted: []};
+    }
+
+    try {
+      for (const st of toDelete) {
+        _store.value.removeStatement(st);
+      }
+      updateStatements();
+      return {success: true, errorMessage: '', deleted: toDelete};
+    } catch (error: any) {
+      return {
+        success: false,
+        errorMessage: error.message || 'Unknown error occurred.',
+        deleted: [],
+      };
     }
   };
 
@@ -340,6 +376,13 @@ export const rdfStoreManager: RdfStore & {
     return values;
   };
 
+  const getStatementsBySubject = (subjectId: string): $rdf.Statement[] => {
+    if (!_store.value) {
+      return [];
+    }
+    return _store.value.statements.filter(st => st.subject.value === subjectId);
+  };
+
   function findStatementIndex(statement: $rdf.Statement): number {
     const index = rdfStoreManager.statements.value.findIndex(
       st =>
@@ -386,6 +429,7 @@ export const rdfStoreManager: RdfStore & {
     parseWarnings: readonly(_parseWarnings),
     editStatement,
     deleteStatement,
+    deleteStatementsBySubject,
     addStatement,
     onChange,
     exportAs,
@@ -395,5 +439,6 @@ export const rdfStoreManager: RdfStore & {
     containsPredicate,
     allPredicate,
     getObject,
+    getStatementsBySubject,
   } as RdfStore & {onChange: (cb: RdfChangeCallback) => void};
 })();

@@ -53,8 +53,7 @@ export class TripleEditorService {
     const newStatement = $rdf.st(
       subjectNode as NamedNode | BlankNode,
       predicateNode as NamedNode,
-      objectNode,
-      $rdf.defaultGraph()
+      objectNode
     );
 
     const isNewNode = false;

@@ -5,7 +5,7 @@
     modal
     maximizable
     :draggable="false"
-    :style="{width: '640px', height: '520px'}"
+    :style="{width: '800px', height: '500px'}"
     contentStyle="overflow-y: auto">
     <div class="flex flex-col gap-6 w-full">
       <div>

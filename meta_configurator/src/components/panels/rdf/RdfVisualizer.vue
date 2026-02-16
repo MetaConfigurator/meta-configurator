@@ -18,6 +18,43 @@
         <Button label="Yes" icon="pi pi-check" text @click="confirmRender(true)" />
       </template>
     </Dialog>
+    <Dialog v-model:visible="deletePropertyDialog" header="Confirm" modal>
+      <div class="flex items-center gap-4">
+        <i class="pi pi-exclamation-triangle !text-3xl" />
+        <span>Are you sure you want to delete the selected property?</span>
+      </div>
+      <template #footer>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          text
+          @click="deletePropertyDialog = false"
+          severity="secondary"
+          variant="text" />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          text
+          @click="confirmDeleteProperty"
+          severity="danger" />
+      </template>
+    </Dialog>
+    <Dialog v-model:visible="deleteNodeDialog" header="Confirm" modal>
+      <div class="flex items-center gap-4">
+        <i class="pi pi-exclamation-triangle !text-3xl" />
+        <span>Are you sure you want to delete the selected node?</span>
+      </div>
+      <template #footer>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          text
+          @click="deleteNodeDialog = false"
+          severity="secondary"
+          variant="text" />
+        <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteNode" severity="danger" />
+      </template>
+    </Dialog>
     <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
       <SplitterPanel class="graph-panel">
         <div class="graph-wrapper">
@@ -44,6 +81,9 @@
         :size="propertiesPanelSize"
         :minSize="propertiesPanelMinSize">
         <div class="properties-content">
+          <Transition name="fade">
+            <ProgressSpinner v-if="isRefreshingNode" class="properties-loading-overlay" />
+          </Transition>
           <div class="properties-body">
             <div class="node-cards">
               <Card class="prop-card">
@@ -72,8 +112,12 @@
                         {{ selectedNode.id }}
                       </span>
                     </span>
-                    <Divider layout="vertical" class="action-divider action-divider-right" />
+                    <Divider
+                      v-if="!props.readOnly"
+                      layout="vertical"
+                      class="action-divider action-divider-right" />
                     <Button
+                      v-if="!props.readOnly"
                       class="delete-node-btn"
                       icon="pi pi-times-circle"
                       text
@@ -130,8 +174,11 @@
                           {{ lit.value }}
                         </span>
                       </span>
-                      <Divider layout="vertical" class="action-divider action-divider-right" />
-                      <div class="prop-actions">
+                      <Divider
+                        v-if="!props.readOnly"
+                        layout="vertical"
+                        class="action-divider action-divider-right" />
+                      <div v-if="!props.readOnly" class="prop-actions">
                         <Button
                           class="prop-action-btn"
                           icon="pi pi-pencil"
@@ -168,7 +215,7 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import Card from 'primevue/card';
 import ProgressSpinner from 'primevue/progressspinner';
-import {ref, computed, onMounted, onUnmounted} from 'vue';
+import {ref, computed, onMounted, onUnmounted, watch, nextTick, withDefaults} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
@@ -181,11 +228,20 @@ import Divider from 'primevue/divider';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import {isDarkMode} from '@/utility/darkModeUtils';
+import {TripleEditorService} from '@/components/panels/rdf/tripleEditorService';
+import {useErrorService} from '@/utility/errorServiceInstance';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 
 interface SelectedNodeData {
   id: string;
   label: string;
-  literals?: Array<{predicate: string; value: string; isIRI: boolean; href?: string}>;
+  literals?: Array<{
+    predicate: string;
+    value: string;
+    isIRI: boolean;
+    href?: string;
+    statement?: $rdf.Statement;
+  }>;
 }
 
 const settings = useSettings();
@@ -197,6 +253,17 @@ const physicsEnabled = ref(false);
 const propertiesPanelVisible = ref(true);
 const propertiesPanelSize = computed(() => (propertiesPanelVisible.value ? 28 : 0));
 const propertiesPanelMinSize = computed(() => (propertiesPanelVisible.value ? 16 : 0));
+const isRefreshingNode = ref(false);
+const needsGraphRefresh = ref(false);
+const deleteNodeDialog = ref(false);
+const deletePropertyDialog = ref(false);
+const propertyToDelete = ref<{
+  predicate: string;
+  value: string;
+  isIRI: boolean;
+  href?: string;
+  statement?: $rdf.Statement;
+} | null>(null);
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
@@ -209,13 +276,20 @@ const emit = defineEmits<{
       predicateType: RdfTermType;
       object: string;
       objectType: RdfTermType;
+      statement?: $rdf.Statement;
     }
   ): void;
 }>();
 
-const props = defineProps<{
-  statements: $rdf.Statement[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    statements: $rdf.Statement[];
+    readOnly?: boolean;
+  }>(),
+  {
+    readOnly: false,
+  }
+);
 
 const dockItems = computed(() => [
   {
@@ -345,22 +419,71 @@ function selectNode(node: any, nodeData: any) {
 
 function deleteSelectedNode() {
   if (!selectedNode.value) return;
-  console.log('Delete node requested:', selectedNode.value);
+  deleteNodeDialog.value = true;
 }
 
 function deleteProperty(lit: {predicate: string; value: string; isIRI: boolean}) {
-  console.log('Delete property requested:', lit);
+  propertyToDelete.value = lit;
+  deletePropertyDialog.value = true;
 }
 
-function editProperty(lit: {predicate: string; value: string; isIRI: boolean; href?: string}) {
+function confirmDeleteProperty() {
+  const target = propertyToDelete.value;
+  if (!target?.statement) {
+    useErrorService().onError('Unable to delete property: missing source statement.');
+    deletePropertyDialog.value = false;
+    propertyToDelete.value = null;
+    return;
+  }
+
+  const result = TripleEditorService.delete(target.statement);
+  if (!result.success) {
+    useErrorService().onError(result.errorMessage!);
+    return;
+  }
+
+  refreshSelectedNodeFromStore();
+  deletePropertyDialog.value = false;
+  propertyToDelete.value = null;
+}
+
+function confirmDeleteNode() {
   if (!selectedNode.value) return;
+  const subjectId = selectedNode.value.id;
+  const result = rdfStoreManager.deleteStatementsBySubject(subjectId);
+  if (!result.success) {
+    useErrorService().onError(result.errorMessage!);
+    return;
+  }
+
+  for (const st of result.deleted) {
+    jsonLdNodeManager.deleteStatement(st);
+  }
+
+  clearSelectedNode();
+  deleteNodeDialog.value = false;
+  needsGraphRefresh.value = true;
+}
+
+function editProperty(lit: {
+  predicate: string;
+  value: string;
+  isIRI: boolean;
+  href?: string;
+  statement?: $rdf.Statement;
+}) {
+  if (!selectedNode.value) return;
+  const statement = lit.statement;
+  const fallbackObject = lit.href ?? expandIRI(lit.value) ?? lit.value;
   emit('edit-triple', {
-    subject: selectedNode.value.id,
-    subjectType: RdfTermType.NamedNode,
-    predicate: expandIRI(lit.predicate) || lit.predicate,
-    predicateType: RdfTermType.NamedNode,
-    object: lit.href || expandIRI(lit.value) || lit.value,
-    objectType: lit.isIRI ? RdfTermType.NamedNode : RdfTermType.Literal,
+    subject: statement?.subject.value ?? selectedNode.value.id,
+    subjectType: statement?.subject.termType ?? RdfTermType.NamedNode,
+    predicate: statement?.predicate.value ?? expandIRI(lit.predicate) ?? lit.predicate,
+    predicateType: statement?.predicate.termType ?? RdfTermType.NamedNode,
+    object: statement?.object.value ?? fallbackObject,
+    objectType:
+      statement?.object.termType ?? (lit.isIRI ? RdfTermType.NamedNode : RdfTermType.Literal),
+    statement,
   });
 }
 
@@ -526,7 +649,14 @@ function isTypePredicate(predicate: string): boolean {
 function buildGraphElements(statements: readonly $rdf.Statement[]) {
   const nodesMap = new Map<
     string,
-    {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}
+    {
+      literals?: Array<{
+        predicate: string;
+        value: string;
+        isIRI: boolean;
+        statement?: $rdf.Statement;
+      }>;
+    }
   >();
   const edges: any[] = [];
   const existingSubjects = new Set<string>(statements.map(st => st.subject.value));
@@ -539,12 +669,12 @@ function buildGraphElements(statements: readonly $rdf.Statement[]) {
     ensureNode(nodesMap, s);
 
     if (st.object.termType === RdfTermType.Literal) {
-      addLiteral(nodesMap, s, p, o);
+      addLiteral(nodesMap, s, p, o, undefined, st);
       continue;
     }
 
     // Always show IRI/object values in the properties list (prefixed when possible).
-    addLiteral(nodesMap, s, p, toPrefixed(o), o);
+    addLiteral(nodesMap, s, p, toPrefixed(o), o, st);
 
     if (isTypePredicate(p) || !existingSubjects.has(o)) {
       continue;
@@ -657,6 +787,77 @@ function toSelectedNodeData(nodeData: any): SelectedNodeData {
   };
 }
 
+function buildLiteralsForSubject(
+  subjectId: string,
+  statements: readonly $rdf.Statement[]
+): Array<{
+  predicate: string;
+  value: string;
+  isIRI: boolean;
+  href?: string;
+  statement?: $rdf.Statement;
+}> {
+  const literals: Array<{
+    predicate: string;
+    value: string;
+    isIRI: boolean;
+    href?: string;
+    statement?: $rdf.Statement;
+  }> = [];
+
+  for (const st of statements) {
+    if (st.subject.value !== subjectId) continue;
+    const p = st.predicate.value;
+    const o = st.object.value;
+    if (st.object.termType === RdfTermType.Literal) {
+      literals.push({
+        predicate: getPredicateAlias(p),
+        value: o,
+        isIRI: isIRI(o),
+        statement: st,
+      });
+    } else {
+      literals.push({
+        predicate: getPredicateAlias(p),
+        value: toPrefixed(o),
+        isIRI: true,
+        href: o,
+        statement: st,
+      });
+    }
+  }
+
+  return literals;
+}
+
+async function refreshSelectedNodeFromStore() {
+  if (!selectedNode.value) return;
+  isRefreshingNode.value = true;
+  await nextTick();
+  const subjectId = selectedNode.value.id;
+  const subjectStatements = rdfStoreManager.getStatementsBySubject(subjectId);
+  const literals = buildLiteralsForSubject(subjectId, subjectStatements);
+  selectedNode.value = {
+    ...selectedNode.value,
+    literals,
+  };
+
+  if (cy) {
+    const node = cy.getElementById(subjectId);
+    if (node && node.length > 0) {
+      node.data({
+        ...node.data(),
+        literals,
+        hasLiterals: literals.length > 0,
+        literalCount: literals.length,
+      });
+    }
+  }
+  isRefreshingNode.value = false;
+}
+
+defineExpose({refreshSelectedNodeFromStore});
+
 function clearSelectedNode() {
   if (selectedCyNode.value) {
     selectedCyNode.value.removeClass('selected');
@@ -666,7 +867,17 @@ function clearSelectedNode() {
 }
 
 function ensureNode(
-  nodesMap: Map<string, {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}>,
+  nodesMap: Map<
+    string,
+    {
+      literals?: Array<{
+        predicate: string;
+        value: string;
+        isIRI: boolean;
+        statement?: $rdf.Statement;
+      }>;
+    }
+  >,
   id: string
 ) {
   if (!nodesMap.has(id)) {
@@ -677,18 +888,28 @@ function ensureNode(
 function addLiteral(
   nodesMap: Map<
     string,
-    {literals?: Array<{predicate: string; value: string; isIRI: boolean; href?: string}>}
+    {
+      literals?: Array<{
+        predicate: string;
+        value: string;
+        isIRI: boolean;
+        href?: string;
+        statement?: $rdf.Statement;
+      }>;
+    }
   >,
   subjectId: string,
   predicate: string,
   value: string,
-  href?: string
+  href?: string,
+  statement?: $rdf.Statement
 ) {
   nodesMap.get(subjectId)!.literals!.push({
     predicate: getPredicateAlias(predicate),
     value,
     isIRI: Boolean(href) || isIRI(value),
     href,
+    statement,
   });
 }
 
@@ -706,7 +927,14 @@ function createEdge(source: string, predicate: string, target: string) {
 
 function createNode(
   id: string,
-  data: {literals?: Array<{predicate: string; value: string; isIRI: boolean}>}
+  data: {
+    literals?: Array<{
+      predicate: string;
+      value: string;
+      isIRI: boolean;
+      statement?: $rdf.Statement;
+    }>;
+  }
 ) {
   return {
     data: {
@@ -844,6 +1072,24 @@ onMounted(() => {
     }
   });
 });
+
+watch(
+  () => rdfStoreManager.statements.value,
+  () => {
+    refreshSelectedNodeFromStore();
+  }
+);
+
+watch(
+  () => props.statements,
+  statements => {
+    if (!needsGraphRefresh.value) return;
+    if (!container.value) return;
+    if (showLargeGraphPrompt.value) return;
+    needsGraphRefresh.value = false;
+    renderGraph(statements);
+  }
+);
 </script>
 
 <style scoped>
@@ -919,6 +1165,15 @@ onMounted(() => {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.properties-loading-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
 }
 
 .properties-body {

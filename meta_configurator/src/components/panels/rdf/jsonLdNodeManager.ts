@@ -23,6 +23,8 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
 
   const editStatement = (oldStatement: $rdf.Statement, newStatement: $rdf.Statement) => {
     if (settings.value.rdf.preserveFormatting) {
+      // TO-DO : Implement preserve-formatting logic
+      rebuildTextData();
       return;
     } else {
       rebuildTextData();
@@ -34,6 +36,8 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
       rebuildTextData();
       return;
     }
+
+    // TO-DO : Check implementaton of preserve-formatting logic
 
     parser.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
 
@@ -68,22 +72,25 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
   };
 
   const addStatement = (statement: $rdf.Statement, isNewNode: boolean) => {
-    if (settings.value.rdf.preserveFormatting) {
-      parser.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
-      if (isNewNode) {
-        let jsonObject = JSON.parse(rdfStoreManager.statementAsJsonLd(statement)!);
-        for (const [prefix, iri] of Object.entries(jsonObject['@context'])) {
-          if (prefix.startsWith('@')) continue;
-          if (!rdfStoreManager.namespaces.value[prefix]) {
-            data.setDataAt(['@context', prefix], iri);
-          }
-        }
-        delete jsonObject['@context'];
-        data.setDataAt(['@graph', data.dataAt(['@graph']).length], jsonObject);
-      } else {
-      }
-    } else {
+    if (!settings.value.rdf.preserveFormatting) {
       rebuildTextData();
+      return;
+    }
+
+    // TO-DO : Check implementaton of preserve-formatting logic
+
+    parser.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
+    if (isNewNode) {
+      let jsonObject = JSON.parse(rdfStoreManager.statementAsJsonLd(statement)!);
+      for (const [prefix, iri] of Object.entries(jsonObject['@context'])) {
+        if (prefix.startsWith('@')) continue;
+        if (!rdfStoreManager.namespaces.value[prefix]) {
+          data.setDataAt(['@context', prefix], iri);
+        }
+      }
+      delete jsonObject['@context'];
+      data.setDataAt(['@graph', data.dataAt(['@graph']).length], jsonObject);
+    } else {
     }
   };
 

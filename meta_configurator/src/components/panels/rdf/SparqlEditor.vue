@@ -202,6 +202,7 @@ What is the average age of all people?" />
           <RdfVisualizer
             v-if="statements.length"
             :statements="statements"
+            :readOnly="true"
             @cancel-render="visualizationCanceled" />
           <Message v-else severity="warn">
             No results. Please check your query and
