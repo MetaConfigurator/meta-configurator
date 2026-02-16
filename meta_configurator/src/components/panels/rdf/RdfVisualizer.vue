@@ -86,121 +86,156 @@
           </Transition>
           <div class="properties-body">
             <div class="node-cards">
-              <Card class="prop-card">
-                <template #title>
-                  <div class="card-title">
-                    <i class="pi pi-globe" />
-                    <span>Node Identifier</span>
-                  </div>
-                </template>
-                <template #content>
-                  <div v-if="!selectedNode" class="card-empty">
-                    <i class="pi pi-share-alt empty-icon" />
-                    <p>Select a node to see its identifier</p>
-                  </div>
-                  <div v-else class="kv-row kv-row-inline">
-                    <span class="kv-row-text">
-                      <a
-                        v-if="isIRI(selectedNode.id)"
-                        class="kv-value link"
-                        :href="selectedNode.id"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        {{ selectedNode.id }}
-                      </a>
-                      <span v-else class="kv-value">
-                        {{ selectedNode.id }}
-                      </span>
-                    </span>
-                    <Divider
-                      v-if="!props.readOnly"
-                      layout="vertical"
-                      class="action-divider action-divider-right" />
-                    <Button
-                      v-if="!props.readOnly"
-                      class="delete-node-btn"
-                      icon="pi pi-times-circle"
-                      text
-                      rounded
-                      size="small"
-                      severity="danger"
-                      v-tooltip.bottom="'Delete node'"
-                      @click="deleteSelectedNode" />
-                  </div>
-                </template>
-              </Card>
-              <Card class="prop-card">
-                <template #title>
-                  <div class="card-title">
-                    <i class="pi pi-list" />
-                    <span>
-                      Properties
-                      <span v-if="selectedNode?.literals?.length" class="count-pill">
-                        ({{ selectedNode.literals.length }})
-                      </span>
-                    </span>
-                  </div>
-                </template>
-                <template #content>
-                  <div v-if="!selectedNode" class="card-empty">
-                    <i class="pi pi-info-circle empty-icon" />
-                    <p>Select a node to view its properties</p>
-                  </div>
-                  <div v-else-if="!selectedNode.literals?.length" class="card-empty">
-                    <i class="pi pi-inbox empty-icon" />
-                    <p>No properties found for this node</p>
-                  </div>
-                  <div v-else class="props-list">
-                    <div class="prop-line" v-for="(lit, idx) in selectedNode.literals" :key="idx">
-                      <span class="prop-text-group">
+              <!-- Node Identifier Card with Transition -->
+              <Transition name="card-fade" mode="out-in">
+                <Card class="prop-card" v-if="selectedNode" :key="`node-${selectedNode.id}`">
+                  <template #title>
+                    <div class="card-title">
+                      <i class="pi pi-globe" />
+                      <span>Node Identifier</span>
+                    </div>
+                  </template>
+                  <template #content>
+                    <div class="kv-row kv-row-inline">
+                      <span class="kv-row-text">
                         <a
+                          v-if="isIRI(selectedNode.id)"
                           class="kv-value link"
-                          :href="iriHref(lit.predicate) || lit.predicate"
+                          :href="selectedNode.id"
                           target="_blank"
                           rel="noopener noreferrer">
-                          {{ lit.predicate }}
+                          {{ selectedNode.id }}
                         </a>
-                        <span class="prop-text">:</span>
-                        <a
-                          v-if="lit.isIRI && (lit.href || isLinkableIRI(lit.value))"
-                          class="prop-text link"
-                          :href="lit.href || iriHref(lit.value) || undefined"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          @click="handlePropertyLinkClick(lit, $event)">
-                          {{ lit.value }}
-                        </a>
-                        <span v-else class="prop-text">
-                          {{ lit.value }}
+                        <span v-else class="kv-value">
+                          {{ selectedNode.id }}
                         </span>
                       </span>
                       <Divider
                         v-if="!props.readOnly"
                         layout="vertical"
                         class="action-divider action-divider-right" />
-                      <div v-if="!props.readOnly" class="prop-actions">
-                        <Button
-                          class="prop-action-btn"
-                          icon="pi pi-pencil"
-                          text
-                          rounded
-                          size="small"
-                          v-tooltip.bottom="'Edit property'"
-                          @click="editProperty(lit)" />
-                        <Button
-                          class="prop-action-btn"
-                          icon="pi pi-times-circle"
-                          text
-                          rounded
-                          size="small"
-                          severity="danger"
-                          v-tooltip.bottom="'Delete property'"
-                          @click="deleteProperty(lit)" />
-                      </div>
+                      <Button
+                        v-if="!props.readOnly"
+                        class="delete-node-btn"
+                        icon="pi pi-times-circle"
+                        text
+                        rounded
+                        size="small"
+                        severity="danger"
+                        v-tooltip.bottom="'Delete node'"
+                        @click="deleteSelectedNode" />
                     </div>
-                  </div>
-                </template>
-              </Card>
+                  </template>
+                </Card>
+                <Card class="prop-card" v-else>
+                  <template #title>
+                    <div class="card-title">
+                      <i class="pi pi-globe" />
+                      <span>Node Identifier</span>
+                    </div>
+                  </template>
+                  <template #content>
+                    <div class="card-empty">
+                      <i class="pi pi-share-alt empty-icon" />
+                      <p>Select a node to see its identifier</p>
+                    </div>
+                  </template>
+                </Card>
+              </Transition>
+
+              <!-- Properties Card with Transition -->
+              <Transition name="card-fade" mode="out-in">
+                <Card
+                  class="prop-card"
+                  v-if="selectedNode"
+                  :key="`props-${selectedNode.id}-${propertyUpdateKey}`">
+                  <template #title>
+                    <div class="card-title">
+                      <i class="pi pi-list" />
+                      <span>
+                        Properties
+                        <span v-if="selectedNode?.literals?.length" class="count-pill">
+                          ({{ selectedNode.literals.length }})
+                        </span>
+                      </span>
+                    </div>
+                  </template>
+                  <template #content>
+                    <div v-if="!selectedNode.literals?.length" class="card-empty">
+                      <i class="pi pi-inbox empty-icon" />
+                      <p>No properties found for this node</p>
+                    </div>
+                    <div v-else class="props-list">
+                      <TransitionGroup name="property-list" tag="div">
+                        <div
+                          class="prop-line"
+                          v-for="(lit, idx) in selectedNode.literals"
+                          :key="`${lit.predicate}-${lit.value}-${idx}`">
+                          <span class="prop-text-group">
+                            <a
+                              class="kv-value link"
+                              :href="iriHref(lit.predicate) || lit.predicate"
+                              target="_blank"
+                              rel="noopener noreferrer">
+                              {{ lit.predicate }}
+                            </a>
+                            <span class="prop-text">:</span>
+                            <a
+                              v-if="lit.isIRI && (lit.href || isLinkableIRI(lit.value))"
+                              class="prop-text link"
+                              :href="lit.href || iriHref(lit.value) || undefined"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              @click="handlePropertyLinkClick(lit, $event)">
+                              {{ lit.value }}
+                            </a>
+                            <span v-else class="prop-text">
+                              {{ lit.value }}
+                            </span>
+                          </span>
+                          <Divider
+                            v-if="!props.readOnly"
+                            layout="vertical"
+                            class="action-divider action-divider-right" />
+                          <div v-if="!props.readOnly" class="prop-actions">
+                            <Button
+                              class="prop-action-btn"
+                              icon="pi pi-pencil"
+                              text
+                              rounded
+                              size="small"
+                              v-tooltip.bottom="'Edit property'"
+                              @click="editProperty(lit)" />
+                            <Button
+                              class="prop-action-btn"
+                              icon="pi pi-times-circle"
+                              text
+                              rounded
+                              size="small"
+                              severity="danger"
+                              v-tooltip.bottom="'Delete property'"
+                              @click="deleteProperty(lit)" />
+                          </div>
+                        </div>
+                      </TransitionGroup>
+                    </div>
+                  </template>
+                </Card>
+                <Card class="prop-card" v-else>
+                  <template #title>
+                    <div class="card-title">
+                      <i class="pi pi-list" />
+                      <span>Properties</span>
+                    </div>
+                  </template>
+                  <template #content>
+                    <div class="card-empty">
+                      <i class="pi pi-info-circle empty-icon" />
+                      <p>Select a node to view its properties</p>
+                    </div>
+                  </template>
+                </Card>
+              </Transition>
             </div>
           </div>
         </div>
@@ -257,6 +292,7 @@ const isRefreshingNode = ref(false);
 const needsGraphRefresh = ref(false);
 const deleteNodeDialog = ref(false);
 const deletePropertyDialog = ref(false);
+const propertyUpdateKey = ref(0); // Force re-render of properties card
 const propertyToDelete = ref<{
   predicate: string;
   value: string;
@@ -415,6 +451,7 @@ function selectNode(node: any, nodeData: any) {
   node.addClass('selected');
   selectedCyNode.value = node;
   selectedNode.value = toSelectedNodeData(nodeData);
+  propertyUpdateKey.value++; // Trigger transition on node selection
 }
 
 function deleteSelectedNode() {
@@ -841,6 +878,7 @@ async function refreshSelectedNodeFromStore() {
     ...selectedNode.value,
     literals,
   };
+  propertyUpdateKey.value++; // Trigger transition when properties update
 
   if (cy) {
     const node = cy.getElementById(subjectId);
@@ -1330,6 +1368,45 @@ watch(
   margin: 0;
 }
 
+/* ===== TRANSITION EFFECTS ===== */
+
+/* Card-level transitions (when switching between nodes) */
+.card-fade-enter-active,
+.card-fade-leave-active {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.card-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Property list transitions (individual items) */
+.property-list-enter-active,
+.property-list-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.property-list-enter-from {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+
+.property-list-leave-to {
+  opacity: 0;
+  transform: translateX(16px);
+}
+
+.property-list-move {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   .graph-container {
     background: #1a202c;
