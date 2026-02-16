@@ -861,11 +861,47 @@ function buildLiteralsForSubject(
   return literals;
 }
 
+function buildEdgeKeySetForSubject(
+  subjectId: string,
+  statements: readonly $rdf.Statement[]
+): Set<string> {
+  const subjects = new Set<string>(statements.map(st => st.subject.value));
+  const keys = new Set<string>();
+  for (const st of statements) {
+    if (st.subject.value !== subjectId) continue;
+    if (st.object.termType === RdfTermType.Literal) continue;
+    if (isTypePredicate(st.predicate.value)) continue;
+    if (!subjects.has(st.object.value)) continue;
+    keys.add(`${st.subject.value}|${st.predicate.value}|${st.object.value}`);
+  }
+  return keys;
+}
+
+function shouldRefreshGraphForSubject(subjectId: string): boolean {
+  if (!cy) return true;
+  const currentEdges = cy.edges(`[source = "${subjectId}"]`);
+  const currentKeys = new Set<string>();
+  currentEdges.forEach(edge => {
+    const source = edge.data('source');
+    const target = edge.data('target');
+    const predicate = edge.data('predicateIRI');
+    currentKeys.add(`${source}|${predicate}|${target}`);
+  });
+
+  const storeKeys = buildEdgeKeySetForSubject(subjectId, rdfStoreManager.statements.value);
+  if (currentKeys.size !== storeKeys.size) return true;
+  for (const key of currentKeys) {
+    if (!storeKeys.has(key)) return true;
+  }
+  return false;
+}
+
 async function refreshSelectedNodeFromStore() {
   if (!selectedNode.value) return;
   isRefreshingNode.value = true;
   await nextTick();
   const subjectId = selectedNode.value.id;
+  const needsRefresh = shouldRefreshGraphForSubject(subjectId);
   const subjectStatements = rdfStoreManager.getStatementsBySubject(subjectId);
   const literals = buildLiteralsForSubject(subjectId, subjectStatements);
   selectedNode.value = {
@@ -883,6 +919,15 @@ async function refreshSelectedNodeFromStore() {
         hasLiterals: literals.length > 0,
         literalCount: literals.length,
       });
+    }
+  }
+  if (needsRefresh) {
+    renderGraph(rdfStoreManager.statements.value);
+    if (cy) {
+      const node = cy.getElementById(subjectId);
+      if (node && node.length > 0) {
+        selectNode(node, node.data());
+      }
     }
   }
   isRefreshingNode.value = false;

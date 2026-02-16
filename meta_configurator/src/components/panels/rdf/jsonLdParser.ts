@@ -124,8 +124,13 @@ export class JsonLdParser {
   findPath(statement: $rdf.Statement): (string | number)[] | null {
     const ast = this.buildAST(JSON.parse(this.text));
     const idIndex = this.indexById(ast);
-    const subjectNodes = idIndex.get(statement.subject.value);
-    if (!subjectNodes) return null;
+    const subjectEquivs = this.getEquivalentTerms(statement.subject.value);
+    const subjectNodes: ASTNode[] = [];
+    for (const subj of subjectEquivs) {
+      const hits = idIndex.get(subj);
+      if (hits) subjectNodes.push(...hits);
+    }
+    if (subjectNodes.length === 0) return null;
     const predicateEquivs = this.getEquivalentTerms(statement.predicate.value);
     const objectEquivs = this.getEquivalentTerms(statement.object.value);
     for (const sn of subjectNodes) {
