@@ -250,7 +250,7 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import Card from 'primevue/card';
 import ProgressSpinner from 'primevue/progressspinner';
-import {ref, computed, onMounted, onUnmounted, watch, nextTick, withDefaults} from 'vue';
+import {ref, computed, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
