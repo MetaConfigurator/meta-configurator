@@ -263,7 +263,10 @@ import Divider from 'primevue/divider';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import {isDarkMode} from '@/utility/darkModeUtils';
-import {TripleEditorService} from '@/components/panels/rdf/tripleEditorService';
+import {
+  TripleEditorService,
+  type TripleTransferObject,
+} from '@/components/panels/rdf/tripleEditorService';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 
@@ -303,18 +306,7 @@ const propertyToDelete = ref<{
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
-  (
-    e: 'edit-triple',
-    triple: {
-      subject: string;
-      subjectType: RdfTermType;
-      predicate: string;
-      predicateType: RdfTermType;
-      object: string;
-      objectType: RdfTermType;
-      statement?: $rdf.Statement;
-    }
-  ): void;
+  (e: 'edit-triple', triple: TripleTransferObject): void;
 }>();
 
 const props = withDefaults(
@@ -513,7 +505,7 @@ function editProperty(lit: {
   if (!selectedNode.value) return;
   const statement = lit.statement;
   const fallbackObject = lit.href ?? expandIRI(lit.value) ?? lit.value;
-  emit('edit-triple', {
+  const payload: TripleTransferObject = {
     subject: statement?.subject.value ?? selectedNode.value.id,
     subjectType: statement?.subject.termType ?? RdfTermType.NamedNode,
     predicate: statement?.predicate.value ?? expandIRI(lit.predicate) ?? lit.predicate,
@@ -522,7 +514,8 @@ function editProperty(lit: {
     objectType:
       statement?.object.termType ?? (lit.isIRI ? RdfTermType.NamedNode : RdfTermType.Literal),
     statement,
-  });
+  };
+  emit('edit-triple', payload);
 }
 
 function handlePropertyLinkClick(

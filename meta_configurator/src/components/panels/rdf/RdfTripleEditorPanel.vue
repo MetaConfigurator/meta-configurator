@@ -180,7 +180,6 @@ import {
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
 import TripleDetailsDialog from '@/components/panels/rdf/TripleDetailsDialog.vue';
-import type * as $rdf from 'rdflib';
 
 const filteredRows = ref<any[]>([]);
 const props = defineProps<{
@@ -371,15 +370,7 @@ const openEditDialog = () => {
   tripleDetailsDialog.value?.open();
 };
 
-function openTripleEditorFromVisualizer(payload: {
-  subject: string;
-  subjectType: RdfTermType;
-  predicate: string;
-  predicateType: RdfTermType;
-  object: string;
-  objectType: RdfTermType;
-  statement?: $rdf.Statement;
-}) {
+function openTripleEditorFromVisualizer(payload: TripleTransferObject) {
   if (payload.statement) {
     const st = payload.statement;
     triple.value = {
