@@ -499,7 +499,8 @@ function confirmDeleteNode() {
 
   clearSelectedNode();
   deleteNodeDialog.value = false;
-  needsGraphRefresh.value = true;
+  const updatedStatements = rdfStoreManager.statements.value;
+  renderGraph(updatedStatements);
 }
 
 function editProperty(lit: {
