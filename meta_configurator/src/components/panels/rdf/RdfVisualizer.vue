@@ -347,6 +347,11 @@ const dockItems = computed(() => [
     command: () => togglePhysics(),
   },
   {
+    label: 'Export Image',
+    icon: 'pi pi-image',
+    command: () => exportGraphImage(),
+  },
+  {
     label: propertiesPanelVisible.value ? 'Hide Properties' : 'Show Properties',
     icon: propertiesPanelVisible.value ? 'pi pi-times' : 'pi pi-info-circle',
     command: () => togglePropertiesPanel(),
@@ -362,6 +367,19 @@ let cy: cytoscape.Core | null = null;
 
 function togglePropertiesPanel() {
   propertiesPanelVisible.value = !propertiesPanelVisible.value;
+}
+
+function exportGraphImage() {
+  if (!cy) return;
+  const dataUrl = cy.png({
+    bg: '#ffffff',
+    full: false,
+    scale: 2,
+  });
+  const link = document.createElement('a');
+  link.href = dataUrl;
+  link.download = `rdf-graph-${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
+  link.click();
 }
 
 function countNodes(statements: readonly $rdf.Statement[]): number {
