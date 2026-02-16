@@ -54,17 +54,18 @@
             :extensions="extensions"
             @ready="handleReady" />
         </div>
+
+        <div v-if="errorMessage.length" class="error-box">
+          <span v-html="errorMessage"></span>
+        </div>
       </div>
     </div>
     <template #footer>
       <Button
-        :disabled="!resultIsValid"
+        v-if="resultIsValid"
         label="Perform Mapping"
         icon="pi pi-play"
         @click="performMapping" />
-      <div v-if="errorMessage.length" class="error-box">
-        <span v-html="errorMessage"></span>
-      </div>
     </template>
   </Dialog>
 </template>

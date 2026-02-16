@@ -232,6 +232,7 @@ const triple = ref<TripleTransferObject>({
   predicateType: RdfTermType.NamedNode,
   object: '',
   objectType: RdfTermType.Literal,
+  objectDatatype: '',
 });
 
 const initFilters = () => {
@@ -349,6 +350,7 @@ const openNewDialog = () => {
     predicateType: RdfTermType.NamedNode,
     object: '',
     objectType: RdfTermType.Literal,
+    objectDatatype: '',
     statement: undefined,
   };
   tripleDetailsDialog.value?.open();
@@ -364,6 +366,8 @@ const openEditDialog = () => {
     predicateType: st.predicate.termType,
     object: st.object.value,
     objectType: st.object.termType,
+    objectDatatype:
+      st.object.termType === RdfTermType.Literal ? st.object.datatype?.value ?? '' : '',
     statement: selectedTriple.value.statement,
   };
 
@@ -380,6 +384,8 @@ function openTripleEditorFromVisualizer(payload: TripleTransferObject) {
       predicateType: st.predicate.termType,
       object: st.object.value,
       objectType: st.object.termType,
+      objectDatatype:
+        st.object.termType === RdfTermType.Literal ? st.object.datatype?.value ?? '' : '',
       statement: st,
     };
   } else {
@@ -390,6 +396,7 @@ function openTripleEditorFromVisualizer(payload: TripleTransferObject) {
       predicateType: payload.predicateType,
       object: payload.object,
       objectType: payload.objectType,
+      objectDatatype: payload.objectDatatype ?? '',
       statement: undefined,
     };
   }

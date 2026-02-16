@@ -65,6 +65,28 @@
             optionLabel="label"
             optionValue="value"
             class="fixed-select" />
+          <template v-if="localTriple.objectType === RdfTermType.Literal">
+            <ToggleButton
+              v-model="useCustomDatatype"
+              onLabel="Custom"
+              offLabel="List"
+              onIcon="pi pi-pencil"
+              offIcon="pi pi-list"
+              class="fixed-toggle" />
+            <Select
+              v-if="!useCustomDatatype"
+              v-model="localTriple.objectDatatype"
+              :options="objectDatatypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="min-w-[200px]"
+              placeholder="Type" />
+            <InputText
+              v-else
+              v-model.trim="localTriple.objectDatatype"
+              placeholder="Datatype IRI or prefix"
+              class="min-w-[200px]" />
+          </template>
           <template v-if="localTriple.objectType === RdfTermType.NamedNode">
             <ToggleButton
               v-model="addNewObject"
@@ -128,6 +150,7 @@ const emit = defineEmits<{
 const visible = ref(false);
 const addNewSubject = ref(false);
 const addNewObject = ref(false);
+const useCustomDatatype = ref(false);
 
 const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
 const predicateTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
@@ -136,12 +159,32 @@ const objectTypeOptions = [
   {label: 'Literal', value: RdfTermType.Literal},
 ];
 
+const COMMON_DATATYPES = [
+  {label: 'Unspecified', value: ''},
+  {label: 'xsd:string', value: 'http://www.w3.org/2001/XMLSchema#string'},
+  {label: 'xsd:boolean', value: 'http://www.w3.org/2001/XMLSchema#boolean'},
+  {label: 'xsd:integer', value: 'http://www.w3.org/2001/XMLSchema#integer'},
+  {label: 'xsd:decimal', value: 'http://www.w3.org/2001/XMLSchema#decimal'},
+  {label: 'xsd:double', value: 'http://www.w3.org/2001/XMLSchema#double'},
+  {label: 'xsd:float', value: 'http://www.w3.org/2001/XMLSchema#float'},
+  {label: 'xsd:date', value: 'http://www.w3.org/2001/XMLSchema#date'},
+  {label: 'xsd:dateTime', value: 'http://www.w3.org/2001/XMLSchema#dateTime'},
+  {label: 'xsd:time', value: 'http://www.w3.org/2001/XMLSchema#time'},
+  {label: 'xsd:duration', value: 'http://www.w3.org/2001/XMLSchema#duration'},
+  {label: 'xsd:anyURI', value: 'http://www.w3.org/2001/XMLSchema#anyURI'},
+  {label: 'xsd:long', value: 'http://www.w3.org/2001/XMLSchema#long'},
+  {label: 'xsd:short', value: 'http://www.w3.org/2001/XMLSchema#short'},
+  {label: 'xsd:byte', value: 'http://www.w3.org/2001/XMLSchema#byte'},
+];
+
 const localTriple = ref<TripleTransferObject>({...props.triple});
 
 watch(
   () => props.triple,
   value => {
-    localTriple.value = {...value};
+    localTriple.value = {...value, objectDatatype: value.objectDatatype ?? ''};
+    useCustomDatatype.value =
+      Boolean(value.objectDatatype) && !isCommonDatatype(value.objectDatatype ?? '');
   },
   {deep: true, immediate: true}
 );
@@ -156,10 +199,55 @@ const nodes = computed(() => {
   return Array.from(nodesSet).map(n => ({label: n, value: n}));
 });
 
+function toPrefixed(iri: string): string {
+  for (const [prefix, ns] of Object.entries(rdfStoreManager.namespaces.value)) {
+    if (iri.startsWith(ns)) {
+      return `${prefix}:${iri.slice(ns.length)}`;
+    }
+  }
+  const xsdNs = 'http://www.w3.org/2001/XMLSchema#';
+  if (iri.startsWith(xsdNs)) {
+    return `xsd:${iri.slice(xsdNs.length)}`;
+  }
+  return iri;
+}
+
+function isCommonDatatype(value: string) {
+  return COMMON_DATATYPES.some(opt => opt.value === value);
+}
+
+const objectDatatypeOptions = computed(() => {
+  const current = localTriple.value.objectDatatype ?? '';
+  if (!current || isCommonDatatype(current)) {
+    return COMMON_DATATYPES;
+  }
+  return [{label: toPrefixed(current), value: current}, ...COMMON_DATATYPES];
+});
+
+watch(
+  () => localTriple.value.objectType,
+  value => {
+    if (value !== RdfTermType.Literal) {
+      localTriple.value.objectDatatype = '';
+      useCustomDatatype.value = false;
+    }
+  }
+);
+
+watch(
+  () => localTriple.value.objectDatatype,
+  value => {
+    if (!value) return;
+    useCustomDatatype.value = !isCommonDatatype(value);
+  }
+);
+
 function open() {
   addNewSubject.value = false;
   addNewObject.value = false;
-  localTriple.value = {...props.triple};
+  localTriple.value = {...props.triple, objectDatatype: props.triple.objectDatatype ?? ''};
+  useCustomDatatype.value =
+    Boolean(props.triple.objectDatatype) && !isCommonDatatype(props.triple.objectDatatype ?? '');
   visible.value = true;
 }
 

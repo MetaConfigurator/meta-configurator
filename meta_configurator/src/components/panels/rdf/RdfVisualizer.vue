@@ -531,6 +531,8 @@ function editProperty(lit: {
     object: statement?.object.value ?? fallbackObject,
     objectType:
       statement?.object.termType ?? (lit.isIRI ? RdfTermType.NamedNode : RdfTermType.Literal),
+    objectDatatype:
+      statement?.object.termType === RdfTermType.Literal ? statement.object.datatype?.value : '',
     statement,
   };
   emit('edit-triple', payload);

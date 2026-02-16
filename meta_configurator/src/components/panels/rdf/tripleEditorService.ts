@@ -13,6 +13,7 @@ export interface TripleTransferObject {
 
   object: string;
   objectType: RdfTermTypeString;
+  objectDatatype?: string | null;
 
   statement?: $rdf.Statement;
 }
@@ -23,14 +24,33 @@ export interface TripleEditorResult {
 }
 
 export class TripleEditorService {
+  private static expandDatatype(value: string): string {
+    if (!value) return value;
+    if (value.includes('://') || value.startsWith('urn:')) return value;
+    const idx = value.indexOf(':');
+    if (idx > 0) {
+      const prefix = value.slice(0, idx);
+      const suffix = value.slice(idx + 1);
+      const ns = rdfStoreManager.namespaces.value[prefix];
+      if (ns) return ns + suffix;
+      if (prefix === 'xsd') return `http://www.w3.org/2001/XMLSchema#${suffix}`;
+    }
+    return value;
+  }
+
   private static createNode(
     value: string,
-    type: RdfTermTypeString
+    type: RdfTermTypeString,
+    datatype?: string | null
   ): NamedNode | BlankNode | Literal {
     switch (type) {
       case RdfTermType.NamedNode:
         return $rdf.sym(value);
       case RdfTermType.Literal:
+        if (datatype) {
+          const expanded = this.expandDatatype(datatype);
+          return $rdf.literal(value, $rdf.sym(expanded));
+        }
         return $rdf.literal(value);
       case RdfTermType.BlankNode:
         return $rdf.blankNode();
@@ -48,7 +68,7 @@ export class TripleEditorService {
     if (predicateNode.termType === RdfTermType.Literal) {
       return {success: false, errorMessage: 'Predicate cannot be a Literal.'};
     }
-    const objectNode = this.createNode(dto.object, dto.objectType);
+    const objectNode = this.createNode(dto.object, dto.objectType, dto.objectDatatype);
 
     const newStatement = $rdf.st(
       subjectNode as NamedNode | BlankNode,
