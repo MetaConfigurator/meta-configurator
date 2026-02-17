@@ -79,19 +79,21 @@
         v-if="propertiesPanelVisible"
         :size="propertiesPanelSize"
         :minSize="propertiesPanelMinSize">
-        <RdfVisualizerPropertiesView
-          :selectedNode="selectedNode"
-          :readOnly="props.readOnly"
-          :isRefreshingNode="isRefreshingNode"
-          :propertyUpdateKey="propertyUpdateKey"
-          :iriHref="iriHref"
-          :isIRI="isIRI"
-          :isLinkableIRI="isLinkableIRI"
-          @delete-node="deleteSelectedNode"
-          @delete-property="deleteProperty"
-          @edit-property="editProperty"
-          @add-property="addPropertyToSelected"
-          @property-link-click="handlePropertyLinkClick" />
+        <ScrollPanel class="properties-scroll">
+          <RdfVisualizerPropertiesView
+            :selectedNode="selectedNode"
+            :readOnly="props.readOnly"
+            :isRefreshingNode="isRefreshingNode"
+            :propertyUpdateKey="propertyUpdateKey"
+            :iriHref="iriHref"
+            :isIRI="isIRI"
+            :isLinkableIRI="isLinkableIRI"
+            @delete-node="deleteSelectedNode"
+            @delete-property="deleteProperty"
+            @edit-property="editProperty"
+            @add-property="addPropertyToSelected"
+            @property-link-click="handlePropertyLinkClick" />
+        </ScrollPanel>
       </SplitterPanel>
     </Splitter>
   </div>
@@ -102,6 +104,7 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
+import ScrollPanel from 'primevue/scrollpanel';
 import {ref, computed, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
@@ -1165,6 +1168,11 @@ watch(
 }
 
 .rdf-splitter {
+  width: 100%;
+  height: 100%;
+}
+
+.properties-scroll {
   width: 100%;
   height: 100%;
 }
