@@ -155,6 +155,15 @@
                           ({{ selectedNode.literals.length }})
                         </span>
                       </span>
+                      <Button
+                        v-if="!props.readOnly"
+                        class="ml-auto prop-action-btn"
+                        icon="pi pi-plus"
+                        text
+                        rounded
+                        size="small"
+                        v-tooltip.bottom="'Add property'"
+                        @click="addPropertyToSelected" />
                     </div>
                   </template>
                   <template #content>
@@ -532,6 +541,20 @@ function editProperty(lit: {
     objectDatatype:
       statement?.object.termType === RdfTermType.Literal ? statement.object.datatype?.value : '',
     statement,
+  };
+  emit('edit-triple', payload);
+}
+
+function addPropertyToSelected() {
+  if (!selectedNode.value) return;
+  const payload: TripleTransferObject = {
+    subject: selectedNode.value.id,
+    subjectType: RdfTermType.NamedNode,
+    predicate: '',
+    predicateType: RdfTermType.NamedNode,
+    object: '',
+    objectType: RdfTermType.Literal,
+    objectDatatype: '',
   };
   emit('edit-triple', payload);
 }
@@ -1415,6 +1438,12 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.props-add-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
 }
 
 .prop-actions {
