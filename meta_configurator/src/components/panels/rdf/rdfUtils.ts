@@ -9,6 +9,12 @@ export enum RdfTermType {
 
 export type RdfTermTypeString = `${RdfTermType}`;
 
+export enum RdfChangeType {
+  Add = 'add',
+  Edit = 'edit',
+  Delete = 'delete',
+}
+
 export const formatCellValue = (value: unknown): string => {
   if (value === null || value === undefined || value === '') {
     return '';

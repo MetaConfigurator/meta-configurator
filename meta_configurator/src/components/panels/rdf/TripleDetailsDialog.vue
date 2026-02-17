@@ -114,7 +114,7 @@ import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
+import {RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {
   TripleEditorService,
@@ -127,7 +127,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'saved', payload: {action: 'add' | 'edit'; triple: TripleTransferObject}): void;
+  (e: 'saved', payload: {action: RdfChangeType; triple: TripleTransferObject}): void;
 }>();
 
 const visible = ref(false);
@@ -257,7 +257,7 @@ function close() {
 }
 
 function saveTriple() {
-  const action: 'add' | 'edit' = localTriple.value.statement ? 'edit' : 'add';
+  const action = localTriple.value.statement ? RdfChangeType.Edit : RdfChangeType.Add;
   const result = TripleEditorService.addOrEdit(localTriple.value);
   if (!result.success) {
     useErrorService().onError(result.errorMessage!);

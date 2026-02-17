@@ -4,11 +4,12 @@ import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
 import {useSettings} from '@/settings/useSettings';
+import {RdfChangeType} from '@/components/panels/rdf/rdfUtils';
 
 const settings = useSettings();
 
 export type RdfChange = {
-  type: 'add' | 'edit' | 'delete';
+  type: RdfChangeType;
   oldStatement?: $rdf.Statement;
   newStatement?: $rdf.Statement;
 };
@@ -136,7 +137,7 @@ export const rdfStoreManager: RdfStore & {
     try {
       _store.value.removeStatement(statement);
       updateStatements();
-      callbacks.forEach(cb => cb({type: 'delete', oldStatement: statement}));
+      callbacks.forEach(cb => cb({type: RdfChangeType.Delete, oldStatement: statement}));
       return {success: true, errorMessage: ''};
     } catch (error: any) {
       return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
@@ -164,7 +165,7 @@ export const rdfStoreManager: RdfStore & {
       }
       updateStatements();
       for (const st of toDelete) {
-        callbacks.forEach(cb => cb({type: 'delete', oldStatement: st}));
+        callbacks.forEach(cb => cb({type: RdfChangeType.Delete, oldStatement: st}));
       }
       return {success: true, errorMessage: '', deleted: toDelete};
     } catch (error: any) {
@@ -188,7 +189,7 @@ export const rdfStoreManager: RdfStore & {
       _store.value.removeStatement(oldStatement);
       _store.value.add(newStatement);
       updateStatements();
-      callbacks.forEach(cb => cb({type: 'edit', oldStatement, newStatement}));
+      callbacks.forEach(cb => cb({type: RdfChangeType.Edit, oldStatement, newStatement}));
       return {success: true, errorMessage: ''};
     } catch (error: any) {
       return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
@@ -214,7 +215,7 @@ export const rdfStoreManager: RdfStore & {
     try {
       _store.value.add(statement);
       updateStatements();
-      callbacks.forEach(cb => cb({type: 'add', newStatement: statement}));
+      callbacks.forEach(cb => cb({type: RdfChangeType.Add, newStatement: statement}));
       return {success: true, errorMessage: ''};
     } catch (error: any) {
       return {success: false, errorMessage: error.message || 'Unknown error occurred.'};

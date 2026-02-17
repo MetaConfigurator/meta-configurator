@@ -174,7 +174,7 @@ import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 import {downloadFile} from '@/utility/rdfUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
-import {formatCellValue, RdfTermType} from '@/components/panels/rdf/rdfUtils';
+import {formatCellValue, RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import {
   TripleEditorService,
   type TripleTransferObject,
@@ -403,9 +403,9 @@ function openTripleEditorFromVisualizer(payload: TripleTransferObject) {
   tripleDetailsDialog.value?.open();
 }
 
-function handleTripleSaved(payload: {action: 'add' | 'edit'; triple: TripleTransferObject}) {
+function handleTripleSaved(payload: {action: RdfChangeType; triple: TripleTransferObject}) {
   loading.value = true;
-  if (payload.action === 'add') {
+  if (payload.action === RdfChangeType.Add) {
     selectedTriple.value = null;
   }
   visualizerRef.value?.refreshSelectedNodeFromStore();
