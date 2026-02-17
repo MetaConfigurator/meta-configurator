@@ -254,7 +254,7 @@ import {ref, computed, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
-import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+import {rdfStoreManager, type RdfChange} from '@/components/panels/rdf/rdfStoreManager';
 import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 import {useSettings} from '@/settings/useSettings';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
@@ -362,6 +362,7 @@ cytoscape.use(coseBilkent);
 const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
 const container = ref<HTMLDivElement | null>(null);
 const selectedNode = ref<SelectedNodeData | null>(null);
+const unsubscribeStore = ref<null | (() => void)>(null);
 
 let cy: cytoscape.Core | null = null;
 
@@ -838,6 +839,10 @@ function toSelectedNodeData(nodeData: any): SelectedNodeData {
   };
 }
 
+function isNamedNodeTerm(term: any): boolean {
+  return term.termType !== RdfTermType.Literal;
+}
+
 function buildLiteralsForSubject(
   subjectId: string,
   statements: readonly $rdf.Statement[]
@@ -881,23 +886,54 @@ function buildLiteralsForSubject(
   return literals;
 }
 
-function buildEdgeKeySetForSubject(
-  subjectId: string,
-  statements: readonly $rdf.Statement[]
-): Set<string> {
-  const subjects = new Set<string>(statements.map(st => st.subject.value));
-  const keys = new Set<string>();
-  for (const st of statements) {
-    if (st.subject.value !== subjectId) continue;
-    if (st.object.termType === RdfTermType.Literal) continue;
-    if (isTypePredicate(st.predicate.value)) continue;
-    if (!subjects.has(st.object.value)) continue;
-    keys.add(`${st.subject.value}|${st.predicate.value}|${st.object.value}`);
-  }
-  return keys;
+function updateNodeData(subjectId: string) {
+  if (!cy) return;
+  const node = cy.getElementById(subjectId);
+  if (!node || node.length === 0) return;
+  const subjectStatements = rdfStoreManager.getStatementsBySubject(subjectId);
+  if (subjectStatements.length === 0) return;
+  const literals = buildLiteralsForSubject(subjectId, subjectStatements);
+  node.data({
+    ...node.data(),
+    literals,
+    hasLiterals: literals.length > 0,
+    literalCount: literals.length,
+  });
 }
 
-function shouldRefreshGraphForSubject(subjectId: string): boolean {
+function getSubjectIds(change: RdfChange): Set<string> {
+  const ids = new Set<string>();
+  const oldSubject = change.oldStatement?.subject.value;
+  const newSubject = change.newStatement?.subject.value;
+  if (oldSubject) ids.add(oldSubject);
+  if (newSubject) ids.add(newSubject);
+  return ids;
+}
+
+function isStructuralChange(change: RdfChange): boolean {
+  const oldSt = change.oldStatement;
+  const newSt = change.newStatement;
+
+  if (!oldSt || !newSt) {
+    const target = newSt?.object ?? oldSt?.object;
+    return Boolean(target && isNamedNodeTerm(target));
+  }
+
+  if (oldSt.subject.value !== newSt.subject.value) return true;
+
+  const oldObject = oldSt.object;
+  const newObject = newSt.object;
+  if (oldObject.termType !== newObject.termType) return true;
+  if (isNamedNodeTerm(oldObject) && oldObject.value !== newObject.value) return true;
+
+  if (oldSt.predicate.value !== newSt.predicate.value) {
+    return isNamedNodeTerm(oldObject);
+  }
+
+  return false;
+}
+
+function hasEdgeDiffForSubject(subjectId: string): boolean {
   if (!cy) return true;
   const currentEdges = cy.edges(`[source = "${subjectId}"]`);
   const currentKeys = new Set<string>();
@@ -908,7 +944,15 @@ function shouldRefreshGraphForSubject(subjectId: string): boolean {
     currentKeys.add(`${source}|${predicate}|${target}`);
   });
 
-  const storeKeys = buildEdgeKeySetForSubject(subjectId, rdfStoreManager.statements.value);
+  const subjects = new Set<string>(rdfStoreManager.statements.value.map(st => st.subject.value));
+  const storeKeys = new Set<string>();
+  for (const st of rdfStoreManager.statements.value) {
+    if (st.subject.value !== subjectId) continue;
+    if (st.object.termType === RdfTermType.Literal) continue;
+    if (isTypePredicate(st.predicate.value)) continue;
+    if (!subjects.has(st.object.value)) continue;
+    storeKeys.add(`${st.subject.value}|${st.predicate.value}|${st.object.value}`);
+  }
   if (currentKeys.size !== storeKeys.size) return true;
   for (const key of currentKeys) {
     if (!storeKeys.has(key)) return true;
@@ -921,26 +965,16 @@ async function refreshSelectedNodeFromStore() {
   isRefreshingNode.value = true;
   await nextTick();
   const subjectId = selectedNode.value.id;
-  const needsRefresh = shouldRefreshGraphForSubject(subjectId);
+  const needsRefresh = hasEdgeDiffForSubject(subjectId);
   const subjectStatements = rdfStoreManager.getStatementsBySubject(subjectId);
   const literals = buildLiteralsForSubject(subjectId, subjectStatements);
   selectedNode.value = {
     ...selectedNode.value,
     literals,
   };
-  propertyUpdateKey.value++; // Trigger transition when properties update
+  propertyUpdateKey.value++;
 
-  if (cy) {
-    const node = cy.getElementById(subjectId);
-    if (node && node.length > 0) {
-      node.data({
-        ...node.data(),
-        literals,
-        hasLiterals: literals.length > 0,
-        literalCount: literals.length,
-      });
-    }
-  }
+  updateNodeData(subjectId);
   if (needsRefresh) {
     renderGraph(rdfStoreManager.statements.value);
     if (cy) {
@@ -951,6 +985,34 @@ async function refreshSelectedNodeFromStore() {
     }
   }
   isRefreshingNode.value = false;
+}
+
+function handleRdfChange(change: RdfChange) {
+  const subjectIds = getSubjectIds(change);
+  const selectedId = selectedNode.value?.id;
+  if (selectedId && subjectIds.has(selectedId)) {
+    const remaining = rdfStoreManager.getStatementsBySubject(selectedId);
+    if (remaining.length === 0) {
+      clearSelectedNode();
+    } else {
+      refreshSelectedNodeFromStore();
+    }
+  } else {
+    subjectIds.forEach(id => updateNodeData(id));
+  }
+
+  if (isStructuralChange(change)) {
+    const toReselect = selectedNode.value?.id;
+    renderGraph(rdfStoreManager.statements.value);
+    if (toReselect && cy) {
+      const node = cy.getElementById(toReselect);
+      if (node && node.length > 0) {
+        selectNode(node, node.data());
+      } else {
+        clearSelectedNode();
+      }
+    }
+  }
 }
 
 defineExpose({refreshSelectedNodeFromStore});
@@ -1154,6 +1216,8 @@ onMounted(() => {
     renderGraph(props.statements);
   }
 
+  unsubscribeStore.value = rdfStoreManager.onChange(handleRdfChange);
+
   const resizeObserver = new ResizeObserver(() => {
     if (cy) {
       cy.resize();
@@ -1162,6 +1226,10 @@ onMounted(() => {
   });
 
   onUnmounted(() => {
+    if (unsubscribeStore.value) {
+      unsubscribeStore.value();
+      unsubscribeStore.value = null;
+    }
     resizeObserver.disconnect();
     if (cy) {
       cy.destroy();

@@ -7,7 +7,13 @@ import {useSettings} from '@/settings/useSettings';
 
 const settings = useSettings();
 
-type RdfChangeCallback = (oldStore: string, newStore: string) => void;
+export type RdfChange = {
+  type: 'add' | 'edit' | 'delete';
+  oldStatement?: $rdf.Statement;
+  newStatement?: $rdf.Statement;
+};
+
+export type RdfChangeCallback = (change: RdfChange) => void;
 
 interface JsonLdDoc {
   '@context': any;
@@ -18,8 +24,8 @@ interface RdfStore {
   readonly store: Readonly<Ref<$rdf.IndexedFormula | null>>;
   readonly statements: Readonly<Ref<readonly $rdf.Statement[]>>;
   readonly namespaces: Readonly<Ref<Record<string, string>>>;
-  readonly parseErrors: Readonly<Ref<string[]>>;
-  readonly parseWarnings: Readonly<Ref<string[]>>;
+  readonly parseErrors: Readonly<Ref<readonly string[]>>;
+  readonly parseWarnings: Readonly<Ref<readonly string[]>>;
   editStatement: (
     oldStatement: $rdf.Statement,
     newStatement: $rdf.Statement
@@ -48,11 +54,11 @@ interface RdfStore {
 }
 
 export const rdfStoreManager: RdfStore & {
-  onChange: (cb: RdfChangeCallback) => void;
+  onChange: (cb: RdfChangeCallback) => () => void;
 } = (() => {
   const _jsonLdText = ref<string>('');
   const _jsonObject = ref<any>(null);
-  const callbacks: RdfChangeCallback[] = [];
+  const callbacks = new Set<RdfChangeCallback>();
   const _store = ref<$rdf.IndexedFormula | null>(null);
   const _statements = ref<$rdf.Statement[]>([]);
   const _parseErrors = ref<string[]>([]);
@@ -130,6 +136,7 @@ export const rdfStoreManager: RdfStore & {
     try {
       _store.value.removeStatement(statement);
       updateStatements();
+      callbacks.forEach(cb => cb({type: 'delete', oldStatement: statement}));
       return {success: true, errorMessage: ''};
     } catch (error: any) {
       return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
@@ -156,6 +163,9 @@ export const rdfStoreManager: RdfStore & {
         _store.value.removeStatement(st);
       }
       updateStatements();
+      for (const st of toDelete) {
+        callbacks.forEach(cb => cb({type: 'delete', oldStatement: st}));
+      }
       return {success: true, errorMessage: '', deleted: toDelete};
     } catch (error: any) {
       return {
@@ -178,6 +188,7 @@ export const rdfStoreManager: RdfStore & {
       _store.value.removeStatement(oldStatement);
       _store.value.add(newStatement);
       updateStatements();
+      callbacks.forEach(cb => cb({type: 'edit', oldStatement, newStatement}));
       return {success: true, errorMessage: ''};
     } catch (error: any) {
       return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
@@ -203,6 +214,7 @@ export const rdfStoreManager: RdfStore & {
     try {
       _store.value.add(statement);
       updateStatements();
+      callbacks.forEach(cb => cb({type: 'add', newStatement: statement}));
       return {success: true, errorMessage: ''};
     } catch (error: any) {
       return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
@@ -253,7 +265,8 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const onChange = (cb: RdfChangeCallback) => {
-    callbacks.push(cb);
+    callbacks.add(cb);
+    return () => callbacks.delete(cb);
   };
 
   const findMatchingStatementIndex = async (path: Path): Promise<number> => {
@@ -440,5 +453,5 @@ export const rdfStoreManager: RdfStore & {
     allPredicate,
     getObject,
     getStatementsBySubject,
-  } as RdfStore & {onChange: (cb: RdfChangeCallback) => void};
+  } as RdfStore & {onChange: (cb: RdfChangeCallback) => () => void};
 })();
