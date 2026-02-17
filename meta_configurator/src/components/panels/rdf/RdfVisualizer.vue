@@ -81,6 +81,7 @@
         :minSize="propertiesPanelMinSize">
         <ScrollPanel class="properties-scroll">
           <RdfVisualizerPropertiesView
+            class="properties-view"
             :selectedNode="selectedNode"
             :readOnly="props.readOnly"
             :isRefreshingNode="isRefreshingNode"
@@ -1175,6 +1176,16 @@ watch(
 .properties-scroll {
   width: 100%;
   height: 100%;
+}
+
+.properties-scroll :deep(.p-scrollpanel-content) {
+  display: flex;
+  flex-direction: column;
+}
+
+.properties-view {
+  flex: 1;
+  min-height: 0;
 }
 
 @media (prefers-color-scheme: dark) {
