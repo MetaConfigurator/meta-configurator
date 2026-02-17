@@ -18,25 +18,13 @@
             optionValue="value"
             class="fixed-select" />
           <template v-if="localTriple.subjectType === RdfTermType.NamedNode">
-            <ToggleButton
-              v-model="addNewSubject"
-              onLabel="New"
-              offLabel="Existing"
-              onIcon="pi pi-plus"
-              offIcon="pi pi-list"
-              class="fixed-toggle" />
             <Select
-              v-if="!addNewSubject"
               v-model="localTriple.subject"
-              :options="nodes"
-              filter
+              :options="filteredSubjectNodes"
+              editable
               optionLabel="label"
               optionValue="value"
-              class="flex-1 min-w-[200px]" />
-            <InputText
-              v-else
-              v-model="localTriple.subject"
-              placeholder="Enter new IRI"
+              placeholder="Select or type IRI"
               class="flex-1 min-w-[260px]" />
           </template>
           <template v-else>
@@ -53,7 +41,14 @@
             optionLabel="label"
             optionValue="value"
             class="fixed-select" />
-          <InputText v-model.trim="localTriple.predicate" required class="flex-1 min-w-[260px]" />
+          <Select
+            v-model="localTriple.predicate"
+            :options="filteredPredicateNodes"
+            editable
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select or type IRI"
+            class="flex-1 min-w-[260px]" />
         </div>
       </div>
       <div>
@@ -88,25 +83,14 @@
               class="min-w-[200px]" />
           </template>
           <template v-if="localTriple.objectType === RdfTermType.NamedNode">
-            <ToggleButton
-              v-model="addNewObject"
-              onLabel="New"
-              offLabel="Existing"
-              onIcon="pi pi-plus"
-              offIcon="pi pi-list"
-              class="fixed-toggle" />
             <Select
-              v-if="!addNewObject"
               v-model="localTriple.object"
               :options="nodes"
               filter
+              editable
               optionLabel="label"
               optionValue="value"
-              class="flex-1 min-w-[200px]" />
-            <InputText
-              v-else
-              v-model="localTriple.object"
-              placeholder="Enter new IRI"
+              placeholder="Select or type IRI"
               class="flex-1 min-w-[260px]" />
           </template>
           <template v-else>
@@ -128,7 +112,6 @@
 import {computed, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
-import ToggleButton from 'primevue/togglebutton';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
@@ -148,8 +131,6 @@ const emit = defineEmits<{
 }>();
 
 const visible = ref(false);
-const addNewSubject = ref(false);
-const addNewObject = ref(false);
 const useCustomDatatype = ref(false);
 
 const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
@@ -199,6 +180,28 @@ const nodes = computed(() => {
   return Array.from(nodesSet).map(n => ({label: n, value: n}));
 });
 
+const predicates = computed(() => {
+  const predicateSet = new Set<string>();
+  rdfStoreManager.statements.value.forEach(st => {
+    predicateSet.add(st.predicate.value);
+  });
+  return Array.from(predicateSet).map(p => ({label: p, value: p}));
+});
+
+const filteredSubjectNodes = computed(() => {
+  const query = localTriple.value.subject;
+  if (!query || typeof query !== 'string') return nodes.value;
+  const lower = query.toLowerCase();
+  return nodes.value.filter(n => n.label.toLowerCase().includes(lower));
+});
+
+const filteredPredicateNodes = computed(() => {
+  const query = localTriple.value.predicate;
+  if (!query || typeof query !== 'string') return predicates.value;
+  const lower = query.toLowerCase();
+  return predicates.value.filter(p => p.label.toLowerCase().includes(lower));
+});
+
 function toPrefixed(iri: string): string {
   for (const [prefix, ns] of Object.entries(rdfStoreManager.namespaces.value)) {
     if (iri.startsWith(ns)) {
@@ -243,8 +246,6 @@ watch(
 );
 
 function open() {
-  addNewSubject.value = false;
-  addNewObject.value = false;
   localTriple.value = {...props.triple, objectDatatype: props.triple.objectDatatype ?? ''};
   useCustomDatatype.value =
     Boolean(props.triple.objectDatatype) && !isCommonDatatype(props.triple.objectDatatype ?? '');
