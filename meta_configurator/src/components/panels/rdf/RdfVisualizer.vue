@@ -86,7 +86,6 @@
           </Transition>
           <div class="properties-body">
             <div class="node-cards">
-              <!-- Node Identifier Card with Transition -->
               <Transition name="card-fade" mode="out-in">
                 <Card class="prop-card" v-if="selectedNode" :key="`node-${selectedNode.id}`">
                   <template #title>
@@ -142,8 +141,6 @@
                   </template>
                 </Card>
               </Transition>
-
-              <!-- Properties Card with Transition -->
               <Transition name="card-fade" mode="out-in">
                 <Card
                   class="prop-card"
@@ -295,7 +292,7 @@ const isRefreshingNode = ref(false);
 const needsGraphRefresh = ref(false);
 const deleteNodeDialog = ref(false);
 const deletePropertyDialog = ref(false);
-const propertyUpdateKey = ref(0); // Force re-render of properties card
+const propertyUpdateKey = ref(0);
 const propertyToDelete = ref<{
   predicate: string;
   value: string;
@@ -462,7 +459,7 @@ function selectNode(node: any, nodeData: any) {
   node.addClass('selected');
   selectedCyNode.value = node;
   selectedNode.value = toSelectedNodeData(nodeData);
-  propertyUpdateKey.value++; // Trigger transition on node selection
+  propertyUpdateKey.value++;
 }
 
 function deleteSelectedNode() {
@@ -725,7 +722,6 @@ function buildGraphElements(statements: readonly $rdf.Statement[]) {
       continue;
     }
 
-    // Always show IRI/object values in the properties list (prefixed when possible).
     addLiteral(nodesMap, s, p, toPrefixed(o), o, st);
 
     if (isTypePredicate(p) || !existingSubjects.has(o)) {
@@ -763,7 +759,6 @@ function attachCytoscapeEvents(graph: cytoscape.Core, initialFit: () => void) {
   registerCanvasTap(graph);
   registerEdgeTap(graph);
   registerEdgeHover(graph);
-  registerNodeDblTap(graph);
 }
 
 function renderGraph(statements: readonly $rdf.Statement[]) {
@@ -815,9 +810,7 @@ function animateFit(eles: cytoscape.Collection, padding: number, duration: numbe
 }
 
 function buildPhysicsLayout() {
-  if (!cy) {
-    throw new Error('Cytoscape not initialized');
-  }
+  if (!cy) return;
   const randomInRange = (min: number, max: number) => min + Math.random() * (max - min);
   return cy.layout({
     name: 'cose-bilkent',
@@ -994,6 +987,7 @@ function handleRdfChange(change: RdfChange) {
     const remaining = rdfStoreManager.getStatementsBySubject(selectedId);
     if (remaining.length === 0) {
       clearSelectedNode();
+      renderGraph(rdfStoreManager.statements.value);
     } else {
       refreshSelectedNodeFromStore();
     }
@@ -1159,20 +1153,6 @@ function registerEdgeHover(graph: cytoscape.Core) {
     if (container.value) {
       container.value.style.cursor = 'default';
     }
-  });
-}
-
-function registerNodeDblTap(graph: cytoscape.Core) {
-  graph.on('dbltap', 'node', event => {
-    const node = event.target;
-    graph.animate({
-      fit: {
-        eles: node.neighborhood().add(node),
-        padding: 100,
-      },
-      duration: 500,
-      easing: 'ease-in-out-cubic',
-    });
   });
 }
 
@@ -1495,9 +1475,6 @@ watch(
   margin: 0;
 }
 
-/* ===== TRANSITION EFFECTS ===== */
-
-/* Card-level transitions (when switching between nodes) */
 .card-fade-enter-active,
 .card-fade-leave-active {
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1513,7 +1490,6 @@ watch(
   transform: translateY(-8px);
 }
 
-/* Property list transitions (individual items) */
 .property-list-enter-active,
 .property-list-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1533,7 +1509,6 @@ watch(
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark mode */
 @media (prefers-color-scheme: dark) {
   .graph-container {
     background: #1a202c;
