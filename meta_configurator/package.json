@@ -47,6 +47,7 @@
     "json-pointer": "^0.6.2",
     "json-schema-faker": "^0.5.8",
     "json-schema-merge-allof": "^0.8.1",
+    "json-schema-ref-parser": "^9.0.9",
     "json-schema-resolver": "^3.0.0",
     "json-schema-to-typescript": "^15.0.4",
     "jsonata": "^2.0.6",
