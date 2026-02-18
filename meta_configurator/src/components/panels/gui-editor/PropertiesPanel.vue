@@ -6,7 +6,7 @@ It also contains the logic for adding, removing and renaming properties.
 TODO: This component is too big. Some of the logic should be moved to other files.
 -->
 <script setup lang="ts">
-import {onMounted, type Ref} from 'vue';
+import {onBeforeUnmount, onMounted, type Ref} from 'vue';
 import {ref, watch} from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
@@ -36,8 +36,9 @@ import {
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {SessionMode} from '@/store/sessionMode';
-import _ from 'lodash';
+import _, {debounce} from 'lodash';
 import {replacePropertyNameUtils} from '@/utility/renameUtils';
+import {isStructuralChangeInInstance} from '@/components/panels/gui-editor/isStructuralChangeInInstance.ts';
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
@@ -62,6 +63,16 @@ const data = getDataForMode(props.sessionMode);
 // when the path of the selected element is changed, this panel scrolls to the position accordingly
 // to avoid scrolling on a click in the GUI itself, we remember the last path clicked by the user in the GUI and do not scroll when the user clicks on the same path again
 const lastClickedElement = ref<Path>([]);
+
+
+const treeNodeResolver = new ConfigTreeNodeResolver();
+
+const loading = ref(false);
+const loadingDebounced = refDebounced(loading, 100);
+
+const treeTableFilters = ref<Record<string, string>>({});
+
+const currentTree = ref<GuiEditorTreeNode>();
 
 watch(
   session.currentSelectedElement,
@@ -95,6 +106,29 @@ onMounted(() => {
   updateTree(true);
 });
 
+onBeforeUnmount(() => {
+  debouncedUpdateTreeForDataChange.cancel()
+})
+
+// update tree when the data changes in a significant way (change not of values but of structure)
+// also uses debouncing
+watch(
+  getDataForMode(props.sessionMode).data,
+  (newValue, oldValue) => {
+    debouncedUpdateTreeForDataChange(oldValue, newValue);
+  }
+)
+
+const debouncedUpdateTreeForDataChange = debounce((oldValue, newValue) => {
+  if (isStructuralChangeInInstance(oldValue, newValue)) {
+    updateTree()
+  }
+},
+  1000, // 1 second
+  { leading: false, trailing: true } // trailing = after stopped typing
+)
+
+
 // update tree when the current path changes
 watch(session.currentPath, () => {
   updateTree();
@@ -102,14 +136,6 @@ watch(session.currentPath, () => {
   allowShowOverlay.value = true; // reset in case the user was editing a property name
 });
 
-const treeNodeResolver = new ConfigTreeNodeResolver();
-
-const loading = ref(false);
-const loadingDebounced = refDebounced(loading, 100);
-
-const treeTableFilters = ref<Record<string, string>>({});
-
-const currentTree = ref<GuiEditorTreeNode>();
 
 /**
  * Compute the tree that should be displayed and expand all nodes that were expanded before.
