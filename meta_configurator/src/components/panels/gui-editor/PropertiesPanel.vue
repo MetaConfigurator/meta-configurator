@@ -64,7 +64,6 @@ const data = getDataForMode(props.sessionMode);
 // to avoid scrolling on a click in the GUI itself, we remember the last path clicked by the user in the GUI and do not scroll when the user clicks on the same path again
 const lastClickedElement = ref<Path>([]);
 
-
 const treeNodeResolver = new ConfigTreeNodeResolver();
 
 const loading = ref(false);
@@ -107,27 +106,24 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  debouncedUpdateTreeForDataChange.cancel()
-})
+  debouncedUpdateTreeForDataChange.cancel();
+});
 
 // update tree when the data changes in a significant way (change not of values but of structure)
 // also uses debouncing
-watch(
-  getDataForMode(props.sessionMode).data,
-  (newValue, oldValue) => {
-    debouncedUpdateTreeForDataChange(oldValue, newValue);
-  }
-)
+watch(getDataForMode(props.sessionMode).data, (newValue, oldValue) => {
+  debouncedUpdateTreeForDataChange(oldValue, newValue);
+});
 
-const debouncedUpdateTreeForDataChange = debounce((oldValue, newValue) => {
-  if (isStructuralChangeInInstance(oldValue, newValue)) {
-    updateTree()
-  }
-},
+const debouncedUpdateTreeForDataChange = debounce(
+  (oldValue, newValue) => {
+    if (isStructuralChangeInInstance(oldValue, newValue)) {
+      updateTree();
+    }
+  },
   1000, // 1 second
-  { leading: false, trailing: true } // trailing = after stopped typing
-)
-
+  {leading: false, trailing: true} // trailing = after stopped typing
+);
 
 // update tree when the current path changes
 watch(session.currentPath, () => {
@@ -135,7 +131,6 @@ watch(session.currentPath, () => {
   focusOnFirstProperty();
   allowShowOverlay.value = true; // reset in case the user was editing a property name
 });
-
 
 /**
  * Compute the tree that should be displayed and expand all nodes that were expanded before.

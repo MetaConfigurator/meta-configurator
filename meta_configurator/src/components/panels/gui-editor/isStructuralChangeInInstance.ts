@@ -1,4 +1,4 @@
-import type {GuiEditorTreeNode} from "@/components/panels/gui-editor/configDataTreeNode.ts";
+import type {GuiEditorTreeNode} from '@/components/panels/gui-editor/configDataTreeNode.ts';
 
 export function isStructuralChangeInInstance(oldObject: any, newObject: any): boolean {
   // algorithm to determine whether any key or structure has changed between oldObject and newObject
@@ -49,9 +49,13 @@ export function isStructuralChangeInInstance(oldObject: any, newObject: any): bo
   }
 
   return false;
-
 }
 
 function isOfPrimitiveType(value: any): boolean {
-  return (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value === null);
+  return (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    value === null
+  );
 }
