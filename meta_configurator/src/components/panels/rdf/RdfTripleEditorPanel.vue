@@ -111,7 +111,11 @@
       </template>
     </Column>
   </DataTable>
-  <TripleDetailsDialog ref="tripleDetailsDialog" :triple="triple" @saved="handleTripleSaved" />
+  <TripleDetailsDialog
+    ref="tripleDetailsDialog"
+    :triple="triple"
+    :disableSubject="disableSubject"
+    @saved="handleTripleSaved" />
   <Dialog v-model:visible="deleteDialog" header="Confirm" modal>
     <div class="flex items-center gap-4">
       <i class="pi pi-exclamation-triangle !text-3xl" />
@@ -149,7 +153,8 @@
       :statements="filteredStatements"
       :readOnly="false"
       @cancel-render="closeVisualizer"
-      @edit-triple="openTripleEditorFromVisualizer" />
+      @edit-triple="openTripleEditorFromVisualizer"
+      @add-node="openNewNodeFromVisualizer" />
   </Dialog>
 </template>
 
@@ -203,6 +208,7 @@ const visualizerRef = ref<InstanceType<typeof RdfVisualizer> | null>(null);
 
 const loading = ref(false);
 const tripleDetailsDialog = ref<InstanceType<typeof TripleDetailsDialog> | null>(null);
+const disableSubject = ref(false);
 const isUserSelection = ref(false);
 const selectedTriple = ref();
 
@@ -353,7 +359,12 @@ const openNewDialog = () => {
     objectDatatype: '',
     statement: undefined,
   };
+  disableSubject.value = false;
   tripleDetailsDialog.value?.open();
+};
+
+const openNewNodeFromVisualizer = () => {
+  openNewDialog();
 };
 
 const openEditDialog = () => {
@@ -371,6 +382,7 @@ const openEditDialog = () => {
     statement: selectedTriple.value.statement,
   };
 
+  disableSubject.value = false;
   tripleDetailsDialog.value?.open();
 };
 
@@ -388,6 +400,7 @@ function openTripleEditorFromVisualizer(payload: TripleTransferObject) {
         st.object.termType === RdfTermType.Literal ? st.object.datatype?.value ?? '' : '',
       statement: st,
     };
+    disableSubject.value = false;
   } else {
     triple.value = {
       subject: payload.subject,
@@ -399,6 +412,7 @@ function openTripleEditorFromVisualizer(payload: TripleTransferObject) {
       objectDatatype: payload.objectDatatype ?? '',
       statement: undefined,
     };
+    disableSubject.value = true;
   }
   tripleDetailsDialog.value?.open();
 }
@@ -407,6 +421,9 @@ function handleTripleSaved(payload: {action: RdfChangeType; triple: TripleTransf
   loading.value = true;
   if (payload.action === RdfChangeType.Add) {
     selectedTriple.value = null;
+    if (payload.triple.subject) {
+      visualizerRef.value?.refreshAndSelectNode(payload.triple.subject);
+    }
   }
   visualizerRef.value?.refreshSelectedNodeFromStore();
 }

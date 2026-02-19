@@ -93,6 +93,7 @@
             @delete-property="deleteProperty"
             @edit-property="editProperty"
             @add-property="addPropertyToSelected"
+            @add-node="addNodeFromVisualizer"
             @property-link-click="handlePropertyLinkClick" />
         </ScrollPanel>
       </SplitterPanel>
@@ -163,6 +164,7 @@ const propertyToDelete = ref<{
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
   (e: 'edit-triple', triple: TripleTransferObject): void;
+  (e: 'add-node'): void;
 }>();
 
 const props = withDefaults(
@@ -409,6 +411,10 @@ function addPropertyToSelected() {
   emit('edit-triple', payload);
 }
 
+function addNodeFromVisualizer() {
+  emit('add-node');
+}
+
 function handlePropertyLinkClick(
   lit: {predicate: string; value: string; isIRI: boolean; href?: string},
   event: MouseEvent
@@ -629,6 +635,7 @@ function attachCytoscapeEvents(graph: cytoscape.Core, initialFit: () => void) {
   enableGraphInteractions(graph);
   registerLayoutStop(graph, initialFit);
   registerNodeTap(graph);
+  registerNodeDoubleTap(graph);
   registerCanvasTap(graph);
   registerEdgeTap(graph);
   registerEdgeHover(graph);
@@ -853,6 +860,14 @@ async function refreshSelectedNodeFromStore() {
   isRefreshingNode.value = false;
 }
 
+function refreshAndSelectNode(nodeId: string) {
+  renderGraph(rdfStoreManager.statements.value);
+  if (!cy) return;
+  const node = cy.getElementById(nodeId);
+  if (!node || node.length === 0) return;
+  selectNode(node, node.data());
+}
+
 function handleRdfChange(change: RdfChange) {
   const subjectIds = getSubjectIds(change);
   const selectedId = selectedNode.value?.id;
@@ -882,7 +897,7 @@ function handleRdfChange(change: RdfChange) {
   }
 }
 
-defineExpose({refreshSelectedNodeFromStore});
+defineExpose({refreshSelectedNodeFromStore, refreshAndSelectNode});
 
 function clearSelectedNode() {
   if (selectedCyNode.value) {
@@ -993,6 +1008,15 @@ function registerNodeTap(graph: cytoscape.Core) {
     const nodeData = node.data();
     pulseNode(node);
     selectNode(node, nodeData);
+  });
+}
+
+function registerNodeDoubleTap(graph: cytoscape.Core) {
+  graph.on('dblclick', 'node', event => {
+    const node = event.target;
+    const nodeData = node.data();
+    selectNode(node, nodeData);
+    zoomToSelected();
   });
 }
 

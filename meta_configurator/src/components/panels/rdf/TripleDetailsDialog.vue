@@ -16,7 +16,8 @@
             :options="subjectTypeOptions"
             optionLabel="label"
             optionValue="value"
-            class="fixed-select" />
+            class="fixed-select"
+            :disabled="props.disableSubject" />
           <template v-if="localTriple.subjectType === RdfTermType.NamedNode">
             <Select
               v-model="localTriple.subject"
@@ -25,10 +26,15 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Select or type IRI"
-              class="flex-1 min-w-[260px]" />
+              class="flex-1 min-w-[260px]"
+              :disabled="props.disableSubject" />
           </template>
           <template v-else>
-            <InputText v-model.trim="localTriple.subject" required class="flex-1 min-w-[260px]" />
+            <InputText
+              v-model.trim="localTriple.subject"
+              required
+              class="flex-1 min-w-[260px]"
+              :disabled="props.disableSubject" />
           </template>
         </div>
       </div>
@@ -123,9 +129,15 @@ import {
 } from '@/components/panels/rdf/tripleEditorService';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 
-const props = defineProps<{
-  triple: TripleTransferObject;
-}>();
+const props = withDefaults(
+  defineProps<{
+    triple: TripleTransferObject;
+    disableSubject?: boolean;
+  }>(),
+  {
+    disableSubject: false,
+  }
+);
 
 const emit = defineEmits<{
   (e: 'saved', payload: {action: RdfChangeType; triple: TripleTransferObject}): void;

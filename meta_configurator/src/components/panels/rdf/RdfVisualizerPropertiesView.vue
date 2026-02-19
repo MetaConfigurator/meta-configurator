@@ -11,6 +11,15 @@
               <div class="card-title">
                 <i class="pi pi-globe" />
                 <span>Node Identifier</span>
+                <Button
+                  v-if="!readOnly"
+                  class="ml-auto prop-action-btn"
+                  icon="pi pi-plus-circle"
+                  text
+                  rounded
+                  size="small"
+                  v-tooltip.bottom="'Add node'"
+                  @click="emit('add-node')" />
               </div>
             </template>
             <template #content>
@@ -50,6 +59,15 @@
               <div class="card-title">
                 <i class="pi pi-globe" />
                 <span>Node Identifier</span>
+                <Button
+                  v-if="!readOnly"
+                  class="ml-auto prop-action-btn"
+                  icon="pi pi-plus-circle"
+                  text
+                  rounded
+                  size="small"
+                  v-tooltip.bottom="'Add node'"
+                  @click="emit('add-node')" />
               </div>
             </template>
             <template #content>
@@ -199,6 +217,7 @@ const emit = defineEmits<{
   (e: 'delete-property', lit: SelectedNodeData['literals'][number]): void;
   (e: 'edit-property', lit: SelectedNodeData['literals'][number]): void;
   (e: 'add-property'): void;
+  (e: 'add-node'): void;
   (e: 'property-link-click', lit: SelectedNodeData['literals'][number], event: MouseEvent): void;
 }>();
 </script>
