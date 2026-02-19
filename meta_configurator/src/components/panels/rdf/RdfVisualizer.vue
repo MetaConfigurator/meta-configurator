@@ -70,6 +70,17 @@
                 @click="item.command" />
             </template>
           </Dock>
+          <Dock :model="bottomDockItems" position="bottom" class="graph-dock-bottom">
+            <template #itemicon="{item}">
+              <Button
+                class="dock-btn"
+                :icon="item.icon"
+                text
+                rounded
+                v-tooltip.top="item.label"
+                @click="item.command" />
+            </template>
+          </Dock>
           <Transition name="fade">
             <ProgressSpinner v-if="isLoading" class="loading-overlay" />
           </Transition>
@@ -126,6 +137,7 @@ import {
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
+import {useCurrentData} from '@/data/useDataLink';
 
 interface SelectedNodeData {
   id: string;
@@ -213,6 +225,23 @@ const dockItems = computed(() => [
     label: propertiesPanelVisible.value ? 'Hide Properties' : 'Show Properties',
     icon: propertiesPanelVisible.value ? 'pi pi-times' : 'pi pi-info-circle',
     command: () => togglePropertiesPanel(),
+  },
+]);
+
+const bottomDockItems = computed(() => [
+  {
+    label: 'Undo',
+    icon: 'pi pi-refresh',
+    command: () => {
+      useCurrentData().undoManager.undo();
+    },
+  },
+  {
+    label: 'Redo',
+    icon: 'pi pi-replay',
+    command: () => {
+      useCurrentData().undoManager.redo();
+    },
   },
 ]);
 
@@ -1173,6 +1202,18 @@ watch(
   z-index: 20;
 }
 
+.graph-dock-bottom {
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+.graph-dock-bottom :deep(.p-dock-list-container) {
+  background: transparent !important;
+  border: none !important ;
+}
+
 .graph-dock :deep(.p-dock) {
   background: transparent;
 }
@@ -1180,6 +1221,17 @@ watch(
 .graph-dock :deep(.p-dock-list) {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  padding: 0;
+}
+
+.graph-dock-bottom :deep(.p-dock) {
+  background: transparent;
+}
+
+.graph-dock-bottom :deep(.p-dock-list) {
+  display: flex;
+  flex-direction: row;
   gap: 10px;
   padding: 0;
 }
