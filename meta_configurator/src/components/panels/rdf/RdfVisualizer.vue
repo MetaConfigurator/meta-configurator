@@ -62,10 +62,10 @@
           <Dock :model="dockItems" position="right" class="graph-dock">
             <template #itemicon="{item}">
               <Button
-                class="dock-btn"
                 :icon="item.icon"
-                text
                 rounded
+                raised
+                severity="contrast"
                 v-tooltip.left="item.label"
                 @click="item.command" />
             </template>
@@ -73,10 +73,10 @@
           <Dock :model="bottomDockItems" position="bottom" class="graph-dock-bottom">
             <template #itemicon="{item}">
               <Button
-                class="dock-btn"
                 :icon="item.icon"
-                text
                 rounded
+                raised
+                severity="contrast"
                 v-tooltip.top="item.label"
                 @click="item.command" />
             </template>
@@ -231,14 +231,14 @@ const dockItems = computed(() => [
 const bottomDockItems = computed(() => [
   {
     label: 'Undo',
-    icon: 'pi pi-refresh',
+    icon: 'pi pi-undo',
     command: () => {
       useCurrentData().undoManager.undo();
     },
   },
   {
     label: 'Redo',
-    icon: 'pi pi-replay',
+    icon: 'pi pi-refresh',
     command: () => {
       useCurrentData().undoManager.redo();
     },
