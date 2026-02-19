@@ -110,6 +110,7 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
+import ToggleButton from 'primevue/togglebutton';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
