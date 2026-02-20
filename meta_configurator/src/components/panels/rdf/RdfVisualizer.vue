@@ -57,7 +57,7 @@
     </Dialog>
     <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
       <SplitterPanel class="graph-panel">
-        <div class="graph-wrapper">
+        <div class="graph-wrapper" :class="{'graph-frozen': hasGraphError}">
           <div ref="container" class="graph-container" :class="{'graph-loaded': graphLoaded}"></div>
           <Dock :model="dockItems" position="right" class="graph-dock">
             <template #itemicon="{item}">
@@ -84,13 +84,18 @@
           <Transition name="fade">
             <ProgressSpinner v-if="isLoading" class="loading-overlay" />
           </Transition>
+          <div v-if="hasGraphError" class="graph-freeze-overlay">
+            <Message severity="error" :closable="false">
+              Graph is disabled because the data contains errors.
+            </Message>
+          </div>
         </div>
       </SplitterPanel>
       <SplitterPanel
         v-if="propertiesPanelVisible"
         :size="propertiesPanelSize"
         :minSize="propertiesPanelMinSize">
-        <ScrollPanel class="properties-scroll">
+        <ScrollPanel class="properties-scroll" :class="{'properties-frozen': hasGraphError}">
           <RdfVisualizerPropertiesView
             class="properties-view"
             :selectedNode="selectedNode"
@@ -162,6 +167,7 @@ const propertiesPanelSize = computed(() => (propertiesPanelVisible.value ? 28 : 
 const propertiesPanelMinSize = computed(() => (propertiesPanelVisible.value ? 16 : 0));
 const isRefreshingNode = ref(false);
 const needsGraphRefresh = ref(false);
+const refreshStack = ref<boolean[]>([]);
 const deleteNodeDialog = ref(false);
 const deletePropertyDialog = ref(false);
 const propertyUpdateKey = ref(0);
@@ -183,9 +189,13 @@ const props = withDefaults(
   defineProps<{
     statements: $rdf.Statement[];
     readOnly?: boolean;
+    dataIsUnparsable?: boolean;
+    dataIsInJsonLd?: boolean;
   }>(),
   {
     readOnly: false,
+    dataIsUnparsable: false,
+    dataIsInJsonLd: true,
   }
 );
 
@@ -232,18 +242,24 @@ const bottomDockItems = computed(() => [
   {
     label: 'Undo',
     icon: 'pi pi-undo',
+    disabled: () => !useCurrentData().undoManager.canUndo.value,
     command: () => {
+      pushGraphRefresh(true);
       useCurrentData().undoManager.undo();
     },
   },
   {
     label: 'Redo',
     icon: 'pi pi-refresh',
+    disabled: () => !useCurrentData().undoManager.canRedo.value,
     command: () => {
+      pushGraphRefresh(true);
       useCurrentData().undoManager.redo();
     },
   },
 ]);
+
+const hasGraphError = computed(() => props.dataIsUnparsable || !props.dataIsInJsonLd);
 
 cytoscape.use(coseBilkent);
 const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
@@ -803,6 +819,11 @@ function updateNodeData(subjectId: string) {
   });
 }
 
+function pushGraphRefresh(needsFullGraphRefresh: boolean) {
+  refreshStack.value.push(needsFullGraphRefresh);
+  needsGraphRefresh.value = true;
+}
+
 function getSubjectIds(change: RdfChange): Set<string> {
   const ids = new Set<string>();
   const oldSubject = change.oldStatement?.subject.value;
@@ -1119,7 +1140,9 @@ onMounted(() => {
   if (nodeCount.value > settings.value.rdf.maximumNodesToVisualize) {
     showLargeGraphPrompt.value = true;
   } else {
-    renderGraph(props.statements);
+    if (!hasGraphError.value) {
+      renderGraph(props.statements);
+    }
   }
 
   unsubscribeStore.value = rdfStoreManager.onChange(handleRdfChange);
@@ -1152,13 +1175,37 @@ watch(
 );
 
 watch(
+  () => hasGraphError.value,
+  hasError => {
+    if (hasError) {
+      isLoading.value = false;
+      refreshStack.value = [];
+      needsGraphRefresh.value = false;
+      return;
+    }
+    if (!container.value) return;
+    if (showLargeGraphPrompt.value) return;
+    renderGraph(props.statements);
+  }
+);
+
+watch(
   () => props.statements,
   statements => {
     if (!needsGraphRefresh.value) return;
     if (!container.value) return;
     if (showLargeGraphPrompt.value) return;
-    needsGraphRefresh.value = false;
-    renderGraph(statements);
+    if (hasGraphError.value) return;
+    const needsFullGraphRefresh = refreshStack.value.pop();
+    needsGraphRefresh.value = refreshStack.value.length > 0;
+    if (needsFullGraphRefresh === undefined) {
+      return;
+    }
+    if (needsFullGraphRefresh) {
+      renderGraph(statements);
+      return;
+    }
+    void refreshSelectedNodeFromStore();
   }
 );
 </script>
@@ -1177,6 +1224,33 @@ watch(
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+.graph-frozen .graph-container,
+.graph-frozen .graph-dock {
+  pointer-events: none;
+  opacity: 0.6;
+  filter: grayscale(0.2);
+}
+
+.graph-freeze-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.graph-freeze-message {
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-align: center;
 }
 
 .graph-container {
@@ -1199,14 +1273,14 @@ watch(
   top: 50%;
   right: 16px;
   transform: translateY(-50%);
-  z-index: 20;
+  z-index: 60;
 }
 
 .graph-dock-bottom {
   left: 50%;
   bottom: 16px;
   transform: translateX(-50%);
-  z-index: 20;
+  z-index: 60;
 }
 
 .graph-dock-bottom :deep(.p-dock-list-container) {
@@ -1252,6 +1326,12 @@ watch(
 .properties-scroll {
   width: 100%;
   height: 100%;
+}
+
+.properties-frozen {
+  pointer-events: none;
+  opacity: 0.6;
+  filter: grayscale(0.2);
 }
 
 .properties-scroll :deep(.p-scrollpanel-content) {

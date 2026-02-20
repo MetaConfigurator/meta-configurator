@@ -152,6 +152,8 @@
       ref="visualizerRef"
       :statements="filteredStatements"
       :readOnly="false"
+      :dataIsUnparsable="props.dataIsUnparsable"
+      :dataIsInJsonLd="props.dataIsInJsonLd"
       @cancel-render="closeVisualizer"
       @edit-triple="openTripleEditorFromVisualizer"
       @add-node="openNewNodeFromVisualizer" />
