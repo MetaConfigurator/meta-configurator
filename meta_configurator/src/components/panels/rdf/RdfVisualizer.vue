@@ -65,6 +65,7 @@
                 :icon="item.icon"
                 rounded
                 raised
+                :disabled="hasGraphError"
                 severity="contrast"
                 v-tooltip.left="item.label"
                 @click="item.command" />
