@@ -71,7 +71,11 @@
                 @click="item.command" />
             </template>
           </Dock>
-          <Dock :model="bottomDockItems" position="bottom" class="graph-dock-bottom">
+          <Dock
+            v-if="!props.readOnly"
+            :model="bottomDockItems"
+            position="bottom"
+            class="graph-dock-bottom">
             <template #itemicon="{item}">
               <Button
                 :icon="item.icon"
