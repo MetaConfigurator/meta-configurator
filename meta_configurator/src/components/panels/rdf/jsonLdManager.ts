@@ -9,7 +9,7 @@ export interface JsonLdDoc {
   '@graph': any[];
 }
 
-interface JsonLdNodeManagerStore {
+interface JsonLdManagerStore {
   editStatement: (oldStatement: $rdf.Statement, newStatement: $rdf.Statement) => void;
   deleteStatement: (statement: $rdf.Statement) => void;
   addStatement: (statement: $rdf.Statement, isNewNode: boolean) => void;
@@ -18,7 +18,7 @@ interface JsonLdNodeManagerStore {
   extractJsonLdByPath: (path: Path) => JsonLdDoc | undefined;
 }
 
-export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
+export const jsonLdManager: JsonLdManagerStore = (() => {
   const data = getDataForMode(SessionMode.DataEditor);
 
   const editStatement = (_oldStatement: $rdf.Statement, _newStatement: $rdf.Statement) => {

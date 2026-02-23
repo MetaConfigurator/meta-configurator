@@ -1,9 +1,9 @@
 import {readonly, ref, computed, watch, type Ref} from 'vue';
-import {getDataForMode, useCurrentData} from '@/data/useDataLink';
+import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
-import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdManager';
+import {jsonLdManager} from '@/components/panels/rdf/jsonLdManager';
 import {useSettings} from '@/settings/useSettings';
 import {RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 
@@ -300,7 +300,7 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const findMatchingStatementIndex = async (path: Path): Promise<number> => {
-    const jsonLdObj = jsonLdNodeManager.extractJsonLdByPath(path);
+    const jsonLdObj = jsonLdManager.extractJsonLdByPath(path);
     if (!jsonLdObj) {
       return -1;
     }

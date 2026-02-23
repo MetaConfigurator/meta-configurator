@@ -194,7 +194,7 @@ import {
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
 import {useErrorService} from '@/utility/errorServiceInstance';
-import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdManager';
+import {jsonLdManager} from '@/components/panels/rdf/jsonLdManager';
 import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
 import {useCurrentData} from '@/data/useDataLink';
 
@@ -518,7 +518,7 @@ function confirmDeleteNode() {
   }
 
   for (const st of result.deleted) {
-    jsonLdNodeManager.deleteStatement(st);
+    jsonLdManager.deleteStatement(st);
   }
 
   clearSelectedNode();
