@@ -91,8 +91,7 @@
           <template v-if="localTriple.objectType === RdfTermType.NamedNode">
             <Select
               v-model="localTriple.object"
-              :options="nodes"
-              filter
+              :options="filteredObjectNodes"
               editable
               optionLabel="label"
               optionValue="value"
@@ -201,18 +200,25 @@ const predicates = computed(() => {
   return Array.from(predicateSet).map(p => ({label: p, value: p}));
 });
 
-const filteredSubjectNodes = computed(() => {
-  const query = localTriple.value.subject;
-  if (!query || typeof query !== 'string') return nodes.value;
+function filterByQuery(
+  options: Array<{label: string; value: string}>,
+  query: unknown
+): Array<{label: string; value: string}> {
+  if (!query || typeof query !== 'string') return options;
   const lower = query.toLowerCase();
-  return nodes.value.filter(n => n.label.toLowerCase().includes(lower));
+  return options.filter(opt => opt.label.toLowerCase().includes(lower));
+}
+
+const filteredSubjectNodes = computed(() => {
+  return filterByQuery(nodes.value, localTriple.value.subject);
+});
+
+const filteredObjectNodes = computed(() => {
+  return filterByQuery(nodes.value, localTriple.value.object);
 });
 
 const filteredPredicateNodes = computed(() => {
-  const query = localTriple.value.predicate;
-  if (!query || typeof query !== 'string') return predicates.value;
-  const lower = query.toLowerCase();
-  return predicates.value.filter(p => p.label.toLowerCase().includes(lower));
+  return filterByQuery(predicates.value, localTriple.value.predicate);
 });
 
 function toPrefixed(iri: string): string {
