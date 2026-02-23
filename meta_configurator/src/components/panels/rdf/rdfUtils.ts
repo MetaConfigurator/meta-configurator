@@ -5,6 +5,8 @@ export enum RdfTermType {
   Variable = 'Variable',
   DefaultGraph = 'DefaultGraph',
   Quad = 'Quad',
+  Collection = 'Collection',
+  Empty = 'Empty',
 }
 
 export type RdfTermTypeString = `${RdfTermType}`;
