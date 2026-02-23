@@ -110,8 +110,7 @@
                 :forceSelection="false"
                 :autoHighlight="true"
                 @complete="onNodeSearch"
-                @item-select="selectNodeById($event.value.id)"
-                @keydown.enter="jumpToFirstSearchResult">
+                @item-select="selectNodeById($event.value.id)">
                 <template #option="slotProps">
                   <div class="result-option">
                     <span class="result-label">{{ slotProps.option.label }}</span>
@@ -164,7 +163,11 @@ import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
 import {rdfStoreManager, type RdfChange} from '@/components/panels/rdf/rdfStoreManager';
 import {useSettings} from '@/settings/useSettings';
-import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
+import {
+  RdfTermType,
+  type RdfTermTypeString,
+  predicateAliasMapping,
+} from '@/components/panels/rdf/rdfUtils';
 import Dock from 'primevue/dock';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
@@ -177,10 +180,6 @@ import {useErrorService} from '@/utility/errorServiceInstance';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
 import {useCurrentData} from '@/data/useDataLink';
-
-const PREDICATE_ALIAS_MAP: Record<string, readonly string[]> = {
-  '@type': ['rdf:type', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'],
-} as const;
 
 interface SelectedNodeData {
   id: string;
@@ -299,6 +298,7 @@ const bottomDockItems = computed(() => [
 
 const hasGraphError = computed(() => props.dataIsUnparsable || !props.dataIsInJsonLd);
 const nodeSearchQuery = ref<{id: string; label: string} | string | null>('');
+
 const allNodes = computed(() => {
   const ids = new Set<string>();
   for (const st of props.statements) {
@@ -317,6 +317,7 @@ const allNodes = computed(() => {
     };
   });
 });
+
 const nodeSearchResults = computed(() => {
   const rawQuery =
     typeof nodeSearchQuery.value === 'string'
@@ -430,12 +431,6 @@ function selectNodeById(nodeId: string) {
   animateFit(node, 80, 400);
 }
 
-function jumpToFirstSearchResult() {
-  const first = nodeSearchResults.value[0];
-  if (!first) return;
-  selectNodeById(first.id);
-}
-
 function togglePhysics() {
   if (!cy) return;
 
@@ -443,10 +438,10 @@ function togglePhysics() {
 
   if (physicsEnabled.value) {
     const layout = buildPhysicsLayout();
-    layout.on('layoutstop', () => {
+    layout!.on('layoutstop', () => {
       physicsEnabled.value = false;
     });
-    layout.run();
+    layout!.run();
   }
 }
 
@@ -517,14 +512,15 @@ function editProperty(lit: {
   if (!selectedNode.value) return;
   const statement = lit.statement;
   const fallbackObject = lit.href ?? expandIRI(lit.value) ?? lit.value;
+  const objectTermType =
+    statement?.object.termType ?? (lit.isIRI ? RdfTermType.NamedNode : RdfTermType.Literal);
   const payload: TripleTransferObject = {
     subject: statement?.subject.value ?? selectedNode.value.id,
-    subjectType: statement?.subject.termType ?? RdfTermType.NamedNode,
+    subjectType: (statement?.subject.termType ?? RdfTermType.NamedNode) as RdfTermTypeString,
     predicate: statement?.predicate.value ?? expandIRI(lit.predicate) ?? lit.predicate,
-    predicateType: statement?.predicate.termType ?? RdfTermType.NamedNode,
+    predicateType: (statement?.predicate.termType ?? RdfTermType.NamedNode) as RdfTermTypeString,
     object: statement?.object.value ?? fallbackObject,
-    objectType:
-      statement?.object.termType ?? (lit.isIRI ? RdfTermType.NamedNode : RdfTermType.Literal),
+    objectType: objectTermType as RdfTermTypeString,
     objectDatatype:
       statement?.object.termType === RdfTermType.Literal ? statement.object.datatype?.value : '',
     statement,
@@ -570,7 +566,7 @@ function handlePropertyLinkClick(
 }
 
 function getPredicateAlias(predicate: string): string {
-  for (const [alias, uris] of Object.entries(PREDICATE_ALIAS_MAP)) {
+  for (const [alias, uris] of Object.entries(predicateAliasMapping)) {
     if (uris.includes(predicate)) {
       return alias;
     }
