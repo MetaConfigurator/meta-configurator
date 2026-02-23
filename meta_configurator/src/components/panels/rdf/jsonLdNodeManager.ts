@@ -1,4 +1,3 @@
-import {ref} from 'vue';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
 import {getDataForMode} from '@/data/useDataLink';
