@@ -47,7 +47,6 @@ const rmlMappingDialog = ref();
 const dataIsUnparsable = ref(false);
 const dataIsInJsonLd = ref(false);
 const missingContext = ref(false);
-const missingGraph = ref(false);
 
 const parsingErrors = computed(() => {
   const baseErrors = rdfStoreManager.parseErrors.value.map((msg, index) => ({
@@ -75,13 +74,6 @@ const parsingWarnings = computed(() => {
     baseWarnings.push({
       id: 'missing-context',
       message: 'Missing @context section in the JSON-LD data.',
-    });
-  }
-
-  if (missingGraph.value) {
-    baseWarnings.push({
-      id: 'missing-graph',
-      message: 'Missing @graph section in the JSON-LD data.',
     });
   }
 
@@ -115,21 +107,15 @@ watch(
 function hasJsonLdFormat(input: Object): boolean {
   if (!input || typeof input !== 'object') {
     missingContext.value = true;
-    missingGraph.value = true;
     return false;
   }
   const data = input as Record<string, unknown>;
   const hasContext = '@context' in data;
-  const hasGraph = '@graph' in data;
 
   missingContext.value = !hasContext;
-  missingGraph.value = !hasGraph;
 
   if (!hasContext) return false;
 
-  if (hasGraph) {
-    return Array.isArray(data['@graph']);
-  }
   const keys = Object.keys(data).filter(k => k !== '@context');
   return keys.length > 0;
 }

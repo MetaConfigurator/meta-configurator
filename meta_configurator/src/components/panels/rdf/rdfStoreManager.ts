@@ -331,38 +331,38 @@ export const rdfStoreManager: RdfStore & {
 
   function extractJsonLdByPath(path: Path): JsonLdDoc | undefined {
     const jsonld = useCurrentData().data.value;
-
-    if (path.length < 3 || path[0] !== '@graph') {
+    const hasGraph = Boolean(jsonld && typeof jsonld === 'object' && jsonld['@graph']);
+    const graphPath = hasGraph ? path : ['@graph', 0, ...path];
+    if (graphPath.length < 3 || graphPath[0] !== '@graph') {
       return undefined;
     }
 
-    const [, graphIndex, predicate, object] = path;
-
+    const [, graphIndex, predicate, object] = graphPath;
     if (typeof graphIndex !== 'number' || typeof predicate !== 'string') {
       return undefined;
     }
 
-    const subjectNode = jsonld['@graph']?.[graphIndex];
-
+    const subjectNode = hasGraph ? jsonld['@graph']?.[graphIndex] : jsonld;
     if (!subjectNode) {
       return undefined;
     }
 
     let value = subjectNode[predicate];
-
     if (value === undefined) {
       return undefined;
     }
-
     if (object !== undefined && typeof object === 'number') {
       value = value[object];
     }
 
+    const subjectId =
+      typeof subjectNode === 'string' ? subjectNode : subjectNode['@id'] ?? jsonld?.['@id'];
+
     return {
-      '@context': jsonld['@context'],
+      '@context': jsonld?.['@context'],
       '@graph': [
         {
-          '@id': subjectNode['@id'],
+          '@id': subjectId,
           [predicate]: value,
         },
       ],

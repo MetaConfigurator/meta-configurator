@@ -41,7 +41,19 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
 
   function buildJsonLdFromStore() {
     const _jsonData = rdfStoreManager.exportAs('application/ld+json');
-    data.setData(JSON.parse(_jsonData.content));
+    const parsed = JSON.parse(_jsonData.content);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      if (!parsed['@graph']) {
+        const graphNode = {...parsed};
+        delete graphNode['@context'];
+        data.setData({
+          '@context': parsed['@context'],
+          '@graph': [graphNode],
+        });
+        return;
+      }
+    }
+    data.setData(parsed);
   }
 
   return {
