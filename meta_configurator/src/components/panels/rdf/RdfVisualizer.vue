@@ -101,6 +101,37 @@
         :size="propertiesPanelSize"
         :minSize="propertiesPanelMinSize">
         <ScrollPanel class="properties-scroll" :class="{'properties-frozen': hasGraphError}">
+          <div class="properties-search-bar">
+            <div class="properties-search-input">
+              <AutoComplete
+                v-model="nodeSearchQuery"
+                :suggestions="nodeSearchResults"
+                optionLabel="label"
+                placeholder="Search nodes..."
+                :disabled="hasGraphError"
+                :forceSelection="false"
+                :autoHighlight="true"
+                @complete="onNodeSearch"
+                @item-select="selectNodeById($event.value.id)"
+                @keydown.enter="jumpToFirstSearchResult">
+                <template #option="slotProps">
+                  <div class="result-option">
+                    <span class="result-label">{{ slotProps.option.label }}</span>
+                    <span class="result-id">{{ slotProps.option.id }}</span>
+                  </div>
+                </template>
+              </AutoComplete>
+              <Button
+                v-if="nodeSearchQuery"
+                class="search-clear-btn"
+                icon="pi pi-times"
+                text
+                rounded
+                size="small"
+                :disabled="hasGraphError"
+                @click="clearNodeSearch" />
+            </div>
+          </div>
           <RdfVisualizerPropertiesView
             class="properties-view"
             :selectedNode="selectedNode"
@@ -128,6 +159,8 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import ScrollPanel from 'primevue/scrollpanel';
+import InputText from 'primevue/inputtext';
+import AutoComplete from 'primevue/autocomplete';
 import {ref, computed, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
@@ -265,6 +298,36 @@ const bottomDockItems = computed(() => [
 ]);
 
 const hasGraphError = computed(() => props.dataIsUnparsable || !props.dataIsInJsonLd);
+const nodeSearchQuery = ref<{id: string; label: string} | string | null>('');
+const allNodes = computed(() => {
+  const ids = new Set<string>();
+  for (const st of props.statements) {
+    ids.add(st.subject.value);
+    if (st.object.termType !== RdfTermType.Literal) {
+      ids.add(st.object.value);
+    }
+  }
+  return Array.from(ids).map(id => {
+    const label = toPrefixed(id);
+    return {
+      id,
+      label,
+      idLower: id.toLowerCase(),
+      labelLower: label.toLowerCase(),
+    };
+  });
+});
+const nodeSearchResults = computed(() => {
+  const rawQuery =
+    typeof nodeSearchQuery.value === 'string'
+      ? nodeSearchQuery.value
+      : nodeSearchQuery.value?.label ?? '';
+  const query = rawQuery.trim().toLowerCase();
+  if (!query) return [];
+  return allNodes.value
+    .filter(node => node.idLower.includes(query) || node.labelLower.includes(query))
+    .slice(0, 8);
+});
 
 cytoscape.use(coseBilkent);
 const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
@@ -349,6 +412,28 @@ function zoomToSelected() {
   if (!node || node.length === 0) return;
 
   animateFit(node, 80, 400);
+}
+
+function onNodeSearch(event: {query: string}) {
+  nodeSearchQuery.value = event.query;
+}
+
+function clearNodeSearch() {
+  nodeSearchQuery.value = '';
+}
+
+function selectNodeById(nodeId: string) {
+  if (!cy) return;
+  const node = cy.getElementById(nodeId);
+  if (!node || node.length === 0) return;
+  selectNode(node, node.data());
+  animateFit(node, 80, 400);
+}
+
+function jumpToFirstSearchResult() {
+  const first = nodeSearchResults.value[0];
+  if (!first) return;
+  selectNodeById(first.id);
 }
 
 function togglePhysics() {
@@ -1328,6 +1413,56 @@ watch(
   height: 100%;
 }
 
+.properties-search-bar {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.properties-search-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.properties-search-input :deep(.p-autocomplete) {
+  width: 100%;
+  flex: 1;
+}
+
+.properties-search-input :deep(.p-autocomplete-input) {
+  width: 100%;
+  font-size: 13px;
+}
+
+.search-icon {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.search-clear-btn {
+  margin-left: auto;
+}
+
+.result-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 2px;
+}
+
+.result-label {
+  font-size: 12px;
+  color: #334155;
+  word-break: break-word;
+}
+
+.result-id {
+  font-size: 11px;
+  color: #94a3b8;
+  word-break: break-word;
+}
+
 .properties-scroll {
   width: 100%;
   height: 100%;
@@ -1352,6 +1487,23 @@ watch(
 @media (prefers-color-scheme: dark) {
   .graph-container {
     background: #1a202c;
+  }
+
+  .properties-search-bar {
+    background: #1a202c;
+    border-bottom-color: #334155;
+  }
+
+  .search-icon {
+    color: #94a3b8;
+  }
+
+  .result-label {
+    color: #e2e8f0;
+  }
+
+  .result-id {
+    color: #64748b;
   }
 }
 </style>
