@@ -66,7 +66,6 @@
                 rounded
                 raised
                 :disabled="hasGraphError"
-                severity="contrast"
                 v-tooltip.left="item.label"
                 @click="item.command" />
             </template>
@@ -81,7 +80,6 @@
                 :icon="item.icon"
                 rounded
                 raised
-                severity="contrast"
                 v-tooltip.top="item.label"
                 @click="item.command" />
             </template>
