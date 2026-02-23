@@ -18,15 +18,15 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
   const parser = ref<JsonLdParser | null>(null);
 
   const editStatement = (_oldStatement: $rdf.Statement, _newStatement: $rdf.Statement) => {
-    rebuildTextData();
+    buildJsonLdFromStore();
   };
 
   const deleteStatement = (_statement: $rdf.Statement) => {
-    rebuildTextData();
+    buildJsonLdFromStore();
   };
 
   const addStatement = (_statement: $rdf.Statement, _isNewNode: boolean) => {
-    rebuildTextData();
+    buildJsonLdFromStore();
   };
 
   const findPath = (statement: $rdf.Statement) => {
@@ -34,7 +34,7 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
     return parser.value.findPath(statement) as Path;
   };
 
-  function rebuildTextData() {
+  function buildJsonLdFromStore() {
     const _jsonData = rdfStoreManager.exportAs('application/ld+json');
     data.setData(JSON.parse(_jsonData.content));
   }

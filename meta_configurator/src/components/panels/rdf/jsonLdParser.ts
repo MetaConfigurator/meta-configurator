@@ -1,11 +1,5 @@
 import * as $rdf from 'rdflib';
 
-interface ASTNode {
-  value: any;
-  path: (string | number)[];
-  children: ASTNode[];
-}
-
 export const PREDICATE_ALIAS_MAP: Record<string, readonly string[]> = {
   '@type': ['rdf:type', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'],
   '@id': ['http://www.w3.org/1999/02/22-rdf-syntax-ns#ID'],
@@ -33,18 +27,6 @@ export class JsonLdParser {
     return this.text;
   }
 
-  buildAST(value: any, path: (string | number)[] = []): ASTNode {
-    const node: ASTNode = {value, path, children: []};
-    if (Array.isArray(value)) {
-      value.forEach((it, i) => node.children.push(this.buildAST(it, [...path, i])));
-    } else if (value && typeof value === 'object') {
-      for (const k of Object.keys(value)) {
-        node.children.push(this.buildAST(value[k], [...path, k]));
-      }
-    }
-    return node;
-  }
-
   private expandTerm(term: string): string | null {
     if (!term || typeof term !== 'string') return null;
 
@@ -59,88 +41,97 @@ export class JsonLdParser {
     return null;
   }
 
-  indexById(ast: ASTNode, map: Map<string, ASTNode[]> = new Map()) {
-    if (ast.value && typeof ast.value === 'object' && '@id' in ast.value) {
-      const id = ast.value['@id'];
-      if (!map.has(id)) map.set(id, []);
-      map.get(id)!.push(ast);
-    }
-    for (const c of ast.children) this.indexById(c, map);
-    return map;
+  findPath(statement: $rdf.Statement): (string | number)[] | null {
+    const json = JSON.parse(this.text);
+    const subjectEquivs = this.getEquivalentTerms(statement.subject.value);
+    const predicateEquivs = this.getEquivalentTerms(statement.predicate.value);
+    const objectEquivs = this.getEquivalentTerms(statement.object.value);
+
+    return this.findPathInJson(json, [], subjectEquivs, predicateEquivs, objectEquivs);
   }
 
-  searchPredicateObject(
-    node: ASTNode,
-    predicate: string,
-    object: string
+  private findPathInJson(
+    value: any,
+    path: (string | number)[],
+    subjectEquivs: Set<string>,
+    predicateEquivs: Set<string>,
+    objectEquivs: Set<string>
   ): (string | number)[] | null {
-    for (const child of node.children) {
-      const last = child.path[child.path.length - 1];
-      if (last === predicate) {
-        if (
-          child.value === object ||
-          (typeof child.value !== 'object' && String(child.value) === object)
-        ) {
-          return child.path.slice();
-        }
-
-        if (child.value && typeof child.value === 'object' && '@value' in child.value) {
-          if (String(child.value['@value']) === object) {
-            return [...child.path, '@value'];
-          }
-        }
-
-        if (child.value && typeof child.value === 'object' && '@id' in child.value) {
-          if (child.value['@id'] === object) return [...child.path, '@id'];
-
-          const idChild = child.children.find(
-            gc => gc.path[gc.path.length - 1] === '@id' && gc.value === object
-          );
-          if (idChild) return idChild.path.slice();
-        }
-
-        if (Array.isArray(child.value)) {
-          for (const elemNode of child.children) {
-            if (elemNode.value === object) return elemNode.path.slice();
-
-            if (elemNode.value && typeof elemNode.value === 'object') {
-              if (elemNode.value['@id'] === object) return [...elemNode.path, '@id'];
-
-              const idChild = elemNode.children.find(
-                gc => gc.path[gc.path.length - 1] === '@id' && gc.value === object
-              );
-              if (idChild) return idChild.path.slice();
-            }
-          }
-        }
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        const found = this.findPathInJson(
+          value[i],
+          [...path, i],
+          subjectEquivs,
+          predicateEquivs,
+          objectEquivs
+        );
+        if (found) return found;
       }
+      return null;
+    }
 
-      const deeper = this.searchPredicateObject(child, predicate, object);
-      if (deeper) return deeper;
+    if (!value || typeof value !== 'object') return null;
+
+    if (typeof value['@id'] === 'string' && subjectEquivs.has(value['@id'])) {
+      const inNode = this.findPathInNode(value, path, predicateEquivs, objectEquivs);
+      if (inNode) return inNode;
+    }
+
+    for (const key of Object.keys(value)) {
+      const found = this.findPathInJson(
+        value[key],
+        [...path, key],
+        subjectEquivs,
+        predicateEquivs,
+        objectEquivs
+      );
+      if (found) return found;
+    }
+
+    return null;
+  }
+
+  private findPathInNode(
+    node: Record<string, any>,
+    nodePath: (string | number)[],
+    predicateEquivs: Set<string>,
+    objectEquivs: Set<string>
+  ): (string | number)[] | null {
+    for (const key of Object.keys(node)) {
+      if (!predicateEquivs.has(key)) continue;
+      const match = this.matchObjectValue(node[key], [...nodePath, key], objectEquivs);
+      if (match) return match;
     }
     return null;
   }
 
-  findPath(statement: $rdf.Statement): (string | number)[] | null {
-    const ast = this.buildAST(JSON.parse(this.text));
-    const idIndex = this.indexById(ast);
-    const subjectEquivs = this.getEquivalentTerms(statement.subject.value);
-    const subjectNodes: ASTNode[] = [];
-    for (const subj of subjectEquivs) {
-      const hits = idIndex.get(subj);
-      if (hits) subjectNodes.push(...hits);
-    }
-    if (subjectNodes.length === 0) return null;
-    const predicateEquivs = this.getEquivalentTerms(statement.predicate.value);
-    const objectEquivs = this.getEquivalentTerms(statement.object.value);
-    for (const sn of subjectNodes) {
-      for (const pred of predicateEquivs) {
-        for (const obj of objectEquivs) {
-          const found = this.searchPredicateObject(sn, pred, obj);
-          if (found) return found;
-        }
+  private matchObjectValue(
+    value: any,
+    basePath: (string | number)[],
+    objectEquivs: Set<string>
+  ): (string | number)[] | null {
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        const found = this.matchObjectValue(value[i], [...basePath, i], objectEquivs);
+        if (found) return found;
       }
+      return null;
     }
+
+    if (value && typeof value === 'object') {
+      if (typeof value['@id'] === 'string' && objectEquivs.has(value['@id'])) {
+        return [...basePath, '@id'];
+      }
+      if ('@value' in value && objectEquivs.has(String(value['@value']))) {
+        return [...basePath, '@value'];
+      }
+      return null;
+    }
+
+    const normalized = String(value);
+    if (objectEquivs.has(normalized)) return basePath;
+
     return null;
   }
 
