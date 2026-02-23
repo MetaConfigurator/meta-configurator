@@ -62,3 +62,38 @@ export const defaultJsonLdSchema = `
   ]
 }
 `.trim();
+
+export const visualizationQueryExample_1 = `
+CONSTRUCT {
+  ?subject ?predicate ?object .
+}
+`.trim();
+
+export const visualizationQueryExample_2 = `
+CONSTRUCT {
+  ?subject ?predicate ?object .
+}
+WHERE {
+  ?s ?p ?o .
+
+  BIND(?s AS ?subject)
+  BIND(?p AS ?predicate)
+  BIND(?o AS ?object)
+}
+`.trim();
+
+export const defaultQueryTemplate = `SELECT ?subject ?predicate ?object
+WHERE
+{
+  ?subject ?predicate ?object .
+}
+`.trim();
+
+export const visualizationQueryTemplate = `CONSTRUCT {
+  ?subject ?predicate ?object .
+}
+WHERE
+{
+  ?subject ?predicate ?object .
+}
+`.trim();

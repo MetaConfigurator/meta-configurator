@@ -264,7 +264,13 @@ import {ScrollPanel} from 'primevue';
 import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
 import ToggleSwitch from 'primevue/toggleswitch';
-import {formatCellValue} from '@/components/panels/rdf/rdfUtils';
+import {
+  defaultQueryTemplate,
+  formatCellValue,
+  visualizationQueryExample_1,
+  visualizationQueryExample_2,
+  visualizationQueryTemplate,
+} from '@/components/panels/rdf/rdfUtils';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import {downloadFile} from '@/utility/rdfUtils';
 
@@ -412,41 +418,6 @@ const errorLineField = StateField.define({
   },
   provide: f => EditorView.decorations.from(f),
 });
-
-const visualizationQueryExample_1 = `
-CONSTRUCT {
-  ?subject ?predicate ?object .
-}
-`.trim();
-
-const visualizationQueryExample_2 = `
-CONSTRUCT {
-  ?subject ?predicate ?object .
-}
-WHERE {
-  ?s ?p ?o .
-
-  BIND(?s AS ?subject)
-  BIND(?p AS ?predicate)
-  BIND(?o AS ?object)
-}
-`.trim();
-
-const defaultQueryTemplate = `SELECT ?subject ?predicate ?object
-WHERE
-{
-  ?subject ?predicate ?object .
-}
-`.trim();
-
-const visualizationQueryTemplate = `CONSTRUCT {
-  ?subject ?predicate ?object .
-}
-WHERE
-{
-  ?subject ?predicate ?object .
-}
-`.trim();
 
 const buildPrefixBlock = (namespaces: Record<string, string>): string => {
   return Object.entries(namespaces)
