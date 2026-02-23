@@ -46,11 +46,7 @@ interface RdfStore {
     statements?: $rdf.Statement[]
   ) => {content: string; success: boolean; errorMessage: string};
   findMatchingStatementIndex: (path: Path) => Promise<number>;
-  statementAsJsonLd: (statement: $rdf.Statement) => string | undefined;
   containsSubject: (statement: $rdf.Statement) => boolean;
-  containsPredicate: (statement: $rdf.Statement) => boolean;
-  allPredicate: (statement: $rdf.Statement) => any;
-  getObject: (statement: $rdf.Statement) => any;
   getStatementsBySubject: (subjectId: string) => $rdf.Statement[];
 }
 
@@ -222,21 +218,6 @@ export const rdfStoreManager: RdfStore & {
     }
   };
 
-  const statementAsJsonLd = (statement: $rdf.Statement): string | undefined => {
-    const tempStore = $rdf.graph();
-    tempStore.add(statement);
-    const serialized = $rdf.serialize(
-      null,
-      tempStore,
-      undefined,
-      'application/ld+json',
-      undefined,
-      {namespaces: namespaces.value}
-    );
-
-    return serialized;
-  };
-
   const exportAs = (
     format: string,
     statements?: $rdf.Statement[]
@@ -343,53 +324,6 @@ export const rdfStoreManager: RdfStore & {
     return _store.value.statements.some(st => st.subject.value === statement.subject.value);
   };
 
-  const containsPredicate = (statement: $rdf.Statement): boolean => {
-    if (!_store.value) {
-      return false;
-    }
-
-    return _store.value.statements.some(
-      st =>
-        st.subject.value === statement.subject.value &&
-        st.predicate.value === statement.predicate.value
-    );
-  };
-
-  const allPredicate = (statement: $rdf.Statement): any => {
-    if (!_store.value) {
-      return false;
-    }
-
-    return _store.value.statements.find(
-      st =>
-        st.subject.value === statement.subject.value &&
-        st.predicate.value === statement.predicate.value
-    );
-  };
-
-  const getObject = (statement: $rdf.Statement): string | string[] | undefined => {
-    if (!_store.value) {
-      return undefined;
-    }
-    const values = _store.value.statements
-      .filter(
-        st =>
-          st.subject.value === statement.subject.value &&
-          st.predicate.value === statement.predicate.value
-      )
-      .map(st => st.object.value);
-
-    if (values.length === 0) {
-      return undefined;
-    }
-
-    if (values.length === 1) {
-      return values[0];
-    }
-
-    return values;
-  };
-
   const getStatementsBySubject = (subjectId: string): $rdf.Statement[] => {
     if (!_store.value) {
       return [];
@@ -448,11 +382,7 @@ export const rdfStoreManager: RdfStore & {
     onChange,
     exportAs,
     findMatchingStatementIndex,
-    statementAsJsonLd,
     containsSubject,
-    containsPredicate,
-    allPredicate,
-    getObject,
     getStatementsBySubject,
   } as RdfStore & {onChange: (cb: RdfChangeCallback) => () => void};
 })();
