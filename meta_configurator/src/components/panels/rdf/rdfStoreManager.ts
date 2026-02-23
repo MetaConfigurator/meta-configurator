@@ -3,7 +3,7 @@ import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
-import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdManager';
 import {useSettings} from '@/settings/useSettings';
 import {RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 

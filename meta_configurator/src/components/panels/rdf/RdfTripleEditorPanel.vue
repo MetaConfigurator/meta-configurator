@@ -172,7 +172,7 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import TieredMenu from 'primevue/tieredmenu';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';

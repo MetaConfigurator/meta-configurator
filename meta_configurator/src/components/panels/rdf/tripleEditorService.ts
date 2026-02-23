@@ -1,7 +1,7 @@
 import * as $rdf from 'rdflib';
 import type {NamedNode, BlankNode, Literal} from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdManager';
 import {RdfTermType, type RdfTermTypeString} from '@/components/panels/rdf/rdfUtils';
 
 export interface TripleTransferObject {
