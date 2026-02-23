@@ -227,7 +227,6 @@ const emit = defineEmits<{
   display: flex;
   flex-direction: column;
   background: white;
-  border-left: 1px solid #e2e8f0;
   overflow: hidden;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
 }
@@ -281,7 +280,7 @@ const emit = defineEmits<{
   gap: 10px;
   font-weight: 700;
   font-size: 13px;
-  color: #1e293b;
+  color: #fe1302;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }

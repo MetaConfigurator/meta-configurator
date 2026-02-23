@@ -1415,7 +1415,6 @@ watch(
 
 .properties-search-bar {
   padding: 10px 12px;
-  border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
 }
 
