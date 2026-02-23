@@ -159,14 +159,12 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import ScrollPanel from 'primevue/scrollpanel';
-import InputText from 'primevue/inputtext';
 import AutoComplete from 'primevue/autocomplete';
 import {ref, computed, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
 import {rdfStoreManager, type RdfChange} from '@/components/panels/rdf/rdfStoreManager';
-import {PREDICATE_ALIAS_MAP} from '@/components/panels/rdf/jsonLdParser';
 import {useSettings} from '@/settings/useSettings';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import Dock from 'primevue/dock';
@@ -181,6 +179,10 @@ import {useErrorService} from '@/utility/errorServiceInstance';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
 import {useCurrentData} from '@/data/useDataLink';
+
+const PREDICATE_ALIAS_MAP: Record<string, readonly string[]> = {
+  '@type': ['rdf:type', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'],
+} as const;
 
 interface SelectedNodeData {
   id: string;

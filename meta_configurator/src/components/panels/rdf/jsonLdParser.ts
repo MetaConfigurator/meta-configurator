@@ -1,10 +1,5 @@
 import * as $rdf from 'rdflib';
 
-export const PREDICATE_ALIAS_MAP: Record<string, readonly string[]> = {
-  '@type': ['rdf:type', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'],
-  '@id': ['http://www.w3.org/1999/02/22-rdf-syntax-ns#ID'],
-} as const;
-
 export class JsonLdParser {
   private text: string = '';
   private context: Record<string, any> = {};
@@ -25,20 +20,6 @@ export class JsonLdParser {
 
   getText() {
     return this.text;
-  }
-
-  private expandTerm(term: string): string | null {
-    if (!term || typeof term !== 'string') return null;
-
-    const [prefix, suffix] = term.split(':');
-    if (suffix !== undefined && this.context[prefix!]) {
-      const base = this.context[prefix!];
-      if (typeof base === 'string') {
-        return base + suffix;
-      }
-    }
-
-    return null;
   }
 
   findPath(statement: $rdf.Statement): (string | number)[] | null {
@@ -149,22 +130,8 @@ export class JsonLdParser {
   private getEquivalentTerms(term: string): Set<string> {
     const out = new Set<string>();
     out.add(term);
-    const expanded = this.expandTerm(term);
-    if (expanded) out.add(expanded);
-
     const compact = this.compactTerm(term);
     if (compact) out.add(compact);
-
-    if (PREDICATE_ALIAS_MAP[term]) {
-      for (const alias of PREDICATE_ALIAS_MAP[term]) out.add(alias);
-    }
-
-    for (const key in PREDICATE_ALIAS_MAP) {
-      for (const value of PREDICATE_ALIAS_MAP[key]!) {
-        if (value === term) out.add(key);
-      }
-    }
-
     return out;
   }
 }
