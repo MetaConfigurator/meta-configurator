@@ -41,16 +41,25 @@
                   v-if="!readOnly"
                   layout="vertical"
                   class="action-divider action-divider-right" />
-                <Button
-                  v-if="!readOnly"
-                  class="delete-node-btn"
-                  icon="pi pi-times-circle"
-                  text
-                  rounded
-                  size="small"
-                  severity="danger"
-                  v-tooltip.bottom="'Delete node'"
-                  @click="emit('delete-node')" />
+                <div v-if="!readOnly" class="prop-actions">
+                  <Button
+                    class="prop-action-btn"
+                    icon="pi pi-pencil"
+                    text
+                    rounded
+                    size="small"
+                    v-tooltip.bottom="'Rename node'"
+                    @click="emit('edit-node')" />
+                  <Button
+                    class="prop-action-btn delete-node-btn"
+                    icon="pi pi-times-circle"
+                    text
+                    rounded
+                    size="small"
+                    severity="danger"
+                    v-tooltip.bottom="'Delete node'"
+                    @click="emit('delete-node')" />
+                </div>
               </div>
             </template>
           </Card>
@@ -214,6 +223,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: 'delete-node'): void;
+  (e: 'edit-node'): void;
   (e: 'delete-property', lit: SelectedNodeData['literals'][number]): void;
   (e: 'edit-property', lit: SelectedNodeData['literals'][number]): void;
   (e: 'add-property'): void;

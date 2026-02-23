@@ -55,6 +55,21 @@
         <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteNode" severity="danger" />
       </template>
     </Dialog>
+    <Dialog
+      v-model:visible="renameNodeDialog"
+      header="Rename Node"
+      modal
+      maximizable
+      :style="{width: '520px'}">
+      <div class="flex flex-col gap-3">
+        <label class="text-sm font-medium">Node IRI</label>
+        <InputText v-model.trim="renameNodeValue" placeholder="Enter new IRI" />
+      </div>
+      <template #footer>
+        <Button label="Cancel" text @click="renameNodeDialog = false" />
+        <Button label="Save" text @click="confirmRenameNode" />
+      </template>
+    </Dialog>
     <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
       <SplitterPanel class="graph-panel">
         <div class="graph-wrapper" :class="{'graph-frozen': hasGraphError}">
@@ -138,6 +153,7 @@
             :iriHref="iriHref"
             :isIRI="isIRI"
             :isLinkableIRI="isLinkableIRI"
+            @edit-node="editSelectedNode"
             @delete-node="deleteSelectedNode"
             @delete-property="deleteProperty"
             @edit-property="editProperty"
@@ -157,6 +173,7 @@ import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import ScrollPanel from 'primevue/scrollpanel';
 import AutoComplete from 'primevue/autocomplete';
+import InputText from 'primevue/inputtext';
 import {ref, computed, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
@@ -207,6 +224,8 @@ const needsGraphRefresh = ref(false);
 const refreshStack = ref<boolean[]>([]);
 const deleteNodeDialog = ref(false);
 const deletePropertyDialog = ref(false);
+const renameNodeDialog = ref(false);
+const renameNodeValue = ref('');
 const propertyUpdateKey = ref(0);
 const propertyToDelete = ref<{
   predicate: string;
@@ -458,6 +477,12 @@ function deleteSelectedNode() {
   deleteNodeDialog.value = true;
 }
 
+function editSelectedNode() {
+  if (!selectedNode.value) return;
+  renameNodeValue.value = selectedNode.value.id;
+  renameNodeDialog.value = true;
+}
+
 function deleteProperty(lit: {predicate: string; value: string; isIRI: boolean}) {
   propertyToDelete.value = lit;
   deletePropertyDialog.value = true;
@@ -500,6 +525,30 @@ function confirmDeleteNode() {
   deleteNodeDialog.value = false;
   const updatedStatements = rdfStoreManager.statements.value;
   renderGraph(updatedStatements);
+}
+
+function confirmRenameNode() {
+  if (!selectedNode.value) return;
+  const oldId = selectedNode.value.id;
+  const newId = renameNodeValue.value.trim();
+
+  if (!newId) {
+    useErrorService().onError('New node IRI cannot be empty.');
+    return;
+  }
+  if (newId === oldId) {
+    renameNodeDialog.value = false;
+    return;
+  }
+
+  const result = TripleEditorService.renameSubjectNode(oldId, newId);
+  if (!result.success) {
+    useErrorService().onError(result.errorMessage);
+    return;
+  }
+
+  renameNodeDialog.value = false;
+  refreshAndSelectNode(newId);
 }
 
 function editProperty(lit: {

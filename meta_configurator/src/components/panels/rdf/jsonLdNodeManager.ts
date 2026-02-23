@@ -10,6 +10,7 @@ interface JsonLdNodeManagerStore {
   editStatement: (oldStatement: $rdf.Statement, newStatement: $rdf.Statement) => void;
   deleteStatement: (statement: $rdf.Statement) => void;
   addStatement: (statement: $rdf.Statement, isNewNode: boolean) => void;
+  renameSubjectNode: () => void;
   findPath: (statement: $rdf.Statement) => Path | undefined;
 }
 
@@ -29,6 +30,10 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
     buildJsonLdFromStore();
   };
 
+  const renameSubjectNode = () => {
+    buildJsonLdFromStore();
+  };
+
   const findPath = (statement: $rdf.Statement) => {
     parser.value = new JsonLdParser(JSON.stringify(data.data.value, null, 2));
     return parser.value.findPath(statement) as Path;
@@ -43,6 +48,7 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
     editStatement,
     deleteStatement,
     addStatement,
+    renameSubjectNode,
     findPath,
   };
 })();

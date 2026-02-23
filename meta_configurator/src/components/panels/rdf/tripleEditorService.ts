@@ -97,4 +97,12 @@ export class TripleEditorService {
     jsonLdNodeManager.deleteStatement(statement);
     return {success: true};
   }
+
+  static renameSubjectNode(oldId: string, newId: string): TripleEditorResult {
+    const response = rdfStoreManager.renameSubjectNode(oldId, newId);
+    if (!response.success) return response;
+
+    jsonLdNodeManager.renameSubjectNode();
+    return {success: true};
+  }
 }

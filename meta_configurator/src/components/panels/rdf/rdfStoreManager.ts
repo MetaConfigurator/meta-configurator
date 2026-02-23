@@ -4,7 +4,7 @@ import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
 import {useSettings} from '@/settings/useSettings';
-import {RdfChangeType} from '@/components/panels/rdf/rdfUtils';
+import {RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 
 const settings = useSettings();
 
@@ -37,6 +37,7 @@ interface RdfStore {
     errorMessage: string;
     deleted: $rdf.Statement[];
   };
+  renameSubjectNode: (oldId: string, newId: string) => {success: boolean; errorMessage: string};
   addStatement: (
     statement: $rdf.Statement,
     isNewNode: boolean
@@ -218,6 +219,58 @@ export const rdfStoreManager: RdfStore & {
     }
   };
 
+  const renameSubjectNode = (
+    oldId: string,
+    newId: string
+  ): {success: boolean; errorMessage: string} => {
+    if (!_store.value) {
+      return {success: false, errorMessage: 'Store is not initialized.'};
+    }
+    if (!oldId || !newId) {
+      return {success: false, errorMessage: 'Invalid node IRI.'};
+    }
+    if (oldId === newId) {
+      return {success: true, errorMessage: ''};
+    }
+
+    const hasConflict = _store.value.statements.some(st => st.subject.value === newId);
+    if (hasConflict) {
+      return {success: false, errorMessage: 'A node with this IRI already exists.'};
+    }
+
+    const affected = _store.value.statements.filter(
+      st =>
+        st.subject.value === oldId ||
+        (st.object.termType === RdfTermType.NamedNode && st.object.value === oldId)
+    );
+
+    if (affected.length === 0) {
+      return {success: true, errorMessage: ''};
+    }
+
+    for (const st of affected) {
+      const delResult = deleteStatement(st);
+      if (!delResult.success) {
+        return delResult;
+      }
+    }
+
+    for (const st of affected) {
+      const subject = st.subject.value === oldId ? $rdf.sym(newId) : st.subject;
+      const object =
+        st.object.termType === RdfTermType.NamedNode && st.object.value === oldId
+          ? $rdf.sym(newId)
+          : st.object;
+      const newStatement = $rdf.st(subject, st.predicate, object, st.graph);
+      const addResult = addStatement(newStatement, false);
+      if (!addResult.success) {
+        return addResult;
+      }
+    }
+
+    return {success: true, errorMessage: ''};
+  };
+
   const exportAs = (
     format: string,
     statements?: $rdf.Statement[]
@@ -378,6 +431,7 @@ export const rdfStoreManager: RdfStore & {
     editStatement,
     deleteStatement,
     deleteStatementsBySubject,
+    renameSubjectNode,
     addStatement,
     onChange,
     exportAs,
