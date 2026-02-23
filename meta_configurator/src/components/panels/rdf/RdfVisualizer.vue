@@ -66,8 +66,8 @@
         <InputText v-model.trim="renameNodeValue" placeholder="Enter new IRI" />
       </div>
       <template #footer>
-        <Button label="Cancel" text @click="renameNodeDialog = false" />
-        <Button label="Save" text @click="confirmRenameNode" />
+        <Button label="Cancel" severity="secondary" @click="renameNodeDialog = false" />
+        <Button label="Save" @click="confirmRenameNode" />
       </template>
     </Dialog>
     <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
@@ -683,7 +683,9 @@ function createCyStyle(): cytoscape.StylesheetCSS[] {
         'font-weight': 'bold',
         'text-wrap': 'wrap',
         'text-max-width': '80px',
-        width: 'label',
+        width: (node: any) => {
+          return node.data('label').length * 7;
+        },
         height: '30',
         padding: '15px',
         shape: 'roundrectangle',
