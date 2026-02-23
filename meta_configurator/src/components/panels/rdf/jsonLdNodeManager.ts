@@ -5,12 +5,18 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 
+export interface JsonLdDoc {
+  '@context': any;
+  '@graph': any[];
+}
+
 interface JsonLdNodeManagerStore {
   editStatement: (oldStatement: $rdf.Statement, newStatement: $rdf.Statement) => void;
   deleteStatement: (statement: $rdf.Statement) => void;
   addStatement: (statement: $rdf.Statement, isNewNode: boolean) => void;
   renameSubjectNode: () => void;
   findPath: (statement: $rdf.Statement) => Path | undefined;
+  extractJsonLdByPath: (path: Path) => JsonLdDoc | undefined;
 }
 
 export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
@@ -172,11 +178,51 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
     return null;
   }
 
+  function extractJsonLdByPath(jsonld: any, path: Path): JsonLdDoc | undefined {
+    const hasGraph = Boolean(jsonld && typeof jsonld === 'object' && jsonld['@graph']);
+    const graphPath = hasGraph ? path : (['@graph', 0, ...path] as Path);
+    if (graphPath.length < 3 || graphPath[0] !== '@graph') {
+      return undefined;
+    }
+
+    const [, graphIndex, predicate, object] = graphPath;
+    if (typeof graphIndex !== 'number' || typeof predicate !== 'string') {
+      return undefined;
+    }
+
+    const subjectNode = hasGraph ? jsonld['@graph']?.[graphIndex] : jsonld;
+    if (!subjectNode) {
+      return undefined;
+    }
+
+    let value = subjectNode[predicate];
+    if (value === undefined) {
+      return undefined;
+    }
+    if (object !== undefined && typeof object === 'number') {
+      value = value[object];
+    }
+
+    const subjectId =
+      typeof subjectNode === 'string' ? subjectNode : subjectNode['@id'] ?? jsonld?.['@id'];
+
+    return {
+      '@context': jsonld?.['@context'],
+      '@graph': [
+        {
+          '@id': subjectId,
+          [predicate]: value,
+        },
+      ],
+    };
+  }
+
   return {
     editStatement,
     deleteStatement,
     addStatement,
     renameSubjectNode,
     findPath,
+    extractJsonLdByPath: (path: Path) => extractJsonLdByPath(data.data.value, path),
   };
 })();

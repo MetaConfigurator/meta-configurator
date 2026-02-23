@@ -3,6 +3,7 @@ import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {useSettings} from '@/settings/useSettings';
 import {RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 
@@ -15,11 +16,6 @@ export type RdfChange = {
 };
 
 export type RdfChangeCallback = (change: RdfChange) => void;
-
-interface JsonLdDoc {
-  '@context': any;
-  '@graph': any[];
-}
 
 interface RdfStore {
   readonly store: Readonly<Ref<$rdf.IndexedFormula | null>>;
@@ -305,7 +301,7 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const findMatchingStatementIndex = async (path: Path): Promise<number> => {
-    const jsonLdObj = extractJsonLdByPath(path);
+    const jsonLdObj = jsonLdNodeManager.extractJsonLdByPath(path);
     if (!jsonLdObj) {
       return -1;
     }
@@ -328,46 +324,6 @@ export const rdfStoreManager: RdfStore & {
     const idx = findStatementIndex(tempStore.statements[0]!);
     return idx !== -1 ? idx : -1;
   };
-
-  function extractJsonLdByPath(path: Path): JsonLdDoc | undefined {
-    const jsonld = useCurrentData().data.value;
-    const hasGraph = Boolean(jsonld && typeof jsonld === 'object' && jsonld['@graph']);
-    const graphPath = hasGraph ? path : ['@graph', 0, ...path];
-    if (graphPath.length < 3 || graphPath[0] !== '@graph') {
-      return undefined;
-    }
-
-    const [, graphIndex, predicate, object] = graphPath;
-    if (typeof graphIndex !== 'number' || typeof predicate !== 'string') {
-      return undefined;
-    }
-
-    const subjectNode = hasGraph ? jsonld['@graph']?.[graphIndex] : jsonld;
-    if (!subjectNode) {
-      return undefined;
-    }
-
-    let value = subjectNode[predicate];
-    if (value === undefined) {
-      return undefined;
-    }
-    if (object !== undefined && typeof object === 'number') {
-      value = value[object];
-    }
-
-    const subjectId =
-      typeof subjectNode === 'string' ? subjectNode : subjectNode['@id'] ?? jsonld?.['@id'];
-
-    return {
-      '@context': jsonld?.['@context'],
-      '@graph': [
-        {
-          '@id': subjectId,
-          [predicate]: value,
-        },
-      ],
-    };
-  }
 
   const containsSubject = (statement: $rdf.Statement): boolean => {
     if (!_store.value) {
