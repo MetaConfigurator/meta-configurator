@@ -3,7 +3,8 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
-import {jsonLdManager} from '@/components/panels/rdf/jsonLdManager';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
+import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import {useSettings} from '@/settings/useSettings';
 import {RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 
@@ -65,31 +66,6 @@ export const rdfStoreManager: RdfStore & {
 
   const clearStore = () => {
     _store.value = $rdf.graph();
-  };
-
-  const contextCache = new Map<string, any>();
-
-  const fetchContextObject = async (url: string): Promise<any> => {
-    if (contextCache.has(url)) {
-      return contextCache.get(url);
-    }
-    try {
-      const response = await fetch(url, {
-        headers: {Accept: 'application/ld+json, application/json'},
-      });
-      if (!response.ok) {
-        contextCache.set(url, null);
-        return null;
-      }
-      const data = await response.json();
-      const resolved =
-        data && typeof data === 'object' && '@context' in data ? data['@context'] : data;
-      contextCache.set(url, resolved);
-      return resolved;
-    } catch (_err) {
-      contextCache.set(url, null);
-      return null;
-    }
   };
 
   const applyContextPrefixes = async (parsed: any) => {
@@ -321,7 +297,6 @@ export const rdfStoreManager: RdfStore & {
       statements.forEach(st => tempStore.add(st));
       serialized = $rdf.serialize(null, tempStore as $rdf.Formula, 'http://example.org/', format);
     } else {
-      console.log('Exporting with namespaces:', _store.value.namespaces);
       serialized = $rdf.serialize(
         null,
         _store.value as $rdf.Formula,
@@ -338,34 +313,12 @@ export const rdfStoreManager: RdfStore & {
     return () => _callbacks.delete(cb);
   };
 
-  const resolveContextWithCache = async (ctx: any): Promise<any | null> => {
-    if (!ctx) return null;
-    if (typeof ctx === 'string') {
-      return await fetchContextObject(ctx);
-    }
-    if (Array.isArray(ctx)) {
-      const resolved = [];
-      for (const part of ctx) {
-        if (typeof part === 'string') {
-          const fetched = await fetchContextObject(part);
-          if (fetched) {
-            resolved.push(fetched);
-            continue;
-          }
-        }
-        resolved.push(part);
-      }
-      return resolved;
-    }
-    return ctx;
-  };
-
   const findMatchingStatementIndex = async (path: Path): Promise<number> => {
-    const jsonLdObj = jsonLdManager.extractJsonLdByPath(path);
+    const jsonLdObj = jsonLdNodeManager.extractJsonLdByPath(path);
     if (!jsonLdObj) {
       return -1;
     }
-    const resolvedContext = await resolveContextWithCache(jsonLdObj['@context']);
+    const resolvedContext = await jsonLdContextManager.resolveContext(jsonLdObj['@context']);
     if (resolvedContext) {
       jsonLdObj['@context'] = resolvedContext;
     }
@@ -417,7 +370,7 @@ export const rdfStoreManager: RdfStore & {
   const rebuildStoreFromEditorData = async (data: any) => {
     if (!data) return;
 
-    const resolvedContext = await resolveContextWithCache(data['@context']);
+    const resolvedContext = await jsonLdContextManager.syncFromData(data);
     const resolvedData =
       resolvedContext !== null && resolvedContext !== undefined
         ? {...data, '@context': resolvedContext}

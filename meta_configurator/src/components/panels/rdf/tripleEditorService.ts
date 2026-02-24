@@ -1,7 +1,7 @@
 import * as $rdf from 'rdflib';
 import type {NamedNode, BlankNode, Literal} from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {jsonLdManager} from '@/components/panels/rdf/jsonLdManager';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {RdfTermType, type RdfTermTypeString} from '@/components/panels/rdf/rdfUtils';
 
 export interface TripleTransferObject {
@@ -81,20 +81,20 @@ export class TripleEditorService {
       const response = rdfStoreManager.addStatement(newStatement, isNewNode);
       if (!response.success) return response;
 
-      jsonLdManager.addStatement(newStatement, isNewNode);
+      jsonLdNodeManager.addStatement(newStatement, isNewNode);
       return {success: true};
     }
 
     const response = rdfStoreManager.editStatement(dto.statement, newStatement);
     if (!response.success) return response;
 
-    jsonLdManager.editStatement(dto.statement, newStatement);
+    jsonLdNodeManager.editStatement(dto.statement, newStatement);
     return {success: true};
   }
 
   static delete(statement: $rdf.Statement): TripleEditorResult {
     rdfStoreManager.deleteStatement(statement);
-    jsonLdManager.deleteStatement(statement);
+    jsonLdNodeManager.deleteStatement(statement);
     return {success: true};
   }
 
@@ -102,7 +102,7 @@ export class TripleEditorService {
     const response = rdfStoreManager.renameSubjectNode(oldId, newId);
     if (!response.success) return response;
 
-    jsonLdManager.renameSubjectNode();
+    jsonLdNodeManager.renameSubjectNode();
     return {success: true};
   }
 }

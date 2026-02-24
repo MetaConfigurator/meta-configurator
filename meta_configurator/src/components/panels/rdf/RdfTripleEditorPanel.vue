@@ -172,7 +172,7 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import TieredMenu from 'primevue/tieredmenu';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {jsonLdManager} from '@/components/panels/rdf/jsonLdManager';
+import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
@@ -342,7 +342,7 @@ const clearFilter = () => {
 watch(selectedTriple, (target, _) => {
   if (!target) return;
   if (isUserSelection.value) {
-    const path = jsonLdManager.findPath(target.statement);
+    const path = jsonLdNodeManager.findPath(target.statement);
     if (path) {
       emit('zoom_into_path', path);
     }
@@ -459,7 +459,7 @@ watch(
 );
 
 function onRowClick(event: any) {
-  const path = jsonLdManager.findPath(event.data.statement);
+  const path = jsonLdNodeManager.findPath(event.data.statement);
   if (path) {
     emit('zoom_into_path', path!);
   }

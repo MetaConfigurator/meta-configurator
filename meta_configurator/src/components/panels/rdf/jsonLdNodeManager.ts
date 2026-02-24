@@ -3,13 +3,14 @@ import type {Path} from '@/utility/path';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 
 export interface JsonLdDoc {
   '@context': any;
   '@graph': any[];
 }
 
-interface JsonLdManagerStore {
+interface JsonLdNodeManagerStore {
   editStatement: (oldStatement: $rdf.Statement, newStatement: $rdf.Statement) => void;
   deleteStatement: (statement: $rdf.Statement) => void;
   addStatement: (statement: $rdf.Statement, isNewNode: boolean) => void;
@@ -18,7 +19,7 @@ interface JsonLdManagerStore {
   extractJsonLdByPath: (path: Path) => JsonLdDoc | undefined;
 }
 
-export const jsonLdManager: JsonLdManagerStore = (() => {
+export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
   const data = getDataForMode(SessionMode.DataEditor);
 
   const editStatement = (_oldStatement: $rdf.Statement, _newStatement: $rdf.Statement) => {
@@ -39,10 +40,13 @@ export const jsonLdManager: JsonLdManagerStore = (() => {
 
   const findPath = (statement: $rdf.Statement) => {
     const json = data.data.value;
-    const context = extractContext(json);
-    const subjectEquivs = getEquivalentTerms(statement.subject.value, context);
-    const predicateEquivs = getEquivalentTerms(statement.predicate.value, context);
-    const objectEquivs = getEquivalentTerms(statement.object.value, context);
+    const context = jsonLdContextManager.extractContext(json);
+    const subjectEquivs = jsonLdContextManager.getEquivalentTerms(statement.subject.value, context);
+    const predicateEquivs = jsonLdContextManager.getEquivalentTerms(
+      statement.predicate.value,
+      context
+    );
+    const objectEquivs = jsonLdContextManager.getEquivalentTerms(statement.object.value, context);
 
     return findPathInJson(json, [], subjectEquivs, predicateEquivs, objectEquivs) as Path;
   };
@@ -62,34 +66,6 @@ export const jsonLdManager: JsonLdManagerStore = (() => {
       }
     }
     data.setData(parsed);
-  }
-
-  function extractContext(json: any): Record<string, any> {
-    if (!json || typeof json !== 'object') return {};
-    const ctx = json['@context'];
-    if (ctx && typeof ctx === 'object' && !Array.isArray(ctx)) {
-      return ctx;
-    }
-    return {};
-  }
-
-  function compactTerm(fullIri: string, context: Record<string, any>): string | null {
-    if (!fullIri || typeof fullIri !== 'string') return null;
-    for (const prefix in context) {
-      const base = context[prefix];
-      if (typeof base === 'string' && fullIri.startsWith(base)) {
-        return `${prefix}:${fullIri.slice(base.length)}`;
-      }
-    }
-    return null;
-  }
-
-  function getEquivalentTerms(term: string, context: Record<string, any>): Set<string> {
-    const out = new Set<string>();
-    out.add(term);
-    const compact = compactTerm(term, context);
-    if (compact) out.add(compact);
-    return out;
   }
 
   function findPathInJson(
