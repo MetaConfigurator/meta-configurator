@@ -21,24 +21,27 @@
           <ApiKeyWarning />
           <p class="text-sm text-gray-700">
             This tool converts the JSON data from the <strong>Data Editor</strong> to
-            <strong>JSON-LD</strong>. You can optionally provide extra instructions below to guide
-            the mapping.
+            <strong>JSON-LD</strong>. You have to provide extra instructions below to guide the
+            mapping. You can skip this step and directly paste your RML mapping configuration in the
+            Mapping Configuration.
           </p>
           <div class="hints-block">
             <label for="userComments" class="block font-semibold mb-1">
-              Additional Mapping Hints
+              Mapping Instructions <span class="text-red-600">*</span>
             </label>
             <Textarea
               id="userComments"
+              required
               v-model="userComments"
               class="w-full rml-hints-textarea"
-              placeholder="e.g., rename fields, format dates..." />
+              placeholder="Describe how to map the JSON to JSON-LD: target classes, how to build IRIs, rename fields, data types, and any joins." />
           </div>
           <Button
             label="Generate Suggestion"
             icon="pi pi-wand"
             @click="generateMappingSuggestion"
-            :loading="isLoadingMapping" />
+            :loading="isLoadingMapping"
+            :disabled="!hasUserComments || isLoadingMapping" />
         </div>
       </Panel>
       <div class="step-panel step-panel-grow">
@@ -54,7 +57,6 @@
             :extensions="extensions"
             @ready="handleReady" />
         </div>
-
         <div v-if="errorMessage.length" class="error-box">
           <span v-html="errorMessage"></span>
         </div>
@@ -105,6 +107,7 @@ const resultIsValid = ref(false);
 const errorMessage = ref('');
 const userComments = ref('');
 const isLoadingMapping = ref(false);
+const hasUserComments = computed(() => userComments.value.trim().length > 0);
 
 const mappingService: Ref<RmlMappingService> = computed(() => {
   return new RmlMappingServiceStandard();
