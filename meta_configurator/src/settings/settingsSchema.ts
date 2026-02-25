@@ -450,7 +450,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       type: 'object',
       required: [
         'sparqlEndpointUrl',
-        'preserveFormatting',
+        'groupBySubject',
         'maximumTriplesToShow',
         'maximumNodesToVisualize',
       ],
@@ -463,10 +463,10 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           default: 'https://dbpedia.org/sparql',
           format: 'uri',
         },
-        preserveFormatting: {
+        groupBySubject: {
           type: 'boolean',
-          description: 'Whether to preserve JSON-LD formatting when editing RDF data.',
-          default: true,
+          description: 'Whether to group RDF triples by subject.',
+          default: false,
         },
         maximumTriplesToShow: {
           type: 'integer',

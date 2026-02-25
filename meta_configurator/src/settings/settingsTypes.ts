@@ -112,7 +112,7 @@ export interface SettingsInterfacFrontend {
 
 export interface SettingsInterfaceRdf {
   sparqlEndpointUrl: string;
-  preserveFormatting: boolean;
+  groupBySubject: boolean;
   maximumTriplesToShow: number;
   maximumNodesToVisualize: number;
 }

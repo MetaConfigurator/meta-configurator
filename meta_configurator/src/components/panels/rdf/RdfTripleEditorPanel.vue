@@ -2,6 +2,10 @@
   <DataTable
     :class="{'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable || parsingErrors.length > 0}"
     :value="items"
+    :rowGroupMode="groupBySubject ? 'subheader' : undefined"
+    :groupRowsBy="groupBySubject ? 'subject' : undefined"
+    :sortField="groupBySubject ? 'subject' : undefined"
+    :sortOrder="groupBySubject ? 1 : undefined"
     @row-click="onRowClick"
     :loading="loading"
     v-model:first="first"
@@ -27,6 +31,9 @@
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
     :rowsPerPageOptions="[10, 20, 50]"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples">
+    <template v-if="groupBySubject" #groupheader="{data}">
+      <span class="font-semibold">{{ data.subject }}</span>
+    </template>
     <template #header>
       <div class="flex justify-between items-center w-full flex-nowrap">
         <div class="flex items-center gap-1 flex-shrink-0">
@@ -187,6 +194,10 @@ import {
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
 import TripleDetailsDialog from '@/components/panels/rdf/TripleDetailsDialog.vue';
+import {useSettings} from '@/settings/useSettings';
+
+const settings = useSettings();
+const groupBySubject = computed(() => settings.value.rdf.groupBySubject);
 
 const filteredRows = ref<any[]>([]);
 const props = defineProps<{

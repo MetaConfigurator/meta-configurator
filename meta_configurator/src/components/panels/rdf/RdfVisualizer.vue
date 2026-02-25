@@ -322,9 +322,6 @@ const allNodes = computed(() => {
   const ids = new Set<string>();
   for (const st of props.statements) {
     ids.add(st.subject.value);
-    if (st.object.termType !== RdfTermType.Literal) {
-      ids.add(st.object.value);
-    }
   }
   return Array.from(ids).map(id => {
     const label = toPrefixed(id);
