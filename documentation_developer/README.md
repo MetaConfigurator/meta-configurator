@@ -14,7 +14,7 @@ To launch the application, follow these steps:
    ```
 2. Navigate into web application folder:
    ```sh
-   cd meta_configurator
+   cd meta-configurator/meta_configurator
 3. Install the necessary dependencies:
    ```sh
    npm install

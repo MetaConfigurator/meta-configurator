@@ -1,8 +1,8 @@
 > [!NOTE]  
-> You are using MetaConfigurator? Please [get in touch with us](https://forms.gle/MHKvrkMfdymH8TDs5)! We are currently applying for funding to turn the tool into a research infrastructure and want to prepare an overview of the existing user base. Besides, we are interested in your ideas, your feedback, and any feature requests.
+> You are using MetaConfigurator? Please [get in touch with us and give us feedback](https://forms.gle/MHKvrkMfdymH8TDs5)!
 
 
-MetaConfigurator
+MetaConfigurator - A powerful JSON Schema Editor and Form/Code/Documentation Generator
 ================
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MetaConfigurator/meta-configurator/e2e.yml?label=End%20to%20End%20Tests)
@@ -14,7 +14,7 @@ MetaConfigurator
 🚀 What is MetaConfigurator?
 ----------------------------
 
-MetaConfigurator is a powerful, user-friendly schema editor and form generator for JSON Schema. It simplifies the process of creating and editing structured data files such as configuration files and research data, making it accessible to both technical and non-technical users.
+MetaConfigurator is a powerful, user-friendly JSON schema editor and form generator with AI assistance. It simplifies the process of creating and editing structured data files such as configuration files and research data, making it accessible to both technical and non-technical users.
 
 🔗 **Try it out now:**
 

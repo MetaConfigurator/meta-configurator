@@ -15,7 +15,10 @@ const props = defineProps<{
 
 <template>
   <div class="panel-container">
-    <PanelSettings panel-name="AI Prompts View" :panel-settings-path="['aiIntegration']">
+    <PanelSettings
+      panel-name="AI Prompts View"
+      :panel-settings-path="['aiIntegration']"
+      :sessionMode="props.sessionMode">
       <p>
         This panel allows you to manage AI prompts for the current document. You can define prompts
         for schema generation, data manipulation, and other AI-related tasks.

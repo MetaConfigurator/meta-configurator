@@ -7,6 +7,7 @@ import {computed} from 'vue';
 import type {Path} from '@/utility/path';
 import {SessionMode} from '@/store/sessionMode';
 import Panel from 'primevue/panel';
+import Button from 'primevue/button';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
@@ -15,6 +16,7 @@ const props = defineProps<{
   panelName: string;
   settingsHeader?: string;
   panelSettingsPath: Path;
+  sessionMode: SessionMode;
 }>();
 
 const schema = getSchemaForMode(SessionMode.Settings);
@@ -36,6 +38,21 @@ function removeProperty(path: Path) {
   data.removeDataAt(path);
 }
 
+const copyToClipboard = async () => {
+  if (props.sessionMode === SessionMode.Settings) return;
+
+  try {
+    const text = getDataForMode(props.sessionMode).unparsedData.value;
+    await navigator.clipboard.writeText(text);
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+  }
+};
+
+const containsText = computed(() => {
+  return ['Text View'].includes(props.panelName);
+});
+
 const settingsName = computed(() => {
   if (props.settingsHeader && props.settingsHeader !== '') {
     return props.settingsHeader;
@@ -52,8 +69,10 @@ const settingsName = computed(() => {
 
 <template>
   <Panel :header="panelName" toggleable :collapsed="true">
+    <template v-if="containsText" #icons>
+      <Button icon="pi pi-clone" severity="secondary" @click="copyToClipboard" rounded text />
+    </template>
     <slot></slot>
-
     <div class="properties-panel-container">
       <PropertiesPanel
         v-if="currentSchema.jsonSchema"
