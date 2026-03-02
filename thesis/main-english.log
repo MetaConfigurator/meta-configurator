@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  2 MAR 2026 19:04
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  2 MAR 2026 19:13
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -2979,13 +2979,13 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 82781 strings out of 476076
+ 82780 strings out of 476076
  195344,3417909 words of node,token memory allocated
  973 words of node memory still in use:
    9 hlist, 2 vlist, 2 rule, 1 local_par, 6 glue, 4 kern, 1 penalty, 1 margin_kern, 4 glyph, 31 attribute, 109 glue_spec, 16 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 1 pdf_action nodes
    avail lists: 1:10,2:5187,3:879,4:1803,5:2995,6:152,7:7313,8:64,9:7209,10:16,11:454,12:1
  95678 multiletter control sequences out of 65536+600000
- 95 fonts using 18905607 bytes
+ 95 fonts using 18905567 bytes
  108i,21n,140p,11294b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 warning  (pdf backend): unreferenced destination with name 'glo:gp'
@@ -2998,7 +2998,7 @@ warning  (pdf backend): unreferenced destination with name 'glo:er'
 
 warning  (pdf backend): unreferenced destination with name 'glo:fr'
 </usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bolditalic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf>{/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolC.enc}</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/public/mnsymbol/MnSymbol10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/zapfding/uzdr.pfb>
-Output written on main-english.pdf (53 pages, 234704 bytes).
+Output written on main-english.pdf (53 pages, 234674 bytes).
 
 PDF statistics: 1102 PDF objects out of 1200 (max. 8388607)
  994 compressed objects within 10 object streams

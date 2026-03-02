@@ -1,15 +1,15 @@
 [0] Config.pm:328> INFO - This is Biber 2.21
 [0] Config.pm:331> INFO - Logfile is 'main-english.blg'
-[30] biber-darwin:342> INFO - === Mon Mar  2, 2026, 19:04:17
+[30] biber-darwin:342> INFO - === Mon Mar  2, 2026, 19:12:54
 [37] Biber.pm:421> INFO - Reading 'main-english.bcf'
-[71] Biber.pm:1002> INFO - Found 1 citekeys in bib section 0
-[77] Biber.pm:4487> INFO - Processing section 0
-[81] Biber.pm:4678> INFO - Looking for bibtex file 'bibliography.bib' for section 0
-[82] bibtex.pm:1713> INFO - LaTeX decoding ...
-[84] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography.bib'
-[99] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[99] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[99] Biber.pm:4307> INFO - Sorting list 'anyt/global//global/global/global' of type 'entry' with template 'anyt' and locale 'en-US'
-[99] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
-[102] bbl.pm:676> INFO - Writing 'main-english.bbl' with encoding 'UTF-8'
-[102] bbl.pm:779> INFO - Output to main-english.bbl
+[69] Biber.pm:1002> INFO - Found 1 citekeys in bib section 0
+[75] Biber.pm:4487> INFO - Processing section 0
+[79] Biber.pm:4678> INFO - Looking for bibtex file 'bibliography.bib' for section 0
+[80] bibtex.pm:1713> INFO - LaTeX decoding ...
+[81] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography.bib'
+[96] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[96] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[96] Biber.pm:4307> INFO - Sorting list 'anyt/global//global/global/global' of type 'entry' with template 'anyt' and locale 'en-US'
+[96] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[99] bbl.pm:676> INFO - Writing 'main-english.bbl' with encoding 'UTF-8'
+[99] bbl.pm:779> INFO - Output to main-english.bbl

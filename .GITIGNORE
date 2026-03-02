@@ -4,3 +4,7 @@ dist
 out
 auxil
 thesis/_minted
+thesis/main-english.blg
+thesis/main-english.log
+thesis/main-english.pdf
+thesis/main-english.synctex.gz
