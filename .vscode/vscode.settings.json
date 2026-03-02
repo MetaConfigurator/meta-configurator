@@ -1,0 +1,36 @@
+{
+    "editor.wordWrap": "on",
+    "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "latexmk (lualatex)",
+            "tools": ["latexmk_lualatex"]
+        }
+    ],
+
+    "latex-workshop.latex.tools": [
+        {
+            "name": "latexmk_lualatex",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-lualatex",
+                "-pdf",
+                "-silent",
+                "-pv-",
+                "%DOC%"
+            ],
+            "env": {}
+        }
+    ],
+
+    "latex-workshop.check.selfCheck.enabled": false,
+    "latex-workshop.showContextMenu": false,
+    
+    "latex-workshop.latex.autoClean.run": "onBuilt",
+    "latex-workshop.latex.clean.subfolder.enabled": true
+}

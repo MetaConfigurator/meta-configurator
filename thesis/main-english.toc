@@ -1,0 +1,52 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Abbreviations}{13}{section*.5}%
+\contentsline {chapter}{\numberline {1}Introduction}{15}{chapter.7}%
+\contentsline {section}{\numberline {1.1}Context and Topic (SM1)}{16}{section.8}%
+\contentsline {section}{\numberline {1.2}State of the Art (SM1)}{16}{section.9}%
+\contentsline {section}{\numberline {1.3}Research Question (SM2)}{17}{section.10}%
+\contentsline {section}{\numberline {1.4}Method or Approach (SM3, SM4)}{17}{section.11}%
+\contentsline {section}{\numberline {1.5}Findings (SM5, SM6)}{18}{section.12}%
+\contentsline {section}{\numberline {1.6}Background (SM1)}{18}{section.13}%
+\contentsline {section}{\numberline {1.7}Problem Exposition (optional)}{19}{section.14}%
+\contentsline {section}{\numberline {1.8}Context/Business Understanding (SM1)}{19}{section.15}%
+\contentsline {section}{\numberline {1.9}Data Understanding (SM1)}{19}{section.16}%
+\contentsline {section}{\numberline {1.10}Detailed Research Questions (SM2)}{20}{section.17}%
+\contentsline {section}{\numberline {1.11}Detailed Method (SM3)}{20}{section.18}%
+\contentsline {section}{\numberline {1.12}First Real Chapter addressing first Research Problem}{20}{section.19}%
+\contentsline {section}{\numberline {1.13}First Sub-Problem}{20}{section.20}%
+\contentsline {section}{\numberline {1.14}Second Sub-Problem}{21}{section.23}%
+\contentsline {section}{\numberline {1.15}Second Real Chapter}{22}{section.24}%
+\contentsline {section}{\numberline {1.16}Evaluation}{22}{section.25}%
+\contentsline {section}{\numberline {1.17}Objective (SM2)}{22}{section.26}%
+\contentsline {section}{\numberline {1.18}Setup (SM3)}{22}{section.27}%
+\contentsline {section}{\numberline {1.19}Execution (SM4)}{23}{section.28}%
+\contentsline {section}{\numberline {1.20}Results (SM5)}{23}{section.29}%
+\contentsline {section}{\numberline {1.21}Discussion (SM6)}{23}{section.32}%
+\contentsline {chapter}{\numberline {2}LaTeX Hints}{25}{chapter.33}%
+\contentsline {section}{\numberline {2.1}Handling of paragraphs}{25}{section.34}%
+\contentsline {section}{\numberline {2.2}Notes separated from the text}{26}{section.55}%
+\contentsline {section}{\numberline {2.3}Handling TODOs}{26}{section.61}%
+\contentsline {section}{\numberline {2.4}Hyphenation}{28}{section.89}%
+\contentsline {section}{\numberline {2.5}Typesetting Units}{28}{section.98}%
+\contentsline {section}{\numberline {2.6}Surrounding Text by Quotes}{29}{section.111}%
+\contentsline {section}{\numberline {2.7}Cleveref examples}{29}{section.117}%
+\contentsline {section}{\numberline {2.8}Figures}{31}{section.129}%
+\contentsline {section}{\numberline {2.9}Sub Figures}{32}{section.145}%
+\contentsline {section}{\numberline {2.10}Tables}{33}{section.162}%
+\contentsline {section}{\numberline {2.11}Source Code}{34}{section.198}%
+\contentsline {section}{\numberline {2.12}Itemization}{37}{section.270}%
+\contentsline {section}{\numberline {2.13}Abbreviations}{38}{section.309}%
+\contentsline {section}{\numberline {2.14}Other Features}{39}{section.322}%
+\contentsline {section}{\numberline {2.15}Varioref examples}{40}{section.336}%
+\contentsline {section}{\numberline {2.16}Citations}{40}{section.344}%
+\contentsline {section}{\numberline {2.17}Miscellaneous Examles}{41}{section.349}%
+\contentsline {subsection}{\numberline {2.17.1}Algorithmen}{43}{subsection.358}%
+\contentsline {subsection}{\numberline {2.17.2}Definitionen}{43}{subsection.365}%
+\contentsline {subsection}{\numberline {2.17.3}Aufzählungen}{43}{subsection.367}%
+\contentsline {subsection}{\numberline {2.17.4}fquote}{45}{subsection.376}%
+\contentsline {chapter}{\numberline {3}Conclusion and Outlook}{47}{chapter.377}%
+\contentsline {chapter}{\nonumberline Bibliography}{49}{chapter*.378}%
+\def \@chapapp {\appendixname }
+\contentsline {part}{Appendix}{50}{chapter*.378}%
+\contentsline {chapter}{\numberline {A}My first appendix}{51}{appendix.379}%
+\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
