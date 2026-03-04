@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  4 MAR 2026 14:52
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  4 MAR 2026 14:58
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -2703,7 +2703,7 @@ Here is how much of LuaTeX's memory you used:
    8 hlist, 2 vlist, 2 rule, 1 local_par, 6 glue, 4 kern, 1 penalty, 3 glyph, 27 attribute, 105 glue_spec, 14 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined nodes
    avail lists: 1:2,2:2148,3:463,4:1801,5:565,6:139,7:6355,8:2,9:734,10:16,11:454,12:1
  93305 multiletter control sequences out of 65536+600000
- 81 fonts using 16831551 bytes
+ 81 fonts using 16831431 bytes
  108i,21n,115p,11294b,2686s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf>
 Output written on main-english.pdf (35 pages, 76555 bytes).
