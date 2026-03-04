@@ -1,7 +1,7 @@
 {
     "editor.wordWrap": "on",
     "latex-workshop.view.pdf.viewer": "tab",
-    "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.latex.autoBuild.run": "never",
     
     "latex-workshop.latex.recipes": [
         {

@@ -16,40 +16,5 @@
   {}
 \endgroup
 
-
-\refsection{0}
-  \datalist[entry]{anyt/global//global/global/global}
-    \entry{mwe}{manual}{}{}
-      \name{author}{1}{}{%
-        {{hash=8f7a59c703e0776368474dde5dc0cc85}{%
-           family={Scharrer},
-           familyi={S\bibinitperiod},
-           given={Martin},
-           giveni={M\bibinitperiod}}}%
-      }
-      \strng{namehash}{8f7a59c703e0776368474dde5dc0cc85}
-      \strng{fullhash}{8f7a59c703e0776368474dde5dc0cc85}
-      \strng{fullhashraw}{8f7a59c703e0776368474dde5dc0cc85}
-      \strng{bibnamehash}{8f7a59c703e0776368474dde5dc0cc85}
-      \strng{authorbibnamehash}{8f7a59c703e0776368474dde5dc0cc85}
-      \strng{authornamehash}{8f7a59c703e0776368474dde5dc0cc85}
-      \strng{authorfullhash}{8f7a59c703e0776368474dde5dc0cc85}
-      \strng{authorfullhashraw}{8f7a59c703e0776368474dde5dc0cc85}
-      \field{labelalpha}{Sch17}
-      \field{sortinit}{S}
-      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{The \texttt{mwe} Package}
-      \field{year}{2017}
-      \verb{urlraw}
-      \verb http://texdoc.net/mwe
-      \endverb
-      \verb{url}
-      \verb http://texdoc.net/mwe
-      \endverb
-    \endentry
-  \enddatalist
-\endrefsection
 \endinput
 

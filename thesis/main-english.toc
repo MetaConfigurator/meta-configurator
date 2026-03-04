@@ -22,31 +22,11 @@
 \contentsline {section}{\numberline {1.19}Execution (SM4)}{23}{section.28}%
 \contentsline {section}{\numberline {1.20}Results (SM5)}{23}{section.29}%
 \contentsline {section}{\numberline {1.21}Discussion (SM6)}{23}{section.32}%
-\contentsline {chapter}{\numberline {2}LaTeX Hints}{25}{chapter.33}%
-\contentsline {section}{\numberline {2.1}Handling of paragraphs}{25}{section.34}%
-\contentsline {section}{\numberline {2.2}Notes separated from the text}{26}{section.54}%
-\contentsline {section}{\numberline {2.3}Handling TODOs}{26}{section.59}%
-\contentsline {section}{\numberline {2.4}Hyphenation}{28}{section.80}%
-\contentsline {section}{\numberline {2.5}Typesetting Units}{28}{section.88}%
-\contentsline {section}{\numberline {2.6}Surrounding Text by Quotes}{29}{section.98}%
-\contentsline {section}{\numberline {2.7}Cleveref examples}{29}{section.103}%
-\contentsline {section}{\numberline {2.8}Figures}{31}{section.114}%
-\contentsline {section}{\numberline {2.9}Sub Figures}{32}{section.129}%
-\contentsline {section}{\numberline {2.10}Tables}{33}{section.145}%
-\contentsline {section}{\numberline {2.11}Source Code}{34}{section.179}%
-\contentsline {section}{\numberline {2.12}Itemization}{37}{section.247}%
-\contentsline {section}{\numberline {2.13}Abbreviations}{38}{section.281}%
-\contentsline {section}{\numberline {2.14}Other Features}{39}{section.293}%
-\contentsline {section}{\numberline {2.15}Varioref examples}{40}{section.304}%
-\contentsline {section}{\numberline {2.16}Citations}{40}{section.311}%
-\contentsline {section}{\numberline {2.17}Miscellaneous Examles}{41}{section.315}%
-\contentsline {subsection}{\numberline {2.17.1}Algorithmen}{43}{subsection.323}%
-\contentsline {subsection}{\numberline {2.17.2}Definitionen}{43}{subsection.330}%
-\contentsline {subsection}{\numberline {2.17.3}Aufzählungen}{43}{subsection.332}%
-\contentsline {subsection}{\numberline {2.17.4}fquote}{45}{subsection.341}%
-\contentsline {chapter}{\numberline {3}Conclusion and Outlook}{47}{chapter.342}%
-\contentsline {chapter}{\nonumberline Bibliography}{49}{chapter*.343}%
+\contentsline {chapter}{\numberline {2}Conclusion and Outlook}{25}{chapter.33}%
+\contentsline {chapter}{\numberline {3}Conclusion and Outlook}{27}{chapter.34}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{29}{chapter.35}%
+\contentsline {chapter}{\numberline {5}Conclusion and Outlook}{31}{chapter.36}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{50}{chapter*.343}%
-\contentsline {chapter}{\numberline {A}My first appendix}{51}{appendix.344}%
+\contentsline {part}{Appendix}{32}{chapter.36}%
+\contentsline {chapter}{\numberline {A}My first appendix}{33}{appendix.37}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

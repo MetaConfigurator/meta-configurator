@@ -1,15 +1,9 @@
 [0] Config.pm:328> INFO - This is Biber 2.21
 [0] Config.pm:331> INFO - Logfile is 'main-english.blg'
-[30] biber-darwin:342> INFO - === Wed Mar  4, 2026, 12:36:25
-[37] Biber.pm:421> INFO - Reading 'main-english.bcf'
-[70] Biber.pm:1002> INFO - Found 1 citekeys in bib section 0
-[77] Biber.pm:4487> INFO - Processing section 0
-[81] Biber.pm:4678> INFO - Looking for bibtex file 'bibliography.bib' for section 0
-[81] bibtex.pm:1713> INFO - LaTeX decoding ...
-[83] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography.bib'
-[99] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[99] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[99] Biber.pm:4307> INFO - Sorting list 'anyt/global//global/global/global' of type 'entry' with template 'anyt' and locale 'en-US'
-[99] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
-[102] bbl.pm:676> INFO - Writing 'main-english.bbl' with encoding 'UTF-8'
-[102] bbl.pm:779> INFO - Output to main-english.bbl
+[31] biber-darwin:342> INFO - === Wed Mar  4, 2026, 14:52:37
+[39] Biber.pm:421> INFO - Reading 'main-english.bcf'
+[71] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[77] bbl.pm:676> INFO - Writing 'main-english.bbl' with encoding 'UTF-8'
+[77] bbl.pm:779> INFO - Output to main-english.bbl
+[77] Biber.pm:132> WARN - The file 'main-english.bcf' does not contain any citations!
+[77] Biber.pm:134> INFO - WARNINGS: 1
