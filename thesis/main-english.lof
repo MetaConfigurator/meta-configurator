@@ -3,13 +3,13 @@
 \contentsline {figure}{\numberline {1.1}{\ignorespaces A scientific figure that has to be explained in the text}}{21}{figure.21}%
 \contentsline {figure}{\numberline {1.2}{\ignorespaces Another scientific figure that has to be explained in the text}}{23}{figure.30}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Example figure for cref demo}}{30}{figure.118}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Simple Figure}}{31}{figure.130}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Example figure with two sub figures.}}{32}{figure.146}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Example figure for cref demo}}{30}{figure.104}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Simple Figure}}{31}{figure.115}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Example figure with two sub figures.}}{32}{figure.130}%
 \contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Case I}}}{32}{subfigure.3.1}%
 \contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Case II}}}{32}{subfigure.3.2}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Abbildung}}{41}{figure.354}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Gedrehte Abbildung}}{42}{figure.356}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Abbildung}}{41}{figure.319}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Gedrehte Abbildung}}{42}{figure.321}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \def \@chapapp {\appendixname }

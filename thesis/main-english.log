@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  2 MAR 2026 19:13
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  4 MAR 2026 12:36
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -2007,13 +2007,6 @@ Package: filehook-2020 2022/10/25 v0.8b Hooks for input files
 Package: currfile-abspath 2024/03/14 v1.0 Provides absolute file paths, the parent working directory and the main file name
 )
 \c@currfiledepth=\count589
-
-
-Package currfile-abspath Warning: The required recorder file (.fls) was not found.
-(currfile-abspath)                Please compile with the '-recorder' option.
-(currfile-abspath)                Note that MikTeX requires two compiler runs.
-(currfile-abspath)                Occurred on input line 309.
-
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/tcolorbox/tcolorbox.sty
 Package: tcolorbox 2025/11/28 version 6.9.0 text color boxes
  (/usr/local/texlive/2026/texmf-dist/tex/latex/environ/environ.sty
@@ -2595,7 +2588,7 @@ Package glossaries-extra Warning: Glossary `abbreviations' is missing on input l
 ]
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
 (Font)              scaled to size 9.85492pt on input line 912.
- [13
+ (./chapters/introduction.tex [13
 
 
 ] [14
@@ -2605,22 +2598,22 @@ LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
 chapter 1.
 [15]
 Package babel Info: 'english' activates 'ngerman' shorthands.
-(babel)             Reported on input line 992.
-Package cleveref Info: loaded `english' language definitions on input line 992.
+(babel)             Reported on input line 70.
+Package cleveref Info: loaded `english' language definitions on input line 70.
  [16]
-Package cleveref Info: loaded `english' language definitions on input line 1027.
+Package cleveref Info: loaded `english' language definitions on input line 105.
  [17]
-Package cleveref Info: loaded `english' language definitions on input line 1062.
+Package cleveref Info: loaded `english' language definitions on input line 140.
  [18]
-Package cleveref Info: loaded `english' language definitions on input line 1099.
+Package cleveref Info: loaded `english' language definitions on input line 177.
  [19]
-Package cleveref Info: loaded `english' language definitions on input line 1136.
+Package cleveref Info: loaded `english' language definitions on input line 214.
  [20]
-Package cleveref Info: loaded `english' language definitions on input line 1175.
+Package cleveref Info: loaded `english' language definitions on input line 253.
  [21]
-Package cleveref Info: loaded `english' language definitions on input line 1219.
- [22]
-Package cleveref Info: loaded `english' language definitions on input line 1246.
+Package cleveref Info: loaded `english' language definitions on input line 297.
+ [22]) (./chapters/latex-hints.tex
+Package cleveref Info: loaded `english' language definitions on input line 1.
  [23] [24
 
 
@@ -2650,312 +2643,312 @@ File: lstlang3.sty 2025/11/14 1.11b listings language file
 File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
 )
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 8.09995pt on input line 1306.
- (./main-english.tex
+(Font)              scaled to size 8.09995pt on input line 61.
+ (./chapters/latex-hints.tex
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/b/n' will be
-(Font)              scaled to size 8.09995pt on input line 1299.
-) [25] (./main-english.tex) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1323.
+(Font)              scaled to size 8.09995pt on input line 54.
+) [25] (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 78.
  [26]
-Package hyperref Info: bookmark level for unknown lpcsec defaults to 0 on input line 1327.
+Package hyperref Info: bookmark level for unknown lpcsec defaults to 0 on input line 82.
 
-Overfull \hbox (10.95pt too wide) in paragraph at lines 1327--1327
+Overfull \hbox (10.95pt too wide) in paragraph at lines 82--82
 [] 
  []
 
-(./main-english.tex) (./main-english.tex) (./main-english.tex)
-Overfull \hbox (10.95pt too wide) in paragraph at lines 1341--1341
+(./chapters/latex-hints.tex) (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+Overfull \hbox (10.95pt too wide) in paragraph at lines 96--96
 [] 
  []
 
-(./main-english.tex)
-Overfull \hbox (10.95pt too wide) in paragraph at lines 1345--1345
+(./chapters/latex-hints.tex)
+Overfull \hbox (10.95pt too wide) in paragraph at lines 100--100
 [] 
  []
 
-(./main-english.tex)
-Overfull \hbox (10.95pt too wide) in paragraph at lines 1349--1349
+(./chapters/latex-hints.tex)
+Overfull \hbox (10.95pt too wide) in paragraph at lines 104--104
 [] 
  []
 
-(./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1350.
- [27] (./main-english.tex) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1376.
- [28] (./main-english.tex) (./main-english.tex) (./main-english.tex)
-<example-image-a.pdf, id=388, 321.2pt x 240.9pt>
+(./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 106.
+ [27] (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 131.
+ [28] (./chapters/latex-hints.tex) (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+<example-image-a.pdf, id=377, 321.2pt x 240.9pt>
 File: example-image-a.pdf Graphic file (type pdf)
 <use example-image-a.pdf>
-Package luatex.def Info: example-image-a.pdf  used on input line 1400.
+Package luatex.def Info: example-image-a.pdf  used on input line 155.
 (luatex.def)             Requested size: 313.69167pt x 235.27536pt.
- (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1425.
+ (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 181.
  [29]
-Package cleveref Info: loaded `english' language definitions on input line 1425.
+Package cleveref Info: loaded `english' language definitions on input line 181.
  [30</usr/local/texlive/2026/texmf-dist/tex/latex/mwe/example-image-a.pdf>]
-<example-image-golden.pdf, id=431, 324.82053pt x 200.75pt>
+<example-image-golden.pdf, id=417, 324.82053pt x 200.75pt>
 File: example-image-golden.pdf Graphic file (type pdf)
 <use example-image-golden.pdf>
-Package luatex.def Info: example-image-golden.pdf  used on input line 1434.
+Package luatex.def Info: example-image-golden.pdf  used on input line 189.
 (luatex.def)             Requested size: 334.60571pt x 206.7993pt.
- (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1442.
+ (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 197.
  [31</usr/local/texlive/2026/texmf-dist/tex/latex/mwe/example-image-golden.pdf>]
 File: example-image-a.pdf Graphic file (type pdf)
 <use example-image-a.pdf>
-Package luatex.def Info: example-image-a.pdf  used on input line 1451.
+Package luatex.def Info: example-image-a.pdf  used on input line 206.
 (luatex.def)             Requested size: 167.29967pt x 125.47823pt.
-<example-image-b.pdf, id=466, 321.2pt x 240.9pt>
+<example-image-b.pdf, id=451, 321.2pt x 240.9pt>
 File: example-image-b.pdf Graphic file (type pdf)
 <use example-image-b.pdf>
-Package luatex.def Info: example-image-b.pdf  used on input line 1454.
+Package luatex.def Info: example-image-b.pdf  used on input line 209.
 (luatex.def)             Requested size: 167.29967pt x 125.47823pt.
- (./main-english.tex
+ (./chapters/latex-hints.tex
 
 LaTeX Font Warning: Font shape `TU/Inconsolatazi4(0)/m/sl' undefined
-(Font)              using `TU/Inconsolatazi4(0)/m/n' instead on input line 1450.
+(Font)              using `TU/Inconsolatazi4(0)/m/n' instead on input line 205.
 
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/sl' will be
-(Font)              scaled to size 8.09995pt on input line 1453.
+(Font)              scaled to size 8.09995pt on input line 208.
 )
-Package cleveref Info: loaded `english' language definitions on input line 1459.
- [32</usr/local/texlive/2026/texmf-dist/tex/latex/mwe/example-image-b.pdf>] (./main-english.tex) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1494.
+Package cleveref Info: loaded `english' language definitions on input line 214.
+ [32</usr/local/texlive/2026/texmf-dist/tex/latex/mwe/example-image-b.pdf>] (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 249.
  [33] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
-) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1512.
- [34] (./main-english.tex) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1544.
+) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 267.
+ [34] (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 299.
  [35] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
-) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1567.
- [36] (./main-english.tex) (./main-english.tex) (./main-english.tex) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1598.
- [37] (./main-english.tex)
-Overfull \hbox (14.0416pt too wide) in paragraph at lines 1618--1619
+) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 322.
+ [36] (./chapters/latex-hints.tex) (./chapters/latex-hints.tex) (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 353.
+ [37] (./chapters/latex-hints.tex)
+Overfull \hbox (14.0416pt too wide) in paragraph at lines 373--374
 [][]\TU/texgyretermes(0)/m/n/10.95 Ab-bre-vi-a-tions[] []are[] []de-fined[] []in[] [][]\TU/Inconsolatazi4(0)/m/n/10.95 \content\ausarbeitung.tex[] []\TU/texgyretermes(0)/m/n/10.95 by[] []means[] []of[] [][]\TU/Inconsolatazi4(0)/m/n/10.95 \newacronym{...}{...}{...}\TU/texgyretermes(0)/m/n/10.95 .[] 
  []
 
-(./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1633.
+(./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 388.
  [38]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\begingroup' on input line 1634.
+(hyperref)                removing `\begingroup' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\catcode' on input line 1634.
+(hyperref)                removing `\catcode' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\catcode' on input line 1634.
+(hyperref)                removing `\catcode' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\active' on input line 1634.
+(hyperref)                removing `\active' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\catcode' on input line 1634.
+(hyperref)                removing `\catcode' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\active' on input line 1634.
+(hyperref)                removing `\active' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 1634.
+(hyperref)                removing `\<let>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 1634.
+(hyperref)                removing `\<let>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\%' on input line 1634.
+(hyperref)                removing `\%' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\catcode' on input line 1634.
+(hyperref)                removing `\catcode' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\active' on input line 1634.
+(hyperref)                removing `\active' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\#' on input line 1634.
+(hyperref)                removing `\#' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\catcode' on input line 1634.
+(hyperref)                removing `\catcode' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\&' on input line 1634.
+(hyperref)                removing `\&' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\textunderscore' on input line 1634.
+(hyperref)                removing `\textunderscore' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 1634.
+(hyperref)                removing `\<let>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\_' on input line 1634.
+(hyperref)                removing `\_' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\catcode' on input line 1634.
+(hyperref)                removing `\catcode' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\active' on input line 1634.
+(hyperref)                removing `\active' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 1634.
+(hyperref)                removing `\<let>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 1634.
+(hyperref)                removing `\<let>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 1634.
+(hyperref)                removing `\<let>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\~' on input line 1634.
+(hyperref)                removing `\~' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 1634.
+(hyperref)                removing `\<let>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\textasciitilde' on input line 1634.
+(hyperref)                removing `\textasciitilde' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 1634.
+(hyperref)                removing `\<let>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\\' on input line 1634.
+(hyperref)                removing `\\' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\Hy@tempa' on input line 1634.
+(hyperref)                removing `\Hy@tempa' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<def>-command' on input line 1634.
+(hyperref)                removing `\<def>-command' on input line 389.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\Hy@tempa' on input line 1634.
+(hyperref)                removing `\Hy@tempa' on input line 389.
 
 
-Overfull \hbox (10.95pt too wide) in paragraph at lines 1634--1634
+Overfull \hbox (10.95pt too wide) in paragraph at lines 389--389
 [] 
  []
 
-(./main-english.tex) (./main-english.tex) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1653.
- [39] (./main-english.tex) (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1677.
- [40] (./main-english.tex)
-Package cleveref Info: loaded `english' language definitions on input line 1705.
+(./chapters/latex-hints.tex) (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 416.
+ [39] (./chapters/latex-hints.tex) (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 444.
+ [40] (./chapters/latex-hints.tex)
+Package cleveref Info: loaded `english' language definitions on input line 460.
  [41]
-Package cleveref Info: loaded `english' language definitions on input line 1711.
+Package cleveref Info: loaded `english' language definitions on input line 466.
  [42]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 1716.
-Package hyperref Info: bookmark level for unknown definition defaults to 0 on input line 1737.
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 471.
+Package hyperref Info: bookmark level for unknown definition defaults to 0 on input line 492.
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/b/n' will be
-(Font)              scaled to size 9.85492pt on input line 1768.
-Package cleveref Info: loaded `english' language definitions on input line 1776.
+(Font)              scaled to size 9.85492pt on input line 523.
+Package cleveref Info: loaded `english' language definitions on input line 531.
  [43
 
 
 ]
-Overfull \hbox (8.2125pt too wide) in paragraph at lines 1787--1788
+Overfull \hbox (8.2125pt too wide) in paragraph at lines 542--543
 []
  []
 
 
-Overfull \hbox (8.2125pt too wide) in paragraph at lines 1788--1789
+Overfull \hbox (8.2125pt too wide) in paragraph at lines 543--544
 []
  []
 
 
-Overfull \hbox (8.2125pt too wide) in paragraph at lines 1789--1790
+Overfull \hbox (8.2125pt too wide) in paragraph at lines 544--545
 []
  []
 
-Package cleveref Info: loaded `english' language definitions on input line 1818.
-[44]
-Package cleveref Info: loaded `english' language definitions on input line 1826.
+Package cleveref Info: loaded `english' language definitions on input line 573.
+[44]) (./chapters/conclusion-outlook.tex
+Package cleveref Info: loaded `english' language definitions on input line 2.
  [45] [46
 
 
 ]
 chapter 3.
-[47] [48
+) [47] [48
 
 
 ]
 chapter without number
 
 LaTeX Font Warning: Font shape `TU/Inconsolatazi4(0)/m/it' undefined
-(Font)              using `TU/Inconsolatazi4(0)/m/n' instead on input line 1841.
+(Font)              using `TU/Inconsolatazi4(0)/m/n' instead on input line 935.
 
-[49] [50
+[49] (./chapters/appendix-first.tex [50
 
 
 
 ]
 chapter A.
-(/usr/local/texlive/2026/texmf-dist/tex/generic/hyph-utf8/loadhyph/loadhyph-la.tex UTF-8 Latin hyphenation patterns (/usr/local/texlive/2026/texmf-dist/tex/generic/hyph-utf8/patterns/tex/hyph-la.tex)) [51] [52
+) (/usr/local/texlive/2026/texmf-dist/tex/generic/hyph-utf8/loadhyph/loadhyph-la.tex UTF-8 Latin hyphenation patterns (/usr/local/texlive/2026/texmf-dist/tex/generic/hyph-utf8/patterns/tex/hyph-la.tex)) [51] [52
 
 
 ] [53]
@@ -2979,14 +2972,14 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 82780 strings out of 476076
+ 82789 strings out of 476076
  195344,3417909 words of node,token memory allocated
  973 words of node memory still in use:
    9 hlist, 2 vlist, 2 rule, 1 local_par, 6 glue, 4 kern, 1 penalty, 1 margin_kern, 4 glyph, 31 attribute, 109 glue_spec, 16 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 1 pdf_action nodes
-   avail lists: 1:10,2:5187,3:879,4:1803,5:2995,6:152,7:7313,8:64,9:7209,10:16,11:454,12:1
- 95678 multiletter control sequences out of 65536+600000
- 95 fonts using 18905567 bytes
- 108i,21n,140p,11294b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
+   avail lists: 1:11,2:5205,3:899,4:1807,5:2954,6:152,7:7275,8:64,9:7104,10:16,11:454,12:1
+ 95696 multiletter control sequences out of 65536+600000
+ 95 fonts using 18905527 bytes
+ 108i,21n,143p,11294b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 warning  (pdf backend): unreferenced destination with name 'glo:gp'
 
@@ -2998,10 +2991,10 @@ warning  (pdf backend): unreferenced destination with name 'glo:er'
 
 warning  (pdf backend): unreferenced destination with name 'glo:fr'
 </usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bolditalic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf>{/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolC.enc}</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/public/mnsymbol/MnSymbol10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/zapfding/uzdr.pfb>
-Output written on main-english.pdf (53 pages, 234674 bytes).
+Output written on main-english.pdf (53 pages, 232088 bytes).
 
-PDF statistics: 1102 PDF objects out of 1200 (max. 8388607)
- 994 compressed objects within 10 object streams
- 438 named destinations out of 1000 (max. 1048576)
+PDF statistics: 1066 PDF objects out of 1200 (max. 8388607)
+ 958 compressed objects within 10 object streams
+ 403 named destinations out of 1000 (max. 1048576)
  408 words of extra memory for PDF output out of 10000 (max. 100000000)
 

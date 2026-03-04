@@ -24,29 +24,29 @@
 \contentsline {section}{\numberline {1.21}Discussion (SM6)}{23}{section.32}%
 \contentsline {chapter}{\numberline {2}LaTeX Hints}{25}{chapter.33}%
 \contentsline {section}{\numberline {2.1}Handling of paragraphs}{25}{section.34}%
-\contentsline {section}{\numberline {2.2}Notes separated from the text}{26}{section.55}%
-\contentsline {section}{\numberline {2.3}Handling TODOs}{26}{section.61}%
-\contentsline {section}{\numberline {2.4}Hyphenation}{28}{section.89}%
-\contentsline {section}{\numberline {2.5}Typesetting Units}{28}{section.98}%
-\contentsline {section}{\numberline {2.6}Surrounding Text by Quotes}{29}{section.111}%
-\contentsline {section}{\numberline {2.7}Cleveref examples}{29}{section.117}%
-\contentsline {section}{\numberline {2.8}Figures}{31}{section.129}%
-\contentsline {section}{\numberline {2.9}Sub Figures}{32}{section.145}%
-\contentsline {section}{\numberline {2.10}Tables}{33}{section.162}%
-\contentsline {section}{\numberline {2.11}Source Code}{34}{section.198}%
-\contentsline {section}{\numberline {2.12}Itemization}{37}{section.270}%
-\contentsline {section}{\numberline {2.13}Abbreviations}{38}{section.309}%
-\contentsline {section}{\numberline {2.14}Other Features}{39}{section.322}%
-\contentsline {section}{\numberline {2.15}Varioref examples}{40}{section.336}%
-\contentsline {section}{\numberline {2.16}Citations}{40}{section.344}%
-\contentsline {section}{\numberline {2.17}Miscellaneous Examles}{41}{section.349}%
-\contentsline {subsection}{\numberline {2.17.1}Algorithmen}{43}{subsection.358}%
-\contentsline {subsection}{\numberline {2.17.2}Definitionen}{43}{subsection.365}%
-\contentsline {subsection}{\numberline {2.17.3}Aufzählungen}{43}{subsection.367}%
-\contentsline {subsection}{\numberline {2.17.4}fquote}{45}{subsection.376}%
-\contentsline {chapter}{\numberline {3}Conclusion and Outlook}{47}{chapter.377}%
-\contentsline {chapter}{\nonumberline Bibliography}{49}{chapter*.378}%
+\contentsline {section}{\numberline {2.2}Notes separated from the text}{26}{section.54}%
+\contentsline {section}{\numberline {2.3}Handling TODOs}{26}{section.59}%
+\contentsline {section}{\numberline {2.4}Hyphenation}{28}{section.80}%
+\contentsline {section}{\numberline {2.5}Typesetting Units}{28}{section.88}%
+\contentsline {section}{\numberline {2.6}Surrounding Text by Quotes}{29}{section.98}%
+\contentsline {section}{\numberline {2.7}Cleveref examples}{29}{section.103}%
+\contentsline {section}{\numberline {2.8}Figures}{31}{section.114}%
+\contentsline {section}{\numberline {2.9}Sub Figures}{32}{section.129}%
+\contentsline {section}{\numberline {2.10}Tables}{33}{section.145}%
+\contentsline {section}{\numberline {2.11}Source Code}{34}{section.179}%
+\contentsline {section}{\numberline {2.12}Itemization}{37}{section.247}%
+\contentsline {section}{\numberline {2.13}Abbreviations}{38}{section.281}%
+\contentsline {section}{\numberline {2.14}Other Features}{39}{section.293}%
+\contentsline {section}{\numberline {2.15}Varioref examples}{40}{section.304}%
+\contentsline {section}{\numberline {2.16}Citations}{40}{section.311}%
+\contentsline {section}{\numberline {2.17}Miscellaneous Examles}{41}{section.315}%
+\contentsline {subsection}{\numberline {2.17.1}Algorithmen}{43}{subsection.323}%
+\contentsline {subsection}{\numberline {2.17.2}Definitionen}{43}{subsection.330}%
+\contentsline {subsection}{\numberline {2.17.3}Aufzählungen}{43}{subsection.332}%
+\contentsline {subsection}{\numberline {2.17.4}fquote}{45}{subsection.341}%
+\contentsline {chapter}{\numberline {3}Conclusion and Outlook}{47}{chapter.342}%
+\contentsline {chapter}{\nonumberline Bibliography}{49}{chapter*.343}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{50}{chapter*.378}%
-\contentsline {chapter}{\numberline {A}My first appendix}{51}{appendix.379}%
+\contentsline {part}{Appendix}{50}{chapter*.343}%
+\contentsline {chapter}{\numberline {A}My first appendix}{51}{appendix.344}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
