@@ -12,7 +12,7 @@ import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
 import {getObjectDisplayName} from '../../../schema/graph-representation/schemaGraphConstructor';
-import { computed } from 'vue';
+import {computed} from 'vue';
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -94,7 +94,6 @@ const isEnumTruncated = computed(() => {
 
   return props.data.values.length > maxEnumValuesToShow.value;
 });
-
 </script>
 
 <template>
@@ -208,7 +207,6 @@ const isEnumTruncated = computed(() => {
 </template>
 
 <style>
-
 .vue-flow__node-schemaenum {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
