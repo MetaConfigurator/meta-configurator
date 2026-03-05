@@ -12,6 +12,7 @@ import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
 import {getObjectDisplayName} from '../../../schema/graph-representation/schemaGraphConstructor';
+import { computed } from 'vue';
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -83,6 +84,17 @@ function addEnumItem() {
   enumValues.value.push('NEW_ITEM');
   emit('update_enum_values', props.data, enumValues.value);
 }
+
+const maxEnumValuesToShow = computed(() => settings.value.schemaDiagram.maxEnumValuesToShow);
+
+const isEnumTruncated = computed(() => {
+  if (!settings.value.schemaDiagram.showEnumValues) {
+    return false;
+  }
+
+  return props.data.values.length > maxEnumValuesToShow.value;
+});
+
 </script>
 
 <template>
@@ -124,6 +136,8 @@ function addEnumItem() {
           {{ value }}
         </p>
       </div>
+
+      <p v-if="isEnumTruncated" class="vue-flow-enum-ellipsis">...</p>
     </div>
 
     <div v-else>
@@ -194,6 +208,7 @@ function addEnumItem() {
 </template>
 
 <style>
+
 .vue-flow__node-schemaenum {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -202,6 +217,11 @@ function addEnumItem() {
 
   color: #536878;
   background: linear-gradient(135deg, #e9f5ff 0%, #ffffff 100%);
+}
+.vue-flow-enum-ellipsis {
+  font-style: italic;
+  opacity: 0.7;
+  margin: 0;
 }
 
 .vue-flow__handle {
