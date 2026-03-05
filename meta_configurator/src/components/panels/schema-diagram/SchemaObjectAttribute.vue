@@ -37,8 +37,19 @@ const emit = defineEmits<{
     attributeData: SchemaObjectAttributeData,
     newType: AttributeTypeChoice
   ): void;
+  (
+    e: 'update_attribute_required',
+    attributeData: SchemaObjectAttributeData,
+    required: boolean
+  ): void;
   (e: 'delete_element', objectData: SchemaElementData): void;
 }>();
+
+const isRequired = ref(props.data.required);
+
+function updateRequired() {
+  emit('update_attribute_required', props.data, isRequired.value);
+}
 
 const attrName = ref(props.data.name);
 const selectedType: Ref<AttributeTypeChoice | undefined> = ref(
@@ -94,7 +105,7 @@ function getHandleTop() {
     v-on:click.stop>
     <div v-if="!isEditable()">
       <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
-      <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
+      <span class="text-red-600">{{ isRequired ? '*' : '' }}</span>
       <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
     </div>
 
@@ -109,8 +120,16 @@ function getHandleTop() {
         @dblclick.stop
         @keydown.stop
         @keyup.enter="updateAttributeName" />
-      <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
+      <input
+        type="checkbox"
+        v-model="isRequired"
+        @change="updateRequired"
+        @mousedown.stop
+        @click.stop
+        @dblclick.stop
+        @keydown.stop />
+      
       <Select
         class="vue-flow-attribute-dropdown"
         v-model="selectedType"
@@ -122,6 +141,7 @@ function getHandleTop() {
         @dblclick.stop
         placeholder="Select Type" />
 
+      
       <Button
         class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
         size="small"
@@ -144,6 +164,11 @@ function getHandleTop() {
 </template>
 
 <style>
+.vue-flow-required-checkbox {
+  margin-left: 6px;
+  transform: scale(0.8);
+}
+
 .vue-flow__node-schemaattribute {
   padding: 0;
 }
