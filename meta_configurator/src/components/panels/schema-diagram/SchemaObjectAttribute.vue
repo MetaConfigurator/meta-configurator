@@ -129,7 +129,7 @@ function getHandleTop() {
         @click.stop
         @dblclick.stop
         @keydown.stop />
-      
+
       <Select
         class="vue-flow-attribute-dropdown"
         v-model="selectedType"
@@ -141,7 +141,6 @@ function getHandleTop() {
         @dblclick.stop
         placeholder="Select Type" />
 
-      
       <Button
         class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
         size="small"
