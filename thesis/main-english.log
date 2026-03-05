@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  4 MAR 2026 14:58
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  5 MAR 2026 14:51
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -2195,7 +2195,7 @@ Package: glossaries-extra-stylemods 2025/11/03 v1.9 (NLCT)
 
 \openout7 = main-english.glo-abr
 Package glossaries Info: Writing glossary file main-english.glo-abr on input line 683.
- (./abbreviations.tex) (/usr/local/texlive/2026/texmf-dist/tex/generic/hyphenex/ushyphex.tex) (./commands.tex) (/usr/local/texlive/2026/texmf-dist/tex/latex/scientific-thesis-cover/scientific-thesis-cover.sty
+ (/usr/local/texlive/2026/texmf-dist/tex/generic/hyphenex/ushyphex.tex) (./commands.tex) (/usr/local/texlive/2026/texmf-dist/tex/latex/scientific-thesis-cover/scientific-thesis-cover.sty
 Package: scientific-thesis-cover 2018/06/03 Cover and affirmation for scientific works.
 
 Package: `scientific-thesis-cover' v4.0.2
@@ -2242,25 +2242,6 @@ File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO)
 )) (./main-english.aux
 Package babel Info: 'english' activates 'ngerman' shorthands.
 (babel)             Reported on input line 19.
-
-
-LaTeX Warning: Label `sec:conclusion' multiply defined.
-
-
-LaTeX Warning: Label `sec:conclusion@cref' multiply defined.
-
-
-LaTeX Warning: Label `sec:conclusion' multiply defined.
-
-
-LaTeX Warning: Label `sec:conclusion@cref' multiply defined.
-
-
-LaTeX Warning: Label `sec:conclusion' multiply defined.
-
-
-LaTeX Warning: Label `sec:conclusion@cref' multiply defined.
-
 )
 \openout1 = main-english.aux
 
@@ -2547,30 +2528,32 @@ LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
 
 ] (./chapters/00_abstract.tex
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 12.9599pt on input line 2.
-)
+(Font)              scaled to size 12.9599pt on input line 1.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/10.95'
-(microtype)             (new value: 10.95pt) on input line 878.
+(microtype)             (new value: 10.95pt) on input line 19.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/7.665'
-(microtype)             (new value: 7.665pt) on input line 878.
+(microtype)             (new value: 7.665pt) on input line 19.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5.475'
-(microtype)             (new value: 5.475pt) on input line 878.
- [3] [4
-
-
-]
+(microtype)             (new value: 5.475pt) on input line 19.
+ [3]) [4]
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
 (Font)              scaled to size 18.66588pt on input line 878.
 Package tocbasic Info: character protrusion at toc deactivated on input line 878.
  (./main-english.toc
 Package cleveref Info: loaded `english' language definitions on input line 1.
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 10.79993pt on input line 30.
+(Font)              scaled to size 10.79993pt on input line 22.
 )
 \tf@toc=\write8
 
 \openout8 = main-english.toc
- [5] [6]
+ [5
+
+
+] [6
+
+
+]
 Package tocbasic Info: character protrusion at lof deactivated on input line 880.
  (./main-english.lof
 Package cleveref Info: loaded `english' language definitions on input line 1.
@@ -2578,10 +2561,7 @@ Package cleveref Info: loaded `english' language definitions on input line 1.
 \tf@lof=\write9
 
 \openout9 = main-english.lof
- [7
-
-
-] [8
+ [7] [8
 
 
 ]
@@ -2592,92 +2572,63 @@ Package cleveref Info: loaded `english' language definitions on input line 1.
 \tf@lot=\write10
 
 \openout10 = main-english.lot
- [9] [10
-
-
-]
-Package tocbasic Info: character protrusion at lol deactivated on input line 887.
- (./main-english.lol
-Package cleveref Info: loaded `english' language definitions on input line 1.
-)
-\tf@lol=\write11
-
-\openout11 = main-english.lol
-
-No file main-english.gls-abr.
-
-Package glossaries-extra Warning: Glossary `abbreviations' is missing on input line 895.
-
-[11] [12
-
-
-]
-LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 9.85492pt on input line 895.
- (./chapters/00_introduction.tex [13
-
-
-] [14
+ (./chapters/01_background_and_related_work.tex [9] [10
 
 
 ]
 chapter 1.
-[15]
+[11]
+LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
+(Font)              scaled to size 9.85492pt on input line 45.
 Package babel Info: 'english' activates 'ngerman' shorthands.
-(babel)             Reported on input line 70.
-Package cleveref Info: loaded `english' language definitions on input line 70.
- [16]
-Package cleveref Info: loaded `english' language definitions on input line 105.
- [17]
-Package cleveref Info: loaded `english' language definitions on input line 140.
- [18]
-Package cleveref Info: loaded `english' language definitions on input line 177.
- [19]
-Package cleveref Info: loaded `english' language definitions on input line 214.
- [20]
-Package cleveref Info: loaded `english' language definitions on input line 253.
- [21]
-Package cleveref Info: loaded `english' language definitions on input line 297.
- [22]) (./chapters/01_json_transformation.tex
+(babel)             Reported on input line 50.
+Package cleveref Info: loaded `english' language definitions on input line 50.
+ [12]
+Package cleveref Info: loaded `english' language definitions on input line 71.
+ [13]
+Package cleveref Info: loaded `english' language definitions on input line 101.
+ [14]) (./chapters/02_design_and_implementation.tex
 Package cleveref Info: loaded `english' language definitions on input line 2.
- [23] [24
+ [15] [16
 
 
 ]
 chapter 2.
-) (./chapters/02_rdf_authoring_panel.tex [25] [26
+) (./chapters/03_application.tex [17] [18
 
 
 ]
 chapter 3.
-) (./chapters/03_knowledge_graph_visualization.tex [27] [28
+) (./chapters/04_conclusion_and_outlook.tex [19] [20
 
 
 ]
 chapter 4.
-) (./chapters/04_conclusion.tex [29] [30
+) [21] [22
 
 
 ]
-chapter 5.
-)
-
-LaTeX Warning: Empty bibliography on input line 918.
-
-[31] (./chapters/05_appendix.tex [32
+chapter without number
+[23] (./chapters/05_appendix.tex [24
 
 
 
 ]
 chapter A.
-) (/usr/local/texlive/2026/texmf-dist/tex/generic/hyph-utf8/loadhyph/loadhyph-la.tex UTF-8 Latin hyphenation patterns (/usr/local/texlive/2026/texmf-dist/tex/generic/hyph-utf8/patterns/tex/hyph-la.tex)) [33] [34
+) [25] [26
 
 
-] [35]
-\tf@thm=\write12
+] [27]
+\tf@thm=\write11
 
-\openout12 = main-english.thm
- (./main-english.aux
+\openout11 = main-english.thm
+
+
+Package glossaries Warning: No \printglossary or \printglossaries found. 
+(Remove \makeglossaries if you don't want any glossaries.) 
+This document will not have a glossary.
+
+(./main-english.aux
 Package cleveref Info: loaded `english' language definitions on input line 19.
 )
  ***********
@@ -2688,28 +2639,25 @@ L3 programming layer <2020/03/25>
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-
-LaTeX Warning: There were multiply-defined labels.
-
 Package logreq Info: Writing requests to 'main-english.run.xml'.
 
 \openout1 = main-english.run.xml
 )
 
 Here is how much of LuaTeX's memory you used:
- 76733 strings out of 476076
+ 75064 strings out of 476076
  100000,3417909 words of node,token memory allocated
- 915 words of node memory still in use:
-   8 hlist, 2 vlist, 2 rule, 1 local_par, 6 glue, 4 kern, 1 penalty, 3 glyph, 27 attribute, 105 glue_spec, 14 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined nodes
-   avail lists: 1:2,2:2148,3:463,4:1801,5:565,6:139,7:6355,8:2,9:734,10:16,11:454,12:1
- 93305 multiletter control sequences out of 65536+600000
- 81 fonts using 16831431 bytes
- 108i,21n,115p,11294b,2686s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf>
-Output written on main-english.pdf (35 pages, 76555 bytes).
+ 989 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 4 glue, 5 kern, 1 penalty, 4 glyph, 41 attribute, 107 glue_spec, 21 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 4 pdf_action nodes
+   avail lists: 1:1,2:1733,3:886,4:2461,5:538,6:136,7:6155,8:59,9:637,10:16,11:537,12:1
+ 93261 multiletter control sequences out of 65536+600000
+ 81 fonts using 16831511 bytes
+ 108i,20n,115p,11294b,2686s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf>
+Output written on main-english.pdf (27 pages, 69045 bytes).
 
-PDF statistics: 415 PDF objects out of 1000 (max. 8388607)
- 359 compressed objects within 4 object streams
- 73 named destinations out of 1000 (max. 1048576)
- 248 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 344 PDF objects out of 1000 (max. 8388607)
+ 297 compressed objects within 3 object streams
+ 63 named destinations out of 1000 (max. 1048576)
+ 192 words of extra memory for PDF output out of 10000 (max. 100000000)
 

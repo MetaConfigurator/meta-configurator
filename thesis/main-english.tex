@@ -681,7 +681,7 @@
 % Required to have the German chapter name % Source: https://tex.stackexchange.com/a/426392/9075
 \makeglossaries
 
-\input{abbreviations}
+% \input{abbreviations}
 
 % Allows for defining commands that don't eat spaces.
 \usepackage{xspace}
@@ -884,7 +884,7 @@
 % We use lstlisting environments with caption paramters.
 % Thus, we need that command.
 % Alternative: \listof{Listing}{List of Listings}
-\lstlistoflistings
+% \lstlistoflistings
 
 % mittels \newfloat wurde die Algorithmus-Gleitumgebung definiert.
 % Mit folgendem Befehl werden alle floats dieses Typs ausgegeben
@@ -892,7 +892,7 @@
 %\listofalgorithms %Ist nur für Algorithmen, die mittels \begin{algorithm} umschlossen werden, nötig
 
 % Abbreviations / Acronyms
-\printglossary[type=\acronymtype,title={Abbreviations}]
+% \printglossary[type=\acronymtype,title={Abbreviations}]
 % \printglossaries
 % \printnoidxglossaries
 % \printunsrtglossaries cannot be used, because then no indexing happens; source: https://tex.stackexchange.com/a/287128/9075
@@ -905,11 +905,10 @@
 
 
 % Chapters
-\input{chapters/00_introduction}
-\input{chapters/01_json_transformation}
-\input{chapters/02_rdf_authoring_panel}
-\input{chapters/03_knowledge_graph_visualization}
-\input{chapters/04_conclusion}
+\input{chapters/01_background_and_related_work.tex}
+\input{chapters/02_design_and_implementation.tex}
+\input{chapters/03_application.tex}
+\input{chapters/04_conclusion_and_outlook.tex}
 
 %%% ===============================================================================
 %%% Bibliography
@@ -921,7 +920,7 @@
 \ \\
 %
 \noindent
-All links were last followed on October 5, 2020.
+All links were last followed on March 5, 2026.
 
 %%% ===============================================================================
 
@@ -934,7 +933,6 @@ All links were last followed on October 5, 2020.
 %\phantomsection
 %\addcontentsline{toc}{chapter}{Appendix}
 \addcontentsline{toc}{part}{Appendix}
-
 
 \input{chapters/05_appendix}
 

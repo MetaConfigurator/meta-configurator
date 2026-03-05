@@ -1,0 +1,102 @@
+%%% ===============================================================================
+\chapter{Background and Related Work}\label{sec:background}
+%%% ===============================================================================
+\section{MetaConfigurator}\label{sec:background:meta-configurator}
+
+
+MetaConfigurator is an open-source, web-based schema editor and form generator for JSON Schema and JSON/YAML documents. 
+It is designed to simplify the creation and maintenance of structured data models by combining a traditional text editor with a schema-driven graphical user interface (GUI). 
+This hybrid approach supports both technically experienced users and domain experts without deep knowledge of schema languages.
+
+The tool is based on JSON Schema, which has become the de-facto standard for describing and validating JSON documents due to its high expressiveness and broad ecosystem support \cite{JSONSchema2020, Wright2017JSONSchema}. 
+JSON Schema enables the formal specification of data structures, constraints, references, and conditional constructs, allowing automatic validation and interoperable data exchange.
+MetaConfigurator runs entirely client-side in the browser and provides three main views: a \emph{Data Editor} for editing instance documents based on a schema, a \emph{Schema Editor} for authoring JSON Schemas, and a \emph{Settings View}. 
+Since schemas are themselves structured JSON documents, the schema editor is generated from a JSON Schema meta-schema, enabling systematic support for most JSON Schema keywords.
+
+To improve usability, MetaConfigurator introduces a distinction between simplified and advanced editing modes. 
+A customizable meta-schema hides less frequently used or complex keywords behind expandable sections, thereby reducing cognitive load while preserving the full expressiveness of JSON Schema. 
+In addition, a graphical schema visualization inspired by UML class diagrams \cite{OMG2017UML} supports structural understanding and visual manipulation of schema components.
+
+Further extensions include CSV import with automatic schema inference and ontology-based URI auto-completion. 
+The ontology integration supports semantic interoperability with RDF-based knowledge graphs and Linked Data technologies \cite{RDF2014, SHACL2017, OWL2012}. 
+These features make MetaConfigurator suitable for research data management, standardization processes, and collaborative schema development.
+
+\section{JSON and JSON-LD}\label{sec:background:json-and-jsonld}
+
+\subsection{JavaScript Object Notation (JSON)}
+
+JavaScript Object Notation (JSON) is a lightweight, text-based data interchange format that is easy for humans to read and write and easy for machines to parse and generate \cite{RFC8259}. It is based on a small set of structural elements, including objects (unordered key--value pairs), arrays (ordered lists of values), strings, numbers, booleans, and null. Due to its simplicity and language independence, JSON has become one of the most widely adopted formats for web APIs, configuration files, and data storage.
+
+JSON defines only the syntactic structure of data but does not impose semantic meaning or structural constraints. To formally describe and validate JSON documents, schema languages such as JSON Schema are used. JSON Schema enables the definition of types, required properties, constraints, references, and conditional constructs, allowing automatic validation and interoperability across systems \cite{JSONSchema2020}.
+
+Despite its advantages, JSON lacks built-in mechanisms for expressing globally unique identifiers, linking data across documents, or explicitly defining semantics. Keys in JSON objects are interpreted only within the local context of a document, which may lead to ambiguity when integrating data from heterogeneous sources.
+
+\subsection{JSON for Linked Data (JSON-LD)}
+
+JSON for Linked Data (JSON-LD) is a W3C standard that extends JSON with features for representing Linked Data and serializing RDF graphs \cite{JSONLD11}. JSON-LD introduces a lightweight semantic layer on top of JSON by providing:
+
+\begin{itemize}
+    \item \textbf{Internationalized Resource Identifiers (IRIs)} for globally unique identification of entities,
+    \item \textbf{Contexts} for mapping local keys to well-defined vocabulary terms,
+    \item \textbf{Explicit typing} of resources,
+    \item \textbf{Graph-based data modeling} compatible with RDF \cite{RDF2014}.
+\end{itemize}
+
+Through the use of a \texttt{@context}, JSON-LD allows local property names to be mapped to IRIs, thereby disambiguating terms and enabling semantic interoperability. The resulting data model corresponds to an RDF graph and can therefore be queried using SPARQL or combined with other Linked Data sources \cite{SPARQL2013}.
+
+\subsection{Why Use JSON-LD?}
+
+The main motivation for using JSON-LD over plain JSON is the need for semantic interoperability and data integration. While JSON is well suited for syntactic data exchange, it does not inherently support linking, reuse of shared vocabularies, or machine-interpretable semantics. JSON-LD addresses these limitations without sacrificing compatibility with existing JSON-based systems.
+
+The advantages of JSON-LD include:
+
+\begin{itemize}
+    \item \textbf{Interoperability}: By referencing shared ontologies and vocabularies, data can be integrated across domains and systems.
+    \item \textbf{Extensibility}: New properties and vocabularies can be added without breaking existing consumers.
+    \item \textbf{Compatibility}: JSON-LD documents remain valid JSON documents.
+    \item \textbf{Knowledge Graph Integration}: JSON-LD can be directly transformed into RDF triples, enabling reasoning, validation (e.g., with SHACL \cite{SHACL2017}), and ontology-based inference (e.g., with OWL \cite{OWL2012}).
+\end{itemize}
+
+In research data management and cross-domain data exchange scenarios, where data must be findable, interoperable, and reusable, JSON-LD provides a practical bridge between conventional JSON-based workflows and Semantic Web technologies. It enables the gradual enrichment of existing JSON data with semantic annotations, thereby facilitating integration into knowledge graphs and Linked Data ecosystems.
+
+\section{RML Mapping}\label{sec:background:rml-mapping}
+
+As discussed in Section~\ref{sec:background:json-and-jsonld}, JSON provides a syntactic data representation format, while JSON-LD enables semantic enrichment by mapping JSON structures to RDF graphs using IRIs and shared vocabularies. However, in many real-world scenarios, data does not originally exist in JSON-LD form. Instead, it is often stored as plain JSON, CSV, XML, or other semi-structured formats. To integrate such heterogeneous data sources into knowledge graphs, a declarative transformation mechanism is required. The RDF Mapping Language (RML) addresses this need.
+
+RML is a mapping language designed to express customized mappings from heterogeneous data sources to RDF \cite{Dimou2014RML}. It extends the W3C standard R2RML, which was originally defined for relational databases \cite{R2RML2012}, by generalizing the mapping model to support multiple input formats, including JSON, XML, CSV, and relational data. RML enables users to declaratively define how data elements from a source document are transformed into RDF triples.
+
+An RML mapping document itself is expressed in RDF and specifies:
+\begin{itemize}
+    \item the logical source (e.g., a JSON document),
+    \item the iteration pattern over data elements (e.g., JSONPath expressions),
+    \item the generation of subject IRIs,
+    \item and the construction of predicate–object mappings.
+\end{itemize}
+
+For JSON sources, RML typically relies on JSONPath expressions to select relevant nodes within a document. These selected values are then mapped to RDF resources, literals, and properties according to a predefined vocabulary. The output of an RML processor is an RDF graph fully compatible with Linked Data principles \cite{RDF2014}.
+
+\subsection{From JSON to JSON-LD to RDF via RML}
+
+The motivation for adopting JSON-LD, as discussed previously, lies in enabling semantic interoperability and knowledge graph integration. While JSON-LD directly embeds RDF-compatible semantics into JSON documents, RML provides an alternative approach: instead of modifying the original data representation, it defines an external mapping layer that transforms existing data into RDF.
+
+This distinction is particularly relevant in scenarios where:
+\begin{itemize}
+    \item the original JSON structure cannot be modified,
+    \item legacy systems must remain unchanged,
+    \item or multiple heterogeneous data sources must be integrated consistently.
+\end{itemize}
+
+By combining JSON or JSON-LD with RML mappings, users gain several advantages:
+
+\begin{itemize}
+    \item \textbf{Separation of concerns}: The original data format remains independent from its semantic representation.
+    \item \textbf{Reproducibility}: Mappings are explicit, versionable artifacts.
+    \item \textbf{Interoperability}: Generated RDF graphs can be validated using SHACL \cite{SHACL2017}, enriched using OWL ontologies \cite{OWL2012}, and queried via SPARQL \cite{SPARQL2013}.
+\end{itemize}
+
+In practice, JSON-LD can simplify the mapping process because semantic annotations, such as IRIs and type information, are already embedded within the data. However, RML remains essential when dealing with raw JSON or other non-RDF-native formats. Together, JSON-LD and RML form complementary approaches: JSON-LD integrates semantics directly into the data representation, whereas RML provides a declarative transformation mechanism for converting heterogeneous data into RDF-based knowledge graphs.
+
+Consequently, RML plays a central role in bridging conventional data management workflows with Semantic Web technologies, enabling scalable, transparent, and interoperable data integration across domains.
+
+\section{RDF Model}\label{sec:background:rdf-model}
+\section{Semantic Web}\label{sec:background:semantic-web}
