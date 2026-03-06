@@ -1,4 +1,4 @@
-import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 import {cloneDeep} from 'lodash';
@@ -7,6 +7,8 @@ import type {Path} from '@/utility/path';
 import {doesSchemaHaveType} from '@/schema/schemaReadingUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
 
+
+// this code is not recursive and also mainly developed for the documentation view, not sure how generally applicable it is
 export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): any {
   if (!subSchema) {
     return new Set();

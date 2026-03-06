@@ -108,6 +108,18 @@ export class SchemaObjectAttributeData extends SchemaElementData {
   }
 }
 
+export class SchemaExternalReferenceNodeData extends SchemaNodeData {
+  public constructor(
+    reference: string,
+    public absolutePath: Path,
+  ) {
+    super(reference, reference, reference, false, absolutePath, { $ref: reference});
+  }
+  public getNodeType() {
+    return 'externalreference';
+  }
+}
+
 export class EdgeData {
   public constructor(
     public start: SchemaNodeData,
@@ -131,4 +143,5 @@ export enum EdgeType {
   ELSE = 'else',
   ADDITIONAL_PROPERTIES = 'additionalProperties',
   PATTERN_PROPERTIES = 'patternProperties',
+  EXTERNAL_REFERENCE = 'externalReference',
 }
