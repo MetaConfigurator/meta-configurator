@@ -14,12 +14,14 @@ import {
   EdgeType,
   SchemaElementData,
   SchemaEnumNodeData,
+  SchemaExternalReferenceNodeData,
   SchemaGraph,
   SchemaNodeData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
 } from '@/schema/graph-representation/schemaGraphTypes';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {isExternalRef} from '@/schema/externalReferences.ts';
 
 const settings = useSettings();
 
@@ -177,6 +179,12 @@ export function identifyObjects(
         rootSchema
       );
     }
+  }
+  if (schema.$ref && isExternalRef(schema.$ref)) {
+    defs.set(
+      schema.$ref,
+      new SchemaExternalReferenceNodeData(schema.$ref, [...currentPath, '$ref'])
+    );
   }
 }
 
@@ -580,6 +588,13 @@ function resolveReferenceNode(
     return undefined;
   }
   if (schema.$ref) {
+    if (isExternalRef(schema.$ref)) {
+      if (objectDefs.has(schema.$ref)) {
+        return objectDefs.get(schema.$ref);
+      } else {
+        return undefined;
+      }
+    }
     const refPath = jsonPointerToPath(schema.$ref.replace('#', ''));
     const refPathString = pathToString(refPath);
     if (objectDefs.has(refPathString)) {
@@ -704,6 +719,18 @@ export function generateObjectSpecialPropertyEdges(
       graph
     );
   }
+  if (schema.$ref) {
+    if (isExternalRef(schema.$ref) && isExternalRef(schema.$ref)) {
+      generateObjectSubSchemaEdge(
+        node,
+        {$ref: schema.$ref},
+        [...node.absolutePath, '$ref'],
+        EdgeType.EXTERNAL_REFERENCE,
+        objectDefs,
+        graph
+      );
+    }
+  }
 }
 
 export function isSchemaThatDeservesANode(schema: JsonSchemaType): boolean {
@@ -739,6 +766,10 @@ export function isSchemaThatDeservesANode(schema: JsonSchemaType): boolean {
     ) {
       return true;
     }
+  }
+
+  if (schema.$ref && isExternalRef(schema.$ref)) {
+    return true;
   }
 
   return false;
