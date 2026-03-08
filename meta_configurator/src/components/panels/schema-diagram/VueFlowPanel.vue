@@ -12,26 +12,20 @@ import {useLayout} from './useLayout';
 import {
   type Edge,
   type Node,
+  SchemaElementData,
   SchemaEnumNodeData,
+  SchemaExternalReferenceNodeData,
   SchemaNodeData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
-  SchemaElementData,
 } from '@/schema/graph-representation/schemaGraphTypes';
 import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vue';
 import {useSettings} from '@/settings/useSettings';
 import {findBestMatchingData, findBestMatchingNode} from '@/schema/graph-representation/graphUtils';
 import {findForwardConnectedNodesAndEdges} from '@/schema/graph-representation/findConnectedNodes';
-import {
-  updateNodeData,
-  wasNodeAddedOrEdgesChanged,
-} from '@/schema/graph-representation/updateGraph';
+import {updateNodeData, wasNodeAddedOrEdgesChanged} from '@/schema/graph-representation/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
-import {
-  applyNewType,
-  type AttributeTypeChoice,
-  collectTypeChoices,
-} from '@/schema/graph-representation/typeUtils';
+import {applyNewType, type AttributeTypeChoice, collectTypeChoices} from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
 import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
 import {
@@ -43,6 +37,11 @@ import {
 import {schemaGraphToVueFlowGraph} from '@/components/panels/schema-diagram/schemaDiagramTypes';
 import {deleteSchemaElement} from '@/utility/deleteUtils';
 import {replacePropertyNameUtils} from '@/utility/renameUtils';
+import SchemaExternalReferenceNode from '@/components/panels/schema-diagram/SchemaExternalReferenceNode.vue';
+import $RefParser from '@apidevtools/json-schema-ref-parser';
+import {useErrorService} from '@/utility/errorServiceInstance.ts';
+import {pathToJsonPointer} from '@/utility/pathUtils.ts';
+import {stringToIdentifier, urlStringToIdentifier} from '@/utility/stringToIdentifier.ts';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -358,6 +357,34 @@ function unselectElement() {
   selectedData.value = undefined;
   schemaSession.currentSelectedElement.value = [];
 }
+
+async function resolveExternalReference(referenceData: SchemaExternalReferenceNodeData) {
+  const referencePath = referenceData.absolutePath;
+  const referenceValue = schemaData.dataAt(referencePath);
+  const schemaWithReference = {
+    $ref: referenceValue,
+  }
+  let resolvedSchema = await $RefParser.dereference(schemaWithReference,  { mutateInputSchema: false });
+  if (typeof resolvedSchema === 'object' && resolvedSchema !== null) {
+    // convert URI identifier to ASCII string
+    const newIdentifier = urlStringToIdentifier(referenceData.reference)
+    const newElementId = addSchemaObject(schemaData, false, resolvedSchema, newIdentifier);
+    // update the $ref at referencePath to now refer to the new internal definition instead of external def
+    const newElementJsonPointer = "#" + pathToJsonPointer(newElementId);
+    schemaData.setDataAt(referencePath, newElementJsonPointer);
+    selectElement(newElementId);
+  } else {
+    useErrorService().onError(new Error("Failed to resolve reference. Resolved value is not an object."));
+  }
+}
+
+function updateExternalReferenceValue(
+  referenceData: SchemaExternalReferenceNodeData,
+  newValue: string
+) {
+  schemaData.setDataAt(referenceData.absolutePath, newValue);
+}
+
 </script>
 
 <template>
@@ -407,6 +434,17 @@ function unselectElement() {
           @update_enum_values="updateEnumValues"
           @delete_element="deleteElement"
           @extract_inlined_element="extractInlinedElement"
+          :source-position="props.sourcePosition"
+          :target-position="props.targetPosition"
+          :selected-data="selectedData" />
+      </template>
+      <template #node-externalreference="props">
+        <SchemaExternalReferenceNode
+          :data="props.data"
+          @select_element="selectElement"
+          @delete_element="deleteElement"
+          @resolve_external_reference="resolveExternalReference"
+          @update_external_reference_value="updateExternalReferenceValue"
           :source-position="props.sourcePosition"
           :target-position="props.targetPosition"
           :selected-data="selectedData" />

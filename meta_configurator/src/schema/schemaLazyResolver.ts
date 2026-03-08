@@ -275,12 +275,6 @@ function resolveReference(
         // TODO: dedicated support for external refs, currently just show warning and ignore them
         // One reason it is not yet supported here: resolving external refs would require async code,
         // which would require lots of code changes, especially as jsonSchemaWrapper resolves all refs in constructor
-        toastService.add({
-          severity: 'info',
-          summary: 'Info',
-          detail: `External reference ${refString} is not resolved.`,
-          life: 5000,
-        })
       } else {
         refSchema = pointer.get(nonBooleanSchema(rootSchema ?? {}) ?? {}, refString);
       }
