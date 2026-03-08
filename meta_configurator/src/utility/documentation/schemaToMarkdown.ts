@@ -11,7 +11,7 @@ import {
   SchemaNodeData,
 } from '@/schema/graph-representation/schemaGraphTypes';
 import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
-import {resolveReferences} from '@/schema/resolveReferences';
+import {resolveReferencesForDocumentation} from '@/schema/resolveReferencesForDocumentation.ts';
 import {hasOutgoingEdge} from '@/schema/graph-representation/graphUtils';
 import {
   escapeMarkdown,
@@ -267,7 +267,7 @@ function writeObjectNode(
     md.push(`</details>`);
   }
 
-  const instance = generateSchemaInstance(resolveReferences(node.schema, rootSchema), rootSchema);
+  const instance = generateSchemaInstance(resolveReferencesForDocumentation(node.schema, rootSchema), rootSchema);
   if (instance) {
     md.push('#### Example\n');
     md.push('```' + useSettings().value.dataFormat);
