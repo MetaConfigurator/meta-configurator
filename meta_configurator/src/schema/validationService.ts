@@ -10,6 +10,7 @@ import {
   getTopLevelSchemaId,
   ValidationResult,
 } from '@/schema/validationUtils';
+import {removeExternalReferences} from '@/schema/removeExternalReferences.ts';
 
 /**
  * Service for validating data against a JSON schema.
@@ -32,10 +33,13 @@ export class ValidationService {
   }
 
   private initValidationFunction() {
-    this._ajv = getMatchingAjvVersion(this.topLevelSchema);
+    // duplicate the schema and remove external references to avoid ajv trying to fetch them and throwing an error if they are not available
+    let schema = JSON.parse(JSON.stringify(this.topLevelSchema));
+    removeExternalReferences(schema);
+    this._ajv = getMatchingAjvVersion(schema);
     addFormats(this._ajv);
-    const topLevelSchemaId = getTopLevelSchemaId(this.topLevelSchema);
-    this._ajv.addSchema(this.topLevelSchema, topLevelSchemaId);
+    const topLevelSchemaId = getTopLevelSchemaId(schema);
+    this._ajv.addSchema(schema, topLevelSchemaId);
     this._validationFunction = this._ajv.getSchema(topLevelSchemaId);
   }
 

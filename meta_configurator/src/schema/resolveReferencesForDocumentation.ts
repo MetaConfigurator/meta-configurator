@@ -8,7 +8,7 @@ import {doesSchemaHaveType} from '@/schema/schemaReadingUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
 
 // this code is not recursive and also mainly developed for the documentation view, not sure how generally applicable it is
-export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): any {
+export function resolveReferencesForDocumentation(subSchema: any, rootSchema: TopLevelSchema): any {
   if (!subSchema) {
     return new Set();
   }
@@ -19,7 +19,7 @@ export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): a
     // copy subSchema
     const subSchemaWithoutRef = cloneDeep(subSchema);
     delete subSchemaWithoutRef.$ref;
-    const resolvedSchema = resolveReferences(schemaAtRef, rootSchema);
+    const resolvedSchema = resolveReferencesForDocumentation(schemaAtRef, rootSchema);
     try {
       return mergeAllOfs([subSchemaWithoutRef, resolvedSchema]);
     } catch (error) {
