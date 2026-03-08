@@ -1,7 +1,7 @@
 import {toastService} from '@/utility/toastService';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import $RefParser from "@apidevtools/json-schema-ref-parser";
+import $RefParser from '@apidevtools/json-schema-ref-parser';
 import {useErrorService} from '@/utility/errorServiceInstance.ts';
 
 /**
@@ -11,7 +11,7 @@ export async function bundleSchema(): Promise<void> {
   const managedSchemaData = getDataForMode(SessionMode.SchemaEditor);
   const schemaData = managedSchemaData.data.value;
   try {
-    let bundledSchema = await $RefParser.bundle(schemaData,  { mutateInputSchema: false });
+    let bundledSchema = await $RefParser.bundle(schemaData, {mutateInputSchema: false});
     managedSchemaData.setData(bundledSchema);
 
     if (toastService) {
@@ -22,9 +22,7 @@ export async function bundleSchema(): Promise<void> {
         life: 5000,
       });
     }
-
   } catch (error) {
     useErrorService().onError(error);
   }
-
 }

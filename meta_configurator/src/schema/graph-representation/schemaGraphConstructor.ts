@@ -13,7 +13,8 @@ import {
   EdgeData,
   EdgeType,
   SchemaElementData,
-  SchemaEnumNodeData, SchemaExternalReferenceNodeData,
+  SchemaEnumNodeData,
+  SchemaExternalReferenceNodeData,
   SchemaGraph,
   SchemaNodeData,
   SchemaObjectAttributeData,
@@ -722,12 +723,12 @@ export function generateObjectSpecialPropertyEdges(
     if (isExternalRef(schema.$ref) && isExternalRef(schema.$ref)) {
       generateObjectSubSchemaEdge(
         node,
-        { $ref: schema.$ref },
+        {$ref: schema.$ref},
         [...node.absolutePath, '$ref'],
         EdgeType.EXTERNAL_REFERENCE,
         objectDefs,
         graph
-      )
+      );
     }
   }
 }

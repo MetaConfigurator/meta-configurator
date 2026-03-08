@@ -23,9 +23,16 @@ import SchemaEnumNode from '@/components/panels/schema-diagram/SchemaEnumNode.vu
 import {useSettings} from '@/settings/useSettings';
 import {findBestMatchingData, findBestMatchingNode} from '@/schema/graph-representation/graphUtils';
 import {findForwardConnectedNodesAndEdges} from '@/schema/graph-representation/findConnectedNodes';
-import {updateNodeData, wasNodeAddedOrEdgesChanged} from '@/schema/graph-representation/updateGraph';
+import {
+  updateNodeData,
+  wasNodeAddedOrEdgesChanged,
+} from '@/schema/graph-representation/updateGraph';
 import CurrentPathBreadcrump from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
-import {applyNewType, type AttributeTypeChoice, collectTypeChoices} from '@/schema/graph-representation/typeUtils';
+import {
+  applyNewType,
+  type AttributeTypeChoice,
+  collectTypeChoices,
+} from '@/schema/graph-representation/typeUtils';
 import Button from 'primevue/button';
 import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
 import {
@@ -363,18 +370,22 @@ async function resolveExternalReference(referenceData: SchemaExternalReferenceNo
   const referenceValue = schemaData.dataAt(referencePath);
   const schemaWithReference = {
     $ref: referenceValue,
-  }
-  let resolvedSchema = await $RefParser.dereference(schemaWithReference,  { mutateInputSchema: false });
+  };
+  let resolvedSchema = await $RefParser.dereference(schemaWithReference, {
+    mutateInputSchema: false,
+  });
   if (typeof resolvedSchema === 'object' && resolvedSchema !== null) {
     // convert URI identifier to ASCII string
-    const newIdentifier = urlStringToIdentifier(referenceData.reference)
+    const newIdentifier = urlStringToIdentifier(referenceData.reference);
     const newElementId = addSchemaObject(schemaData, false, resolvedSchema, newIdentifier);
     // update the $ref at referencePath to now refer to the new internal definition instead of external def
-    const newElementJsonPointer = "#" + pathToJsonPointer(newElementId);
+    const newElementJsonPointer = '#' + pathToJsonPointer(newElementId);
     schemaData.setDataAt(referencePath, newElementJsonPointer);
     selectElement(newElementId);
   } else {
-    useErrorService().onError(new Error("Failed to resolve reference. Resolved value is not an object."));
+    useErrorService().onError(
+      new Error('Failed to resolve reference. Resolved value is not an object.')
+    );
   }
 }
 
@@ -384,7 +395,6 @@ function updateExternalReferenceValue(
 ) {
   schemaData.setDataAt(referenceData.absolutePath, newValue);
 }
-
 </script>
 
 <template>

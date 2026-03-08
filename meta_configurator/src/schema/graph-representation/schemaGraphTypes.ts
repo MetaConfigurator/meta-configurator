@@ -110,12 +110,9 @@ export class SchemaObjectAttributeData extends SchemaElementData {
 }
 
 export class SchemaExternalReferenceNodeData extends SchemaNodeData {
-  public constructor(
-    public reference: string,
-    public absolutePath: Path,
-  ) {
+  public constructor(public reference: string, public absolutePath: Path) {
     const identifier = urlStringToIdentifier(reference);
-    super(identifier, identifier, identifier, false, absolutePath, { $ref: reference});
+    super(identifier, identifier, identifier, false, absolutePath, {$ref: reference});
   }
   public getNodeType() {
     return 'externalreference';

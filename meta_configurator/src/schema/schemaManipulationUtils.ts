@@ -108,7 +108,12 @@ export function createIdentifierForExtractedElement(
   return identifier;
 }
 
-export function addSchemaObject(schemaData: ManagedData, connectWithRootIfRootEmpty: boolean = true, schema: any = undefined, identifier: string|undefined = undefined) {
+export function addSchemaObject(
+  schemaData: ManagedData,
+  connectWithRootIfRootEmpty: boolean = true,
+  schema: any = undefined,
+  identifier: string | undefined = undefined
+) {
   const rawData = schemaData.data.value;
 
   // set type of root element to object if not done yet

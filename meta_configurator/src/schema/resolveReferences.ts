@@ -7,7 +7,6 @@ import type {Path} from '@/utility/path';
 import {doesSchemaHaveType} from '@/schema/schemaReadingUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
 
-
 // this code is not recursive and also mainly developed for the documentation view, not sure how generally applicable it is
 export function resolveReferences(subSchema: any, rootSchema: TopLevelSchema): any {
   if (!subSchema) {

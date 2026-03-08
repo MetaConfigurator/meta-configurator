@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-  SchemaElementData, SchemaExternalReferenceNodeData,
+  SchemaElementData,
+  SchemaExternalReferenceNodeData,
   SchemaObjectAttributeData,
   SchemaObjectNodeData,
 } from '@/schema/graph-representation/schemaGraphTypes';
@@ -74,17 +75,15 @@ function isHighlighted() {
 function resolveExternalReference() {
   emit('resolve_external_reference', props.data);
 }
-
 </script>
 <template>
   <div
     :class="{
       'bg-yellow-100': isHighlighted(),
-      'vue-flow__node-externalreference': !isHighlighted()
+      'vue-flow__node-externalreference': !isHighlighted(),
     }"
     @click="clickedNode()"
-    @click.stop
-  >
+    @click.stop>
     <Handle type="target" :position="props.targetPosition!" class="vue-flow__handle"></Handle>
 
     <div v-if="!isReferenceEditable()" class="vue-flow-ref-label">
@@ -101,8 +100,7 @@ function resolveExternalReference() {
         @click.stop
         @dblclick.stop
         @keydown.stop
-        @keyup.enter="updateReferenceValue"
-      />
+        @keyup.enter="updateReferenceValue" />
       <Button
         class="vue-flow-ref-button"
         size="small"
@@ -110,8 +108,7 @@ function resolveExternalReference() {
         @mousedown.stop
         @click.stop
         @dblclick.stop
-        @click="_ => resolveExternalReference()"
-      >
+        @click="_ => resolveExternalReference()">
         <FontAwesomeIcon :icon="'fa-file-import fa-solid'" />
       </Button>
     </div>
@@ -121,8 +118,7 @@ function resolveExternalReference() {
       type="source"
       :position="props.sourcePosition!"
       class="vue-flow__handle"
-      :style="[props.sourcePosition == Position.Right ? { top: '14px' } : {}]"
-    ></Handle>
+      :style="[props.sourcePosition == Position.Right ? {top: '14px'} : {}]"></Handle>
   </div>
 </template>
 
@@ -131,7 +127,7 @@ function resolveExternalReference() {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 4px;
-  border: 1px solid #1E88E5;
+  border: 1px solid #1e88e5;
   color: #2e3d49;
   background: linear-gradient(135deg, #fafcff 0%, #ffffff 100%);
   display: flex;

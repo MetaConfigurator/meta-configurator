@@ -41,7 +41,9 @@ import {
   faShare,
   faScissors,
   faBook,
-  faLockOpen, faFileZipper, faLink,
+  faLockOpen,
+  faFileZipper,
+  faLink,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -105,5 +107,5 @@ export function registerIcons() {
   library.add(faLock);
   library.add(faLockOpen);
   library.add(faFileZipper);
-  library.add(faLink)
+  library.add(faLink);
 }

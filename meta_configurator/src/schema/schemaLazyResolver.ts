@@ -271,7 +271,7 @@ function resolveReference(
     let rootSchema = getSchemaForMode(mode).schemaPreprocessed.value;
     try {
       if (isExternalRef(refString)) {
-        refSchema = {}
+        refSchema = {};
         // TODO: dedicated support for external refs, currently just show warning and ignore them
         // One reason it is not yet supported here: resolving external refs would require async code,
         // which would require lots of code changes, especially as jsonSchemaWrapper resolves all refs in constructor

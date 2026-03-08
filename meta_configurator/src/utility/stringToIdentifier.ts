@@ -11,12 +11,15 @@ export function stringToIdentifier(input: string, cutExtension: boolean = false)
     .toLowerCase();
 }
 
-
 export function urlStringToIdentifier(input: string): string {
   // leave only last part of URL and then apply stringToIdentifier
   try {
     const url = new URL(input);
-    const lastPart = url.pathname.split('/').filter(part => part.length > 0).pop() || '';
+    const lastPart =
+      url.pathname
+        .split('/')
+        .filter(part => part.length > 0)
+        .pop() || '';
     return stringToIdentifier(lastPart, true);
   } catch {
     // if input is not a valid URL, just apply stringToIdentifier to the whole input
