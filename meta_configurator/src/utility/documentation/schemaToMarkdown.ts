@@ -267,7 +267,10 @@ function writeObjectNode(
     md.push(`</details>`);
   }
 
-  const instance = generateSchemaInstance(resolveReferencesForDocumentation(node.schema, rootSchema), rootSchema);
+  const instance = generateSchemaInstance(
+    resolveReferencesForDocumentation(node.schema, rootSchema),
+    rootSchema
+  );
   if (instance) {
     md.push('#### Example\n');
     md.push('```' + useSettings().value.dataFormat);

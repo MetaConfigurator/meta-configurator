@@ -1,5 +1,9 @@
 import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
-import {collectReferences, findTargetPath, resolveReferencesForDocumentation} from '@/schema/resolveReferencesForDocumentation.ts';
+import {
+  collectReferences,
+  findTargetPath,
+  resolveReferencesForDocumentation,
+} from '@/schema/resolveReferencesForDocumentation.ts';
 import type {Path} from '@/utility/path';
 import {pathToAscii} from '@/utility/pathUtils';
 import {formatRegistry} from '@/dataformats/formatRegistry';
@@ -96,7 +100,10 @@ export function generateSchemaInstance(
   visitedReferences = new Set([...visitedReferences, ...collectReferences(schema, rootSchema)]);
 
   // resolve the references of the current schema if needed
-  const resolvedSchema: JsonSchemaObjectType = resolveReferencesForDocumentation(schema, rootSchema);
+  const resolvedSchema: JsonSchemaObjectType = resolveReferencesForDocumentation(
+    schema,
+    rootSchema
+  );
 
   const type = resolvedSchema?.type ?? 'any';
   if (type === 'string') return '{string}';

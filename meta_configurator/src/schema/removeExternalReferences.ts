@@ -5,7 +5,11 @@ export function removeExternalReferences(schema: any): number {
 
   // recursively go over while schema and remove all external refs
   if (typeof schema === 'object' && schema !== null) {
-    if (schema.$ref !== undefined && typeof schema.$ref === 'string' && isExternalRef(schema.$ref)) {
+    if (
+      schema.$ref !== undefined &&
+      typeof schema.$ref === 'string' &&
+      isExternalRef(schema.$ref)
+    ) {
       // remove external ref
       delete schema.$ref;
       externalRefsRemoved++;
