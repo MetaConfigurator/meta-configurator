@@ -12,6 +12,8 @@ import type {MenuItem} from 'primevue/menuitem';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import {openImportSchemaDialog} from '@/components/toolbar/importFile';
 import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchemaDefinitions';
+import {resolveSchemaReferences} from '@/components/toolbar/resolveSchemaReferences.ts';
+import {bundleSchema} from '@/components/toolbar/bundleSchema.ts';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -187,9 +189,19 @@ export class MenuItems {
         key: 'utility',
         items: [
           {
-            label: 'Extract All Inlined Schema Elements',
+            label: 'Extract All Inlined Schema Elements into Definitions and use References',
             icon: 'fa-solid fa-scissors',
             command: extractInlinedSchemaDefinitions,
+          },
+          {
+            label: 'Resolve References and Inline all Schema Elements',
+            icon: 'fa-solid fa-link',
+            command: resolveSchemaReferences,
+          },
+          {
+            label: 'Bundle External References into the same File',
+            icon: 'fa-solid fa-file-zipper',
+            command: bundleSchema,
           },
         ],
       },
