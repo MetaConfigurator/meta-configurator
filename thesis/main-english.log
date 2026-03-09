@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  9 MAR 2026 18:35
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  9 MAR 2026 20:05
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -165,24 +165,6 @@ Package scrlayer Info: patching LaTeX kernel macro \pagestyle on input line 2179
 )
 Package scrlayer-scrpage Info: Makeing stand-alone element `pagehead' from
 (scrlayer-scrpage)             alias to `pageheadfoot' on input line 1106.
-) (/usr/local/texlive/2026/texmf-dist/tex/latex/xcolor/xcolor.sty
-Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
- (/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-cfg/color.cfg
-File: color.cfg 2016/01/02 v1.6 sample color configuration
-)
-Package xcolor Info: Driver file: luatex.def on input line 274.
- (/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-def/luatex.def
-File: luatex.def 2025/09/29 v1.2f Graphics/color driver for luatex
-) (/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/mathcolor.ltx)
-Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1349.
-Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1353.
-Package xcolor Info: Model `RGB' extended on input line 1365.
-Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1367.
-Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1368.
-Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
-Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
-Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
-Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
 ) (/usr/local/texlive/2026/texmf-dist/tex/generic/iftex/iftex.sty
 Package: iftex 2024/12/12 v1.0g TeX engine tests
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/ifplatform/ifplatform.sty
@@ -987,7 +969,9 @@ Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: luatex.def on input line 106.
-)
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-def/luatex.def
+File: luatex.def 2025/09/29 v1.2f Graphics/color driver for luatex
+))
 \Gin@req@height=\dimen176
 \Gin@req@width=\dimen177
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/pdfpages/pdfpages.sty
@@ -996,7 +980,23 @@ Package: pdfpages 2025/07/23 v0.6g Insert pages of external PDF documents (AM)
 Package: eso-pic 2025/12/10 v3.0d eso-pic (RN)
 \ESO@tempdima=\dimen178
 \ESO@tempdimb=\dimen179
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
+Package xcolor Info: Driver file: luatex.def on input line 274.
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1349.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1353.
+Package xcolor Info: Model `RGB' extended on input line 1365.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1367.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
+))
 \AM@pagewidth=\dimen180
 \AM@pageheight=\dimen181
 \AM@fboxrule=\dimen182
@@ -2275,25 +2275,6 @@ Package scrbase Info: activating english \listfigurename on input line 874.
 Package scrbase Info: activating english \listtablename on input line 874.
 Package scrbase Info: activating english \bibname on input line 874.
 Package scrbase Info: activating english \indexname on input line 874.
- (/usr/local/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
-[Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count635
-\scratchdimen=\dimen382
-\scratchbox=\box111
-\nofMPsegments=\count636
-\nofMParguments=\count637
-\everyMPshowfont=\toks87
-\MPscratchCnt=\count638
-\MPscratchDim=\dimen383
-\MPnumerator=\count639
-\makeMPintoPDFobject=\count640
-\everyMPtoPDFconversion=\toks88
-) (/usr/local/texlive/2026/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
-Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
-Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
- (/usr/local/texlive/2026/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
-File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
-))
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(0)' created for font
@@ -2394,8 +2375,8 @@ Package unicode-math Warning: I'm going to overwrite the following commands
 (unicode-math)                inconsistencies.
 
 Package microtype Info: Patching varwidth to enable character protrusion.
-\MT@vwid@leftmargin=\dimen384
-\MT@vwid@rightmargin=\dimen385
+\MT@vwid@leftmargin=\dimen382
+\MT@vwid@rightmargin=\dimen383
 LaTeX Info: Redefining \microtypecontext on input line 874.
 Package microtype Info: Applying patch `item' on input line 874.
 Package microtype Info: Applying patch `toc' on input line 874.
@@ -2418,12 +2399,31 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `texgyretermes' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
+(/usr/local/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count635
+\scratchdimen=\dimen384
+\scratchbox=\box111
+\nofMPsegments=\count636
+\nofMParguments=\count637
+\everyMPshowfont=\toks87
+\MPscratchCnt=\count638
+\MPscratchDim=\dimen385
+\MPnumerator=\count639
+\makeMPintoPDFobject=\count640
+\everyMPtoPDFconversion=\toks88
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
+))
 \c@lstlisting=\count641
 Package tocbasic Info: setting babel extension for `lol' on input line 874.
 \scr@dte@lstlisting@maxnumwidth=\skip169
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
-(/usr/local/texlive/2026/texmf-dist/tex/latex/biblatex/lbx/english.lbx
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/biblatex/lbx/english.lbx
 File: english.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
 )
 Package biblatex Info: Trying to load language 'ngerman'...
@@ -2542,7 +2542,7 @@ Package tocbasic Info: character protrusion at toc deactivated on input line 896
  (./main-english.toc
 Package cleveref Info: loaded `english' language definitions on input line 1.
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 10.79993pt on input line 19.
+(Font)              scaled to size 10.79993pt on input line 26.
 )
 \tf@toc=\write8
 
@@ -2578,55 +2578,77 @@ Package cleveref Info: loaded `english' language definitions on input line 1.
 ]
 chapter 1.
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 9.85492pt on input line 11.
+(Font)              scaled to size 9.85492pt on input line 12.
 [11]
 Package babel Info: 'english' activates 'ngerman' shorthands.
 (babel)             Reported on input line 59.
 Package cleveref Info: loaded `english' language definitions on input line 59.
  [12]
-Package cleveref Info: loaded `english' language definitions on input line 90.
+Package cleveref Info: loaded `english' language definitions on input line 88.
  [13]
-Package cleveref Info: loaded `english' language definitions on input line 121.
+Package cleveref Info: loaded `english' language definitions on input line 119.
  [14]
-Package cleveref Info: loaded `english' language definitions on input line 156.
- [15]
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 8.99994pt on input line 183.
-Package cleveref Info: loaded `english' language definitions on input line 192.
+(Font)              scaled to size 8.99994pt on input line 126.
+Package cleveref Info: loaded `english' language definitions on input line 153.
+ [15] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2025/11/14 1.11b listings language file
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang2.sty
+File: lstlang2.sty 2025/11/14 1.11b listings language file
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang3.sty
+File: lstlang3.sty 2025/11/14 1.11b listings language file
+)
+Package cleveref Info: loaded `english' language definitions on input line 185.
  [16]
-Package cleveref Info: loaded `english' language definitions on input line 238.
- [17]) (./chapters/02_design_and_implementation.tex
-Package cleveref Info: loaded `english' language definitions on input line 2.
+Package cleveref Info: loaded `english' language definitions on input line 219.
+ [17]
+Package cleveref Info: loaded `english' language definitions on input line 262.
  [18]
+Package cleveref Info: loaded `english' language definitions on input line 303.
+ [19]
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/9'
+(microtype)             (new value: 9.0pt) on input line 304.
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/6'
+(microtype)             (new value: 6.0pt) on input line 304.
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5'
+(microtype)             (new value: 5.0pt) on input line 304.
+LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
+(Font)              scaled to size 8.09995pt on input line 304.
+Package cleveref Info: loaded `english' language definitions on input line 328.
+ [20]
+Package cleveref Info: loaded `english' language definitions on input line 350.
+ [21]) (./chapters/02_design_and_implementation.tex
+Package cleveref Info: loaded `english' language definitions on input line 2.
+ [22]
 chapter 2.
-) (./chapters/03_application.tex [19
+) (./chapters/03_application.tex [23
 
 
-] [20
+] [24
 
 
 ]
 chapter 3.
-) (./chapters/04_conclusion_and_outlook.tex [21] [22
+) (./chapters/04_conclusion_and_outlook.tex [25] [26
 
 
 ]
 chapter 4.
-) [23] [24
+) [27] [28
 
 
 ]
 chapter without number
-[25] (./chapters/05_appendix.tex [26
+[29] (./chapters/05_appendix.tex [30
 
 
 
 ]
 chapter A.
-) [27] [28
+) [31] [32
 
 
-] [29]
+] [33]
 \tf@thm=\write11
 
 \openout11 = main-english.thm
@@ -2653,19 +2675,19 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 75576 strings out of 476076
- 156261,3417909 words of node,token memory allocated
- 931 words of node memory still in use:
-   8 hlist, 2 vlist, 2 rule, 1 local_par, 4 glue, 4 kern, 1 penalty, 4 glyph, 31 attribute, 106 glue_spec, 16 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 1 pdf_action nodes
-   avail lists: 1:10,2:3735,3:472,4:1603,5:2740,6:155,7:5916,8:38,9:5928,10:16,11:453,12:1
- 93329 multiletter control sequences out of 65536+600000
- 85 fonts using 17406223 bytes
+ 77192 strings out of 476076
+ 156267,3417909 words of node,token memory allocated
+ 990 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 5 glue, 5 kern, 1 penalty, 4 glyph, 41 attribute, 107 glue_spec, 21 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 3 pdf_action nodes
+   avail lists: 1:5,2:4101,3:686,4:1907,5:2558,6:152,7:7965,8:40,9:5611,10:16,11:733,12:1
+ 93486 multiletter control sequences out of 65536+600000
+ 102 fonts using 24981563 bytes
  108i,21n,115p,11294b,2686s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf>
-Output written on main-english.pdf (29 pages, 77906 bytes).
+</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf>
+Output written on main-english.pdf (33 pages, 98134 bytes).
 
-PDF statistics: 485 PDF objects out of 1000 (max. 8388607)
- 434 compressed objects within 5 object streams
- 229 named destinations out of 1000 (max. 1048576)
- 168 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 579 PDF objects out of 1000 (max. 8388607)
+ 523 compressed objects within 6 object streams
+ 260 named destinations out of 1000 (max. 1048576)
+ 224 words of extra memory for PDF output out of 10000 (max. 100000000)
 

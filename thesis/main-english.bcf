@@ -2377,8 +2377,12 @@
     <bcf:citekey order="2" intorder="1">wright2020jsonschema</bcf:citekey>
     <bcf:citekey order="3" intorder="1">gruber1993ontology</bcf:citekey>
     <bcf:citekey order="4" intorder="1">berners2001semantic</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">jsonld2014</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">dimou2014rml</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">shacl_standard</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">sparql_standard</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">jsonld2014</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">dimou2014rml</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">metaconfigurator2024</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">metaconfigurator2024</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

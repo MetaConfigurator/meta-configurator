@@ -3,7 +3,8 @@
 
 The increasing adoption of computational experiments and simulation workflows in scientific research has resulted in large volumes of structured data describing parameters, metrics, and results. Ensuring that such data can be validated, exchanged, and semantically interpreted requires standardized mechanisms for describing structure and meaning. This chapter introduces three key technologies that enable this process: JSON for structured data representation, JSON Schema for structural validation, and semantic mappings using the RDF Mapping Language (RML) to produce semantically enriched JSON-LD representations. The discussion is illustrated using a running example from a simulation experiment where the element size parameter influences a computed stress metric.
 
-\section{JSON as a Data Representation Format}
+\section{JSON and JSON Schema}
+\subsection{JSON as a Data Representation Format}
 \label{sec:background:json}
 
 JavaScript Object Notation (JSON) is a lightweight data-interchange format widely used for representing structured data in web services, scientific workflows, and configuration systems. JSON encodes data as attribute-value pairs and ordered lists, making it human-readable and easy to parse by machines. Due to its simplicity and broad ecosystem support, JSON has become a de facto standard for structured data exchange across many domains \cite{json_standard}.
@@ -26,7 +27,7 @@ In computational science workflows, JSON files often capture experiment paramete
 
 While JSON provides a convenient serialization format, it does not inherently enforce structural constraints. Therefore, additional mechanisms are required to validate that JSON documents conform to an expected structure.
 
-\section{JSON Schema for Data Validation}
+\subsection{JSON Schema for Data Validation}
 \label{sec:background:json_jsonschema}
 
 JSON Schema provides a standardized mechanism for describing the expected structure and constraints of JSON documents. A JSON Schema defines properties, data types, required attributes, and validation rules for JSON instances. This allows automated validation of data before further processing or transformation. The JSON Schema specification defines a vocabulary for describing JSON documents and their validation rules \cite{wright2020jsonschema}. 
@@ -74,7 +75,8 @@ Using JSON Schema enables consistent validation of experiment data and ensures t
 
 However, JSON Schema focuses primarily on structural validation and does not provide semantic meaning or interoperability with knowledge graph technologies. To address this limitation, semantic mapping techniques can be applied.
 
-\section{Ontology: Modeling Knowledge Domains}
+\section{Semantic Web}
+\subsection{Ontology: Modeling Knowledge Domains}
 \label{sec:background:ontology}
 
 Ontologies provide a formal specification of concepts and relationships within a domain of knowledge. They enable shared understanding among humans and machines by defining classes, properties, and axioms that describe entities and their interrelations \cite{gruber1993ontology}. 
@@ -83,7 +85,7 @@ In the context of scientific experiments, ontologies can define experiment param
 
 Ontologies serve as the backbone for semantic data integration and reasoning. They allow data from heterogeneous sources to be interpreted consistently, facilitate interoperability, and enable advanced queries across datasets using formal reasoning engines.
 
-\section{Semantic Web Concepts}
+\subsection{Semantic Web Concepts}
 \label{sec:background:semantic_web}
 
 The Semantic Web extends the World Wide Web by enabling data to be represented in a machine-readable, semantically rich form. Data is described using standards such as RDF (Resource Description Framework), which encodes information as triples consisting of subject, predicate, and object. This allows heterogeneous data to be interlinked and queried using semantic technologies \cite{berners2001semantic}.
@@ -102,7 +104,7 @@ JSON-LD is one of the key technologies bridging conventional JSON data and the S
 }
 \end{lstlisting}
 
-Here, the unit is linked to the QUDT ontology (`http://qudt.org/vocab/unit/`) using its URI `unit:M`. This allows applications and knowledge graph systems to unambiguously interpret the measurement unit and integrate it with other semantically annotated datasets. Similarly, experiment methods and metrics are linked to well-defined ontology classes such as `m4i:Method` and `schema:PropertyValue`.
+Here, the unit is linked to the QUDT ontology (`http://qudt.org/vocab/unit/`) using its prefxied URI `unit:M`. This allows applications and knowledge graph systems to unambiguously interpret the measurement unit and integrate it with other semantically annotated datasets. Similarly, experiment methods and metrics are linked to well-defined ontology classes such as `m4i:Method` and `schema:PropertyValue`.
 
 Semantic Web technologies thus provide a framework for:
 
@@ -112,9 +114,61 @@ Semantic Web technologies thus provide a framework for:
     \item Querying and integrating datasets through standard languages like SPARQL.
 \end{itemize}
 
-By grounding JSON data in ontologies and RDF through JSON-LD, simulation results become part of the Semantic Web, enabling more advanced analysis, automated reasoning, and integration with other scientific knowledge graphs.
+By grounding JSON data in ontologies and RDF through JSON-LD, this example from a simulation result become part of the Semantic Web, enabling more advanced analysis, automated reasoning, and integration with other scientific knowledge graphs.
 
-\section{Semantic Data Representation using JSON-LD}
+\subsection{SHACL: Shapes Constraint Language}
+\label{sec:background:shacl}
+
+The Shapes Constraint Language (SHACL) is a W3C standard for validating RDF graphs against a set of structural and semantic constraints \cite{shacl_standard}. SHACL allows ontology-based validation of RDF data by defining "shapes" that describe the expected properties, data types, and cardinality of RDF nodes.
+
+For example, consider the simulation parameter `element-size` in the JSON-LD example (Listing \ref{lst:background_jsonld_example}). Using SHACL, we can define a shape that enforces that every `schema:PropertyValue` representing an experiment parameter must have a numeric `schema:value` and a `schema:unitCode` pointing to a valid unit from the QUDT ontology:
+
+\begin{lstlisting}[language=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix schema: <https://schema.org/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+
+ex:ParameterShape
+    a sh:NodeShape ;
+    sh:targetClass schema:PropertyValue ;
+    sh:property [
+        sh:path schema:value ;
+        sh:datatype xsd:decimal ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path schema:unitCode ;
+        sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
+    ] .
+\end{lstlisting}
+
+By applying this shape, RDF data can be automatically checked for compliance with the expected structure and semantics, preventing errors or inconsistencies before integration into a knowledge graph.
+
+\subsection{SPARQL: Querying Semantic Data}
+\label{sec:background:sparql}
+
+SPARQL (SPARQL Protocol and RDF Query Language) is the standard query language for RDF datasets \cite{sparql_standard}. SPARQL allows retrieval, filtering, and aggregation of data stored in knowledge graphs. Queries are expressed in terms of triples, similar to RDF statements.
+
+For example, using the JSON-LD simulation data, we might want to retrieve all experiment parameters along with their values and units. A SPARQL query could be written as:
+
+\begin{lstlisting}[language=sparql, caption={SPARQL query retrieving parameter values and units}, label={lst:background_sparql_example}]
+PREFIX schema: <https://schema.org/>
+PREFIX unit: <http://qudt.org/vocab/unit/>
+PREFIX local: <https://www.example.org/>
+
+SELECT ?parameter ?value ?unit
+WHERE {
+    ?param a schema:PropertyValue ;
+           rdfs:label ?parameter ;
+           schema:value ?value ;
+           schema:unitCode ?unit .
+}
+\end{lstlisting}
+
+This query returns the `element-size` parameter with its numeric value and QUDT unit (`unit:M`), demonstrating how semantic annotations enable precise data access. SPARQL supports more complex operations such as joins, filters, and reasoning over ontologies, making it a key tool for exploring and analyzing semantically enriched simulation data.
+
+\subsection{Semantic Data Representation using JSON-LD}
 \label{sec:background:jsonld}
 
 JSON-LD (JavaScript Object Notation for Linked Data) extends JSON by introducing semantic annotations that allow data to be interpreted as linked data within the Resource Description Framework (RDF). JSON-LD integrates JSON with established semantic web standards by providing mechanisms for defining contexts, identifiers, and relationships between entities \cite{jsonld2014}.
@@ -129,34 +183,21 @@ Listing \ref{lst:background_jsonld_example} shows a JSON-LD representation corre
         "local": "https://www.example.org/",
         "schema": "https://schema.org/",
         "m4i": "http://w3id.org/nfdi4ing/metadata4ing#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "unit": "http://qudt.org/vocab/unit/"
     },
     "@graph": [
         {
             "@id": "local:run_fenics_simulation",
             "@type": "m4i:Method",
-            "m4i:hasParameter": [
-                [
-                    {
-                        "@id": "local:variable_element_size"
-                    }
-                ]
-            ],
-            "m4i:investigates": [
-                [
-                    {
-                        "@id": "local:variable_max_von_mises_stress"
-                    }
-                ]
-            ]
+            "m4i:hasParameter": [{"@id": "local:variable_element_size"}],
+            "m4i:investigates": [{"@id": "local:variable_max_von_mises_stress"}]
         },
         {
             "@id": "local:variable_element_size",
             "@type": "schema:PropertyValue",
             "rdfs:label": "element-size",
-            "schema:unitCode": {
-                "@id": "unit:M"
-            },
+            "schema:unitCode": {"@id": "unit:M"},
             "schema:value": 0.025
         },
         {
@@ -171,7 +212,7 @@ Listing \ref{lst:background_jsonld_example} shows a JSON-LD representation corre
 
 This representation enriches the raw simulation output with semantic context, enabling interoperability with knowledge graphs and semantic data infrastructures.
 
-\section{RML for Mapping JSON to RDF}
+\subsection{RML for Mapping JSON to RDF}
 \label{sec:background:rml}
 
 The RDF Mapping Language (RML) is a declarative mapping language used to transform heterogeneous data sources into RDF representations. RML extends the W3C-standardized R2RML language and enables mappings from various data formats, including JSON, XML, CSV, and relational databases, into RDF datasets \cite{dimou2014rml}. 
@@ -191,7 +232,7 @@ Listing \ref{lst:background_rml_mapping} shows an example RML mapping that trans
 
 <#MethodMapping>
     rml:logicalSource [
-        rml:source "simulation.json" ;
+        rml:source "parameter.json" ;
         rml:referenceFormulation ql:JSONPath ;
         rml:iterator "$"
     ];
@@ -214,7 +255,7 @@ Listing \ref{lst:background_rml_mapping} shows an example RML mapping that trans
 
 <#ElementSizeMapping>
     rml:logicalSource [
-        rml:source "simulation.json" ;
+        rml:source "parameter.json" ;
         rml:referenceFormulation ql:JSONPath ;
         rml:iterator "$.parameters.element-size"
     ];
@@ -254,3 +295,58 @@ Listing \ref{lst:background_rml_mapping} shows an example RML mapping that trans
 \end{lstlisting}
 
 Through this mapping process, structured simulation outputs can be automatically converted into semantically enriched knowledge graph representations, enabling integration with semantic data infrastructures and facilitating interoperability across scientific systems.
+
+
+\section{MetaConfigurator for Schema-Driven Data Modeling}
+\label{sec:background:metaconfigurator}
+
+The technologies discussed in the previous sections enable structured, validated, and semantically enriched data representations. However, creating and editing such structured data manually can be challenging, particularly for users who are not familiar with textual formats such as JSON or with schema-based validation mechanisms. To address this challenge, tools that support schema-driven data modeling and editing are required.
+
+MetaConfigurator\footnote{\url{https://www.metaconfigurator.org}} is an open-source web application designed to simplify the creation, editing, and management of structured data and schemas \cite{metaconfigurator2024}. The tool generates graphical user interfaces dynamically based on a provided schema, allowing users to interact with structured data through intuitive forms rather than manually editing raw text files. By leveraging JSON Schema as the underlying model description, MetaConfigurator enables consistent data validation and guided data entry.
+
+MetaConfigurator follows a schema-driven approach: the structure of the user interface is derived directly from the schema that describes the data model. This design allows the same tool to be applied across different domains without the need to implement domain-specific user interfaces. The application runs entirely in the user's browser and supports multiple structured data formats such as JSON and YAML \cite{metaconfigurator2024}.
+
+\subsection{Core Features}
+
+MetaConfigurator provides several features that facilitate the creation and maintenance of structured data models:
+
+\begin{itemize}
+    \item \textbf{Visual Schema Editor:}  
+    Users can create and modify JSON schemas using a graphical interface, enabling intuitive construction of data models without manually writing schema definitions.
+
+    \item \textbf{Schema-Driven Form Generation:}  
+    Based on a given JSON Schema, MetaConfigurator automatically generates a graphical form for editing instance data. This ensures that all entered data conforms to the defined structure and constraints.
+
+    \item \textbf{Integrated Text and GUI Editing:}  
+    The tool combines a traditional text editor with a graphical editor, allowing users to switch between raw JSON editing and structured form-based editing within the same interface.
+
+    \item \textbf{Schema Validation Support:}  
+    During data editing, MetaConfigurator validates instance data against the provided JSON Schema, ensuring structural correctness and preventing invalid data entries.
+
+    \item \textbf{Schema Visualization and Navigation:}  
+    Complex schemas can be explored using a tree-like or diagram-based representation, helping users understand hierarchical structures and relationships between properties.
+
+    \item \textbf{Ontology Integration:}  
+    The tool supports URI-based references and auto-completion mechanisms, enabling users to reference ontology concepts when creating structured data models.
+\end{itemize}
+
+These capabilities significantly reduce the effort required to design and maintain structured data models and improve accessibility for users who may not be familiar with schema languages.
+
+\subsection{Limitations for Semantic Web Integration}
+\label{sec:background:metaconfigurator_limitations}
+
+Despite its strong support for schema-driven data modeling, MetaConfigurator currently provides only limited support for Semantic Web technologies. While the platform enables the creation and validation of structured data using JSON and JSON Schema, it does not natively support Linked Data representations such as JSON-LD or RDF graphs.
+
+As discussed in previous sections, the Semantic Web relies on standards such as RDF, ontologies, and IRIs to represent data in a machine-interpretable and interoperable manner. JSON-LD serves as an important bridge between traditional JSON-based data structures and RDF-based knowledge graphs. However, MetaConfigurator currently treats JSON documents primarily as structured configuration data and does not interpret or expose their underlying RDF semantics.
+
+Several limitations arise from this restriction. First, users cannot directly author or edit JSON-LD contexts (e.g., the \texttt{@context} section that defines mappings between JSON keys and ontology IRIs). Without such support, linking data elements to ontologies such as \texttt{schema.org}, \texttt{metadata4ing}, or QUDT units requires manual editing outside of the tool.
+
+Second, MetaConfigurator does not provide mechanisms for inspecting or manipulating RDF triples derived from the underlying JSON data. As a result, users cannot directly view the semantic graph structure implied by JSON-LD documents, nor can they explore relationships between entities in a knowledge graph representation.
+
+Third, the platform currently lacks built-in mechanisms for transforming conventional JSON documents into semantic representations. As discussed in Section~\ref{sec:background:rml}, technologies such as the RDF Mapping Language (RML) enable declarative transformations from JSON to RDF. However, such transformations are not yet integrated into MetaConfigurator's workflow.
+
+Finally, the platform currently does not support semantic querying of RDF data. As described in Section~\ref{sec:background:sparql}, SPARQL provides a standard mechanism for querying RDF graphs and retrieving structured information from knowledge graphs. Without SPARQL support, users cannot directly explore or analyze semantically enriched data within the tool.
+
+To address these limitations, this thesis extends MetaConfigurator with an \textbf{RDF Authoring Panel} that integrates Semantic Web technologies directly into the schema-driven editing environment. The extension introduces several new capabilities. First, JSON documents can be transformed into JSON-LD using RML mappings, enabling the generation of RDF triples from structured JSON data. Second, the panel enables direct authoring and editing of RDF triples and JSON-LD contexts with ontology-aware auto-completion of IRIs. Third, the system introduces \textbf{SPARQL querying support}, allowing users to retrieve and explore RDF data using standard Semantic Web query mechanisms. Finally, the extension provides an \textbf{interactive knowledge graph visualization} that renders RDF triples as a graph structure synchronized with the JSON-LD representation.
+
+By integrating these capabilities into MetaConfigurator, the platform evolves from a schema-based configuration editor into a tool that supports the full workflow of creating, transforming, querying, and exploring semantically enriched data.
