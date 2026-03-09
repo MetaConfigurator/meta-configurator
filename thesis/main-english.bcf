@@ -2373,25 +2373,12 @@
     <bcf:datasource type="file" datatype="bibtex">bibliography.bib</bcf:datasource>
   </bcf:bibdata>
   <bcf:section number="0">
-    <bcf:citekey order="1" intorder="1">JSONSchema2020</bcf:citekey>
-    <bcf:citekey order="1" intorder="2">Wright2017JSONSchema</bcf:citekey>
-    <bcf:citekey order="2" intorder="1">OMG2017UML</bcf:citekey>
-    <bcf:citekey order="3" intorder="1">RDF2014</bcf:citekey>
-    <bcf:citekey order="3" intorder="2">SHACL2017</bcf:citekey>
-    <bcf:citekey order="3" intorder="3">OWL2012</bcf:citekey>
-    <bcf:citekey order="4" intorder="1">RFC8259</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">JSONSchema2020</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">JSONLD11</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">RDF2014</bcf:citekey>
-    <bcf:citekey order="8" intorder="1">SPARQL2013</bcf:citekey>
-    <bcf:citekey order="9" intorder="1">SHACL2017</bcf:citekey>
-    <bcf:citekey order="10" intorder="1">OWL2012</bcf:citekey>
-    <bcf:citekey order="11" intorder="1">Dimou2014RML</bcf:citekey>
-    <bcf:citekey order="12" intorder="1">R2RML2012</bcf:citekey>
-    <bcf:citekey order="13" intorder="1">RDF2014</bcf:citekey>
-    <bcf:citekey order="14" intorder="1">SHACL2017</bcf:citekey>
-    <bcf:citekey order="15" intorder="1">OWL2012</bcf:citekey>
-    <bcf:citekey order="16" intorder="1">SPARQL2013</bcf:citekey>
+    <bcf:citekey order="1" intorder="1">json_standard</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">wright2020jsonschema</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">gruber1993ontology</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">berners2001semantic</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">jsonld2014</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">dimou2014rml</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

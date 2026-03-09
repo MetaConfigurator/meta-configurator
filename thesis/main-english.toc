@@ -1,25 +1,22 @@
 \babel@toc {english}{}\relax 
 \contentsline {chapter}{\numberline {1}Background and Related Work}{11}{chapter.4}%
-\contentsline {section}{\numberline {1.1}MetaConfigurator}{11}{section.5}%
-\contentsline {section}{\numberline {1.2}JSON and JSON-LD}{12}{section.6}%
-\contentsline {subsection}{\numberline {1.2.1}JavaScript Object Notation (JSON)}{12}{subsection.7}%
-\contentsline {subsection}{\numberline {1.2.2}JSON for Linked Data (JSON-LD)}{12}{subsection.8}%
-\contentsline {subsection}{\numberline {1.2.3}Why Use JSON-LD?}{13}{subsection.9}%
-\contentsline {section}{\numberline {1.3}RML Mapping}{13}{section.10}%
-\contentsline {subsection}{\numberline {1.3.1}From JSON to JSON-LD to RDF via RML}{14}{subsection.11}%
-\contentsline {section}{\numberline {1.4}RDF Model}{15}{section.12}%
-\contentsline {section}{\numberline {1.5}Semantic Web}{15}{section.13}%
-\contentsline {chapter}{\numberline {2}Design and Implementation}{17}{chapter.14}%
-\contentsline {section}{\numberline {2.1}RDF Panel}{17}{section.15}%
-\contentsline {section}{\numberline {2.2}RML Mapping Tool}{17}{section.16}%
-\contentsline {section}{\numberline {2.3}Query with SPARQL}{17}{section.17}%
-\contentsline {section}{\numberline {2.4}Visualization}{17}{section.18}%
-\contentsline {chapter}{\numberline {3}Application}{19}{chapter.19}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{19}{section.20}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{21}{chapter.21}%
-\contentsline {chapter}{\nonumberline Bibliography}{23}{chapter*.22}%
+\contentsline {section}{\numberline {1.1}JSON as a Data Representation Format}{11}{section.5}%
+\contentsline {section}{\numberline {1.2}JSON Schema for Data Validation}{12}{section.18}%
+\contentsline {section}{\numberline {1.3}Ontology: Modeling Knowledge Domains}{13}{section.54}%
+\contentsline {section}{\numberline {1.4}Semantic Web Concepts}{14}{section.55}%
+\contentsline {section}{\numberline {1.5}Semantic Data Representation using JSON-LD}{15}{section.66}%
+\contentsline {section}{\numberline {1.6}RML for Mapping JSON to RDF}{16}{section.111}%
+\contentsline {chapter}{\numberline {2}Design and Implementation}{19}{chapter.183}%
+\contentsline {section}{\numberline {2.1}RDF Panel}{19}{section.184}%
+\contentsline {section}{\numberline {2.2}RML Mapping Tool}{19}{section.185}%
+\contentsline {section}{\numberline {2.3}Query with SPARQL}{19}{section.186}%
+\contentsline {section}{\numberline {2.4}Visualization}{19}{section.187}%
+\contentsline {chapter}{\numberline {3}Application}{21}{chapter.188}%
+\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{21}{section.189}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{23}{chapter.190}%
+\contentsline {chapter}{\nonumberline Bibliography}{25}{chapter*.191}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{24}{chapter*.22}%
-\contentsline {chapter}{\numberline {A}Appendix}{25}{appendix.23}%
-\contentsline {section}{\numberline {A.1}RML Mapping}{25}{section.24}%
+\contentsline {part}{Appendix}{26}{chapter*.191}%
+\contentsline {chapter}{\numberline {A}Appendix}{27}{appendix.192}%
+\contentsline {section}{\numberline {A.1}RML Mapping}{27}{section.193}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

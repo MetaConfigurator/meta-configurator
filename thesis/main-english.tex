@@ -25,7 +25,7 @@
   draft=false
 ]{scrbook}
 \usepackage{scrlayer-scrpage}
-
+\usepackage{xcolor}
 \usepackage{iftex}
 
 \usepackage{ifplatform}
@@ -456,6 +456,24 @@
 }
 {\multicitedelim}
 {\usebibmacro{postnote}}
+
+
+
+\lstdefinelanguage{Turtle}{
+  morekeywords={@prefix, a},
+  sensitive=false,
+  morecomment=[l]{\#},
+  morestring=[b]",
+}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  frame=single
+}
 
 % Farbige Tabellen
 % ----------------
