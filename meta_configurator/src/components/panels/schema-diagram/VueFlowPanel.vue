@@ -319,7 +319,7 @@ function updateAttributeRequired(attributeData: SchemaObjectAttributeData, requi
 
   const parentObjectPath = attributePath.slice(0, -2); // remove "properties" + attribute name
   const parentSchema = structuredClone(schemaData.dataAt(parentObjectPath));
-  
+
   if (!parentSchema.required) {
     parentSchema.required = [];
   }
@@ -333,7 +333,7 @@ function updateAttributeRequired(attributeData: SchemaObjectAttributeData, requi
   if (!required && index !== -1) {
     parentSchema.required.splice(index, 1);
   }
-  
+
   schemaData.setDataAt(parentObjectPath, parentSchema);
 }
 

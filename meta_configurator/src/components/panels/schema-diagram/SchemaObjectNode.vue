@@ -48,20 +48,17 @@ const emit = defineEmits<{
   ): void;
   (e: 'add_attribute', objectData: SchemaObjectNodeData): void;
   (
-  e: 'update_attribute_required',
-  attributeData: SchemaObjectAttributeData,
-  required: boolean
-): void;
+    e: 'update_attribute_required',
+    attributeData: SchemaObjectAttributeData,
+    required: boolean
+  ): void;
 }>();
 
 const objectName = ref(props.data.name || '');
 
 const settings = useSettings();
 
-function updateAttributeRequired(
-  attributeData: SchemaObjectAttributeData,
-  required: boolean
-) {
+function updateAttributeRequired(attributeData: SchemaObjectAttributeData, required: boolean) {
   emit('update_attribute_required', attributeData, required);
 }
 
