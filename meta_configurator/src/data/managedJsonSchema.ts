@@ -13,7 +13,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
 import {writeSchemaRequiredDefaultsToData} from '@/schema/writeDefaultsToData';
 import {useDataSource} from '@/data/dataSource';
-import {detectSchemaFeatures, type SchemaFeatures} from "@/schema/detectSchemaFeatures.ts";
+import {detectSchemaFeatures, type SchemaFeatures} from '@/schema/detectSchemaFeatures.ts';
 
 /**
  * This class manages the schema and provides easy access to its content.

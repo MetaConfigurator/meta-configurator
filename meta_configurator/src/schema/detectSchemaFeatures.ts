@@ -1,7 +1,6 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {isExternalRef} from '@/schema/externalReferences.ts';
 
-
 export type SchemaFeatures = {
   composition: boolean;
   conditionals: boolean;

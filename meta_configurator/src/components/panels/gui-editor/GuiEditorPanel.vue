@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import GuiEditorPanelJsonSchema from '@/components/panels/gui-editor/GuiEditorPanelJsonSchema.vue';
-import { SessionMode} from '@/store/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 import {ScrollPanel} from 'primevue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import SchemaInfoPanel from '@/components/panels/gui-editor/SchemaInfoPanel.vue';
@@ -16,12 +16,12 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
-
 const isSchemaBundlingSuggested = computed(() => {
-  return props.sessionMode === SessionMode.DataEditor && getSchemaForMode(props.sessionMode).getCurrentSchemaFeatures().externalReferences;
+  return (
+    props.sessionMode === SessionMode.DataEditor &&
+    getSchemaForMode(props.sessionMode).getCurrentSchemaFeatures().externalReferences
+  );
 });
-
-
 </script>
 
 <template>
@@ -45,9 +45,11 @@ const isSchemaBundlingSuggested = computed(() => {
         <SchemaInfoPanel :sessionMode="props.sessionMode" />
       </PanelSettings>
 
-
       <Message v-if="isSchemaBundlingSuggested" severity="warn"
-      >Your schema contains external references which are not automatically resolved in the GUI view or by the validator. If you want to bundle them inside your same schema file, you can do so with the utility features in the Schema tab in the menu bar.</Message>
+        >Your schema contains external references which are not automatically resolved in the GUI
+        view or by the validator. If you want to bundle them inside your same schema file, you can
+        do so with the utility features in the Schema tab in the menu bar.</Message
+      >
 
       <div class="panel-content">
         <ScrollPanel
