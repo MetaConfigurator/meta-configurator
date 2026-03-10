@@ -335,7 +335,7 @@ function updateAttributeRequired(attributeData: SchemaObjectAttributeData, requi
   }
 
   schemaData.setDataAt(requiredPath, newRequired);
-  
+
   // let requiredList = schemaData.dataAt(requiredPath);
 
   // if (!requiredList) {
