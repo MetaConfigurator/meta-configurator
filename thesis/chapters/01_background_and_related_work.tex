@@ -331,6 +331,15 @@ MetaConfigurator provides several features that facilitate the creation and main
 
 These capabilities significantly reduce the effort required to design and maintain structured data models and improve accessibility for users who may not be familiar with schema languages.
 
+\subsection{AI-Assisted Schema Engineering and Mapping}
+\label{sec:background:metaconfigurator_ai}
+
+Recent work extends MetaConfigurator with AI-assisted support for schema creation, schema modification, and schema mapping based on natural-language user input \cite{ai_assisted_schema_mapping_2025}. The approach combines large language models with deterministic safeguards to improve reliability and usability.
+
+For schema authoring, MetaConfigurator provides a chat-like interface where users describe their intent in natural language. The system then performs prompt construction and context management automatically, including role instructions, task-specific formatting constraints, and relevant schema context. Generated results are directly validated and visualized in the schema editor, and users remain in control through a human-in-the-loop workflow where generated output can be reviewed and manually refined before acceptance.
+
+For data transformation, the system generates mapping expressions from user input and executes these mappings deterministically. In the presented implementation, JSONata expressions are generated from an input document and a target schema, then validated and executed in a controlled pipeline. This separates AI-based generation from rule execution and supports scalable transformation workflows across heterogeneous source formats.
+
 \subsection{Limitations for Semantic Web Integration}
 \label{sec:background:metaconfigurator_limitations}
 
@@ -374,6 +383,9 @@ To address these limitations, this thesis extends MetaConfigurator with an \text
 
     \item \textbf{Interactive knowledge graph visualization:}  
     The RDF triples generated from JSON-LD can be visualized as an interactive graph representation. This visualization enables users to explore entities and relationships within the knowledge graph and understand the semantic structure of the data more easily.
+
+    \item \textbf{AI-assisted SPARQL and RML authoring from user hints:}  
+    Building on MetaConfigurator's existing AI-assisted schema capabilities, this thesis introduces AI-assisted generation of SPARQL queries and RML mappings from user-provided hints. Users can describe their intent in natural language and receive draft SPARQL queries and RML mapping definitions that can be reviewed and refined in the RDF Authoring Panel.
 \end{enumerate}
 
 By integrating these capabilities into MetaConfigurator, the platform evolves from a schema-based configuration editor into a tool that supports the full workflow of creating, transforming, querying, and exploring semantically enriched data.

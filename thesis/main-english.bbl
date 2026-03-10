@@ -253,6 +253,7 @@
       \strng{authornamehash}{926ca14259e9aca676d600426b174a2a}
       \strng{authorfullhash}{83b876f273665da7742eb893e4401957}
       \strng{authorfullhashraw}{83b876f273665da7742eb893e4401957}
+      \field{extraname}{1}
       \field{labelalpha}{NBX+24}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
@@ -266,6 +267,47 @@
       \range{pages}{9}
       \verb{doi}
       \verb 10.1007/s13222-024-00472-7
+      \endverb
+    \endentry
+    \entry{ai_assisted_schema_mapping_2025}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=cee8fd4aa4588c8a57078a2b835113dc}{%
+           family={Neubauer},
+           familyi={N\bibinitperiod},
+           given={Felix},
+           giveni={F\bibinitperiod}}}%
+        {{hash=96492da40bafc5224b4ca48bed84b96a}{%
+           family={Uekermann},
+           familyi={U\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod}}}%
+        {{hash=a53295d118b38d3f18e99b0bcb23e584}{%
+           family={Pleiss},
+           familyi={P\bibinitperiod},
+           given={Jürgen},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{926ca14259e9aca676d600426b174a2a}
+      \strng{fullhash}{9edbdbdec2fe43ce79ab3ace74bd727a}
+      \strng{fullhashraw}{9edbdbdec2fe43ce79ab3ace74bd727a}
+      \strng{bibnamehash}{9edbdbdec2fe43ce79ab3ace74bd727a}
+      \strng{authorbibnamehash}{9edbdbdec2fe43ce79ab3ace74bd727a}
+      \strng{authornamehash}{926ca14259e9aca676d600426b174a2a}
+      \strng{authorfullhash}{9edbdbdec2fe43ce79ab3ace74bd727a}
+      \strng{authorfullhashraw}{9edbdbdec2fe43ce79ab3ace74bd727a}
+      \field{extraname}{2}
+      \field{labelalpha}{NUP25}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2025 ACM/IEEE 28th International Conference on Model Driven Engineering Languages and Systems Companion (MODELS-C)}
+      \field{title}{AI-assisted JSON Schema Creation and Mapping}
+      \field{year}{2025}
+      \field{pages}{79\bibrangedash 83}
+      \range{pages}{5}
+      \verb{doi}
+      \verb 10.1109/MODELS-C68889.2025.00019
       \endverb
     \endentry
     \entry{sparql_standard}{misc}{}{}

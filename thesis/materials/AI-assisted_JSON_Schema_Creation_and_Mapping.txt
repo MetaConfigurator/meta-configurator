@@ -1,0 +1,334 @@
+               2025 ACM/IEEE 28th International Conference on Model Driven Engineering Languages and Systems Companion (MODELS-
+                                                                                          C)
+                        AI-assisted JSON Schema Creation and Mapping
+                            st                           rd                                                          nd  ¨
+                          1 Felix Neubauer            , 3   Benjamin Uekermann                                     2    Jurgen Pleiss
+                                Institute for Parallel and Distributed Systems                   Institute of Biochemistry and Technical Biochemistry
+                                              University of Stuttgart                                              University of Stuttgart
+                                               Stuttgart, Germany                                                   Stuttgart, Germany
+                                     Felix.Neubauer@ipvs.uni-stuttgart.de,                                  Juergen.Pleiss@itb.uni-stuttgart.de
+                                  Benjamin.Uekermann@ipvs.uni-stuttgart.de
+                     Abstract—Model-Driven Engineering (MDE) places models                    downstream methods such as knowledge graph construction or
+                  at the core of system and data engineering processes. In the                automated schema-driven validation.
+                  context of research data, these models are typically expressed                 Recent advances in large language models (LLMs) offer
+                  as schemas that deﬁne the structure and semantics of datasets.              a promising opportunity to bridge this gap by assisting users,
+                  However, many domains still lack standardized models, and                   particularly non-experts, in the creation and reﬁnement of data
+                  creating them remains a signiﬁcant barrier, especially for non-
+                  experts. We present a hybrid approach that combines large                   models. LLMs can translate natural language descriptions into
+                  language models (LLMs) with deterministic techniques to enable              structured model representations, potentially democratizing
+                  JSONSchemacreation,modiﬁcation,andschemamappingbased                        model-driven techniques. However, relying solely on LLMs
+                  on natural language inputs by the user. These capabilities are              introduces several limitations: 1) lack of guaranteed model
+                  integrated into the open-source tool MetaConﬁgurator, which                 validity, 2) limited interpretability of plain-text outputs, 3)
+                  already provides visual model editing, validation, code gener-
+                  ation, and form generation from models. For data integration,               challenges in processing large or complex datasets, and 4) the
+                  we generate schema mappings from heterogeneous JSON, CSV,                   need for users to craft effective prompts.
+                  XML, and YAML data using LLMs, while ensuring scalability                      Toaddress these issues, we present an MDE-based approach
+                  and reliability through deterministic execution of generated                that integrates LLMs with deterministic safeguards, including
+                  mapping rules. The applicability of our work is demonstrated in             targeted pre- and post-processing, and the rule-based execution
+                  an application example in the ﬁeld of chemistry. By combining
+                  natural language interaction with deterministic safeguards, this            of AI-generated mappings, implemented in the open-source
+                  work signiﬁcantly lowers the barrier to structured data modeling            tool MetaConﬁgurator1 [5]. MetaConﬁgurator supports inter-
+                  and data integration for non-experts.                                       active visual model (schema) editing, validation, and code/-
+                     Index Terms—rdm, research data management, mde, model                    documentation/form generation.
+                  driven engineering, json, yaml, conﬁguration, schema, data,                    We extend the tool with capabilities for schema creation,
+                  model, editor, gui, tool, ai, llm, mapping, matching
+                                                                                              modiﬁcation, and querying from natural language input (Sec-
+                                           I. INTRODUCTION                                    tion III-A). By integrating prompt engineering, context man-
+                                                                                              agement, and post-processing safeguards with visual feedback
+                     Model-Driven Engineering (MDE) emphasizes the central                    and schema validation, we align LLM-generated content with
+                  role of models in the design, development, and operation of                 the principles of model correctness and transparency central to
+                  systems [1]. In the context of research data management [2]–                MDE. Second, we introduce a model-driven approach to data
+                  [4], models are typically expressed as schemas, which deﬁne                 integration (Section III-B): given heterogeneous data sources
+                  the structure and semantics of datasets. These models enable                in JSON [6], YAML [7], XML [8], or CSV, LLMs generate
+                  key functionalities such as instance validation, transformation,            human-readable mapping rules to transform the data into a
+                  code generation, and visualization, and are essential for ensur-            target schema (model). These rules are executed deterministi-
+                  ing data quality, interoperability, and reusability.                        cally, separating generation from execution and ensuring reli-
+                     Despite their importance, many scientiﬁc domains still                   ability and scalability, especially for large datasets. To demon-
+                  lack standardized data models. In ﬁelds such as chemistry,                  strate practical applicability, Section IV showcases an example
+                  data are often stored in electronic lab notebooks (ELNs) or                 from the domain of chemistry, where existing unstructured
+                  spreadsheets, where much of the meaning is implicit rather                  Excel data are transformed into structured, interoperable, and
+                  than explicitly structured. While CSV documents are used in                 AI-ready representations using the extended toolchain.
+                  many machine learning workﬂows, they are inherently limited                            II. BACKGROUND AND RELATED WORK
+                  to ﬂat, table-like structures and cannot encode relationships,
+                  constraints, or domain-speciﬁc rules. This lack of structure                   This section introduces JSON, JSON Schema and work
+                  restricts interoperability, reproducibility, and the application of         related to schema creation, schema mapping, large language
+                                                                                              models (LLMs) and prompt engineering.
+                     Deutsche   Forschungsgemeinschaft  (DFG)    under  project  numbers
+                  528693298 (preECO), 358283783 (SFB1333), and 390740016 (EXC2075)              1https://github.com/MetaConﬁgurator/meta-conﬁgurator
+      2025 ACM/IEEE 28th International Conference on Model Driven Engineering Languages and Systems Companion (MODELS-C) | 979-8-3315-7990-6/25/$31.00 ©2025 IEEE | DOI: 10.1109/MODELS-C68889.2025.00019979-8-3315-7990-6/25/$31.00 ©2025 IEEE79
+              DOI 10.1109/MODELS-C68889.2025.00019
+                 Authorized licensed use limited to: UNIVERSITAETSBIBL STUTTGART. Downloaded on March 10,2026 at 14:36:17 UTC from IEEE Xplore.  Restrictions apply. 
+                 A. JSON and JSON Schema                                           is another transformation library, written in TypeScript. The
+                                                                                                            5
+                   JSON is a widespread data format for exchanging infor-          JSONquery language jq also can be used to transform JSON
+                 mation with web services, storing semi-structured documents       documents. While it is a powerful tool for concise JSON
+                 in NoSQL databases [9], and representing structured content       querying and transformation on the command line, it is not
+                 in APIs and conﬁguration ﬁles. Its simplicity and human-          primarily intended for transforming large JSON documents
+                 readability, combined with wide support across programming        due to its in-memory processing model and limited support
+                 languages, make it a natural ﬁt for data interchange and          for streaming or parallel execution.
+                 machine learning pipelines.                                          Schema mappings can be created manually, but there also
+                   JSON Schema, the de-facto standard for describing the           exist automated approaches [23]. The task of identifying which
+                 structure and constraints of JSON documents [10], plays a         elements in one schema correspond to elements in another is
+                 crucial role in enabling validation, interoperability, and au-    called schema matching. Rahm and Bernstein [24] compare
+                 tomation. It can also be understood as a modeling language,       different automated schema matching approaches for rela-
+                 capturing the conceptual structure of data much like class        tional databases. Stanek and Killough [25] created a program
+                 diagrams in MDE.                                                  which generates code to convert a JSON document from
+                 B. JSON Schema Creation                                           one schema to another, deﬁning and implementing different
+                                                                                   mapping rules themselves. Buss et al. [26] discuss the use of
+                   There exist several so-called JSON schema editors, which        LLM to automatically create schema mappings, focusing on
+                 are tools for creating and editing schemas. Among others,         relational databases. Among other points, they state that due
+                 this includes MetaConﬁgurator [5], Adamant [11] and Liq-          to the difﬁcult nature of data integration, human-in-the-loop
+                                                   2
+                 uid Studio JSON Schema Editor (paid). All these editors           approaches are required.
+                 require some level of understanding of JSON schema. For           D. Large Language Models (LLMs) and Prompt Engineering
+                 this work, we build on MetaConﬁgurator a general-purpose
+                 schema editor and form generator that supports different data        LLMs are powerful deep learning models trained on large
+                 formats (e.g., JSON, YAML, XML) and different ways to             corpora of text to perform a wide range of natural language
+                 present and edit the data (e.g., a text editor, GUI editor or     processing tasks [27]–[29]. Prompt engineering is the task of
+                 schema diagram [12]). We choose MetaConﬁgurator, because          optimizing the input prompt for an LLM to get the best results
+                 of its modular architecture and because it can generate source    from it. Sahoo et al. [30] performed a systematic survey of
+                 code in 17 programming languages, as well as generate             prompt engineering techniques. For example, for new tasks
+                 documentation from a schema. Furthermore, it is open source,      without extensive prior training, few-shot training (providing
+                 free, accessible as a web service and we are familiar with it.    the model a few input-output examples) improves model per-
+                   There also exist approaches to generate a schema automat-       formance on complex tasks, but requires additional tokens and
+                 ically, based on an instance dataset. They are referred to as     can lead to biases. Assigning the LLM a role or persona can
+                 schema inference [13] or schema discovery [14] tasks. LLM-        also increase the model performance [31]. For complex long
+                 based services, such as ChatGPT, can also directly be used        instructional prompts, reframing them into multiple smaller
+                 to generate a schema using natural language, however these        subtasks has shown to improve the results [32]. Prior work has
+                 services lack proper schema validation and visualization of       shown that providing detailed natural-language instructions
+                 the schema in a graphical way. Furthermore, 1) LLMs can be        signiﬁcantly improves task performance, compared to relying
+                 distracted by irrelevant contexts [15]; 2) Even for deterministic on implicit task formulation [33]–[35].
+                 tasks, LLMs showed a signiﬁcant drop in accuracy when                         III. DESIGN AND IMPLEMENTATION
+                 dealing with low-probability inputs [16]; and 3) The reasoning       In this section, we describe the design and implementation
+                 abilities of LLMs degrades as the input length increases, also    of our AI-assisted schema creation (Section III-A) and schema
+                 before reaching maximum context window [17]. Mior [18]            matching (Section III-B) approaches.
+                 ﬁne-tune a LLM for schema related tasks and outperform the           Our system communicates with LLMs via a conﬁgurable
+                 base model Code LLama [19] signiﬁcantly.                                                                   6
+                                                                                   endpoint that follows the OpenAI API . Users may select
+                 C. Schema Matching and Mapping                                    the desired model via the application’s settings. Prompts are
+                   Integrating data from various sources and in different for-     programmatically constructed and transmitted to the API, and
+                 mats poses a signiﬁcant challenge [20]–[22]. In this work,        the resulting textual outputs are automatically parsed and
+                 we study the task of schema mapping: converting an instance       processed by our application. Access to LLMs via these APIs
+                 from one JSON schema to another. A schema mapping can             requires an authentication key tied to a user account and billing
+                 contain simple property-to-property correspondences or also       conﬁguration. We do not provide such API keys directly;
+                                                                             3     instead, MetaConﬁgurator requires users to supply their own
+                 more expressive logics. JSON to JSON transformation (Jolt) ,
+                                                                             4     credentials for API access. All LLM-based interactions and
+                 is a Java library to transform JSON documents. JSONata ,
+                                                                                   evaluations presented in this paper were conducted using
+                  2https://www.liquid-technologies.com/json-schema-editor, acc. 25/06/02
+                  3https://github.com/bazaarvoice/jolt, acc. 25/06/02                5https://github.com/jqlang/jq, acc. 25/06/02
+                  4https://github.com/jsonata-js/jsonata, acc. 25/06/02              6https://platform.openai.com/docs, acc. 25/06/07
+                                                                                80
+               Authorized licensed use limited to: UNIVERSITAETSBIBL STUTTGART. Downloaded on March 10,2026 at 14:36:17 UTC from IEEE Xplore.  Restrictions apply. 
+                gpt-4o-mini, which we selected for its favorable trade-           "Create a schema about MOF synthesis in chemistry. We
+                off between cost-efﬁciency and its demonstrated proﬁciency        have a list of synthesis experiments. Each experiment
+                                                                                  has a metal salt and a ligand and also creator, date,
+                in handling JSON Schema tasks.                                    temperature, duration, product_purity (boolean). Ligand
+                                                                                  and metal salt should be objects which each have name,
+                A. AI-assisted JSON Schema Creation                               mass, inchi as properties."
+                  MetaConﬁgurator’s modular and extensible architecture en-                                  ⇓
+                ables the integration of a new AI assistance view. To enable
+                schema creation and modiﬁcations via natural language, we
+                introduce a conversational, chat-like interface. Our hybrid
+                method offers several advantages over pure LLM-based so-
+                lutions:
+                  1) Prompt construction and context management: The
+                      tool handles all aspects of prompt engineering. For
+                      schema creation, it dynamically constructs a structured
+                      prompt that sets the LLM’s role (e.g., ”You are a JSON     Fig. 1: Example of natural language schema creation: The user
+                      Schema expert”), includes the user’s natural language      provides a prompt (top), which is translated into a structured
+                      description, and speciﬁes the expected output format.      visual schema (bottom).
+                      For schema modiﬁcations, the relevant schema subset,
+                      based on the user’s current selection, is included in the
+                      prompt.                                                    "The metal salt and ligand both have the same structure,
+                                                                                 both are compounds. Instead of having two different
+                  2) Integrated validation and visualization: The generated      definitions, create one compound class with their
+                      or modiﬁed schema is immediately subject to validation     properties and then make metal_salt and ligand both refer
+                      and is visualized within MetaConﬁgurator’s schema ed-      to this compound class."
+                      itor.                                                                                  ⇓
+                  3) Scalability through targeted context: To prevent LLM
+                      inaccuracies and hallucinations on large schemas, we
+                      avoid transmitting the entire schema. Instead, only the
+                      user-selected sub-schema is provided as context, en-
+                      abling precise and modular editing.
+                  4) Automated response post-processing: The tool auto-
+                      matically cleans the LLM response by removing format-
+                      ting artifacts such as code fences or language identiﬁers.
+                  5) Human-in-the-loop editing: If the LLM output is in-         Fig. 2: Example of schema modiﬁcation through natural lan-
+                      complete or incorrect, the user is presented with the raw  guage: The user requests schema changes using a prompt (top),
+                      response. They may then correct the schema manually        which results in the updated schema (bottom).
+                      before accepting or discarding the change.
+                  For schema creation tasks, prompts are constructed accord-
+                ing to the principles described above. Figure 1 shows an exam-     As schema mapping language, we use JSONata. It is very
+                ple of a user-provided schema description to MetaConﬁgurator     expressive and supports complex features, such as numeric,
+                and the resulting schema, visualized. The same chat-based        path, boolean and comparison operators, sorting, grouping, ag-
+                interface can be used to modify existing schemas (Figure 2),     gregation, functions and expressions, functional programming
+                to query a schema for information or to create, edit and query   and higher order functions.
+                document instances.                                                To perform the schema matching and mapping (data model
+                B. AI-assisted Schema Matching and Mapping                       transformation), the user provides an input JSON document
+                                                                                 and a target JSON schema. First, a source schema is in-
+                  Schema mapping is performed using human-deﬁned map-            ferred for the provided JSON document instance, using the
+                ping rules or scripts, traditional automated approaches [23],                         7
+                                                                                 jsonhero/schema-infer library. Next, the prompt for the LLM
+                [25] and recently also using LLMs [26]. We propose and im-       is constructed. It consists of mapping instructions (giving
+                plement a new approach, which transforms a JSON document         the LLM a personality, describing the overall tasks and de-
+                to satisfy a given target schema by ﬁrst generating schema       tailed mapping rules), a mapping example (example input and
+                mapping rules with the help of a LLM and then executing          expected output ﬁles) and the user input. To improve the
+                these deterministically. Aside from JSON, MetaConﬁgurator        quality of the generated JSONata expressions, a detailed set
+                supports the data formats YAML and XML and has a function                                                 8
+                                                                                 of instructions and JSONata speciﬁcations is included.
+                to import CSV documents (by conversion to JSON). Therefore,
+                data from any of these formats are supported and can be           7https://github.com/triggerdotdev/schema-infer, acc. 25/06/05.
+                transformed using the approach.                                   8Our set of JSONata instructions: https://doi.org/10.18419/DARUS-5157
+                                                                             81
+               Authorized licensed use limited to: UNIVERSITAETSBIBL STUTTGART. Downloaded on March 10,2026 at 14:36:17 UTC from IEEE Xplore.  Restrictions apply. 
+                         Because the user input JSON document might be large,                                           Input JSON Document                               Target Schema
+                      we perform a recursive array and properties truncation to                                 {                                              {
+                                                                                                                  "mof_id": "mof-123",                           "type": "object",
+                      shorten the document while maintaining its overall structure.                               "reagents": [                                  "properties": {
+                                                                                                                    { "role": "metal", "name": "ZrCl4" },          "materialId": { "type": "string" },
+                      The algorithm iteratively trims all arrays and object prop-                                   { "role": "linker", "name": "BDC" },           "metal": { "type": "string" },
+                                                                                                                    { "role": "linker", "name": "DABCO" }          "linkers": {
+                      erties to a maximum length n and 8 ∗ n respectively, until                                  ]                                                  "type": "array",
+                                                                                                                }                                                    "items": { "type": "string" }
+                      either the target document size of 64KB or the minimum                                                                                       }
+                                                                                                                                                                 }
+                      nmin = 2 is reached. The value n starts at 64 and ev-                                                                                    }
+                      ery iteration it is divided by 2. Properties of objects are                                                                       ⇓
+                      trimmed more conservatively than array items, to a length
+                      of 8 ∗ n, as they are usually all relevant and different                                                             Mapping Generated by LLM
+                      (except for schemas with additionalProperties or
+                      patternProperties), contrary to arrays items, which                                              {
+                                                                                                                          "materialId": mof_id,
+                      tend to follow the same schema. Possible information loss is                                        "metal": reagents[role = "metal"].name,
+                      constrained by including the JSON schema inferred from the                                          "linkers": reagents[role = "linker"].name
+                                                                                                                       }
+                      complete JSON document in the prompt. Because of including                                                           Transformed JSON Document
+                      the whole document schema in the prompt, there is an upper
+                      boundary of document complexity which is supported.                                              {
+                                                                                                                          "materialId": "mof-123",
+                         After the prompt is constructed, sent to the LLM and a                                           "metal": "ZrCl4",
+                      response is received, a post-processing algorithm is executed                                       "linkers": ["BDC", "DABCO"]
+                      on the response. The response might be surrounded by a code                                      }
+                      fence, often with a language hint (jsonata). If applicable,                               Fig. 3: Example of schema mapping: given an input JSON
+                      it is removed. Finally, the resulting suggested schema map-                               document and a target schema (top), the LLM generates a
+                      ping is presented to the user in an interactive code editor.                              transformation expression (middle), which is then used to
+                      It is automatically validated for syntactical correctness (not                            derive the structured output (bottom).
+                                                                          9
+                      semantics) using the JSONata library and validation errors
+                      are shown to the user. The user can make any changes of their
+                      choice and can only apply the mapping once it is recognized as                            creators of Chemspyd [36], a python interface for operating
+                      valid. Figure 3 shows an example schema mapping input, the                                laboratory robotic platforms from Chemspeed Technologies,
+                      generated JSONata expression and the transformation result.                               provide the outlook of integrating the Chemical Description
+                                                                                                                Language XDL [37] into Chemspyd. As of writing this paper,
+                                            IV. APPLICATION EXAMPLE                                             no formal schema is available for XDL 2.0, aside from doc-
+                         Chemists have performed chemical synthesis experiments                                 umentation11. We copy and paste the relevant sections of the
+                      and tracked their inputs and results in an Excel table. They                              XDLdocumentation into the schema creation prompt of Meta-
+                      want to apply machine learning and other algorithms on their                              Conﬁgurator to generate a schema. Since XDL documents
+                                                                              10                                fundamentally differ from our data in structure, JSONata
+                      data, but it is not yet in a suitable format . MetaConﬁgurator                            cannot provide an adequate mapping. Therefore, we use the
+                      is used to convert the excel table into a JSON document                                   code generation capabilities of MetaConﬁgurator to generate
+                      and automatically infer the corresponding schema. The JSON                                python classes representing the data structure of our schema
+                      document and schema, however, are not yet of sufﬁcient                                    andtheXDLschemaandwriteourownpythoncodetoconvert
+                      quality. Among other points, the product_purity values                                    between the structures. The result is a XDL document instance
+                      of yes and no have been inferred as being of type string                                  that is compatible with the XDL ecosystem and might enable
+                      instead of boolean and the ligand and metal_salt                                          an automatic synthesis execution in the near future.
+                      properties are all listed directly as children of an experiment
+                      instance, although it would be more suitable to extract them                                                            V. CONCLUSION
+                      into separate ligand and metal_salt classes. Using the                                        We presented a hybrid approach for schema creation,
+                      chat-based interface we create an improved schema (Figure 1-                              editing, and instance transformation using large language
+                      2). To transform the JSON document to satisfy the new                                     models, integrated into the open-source tool MetaConﬁgu-
+                      schema, we use the automated schema mapping functionality.                                rator. Our method combines modular prompt engineering,
+                      It successfully maps from yes and no to boolean values and                                targeted context scoping, human-in-the-loop reﬁnement, and
+                      from the ﬂat source paths to the nested paths of the target                               post-processing safeguards to enable intuitive and controlled
+                      schema. The data is now well-structured, formally speciﬁed                                schema modeling. To enable transforming also large document
+                      by a schema and AI-ready.                                                                 instances to satisfy a target schema, mapping rules are gener-
+                         For the automated execution of experiments using labora-                               ated by LLMs but then applied in a deterministic manner.
+                      tory robots, existing standards are preferred. For example, the                               An example in the chemistry domain demonstrates the
+                         9                                                                                      applicability of our approach. By translating informal data
+                          https://github.com/jsonata-js/jsonata, acc. 25/06/09.
+                         10Sources: https://doi.org/10.18419/DARUS-5157.                                           11https://croningroup.gitlab.io/chemputer/xdl/standard, acc. 25/07/05.
+                                                                                                            82
+                     Authorized licensed use limited to: UNIVERSITAETSBIBL STUTTGART. Downloaded on March 10,2026 at 14:36:17 UTC from IEEE Xplore.  Restrictions apply. 
+                     into machine-readable structures, our method enables FAIR                            [17] M. Levy, A. Jacoby, and Y. Goldberg, “Same task, more tokens: The
+                     (Findable, Accessible, Interoperable, and Reusable) [38] data                             impact of input length on the reasoning performance of large language
+                     practices and model-driven workﬂows.                                                      models,” arXiv preprint arXiv:2402.14848, 2024, unpublished.
+                                                                                                          [18] M. J. Mior, “Large language models for JSON schema discovery,” arXiv
+                        Beyond this proof-of-concept, model editing and instance                               preprint arXiv:2407.03286, 2024, unpublished.
+                     transformation, the tool supports other MDE-oriented tasks                           [19] B. Roziere, J. Gehring, F. Gloeckle, S. Sootla, I. Gat, X. E. Tan, Y. Adi,
+                     such as instance validation, code/documentation generation,                               J. Liu, R. Sauvestre, T. Remez, et al., “Code LLaMA: Open foundation
+                                                                                                               models for code,” arXiv preprint arXiv:2308.12950, 2023, unpublished.
+                     mapping discovery and schema-driven form generation. A                               [20] I. M. Putrama and P. Martinek, “Heterogeneous data integration: Chal-
+                     future extension for model-to-model transformations (e.g.,                                lenges and opportunities,” Data in Brief, p. 110853, 2024.
+                     XSD to JSON Schema) is planned.                                                      [21] B. Ahamed and T. Ramkumar, “Data integration—Challenges, tech-
+                                                                                                               niques and future directions: A comprehensive study,” Indian Journal
+                                              ACKNOWLEDGMENT                                                   of Science and Technology, vol. 9, no. 44, pp. 1–9, 2016.
+                                                                                                          [22] F. Z. Rozony, M. N. A. Aktar, M. Ashrafuzzaman, and A. Islam, “A
+                                                                  ¨                                            systematic review of big data integration challenges and solutions for
+                        The authors acknowledge Esengul Ciftci (Max Planck In-                                 heterogeneous data sources,” Academic Journal on Business Adminis-
+                     stitute for Solid State Research, Stuttgart, Germany) and                                 tration, Innovation & Sustainability, vol. 4, no. 4, pp. 1–18, 2024.
+                     Kenichi Endo (University of Stuttgart, Institute of Polymer                          [23] R. Hai, C. Quix, and D. Kensche, “Nested schema mappings for
+                     Chemistry, Stuttgart, Germany) for inspiring the chemistry                                integrating JSON,” in Conceptual Modeling: Proc. ER 2018, Xi’an,
+                     application example. The assistance of ChatGPT-4 for editorial                            China, Springer, pp. 397–405, 2018.
+                     suggestions is acknowledged.                                                         [24] E. Rahm and P. A. Bernstein, “A survey of approaches to automatic
+                                                                                                               schema matching,” The VLDB Journal, 10:334–350, 2001. Springer,
+                                                   REFERENCES                                                  doi: 10.1007/s007780100057.
+                                                                                                          [25] J. Stanek and D. Killough, “Synthesizing JSON Schema Transformers,”
+                      [1] Douglas C. Schmidt, “Guest editor’s introduction: Model-driven                       arXiv preprint arXiv:2405.17681, 2024, unpublished.
+                          engineering,” Computer, vol. 39, no. 2, pp. 25–31, 2006, doi:                   [26] C. Buss, M. Safari, A. Termehchy, S. Lee, and D. Maier, “Towards Scal-
+                          10.1109/MC.2006.58.                                                                  able Schema Mapping using Large Language Models,” arXiv preprint
+                      [2] G. Pryor, “Managing research data,” Facet Publishing, 2012, doi:                     arXiv:2505.24716, 2025, unpublished.
+                          10.29085/9781856048910.                                                         [27] T. Brown, B. Mann, N. Ryder, M. Subbiah, J. D. Kaplan, P. Dhariwal, A.
+                      [3] S. Wall, “Data management for researchers: Organize, maintain and                    Neelakantan, P. Shyam, G. Sastry, A. Askell, et al., “Language models
+                          share your data for research success,” Archives and Manuscripts, vol.                are few-shot learners,” Advances in Neural Information Processing
+                          45, no. 1, pp. 53–55, 2017, doi: 10.1080/01576895.2017.1279038.                      Systems, vol. 33, pp. 1877–1901, 2020, doi: 10.48550/arXiv.2005.14165
+                                          ¨                                                               [28] J. Achiam, S. Adler, S. Agarwal, L. Ahmad, I. Akkaya, F. L. Aleman,
+                      [4] N. Hartl, E. Woßner, and Y. Sure-Vetter, “Nationale Forschungsdatenin-               D. Almeida, J. Altenschmidt, S. Altman, S. Anadkat, et al., “GPT-4
+                          frastruktur (NFDI),” Informatik Spektrum, vol. 44, no. 5, pp. 370–373,               technical report,” arXiv preprint arXiv:2303.08774, 2023, unpublished.
+                          2021.                                                                           [29] H. Touvron, T. Lavril, G. Izacard, X. Martinet, M.-A. Lachaux,
+                      [5] F. Neubauer, P. Bredl, M. Xu, K. Patel, J. Pleiss, and B. Uekermann,                                        `
+                          “MetaConﬁgurator: A user-friendly tool for editing structured data ﬁles,”            T. Lacroix, B. Roziere, N. Goyal, E. Hambro, F. Azhar, et al.,
+                          Datenbank-Spektrum, pp. 1–9, 2024, doi: 10.1007/s13222-024-00472-7.                  “LLaMA: Open and efﬁcient foundation language models,” arXiv
+                      [6] D. Crockford, “The application/json media type for JavaScript Object                 preprint arXiv:2302.13971, 2023, unpublished.
+                          Notation (JSON),” Internet Engineering Task Force IETF Request for              [30] P. Sahoo, A. K. Singh, S. Saha, V. Jain, S. Mondal, and A. Chadha,
+                          Comments, 2006.                                                                      “A systematic survey of prompt engineering in large language models:
+                                                            ¨                                                  Techniques and applications,” arXiv preprint arXiv:2402.07927, 2024,
+                      [7] O. Ben-Kiki, C. Evans, and I. dot Net, “YAML ain’t markup language                   unpublished.
+                          version 1.2,” Available: http://yaml.org/spec/1.2/spec.html, 2009.              [31] A. Kong, S. Zhao, H. Chen, Q. Li, Y. Qin, R. Sun, X. Zhou, E. Wang,
+                      [8] F. Yergeau, T. Bray, J. Paoli, C. M. Sperberg-McQueen, and E. Maler,                 and X. Dong, “Better zero-shot reasoning with role-play prompting,”
+                          “Extensible markup language (XML) 1.0,” in XML, vol. 1, no. 1, pp.                   arXiv preprint arXiv:2308.07702, 2023.
+                          W3C, 2006.                                                                      [32] S. Mishra, D. Khashabi, C. Baral, Y. Choi, and H. Hajishirzi, “Re-
+                      [9] T. Marrs, “JSON at work: Practical data integration for the web,”                    framing instructional prompts to GPTk’s language,” arXiv preprint
+                          O’Reilly Media, Inc., 2017, pp. 269–286.                                             arXiv:2109.07830, 2021, unpublished.
+                     [10] M.-A. Baazizi, D. Colazzo, G. Ghelli, C. Sartiani, and S. Scherzinger,          [33] L. Ouyang, J. Wu, X. Jiang, D. Almeida, C. Wainwright, P. Mishkin,
+                          “An empirical study on the “Usage of Not” in real-world JSON schema                  C. Zhang, S. Agarwal, K. Slama, A. Ray, et al., “Training language
+                          documents (long version),” arXiv preprint arXiv:2107.08677, 2021,                    modelstofollowinstructions with human feedback,” Advances in Neural
+                          unpublished.                                                                         Information Processing Systems, vol. 35, pp. 27730–27744, 2022.
+                                                   ¨
+                     [11] I.  C.   Siffa,  J.  Schafer,   and   M. M. Becker, “Adamant: A                 [34] Y. Wang, Y. Kordi, S. Mishra, A. Liu, N. A. Smith, D. Khashabi, and H.
+                          JSON schema-based metadata editor for research data manage-                          Hajishirzi, “Self-instruct: Aligning language models with self-generated
+                          ment workﬂows,” F1000Research, vol. 11, p. 475, Apr. 2022, doi:                      instructions,” arXiv preprint arXiv:2212.10560, 2022, unpublished.
+                          10.12688/f1000research.110875.1.                                                [35] J. Wei, M. Bosma, V. Y. Zhao, K. Guu, A. W. Yu, B. Lester, N. Du,
+                     [12] F. Neubauer, J. Pleiss, and B. Uekermann, “Data model creation with                  A. M. Dai, and Q. V. Le, “Finetuned language models are zero-shot
+                                                                      ¨
+                          MetaConﬁgurator,” in Datenbanksysteme fur Business, Technologie und                  learners,” arXiv preprint arXiv:2109.01652, 2021, unpublished.
+                          Web (BTW 2025), Lecture Notes in Informatics (LNI), vol. P-361, GI,             [36] M. Seifrid, F. Strieth-Kalthoff, M. Haddadnia, T. C. Wu, E. Alca, L.
+                          Bonn, 2025, doi: 10.18420/BTW2025-60.                                                Bodo, S. Arellano-Rubach, N. Yoshikawa, M. Skreta, and R. Keunen,
+                     [13] M.-A. Baazizi, D. Colazzo, G. Ghelli, and C. Sartiani, “Parametric                   “Chemspyd: An open-source Python interface for Chemspeed robotic
+                          schema inference for massive JSON datasets,” The VLDB Journal, vol.                  chemistry and materials platforms,” Digital Discovery, vol. 3, no. 7, pp.
+                          28, pp. 497–521, 2019, doi: 10.1007/s00778-018-0532-7.                               1319–1326, 2024.
+                     [14] W. Spoth, O. Kennedy, Y. Lu, B. Hammerschmidt, and Z. H. Liu,                   [37] S. H. M. Mehr, M. Craven, A. I. Leonov, G. Keenan, and L. Cronin, “A
+                          “Reducing ambiguity in JSON schema discovery,” in Proc. 2021 Int.                    universal system for digitization and automatic execution of the chemical
+                          Conf. on Management of Data, pp. 1732–1744, 2021.                                    synthesis literature,” Science, vol. 370, no. 6512, pp. 101–108, 2020, doi:
+                                                                                                ¨
+                     [15] F. Shi, X. Chen, K. Misra, N. Scales, D. Dohan, E. H. Chi, N. Scharli,               10.1126/science.abc2986.
+                          and D. Zhou, “Large language models can be easily distracted by                 [38] M. D. Wilkinson, M. Dumontier, I. J. Aalbersberg, G. Appleton, M.
+                          irrelevant context,” in Int. Conf. on Machine Learning, pp. 31210–31227,             Axton, A. Baak, N. Blomberg, J.-W. Boiten, L. B. da Silva Santos,
+                          2023.                                                                                P. E. Bourne, et al., “The FAIR guiding principles for scientiﬁc data
+                     [16] R. T. McCoy, S. Yao, D. Friedman, M. Hardy, and T. L. Grifﬁths, “Em-                 management and stewardship,” Scientiﬁc Data, vol. 3, no. 1, pp. 1–9,
+                          bers of autoregression: Understanding large language models through                  2016.
+                          the problem they are trained to solve,” arXiv preprint arXiv:2309.13638,
+                          2023, unpublished.
+                                                                                                      83
+                    Authorized licensed use limited to: UNIVERSITAETSBIBL STUTTGART. Downloaded on March 10,2026 at 14:36:17 UTC from IEEE Xplore.  Restrictions apply. 
