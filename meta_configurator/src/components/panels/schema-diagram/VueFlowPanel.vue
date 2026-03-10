@@ -317,24 +317,43 @@ function updateAttributeRequired(attributeData: SchemaObjectAttributeData, requi
   const attributePath = attributeData.absolutePath;
   const attributeName = attributeData.name;
 
-  const parentObjectPath = attributePath.slice(0, -2); // remove "properties" + attribute name
-  const parentSchema = structuredClone(schemaData.dataAt(parentObjectPath));
-  
-  if (!parentSchema.required) {
-    parentSchema.required = [];
-  }
+  const parentObjectPath = attributePath.slice(0, -2);
+  const requiredPath = [...parentObjectPath, 'required'];
 
-  const index = parentSchema.required.indexOf(attributeName);
+  const currentRequired = schemaData.dataAt(requiredPath) ?? [];
+
+  let newRequired = [...currentRequired];
+
+  const index = newRequired.indexOf(attributeName);
 
   if (required && index === -1) {
-    parentSchema.required.push(attributeName);
+    newRequired.push(attributeName);
   }
 
   if (!required && index !== -1) {
-    parentSchema.required.splice(index, 1);
+    newRequired.splice(index, 1);
   }
+
+  schemaData.setDataAt(requiredPath, newRequired);
   
-  schemaData.setDataAt(parentObjectPath, parentSchema);
+  // let requiredList = schemaData.dataAt(requiredPath);
+
+  // if (!requiredList) {
+  //   requiredList = [];
+  // }
+
+  // const index = requiredList.indexOf(attributeName);
+
+  // if (required && index === -1) {
+  //   requiredList.push(attributeName);
+  // }
+
+  // if (!required && index !== -1) {
+  //   requiredList.splice(index, 1);
+  // }
+
+  // // trigger schema update
+  // schemaData.setDataAt(requiredPath, requiredList);
 }
 
 function updateAttributeType(

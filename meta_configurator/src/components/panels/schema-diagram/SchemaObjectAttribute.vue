@@ -49,7 +49,6 @@ const isRequired = ref(props.data.required);
 
 function updateRequired() {
   emit('update_attribute_required', props.data, isRequired.value);
-  console.log('dev');
 }
 
 const attrName = ref(props.data.name);
@@ -124,6 +123,7 @@ function getHandleTop() {
 
       <input
         type="checkbox"
+        class="vue-flow-required-checkbox"
         v-model="isRequired"
         @change="updateRequired"
         @mousedown.stop
@@ -165,7 +165,7 @@ function getHandleTop() {
 
 <style>
 .vue-flow-required-checkbox {
-  margin-left: 6px;
+  margin: 0 4px;
   transform: scale(0.8);
 }
 
