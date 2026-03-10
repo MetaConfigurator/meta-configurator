@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  9 MAR 2026 20:05
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  10 MAR 2026 15:31
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -2598,7 +2598,15 @@ File: lstlang2.sty 2025/11/14 1.11b listings language file
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang3.sty
 File: lstlang3.sty 2025/11/14 1.11b listings language file
 )
-Package cleveref Info: loaded `english' language definitions on input line 185.
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/9'
+(microtype)             (new value: 9.0pt) on input line 175.
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/6'
+(microtype)             (new value: 6.0pt) on input line 175.
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5'
+(microtype)             (new value: 5.0pt) on input line 175.
+LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
+(Font)              scaled to size 8.09995pt on input line 175.
+Package cleveref Info: loaded `english' language definitions on input line 183.
  [16]
 Package cleveref Info: loaded `english' language definitions on input line 219.
  [17]
@@ -2606,17 +2614,9 @@ Package cleveref Info: loaded `english' language definitions on input line 262.
  [18]
 Package cleveref Info: loaded `english' language definitions on input line 303.
  [19]
-Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/9'
-(microtype)             (new value: 9.0pt) on input line 304.
-Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/6'
-(microtype)             (new value: 6.0pt) on input line 304.
-Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5'
-(microtype)             (new value: 5.0pt) on input line 304.
-LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 8.09995pt on input line 304.
 Package cleveref Info: loaded `english' language definitions on input line 328.
  [20]
-Package cleveref Info: loaded `english' language definitions on input line 350.
+Package cleveref Info: loaded `english' language definitions on input line 356.
  [21]) (./chapters/02_design_and_implementation.tex
 Package cleveref Info: loaded `english' language definitions on input line 2.
  [22]
@@ -2675,19 +2675,19 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 77192 strings out of 476076
- 156267,3417909 words of node,token memory allocated
- 990 words of node memory still in use:
-   8 hlist, 2 vlist, 2 rule, 1 local_par, 5 glue, 5 kern, 1 penalty, 4 glyph, 41 attribute, 107 glue_spec, 21 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 3 pdf_action nodes
-   avail lists: 1:5,2:4101,3:686,4:1907,5:2558,6:152,7:7965,8:40,9:5611,10:16,11:733,12:1
- 93486 multiletter control sequences out of 65536+600000
- 102 fonts using 24981563 bytes
+ 77396 strings out of 476076
+ 156269,3417909 words of node,token memory allocated
+ 1003 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 6 glue, 5 kern, 1 penalty, 4 glyph, 43 attribute, 107 glue_spec, 22 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 3 pdf_action nodes
+   avail lists: 1:5,2:4305,3:686,4:1971,5:2560,6:151,7:6553,8:64,9:5611,10:16,11:605,12:1
+ 93492 multiletter control sequences out of 65536+600000
+ 102 fonts using 24981183 bytes
  108i,21n,115p,11294b,2686s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf>
-Output written on main-english.pdf (33 pages, 98134 bytes).
+Output written on main-english.pdf (33 pages, 100196 bytes).
 
-PDF statistics: 579 PDF objects out of 1000 (max. 8388607)
- 523 compressed objects within 6 object streams
- 260 named destinations out of 1000 (max. 1048576)
+PDF statistics: 593 PDF objects out of 1000 (max. 8388607)
+ 537 compressed objects within 6 object streams
+ 271 named destinations out of 1000 (max. 1048576)
  224 words of extra memory for PDF output out of 10000 (max. 100000000)
 

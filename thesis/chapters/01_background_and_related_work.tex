@@ -154,8 +154,7 @@ For example, using the JSON-LD simulation data, we might want to retrieve all ex
 
 \begin{lstlisting}[language=sparql, caption={SPARQL query retrieving parameter values and units}, label={lst:background_sparql_example}]
 PREFIX schema: <https://schema.org/>
-PREFIX unit: <http://qudt.org/vocab/unit/>
-PREFIX local: <https://www.example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT ?parameter ?value ?unit
 WHERE {
@@ -173,7 +172,7 @@ This query returns the `element-size` parameter with its numeric value and QUDT 
 
 JSON-LD (JavaScript Object Notation for Linked Data) extends JSON by introducing semantic annotations that allow data to be interpreted as linked data within the Resource Description Framework (RDF). JSON-LD integrates JSON with established semantic web standards by providing mechanisms for defining contexts, identifiers, and relationships between entities \cite{jsonld2014}.
 
-In the context of scientific experiments, JSON-LD allows simulation parameters and results to be linked to well-defined ontologies and vocabularies. For instance, parameters can be modeled using \texttt{schema:PropertyValue}, while experiment procedures can be represented using domain ontologies such as metadata4ing.
+In the context of scientific experiments, JSON-LD allows simulation parameters and results to be linked to well-defined ontologies and vocabularies. For instance, parameters can be modeled using \texttt{schema:PropertyValue}, while experiment procedures can be represented using domain ontologies such as metadata4ing \footnote{\url{https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/}}.
 
 Listing \ref{lst:background_jsonld_example} shows a JSON-LD representation corresponding to the example simulation result.
 
@@ -339,14 +338,42 @@ Despite its strong support for schema-driven data modeling, MetaConfigurator cur
 
 As discussed in previous sections, the Semantic Web relies on standards such as RDF, ontologies, and IRIs to represent data in a machine-interpretable and interoperable manner. JSON-LD serves as an important bridge between traditional JSON-based data structures and RDF-based knowledge graphs. However, MetaConfigurator currently treats JSON documents primarily as structured configuration data and does not interpret or expose their underlying RDF semantics.
 
-Several limitations arise from this restriction. First, users cannot directly author or edit JSON-LD contexts (e.g., the \texttt{@context} section that defines mappings between JSON keys and ontology IRIs). Without such support, linking data elements to ontologies such as \texttt{schema.org}, \texttt{metadata4ing}, or QUDT units requires manual editing outside of the tool.
+Several limitations arise from this restriction:
 
-Second, MetaConfigurator does not provide mechanisms for inspecting or manipulating RDF triples derived from the underlying JSON data. As a result, users cannot directly view the semantic graph structure implied by JSON-LD documents, nor can they explore relationships between entities in a knowledge graph representation.
+\begin{enumerate}
+    \item \textbf{Lack of JSON-LD context authoring:}  
+    Users cannot directly author or edit JSON-LD contexts (e.g., the \texttt{@context} section that defines mappings between JSON keys and ontology IRIs). Without such support, linking data elements to ontologies requires manual editing outside the tool.
 
-Third, the platform currently lacks built-in mechanisms for transforming conventional JSON documents into semantic representations. As discussed in Section~\ref{sec:background:rml}, technologies such as the RDF Mapping Language (RML) enable declarative transformations from JSON to RDF. However, such transformations are not yet integrated into MetaConfigurator's workflow.
+    \item \textbf{No direct inspection or editing of RDF triples:}  
+    MetaConfigurator does not provide mechanisms for inspecting or manipulating RDF triples derived from the underlying JSON data. As a result, users cannot directly view the semantic graph structure implied by JSON-LD documents.
 
-Finally, the platform currently does not support semantic querying of RDF data. As described in Section~\ref{sec:background:sparql}, SPARQL provides a standard mechanism for querying RDF graphs and retrieving structured information from knowledge graphs. Without SPARQL support, users cannot directly explore or analyze semantically enriched data within the tool.
+    \item \textbf{Missing transformation from JSON to RDF:}  
+    The platform lacks built-in mechanisms for transforming conventional JSON documents into semantic representations. As discussed in Section~\ref{sec:background:rml}, technologies such as the RDF Mapping Language (RML) enable declarative transformations from JSON to RDF, but such transformations are not currently integrated into MetaConfigurator's workflow.
 
-To address these limitations, this thesis extends MetaConfigurator with an \textbf{RDF Authoring Panel} that integrates Semantic Web technologies directly into the schema-driven editing environment. The extension introduces several new capabilities. First, JSON documents can be transformed into JSON-LD using RML mappings, enabling the generation of RDF triples from structured JSON data. Second, the panel enables direct authoring and editing of RDF triples and JSON-LD contexts with ontology-aware auto-completion of IRIs. Third, the system introduces \textbf{SPARQL querying support}, allowing users to retrieve and explore RDF data using standard Semantic Web query mechanisms. Finally, the extension provides an \textbf{interactive knowledge graph visualization} that renders RDF triples as a graph structure synchronized with the JSON-LD representation.
+    \item \textbf{Lack of semantic querying capabilities:}  
+    MetaConfigurator does not support semantic querying of RDF data. As described in Section~\ref{sec:background:sparql}, SPARQL provides a standard mechanism for querying RDF graphs and retrieving structured information from knowledge graphs.
+
+    \item \textbf{No visualization of RDF knowledge graphs:}  
+    Knowledge graphs are often easier to understand when represented visually as nodes and relationships. However, the current platform does not provide mechanisms to visually explore RDF triples or inspect the structure of the resulting knowledge graph.
+\end{enumerate}
+
+To address these limitations, this thesis extends MetaConfigurator with an \textbf{RDF Authoring Panel} that integrates Semantic Web technologies directly into the schema-driven editing environment. The main contributions of this thesis include:
+
+\begin{enumerate}
+    \item \textbf{Transformation of JSON documents to JSON-LD:}  
+    The system enables the transformation of conventional JSON documents into JSON-LD using RML mappings. This allows structured JSON data created within MetaConfigurator to be converted into RDF triples that can be integrated into Semantic Web infrastructures.
+
+    \item \textbf{RDF authoring and editing support:}  
+    The RDF Authoring Panel allows users to directly inspect and edit RDF data. This includes editing the JSON-LD \texttt{@context} as well as creating and modifying RDF triples within the interface.
+
+    \item \textbf{Ontology-aware IRI auto-completion:}  
+    The system integrates ontology lookup services that provide auto-completion for IRIs when authoring RDF triples. This facilitates the reuse of existing ontologies and promotes semantic interoperability.
+
+    \item \textbf{SPARQL querying support:}  
+    The extension introduces the ability to query RDF data using SPARQL. This allows users to retrieve and analyze information from the generated knowledge graph directly within the MetaConfigurator environment.
+
+    \item \textbf{Interactive knowledge graph visualization:}  
+    The RDF triples generated from JSON-LD can be visualized as an interactive graph representation. This visualization enables users to explore entities and relationships within the knowledge graph and understand the semantic structure of the data more easily.
+\end{enumerate}
 
 By integrating these capabilities into MetaConfigurator, the platform evolves from a schema-based configuration editor into a tool that supports the full workflow of creating, transforming, querying, and exploring semantically enriched data.

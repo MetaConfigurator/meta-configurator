@@ -16,5 +16,386 @@
   {}
 \endgroup
 
+
+\refsection{0}
+  \datalist[entry]{anyt/global//global/global/global}
+    \entry{berners2001semantic}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=d469e0df304c98f67b55d087ea6187a1}{%
+           family={Berners-Lee},
+           familyi={B\bibinithyphendelim L\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+        {{hash=b03c1c11511fa3c1c6224a741f227be4}{%
+           family={Hendler},
+           familyi={H\bibinitperiod},
+           given={James},
+           giveni={J\bibinitperiod}}}%
+        {{hash=fb144ce9931b409b1bdccdff7d3a4ecd}{%
+           family={Lassila},
+           familyi={L\bibinitperiod},
+           given={Ora},
+           giveni={O\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Scientific American, Inc.}%
+      }
+      \strng{namehash}{282db63790560cddab64edb482ae1b3e}
+      \strng{fullhash}{f4ea8e196bdf65a991bf6b05075d7d62}
+      \strng{fullhashraw}{f4ea8e196bdf65a991bf6b05075d7d62}
+      \strng{bibnamehash}{f4ea8e196bdf65a991bf6b05075d7d62}
+      \strng{authorbibnamehash}{f4ea8e196bdf65a991bf6b05075d7d62}
+      \strng{authornamehash}{282db63790560cddab64edb482ae1b3e}
+      \strng{authorfullhash}{f4ea8e196bdf65a991bf6b05075d7d62}
+      \strng{authorfullhashraw}{f4ea8e196bdf65a991bf6b05075d7d62}
+      \field{labelalpha}{BHL01}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Scientific American}
+      \field{number}{5}
+      \field{title}{The Semantic Web}
+      \field{volume}{284}
+      \field{year}{2001}
+      \field{pages}{28\bibrangedash 37}
+      \range{pages}{10}
+    \endentry
+    \entry{json_standard}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=3e2f0f38495aebf8b91a698c2ccbfae3}{%
+           family={Bray},
+           familyi={B\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Internet Engineering Task Force}%
+      }
+      \strng{namehash}{3e2f0f38495aebf8b91a698c2ccbfae3}
+      \strng{fullhash}{3e2f0f38495aebf8b91a698c2ccbfae3}
+      \strng{fullhashraw}{3e2f0f38495aebf8b91a698c2ccbfae3}
+      \strng{bibnamehash}{3e2f0f38495aebf8b91a698c2ccbfae3}
+      \strng{authorbibnamehash}{3e2f0f38495aebf8b91a698c2ccbfae3}
+      \strng{authornamehash}{3e2f0f38495aebf8b91a698c2ccbfae3}
+      \strng{authorfullhash}{3e2f0f38495aebf8b91a698c2ccbfae3}
+      \strng{authorfullhashraw}{3e2f0f38495aebf8b91a698c2ccbfae3}
+      \field{labelalpha}{Bra17}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{RFC 8259}
+      \field{title}{The JavaScript Object Notation (JSON) Data Interchange Format}
+      \field{year}{2017}
+      \verb{urlraw}
+      \verb https://www.rfc-editor.org/rfc/rfc8259
+      \endverb
+      \verb{url}
+      \verb https://www.rfc-editor.org/rfc/rfc8259
+      \endverb
+    \endentry
+    \entry{dimou2014rml}{inproceedings}{}{}
+      \name{author}{6}{}{%
+        {{hash=3b9c611a002db08364a65ed5f2d88056}{%
+           family={Dimou},
+           familyi={D\bibinitperiod},
+           given={Anastasia},
+           giveni={A\bibinitperiod}}}%
+        {{hash=3d07782186d6043a469195fab09d6a9f}{%
+           family={Vander\bibnamedelima Sande},
+           familyi={V\bibinitperiod\bibinitdelim S\bibinitperiod},
+           given={Miel},
+           giveni={M\bibinitperiod}}}%
+        {{hash=53f6105c441349d83d9fcbf7eb9640b5}{%
+           family={Colpaert},
+           familyi={C\bibinitperiod},
+           given={Pieter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=f6f7b1f03b36b6df0b508d6e0e17c85d}{%
+           family={Verborgh},
+           familyi={V\bibinitperiod},
+           given={Ruben},
+           giveni={R\bibinitperiod}}}%
+        {{hash=c6ff5262327adb6f8a89b0e6cc6b4a42}{%
+           family={Mannens},
+           familyi={M\bibinitperiod},
+           given={Erik},
+           giveni={E\bibinitperiod}}}%
+        {{hash=61d468ff80c9764df8fe6a95408b219e}{%
+           family={Van\bibnamedelimb de\bibnamedelima Walle},
+           familyi={V\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim W\bibinitperiod},
+           given={Rik},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{0f638a91309b745e25f6f9e48ff22d4f}
+      \strng{fullhash}{aa6dd308445b0b99ae74589af16ad5e8}
+      \strng{fullhashraw}{aa6dd308445b0b99ae74589af16ad5e8}
+      \strng{bibnamehash}{aa6dd308445b0b99ae74589af16ad5e8}
+      \strng{authorbibnamehash}{aa6dd308445b0b99ae74589af16ad5e8}
+      \strng{authornamehash}{0f638a91309b745e25f6f9e48ff22d4f}
+      \strng{authorfullhash}{aa6dd308445b0b99ae74589af16ad5e8}
+      \strng{authorfullhashraw}{aa6dd308445b0b99ae74589af16ad5e8}
+      \field{labelalpha}{DVC+14}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 7th Workshop on Linked Data on the Web}
+      \field{title}{RML: A Generic Language for Integrated RDF Mappings of Heterogeneous Data}
+      \field{year}{2014}
+    \endentry
+    \entry{gruber1993ontology}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=afb9b0d3d5b76f30ab451acf45400285}{%
+           family={Gruber},
+           familyi={G\bibinitperiod},
+           given={Thomas\bibnamedelima R.},
+           giveni={T\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{afb9b0d3d5b76f30ab451acf45400285}
+      \strng{fullhash}{afb9b0d3d5b76f30ab451acf45400285}
+      \strng{fullhashraw}{afb9b0d3d5b76f30ab451acf45400285}
+      \strng{bibnamehash}{afb9b0d3d5b76f30ab451acf45400285}
+      \strng{authorbibnamehash}{afb9b0d3d5b76f30ab451acf45400285}
+      \strng{authornamehash}{afb9b0d3d5b76f30ab451acf45400285}
+      \strng{authorfullhash}{afb9b0d3d5b76f30ab451acf45400285}
+      \strng{authorfullhashraw}{afb9b0d3d5b76f30ab451acf45400285}
+      \field{labelalpha}{Gru93}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Knowledge Acquisition}
+      \field{number}{2}
+      \field{title}{A Translation Approach to Portable Ontology Specifications}
+      \field{volume}{5}
+      \field{year}{1993}
+      \field{pages}{199\bibrangedash 220}
+      \range{pages}{22}
+    \endentry
+    \entry{shacl_standard}{misc}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=0976c9ea4273720766d1f30c98e29f16}{%
+           family={Knublauch},
+           familyi={K\bibinitperiod},
+           given={Holger},
+           giveni={H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{9baccc1844088d3e97f8bac05610e88a}
+      \strng{fullhash}{9baccc1844088d3e97f8bac05610e88a}
+      \strng{fullhashraw}{9baccc1844088d3e97f8bac05610e88a}
+      \strng{bibnamehash}{9baccc1844088d3e97f8bac05610e88a}
+      \strng{authorbibnamehash}{9baccc1844088d3e97f8bac05610e88a}
+      \strng{authornamehash}{9baccc1844088d3e97f8bac05610e88a}
+      \strng{authorfullhash}{9baccc1844088d3e97f8bac05610e88a}
+      \strng{authorfullhashraw}{9baccc1844088d3e97f8bac05610e88a}
+      \field{labelalpha}{Knu+17}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Shapes Constraint Language (SHACL)}
+      \field{year}{2017}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/shacl/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/shacl/
+      \endverb
+    \endentry
+    \entry{metaconfigurator2024}{article}{}{}
+      \name{author}{6}{}{%
+        {{hash=cee8fd4aa4588c8a57078a2b835113dc}{%
+           family={Neubauer},
+           familyi={N\bibinitperiod},
+           given={Felix},
+           giveni={F\bibinitperiod}}}%
+        {{hash=bc700f0407d81c23dc80c328450e0d6c}{%
+           family={Bredl},
+           familyi={B\bibinitperiod},
+           given={Paul},
+           giveni={P\bibinitperiod}}}%
+        {{hash=3441822153796507891dc2eaf2f27fb3}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Minye},
+           giveni={M\bibinitperiod}}}%
+        {{hash=30b22f3a3ef07a421f4b9f3e0b285984}{%
+           family={Patel},
+           familyi={P\bibinitperiod},
+           given={Keyuriben},
+           giveni={K\bibinitperiod}}}%
+        {{hash=a53295d118b38d3f18e99b0bcb23e584}{%
+           family={Pleiss},
+           familyi={P\bibinitperiod},
+           given={Jürgen},
+           giveni={J\bibinitperiod}}}%
+        {{hash=96492da40bafc5224b4ca48bed84b96a}{%
+           family={Uekermann},
+           familyi={U\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{926ca14259e9aca676d600426b174a2a}
+      \strng{fullhash}{83b876f273665da7742eb893e4401957}
+      \strng{fullhashraw}{83b876f273665da7742eb893e4401957}
+      \strng{bibnamehash}{83b876f273665da7742eb893e4401957}
+      \strng{authorbibnamehash}{83b876f273665da7742eb893e4401957}
+      \strng{authornamehash}{926ca14259e9aca676d600426b174a2a}
+      \strng{authorfullhash}{83b876f273665da7742eb893e4401957}
+      \strng{authorfullhashraw}{83b876f273665da7742eb893e4401957}
+      \field{labelalpha}{NBX+24}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Datenbank-Spektrum}
+      \field{title}{MetaConfigurator: A User-Friendly Tool for Editing Structured Data Files}
+      \field{volume}{24}
+      \field{year}{2024}
+      \field{pages}{161\bibrangedash 169}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1007/s13222-024-00472-7
+      \endverb
+    \endentry
+    \entry{sparql_standard}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=be64499247ac1c766030e23529596f0e}{%
+           family={Prud'hommeaux},
+           familyi={P\bibinitperiod},
+           given={Eric},
+           giveni={E\bibinitperiod}}}%
+        {{hash=b0f2e76dd842dc9052f49422b3cc10e6}{%
+           family={Seaborne},
+           familyi={S\bibinitperiod},
+           given={Andy},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{836b969fa9b2eeb117f5d2c8855d570e}
+      \strng{fullhash}{836b969fa9b2eeb117f5d2c8855d570e}
+      \strng{fullhashraw}{836b969fa9b2eeb117f5d2c8855d570e}
+      \strng{bibnamehash}{836b969fa9b2eeb117f5d2c8855d570e}
+      \strng{authorbibnamehash}{836b969fa9b2eeb117f5d2c8855d570e}
+      \strng{authornamehash}{836b969fa9b2eeb117f5d2c8855d570e}
+      \strng{authorfullhash}{836b969fa9b2eeb117f5d2c8855d570e}
+      \strng{authorfullhashraw}{836b969fa9b2eeb117f5d2c8855d570e}
+      \field{labelalpha}{PS13}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{SPARQL 1.1 Overview}
+      \field{year}{2013}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/sparql11-overview/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/sparql11-overview/
+      \endverb
+    \endentry
+    \entry{jsonld2014}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=a466ea64da1230f086236ee5cc2e8151}{%
+           family={Sporny},
+           familyi={S\bibinitperiod},
+           given={Manu},
+           giveni={M\bibinitperiod}}}%
+        {{hash=436a37a83ece69ff0ba2b555d4dd82aa}{%
+           family={Kellogg},
+           familyi={K\bibinitperiod},
+           given={Gregg},
+           giveni={G\bibinitperiod}}}%
+        {{hash=d91ccb882c2defa0b7d5801d3486fe95}{%
+           family={Lanthaler},
+           familyi={L\bibinitperiod},
+           given={Markus},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{a5baa510dded8b58d4df7371fb7d0e22}
+      \strng{fullhash}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{fullhashraw}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{bibnamehash}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{authorbibnamehash}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{authornamehash}{a5baa510dded8b58d4df7371fb7d0e22}
+      \strng{authorfullhash}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{authorfullhashraw}{044908d0c2594e499a7acdc1bbbd8199}
+      \field{labelalpha}{SKL14}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{JSON-LD 1.0: A JSON-based Serialization for Linked Data}
+      \field{year}{2014}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/json-ld/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/json-ld/
+      \endverb
+    \endentry
+    \entry{wright2020jsonschema}{misc}{}{}
+      \name{author}{4}{}{%
+        {{hash=e5a4b65326e4b050889dd3c516364f5b}{%
+           family={Wright},
+           familyi={W\bibinitperiod},
+           given={Austin},
+           giveni={A\bibinitperiod}}}%
+        {{hash=e3ca512a077fb5d3632a37d4762d9e13}{%
+           family={Andrews},
+           familyi={A\bibinitperiod},
+           given={Henry},
+           giveni={H\bibinitperiod}}}%
+        {{hash=2075eae811e7ac9aaa1af14d4842f872}{%
+           family={Hutton},
+           familyi={H\bibinitperiod},
+           given={Ben},
+           giveni={B\bibinitperiod}}}%
+        {{hash=45371736ea60e84429c85f4ff46c6ad0}{%
+           family={Dennis},
+           familyi={D\bibinitperiod},
+           given={Greg},
+           giveni={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{79fa00b0a39023f5df0ce0f4e8a873cc}
+      \strng{fullhash}{c1c7b04088af6111525833f6208140d8}
+      \strng{fullhashraw}{c1c7b04088af6111525833f6208140d8}
+      \strng{bibnamehash}{c1c7b04088af6111525833f6208140d8}
+      \strng{authorbibnamehash}{c1c7b04088af6111525833f6208140d8}
+      \strng{authornamehash}{79fa00b0a39023f5df0ce0f4e8a873cc}
+      \strng{authorfullhash}{c1c7b04088af6111525833f6208140d8}
+      \strng{authorfullhashraw}{c1c7b04088af6111525833f6208140d8}
+      \field{labelalpha}{WAHD20}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{IETF Internet Draft}
+      \field{title}{JSON Schema: A Media Type for Describing JSON Documents}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://json-schema.org/draft/2020-12/
+      \endverb
+      \verb{url}
+      \verb https://json-schema.org/draft/2020-12/
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
 \endinput
 

@@ -8,22 +8,22 @@
 \contentsline {subsection}{\numberline {1.2.2}Semantic Web Concepts}{14}{subsection.57}%
 \contentsline {subsection}{\numberline {1.2.3}SHACL: Shapes Constraint Language}{15}{subsection.68}%
 \contentsline {subsection}{\numberline {1.2.4}SPARQL: Querying Semantic Data}{16}{subsection.87}%
-\contentsline {subsection}{\numberline {1.2.5}Semantic Data Representation using JSON-LD}{16}{subsection.100}%
-\contentsline {subsection}{\numberline {1.2.6}RML for Mapping JSON to RDF}{17}{subsection.131}%
-\contentsline {section}{\numberline {1.3}MetaConfigurator for Schema-Driven Data Modeling}{20}{section.203}%
-\contentsline {subsection}{\numberline {1.3.1}Core Features}{20}{subsection.205}%
-\contentsline {subsection}{\numberline {1.3.2}Limitations for Semantic Web Integration}{21}{subsection.206}%
-\contentsline {chapter}{\numberline {2}Design and Implementation}{23}{chapter.207}%
-\contentsline {section}{\numberline {2.1}RDF Panel}{23}{section.208}%
-\contentsline {section}{\numberline {2.2}RML Mapping Tool}{23}{section.209}%
-\contentsline {section}{\numberline {2.3}Query with SPARQL}{23}{section.210}%
-\contentsline {section}{\numberline {2.4}Visualization}{23}{section.211}%
-\contentsline {chapter}{\numberline {3}Application}{25}{chapter.212}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{25}{section.213}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{27}{chapter.214}%
-\contentsline {chapter}{\nonumberline Bibliography}{29}{chapter*.215}%
+\contentsline {subsection}{\numberline {1.2.5}Semantic Data Representation using JSON-LD}{16}{subsection.99}%
+\contentsline {subsection}{\numberline {1.2.6}RML for Mapping JSON to RDF}{17}{subsection.132}%
+\contentsline {section}{\numberline {1.3}MetaConfigurator for Schema-Driven Data Modeling}{20}{section.204}%
+\contentsline {subsection}{\numberline {1.3.1}Core Features}{20}{subsection.206}%
+\contentsline {subsection}{\numberline {1.3.2}Limitations for Semantic Web Integration}{21}{subsection.207}%
+\contentsline {chapter}{\numberline {2}Design and Implementation}{23}{chapter.218}%
+\contentsline {section}{\numberline {2.1}RDF Panel}{23}{section.219}%
+\contentsline {section}{\numberline {2.2}RML Mapping Tool}{23}{section.220}%
+\contentsline {section}{\numberline {2.3}Query with SPARQL}{23}{section.221}%
+\contentsline {section}{\numberline {2.4}Visualization}{23}{section.222}%
+\contentsline {chapter}{\numberline {3}Application}{25}{chapter.223}%
+\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{25}{section.224}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{27}{chapter.225}%
+\contentsline {chapter}{\nonumberline Bibliography}{29}{chapter*.226}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{30}{chapter*.215}%
-\contentsline {chapter}{\numberline {A}Appendix}{31}{appendix.216}%
-\contentsline {section}{\numberline {A.1}RML Mapping}{31}{section.217}%
+\contentsline {part}{Appendix}{30}{chapter*.226}%
+\contentsline {chapter}{\numberline {A}Appendix}{31}{appendix.227}%
+\contentsline {section}{\numberline {A.1}RML Mapping}{31}{section.228}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

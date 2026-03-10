@@ -1,0 +1,10 @@
+PREFIX schema: <https://schema.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?parameter ?value ?unit
+WHERE {
+    ?param a schema:PropertyValue ;
+           rdfs:label ?parameter ;
+           schema:value ?value ;
+           schema:unitCode ?unit .
+}
