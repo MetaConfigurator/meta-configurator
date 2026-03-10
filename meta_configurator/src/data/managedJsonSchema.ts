@@ -13,6 +13,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
 import {writeSchemaRequiredDefaultsToData} from '@/schema/writeDefaultsToData';
 import {useDataSource} from '@/data/dataSource';
+import {detectSchemaFeatures, type SchemaFeatures} from "@/schema/detectSchemaFeatures.ts";
 
 /**
  * This class manages the schema and provides easy access to its content.
@@ -29,6 +30,7 @@ export class ManagedJsonSchema {
     public mode: SessionMode
   ) {
     this._schemaPreprocessed = ref(preprocessOneTime(this._schemaRaw.value));
+    this._schemaFeatures = ref(detectSchemaFeatures(this._schemaRaw.value));
 
     if (watchSchemaChanges) {
       // make sure that the schema is not preprocessed too often
@@ -45,6 +47,8 @@ export class ManagedJsonSchema {
    * The json schema as a TopLevelJsonSchema object
    */
   private _schemaWrapper?: Ref<TopLevelJsonSchemaWrapper>;
+
+  private _schemaFeatures?: Ref<SchemaFeatures>;
 
   get schemaPreprocessed(): Ref<JsonSchemaTypePreprocessed> {
     return this._schemaPreprocessed;
@@ -110,6 +114,10 @@ export class ManagedJsonSchema {
     return currentEffectiveSchema;
   }
 
+  public getCurrentSchemaFeatures(): SchemaFeatures {
+    return this._schemaFeatures!.value;
+  }
+
   public reloadSchema() {
     clearPreprocessedRefSchemaCache();
     this._schemaPreprocessed.value = preprocessOneTime(this._schemaRaw.value);
@@ -117,6 +125,7 @@ export class ManagedJsonSchema {
       this._schemaPreprocessed.value,
       this.mode
     );
+    this._schemaFeatures!.value = detectSchemaFeatures(this._schemaRaw.value);
 
     if (useDataSource().newSchemaWasFetched) {
       // add defaults to user data, but only when new schema was fetched, not after every schema edit
