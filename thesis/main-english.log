@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  10 MAR 2026 16:17
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  10 MAR 2026 18:16
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -390,7 +390,7 @@ LaTeX Info: Redefining \[ on input line 2950.
 LaTeX Info: Redefining \] on input line 2951.
 )
 LaTeX Font Info:    Overwriting math alphabet `\mathcal' in version `normal'
-(Font)                  OMS/cmsy/m/n --> OMS/amsa/m/n on input line 84.
+(Font)                  OMS/cmsy/m/n --> OMS/amsa/m/n on input line 85.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/mathtools/mathtools.sty
 Package: mathtools 2024/10/04 v1.31 mathematical typesetting tools
  (/usr/local/texlive/2026/texmf-dist/tex/latex/tools/calc.sty
@@ -419,7 +419,16 @@ Package: mhsetup 2021/03/18 v1.4 programming setup (MH)
 \l_MT_below_shortintertext_sep=\dimen166
 \xmathstrut@box=\box57
 \xmathstrut@dim=\dimen167
-) (/usr/local/texlive/2026/texmf-dist/tex/latex/fixmath/fixmath.sty
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)) (/usr/local/texlive/2026/texmf-dist/tex/latex/fixmath/fixmath.sty
 Package: fixmath 2022/10/06 v0.9.1 (WaS)
 LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 27.
 LaTeX Font Info:    Redeclaring math symbol \Delta on input line 28.
@@ -733,11 +742,11 @@ Package fontspec Info:
 (fontspec)             <->"[texgyretermes-bolditalic.otf]:mode=base;script=latn;language=dflt;+tlig;+smcp;"
 
 LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/texgyretermes(1)/m/n on input line 140.
+(Font)                  OT1/cmr/m/n --> TU/texgyretermes(1)/m/n on input line 141.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/texgyretermes(1)/m/it on input line 140.
+(Font)                  OT1/cmr/m/it --> TU/texgyretermes(1)/m/it on input line 141.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/texgyretermes(1)/b/n on input line 140.
+(Font)                  OT1/cmr/bx/n --> TU/texgyretermes(1)/b/n on input line 141.
 luaotfload | cache : Lookup cache loaded from /Users/mahdi/Library/texlive/2026/texmf-var/luatex-cache/generic/names/luaotfload-lookup-cache.luc.
 
 Package fontspec Info: 
@@ -826,9 +835,9 @@ Package fontspec Info:
 (fontspec)             Regular:mode=base;script=latn;language=dflt;+smcp;"
 
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/TeXGyreHerosRegular(1)/m/n on input line 145.
+(Font)                  OT1/cmss/m/n --> TU/TeXGyreHerosRegular(1)/m/n on input line 146.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/TeXGyreHerosRegular(1)/b/n on input line 145.
+(Font)                  OT1/cmss/bx/n --> TU/TeXGyreHerosRegular(1)/b/n on input line 146.
 
 Package fontspec Info: 
 (fontspec)             Inconsolatazi4 scale = .9.
@@ -902,9 +911,9 @@ Package fontspec Info:
 (fontspec)             <->s*[.9]"name:Inconsolatazi4/B:mode=base;script=latn;language=dflt;+ss01;+ss03;"
 
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/Inconsolatazi4(1)/m/n on input line 149.
+(Font)                  OT1/cmtt/m/n --> TU/Inconsolatazi4(1)/m/n on input line 150.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/Inconsolatazi4(1)/b/n on input line 149.
+(Font)                  OT1/cmtt/m/n --> TU/Inconsolatazi4(1)/b/n on input line 150.
  (/usr/local/texlive/2026/texmf-dist/tex/lualatex/selnolig/selnolig.sty
 === Package selnolig, Version 0.302, Date 2015/10/26 ===
 Package: selnolig 2015/10/26
@@ -1383,7 +1392,7 @@ Package biblatex Info: ... and expl3
  (/usr/local/texlive/2026/texmf-dist/tex/latex/biblatex/blx-case-expl3.sty
 Package: blx-case-expl3 2025/07/10 v3.21 expl3 case changing code for biblatex
 ))
-Package biblatex Info: Redefining '\citeauthor' on input line 445.
+Package biblatex Info: Redefining '\citeauthor' on input line 446.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 \multirow@colwidth=\skip111
@@ -1589,10 +1598,10 @@ Package: translations 2022/02/05 v1.12 internationalization of LaTeX2e packages 
 Package: varioref 2025/01/14 v1.6g package for extended references (FMi)
 \c@vrcnt=\count506
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 612.
-Package hyperref Info: Option `raiselinks' set `true' on input line 612.
-Package hyperref Info: Option `breaklinks' set `true' on input line 612.
-Package hyperref Info: Option `hypertexnames' set `false' on input line 612.
+Package hyperref Info: Option `colorlinks' set `true' on input line 613.
+Package hyperref Info: Option `raiselinks' set `true' on input line 613.
+Package hyperref Info: Option `breaklinks' set `true' on input line 613.
+Package hyperref Info: Option `hypertexnames' set `false' on input line 613.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/hypcap/hypcap.sty
 Package: hypcap 2024-07-26 v1.13 Adjusting the anchors of captions (HO)
  (/usr/local/texlive/2026/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty
@@ -2043,7 +2052,7 @@ Library (tcolorbox): 'tcbprocessing.code.tex' version '6.9.0'
 )
 \c@tcblisting=\count593
 ))
-\symMnSyC=\mathgroup4
+\symMnSyC=\mathgroup6
  (/usr/local/texlive/2026/texmf-dist/tex/latex/glossaries-extra/glossaries-extra.sty
 Package: glossaries-extra 2025/11/03 v1.9 (NLCT)
  (/usr/local/texlive/2026/texmf-dist/tex/latex/glossaries/base/glossaries.sty
@@ -2194,7 +2203,7 @@ Package: glossaries-extra-stylemods 2025/11/03 v1.9 (NLCT)
 \glo@abbreviations@file=\write7
 
 \openout7 = main-english.glo-abr
-Package glossaries Info: Writing glossary file main-english.glo-abr on input line 701.
+Package glossaries Info: Writing glossary file main-english.glo-abr on input line 702.
  (/usr/local/texlive/2026/texmf-dist/tex/generic/hyphenex/ushyphex.tex) (./commands.tex) (/usr/local/texlive/2026/texmf-dist/tex/latex/scientific-thesis-cover/scientific-thesis-cover.sty
 Package: scientific-thesis-cover 2018/06/03 Cover and affirmation for scientific works.
 
@@ -2233,7 +2242,7 @@ Class scrbook Info: loading recommended package `bookmark'.
 (scrbook)           `bookmarkpackage=false' before \begin{document} and
 (scrbook)           you can avoid this message adding:
 (scrbook)             \usepackage{bookmark}
-(scrbook)           before \begin{document} on input line 874.
+(scrbook)           before \begin{document} on input line 875.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
  (/usr/local/texlive/2026/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
@@ -2245,36 +2254,36 @@ Package babel Info: 'english' activates 'ngerman' shorthands.
 )
 \openout1 = main-english.aux
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 874.
-LaTeX Font Info:    ... okay on input line 874.
-Package scrbase Info: activating english \partname on input line 874.
-Package scrbase Info: activating english \chaptername on input line 874.
-Package scrbase Info: activating english \appendixname on input line 874.
-Package scrbase Info: activating english \figurename on input line 874.
-Package scrbase Info: activating english \tablename on input line 874.
-Package scrbase Info: activating english \contentsname on input line 874.
-Package scrbase Info: activating english \listfigurename on input line 874.
-Package scrbase Info: activating english \listtablename on input line 874.
-Package scrbase Info: activating english \bibname on input line 874.
-Package scrbase Info: activating english \indexname on input line 874.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 875.
+LaTeX Font Info:    ... okay on input line 875.
+Package scrbase Info: activating english \partname on input line 875.
+Package scrbase Info: activating english \chaptername on input line 875.
+Package scrbase Info: activating english \appendixname on input line 875.
+Package scrbase Info: activating english \figurename on input line 875.
+Package scrbase Info: activating english \tablename on input line 875.
+Package scrbase Info: activating english \contentsname on input line 875.
+Package scrbase Info: activating english \listfigurename on input line 875.
+Package scrbase Info: activating english \listtablename on input line 875.
+Package scrbase Info: activating english \bibname on input line 875.
+Package scrbase Info: activating english \indexname on input line 875.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(0)' created for font
@@ -2304,13 +2313,13 @@ Package fontspec Info:
 (fontspec)             <->"[latinmodern-math.otf]:mode=base;script=math;language=dflt;mathfontdimen=xetex;"
 
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 874.
+(Font)              `operators' in the math version `normal' on input line 875.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/latinmodern-math.otf(1)/m/n on input line 874.
+(Font)                  OT1/cmr/m/n --> TU/latinmodern-math.otf(1)/m/n on input line 875.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 874.
+(Font)              `operators' in the math version `bold' on input line 875.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> TU/latinmodern-math.otf(1)/b/n on input line 874.
+(Font)                  OT1/cmr/bx/n --> TU/latinmodern-math.otf(1)/b/n on input line 875.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(2)' created for font
@@ -2326,13 +2335,13 @@ Package fontspec Info:
 (fontspec)             <->"[latinmodern-math.otf]:mode=base;script=math;language=dflt;mathfontdimen=xetex;mathfontdimen=tex2;"
 
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
-(Font)              `symbols' in the math version `normal' on input line 874.
+(Font)              `symbols' in the math version `normal' on input line 875.
 LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
-(Font)                  OMS/cmsy/m/n --> TU/latinmodern-math.otf(2)/m/n on input line 874.
+(Font)                  OMS/cmsy/m/n --> TU/latinmodern-math.otf(2)/m/n on input line 875.
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
-(Font)              `symbols' in the math version `bold' on input line 874.
+(Font)              `symbols' in the math version `bold' on input line 875.
 LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
-(Font)                  OMS/cmsy/b/n --> TU/latinmodern-math.otf(2)/b/n on input line 874.
+(Font)                  OMS/cmsy/b/n --> TU/latinmodern-math.otf(2)/b/n on input line 875.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(3)' created for font
@@ -2348,14 +2357,21 @@ Package fontspec Info:
 (fontspec)             <->"[latinmodern-math.otf]:mode=base;script=math;language=dflt;mathfontdimen=xetex;mathfontdimen=tex3;"
 
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
-(Font)              `largesymbols' in the math version `normal' on input line 874.
+(Font)              `largesymbols' in the math version `normal' on input line 875.
 LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
-(Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/m/n on input line 874.
+(Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/m/n on input line 875.
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
-(Font)              `largesymbols' in the math version `bold' on input line 874.
+(Font)              `largesymbols' in the math version `bold' on input line 875.
 LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
-(Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/b/n on input line 874.
-
+(Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/b/n on input line 875.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 875.
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 875.
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
 
 Package unicode-math Warning: Using \overbracket and \underbracket from
 (unicode-math)                `mathtools' package.
@@ -2377,13 +2393,13 @@ Package unicode-math Warning: I'm going to overwrite the following commands
 Package microtype Info: Patching varwidth to enable character protrusion.
 \MT@vwid@leftmargin=\dimen382
 \MT@vwid@rightmargin=\dimen383
-LaTeX Info: Redefining \microtypecontext on input line 874.
-Package microtype Info: Applying patch `item' on input line 874.
-Package microtype Info: Applying patch `toc' on input line 874.
-Package microtype Info: Applying patch `eqnum' on input line 874.
-Package microtype Info: Applying patch `footnote' on input line 874.
-Package microtype Info: Applying patch `verbatim' on input line 874.
-LaTeX Info: Redefining \microtypesetup on input line 874.
+LaTeX Info: Redefining \microtypecontext on input line 875.
+Package microtype Info: Applying patch `item' on input line 875.
+Package microtype Info: Applying patch `toc' on input line 875.
+Package microtype Info: Applying patch `eqnum' on input line 875.
+Package microtype Info: Applying patch `footnote' on input line 875.
+Package microtype Info: Applying patch `verbatim' on input line 875.
+LaTeX Info: Redefining \microtypesetup on input line 875.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `alltext-nott'.
@@ -2419,7 +2435,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
 \c@lstlisting=\count641
-Package tocbasic Info: setting babel extension for `lol' on input line 874.
+Package tocbasic Info: setting babel extension for `lol' on input line 875.
 \scr@dte@lstlisting@maxnumwidth=\skip169
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
@@ -2449,9 +2465,9 @@ Package biblatex Info: Automatic encoding selection.
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'main-english.bbl' found.
  (./main-english.bbl)
-Package biblatex Info: Reference section=0 on input line 874.
-Package biblatex Info: Reference segment=0 on input line 874.
-Package soulpos Info: Loading soulutf8 on input line 874.
+Package biblatex Info: Reference section=0 on input line 875.
+Package biblatex Info: Reference segment=0 on input line 875.
+Package soulpos Info: Loading soulutf8 on input line 875.
  (/usr/local/texlive/2026/texmf-dist/tex/generic/soul/soulutf8.sty
 Package: soulutf8 2023-06-14 v3.1 Permit use of UTF-8 characters in soul (HO)
 
@@ -2485,36 +2501,36 @@ Package: soul-ori 2023-06-14 v3.1 letterspacing/underlining (mf)
 \SOUL@uldp=\dimen393
 \SOUL@ulht=\dimen394
 ))
-Package hyperref Info: Link coloring ON on input line 874.
+Package hyperref Info: Link coloring ON on input line 875.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/translations/translations-basic-dictionary-english.trsl
 File: translations-basic-dictionary-english.trsl (english translation file `translations-basic-dictionary')
 )
-Package translations Info: loading dictionary `translations-basic-dictionary' for `english'. on input line 874.
+Package translations Info: loading dictionary `translations-basic-dictionary' for `english'. on input line 875.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/translations/translations-basic-dictionary-german.trsl
 File: translations-basic-dictionary-german.trsl (german translation file `translations-basic-dictionary')
 )
-Package translations Info: loading dictionary `translations-basic-dictionary' for `german'. on input line 874.
+Package translations Info: loading dictionary `translations-basic-dictionary' for `german'. on input line 875.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
 Package caption Info: End \AtBeginDocument code.
 \g__cctab_next_cctab=\catcodetable19
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 9.85492pt on input line 877.
+(Font)              scaled to size 9.85492pt on input line 878.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `TeXGyreHerosRegular' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 10.79993pt on input line 877.
+(Font)              scaled to size 10.79993pt on input line 878.
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 15.55188pt on input line 877.
+(Font)              scaled to size 15.55188pt on input line 878.
 
 
 LaTeX Font Warning: Font shape `TU/TeXGyreHerosRegular(0)/b/n' undefined
-(Font)              using `TU/TeXGyreHerosRegular(0)/m/n' instead on input line 877.
+(Font)              using `TU/TeXGyreHerosRegular(0)/m/n' instead on input line 878.
 
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 9.85492pt on input line 877.
+(Font)              scaled to size 9.85492pt on input line 878.
 [1
 
 
@@ -2529,6 +2545,11 @@ LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
 ] (./chapters/00_abstract.tex
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
 (Font)              scaled to size 12.9599pt on input line 1.
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-msa.cfg
+File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-msb.cfg
+File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+)
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/10.95'
 (microtype)             (new value: 10.95pt) on input line 19.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/7.665'
@@ -2537,22 +2558,21 @@ Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5.475
 (microtype)             (new value: 5.475pt) on input line 19.
  [3]) [4]
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 18.66588pt on input line 896.
-Package tocbasic Info: character protrusion at toc deactivated on input line 896.
+(Font)              scaled to size 18.66588pt on input line 897.
+Package tocbasic Info: character protrusion at toc deactivated on input line 897.
  (./main-english.toc
 Package cleveref Info: loaded `english' language definitions on input line 1.
- [5
-
-
-]
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 10.79993pt on input line 35.
+(Font)              scaled to size 10.79993pt on input line 33.
 )
 \tf@toc=\write8
 
 \openout8 = main-english.toc
- [6]
-Package tocbasic Info: character protrusion at lof deactivated on input line 898.
+ [5
+
+
+] [6]
+Package tocbasic Info: character protrusion at lof deactivated on input line 899.
  (./main-english.lof
 Package cleveref Info: loaded `english' language definitions on input line 1.
 )
@@ -2566,7 +2586,7 @@ Package cleveref Info: loaded `english' language definitions on input line 1.
 
 
 ]
-Package tocbasic Info: character protrusion at lot deactivated on input line 900.
+Package tocbasic Info: character protrusion at lot deactivated on input line 901.
  (./main-english.lot
 Package cleveref Info: loaded `english' language definitions on input line 1.
 )
@@ -2623,79 +2643,15 @@ Package cleveref Info: loaded `english' language definitions on input line 381.
  [22]
 Package cleveref Info: loaded `english' language definitions on input line 405.
  [23]
-Package cleveref Info: loaded `english' language definitions on input line 426.
- [24]
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-Package cleveref Info: loaded `english' language definitions on input line 490.
-[25]) (./chapters/02_design_and_implementation.tex
+Package cleveref Info: loaded `english' language definitions on input line 458.
+[24]
+Package cleveref Info: loaded `english' language definitions on input line 463.
+ [25]) (./chapters/02_design_and_implementation.tex
 Package cleveref Info: loaded `english' language definitions on input line 2.
- [26
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
-]
+ [26]
 chapter 2.
 ) (./chapters/03_application.tex [27
 
@@ -2715,15 +2671,13 @@ chapter 4.
 
 ]
 chapter without number
-[33]
-Package cleveref Info: loaded `english' language definitions on input line 948.
- [34] (./chapters/05_appendix.tex
+[33] (./chapters/05_appendix.tex [34
+
+
+
+]
 chapter A.
-) [35
-
-
-
-] [36
+) [35] [36
 
 
 ] [37]
@@ -2753,19 +2707,19 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 78823 strings out of 476076
+ 78803 strings out of 476076
  156269,3417909 words of node,token memory allocated
- 1008 words of node memory still in use:
-   8 hlist, 2 vlist, 2 rule, 1 local_par, 6 glue, 5 kern, 1 penalty, 4 glyph, 43 attribute, 108 glue_spec, 22 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 3 pdf_action nodes
-   avail lists: 1:5,2:4309,3:714,4:2184,5:2562,6:175,7:6646,8:65,9:5612,10:16,11:647,12:1
- 93530 multiletter control sequences out of 65536+600000
- 102 fonts using 24981487 bytes
- 108i,21n,115p,11294b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf>
-Output written on main-english.pdf (37 pages, 117423 bytes).
+ 1169 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 18 glue, 6 kern, 1 penalty, 4 glyph, 67 attribute, 108 glue_spec, 34 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 3 pdf_action nodes
+   avail lists: 1:5,2:4270,3:744,4:2147,5:2560,6:173,7:6634,8:64,9:5612,10:16,11:647,12:1
+ 93875 multiletter control sequences out of 65536+600000
+ 114 fonts using 25723311 bytes
+ 108i,21n,115p,11294b,2686s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/zapfding/uzdr.pfb>
+Output written on main-english.pdf (37 pages, 115827 bytes).
 
-PDF statistics: 682 PDF objects out of 1000 (max. 8388607)
- 621 compressed objects within 7 object streams
- 291 named destinations out of 1000 (max. 1048576)
- 296 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 696 PDF objects out of 1000 (max. 8388607)
+ 634 compressed objects within 7 object streams
+ 297 named destinations out of 1000 (max. 1048576)
+ 280 words of extra memory for PDF output out of 10000 (max. 100000000)
 

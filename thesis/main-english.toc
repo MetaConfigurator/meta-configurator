@@ -15,24 +15,22 @@
 \contentsline {subsection}{\numberline {1.3.2}AI-Assisted Schema Engineering and Mapping}{21}{subsection.207}%
 \contentsline {subsection}{\numberline {1.3.3}Limitations for Semantic Web Integration}{21}{subsection.208}%
 \contentsline {section}{\numberline {1.4}Related Work}{23}{section.220}%
-\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering Environments}{23}{subsection.221}%
-\contentsline {subsection}{\numberline {1.4.2}Semantic Metadata Authoring Platforms}{24}{subsection.222}%
-\contentsline {subsection}{\numberline {1.4.3}Data-to-RDF Mapping Frameworks}{24}{subsection.223}%
-\contentsline {subsection}{\numberline {1.4.4}RDF Storage and Query Platforms}{25}{subsection.224}%
-\contentsline {subsection}{\numberline {1.4.5}Semantic Data Experimentation Tools}{25}{subsection.225}%
-\contentsline {subsection}{\numberline {1.4.6}Comparison of Existing Tools}{25}{subsection.226}%
-\contentsline {subsection}{\numberline {1.4.7}Limitations of Existing Approaches}{25}{subsection.229}%
-\contentsline {chapter}{\numberline {2}Design and Implementation}{27}{chapter.230}%
-\contentsline {section}{\numberline {2.1}RDF Panel}{27}{section.231}%
-\contentsline {section}{\numberline {2.2}RML Mapping Tool}{27}{section.232}%
-\contentsline {section}{\numberline {2.3}Query with SPARQL}{27}{section.233}%
-\contentsline {section}{\numberline {2.4}Visualization}{27}{section.234}%
-\contentsline {chapter}{\numberline {3}Application}{29}{chapter.235}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{29}{section.236}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{31}{chapter.237}%
-\contentsline {chapter}{\nonumberline Bibliography}{33}{chapter*.238}%
+\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and Semantic Frameworks}{23}{subsection.221}%
+\contentsline {subsection}{\numberline {1.4.2}Data Transformation and RDF Validation}{24}{subsection.228}%
+\contentsline {subsection}{\numberline {1.4.3}Experimentation and Visualization Tools}{24}{subsection.231}%
+\contentsline {subsection}{\numberline {1.4.4}Comparison of Existing Tools}{24}{subsection.235}%
+\contentsline {subsection}{\numberline {1.4.5}Limitations of Existing Approaches}{25}{subsection.238}%
+\contentsline {chapter}{\numberline {2}Design and Implementation}{27}{chapter.239}%
+\contentsline {section}{\numberline {2.1}RDF Panel}{27}{section.240}%
+\contentsline {section}{\numberline {2.2}RML Mapping Tool}{27}{section.241}%
+\contentsline {section}{\numberline {2.3}Query with SPARQL}{27}{section.242}%
+\contentsline {section}{\numberline {2.4}Visualization}{27}{section.243}%
+\contentsline {chapter}{\numberline {3}Application}{29}{chapter.244}%
+\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{29}{section.245}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{31}{chapter.246}%
+\contentsline {chapter}{\nonumberline Bibliography}{33}{chapter*.247}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{35}{chapter*.238}%
-\contentsline {chapter}{\numberline {A}Appendix}{35}{appendix.239}%
-\contentsline {section}{\numberline {A.1}RML Mapping}{35}{section.240}%
+\contentsline {part}{Appendix}{34}{chapter*.247}%
+\contentsline {chapter}{\numberline {A}Appendix}{35}{appendix.248}%
+\contentsline {section}{\numberline {A.1}RML Mapping}{35}{section.249}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
