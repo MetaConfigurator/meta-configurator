@@ -90,7 +90,7 @@ Ontologies serve as the backbone for semantic data integration and reasoning. Th
 
 The Semantic Web extends the World Wide Web by enabling data to be represented in a machine-readable, semantically rich form. Data is described using standards such as RDF (Resource Description Framework), which encodes information as triples consisting of subject, predicate, and object. This allows heterogeneous data to be interlinked and queried using semantic technologies \cite{berners2001semantic}.
 
-JSON-LD is one of the key technologies bridging conventional JSON data and the Semantic Web. By adding semantic annotations, JSON-LD enables JSON documents to be interpreted as RDF graphs. For instance, in the example simulation data (Listing \ref{lst:background_jsonld_example}), the simulation parameter `element-size` is represented as a `schema:PropertyValue` with a QUDT unit:
+JSON-LD is one of the key technologies bridging conventional JSON data and the Semantic Web. By adding semantic annotations, JSON-LD enables JSON documents to be interpreted as RDF graphs. For instance, in the example simulation data (Listing \ref{lst:background_jsonld_example}), the simulation parameter \texttt{element-size} is represented as a `schema:PropertyValue` with a QUDT unit:
 
 \begin{lstlisting}[language=json, caption={Example of semantic annotation of a parameter with QUDT unit}, label={lst:background_qudt_example}]
 {
@@ -104,7 +104,7 @@ JSON-LD is one of the key technologies bridging conventional JSON data and the S
 }
 \end{lstlisting}
 
-Here, the unit is linked to the QUDT ontology (`http://qudt.org/vocab/unit/`) using its prefxied URI `unit:M`. This allows applications and knowledge graph systems to unambiguously interpret the measurement unit and integrate it with other semantically annotated datasets. Similarly, experiment methods and metrics are linked to well-defined ontology classes such as `m4i:Method` and `schema:PropertyValue`.
+Here, the unit is linked to the QUDT Unit ontology\footnote{\url{http://qudt.org/vocab/unit/}} using its prefixed URI \texttt{unit:M}. This allows applications and knowledge graph systems to unambiguously interpret the measurement unit and integrate it with other semantically annotated datasets. Similarly, experiment methods and metrics are linked to well-defined ontology classes such as \texttt{m4i:Method} and \texttt{schema:PropertyValue}.
 
 Semantic Web technologies thus provide a framework for:
 
@@ -114,19 +114,20 @@ Semantic Web technologies thus provide a framework for:
     \item Querying and integrating datasets through standard languages like SPARQL.
 \end{itemize}
 
-By grounding JSON data in ontologies and RDF through JSON-LD, this example from a simulation result become part of the Semantic Web, enabling more advanced analysis, automated reasoning, and integration with other scientific knowledge graphs.
+By grounding JSON data in ontologies and RDF through JSON-LD, this simulation result becomes part of the Semantic Web, enabling more advanced analysis, automated reasoning, and integration with other scientific knowledge graphs.
 
 \subsection{SHACL: Shapes Constraint Language}
 \label{sec:background:shacl}
 
 The Shapes Constraint Language (SHACL) is a W3C standard for validating RDF graphs against a set of structural and semantic constraints \cite{shacl_standard}. SHACL allows ontology-based validation of RDF data by defining "shapes" that describe the expected properties, data types, and cardinality of RDF nodes.
 
-For example, consider the simulation parameter `element-size` in the JSON-LD example (Listing \ref{lst:background_jsonld_example}). Using SHACL, we can define a shape that enforces that every `schema:PropertyValue` representing an experiment parameter must have a numeric `schema:value` and a `schema:unitCode` pointing to a valid unit from the QUDT ontology:
+For example, consider the simulation parameter \texttt{element-size} in the JSON-LD example (Listing \ref{lst:background_jsonld_example}). Using SHACL, we can define a shape that enforces that every \texttt{schema:PropertyValue} representing an experiment parameter must have a numeric \texttt{schema:value} and a \texttt{schema:unitCode} pointing to a valid unit from the QUDT ontology:
 
 \begin{lstlisting}[language=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix schema: <https://schema.org/> .
 @prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 ex:ParameterShape
     a sh:NodeShape ;
@@ -165,16 +166,23 @@ WHERE {
 }
 \end{lstlisting}
 
-This query returns the `element-size` parameter with its numeric value and QUDT unit (`unit:M`), demonstrating how semantic annotations enable precise data access. SPARQL supports more complex operations such as joins, filters, and reasoning over ontologies, making it a key tool for exploring and analyzing semantically enriched simulation data.
+This query returns the \texttt{element-size} parameter with its numeric value and QUDT unit (\texttt{unit:M}), demonstrating how semantic annotations enable precise data access. SPARQL supports more complex operations such as joins, filters, and reasoning over ontologies, making it a key tool for exploring and analyzing semantically enriched simulation data.
 
 \subsection{Semantic Data Representation using JSON-LD}
 \label{sec:background:jsonld}
 
-JSON-LD (JavaScript Object Notation for Linked Data) extends JSON by introducing semantic annotations that allow data to be interpreted as linked data within the Resource Description Framework (RDF). JSON-LD integrates JSON with established semantic web standards by providing mechanisms for defining contexts, identifiers, and relationships between entities \cite{jsonld2014}.
+JSON-LD (JavaScript Object Notation for Linked Data) extends JSON by introducing semantic annotations that allow data to be interpreted as linked data within the Resource Description Framework (RDF) \cite{jsonld2014}. JSON-LD integrates JSON with established Semantic Web standards by providing mechanisms for defining contexts, identifiers, and relationships between entities.
 
-In the context of scientific experiments, JSON-LD allows simulation parameters and results to be linked to well-defined ontologies and vocabularies. For instance, parameters can be modeled using \texttt{schema:PropertyValue}, while experiment procedures can be represented using domain ontologies such as metadata4ing \footnote{\url{https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/}}.
+A typical JSON-LD document has two key structural components:
 
-Listing \ref{lst:background_jsonld_example} shows a JSON-LD representation corresponding to the example simulation result.
+\begin{itemize}
+    \item \textbf{@context:} This section defines the mapping between JSON keys and ontology IRIs or vocabularies. It provides semantic meaning to each field and enables JSON documents to be interpreted as RDF triples.
+    \item \textbf{@graph:} This array contains the actual data entities, each represented as a node with an \texttt{@id}, a \texttt{@type}, and associated properties. Relationships between entities are expressed using references to other \texttt{@id} values, forming a connected graph structure.
+\end{itemize}
+
+In scientific experiments, JSON-LD allows simulation parameters and results to be linked to well-defined ontologies. For example, parameters can be modeled using \texttt{schema:PropertyValue}, while experiment procedures can be represented using domain ontologies such as metadata4ing ontology \footnote{\url{https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/}}.
+
+Listing \ref{lst:background_jsonld_example} shows a JSON-LD representation corresponding to the example simulation result. The \texttt{@context} defines prefixes such as \texttt{schema} and \texttt{unit}, while the \texttt{@graph} contains nodes representing the simulation run, the element-size parameter, and the stress metric.
 
 \begin{lstlisting}[language=json, caption={JSON-LD representation of the simulation result}, label={lst:background_jsonld_example}]
 {
@@ -209,16 +217,41 @@ Listing \ref{lst:background_jsonld_example} shows a JSON-LD representation corre
 }
 \end{lstlisting}
 
-This representation enriches the raw simulation output with semantic context, enabling interoperability with knowledge graphs and semantic data infrastructures.
+This structure allows each entity to be unambiguously identified, linked, and queried using RDF-aware tools. By separating semantic definitions (\texttt{@context}) from the data graph (\texttt{@graph}), JSON-LD documents support both human readability and machine interoperability, enabling integration with knowledge graphs and other Semantic Web infrastructures.
+
 
 \subsection{RML for Mapping JSON to RDF}
 \label{sec:background:rml}
 
-The RDF Mapping Language (RML) is a declarative mapping language used to transform heterogeneous data sources into RDF representations. RML extends the W3C-standardized R2RML language and enables mappings from various data formats, including JSON, XML, CSV, and relational databases, into RDF datasets \cite{dimou2014rml}. 
+The RDF Mapping Language (RML) is a declarative language for transforming heterogeneous data sources into RDF representations. RML extends the W3C-standardized R2RML language and supports mappings from JSON, XML, CSV, and relational databases into RDF datasets \cite{dimou2014rml}.
 
-RML mappings are themselves expressed as RDF graphs and specify how elements from a data source should be transformed into RDF triples. The mapping process defines logical sources, subject maps, and predicate-object maps that together generate RDF statements.
+Formally, an RDF triple is a 3-tuple:
+\[
+(s, p, o) \in (U \cup B) \times U \times (U \cup B \cup L)
+\]
+where:
+\begin{itemize}
+    \item \(U\) is the set of all Internationalized Resource Identifiers (IRIs),
+    \item \(B\) is the set of blank nodes (anonymous resources),
+    \item \(L\) is the set of RDF literals (e.g., strings, numbers, dates),
+    \item \(s \in U \cup B\) is the subject,
+    \item \(p \in U\) is the predicate (also called property),
+    \item \(o \in U \cup B \cup L\) is the object.
+\end{itemize}
+An RDF graph \(G\) is then defined as a finite set of such triples:
+\[
+G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in U, \; o_i \in U \cup B \cup L
+\]
 
-Listing \ref{lst:background_rml_mapping} shows an example RML mapping that transforms the JSON document in Listing \ref{lst:background_json_example} into the JSON-LD structure presented in Listing \ref{lst:background_jsonld_example}.
+RML mappings are themselves RDF graphs specifying how elements from a source data structure are transformed into RDF triples. Each mapping defines:
+
+\begin{itemize}
+    \item \textbf{Logical source:} the data source and reference formulation (e.g., JSONPath, XPath, SQL query),
+    \item \textbf{Subject map:} rules to generate the \emph{subject} of triples,
+    \item \textbf{Predicate-object maps:} rules to generate the \emph{predicate} and \emph{object} for triples.
+\end{itemize}
+
+Listing \ref{lst:background_rml_mapping} shows an example RML mapping that converts the JSON simulation output from Listing \ref{lst:background_json_example} into the JSON-LD structure presented in Listing \ref{lst:background_jsonld_example}.
 
 \begin{lstlisting}[language=turtle, caption={RML mapping from JSON simulation output to RDF/JSON-LD}, label={lst:background_rml_mapping}]
 @prefix rml: <http://semweb.mmlab.be/ns/rml#>.
@@ -241,15 +274,11 @@ Listing \ref{lst:background_rml_mapping} shows an example RML mapping that trans
     ];
     rr:predicateObjectMap [
         rr:predicate m4i:hasParameter ;
-        rr:objectMap [
-            rr:constant local:variable_element_size
-        ]
+        rr:objectMap [ rr:constant local:variable_element_size ]
     ];
     rr:predicateObjectMap [
         rr:predicate m4i:investigates ;
-        rr:objectMap [
-            rr:constant local:variable_max_von_mises_stress
-        ]
+        rr:objectMap [ rr:constant local:variable_max_von_mises_stress ]
     ].
 
 <#ElementSizeMapping>
@@ -264,15 +293,11 @@ Listing \ref{lst:background_rml_mapping} shows an example RML mapping that trans
     ];
     rr:predicateObjectMap [
         rr:predicate schema:value ;
-        rr:objectMap [
-            rml:reference "value"
-        ]
+        rr:objectMap [ rml:reference "value" ]
     ];
     rr:predicateObjectMap [
         rr:predicate schema:unitCode ;
-        rr:objectMap [
-            rr:constant unit:M
-        ]
+        rr:objectMap [ rr:constant unit:M ]
     ].
 
 <#StressMetricMapping>
@@ -287,14 +312,11 @@ Listing \ref{lst:background_rml_mapping} shows an example RML mapping that trans
     ];
     rr:predicateObjectMap [
         rr:predicate schema:value ;
-        rr:objectMap [
-            rml:reference "max_von_mises_stress_nodes"
-        ]
+        rr:objectMap [ rml:reference "max_von_mises_stress_nodes" ]
     ].
 \end{lstlisting}
 
-Through this mapping process, structured simulation outputs can be automatically converted into semantically enriched knowledge graph representations, enabling integration with semantic data infrastructures and facilitating interoperability across scientific systems.
-
+Through this mapping process, structured simulation outputs are automatically converted into RDF triples forming a semantically enriched knowledge graph. 
 
 \section{MetaConfigurator for Schema-Driven Data Modeling}
 \label{sec:background:metaconfigurator}
@@ -357,7 +379,7 @@ Several limitations arise from this restriction:
     MetaConfigurator does not provide mechanisms for inspecting or manipulating RDF triples derived from the underlying JSON data. As a result, users cannot directly view the semantic graph structure implied by JSON-LD documents.
 
     \item \textbf{Missing transformation from JSON to RDF:}  
-    The platform lacks built-in mechanisms for transforming conventional JSON documents into semantic representations. As discussed in Section~\ref{sec:background:rml}, technologies such as the RDF Mapping Language (RML) enable declarative transformations from JSON to RDF, but such transformations are not currently integrated into MetaConfigurator's workflow.
+    The platform lacks built-in mechanisms for transforming conventional JSON documents into semantic representations. As discussed in Section~\ref{sec:background:rml}, technologies such as the RML enable declarative transformations from JSON to RDF, but such transformations are not currently integrated into MetaConfigurator's workflow.
 
     \item \textbf{Lack of semantic querying capabilities:}  
     MetaConfigurator does not support semantic querying of RDF data. As described in Section~\ref{sec:background:sparql}, SPARQL provides a standard mechanism for querying RDF graphs and retrieving structured information from knowledge graphs.
@@ -394,31 +416,31 @@ By integrating these capabilities into MetaConfigurator, the platform evolves fr
 \section{Related Work}
 \label{sec:background:related_work}
 
-A variety of tools and frameworks support Semantic Web technologies and the creation, validation, and querying of RDF data. Most focus on specific parts of the semantic workflow—ontology engineering, data modeling, RDF transformation, or querying—rather than providing a unified, schema‑driven configuration and RDF authoring environment. Importantly, current tools generally do not include AI assistance for tasks such as automatic SPARQL query suggestions or RML mapping generation, which could simplify RDF data generation and knowledge graph construction for non-expert users.
+Existing work on Semantic Web tooling can be grouped into four areas: ontology engineering platforms, data-to-RDF transformation tools, schema/metadata modeling environments, and RDF query/processing libraries. Across these areas, strong support exists for individual tasks, but end-to-end workflows that combine schema-driven JSON editing, RDF authoring, mapping, querying, and AI-assisted guidance in one environment remain limited.
 
-\subsection{Ontology Engineering and Semantic Frameworks}
+\subsection{Ontology Engineering and Knowledge Graph Tooling}
 
-Protégé provides a graphical environment for creating and editing OWL ontologies and performing reasoning tasks\footnote{\url{https://protege.stanford.edu}}. Its web-based counterpart, WebProtégé, offers collaborative ontology editing with revision tracking and support for multiple RDF serialization formats\footnote{\url{https://webprotege.stanford.edu}}.
+Protégé and WebProtégé are widely used for ontology engineering and collaborative ontology curation \cite{protege,webprotege}. They provide robust support for class/property modeling and ontology lifecycle management, but they are not primarily designed as schema-driven editors for end-user JSON instance data.
 
-Apache Jena is an open-source framework for RDF and OWL processing, SPARQL querying, and reasoning\footnote{\url{https://jena.apache.org/}}.
+Apache Jena provides a mature programmatic stack for RDF processing, reasoning, and SPARQL querying \cite{apache_jena}. GraphDB focuses on RDF storage and query execution in production-oriented knowledge graph settings \cite{graphdb}. These systems are strong back-end components, but typically require separate front-end layers for guided data entry and authoring workflows.
 
-LinkML (Linked Data Modeling Language) allows schema definitions in a human-friendly syntax (e.g., YAML) and automatic generation of JSON-LD and OWL representations\footnote{\url{https://linkedmodel.org/}}.
+\subsection{Schema and Metadata Modeling Approaches}
 
-SemTK (Semantic Toolkit) simplifies knowledge graph creation and SPARQL query generation via user-friendly interfaces\footnote{\url{https://semtk.org/}}.
+LinkML supports schema-first modeling and can generate artifacts such as JSON-LD and OWL from a single model \cite{linkml}. The CEDAR Workbench supports ontology-assisted metadata authoring for scientific experiments \cite{cedar_workbench}. Both approaches improve semantic consistency at model level, but they do not directly address an integrated workflow where users iteratively transform arbitrary JSON instance data into RDF using declarative mappings and in-tool graph exploration.
 
-Widoco generates human-readable documentation from RDF vocabularies and ontologies\footnote{\url{https://github.com/dgarijo/Widoco}}.
+\subsection{Data-to-RDF Transformation and Authoring}
 
-\subsection{Data Transformation and RDF Validation}
+Karma, OpenRefine (with RDF extensions), and SPARQL-Generate support transformation from heterogeneous sources to RDF \cite{karma,openrefine,sparql_generate}. They are effective for ETL-style conversion tasks, but generally emphasize transformation pipelines over schema-driven configuration editing inside a single application.
 
-OpenRefine, with RDF extensions, enables conversion of tabular or semi-structured data to RDF\footnote{\url{https://openrefine.org/}}. SPARQL-Generate allows template-based RDF generation from arbitrary sources\footnote{\url{https://github.com/SPARQL-Generate}}.
+TopBraid and SemTK provide broader semantic engineering capabilities, including modeling and query support \cite{topbraid,semtk}. However, they are not centered on JSON Schema-based configuration editing as the primary user interaction pattern.
 
-\subsection{Experimentation and Visualization Tools}
+\subsection{Querying, Validation, and Lightweight Experimentation}
 
-The JSON-LD Playground allows interactive testing of JSON-LD contexts and visualization of RDF triples\footnote{\url{https://json-ld.org/playground/}}. RDFLib and Redland offer programmatic RDF manipulation in Python and C\footnote{\url{https://rdflib.dev/}},\footnote{\url{http://librdf.org/}}.
+RDF validation and querying standards such as SHACL and SPARQL are well established \cite{shacl_standard,sparql_standard}. For lightweight experimentation, JSON-LD Playground provides quick inspection of contexts and RDF output \cite{jsonld_playground}. RDFLib and Redland provide low-level programmatic RDF processing \cite{rdflib,redland}. These tools are important ecosystem building blocks but are not, by themselves, unified authoring environments for non-expert users.
 
-\subsection{Comparison of Existing Tools}
+\subsection{Comparison of Representative Tools}
 
-Table~\ref{tab:related_tools_comparison} summarizes representative tools with respect to RDF authoring, ontology integration, data transformation, schema-driven configuration support, RDF storage/querying, visualization, and AI assistance.
+Table~\ref{tab:related_tools_comparison} compares representative tools across capabilities relevant to this thesis: RDF authoring, ontology integration, data-to-RDF mapping, schema-driven configuration, RDF storage/query, visualization, and AI assistance.
 
 \begin{table}[h!]
 \centering
@@ -433,31 +455,34 @@ Table~\ref{tab:related_tools_comparison} summarizes representative tools with re
 & \rotatebox{90}{Data-to-RDF Mapping} 
 & \rotatebox{90}{Schema-Driven Config.} 
 & \rotatebox{90}{RDF Storage / Query} 
-& \rotatebox{90}{Visualization}  \\
+& \rotatebox{90}{Visualization}
+& \rotatebox{90}{AI Assistance} \\
 \hline
-Protégé & \dingcheck & \dingcheck & -- & -- & -- & \dingcheck \\
-WebProtégé & \dingcheck & \dingcheck & -- & -- & -- & Limited \\
-Apache Jena & \dingcheck & \dingcheck & Limited & -- & \dingcheck & Limited \\
-LinkML & Limited & \dingcheck & Partial & Partial & -- & -- \\
-SemTK & \dingcheck & \dingcheck & Partial & -- & \dingcheck & \dingcheck \\
-OpenRefine (RDF) & Limited & -- & \dingcheck & -- & -- & Limited \\
-SPARQL-Generate & -- & Limited & \dingcheck & -- & -- & -- \\
-JSON-LD Playground & Limited & -- & Limited & -- & -- & Limited \\
-RDFLib & \dingcheck & \dingcheck & -- & -- & Partial & -- \\
-Redland RDF & \dingcheck & \dingcheck & -- & -- & Partial & -- \\
-Widoco & -- & \dingcheck & -- & -- & -- & Limited \\
+Protégé & \dingcheck & \dingcheck & -- & -- & -- & \dingcheck & -- \\
+WebProtégé & \dingcheck & \dingcheck & -- & -- & -- & Limited & -- \\
+Apache Jena & \dingcheck & \dingcheck & Limited & -- & \dingcheck & Limited & -- \\
+LinkML & Limited & \dingcheck & Partial & Partial & -- & -- & -- \\
+SemTK & \dingcheck & \dingcheck & Partial & -- & \dingcheck & \dingcheck & -- \\
+OpenRefine (RDF) & Limited & -- & \dingcheck & -- & -- & Limited & -- \\
+SPARQL-Generate & -- & Limited & \dingcheck & -- & -- & -- & -- \\
+JSON-LD Playground & Limited & -- & Limited & -- & -- & Limited & -- \\
+RDFLib & \dingcheck & \dingcheck & -- & -- & Partial & -- & -- \\
+Redland RDF & \dingcheck & \dingcheck & -- & -- & Partial & -- & -- \\
+Widoco & -- & \dingcheck & -- & -- & -- & Limited & -- \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Limitations of Existing Approaches}
+\subsection{Research Gap and Positioning of This Thesis}
 
-Although these tools provide strong support for semantic web technologies, several key limitations remain:
+Although the reviewed tools provide strong support for specific Semantic Web tasks, several limitations remain for practical, user-facing scientific data workflows:
 
 \begin{itemize}
-    \item \textbf{Fragmented ecosystem:} Semantic modeling, data transformation, and graph storage are handled by separate tools.
-    \item \textbf{Technical barrier:} Many tools require expertise in OWL, SPARQL, or data-to-RDF mapping.
-    \item \textbf{Limited schema-driven configuration support:} Few systems integrate user-friendly schema interfaces with automated RDF generation.
-    \item \textbf{Lack of unified authoring environments:} Tools often focus on either ontology design or data transformation, not end-to-end workflows.
-    \item \textbf{No AI assistance:} Current tools do not leverage AI for tasks such as SPARQL query suggestions or RML mapping generation, limiting usability for non-expert users.
+    \item \textbf{Fragmented workflows:} Modeling, mapping, querying, and visualization are often distributed across multiple tools.
+    \item \textbf{High technical entry barrier:} Effective use often requires advanced knowledge of OWL/RDF/SPARQL and mapping languages.
+    \item \textbf{Weak integration with schema-driven JSON editing:} Existing platforms rarely combine JSON Schema-based instance editing with first-class RDF authoring.
+    \item \textbf{Limited end-to-end support in one UI:} Few tools provide a single environment for authoring, transforming, validating, querying, and graph exploration.
+    \item \textbf{Limited AI support in semantic authoring workflows:} AI assistance for generating SPARQL queries or RML mappings from user intent is still uncommon.
 \end{itemize}
+
+This thesis addresses these gaps by extending MetaConfigurator from schema-driven configuration editing to an integrated RDF authoring environment with JSON-to-JSON-LD transformation, ontology-aware authoring support, SPARQL querying, graph visualization, and AI-assisted drafting of SPARQL and RML artifacts.

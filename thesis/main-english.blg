@@ -1,21 +1,18 @@
 [0] Config.pm:328> INFO - This is Biber 2.21
 [0] Config.pm:331> INFO - Logfile is 'main-english.blg'
-[32] biber-darwin:342> INFO - === Tue Mar 10, 2026, 18:16:49
-[40] Biber.pm:421> INFO - Reading 'main-english.bcf'
-[75] Biber.pm:1002> INFO - Found 10 citekeys in bib section 0
-[81] Biber.pm:4487> INFO - Processing section 0
-[89] Biber.pm:4678> INFO - Looking for bibtex file 'bibliography.bib' for section 0
-[90] bibtex.pm:1713> INFO - LaTeX decoding ...
-[98] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography.bib'
-[150] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[150] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[150] Biber.pm:4307> INFO - Sorting list 'anyt/global//global/global/global' of type 'entry' with template 'anyt' and locale 'en-US'
-[150] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
-[166] bbl.pm:676> INFO - Writing 'main-english.bbl' with encoding 'UTF-8'
-[171] bbl.pm:779> INFO - Output to main-english.bbl
-[171] Biber.pm:132> WARN - Duplicate entry key: 'dimou2014rml' in file 'bibliography.bib', skipping ...
-[171] Biber.pm:132> WARN - Duplicate entry key: 'shacl_standard' in file 'bibliography.bib', skipping ...
-[171] Biber.pm:132> WARN - Duplicate entry key: 'webprotege' in file 'bibliography.bib', skipping ...
-[171] Biber.pm:132> WARN - Duplicate entry key: 'linkml' in file 'bibliography.bib', skipping ...
-[171] Biber.pm:132> WARN - Duplicate entry key: 'jsonld_playground' in file 'bibliography.bib', skipping ...
-[171] Biber.pm:134> INFO - WARNINGS: 5
+[31] biber-darwin:342> INFO - === Tue Mar 10, 2026, 19:27:19
+[39] Biber.pm:421> INFO - Reading 'main-english.bcf'
+[72] Biber.pm:1002> INFO - Found 24 citekeys in bib section 0
+[79] Biber.pm:4487> INFO - Processing section 0
+[83] Biber.pm:4678> INFO - Looking for bibtex file 'bibliography.bib' for section 0
+[84] bibtex.pm:1713> INFO - LaTeX decoding ...
+[90] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography.bib'
+[162] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[162] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[162] Biber.pm:4307> INFO - Sorting list 'anyt/global//global/global/global' of type 'entry' with template 'anyt' and locale 'en-US'
+[162] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[178] bbl.pm:676> INFO - Writing 'main-english.bbl' with encoding 'UTF-8'
+[183] bbl.pm:779> INFO - Output to main-english.bbl
+[183] Biber.pm:132> WARN - Duplicate entry key: 'webprotege' in file 'bibliography.bib', skipping ...
+[183] Biber.pm:132> WARN - Duplicate entry key: 'linkml' in file 'bibliography.bib', skipping ...
+[183] Biber.pm:134> INFO - WARNINGS: 2

@@ -1,35 +1,17 @@
 \section*{Abstract}
 
-MetaConfigurator is an open-source schema editor and dynamic form generator for JSON and YAML documents, 
-enabling users to define structured schemas and generate corresponding user interfaces for consistent data entry and validation. 
-While the platform provides strong support for schema-driven configuration and data modeling, 
-it currently offers only limited integration with Semantic Web technologies and Linked Data principles.
+Scientific workflows increasingly produce structured JSON data that is easy to exchange but difficult to interpret semantically across systems. While JSON Schema supports structural validation, it does not provide native semantics for Linked Data integration. This thesis addresses that gap by extending MetaConfigurator, a schema-driven web application for structured data authoring, with Semantic Web capabilities.
 
-The Semantic Web is based on the use of IRIs, RDF triples, ontologies, knowledge graphs, and query mechanisms such as SPARQL to ensure interoperable and machine-readable data exchange. 
-Integrating these concepts into MetaConfigurator would allow structured documents to be enriched with explicit semantics, improving interoperability across systems and domains. 
-To address this gap, this thesis explores the integration of JSON-LD to embed semantic context directly into JSON documents, enabling their interpretation as RDF. 
-Furthermore, the RDF Mapping Language (RML) is employed to define declarative mappings that transform JSON data into RDF triples. 
-In addition, SPARQL querying capabilities are incorporated to enable structured querying and validation of the generated RDF data.
+The core contribution is an integrated RDF Authoring Panel that supports end-to-end semantic data workflows in a single user interface. The extension enables transformation of JSON documents into JSON-LD using RDF Mapping Language (RML), direct authoring and editing of semantic structures, SPARQL-based querying, and interactive knowledge graph visualization. In addition, AI-assisted generation of SPARQL queries and RML mappings from user hints is introduced to reduce the entry barrier for non-expert users.
 
-Based on these technologies, an RDF Authoring Panel is designed and implemented within MetaConfigurator, providing ontology integration, visualization of RDF graph structures, and interactive querying of RDF triples via SPARQL. 
-This extension directly connects schema definition and instance authoring with Linked Data concepts, 
-transforming MetaConfigurator into a semantically-aware authoring environment. 
-The result is a framework that bridges traditional JSON schema modeling with Semantic Web standards, enabling the creation, transformation, and querying of interoperable, knowledge graph-ready data.
+The result is a unified environment that bridges schema-driven configuration editing and Semantic Web technologies. By combining validation, transformation, querying, and visualization in one workflow, the approach improves interoperability of scientific experiment data and supports more accessible creation and exploration of semantically enriched knowledge graphs.
 
 \newpage
 
 \section*{Kurzfassung}
 
-MetaConfigurator ist ein Open-Source-Schema-Editor und dynamischer Formular-Generator für JSON- und YAML-Dokumente, der es Nutzern ermöglicht, 
-strukturierte Schemata zu definieren und entsprechende Benutzeroberflächen für eine konsistente Dateneingabe und Validierung zu erzeugen. 
-Während die Plattform eine starke Unterstützung für schema-gesteuerte Konfiguration und Datenmodellierung bietet, verfügt sie derzeit nur über eine begrenzte Integration mit Semantic-Web-Technologien und den Prinzipien von Linked Data.
+Wissenschaftliche Workflows erzeugen zunehmend strukturierte JSON-Daten, die sich zwar leicht austauschen lassen, deren semantische Interpretation über Systemgrenzen hinweg jedoch schwierig ist. JSON Schema ermöglicht strukturelle Validierung, bietet aber keine nativen Semantiken für die Integration in Linked-Data-Infrastrukturen. Diese Arbeit schließt diese Lücke, indem MetaConfigurator, eine schema-getriebene Webanwendung zur Bearbeitung strukturierter Daten, um Semantic-Web-Funktionen erweitert wird.
 
-Das Semantic Web basiert auf der Nutzung von IRIs, RDF-Tripeln, Ontologien, Wissensgraphen sowie Abfragesprachen wie SPARQL, um einen interoperablen und maschinenlesbaren Datenaustausch zu gewährleisten. 
-Die Integration dieser Konzepte in MetaConfigurator würde es ermöglichen, strukturierte Dokumente mit expliziter Semantik anzureichern und so die Interoperabilität zwischen Systemen und Domänen zu verbessern. 
-Um diese Lücke zu schließen, untersucht diese Arbeit die Integration von JSON-LD, um den semantischen Kontext direkt in JSON-Dokumente einzubetten und deren Interpretation als RDF zu ermöglichen. 
-Darüber hinaus wird die RDF Mapping Language (RML) eingesetzt, um deklarative Mappings zu definieren, die JSON-Daten in RDF-Tripel transformieren. 
-Zusätzlich werden SPARQL-Abfragemöglichkeiten integriert, um die erzeugten RDF-Daten strukturiert abfragen und validieren zu können.
+Der zentrale Beitrag ist ein integriertes RDF-Authoring-Panel, das durchgängige semantische Daten-Workflows in einer einzigen Benutzeroberfläche unterstützt. Die Erweiterung umfasst die Transformation von JSON-Dokumenten nach JSON-LD mittels RDF Mapping Language (RML), die direkte Erstellung und Bearbeitung semantischer Strukturen, SPARQL-basierte Abfragen sowie eine interaktive Visualisierung von Wissensgraphen. Ergänzend wird eine KI-gestützte Generierung von SPARQL-Abfragen und RML-Mappings aus Nutzerhinweisen eingeführt, um die Einstiegshürde für Nicht-Expert:innen zu senken.
 
-Auf Basis dieser Technologien wird innerhalb von MetaConfigurator ein RDF-Authoring-Panel entworfen und implementiert, das die Integration von Ontologien, die Visualisierung von RDF-Graphstrukturen sowie die interaktive Abfrage von RDF-Tripeln mittels SPARQL ermöglicht. 
-Diese Erweiterung verbindet die Schema-Definition und die Erstellung von Instanzen direkt mit den Konzepten von Linked Data und transformiert MetaConfigurator in eine semantisch-erweiterte Authoring-Umgebung. 
-Das Ergebnis ist ein Framework, das traditionelles JSON-Schema-Modelling mit Semantic-Web-Standards verbindet und die Erstellung, Transformation und Abfrage interoperabler, wissensgraph-fähiger Daten ermöglicht.
+Als Ergebnis entsteht eine einheitliche Umgebung, die schema-getriebene Konfigurationsbearbeitung mit Semantic-Web-Technologien verbindet. Durch die Kombination von Validierung, Transformation, Abfrage und Visualisierung in einem Workflow verbessert der Ansatz die Interoperabilität wissenschaftlicher Versuchsdaten und erleichtert die Erstellung sowie Exploration semantisch angereicherter Wissensgraphen.
