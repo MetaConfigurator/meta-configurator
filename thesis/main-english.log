@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  10 MAR 2026 15:42
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  10 MAR 2026 16:17
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -2541,19 +2541,17 @@ LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
 Package tocbasic Info: character protrusion at toc deactivated on input line 896.
  (./main-english.toc
 Package cleveref Info: loaded `english' language definitions on input line 1.
+ [5
+
+
+]
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 10.79993pt on input line 27.
+(Font)              scaled to size 10.79993pt on input line 35.
 )
 \tf@toc=\write8
 
 \openout8 = main-english.toc
- [5
-
-
-] [6
-
-
-]
+ [6]
 Package tocbasic Info: character protrusion at lof deactivated on input line 898.
  (./main-english.lof
 Package cleveref Info: loaded `english' language definitions on input line 1.
@@ -2561,7 +2559,10 @@ Package cleveref Info: loaded `english' language definitions on input line 1.
 \tf@lof=\write9
 
 \openout9 = main-english.lof
- [7] [8
+ [7
+
+
+] [8
 
 
 ]
@@ -2619,38 +2620,113 @@ Package cleveref Info: loaded `english' language definitions on input line 328.
 Package cleveref Info: loaded `english' language definitions on input line 350.
  [21]
 Package cleveref Info: loaded `english' language definitions on input line 381.
- [22]) (./chapters/02_design_and_implementation.tex
+ [22]
+Package cleveref Info: loaded `english' language definitions on input line 405.
+ [23]
+Package cleveref Info: loaded `english' language definitions on input line 426.
+ [24]
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+Package cleveref Info: loaded `english' language definitions on input line 490.
+[25]) (./chapters/02_design_and_implementation.tex
 Package cleveref Info: loaded `english' language definitions on input line 2.
- [23] [24
-
-
+ [26
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font [texgyretermes-regular.otf]:mode=node;script=latn;language=dflt;+tlig;!
 ]
 chapter 2.
-) (./chapters/03_application.tex [25] [26
+) (./chapters/03_application.tex [27
+
+
+] [28
 
 
 ]
 chapter 3.
-) (./chapters/04_conclusion_and_outlook.tex [27] [28
+) (./chapters/04_conclusion_and_outlook.tex [29] [30
 
 
 ]
 chapter 4.
-) [29] [30
+) [31] [32
 
 
 ]
 chapter without number
-[31] (./chapters/05_appendix.tex [32
-
-
-
-]
+[33]
+Package cleveref Info: loaded `english' language definitions on input line 948.
+ [34] (./chapters/05_appendix.tex
 chapter A.
-) [33] [34
+) [35
 
 
-] [35]
+
+] [36
+
+
+] [37]
 \tf@thm=\write11
 
 \openout11 = main-english.thm
@@ -2677,19 +2753,19 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 77704 strings out of 476076
- 156265,3417909 words of node,token memory allocated
- 1014 words of node memory still in use:
-   8 hlist, 2 vlist, 2 rule, 1 local_par, 6 glue, 5 kern, 1 penalty, 1 margin_kern, 5 glyph, 43 attribute, 107 glue_spec, 22 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 3 pdf_action nodes
-   avail lists: 1:8,2:4306,3:744,4:2147,5:2560,6:158,7:6645,8:64,9:5612,10:16,11:647,12:1
- 93499 multiletter control sequences out of 65536+600000
- 102 fonts using 24981183 bytes
- 108i,21n,115p,11294b,2686s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 78823 strings out of 476076
+ 156269,3417909 words of node,token memory allocated
+ 1008 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 6 glue, 5 kern, 1 penalty, 4 glyph, 43 attribute, 108 glue_spec, 22 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 3 pdf_action nodes
+   avail lists: 1:5,2:4309,3:714,4:2184,5:2562,6:175,7:6646,8:65,9:5612,10:16,11:647,12:1
+ 93530 multiletter control sequences out of 65536+600000
+ 102 fonts using 24981487 bytes
+ 108i,21n,115p,11294b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf>
-Output written on main-english.pdf (35 pages, 104484 bytes).
+Output written on main-english.pdf (37 pages, 117423 bytes).
 
-PDF statistics: 611 PDF objects out of 1000 (max. 8388607)
- 553 compressed objects within 6 object streams
- 276 named destinations out of 1000 (max. 1048576)
- 232 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 682 PDF objects out of 1000 (max. 8388607)
+ 621 compressed objects within 7 object streams
+ 291 named destinations out of 1000 (max. 1048576)
+ 296 words of extra memory for PDF output out of 10000 (max. 100000000)
 

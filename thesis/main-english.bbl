@@ -145,6 +145,43 @@
       \field{title}{RML: A Generic Language for Integrated RDF Mappings of Heterogeneous Data}
       \field{year}{2014}
     \endentry
+    \entry{cedar_workbench}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{3}{}{%
+        {{hash=c442eb88053c5d36d0a4dc10ab11dc60}{%
+           family={Gonçalves},
+           familyi={G\bibinitperiod},
+           given={Rafael\bibnamedelima S.},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=02daeb0f947aaed2e947e28e86895dac}{%
+           family={O'Connor},
+           familyi={O\bibinitperiod},
+           given={Martin\bibnamedelima J.},
+           giveni={M\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=f84673fda81f835e3e53b7bae585400c}{%
+           family={Martínez-Romero},
+           familyi={M\bibinithyphendelim R\bibinitperiod},
+           given={Marcos},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{658bd09882cb29a8d9337e0dc351089a}
+      \strng{fullhash}{4d0438c86d6da83bf77ab0a0abdc0443}
+      \strng{fullhashraw}{4d0438c86d6da83bf77ab0a0abdc0443}
+      \strng{bibnamehash}{4d0438c86d6da83bf77ab0a0abdc0443}
+      \strng{authorbibnamehash}{4d0438c86d6da83bf77ab0a0abdc0443}
+      \strng{authornamehash}{658bd09882cb29a8d9337e0dc351089a}
+      \strng{authorfullhash}{4d0438c86d6da83bf77ab0a0abdc0443}
+      \strng{authorfullhashraw}{4d0438c86d6da83bf77ab0a0abdc0443}
+      \field{labelalpha}{GOM+19}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:1905.06480}
+      \field{title}{The CEDAR Workbench: An Ontology-Assisted Environment for Authoring Metadata that Describe Scientific Experiments}
+      \field{year}{2019}
+    \endentry
     \entry{gruber1993ontology}{article}{}{}
       \name{author}{1}{}{%
         {{hash=afb9b0d3d5b76f30ab451acf45400285}{%
@@ -176,6 +213,51 @@
       \field{year}{1993}
       \field{pages}{199\bibrangedash 220}
       \range{pages}{22}
+    \endentry
+    \entry{webprotege}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=92fdcbdf58626ebe99594fa1c5fb181d}{%
+           family={Horridge},
+           familyi={H\bibinitperiod},
+           given={Matthew},
+           giveni={M\bibinitperiod}}}%
+        {{hash=c442eb88053c5d36d0a4dc10ab11dc60}{%
+           family={Gonçalves},
+           familyi={G\bibinitperiod},
+           given={Rafael\bibnamedelima S.},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=cb7ce3ec19b354dd69bf3c473f6a3742}{%
+           family={Nyulas},
+           familyi={N\bibinitperiod},
+           given={Csongor},
+           giveni={C\bibinitperiod}}}%
+        {{hash=919a9c101fe03e693b5cdd78e861c8be}{%
+           family={Tudorache},
+           familyi={T\bibinitperiod},
+           given={Tania},
+           giveni={T\bibinitperiod}}}%
+        {{hash=daa3f61cc04957ea4bf038da94584e07}{%
+           family={Musen},
+           familyi={M\bibinitperiod},
+           given={Mark\bibnamedelima A.},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \strng{namehash}{881aa5c24bbdc8a0907a1fd54b337d9d}
+      \strng{fullhash}{bfc8918a9983ce4d0dc06a9c2f78a9b6}
+      \strng{fullhashraw}{bfc8918a9983ce4d0dc06a9c2f78a9b6}
+      \strng{bibnamehash}{bfc8918a9983ce4d0dc06a9c2f78a9b6}
+      \strng{authorbibnamehash}{bfc8918a9983ce4d0dc06a9c2f78a9b6}
+      \strng{authornamehash}{881aa5c24bbdc8a0907a1fd54b337d9d}
+      \strng{authorfullhash}{bfc8918a9983ce4d0dc06a9c2f78a9b6}
+      \strng{authorfullhashraw}{bfc8918a9983ce4d0dc06a9c2f78a9b6}
+      \field{labelalpha}{HGN+14}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Bioinformatics}
+      \field{title}{WebProtégé: A collaborative Web-based platform for editing biomedical ontologies}
+      \field{year}{2014}
     \endentry
     \entry{shacl_standard}{misc}{}{}
       \true{moreauthor}
@@ -390,6 +472,29 @@
       \verb{url}
       \verb https://www.w3.org/TR/json-ld/
       \endverb
+    \endentry
+    \entry{topbraid}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=ffcae3313f712f566136fc6d64433acc}{%
+           family={TopQuadrant},
+           familyi={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{ffcae3313f712f566136fc6d64433acc}
+      \strng{fullhash}{ffcae3313f712f566136fc6d64433acc}
+      \strng{fullhashraw}{ffcae3313f712f566136fc6d64433acc}
+      \strng{bibnamehash}{ffcae3313f712f566136fc6d64433acc}
+      \strng{authorbibnamehash}{ffcae3313f712f566136fc6d64433acc}
+      \strng{authornamehash}{ffcae3313f712f566136fc6d64433acc}
+      \strng{authorfullhash}{ffcae3313f712f566136fc6d64433acc}
+      \strng{authorfullhashraw}{ffcae3313f712f566136fc6d64433acc}
+      \field{labelalpha}{Top23}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Supports RDF, OWL, SPARQL and reasoning for ontology development}
+      \field{title}{TopBraid Composer: Semantic Web Modeling Environment}
+      \field{year}{2023}
     \endentry
     \entry{wright2020jsonschema}{misc}{}{}
       \name{author}{4}{}{%

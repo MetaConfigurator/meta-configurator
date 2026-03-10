@@ -389,3 +389,99 @@ To address these limitations, this thesis extends MetaConfigurator with an \text
 \end{enumerate}
 
 By integrating these capabilities into MetaConfigurator, the platform evolves from a schema-based configuration editor into a tool that supports the full workflow of creating, transforming, querying, and exploring semantically enriched data.
+
+
+\section{Related Work}
+\label{sec:background:related_work}
+
+A variety of tools and frameworks have been developed to support Semantic Web technologies, RDF authoring, and knowledge graph construction. These tools typically focus on specific tasks such as ontology engineering, metadata authoring, data-to-RDF transformation, or RDF storage and querying. However, most existing solutions address only a subset of the overall workflow required for schema-driven configuration and semantic data generation.
+
+\subsection{Ontology Engineering Environments}
+
+Ontology engineering tools are widely used for creating and maintaining Semantic Web ontologies.
+
+Protégé is one of the most widely adopted ontology development platforms. It provides a graphical environment for creating OWL ontologies, defining classes and properties, and executing reasoning and validation tasks. In addition to the desktop version, the platform also provides WebProtégé, a collaborative web-based ontology editor that enables multiple users to edit OWL ontologies simultaneously and supports change tracking and revision history \cite{webprotege}. WebProtégé is particularly useful for collaborative ontology development and supports multiple serialization formats such as RDF/XML and Turtle.
+
+Another widely used semantic modeling environment is TopBraid Composer. TopBraid Composer is an Eclipse-based development environment for Semantic Web applications that supports RDF, RDFS, OWL, and SPARQL standards \cite{topbraid}. It provides graphical editing, ontology visualization, reasoning support, and integration with RDF databases and external data sources. Additionally, the tool allows importing legacy data sources such as relational databases, XML files, and spreadsheets into semantic models.
+
+Despite their powerful ontology modeling capabilities, these tools are primarily designed for ontology engineers and require familiarity with Semantic Web technologies. They are not intended for schema-driven configuration modeling or automated transformation of structured configuration data into RDF representations.
+
+\subsection{Semantic Metadata Authoring Platforms}
+
+Some platforms focus specifically on ontology-assisted metadata authoring.
+
+The CEDAR Workbench provides a web-based environment for creating metadata templates and generating semantically annotated metadata using ontology terms \cite{cedar_workbench}. Metadata produced with CEDAR can be exported in formats such as JSON-LD and RDF, facilitating interoperability with Semantic Web technologies.
+
+While these systems provide structured metadata generation, they are typically designed for research metadata annotation rather than general configuration modeling or automated knowledge graph construction from configuration schemas.
+
+\subsection{Data-to-RDF Mapping Frameworks}
+
+Another category of tools focuses on transforming structured data into RDF. Tools such as RMLMapper and SDM-RDFizer execute these mappings and generate RDF knowledge graphs from structured data sources. While such tools are powerful for generating knowledge graphs, they rely heavily on manually defined mapping rules and typically assume that the source data structures already exist. They do not provide schema-driven configuration environments that integrate semantic modeling and data authoring.
+
+\subsection{RDF Storage and Query Platforms}
+
+RDF databases and triple stores provide infrastructure for storing and querying knowledge graphs.
+
+GraphDB is a widely used RDF database that supports SPARQL querying, reasoning, and large-scale knowledge graph management. Such platforms focus primarily on data storage, querying, and inference rather than authoring RDF data or modeling schemas. As a result, they typically rely on external tools for RDF generation and ontology modeling.
+
+\subsection{Semantic Data Experimentation Tools}
+
+Some lightweight tools support experimentation with RDF serialization formats.
+
+The JSON-LD Playground provides an interactive web interface for converting JSON documents into JSON-LD and RDF representations. It allows users to test JSON-LD contexts, transformations, and RDF output structures. However, it is primarily designed for experimentation and debugging of JSON-LD documents rather than for large-scale semantic data modeling or structured configuration workflows.
+
+\subsection{Comparison of Existing Tools}
+
+Table~\ref{tab:related_tools_comparison} compares representative Semantic Web tools with respect to RDF authoring, ontology integration, mapping capabilities, and schema-driven configuration support.
+
+\begin{table}[h]
+\centering
+\caption{Comparison of tools supporting RDF authoring and Semantic Web integration}
+\label{tab:related_tools_comparison}
+
+\begin{tabular}{lcccccc}
+\hline
+\textbf{Tool / Framework} 
+& \rotatebox{90}{RDF Authoring} 
+& \rotatebox{90}{Ontology Integration} 
+& \rotatebox{90}{Data-to-RDF Mapping} 
+& \rotatebox{90}{Schema-driven Configuration} 
+& \rotatebox{90}{RDF Storage / Query} 
+& \rotatebox{90}{Visualization Support} \\
+\hline
+
+Protégé & \checkmark & \checkmark & -- & -- & -- & \checkmark \\
+
+WebProtégé & \checkmark & \checkmark & -- & -- & -- & Limited \\
+
+TopBraid Composer & \checkmark & \checkmark & Limited & -- & Limited & \checkmark \\
+
+CEDAR Workbench & \checkmark & \checkmark & Limited & -- & -- & Limited \\
+
+Karma (ISI) & Limited & \checkmark & \checkmark & -- & -- & Limited \\
+
+RMLMapper / Morph-KGC & -- & Limited & \checkmark & -- & -- & -- \\
+
+GraphDB & -- & \checkmark & Limited & -- & \checkmark & \checkmark \\
+
+JSON-LD Playground & Limited & -- & Limited & -- & -- & Limited \\
+
+MetaConfigurator (this work) & \checkmark & \checkmark & \checkmark & \checkmark & Limited & \checkmark \\
+
+\hline
+\end{tabular}
+
+\end{table}
+
+\subsection{Limitations of Existing Approaches}
+
+Although the reviewed tools provide powerful capabilities for ontology engineering, knowledge graph construction, and RDF storage, several limitations remain:
+
+\begin{itemize}
+\item \textbf{Fragmented tool ecosystem.} Semantic modeling, data transformation, and RDF storage are typically handled by separate tools that must be manually integrated.
+\item \textbf{High technical barrier.} Many tools require expertise in OWL, SPARQL, or mapping languages such as RML.
+\item \textbf{Limited support for configuration-driven modeling.} Existing tools rarely integrate schema-driven configuration environments with semantic data generation.
+\item \textbf{Lack of integrated authoring workflows.} Most tools either focus on ontology design or data transformation but do not provide unified environments for configuration modeling and RDF authoring.
+\end{itemize}
+
+The approach presented in this thesis addresses these limitations by extending MetaConfigurator with Semantic Web integration and RDF authoring capabilities. By combining schema-driven configuration modeling with automatic generation of RDF representations, the proposed system enables users to create semantically enriched configuration data and knowledge graph representations within a single integrated environment.

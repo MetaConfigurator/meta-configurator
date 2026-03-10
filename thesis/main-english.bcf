@@ -2384,6 +2384,10 @@
     <bcf:citekey order="9" intorder="1">metaconfigurator2024</bcf:citekey>
     <bcf:citekey order="10" intorder="1">metaconfigurator2024</bcf:citekey>
     <bcf:citekey order="11" intorder="1">ai_assisted_schema_mapping_2025</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">webprotege</bcf:citekey>
+    <bcf:citekey order="13" intorder="1">topbraid</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">cedar_workbench</bcf:citekey>
+    <bcf:citekey order="15" intorder="1">dimou2014rml</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">
