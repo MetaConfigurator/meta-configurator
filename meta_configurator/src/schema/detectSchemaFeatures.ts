@@ -1,4 +1,5 @@
 import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
+import {isExternalRef} from '@/schema/externalReferences.ts';
 
 export type SchemaFeatures = {
   composition: boolean;
@@ -14,6 +15,7 @@ export type SchemaFeatures = {
   booleanSchemas: boolean;
   descriptions: boolean;
   titles: boolean;
+  externalReferences: boolean;
   // on purpose, we currently do not track whether it uses constraints (e.g., maxLength, minLength, etc.) because there are so many of them and for our use case we do not need to know about them
 };
 
@@ -32,6 +34,7 @@ export function detectSchemaFeatures(jsonSchema: TopLevelSchema): SchemaFeatures
     booleanSchemas: false, // when a sub-schema is simply true or false instead of an object
     descriptions: false,
     titles: false,
+    externalReferences: false, // whether the schema contains $refs that point to external schemas (i.e., not starting with #)
   };
 
   // detect features for root level schema
@@ -131,6 +134,9 @@ function detectSubObjectSchemaFeatures(subSchema: JsonSchemaObjectType, features
   // Check for references
   if (subSchema.$ref) {
     features.references = true;
+    if (isExternalRef(subSchema.$ref)) {
+      features.externalReferences = true;
+    }
   }
 
   // Check for required properties
