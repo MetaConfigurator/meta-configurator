@@ -685,6 +685,7 @@
 \DeclareMathSymbol{\powerset}{\mathord}{MnSyC}{180}
 
 \usepackage[
+  automake,
   translate=babel,
   abbreviations,         % create "abbreviations" glossary
   nomain,                % don't create "main" glossary
@@ -700,7 +701,7 @@
 % Required to have the German chapter name % Source: https://tex.stackexchange.com/a/426392/9075
 \makeglossaries
 
-% \input{abbreviations}
+\input{abbreviations}
 
 % Allows for defining commands that don't eat spaces.
 \usepackage{xspace}
@@ -911,8 +912,7 @@
 %\listofalgorithms %Ist nur für Algorithmen, die mittels \begin{algorithm} umschlossen werden, nötig
 
 % Abbreviations / Acronyms
-% \printglossary[type=\acronymtype,title={Abbreviations}]
-% \printglossaries
+\printglossary[type=abbreviations,title={Abbreviations}]
 % \printnoidxglossaries
 % \printunsrtglossaries cannot be used, because then no indexing happens; source: https://tex.stackexchange.com/a/287128/9075
 

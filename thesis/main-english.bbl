@@ -542,13 +542,18 @@
       \strng{authornamehash}{dffe7dd6f49490d80de4a82fd13d8179}
       \strng{authorfullhash}{dffe7dd6f49490d80de4a82fd13d8179}
       \strng{authorfullhashraw}{dffe7dd6f49490d80de4a82fd13d8179}
-      \field{labelalpha}{Ont23}
+      \field{labelalpha}{Ont}
       \field{sortinit}{O}
       \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{GraphDB: RDF Database for Knowledge Graphs}
-      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://www.ontotext.com/products/graphdb/
+      \endverb
+      \verb{url}
+      \verb https://www.ontotext.com/products/graphdb/
+      \endverb
     \endentry
     \entry{openrefine}{misc}{}{}
       \name{author}{1}{}{%
@@ -681,35 +686,6 @@
       \verb https://www.w3.org/TR/sparql11-overview/
       \endverb
     \endentry
-    \entry{semtk}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=947a185dd2612327d37f45299175d357}{%
-           family={Semantic\bibnamedelimb Computing\bibnamedelimb Research\bibnamedelima Group},
-           familyi={S\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim R\bibinitperiod\bibinitdelim G\bibinitperiod},
-           given={Wright\bibnamedelimb State\bibnamedelima U.},
-           giveni={W\bibinitperiod\bibinitdelim S\bibinitperiod\bibinitdelim U\bibinitperiod}}}%
-      }
-      \strng{namehash}{947a185dd2612327d37f45299175d357}
-      \strng{fullhash}{947a185dd2612327d37f45299175d357}
-      \strng{fullhashraw}{947a185dd2612327d37f45299175d357}
-      \strng{bibnamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authorbibnamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authornamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authorfullhash}{947a185dd2612327d37f45299175d357}
-      \strng{authorfullhashraw}{947a185dd2612327d37f45299175d357}
-      \field{labelalpha}{Sem}
-      \field{sortinit}{S}
-      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{SemTK: Semantic Toolkit}
-      \verb{urlraw}
-      \verb https://semtk.org/
-      \endverb
-      \verb{url}
-      \verb https://semtk.org/
-      \endverb
-    \endentry
     \entry{jsonld2014}{misc}{}{}
       \name{author}{3}{}{%
         {{hash=f3efcc01f03d41d1f4597c347699522d}{%
@@ -752,28 +728,6 @@
       \verb{url}
       \verb https://www.w3.org/TR/json-ld/
       \endverb
-    \endentry
-    \entry{topbraid}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=ffcae3313f712f566136fc6d64433acc}{%
-           family={TopQuadrant},
-           familyi={T\bibinitperiod}}}%
-      }
-      \strng{namehash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{fullhash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{fullhashraw}{ffcae3313f712f566136fc6d64433acc}
-      \strng{bibnamehash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{authorbibnamehash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{authornamehash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{authorfullhash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{authorfullhashraw}{ffcae3313f712f566136fc6d64433acc}
-      \field{labelalpha}{Top23}
-      \field{sortinit}{T}
-      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{TopBraid Composer: Semantic Web Modeling Environment}
-      \field{year}{2023}
     \endentry
     \entry{shacl_standard}{misc}{}{}
       \name{author}{1}{}{%

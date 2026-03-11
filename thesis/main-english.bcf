@@ -2393,13 +2393,11 @@
     <bcf:citekey order="17" intorder="1">karma</bcf:citekey>
     <bcf:citekey order="17" intorder="2">openrefine</bcf:citekey>
     <bcf:citekey order="17" intorder="3">sparql_generate</bcf:citekey>
-    <bcf:citekey order="18" intorder="1">topbraid</bcf:citekey>
-    <bcf:citekey order="18" intorder="2">semtk</bcf:citekey>
-    <bcf:citekey order="19" intorder="1">shacl_standard</bcf:citekey>
-    <bcf:citekey order="19" intorder="2">sparql_standard</bcf:citekey>
-    <bcf:citekey order="20" intorder="1">jsonld_playground</bcf:citekey>
-    <bcf:citekey order="21" intorder="1">rdflib</bcf:citekey>
-    <bcf:citekey order="21" intorder="2">redland</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">shacl_standard</bcf:citekey>
+    <bcf:citekey order="18" intorder="2">sparql_standard</bcf:citekey>
+    <bcf:citekey order="19" intorder="1">jsonld_playground</bcf:citekey>
+    <bcf:citekey order="20" intorder="1">rdflib</bcf:citekey>
+    <bcf:citekey order="20" intorder="2">redland</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

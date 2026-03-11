@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  10 MAR 2026 19:27
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  11 MAR 2026 17:53
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -2056,7 +2056,7 @@ Package: mfirstuc 2025/04/03 v2.09 (NLCT)
 \@glsmrest=\toks76
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/xfor/xfor.sty
 Package: xfor 2009/02/05 v1.05 (NLCT)
-) (/usr/local/texlive/2026/texmf-dist/tex/latex/glossaries-english/glossaries-english.ldf
+) ("|kpsewhich --var-value=TEXMF_OUTPUT_DIRECTORY") (/usr/local/texlive/2026/texmf-dist/tex/latex/glossaries-english/glossaries-english.ldf
 File: glossaries-english.ldf 2014/11/23 v1.0
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/datatool/datatool-base.sty
 Package: datatool-base 2025/12/04 v3.4.3 (NLCT)
@@ -2192,12 +2192,13 @@ Package: glossaries-extra-stylemods 2025/11/03 v1.9 (NLCT)
 \glsxtrAltTreeIndent=\skip165
 \glsxtrtreetopindent=\skip166
 ))
+runsystem(makeindex -s main-english.ist -t main-english.glg-abr -o main-english.gls-abr main-english.glo-abr)...executed.
 \glswrite=\write6
 \glo@abbreviations@file=\write7
 
 \openout7 = main-english.glo-abr
-Package glossaries Info: Writing glossary file main-english.glo-abr on input line 702.
- (/usr/local/texlive/2026/texmf-dist/tex/generic/hyphenex/ushyphex.tex) (./commands.tex) (/usr/local/texlive/2026/texmf-dist/tex/latex/scientific-thesis-cover/scientific-thesis-cover.sty
+Package glossaries Info: Writing glossary file main-english.glo-abr on input line 703.
+ (./abbreviations.tex) (/usr/local/texlive/2026/texmf-dist/tex/generic/hyphenex/ushyphex.tex) (./commands.tex) (/usr/local/texlive/2026/texmf-dist/tex/latex/scientific-thesis-cover/scientific-thesis-cover.sty
 Package: scientific-thesis-cover 2018/06/03 Cover and affirmation for scientific works.
 
 Package: `scientific-thesis-cover' v4.0.2
@@ -2235,7 +2236,7 @@ Class scrbook Info: loading recommended package `bookmark'.
 (scrbook)           `bookmarkpackage=false' before \begin{document} and
 (scrbook)           you can avoid this message adding:
 (scrbook)             \usepackage{bookmark}
-(scrbook)           before \begin{document} on input line 875.
+(scrbook)           before \begin{document} on input line 876.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
  (/usr/local/texlive/2026/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
@@ -2247,36 +2248,36 @@ Package babel Info: 'english' activates 'ngerman' shorthands.
 )
 \openout1 = main-english.aux
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 875.
-LaTeX Font Info:    ... okay on input line 875.
-Package scrbase Info: activating english \partname on input line 875.
-Package scrbase Info: activating english \chaptername on input line 875.
-Package scrbase Info: activating english \appendixname on input line 875.
-Package scrbase Info: activating english \figurename on input line 875.
-Package scrbase Info: activating english \tablename on input line 875.
-Package scrbase Info: activating english \contentsname on input line 875.
-Package scrbase Info: activating english \listfigurename on input line 875.
-Package scrbase Info: activating english \listtablename on input line 875.
-Package scrbase Info: activating english \bibname on input line 875.
-Package scrbase Info: activating english \indexname on input line 875.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 876.
+LaTeX Font Info:    ... okay on input line 876.
+Package scrbase Info: activating english \partname on input line 876.
+Package scrbase Info: activating english \chaptername on input line 876.
+Package scrbase Info: activating english \appendixname on input line 876.
+Package scrbase Info: activating english \figurename on input line 876.
+Package scrbase Info: activating english \tablename on input line 876.
+Package scrbase Info: activating english \contentsname on input line 876.
+Package scrbase Info: activating english \listfigurename on input line 876.
+Package scrbase Info: activating english \listtablename on input line 876.
+Package scrbase Info: activating english \bibname on input line 876.
+Package scrbase Info: activating english \indexname on input line 876.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(0)' created for font
@@ -2306,13 +2307,13 @@ Package fontspec Info:
 (fontspec)             <->"[latinmodern-math.otf]:mode=base;script=math;language=dflt;mathfontdimen=xetex;"
 
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 875.
+(Font)              `operators' in the math version `normal' on input line 876.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/latinmodern-math.otf(1)/m/n on input line 875.
+(Font)                  OT1/cmr/m/n --> TU/latinmodern-math.otf(1)/m/n on input line 876.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 875.
+(Font)              `operators' in the math version `bold' on input line 876.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> TU/latinmodern-math.otf(1)/b/n on input line 875.
+(Font)                  OT1/cmr/bx/n --> TU/latinmodern-math.otf(1)/b/n on input line 876.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(2)' created for font
@@ -2328,13 +2329,13 @@ Package fontspec Info:
 (fontspec)             <->"[latinmodern-math.otf]:mode=base;script=math;language=dflt;mathfontdimen=xetex;mathfontdimen=tex2;"
 
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
-(Font)              `symbols' in the math version `normal' on input line 875.
+(Font)              `symbols' in the math version `normal' on input line 876.
 LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
-(Font)                  OMS/cmsy/m/n --> TU/latinmodern-math.otf(2)/m/n on input line 875.
+(Font)                  OMS/cmsy/m/n --> TU/latinmodern-math.otf(2)/m/n on input line 876.
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
-(Font)              `symbols' in the math version `bold' on input line 875.
+(Font)              `symbols' in the math version `bold' on input line 876.
 LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
-(Font)                  OMS/cmsy/b/n --> TU/latinmodern-math.otf(2)/b/n on input line 875.
+(Font)                  OMS/cmsy/b/n --> TU/latinmodern-math.otf(2)/b/n on input line 876.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(3)' created for font
@@ -2350,18 +2351,18 @@ Package fontspec Info:
 (fontspec)             <->"[latinmodern-math.otf]:mode=base;script=math;language=dflt;mathfontdimen=xetex;mathfontdimen=tex3;"
 
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
-(Font)              `largesymbols' in the math version `normal' on input line 875.
+(Font)              `largesymbols' in the math version `normal' on input line 876.
 LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
-(Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/m/n on input line 875.
+(Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/m/n on input line 876.
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
-(Font)              `largesymbols' in the math version `bold' on input line 875.
+(Font)              `largesymbols' in the math version `bold' on input line 876.
 LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
-(Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/b/n on input line 875.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 875.
+(Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/b/n on input line 876.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 876.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 875.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 876.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
@@ -2386,13 +2387,13 @@ Package unicode-math Warning: I'm going to overwrite the following commands
 Package microtype Info: Patching varwidth to enable character protrusion.
 \MT@vwid@leftmargin=\dimen382
 \MT@vwid@rightmargin=\dimen383
-LaTeX Info: Redefining \microtypecontext on input line 875.
-Package microtype Info: Applying patch `item' on input line 875.
-Package microtype Info: Applying patch `toc' on input line 875.
-Package microtype Info: Applying patch `eqnum' on input line 875.
-Package microtype Info: Applying patch `footnote' on input line 875.
-Package microtype Info: Applying patch `verbatim' on input line 875.
-LaTeX Info: Redefining \microtypesetup on input line 875.
+LaTeX Info: Redefining \microtypecontext on input line 876.
+Package microtype Info: Applying patch `item' on input line 876.
+Package microtype Info: Applying patch `toc' on input line 876.
+Package microtype Info: Applying patch `eqnum' on input line 876.
+Package microtype Info: Applying patch `footnote' on input line 876.
+Package microtype Info: Applying patch `verbatim' on input line 876.
+LaTeX Info: Redefining \microtypesetup on input line 876.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `alltext-nott'.
@@ -2428,7 +2429,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
 \c@lstlisting=\count641
-Package tocbasic Info: setting babel extension for `lol' on input line 875.
+Package tocbasic Info: setting babel extension for `lol' on input line 876.
 \scr@dte@lstlisting@maxnumwidth=\skip169
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
@@ -2458,9 +2459,9 @@ Package biblatex Info: Automatic encoding selection.
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'main-english.bbl' found.
  (./main-english.bbl)
-Package biblatex Info: Reference section=0 on input line 875.
-Package biblatex Info: Reference segment=0 on input line 875.
-Package soulpos Info: Loading soulutf8 on input line 875.
+Package biblatex Info: Reference section=0 on input line 876.
+Package biblatex Info: Reference segment=0 on input line 876.
+Package soulpos Info: Loading soulutf8 on input line 876.
  (/usr/local/texlive/2026/texmf-dist/tex/generic/soul/soulutf8.sty
 Package: soulutf8 2023-06-14 v3.1 Permit use of UTF-8 characters in soul (HO)
 
@@ -2494,36 +2495,36 @@ Package: soul-ori 2023-06-14 v3.1 letterspacing/underlining (mf)
 \SOUL@uldp=\dimen393
 \SOUL@ulht=\dimen394
 ))
-Package hyperref Info: Link coloring ON on input line 875.
+Package hyperref Info: Link coloring ON on input line 876.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/translations/translations-basic-dictionary-english.trsl
 File: translations-basic-dictionary-english.trsl (english translation file `translations-basic-dictionary')
 )
-Package translations Info: loading dictionary `translations-basic-dictionary' for `english'. on input line 875.
+Package translations Info: loading dictionary `translations-basic-dictionary' for `english'. on input line 876.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/translations/translations-basic-dictionary-german.trsl
 File: translations-basic-dictionary-german.trsl (german translation file `translations-basic-dictionary')
 )
-Package translations Info: loading dictionary `translations-basic-dictionary' for `german'. on input line 875.
+Package translations Info: loading dictionary `translations-basic-dictionary' for `german'. on input line 876.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
 Package caption Info: End \AtBeginDocument code.
 \g__cctab_next_cctab=\catcodetable19
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 9.85492pt on input line 878.
+(Font)              scaled to size 9.85492pt on input line 879.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `TeXGyreHerosRegular' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 10.79993pt on input line 878.
+(Font)              scaled to size 10.79993pt on input line 879.
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 15.55188pt on input line 878.
+(Font)              scaled to size 15.55188pt on input line 879.
 
 
 LaTeX Font Warning: Font shape `TU/TeXGyreHerosRegular(0)/b/n' undefined
-(Font)              using `TU/TeXGyreHerosRegular(0)/m/n' instead on input line 878.
+(Font)              using `TU/TeXGyreHerosRegular(0)/m/n' instead on input line 879.
 
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 9.85492pt on input line 878.
+(Font)              scaled to size 9.85492pt on input line 879.
 [1
 
 
@@ -2551,8 +2552,8 @@ Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5.475
 (microtype)             (new value: 5.475pt) on input line 9.
  [3]) [4]
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 18.66588pt on input line 897.
-Package tocbasic Info: character protrusion at toc deactivated on input line 897.
+(Font)              scaled to size 18.66588pt on input line 898.
+Package tocbasic Info: character protrusion at toc deactivated on input line 898.
  (./main-english.toc
 Package cleveref Info: loaded `english' language definitions on input line 1.
  [5
@@ -2560,13 +2561,13 @@ Package cleveref Info: loaded `english' language definitions on input line 1.
 
 ]
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 10.79993pt on input line 34.
+(Font)              scaled to size 10.79993pt on input line 35.
 )
 \tf@toc=\write8
 
 \openout8 = main-english.toc
  [6]
-Package tocbasic Info: character protrusion at lof deactivated on input line 899.
+Package tocbasic Info: character protrusion at lof deactivated on input line 900.
  (./main-english.lof
 Package cleveref Info: loaded `english' language definitions on input line 1.
 )
@@ -2580,27 +2581,90 @@ Package cleveref Info: loaded `english' language definitions on input line 1.
 
 
 ]
-Package tocbasic Info: character protrusion at lot deactivated on input line 901.
+Package tocbasic Info: character protrusion at lot deactivated on input line 902.
  (./main-english.lot
 Package cleveref Info: loaded `english' language definitions on input line 1.
 )
 \tf@lot=\write10
 
 \openout10 = main-english.lot
- (./chapters/01_background_and_related_work.tex [9] [10
+ (./main-english.gls-abr [9] [10
 
 
 ]
+Underfull \hbox (badness 10000) in paragraph at lines 21--21
+[]|[][][]\TU/texgyretermes(0)/m/n/10.95 18[][][][],[] [][][]20[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 27--28
+[]|[][][]\TU/texgyretermes(0)/m/n/10.95 13[][][][],[] [][][]14[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 27--28
+[][][]\TU/texgyretermes(0)/m/n/10.95 16[][][][]--[][][][]18[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 27--28
+[][][]\TU/texgyretermes(0)/m/n/10.95 20[][][][]--[][][][]26[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--32
+[]|[][][]\TU/texgyretermes(0)/m/n/10.95 13[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--32
+[][][]\TU/texgyretermes(0)/m/n/10.95 16[][][][]--[][][][]21[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--49
+[]|[][][]\TU/texgyretermes(0)/m/n/10.95 16[][][][]--[][][][]18[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--49
+[][][]\TU/texgyretermes(0)/m/n/10.95 20[][][][],[] [][][]22[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
+[]|[][][]\TU/texgyretermes(0)/m/n/10.95 13[][][][],[] [][][]20[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
+[][][]\TU/texgyretermes(0)/m/n/10.95 21[][][][],[] [][][]24[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 62--63
+[]|[][][]\TU/texgyretermes(0)/m/n/10.95 17[][][][],[] [][][]18[][][][],[]
+ []
+
+[11
+
+
+]) (./chapters/01_background_and_related_work.tex
+Package babel Info: 'english' activates 'ngerman' shorthands.
+(babel)             Reported on input line 1.
+Package cleveref Info: loaded `english' language definitions on input line 1.
+ [12]
 chapter 1.
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
 (Font)              scaled to size 9.85492pt on input line 12.
-[11]
-Package babel Info: 'english' activates 'ngerman' shorthands.
-(babel)             Reported on input line 59.
-Package cleveref Info: loaded `english' language definitions on input line 59.
- [12]
+[13
+
+
+]
+Package cleveref Info: loaded `english' language definitions on input line 58.
+ [14]
 Package cleveref Info: loaded `english' language definitions on input line 88.
- [13]
+ [15]
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/9'
 (microtype)             (new value: 9.0pt) on input line 107.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/6'
@@ -2609,12 +2673,12 @@ Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5'
 (microtype)             (new value: 5.0pt) on input line 107.
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
 (Font)              scaled to size 8.09995pt on input line 107.
-Package cleveref Info: loaded `english' language definitions on input line 119.
- [14]
+Package cleveref Info: loaded `english' language definitions on input line 115.
+ [16]
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
 (Font)              scaled to size 8.99994pt on input line 126.
 Package cleveref Info: loaded `english' language definitions on input line 154.
- [15] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
+ [17] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang2.sty
 File: lstlang2.sty 2025/11/14 1.11b listings language file
@@ -2622,73 +2686,67 @@ File: lstlang2.sty 2025/11/14 1.11b listings language file
 File: lstlang3.sty 2025/11/14 1.11b listings language file
 )
 Package cleveref Info: loaded `english' language definitions on input line 184.
- [16]
-Package cleveref Info: loaded `english' language definitions on input line 218.
- [17]
-Package cleveref Info: loaded `english' language definitions on input line 252.
  [18]
-Package cleveref Info: loaded `english' language definitions on input line 300.
+Package cleveref Info: loaded `english' language definitions on input line 218.
  [19]
-Package cleveref Info: loaded `english' language definitions on input line 329.
+Package cleveref Info: loaded `english' language definitions on input line 252.
  [20]
-Package cleveref Info: loaded `english' language definitions on input line 362.
+Package cleveref Info: loaded `english' language definitions on input line 300.
  [21]
-Package cleveref Info: loaded `english' language definitions on input line 386.
+Package cleveref Info: loaded `english' language definitions on input line 329.
  [22]
-Package cleveref Info: loaded `english' language definitions on input line 420.
+Package cleveref Info: loaded `english' language definitions on input line 362.
  [23]
-Package cleveref Info: loaded `english' language definitions on input line 440.
+Package cleveref Info: loaded `english' language definitions on input line 386.
  [24]
-Package cleveref Info: loaded `english' language definitions on input line 481.
+Package cleveref Info: loaded `english' language definitions on input line 420.
  [25]
-Overfull \hbox (50.10794pt too wide) in paragraph at lines 482--483
-[][]\TU/texgyretermes(0)/b/n/10.95 High[] []tech-ni-cal[] []en-try[] []bar-rier:[] []\TU/texgyretermes(0)/m/n/10.95 Ef-fec-tive[] []use[] []of-ten[] []re-quires[] []ad-vanced[] []knowl-edge[] []of[] []OWL/RDF/SPARQL[]
+Package cleveref Info: loaded `english' language definitions on input line 438.
+ [26]
+Package cleveref Info: loaded `english' language definitions on input line 478.
+ [27]
+Overfull \hbox (50.10794pt too wide) in paragraph at lines 479--480
+[][]\TU/texgyretermes(0)/b/n/10.95 High[] []tech-ni-cal[] []en-try[] []bar-rier:[] []\TU/texgyretermes(0)/m/n/10.95 Ef-fec-tive[] []use[] []of-ten[] []re-quires[] []ad-vanced[] []knowl-edge[] []of[] [][][][]OWL[][][][]/[][][][][]RDF[][][][]/[][][][][]SPARQL[][][]
  []
 
 ) (./chapters/02_design_and_implementation.tex
 Package cleveref Info: loaded `english' language definitions on input line 2.
- [26]
+ [28]
 chapter 2.
-) (./chapters/03_application.tex [27
+) (./chapters/03_application.tex [29
 
 
-] [28
+] [30
 
 
 ]
 chapter 3.
-) (./chapters/04_conclusion_and_outlook.tex [29] [30
+) (./chapters/04_conclusion_and_outlook.tex [31] [32
 
 
 ]
 chapter 4.
-) [31] [32
+) [33] [34
 
 
 ]
 chapter without number
-[33]
+[35]
 Package cleveref Info: loaded `english' language definitions on input line 949.
- [34] (./chapters/05_appendix.tex
+ [36] (./chapters/05_appendix.tex
 chapter A.
-) [35
+) [37
 
 
 
-] [36
+] [38
 
 
-] [37]
+] [39]
 \tf@thm=\write11
 
 \openout11 = main-english.thm
-
-
-Package glossaries Warning: No \printglossary or \printglossaries found. 
-(Remove \makeglossaries if you don't want any glossaries.) 
-This document will not have a glossary.
-
-(./main-english.aux
+ (./main-english.aux
 Package cleveref Info: loaded `english' language definitions on input line 19.
 )
  ***********
@@ -2705,19 +2763,19 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 79435 strings out of 476076
- 195338,3417909 words of node,token memory allocated
- 1045 words of node memory still in use:
-   8 hlist, 2 vlist, 2 rule, 1 local_par, 7 glue, 5 kern, 1 penalty, 4 glyph, 51 attribute, 108 glue_spec, 26 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 4 pdf_action nodes
-   avail lists: 1:9,2:4630,3:728,4:2142,5:3218,6:184,7:7522,8:65,9:7000,10:16,11:684,12:1
- 93936 multiletter control sequences out of 65536+600000
- 114 fonts using 25723159 bytes
- 108i,21n,115p,11294b,3431s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/zapfding/uzdr.pfb>
-Output written on main-english.pdf (37 pages, 128709 bytes).
+ 80591 strings out of 476076
+ 195339,3417909 words of node,token memory allocated
+ 1207 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 7 glue, 5 kern, 1 penalty, 4 glyph, 77 attribute, 108 glue_spec, 39 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 18 pdf_action nodes
+   avail lists: 1:8,2:4670,3:738,4:2143,5:3218,6:215,7:7621,8:64,9:7007,10:16,11:688,12:1
+ 94835 multiletter control sequences out of 65536+600000
+ 114 fonts using 25723083 bytes
+ 108i,21n,115p,11294b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/zapfding/uzdr.pfb>
+Output written on main-english.pdf (39 pages, 142178 bytes).
 
-PDF statistics: 735 PDF objects out of 1000 (max. 8388607)
- 667 compressed objects within 7 object streams
- 293 named destinations out of 1000 (max. 1048576)
- 288 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 1025 PDF objects out of 1200 (max. 8388607)
+ 952 compressed objects within 10 object streams
+ 320 named destinations out of 1000 (max. 1048576)
+ 296 words of extra memory for PDF output out of 10000 (max. 100000000)
 
