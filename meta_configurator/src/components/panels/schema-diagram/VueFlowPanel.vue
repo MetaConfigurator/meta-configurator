@@ -313,6 +313,32 @@ function updateAttributeName(attributeData: SchemaNodeData, oldName: string, new
   // TODO: when renaming happens, also force update in the GUI
 }
 
+function updateAttributeRequired(attributeData: SchemaObjectAttributeData, required: boolean) {
+  const attributePath = attributeData.absolutePath;
+  const attributeName = attributeData.name;
+
+  const parentObjectPath = attributePath.slice(0, -2);
+  const parentObject = structuredClone(schemaData.dataAt(parentObjectPath));
+
+  if (!parentObject.required) {
+    parentObject.required = [];
+  }
+
+  const requiredList = parentObject.required;
+
+  const index = requiredList.indexOf(attributeName);
+
+  if (required && index === -1) {
+    requiredList.push(attributeName);
+  }
+
+  if (!required && index !== -1) {
+    requiredList.splice(index, 1);
+  }
+
+  schemaData.setDataAt(parentObjectPath, parentObject);
+}
+
 function updateAttributeType(
   attributeData: SchemaObjectAttributeData,
   newType: AttributeTypeChoice
@@ -428,6 +454,7 @@ function updateExternalReferenceValue(
           @update_object_name="updateObjectOrEnumName"
           @update_attribute_name="updateAttributeName"
           @update_attribute_type="updateAttributeType"
+          @update_attribute_required="updateAttributeRequired"
           @delete_element="deleteElement"
           @add_attribute="addAttribute"
           @extract_inlined_element="extractInlinedElement"
