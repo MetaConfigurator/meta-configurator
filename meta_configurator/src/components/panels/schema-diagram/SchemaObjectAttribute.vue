@@ -117,8 +117,7 @@ function getHandleTop() {
         @click.stop
         @dblclick.stop
         @keydown.stop
-        @keyup.enter="updateAttributeName"
-      />
+        @keyup.enter="updateAttributeName" />
 
       <div class="vue-flow-attribute-inline">
         <input
@@ -129,8 +128,7 @@ function getHandleTop() {
           @mousedown.stop
           @click.stop
           @dblclick.stop
-          @keydown.stop
-        />
+          @keydown.stop />
 
         <Select
           class="vue-flow-attribute-dropdown"
@@ -141,8 +139,7 @@ function getHandleTop() {
           @keydown.stop
           @click.stop
           @dblclick.stop
-          placeholder="Select Type"
-        />
+          placeholder="Select Type" />
 
         <Button
           class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
@@ -151,13 +148,11 @@ function getHandleTop() {
           @mousedown.stop
           @click.stop
           @dblclick.stop
-          @click="_ => deleteAttribute()"
-        >
+          @click="_ => deleteAttribute()">
           <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
         </Button>
       </div>
     </div>
-
 
     <Handle
       :id="getHandleId()"
