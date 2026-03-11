@@ -324,6 +324,36 @@
       \field{pages}{199\bibrangedash 220}
       \range{pages}{22}
     \endentry
+    \entry{guarino1998formal}{incollection}{}{}
+      \name{author}{1}{}{%
+        {{hash=307bdf55deacc768352a80967e0b12e6}{%
+           family={Guarino},
+           familyi={G\bibinitperiod},
+           given={N.},
+           giveni={N\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IOS Press}%
+      }
+      \strng{namehash}{307bdf55deacc768352a80967e0b12e6}
+      \strng{fullhash}{307bdf55deacc768352a80967e0b12e6}
+      \strng{fullhashraw}{307bdf55deacc768352a80967e0b12e6}
+      \strng{bibnamehash}{307bdf55deacc768352a80967e0b12e6}
+      \strng{authorbibnamehash}{307bdf55deacc768352a80967e0b12e6}
+      \strng{authornamehash}{307bdf55deacc768352a80967e0b12e6}
+      \strng{authorfullhash}{307bdf55deacc768352a80967e0b12e6}
+      \strng{authorfullhashraw}{307bdf55deacc768352a80967e0b12e6}
+      \field{labelalpha}{Gua98}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Formal Ontology in Information Systems}
+      \field{title}{Formal Ontology and Information Systems}
+      \field{year}{1998}
+      \field{pages}{3\bibrangedash 15}
+      \range{pages}{13}
+    \endentry
     \entry{webprotege}{article}{}{}
       \name{author}{5}{}{%
         {{hash=86479e2c5be74768c2c0ffdfa751006b}{%
@@ -542,13 +572,18 @@
       \strng{authornamehash}{dffe7dd6f49490d80de4a82fd13d8179}
       \strng{authorfullhash}{dffe7dd6f49490d80de4a82fd13d8179}
       \strng{authorfullhashraw}{dffe7dd6f49490d80de4a82fd13d8179}
-      \field{labelalpha}{Ont23}
+      \field{labelalpha}{Ont}
       \field{sortinit}{O}
       \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{GraphDB: RDF Database for Knowledge Graphs}
-      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://www.ontotext.com/products/graphdb/
+      \endverb
+      \verb{url}
+      \verb https://www.ontotext.com/products/graphdb/
+      \endverb
     \endentry
     \entry{openrefine}{misc}{}{}
       \name{author}{1}{}{%
@@ -681,33 +716,46 @@
       \verb https://www.w3.org/TR/sparql11-overview/
       \endverb
     \endentry
-    \entry{semtk}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=947a185dd2612327d37f45299175d357}{%
-           family={Semantic\bibnamedelimb Computing\bibnamedelimb Research\bibnamedelima Group},
-           familyi={S\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim R\bibinitperiod\bibinitdelim G\bibinitperiod},
-           given={Wright\bibnamedelimb State\bibnamedelima U.},
-           giveni={W\bibinitperiod\bibinitdelim S\bibinitperiod\bibinitdelim U\bibinitperiod}}}%
+    \entry{studer1998knowledge}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=6b9c2c7febe554891fc3b7af5e589694}{%
+           family={Studer},
+           familyi={S\bibinitperiod},
+           given={R.},
+           giveni={R\bibinitperiod}}}%
+        {{hash=68cba85fbe23765b76a2c6e0aea42640}{%
+           family={Benjamins},
+           familyi={B\bibinitperiod},
+           given={V.\bibnamedelimi R.},
+           giveni={V\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=46b59b946283bfaee75fb2c56ceb2731}{%
+           family={Fensel},
+           familyi={F\bibinitperiod},
+           given={D.},
+           giveni={D\bibinitperiod}}}%
       }
-      \strng{namehash}{947a185dd2612327d37f45299175d357}
-      \strng{fullhash}{947a185dd2612327d37f45299175d357}
-      \strng{fullhashraw}{947a185dd2612327d37f45299175d357}
-      \strng{bibnamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authorbibnamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authornamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authorfullhash}{947a185dd2612327d37f45299175d357}
-      \strng{authorfullhashraw}{947a185dd2612327d37f45299175d357}
-      \field{labelalpha}{Sem}
+      \strng{namehash}{72f4368657c398ae4f25972b7d8b08cc}
+      \strng{fullhash}{46a2204bc2b8791a8750a04d77e23d4d}
+      \strng{fullhashraw}{46a2204bc2b8791a8750a04d77e23d4d}
+      \strng{bibnamehash}{46a2204bc2b8791a8750a04d77e23d4d}
+      \strng{authorbibnamehash}{46a2204bc2b8791a8750a04d77e23d4d}
+      \strng{authornamehash}{72f4368657c398ae4f25972b7d8b08cc}
+      \strng{authorfullhash}{46a2204bc2b8791a8750a04d77e23d4d}
+      \strng{authorfullhashraw}{46a2204bc2b8791a8750a04d77e23d4d}
+      \field{labelalpha}{SBF98}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{SemTK: Semantic Toolkit}
-      \verb{urlraw}
-      \verb https://semtk.org/
-      \endverb
-      \verb{url}
-      \verb https://semtk.org/
+      \field{journaltitle}{Data \& Knowledge Engineering}
+      \field{number}{1--2}
+      \field{title}{Knowledge Engineering: Principles and Methods}
+      \field{volume}{25}
+      \field{year}{1998}
+      \field{pages}{161\bibrangedash 197}
+      \range{pages}{37}
+      \verb{doi}
+      \verb 10.1016/S0169-023X(97)00056-6
       \endverb
     \endentry
     \entry{jsonld2014}{misc}{}{}
@@ -752,28 +800,6 @@
       \verb{url}
       \verb https://www.w3.org/TR/json-ld/
       \endverb
-    \endentry
-    \entry{topbraid}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=ffcae3313f712f566136fc6d64433acc}{%
-           family={TopQuadrant},
-           familyi={T\bibinitperiod}}}%
-      }
-      \strng{namehash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{fullhash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{fullhashraw}{ffcae3313f712f566136fc6d64433acc}
-      \strng{bibnamehash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{authorbibnamehash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{authornamehash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{authorfullhash}{ffcae3313f712f566136fc6d64433acc}
-      \strng{authorfullhashraw}{ffcae3313f712f566136fc6d64433acc}
-      \field{labelalpha}{Top23}
-      \field{sortinit}{T}
-      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{TopBraid Composer: Semantic Web Modeling Environment}
-      \field{year}{2023}
     \endentry
     \entry{shacl_standard}{misc}{}{}
       \name{author}{1}{}{%

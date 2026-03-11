@@ -2376,28 +2376,30 @@
     <bcf:citekey order="1" intorder="1">json_standard</bcf:citekey>
     <bcf:citekey order="2" intorder="1">wright2020jsonschema</bcf:citekey>
     <bcf:citekey order="3" intorder="1">gruber1993ontology</bcf:citekey>
-    <bcf:citekey order="4" intorder="1">berners2001semantic</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">shacl_standard</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">sparql_standard</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">jsonld2014</bcf:citekey>
-    <bcf:citekey order="8" intorder="1">dimou2014rml</bcf:citekey>
-    <bcf:citekey order="9" intorder="1">metaconfigurator2024</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">guarino1998formal</bcf:citekey>
+    <bcf:citekey order="4" intorder="2">studer1998knowledge</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">berners2001semantic</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">shacl_standard</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">sparql_standard</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">jsonld2014</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">dimou2014rml</bcf:citekey>
     <bcf:citekey order="10" intorder="1">metaconfigurator2024</bcf:citekey>
-    <bcf:citekey order="11" intorder="1">ai_assisted_schema_mapping_2025</bcf:citekey>
-    <bcf:citekey order="12" intorder="1">protege</bcf:citekey>
-    <bcf:citekey order="12" intorder="2">webprotege</bcf:citekey>
-    <bcf:citekey order="13" intorder="1">apache_jena</bcf:citekey>
-    <bcf:citekey order="14" intorder="1">graphdb</bcf:citekey>
-    <bcf:citekey order="15" intorder="1">linkml</bcf:citekey>
-    <bcf:citekey order="16" intorder="1">cedar_workbench</bcf:citekey>
-    <bcf:citekey order="17" intorder="1">karma</bcf:citekey>
-    <bcf:citekey order="17" intorder="2">openrefine</bcf:citekey>
-    <bcf:citekey order="17" intorder="3">sparql_generate</bcf:citekey>
-    <bcf:citekey order="18" intorder="1">shacl_standard</bcf:citekey>
-    <bcf:citekey order="18" intorder="2">sparql_standard</bcf:citekey>
-    <bcf:citekey order="19" intorder="1">jsonld_playground</bcf:citekey>
-    <bcf:citekey order="20" intorder="1">rdflib</bcf:citekey>
-    <bcf:citekey order="20" intorder="2">redland</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">metaconfigurator2024</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">ai_assisted_schema_mapping_2025</bcf:citekey>
+    <bcf:citekey order="13" intorder="1">protege</bcf:citekey>
+    <bcf:citekey order="13" intorder="2">webprotege</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">apache_jena</bcf:citekey>
+    <bcf:citekey order="15" intorder="1">graphdb</bcf:citekey>
+    <bcf:citekey order="16" intorder="1">linkml</bcf:citekey>
+    <bcf:citekey order="17" intorder="1">cedar_workbench</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">karma</bcf:citekey>
+    <bcf:citekey order="18" intorder="2">openrefine</bcf:citekey>
+    <bcf:citekey order="18" intorder="3">sparql_generate</bcf:citekey>
+    <bcf:citekey order="19" intorder="1">shacl_standard</bcf:citekey>
+    <bcf:citekey order="19" intorder="2">sparql_standard</bcf:citekey>
+    <bcf:citekey order="20" intorder="1">jsonld_playground</bcf:citekey>
+    <bcf:citekey order="21" intorder="1">rdflib</bcf:citekey>
+    <bcf:citekey order="21" intorder="2">redland</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">
