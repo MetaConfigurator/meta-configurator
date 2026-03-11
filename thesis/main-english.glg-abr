@@ -1,7 +1,7 @@
 This is makeindex, version 2.18 [TeX Live 2026] (kpathsea + Thai support).
 Scanning style file ./main-english.ist...........................done (27 attributes redefined, 0 ignored).
-Scanning input file main-english.glo-abr....done (180 entries accepted, 0 rejected).
-Sorting entries.....done (1578 comparisons).
-Generating output file main-english.gls-abr....done (83 lines written, 0 warnings).
+Scanning input file main-english.glo-abr....done (198 entries accepted, 0 rejected).
+Sorting entries.....done (1626 comparisons).
+Generating output file main-english.gls-abr....done (93 lines written, 0 warnings).
 Output written in main-english.gls-abr.
 Transcript written in main-english.glg-abr.

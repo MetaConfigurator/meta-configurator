@@ -31,3 +31,4 @@ thesis/*.thm
 thesis/*.toc
 thesis/*.upa
 thesis/*-SAVE-ERROR
+thesis/.DS_Store

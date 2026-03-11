@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  11 MAR 2026 17:53
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  11 MAR 2026 17:56
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/Users/mahdi/Documents/GitHub/meta-configurator/thesis/main-english
@@ -2592,58 +2592,68 @@ Package cleveref Info: loaded `english' language definitions on input line 1.
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 21--21
+Underfull \hbox (badness 10000) in paragraph at lines 22--22
 []|[][][]\TU/texgyretermes(0)/m/n/10.95 18[][][][],[] [][][]20[][][][],[]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 27--28
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 13[][][][],[] [][][]14[][][][],[]
+Underfull \hbox (badness 10000) in paragraph at lines 31--32
+[][][]\TU/texgyretermes(0)/m/n/10.95 14[][][][],[] [][][]16[][][][],[]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 27--28
+Underfull \hbox (badness 10000) in paragraph at lines 31--32
+[][][]\TU/texgyretermes(0)/m/n/10.95 18[][][][],[] [][][]20[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--32
+[][][]\TU/texgyretermes(0)/m/n/10.95 22[][][][]--[][][][]26[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--38
+[][][]\TU/texgyretermes(0)/m/n/10.95 16[][][][]--[][][][]20[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--38
+[][][]\TU/texgyretermes(0)/m/n/10.95 24[][][][]--[][][][]26[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 54--55
+[]|[][][]\TU/texgyretermes(0)/m/n/10.95 3[][][][],[] [][][]4[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 54--55
+[][][]\TU/texgyretermes(0)/m/n/10.95 16[][][][]--[][][][]20[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 54--55
+[][][]\TU/texgyretermes(0)/m/n/10.95 22[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 62--62
+[][][]\TU/texgyretermes(0)/m/n/10.95 20[][][][],[] [][][]24[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 71--72
+[]|[][][]\TU/texgyretermes(0)/m/n/10.95 3[][][][],[] [][][]4[][][][],[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 71--72
 [][][]\TU/texgyretermes(0)/m/n/10.95 16[][][][]--[][][][]18[][][][],[]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 27--28
-[][][]\TU/texgyretermes(0)/m/n/10.95 20[][][][]--[][][][]26[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 31--32
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 13[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 31--32
-[][][]\TU/texgyretermes(0)/m/n/10.95 16[][][][]--[][][][]21[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 48--49
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 16[][][][]--[][][][]18[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 48--49
-[][][]\TU/texgyretermes(0)/m/n/10.95 20[][][][],[] [][][]22[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 55--55
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 13[][][][],[] [][][]20[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 55--55
-[][][]\TU/texgyretermes(0)/m/n/10.95 21[][][][],[] [][][]24[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 62--63
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 17[][][][],[] [][][]18[][][][],[]
+Underfull \hbox (badness 10000) in paragraph at lines 71--72
+[][][]\TU/texgyretermes(0)/m/n/10.95 24[][][][]--[][][][]26[][][][],[]
  []
 
 [11
@@ -2661,9 +2671,9 @@ LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
 
 
 ]
-Package cleveref Info: loaded `english' language definitions on input line 58.
+Package cleveref Info: loaded `english' language definitions on input line 60.
  [14]
-Package cleveref Info: loaded `english' language definitions on input line 88.
+Package cleveref Info: loaded `english' language definitions on input line 92.
  [15]
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/9'
 (microtype)             (new value: 9.0pt) on input line 107.
@@ -2673,43 +2683,43 @@ Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5'
 (microtype)             (new value: 5.0pt) on input line 107.
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
 (Font)              scaled to size 8.09995pt on input line 107.
-Package cleveref Info: loaded `english' language definitions on input line 115.
+Package cleveref Info: loaded `english' language definitions on input line 123.
  [16]
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
 (Font)              scaled to size 8.99994pt on input line 126.
-Package cleveref Info: loaded `english' language definitions on input line 154.
- [17] (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
+ (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang2.sty
 File: lstlang2.sty 2025/11/14 1.11b listings language file
 ) (/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstlang3.sty
 File: lstlang3.sty 2025/11/14 1.11b listings language file
 )
-Package cleveref Info: loaded `english' language definitions on input line 184.
+Package cleveref Info: loaded `english' language definitions on input line 156.
+ [17]
+Package cleveref Info: loaded `english' language definitions on input line 187.
  [18]
-Package cleveref Info: loaded `english' language definitions on input line 218.
+Package cleveref Info: loaded `english' language definitions on input line 227.
  [19]
-Package cleveref Info: loaded `english' language definitions on input line 252.
+Package cleveref Info: loaded `english' language definitions on input line 265.
  [20]
-Package cleveref Info: loaded `english' language definitions on input line 300.
+Package cleveref Info: loaded `english' language definitions on input line 309.
  [21]
-Package cleveref Info: loaded `english' language definitions on input line 329.
+Package cleveref Info: loaded `english' language definitions on input line 338.
  [22]
-Package cleveref Info: loaded `english' language definitions on input line 362.
+Package cleveref Info: loaded `english' language definitions on input line 364.
  [23]
-Package cleveref Info: loaded `english' language definitions on input line 386.
+Package cleveref Info: loaded `english' language definitions on input line 389.
  [24]
 Package cleveref Info: loaded `english' language definitions on input line 420.
  [25]
-Package cleveref Info: loaded `english' language definitions on input line 438.
+Package cleveref Info: loaded `english' language definitions on input line 439.
  [26]
-Package cleveref Info: loaded `english' language definitions on input line 478.
- [27]
 Overfull \hbox (50.10794pt too wide) in paragraph at lines 479--480
 [][]\TU/texgyretermes(0)/b/n/10.95 High[] []tech-ni-cal[] []en-try[] []bar-rier:[] []\TU/texgyretermes(0)/m/n/10.95 Ef-fec-tive[] []use[] []of-ten[] []re-quires[] []ad-vanced[] []knowl-edge[] []of[] [][][][]OWL[][][][]/[][][][][]RDF[][][][]/[][][][][]SPARQL[][][]
  []
 
-) (./chapters/02_design_and_implementation.tex
+Package cleveref Info: loaded `english' language definitions on input line 480.
+[27]) (./chapters/02_design_and_implementation.tex
 Package cleveref Info: loaded `english' language definitions on input line 2.
  [28]
 chapter 2.
@@ -2763,19 +2773,19 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 80591 strings out of 476076
- 195339,3417909 words of node,token memory allocated
- 1207 words of node memory still in use:
-   8 hlist, 2 vlist, 2 rule, 1 local_par, 7 glue, 5 kern, 1 penalty, 4 glyph, 77 attribute, 108 glue_spec, 39 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 18 pdf_action nodes
-   avail lists: 1:8,2:4670,3:738,4:2143,5:3218,6:215,7:7621,8:64,9:7007,10:16,11:688,12:1
+ 80614 strings out of 476076
+ 195344,3417909 words of node,token memory allocated
+ 1171 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 7 glue, 5 kern, 1 penalty, 4 glyph, 71 attribute, 108 glue_spec, 36 attribute_list, 2 shape, 5 write, 1 close, 3 user_defined, 15 pdf_action nodes
+   avail lists: 1:8,2:4565,3:738,4:2232,5:3291,6:230,7:6758,8:64,9:7056,10:16,11:641,12:1
  94835 multiletter control sequences out of 65536+600000
  114 fonts using 25723083 bytes
  108i,21n,115p,11294b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyreheros-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/zapfding/uzdr.pfb>
-Output written on main-english.pdf (39 pages, 142178 bytes).
+Output written on main-english.pdf (39 pages, 143404 bytes).
 
-PDF statistics: 1025 PDF objects out of 1200 (max. 8388607)
- 952 compressed objects within 10 object streams
+PDF statistics: 1052 PDF objects out of 1200 (max. 8388607)
+ 979 compressed objects within 10 object streams
  320 named destinations out of 1000 (max. 1048576)
  296 words of extra memory for PDF output out of 10000 (max. 100000000)
 
