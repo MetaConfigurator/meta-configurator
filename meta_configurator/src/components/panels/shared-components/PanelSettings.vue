@@ -68,7 +68,7 @@ const settingsName = computed(() => {
 </script>
 
 <template>
-  <Panel :header="panelName" toggleable :collapsed="true">
+  <Panel :header="panelName" toggleable :collapsed="true" class="panel-settings-scroll">
     <template v-if="containsText" #icons>
       <Button icon="pi pi-clone" severity="secondary" @click="copyToClipboard" rounded text />
     </template>
@@ -88,6 +88,10 @@ const settingsName = computed(() => {
 </template>
 
 <style scoped>
+.panel-settings-scroll {
+  max-height: 80vh;
+  overflow-y: auto;
+}
 .properties-panel-container {
   padding-top: 1.5rem;
 }
