@@ -45,11 +45,11 @@ const emit = defineEmits<{
   (e: 'delete_element', objectData: SchemaElementData): void;
 }>();
 
-const isRequired = ref(props.data.required);
 
 function updateRequired() {
-  emit('update_attribute_required', props.data, isRequired.value);
+  emit('update_attribute_required', props.data, props.data.required);
 }
+
 
 const attrName = ref(props.data.name);
 const selectedType: Ref<AttributeTypeChoice | undefined> = ref(
@@ -105,7 +105,7 @@ function getHandleTop() {
     v-on:click.stop>
     <div v-if="!isEditable()">
       <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
-      <span class="text-red-600">{{ isRequired ? '*' : '' }}</span>
+      <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
       <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
     </div>
 
@@ -124,7 +124,7 @@ function getHandleTop() {
       <input
         type="checkbox"
         class="vue-flow-required-checkbox"
-        v-model="isRequired"
+        v-model="props.data.required"
         @change="updateRequired"
         @mousedown.stop
         @click.stop
