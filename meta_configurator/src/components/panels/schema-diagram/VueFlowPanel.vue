@@ -335,7 +335,7 @@ function updateAttributeRequired(attributeData: SchemaObjectAttributeData, requi
   if (!required && index !== -1) {
     requiredList.splice(index, 1);
   }
-  
+
   schemaData.setDataAt(parentObjectPath, parentObject);
 }
 

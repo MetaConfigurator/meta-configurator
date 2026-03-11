@@ -45,11 +45,9 @@ const emit = defineEmits<{
   (e: 'delete_element', objectData: SchemaElementData): void;
 }>();
 
-
 function updateRequired() {
   emit('update_attribute_required', props.data, props.data.required);
 }
-
 
 const attrName = ref(props.data.name);
 const selectedType: Ref<AttributeTypeChoice | undefined> = ref(
