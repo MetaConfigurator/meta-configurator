@@ -1,0 +1,116 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "type": "SoftwareSourceCode",
+  "applicationCategory": "Research Data Management",
+  "author": [
+    {
+      "id": "https://orcid.org/0009-0008-5367-2034",
+      "type": "Person",
+      "affiliation": {
+        "type": "Organization",
+        "name": "University of Stuttgart"
+      },
+      "email": "felix@neuby.de",
+      "familyName": "Neubauer",
+      "givenName": "Felix"
+    },
+    {
+      "id": "_:author_2",
+      "type": "Person",
+      "affiliation": {
+        "type": "Organization",
+        "name": "University of Stuttgart"
+      },
+      "familyName": "Bredl",
+      "givenName": "Paul"
+    },
+    {
+      "id": "_:author_3",
+      "type": "Person",
+      "affiliation": {
+        "type": "Organization",
+        "name": "University of Stuttgart"
+      },
+      "familyName": "Xu",
+      "givenName": "Minye"
+    },
+    {
+      "id": "_:author_4",
+      "type": "Person",
+      "affiliation": {
+        "type": "Organization",
+        "name": "University of Stuttgart"
+      },
+      "familyName": "Patel",
+      "givenName": "Keyuriben"
+    },
+    {
+      "id": "https://orcid.org/0000-0003-1045-8202",
+      "type": "Person",
+      "affiliation": {
+        "type": "Organization",
+        "name": "University of Stuttgart"
+      },
+      "familyName": "Pleiss",
+      "givenName": "Jürgen"
+    },
+    {
+      "id": "https://orcid.org/0000-0002-1314-9969",
+      "type": "Person",
+      "affiliation": {
+        "type": "Organization",
+        "name": "University of Stuttgart"
+      },
+      "familyName": "Uekermann",
+      "givenName": "Benjamin"
+    }
+  ],
+  "codeRepository": "https://github.com/MetaConfigurator/meta-configurator",
+  "dateCreated": "2023-03-13",
+  "dateModified": "2024-09-28",
+  "datePublished": "2023-10-19",
+  "description": "MetaConfigurator is a powerful, user-friendly JSON schema editor and form generator with AI assistance. It simplifies the process of creating and editing structured data files such as configuration files and research data, making it accessible to both technical and non-technical users.\n",
+  "downloadUrl": "https://github.com/MetaConfigurator/meta-configurator/releases/tag/2.0.0",
+  "identifier": "https://doi.org/10.1007/s13222-024-00472-7",
+  "keywords": [
+    "JSON",
+    "JSON Schema",
+    "Schema",
+    "Editor",
+    "Form Generation",
+    "Code Generation",
+    "Model Driven Engineering",
+    "MDE",
+    "UI",
+    "Web",
+    "Configurator",
+    "Research Data",
+    "Research Software Engineering",
+    "RSE"
+  ],
+  "license": "https://spdx.org/licenses/MIT",
+  "name": "MetaConfigurator",
+  "operatingSystem": [
+    "Android",
+    "Linux",
+    "Windows",
+    "macOs"
+  ],
+  "programmingLanguage": "TypeScript",
+  "relatedLink": [
+    "http://metaconfigurator.org/",
+    "http://metaconfigurator.github.io/meta-configurator/"
+  ],
+  "runtimePlatform": [
+    "Browser",
+    "Web"
+  ],
+  "version": "2.0.0",
+  "contIntegration": "https://github.com/MetaConfigurator/meta-configurator/actions",
+  "codemeta:continuousIntegration": {
+    "id": "https://github.com/MetaConfigurator/meta-configurator/actions"
+  },
+  "developmentStatus": "active",
+  "issueTracker": "https://github.com/MetaConfigurator/meta-configurator/issues",
+  "referencePublication": "https://doi.org/10.1007/s13222-024-00472-7"
+}
