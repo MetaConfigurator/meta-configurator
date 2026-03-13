@@ -53,7 +53,7 @@ const copyToClipboard = async () => {
 };
 
 const containsText = computed(() => {
-  return props.panelType == "textEditor";
+  return props.panelType == 'textEditor';
 });
 
 const settingsName = computed(() => {
@@ -72,15 +72,15 @@ const settingsName = computed(() => {
 function hideView() {
   const mode = props.sessionMode;
   const settings = useSettings().value;
-  settings.panels[mode] = settings.panels[mode].filter(panel => panel.panelType !== props.panelType);
+  settings.panels[mode] = settings.panels[mode].filter(
+    panel => panel.panelType !== props.panelType
+  );
 }
-
 </script>
 
 <template>
   <Panel :header="panelDisplayName" toggleable :collapsed="true" class="panel-settings-scroll">
     <template #icons>
-
       <Button
         v-if="containsText"
         text
@@ -90,14 +90,9 @@ function hideView() {
         <FontAwesomeIcon icon="fa-regular fa-clone" />
       </Button>
 
-      <Button
-        text
-        severity="secondary"
-        v-tooltip.left="'Hide view'"
-        @click="hideView()">
+      <Button text severity="secondary" v-tooltip.left="'Hide view'" @click="hideView()">
         <FontAwesomeIcon icon="fa-solid fa-eye-slash" />
       </Button>
-
     </template>
     <slot></slot>
     <div class="properties-panel-container">

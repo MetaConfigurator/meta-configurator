@@ -43,7 +43,8 @@ import {
   faBook,
   faLockOpen,
   faFileZipper,
-  faLink, faEyeSlash,
+  faLink,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -51,7 +52,8 @@ import {
   faFloppyDisk as faFloppyDiskRegular,
   faFolderOpen as faFolderOpenRegular,
   faEye as faEyeRegular,
-  faFileCode as faFileCodeRegular, faClone,
+  faFileCode as faFileCodeRegular,
+  faClone,
 } from '@fortawesome/free-regular-svg-icons';
 import {faLock} from '@fortawesome/free-solid-svg-icons/faLock';
 
