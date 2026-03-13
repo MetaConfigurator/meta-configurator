@@ -44,7 +44,6 @@ import {
   faLockOpen,
   faFileZipper,
   faLink,
-  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -87,7 +86,6 @@ export function registerIcons() {
   library.add(faTriangleExclamation);
   library.add(faTrashArrowUp);
   library.add(faEye);
-  library.add(faEyeSlash);
   library.add(faEyeRegular);
   library.add(faDiagramProject);
   library.add(faCode);
