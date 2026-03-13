@@ -11,7 +11,6 @@ import Button from 'primevue/button';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
-import {useSettings} from '@/settings/useSettings.ts';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
@@ -69,13 +68,7 @@ const settingsName = computed(() => {
   return props.panelDisplayName + ' Settings';
 });
 
-function hideView() {
-  const mode = props.sessionMode;
-  const settings = useSettings().value;
-  settings.panels[mode] = settings.panels[mode].filter(
-    panel => panel.panelType !== props.panelType
-  );
-}
+
 </script>
 
 <template>
@@ -88,10 +81,6 @@ function hideView() {
         v-tooltip.left="'Copy text to clipboard'"
         @click="copyToClipboard()">
         <FontAwesomeIcon icon="fa-regular fa-clone" />
-      </Button>
-
-      <Button v-if="panelType" text severity="secondary" v-tooltip.left="'Hide view'" @click="hideView()">
-        <FontAwesomeIcon icon="fa-solid fa-eye-slash" />
       </Button>
     </template>
     <slot></slot>
