@@ -16,7 +16,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
   panelDisplayName: string;
-  panelType: string;
+  panelType?: string;
   settingsHeader?: string;
   panelSettingsPath: Path;
   sessionMode: SessionMode;
@@ -90,7 +90,7 @@ function hideView() {
         <FontAwesomeIcon icon="fa-regular fa-clone" />
       </Button>
 
-      <Button text severity="secondary" v-tooltip.left="'Hide view'" @click="hideView()">
+      <Button v-if="panelType" text severity="secondary" v-tooltip.left="'Hide view'" @click="hideView()">
         <FontAwesomeIcon icon="fa-solid fa-eye-slash" />
       </Button>
     </template>
