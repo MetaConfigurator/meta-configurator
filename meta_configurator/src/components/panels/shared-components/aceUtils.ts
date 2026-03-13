@@ -33,13 +33,13 @@ export function setupAceProperties(editor: Editor, settings: SettingsInterfaceRo
     editor.setTheme('ace/theme/clouds');
   }
   editor.setShowPrintMargin(false);
-  editor.getSession().setTabSize(settings.codeEditor.tabSize);
+  editor.getSession().setTabSize(settings.textEditor.tabSize);
 
   // it's not clear why timeout is needed here, but without it the
   // ace editor starts flashing and becomes unusable
   window.setTimeout(() => {
     watchImmediate(
-      () => settings.codeEditor.fontSize,
+      () => settings.textEditor.fontSize,
       fontSize => {
         if (editor && fontSize && fontSize > 6 && fontSize < 65) {
           editor.setFontSize(fontSize.toString() + 'px');

@@ -16,7 +16,8 @@ const props = defineProps<{
 <template>
   <div class="panel-container">
     <PanelSettings
-      panel-name="AI Prompts View"
+      panel-display-name="AI Prompts View"
+      panel-type="aiPrompts"
       :panel-settings-path="['aiIntegration']"
       :sessionMode="props.sessionMode">
       <p>
