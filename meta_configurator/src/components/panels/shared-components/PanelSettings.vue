@@ -67,8 +67,6 @@ const settingsName = computed(() => {
   }
   return props.panelDisplayName + ' Settings';
 });
-
-
 </script>
 
 <template>
