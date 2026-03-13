@@ -17,7 +17,7 @@ export const SETTINGS_DATA_DEFAULT = {
     maxErrorsToShow: 15,
     maxErrorsToShowBulkValidation: 200,
   },
-  codeEditor: {
+  textEditor: {
     fontSize: 14,
     tabSize: 2,
     showFormatSelector: true,

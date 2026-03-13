@@ -9,7 +9,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     'dataFormat',
     'toolbarTitle',
     'performance',
-    'codeEditor',
+    'textEditor',
     'guiEditor',
     'schemaDiagram',
     'documentation',
@@ -122,7 +122,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
       },
     },
-    codeEditor: {
+    textEditor: {
       type: 'object',
       required: ['fontSize', 'tabSize', 'showFormatSelector', 'xml'],
       additionalProperties: false,
