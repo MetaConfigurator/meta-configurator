@@ -38,7 +38,7 @@ For example, a sample mapping hint that could convert the JSON example in Listin
 
 After providing these hints, the AI model (OpenAI GPT-4o-Mini) generates an RML mapping that follows the specified structure and semantics, as shown in Figure \ref{fig:metaconfigurator_interface_rdf:rml_2}. This mapping closely resembles the one presented in Listing \ref{lst:background_rml_mapping}. Once the user reviews and confirms the mapping, it can be executed to transform the input JSON data into a semantically enriched JSON-LD representation, as illustrated in Figure \ref{fig:metaconfigurator_interface_rdf:jsonld_1}.
 
-\begin{lstlisting}[caption={Sample RML hints which describe the mapping from JSON to JSON-LD}, label={lst:metaconfigurator_interface_rdf:rml_hint}, basicstyle=\ttfamily]
+\begin{lstlisting}[style=plaintext,caption={Sample RML hints which describe the mapping from JSON to JSON-LD}, label={lst:metaconfigurator_interface_rdf:rml_hint}, basicstyle=\ttfamily]
 Create one main resource local:run_fenics_simulation of type m4i:Method.
 This node links to parameter nodes using m4i:hasParameter and to metric nodes using m4i:investigates.
 

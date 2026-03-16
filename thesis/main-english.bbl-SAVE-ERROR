@@ -176,6 +176,42 @@
       \field{title}{JSON-LD Playground}
       \field{year}{2023}
     \endentry
+    \entry{das2012r2rml}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=dbbd12787f57ae5996546418b9c2b749}{%
+           family={Das},
+           familyi={D\bibinitperiod},
+           given={Souripriya},
+           giveni={S\bibinitperiod}}}%
+        {{hash=d0cfa0aaa35cf7bdc813cef715cfbe57}{%
+           family={Sundara},
+           familyi={S\bibinitperiod},
+           given={Srikumar},
+           giveni={S\bibinitperiod}}}%
+        {{hash=ff065518eacac535eec041c322c21896}{%
+           family={Cyganiak},
+           familyi={C\bibinitperiod},
+           given={Richard},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{f54a4724f9174be49115fc023b4e28df}
+      \strng{fullhash}{f730a58a33e2b5282c076a36a1ae779f}
+      \strng{fullhashraw}{f730a58a33e2b5282c076a36a1ae779f}
+      \strng{bibnamehash}{f730a58a33e2b5282c076a36a1ae779f}
+      \strng{authorbibnamehash}{f730a58a33e2b5282c076a36a1ae779f}
+      \strng{authornamehash}{f54a4724f9174be49115fc023b4e28df}
+      \strng{authorfullhash}{f730a58a33e2b5282c076a36a1ae779f}
+      \strng{authorfullhashraw}{f730a58a33e2b5282c076a36a1ae779f}
+      \field{labelalpha}{DSC12}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://www.w3.org/TR/r2rml/}}
+      \field{note}{W3C Recommendation}
+      \field{title}{R2RML: RDB to RDF Mapping Language}
+      \field{year}{2012}
+    \endentry
     \entry{dimou2014rml}{inproceedings}{}{}
       \name{author}{6}{}{%
         {{hash=627dac41d3a9554fe6ddd654ab112600}{%
@@ -354,6 +390,155 @@
       \field{pages}{3\bibrangedash 15}
       \range{pages}{13}
     \endentry
+    \entry{codemirror}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=129098e814fb9141e381f6b3068dd41c}{%
+           family={Haverbeke},
+           familyi={H\bibinitperiod},
+           given={Marijn},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{fullhash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{fullhashraw}{129098e814fb9141e381f6b3068dd41c}
+      \strng{bibnamehash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{authorbibnamehash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{authornamehash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{authorfullhash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{authorfullhashraw}{129098e814fb9141e381f6b3068dd41c}
+      \field{labelalpha}{Hav23}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{CodeMirror: In-browser Code Editor}
+      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://codemirror.net/
+      \endverb
+      \verb{url}
+      \verb https://codemirror.net/
+      \endverb
+    \endentry
+    \entry{hogan2021knowledgegraphs}{article}{}{}
+      \name{author}{18}{}{%
+        {{hash=56f2d88e83f41f6e1f0d9a0197c4c7eb}{%
+           family={Hogan},
+           familyi={H\bibinitperiod},
+           given={Aidan},
+           giveni={A\bibinitperiod}}}%
+        {{hash=019293949e6289df4e3b751f3f9ecf4e}{%
+           family={Blomqvist},
+           familyi={B\bibinitperiod},
+           given={Eva},
+           giveni={E\bibinitperiod}}}%
+        {{hash=ac9f2c71e19d14efaa82ad1908d35843}{%
+           family={Cochez},
+           familyi={C\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=394d1d807bb7b7586bae609d5aa73cee}{%
+           family={d'Amato},
+           familyi={d\bibinitperiod},
+           given={Claudia},
+           giveni={C\bibinitperiod}}}%
+        {{hash=96fa7de0e15705cafb281ade1eaecfd0}{%
+           family={Melo},
+           familyi={M\bibinitperiod},
+           given={Gerard},
+           giveni={G\bibinitperiod},
+           prefix={de},
+           prefixi={d\bibinitperiod}}}%
+        {{hash=5feae03b05f14f0a5fd1f3e07badd8e6}{%
+           family={Gutierrez},
+           familyi={G\bibinitperiod},
+           given={Claudio},
+           giveni={C\bibinitperiod}}}%
+        {{hash=5ddbf3af24e3802f8842794c8c86b60c}{%
+           family={Kirrane},
+           familyi={K\bibinitperiod},
+           given={Sabrina},
+           giveni={S\bibinitperiod}}}%
+        {{hash=e5dd48e57271eb2f5a4e20bd6b8e4690}{%
+           family={Labra\bibnamedelima Gayo},
+           familyi={L\bibinitperiod\bibinitdelim G\bibinitperiod},
+           given={Jose\bibnamedelima Emilio},
+           giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=6fe24dce481a67e247581d4b20435709}{%
+           family={Navigli},
+           familyi={N\bibinitperiod},
+           given={Roberto},
+           giveni={R\bibinitperiod}}}%
+        {{hash=9aabe7235b5cda4ebcca85f21cf40b60}{%
+           family={Neumaier},
+           familyi={N\bibinitperiod},
+           given={Sebastian},
+           giveni={S\bibinitperiod}}}%
+        {{hash=a53ea1e67bff64c9ebe4ffbf19a852d2}{%
+           family={Ngomo},
+           familyi={N\bibinitperiod},
+           given={Axel-Cyrille\bibnamedelima Ngonga},
+           giveni={A\bibinithyphendelim C\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=a2be0ec850b04b1f5e9fe3aca6bf5226}{%
+           family={Polleres},
+           familyi={P\bibinitperiod},
+           given={Axel},
+           giveni={A\bibinitperiod}}}%
+        {{hash=95ae583344f22f1d58dae51c33b60901}{%
+           family={Rashid},
+           familyi={R\bibinitperiod},
+           given={Sabbir\bibnamedelima M.},
+           giveni={S\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=1bff37423f112cd817f8975c889c0791}{%
+           family={Rula},
+           familyi={R\bibinitperiod},
+           given={Anisa},
+           giveni={A\bibinitperiod}}}%
+        {{hash=9c1975136125fdac517346a463335503}{%
+           family={Schmelzeisen},
+           familyi={S\bibinitperiod},
+           given={Lukas},
+           giveni={L\bibinitperiod}}}%
+        {{hash=9d2c4c78dacb7d5c0f840ed22b1fd0c8}{%
+           family={Sequeda},
+           familyi={S\bibinitperiod},
+           given={Juan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=3489f3873d85937d1977e3a21e5e76a7}{%
+           family={Staab},
+           familyi={S\bibinitperiod},
+           given={Steffen},
+           giveni={S\bibinitperiod}}}%
+        {{hash=2472f33c293d18b30767d8cd170089fd}{%
+           family={Zimmermann},
+           familyi={Z\bibinitperiod},
+           given={Antoine},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{d5ce211d54ee18055922d1ccf1a63ea0}
+      \strng{fullhash}{f2311051bb070d887f7bf79203c6dc80}
+      \strng{fullhashraw}{f2311051bb070d887f7bf79203c6dc80}
+      \strng{bibnamehash}{f2311051bb070d887f7bf79203c6dc80}
+      \strng{authorbibnamehash}{f2311051bb070d887f7bf79203c6dc80}
+      \strng{authornamehash}{d5ce211d54ee18055922d1ccf1a63ea0}
+      \strng{authorfullhash}{f2311051bb070d887f7bf79203c6dc80}
+      \strng{authorfullhashraw}{f2311051bb070d887f7bf79203c6dc80}
+      \field{labelalpha}{HBC+21}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ACM Computing Surveys}
+      \field{number}{4}
+      \field{title}{Knowledge Graphs}
+      \field{volume}{54}
+      \field{year}{2021}
+      \field{pages}{1\bibrangedash 37}
+      \range{pages}{37}
+      \verb{doi}
+      \verb 10.1145/3447772
+      \endverb
+    \endentry
     \entry{webprotege}{article}{}{}
       \name{author}{5}{}{%
         {{hash=86479e2c5be74768c2c0ffdfa751006b}{%
@@ -422,6 +607,58 @@
       \field{labeltitlesource}{title}
       \field{title}{Karma: A Data Integration Tool for Mapping Structured Data to RDF}
       \field{year}{2020}
+    \endentry
+    \entry{janowicz2015geospatial}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=f8032db780b653246bf029dcbffb6859}{%
+           family={Janowicz},
+           familyi={J\bibinitperiod},
+           given={Krzysztof},
+           giveni={K\bibinitperiod}}}%
+        {{hash=f5f9e34f0f94cb29697bb1ea72190579}{%
+           family={Haller},
+           familyi={H\bibinitperiod},
+           given={Armin},
+           giveni={A\bibinitperiod}}}%
+        {{hash=9739cb225b25807f7d9c9dd037f3ae2d}{%
+           family={Cox},
+           familyi={C\bibinitperiod},
+           given={Simon\bibnamedelimb J.\bibnamedelimi D.},
+           giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=efb04a9f7ce7ef0345c2ff647f20cbf3}{%
+           family={Le\bibnamedelima Phuoc},
+           familyi={L\bibinitperiod\bibinitdelim P\bibinitperiod},
+           given={Danh},
+           giveni={D\bibinitperiod}}}%
+        {{hash=36ea51918966dde7b9dd325ba6f9147b}{%
+           family={Lefrançois},
+           familyi={L\bibinitperiod},
+           given={Maxime},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{554eabe32aee0c682029595d36dd779c}
+      \strng{fullhash}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{fullhashraw}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{bibnamehash}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{authorbibnamehash}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{authornamehash}{554eabe32aee0c682029595d36dd779c}
+      \strng{authorfullhash}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{authorfullhashraw}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \field{labelalpha}{JHC+15}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{AI Magazine}
+      \field{number}{1}
+      \field{title}{Why the Data Train Needs Semantic Rails}
+      \field{volume}{36}
+      \field{year}{2015}
+      \field{pages}{5\bibrangedash 14}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1609/aimag.v36i1.2568
+      \endverb
     \endentry
     \entry{linkml}{article}{}{}
       \true{moreauthor}
@@ -787,9 +1024,11 @@
       \strng{authornamehash}{259371d4ff2a017f622765ec7a277a8d}
       \strng{authorfullhash}{2d04803448e59b62c7be4c7acf65676b}
       \strng{authorfullhashraw}{2d04803448e59b62c7be4c7acf65676b}
+      \field{extraname}{1}
       \field{labelalpha}{SKL14}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extraalpha}{1}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{JSON-LD 1.0: A JSON-based Serialization for Linked Data}
@@ -800,6 +1039,44 @@
       \verb{url}
       \verb https://www.w3.org/TR/json-ld/
       \endverb
+    \endentry
+    \entry{sporny2014jsonld}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=a466ea64da1230f086236ee5cc2e8151}{%
+           family={Sporny},
+           familyi={S\bibinitperiod},
+           given={Manu},
+           giveni={M\bibinitperiod}}}%
+        {{hash=436a37a83ece69ff0ba2b555d4dd82aa}{%
+           family={Kellogg},
+           familyi={K\bibinitperiod},
+           given={Gregg},
+           giveni={G\bibinitperiod}}}%
+        {{hash=d91ccb882c2defa0b7d5801d3486fe95}{%
+           family={Lanthaler},
+           familyi={L\bibinitperiod},
+           given={Markus},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{a5baa510dded8b58d4df7371fb7d0e22}
+      \strng{fullhash}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{fullhashraw}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{bibnamehash}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{authorbibnamehash}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{authornamehash}{a5baa510dded8b58d4df7371fb7d0e22}
+      \strng{authorfullhash}{044908d0c2594e499a7acdc1bbbd8199}
+      \strng{authorfullhashraw}{044908d0c2594e499a7acdc1bbbd8199}
+      \field{extraname}{2}
+      \field{labelalpha}{SKL14}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extraalpha}{2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://www.w3.org/TR/json-ld/}}
+      \field{note}{W3C Recommendation}
+      \field{title}{JSON-LD 1.0: A JSON-based Serialization for Linked Data}
+      \field{year}{2014}
     \endentry
     \entry{shacl_standard}{misc}{}{}
       \name{author}{1}{}{%

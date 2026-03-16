@@ -11,7 +11,7 @@ The increasing adoption of computational experiments and simulation workflows in
 
 In computational science workflows, \gls{json} files often capture experiment parameters and resulting metrics. The following example illustrates a minimal \gls{json} document describing the input parameter \texttt{element\_size} and the resulting metric \texttt{max\_von\_mises\_stress}.
 
-\begin{lstlisting}[language=json, caption={Example JSON representation of simulation input parameters and results}, label={lst:background_json_example}]
+\begin{lstlisting}[style=json,caption={Example JSON representation of simulation input parameters and results}, label={lst:background_json_example}]
 {
   "parameters": [
     {
@@ -42,7 +42,7 @@ JSON Schema provides a standardized mechanism for describing the expected struct
 
 Listing \ref{lst:background_json_schema} shows a JSON Schema corresponding to the example \gls{json} document in Listing \ref{lst:background_json_example}. The schema ensures that the \gls{json} document contains the expected parameter and metric fields and enforces the correct numeric data types.
 
-\begin{lstlisting}[language=json, caption={JSON Schema validating the simulation result JSON document}, label={lst:background_json_schema}]
+\begin{lstlisting}[style=json, caption={JSON Schema validating the simulation result JSON document}, label={lst:background_json_schema}]
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Simulation Results",
@@ -135,7 +135,7 @@ The Semantic Web extends the World Wide Web by enabling data to be represented i
 
 \gls{jsonld} is one of the key technologies bridging conventional \gls{json} data and the Semantic Web. By adding semantic annotations, \gls{jsonld} enables \gls{json} documents to be interpreted as \gls{rdf} graphs. For instance, in the example simulation data (Listing \ref{lst:background_jsonld_example}), the simulation parameter \texttt{element\_size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} class.
 
-\begin{lstlisting}[language=json, caption={Example of semantic annotation of a parameter with QUDT unit}, label={lst:background_qudt_example}]
+\begin{lstlisting}[style=json, caption={Example of semantic annotation of a parameter with QUDT unit}, label={lst:background_qudt_example}]
 {
   "@id": "local:variable_element_size",
   "@type": "schema:PropertyValue",
@@ -177,7 +177,7 @@ The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against 
 
 For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing \ref{lst:background_jsonld_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
 
-\begin{lstlisting}[language=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
+\begin{lstlisting}[style=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix schema: <https://schema.org/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -223,7 +223,7 @@ By applying this shape, \gls{rdf} data can be automatically checked for complian
 
 For example, using the \gls{jsonld} simulation data, we might want to retrieve all experiment parameters along with their values and units. A \gls{sparql} query could be written as:
 
-\begin{lstlisting}[language=sparql, caption={SPARQL query retrieving parameter values and units}, label={lst:background_sparql_example}]
+\begin{lstlisting}[style=sparql, caption={SPARQL query retrieving parameter values and units}, label={lst:background_sparql_example}]
 PREFIX schema: <https://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX unit: <http://qudt.org/vocab/unit/>
@@ -261,7 +261,7 @@ A typical \gls{jsonld} document has two key structural components:
 
 Listing \ref{lst:background_jsonld_example} shows a \gls{jsonld} representation corresponding to the example simulation result. The \texttt{@context} defines prefixes such as \href{https://schema.org/}{\texttt{schema}} and \href{https://qudt.org/vocab/unit}{\texttt{unit}}, while the \texttt{@graph} contains nodes representing the simulation run, the \texttt{element\_size} parameter, and the stress metric.
 
-\begin{lstlisting}[language=json, caption={JSON-LD representation of the simulation result}, label={lst:background_jsonld_example}]
+\begin{lstlisting}[style=json, caption={JSON-LD representation of the simulation result}, label={lst:background_jsonld_example}]
 {
     "@context": {
         "m4i": "http://w3id.org/nfdi4ing/metadata4ing#",
@@ -345,7 +345,7 @@ G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in
 
 Listing \ref{lst:background_rml_mapping} shows an example \gls{rml} mapping that converts the \gls{json} simulation output from Listing \ref{lst:background_json_example} into the \gls{jsonld} structure presented in Listing \ref{lst:background_jsonld_example}.
 
-\begin{lstlisting}[language=turtle, caption={RML mapping from JSON simulation output to RDF/JSON-LD}, label={lst:background_rml_mapping}]
+\begin{lstlisting}[style=turtle, caption={RML mapping from JSON simulation output to RDF/JSON-LD}, label={lst:background_rml_mapping}]
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .

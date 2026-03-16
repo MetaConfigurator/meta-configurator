@@ -1,12 +1,12 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces A snapshot of MetaConfigurator's schema editing interface.}}{26}{figure.278}%
-\contentsline {figure}{\numberline {1.2}{\ignorespaces A snapshot of MetaConfigurator's data editing interface.}}{27}{figure.280}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces A snapshot of MetaConfigurator's schema editing interface.}}{24}{figure.278}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces A snapshot of MetaConfigurator's data editing interface.}}{25}{figure.280}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces A snapshot of MetaConfigurator's RDF panel.}}{34}{figure.306}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces The RML mapping dialog for JSON-to-JSON-LD conversion.}}{35}{figure.309}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces AI-generated RML mapping (OpenAI GPT-4o-Mini) based on user-provided hints from Listing \ref {lst:metaconfigurator_interface_rdf:rml_hint}}}{37}{figure.333}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}}}{38}{figure.335}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces A snapshot of MetaConfigurator's RDF panel.}}{32}{figure.306}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces The RML mapping dialog for JSON-to-JSON-LD conversion.}}{33}{figure.309}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces AI-generated RML mapping (OpenAI GPT-4o-Mini) based on user-provided hints from Listing \ref {lst:metaconfigurator_interface_rdf:rml_hint}}}{35}{figure.333}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}}}{36}{figure.335}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

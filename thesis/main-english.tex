@@ -669,6 +669,93 @@
 \usepackage[realmainfile]{currfile}
 \usepackage{tcolorbox}
 \tcbuselibrary{listings}
+% Define background color
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+% Define a reusable style for code listings
+\lstdefinestyle{json}{
+    basicstyle=\ttfamily\scriptsize,  % monospaced and smaller
+    numbers=left,                      % line numbers
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,                      % frame around the listing
+    backgroundcolor=\color{backcolour},
+    stringstyle=\ttfamily,
+    commentstyle=\ttfamily,
+    keywordstyle=\ttfamily
+}
+
+\lstdefinestyle{plaintext}{
+    basicstyle=\ttfamily\scriptsize, % monospaced, small font
+    numbers=left,                     % line numbers
+    numberstyle=\tiny,                % size of line numbers
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,           % don't show spaces as special symbols
+    breaklines=true,                  % wrap long lines
+    frame=single,                     % box around the listing
+    backgroundcolor=\color{backcolour}, % light background
+    stringstyle=\ttfamily,            % plain text for strings
+    commentstyle=\ttfamily,           % plain text for comments
+    keywordstyle=\ttfamily,           % no keyword highlighting
+    morekeywords={}                   % no extra keywords
+}
+
+\lstdefinestyle{turtle}{
+    basicstyle=\ttfamily\scriptsize,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{backcolour},
+    stringstyle=\ttfamily,       % literals
+    commentstyle=\ttfamily\itshape, % comments italic
+    keywordstyle=\ttfamily,      % RDF keywords like a:, rdfs:, etc.
+    morekeywords={@prefix,@base}, % Turtle directives
+    alsoletter={:,_},            % allow colon and underscore in keywords
+    literate=
+      {:}{{:}}1
+      {;}{{;}}1
+      {,}{{,}}1
+      {.}{{.}}1
+      {"}{{"}}1
+      {<}{{<}}1
+      {>}{{>}}1
+}
+
+\lstdefinestyle{sparql}{
+    basicstyle=\ttfamily\scriptsize,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{backcolour},
+    stringstyle=\ttfamily,
+    commentstyle=\ttfamily\itshape,
+    keywordstyle=\ttfamily\bfseries,
+    morekeywords={
+        SELECT, CONSTRUCT, ASK, DESCRIBE, WHERE, FILTER, OPTIONAL, 
+        UNION, PREFIX, BASE, GRAPH, FROM, ORDER, BY, DESC, ASC, LIMIT, OFFSET
+    },
+    alsoletter={:,_},
+    literate=
+      {:}{{:}}1
+      {;}{{;}}1
+      {,}{{,}}1
+      {.}{{.}}1
+      {"}{{"}}1
+      {<}{{<}}1
+      {>}{{>}}1
+}
 
 %introduce \powerset - hint by http://matheplanet.com/matheplanet/nuke/html/viewtopic.php?topic=136492&post_id=997377
 \DeclareFontFamily{U}{MnSymbolC}{}
