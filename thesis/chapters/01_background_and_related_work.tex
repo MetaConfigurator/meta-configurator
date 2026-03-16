@@ -9,7 +9,7 @@ The increasing adoption of computational experiments and simulation workflows in
 
 \gls{json} is a lightweight data-interchange format widely used for representing structured data in web services, scientific workflows, and configuration systems. \gls{json} encodes data as attribute-value pairs and ordered lists, making it human-readable and easy to parse by machines. Due to its simplicity and broad ecosystem support, \gls{json} has become a de facto standard for structured data exchange across many domains \cite{json_standard}.
 
-In computational science workflows, \gls{json} files often capture experiment parameters and resulting metrics. The following example illustrates a minimal \gls{json} document describing the input parameter \texttt{element-size} and the resulting metric \texttt{max\_von\_mises\_stress}.
+In computational science workflows, \gls{json} files often capture experiment parameters and resulting metrics. The following example illustrates a minimal \gls{json} document describing the input parameter \texttt{element\_size} and the resulting metric \texttt{max\_von\_mises\_stress}.
 
 \begin{lstlisting}[language=json, caption={Example JSON representation of simulation input parameters and results}, label={lst:background_json_example}]
 {
@@ -133,7 +133,7 @@ Ontologies serve as the backbone for semantic data integration and reasoning. Th
 
 The Semantic Web extends the World Wide Web by enabling data to be represented in a machine-readable, semantically rich form. Data is described using standards such as \gls{rdf}, which encodes information as triples consisting of subject, predicate, and object. This allows heterogeneous data to be interlinked and queried using semantic technologies \cite{berners2001semantic}.
 
-\gls{jsonld} is one of the key technologies bridging conventional \gls{json} data and the Semantic Web. By adding semantic annotations, \gls{jsonld} enables \gls{json} documents to be interpreted as \gls{rdf} graphs. For instance, in the example simulation data (Listing \ref{lst:background_jsonld_example}), the simulation parameter \texttt{element-size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} class.
+\gls{jsonld} is one of the key technologies bridging conventional \gls{json} data and the Semantic Web. By adding semantic annotations, \gls{jsonld} enables \gls{json} documents to be interpreted as \gls{rdf} graphs. For instance, in the example simulation data (Listing \ref{lst:background_jsonld_example}), the simulation parameter \texttt{element\_size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} class.
 
 \begin{lstlisting}[language=json, caption={Example of semantic annotation of a parameter with QUDT unit}, label={lst:background_qudt_example}]
 {
@@ -154,7 +154,7 @@ In this JSON-LD snippet, the parameter \texttt{element\_size} is represented as 
 \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}. Its numeric value is stored in 
 \texttt{schema:value} and the associated unit is linked via 
 \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} to the QUDT unit 
-\href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}}. This representation allows applications and knowledge graph systems 
+\href{https://qudt.org/vocab/unit/M}{\texttt{m}}. This representation allows applications and knowledge graph systems 
 to unambiguously interpret the measurement and integrate it with other semantically annotated data. 
 Similarly, other variables such as metrics (e.g., \texttt{max\_von\_mises\_stress}) follow the same pattern, 
 and experiment methods are linked to ontology classes such as 
@@ -175,7 +175,7 @@ By grounding \gls{json} data in ontologies and \gls{rdf} through \gls{jsonld}, t
 
 The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against a set of structural and semantic constraints \cite{shacl_standard}. \gls{shacl} allows ontology-based validation of \gls{rdf} data by defining "shapes" that describe the expected properties, data types, and cardinality of \gls{rdf} nodes.
 
-For example, consider the simulation parameter \texttt{element-size} in the \gls{jsonld} example (Listing \ref{lst:background_jsonld_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
+For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing \ref{lst:background_jsonld_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
 
 \begin{lstlisting}[language=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -259,7 +259,7 @@ A typical \gls{jsonld} document has two key structural components:
     \item \textbf{@graph:} This array contains the actual data entities, each represented as a node with an \texttt{@id}, a \texttt{@type}, and associated properties. Relationships between entities are expressed using references to other \texttt{@id} values, forming a connected graph structure.
 \end{itemize}
 
-Listing \ref{lst:background_jsonld_example} shows a \gls{jsonld} representation corresponding to the example simulation result. The \texttt{@context} defines prefixes such as \href{https://schema.org/}{\texttt{schema}} and \href{https://qudt.org/vocab/unit}{\texttt{unit}}, while the \texttt{@graph} contains nodes representing the simulation run, the element-size parameter, and the stress metric.
+Listing \ref{lst:background_jsonld_example} shows a \gls{jsonld} representation corresponding to the example simulation result. The \texttt{@context} defines prefixes such as \href{https://schema.org/}{\texttt{schema}} and \href{https://qudt.org/vocab/unit}{\texttt{unit}}, while the \texttt{@graph} contains nodes representing the simulation run, the \texttt{element_size} parameter, and the stress metric.
 
 \begin{lstlisting}[language=json, caption={JSON-LD representation of the simulation result}, label={lst:background_jsonld_example}]
 {
@@ -468,7 +468,7 @@ MetaConfigurator provides several features that facilitate the creation and main
 
 \begin{figure}
   \centering
-  \includegraphics[width=.85\linewidth]{../figures/MC-JSON_Schema.png}
+  \includegraphics[width=.85\linewidth]{../figures/MC-JSON-Schema.png}
   \caption{A snapshot of MetaConfigurator's schema editing interface.}
   \label{fig:metaconfigurator_interface:schema}
 \end{figure}
