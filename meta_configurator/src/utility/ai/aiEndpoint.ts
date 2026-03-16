@@ -275,7 +275,6 @@ export const queryRmlMapping = async (
   inputFileSubset: string,
   userComments: string
 ) => {
-
   const systemMessage = `
 You are an assistant that generates RML mappings in Turtle syntax that convert JSON input into RDF.
 
@@ -382,8 +381,8 @@ ${userComments}
   }
 
   return queryOpenAI(apiKey, [
-    { role: "system", content: systemMessage },
-    { role: "user", content: userMessage },
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: userMessage},
   ]);
 };
 
