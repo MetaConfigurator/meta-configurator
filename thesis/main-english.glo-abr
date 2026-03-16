@@ -16,7 +16,6 @@
 \glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{4}
 \glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{4}
 \glossaryentry{RML?\glossentry{rml}|setentrycounter[]{page}"\glsnumberformat}{4}
-\glossaryentry{RML?\glossentry{rml}|setentrycounter[]{page}"\glsnumberformat}{5}
 \glossaryentry{JSON?\glossentry{json}|setentrycounter[]{page}"\glsnumberformat}{13}
 \glossaryentry{RML?\glossentry{rml}|setentrycounter[]{page}"\glsnumberformat}{13}
 \glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{13}
@@ -202,10 +201,9 @@
 \glossaryentry{JSON?\glossentry{json}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{RML?\glossentry{rml}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{RML?\glossentry{rml}|setentrycounter[]{page}"\glsnumberformat}{33}
-\glossaryentry{RML?\glossentry{rml}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{R2RML?\glossentry{r2rml}|setentrycounter[]{page}"\glsnumberformat}{33}
-\glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{34}
-\glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{34}
-\glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{36}
-\glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{36}
-\glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{36}
+\glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{36}
+\glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{38}
+\glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{38}
+\glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{39}
+\glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{39}
