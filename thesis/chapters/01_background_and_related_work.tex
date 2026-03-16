@@ -360,15 +360,22 @@ MetaConfigurator follows a schema-driven approach: the structure of the \gls{ui}
 
 MetaConfigurator provides several features that facilitate the creation and maintenance of structured data models:
 
+\begin{figure}
+  \centering
+  \includegraphics[width=.85\linewidth]{../figures/MC-JSON_Schema.png}
+  \caption{A snapshot of MetaConfigurator's schema editing interface.}
+  \label{fig:metaconfigurator_interface:schema}
+\end{figure}
+
 \begin{itemize}
     \item \textbf{Visual Schema Editor:}  
-    Users can create and modify \gls{json} schemas using a graphical interface, enabling intuitive construction of data models without manually writing schema definitions.
+    Users can create and modify \gls{json} schemas using a graphical interface, enabling intuitive construction of data models without manually writing schema definitions. Figure \ref{fig:metaconfigurator_interface:schema} depicts an example of schema editing in MetaConfigurator, showing the JSON Schema from \ref{lst:background_json_schema}. The left panel shows the raw JSON Schema, the middle panel provides a diagram view for editing, and the right panel offers a structured form for schema modification.
 
     \item \textbf{Schema-Driven Form Generation:}  
     Based on a given JSON Schema, MetaConfigurator automatically generates a graphical form for editing instance data. This ensures that all entered data conforms to the defined structure and constraints.
 
     \item \textbf{Integrated Text and GUI Editing:}  
-    The tool combines a traditional text editor with a graphical editor, allowing users to switch between raw \gls{json} editing and structured form-based editing within the same interface.
+    The tool combines a traditional text editor with a graphical editor, allowing users to switch between raw \gls{json} editing and structured form-based editing within the same interface. Figure \ref{fig:metaconfigurator_interface:data} depicts an example of data editing in MetaConfigurator, showing the JSON instance from \ref{lst:background_qudt_example} that conforms to the JSON Schema in \ref{lst:background_json_schema}. The left panel displays the raw JSON data, while the right panel offers a structured form for editing.
 
     \item \textbf{Schema Validation Support:}  
     During data editing, MetaConfigurator validates instance data against the provided JSON Schema, ensuring structural correctness and preventing invalid data entries.
@@ -376,11 +383,19 @@ MetaConfigurator provides several features that facilitate the creation and main
     \item \textbf{Schema Visualization and Navigation:}  
     Complex schemas can be explored using a tree-like or diagram-based representation, helping users understand hierarchical structures and relationships between properties.
 
-    \item \textbf{Ontology Integration:}  
-    The tool supports \gls{uri}-based references and auto-completion mechanisms, enabling users to reference ontology concepts when creating structured data models.
+\item \textbf{Limited Ontology Integration:}  
+While the tool offers a JSON-LD option that introduces \texttt{@context} and \texttt{@id} fields, its overall support for ontologies remains very limited. It allows \gls{uri}-based references and provides auto-completion to reference ontology concepts when creating structured data models, but deeper integration is not available.
 \end{itemize}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=.85\linewidth]{../figures/MC-JSON.png}
+  \caption{A snapshot of MetaConfigurator's data editing interface.}
+    \label{fig:metaconfigurator_interface:data}
+\end{figure}
+
 These capabilities significantly reduce the effort required to design and maintain structured data models and improve accessibility for users who may not be familiar with schema languages.
+\newpage
 
 \subsection{AI-Assisted Schema Engineering and Mapping}
 \label{sec:background:metaconfigurator_ai}
@@ -498,17 +513,20 @@ Redland RDF & \dingcheck & \dingcheck & -- & -- & Partial & -- & -- \\
 \hline
 \end{tabular}
 \end{table}
-
 \subsection{Research Gap and Positioning of This Thesis}
 
 Although the reviewed tools provide strong support for specific Semantic Web tasks, several limitations remain for practical, user-facing scientific data workflows:
 
 \begin{itemize}
-    \item \textbf{Fragmented workflows:} Modeling, mapping, querying, and visualization are often distributed across multiple tools.
-    \item \textbf{High technical entry barrier:} Effective use often requires advanced knowledge of \gls{owl}/\gls{rdf}/\gls{sparql} and mapping languages.
-    \item \textbf{Weak integration with schema-driven JSON editing:} Existing platforms rarely combine JSON Schema-based instance editing with first-class \gls{rdf} authoring.
-    \item \textbf{Limited end-to-end support in one UI:} Few tools provide a single environment for authoring, transforming, validating, querying, and graph exploration.
-    \item \textbf{Limited AI support in semantic authoring workflows:} \gls{ai} assistance for generating \gls{sparql} queries or \gls{rml} mappings from user intent is still uncommon.
+    \item \textbf{Fragmented workflows:} Modeling, mapping, querying, and visualization are often distributed across multiple tools, requiring users to switch between different environments to complete a single data integration task \cite{hogan2021knowledgegraphs}.
+
+    \item \textbf{High technical entry barrier:} Effective use often requires advanced knowledge of \gls{owl}, \gls{rdf}, \gls{sparql}, and mapping languages, which limits accessibility for domain scientists who are not Semantic Web experts \cite{janowicz2015geospatial}.
+
+    \item \textbf{Bridging hierarchical data to RDF:} In practice, a large amount of scientific and web data already exists in hierarchical formats such as \gls{json}. While standards such as \gls{jsonld} allow RDF data to be expressed within JSON documents \cite{sporny2014jsonld}, converting existing hierarchical data models into semantically linked representations typically requires additional transformation languages such as \gls{r2rml} or \gls{rml} \cite{das2012r2rml,dimou2014rml}. However, practical tools that help users incrementally bridge existing JSON-based data to Semantic Web representations remain limited.
+
+    \item \textbf{Limited end-to-end support in one UI:} Most tools focus on a single task—such as ontology editing, mapping definition, or querying—rather than supporting the entire workflow from data authoring and transformation to validation, querying, and graph exploration in a unified environment.
+
+    \item \textbf{Limited AI support in semantic authoring workflows:} Despite recent advances in generative \gls{ai}, assistance for generating artifacts such as \gls{sparql} queries or \gls{rml} mappings from natural language or user intent is still rarely integrated into Semantic Web authoring tools.
 \end{itemize}
 
-This thesis addresses these gaps by extending MetaConfigurator from schema-driven configuration editing to an integrated \gls{rdf} authoring environment with \gls{json}-to-\gls{jsonld} transformation, ontology-aware authoring support, \gls{sparql} querying, graph visualization, and \gls{ai}-assisted drafting of \gls{sparql} and \gls{rml} artifacts.
+This thesis addresses these gaps by extending MetaConfigurator from a schema-driven configuration editor into an integrated \gls{rdf} authoring environment. In particular, it provides a practical bridge from hierarchical JSON-based data models to Semantic Web representations through \gls{json}-to-\gls{jsonld} transformation, ontology-aware authoring support, integrated \gls{sparql} querying, graph visualization, and \gls{ai}-assisted drafting of \gls{sparql} and \gls{rml} artifacts.

@@ -2400,6 +2400,11 @@
     <bcf:citekey order="20" intorder="1">jsonld_playground</bcf:citekey>
     <bcf:citekey order="21" intorder="1">rdflib</bcf:citekey>
     <bcf:citekey order="21" intorder="2">redland</bcf:citekey>
+    <bcf:citekey order="22" intorder="1">hogan2021knowledgegraphs</bcf:citekey>
+    <bcf:citekey order="23" intorder="1">janowicz2015geospatial</bcf:citekey>
+    <bcf:citekey order="24" intorder="1">sporny2014jsonld</bcf:citekey>
+    <bcf:citekey order="25" intorder="1">das2012r2rml</bcf:citekey>
+    <bcf:citekey order="25" intorder="2">dimou2014rml</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">
