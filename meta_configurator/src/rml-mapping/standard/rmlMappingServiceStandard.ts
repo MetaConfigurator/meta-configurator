@@ -3,10 +3,7 @@ import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import {queryRmlMapping} from '@/utility/ai/aiEndpoint';
-import {
-  RML_INPUT_EXAMPLE,
-  RML_OUTPUT_EXAMPLE,
-} from '@/rml-mapping/standard/rmlExamples';
+import {RML_INPUT_EXAMPLE, RML_OUTPUT_EXAMPLE} from '@/rml-mapping/standard/rmlExamples';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import * as RmlMapper from '@comake/rmlmapper-js';
 import {Parser as N3Parser} from 'n3';
@@ -54,11 +51,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
     console.log(
       'Sizes of the different input files in KB:' +
         ' rml example files: ' +
-        (
-          (rmlInputExampleStr.length +
-            rmlOutputExampleStr.length) /
-          1024
-        ).toFixed(2) +
+        ((rmlInputExampleStr.length + rmlOutputExampleStr.length) / 1024).toFixed(2) +
         ' inputDataSubset: ' +
         (inputDataSubsetStr.length / 1024).toFixed(2)
     );
