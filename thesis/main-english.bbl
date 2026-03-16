@@ -390,6 +390,36 @@
       \field{pages}{3\bibrangedash 15}
       \range{pages}{13}
     \endentry
+    \entry{codemirror}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=129098e814fb9141e381f6b3068dd41c}{%
+           family={Haverbeke},
+           familyi={H\bibinitperiod},
+           given={Marijn},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{fullhash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{fullhashraw}{129098e814fb9141e381f6b3068dd41c}
+      \strng{bibnamehash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{authorbibnamehash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{authornamehash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{authorfullhash}{129098e814fb9141e381f6b3068dd41c}
+      \strng{authorfullhashraw}{129098e814fb9141e381f6b3068dd41c}
+      \field{labelalpha}{Hav23}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{CodeMirror: In-browser Code Editor}
+      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://codemirror.net/
+      \endverb
+      \verb{url}
+      \verb https://codemirror.net/
+      \endverb
+    \endentry
     \entry{hogan2021knowledgegraphs}{article}{}{}
       \name{author}{18}{}{%
         {{hash=56f2d88e83f41f6e1f0d9a0197c4c7eb}{%

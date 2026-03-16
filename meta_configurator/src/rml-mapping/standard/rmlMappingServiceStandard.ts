@@ -5,7 +5,6 @@ import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/
 import {queryRmlMapping} from '@/utility/ai/aiEndpoint';
 import {
   RML_INPUT_EXAMPLE,
-  RML_INPUT_EXAMPLE_SCHEMA,
   RML_OUTPUT_EXAMPLE,
 } from '@/rml-mapping/standard/rmlExamples';
 import {trimDataToMaxSize} from '@/utility/trimData';
@@ -35,7 +34,6 @@ const ignoredIRIs = new Set([
 export class RmlMappingServiceStandard implements RmlMappingService {
   async generateMappingSuggestion(
     input: any,
-    targetSchema: TopLevelSchema,
     userComments: string
   ): Promise<{config: string; success: boolean; message: string}> {
     const inputDataSubset = trimDataToMaxSize(input);
@@ -47,14 +45,10 @@ export class RmlMappingServiceStandard implements RmlMappingService {
         ' KB'
     );
 
-    const inputFileSchema = inferJsonSchema(inputDataSubset);
     const apiKey = getApiKey();
 
     const rmlInputExampleStr = JSON.stringify(RML_INPUT_EXAMPLE);
-    const rmlInputExampleSchemaStr = JSON.stringify(RML_INPUT_EXAMPLE_SCHEMA);
     const rmlOutputExampleStr = JSON.stringify(RML_OUTPUT_EXAMPLE);
-    const inputFileSchemaStr = JSON.stringify(inputFileSchema);
-    const targetSchemaStr = JSON.stringify(targetSchema);
     const inputDataSubsetStr = JSON.stringify(inputDataSubset);
 
     console.log(
@@ -62,14 +56,9 @@ export class RmlMappingServiceStandard implements RmlMappingService {
         ' rml example files: ' +
         (
           (rmlInputExampleStr.length +
-            rmlInputExampleSchemaStr.length +
             rmlOutputExampleStr.length) /
           1024
         ).toFixed(2) +
-        ' inputFileSchema: ' +
-        (inputFileSchemaStr.length / 1024).toFixed(2) +
-        ' targetSchema: ' +
-        (targetSchemaStr.length / 1024).toFixed(2) +
         ' inputDataSubset: ' +
         (inputDataSubsetStr.length / 1024).toFixed(2)
     );
@@ -77,11 +66,8 @@ export class RmlMappingServiceStandard implements RmlMappingService {
     const resultPromise = queryRmlMapping(
       apiKey,
       rmlInputExampleStr,
-      rmlInputExampleSchemaStr,
       rmlOutputExampleStr,
       inputDataSubsetStr,
-      inputFileSchemaStr,
-      targetSchemaStr,
       userComments
     );
 

@@ -2405,6 +2405,12 @@
     <bcf:citekey order="24" intorder="1">sporny2014jsonld</bcf:citekey>
     <bcf:citekey order="25" intorder="1">das2012r2rml</bcf:citekey>
     <bcf:citekey order="25" intorder="2">dimou2014rml</bcf:citekey>
+    <bcf:citekey order="26" intorder="1">metaconfigurator2024</bcf:citekey>
+    <bcf:citekey order="27" intorder="1">dimou2014rml</bcf:citekey>
+    <bcf:citekey order="28" intorder="1">codemirror</bcf:citekey>
+    <bcf:citekey order="29" intorder="1">jsonld2014</bcf:citekey>
+    <bcf:citekey order="30" intorder="1">rdflib</bcf:citekey>
+    <bcf:citekey order="31" intorder="1">sparql_standard</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

@@ -9,24 +9,29 @@ The increasing adoption of computational experiments and simulation workflows in
 
 \gls{json} is a lightweight data-interchange format widely used for representing structured data in web services, scientific workflows, and configuration systems. \gls{json} encodes data as attribute-value pairs and ordered lists, making it human-readable and easy to parse by machines. Due to its simplicity and broad ecosystem support, \gls{json} has become a de facto standard for structured data exchange across many domains \cite{json_standard}.
 
-In computational science workflows, \gls{json} files often capture experiment parameters and resulting metrics. The following example illustrates a minimal \gls{json} document describing the input parameter \texttt{element-size} and the resulting metric \texttt{max\_von\_mises\_stress\_nodes}.
+In computational science workflows, \gls{json} files often capture experiment parameters and resulting metrics. The following example illustrates a minimal \gls{json} document describing the input parameter \texttt{element-size} and the resulting metric \texttt{max\_von\_mises\_stress}.
 
 \begin{lstlisting}[language=json, caption={Example JSON representation of simulation input parameters and results}, label={lst:background_json_example}]
 {
-    "parameters": {
-        "element-size": {
-            "value": 0.025,
-            "unit": "m"
-        }
-    },
-    "metrics": {
-        "max_von_mises_stress": 299791507.5586333
+  "parameters": [
+    {
+      "name": "element_size",
+      "value": 0.025,
+      "unit": "m"
     }
+  ],
+  "metrics": [
+    {
+      "name": "max_von_mises_stress",
+      "value": 299791507.5586333,
+      "unit": "MPa"
+    }
+  ]
 }
 \end{lstlisting}
 
-In Listing \ref{lst:background_json_example}, the \texttt{parameters.element-size} object stores the input value (\texttt{0.025}) and its unit (\texttt{m}), while \texttt{metrics.max\_von\_mises\_stress} captures the computed simulation output.
-In our benchmark example, \texttt{element-size} represents a meshing property that controls mesh density for \(h\)-refinement, i.e., the characteristic size of finite elements. The \texttt{max\_von\_mises\_stress} value is a scalar result metric defined as the maximum von Mises stress over the simulated domain.
+In Listing \ref{lst:background_json_example}, each entry in the \texttt{parameters} array contains a \texttt{name} (e.g., \texttt{element\_size}), a numeric \texttt{value} (\texttt{0.025}), and a \texttt{unit} (\texttt{m}), while each entry in the \texttt{metrics} array contains a result variable such as \texttt{max\_von\_mises\_stress}.
+In our benchmark example, \texttt{element\_size} represents a meshing property that controls mesh density for \(h\)-refinement, i.e., the characteristic size of finite elements. The \texttt{max\_von\_mises\_stress} value is a scalar result metric defined as the maximum von Mises stress over the simulated domain.
 
 While \gls{json} provides a convenient serialization format, it does not inherently enforce structural constraints. Therefore, additional mechanisms are required to validate that \gls{json} documents conform to an expected structure.
 
@@ -40,45 +45,54 @@ Listing \ref{lst:background_json_schema} shows a JSON Schema corresponding to th
 \begin{lstlisting}[language=json, caption={JSON Schema validating the simulation result JSON document}, label={lst:background_json_schema}]
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Simulation Results",
   "type": "object",
   "properties": {
     "parameters": {
-      "type": "object",
-      "properties": {
-        "element-size": {
-          "type": "object",
-          "properties": {
-            "value": {
-              "type": "number"
-            },
-            "unit": {
-              "type": "string"
-            }
-          },
-          "required": ["value", "unit"]
-        }
-      },
-      "required": ["element-size"]
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/variable"
+      }
     },
     "metrics": {
-      "type": "object",
-      "properties": {
-        "max_von_mises_stress": {
-          "type": "number"
-        }
-      },
-      "required": ["max_von_mises_stress"]
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/variable"
+      }
     }
   },
-  "required": ["parameters", "metrics"]
+  "required": ["parameters", "metrics"],
+  "additionalProperties": false,
+  "$defs": {
+    "variable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the parameter or metric"
+        },
+        "value": {
+          "type": "number",
+          "description": "Numeric value of the parameter or metric"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit symbol (e.g., m, MPa)"
+        }
+      },
+      "required": ["name", "value", "unit"],
+      "additionalProperties": false
+    }
+  }
 }
 \end{lstlisting}
 
-The schema in Listing \ref{lst:background_json_schema} directly mirrors the example instance in Listing \ref{lst:background_json_example}: it requires both top-level objects (\texttt{parameters}, \texttt{metrics}), enforces the nested \texttt{element-size.value/unit} fields, and constrains the stress metric to a numeric type.
+The schema in Listing \ref{lst:background_json_schema} directly mirrors the example instance in Listing \ref{lst:background_json_example}. It requires the two top-level arrays (\texttt{parameters} and \texttt{metrics}), where each entry is defined by a common structure containing the fields \texttt{name}, \texttt{value}, and \texttt{unit}. The schema enforces that each variable has a textual identifier (\texttt{name}), a numeric value (\texttt{value}), and an associated unit (\texttt{unit}).
 
-Using JSON Schema enables consistent validation of experiment data and ensures that all required values are present before transformation into other representations.
+Using JSON Schema enables consistent validation of experiment data and ensures that all required attributes are present before transformation into other representations.
 
 However, JSON Schema focuses primarily on structural validation and does not provide semantic meaning or interoperability with knowledge graph technologies. To address this limitation, semantic mapping techniques can be applied.
+
 
 \section{Semantic Web}
 \subsection{Ontology: Modeling Knowledge Domains}
@@ -123,17 +137,28 @@ The Semantic Web extends the World Wide Web by enabling data to be represented i
 
 \begin{lstlisting}[language=json, caption={Example of semantic annotation of a parameter with QUDT unit}, label={lst:background_qudt_example}]
 {
-    "@id": "local:variable_element_size",
-    "@type": "schema:PropertyValue",
-    "rdfs:label": "element-size",
-    "schema:unitCode": {
-        "@id": "unit:M"
-    },
-    "schema:value": 0.025
+  "@id": "local:variable_element_size",
+  "@type": "schema:PropertyValue",
+  "rdfs:label": "element_size",
+  "schema:unitCode": {
+    "@id": "unit:m"
+  },
+  "schema:value": {
+    "@type": "http://www.w3.org/2001/XMLSchema#double",
+    "@value": "2.5E-2"
+  }
 }
 \end{lstlisting}
 
-Here, the \texttt{element-size} is measured in meters, and is linked to the \href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}} as its \href{https://schema.org/unitCode}{\texttt{schema:unitCode}}. This allows applications and knowledge graph systems to unambiguously interpret the measurement unit and integrate it with other semantically annotated datasets. Similarly, experiment methods and metrics are linked to well-defined ontology classes such as \href{https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/\#Method}{\texttt{m4i:Method}} and \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}.
+In this JSON-LD snippet, the parameter \texttt{element\_size} is represented as a resource of type 
+\href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}. Its numeric value is stored in 
+\texttt{schema:value} and the associated unit is linked via 
+\href{https://schema.org/unitCode}{\texttt{schema:unitCode}} to the QUDT unit 
+\href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}}. This representation allows applications and knowledge graph systems 
+to unambiguously interpret the measurement and integrate it with other semantically annotated data. 
+Similarly, other variables such as metrics (e.g., \texttt{max\_von\_mises\_stress}) follow the same pattern, 
+and experiment methods are linked to ontology classes such as 
+\href{https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/\#Method}{\texttt{m4i:Method}}.
 
 Semantic Web technologies thus provide a framework for:
 
@@ -155,21 +180,37 @@ For example, consider the simulation parameter \texttt{element-size} in the \gls
 \begin{lstlisting}[language=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix schema: <https://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix unit: <http://qudt.org/vocab/unit/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix local: <https://www.example.org/> .
 
-ex:ParameterShape
+local:PropertyValueShape
     a sh:NodeShape ;
     sh:targetClass schema:PropertyValue ;
+
+    # The variable name label
+    sh:property [
+        sh:path rdfs:label ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+
+    # The numeric value of the parameter or metric
     sh:property [
         sh:path schema:value ;
-        sh:datatype xsd:decimal ;
+        sh:datatype xsd:double ;
         sh:minCount 1 ;
+        sh:maxCount 1 ;
     ] ;
+
+    # The unit, as a named QUDT IRI
     sh:property [
         sh:path schema:unitCode ;
         sh:nodeKind sh:IRI ;
         sh:minCount 1 ;
+        sh:maxCount 1 ;
     ] .
 \end{lstlisting}
 
@@ -185,6 +226,8 @@ For example, using the \gls{jsonld} simulation data, we might want to retrieve a
 \begin{lstlisting}[language=sparql, caption={SPARQL query retrieving parameter values and units}, label={lst:background_sparql_example}]
 PREFIX schema: <https://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX unit: <http://qudt.org/vocab/unit/>
+PREFIX local: <https://www.example.org/>
 
 SELECT ?parameter ?value ?unit
 WHERE {
@@ -195,7 +238,14 @@ WHERE {
 }
 \end{lstlisting}
 
-This query returns the \texttt{element-size} parameter with its numeric value and \gls{qudt} unit (\href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}}), demonstrating how semantic annotations enable precise data access. \gls{sparql} supports more complex operations such as joins, filters, and reasoning over ontologies, making it a key tool for exploring and analyzing semantically enriched simulation data.
+This query returns the \texttt{element\_size} parameter along with its numeric value and associated \gls{qudt} unit 
+(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:m}}), reflecting the structure of the JSON-LD representation where 
+parameters and metrics are modeled as \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resources. 
+Similarly, metrics such as \texttt{max\_von\_mises\_stress} can be queried in the same way, retrieving their values 
+and units (e.g., \href{https://qudt.org/vocab/unit/MPa}{\texttt{unit:MPa}}). 
+This demonstrates how semantic annotations enable precise, ontology-aware data access. 
+\gls{sparql} supports complex operations such as joins, filters, and reasoning over ontologies, making it an essential 
+tool for exploring and analyzing semantically enriched simulation and experiment data.
 
 \subsection{Semantic Data Representation using JSON-LD}
 \label{sec:background:jsonld}
@@ -214,31 +264,46 @@ Listing \ref{lst:background_jsonld_example} shows a \gls{jsonld} representation 
 \begin{lstlisting}[language=json, caption={JSON-LD representation of the simulation result}, label={lst:background_jsonld_example}]
 {
     "@context": {
-        "local": "https://www.example.org/",
-        "schema": "https://schema.org/",
         "m4i": "http://w3id.org/nfdi4ing/metadata4ing#",
+        "schema": "https://schema.org/",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "unit": "http://qudt.org/vocab/unit/"
+        "unit": "http://qudt.org/vocab/unit/",
+        "local": "https://www.example.org/"
     },
     "@graph": [
         {
             "@id": "local:run_fenics_simulation",
             "@type": "m4i:Method",
-            "m4i:hasParameter": [{"@id": "local:variable_element_size"}],
-            "m4i:investigates": [{"@id": "local:variable_max_von_mises_stress"}]
+            "m4i:hasParameter": {
+                "@id": "local:variable_element_size"
+            },
+            "m4i:investigates": {
+                "@id": "local:variable_max_von_mises_stress"
+            }
         },
         {
             "@id": "local:variable_element_size",
             "@type": "schema:PropertyValue",
-            "rdfs:label": "element-size",
-            "schema:unitCode": {"@id": "unit:M"},
-            "schema:value": 0.025
+            "rdfs:label": "element_size",
+            "schema:unitCode": {
+                "@id": "unit:m"
+            },
+            "schema:value": {
+                "@type": "http://www.w3.org/2001/XMLSchema#double",
+                "@value": "2.5E-2"
+            }
         },
         {
             "@id": "local:variable_max_von_mises_stress",
             "@type": "schema:PropertyValue",
             "rdfs:label": "max_von_mises_stress",
-            "schema:value": 299791507.5586333
+            "schema:unitCode": {
+                "@id": "unit:MPa"
+            },
+            "schema:value": {
+                "@type": "http://www.w3.org/2001/XMLSchema#double",
+                "@value": "2.997915075586333E8"
+            }
         }
     ]
 }
@@ -281,69 +346,110 @@ G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in
 Listing \ref{lst:background_rml_mapping} shows an example \gls{rml} mapping that converts the \gls{json} simulation output from Listing \ref{lst:background_json_example} into the \gls{jsonld} structure presented in Listing \ref{lst:background_jsonld_example}.
 
 \begin{lstlisting}[language=turtle, caption={RML mapping from JSON simulation output to RDF/JSON-LD}, label={lst:background_rml_mapping}]
-@prefix rml: <http://semweb.mmlab.be/ns/rml#>.
-@prefix rr: <http://www.w3.org/ns/r2rml#>.
-@prefix ql: <http://semweb.mmlab.be/ns/ql#>.
-@prefix schema: <https://schema.org/>.
-@prefix m4i: <http://w3id.org/nfdi4ing/metadata4ing#>.
-@prefix unit: <http://qudt.org/vocab/unit/>.
-@prefix local: <https://www.example.org/>.
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix m4i: <http://w3id.org/nfdi4ing/metadata4ing#> .
+@prefix schema: <https://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix local: <https://www.example.org/> .
 
-<#MethodMapping>
-    rml:logicalSource [
-        rml:source "parameter.json" ;
-        rml:referenceFormulation ql:JSONPath ;
-        rml:iterator "$"
-    ];
-    rr:subjectMap [
-        rr:constant local:run_fenics_simulation ;
-        rr:class m4i:Method ;
-    ];
-    rr:predicateObjectMap [
-        rr:predicate m4i:hasParameter ;
-        rr:objectMap [ rr:constant local:variable_element_size ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate m4i:investigates ;
-        rr:objectMap [ rr:constant local:variable_max_von_mises_stress ]
-    ].
+<#RunFenicsSimulation>
+  rml:logicalSource [
+    rml:source "Data.json" ;
+    rml:referenceFormulation ql:JSONPath ;
+    rml:iterator "$"
+  ] ;
+  
+  rr:subjectMap [
+    rr:template "https://www.example.org/run_fenics_simulation" ;
+    rr:class m4i:Method
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate m4i:hasParameter ;
+    rr:objectMap [ rr:parentTriplesMap <#ParameterMapping> ]
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate m4i:investigates ;
+    rr:objectMap [ rr:parentTriplesMap <#MetricMapping> ]
+  ] .
 
-<#ElementSizeMapping>
-    rml:logicalSource [
-        rml:source "parameter.json" ;
-        rml:referenceFormulation ql:JSONPath ;
-        rml:iterator "$.parameters.element-size"
-    ];
-    rr:subjectMap [
-        rr:constant local:variable_element_size ;
-        rr:class schema:PropertyValue ;
-    ];
-    rr:predicateObjectMap [
-        rr:predicate schema:value ;
-        rr:objectMap [ rml:reference "value" ]
-    ];
-    rr:predicateObjectMap [
-        rr:predicate schema:unitCode ;
-        rr:objectMap [ rr:constant unit:M ]
-    ].
+<#ParameterMapping>
+  rml:logicalSource [
+    rml:source "Data.json" ;
+    rml:referenceFormulation ql:JSONPath ;
+    rml:iterator "$.parameters[*]"
+  ] ;
+  
+  rr:subjectMap [
+    rr:template "https://www.example.org/variable_{name}" ;
+    rr:class schema:PropertyValue
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate rdfs:label ;
+    rr:objectMap [ rml:reference "name" ]
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate schema:value ;
+    rr:objectMap [ rml:reference "value" ]
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate schema:unitCode ;
+    rr:objectMap [
+      rr:template "http://qudt.org/vocab/unit/{unit}" ;
+      rr:termType rr:IRI
+    ]
+  ] .
 
-<#StressMetricMapping>
-    rml:logicalSource [
-        rml:source "simulation.json" ;
-        rml:referenceFormulation ql:JSONPath ;
-        rml:iterator "$.metrics"
-    ];
-    rr:subjectMap [
-        rr:constant local:variable_max_von_mises_stress ;
-        rr:class schema:PropertyValue ;
-    ];
-    rr:predicateObjectMap [
-        rr:predicate schema:value ;
-        rr:objectMap [ rml:reference "max_von_mises_stress" ]
-    ].
+<#MetricMapping>
+  rml:logicalSource [
+    rml:source "Data.json" ;
+    rml:referenceFormulation ql:JSONPath ;
+    rml:iterator "$.metrics[*]"
+  ] ;
+  
+  rr:subjectMap [
+    rr:template "https://www.example.org/variable_{name}" ;
+    rr:class schema:PropertyValue
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate rdfs:label ;
+    rr:objectMap [ rml:reference "name" ]
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate schema:value ;
+    rr:objectMap [ rml:reference "value" ]
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate schema:unitCode ;
+    rr:objectMap [
+      rr:template "http://qudt.org/vocab/unit/{unit}" ;
+      rr:termType rr:IRI
+    ]
+  ] .
 \end{lstlisting}
 
-As one concrete example, \texttt{<\#ElementSizeMapping>} reads the nested JSON object at \texttt{\$.parameters.element-size}, creates the RDF resource \texttt{local:variable\_element\_size} of type \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}, then maps the JSON field \texttt{value} to \href{https://schema.org/value}{\texttt{schema:value}} and assigns the constant unit \href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}} via \href{https://schema.org/unitCode}{\texttt{schema:unitCode}}.
+As one concrete example, \texttt{<\#ParameterMapping>} iterates over the array 
+\texttt{\$.parameters[*]} in the JSON document. For each entry, it creates an RDF 
+resource with an IRI constructed from the \texttt{name} field 
+(e.g., \texttt{local:variable\_element\_size}) and assigns it the type 
+\href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}. 
+The JSON attribute \texttt{name} is mapped to 
+\href{http://www.w3.org/2000/01/rdf-schema\#label}{\texttt{rdfs:label}}, while the 
+numeric field \texttt{value} is mapped to 
+\href{https://schema.org/value}{\texttt{schema:value}}. The unit is converted into 
+a QUDT unit IRI by constructing the resource 
+\texttt{http://qudt.org/vocab/unit/\{unit\}} and assigning it via 
+\href{https://schema.org/unitCode}{\texttt{schema:unitCode}}.
 
 Through this mapping process, structured simulation outputs are automatically converted into \gls{rdf} triples forming a semantically enriched knowledge graph. 
 

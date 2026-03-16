@@ -271,83 +271,122 @@ export const queryHandlebarsTemplate = async (
 export const queryRmlMapping = async (
   apiKey: string,
   exampleInput: string,
-  exampleInputSchema: string,
   exampleOutputRml: string,
   inputFileSubset: string,
-  inputFileSchema: string,
-  targetSchema: string,
   userComments: string
 ) => {
-  const systemMessage = `You are an assistant that generates RML mappings (in Turtle syntax) that convert a given JSON input into RDF. 
-  Follow the RML spec rules for JSON sources (use 'ql:JSONPath' as the reference formulation and JSONPath iterators). Always produce only valid Turtle output (the mapping), nothing else (no commentary).
-  Input I will provide (fill these in or expect them in the same message):
-  - A small representative JSON document (or a path to the JSON file).
-  - Use 'Data.json' for 'rml:source'.
-  - 'prefixes': map of prefix → IRI to include (e.g. 'ex: http://example.com/ns#', 'rr: http://www.w3.org/ns/r2rml#', 'rml: http://semweb.mmlab.be/ns/rml#', 'ql: http://semweb.mmlab.be/ns/ql#').
-  - 'base_iri' (optional): base IRI used for '@base' or 'rr:template' generation.
-  - 'iterator' (optional): JSONPath iterator string — default is '$.<...>' covering the repeating objects (e.g. '$.items[*]').
-  - 'subject_template' or 'subject_rules': either a template like 'http://example.com/{id}' or rules to build the subject (use template or 'rr:termType rr:BlankNode').
-  - 'mappings': a list describing how JSON fields map to RDF — each item should include:
-    - 'predicate' (as a full IRI or prefixed name)
-    - 'reference' (JSONPath, relative to iterator — for RML use 'rml:reference "fieldName"' where fieldName matches JSONPath inside iterator, e.g. 'name' for '$.items[*].name').
-    - optional 'datatype' (xsd type)
-    - optional 'language'
-    - optional 'termType' (IRI, Literal, BlankNode)
-    - optional 'template' (for object IRIs built from multiple fields)
-  - Optionally: 'type_triples' (classes to attach via 'rr:class') and 'nested_mappings' for nested objects/arrays (create parent/child 'rr:RefObjectMap' with join conditions if needed).
 
-  Rules the you must follow
-  1. Use 'rml:logicalSource' with:
-     - 'rml:source' = 'Data.json'
-     - 'rml:referenceFormulation ql:JSONPath'
-     - 'rml:iterator' = the provided iterator (or a sensible default)
-  2. Create one 'rr:TriplesMap' per repeating object (or more, if user supplies multiple logical sources).
-  3. For each TriplesMap:
-     - Include exactly one 'rr:subjectMap' using either:
-       - 'rr:template' for IRI subjects (e.g. 'rr:template "http://example.com/{id}"'), and/or
-       - 'rr:termType rr:BlankNode' for blank node subjects, and/or
-       - 'rr:constant' where requested.
-     - Add 'rr:class' statements when user asks for types.
-     - For each mapping item create a 'rr:predicateObjectMap' with 'rr:predicate' and an 'rr:objectMap' using:
-       - 'rml:reference' for JSON field references (the RML JSONPath reference is the field *name* relative to the iterator)
-       - 'rr:datatype' or 'rr:termType' or language tag if provided
-       - 'rr:template' if the object should be constructed from multiple fields
-  4. If nested objects/arrays must be mapped to separate resources, create an additional TriplesMap for the nested logical source with its own iterator and logical source and link them using 'rr:RefObjectMap' + 'rr:joinCondition' (use 'rr:child' and 'rr:parent' keys for the join).
-  5. Use only the 'prefixes' the user provided plus the standard RML/R2RML prefixes if not present: 'rml:', 'rr:', 'ql:', 'rdf:', 'xsd:'. Put them at the top of the Turtle output.
-  6. Keep Turtle compact and readable (use '[]' blank node syntax for inline maps when appropriate).
-  7. Do not produce any natural-language explanation in the output — only Turtle content.
+  const systemMessage = `
+You are an assistant that generates RML mappings in Turtle syntax that convert JSON input into RDF.
 
-  Required output
-  - A single Turtle document that:
-    - Declares prefixes and optional base.
-    - Contains one or more 'rr:TriplesMap' resources with 'rml:logicalSource', 'rr:subjectMap', 'rr:predicateObjectMap' entries as described above.
-  - Use 'ql:JSONPath' for 'rml:referenceFormulation'.
-  - Ensure 'rml:reference' uses the JSON field name relative to the tripes map iterator (no leading '$.' inside 'rml:reference' value — only the property name or path within the iterator).
-  - If the user supplied datatypes or language tags, include them with 'rr:datatype' or 'rr:language'.
-  - Remove any prefixes that are not used in the mapping, for exmaple RML-related prefixes.
-  - Output should contains @context, and @graph which should be an array.
-  - Important: Add any missing prefixes which are used in the mapping.
-  
-  Example input JSON: \`\`\`${exampleInput}\`\`\`
-  Example input schema: \`\`\`${exampleInputSchema}\`\`\`
-  Example output RML mapping: \`\`\`${exampleOutputRml}\`\`\`
-  Use these examples to understand how the mapping relates input data to the RDF output.`;
+Follow the RML specification strictly and avoid generating invalid RML constructs.
 
-  let userMessage = `Real input JSON subset: \`\`\`${inputFileSubset}\`\`\`
-  Input file schema: \`\`\`${inputFileSchema}\`\`\`
-  The goal is to generate an RML mapping (TTL) that transforms this input to match the target RDF schema: \`\`\`${targetSchema}\`\`\`
-  Keep the mapping minimal, accurate, and only map existing fields. Avoid generating values not present in the input.
-  Return ONLY valid RML mapping in Turtle format, with proper prefixes and structure, no extra text or explanation.`;
+General task:
+Generate a valid RML mapping that transforms the given JSON input into RDF according to the target schema.
+
+The output must contain ONLY valid Turtle mapping code and no explanations.
+
+Input information that will be provided:
+- Example JSON input
+- Example RML mapping
+- Real JSON input subset
+- Optional user comments
+
+Use the following conventions:
+
+Logical source rules:
+- Use 'rml:logicalSource'
+- Set 'rml:source' to "Data.json"
+- Use 'rml:referenceFormulation ql:JSONPath'
+- Use appropriate JSONPath iterators (e.g. "$.items[*]" for arrays)
+
+TriplesMap rules:
+- Create one 'rr:TriplesMap' per repeating JSON structure (arrays or main objects).
+- Each TriplesMap must contain exactly one 'rr:subjectMap'.
+- Use 'rr:class' when assigning RDF types.
+
+Object mapping rules:
+In an 'rr:objectMap', use exactly ONE of the following:
+- rml:reference
+- rr:template
+- rr:constant
+
+Never combine them in the same objectMap.
+
+Resource linking rules:
+If the object refers to another mapped resource:
+- Use 'rr:parentTriplesMap'
+- Do NOT include 'rml:reference', 'rr:template', or 'rr:constant' in that objectMap.
+
+IRI construction rules:
+If an RDF object must be an IRI constructed from a JSON value:
+- Use 'rr:template'
+- Declare 'rr:termType rr:IRI'
+
+Reference rules:
+- 'rml:reference' values must be relative to the TriplesMap iterator
+- Do NOT include "$." inside rml:reference values
+
+Array mapping:
+Arrays in JSON should normally be mapped using a separate TriplesMap
+with its own 'rml:iterator'.
+
+Prefix rules:
+Use only the prefixes provided, and other prefixes which user may provide:
+- rr:
+- rml:
+- ql:
+- rdf:
+- xsd:
+
+Output format:
+- Produce a single valid Turtle document.
+- Declare prefixes at the top.
+- Use compact Turtle syntax.
+- Use inline blank nodes '[]' where appropriate.
+- Do not output explanations or comments.
+
+Example input JSON:
+\`\`\`
+${exampleInput}
+\`\`\`
+
+Example RML mapping:
+\`\`\`
+${exampleOutputRml}
+\`\`\`
+`;
+
+  let userMessage = `
+Real input JSON subset:
+\`\`\`
+${inputFileSubset}
+\`\`\`
+
+Requirements:
+- Keep the mapping minimal and accurate.
+- Only map fields that exist in the input JSON.
+- Do not invent values or fields.
+
+Return ONLY the RML mapping in valid Turtle syntax.
+`;
 
   if (userComments && userComments.length > 0) {
-    userMessage += `User comments for clarification: \`\`\`${userComments}\`\`\``;
+    userMessage += `
+
+Additional user comments:
+\`\`\`
+${userComments}
+\`\`\`
+`;
   }
 
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
-    {role: 'user', content: userMessage},
+    { role: "system", content: systemMessage },
+    { role: "user", content: userMessage },
   ]);
 };
+
 export const generateSparqlSuggestion = async (
   apiKey: string,
   jsonLdContent: string,

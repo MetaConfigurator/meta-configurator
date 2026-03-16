@@ -4,7 +4,6 @@ export interface RmlMappingService {
   validateMappingConfig(config: string, input: any): {success: boolean; message: string};
   generateMappingSuggestion(
     input: any,
-    targetSchema: TopLevelSchema,
     userComments: string
   ): Promise<{config: string; success: boolean; message: string}>;
   performRmlMapping(

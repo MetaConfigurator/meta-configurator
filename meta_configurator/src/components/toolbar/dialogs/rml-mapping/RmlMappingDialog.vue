@@ -188,9 +188,8 @@ watch(rmlConfig, () => {
 
 function generateMappingSuggestion() {
   isLoadingMapping.value = true;
-  const targetSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
   mappingService.value
-    .generateMappingSuggestion(input.value, targetSchema, userComments.value)
+    .generateMappingSuggestion(input.value, userComments.value)
     .then(res => {
       result.value = res.config;
       rmlConfig.value = res.config;
