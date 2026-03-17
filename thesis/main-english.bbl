@@ -953,6 +953,34 @@
       \verb https://www.w3.org/TR/sparql11-overview/
       \endverb
     \endentry
+    \entry{rdflib_docs}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=73bfd5dfd2a0e80256ec1a0af42d6a44}{%
+           family={{RDFLib Team}},
+           familyi={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{73bfd5dfd2a0e80256ec1a0af42d6a44}
+      \strng{fullhash}{73bfd5dfd2a0e80256ec1a0af42d6a44}
+      \strng{fullhashraw}{73bfd5dfd2a0e80256ec1a0af42d6a44}
+      \strng{bibnamehash}{73bfd5dfd2a0e80256ec1a0af42d6a44}
+      \strng{authorbibnamehash}{73bfd5dfd2a0e80256ec1a0af42d6a44}
+      \strng{authornamehash}{73bfd5dfd2a0e80256ec1a0af42d6a44}
+      \strng{authorfullhash}{73bfd5dfd2a0e80256ec1a0af42d6a44}
+      \strng{authorfullhashraw}{73bfd5dfd2a0e80256ec1a0af42d6a44}
+      \field{labelalpha}{RDF23}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{RDFLib: A Python library for working with RDF}
+      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://rdflib.readthedocs.io/
+      \endverb
+      \verb{url}
+      \verb https://rdflib.readthedocs.io/
+      \endverb
+    \endentry
     \entry{studer1998knowledge}{article}{}{}
       \name{author}{3}{}{%
         {{hash=6b9c2c7febe554891fc3b7af5e589694}{%
