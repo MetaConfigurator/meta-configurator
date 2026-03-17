@@ -10,6 +10,9 @@
 \contentsline {figure}{\numberline {2.5}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}, focused on the Triples tab.}}{35}{figure.337}%
 \contentsline {figure}{\numberline {2.6}{\ignorespaces Change propagation flow between Text View and RDF View when the source of change is the Text View.}}{37}{figure.344}%
 \contentsline {figure}{\numberline {2.7}{\ignorespaces Change propagation flow between Text View and RDF View when the source of change is the RDF View.}}{38}{figure.346}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query editor with AI-generated query based on user hints.}}{41}{figure.382}%
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{42}{figure.384}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Data exported as CSV from the result shown in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated} could be visualized as a plot of element size vs. maximum von Mises stress, revealing trends in the simulation results.}}{43}{figure.386}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

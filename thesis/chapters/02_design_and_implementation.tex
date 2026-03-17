@@ -70,14 +70,14 @@ local: https://www.example.org/
 \end{lstlisting}
 
 
-\begin{figure}
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=.65\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
   \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}, focused on the Context tab.}
   \label{fig:rdf_authoring_panel:jsonld_2}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=.65\linewidth]{../figures/MC-RDF-JSON-LD-1.png}
   \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}, focused on the Triples tab.}
@@ -196,4 +196,66 @@ Together, this implementation turns the RDF panel into a full authoring environm
 
 
 \section{Query with SPARQL}\label{sec:design:query-with-sparql}
+The \gls{sparql} query functionality is implemented in \texttt{SparqlEditor.vue} as a dialog with three tabs: \textbf{Query View}, \textbf{Result View}, and \textbf{Visualization}. Query execution is performed in-browser using Comunica's \texttt{QueryEngine} \cite{comunica_query_sparql}. According to Comunica's official specification matrix, the engine supports SPARQL 1.2 query-related specifications \cite{comunica_supported_specs}.
+
+In the \textbf{Query View}, users can write and validate queries in a CodeMirror editor and execute them against the current in-memory \gls{rdf} graph. The same view also provides \gls{ai}-assisted \gls{sparql} generation. Similar to the \gls{ai}-assisted \gls{rml} workflow described in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, user hints are combined with prompt-engineering instructions and a representative subset of the current \gls{jsonld} data, then sent to the configured \gls{llm} to generate a draft \gls{sparql} query.
+
+\subsection{Showcase: AI-Assisted SPARQL Query Generation}
+\label{sec:design:query-with-sparql:ai-showcase}
+
+To demonstrate the \gls{ai}-assisted workflow, we assume that the simulation \gls{json} from Listing~\ref{lst:background_json_example} has been extended with additional \texttt{element\_size} and \texttt{max\_von\_mises\_stress} value pairs (e.g., from multiple simulation runs), and then transformed into \gls{jsonld} using the mapping workflow described earlier. In this extended dataset, metric measurements are available for multiple element sizes, for example \texttt{0.003125}, \texttt{0.00625}, \texttt{0.0125}, \texttt{0.05} and \texttt{0.1}.
+
+In this scenario, the user provides a natural-language hint in the Query View to request a query that returns paired values of mesh element size and maximum von Mises stress. An example hint is shown in Listing~\ref{lst:design_sparql_ai_hint}. The hint and a subset of the current \gls{jsonld} graph are sent to the configured \gls{llm}, which proposes a syntactically valid draft query that can then be reviewed and refined by the user. A representative generated query is shown in Listing~\ref{lst:design_sparql_ai_generated}, and its integration in the dialog is illustrated in Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated}.
+
+\begin{lstlisting}[style=plaintext,caption={Example user hint for AI-assisted SPARQL generation}, label={lst:design_sparql_ai_hint}]
+Return pairs of element_size and max_von_mises_stress.
+For each run, show the numeric element size value and the numeric stress value.
+Sort by element_size ascending.
+\end{lstlisting}
+
+\begin{lstlisting}[style=sparql,caption={Example AI-suggested SPARQL query for element-size/stress pairs}, label={lst:design_sparql_ai_generated}]
+PREFIX m4i: <http://w3id.org/nfdi4ing/metadata4ing#>
+PREFIX schema: <https://schema.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX unit: <http://qudt.org/vocab/unit/>
+PREFIX local: <https://www.example.org/>
+
+SELECT ?element_size ?max_von_mises_stress WHERE {
+  ?method a m4i:Method .
+  ?method m4i:hasParameter ?element_size_param .
+  ?element_size_param a schema:PropertyValue ;
+                      schema:value ?element_size .
+  ?method m4i:investigates ?stress_param .
+  ?stress_param a schema:PropertyValue ;
+                schema:value ?max_von_mises_stress .
+} ORDER BY ASC(?element_size)
+\end{lstlisting}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-SPARQL-1.png}
+  \caption{SPARQL query editor with AI-generated query based on user hints.}
+  \label{fig:rdf_authoring_panel:sparql_ai_generated}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-SPARQL-2.png}
+  \caption{Result after running SPARQL query in Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated}.}
+  \label{fig:rdf_authoring_panel:sparql_ai_generated}
+\end{figure}
+
+This showcase illustrates the intended interaction pattern: \gls{ai} is used to accelerate query authoring, while final semantic and syntactic validation remains under user control before execution.
+
+The dialog supports two execution modes controlled by a toggle: \textbf{Visualization Off} and \textbf{Visualization On}. With \textbf{Visualization Off}, standard SELECT-style querying is used and results are shown in the \textbf{Result View}. There, the PrimeVue DataTable columns are generated dynamically from the returned variables, and export is provided as CSV. With \textbf{Visualization On}, the query mode switches to CONSTRUCT-based graph output; the same result table is still populated, but export options target RDF serializations (e.g., Turtle, N-Triples, RDF/XML) for graph-oriented workflows.
+
+The \textbf{Visualization} tab renders the query result graph in read-only mode. Its interaction model and rendering details are discussed in the following section.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.75\linewidth]{../figures/Plot.png}
+  \caption{Data exported as CSV from the result shown in Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated} could be visualized as a plot of element size vs. maximum von Mises stress, revealing trends in the simulation results.}
+  \label{fig:rdf_authoring_panel:sparql_ai_generated}
+\end{figure}
+
 \section{Knowledge Graph Visualization}\label{sec:design:knowledge-graph-visualization}

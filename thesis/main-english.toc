@@ -34,13 +34,14 @@
 \contentsline {subsubsection}{\nonumberline RDF View to Text View}{39}{subsubsection*.355}%
 \contentsline {subsection}{\numberline {2.1.7}Integrated Extensions in the Triple Workflow}{39}{subsection.359}%
 \contentsline {section}{\numberline {2.2}Query with SPARQL}{40}{section.360}%
-\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{40}{section.361}%
-\contentsline {chapter}{\numberline {3}Application}{41}{chapter.362}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{41}{section.363}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{43}{chapter.364}%
-\contentsline {chapter}{\nonumberline Bibliography}{45}{chapter*.365}%
+\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{40}{subsection.361}%
+\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{42}{section.388}%
+\contentsline {chapter}{\numberline {3}Application}{45}{chapter.389}%
+\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{45}{section.390}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{47}{chapter.391}%
+\contentsline {chapter}{\nonumberline Bibliography}{49}{chapter*.392}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{48}{chapter*.365}%
-\contentsline {chapter}{\numberline {A}Appendix}{49}{appendix.366}%
-\contentsline {section}{\numberline {A.1}RML Mapping}{49}{section.367}%
+\contentsline {part}{Appendix}{52}{chapter*.392}%
+\contentsline {chapter}{\numberline {A}Appendix}{53}{appendix.393}%
+\contentsline {section}{\numberline {A.1}RML Mapping}{53}{section.394}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

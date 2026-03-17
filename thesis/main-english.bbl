@@ -19,6 +19,70 @@
 
 \refsection{0}
   \datalist[entry]{anyt/global//global/global/global}
+    \entry{comunica_query_sparql}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=3e3e285baf3d7be2ffef0d2fec336ae8}{%
+           family={Association},
+           familyi={A\bibinitperiod},
+           given={Comunica},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{fullhash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{fullhashraw}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{bibnamehash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{authorbibnamehash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{authornamehash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{authorfullhash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{authorfullhashraw}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \field{extraname}{1}
+      \field{labelalpha}{Ass26}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extraalpha}{1}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{@comunica/query-sparql}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://www.npmjs.com/package/@comunica/query-sparql
+      \endverb
+      \verb{url}
+      \verb https://www.npmjs.com/package/@comunica/query-sparql
+      \endverb
+    \endentry
+    \entry{comunica_supported_specs}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=3e3e285baf3d7be2ffef0d2fec336ae8}{%
+           family={Association},
+           familyi={A\bibinitperiod},
+           given={Comunica},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{fullhash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{fullhashraw}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{bibnamehash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{authorbibnamehash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{authornamehash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{authorfullhash}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \strng{authorfullhashraw}{3e3e285baf3d7be2ffef0d2fec336ae8}
+      \field{extraname}{2}
+      \field{labelalpha}{Ass26}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extraalpha}{2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Comunica: Supported specifications}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://comunica.dev/docs/query/advanced/specifications/
+      \endverb
+      \verb{url}
+      \verb https://comunica.dev/docs/query/advanced/specifications/
+      \endverb
+    \endentry
     \entry{berners2001semantic}{article}{}{}
       \name{author}{3}{}{%
         {{hash=89ce6361749d05e9c8f47cae979594e9}{%

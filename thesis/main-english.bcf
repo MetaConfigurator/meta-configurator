@@ -2412,6 +2412,8 @@
     <bcf:citekey order="30" intorder="1">rdflib_docs</bcf:citekey>
     <bcf:citekey order="31" intorder="1">rdflib_docs</bcf:citekey>
     <bcf:citekey order="32" intorder="1">sparql_standard</bcf:citekey>
+    <bcf:citekey order="33" intorder="1">comunica_query_sparql</bcf:citekey>
+    <bcf:citekey order="34" intorder="1">comunica_supported_specs</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">
