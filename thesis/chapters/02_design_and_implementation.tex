@@ -5,38 +5,38 @@
 
 The \gls{rdf} authoring functionality is implemented as a dedicated, separated panel in MetaConfigurator, located in \texttt{meta\_configurator/src/components/panels/rdf}. This design keeps semantic authoring concerns modular while still integrating with the existing session, path selection, and data editing flow of MetaConfigurator \cite{metaconfigurator2024}. At runtime, the entry component \texttt{RdfPanel.vue} validates whether the current data can be treated as \gls{jsonld} and provides immediate warnings for missing \texttt{@context} or syntax issues.
 
-Figure \ref{fig:metaconfigurator_interface_rdf:json_data} shows a snapshot of the RDF panel in action, loaded with the \gls{json} example from \ref{lst:background_json_example}. Since the data is provided in \gls{json} format, the panel indicates that it must first be converted to JSON-LD before further processing. The user can proceed in two ways: either by directly supplying a JSON-LD document in the text view, or by using the \textbf{JSON-to-JSON-LD} conversion tool which is discussed in the next section \ref{sec:design:rdf-authoring-panel:rml-mapping-tool}.
+Figure \ref{fig:rdf_authoring_panel:json_data} shows a snapshot of the RDF panel in action, loaded with the \gls{json} example from \ref{lst:background_json_example}. Since the data is provided in \gls{json} format, the panel indicates that it must first be converted to JSON-LD before further processing. The user can proceed in two ways: either by directly supplying a JSON-LD document in the text view, or by using the \textbf{JSON-to-JSON-LD} conversion tool which is discussed in the next section \ref{sec:design:rdf-authoring-panel:rml-mapping-tool}.
 
 \begin{figure}
   \centering
   \includegraphics[width=.85\linewidth]{../figures/MC-RDF-JSON.png}
   \caption{A snapshot of MetaConfigurator's RDF panel.}
-    \label{fig:metaconfigurator_interface_rdf:json_data}
+    \label{fig:rdf_authoring_panel:json_data}
 \end{figure}
 
 \subsection{RML Mapping Tool}
 \label{sec:design:rdf-authoring-panel:rml-mapping-tool}
 
-If the input data is not already expressed as JSON-LD, the RDF panel provides a conversion tool that enables users to transform JSON data into RDF-compatible JSON-LD using \gls{rml} mappings. \gls{rml} extends the \gls{r2rml} mapping language and allows the transformation of heterogeneous data sources such as JSON, CSV, or XML into RDF graphs \cite{dimou2014rml}. Figure~\ref{fig:metaconfigurator_interface_rdf:rml_1} illustrates the dialog used to define such mappings.
+If the input data is not already expressed as JSON-LD, the RDF panel provides a conversion tool that enables users to transform JSON data into RDF-compatible JSON-LD using \gls{rml} mappings. \gls{rml} extends the \gls{r2rml} mapping language and allows the transformation of heterogeneous data sources such as JSON, CSV, or XML into RDF graphs \cite{dimou2014rml}. Figure~\ref{fig:rdf_authoring_panel:rml_1} illustrates the dialog used to define such mappings.
 
 \begin{figure}
   \centering
-  \includegraphics[width=.85\linewidth]{../figures/MC-RDF-RML-1.png}
+  \includegraphics[width=.65\linewidth]{../figures/MC-RDF-RML-1.png}
   \caption{The RML mapping dialog for JSON-to-JSON-LD conversion.}
-  \label{fig:metaconfigurator_interface_rdf:rml_1}
+  \label{fig:rdf_authoring_panel:rml_1}
 \end{figure}
 
 The dialog allows users to either provide an existing RML mapping or generate one automatically with AI assistance. In the latter case, the user supplies mapping hints that describe how elements of the input JSON data should correspond to RDF properties or classes. These hints, together with a representative subset of the input data, are sent to an external AI API to generate a candidate RML mapping.
 
-Internally, the system constructs a structured prompt that includes example mappings and fragments of the input data. This prompt guides the language model to produce a valid RML mapping in Turtle syntax that conforms to the expected structure. The prompt engineering approach constrains the model to output only the mapping definition while adhering to RML rules, thereby improving the reliability and syntactic correctness of the generated mappings.
+Internally, the system constructs a structured prompt that includes example mappings and fragments of the input data. This prompt guides the language model to produce a valid RML mapping in Turtle syntax that conforms to the JSON-LD structure. The prompt engineering approach constrains the model to output only the mapping definition while adhering to RML rules, thereby improving the reliability and syntactic correctness of the generated mappings.
 
 The mapping editor is implemented using the CodeMirror component, a widely used web-based code editor that provides syntax highlighting, automatic indentation, and real-time validation \cite{codemirror}. This allows users to inspect, refine, and validate the generated mapping directly within the interface before applying it to transform the JSON input into JSON-LD.
 
-Users may either provide an RML mapping in Turtle syntax directly or use the AI-assisted generation feature by supplying mapping hints. The resulting mapping is displayed in the CodeMirror editor, where it can be reviewed and edited as needed. Since the mapping is generated by AI, user verification and refinement are recommended. Once finalized, the mapping can be applied to convert the input JSON data into RDF-compatible JSON-LD, which can then be further managed in the RDF authoring panel.
+Users may either provide an RML mapping in Turtle syntax directly or use the AI-assisted generation feature by supplying mapping hints. The resulting mapping is displayed in the CodeMirror editor, where it can be reviewed and edited as needed. Since the mapping is generated by AI, user verification and refinement are recommended. Once finalized, the mapping can be applied to convert the input JSON data into JSON-LD, which can then be further managed in the RDF authoring panel.
 
 For example, a sample mapping hint that could convert the JSON example in Listing \ref{lst:background_json_example} to the JSON-LD example in Listing \ref{lst:background_jsonld_example} is depicted in Listing \ref{lst:metaconfigurator_interface_rdf:rml_hint}. This hint describes how to create RDF resources for the simulation run, parameters, and metrics, and how to link them using appropriate properties from the \texttt{schema} and \texttt{m4i} vocabularies. It also specifies how to map JSON fields to RDF properties, including handling units via the QUDT vocabulary.
 
-After providing these hints, the AI model (OpenAI GPT-4o-Mini) generates an RML mapping that follows the specified structure and semantics, as shown in Figure \ref{fig:metaconfigurator_interface_rdf:rml_2}. This mapping closely resembles the one presented in Listing \ref{lst:background_rml_mapping}. Once the user reviews and confirms the mapping, it can be executed to transform the input JSON data into a semantically enriched JSON-LD representation, as illustrated in Figure \ref{fig:metaconfigurator_interface_rdf:jsonld_1}.
+After providing these hints, the AI model (e.g. OpenAI GPT-4o-Mini) generates an RML mapping that follows the specified structure and semantics, as shown in Figure \ref{fig:rdf_authoring_panel:rml_2}. This mapping closely resembles the one presented in Listing \ref{lst:background_rml_mapping}. Once the user reviews and confirms the mapping, it can be executed to transform the input JSON data into a semantically enriched JSON-LD representation, as illustrated in Figure \ref{fig:rdf_authoring_panel:jsonld_1}.
 
 \begin{lstlisting}[style=plaintext,caption={Sample RML hints which describe the mapping from JSON to JSON-LD}, label={lst:metaconfigurator_interface_rdf:rml_hint}, basicstyle=\ttfamily]
 Create one main resource local:run_fenics_simulation of type m4i:Method.
@@ -67,14 +67,21 @@ local: https://www.example.org/
   \centering
   \includegraphics[width=.85\linewidth]{../figures/MC-RDF-RML-2.png}
 \caption{AI-generated RML mapping (OpenAI GPT-4o-Mini) based on user-provided hints from Listing \ref{lst:metaconfigurator_interface_rdf:rml_hint}}
-  \label{fig:metaconfigurator_interface_rdf:rml_2}
+  \label{fig:rdf_authoring_panel:rml_2}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=.85\linewidth]{../figures/MC-RDF-JSON-LD-1.png}
-  \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}}
-  \label{fig:metaconfigurator_interface_rdf:jsonld_1}
+  \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}, focused on Triples tab.}
+  \label{fig:rdf_authoring_panel:jsonld_1}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.85\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
+  \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}, focused on Context tab.}
+  \label{fig:rdf_authoring_panel:jsonld_2}
 \end{figure}
 
 \subsection{Panel Composition and UI Structure}
@@ -89,31 +96,49 @@ This explicit split mirrors the conceptual separation in \gls{jsonld} between vo
 
 \subsection{Context Tab Implementation}
 
-The Context tab is implemented by \texttt{RdfContextEditorPanel.vue}. It reuses MetaConfigurator's schema-driven property editor and applies a JSON Schema wrapper (\texttt{defaultJsonLdSchema}) so that \texttt{@context} can be edited through structured forms rather than plain text only. The current path breadcrumb and selection updates are synchronized with the global editor session, enabling users to navigate to and manipulate context entries consistently with other panels.
+The Context tab is implemented by \texttt{RdfContextEditorPanel.vue}. It reuses MetaConfigurator's GUI editor and applies a pre-defined JSON Schema so that \texttt{@context} can be edited through structured forms rather than plain text only. The selection updates are synchronized with the text editor view, enabling users to navigate to and manipulate context entries consistently with other panels.
 
-When the current document is invalid or not in expected \gls{jsonld} form, the context panel is visually disabled. This prevents accidental modifications when parsing preconditions are not satisfied.
+When the current document is invalid or not in correct \gls{jsonld} form, both panels become visually disabled. This prevents accidental modifications when parsing preconditions are not satisfied.
 
 \subsection{Triples Tab Implementation}
 
-The Triples tab is implemented by \texttt{RdfTripleEditorPanel.vue}. It presents triples in a PrimeVue \texttt{DataTable} with:
+The Triples tab is implemented by \texttt{RdfTripleEditorPanel.vue}. It presents triples in a PrimeVue \texttt{DataTable} \footnote{\url{https://primevue.org/datatable/}} with:
 \begin{itemize}
     \item paging, sorting, and column/global filtering,
-    \item single-row selection synchronized to JSON path navigation,
+    \item two-way single-row selection synchronized with Text editor cursor position,
     \item actions for add, edit, delete, export, \gls{sparql}, and visualization.
 \end{itemize}
 
-Triple editing is handled through \texttt{TripleDetailsDialog.vue}, which allows controlled entry of subject, predicate, and object terms, including typed literals with XML Schema datatypes. Changes are executed through \texttt{TripleEditorService} and propagated to the central RDF store.
+Triple editing is handled through \texttt{TripleDetailsDialog.vue}, which allows controlled entry of subject, predicate, and object terms, including typed literals with XML Schema data types. Changes are executed through \texttt{TripleEditorService} and propagated to the central RDF store.
+
+Changes to the data occurs from 2 sources: the JSON Text View editor and the Triple DataTable. When a change is made in the JSON editor, the RDF store manager rebuilds the RDF graph and updates the triple view. \ref{fig:rdf_authoring_panel:change_propagation_json_editor} 
+
+Conversely, when a triple is edited, removed or added in the DataTable, the change event is emitted through \texttt{TripleEditorService}. This service is responsible for ensuring that change is valid. \texttt{rdfStoreManager.ts} validates this change and if successfull, JSON Text View editor is updated from the fresh changes in the Statements. To update the Text View editor, the RDF store manager apply the changes, deserailize the new Statements to JSON-LD, and notifies the \texttt{TripleEditorService} to update the Text View. \ref{fig:rdf_authoring_panel:change_propagation_rdf_view}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.85\linewidth]{../figures/Diagram-1.png}
+  \caption{Change propagation flow between Text View and RDF View, when source of change is the Text View.}
+  \label{fig:rdf_authoring_panel:change_propagation_json_editor}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.85\linewidth]{../figures/Diagram-2.png}
+  \caption{Change propagation flow between Text View and RDF View, when source of change is the RDF View.}
+  \label{fig:rdf_authoring_panel:change_propagation_rdf_view}
+\end{figure}
 
 \subsection{RDF Store and Data Synchronization}
 
 The internal semantic state is managed by \texttt{rdfStoreManager.ts}, which uses RDFLib to parse and serialize data \cite{rdflib}. On each source-data update, the manager:
 \begin{enumerate}
-    \item resolves \texttt{@context},
-    \item parses \gls{jsonld} into an indexed RDF graph,
+    \item resolves \texttt{@context} data into namespace mappings,
+    \item parses \gls{jsonld} into an indexed RDF graph, which is then parsed as an Array of Statements,
     \item exposes reactive statements, warnings, and errors to UI components.
 \end{enumerate}
 
-To keep the JSON editor and RDF authoring panel consistent, \texttt{jsonLdNodeManager.ts} maps RDF statements back into JSON-LD data and computes path correspondences between selected triples and document positions. This enables bidirectional synchronization: selecting a triple can focus the matching JSON path, and JSON changes trigger store rebuilds.
+To keep the JSON editor and RDF authoring panel consistent, \texttt{jsonLdNodeManager.ts} maps RDF statements back into JSON-LD data and computes path correspondences between selected triples and document positions. This enables bidirectional synchronization: selecting a triple can focus the matching JSON path, and raw JSON data changes trigger store rebuilds.
 
 \subsection{Integrated Extensions in the Triple Workflow}
 
@@ -123,7 +148,9 @@ The Triple tab also integrates two advanced features:
     \item \textbf{Graph visualization} (\texttt{RdfVisualizer.vue}): interactive inspection of currently filtered triples as a graph representation.
 \end{itemize}
 
-Together, this implementation turns the separated PrimeVue RDF panel into a full authoring environment: users can define context terms, curate triples, run semantic queries, and visually inspect graph structures in a single, cohesive interface.
+Together, this implementation turns the RDF panel into a full authoring environment: users can define context terms, curate triples, run semantic queries, and visually inspect graph structures in a single, cohesive interface.
+
+
 
 \section{Query with SPARQL}\label{sec:design:query-with-sparql}
 \section{Knowledge Graph Visualization}\label{sec:design:knowledge-graph-visualization}
