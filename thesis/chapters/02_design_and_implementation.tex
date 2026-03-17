@@ -7,9 +7,9 @@ The \gls{rdf} authoring functionality is implemented as a dedicated, separate pa
 
 Figure \ref{fig:rdf_authoring_panel:json_data} shows a snapshot of the \gls{rdf} panel in action, loaded with the \gls{json} example from \ref{lst:background_json_example}. Since the data is provided in \gls{json} format, the panel indicates that it must first be converted to \gls{jsonld} before further processing. The user can proceed in two ways: either by directly supplying a \gls{jsonld} document in the text view, or by using the \textbf{JSON-to-JSON-LD} conversion tool discussed in Section \ref{sec:design:rdf-authoring-panel:rml-mapping-tool}.
 
-\begin{figure}
+\begin{figure}[htbp]
   \centering
-  \includegraphics[width=.65\linewidth]{../figures/MC-RDF-JSON.png}
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-JSON.png}
   \caption{A snapshot of MetaConfigurator's RDF panel.}
     \label{fig:rdf_authoring_panel:json_data}
 \end{figure}
@@ -21,14 +21,14 @@ If the input data is not already expressed as \gls{jsonld}, the \gls{rdf} panel 
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.65\linewidth]{../figures/MC-RDF-RML-1.png}
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-RML-1.png}
   \caption{The RML mapping dialog for JSON-to-JSON-LD conversion.}
   \label{fig:rdf_authoring_panel:rml_1}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.65\linewidth]{../figures/MC-RDF-RML-2.png}
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-RML-2.png}
 \caption{AI-generated RML mapping based on user-provided hints from Listing \ref{lst:metaconfigurator_interface_rdf:rml_hint}.}
   \label{fig:rdf_authoring_panel:rml_2}
 \end{figure}
@@ -45,7 +45,7 @@ For example, a sample mapping hint that could convert the \gls{json} example in 
 
 After providing these hints, the configured \gls{ai} model generates an \gls{rml} mapping that follows the specified structure and semantics, as shown in Figure \ref{fig:rdf_authoring_panel:rml_2}. This mapping closely resembles the one presented in Listing \ref{lst:background_rml_mapping}. Once the user reviews and confirms the mapping, it can be executed to transform the input \gls{json} data into a semantically enriched \gls{jsonld} representation, as illustrated in Figure \ref{fig:rdf_authoring_panel:jsonld_1}.
 
-\begin{lstlisting}[style=plaintext,caption={Sample RML hints which describe the mapping from JSON to JSON-LD}, label={lst:metaconfigurator_interface_rdf:rml_hint}]
+\begin{lstlisting}[float=htbp,style=plaintext,caption={Sample RML hints which describe the mapping from JSON to JSON-LD}, label={lst:metaconfigurator_interface_rdf:rml_hint}]
 Create one main resource local:run_fenics_simulation of type m4i:Method.
 This node links to parameter nodes using m4i:hasParameter and to metric nodes using m4i:investigates.
 
@@ -72,16 +72,16 @@ local: https://www.example.org/
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.65\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
-  \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}, focused on the Context tab.}
-  \label{fig:rdf_authoring_panel:jsonld_2}
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-JSON-LD-1.png}
+  \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}, focused on the Triples tab.}
+  \label{fig:rdf_authoring_panel:jsonld_1}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.65\linewidth]{../figures/MC-RDF-JSON-LD-1.png}
-  \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}, focused on the Triples tab.}
-  \label{fig:rdf_authoring_panel:jsonld_1}
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
+  \caption{JSON-LD output obtained by applying the mapping from Listing \ref{lst:background_rml_mapping}, focused on the Context tab.}
+  \label{fig:rdf_authoring_panel:jsonld_2}
 \end{figure}
 
 \subsection{Panel Composition and UI Structure}
@@ -120,14 +120,14 @@ Conversely, when a triple is edited, removed, or added in the DataTable, \texttt
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.65\linewidth]{../figures/Diagram-1.png}
+  \includegraphics[width=.75\linewidth]{../figures/Diagram-1.png}
   \caption{Change propagation flow between Text View and RDF View when the source of change is the Text View.}
   \label{fig:rdf_authoring_panel:change_propagation_json_editor}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.65\linewidth]{../figures/Diagram-2.png}
+  \includegraphics[width=.75\linewidth]{../figures/Diagram-2.png}
   \caption{Change propagation flow between Text View and RDF View when the source of change is the RDF View.}
   \label{fig:rdf_authoring_panel:change_propagation_rdf_view}
 \end{figure}
@@ -143,11 +143,11 @@ The internal semantic state is managed by \texttt{rdfStoreManager.ts}, which use
 \end{enumerate}
 
 \begin{definition}[RDFLib Statement]
-In this implementation, an RDFLib Statement is the runtime representation of one \gls{rdf} triple of the form $(s, p, o)$, where $s$ (subject), $p$ (predicate), and $o$ (object) are \gls{rdf} terms. In \texttt{rdflib.js}, these terms are represented as \texttt{NamedNode}, \texttt{BlankNode}, and \texttt{Literal} objects, and each triple is stored as a \texttt{\$rdf.Statement}. A collection of such statements forms the in-memory graph used by the panel \cite{rdflib_docs}.
+In this implementation, an RDFLib Statement is the runtime representation of one \gls{rdf} triple of the form $(s, p, o)$, where $s$ (subject), $p$ (predicate), and $o$ (object) are \gls{rdf} terms. In \texttt{rdflib.js}, these terms are represented as \texttt{NamedNode}, \texttt{BlankNode}, and \texttt{Literal} objects, and each triple is stored as a Statement. A collection of such Statements forms the in-memory graph used by the panel \cite{rdflib_docs}.
 
 \end{definition}
 
-This definition is directly reflected in the implementation workflow: the internal store parses \gls{jsonld} into a reactive list of \texttt{\$rdf.Statement} objects, the triples table renders this list, and editing actions create or modify individual statements for add/edit/delete operations. Statement-level matching (subject, predicate, object) is used to synchronize table selection with text-editor paths.
+This definition is directly reflected in the implementation workflow: the internal store parses \gls{jsonld} into a reactive list of Statement objects, the triples table renders this list, and editing actions create or modify individual statements for add/edit/delete operations. Statement-level matching (subject, predicate, object) is used to synchronize table selection with text-editor paths.
 
 To keep the \gls{json} editor and \gls{rdf} authoring panel consistent, the implementation maps \gls{rdf} statements back into \gls{jsonld} data and computes path correspondences between selected triples and document positions. This enables bidirectional synchronization: selecting a triple can focus the matching JSON path, and raw \gls{json} data changes trigger store rebuilds.
 
@@ -196,7 +196,7 @@ Together, this implementation turns the RDF panel into a full authoring environm
 
 
 \section{Query with SPARQL}\label{sec:design:query-with-sparql}
-The \gls{sparql} query functionality is implemented in \texttt{SparqlEditor.vue} as a dialog with three tabs: \textbf{Query View}, \textbf{Result View}, and \textbf{Visualization}. Query execution is performed in-browser using Comunica's \texttt{QueryEngine} \cite{comunica_query_sparql}. According to Comunica's official specification matrix, the engine supports SPARQL 1.2 query-related specifications \cite{comunica_supported_specs}.
+The \gls{sparql} query functionality is implemented in \texttt{SparqlEditor.vue} as a dialog with three tabs: \textbf{Query View}, \textbf{Result View}, and \textbf{Visualization}. Query execution is performed in-browser using Comunica's \texttt{QueryEngine} \cite{comunica_query_sparql}. According to Comunica's official documentation, the engine supports SPARQL 1.2 query-related specifications \cite{comunica_supported_specs}.
 
 In the \textbf{Query View}, users can write and validate queries in a CodeMirror editor and execute them against the current in-memory \gls{rdf} graph. The same view also provides \gls{ai}-assisted \gls{sparql} generation. Similar to the \gls{ai}-assisted \gls{rml} workflow described in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, user hints are combined with prompt-engineering instructions and a representative subset of the current \gls{jsonld} data, then sent to the configured \gls{llm} to generate a draft \gls{sparql} query.
 
@@ -207,13 +207,13 @@ To demonstrate the \gls{ai}-assisted workflow, we assume that the simulation \gl
 
 In this scenario, the user provides a natural-language hint in the Query View to request a query that returns paired values of mesh element size and maximum von Mises stress. An example hint is shown in Listing~\ref{lst:design_sparql_ai_hint}. The hint and a subset of the current \gls{jsonld} graph are sent to the configured \gls{llm}, which proposes a syntactically valid draft query that can then be reviewed and refined by the user. A representative generated query is shown in Listing~\ref{lst:design_sparql_ai_generated}, and its integration in the dialog is illustrated in Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated}.
 
-\begin{lstlisting}[style=plaintext,caption={Example user hint for AI-assisted SPARQL generation}, label={lst:design_sparql_ai_hint}]
+\begin{lstlisting}[float=htbp,style=plaintext,caption={Example user hint for AI-assisted SPARQL generation}, label={lst:design_sparql_ai_hint}]
 Return pairs of element_size and max_von_mises_stress.
 For each run, show the numeric element size value and the numeric stress value.
 Sort by element_size ascending.
 \end{lstlisting}
 
-\begin{lstlisting}[style=sparql,caption={Example AI-suggested SPARQL query for element-size/stress pairs}, label={lst:design_sparql_ai_generated}]
+\begin{lstlisting}[float=htbp,style=sparql,caption={Example AI-suggested SPARQL query for element-size/stress pairs}, label={lst:design_sparql_ai_generated}]
 PREFIX m4i: <http://w3id.org/nfdi4ing/metadata4ing#>
 PREFIX schema: <https://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
