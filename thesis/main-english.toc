@@ -29,15 +29,18 @@
 \contentsline {subsection}{\numberline {2.1.3}Context Tab Implementation}{36}{subsection.341}%
 \contentsline {subsection}{\numberline {2.1.4}Triples Tab Implementation}{36}{subsection.342}%
 \contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{37}{subsection.348}%
-\contentsline {subsection}{\numberline {2.1.6}Integrated Extensions in the Triple Workflow}{38}{subsection.353}%
-\contentsline {section}{\numberline {2.2}Query with SPARQL}{39}{section.354}%
-\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{39}{section.355}%
-\contentsline {chapter}{\numberline {3}Application}{41}{chapter.356}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{41}{section.357}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{43}{chapter.358}%
-\contentsline {chapter}{\nonumberline Bibliography}{45}{chapter*.359}%
+\contentsline {subsection}{\numberline {2.1.6}Synchronization Between Text View and RDF View}{38}{subsection.353}%
+\contentsline {subsubsection}{\nonumberline Text View to RDF View}{39}{subsubsection*.354}%
+\contentsline {subsubsection}{\nonumberline RDF View to Text View}{39}{subsubsection*.355}%
+\contentsline {subsection}{\numberline {2.1.7}Integrated Extensions in the Triple Workflow}{39}{subsection.359}%
+\contentsline {section}{\numberline {2.2}Query with SPARQL}{40}{section.360}%
+\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{40}{section.361}%
+\contentsline {chapter}{\numberline {3}Application}{41}{chapter.362}%
+\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{41}{section.363}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{43}{chapter.364}%
+\contentsline {chapter}{\nonumberline Bibliography}{45}{chapter*.365}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{48}{chapter*.359}%
-\contentsline {chapter}{\numberline {A}Appendix}{49}{appendix.360}%
-\contentsline {section}{\numberline {A.1}RML Mapping}{49}{section.361}%
+\contentsline {part}{Appendix}{48}{chapter*.365}%
+\contentsline {chapter}{\numberline {A}Appendix}{49}{appendix.366}%
+\contentsline {section}{\numberline {A.1}RML Mapping}{49}{section.367}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

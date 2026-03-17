@@ -23,7 +23,8 @@
 \glossentry{iri}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{19}\delimN 
 		\setentrycounter[]{page}\glsnumberformat{21}\delimN 
-		\setentrycounter[]{page}\glsnumberformat{26\delimN 27}}}\glsgroupskip
+		\setentrycounter[]{page}\glsnumberformat{26\delimN 27}\delimN 
+		\setentrycounter[]{page}\glsnumberformat{39}}}\glsgroupskip
 \glsgroupheading{J}\relax \glsresetentrylist %
 \glossentry{json}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{3\delimN 4}\delimN 
@@ -40,7 +41,7 @@
 		\setentrycounter[]{page}\glsnumberformat{16\delimR 21}\delimN 
 		\setentrycounter[]{page}\glsnumberformat{26\delimR 31}\delimN 
 		\setentrycounter[]{page}\glsnumberformat{34}\delimN 
-		\setentrycounter[]{page}\glsnumberformat{36\delimR 38}}}%
+		\setentrycounter[]{page}\glsnumberformat{36\delimR 39}}}%
 \glossentry{jsonpath}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{21}}}\glsgroupskip
 \glsgroupheading{O}\relax \glsresetentrylist %

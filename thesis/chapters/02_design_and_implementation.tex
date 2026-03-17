@@ -85,6 +85,7 @@ local: https://www.example.org/
 \end{figure}
 
 \subsection{Panel Composition and UI Structure}
+\label{sec:design:rdf-authoring-panel:panel-composition}
 
 The core editing surface is implemented in \texttt{RdfEditorPanel.vue} as a PrimeVue Tabs\footnote{\url{https://primevue.org/tabs/}} container. The implementation is primarily organized into two tabs:
 \begin{itemize}
@@ -95,12 +96,14 @@ The core editing surface is implemented in \texttt{RdfEditorPanel.vue} as a Prim
 This explicit split mirrors the conceptual separation in \gls{jsonld} between vocabulary declarations and graph assertions \cite{jsonld2014}. The panel therefore supports both semantic modeling tasks (namespace/prefix handling) and graph authoring tasks (subject-predicate-object manipulation) in one workflow.
 
 \subsection{Context Tab Implementation}
+\label{sec:design:rdf-authoring-panel:context-tab-implementation}
 
 The Context tab is implemented by \texttt{RdfContextEditorPanel.vue}. It reuses MetaConfigurator's \gls{gui} editor and applies a predefined JSON Schema so that \texttt{@context} can be edited through structured forms rather than plain text only. The selection updates are synchronized with the text editor view, enabling users to navigate to and manipulate context entries consistently with other panels.
 
 When the current document is invalid or not in the expected \gls{jsonld} form, both tabs become visually disabled. This prevents accidental modifications when parsing preconditions are not satisfied.
 
 \subsection{Triples Tab Implementation}
+\label{sec:design:rdf-authoring-panel:triples-tab-implementation}
 
 The Triples tab is implemented by \texttt{RdfTripleEditorPanel.vue}. It presents triples in a PrimeVue \texttt{DataTable} \footnote{\url{https://primevue.org/datatable/}} with:
 \begin{itemize}
@@ -130,6 +133,7 @@ Conversely, when a triple is edited, removed, or added in the DataTable, \texttt
 \end{figure}
 
 \subsection{RDF Store and Data Synchronization}
+\label{sec:design:rdf-authoring-panel:rdf-store-and-sync}
 
 The internal semantic state is managed by \texttt{rdfStoreManager.ts}, which uses RDFLib to parse and serialize data \cite{rdflib_docs}. On each source-data update, the manager:
 \begin{enumerate}
@@ -143,11 +147,43 @@ In this implementation, an RDFLib Statement is the runtime representation of one
 
 \end{definition}
 
-This definition is directly reflected in the implementation workflow: \texttt{rdfStoreManager.ts} parses \gls{jsonld} into a list of \texttt{\$rdf.Statement} objects (\texttt{statements.value}), \texttt{RdfTripleEditorPanel.vue} renders this list in the Data Table, and \texttt{TripleEditorService} creates or modifies individual statements for add/edit/delete operations. Statement-level matching (subject, predicate, object) functions are usedto synchronize table selection with text-editor paths.
+This definition is directly reflected in the implementation workflow: the internal store parses \gls{jsonld} into a reactive list of \texttt{\$rdf.Statement} objects, the triples table renders this list, and editing actions create or modify individual statements for add/edit/delete operations. Statement-level matching (subject, predicate, object) is used to synchronize table selection with text-editor paths.
 
-To keep the \gls{json} editor and \gls{rdf} authoring panel consistent, \texttt{jsonLdNodeManager.ts} maps \gls{rdf} statements back into \gls{jsonld} data and computes path correspondences between selected triples and document positions. This enables bidirectional synchronization: selecting a triple can focus the matching JSON path, and raw \gls{json} data changes trigger store rebuilds.
+To keep the \gls{json} editor and \gls{rdf} authoring panel consistent, the implementation maps \gls{rdf} statements back into \gls{jsonld} data and computes path correspondences between selected triples and document positions. This enables bidirectional synchronization: selecting a triple can focus the matching JSON path, and raw \gls{json} data changes trigger store rebuilds.
+
+\subsection{Synchronization Between Text View and RDF View}
+\label{sec:design:rdf-authoring-panel:view-synchronization}
+
+Synchronization between the Text View (\gls{jsonld} editor) and the \gls{rdf} View (triples DataTable) is implemented as two directional mapping procedures that operate on \texttt{\$rdf.Statement} matching.
+
+\subsubsection{Text View to RDF View}
+\label{sec:design:rdf-authoring-panel:view-synchronization:text-to-rdf}
+
+When the current selection changes in the Text View, the selected JSON path is read from the editor state and used to derive a focused semantic fragment.
+
+This extraction step constructs a minimal \gls{jsonld} fragment that preserves the original \texttt{@context} and contains exactly one node in \texttt{@graph}. The node contains:
+\begin{itemize}
+    \item the subject identifier (\texttt{@id}),
+    \item the selected predicate,
+    \item the selected object value (including array-element handling when needed).
+\end{itemize}
+
+The minimal fragment is then parsed by RDFLib into a temporary graph. If the parse yields exactly one statement, this statement is compared against the current statement list using subject, predicate, and object equality. The resulting index is used to focus and select the matching row in the DataTable.
+
+\subsubsection{RDF View to Text View}
+\label{sec:design:rdf-authoring-panel:view-synchronization:rdf-to-text}
+
+When a row is selected (or clicked) in the triples DataTable, the selected statement's subject, predicate, and object are used to search the corresponding location in the \gls{jsonld} document. Path matching is performed in three stages:
+\begin{enumerate}
+    \item find the candidate node by matching \texttt{@id} with the subject,
+    \item inside that node, find the matching predicate key,
+    \item inside that predicate value, match the object (as \texttt{@id}, \texttt{@value}, or scalar value).
+\end{enumerate}
+
+To improve robustness, matching considers semantic term equivalence and checks both compact prefixed terms and full \glspl{iri}. Therefore, values such as \texttt{schema:value} and \texttt{https://schema.org/value} are treated as equivalent during lookup. Once the path is found, the editor view navigates to the corresponding JSON location.
 
 \subsection{Integrated Extensions in the Triple Workflow}
+\label{sec:design:rdf-authoring-panel:integrated-extensions}
 
 The Triple tab also integrates two advanced features:
 \begin{itemize}
