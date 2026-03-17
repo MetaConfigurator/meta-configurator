@@ -1,0 +1,21 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces A snapshot of MetaConfigurator's schema editing interface.}}{26}{figure.278}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces A snapshot of MetaConfigurator's data editing interface.}}{28}{figure.280}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces A snapshot of MetaConfigurator's RDF panel.}}{36}{figure.306}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces The RML mapping dialog for JSON-to-JSON-LD conversion.}}{36}{figure.309}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces AI-generated RML mapping based on user-provided hints from Listing \ref {lst:metaconfigurator_interface_rdf:rml_hint}.}}{37}{figure.311}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}, focused on the Context tab.}}{39}{figure.335}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}, focused on the Triples tab.}}{39}{figure.337}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Change propagation flow between Text View and RDF View when the source of change is the Text View.}}{41}{figure.344}%
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Change propagation flow between Text View and RDF View when the source of change is the RDF View.}}{42}{figure.346}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query editor with AI-generated query based on user hints.}}{45}{figure.382}%
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{46}{figure.384}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Data exported as CSV could be visualized as a plot of element size vs. Max von Mises stress, revealing trends in the simulation results.}}{47}{figure.386}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\def \@chapapp {\appendixname }
+\addvspace {10\p@ }
+\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

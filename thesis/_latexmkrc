@@ -1,12 +1,22 @@
 $pdflatex = 'lualatex --shell-escape --file-line-error --synctex=-1 %O %S';
 
-#Use SumatraPDF instead of the default PDF viewer
-$pdf_previewer = 'start "C:\Program Files\SumatraPDF\SumatraPDF.exe"';
+# Keep generated files out of source tree and make runs deterministic
+$aux_dir = 'build';
+$out_dir = 'build';
+
+# Ensure LuaTeX has a writable, stable cache path
+$ENV{'TEXMFCACHE'} = 'build/.texmf-cache';
+$ENV{'LUAOTFLOAD_CACHE'} = 'build/.texmf-cache';
+
+# Use SumatraPDF only on Windows
+if ( $^O eq 'MSWin32' ) {
+  $pdf_previewer = 'start "C:\Program Files\SumatraPDF\SumatraPDF.exe"';
+}
 
 #SumatraPDF updates automatically
 $preview_mode = 0;
 
-#automatically call lualatex/pdflatex (instead of latex)
+# automatically call lualatex/pdflatex (instead of latex)
 $pdf_mode = 1;
 
 # enable deletion of *.bbl when calling "latexmk -c"

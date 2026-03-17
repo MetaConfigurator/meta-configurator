@@ -15,12 +15,13 @@
             "name": "latexmk_lualatex",
             "command": "latexmk",
             "args": [
+                "-cd",
+                "-r",
+                "%DIR%/_latexmkrc",
                 "-synctex=1",
                 "-interaction=nonstopmode",
                 "-file-line-error",
-                "-lualatex",
                 "-pdf",
-                "-silent",
                 "-pv-",
                 "%DOC%"
             ],
@@ -31,6 +32,6 @@
     "latex-workshop.check.selfCheck.enabled": false,
     "latex-workshop.showContextMenu": false,
     
-    "latex-workshop.latex.autoClean.run": "onBuilt",
+    "latex-workshop.latex.autoClean.run": "never",
     "latex-workshop.latex.clean.subfolder.enabled": true
 }
