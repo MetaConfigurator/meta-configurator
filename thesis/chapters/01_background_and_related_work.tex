@@ -458,9 +458,11 @@ Through this mapping process, structured simulation outputs are automatically co
 
 The technologies discussed in the previous sections enable structured, validated, and semantically enriched data representations. However, creating and editing such structured data manually can be challenging, particularly for users who are not familiar with textual formats such as \gls{json} or with schema-based validation mechanisms. To address this challenge, tools that support schema-driven data modeling and editing are required.
 
-MetaConfigurator\footnote{\url{https://www.metaconfigurator.org}} is an open-source web application designed to simplify the creation, editing, and management of structured data and schemas \cite{metaconfigurator2024}. The tool generates \glspl{gui} dynamically based on a provided schema, allowing users to interact with structured data through intuitive forms rather than manually editing raw text files. By leveraging JSON Schema as the underlying model description, MetaConfigurator enables consistent data validation and guided data entry.
+MetaConfigurator\footnote{\url{https://www.metaconfigurator.org}} is an open-source web application designed to simplify the creation, editing, and management of structured data and schemas \cite{metaconfigurator2024,metaconfigurator2025datamodels}. The tool generates \glspl{gui} dynamically based on a provided schema, allowing users to interact with structured data through intuitive forms rather than manually editing raw text files. By leveraging JSON Schema as the underlying model description, MetaConfigurator enables consistent data validation and guided data entry.
 
-MetaConfigurator follows a schema-driven approach: the structure of the \gls{ui} is derived directly from the schema that describes the data model. This design allows the same tool to be applied across different domains without the need to implement domain-specific \glspl{ui}. The application runs entirely in the user's browser and supports multiple structured data formats such as \gls{json} and \gls{yaml} \cite{metaconfigurator2024}.
+MetaConfigurator follows a schema-driven approach: the structure of the \gls{ui} is derived directly from the schema that describes the data model. This design allows the same tool to be applied across different domains without the need to implement domain-specific \glspl{ui}. The application runs entirely in the user's browser and supports multiple structured data formats such as \gls{json} and \gls{yaml} \cite{metaconfigurator2024,metaconfigurator2025datamodels}.
+
+As reported in the 2025 BTW paper, the tool is organized into three main views: Data Editor, Schema Editor, and Settings \cite{metaconfigurator2025datamodels}. In each view, users can work in a synchronized split interface combining a text editor and a generated \gls{gui}, which supports both expert-oriented direct editing and guided editing for non-experts.
 
 \subsection{Core Features}
 
@@ -477,6 +479,9 @@ MetaConfigurator provides several features that facilitate the creation and main
     \item \textbf{Visual Schema Editor:}  
     Users can create and modify \gls{json} schemas using a graphical interface, enabling intuitive construction of data models without manually writing schema definitions. Figure \ref{fig:metaconfigurator_interface:schema} depicts an example of schema editing in MetaConfigurator, showing the JSON Schema from \ref{lst:background_json_schema}. The left panel shows the raw JSON Schema, the middle panel provides a diagram view for editing, and the right panel offers a structured form for schema modification.
 
+    \item \textbf{Simplified and Advanced Schema Modes:}
+    To reduce complexity while preserving expressiveness, MetaConfigurator provides configurable schema-editing modes. A simplified mode hides advanced JSON Schema options, while an advanced mode exposes the full feature set. This behavior is implemented through a meta-schema-builder approach that dynamically derives the editor schema from user settings \cite{metaconfigurator2025datamodels}.
+
     \item \textbf{Schema-Driven Form Generation:}  
     Based on a given JSON Schema, MetaConfigurator automatically generates a graphical form for editing instance data. This ensures that all entered data conforms to the defined structure and constraints.
 
@@ -487,7 +492,13 @@ MetaConfigurator provides several features that facilitate the creation and main
     During data editing, MetaConfigurator validates instance data against the provided JSON Schema, ensuring structural correctness and preventing invalid data entries.
 
     \item \textbf{Schema Visualization and Navigation:}  
-    Complex schemas can be explored using a tree-like or diagram-based representation, helping users understand hierarchical structures and relationships between properties.
+    Complex schemas can be explored using a tree-like or diagram-based representation, helping users understand hierarchical structures and relationships between properties. The 2025 extension introduces an interactive diagram-like schema view with synchronized editing actions (e.g., renaming and adding properties), while advanced constructs such as compositions and conditionals are primarily visualized rather than fully edited graphically \cite{metaconfigurator2025datamodels}.
+
+    \item \textbf{CSV Import and Schema Inference:}
+    Tabular data can be imported from CSV/Excel-oriented workflows into \gls{json}, with automatic initial schema inference to reduce manual modeling effort \cite{metaconfigurator2025datamodels}.
+
+    \item \textbf{Snapshot Sharing and URL-Based Collaboration:}
+    MetaConfigurator supports sharing complete editor states (data, schema, settings) through shareable links and snapshot storage, enabling reproducible collaboration between users \cite{metaconfigurator2025datamodels}.
 
 \item \textbf{Limited Ontology Integration:}  
 While the tool offers a JSON-LD option that introduces \texttt{@context} and \texttt{@id} fields, its overall support for ontologies remains very limited. It allows \gls{uri}-based references and provides auto-completion to reference ontology concepts when creating structured data models, but deeper integration is not available.
@@ -500,7 +511,7 @@ While the tool offers a JSON-LD option that introduces \texttt{@context} and \te
     \label{fig:metaconfigurator_interface:data}
 \end{figure}
 
-These capabilities significantly reduce the effort required to design and maintain structured data models and improve accessibility for users who may not be familiar with schema languages.
+The above extensions were demonstrated in a chemistry use case, where tabular experiment data was migrated from CSV/Excel-oriented workflows to \gls{json}, extended with additional metadata, and iteratively refined through schema editing \cite{metaconfigurator2025datamodels}. These capabilities significantly reduce the effort required to design and maintain structured data models and improve accessibility for users who may not be familiar with schema languages.
 \newpage
 
 \subsection{AI-Assisted Schema Engineering and Mapping}

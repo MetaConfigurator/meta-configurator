@@ -818,6 +818,56 @@
       \verb 10.1007/s13222-024-00472-7
       \endverb
     \endentry
+    \entry{metaconfigurator2025datamodels}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=cee8fd4aa4588c8a57078a2b835113dc}{%
+           family={Neubauer},
+           familyi={N\bibinitperiod},
+           given={Felix},
+           giveni={F\bibinitperiod}}}%
+        {{hash=a53295d118b38d3f18e99b0bcb23e584}{%
+           family={Pleiss},
+           familyi={P\bibinitperiod},
+           given={Jürgen},
+           giveni={J\bibinitperiod}}}%
+        {{hash=96492da40bafc5224b4ca48bed84b96a}{%
+           family={Uekermann},
+           familyi={U\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Gesellschaft für Informatik, Bonn}%
+      }
+      \strng{namehash}{926ca14259e9aca676d600426b174a2a}
+      \strng{fullhash}{d19ca2262e67712bd506409da7180da8}
+      \strng{fullhashraw}{d19ca2262e67712bd506409da7180da8}
+      \strng{bibnamehash}{d19ca2262e67712bd506409da7180da8}
+      \strng{authorbibnamehash}{d19ca2262e67712bd506409da7180da8}
+      \strng{authornamehash}{926ca14259e9aca676d600426b174a2a}
+      \strng{authorfullhash}{d19ca2262e67712bd506409da7180da8}
+      \strng{authorfullhashraw}{d19ca2262e67712bd506409da7180da8}
+      \field{extraname}{2}
+      \field{labelalpha}{NPU25}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Datenbanksysteme für Business, Technologie und Web (BTW 2025)}
+      \field{series}{Lecture Notes in Informatics (LNI), Proceedings}
+      \field{title}{Data Model Creation with MetaConfigurator}
+      \field{volume}{P-361}
+      \field{year}{2025}
+      \verb{doi}
+      \verb 10.18420/BTW2025-60
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.gi.de/handle/20.500.12116/45927
+      \endverb
+      \verb{url}
+      \verb https://dl.gi.de/handle/20.500.12116/45927
+      \endverb
+    \endentry
     \entry{ai_assisted_schema_mapping_2025}{inproceedings}{}{}
       \name{author}{3}{}{%
         {{hash=5c1b2d3efbb1cacb955c427c5bf99eef}{%
@@ -844,7 +894,7 @@
       \strng{authornamehash}{a782f77109ef778d362377a5076509db}
       \strng{authorfullhash}{fe0041e88001b49796ba2524453bfe6b}
       \strng{authorfullhashraw}{fe0041e88001b49796ba2524453bfe6b}
-      \field{extraname}{2}
+      \field{extraname}{3}
       \field{labelalpha}{NUP25}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
