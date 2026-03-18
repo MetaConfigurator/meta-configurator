@@ -154,7 +154,6 @@
 \glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{30}
 \glossaryentry{RML?\glossentry{rml}|setentrycounter[]{page}"\glsnumberformat}{30}
 \glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{30}
-\glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{30}
 \glossaryentry{JSON?\glossentry{json}|setentrycounter[]{page}"\glsnumberformat}{30}
 \glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{30}
 \glossaryentry{AI?\glossentry{ai}|setentrycounter[]{page}"\glsnumberformat}{30}
@@ -170,6 +169,7 @@
 \glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{31}
 \glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{31}
 \glossaryentry{ETL?\glossentry{etl}|setentrycounter[]{page}"\glsnumberformat}{31}
+\glossaryentry{JSON?\glossentry{json}|setentrycounter[]{page}"\glsnumberformat}{31}
 \glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{31}
 \glossaryentry{SHACL?\glossentry{shacl}|setentrycounter[]{page}"\glsnumberformat}{31}
 \glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{31}
@@ -181,11 +181,13 @@
 \glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{32}
 \glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{32}
 \glossaryentry{AI?\glossentry{ai}|setentrycounter[]{page}"\glsnumberformat}{32}
-\glossaryentry{OWL?\glossentry{owl}|setentrycounter[]{page}"\glsnumberformat}{32}
-\glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{32}
-\glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{32}
+\glossaryentry{OWL?\glossentry{owl}|setentrycounter[]{page}"\glsnumberformat}{33}
+\glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{33}
+\glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{JSON?\glossentry{json}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{33}
+\glossaryentry{JSON?\glossentry{json}|setentrycounter[]{page}"\glsnumberformat}{33}
+\glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{R2RML?\glossentry{r2rml}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{RML?\glossentry{rml}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{AI?\glossentry{ai}|setentrycounter[]{page}"\glsnumberformat}{33}
@@ -194,6 +196,7 @@
 \glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{JSON?\glossentry{json}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{JSON-LD?\glossentry{jsonld}|setentrycounter[]{page}"\glsnumberformat}{33}
+\glossaryentry{RDF?\glossentry{rdf}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{AI?\glossentry{ai}|setentrycounter[]{page}"\glsnumberformat}{33}
 \glossaryentry{SPARQL?\glossentry{sparql}|setentrycounter[]{page}"\glsnumberformat}{33}

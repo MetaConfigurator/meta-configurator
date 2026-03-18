@@ -547,73 +547,79 @@ By integrating these capabilities into MetaConfigurator, the platform evolves fr
 \section{Related Work}
 \label{sec:background:related_work}
 
-Existing work on Semantic Web tooling can be grouped into four areas: ontology engineering platforms, data-to-\gls{rdf} transformation tools, schema/metadata modeling environments, and \gls{rdf} query/processing libraries. Across these areas, strong support exists for individual tasks, but end-to-end workflows that combine schema-driven \gls{json} editing, \gls{rdf} authoring, mapping, querying, and \gls{ai}-assisted guidance in one environment remain limited.
+Related work in this area spans several mature but often separate tool families: ontology engineering platforms, transformation tools that convert source data into \gls{rdf}, schema/metadata modeling environments for structured data, and libraries or engines for querying and validation. These families provide strong support for individual tasks, but integrated workflows that combine guided \gls{json} authoring, semantic transformation, \gls{rdf} curation, querying, and \gls{ai}-assisted support in a single user-facing environment are still uncommon.
 
-\subsection{Ontology Engineering and Knowledge Graph Tooling}
+\subsection{Ontology Engineering and Knowledge Graph Platforms}
 
 Protégé and WebProtégé are widely used for ontology engineering and collaborative ontology curation \cite{protege,webprotege}. They provide robust support for class/property modeling and ontology lifecycle management, but they are not primarily designed as schema-driven editors for end-user \gls{json} instance data.
 
 Apache Jena provides a mature programmatic stack for \gls{rdf} processing, reasoning, and \gls{sparql} querying \cite{apache_jena}. GraphDB focuses on \gls{rdf} storage and query execution in production-oriented knowledge graph settings \cite{graphdb}. These systems are strong back-end components, but typically require separate front-end layers for guided data entry and authoring workflows.
 
-\subsection{Schema and Metadata Modeling Approaches}
+\subsection{Schema and Metadata Modeling for Structured Data}
 
 LinkML supports schema-first modeling and can generate artifacts such as \gls{jsonld} and \gls{owl} from a single model \cite{linkml}. The \gls{cedar} Workbench supports ontology-assisted metadata authoring for scientific experiments \cite{cedar_workbench}. Both approaches improve semantic consistency at model level, but they do not directly address an integrated workflow where users iteratively transform arbitrary \gls{json} instance data into \gls{rdf} using declarative mappings and in-tool graph exploration.
 
-\subsection{Data-to-RDF Transformation and Authoring}
+\subsection{Transformation from Source Data to RDF}
 
-Karma, OpenRefine (with \gls{rdf} extensions), and SPARQL-Generate support transformation from heterogeneous sources to \gls{rdf} \cite{karma,openrefine,sparql_generate}. They are effective for \gls{etl}-style conversion tasks, but generally emphasize transformation pipelines over schema-driven configuration editing inside a single application.
+Karma, OpenRefine (with \gls{rdf} extensions), and SPARQL-Generate support transformation from heterogeneous sources to \gls{rdf} \cite{karma,openrefine,sparql_generate}. These tools are effective for \gls{etl}-oriented conversion pipelines, but they focus primarily on mapping and transformation rather than tightly coupled, schema-guided \gls{json} editing and semantic authoring in one interface.
 
-\subsection{Querying, Validation, and Lightweight Experimentation}
+\subsection{Querying, Validation, and Programmatic RDF Processing}
 
 \gls{rdf} validation and querying standards such as \gls{shacl} and \gls{sparql} are well established \cite{shacl_standard,sparql_standard}. For lightweight experimentation, \gls{jsonld} Playground provides quick inspection of contexts and \gls{rdf} output \cite{jsonld_playground}. \gls{rdflib} and Redland provide low-level programmatic \gls{rdf} processing \cite{rdflib,redland}. These tools are important ecosystem building blocks but are not, by themselves, unified authoring environments for non-expert users.
 
 \subsection{Comparison of Representative Tools}
 
-Table~\ref{tab:related_tools_comparison} compares representative tools across capabilities relevant to this thesis: \gls{rdf} authoring, ontology integration, data-to-\gls{rdf} mapping, schema-driven configuration, \gls{rdf} storage/query, visualization, and \gls{ai} assistance.
+Table~\ref{tab:related_tools_comparison} compares representative tools across capabilities relevant to this thesis: \gls{rdf} authoring, ontology integration, source-to-\gls{rdf} transformation, \gls{rdf} storage/query, visualization, and \gls{ai} assistance.
 
 \begin{table}[h!]
 \centering
 \caption{Comparison of tools supporting RDF authoring and Semantic Web integration}
 \label{tab:related_tools_comparison}
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{lccccccc}
+\begin{tabular}{lcccccc}
 \hline
 \textbf{Tool / Framework} 
 & \rotatebox{90}{RDF Authoring} 
 & \rotatebox{90}{Ontology Integration} 
-& \rotatebox{90}{Data-to-RDF Mapping} 
-& \rotatebox{90}{Schema-Driven Config.} 
+& \rotatebox{90}{Source-to-RDF Transform.} 
 & \rotatebox{90}{RDF Storage / Query} 
 & \rotatebox{90}{Visualization}
 & \rotatebox{90}{AI Assistance} \\
 \hline
-Protégé & \dingcheck & \dingcheck & -- & -- & -- & \dingcheck & -- \\
-WebProtégé & \dingcheck & \dingcheck & -- & -- & -- & Limited & -- \\
-Apache Jena & \dingcheck & \dingcheck & Limited & -- & \dingcheck & Limited & -- \\
-LinkML & Limited & \dingcheck & Partial & Partial & -- & -- & -- \\
-SemTK & \dingcheck & \dingcheck & Partial & -- & \dingcheck & \dingcheck & -- \\
-OpenRefine (RDF) & Limited & -- & \dingcheck & -- & -- & Limited & -- \\
-SPARQL-Generate & -- & Limited & \dingcheck & -- & -- & -- & -- \\
-JSON-LD Playground & Limited & -- & Limited & -- & -- & Limited & -- \\
-RDFLib & \dingcheck & \dingcheck & -- & -- & Partial & -- & -- \\
-Redland RDF & \dingcheck & \dingcheck & -- & -- & Partial & -- & -- \\
+Protégé & \dingcheck & \dingcheck & -- & -- & \dingcheck & -- \\
+WebProtégé & \dingcheck & \dingcheck & -- & -- & Limited & -- \\
+Apache Jena & \dingcheck & \dingcheck & Limited & \dingcheck & -- & -- \\
+LinkML & -- & \dingcheck & Partial & -- & -- & -- \\
+SemTK & \dingcheck & \dingcheck & Partial & \dingcheck & \dingcheck & -- \\
+OpenRefine (RDF) & Limited & -- & \dingcheck & -- & -- & -- \\
+SPARQL-Generate & -- & -- & \dingcheck & -- & -- & -- \\
+JSON-LD Playground & Limited & -- & Limited & -- & Limited & -- \\
+RDFLib & \dingcheck & Limited & -- & Partial & -- & -- \\
+Redland RDF & \dingcheck & Limited & -- & Partial & -- & -- \\
 \hline
 \end{tabular}
 \end{table}
+\noindent\textit{Rating scale:}
+\begin{itemize}
+    \item \dingcheck: native, first-class support.
+    \item \textit{Partial}: substantial but scope-limited support (often programmatic rather than end-user focused).
+    \item \textit{Limited}: basic or indirect support (e.g., plugin-based, narrow subset, or lightweight/read-only capability).
+    \item --: not a core capability.
+\end{itemize}
 \subsection{Research Gap and Positioning of This Thesis}
 
-Although the reviewed tools provide strong support for specific Semantic Web tasks, several limitations remain for practical, user-facing scientific data workflows:
+Although these tools provide strong support for individual Semantic Web tasks, several limitations remain for practical, user-facing scientific data workflows:
 
 \begin{itemize}
     \item \textbf{Fragmented workflows:} Modeling, mapping, querying, and visualization are often distributed across multiple tools, requiring users to switch between different environments to complete a single data integration task \cite{hogan2021knowledgegraphs}.
 
     \item \textbf{High technical entry barrier:} Effective use often requires advanced knowledge of \gls{owl}, \gls{rdf}, \gls{sparql}, and mapping languages, which limits accessibility for domain scientists who are not Semantic Web experts \cite{janowicz2015geospatial}.
 
-    \item \textbf{Bridging hierarchical data to RDF:} In practice, a large amount of scientific and web data already exists in hierarchical formats such as \gls{json}. While standards such as \gls{jsonld} allow RDF data to be expressed within JSON documents \cite{sporny2014jsonld}, converting existing hierarchical data models into semantically linked representations typically requires additional transformation languages such as \gls{r2rml} or \gls{rml} \cite{das2012r2rml,dimou2014rml}. However, practical tools that help users incrementally bridge existing JSON-based data to Semantic Web representations remain limited.
+    \item \textbf{Gap between structured JSON editing and RDF transformation:} In practice, much scientific data is authored and maintained in hierarchical formats such as \gls{json}. While standards such as \gls{jsonld} provide a bridge to linked data \cite{sporny2014jsonld}, moving from conventional \gls{json} structures to \gls{rdf} still often requires separate mapping artifacts and additional tools (e.g., \gls{r2rml}/\gls{rml}) \cite{das2012r2rml,dimou2014rml}.
 
     \item \textbf{Limited end-to-end support in one UI:} Most tools focus on a single task—such as ontology editing, mapping definition, or querying—rather than supporting the entire workflow from data authoring and transformation to validation, querying, and graph exploration in a unified environment.
 
     \item \textbf{Limited AI support in semantic authoring workflows:} Despite recent advances in generative \gls{ai}, assistance for generating artifacts such as \gls{sparql} queries or \gls{rml} mappings from natural language or user intent is still rarely integrated into Semantic Web authoring tools.
 \end{itemize}
 
-This thesis addresses these gaps by extending MetaConfigurator from a schema-driven configuration editor into an integrated \gls{rdf} authoring environment. In particular, it provides a practical bridge from hierarchical JSON-based data models to Semantic Web representations through \gls{json}-to-\gls{jsonld} transformation, ontology-aware authoring support, integrated \gls{sparql} querying, graph visualization, and \gls{ai}-assisted drafting of \gls{sparql} and \gls{rml} artifacts.
+This thesis addresses these gaps by extending MetaConfigurator from a schema-guided data modeling tool into an integrated \gls{rdf} authoring environment. In particular, it supports a continuous workflow from \gls{json} authoring to \gls{jsonld}/\gls{rdf} transformation, ontology-aware triple editing, integrated \gls{sparql} querying, graph visualization, and \gls{ai}-assisted drafting of \gls{sparql} queries and \gls{rml} mappings.
