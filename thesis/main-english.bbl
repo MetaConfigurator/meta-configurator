@@ -1283,6 +1283,39 @@
       \verb https://www.researchgate.net/publication/401659007
       \endverb
     \endentry
+    \entry{sparqljs}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=f6f7b1f03b36b6df0b508d6e0e17c85d}{%
+           family={Verborgh},
+           familyi={V\bibinitperiod},
+           given={Ruben},
+           giveni={R\bibinitperiod}}}%
+        {{hash=a8b2e39951bba535f313f563f6abaef6}{%
+           family={contributors},
+           familyi={c\bibinitperiod}}}%
+      }
+      \strng{namehash}{640027b15558657c0a6a1b6b64006a5a}
+      \strng{fullhash}{640027b15558657c0a6a1b6b64006a5a}
+      \strng{fullhashraw}{640027b15558657c0a6a1b6b64006a5a}
+      \strng{bibnamehash}{640027b15558657c0a6a1b6b64006a5a}
+      \strng{authorbibnamehash}{640027b15558657c0a6a1b6b64006a5a}
+      \strng{authornamehash}{640027b15558657c0a6a1b6b64006a5a}
+      \strng{authorfullhash}{640027b15558657c0a6a1b6b64006a5a}
+      \strng{authorfullhashraw}{640027b15558657c0a6a1b6b64006a5a}
+      \field{labelalpha}{Vc26}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{SPARQL.js}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://www.npmjs.com/package/sparqljs
+      \endverb
+      \verb{url}
+      \verb https://www.npmjs.com/package/sparqljs
+      \endverb
+    \endentry
     \entry{shacl_standard}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=446a1ae6601a5c59360c7d591c3992da}{%

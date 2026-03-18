@@ -2424,6 +2424,8 @@
     <bcf:citekey order="40" intorder="1">sparql_standard</bcf:citekey>
     <bcf:citekey order="41" intorder="1">comunica_query_sparql</bcf:citekey>
     <bcf:citekey order="42" intorder="1">comunica_supported_specs</bcf:citekey>
+    <bcf:citekey order="43" intorder="1">codemirror</bcf:citekey>
+    <bcf:citekey order="43" intorder="2">sparqljs</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

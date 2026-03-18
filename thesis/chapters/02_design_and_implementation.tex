@@ -200,7 +200,7 @@ Together, this implementation turns the RDF panel into a full authoring environm
 \section{Query with SPARQL}\label{sec:design:query-with-sparql}
 The \gls{sparql} query functionality is implemented in \texttt{SparqlEditor.vue} as a dialog with three tabs: \textbf{Query View}, \textbf{Result View}, and \textbf{Visualization}. Query execution is performed in-browser using Comunica's \texttt{QueryEngine} \cite{comunica_query_sparql}. According to Comunica's official documentation, the engine supports SPARQL 1.2 query-related specifications \cite{comunica_supported_specs}.
 
-In the \textbf{Query View}, users can write and validate queries in a CodeMirror editor and execute them against the current in-memory \gls{rdf} graph. The same view also provides \gls{ai}-assisted \gls{sparql} generation. Similar to the \gls{ai}-assisted \gls{rml} workflow described in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, user hints are combined with prompt-engineering instructions and a representative subset of the current \gls{jsonld} data, then sent to the configured \gls{llm} to generate a draft \gls{sparql} query.
+In the \textbf{Query View}, users can write and validate queries in a CodeMirror editor and execute them against the current in-memory \gls{rdf} graph. Query syntax is checked through debounced live validation using the SparqlJS parser, which provides immediate feedback while editing \cite{codemirror,sparqljs}. The same view also provides \gls{ai}-assisted \gls{sparql} generation. Similar to the \gls{ai}-assisted \gls{rml} workflow described in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, user hints are combined with prompt-engineering instructions and a representative subset of the current \gls{jsonld} data, then sent to the configured \gls{llm} to generate a draft \gls{sparql} query.
 
 \subsection{Showcase: AI-Assisted SPARQL Query Generation}
 \label{sec:design:query-with-sparql:ai-showcase}
@@ -232,7 +232,7 @@ SELECT ?element_size ?max_von_mises_stress WHERE {
                 schema:value ?max_von_mises_stress .
 } ORDER BY ASC(?element_size)
 \end{lstlisting}
-xxx
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.75\linewidth]{../figures/MC-RDF-SPARQL-1.png}
