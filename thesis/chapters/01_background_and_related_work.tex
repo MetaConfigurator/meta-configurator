@@ -30,8 +30,9 @@ In computational science workflows, \gls{json} files often capture experiment pa
 }
 \end{lstlisting}
 
-In Listing \ref{lst:background_json_example}, each entry in the \texttt{parameters} array contains a \texttt{name} (e.g., \texttt{element\_size}), a numeric \texttt{value} (\texttt{0.025}), and a \texttt{unit} (\texttt{m}), while each entry in the \texttt{metrics} array contains a result variable such as \texttt{max\_von\_mises\_stress}.
-In our benchmark example, \texttt{element\_size} represents a meshing property that controls mesh density for \(h\)-refinement, i.e., the characteristic size of finite elements. The \texttt{max\_von\_mises\_stress} value is a scalar result metric defined as the maximum von Mises stress over the simulated domain.
+In Listing~\ref{lst:background_json_example}, each entry in the \texttt{parameters} array contains a \texttt{name} (e.g., \texttt{element\_size}), a numeric \texttt{value} (\texttt{0.025}), and a \texttt{unit} (\texttt{m}), while each entry in the \texttt{metrics} array contains a result variable such as \texttt{max\_von\_mises\_stress}.~\cite{Unger2026Platform}
+
+In our benchmark example, \texttt{element\_size} represents a meshing property that controls mesh density for \(h\)-refinement, i.e., the characteristic size of finite elements. The \texttt{max\_von\_mises\_stress} value is a scalar result metric defined as the maximum von Mises stress over the simulated domain.~\cite{Unger2026Platform} 
 
 While \gls{json} provides a convenient serialization format, it does not inherently enforce structural constraints. Therefore, additional mechanisms are required to validate that \gls{json} documents conform to an expected structure.
 
@@ -40,9 +41,9 @@ While \gls{json} provides a convenient serialization format, it does not inheren
 
 JSON Schema provides a standardized mechanism for describing the expected structure and constraints of \gls{json} documents. A JSON Schema defines properties, data types, required attributes, and validation rules for \gls{json} instances. This allows automated validation of data before further processing or transformation. The JSON Schema specification defines a vocabulary for describing \gls{json} documents and their validation rules \cite{wright2020jsonschema}. 
 
-Listing \ref{lst:background_json_schema} shows a JSON Schema corresponding to the example \gls{json} document in Listing \ref{lst:background_json_example}. The schema ensures that the \gls{json} document contains the expected parameter and metric fields and enforces the correct numeric data types.
+Listing~\ref{lst:background_json_schema} shows a JSON Schema corresponding to the example \gls{json} document in Listing~\ref{lst:background_json_example}. The schema ensures that the \gls{json} document contains the expected parameter and metric fields and enforces the correct numeric data types.
 
-\begin{lstlisting}[float=htbp,style=json, caption={JSON Schema validating the simulation result JSON document}, label={lst:background_json_schema}]
+\begin{lstlisting}[float=htbp,style=json, caption={JSON Schema validating the simulation result for JSON document in Listing~\ref{lst:background_json_example}}, label={lst:background_json_schema}]
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Simulation Results",
@@ -87,7 +88,7 @@ Listing \ref{lst:background_json_schema} shows a JSON Schema corresponding to th
 }
 \end{lstlisting}
 
-The schema in Listing \ref{lst:background_json_schema} directly mirrors the example instance in Listing \ref{lst:background_json_example}. It requires the two top-level arrays (\texttt{parameters} and \texttt{metrics}), where each entry is defined by a common structure containing the fields \texttt{name}, \texttt{value}, and \texttt{unit}. The schema enforces that each variable has a textual identifier (\texttt{name}), a numeric value (\texttt{value}), and an associated unit (\texttt{unit}).
+The schema in Listing~\ref{lst:background_json_schema} directly mirrors the example instance in Listing~\ref{lst:background_json_example}. It requires the two top-level arrays (\texttt{parameters} and \texttt{metrics}), where each entry is defined by a common structure containing the fields \texttt{name}, \texttt{value}, and \texttt{unit}. The schema enforces that each variable has a textual identifier (\texttt{name}), a numeric value (\texttt{value}), and an associated unit (\texttt{unit}).
 
 Using JSON Schema enables consistent validation of experiment data and ensures that all required attributes are present before transformation into other representations.
 
@@ -99,9 +100,9 @@ However, JSON Schema focuses primarily on structural validation and does not pro
 \label{sec:background:ontology}
 
 Ontologies provide a formal specification of concepts and relationships within a domain of knowledge.
-One of the most widely cited and influential definitions is provided by Gruber:
+One of the most widely cited and influential definitions is provided by Gruber~\cite{gruber1993ontology}:
 \begin{quote}
-``An ontology is an \underline{explicit} \underline{specification} of a \underline{shared conceptualization}.'' \cite{gruber1993ontology}
+``An ontology is an \underline{explicit} \underline{specification} of a \underline{shared conceptualization}.'' 
 \end{quote}
 
 In this definition, the key terms can be interpreted as follows:
@@ -133,9 +134,9 @@ Ontologies serve as the backbone for semantic data integration and reasoning. Th
 
 The Semantic Web extends the World Wide Web by enabling data to be represented in a machine-readable, semantically rich form. Data is described using standards such as \gls{rdf}, which encodes information as triples consisting of subject, predicate, and object. This allows heterogeneous data to be interlinked and queried using semantic technologies \cite{berners2001semantic}.
 
-\gls{jsonld} is one of the key technologies bridging conventional \gls{json} data and the Semantic Web. By adding semantic annotations, \gls{jsonld} enables \gls{json} documents to be interpreted as \gls{rdf} graphs. For instance, in the example simulation data (Listing \ref{lst:background_qudt_example}), the simulation parameter \texttt{element\_size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} class.
+\gls{jsonld} is one of the key technologies bridging conventional \gls{json} data and the Semantic Web. By adding semantic annotations, \gls{jsonld} enables \gls{json} documents to be interpreted as \gls{rdf} graphs. For instance, in the example simulation data (Listing~\ref{lst:background_qudt_example}), the simulation parameter \texttt{element\_size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} class.
 
-\begin{lstlisting}[float=htbp,style=json, caption={Example of semantic annotation of a parameter with QUDT unit}, label={lst:background_qudt_example}]
+\begin{lstlisting}[float=htbp,style=json, caption={Example of semantic annotation of a parameter \texttt{element\_size}}, label={lst:background_qudt_example}]
 {
   "@id": "local:variable_element_size",
   "@type": "schema:PropertyValue",
@@ -153,8 +154,8 @@ The Semantic Web extends the World Wide Web by enabling data to be represented i
 In this JSON-LD snippet, the parameter \texttt{element\_size} is represented as a resource of type 
 \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}. Its numeric value is stored in 
 \texttt{schema:value} and the associated unit is linked via 
-\href{https://schema.org/unitCode}{\texttt{schema:unitCode}} to the QUDT unit 
-\href{https://qudt.org/vocab/unit/M}{\texttt{m}}. This representation allows applications and knowledge graph systems 
+\href{https://schema.org/unitCode}{\texttt{schema:unitCode}} to the \gls{qudt} unit 
+\href{https://qudt.org/vocab/unit/M}{\texttt{m}}, which defines the meter. This representation allows applications and knowledge graph systems 
 to unambiguously interpret the measurement and integrate it with other semantically annotated data. 
 Similarly, other variables such as metrics (e.g., \texttt{max\_von\_mises\_stress}) follow the same pattern, 
 and experiment methods are linked to ontology classes such as 
@@ -175,7 +176,7 @@ By grounding \gls{json} data in ontologies and \gls{rdf} through \gls{jsonld}, t
 
 The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against a set of structural and semantic constraints \cite{shacl_standard}. \gls{shacl} allows ontology-based validation of \gls{rdf} data by defining "shapes" that describe the expected properties, data types, and cardinality of \gls{rdf} nodes.
 
-For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing \ref{lst:background_qudt_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
+For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing~\ref{lst:background_qudt_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
 
 \begin{lstlisting}[float=htbp,style=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -221,7 +222,7 @@ By applying this shape, \gls{rdf} data can be automatically checked for complian
 
 \gls{sparql} is the standard query language for \gls{rdf} datasets \cite{sparql_standard}. \gls{sparql} allows retrieval, filtering, and aggregation of data stored in knowledge graphs. Queries are expressed in terms of triples, similar to \gls{rdf} statements.
 
-For example, using the \gls{jsonld} simulation data, we might want to retrieve all experiment parameters along with their values and units. Listing \ref{lst:background_sparql_example} shows an example.
+Listing~\ref{lst:background_sparql_example} presents an SPARQL example using the \gls{jsonld} simulation data, where all experiment parameters and metrics are retrieved together with their corresponding values and units.
 
 \begin{lstlisting}[float=htbp,style=sparql, caption={SPARQL query retrieving parameter values and units}, label={lst:background_sparql_example}]
 PREFIX schema: <https://schema.org/>
@@ -238,11 +239,10 @@ WHERE {
 }
 \end{lstlisting}
 
-This query returns the \texttt{element\_size} parameter along with its numeric value and associated \gls{qudt} unit 
-(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:m}}), reflecting the structure of the JSON-LD representation where 
+This query returns the \texttt{element\_size} parameter and \texttt{max\_von\_mises\_stress} along with their numeric values and associated \gls{qudt} units 
+(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:m}} and \href{https://qudt.org/vocab/unit/MPa}{\texttt{unit:MPa}}), reflecting the structure of the JSON-LD representation where 
 parameters and metrics are modeled as \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resources. 
-Similarly, metrics such as \texttt{max\_von\_mises\_stress} can be queried in the same way, retrieving their values 
-and units (e.g., \href{https://qudt.org/vocab/unit/MPa}{\texttt{unit:MPa}}). 
+
 This demonstrates how semantic annotations enable precise, ontology-aware data access. 
 \gls{sparql} supports complex operations such as joins, filters, and reasoning over ontologies, making it an essential 
 tool for exploring and analyzing semantically enriched simulation and experiment data.
@@ -259,9 +259,9 @@ A typical \gls{jsonld} document has two key structural components:
     \item \textbf{@graph:} This array contains the actual data entities, each represented as a node with an \texttt{@id}, a \texttt{@type}, and associated properties. Relationships between entities are expressed using references to other \texttt{@id} values, forming a connected graph structure.
 \end{itemize}
 
-Listing \ref{lst:background_jsonld_example} shows a \gls{jsonld} representation corresponding to the example simulation result. The \texttt{@context} defines prefixes such as \href{https://schema.org/}{\texttt{schema}} and \href{https://qudt.org/vocab/unit}{\texttt{unit}}, while the \texttt{@graph} contains nodes representing the simulation run, the \texttt{element\_size} parameter, and the stress metric.
+Listing~\ref{lst:background_jsonld_example} shows a \gls{jsonld} representation corresponding to the example simulation result. The \texttt{@context} defines prefixes such as \href{https://schema.org/}{\texttt{schema}} and \href{https://qudt.org/vocab/unit}{\texttt{unit}}, while the \texttt{@graph} contains nodes representing the simulation run, the \texttt{element\_size} parameter, and the stress metric.
 
-\begin{lstlisting}[float=htbp,style=json, caption={JSON-LD representation of the simulation result}, label={lst:background_jsonld_example}]
+\begin{lstlisting}[float=htbp,style=json, caption={JSON-LD representation of the simulation result presented in Listing~\ref{lst:background_json_example}}, label={lst:background_jsonld_example}]
 {
     "@context": {
         "m4i": "http://w3id.org/nfdi4ing/metadata4ing#",
@@ -343,7 +343,7 @@ G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in
     \item \textbf{Predicate-object maps:} rules to generate the \emph{predicate} and \emph{object} for triples.
 \end{itemize}
 
-Listing \ref{lst:background_rml_mapping} shows an example \gls{rml} mapping that converts the \gls{json} simulation output from Listing \ref{lst:background_json_example} into the \gls{jsonld} structure presented in Listing \ref{lst:background_jsonld_example}.
+Listing~\ref{lst:background_rml_mapping} shows an example \gls{rml} mapping that converts the \gls{json} simulation output from Listing~\ref{lst:background_json_example} into the \gls{jsonld} structure presented in Listing~\ref{lst:background_jsonld_example}.
 
 \begin{lstlisting}[float=htbp,style=turtle, caption={RML mapping from JSON simulation output to RDF/JSON-LD}, label={lst:background_rml_mapping}]
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
@@ -442,13 +442,13 @@ MetaConfigurator provides several features that facilitate the creation and main
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.85\linewidth]{../figures/MC-JSON-Schema.png}
-  \caption{A snapshot of MetaConfigurator's schema editing interface.}
+  \caption{A snapshot of MetaConfigurator's schema editing interface, showing the JSON Schema from Listing~\ref{lst:background_json_schema}}
   \label{fig:metaconfigurator_interface:schema}
 \end{figure}
 
 \begin{itemize}
     \item \textbf{Visual Schema Editor:}  
-    Users can create and modify \gls{json} schemas using a graphical interface, enabling intuitive construction of data models without manually writing schema definitions. Figure \ref{fig:metaconfigurator_interface:schema} depicts an example of schema editing in MetaConfigurator, showing the JSON Schema from \ref{lst:background_json_schema}. The left panel shows the raw JSON Schema, the middle panel provides a diagram view for editing, and the right panel offers a structured form for schema modification.
+    Users can create and modify \gls{json} schemas using a graphical interface, enabling intuitive construction of data models without manually writing schema definitions. Figure~\ref{fig:metaconfigurator_interface:schema} depicts an example of schema editing in MetaConfigurator, showing the JSON Schema from~\ref{lst:background_json_schema}. The left panel shows the raw JSON Schema, the middle panel provides a diagram view for editing, and the right panel offers a structured form for schema modification.
 
     \item \textbf{Simplified and Advanced Schema Modes:}
     To reduce complexity while preserving expressiveness, MetaConfigurator provides configurable schema-editing modes. A simplified mode hides advanced JSON Schema options, while an advanced mode exposes the full feature set. This behavior is implemented through a meta-schema-builder approach that dynamically derives the editor schema from user settings \cite{metaconfigurator2025datamodels}.
@@ -457,7 +457,7 @@ MetaConfigurator provides several features that facilitate the creation and main
     Based on a given JSON Schema, MetaConfigurator automatically generates a graphical form for editing instance data. This ensures that all entered data conforms to the defined structure and constraints.
 
     \item \textbf{Integrated Text and GUI Editing:}  
-    The tool combines a traditional text editor with a graphical editor, allowing users to switch between raw \gls{json} editing and structured form-based editing within the same interface. Figure \ref{fig:metaconfigurator_interface:data} depicts an example of data editing in MetaConfigurator, showing the JSON instance from \ref{lst:background_qudt_example} that conforms to the JSON Schema in \ref{lst:background_json_schema}. The left panel displays the raw JSON data, while the right panel offers a structured form for editing.
+    The tool combines a traditional text editor with a graphical editor, allowing users to switch between raw \gls{json} editing and structured form-based editing within the same interface. Figure~\ref{fig:metaconfigurator_interface:data} depicts an example of data editing in MetaConfigurator, showing the JSON instance from~\ref{lst:background_qudt_example} that conforms to the JSON Schema in~\ref{lst:background_json_schema}. The left panel displays the raw JSON data, while the right panel offers a structured form for editing.
 
     \item \textbf{Schema Validation Support:}  
     During data editing, MetaConfigurator validates instance data against the provided JSON Schema, ensuring structural correctness and preventing invalid data entries.
@@ -477,7 +477,7 @@ While the tool provides a JSON-LD export that adds \texttt{@context} and \texttt
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.85\linewidth]{../figures/MC-JSON.png}
-  \caption{A snapshot of MetaConfigurator's data editing interface.}
+  \caption{A snapshot of MetaConfigurator's data editing interface, showing the JSON instance from Listing~\ref{lst:background_json_example}}
     \label{fig:metaconfigurator_interface:data}
 \end{figure}
 

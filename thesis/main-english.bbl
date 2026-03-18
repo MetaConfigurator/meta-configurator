@@ -1220,6 +1220,69 @@
       \field{title}{JSON-LD 1.0: A JSON-based Serialization for Linked Data}
       \field{year}{2014}
     \endentry
+    \entry{Unger2026Platform}{incollection}{}{}
+      \name{author}{6}{}{%
+        {{hash=b20c4b506053f18b4b3bd54abc32aa4e}{%
+           family={Unger},
+           familyi={U\bibinitperiod},
+           given={J.\bibnamedelimi F.},
+           giveni={J\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=a97c16a46e7b859b35034a297140cbc4}{%
+           family={Robens-Radermacher},
+           familyi={R\bibinithyphendelim R\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=52a8c634fbcb90e41eae49599e1fa97f}{%
+           family={Rosenbusch},
+           familyi={R\bibinitperiod},
+           given={S.\bibnamedelimi M.},
+           giveni={S\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=f6c78e1ecac5b377aae384cfcbf70dcb}{%
+           family={Tyagi},
+           familyi={T\bibinitperiod},
+           given={D.},
+           giveni={D\bibinitperiod}}}%
+        {{hash=c43ab0ba1fd45f3e89264bdc4800127b}{%
+           family={Iglezakis},
+           familyi={I\bibinitperiod},
+           given={D.},
+           giveni={D\bibinitperiod}}}%
+        {{hash=9955b9885774da51c571c4bc321dbfb0}{%
+           family={Jafarkhani},
+           familyi={J\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor \& Francis}%
+      }
+      \strng{namehash}{5a0070447690dfa43b3cf0115cc75266}
+      \strng{fullhash}{e6449cdd1d18d855677126d86645af28}
+      \strng{fullhashraw}{e6449cdd1d18d855677126d86645af28}
+      \strng{bibnamehash}{e6449cdd1d18d855677126d86645af28}
+      \strng{authorbibnamehash}{e6449cdd1d18d855677126d86645af28}
+      \strng{authornamehash}{5a0070447690dfa43b3cf0115cc75266}
+      \strng{authorfullhash}{e6449cdd1d18d855677126d86645af28}
+      \strng{authorfullhashraw}{e6449cdd1d18d855677126d86645af28}
+      \field{labelalpha}{URR+26}
+      \field{sortinit}{U}
+      \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Computational Modelling of Concrete and Concrete Structures}
+      \field{chapter}{A platform for validation and verification of models for concrete and concrete structures}
+      \field{title}{A Platform for Validation and Verification of Models for Concrete and Concrete Structures}
+      \field{year}{2026}
+      \verb{doi}
+      \verb 10.1201/9781003660026-32
+      \endverb
+      \verb{urlraw}
+      \verb https://www.researchgate.net/publication/401659007
+      \endverb
+      \verb{url}
+      \verb https://www.researchgate.net/publication/401659007
+      \endverb
+    \endentry
     \entry{shacl_standard}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=446a1ae6601a5c59360c7d591c3992da}{%

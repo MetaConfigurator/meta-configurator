@@ -56,7 +56,7 @@ For each entry in these arrays:
 Create a resource with IRI local:variable_{name} using the "name" field.
 Set the type to schema:PropertyValue.
 Set rdfs:label to the "name" value.
-Set schema:value to the "value" field using rml:reference.
+Set schema:value to the "value".
 Map the "unit" field to schema:unitCode as an IRI from the QUDT unit vocabulary using the template http://qudt.org/vocab/unit/{unit}.
 
 Connect the method node to parameter nodes using m4i:hasParameter, and to metric nodes using m4i:investigates.
@@ -120,14 +120,14 @@ Conversely, when a triple is edited, removed, or added in the DataTable, \texttt
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/Diagram-1.png}
+  \includegraphics[width=.85\linewidth]{../figures/Diagram-1.png}
   \caption{Change propagation flow between Text View and RDF View when the source of change is the Text View.}
   \label{fig:rdf_authoring_panel:change_propagation_json_editor}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/Diagram-2.png}
+  \includegraphics[width=.85\linewidth]{../figures/Diagram-2.png}
   \caption{Change propagation flow between Text View and RDF View when the source of change is the RDF View.}
   \label{fig:rdf_authoring_panel:change_propagation_rdf_view}
 \end{figure}
