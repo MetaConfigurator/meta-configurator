@@ -86,7 +86,6 @@ function clickedAttribute(path: Path, event?: MouseEvent) {
   emit('select_element', path);
 }
 
-
 function updateObjectName() {
   const newName = objectName.value.trim();
   if (newName.length == 0) {
