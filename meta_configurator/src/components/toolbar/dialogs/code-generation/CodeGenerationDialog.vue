@@ -43,10 +43,13 @@ watch(selectedProgrammingLanguage, newLanguage => {
     document = getDataForMode(SessionMode.DataEditor).data.value;
     documentTitle = 'Data';
   }
-  quicktypeJSONSchema(newLanguage, documentTitle, JSON.stringify(document)).then(code => {
-    generatedCodeDataStructure.value = code.lines.join('\n');
-  });
-
+  quicktypeJSONSchema(newLanguage, documentTitle, JSON.stringify(document))
+    .then(code => {
+      generatedCodeDataStructure.value = code.lines.join('\n');
+    })
+    .catch(error => {
+      generatedCodeDataStructure.value = 'Error:\n' + (error?.message || String(error));
+    });
   const fileNamePrefix = useDataSource().userSchemaData.value.title ?? 'untitled';
   const schemaFileName = generateFileName(fileNamePrefix, true);
   const dataFileName = generateFileName(fileNamePrefix, false);
@@ -115,7 +118,11 @@ defineExpose({show: openDialog, close: hideDialog, activateSchemaMode, activateD
         <pre><code>{{ generatedCodeDataStructure }}</code></pre>
       </div>
 
-      <Button @click="copyToClipboardDataStructure()" v-if="generatedCodeDataStructure.length > 0"
+      <Button
+        @click="copyToClipboardDataStructure()"
+        v-if="
+          generatedCodeDataStructure.length > 0 && !generatedCodeDataStructure.startsWith('Error:')
+        "
         >Copy data structure code to clipboard</Button
       >
     </div>
