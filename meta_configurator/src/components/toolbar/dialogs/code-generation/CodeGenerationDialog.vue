@@ -13,6 +13,7 @@ import Select from 'primevue/select';
 import Button from 'primevue/button';
 import {useDataSource} from '@/data/dataSource';
 import {generateFileName} from '@/components/toolbar/downloadFile';
+import {useErrorService} from '@/utility/errorServiceInstance.ts';
 
 const showDialog = ref(false);
 
@@ -48,7 +49,8 @@ watch(selectedProgrammingLanguage, newLanguage => {
       generatedCodeDataStructure.value = code.lines.join('\n');
     })
     .catch(error => {
-      generatedCodeDataStructure.value = 'Error:\n' + (error?.message || String(error));
+      generatedCodeDataStructure.value = '';
+      useErrorService().onError(error);
     });
   const fileNamePrefix = useDataSource().userSchemaData.value.title ?? 'untitled';
   const schemaFileName = generateFileName(fileNamePrefix, true);
@@ -118,11 +120,7 @@ defineExpose({show: openDialog, close: hideDialog, activateSchemaMode, activateD
         <pre><code>{{ generatedCodeDataStructure }}</code></pre>
       </div>
 
-      <Button
-        @click="copyToClipboardDataStructure()"
-        v-if="
-          generatedCodeDataStructure.length > 0 && !generatedCodeDataStructure.startsWith('Error:')
-        "
+      <Button @click="copyToClipboardDataStructure()" v-if="generatedCodeDataStructure.length > 0"
         >Copy data structure code to clipboard</Button
       >
     </div>
