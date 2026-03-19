@@ -51,7 +51,8 @@ watch(selectedType, () => {
   }
 });
 
-function clickedAttribute() {
+function clickedAttribute(event: MouseEvent) {
+  event.stopPropagation();
   emit('select_element', props.data.absolutePath);
 }
 function updateAttributeName() {
@@ -89,8 +90,9 @@ function getHandleTop() {
 
 <template>
   <div
+    class="attribute-item"
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted()}"
-    @click="clickedAttribute"
+    @click="clickedAttribute($event)"
     v-on:click.stop>
     <div v-if="!isEditable()">
       <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>
@@ -144,6 +146,12 @@ function getHandleTop() {
 </template>
 
 <style>
+.attribute-item {
+  cursor: pointer;
+}
+.attribute-item:hover {
+  background-color: rgba(0, 150, 255, 0.2);
+}
 .vue-flow__node-schemaattribute {
   padding: 0;
 }

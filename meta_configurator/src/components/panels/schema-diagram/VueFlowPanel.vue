@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {ComputedRef, Ref} from 'vue';
-import {computed, nextTick, onMounted, ref, watch} from 'vue';
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 
 import {getNodesInside, useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
@@ -104,12 +104,88 @@ watch(schemaSession.currentPath, () => {
 
 onMounted(() => {
   updateGraph();
-
+  window.addEventListener('keydown', handleKeyDown);
   nextTick(() => {
     fitView();
   });
 });
 
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
+});
+
+function handleKeyDown(event: KeyboardEvent) {
+  if (event.ctrlKey && event.key === 'c') {
+    copyToClipboard();
+    event.preventDefault(); // prevent default browser copy
+  }
+
+  if (event.ctrlKey && event.key === 'v') {
+    pasteFromClipboard();
+    event.preventDefault(); // prevent default browser paste
+  }
+}
+
+async function copyToClipboard() {
+  if (!selectedData.value) {
+    console.log('No element selected to copy');
+    return;
+  }
+
+  // Get the schema at selected node
+  const schema = schemaData.dataAt(selectedData.value.absolutePath);
+
+  const dataToCopy = {
+    metaType: selectedData.value.getNodeType(),
+    schema: structuredClone(schema),
+  };
+
+  try {
+    // Write JSON string to system clipboard
+    await navigator.clipboard.writeText(JSON.stringify(dataToCopy, null, 2));
+    console.log('Copied to system clipboard:', dataToCopy);
+  } catch (err) {
+    console.error('Failed to write to clipboard:', err);
+  }
+}
+
+async function pasteFromClipboard() {
+  try {
+    // Read JSON string from system clipboard
+    const clipboardText = await navigator.clipboard.readText();
+    const data = JSON.parse(clipboardText);
+
+    console.log('Pasting from system clipboard:', data);
+
+    if (data.metaType === 'schemaobject') {
+      const objectPath = addSchemaObject(schemaData, false, data.schema);
+      selectElement(objectPath);
+    }
+
+    if (data.metaType === 'schemaenum') {
+      const enumPath = addSchemaEnum(schemaData, false, data.schema);
+      selectElement(enumPath);
+    }
+
+    if (data.metaType === 'attribute') {
+      if (!selectedData.value) {
+        console.log('Select an object to paste attribute into');
+        return;
+      }
+
+      const attributePath = findAvailableSchemaId(
+        schemaData,
+        [...selectedData.value.absolutePath, 'properties'],
+        'property'
+      );
+
+      schemaData.setDataAt(attributePath, data.schema);
+      selectElement(attributePath);
+    }
+  } catch (err) {
+    console.error('Failed to read from clipboard:', err);
+  }
+}
 // scroll to the current selected element when it changes
 watch(
   schemaSession.currentSelectedElement,

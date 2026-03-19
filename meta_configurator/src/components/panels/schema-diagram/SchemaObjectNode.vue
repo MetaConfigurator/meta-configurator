@@ -81,9 +81,11 @@ function doubleClickedNode() {
   emit('zoom_into_element', props.data.absolutePath);
 }
 
-function clickedAttribute(path: Path) {
+function clickedAttribute(path: Path, event?: MouseEvent) {
+  if (event) event.stopPropagation();
   emit('select_element', path);
 }
+
 
 function updateObjectName() {
   const newName = objectName.value.trim();
