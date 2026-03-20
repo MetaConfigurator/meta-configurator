@@ -117,7 +117,7 @@ defineExpose({show: openDialog, close: hideDialog, activateSchemaMode, activateD
     <div class="flex flex-column gap-3 bigger-dialog-content">
       <Panel header="Generate a Template with AI Assistance" toggleable :collapsed="true">
         <PanelSettings
-          panel-name="API Key and AI Settings"
+          panel-display-name="API Key and AI Settings"
           settings-header="AI Settings"
           :panel-settings-path="['aiIntegration']"
           :sessionMode="SessionMode.DataEditor">

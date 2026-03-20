@@ -28,7 +28,8 @@ const isSchemaBundlingSuggested = computed(() => {
   <div class="panel-container">
     <div class="gui-panel">
       <PanelSettings
-        panel-name="GUI View"
+        panel-display-name="GUI View"
+        panel-type="guiEditor"
         :panel-settings-path="['guiEditor']"
         :sessionMode="props.sessionMode">
         <p>

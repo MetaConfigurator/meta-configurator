@@ -74,7 +74,7 @@ export class DataConverterJson extends DataConverter {
     if (data === undefined) {
       return '';
     }
-    return JSON.stringify(data, null, useSettings().value.codeEditor.tabSize);
+    return JSON.stringify(data, null, useSettings().value.textEditor.tabSize);
   }
 }
 
@@ -88,7 +88,7 @@ export class DataConverterYaml extends DataConverter {
 
   override stringify(data: any): string {
     return YAML.stringify(data, {
-      indent: useSettings().value.codeEditor.tabSize,
+      indent: useSettings().value.textEditor.tabSize,
     });
   }
 }
@@ -133,7 +133,7 @@ const xmlBuilderOptions: XmlBuilderOptions = {
  */
 export class DataConverterXml extends DataConverter {
   override parse(data: string): any {
-    const settings = useSettings().value.codeEditor.xml;
+    const settings = useSettings().value.textEditor.xml;
     xmlOptions.attributeNamePrefix = settings.attributeNamePrefix;
 
     const parser: XMLParser = new XMLParser(xmlOptions);
@@ -141,7 +141,7 @@ export class DataConverterXml extends DataConverter {
   }
 
   override stringify(data: any): string {
-    const settings = useSettings().value.codeEditor.xml;
+    const settings = useSettings().value.textEditor.xml;
     xmlBuilderOptions.attributeNamePrefix = settings.attributeNamePrefix;
 
     const builder: XMLBuilder = new XMLBuilder(xmlBuilderOptions);

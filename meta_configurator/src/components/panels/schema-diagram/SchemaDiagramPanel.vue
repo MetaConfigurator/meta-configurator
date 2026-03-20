@@ -10,7 +10,8 @@ const props = defineProps<{
 
 <template>
   <PanelSettings
-    panel-name="Diagram View"
+    panel-display-name="Diagram View"
+    panel-type="schemaDiagram"
     :panel-settings-path="['schemaDiagram']"
     :sessionMode="props.sessionMode">
     <p>

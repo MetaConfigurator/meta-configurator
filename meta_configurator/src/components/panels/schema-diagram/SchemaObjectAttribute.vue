@@ -37,8 +37,17 @@ const emit = defineEmits<{
     attributeData: SchemaObjectAttributeData,
     newType: AttributeTypeChoice
   ): void;
+  (
+    e: 'update_attribute_required',
+    attributeData: SchemaObjectAttributeData,
+    required: boolean
+  ): void;
   (e: 'delete_element', objectData: SchemaElementData): void;
 }>();
+
+function updateRequired() {
+  emit('update_attribute_required', props.data, props.data.required);
+}
 
 const attrName = ref(props.data.name);
 const selectedType: Ref<AttributeTypeChoice | undefined> = ref(
@@ -100,7 +109,7 @@ function getHandleTop() {
       <span class="vue-flow__node-schemaattribute-type">: {{ props.data.typeDescription }}</span>
     </div>
 
-    <div v-else>
+    <div v-else class="vue-flow-attribute-edit-row">
       <InputText
         type="text"
         class="vue-flow-attribute-input-dimensions"
@@ -111,29 +120,40 @@ function getHandleTop() {
         @dblclick.stop
         @keydown.stop
         @keyup.enter="updateAttributeName" />
-      <span class="text-red-600">{{ props.data.required ? '*' : '' }}</span>
 
-      <Select
-        class="vue-flow-attribute-dropdown"
-        v-model="selectedType"
-        :options="typeChoices"
-        optionLabel="label"
-        @mousedown.stop
-        @keydown.stop
-        @click.stop
-        @dblclick.stop
-        placeholder="Select Type" />
+      <div class="vue-flow-attribute-inline">
+        <input
+          type="checkbox"
+          class="vue-flow-required-checkbox"
+          v-model="props.data.required"
+          @change="updateRequired"
+          @mousedown.stop
+          @click.stop
+          @dblclick.stop
+          @keydown.stop />
 
-      <Button
-        class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
-        size="small"
-        v-tooltip.bottom="'Delete Property'"
-        @mousedown.stop
-        @click.stop
-        @dblclick.stop
-        @click="_ => deleteAttribute()">
-        <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
-      </Button>
+        <Select
+          class="vue-flow-attribute-dropdown"
+          v-model="selectedType"
+          :options="typeChoices"
+          optionLabel="label"
+          @mousedown.stop
+          @keydown.stop
+          @click.stop
+          @dblclick.stop
+          placeholder="Select Type" />
+
+        <Button
+          class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
+          size="small"
+          v-tooltip.bottom="'Delete Property'"
+          @mousedown.stop
+          @click.stop
+          @dblclick.stop
+          @click="_ => deleteAttribute()">
+          <FontAwesomeIcon :icon="'fa-trash fa-solid'" />
+        </Button>
+      </div>
     </div>
 
     <Handle
@@ -151,6 +171,19 @@ function getHandleTop() {
 }
 .attribute-item:hover {
   background-color: rgba(0, 150, 255, 0.2);
+}
+.vue-flow-attribute-edit-row {
+  display: flex;
+  align-items: center;
+}
+.vue-flow-attribute-inline {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.vue-flow-required-checkbox {
+  margin: 0 4px;
+  transform: scale(0.8);
 }
 .vue-flow__node-schemaattribute {
   padding: 0;

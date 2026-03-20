@@ -84,8 +84,9 @@ function exportTableAsCsv() {
 <template>
   <div class="panel-container">
     <PanelSettings
-      panel-name="Table View"
-      :panel-settings-path="['listAnalysis']"
+      panel-display-name="Table View"
+      panel-type="tableView"
+      :panel-settings-path="['tableView']"
       :sessionMode="props.sessionMode">
       <p>
         This panel allows you to analyze object arrays in the current document. Select an object

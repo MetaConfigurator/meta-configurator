@@ -169,7 +169,7 @@ useMagicKeys({
       </div>
 
       <!-- RIGHT side: format selector -->
-      <div class="format-switch-container" v-if="settings.codeEditor.showFormatSelector">
+      <div class="format-switch-container" v-if="settings.textEditor.showFormatSelector">
         <Select
           :options="dataFormatOptions"
           v-model="settings.dataFormat"
