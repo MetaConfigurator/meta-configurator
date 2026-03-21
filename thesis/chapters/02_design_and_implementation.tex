@@ -193,13 +193,13 @@ The Triples tab is implemented by \texttt{RdfTripleEditorPanel.vue}. It shows tr
     \item actions for add, edit, delete, export, \gls{sparql}, and visualization.
 \end{itemize}
 
-Triple editing is handled through \texttt{TripleDetailsDialog.vue}, which allows controlled entry of subject, predicate, and object terms, including typed literals with XML Schema datatypes. Changes are executed through \texttt{TripleEditorService} and propagated to the central \gls{rdf} store. Figure \ref{{fig:rdf_authoring_panel:triple-modal}} shows the edit modal for triple editing.
+Triple editing is handled through \texttt{TripleDetailsDialog.vue}, which allows controlled entry of subject, predicate, and object terms, including typed literals with XML Schema datatypes. Changes are executed through \texttt{TripleEditorService} and propagated to the central \gls{rdf} store. Figure \ref{{fig:rdf_authoring_panel:triple_modal}} shows the edit modal for triple editing.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.85\linewidth]{../figures/MC-RDF-Modal.png}
   \caption{Edit modal for triple editing.}
-  \label{fig:rdf_authoring_panel:triple-modal}
+  \label{fig:rdf_authoring_panel:triple_modal}
 \end{figure}
 
 Data changes occur from two sources: the Text View (raw JSON-LD data) or the RDF Panel. When a change is made in the Text View, \texttt{rdfStoreManager.ts} rebuilds the \gls{rdf} graph and updates the RDF Panel (Figure \ref{fig:rdf_authoring_panel:change_propagation_json_editor}).
@@ -240,15 +240,15 @@ This definition is directly reflected in the implementation workflow: the intern
 
 To keep the \gls{json} editor and \gls{rdf} authoring panel consistent, the implementation maps \gls{rdf} statements back into \gls{jsonld} data and computes path correspondences between selected triples and document positions. This enables bidirectional synchronization: selecting a triple can focus the matching JSON path, and raw \gls{json} data changes trigger store rebuilds.
 
-\subsection{Synchronization Between Text View and RDF View}
-\label{sec:design:rdf-authoring-panel:view-synchronization}
+\subsection{Linked Selection Between Text View and RDF View}
+\label{sec:design:rdf-authoring-panel:linked-selection}
 
-Synchronization between the Text View (\gls{jsonld} editor) and the \gls{rdf} View (triples DataTable) is implemented as two directional mapping procedures that operate on \texttt{\$rdf.Statement} matching.
+Linked selection between the Text View and the \gls{rdf} View enables coordinated highlighting of corresponding elements across both representations. When a user selects a section of the JSON-LD document, the corresponding RDF statement is identified and highlighted in the DataTable, and vice versa. This maintains a consistent visual selection state across both views. Figure~\ref{fig:rdf_authoring_panel:linked_selection} illustrates this process.
 
-\subsubsection{Text View to RDF View}
-\label{sec:design:rdf-authoring-panel:view-synchronization:text-to-rdf}
+\subsubsection{Linked Selection: Text View to RDF View}
+\label{sec:design:rdf-authoring-panel:linked-selection:text-to-rdf}
 
-When the current selection changes in the Text View, the selected JSON path is read from the editor state and used to derive a focused semantic fragment.
+When the current selection changes in the Text View, the selected JSON path is read from the editor state and used to derive the corresponding semantic fragment. Moving the cursor within the JSON-LD document identifies the corresponding RDF statement and highlights it in the DataTable, while selecting a triple in the DataTable moves the cursor to the associated JSON fragment in the Text View.
 
 This extraction step constructs a minimal \gls{jsonld} fragment that preserves the original \texttt{@context} and contains exactly one node in \texttt{@graph}. The node contains:
 \begin{itemize}
@@ -257,7 +257,14 @@ This extraction step constructs a minimal \gls{jsonld} fragment that preserves t
     \item the selected object value (including array-element handling when needed).
 \end{itemize}
 
-The minimal fragment is then parsed by RDFLib into a temporary graph. If the parse yields exactly one statement, this statement is compared against the current statement list using subject, predicate, and object equality. The resulting index is used to focus and select the matching row in the DataTable.
+The minimal fragment is then parsed by RDFLib into a temporary graph. If the parse yields exactly one statement, this statement is compared against the current statement list using subject, predicate, and object equality. The resulting index is used to locate and highlight the matching row in the DataTable.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.95\linewidth]{../figures/MC-RDF-JSON-LD-3.png}
+  \caption{Linked selection between Text View and RDF View. The highlighted JSON fragment corresponds to the selected triple in the DataTable, and vice versa.}
+  \label{fig:rdf_authoring_panel:linked_selection}
+\end{figure}
 
 \subsubsection{RDF View to Text View}
 \label{sec:design:rdf-authoring-panel:view-synchronization:rdf-to-text}
