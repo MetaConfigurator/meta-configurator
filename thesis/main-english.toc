@@ -25,22 +25,22 @@
 \contentsline {chapter}{\numberline {2}Design and Implementation}{35}{chapter.277}%
 \contentsline {section}{\numberline {2.1}RDF Authoring Panel}{35}{section.278}%
 \contentsline {subsection}{\numberline {2.1.1}RML Mapping Tool}{36}{subsection.281}%
-\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{40}{subsection.312}%
-\contentsline {subsection}{\numberline {2.1.3}Context Tab Implementation}{40}{subsection.314}%
-\contentsline {subsection}{\numberline {2.1.4}Triples Tab Implementation}{41}{subsection.315}%
-\contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{41}{subsection.321}%
-\contentsline {subsection}{\numberline {2.1.6}Synchronization Between Text View and RDF View}{43}{subsection.326}%
-\contentsline {subsubsection}{\nonumberline Text View to RDF View}{43}{subsubsection*.327}%
-\contentsline {subsubsection}{\nonumberline RDF View to Text View}{44}{subsubsection*.328}%
-\contentsline {subsection}{\numberline {2.1.7}Integrated Extensions in the Triple Workflow}{44}{subsection.332}%
-\contentsline {section}{\numberline {2.2}Query with SPARQL}{44}{section.333}%
-\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{45}{subsection.334}%
-\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{47}{section.361}%
-\contentsline {chapter}{\numberline {3}Application}{49}{chapter.362}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{49}{section.363}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{51}{chapter.364}%
-\contentsline {chapter}{\nonumberline Bibliography}{53}{chapter*.365}%
+\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{41}{subsection.397}%
+\contentsline {subsection}{\numberline {2.1.3}Context Tab Implementation}{43}{subsection.399}%
+\contentsline {subsection}{\numberline {2.1.4}Triples Tab Implementation}{43}{subsection.400}%
+\contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{45}{subsection.406}%
+\contentsline {subsection}{\numberline {2.1.6}Synchronization Between Text View and RDF View}{45}{subsection.411}%
+\contentsline {subsubsection}{\nonumberline Text View to RDF View}{45}{subsubsection*.412}%
+\contentsline {subsubsection}{\nonumberline RDF View to Text View}{46}{subsubsection*.413}%
+\contentsline {subsection}{\numberline {2.1.7}Integrated Extensions in the Triple Workflow}{46}{subsection.417}%
+\contentsline {section}{\numberline {2.2}Query with SPARQL}{47}{section.418}%
+\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{47}{subsection.419}%
+\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{49}{section.446}%
+\contentsline {chapter}{\numberline {3}Application}{51}{chapter.447}%
+\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{51}{section.448}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{53}{chapter.449}%
+\contentsline {chapter}{\nonumberline Bibliography}{55}{chapter*.450}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{56}{chapter*.365}%
-\contentsline {chapter}{\numberline {A}Appendix}{57}{appendix.366}%
+\contentsline {part}{Appendix}{58}{chapter*.450}%
+\contentsline {chapter}{\numberline {A}Appendix}{59}{appendix.451}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

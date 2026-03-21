@@ -5,14 +5,14 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {2.1}{\ignorespaces A snapshot of MetaConfigurator's RDF panel.}}{35}{figure.279}%
 \contentsline {figure}{\numberline {2.2}{\ignorespaces The RML mapping dialog for JSON-to-JSON-LD conversion.}}{36}{figure.282}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces AI-generated RML mapping based on user-provided hints from Listing \ref {lst:metaconfigurator_interface_rdf:rml_hint}.}}{38}{figure.306}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}, focused on the Triples tab.}}{39}{figure.308}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}, focused on the Context tab.}}{40}{figure.310}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Synchronization process illustrating how modifications made in the Text View are propagated and reflected in the RDF View.}}{42}{figure.317}%
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}}{42}{figure.319}%
-\contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query editor with AI-generated query based on user hints in~\ref {lst:design_sparql_ai_hint}.}}{46}{figure.355}%
-\contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{46}{figure.357}%
-\contentsline {figure}{\numberline {2.10}{\ignorespaces Data exported as CSV could be visualized as a plot of \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress}, revealing trends in the simulation results.}}{47}{figure.359}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces AI-generated RML mapping based on user-provided hints from Listing \ref {lst:metaconfigurator_interface_rdf:rml_hint_complex}.}}{40}{figure.391}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}, focused on the Triples tab.}}{42}{figure.393}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing \ref {lst:background_rml_mapping}, focused on the Context tab.}}{42}{figure.395}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Synchronization process illustrating how modifications made in the Text View are propagated and reflected in the RDF View.}}{44}{figure.402}%
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}}{44}{figure.404}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query editor with AI-generated query based on user hints in~\ref {lst:design_sparql_ai_hint}.}}{48}{figure.440}%
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{49}{figure.442}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Data exported as CSV could be visualized as a plot of \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress}, revealing trends in the simulation results.}}{50}{figure.444}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
