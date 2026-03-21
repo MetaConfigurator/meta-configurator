@@ -311,7 +311,6 @@ Listing~\ref{lst:background_jsonld_example} shows a \gls{jsonld} representation 
 
 This structure allows each entity to be unambiguously identified, linked, and queried using \gls{rdf}-aware tools. By separating semantic definitions (\texttt{@context}) from the data graph (\texttt{@graph}), \gls{jsonld} documents support both human readability and machine interoperability, enabling integration with knowledge graphs and other Semantic Web infrastructures.
 
-
 \subsection{RML for Mapping JSON to RDF}
 \label{sec:background:rml}
 
@@ -343,9 +342,9 @@ G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in
     \item \textbf{Predicate-object maps:} rules to generate the \emph{predicate} and \emph{object} for triples.
 \end{itemize}
 
-Listing~\ref{lst:background_rml_mapping} shows an example \gls{rml} mapping that converts the \gls{json} simulation output from Listing~\ref{lst:background_json_example} into the \gls{jsonld} structure presented in Listing~\ref{lst:background_jsonld_example}.
+Listing~\ref{lst:background_rml_mapping} shows part of an example \gls{rml} mapping that converts the \gls{json} simulation output from Listing~\ref{lst:background_json_example} into the \gls{jsonld} structure presented in Listing~\ref{lst:background_jsonld_example}.
 
-\begin{lstlisting}[float=htbp,style=turtle, caption={RML mapping from JSON simulation output to RDF/JSON-LD}, label={lst:background_rml_mapping}]
+\begin{lstlisting}[float=htbp,style=turtle, caption={RML mapping which converts JSON data in Listing~\ref{lst:background_json_example} to JSON-LD in Listing~\ref{lst:background_jsonld_example}}, label={lst:background_rml_mapping}]
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
