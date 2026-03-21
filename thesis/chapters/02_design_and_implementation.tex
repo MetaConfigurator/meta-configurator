@@ -209,14 +209,14 @@ Change in the Context tab is propagated in the same way as changes to the GUI Vi
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.85\linewidth]{../figures/Diagram-1.png}
+  \includegraphics[width=.99\linewidth]{../figures/Diagram-1.png}
   \caption{Synchronization process illustrating how modifications made in the Text View are propagated and reflected in the RDF View.}
   \label{fig:rdf_authoring_panel:change_propagation_json_editor}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.85\linewidth]{../figures/Diagram-2.png}
+  \includegraphics[width=.99\linewidth]{../figures/Diagram-2.png}
   \caption{Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}
   \label{fig:rdf_authoring_panel:change_propagation_rdf_view}
 \end{figure}
@@ -240,24 +240,13 @@ This definition is directly reflected in the implementation workflow: the intern
 
 To keep the \gls{json} editor and \gls{rdf} authoring panel consistent, the implementation maps \gls{rdf} statements back into \gls{jsonld} data and computes path correspondences between selected triples and document positions. This enables bidirectional synchronization: selecting a triple can focus the matching JSON path, and raw \gls{json} data changes trigger store rebuilds.
 
+\newpage
+
 \subsection{Linked Selection Between Text View and RDF View}
 \label{sec:design:rdf-authoring-panel:linked-selection}
 
-Linked selection between the Text View and the \gls{rdf} View enables coordinated highlighting of corresponding elements across both representations. When a user selects a section of the JSON-LD document, the corresponding RDF statement is identified and highlighted in the DataTable, and vice versa. This maintains a consistent visual selection state across both views. Figure~\ref{fig:rdf_authoring_panel:linked_selection} illustrates this process.
-
-\subsubsection{Linked Selection: Text View to RDF View}
-\label{sec:design:rdf-authoring-panel:linked-selection:text-to-rdf}
-
-When the current selection changes in the Text View, the selected JSON path is read from the editor state and used to derive the corresponding semantic fragment. Moving the cursor within the JSON-LD document identifies the corresponding RDF statement and highlights it in the DataTable, while selecting a triple in the DataTable moves the cursor to the associated JSON fragment in the Text View.
-
-This extraction step constructs a minimal \gls{jsonld} fragment that preserves the original \texttt{@context} and contains exactly one node in \texttt{@graph}. The node contains:
-\begin{itemize}
-    \item the subject identifier (\texttt{@id}),
-    \item the selected predicate,
-    \item the selected object value (including array-element handling when needed).
-\end{itemize}
-
-The minimal fragment is then parsed by RDFLib into a temporary graph. If the parse yields exactly one statement, this statement is compared against the current statement list using subject, predicate, and object equality. The resulting index is used to locate and highlight the matching row in the DataTable.
+Linked selection between the Text View and the \gls{rdf} View enables coordinated highlighting of corresponding elements across both representations. When a user selects a section of the JSON-LD document, the corresponding RDF statement is identified and highlighted in the DataTable, and vice versa. This maintains a consistent visual selection state across both views. Figure~\ref{fig:rdf_authoring_panel:linked_selection} illustrates this behavior. 
+Algorithms~\ref{alg:rdf_authoring_panel:text_to_rdf_linked_selection} and \ref{alg:rdf_authoring_panel:rdf_to_text_linked_selection} describe the implementation of linked selection in both directions.
 
 \begin{figure}[htbp]
   \centering
@@ -265,31 +254,55 @@ The minimal fragment is then parsed by RDFLib into a temporary graph. If the par
   \caption{Linked selection between Text View and RDF View. The highlighted JSON fragment corresponds to the selected triple in the DataTable, and vice versa.}
   \label{fig:rdf_authoring_panel:linked_selection}
 \end{figure}
-
-\subsubsection{RDF View to Text View}
 \label{sec:design:rdf-authoring-panel:view-synchronization:rdf-to-text}
 
-When a row is selected (or clicked) in the triples DataTable, the selected statement's subject, predicate, and object are used to search the corresponding location in the \gls{jsonld} document. Path matching is performed in three stages:
-\begin{enumerate}
-    \item find the candidate node by matching \texttt{@id} with the subject,
-    \item inside that node, find the matching predicate key,
-    \item inside that predicate value, match the object (as \texttt{@id}, \texttt{@value}, or scalar value).
-\end{enumerate}
+\begin{algorithm}[htbp]
+  \caption{Linked selection from Text View to RDF View}
+  \label{alg:rdf_authoring_panel:text_to_rdf_linked_selection}
+  \begin{algorithmic}[1]
+    \State \textbf{Input:} current JSON path selection, full \gls{jsonld} document, current DataTable rows
+    \State Read the selected JSON path from the editor state
+    \State Extract subject (\texttt{@id}), predicate, and object at the selected path
+    \State Build a minimal \gls{jsonld} fragment containing:
+    \Statex \hspace{\algorithmicindent}a) original \texttt{@context}
+    \Statex \hspace{\algorithmicindent}b) one \texttt{@graph} node with extracted subject, predicate, and object
+    \State Parse the minimal fragment with RDFLib into a temporary graph
+    \If{the temporary graph contains exactly one statement}
+      \State Compare that statement against each DataTable statement by subject, predicate, and object equality
+      \If{a matching statement is found}
+        \State Determine its row index in the DataTable
+        \State Set DataTable selection to the matching row
+        \State Scroll/focus the table to the selected row
+      \EndIf
+    \EndIf
+  \end{algorithmic}
+\end{algorithm}
 
-To improve robustness, matching considers semantic term equivalence and checks both compact prefixed terms and full \glspl{iri}. Therefore, values such as \texttt{schema:value} and \texttt{https://schema.org/value} are treated as equivalent during lookup. Once the path is found, the editor view navigates to the corresponding JSON location.
+\begin{algorithm}[htbp]
+  \caption{Linked selection from RDF View to Text View}
+  \label{alg:rdf_authoring_panel:rdf_to_text_linked_selection}
+  \begin{algorithmic}[1]
+    \State \textbf{Input:} selected DataTable statement $(s,p,o)$, current \gls{jsonld} document
+    \State Read subject $s$, predicate $p$, and object $o$ from the selected table row
+    \State Find candidate node in \texttt{@graph} whose \texttt{@id} matches $s$
+    \If{no candidate node is found}
+      \State \Return without navigation
+    \EndIf
+    \State Find predicate entry in the candidate node that matches $p$
+    \Statex \hspace{\algorithmicindent}(consider both prefixed terms and full \glspl{iri} as equivalent)
+    \If{no matching predicate entry is found}
+      \State \Return without navigation
+    \EndIf
+    \State Match object $o$ within the predicate value
+    \Statex \hspace{\algorithmicindent}(as \texttt{@id}, \texttt{@value}, or scalar value)
+    \If{an object match is found}
+      \State Compute the corresponding JSON path
+      \State Move editor cursor/focus to that JSON path
+    \EndIf
+  \end{algorithmic}
+\end{algorithm}
 
-\subsection{Integrated Extensions in the Triple Workflow}
-\label{sec:design:rdf-authoring-panel:integrated-extensions}
-
-The Triple tab also integrates two advanced features:
-\begin{itemize}
-    \item \textbf{SPARQL dialog} (\texttt{SparqlEditor.vue}): query execution and result inspection aligned with SPARQL standards \cite{sparql_standard}.
-    \item \textbf{Graph visualization} (\texttt{RdfVisualizer.vue}): interactive inspection of currently filtered triples as a graph representation.
-\end{itemize}
-
-Together, this implementation turns the RDF panel into a full authoring environment: users can define context terms, curate triples, run semantic queries, and visually inspect graph structures in a single, cohesive interface.
-
-
+\newpage
 
 \section{Query with SPARQL}\label{sec:design:query-with-sparql}
 The \gls{sparql} query functionality is implemented in \texttt{SparqlEditor.vue} as a dialog with three tabs: \textbf{Query View}, \textbf{Result View}, and \textbf{Visualization}. During implementation, RDFLib query capabilities were evaluated first, but they proved limited for the required in-browser query workflow and did not provide full support for SPARQL~1.2. Query execution is therefore performed in-browser using Comunica's \texttt{QueryEngine} \cite{comunica_query_sparql}. According to Comunica's official documentation, the engine supports SPARQL 1.2 query-related specifications \cite{comunica_supported_specs}.
