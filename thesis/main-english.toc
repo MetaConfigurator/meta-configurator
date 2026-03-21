@@ -14,33 +14,33 @@
 \contentsline {section}{\numberline {1.3}MetaConfigurator for Schema-Driven Data Modeling}{24}{section.246}%
 \contentsline {subsection}{\numberline {1.3.1}Core Features}{26}{subsection.248}%
 \contentsline {subsection}{\numberline {1.3.2}AI-Assisted Schema Engineering and Mapping}{28}{subsection.253}%
-\contentsline {subsection}{\numberline {1.3.3}Limitations for Semantic Web Integration}{29}{subsection.254}%
+\contentsline {subsection}{\numberline {1.3.3}Limitations for Semantic Web Integration}{28}{subsection.254}%
 \contentsline {section}{\numberline {1.4}Related Work}{30}{section.266}%
-\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and Knowledge Graph Platforms}{31}{subsection.267}%
+\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and Knowledge Graph Platforms}{30}{subsection.267}%
 \contentsline {subsection}{\numberline {1.4.2}Schema and Metadata Modeling for Structured Data}{31}{subsection.268}%
 \contentsline {subsection}{\numberline {1.4.3}Transformation from Source Data to RDF}{31}{subsection.269}%
 \contentsline {subsection}{\numberline {1.4.4}Querying, Validation, and Programmatic RDF Processing}{31}{subsection.270}%
-\contentsline {subsection}{\numberline {1.4.5}Comparison of Representative Tools}{32}{subsection.271}%
-\contentsline {subsection}{\numberline {1.4.6}Research Gap and Positioning of This Thesis}{33}{subsection.274}%
-\contentsline {chapter}{\numberline {2}Design and Implementation}{35}{chapter.275}%
-\contentsline {section}{\numberline {2.1}RDF Authoring Panel}{35}{section.276}%
-\contentsline {subsection}{\numberline {2.1.1}RML Mapping Tool}{36}{subsection.279}%
-\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{39}{subsection.310}%
-\contentsline {subsection}{\numberline {2.1.3}Context Tab Implementation}{41}{subsection.312}%
-\contentsline {subsection}{\numberline {2.1.4}Triples Tab Implementation}{41}{subsection.313}%
-\contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{43}{subsection.319}%
-\contentsline {subsection}{\numberline {2.1.6}Synchronization Between Text View and RDF View}{43}{subsection.324}%
-\contentsline {subsubsection}{\nonumberline Text View to RDF View}{43}{subsubsection*.325}%
-\contentsline {subsubsection}{\nonumberline RDF View to Text View}{44}{subsubsection*.326}%
-\contentsline {subsection}{\numberline {2.1.7}Integrated Extensions in the Triple Workflow}{44}{subsection.330}%
-\contentsline {section}{\numberline {2.2}Query with SPARQL}{45}{section.331}%
-\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{45}{subsection.332}%
-\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{47}{section.359}%
-\contentsline {chapter}{\numberline {3}Application}{49}{chapter.360}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{49}{section.361}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{51}{chapter.362}%
-\contentsline {chapter}{\nonumberline Bibliography}{53}{chapter*.363}%
+\contentsline {subsection}{\numberline {1.4.5}Comparison of Representative Tools}{31}{subsection.271}%
+\contentsline {subsection}{\numberline {1.4.6}Research Gap and Positioning of This Thesis}{32}{subsection.276}%
+\contentsline {chapter}{\numberline {2}Design and Implementation}{35}{chapter.277}%
+\contentsline {section}{\numberline {2.1}RDF Authoring Panel}{35}{section.278}%
+\contentsline {subsection}{\numberline {2.1.1}RML Mapping Tool}{36}{subsection.281}%
+\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{40}{subsection.312}%
+\contentsline {subsection}{\numberline {2.1.3}Context Tab Implementation}{40}{subsection.314}%
+\contentsline {subsection}{\numberline {2.1.4}Triples Tab Implementation}{41}{subsection.315}%
+\contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{41}{subsection.321}%
+\contentsline {subsection}{\numberline {2.1.6}Synchronization Between Text View and RDF View}{43}{subsection.326}%
+\contentsline {subsubsection}{\nonumberline Text View to RDF View}{43}{subsubsection*.327}%
+\contentsline {subsubsection}{\nonumberline RDF View to Text View}{44}{subsubsection*.328}%
+\contentsline {subsection}{\numberline {2.1.7}Integrated Extensions in the Triple Workflow}{44}{subsection.332}%
+\contentsline {section}{\numberline {2.2}Query with SPARQL}{44}{section.333}%
+\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{45}{subsection.334}%
+\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{47}{section.361}%
+\contentsline {chapter}{\numberline {3}Application}{49}{chapter.362}%
+\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{49}{section.363}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{51}{chapter.364}%
+\contentsline {chapter}{\nonumberline Bibliography}{53}{chapter*.365}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{56}{chapter*.363}%
-\contentsline {chapter}{\numberline {A}Appendix}{57}{appendix.364}%
+\contentsline {part}{Appendix}{56}{chapter*.365}%
+\contentsline {chapter}{\numberline {A}Appendix}{57}{appendix.366}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

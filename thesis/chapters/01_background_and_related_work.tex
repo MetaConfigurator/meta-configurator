@@ -599,13 +599,28 @@ Redland RDF & \dingcheck & Limited & -- & Partial & -- & -- \\
 \hline
 \end{tabular}
 \end{table}
-\noindent\textit{Rating scale:}
-\begin{itemize}
-    \item \dingcheck: native, first-class support.
-    \item \textit{Partial}: substantial but scope-limited support (often programmatic rather than end-user focused).
-    \item \textit{Limited}: basic or indirect support (e.g., plugin-based, narrow subset, or lightweight/read-only capability).
-    \item --: not a core capability.
-\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{Rating scale used in Table~\ref{tab:related_tools_comparison}}
+\label{tab:rating_scale}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{10cm}}
+\hline
+\textbf{Symbol / Term} & \textbf{Meaning} \\
+\hline
+\dingcheck & Native, first-class support \\
+\cdashline{1-2}
+Partial & Substantial but scope-limited support (often programmatic rather than end-user focused) \\
+\cdashline{1-2}
+Limited & Basic or indirect support (e.g., plugin-based, narrow subset, or lightweight/read-only capability) \\
+\cdashline{1-2}
+-- & Not a core capability \\
+\hline
+\end{tabular}
+\end{table}
+
+
 \subsection{Research Gap and Positioning of This Thesis}
 
 Although these tools provide strong support for individual Semantic Web tasks, several limitations remain for practical, user-facing scientific data workflows:
