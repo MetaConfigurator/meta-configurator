@@ -17,7 +17,7 @@ In computational science workflows, \gls{json} files often capture experiment pa
     {
       "name": "element_size",
       "value": 0.025,
-      "unit": "m"
+      "unit": "M"
     }
   ],
   "metrics": [
@@ -142,7 +142,7 @@ The Semantic Web extends the World Wide Web by enabling data to be represented i
   "@type": "schema:PropertyValue",
   "rdfs:label": "element_size",
   "schema:unitCode": {
-    "@id": "unit:m"
+    "@id": "unit:M"
   },
   "schema:value": {
     "@type": "http://www.w3.org/2001/XMLSchema#double",
@@ -240,7 +240,7 @@ WHERE {
 \end{lstlisting}
 
 This query returns the \texttt{element\_size} parameter and \texttt{max\_von\_mises\_stress} along with their numeric values and associated \gls{qudt} units 
-(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:m}} and \href{https://qudt.org/vocab/unit/MPa}{\texttt{unit:MPa}}), reflecting the structure of the JSON-LD representation where 
+(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}} and \href{https://qudt.org/vocab/unit/MPa}{\texttt{unit:MPa}}), reflecting the structure of the JSON-LD representation where 
 parameters and metrics are modeled as \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resources. 
 
 This demonstrates how semantic annotations enable precise, ontology-aware data access. 
@@ -286,7 +286,7 @@ Listing~\ref{lst:background_jsonld_example} shows a \gls{jsonld} representation 
             "@type": "schema:PropertyValue",
             "rdfs:label": "element_size",
             "schema:unitCode": {
-                "@id": "unit:m"
+                "@id": "unit:M"
             },
             "schema:value": {
                 "@type": "http://www.w3.org/2001/XMLSchema#double",
