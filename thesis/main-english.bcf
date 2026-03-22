@@ -2410,21 +2410,23 @@
     <bcf:citekey order="28" intorder="1">jsonld_playground</bcf:citekey>
     <bcf:citekey order="29" intorder="1">rdflib</bcf:citekey>
     <bcf:citekey order="29" intorder="2">redland</bcf:citekey>
-    <bcf:citekey order="30" intorder="1">hogan2021knowledgegraphs</bcf:citekey>
-    <bcf:citekey order="31" intorder="1">janowicz2015geospatial</bcf:citekey>
-    <bcf:citekey order="32" intorder="1">sporny2014jsonld</bcf:citekey>
-    <bcf:citekey order="33" intorder="1">das2012r2rml</bcf:citekey>
-    <bcf:citekey order="33" intorder="2">dimou2014rml</bcf:citekey>
-    <bcf:citekey order="34" intorder="1">metaconfigurator2024</bcf:citekey>
-    <bcf:citekey order="35" intorder="1">dimou2014rml</bcf:citekey>
-    <bcf:citekey order="36" intorder="1">codemirror</bcf:citekey>
-    <bcf:citekey order="37" intorder="1">jsonld2014</bcf:citekey>
-    <bcf:citekey order="38" intorder="1">rdflib_docs</bcf:citekey>
+    <bcf:citekey order="30" intorder="1">semtk</bcf:citekey>
+    <bcf:citekey order="31" intorder="1">hogan2021knowledgegraphs</bcf:citekey>
+    <bcf:citekey order="32" intorder="1">janowicz2015geospatial</bcf:citekey>
+    <bcf:citekey order="33" intorder="1">jsonld2014</bcf:citekey>
+    <bcf:citekey order="34" intorder="1">das2012r2rml</bcf:citekey>
+    <bcf:citekey order="34" intorder="2">dimou2014rml</bcf:citekey>
+    <bcf:citekey order="35" intorder="1">metaconfigurator2024</bcf:citekey>
+    <bcf:citekey order="36" intorder="1">dimou2014rml</bcf:citekey>
+    <bcf:citekey order="37" intorder="1">codemirror</bcf:citekey>
+    <bcf:citekey order="38" intorder="1">jsonld2014</bcf:citekey>
     <bcf:citekey order="39" intorder="1">rdflib_docs</bcf:citekey>
-    <bcf:citekey order="40" intorder="1">comunica_query_sparql</bcf:citekey>
-    <bcf:citekey order="41" intorder="1">comunica_supported_specs</bcf:citekey>
-    <bcf:citekey order="42" intorder="1">codemirror</bcf:citekey>
-    <bcf:citekey order="42" intorder="2">sparqljs</bcf:citekey>
+    <bcf:citekey order="40" intorder="1">rdflib_docs</bcf:citekey>
+    <bcf:citekey order="41" intorder="1">comunica_query_sparql</bcf:citekey>
+    <bcf:citekey order="42" intorder="1">comunica_supported_specs</bcf:citekey>
+    <bcf:citekey order="43" intorder="1">codemirror</bcf:citekey>
+    <bcf:citekey order="44" intorder="1">sparqljs</bcf:citekey>
+    <bcf:citekey order="45" intorder="1">cytoscapejs</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

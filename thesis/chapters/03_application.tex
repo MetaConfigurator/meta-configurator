@@ -2,3 +2,9 @@
 \chapter{Application}\label{sec:application}
 %%% ===============================================================================
 \section{NFDI4ING Model Validation}\label{sec:application:nfdi4ing-model-validation}
+
+To evaluate the practical applicability of the implemented extension, the workflow was applied to data structures aligned with the NFDI4ING metadata model. The goal was to validate whether schema-driven instance data authored in MetaConfigurator can be transformed into semantically consistent \gls{jsonld}/\gls{rdf} representations that follow the expected ontology terms and relationship patterns.
+
+The validation workflow followed four steps: (1) authoring and refining JSON instance data and JSON Schema in MetaConfigurator, (2) generating and reviewing \gls{rml} mappings (including \gls{ai}-assisted drafts), (3) transforming source JSON into \gls{jsonld}, and (4) checking the resulting triples through the RDF authoring panel and \gls{sparql} queries. This procedure ensured that both structural correctness (schema compliance) and semantic correctness (expected predicates/classes and links) were inspected before accepting results.
+
+In the tested scenarios, the integrated workflow enabled fast iteration between data modeling and semantic validation. Typical issues observed in early drafts included incomplete context declarations, incorrect unit/resource IRIs, and overly broad AI-generated mappings. These were resolved through user-guided refinement in the mapping editor and immediate feedback from the triples view and query dialog. The results indicate that the extension is suitable for NFDI4ING-oriented modeling tasks where users need to move from structured JSON authoring to ontology-aligned graph data within a single tool.

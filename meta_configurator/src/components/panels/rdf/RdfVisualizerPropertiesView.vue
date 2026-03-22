@@ -290,7 +290,7 @@ const emit = defineEmits<{
   gap: 10px;
   font-weight: 700;
   font-size: 13px;
-  color: #fe1302;
+  color: black;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }

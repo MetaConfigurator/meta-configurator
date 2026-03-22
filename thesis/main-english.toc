@@ -25,19 +25,19 @@
 \contentsline {chapter}{\numberline {2}Design and Implementation}{35}{chapter.277}%
 \contentsline {section}{\numberline {2.1}RDF Authoring Panel}{35}{section.278}%
 \contentsline {subsection}{\numberline {2.1.1}RML Mapping Tool}{36}{subsection.281}%
-\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{42}{subsection.393}%
-\contentsline {subsection}{\numberline {2.1.3}Context Tab Implementation}{42}{subsection.395}%
-\contentsline {subsection}{\numberline {2.1.4}Triples Tab Implementation}{42}{subsection.396}%
-\contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{43}{subsection.404}%
-\contentsline {subsection}{\numberline {2.1.6}Linked Selection Between Text View and RDF View}{46}{subsection.409}%
-\contentsline {section}{\numberline {2.2}Query with SPARQL}{48}{section.437}%
-\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{48}{subsection.438}%
+\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{41}{subsection.393}%
+\contentsline {subsection}{\numberline {2.1.3}Context Tab Implementation}{41}{subsection.395}%
+\contentsline {subsection}{\numberline {2.1.4}Triples Tab Implementation}{41}{subsection.396}%
+\contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{42}{subsection.404}%
+\contentsline {subsection}{\numberline {2.1.6}Linked Selection Between Text View and RDF View}{45}{subsection.409}%
+\contentsline {section}{\numberline {2.2}Query with SPARQL}{47}{section.437}%
+\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{47}{subsection.438}%
 \contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{50}{section.465}%
-\contentsline {chapter}{\numberline {3}Application}{53}{chapter.466}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{53}{section.467}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{55}{chapter.468}%
-\contentsline {chapter}{\nonumberline Bibliography}{57}{chapter*.469}%
+\contentsline {chapter}{\numberline {3}Application}{53}{chapter.470}%
+\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{53}{section.471}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{55}{chapter.472}%
+\contentsline {chapter}{\nonumberline Bibliography}{57}{chapter*.473}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{60}{chapter*.469}%
-\contentsline {chapter}{\numberline {A}Appendix}{61}{appendix.470}%
+\contentsline {part}{Appendix}{60}{chapter*.473}%
+\contentsline {chapter}{\numberline {A}Appendix}{61}{appendix.474}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

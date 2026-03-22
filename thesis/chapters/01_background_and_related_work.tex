@@ -344,7 +344,7 @@ G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in
 
 Listing~\ref{lst:background_rml_mapping} shows part of an example \gls{rml} mapping that converts the \gls{json} simulation output from Listing~\ref{lst:background_json_example} into the \gls{jsonld} structure presented in Listing~\ref{lst:background_jsonld_example}.
 
-\begin{lstlisting}[float=htbp,style=turtle, caption={RML mapping which converts JSON data in Listing~\ref{lst:background_json_example} to JSON-LD in Listing~\ref{lst:background_jsonld_example}}, label={lst:background_rml_mapping}]
+\begin{lstlisting}[float=htbp,style=turtle, caption={Subset of a RML mapping which converts JSON data in Listing~\ref{lst:background_json_example} to JSON-LD in Listing~\ref{lst:background_jsonld_example}}, label={lst:background_rml_mapping}]
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
@@ -447,7 +447,7 @@ MetaConfigurator provides several features that facilitate the creation and main
 
 \begin{itemize}
     \item \textbf{Visual Schema Editor:}  
-    Users can create and modify \gls{json} schemas using a graphical interface, enabling intuitive construction of data models without manually writing schema definitions. Figure~\ref{fig:metaconfigurator_interface:schema} depicts an example of schema editing in MetaConfigurator, showing the JSON Schema from~\ref{lst:background_json_schema}. The left panel shows the raw JSON Schema, the middle panel provides a diagram view for editing, and the right panel offers a structured form for schema modification.
+    Users can create and modify \gls{json} schemas using a graphical interface, enabling intuitive construction of data models without manually writing schema definitions. Figure~\ref{fig:metaconfigurator_interface:schema} depicts an example of schema editing in MetaConfigurator, showing the JSON Schema from Listing~\ref{lst:background_json_schema}. The left panel shows the raw JSON Schema, the middle panel provides a diagram view for editing, and the right panel offers a structured form for schema modification.
 
     \item \textbf{Simplified and Advanced Schema Modes:}
     To reduce complexity while preserving expressiveness, MetaConfigurator provides configurable schema-editing modes. A simplified mode hides advanced JSON Schema options, while an advanced mode exposes the full feature set. This behavior is implemented through a meta-schema-builder approach that dynamically derives the editor schema from user settings \cite{metaconfigurator2025datamodels}.
@@ -456,7 +456,7 @@ MetaConfigurator provides several features that facilitate the creation and main
     Based on a given JSON Schema, MetaConfigurator automatically generates a graphical form for editing instance data. This ensures that all entered data conforms to the defined structure and constraints.
 
     \item \textbf{Integrated Text and GUI Editing:}  
-    The tool combines a traditional text editor with a graphical editor, allowing users to switch between raw \gls{json} editing and structured form-based editing within the same interface. Figure~\ref{fig:metaconfigurator_interface:data} depicts an example of data editing in MetaConfigurator, showing the JSON instance from~\ref{lst:background_qudt_example} that conforms to the JSON Schema in~\ref{lst:background_json_schema}. The left panel displays the raw JSON data, while the right panel offers a structured form for editing.
+    The tool combines a traditional text editor with a graphical editor, allowing users to switch between raw \gls{json} editing and structured form-based editing within the same interface. Figure~\ref{fig:metaconfigurator_interface:data} depicts an example of data editing in MetaConfigurator, showing the JSON instance from Listing~\ref{lst:background_json_example} that conforms to the JSON Schema in Listing~\ref{lst:background_json_schema}. The left panel displays the raw JSON data, while the right panel offers a structured form for editing.
 
     \item \textbf{Schema Validation Support:}  
     During data editing, MetaConfigurator validates instance data against the provided JSON Schema, ensuring structural correctness and preventing invalid data entries.
@@ -495,7 +495,7 @@ For data transformation, the system generates mapping expressions from user inpu
 \subsection{Limitations for Semantic Web Integration}
 \label{sec:background:metaconfigurator_limitations}
 
-Despite its strong support for schema-driven data modeling, MetaConfigurator currently provides only limited support for Semantic Web technologies. While the platform enables the creation and validation of structured data using \gls{json} and JSON Schema, it does not natively support Linked Data representations such as \gls{jsonld} or \gls{rdf} graphs.
+Despite its strong support for schema-driven data modeling, MetaConfigurator currently provides only limited support for Semantic Web technologies: while the platform enables the creation and validation of structured data using \gls{json} and JSON Schema, it does not natively support Linked Data representations such as \gls{jsonld} or \gls{rdf} graphs.
 
 As discussed in previous sections, the Semantic Web relies on standards such as \gls{rdf}, ontologies, and \glspl{iri} to represent data in a machine-interpretable and interoperable manner. \gls{jsonld} serves as an important bridge between traditional \gls{json}-based data structures and \gls{rdf}-based knowledge graphs. However, MetaConfigurator currently treats \gls{json} documents primarily as structured configuration data and does not interpret or expose their underlying \gls{rdf} semantics.
 
@@ -589,7 +589,7 @@ Protégé & \dingcheck & \dingcheck & -- & -- & \dingcheck & -- \\
 WebProtégé & \dingcheck & \dingcheck & -- & -- & Limited & -- \\
 Apache Jena & \dingcheck & \dingcheck & Limited & \dingcheck & -- & -- \\
 LinkML & -- & \dingcheck & Partial & -- & -- & -- \\
-SemTK & \dingcheck & \dingcheck & Partial & \dingcheck & \dingcheck & -- \\
+SemTK~\cite{semtk} & \dingcheck & \dingcheck & Partial & \dingcheck & \dingcheck & -- \\
 OpenRefine (RDF) & Limited & -- & \dingcheck & -- & -- & -- \\
 SPARQL-Generate & -- & -- & \dingcheck & -- & -- & -- \\
 JSON-LD Playground & Limited & -- & Limited & -- & Limited & -- \\
@@ -629,7 +629,7 @@ Although these tools provide strong support for individual Semantic Web tasks, s
 
     \item \textbf{High technical entry barrier:} Effective use often requires advanced knowledge of \gls{owl}, \gls{rdf}, \gls{sparql}, and mapping languages, which limits accessibility for domain scientists who are not Semantic Web experts \cite{janowicz2015geospatial}.
 
-    \item \textbf{Gap between structured JSON editing and RDF transformation:} In practice, much scientific data is authored and maintained in hierarchical formats such as \gls{json}. While standards such as \gls{jsonld} provide a bridge to linked data \cite{sporny2014jsonld}, moving from conventional \gls{json} structures to \gls{rdf} still often requires separate mapping artifacts and additional tools (e.g., \gls{r2rml}/\gls{rml}) \cite{das2012r2rml,dimou2014rml}.
+    \item \textbf{Gap between structured JSON editing and RDF transformation:} In practice, much scientific data is authored and maintained in hierarchical formats such as \gls{json}. While standards such as \gls{jsonld} provide a bridge to linked data \cite{jsonld2014}, moving from conventional \gls{json} structures to \gls{rdf} still often requires separate mapping artifacts and additional tools (e.g., \gls{r2rml}/\gls{rml}) \cite{das2012r2rml,dimou2014rml}.
 
     \item \textbf{Limited end-to-end support in one UI:} Most tools focus on a single task—such as ontology editing, mapping definition, or querying—rather than supporting the entire workflow from data authoring and transformation to validation, querying, and graph exploration in a unified environment.
 

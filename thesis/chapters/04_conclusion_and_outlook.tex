@@ -1,5 +1,12 @@
 %%% ===============================================================================
 \chapter{Conclusion and Outlook}\label{sec:conclusion}
 %%% ===============================================================================
+This thesis extends MetaConfigurator with an integrated \gls{rdf} authoring workflow that bridges schema-driven JSON editing and Semantic Web technologies. The implementation contributes four main capabilities: transformation from \gls{json} to \gls{jsonld} via \gls{rml}, direct editing of semantic structures through context and triple views, in-browser \gls{sparql} querying with validation support, and interactive graph visualization. In addition, \gls{ai}-assisted generation of \gls{rml} mappings and \gls{sparql} queries reduces authoring effort while preserving user control through mandatory review.
 
-Conclusion and Outlook
+The resulting system supports an end-to-end process in a single interface: users can model and validate structured data, enrich it semantically, inspect and edit generated triples, run semantic queries, and explore graph structures without switching tools. This addresses a central gap in existing workflows, where authoring, mapping, querying, and visualization are often fragmented across separate environments.
+
+Several limitations remain. First, AI-generated artifacts can still contain semantic mistakes and therefore require careful user verification. Second, scalability of in-browser graph processing and visualization is bounded by client resources for larger datasets. Third, ontology integration is currently focused on assisted lookup and authoring support rather than full reasoning-based guidance.
+
+Future work should focus on three directions. (1) Robust validation pipelines: integrate SHACL-based validation directly into the authoring workflow to provide machine-checkable semantic constraints before export or publication. (2) Better scalability: add progressive loading, result-size controls, and graph summarization strategies for larger knowledge graphs. (3) Deeper assistance: improve AI-supported authoring with constraint-aware prompting and automated quality checks that detect likely mapping/query errors before execution.
+
+Overall, the presented extension demonstrates that schema-guided data engineering and Semantic Web authoring can be effectively combined in one user-facing environment, improving accessibility and interoperability for scientific data workflows.
