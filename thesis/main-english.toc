@@ -30,14 +30,15 @@
 \contentsline {subsection}{\numberline {2.1.4}Triples Tab Implementation}{41}{subsection.396}%
 \contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{42}{subsection.404}%
 \contentsline {subsection}{\numberline {2.1.6}Linked Selection Between Text View and RDF View}{45}{subsection.409}%
-\contentsline {section}{\numberline {2.2}Query with SPARQL}{47}{section.437}%
-\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{47}{subsection.438}%
+\contentsline {section}{\numberline {2.2}Query with SPARQL}{46}{section.437}%
+\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{46}{subsection.438}%
 \contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{50}{section.465}%
 \contentsline {chapter}{\numberline {3}Application}{53}{chapter.470}%
-\contentsline {section}{\numberline {3.1}NFDI4ING Model Validation}{53}{section.471}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{55}{chapter.472}%
-\contentsline {chapter}{\nonumberline Bibliography}{57}{chapter*.473}%
+\contentsline {section}{\numberline {3.1}Metal-Organic Framework Synthesis Using Data Models}{53}{section.471}%
+\contentsline {subsection}{\numberline {3.1.1}Input Data and Modeling Objective}{53}{subsection.472}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{55}{chapter.511}%
+\contentsline {chapter}{\nonumberline Bibliography}{57}{chapter*.512}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{60}{chapter*.473}%
-\contentsline {chapter}{\numberline {A}Appendix}{61}{appendix.474}%
+\contentsline {part}{Appendix}{60}{chapter*.512}%
+\contentsline {chapter}{\numberline {A}Appendix}{61}{appendix.513}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

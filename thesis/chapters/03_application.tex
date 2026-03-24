@@ -1,10 +1,46 @@
 %%% ===============================================================================
 \chapter{Application}\label{sec:application}
 %%% ===============================================================================
-\section{NFDI4ING Model Validation}\label{sec:application:nfdi4ing-model-validation}
 
-To evaluate the practical applicability of the implemented extension, the workflow was applied to data structures aligned with the NFDI4ING metadata model. The goal was to validate whether schema-driven instance data authored in MetaConfigurator can be transformed into semantically consistent \gls{jsonld}/\gls{rdf} representations that follow the expected ontology terms and relationship patterns.
+\section{Metal-Organic Framework Synthesis Using Data Models}\label{sec:application:metal}
 
-The validation workflow followed four steps: (1) authoring and refining JSON instance data and JSON Schema in MetaConfigurator, (2) generating and reviewing \gls{rml} mappings (including \gls{ai}-assisted drafts), (3) transforming source JSON into \gls{jsonld}, and (4) checking the resulting triples through the RDF authoring panel and \gls{sparql} queries. This procedure ensured that both structural correctness (schema compliance) and semantic correctness (expected predicates/classes and links) were inspected before accepting results.
 
-In the tested scenarios, the integrated workflow enabled fast iteration between data modeling and semantic validation. Typical issues observed in early drafts included incomplete context declarations, incorrect unit/resource IRIs, and overly broad AI-generated mappings. These were resolved through user-guided refinement in the mapping editor and immediate feedback from the triples view and query dialog. The results indicate that the extension is suitable for NFDI4ING-oriented modeling tasks where users need to move from structured JSON authoring to ontology-aligned graph data within a single tool.
+\begin{lstlisting}[float=htbp,style=json,caption={Representative JSON excerpt from the MOF synthesis dataset},label={lst:application_mof_json_example}]
+{
+  "Synthesis": [
+    {
+      "Hardware": { "Component": [{ "_id": "S-1", "_type": "glass vial" }] },
+      "Metadata": { "_description": "S-1", "_product": "MIL-88B (Fe)" },
+      "Procedure": {
+        "Prep": {
+          "Step": [
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "FeCl3", "_order": 0 },
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "millilitre", "Value": 4}, "_reagent": "DMF", "_order": 2 }
+          ]
+        },
+        "Reaction": {
+          "Step": [
+            { "_vessel": "S-1", "$xml_type": "Sonicate", "_time": { "Value": 30.0, "Unit": "minute"}, "_order": 0 },
+            { "_comment": "In: oven", "_vessel": "S-1", "$xml_type": "HeatChill", "_temp": { "Unit": "celsius", "Value": 120.0}, "_time": { "Value": 1, "Unit": "day"}, "_order": 1 }
+          ]
+        },
+        "Workup": {
+          "Step": [
+            { "_vessel": "S-1", "$xml_type": "WashSolid", "_solvent": "EtOH", "_order": 0 },
+            { "_vessel": "S-1", "$xml_type": "Dry", "_temp": { "Unit": "celsius", "Value": 120.0}, "_time": { "Value": 1, "Unit": "day"}, "_pressure": { "Unit": "pascal", "Value": 0}, "_order": 1 }
+          ]
+        }
+      },
+      "Reagents": {
+        "Reagent": [
+          { "_id": "FeCl3", "_name": "FeCl3", "_role": "substrate" },
+          { "_id": "Benzene-1%252C4-dicarboxylic%2520acid", "_name": "Benzene-1,4-dicarboxylic acid", "_role": "ligand" },
+          { "_id": "DMF", "_name": "DMF", "_role": "solvent" },
+          { "_id": "EtOH", "_name": "EtOH", "_role": "solvent" }
+        ]
+      }
+    }
+  ]
+}
+\end{lstlisting}

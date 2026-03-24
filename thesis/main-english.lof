@@ -10,9 +10,9 @@
 \contentsline {figure}{\numberline {2.5}{\ignorespaces Synchronization process illustrating how modifications made in the Text View are propagated and reflected in the RDF View.}}{43}{figure.400}%
 \contentsline {figure}{\numberline {2.6}{\ignorespaces Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}}{43}{figure.402}%
 \contentsline {figure}{\numberline {2.7}{\ignorespaces Linked selection between Text View and RDF View. The highlighted JSON fragment corresponds to the selected triple in the DataTable, and vice versa.}}{45}{figure.410}%
-\contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query dialog, with AI-assisted query generation.}}{48}{figure.443}%
-\contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{49}{figure.461}%
-\contentsline {figure}{\numberline {2.10}{\ignorespaces Data exported as CSV could be visualized as a plot of \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress}, revealing trends in the simulation results.}}{50}{figure.463}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query dialog, with AI-assisted query generation.}}{47}{figure.443}%
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{48}{figure.461}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Data exported as CSV could be visualized as a plot of \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress}, revealing trends in the simulation results.}}{49}{figure.463}%
 \contentsline {figure}{\numberline {2.11}{\ignorespaces Knowledge graph visualization of the JSON-LD data from Listing~\ref {lst:background_jsonld_example}, rendered in the Visualization dialog.}}{51}{figure.468}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
