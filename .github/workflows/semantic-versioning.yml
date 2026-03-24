@@ -12,7 +12,7 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -21,6 +21,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: patch
-          major_string_token: 'BREAKING CHANGE,!:'
-          minor_string_token: 'feat:'
-          patch_string_token: 'fix:,perf:,refactor:,docs:,chore:,test:'
+          custom_release_rules: 'breaking:major,feat:minor,fix:patch,perf:patch,refactor:patch,docs:patch,chore:patch,test:patch'
