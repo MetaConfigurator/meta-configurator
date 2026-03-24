@@ -2428,6 +2428,10 @@
     <bcf:citekey order="44" intorder="1">sparqljs</bcf:citekey>
     <bcf:citekey order="45" intorder="1">cytoscapejs</bcf:citekey>
     <bcf:citekey order="46" intorder="1">neubauer2026data</bcf:citekey>
+    <bcf:citekey order="47" intorder="1">neubauer2026data</bcf:citekey>
+    <bcf:citekey order="48" intorder="1">chmo_ontology</bcf:citekey>
+    <bcf:citekey order="49" intorder="1">obi2016</bcf:citekey>
+    <bcf:citekey order="49" intorder="2">jackson2021obofoundry</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

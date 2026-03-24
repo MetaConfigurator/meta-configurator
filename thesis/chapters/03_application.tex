@@ -2,9 +2,9 @@
 \chapter{Application}\label{sec:application}
 %%% ===============================================================================
 
-This chapter demonstrates the end-to-end application of the thesis workflow to \gls{mof} synthesis data. Structured experiment records are modeled in \gls{json}, transformed into semantically enriched \gls{rdf}/\gls{jsonld} using \gls{rml}, and then prepared for ontology-aware querying and graph-based analysis.
+This chapter presents the end-to-end application of the thesis workflow to \gls{mof} synthesis data. Structured experiment records are first modeled in \gls{json}, then transformed into semantically enriched \gls{rdf}/\gls{jsonld} using \gls{rml}, and finally prepared for ontology-aware querying and graph-based analysis.
 
-In line with the motivation in Chapters~\ref{sec:background} and~\ref{sec:design}, the main idea is to preserve laboratory protocol detail (materials, actions, and conditions) while adding formal semantics so that the same data can be interpreted consistently across tools and datasets.
+In line with the motivation in Chapters~\ref{sec:background} and~\ref{sec:design}, the main idea is to preserve laboratory protocol detail (materials, actions, and conditions) while adding formal semantics so that the same data can be interpreted consistently across tools and datasets \cite{neubauer2026data}.
 
 \section{JSON Structure of the \glsentryshort{mof} Synthesis Dataset}\label{sec:application:metal:json-structure}
 
@@ -92,9 +92,26 @@ Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof
 }
 \end{lstlisting}
 
+\subsection{\glsentryshort{chmo}}\label{sec:application:metal:chmo-introduction}
+
+The \gls{chmo} provides a controlled vocabulary for chemical methods and related experimental concepts, including data-acquisition techniques, preparation and separation procedures, and synthesis methods \cite{chmo_ontology}. Within the broader OBO ecosystem, \gls{chmo} is designed to complement other ontologies such as the \gls{obi}, which captures more general investigation processes and experimental context \cite{obi2016,jackson2021obofoundry}.
+
+Using \gls{chmo} terms in this chapter serves two purposes. First, it anchors synthesis resources to a domain-specific ontology rather than leaving them as generic data records. Second, it improves interoperability, because \gls{chmo}-typed entities can be combined with \gls{obi}- and \gls{chebi}-based descriptions in a shared \gls{rdf} graph.
+
 \section{RML Mapping for Semantic Enrichment}\label{sec:application:metal:rml}
 
-The \gls{rml} mappings in Listings~\ref{lst:application_mof_rml_example_1} and Listings~\ref{lst:application_mof_rml_example_2} show how the \gls{json} structures defined in Listings~\ref{lst:application_mof_json_example_s_1} and Listings~\ref{lst:application_mof_json_example_s_2} are transformed into typed \gls{rdf} resources, as described in Section~\ref{sec:background:rml}. In MetaConfigurator, this is the operational step that bridges conventional \gls{json} input and the \gls{rdf}/\gls{jsonld} authoring and query workflow.
+The \gls{rml} mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} show how the \gls{json} structures defined in Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof_json_example_s_2} are transformed into typed \gls{rdf} resources, as described in Section~\ref{sec:background:rml}. In MetaConfigurator, this is the operational step that bridges conventional \gls{json} input and the \gls{rdf}/\gls{jsonld} authoring and query workflow.
+
+
+\subsection{An RML mapping for CHMO integration}\label{sec:application:metal:rml-chmo-introduction}
+
+Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} demonstrate how the chemistry-oriented ontology design is operationalized as executable \gls{rml}. The first listing defines the synthesis-level mapping context: \texttt{rml:iterator "\$.Synthesis[*]"} selects each run in the input data, and \texttt{rr:subjectMap} creates one stable resource per run. By assigning \texttt{rr:class chmo:0000410}, each generated subject is explicitly typed as a \gls{chmo}-grounded synthesis entity rather than a generic node.
+
+The same mapping block also shows how experimental metadata is semantically attached to the synthesis resource. Fields such as vessel identifier, vessel type, human-readable run label, and product are transferred through \texttt{rr:predicateObjectMap}. This mapping pattern preserves the operational laboratory context while simultaneously lifting the data into an ontology-aware representation that can be interpreted by semantic tools.
+
+The second listing extends this principle to reagents and preparation steps. Reagent resources are typed with \texttt{obo:CHEBI\_24431}, aligning them with \gls{chebi}-based chemical entities, while preparation-step resources are typed with \texttt{obo:OBI\_0000070}, aligning procedural actions with \gls{obi}-based process semantics. As a result, the mapping does not merely copy JSON values into triples; it establishes a typed graph structure in which substances, methods, and process phases can be distinguished and queried systematically.
+
+From a workflow perspective, this is crucial for the integration goals discussed in Chapters~\ref{sec:background} and~\ref{sec:design}. Once the mapped graph is loaded in MetaConfigurator, users can formulate \gls{sparql} queries over synthesis-level entities, reagent roles, and process steps without relying on fragile path-specific JSON logic. The same typed structure also improves graph visualization readability, because nodes and edges represent explicit domain semantics rather than implicit document structure.
 
 \begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping focused on synthesis-level hardware and metadata},label={lst:application_mof_rml_example_1}]
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
@@ -136,14 +153,11 @@ The \gls{rml} mappings in Listings~\ref{lst:application_mof_rml_example_1} and L
   rr:predicateObjectMap [ rr:predicate ex:amountUnit ; rr:objectMap [ rml:reference "_amount.Unit" ] ] .
 \end{lstlisting}
 
-\subsection{How Ontology Classes Add Semantics to JSON Data}\label{sec:application:metal:rml-class-semantics}
-
 A central semantic effect of the mapping is ontology-based typing in \texttt{rr:class}. These class assignments transform plain JSON objects into explicit domain entities. For example, the mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} assign the following classes:
 \begin{itemize}
     \item \textbf{\texttt{chmo:0000410}} types each synthesis run as a chemistry synthesis entity.
-    \item \textbf{\texttt{obo:CHEBI\_24431}} types each reagent node as a chemical entity.
-    \item \textbf{\texttt{obo:OBI\_0000070}} types each procedure step as an experimental/process step entity.
+    \item \textbf{\texttt{obo:CHEBI\_24431}} types each reagent node as a \gls{chebi}-aligned chemical entity.
+    \item \textbf{\texttt{obo:OBI\_0000070}} types each procedure step as an \gls{obi}-aligned experimental/process step entity.
 \end{itemize}
 
-This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Reagent}, and \texttt{Step} are structural labels only. After \gls{rml} transformation, they become ontology-grounded \gls{rdf} nodes that can be queried by meaning and reused across datasets. This is the semantic lifting described in Sections~\ref{sec:background:jsonld} and~\ref{sec:background:rml}.
-
+This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Reagent}, and \texttt{Step} are structural labels only. After \gls{rml} transformation, they become ontology-grounded \gls{rdf} nodes that can be queried by meaning and reused across datasets.
