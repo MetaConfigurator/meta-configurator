@@ -41,5 +41,7 @@
 \contentsline {section}{\numberline {3.3}AI-Assisted SPARQL Generation}{58}{section.633}%
 \contentsline {section}{\numberline {3.4}Knowledge Graph Visualization and Editing}{61}{section.654}%
 \contentsline {chapter}{\numberline {4}Conclusion and Outlook}{63}{chapter.657}%
-\contentsline {chapter}{\nonumberline Bibliography}{65}{chapter*.658}%
+\contentsline {section}{\numberline {4.1}Current Limitations}{63}{section.658}%
+\contentsline {section}{\numberline {4.2}Outlook}{64}{section.659}%
+\contentsline {chapter}{\nonumberline Bibliography}{65}{chapter*.660}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
