@@ -1,8 +1,8 @@
 name: Build and Deploy
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 permissions:
   contents: write
 jobs:
@@ -13,10 +13,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Extract version from tag
+        run: echo "APP_VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
       - name: Install and Build
         env:
           USE_META_CONFIGURATOR_BASE_PATH: true  # Set to true for GitHub Pages deployment
           VITE_FRONTEND_HOSTNAME: https://metaconfigurator.github.io/meta-configurator
+          VITE_APP_VERSION: ${{ env.APP_VERSION }}
         run: |
           cd meta_configurator
           npm ci

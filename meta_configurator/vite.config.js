@@ -16,7 +16,7 @@ const useMetaConfiguratorBasePath = process.env.USE_META_CONFIGURATOR_BASE_PATH 
 export default defineConfig({
   base: useMetaConfiguratorBasePath ? '/meta-configurator/' : '/',
   define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),
+    __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION || pkg.version),
   },
   plugins: [vue(), vueJsx(),
 
