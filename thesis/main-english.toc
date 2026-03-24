@@ -35,12 +35,14 @@
 \contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{50}{section.465}%
 \contentsline {chapter}{\numberline {3}Application}{53}{chapter.470}%
 \contentsline {section}{\numberline {3.1}JSON Structure of the MOF Synthesis Dataset}{53}{section.471}%
-\contentsline {section}{\numberline {3.2}RML Mapping for Semantic Enrichment}{53}{section.548}%
-\contentsline {subsection}{\numberline {3.2.1}CHMO}{56}{subsection.549}%
-\contentsline {subsection}{\numberline {3.2.2}An RML mapping for CHMO integration}{56}{subsection.550}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{59}{chapter.587}%
-\contentsline {chapter}{\nonumberline Bibliography}{61}{chapter*.588}%
+\contentsline {subsection}{\numberline {3.1.1}CHMO}{53}{subsection.548}%
+\contentsline {section}{\numberline {3.2}RML Mapping for Semantic Enrichment}{56}{section.549}%
+\contentsline {subsection}{\numberline {3.2.1}An RML mapping for CHMO integration}{56}{subsection.550}%
+\contentsline {section}{\numberline {3.3}AI-Assisted SPARQL Generation}{58}{section.631}%
+\contentsline {section}{\numberline {3.4}Knowledge Graph Visualization and Editing}{61}{section.652}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{63}{chapter.655}%
+\contentsline {chapter}{\nonumberline Bibliography}{65}{chapter*.656}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{65}{chapter*.588}%
-\contentsline {chapter}{\numberline {A}Appendix}{65}{appendix.589}%
+\contentsline {part}{Appendix}{69}{chapter*.656}%
+\contentsline {chapter}{\numberline {A}Appendix}{69}{appendix.657}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
