@@ -92,7 +92,7 @@ The schema in Listing~\ref{lst:background_json_schema} directly mirrors the exam
 
 Using JSON Schema enables consistent validation of experiment data and ensures that all required attributes are present before transformation into other representations.
 
-However, JSON Schema focuses primarily on structural validation and does not provide semantic meaning or interoperability with knowledge graph technologies. To address this limitation, semantic mapping techniques can be applied.
+However, JSON Schema focuses primarily on structural validation and does not provide semantic meaning or interoperability with \gls{kg} technologies. To address this limitation, semantic mapping techniques can be applied.
 
 
 \section{Semantic Web}
@@ -155,7 +155,7 @@ In this JSON-LD snippet, the parameter \texttt{element\_size} is represented as 
 \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}. Its numeric value is stored in 
 \texttt{schema:value} and the associated unit is linked via 
 \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} to the \gls{qudt} unit 
-\href{https://qudt.org/vocab/unit/M}{\texttt{m}}, which defines the meter. This representation allows applications and knowledge graph systems 
+\href{https://qudt.org/vocab/unit/M}{\texttt{m}}, which defines the meter. This representation allows applications and \gls{kg} systems 
 to unambiguously interpret the measurement and integrate it with other semantically annotated data. 
 Similarly, other variables such as metrics (e.g., \texttt{max\_von\_mises\_stress}) follow the same pattern, 
 and experiment methods are linked to ontology classes such as 
@@ -169,7 +169,7 @@ Semantic Web technologies thus provide a framework for:
     \item Querying and integrating datasets through standard languages like \gls{sparql}.
 \end{itemize}
 
-By grounding \gls{json} data in ontologies and \gls{rdf} through \gls{jsonld}, this simulation result becomes part of the Semantic Web, enabling more advanced analysis, automated reasoning, and integration with other scientific knowledge graphs.
+By grounding \gls{json} data in ontologies and \gls{rdf} through \gls{jsonld}, this simulation result becomes part of the Semantic Web, enabling more advanced analysis, automated reasoning, and integration with other scientific \glspl{kg}.
 
 \subsection{SHACL: Shapes Constraint Language}
 \label{sec:background:shacl}
@@ -215,12 +215,12 @@ local:PropertyValueShape
     ] .
 \end{lstlisting}
 
-By applying this shape, \gls{rdf} data can be automatically checked for compliance with the expected structure and semantics, preventing errors or inconsistencies before integration into a knowledge graph.
+By applying this shape, \gls{rdf} data can be automatically checked for compliance with the expected structure and semantics, preventing errors or inconsistencies before integration into a \gls{kg}.
 
 \subsection{SPARQL: Querying Semantic Data}
 \label{sec:background:sparql}
 
-\gls{sparql} is the standard query language for \gls{rdf} datasets \cite{sparql_standard}, supporting retrieval, filtering, and aggregation of data stored in knowledge graphs. Queries are expressed in terms of triples, similar to \gls{rdf} statements.
+\gls{sparql} is the standard query language for \gls{rdf} datasets \cite{sparql_standard}, supporting retrieval, filtering, and aggregation of data stored in \glspl{kg}. Queries are expressed in terms of triples, similar to \gls{rdf} statements.
 
 Listing~\ref{lst:background_sparql_example} presents an SPARQL example using the \gls{jsonld} simulation data, where all experiment parameters and metrics are retrieved together with their corresponding values and units.
 
@@ -309,7 +309,7 @@ Listing~\ref{lst:background_jsonld_example} shows a \gls{jsonld} representation 
 }
 \end{lstlisting}
 
-This structure allows each entity to be unambiguously identified, linked, and queried using \gls{rdf}-aware tools. By separating semantic definitions (\texttt{@context}) from the data graph (\texttt{@graph}), \gls{jsonld} documents support both human readability and machine interoperability, enabling integration with knowledge graphs and other Semantic Web infrastructures.
+This structure allows each entity to be unambiguously identified, linked, and queried using \gls{rdf}-aware tools. By separating semantic definitions (\texttt{@context}) from the data graph (\texttt{@graph}), \gls{jsonld} documents support both human readability and machine interoperability, enabling integration with \glspl{kg} and other Semantic Web infrastructures.
 
 \subsection{RML for Mapping JSON to RDF}
 \label{sec:background:rml}
@@ -421,7 +421,7 @@ a QUDT unit IRI by constructing the resource
 \texttt{http://qudt.org/vocab/unit/\{unit\}} and assigning it via 
 \href{https://schema.org/unitCode}{\texttt{schema:unitCode}}.
 
-Through this mapping process, structured simulation outputs are automatically converted into \gls{rdf} triples forming a semantically enriched knowledge graph. 
+Through this mapping process, structured simulation outputs are automatically converted into \gls{rdf} triples forming a semantically enriched \gls{kg}. 
 
 \section{MetaConfigurator for Schema-Driven Data Modeling}
 \label{sec:background:metaconfigurator}
@@ -497,7 +497,7 @@ For data transformation, the system generates mapping expressions from user inpu
 
 Despite its strong support for schema-driven data modeling, MetaConfigurator currently provides only limited support for Semantic Web technologies: while the platform enables the creation and validation of structured data using \gls{json} and JSON Schema, it does not natively support Linked Data representations such as \gls{jsonld} or \gls{rdf} graphs.
 
-As discussed in previous sections, the Semantic Web relies on standards such as \gls{rdf}, ontologies, and \glspl{iri} to represent data in a machine-interpretable and interoperable manner. \gls{jsonld} serves as an important bridge between traditional \gls{json}-based data structures and \gls{rdf}-based knowledge graphs. However, MetaConfigurator currently treats \gls{json} documents primarily as structured configuration data and does not interpret or expose their underlying \gls{rdf} semantics.
+As discussed in previous sections, the Semantic Web relies on standards such as \gls{rdf}, ontologies, and \glspl{iri} to represent data in a machine-interpretable and interoperable manner. \gls{jsonld} serves as an important bridge between traditional \gls{json}-based data structures and \gls{rdf}-based \glspl{kg}. However, MetaConfigurator currently treats \gls{json} documents primarily as structured configuration data and does not interpret or expose their underlying \gls{rdf} semantics.
 
 Several limitations arise from this restriction:
 
@@ -512,10 +512,10 @@ Several limitations arise from this restriction:
     The platform lacks built-in mechanisms for transforming conventional \gls{json} documents into semantic representations. As discussed in Section~\ref{sec:background:rml}, technologies such as \gls{rml} enable declarative transformations from \gls{json} to \gls{rdf}, but such transformations are not currently integrated into MetaConfigurator's workflow.
 
     \item \textbf{Lack of semantic querying capabilities:}  
-    MetaConfigurator does not support semantic querying of \gls{rdf} data. As described in Section~\ref{sec:background:sparql}, \gls{sparql} provides a standard mechanism for querying \gls{rdf} graphs and retrieving structured information from knowledge graphs.
+    MetaConfigurator does not support semantic querying of \gls{rdf} data. As described in Section~\ref{sec:background:sparql}, \gls{sparql} provides a standard mechanism for querying \gls{rdf} graphs and retrieving structured information from \glspl{kg}.
 
-    \item \textbf{No visualization of RDF knowledge graphs:}  
-    Knowledge graphs are often easier to understand when represented visually as nodes and relationships. However, the current platform does not provide mechanisms to visually explore \gls{rdf} triples or inspect the structure of the resulting knowledge graph.
+    \item \textbf{No visualization of RDF \glsentryshort{kg}s:}  
+    \Glspl{kg} are often easier to understand when represented visually as nodes and relationships. However, the current platform does not provide mechanisms to visually explore \gls{rdf} triples or inspect the structure of the resulting \gls{kg}.
 \end{enumerate}
 
 To address these limitations, this thesis extends MetaConfigurator with an \textbf{RDF Authoring Panel} that integrates Semantic Web technologies directly into the schema-driven editing environment. The main contributions of this thesis include:
@@ -531,10 +531,10 @@ To address these limitations, this thesis extends MetaConfigurator with an \text
     The system integrates ontology lookup services that provide auto-completion for \glspl{iri} when authoring \gls{rdf} triples. This facilitates the reuse of existing ontologies and promotes semantic interoperability.
 
     \item \textbf{SPARQL querying support:}  
-    The extension introduces the ability to query \gls{rdf} data using \gls{sparql}. This allows users to retrieve and analyze information from the generated knowledge graph directly within the MetaConfigurator environment.
+    The extension introduces the ability to query \gls{rdf} data using \gls{sparql}. This allows users to retrieve and analyze information from the generated \gls{kg} directly within the MetaConfigurator environment.
 
-    \item \textbf{Interactive knowledge graph visualization:}  
-    The \gls{rdf} triples generated from \gls{jsonld} can be visualized as an interactive graph representation. This visualization enables users to explore entities and relationships within the knowledge graph and understand the semantic structure of the data more easily.
+    \item \textbf{Interactive \glsentryshort{kg} visualization:}  
+    The \gls{rdf} triples generated from \gls{jsonld} can be visualized as an interactive graph representation. This visualization enables users to explore entities and relationships within the \gls{kg} and understand the semantic structure of the data more easily.
 
     \item \textbf{AI-assisted SPARQL and RML authoring from user hints:}  
     Building on MetaConfigurator's existing \gls{ai}-assisted schema capabilities, this thesis introduces \gls{ai}-assisted generation of \gls{sparql} queries and \gls{rml} mappings from user-provided hints. Users can describe their intent in natural language and receive draft \gls{sparql} queries and \gls{rml} mapping definitions that can be reviewed and refined in the RDF Authoring Panel.
@@ -548,11 +548,11 @@ By integrating these capabilities into MetaConfigurator, the platform evolves fr
 
 Related work in this area spans several mature but often separate tool families: ontology engineering platforms, transformation tools that convert source data into \gls{rdf}, schema/metadata modeling environments for structured data, and libraries or engines for querying and validation. These families provide strong support for individual tasks, but integrated workflows that combine guided \gls{json} authoring, semantic transformation, \gls{rdf} curation, querying, and \gls{ai}-assisted support in a single user-facing environment are still uncommon.
 
-\subsection{Ontology Engineering and Knowledge Graph Platforms}
+\subsection{Ontology Engineering and \glsentryshort{kg} Platforms}
 
 Protégé and WebProtégé are widely used for ontology engineering and collaborative ontology curation \cite{protege,webprotege}. They provide robust support for class/property modeling and ontology lifecycle management, but they are not primarily designed as schema-driven editors for end-user \gls{json} instance data.
 
-Apache Jena provides a mature programmatic stack for \gls{rdf} processing, reasoning, and \gls{sparql} querying \cite{apache_jena}. GraphDB focuses on \gls{rdf} storage and query execution in production-oriented knowledge graph settings \cite{graphdb}. These systems are strong back-end components, but typically require separate front-end layers for guided data entry and authoring workflows.
+Apache Jena provides a mature programmatic stack for \gls{rdf} processing, reasoning, and \gls{sparql} querying \cite{apache_jena}. GraphDB focuses on \gls{rdf} storage and query execution in production-oriented \gls{kg} settings \cite{graphdb}. These systems are strong back-end components, but typically require separate front-end layers for guided data entry and authoring workflows.
 
 \subsection{Schema and Metadata Modeling for Structured Data}
 

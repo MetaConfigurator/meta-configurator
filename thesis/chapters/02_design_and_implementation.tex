@@ -309,9 +309,6 @@ The \gls{sparql} query functionality is implemented in \texttt{SparqlEditor.vue}
 
 In the \textbf{Query View}, users can write and validate queries in a CodeMirror editor \cite{codemirror} and execute them against the current in-memory \gls{rdf} graph. Query syntax is checked through debounced live validation using the SparqlJS parser, which provides immediate feedback while editing \cite{sparqljs}. The same view also provides \gls{ai}-assisted \gls{sparql} generation. Similar to the \gls{ai}-assisted \gls{rml} workflow described in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, user hints are combined with prompt-engineering instructions and a representative subset of the current \gls{jsonld} data, then sent to the configured \gls{llm} to generate a draft \gls{sparql} query. In simplified form, the prompt includes: (i) output constraints (return only SPARQL), (ii) relevant prefixes/context, (iii) representative graph fragments, and (iv) the user hint. Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated} shows the dialog with an AI-assisted query suggestion in the Query View.
 
-\subsection{Showcase: AI-Assisted SPARQL Query Generation}
-\label{sec:design:query-with-sparql:ai-showcase}
-
 To demonstrate the \gls{ai}-assisted workflow, we assume that the simulation \gls{json} from Listing~\ref{lst:background_json_example} has been extended with additional \texttt{element\_size} and \texttt{max\_von\_mises\_stress} value pairs (e.g., from multiple simulation runs), and then transformed into \gls{jsonld} using the mapping workflow described earlier. In this extended dataset, metric measurements are available for multiple element sizes, for example \texttt{0.003125}, \texttt{0.00625}, \texttt{0.0125}, \texttt{0.05} and \texttt{0.1}.
 
 In this scenario, the user provides a natural-language hint in the Query View to request a query that returns paired values of \texttt{element\_size} and \texttt{max\_von\_mises\_stress}. An example hint is shown in Listing~\ref{lst:design_sparql_ai_hint}. The hint and a subset of the current \gls{jsonld} graph are sent to the AI API, which proposes a draft query that may still contain syntactic or semantic errors. Therefore, the generated query must be reviewed and, if necessary, refined by the user before execution. A representative generated query is shown in Listing~\ref{lst:design_sparql_ai_generated}.
@@ -365,14 +362,14 @@ The \textbf{Visualization} tab renders the query result graph in read-only mode.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.75\linewidth]{../figures/Plot.png}
-  \caption{Data exported as CSV could be visualized as a plot of \texttt{element\_size} vs. \texttt{max\_von\_mises\_stress}, revealing trends in the simulation results.}
+\caption{CSV export visualized: \texttt{element\_size} vs. \texttt{max\_von\_mises\_stress} trends.}
   \label{fig:rdf_authoring_panel:sparql_plot}
 \end{figure}
 
 \newpage
-\section{Knowledge Graph Visualization}\label{sec:design:knowledge-graph-visualization}
+\section{\glsentryshort{kg} Visualization}\label{sec:design:knowledge-graph-visualization}
 
-Knowledge graph rendering is implemented in \texttt{RdfVisualizer.vue} using Cytoscape.js \cite{cytoscapejs}, with the COSE-Bilkent layout extension for force-directed graph placement. The visualization presents resources as nodes and semantic relations as directed edges, while preserving readable labels through namespace-aware prefix shortening.
+\gls{kg} rendering is implemented in \texttt{RdfVisualizer.vue} using Cytoscape.js \cite{cytoscapejs}, with the COSE-Bilkent layout extension for force-directed graph placement. The visualization presents resources as nodes and semantic relations as directed edges, while preserving readable labels through namespace-aware prefix shortening.
 
 The view provides interactive graph navigation features including zoom in/out, fit-to-view, and zoom-to-selected-node actions. For performance and usability, large graphs are detected before rendering and users are prompted to continue or cancel. In addition, graph export is supported as an image, and an optional animation mode can recompute the layout to improve readability after edits.
 
@@ -389,6 +386,6 @@ The visualization also supports clickable hyperlinks for semantic terms. Predica
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.99\linewidth]{../figures/MC-RDF-KG-1.png}
-  \caption{Knowledge graph visualization of the JSON-LD data from Listing~\ref{lst:background_jsonld_example}, rendered in the Visualization dialog.}
+  \caption{\glsentryshort{kg} visualization of the JSON-LD data from Listing~\ref{lst:background_jsonld_example}, rendered in the Visualization dialog.}
   \label{fig:rdf_authoring_panel:kg_visualization}
 \end{figure}

@@ -8,7 +8,7 @@
 \contentsline {subsection}{\numberline {1.2.1}Ontology: Modeling Knowledge Domains}{18}{subsection.71}%
 \contentsline {subsection}{\numberline {1.2.2}Semantic Web Concepts}{18}{subsection.72}%
 \contentsline {subsection}{\numberline {1.2.3}SHACL: Shapes Constraint Language}{19}{subsection.86}%
-\contentsline {subsection}{\numberline {1.2.4}SPARQL: Querying Semantic Data}{21}{subsection.122}%
+\contentsline {subsection}{\numberline {1.2.4}SPARQL: Querying Semantic Data}{20}{subsection.122}%
 \contentsline {subsection}{\numberline {1.2.5}Semantic Data Representation using JSON-LD}{21}{subsection.136}%
 \contentsline {subsection}{\numberline {1.2.6}RML for Mapping JSON to RDF}{22}{subsection.183}%
 \contentsline {section}{\numberline {1.3}MetaConfigurator for Schema-Driven Data Modeling}{24}{section.246}%
@@ -16,7 +16,7 @@
 \contentsline {subsection}{\numberline {1.3.2}AI-Assisted Schema Engineering and Mapping}{29}{subsection.253}%
 \contentsline {subsection}{\numberline {1.3.3}Limitations for Semantic Web Integration}{29}{subsection.254}%
 \contentsline {section}{\numberline {1.4}Related Work}{31}{section.266}%
-\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and Knowledge Graph Platforms}{31}{subsection.267}%
+\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and KG Platforms}{31}{subsection.267}%
 \contentsline {subsection}{\numberline {1.4.2}Schema and Metadata Modeling for Structured Data}{31}{subsection.268}%
 \contentsline {subsection}{\numberline {1.4.3}Transformation from Source Data to RDF}{32}{subsection.269}%
 \contentsline {subsection}{\numberline {1.4.4}Querying, Validation, and Programmatic RDF Processing}{32}{subsection.270}%
@@ -31,17 +31,15 @@
 \contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{42}{subsection.404}%
 \contentsline {subsection}{\numberline {2.1.6}Linked Selection Between Text View and RDF View}{45}{subsection.409}%
 \contentsline {section}{\numberline {2.2}Query with SPARQL}{46}{section.437}%
-\contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{47}{subsection.438}%
-\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{50}{section.465}%
-\contentsline {chapter}{\numberline {3}Application}{53}{chapter.470}%
-\contentsline {section}{\numberline {3.1}JSON Structure of the MOF Synthesis Dataset}{53}{section.471}%
-\contentsline {subsection}{\numberline {3.1.1}CHMO}{53}{subsection.548}%
-\contentsline {section}{\numberline {3.2}RML Mapping}{56}{section.549}%
-\contentsline {subsection}{\numberline {3.2.1}An RML mapping for CHMO integration}{56}{subsection.550}%
-\contentsline {section}{\numberline {3.3}AI-Assisted SPARQL Generation}{58}{section.633}%
-\contentsline {section}{\numberline {3.4}Knowledge Graph Visualization and Editing}{61}{section.654}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{63}{chapter.657}%
-\contentsline {section}{\numberline {4.1}Current Limitations}{63}{section.658}%
-\contentsline {section}{\numberline {4.2}Outlook}{64}{section.659}%
-\contentsline {chapter}{\nonumberline Bibliography}{65}{chapter*.660}%
+\contentsline {section}{\numberline {2.3}KG Visualization}{50}{section.464}%
+\contentsline {chapter}{\numberline {3}Application}{53}{chapter.469}%
+\contentsline {section}{\numberline {3.1}JSON Structure of the MOF Synthesis Dataset}{53}{section.470}%
+\contentsline {section}{\numberline {3.2}CHMO Ontology}{53}{section.547}%
+\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{56}{section.548}%
+\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{58}{section.631}%
+\contentsline {section}{\numberline {3.5}KG Visualization and Editing}{61}{section.652}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{63}{chapter.655}%
+\contentsline {section}{\numberline {4.1}Current Limitations}{63}{section.656}%
+\contentsline {section}{\numberline {4.2}Outlook}{64}{section.657}%
+\contentsline {chapter}{\nonumberline Bibliography}{65}{chapter*.658}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
