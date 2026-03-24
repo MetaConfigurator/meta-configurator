@@ -15,10 +15,8 @@
 \contentsline {figure}{\numberline {2.10}{\ignorespaces Data exported as CSV could be visualized as a plot of \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress}, revealing trends in the simulation results.}}{49}{figure.463}%
 \contentsline {figure}{\numberline {2.11}{\ignorespaces Knowledge graph visualization of the JSON-LD data from Listing~\ref {lst:background_jsonld_example}, rendered in the Visualization dialog.}}{51}{figure.468}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running SPARQL query in Figure~\ref {lst:application_mof_sparql_example}.}}{60}{figure.650}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Knowledge graph visualization of the JSON-LD data in Listing~\ref {lst:application_mof_jsonld_example_s_1}, rendered in the Visualization dialog.}}{61}{figure.653}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running SPARQL query in Figure~\ref {lst:application_mof_sparql_example}.}}{60}{figure.652}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Knowledge graph visualization of the JSON-LD data in Listing~\ref {lst:application_mof_jsonld_example_s_1}, rendered in the Visualization dialog.}}{61}{figure.655}%
 \addvspace {10\p@ }
-\addvspace {10\p@ }
-\def \@chapapp {\appendixname }
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

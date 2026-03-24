@@ -96,9 +96,9 @@ Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof
 
 The \gls{chmo} provides a controlled vocabulary for chemical methods and related experimental concepts, including data-acquisition techniques, preparation and separation procedures, and synthesis methods \cite{chmo_ontology}. Within the broader OBO ecosystem, \gls{chmo} is designed to complement other ontologies such as the \gls{obi}, which captures more general investigation processes and experimental context \cite{obi2016,jackson2021obofoundry}.
 
-Using \gls{chmo} terms in this chapter serves two purposes. First, it anchors synthesis resources to a domain-specific ontology rather than leaving them as generic data records. Second, it improves interoperability, because \gls{chmo}-typed entities can be combined with \gls{obi}- and \gls{chebi}-based descriptions in a shared \gls{rdf} graph.
+Using \gls{chmo} serves two purposes. First, it anchors synthesis resources to a domain-specific ontology rather than leaving them as generic data records. Second, it improves interoperability, because \gls{chmo}-typed entities can be combined with \gls{obi}- and \gls{chebi}-based descriptions in a shared \gls{rdf} graph.
 
-\section{RML Mapping for Semantic Enrichment}\label{sec:application:metal:rml}
+\section{RML Mapping}\label{sec:application:metal:rml}
 
 The \gls{rml} mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} show how the \gls{json} structures defined in Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof_json_example_s_2} are transformed into typed \gls{rdf} resources, as described in Section~\ref{sec:background:rml}. In MetaConfigurator, this is the operational step that bridges conventional \gls{json} input and the \gls{rdf}/\gls{jsonld} authoring and query workflow.
 
@@ -154,11 +154,20 @@ From a workflow perspective, this is crucial for the integration goals discussed
 \end{lstlisting}
 
 A central semantic effect of the mapping is ontology-based typing in \texttt{rr:class}. These class assignments transform plain JSON objects into explicit domain entities. For example, the mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} assign the following classes:
-\begin{itemize}
-    \item \textbf{\texttt{chmo:0000410}} types each synthesis run as a chemistry synthesis entity.
-    \item \textbf{\texttt{obo:CHEBI\_24431}} types each reagent node as a \gls{chebi}-aligned chemical entity.
-    \item \textbf{\texttt{obo:OBI\_0000070}} types each procedure step as an \gls{obi}-aligned experimental/process step entity.
-\end{itemize}
+\begin{table}[htbp]
+  \centering
+  \caption{Ontology classes used in \texttt{rr:class} assignments in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2}}
+  \label{tab:application:mof_rml_class_definitions}
+  \begin{tabular}{p{0.28\linewidth}p{0.22\linewidth}p{0.43\linewidth}}
+    \hline
+    \textbf{Class (Prefix Form)} & \textbf{Ontology} & \textbf{Definition in this mapping context} \\
+    \hline
+    \texttt{chmo:0000410} & \glsentryshort{chmo} & Types each synthesis run as a chemistry synthesis entity. \\
+    \texttt{obo:CHEBI\_24431} & \glsentryshort{chebi} (via OBO IRI) & Types each reagent resource as a chemical entity (e.g., ligand, solvent, substrate). \\
+    \texttt{obo:OBI\_0000070} & \glsentryshort{obi} (via OBO IRI) & Types each procedure-step resource as an experimental/process step entity. \\
+    \hline
+  \end{tabular}
+\end{table}
 
 This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Reagent}, and \texttt{Step} are structural labels only. After \gls{rml} transformation, they become ontology-grounded \gls{rdf} nodes that can be queried by meaning and reused across datasets. Figure~\ref{fig:application:jsonld_example_s_1} shows part of the transformed data in JSON-LD format, representing synthesis run for \texttt{S-1}.
 
@@ -210,7 +219,7 @@ This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Re
 
 \section{AI-Assisted SPARQL Generation}
 
-After the \gls{rml}-based semantic enrichment, users can query the resulting \gls{rdf} graph directly with \gls{sparql}. In practical laboratory workflows, however, writing correct \gls{sparql} often becomes a bottleneck, especially for users with strong domain expertise but limited query-language experience. Therefore, this chapter applies the same \gls{ai}-assisted interaction pattern introduced in Chapter~\ref{sec:design}: users formulate an intent in natural language, and a configured \gls{llm} proposes a first query draft.
+After applying the full mapping in Listing~\ref{lst:application_mof_rml_example_1} and Listing~\ref{lst:application_mof_rml_example_2}, users can query the resulting \gls{rdf} graph directly with \gls{sparql}. In practical laboratory workflows, however, writing correct \gls{sparql} often becomes a bottleneck, especially for users with strong domain expertise but limited query-language experience. Therefore, this chapter applies the same \gls{ai}-assisted interaction pattern introduced in Chapter~\ref{sec:design}: users formulate an intent in natural language, and a configured \gls{llm} proposes a first query draft.
 
 For the \gls{mof} dataset, the main benefit is that users can start from experimental questions (e.g., ``Which Prep steps used which reagent and amount?'') instead of manually constructing triple patterns from scratch. Listing~\ref{lst:application_mof_sparql_example_hint} shows such a concise user hint. Based on this hint and a representative subset of the current \gls{jsonld}/\gls{rdf} graph, the \gls{llm} generates a candidate query, shown in Listing~\ref{lst:application_mof_sparql_example}. Figure~\ref{fig:application:sparql_ai_generated_result} shows the result of executing this query, which retrieves all preparation steps with their associated reagents and amounts for each synthesis run.
 
@@ -245,8 +254,6 @@ ORDER BY ?synthesis ?step
   \label{fig:application:sparql_ai_generated_result}
 \end{figure}
 
-From an application perspective, the key contribution is not only faster query drafting, but also improved reproducibility of analytic intent.
-
 \section{Knowledge Graph Visualization and Editing}\label{sec:application:knowledge-graph-visualization}
 
 After conversion of the synthesis records to \gls{jsonld}, graph visualization becomes a direct, low-friction step in the workflow: users can open the Visualization view and inspect the same underlying \gls{rdf} data as a \gls{kg}, without writing additional transformation code. In this representation, synthesis runs, reagents, and process steps are shown as connected nodes, while semantic relations appear as labeled edges. Figure~\ref{fig:application:kg_visualization} illustrates this view for the mapped \gls{mof} data.
@@ -256,7 +263,7 @@ This immediate \gls{jsonld}-to-\gls{kg} transition improves usability for non-\g
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.99\linewidth]{../figures/MC-RDF-KG-2.png}
-  \caption{Knowledge graph visualization of the JSON-LD data in Listing~\ref{lst:application_mof_jsonld_example_s_1}, rendered in the Visualization dialog.}
+  \caption{Visualization of the JSON-LD data in Listing~\ref{lst:application_mof_jsonld_example_s_1}, rendered in the Visualization dialog.}
   \label{fig:application:kg_visualization}
 \end{figure}
 
