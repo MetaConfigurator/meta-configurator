@@ -34,11 +34,12 @@
 \contentsline {subsection}{\numberline {2.2.1}Showcase: AI-Assisted SPARQL Query Generation}{46}{subsection.438}%
 \contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{50}{section.465}%
 \contentsline {chapter}{\numberline {3}Application}{53}{chapter.470}%
-\contentsline {section}{\numberline {3.1}Metal-Organic Framework Synthesis Using Data Models}{53}{section.471}%
-\contentsline {subsection}{\numberline {3.1.1}How Ontology Classes Add Semantics to JSON Data}{53}{subsection.587}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{59}{chapter.588}%
-\contentsline {chapter}{\nonumberline Bibliography}{61}{chapter*.589}%
+\contentsline {section}{\numberline {3.1}JSON Structure of the MOF Synthesis Dataset}{53}{section.471}%
+\contentsline {section}{\numberline {3.2}RML Mapping for Semantic Enrichment}{53}{section.548}%
+\contentsline {subsection}{\numberline {3.2.1}How Ontology Classes Add Semantics to JSON Data}{57}{subsection.585}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{59}{chapter.586}%
+\contentsline {chapter}{\nonumberline Bibliography}{61}{chapter*.587}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{64}{chapter*.589}%
-\contentsline {chapter}{\numberline {A}Appendix}{65}{appendix.590}%
+\contentsline {part}{Appendix}{64}{chapter*.587}%
+\contentsline {chapter}{\numberline {A}Appendix}{65}{appendix.588}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

@@ -2,13 +2,15 @@
 \chapter{Application}\label{sec:application}
 %%% ===============================================================================
 
-\section{Metal-Organic Framework Synthesis Using Data Models}\label{sec:application:metal}
+This chapter demonstrates the end-to-end application of the thesis workflow to \gls{mof} synthesis data. Structured experiment records are modeled in \gls{json}, transformed into semantically enriched \gls{rdf}/\gls{jsonld} using \gls{rml}, and then prepared for ontology-aware querying and graph-based analysis.
 
-Metal-Organic Framework (MOF) synthesis refers to the stepwise preparation of crystalline coordination materials from metal precursors and organic linkers under controlled laboratory conditions. As emphasized by Neubauer et al. \cite{neubauer2026data}, the synthesis process is not only defined by the final product, but also by the full protocol context (reagents, roles, action sequence, and process conditions), which must be represented in a structured and machine-readable way for analysis and reuse.
+In line with the motivation in Chapters~\ref{sec:background} and~\ref{sec:design}, the main idea is to preserve laboratory protocol detail (materials, actions, and conditions) while adding formal semantics so that the same data can be interpreted consistently across tools and datasets.
 
-Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof_json_example_s_2} represent a structured subset of the MOF synthesis dataset discussed. It models synthesis experiments as process-centric records under \texttt{Synthesis[*]}, where each record combines (i) experimental setup (\texttt{Hardware}), (ii) run-level metadata including product phase (\texttt{Metadata}), (iii) ordered procedural actions across \texttt{Prep}, \texttt{Reaction}, and \texttt{Workup}, and (iv) a reagent inventory with semantic roles such as substrate, ligand, and solvent.
+\section{JSON Structure of the \glsentryshort{mof} Synthesis Dataset}\label{sec:application:metal:json-structure}
 
-In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is represented as a complete protocol instance. The data captures not only which chemicals are used, but also how they are used: quantities, processing actions (e.g., \texttt{Add}, \texttt{Sonicate}, \texttt{HeatChill}, \texttt{Dry}), and operating conditions such as time, temperature, and pressure. Therefore, the JSON represents executable laboratory knowledge in machine-readable form, rather than only final product labels.
+\gls{mof} synthesis refers to the stepwise preparation of crystalline coordination materials from metal precursors and organic linkers under controlled laboratory conditions. The synthesis process is not only defined by the final product, but also by the full protocol context (reagents, roles, action sequence, and process conditions), which should be represented in structured, machine-readable form. \cite{neubauer2026data}
+
+Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof_json_example_s_2} show a representative subset of this dataset. Each top-level entry under \texttt{Synthesis[*]} encodes one complete run (e.g., \texttt{S-1}, \texttt{S-2}) with four core components: hardware setup, run metadata, ordered procedure phases (Prep/Reaction/Workup), and reagent inventory with functional roles.
 
 \begin{lstlisting}[float=htbp,style=json,caption={Representative JSON excerpt from the MOF synthesis dataset for \texttt{S-1}},label={lst:application_mof_json_example_s_1}]
 {
@@ -59,7 +61,7 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
       "Procedure": {
         "Prep": {
           "Step": [
-            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "FeCl3·6H2O", "_order": 0 },
+            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "FeCl3\\u00B76H2O", "_order": 0 },
             { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
             { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "millilitre", "Value": 4}, "_reagent": "DMF", "_order": 2 }
           ]
@@ -79,7 +81,7 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
       },
       "Reagents": {
         "Reagent": [
-          { "_id": "FeCl3%25C2%25B76H2O", "_name": "FeCl3·6H2O", "_role": "substrate" },
+          { "_id": "FeCl3%25C2%25B76H2O", "_name": "FeCl3\\u00B76H2O", "_role": "substrate" },
           { "_id": "Benzene-1%252C4-dicarboxylic%2520acid", "_name": "Benzene-1,4-dicarboxylic acid", "_role": "ligand" },
           { "_id": "DMF", "_name": "DMF", "_role": "solvent" },
           { "_id": "EtOH", "_name": "EtOH", "_role": "solvent" }
@@ -90,10 +92,11 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
 }
 \end{lstlisting}
 
+\section{RML Mapping for Semantic Enrichment}\label{sec:application:metal:rml}
 
+The \gls{rml} mappings in Listings~\ref{lst:application_mof_rml_example_1} and Listings~\ref{lst:application_mof_rml_example_2} show how the \gls{json} structures defined in Listings~\ref{lst:application_mof_json_example_s_1} and Listings~\ref{lst:application_mof_json_example_s_2} are transformed into typed \gls{rdf} resources, as described in Section~\ref{sec:background:rml}. In MetaConfigurator, this is the operational step that bridges conventional \gls{json} input and the \gls{rdf}/\gls{jsonld} authoring and query workflow.
 
-\begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping to convert data in Listing~\ref{lst:application_mof_json_example_s_1} and Listing~\ref{lst:application_mof_json_example_s_2}, focusing on hardware and metadata},label={lst:application_mof_rml_example_1}]
-{
+\begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping focused on synthesis-level hardware and metadata},label={lst:application_mof_rml_example_1}]
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
@@ -111,11 +114,9 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
   rr:predicateObjectMap [ rr:predicate ex:componentType ; rr:objectMap [ rml:reference "Hardware.Component[0]._type" ] ] ;
   rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "Metadata._description" ] ] ;
   rr:predicateObjectMap [ rr:predicate chmo:hasProduct ; rr:objectMap [ rml:reference "Metadata._product" ] ] .
-}
 \end{lstlisting}
 
-\begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping to convert data in Listing~\ref{lst:application_mof_json_example_s_1} and Listing~\ref{lst:application_mof_json_example_s_2}, focusing on reagents and preparation data},label={lst:application_mof_rml_example_2}]
-{
+\begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping focused on reagents and preparation steps},label={lst:application_mof_rml_example_2}]
 <#ReagentSource> rml:source "Data.json" ; rml:referenceFormulation ql:JSONPath ; rml:iterator "$.Synthesis[*].Reagents.Reagent[*]" .
 
 <#ReagentTriplesMap>
@@ -123,6 +124,7 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
   rr:subjectMap [ rr:template "http://example.org/reagent/{_id}" ; rr:class obo:CHEBI_24431 ] ;
   rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "_name" ] ] ;
   rr:predicateObjectMap [ rr:predicate ex:role ; rr:objectMap [ rml:reference "_role" ] ] .
+
 <#PrepStepSource> rml:source "Data.json" ; rml:referenceFormulation ql:JSONPath ; rml:iterator "$.Synthesis[*].Procedure.Prep.Step[*]" .
 
 <#PrepStepTriplesMap>
@@ -132,18 +134,16 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
   rr:predicateObjectMap [ rr:predicate ex:action ; rr:objectMap [ rml:reference "$xml_type" ] ] ;
   rr:predicateObjectMap [ rr:predicate ex:amountValue ; rr:objectMap [ rml:reference "_amount.Value" ] ] ;
   rr:predicateObjectMap [ rr:predicate ex:amountUnit ; rr:objectMap [ rml:reference "_amount.Unit" ] ] .
-}
 \end{lstlisting}
 
 \subsection{How Ontology Classes Add Semantics to JSON Data}\label{sec:application:metal:rml-class-semantics}
 
-Following the RML foundations in Section~\ref{sec:background:rml} and the implementation workflow in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, the key semantic step in this mapping is the use of ontology classes in each \texttt{rr:subjectMap}. These class assignments convert plain JSON objects into typed domain entities:
+A central semantic effect of the mapping is ontology-based typing in \texttt{rr:class}. These class assignments transform plain JSON objects into explicit domain entities. For example, the mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} assign the following classes:
 \begin{itemize}
-    \item \textbf{\texttt{chmo:0000410}} is used for synthesis resources (\texttt{/synthesis/S-1}, \texttt{/synthesis/S-2}), so each top-level JSON experiment is interpreted as a chemistry synthesis entity rather than an unlabeled record.
-    \item \textbf{\texttt{obo:CHEBI\_24431}} is used for reagent resources, so entries such as \texttt{FeCl3}, \texttt{DMF}, or \texttt{Benzene-1,4-dicarboxylic acid} are explicitly interpreted as chemical entities with roles.
-    \item \textbf{\texttt{obo:OBI\_0000070}} is used for process-step resources, so preparation/reaction/workup actions are represented as typed process nodes and can be analyzed as workflow steps.
+    \item \textbf{\texttt{chmo:0000410}} types each synthesis run as a chemistry synthesis entity.
+    \item \textbf{\texttt{obo:CHEBI\_24431}} types each reagent node as a chemical entity.
+    \item \textbf{\texttt{obo:OBI\_0000070}} types each procedure step as an experimental/process step entity.
 \end{itemize}
 
-This typing adds semantics in a way that raw JSON alone cannot provide. In JSON, \texttt{Synthesis}, \texttt{Reagent}, or \texttt{Step} are only structural keys. After mapping, they become ontology-grounded RDF nodes that can be queried and linked by meaning (e.g., ``all chemical entities'', ``all process steps'', ``all synthesis runs''). This is exactly the transition from structural representation to semantic representation discussed in Sections~\ref{sec:background:jsonld} and~\ref{sec:background:rml}.
+This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Reagent}, and \texttt{Step} are structural labels only. After \gls{rml} transformation, they become ontology-grounded \gls{rdf} nodes that can be queried by meaning and reused across datasets. This is the semantic lifting described in Sections~\ref{sec:background:jsonld} and~\ref{sec:background:rml}.
 
-Practically, these class assertions are important because they enable reusable SPARQL query patterns and graph interpretation in the MetaConfigurator pipeline (Section~\ref{sec:design:query-with-sparql} and Section~\ref{sec:design:knowledge-graph-visualization}). Instead of querying ad-hoc JSON paths, users can query typed entities and relations across datasets with consistent semantics.
