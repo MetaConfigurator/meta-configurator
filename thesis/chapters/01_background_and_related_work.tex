@@ -7,7 +7,7 @@ The increasing adoption of computational experiments and simulation workflows in
 \subsection{JSON as a Data Representation Format}
 \label{sec:background:json}
 
-\gls{json} is a lightweight data-interchange format widely used for representing structured data in web services, scientific workflows, and configuration systems. \gls{json} encodes data as attribute-value pairs and ordered lists, making it human-readable and easy to parse by machines. Due to its simplicity and broad ecosystem support, \gls{json} has become a de facto standard for structured data exchange across many domains \cite{json_standard}.
+\gls{json} is a lightweight data-interchange format widely used for representing structured data in web services, scientific workflows, and configuration systems. \gls{json} encodes data as attribute-value pairs and ordered lists, making it both human-readable and machine-parseable. Due to its simplicity and broad ecosystem support, \gls{json} has become a de facto standard for structured data exchange across many domains \cite{json_standard}.
 
 In computational science workflows, \gls{json} files often capture experiment parameters and resulting metrics. The following example illustrates a minimal \gls{json} document describing the input parameter \texttt{element\_size} and the resulting metric \texttt{max\_von\_mises\_stress}.
 
@@ -30,9 +30,9 @@ In computational science workflows, \gls{json} files often capture experiment pa
 }
 \end{lstlisting}
 
-In Listing~\ref{lst:background_json_example}, each entry in the \texttt{parameters} array contains a \texttt{name} (e.g., \texttt{element\_size}), a numeric \texttt{value} (\texttt{0.025}), and a \texttt{unit} (\texttt{m}), while each entry in the \texttt{metrics} array contains a result variable such as \texttt{max\_von\_mises\_stress}.~\cite{Unger2026Platform}
+In Listing~\ref{lst:background_json_example}, each entry in the \texttt{parameters} array contains a \texttt{name} (e.g., \texttt{element\_size}), a numeric \texttt{value} (\texttt{0.025}), and a \texttt{unit} (\texttt{m}), while each entry in the \texttt{metrics} array contains a result variable such as \texttt{max\_von\_mises\_stress}.
 
-In our benchmark example, \texttt{element\_size} represents a meshing property that controls mesh density for \(h\)-refinement, i.e., the characteristic size of finite elements. The \texttt{max\_von\_mises\_stress} value is a scalar result metric defined as the maximum von Mises stress over the simulated domain.~\cite{Unger2026Platform} 
+In our benchmark example, \texttt{element\_size} represents a meshing property that controls mesh density for \(h\)-refinement, i.e., the characteristic size of finite elements. The \texttt{max\_von\_mises\_stress} value is a scalar result metric defined as the maximum von Mises stress over the simulated domain \cite{Unger2026Platform}. 
 
 While \gls{json} provides a convenient serialization format, it does not inherently enforce structural constraints. Therefore, additional mechanisms are required to validate that \gls{json} documents conform to an expected structure.
 
@@ -115,7 +115,7 @@ In this definition, the key terms can be interpreted as follows:
     \item \textbf{Shared conceptualization}: The model captures a common understanding of a domain agreed upon by a community, allowing data created by different people or systems to be interpreted in the same way.
 \end{itemize}
 
-Later work further emphasizes that ontologies should be formal and shared in order to support machine interpretation and interoperability across communities \cite{guarino1998formal,studer1998knowledge}. They enable shared understanding among humans and machines by defining classes, properties, and axioms that describe entities and their interrelations.
+Subsequent work emphasizes the need for formal ontology foundations \cite{guarino1998formal} and shared conceptual models for interoperable knowledge engineering \cite{studer1998knowledge}. Together, these perspectives support machine interpretation across communities.
 
 In the context of scientific experiments, ontologies can define experiment parameters, measurement units, procedures, and results. For example, an ontology might define a class 
 \href{https://schema.org/PropertyValue}{\texttt{PropertyValue}} 
@@ -132,9 +132,9 @@ Ontologies serve as the backbone for semantic data integration and reasoning. Th
 \subsection{Semantic Web Concepts}
 \label{sec:background:semantic_web}
 
-The Semantic Web extends the World Wide Web by enabling data to be represented in a machine-readable, semantically rich form. Data is described using standards such as \gls{rdf}, which encodes information as triples consisting of subject, predicate, and object. This allows heterogeneous data to be interlinked and queried using semantic technologies \cite{berners2001semantic}.
+The Semantic Web extends the World Wide Web by enabling data to be represented in a machine-readable, semantically rich form. Data is described using standards such as \gls{rdf}, which encodes information as triples consisting of subject, predicate, and object. This allows heterogeneous data to be interlinked and queried using semantic technologies \cite{berners2001semantic,rdf_concepts2014}.
 
-\gls{jsonld} is one of the key technologies bridging conventional \gls{json} data and the Semantic Web. By adding semantic annotations, \gls{jsonld} enables \gls{json} documents to be interpreted as \gls{rdf} graphs. For instance, in the example simulation data (Listing~\ref{lst:background_qudt_example}), the simulation parameter \texttt{element\_size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} class.
+\gls{jsonld} is one of the key technologies bridging conventional \gls{json} and the Semantic Web. By adding semantic annotations, \gls{jsonld} enables \gls{json} documents to be interpreted as \gls{rdf} graphs. For instance, in the example simulation data (Listing~\ref{lst:background_qudt_example}), the simulation parameter \texttt{element\_size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} class.
 
 \begin{lstlisting}[float=htbp,style=json, caption={Example of semantic annotation of a parameter \texttt{element\_size}}, label={lst:background_qudt_example}]
 {
@@ -220,7 +220,7 @@ By applying this shape, \gls{rdf} data can be automatically checked for complian
 \subsection{SPARQL: Querying Semantic Data}
 \label{sec:background:sparql}
 
-\gls{sparql} is the standard query language for \gls{rdf} datasets \cite{sparql_standard}. \gls{sparql} allows retrieval, filtering, and aggregation of data stored in knowledge graphs. Queries are expressed in terms of triples, similar to \gls{rdf} statements.
+\gls{sparql} is the standard query language for \gls{rdf} datasets \cite{sparql_standard}, supporting retrieval, filtering, and aggregation of data stored in knowledge graphs. Queries are expressed in terms of triples, similar to \gls{rdf} statements.
 
 Listing~\ref{lst:background_sparql_example} presents an SPARQL example using the \gls{jsonld} simulation data, where all experiment parameters and metrics are retrieved together with their corresponding values and units.
 
@@ -316,7 +316,7 @@ This structure allows each entity to be unambiguously identified, linked, and qu
 
 \gls{rml} is a declarative language for transforming heterogeneous data sources into \gls{rdf} representations. \gls{rml} extends the \gls{w3c}-standardized \gls{r2rml} language and supports mappings from \gls{json}, \gls{xml}, \gls{csv}, and relational databases into \gls{rdf} datasets \cite{dimou2014rml}.
 
-Formally, an \gls{rdf} triple is a 3-tuple:
+Formally, an \gls{rdf} triple is a 3-tuple \cite{rdf_concepts2014}:
 \[
 (s, p, o) \in (U \cup B) \times U \times (U \cup B \cup L)
 \]
@@ -428,7 +428,7 @@ Through this mapping process, structured simulation outputs are automatically co
 
 The technologies discussed in the previous sections enable structured, validated, and semantically enriched data representations. However, creating and editing such structured data manually can be challenging, particularly for users who are not familiar with textual formats such as \gls{json} or with schema-based validation mechanisms. To address this challenge, tools that support schema-driven data modeling and editing are required.
 
-MetaConfigurator\footnote{\url{https://www.metaconfigurator.org}} is an open-source web application designed to simplify the creation, editing, and management of structured data and schemas \cite{metaconfigurator2024,metaconfigurator2025datamodels}. The tool generates \glspl{gui} dynamically based on a provided schema, allowing users to interact with structured data through intuitive forms rather than manually editing raw text files. By leveraging JSON Schema as the underlying model description, MetaConfigurator enables consistent data validation and guided data entry.
+MetaConfigurator\footnote{\url{https://www.metaconfigurator.org}} is an open-source web application designed to simplify the creation, editing, and management of structured data files and their accompanying schemas \cite{metaconfigurator2024,metaconfigurator2025datamodels}. The tool generates \glspl{gui} dynamically based on a provided schema, allowing users to interact with structured data through intuitive forms rather than manually editing raw text files. By leveraging JSON Schema as the underlying model description, MetaConfigurator enables consistent data validation and guided data entry.
 
 MetaConfigurator follows a schema-driven approach: the structure of the \gls{ui} is derived directly from the schema that describes the data model. This design allows the same tool to be applied across different domains without the need to implement domain-specific \glspl{ui}. The application runs entirely in the user's browser and supports multiple structured data formats such as \gls{json} and \gls{yaml} \cite{metaconfigurator2024,metaconfigurator2025datamodels}.
 
@@ -486,9 +486,9 @@ The above extensions were demonstrated in a chemistry use case, where tabular ex
 \subsection{AI-Assisted Schema Engineering and Mapping}
 \label{sec:background:metaconfigurator_ai}
 
-Recent work extends MetaConfigurator with \gls{ai}-assisted support for schema creation, schema modification, and schema mapping based on natural-language user input \cite{ai_assisted_schema_mapping_2025}. The approach combines large language models with deterministic safeguards to improve reliability and usability.
+Recent work extends MetaConfigurator with \gls{ai}-assisted support for schema creation, modification, and mapping from natural-language user input \cite{ai_assisted_schema_mapping_2025}. The approach combines large language models with deterministic safeguards to improve reliability and usability.
 
-For schema authoring, MetaConfigurator provides a chat-like interface where users describe their intent in natural language. The system then performs prompt construction and context management automatically, including role instructions, task-specific formatting constraints, and relevant schema context. Generated results are directly validated and visualized in the schema editor, and users remain in control through a human-in-the-loop workflow where generated output can be reviewed and manually refined before acceptance.
+For schema authoring, MetaConfigurator provides a chat-like interface where users describe their intent in natural language. The system then performs prompt construction and context management automatically, including role instructions, task-specific formatting constraints, and relevant schema context. Generated results are directly validated and visualized in the schema editor, and users remain in control through a manual validation workflow where generated output can be reviewed and refined before acceptance.
 
 For data transformation, the system generates mapping expressions from user input and executes these mappings deterministically. In the presented implementation, JSONata expressions are generated from an input document and a target schema, then validated and executed in a controlled pipeline. This separates \gls{ai}-based generation from rule execution and supports scalable transformation workflows across heterogeneous source formats.
 
@@ -508,7 +508,7 @@ Several limitations arise from this restriction:
     \item \textbf{No direct inspection or editing of RDF triples:}  
     MetaConfigurator does not provide mechanisms for inspecting or manipulating \gls{rdf} triples derived from the underlying \gls{json} data. As a result, users cannot directly view the semantic graph structure implied by \gls{jsonld} documents.
 
-    \item \textbf{Missing transformation from JSON to RDF:}  
+    \item \textbf{Lack of transformation from JSON to RDF:}  
     The platform lacks built-in mechanisms for transforming conventional \gls{json} documents into semantic representations. As discussed in Section~\ref{sec:background:rml}, technologies such as \gls{rml} enable declarative transformations from \gls{json} to \gls{rdf}, but such transformations are not currently integrated into MetaConfigurator's workflow.
 
     \item \textbf{Lack of semantic querying capabilities:}  
@@ -610,7 +610,7 @@ Redland RDF & \dingcheck & Limited & -- & Partial & -- & -- \\
 \hline
 \dingcheck & Native, first-class support \\
 \cdashline{1-2}
-Partial & Substantial but scope-limited support (often programmatic rather than end-user focused) \\
+Partial & Substantial but scope-limited support (often programmatic rather than end-user-focused) \\
 \cdashline{1-2}
 Limited & Basic or indirect support (e.g., plugin-based, narrow subset, or lightweight/read-only capability) \\
 \cdashline{1-2}
@@ -633,7 +633,9 @@ Although these tools provide strong support for individual Semantic Web tasks, s
 
     \item \textbf{Limited end-to-end support in one UI:} Most tools focus on a single task—such as ontology editing, mapping definition, or querying—rather than supporting the entire workflow from data authoring and transformation to validation, querying, and graph exploration in a unified environment.
 
-    \item \textbf{Limited AI support in semantic authoring workflows:} Despite recent advances in generative \gls{ai}, assistance for generating artifacts such as \gls{sparql} queries or \gls{rml} mappings from natural language or user intent is still rarely integrated into Semantic Web authoring tools.
+    \item \textbf{Limited AI support in semantic authoring workflows:} Despite recent advances in generative \gls{ai}, assistance for generating artifacts such as \gls{sparql} queries or \gls{rml} mappings from natural-language descriptions of user intent is still rarely integrated into Semantic Web authoring tools.
 \end{itemize}
 
 This thesis addresses these gaps by extending MetaConfigurator from a schema-guided data modeling tool into an integrated \gls{rdf} authoring environment. In particular, it supports a continuous workflow from \gls{json} authoring to \gls{jsonld}/\gls{rdf} transformation, ontology-aware triple editing, integrated \gls{sparql} querying, graph visualization, and \gls{ai}-assisted drafting of \gls{sparql} queries and \gls{rml} mappings.
+
+Chapter~\ref{sec:design} builds on this background by translating these requirements into concrete architectural and implementation decisions for the \gls{rdf} authoring extension in MetaConfigurator.

@@ -433,7 +433,6 @@
       \strng{authornamehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
       \strng{authorfullhash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
       \strng{authorfullhashraw}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \field{extraname}{1}
       \field{labelalpha}{CG}
       \field{sortinit}{C}
       \field{sortinithash}{4d103a86280481745c9c897c925753c0}
@@ -447,30 +446,48 @@
       \verb https://github.com/SPARQL-Generate
       \endverb
     \endentry
-    \entry{jsonld_playground}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=22552eda6234a0909be370deaad9863f}{%
-           family={CG},
+    \entry{rdf_concepts2014}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=ff065518eacac535eec041c322c21896}{%
+           family={Cyganiak},
            familyi={C\bibinitperiod},
-           given={JSON-LD},
-           giveni={J\bibinithyphendelim L\bibinitperiod}}}%
+           given={Richard},
+           giveni={R\bibinitperiod}}}%
+        {{hash=ad0aae768a1174aba9738b6d2719985b}{%
+           family={Wood},
+           familyi={W\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=d91ccb882c2defa0b7d5801d3486fe95}{%
+           family={Lanthaler},
+           familyi={L\bibinitperiod},
+           given={Markus},
+           giveni={M\bibinitperiod}}}%
       }
-      \strng{namehash}{22552eda6234a0909be370deaad9863f}
-      \strng{fullhash}{22552eda6234a0909be370deaad9863f}
-      \strng{fullhashraw}{22552eda6234a0909be370deaad9863f}
-      \strng{bibnamehash}{22552eda6234a0909be370deaad9863f}
-      \strng{authorbibnamehash}{22552eda6234a0909be370deaad9863f}
-      \strng{authornamehash}{22552eda6234a0909be370deaad9863f}
-      \strng{authorfullhash}{22552eda6234a0909be370deaad9863f}
-      \strng{authorfullhashraw}{22552eda6234a0909be370deaad9863f}
-      \field{extraname}{2}
-      \field{labelalpha}{CG23}
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{239617b5251160922f9c0eb4e93d3c6d}
+      \strng{fullhash}{6150123d390d138e88985af00327f937}
+      \strng{fullhashraw}{6150123d390d138e88985af00327f937}
+      \strng{bibnamehash}{6150123d390d138e88985af00327f937}
+      \strng{authorbibnamehash}{6150123d390d138e88985af00327f937}
+      \strng{authornamehash}{239617b5251160922f9c0eb4e93d3c6d}
+      \strng{authorfullhash}{6150123d390d138e88985af00327f937}
+      \strng{authorfullhashraw}{6150123d390d138e88985af00327f937}
+      \field{labelalpha}{CWL14}
       \field{sortinit}{C}
       \field{sortinithash}{4d103a86280481745c9c897c925753c0}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{JSON-LD Playground}
-      \field{year}{2023}
+      \field{title}{RDF 1.1 Concepts and Abstract Syntax}
+      \field{year}{2014}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/rdf11-concepts/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/rdf11-concepts/
+      \endverb
     \endentry
     \entry{das2012r2rml}{misc}{}{}
       \name{author}{3}{}{%
@@ -1679,20 +1696,20 @@
     \endentry
     \entry{semtk}{misc}{}{}
       \name{author}{1}{}{%
-        {{hash=947a185dd2612327d37f45299175d357}{%
+        {{hash=3e6a6f24c2db79cd880154f9292e5774}{%
            family={Semantic\bibnamedelimb Computing\bibnamedelimb Research\bibnamedelima Group},
            familyi={S\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim R\bibinitperiod\bibinitdelim G\bibinitperiod},
-           given={Wright\bibnamedelimb State\bibnamedelima U.},
+           given={Wright\bibnamedelimb State\bibnamedelima University},
            giveni={W\bibinitperiod\bibinitdelim S\bibinitperiod\bibinitdelim U\bibinitperiod}}}%
       }
-      \strng{namehash}{947a185dd2612327d37f45299175d357}
-      \strng{fullhash}{947a185dd2612327d37f45299175d357}
-      \strng{fullhashraw}{947a185dd2612327d37f45299175d357}
-      \strng{bibnamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authorbibnamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authornamehash}{947a185dd2612327d37f45299175d357}
-      \strng{authorfullhash}{947a185dd2612327d37f45299175d357}
-      \strng{authorfullhashraw}{947a185dd2612327d37f45299175d357}
+      \strng{namehash}{3e6a6f24c2db79cd880154f9292e5774}
+      \strng{fullhash}{3e6a6f24c2db79cd880154f9292e5774}
+      \strng{fullhashraw}{3e6a6f24c2db79cd880154f9292e5774}
+      \strng{bibnamehash}{3e6a6f24c2db79cd880154f9292e5774}
+      \strng{authorbibnamehash}{3e6a6f24c2db79cd880154f9292e5774}
+      \strng{authornamehash}{3e6a6f24c2db79cd880154f9292e5774}
+      \strng{authorfullhash}{3e6a6f24c2db79cd880154f9292e5774}
+      \strng{authorfullhashraw}{3e6a6f24c2db79cd880154f9292e5774}
       \field{labelalpha}{Sem}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
@@ -1874,6 +1891,35 @@
       \endverb
       \verb{url}
       \verb https://www.w3.org/TR/shacl/
+      \endverb
+    \endentry
+    \entry{jsonld_playground}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=e98011534a9779c6c3cdea80268131ae}{%
+           family={{W3C JSON-LD Community Group}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{fullhash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{fullhashraw}{e98011534a9779c6c3cdea80268131ae}
+      \strng{bibnamehash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{authorbibnamehash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{authornamehash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{authorfullhash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{authorfullhashraw}{e98011534a9779c6c3cdea80268131ae}
+      \field{labelalpha}{W3C23}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Online tool maintained by the W3C JSON-LD Community Group}
+      \field{title}{JSON-LD Playground}
+      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://json-ld.org/playground/
+      \endverb
+      \verb{url}
+      \verb https://json-ld.org/playground/
       \endverb
     \endentry
     \entry{wright2020jsonschema}{misc}{}{}

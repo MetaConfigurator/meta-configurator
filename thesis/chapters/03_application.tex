@@ -8,7 +8,7 @@ In line with the motivation in Chapters~\ref{sec:background} and~\ref{sec:design
 
 \section{JSON Structure of the \glsentryshort{mof} Synthesis Dataset}\label{sec:application:metal:json-structure}
 
-\gls{mof} synthesis refers to the stepwise preparation of crystalline coordination materials from metal precursors and organic linkers under controlled laboratory conditions. The synthesis process is not only defined by the final product, but also by the full protocol context (reagents, roles, action sequence, and process conditions), which should be represented in structured, machine-readable form. \cite{neubauer2026data}
+\gls{mof} synthesis refers to the stepwise preparation of crystalline coordination materials from metal precursors and organic linkers under controlled laboratory conditions. Beyond the final product, the process is characterized by full protocol context, including reagents, roles, action sequence, and process conditions, which should be represented in structured, machine-readable form \cite{neubauer2026data}.
 
 Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof_json_example_s_2} show a representative subset of this dataset. Each top-level entry under \texttt{Synthesis[*]} encodes one complete run (e.g., \texttt{S-1}, \texttt{S-2}) with four core components: hardware setup, run metadata, ordered procedure phases (Prep/Reaction/Workup), and reagent inventory with functional roles.
 
@@ -130,7 +130,7 @@ From a workflow perspective, this is crucial for the integration goals discussed
   rr:predicateObjectMap [ rr:predicate ex:componentID ; rr:objectMap [ rml:reference "Hardware.Component[0]._id" ] ] ;
   rr:predicateObjectMap [ rr:predicate ex:componentType ; rr:objectMap [ rml:reference "Hardware.Component[0]._type" ] ] ;
   rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "Metadata._description" ] ] ;
-  rr:predicateObjectMap [ rr:predicate chmo:hasProduct ; rr:objectMap [ rml:reference "Metadata._product" ] ] .
+  rr:predicateObjectMap [ rr:predicate ex:hasProduct ; rr:objectMap [ rml:reference "Metadata._product" ] ] .
 \end{lstlisting}
 
 \begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping focused on reagents and preparation steps},label={lst:application_mof_rml_example_2}]
@@ -169,7 +169,7 @@ A central semantic effect of the mapping is ontology-based typing in \texttt{rr:
   \end{tabular}
 \end{table}
 
-This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Reagent}, and \texttt{Step} are structural labels only. After \gls{rml} transformation, they become ontology-grounded \gls{rdf} nodes that can be queried by meaning and reused across datasets. Figure~\ref{fig:application:jsonld_example_s_1} shows part of the transformed data in JSON-LD format, representing synthesis run for \texttt{S-1}.
+This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Reagent}, and \texttt{Step} are structural labels only. After \gls{rml} transformation, they become ontology-grounded \gls{rdf} nodes that can be queried by meaning and reused across datasets. Listing~\ref{lst:application_mof_jsonld_example_s_1} shows part of the transformed data in JSON-LD format, representing synthesis run for \texttt{S-1}.
 
 \begin{lstlisting}[float=htbp,style=json, caption={Representative JSON-LD excerpt from the MOF synthesis dataset for \texttt{S-1} after RML Mapping}, label={lst:application_mof_jsonld_example_s_1}]
 {
@@ -210,7 +210,7 @@ This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Re
         { "@id": "ex:step/workup/S-1-0" },
         { "@id": "ex:step/workup/S-1-1" }
       ],
-      "obo:CHMO_hasProduct": "MIL-88B (Fe)",
+      "ex:hasProduct": "MIL-88B (Fe)",
       "rdfs:label": "S-1"
     }
   ]
@@ -221,9 +221,9 @@ This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Re
 
 After applying the full mapping in Listing~\ref{lst:application_mof_rml_example_1} and Listing~\ref{lst:application_mof_rml_example_2}, users can query the resulting \gls{rdf} graph directly with \gls{sparql}. In practical laboratory workflows, however, writing correct \gls{sparql} often becomes a bottleneck, especially for users with strong domain expertise but limited query-language experience. Therefore, this chapter applies the same \gls{ai}-assisted interaction pattern introduced in Chapter~\ref{sec:design}: users formulate an intent in natural language, and a configured \gls{llm} proposes a first query draft.
 
-For the \gls{mof} dataset, the main benefit is that users can start from experimental questions (e.g., ``Which Prep steps used which reagent and amount?'') instead of manually constructing triple patterns from scratch. Listing~\ref{lst:application_mof_sparql_example_hint} shows such a concise user hint. Based on this hint and a representative subset of the current \gls{jsonld}/\gls{rdf} graph, the \gls{llm} generates a candidate query, shown in Listing~\ref{lst:application_mof_sparql_example}. Figure~\ref{fig:application:sparql_ai_generated_result} shows the result of executing this query, which retrieves all preparation steps with their associated reagents and amounts for each synthesis run.
+For the \gls{mof} dataset, the main benefit is that users can start from experimental questions (e.g., ``Which Prep steps used which reagent, and in what amount?'') instead of manually constructing triple patterns from scratch. Listing~\ref{lst:application_mof_sparql_example_hint} shows such a concise user hint. Based on this hint and a representative subset of the current \gls{jsonld}/\gls{rdf} graph, the \gls{llm} generates a candidate query, shown in Listing~\ref{lst:application_mof_sparql_example}. Figure~\ref{fig:application:sparql_ai_generated_result} shows the result of executing this query, which retrieves all preparation steps with their associated reagents and amounts for each synthesis run.
 
-This workflow lowers the entry barrier for \gls{sparql} authoring, reduces trial-and-error iterations in the query editor, and helps domain experts focus on scientific interpretation rather than query syntax details. At the same time, the generated query remains a draft artifact: it can contain modeling assumptions or predicate choices that require correction. Consequently, a human-in-the-loop review step remains mandatory before execution.
+This workflow lowers the entry barrier for \gls{sparql} authoring, reduces trial-and-error iterations in the query editor, and helps domain experts focus on scientific interpretation rather than query syntax details. At the same time, the generated query remains a draft artifact: it can contain modeling assumptions or predicate choices that require correction. Consequently, a user-controlled review step remains mandatory before execution.
 
 \begin{lstlisting}[float=htbp,style=plaintext,caption={Example user hint for AI-assisted SPARQL generation}, label={lst:application_mof_sparql_example_hint}]
 Retrieve all Prep steps with their reagents and amounts for each synthesis.
@@ -250,7 +250,7 @@ ORDER BY ?synthesis ?step
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.99\linewidth]{../figures/MC-RDF-SPARQL-3.png}
-  \caption{Result after running SPARQL query in Figure~\ref{lst:application_mof_sparql_example}.}
+  \caption{Result after running the SPARQL query from Listing~\ref{lst:application_mof_sparql_example}.}
   \label{fig:application:sparql_ai_generated_result}
 \end{figure}
 
