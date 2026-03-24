@@ -76,24 +76,14 @@ You can optionally open a **Draft Pull Request** earlier during development to g
 
 ---
 
-## Commit Message Convention
+## Pull Request Guidelines
 
-This project follows [Conventional Commits](https://www.conventionalcommits.org/). Every commit message must start with a **type prefix**, followed by a short description written as a **verb phrase starting with a capital letter**.
+- **Title:** Must follow the [Conventional Commits](https://www.conventionalcommits.org/) format — `<type>: <Verb> <subject>` — e.g. `feat: Add searchbar component`. This is required because the PR title is used as the squash merge commit message on `main`, from which the CI/CD pipeline automatically determines the semantic version bump and creates a release tag.
+- **Description:** Always explain **why** the change is needed, not just what was changed. Link the related issue.
+- **Scope:** Keep PRs focused on a single concern. Smaller PRs are reviewed faster and merged sooner.
+- **Discussion:** PRs are the primary place for code review discussion. Use inline comments and the general PR thread to ask questions and suggest improvements.
 
-```
-<type>: <Verb> <subject>
-```
-
-**Examples:**
-```
-feat: Add searchbar component
-fix: Resolve crash when schema is empty
-refactor: Extract validation logic into utility
-docs: Update contributing guide
-chore: Bump version to 2.1.0
-```
-
-**Type prefixes and their effect on versioning:**
+**PR title type prefixes and their effect on versioning:**
 
 | Prefix | Description | Version bump |
 |---|---|---|
@@ -104,18 +94,9 @@ chore: Bump version to 2.1.0
 | `docs:` | Documentation only | Patch |
 | `chore:` | Build process, dependencies, tooling | Patch |
 | `test:` | Adding or fixing tests | Patch |
-| `BREAKING CHANGE:` | Incompatible API change | Major (`X.0.0`) |
+| `breaking:` | Incompatible API change | Major (`X.0.0`) |
 
-The CI/CD pipeline uses these prefixes to automatically determine the next [semantic version](https://semver.org/) when commits are merged to `main`.
-
----
-
-## Pull Request Guidelines
-
-- **Title:** Use the same convention as commit messages — `<type>: <Verb> <subject>`.
-- **Description:** Always explain **why** the change is needed, not just what was changed. Link the related issue.
-- **Scope:** Keep PRs focused on a single concern. Smaller PRs are reviewed faster and merged sooner.
-- **Discussion:** PRs are the primary place for code review discussion. Use inline comments and the general PR thread to ask questions and suggest improvements.
+PRs are always merged via **squash merge**, so the PR title becomes the single commit message on `main`. Individual commit messages on your branch are not required to follow the Conventional Commits format, but should still start with a verb and clearly describe what was done, e.g. `Add validation for empty schema` — this helps reviewers follow your work in the PR.
 
 ---
 
