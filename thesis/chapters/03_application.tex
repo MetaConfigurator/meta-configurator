@@ -4,6 +4,9 @@
 
 \section{Metal-Organic Framework Synthesis Using Data Models}\label{sec:application:metal}
 
+The following excerpt represents a structured subset of the MOF synthesis dataset discussed by Neubauer et al. \cite{neubauer2026data}. It models synthesis experiments as process-centric records under \texttt{Synthesis[*]}, where each record combines (i) experimental setup (\texttt{Hardware}), (ii) run-level metadata including product phase (\texttt{Metadata}), (iii) ordered procedural actions across \texttt{Prep}, \texttt{Reaction}, and \texttt{Workup}, and (iv) a reagent inventory with semantic roles such as substrate, ligand, and solvent.
+
+In this excerpt, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is represented as a complete protocol instance. The data captures not only which chemicals are used, but also how they are used: quantities, processing actions (e.g., \texttt{Add}, \texttt{Sonicate}, \texttt{HeatChill}, \texttt{Dry}), and operating conditions such as time, temperature, and pressure. Therefore, the JSON represents executable laboratory knowledge in machine-readable form, rather than only final product labels.
 
 \begin{lstlisting}[float=htbp,style=json,caption={Representative JSON excerpt from the MOF synthesis dataset},label={lst:application_mof_json_example}]
 {
