@@ -2427,6 +2427,7 @@
     <bcf:citekey order="43" intorder="1">codemirror</bcf:citekey>
     <bcf:citekey order="44" intorder="1">sparqljs</bcf:citekey>
     <bcf:citekey order="45" intorder="1">cytoscapejs</bcf:citekey>
+    <bcf:citekey order="46" intorder="1">neubauer2026data</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

@@ -909,6 +909,68 @@
       \verb 10.1007/s13222-024-00472-7
       \endverb
     \endentry
+    \entry{neubauer2026data}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{8}{}{%
+        {{hash=cee8fd4aa4588c8a57078a2b835113dc}{%
+           family={Neubauer},
+           familyi={N\bibinitperiod},
+           given={Felix},
+           giveni={F\bibinitperiod}}}%
+        {{hash=e4fa020258ffd675f3cb21d322f44be1}{%
+           family={Endo},
+           familyi={E\bibinitperiod},
+           given={Kenichi},
+           giveni={K\bibinitperiod}}}%
+        {{hash=467474255c135a52b785df8ce5c23071}{%
+           family={Bender},
+           familyi={B\bibinitperiod},
+           given={Frederic},
+           giveni={F\bibinitperiod}}}%
+        {{hash=bcd9cd7f32c5cfd6d61349c002d0948d}{%
+           family={Ciftci},
+           familyi={C\bibinitperiod},
+           given={Esengül},
+           giveni={E\bibinitperiod}}}%
+        {{hash=7df184f09ac09eccb1c9aeed4098ce5c}{%
+           family={Hansen},
+           familyi={H\bibinitperiod},
+           given={Niels},
+           giveni={N\bibinitperiod}}}%
+        {{hash=8320332a3ba85988cc75fcff2709106f}{%
+           family={Krause},
+           familyi={K\bibinitperiod},
+           given={Simon},
+           giveni={S\bibinitperiod}}}%
+        {{hash=96492da40bafc5224b4ca48bed84b96a}{%
+           family={Uekermann},
+           familyi={U\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod}}}%
+        {{hash=a53295d118b38d3f18e99b0bcb23e584}{%
+           family={Pleiss},
+           familyi={P\bibinitperiod},
+           given={Jürgen},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{926ca14259e9aca676d600426b174a2a}
+      \strng{fullhash}{0f8c6dc958dee37b9532b7e97c42550d}
+      \strng{fullhashraw}{0f8c6dc958dee37b9532b7e97c42550d}
+      \strng{bibnamehash}{0f8c6dc958dee37b9532b7e97c42550d}
+      \strng{authorbibnamehash}{0f8c6dc958dee37b9532b7e97c42550d}
+      \strng{authornamehash}{926ca14259e9aca676d600426b174a2a}
+      \strng{authorfullhash}{0f8c6dc958dee37b9532b7e97c42550d}
+      \strng{authorfullhashraw}{0f8c6dc958dee37b9532b7e97c42550d}
+      \field{extraname}{2}
+      \field{labelalpha}{NEB+26}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Data-Model-Driven Management and Analysis of MOF Synthesis Data}
+      \field{year}{2026}
+    \endentry
     \entry{metaconfigurator2025datamodels}{inproceedings}{}{}
       \name{author}{3}{}{%
         {{hash=cee8fd4aa4588c8a57078a2b835113dc}{%
@@ -938,7 +1000,7 @@
       \strng{authornamehash}{926ca14259e9aca676d600426b174a2a}
       \strng{authorfullhash}{d19ca2262e67712bd506409da7180da8}
       \strng{authorfullhashraw}{d19ca2262e67712bd506409da7180da8}
-      \field{extraname}{2}
+      \field{extraname}{3}
       \field{labelalpha}{NPU25}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
@@ -985,7 +1047,7 @@
       \strng{authornamehash}{a782f77109ef778d362377a5076509db}
       \strng{authorfullhash}{fe0041e88001b49796ba2524453bfe6b}
       \strng{authorfullhashraw}{fe0041e88001b49796ba2524453bfe6b}
-      \field{extraname}{3}
+      \field{extraname}{4}
       \field{labelalpha}{NUP25}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
