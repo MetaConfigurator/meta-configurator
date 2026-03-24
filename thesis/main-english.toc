@@ -35,9 +35,10 @@
 \contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{50}{section.465}%
 \contentsline {chapter}{\numberline {3}Application}{53}{chapter.470}%
 \contentsline {section}{\numberline {3.1}Metal-Organic Framework Synthesis Using Data Models}{53}{section.471}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{57}{chapter.548}%
-\contentsline {chapter}{\nonumberline Bibliography}{59}{chapter*.549}%
+\contentsline {subsection}{\numberline {3.1.1}How Ontology Classes Add Semantics to JSON Data}{53}{subsection.587}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{59}{chapter.588}%
+\contentsline {chapter}{\nonumberline Bibliography}{61}{chapter*.589}%
 \def \@chapapp {\appendixname }
-\contentsline {part}{Appendix}{62}{chapter*.549}%
-\contentsline {chapter}{\numberline {A}Appendix}{63}{appendix.550}%
+\contentsline {part}{Appendix}{64}{chapter*.589}%
+\contentsline {chapter}{\numberline {A}Appendix}{65}{appendix.590}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

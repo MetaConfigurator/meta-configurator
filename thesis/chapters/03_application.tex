@@ -92,7 +92,7 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
 
 
 
-\begin{lstlisting}[float=htbp,style=json,caption={Part of RML mapping to convert data in Listing~\ref{lst:application_mof_json_example_s_1} and Listing~\ref{lst:application_mof_json_example_s_2}},label={lst:application_mof_rml_example_1}, focusing on Hardware and Metadata data]
+\begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping to convert data in Listing~\ref{lst:application_mof_json_example_s_1} and Listing~\ref{lst:application_mof_json_example_s_2}, focusing on hardware and metadata},label={lst:application_mof_rml_example_1}]
 {
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
@@ -114,7 +114,7 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
 }
 \end{lstlisting}
 
-\begin{lstlisting}[float=htbp,style=json,caption={Part of RML mapping to convert data in Listing~\ref{lst:application_mof_json_example_s_1} and Listing~\ref{lst:application_mof_json_example_s_2}},label={lst:application_mof_rml_example_2}, focusing on Reagents and Prepartion data]
+\begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping to convert data in Listing~\ref{lst:application_mof_json_example_s_1} and Listing~\ref{lst:application_mof_json_example_s_2}, focusing on reagents and preparation data},label={lst:application_mof_rml_example_2}]
 {
 <#ReagentSource> rml:source "Data.json" ; rml:referenceFormulation ql:JSONPath ; rml:iterator "$.Synthesis[*].Reagents.Reagent[*]" .
 
@@ -123,8 +123,6 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
   rr:subjectMap [ rr:template "http://example.org/reagent/{_id}" ; rr:class obo:CHEBI_24431 ] ;
   rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "_name" ] ] ;
   rr:predicateObjectMap [ rr:predicate ex:role ; rr:objectMap [ rml:reference "_role" ] ] .
-}
-
 <#PrepStepSource> rml:source "Data.json" ; rml:referenceFormulation ql:JSONPath ; rml:iterator "$.Synthesis[*].Procedure.Prep.Step[*]" .
 
 <#PrepStepTriplesMap>
@@ -134,4 +132,18 @@ In these excerpts, each synthesis run (e.g., \texttt{S-1}, \texttt{S-2}) is repr
   rr:predicateObjectMap [ rr:predicate ex:action ; rr:objectMap [ rml:reference "$xml_type" ] ] ;
   rr:predicateObjectMap [ rr:predicate ex:amountValue ; rr:objectMap [ rml:reference "_amount.Value" ] ] ;
   rr:predicateObjectMap [ rr:predicate ex:amountUnit ; rr:objectMap [ rml:reference "_amount.Unit" ] ] .
+}
 \end{lstlisting}
+
+\subsection{How Ontology Classes Add Semantics to JSON Data}\label{sec:application:metal:rml-class-semantics}
+
+Following the RML foundations in Section~\ref{sec:background:rml} and the implementation workflow in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, the key semantic step in this mapping is the use of ontology classes in each \texttt{rr:subjectMap}. These class assignments convert plain JSON objects into typed domain entities:
+\begin{itemize}
+    \item \textbf{\texttt{chmo:0000410}} is used for synthesis resources (\texttt{/synthesis/S-1}, \texttt{/synthesis/S-2}), so each top-level JSON experiment is interpreted as a chemistry synthesis entity rather than an unlabeled record.
+    \item \textbf{\texttt{obo:CHEBI\_24431}} is used for reagent resources, so entries such as \texttt{FeCl3}, \texttt{DMF}, or \texttt{Benzene-1,4-dicarboxylic acid} are explicitly interpreted as chemical entities with roles.
+    \item \textbf{\texttt{obo:OBI\_0000070}} is used for process-step resources, so preparation/reaction/workup actions are represented as typed process nodes and can be analyzed as workflow steps.
+\end{itemize}
+
+This typing adds semantics in a way that raw JSON alone cannot provide. In JSON, \texttt{Synthesis}, \texttt{Reagent}, or \texttt{Step} are only structural keys. After mapping, they become ontology-grounded RDF nodes that can be queried and linked by meaning (e.g., ``all chemical entities'', ``all process steps'', ``all synthesis runs''). This is exactly the transition from structural representation to semantic representation discussed in Sections~\ref{sec:background:jsonld} and~\ref{sec:background:rml}.
+
+Practically, these class assertions are important because they enable reusable SPARQL query patterns and graph interpretation in the MetaConfigurator pipeline (Section~\ref{sec:design:query-with-sparql} and Section~\ref{sec:design:knowledge-graph-visualization}). Instead of querying ad-hoc JSON paths, users can query typed entities and relations across datasets with consistent semantics.
