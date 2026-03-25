@@ -4,9 +4,14 @@ Welcome to the MetaConfigurator project! We appreciate your interest in contribu
 
 ---
 
-## Team Members (with repository access)
+## Branching Model
 
-If you are part of the core team and have direct write access to the repository, follow this workflow:
+- **`develop`** — the default branch. All feature branches are created from here and all PRs target here.
+- **`main`** — stable releases only. Updated manually by a maintainer when a set of changes is deemed stable, together with a version bump and changelog entry.
+
+---
+
+## Team Members (with repository access)
 
 ### 1. Start with a GitHub Issue
 
@@ -16,7 +21,7 @@ If no issue exists yet, create one. If one exists, assign yourself to it or ask 
 ### 2. Create a Branch from the Issue
 
 Create a branch directly from the GitHub issue (using the "Create a branch" link on the issue page).
-This automatically links the branch to the issue.
+This automatically links the branch to the issue and bases it on `develop`.
 Branch names follow the pattern `<issue-number>-short-description`, e.g. `123-add-searchbar`.
 
 ### 3. Develop Locally
@@ -32,14 +37,12 @@ See [documentation_developer/README.md](documentation_developer/README.md) for s
 
 ### 4. Open a Pull Request
 
-When the work is complete, open a Pull Request and request a review.
+When the work is complete, open a Pull Request targeting `develop` and request a review.
 You can optionally open a **Draft Pull Request** earlier during development — this lets others follow along and give early feedback without a formal review being requested.
 
 ---
 
 ## External Contributors (without repository access)
-
-If you are not part of the core team, you will need to fork the repository.
 
 ### 1. Find or Create an Issue
 
@@ -63,40 +66,41 @@ git remote add upstream https://github.com/MetaConfigurator/meta-configurator.gi
 
 ### 3. Create a Feature Branch
 
-Never work directly on `main`. Create a branch for your change:
+Never work directly on `develop` or `main`. Create a branch from `develop`:
 
 ```sh
+git checkout develop
 git checkout -b <issue-number>-short-description
 ```
 
 ### 4. Open a Pull Request
 
-When your work is complete, open a Pull Request against the upstream `main` branch and request a review.
+When your work is complete, open a Pull Request against the upstream `develop` branch and request a review.
 You can optionally open a **Draft Pull Request** earlier during development to get early feedback from maintainers.
+
+---
+
+## Commit Messages
+
+No specific format is enforced, but commit messages should start with a verb and clearly describe what was done — e.g. `Add validation for empty schema`. This helps reviewers follow your work in the PR.
 
 ---
 
 ## Pull Request Guidelines
 
-- **Title:** Must follow the [Conventional Commits](https://www.conventionalcommits.org/) format — `<type>: <Verb> <subject>` — e.g. `feat: Add searchbar component`. This is required because the PR title is used as the squash merge commit message on `main`, from which the CI/CD pipeline automatically determines the semantic version bump and creates a release tag.
+- **Title:** Start with a verb and describe what was done — e.g. `Add searchbar component`.
 - **Description:** Always explain **why** the change is needed, not just what was changed. Link the related issue.
 - **Scope:** Keep PRs focused on a single concern. Smaller PRs are reviewed faster and merged sooner.
 - **Discussion:** PRs are the primary place for code review discussion. Use inline comments and the general PR thread to ask questions and suggest improvements.
 
-**PR title type prefixes and their effect on versioning:**
+---
 
-| Prefix | Description | Version bump |
-|---|---|---|
-| `feat:` | A new feature | Minor (`x.Y.0`) |
-| `fix:` | A bug fix | Patch (`x.y.Z`) |
-| `perf:` | A performance improvement | Patch |
-| `refactor:` | Code restructuring without behavior change | Patch |
-| `docs:` | Documentation only | Patch |
-| `chore:` | Build process, dependencies, tooling | Patch |
-| `test:` | Adding or fixing tests | Patch |
-| `breaking:` | Incompatible API change | Major (`X.0.0`) |
+## Releases
 
-PRs are always merged via **squash merge**, so the PR title becomes the single commit message on `main`. Individual commit messages on your branch are not required to follow the Conventional Commits format, but should still start with a verb and clearly describe what was done, e.g. `Add validation for empty schema` — this helps reviewers follow your work in the PR.
+Releases are managed manually by maintainers. When a set of changes on `develop` is deemed stable, a maintainer will:
+1. Update the version in `meta_configurator/package.json`
+2. Add a changelog entry
+3. Merge `develop` into `main`
 
 ---
 

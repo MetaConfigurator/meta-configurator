@@ -1,35 +1,23 @@
 name: Build and Deploy
 on:
-  workflow_run:
-    workflows: ["Create Release Tag"]
-    types:
-      - completed
+  push:
     branches:
       - main
+      - develop
 permissions:
   contents: write
 jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Extract version from latest tag
-        run: |
-          git fetch --tags
-          VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
-          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Install and Build
         env:
           USE_META_CONFIGURATOR_BASE_PATH: true  # Set to true for GitHub Pages deployment
           VITE_FRONTEND_HOSTNAME: https://metaconfigurator.github.io/meta-configurator
-          VITE_APP_VERSION: ${{ env.APP_VERSION }}
         run: |
           cd meta_configurator
           npm ci
