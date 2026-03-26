@@ -134,7 +134,6 @@ async function copyToClipboard() {
 
   let metaType = selectedData.value.getNodeType();
 
- 
   if (schema?.enum) {
     metaType = 'schemaenum';
   }
