@@ -50,7 +50,8 @@ describe('PanelSettings', () => {
   it('copies panel content to the clipboard when the copy button is clicked', async () => {
     const wrapper = mount(PanelSettings, {
       props: {
-        panelName: 'Text View',
+        panelDisplayName: 'Text View',
+        panelType: 'textEditor',
         panelSettingsPath: [],
         sessionMode: SessionMode.DataEditor,
       },

@@ -59,6 +59,8 @@ Creating structured data files (or schemas) manually can be complex and error-pr
 
 *   **Support for JSON Schema Draft-2020-12** – Ensuring compatibility with modern schema definitions.
 
+*   **Utility Functions for External References** – Automatically resolve/bundle external references and visualize them in the interactive schema diagram.
+
 *   **Code Generation** – Generate source code from JSON schemas in multiple programming languages (Python, Rust, TypeScript, C++, Java, etc.) using [quicktype](https://github.com/glideapps/quicktype/).
 
 *   **Documentation Generation** – Generate documentation from JSON schemas, with export to a Markdown file.

@@ -207,7 +207,7 @@ defineExpose({show: openDialog, close: hideDialog});
     :style="{width: '50vw'}">
     <div class="space-y-4">
       <PanelSettings
-        panel-name="API Key and AI Settings"
+        panel-display-name="API Key and AI Settings"
         settings-header="AI Settings"
         :panel-settings-path="['aiIntegration']"
         :sessionMode="SessionMode.DataEditor">

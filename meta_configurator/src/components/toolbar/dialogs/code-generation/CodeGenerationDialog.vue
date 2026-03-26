@@ -13,6 +13,7 @@ import Select from 'primevue/select';
 import Button from 'primevue/button';
 import {useDataSource} from '@/data/dataSource';
 import {generateFileName} from '@/components/toolbar/downloadFile';
+import {useErrorService} from '@/utility/errorServiceInstance.ts';
 
 const showDialog = ref(false);
 
@@ -43,10 +44,14 @@ watch(selectedProgrammingLanguage, newLanguage => {
     document = getDataForMode(SessionMode.DataEditor).data.value;
     documentTitle = 'Data';
   }
-  quicktypeJSONSchema(newLanguage, documentTitle, JSON.stringify(document)).then(code => {
-    generatedCodeDataStructure.value = code.lines.join('\n');
-  });
-
+  quicktypeJSONSchema(newLanguage, documentTitle, JSON.stringify(document))
+    .then(code => {
+      generatedCodeDataStructure.value = code.lines.join('\n');
+    })
+    .catch(error => {
+      generatedCodeDataStructure.value = '';
+      useErrorService().onError(error);
+    });
   const fileNamePrefix = useDataSource().userSchemaData.value.title ?? 'untitled';
   const schemaFileName = generateFileName(fileNamePrefix, true);
   const dataFileName = generateFileName(fileNamePrefix, false);
