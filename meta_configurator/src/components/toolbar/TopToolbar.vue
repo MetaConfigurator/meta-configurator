@@ -65,15 +65,15 @@ function selectedMode(newMode: SessionMode) {
 
 const modeSelector = ref();
 
-useMagicKeys({
-  passive: false,
-  onEventFired(event) {
-    if (event.key === 'f' && event.ctrlKey) {
-      event.preventDefault();
-      focus('searchBar');
-    }
-  },
-});
+// useMagicKeys({
+//   passive: false,
+//   onEventFired(event) {
+//     if (event.key === 'f' && event.ctrlKey) {
+//       // event.preventDefault();
+//       focus('searchBar');
+//     }
+//   },
+// });
 </script>
 
 <template>

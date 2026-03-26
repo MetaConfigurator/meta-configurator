@@ -45,6 +45,13 @@ onMounted(() => {
   if (isEditorReadOnly()) {
     editor.value.setReadOnly(true);
   }
+
+  // FIX: Allow browser Ctrl+F for searching in the editor, instead of opening the Ace Editor search box
+  const commands = editor.value.commands as any;
+
+  commands.removeCommand('find');
+  commands.bindKey('Ctrl-F', null);
+  commands.bindKey('Command-F', null);
 });
 
 // watch for changes in the data format and update the editor accordingly
