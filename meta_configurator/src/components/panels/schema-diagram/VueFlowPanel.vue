@@ -104,26 +104,24 @@ watch(schemaSession.currentPath, () => {
 
 onMounted(() => {
   updateGraph();
-  window.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('copy', handleCopy);
+  document.addEventListener('paste', handlePaste);
   nextTick(() => {
     fitView();
   });
 });
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown);
+  document.removeEventListener('copy', handleCopy);
+  document.removeEventListener('paste', handlePaste);
 });
-
-function handleKeyDown(event: KeyboardEvent) {
-  if (event.ctrlKey && event.key === 'c') {
-    copyToClipboard();
-    event.preventDefault(); // prevent default browser copy
-  }
-
-  if (event.ctrlKey && event.key === 'v') {
-    pasteFromClipboard();
-    event.preventDefault(); // prevent default browser paste
-  }
+function handleCopy(event: ClipboardEvent) {
+  copyToClipboard();
+  event.preventDefault(); // override default browser copy
+}
+function handlePaste(event: ClipboardEvent) {
+  pasteFromClipboard();
+  event.preventDefault(); // override default browser paste
 }
 
 async function copyToClipboard() {
@@ -132,16 +130,21 @@ async function copyToClipboard() {
     return;
   }
 
-  // Get the schema at selected node
   const schema = schemaData.dataAt(selectedData.value.absolutePath);
 
+  let metaType = selectedData.value.getNodeType();
+
+ 
+  if (schema?.enum) {
+    metaType = 'schemaenum';
+  }
+
   const dataToCopy = {
-    metaType: selectedData.value.getNodeType(),
+    metaType,
     schema: structuredClone(schema),
   };
 
   try {
-    // Write JSON string to system clipboard
     await navigator.clipboard.writeText(JSON.stringify(dataToCopy, null, 2));
     console.log('Copied to system clipboard:', dataToCopy);
   } catch (err) {
@@ -160,24 +163,37 @@ async function pasteFromClipboard() {
     if (data.metaType === 'schemaobject') {
       const objectPath = addSchemaObject(schemaData, false, data.schema);
       selectElement(objectPath);
+      return;
     }
 
     if (data.metaType === 'schemaenum') {
-      const enumPath = addSchemaEnum(schemaData, false, data.schema);
+      const enumPath = findAvailableSchemaId(schemaData, ['$defs'], 'enum');
+      schemaData.setDataAt(enumPath, data.schema);
       selectElement(enumPath);
     }
 
+    // ATTRIBUTE (extended logic)
     if (data.metaType === 'attribute') {
-      if (!selectedData.value) {
+      const selectedPath = schemaSession.currentSelectedElement.value;
+
+      if (!selectedPath || selectedPath.length === 0) {
         console.log('Select an object to paste attribute into');
         return;
       }
 
-      const attributePath = findAvailableSchemaId(
-        schemaData,
-        [...selectedData.value.absolutePath, 'properties'],
-        'property'
-      );
+      // ensure attribute goes into properties of selected object
+      const basePath = [...selectedPath, 'properties'];
+
+      // preferred name logic
+      let preferredName = 'property';
+
+      if (data.schema?.title) {
+        preferredName = data.schema.title;
+      } else if (data.schema?.name) {
+        preferredName = data.schema.name;
+      }
+
+      const attributePath = findAvailableSchemaId(schemaData, basePath, preferredName);
 
       schemaData.setDataAt(attributePath, data.schema);
       selectElement(attributePath);
