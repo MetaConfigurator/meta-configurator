@@ -18,6 +18,7 @@ jobs:
         env:
           USE_META_CONFIGURATOR_BASE_PATH: true  # Set to true for GitHub Pages deployment
           VITE_FRONTEND_HOSTNAME: https://metaconfigurator.github.io/meta-configurator
+          EXPERIMENTAL: true
         run: |
           cd meta_configurator
           npm ci
