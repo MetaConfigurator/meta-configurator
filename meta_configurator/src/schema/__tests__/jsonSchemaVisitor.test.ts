@@ -7,9 +7,21 @@ class RecordingVisitor extends JsonSchemaVisitor {
   readonly booleans: Array<{value: boolean; ctx: VisitorContext}> = [];
   readonly refs: Array<{ref: string; ctx: VisitorContext}> = [];
   readonly properties: Array<{name: string; schema: JsonSchemaType; ctx: VisitorContext}> = [];
-  readonly patternProperties: Array<{pattern: string; schema: JsonSchemaType; ctx: VisitorContext}> = [];
-  readonly subSchemaKeywords: Array<{keyword: string; schema: JsonSchemaType; ctx: VisitorContext}> = [];
-  readonly compositionals: Array<{keyword: string; schemas: JsonSchemaType | JsonSchemaType[]; ctx: VisitorContext}> = [];
+  readonly patternProperties: Array<{
+    pattern: string;
+    schema: JsonSchemaType;
+    ctx: VisitorContext;
+  }> = [];
+  readonly subSchemaKeywords: Array<{
+    keyword: string;
+    schema: JsonSchemaType;
+    ctx: VisitorContext;
+  }> = [];
+  readonly compositionals: Array<{
+    keyword: string;
+    schemas: JsonSchemaType | JsonSchemaType[];
+    ctx: VisitorContext;
+  }> = [];
   readonly conditionals: Array<{keyword: string; schema: JsonSchemaType; ctx: VisitorContext}> = [];
   readonly definitions: Array<{name: string; schema: JsonSchemaType; ctx: VisitorContext}> = [];
 
@@ -25,13 +37,25 @@ class RecordingVisitor extends JsonSchemaVisitor {
   protected visitProperty(name: string, schema: JsonSchemaType, ctx: VisitorContext): void {
     this.properties.push({name, schema, ctx});
   }
-  protected visitPatternProperty(pattern: string, schema: JsonSchemaType, ctx: VisitorContext): void {
+  protected visitPatternProperty(
+    pattern: string,
+    schema: JsonSchemaType,
+    ctx: VisitorContext
+  ): void {
     this.patternProperties.push({pattern, schema, ctx});
   }
-  protected visitSubSchemaKeyword(keyword: string, schema: JsonSchemaType, ctx: VisitorContext): void {
+  protected visitSubSchemaKeyword(
+    keyword: string,
+    schema: JsonSchemaType,
+    ctx: VisitorContext
+  ): void {
     this.subSchemaKeywords.push({keyword, schema, ctx});
   }
-  protected visitCompositional(keyword: string, schemas: JsonSchemaType | JsonSchemaType[], ctx: VisitorContext): void {
+  protected visitCompositional(
+    keyword: string,
+    schemas: JsonSchemaType | JsonSchemaType[],
+    ctx: VisitorContext
+  ): void {
     this.compositionals.push({keyword, schemas, ctx});
   }
   protected visitConditional(keyword: string, schema: JsonSchemaType, ctx: VisitorContext): void {

@@ -44,7 +44,8 @@ class SchemaFeaturesVisitor extends JsonSchemaVisitor {
 
   protected visitSchema(schema: JsonSchemaObjectType): void {
     if (schema.allOf || schema.anyOf || schema.oneOf) this.features.composition = true;
-    if (schema.if !== undefined || schema.then !== undefined || schema.else !== undefined) this.features.conditionals = true;
+    if (schema.if !== undefined || schema.then !== undefined || schema.else !== undefined)
+      this.features.conditionals = true;
     if ('default' in schema) this.features.defaultValues = true;
     if (schema.examples) this.features.exampleValues = true;
     if (schema.enum) this.features.enums = true;

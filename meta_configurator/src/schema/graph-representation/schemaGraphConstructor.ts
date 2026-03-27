@@ -82,7 +82,12 @@ class IdentifyObjectsVisitor extends JsonSchemaVisitor {
     if (typeof schema === 'object' && schema !== null) {
       this.defs.set(
         pathToString(path),
-        generateInitialNode(path, hasUserDefinedName, schema as JsonSchemaObjectType, this.rootSchema)
+        generateInitialNode(
+          path,
+          hasUserDefinedName,
+          schema as JsonSchemaObjectType,
+          this.rootSchema
+        )
       );
     }
   }
@@ -97,7 +102,11 @@ class IdentifyObjectsVisitor extends JsonSchemaVisitor {
     this.addNode(schema, ctx.path as Path, true);
   }
 
-  protected visitPatternProperty(_pattern: string, schema: JsonSchemaType, ctx: VisitorContext): void {
+  protected visitPatternProperty(
+    _pattern: string,
+    schema: JsonSchemaType,
+    ctx: VisitorContext
+  ): void {
     this.addNode(schema, ctx.path as Path, true);
   }
 
@@ -105,7 +114,11 @@ class IdentifyObjectsVisitor extends JsonSchemaVisitor {
     this.addNode(schema, ctx.path as Path, true);
   }
 
-  protected visitCompositional(keyword: string, schemas: JsonSchemaType | JsonSchemaType[], ctx: VisitorContext): void {
+  protected visitCompositional(
+    keyword: string,
+    schemas: JsonSchemaType | JsonSchemaType[],
+    ctx: VisitorContext
+  ): void {
     if (keyword !== 'not' && Array.isArray(schemas)) {
       schemas.forEach((schema, i) => {
         this.addNode(schema, [...ctx.path, keyword, i] as Path, false);
@@ -117,7 +130,11 @@ class IdentifyObjectsVisitor extends JsonSchemaVisitor {
     this.addNode(schema, ctx.path as Path, false);
   }
 
-  protected visitSubSchemaKeyword(keyword: string, schema: JsonSchemaType, ctx: VisitorContext): void {
+  protected visitSubSchemaKeyword(
+    keyword: string,
+    schema: JsonSchemaType,
+    ctx: VisitorContext
+  ): void {
     if (keyword === 'items' || keyword === 'additionalProperties') {
       this.addNode(schema, ctx.path as Path, false);
     }

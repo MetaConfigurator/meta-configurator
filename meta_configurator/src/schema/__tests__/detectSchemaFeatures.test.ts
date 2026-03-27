@@ -33,11 +33,15 @@ describe('detectSchemaFeatures', () => {
   it('detects composition (allOf/anyOf/oneOf)', () => {
     expect(detectSchemaFeatures({allOf: [{type: 'string'}]}).composition).toBe(true);
     expect(detectSchemaFeatures({anyOf: [{type: 'string'}]}).composition).toBe(true);
-    expect(detectSchemaFeatures({oneOf: [{type: 'string'}, {type: 'number'}]}).composition).toBe(true);
+    expect(detectSchemaFeatures({oneOf: [{type: 'string'}, {type: 'number'}]}).composition).toBe(
+      true
+    );
   });
 
   it('detects conditionals (if/then/else)', () => {
-    expect(detectSchemaFeatures({if: {type: 'string'}, then: {minLength: 1}}).conditionals).toBe(true);
+    expect(detectSchemaFeatures({if: {type: 'string'}, then: {minLength: 1}}).conditionals).toBe(
+      true
+    );
     expect(detectSchemaFeatures({then: {minLength: 1}}).conditionals).toBe(true);
     expect(detectSchemaFeatures({else: true}).conditionals).toBe(true);
   });
