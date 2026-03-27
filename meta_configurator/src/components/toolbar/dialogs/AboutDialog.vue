@@ -77,5 +77,4 @@ const isExperimental = __APP_EXPERIMENTAL__;
 .tag {
   background-color: var(--p-primary-color);
 }
-
 </style>
