@@ -51,7 +51,7 @@ onMounted(() => {
     editor.value.setReadOnly(true);
   }
 
-  //FIX: Handle resize
+  // watch for changes in the editor container size and resize the editor accordingly
   const observer = new ResizeObserver(() => {
     editor.value?.resize();
   });
