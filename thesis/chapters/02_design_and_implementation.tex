@@ -1,6 +1,5 @@
-%%% ===============================================================================
 \chapter{Design and Implementation}\label{sec:design}
-%%% ===============================================================================
+
 \section{RDF Authoring Panel}\label{sec:design:rdf-authoring-panel}
 
 The \gls{rdf} authoring functionality is implemented as a dedicated, separate panel in MetaConfigurator, located in \texttt{meta\_configurator/src/components/panels/rdf}. This design keeps semantic authoring concerns modular while still integrating with the existing panel configurations, path selection, and data editing flow of MetaConfigurator \cite{metaconfigurator2024}. At runtime, the entry component \texttt{RdfPanel.vue} validates whether the current data can be treated as \gls{jsonld} and provides immediate warnings for missing \texttt{@context}, invalid syntax, and non-\gls{jsonld} input.
@@ -14,7 +13,7 @@ Figure~\ref{fig:rdf_authoring_panel:json_data} shows a snapshot of the \gls{rdf}
     \label{fig:rdf_authoring_panel:json_data}
 \end{figure}
 
-\subsection{RML Mapping Tool}
+\subsection{RML Mapping Dialog}
 \label{sec:design:rdf-authoring-panel:rml-mapping-tool}
 
 If the input data is not already expressed as \gls{jsonld}, the \gls{rdf} panel provides a conversion tool that enables users to transform \gls{json} data into \gls{rdf}-compatible \gls{jsonld} using \gls{rml} mappings. \gls{rml} extends the \gls{r2rml} mapping language and allows the transformation of heterogeneous data sources such as \gls{json}, \gls{csv}, or \gls{xml} into \gls{rdf} graphs \cite{dimou2014rml}, as discussed in Section~\ref{sec:background:rml}. Figure~\ref{fig:rdf_authoring_panel:rml_1} illustrates the dialog used to define such mappings.
@@ -178,12 +177,12 @@ This explicit split mirrors the conceptual separation in \gls{jsonld} between vo
 
 When the current document is invalid or not in the expected \gls{jsonld} form, both tabs become visually disabled. This prevents accidental modifications when parsing preconditions are not satisfied.
 
-\subsection{Context Tab Implementation}
+\subsection{Context Tab}
 \label{sec:design:rdf-authoring-panel:context-tab-implementation}
 
 The Context tab is implemented by \texttt{RdfContextEditorPanel.vue}. It reuses MetaConfigurator's \gls{gui} editor and applies a predefined JSON Schema so that \texttt{@context} can be edited through structured forms rather than plain text only. The selection updates are synchronized with the text editor view, enabling users to navigate to and manipulate context entries consistently with other panels.
 
-\subsection{Triples Tab Implementation}
+\subsection{Triples Tab}
 \label{sec:design:rdf-authoring-panel:triples-tab-implementation}
 
 The Triples tab is implemented by \texttt{RdfTripleEditorPanel.vue}. It shows triples in a PrimeVue \texttt{DataTable} \footnote{\url{https://primevue.org/datatable/}} with:

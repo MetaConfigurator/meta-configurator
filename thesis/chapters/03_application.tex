@@ -1,12 +1,12 @@
 %%% ===============================================================================
-\chapter{Application}\label{sec:application}
+\chapter{Application in Chemistry}\label{sec:application}
 %%% ===============================================================================
 
 This chapter presents the end-to-end application of the thesis workflow to \gls{mof} synthesis data. Structured experiment records are first modeled in \gls{json}, then transformed into semantically enriched \gls{rdf}/\gls{jsonld} using \gls{rml}, and finally prepared for ontology-aware querying and graph-based analysis.
 
 In line with the motivation in Chapters~\ref{sec:background} and~\ref{sec:design}, the main idea is to preserve laboratory protocol detail (materials, actions, and conditions) while adding formal semantics so that the same data can be interpreted consistently across tools and datasets \cite{neubauer2026data}.
 
-\section{JSON Structure of the \glsentryshort{mof} Synthesis Dataset}\label{sec:application:metal:json-structure}
+\section{JSON Structure of the Chemical Dataset}\label{sec:application:metal:json-structure}
 
 \gls{mof} synthesis refers to the stepwise preparation of crystalline coordination materials from metal precursors and organic linkers under controlled laboratory conditions. Beyond the final product, the process is characterized by full protocol context, including reagents, roles, action sequence, and process conditions, which should be represented in structured, machine-readable form \cite{neubauer2026data}.
 
@@ -251,7 +251,7 @@ ORDER BY ?synthesis ?step
   \label{fig:application:sparql_ai_generated_result}
 \end{figure}
 
-\section{\glsentryshort{kg} Visualization and Editing}\label{sec:application:knowledge-graph-visualization}
+\section{Knowledge Graph Visualization and Editing}\label{sec:application:knowledge-graph-visualization}
 
 After conversion of the synthesis records to \gls{jsonld}, graph visualization becomes a direct, low-friction step in the workflow: users can open the Visualization view and inspect the same underlying \gls{rdf} data as a \gls{kg}, without writing additional transformation code. In this representation, synthesis runs, reagents, and process steps are shown as connected nodes, while semantic relations appear as labeled edges. Figure~\ref{fig:application:kg_visualization} illustrates this view for the mapped \gls{mof} data.
 
