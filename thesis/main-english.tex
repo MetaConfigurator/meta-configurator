@@ -688,6 +688,46 @@
     keywordstyle=\ttfamily
 }
 
+\definecolor{xmltagcolor}{RGB}{0, 100, 180}      % blue for tag names
+\definecolor{xmlattrcolor}{RGB}{180, 60, 0}      % orange-red for attribute names
+\definecolor{xmlvaluecolor}{RGB}{0, 140, 60}     % green for attribute values
+\definecolor{xmlcommentcolor}{RGB}{140, 140, 140}% grey for comments
+\definecolor{xmlcontentcolor}{RGB}{80, 0, 120}   % purple for text content
+\definecolor{backcolour}{RGB}{245, 245, 250}     % light background
+
+\lstdefinelanguage{xmlcolored}{
+    sensitive=true,
+    morestring=[b]",
+    morestring=[b]',
+    morecomment=[s]{<!--}{-->},
+    moredelim=[s][\color{xmltagcolor}\bfseries]{<}{\ },     % tag names before space
+    moredelim=[s][\color{xmltagcolor}\bfseries]{</}{>},     % closing tags
+    moredelim=[s][\color{xmltagcolor}\bfseries]{<}{>},      % self-closing / simple tags
+    moredelim=[l][\color{xmltagcolor}\bfseries]{/>},        % self-closing end
+}
+
+\lstdefinestyle{xml}{
+    language=xmlcolored,
+    basicstyle=\ttfamily\scriptsize,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{backcolour},
+    stringstyle=\color{xmlvaluecolor}\ttfamily,      % attribute values in green
+    commentstyle=\color{xmlcommentcolor}\itshape,    % comments in grey italic
+    keywordstyle=\color{xmlattrcolor}\ttfamily,      % attribute names in orange-red
+    identifierstyle=\color{xmlcontentcolor},         % text content in purple
+    literate=
+        {=}{{\color{xmlattrcolor}=}}1                % colour the = in attributes
+        {<}{{\color{xmltagcolor}<}}1                 % colour angle brackets
+        {>}{{\color{xmltagcolor}>}}1
+        {/}{{\color{xmltagcolor}/}}1,
+}
+
 \lstdefinestyle{plaintext}{
     basicstyle=\ttfamily\small\color{black},
     numbers=none,

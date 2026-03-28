@@ -7,38 +7,39 @@
 \contentsline {section}{\numberline {1.2}Semantic Web}{14}{section.70}%
 \contentsline {subsection}{\numberline {1.2.1}Ontology: Modeling Knowledge Domains}{14}{subsection.71}%
 \contentsline {subsection}{\numberline {1.2.2}Semantic Data Representation using JSON-LD}{14}{subsection.72}%
-\contentsline {subsection}{\numberline {1.2.3}SHACL: Shapes Constraint Language}{15}{subsection.132}%
-\contentsline {subsection}{\numberline {1.2.4}SPARQL: Querying Semantic Data}{17}{subsection.168}%
-\contentsline {subsection}{\numberline {1.2.5}RML for Mapping JSON to RDF}{17}{subsection.182}%
-\contentsline {section}{\numberline {1.3}MetaConfigurator for Schema-Driven Data Modeling}{21}{section.245}%
-\contentsline {subsection}{\numberline {1.3.1}Core Features}{21}{subsection.247}%
-\contentsline {subsection}{\numberline {1.3.2}AI-Assisted Schema Engineering and Mapping}{24}{subsection.252}%
-\contentsline {subsection}{\numberline {1.3.3}Limitations for Semantic Web Integration}{24}{subsection.253}%
-\contentsline {section}{\numberline {1.4}Related Work}{26}{section.265}%
-\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and KG Platforms}{26}{subsection.266}%
-\contentsline {subsection}{\numberline {1.4.2}Schema and Metadata Modeling for Structured Data}{26}{subsection.267}%
-\contentsline {subsection}{\numberline {1.4.3}Transformation from Source Data to RDF}{27}{subsection.268}%
-\contentsline {subsection}{\numberline {1.4.4}Querying, Validation, and Programmatic RDF Processing}{27}{subsection.269}%
-\contentsline {subsection}{\numberline {1.4.5}Comparison of Semantic Web Editing Tools}{27}{subsection.270}%
-\contentsline {section}{\numberline {1.5}Research Gap and Positioning of This Thesis}{27}{section.275}%
-\contentsline {chapter}{\numberline {2}Design and Implementation}{30}{chapter.276}%
-\contentsline {section}{\numberline {2.1}RDF Authoring Panel}{30}{section.277}%
-\contentsline {subsection}{\numberline {2.1.1}RML Mapping Dialog}{31}{subsection.280}%
-\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{36}{subsection.392}%
-\contentsline {subsection}{\numberline {2.1.3}Context Tab}{36}{subsection.394}%
-\contentsline {subsection}{\numberline {2.1.4}Triples Tab}{36}{subsection.395}%
-\contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{37}{subsection.403}%
-\contentsline {subsection}{\numberline {2.1.6}Linked Selection Between Text View and RDF View}{40}{subsection.408}%
-\contentsline {section}{\numberline {2.2}Query with SPARQL}{41}{section.436}%
-\contentsline {section}{\numberline {2.3}KG Visualization}{45}{section.463}%
-\contentsline {chapter}{\numberline {3}Application in Chemistry}{47}{chapter.468}%
-\contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{47}{section.469}%
-\contentsline {section}{\numberline {3.2}CHMO Ontology}{47}{section.546}%
-\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{50}{section.547}%
-\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{52}{section.630}%
-\contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{55}{section.651}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{57}{chapter.654}%
-\contentsline {section}{\numberline {4.1}Current Limitations}{57}{section.655}%
-\contentsline {section}{\numberline {4.2}Outlook}{58}{section.656}%
-\contentsline {chapter}{\nonumberline Bibliography}{59}{chapter*.657}%
+\contentsline {subsection}{\numberline {1.2.3}RDF: Resource Description Framework}{16}{subsection.118}%
+\contentsline {subsection}{\numberline {1.2.4}SHACL: Shapes Constraint Language}{17}{subsection.129}%
+\contentsline {subsection}{\numberline {1.2.5}SPARQL: Querying Semantic Data}{17}{subsection.165}%
+\contentsline {subsection}{\numberline {1.2.6}RML for Mapping JSON to RDF}{19}{subsection.179}%
+\contentsline {section}{\numberline {1.3}MetaConfigurator for Schema-Driven Data Modeling}{21}{section.242}%
+\contentsline {subsection}{\numberline {1.3.1}Core Features}{21}{subsection.244}%
+\contentsline {subsection}{\numberline {1.3.2}AI-Assisted Schema Engineering and Mapping}{25}{subsection.249}%
+\contentsline {subsection}{\numberline {1.3.3}Limitations for Semantic Web Integration}{25}{subsection.250}%
+\contentsline {section}{\numberline {1.4}Related Work}{27}{section.262}%
+\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and KG Platforms}{27}{subsection.263}%
+\contentsline {subsection}{\numberline {1.4.2}Schema and Metadata Modeling for Structured Data}{27}{subsection.264}%
+\contentsline {subsection}{\numberline {1.4.3}Transformation from Source Data to RDF}{28}{subsection.265}%
+\contentsline {subsection}{\numberline {1.4.4}Querying, Validation, and Programmatic RDF Processing}{28}{subsection.266}%
+\contentsline {subsection}{\numberline {1.4.5}Comparison of Semantic Web Editing Tools}{28}{subsection.267}%
+\contentsline {section}{\numberline {1.5}Research Gap and Positioning of This Thesis}{28}{section.272}%
+\contentsline {chapter}{\numberline {2}Design and Implementation}{31}{chapter.273}%
+\contentsline {section}{\numberline {2.1}RDF Authoring Panel}{31}{section.274}%
+\contentsline {subsection}{\numberline {2.1.1}RML Mapping Dialog}{32}{subsection.277}%
+\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{37}{subsection.389}%
+\contentsline {subsection}{\numberline {2.1.3}Context Tab}{37}{subsection.391}%
+\contentsline {subsection}{\numberline {2.1.4}Triples Tab}{37}{subsection.392}%
+\contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{38}{subsection.400}%
+\contentsline {subsection}{\numberline {2.1.6}Linked Selection Between Text View and RDF View}{41}{subsection.405}%
+\contentsline {section}{\numberline {2.2}Query with SPARQL}{42}{section.433}%
+\contentsline {section}{\numberline {2.3}KG Visualization}{46}{section.460}%
+\contentsline {chapter}{\numberline {3}Application in Chemistry}{48}{chapter.465}%
+\contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{48}{section.466}%
+\contentsline {section}{\numberline {3.2}CHMO Ontology}{48}{section.543}%
+\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{51}{section.544}%
+\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{53}{section.627}%
+\contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{56}{section.648}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{58}{chapter.651}%
+\contentsline {section}{\numberline {4.1}Current Limitations}{58}{section.652}%
+\contentsline {section}{\numberline {4.2}Outlook}{59}{section.653}%
+\contentsline {chapter}{\nonumberline Bibliography}{60}{chapter*.654}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
