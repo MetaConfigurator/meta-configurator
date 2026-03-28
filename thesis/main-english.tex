@@ -780,6 +780,19 @@
 ]{glossaries-extra}
 \setglossarystyle{long3col-booktabs}
 
+\renewcommand*{\glossaryheader}{%
+  \toprule
+  \textbf{Notation} & \textbf{Description} & \textbf{Page List} \\
+  \midrule
+  \endhead
+}
+
+\renewenvironment{theglossary}{
+  \begin{longtable}{p{0.15\textwidth} p{0.45\textwidth} p{0.35\textwidth}}
+}{
+  \end{longtable}
+}
+
 % Hint by https://tex.stackexchange.com/a/463188/9075
 % \usepackage{glossary-longextra}
 

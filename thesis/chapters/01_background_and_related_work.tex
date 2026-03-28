@@ -1,15 +1,13 @@
 \chapter{Background and Related Work}
 \label{sec:background}
 
-The increasing adoption of computational experiments and simulation workflows in scientific research has resulted in large volumes of structured data describing parameters, metrics, and results. Ensuring that such data can be validated, exchanged, and semantically interpreted requires standardized mechanisms for describing structure and meaning. This chapter introduces three key technologies that enable this process: \gls{json} for structured data representation, JSON Schema for structural validation, and semantic mappings using \gls{rml} to produce semantically enriched \gls{jsonld} representations. The discussion is illustrated using a running example from a simulation experiment where the element size parameter influences a computed stress metric.
+The increasing adoption of computational experiments and simulation workflows in scientific research has resulted in large volumes of data describing parameters, metrics, and results. In principle, such data can be modeled and validated directly with \gls{rdf}-based standards \cite{rdf_concepts2014,shacl_standard}. In practice, however, many researchers still manage data in ad hoc artifacts such as spreadsheet files, and when machine-readable encodings are used, they are commonly represented in formats such as XML, \gls{json}, or YAML rather than as native \gls{rdf} graphs \cite{metaconfigurator2024,neubauer2026data}. The Semantic Web promises improved interoperability, explicit semantics, and cross-dataset integration \cite{berners2001semantic,janowicz2015geospatial,hogan2021knowledgegraphs}, but its adoption often faces a substantial entry barrier due to ontology engineering effort, identifier and vocabulary design, and mapping complexity \cite{janowicz2015geospatial,hogan2021knowledgegraphs}. Against this background, this chapter introduces one practical workflow, not yet a universal standard: using \gls{json} as the operational data format, JSON Schema for structural validation, and \gls{rml} mappings to generate semantically enriched \gls{jsonld}. The discussion is illustrated using a running example from a simulation experiment where the element size parameter influences a computed stress metric.
 
 \section{JSON and JSON Schema}
 \subsection{JSON as a Data Representation Format}
 \label{sec:background:json}
 
 \gls{json} is a lightweight data-interchange format widely used for representing structured data in web services, scientific workflows, and configuration systems. \gls{json} encodes data as attribute-value pairs and ordered lists, making it both human-readable and machine-parseable. Due to its simplicity and broad ecosystem support, \gls{json} has become a de facto standard for structured data exchange across many domains \cite{json_standard}.
-
-In computational science workflows, \gls{json} files often capture experiment parameters and resulting metrics. The following example illustrates a minimal \gls{json} document describing the input parameter \texttt{element\_size} and the resulting metric \texttt{max\_von\_mises\_stress}.
 
 \begin{lstlisting}[float=htbp,style=json,caption={Example JSON representation of simulation input parameters and results}, label={lst:background_json_example}]
 {
@@ -30,9 +28,9 @@ In computational science workflows, \gls{json} files often capture experiment pa
 }
 \end{lstlisting}
 
-In Listing~\ref{lst:background_json_example}, each entry in the \texttt{parameters} array contains a \texttt{name} (e.g., \texttt{element\_size}), a numeric \texttt{value} (\texttt{0.025}), and a \texttt{unit} (\texttt{m}), while each entry in the \texttt{metrics} array contains a result variable such as \texttt{max\_von\_mises\_stress}.
+The running example is derived from the benchmark concept presented by Unger et al. for validation and verification of simulation models for concrete structures \cite{Unger2026Platform}. The benchmark context is a real finite-element simulation setting in which comparable test cases are executed across tools and mesh resolutions to evaluate reproducibility and implementation consistency. In such a setup, each run must be documented in a machine-readable form so that results can be compared, queried, and reproduced.
 
-In our benchmark example, \texttt{element\_size} represents a meshing property that controls mesh density for \(h\)-refinement, i.e., the characteristic size of finite elements. The \texttt{max\_von\_mises\_stress} value is a scalar result metric defined as the maximum von Mises stress over the simulated domain \cite{Unger2026Platform}. 
+Listing~\ref{lst:background_json_example} shows one such run record as two arrays: \texttt{parameters} for model inputs and \texttt{metrics} for computed outputs. Each entry follows the structure \texttt{name}, \texttt{value}, and \texttt{unit}. In this example, \texttt{element\_size} is the characteristic mesh length for \(h\)-refinement (here \(0.025\,\mathrm{m}\), where smaller values mean finer meshes), and \texttt{max\_von\_mises\_stress} is the resulting maximum von Mises stress of the simulated specimen (approximately \(299.8\,\mathrm{MPa}\)) \cite{Unger2026Platform}. 
 
 While \gls{json} provides a convenient serialization format, it does not inherently enforce structural constraints. Therefore, additional mechanisms are required to validate that \gls{json} documents conform to an expected structure.
 
