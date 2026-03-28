@@ -1,22 +1,22 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces A snapshot of MetaConfigurator's schema editing interface, showing the JSON Schema from Listing~\ref {lst:background_json_schema}}}{24}{figure.249}%
-\contentsline {figure}{\numberline {1.2}{\ignorespaces A snapshot of MetaConfigurator's data editing interface, showing the JSON instance from Listing~\ref {lst:background_json_example}}}{26}{figure.251}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces A snapshot of MetaConfigurator's schema editing interface, showing the JSON Schema from Listing~\ref {lst:background_json_schema}}}{22}{figure.248}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces A snapshot of MetaConfigurator's data editing interface, showing the JSON instance from Listing~\ref {lst:background_json_example}}}{23}{figure.250}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces A snapshot of MetaConfigurator's RDF panel.}}{33}{figure.279}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces The RML mapping dialog for JSON-to-JSON-LD conversion.}}{34}{figure.282}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing~\ref {lst:background_rml_mapping}, focused on the Triples and Context tabs, respectively.}}{38}{figure.391}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Edit modal for triple editing.}}{40}{figure.398}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Synchronization process illustrating how modifications made in the Text View are propagated and reflected in the RDF View.}}{41}{figure.400}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}}{41}{figure.402}%
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Linked selection between Text View and RDF View. The highlighted JSON fragment corresponds to the selected triple in the DataTable, and vice versa.}}{43}{figure.410}%
-\contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query dialog, with AI-assisted query generation.}}{45}{figure.442}%
-\contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{46}{figure.460}%
-\contentsline {figure}{\numberline {2.10}{\ignorespaces CSV export visualized: \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress} trends.}}{47}{figure.462}%
-\contentsline {figure}{\numberline {2.11}{\ignorespaces KG visualization of the JSON-LD data from Listing~\ref {lst:background_jsonld_example}, rendered in the Visualization dialog.}}{49}{figure.467}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces A snapshot of MetaConfigurator's RDF panel.}}{30}{figure.278}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces The RML mapping dialog for JSON-to-JSON-LD conversion.}}{31}{figure.281}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces JSON-LD output obtained by applying the mapping from Listing~\ref {lst:background_rml_mapping}, focused on the Triples and Context tabs, respectively.}}{35}{figure.390}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Edit modal for triple editing.}}{37}{figure.397}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Synchronization process illustrating how modifications made in the Text View are propagated and reflected in the RDF View.}}{38}{figure.399}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}}{38}{figure.401}%
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Linked selection between Text View and RDF View. The highlighted JSON fragment corresponds to the selected triple in the DataTable, and vice versa.}}{40}{figure.409}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query dialog, with AI-assisted query generation.}}{42}{figure.441}%
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{43}{figure.459}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces CSV export visualized: \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress} trends.}}{44}{figure.461}%
+\contentsline {figure}{\numberline {2.11}{\ignorespaces KG visualization of the JSON-LD data from Listing~\ref {lst:background_jsonld_example}, rendered in the Visualization dialog.}}{46}{figure.466}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running the SPARQL query from Listing~\ref {lst:application_mof_sparql_example}.}}{58}{figure.650}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Visualization of the JSON-LD data in Listing~\ref {lst:application_mof_jsonld_example_s_1}, rendered in the Visualization dialog.}}{59}{figure.653}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running the SPARQL query from Listing~\ref {lst:application_mof_sparql_example}.}}{54}{figure.649}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Visualization of the JSON-LD data in Listing~\ref {lst:application_mof_jsonld_example_s_1}, rendered in the Visualization dialog.}}{55}{figure.652}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
