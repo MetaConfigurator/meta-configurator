@@ -1,7 +1,11 @@
 \chapter{Background and Related Work}
 \label{sec:background}
 
-The increasing adoption of computational experiments and simulation workflows in scientific research has resulted in large volumes of data describing parameters, metrics, and results. In principle, such data can be modeled and validated directly with \gls{rdf}-based standards \cite{rdf_concepts2014,shacl_standard}. In practice, however, many researchers still manage data in ad hoc artifacts such as spreadsheet files, and when machine-readable encodings are used, they are commonly represented in formats such as XML, \gls{json}, or YAML rather than as native \gls{rdf} graphs \cite{metaconfigurator2024,neubauer2026data}. The Semantic Web promises improved interoperability, explicit semantics, and cross-dataset integration \cite{berners2001semantic,janowicz2015geospatial,hogan2021knowledgegraphs}, but its adoption often faces a substantial entry barrier due to ontology engineering effort, identifier and vocabulary design, and mapping complexity \cite{janowicz2015geospatial,hogan2021knowledgegraphs}. Against this background, this chapter introduces one practical workflow, not yet a universal standard: using \gls{json} as the operational data format, JSON Schema for structural validation, and \gls{rml} mappings to generate semantically enriched \gls{jsonld}. The discussion is illustrated using a running example from a simulation experiment where the element size parameter influences a computed stress metric.
+The increasing adoption of computational experiments and simulation workflows in scientific research has resulted in large volumes of data \cite{boulakia2017workflows,wilkinson2025fairworkflows,villamar2025metadata}. In principle, such data can be modeled and validated directly with \gls{rdf}-based standards \cite{rdf_concepts2014,shacl_standard}. In practice, however, many researchers still manage data in ad hoc artifacts such as spreadsheet files, and when machine-readable encodings are used, they are commonly represented in formats such as \gls{xml} or \gls{json}, rather than as native \gls{rdf} graphs \cite{metaconfigurator2024,neubauer2026data}.
+
+While the Semantic Web promises improved interoperability, explicit semantics, and cross-dataset integration \cite{berners2001semantic,janowicz2015geospatial,hogan2021knowledgegraphs}, its adoption often faces a substantial entry barrier due to ontology engineering effort, identifier and vocabulary design, and mapping complexity \cite{janowicz2015geospatial,hogan2021knowledgegraphs}. To motivate a practical path across this gap, this chapter first introduces structured data representation and validation with \gls{json} and JSON Schema. It then presents core Semantic Web concepts, and introduces MetaConfigurator as a tool for schema-driven data modeling and editing. 
+
+The chapter also reviews existing tools and approaches in areas such as ontology engineering, data transformation, and semantic data management. Although these solutions are powerful, they typically focus on specific tasks and are often used in isolation. As a result, users frequently have to switch between different tools to move from structured \gls{json} data to semantically enriched \gls{rdf} representations. This highlights a gap between data modeling and practical Semantic Web integration. By extending MetaConfigurator with support for semantic transformation, \gls{rdf} authoring, querying, and visualization, this thesis aims to close this gap and provide a more integrated and accessible tool to work with semantically enriched data.
 
 \section{JSON and JSON Schema}
 \subsection{JSON as a Data Representation Format}
@@ -117,6 +121,57 @@ to link methods to parameters and observed metrics.
 
 Ontologies serve as the backbone for semantic data integration and reasoning. They allow data from heterogeneous sources to be interpreted consistently, facilitate interoperability, and enable advanced queries across datasets using formal reasoning engines.
 
+\subsection{RDF: Resource Description Framework}
+\label{sec:background:rdf}
+
+\gls{rdf} is the core data model of the Semantic Web. It represents information as triples of \textit{subject}, \textit{predicate}, and \textit{object}, which together form a graph structure \cite{rdf_concepts2014}. This model provides a common, tool-independent way to express entities and relationships across datasets.
+
+Formally, a \gls{rdf} triple is a 3-tuple \cite{rdf_concepts2014}:
+\[
+(s, p, o) \in (U \cup B) \times U \times (U \cup B \cup L)
+\]
+where:
+\begin{itemize}
+    \item \(U\) is the set of all \glspl{iri},
+    \item \(B\) is the set of blank nodes (anonymous resources),
+    \item \(L\) is the set of \gls{rdf} literals (e.g., strings, numbers, dates),
+    \item \(s \in U \cup B\) is the subject,
+    \item \(p \in U\) is the predicate (also called property),
+    \item \(o \in U \cup B \cup L\) is the object.
+\end{itemize}
+A \gls{rdf} graph \(G\) is then defined as a finite set of such triples:
+\[
+G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in U, \; o_i \in U \cup B \cup L
+\]
+
+\begin{lstlisting}[float=htbp,style=xml, caption={RDF/XML representation of parameter \texttt{element\_size}} in Listing~\ref{lst:background_json_example}, label={lst:background_rdf_xml_example}]
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:schema="https://schema.org/">
+    <schema:PropertyValue rdf:about="https://www.example.org/variable_element_size">
+        <schema:name>element_size</schema:name>
+        <schema:unitCode rdf:resource="http://qudt.org/vocab/unit/M"/>
+        <schema:value rdf:datatype="http://www.w3.org/2001/XMLSchema#double">2.5E-2</schema:value>
+    </schema:PropertyValue>
+</rdf:RDF>
+\end{lstlisting}
+
+The RDF model in Listing~\ref{lst:background_rdf_xml_example} adds an extra layer of meaning to the same data in Listing~\ref{lst:background_json_example}. RDF/XML models the data as explicit graph statements instead of nested key-value objects, as depicted in Figures~\ref{fig:rdf:diagram_1} and \ref{fig:rdf:triples}\footnote{Visualization and Table view were generated with ISSemantic: \url{https://issemantic.net/}}. In JSON, fields such as \texttt{name}, \texttt{unit}, and \texttt{value} are interpreted mainly by application logic, whereas in RDF the subject (\texttt{variable\_element\_size}) is connected through well-defined predicates (\texttt{schema:name}, \texttt{schema:unitCode}, \texttt{schema:value}) to typed objects, including links to specific ontologies such as QUDT for units. This makes the representation less format-specific and more interoperable, because the meaning is encoded directly in standard \gls{iri} and data types rather than implied by local JSON structure.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.99\linewidth]{../figures/RDF-Diag-1.png}
+  \caption{Graph view of the RDF representation in Listing~\ref{lst:background_rdf_xml_example}}
+  \label{fig:rdf:diagram_1}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.99\linewidth]{../figures/RDF-Triples.png}
+  \caption{Table view of the RDF representation in Listing~\ref{lst:background_rdf_xml_example}}
+  \label{fig:rdf:triples}
+\end{figure}
+
 \subsection{Semantic Data Representation using JSON-LD}
 \label{sec:background:jsonld}
 
@@ -128,6 +183,19 @@ A typical \gls{jsonld} document has two key structural components:
     \item \textbf{@context:} This section defines the mapping between \gls{json} keys and ontology \glspl{iri} or vocabularies. It provides semantic meaning to each field.
     \item \textbf{@graph:} This array contains the actual data entities, each represented as a node with an \texttt{@id}, a \texttt{@type}, and associated properties. Relationships between entities are expressed using references to other \texttt{@id} values, forming a connected graph structure.
 \end{itemize}
+
+\gls{rdf} data models can be interpreted as \gls{jsonld}. For instance, in the simulation example in Listing~\ref{lst:background_rdf_xml_example}, the parameter \texttt{element\_size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resource.
+
+In this JSON-LD snippet, the parameter \texttt{element\_size} is represented as a resource of type 
+\href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}. Its numeric value is stored in 
+\texttt{schema:value} and the associated unit is linked via 
+\href{https://schema.org/unitCode}{\texttt{schema:unitCode}} to the \gls{qudt} unit 
+\href{https://qudt.org/vocab/unit/M}{\texttt{m}}, which defines the meter. This representation allows applications and \gls{kg} systems 
+to unambiguously interpret the measurement and integrate it with other semantically annotated data. 
+Similarly, other variables such as metrics (e.g., \texttt{max\_von\_mises\_stress}) follow the same pattern, 
+and experiment methods are linked to ontology classes such as 
+\href{https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/\#Method}{\texttt{m4i:Method}}.
+
 
 Listing~\ref{lst:background_jsonld_example} shows a \gls{jsonld} representation corresponding to the example simulation result. The \texttt{@context} defines prefixes such as \href{https://schema.org/}{\texttt{schema}} and \href{https://qudt.org/vocab/unit}{\texttt{unit}}, while the \texttt{@graph} contains nodes representing the simulation run, the \texttt{element\_size} parameter, and the stress metric.
 
@@ -180,51 +248,12 @@ Listing~\ref{lst:background_jsonld_example} shows a \gls{jsonld} representation 
 
 This structure allows each entity to be unambiguously identified, linked, and queried with semantic tools. By separating semantic definitions (\texttt{@context}) from the data graph (\texttt{@graph}), \gls{jsonld} documents support both human readability and machine interoperability, enabling integration with \glspl{kg} and other Semantic Web infrastructures.
 
-\subsection{RDF: Resource Description Framework}
-\label{sec:background:rdf}
-
-\gls{rdf} is the core data model of the Semantic Web. It represents information as triples of \textit{subject}, \textit{predicate}, and \textit{object}, which together form a graph structure \cite{rdf_concepts2014}. This model provides a common, tool-independent way to express entities and relationships across datasets.
-
-\gls{jsonld} data can be interpreted as \gls{rdf}. For instance, in the simulation example in Listing~\ref{lst:background_rdf_example}, the parameter \texttt{element\_size} is represented as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resource.
-
-\begin{lstlisting}[float=htbp,style=xml, caption={Representation of \texttt{local:variable\_element\_size} node in \gls{rdf} format}, label={lst:background_rdf_example}]
-<rdf:RDF
- xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
- xmlns:schema="https://schema.org/">
-    <schema:PropertyValue rdf:about="https://www.example.org/variable_element_size">
-        <schema:name>element_size</schema:name>
-        <schema:unitCode rdf:resource="http://qudt.org/vocab/unit/M"/>
-        <schema:value rdf:datatype="http://www.w3.org/2001/XMLSchema#double">2.5E-2</schema:value>
-    </schema:PropertyValue>
-</rdf:RDF>
-\end{lstlisting}
-
-In this JSON-LD snippet, the parameter \texttt{element\_size} is represented as a resource of type 
-\href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}}. Its numeric value is stored in 
-\texttt{schema:value} and the associated unit is linked via 
-\href{https://schema.org/unitCode}{\texttt{schema:unitCode}} to the \gls{qudt} unit 
-\href{https://qudt.org/vocab/unit/M}{\texttt{m}}, which defines the meter. This representation allows applications and \gls{kg} systems 
-to unambiguously interpret the measurement and integrate it with other semantically annotated data. 
-Similarly, other variables such as metrics (e.g., \texttt{max\_von\_mises\_stress}) follow the same pattern, 
-and experiment methods are linked to ontology classes such as 
-\href{https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/\#Method}{\texttt{m4i:Method}}.
-
-RDF-based Semantic Web technologies thus provide a framework for:
-
-\begin{itemize}
-    \item Interoperable data representation across different systems and domains.
-    \item Linking and reasoning over experimental data using ontologies.
-    \item Querying and integrating datasets through standard languages like \gls{sparql}.
-\end{itemize}
-
-By grounding \gls{json} data in ontologies and expressing it as \gls{rdf} through \gls{jsonld}, this simulation result becomes part of the Semantic Web, enabling more advanced analysis, automated reasoning, and integration with other scientific \glspl{kg}.
-
 \subsection{SHACL: Shapes Constraint Language}
 \label{sec:background:shacl}
 
 The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against a set of structural and semantic constraints \cite{shacl_standard}. \gls{shacl} allows ontology-based validation of \gls{rdf} data by defining "shapes" that describe the expected properties, data types, and cardinality of \gls{rdf} nodes.
 
-For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing~\ref{lst:background_rdf_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
+For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing~\ref{lst:background_rdf_xml_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
 
 \begin{lstlisting}[float=htbp,style=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -299,24 +328,6 @@ tool for exploring and analyzing semantically enriched simulation and experiment
 \label{sec:background:rml}
 
 \gls{rml} is a declarative language for transforming heterogeneous data sources into \gls{rdf} representations. \gls{rml} extends the \gls{w3c}-standardized \gls{r2rml} language and supports mappings from \gls{json}, \gls{xml}, \gls{csv}, and relational databases into \gls{rdf} datasets \cite{dimou2014rml}.
-
-Formally, an \gls{rdf} triple is a 3-tuple \cite{rdf_concepts2014}:
-\[
-(s, p, o) \in (U \cup B) \times U \times (U \cup B \cup L)
-\]
-where:
-\begin{itemize}
-    \item \(U\) is the set of all \glspl{iri},
-    \item \(B\) is the set of blank nodes (anonymous resources),
-    \item \(L\) is the set of \gls{rdf} literals (e.g., strings, numbers, dates),
-    \item \(s \in U \cup B\) is the subject,
-    \item \(p \in U\) is the predicate (also called property),
-    \item \(o \in U \cup B \cup L\) is the object.
-\end{itemize}
-An \gls{rdf} graph \(G\) is then defined as a finite set of such triples:
-\[
-G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in U, \; o_i \in U \cup B \cup L
-\]
 
 \gls{rml} mappings are themselves \gls{rdf} graphs specifying how elements from a source data structure are transformed into \gls{rdf} triples. Each mapping defines:
 

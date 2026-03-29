@@ -669,63 +669,63 @@
 \usepackage[realmainfile]{currfile}
 \usepackage{tcolorbox}
 \tcbuselibrary{listings}
-% Define background color
-\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+% Unified color palette for all lstlisting styles
+\definecolor{lstBackground}{RGB}{245,245,250}
+\definecolor{lstNumber}{RGB}{120,120,120}
+\definecolor{lstKeyword}{RGB}{0,100,180}
+\definecolor{lstString}{RGB}{0,0,0}
+\definecolor{lstComment}{RGB}{140,140,140}
+\definecolor{lstIdentifier}{RGB}{80,0,120}
+\definecolor{lstPunctuation}{RGB}{90,90,90}
 
 % Define a reusable style for code listings
 \lstdefinestyle{json}{
     basicstyle=\ttfamily\scriptsize,  % monospaced and smaller
     numbers=left,                      % line numbers
-    numberstyle=\tiny,
+    numberstyle=\tiny\color{lstNumber},
     stepnumber=1,
     numbersep=5pt,
     showstringspaces=false,
     breaklines=true,
     frame=single,                      % frame around the listing
-    backgroundcolor=\color{backcolour},
-    stringstyle=\ttfamily,
-    commentstyle=\ttfamily,
-    keywordstyle=\ttfamily
+    backgroundcolor=\color{lstBackground},
+    stringstyle=\color{lstString}\ttfamily,
+    commentstyle=\color{lstComment}\ttfamily\itshape,
+    keywordstyle=\color{lstKeyword}\ttfamily,
+    identifierstyle=\color{lstIdentifier}
 }
-
-\definecolor{xmltagcolor}{RGB}{0, 100, 180}      % blue for tag names
-\definecolor{xmlattrcolor}{RGB}{180, 60, 0}      % orange-red for attribute names
-\definecolor{xmlvaluecolor}{RGB}{0, 140, 60}     % green for attribute values
-\definecolor{xmlcommentcolor}{RGB}{140, 140, 140}% grey for comments
-\definecolor{xmlcontentcolor}{RGB}{80, 0, 120}   % purple for text content
-\definecolor{backcolour}{RGB}{245, 245, 250}     % light background
 
 \lstdefinelanguage{xmlcolored}{
     sensitive=true,
     morestring=[b]",
     morestring=[b]',
     morecomment=[s]{<!--}{-->},
-    moredelim=[s][\color{xmltagcolor}\bfseries]{<}{\ },     % tag names before space
-    moredelim=[s][\color{xmltagcolor}\bfseries]{</}{>},     % closing tags
-    moredelim=[s][\color{xmltagcolor}\bfseries]{<}{>},      % self-closing / simple tags
-    moredelim=[l][\color{xmltagcolor}\bfseries]{/>},        % self-closing end
+    moredelim=[s][\color{lstKeyword}\bfseries]{<}{\ },     % tag names before space
+    moredelim=[s][\color{lstKeyword}\bfseries]{</}{>},     % closing tags
+    moredelim=[s][\color{lstKeyword}\bfseries]{<}{>},      % self-closing / simple tags
+    moredelim=[l][\color{lstKeyword}\bfseries]{/>},        % self-closing end
 }
 
 \lstdefinestyle{xml}{
     language=xmlcolored,
     basicstyle=\ttfamily\scriptsize,
     numbers=left,
-    numberstyle=\tiny,
+    numberstyle=\tiny\color{lstNumber},
     stepnumber=1,
     numbersep=5pt,
     showstringspaces=false,
     breaklines=true,
     frame=single,
-    backgroundcolor=\color{backcolour},
-    stringstyle=\color{xmlvaluecolor}\ttfamily,      % attribute values in green
-    commentstyle=\color{xmlcommentcolor}\itshape,    % comments in grey italic
-    keywordstyle=\color{xmlattrcolor}\ttfamily,      % attribute names in orange-red
-    identifierstyle=\color{xmlcontentcolor},         % text content in purple
+    backgroundcolor=\color{lstBackground},
+    stringstyle=\color{lstString}\ttfamily,
+    commentstyle=\color{lstComment}\ttfamily\itshape,
+    keywordstyle=\color{lstKeyword}\ttfamily,
+    identifierstyle=\color{lstIdentifier},
     literate=
-        {=}{{\color{xmlattrcolor}=}}1                % colour the = in attributes
-        {<}{{\color{xmltagcolor}<}}1                 % colour angle brackets
-        {>}{{\color{xmltagcolor}>}}1
-        {/}{{\color{xmltagcolor}/}}1,
+        {=}{{\color{lstPunctuation}=}}1
+        {<}{{\color{lstKeyword}<}}1
+        {>}{{\color{lstKeyword}>}}1
+        {/}{{\color{lstKeyword}/}}1,
 }
 
 \lstdefinestyle{plaintext}{
@@ -734,7 +734,7 @@
     showstringspaces=false,
     breaklines=true,
     frame=single,
-    backgroundcolor=\color{backcolour},
+    backgroundcolor=\color{lstBackground},
     stringstyle=\color{black},
     commentstyle=\color{black},
     keywordstyle=\color{black},
@@ -747,54 +747,56 @@
 \lstdefinestyle{turtle}{
     basicstyle=\ttfamily\scriptsize,
     numbers=left,
-    numberstyle=\tiny,
+    numberstyle=\tiny\color{lstNumber},
     stepnumber=1,
     numbersep=5pt,
     showstringspaces=false,
     breaklines=true,
     frame=single,
-    backgroundcolor=\color{backcolour},
-    stringstyle=\ttfamily,       % literals
-    commentstyle=\ttfamily\itshape, % comments italic
-    keywordstyle=\ttfamily,      % RDF keywords like a:, rdfs:, etc.
+    backgroundcolor=\color{lstBackground},
+    stringstyle=\color{lstString}\ttfamily,
+    commentstyle=\color{lstComment}\ttfamily\itshape,
+    keywordstyle=\color{lstKeyword}\ttfamily,
+    identifierstyle=\color{lstIdentifier},
     morekeywords={@prefix,@base}, % Turtle directives
     alsoletter={:,_},            % allow colon and underscore in keywords
     literate=
-      {:}{{:}}1
-      {;}{{;}}1
-      {,}{{,}}1
-      {.}{{.}}1
-      {"}{{"}}1
-      {<}{{<}}1
-      {>}{{>}}1
+      {:}{{\color{lstPunctuation}:}}1
+      {;}{{\color{lstPunctuation};}}1
+      {,}{{\color{lstPunctuation},}}1
+      {.}{{\color{lstPunctuation}.}}1
+      {"}{{\color{lstString}"}}1
+      {<}{{\color{lstKeyword}<}}1
+      {>}{{\color{lstKeyword}>}}1
 }
 
 \lstdefinestyle{sparql}{
     basicstyle=\ttfamily\scriptsize,
     numbers=left,
-    numberstyle=\tiny,
+    numberstyle=\tiny\color{lstNumber},
     stepnumber=1,
     numbersep=5pt,
     showstringspaces=false,
     breaklines=true,
     frame=single,
-    backgroundcolor=\color{backcolour},
-    stringstyle=\ttfamily,
-    commentstyle=\ttfamily\itshape,
-    keywordstyle=\ttfamily\bfseries,
+    backgroundcolor=\color{lstBackground},
+    stringstyle=\color{lstString}\ttfamily,
+    commentstyle=\color{lstComment}\ttfamily\itshape,
+    keywordstyle=\color{lstKeyword}\ttfamily\bfseries,
+    identifierstyle=\color{lstIdentifier},
     morekeywords={
         SELECT, CONSTRUCT, ASK, DESCRIBE, WHERE, FILTER, OPTIONAL, 
         UNION, PREFIX, BASE, GRAPH, FROM, ORDER, BY, DESC, ASC, LIMIT, OFFSET
     },
     alsoletter={:,_},
     literate=
-      {:}{{:}}1
-      {;}{{;}}1
-      {,}{{,}}1
-      {.}{{.}}1
-      {"}{{"}}1
-      {<}{{<}}1
-      {>}{{>}}1
+      {:}{{\color{lstPunctuation}:}}1
+      {;}{{\color{lstPunctuation};}}1
+      {,}{{\color{lstPunctuation},}}1
+      {.}{{\color{lstPunctuation}.}}1
+      {"}{{\color{lstString}"}}1
+      {<}{{\color{lstKeyword}<}}1
+      {>}{{\color{lstKeyword}>}}1
 }
 
 %introduce \powerset - hint by http://matheplanet.com/matheplanet/nuke/html/viewtopic.php?topic=136492&post_id=997377

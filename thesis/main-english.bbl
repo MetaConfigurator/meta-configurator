@@ -388,6 +388,102 @@
       \verb https://www.rfc-editor.org/rfc/rfc8259
       \endverb
     \endentry
+    \entry{boulakia2017workflows}{article}{}{}
+      \name{author}{14}{}{%
+        {{hash=077fc53a0ef45ae81aef5de467af2b2f}{%
+           family={Cohen-Boulakia},
+           familyi={C\bibinithyphendelim B\bibinitperiod},
+           given={Sarah},
+           giveni={S\bibinitperiod}}}%
+        {{hash=2cf67e661d81f867d52601e30f177bd2}{%
+           family={Belhajjame},
+           familyi={B\bibinitperiod},
+           given={Khalid},
+           giveni={K\bibinitperiod}}}%
+        {{hash=d37e011a88d76c6b7c50201cdb98cdf3}{%
+           family={Collin},
+           familyi={C\bibinitperiod},
+           given={Olivier},
+           giveni={O\bibinitperiod}}}%
+        {{hash=6fa5d1ad6786e50dd31e49243b677446}{%
+           family={Chopard},
+           familyi={C\bibinitperiod},
+           given={Jérôme},
+           giveni={J\bibinitperiod}}}%
+        {{hash=680448a212297e7233018a09b3a9b698}{%
+           family={Froidevaux},
+           familyi={F\bibinitperiod},
+           given={Christine},
+           giveni={C\bibinitperiod}}}%
+        {{hash=71a96f899ae285ba0b1a62ab569cfd2a}{%
+           family={Gaignard},
+           familyi={G\bibinitperiod},
+           given={Alban},
+           giveni={A\bibinitperiod}}}%
+        {{hash=19070589d173a06bc3b5361deaaa3798}{%
+           family={Hinsen},
+           familyi={H\bibinitperiod},
+           given={Konrad},
+           giveni={K\bibinitperiod}}}%
+        {{hash=df6289fb63816cb321345266e7bac9b7}{%
+           family={Larmande},
+           familyi={L\bibinitperiod},
+           given={Pierre},
+           giveni={P\bibinitperiod}}}%
+        {{hash=32dc29aea13c6c371f4838a9420b9263}{%
+           family={Le\bibnamedelima Bras},
+           familyi={L\bibinitperiod\bibinitdelim B\bibinitperiod},
+           given={Yvan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=2ab62691708733ccb672d3e829ca3158}{%
+           family={Lemoine},
+           familyi={L\bibinitperiod},
+           given={Frédéric},
+           giveni={F\bibinitperiod}}}%
+        {{hash=d61a76984a178aa32aa52eb0cafe9f90}{%
+           family={Mareuil},
+           familyi={M\bibinitperiod},
+           given={Fabien},
+           giveni={F\bibinitperiod}}}%
+        {{hash=dd3f46a7eae4e6c29f6d47f10f0977d6}{%
+           family={Ménager},
+           familyi={M\bibinitperiod},
+           given={Hervé},
+           giveni={H\bibinitperiod}}}%
+        {{hash=fc80f0693fb16accc811ff2dc9cf052b}{%
+           family={Pradal},
+           familyi={P\bibinitperiod},
+           given={Christophe},
+           giveni={C\bibinitperiod}}}%
+        {{hash=ec49e29860cb727056e6a197e5a7ad80}{%
+           family={Blanchet},
+           familyi={B\bibinitperiod},
+           given={Christophe},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{76ef1feb86630f8c862a8e596c128ab7}
+      \strng{fullhash}{db644f4b48159cedb4c3fd0c7dbfc79c}
+      \strng{fullhashraw}{db644f4b48159cedb4c3fd0c7dbfc79c}
+      \strng{bibnamehash}{db644f4b48159cedb4c3fd0c7dbfc79c}
+      \strng{authorbibnamehash}{db644f4b48159cedb4c3fd0c7dbfc79c}
+      \strng{authornamehash}{76ef1feb86630f8c862a8e596c128ab7}
+      \strng{authorfullhash}{db644f4b48159cedb4c3fd0c7dbfc79c}
+      \strng{authorfullhashraw}{db644f4b48159cedb4c3fd0c7dbfc79c}
+      \field{labelalpha}{CBC+17}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Future Generation Computer Systems}
+      \field{title}{Scientific workflows for computational reproducibility in the life sciences: Status, challenges and opportunities}
+      \field{volume}{75}
+      \field{year}{2017}
+      \field{pages}{284\bibrangedash 298}
+      \range{pages}{15}
+      \verb{doi}
+      \verb 10.1016/j.future.2017.01.012
+      \endverb
+    \endentry
     \entry{protege}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=fc0c42b1e69e9c6175d599ff7388248c}{%
@@ -1790,6 +1886,64 @@
       \verb https://www.npmjs.com/package/sparqljs
       \endverb
     \endentry
+    \entry{villamar2025metadata}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{6}{}{%
+        {{hash=9ad7434618003fd54284a3e86c8e7ee1}{%
+           family={Villamar},
+           familyi={V\bibinitperiod},
+           given={José},
+           giveni={J\bibinitperiod}}}%
+        {{hash=d813866db4712b9b93d1120270d06e6b}{%
+           family={Kelbling},
+           familyi={K\bibinitperiod},
+           given={Matthias},
+           giveni={M\bibinitperiod}}}%
+        {{hash=2cebdc3b3351fa90359f023ab89ae0eb}{%
+           family={More},
+           familyi={M\bibinitperiod},
+           given={Heather\bibnamedelima L.},
+           giveni={H\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=f6f72f78b262d4fcff83ad67927cd29c}{%
+           family={Denker},
+           familyi={D\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=8b78dcd6c069478ed493378f5de4d8c1}{%
+           family={Tetzlaff},
+           familyi={T\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=e063c4f4f823efdd0dbba8fc361d259f}{%
+           family={Senk},
+           familyi={S\bibinitperiod},
+           given={Johanna},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{079b2a7edb061e53e21bfbfa440d39f8}
+      \strng{fullhash}{5edb0c241bd648b5428522b47d3ea6e8}
+      \strng{fullhashraw}{5edb0c241bd648b5428522b47d3ea6e8}
+      \strng{bibnamehash}{5edb0c241bd648b5428522b47d3ea6e8}
+      \strng{authorbibnamehash}{5edb0c241bd648b5428522b47d3ea6e8}
+      \strng{authornamehash}{079b2a7edb061e53e21bfbfa440d39f8}
+      \strng{authorfullhash}{5edb0c241bd648b5428522b47d3ea6e8}
+      \strng{authorfullhashraw}{5edb0c241bd648b5428522b47d3ea6e8}
+      \field{labelalpha}{VKM+25}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Scientific Data}
+      \field{title}{Metadata practices for simulation workflows}
+      \field{volume}{12}
+      \field{year}{2025}
+      \field{pages}{942}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1038/s41597-025-05126-1
+      \endverb
+    \endentry
     \entry{shacl_standard}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=446a1ae6601a5c59360c7d591c3992da}{%
@@ -1848,6 +2002,150 @@
       \endverb
       \verb{url}
       \verb https://json-ld.org/playground/
+      \endverb
+    \endentry
+    \entry{wilkinson2025fairworkflows}{article}{}{}
+      \name{author}{23}{}{%
+        {{hash=5c3ed3772504f0eff721817ad2e0142f}{%
+           family={Wilkinson},
+           familyi={W\bibinitperiod},
+           given={Sean\bibnamedelima R.},
+           giveni={S\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=5f46f673fa83c349c498720136a28f86}{%
+           family={Aloqalaa},
+           familyi={A\bibinitperiod},
+           given={Meznah},
+           giveni={M\bibinitperiod}}}%
+        {{hash=2cf67e661d81f867d52601e30f177bd2}{%
+           family={Belhajjame},
+           familyi={B\bibinitperiod},
+           given={Khalid},
+           giveni={K\bibinitperiod}}}%
+        {{hash=5693b849591bf584b41425232c158a01}{%
+           family={Crusoe},
+           familyi={C\bibinitperiod},
+           given={Michael\bibnamedelima R.},
+           giveni={M\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=b0e06f2d9fa7c7f891f90267732ef501}{%
+           family={Paula\bibnamedelima Kinoshita},
+           familyi={P\bibinitperiod\bibinitdelim K\bibinitperiod},
+           given={Bruno},
+           giveni={B\bibinitperiod},
+           prefix={de},
+           prefixi={d\bibinitperiod}}}%
+        {{hash=902d622d0c551c151c6651f3b82582e4}{%
+           family={Gadelha},
+           familyi={G\bibinitperiod},
+           given={Luiz},
+           giveni={L\bibinitperiod}}}%
+        {{hash=d19d285480239e7baa7304e4c8e331b5}{%
+           family={Garijo},
+           familyi={G\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=c535dba2602ac5a1bded5cb5dee39d4d}{%
+           family={Gustafsson},
+           familyi={G\bibinitperiod},
+           given={Ove\bibnamedelimb Johan\bibnamedelima Ragnar},
+           giveni={O\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=67e3357ddcbe60d5c5aaa319917d071a}{%
+           family={Juty},
+           familyi={J\bibinitperiod},
+           given={Nick},
+           giveni={N\bibinitperiod}}}%
+        {{hash=e253ec3f3f8e8dc5740205e23388a404}{%
+           family={Kanwal},
+           familyi={K\bibinitperiod},
+           given={Sehrish},
+           giveni={S\bibinitperiod}}}%
+        {{hash=8a4c6c7eb26a35faf48ec4a270bfc273}{%
+           family={Khan},
+           familyi={K\bibinitperiod},
+           given={Farah\bibnamedelima Zaib},
+           giveni={F\bibinitperiod\bibinitdelim Z\bibinitperiod}}}%
+        {{hash=04ed6e29b3eb86332d2349de92736560}{%
+           family={Köster},
+           familyi={K\bibinitperiod},
+           given={Johannes},
+           giveni={J\bibinitperiod}}}%
+        {{hash=dfde9fbb38e4b4fc6756650c39851d05}{%
+           family={Peters-von\bibnamedelima Gehlen},
+           familyi={P\bibinithyphendelim v\bibinitperiod\bibinitdelim G\bibinitperiod},
+           given={Karsten},
+           giveni={K\bibinitperiod}}}%
+        {{hash=6689e3a49e8237c710a6c966e6efd965}{%
+           family={Pouchard},
+           familyi={P\bibinitperiod},
+           given={Line},
+           giveni={L\bibinitperiod}}}%
+        {{hash=9fa085dfb03494df871ef0d108b3380c}{%
+           family={Rannow},
+           familyi={R\bibinitperiod},
+           given={Randy\bibnamedelima K.},
+           giveni={R\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=522402a070f60aa5efffa4307bfa94c5}{%
+           family={Soiland-Reyes},
+           familyi={S\bibinithyphendelim R\bibinitperiod},
+           given={Stian},
+           giveni={S\bibinitperiod}}}%
+        {{hash=45cfb2b0a49e1d6978baaa8e0f7f51aa}{%
+           family={Soranzo},
+           familyi={S\bibinitperiod},
+           given={Nicola},
+           giveni={N\bibinitperiod}}}%
+        {{hash=e50fd75b203430c87bbb38a50c70107c}{%
+           family={Sufi},
+           familyi={S\bibinitperiod},
+           given={Shoaib},
+           giveni={S\bibinitperiod}}}%
+        {{hash=40da32ed9b0e2abf027cf9c29b57f833}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Ziheng},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=5daff9611ab2a41a6b30185414467b32}{%
+           family={Vilne},
+           familyi={V\bibinitperiod},
+           given={Baiba},
+           giveni={B\bibinitperiod}}}%
+        {{hash=6648185bc64b36f0edf0183d24942543}{%
+           family={Wouters},
+           familyi={W\bibinitperiod},
+           given={Merridee\bibnamedelima A.},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=519c8744a34d9b4a31ec6ae4b425c173}{%
+           family={Yuen},
+           familyi={Y\bibinitperiod},
+           given={Denis},
+           giveni={D\bibinitperiod}}}%
+        {{hash=fae216475918e7d5a3fd11e334229e70}{%
+           family={Goble},
+           familyi={G\bibinitperiod},
+           given={Carole},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{467f1b9b2f5f3d0cdc2fa83940290eb7}
+      \strng{fullhash}{e74762d4b38cbfee559e18306b5da17f}
+      \strng{fullhashraw}{e74762d4b38cbfee559e18306b5da17f}
+      \strng{bibnamehash}{e74762d4b38cbfee559e18306b5da17f}
+      \strng{authorbibnamehash}{e74762d4b38cbfee559e18306b5da17f}
+      \strng{authornamehash}{467f1b9b2f5f3d0cdc2fa83940290eb7}
+      \strng{authorfullhash}{e74762d4b38cbfee559e18306b5da17f}
+      \strng{authorfullhashraw}{e74762d4b38cbfee559e18306b5da17f}
+      \field{labelalpha}{WAB+25}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Scientific Data}
+      \field{number}{1}
+      \field{title}{Applying the FAIR Principles to computational workflows}
+      \field{volume}{12}
+      \field{year}{2025}
+      \field{pages}{328}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1038/s41597-025-04451-9
       \endverb
     \endentry
     \entry{wright2020jsonschema}{misc}{}{}
