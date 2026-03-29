@@ -29,7 +29,43 @@ If the input data is not already expressed as \gls{jsonld}, the \gls{rdf} panel 
   \label{fig:rdf_authoring_panel:rml_1}
 \end{figure}
 
-The dialog allows users to either provide an existing \gls{rml} mapping or generate one automatically with \gls{ai} assistance. In the latter case, the user supplies mapping hints that describe how elements of the input \gls{json} data should be mapped to \gls{rdf} properties or classes. These hints, together with a representative subset of the input data, are sent to an external \gls{ai} API to generate a candidate mapping. This prompt guides the language model to produce a valid \gls{rml} mapping in Turtle syntax that conforms to the target \gls{jsonld} structure. The prompt constrains the model to return a mapping definition adhering to \gls{rml} rules, thereby improving reliability and syntactic correctness. In simplified form, the prompt contains: (i) role/instruction constraints, (ii) required prefixes and output format, (iii) representative input-data fragments, and (iv) user-provided mapping hints.
+The dialog allows users to either provide an existing \gls{rml} mapping or generate one automatically with \gls{ai} assistance. In the latter case, the user supplies mapping hints that describe how elements of the input \gls{json} data should be mapped to \gls{rdf} properties or classes. These hints, together with a representative subset of the input data, are sent to an external \gls{ai} API to generate a candidate mapping. This prompt guides the language model to produce a valid \gls{rml} mapping in Turtle syntax that conforms to the target \gls{jsonld} structure. The prompt constrains the model to return a mapping definition adhering to \gls{rml} rules, thereby improving reliability and syntactic correctness. In simplified form, the prompt contains: (i) role/instruction constraints, (ii) required prefixes and output format, (iii) representative input-data fragments, and (iv) user-provided mapping hints. Listing~\ref{lst:design:rml_prompt_template} shows a shortened excerpt of the prompt-construction logic.
+
+\begin{lstlisting}[float=htbp,style=plaintext,caption={Part of the RML prompt template which guides the AI model}, label={lst:design:rml_prompt_template}]
+[instruction template]
+You are an assistant that generates RML mappings in Turtle syntax that convert JSON input into RDF.
+Follow the RML specification strictly and avoid generating invalid RML constructs.
+The output must contain ONLY valid Turtle mapping code and no explanations.
+
+Logical source rules:
+- Use rml:logicalSource
+- Set rml:source to "Data.json"
+- Use rml:referenceFormulation ql:JSONPath
+- Use appropriate JSONPath iterators (e.g., "$.items[*]")
+
+Object mapping / linking rules:
+- In rr:objectMap, use exactly ONE of: rml:reference | rr:template | rr:constant
+- If linking to another mapped resource, use rr:parentTriplesMap
+- Do NOT combine rr:parentTriplesMap with rml:reference/rr:template/rr:constant
+- For IRI objects from JSON values, use rr:template + rr:termType rr:IRI
+- Do NOT use "$." inside rml:reference values
+
+Prefix/output rules:
+Use only provided prefixes (and user-provided ones), e.g.:
+rr:  rml:  ql:  rdf:  xsd:
+Declare prefixes at the top and return a single Turtle document.
+
+Here is an example of the expected input and output 
+...
+
+- Real input JSON subset 
+  {user input}
+
+Additional user comments: 
+  {mapping hints}
+
+- Final instruction: Return ONLY the RML mapping in valid Turtle syntax.
+\end{lstlisting}
 
 \begin{lstlisting}[float=htbp,style=plaintext,caption={Sample RML hint which describes the mapping from JSON in~\ref{lst:background_json_example} to a minimal JSON-LD in~\ref{lst:background_jsonld_example_simple}}, label={lst:metaconfigurator_interface_rdf:rml_hint_simple}]
 Convert my JSON Data to JSON-LD such that I have two nodes, each node representing a parameter or metric.
