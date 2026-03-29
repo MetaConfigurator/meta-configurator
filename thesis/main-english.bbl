@@ -1944,6 +1944,72 @@
       \verb 10.1038/s41597-025-05126-1
       \endverb
     \endentry
+    \entry{owl2_overview}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=cb320ec3867effa6aeda100c390936b2}{%
+           family={{W3C OWL Working Group}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{fullhash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{fullhashraw}{cb320ec3867effa6aeda100c390936b2}
+      \strng{bibnamehash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{authorbibnamehash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{authornamehash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{authorfullhash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{authorfullhashraw}{cb320ec3867effa6aeda100c390936b2}
+      \field{extraname}{1}
+      \field{labelalpha}{W3C12}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extraalpha}{1}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{OWL 2 Web Ontology Language Document Overview (Second Edition)}
+      \field{year}{2012}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/owl2-overview/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/owl2-overview/
+      \endverb
+    \endentry
+    \entry{owl2_primer}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=cb320ec3867effa6aeda100c390936b2}{%
+           family={{W3C OWL Working Group}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{fullhash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{fullhashraw}{cb320ec3867effa6aeda100c390936b2}
+      \strng{bibnamehash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{authorbibnamehash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{authornamehash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{authorfullhash}{cb320ec3867effa6aeda100c390936b2}
+      \strng{authorfullhashraw}{cb320ec3867effa6aeda100c390936b2}
+      \field{extraname}{2}
+      \field{labelalpha}{W3C12}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extraalpha}{2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{OWL 2 Web Ontology Language Primer (Second Edition)}
+      \field{year}{2012}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/owl2-primer/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/owl2-primer/
+      \endverb
+    \endentry
     \entry{shacl_standard}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=446a1ae6601a5c59360c7d591c3992da}{%

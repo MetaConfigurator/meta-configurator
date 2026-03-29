@@ -423,20 +423,9 @@ The technologies discussed in the previous sections enable structured, validated
 
 MetaConfigurator\footnote{\url{https://www.metaconfigurator.org}} is an open-source web application designed to simplify the creation, editing, and management of structured data files and their accompanying schemas \cite{metaconfigurator2024,metaconfigurator2025datamodels}. The tool generates \glspl{gui} dynamically based on a provided schema, allowing users to interact with structured data through intuitive forms rather than manually editing raw text files. By leveraging JSON Schema as the underlying model description, MetaConfigurator enables consistent data validation and guided data entry.
 
-MetaConfigurator follows a schema-driven approach: the structure of the \gls{ui} is derived directly from the schema that describes the data model. This design allows the same tool to be applied across different domains without the need to implement domain-specific \glspl{ui}. The application runs entirely in the user's browser and supports multiple structured data formats such as \gls{json} and \gls{yaml} \cite{metaconfigurator2024,metaconfigurator2025datamodels}.
-
-This tool is organized into three main views: Data Editor, Schema Editor, and Settings \cite{metaconfigurator2025datamodels}. In each view, users can work in a synchronized split interface combining a text editor and a generated \gls{gui}, which supports both expert-oriented direct editing and guided editing for non-experts.
+In practice, MetaConfigurator is centered around two main working tabs, \textbf{Data} and \textbf{Schema}, while \textbf{Settings} is used for global configuration \cite{metaconfigurator2025datamodels}.
 
 \subsection{Core Features}
-
-MetaConfigurator provides several features that facilitate the creation and maintenance of structured data models:
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=.85\linewidth]{../figures/MC-JSON-Schema.png}
-  \caption{A snapshot of MetaConfigurator's schema editing interface, showing the JSON Schema from Listing~\ref{lst:background_json_schema}}
-  \label{fig:metaconfigurator_interface:schema}
-\end{figure}
 
 \begin{itemize}
     \item \textbf{Visual Schema Editor:}  
@@ -447,9 +436,6 @@ MetaConfigurator provides several features that facilitate the creation and main
 
     \item \textbf{Schema-Driven Form Generation:}  
     Based on a given JSON Schema, MetaConfigurator automatically generates a graphical form for editing instance data. This ensures that all entered data conforms to the defined structure and constraints.
-
-    \item \textbf{Integrated Text and GUI Editing:}  
-    The tool combines a traditional text editor with a graphical editor, allowing users to switch between raw \gls{json} editing and structured form-based editing within the same interface. Figure~\ref{fig:metaconfigurator_interface:data} depicts an example of data editing in MetaConfigurator, showing the JSON instance from Listing~\ref{lst:background_json_example} that conforms to the JSON Schema in Listing~\ref{lst:background_json_schema}. The left panel displays the raw JSON data, while the right panel offers a structured form for editing.
 
     \item \textbf{Schema Validation Support:}  
     During data editing, MetaConfigurator validates instance data against the provided JSON Schema, ensuring structural correctness and preventing invalid data entries.
@@ -463,8 +449,11 @@ MetaConfigurator provides several features that facilitate the creation and main
     \item \textbf{Snapshot Sharing and URL-Based Collaboration:}
     MetaConfigurator supports sharing complete editor states (data, schema, settings) through shareable links and snapshot storage, enabling reproducible collaboration between users \cite{metaconfigurator2025datamodels}.
 
-\item \textbf{Limited Ontology Integration:}  
-While the tool provides a JSON-LD export that adds \texttt{@context} and \texttt{@id} fields, its support for ontologies is still quite limited. It enables \gls{uri}-based references and offers auto-completion for ontology concepts (via a specified ontology endpoint) during structured data modeling, but more advanced ontology integration is not supported.\end{itemize}
+    \item \textbf{Limited Ontology Integration:}  
+   While the tool provides support for JSON-LD by recognizing \texttt{@context} and \texttt{@id} fields, its ontology integration capabilities remain limited. In its current form, a field can be annotated as JSON-LD and connected to a SPARQL endpoint that may be used to retrieve lists of ontology concepts, such as \gls{owl} classes or \gls{rdf} properties, to support basic auto-completion during data modeling.
+
+\end{itemize}
+
 
 \begin{figure}[htbp]
   \centering
@@ -473,7 +462,17 @@ While the tool provides a JSON-LD export that adds \texttt{@context} and \texttt
     \label{fig:metaconfigurator_interface:data}
 \end{figure}
 
-The above extensions were demonstrated in a chemistry use case, where tabular experiment data was migrated from CSV/Excel-oriented workflows to \gls{json}, extended with additional metadata, and iteratively refined through schema editing \cite{metaconfigurator2025datamodels}. These capabilities significantly reduce the effort required to design and maintain structured data models and improve accessibility for users who may not be familiar with schema languages.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.85\linewidth]{../figures/MC-JSON-Schema.png}
+  \caption{A snapshot of MetaConfigurator's schema editing interface, showing the JSON Schema from Listing~\ref{lst:background_json_schema}}
+  \label{fig:metaconfigurator_interface:schema}
+\end{figure}
+
+
+This combination of views gives users a continuous workflow from low-level text editing to guided schema-driven interaction, and reduces the effort needed to model, validate, and maintain structured data across different domains \cite{metaconfigurator2024,metaconfigurator2025datamodels}.
+
 \newpage
 
 \subsection{AI-Assisted Schema Engineering and Mapping}
@@ -488,15 +487,15 @@ For data transformation, the system generates mapping expressions from user inpu
 \subsection{Limitations for Semantic Web Integration}
 \label{sec:background:metaconfigurator_limitations}
 
-Despite its strong support for schema-driven data modeling, MetaConfigurator currently provides only limited support for Semantic Web technologies: while the platform enables the creation and validation of structured data using \gls{json} and JSON Schema, it does not natively support Linked Data representations such as \gls{jsonld} or \gls{rdf} graphs.
-
-As discussed in previous sections, the Semantic Web relies on standards such as \gls{rdf}, ontologies, and \glspl{iri} to represent data in a machine-interpretable and interoperable manner. \gls{jsonld} serves as an important bridge between traditional \gls{json}-based data structures and \gls{rdf}-based \glspl{kg}. However, MetaConfigurator currently treats \gls{json} documents primarily as structured configuration data and does not interpret or expose their underlying \gls{rdf} semantics.
+Despite its strong support for schema-driven data modeling, MetaConfigurator currently provides only limited support for Semantic Web technologies: while the platform enables the creation and validation of structured data using \gls{json} and JSON Schema, it has limited support for Linked Data representations. Currently, MetaConfigurator treats \gls{json} documents primarily as structured configuration data and does not interpret or expose their underlying \gls{rdf} semantics.
 
 Several limitations arise from this restriction:
 
 \begin{enumerate}
     \item \textbf{Lack of JSON-LD context authoring:}  
     Users cannot directly author or edit \gls{jsonld} contexts (e.g., the \texttt{@context} section that defines mappings between \gls{json} keys and ontology \glspl{iri}). Without such support, linking data elements to ontologies requires manual editing outside the tool.
+
+    Users can define a \gls{jsonld} context when JSON-LD support is enabled; however, this functionality is limited and currently only available within the schema editor. The \texttt{@context} section, which defines mappings between \gls{json} keys and ontology \glspl{iri}, is not exposed in the data editing view. As a result, working with or adjusting context definitions remains less accessible during instance-level data authoring.
 
     \item \textbf{No direct inspection or editing of RDF triples:}  
     MetaConfigurator does not provide mechanisms for inspecting or manipulating \gls{rdf} triples derived from the underlying \gls{json} data. As a result, users cannot directly view the semantic graph structure implied by \gls{jsonld} documents.

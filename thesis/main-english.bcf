@@ -2396,9 +2396,9 @@
     <bcf:citekey order="14" intorder="1">jsonld2014</bcf:citekey>
     <bcf:citekey order="15" intorder="1">shacl_standard</bcf:citekey>
     <bcf:citekey order="16" intorder="1">sparql_standard</bcf:citekey>
-    <bcf:citekey order="17" intorder="1">dimou2014rml</bcf:citekey>
-    <bcf:citekey order="18" intorder="1">metaconfigurator2024</bcf:citekey>
-    <bcf:citekey order="18" intorder="2">metaconfigurator2025datamodels</bcf:citekey>
+    <bcf:citekey order="17" intorder="1">owl2_overview</bcf:citekey>
+    <bcf:citekey order="17" intorder="2">owl2_primer</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">dimou2014rml</bcf:citekey>
     <bcf:citekey order="19" intorder="1">metaconfigurator2024</bcf:citekey>
     <bcf:citekey order="19" intorder="2">metaconfigurator2025datamodels</bcf:citekey>
     <bcf:citekey order="20" intorder="1">metaconfigurator2025datamodels</bcf:citekey>
@@ -2406,7 +2406,8 @@
     <bcf:citekey order="22" intorder="1">metaconfigurator2025datamodels</bcf:citekey>
     <bcf:citekey order="23" intorder="1">metaconfigurator2025datamodels</bcf:citekey>
     <bcf:citekey order="24" intorder="1">metaconfigurator2025datamodels</bcf:citekey>
-    <bcf:citekey order="25" intorder="1">metaconfigurator2025datamodels</bcf:citekey>
+    <bcf:citekey order="25" intorder="1">metaconfigurator2024</bcf:citekey>
+    <bcf:citekey order="25" intorder="2">metaconfigurator2025datamodels</bcf:citekey>
     <bcf:citekey order="26" intorder="1">ai_assisted_schema_mapping_2025</bcf:citekey>
     <bcf:citekey order="27" intorder="1">protege</bcf:citekey>
     <bcf:citekey order="27" intorder="2">webprotege</bcf:citekey>
