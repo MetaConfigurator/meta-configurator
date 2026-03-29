@@ -235,12 +235,14 @@ Listing~\ref{lst:background_jsonld_example} shows a complete \gls{jsonld} repres
 }
 \end{lstlisting}
 
-In this JSON-LD representation, \texttt{element\_size} is modeled as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resource with a typed numeric value and an explicit unit link to QUDT, just as in RDF/XML. Compared with Listing~\ref{lst:background_rdf_xml_example}, the semantics are equivalent, but the syntax is JSON-based. This makes \gls{jsonld} suitable when one wants RDF-level semantics while keeping compatibility with JSON-oriented tooling and workflows.
+By modeling the experimental data from Listing~\ref{lst:background_json_example} in \gls{jsonld} and explicitly defining its semantics, the data becomes linked to the Semantic Web and can be integrated into a \gls{kg}. In this representation, \texttt{element\_size} is modeled as a \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resource with a typed numeric value and an explicit unit link to QUDT, just as in RDF/XML. Compared with Listing~\ref{lst:background_rdf_xml_example}, the semantics are equivalent, but the syntax remains JSON-based.
+
+This enables graph-based queries, reasoning, and inference beyond simple format validation. For example, if an ontology defines that every \texttt{m4i:Method} must \texttt{m4i:hasParameter} only resources of type \texttt{schema:PropertyValue}, then from the statement that \texttt{local:run\_fenics\_simulation} is a \texttt{m4i:Method} and \texttt{m4i:hasParameter} is linked to \texttt{local:variable\_element\_size} node, a reasoner can infer that \texttt{local:variable\_element\_size} is a \texttt{schema:PropertyValue}, even if this type assertion were not explicitly stated.
 
 \subsection{SHACL: Shapes Constraint Language}
 \label{sec:background:shacl}
 
-The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against a set of structural and semantic constraints \cite{shacl_standard}. \gls{shacl} allows ontology-based validation of \gls{rdf} data by defining "shapes" that describe the expected properties, data types, and cardinality of \gls{rdf} nodes.
+The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against a set of structural and semantic constraints \cite{shacl_standard}. \gls{shacl} performs validation based on explicitly defined ``shapes'' \, that describe the expected properties, data types, and cardinality of \gls{rdf} nodes. While these shapes can be designed to reflect or align with domain ontologies, \gls{shacl} validation itself is independent of ontology languages such as \gls{owl}, which are primarily used for logical reasoning rather than constraint checking.
 
 For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing~\ref{lst:background_jsonld_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
 
@@ -305,13 +307,11 @@ WHERE {
 }
 \end{lstlisting}
 
-This query returns the \texttt{element\_size} parameter and \texttt{max\_von\_mises\_stress} along with their numeric values and associated \gls{qudt} units 
-(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}} and \href{https://qudt.org/vocab/unit/MPa}{\texttt{unit:MPa}}), reflecting the structure of the JSON-LD representation where 
-parameters and metrics are modeled as \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resources. 
+This query retrieves the parameters \texttt{element\_size} and \texttt{max\_von\_mises\_stress} together with their corresponding numeric values and associated \gls{qudt} units 
+(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}} and \href{https://qudt.org/vocab/unit/MPa}{\texttt{unit:MPa}}). The result reflects the structure of the JSON-LD representation, in which both parameters and metrics are modeled as \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resources.
 
-This demonstrates how semantic annotations enable precise, ontology-aware data access. 
-\gls{sparql} supports complex operations such as joins, filters, and reasoning over ontologies, making it an essential 
-tool for exploring and analyzing semantically enriched simulation and experiment data.
+This example illustrates how semantic annotations enable structured and consistent access to data. 
+\gls{sparql} further provides mechanisms for querying \gls{rdf} graphs, including filtering and combining data from multiple sources, which supports the analysis of semantically enriched simulation data.
 
 \subsection{RML for Mapping JSON to RDF}
 \label{sec:background:rml}
