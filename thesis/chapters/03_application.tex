@@ -4,7 +4,7 @@
 
 This chapter presents the end-to-end application of the thesis workflow to \gls{mof} synthesis data. Structured experiment records are first modeled in \gls{json}, then transformed into semantically enriched \gls{rdf}/\gls{jsonld} using \gls{rml}, and finally prepared for ontology-aware querying and graph-based analysis.
 
-In line with the motivation in Chapters~\ref{sec:background} and~\ref{sec:design}, the main idea is to preserve laboratory protocol detail (materials, actions, and conditions) while adding formal semantics so that the same data can be interpreted consistently across tools and datasets \cite{neubauer2026data}.
+In line with the motivation in Chapters~\ref{sec:background} and~\ref{sec:design}, the main idea is to preserve laboratory protocol detail (materials, actions, and conditions) while adding formal semantics so that the same data can be interpreted consistently across tools and datasets.
 
 \section{JSON Structure of the Chemical Dataset}\label{sec:application:metal:json-structure}
 
@@ -94,7 +94,7 @@ Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof
 
 \section{\glsentryshort{chmo} Ontology}\label{sec:application:metal:chmo-introduction}
 
-The \gls{chmo} provides a controlled vocabulary for chemical methods and related experimental concepts, including data-acquisition techniques, preparation and separation procedures, and synthesis methods \cite{chmo_ontology}. Within the broader OBO ecosystem, \gls{chmo} is designed to complement other ontologies such as the \gls{obi}, which captures more general investigation processes and experimental context \cite{obi2016,jackson2021obofoundry}.
+The \gls{chmo} provides a controlled vocabulary for chemical methods and related experimental concepts, including data-acquisition techniques, preparation and separation procedures, and synthesis methods \cite{chmo_ontology}. Within the broader \gls{obo} ecosystem, \gls{chmo} is designed to complement other ontologies such as the \gls{obi}, which captures more general investigation processes and experimental context \cite{obi2016,jackson2021obofoundry}.
 
 Using \gls{chmo} serves two purposes. First, it anchors synthesis resources to a domain-specific ontology rather than leaving them as generic data records. Second, it improves interoperability, because \gls{chmo}-typed entities can be combined with \gls{obi}- and \gls{chebi}-based descriptions in a shared \gls{rdf} graph.
 
