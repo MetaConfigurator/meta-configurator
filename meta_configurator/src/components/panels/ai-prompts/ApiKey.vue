@@ -30,7 +30,8 @@ const rememberOptions = ref([
   results you can change to more performant models in the settings tab.
   <br />
   <br />
-  Your key is stored only in your browser and sent directly to your chosen provider. It is never sent to MetaConfigurator servers.
+  Your key is stored only in your browser and sent directly to your chosen provider. It is never
+  sent to MetaConfigurator servers.
   <span class="api-key-container">
     <span>Key:</span>
     <Password v-model="apiKey" placeholder="Enter your API Key" :feedback="false" />
