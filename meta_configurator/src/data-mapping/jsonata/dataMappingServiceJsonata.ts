@@ -22,13 +22,6 @@ export class DataMappingServiceJsonata implements DataMappingService {
     userComments: string
   ): Promise<{config: string; success: boolean; message: string}> {
     const inputDataSubset = trimDataToMaxSize(input);
-    console.log(
-      'Reduced input data from ' +
-        JSON.stringify(input).length / 1024 +
-        ' KB to ' +
-        JSON.stringify(inputDataSubset).length / 1024 +
-        ' KB'
-    );
 
     // infer schema for input data
     const inputFileSchema = inferJsonSchema(inputDataSubset);
@@ -43,25 +36,6 @@ export class DataMappingServiceJsonata implements DataMappingService {
     const inputFileSchemaStr = JSON.stringify(inputFileSchema);
     const targetSchemaStr = JSON.stringify(targetSchema);
     const inputDataSubsetStr = JSON.stringify(inputDataSubset);
-    console.log(
-      'Sizes of the different input files in KB:' +
-        ' jsonata example files: ' +
-        (
-          (jsonataReferenceStr.length +
-            jsonataInputExampleStr.length +
-            jsonataInputExampleSchemaStr.length +
-            jsonataExpressionStr.length +
-            jsonataOutputExampleStr.length +
-            jsonataOutputExampleSchemaStr.length) /
-          1024
-        ).toFixed(2) +
-        ' inputFileSchema: ' +
-        (inputFileSchemaStr.length / 1024).toFixed(2) +
-        ' targetSchema: ' +
-        (targetSchemaStr.length / 1024).toFixed(2) +
-        ' inputDataSubset: ' +
-        (inputDataSubsetStr.length / 1024).toFixed(2)
-    );
     const resultPromise = queryJsonataExpression(
       apiKey,
       jsonataReferenceStr,
@@ -124,12 +98,25 @@ export class DataMappingServiceJsonata implements DataMappingService {
     return result;
   }
 
-  removeSpecialCharactersRecursive(data: any) {
-    // TODO
+  removeSpecialCharactersRecursive(data: any): void {
+    if (Array.isArray(data)) {
+      data.forEach(item => this.removeSpecialCharactersRecursive(item));
+    } else if (data !== null && typeof data === 'object') {
+      for (const key of Object.keys(data)) {
+        const sanitizedKey = key.replace(/[^a-zA-Z0-9_]/g, '_');
+        if (sanitizedKey !== key) {
+          data[sanitizedKey] = data[key];
+          delete data[key];
+        }
+        this.removeSpecialCharactersRecursive(data[sanitizedKey]);
+      }
+    }
   }
 
-  sanitizeMappingConfig(config: string, input: any): string {
-    return config; // TODO
+  sanitizeMappingConfig(config: string, _input: any): string {
+    // JSONata natively supports special characters in property names via backtick syntax,
+    // so no transformation of the mapping config expression is required.
+    return config;
   }
 
   validateMappingConfig(config: string, input: any): {success: boolean; message: string} {
