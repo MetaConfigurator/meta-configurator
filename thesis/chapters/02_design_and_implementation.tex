@@ -22,16 +22,18 @@ Figure~\ref{fig:rdf_authoring_panel:json_data} shows a snapshot of the \gls{rdf}
 
 If the input data is not already expressed as \gls{jsonld}, the \gls{rdf} panel provides a conversion tool that enables users to transform \gls{json} data into \gls{rdf}-compatible \gls{jsonld} using \gls{rml} mappings. \gls{rml} extends the \gls{r2rml} mapping language and allows the transformation of heterogeneous data sources such as \gls{json}, \gls{csv}, or \gls{xml} into \gls{rdf} graphs \cite{dimou2014rml}, as discussed in Section~\ref{sec:background:rml}. Figure~\ref{fig:rdf_authoring_panel:rml_1} illustrates the dialog used to define such mappings.
 
+
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-RML-1.png}
+  \includegraphics[width=.65\linewidth]{../figures/MC-RDF-RML-1.png}
   \caption{The RML mapping dialog for JSON-to-JSON-LD conversion.}
   \label{fig:rdf_authoring_panel:rml_1}
 \end{figure}
 
+
 The dialog allows users to either provide an existing \gls{rml} mapping or generate one automatically with \gls{ai} assistance. In the latter case, the user supplies mapping hints that describe how elements of the input \gls{json} data should be mapped to \gls{rdf} properties or classes. These hints, together with a representative subset of the input data, are sent to an external \gls{ai} API to generate a candidate mapping. This prompt guides the language model to produce a valid \gls{rml} mapping in Turtle syntax that conforms to the target \gls{jsonld} structure. The prompt constrains the model to return a mapping definition adhering to \gls{rml} rules, thereby improving reliability and syntactic correctness. In simplified form, the prompt contains: (i) role/instruction constraints, (ii) required prefixes and output format, (iii) representative input-data fragments, and (iv) user-provided mapping hints. Listing~\ref{lst:design:rml_prompt_template} shows a shortened excerpt of the prompt-construction logic.
 
-\begin{lstlisting}[float=htbp,style=plaintext,caption={Part of the RML prompt template which guides the AI model}, label={lst:design:rml_prompt_template}]
+\begin{lstlisting}[float=htbp,style=plaintext,,basicstyle=\ttfamily\fontsize{7}{8}\selectfont\color{black},caption={Part of the RML prompt template which guides the AI model}, label={lst:design:rml_prompt_template}]
 You are an assistant that generates RML mappings in Turtle syntax that convert JSON input into RDF.
 Follow the RML specification strictly and avoid generating invalid RML constructs.
 The output must contain ONLY valid Turtle mapping code and no explanations.
@@ -191,16 +193,6 @@ local: https://www.example.org/
 
 After providing such hints, the configured \gls{ai} model generates a mapping that is intended to follow the specified structure and semantics, although this is not always guaranteed in practice and largely depends on the capability of the underlying model. Once the user reviews and confirms the mapping, it can be executed to transform the input \gls{json} data into a semantically enriched \gls{jsonld} representation, as illustrated in Figure~\ref{fig:rdf_authoring_panel:jsonld}.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=.85\linewidth]{../figures/MC-RDF-JSON-LD-1.png}
-  \includegraphics[width=.85\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
-  \caption{JSON-LD output obtained by applying the mapping from Listing~\ref{lst:background_rml_mapping}, focused on the Triples and Context tabs, respectively.}
-  \label{fig:rdf_authoring_panel:jsonld}
-\end{figure}
-
-\newpage
-
 \subsection{Panel Composition and UI Structure}
 \label{sec:design:rdf-authoring-panel:panel-composition}
 
@@ -209,6 +201,15 @@ The core editing surface is implemented in \texttt{RdfEditorPanel.vue} as a Prim
     \item \textbf{Context tab}: for editing \texttt{@context} definitions.
     \item \textbf{Triples tab}: for browsing and editing \gls{rdf} triples.
 \end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-JSON-LD-1.png}
+  \vspace{3cm}
+  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
+  \caption{JSON-LD output obtained by applying the mapping from Listing~\ref{lst:background_rml_mapping}, focused on the Triples and Context tabs, respectively.}
+  \label{fig:rdf_authoring_panel:jsonld}
+\end{figure}
 
 This explicit split mirrors the conceptual separation in \gls{jsonld} between vocabulary declarations and graph assertions \cite{jsonld2014}, and therefore supports both semantic modeling tasks (namespace/prefix handling) and graph authoring tasks (subject-predicate-object manipulation) in one workflow.
 
@@ -238,10 +239,10 @@ Triple editing is handled through \texttt{TripleDetailsDialog.vue}, which allows
   \label{fig:rdf_authoring_panel:triple_modal}
 \end{figure}
 
-Data changes occur from two sources: the Text View (raw JSON-LD data) or the RDF Panel. When a change is made in the Text View, \texttt{rdfStoreManager.ts} rebuilds the \gls{rdf} graph and updates the RDF Panel (Figure~\ref{fig:rdf_authoring_panel:change_propagation_json_editor}).
+Data changes originate from two primary sources: the Text View (raw JSON-LD data) and the RDF Panel. In this simplified description, updates appear to flow directly between these components. In reality, however, all data is managed through a central store (\texttt{dataSource}) that acts as the single source of truth, while the individual panels remain decoupled and do not communicate with each other directly. At this layer, \texttt{managedData.ts} provides synchronized access to both parsed data and its text representation, supports path-based updates, and preserves temporarily unparseable text input without discarding the last valid data state. For example, when a change is made in the Text View, \texttt{rdfStoreManager.ts} reconstructs the \gls{rdf} graph within this central store, which in turn triggers an update in the RDF Panel (Figure~\ref{fig:rdf_authoring_panel:change_propagation_json_editor}).
 
-Conversely, when a triple is edited, removed, or added in Triples tab, \texttt{TripleEditorService} validates and applies the change through \texttt{rdfStoreManager.ts}. If successful, \texttt{jsonLdNodeManager.ts} rebuilds \gls{jsonld} from the updated store and writes it back to the Data Editor state, which updates the Text View accordingly (Figure~\ref{fig:rdf_authoring_panel:change_propagation_rdf_view}).
-Change in the Context tab is propagated in the same way as changes to the GUI View, since underlying data is still treated as JSON data and processed by the same synchronization workflow.
+Conversely, when a triple is edited, removed, or added in Triples tab, \texttt{TripleEditorService} validates and applies the change through \texttt{rdfStoreManager.ts}. If successful, \texttt{jsonLdNodeManager.ts} rebuilds \gls{jsonld} from the updated store and writes it back to the \texttt{dataSource}, which updates the Text View accordingly (Figure~\ref{fig:rdf_authoring_panel:change_propagation_rdf_view}).
+Changes in the Context tab is propagated in the same way as changes to the GUI View, since underlying data is still treated as JSON data and processed by the same synchronization workflow.
 
 \begin{figure}[htbp]
   \centering
@@ -260,17 +261,19 @@ Change in the Context tab is propagated in the same way as changes to the GUI Vi
 \subsection{RDF Store and Data Synchronization}
 \label{sec:design:rdf-authoring-panel:rdf-store-and-sync}
 
-The internal semantic state is managed by \texttt{rdfStoreManager.ts}, which uses \texttt{rdflib.js} to parse and serialize data \cite{rdflib_docs}. \texttt{rdflib.js} was selected because it provides mature browser-side handling of \gls{jsonld}/\gls{rdf} terms and integrates directly with statement-level editing operations used by the panel. On each source-data update, the manager:
+The internal semantic state is managed by \texttt{rdfStoreManager.ts}, which uses \texttt{rdflib.js} to parse and serialize data \cite{rdflib_docs}. 
+Because the synchronization logic operates on statement-level objects throughout this subsection, we first define the term \emph{RDFLib Statement} used in the following description.
+
+\begin{definition}[RDFLib Statement]
+In this implementation, an RDFLib Statement is the runtime representation of one \gls{rdf} triple of the form $(s, p, o)$, where $s$ (subject), $p$ (predicate), and $o$ (object) are \gls{rdf} terms. In \texttt{rdflib.js}, these terms are represented as \texttt{NamedNode}, \texttt{BlankNode}, and \texttt{Literal} objects, and each triple is stored as a Statement. Briefly, a \texttt{NamedNode} represents an identified resource via an IRI (e.g., ontology classes, predicates, or linked entities), a \texttt{BlankNode} represents an unnamed local resource without a global IRI, and a \texttt{Literal} represents a concrete value such as text, number, or date (optionally with datatype or language tag). A collection of such Statements forms the in-memory graph used by the panel \cite{rdflib_docs}.
+\end{definition}
+
+The \texttt{rdflib.js} library was selected because it provides mature browser-side handling of \gls{jsonld}/\gls{rdf} terms and integrates directly with statement-level editing operations used by the panel. On each source-data update, the manager:
 \begin{enumerate}
     \item resolves \texttt{@context} data into namespace mappings,
     \item parses \gls{jsonld} into an indexed \gls{rdf} graph and derives a reactive list of Statements,
     \item exposes reactive Statements, warnings, and errors to UI components.
 \end{enumerate}
-
-\begin{definition}[RDFLib Statement]
-In this implementation, an RDFLib Statement is the runtime representation of one \gls{rdf} triple of the form $(s, p, o)$, where $s$ (subject), $p$ (predicate), and $o$ (object) are \gls{rdf} terms. In \texttt{rdflib.js}, these terms are represented as \texttt{NamedNode}, \texttt{BlankNode}, and \texttt{Literal} objects, and each triple is stored as a Statement. Briefly, a \texttt{NamedNode} represents an identified resource via an IRI (e.g., ontology classes, predicates, or linked entities), a \texttt{BlankNode} represents an unnamed local resource without a global IRI, and a \texttt{Literal} represents a concrete value such as text, number, or date (optionally with datatype or language tag). A collection of such Statements forms the in-memory graph used by the panel \cite{rdflib_docs}.
-
-\end{definition}
 
 This definition is directly reflected in the implementation workflow: the internal store parses \gls{jsonld} into a reactive list of Statement objects, the triples table renders this list, and editing actions create or modify individual statements for add/edit/delete operations. Statement-level matching (subject, predicate, object) is used to synchronize table selection with text-editor paths.
 
@@ -281,13 +284,13 @@ To keep the \gls{json} editor and \gls{rdf} authoring panel consistent, the impl
 \subsection{Linked Selection Between Text View and RDF View}
 \label{sec:design:rdf-authoring-panel:linked-selection}
 
-Linked selection between the Text View and the \gls{rdf} View enables coordinated highlighting of corresponding elements across both representations. When a user selects a section of the JSON-LD document, the corresponding RDF statement is identified and highlighted in the DataTable, and vice versa. This maintains a consistent visual selection state across both views. Figure~\ref{fig:rdf_authoring_panel:linked_selection} illustrates this behavior. 
+Linked selection between the Text View and the \gls{rdf} View enables coordinated highlighting of corresponding elements across both representations. When a user selects a section of the JSON-LD document, the corresponding RDF statement is identified and highlighted in the triple table, and vice versa. This maintains a consistent visual selection state across both views. Figure~\ref{fig:rdf_authoring_panel:linked_selection} illustrates this behavior. 
 Algorithms~\ref{alg:rdf_authoring_panel:text_to_rdf_linked_selection} and~\ref{alg:rdf_authoring_panel:rdf_to_text_linked_selection} describe the implementation of linked selection in both directions.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.95\linewidth]{../figures/MC-RDF-JSON-LD-3.png}
-  \caption{Linked selection between Text View and RDF View. The highlighted JSON fragment corresponds to the selected triple in the DataTable, and vice versa.}
+  \caption{Linked selection between Text View and RDF View. The highlighted JSON fragment corresponds to the selected triple in the triple table, and vice versa.}
   \label{fig:rdf_authoring_panel:linked_selection}
 \end{figure}
 \label{sec:design:rdf-authoring-panel:view-synchronization:rdf-to-text}
@@ -296,18 +299,17 @@ Algorithms~\ref{alg:rdf_authoring_panel:text_to_rdf_linked_selection} and~\ref{a
   \caption{Linked selection from Text View to RDF View}
   \label{alg:rdf_authoring_panel:text_to_rdf_linked_selection}
   \begin{algorithmic}[1]
-    \State \textbf{Input:} current JSON path selection, full \gls{jsonld} document, current DataTable rows
-    \State Read the selected JSON path from the editor state
-    \State Extract subject (\texttt{@id}), predicate, and object at the selected path
+    \State \textbf{Input:} current JSON path selection, full \gls{jsonld} document, current triple table rows
+    \State Extract subject (\texttt{@id}), predicate, and object at the selected path in the JSON-LD document
     \State Build a minimal \gls{jsonld} fragment containing:
     \Statex \hspace{\algorithmicindent}a) original \texttt{@context}
     \Statex \hspace{\algorithmicindent}b) one \texttt{@graph} node with extracted subject, predicate, and object
     \State Parse the minimal fragment with RDFLib into a temporary graph
     \If{the temporary graph contains exactly one statement}
-      \State Compare that statement against each DataTable statement by subject, predicate, and object equality
-      \If{a matching statement is found}
-        \State Determine its row index in the DataTable
-        \State Set DataTable selection to the matching row
+      \State Compare that statement against each triple table statement by subject, predicate, and object equality
+      \If{only one matching statement is found}
+        \State Determine its row index in the triple table
+        \State Set triple table selection to the matching row
         \State Scroll/focus the table to the selected row
       \EndIf
     \EndIf
@@ -318,7 +320,7 @@ Algorithms~\ref{alg:rdf_authoring_panel:text_to_rdf_linked_selection} and~\ref{a
   \caption{Linked selection from RDF View to Text View}
   \label{alg:rdf_authoring_panel:rdf_to_text_linked_selection}
   \begin{algorithmic}[1]
-    \State \textbf{Input:} selected DataTable statement $(s,p,o)$, current \gls{jsonld} document
+    \State \textbf{Input:} selected triple table statement $(s,p,o)$, current \gls{jsonld} document
     \State Read subject $s$, predicate $p$, and object $o$ from the selected table row
     \State Find candidate node in \texttt{@graph} whose \texttt{@id} matches $s$
     \If{no candidate node is found}
@@ -343,7 +345,7 @@ Algorithms~\ref{alg:rdf_authoring_panel:text_to_rdf_linked_selection} and~\ref{a
 \section{Query with SPARQL}\label{sec:design:query-with-sparql}
 The \gls{sparql} query functionality is implemented in \texttt{SparqlEditor.vue} as a dialog with three tabs: \textbf{Query View}, \textbf{Result View}, and \textbf{Visualization}. During implementation, RDFLib query capabilities were evaluated first, but they proved limited for the required in-browser query workflow and did not provide full support for current SPARQL 1.2 draft specifications. Query execution is therefore handled in-browser via Comunica's \texttt{QueryEngine} \cite{comunica_query_sparql}. According to Comunica's official documentation, the engine supports SPARQL 1.2 draft query-related specifications \cite{comunica_supported_specs}.
 
-In the \textbf{Query View}, users can write and validate queries in a CodeMirror editor \cite{codemirror} and execute them against the current in-memory \gls{rdf} graph. Query syntax is checked through debounced live validation using the SparqlJS parser, which provides immediate feedback while editing \cite{sparqljs}. The same view also provides \gls{ai}-assisted \gls{sparql} generation. Similar to the \gls{ai}-assisted \gls{rml} workflow described in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, user hints are combined with prompt-engineering instructions and a representative subset of the current \gls{jsonld} data, then sent to the configured \gls{llm} to generate a draft \gls{sparql} query. In simplified form, the prompt includes: (i) output constraints (return only SPARQL), (ii) relevant prefixes/context, (iii) representative graph fragments, and (iv) the user hint. Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated} shows the dialog with an AI-assisted query suggestion in the Query View.
+In the \textbf{Query View}, users can write and validate queries in a CodeMirror editor \cite{codemirror} and execute them against the current in-memory \gls{rdf} graph. Query syntax is checked through debounced live validation using the SparqlJS parser, which provides immediate feedback while editing \cite{sparqljs}. The same view also provides \gls{ai}-assisted \gls{sparql} generation. Similar to the \gls{ai}-assisted \gls{rml} workflow described in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, user hints are combined with prompt-engineering instructions and a representative subset of the current \gls{jsonld} data, then sent to the configured AI-endpoint to generate a draft \gls{sparql} query. In simplified form, the prompt includes: (i) output constraints (return only SPARQL), (ii) relevant prefixes/context, (iii) representative graph fragments, and (iv) the user hint. Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated} shows the dialog with an AI-assisted query suggestion in the Query View.
 
 To demonstrate the \gls{ai}-assisted workflow, we assume that the simulation \gls{json} from Listing~\ref{lst:background_json_example} has been extended with additional \texttt{element\_size} and \texttt{max\_von\_mises\_stress} value pairs (e.g., from multiple simulation runs), and then transformed into \gls{jsonld} using the mapping workflow described earlier. In this extended dataset, metric measurements are available for multiple element sizes, for example \texttt{0.003125}, \texttt{0.00625}, \texttt{0.0125}, \texttt{0.05} and \texttt{0.1}.
 
@@ -382,16 +384,16 @@ SELECT ?element_size ?max_von_mises_stress WHERE {
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-SPARQL-2.png}
+  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-SPARQL-2.png}
   \caption{Result after running SPARQL query in Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated}.}
   \label{fig:rdf_authoring_panel:sparql_ai_generated_result}
 \end{figure}
 
-This showcase illustrates the intended interaction pattern: \gls{ai} is used to accelerate query authoring, while final semantic and syntactic validation remains under user control before execution. Human-in-the-loop review is therefore essential in both \gls{ai}-generated \gls{rml} mappings and \gls{ai}-generated \gls{sparql} queries, and users can inspect and refine both results before applying or executing them.
+This showcase illustrates the intended interaction pattern: \gls{ai} is used to accelerate query authoring, while final semantic and syntactic validation remains under user control before execution. Human-in-the-loop review is essential in both \gls{ai}-generated \gls{rml} mappings and \gls{ai}-generated \gls{sparql} queries, and users can inspect and refine both results before applying or executing them.
 
-The dialog supports two execution modes controlled by a toggle: \textbf{Visualization Off} and \textbf{Visualization On}. With \textbf{Visualization Off}, standard SELECT-style querying is used and results are shown in the \textbf{Result View}. There, the PrimeVue DataTable columns are generated dynamically from the returned variables, and export is provided as CSV. Figure~\ref{fig:rdf_authoring_panel:sparql_plot} shows a plot which is generated from the CSV export of the query result, visualizing the relationship between element size and maximum von Mises stress.
+The dialog supports two execution modes controlled by a toggle: \texttt{Visualization Off} and \texttt{Visualization On}. With \texttt{Visualization Off}, standard SELECT-style querying is used and results are shown in the \textbf{Result View}. There, the PrimeVue DataTable columns are generated dynamically from the returned variables, and export is provided as CSV. Figure~\ref{fig:rdf_authoring_panel:sparql_plot} shows a plot which is generated from the CSV export of the query result, visualizing the relationship between element size and maximum von Mises stress.
 
-With \textbf{Visualization On}, the query mode switches to CONSTRUCT-based graph output; the same result table is still populated, but export options target RDF serializations (e.g., Turtle, N-Triples, RDF/XML) for graph-oriented workflows.
+With \texttt{Visualization On}, the query mode switches to CONSTRUCT-based graph output; the same result table is still populated, but export options target RDF serializations (e.g., Turtle, N-Triples, RDF/XML).
 
 The \textbf{Visualization} tab renders the query result graph in read-only mode. Its interaction model and rendering details are discussed in the Section~\ref{sec:design:knowledge-graph-visualization}.
 
@@ -411,7 +413,7 @@ The view provides interactive graph navigation features including zoom in/out, f
 
 Node inspection and editing support are integrated through \texttt{RdfVisualizerPropertiesView.vue}. When a node is selected, a side panel shows the node identifier and its properties, including linkable IRIs. The same panel exposes lightweight authoring actions (add/edit/delete property, rename/delete node, add node), so users can inspect and refine graph content directly from the visualization workflow.
 
-The visualization tab can be opened in two ways. First, it can be opened directly from the Triples tab of the RDF panel. In this mode, the visualization is editable, and user interactions are propagated back to the main JSON-LD data and RDF store. Second, it can be opened from the SPARQL dialog when the \textbf{Visualization On} toggle is enabled. In that case, the graph is built from the user's SPARQL CONSTRUCT result and is shown in read-only mode, because returned triples are not guaranteed to map one-to-one to statements in the internal RDF store.
+The visualization tab can be opened in two ways. First, it can be opened directly from the Triples tab of the RDF panel. In this mode, the visualization is editable, and user interactions are propagated back to the main JSON-LD data and RDF store. Second, it can be opened from the SPARQL dialog when the \texttt{Visualization On} toggle is enabled. In that case, the graph is built from the user's SPARQL CONSTRUCT result and is shown in read-only mode, because returned triples are not guaranteed to map one-to-one to statements in the internal RDF store.
 
 For editable visualization workflows, undo and redo actions are also integrated in the graph toolbar. This allows users to safely revise node/property edits while keeping visualization and underlying data synchronized.
 
