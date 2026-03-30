@@ -1437,6 +1437,35 @@
       \field{title}{Data-Model-Driven Management and Analysis of MOF Synthesis Data}
       \field{year}{2026}
     \endentry
+    \entry{metadata4ing_ontology}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=c868af1be6babe3bc462a90a21c38dda}{%
+           family={{NFDI4Ing Consortium}},
+           familyi={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{fullhash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{fullhashraw}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{bibnamehash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{authorbibnamehash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{authornamehash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{authorfullhash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{authorfullhashraw}{c868af1be6babe3bc462a90a21c38dda}
+      \field{labelalpha}{NFDnd}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed: 2026-03-30}
+      \field{title}{metadata4ing Ontology}
+      \field{year}{n.d.}
+      \verb{urlraw}
+      \verb https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/
+      \endverb
+      \verb{url}
+      \verb https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/
+      \endverb
+    \endentry
     \entry{metaconfigurator2025datamodels}{inproceedings}{}{}
       \name{author}{3}{}{%
         {{hash=cee8fd4aa4588c8a57078a2b835113dc}{%

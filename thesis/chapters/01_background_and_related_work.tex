@@ -240,7 +240,7 @@ By modeling the experimental data from Listing~\ref{lst:background_json_example}
 
 The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against a set of structural and semantic constraints \cite{shacl_standard}. \gls{shacl} performs validation based on explicitly defined ``shapes'' \,that describe the expected properties, data types, and cardinality of \gls{rdf} nodes. While these shapes can be designed to reflect or align with domain ontologies, \gls{shacl} validation itself is independent of ontology languages such as \gls{owl}, which are primarily used for logical reasoning rather than constraint checking.
 
-For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing~\ref{lst:background_jsonld_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology:
+For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing~\ref{lst:background_jsonld_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology. By applying this shape, \gls{rdf} data can be automatically checked for compliance with the expected structure and semantics, preventing errors or inconsistencies before integration into a \gls{kg}.
 
 \begin{lstlisting}[float=htbp,style=turtle, caption={SHACL shape for validating simulation parameters}, label={lst:background_shacl_example}]
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -279,8 +279,6 @@ local:PropertyValueShape
     ] .
 \end{lstlisting}
 
-By applying this shape, \gls{rdf} data can be automatically checked for compliance with the expected structure and semantics, preventing errors or inconsistencies before integration into a \gls{kg}.
-
 \subsection{SPARQL: Querying Semantic Data}
 \label{sec:background:sparql}
 
@@ -309,14 +307,38 @@ This query retrieves the parameters \texttt{element\_size} and \texttt{max\_von\
 This example illustrates how semantic annotations enable structured and consistent access to data. 
 \gls{sparql} further provides mechanisms for querying \gls{rdf} graphs, including filtering and combining data from multiple sources, which supports the analysis of semantically enriched simulation data.
 
+\newpage
+
 \subsection{OWL: Modeling Rich Semantics and Logical Rules}
 \label{sec:background:owl}
 
 While \gls{rdf} provides the graph structure and \gls{sparql} enables querying, \gls{owl} adds a formal layer for expressing richer domain knowledge \cite{owl2_overview,owl2_primer}. With \gls{owl}, one can define class hierarchies, equivalence and disjointness of classes, and logical constraints on properties (e.g., transitive, symmetric, or cardinality-based restrictions). This allows data to be interpreted not only as stored triples, but also through the rules encoded in the ontology.
 
-In the context of the running simulation example, \gls{owl} can make implicit knowledge explicit. Assume the ontology defines \texttt{m4i:SimulationMethod} as a subclass of \texttt{m4i:Method}, and constrains \texttt{m4i:hasParameter} to point only to \texttt{schema:PropertyValue} resources. If the data states that \texttt{local:run\_fenics\_simulation} is a \texttt{m4i:SimulationMethod} and links it via \texttt{m4i:hasParameter} to \texttt{local:variable\_element\_size}, an \gls{owl} reasoner can infer that \texttt{local:run\_fenics\_simulation} is also a \texttt{m4i:Method} and that \texttt{local:variable\_element\_size} is a \texttt{schema:PropertyValue}, even when these types are not asserted explicitly.
+\begin{lstlisting}[float=htbp,style=turtle, caption={Definition for \texttt{:hasParameter} property in Metadata4Ing ontology\cite{metadata4ing_ontology}}, label={lst:background_owl_example}]
+:hasParameter rdf:type owl:ObjectProperty ;
+              rdfs:domain [ rdf:type owl:Class ;
+                            owl:unionOf ( :Method
+                                          :Tool
+                                        )
+                          ] ;
+              rdfs:range <http://www.molmod.info/semantics/pims-ii.ttl#Variable> ;
+              rdfs:comment "Points to a parameter of a given method or tool."@en ;
+              rdfs:label "has parameter"@en .
+\end{lstlisting}
 
-Compared with \gls{shacl}, which is mainly used to validate whether data satisfies predefined constraints, \gls{owl} focuses on deriving additional knowledge from formally defined semantics. In practice, both are complementary: \gls{shacl} helps ensure data quality, while \gls{owl} supports richer interpretation and inference in a \gls{kg}.
+An \gls{owl} reasoner is a software system that applies ontology axioms to infer implicit facts and check whether a knowledge graph is logically consistent \cite{owl2_primer}. Using this definition, \gls{owl} can derive additional knowledge from very compact assertions. For example, if the graph only specifies the following triple:
+\begin{quote}
+\small
+\texttt{(local:run\_fenics\_simulation , m4i:hasParameter , local:variable\_element\_size)}
+\end{quote}
+a reasoner infers that
+\begin{quote}
+\small  
+\texttt{(local:variable\_element\_size, rdf:type, <http://www.molmod.info/semantics/pims-ii.ttl\#Variable)}
+\end{quote}
+from the property range, and that \texttt{local:run\_fenics\_simulation} belongs to the union class \texttt{(:Method $\sqcup$ :Tool)} (from the property domain).
+
+This illustrates how \gls{owl} models richer semantics than plain triples: the meaning of \texttt{:hasParameter} is encoded declaratively in the ontology and reused automatically across all instances. Compared with \gls{shacl}, which is mainly used to validate whether data satisfies predefined constraints, \gls{owl} focuses on deriving additional knowledge from formally defined semantics. In practice, both are complementary: \gls{shacl} helps ensure data quality, while \gls{owl} supports richer interpretation and inference in a \gls{kg}.
 
 \subsection{RML for Mapping JSON to RDF}
 \label{sec:background:rml}
@@ -340,8 +362,6 @@ Listing~\ref{lst:background_rml_mapping} shows part of an example \gls{rml} mapp
 @prefix m4i: <http://w3id.org/nfdi4ing/metadata4ing#> .
 @prefix schema: <https://schema.org/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix unit: <http://qudt.org/vocab/unit/> .
-@prefix local: <https://www.example.org/> .
 
 <#RunFenicsSimulation>
   rml:logicalSource [
@@ -625,5 +645,3 @@ Although these tools provide strong support for individual Semantic Web tasks, s
 \end{itemize}
 
 This thesis addresses these gaps by extending MetaConfigurator from a schema-guided data modeling tool into an integrated \gls{rdf} authoring environment. In particular, it supports a continuous workflow from \gls{json} authoring to \gls{jsonld}/\gls{rdf} transformation, ontology-aware triple editing, integrated \gls{sparql} querying, graph visualization, and \gls{ai}-assisted drafting of \gls{sparql} queries and \gls{rml} mappings.
-
-Chapter~\ref{sec:design} builds on this background by translating these requirements into concrete architectural and implementation decisions for the \gls{rdf} authoring extension in MetaConfigurator.
