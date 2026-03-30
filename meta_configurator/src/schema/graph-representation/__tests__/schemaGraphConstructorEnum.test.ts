@@ -1,11 +1,10 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import type {Path} from '@/utility/path';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {EdgeType, SchemaEnumNodeData, SchemaGraph, SchemaObjectNodeData} from '../schemaGraphTypes';
 import {
   generateAttributeEdges,
   generateObjectAttributes,
-  identifyObjects,
+  identifyAllObjects,
   populateGraph,
   trimNodeChildren,
 } from '../schemaGraphConstructor';
@@ -30,7 +29,6 @@ vi.mock('@/dataformats/formatRegistry', () => ({
 }));
 
 describe('test schema graph constructor with objects and attributes with enums', () => {
-  let currentPath: Path;
   let schema: TopLevelSchema = {
     type: 'object',
     $defs: {
@@ -64,13 +62,7 @@ describe('test schema graph constructor with objects and attributes with enums',
   let defs: Map<string, SchemaObjectNodeData>;
 
   beforeEach(() => {
-    currentPath = [];
-    defs = new Map();
-    identifyObjects(currentPath, schema, defs, false, schema);
-    // @ts-ignore
-    for (const [key, value] of Object.entries(schema.$defs)) {
-      identifyObjects(['$defs', key], value, defs, true, schema);
-    }
+    defs = identifyAllObjects(schema);
   });
 
   it('identify objects', () => {

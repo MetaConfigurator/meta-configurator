@@ -22,6 +22,7 @@ import {
 } from '@/schema/graph-representation/schemaGraphTypes';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {isExternalRef} from '@/schema/externalReferences.ts';
+import {JsonSchemaVisitor, type VisitorContext} from '@/schema/jsonSchemaVisitor.ts';
 
 const settings = useSettings();
 
@@ -70,122 +71,86 @@ export function populateGraph(
   }
 }
 
-export function identifyAllObjects(rootSchema: TopLevelSchema): Map<string, SchemaObjectNodeData> {
-  const objectDefs = new Map<string, SchemaObjectNodeData>();
-  identifyObjects([], rootSchema, objectDefs, false, rootSchema);
+class IdentifyObjectsVisitor extends JsonSchemaVisitor {
+  readonly defs = new Map<string, SchemaElementData>();
 
-  if (rootSchema.$defs) {
-    for (const [key, value] of Object.entries(rootSchema.$defs)) {
-      identifyObjects(['$defs', key], value, objectDefs, true, rootSchema);
-    }
-  }
-  if (rootSchema.definitions) {
-    for (const [key, value] of Object.entries(rootSchema.definitions)) {
-      identifyObjects(['definitions', key], value, objectDefs, true, rootSchema);
-    }
+  constructor(private readonly rootSchema: TopLevelSchema) {
+    super();
   }
 
-  return objectDefs;
-}
-
-export function identifyObjects(
-  currentPath: Path,
-  schema: JsonSchemaType,
-  defs: Map<string, SchemaElementData>,
-  hasUserDefinedName: boolean,
-  rootSchema: TopLevelSchema
-) {
-  if (schema === true || schema === false) {
-    return;
-  }
-
-  // It can be that simple types, such as strings with enum constraint, have their own definition.
-  // We allow generating a node for this, so it can be referred to by other objects.
-  // But we do not visualize those nodes for simple types.
-  defs.set(
-    pathToString(currentPath),
-    generateInitialNode(currentPath, hasUserDefinedName, schema, rootSchema)
-  );
-
-  if (schema.properties) {
-    for (const [key, value] of Object.entries(schema.properties)) {
-      if (typeof value === 'object') {
-        const childPath = [...currentPath, 'properties', key];
-        identifyObjects(childPath, value, defs, true, rootSchema);
-      }
-    }
-  }
-  if (schema.patternProperties) {
-    for (const [key, value] of Object.entries(schema.patternProperties)) {
-      if (typeof value === 'object') {
-        const childPath = [...currentPath, 'patternProperties', key];
-        identifyObjects(childPath, value, defs, true, rootSchema);
-      }
-    }
-  }
-  if (schema.items) {
-    if (typeof schema.items === 'object') {
-      const childPath = [...currentPath, 'items'];
-      identifyObjects(childPath, schema.items, defs, false, rootSchema);
-    }
-  }
-
-  if (schema.oneOf) {
-    for (const [index, value] of schema.oneOf.entries()) {
-      if (typeof value === 'object') {
-        const childPath = [...currentPath, 'oneOf', index];
-        identifyObjects(childPath, value, defs, false, rootSchema);
-      }
-    }
-  }
-  if (schema.anyOf) {
-    for (const [index, value] of schema.anyOf.entries()) {
-      if (typeof value === 'object') {
-        const childPath = [...currentPath, 'anyOf', index];
-        identifyObjects(childPath, value, defs, false, rootSchema);
-      }
-    }
-  }
-  if (schema.allOf) {
-    for (const [index, value] of schema.allOf.entries()) {
-      if (typeof value === 'object') {
-        const childPath = [...currentPath, 'allOf', index];
-        identifyObjects(childPath, value, defs, false, rootSchema);
-      }
-    }
-  }
-  if (schema.if) {
-    if (typeof schema.if === 'object') {
-      identifyObjects([...currentPath, 'if'], schema.if, defs, false, rootSchema);
-    }
-  }
-  if (schema.then) {
-    if (typeof schema.then === 'object') {
-      identifyObjects([...currentPath, 'then'], schema.then, defs, false, rootSchema);
-    }
-  }
-  if (schema.else) {
-    if (typeof schema.else === 'object') {
-      identifyObjects([...currentPath, 'else'], schema.else, defs, false, rootSchema);
-    }
-  }
-  if (schema.additionalProperties) {
-    if (typeof schema.additionalProperties === 'object') {
-      identifyObjects(
-        [...currentPath, 'additionalProperties'],
-        schema.additionalProperties,
-        defs,
-        false,
-        rootSchema
+  private addNode(schema: JsonSchemaType, path: Path, hasUserDefinedName: boolean): void {
+    if (typeof schema === 'object' && schema !== null) {
+      this.defs.set(
+        pathToString(path),
+        generateInitialNode(
+          path,
+          hasUserDefinedName,
+          schema as JsonSchemaObjectType,
+          this.rootSchema
+        )
       );
     }
   }
-  if (schema.$ref && isExternalRef(schema.$ref)) {
-    defs.set(
-      schema.$ref,
-      new SchemaExternalReferenceNodeData(schema.$ref, [...currentPath, '$ref'])
-    );
+
+  protected visitSchema(schema: JsonSchemaObjectType, ctx: VisitorContext): void {
+    if (ctx.depth === 0) {
+      this.addNode(schema, [] as Path, false);
+    }
   }
+
+  protected visitProperty(_name: string, schema: JsonSchemaType, ctx: VisitorContext): void {
+    this.addNode(schema, ctx.path as Path, true);
+  }
+
+  protected visitPatternProperty(
+    _pattern: string,
+    schema: JsonSchemaType,
+    ctx: VisitorContext
+  ): void {
+    this.addNode(schema, ctx.path as Path, true);
+  }
+
+  protected visitDefinition(_name: string, schema: JsonSchemaType, ctx: VisitorContext): void {
+    this.addNode(schema, ctx.path as Path, true);
+  }
+
+  protected visitCompositional(
+    keyword: string,
+    schemas: JsonSchemaType | JsonSchemaType[],
+    ctx: VisitorContext
+  ): void {
+    if (keyword !== 'not' && Array.isArray(schemas)) {
+      schemas.forEach((schema, i) => {
+        this.addNode(schema, [...ctx.path, keyword, i] as Path, false);
+      });
+    }
+  }
+
+  protected visitConditional(_keyword: string, schema: JsonSchemaType, ctx: VisitorContext): void {
+    this.addNode(schema, ctx.path as Path, false);
+  }
+
+  protected visitSubSchemaKeyword(
+    keyword: string,
+    schema: JsonSchemaType,
+    ctx: VisitorContext
+  ): void {
+    if (keyword === 'items' || keyword === 'additionalProperties') {
+      this.addNode(schema, ctx.path as Path, false);
+    }
+  }
+
+  protected visitRef(ref: string, ctx: VisitorContext): void {
+    if (isExternalRef(ref)) {
+      this.defs.set(ref, new SchemaExternalReferenceNodeData(ref, [...ctx.path, '$ref'] as Path));
+    }
+  }
+}
+
+export function identifyAllObjects(rootSchema: TopLevelSchema): Map<string, SchemaObjectNodeData> {
+  const visitor = new IdentifyObjectsVisitor(rootSchema);
+  visitor.traverse(rootSchema);
+  return visitor.defs as unknown as Map<string, SchemaObjectNodeData>;
 }
 
 function generateInitialNode(
