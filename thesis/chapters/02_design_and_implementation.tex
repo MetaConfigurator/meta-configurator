@@ -32,7 +32,6 @@ If the input data is not already expressed as \gls{jsonld}, the \gls{rdf} panel 
 The dialog allows users to either provide an existing \gls{rml} mapping or generate one automatically with \gls{ai} assistance. In the latter case, the user supplies mapping hints that describe how elements of the input \gls{json} data should be mapped to \gls{rdf} properties or classes. These hints, together with a representative subset of the input data, are sent to an external \gls{ai} API to generate a candidate mapping. This prompt guides the language model to produce a valid \gls{rml} mapping in Turtle syntax that conforms to the target \gls{jsonld} structure. The prompt constrains the model to return a mapping definition adhering to \gls{rml} rules, thereby improving reliability and syntactic correctness. In simplified form, the prompt contains: (i) role/instruction constraints, (ii) required prefixes and output format, (iii) representative input-data fragments, and (iv) user-provided mapping hints. Listing~\ref{lst:design:rml_prompt_template} shows a shortened excerpt of the prompt-construction logic.
 
 \begin{lstlisting}[float=htbp,style=plaintext,caption={Part of the RML prompt template which guides the AI model}, label={lst:design:rml_prompt_template}]
-[instruction template]
 You are an assistant that generates RML mappings in Turtle syntax that convert JSON input into RDF.
 Follow the RML specification strictly and avoid generating invalid RML constructs.
 The output must contain ONLY valid Turtle mapping code and no explanations.
@@ -130,7 +129,7 @@ Convert my JSON Data to JSON-LD such that I have two nodes, each node representi
 
 The mapping editor is implemented using the CodeMirror component, a widely used web-based code editor that provides syntax highlighting and automatic indentation \cite{codemirror}. Mapping validity is checked by the mapping service through debounced live validation. This allows users to inspect, refine, and validate the generated mapping directly within the interface before applying it to transform the \gls{json} input into \gls{jsonld}.
 
-Users may either provide a \gls{rml} mapping in Turtle syntax directly or use the \gls{ai}-assisted generation feature by supplying mapping hints. The resulting mapping is displayed in the CodeMirror editor, where it can be reviewed and edited as needed. Because \gls{ai}-generated mappings may contain semantic or syntactic errors, users must verify them before execution. Once finalized, the mapping can be applied to convert the input \gls{json} data into \gls{jsonld}, which can then be further managed in the \gls{rdf} authoring panel.
+Users may either provide a \gls{rml} mapping in Turtle syntax directly or use the \gls{ai}-assisted generation feature by supplying mapping hints. The resulting mapping is displayed in the CodeMirror editor, where it can be reviewed and edited as needed. Because \gls{ai}-generated mappings may contain semantic or syntactic errors, users must verify them before execution. Any syntax errors introduced during mapping editing, as well as errors that occur after applying the mapping, are reported to the user to support debugging and correction. Once finalized, the mapping can be applied to convert the input \gls{json} data into \gls{jsonld}, which can then be further managed in the \gls{rdf} authoring panel.
 
 The examples in this section show that even a minimal hint can already produce a correct mapping for simple targets. In particular, the short natural-language hint shown above can still lead to a valid \gls{rml} mapping (Listing~\ref{lst:background_rml_mapping_simple}) and a corresponding \gls{jsonld} output (Listing~\ref{lst:background_jsonld_example_simple}).
 
@@ -164,7 +163,7 @@ The examples in this section show that even a minimal hint can already produce a
 }  
 \end{lstlisting}
 
-However, realistic \gls{rml} authoring is often more complex and usually requires precise guidance to obtain the intended semantic structure. Therefore, detailed hints such as Listing~\ref{lst:metaconfigurator_interface_rdf:rml_hint_complex} are needed when the target output must follow specific vocabularies, resource patterns, and links between entities. With this level of instruction, the generated mapping can match the expected structure in Listing~\ref{lst:background_rml_mapping} and produce the intended \gls{jsonld} in Listing~\ref{lst:background_jsonld_example}. 
+However, realistic \gls{rml} crafting is often more complex and usually requires precise guidance to obtain the intended semantic structure. Therefore, detailed hints are needed when the target output must follow specific vocabularies, resource patterns, and links between entities. Listing~\ref{lst:metaconfigurator_interface_rdf:rml_hint_complex} shows a detailed example. With this level of instruction, the generated mapping matches the expected structure in Listing~\ref{lst:background_rml_mapping} and produce the intended \gls{jsonld} in Listing~\ref{lst:background_jsonld_example}. 
 
 \begin{lstlisting}[float=htbp,style=plaintext,basicstyle=\ttfamily\fontsize{7}{8}\selectfont\color{black},caption={Sample RML hints which describe the mapping from JSON in~\ref{lst:background_json_example} to JSON-LD in~\ref{lst:background_jsonld_example}}, label={lst:metaconfigurator_interface_rdf:rml_hint_complex}]
 Create one main resource local:run_fenics_simulation of type m4i:Method.
@@ -190,7 +189,7 @@ unit: http://qudt.org/vocab/unit/
 local: https://www.example.org/
 \end{lstlisting}
 
-After providing such hints, the configured \gls{ai} model generates a mapping that follows the specified structure and semantics. Once the user reviews and confirms the mapping, it can be executed to transform the input \gls{json} data into a semantically enriched \gls{jsonld} representation, as illustrated in Figure~\ref{fig:rdf_authoring_panel:jsonld}.
+After providing such hints, the configured \gls{ai} model generates a mapping that is intended to follow the specified structure and semantics, although this is not always guaranteed in practice and largely depends on the capability of the underlying model. Once the user reviews and confirms the mapping, it can be executed to transform the input \gls{json} data into a semantically enriched \gls{jsonld} representation, as illustrated in Figure~\ref{fig:rdf_authoring_panel:jsonld}.
 
 \begin{figure}[htbp]
   \centering
