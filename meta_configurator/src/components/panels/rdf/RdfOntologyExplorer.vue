@@ -15,7 +15,10 @@
       </div>
       <div v-if="selectedPrefix" class="content-pane">
         <div class="flex flex-col gap-2 mb-3">
-          <label class="text-sm font-medium">Ontology URL (Supported RDF serializations: RDF/XML, Turtle, N-Triples, N3, JSON-LD)</label>
+          <label class="text-sm font-medium"
+            >Ontology URL (Supported RDF serializations: RDF/XML, Turtle, N-Triples, N3,
+            JSON-LD)</label
+          >
           <InputText
             v-model.trim="ontologyUrl"
             class="w-full"
@@ -206,7 +209,9 @@ const objectRows = computed(() =>
 const filteredDatatypeRows = computed(() => filterRows(datatypeRows.value, datatypeSearch.value));
 const filteredObjectRows = computed(() => filterRows(objectRows.value, objectSearch.value));
 const activeSelectedRow = computed(() =>
-  activePropertyTab.value === 'DatatypeProperty' ? selectedDatatypeRow.value : selectedObjectRow.value
+  activePropertyTab.value === 'DatatypeProperty'
+    ? selectedDatatypeRow.value
+    : selectedObjectRow.value
 );
 const selectedRowIri = computed(() => {
   const row = activeSelectedRow.value;
