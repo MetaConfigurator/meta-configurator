@@ -132,6 +132,7 @@
     :style="{width: '1200px', height: '900px'}"
     :contentStyle="{height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column'}">
     <RdfOntologyExplorer
+      :sourceField="ontologyExplorerTarget"
       :initialIri="ontologyExplorerInitialIri"
       @select-iri="applyOntologySelection" />
   </Dialog>

@@ -2,7 +2,6 @@
   <div class="rdf-ontology-explorer p-3">
     <div class="explorer-layout">
       <div class="prefix-pane">
-        <label class="text-sm font-medium block mb-2">Prefixes</label>
         <Listbox
           v-model="selectedPrefix"
           :options="prefixOptions"
@@ -14,42 +13,49 @@
           :listStyle="{height: '100%'}" />
       </div>
       <div v-if="selectedPrefix" class="content-pane">
-        <div class="flex flex-col gap-2 mb-3">
-          <label class="text-sm font-medium"
-            >Ontology URL (Supported RDF serializations: RDF/XML, Turtle, N-Triples, N3,
-            JSON-LD)</label
-          >
-          <InputText
-            v-model.trim="ontologyUrl"
-            class="w-full"
-            :disabled="!selectedPrefix || isDownloading" />
-          <div class="flex gap-2 items-center flex-wrap">
-            <Button
-              label="Download"
-              icon="pi pi-download"
-              :loading="isDownloading"
-              :disabled="!selectedPrefix || !ontologyUrl"
-              @click="downloadAndCacheOntology" />
-            <Button
-              label="Refresh"
-              icon="pi pi-refresh"
-              severity="secondary"
-              variant="text"
-              :loading="isQuerying"
-              :disabled="!selectedCacheEntry"
-              @click="loadOntologyCards" />
-            <Button
-              label="Delete"
-              icon="pi pi-trash"
-              severity="danger"
-              variant="text"
-              :disabled="!selectedPrefix || !selectedCacheEntry"
-              @click="deleteCachedOntology" />
-          </div>
-          <small v-if="selectedCacheEntry" class="text-muted-color">
-            Cached on {{ formatDate(selectedCacheEntry.fetchedAt) }}
-          </small>
-        </div>
+        <Accordion v-model:value="activeAccordion" class="mb-3">
+          <AccordionPanel value="ontologyControls">
+            <AccordionHeader>Ontology Controls</AccordionHeader>
+            <AccordionContent>
+              <div class="flex flex-col gap-2">
+                <label class="text-sm font-medium"
+                  >Ontology URL (Supported RDF serializations: RDF/XML, Turtle, N-Triples, N3,
+                  JSON-LD)</label
+                >
+                <InputText
+                  v-model.trim="ontologyUrl"
+                  class="w-full"
+                  :disabled="!selectedPrefix || isDownloading" />
+                <div class="flex gap-2 items-center flex-wrap">
+                  <Button
+                    label="Download"
+                    icon="pi pi-download"
+                    severity="secondary"
+                    :loading="isDownloading"
+                    :disabled="!selectedPrefix || !ontologyUrl"
+                    @click="downloadAndCacheOntology" />
+                  <Button
+                    label="Refresh"
+                    icon="pi pi-refresh"
+                    variant="text"
+                    :loading="isQuerying"
+                    :disabled="!selectedCacheEntry"
+                    @click="loadOntologyCards" />
+                  <Button
+                    label="Delete"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    variant="text"
+                    :disabled="!selectedPrefix || !selectedCacheEntry"
+                    @click="confirmDeleteCachedOntology" />
+                </div>
+                <small v-if="selectedCacheEntry" class="text-muted-color">
+                  Cached on {{ formatDate(selectedCacheEntry.fetchedAt) }}
+                </small>
+              </div>
+            </AccordionContent>
+          </AccordionPanel>
+        </Accordion>
 
         <Message v-if="statusMessage" :severity="statusSeverity" :closable="false" class="mb-3">
           {{ statusMessage }}
@@ -62,8 +68,11 @@
         <div v-else class="table-wrapper">
           <Tabs v-model:value="activePropertyTab" class="ontology-tabs">
             <TabList>
-              <Tab value="DatatypeProperty">DatatypeProperty</Tab>
-              <Tab value="ObjectProperty">ObjectProperty</Tab>
+              <Tab value="DatatypeProperty" :disabled="!isDatatypeTabEnabled">DatatypeProperty</Tab>
+              <Tab value="ObjectProperty" :disabled="!isObjectPropertyTabEnabled"
+                >ObjectProperty</Tab
+              >
+              <Tab value="Class" :disabled="!isClassTabEnabled">Class</Tab>
             </TabList>
             <TabPanels>
               <TabPanel value="DatatypeProperty">
@@ -80,6 +89,7 @@
                   selectionMode="single"
                   dataKey="about"
                   size="small"
+                  stripedRows
                   scrollable
                   scrollHeight="flex">
                   <Column selectionMode="single" headerStyle="width: 3rem" />
@@ -88,7 +98,7 @@
                       {{ termNameFromIri(data.about) }}
                     </template>
                   </Column>
-                  <Column field="comment" header="comment" />
+                  <Column field="comment" header="Comment" />
                 </DataTable>
               </TabPanel>
               <TabPanel value="ObjectProperty">
@@ -105,6 +115,7 @@
                   selectionMode="single"
                   dataKey="about"
                   size="small"
+                  stripedRows
                   scrollable
                   scrollHeight="flex">
                   <Column selectionMode="single" headerStyle="width: 3rem" />
@@ -113,7 +124,33 @@
                       {{ termNameFromIri(data.about) }}
                     </template>
                   </Column>
-                  <Column field="comment" header="comment" />
+                  <Column field="comment" header="Comment" />
+                </DataTable>
+              </TabPanel>
+              <TabPanel value="Class">
+                <div class="table-search mb-2">
+                  <InputText
+                    v-model.trim="tableSearch"
+                    placeholder="Search classes"
+                    class="w-full" />
+                </div>
+                <DataTable
+                  ref="classTableRef"
+                  :value="filteredClassRows"
+                  v-model:selection="selectedClassRow"
+                  selectionMode="single"
+                  dataKey="about"
+                  size="small"
+                  stripedRows
+                  scrollable
+                  scrollHeight="flex">
+                  <Column selectionMode="single" headerStyle="width: 3rem" />
+                  <Column field="about" header="rdf:about">
+                    <template #body="{data}">
+                      {{ termNameFromIri(data.about) }}
+                    </template>
+                  </Column>
+                  <Column field="comment" header="Comment" />
                 </DataTable>
               </TabPanel>
             </TabPanels>
@@ -128,6 +165,27 @@
         Select a prefix from the list to open the ontology panel.
       </div>
     </div>
+    <Dialog v-model:visible="deleteDialog" header="Confirm" modal>
+      <div class="flex items-center gap-4">
+        <i class="pi pi-exclamation-triangle !text-3xl" />
+        <span>Are you sure you want to delete the cached ontology for this prefix?</span>
+      </div>
+      <template #footer>
+        <Button
+          label="No"
+          icon="pi pi-times"
+          text
+          @click="deleteDialog = false"
+          severity="secondary"
+          variant="text" />
+        <Button
+          label="Yes"
+          icon="pi pi-check"
+          text
+          @click="deleteCachedOntology"
+          severity="danger" />
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -138,6 +196,11 @@ import Listbox from 'primevue/listbox';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
+import Dialog from 'primevue/dialog';
+import Accordion from 'primevue/accordion';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Tabs from 'primevue/tabs';
@@ -152,9 +215,11 @@ import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager
 const props = withDefaults(
   defineProps<{
     initialIri?: string;
+    sourceField?: 'Predicate' | 'Object';
   }>(),
   {
     initialIri: '',
+    sourceField: 'Predicate',
   }
 );
 const emit = defineEmits<{
@@ -171,16 +236,24 @@ const statusMessage = ref('');
 const statusSeverity = ref<'success' | 'info' | 'warn' | 'error'>('info');
 const isQuerying = ref(false);
 const ontologyRows = ref<
-  Array<{about: string; comment: string; propertyType: 'ObjectProperty' | 'DatatypeProperty'}>
+  Array<{
+    about: string;
+    comment: string;
+    propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
+  }>
 >([]);
-const activePropertyTab = ref<'DatatypeProperty' | 'ObjectProperty'>('ObjectProperty');
+const activePropertyTab = ref<'DatatypeProperty' | 'ObjectProperty' | 'Class'>('ObjectProperty');
 const tableSearch = ref('');
 const selectedDatatypeRow = ref<any | null>(null);
 const selectedObjectRow = ref<any | null>(null);
+const selectedClassRow = ref<any | null>(null);
 const pendingInitialIri = ref('');
 const isAutoSelectingPrefix = ref(false);
 const datatypeTableRef = ref<any | null>(null);
 const objectTableRef = ref<any | null>(null);
+const classTableRef = ref<any | null>(null);
+const activeAccordion = ref<string | null>('ontologyControls');
+const deleteDialog = ref(false);
 
 type CachedOntology = {
   prefix: string;
@@ -209,13 +282,20 @@ const datatypeRows = computed(() =>
 const objectRows = computed(() =>
   ontologyRows.value.filter(row => row.propertyType === 'ObjectProperty')
 );
+const classRows = computed(() => ontologyRows.value.filter(row => row.propertyType === 'Class'));
 const filteredDatatypeRows = computed(() => filterRows(datatypeRows.value, tableSearch.value));
 const filteredObjectRows = computed(() => filterRows(objectRows.value, tableSearch.value));
+const filteredClassRows = computed(() => filterRows(classRows.value, tableSearch.value));
 const activeSelectedRow = computed(() =>
   activePropertyTab.value === 'DatatypeProperty'
     ? selectedDatatypeRow.value
-    : selectedObjectRow.value
+    : activePropertyTab.value === 'ObjectProperty'
+    ? selectedObjectRow.value
+    : selectedClassRow.value
 );
+const isDatatypeTabEnabled = computed(() => props.sourceField === 'Predicate');
+const isObjectPropertyTabEnabled = computed(() => props.sourceField === 'Predicate');
+const isClassTabEnabled = computed(() => props.sourceField === 'Object');
 const selectedRowIri = computed(() => {
   const row = activeSelectedRow.value;
   if (!row?.about) return '';
@@ -265,6 +345,7 @@ watch(
     ontologyRows.value = [];
     selectedDatatypeRow.value = null;
     selectedObjectRow.value = null;
+    selectedClassRow.value = null;
     tableSearch.value = '';
     if (!newPrefix) {
       ontologyUrl.value = '';
@@ -285,6 +366,25 @@ watch(
     trySelectRowForIri(pendingInitialIri.value);
   },
   {deep: false}
+);
+
+watch(
+  () => props.sourceField,
+  sourceField => {
+    activePropertyTab.value = sourceField === 'Object' ? 'Class' : 'ObjectProperty';
+    selectedDatatypeRow.value = null;
+    selectedObjectRow.value = null;
+    selectedClassRow.value = null;
+  },
+  {immediate: true}
+);
+
+watch(
+  selectedCacheEntry,
+  entry => {
+    activeAccordion.value = entry ? null : 'ontologyControls';
+  },
+  {immediate: true}
 );
 
 async function downloadAndCacheOntology() {
@@ -328,15 +428,30 @@ async function downloadAndCacheOntology() {
       contentType,
       fetchedAt: new Date().toISOString(),
     };
-    saveCacheToStorage(ontologyCache.value);
+    const cacheSaveResult = saveCacheToStorage(ontologyCache.value, [selectedPrefix.value]);
     await loadOntologyCards();
 
-    setStatus(
-      `Ontology for prefix "${selectedPrefix.value}" was downloaded and cached${
-        usedProxy ? ' (via local proxy)' : ''
-      }.`,
-      'success'
-    );
+    if (cacheSaveResult.saved) {
+      const cleanedHint =
+        cacheSaveResult.evictedCount > 0
+          ? ` (removed ${cacheSaveResult.evictedCount} old cache entr${
+              cacheSaveResult.evictedCount === 1 ? 'y' : 'ies'
+            })`
+          : '';
+      setStatus(
+        `Ontology for prefix "${selectedPrefix.value}" was downloaded and cached${
+          usedProxy ? ' (via local proxy)' : ''
+        }${cleanedHint}.`,
+        'success'
+      );
+    } else {
+      setStatus(
+        `Ontology for prefix "${selectedPrefix.value}" was downloaded${
+          usedProxy ? ' (via local proxy)' : ''
+        }, but browser storage is full so it could not be cached persistently.`,
+        'warn'
+      );
+    }
   } catch (error: any) {
     setStatus(error?.message ?? 'Failed to download ontology.', 'error');
   } finally {
@@ -453,7 +568,9 @@ function buildOntologyQuery() {
       FILTER(
         ?propertyType IN (
           <http://www.w3.org/2002/07/owl#ObjectProperty>,
-          <http://www.w3.org/2002/07/owl#DatatypeProperty>
+          <http://www.w3.org/2002/07/owl#DatatypeProperty>,
+          <http://www.w3.org/2000/01/rdf-schema#Class>,
+          <http://www.w3.org/2002/07/owl#Class>
         )
       )
       ${namespaceFilter}
@@ -481,7 +598,7 @@ async function runSparqlOnCachedOntology(query: string, content: string, format:
   const rows: Array<{
     about: string;
     comment: string;
-    propertyType: 'ObjectProperty' | 'DatatypeProperty';
+    propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
   }> = [];
 
   await new Promise<void>((resolve, reject) => {
@@ -496,6 +613,9 @@ async function runSparqlOnCachedOntology(query: string, content: string, format:
           propertyType:
             propertyTypeIri === 'http://www.w3.org/2002/07/owl#DatatypeProperty'
               ? 'DatatypeProperty'
+              : propertyTypeIri === 'http://www.w3.org/2000/01/rdf-schema#Class' ||
+                propertyTypeIri === 'http://www.w3.org/2002/07/owl#Class'
+              ? 'Class'
               : 'ObjectProperty',
         });
       })
@@ -510,7 +630,7 @@ function filterRows(
   rows: Array<{
     about: string;
     comment: string;
-    propertyType: 'ObjectProperty' | 'DatatypeProperty';
+    propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
   }>,
   query: string
 ) {
@@ -560,9 +680,60 @@ function loadCacheFromStorage(): Record<string, CachedOntology> {
   }
 }
 
-function saveCacheToStorage(cache: Record<string, CachedOntology>) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
+function saveCacheToStorage(
+  cache: Record<string, CachedOntology>,
+  protectedPrefixes: string[] = []
+): {
+  saved: boolean;
+  evictedCount: number;
+} {
+  if (typeof window === 'undefined') return {saved: true, evictedCount: 0};
+
+  const tryPersist = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
+  };
+
+  try {
+    tryPersist();
+    return {saved: true, evictedCount: 0};
+  } catch (error: any) {
+    if (!isQuotaExceededError(error)) {
+      return {saved: false, evictedCount: 0};
+    }
+  }
+
+  const protectedSet = new Set(protectedPrefixes.filter(Boolean));
+  const entries = Object.entries(cache)
+    .filter(([prefix]) => !protectedSet.has(prefix))
+    .sort((a, b) => {
+      const aTime = Date.parse(a[1].fetchedAt || '');
+      const bTime = Date.parse(b[1].fetchedAt || '');
+      const safeATime = Number.isNaN(aTime) ? 0 : aTime;
+      const safeBTime = Number.isNaN(bTime) ? 0 : bTime;
+      return safeATime - safeBTime;
+    });
+
+  let evictedCount = 0;
+  for (const [prefix] of entries) {
+    delete cache[prefix];
+    evictedCount += 1;
+    try {
+      tryPersist();
+      return {saved: true, evictedCount};
+    } catch (error: any) {
+      if (!isQuotaExceededError(error)) {
+        return {saved: false, evictedCount};
+      }
+    }
+  }
+
+  return {saved: false, evictedCount};
+}
+
+function isQuotaExceededError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as DOMException;
+  return err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED';
 }
 
 function deleteCachedOntology() {
@@ -574,7 +745,13 @@ function deleteCachedOntology() {
   ontologyRows.value = [];
   selectedDatatypeRow.value = null;
   selectedObjectRow.value = null;
+  selectedClassRow.value = null;
+  deleteDialog.value = false;
   setStatus(`Cached ontology for prefix "${selectedPrefix.value}" was deleted.`, 'info');
+}
+
+function confirmDeleteCachedOntology() {
+  deleteDialog.value = true;
 }
 
 function selectCurrentIri() {
@@ -607,15 +784,23 @@ function trySelectRowForIri(iri: string) {
 
   const match = ontologyRows.value.find(row => rowMatchesIri(row.about, iri, namespace));
   if (!match) return;
+  if (!isRowTypeEnabled(match.propertyType)) return;
 
   if (match.propertyType === 'DatatypeProperty') {
     activePropertyTab.value = 'DatatypeProperty';
     selectedDatatypeRow.value = match;
     selectedObjectRow.value = null;
+    selectedClassRow.value = null;
+  } else if (match.propertyType === 'Class') {
+    activePropertyTab.value = 'Class';
+    selectedClassRow.value = match;
+    selectedDatatypeRow.value = null;
+    selectedObjectRow.value = null;
   } else {
     activePropertyTab.value = 'ObjectProperty';
     selectedObjectRow.value = match;
     selectedDatatypeRow.value = null;
+    selectedClassRow.value = null;
   }
   focusMatchedRow(match);
   pendingInitialIri.value = '';
@@ -641,13 +826,19 @@ function rowMatchesIri(rowAbout: string, iri: string, namespace: string): boolea
   return `${namespace}${termNameFromIri(rowAbout)}` === iri;
 }
 
+function isRowTypeEnabled(propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class'): boolean {
+  if (propertyType === 'DatatypeProperty') return isDatatypeTabEnabled.value;
+  if (propertyType === 'ObjectProperty') return isObjectPropertyTabEnabled.value;
+  return isClassTabEnabled.value;
+}
+
 function normalizeIri(value: string | undefined): string {
   return (value ?? '').trim();
 }
 
 async function focusMatchedRow(match: {
   about: string;
-  propertyType: 'ObjectProperty' | 'DatatypeProperty';
+  propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
 }) {
   await nextTick();
   window.setTimeout(async () => {
@@ -655,12 +846,18 @@ async function focusMatchedRow(match: {
     const rows =
       match.propertyType === 'DatatypeProperty'
         ? filteredDatatypeRows.value
-        : filteredObjectRows.value;
+        : match.propertyType === 'ObjectProperty'
+        ? filteredObjectRows.value
+        : filteredClassRows.value;
     const index = rows.findIndex(row => row.about === match.about);
     if (index < 0) return;
 
     const tableRef =
-      match.propertyType === 'DatatypeProperty' ? datatypeTableRef.value : objectTableRef.value;
+      match.propertyType === 'DatatypeProperty'
+        ? datatypeTableRef.value
+        : match.propertyType === 'ObjectProperty'
+        ? objectTableRef.value
+        : classTableRef.value;
     const tableEl = tableRef?.$el as HTMLElement | undefined;
     const rowEl = tableEl?.querySelector(`tr[data-p-index="${index}"]`) as HTMLElement | null;
     if (!rowEl) return;
