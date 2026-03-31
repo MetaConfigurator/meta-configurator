@@ -2,6 +2,40 @@ import axios from 'axios';
 import {useSettings} from '@/settings/useSettings';
 
 const BASE_URL = 'https://api.openai.com/v1';
+const HF_ENDPOINT =
+  "https://durga-lakshmi-2000-json-generation.hf.space/generate";
+const HF_TOKEN = process.env.HF_TOKEN;
+/**
+ * Query your HF JSON Schema model
+ * @param description user-provided schema description
+ */
+export const queryHFSchemaModel = async (description: string) => {
+  console.log("=== Sending to HF Endpoint ===");
+  console.log({ description });
+  console.log("=============================");
+
+  try {
+    const response = await axios.post(
+      HF_ENDPOINT,
+      { description },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${HF_TOKEN}`,
+        },
+      }
+    );
+
+    console.log("=== Response from HF Endpoint ===");
+    console.log(response.data.response);
+    console.log("================================");
+
+    return response.data.response;
+  } catch (error) {
+    console.error("Error querying HF schema model:", error);
+    throw error;
+  }
+};
 
 export const queryOpenAI = async (
   apiKey: string,
@@ -50,27 +84,47 @@ export const queryOpenAI = async (
   }
 };
 
-export const querySchemaCreation = async (
-  apiKey: string,
-  schemaDescriptionNaturalLanguage: string
-) => {
-  const systemMessage = `You are a JSON schema expert. Create a JSON schema based on the schema description by the user. Return no other text than a fully valid JSON schema document. When appropriate, put sub-schema definitions into the $defs section. `;
-  return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
-    {role: 'user', content: schemaDescriptionNaturalLanguage},
-  ]);
+/** Schema creation */
+export const querySchemaCreation = async (apikey: string, description: string) => {
+  console.log('Querying schema creation with description:', description);
+  const result = await queryHFSchemaModel(description);
+  // If the result is an object, return it as a JSON string
+  if (typeof result === 'object') {
+    // if result contains a $schema property, then remove it
+    if ('$schema' in result) {
+      delete result['$schema'];
+    }
+    return JSON.stringify(result, null, 2);
+  }
+  // if result is a string it is an error message, so throw error with the message
+  if (typeof result === 'string') {
+    throw new Error(result);
+  }
+  
+  // otherwise throw error
+  throw new Error('Unexpected result type from HF schema model: ' + typeof result);
 };
 
-export const querySchemaModification = async (
-  apiKey: string,
-  schemaChangeDescriptionNaturalLanguage: string,
-  fullSchema: string
-) => {
-  const systemMessage = `You are a JSON schema expert. Modify the provided JSON schema based on the schema change description by the user. Return no other text than a fully valid JSON schema document. No other explanation or words. When appropriate, put sub-schema definitions into the $defs section. The schema to modify is: \`\`\`${fullSchema}\`\`\``;
-  return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
-    {role: 'user', content: schemaChangeDescriptionNaturalLanguage},
-  ]);
+/** Schema modification */
+export const querySchemaModification = async (apikey: string, changeDescription: string, currentSchema: string) => {
+  console.log('Querying schema modification with change description:', changeDescription);
+  const prompt = `Modify the following schema:\n\n${currentSchema}\n\nMake the following changes:\n- ${changeDescription}`;
+  const result = await queryHFSchemaModel(prompt);
+  // If the result is an object, return it as a JSON string
+  if (typeof result === 'object') {
+    // if result contains a $schema property, then remove it
+    if ('$schema' in result) {
+      delete result['$schema'];
+    }
+    return JSON.stringify(result, null, 2);
+  }
+  // if result is a string it is an error message, so throw error with the message
+  if (typeof result === 'string') {
+    throw new Error(result);
+  }
+  
+  // otherwise throw error
+  throw new Error('Unexpected result type from HF schema model: ' + typeof result);
 };
 
 export const querySchemaQuestion = async (
