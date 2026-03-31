@@ -55,6 +55,12 @@
             optionValue="value"
             placeholder="Select or type IRI"
             class="flex-1 min-w-[260px]" />
+          <Button
+            icon="pi pi-compass"
+            severity="contrast"
+            variant="text"
+            rounded
+            @click="openOntologyExplorer('Predicate')" />
         </div>
       </div>
       <div>
@@ -101,6 +107,12 @@
           <template v-else>
             <InputText v-model.trim="localTriple.object" required class="flex-1 min-w-[260px]" />
           </template>
+          <Button
+            icon="pi pi-compass"
+            severity="contrast"
+            variant="text"
+            rounded
+            @click="openOntologyExplorer('Object')" />
         </div>
       </div>
     </div>
@@ -110,6 +122,15 @@
         <Button label="Save" @click="saveTriple" />
       </div>
     </template>
+  </Dialog>
+  <Dialog
+    v-model:visible="ontologyExplorerDialog"
+    :header="ontologyExplorerDialogTitle"
+    modal
+    maximizable
+    :style="{width: '1100px', maxWidth: '95vw'}"
+    :contentStyle="{height: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column'}">
+    <RdfOntologyExplorer :explorerMode="ontologyExplorerTarget" />
   </Dialog>
 </template>
 
@@ -127,6 +148,7 @@ import {
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+import RdfOntologyExplorer from '@/components/panels/rdf/RdfOntologyExplorer.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -144,6 +166,8 @@ const emit = defineEmits<{
 
 const visible = ref(false);
 const useCustomDatatype = ref(false);
+const ontologyExplorerDialog = ref(false);
+const ontologyExplorerTarget = ref<'Predicate' | 'Object'>('Predicate');
 
 const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
 const predicateTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
@@ -220,6 +244,14 @@ const filteredObjectNodes = computed(() => {
 const filteredPredicateNodes = computed(() => {
   return filterByQuery(predicates.value, localTriple.value.predicate);
 });
+const ontologyExplorerDialogTitle = computed(
+  () => `Ontology Explorer (${ontologyExplorerTarget.value})`
+);
+
+function openOntologyExplorer(target: 'Predicate' | 'Object') {
+  ontologyExplorerTarget.value = target;
+  ontologyExplorerDialog.value = true;
+}
 
 function toPrefixed(iri: string): string {
   for (const [prefix, ns] of Object.entries(rdfStoreManager.namespaces.value)) {
