@@ -108,6 +108,7 @@
             <InputText v-model.trim="localTriple.object" required class="flex-1 min-w-[260px]" />
           </template>
           <Button
+            v-if="localTriple.objectType === RdfTermType.NamedNode"
             icon="pi pi-compass"
             severity="contrast"
             variant="text"
@@ -131,7 +132,7 @@
     :style="{width: '1200px', height: '900px'}"
     :contentStyle="{height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column'}">
     <RdfOntologyExplorer
-      :explorerMode="ontologyExplorerTarget"
+      :initialIri="ontologyExplorerInitialIri"
       @select-iri="applyOntologySelection" />
   </Dialog>
 </template>
@@ -170,6 +171,7 @@ const visible = ref(false);
 const useCustomDatatype = ref(false);
 const ontologyExplorerDialog = ref(false);
 const ontologyExplorerTarget = ref<'Predicate' | 'Object'>('Predicate');
+const ontologyExplorerInitialIri = ref('');
 
 const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
 const predicateTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
@@ -252,6 +254,12 @@ const ontologyExplorerDialogTitle = computed(
 
 function openOntologyExplorer(target: 'Predicate' | 'Object') {
   ontologyExplorerTarget.value = target;
+  ontologyExplorerInitialIri.value =
+    target === 'Predicate'
+      ? (localTriple.value.predicate ?? '').trim()
+      : localTriple.value.objectType === RdfTermType.NamedNode
+      ? (localTriple.value.object ?? '').trim()
+      : '';
   ontologyExplorerDialog.value = true;
 }
 

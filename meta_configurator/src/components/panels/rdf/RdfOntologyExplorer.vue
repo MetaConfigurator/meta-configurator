@@ -15,7 +15,10 @@
       </div>
       <div v-if="selectedPrefix" class="content-pane">
         <div class="flex flex-col gap-2 mb-3">
-          <label class="text-sm font-medium">Ontology URL (Supported RDF serializations: RDF/XML, Turtle, N-Triples, N3, JSON-LD)</label>
+          <label class="text-sm font-medium"
+            >Ontology URL (Supported RDF serializations: RDF/XML, Turtle, N-Triples, N3,
+            JSON-LD)</label
+          >
           <InputText
             v-model.trim="ontologyUrl"
             class="w-full"
@@ -66,11 +69,12 @@
               <TabPanel value="DatatypeProperty">
                 <div class="table-search mb-2">
                   <InputText
-                    v-model.trim="datatypeSearch"
-                    placeholder="Search datatype properties"
+                    v-model.trim="tableSearch"
+                    placeholder="Search properties"
                     class="w-full" />
                 </div>
                 <DataTable
+                  ref="datatypeTableRef"
                   :value="filteredDatatypeRows"
                   v-model:selection="selectedDatatypeRow"
                   selectionMode="single"
@@ -90,11 +94,12 @@
               <TabPanel value="ObjectProperty">
                 <div class="table-search mb-2">
                   <InputText
-                    v-model.trim="objectSearch"
-                    placeholder="Search object properties"
+                    v-model.trim="tableSearch"
+                    placeholder="Search properties"
                     class="w-full" />
                 </div>
                 <DataTable
+                  ref="objectTableRef"
                   :value="filteredObjectRows"
                   v-model:selection="selectedObjectRow"
                   selectionMode="single"
@@ -127,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {computed, nextTick, ref, watch} from 'vue';
 import * as $rdf from 'rdflib';
 import Listbox from 'primevue/listbox';
 import InputText from 'primevue/inputtext';
@@ -146,19 +151,17 @@ import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager
 
 const props = withDefaults(
   defineProps<{
-    sessionMode?: SessionMode;
-    explorerMode?: 'Predicate' | 'Object';
+    initialIri?: string;
   }>(),
   {
-    sessionMode: SessionMode.DataEditor,
-    explorerMode: 'Predicate',
+    initialIri: '',
   }
 );
 const emit = defineEmits<{
   (e: 'select-iri', iri: string): void;
 }>();
 
-const data = getDataForMode(props.sessionMode);
+const data = getDataForMode(SessionMode.DataEditor);
 const selectedPrefix = ref<string | null>(null);
 const prefixes = ref<string[]>([]);
 const prefixNamespaces = ref<Record<string, string>>({});
@@ -171,10 +174,13 @@ const ontologyRows = ref<
   Array<{about: string; comment: string; propertyType: 'ObjectProperty' | 'DatatypeProperty'}>
 >([]);
 const activePropertyTab = ref<'DatatypeProperty' | 'ObjectProperty'>('ObjectProperty');
-const datatypeSearch = ref('');
-const objectSearch = ref('');
+const tableSearch = ref('');
 const selectedDatatypeRow = ref<any | null>(null);
 const selectedObjectRow = ref<any | null>(null);
+const pendingInitialIri = ref('');
+const isAutoSelectingPrefix = ref(false);
+const datatypeTableRef = ref<any | null>(null);
+const objectTableRef = ref<any | null>(null);
 
 type CachedOntology = {
   prefix: string;
@@ -203,10 +209,12 @@ const datatypeRows = computed(() =>
 const objectRows = computed(() =>
   ontologyRows.value.filter(row => row.propertyType === 'ObjectProperty')
 );
-const filteredDatatypeRows = computed(() => filterRows(datatypeRows.value, datatypeSearch.value));
-const filteredObjectRows = computed(() => filterRows(objectRows.value, objectSearch.value));
+const filteredDatatypeRows = computed(() => filterRows(datatypeRows.value, tableSearch.value));
+const filteredObjectRows = computed(() => filterRows(objectRows.value, tableSearch.value));
 const activeSelectedRow = computed(() =>
-  activePropertyTab.value === 'DatatypeProperty' ? selectedDatatypeRow.value : selectedObjectRow.value
+  activePropertyTab.value === 'DatatypeProperty'
+    ? selectedDatatypeRow.value
+    : selectedObjectRow.value
 );
 const selectedRowIri = computed(() => {
   const row = activeSelectedRow.value;
@@ -232,19 +240,32 @@ watch(
     if (selectedPrefix.value && !prefixes.value.includes(selectedPrefix.value)) {
       selectedPrefix.value = null;
     }
+
+    tryAutoSelectFromInitialIri();
   },
   {immediate: true, deep: true}
 );
 
 watch(
+  () => props.initialIri,
+  iri => {
+    pendingInitialIri.value = normalizeIri(iri);
+    tryAutoSelectFromInitialIri();
+  },
+  {immediate: true}
+);
+
+watch(
   selectedPrefix,
   async newPrefix => {
+    if (isAutoSelectingPrefix.value) {
+      isAutoSelectingPrefix.value = false;
+    }
     statusMessage.value = '';
     ontologyRows.value = [];
     selectedDatatypeRow.value = null;
     selectedObjectRow.value = null;
-    datatypeSearch.value = '';
-    objectSearch.value = '';
+    tableSearch.value = '';
     if (!newPrefix) {
       ontologyUrl.value = '';
       return;
@@ -258,14 +279,12 @@ watch(
 );
 
 watch(
-  () => props.explorerMode,
-  async () => {
-    setFocusedTabFromMode();
-    if (selectedCacheEntry.value) {
-      await loadOntologyCards();
-    }
+  [ontologyRows, selectedPrefix],
+  () => {
+    if (!pendingInitialIri.value) return;
+    trySelectRowForIri(pendingInitialIri.value);
   },
-  {immediate: true}
+  {deep: false}
 );
 
 async function downloadAndCacheOntology() {
@@ -487,11 +506,6 @@ async function runSparqlOnCachedOntology(query: string, content: string, format:
   return rows;
 }
 
-function setFocusedTabFromMode() {
-  activePropertyTab.value =
-    props.explorerMode === 'Predicate' ? 'ObjectProperty' : 'DatatypeProperty';
-}
-
 function filterRows(
   rows: Array<{
     about: string;
@@ -566,6 +580,94 @@ function deleteCachedOntology() {
 function selectCurrentIri() {
   if (!selectedRowIri.value) return;
   emit('select-iri', selectedRowIri.value);
+}
+
+function tryAutoSelectFromInitialIri() {
+  if (!pendingInitialIri.value || !prefixes.value.length) return;
+  const bestPrefix = findBestPrefixForIri(pendingInitialIri.value);
+  if (!bestPrefix) return;
+  if (!selectedPrefix.value) {
+    isAutoSelectingPrefix.value = true;
+    selectedPrefix.value = bestPrefix;
+    return;
+  }
+  if (selectedPrefix.value !== bestPrefix) {
+    return;
+  }
+  trySelectRowForIri(pendingInitialIri.value);
+}
+
+function trySelectRowForIri(iri: string) {
+  if (!iri || !selectedPrefix.value || !ontologyRows.value.length) return;
+
+  const namespace =
+    selectedPrefix.value && prefixNamespaces.value[selectedPrefix.value]
+      ? prefixNamespaces.value[selectedPrefix.value]
+      : '';
+
+  const match = ontologyRows.value.find(row => rowMatchesIri(row.about, iri, namespace));
+  if (!match) return;
+
+  if (match.propertyType === 'DatatypeProperty') {
+    activePropertyTab.value = 'DatatypeProperty';
+    selectedDatatypeRow.value = match;
+    selectedObjectRow.value = null;
+  } else {
+    activePropertyTab.value = 'ObjectProperty';
+    selectedObjectRow.value = match;
+    selectedDatatypeRow.value = null;
+  }
+  focusMatchedRow(match);
+  pendingInitialIri.value = '';
+}
+
+function findBestPrefixForIri(iri: string): string | null {
+  let bestPrefix: string | null = null;
+  let bestLength = -1;
+
+  for (const [prefix, namespace] of Object.entries(prefixNamespaces.value)) {
+    if (!namespace) continue;
+    if (iri.startsWith(namespace) && namespace.length > bestLength) {
+      bestPrefix = prefix;
+      bestLength = namespace.length;
+    }
+  }
+  return bestPrefix;
+}
+
+function rowMatchesIri(rowAbout: string, iri: string, namespace: string): boolean {
+  if (rowAbout === iri) return true;
+  if (!namespace) return false;
+  return `${namespace}${termNameFromIri(rowAbout)}` === iri;
+}
+
+function normalizeIri(value: string | undefined): string {
+  return (value ?? '').trim();
+}
+
+async function focusMatchedRow(match: {
+  about: string;
+  propertyType: 'ObjectProperty' | 'DatatypeProperty';
+}) {
+  await nextTick();
+  window.setTimeout(async () => {
+    await nextTick();
+    const rows =
+      match.propertyType === 'DatatypeProperty'
+        ? filteredDatatypeRows.value
+        : filteredObjectRows.value;
+    const index = rows.findIndex(row => row.about === match.about);
+    if (index < 0) return;
+
+    const tableRef =
+      match.propertyType === 'DatatypeProperty' ? datatypeTableRef.value : objectTableRef.value;
+    const tableEl = tableRef?.$el as HTMLElement | undefined;
+    const rowEl = tableEl?.querySelector(`tr[data-p-index="${index}"]`) as HTMLElement | null;
+    if (!rowEl) return;
+
+    rowEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+    rowEl.focus();
+  }, 140);
 }
 
 function setStatus(message: string, severity: 'success' | 'info' | 'warn' | 'error' = 'info') {
