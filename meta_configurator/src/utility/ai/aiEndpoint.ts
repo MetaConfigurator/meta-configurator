@@ -2,37 +2,36 @@ import axios from 'axios';
 import {useSettings} from '@/settings/useSettings';
 
 const BASE_URL = 'https://api.openai.com/v1';
-const HF_ENDPOINT =
-  "https://durga-lakshmi-2000-json-generation.hf.space/generate";
+const HF_ENDPOINT = 'https://durga-lakshmi-2000-json-generation.hf.space/generate';
 const HF_TOKEN = process.env.HF_TOKEN;
 /**
  * Query your HF JSON Schema model
  * @param description user-provided schema description
  */
 export const queryHFSchemaModel = async (description: string) => {
-  console.log("=== Sending to HF Endpoint ===");
-  console.log({ description });
-  console.log("=============================");
+  console.log('=== Sending to HF Endpoint ===');
+  console.log({description});
+  console.log('=============================');
 
   try {
     const response = await axios.post(
       HF_ENDPOINT,
-      { description },
+      {description},
       {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${HF_TOKEN}`,
         },
       }
     );
 
-    console.log("=== Response from HF Endpoint ===");
+    console.log('=== Response from HF Endpoint ===');
     console.log(response.data.response);
-    console.log("================================");
+    console.log('================================');
 
     return response.data.response;
   } catch (error) {
-    console.error("Error querying HF schema model:", error);
+    console.error('Error querying HF schema model:', error);
     throw error;
   }
 };
@@ -100,13 +99,17 @@ export const querySchemaCreation = async (apikey: string, description: string) =
   if (typeof result === 'string') {
     throw new Error(result);
   }
-  
+
   // otherwise throw error
   throw new Error('Unexpected result type from HF schema model: ' + typeof result);
 };
 
 /** Schema modification */
-export const querySchemaModification = async (apikey: string, changeDescription: string, currentSchema: string) => {
+export const querySchemaModification = async (
+  apikey: string,
+  changeDescription: string,
+  currentSchema: string
+) => {
   console.log('Querying schema modification with change description:', changeDescription);
   const prompt = `Modify the following schema:\n\n${currentSchema}\n\nMake the following changes:\n- ${changeDescription}`;
   const result = await queryHFSchemaModel(prompt);
@@ -122,7 +125,7 @@ export const querySchemaModification = async (apikey: string, changeDescription:
   if (typeof result === 'string') {
     throw new Error(result);
   }
-  
+
   // otherwise throw error
   throw new Error('Unexpected result type from HF schema model: ' + typeof result);
 };
