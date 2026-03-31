@@ -17,15 +17,19 @@ import {useErrorService} from '@/utility/errorServiceInstance';
 
 const searchTerm: Ref<string> = ref('');
 
-// useMagicKeys({
-//   passive: false,
-//   onEventFired(event) {
-//     if (event.key === 'f' && event.ctrlKey) {
-//       // event.preventDefault();
-//       // focus('searchBar');
-//     }
-//   },
-// });
+useMagicKeys({
+  passive: false,
+  onEventFired(event) {
+    if (event.key === 'f' && event.ctrlKey) {
+      const fromAce = (window as any).__fromAceEditor;
+
+      if (fromAce) {
+        event.preventDefault();
+        focus('searchBar');
+      }
+    }
+  },
+});
 const searchResultMenu = ref();
 const searchResultItems = ref<MenuItem[]>([]);
 

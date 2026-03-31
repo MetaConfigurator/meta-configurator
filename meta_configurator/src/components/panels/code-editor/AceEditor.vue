@@ -47,11 +47,13 @@ onMounted(() => {
   }
 
   // FIX: Allow browser Ctrl+F for searching in the editor, instead of opening the Ace Editor search box
-  const commands = editor.value.commands as any;
+  editor.value.on('focus', () => {
+    (window as any).__fromAceEditor = true;
+  });
 
-  commands.removeCommand('find');
-  commands.bindKey('Ctrl-F', null);
-  commands.bindKey('Command-F', null);
+  editor.value.on('blur', () => {
+    (window as any).__fromAceEditor = false;
+  });
 });
 
 // watch for changes in the data format and update the editor accordingly
