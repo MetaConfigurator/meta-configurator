@@ -128,9 +128,11 @@
     :header="ontologyExplorerDialogTitle"
     modal
     maximizable
-    :style="{width: '1100px', maxWidth: '95vw'}"
-    :contentStyle="{height: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column'}">
-    <RdfOntologyExplorer :explorerMode="ontologyExplorerTarget" />
+    :style="{width: '1200px', height: '900px'}"
+    :contentStyle="{height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column'}">
+    <RdfOntologyExplorer
+      :explorerMode="ontologyExplorerTarget"
+      @select-iri="applyOntologySelection" />
   </Dialog>
 </template>
 
@@ -251,6 +253,16 @@ const ontologyExplorerDialogTitle = computed(
 function openOntologyExplorer(target: 'Predicate' | 'Object') {
   ontologyExplorerTarget.value = target;
   ontologyExplorerDialog.value = true;
+}
+
+function applyOntologySelection(iri: string) {
+  if (ontologyExplorerTarget.value === 'Predicate') {
+    localTriple.value.predicate = iri;
+  } else {
+    localTriple.value.objectType = RdfTermType.NamedNode;
+    localTriple.value.object = iri;
+  }
+  ontologyExplorerDialog.value = false;
 }
 
 function toPrefixed(iri: string): string {

@@ -13,18 +13,16 @@
           :disabled="prefixOptions.length === 0"
           :listStyle="{height: '100%'}" />
       </div>
-
-      <div class="content-pane">
+      <div v-if="selectedPrefix" class="content-pane">
         <div class="flex flex-col gap-2 mb-3">
-          <label class="text-sm font-medium">Ontology URL (RDF only)</label>
+          <label class="text-sm font-medium">Ontology URL (Supported RDF serializations: RDF/XML, Turtle, N-Triples, N3, JSON-LD)</label>
           <InputText
             v-model.trim="ontologyUrl"
-            placeholder="https://example.org/ontology.ttl"
             class="w-full"
             :disabled="!selectedPrefix || isDownloading" />
           <div class="flex gap-2 items-center flex-wrap">
             <Button
-              label="Download and Cache"
+              label="Download"
               icon="pi pi-download"
               :loading="isDownloading"
               :disabled="!selectedPrefix || !ontologyUrl"
@@ -38,16 +36,13 @@
               :disabled="!selectedCacheEntry"
               @click="loadOntologyCards" />
             <Button
-              label="Delete Cached Data"
+              label="Delete"
               icon="pi pi-trash"
               severity="danger"
               variant="text"
               :disabled="!selectedPrefix || !selectedCacheEntry"
               @click="deleteCachedOntology" />
           </div>
-          <small class="text-muted-color">
-            Supported RDF serializations: RDF/XML, Turtle, N-Triples, N3, JSON-LD
-          </small>
           <small v-if="selectedCacheEntry" class="text-muted-color">
             Cached on {{ formatDate(selectedCacheEntry.fetchedAt) }}
           </small>
@@ -118,7 +113,14 @@
               </TabPanel>
             </TabPanels>
           </Tabs>
+          <div v-if="selectedRowIri" class="selection-bar mt-2">
+            <InputText :modelValue="selectedRowIri" class="selection-input" readonly />
+            <Button label="Select" icon="pi pi-check" @click="selectCurrentIri" />
+          </div>
         </div>
+      </div>
+      <div v-else class="content-placeholder text-sm text-muted-color">
+        Select a prefix from the list to open the ontology panel.
       </div>
     </div>
   </div>
@@ -152,6 +154,9 @@ const props = withDefaults(
     explorerMode: 'Predicate',
   }
 );
+const emit = defineEmits<{
+  (e: 'select-iri', iri: string): void;
+}>();
 
 const data = getDataForMode(props.sessionMode);
 const selectedPrefix = ref<string | null>(null);
@@ -198,6 +203,22 @@ const filteredDatatypeRows = computed(() =>
   filterRows(datatypeRows.value, datatypeSearch.value)
 );
 const filteredObjectRows = computed(() => filterRows(objectRows.value, objectSearch.value));
+const activeSelectedRow = computed(() =>
+  activePropertyTab.value === 'DatatypeProperty' ? selectedDatatypeRow.value : selectedObjectRow.value
+);
+const selectedRowIri = computed(() => {
+  const row = activeSelectedRow.value;
+  if (!row?.about) return '';
+
+  const namespace =
+    selectedPrefix.value && prefixNamespaces.value[selectedPrefix.value]
+      ? prefixNamespaces.value[selectedPrefix.value]
+      : '';
+
+  if (!namespace) return row.about;
+  if (row.about.startsWith(namespace)) return row.about;
+  return `${namespace}${termNameFromIri(row.about)}`;
+});
 
 watch(
   () => data.data.value,
@@ -318,7 +339,7 @@ async function fetchOntologyWithCorsFallback(
 }
 
 function detectRdfFormat(contentTypeHeader: string, url: string): string | null {
-  const contentType = contentTypeHeader.split(';')[0].trim().toLowerCase();
+  const contentType = contentTypeHeader.split(';')[0]!.trim().toLowerCase();
   const normalizedUrl = url.toLowerCase();
 
   if (contentType === 'application/rdf+xml') return 'application/rdf+xml';
@@ -524,6 +545,11 @@ function deleteCachedOntology() {
   setStatus(`Cached ontology for prefix "${selectedPrefix.value}" was deleted.`, 'info');
 }
 
+function selectCurrentIri() {
+  if (!selectedRowIri.value) return;
+  emit('select-iri', selectedRowIri.value);
+}
+
 function setStatus(message: string, severity: 'success' | 'info' | 'warn' | 'error' = 'info') {
   statusMessage.value = message;
   statusSeverity.value = severity;
@@ -596,12 +622,32 @@ function collectFromContextObject(contextPart: any, out: Record<string, string>)
   overflow: hidden;
 }
 
+.content-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--p-content-border-color, #d1d5db);
+  border-radius: 0.5rem;
+  min-height: 0;
+}
+
 .table-wrapper {
   flex: 1;
   min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.selection-bar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.selection-input {
+  flex: 1;
 }
 
 .prefix-listbox {
