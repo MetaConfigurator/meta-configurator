@@ -190,7 +190,9 @@ const ACCEPT_RDF_HEADER =
   'application/rdf+xml, text/turtle, application/x-turtle, application/n-triples, text/n3, application/ld+json, application/json, application/xml, text/xml, text/plain';
 const ontologyCache = ref<Record<string, CachedOntology>>(loadCacheFromStorage());
 
-const prefixOptions = computed(() => prefixes.value.map(prefix => ({label: prefix, value: prefix})));
+const prefixOptions = computed(() =>
+  prefixes.value.map(prefix => ({label: prefix, value: prefix}))
+);
 const selectedCacheEntry = computed(() => {
   if (!selectedPrefix.value) return null;
   return ontologyCache.value[selectedPrefix.value] ?? null;
@@ -198,10 +200,10 @@ const selectedCacheEntry = computed(() => {
 const datatypeRows = computed(() =>
   ontologyRows.value.filter(row => row.propertyType === 'DatatypeProperty')
 );
-const objectRows = computed(() => ontologyRows.value.filter(row => row.propertyType === 'ObjectProperty'));
-const filteredDatatypeRows = computed(() =>
-  filterRows(datatypeRows.value, datatypeSearch.value)
+const objectRows = computed(() =>
+  ontologyRows.value.filter(row => row.propertyType === 'ObjectProperty')
 );
+const filteredDatatypeRows = computed(() => filterRows(datatypeRows.value, datatypeSearch.value));
 const filteredObjectRows = computed(() => filterRows(objectRows.value, objectSearch.value));
 const activeSelectedRow = computed(() =>
   activePropertyTab.value === 'DatatypeProperty' ? selectedDatatypeRow.value : selectedObjectRow.value
@@ -311,7 +313,9 @@ async function downloadAndCacheOntology() {
     await loadOntologyCards();
 
     setStatus(
-      `Ontology for prefix "${selectedPrefix.value}" was downloaded and cached${usedProxy ? ' (via local proxy)' : ''}.`,
+      `Ontology for prefix "${selectedPrefix.value}" was downloaded and cached${
+        usedProxy ? ' (via local proxy)' : ''
+      }.`,
       'success'
     );
   } catch (error: any) {
@@ -354,19 +358,29 @@ function detectRdfFormat(contentTypeHeader: string, url: string): string | null 
     if (normalizedUrl.endsWith('.nt')) return 'application/n-triples';
     if (normalizedUrl.endsWith('.ttl')) return 'text/turtle';
     if (normalizedUrl.endsWith('.n3')) return 'text/n3';
-    if (normalizedUrl.endsWith('.rdf') || normalizedUrl.endsWith('.owl') || normalizedUrl.endsWith('.xml')) {
+    if (
+      normalizedUrl.endsWith('.rdf') ||
+      normalizedUrl.endsWith('.owl') ||
+      normalizedUrl.endsWith('.xml')
+    ) {
       return 'application/rdf+xml';
     }
-    if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json')) return 'application/ld+json';
+    if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json'))
+      return 'application/ld+json';
   }
 
-  if (normalizedUrl.endsWith('.rdf') || normalizedUrl.endsWith('.owl') || normalizedUrl.endsWith('.xml')) {
+  if (
+    normalizedUrl.endsWith('.rdf') ||
+    normalizedUrl.endsWith('.owl') ||
+    normalizedUrl.endsWith('.xml')
+  ) {
     return 'application/rdf+xml';
   }
   if (normalizedUrl.endsWith('.ttl')) return 'text/turtle';
   if (normalizedUrl.endsWith('.nt')) return 'application/n-triples';
   if (normalizedUrl.endsWith('.n3')) return 'text/n3';
-  if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json')) return 'application/ld+json';
+  if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json'))
+    return 'application/ld+json';
 
   return null;
 }
@@ -474,19 +488,23 @@ async function runSparqlOnCachedOntology(query: string, content: string, format:
 }
 
 function setFocusedTabFromMode() {
-  activePropertyTab.value = props.explorerMode === 'Predicate' ? 'ObjectProperty' : 'DatatypeProperty';
+  activePropertyTab.value =
+    props.explorerMode === 'Predicate' ? 'ObjectProperty' : 'DatatypeProperty';
 }
 
 function filterRows(
-  rows: Array<{about: string; comment: string; propertyType: 'ObjectProperty' | 'DatatypeProperty'}>,
+  rows: Array<{
+    about: string;
+    comment: string;
+    propertyType: 'ObjectProperty' | 'DatatypeProperty';
+  }>,
   query: string
 ) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return rows;
   return rows.filter(
     row =>
-      row.about.toLowerCase().includes(normalized) ||
-      row.comment.toLowerCase().includes(normalized)
+      row.about.toLowerCase().includes(normalized) || row.comment.toLowerCase().includes(normalized)
   );
 }
 
