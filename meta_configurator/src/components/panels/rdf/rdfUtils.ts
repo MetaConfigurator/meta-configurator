@@ -39,22 +39,27 @@ export const defaultJsonLdSchema = `
 {
   "oneOf": [
     {
+      "title": "URI",
       "type": "string",
       "format": "uri"
     },
     {
+      "title": "Object",
       "type": "object",
       "additionalProperties": true
     },
     {
+      "title": "Array of URIs or Objects",
       "type": "array",
       "items": {
         "oneOf": [
           {
+            "title": "URI",
             "type": "string",
             "format": "uri"
           },
           {
+             "title": "Object",
             "type": "object",
             "additionalProperties": true
           }
