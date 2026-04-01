@@ -32,8 +32,20 @@
                     icon="pi pi-download"
                     severity="secondary"
                     :loading="isDownloading"
-                    :disabled="!selectedPrefix || !ontologyUrl"
+                    :disabled="!selectedPrefix || !ontologyUrl || isUploading"
                     @click="downloadAndCacheOntology" />
+                  <FileUpload
+                    ref="ontologyFileUploadRef"
+                    mode="basic"
+                    name="ontologyFile"
+                    chooseLabel="Upload File"
+                    chooseIcon="pi pi-upload"
+                    :auto="true"
+                    :customUpload="true"
+                    :multiple="false"
+                    :accept="RDF_FILE_ACCEPT"
+                    :disabled="!selectedPrefix || isDownloading || isUploading"
+                    @select="onOntologyFileSelected" />
                   <Button
                     label="Refresh"
                     icon="pi pi-refresh"
@@ -57,7 +69,7 @@
           </AccordionPanel>
         </Accordion>
 
-        <Message v-if="statusMessage" :severity="statusSeverity" :closable="false" class="mb-3">
+        <Message v-if="statusMessage" :severity="statusSeverity" :closable="true" class="mb-3">
           {{ statusMessage }}
         </Message>
 
@@ -197,6 +209,7 @@ import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import Dialog from 'primevue/dialog';
+import FileUpload from 'primevue/fileupload';
 import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
@@ -232,6 +245,7 @@ const prefixes = ref<string[]>([]);
 const prefixNamespaces = ref<Record<string, string>>({});
 const ontologyUrl = ref('');
 const isDownloading = ref(false);
+const isUploading = ref(false);
 const statusMessage = ref('');
 const statusSeverity = ref<'success' | 'info' | 'warn' | 'error'>('info');
 const isQuerying = ref(false);
@@ -254,6 +268,7 @@ const objectTableRef = ref<any | null>(null);
 const classTableRef = ref<any | null>(null);
 const activeAccordion = ref<string | null>('ontologyControls');
 const deleteDialog = ref(false);
+const ontologyFileUploadRef = ref<any | null>(null);
 
 type CachedOntology = {
   prefix: string;
@@ -264,18 +279,27 @@ type CachedOntology = {
   fetchedAt: string;
 };
 
-const STORAGE_KEY = 'rdf_ontology_cache_v1';
+const INDEXED_DB_NAME = 'rdf_ontology_cache_db';
+const INDEXED_DB_VERSION = 1;
+const INDEXED_DB_STORE = 'ontologies';
 const ACCEPT_RDF_HEADER =
   'application/rdf+xml, text/turtle, application/x-turtle, application/n-triples, text/n3, application/ld+json, application/json, application/xml, text/xml, text/plain';
-const ontologyCache = ref<Record<string, CachedOntology>>(loadCacheFromStorage());
+const RDF_FILE_ACCEPT =
+  '.rdf,.owl,.xml,.ttl,.nt,.n3,.jsonld,.json,application/rdf+xml,text/turtle,application/x-turtle,application/n-triples,text/n3,application/ld+json,application/json,application/xml,text/xml,text/plain';
+const loadedCacheEntry = ref<CachedOntology | null>(null);
+let ontologyDbPromise: Promise<IDBDatabase> | null = null;
+let prefixLookupRequestId = 0;
 
 const prefixOptions = computed(() =>
   prefixes.value.map(prefix => ({label: prefix, value: prefix}))
 );
 const selectedCacheEntry = computed(() => {
   if (!selectedPrefix.value) return null;
-  return ontologyCache.value[selectedPrefix.value] ?? null;
+  const entry = loadedCacheEntry.value;
+  if (!entry || entry.prefix !== selectedPrefix.value) return null;
+  return entry;
 });
+
 const datatypeRows = computed(() =>
   ontologyRows.value.filter(row => row.propertyType === 'DatatypeProperty')
 );
@@ -338,6 +362,7 @@ watch(
 watch(
   selectedPrefix,
   async newPrefix => {
+    const requestId = ++prefixLookupRequestId;
     if (isAutoSelectingPrefix.value) {
       isAutoSelectingPrefix.value = false;
     }
@@ -347,13 +372,23 @@ watch(
     selectedObjectRow.value = null;
     selectedClassRow.value = null;
     tableSearch.value = '';
+    loadedCacheEntry.value = null;
     if (!newPrefix) {
       ontologyUrl.value = '';
       return;
     }
-    ontologyUrl.value = ontologyCache.value[newPrefix]?.url ?? '';
-    if (ontologyCache.value[newPrefix]) {
-      await loadOntologyCards();
+    try {
+      ontologyUrl.value = '';
+      const cachedEntry = await getOntologyFromIndexedDb(newPrefix);
+      if (requestId !== prefixLookupRequestId) return;
+      loadedCacheEntry.value = cachedEntry;
+      ontologyUrl.value = cachedEntry?.url ?? '';
+      if (cachedEntry) {
+        await loadOntologyCards();
+      }
+    } catch (error: any) {
+      if (requestId !== prefixLookupRequestId) return;
+      setStatus(error?.message ?? 'Failed to read cached ontology from IndexedDB.', 'warn');
     }
   },
   {immediate: true}
@@ -420,7 +455,7 @@ async function downloadAndCacheOntology() {
     const content = await response.text();
     await validateRdf(content, parsedUrl.toString(), format);
 
-    ontologyCache.value[selectedPrefix.value] = {
+    const cacheEntry: CachedOntology = {
       prefix: selectedPrefix.value,
       url: parsedUrl.toString(),
       content,
@@ -428,34 +463,67 @@ async function downloadAndCacheOntology() {
       contentType,
       fetchedAt: new Date().toISOString(),
     };
-    const cacheSaveResult = saveCacheToStorage(ontologyCache.value, [selectedPrefix.value]);
+    loadedCacheEntry.value = cacheEntry;
+    await putOntologyToIndexedDb(cacheEntry);
     await loadOntologyCards();
 
-    if (cacheSaveResult.saved) {
-      const cleanedHint =
-        cacheSaveResult.evictedCount > 0
-          ? ` (removed ${cacheSaveResult.evictedCount} old cache entr${
-              cacheSaveResult.evictedCount === 1 ? 'y' : 'ies'
-            })`
-          : '';
-      setStatus(
-        `Ontology for prefix "${selectedPrefix.value}" was downloaded and cached${
-          usedProxy ? ' (via local proxy)' : ''
-        }${cleanedHint}.`,
-        'success'
-      );
-    } else {
-      setStatus(
-        `Ontology for prefix "${selectedPrefix.value}" was downloaded${
-          usedProxy ? ' (via local proxy)' : ''
-        }, but browser storage is full so it could not be cached persistently.`,
-        'warn'
-      );
-    }
+    setStatus(
+      `Ontology for prefix "${selectedPrefix.value}" was downloaded and cached in IndexedDB${
+        usedProxy ? ' (via local proxy)' : ''
+      }.`,
+      'success'
+    );
   } catch (error: any) {
     setStatus(error?.message ?? 'Failed to download ontology.', 'error');
   } finally {
     isDownloading.value = false;
+  }
+}
+
+async function onOntologyFileSelected(event: any) {
+  const file = Array.isArray(event?.files) ? event.files[0] : null;
+  if (!file) return;
+
+  if (!selectedPrefix.value) {
+    setStatus('Please select a prefix first.', 'warn');
+    ontologyFileUploadRef.value?.clear?.();
+    return;
+  }
+
+  isUploading.value = true;
+  setStatus('');
+
+  try {
+    const contentType = file.type || 'application/octet-stream';
+    const format = detectRdfFormat(contentType, file.name);
+    if (!format) {
+      throw new Error('Only RDF files are supported.');
+    }
+
+    const content = await file.text();
+    await validateRdf(content, `file://${encodeURIComponent(file.name)}`, format);
+
+    const cacheEntry: CachedOntology = {
+      prefix: selectedPrefix.value,
+      url: ontologyUrl.value.trim(),
+      content,
+      format,
+      contentType,
+      fetchedAt: new Date().toISOString(),
+    };
+    loadedCacheEntry.value = cacheEntry;
+    await putOntologyToIndexedDb(cacheEntry);
+    await loadOntologyCards();
+
+    setStatus(
+      `Ontology file "${file.name}" for prefix "${selectedPrefix.value}" was uploaded and cached in IndexedDB.`,
+      'success'
+    );
+  } catch (error: any) {
+    setStatus(error?.message ?? 'Failed to upload ontology file.', 'error');
+  } finally {
+    isUploading.value = false;
+    ontologyFileUploadRef.value?.clear?.();
   }
 }
 
@@ -524,7 +592,7 @@ function validateRdf(content: string, baseUri: string, format: string): Promise<
     const store = $rdf.graph();
     $rdf.parse(content, store as $rdf.Formula, baseUri, format, err => {
       if (err) {
-        reject(new Error('The downloaded file is not valid RDF.'));
+        reject(new Error('The ontology content is not valid RDF.'));
         return;
       }
       resolve();
@@ -569,6 +637,7 @@ function buildOntologyQuery() {
         ?propertyType IN (
           <http://www.w3.org/2002/07/owl#ObjectProperty>,
           <http://www.w3.org/2002/07/owl#DatatypeProperty>,
+          <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property>,
           <http://www.w3.org/2000/01/rdf-schema#Class>,
           <http://www.w3.org/2002/07/owl#Class>
         )
@@ -600,6 +669,18 @@ async function runSparqlOnCachedOntology(query: string, content: string, format:
     comment: string;
     propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
   }> = [];
+  const seen = new Set<string>();
+
+  const pushRow = (
+    about: string,
+    comment: string,
+    propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class'
+  ) => {
+    const key = `${about}::${propertyType}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    rows.push({about, comment, propertyType});
+  };
 
   await new Promise<void>((resolve, reject) => {
     stream
@@ -607,17 +688,28 @@ async function runSparqlOnCachedOntology(query: string, content: string, format:
         const about = getBindingValue(binding, 'about');
         if (!about) return;
         const propertyTypeIri = getBindingValue(binding, 'propertyType');
-        rows.push({
-          about,
-          comment: getBindingValue(binding, 'comment'),
-          propertyType:
-            propertyTypeIri === 'http://www.w3.org/2002/07/owl#DatatypeProperty'
-              ? 'DatatypeProperty'
-              : propertyTypeIri === 'http://www.w3.org/2000/01/rdf-schema#Class' ||
-                propertyTypeIri === 'http://www.w3.org/2002/07/owl#Class'
-              ? 'Class'
-              : 'ObjectProperty',
-        });
+        const comment = getBindingValue(binding, 'comment');
+
+        if (propertyTypeIri === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property') {
+          pushRow(about, comment, 'DatatypeProperty');
+          pushRow(about, comment, 'ObjectProperty');
+          return;
+        }
+
+        if (propertyTypeIri === 'http://www.w3.org/2002/07/owl#DatatypeProperty') {
+          pushRow(about, comment, 'DatatypeProperty');
+          return;
+        }
+
+        if (
+          propertyTypeIri === 'http://www.w3.org/2000/01/rdf-schema#Class' ||
+          propertyTypeIri === 'http://www.w3.org/2002/07/owl#Class'
+        ) {
+          pushRow(about, comment, 'Class');
+          return;
+        }
+
+        pushRow(about, comment, 'ObjectProperty');
       })
       .on('end', () => resolve())
       .on('error', (err: any) => reject(err));
@@ -667,87 +759,112 @@ function escapeForSparqlString(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
-function loadCacheFromStorage(): Record<string, CachedOntology> {
-  if (typeof window === 'undefined') return {};
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return {};
-    return parsed as Record<string, CachedOntology>;
-  } catch {
-    return {};
-  }
-}
-
-function saveCacheToStorage(
-  cache: Record<string, CachedOntology>,
-  protectedPrefixes: string[] = []
-): {
-  saved: boolean;
-  evictedCount: number;
-} {
-  if (typeof window === 'undefined') return {saved: true, evictedCount: 0};
-
-  const tryPersist = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
-  };
-
-  try {
-    tryPersist();
-    return {saved: true, evictedCount: 0};
-  } catch (error: any) {
-    if (!isQuotaExceededError(error)) {
-      return {saved: false, evictedCount: 0};
-    }
+function openOntologyDb(): Promise<IDBDatabase> {
+  if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+    return Promise.reject(new Error('IndexedDB is not available.'));
   }
 
-  const protectedSet = new Set(protectedPrefixes.filter(Boolean));
-  const entries = Object.entries(cache)
-    .filter(([prefix]) => !protectedSet.has(prefix))
-    .sort((a, b) => {
-      const aTime = Date.parse(a[1].fetchedAt || '');
-      const bTime = Date.parse(b[1].fetchedAt || '');
-      const safeATime = Number.isNaN(aTime) ? 0 : aTime;
-      const safeBTime = Number.isNaN(bTime) ? 0 : bTime;
-      return safeATime - safeBTime;
-    });
+  if (ontologyDbPromise) return ontologyDbPromise;
 
-  let evictedCount = 0;
-  for (const [prefix] of entries) {
-    delete cache[prefix];
-    evictedCount += 1;
-    try {
-      tryPersist();
-      return {saved: true, evictedCount};
-    } catch (error: any) {
-      if (!isQuotaExceededError(error)) {
-        return {saved: false, evictedCount};
+  ontologyDbPromise = new Promise((resolve, reject) => {
+    const request = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(INDEXED_DB_STORE)) {
+        db.createObjectStore(INDEXED_DB_STORE, {keyPath: 'prefix'});
       }
-    }
-  }
+    };
 
-  return {saved: false, evictedCount};
+    request.onsuccess = () => {
+      const db = request.result;
+      db.onversionchange = () => {
+        db.close();
+      };
+      resolve(db);
+    };
+
+    request.onerror = () => {
+      reject(new Error(request.error?.message || 'Failed to open IndexedDB.'));
+    };
+  });
+
+  ontologyDbPromise = ontologyDbPromise.catch(error => {
+    ontologyDbPromise = null;
+    throw error;
+  });
+
+  return ontologyDbPromise;
 }
 
-function isQuotaExceededError(error: unknown): boolean {
-  if (!error || typeof error !== 'object') return false;
-  const err = error as DOMException;
-  return err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED';
+async function getOntologyFromIndexedDb(prefix: string): Promise<CachedOntology | null> {
+  const db = await openOntologyDb();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(INDEXED_DB_STORE, 'readonly');
+    const store = tx.objectStore(INDEXED_DB_STORE);
+    const request = store.get(prefix);
+
+    request.onsuccess = () => {
+      const result = request.result as CachedOntology | undefined;
+      resolve(result ?? null);
+    };
+
+    request.onerror = () => {
+      reject(new Error(request.error?.message || 'Failed to read ontology from IndexedDB.'));
+    };
+  });
 }
 
-function deleteCachedOntology() {
+async function putOntologyToIndexedDb(entry: CachedOntology): Promise<void> {
+  const db = await openOntologyDb();
+
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(INDEXED_DB_STORE, 'readwrite');
+    const store = tx.objectStore(INDEXED_DB_STORE);
+    store.put(entry);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () =>
+      reject(new Error(tx.error?.message || 'Failed to write ontology to IndexedDB.'));
+    tx.onabort = () => reject(new Error(tx.error?.message || 'IndexedDB write aborted.'));
+  });
+}
+
+async function deleteOntologyFromIndexedDb(prefix: string): Promise<void> {
+  const db = await openOntologyDb();
+
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(INDEXED_DB_STORE, 'readwrite');
+    const store = tx.objectStore(INDEXED_DB_STORE);
+    store.delete(prefix);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () =>
+      reject(new Error(tx.error?.message || 'Failed to delete ontology from IndexedDB.'));
+    tx.onabort = () => reject(new Error(tx.error?.message || 'IndexedDB delete aborted.'));
+  });
+}
+
+async function deleteCachedOntology() {
   if (!selectedPrefix.value) return;
-  if (!ontologyCache.value[selectedPrefix.value]) return;
 
-  delete ontologyCache.value[selectedPrefix.value];
-  saveCacheToStorage(ontologyCache.value);
-  ontologyRows.value = [];
-  selectedDatatypeRow.value = null;
-  selectedObjectRow.value = null;
-  selectedClassRow.value = null;
-  deleteDialog.value = false;
-  setStatus(`Cached ontology for prefix "${selectedPrefix.value}" was deleted.`, 'info');
+  const prefixToDelete = selectedPrefix.value;
+  try {
+    await deleteOntologyFromIndexedDb(prefixToDelete);
+    if (selectedPrefix.value === prefixToDelete) {
+      loadedCacheEntry.value = null;
+      ontologyRows.value = [];
+      selectedDatatypeRow.value = null;
+      selectedObjectRow.value = null;
+      selectedClassRow.value = null;
+      ontologyUrl.value = '';
+    }
+    deleteDialog.value = false;
+    setStatus(`Cached ontology for prefix "${prefixToDelete}" was deleted from IndexedDB.`, 'info');
+  } catch (error: any) {
+    setStatus(error?.message ?? 'Failed to delete cached ontology.', 'error');
+  }
 }
 
 function confirmDeleteCachedOntology() {

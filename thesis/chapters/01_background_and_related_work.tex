@@ -26,7 +26,7 @@ The chapter also reviews existing tools and approaches in areas such as ontology
     {
       "name": "max_von_mises_stress",
       "value": 299791507.5586333,
-      "unit": "MPa"
+      "unit": "MegaPA"
     }
   ]
 }
@@ -222,7 +222,7 @@ Listing~\ref{lst:background_jsonld_example} shows a complete \gls{jsonld} repres
             "@type": "schema:PropertyValue",
             "schema:name": "max_von_mises_stress",
             "schema:unitCode": {
-                "@id": "unit:MPa"
+                "@id": "unit:MegaPA"
             },
             "schema:value": {
                 "@type": "http://www.w3.org/2001/XMLSchema#double",
@@ -302,7 +302,7 @@ WHERE {
 \end{lstlisting}
 
 This query retrieves the parameters \texttt{element\_size} and \texttt{max\_von\_mises\_stress} together with their corresponding numeric values and associated \gls{qudt} units 
-(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}} and \href{https://qudt.org/vocab/unit/MPa}{\texttt{unit:MPa}}). The result reflects the structure of the JSON-LD representation, in which both parameters and metrics are modeled as \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resources.
+(\href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}} and \href{https://qudt.org/vocab/unit/MegaPA}{\texttt{unit:MegaPA}}). The result reflects the structure of the JSON-LD representation, in which both parameters and metrics are modeled as \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} resources.
 
 This example illustrates how semantic annotations enable structured and consistent access to data. 
 \gls{sparql} further provides mechanisms for querying \gls{rdf} graphs, including filtering and combining data from multiple sources, which supports the analysis of semantically enriched simulation data.
