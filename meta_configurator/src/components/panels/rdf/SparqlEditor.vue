@@ -53,18 +53,10 @@ What is the average age of all people?" />
                 </Accordion>
               </div>
               <div class="editor-container mb-2">
-                <codemirror
+                <SparqlQueryEditor
                   v-model="sparqlQuery"
-                  :autofocus="true"
-                  :indent-with-tab="true"
-                  :tab-size="2"
-                  :extensions="extensions"
-                  @click.stop
-                  @keydown.stop
-                  @ready="handleReady" />
-              </div>
-              <div v-if="errorMessage" class="error-box mb-2">
-                {{ errorMessage }}
+                  :errorLine="errorLineNumber"
+                  :errorMessage="errorMessage" />
               </div>
               <div class="editor-footer flex items-center w-full mb-2">
                 <div class="flex items-center gap-2">
@@ -230,17 +222,9 @@ import {useErrorService} from '@/utility/errorServiceInstance';
 import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {Parser} from 'sparqljs';
-import {ref, shallowRef, computed, watch} from 'vue';
-import {Codemirror} from 'vue-codemirror';
-import {basicSetup} from 'codemirror';
-import {sparql} from 'codemirror-lang-sparql';
-import {syntaxHighlighting, HighlightStyle} from '@codemirror/language';
-import {tags} from '@lezer/highlight';
-import {oneDark} from '@codemirror/theme-one-dark';
+import {ref, computed, watch} from 'vue';
 import TieredMenu from 'primevue/tieredmenu';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {StateEffect, StateField} from '@codemirror/state';
-import {EditorView, Decoration} from '@codemirror/view';
 import {FilterMatchMode} from '@primevue/core/api';
 import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
@@ -273,6 +257,7 @@ import {
 } from '@/components/panels/rdf/rdfUtils';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import {downloadFile} from '@/utility/rdfUtils';
+import SparqlQueryEditor from '@/components/panels/rdf/SparqlQueryEditor.vue';
 
 enum QueryResultMode {
   CONSTRUCT = 'construct',
@@ -289,30 +274,16 @@ const activeAccordion = ref<string | null>(null);
 let validateTimer: number | null = null;
 const statements = ref<$rdf.Statement[]>([]);
 const visualizationHelpDialog = ref(false);
-const addErrorLine = StateEffect.define<number | null>();
-const clearErrorLines = StateEffect.define<null>();
 const enableResult = ref(false);
 const enableVisualization = ref(false);
-const view = shallowRef();
 const results = ref<Record<string, string>[]>([]);
 const columns = ref<string[]>([]);
 const exportPopover = ref();
 const errorMessage = ref<string | null>(null);
+const errorLineNumber = ref<number | null>(null);
 const filters = ref<Record<string, any>>({});
 const activeTab = ref('query');
 const priority = ['?subject', '?predicate', '?object'];
-const errorLineMark = Decoration.line({
-  attributes: {class: 'cm-error-line'},
-});
-const sparqlHighlightStyle = HighlightStyle.define([
-  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
-  {tag: tags.variableName, color: '#82aaff'},
-  {tag: tags.string, color: '#c3e88d'},
-  {tag: tags.number, color: '#f78c6c'},
-  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
-  {tag: tags.operator, color: '#89ddff'},
-  {tag: tags.punctuation, color: '#abb2bf'},
-]);
 
 const exportOnConstruct = [
   {
@@ -397,28 +368,6 @@ function suggestSparqlQuery() {
     });
 }
 
-const errorLineField = StateField.define({
-  create() {
-    return Decoration.none;
-  },
-  update(decorations, tr) {
-    decorations = decorations.map(tr.changes);
-
-    for (let effect of tr.effects) {
-      if (effect.is(addErrorLine)) {
-        const line = tr.state.doc.line(effect.value!);
-        decorations = decorations.update({
-          add: [errorLineMark.range(line.from)],
-        });
-      } else if (effect.is(clearErrorLines)) {
-        decorations = Decoration.none;
-      }
-    }
-    return decorations;
-  },
-  provide: f => EditorView.decorations.from(f),
-});
-
 const buildPrefixBlock = (namespaces: Record<string, string>): string => {
   return Object.entries(namespaces)
     .filter(([prefix]) => prefix !== '@vocab')
@@ -433,28 +382,6 @@ const applyPrefixesToQuery = (queryBody: string): string => {
 };
 
 const sparqlQuery = ref(applyPrefixesToQuery(defaultQueryTemplate));
-
-const highlightErrorLine = (lineNumber: number | null) => {
-  if (!view.value) return;
-
-  view.value.dispatch({
-    effects: clearErrorLines.of(null),
-  });
-
-  if (lineNumber && lineNumber > 0) {
-    view.value.dispatch({
-      effects: addErrorLine.of(lineNumber),
-    });
-  }
-};
-
-const extensions = computed(() => [
-  basicSetup,
-  sparql(),
-  syntaxHighlighting(sparqlHighlightStyle),
-  errorLineField,
-  ...(isDarkMode.value ? [oneDark] : []),
-]);
 
 const clearFilters = () => {
   Object.values(filters.value).forEach(filter => {
@@ -501,7 +428,7 @@ const runQuery = async () => {
   columns.value = [];
   statements.value = [];
   errorMessage.value = null;
-  highlightErrorLine(null);
+  errorLineNumber.value = null;
 
   if (!validateSparqlSyntax()) return;
 
@@ -624,27 +551,18 @@ const validateSparqlSyntax = (): boolean => {
     errorMessage.value = err.message;
     const lineMatch = err.message?.match(/line[:\s]+(\d+)/i);
     if (lineMatch) {
-      highlightErrorLine(parseInt(lineMatch[1], 10));
-    }
-    if (err.location?.start?.line) {
-      highlightErrorLine(err.location.start.line);
+      errorLineNumber.value = parseInt(lineMatch[1], 10);
+    } else if (err.location?.start?.line) {
+      errorLineNumber.value = err.location.start.line;
+    } else {
+      errorLineNumber.value = null;
     }
     return false;
   }
 };
 
-const handleReady = (payload: {view: any}) => {
-  view.value = payload.view;
-};
-
 const setEditorText = (text: string, applyPrefixes: boolean = true) => {
   sparqlQuery.value = applyPrefixes ? applyPrefixesToQuery(text) : text;
-  if (!view.value) return;
-
-  const state = view.value.state;
-  view.value.dispatch({
-    changes: {from: 0, to: state.doc.length, insert: sparqlQuery.value},
-  });
 };
 
 watch(
@@ -660,7 +578,7 @@ const validateLive = () => {
 
   validateTimer = window.setTimeout(() => {
     errorMessage.value = null;
-    highlightErrorLine(null);
+    errorLineNumber.value = null;
 
     try {
       const parser = new Parser();
@@ -668,8 +586,11 @@ const validateLive = () => {
     } catch (err: any) {
       errorMessage.value = err.message;
       const lineMatch = err.message?.match(/line[:\s]+(\d+)/i);
-      if (lineMatch) highlightErrorLine(parseInt(lineMatch[1], 10));
-      if (err.location?.start?.line) highlightErrorLine(err.location.start.line);
+      if (lineMatch) {
+        errorLineNumber.value = parseInt(lineMatch[1], 10);
+      } else if (err.location?.start?.line) {
+        errorLineNumber.value = err.location.start.line;
+      }
     }
   }, 250);
 };
@@ -768,27 +689,7 @@ const toggleExportPopover = (event: Event) => {
 
 .editor-container {
   flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  overflow: hidden;
   min-height: 0;
-  position: relative;
-}
-
-:deep(.cm-editor) {
-  height: 100%;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-size: 14px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-:deep(.cm-scroller) {
-  overflow: auto;
-  height: 100%;
 }
 
 .editor-footer {
@@ -812,48 +713,6 @@ const toggleExportPopover = (event: Event) => {
 :deep(.p-datatable-wrapper) {
   flex: 1;
   overflow: auto;
-}
-
-.error-box {
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  background-color: #ffe5e5;
-  color: #d8000c;
-  font-size: 0.875rem;
-  border: 1px solid #d8000c;
-  flex-shrink: 0;
-  max-height: 150px;
-  overflow: auto;
-  white-space: pre-wrap;
-}
-
-:deep(.cm-error-line) {
-  border-left: 3px solid #f44336;
-}
-
-:deep(.cm-error-line) {
-  animation: errorPulse 0.5s ease-in-out;
-}
-
-:deep(.cm-frozen-line) {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-:deep(.dark .cm-frozen-line) {
-  background-color: #2a2a2a;
-}
-
-@keyframes errorPulse {
-  0%,
-  100% {
-    background-color: #ffebee;
-  }
-  50% {
-    background-color: #ffcdd2;
-  }
 }
 
 :deep(.p-tabpanel[value='query']) {
@@ -883,7 +742,6 @@ const toggleExportPopover = (event: Event) => {
   flex-shrink: 0;
 }
 
-.error-box,
 .editor-footer {
   flex-shrink: 0;
 }
