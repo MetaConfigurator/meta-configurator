@@ -6,7 +6,6 @@ interface JsonLdContextManagerStore {
   syncFromData: (data: any) => Promise<any | null>;
   getContextText: () => string;
   resolveContext: (ctx: any) => Promise<any | null>;
-  mergeContexts: (primary: any, secondary: any) => any;
   extractContext: (json: any) => Record<string, any>;
   getEquivalentTerms: (term: string, context: Record<string, any>) => Set<string>;
 }
@@ -50,27 +49,6 @@ export const jsonLdContextManager: JsonLdContextManagerStore = (() => {
       return ctx;
     }
     return null;
-  };
-
-  const mergeContexts = (primary: any, secondary: any): any => {
-    if (!primary) return secondary;
-    if (!secondary) return primary;
-
-    if (Array.isArray(primary) || Array.isArray(secondary)) {
-      const left = Array.isArray(primary) ? primary : [primary];
-      const right = Array.isArray(secondary) ? secondary : [secondary];
-      return [...left, ...right];
-    }
-
-    if (typeof primary === 'object' && typeof secondary === 'object') {
-      return {...secondary, ...primary};
-    }
-
-    if (typeof primary === 'string' && typeof secondary === 'string') {
-      return primary === secondary ? primary : [primary, secondary];
-    }
-
-    return [primary, secondary];
   };
 
   const extractContext = (json: any): Record<string, any> => {
@@ -128,7 +106,6 @@ export const jsonLdContextManager: JsonLdContextManagerStore = (() => {
     syncFromData,
     getContextText,
     resolveContext,
-    mergeContexts,
     extractContext,
     getEquivalentTerms,
   };

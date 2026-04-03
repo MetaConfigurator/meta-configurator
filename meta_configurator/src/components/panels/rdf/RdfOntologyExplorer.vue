@@ -46,15 +46,6 @@
                     :accept="RDF_FILE_ACCEPT"
                     :disabled="!selectedPrefix || isDownloading || isUploading"
                     @select="onOntologyFileSelected" />
-                  <div class="flex items-center gap-2">
-                    <Checkbox
-                      inputId="downloadNestedImports"
-                      v-model="downloadNestedImports"
-                      :binary="true" />
-                    <label for="downloadNestedImports" class="text-sm text-muted-color"
-                      >Download nested imports</label
-                    >
-                  </div>
                   <Button
                     label="Refresh"
                     icon="pi pi-refresh"
@@ -268,7 +259,6 @@ import * as $rdf from 'rdflib';
 import Listbox from 'primevue/listbox';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
 import Dialog from 'primevue/dialog';
 import FileUpload from 'primevue/fileupload';
@@ -337,7 +327,6 @@ const classTableRef = ref<any | null>(null);
 const activeAccordion = ref<string | null>('ontologyControls');
 const deleteDialog = ref(false);
 const ontologyFileUploadRef = ref<any | null>(null);
-const downloadNestedImports = ref(false);
 
 type CachedOntology = {
   ontologyPrefix: string;
@@ -346,7 +335,6 @@ type CachedOntology = {
   format: string;
   contentType: string;
   fetchedAt: string;
-  importedSources?: ImportedOntologySource[];
   mergedGraphNTriples?: string;
   ontologyQueryResults?: OntologyRow[];
   queryResultsFetchedAt?: string;
@@ -358,20 +346,6 @@ type CachedGlobalGraph = {
   updatedAt: string;
 };
 
-type ImportedOntologySource = {
-  url: string;
-  content: string;
-  format: string;
-  contentType: string;
-};
-
-type OntologySource = {
-  url: string;
-  content: string;
-  format: string;
-  contentType: string;
-};
-
 type OntologyRow = {
   about: string;
   comment: string;
@@ -379,15 +353,6 @@ type OntologyRow = {
 };
 
 type CustomQueryRow = Record<string, string>;
-
-type OntologyBundle = {
-  rootSource: OntologySource;
-  importedSources: ImportedOntologySource[];
-  mergedGraphNTriples: string;
-  usedProxy: boolean;
-  downloadedImportCount: number;
-  skippedImportCount: number;
-};
 
 const INDEXED_DB_NAME = 'rdf_ontology_cache_db';
 const INDEXED_DB_VERSION = 2;
@@ -398,7 +363,6 @@ const ACCEPT_RDF_HEADER =
   'application/rdf+xml, text/turtle, application/x-turtle, application/n-triples, text/n3, application/ld+json, application/json, application/xml, text/xml, text/plain';
 const RDF_FILE_ACCEPT =
   '.rdf,.owl,.xml,.ttl,.nt,.n3,.jsonld,.json,application/rdf+xml,text/turtle,application/x-turtle,application/n-triples,text/n3,application/ld+json,application/json,application/xml,text/xml,text/plain';
-const OWL_IMPORTS_IRI = 'http://www.w3.org/2002/07/owl#imports';
 const loadedCacheEntry = ref<CachedOntology | null>(null);
 let ontologyDbPromise: Promise<IDBDatabase> | null = null;
 let prefixLookupRequestId = 0;
@@ -571,19 +535,27 @@ async function downloadAndCacheOntology() {
   setStatus('');
 
   try {
-    const ontologyBundle = await buildOntologyBundleFromUrl(
-      parsedUrl.toString(),
-      downloadNestedImports.value
-    );
+    const {response, usedProxy} = await fetchOntologyWithCorsFallback(parsedUrl.toString());
+    if (!response.ok) {
+      throw new Error(`Download failed with HTTP ${response.status} for ${parsedUrl.toString()}.`);
+    }
+    const contentType = response.headers.get('content-type') ?? '';
+    const format = detectRdfFormat(contentType, parsedUrl.toString());
+    if (!format) {
+      throw new Error(`Only RDF files are supported (${parsedUrl.toString()}).`);
+    }
+    const content = await response.text();
+    const store = await parseRdfToStore(content, parsedUrl.toString(), format);
+    const mergedGraphNTriples = serializeStoreToNTriples(store);
+
     const cacheEntry: CachedOntology = {
       ontologyPrefix,
-      url: ontologyBundle.rootSource.url,
-      content: ontologyBundle.rootSource.content,
-      format: ontologyBundle.rootSource.format,
-      contentType: ontologyBundle.rootSource.contentType,
+      url: parsedUrl.toString(),
+      content,
+      format,
+      contentType,
       fetchedAt: new Date().toISOString(),
-      importedSources: ontologyBundle.importedSources,
-      mergedGraphNTriples: ontologyBundle.mergedGraphNTriples,
+      mergedGraphNTriples,
     };
     loadedCacheEntry.value = cacheEntry;
     await putOntologyToIndexedDb(cacheEntry);
@@ -591,11 +563,7 @@ async function downloadAndCacheOntology() {
 
     setStatus(
       `Ontology for prefix "${ontologyPrefix}" was downloaded and cached in IndexedDB${
-        ontologyBundle.usedProxy ? ' (via local proxy)' : ''
-      }. Imported ${ontologyBundle.downloadedImportCount} ontologies${
-        ontologyBundle.skippedImportCount > 0
-          ? `, skipped ${ontologyBundle.skippedImportCount} unresolved/non-HTTP imports`
-          : ''
+        usedProxy ? ' (via local proxy)' : ''
       }.`,
       'success'
     );
@@ -628,40 +596,25 @@ async function onOntologyFileSelected(event: any) {
     }
 
     const content = await file.text();
-    const ontologyBundle = await buildOntologyBundleFromSource({
-      source: {
-        url: `file://${encodeURIComponent(file.name)}`,
-        content,
-        format,
-        contentType,
-      },
-      allowImportDownloads: downloadNestedImports.value,
-    });
+    const fileUrl = `file://${encodeURIComponent(file.name)}`;
+    const store = await parseRdfToStore(content, fileUrl, format);
+    const mergedGraphNTriples = serializeStoreToNTriples(store);
 
     const cacheEntry: CachedOntology = {
       ontologyPrefix,
-      url: ontologyBundle.rootSource.url,
-      content: ontologyBundle.rootSource.content,
-      format: ontologyBundle.rootSource.format,
-      contentType: ontologyBundle.rootSource.contentType,
+      url: fileUrl,
+      content,
+      format,
+      contentType,
       fetchedAt: new Date().toISOString(),
-      importedSources: ontologyBundle.importedSources,
-      mergedGraphNTriples: ontologyBundle.mergedGraphNTriples,
+      mergedGraphNTriples,
     };
     loadedCacheEntry.value = cacheEntry;
     await putOntologyToIndexedDb(cacheEntry);
     await loadOntologyCards();
 
     setStatus(
-      `Ontology file "${
-        file.name
-      }" for prefix "${ontologyPrefix}" was uploaded and cached in IndexedDB. Imported ${
-        ontologyBundle.downloadedImportCount
-      } ontologies${
-        ontologyBundle.skippedImportCount > 0
-          ? `, skipped ${ontologyBundle.skippedImportCount} unresolved/non-HTTP imports`
-          : ''
-      }.`,
+      `Ontology file "${file.name}" for prefix "${ontologyPrefix}" was uploaded and cached in IndexedDB.`,
       'success'
     );
   } catch (error: any) {
@@ -686,159 +639,6 @@ async function fetchOntologyWithCorsFallback(
       headers: {Accept: ACCEPT_RDF_HEADER},
     });
     return {response: proxiedResponse, usedProxy: true};
-  }
-}
-
-async function buildOntologyBundleFromUrl(
-  url: string,
-  allowImportDownloads: boolean
-): Promise<OntologyBundle> {
-  const {response, usedProxy} = await fetchOntologyWithCorsFallback(url);
-  if (!response.ok) {
-    throw new Error(`Download failed with HTTP ${response.status} for ${url}.`);
-  }
-
-  const contentType = response.headers.get('content-type') ?? '';
-  const format = detectRdfFormat(contentType, url);
-  if (!format) {
-    throw new Error(`Only RDF files are supported (${url}).`);
-  }
-
-  const content = await response.text();
-  return buildOntologyBundleFromSource({
-    source: {url, content, format, contentType},
-    initialUsedProxy: usedProxy,
-    allowImportDownloads,
-  });
-}
-
-async function buildOntologyBundleFromSource(options: {
-  source: OntologySource;
-  initialUsedProxy?: boolean;
-  allowImportDownloads?: boolean;
-}): Promise<OntologyBundle> {
-  const rootUrl = normalizeAbsoluteUrl(options.source.url);
-  const importedSources: ImportedOntologySource[] = [];
-  const visited = new Set<string>([rootUrl]);
-  const mergedTriples = new Set<string>();
-  const allowImportDownloads = options.allowImportDownloads ?? true;
-  let usedProxy = options.initialUsedProxy ?? false;
-  let skippedImportCount = 0;
-
-  const rootStore = await parseRdfToStore(options.source.content, rootUrl, options.source.format);
-  addStoreTriplesToSet(rootStore, mergedTriples);
-
-  const queue = extractImports({
-    content: options.source.content,
-    store: rootStore,
-    baseUri: rootUrl,
-  });
-
-  while (queue.length > 0) {
-    const importUrl = queue.shift();
-    if (!importUrl) continue;
-    if (visited.has(importUrl)) continue;
-    visited.add(importUrl);
-
-    if (!allowImportDownloads || !isHttpUrl(importUrl)) {
-      skippedImportCount += 1;
-      continue;
-    }
-
-    try {
-      const {response, usedProxy: usedProxyForImport} = await fetchOntologyWithCorsFallback(
-        importUrl
-      );
-      usedProxy = usedProxy || usedProxyForImport;
-      if (!response.ok) {
-        skippedImportCount += 1;
-        continue;
-      }
-
-      const contentType = response.headers.get('content-type') ?? '';
-      const format = detectRdfFormat(contentType, importUrl);
-      if (!format) {
-        skippedImportCount += 1;
-        continue;
-      }
-
-      const content = await response.text();
-      const store = await parseRdfToStore(content, importUrl, format);
-      addStoreTriplesToSet(store, mergedTriples);
-      importedSources.push({url: importUrl, content, format, contentType});
-
-      const nestedImports = extractImports({content, store, baseUri: importUrl});
-      for (const nestedImport of nestedImports) {
-        if (!visited.has(nestedImport)) {
-          queue.push(nestedImport);
-        }
-      }
-    } catch {
-      skippedImportCount += 1;
-    }
-  }
-
-  return {
-    rootSource: {
-      ...options.source,
-      url: rootUrl,
-    },
-    importedSources,
-    mergedGraphNTriples: Array.from(mergedTriples).join('\n'),
-    usedProxy,
-    downloadedImportCount: importedSources.length,
-    skippedImportCount,
-  };
-}
-
-function extractImports(options: {
-  content: string;
-  store: $rdf.Formula;
-  baseUri: string;
-}): string[] {
-  const imports = new Set<string>();
-
-  const regex = /@imports\s+<([^>]+)>\s*\./g;
-  for (const match of options.content.matchAll(regex)) {
-    const rawIri = match[1]?.trim();
-    if (!rawIri) continue;
-    const resolved = resolveImportUri(rawIri, options.baseUri);
-    if (resolved) imports.add(resolved);
-  }
-
-  for (const statement of options.store.statements) {
-    if (statement.predicate.value !== OWL_IMPORTS_IRI) continue;
-    if (statement.object.termType !== 'NamedNode') continue;
-    const resolved = resolveImportUri(statement.object.value, options.baseUri);
-    if (resolved) imports.add(resolved);
-  }
-
-  return Array.from(imports);
-}
-
-function resolveImportUri(value: string, baseUri: string): string | null {
-  try {
-    return normalizeAbsoluteUrl(new URL(value, baseUri).toString());
-  } catch {
-    return null;
-  }
-}
-
-function normalizeAbsoluteUrl(value: string): string {
-  try {
-    return new URL(value).toString();
-  } catch {
-    return value.trim();
-  }
-}
-
-function isHttpUrl(value: string): boolean {
-  return value.startsWith('http://') || value.startsWith('https://');
-}
-
-function addStoreTriplesToSet(store: $rdf.Formula, triples: Set<string>) {
-  for (const statement of store.statements) {
-    triples.add(statement.toNT());
   }
 }
 
@@ -896,6 +696,14 @@ function parseRdfToStore(content: string, baseUri: string, format: string): Prom
       resolve(store as $rdf.Formula);
     });
   });
+}
+
+function serializeStoreToNTriples(store: $rdf.Formula): string {
+  const triples = new Set<string>();
+  for (const statement of store.statements) {
+    triples.add(statement.toNT());
+  }
+  return Array.from(triples).join('\n');
 }
 
 async function loadOntologyCards(forceRefresh = false) {
@@ -1155,10 +963,11 @@ async function ensureCacheEntryGraph(entry: CachedOntology): Promise<CachedOntol
     return entry;
   }
 
+  const rootUrl = entry.url || `cached://${entry.ontologyPrefix}`;
+  const store = await parseRdfToStore(entry.content, rootUrl, entry.format);
   const upgradedEntry: CachedOntology = {
     ...entry,
-    importedSources: entry.importedSources ?? [],
-    mergedGraphNTriples: await getEntryGraphNTriples(entry),
+    mergedGraphNTriples: serializeStoreToNTriples(store),
   };
 
   loadedCacheEntry.value = upgradedEntry;
@@ -1301,11 +1110,6 @@ function normalizeCachedOntology(value: CachedOntology | undefined): CachedOntol
   return {
     ...value,
     ontologyPrefix,
-    importedSources: Array.isArray(value.importedSources)
-      ? value.importedSources.filter(
-          source => !!source?.content && !!source?.format && !!source?.url
-        )
-      : [],
     mergedGraphNTriples:
       typeof value.mergedGraphNTriples === 'string' ? value.mergedGraphNTriples : '',
     ontologyQueryResults: Array.isArray(value.ontologyQueryResults)
@@ -1394,17 +1198,9 @@ async function rebuildAndStoreGlobalGraph(): Promise<CachedGlobalGraph> {
 async function getEntryGraphNTriples(entry: CachedOntology): Promise<string> {
   if (entry.mergedGraphNTriples) return entry.mergedGraphNTriples;
 
-  const triples = new Set<string>();
   const rootUrl = entry.url || `cached://${entry.ontologyPrefix}`;
   const rootStore = await parseRdfToStore(entry.content, rootUrl, entry.format);
-  addStoreTriplesToSet(rootStore, triples);
-
-  for (const source of entry.importedSources ?? []) {
-    const importedStore = await parseRdfToStore(source.content, source.url, source.format);
-    addStoreTriplesToSet(importedStore, triples);
-  }
-
-  return Array.from(triples).join('\n');
+  return serializeStoreToNTriples(rootStore);
 }
 
 async function putOntologyToIndexedDb(
@@ -1444,12 +1240,6 @@ function toStorableCachedOntology(entry: CachedOntology): CachedOntology {
     contentType: String(rawEntry.contentType ?? ''),
     fetchedAt: String(rawEntry.fetchedAt ?? ''),
     mergedGraphNTriples: rawEntry.mergedGraphNTriples ? String(rawEntry.mergedGraphNTriples) : '',
-    importedSources: (rawEntry.importedSources ?? []).map(source => ({
-      url: String(source?.url ?? ''),
-      content: String(source?.content ?? ''),
-      format: String(source?.format ?? ''),
-      contentType: String(source?.contentType ?? ''),
-    })),
     ontologyQueryResults: (rawEntry.ontologyQueryResults ?? []).map(row => ({
       about: String(row?.about ?? ''),
       comment: String(row?.comment ?? ''),
