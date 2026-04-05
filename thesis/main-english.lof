@@ -15,10 +15,10 @@
 \contentsline {figure}{\numberline {2.8}{\ignorespaces SPARQL query dialog, with AI-assisted query generation.}}{45}{figure.484}%
 \contentsline {figure}{\numberline {2.9}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{46}{figure.502}%
 \contentsline {figure}{\numberline {2.10}{\ignorespaces CSV export visualized: \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress} trends.}}{47}{figure.504}%
-\contentsline {figure}{\numberline {2.11}{\ignorespaces KG visualization of the JSON-LD data from Listing~\ref {lst:background_jsonld_example}, rendered in the Visualization dialog.}}{48}{figure.509}%
+\contentsline {figure}{\numberline {2.11}{\ignorespaces KG visualization of the JSON-LD data from Listing~\ref {lst:background_jsonld_example}, rendered in the Visualization dialog.}}{49}{figure.509}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running the SPARQL query from Listing~\ref {lst:application_mof_sparql_example}.}}{56}{figure.692}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Visualization of the JSON-LD data in Listing~\ref {lst:application_mof_jsonld_example_s_1}, rendered in the Visualization dialog.}}{57}{figure.695}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running the SPARQL query from Listing~\ref {lst:application_mof_sparql_example}.}}{57}{figure.692}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Visualization of the JSON-LD data in Listing~\ref {lst:application_mof_jsonld_example_s_1}, rendered in the Visualization dialog.}}{58}{figure.695}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

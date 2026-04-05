@@ -409,7 +409,7 @@ The \texttt{Visualization} tab renders the query result graph in read-only mode.
 \end{figure}
 
 \newpage
-\section{\glsentryshort{kg} Visualization}\label{sec:design:knowledge-graph-visualization}
+\section{Knowledge Graph Visualization}\label{sec:design:knowledge-graph-visualization}
 
 \gls{kg} rendering is implemented in \texttt{RdfVisualizer.vue} using Cytoscape.js \cite{cytoscapejs}, with the COSE-Bilkent layout extension for force-directed graph placement. The visualization presents resources as nodes and semantic relations as directed edges, while preserving readable labels through namespace-aware prefix shortening.
 
@@ -427,7 +427,7 @@ The visualization also supports clickable hyperlinks for semantic terms. Predica
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.6\linewidth]{../figures/MC-RDF-KG-1.png}
+  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-KG-1.png}
   \caption{\glsentryshort{kg} visualization of the JSON-LD data from Listing~\ref{lst:background_jsonld_example}, rendered in the Visualization dialog.}
   \label{fig:rdf_authoring_panel:kg_visualization}
 \end{figure}

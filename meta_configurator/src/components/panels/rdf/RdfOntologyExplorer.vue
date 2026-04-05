@@ -101,6 +101,7 @@
                   size="small"
                   stripedRows
                   scrollable
+                  resizableColumns
                   scrollHeight="flex">
                   <Column selectionMode="single" headerStyle="width: 3rem" />
                   <Column field="about" header="rdf:about">
@@ -127,6 +128,7 @@
                   size="small"
                   stripedRows
                   scrollable
+                  resizableColumns
                   scrollHeight="flex">
                   <Column selectionMode="single" headerStyle="width: 3rem" />
                   <Column field="about" header="rdf:about">
@@ -153,6 +155,7 @@
                   size="small"
                   stripedRows
                   scrollable
+                  resizableColumns
                   scrollHeight="flex">
                   <Column selectionMode="single" headerStyle="width: 3rem" />
                   <Column field="about" header="rdf:about">
@@ -199,6 +202,7 @@
                   size="small"
                   stripedRows
                   scrollable
+                  resizableColumns
                   scrollHeight="flex">
                   <Column
                     v-for="column in customQueryColumns"

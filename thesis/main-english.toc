@@ -32,15 +32,15 @@
 \contentsline {subsection}{\numberline {2.1.5}RDF Store and Data Synchronization}{41}{subsection.447}%
 \contentsline {subsection}{\numberline {2.1.6}Linked Selection Between Text View and RDF View}{42}{subsection.452}%
 \contentsline {section}{\numberline {2.2}Query with SPARQL}{44}{section.479}%
-\contentsline {section}{\numberline {2.3}KG Visualization}{47}{section.506}%
-\contentsline {chapter}{\numberline {3}Application in Chemistry}{49}{chapter.511}%
-\contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{49}{section.512}%
-\contentsline {section}{\numberline {3.2}CHMO Ontology}{49}{section.589}%
-\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{52}{section.590}%
-\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{54}{section.673}%
-\contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{57}{section.694}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{59}{chapter.697}%
-\contentsline {section}{\numberline {4.1}Current Limitations}{59}{section.698}%
-\contentsline {section}{\numberline {4.2}Outlook}{60}{section.699}%
-\contentsline {chapter}{\nonumberline Bibliography}{61}{chapter*.700}%
+\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{47}{section.506}%
+\contentsline {chapter}{\numberline {3}Application in Chemistry}{50}{chapter.511}%
+\contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{50}{section.512}%
+\contentsline {section}{\numberline {3.2}CHMO Ontology}{50}{section.589}%
+\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{53}{section.590}%
+\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{55}{section.673}%
+\contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{58}{section.694}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{60}{chapter.697}%
+\contentsline {section}{\numberline {4.1}Current Limitations}{60}{section.698}%
+\contentsline {section}{\numberline {4.2}Outlook}{61}{section.699}%
+\contentsline {chapter}{\nonumberline Bibliography}{62}{chapter*.700}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
