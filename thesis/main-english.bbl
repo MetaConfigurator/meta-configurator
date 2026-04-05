@@ -315,6 +315,44 @@
       \verb 10.1371/journal.pone.0154556
       \endverb
     \endentry
+    \entry{rdf_schema2014}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=e12edfe7ea67a8d960a85df6442dc2d3}{%
+           family={Brickley},
+           familyi={B\bibinitperiod},
+           given={Dan},
+           giveni={D\bibinitperiod}}}%
+        {{hash=bbcd1770e4aca99d0a1e679b1fb04491}{%
+           family={Guha},
+           familyi={G\bibinitperiod},
+           given={R.\bibnamedelimi V.},
+           giveni={R\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{fullhash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{fullhashraw}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{bibnamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{authorbibnamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{authornamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{authorfullhash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{authorfullhashraw}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \field{labelalpha}{BG14}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{RDF Schema 1.1}
+      \field{year}{2014}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/rdf-schema/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/rdf-schema/
+      \endverb
+    \endentry
     \entry{berners2001semantic}{article}{}{}
       \name{author}{3}{}{%
         {{hash=89ce6361749d05e9c8f47cae979594e9}{%

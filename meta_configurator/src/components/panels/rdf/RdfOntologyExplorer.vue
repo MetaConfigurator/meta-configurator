@@ -102,6 +102,7 @@
                   size="small"
                   stripedRows
                   paginator
+                  :rowsPerPageOptions="[10, 20, 50]"
                   :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
@@ -142,6 +143,7 @@
                   size="small"
                   stripedRows
                   paginator
+                  :rowsPerPageOptions="[10, 20, 50]"
                   :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
@@ -182,6 +184,7 @@
                   size="small"
                   stripedRows
                   paginator
+                  :rowsPerPageOptions="[10, 20, 50]"
                   :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
@@ -242,6 +245,7 @@
                   size="small"
                   stripedRows
                   paginator
+                  :rowsPerPageOptions="[10, 20, 50]"
                   :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
@@ -350,7 +354,7 @@ const statusMessage = ref('');
 const statusSeverity = ref<'success' | 'info' | 'warn' | 'error'>('info');
 const isQuerying = ref(false);
 const ontologyRows = ref<OntologyRow[]>([]);
-const ROWS_PER_PAGE = 100;
+const ROWS_PER_PAGE = 50;
 const activePropertyTab = ref<'DatatypeProperty' | 'ObjectProperty' | 'Class' | 'CustomQuery'>(
   'ObjectProperty'
 );

@@ -2440,17 +2440,25 @@
     <bcf:citekey order="47" intorder="1">dimou2014rml</bcf:citekey>
     <bcf:citekey order="48" intorder="1">codemirror</bcf:citekey>
     <bcf:citekey order="49" intorder="1">jsonld2014</bcf:citekey>
-    <bcf:citekey order="50" intorder="1">rdflib_docs</bcf:citekey>
-    <bcf:citekey order="51" intorder="1">rdflib_docs</bcf:citekey>
-    <bcf:citekey order="52" intorder="1">comunica_query_sparql</bcf:citekey>
-    <bcf:citekey order="53" intorder="1">comunica_supported_specs</bcf:citekey>
-    <bcf:citekey order="54" intorder="1">codemirror</bcf:citekey>
-    <bcf:citekey order="55" intorder="1">sparqljs</bcf:citekey>
-    <bcf:citekey order="56" intorder="1">cytoscapejs</bcf:citekey>
-    <bcf:citekey order="57" intorder="1">neubauer2026data</bcf:citekey>
-    <bcf:citekey order="58" intorder="1">chmo_ontology</bcf:citekey>
-    <bcf:citekey order="59" intorder="1">obi2016</bcf:citekey>
-    <bcf:citekey order="59" intorder="2">jackson2021obofoundry</bcf:citekey>
+    <bcf:citekey order="50" intorder="1">owl2_overview</bcf:citekey>
+    <bcf:citekey order="50" intorder="2">owl2_primer</bcf:citekey>
+    <bcf:citekey order="51" intorder="1">owl2_overview</bcf:citekey>
+    <bcf:citekey order="51" intorder="2">owl2_primer</bcf:citekey>
+    <bcf:citekey order="52" intorder="1">rdf_schema2014</bcf:citekey>
+    <bcf:citekey order="53" intorder="1">rdf_schema2014</bcf:citekey>
+    <bcf:citekey order="54" intorder="1">owl2_overview</bcf:citekey>
+    <bcf:citekey order="54" intorder="2">owl2_primer</bcf:citekey>
+    <bcf:citekey order="55" intorder="1">rdflib_docs</bcf:citekey>
+    <bcf:citekey order="56" intorder="1">rdflib_docs</bcf:citekey>
+    <bcf:citekey order="57" intorder="1">comunica_query_sparql</bcf:citekey>
+    <bcf:citekey order="58" intorder="1">comunica_supported_specs</bcf:citekey>
+    <bcf:citekey order="59" intorder="1">codemirror</bcf:citekey>
+    <bcf:citekey order="60" intorder="1">sparqljs</bcf:citekey>
+    <bcf:citekey order="61" intorder="1">cytoscapejs</bcf:citekey>
+    <bcf:citekey order="62" intorder="1">neubauer2026data</bcf:citekey>
+    <bcf:citekey order="63" intorder="1">chmo_ontology</bcf:citekey>
+    <bcf:citekey order="64" intorder="1">obi2016</bcf:citekey>
+    <bcf:citekey order="64" intorder="2">jackson2021obofoundry</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

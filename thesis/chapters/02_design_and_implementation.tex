@@ -266,7 +266,27 @@ Users can edit \gls{iri}s in the triple modal (Figure~\ref{fig:rdf_authoring_pan
 
 The interaction flow is shown in Figure~\ref{fig:rdf_authoring_panel:ontology_integration_1}. In this dialog, users can cache ontology content either by downloading it from a URL or by uploading a local file. The implementation detects supported RDF serializations (RDF/XML, Turtle, N-Triples, N3, JSON-LD), parses them in the browser using \texttt{rdflib.js}, serializes the resulting triples to N-Triples, and stores both the original source content and the parsed graph data in IndexedDB\footnote{IndexedDB is a low-level, browser-based NoSQL database that enables web applications to store and efficiently query large amounts of structured data on the client side.}.
 
-Figure~\ref{fig:rdf_authoring_panel:ontology_integration_2} illustrates how users can download the Schema.org ontology through the Ontology Explorer. After downloading an ontology or uploading a local file, the explorer updates a global cached graph by merging triples from all stored ontologies. This global graph is queried using the Comunica library, allowing ontology terms to be explored consistently across previously cached sources. The predefined query retrieves \texttt{owl:ObjectProperty}, \texttt{owl:DatatypeProperty}, \texttt{rdf:Property}, \texttt{rdfs:Class}, and \texttt{owl:Class}. Property-related entries are displayed in both the \texttt{ObjectProperty} and \texttt{DatatypeProperty} tabs, while class definitions appear in the \texttt{Class} tab. Query results are cached per ontology prefix and recomputed only when the user explicitly triggers the \texttt{Refresh} action. To support large ontologies, each result table is paginated (100 rows per page) and includes table-level filtering.
+Figure~\ref{fig:rdf_authoring_panel:ontology_integration_2} illustrates how users can download the Schema.org ontology through the Ontology Explorer. After downloading an ontology or uploading a local file, the explorer updates a global cached graph by merging triples from all stored ontologies. This global graph is queried using the Comunica library, allowing ontology terms to be explored consistently across previously cached sources. The predefined query retrieves \texttt{owl:ObjectProperty}, \texttt{owl:DatatypeProperty}, \texttt{rdf:Property}, \texttt{rdfs:Class}, and \texttt{owl:Class}. Property-related entries are displayed in both the \texttt{ObjectProperty} and \texttt{DatatypeProperty} tabs, while class definitions appear in the \texttt{Class} tab. Query results are cached per ontology prefix and recomputed only when the user explicitly triggers the \texttt{Refresh} action. To support large ontologies, each result table is paginated and includes table-level filtering.
+
+Table~\ref{tab:rdf_authoring_panel:ontology_term_types} summarizes these vocabulary terms and their role in the explorer. In brief, the first three terms are property descriptors (for links between resources or from resources to literal values), while the last two denote class-level concepts used for type hierarchies in ontologies.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Vocabulary terms used by the predefined ontology-term query in the Ontology Explorer.}
+  \label{tab:rdf_authoring_panel:ontology_term_types}
+  \begin{tabular}{p{0.26\linewidth} p{0.70\linewidth}}
+    \toprule
+    \textbf{Term} & \textbf{Meaning in ontology exploration} \\
+    \midrule
+    \texttt{owl:ObjectProperty} & A property whose values are resources (IRIs or blank nodes), i.e., links between entities in the graph \cite{owl2_overview,owl2_primer}. \\
+    \texttt{owl:DatatypeProperty} & A property whose values are literals such as strings, numbers, or dates \cite{owl2_overview,owl2_primer}. \\
+    \texttt{rdf:Property} & A generic RDF property class; in practice, used when no more specific OWL property typing is declared \cite{rdf_schema2014}. \\
+    \texttt{rdfs:Class} & The RDF Schema class of classes, used to define conceptual categories for resources \cite{rdf_schema2014}. \\
+    \texttt{owl:Class} & The OWL class construct used to model ontology concepts with richer semantics than plain RDF Schema typing \cite{owl2_overview,owl2_primer}. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 In addition to the predefined tabs, the explorer provides a custom \gls{sparql} interface, as shown in Figure~\ref{fig:rdf_authoring_panel:ontology_integration_3}. This feature allows users to execute custom SPARQL queries to locate specific classes or properties, while offering live syntax validation and inline error feedback. Queries are executed against the cached global graph, and results are rendered with dynamically generated columns. If the results include \gls{iri} variables, the corresponding cells become selectable for IRI completion in the triple modal. This enables users to discover and select ontology terms that may not be easily accessible through the predefined views.
 
