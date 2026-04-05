@@ -10,7 +10,7 @@
           filter
           class="w-full prefix-listbox"
           :disabled="prefixOptions.length === 0"
-          :listStyle="{height: '100%'}" />
+          listStyle="height: 100%" />
       </div>
       <div v-if="selectedPrefix" class="content-pane">
         <Accordion v-model:value="activeAccordion" class="mb-3">
@@ -75,139 +75,19 @@
 
         <div v-if="isQuerying" class="text-sm text-muted-color">Loading terms...</div>
         <div v-else class="table-wrapper">
-          <Tabs v-model:value="activePropertyTab" class="ontology-tabs">
-            <TabList>
-              <Tab value="DatatypeProperty" :disabled="!isDatatypeTabEnabled">DatatypeProperty</Tab>
-              <Tab value="ObjectProperty" :disabled="!isObjectPropertyTabEnabled"
-                >ObjectProperty</Tab
-              >
-              <Tab value="Class" :disabled="!isClassTabEnabled">Class</Tab>
+          <OntologyTermTabs
+            v-model="activePropertyTab"
+            :rows="ontologyRows"
+            :sourceField="props.sourceField"
+            :selectedPrefix="selectedPrefix"
+            :prefixNamespaces="prefixNamespaces"
+            :initialIri="pendingInitialIri"
+            :rowsPerPage="ROWS_PER_PAGE"
+            @preview-iri="onOntologyPreviewIri">
+            <template #extra-tabs>
               <Tab value="CustomQuery">Custom Query</Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel value="DatatypeProperty">
-                <div class="table-search mb-2">
-                  <InputText
-                    v-model.trim="tableSearch"
-                    placeholder="Search properties"
-                    class="w-full" />
-                </div>
-                <DataTable
-                  ref="datatypeTableRef"
-                  :value="filteredDatatypeRows"
-                  v-model:first="datatypeFirst"
-                  v-model:selection="selectedDatatypeRow"
-                  selectionMode="single"
-                  dataKey="about"
-                  size="small"
-                  stripedRows
-                  paginator
-                  :rowsPerPageOptions="[10, 20, 50]"
-                  :rows="ROWS_PER_PAGE"
-                  scrollable
-                  resizableColumns
-                  scrollHeight="flex">
-                  <Column selectionMode="single" headerStyle="width: 3rem" />
-                  <Column field="about" header="rdf:about">
-                    <template #body="{data}">
-                      <a
-                        class="ontology-term-link"
-                        :href="buildOntologyTermHref(data.about)"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        {{ termNameFromIri(data.about) }}
-                      </a>
-                    </template>
-                  </Column>
-                  <Column field="comment" header="Comment">
-                    <template #body="{data}">
-                      <div class="wrapped-comment">{{ data.comment }}</div>
-                    </template>
-                  </Column>
-                </DataTable>
-              </TabPanel>
-              <TabPanel value="ObjectProperty">
-                <div class="table-search mb-2">
-                  <InputText
-                    v-model.trim="tableSearch"
-                    placeholder="Search properties"
-                    class="w-full" />
-                </div>
-                <DataTable
-                  ref="objectTableRef"
-                  :value="filteredObjectRows"
-                  v-model:first="objectFirst"
-                  v-model:selection="selectedObjectRow"
-                  selectionMode="single"
-                  dataKey="about"
-                  size="small"
-                  stripedRows
-                  paginator
-                  :rowsPerPageOptions="[10, 20, 50]"
-                  :rows="ROWS_PER_PAGE"
-                  scrollable
-                  resizableColumns
-                  scrollHeight="flex">
-                  <Column selectionMode="single" headerStyle="width: 3rem" />
-                  <Column field="about" header="rdf:about">
-                    <template #body="{data}">
-                      <a
-                        class="ontology-term-link"
-                        :href="buildOntologyTermHref(data.about)"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        {{ termNameFromIri(data.about) }}
-                      </a>
-                    </template>
-                  </Column>
-                  <Column field="comment" header="Comment">
-                    <template #body="{data}">
-                      <div class="wrapped-comment">{{ data.comment }}</div>
-                    </template>
-                  </Column>
-                </DataTable>
-              </TabPanel>
-              <TabPanel value="Class">
-                <div class="table-search mb-2">
-                  <InputText
-                    v-model.trim="tableSearch"
-                    placeholder="Search classes"
-                    class="w-full" />
-                </div>
-                <DataTable
-                  ref="classTableRef"
-                  :value="filteredClassRows"
-                  v-model:first="classFirst"
-                  v-model:selection="selectedClassRow"
-                  selectionMode="single"
-                  dataKey="about"
-                  size="small"
-                  stripedRows
-                  paginator
-                  :rowsPerPageOptions="[10, 20, 50]"
-                  :rows="ROWS_PER_PAGE"
-                  scrollable
-                  resizableColumns
-                  scrollHeight="flex">
-                  <Column selectionMode="single" headerStyle="width: 3rem" />
-                  <Column field="about" header="rdf:about">
-                    <template #body="{data}">
-                      <a
-                        class="ontology-term-link"
-                        :href="buildOntologyTermHref(data.about)"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        {{ termNameFromIri(data.about) }}
-                      </a>
-                    </template>
-                  </Column>
-                  <Column field="comment" header="Comment">
-                    <template #body="{data}">
-                      <div class="wrapped-comment">{{ data.comment }}</div>
-                    </template>
-                  </Column>
-                </DataTable>
-              </TabPanel>
+            </template>
+            <template #extra-panels>
               <TabPanel value="CustomQuery">
                 <div class="flex flex-col gap-2 mb-2 mt-2">
                   <Accordion v-model:value="customQueryAccordion">
@@ -235,7 +115,7 @@
                 </div>
                 <div class="table-search mb-2">
                   <InputText
-                    v-model.trim="tableSearch"
+                    v-model.trim="customTableSearch"
                     placeholder="Search query results"
                     class="w-full" />
                 </div>
@@ -245,7 +125,6 @@
                   size="small"
                   stripedRows
                   paginator
-                  :rowsPerPageOptions="[10, 20, 50]"
                   :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
@@ -267,11 +146,15 @@
                   </Column>
                 </DataTable>
               </TabPanel>
-            </TabPanels>
-          </Tabs>
-          <div v-if="selectedRowIri" class="selection-bar mt-2">
+            </template>
+          </OntologyTermTabs>
+          <div class="selection-bar mt-2">
             <InputText :modelValue="selectedRowIri" class="selection-input" readonly />
-            <Button label="Select" icon="pi pi-check" @click="selectCurrentIri" />
+            <Button
+              label="Select"
+              icon="pi pi-check"
+              :disabled="!canSelectCurrentIri"
+              @click="selectCurrentIri" />
           </div>
         </div>
       </div>
@@ -304,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, nextTick, ref, toRaw, watch} from 'vue';
+import {computed, ref, toRaw, watch} from 'vue';
 import * as $rdf from 'rdflib';
 import Listbox from 'primevue/listbox';
 import InputText from 'primevue/inputtext';
@@ -318,16 +201,14 @@ import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import {Parser} from 'sparqljs';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import SparqlQueryEditor from '@/components/panels/rdf/SparqlQueryEditor.vue';
+import OntologyTermTabs from '@/components/panels/rdf/OntologyTermTabs.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -354,17 +235,12 @@ const statusMessage = ref('');
 const statusSeverity = ref<'success' | 'info' | 'warn' | 'error'>('info');
 const isQuerying = ref(false);
 const ontologyRows = ref<OntologyRow[]>([]);
-const ROWS_PER_PAGE = 50;
+const ROWS_PER_PAGE = 100;
 const activePropertyTab = ref<'DatatypeProperty' | 'ObjectProperty' | 'Class' | 'CustomQuery'>(
   'ObjectProperty'
 );
-const tableSearch = ref('');
-const selectedDatatypeRow = ref<any | null>(null);
-const selectedObjectRow = ref<any | null>(null);
-const selectedClassRow = ref<any | null>(null);
-const datatypeFirst = ref(0);
-const objectFirst = ref(0);
-const classFirst = ref(0);
+const customTableSearch = ref('');
+const selectedOntologyTabIri = ref('');
 const customQueryFirst = ref(0);
 const customSparqlQuery = ref('SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 100');
 const customQueryRows = ref<CustomQueryRow[]>([]);
@@ -376,9 +252,6 @@ const customQueryAccordion = ref<string | null>('editor');
 let customQueryValidateTimer: number | null = null;
 const pendingInitialIri = ref('');
 const isAutoSelectingPrefix = ref(false);
-const datatypeTableRef = ref<any | null>(null);
-const objectTableRef = ref<any | null>(null);
-const classTableRef = ref<any | null>(null);
 const activeAccordion = ref<string | null>('ontologyControls');
 const deleteDialog = ref(false);
 const ontologyFileUploadRef = ref<any | null>(null);
@@ -432,18 +305,8 @@ const selectedCacheEntry = computed(() => {
   return entry;
 });
 
-const datatypeRows = computed(() =>
-  ontologyRows.value.filter(row => row.propertyType === 'DatatypeProperty')
-);
-const objectRows = computed(() =>
-  ontologyRows.value.filter(row => row.propertyType === 'ObjectProperty')
-);
-const classRows = computed(() => ontologyRows.value.filter(row => row.propertyType === 'Class'));
-const filteredDatatypeRows = computed(() => filterRows(datatypeRows.value, tableSearch.value));
-const filteredObjectRows = computed(() => filterRows(objectRows.value, tableSearch.value));
-const filteredClassRows = computed(() => filterRows(classRows.value, tableSearch.value));
 const filteredCustomQueryRows = computed(() =>
-  filterCustomQueryRows(customQueryRows.value, tableSearch.value)
+  filterCustomQueryRows(customQueryRows.value, customTableSearch.value)
 );
 const customQueryColumns = computed(() => {
   const columns = new Set<string>();
@@ -454,39 +317,14 @@ const customQueryColumns = computed(() => {
   }
   return Array.from(columns);
 });
-const activeSelectedRow = computed(() =>
-  activePropertyTab.value === 'DatatypeProperty'
-    ? selectedDatatypeRow.value
-    : activePropertyTab.value === 'ObjectProperty'
-    ? selectedObjectRow.value
-    : activePropertyTab.value === 'Class'
-    ? selectedClassRow.value
-    : null
-);
-const isDatatypeTabEnabled = computed(() => props.sourceField === 'Predicate');
-const isObjectPropertyTabEnabled = computed(() => props.sourceField === 'Predicate');
-const isClassTabEnabled = computed(() => props.sourceField === 'Object');
 const selectedRowIri = computed(() => {
-  if (activePropertyTab.value === 'CustomQuery') {
-    return selectedCustomQueryIri.value;
-  }
-
-  const row = activeSelectedRow.value;
-  if (!row?.about) return '';
-
-  const namespace = selectedPrefix.value ? prefixNamespaces.value[selectedPrefix.value] ?? '' : '';
-
-  if (!namespace) return row.about;
-  if (row.about.startsWith(namespace)) return row.about;
-  return `${namespace}${termNameFromIri(row.about)}`;
+  return activePropertyTab.value === 'CustomQuery'
+    ? selectedCustomQueryIri.value
+    : selectedOntologyTabIri.value;
 });
-
-function resetTablePaging() {
-  datatypeFirst.value = 0;
-  objectFirst.value = 0;
-  classFirst.value = 0;
-  customQueryFirst.value = 0;
-}
+const canSelectCurrentIri = computed(() =>
+  isLikelyIri(normalizePotentialIri(selectedRowIri.value))
+);
 
 watch(
   () => data.data.value,
@@ -514,13 +352,6 @@ watch(
 );
 
 watch(
-  () => tableSearch.value,
-  () => {
-    resetTablePaging();
-  }
-);
-
-watch(
   selectedPrefix,
   async newPrefix => {
     const requestId = ++prefixLookupRequestId;
@@ -531,11 +362,9 @@ watch(
     ontologyRows.value = [];
     customQueryRows.value = [];
     selectedCustomQueryIri.value = '';
-    selectedDatatypeRow.value = null;
-    selectedObjectRow.value = null;
-    selectedClassRow.value = null;
-    resetTablePaging();
-    tableSearch.value = '';
+    selectedOntologyTabIri.value = '';
+    customQueryFirst.value = 0;
+    customTableSearch.value = '';
     loadedCacheEntry.value = null;
     if (!newPrefix) {
       ontologyUrl.value = '';
@@ -559,21 +388,10 @@ watch(
 );
 
 watch(
-  [ontologyRows, selectedPrefix],
-  () => {
-    if (!pendingInitialIri.value) return;
-    trySelectRowForIri(pendingInitialIri.value);
-  },
-  {deep: false}
-);
-
-watch(
   () => props.sourceField,
   sourceField => {
     activePropertyTab.value = sourceField === 'Object' ? 'Class' : 'ObjectProperty';
-    selectedDatatypeRow.value = null;
-    selectedObjectRow.value = null;
-    selectedClassRow.value = null;
+    selectedOntologyTabIri.value = '';
   },
   {immediate: true}
 );
@@ -795,9 +613,6 @@ async function loadOntologyCards(forceRefresh = false) {
 
     if (!forceRefresh && Array.isArray(cacheEntry.ontologyQueryResults)) {
       ontologyRows.value = cacheEntry.ontologyQueryResults;
-      datatypeFirst.value = 0;
-      objectFirst.value = 0;
-      classFirst.value = 0;
       return;
     }
 
@@ -810,9 +625,6 @@ async function loadOntologyCards(forceRefresh = false) {
     const query = buildOntologyQuery();
     const rows = await runSparqlOnCachedOntology(query, globalGraph.nTriples);
     ontologyRows.value = rows;
-    datatypeFirst.value = 0;
-    objectFirst.value = 0;
-    classFirst.value = 0;
 
     const updatedCacheEntry: CachedOntology = {
       ...cacheEntry,
@@ -1052,22 +864,6 @@ async function ensureCacheEntryGraph(entry: CachedOntology): Promise<CachedOntol
   return upgradedEntry;
 }
 
-function filterRows(
-  rows: Array<{
-    about: string;
-    comment: string;
-    propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
-  }>,
-  query: string
-) {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return rows;
-  return rows.filter(
-    row =>
-      row.about.toLowerCase().includes(normalized) || row.comment.toLowerCase().includes(normalized)
-  );
-}
-
 function filterCustomQueryRows(rows: CustomQueryRow[], query: string) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return rows;
@@ -1084,26 +880,6 @@ function getBindingValue(binding: any, name: string): string {
     }
   }
   return '';
-}
-
-function termNameFromIri(iri: string): string {
-  if (!iri) return '';
-  const hashIndex = iri.lastIndexOf('#');
-  const slashIndex = iri.lastIndexOf('/');
-  const splitIndex = Math.max(hashIndex, slashIndex);
-  if (splitIndex === -1 || splitIndex === iri.length - 1) {
-    return iri;
-  }
-  return decodeURIComponent(iri.slice(splitIndex + 1));
-}
-
-function buildOntologyTermHref(about: string): string {
-  if (!about) return '';
-
-  const namespace = selectedPrefix.value ? prefixNamespaces.value[selectedPrefix.value] ?? '' : '';
-  if (!namespace) return about;
-  if (about.startsWith(namespace)) return about;
-  return `${namespace}${termNameFromIri(about)}`;
 }
 
 function escapeForSparqlString(value: string): string {
@@ -1369,9 +1145,8 @@ async function deleteCachedOntology() {
       loadedCacheEntry.value = null;
       ontologyRows.value = [];
       customQueryRows.value = [];
-      selectedDatatypeRow.value = null;
-      selectedObjectRow.value = null;
-      selectedClassRow.value = null;
+      selectedOntologyTabIri.value = '';
+      selectedCustomQueryIri.value = '';
       ontologyUrl.value = '';
     }
     deleteDialog.value = false;
@@ -1386,13 +1161,20 @@ function confirmDeleteCachedOntology() {
 }
 
 function selectCurrentIri() {
-  if (!selectedRowIri.value) return;
+  if (!canSelectCurrentIri.value) return;
   emit('select-iri', selectedRowIri.value);
 }
 
 function onCustomQueryValueClick(rawValue: unknown) {
   const iri = normalizePotentialIri(rawValue);
   selectedCustomQueryIri.value = iri && isLikelyIri(iri) ? iri : '';
+}
+
+function onOntologyPreviewIri(iri: string) {
+  selectedOntologyTabIri.value = iri;
+  if (iri) {
+    pendingInitialIri.value = '';
+  }
 }
 
 function normalizePotentialIri(value: unknown): string {
@@ -1421,39 +1203,6 @@ function tryAutoSelectFromInitialIri() {
     selectedPrefix.value = bestPrefix;
     return;
   }
-  if (selectedPrefix.value !== bestPrefix) {
-    return;
-  }
-  trySelectRowForIri(pendingInitialIri.value);
-}
-
-function trySelectRowForIri(iri: string) {
-  if (!iri || !selectedPrefix.value || !ontologyRows.value.length) return;
-
-  const namespace = selectedPrefix.value ? prefixNamespaces.value[selectedPrefix.value] ?? '' : '';
-
-  const match = ontologyRows.value.find(row => rowMatchesIri(row.about, iri, namespace));
-  if (!match) return;
-  if (!isRowTypeEnabled(match.propertyType)) return;
-
-  if (match.propertyType === 'DatatypeProperty') {
-    activePropertyTab.value = 'DatatypeProperty';
-    selectedDatatypeRow.value = match;
-    selectedObjectRow.value = null;
-    selectedClassRow.value = null;
-  } else if (match.propertyType === 'Class') {
-    activePropertyTab.value = 'Class';
-    selectedClassRow.value = match;
-    selectedDatatypeRow.value = null;
-    selectedObjectRow.value = null;
-  } else {
-    activePropertyTab.value = 'ObjectProperty';
-    selectedObjectRow.value = match;
-    selectedDatatypeRow.value = null;
-    selectedClassRow.value = null;
-  }
-  focusMatchedRow(match);
-  pendingInitialIri.value = '';
 }
 
 function findBestPrefixForIri(iri: string): string | null {
@@ -1470,63 +1219,8 @@ function findBestPrefixForIri(iri: string): string | null {
   return bestPrefix;
 }
 
-function rowMatchesIri(rowAbout: string, iri: string, namespace: string): boolean {
-  if (rowAbout === iri) return true;
-  if (!namespace) return false;
-  return `${namespace}${termNameFromIri(rowAbout)}` === iri;
-}
-
-function isRowTypeEnabled(propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class'): boolean {
-  if (propertyType === 'DatatypeProperty') return isDatatypeTabEnabled.value;
-  if (propertyType === 'ObjectProperty') return isObjectPropertyTabEnabled.value;
-  return isClassTabEnabled.value;
-}
-
 function normalizeIri(value: string | undefined): string {
   return (value ?? '').trim();
-}
-
-async function focusMatchedRow(match: {
-  about: string;
-  propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
-}) {
-  await nextTick();
-  window.setTimeout(async () => {
-    await nextTick();
-    const rows =
-      match.propertyType === 'DatatypeProperty'
-        ? filteredDatatypeRows.value
-        : match.propertyType === 'ObjectProperty'
-        ? filteredObjectRows.value
-        : filteredClassRows.value;
-    const index = rows.findIndex(row => row.about === match.about);
-    if (index < 0) return;
-    const pageFirst = Math.floor(index / ROWS_PER_PAGE) * ROWS_PER_PAGE;
-    if (match.propertyType === 'DatatypeProperty' && datatypeFirst.value !== pageFirst) {
-      datatypeFirst.value = pageFirst;
-      await nextTick();
-    } else if (match.propertyType === 'ObjectProperty' && objectFirst.value !== pageFirst) {
-      objectFirst.value = pageFirst;
-      await nextTick();
-    } else if (match.propertyType === 'Class' && classFirst.value !== pageFirst) {
-      classFirst.value = pageFirst;
-      await nextTick();
-    }
-
-    const tableRef =
-      match.propertyType === 'DatatypeProperty'
-        ? datatypeTableRef.value
-        : match.propertyType === 'ObjectProperty'
-        ? objectTableRef.value
-        : classTableRef.value;
-    const tableEl = tableRef?.$el as HTMLElement | undefined;
-    const localIndex = index % ROWS_PER_PAGE;
-    const rowEl = tableEl?.querySelector(`tr[data-p-index="${localIndex}"]`) as HTMLElement | null;
-    if (!rowEl) return;
-
-    rowEl.scrollIntoView({behavior: 'smooth', block: 'center'});
-    rowEl.focus();
-  }, 140);
 }
 
 function setStatus(message: string, severity: 'success' | 'info' | 'warn' | 'error' = 'info') {
@@ -1641,17 +1335,6 @@ function collectFromContextObject(contextPart: any, out: Record<string, string>)
   cursor: pointer;
   color: var(--p-primary-color, #2563eb);
   text-decoration: underline;
-}
-
-.ontology-term-link {
-  color: var(--p-primary-color, #2563eb);
-  text-decoration: underline;
-}
-
-.wrapped-comment {
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 .custom-query-editor {
