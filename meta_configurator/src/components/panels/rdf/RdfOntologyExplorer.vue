@@ -95,21 +95,34 @@
                 <DataTable
                   ref="datatypeTableRef"
                   :value="filteredDatatypeRows"
+                  v-model:first="datatypeFirst"
                   v-model:selection="selectedDatatypeRow"
                   selectionMode="single"
                   dataKey="about"
                   size="small"
                   stripedRows
+                  paginator
+                  :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
                   scrollHeight="flex">
                   <Column selectionMode="single" headerStyle="width: 3rem" />
                   <Column field="about" header="rdf:about">
                     <template #body="{data}">
-                      {{ termNameFromIri(data.about) }}
+                      <a
+                        class="ontology-term-link"
+                        :href="buildOntologyTermHref(data.about)"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {{ termNameFromIri(data.about) }}
+                      </a>
                     </template>
                   </Column>
-                  <Column field="comment" header="Comment" />
+                  <Column field="comment" header="Comment">
+                    <template #body="{data}">
+                      <div class="wrapped-comment">{{ data.comment }}</div>
+                    </template>
+                  </Column>
                 </DataTable>
               </TabPanel>
               <TabPanel value="ObjectProperty">
@@ -122,21 +135,34 @@
                 <DataTable
                   ref="objectTableRef"
                   :value="filteredObjectRows"
+                  v-model:first="objectFirst"
                   v-model:selection="selectedObjectRow"
                   selectionMode="single"
                   dataKey="about"
                   size="small"
                   stripedRows
+                  paginator
+                  :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
                   scrollHeight="flex">
                   <Column selectionMode="single" headerStyle="width: 3rem" />
                   <Column field="about" header="rdf:about">
                     <template #body="{data}">
-                      {{ termNameFromIri(data.about) }}
+                      <a
+                        class="ontology-term-link"
+                        :href="buildOntologyTermHref(data.about)"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {{ termNameFromIri(data.about) }}
+                      </a>
                     </template>
                   </Column>
-                  <Column field="comment" header="Comment" />
+                  <Column field="comment" header="Comment">
+                    <template #body="{data}">
+                      <div class="wrapped-comment">{{ data.comment }}</div>
+                    </template>
+                  </Column>
                 </DataTable>
               </TabPanel>
               <TabPanel value="Class">
@@ -149,21 +175,34 @@
                 <DataTable
                   ref="classTableRef"
                   :value="filteredClassRows"
+                  v-model:first="classFirst"
                   v-model:selection="selectedClassRow"
                   selectionMode="single"
                   dataKey="about"
                   size="small"
                   stripedRows
+                  paginator
+                  :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
                   scrollHeight="flex">
                   <Column selectionMode="single" headerStyle="width: 3rem" />
                   <Column field="about" header="rdf:about">
                     <template #body="{data}">
-                      {{ termNameFromIri(data.about) }}
+                      <a
+                        class="ontology-term-link"
+                        :href="buildOntologyTermHref(data.about)"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {{ termNameFromIri(data.about) }}
+                      </a>
                     </template>
                   </Column>
-                  <Column field="comment" header="Comment" />
+                  <Column field="comment" header="Comment">
+                    <template #body="{data}">
+                      <div class="wrapped-comment">{{ data.comment }}</div>
+                    </template>
+                  </Column>
                 </DataTable>
               </TabPanel>
               <TabPanel value="CustomQuery">
@@ -199,8 +238,11 @@
                 </div>
                 <DataTable
                   :value="filteredCustomQueryRows"
+                  v-model:first="customQueryFirst"
                   size="small"
                   stripedRows
+                  paginator
+                  :rows="ROWS_PER_PAGE"
                   scrollable
                   resizableColumns
                   scrollHeight="flex">
@@ -308,6 +350,7 @@ const statusMessage = ref('');
 const statusSeverity = ref<'success' | 'info' | 'warn' | 'error'>('info');
 const isQuerying = ref(false);
 const ontologyRows = ref<OntologyRow[]>([]);
+const ROWS_PER_PAGE = 100;
 const activePropertyTab = ref<'DatatypeProperty' | 'ObjectProperty' | 'Class' | 'CustomQuery'>(
   'ObjectProperty'
 );
@@ -315,6 +358,10 @@ const tableSearch = ref('');
 const selectedDatatypeRow = ref<any | null>(null);
 const selectedObjectRow = ref<any | null>(null);
 const selectedClassRow = ref<any | null>(null);
+const datatypeFirst = ref(0);
+const objectFirst = ref(0);
+const classFirst = ref(0);
+const customQueryFirst = ref(0);
 const customSparqlQuery = ref('SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 100');
 const customQueryRows = ref<CustomQueryRow[]>([]);
 const selectedCustomQueryIri = ref('');
@@ -430,6 +477,13 @@ const selectedRowIri = computed(() => {
   return `${namespace}${termNameFromIri(row.about)}`;
 });
 
+function resetTablePaging() {
+  datatypeFirst.value = 0;
+  objectFirst.value = 0;
+  classFirst.value = 0;
+  customQueryFirst.value = 0;
+}
+
 watch(
   () => data.data.value,
   async dataValue => {
@@ -456,6 +510,13 @@ watch(
 );
 
 watch(
+  () => tableSearch.value,
+  () => {
+    resetTablePaging();
+  }
+);
+
+watch(
   selectedPrefix,
   async newPrefix => {
     const requestId = ++prefixLookupRequestId;
@@ -469,6 +530,7 @@ watch(
     selectedDatatypeRow.value = null;
     selectedObjectRow.value = null;
     selectedClassRow.value = null;
+    resetTablePaging();
     tableSearch.value = '';
     loadedCacheEntry.value = null;
     if (!newPrefix) {
@@ -729,6 +791,9 @@ async function loadOntologyCards(forceRefresh = false) {
 
     if (!forceRefresh && Array.isArray(cacheEntry.ontologyQueryResults)) {
       ontologyRows.value = cacheEntry.ontologyQueryResults;
+      datatypeFirst.value = 0;
+      objectFirst.value = 0;
+      classFirst.value = 0;
       return;
     }
 
@@ -741,6 +806,9 @@ async function loadOntologyCards(forceRefresh = false) {
     const query = buildOntologyQuery();
     const rows = await runSparqlOnCachedOntology(query, globalGraph.nTriples);
     ontologyRows.value = rows;
+    datatypeFirst.value = 0;
+    objectFirst.value = 0;
+    classFirst.value = 0;
 
     const updatedCacheEntry: CachedOntology = {
       ...cacheEntry,
@@ -907,6 +975,7 @@ async function runCustomSparqlQuery() {
     });
 
     customQueryRows.value = rows;
+    customQueryFirst.value = 0;
     selectedCustomQueryIri.value = '';
     customQueryErrorMessage.value = null;
     customQueryAccordion.value = null;
@@ -1022,6 +1091,15 @@ function termNameFromIri(iri: string): string {
     return iri;
   }
   return decodeURIComponent(iri.slice(splitIndex + 1));
+}
+
+function buildOntologyTermHref(about: string): string {
+  if (!about) return '';
+
+  const namespace = selectedPrefix.value ? prefixNamespaces.value[selectedPrefix.value] ?? '' : '';
+  if (!namespace) return about;
+  if (about.startsWith(namespace)) return about;
+  return `${namespace}${termNameFromIri(about)}`;
 }
 
 function escapeForSparqlString(value: string): string {
@@ -1419,6 +1497,17 @@ async function focusMatchedRow(match: {
         : filteredClassRows.value;
     const index = rows.findIndex(row => row.about === match.about);
     if (index < 0) return;
+    const pageFirst = Math.floor(index / ROWS_PER_PAGE) * ROWS_PER_PAGE;
+    if (match.propertyType === 'DatatypeProperty' && datatypeFirst.value !== pageFirst) {
+      datatypeFirst.value = pageFirst;
+      await nextTick();
+    } else if (match.propertyType === 'ObjectProperty' && objectFirst.value !== pageFirst) {
+      objectFirst.value = pageFirst;
+      await nextTick();
+    } else if (match.propertyType === 'Class' && classFirst.value !== pageFirst) {
+      classFirst.value = pageFirst;
+      await nextTick();
+    }
 
     const tableRef =
       match.propertyType === 'DatatypeProperty'
@@ -1427,7 +1516,8 @@ async function focusMatchedRow(match: {
         ? objectTableRef.value
         : classTableRef.value;
     const tableEl = tableRef?.$el as HTMLElement | undefined;
-    const rowEl = tableEl?.querySelector(`tr[data-p-index="${index}"]`) as HTMLElement | null;
+    const localIndex = index % ROWS_PER_PAGE;
+    const rowEl = tableEl?.querySelector(`tr[data-p-index="${localIndex}"]`) as HTMLElement | null;
     if (!rowEl) return;
 
     rowEl.scrollIntoView({behavior: 'smooth', block: 'center'});
@@ -1547,6 +1637,17 @@ function collectFromContextObject(contextPart: any, out: Record<string, string>)
   cursor: pointer;
   color: var(--p-primary-color, #2563eb);
   text-decoration: underline;
+}
+
+.ontology-term-link {
+  color: var(--p-primary-color, #2563eb);
+  text-decoration: underline;
+}
+
+.wrapped-comment {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .custom-query-editor {

@@ -260,13 +260,54 @@ Changes in the Context tab is propagated in the same way as changes to the GUI V
   \label{fig:rdf_authoring_panel:change_propagation_rdf_view}
 \end{figure}
 
+\subsection{Ontology Integration and IRI Completion}
+\label{sec:design:rdf-authoring-panel:ontology-integration}
+Users can edit \gls{iri}s in the triple modal (Figure~\ref{fig:rdf_authoring_panel:triple_modal}). For the \texttt{Predicate} and \texttt{Object} fields with the \texttt{Named Node} type, the panel provides a completion assistant by opening the Ontology Explorer dialog (\texttt{RdfOntologyExplorer.vue}). The explorer reads the JSON-LD \texttt{@context}, extracts prefix mappings, and presents them as selectable ontology scopes.
+
+The interaction flow is shown in Figure~\ref{fig:rdf_authoring_panel:ontology_integration_1}. In this dialog, users can cache ontology content either by downloading it from a URL or by uploading a local file. The implementation detects supported RDF serializations (RDF/XML, Turtle, N-Triples, N3, JSON-LD), parses them in the browser using \texttt{rdflib.js}, serializes the resulting triples to N-Triples, and stores both the original source content and the parsed graph data in IndexedDB\footnote{IndexedDB is a low-level, browser-based NoSQL database that enables web applications to store and efficiently query large amounts of structured data on the client side.}.
+
+Figure~\ref{fig:rdf_authoring_panel:ontology_integration_2} illustrates how users can download the Schema.org ontology through the Ontology Explorer. After downloading an ontology or uploading a local file, the explorer updates a global cached graph by merging triples from all stored ontologies. This global graph is queried using the Comunica library, allowing ontology terms to be explored consistently across previously cached sources. The predefined query retrieves \texttt{owl:ObjectProperty}, \texttt{owl:DatatypeProperty}, \texttt{rdf:Property}, \texttt{rdfs:Class}, and \texttt{owl:Class}. Property-related entries are displayed in both the \texttt{ObjectProperty} and \texttt{DatatypeProperty} tabs, while class definitions appear in the \texttt{Class} tab. Query results are cached per ontology prefix and recomputed only when the user explicitly triggers the \texttt{Refresh} action. To support large ontologies, each result table is paginated (100 rows per page) and includes table-level filtering.
+
+In addition to the predefined tabs, the explorer provides a custom \gls{sparql} interface, as shown in Figure~\ref{fig:rdf_authoring_panel:ontology_integration_3}. This feature allows users to execute custom SPARQL queries to locate specific classes or properties, while offering live syntax validation and inline error feedback. Queries are executed against the cached global graph, and results are rendered with dynamically generated columns. If the results include \gls{iri} variables, the corresponding cells become selectable for IRI completion in the triple modal. This enables users to discover and select ontology terms that may not be easily accessible through the predefined views.
+
+Figure~\ref{fig:rdf_authoring_panel:ontology_integration_4} shows the result of a \gls{sparql} query in the Ontology Explorer dialog, which can be used for IRI completion with the \gls{qudt} ontology. After executing a query, users can click on an IRI-valued cell, inspect the resolved IRI in the selection bar, and confirm their choice via \texttt{Select} button. The dialog then emits the selected IRI back to the triple modal, completing the predicate or object entry. If an initial IRI is already present, the explorer automatically selects the best matching prefix when opened, navigates to the appropriate tab and page, and highlights the corresponding row, ensuring a consistent and deterministic editing workflow.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-1.png}
+  \caption{Ontology Explorer dialog, which allows users to download ontologies and browse their classes and properties for IRI completion.}
+  \label{fig:rdf_authoring_panel:ontology_integration_1}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-2.png}
+  \caption{Downloading Schema.org ontology in the Ontology Explorer dialog.}
+  \label{fig:rdf_authoring_panel:ontology_integration_2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-3.png}
+  \caption{Ontology Explorer allows users to run custom SPARQL queries to find specific classes or properties.}
+  \label{fig:rdf_authoring_panel:ontology_integration_3}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-4.png}
+  \caption{Results of a SPARQL query in the Ontology Explorer dialog, which can be selected for IRI completion for \gls{qudt} ontology.}
+  \label{fig:rdf_authoring_panel:ontology_integration_4}
+\end{figure}
+
 \subsection{RDF Store and Data Synchronization}
 \label{sec:design:rdf-authoring-panel:rdf-store-and-sync}
 
 The internal semantic state is managed by \texttt{rdfStoreManager.ts}, which uses \texttt{rdflib.js} to parse and serialize data \cite{rdflib_docs}. 
 Because the synchronization logic operates on statement-level objects throughout this subsection, we first define the term \emph{RDFLib Statement} used in the following description.
 
-\begin{definition}[RDFLib Statement]
+\begin{definition}[RDFLib Statement]\label{def:statement}
 In this implementation, an RDFLib Statement is the runtime representation of one \gls{rdf} triple of the form $(s, p, o)$, where $s$ (subject), $p$ (predicate), and $o$ (object) are \gls{rdf} terms. In \texttt{rdflib.js}, these terms are represented as \texttt{NamedNode}, \texttt{BlankNode}, and \texttt{Literal} objects, and each triple is stored as a Statement. Briefly, a \texttt{NamedNode} represents an identified resource via an IRI (e.g., ontology classes, predicates, or linked entities), a \texttt{BlankNode} represents an unnamed local resource without a global IRI, and a \texttt{Literal} represents a concrete value such as text, number, or date (optionally with datatype or language tag). A collection of such Statements forms the in-memory graph used by the panel \cite{rdflib_docs}.
 \end{definition}
 
