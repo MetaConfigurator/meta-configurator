@@ -384,7 +384,7 @@
       \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Sci. Amer.}
+      \field{journaltitle}{Scientific American}
       \field{number}{5}
       \field{title}{The Semantic Web}
       \field{volume}{284}
@@ -862,7 +862,7 @@
       \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Knowl. Acquis.}
+      \field{journaltitle}{Knowledge Acquisition}
       \field{number}{2}
       \field{title}{A Translation Approach to Portable Ontology Specifications}
       \field{volume}{5}
@@ -1489,14 +1489,13 @@
       \strng{authornamehash}{c868af1be6babe3bc462a90a21c38dda}
       \strng{authorfullhash}{c868af1be6babe3bc462a90a21c38dda}
       \strng{authorfullhashraw}{c868af1be6babe3bc462a90a21c38dda}
-      \field{labelalpha}{NFDnd}
+      \field{labelalpha}{NFD22}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{note}{Accessed: 2026-03-30}
-      \field{title}{metadata4ing Ontology}
-      \field{year}{n.d.}
+      \field{title}{Metadata4Ing Ontology}
+      \field{year}{2022}
       \verb{urlraw}
       \verb https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/
       \endverb
@@ -1638,11 +1637,9 @@
       \strng{authornamehash}{3bcdaa3c66a4c1d8f23062f8369f7afc}
       \strng{authorfullhash}{3bcdaa3c66a4c1d8f23062f8369f7afc}
       \strng{authorfullhashraw}{3bcdaa3c66a4c1d8f23062f8369f7afc}
-      \field{extraname}{1}
       \field{labelalpha}{Pro}
       \field{sortinit}{P}
       \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
-      \field{extraalpha}{1}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{OpenRefine}
@@ -1651,68 +1648,6 @@
       \endverb
       \verb{url}
       \verb https://openrefine.org/
-      \endverb
-    \endentry
-    \entry{rdflib}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=f856c51d4605387c8193da997598b296}{%
-           family={Project},
-           familyi={P\bibinitperiod},
-           given={RDFLib},
-           giveni={R\bibinitperiod}}}%
-      }
-      \strng{namehash}{f856c51d4605387c8193da997598b296}
-      \strng{fullhash}{f856c51d4605387c8193da997598b296}
-      \strng{fullhashraw}{f856c51d4605387c8193da997598b296}
-      \strng{bibnamehash}{f856c51d4605387c8193da997598b296}
-      \strng{authorbibnamehash}{f856c51d4605387c8193da997598b296}
-      \strng{authornamehash}{f856c51d4605387c8193da997598b296}
-      \strng{authorfullhash}{f856c51d4605387c8193da997598b296}
-      \strng{authorfullhashraw}{f856c51d4605387c8193da997598b296}
-      \field{extraname}{2}
-      \field{labelalpha}{Pro}
-      \field{sortinit}{P}
-      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
-      \field{extraalpha}{2}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{RDFLib}
-      \verb{urlraw}
-      \verb https://rdflib.dev/
-      \endverb
-      \verb{url}
-      \verb https://rdflib.dev/
-      \endverb
-    \endentry
-    \entry{redland}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=0682880af4322e3a12b06c682071d8cd}{%
-           family={Project},
-           familyi={P\bibinitperiod},
-           given={Redland\bibnamedelima RDF},
-           giveni={R\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
-      }
-      \strng{namehash}{0682880af4322e3a12b06c682071d8cd}
-      \strng{fullhash}{0682880af4322e3a12b06c682071d8cd}
-      \strng{fullhashraw}{0682880af4322e3a12b06c682071d8cd}
-      \strng{bibnamehash}{0682880af4322e3a12b06c682071d8cd}
-      \strng{authorbibnamehash}{0682880af4322e3a12b06c682071d8cd}
-      \strng{authornamehash}{0682880af4322e3a12b06c682071d8cd}
-      \strng{authorfullhash}{0682880af4322e3a12b06c682071d8cd}
-      \strng{authorfullhashraw}{0682880af4322e3a12b06c682071d8cd}
-      \field{extraname}{3}
-      \field{labelalpha}{Pro}
-      \field{sortinit}{P}
-      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
-      \field{extraalpha}{3}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Redland RDF Libraries}
-      \verb{urlraw}
-      \verb http://librdf.org/
-      \endverb
-      \verb{url}
-      \verb http://librdf.org/
       \endverb
     \endentry
     \entry{sparql_standard}{misc}{}{}
@@ -1751,6 +1686,60 @@
       \endverb
       \verb{url}
       \verb https://www.w3.org/TR/sparql11-overview/
+      \endverb
+    \endentry
+    \entry{rdflib}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=8019d9b72f11b4807c8f79b4157d60b9}{%
+           family={{RDFLib Project}},
+           familyi={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{8019d9b72f11b4807c8f79b4157d60b9}
+      \strng{fullhash}{8019d9b72f11b4807c8f79b4157d60b9}
+      \strng{fullhashraw}{8019d9b72f11b4807c8f79b4157d60b9}
+      \strng{bibnamehash}{8019d9b72f11b4807c8f79b4157d60b9}
+      \strng{authorbibnamehash}{8019d9b72f11b4807c8f79b4157d60b9}
+      \strng{authornamehash}{8019d9b72f11b4807c8f79b4157d60b9}
+      \strng{authorfullhash}{8019d9b72f11b4807c8f79b4157d60b9}
+      \strng{authorfullhashraw}{8019d9b72f11b4807c8f79b4157d60b9}
+      \field{labelalpha}{RDF}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{RDFLib: A Python library for working with RDF}}
+      \verb{urlraw}
+      \verb https://rdflib.dev/
+      \endverb
+      \verb{url}
+      \verb https://rdflib.dev/
+      \endverb
+    \endentry
+    \entry{redland}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=da95a362718d353c356c18582762014f}{%
+           family={{Redland RDF Project}},
+           familyi={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{da95a362718d353c356c18582762014f}
+      \strng{fullhash}{da95a362718d353c356c18582762014f}
+      \strng{fullhashraw}{da95a362718d353c356c18582762014f}
+      \strng{bibnamehash}{da95a362718d353c356c18582762014f}
+      \strng{authorbibnamehash}{da95a362718d353c356c18582762014f}
+      \strng{authornamehash}{da95a362718d353c356c18582762014f}
+      \strng{authorfullhash}{da95a362718d353c356c18582762014f}
+      \strng{authorfullhashraw}{da95a362718d353c356c18582762014f}
+      \field{labelalpha}{Red}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Redland RDF Libraries}
+      \verb{urlraw}
+      \verb http://librdf.org/
+      \endverb
+      \verb{url}
+      \verb http://librdf.org/
       \endverb
     \endentry
     \entry{chmo_ontology}{misc}{}{}
@@ -2084,7 +2073,7 @@
            familyi={W\bibinitperiod}}}%
       }
       \list{publisher}{1}{%
-        {W3C Rec.}%
+        {W3C Recommendation}%
       }
       \strng{namehash}{446a1ae6601a5c59360c7d591c3992da}
       \strng{fullhash}{446a1ae6601a5c59360c7d591c3992da}
