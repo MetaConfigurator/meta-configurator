@@ -27,21 +27,21 @@
 \contentsline {section}{\numberline {2.1}RDF Authoring Panel}{33}{section.290}%
 \contentsline {subsection}{\numberline {2.1.1}RML Mapping Dialog}{34}{subsection.293}%
 \contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{39}{subsection.436}%
-\contentsline {subsection}{\numberline {2.1.3}Context Tab}{39}{subsection.440}%
-\contentsline {subsection}{\numberline {2.1.4}Triples Tab}{39}{subsection.441}%
-\contentsline {subsection}{\numberline {2.1.5}Ontology Integration and IRI Completion}{43}{subsection.449}%
-\contentsline {subsection}{\numberline {2.1.6}RDF Store and Data Synchronization}{47}{subsection.473}%
-\contentsline {subsection}{\numberline {2.1.7}Linked Selection Between Text View and RDF View}{48}{subsection.478}%
-\contentsline {section}{\numberline {2.2}Query with SPARQL}{50}{section.505}%
-\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{53}{section.532}%
-\contentsline {chapter}{\numberline {3}Application in Chemistry}{56}{chapter.537}%
-\contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{56}{section.538}%
-\contentsline {section}{\numberline {3.2}CHMO Ontology}{56}{section.615}%
-\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{59}{section.616}%
-\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{61}{section.699}%
-\contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{64}{section.720}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{66}{chapter.723}%
-\contentsline {section}{\numberline {4.1}Current Limitations}{66}{section.724}%
-\contentsline {section}{\numberline {4.2}Outlook}{67}{section.725}%
-\contentsline {chapter}{\nonumberline Bibliography}{68}{chapter*.726}%
+\contentsline {subsection}{\numberline {2.1.3}Context Tab}{39}{subsection.439}%
+\contentsline {subsection}{\numberline {2.1.4}Triples Tab}{39}{subsection.440}%
+\contentsline {subsection}{\numberline {2.1.5}Ontology Integration and IRI Completion}{43}{subsection.447}%
+\contentsline {subsection}{\numberline {2.1.6}RDF Store and Data Synchronization}{47}{subsection.471}%
+\contentsline {subsection}{\numberline {2.1.7}Linked Selection Between Text View and RDF View}{48}{subsection.476}%
+\contentsline {section}{\numberline {2.2}Query with SPARQL}{50}{section.503}%
+\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{53}{section.530}%
+\contentsline {chapter}{\numberline {3}Application in Chemistry}{55}{chapter.535}%
+\contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{55}{section.536}%
+\contentsline {section}{\numberline {3.2}CHMO Ontology}{55}{section.613}%
+\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{58}{section.614}%
+\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{60}{section.697}%
+\contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{63}{section.718}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{65}{chapter.721}%
+\contentsline {section}{\numberline {4.1}Current Limitations}{65}{section.722}%
+\contentsline {section}{\numberline {4.2}Outlook}{66}{section.723}%
+\contentsline {chapter}{\nonumberline Bibliography}{67}{chapter*.724}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
