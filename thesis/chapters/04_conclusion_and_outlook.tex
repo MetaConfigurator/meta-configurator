@@ -9,7 +9,7 @@ The application chapter demonstrates this workflow on \gls{mof} synthesis data. 
 
 Despite these contributions, several limitations remain.
 
-First, after the first edit in the \gls{rdf} panel, the underlying \gls{jsonld} text is regenerated (de-serialized) from the updated \gls{rdf} statements. As a result, the textual representation may differ from the original input formatting and structure order, even when the represented semantics are equivalent. The root cause is that each edit currently triggers reconstruction of the whole document, rather than a localized in-place text update.
+First, after the first edit in the \gls{rdf} panel, the underlying \gls{jsonld} text is regenerated (de-serialized) from the updated \gls{rdf} statements. As a result, the textual representation may differ from the original input formatting and structured order, even when the represented semantics are equivalent. The root cause is that each edit currently triggers reconstruction of the whole document, rather than a localized in-place text update.
 
 Second, \gls{ai}-generated mappings and queries can still contain semantic or structural errors. Therefore, user review remains mandatory, especially for domain-critical data and ontology alignment decisions.
 
