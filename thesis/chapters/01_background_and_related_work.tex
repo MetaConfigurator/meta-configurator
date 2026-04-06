@@ -1,13 +1,16 @@
 \chapter{Background and Related Work}
 \label{sec:background}
 
-The increasing adoption of computational experiments and simulation workflows in scientific research has resulted in large volumes of data \cite{boulakia2017workflows,wilkinson2025fairworkflows,villamar2025metadata}. In principle, such data can be modeled and validated directly with \gls{rdf}-based standards \cite{rdf_concepts2014,shacl_standard}. In practice, however, many researchers still manage data in ad hoc artifacts such as spreadsheet files, and when machine-readable encodings are used, they are commonly represented in formats such as \gls{xml} or \gls{json}, rather than as native \gls{rdf} graphs \cite{metaconfigurator2024,neubauer2026data}.
+The increasing adoption of computational experiments and simulation workflows in scientific research has resulted in large volumes of data \cite{boulakia2017workflows,wilkinson2025fairworkflows,villamar2025metadata}. In principle, such data can be modeled and validated directly with \gls{rdf}-based standards \cite{rdf_concepts2014,shacl_standard}. In practice, however, many researchers still manage data in artifacts such as spreadsheet files, and when machine-readable encodings are used, they are commonly represented in formats such as \gls{xml} or \gls{json}, rather than as native \gls{rdf} graphs \cite{metaconfigurator2024,neubauer2026data}.
 
 While the Semantic Web promises improved interoperability, explicit semantics, and cross-dataset integration \cite{berners2001semantic,janowicz2015geospatial,hogan2021knowledgegraphs}, its adoption often faces a substantial entry barrier due to ontology engineering effort, identifier and vocabulary design, and mapping complexity \cite{janowicz2015geospatial,hogan2021knowledgegraphs}. To motivate a practical path across this gap, this chapter first introduces structured data representation and validation with \gls{json} and JSON Schema. It then presents core Semantic Web concepts, and introduces MetaConfigurator as a tool for schema-driven data modeling and editing. 
 
 The chapter also reviews existing tools and approaches in areas such as ontology engineering, data transformation, and semantic data management. Although these solutions are powerful, they typically focus on specific tasks and are often used in isolation. As a result, users frequently have to switch between different tools to move from structured \gls{json} data to semantically enriched \gls{rdf} representations. This highlights a gap between data modeling and practical Semantic Web integration. By extending MetaConfigurator with support for semantic transformation, \gls{rdf} authoring, querying, and visualization, this thesis aims to close this gap and provide a more integrated and accessible tool to work with semantically enriched data.
 
 \section{JSON and JSON Schema}
+
+This section introduces the non-semantic data foundation that many scientific workflows already use in practice. It first presents \gls{json} as a lightweight representation format for structured experimental data, then explains how JSON Schema adds machine-checkable structural constraints. Together, these technologies provide a practical baseline for data quality before semantic enrichment and transformation into \gls{rdf}-based representations.
+
 \subsection{JSON as a Data Representation Format}
 \label{sec:background:json}
 
@@ -154,7 +157,7 @@ G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in
 </rdf:RDF>
 \end{lstlisting}
 
-The RDF model in Listing~\ref{lst:background_rdf_xml_example} adds an extra layer of meaning to the same data in Listing~\ref{lst:background_json_example}. RDF/XML models the data as explicit graph statements instead of nested key-value objects, as depicted in Figures~\ref{fig:rdf:diagram_1} and \ref{fig:rdf:triples}\footnote{Visualization and Table view were generated with ISSemantic: \url{https://issemantic.net/}}. In JSON, fields such as \texttt{name}, \texttt{unit}, and \texttt{value} are interpreted mainly by application logic, whereas in RDF the subject (\texttt{variable\_element\_size}) is connected through well-defined predicates (\texttt{schema:name}, \texttt{schema:unitCode}, \texttt{schema:value}) to typed objects, including links to specific ontologies such as QUDT for units. This makes the representation less format-specific and more interoperable, because the meaning is encoded directly in standard \gls{iri} and data types rather than implied by local JSON structure.
+The RDF model in Listing~\ref{lst:background_rdf_xml_example} adds an extra layer of meaning to the same data in Listing~\ref{lst:background_json_example}. RDF/XML models the data as explicit graph statements instead of nested key-value objects, as depicted in Figures~\ref{fig:rdf:diagram_1} and \ref{fig:rdf:triples}\footnote{Visualization and Table view were generated with ISSemantic: \url{https://issemantic.net/}}. In JSON, fields such as \texttt{name}, \texttt{unit}, and \texttt{value} are interpreted mainly by application logic, whereas in RDF the subject (\texttt{variable\_element\_size}) is connected through well-defined predicates (\texttt{schema:name}, \texttt{schema:unitCode}, \texttt{schema:value}) to typed objects, including links to specific ontologies such as \gls{qudt}. This makes the representation less format-specific and more interoperable, because the meaning is encoded directly in standard \gls{iri} and data types rather than implied by local JSON structure.
 
 \begin{figure}[htbp]
   \centering
@@ -175,7 +178,7 @@ The RDF model in Listing~\ref{lst:background_rdf_xml_example} adds an extra laye
 \subsection{Semantic Data Representation using JSON-LD}
 \label{sec:background:jsonld}
 
-\gls{jsonld} is another serialization format for \gls{rdf} graphs, but expressed in \gls{json} syntax \cite{jsonld2014}. While RDF/XML (Listing~\ref{lst:background_rdf_xml_example}) uses XML tags, \gls{jsonld} represents the same graph concepts in a JSON-friendly structure that is often easier to integrate into existing data pipelines and web-based tools.
+\gls{jsonld} is another serialization format for \gls{rdf} graphs, but expressed in \gls{json} syntax \cite{jsonld2014}. While RDF/XML (Listing~\ref{lst:background_rdf_xml_example}) uses XML tags, \gls{jsonld} represents the same graph concepts in a \gls{json} structure that is often easier to integrate into existing data pipelines and web-based tools.
 
 A typical \gls{jsonld} document has two key structural components:
 
@@ -238,7 +241,9 @@ By modeling the experimental data from Listing~\ref{lst:background_json_example}
 \subsection{SHACL: Shapes Constraint Language}
 \label{sec:background:shacl}
 
-The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against a set of structural and semantic constraints \cite{shacl_standard}. \gls{shacl} performs validation based on explicitly defined ``shapes'' \,that describe the expected properties, data types, and cardinality of \gls{rdf} nodes. While these shapes can be designed to reflect or align with domain ontologies, \gls{shacl} validation itself is independent of ontology languages such as \gls{owl}, which are primarily used for logical reasoning rather than constraint checking.
+The \gls{shacl} is a \gls{w3c} standard for validating \gls{rdf} graphs against a set of structural and semantic constraints \cite{shacl_standard}. \gls{shacl} performs validation based on explicitly defined ``shapes'' \,that describe the expected properties, data types, and cardinality of \gls{rdf} nodes. 
+
+While these shapes can be designed to reflect or align with domain ontologies, \gls{shacl} validation itself is independent of ontology languages such as \gls{owl}, which are primarily used for logical reasoning rather than constraint checking.
 
 For example, consider the simulation parameter \texttt{element\_size} in the \gls{jsonld} example (Listing~\ref{lst:background_jsonld_example}). Using \gls{shacl}, we can define a shape that enforces that every \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} representing an experiment parameter must have a numeric \href{https://schema.org/value}{\texttt{schema:value}} and a \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} pointing to a valid unit from the \gls{qudt} ontology. By applying this shape, \gls{rdf} data can be automatically checked for compliance with the expected structure and semantics, preventing errors or inconsistencies before integration into a \gls{kg}.
 
@@ -274,6 +279,7 @@ local:PropertyValueShape
     sh:property [
         sh:path schema:unitCode ;
         sh:nodeKind sh:IRI ;
+        sh:class qudt:Unit ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
     ] .
@@ -282,7 +288,7 @@ local:PropertyValueShape
 \subsection{SPARQL: Querying Semantic Data}
 \label{sec:background:sparql}
 
-\gls{sparql} is the standard query language for \gls{rdf} datasets \cite{sparql_standard}, supporting retrieval, filtering, and aggregation of data stored in \glspl{kg}. Queries are expressed in terms of triples, similar to \gls{rdf} statements.
+\gls{sparql} is the standard query language for \gls{rdf} datasets \cite{sparql_standard}, supporting retrieval, filtering, and aggregation of data stored in \glspl{kg}. Queries are expressed using triple patterns, similar to \gls{rdf} statements.
 
 Listing~\ref{lst:background_sparql_example} presents an SPARQL example using the \gls{jsonld} simulation data, where all experiment parameters and metrics are retrieved together with their corresponding values and units.
 
@@ -312,7 +318,9 @@ This example illustrates how semantic annotations enable structured and consiste
 \subsection{OWL: Modeling Rich Semantics and Logical Rules}
 \label{sec:background:owl}
 
-While \gls{rdf} provides the graph structure and \gls{sparql} enables querying, \gls{owl} adds a formal layer for expressing richer domain knowledge \cite{owl2_overview,owl2_primer}. With \gls{owl}, one can define class hierarchies, equivalence and disjointness of classes, and logical constraints on properties (e.g., transitive, symmetric, or cardinality-based restrictions). This allows data to be interpreted not only as stored triples, but also through the rules encoded in the ontology.
+While \gls{rdf} provides the graph structure and \gls{sparql} enables querying, \gls{owl} adds a formal layer for expressing richer domain knowledge \cite{owl2_overview,owl2_primer}. With \gls{owl}, one can define class hierarchies, equivalence and disjointness of classes, and logical constraints on properties (e.g., transitive, symmetric, or cardinality-based restrictions). This allows data to be interpreted not only as stored triples, but also through the rules encoded in the ontology. In addition, \gls{shacl} introduces a complementary validation layer for defining structural and integrity constraints over \gls{rdf} graphs. Unlike \gls{owl}, which focuses on logical inference, \gls{shacl} is primarily used to validate whether data conforms to expected shapes, such as required properties, value types, or cardinality restrictions. Together, these technologies support a comprehensive workflow in which \gls{rdf} represents data, \gls{owl} enriches its semantics, \gls{sparql} enables flexible querying, and \gls{shacl} ensures data quality and conformance. 
+
+Listing \ref{lst:background_owl_example} shows an example of an \gls{owl} property definition for \texttt{:hasParameter} in the Metadata4Ing ontology \cite{metadata4ing_ontology}. This property is defined as an object property with a domain that is a union of the classes \texttt{:Method} and \texttt{:Tool}, and a range that points to the class \texttt{Variable} from the PIMS-II\footnote{The PIMS-II (Process and Instrument Metadata Schema II) ontology is used to model variables and metadata associated with scientific and engineering processes, particularly in simulation and experimental workflows.} ontology. The definition also includes a human-readable comment and label.
 
 \begin{lstlisting}[float=htbp,style=turtle, caption={Definition for \texttt{:hasParameter} property in Metadata4Ing ontology\cite{metadata4ing_ontology}}, label={lst:background_owl_example}]
 :hasParameter rdf:type owl:ObjectProperty ;
@@ -465,11 +473,7 @@ In practice, MetaConfigurator is centered around two main working tabs, \textbf{
     \item \textbf{Snapshot Sharing and URL-Based Collaboration:}
     MetaConfigurator supports sharing complete editor states (data, schema, settings) through shareable links and snapshot storage, enabling reproducible collaboration between users \cite{metaconfigurator2025datamodels}.
 
-    \item \textbf{Limited Ontology Integration:}  
-   While the tool provides support for JSON-LD by recognizing \texttt{@context} and \texttt{@id} fields, its ontology integration capabilities remain limited. In its current form, a field can be annotated as JSON-LD and connected to a SPARQL endpoint that may be used to retrieve lists of ontology concepts, such as \gls{owl} classes or \gls{rdf} properties, to support basic auto-completion during data modeling.
-
 \end{itemize}
-
 
 \begin{figure}[htbp]
   \centering
@@ -494,7 +498,7 @@ This combination of views gives users a continuous workflow from low-level text 
 \subsection{AI-Assisted Schema Engineering and Mapping}
 \label{sec:background:metaconfigurator_ai}
 
-Recent work extends MetaConfigurator with \gls{ai}-assisted support for schema creation, modification, and mapping from natural-language user input \cite{ai_assisted_schema_mapping_2025}. The approach combines large language models with deterministic safeguards to improve reliability and usability.
+Recent work extends MetaConfigurator with \gls{ai}-assisted support for schema creation, modification, and mapping from natural-language user input \cite{ai_assisted_schema_mapping_2025}. The approach combines \gls{llm}s with deterministic safeguards to improve reliability and usability.
 
 For schema authoring, MetaConfigurator provides a chat-like interface where users describe their intent in natural language. The system then performs prompt construction and context management automatically, including role instructions, task-specific formatting constraints, and relevant schema context. Generated results are directly validated and visualized in the schema editor, and users remain in control through a manual validation workflow where generated output can be reviewed and refined before acceptance.
 
@@ -526,7 +530,11 @@ Several limitations arise from this restriction:
     \Glspl{kg} are often easier to understand when represented visually as nodes and relationships. However, the current platform does not provide mechanisms to visually explore \gls{rdf} triples or inspect the structure of the resulting \gls{kg}.
 \end{enumerate}
 
-To address these limitations, this thesis extends MetaConfigurator with an \textbf{RDF Authoring Panel} that integrates Semantic Web technologies directly into the schema-driven editing environment. The main contributions of this thesis include:
+To address these limitations, this thesis extends MetaConfigurator with an \textbf{RDF Authoring Panel} that integrates Semantic Web technologies directly into the schema-driven editing environment. 
+
+\newpage
+
+The main contributions of this thesis include:
 
 \begin{enumerate}
     \item \textbf{Transformation of JSON documents to JSON-LD:}  
@@ -557,7 +565,7 @@ Related work in this area spans several mature but often separate tool families:
 
 \subsection{Ontology Engineering and \glsentryshort{kg} Platforms}
 
-Protégé and WebProtégé are widely used for ontology engineering and collaborative ontology curation \cite{protege,webprotege}. Their strength is formal ontology modeling, but this also implies a relatively high entry barrier: users need to understand \gls{rdf}/\gls{owl} concepts, \glspl{iri}, and \glsentryshort{kg} thinking before they can work productively \cite{janowicz2015geospatial,hogan2021knowledgegraphs}. In many practical settings, however, data already exists in traditional non-linked formats such as \gls{json}, \gls{xml}, \gls{csv}, or \gls{yaml}, and teams do not start from native \gls{rdf}. MetaConfigurator addresses this gap by supporting import and schema-driven editing of such existing formats \cite{metaconfigurator2024,metaconfigurator2025datamodels}; the RDF Authoring Panel could provide the next step as a bridge from conventional structured data to semantic \gls{rdf}/\glsentryshort{kg} workflows.
+Protégé and WebProtégé are widely used for ontology engineering and collaborative ontology curation \cite{protege,webprotege}. Their strength is formal ontology modeling, but this also implies a relatively high entry barrier: users need to understand \gls{rdf}/\gls{owl} concepts and \glspl{iri}s before they can work productively \cite{janowicz2015geospatial,hogan2021knowledgegraphs}. In many practical settings, however, data already exists in traditional non-linked formats such as \gls{json}, \gls{xml}, \gls{csv}, or \gls{yaml}, and teams do not start from native \gls{rdf}. MetaConfigurator addresses this gap by supporting import and schema-driven editing of such existing formats \cite{metaconfigurator2024,metaconfigurator2025datamodels}; the RDF Authoring Panel could provide the next step as a bridge from conventional structured data to semantic data engineering.
 
 Apache Jena provides a mature programmatic stack for \gls{rdf} processing, reasoning, and \gls{sparql} querying \cite{apache_jena}. GraphDB focuses on \gls{rdf} storage and query execution in production-oriented \gls{kg} settings \cite{graphdb}. These systems are strong back-end components, but typically require separate front-end layers for guided data entry and authoring workflows.
 
@@ -569,17 +577,17 @@ The \gls{cedar} Workbench also improves metadata quality through ontology-assist
 
 \subsection{Transformation from Source Data to RDF}
 
-Karma, OpenRefine (with \gls{rdf} extensions), and SPARQL-Generate support transformation from heterogeneous sources to \gls{rdf} \cite{karma,openrefine,sparql_generate}. These tools are effective for \gls{etl}-oriented conversion pipelines and are strong choices when the main goal is mapping source records into triples. However, they are typically centered on the transformation step itself. In contrast, our approach targets a broader user workflow: preparing existing non-linked data, transforming it to \gls{rdf}, and then continuing with semantic authoring, inspection, and querying in one environment.
+Karma, OpenRefine (with \gls{rdf} extensions), and SPARQL-Generate support transformation from heterogeneous sources to \gls{rdf} \cite{karma,openrefine,sparql_generate}. These tools are strong choices when the main goal is mapping source records into triples. However, they are typically centered on the transformation step itself. In contrast, our approach targets a broader user workflow: preparing existing non-linked data, transforming it to \gls{rdf}, and then continuing with semantic authoring, inspection, and querying in one environment.
 
 \subsection{Querying, Validation, and Programmatic RDF Processing}
 
-\gls{rdf} validation and querying standards such as \gls{shacl} and \gls{sparql} are well established \cite{shacl_standard,sparql_standard}. For lightweight experimentation, \gls{jsonld} Playground provides quick inspection of contexts and \gls{rdf} output \cite{jsonld_playground}. \gls{rdflib} and Redland provide low-level programmatic \gls{rdf} processing \cite{rdflib,redland}. These tools are important ecosystem building blocks but are not, by themselves, unified authoring environments.
+\gls{rdf} validation and querying standards such as \gls{shacl} and \gls{sparql} are well established \cite{shacl_standard,sparql_standard}. For lightweight experimentation, \gls{jsonld} Playground provides quick inspection of contexts and \gls{rdf} output \cite{jsonld_playground}. RDFLib and Redland provide low-level programmatic \gls{rdf} processing \cite{rdflib,redland}. These tools are important ecosystem building blocks but are not, by themselves, unified authoring environments.
 
 \subsection{Comparison of Semantic Web Editing Tools}
 
-Table~\ref{tab:related_tools_comparison} compares a subset of Semantic Web editing tools across capabilities relevant to this thesis: \gls{rdf} authoring, ontology integration, source-to-\gls{rdf} transformation, \gls{rdf} storage/query, visualization, and \gls{ai} assistance.
+Table~\ref{tab:related_tools_comparison} compares a subset of Semantic Web editing tools across capabilities, including \gls{rdf} authoring, ontology integration, source-to-\gls{rdf} transformation, \gls{rdf} storage/query, visualization, and \gls{ai} assistance.
 
-\begin{table}[h!]
+\begin{table}
 \centering
 \caption{Comparison of tools supporting RDF authoring and Semantic Web integration}
 \label{tab:related_tools_comparison}
@@ -608,7 +616,7 @@ Redland RDF & \dingcheck & Limited & -- & Partial & -- & -- \\
 \end{tabular}
 \end{table}
 
-\begin{table}[h!]
+\begin{table}
 \centering
 \caption{Rating scale used in Table~\ref{tab:related_tools_comparison}}
 \label{tab:rating_scale}
@@ -628,9 +636,12 @@ Limited & Basic or indirect support (e.g., plugin-based, narrow subset, or light
 \end{tabular}
 \end{table}
 
+
+\newpage
+
 \section{Research Gap and Positioning of This Thesis}
 
-Although these tools provide strong support for individual Semantic Web tasks, several limitations remain for practical, user-facing scientific data workflows:
+Although these tools provide strong support for individual Semantic Web tasks, several limitations remain for practical data workflows:
 
 \begin{itemize}
     \item \textbf{Fragmented workflows:} Modeling, mapping, querying, and visualization are often distributed across multiple tools, requiring users to switch between different environments to complete a single data integration task \cite{hogan2021knowledgegraphs}.
@@ -639,7 +650,7 @@ Although these tools provide strong support for individual Semantic Web tasks, s
 
     \item \textbf{Gap between structured JSON editing and RDF transformation:} In practice, much scientific data is authored and maintained in hierarchical formats such as \gls{json}. While standards such as \gls{jsonld} provide a bridge to linked data \cite{jsonld2014}, moving from conventional \gls{json} structures to \gls{rdf} still often requires separate mapping artifacts and additional tools (e.g., \gls{r2rml}/\gls{rml}) \cite{das2012r2rml,dimou2014rml}.
 
-    \item \textbf{Limited end-to-end support in one UI:} Most tools focus on a single task—such as ontology editing, mapping definition, or querying—rather than supporting the entire workflow from data authoring and transformation to validation, querying, and graph exploration in a unified environment.
+    \item \textbf{Limited end-to-end support in one User Interface:} Most tools focus on a single task—such as ontology editing, mapping definition, or querying—rather than supporting the entire workflow from data authoring and transformation to validation, querying, and graph exploration in a unified environment.
 
     \item \textbf{Limited AI support in semantic authoring workflows:} Despite recent advances in generative \gls{ai}, assistance for generating artifacts such as \gls{sparql} queries or \gls{rml} mappings from natural-language descriptions of user intent is still rarely integrated into Semantic Web authoring tools.
 \end{itemize}

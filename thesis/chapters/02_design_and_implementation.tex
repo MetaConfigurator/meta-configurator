@@ -273,51 +273,67 @@ Table~\ref{tab:rdf_authoring_panel:ontology_term_types} summarizes these vocabul
 \begin{table}[htbp]
   \centering
   \small
+  \renewcommand{\arraystretch}{1.3}
   \caption{Vocabulary terms used by the predefined ontology-term query in the Ontology Explorer.}
   \label{tab:rdf_authoring_panel:ontology_term_types}
-  \begin{tabular}{p{0.26\linewidth} p{0.70\linewidth}}
+  \begin{tabular}{p{0.24\linewidth} p{0.5\linewidth} p{0.16\linewidth}}
     \toprule
-    \textbf{Term} & \textbf{Meaning in ontology exploration} \\
+    \textbf{Term} & \textbf{Meaning in ontology exploration} & \textbf{Tab} \\
     \midrule
-    \texttt{owl:ObjectProperty} & A property whose values are resources (IRIs or blank nodes), i.e., links between entities in the graph \cite{owl2_overview,owl2_primer}. \\
-    \texttt{owl:DatatypeProperty} & A property whose values are literals such as strings, numbers, or dates \cite{owl2_overview,owl2_primer}. \\
-    \texttt{rdf:Property} & A generic RDF property class; in practice, used when no more specific OWL property typing is declared \cite{rdf_schema2014}. \\
-    \texttt{rdfs:Class} & The RDF Schema class of classes, used to define conceptual categories for resources \cite{rdf_schema2014}. \\
-    \texttt{owl:Class} & The OWL class construct used to model ontology concepts with richer semantics than plain RDF Schema typing \cite{owl2_overview,owl2_primer}. \\
+    \texttt{owl:ObjectProperty} & A property whose values are resources (IRIs or blank nodes), i.e., links between entities in the graph \cite{owl2_overview,owl2_primer}. & \texttt{ObjectProperty} \\
+    \texttt{owl:DatatypeProperty} & A property whose values are literals such as strings, numbers, or dates \cite{owl2_overview,owl2_primer}. & \texttt{DatatypeProperty} \\
+    \texttt{rdf:Property} & A generic RDF property class; in practice, used when no more specific OWL property typing is declared \cite{rdf_schema2014}. & \texttt{ObjectProperty} and \texttt{DatatypeProperty} \\
+    \texttt{rdfs:Class} & The RDF Schema class of classes, used to define conceptual categories for resources \cite{rdf_schema2014}. & \texttt{Class} \\
+    \texttt{owl:Class} & The OWL class construct used to model ontology concepts with richer semantics than plain RDF Schema typing \cite{owl2_overview,owl2_primer}. & \texttt{Class} \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-In addition to the predefined tabs, the explorer provides a custom \gls{sparql} interface, as shown in Figure~\ref{fig:rdf_authoring_panel:ontology_integration_3}. This feature allows users to execute custom SPARQL queries to locate specific classes or properties, while offering live syntax validation and inline error feedback. Queries are executed against the cached global graph, and results are rendered with dynamically generated columns. If the results include \gls{iri} variables, the corresponding cells become selectable for IRI completion in the triple modal. This enables users to discover and select ontology terms that may not be easily accessible through the predefined views.
+While the predefined tabs cover common ontology elements such as properties and classes, they are inherently limited to schema-level constructs. In practice, however, users often need to access instance-level resources or domain-specific concepts that are not captured by these fixed categories. For example, in the \gls{qudt} ontology, users may be interested in concrete unit definitions such as \href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}}, similar to example in Listing~\ref{lst:background_jsonld_example}, which is an individual of type \href{https://qudt.org/schema/qudt/}{\texttt{qudt:Unit}}. Such resources are not discoverable through the predefined tabs, as they are neither classes nor properties, but instances of a domain-specific class.
+
+Hence, in addition to the predefined tabs, the explorer therefore provides a custom \gls{sparql} interface, as shown in Figure~\ref{fig:rdf_authoring_panel:ontology_integration_3}. This feature allows users to execute custom SPARQL queries to locate specific classes, properties, or instances, while offering live syntax validation and inline error feedback. Listing~\ref{lst:design_sparql_qudt} shows a sample SPARQL query for retrieving unit instances from the \gls{qudt} ontology. Queries are executed against the cached global graph, and results are rendered with dynamically generated columns. If the results include \gls{iri} variables, the corresponding cells become selectable for IRI completion in the triple modal. This enables users to discover and select ontology terms that may not be easily accessible through the predefined views. Further details about the SPARQL component and its design are discussed in Section~\ref{sec:design:query-with-sparql}.
+
+\begin{lstlisting}[float=htbp,style=sparql,caption={Sample \gls{sparql} query which returns instances of units defined in \gls{qudt} ontology}, label={lst:design_sparql_qudt}]
+PREFIX qudt: <http://qudt.org/schema/qudt/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+SELECT ?subject ?description WHERE {
+  ?subject rdf:type qudt:Unit .
+
+  OPTIONAL {
+    ?subject dcterms:description ?description .
+  }
+}
+\end{lstlisting}
 
 Figure~\ref{fig:rdf_authoring_panel:ontology_integration_4} shows the result of a \gls{sparql} query in the Ontology Explorer dialog, which can be used for IRI completion with the \gls{qudt} ontology. After executing a query, users can click on an IRI-valued cell, inspect the resolved IRI in the selection bar, and confirm their choice via \texttt{Select} button. The dialog then emits the selected IRI back to the triple modal, completing the predicate or object entry. If an initial IRI is already present, the explorer automatically selects the best matching prefix when opened, navigates to the appropriate tab and page, and highlights the corresponding row, ensuring a consistent and deterministic editing workflow.
 
-
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-1.png}
+  \includegraphics[width=.8\linewidth]{../figures/MC-RDF-Ontology-1.png}
   \caption{Ontology Explorer dialog, which allows users to download ontologies and browse their classes and properties for IRI completion.}
   \label{fig:rdf_authoring_panel:ontology_integration_1}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-2.png}
+  \includegraphics[width=.8\linewidth]{../figures/MC-RDF-Ontology-2.png}
   \caption{Downloading Schema.org ontology in the Ontology Explorer dialog.}
   \label{fig:rdf_authoring_panel:ontology_integration_2}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-3.png}
-  \caption{Ontology Explorer allows users to run custom SPARQL queries to find specific classes or properties.}
+  \includegraphics[width=.8\linewidth]{../figures/MC-RDF-Ontology-3.png}
+  \caption{Ontology Explorer allows users to run custom SPARQL queries to find specific classes, properties or instances that are not directly accessible through predefined views.}
   \label{fig:rdf_authoring_panel:ontology_integration_3}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-4.png}
-  \caption{Results of a SPARQL query in the Ontology Explorer dialog, which can be selected for IRI completion for \gls{qudt} ontology.}
+  \includegraphics[width=.8\linewidth]{../figures/MC-RDF-Ontology-4.png}
+  \caption{Results of running SPARQL query in Listing~\ref{lst:design_sparql_qudt} over the \gls{qudt} ontology.}
   \label{fig:rdf_authoring_panel:ontology_integration_4}
 \end{figure}
 
