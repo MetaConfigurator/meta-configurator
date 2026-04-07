@@ -1,47 +1,50 @@
 \babel@toc {english}{}\relax 
-\contentsline {chapter}{Abbreviations}{9}{section*.4}%
-\contentsline {chapter}{\numberline {1}Background and Related Work}{11}{chapter.6}%
-\contentsline {section}{\numberline {1.1}JSON and JSON Schema}{11}{section.7}%
-\contentsline {subsection}{\numberline {1.1.1}JSON as a Data Representation Format}{11}{subsection.8}%
-\contentsline {subsection}{\numberline {1.1.2}JSON Schema for Data Validation}{12}{subsection.26}%
-\contentsline {section}{\numberline {1.2}Semantic Web}{13}{section.87}%
-\contentsline {subsection}{\numberline {1.2.1}Ontology: Modeling Knowledge Domains}{13}{subsection.88}%
-\contentsline {subsection}{\numberline {1.2.2}RDF: Resource Description Framework}{15}{subsection.89}%
-\contentsline {subsection}{\numberline {1.2.3}JSON-LD as Serialization of RDF}{17}{subsection.105}%
-\contentsline {subsection}{\numberline {1.2.4}SHACL: Shapes Constraint Language}{17}{subsection.151}%
-\contentsline {subsection}{\numberline {1.2.5}SPARQL: Querying Semantic Data}{20}{subsection.188}%
-\contentsline {subsection}{\numberline {1.2.6}OWL: Modeling Rich Semantics and Logical Rules}{21}{subsection.202}%
-\contentsline {subsection}{\numberline {1.2.7}RML for Mapping JSON to RDF}{22}{subsection.214}%
-\contentsline {section}{\numberline {1.3}MetaConfigurator for Schema-Driven Data Modeling}{24}{section.275}%
-\contentsline {subsection}{\numberline {1.3.1}Core Features}{24}{subsection.277}%
-\contentsline {subsection}{\numberline {1.3.2}AI-Assisted Schema Engineering and Mapping}{26}{subsection.282}%
-\contentsline {subsection}{\numberline {1.3.3}Limitations for Semantic Web Integration}{26}{subsection.283}%
-\contentsline {section}{\numberline {1.4}Related Work}{28}{section.295}%
-\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and KG Platforms}{29}{subsection.296}%
-\contentsline {subsection}{\numberline {1.4.2}Schema and Metadata Modeling for Structured Data}{29}{subsection.297}%
-\contentsline {subsection}{\numberline {1.4.3}Transformation from Source Data to RDF}{30}{subsection.298}%
-\contentsline {subsection}{\numberline {1.4.4}Querying, Validation, and Programmatic RDF Processing}{30}{subsection.299}%
-\contentsline {subsection}{\numberline {1.4.5}Comparison of Semantic Web Editing Tools}{30}{subsection.300}%
-\contentsline {section}{\numberline {1.5}Research Gap and Positioning of This Thesis}{32}{section.305}%
-\contentsline {chapter}{\numberline {2}Design and Implementation}{33}{chapter.306}%
-\contentsline {section}{\numberline {2.1}RDF Authoring Panel}{33}{section.307}%
-\contentsline {subsection}{\numberline {2.1.1}RML Mapping Dialog}{33}{subsection.310}%
-\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{39}{subsection.453}%
-\contentsline {subsection}{\numberline {2.1.3}Context Tab}{40}{subsection.459}%
-\contentsline {subsection}{\numberline {2.1.4}Triples Tab}{40}{subsection.460}%
-\contentsline {subsection}{\numberline {2.1.5}Ontology Integration and IRI Completion}{43}{subsection.468}%
-\contentsline {subsection}{\numberline {2.1.6}RDF Store and Data Synchronization}{47}{subsection.493}%
-\contentsline {subsection}{\numberline {2.1.7}Linked Selection Between Text View and RDF View}{49}{subsection.498}%
-\contentsline {section}{\numberline {2.2}Query with SPARQL}{51}{section.525}%
-\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{54}{section.552}%
-\contentsline {chapter}{\numberline {3}Application in Chemistry}{56}{chapter.557}%
-\contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{56}{section.558}%
-\contentsline {section}{\numberline {3.2}CHMO Ontology}{56}{section.635}%
-\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{59}{section.636}%
-\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{61}{section.718}%
-\contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{64}{section.738}%
-\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{66}{chapter.741}%
-\contentsline {section}{\numberline {4.1}Current Limitations}{66}{section.742}%
-\contentsline {section}{\numberline {4.2}Outlook}{67}{section.743}%
-\contentsline {chapter}{\nonumberline Bibliography}{68}{chapter*.744}%
+\contentsline {chapter}{Abbreviations}{9}{section*.5}%
+\contentsline {chapter}{\numberline {1}Background and Related Work}{11}{chapter.7}%
+\contentsline {section}{\numberline {1.1}JSON and JSON Schema}{11}{section.8}%
+\contentsline {subsection}{\numberline {1.1.1}JSON as a Data Representation Format}{11}{subsection.9}%
+\contentsline {subsection}{\numberline {1.1.2}JSON Schema for Data Validation}{12}{subsection.27}%
+\contentsline {section}{\numberline {1.2}Semantic Web}{13}{section.88}%
+\contentsline {subsection}{\numberline {1.2.1}Ontology: Modeling Knowledge Domains}{13}{subsection.89}%
+\contentsline {subsection}{\numberline {1.2.2}RDF: Resource Description Framework}{15}{subsection.90}%
+\contentsline {subsection}{\numberline {1.2.3}JSON-LD as Serialization of RDF}{17}{subsection.106}%
+\contentsline {subsection}{\numberline {1.2.4}SHACL: Shapes Constraint Language}{17}{subsection.152}%
+\contentsline {subsection}{\numberline {1.2.5}SPARQL: Querying Semantic Data}{20}{subsection.189}%
+\contentsline {subsection}{\numberline {1.2.6}OWL: Modeling Rich Semantics and Logical Rules}{21}{subsection.203}%
+\contentsline {subsection}{\numberline {1.2.7}RML for Mapping JSON to RDF}{22}{subsection.215}%
+\contentsline {section}{\numberline {1.3}MetaConfigurator for Schema-Driven Data Modeling}{24}{section.276}%
+\contentsline {subsection}{\numberline {1.3.1}Core Features}{24}{subsection.278}%
+\contentsline {subsection}{\numberline {1.3.2}AI-Assisted Schema Engineering and Mapping}{26}{subsection.283}%
+\contentsline {subsection}{\numberline {1.3.3}Limitations for Semantic Web Integration}{27}{subsection.284}%
+\contentsline {section}{\numberline {1.4}Related Work}{28}{section.296}%
+\contentsline {subsection}{\numberline {1.4.1}Ontology Engineering and KG Platforms}{29}{subsection.297}%
+\contentsline {subsection}{\numberline {1.4.2}Schema and Metadata Modeling for Structured Data}{29}{subsection.298}%
+\contentsline {subsection}{\numberline {1.4.3}Transformation from Source Data to RDF}{30}{subsection.299}%
+\contentsline {subsection}{\numberline {1.4.4}Querying, Validation, and Programmatic RDF Processing}{30}{subsection.300}%
+\contentsline {subsection}{\numberline {1.4.5}Comparison of Semantic Web Editing Tools}{30}{subsection.301}%
+\contentsline {section}{\numberline {1.5}Research Gap and Positioning of This Thesis}{32}{section.306}%
+\contentsline {chapter}{\numberline {2}Design and Implementation}{33}{chapter.307}%
+\contentsline {section}{\numberline {2.1}RDF Authoring Panel}{33}{section.308}%
+\contentsline {subsection}{\numberline {2.1.1}RML Mapping Dialog}{34}{subsection.311}%
+\contentsline {subsection}{\numberline {2.1.2}Panel Composition and UI Structure}{39}{subsection.454}%
+\contentsline {subsection}{\numberline {2.1.3}Context Tab}{40}{subsection.460}%
+\contentsline {subsection}{\numberline {2.1.4}Triples Tab}{40}{subsection.461}%
+\contentsline {subsection}{\numberline {2.1.5}Ontology Integration and IRI Completion}{43}{subsection.469}%
+\contentsline {subsection}{\numberline {2.1.6}RDF Store and Data Synchronization}{47}{subsection.494}%
+\contentsline {subsection}{\numberline {2.1.7}Linked Selection Between Text View and RDF View}{48}{subsection.499}%
+\contentsline {section}{\numberline {2.2}Query with SPARQL}{50}{section.526}%
+\contentsline {section}{\numberline {2.3}Knowledge Graph Visualization}{53}{section.553}%
+\contentsline {chapter}{\numberline {3}Application in Chemistry}{55}{chapter.558}%
+\contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{55}{section.559}%
+\contentsline {section}{\numberline {3.2}CHMO Ontology}{55}{section.636}%
+\contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{58}{section.637}%
+\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{60}{section.719}%
+\contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{63}{section.739}%
+\contentsline {chapter}{\numberline {4}Conclusion and Outlook}{65}{chapter.742}%
+\contentsline {section}{\numberline {4.1}Current Limitations}{65}{section.743}%
+\contentsline {section}{\numberline {4.2}Outlook}{66}{section.792}%
+\contentsline {chapter}{\nonumberline Bibliography}{68}{chapter*.797}%
+\def \@chapapp {\appendixname }
+\contentsline {part}{Appendix}{71}{chapter*.797}%
+\contentsline {chapter}{\numberline {A}Use of AI}{72}{appendix.798}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

@@ -172,6 +172,8 @@ G = \{(s_i, p_i, o_i) \mid i = 1, \dots, n\}, \quad s_i \in U \cup B, \; p_i \in
 </rdf:RDF>
 \end{lstlisting}
 
+\newpage
+
 The RDF model in Listing~\ref{lst:background_rdf_xml_example} adds an extra layer of meaning to the same data in Listing~\ref{lst:background_json_example}. RDF/XML models the data as explicit graph statements instead of nested key-value objects, as depicted in Figures~\ref{fig:rdf:diagram_1} and \ref{fig:rdf:triples}\footnote{Visualization and Table view were generated with ISSemantic: \url{https://issemantic.net/}}. In JSON, fields such as \texttt{name}, \texttt{unit}, and \texttt{value} are interpreted mainly by application logic, whereas in RDF the subject (\texttt{variable\_element\_size}) is connected through well-defined predicates (\texttt{schema:name}, \texttt{schema:unitCode}, \texttt{schema:value}) to typed objects, including links to specific ontologies such as \gls{qudt}. This makes the representation less format-specific and more interoperable, because the meaning is encoded directly in standard \gls{iri} and data types rather than implied by local JSON structure.
 
 \begin{figure}[htbp]
@@ -206,48 +208,48 @@ Listing~\ref{lst:background_jsonld_example} shows a complete \gls{jsonld} repres
 
 \begin{lstlisting}[float=htbp,style=json, caption={JSON-LD representation of the simulation result presented in Listing~\ref{lst:background_json_example}}, label={lst:background_jsonld_example}]
 {
-    "@context": {
-        "m4i": "http://w3id.org/nfdi4ing/metadata4ing#",
-        "schema": "https://schema.org/",
-        "unit": "http://qudt.org/vocab/unit/",
-        "local": "https://www.example.org/"
+  "@context": {
+    "m4i": "http://w3id.org/nfdi4ing/metadata4ing#",
+    "schema": "https://schema.org/",
+    "unit": "http://qudt.org/vocab/unit/",
+    "local": "https://www.example.org/"
+  },
+  "@graph": [
+    {
+      "@id": "local:run_fenics_simulation",
+      "@type": "m4i:Method",
+      "m4i:hasParameter": {
+        "@id": "local:variable_element_size"
+      },
+      "m4i:investigates": {
+        "@id": "local:variable_max_von_mises_stress"
+      }
     },
-    "@graph": [
-        {
-            "@id": "local:run_fenics_simulation",
-            "@type": "m4i:Method",
-            "m4i:hasParameter": {
-                "@id": "local:variable_element_size"
-            },
-            "m4i:investigates": {
-                "@id": "local:variable_max_von_mises_stress"
-            }
-        },
-        {
-            "@id": "local:variable_element_size",
-            "@type": "schema:PropertyValue",
-            "schema:name": "element_size",
-            "schema:unitCode": {
-                "@id": "unit:M"
-            },
-            "schema:value": {
-                "@type": "http://www.w3.org/2001/XMLSchema#double",
-                "@value": "2.5E-2"
-            }
-        },
-        {
-            "@id": "local:variable_max_von_mises_stress",
-            "@type": "schema:PropertyValue",
-            "schema:name": "max_von_mises_stress",
-            "schema:unitCode": {
-                "@id": "unit:MegaPA"
-            },
-            "schema:value": {
-                "@type": "http://www.w3.org/2001/XMLSchema#double",
-                "@value": "2.997915075586333E8"
-            }
-        }
-    ]
+    {
+      "@id": "local:variable_element_size",
+      "@type": "schema:PropertyValue",
+      "schema:name": "element_size",
+      "schema:unitCode": {
+        "@id": "unit:M"
+      },
+      "schema:value": {
+        "@type": "http://www.w3.org/2001/XMLSchema#double",
+        "@value": "2.5E-2"
+      }
+    },
+    {
+      "@id": "local:variable_max_von_mises_stress",
+      "@type": "schema:PropertyValue",
+      "schema:name": "max_von_mises_stress",
+      "schema:unitCode": {
+        "@id": "unit:MegaPA"
+      },
+      "schema:value": {
+        "@type": "http://www.w3.org/2001/XMLSchema#double",
+        "@value": "2.997915075586333E8"
+      }
+    }
+  ]
 }
 \end{lstlisting}
 
@@ -518,6 +520,8 @@ Recent work extends MetaConfigurator with \gls{ai}-assisted support for schema c
 In this workflow, the chat-like dialog is used for data-mapping tasks. Schema edits, in contrast, are applied directly in the schema editor rather than through a separate dialog; users can immediately inspect the result and revert undesired changes with the built-in Undo action. This keeps schema authoring interactive while preserving user control over incremental modifications.
 
 For data transformation, the system generates mapping expressions from user input and executes these mappings deterministically. In the presented implementation, JSONata expressions are generated from an input document and a target schema, then validated and executed in a controlled pipeline. This separates \gls{ai}-based generation from rule execution and supports scalable transformation workflows across heterogeneous source formats.
+
+\newpage
 
 \subsection{Limitations for Semantic Web Integration}
 \label{sec:background:metaconfigurator_limitations}

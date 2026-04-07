@@ -645,7 +645,7 @@
 \usepackage{algpseudocodex}
 
 \floatname{algorithm}{Algorithmus}
-\renewcommand{\listalgorithmname}{Algorithmenverzeichnis}
+% \renewcommand{\listalgorithmname}{Algorithmenverzeichnis}
 
 \newcommand{\commentchar}{\ensuremath{/\mkern-4mu/}}
 \algrenewcommand{\algorithmiccomment}[1]{\hfill $\commentchar$ #1}
@@ -1050,8 +1050,8 @@
 
 % mittels \newfloat wurde die Algorithmus-Gleitumgebung definiert.
 % Mit folgendem Befehl werden alle floats dieses Typs ausgegeben
-%\listof{Algorithmus}{List of Algorithms}
-%\listofalgorithms %Ist nur für Algorithmen, die mittels \begin{algorithm} umschlossen werden, nötig
+% \listof{Algorithmus}{List of Algorithms}
+\listofalgorithms %Ist nur für Algorithmen, die mittels \begin{algorithm} umschlossen werden, nötig
 
 % Abbreviations / Acronyms
 \printglossary[type=abbreviations,title={Abbreviations}]
@@ -1089,13 +1089,13 @@ All links were last followed on April 06, 2026.
 %\IfDefined{printnomenclature}{\printnomenclature}
 
 % \clearpage
-% \appendix
+\appendix
 % % 'Anhang' ins Inhaltsverzeichnis
 % %\phantomsection
 % %\addcontentsline{toc}{chapter}{Appendix}
-% \addcontentsline{toc}{part}{Appendix}
+\addcontentsline{toc}{part}{Appendix}
 
-% \input{chapters/05_appendix}
+\input{chapters/05_use_of_ai}
 
 \pagestyle{empty}
 \renewcommand*{\chapterpagestyle}{empty}

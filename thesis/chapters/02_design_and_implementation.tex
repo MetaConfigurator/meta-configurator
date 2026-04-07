@@ -17,11 +17,12 @@ Figure~\ref{fig:rdf_authoring_panel:json_data} shows a snapshot of the \gls{rdf}
     \label{fig:rdf_authoring_panel:json_data}
 \end{figure}
 
+\newpage
+
 \subsection{RML Mapping Dialog}
 \label{sec:design:rdf-authoring-panel:rml-mapping-tool}
 
 If the input is not already available as \gls{jsonld}, the \gls{rdf} panel offers a conversion dialog that maps \gls{json} data to \gls{rdf}-compatible \gls{jsonld} using \gls{rml}. \gls{rml} extends \gls{r2rml} and supports transformation from heterogeneous sources such as \gls{json}, \gls{csv}, and \gls{xml} into \gls{rdf} graphs \cite{dimou2014rml} (see Section~\ref{sec:background:rml}). Figure~\ref{fig:rdf_authoring_panel:rml_1} shows the mapping dialog.
-
 
 \begin{figure}[htbp]
   \centering
@@ -29,7 +30,6 @@ If the input is not already available as \gls{jsonld}, the \gls{rdf} panel offer
   \caption{The RML mapping dialog for JSON-to-JSON-LD conversion.}
   \label{fig:rdf_authoring_panel:rml_1}
 \end{figure}
-
 
 The dialog supports two entry points: users can paste an existing \gls{rml} mapping or generate a draft with \gls{ai} assistance. For AI-assisted generation, users provide short mapping hints that describe how elements of the input \gls{json} should be mapped to \gls{rdf} classes and properties. These hints are combined with a representative subset of the input data and sent to an external \gls{ai} API. The generated prompt is structured to improve output quality, requiring Turtle syntax and \gls{rml}-compliant constructs. In simplified form, it contains: (i) role and instruction constraints, (ii) required prefixes and output format, (iii) representative input fragments, and (iv) user-provided mapping hints. Listing~\ref{lst:design:rml_prompt_template} shows a shortened excerpt of this prompt logic.
 
@@ -205,16 +205,17 @@ The core editing surface is implemented in \texttt{RdfEditorPanel.vue} as a Prim
 \end{itemize}
 
 \begin{figure}[htbp]
-  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
-  \caption{JSON-LD output obtained by applying the mapping from Listing~\ref{lst:background_rml_mapping}, focused on the Context tab.}
-  \label{fig:rdf_authoring_panel:jsonld_triples}
-\end{figure}
-
-\begin{figure}[htbp]
   \centering
   \includegraphics[width=.99\linewidth]{../figures/MC-RDF-JSON-LD-1.png}
-  \caption{JSON-LD output obtained by applying the mapping from Listing~\ref{lst:background_rml_mapping}, focused on the Triples tab.}
+  \caption{JSON-LD output after applying the mapping from Listing~\ref{lst:background_rml_mapping} in the Triples tab.}
   \label{fig:rdf_authoring_panel:jsonld_context}
+\end{figure}
+
+
+\begin{figure}[htbp]
+  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
+  \caption{JSON-LD output after applying the mapping from Listing~\ref{lst:background_rml_mapping} in the Context tab.}
+  \label{fig:rdf_authoring_panel:jsonld_triples}
 \end{figure}
 
 This explicit split mirrors the conceptual separation in \gls{jsonld} between vocabulary declarations and graph assertions \cite{jsonld2014}, and therefore supports both semantic modeling tasks (namespace/prefix handling) and graph authoring tasks (subject-predicate-object manipulation) in one workflow.
@@ -245,6 +246,8 @@ Figure~\ref{fig:rdf_authoring_panel:jsonld_triples} shows the RDF panel focused 
   \label{fig:rdf_authoring_panel:triple_modal}
 \end{figure}
 
+\newpage
+
 Data updates come from two places: the Text View (raw JSON-LD) and the RDF panel itself. Both paths write to MetaConfigurator's existing core data infrastructure, not to a new store introduced by this thesis. Specifically, \texttt{dataSource.ts} provides the global reactive source of editor data, which acts as the single source of truth across panels. On top of this, \texttt{managedData.ts} is the pre-existing synchronization layer that keeps parsed data and string representations aligned, supports path-based updates, and preserves temporarily unparseable text without discarding the last valid state. Within this architecture, the RDF extension plugs into the same flow: when a user edits the Text View, \texttt{rdfStoreManager.ts} rebuilds the \gls{rdf} graph from the updated shared data state, which then updates the RDF panel (Figure~\ref{fig:rdf_authoring_panel:change_propagation_json_editor}).
 
 Conversely, when a triple is added, edited, or removed in the Triples tab, \texttt{TripleEditorService} validates and applies the change through \texttt{rdfStoreManager.ts}.Then \texttt{jsonLdNodeManager.ts} rebuilds \gls{jsonld} from the updated store and writes it back to \texttt{dataSource.ts}, which refreshes the Text View (Figure~\ref{fig:rdf_authoring_panel:change_propagation_rdf_view}). Changes in the Context tab propagate through the same mechanism as GUI-based edits, because the underlying representation is still handled as JSON data by the same synchronization workflow.
@@ -262,6 +265,8 @@ Conversely, when a triple is added, edited, or removed in the Triples tab, \text
   \caption{Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}
   \label{fig:rdf_authoring_panel:change_propagation_rdf_view}
 \end{figure}
+
+\newpage
 
 \subsection{Ontology Integration and IRI Completion}
 \label{sec:design:rdf-authoring-panel:ontology-integration}
@@ -331,13 +336,13 @@ Figure~\ref{fig:rdf_authoring_panel:ontology_integration_4} shows the result of 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.8\linewidth]{../figures/MC-RDF-Ontology-3.png}
-  \caption{Ontology Explorer allows users to run custom SPARQL queries to find specific classes, properties or instances that are not directly accessible through predefined views.}
+  \caption{Ontology Explorer allows running custom SPARQL queries to find specific classes, properties or instances that are not directly accessible in predefined views.}
   \label{fig:rdf_authoring_panel:ontology_integration_3}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.8\linewidth]{../figures/MC-RDF-Ontology-4.png}
+  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-Ontology-4.png}
   \caption{Results of running SPARQL query in Listing~\ref{lst:design_sparql_qudt} over the QUDT ontology.}
   \label{fig:rdf_authoring_panel:ontology_integration_4}
 \end{figure}
@@ -374,7 +379,7 @@ Algorithms~\ref{alg:rdf_authoring_panel:text_to_rdf_linked_selection} and~\ref{a
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\linewidth]{../figures/MC-RDF-JSON-LD-3.png}
-  \caption{Linked selection between Text View and RDF View. The highlighted JSON fragment corresponds to the selected triple in the triple table, and vice versa.}
+  \caption{Linked selection between Text View and RDF View.}
   \label{fig:rdf_authoring_panel:linked_selection}
 \end{figure}
 \label{sec:design:rdf-authoring-panel:view-synchronization:rdf-to-text}

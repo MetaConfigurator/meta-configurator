@@ -8,22 +8,87 @@ The application chapter demonstrates this workflow on \gls{mof} synthesis data. 
 
 Despite these contributions, several limitations remain.
 
-First, after the first edit in the \gls{rdf} panel, the underlying \gls{jsonld} text is regenerated (de-serialized) from updated \gls{rdf} statements. As a consequence, the text may differ from the original formatting and ordering even when the semantics remain equivalent. The main reason is that each edit currently triggers reconstruction of the full document instead of a localized in-place update.
+\begin{enumerate}
+  \item \textbf{Text-view serialization pattern after the first RDF edit:} After the first data edit in the \gls{rdf} panel, the JSON-LD rendered in the Text View is regenerated from the internal \gls{rdf} statements using a predefined serialization pattern. The resulting text can differ from the originally authored document even when the represented semantics stay equivalent. As shown in Listing~\ref{lst:conclusion_jsonld_example}, removing the triple:
+  
+  \begin{quote}
+  \small
+  \texttt{(local:variable\_element\_size , \texttt{schema:name} , "element\_size")}
+  \end{quote}
+    
+  leads to additional textual changes such as renaming the \texttt{schema} prefix to \texttt{sch} and reordering literal fields (e.g., \texttt{@value} and \texttt{@type}). This behavior makes it harder to preserve original authoring style and document-level traceability.
 
-Second, \gls{ai}-generated mappings and queries can still contain semantic or structural errors. User review therefore remains essential, especially for domain-critical data and ontology alignment decisions.
+  \item \textbf{Remaining error risk in AI-assisted artifacts:} \gls{ai}-generated mappings and queries can still contain semantic or structural errors. User review therefore remains essential, especially for domain-critical data and ontology alignment decisions.
 
-Third, scalability is still bounded by browser-side processing constraints for larger graphs, especially during interactive visualization and query-result rendering. To mitigate this, two configurable limits are already available: \texttt{maximumTriplesToShow} (limits displayed triples in the \gls{rdf} panel) and \texttt{maximumNodesToVisualize} (limits rendered nodes in the Visualization panel). Both can be adjusted according to dataset size and client performance.
+  \item \textbf{Scalability limits for browser-side workflows:} Scalability is still bounded by browser-side processing constraints for larger graphs, especially during interactive visualization and query-result rendering. To mitigate this, two configurable limits are already available:
+  \begin{itemize}
+    \item \texttt{maximumTriplesToShow}: limits how many triples are rendered in the \gls{rdf} panel to keep table rendering and interaction responsive.
+    \item \texttt{maximumNodesToVisualize}: limits how many nodes are rendered in the \texttt{Visualization} dialog to avoid unstable layout computation and slow graph interactions.
+  \end{itemize}
+  Both settings can be adjusted according to dataset size and client performance.
+
+  \item \textbf{Ontology and IRI selection still requires expert knowledge:} Even with integrated mapping support, high-quality transformation from \gls{json} to \gls{rdf} still depends on choosing suitable ontologies, classes, predicates, and identifier patterns. Producing semantically robust mappings often requires domain and Semantic Web expertise (e.g., selecting appropriate ontology terms and stable \glspl{iri}), which remains a substantial barrier for non-expert users.
+\end{enumerate}
+
+\begin{lstlisting}[float=htbp,style=json, caption={De-serilaized JSON-LD in Listing~\ref{lst:background_json_example} after the first edit in the \gls{rdf} Panel results in renaming \texttt{schema} prefix and reordering \texttt{@value} and \texttt{@type} fields}, label={lst:conclusion_jsonld_example}]
+{
+  "@context": {
+    "m4i": "http://w3id.org/nfdi4ing/metadata4ing#",
+    "unit": "http://qudt.org/vocab/unit/",
+    "local": "https://www.example.org/",
+    "sch": "https://schema.org/"
+  },
+  "@graph": [
+    {
+      "@id": "local:run_fenics_simulation",
+      "@type": "m4i:Method",
+      "m4i:hasParameter": {
+        "@id": "local:variable_element_size"
+      },
+      "m4i:investigates": {
+        "@id": "local:variable_max_von_mises_stress"
+      }
+    },
+    {
+      "@id": "local:variable_element_size",
+      "@type": "sch:PropertyValue",
+      "sch:unitCode": {
+        "@id": "unit:M"
+      },
+      "sch:value": {
+        "@value": "2.5E-2",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "local:variable_max_von_mises_stress",
+      "@type": "sch:PropertyValue",
+      "sch:name": "max_von_mises_stress",
+      "sch:unitCode": {
+        "@id": "unit:MegaPA"
+      },
+      "sch:value": {
+        "@value": "2.997915075586333E8",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    }
+  ]
+}
+\end{lstlisting}
 
 \section{Outlook}
 
-Future work should focus on four directions.
+Future work should focus on five directions:
 
-First, synchronization granularity should be improved by introducing path-aware or diff-based updates from statement edits back to the \gls{jsonld} text view. This would preserve more of the original document layout and reduce disruptive full-document rewrites.
+\begin{enumerate}
+  \item \textbf{Preserve textual form during synchronization:} Future work should improve synchronization using path-aware or diff-based updates from statement changes back to the Text View. This is a syntactic and formatting concern: the semantic content is already preserved correctly, but the rendered textual form can drift from the originally authored style.
 
-Second, semantic quality assurance should be strengthened through integrated \gls{shacl} validation in the authoring loop, so users can check constraints before export and publication.
+  \item \textbf{Integrate semantic quality checks:} Semantic quality assurance should be strengthened through integrated \gls{shacl} validation in the authoring loop, so users can check constraints before export and publication.
 
-Third, scalability mechanisms such as progressive graph loading, query-result size control, and graph summarization should be added to better support larger datasets.
+  \item \textbf{Improve scalability mechanisms:} Progressive graph loading, query-result size control, and graph summarization should be added to better support larger datasets.
 
-Fourth, \gls{ai} assistance should be extended with constraint-aware prompting and automated pre-execution checks to detect likely mapping and query issues earlier.
+  \item \textbf{Support ontology discovery from current data context:} An additional extension would be an integrated recommendation feature that suggests suitable ontologies, classes, and predicates based on the currently loaded \gls{json} data. This could reduce ontology-selection effort during mapping and help non-expert users choose semantically appropriate vocabularies.
+
+\end{enumerate}
 
 Overall, the presented extension shows that user-centered semantic authoring in scientific workflows can be carried out within a single application, from structured \gls{json} input to ontology-aware querying and \gls{kg} analysis.
