@@ -116,7 +116,7 @@ function handleCopy(event: ClipboardEvent) {
 function handlePaste(event: ClipboardEvent) {
   pasteFromClipboard();
   event.preventDefault(); // override default browser paste
-}   
+}
 
 async function copyToClipboard() {
   if (!selectedData.value) {
@@ -126,11 +126,11 @@ async function copyToClipboard() {
 
   const schema = schemaData.dataAt(schemaSession.currentSelectedElement.value);
 
-let metaType = selectedData.value.getNodeType();
+  let metaType = selectedData.value.getNodeType();
 
-if (schema.enum != undefined) {
-  metaType = 'schemaenum';
-}
+  if (schema.enum != undefined) {
+    metaType = 'schemaenum';
+  }
 
   const dataToCopy = structuredClone(schema);
 
