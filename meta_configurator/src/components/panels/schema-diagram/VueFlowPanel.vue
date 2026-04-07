@@ -128,7 +128,11 @@ async function copyToClipboard() {
 
   let metaType = selectedData.value.getNodeType();
 
+<<<<<<< HEAD
   if (schema.enum != undefined) {
+=======
+  if (schema?.enum) {
+>>>>>>> 6a88e5c4637c9ed1da8c43f5205c6b3702f0c57f
     metaType = 'schemaenum';
   }
 
