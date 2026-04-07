@@ -1,6 +1,6 @@
 {
-  "name": "config-assistant",
-  "version": "0.0.0",
+  "name": "meta-configurator",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "dev": "vite",

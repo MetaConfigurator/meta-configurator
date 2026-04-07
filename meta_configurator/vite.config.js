@@ -1,9 +1,13 @@
 import {fileURLToPath, URL} from 'node:url';
+import {createRequire} from 'node:module';
 
 import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import {nodePolyfills} from "vite-plugin-node-polyfills";
+
+const require = createRequire(import.meta.url);
+const pkg = require('./package.json');
 
 // Use process.env.USE_BASE_PATH to determine if base path should be included
 const useMetaConfiguratorBasePath = process.env.USE_META_CONFIGURATOR_BASE_PATH === 'true';
@@ -11,6 +15,9 @@ const useMetaConfiguratorBasePath = process.env.USE_META_CONFIGURATOR_BASE_PATH 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: useMetaConfiguratorBasePath ? '/meta-configurator/' : '/',
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   plugins: [vue(), vueJsx(),
 
   nodePolyfills({

@@ -11,6 +11,8 @@ defineProps<{visible: boolean}>();
 defineEmits<{
   (e: 'update:visible', newValue: boolean): void;
 }>();
+
+const appVersion = __APP_VERSION__;
 </script>
 
 <template>
@@ -24,6 +26,7 @@ defineEmits<{
     </p>
     <p>It is currently in alpha stage, so expect bugs and missing features.</p>
     <p>MetaConfigurator is open source and licensed under the MIT license.</p>
+    <p class="text-sm text-gray-500">Version {{ appVersion }}</p>
     <p>
       Check our
       <a
