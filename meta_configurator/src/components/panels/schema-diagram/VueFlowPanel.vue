@@ -104,17 +104,11 @@ watch(schemaSession.currentPath, () => {
 
 onMounted(() => {
   updateGraph();
-  document.addEventListener('copy', handleCopy);
-  document.addEventListener('paste', handlePaste);
   nextTick(() => {
     fitView();
   });
 });
 
-onUnmounted(() => {
-  document.removeEventListener('copy', handleCopy);
-  document.removeEventListener('paste', handlePaste);
-});
 function handleCopy(event: ClipboardEvent) {
   copyToClipboard();
   event.preventDefault(); // override default browser copy
@@ -130,19 +124,20 @@ async function copyToClipboard() {
     return;
   }
 
-  const schema = schemaData.dataAt(selectedData.value.absolutePath);
+  const schema = schemaData.dataAt(schemaSession.currentSelectedElement.value);
 
   let metaType = selectedData.value.getNodeType();
 
- 
-  if (schema?.enum) {
+  if (schema.enum != undefined) {
     metaType = 'schemaenum';
   }
 
-  const dataToCopy = {
-    metaType,
-    schema: structuredClone(schema),
-  };
+  const dataToCopy = structuredClone(schema);
+
+  // if no type is given and metatype is object overwrite the type
+  if (!dataToCopy.type && metaType === 'schemaobject') {
+    dataToCopy.type = 'object';
+  }
 
   try {
     await navigator.clipboard.writeText(JSON.stringify(dataToCopy, null, 2));
@@ -160,15 +155,14 @@ async function pasteFromClipboard() {
 
     console.log('Pasting from system clipboard:', data);
 
-    if (data.metaType === 'schemaobject') {
-      const objectPath = addSchemaObject(schemaData, false, data.schema);
+    if (data.type === 'object') {
+      const objectPath = addSchemaObject(schemaData, false, data);
       selectElement(objectPath);
       return;
     }
-
-    if (data.metaType === 'schemaenum') {
+    if (data.enum != undefined) {
       const enumPath = findAvailableSchemaId(schemaData, ['$defs'], 'enum');
-      schemaData.setDataAt(enumPath, data.schema);
+      schemaData.setDataAt(enumPath, data);
       selectElement(enumPath);
     }
 
@@ -516,7 +510,7 @@ function updateExternalReferenceValue(
 </script>
 
 <template>
-  <div class="layout-flow">
+  <div class="layout-flow" @copy="handleCopy" @paste="handlePaste">
     <VueFlow
       :nodes="activeNodes"
       :edges="activeEdges"
