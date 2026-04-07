@@ -1,19 +1,18 @@
-%%% ===============================================================================
 \chapter{Conclusion and Outlook}\label{sec:conclusion}
-%%% ===============================================================================
-This thesis extends MetaConfigurator with an integrated \gls{rdf} authoring workflow that bridges schema-driven \gls{json} editing and Semantic Web technologies. The implementation combines four core capabilities in one user interface: (1) transformation from \gls{json} to \gls{jsonld} via \gls{rml}, (2) direct semantic editing through context and triple views, (3) in-browser \gls{sparql} querying with validation support, and (4) interactive \gls{kg} visualization with editing actions. In addition, \gls{ai}-assisted generation of \gls{rml} mappings and \gls{sparql} queries lowers the entry barrier for non-expert users while preserving human control through review before execution.
 
-The application chapter demonstrates this workflow on \gls{mof} synthesis data. Laboratory protocol records are transformed into ontology-grounded \gls{rdf} resources (\gls{chmo}, \gls{chebi}, and \gls{obi}), then queried and explored as a graph. This means semantic data authoring can be done in one environment, reducing tool switching and improving interoperability of scientific data.
+This thesis extends MetaConfigurator with an integrated \gls{rdf} authoring workflow that connects schema-driven \gls{json} editing with Semantic Web technologies. The resulting workflow combines four capabilities in one interface: (1) transformation from \gls{json} to \gls{jsonld} via \gls{rml}, (2) semantic editing through context and triple views, (3) in-browser \gls{sparql} querying with validation support, and (4) interactive \gls{kg} visualization with editing actions. \gls{ai}-assisted generation of \gls{rml} mappings and \gls{sparql} queries further lowers the entry barrier for non-expert users, while keeping humans in control through explicit review before execution.
+
+The application chapter demonstrates this workflow on \gls{mof} synthesis data. Laboratory protocol records are transformed into ontology-grounded \gls{rdf} resources (\gls{chmo}, \gls{chebi}, and \gls{obi}), then queried and explored as a graph. In practice, this shows that semantic data authoring can be carried out in one environment, reducing tool switching and improving interoperability.
 
 \section{Current Limitations}
 
 Despite these contributions, several limitations remain.
 
-First, after the first edit in the \gls{rdf} panel, the underlying \gls{jsonld} text is regenerated (de-serialized) from the updated \gls{rdf} statements. As a result, the textual representation may differ from the original input formatting and structured order, even when the represented semantics are equivalent. The root cause is that each edit currently triggers reconstruction of the whole document, rather than a localized in-place text update.
+First, after the first edit in the \gls{rdf} panel, the underlying \gls{jsonld} text is regenerated (de-serialized) from updated \gls{rdf} statements. As a consequence, the text may differ from the original formatting and ordering even when the semantics remain equivalent. The main reason is that each edit currently triggers reconstruction of the full document instead of a localized in-place update.
 
-Second, \gls{ai}-generated mappings and queries can still contain semantic or structural errors. Therefore, user review remains mandatory, especially for domain-critical data and ontology alignment decisions.
+Second, \gls{ai}-generated mappings and queries can still contain semantic or structural errors. User review therefore remains essential, especially for domain-critical data and ontology alignment decisions.
 
-Third, scalability is bounded by browser-side processing constraints when working with larger graphs, especially for interactive visualization and query-result rendering. To mitigate this, two configurable limits are already integrated: \texttt{maximumTriplesToShow}, which limits how many triples are displayed in the \gls{rdf} panel, and \texttt{maximumNodesToVisualize}, which limits how many nodes are rendered in the Visualization panel. Both settings can be adjusted by the user according to dataset size and client-side performance.
+Third, scalability is still bounded by browser-side processing constraints for larger graphs, especially during interactive visualization and query-result rendering. To mitigate this, two configurable limits are already available: \texttt{maximumTriplesToShow} (limits displayed triples in the \gls{rdf} panel) and \texttt{maximumNodesToVisualize} (limits rendered nodes in the Visualization panel). Both can be adjusted according to dataset size and client performance.
 
 \section{Outlook}
 
@@ -27,4 +26,4 @@ Third, scalability mechanisms such as progressive graph loading, query-result si
 
 Fourth, \gls{ai} assistance should be extended with constraint-aware prompting and automated pre-execution checks to detect likely mapping and query issues earlier.
 
-Overall, the presented extension shows that user-centered semantic authoring in scientific workflows is practical in a single application: from structured \gls{json} input to ontology-aware querying and \gls{kg} analysis.
+Overall, the presented extension shows that user-centered semantic authoring in scientific workflows can be carried out within a single application, from structured \gls{json} input to ontology-aware querying and \gls{kg} analysis.

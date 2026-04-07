@@ -1,11 +1,11 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.6">
   <diagram id="prtHgNgQTEPvFCAcTncT" name="Page-1">
-    <mxGraphModel dx="1158" dy="826" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1009" dy="1089" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="hAOrv62w2Uf5gGNGf64k-12" parent="1" style="swimlane;childLayout=stackLayout;resizeParent=1;resizeParentMax=0;startSize=20;html=1;" value="Change Propagation: Triggered by RDF Panel&amp;nbsp;" vertex="1">
-          <mxGeometry height="580" width="1000" x="30" y="70" as="geometry" />
+          <mxGeometry height="580" width="1200" x="30" y="70" as="geometry" />
         </mxCell>
         <mxCell id="hAOrv62w2Uf5gGNGf64k-13" parent="hAOrv62w2Uf5gGNGf64k-12" style="swimlane;startSize=20;html=1;" value="RDF View" vertex="1">
           <mxGeometry height="560" width="210" y="20" as="geometry" />
@@ -56,10 +56,16 @@
         <mxCell id="hAOrv62w2Uf5gGNGf64k-32" parent="hAOrv62w2Uf5gGNGf64k-35" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;" value="Deserialize updated statements as JSON-LD" vertex="1">
           <mxGeometry height="60" width="135" x="32.5" y="310" as="geometry" />
         </mxCell>
-        <mxCell id="hAOrv62w2Uf5gGNGf64k-45" parent="hAOrv62w2Uf5gGNGf64k-12" style="swimlane;startSize=20;html=1;fontSize=12;" value="Text View" vertex="1">
+        <mxCell id="hAOrv62w2Uf5gGNGf64k-45" parent="hAOrv62w2Uf5gGNGf64k-12" style="swimlane;startSize=20;html=1;fontSize=12;" value="Managed Data" vertex="1">
           <mxGeometry height="560" width="200" x="800" y="20" as="geometry" />
         </mxCell>
-        <mxCell id="hAOrv62w2Uf5gGNGf64k-46" parent="hAOrv62w2Uf5gGNGf64k-45" style="rounded=1;whiteSpace=wrap;html=1;fontSize=13;" value="JSON-LD text data is updated" vertex="1">
+        <mxCell id="hAOrv62w2Uf5gGNGf64k-46" parent="hAOrv62w2Uf5gGNGf64k-45" style="rounded=1;whiteSpace=wrap;html=1;fontSize=13;" value="dataSource is updated" vertex="1">
+          <mxGeometry height="60" width="135" x="32.5" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="dvagLd1lMFwTa-oICFoW-3" parent="hAOrv62w2Uf5gGNGf64k-12" style="swimlane;startSize=20;html=1;fontSize=12;" value="Text View" vertex="1">
+          <mxGeometry height="560" width="200" x="1000" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="dvagLd1lMFwTa-oICFoW-4" parent="dvagLd1lMFwTa-oICFoW-3" style="rounded=1;whiteSpace=wrap;html=1;fontSize=13;" value="JSON-LD text data is updated" vertex="1">
           <mxGeometry height="60" width="135" x="32.5" y="310" as="geometry" />
         </mxCell>
         <mxCell id="hAOrv62w2Uf5gGNGf64k-20" edge="1" parent="hAOrv62w2Uf5gGNGf64k-12" source="hAOrv62w2Uf5gGNGf64k-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="hAOrv62w2Uf5gGNGf64k-19">
@@ -77,6 +83,9 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="hAOrv62w2Uf5gGNGf64k-47" edge="1" parent="hAOrv62w2Uf5gGNGf64k-12" source="hAOrv62w2Uf5gGNGf64k-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="hAOrv62w2Uf5gGNGf64k-46">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dvagLd1lMFwTa-oICFoW-5" edge="1" parent="hAOrv62w2Uf5gGNGf64k-12" source="hAOrv62w2Uf5gGNGf64k-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dvagLd1lMFwTa-oICFoW-4" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>

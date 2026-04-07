@@ -1,10 +1,10 @@
 \chapter{Design and Implementation}\label{sec:design}
 
-This chapter describes how the proposed Semantic Web integrations are implemented in MetaConfigurator. This enables users to move from conventional structured data to semantically enriched \gls{jsonld}/\gls{rdf}, author and inspect triples, execute \gls{sparql} queries, and explore resulting \glspl{kg} within one coherent interface. The chapter is structured along this workflow: Section~\ref{sec:design:rdf-authoring-panel} introduces the RDF Authoring Panel, including \gls{rml}-based transformation support, panel composition, linked selection between text and triple views, and ontology integration; Section~\ref{sec:design:query-with-sparql} presents query authoring and execution with \gls{sparql}, including \gls{ai}-assisted query drafting; and Section~\ref{sec:design:knowledge-graph-visualization} describes interactive \glsentryshort{kg} visualization and editing support for graph-centric exploration.
+This chapter explains how the Semantic Web extensions were implemented in MetaConfigurator. The implementation supports a continuous workflow from conventional structured data to semantically enriched \gls{jsonld}/\gls{rdf}, including triple authoring, \gls{sparql} querying, and \glsentryshort{kg} exploration in one interface. The chapter is structured along this workflow: Section~\ref{sec:design:rdf-authoring-panel} introduces the RDF Authoring Panel (including \gls{rml}-based transformation, panel composition, linked selection, and ontology integration), Section~\ref{sec:design:query-with-sparql} covers query authoring and execution with optional \gls{ai} support, and Section~\ref{sec:design:knowledge-graph-visualization} presents interactive \glsentryshort{kg} visualization.
 
 \section{RDF Authoring Panel}\label{sec:design:rdf-authoring-panel}
 
-The \gls{rdf} authoring functionality is implemented as a dedicated, separate panel in MetaConfigurator, located in \texttt{meta\_configurator/src/components/panels/rdf}. This design keeps semantic authoring concerns modular while still integrating with the existing panel configurations, path selection, and data editing flow of MetaConfigurator \cite{metaconfigurator2024}. At runtime, the entry component \texttt{RdfPanel.vue} validates whether the current data can be treated as \gls{jsonld} and provides immediate warnings for missing \texttt{@context}, invalid syntax, and non-\gls{jsonld} input.
+The \gls{rdf} authoring functionality is implemented as a dedicated panel in MetaConfigurator (\texttt{meta\_configurator/src/components/panels/rdf}). This keeps semantic authoring modular while remaining integrated with existing panel configuration, path selection, and data editing flows \cite{metaconfigurator2024}. At runtime, the entry component \texttt{RdfPanel.vue} checks whether the current data can be interpreted as \gls{jsonld} and immediately reports issues such as missing \texttt{@context}, invalid syntax, or non-\gls{jsonld} input.
 
 More generally, panel integration in MetaConfigurator follows a decoupled architecture: panels do not update each other directly, but communicate through a central reactive store as the single source of truth. Each panel writes data updates to the store and watches store state for incoming changes.
 
@@ -12,7 +12,7 @@ Figure~\ref{fig:rdf_authoring_panel:json_data} shows a snapshot of the \gls{rdf}
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.75\linewidth]{../figures/MC-RDF-JSON.png}
+  \includegraphics[width=.95\linewidth]{../figures/MC-RDF-JSON.png}
   \caption{A snapshot of MetaConfigurator's RDF panel.}
     \label{fig:rdf_authoring_panel:json_data}
 \end{figure}
@@ -20,7 +20,7 @@ Figure~\ref{fig:rdf_authoring_panel:json_data} shows a snapshot of the \gls{rdf}
 \subsection{RML Mapping Dialog}
 \label{sec:design:rdf-authoring-panel:rml-mapping-tool}
 
-If the input data is not already expressed as \gls{jsonld}, the \gls{rdf} panel provides a conversion tool that enables users to transform \gls{json} data into \gls{rdf}-compatible \gls{jsonld} using \gls{rml} mappings. \gls{rml} extends the \gls{r2rml} mapping language and allows the transformation of heterogeneous data sources such as \gls{json}, \gls{csv}, or \gls{xml} into \gls{rdf} graphs \cite{dimou2014rml}, as discussed in Section~\ref{sec:background:rml}. Figure~\ref{fig:rdf_authoring_panel:rml_1} illustrates the dialog used to define such mappings.
+If the input is not already available as \gls{jsonld}, the \gls{rdf} panel offers a conversion dialog that maps \gls{json} data to \gls{rdf}-compatible \gls{jsonld} using \gls{rml}. \gls{rml} extends \gls{r2rml} and supports transformation from heterogeneous sources such as \gls{json}, \gls{csv}, and \gls{xml} into \gls{rdf} graphs \cite{dimou2014rml} (see Section~\ref{sec:background:rml}). Figure~\ref{fig:rdf_authoring_panel:rml_1} shows the mapping dialog.
 
 
 \begin{figure}[htbp]
@@ -31,9 +31,9 @@ If the input data is not already expressed as \gls{jsonld}, the \gls{rdf} panel 
 \end{figure}
 
 
-The dialog allows users to either provide an existing \gls{rml} mapping or generate one automatically with \gls{ai} assistance. In the latter case, the user supplies mapping hints that describe how elements of the input \gls{json} data should be mapped to \gls{rdf} properties or classes. These hints, together with a representative subset of the input data, are sent to an external \gls{ai} API to generate a candidate mapping. This prompt guides the language model to produce a valid \gls{rml} mapping in Turtle syntax that conforms to the target \gls{jsonld} structure. The prompt constrains the model to return a mapping definition adhering to \gls{rml} rules, thereby improving reliability and syntactic correctness. In simplified form, the prompt contains: (i) role/instruction constraints, (ii) required prefixes and output format, (iii) representative input-data fragments, and (iv) user-provided mapping hints. Listing~\ref{lst:design:rml_prompt_template} shows a shortened excerpt of the prompt-construction logic.
+The dialog supports two entry points: users can paste an existing \gls{rml} mapping or generate a draft with \gls{ai} assistance. For AI-assisted generation, users provide short mapping hints that describe how elements of the input \gls{json} should be mapped to \gls{rdf} classes and properties. These hints are combined with a representative subset of the input data and sent to an external \gls{ai} API. The generated prompt is structured to improve output quality, requiring Turtle syntax and \gls{rml}-compliant constructs. In simplified form, it contains: (i) role and instruction constraints, (ii) required prefixes and output format, (iii) representative input fragments, and (iv) user-provided mapping hints. Listing~\ref{lst:design:rml_prompt_template} shows a shortened excerpt of this prompt logic.
 
-\begin{lstlisting}[float=htbp,style=plaintext,,basicstyle=\ttfamily\fontsize{7}{8}\selectfont\color{black},caption={Part of the RML prompt template which guides the AI model}, label={lst:design:rml_prompt_template}]
+\begin{lstlisting}[float=htbp,style=plaintext,caption={Part of the RML prompt template which guides the AI model}, label={lst:design:rml_prompt_template}]
 You are an assistant that generates RML mappings in Turtle syntax that convert JSON input into RDF.
 Follow the RML specification strictly and avoid generating invalid RML constructs.
 The output must contain ONLY valid Turtle mapping code and no explanations.
@@ -56,16 +56,16 @@ Use only provided prefixes (and user-provided ones), e.g.:
 rr:  rml:  ql:  rdf:  xsd:
 Declare prefixes at the top and return a single Turtle document.
 
-Here is an example of the expected input and output 
+Here is an example of the expected input and output: 
 ...
 
-- Real input JSON subset 
+Real input JSON subset: 
   {user input}
 
 Additional user comments: 
   {mapping hints}
 
-- Final instruction: Return ONLY the RML mapping in valid Turtle syntax.
+Final instruction: Return ONLY the RML mapping in valid Turtle syntax.
 \end{lstlisting}
 
 \begin{lstlisting}[float=htbp,style=plaintext,caption={Sample RML hint which describes the mapping from JSON in~\ref{lst:background_json_example} to a minimal JSON-LD in~\ref{lst:background_jsonld_example_simple}}, label={lst:metaconfigurator_interface_rdf:rml_hint_simple}]
@@ -129,11 +129,11 @@ Convert my JSON Data to JSON-LD such that I have two nodes, each node representi
   ] .
 \end{lstlisting}
 
-The mapping editor is implemented using the CodeMirror component, a widely used web-based code editor that provides syntax highlighting and automatic indentation \cite{codemirror}. Mapping validity is checked by the mapping service through debounced live validation. This allows users to inspect, refine, and validate the generated mapping directly within the interface before applying it to transform the \gls{json} input into \gls{jsonld}. Users may either provide a \gls{rml} mapping in Turtle syntax directly or use the \gls{ai}-assisted generation feature by supplying mapping hints. The resulting mapping is displayed in the CodeMirror editor, where it can be reviewed and edited as needed. 
+The mapping editor is built on CodeMirror, which provides syntax highlighting and automatic indentation \cite{codemirror}. A debounced validation routine checks mapping syntax while users edit. This setup lets users inspect, refine, and validate a mapping before applying it to transform \gls{json} into \gls{jsonld}. Regardless of whether the mapping is pasted manually or generated via \gls{ai}, it is presented in the same editor for final review and correction.
 
 Since \gls{ai}-generated mappings may contain semantic or syntactic errors, users must verify them before execution. Any syntax errors introduced during mapping editing, as well as errors that occur after applying the mapping, are reported to the user to support debugging and correction. Once finalized, the mapping can be applied to convert the input \gls{json} data into \gls{jsonld}, which can then be further managed in the \gls{rdf} authoring panel.
 
-The examples in this section show that even a minimal hint can already produce a correct mapping for simple targets. In particular, the short natural-language hint shown above can still lead to a valid \gls{rml} mapping (Listing~\ref{lst:background_rml_mapping_simple}) and a corresponding \gls{jsonld} output (Listing~\ref{lst:background_jsonld_example_simple}).
+For the \gls{json} example presented earlier in Listing~\ref{lst:background_json_example}, a short natural-language instruction is sufficient to generate an executable \gls{rml} draft that captures the intended structure (Listing~\ref{lst:background_rml_mapping_simple}). The resulting mapping already produces a consistent \gls{jsonld} graph with stable resource identifiers, explicit types, and typed numeric values (Listing~\ref{lst:background_jsonld_example_simple}). This is important because it demonstrates the practical baseline of the workflow: low-effort hinting can work for straightforward mappings, while more complex semantics still require the detailed guidance.
 
 \begin{lstlisting}[float=htbp,style=json, caption={JSON-LD representation of the simulation result, obtained after applying the minimal RML mapping hint shown above}, label={lst:background_jsonld_example_simple}]
 {
@@ -165,7 +165,7 @@ The examples in this section show that even a minimal hint can already produce a
 }  
 \end{lstlisting}
 
-However, realistic \gls{rml} crafting is often more complex and usually requires precise guidance to obtain the intended semantic structure. Therefore, detailed hints are needed when the target output must follow specific vocabularies, resource patterns, and links between entities. Listing~\ref{lst:metaconfigurator_interface_rdf:rml_hint_complex} shows a detailed example. With this level of instruction, the generated mapping matches the expected structure in Listing~\ref{lst:background_rml_mapping} and produce the intended \gls{jsonld} in Listing~\ref{lst:background_jsonld_example}. 
+In realistic scenarios, \gls{rml} authoring is usually more complex and requires more explicit guidance to achieve the intended semantic structure. Detailed hints become especially important when the target output must follow specific vocabularies, IRI patterns, and inter-entity links. Listing~\ref{lst:metaconfigurator_interface_rdf:rml_hint_complex} shows such a detailed hint. With this level of instruction, the generated mapping matches the expected structure in Listing~\ref{lst:background_rml_mapping} and produces the intended \gls{jsonld} in Listing~\ref{lst:background_jsonld_example}. 
 
 \begin{lstlisting}[float=htbp,style=plaintext,basicstyle=\ttfamily\fontsize{7}{8}\selectfont\color{black},caption={Sample RML hints which describe the mapping from JSON in~\ref{lst:background_json_example} to JSON-LD in~\ref{lst:background_jsonld_example}}, label={lst:metaconfigurator_interface_rdf:rml_hint_complex}]
 Create one main resource local:run_fenics_simulation of type m4i:Method.
@@ -193,24 +193,28 @@ local: https://www.example.org/
 
 \newpage
 
-After providing such hints, the configured \gls{ai} model generates a mapping that is intended to follow the specified structure and semantics, although this is not always guaranteed in practice and largely depends on the capability of the underlying model. Once the user reviews and confirms the mapping, it can be executed to transform the input \gls{json} data into a semantically enriched \gls{jsonld} representation, as illustrated in Figure~\ref{fig:rdf_authoring_panel:jsonld}.
+After users provide these hints, the configured \gls{ai} model generates a mapping draft that aims to follow the requested structure and semantics. In practice, quality still depends on the underlying model, so correctness is not guaranteed. Once reviewed and confirmed by the user, the mapping can be executed to transform the input \gls{json} into semantically enriched \gls{jsonld}, as illustrated in Figures~\ref{fig:rdf_authoring_panel:jsonld_context} and ~\ref{fig:rdf_authoring_panel:jsonld_triples}.
 
 \subsection{Panel Composition and UI Structure}
 \label{sec:design:rdf-authoring-panel:panel-composition}
 
-The core editing surface is implemented in \texttt{RdfEditorPanel.vue} as a PrimeVue Tabs container. The implementation is primarily organized into two tabs:
+The core editing surface is implemented in \texttt{RdfEditorPanel.vue} as a PrimeVue \texttt{Tabs}\footnote{\url{https://primevue.org/tabs/}} container. The implementation is primarily organized into two tabs:
 \begin{itemize}
     \item \textbf{Context tab}: for editing \texttt{@context} definitions.
     \item \textbf{Triples tab}: for browsing and editing \gls{rdf} triples.
 \end{itemize}
 
 \begin{figure}[htbp]
+  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
+  \caption{JSON-LD output obtained by applying the mapping from Listing~\ref{lst:background_rml_mapping}, focused on the Context tab.}
+  \label{fig:rdf_authoring_panel:jsonld_triples}
+\end{figure}
+
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=.99\linewidth]{../figures/MC-RDF-JSON-LD-1.png}
-  \\[3cm]
-  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-JSON-LD-2.png}
-  \caption{JSON-LD output obtained by applying the mapping from Listing~\ref{lst:background_rml_mapping}, focused on the Triples and Context tabs, respectively.}
-  \label{fig:rdf_authoring_panel:jsonld}
+  \caption{JSON-LD output obtained by applying the mapping from Listing~\ref{lst:background_rml_mapping}, focused on the Triples tab.}
+  \label{fig:rdf_authoring_panel:jsonld_context}
 \end{figure}
 
 This explicit split mirrors the conceptual separation in \gls{jsonld} between vocabulary declarations and graph assertions \cite{jsonld2014}, and therefore supports both semantic modeling tasks (namespace/prefix handling) and graph authoring tasks (subject-predicate-object manipulation) in one workflow.
@@ -220,19 +224,19 @@ When the current document is invalid or not in the expected \gls{jsonld} form, b
 \subsection{Context Tab}
 \label{sec:design:rdf-authoring-panel:context-tab-implementation}
 
-The Context tab is implemented by \texttt{RdfContextEditorPanel.vue}. It reuses MetaConfigurator's \gls{gui} editor and applies a predefined JSON Schema so that \texttt{@context} can be edited through structured forms rather than plain text only. The selection updates are synchronized with the text editor view, enabling users to navigate to and manipulate context entries consistently with other panels.
+The Context tab is implemented by \texttt{RdfContextEditorPanel.vue}. It reuses MetaConfigurator's \gls{gui} editor and applies a predefined JSON Schema so that \texttt{@context} can be edited through structured forms rather than plain text only. The selection updates are synchronized with the text editor view, enabling users to navigate to and manipulate context entries consistently with other panels (Figure~\ref{fig:rdf_authoring_panel:jsonld_context}).
 
 \subsection{Triples Tab}
 \label{sec:design:rdf-authoring-panel:triples-tab-implementation}
 
-The Triples tab is implemented by \texttt{RdfTripleEditorPanel.vue}. It shows triples in a PrimeVue \texttt{DataTable} with:
+The Triples tab is implemented by \texttt{RdfTripleEditorPanel.vue}. It shows triples in a PrimeVue \texttt{DataTable}\footnote{\url{https://primevue.org/datatable/}} with:
 \begin{itemize}
     \item paging, sorting, and column/global filtering,
     \item single-row selection synchronized with document path selection in the text editor,
     \item actions for add, edit, delete, export, \gls{sparql}, and visualization.
 \end{itemize}
 
-Triple editing is handled through \texttt{TripleDetailsDialog.vue}, which allows controlled entry of subject, predicate, and object terms, including typed literals with XML Schema datatypes. Changes are executed through \texttt{TripleEditorService} and propagated to the central \gls{rdf} store. Figure~\ref{fig:rdf_authoring_panel:triple_modal} shows the edit modal for triple editing.
+Figure~\ref{fig:rdf_authoring_panel:jsonld_triples} shows the RDF panel focused on triples view. Triple editing is handled through \texttt{TripleDetailsDialog.vue}, which allows controlled entry of subject, predicate, and object terms, including typed literals with XML Schema datatypes. Changes are executed through \texttt{TripleEditorService} and propagated to the central \gls{rdf} store. Figure~\ref{fig:rdf_authoring_panel:triple_modal} shows the edit modal for triple editing.
 
 \begin{figure}[htbp]
   \centering
@@ -241,10 +245,9 @@ Triple editing is handled through \texttt{TripleDetailsDialog.vue}, which allows
   \label{fig:rdf_authoring_panel:triple_modal}
 \end{figure}
 
-Data changes originate from two primary sources: the Text View (raw JSON-LD data) and the RDF Panel. All data updates are managed through a central store (\texttt{dataSource}) that acts as the single source of truth, while the individual panels remain decoupled and do not communicate with each other directly. At this layer, \texttt{managedData.ts} provides synchronized access to both parsed data and its text representation, supports path-based updates, and preserves temporarily unparseable text input without discarding the last valid data state. For example, when a change is made in the Text View, \texttt{rdfStoreManager.ts} reconstructs the \gls{rdf} graph within this central store, which in turn triggers an update in the RDF Panel (Figure~\ref{fig:rdf_authoring_panel:change_propagation_json_editor}).
+Data updates come from two places: the Text View (raw JSON-LD) and the RDF panel itself. Both paths write to MetaConfigurator's existing core data infrastructure, not to a new store introduced by this thesis. Specifically, \texttt{dataSource.ts} provides the global reactive source of editor data, which acts as the single source of truth across panels. On top of this, \texttt{managedData.ts} is the pre-existing synchronization layer that keeps parsed data and string representations aligned, supports path-based updates, and preserves temporarily unparseable text without discarding the last valid state. Within this architecture, the RDF extension plugs into the same flow: when a user edits the Text View, \texttt{rdfStoreManager.ts} rebuilds the \gls{rdf} graph from the updated shared data state, which then updates the RDF panel (Figure~\ref{fig:rdf_authoring_panel:change_propagation_json_editor}).
 
-Conversely, when a triple is edited, removed, or added in Triples tab, \texttt{TripleEditorService} validates and applies the change through \texttt{rdfStoreManager.ts}. If successful, \texttt{jsonLdNodeManager.ts} rebuilds \gls{jsonld} from the updated store and writes it back to the \texttt{dataSource}, which updates the Text View accordingly (Figure~\ref{fig:rdf_authoring_panel:change_propagation_rdf_view}).
-Changes in the Context tab is propagated in the same way as changes to the GUI View, since underlying data is still treated as JSON data and processed by the same synchronization workflow.
+Conversely, when a triple is added, edited, or removed in the Triples tab, \texttt{TripleEditorService} validates and applies the change through \texttt{rdfStoreManager.ts}.Then \texttt{jsonLdNodeManager.ts} rebuilds \gls{jsonld} from the updated store and writes it back to \texttt{dataSource.ts}, which refreshes the Text View (Figure~\ref{fig:rdf_authoring_panel:change_propagation_rdf_view}). Changes in the Context tab propagate through the same mechanism as GUI-based edits, because the underlying representation is still handled as JSON data by the same synchronization workflow.
 
 \begin{figure}[htbp]
   \centering
@@ -266,7 +269,7 @@ Users can edit \gls{iri}s in the triple modal (Figure~\ref{fig:rdf_authoring_pan
 
 The interaction flow is shown in Figure~\ref{fig:rdf_authoring_panel:ontology_integration_1}. In this dialog, users can cache ontology content either by downloading it from a URL or by uploading a local file. The implementation detects supported RDF serializations (RDF/XML, Turtle, N-Triples, N3, JSON-LD), parses them in the browser using \texttt{rdflib.js}, serializes the resulting triples and stores both the original source content and the parsed graph data in IndexedDB\footnote{IndexedDB is a low-level, browser-based NoSQL database that enables web applications to store and efficiently query large amounts of structured data on the client side.}.
 
-Figure~\ref{fig:rdf_authoring_panel:ontology_integration_2} illustrates how users can download the Schema.org ontology through the Ontology Explorer. After downloading an ontology or uploading a local file, the explorer updates a global cached graph by merging triples from all stored ontologies. This global graph is queried using the Comunica library, allowing ontology terms to be explored consistently across previously cached sources. The predefined query retrieves \texttt{owl:ObjectProperty}, \texttt{owl:DatatypeProperty}, \texttt{rdf:Property}, \texttt{rdfs:Class}, and \texttt{owl:Class}. Property-related entries are displayed in both the \texttt{ObjectProperty} and \texttt{DatatypeProperty} tabs, while class definitions appear in the \texttt{Class} tab. Query results are cached per ontology prefix and recomputed only when the user explicitly triggers the \texttt{Refresh} action. To support large ontologies, each result table is paginated and includes table-level filtering.
+Figure~\ref{fig:rdf_authoring_panel:ontology_integration_2} illustrates how users can download the Schema.org ontology through the Ontology Explorer. After downloading an ontology or uploading a local file, the explorer updates a global cached graph by merging triples from all stored ontologies. This global graph is queried using the Comunica\footnote{\url{https://comunica.dev/}} library, allowing ontology terms to be explored consistently across previously cached sources. The predefined query retrieves \texttt{owl:ObjectProperty}, \texttt{owl:DatatypeProperty}, \texttt{rdf:Property}, \texttt{rdfs:Class}, and \texttt{owl:Class}. Property-related entries are displayed in both the \texttt{ObjectProperty} and \texttt{DatatypeProperty} tabs, while class definitions appear in the \texttt{Class} tab. Query results are cached per ontology prefix and recomputed only when the user explicitly triggers the \texttt{Refresh} action. To support large ontologies, each result table is paginated and includes table-level filtering.
 
 Table~\ref{tab:rdf_authoring_panel:ontology_term_types} summarizes these vocabulary terms and their role in the explorer. In brief, the first three terms are property descriptors (for links between resources or from resources to literal values), while the last two denote class-level concepts used for type hierarchies in ontologies.
 
@@ -289,9 +292,9 @@ Table~\ref{tab:rdf_authoring_panel:ontology_term_types} summarizes these vocabul
   \end{tabular}
 \end{table}
 
-While the predefined tabs cover common ontology elements such as properties and classes, they are inherently limited to schema-level constructs. In practice, however, users often need to access instance-level resources or domain-specific concepts that are not captured by these fixed categories. For example, in the \gls{qudt} ontology, users may be interested in concrete unit definitions such as \href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}}, similar to example in Listing~\ref{lst:background_jsonld_example}, which is an instance of type \href{https://qudt.org/schema/qudt/}{\texttt{qudt:Unit}}. Such resources are not discoverable through the predefined tabs, as they are neither classes nor properties, but instances of a domain-specific class.
+The predefined tabs work well for common schema elements (properties and classes), but they are limited to schema-level constructs. In real use cases, users also need instance-level resources and domain-specific concepts that do not fit these fixed categories. For example, in \gls{qudt}, a concrete unit such as \href{https://qudt.org/vocab/unit/M}{\texttt{unit:M}} (similar to Listing~\ref{lst:background_jsonld_example}) is an instance of \href{https://qudt.org/schema/qudt/}{\texttt{qudt:Unit}}. Such terms are not discoverable through class/property-only tabs.
 
-Hence, in addition to the predefined tabs, the explorer therefore provides a custom \gls{sparql} interface, as shown in Figure~\ref{fig:rdf_authoring_panel:ontology_integration_3}. This feature allows users to execute custom SPARQL queries to locate specific classes, properties, or instances, while offering live syntax validation and inline error feedback. Listing~\ref{lst:design_sparql_qudt} shows a sample SPARQL query for retrieving unit instances from the \gls{qudt} ontology. 
+For this reason, the explorer also provides a custom \gls{sparql} interface (Figure~\ref{fig:rdf_authoring_panel:ontology_integration_3}). Users can run custom queries to locate classes, properties, and instances, with live syntax validation and inline error feedback. Listing~\ref{lst:design_sparql_qudt} shows an example query that retrieves unit instances from \gls{qudt}. 
 
 Queries are executed against the cached global graph, and results are rendered with dynamically generated columns. If the results include \gls{iri} variables, the corresponding cells become selectable for IRI completion. This enables users to discover and select ontology terms that may not be easily accessible through the predefined views. Further details about the SPARQL component and its design are discussed in Section~\ref{sec:design:query-with-sparql}.
 
@@ -309,7 +312,7 @@ SELECT ?subject ?description WHERE {
 }
 \end{lstlisting}
 
-Figure~\ref{fig:rdf_authoring_panel:ontology_integration_4} shows the result of running \gls{sparql} query in Listing~\ref{lst:design_sparql_qudt}. After executing a query, users can click on an IRI-valued cell, inspect the resolved IRI in the selection bar, and confirm their choice via \texttt{Select} button. The dialog then emits the selected IRI back to the triple modal, completing the predicate or object entry. If an initial IRI is already present, the explorer automatically selects the best matching prefix when opened, navigates to the appropriate tab and page, and highlights the corresponding row, ensuring a consistent and deterministic editing workflow.
+Figure~\ref{fig:rdf_authoring_panel:ontology_integration_4} shows the result of the query in Listing~\ref{lst:design_sparql_qudt}. After execution, users can click an IRI-valued cell, inspect the resolved value in the selection bar, and confirm it with the \texttt{Select} button. The dialog then returns the chosen IRI to the triple modal, completing predicate or object entry. If an initial IRI already exists, the explorer automatically picks the best matching prefix, navigates to the relevant tab and page, and highlights the matching row for a consistent editing flow.
 
 \begin{figure}[htbp]
   \centering
@@ -335,7 +338,7 @@ Figure~\ref{fig:rdf_authoring_panel:ontology_integration_4} shows the result of 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.8\linewidth]{../figures/MC-RDF-Ontology-4.png}
-  \caption{Results of running SPARQL query in Listing~\ref{lst:design_sparql_qudt} over the \gls{qudt} ontology.}
+  \caption{Results of running SPARQL query in Listing~\ref{lst:design_sparql_qudt} over the QUDT ontology.}
   \label{fig:rdf_authoring_panel:ontology_integration_4}
 \end{figure}
 
@@ -424,9 +427,9 @@ Algorithms~\ref{alg:rdf_authoring_panel:text_to_rdf_linked_selection} and~\ref{a
 \newpage
 
 \section{Query with SPARQL}\label{sec:design:query-with-sparql}
-The \gls{sparql} query functionality is implemented in \texttt{SparqlEditor.vue} as a dialog with three tabs: \textbf{Query View}, \textbf{Result View}, and \textbf{Visualization}. During implementation, RDFLib query capabilities were evaluated first, but they proved limited for the required in-browser query workflow and did not provide full support for current SPARQL 1.2 draft specifications. Query execution is therefore handled in-browser via Comunica's \texttt{QueryEngine} \cite{comunica_query_sparql}. According to Comunica's official documentation, the engine supports SPARQL 1.2 draft query-related specifications \cite{comunica_supported_specs}.
+SPARQL querying is implemented in \texttt{SparqlEditor.vue} as a dialog with three tabs: \texttt{Query View}, \texttt{Result View}, and \texttt{Visualization}. RDFLib query support was initially evaluated, but it was too limited for the required in-browser workflow and did not fully cover current SPARQL 1.2 draft query features. The final implementation uses Comunica's in-browser \texttt{QueryEngine} \cite{comunica_query_sparql}, which supports SPARQL 1.2 draft query-related specifications according to official documentation \cite{comunica_supported_specs}.
 
-In the \textbf{Query View}, users can write and validate queries in a CodeMirror editor \cite{codemirror} and execute them against the current in-memory \gls{rdf} graph. Query syntax is checked through debounced live validation using the \texttt{Sparql.js} parser, which provides immediate feedback while editing \cite{sparqljs}. The same view also provides \gls{ai}-assisted \gls{sparql} generation. Similar to the \gls{ai}-assisted \gls{rml} workflow described in Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}, user hints are combined with prompt-engineering instructions and a representative subset of the current \gls{jsonld} data, then sent to the configured AI-endpoint to generate a draft \gls{sparql} query. In simplified form, the prompt includes: (i) output constraints (return only SPARQL), (ii) relevant prefixes/context, (iii) representative graph fragments, and (iv) the user hint. Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated} shows the dialog with an AI-assisted query suggestion in the Query View.
+In the \textbf{Query View}, users write and validate queries in a CodeMirror editor \cite{codemirror} and execute them against the in-memory \gls{rdf} graph. Syntax checking is performed via debounced live validation using \texttt{Sparql.js}, which provides immediate feedback during editing \cite{sparqljs}. The same view also supports \gls{ai}-assisted query drafting. As in the \gls{rml} workflow (Section~\ref{sec:design:rdf-authoring-panel:rml-mapping-tool}), user hints are combined with prompt instructions and representative graph fragments, then sent to the configured AI endpoint. In simplified form, the prompt includes: (i) output constraints (SPARQL only), (ii) relevant prefixes and context, (iii) representative graph fragments, and (iv) the user hint. Figure~\ref{fig:rdf_authoring_panel:sparql_ai_generated} shows this interaction.
 
 To demonstrate the \gls{ai}-assisted workflow, we assume that the simulation \gls{json} from Listing~\ref{lst:background_json_example} has been extended with additional \texttt{element\_size} and \texttt{max\_von\_mises\_stress} value pairs (e.g., from multiple simulation runs), and then transformed into \gls{jsonld} using the mapping workflow described earlier. In this extended dataset, metric measurements are available for multiple element sizes, for example \texttt{0.003125}, \texttt{0.00625}, \texttt{0.0125}, \texttt{0.05} and \texttt{0.1}.
 

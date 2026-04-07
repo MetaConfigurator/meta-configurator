@@ -1,15 +1,15 @@
 \chapter{Background and Related Work}
 \label{sec:background}
 
-The increasing adoption of computational experiments and simulation workflows in scientific research has resulted in large volumes of data \cite{boulakia2017workflows,wilkinson2025fairworkflows,villamar2025metadata}. In principle, such data can be modeled and validated directly with \gls{rdf}-based standards \cite{rdf_concepts2014,shacl_standard}. In practice, however, many researchers still manage data in artifacts such as spreadsheet files, and when machine-readable encodings are used, they are commonly represented in formats such as \gls{xml} or \gls{json}, rather than as native \gls{rdf} graphs \cite{metaconfigurator2024,neubauer2026data}.
+Computational experiments and simulation workflows now produce large volumes of scientific data \cite{boulakia2017workflows,wilkinson2025fairworkflows,villamar2025metadata}. In principle, this data can be modeled and validated directly with \gls{rdf}-based standards \cite{rdf_concepts2014,shacl_standard}. In day-to-day practice, however, many researchers still work with spreadsheets or with machine-readable formats such as \gls{xml} and \gls{json} rather than native \gls{rdf} graphs \cite{metaconfigurator2024,neubauer2026data}.
 
-While the Semantic Web promises improved interoperability, explicit semantics, and cross-dataset integration \cite{berners2001semantic,janowicz2015geospatial,hogan2021knowledgegraphs}, its adoption often faces a substantial entry barrier due to ontology engineering effort, identifier and vocabulary design, and mapping complexity \cite{janowicz2015geospatial,hogan2021knowledgegraphs}. To motivate a practical path across this gap, this chapter first introduces structured data representation and validation with \gls{json} and JSON Schema. It then presents core Semantic Web concepts, and introduces MetaConfigurator as a tool for schema-driven data modeling and editing. 
+The Semantic Web promises better interoperability, explicit semantics, and cross-dataset integration \cite{berners2001semantic,janowicz2015geospatial,hogan2021knowledgegraphs}, but adopting it remains challenging. Typical hurdles include ontology engineering effort, identifier and vocabulary design, and mapping complexity \cite{janowicz2015geospatial,hogan2021knowledgegraphs}. To build a practical path through this gap, this chapter starts with \gls{json} and JSON Schema, then introduces core Semantic Web concepts, and finally positions MetaConfigurator as a schema-driven environment for data modeling and editing.
 
-The chapter also reviews existing tools and approaches in areas such as ontology engineering, data transformation, and semantic data management. Although these solutions are powerful, they typically focus on specific tasks and are often used in isolation. As a result, users frequently have to switch between different tools to move from structured \gls{json} data to semantically enriched \gls{rdf} representations. This highlights a gap between data modeling and practical Semantic Web integration. By extending MetaConfigurator with support for semantic transformation, \gls{rdf} authoring, querying, and visualization, this thesis aims to close this gap and provide a more integrated and accessible tool to work with semantically enriched data.
+The chapter also reviews related tools for ontology engineering, data transformation, and semantic data management. Many of these tools are strong in their own scope but are commonly used in isolation. As a result, users often have to switch environments to move from structured \gls{json} data to semantically enriched \gls{rdf}. This thesis addresses that workflow gap by extending MetaConfigurator with semantic transformation, \gls{rdf} authoring, querying, and visualization in a single user-facing workflow.
 
 \section{JSON and JSON Schema}
 
-This section introduces the non-semantic data foundation that many scientific workflows already use in practice. It first presents \gls{json} as a lightweight representation format for structured experimental data, then explains how JSON Schema adds machine-checkable structural constraints. Together, these technologies provide a practical baseline for data quality before semantic enrichment and transformation into \gls{rdf}-based representations.
+This section introduces the data foundations that many scientific workflows already rely on. It first discusses \gls{json} as a lightweight format for structured experimental data, then shows how JSON Schema adds machine-readable structural constraints. Together, they provide a pragmatic baseline for data quality before semantic enrichment and transformation into \gls{rdf}-based representations.
 
 \subsection{JSON as a Data Representation Format}
 \label{sec:background:json}
@@ -44,58 +44,73 @@ While \gls{json} provides a convenient serialization format, it does not inheren
 \subsection{JSON Schema for Data Validation}
 \label{sec:background:json_jsonschema}
 
-JSON Schema provides a standardized mechanism for describing the expected structure and constraints of \gls{json} documents. A JSON Schema defines properties, data types, required attributes, and validation rules for \gls{json} instances. This allows automated validation of data. The JSON Schema specification defines a vocabulary for describing \gls{json} documents and their validation rules \cite{wright2020jsonschema}. 
+JSON Schema offers a standard way to describe the expected structure and constraints of \gls{json} documents. A schema defines properties, data types, required attributes, and validation rules for JSON instances, enabling automated quality checks. The JSON Schema specification formalizes this vocabulary for describing \gls{json} documents and their validation behavior \cite{wright2020jsonschema}. 
 
 Listing~\ref{lst:background_json_schema} presents a JSON Schema corresponding to the example \gls{json} document in Listing~\ref{lst:background_json_example}. The schema mirrors the structure of the instance and ensures that the document contains the expected \texttt{parameters} and \texttt{metrics} arrays. Each entry in these arrays follows a common structure with the fields \texttt{name}, \texttt{value}, and \texttt{unit}, enforcing that every variable has a textual identifier, a numeric value, and an associated unit.
 
-However, JSON Schema focuses primarily on structural validation and does not provide semantic meaning or interoperability with \gls{kg} technologies. To address this limitation, semantic mapping techniques can be applied.
+The schema in Listing~\ref{lst:background_json_schema} checks that simulation data has the expected format before it is processed further. It requires every parameter and metric to include a \texttt{name}, a numeric \texttt{value}, and a \texttt{unit}, and it blocks unexpected extra fields (\texttt{additionalProperties: false}). This avoids common exchange problems such as missing units, wrong field names, or incorrect data types. At the same time, JSON Schema focuses on structural validity only: it does not encode the domain meaning of terms such as \texttt{element\_size} or \texttt{max\_von\_mises\_stress}, nor does it provide semantic interoperability with \glspl{kg}. To address this limitation, semantic mapping techniques are required.
 
 \begin{lstlisting}[float=htbp,style=json, caption={JSON Schema validating the simulation result for JSON document in Listing~\ref{lst:background_json_example}}, label={lst:background_json_schema}]
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Simulation Results",
+  "title": "Simulation Parameters and Results Dataset",
+  "description": "Schema describing input parameters and resulting performance metrics of a simulation run.",
   "type": "object",
   "properties": {
     "parameters": {
+      "title": "Simulation Input Parameters",
+      "description": "List of input variables.",
       "type": "array",
       "items": {
         "$ref": "#/$defs/variable"
       }
     },
     "metrics": {
+      "title": "Simulation Metrics",
+      "description": "List of measured or computed results produced by the simulation.",
       "type": "array",
       "items": {
         "$ref": "#/$defs/variable"
       }
     }
   },
-  "required": ["parameters", "metrics"],
+  "required": [
+    "parameters",
+    "metrics"
+  ],
   "additionalProperties": false,
   "$defs": {
     "variable": {
+      "title": "Quantitative Variable",
+      "description": "Represents a numeric quantity with a name and unit, used for both parameters and metrics.",
       "type": "object",
       "properties": {
         "name": {
+          "title": "Variable Name",
           "type": "string",
-          "description": "Name of the parameter or metric"
+          "description": "Identifier of the parameter or metric."
         },
         "value": {
+          "title": "Numeric Value",
           "type": "number",
-          "description": "Numeric value of the parameter or metric"
+          "description": "Measured or assigned numeric value."
         },
         "unit": {
+          "title": "Measurement Unit",
           "type": "string",
-          "description": "Unit symbol (e.g., m, MPa)"
+          "description": "Unit symbol following a standard QUDT instance."
         }
       },
-      "required": ["name", "value", "unit"],
+      "required": [
+        "name",
+        "value",
+        "unit"
+      ],
       "additionalProperties": false
     }
   }
 }
 \end{lstlisting}
-
-The schema in Listing~\ref{lst:background_json_schema} checks that simulation data has the expected format before it is processed further. It requires every parameter and metric to include a \texttt{name}, a numeric \texttt{value}, and a \texttt{unit}, and it blocks extra unexpected fields (\texttt{additionalProperties: false}). This avoids common problems such as missing units, wrong field names, or wrong data types when files are exchanged between tools. However, JSON Schema only checks structure. It does not describe the domain meaning of terms such as \texttt{element\_size} or \texttt{max\_von\_mises\_stress}. For that reason, we need to incorporate Semantic Web technologies to add explicit meaning and improve interoperability.
 
 \section{Semantic Web}
 
@@ -175,7 +190,7 @@ The RDF model in Listing~\ref{lst:background_rdf_xml_example} adds an extra laye
 
 \newpage
 
-\subsection{Semantic Data Representation using JSON-LD}
+\subsection{JSON-LD as Serialization of RDF}
 \label{sec:background:jsonld}
 
 \gls{jsonld} is another serialization format for \gls{rdf} graphs, but expressed in \gls{json} syntax \cite{jsonld2014}. While RDF/XML (Listing~\ref{lst:background_rdf_xml_example}) uses XML tags, \gls{jsonld} represents the same graph concepts in a \gls{json} structure that is often easier to integrate into existing data pipelines and web-based tools.
@@ -318,7 +333,7 @@ This example illustrates how semantic annotations enable structured and consiste
 \subsection{OWL: Modeling Rich Semantics and Logical Rules}
 \label{sec:background:owl}
 
-While \gls{rdf} provides the graph structure and \gls{sparql} enables querying, \gls{owl} adds a formal layer for expressing richer domain knowledge \cite{owl2_overview,owl2_primer}. With \gls{owl}, one can define class hierarchies, equivalence and disjointness of classes, and logical constraints on properties (e.g., transitive, symmetric, or cardinality-based restrictions). This allows data to be interpreted not only as stored triples, but also through the rules encoded in the ontology. In addition, \gls{shacl} introduces a complementary validation layer for defining structural and integrity constraints over \gls{rdf} graphs. Unlike \gls{owl}, which focuses on logical inference, \gls{shacl} is primarily used to validate whether data conforms to expected shapes, such as required properties, value types, or cardinality restrictions. Together, these technologies support a comprehensive workflow in which \gls{rdf} represents data, \gls{owl} enriches its semantics, \gls{sparql} enables flexible querying, and \gls{shacl} ensures data quality and conformance. 
+While \gls{rdf} provides the graph structure and \gls{sparql} enables querying, \gls{owl} adds a formal layer for expressing richer domain knowledge \cite{owl2_overview,owl2_primer}. With \gls{owl}, one can define class hierarchies, equivalence and disjointness of classes, and logical constraints on properties (e.g., transitive, symmetric, or cardinality-based restrictions). This allows data to be interpreted not only as stored triples, but also through the rules encoded in the ontology. As discussed in Section~\ref{sec:background:shacl}, \gls{shacl} complements this by providing a validation layer for structural and integrity constraints over \gls{rdf} graphs. Unlike \gls{owl}, which focuses on logical inference, \gls{shacl} is primarily used to validate whether data conforms to expected shapes, such as required properties, value types, or cardinality restrictions. Together, these technologies support a comprehensive workflow in which \gls{rdf} represents data, \gls{owl} enriches its semantics, \gls{sparql} enables flexible querying, and \gls{shacl} ensures data quality and conformance. 
 
 Listing \ref{lst:background_owl_example} shows an example of an \gls{owl} property definition for \texttt{:hasParameter} in the Metadata4Ing ontology \cite{metadata4ing_ontology}. This property is defined as an object property with a domain that is a union of the classes \texttt{:Method} and \texttt{:Tool}, and a range that points to the class \texttt{Variable} from the PIMS-II\footnote{The PIMS-II (Process and Instrument Metadata Schema II) ontology is used to model variables and metadata associated with scientific and engineering processes, particularly in simulation and experimental workflows.} ontology. The definition also includes a human-readable comment and label.
 
@@ -500,7 +515,7 @@ This combination of views gives users a continuous workflow from low-level text 
 
 Recent work extends MetaConfigurator with \gls{ai}-assisted support for schema creation, modification, and mapping from natural-language user input \cite{ai_assisted_schema_mapping_2025}. The approach combines \gls{llm}s with deterministic safeguards to improve reliability and usability.
 
-For schema authoring, MetaConfigurator provides a chat-like interface where users describe their intent in natural language. The system then performs prompt construction and context management automatically, including role instructions, task-specific formatting constraints, and relevant schema context. Generated results are directly validated and visualized in the schema editor, and users remain in control through a manual validation workflow where generated output can be reviewed and refined before acceptance.
+In this workflow, the chat-like dialog is used for data-mapping tasks. Schema edits, in contrast, are applied directly in the schema editor rather than through a separate dialog; users can immediately inspect the result and revert undesired changes with the built-in Undo action. This keeps schema authoring interactive while preserving user control over incremental modifications.
 
 For data transformation, the system generates mapping expressions from user input and executes these mappings deterministically. In the presented implementation, JSONata expressions are generated from an input document and a target schema, then validated and executed in a controlled pipeline. This separates \gls{ai}-based generation from rule execution and supports scalable transformation workflows across heterogeneous source formats.
 
@@ -513,9 +528,7 @@ Several limitations arise from this restriction:
 
 \begin{enumerate}
     \item \textbf{Lack of JSON-LD context authoring:}  
-    Users cannot directly author or edit \gls{jsonld} contexts (e.g., the \texttt{@context} section that defines mappings between \gls{json} keys and ontology \glspl{iri}). Without such support, linking data elements to ontologies requires manual editing outside the tool.
-
-    Users can define a \gls{jsonld} context when JSON-LD support is enabled; however, this functionality is limited and currently only available within the schema editor. The \texttt{@context} section, which defines mappings between \gls{json} keys and ontology \glspl{iri}, is not exposed in the data editing view. As a result, working with or adjusting context definitions remains less accessible during instance-level data authoring.
+    Users cannot directly author or edit \gls{jsonld} contexts (e.g., the \texttt{@context} section that maps \gls{json} keys to ontology \glspl{iri}) in the data editing view. Although JSON-LD support allows defining context information in the schema editor, this functionality remains limited and is not available where instance-level data is authored, so linking data elements to ontologies still often requires manual editing outside the core data workflow.
 
     \item \textbf{No direct inspection or editing of RDF triples:}  
     MetaConfigurator does not provide mechanisms for inspecting or manipulating \gls{rdf} triples derived from the underlying \gls{json} data. As a result, users cannot directly view the semantic graph structure implied by \gls{jsonld} documents.
@@ -537,8 +550,8 @@ To address these limitations, this thesis extends MetaConfigurator with an \text
 The main contributions of this thesis include:
 
 \begin{enumerate}
-    \item \textbf{Transformation of JSON documents to JSON-LD:}  
-    The system enables the transformation of conventional \gls{json} documents into \gls{jsonld} using \gls{rml} mappings. This allows structured \gls{json} data created within MetaConfigurator to be converted into \gls{rdf} triples that can be integrated into Semantic Web infrastructures.
+    \item \textbf{Integration of RML Mapping Functionality into MetaConfigurator:}  
+    The system integrates \gls{rml}-based mapping functionality into MetaConfigurator to transform conventional \gls{json} documents into \gls{jsonld}. This allows structured \gls{json} data created within the platform to be converted into \gls{rdf} triples that can be integrated into Semantic Web infrastructures.
 
     \item \textbf{RDF authoring and editing support:}  
     The RDF Authoring Panel allows users to directly inspect and edit \gls{rdf} data. This includes editing the \gls{jsonld} \texttt{@context} as well as creating and modifying \gls{rdf} triples within the interface.
@@ -571,7 +584,7 @@ Apache Jena provides a mature programmatic stack for \gls{rdf} processing, reaso
 
 \subsection{Schema and Metadata Modeling for Structured Data}
 
-LinkML is a schema-centric tool in this context. It follows a model-driven approach in which a single high-level schema can be used to generate multiple artifacts, including validation schemas and semantic representations such as \gls{jsonld} and \gls{owl} \cite{linkml}. This is highly valuable for maintaining consistency across data models and downstream implementations. At the same time, effective use of LinkML still requires substantial conceptual understanding of schema design, semantic modeling decisions, and artifact generation workflows, which can be challenging for domain users without prior Semantic Web experience.
+LinkML is a schema-centric tool in this context. It follows a model-driven approach in which a single high-level schema can be used to generate multiple artifacts, including validation schemas and semantic representations such as \gls{jsonld} and \gls{owl} \cite{linkml}. This is highly valuable for maintaining consistency across data models and downstream implementations. At the same time, effective use of LinkML still requires substantial conceptual understanding of schema design, semantic modeling decisions, and artifact generation workflows, which can be challenging for domain users without prior Semantic Web experience. In addition, LinkML introduces yet another schema-language standard that users must learn alongside existing standards such as JSON Schema and \gls{rdf}, which can increase adoption overhead in practice.
 
 The \gls{cedar} Workbench also improves metadata quality through ontology-assisted authoring in scientific contexts \cite{cedar_workbench}. However, as with other advanced modeling environments, the practical starting point in many projects is not a clean semantic model, but existing non-linked datasets in operational formats such as \gls{json}, \gls{xml}, \gls{csv}, or \gls{yaml}. For these scenarios, a bridge approach is needed: first support users in editing and structuring their existing data, then map it into \gls{rdf}. This is why declarative mapping approaches such as \gls{rml} are particularly suitable in our setting (Section~\ref{sec:background:rml}), and why MetaConfigurator is positioned as a gradual path from conventional structured data toward semantic \glsentryshort{kg} workflows rather than assuming that users begin directly with native \gls{rdf}.
 
@@ -650,7 +663,7 @@ Although these tools provide strong support for individual Semantic Web tasks, s
 
     \item \textbf{Gap between structured JSON editing and RDF transformation:} In practice, much scientific data is authored and maintained in hierarchical formats such as \gls{json}. While standards such as \gls{jsonld} provide a bridge to linked data \cite{jsonld2014}, moving from conventional \gls{json} structures to \gls{rdf} still often requires separate mapping artifacts and additional tools (e.g., \gls{r2rml}/\gls{rml}) \cite{das2012r2rml,dimou2014rml}.
 
-    \item \textbf{Limited end-to-end support in one User Interface:} Most tools focus on a single task—such as ontology editing, mapping definition, or querying—rather than supporting the entire workflow from data authoring and transformation to validation, querying, and graph exploration in a unified environment.
+    \item \textbf{Limited end-to-end support in one user interface:} Most tools focus on a single task—such as ontology editing, mapping definition, or querying—rather than supporting the entire workflow from data authoring and transformation to validation, querying, and graph exploration in a unified environment.
 
     \item \textbf{Limited AI support in semantic authoring workflows:} Despite recent advances in generative \gls{ai}, assistance for generating artifacts such as \gls{sparql} queries or \gls{rml} mappings from natural-language descriptions of user intent is still rarely integrated into Semantic Web authoring tools.
 \end{itemize}
