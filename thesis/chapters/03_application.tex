@@ -100,7 +100,7 @@ Using \gls{chmo} serves two purposes. First, it anchors synthesis resources to a
 
 The \gls{rml} mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} transform the \gls{json} structures from Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof_json_example_s_2} into typed \gls{rdf} resources (see Section~\ref{sec:background:rml}). In MetaConfigurator, this is the key transition from conventional \gls{json} input to the \gls{rdf}/\gls{jsonld} authoring and query workflow.
 
-Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} illustrate how the chemistry-oriented ontology design is encoded in executable \gls{rml}. The first listing defines the synthesis-level mapping context: \texttt{rml:iterator "\$.Synthesis[*]"} selects each run in the input data, and \texttt{rr:subjectMap} creates one stable resource per run. Assigning \texttt{rr:class} \href{http://purl.obolibrary.org/obo/CHMO_0000410}{\texttt{chmo:0000410}} explicitly types each generated subject as a \gls{chmo}-grounded synthesis entity rather than a generic node.
+Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} illustrate how the chemistry-oriented ontology design is encoded in executable \gls{rml}. The first listing defines the synthesis-level mapping context: \texttt{rml:iterator "\$.Synthesis[*]"} selects each run in the input data, and \texttt{rr:subjectMap} creates one stable resource per run. Assigning \texttt{rr:class} \href{http://purl.obolibrary.org/obo/COB_0000082}{\texttt{obo:COB\_0000082}} explicitly types each generated subject as an ontology-grounded synthesis process entity rather than a generic node.
 
 The same mapping block also shows how experimental metadata is semantically attached to the synthesis resource. Fields such as vessel identifier, vessel type, human-readable run label, and product are transferred through \texttt{rr:predicateObjectMap}. This mapping pattern preserves the operational laboratory context while simultaneously lifting the data into an ontology-aware representation that can be interpreted by semantic tools.
 
@@ -113,7 +113,6 @@ From a workflow perspective, this is crucial for the integration goals discussed
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
 @prefix ex: <http://example.org/> .
-@prefix chmo: <http://purl.obolibrary.org/obo/CHMO_> .
 @prefix obo: <http://purl.obolibrary.org/obo/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
@@ -121,11 +120,11 @@ From a workflow perspective, this is crucial for the integration goals discussed
 
 <#SynthesisTriplesMap>
   rml:logicalSource <#SynthesisSource> ;
-  rr:subjectMap [ rr:template "http://example.org/synthesis/{Hardware.Component[0]._id}" ; rr:class chmo:0000410 ] ;
+  rr:subjectMap [ rr:template "http://example.org/synthesis/{Hardware.Component[0]._id}" ; rr:class obo:COB_0000082 ] ;
   rr:predicateObjectMap [ rr:predicate schema:identifier ; rr:objectMap [ rml:reference "Hardware.Component[0]._id" ] ] ;
   rr:predicateObjectMap [ rr:predicate obo:RO_0000086 ; rr:objectMap [ rml:reference "Hardware.Component[0]._type" ] ] ;
   rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "Metadata._description" ] ] ;
-  rr:predicateObjectMap [ rr:predicate ex:hasProduct ; rr:objectMap [ rml:reference "Metadata._product" ] ] .
+  rr:predicateObjectMap [ rr:predicate obo:OBI_0000299 ; rr:objectMap [ rml:reference "Metadata._product" ] ] .
 \end{lstlisting}
 
 \begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping focused on reagents and preparation steps},label={lst:application_mof_rml_example_2}]
@@ -142,10 +141,11 @@ From a workflow perspective, this is crucial for the integration goals discussed
 <#PrepStepTriplesMap>
   rml:logicalSource <#PrepStepSource> ;
   rr:subjectMap [ rr:template "http://example.org/step/prep/{_vessel}-{_order}" ; rr:class obo:OBI_0000070 ] ;
-  rr:predicateObjectMap [ rr:predicate ex:phase ; rr:objectMap [ rr:constant "Prep" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:OBI_0000293 ; rr:objectMap [ rr:constant "Prep" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:RO_0000057 ; rr:objectMap [ rr:template "http://example.org/reagent/{_reagent}" ] ] ;
   rr:predicateObjectMap [ rr:predicate obo:RO_0000056 ; rr:objectMap [ rml:reference "$xml_type" ] ] ;
   rr:predicateObjectMap [
-        rr:predicate ex:hasAmount ;
+        rr:predicate obo:OBI_0001937 ;
         rr:objectMap [
             rr:template "http://example.org/quantity/prep/{_vessel}-{_order}/amount"
         ]
@@ -182,7 +182,7 @@ From a workflow perspective, this is crucial for the integration goals discussed
     ] .
 \end{lstlisting}
 
-A central semantic effect of the mapping is ontology-based typing in \texttt{rr:class}. These class assignments transform plain JSON objects into explicit domain entities. For example, the mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} assign the classes summarized in Table~\ref{tab:application:mof_rml_class_definitions}. In Listing~\ref{lst:application_mof_rml_example_3}, amount values are represented as typed nodes of type \texttt{schema:PropertyValue}, with the unit code linked to the \gls{qudt} ontology.
+A central semantic effect of the mapping is ontology-based typing in \texttt{rr:class}. These class assignments transform plain JSON objects into explicit domain entities. For example, the mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} assign the classes summarized in Table~\ref{tab:application:mof_rml_class_definitions}. In Listing~\ref{lst:application_mof_rml_example_3}, amount values are represented as typed nodes of type \texttt{schema:PropertyValue}, with the unit code linked to the \gls{qudt} ontology. Listing~\ref{lst:application_mof_jsonld_example_s_1} shows part of the transformed data in JSON-LD format, representing synthesis run for \texttt{S-1}.
 
 \begin{table}[htbp]
   \renewcommand{\arraystretch}{1.2}
@@ -216,8 +216,6 @@ A central semantic effect of the mapping is ontology-based typing in \texttt{rr:
     \hline
   \end{tabular}
 \end{table}
-
-This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Reagent}, and \texttt{Step} are structural labels only. After \gls{rml} transformation, they become ontology-grounded \gls{rdf} nodes that can be queried by meaning and reused across datasets. Listing~\ref{lst:application_mof_jsonld_example_s_1} shows part of the transformed data in JSON-LD format, representing synthesis run for \texttt{S-1}.
 
 \begin{lstlisting}[float=htbp,style=json, caption={Representative JSON-LD excerpt from the MOF synthesis dataset for \texttt{S-1}}, label={lst:application_mof_jsonld_example_s_1}]
 {
@@ -263,6 +261,8 @@ This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Re
   ]
 }
 \end{lstlisting}
+
+\newpage
 
 \section{AI-Assisted SPARQL Generation}
 
@@ -313,7 +313,7 @@ This immediate \gls{jsonld}-to-\gls{kg} transition is especially helpful for non
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=.99\linewidth]{../figures/MC-RDF-KG-2.png}
+  \includegraphics[width=.85\linewidth]{../figures/MC-RDF-KG-2.png}
   \caption{Visualization of the JSON-LD in Listing~\ref{lst:application_mof_jsonld_example_s_1}.}
   \label{fig:application:kg_visualization}
 \end{figure}

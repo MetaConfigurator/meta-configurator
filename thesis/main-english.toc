@@ -38,7 +38,7 @@
 \contentsline {section}{\numberline {3.1}JSON Structure of the Chemical Dataset}{59}{section.559}%
 \contentsline {section}{\numberline {3.2}CHMO Ontology}{59}{section.636}%
 \contentsline {section}{\numberline {3.3}RML Mapping for CHMO Integration}{62}{section.637}%
-\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{66}{section.751}%
+\contentsline {section}{\numberline {3.4}AI-Assisted SPARQL Generation}{67}{section.751}%
 \contentsline {section}{\numberline {3.5}Knowledge Graph Visualization and Editing}{68}{section.776}%
 \contentsline {chapter}{\numberline {4}Conclusion and Outlook}{71}{chapter.779}%
 \contentsline {section}{\numberline {4.1}Current Limitations}{71}{section.780}%

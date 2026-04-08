@@ -22,7 +22,7 @@
 \contentsline {figure}{\numberline {2.15}{\ignorespaces CSV export visualized: \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress} trends.}}{57}{figure.551}%
 \contentsline {figure}{\numberline {2.16}{\ignorespaces KG visualization of the JSON-LD from Listing~\ref {lst:background_jsonld_example} in the Visualization dialog.}}{58}{figure.556}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running the SPARQL query from Listing~\ref {lst:application_mof_sparql_example}.}}{66}{figure.774}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running the SPARQL query from Listing~\ref {lst:application_mof_sparql_example}.}}{68}{figure.774}%
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Visualization of the JSON-LD in Listing~\ref {lst:application_mof_jsonld_example_s_1}.}}{69}{figure.777}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
