@@ -19,21 +19,21 @@ Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof
       "Procedure": {
         "Prep": {
           "Step": [
-            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "FeCl3", "_order": 0 },
-            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
-            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "millilitre", "Value": 4}, "_reagent": "DMF", "_order": 2 }
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "FeCl3", "_order": 0 },
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliL", "Value": 4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "DMF", "_order": 2 }
           ]
         },
         "Reaction": {
           "Step": [
-            { "_vessel": "S-1", "$xml_type": "Sonicate", "_time": { "Value": 30.0, "Unit": "minute"}, "_order": 0 },
-            { "_comment": "In: oven", "_vessel": "S-1", "$xml_type": "HeatChill", "_temp": { "Unit": "celsius", "Value": 120.0}, "_time": { "Value": 1, "Unit": "day"}, "_order": 1 }
+            { "_vessel": "S-1", "$xml_type": "Sonicate", "_time": { "Value": 30.0, "Unit": "MIN", "$xml_append": "${Value} ${Unit}" }, "_order": 0 },
+            { "_comment": "In: oven", "_vessel": "S-1", "$xml_type": "HeatChill", "_temp": { "Unit": "DEG_C", "Value": 120.0, "$xml_append": "${Value} ${Unit}" }, "_time": { "Value": 1, "Unit":"DAY", "$xml_append": "${Value} ${Unit}" }, "_order": 1 }
           ]
         },
         "Workup": {
           "Step": [
             { "_vessel": "S-1", "$xml_type": "WashSolid", "_solvent": "EtOH", "_order": 0 },
-            { "_vessel": "S-1", "$xml_type": "Dry", "_temp": { "Unit": "celsius", "Value": 120.0}, "_time": { "Value": 1, "Unit": "day"}, "_pressure": { "Unit": "pascal", "Value": 0}, "_order": 1 }
+            { "_vessel": "S-1", "$xml_type": "Dry", "_temp": { "Unit": "DEG_C", "Value": 120.0, "$xml_append": "${Value} ${Unit}" }, "_time": { "Value": 1, "Unit":"DAY", "$xml_append": "${Value} ${Unit}" }, "_pressure": { "Unit": "PA", "Value": 0, "$xml_append": "${Value} ${Unit}" }, "_order": 1 }
           ]
         }
       },
@@ -59,27 +59,27 @@ Listings~\ref{lst:application_mof_json_example_s_1} and~\ref{lst:application_mof
       "Procedure": {
         "Prep": {
           "Step": [
-            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "FeCl3\\u00B76H2O", "_order": 0 },
-            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "millimole", "Value": 0.4}, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
-            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "millilitre", "Value": 4}, "_reagent": "DMF", "_order": 2 }
+            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "FeCl3·6H2O", "_order": 0 },
+            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
+            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "MilliL", "Value": 4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "DMF", "_order": 2 }
           ]
         },
         "Reaction": {
           "Step": [
-            { "_vessel": "S-2", "$xml_type": "Sonicate", "_time": { "Value": 30.0, "Unit": "minute"}, "_order": 0 },
-            { "_comment": "In: oven", "_vessel": "S-2", "$xml_type": "HeatChill", "_temp": { "Unit": "celsius", "Value": 120.0}, "_time": { "Value": 1, "Unit": "day"}, "_order": 1 }
+            { "_vessel": "S-2", "$xml_type": "Sonicate", "_time": { "Value": 30.0, "Unit": "MIN", "$xml_append": "${Value} ${Unit}" }, "_order": 0 },
+            { "_comment": "In: oven", "_vessel": "S-2", "$xml_type": "HeatChill", "_temp": { "Unit": "DEG_C", "Value": 120.0, "$xml_append": "${Value} ${Unit}" }, "_time": { "Value": 1, "Unit":"DAY", "$xml_append": "${Value} ${Unit}" }, "_order": 1 }
           ]
         },
         "Workup": {
           "Step": [
             { "_vessel": "S-2", "$xml_type": "WashSolid", "_solvent": "EtOH", "_order": 0 },
-            { "_vessel": "S-2", "$xml_type": "Dry", "_temp": { "Unit": "celsius", "Value": 120.0}, "_time": { "Value": 1, "Unit": "day"}, "_pressure": { "Unit": "pascal", "Value": 0}, "_order": 1 }
+            { "_vessel": "S-2", "$xml_type": "Dry", "_temp": { "Unit": "DEG_C", "Value": 120.0, "$xml_append": "${Value} ${Unit}" }, "_time": { "Value": 1, "Unit":"DAY", "$xml_append": "${Value} ${Unit}" }, "_pressure": { "Unit": "PA", "Value": 0, "$xml_append": "${Value} ${Unit}" }, "_order": 1 }
           ]
         }
       },
       "Reagents": {
         "Reagent": [
-          { "_id": "FeCl3%25C2%25B76H2O", "_name": "FeCl3\\u00B76H2O", "_role": "substrate" },
+          { "_id": "FeCl3%25C2%25B76H2O", "_name": "FeCl3·6H2O", "_role": "substrate" },
           { "_id": "Benzene-1%252C4-dicarboxylic%2520acid", "_name": "Benzene-1,4-dicarboxylic acid", "_role": "ligand" },
           { "_id": "DMF", "_name": "DMF", "_role": "solvent" },
           { "_id": "EtOH", "_name": "EtOH", "_role": "solvent" }
@@ -122,8 +122,8 @@ From a workflow perspective, this is crucial for the integration goals discussed
 <#SynthesisTriplesMap>
   rml:logicalSource <#SynthesisSource> ;
   rr:subjectMap [ rr:template "http://example.org/synthesis/{Hardware.Component[0]._id}" ; rr:class chmo:0000410 ] ;
-  rr:predicateObjectMap [ rr:predicate ex:componentID ; rr:objectMap [ rml:reference "Hardware.Component[0]._id" ] ] ;
-  rr:predicateObjectMap [ rr:predicate ex:componentType ; rr:objectMap [ rml:reference "Hardware.Component[0]._type" ] ] ;
+  rr:predicateObjectMap [ rr:predicate schema:identifier ; rr:objectMap [ rml:reference "Hardware.Component[0]._id" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:RO_0000086 ; rr:objectMap [ rml:reference "Hardware.Component[0]._type" ] ] ;
   rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "Metadata._description" ] ] ;
   rr:predicateObjectMap [ rr:predicate ex:hasProduct ; rr:objectMap [ rml:reference "Metadata._product" ] ] .
 \end{lstlisting}
@@ -135,7 +135,7 @@ From a workflow perspective, this is crucial for the integration goals discussed
   rml:logicalSource <#ReagentSource> ;
   rr:subjectMap [ rr:template "http://example.org/reagent/{_id}" ; rr:class obo:CHEBI_24431 ] ;
   rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "_name" ] ] ;
-  rr:predicateObjectMap [ rr:predicate ex:role ; rr:objectMap [ rml:reference "_role" ] ] .
+  rr:predicateObjectMap [ rr:predicate obo:RO_0000087 ; rr:objectMap [ rml:reference "_role" ] ] .
 
 <#PrepStepSource> rml:source "Data.json" ; rml:referenceFormulation ql:JSONPath ; rml:iterator "$.Synthesis[*].Procedure.Prep.Step[*]" .
 
@@ -143,26 +143,76 @@ From a workflow perspective, this is crucial for the integration goals discussed
   rml:logicalSource <#PrepStepSource> ;
   rr:subjectMap [ rr:template "http://example.org/step/prep/{_vessel}-{_order}" ; rr:class obo:OBI_0000070 ] ;
   rr:predicateObjectMap [ rr:predicate ex:phase ; rr:objectMap [ rr:constant "Prep" ] ] ;
-  rr:predicateObjectMap [ rr:predicate ex:action ; rr:objectMap [ rml:reference "$xml_type" ] ] ;
-  rr:predicateObjectMap [ rr:predicate ex:amountValue ; rr:objectMap [ rml:reference "_amount.Value" ] ] ;
-  rr:predicateObjectMap [ rr:predicate ex:amountUnit ; rr:objectMap [ rml:reference "_amount.Unit" ] ] .
+  rr:predicateObjectMap [ rr:predicate obo:RO_0000056 ; rr:objectMap [ rml:reference "$xml_type" ] ] ;
+  rr:predicateObjectMap [
+        rr:predicate ex:hasAmount ;
+        rr:objectMap [
+            rr:template "http://example.org/quantity/prep/{_vessel}-{_order}/amount"
+        ]
+    ] .
 \end{lstlisting}
 
-\newpage
+\begin{lstlisting}[float=htbp,style=turtle,caption={Part of RML mapping focused on creating amount value nodes for preparation steps},label={lst:application_mof_rml_example_3}]
+<#PrepAmountValueMap>
+    rml:logicalSource <#PrepStepSource> ;
 
-A central semantic effect of the mapping is ontology-based typing in \texttt{rr:class}. These class assignments transform plain JSON objects into explicit domain entities. For example, the mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} assign the classes summarized in Table~\ref{tab:application:mof_rml_class_definitions}.
+    rr:subjectMap [
+        rr:template "http://example.org/quantity/prep/{_vessel}-{_order}/amount" ;
+        rr:class schema:PropertyValue
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rr:constant "amount" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:value ;
+        rr:objectMap [
+            rml:reference "_amount.Value" ;
+            rr:datatype xsd:double
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:unitCode ;
+        rr:objectMap [
+            rr:template "http://qudt.org/vocab/unit/{_amount.Unit}"
+        ]
+    ] .
+\end{lstlisting}
+
+A central semantic effect of the mapping is ontology-based typing in \texttt{rr:class}. These class assignments transform plain JSON objects into explicit domain entities. For example, the mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2} assign the classes summarized in Table~\ref{tab:application:mof_rml_class_definitions}. In Listing~\ref{lst:application_mof_rml_example_3}, amount values are represented as typed nodes of type \texttt{schema:PropertyValue}, with the unit code linked to the \gls{qudt} ontology.
 
 \begin{table}[htbp]
+  \renewcommand{\arraystretch}{1.2}
   \centering
-  \caption{Ontology classes used in \texttt{rr:class} assignments in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2}}
+  \caption{Ontology classes and properties used in \texttt{rr:class} and \texttt{rr:predicate} assignments in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2}}
   \label{tab:application:mof_rml_class_definitions}
-  \begin{tabular}{p{0.28\linewidth}p{0.22\linewidth}p{0.43\linewidth}}
+  \begin{tabular}{p{0.32\linewidth}p{0.58\linewidth}}
     \hline
-    \textbf{Class (Prefix Form)} & \textbf{Ontology} & \textbf{Definition in this mapping context} \\
+    \textbf{Class / Property IRI} & \textbf{Definition in this mapping context} \\
     \hline
-    \texttt{chmo:0000410} & \glsentryshort{chmo} & Types each synthesis run as a chemistry synthesis entity. \\
-    \texttt{obo:CHEBI\_24431} & \glsentryshort{chebi} & Types each reagent resource as a chemical entity (e.g., ligand, solvent, substrate). \\
-    \texttt{obo:OBI\_0000070} & \glsentryshort{obi} & Types each procedure-step resource as an experimental/process step entity. \\
+    \multicolumn{2}{l}{\textit{Classes (\texttt{rr:class})}} \\
+    \hline
+    \href{http://purl.obolibrary.org/obo/COB_0000082}{\texttt{obo:COB\_0000082}} & A process that is initiated by an agent. \\
+    \href{http://purl.obolibrary.org/obo/CHEBI_24431}{\texttt{obo:CHEBI\_24431}} & Types each reagent resource as a chemical entity (e.g., ligand, solvent, substrate). \\
+    \href{http://purl.obolibrary.org/obo/OBI_0000070}{\texttt{obo:OBI\_0000070}} & Types each procedure-step resource as a planned process entity. \\
+    \href{https://schema.org/PropertyValue}{\texttt{schema:PropertyValue}} & Types each quantity node encoding a numeric value and its unit. \\
+    \hline
+    \multicolumn{2}{l}{\textit{Properties (\texttt{rr:predicate})}} \\
+    \hline
+    \href{https://schema.org/identifier}{\texttt{schema:identifier}} & Assigns the local alphanumeric identifier of the synthesis component (e.g., \texttt{S-1}). \\
+    \href{http://purl.obolibrary.org/obo/RO_0000086}{\texttt{obo:RO\_0000086}} & Links the synthesis vessel to its physical container quality (e.g., glass vial). \\
+    \href{http://purl.obolibrary.org/obo/BFO_0000051}{\texttt{obo:BFO\_0000051}} & Relates a synthesis process to its constituent procedure steps (\textit{has part}). \\
+    \href{http://purl.obolibrary.org/obo/OBI_0000299}{\texttt{obo:OBI\_0000299}} & Links a synthesis process to its specified output product (\textit{has specified output}). \\
+    \href{http://purl.obolibrary.org/obo/RO_0000056}{\texttt{obo:RO\_0000056}} & Relates a process step to the action type it realises (e.g., Add, Sonicate). \\
+    \href{http://purl.obolibrary.org/obo/OBI_0001937}{\texttt{obo:OBI\_0001937}} & Links a process step to its quantity value specification (\textit{has value specification}). \\
+    \href{http://purl.obolibrary.org/obo/OBI_0000293}{\texttt{obo:OBI\_0000293}} & Indicates the procedural phase a step belongs to (\textit{has specified input}). \\
+    \href{http://purl.obolibrary.org/obo/RO_0000057}{\texttt{obo:RO\_0000057}} & Associates a process step with its participant reagent (\textit{has participant}). \\
+    \href{http://purl.obolibrary.org/obo/RO_0000087}{\texttt{obo:RO\_0000087}} & Assigns the chemical role of a reagent (e.g., substrate, ligand, solvent). \\
+    \href{https://schema.org/unitCode}{\texttt{schema:unitCode}} & Specifies the unit of measurement for a quantity value node. \\
+    \href{https://schema.org/value}{\texttt{schema:value}} & Holds the numeric value within a quantity value node. \\
     \hline
   \end{tabular}
 \end{table}
@@ -175,40 +225,40 @@ This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Re
     "ex": "http://example.org/",
     "obo": "http://purl.obolibrary.org/obo/",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "xsd": "http://www.w3.org/2001/XMLSchema#"
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "qudt": "http://qudt.org/vocab/unit/"
   },
   "@graph": [
-    { "@id": "ex:reagent/Benzene-1%25252C4-dicarboxylic%252520acid", "@type": "obo:CHEBI_24431", "ex:role": "ligand", "rdfs:label": "Benzene-1,4-dicarboxylic acid" },
-    { "@id": "ex:reagent/DMF", "@type": "obo:CHEBI_24431", "ex:role": "solvent", "rdfs:label": "DMF" },
-    { "@id": "ex:reagent/EtOH", "@type": "obo:CHEBI_24431", "ex:role": "solvent", "rdfs:label": "EtOH" },
-    { "@id": "ex:reagent/FeCl3", "@type": "obo:CHEBI_24431", "ex:role": "substrate", "rdfs:label": "FeCl3" },
-
-    { "@id": "ex:step/prep/S-1-0", "@type": "obo:OBI_0000070", "ex:action": "Add", "ex:amountUnit": "millimole", "ex:amountValue": { "@type": "xsd:double", "@value": "4.0E-1" }, "ex:phase": "Prep", "obo:RO_0000057": { "@id": "ex:reagent/FeCl3" } },
-    { "@id": "ex:step/prep/S-1-1", "@type": "obo:OBI_0000070", "ex:action": "Add", "ex:amountUnit": "millimole", "ex:amountValue": { "@type": "xsd:double", "@value": "4.0E-1" }, "ex:phase": "Prep", "obo:RO_0000057": { "@id": "ex:reagent/Benzene-1%25252C4-dicarboxylic%252520acid" } },
-    { "@id": "ex:step/prep/S-1-2", "@type": "obo:OBI_0000070", "ex:action": "Add", "ex:amountUnit": "millilitre", "ex:amountValue": { "@type": "xsd:integer", "@value": "4" }, "ex:phase": "Prep", "obo:RO_0000057": { "@id": "ex:reagent/DMF" } },
-
-    { "@id": "ex:step/reaction/S-1-0", "@type": "obo:OBI_0000070", "ex:action": "Sonicate", "ex:phase": "Reaction", "ex:timeUnit": "minute", "ex:timeValue": { "@type": "xsd:integer", "@value": "30" } },
-    { "@id": "ex:step/reaction/S-1-1", "@type": "obo:OBI_0000070", "ex:action": "HeatChill", "ex:phase": "Reaction", "ex:temperatureUnit": "celsius", "ex:temperatureValue": { "@type": "xsd:integer", "@value": "120" }, "ex:timeUnit": "day", "ex:timeValue": { "@type": "xsd:integer", "@value": "1" } },
-
-    { "@id": "ex:step/workup/S-1-0", "@type": "obo:OBI_0000070", "ex:action": "WashSolid", "ex:phase": "Workup", "obo:RO_0000057": { "@id": "ex:reagent/EtOH" } },
-    { "@id": "ex:step/workup/S-1-1", "@type": "obo:OBI_0000070", "ex:action": "Dry", "ex:phase": "Workup", "ex:pressureUnit": "pascal", "ex:pressureValue": { "@type": "xsd:integer", "@value": "0" }, "ex:temperatureUnit": "celsius", "ex:temperatureValue": { "@type": "xsd:integer", "@value": "120" }, "ex:timeUnit": "day", "ex:timeValue": { "@type": "xsd:integer", "@value": "1" } },
-
     {
       "@id": "ex:synthesis/S-1",
-      "@type": "obo:CHMO_0000410",
-      "ex:componentID": "S-1",
-      "ex:componentType": "glass vial",
-      "obo:BFO_0000051": [
-        { "@id": "ex:step/prep/S-1-0" },
-        { "@id": "ex:step/prep/S-1-1" },
-        { "@id": "ex:step/prep/S-1-2" },
-        { "@id": "ex:step/reaction/S-1-0" },
-        { "@id": "ex:step/reaction/S-1-1" },
-        { "@id": "ex:step/workup/S-1-0" },
-        { "@id": "ex:step/workup/S-1-1" }
-      ],
-      "ex:hasProduct": "MIL-88B (Fe)",
+      "@type": "obo:COB_0000082",
+      "schema:identifier": "S-1",
+      "obo:RO_0000086": "glass vial",
+      "obo:BFO_0000051": [ { "@id": "ex:step/prep/S-1-0" } ],
+      "obo:OBI_0000299": "MIL-88B (Fe)",
       "rdfs:label": "S-1"
+    },
+    {
+      "@id": "ex:step/prep/S-1-0",
+      "@type": "obo:OBI_0000070",
+      "obo:RO_0000056": "Add",
+      "obo:OBI_0001937": { "@id": "ex:quantity/prep/S-1-0/amount" },
+      "obo:OBI_0000293": "Prep",
+      "obo:RO_0000057": { "@id": "ex:reagent/FeCl3" }
+    },
+    {
+      "@id": "ex:quantity/prep/S-1-0/amount",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "amount",
+      "schema:unitCode": { "@id": "qudt:MilliMOL" },
+      "schema:value": { "@type": "xsd:double", "@value": "4.0E-1" }
+    },
+    {
+      "@id": "ex:reagent/FeCl3",
+      "@type": "obo:CHEBI_24431",
+      "obo:RO_0000087": "substrate",
+      "rdfs:label": "FeCl3"
     }
   ]
 }
@@ -216,7 +266,7 @@ This is important because \gls{json} keys such as \texttt{Synthesis}, \texttt{Re
 
 \section{AI-Assisted SPARQL Generation}
 
-After applying the mappings in Listings~\ref{lst:application_mof_rml_example_1} and~\ref{lst:application_mof_rml_example_2}, users can query the resulting \gls{rdf} graph directly with \gls{sparql}. In practical laboratory settings, however, writing correct \gls{sparql} is often a bottleneck, especially for users with strong domain expertise but limited query-language experience. To reduce this friction, this chapter applies the same \gls{ai}-assisted interaction pattern introduced in Chapter~\ref{sec:design}: users describe intent in natural language, and a configured AI endpoint proposes a first query draft.
+After applying the full mappings (partially depicted in Listings~\ref{lst:application_mof_rml_example_1}, ~\ref{lst:application_mof_rml_example_2} and~\ref{lst:application_mof_rml_example_3}), users can query the resulting \gls{rdf} graph directly with \gls{sparql}. In practical laboratory settings, however, writing correct \gls{sparql} is often a bottleneck, especially for users with strong domain expertise but limited query-language experience. To reduce this friction, this chapter applies the same \gls{ai}-assisted interaction pattern introduced in Chapter~\ref{sec:design}: users describe intent in natural language, and a configured AI endpoint proposes a first query draft.
 
 For the \gls{mof} dataset, the main benefit is that users can start from experimental questions (e.g., ``Which Prep steps used which reagent, and in what amount?'') instead of manually constructing triple patterns from scratch. Listing~\ref{lst:application_mof_sparql_example_hint} shows such a concise user hint. Based on this hint and a representative subset of the current \gls{jsonld}/\gls{rdf} graph, the AI-endpoint generates a candidate query, shown in Listing~\ref{lst:application_mof_sparql_example}. Figure~\ref{fig:application:sparql_ai_generated_result} shows the result of executing this query, which retrieves all preparation steps with their associated reagents and amounts for each synthesis run.
 
@@ -230,14 +280,19 @@ Retrieve all Prep steps with their reagents and amounts for each synthesis.
 PREFIX ex: <http://example.org/>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <https://schema.org/>
 
 SELECT ?synthesis ?step ?reagentLabel ?amount ?unit
 WHERE {
   ?synthesis obo:BFO_0000051 ?step .
-  ?step ex:phase "Prep" ;
+
+  ?step obo:OBI_0000293 "Prep" ;
         obo:RO_0000057 ?reagent ;
-        ex:amountValue ?amount ;
-        ex:amountUnit ?unit .
+        obo:OBI_0001937 ?amountNode .
+
+  ?amountNode schema:value ?amount ;
+              schema:unitCode ?unit .
+
   ?reagent rdfs:label ?reagentLabel .
 }
 ORDER BY ?synthesis ?step

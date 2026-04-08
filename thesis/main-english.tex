@@ -14,7 +14,7 @@
   numbers=noenddot,
   english,  % English as main language; this parameter is passed to other packages (e.g., selnolig in the case of lualatex)
   a4paper,  % KOMAScript allows for both paper=a4 and (standard) a4paper - https://tex.stackexchange.com/a/61044/9075
-  oneside,  % We are optimizing for both screen and two-side printing. So the page numbers will jump, but the content is configured to stay in the middle (by using the geometry package)
+  twoside,  % We are optimizing for both screen and two-side printing. So the page numbers will jump, but the content is configured to stay in the middle (by using the geometry package)
   bibliography=totoc,
   % idxtotoc,   % Index ins Inhaltsverzeichnis
   % liststotoc, % List of * ins Inhaltsverzeichnis, mit liststotocnumbered werden die Abbildungsverzeichnisse nummeriert
@@ -396,8 +396,8 @@
 \usepackage[
   backend       = biber, %biber does not work with 64x versions alternative: bibtex8; minalphanames only works with biber backend
   sortcites     = true,
-  bibstyle      = alphabetic,
-  citestyle     = alphabetic,
+  bibstyle      = numeric,
+  citestyle     = numeric,
   giveninits    = true,
   useprefix     = false, %"von, van, etc." will be printed, too. See below.
   minnames      = 1,
@@ -818,22 +818,10 @@
   translate=babel,
   abbreviations,         % create "abbreviations" glossary
   nomain,                % don't create "main" glossary
-  stylemods=longbooktabs % do the adjustments for the longbooktabs styles
+  stylemods=longbooktabs, % do the adjustments for the longbooktabs styles
+  indexonlyfirst
 ]{glossaries-extra}
 \setglossarystyle{long3col-booktabs}
-
-\renewcommand*{\glossaryheader}{%
-  \toprule
-  \textbf{Notation} & \textbf{Description} & \textbf{Page List} \\
-  \midrule
-  \endhead
-}
-
-\renewenvironment{theglossary}{
-  \begin{longtable}{p{0.15\textwidth} p{0.45\textwidth} p{0.35\textwidth}}
-}{
-  \end{longtable}
-}
 
 % Hint by https://tex.stackexchange.com/a/463188/9075
 % \usepackage{glossary-longextra}
@@ -1097,6 +1085,7 @@ All links were last followed on April 06, 2026.
 \addcontentsline{toc}{part}{Appendix}
 
 \input{chapters/05_use_of_ai}
+\input{chapters/06_code_and_data}
 
 \pagestyle{empty}
 \renewcommand*{\chapterpagestyle}{empty}

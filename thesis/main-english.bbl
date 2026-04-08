@@ -18,7 +18,7 @@
 
 
 \refsection{0}
-  \datalist[entry]{anyt/global//global/global/global}
+  \datalist[entry]{nty/global//global/global/global}
     \entry{comunica_query_sparql}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=3e3e285baf3d7be2ffef0d2fec336ae8}{%
@@ -36,10 +36,8 @@
       \strng{authorfullhash}{3e3e285baf3d7be2ffef0d2fec336ae8}
       \strng{authorfullhashraw}{3e3e285baf3d7be2ffef0d2fec336ae8}
       \field{extraname}{1}
-      \field{labelalpha}{Ass26}
       \field{sortinit}{A}
       \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
-      \field{extraalpha}{1}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{@comunica/query-sparql}
@@ -68,10 +66,8 @@
       \strng{authorfullhash}{3e3e285baf3d7be2ffef0d2fec336ae8}
       \strng{authorfullhashraw}{3e3e285baf3d7be2ffef0d2fec336ae8}
       \field{extraname}{2}
-      \field{labelalpha}{Ass26}
       \field{sortinit}{A}
       \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
-      \field{extraalpha}{2}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Comunica: Supported specifications}
@@ -299,7 +295,6 @@
       \strng{authornamehash}{6d441e1a2c20a04e2dcea3af1445e4a9}
       \strng{authorfullhash}{463bd11ac1cbe2f8a742f36cd0f8935f}
       \strng{authorfullhashraw}{463bd11ac1cbe2f8a742f36cd0f8935f}
-      \field{labelalpha}{BBB+16}
       \field{sortinit}{B}
       \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
       \field{labelnamesource}{author}
@@ -313,44 +308,6 @@
       \range{pages}{-1}
       \verb{doi}
       \verb 10.1371/journal.pone.0154556
-      \endverb
-    \endentry
-    \entry{rdf_schema2014}{misc}{}{}
-      \name{author}{2}{}{%
-        {{hash=e12edfe7ea67a8d960a85df6442dc2d3}{%
-           family={Brickley},
-           familyi={B\bibinitperiod},
-           given={Dan},
-           giveni={D\bibinitperiod}}}%
-        {{hash=bbcd1770e4aca99d0a1e679b1fb04491}{%
-           family={Guha},
-           familyi={G\bibinitperiod},
-           given={R.\bibnamedelimi V.},
-           giveni={R\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
-      }
-      \list{publisher}{1}{%
-        {W3C Recommendation}%
-      }
-      \strng{namehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
-      \strng{fullhash}{8d6f15f2de5405f07c3fa4cf3d60938c}
-      \strng{fullhashraw}{8d6f15f2de5405f07c3fa4cf3d60938c}
-      \strng{bibnamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
-      \strng{authorbibnamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
-      \strng{authornamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
-      \strng{authorfullhash}{8d6f15f2de5405f07c3fa4cf3d60938c}
-      \strng{authorfullhashraw}{8d6f15f2de5405f07c3fa4cf3d60938c}
-      \field{labelalpha}{BG14}
-      \field{sortinit}{B}
-      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{RDF Schema 1.1}
-      \field{year}{2014}
-      \verb{urlraw}
-      \verb https://www.w3.org/TR/rdf-schema/
-      \endverb
-      \verb{url}
-      \verb https://www.w3.org/TR/rdf-schema/
       \endverb
     \endentry
     \entry{berners2001semantic}{article}{}{}
@@ -379,7 +336,6 @@
       \strng{authornamehash}{f679150567009928b050e7c1f2330f54}
       \strng{authorfullhash}{74570197268b5c125ee7686d19e46d2f}
       \strng{authorfullhashraw}{74570197268b5c125ee7686d19e46d2f}
-      \field{labelalpha}{BHL01}
       \field{sortinit}{B}
       \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
       \field{labelnamesource}{author}
@@ -411,7 +367,6 @@
       \strng{authornamehash}{532fb491ff1af75ada11b8ee4c440170}
       \strng{authorfullhash}{532fb491ff1af75ada11b8ee4c440170}
       \strng{authorfullhashraw}{532fb491ff1af75ada11b8ee4c440170}
-      \field{labelalpha}{Bra17}
       \field{sortinit}{B}
       \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
       \field{labelnamesource}{author}
@@ -424,6 +379,99 @@
       \endverb
       \verb{url}
       \verb https://www.rfc-editor.org/rfc/rfc8259
+      \endverb
+    \endentry
+    \entry{rdf_schema2014}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=e12edfe7ea67a8d960a85df6442dc2d3}{%
+           family={Brickley},
+           familyi={B\bibinitperiod},
+           given={Dan},
+           giveni={D\bibinitperiod}}}%
+        {{hash=bbcd1770e4aca99d0a1e679b1fb04491}{%
+           family={Guha},
+           familyi={G\bibinitperiod},
+           given={R.\bibnamedelimi V.},
+           giveni={R\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{fullhash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{fullhashraw}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{bibnamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{authorbibnamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{authornamehash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{authorfullhash}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \strng{authorfullhashraw}{8d6f15f2de5405f07c3fa4cf3d60938c}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{RDF Schema 1.1}
+      \field{year}{2014}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/rdf-schema/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/rdf-schema/
+      \endverb
+    \endentry
+    \entry{protege}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=fc0c42b1e69e9c6175d599ff7388248c}{%
+           family={CBIR},
+           familyi={C\bibinitperiod},
+           given={Stanford},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{fc0c42b1e69e9c6175d599ff7388248c}
+      \strng{fullhash}{fc0c42b1e69e9c6175d599ff7388248c}
+      \strng{fullhashraw}{fc0c42b1e69e9c6175d599ff7388248c}
+      \strng{bibnamehash}{fc0c42b1e69e9c6175d599ff7388248c}
+      \strng{authorbibnamehash}{fc0c42b1e69e9c6175d599ff7388248c}
+      \strng{authornamehash}{fc0c42b1e69e9c6175d599ff7388248c}
+      \strng{authorfullhash}{fc0c42b1e69e9c6175d599ff7388248c}
+      \strng{authorfullhashraw}{fc0c42b1e69e9c6175d599ff7388248c}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Protégé}
+      \verb{urlraw}
+      \verb https://protege.stanford.edu
+      \endverb
+      \verb{url}
+      \verb https://protege.stanford.edu
+      \endverb
+    \endentry
+    \entry{sparql_generate}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=5e5aa78bb2e8e8d4c886fbc742f4e2dd}{%
+           family={CG},
+           familyi={C\bibinitperiod},
+           given={SPARQL-Generate},
+           giveni={S\bibinithyphendelim G\bibinitperiod}}}%
+      }
+      \strng{namehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
+      \strng{fullhash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
+      \strng{fullhashraw}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
+      \strng{bibnamehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
+      \strng{authorbibnamehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
+      \strng{authornamehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
+      \strng{authorfullhash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
+      \strng{authorfullhashraw}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{SPARQL-Generate}
+      \verb{urlraw}
+      \verb https://github.com/SPARQL-Generate
+      \endverb
+      \verb{url}
+      \verb https://github.com/SPARQL-Generate
       \endverb
     \endentry
     \entry{boulakia2017workflows}{article}{}{}
@@ -507,7 +555,6 @@
       \strng{authornamehash}{76ef1feb86630f8c862a8e596c128ab7}
       \strng{authorfullhash}{db644f4b48159cedb4c3fd0c7dbfc79c}
       \strng{authorfullhashraw}{db644f4b48159cedb4c3fd0c7dbfc79c}
-      \field{labelalpha}{CBC+17}
       \field{sortinit}{C}
       \field{sortinithash}{4d103a86280481745c9c897c925753c0}
       \field{labelnamesource}{author}
@@ -520,64 +567,6 @@
       \range{pages}{15}
       \verb{doi}
       \verb 10.1016/j.future.2017.01.012
-      \endverb
-    \endentry
-    \entry{protege}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=fc0c42b1e69e9c6175d599ff7388248c}{%
-           family={CBIR},
-           familyi={C\bibinitperiod},
-           given={Stanford},
-           giveni={S\bibinitperiod}}}%
-      }
-      \strng{namehash}{fc0c42b1e69e9c6175d599ff7388248c}
-      \strng{fullhash}{fc0c42b1e69e9c6175d599ff7388248c}
-      \strng{fullhashraw}{fc0c42b1e69e9c6175d599ff7388248c}
-      \strng{bibnamehash}{fc0c42b1e69e9c6175d599ff7388248c}
-      \strng{authorbibnamehash}{fc0c42b1e69e9c6175d599ff7388248c}
-      \strng{authornamehash}{fc0c42b1e69e9c6175d599ff7388248c}
-      \strng{authorfullhash}{fc0c42b1e69e9c6175d599ff7388248c}
-      \strng{authorfullhashraw}{fc0c42b1e69e9c6175d599ff7388248c}
-      \field{labelalpha}{CBI}
-      \field{sortinit}{C}
-      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Protégé}
-      \verb{urlraw}
-      \verb https://protege.stanford.edu
-      \endverb
-      \verb{url}
-      \verb https://protege.stanford.edu
-      \endverb
-    \endentry
-    \entry{sparql_generate}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=5e5aa78bb2e8e8d4c886fbc742f4e2dd}{%
-           family={CG},
-           familyi={C\bibinitperiod},
-           given={SPARQL-Generate},
-           giveni={S\bibinithyphendelim G\bibinitperiod}}}%
-      }
-      \strng{namehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \strng{fullhash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \strng{fullhashraw}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \strng{bibnamehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \strng{authorbibnamehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \strng{authornamehash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \strng{authorfullhash}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \strng{authorfullhashraw}{5e5aa78bb2e8e8d4c886fbc742f4e2dd}
-      \field{labelalpha}{CG}
-      \field{sortinit}{C}
-      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{SPARQL-Generate}
-      \verb{urlraw}
-      \verb https://github.com/SPARQL-Generate
-      \endverb
-      \verb{url}
-      \verb https://github.com/SPARQL-Generate
       \endverb
     \endentry
     \entry{rdf_concepts2014}{misc}{}{}
@@ -609,7 +598,6 @@
       \strng{authornamehash}{239617b5251160922f9c0eb4e93d3c6d}
       \strng{authorfullhash}{6150123d390d138e88985af00327f937}
       \strng{authorfullhashraw}{6150123d390d138e88985af00327f937}
-      \field{labelalpha}{CWL14}
       \field{sortinit}{C}
       \field{sortinithash}{4d103a86280481745c9c897c925753c0}
       \field{labelnamesource}{author}
@@ -649,7 +637,6 @@
       \strng{authornamehash}{f54a4724f9174be49115fc023b4e28df}
       \strng{authorfullhash}{f730a58a33e2b5282c076a36a1ae779f}
       \strng{authorfullhashraw}{f730a58a33e2b5282c076a36a1ae779f}
-      \field{labelalpha}{DSC12}
       \field{sortinit}{D}
       \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
       \field{labelnamesource}{author}
@@ -700,7 +687,6 @@
       \strng{authornamehash}{55791eb457de748943292c6cf0c6a2d1}
       \strng{authorfullhash}{3e54111004db096a435f3260ee7190dd}
       \strng{authorfullhashraw}{3e54111004db096a435f3260ee7190dd}
-      \field{labelalpha}{DVC+14}
       \field{sortinit}{D}
       \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
       \field{labelnamesource}{author}
@@ -708,6 +694,34 @@
       \field{booktitle}{7th Workshop on Linked Data on the Web}
       \field{title}{RML: A Generic Language for Integrated RDF Mappings of Heterogeneous Data}
       \field{year}{2014}
+    \endentry
+    \entry{apache_jena}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=d4a5bef067a1f1bba1782027ad219e93}{%
+           family={Foundation},
+           familyi={F\bibinitperiod},
+           given={Apache\bibnamedelima Software},
+           giveni={A\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \strng{namehash}{d4a5bef067a1f1bba1782027ad219e93}
+      \strng{fullhash}{d4a5bef067a1f1bba1782027ad219e93}
+      \strng{fullhashraw}{d4a5bef067a1f1bba1782027ad219e93}
+      \strng{bibnamehash}{d4a5bef067a1f1bba1782027ad219e93}
+      \strng{authorbibnamehash}{d4a5bef067a1f1bba1782027ad219e93}
+      \strng{authornamehash}{d4a5bef067a1f1bba1782027ad219e93}
+      \strng{authorfullhash}{d4a5bef067a1f1bba1782027ad219e93}
+      \strng{authorfullhashraw}{d4a5bef067a1f1bba1782027ad219e93}
+      \field{sortinit}{F}
+      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Apache Jena}
+      \verb{urlraw}
+      \verb https://jena.apache.org/
+      \endverb
+      \verb{url}
+      \verb https://jena.apache.org/
+      \endverb
     \endentry
     \entry{cytoscapejs}{article}{}{}
       \name{author}{6}{}{%
@@ -750,7 +764,6 @@
       \strng{authornamehash}{dbefdc81a13de8ab69fa12af7fa9b666}
       \strng{authorfullhash}{51aa87083466a24051a7a3663c713884}
       \strng{authorfullhashraw}{51aa87083466a24051a7a3663c713884}
-      \field{labelalpha}{FLH+16}
       \field{sortinit}{F}
       \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
       \field{labelnamesource}{author}
@@ -770,35 +783,6 @@
       \endverb
       \verb{url}
       \verb https://js.cytoscape.org/
-      \endverb
-    \endentry
-    \entry{apache_jena}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=d4a5bef067a1f1bba1782027ad219e93}{%
-           family={Foundation},
-           familyi={F\bibinitperiod},
-           given={Apache\bibnamedelima Software},
-           giveni={A\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
-      }
-      \strng{namehash}{d4a5bef067a1f1bba1782027ad219e93}
-      \strng{fullhash}{d4a5bef067a1f1bba1782027ad219e93}
-      \strng{fullhashraw}{d4a5bef067a1f1bba1782027ad219e93}
-      \strng{bibnamehash}{d4a5bef067a1f1bba1782027ad219e93}
-      \strng{authorbibnamehash}{d4a5bef067a1f1bba1782027ad219e93}
-      \strng{authornamehash}{d4a5bef067a1f1bba1782027ad219e93}
-      \strng{authorfullhash}{d4a5bef067a1f1bba1782027ad219e93}
-      \strng{authorfullhashraw}{d4a5bef067a1f1bba1782027ad219e93}
-      \field{labelalpha}{Fou}
-      \field{sortinit}{F}
-      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Apache Jena}
-      \verb{urlraw}
-      \verb https://jena.apache.org/
-      \endverb
-      \verb{url}
-      \verb https://jena.apache.org/
       \endverb
     \endentry
     \entry{cedar_workbench}{article}{}{}
@@ -829,7 +813,6 @@
       \strng{authornamehash}{bf195392392125d1be40e7fbee30a62b}
       \strng{authorfullhash}{c1642b60ee9140f0aa8862cbbfb9f87a}
       \strng{authorfullhashraw}{c1642b60ee9140f0aa8862cbbfb9f87a}
-      \field{labelalpha}{GOM+19}
       \field{sortinit}{G}
       \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
       \field{labelnamesource}{author}
@@ -857,7 +840,6 @@
       \strng{authornamehash}{294bb1c0a95c945d393072f5814f9a92}
       \strng{authorfullhash}{294bb1c0a95c945d393072f5814f9a92}
       \strng{authorfullhashraw}{294bb1c0a95c945d393072f5814f9a92}
-      \field{labelalpha}{Gru93}
       \field{sortinit}{G}
       \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
       \field{labelnamesource}{author}
@@ -886,7 +868,6 @@
       \strng{authornamehash}{129098e814fb9141e381f6b3068dd41c}
       \strng{authorfullhash}{129098e814fb9141e381f6b3068dd41c}
       \strng{authorfullhashraw}{129098e814fb9141e381f6b3068dd41c}
-      \field{labelalpha}{Hav23}
       \field{sortinit}{H}
       \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
       \field{labelnamesource}{author}
@@ -1003,7 +984,6 @@
       \strng{authornamehash}{d5ce211d54ee18055922d1ccf1a63ea0}
       \strng{authorfullhash}{f2311051bb070d887f7bf79203c6dc80}
       \strng{authorfullhashraw}{f2311051bb070d887f7bf79203c6dc80}
-      \field{labelalpha}{HBC+21}
       \field{sortinit}{H}
       \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
       \field{labelnamesource}{author}
@@ -1055,7 +1035,6 @@
       \strng{authornamehash}{cd28fe9acdb4c732b1022703d3b9ad3e}
       \strng{authorfullhash}{ade4cd47ff23846bea09a69bf598e4f9}
       \strng{authorfullhashraw}{ade4cd47ff23846bea09a69bf598e4f9}
-      \field{labelalpha}{HGN+14}
       \field{sortinit}{H}
       \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
       \field{labelnamesource}{author}
@@ -1080,65 +1059,12 @@
       \strng{authornamehash}{58e17288994ab8b9e3c26ba0b4ea44bb}
       \strng{authorfullhash}{58e17288994ab8b9e3c26ba0b4ea44bb}
       \strng{authorfullhashraw}{58e17288994ab8b9e3c26ba0b4ea44bb}
-      \field{labelalpha}{ISI20}
       \field{sortinit}{I}
       \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Karma: A Data Integration Tool for Mapping Structured Data to RDF}
       \field{year}{2020}
-    \endentry
-    \entry{janowicz2015geospatial}{article}{}{}
-      \name{author}{5}{}{%
-        {{hash=f8032db780b653246bf029dcbffb6859}{%
-           family={Janowicz},
-           familyi={J\bibinitperiod},
-           given={Krzysztof},
-           giveni={K\bibinitperiod}}}%
-        {{hash=f5f9e34f0f94cb29697bb1ea72190579}{%
-           family={Haller},
-           familyi={H\bibinitperiod},
-           given={Armin},
-           giveni={A\bibinitperiod}}}%
-        {{hash=9739cb225b25807f7d9c9dd037f3ae2d}{%
-           family={Cox},
-           familyi={C\bibinitperiod},
-           given={Simon\bibnamedelimb J.\bibnamedelimi D.},
-           giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
-        {{hash=efb04a9f7ce7ef0345c2ff647f20cbf3}{%
-           family={Le\bibnamedelima Phuoc},
-           familyi={L\bibinitperiod\bibinitdelim P\bibinitperiod},
-           given={Danh},
-           giveni={D\bibinitperiod}}}%
-        {{hash=36ea51918966dde7b9dd325ba6f9147b}{%
-           family={Lefrançois},
-           familyi={L\bibinitperiod},
-           given={Maxime},
-           giveni={M\bibinitperiod}}}%
-      }
-      \strng{namehash}{554eabe32aee0c682029595d36dd779c}
-      \strng{fullhash}{d5b1c5b0ee5f28333028750f7e9b9203}
-      \strng{fullhashraw}{d5b1c5b0ee5f28333028750f7e9b9203}
-      \strng{bibnamehash}{d5b1c5b0ee5f28333028750f7e9b9203}
-      \strng{authorbibnamehash}{d5b1c5b0ee5f28333028750f7e9b9203}
-      \strng{authornamehash}{554eabe32aee0c682029595d36dd779c}
-      \strng{authorfullhash}{d5b1c5b0ee5f28333028750f7e9b9203}
-      \strng{authorfullhashraw}{d5b1c5b0ee5f28333028750f7e9b9203}
-      \field{labelalpha}{JHC+15}
-      \field{sortinit}{J}
-      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{AI Magazine}
-      \field{number}{1}
-      \field{title}{Why the Data Train Needs Semantic Rails}
-      \field{volume}{36}
-      \field{year}{2015}
-      \field{pages}{5\bibrangedash 14}
-      \range{pages}{10}
-      \verb{doi}
-      \verb 10.1609/aimag.v36i1.2568
-      \endverb
     \endentry
     \entry{jackson2021obofoundry}{article}{}{}
       \name{author}{25}{}{%
@@ -1276,7 +1202,6 @@
       \strng{authornamehash}{012cb67e3419503100a28f24f9141d1b}
       \strng{authorfullhash}{3522f701919860f9b84d7903f12cad9b}
       \strng{authorfullhashraw}{3522f701919860f9b84d7903f12cad9b}
-      \field{labelalpha}{JMO+21}
       \field{sortinit}{J}
       \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
       \field{labelnamesource}{author}
@@ -1289,6 +1214,57 @@
       \range{pages}{-1}
       \verb{doi}
       \verb 10.1093/database/baab069
+      \endverb
+    \endentry
+    \entry{janowicz2015geospatial}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=f8032db780b653246bf029dcbffb6859}{%
+           family={Janowicz},
+           familyi={J\bibinitperiod},
+           given={Krzysztof},
+           giveni={K\bibinitperiod}}}%
+        {{hash=f5f9e34f0f94cb29697bb1ea72190579}{%
+           family={Haller},
+           familyi={H\bibinitperiod},
+           given={Armin},
+           giveni={A\bibinitperiod}}}%
+        {{hash=9739cb225b25807f7d9c9dd037f3ae2d}{%
+           family={Cox},
+           familyi={C\bibinitperiod},
+           given={Simon\bibnamedelimb J.\bibnamedelimi D.},
+           giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=efb04a9f7ce7ef0345c2ff647f20cbf3}{%
+           family={Le\bibnamedelima Phuoc},
+           familyi={L\bibinitperiod\bibinitdelim P\bibinitperiod},
+           given={Danh},
+           giveni={D\bibinitperiod}}}%
+        {{hash=36ea51918966dde7b9dd325ba6f9147b}{%
+           family={Lefrançois},
+           familyi={L\bibinitperiod},
+           given={Maxime},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{554eabe32aee0c682029595d36dd779c}
+      \strng{fullhash}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{fullhashraw}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{bibnamehash}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{authorbibnamehash}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{authornamehash}{554eabe32aee0c682029595d36dd779c}
+      \strng{authorfullhash}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \strng{authorfullhashraw}{d5b1c5b0ee5f28333028750f7e9b9203}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{AI Magazine}
+      \field{number}{1}
+      \field{title}{Why the Data Train Needs Semantic Rails}
+      \field{volume}{36}
+      \field{year}{2015}
+      \field{pages}{5\bibrangedash 14}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1609/aimag.v36i1.2568
       \endverb
     \endentry
     \entry{rdflib_docs}{misc}{}{}
@@ -1305,7 +1281,6 @@
       \strng{authornamehash}{4c32911b73a37febfc26c467584764d7}
       \strng{authorfullhash}{4c32911b73a37febfc26c467584764d7}
       \strng{authorfullhashraw}{4c32911b73a37febfc26c467584764d7}
-      \field{labelalpha}{lin26}
       \field{sortinit}{l}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{labelnamesource}{author}
@@ -1313,10 +1288,10 @@
       \field{title}{rdflib.js Documentation}
       \field{year}{2026}
       \verb{urlraw}
-      \verb https://linkeddata.github.io/rdflib.js/
+      \verb https://linkeddata.github.io/rdflib.js/doc/
       \endverb
       \verb{url}
-      \verb https://linkeddata.github.io/rdflib.js/
+      \verb https://linkeddata.github.io/rdflib.js/doc/
       \endverb
     \endentry
     \entry{linkml}{article}{}{}
@@ -1347,7 +1322,6 @@
       \strng{authornamehash}{29ad84f5f862a4638e28cc4bdd4954fb}
       \strng{authorfullhash}{9672d7427db42dc69040a3a728166ee4}
       \strng{authorfullhashraw}{9672d7427db42dc69040a3a728166ee4}
-      \field{labelalpha}{MSU+21}
       \field{sortinit}{M}
       \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
       \field{labelnamesource}{author}
@@ -1398,7 +1372,6 @@
       \strng{authorfullhash}{5ed67bfee9aca002fbfd4548119bf478}
       \strng{authorfullhashraw}{5ed67bfee9aca002fbfd4548119bf478}
       \field{extraname}{1}
-      \field{labelalpha}{NBX+24}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
       \field{labelnamesource}{author}
@@ -1411,6 +1384,46 @@
       \range{pages}{9}
       \verb{doi}
       \verb 10.1007/s13222-024-00472-7
+      \endverb
+    \endentry
+    \entry{ai_assisted_schema_mapping_2025}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=5c1b2d3efbb1cacb955c427c5bf99eef}{%
+           family={Neubauer},
+           familyi={N\bibinitperiod},
+           given={F.},
+           giveni={F\bibinitperiod}}}%
+        {{hash=728e4437600578a369dfc048dcb1e747}{%
+           family={Uekermann},
+           familyi={U\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod}}}%
+        {{hash=2bbd5d89fae8f149e573ae5bda2d0e58}{%
+           family={Pleiss},
+           familyi={P\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{a782f77109ef778d362377a5076509db}
+      \strng{fullhash}{fe0041e88001b49796ba2524453bfe6b}
+      \strng{fullhashraw}{fe0041e88001b49796ba2524453bfe6b}
+      \strng{bibnamehash}{fe0041e88001b49796ba2524453bfe6b}
+      \strng{authorbibnamehash}{fe0041e88001b49796ba2524453bfe6b}
+      \strng{authornamehash}{a782f77109ef778d362377a5076509db}
+      \strng{authorfullhash}{fe0041e88001b49796ba2524453bfe6b}
+      \strng{authorfullhashraw}{fe0041e88001b49796ba2524453bfe6b}
+      \field{extraname}{2}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{28th ACM/IEEE Int. Conf. Model Driven Eng. Languages and Systems Companion (MODELS-C)}
+      \field{title}{AI-assisted JSON Schema Creation and Mapping}
+      \field{year}{2025}
+      \field{pages}{79\bibrangedash 83}
+      \range{pages}{5}
+      \verb{doi}
+      \verb 10.1109/MODELS-C68889.2025.00019
       \endverb
     \endentry
     \entry{neubauer2026data}{article}{}{}
@@ -1466,42 +1479,13 @@
       \strng{authornamehash}{926ca14259e9aca676d600426b174a2a}
       \strng{authorfullhash}{0f8c6dc958dee37b9532b7e97c42550d}
       \strng{authorfullhashraw}{0f8c6dc958dee37b9532b7e97c42550d}
-      \field{extraname}{2}
-      \field{labelalpha}{NEB+26}
+      \field{extraname}{3}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Data-Model-Driven Management and Analysis of MOF Synthesis Data}
       \field{year}{2026}
-    \endentry
-    \entry{metadata4ing_ontology}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=c868af1be6babe3bc462a90a21c38dda}{%
-           family={{NFDI4Ing Consortium}},
-           familyi={N\bibinitperiod}}}%
-      }
-      \strng{namehash}{c868af1be6babe3bc462a90a21c38dda}
-      \strng{fullhash}{c868af1be6babe3bc462a90a21c38dda}
-      \strng{fullhashraw}{c868af1be6babe3bc462a90a21c38dda}
-      \strng{bibnamehash}{c868af1be6babe3bc462a90a21c38dda}
-      \strng{authorbibnamehash}{c868af1be6babe3bc462a90a21c38dda}
-      \strng{authornamehash}{c868af1be6babe3bc462a90a21c38dda}
-      \strng{authorfullhash}{c868af1be6babe3bc462a90a21c38dda}
-      \strng{authorfullhashraw}{c868af1be6babe3bc462a90a21c38dda}
-      \field{labelalpha}{NFD22}
-      \field{sortinit}{N}
-      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Metadata4Ing Ontology}
-      \field{year}{2022}
-      \verb{urlraw}
-      \verb https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/
-      \endverb
-      \verb{url}
-      \verb https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/
-      \endverb
     \endentry
     \entry{metaconfigurator2025datamodels}{inproceedings}{}{}
       \name{author}{3}{}{%
@@ -1532,8 +1516,7 @@
       \strng{authornamehash}{926ca14259e9aca676d600426b174a2a}
       \strng{authorfullhash}{d19ca2262e67712bd506409da7180da8}
       \strng{authorfullhashraw}{d19ca2262e67712bd506409da7180da8}
-      \field{extraname}{3}
-      \field{labelalpha}{NPU25}
+      \field{extraname}{4}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
       \field{labelnamesource}{author}
@@ -1553,45 +1536,31 @@
       \verb https://dl.gi.de/handle/20.500.12116/45927
       \endverb
     \endentry
-    \entry{ai_assisted_schema_mapping_2025}{inproceedings}{}{}
-      \name{author}{3}{}{%
-        {{hash=5c1b2d3efbb1cacb955c427c5bf99eef}{%
-           family={Neubauer},
-           familyi={N\bibinitperiod},
-           given={F.},
-           giveni={F\bibinitperiod}}}%
-        {{hash=728e4437600578a369dfc048dcb1e747}{%
-           family={Uekermann},
-           familyi={U\bibinitperiod},
-           given={B.},
-           giveni={B\bibinitperiod}}}%
-        {{hash=2bbd5d89fae8f149e573ae5bda2d0e58}{%
-           family={Pleiss},
-           familyi={P\bibinitperiod},
-           given={J.},
-           giveni={J\bibinitperiod}}}%
+    \entry{metadata4ing_ontology}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=c868af1be6babe3bc462a90a21c38dda}{%
+           family={{NFDI4Ing Consortium}},
+           familyi={N\bibinitperiod}}}%
       }
-      \strng{namehash}{a782f77109ef778d362377a5076509db}
-      \strng{fullhash}{fe0041e88001b49796ba2524453bfe6b}
-      \strng{fullhashraw}{fe0041e88001b49796ba2524453bfe6b}
-      \strng{bibnamehash}{fe0041e88001b49796ba2524453bfe6b}
-      \strng{authorbibnamehash}{fe0041e88001b49796ba2524453bfe6b}
-      \strng{authornamehash}{a782f77109ef778d362377a5076509db}
-      \strng{authorfullhash}{fe0041e88001b49796ba2524453bfe6b}
-      \strng{authorfullhashraw}{fe0041e88001b49796ba2524453bfe6b}
-      \field{extraname}{4}
-      \field{labelalpha}{NUP25}
+      \strng{namehash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{fullhash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{fullhashraw}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{bibnamehash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{authorbibnamehash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{authornamehash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{authorfullhash}{c868af1be6babe3bc462a90a21c38dda}
+      \strng{authorfullhashraw}{c868af1be6babe3bc462a90a21c38dda}
       \field{sortinit}{N}
       \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{booktitle}{28th ACM/IEEE Int. Conf. Model Driven Eng. Languages and Systems Companion (MODELS-C)}
-      \field{title}{AI-assisted JSON Schema Creation and Mapping}
-      \field{year}{2025}
-      \field{pages}{79\bibrangedash 83}
-      \range{pages}{5}
-      \verb{doi}
-      \verb 10.1109/MODELS-C68889.2025.00019
+      \field{title}{Metadata4Ing Ontology}
+      \field{year}{2022}
+      \verb{urlraw}
+      \verb https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/
+      \endverb
+      \verb{url}
+      \verb https://nfdi4ing.pages.rwth-aachen.de/metadata4ing/metadata4ing/
       \endverb
     \endentry
     \entry{graphdb}{misc}{}{}
@@ -1608,7 +1577,6 @@
       \strng{authornamehash}{dffe7dd6f49490d80de4a82fd13d8179}
       \strng{authorfullhash}{dffe7dd6f49490d80de4a82fd13d8179}
       \strng{authorfullhashraw}{dffe7dd6f49490d80de4a82fd13d8179}
-      \field{labelalpha}{Ont}
       \field{sortinit}{O}
       \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
       \field{labelnamesource}{author}
@@ -1637,7 +1605,6 @@
       \strng{authornamehash}{3bcdaa3c66a4c1d8f23062f8369f7afc}
       \strng{authorfullhash}{3bcdaa3c66a4c1d8f23062f8369f7afc}
       \strng{authorfullhashraw}{3bcdaa3c66a4c1d8f23062f8369f7afc}
-      \field{labelalpha}{Pro}
       \field{sortinit}{P}
       \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
       \field{labelnamesource}{author}
@@ -1674,7 +1641,6 @@
       \strng{authornamehash}{a60af841084888d9205610435d8f0182}
       \strng{authorfullhash}{a60af841084888d9205610435d8f0182}
       \strng{authorfullhashraw}{a60af841084888d9205610435d8f0182}
-      \field{labelalpha}{PS13}
       \field{sortinit}{P}
       \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
       \field{labelnamesource}{author}
@@ -1702,7 +1668,6 @@
       \strng{authornamehash}{8019d9b72f11b4807c8f79b4157d60b9}
       \strng{authorfullhash}{8019d9b72f11b4807c8f79b4157d60b9}
       \strng{authorfullhashraw}{8019d9b72f11b4807c8f79b4157d60b9}
-      \field{labelalpha}{RDF}
       \field{sortinit}{R}
       \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
       \field{labelnamesource}{author}
@@ -1729,7 +1694,6 @@
       \strng{authornamehash}{da95a362718d353c356c18582762014f}
       \strng{authorfullhash}{da95a362718d353c356c18582762014f}
       \strng{authorfullhashraw}{da95a362718d353c356c18582762014f}
-      \field{labelalpha}{Red}
       \field{sortinit}{R}
       \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
       \field{labelnamesource}{author}
@@ -1759,7 +1723,6 @@
       \strng{authornamehash}{89b31aa72890b3c7d597d2762064ed5b}
       \strng{authorfullhash}{89b31aa72890b3c7d597d2762064ed5b}
       \strng{authorfullhashraw}{89b31aa72890b3c7d597d2762064ed5b}
-      \field{labelalpha}{RO26}
       \field{sortinit}{R}
       \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
       \field{labelnamesource}{author}
@@ -1772,35 +1735,6 @@
       \endverb
       \verb{url}
       \verb http://purl.obolibrary.org/obo/chmo.owl
-      \endverb
-    \endentry
-    \entry{semtk}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=3e6a6f24c2db79cd880154f9292e5774}{%
-           family={Semantic\bibnamedelimb Computing\bibnamedelimb Research\bibnamedelima Group},
-           familyi={S\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim R\bibinitperiod\bibinitdelim G\bibinitperiod},
-           given={Wright\bibnamedelimb State\bibnamedelima University},
-           giveni={W\bibinitperiod\bibinitdelim S\bibinitperiod\bibinitdelim U\bibinitperiod}}}%
-      }
-      \strng{namehash}{3e6a6f24c2db79cd880154f9292e5774}
-      \strng{fullhash}{3e6a6f24c2db79cd880154f9292e5774}
-      \strng{fullhashraw}{3e6a6f24c2db79cd880154f9292e5774}
-      \strng{bibnamehash}{3e6a6f24c2db79cd880154f9292e5774}
-      \strng{authorbibnamehash}{3e6a6f24c2db79cd880154f9292e5774}
-      \strng{authornamehash}{3e6a6f24c2db79cd880154f9292e5774}
-      \strng{authorfullhash}{3e6a6f24c2db79cd880154f9292e5774}
-      \strng{authorfullhashraw}{3e6a6f24c2db79cd880154f9292e5774}
-      \field{labelalpha}{Sem}
-      \field{sortinit}{S}
-      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{SemTK: Semantic Toolkit}
-      \verb{urlraw}
-      \verb https://semtk.org/
-      \endverb
-      \verb{url}
-      \verb https://semtk.org/
       \endverb
     \endentry
     \entry{jsonld2014}{misc}{}{}
@@ -1832,7 +1766,6 @@
       \strng{authornamehash}{259371d4ff2a017f622765ec7a277a8d}
       \strng{authorfullhash}{2d04803448e59b62c7be4c7acf65676b}
       \strng{authorfullhashraw}{2d04803448e59b62c7be4c7acf65676b}
-      \field{labelalpha}{SKL14}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{labelnamesource}{author}
@@ -1890,7 +1823,6 @@
       \strng{authornamehash}{5a0070447690dfa43b3cf0115cc75266}
       \strng{authorfullhash}{e6449cdd1d18d855677126d86645af28}
       \strng{authorfullhashraw}{e6449cdd1d18d855677126d86645af28}
-      \field{labelalpha}{URR+26}
       \field{sortinit}{U}
       \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
       \field{labelnamesource}{author}
@@ -1928,7 +1860,6 @@
       \strng{authornamehash}{640027b15558657c0a6a1b6b64006a5a}
       \strng{authorfullhash}{640027b15558657c0a6a1b6b64006a5a}
       \strng{authorfullhashraw}{640027b15558657c0a6a1b6b64006a5a}
-      \field{labelalpha}{Vc26}
       \field{sortinit}{V}
       \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
       \field{labelnamesource}{author}
@@ -1985,7 +1916,6 @@
       \strng{authornamehash}{079b2a7edb061e53e21bfbfa440d39f8}
       \strng{authorfullhash}{5edb0c241bd648b5428522b47d3ea6e8}
       \strng{authorfullhashraw}{5edb0c241bd648b5428522b47d3ea6e8}
-      \field{labelalpha}{VKM+25}
       \field{sortinit}{V}
       \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
       \field{labelnamesource}{author}
@@ -1998,6 +1928,64 @@
       \range{pages}{1}
       \verb{doi}
       \verb 10.1038/s41597-025-05126-1
+      \endverb
+    \endentry
+    \entry{shacl_standard}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=446a1ae6601a5c59360c7d591c3992da}{%
+           family={W3C},
+           familyi={W\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {W3C Recommendation}%
+      }
+      \strng{namehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{fullhash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{fullhashraw}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{bibnamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authorbibnamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authornamehash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authorfullhash}{446a1ae6601a5c59360c7d591c3992da}
+      \strng{authorfullhashraw}{446a1ae6601a5c59360c7d591c3992da}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Shapes Constraint Language (SHACL)}
+      \field{year}{2017}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/shacl/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/shacl/
+      \endverb
+    \endentry
+    \entry{jsonld_playground}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=e98011534a9779c6c3cdea80268131ae}{%
+           family={{W3C JSON-LD Community Group}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{fullhash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{fullhashraw}{e98011534a9779c6c3cdea80268131ae}
+      \strng{bibnamehash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{authorbibnamehash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{authornamehash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{authorfullhash}{e98011534a9779c6c3cdea80268131ae}
+      \strng{authorfullhashraw}{e98011534a9779c6c3cdea80268131ae}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Online tool maintained by the W3C JSON-LD Community Group}
+      \field{title}{JSON-LD Playground}
+      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://json-ld.org/playground/
+      \endverb
+      \verb{url}
+      \verb https://json-ld.org/playground/
       \endverb
     \endentry
     \entry{owl2_overview}{misc}{}{}
@@ -2018,10 +2006,8 @@
       \strng{authorfullhash}{cb320ec3867effa6aeda100c390936b2}
       \strng{authorfullhashraw}{cb320ec3867effa6aeda100c390936b2}
       \field{extraname}{1}
-      \field{labelalpha}{W3C12}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
-      \field{extraalpha}{1}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{OWL 2 Web Ontology Language Document Overview (Second Edition)}
@@ -2051,10 +2037,8 @@
       \strng{authorfullhash}{cb320ec3867effa6aeda100c390936b2}
       \strng{authorfullhashraw}{cb320ec3867effa6aeda100c390936b2}
       \field{extraname}{2}
-      \field{labelalpha}{W3C12}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
-      \field{extraalpha}{2}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{OWL 2 Web Ontology Language Primer (Second Edition)}
@@ -2064,66 +2048,6 @@
       \endverb
       \verb{url}
       \verb https://www.w3.org/TR/owl2-primer/
-      \endverb
-    \endentry
-    \entry{shacl_standard}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=446a1ae6601a5c59360c7d591c3992da}{%
-           family={W3C},
-           familyi={W\bibinitperiod}}}%
-      }
-      \list{publisher}{1}{%
-        {W3C Recommendation}%
-      }
-      \strng{namehash}{446a1ae6601a5c59360c7d591c3992da}
-      \strng{fullhash}{446a1ae6601a5c59360c7d591c3992da}
-      \strng{fullhashraw}{446a1ae6601a5c59360c7d591c3992da}
-      \strng{bibnamehash}{446a1ae6601a5c59360c7d591c3992da}
-      \strng{authorbibnamehash}{446a1ae6601a5c59360c7d591c3992da}
-      \strng{authornamehash}{446a1ae6601a5c59360c7d591c3992da}
-      \strng{authorfullhash}{446a1ae6601a5c59360c7d591c3992da}
-      \strng{authorfullhashraw}{446a1ae6601a5c59360c7d591c3992da}
-      \field{labelalpha}{W3C17}
-      \field{sortinit}{W}
-      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Shapes Constraint Language (SHACL)}
-      \field{year}{2017}
-      \verb{urlraw}
-      \verb https://www.w3.org/TR/shacl/
-      \endverb
-      \verb{url}
-      \verb https://www.w3.org/TR/shacl/
-      \endverb
-    \endentry
-    \entry{jsonld_playground}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=e98011534a9779c6c3cdea80268131ae}{%
-           family={{W3C JSON-LD Community Group}},
-           familyi={W\bibinitperiod}}}%
-      }
-      \strng{namehash}{e98011534a9779c6c3cdea80268131ae}
-      \strng{fullhash}{e98011534a9779c6c3cdea80268131ae}
-      \strng{fullhashraw}{e98011534a9779c6c3cdea80268131ae}
-      \strng{bibnamehash}{e98011534a9779c6c3cdea80268131ae}
-      \strng{authorbibnamehash}{e98011534a9779c6c3cdea80268131ae}
-      \strng{authornamehash}{e98011534a9779c6c3cdea80268131ae}
-      \strng{authorfullhash}{e98011534a9779c6c3cdea80268131ae}
-      \strng{authorfullhashraw}{e98011534a9779c6c3cdea80268131ae}
-      \field{labelalpha}{W3C23}
-      \field{sortinit}{W}
-      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{note}{Online tool maintained by the W3C JSON-LD Community Group}
-      \field{title}{JSON-LD Playground}
-      \field{year}{2023}
-      \verb{urlraw}
-      \verb https://json-ld.org/playground/
-      \endverb
-      \verb{url}
-      \verb https://json-ld.org/playground/
       \endverb
     \endentry
     \entry{wilkinson2025fairworkflows}{article}{}{}
@@ -2254,7 +2178,6 @@
       \strng{authornamehash}{467f1b9b2f5f3d0cdc2fa83940290eb7}
       \strng{authorfullhash}{e74762d4b38cbfee559e18306b5da17f}
       \strng{authorfullhashraw}{e74762d4b38cbfee559e18306b5da17f}
-      \field{labelalpha}{WAB+25}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
       \field{labelnamesource}{author}
@@ -2301,7 +2224,6 @@
       \strng{authornamehash}{08fcc539796ba506ca62c3af976b1e3f}
       \strng{authorfullhash}{2f5893eb99a1e0d04a1e247843194be3}
       \strng{authorfullhashraw}{2f5893eb99a1e0d04a1e247843194be3}
-      \field{labelalpha}{WAHD20}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
       \field{labelnamesource}{author}

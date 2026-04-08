@@ -45,7 +45,7 @@
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>labelalpha</bcf:key>
-      <bcf:value>1</bcf:value>
+      <bcf:value>0</bcf:value>
     </bcf:option>
     <bcf:option type="multivalued">
       <bcf:key>labelnamespec</bcf:key>
@@ -172,7 +172,7 @@
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>sortingtemplatename</bcf:key>
-      <bcf:value>anyt</bcf:value>
+      <bcf:value>nty</bcf:value>
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>sortsets</bcf:key>
@@ -288,7 +288,7 @@
     </bcf:option>
     <bcf:option type="singlevalued">
       <bcf:key>labelalpha</bcf:key>
-      <bcf:value>1</bcf:value>
+      <bcf:value>0</bcf:value>
     </bcf:option>
     <bcf:option type="multivalued">
       <bcf:key>labelnamespec</bcf:key>
@@ -2431,48 +2431,44 @@
     <bcf:citekey order="40" intorder="1">jsonld_playground</bcf:citekey>
     <bcf:citekey order="41" intorder="1">rdflib</bcf:citekey>
     <bcf:citekey order="41" intorder="2">redland</bcf:citekey>
-    <bcf:citekey order="42" intorder="1">semtk</bcf:citekey>
-    <bcf:citekey order="43" intorder="1">hogan2021knowledgegraphs</bcf:citekey>
-    <bcf:citekey order="44" intorder="1">janowicz2015geospatial</bcf:citekey>
-    <bcf:citekey order="45" intorder="1">jsonld2014</bcf:citekey>
-    <bcf:citekey order="46" intorder="1">das2012r2rml</bcf:citekey>
-    <bcf:citekey order="46" intorder="2">dimou2014rml</bcf:citekey>
-    <bcf:citekey order="47" intorder="1">metaconfigurator2024</bcf:citekey>
-    <bcf:citekey order="48" intorder="1">dimou2014rml</bcf:citekey>
-    <bcf:citekey order="49" intorder="1">codemirror</bcf:citekey>
-    <bcf:citekey order="50" intorder="1">jsonld2014</bcf:citekey>
+    <bcf:citekey order="42" intorder="1">hogan2021knowledgegraphs</bcf:citekey>
+    <bcf:citekey order="43" intorder="1">janowicz2015geospatial</bcf:citekey>
+    <bcf:citekey order="44" intorder="1">jsonld2014</bcf:citekey>
+    <bcf:citekey order="45" intorder="1">das2012r2rml</bcf:citekey>
+    <bcf:citekey order="45" intorder="2">dimou2014rml</bcf:citekey>
+    <bcf:citekey order="46" intorder="1">metaconfigurator2024</bcf:citekey>
+    <bcf:citekey order="47" intorder="1">dimou2014rml</bcf:citekey>
+    <bcf:citekey order="48" intorder="1">codemirror</bcf:citekey>
+    <bcf:citekey order="49" intorder="1">jsonld2014</bcf:citekey>
+    <bcf:citekey order="50" intorder="1">owl2_overview</bcf:citekey>
+    <bcf:citekey order="50" intorder="2">owl2_primer</bcf:citekey>
     <bcf:citekey order="51" intorder="1">owl2_overview</bcf:citekey>
     <bcf:citekey order="51" intorder="2">owl2_primer</bcf:citekey>
-    <bcf:citekey order="52" intorder="1">owl2_overview</bcf:citekey>
-    <bcf:citekey order="52" intorder="2">owl2_primer</bcf:citekey>
+    <bcf:citekey order="52" intorder="1">rdf_schema2014</bcf:citekey>
     <bcf:citekey order="53" intorder="1">rdf_schema2014</bcf:citekey>
-    <bcf:citekey order="54" intorder="1">rdf_schema2014</bcf:citekey>
-    <bcf:citekey order="55" intorder="1">owl2_overview</bcf:citekey>
-    <bcf:citekey order="55" intorder="2">owl2_primer</bcf:citekey>
+    <bcf:citekey order="54" intorder="1">owl2_overview</bcf:citekey>
+    <bcf:citekey order="54" intorder="2">owl2_primer</bcf:citekey>
+    <bcf:citekey order="55" intorder="1">rdflib_docs</bcf:citekey>
     <bcf:citekey order="56" intorder="1">rdflib_docs</bcf:citekey>
-    <bcf:citekey order="57" intorder="1">rdflib_docs</bcf:citekey>
-    <bcf:citekey order="58" intorder="1">comunica_query_sparql</bcf:citekey>
-    <bcf:citekey order="59" intorder="1">comunica_supported_specs</bcf:citekey>
-    <bcf:citekey order="60" intorder="1">codemirror</bcf:citekey>
-    <bcf:citekey order="61" intorder="1">sparqljs</bcf:citekey>
-    <bcf:citekey order="62" intorder="1">cytoscapejs</bcf:citekey>
-    <bcf:citekey order="63" intorder="1">neubauer2026data</bcf:citekey>
-    <bcf:citekey order="64" intorder="1">chmo_ontology</bcf:citekey>
-    <bcf:citekey order="65" intorder="1">obi2016</bcf:citekey>
-    <bcf:citekey order="65" intorder="2">jackson2021obofoundry</bcf:citekey>
+    <bcf:citekey order="57" intorder="1">comunica_query_sparql</bcf:citekey>
+    <bcf:citekey order="58" intorder="1">comunica_supported_specs</bcf:citekey>
+    <bcf:citekey order="59" intorder="1">codemirror</bcf:citekey>
+    <bcf:citekey order="60" intorder="1">sparqljs</bcf:citekey>
+    <bcf:citekey order="61" intorder="1">cytoscapejs</bcf:citekey>
+    <bcf:citekey order="62" intorder="1">neubauer2026data</bcf:citekey>
+    <bcf:citekey order="63" intorder="1">chmo_ontology</bcf:citekey>
+    <bcf:citekey order="64" intorder="1">obi2016</bcf:citekey>
+    <bcf:citekey order="64" intorder="2">jackson2021obofoundry</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
-  <bcf:sortingtemplate name="anyt">
+  <bcf:sortingtemplate name="nty">
     <bcf:sort order="1">
       <bcf:sortitem order="1">presort</bcf:sortitem>
     </bcf:sort>
-    <bcf:sort order="2">
-      <bcf:sortitem order="1">labelalpha</bcf:sortitem>
-    </bcf:sort>
-    <bcf:sort order="3" final="1">
+    <bcf:sort order="2" final="1">
       <bcf:sortitem order="1">sortkey</bcf:sortitem>
     </bcf:sort>
-    <bcf:sort order="4">
+    <bcf:sort order="3">
       <bcf:sortitem order="1">sortname</bcf:sortitem>
       <bcf:sortitem order="2">author</bcf:sortitem>
       <bcf:sortitem order="3">editor</bcf:sortitem>
@@ -2480,24 +2476,24 @@
       <bcf:sortitem order="5">sorttitle</bcf:sortitem>
       <bcf:sortitem order="6">title</bcf:sortitem>
     </bcf:sort>
+    <bcf:sort order="4">
+      <bcf:sortitem order="1">sorttitle</bcf:sortitem>
+      <bcf:sortitem order="2">title</bcf:sortitem>
+    </bcf:sort>
     <bcf:sort order="5">
       <bcf:sortitem order="1">sortyear</bcf:sortitem>
       <bcf:sortitem order="2">year</bcf:sortitem>
     </bcf:sort>
     <bcf:sort order="6">
-      <bcf:sortitem order="1">sorttitle</bcf:sortitem>
-      <bcf:sortitem order="2">title</bcf:sortitem>
-    </bcf:sort>
-    <bcf:sort order="7">
       <bcf:sortitem order="1">volume</bcf:sortitem>
       <bcf:sortitem literal="1" order="2">0</bcf:sortitem>
     </bcf:sort>
   </bcf:sortingtemplate>
   <!-- DATALISTS -->
   <bcf:datalist section="0"
-                name="anyt/global//global/global/global"
+                name="nty/global//global/global/global"
                 type="entry"
-                sortingtemplatename="anyt"
+                sortingtemplatename="nty"
                 sortingnamekeytemplatename="global"
                 labelprefix=""
                 uniquenametemplatename="global"

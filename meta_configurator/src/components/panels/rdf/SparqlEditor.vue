@@ -136,6 +136,7 @@ What is the average age of all people?" />
               stripedRows
               paginator
               frozenHeader
+              resizableColumns
               v-model:filters="filters"
               filterDisplay="menu"
               scrollHeight="flex"
