@@ -277,9 +277,19 @@
 % Code Listings
 \usepackage{listings}
 
-\definecolor{eclipseStrings}{RGB}{42,0.0,255}
-\definecolor{eclipseKeywords}{RGB}{127,0,85}
-\colorlet{numb}{magenta!60!black}
+% Unified color palette for all lstlisting styles
+\definecolor{lstBackground}{RGB}{245,245,250}
+\definecolor{lstNumber}{RGB}{0,0,0}
+\definecolor{lstKeyword}{RGB}{0,0,0}
+\definecolor{lstString}{RGB}{0,0,0}
+\definecolor{lstComment}{RGB}{0,0,0}
+\definecolor{lstIdentifier}{RGB}{0,0,0}
+\definecolor{lstPunctuation}{RGB}{0,0,0}
+
+% Legacy aliases used by older listing definitions
+\definecolor{eclipseStrings}{RGB}{0,0,0}
+\definecolor{eclipseKeywords}{RGB}{0,0,0}
+\colorlet{numb}{lstNumber}
 
 % JSON definition
 % Source: https://tex.stackexchange.com/a/433961/9075
@@ -322,10 +332,10 @@
   %
   basicstyle=\footnotesize\ttfamily,
   %
-  commentstyle=\slshape,
+  commentstyle=\color{lstComment}\slshape,
   %
   % default: \rmfamily
-  stringstyle=\ttfamily,
+  stringstyle=\color{lstString}\ttfamily,
   %
   breaklines=true,            % Zeilen werden umbrochen
   %
@@ -338,7 +348,7 @@
   %
   numbers=left,
   %
-  numberstyle=\tiny,
+  numberstyle=\tiny\color{lstNumber},
   %
   basewidth=.5em,
   %
@@ -469,9 +479,9 @@
 
 \lstset{
   basicstyle=\ttfamily\small,
-  keywordstyle=\color{blue},
-  commentstyle=\color{gray},
-  stringstyle=\color{red},
+  keywordstyle=\color{lstKeyword},
+  commentstyle=\color{lstComment},
+  stringstyle=\color{lstString},
   breaklines=true,
   frame=single
 }
@@ -669,15 +679,6 @@
 \usepackage[realmainfile]{currfile}
 \usepackage{tcolorbox}
 \tcbuselibrary{listings}
-% Unified color palette for all lstlisting styles
-\definecolor{lstBackground}{RGB}{245,245,250}
-\definecolor{lstNumber}{RGB}{0,0,0}
-\definecolor{lstKeyword}{RGB}{0,100,180}
-\definecolor{lstString}{RGB}{0,0,0}
-\definecolor{lstComment}{RGB}{0,0,0}
-\definecolor{lstIdentifier}{RGB}{80,0,120}
-\definecolor{lstPunctuation}{RGB}{0,0,0}
-
 % Define a reusable style for code listings
 \lstdefinestyle{json}{
     basicstyle=\ttfamily\scriptsize,  % monospaced and smaller
@@ -729,19 +730,19 @@
 }
 
 \lstdefinestyle{plaintext}{
-    basicstyle=\ttfamily\small\color{black},
+    basicstyle=\ttfamily\small\color{lstPunctuation},
     numbers=none,
     showstringspaces=false,
     breaklines=true,
     frame=single,
     backgroundcolor=\color{lstBackground},
-    stringstyle=\color{black},
-    commentstyle=\color{black},
-    keywordstyle=\color{black},
-    identifierstyle=\color{black},
-    numberstyle=\color{black},
+    stringstyle=\color{lstString},
+    commentstyle=\color{lstComment},
+    keywordstyle=\color{lstKeyword},
+    identifierstyle=\color{lstIdentifier},
+    numberstyle=\color{lstNumber},
     language={},
-    moredelim=[s][\color{black}]{0}{9},
+    moredelim=[s][\color{lstPunctuation}]{0}{9},
 }
 
 \lstdefinestyle{turtle}{
