@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  24 MAR 2026 12:02
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  9 APR 2026 10:29
  system commands enabled.
  file:line:error style messages enabled.
 **main-english.tex
@@ -9,8 +9,8 @@ Lua module: luaotfload 2024-12-03 v3.29 Lua based OpenType font support
 Lua module: lualibs 2023-07-13 v2.76 ConTeXt Lua standard libraries.
 Lua module: lualibs-extended 2023-07-13 v2.76 ConTeXt Lua libraries -- extended 
 collection.
-luaotfload | conf : Root cache directory is "build/.texmf-cache/luatex-cache/gen
-eric/names".
+luaotfload | conf : Root cache directory is "/tmp/texmf-cache/luatex-cache/gener
+ic/names".
 luaotfload | init : Loading fontloader "fontloader-2023-12-28.lua" from kpse-res
 olved path "/usr/local/texlive/2026/texmf-dist/tex/luatex/luaotfload/fontloader-
 2023-12-28.lua".
@@ -21,8 +21,8 @@ Inserting `luaotfload.node_processor' in `hpack_filter'.
 Inserting `luaotfload.glyph_stream' in `glyph_stream_provider'.
 Inserting `luaotfload.define_font' in `define_font'.
 Lua-only attribute luaotfload_color_attribute = 2
-luaotfload | conf : Root cache directory is "build/.texmf-cache/luatex-cache/gen
-eric/names".
+luaotfload | conf : Root cache directory is "/tmp/texmf-cache/luatex-cache/gener
+ic/names".
 Inserting `luaotfload.harf.strip_prefix' in `find_opentype_file'.
 Inserting `luaotfload.harf.strip_prefix' in `find_truetype_file'.
 Removing  `luaotfload.glyph_stream' from `glyph_stream_provider'.
@@ -90,8 +90,8 @@ Class scrbook Info: File `scrsize11pt.clo' used instead of
 (/usr/local/texlive/2026/texmf-dist/tex/latex/koma-script/scrsize11pt.clo
 File: scrsize11pt.clo 2026/02/02 v3.49.2 KOMA-Script font size class option (11
 pt)
-luaotfload | db : Font names database loaded from build/.texmf-cache/luatex-cach
-e/generic/names/luaotfload-names.luc.gz)
+luaotfload | db : Font names database loaded from /tmp/texmf-cache/luatex-cache/
+generic/names/luaotfload-names.luc.gz)
 (/usr/local/texlive/2026/texmf-dist/tex/latex/koma-script/typearea.sty
 Package: typearea 2026/02/02 v3.49.2 KOMA-Script package (type area)
 \ta@bcor=\skip50
@@ -1017,8 +1017,8 @@ LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
 (Font)                  OT1/cmr/bx/n --> TU/texgyretermes(1)/b/n on input line 
 141.
-luaotfload | cache : Lookup cache loaded from build/.texmf-cache/luatex-cache/ge
-neric/names/luaotfload-lookup-cache.luc.
+luaotfload | cache : Lookup cache loaded from /tmp/texmf-cache/luatex-cache/gene
+ric/names/luaotfload-lookup-cache.luc.
 
 Package fontspec Info: 
 (fontspec)             TeX Gyre Heros Regular scale = .9.
@@ -1572,7 +1572,7 @@ Package biblatex Info: ... file 'blx-dm.def' found.
 File: blx-dm.def 2025/07/10 v3.21 biblatex datamodel (PK/MW)
 )
 Package biblatex Info: Trying to load biblatex citestyle data model...
-Package biblatex Info: ... file 'alphabetic.dbx' not found.
+Package biblatex Info: ... file 'numeric.dbx' not found.
 Package biblatex Info: Trying to load biblatex custom data model...
 Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
 \c@afterword=\count399
@@ -1694,11 +1694,11 @@ File: blx-natbib.def 2025/07/10 v3.21 biblatex compatibility (PK/MW)
 Package biblatex Info: Delimiter 'nameyeardelim' in context '' already defined,
  overwriting.
 )
-Package biblatex Info: Trying to load bibliography style 'alphabetic'...
-Package biblatex Info: ... file 'alphabetic.bbx' found.
+Package biblatex Info: Trying to load bibliography style 'numeric'...
+Package biblatex Info: ... file 'numeric.bbx' found.
 
-(/usr/local/texlive/2026/texmf-dist/tex/latex/biblatex/bbx/alphabetic.bbx
-File: alphabetic.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/biblatex/bbx/numeric.bbx
+File: numeric.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
 Package biblatex Info: Trying to load bibliography style 'standard'...
 Package biblatex Info: ... file 'standard.bbx' found.
 
@@ -1707,16 +1707,17 @@ File: standard.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
 \c@bbx:relatedcount=\count476
 \c@bbx:relatedtotal=\count477
 ))
-Package biblatex Info: Trying to load citation style 'alphabetic'...
-Package biblatex Info: ... file 'alphabetic.cbx' found.
+Package biblatex Info: Trying to load citation style 'numeric'...
+Package biblatex Info: ... file 'numeric.cbx' found.
 
-(/usr/local/texlive/2026/texmf-dist/tex/latex/biblatex/cbx/alphabetic.cbx
-File: alphabetic.cbx 2025/07/10 v3.21 biblatex citation style (PK/MW)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/biblatex/cbx/numeric.cbx
+File: numeric.cbx 2025/07/10 v3.21 biblatex citation style (PK/MW)
 Package biblatex Info: Redefining '\cite'.
 Package biblatex Info: Redefining '\parencite'.
 Package biblatex Info: Redefining '\footcite'.
 Package biblatex Info: Redefining '\footcitetext'.
 Package biblatex Info: Redefining '\smartcite'.
+Package biblatex Info: Redefining '\supercite'.
 Package biblatex Info: Redefining '\textcite'.
 Package biblatex Info: Redefining '\textcites'.
 Package biblatex Info: Redefining '\cites'.
@@ -1740,7 +1741,7 @@ Package biblatex Info: ... and expl3
 (/usr/local/texlive/2026/texmf-dist/tex/latex/biblatex/blx-case-expl3.sty
 Package: blx-case-expl3 2025/07/10 v3.21 expl3 case changing code for biblatex
 ))
-Package biblatex Info: Redefining '\citeauthor' on input line 446.
+Package biblatex Info: Redefining '\citeauthor' on input line 456.
 
 (/usr/local/texlive/2026/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
@@ -1995,10 +1996,10 @@ Package: translations 2022/02/05 v1.12 internationalization of LaTeX2e packages
 Package: varioref 2025/01/14 v1.6g package for extended references (FMi)
 \c@vrcnt=\count516
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 613.
-Package hyperref Info: Option `raiselinks' set `true' on input line 613.
-Package hyperref Info: Option `breaklinks' set `true' on input line 613.
-Package hyperref Info: Option `hypertexnames' set `false' on input line 613.
+Package hyperref Info: Option `colorlinks' set `true' on input line 623.
+Package hyperref Info: Option `raiselinks' set `true' on input line 623.
+Package hyperref Info: Option `breaklinks' set `true' on input line 623.
+Package hyperref Info: Option `hypertexnames' set `false' on input line 623.
 
 (/usr/local/texlive/2026/texmf-dist/tex/latex/hypcap/hypcap.sty
 Package: hypcap 2024-07-26 v1.13 Adjusting the anchors of captions (HO)
@@ -2775,7 +2776,7 @@ runsystem(makeindex -s "build"/main-english.ist -t "build"/main-english.glg-abr
 
 \openout7 = main-english.glo-abr
 Package glossaries Info: Writing glossary file main-english.glo-abr on input li
-ne 790.
+ne 834.
  (./abbreviations.tex)
 (/usr/local/texlive/2026/texmf-dist/tex/generic/hyphenex/ushyphex.tex)
 (./commands.tex)
@@ -2828,7 +2829,7 @@ Class scrbook Info: loading recommended package `bookmark'.
 (scrbook)           `bookmarkpackage=false' before \begin{document} and
 (scrbook)           you can avoid this message adding:
 (scrbook)             \usepackage{bookmark}
-(scrbook)           before \begin{document} on input line 963.
+(scrbook)           before \begin{document} on input line 1008.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
 
@@ -2837,6 +2838,10 @@ File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO
 )
 \BKM@id=\count644
 ))
+
+LaTeX Warning: Unused global option(s):
+    [cleardoublepage].
+
 (./build/main-english.aux
 Package babel Info: 'english' activates 'ngerman' shorthands.
 (babel)             Reported on input line 19.
@@ -2849,36 +2854,36 @@ Package babel Info: 'english' activates 'ngerman' shorthands.
 )
 \openout1 = main-english.aux
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 963.
-LaTeX Font Info:    ... okay on input line 963.
-Package scrbase Info: activating english \partname on input line 963.
-Package scrbase Info: activating english \chaptername on input line 963.
-Package scrbase Info: activating english \appendixname on input line 963.
-Package scrbase Info: activating english \figurename on input line 963.
-Package scrbase Info: activating english \tablename on input line 963.
-Package scrbase Info: activating english \contentsname on input line 963.
-Package scrbase Info: activating english \listfigurename on input line 963.
-Package scrbase Info: activating english \listtablename on input line 963.
-Package scrbase Info: activating english \bibname on input line 963.
-Package scrbase Info: activating english \indexname on input line 963.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 1008.
+LaTeX Font Info:    ... okay on input line 1008.
+Package scrbase Info: activating english \partname on input line 1008.
+Package scrbase Info: activating english \chaptername on input line 1008.
+Package scrbase Info: activating english \appendixname on input line 1008.
+Package scrbase Info: activating english \figurename on input line 1008.
+Package scrbase Info: activating english \tablename on input line 1008.
+Package scrbase Info: activating english \contentsname on input line 1008.
+Package scrbase Info: activating english \listfigurename on input line 1008.
+Package scrbase Info: activating english \listtablename on input line 1008.
+Package scrbase Info: activating english \bibname on input line 1008.
+Package scrbase Info: activating english \indexname on input line 1008.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(0)' created for font
@@ -2920,16 +2925,16 @@ ath.otf]:mode=base;script=math;language=dflt;mathfontdimen=xetex;+ssty=1;"
 e=dflt;mathfontdimen=xetex;"
 
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 963.
-
+(Font)              `operators' in the math version `normal' on input line 1008
+.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
 (Font)                  OT1/cmr/m/n --> TU/latinmodern-math.otf(1)/m/n on input
- line 963.
+ line 1008.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 963.
+(Font)              `operators' in the math version `bold' on input line 1008.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
 (Font)                  OT1/cmr/bx/n --> TU/latinmodern-math.otf(1)/b/n on inpu
-t line 963.
+t line 1008.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(2)' created for font
@@ -2954,15 +2959,15 @@ flt;mathfontdimen=xetex;mathfontdimen=tex2;+ssty=1;"
 e=dflt;mathfontdimen=xetex;mathfontdimen=tex2;"
 
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
-(Font)              `symbols' in the math version `normal' on input line 963.
+(Font)              `symbols' in the math version `normal' on input line 1008.
 LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
 (Font)                  OMS/cmsy/m/n --> TU/latinmodern-math.otf(2)/m/n on inpu
-t line 963.
+t line 1008.
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
-(Font)              `symbols' in the math version `bold' on input line 963.
+(Font)              `symbols' in the math version `bold' on input line 1008.
 LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
 (Font)                  OMS/cmsy/b/n --> TU/latinmodern-math.otf(2)/b/n on inpu
-t line 963.
+t line 1008.
 
 Package fontspec Info: 
 (fontspec)             Font family 'latinmodern-math.otf(3)' created for font
@@ -2987,25 +2992,25 @@ flt;mathfontdimen=xetex;mathfontdimen=tex3;+ssty=1;"
 e=dflt;mathfontdimen=xetex;mathfontdimen=tex3;"
 
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
-(Font)              `largesymbols' in the math version `normal' on input line 9
-63.
+(Font)              `largesymbols' in the math version `normal' on input line 1
+008.
 LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
 (Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/m/n on inpu
-t line 963.
+t line 1008.
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
-(Font)              `largesymbols' in the math version `bold' on input line 963
-.
+(Font)              `largesymbols' in the math version `bold' on input line 100
+8.
 LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
 (Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/b/n on inpu
-t line 963.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 963
-.
+t line 1008.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 100
+8.
 
 (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 963
-.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 100
+8.
 
 (/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -3031,13 +3036,13 @@ Package unicode-math Warning: I'm going to overwrite the following commands
 Package microtype Info: Patching varwidth to enable character protrusion.
 \MT@vwid@leftmargin=\dimen390
 \MT@vwid@rightmargin=\dimen391
-LaTeX Info: Redefining \microtypecontext on input line 963.
-Package microtype Info: Applying patch `item' on input line 963.
-Package microtype Info: Applying patch `toc' on input line 963.
-Package microtype Info: Applying patch `eqnum' on input line 963.
-Package microtype Info: Applying patch `footnote' on input line 963.
-Package microtype Info: Applying patch `verbatim' on input line 963.
-LaTeX Info: Redefining \microtypesetup on input line 963.
+LaTeX Info: Redefining \microtypecontext on input line 1008.
+Package microtype Info: Applying patch `item' on input line 1008.
+Package microtype Info: Applying patch `toc' on input line 1008.
+Package microtype Info: Applying patch `eqnum' on input line 1008.
+Package microtype Info: Applying patch `footnote' on input line 1008.
+Package microtype Info: Applying patch `verbatim' on input line 1008.
+LaTeX Info: Redefining \microtypesetup on input line 1008.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `alltext-nott'.
@@ -3076,7 +3081,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \c@lstlisting=\count657
-Package tocbasic Info: setting babel extension for `lol' on input line 963.
+Package tocbasic Info: setting babel extension for `lol' on input line 1008.
 \scr@dte@lstlisting@maxnumwidth=\skip169
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
@@ -3111,9 +3116,9 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'main-english.bbl' found.
 
 (./build/main-english.bbl)
-Package biblatex Info: Reference section=0 on input line 963.
-Package biblatex Info: Reference segment=0 on input line 963.
-Package soulpos Info: Loading soulutf8 on input line 963.
+Package biblatex Info: Reference section=0 on input line 1008.
+Package biblatex Info: Reference segment=0 on input line 1008.
+Package soulpos Info: Loading soulutf8 on input line 1008.
 
 (/usr/local/texlive/2026/texmf-dist/tex/generic/soul/soulutf8.sty
 Package: soulutf8 2023-06-14 v3.1 Permit use of UTF-8 characters in soul (HO)
@@ -3149,7 +3154,7 @@ Package: soul-ori 2023-06-14 v3.1 letterspacing/underlining (mf)
 \SOUL@uldp=\dimen401
 \SOUL@ulht=\dimen402
 ))
-Package hyperref Info: Link coloring ON on input line 963.
+Package hyperref Info: Link coloring ON on input line 1008.
 
 (/usr/local/texlive/2026/texmf-dist/tex/latex/translations/translations-basic-d
 ictionary-english.trsl
@@ -3157,7 +3162,7 @@ File: translations-basic-dictionary-english.trsl (english translation file `tra
 nslations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `english'. on input line 963.
+or `english'. on input line 1008.
 
 (/usr/local/texlive/2026/texmf-dist/tex/latex/translations/translations-basic-d
 ictionary-german.trsl
@@ -3165,29 +3170,29 @@ File: translations-basic-dictionary-german.trsl (german translation file `trans
 lations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `german'. on input line 963.
+or `german'. on input line 1008.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
 Package caption Info: End \AtBeginDocument code.
 \g__cctab_next_cctab=\catcodetable19
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 9.85492pt on input line 966.
+(Font)              scaled to size 9.85492pt on input line 1011.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `TeXGyreHerosRegular' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 10.79993pt on input line 966.
+(Font)              scaled to size 10.79993pt on input line 1011.
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/m/n' will be
-(Font)              scaled to size 15.55188pt on input line 966.
+(Font)              scaled to size 15.55188pt on input line 1011.
 
 
 LaTeX Font Warning: Font shape `TU/TeXGyreHerosRegular(0)/b/n' undefined
 (Font)              using `TU/TeXGyreHerosRegular(0)/m/n' instead on input line
- 966.
+ 1011.
 
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 9.85492pt on input line 966.
+(Font)              scaled to size 9.85492pt on input line 1011.
 [1
 
 
@@ -3203,7 +3208,7 @@ LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
 ] (./chapters/00_abstract.tex
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
 (Font)              scaled to size 12.9599pt on input line 1.
-
+)
 (/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
@@ -3212,47 +3217,38 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/10.9
 5'
-(microtype)             (new value: 10.95pt) on input line 9.
+(microtype)             (new value: 10.95pt) on input line 1030.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/7.66
 5'
-(microtype)             (new value: 7.665pt) on input line 9.
+(microtype)             (new value: 7.665pt) on input line 1030.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5.47
 5'
-(microtype)             (new value: 5.475pt) on input line 9.
- [3])
-[4]
-LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 18.66588pt on input line 985.
-Package tocbasic Info: character protrusion at toc deactivated on input line 98
-5.
- (./build/main-english.toc
-Package cleveref Info: loaded `english' language definitions on input line 1.
- [5
+(microtype)             (new value: 5.475pt) on input line 1030.
+ [3]
+[4
 
 
 ]
 LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
-(Font)              scaled to size 10.79993pt on input line 46.
+(Font)              scaled to size 18.66588pt on input line 1030.
+Package tocbasic Info: character protrusion at toc deactivated on input line 10
+30.
+ (./build/main-english.toc
+Package cleveref Info: loaded `english' language definitions on input line 1.
+ [5]
+LaTeX Font Info:    Font shape `TU/TeXGyreHerosRegular(0)/b/n' will be
+(Font)              scaled to size 10.79993pt on input line 48.
 )
 \tf@toc=\write8
 
 \openout8 = main-english.toc
  [6]
-Package tocbasic Info: character protrusion at lof deactivated on input line 98
-7.
+Package tocbasic Info: character protrusion at lof deactivated on input line 10
+32.
  (./build/main-english.lof
 Package cleveref Info: loaded `english' language definitions on input line 1.
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 9.85492pt on input line 15.
-
-Overfull \hbox (49.7851pt too wide) in paragraph at lines 15--15
- [][] [][][][]\TU/texgyretermes(0)/m/n/10.95 Data[] []ex-ported[] []as[] []CSV[
-] []could[] []be[] []vi-su-al-ized[] []as[] []a[] []plot[] []of[] []\TU/Inconso
-latazi4(0)/m/n/10.95 e󰀒ement_size[] []\TU/texgyretermes(0)/m/n/10.95 vs.[] [
-]\TU/Inconsolatazi4(0)/m/n/10.95 max_von_mises_stress\TU/texgyretermes(0)/m/n/1
-0.95 ,[] 
- []
-
+(Font)              scaled to size 9.85492pt on input line 22.
 )
 \tf@lof=\write9
 
@@ -3264,437 +3260,492 @@ latazi4(0)/m/n/10.95 e󰀒ement_size[] []\TU/texgyretermes(0)/m/n/10.95 vs.[] [
 
 
 ]
-Package tocbasic Info: character protrusion at lot deactivated on input line 98
-9.
- (./build/main-english.lot
+Package tocbasic Info: character protrusion at lot deactivated on input line 10
+34.
+
+(./build/main-english.lot
 Package cleveref Info: loaded `english' language definitions on input line 1.
 )
 \tf@lot=\write10
 
 \openout10 = main-english.lot
- (./build/main-english.gls-abr [9] [10
+ [9] [10
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 11--11
-[][][]\TU/texgyretermes(0)/m/n/10.95 31[][][][],[] [][][]33[][][][],[]
- []
+Package tocbasic Info: character protrusion at loa deactivated on input line 10
+44.
+ (./build/main-english.loa)
+\tf@loa=\write11
 
+\openout11 = main-english.loa
 
-Underfull \hbox (badness 10000) in paragraph at lines 11--11
-[][][]\TU/texgyretermes(0)/m/n/10.95 36[][][][],[] [][][]37[][][][],[]
- []
+(./build/main-english.gls-abr [11] [12
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 11--11
-[][][]\TU/texgyretermes(0)/m/n/10.95 46[][][][],[] [][][]47[][][][],[]
- []
+] [13
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 30--30
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 21[][][][],[] [][][]22[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 30--30
-[][][]\TU/texgyretermes(0)/m/n/10.95 29[][][][],[] [][][]30[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 3[][][][],[] [][][]4[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-[][][]\TU/texgyretermes(0)/m/n/10.95 15[][][][],[] [][][]16[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-[][][]\TU/texgyretermes(0)/m/n/10.95 19[][][][],[] [][][]21[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-[][][]\TU/texgyretermes(0)/m/n/10.95 22[][][][],[] [][][]24[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-[][][]\TU/texgyretermes(0)/m/n/10.95 26[][][][]--[][][][]31[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-[][][]\TU/texgyretermes(0)/m/n/10.95 33[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-[][][]\TU/texgyretermes(0)/m/n/10.95 35[][][][]--[][][][]37[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-[][][]\TU/texgyretermes(0)/m/n/10.95 44[][][][],[] [][][]46[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
-[][][]\TU/texgyretermes(0)/m/n/10.95 19[][][][]--[][][][]22[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
-[][][]\TU/texgyretermes(0)/m/n/10.95 24[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
-[][][]\TU/texgyretermes(0)/m/n/10.95 28[][][][]--[][][][]31[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
-[][][]\TU/texgyretermes(0)/m/n/10.95 33[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
-[][][]\TU/texgyretermes(0)/m/n/10.95 35[][][][]--[][][][]37[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
-[][][]\TU/texgyretermes(0)/m/n/10.95 41[][][][],[] [][][]42[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
-[][][]\TU/texgyretermes(0)/m/n/10.95 44[][][][]--[][][][]47[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
-[][][]\TU/texgyretermes(0)/m/n/10.95 53[][][][],[] [][][]55[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 3[][][][],[] [][][]4[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[][][]\TU/texgyretermes(0)/m/n/10.95 18[][][][]--[][][][]22[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[][][]\TU/texgyretermes(0)/m/n/10.95 24[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[][][]\TU/texgyretermes(0)/m/n/10.95 28[][][][]--[][][][]31[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[][][]\TU/texgyretermes(0)/m/n/10.95 33[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[][][]\TU/texgyretermes(0)/m/n/10.95 35[][][][]--[][][][]37[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[][][]\TU/texgyretermes(0)/m/n/10.95 41[][][][],[] [][][]42[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[][][]\TU/texgyretermes(0)/m/n/10.95 44[][][][]--[][][][]46[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
-[][][]\TU/texgyretermes(0)/m/n/10.95 55[][][][],[] [][][]56[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 99--99
-[][][]\TU/texgyretermes(0)/m/n/10.95 22[][][][],[] [][][]24[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 99--99
-[][][]\TU/texgyretermes(0)/m/n/10.95 29[][][][],[] [][][]30[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 99--99
-[][][]\TU/texgyretermes(0)/m/n/10.95 33[][][][],[] [][][]36[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 99--99
-[][][]\TU/texgyretermes(0)/m/n/10.95 37[][][][],[] [][][]46[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 99--99
-[][][]\TU/texgyretermes(0)/m/n/10.95 47[][][][],[] [][][]53[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-[]|[][][]\TU/texgyretermes(0)/m/n/10.95 3[][][][],[] [][][]4[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-[][][]\TU/texgyretermes(0)/m/n/10.95 19[][][][],[] [][][]21[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-[][][]\TU/texgyretermes(0)/m/n/10.95 29[][][][]--[][][][]31[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-[][][]\TU/texgyretermes(0)/m/n/10.95 33[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-[][][]\TU/texgyretermes(0)/m/n/10.95 41[][][][],[] [][][]46[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-[][][]\TU/texgyretermes(0)/m/n/10.95 47[][][][],[] [][][]53[][][][],[]
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 114--115
-[][][]\TU/texgyretermes(0)/m/n/10.95 55[][][][]--[][][][]57[][][][],[]
- []
-
-[11
-
-
-] [12]) (./chapters/01_background_and_related_work.tex
+])
+(./chapters/01_background_and_related_work.tex
 Package babel Info: 'english' activates 'ngerman' shorthands.
 (babel)             Reported on input line 1.
 Package cleveref Info: loaded `english' language definitions on input line 1.
- [13] [14
-
-
-]
+ [14]
 chapter 1.
-LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 7.19995pt on input line 14.
-[15]
-Package cleveref Info: loaded `english' language definitions on input line 104.
-
- [16]
-Package cleveref Info: loaded `english' language definitions on input line 104.
-
- [17]
-Package cleveref Info: loaded `english' language definitions on input line 138.
-
- [18]
-Package cleveref Info: loaded `english' language definitions on input line 180.
-
- [19]
-Package cleveref Info: loaded `english' language definitions on input line 225.
-
- [20]
-LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/b/n' will be
-(Font)              scaled to size 7.19995pt on input line 228.
-Package cleveref Info: loaded `english' language definitions on input line 260.
-
- [21]
-Package cleveref Info: loaded `english' language definitions on input line 341.
-
- [22]
-Package cleveref Info: loaded `english' language definitions on input line 341.
-
- [23]
-
-LaTeX Warning: Float too large for page by 72.3988pt on input line 409.
-
-Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/9'
-(microtype)             (new value: 9.0pt) on input line 431.
-Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/6'
-(microtype)             (new value: 6.0pt) on input line 431.
-Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5'
-(microtype)             (new value: 5.0pt) on input line 431.
-LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 8.09995pt on input line 431.
-Package cleveref Info: loaded `english' language definitions on input line 437.
-
-[24]
-Package cleveref Info: loaded `english' language definitions on input line 437.
-
- [25]
-<../figures/MC-JSON-Schema.png, id=866, 1715.40875pt x 951.555pt>
-File: ../figures/MC-JSON-Schema.png Graphic file (type png)
-<use ../figures/MC-JSON-Schema.png>
-Package luatex.def Info: ../figures/MC-JSON-Schema.png  used on input line 443.
-
-(luatex.def)             Requested size: 355.51976pt x 197.2044pt.
-Package cleveref Info: loaded `english' language definitions on input line 458.
-
- [26<./build/../figures/MC-JSON-Schema.png>]
-<../figures/MC-JSON.png, id=888, 1711.39375pt x 631.35875pt>
-File: ../figures/MC-JSON.png Graphic file (type png)
-<use ../figures/MC-JSON.png>
-Package luatex.def Info: ../figures/MC-JSON.png  used on input line 478.
-(luatex.def)             Requested size: 355.51976pt x 131.15382pt.
-Package cleveref Info: loaded `english' language definitions on input line 484.
-
- [27]
-Package cleveref Info: loaded `english' language definitions on input line 501.
-
- [28<./build/../figures/MC-JSON.png>]
-Package cleveref Info: loaded `english' language definitions on input line 530.
-
- [29]
-Package cleveref Info: loaded `english' language definitions on input line 555.
-
- [30]
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-Package cleveref Info: loaded `english' language definitions on input line 628.
-
-[31]
-Package cleveref Info: loaded `english' language definitions on input line 630.
-
- [32]) (./chapters/02_design_and_implementation.tex
-Package cleveref Info: loaded `english' language definitions on input line 2.
- [33] [34
+[15
 
 
 ]
-chapter 2.
-<../figures/MC-RDF-JSON.png, id=1098, 1713.40125pt x 947.54pt>
-File: ../figures/MC-RDF-JSON.png Graphic file (type png)
-<use ../figures/MC-RDF-JSON.png>
-Package luatex.def Info: ../figures/MC-RDF-JSON.png  used on input line 12.
-(luatex.def)             Requested size: 313.69167pt x 173.47041pt.
-[35<./build/../figures/MC-RDF-JSON.png>]
-<../figures/MC-RDF-RML-1.png, id=1120, 997.7275pt x 852.18375pt>
-File: ../figures/MC-RDF-RML-1.png Graphic file (type png)
-<use ../figures/MC-RDF-RML-1.png>
-Package luatex.def Info: ../figures/MC-RDF-RML-1.png  used on input line 24.
-(luatex.def)             Requested size: 313.69167pt x 267.93217pt.
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 8.99994pt on input line 31.
-Package cleveref Info: loaded `english' language definitions on input line 95.
- [36<./build/../figures/MC-RDF-RML-1.png>]
-LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 6.29996pt on input line 132.
-<../figures/MC-RDF-JSON-LD-1.png, id=1169, 1703.36375pt x 782.925pt>
-File: ../figures/MC-RDF-JSON-LD-1.png Graphic file (type png)
-<use ../figures/MC-RDF-JSON-LD-1.png>
-Package luatex.def Info: ../figures/MC-RDF-JSON-LD-1.png  used on input line 16
-0.
-(luatex.def)             Requested size: 355.51976pt x 163.40366pt.
-<../figures/MC-RDF-JSON-LD-2.png, id=1170, 1693.32625pt x 543.02875pt>
-File: ../figures/MC-RDF-JSON-LD-2.png Graphic file (type png)
-<use ../figures/MC-RDF-JSON-LD-2.png>
-Package luatex.def Info: ../figures/MC-RDF-JSON-LD-2.png  used on input line 16
-1.
-(luatex.def)             Requested size: 355.51976pt x 114.00626pt.
-Package cleveref Info: loaded `english' language definitions on input line 166.
-
- [37]
-Package cleveref Info: loaded `english' language definitions on input line 166.
-
- [38]
-Package cleveref Info: loaded `english' language definitions on input line 166.
-
- [39]
-Package cleveref Info: loaded `english' language definitions on input line 166.
-
- [40<./build/../figures/MC-RDF-JSON-LD-1.png><./build/../figures/MC-RDF-JSON-LD-
-2.png>]
-<../figures/MC-RDF-Modal.png, id=1317, 1167.86313pt x 724.20563pt>
-File: ../figures/MC-RDF-Modal.png Graphic file (type png)
-<use ../figures/MC-RDF-Modal.png>
-Package luatex.def Info: ../figures/MC-RDF-Modal.png  used on input line 200.
-(luatex.def)             Requested size: 355.51976pt x 220.45694pt.
-Package cleveref Info: loaded `english' language definitions on input line 207.
-
- [41]
-<../figures/Diagram-1.png, id=1329, 1528.71124pt x 541.02126pt>
-File: ../figures/Diagram-1.png Graphic file (type png)
-<use ../figures/Diagram-1.png>
-Package luatex.def Info: ../figures/Diagram-1.png  used on input line 212.
-(luatex.def)             Requested size: 414.07529pt x 146.53998pt.
-<../figures/Diagram-2.png, id=1330, 1594.95876pt x 779.91376pt>
-File: ../figures/Diagram-2.png Graphic file (type png)
-<use ../figures/Diagram-2.png>
-Package luatex.def Info: ../figures/Diagram-2.png  used on input line 219.
-(luatex.def)             Requested size: 414.07529pt x 202.47528pt.
-Package hyperref Info: bookmark level for unknown definition defaults to 0 on i
-nput line 234.
+(Font)              scaled to size 7.19995pt on input line 19.
 
 
 LaTeX Font Warning: Font shape `TU/Inconsolatazi4(0)/m/it' undefined
-(Font)              using `TU/Inconsolatazi4(0)/m/n' instead on input line 235.
-
+(Font)              using `TU/Inconsolatazi4(0)/m/n' instead on input line 23.
 
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/it' will be
-(Font)              scaled to size 9.85492pt on input line 235.
-Package cleveref Info: loaded `english' language definitions on input line 236.
+(Font)              scaled to size 7.19995pt on input line 23.
+Package cleveref Info: loaded `english' language definitions on input line 50.
+[16]
 
-[42<./build/../figures/MC-RDF-Modal.png>]
-Package cleveref Info: loaded `english' language definitions on input line 236.
+LaTeX Warning: Float too large for page by 48.97887pt on input line 113.
 
- [43<./build/../figures/Diagram-1.png><./build/../figures/Diagram-2.png>]
-Package cleveref Info: loaded `english' language definitions on input line 243.
+Package cleveref Info: loaded `english' language definitions on input line 145.
 
- [44]
-<../figures/MC-RDF-JSON-LD-3.png, id=1371, 1699.34875pt x 644.4075pt>
+[17]
+Package cleveref Info: loaded `english' language definitions on input line 145.
+
+ [18]
+Package cleveref Info: loaded `english' language definitions on input line 175.
+
+ [19]
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/9'
+(microtype)             (new value: 9.0pt) on input line 177.
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/6'
+(microtype)             (new value: 6.0pt) on input line 177.
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5'
+(microtype)             (new value: 5.0pt) on input line 177.
+LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
+(Font)              scaled to size 8.09995pt on input line 177.
+<../figures/RDF-Diag-1.png, id=527, 941.5175pt x 493.845pt>
+File: ../figures/RDF-Diag-1.png Graphic file (type png)
+<use ../figures/RDF-Diag-1.png>
+Package luatex.def Info: ../figures/RDF-Diag-1.png  used on input line 181.
+(luatex.def)             Requested size: 414.07529pt x 217.18697pt.
+<../figures/RDF-Triples.png, id=530, 1047.915pt x 187.70125pt>
+File: ../figures/RDF-Triples.png Graphic file (type png)
+<use ../figures/RDF-Triples.png>
+Package luatex.def Info: ../figures/RDF-Triples.png  used on input line 188.
+(luatex.def)             Requested size: 414.07529pt x 74.16838pt.
+Package cleveref Info: loaded `english' language definitions on input line 193.
+
+ [20<./build/../figures/RDF-Diag-1.png><./build/../figures/RDF-Triples.png>]
+Package cleveref Info: loaded `english' language definitions on input line 310.
+
+ [21]
+Package cleveref Info: loaded `english' language definitions on input line 310.
+
+ [22]
+Package cleveref Info: loaded `english' language definitions on input line 310.
+
+ [23]
+LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/b/n' will be
+(Font)              scaled to size 7.19995pt on input line 313.
+Package cleveref Info: loaded `english' language definitions on input line 333.
+
+ [24]
+LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
+(Font)              scaled to size 8.99994pt on input line 357.
+
+Overfull \hbox (55.62186pt too wide) in paragraph at lines 362--363
+[][]\TU/Inconsolatazi4(0)/m/n/10 (󰀒oca󰀒:variab󰀒e_e󰀒ement_size,[] []
+rdf:type,[] []<http://www.mo󰀒mod.info/semantics/pims-ii.tt󰀒#Variab󰀒e)[
+] 
+ []
+
+Package cleveref Info: loaded `english' language definitions on input line 367.
+
+[25]
+
+LaTeX Warning: Float too large for page by 53.39883pt on input line 443.
+
+Package cleveref Info: loaded `english' language definitions on input line 464.
+
+[26]
+Package cleveref Info: loaded `english' language definitions on input line 464.
+
+ [27]
+Package cleveref Info: loaded `english' language definitions on input line 486.
+
+ [28]
+<../figures/MC-JSON.png, id=887, 1713.40125pt x 653.44125pt>
+File: ../figures/MC-JSON.png Graphic file (type png)
+<use ../figures/MC-JSON.png>
+Package luatex.def Info: ../figures/MC-JSON.png  used on input line 497.
+(luatex.def)             Requested size: 397.34149pt x 151.53465pt.
+<../figures/MC-JSON-Schema.png, id=890, 1711.39375pt x 865.2325pt>
+File: ../figures/MC-JSON-Schema.png Graphic file (type png)
+<use ../figures/MC-JSON-Schema.png>
+Package luatex.def Info: ../figures/MC-JSON-Schema.png  used on input line 505.
+
+(luatex.def)             Requested size: 355.51976pt x 179.73703pt.
+Package cleveref Info: loaded `english' language definitions on input line 513.
+
+ [29<./build/../figures/MC-JSON.png>]
+Package cleveref Info: loaded `english' language definitions on input line 524.
+
+ [30<./build/../figures/MC-JSON-Schema.png>]
+Package cleveref Info: loaded `english' language definitions on input line 552.
+
+ [31]
+Package cleveref Info: loaded `english' language definitions on input line 583.
+
+ [32]
+Package cleveref Info: loaded `english' language definitions on input line 598.
+
+ [33]
+Package cleveref Info: loaded `english' language definitions on input line 656.
+
+ [34]
+Package cleveref Info: loaded `english' language definitions on input line 656.
+
+ [35])
+(./chapters/02_design_and_implementation.tex
+Package cleveref Info: loaded `english' language definitions on input line 1.
+ [36]
+chapter 2.
+<../figures/MC-RDF-JSON.png, id=1123, 1711.39375pt x 771.88374pt>
+File: ../figures/MC-RDF-JSON.png Graphic file (type png)
+<use ../figures/MC-RDF-JSON.png>
+Package luatex.def Info: ../figures/MC-RDF-JSON.png  used on input line 15.
+(luatex.def)             Requested size: 397.34149pt x 179.202pt.
+[37
+
+
+]
+<../figures/MC-RDF-RML-1.png, id=1144, 997.7275pt x 852.18375pt>
+File: ../figures/MC-RDF-RML-1.png Graphic file (type png)
+<use ../figures/MC-RDF-RML-1.png>
+Package luatex.def Info: ../figures/MC-RDF-RML-1.png  used on input line 29.
+(luatex.def)             Requested size: 271.86356pt x 232.1992pt.
+Package cleveref Info: loaded `english' language definitions on input line 136.
+
+ [38<./build/../figures/MC-RDF-JSON.png>]
+Package cleveref Info: loaded `english' language definitions on input line 136.
+
+ [39]
+Package cleveref Info: loaded `english' language definitions on input line 136.
+
+ [40]
+LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
+(Font)              scaled to size 6.29996pt on input line 170.
+Package cleveref Info: loaded `english' language definitions on input line 194.
+
+ [41<./build/../figures/MC-RDF-RML-1.png>]
+Package cleveref Info: loaded `english' language definitions on input line 194.
+
+ [42]
+<../figures/MC-RDF-JSON-LD-1.png, id=1364, 1702.36pt x 765.86125pt>
+File: ../figures/MC-RDF-JSON-LD-1.png Graphic file (type png)
+<use ../figures/MC-RDF-JSON-LD-1.png>
+Package luatex.def Info: ../figures/MC-RDF-JSON-LD-1.png  used on input line 20
+9.
+(luatex.def)             Requested size: 414.07529pt x 186.27621pt.
+<../figures/MC-RDF-JSON-LD-2.png, id=1367, 1699.34875pt x 559.08875pt>
+File: ../figures/MC-RDF-JSON-LD-2.png Graphic file (type png)
+<use ../figures/MC-RDF-JSON-LD-2.png>
+Package luatex.def Info: ../figures/MC-RDF-JSON-LD-2.png  used on input line 21
+6.
+(luatex.def)             Requested size: 414.07529pt x 136.23148pt.
+Package cleveref Info: loaded `english' language definitions on input line 229.
+
+ [43<./build/../figures/MC-RDF-JSON-LD-1.png>]
+Overfull \hbox (20.86407pt too wide) in paragraph at lines 240--241
+\TU/texgyretermes(0)/m/n/10.95 clud-ing[] []typed[] []lit-er-als[] []with[] []XM
+L[] []Schema[] []data-types.[] []Changes[] []are[] []ex-e-cuted[] []through[] [
+]\TU/Inconsolatazi4(0)/m/n/10.95 Trip󰀒eEditorService[]
+ []
+
+<../figures/MC-RDF-Modal.png, id=1389, 788.9475pt x 489.83pt>
+File: ../figures/MC-RDF-Modal.png Graphic file (type png)
+<use ../figures/MC-RDF-Modal.png>
+Package luatex.def Info: ../figures/MC-RDF-Modal.png  used on input line 244.
+(luatex.def)             Requested size: 355.51976pt x 220.7279pt.
+Package cleveref Info: loaded `english' language definitions on input line 249.
+
+[44<./build/../figures/MC-RDF-JSON-LD-2.png>]
+<../figures/Diagram-1.png, id=1403, 1023.825pt x 364.36125pt>
+File: ../figures/Diagram-1.png Graphic file (type png)
+<use ../figures/Diagram-1.png>
+Package luatex.def Info: ../figures/Diagram-1.png  used on input line 257.
+(luatex.def)             Requested size: 414.07529pt x 147.35979pt.
+<../figures/Diagram-2.png, id=1404, 1116.17pt x 546.04pt>
+File: ../figures/Diagram-2.png Graphic file (type png)
+<use ../figures/Diagram-2.png>
+Package luatex.def Info: ../figures/Diagram-2.png  used on input line 264.
+(luatex.def)             Requested size: 414.07529pt x 202.56488pt.
+Package cleveref Info: loaded `english' language definitions on input line 269.
+
+ [45<./build/../figures/MC-RDF-Modal.png>]
+Package cleveref Info: loaded `english' language definitions on input line 269.
+
+ [46<./build/../figures/Diagram-1.png><./build/../figures/Diagram-2.png>]
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/10'
+(microtype)             (new value: 10.0pt) on input line 287.
+Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/7'
+(microtype)             (new value: 7.0pt) on input line 287.
+
+Overfull \hbox (3.63716pt too wide) in paragraph at lines 292--293
+[]|[]\TU/Inconsolatazi4(0)/m/n/10 DatatypeProperty[]| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 293--294
+[]|[]\TU/Inconsolatazi4(0)/m/n/10 ObjectProperty[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 293--294
+[]\TU/texgyretermes(0)/m/n/10 and[]
+ []
+
+
+Overfull \hbox (3.63716pt too wide) in paragraph at lines 293--294
+[]\TU/Inconsolatazi4(0)/m/n/10 DatatypeProperty[]| 
+ []
+
+Package cleveref Info: loaded `english' language definitions on input line 305.
+
+[47]
+<../figures/MC-RDF-Ontology-1.png, id=1459, 1187.43625pt x 837.1275pt>
+File: ../figures/MC-RDF-Ontology-1.png Graphic file (type png)
+<use ../figures/MC-RDF-Ontology-1.png>
+Package luatex.def Info: ../figures/MC-RDF-Ontology-1.png  used on input line 3
+24.
+(luatex.def)             Requested size: 334.60571pt x 235.8886pt.
+<../figures/MC-RDF-Ontology-2.png, id=1460, 1174.3875pt x 818.05624pt>
+File: ../figures/MC-RDF-Ontology-2.png Graphic file (type png)
+<use ../figures/MC-RDF-Ontology-2.png>
+Package luatex.def Info: ../figures/MC-RDF-Ontology-2.png  used on input line 3
+31.
+(luatex.def)             Requested size: 334.60571pt x 233.07355pt.
+<../figures/MC-RDF-Ontology-3.png, id=1461, 1167.36125pt x 822.07124pt>
+File: ../figures/MC-RDF-Ontology-3.png Graphic file (type png)
+<use ../figures/MC-RDF-Ontology-3.png>
+Package luatex.def Info: ../figures/MC-RDF-Ontology-3.png  used on input line 3
+38.
+(luatex.def)             Requested size: 334.60571pt x 235.63492pt.
+<../figures/MC-RDF-Ontology-4.png, id=1462, 1181.41376pt x 819.06pt>
+File: ../figures/MC-RDF-Ontology-4.png Graphic file (type png)
+<use ../figures/MC-RDF-Ontology-4.png>
+Package luatex.def Info: ../figures/MC-RDF-Ontology-4.png  used on input line 3
+45.
+(luatex.def)             Requested size: 313.69167pt x 217.4748pt.
+Package cleveref Info: loaded `english' language definitions on input line 355.
+
+ [48]
+Package cleveref Info: loaded `english' language definitions on input line 355.
+
+ [49<./build/../figures/MC-RDF-Ontology-1.png><./build/../figures/MC-RDF-Ontolog
+y-2.png>]
+Package cleveref Info: loaded `english' language definitions on input line 355.
+
+ [50<./build/../figures/MC-RDF-Ontology-3.png><./build/../figures/MC-RDF-Ontolog
+y-4.png>]
+Package hyperref Info: bookmark level for unknown definition defaults to 0 on i
+nput line 356.
+LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/it' will be
+(Font)              scaled to size 9.85492pt on input line 357.
+Package cleveref Info: loaded `english' language definitions on input line 371.
+
+ [51]
+<../figures/MC-RDF-JSON-LD-3.png, id=1531, 1700.3525pt x 769.87625pt>
 File: ../figures/MC-RDF-JSON-LD-3.png Graphic file (type png)
 <use ../figures/MC-RDF-JSON-LD-3.png>
-Package luatex.def Info: ../figures/MC-RDF-JSON-LD-3.png  used on input line 25
-3.
-(luatex.def)             Requested size: 397.34149pt x 150.66882pt.
+Package luatex.def Info: ../figures/MC-RDF-JSON-LD-3.png  used on input line 38
+1.
+(luatex.def)             Requested size: 418.25555pt x 189.36728pt.
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 260.
+put line 388.
 \c@algpx@indentEndPage-0=\count662
 \c@algpx@indentEndPage-1=\count663
 \c@algpx@indentEndCoordIndex-0=\count664
 \c@algpx@indentEndPage-2=\count665
 \c@algpx@indentEndPage-3=\count666
 \c@algpx@indentEndPage-4=\count667
-Package cleveref Info: loaded `english' language definitions on input line 305.
+Package cleveref Info: loaded `english' language definitions on input line 432.
 
- [45<./build/../figures/MC-RDF-JSON-LD-3.png>]
-Package cleveref Info: loaded `english' language definitions on input line 317.
+ [52<./build/../figures/MC-RDF-JSON-LD-3.png>]
+Package cleveref Info: loaded `english' language definitions on input line 432.
 
- [46]
-<../figures/MC-RDF-SPARQL-1.png, id=1437, 1188.44pt x 825.0825pt>
+ [53]
+<../figures/MC-RDF-SPARQL-1.png, id=1586, 1188.44pt x 825.0825pt>
 File: ../figures/MC-RDF-SPARQL-1.png Graphic file (type png)
 <use ../figures/MC-RDF-SPARQL-1.png>
-Package luatex.def Info: ../figures/MC-RDF-SPARQL-1.png  used on input line 327
+Package luatex.def Info: ../figures/MC-RDF-SPARQL-1.png  used on input line 451
 .
 (luatex.def)             Requested size: 313.69167pt x 217.77713pt.
-<../figures/MC-RDF-SPARQL-2.png, id=1438, 1475.5125pt x 805.0075pt>
+<../figures/MC-RDF-SPARQL-2.png, id=1587, 1475.5125pt x 805.0075pt>
 File: ../figures/MC-RDF-SPARQL-2.png Graphic file (type png)
 <use ../figures/MC-RDF-SPARQL-2.png>
-Package luatex.def Info: ../figures/MC-RDF-SPARQL-2.png  used on input line 354
+Package luatex.def Info: ../figures/MC-RDF-SPARQL-2.png  used on input line 476
 .
-(luatex.def)             Requested size: 313.6
+(luatex.def)             Requested size: 414.07529pt x 225.90419pt.
+Package cleveref Info: loaded `english' language definitions on input line 481.
+
+ [54]
+Package cleveref Info: loaded `english' language definitions on input line 481.
+
+ [55<./build/../figures/MC-RDF-SPARQL-1.png>]
+<../figures/Plot.png, id=1632, 617.9085pt x 339.669pt>
+File: ../figures/Plot.png Graphic file (type png)
+<use ../figures/Plot.png>
+Package luatex.def Info: ../figures/Plot.png  used on input line 493.
+(luatex.def)             Requested size: 414.07529pt x 227.6185pt.
+Package cleveref Info: loaded `english' language definitions on input line 498.
+
+ [56<./build/../figures/MC-RDF-SPARQL-2.png>]
+Package cleveref Info: loaded `english' language definitions on input line 507.
+
+ [57<./build/../figures/Plot.png>]
+<../figures/MC-RDF-KG-1.png, id=1655, 1172.38pt x 816.04875pt>
+File: ../figures/MC-RDF-KG-1.png Graphic file (type png)
+<use ../figures/MC-RDF-KG-1.png>
+Package luatex.def Info: ../figures/MC-RDF-KG-1.png  used on input line 519.
+(luatex.def)             Requested size: 292.7776pt x 203.78755pt.
+)
+(./chapters/03_application.tex
+Package cleveref Info: loaded `english' language definitions on input line 1.
+ [58<./build/../figures/MC-RDF-KG-1.png>]
+chapter 3.
+[59
+
+
+]
+Package cleveref Info: loaded `english' language definitions on input line 99.
+ [60]
+Package cleveref Info: loaded `english' language definitions on input line 99.
+ [61]
+Package cleveref Info: loaded `english' language definitions on input line 265.
+
+ [62]
+Package cleveref Info: loaded `english' language definitions on input line 265.
+
+ [63]
+Package cleveref Info: loaded `english' language definitions on input line 265.
+
+ [64]
+Package cleveref Info: loaded `english' language definitions on input line 265.
+
+ [65]
+Package cleveref Info: loaded `english' language definitions on input line 265.
+
+ [66]
+<../figures/MC-RDF-SPARQL-3.png, id=1978, 1246.6575pt x 433.62pt>
+File: ../figures/MC-RDF-SPARQL-3.png Graphic file (type png)
+<use ../figures/MC-RDF-SPARQL-3.png>
+Package luatex.def Info: ../figures/MC-RDF-SPARQL-3.png  used on input line 303
+.
+(luatex.def)             Requested size: 414.07529pt x 144.02797pt.
+Package cleveref Info: loaded `english' language definitions on input line 311.
+
+ [67]
+<../figures/MC-RDF-KG-2.png, id=2015, 1153.30875pt x 712.6625pt>
+File: ../figures/MC-RDF-KG-2.png Graphic file (type png)
+<use ../figures/MC-RDF-KG-2.png>
+Package luatex.def Info: ../figures/MC-RDF-KG-2.png  used on input line 316.
+(luatex.def)             Requested size: 355.51976pt x 219.68341pt.
+Package cleveref Info: loaded `english' language definitions on input line 323.
+
+ [68<./build/../figures/MC-RDF-SPARQL-3.png>]) (./chapters/04_conclusion_and_ou
+tlook.tex
+Package cleveref Info: loaded `english' language definitions on input line 1.
+ [69<./build/../figures/MC-RDF-KG-2.png>] [70
+
+
+]
+chapter 4.
+[71])
+Package cleveref Info: loaded `english' language definitions on input line 1068
+.
+ [72]
+Package cleveref Info: loaded `english' language definitions on input line 1068
+.
+ [73] [74
+
+
+]
+chapter without number
+[75]
+Package cleveref Info: loaded `english' language definitions on input line 1068
+.
+ [76]
+Package cleveref Info: loaded `english' language definitions on input line 1068
+.
+ [77] (./chapters/05_use_of_ai.tex
+Package cleveref Info: loaded `english' language definitions on input line 1.
+ [78]
+chapter A.
+) (./chapters/06_code_and_data.tex [79
+
+
+] [80
+
+
+]
+chapter B.
+) [81] [82
+
+
+] [83]
+\tf@thm=\write12
+
+\openout12 = main-english.thm
+ (./build/main-english.aux
+Package cleveref Info: loaded `english' language definitions on input line 19.
+)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2020/03/25>
+ ***********
+
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+Package logreq Info: Writing requests to 'main-english.run.xml'.
+
+\openout1 = main-english.run.xml
+)
+
+Here is how much of LuaTeX's memory you used:
+ 98090 strings out of 476076
+ 596140,3417909 words of node,token memory allocated
+ 1622 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 28 glue, 5 kern, 1 penalty, 4 glyph, 1
+39 attribute, 110 glue_spec, 70 attribute_list, 2 shape, 5 write, 1 close, 3 use
+r_defined, 30 pdf_action nodes
+   avail lists: 1:20,2:25327,3:2388,4:14343,5:7901,6:335,7:17025,8:97,9:23581,10
+:24,11:1038,12:1
+ 96310 multiletter control sequences out of 65536+600000
+ 140 fonts using 32595671 bytes
+ 108i,21n,115p,11243b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolat
+azi4-Bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/
+latinmodern-math.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/t
+ex-gyre/texgyretermes-italic.otf></usr/local/texlive/2026/texmf-dist/fonts/opent
+ype/public/tex-gyre/texgyretermes-regular.otf></usr/local/texlive/2026/texmf-dis
+t/fonts/opentype/public/lm-math/latinmodern-math.otf></usr/local/texlive/2026/te
+xmf-dist/fonts/opentype/public/tex-gyre/texgyretermes-bold.otf></usr/local/texli
+ve/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf>
+</usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/texgyretermes
+-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/
+texgyreheros-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/zap
+fding/uzdr.pfb>
+Output written on main-english.pdf (83 pages, 4059516 bytes).
+
+PDF statistics: 2588 PDF objects out of 2984 (max. 8388607)
+ 2377 compressed objects within 24 object streams
+ 1002 named destinations out of 1200 (max. 1048576)
+ 416 words of extra memory for PDF output out of 10000 (max. 100000000)
+

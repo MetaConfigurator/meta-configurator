@@ -1,0 +1,79 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'build/main-english-debug.blg'
+[35] biber-darwin:342> INFO - === Thu Apr  9, 2026, 10:23:49
+[43] Biber.pm:421> INFO - Reading 'build/main-english.bcf'
+[87] Biber.pm:1002> INFO - Found 45 citekeys in bib section 0
+[87] Biber.pm:1005> DEBUG - The citekeys for section 0 are: Unger2026Platform, ai_assisted_schema_mapping_2025, apache_jena, berners2001semantic, boulakia2017workflows, cedar_workbench, chmo_ontology, codemirror, comunica_query_sparql, comunica_supported_specs, cytoscapejs, das2012r2rml, dimou2014rml, graphdb, gruber1993ontology, hogan2021knowledgegraphs, jackson2021obofoundry, janowicz2015geospatial, json_standard, jsonld2014, jsonld_playground, karma, linkml, metaconfigurator2024, metaconfigurator2025datamodels, metadata4ing_ontology, neubauer2026data, obi2016, openrefine, owl2_overview, owl2_primer, protege, rdf_concepts2014, rdf_schema2014, rdflib, rdflib_docs, redland, shacl_standard, sparql_generate, sparql_standard, sparqljs, villamar2025metadata, webprotege, wilkinson2025fairworkflows, wright2020jsonschema
+[121] Biber.pm:1078> DEBUG - Adding datalist of type 'entry' with sortingtemplate 'nty', sortingnamekeytemplatename 'global', labelprefix '', uniquenametemplate 'global', labelalphanametemplate 'global' and name 'nty/global//global/global/global' for section 0
+[125] Biber.pm:4487> INFO - Processing section 0
+[125] Biber.pm:4601> DEBUG - Looking for directly cited keys: boulakia2017workflows, wilkinson2025fairworkflows, villamar2025metadata, rdf_concepts2014, shacl_standard, metaconfigurator2024, neubauer2026data, berners2001semantic, janowicz2015geospatial, hogan2021knowledgegraphs, json_standard, Unger2026Platform, wright2020jsonschema, gruber1993ontology, jsonld2014, sparql_standard, owl2_overview, owl2_primer, metadata4ing_ontology, dimou2014rml, metaconfigurator2025datamodels, ai_assisted_schema_mapping_2025, protege, webprotege, apache_jena, graphdb, linkml, cedar_workbench, karma, openrefine, sparql_generate, jsonld_playground, rdflib, redland, das2012r2rml, codemirror, rdf_schema2014, rdflib_docs, comunica_query_sparql, comunica_supported_specs, sparqljs, cytoscapejs, chmo_ontology, obi2016, jackson2021obofoundry
+[137] Biber.pm:4678> INFO - Looking for bibtex file 'bibliography.bib' for section 0
+[137] bibtex.pm:181> DEBUG - Caching data for BibTeX format file 'bibliography.bib' for section 0
+[137] bibtex.pm:1662> DEBUG - File 'bibliography.bib' is converted to UTF8 as '/var/folders/0x/76vhfzhn0txf5wnfxfwzyl400000gn/T/biber_tmp_UNZr/f4d088b3f9f145b5c3058da33afd57d4_90756.utf8'
+[137] bibtex.pm:1713> INFO - LaTeX decoding ...
+[151] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'json_standard' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'wright2020jsonschema' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'dimou2014rml' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'jsonld2014' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'gruber1993ontology' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'berners2001semantic' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'metadata4ing_ontology' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'shacl_standard' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'sparql_standard' from BibTeX file 'bibliography.bib'
+[151] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'owl2_overview' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'owl2_primer' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'metaconfigurator2024' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'metaconfigurator2025datamodels' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'ai_assisted_schema_mapping_2025' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'cedar_workbench' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'linkml' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'webprotege' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'graphdb' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'jsonld_playground' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'karma' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'protege' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'apache_jena' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'rdf_concepts2014' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'rdf_schema2014' from BibTeX file 'bibliography.bib'
+[152] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'openrefine' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'sparql_generate' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'rdflib' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'redland' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'hogan2021knowledgegraphs' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'janowicz2015geospatial' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'das2012r2rml' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'codemirror' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'cytoscapejs' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'sparqljs' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'rdflib_docs' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'comunica_query_sparql' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'comunica_supported_specs' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'Unger2026Platform' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'neubauer2026data' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'chmo_ontology' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'obi2016' from BibTeX file 'bibliography.bib'
+[153] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'jackson2021obofoundry' from BibTeX file 'bibliography.bib'
+[154] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'villamar2025metadata' from BibTeX file 'bibliography.bib'
+[154] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'wilkinson2025fairworkflows' from BibTeX file 'bibliography.bib'
+[154] bibtex.pm:1632> DEBUG - Cached Text::BibTeX entry for key 'boulakia2017workflows' from BibTeX file 'bibliography.bib'
+[155] bibtex.pm:239> DEBUG - Text::BibTeX cache keys: cedar_workbench, jsonld2014, dimou2014rml, boulakia2017workflows, rdflib_docs, Unger2026Platform, webprotege, berners2001semantic, redland, sparql_standard, openrefine, owl2_overview, chmo_ontology, janowicz2015geospatial, das2012r2rml, jackson2021obofoundry, owl2_primer, metaconfigurator2024, wright2020jsonschema, rdflib, rdf_schema2014, hogan2021knowledgegraphs, shacl_standard, obi2016, jsonld_playground, metaconfigurator2025datamodels, sparqljs, gruber1993ontology, protege, rdf_concepts2014, villamar2025metadata, comunica_query_sparql, graphdb, cytoscapejs, karma, wilkinson2025fairworkflows, metadata4ing_ontology, sparql_generate, comunica_supported_specs, json_standard, neubauer2026data, codemirror, ai_assisted_schema_mapping_2025, linkml, apache_jena
+[155] bibtex.pm:240> DEBUG - Wanted keys: boulakia2017workflows, wilkinson2025fairworkflows, villamar2025metadata, rdf_concepts2014, shacl_standard, metaconfigurator2024, neubauer2026data, berners2001semantic, janowicz2015geospatial, hogan2021knowledgegraphs, json_standard, Unger2026Platform, wright2020jsonschema, gruber1993ontology, jsonld2014, sparql_standard, owl2_overview, owl2_primer, metadata4ing_ontology, dimou2014rml, metaconfigurator2025datamodels, ai_assisted_schema_mapping_2025, protege, webprotege, apache_jena, graphdb, linkml, cedar_workbench, karma, openrefine, sparql_generate, jsonld_playground, rdflib, redland, das2012r2rml, codemirror, rdf_schema2014, rdflib_docs, comunica_query_sparql, comunica_supported_specs, sparqljs, cytoscapejs, chmo_ontology, obi2016, jackson2021obofoundry
+[155] bibtex.pm:243> DEBUG - Looking for key 'boulakia2017workflows' in Text::BibTeX cache
+[155] bibtex.pm:251> DEBUG - Found key 'boulakia2017workflows' in Text::BibTeX cache
+[155] bibtex.pm:849> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): Deleting field 'day'
+[155] bibtex.pm:554> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): Entry type is 'article' but map wants 'conference', skipping step ...
+[155] bibtex.pm:554> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): Entry type is 'article' but map wants 'electronic', skipping step ...
+[155] bibtex.pm:554> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): Entry type is 'article' but map wants 'www', skipping step ...
+[155] bibtex.pm:547> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): Entry type is 'article' but map wants 'mastersthesis' and step has 'final' set, skipping rest of map ...
+[155] bibtex.pm:547> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): Entry type is 'article' but map wants 'phdthesis' and step has 'final' set, skipping rest of map ...
+[155] bibtex.pm:547> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): Entry type is 'article' but map wants 'techreport' and step has 'final' set, skipping rest of map ...
+[155] bibtex.pm:713> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): No field 'hyphenation', skipping step ...
+[156] bibtex.pm:713> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): No field 'address', skipping step ...
+[156] bibtex.pm:713> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): No field 'school', skipping step ...
+[156] bibtex.pm:713> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): No field 'annote', skipping step ...
+[156] bibtex.pm:713> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): No field 'archiveprefix', skipping step ...
+[156] bibtex.pm:713> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): No field 'primaryclass', skipping step ...
+[156] bibtex.pm:713> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): No field 'key', skipping step ...
+[156] bibtex.pm:713> DEBUG - Source mapping (type=driver, key=boulakia2017workflows): No field 'pdf', skipping step ...
+[156] bibtex.pm:950> DEBUG - Creating biber Entry object with key 'boulakia2017workflows'
