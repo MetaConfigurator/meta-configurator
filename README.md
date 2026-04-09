@@ -59,6 +59,8 @@ Creating structured data files (or schemas) manually can be complex and error-pr
 
 *   **Support for JSON Schema Draft-2020-12** – Ensuring compatibility with modern schema definitions.
 
+*   **Utility Functions for External References** – Automatically resolve/bundle external references and visualize them in the interactive schema diagram.
+
 *   **Code Generation** – Generate source code from JSON schemas in multiple programming languages (Python, Rust, TypeScript, C++, Java, etc.) using [quicktype](https://github.com/glideapps/quicktype/).
 
 *   **Documentation Generation** – Generate documentation from JSON schemas, with export to a Markdown file.
@@ -99,7 +101,11 @@ Explore how to use MetaConfigurator with real-world examples:
 
 *   **[Code Generation](./documentation_user/examples/code_generation)** – Learn how to generate code in multiple programming languages from JSON schemas.
 
+*   **[Schema Selection List](./documentation_user/examples/schema_selection_list)** – Learn how to provide your users with a pre-defined list of schemas to choose from; useful for organizations.
+
 *   **[AI Assistance](./documentation_user/examples/ai_assistance)** – Learn how to use AI-assisted features for schema and data creation/editing, as well as data transformation.
+
+*   **[External References](./documentation_user/examples/external_references)** – Learn how to handle external references in MetaConfigurator.
 
 
 
@@ -130,7 +136,9 @@ pages = {1--9}
 
 MetaConfigurator runs entirely **inside your browser** - it does **not** send your schemas, data, or anything you type to any server. The website itself is just a static page delivered by GitHub Pages (like downloading a PDF or image), and all the work happens locally on your computer.
 
-The only exception is if you **click the “Share Snapshot” button**. Then, and only then, the snapshot you create is sent to a **University of Stuttgart** server so you can share a unique link with others.
+The exception is if you **click the “Share Snapshot” button**. Then, and only then, the snapshot you create is sent to a **University of Stuttgart** server so you can share a unique link with others.
+
+Additionally, if you use the optional AI assistance functionality, relevant subsets of your schema and data are shared with the AI endpoint you configure in the MetaConfigurator settings (by default OpenAI). This will not accidentally happen, as an authentification key from the AI endpoint provider is needed to use the AI assistance features.
 
 **See our [full Privacy Policy](PRIVACY.md)** for more information.
 

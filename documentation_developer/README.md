@@ -1,5 +1,7 @@
 # Development
 
+> **New here?** See [CONTRIBUTING.md](../CONTRIBUTING.md) for the contribution workflow, branch naming, commit message conventions, and PR guidelines before diving in.
+
 The project relies on [Node Js](https://nodejs.org/en/download/).
 
 We use [vue.js](https://vuejs.org/) as a frontend framework and [PrimeVue](https://www.primefaces.org/primevue/) for the UI components.

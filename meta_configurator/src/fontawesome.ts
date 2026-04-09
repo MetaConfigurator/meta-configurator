@@ -42,6 +42,8 @@ import {
   faScissors,
   faBook,
   faLockOpen,
+  faFileZipper,
+  faLink,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFile,
@@ -50,6 +52,7 @@ import {
   faFolderOpen as faFolderOpenRegular,
   faEye as faEyeRegular,
   faFileCode as faFileCodeRegular,
+  faClone,
 } from '@fortawesome/free-regular-svg-icons';
 import {faLock} from '@fortawesome/free-solid-svg-icons/faLock';
 
@@ -104,4 +107,7 @@ export function registerIcons() {
   library.add(faBook);
   library.add(faLock);
   library.add(faLockOpen);
+  library.add(faFileZipper);
+  library.add(faLink);
+  library.add(faClone);
 }

@@ -3,6 +3,7 @@
     <PanelSettings
       panel-name="RDF View"
       :panel-settings-path="['rdf']"
+      panel-display-name="RDF View"
       :sessionMode="SessionMode.DataEditor">
     </PanelSettings>
     <RmlMappingDialog ref="rmlMappingDialog" />

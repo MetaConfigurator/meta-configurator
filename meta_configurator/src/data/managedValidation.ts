@@ -8,6 +8,7 @@ import {sizeOf} from '@/utility/sizeOf';
 
 // Import worker as ESM
 import ValidationWorker from '@/workers/validationWorker?worker';
+import {removeExternalReferences} from '@/schema/removeExternalReferences.ts';
 
 export class ManagedValidation {
   private worker: Worker;
@@ -70,13 +71,16 @@ export class ManagedValidation {
       this.isValidationOngoing = true;
 
       const data = getDataForMode(this.mode).data.value;
-      const schema = getSchemaForMode(this.mode).schemaRaw.value;
 
       if (sizeOf(data) > useSettings().value.performance.maxDocumentSizeForValidation) {
         this.currentValidationResult.value = new ValidationResult([]);
         this.isValidationOngoing = false;
         return;
       }
+
+      // duplicate the schema and remove external references to avoid ajv trying to fetch them and throwing an error if they are not available
+      const schema = JSON.parse(JSON.stringify(getSchemaForMode(this.mode).schemaRaw.value));
+      removeExternalReferences(schema);
 
       try {
         this.currentValidationResult.value = await this.validateWithWorker(data, schema);

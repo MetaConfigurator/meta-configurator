@@ -11,9 +11,11 @@ import Button from 'primevue/button';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
-  panelName: string;
+  panelDisplayName: string;
+  panelType?: string;
   settingsHeader?: string;
   panelSettingsPath: Path;
   sessionMode: SessionMode;
@@ -50,27 +52,34 @@ const copyToClipboard = async () => {
 };
 
 const containsText = computed(() => {
-  return ['Text View'].includes(props.panelName);
+  return props.panelType == 'textEditor';
 });
 
 const settingsName = computed(() => {
   if (props.settingsHeader && props.settingsHeader !== '') {
     return props.settingsHeader;
   }
-  if (!props.panelName || props.panelName === '') {
+  if (!props.panelDisplayName || props.panelDisplayName === '') {
     return 'Settings';
   }
-  if (props.panelName.toLowerCase().includes('settings')) {
-    return props.panelName;
+  if (props.panelDisplayName.toLowerCase().includes('settings')) {
+    return props.panelDisplayName;
   }
-  return props.panelName + ' Settings';
+  return props.panelDisplayName + ' Settings';
 });
 </script>
 
 <template>
-  <Panel :header="panelName" toggleable :collapsed="true">
-    <template v-if="containsText" #icons>
-      <Button icon="pi pi-clone" severity="secondary" @click="copyToClipboard" rounded text />
+  <Panel :header="panelDisplayName" toggleable :collapsed="true" class="panel-settings-scroll">
+    <template #icons>
+      <Button
+        v-if="containsText"
+        text
+        severity="secondary"
+        v-tooltip.left="'Copy text to clipboard'"
+        @click="copyToClipboard()">
+        <FontAwesomeIcon icon="fa-regular fa-clone" />
+      </Button>
     </template>
     <slot></slot>
     <div class="properties-panel-container">
@@ -88,6 +97,10 @@ const settingsName = computed(() => {
 </template>
 
 <style scoped>
+.panel-settings-scroll {
+  max-height: 80vh;
+  overflow-y: auto;
+}
 .properties-panel-container {
   padding-top: 1.5rem;
 }

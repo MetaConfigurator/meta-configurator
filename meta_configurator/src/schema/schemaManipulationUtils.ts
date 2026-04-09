@@ -108,7 +108,12 @@ export function createIdentifierForExtractedElement(
   return identifier;
 }
 
-export function addSchemaObject(schemaData: ManagedData) {
+export function addSchemaObject(
+  schemaData: ManagedData,
+  connectWithRootIfRootEmpty: boolean = true,
+  schema: any = undefined,
+  identifier: string | undefined = undefined
+) {
   const rawData = schemaData.data.value;
 
   // set type of root element to object if not done yet
@@ -116,19 +121,29 @@ export function addSchemaObject(schemaData: ManagedData) {
     rawData.type = 'object';
   }
 
-  const objectPath = findAvailableSchemaId(schemaData, ['$defs'], 'object');
-  schemaData.setDataAt(objectPath, {
-    type: 'object',
-    properties: {
-      property1: {
-        type: 'string',
+  let objectPath: Path;
+  if (identifier !== undefined) {
+    objectPath = findAvailableSchemaId(schemaData, ['$defs'], identifier, true);
+  } else {
+    objectPath = findAvailableSchemaId(schemaData, ['$defs'], 'object');
+  }
+
+  if (schema !== undefined) {
+    schemaData.setDataAt(objectPath, schema);
+  } else {
+    schemaData.setDataAt(objectPath, {
+      type: 'object',
+      properties: {
+        property1: {
+          type: 'string',
+        },
       },
-    },
-  });
+    });
+  }
 
   // make connection from root element to new object if root has no properties yet
-  if (rawData.properties === undefined) {
-    const objectName = objectPath[objectPath.length - 1];
+  if (connectWithRootIfRootEmpty && rawData.properties === undefined) {
+    const objectName = objectPath[objectPath.length - 1]!;
     const referenceToNewObject = '#' + pathToJsonPointer(objectPath);
     schemaData.setDataAt(['properties', objectName], {
       $ref: referenceToNewObject,

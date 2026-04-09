@@ -8,7 +8,7 @@ export interface SettingsInterfaceRoot {
   hideSchemaEditor: boolean;
   hideSettings: boolean;
   performance: SettingsInterfacePerformance;
-  codeEditor: SettingsInterfaceCodeEditor;
+  textEditor: SettingsInterfaceCodeEditor;
   guiEditor: SettingsInterfaceGuiEditor;
   schemaDiagram: SettingsInterfaceSchemaDiagram;
   documentation: SettingsInterfaceDocumentation;

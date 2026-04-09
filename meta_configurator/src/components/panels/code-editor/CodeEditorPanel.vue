@@ -1,8 +1,9 @@
 <template>
   <div class="panel-container">
     <PanelSettings
-      panel-name="Text View"
-      :panel-settings-path="['codeEditor']"
+      panel-display-name="Text View"
+      panel-type="textEditor"
+      :panel-settings-path="['textEditor']"
       :sessionMode="props.sessionMode">
       <p>
         This panel allows you to view and edit the raw JSON/YAML/XML data of the current document.

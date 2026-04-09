@@ -5,16 +5,14 @@ Component for displaying the OpenAI API key input.
 import {type Ref, ref} from 'vue';
 import Password from 'primevue/password';
 import SelectButton from 'primevue/selectbutton';
-import {getApiKeyRef, getIsPersistKeyRef} from '@/utility/ai/apiKey';
-
-const isShowPersistOption = false; // currently the option of whether to persist the key is not shown because without persistence the key currently can not be accessed
+import {getApiKeyRef, getRememberInTabRef} from '@/utility/ai/apiKey';
 
 const apiKey: Ref<string> = getApiKeyRef();
-const isPersistKey: Ref<boolean> = getIsPersistKeyRef();
+const rememberInTab: Ref<boolean> = getRememberInTabRef();
 
-const persistOptions = ref([
-  {name: 'true', value: true},
-  {name: 'false', value: false},
+const rememberOptions = ref([
+  {name: 'Remember in this tab', value: true},
+  {name: 'Forget on refresh', value: false},
 ]);
 </script>
 
@@ -28,17 +26,18 @@ const persistOptions = ref([
   possible without permanently connecting your credit card with your account. Check this
   <a href="https://platform.openai.com/docs/pricing" target="_blank">link</a> for pricing.
   <br />
-  <br />
   MetaConfigurator by default uses the gpt-4o-mini model, which has very low cost. For improved
   results you can change to more performant models in the settings tab.
+  <br />
+  <br />
+  Your key is stored only in your browser and sent directly to your chosen provider. It is never
+  sent to MetaConfigurator servers.
   <span class="api-key-container">
     <span>Key:</span>
-    <Password v-model="apiKey" placeholder="Enter your OpenAI API Key" :feedback="false" />
-    <span v-show="isShowPersistOption">Persist:</span>
+    <Password v-model="apiKey" placeholder="Enter your API Key" :feedback="false" />
     <SelectButton
-      v-show="isShowPersistOption"
-      v-model="isPersistKey"
-      :options="persistOptions"
+      v-model="rememberInTab"
+      :options="rememberOptions"
       option-label="name"
       option-value="value" />
   </span>

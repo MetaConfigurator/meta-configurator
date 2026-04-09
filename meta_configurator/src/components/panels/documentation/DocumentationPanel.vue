@@ -96,7 +96,8 @@ onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
 <template>
   <div class="panel-container">
     <PanelSettings
-      panel-name="Documentation View"
+      panel-display-name="Documentation View"
+      panel-type="documentation"
       :panel-settings-path="['documentation']"
       :sessionMode="props.sessionMode">
       <p>

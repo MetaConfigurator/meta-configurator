@@ -1,12 +1,17 @@
 import {fileURLToPath, URL} from 'node:url';
+import {createRequire} from 'node:module';
 
 import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import {nodePolyfills} from "vite-plugin-node-polyfills";
 
+const require = createRequire(import.meta.url);
+const pkg = require('./package.json');
+
 // Use process.env.USE_BASE_PATH to determine if base path should be included
 const useMetaConfiguratorBasePath = process.env.USE_META_CONFIGURATOR_BASE_PATH === 'true';
+const isExperimental = process.env.EXPERIMENTAL !== 'false';
 const ACCEPT_RDF_HEADER =
   'application/rdf+xml, text/turtle, application/x-turtle, application/n-triples, text/n3, application/ld+json, application/json, application/xml, text/xml, text/plain';
 
@@ -66,11 +71,15 @@ function rdfProxyPlugin() {
 // https://vitejs.dev/config/
 export default defineConfig({
   base: useMetaConfiguratorBasePath ? '/meta-configurator/' : '/',
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __APP_EXPERIMENTAL__: JSON.stringify(isExperimental),
+  },
   plugins: [vue(), vueJsx(), rdfProxyPlugin(),
 
   nodePolyfills({
     globals: {
-      Buffer: false,
+      Buffer: true,
       global: true,
       process: true,
     },

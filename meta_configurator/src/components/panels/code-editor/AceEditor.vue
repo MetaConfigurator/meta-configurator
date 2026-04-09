@@ -35,6 +35,11 @@ let editor: Ref<Editor | undefined> = ref(undefined);
 
 onMounted(() => {
   editor.value = ace.edit(editor_id);
+
+  editor.value.getSession().setUseWrapMode(true);
+  editor.value.setOption('wrap', true);
+  editor.value.setOption('hScrollBarAlwaysVisible', false);
+
   setupAceMode(editor.value, settings.value);
   setupAceProperties(editor.value, settings.value);
 
@@ -45,6 +50,13 @@ onMounted(() => {
   if (isEditorReadOnly()) {
     editor.value.setReadOnly(true);
   }
+
+  // watch for changes in the editor container size and resize the editor accordingly
+  const observer = new ResizeObserver(() => {
+    editor.value?.resize();
+  });
+  const el = document.getElementById(editor_id);
+  if (el) observer.observe(el);
 });
 
 // watch for changes in the data format and update the editor accordingly

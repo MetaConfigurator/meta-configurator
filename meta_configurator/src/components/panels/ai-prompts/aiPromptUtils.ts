@@ -38,6 +38,4 @@ function hasMoreOpeningBrackets(input: string): boolean {
   return openingCount > closingCount;
 }
 
-export function getApiKey(): string {
-  return localStorage.getItem('openai_api_key') || '';
-}
+export {getApiKey} from '@/utility/ai/apiKey';

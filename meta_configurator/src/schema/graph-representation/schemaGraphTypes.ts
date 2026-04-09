@@ -1,6 +1,7 @@
 import type {Path} from '@/utility/path';
 import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
 import {pathToString} from '@/utility/pathUtils';
+import {urlStringToIdentifier} from '@/utility/stringToIdentifier.ts';
 
 export class SchemaGraph {
   public constructor(public nodes: SchemaNodeData[], public edges: EdgeData[]) {}
@@ -108,6 +109,16 @@ export class SchemaObjectAttributeData extends SchemaElementData {
   }
 }
 
+export class SchemaExternalReferenceNodeData extends SchemaNodeData {
+  public constructor(public reference: string, public absolutePath: Path) {
+    const identifier = urlStringToIdentifier(reference);
+    super(identifier, identifier, identifier, false, absolutePath, {$ref: reference});
+  }
+  public getNodeType() {
+    return 'externalreference';
+  }
+}
+
 export class EdgeData {
   public constructor(
     public start: SchemaNodeData,
@@ -131,4 +142,5 @@ export enum EdgeType {
   ELSE = 'else',
   ADDITIONAL_PROPERTIES = 'additionalProperties',
   PATTERN_PROPERTIES = 'patternProperties',
+  EXTERNAL_REFERENCE = 'externalReference',
 }

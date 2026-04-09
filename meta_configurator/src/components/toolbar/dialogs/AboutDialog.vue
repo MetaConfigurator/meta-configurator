@@ -2,8 +2,9 @@
 Dialog that shows information about the application and the licenses of the used icons.
 Emits an update:visible event when the dialog is closed.
 -->
-<script setup lang="ts">
+<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
 import Dialog from 'primevue/dialog';
+import Tag from 'primevue/tag';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 defineProps<{visible: boolean}>();
@@ -11,6 +12,9 @@ defineProps<{visible: boolean}>();
 defineEmits<{
   (e: 'update:visible', newValue: boolean): void;
 }>();
+
+const appVersion = __APP_VERSION__;
+const isExperimental = __APP_EXPERIMENTAL__;
 </script>
 
 <template>
@@ -34,6 +38,11 @@ defineEmits<{
         <span class="pi pi-github mr-1" />GitHub
       </a>
       for more information
+    </p>
+    <hr class="my-2" />
+    <p class="text-sm text-gray-500">
+      Version {{ appVersion }}
+      <Tag v-if="isExperimental" severity="warn" value="Experimental" class="ml-2 tag" />
     </p>
     <hr class="my-2" />
     <p>Felix Neubauer, Paul Bredl, Minye Xu, Keyuriben Patel, Jürgen Pleiss, Benjamin Uekermann</p>
@@ -64,4 +73,8 @@ defineEmits<{
   </Dialog>
 </template>
 
-<style scoped></style>
+<style scoped>
+.tag {
+  background-color: var(--p-primary-color);
+}
+</style>

@@ -1,6 +1,6 @@
 {
-  "name": "config-assistant",
-  "version": "0.0.0",
+  "name": "meta-configurator",
+  "version": "2.2.0",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -24,6 +24,7 @@
     "precommit": "pretty-quick --staged"
   },
   "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^15.3.1",
     "@codemirror/basic-setup": "^0.20.0",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/language": "^6.11.3",
@@ -54,7 +55,7 @@
     "dagrejs": "^0.2.1",
     "fast-xml-parser": "^5.0.8",
     "flowbite": "^1.6.5",
-    "handlebars": "^4.7.8",
+    "handlebars": "^4.7.9",
     "js-yaml": "^4.1.0",
     "json-cst": "^1.2.0",
     "json-pointer": "^0.6.2",
@@ -80,7 +81,7 @@
     "vue-codemirror": "^6.1.1",
     "vue-flow": "^0.3.0",
     "vue-router": "^4.3.2",
-    "yaml": "^2.3.1"
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "^2.2.3",

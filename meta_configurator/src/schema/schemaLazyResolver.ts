@@ -5,6 +5,8 @@ import {areSchemasCompatible, mergeAllOfs, safeMergeSchemas} from '@/schema/merg
 import {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode} from '@/data/useDataLink';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {toastService} from '@/utility/toastService.ts';
+import {isExternalRef} from '@/schema/externalReferences.ts';
 
 const preprocessedRefSchemasMap: Map<SessionMode, Map<string, JsonSchemaType>> = new Map(
   Object.values(SessionMode).map(mode => [mode, new Map()])
@@ -268,7 +270,14 @@ function resolveReference(
   } else {
     let rootSchema = getSchemaForMode(mode).schemaPreprocessed.value;
     try {
-      refSchema = pointer.get(nonBooleanSchema(rootSchema ?? {}) ?? {}, refString);
+      if (isExternalRef(refString)) {
+        refSchema = {};
+        // TODO: dedicated support for external refs, currently just show warning and ignore them
+        // One reason it is not yet supported here: resolving external refs would require async code,
+        // which would require lots of code changes, especially as jsonSchemaWrapper resolves all refs in constructor
+      } else {
+        refSchema = pointer.get(nonBooleanSchema(rootSchema ?? {}) ?? {}, refString);
+      }
     } catch (e) {
       throw e;
       refSchema = {};

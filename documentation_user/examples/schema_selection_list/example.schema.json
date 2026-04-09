@@ -279,6 +279,10 @@
           "title": "Partner Name"
         }
       ]
+    },
+    "favoritePreciceTopology": {
+      "description": "Example for an external reference.",
+      "$ref": "https://raw.githubusercontent.com/MetaConfigurator/meta-configurator/refs/heads/main/documentation_user/examples/schema_selection_list/topology.schema.json"
     }
   }
 }

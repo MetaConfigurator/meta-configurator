@@ -12,6 +12,7 @@ import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {isSubSchemaDefinedInDefinitions} from '@/schema/schemaReadingUtils';
 import {getObjectDisplayName} from '../../../schema/graph-representation/schemaGraphConstructor';
+import {computed} from 'vue';
 
 const props = defineProps<{
   data: SchemaEnumNodeData;
@@ -83,6 +84,16 @@ function addEnumItem() {
   enumValues.value.push('NEW_ITEM');
   emit('update_enum_values', props.data, enumValues.value);
 }
+
+const maxEnumValuesToShow = computed(() => settings.value.schemaDiagram.maxEnumValuesToShow);
+
+const isEnumTruncated = computed(() => {
+  if (!settings.value.schemaDiagram.showEnumValues) {
+    return false;
+  }
+
+  return props.data.values.length > maxEnumValuesToShow.value;
+});
 </script>
 
 <template>
@@ -120,10 +131,12 @@ function addEnumItem() {
       <hr />
 
       <div v-if="settings.schemaDiagram.showEnumValues" v-for="(value,index) in props.data!.values">
-        <p v-if="index < settings.schemaDiagram.maxEnumValuesToShow">
+        <p v-if="index < maxEnumValuesToShow">
           {{ value }}
         </p>
       </div>
+
+      <p v-if="isEnumTruncated" class="vue-flow-enum-ellipsis">...</p>
     </div>
 
     <div v-else>
@@ -202,6 +215,11 @@ function addEnumItem() {
 
   color: #536878;
   background: linear-gradient(135deg, #e9f5ff 0%, #ffffff 100%);
+}
+.vue-flow-enum-ellipsis {
+  font-style: italic;
+  opacity: 0.7;
+  margin: 0;
 }
 
 .vue-flow__handle {
