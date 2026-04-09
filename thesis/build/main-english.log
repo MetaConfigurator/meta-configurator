@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  9 APR 2026 10:29
+This is LuaHBTeX, Version 1.24.0 (TeX Live 2026)  (format=lualatex 2026.3.2)  9 APR 2026 10:36
  system commands enabled.
  file:line:error style messages enabled.
 **main-english.tex
@@ -3309,113 +3309,113 @@ LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/it' will be
 Package cleveref Info: loaded `english' language definitions on input line 50.
 [16]
 
-LaTeX Warning: Float too large for page by 48.97887pt on input line 113.
+LaTeX Warning: Float too large for page by 39.47888pt on input line 112.
 
-Package cleveref Info: loaded `english' language definitions on input line 145.
+Package cleveref Info: loaded `english' language definitions on input line 144.
 
 [17]
-Package cleveref Info: loaded `english' language definitions on input line 145.
+Package cleveref Info: loaded `english' language definitions on input line 144.
 
  [18]
-Package cleveref Info: loaded `english' language definitions on input line 175.
+Package cleveref Info: loaded `english' language definitions on input line 174.
 
  [19]
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/9'
-(microtype)             (new value: 9.0pt) on input line 177.
+(microtype)             (new value: 9.0pt) on input line 176.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/6'
-(microtype)             (new value: 6.0pt) on input line 177.
+(microtype)             (new value: 6.0pt) on input line 176.
 Package microtype Info: Fixing zero \fontdimen 6 for font `U/MnSymbolC/m/n/5'
-(microtype)             (new value: 5.0pt) on input line 177.
+(microtype)             (new value: 5.0pt) on input line 176.
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 8.09995pt on input line 177.
-<../figures/RDF-Diag-1.png, id=527, 941.5175pt x 493.845pt>
+(Font)              scaled to size 8.09995pt on input line 176.
+<../figures/RDF-Diag-1.png, id=526, 941.5175pt x 493.845pt>
 File: ../figures/RDF-Diag-1.png Graphic file (type png)
 <use ../figures/RDF-Diag-1.png>
-Package luatex.def Info: ../figures/RDF-Diag-1.png  used on input line 181.
+Package luatex.def Info: ../figures/RDF-Diag-1.png  used on input line 180.
 (luatex.def)             Requested size: 414.07529pt x 217.18697pt.
-<../figures/RDF-Triples.png, id=530, 1047.915pt x 187.70125pt>
+<../figures/RDF-Triples.png, id=529, 1047.915pt x 187.70125pt>
 File: ../figures/RDF-Triples.png Graphic file (type png)
 <use ../figures/RDF-Triples.png>
-Package luatex.def Info: ../figures/RDF-Triples.png  used on input line 188.
+Package luatex.def Info: ../figures/RDF-Triples.png  used on input line 187.
 (luatex.def)             Requested size: 414.07529pt x 74.16838pt.
-Package cleveref Info: loaded `english' language definitions on input line 193.
+Package cleveref Info: loaded `english' language definitions on input line 192.
 
  [20<./build/../figures/RDF-Diag-1.png><./build/../figures/RDF-Triples.png>]
-Package cleveref Info: loaded `english' language definitions on input line 310.
+Package cleveref Info: loaded `english' language definitions on input line 309.
 
  [21]
-Package cleveref Info: loaded `english' language definitions on input line 310.
+Package cleveref Info: loaded `english' language definitions on input line 309.
 
  [22]
-Package cleveref Info: loaded `english' language definitions on input line 310.
+Package cleveref Info: loaded `english' language definitions on input line 309.
 
  [23]
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/b/n' will be
-(Font)              scaled to size 7.19995pt on input line 313.
-Package cleveref Info: loaded `english' language definitions on input line 333.
+(Font)              scaled to size 7.19995pt on input line 312.
+Package cleveref Info: loaded `english' language definitions on input line 332.
 
  [24]
 LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/n' will be
-(Font)              scaled to size 8.99994pt on input line 357.
+(Font)              scaled to size 8.99994pt on input line 356.
 
-Overfull \hbox (55.62186pt too wide) in paragraph at lines 362--363
+Overfull \hbox (55.62186pt too wide) in paragraph at lines 361--362
 [][]\TU/Inconsolatazi4(0)/m/n/10 (󰀒oca󰀒:variab󰀒e_e󰀒ement_size,[] []
 rdf:type,[] []<http://www.mo󰀒mod.info/semantics/pims-ii.tt󰀒#Variab󰀒e)[
 ] 
  []
 
-Package cleveref Info: loaded `english' language definitions on input line 367.
+Package cleveref Info: loaded `english' language definitions on input line 366.
 
 [25]
 
-LaTeX Warning: Float too large for page by 53.39883pt on input line 443.
+LaTeX Warning: Float too large for page by 53.39883pt on input line 442.
 
-Package cleveref Info: loaded `english' language definitions on input line 464.
+Package cleveref Info: loaded `english' language definitions on input line 463.
 
 [26]
-Package cleveref Info: loaded `english' language definitions on input line 464.
+Package cleveref Info: loaded `english' language definitions on input line 463.
 
  [27]
-Package cleveref Info: loaded `english' language definitions on input line 486.
+Package cleveref Info: loaded `english' language definitions on input line 485.
 
  [28]
-<../figures/MC-JSON.png, id=887, 1713.40125pt x 653.44125pt>
+<../figures/MC-JSON.png, id=886, 1713.40125pt x 653.44125pt>
 File: ../figures/MC-JSON.png Graphic file (type png)
 <use ../figures/MC-JSON.png>
-Package luatex.def Info: ../figures/MC-JSON.png  used on input line 497.
+Package luatex.def Info: ../figures/MC-JSON.png  used on input line 496.
 (luatex.def)             Requested size: 397.34149pt x 151.53465pt.
-<../figures/MC-JSON-Schema.png, id=890, 1711.39375pt x 865.2325pt>
+<../figures/MC-JSON-Schema.png, id=889, 1711.39375pt x 865.2325pt>
 File: ../figures/MC-JSON-Schema.png Graphic file (type png)
 <use ../figures/MC-JSON-Schema.png>
-Package luatex.def Info: ../figures/MC-JSON-Schema.png  used on input line 505.
+Package luatex.def Info: ../figures/MC-JSON-Schema.png  used on input line 504.
 
 (luatex.def)             Requested size: 355.51976pt x 179.73703pt.
-Package cleveref Info: loaded `english' language definitions on input line 513.
+Package cleveref Info: loaded `english' language definitions on input line 512.
 
  [29<./build/../figures/MC-JSON.png>]
-Package cleveref Info: loaded `english' language definitions on input line 524.
+Package cleveref Info: loaded `english' language definitions on input line 523.
 
  [30<./build/../figures/MC-JSON-Schema.png>]
-Package cleveref Info: loaded `english' language definitions on input line 552.
+Package cleveref Info: loaded `english' language definitions on input line 551.
 
  [31]
-Package cleveref Info: loaded `english' language definitions on input line 583.
+Package cleveref Info: loaded `english' language definitions on input line 582.
 
  [32]
-Package cleveref Info: loaded `english' language definitions on input line 598.
+Package cleveref Info: loaded `english' language definitions on input line 597.
 
  [33]
-Package cleveref Info: loaded `english' language definitions on input line 656.
+Package cleveref Info: loaded `english' language definitions on input line 655.
 
  [34]
-Package cleveref Info: loaded `english' language definitions on input line 656.
+Package cleveref Info: loaded `english' language definitions on input line 655.
 
  [35])
 (./chapters/02_design_and_implementation.tex
 Package cleveref Info: loaded `english' language definitions on input line 1.
  [36]
 chapter 2.
-<../figures/MC-RDF-JSON.png, id=1123, 1711.39375pt x 771.88374pt>
+<../figures/MC-RDF-JSON.png, id=1122, 1711.39375pt x 771.88374pt>
 File: ../figures/MC-RDF-JSON.png Graphic file (type png)
 <use ../figures/MC-RDF-JSON.png>
 Package luatex.def Info: ../figures/MC-RDF-JSON.png  used on input line 15.
@@ -3424,7 +3424,7 @@ Package luatex.def Info: ../figures/MC-RDF-JSON.png  used on input line 15.
 
 
 ]
-<../figures/MC-RDF-RML-1.png, id=1144, 997.7275pt x 852.18375pt>
+<../figures/MC-RDF-RML-1.png, id=1143, 997.7275pt x 852.18375pt>
 File: ../figures/MC-RDF-RML-1.png Graphic file (type png)
 <use ../figures/MC-RDF-RML-1.png>
 Package luatex.def Info: ../figures/MC-RDF-RML-1.png  used on input line 29.
@@ -3446,13 +3446,13 @@ Package cleveref Info: loaded `english' language definitions on input line 194.
 Package cleveref Info: loaded `english' language definitions on input line 194.
 
  [42]
-<../figures/MC-RDF-JSON-LD-1.png, id=1364, 1702.36pt x 765.86125pt>
+<../figures/MC-RDF-JSON-LD-1.png, id=1363, 1702.36pt x 765.86125pt>
 File: ../figures/MC-RDF-JSON-LD-1.png Graphic file (type png)
 <use ../figures/MC-RDF-JSON-LD-1.png>
 Package luatex.def Info: ../figures/MC-RDF-JSON-LD-1.png  used on input line 20
 9.
 (luatex.def)             Requested size: 414.07529pt x 186.27621pt.
-<../figures/MC-RDF-JSON-LD-2.png, id=1367, 1699.34875pt x 559.08875pt>
+<../figures/MC-RDF-JSON-LD-2.png, id=1366, 1699.34875pt x 559.08875pt>
 File: ../figures/MC-RDF-JSON-LD-2.png Graphic file (type png)
 <use ../figures/MC-RDF-JSON-LD-2.png>
 Package luatex.def Info: ../figures/MC-RDF-JSON-LD-2.png  used on input line 21
@@ -3467,7 +3467,7 @@ L[] []Schema[] []data-types.[] []Changes[] []are[] []ex-e-cuted[] []through[] [
 ]\TU/Inconsolatazi4(0)/m/n/10.95 Trip󰀒eEditorService[]
  []
 
-<../figures/MC-RDF-Modal.png, id=1389, 788.9475pt x 489.83pt>
+<../figures/MC-RDF-Modal.png, id=1388, 788.9475pt x 489.83pt>
 File: ../figures/MC-RDF-Modal.png Graphic file (type png)
 <use ../figures/MC-RDF-Modal.png>
 Package luatex.def Info: ../figures/MC-RDF-Modal.png  used on input line 244.
@@ -3475,12 +3475,12 @@ Package luatex.def Info: ../figures/MC-RDF-Modal.png  used on input line 244.
 Package cleveref Info: loaded `english' language definitions on input line 249.
 
 [44<./build/../figures/MC-RDF-JSON-LD-2.png>]
-<../figures/Diagram-1.png, id=1403, 1023.825pt x 364.36125pt>
+<../figures/Diagram-1.png, id=1402, 1023.825pt x 364.36125pt>
 File: ../figures/Diagram-1.png Graphic file (type png)
 <use ../figures/Diagram-1.png>
 Package luatex.def Info: ../figures/Diagram-1.png  used on input line 257.
 (luatex.def)             Requested size: 414.07529pt x 147.35979pt.
-<../figures/Diagram-2.png, id=1404, 1116.17pt x 546.04pt>
+<../figures/Diagram-2.png, id=1403, 1116.17pt x 546.04pt>
 File: ../figures/Diagram-2.png Graphic file (type png)
 <use ../figures/Diagram-2.png>
 Package luatex.def Info: ../figures/Diagram-2.png  used on input line 264.
@@ -3518,25 +3518,25 @@ Overfull \hbox (3.63716pt too wide) in paragraph at lines 293--294
 Package cleveref Info: loaded `english' language definitions on input line 305.
 
 [47]
-<../figures/MC-RDF-Ontology-1.png, id=1459, 1187.43625pt x 837.1275pt>
+<../figures/MC-RDF-Ontology-1.png, id=1458, 1187.43625pt x 837.1275pt>
 File: ../figures/MC-RDF-Ontology-1.png Graphic file (type png)
 <use ../figures/MC-RDF-Ontology-1.png>
 Package luatex.def Info: ../figures/MC-RDF-Ontology-1.png  used on input line 3
 24.
 (luatex.def)             Requested size: 334.60571pt x 235.8886pt.
-<../figures/MC-RDF-Ontology-2.png, id=1460, 1174.3875pt x 818.05624pt>
+<../figures/MC-RDF-Ontology-2.png, id=1459, 1174.3875pt x 818.05624pt>
 File: ../figures/MC-RDF-Ontology-2.png Graphic file (type png)
 <use ../figures/MC-RDF-Ontology-2.png>
 Package luatex.def Info: ../figures/MC-RDF-Ontology-2.png  used on input line 3
 31.
 (luatex.def)             Requested size: 334.60571pt x 233.07355pt.
-<../figures/MC-RDF-Ontology-3.png, id=1461, 1167.36125pt x 822.07124pt>
+<../figures/MC-RDF-Ontology-3.png, id=1460, 1167.36125pt x 822.07124pt>
 File: ../figures/MC-RDF-Ontology-3.png Graphic file (type png)
 <use ../figures/MC-RDF-Ontology-3.png>
 Package luatex.def Info: ../figures/MC-RDF-Ontology-3.png  used on input line 3
 38.
 (luatex.def)             Requested size: 334.60571pt x 235.63492pt.
-<../figures/MC-RDF-Ontology-4.png, id=1462, 1181.41376pt x 819.06pt>
+<../figures/MC-RDF-Ontology-4.png, id=1461, 1181.41376pt x 819.06pt>
 File: ../figures/MC-RDF-Ontology-4.png Graphic file (type png)
 <use ../figures/MC-RDF-Ontology-4.png>
 Package luatex.def Info: ../figures/MC-RDF-Ontology-4.png  used on input line 3
@@ -3560,7 +3560,7 @@ LaTeX Font Info:    Font shape `TU/Inconsolatazi4(0)/m/it' will be
 Package cleveref Info: loaded `english' language definitions on input line 371.
 
  [51]
-<../figures/MC-RDF-JSON-LD-3.png, id=1531, 1700.3525pt x 769.87625pt>
+<../figures/MC-RDF-JSON-LD-3.png, id=1530, 1700.3525pt x 769.87625pt>
 File: ../figures/MC-RDF-JSON-LD-3.png Graphic file (type png)
 <use ../figures/MC-RDF-JSON-LD-3.png>
 Package luatex.def Info: ../figures/MC-RDF-JSON-LD-3.png  used on input line 38
@@ -3580,13 +3580,13 @@ Package cleveref Info: loaded `english' language definitions on input line 432.
 Package cleveref Info: loaded `english' language definitions on input line 432.
 
  [53]
-<../figures/MC-RDF-SPARQL-1.png, id=1586, 1188.44pt x 825.0825pt>
+<../figures/MC-RDF-SPARQL-1.png, id=1585, 1188.44pt x 825.0825pt>
 File: ../figures/MC-RDF-SPARQL-1.png Graphic file (type png)
 <use ../figures/MC-RDF-SPARQL-1.png>
 Package luatex.def Info: ../figures/MC-RDF-SPARQL-1.png  used on input line 451
 .
 (luatex.def)             Requested size: 313.69167pt x 217.77713pt.
-<../figures/MC-RDF-SPARQL-2.png, id=1587, 1475.5125pt x 805.0075pt>
+<../figures/MC-RDF-SPARQL-2.png, id=1586, 1475.5125pt x 805.0075pt>
 File: ../figures/MC-RDF-SPARQL-2.png Graphic file (type png)
 <use ../figures/MC-RDF-SPARQL-2.png>
 Package luatex.def Info: ../figures/MC-RDF-SPARQL-2.png  used on input line 476
@@ -3598,7 +3598,7 @@ Package cleveref Info: loaded `english' language definitions on input line 481.
 Package cleveref Info: loaded `english' language definitions on input line 481.
 
  [55<./build/../figures/MC-RDF-SPARQL-1.png>]
-<../figures/Plot.png, id=1632, 617.9085pt x 339.669pt>
+<../figures/Plot.png, id=1631, 617.9085pt x 339.669pt>
 File: ../figures/Plot.png Graphic file (type png)
 <use ../figures/Plot.png>
 Package luatex.def Info: ../figures/Plot.png  used on input line 493.
@@ -3609,7 +3609,7 @@ Package cleveref Info: loaded `english' language definitions on input line 498.
 Package cleveref Info: loaded `english' language definitions on input line 507.
 
  [57<./build/../figures/Plot.png>]
-<../figures/MC-RDF-KG-1.png, id=1655, 1172.38pt x 816.04875pt>
+<../figures/MC-RDF-KG-1.png, id=1654, 1172.38pt x 816.04875pt>
 File: ../figures/MC-RDF-KG-1.png Graphic file (type png)
 <use ../figures/MC-RDF-KG-1.png>
 Package luatex.def Info: ../figures/MC-RDF-KG-1.png  used on input line 519.
@@ -3642,7 +3642,7 @@ Package cleveref Info: loaded `english' language definitions on input line 265.
 Package cleveref Info: loaded `english' language definitions on input line 265.
 
  [66]
-<../figures/MC-RDF-SPARQL-3.png, id=1978, 1246.6575pt x 433.62pt>
+<../figures/MC-RDF-SPARQL-3.png, id=1977, 1246.6575pt x 433.62pt>
 File: ../figures/MC-RDF-SPARQL-3.png Graphic file (type png)
 <use ../figures/MC-RDF-SPARQL-3.png>
 Package luatex.def Info: ../figures/MC-RDF-SPARQL-3.png  used on input line 303
@@ -3651,7 +3651,7 @@ Package luatex.def Info: ../figures/MC-RDF-SPARQL-3.png  used on input line 303
 Package cleveref Info: loaded `english' language definitions on input line 311.
 
  [67]
-<../figures/MC-RDF-KG-2.png, id=2015, 1153.30875pt x 712.6625pt>
+<../figures/MC-RDF-KG-2.png, id=2014, 1153.30875pt x 712.6625pt>
 File: ../figures/MC-RDF-KG-2.png Graphic file (type png)
 <use ../figures/MC-RDF-KG-2.png>
 Package luatex.def Info: ../figures/MC-RDF-KG-2.png  used on input line 316.
@@ -3719,16 +3719,16 @@ Package logreq Info: Writing requests to 'main-english.run.xml'.
 )
 
 Here is how much of LuaTeX's memory you used:
- 98090 strings out of 476076
- 596140,3417909 words of node,token memory allocated
- 1622 words of node memory still in use:
-   8 hlist, 2 vlist, 2 rule, 1 local_par, 28 glue, 5 kern, 1 penalty, 4 glyph, 1
-39 attribute, 110 glue_spec, 70 attribute_list, 2 shape, 5 write, 1 close, 3 use
-r_defined, 30 pdf_action nodes
-   avail lists: 1:20,2:25327,3:2388,4:14343,5:7901,6:335,7:17025,8:97,9:23581,10
+ 98051 strings out of 476076
+ 596174,3417909 words of node,token memory allocated
+ 1628 words of node memory still in use:
+   8 hlist, 2 vlist, 2 rule, 1 local_par, 28 glue, 4 kern, 1 penalty, 1 margin_k
+ern, 5 glyph, 139 attribute, 110 glue_spec, 70 attribute_list, 2 shape, 5 write,
+ 1 close, 3 user_defined, 30 pdf_action nodes
+   avail lists: 1:14,2:25327,3:2388,4:14343,5:7902,6:335,7:17024,8:97,9:23581,10
 :24,11:1038,12:1
  96310 multiletter control sequences out of 65536+600000
- 140 fonts using 32595671 bytes
+ 140 fonts using 32595471 bytes
  108i,21n,115p,11243b,3429s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolat
 azi4-Bold.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/lm-math/
@@ -3742,10 +3742,10 @@ ve/2026/texmf-dist/fonts/opentype/public/inconsolata/Inconsolatazi4-Regular.otf>
 -regular.otf></usr/local/texlive/2026/texmf-dist/fonts/opentype/public/tex-gyre/
 texgyreheros-regular.otf></usr/local/texlive/2026/texmf-dist/fonts/type1/urw/zap
 fding/uzdr.pfb>
-Output written on main-english.pdf (83 pages, 4059516 bytes).
+Output written on main-english.pdf (83 pages, 4059191 bytes).
 
-PDF statistics: 2588 PDF objects out of 2984 (max. 8388607)
- 2377 compressed objects within 24 object streams
- 1002 named destinations out of 1200 (max. 1048576)
+PDF statistics: 2587 PDF objects out of 2984 (max. 8388607)
+ 2376 compressed objects within 24 object streams
+ 1001 named destinations out of 1200 (max. 1048576)
  416 words of extra memory for PDF output out of 10000 (max. 100000000)
 

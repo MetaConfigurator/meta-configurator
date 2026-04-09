@@ -1,11 +1,11 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {1.1}{\ignorespaces Comparison of tools supporting RDF authoring and Semantic Web integration}}{35}{table.302}%
-\contentsline {table}{\numberline {1.2}{\ignorespaces Rating scale used in Table~\ref {tab:related_tools_comparison}}}{35}{table.304}%
+\contentsline {table}{\numberline {1.1}{\ignorespaces Comparison of tools supporting RDF authoring and Semantic Web integration}}{35}{table.301}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces Rating scale used in Table~\ref {tab:related_tools_comparison}}}{35}{table.303}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {2.1}{\ignorespaces Vocabulary terms used for ontology term classification in the Ontology Explorer}}{48}{table.472}%
+\contentsline {table}{\numberline {2.1}{\ignorespaces Vocabulary terms used for ontology term classification in the Ontology Explorer}}{48}{table.471}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {3.1}{\ignorespaces Ontology classes and properties used in \texttt {rr:class} and \texttt {rr:predicate} assignments in Listings~\ref {lst:application_mof_rml_example_1} and~\ref {lst:application_mof_rml_example_2}}}{65}{table.706}%
+\contentsline {table}{\numberline {3.1}{\ignorespaces Ontology classes and properties used in \texttt {rr:class} and \texttt {rr:predicate} assignments in Listings~\ref {lst:application_mof_rml_example_1} and~\ref {lst:application_mof_rml_example_2}}}{65}{table.705}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \def \@chapapp {\appendixname }

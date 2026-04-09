@@ -1,29 +1,29 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Graph view of the RDF representation in Listing~\ref {lst:background_rdf_xml_example}}}{20}{figure.102}%
-\contentsline {figure}{\numberline {1.2}{\ignorespaces Table view of the RDF representation in Listing~\ref {lst:background_rdf_xml_example}}}{20}{figure.104}%
-\contentsline {figure}{\numberline {1.3}{\ignorespaces A snapshot of MetaConfigurator's data editing interface, showing the JSON instance from Listing~\ref {lst:background_json_example}}}{29}{figure.279}%
-\contentsline {figure}{\numberline {1.4}{\ignorespaces A snapshot of MetaConfigurator's schema editing interface, showing the JSON Schema from Listing~\ref {lst:background_json_schema}}}{30}{figure.281}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Graph view of the RDF representation in Listing~\ref {lst:background_rdf_xml_example}}}{20}{figure.101}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Table view of the RDF representation in Listing~\ref {lst:background_rdf_xml_example}}}{20}{figure.103}%
+\contentsline {figure}{\numberline {1.3}{\ignorespaces A snapshot of MetaConfigurator's data editing interface, showing the JSON instance from Listing~\ref {lst:background_json_example}}}{29}{figure.278}%
+\contentsline {figure}{\numberline {1.4}{\ignorespaces A snapshot of MetaConfigurator's schema editing interface, showing the JSON Schema from Listing~\ref {lst:background_json_schema}}}{30}{figure.280}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces A snapshot of MetaConfigurator's RDF panel.}}{38}{figure.309}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces The RML mapping dialog for JSON-to-JSON-LD conversion.}}{41}{figure.312}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces JSON-LD output after applying the mapping from Listing~\ref {lst:background_rml_mapping} in the Triples tab.}}{43}{figure.456}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces JSON-LD output after applying the mapping from Listing~\ref {lst:background_rml_mapping} in the Context tab.}}{44}{figure.458}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Edit modal for triple editing.}}{45}{figure.463}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Synchronization process illustrating how modifications made in the Text View are propagated and reflected in the RDF View.}}{46}{figure.465}%
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}}{46}{figure.467}%
-\contentsline {figure}{\numberline {2.8}{\ignorespaces Ontology Explorer dialog, which allows users to download ontologies and browse their classes and properties for IRI completion.}}{49}{figure.486}%
-\contentsline {figure}{\numberline {2.9}{\ignorespaces Downloading Schema.org ontology in the Ontology Explorer dialog.}}{49}{figure.488}%
-\contentsline {figure}{\numberline {2.10}{\ignorespaces Ontology Explorer allows running custom SPARQL queries to find specific classes, properties or instances that are not accessible in predefined views.}}{50}{figure.490}%
-\contentsline {figure}{\numberline {2.11}{\ignorespaces Results of running SPARQL query in Listing~\ref {lst:design_sparql_qudt} over the QUDT ontology.}}{50}{figure.492}%
-\contentsline {figure}{\numberline {2.12}{\ignorespaces Linked selection between Text View and RDF View.}}{52}{figure.500}%
-\contentsline {figure}{\numberline {2.13}{\ignorespaces SPARQL query dialog, with AI-assisted query generation.}}{55}{figure.531}%
-\contentsline {figure}{\numberline {2.14}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{56}{figure.549}%
-\contentsline {figure}{\numberline {2.15}{\ignorespaces CSV export visualized: \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress} trends.}}{57}{figure.551}%
-\contentsline {figure}{\numberline {2.16}{\ignorespaces KG visualization of the JSON-LD from Listing~\ref {lst:background_jsonld_example} in the Visualization dialog.}}{58}{figure.556}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces A snapshot of MetaConfigurator's RDF panel.}}{38}{figure.308}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces The RML mapping dialog for JSON-to-JSON-LD conversion.}}{41}{figure.311}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces JSON-LD output after applying the mapping from Listing~\ref {lst:background_rml_mapping} in the Triples tab.}}{43}{figure.455}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces JSON-LD output after applying the mapping from Listing~\ref {lst:background_rml_mapping} in the Context tab.}}{44}{figure.457}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Edit modal for triple editing.}}{45}{figure.462}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Synchronization process illustrating how modifications made in the Text View are propagated and reflected in the RDF View.}}{46}{figure.464}%
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Workflow showing how changes originating in the RDF View are transferred back and represented in the Text View.}}{46}{figure.466}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Ontology Explorer dialog, which allows users to download ontologies and browse their classes and properties for IRI completion.}}{49}{figure.485}%
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Downloading Schema.org ontology in the Ontology Explorer dialog.}}{49}{figure.487}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Ontology Explorer allows running custom SPARQL queries to find specific classes, properties or instances that are not accessible in predefined views.}}{50}{figure.489}%
+\contentsline {figure}{\numberline {2.11}{\ignorespaces Results of running SPARQL query in Listing~\ref {lst:design_sparql_qudt} over the QUDT ontology.}}{50}{figure.491}%
+\contentsline {figure}{\numberline {2.12}{\ignorespaces Linked selection between Text View and RDF View.}}{52}{figure.499}%
+\contentsline {figure}{\numberline {2.13}{\ignorespaces SPARQL query dialog, with AI-assisted query generation.}}{55}{figure.530}%
+\contentsline {figure}{\numberline {2.14}{\ignorespaces Result after running SPARQL query in Figure~\ref {fig:rdf_authoring_panel:sparql_ai_generated}.}}{56}{figure.548}%
+\contentsline {figure}{\numberline {2.15}{\ignorespaces CSV export visualized: \texttt {element\_size} vs. \texttt {max\_von\_mises\_stress} trends.}}{57}{figure.550}%
+\contentsline {figure}{\numberline {2.16}{\ignorespaces KG visualization of the JSON-LD from Listing~\ref {lst:background_jsonld_example} in the Visualization dialog.}}{58}{figure.555}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running the SPARQL query from Listing~\ref {lst:application_mof_sparql_example}.}}{68}{figure.774}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Visualization of the JSON-LD in Listing~\ref {lst:application_mof_jsonld_example_s_1}.}}{69}{figure.777}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Result after running the SPARQL query from Listing~\ref {lst:application_mof_sparql_example}.}}{68}{figure.773}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Visualization of the JSON-LD in Listing~\ref {lst:application_mof_jsonld_example_s_1}.}}{69}{figure.776}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \def \@chapapp {\appendixname }
