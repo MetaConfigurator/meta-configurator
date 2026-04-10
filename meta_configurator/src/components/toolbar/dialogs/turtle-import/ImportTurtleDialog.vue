@@ -10,6 +10,7 @@ import {
 } from '@/components/toolbar/dialogs/turtle-import/importTurtleUtils';
 import {useCurrentData} from '@/data/useDataLink';
 import {toastService} from '@/utility/toastService';
+import Message from 'primevue/message';
 
 const isLoading = ref(false);
 const showDialog = ref(false);
@@ -63,15 +64,11 @@ defineExpose({show: openDialog, close: hideDialog});
     <div
       class="flex flex-column gap-3 bigger-dialog-content"
       :style="{cursor: isLoading ? 'wait' : 'default'}">
-      <div class="warning-box">
-        ⚠️ Importing a Turtle file overwrite existing data in the text view.
-      </div>
+      <Message severity="warn" :closable="false" icon="pi pi-exclamation-triangle">
+        Importing a Turtle file will overwrite existing data in the text view.
+      </Message>
       <div class="flex align-items-center justify-content-center gap-2">
-        <Button
-          label="Select File"
-          @click="requestUploadFile"
-          class="p-button-raised p-button-rounded"
-          :disabled="isLoading" />
+        <Button label="Select File" @click="requestUploadFile" :disabled="isLoading" />
         <FontAwesomeIcon icon="fa-regular" class="text-green-500" />
       </div>
 
@@ -87,14 +84,16 @@ defineExpose({show: openDialog, close: hideDialog});
   flex-direction: column;
   align-items: center;
 }
+
 .vertical-center {
   display: flex;
   align-items: center;
 }
+
 .warning-box {
-  background-color: #fff3cd;
-  color: #664d03;
-  border: 1px solid #ffecb5;
+  background-color: var(--yellow-100);
+  color: var(--yellow-900);
+  border: 1px solid var(--yellow-300);
   padding: 0.75rem 1rem;
   border-radius: 6px;
   font-size: 0.9rem;
