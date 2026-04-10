@@ -187,7 +187,7 @@ import {
 import Dock from 'primevue/dock';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
-import {isDarkMode} from '@/utility/darkModeUtils';
+import {useDark} from '@vueuse/core';
 import {
   TripleEditorService,
   type TripleTransferObject,
@@ -209,6 +209,7 @@ interface SelectedNodeData {
   }>;
 }
 
+const isDark = useDark();
 const settings = useSettings();
 const showLargeGraphPrompt = ref(false);
 const nodeCount = ref(0);
@@ -661,7 +662,7 @@ const TYPE_PREDICATES = [
 ];
 
 function createCyStyle(): cytoscape.StylesheetCSS[] {
-  const edgeLabelColor = isDarkMode.value ? '#f8fafc' : '#111827';
+  const edgeLabelColor = isDark.value ? '#f8fafc' : '#111827';
   return [
     {
       selector: 'node',
