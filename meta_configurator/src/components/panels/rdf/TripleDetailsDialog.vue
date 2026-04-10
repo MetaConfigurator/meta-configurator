@@ -237,6 +237,7 @@ const filteredObjectNodes = computed(() => {
 const filteredPredicateNodes = computed(() => {
   return filterByQuery(predicates.value, localTriple.value.predicate);
 });
+
 const ontologyExplorerDialogTitle = computed(
   () => `Ontology Explorer (${ontologyExplorerTarget.value})`
 );

@@ -84,7 +84,7 @@ export function createCyStyle(isDarkMode: boolean): cytoscape.StylesheetCSS[] {
 export const CY_LAYOUT = {
   name: 'cose-bilkent',
   animate: true,
-  animationDuration: 1000,
+  animationDuration: 500,
   animationEasing: 'ease-in-out-cubic',
   randomize: true,
   idealEdgeLength: 220,
@@ -95,7 +95,7 @@ export const CY_LAYOUT = {
   tile: true,
   tilingPaddingVertical: 10,
   tilingPaddingHorizontal: 10,
-  nodeDimensionsIncludeLabels: true,
+  nodeDimensionsIncludeLabels: false,
   avoidOverlap: true,
   avoidOverlapPadding: 50,
 } as any;
