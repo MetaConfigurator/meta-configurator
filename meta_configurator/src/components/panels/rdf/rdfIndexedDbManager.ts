@@ -45,6 +45,7 @@ export type RdfCachedOntology = {
   mergedGraphNTriples?: string;
   ontologyQueryResults?: RdfOntologyRow[];
   queryResultsFetchedAt?: string;
+  lastCustomSparqlQuery?: string;
 };
 
 export type RdfCachedContext = {
@@ -233,6 +234,8 @@ export function normalizeOntologyCacheEntry(
       : undefined,
     queryResultsFetchedAt:
       typeof value.queryResultsFetchedAt === 'string' ? value.queryResultsFetchedAt : undefined,
+    lastCustomSparqlQuery:
+      typeof value.lastCustomSparqlQuery === 'string' ? value.lastCustomSparqlQuery : undefined,
   };
 }
 

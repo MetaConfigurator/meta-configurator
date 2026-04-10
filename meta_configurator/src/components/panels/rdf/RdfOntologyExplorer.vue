@@ -89,62 +89,14 @@
             </template>
             <template #extra-panels>
               <TabPanel :value="ONTOLOGY_EXPLORER_TAB.CustomQuery">
-                <div class="flex flex-col gap-2 mb-2 mt-2">
-                  <Accordion v-model:value="customQueryAccordion">
-                    <AccordionPanel :value="CUSTOM_QUERY_ACCORDION_SECTION.Editor">
-                      <AccordionHeader>SPARQL Query Editor</AccordionHeader>
-                      <AccordionContent>
-                        <div class="custom-query-editor">
-                          <SparqlQueryEditor
-                            v-model="customSparqlQuery"
-                            :errorLine="customQueryErrorLineNumber"
-                            :errorMessage="customQueryErrorMessage" />
-                        </div>
-                      </AccordionContent>
-                    </AccordionPanel>
-                  </Accordion>
-                  <div class="flex justify-end">
-                    <Button
-                      label="Run Query"
-                      icon="pi pi-play"
-                      size="small"
-                      :loading="isRunningCustomQuery"
-                      :disabled="!selectedCacheEntry || !customSparqlQuery.trim()"
-                      @click="runCustomSparqlQuery" />
-                  </div>
-                </div>
-                <div class="table-search mb-2">
-                  <InputText
-                    v-model.trim="customTableSearch"
-                    placeholder="Search query results"
-                    class="w-full" />
-                </div>
-                <DataTable
-                  :value="filteredCustomQueryRows"
-                  v-model:first="customQueryFirst"
-                  size="small"
-                  stripedRows
-                  paginator
-                  :rows="ROWS_PER_PAGE"
-                  scrollable
-                  resizableColumns
-                  scrollHeight="flex">
-                  <Column
-                    v-for="column in customQueryColumns"
-                    :key="column"
-                    :field="column"
-                    :header="column">
-                    <template #body="{data}">
-                      <button
-                        type="button"
-                        class="custom-query-cell"
-                        :class="{iri: isLikelyIri(normalizePotentialIri(data[column]))}"
-                        @click="onCustomQueryValueClick(data[column])">
-                        {{ data[column] }}
-                      </button>
-                    </template>
-                  </Column>
-                </DataTable>
+                <OntologyCustomQueryTab
+                  :selectedCacheEntry="selectedCacheEntry"
+                  :rowsPerPage="ROWS_PER_PAGE"
+                  :defaultQuery="DEFAULT_CUSTOM_SPARQL_QUERY"
+                  :ensureCacheEntryGraph="ensureCacheEntryGraph"
+                  :putOntologyToIndexedDb="putOntologyToIndexedDb"
+                  @select-iri="onCustomQueryIriSelect"
+                  @status="onCustomQueryStatus" />
               </TabPanel>
             </template>
           </OntologyTermTabs>
@@ -199,15 +151,13 @@ import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import Tab from 'primevue/tab';
 import TabPanel from 'primevue/tabpanel';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
-import SparqlQueryEditor from '@/components/panels/rdf/SparqlQueryEditor.vue';
 import OntologyTermTabs from '@/components/panels/rdf/OntologyTermTabs.vue';
+import OntologyCustomQueryTab from '@/components/panels/rdf/OntologyCustomQueryTab.vue';
 import {
   deleteOntologyFromRdfCache,
   getOntologyFromRdfCache,
@@ -216,7 +166,6 @@ import {
   type RdfOntologyRow,
 } from '@/components/panels/rdf/rdfIndexedDbManager';
 import {
-  CustomQueryAccordionSection,
   OntologyAccordionSection,
   OntologyExplorerTab,
   RdfBindingName,
@@ -227,7 +176,6 @@ import {
   RdfProxyPath,
   RdfStatusSeverity,
 } from '@/components/panels/rdf/rdfEnums';
-import {validateSparqlSyntax} from '@/components/panels/rdf/rdfUtils';
 
 const props = withDefaults(
   defineProps<{
@@ -256,19 +204,9 @@ const isQuerying = ref(false);
 const ontologyRows = ref<OntologyRow[]>([]);
 const ROWS_PER_PAGE = 100;
 const activePropertyTab = ref<OntologyExplorerTab>(OntologyExplorerTab.ObjectProperty);
-const customTableSearch = ref('');
 const selectedOntologyTabIri = ref('');
-const customQueryFirst = ref(0);
-const customSparqlQuery = ref('SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 100');
-const customQueryRows = ref<CustomQueryRow[]>([]);
+const DEFAULT_CUSTOM_SPARQL_QUERY = 'SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 100';
 const selectedCustomQueryIri = ref('');
-const isRunningCustomQuery = ref(false);
-const customQueryErrorLineNumber = ref<number | null>(null);
-const customQueryErrorMessage = ref<string | null>(null);
-const customQueryAccordion = ref<CustomQueryAccordionSection | null>(
-  CustomQueryAccordionSection.Editor
-);
-let customQueryValidateTimer: number | null = null;
 const pendingInitialIri = ref('');
 const isAutoSelectingPrefix = ref(false);
 const activeAccordion = ref<OntologyAccordionSection | null>(OntologyAccordionSection.Controls);
@@ -278,11 +216,8 @@ const ontologyFileUploadRef = ref<any | null>(null);
 type CachedOntology = RdfCachedOntology;
 type OntologyRow = RdfOntologyRow;
 
-type CustomQueryRow = Record<string, string>;
-
 const ONTOLOGY_EXPLORER_TAB = OntologyExplorerTab;
 const ONTOLOGY_ACCORDION_SECTION = OntologyAccordionSection;
-const CUSTOM_QUERY_ACCORDION_SECTION = CustomQueryAccordionSection;
 
 const ACCEPT_RDF_HEADER = `${RdfMediaType.RdfXml}, ${RdfMediaType.Turtle}, ${RdfMediaType.XTurtle}, ${RdfMediaType.NTriples}, ${RdfMediaType.N3}, ${RdfMediaType.JsonLd}, ${RdfMediaType.Json}, ${RdfMediaType.Xml}, ${RdfMediaType.TextXml}, ${RdfMediaType.TextPlain}`;
 const RDF_FILE_ACCEPT = `.rdf,.owl,.xml,.ttl,.nt,.n3,.jsonld,.json,${RdfMediaType.RdfXml},${RdfMediaType.Turtle},${RdfMediaType.XTurtle},${RdfMediaType.NTriples},${RdfMediaType.N3},${RdfMediaType.JsonLd},${RdfMediaType.Json},${RdfMediaType.Xml},${RdfMediaType.TextXml},${RdfMediaType.TextPlain}`;
@@ -300,26 +235,12 @@ const selectedCacheEntry = computed(() => {
   return entry;
 });
 
-const filteredCustomQueryRows = computed(() =>
-  filterCustomQueryRows(customQueryRows.value, customTableSearch.value)
-);
-const customQueryColumns = computed(() => {
-  const columns = new Set<string>();
-  for (const row of customQueryRows.value) {
-    for (const key of Object.keys(row)) {
-      columns.add(key);
-    }
-  }
-  return Array.from(columns);
-});
 const selectedRowIri = computed(() => {
   return activePropertyTab.value === OntologyExplorerTab.CustomQuery
     ? selectedCustomQueryIri.value
     : selectedOntologyTabIri.value;
 });
-const canSelectCurrentIri = computed(() =>
-  isLikelyIri(normalizePotentialIri(selectedRowIri.value))
-);
+const canSelectCurrentIri = computed(() => isLikelyIri(selectedRowIri.value));
 
 watch(
   () => data.data.value,
@@ -355,11 +276,8 @@ watch(
     }
     statusMessage.value = '';
     ontologyRows.value = [];
-    customQueryRows.value = [];
     selectedCustomQueryIri.value = '';
     selectedOntologyTabIri.value = '';
-    customQueryFirst.value = 0;
-    customTableSearch.value = '';
     loadedCacheEntry.value = null;
     if (!newPrefix) {
       ontologyUrl.value = '';
@@ -636,7 +554,6 @@ async function loadOntologyCards(forceRefresh = false) {
   const selectedEntry = selectedCacheEntry.value;
   if (!selectedEntry) {
     ontologyRows.value = [];
-    customQueryRows.value = [];
     return;
   }
 
@@ -776,101 +693,6 @@ async function runSparqlOnCachedOntology(query: string, graphNTriples: string) {
   return rows;
 }
 
-async function runCustomSparqlQuery() {
-  const entry = selectedCacheEntry.value;
-  if (!entry) {
-    setStatus('Please select a prefix with a cached ontology first.', RdfStatusSeverity.Warn);
-    return;
-  }
-
-  const query = customSparqlQuery.value;
-  if (!query.trim()) {
-    setStatus('Please enter a SPARQL query.', RdfStatusSeverity.Warn);
-    return;
-  }
-  if (!validateCustomSparqlSyntax(query, false)) {
-    return;
-  }
-  customQueryErrorMessage.value = null;
-
-  const queryEngineCtor = (window as any)?.Comunica?.QueryEngine;
-  if (!queryEngineCtor) {
-    setStatus('SPARQL engine is not available.', RdfStatusSeverity.Error);
-    return;
-  }
-
-  isRunningCustomQuery.value = true;
-  try {
-    const cacheEntry = await ensureCacheEntryGraph(entry);
-    const graphNTriples = cacheEntry.mergedGraphNTriples ?? '';
-    const engine = new queryEngineCtor();
-    const sources = [{type: 'serialized', value: graphNTriples, mediaType: RdfMediaType.NTriples}];
-    const stream = await engine.queryBindings(query, {sources});
-    const rows: CustomQueryRow[] = [];
-
-    await new Promise<void>((resolve, reject) => {
-      stream
-        .on('data', (binding: any) => {
-          const row: CustomQueryRow = {};
-          for (const key of binding.keys()) {
-            const keyName = key?.value ?? key?.name ?? String(key).replace(/^\?/, '');
-            row[keyName] = binding.get(key)?.value ?? '';
-          }
-          rows.push(row);
-        })
-        .on('end', () => resolve())
-        .on('error', (err: any) => reject(err));
-    });
-
-    customQueryRows.value = rows;
-    customQueryFirst.value = 0;
-    selectedCustomQueryIri.value = '';
-    customQueryErrorMessage.value = null;
-    customQueryAccordion.value = null;
-    setStatus(`Custom query returned ${rows.length} row(s).`, RdfStatusSeverity.Success);
-  } catch (error: any) {
-    customQueryErrorMessage.value = error?.message ?? 'Failed to execute custom query.';
-    setStatus(error?.message ?? 'Failed to execute custom query.', RdfStatusSeverity.Error);
-  } finally {
-    isRunningCustomQuery.value = false;
-  }
-}
-
-function validateCustomSparqlSyntax(query: string, silent: boolean): boolean {
-  const result = validateSparqlSyntax(query);
-  if (result.valid) {
-    customQueryErrorLineNumber.value = null;
-    customQueryErrorMessage.value = null;
-    return true;
-  }
-
-  customQueryErrorLineNumber.value = result.errorLine;
-  customQueryErrorMessage.value = result.errorMessage ?? 'Invalid SPARQL query syntax.';
-  if (!silent) {
-    setStatus(result.errorMessage ?? 'Invalid SPARQL query syntax.', RdfStatusSeverity.Error);
-  }
-  return false;
-}
-
-function validateCustomQueryLive() {
-  if (customQueryValidateTimer) {
-    window.clearTimeout(customQueryValidateTimer);
-  }
-  customQueryValidateTimer = window.setTimeout(() => {
-    const query = customSparqlQuery.value;
-    if (!query.trim()) {
-      customQueryErrorLineNumber.value = null;
-      customQueryErrorMessage.value = null;
-      return;
-    }
-    validateCustomSparqlSyntax(query, true);
-  }, 250);
-}
-
-watch(customSparqlQuery, () => {
-  validateCustomQueryLive();
-});
-
 async function ensureCacheEntryGraph(entry: CachedOntology): Promise<CachedOntology> {
   if (entry.mergedGraphNTriples) {
     return entry;
@@ -890,14 +712,6 @@ async function ensureCacheEntryGraph(entry: CachedOntology): Promise<CachedOntol
   loadedCacheEntry.value = upgradedEntry;
   await putOntologyToIndexedDb(upgradedEntry);
   return upgradedEntry;
-}
-
-function filterCustomQueryRows(rows: CustomQueryRow[], query: string) {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return rows;
-  return rows.filter(row =>
-    Object.values(row).some(value => value.toLowerCase().includes(normalized))
-  );
 }
 
 function getBindingValue(binding: any, name: string): string {
@@ -943,7 +757,6 @@ async function deleteCachedOntology() {
     if (selectedPrefix.value === prefixToDelete) {
       loadedCacheEntry.value = null;
       ontologyRows.value = [];
-      customQueryRows.value = [];
       selectedOntologyTabIri.value = '';
       selectedCustomQueryIri.value = '';
       ontologyUrl.value = '';
@@ -967,9 +780,12 @@ function selectCurrentIri() {
   emit('select-iri', selectedRowIri.value);
 }
 
-function onCustomQueryValueClick(rawValue: unknown) {
-  const iri = normalizePotentialIri(rawValue);
-  selectedCustomQueryIri.value = iri && isLikelyIri(iri) ? iri : '';
+function onCustomQueryIriSelect(iri: string) {
+  selectedCustomQueryIri.value = iri;
+}
+
+function onCustomQueryStatus(payload: {message: string; severity: RdfStatusSeverity}) {
+  setStatus(payload.message, payload.severity);
 }
 
 function onOntologyPreviewIri(iri: string) {
@@ -977,16 +793,6 @@ function onOntologyPreviewIri(iri: string) {
   if (iri) {
     pendingInitialIri.value = '';
   }
-}
-
-function normalizePotentialIri(value: unknown): string {
-  if (typeof value !== 'string') return '';
-  const trimmed = value.trim();
-  if (!trimmed) return '';
-  if (trimmed.startsWith('<') && trimmed.endsWith('>')) {
-    return trimmed.slice(1, -1).trim();
-  }
-  return trimmed;
 }
 
 function isLikelyIri(value: string): boolean {
@@ -1127,25 +933,6 @@ function collectFromContextObject(contextPart: any, out: Record<string, string>)
 
 .selection-input {
   flex: 1;
-}
-
-.custom-query-cell {
-  all: unset;
-  display: block;
-  width: 100%;
-  cursor: default;
-  color: inherit;
-}
-
-.custom-query-cell.iri {
-  cursor: pointer;
-  color: var(--p-primary-color);
-  text-decoration: underline;
-}
-
-.custom-query-editor {
-  height: 16rem;
-  min-height: 12rem;
 }
 
 .prefix-listbox {
