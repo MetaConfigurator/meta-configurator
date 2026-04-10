@@ -1,5 +1,9 @@
 import {Parser} from 'sparqljs';
 import type * as $rdf from 'rdflib';
+import {useDark} from '@vueuse/core';
+import {computed} from 'vue';
+
+export const isDark = computed(() => useDark().value);
 
 export enum RdfTermType {
   NamedNode = 'NamedNode',
@@ -132,9 +136,6 @@ export type SparqlValidationResult = {
   errorLine: number | null;
 };
 
-/**
- * Shared SPARQL syntax validation used by RDF editors.
- */
 export function validateSparqlSyntax(query: string): SparqlValidationResult {
   try {
     const parser = new Parser();

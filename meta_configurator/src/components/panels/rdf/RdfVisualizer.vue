@@ -189,7 +189,6 @@ import {
 import Dock from 'primevue/dock';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
-import {useDark} from '@vueuse/core';
 import {
   TripleEditorService,
   type TripleTransferObject,
@@ -199,8 +198,8 @@ import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
 import {useCurrentData} from '@/data/useDataLink';
+import {isDark} from '@/components/panels/rdf/rdfUtils';
 
-const isDark = useDark();
 const settings = useSettings();
 const showLargeGraphPrompt = ref(false);
 const nodeCount = ref(0);
@@ -659,6 +658,12 @@ function createCyStyle(): cytoscape.StylesheetCSS[] {
       },
     },
   ];
+}
+
+function applyCyTheme() {
+  if (!cy) return;
+  cy.style(createCyStyle());
+  cy.resize();
 }
 
 const CY_LAYOUT: cytoscape.LayoutOptions = {
@@ -1201,6 +1206,13 @@ onMounted(() => {
     }
   });
 });
+
+watch(
+  () => isDark.value,
+  () => {
+    applyCyTheme();
+  }
+);
 
 watch(
   () => rdfStoreManager.statements.value,

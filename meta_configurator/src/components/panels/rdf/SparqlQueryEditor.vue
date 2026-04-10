@@ -25,7 +25,7 @@ import {tags} from '@lezer/highlight';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {StateEffect, StateField} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
-import {isDarkMode} from '@/utility/darkModeUtils';
+import {isDark} from '@/components/panels/rdf/rdfUtils';
 
 const props = withDefaults(
   defineProps<{
@@ -106,7 +106,7 @@ const extensions = computed(() => [
   sparql(),
   syntaxHighlighting(sparqlHighlightStyle),
   errorLineField,
-  ...(isDarkMode.value ? [oneDark] : []),
+  ...(isDark.value ? [oneDark] : []),
 ]);
 
 watch(

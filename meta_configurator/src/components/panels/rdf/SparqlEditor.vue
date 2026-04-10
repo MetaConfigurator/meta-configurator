@@ -82,50 +82,7 @@ What is the average age of all people?" />
               </div>
             </ScrollPanel>
           </div>
-          <Dialog
-            v-model:visible="visualizationHelpDialog"
-            header="Visualization Mode – Query Requirements"
-            modal
-            style="width: 500px">
-            <div class="text-sm leading-relaxed">
-              <p class="mb-3">
-                <b>Visualization mode</b> works by directly consuming RDF triples. For this reason,
-                only <b>SPARQL CONSTRUCT queries</b> are supported.
-              </p>
-
-              <p class="font-semibold mb-1">Required query structure:</p>
-              <ul class="pl-4 list-disc mb-3">
-                <li>The query <b>must be a CONSTRUCT query</b></li>
-                <li>
-                  The <code>CONSTRUCT</code> template must follow this exact pattern:
-                  <pre
-                    :class="[
-                      'p-2 rounded text-xs overflow-auto !bg-gray-100',
-                      isDarkMode && '!bg-gray-900',
-                    ]"
-                    >{{ visualizationQueryExample_1 }}
-    </pre
-                  >
-                </li>
-                <li>The <code>WHERE</code> clause may contain any valid SPARQL pattern</li>
-                <li>
-                  <code>?subject</code> and <code>?predicate</code> must always be a
-                  <b>Named Node (IRI)</b>
-                </li>
-                <li><code>?object</code> may be IRI or literal</li>
-              </ul>
-
-              <p class="font-semibold mb-1">Example:</p>
-              <pre
-                :class="[
-                  'p-2 rounded text-xs overflow-auto !bg-gray-100',
-                  isDarkMode && '!bg-gray-900',
-                ]"
-                >{{ visualizationQueryExample_2 }}
-    </pre
-              >
-            </div>
-          </Dialog>
+          <RdfVisualizationHelpDialog v-model:visible="visualizationHelpDialog" />
         </TabPanel>
         <TabPanel value="result">
           <div class="datatable-wrapper">
@@ -231,7 +188,6 @@ import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
-import {isDarkMode} from '@/utility/darkModeUtils';
 import Textarea from 'primevue/textarea';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
@@ -244,17 +200,15 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
-import Dialog from 'primevue/dialog';
 import {ScrollPanel} from 'primevue';
 import * as $rdf from 'rdflib';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
+import RdfVisualizationHelpDialog from '@/components/panels/rdf/RdfVisualizationHelpDialog.vue';
 import ToggleSwitch from 'primevue/toggleswitch';
 import {
   defaultQueryTemplate,
   formatCellValue,
   validateSparqlSyntax,
-  visualizationQueryExample_1,
-  visualizationQueryExample_2,
   visualizationQueryTemplate,
 } from '@/components/panels/rdf/rdfUtils';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
