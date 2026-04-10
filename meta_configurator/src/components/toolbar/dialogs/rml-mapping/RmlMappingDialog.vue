@@ -275,7 +275,7 @@ label {
   display: flex;
   flex-direction: column;
   width: 100%;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--p-primary-active-color);
   border-radius: 4px;
   overflow: hidden;
 }

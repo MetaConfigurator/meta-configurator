@@ -673,6 +673,7 @@ const CY_LAYOUT: cytoscape.LayoutOptions = {
   animationEasing: 'ease-in-out-cubic',
   randomize: true,
   idealEdgeLength: 220,
+  nodeRepulsion: 9000,
   edgeElasticity: 100,
   gravity: 80,
   numIter: 1000000,
@@ -744,9 +745,13 @@ function setupCytoscape(elements: cytoscape.ElementDefinition[]) {
   });
 }
 
-function attachCytoscapeEvents(graph: cytoscape.Core, initialFit: () => void) {
+function attachCytoscapeEvents(
+  graph: cytoscape.Core,
+  initialFit: () => void,
+  beforeFinalizeLayout: () => boolean
+) {
   enableGraphInteractions(graph);
-  registerLayoutStop(graph, initialFit);
+  registerLayoutStop(graph, initialFit, beforeFinalizeLayout);
   registerNodeTap(graph);
   registerNodeDoubleTap(graph);
   registerCanvasTap(graph);
@@ -759,17 +764,38 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
 
   isLoading.value = true;
   let didInitialFit = false;
+  let overlapRetryCount = 0;
   const elements = buildGraphElements(statements);
 
   const graph = setupCytoscape(elements);
   if (!graph) return;
   cy = graph;
 
-  attachCytoscapeEvents(graph, () => {
-    if (didInitialFit) return;
-    didInitialFit = true;
-    resizeAndFit(graph);
-  });
+  attachCytoscapeEvents(
+    graph,
+    () => {
+      if (didInitialFit) return;
+      didInitialFit = true;
+      resizeAndFit(graph);
+    },
+    () => {
+      if (overlapRetryCount > 0) return false;
+      if (!hasOverlappingNodes(graph)) return false;
+
+      overlapRetryCount++;
+      const overlapRecoveryLayout: any = {
+        ...CY_LAYOUT,
+        animate: false,
+        randomize: true,
+        nodeRepulsion: 13000,
+        idealEdgeLength: 260,
+        avoidOverlapPadding: 80,
+        numIter: 25000,
+      };
+      graph.layout(overlapRecoveryLayout).run();
+      return true;
+    }
+  );
 }
 
 function animateZoom(factor: number, centerOnSelected: boolean) {
@@ -1084,12 +1110,37 @@ function enableGraphInteractions(graph: cytoscape.Core) {
   graph.boxSelectionEnabled(true);
 }
 
-function registerLayoutStop(graph: cytoscape.Core, initialFit: () => void) {
+function registerLayoutStop(
+  graph: cytoscape.Core,
+  initialFit: () => void,
+  beforeFinalizeLayout: () => boolean
+) {
   graph.on('layoutstop', () => {
+    if (beforeFinalizeLayout()) {
+      return;
+    }
     isLoading.value = false;
     graphLoaded.value = true;
     initialFit();
   });
+}
+
+function hasOverlappingNodes(graph: cytoscape.Core): boolean {
+  const nodes = graph.nodes();
+  for (let i = 0; i < nodes.length; i++) {
+    const a = nodes[i];
+    if (!a) continue;
+    const aBox = a.boundingBox({includeLabels: true, includeOverlays: false});
+    for (let j = i + 1; j < nodes.length; j++) {
+      const b = nodes[j];
+      if (!b) continue;
+      const bBox = b.boundingBox({includeLabels: true, includeOverlays: false});
+      const overlaps =
+        aBox.x1 < bBox.x2 && aBox.x2 > bBox.x1 && aBox.y1 < bBox.y2 && aBox.y2 > bBox.y1;
+      if (overlaps) return true;
+    }
+  }
+  return false;
 }
 
 function registerNodeTap(graph: cytoscape.Core) {
