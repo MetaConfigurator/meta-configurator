@@ -150,9 +150,9 @@
             :readOnly="props.readOnly"
             :isRefreshingNode="isRefreshingNode"
             :propertyUpdateKey="propertyUpdateKey"
-            :iriHref="iriHref"
-            :isIRI="isIRI"
-            :isLinkableIRI="isLinkableIRI"
+            :iriHref="jsonLdContextManager.iriHref"
+            :isIRI="jsonLdContextManager.isIRI"
+            :isLinkableIRI="jsonLdContextManager.isLinkableIRI"
             @edit-node="editSelectedNode"
             @delete-node="deleteSelectedNode"
             @delete-property="deleteProperty"
@@ -194,6 +194,7 @@ import {
 } from '@/components/panels/rdf/tripleEditorService';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
+import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
 import {useCurrentData} from '@/data/useDataLink';
 
@@ -320,7 +321,7 @@ const allNodes = computed(() => {
     ids.add(st.subject.value);
   }
   return Array.from(ids).map(id => {
-    const label = toPrefixed(id);
+    const label = jsonLdContextManager.toPrefixed(id);
     return {
       id,
       label,
@@ -394,15 +395,6 @@ function confirmRender(allow: boolean) {
   }
 
   renderGraph(props.statements);
-}
-
-function isIRI(value: string): boolean {
-  return (
-    value.startsWith('http://') ||
-    value.startsWith('https://') ||
-    value.startsWith('urn:') ||
-    value.includes('://')
-  );
 }
 
 function zoomIn() {
@@ -547,13 +539,14 @@ function confirmRenameNode() {
 function editProperty(lit: RdfNodeLiteral) {
   if (!selectedNode.value) return;
   const statement = lit.statement;
-  const fallbackObject = lit.href ?? expandIRI(lit.value) ?? lit.value;
+  const fallbackObject = lit.href ?? jsonLdContextManager.expandIRI(lit.value) ?? lit.value;
   const objectTermType =
     statement?.object.termType ?? (lit.isIRI ? RdfTermType.NamedNode : RdfTermType.Literal);
   const payload: TripleTransferObject = {
     subject: statement?.subject.value ?? selectedNode.value.id,
     subjectType: (statement?.subject.termType ?? RdfTermType.NamedNode) as RdfTermTypeString,
-    predicate: statement?.predicate.value ?? expandIRI(lit.predicate) ?? lit.predicate,
+    predicate:
+      statement?.predicate.value ?? jsonLdContextManager.expandIRI(lit.predicate) ?? lit.predicate,
     predicateType: (statement?.predicate.termType ?? RdfTermType.NamedNode) as RdfTermTypeString,
     object: statement?.object.value ?? fallbackObject,
     objectType: objectTermType as RdfTermTypeString,
@@ -583,7 +576,7 @@ function addNodeFromVisualizer() {
 }
 
 function handlePropertyLinkClick(lit: RdfNodeLiteral, event: MouseEvent) {
-  const iri = lit.href || iriHref(lit.value);
+  const iri = lit.href || jsonLdContextManager.iriHref(lit.value);
   if (!iri || !cy) return;
   const node = cy.getElementById(iri);
   if (!node || node.length === 0) return;
@@ -604,41 +597,7 @@ function getPredicateAlias(predicate: string): string {
       return alias;
     }
   }
-  return toPrefixed(predicate);
-}
-
-function toPrefixed(iri: string): string {
-  for (const [prefix, ns] of Object.entries(rdfStoreManager.namespaces.value)) {
-    if (iri.startsWith(ns)) {
-      return `${prefix}:${iri.slice(ns.length)}`;
-    }
-  }
-  return iri;
-}
-
-function expandIRI(value: string): string | null {
-  if (isIRI(value)) {
-    return value;
-  }
-
-  const idx = value.indexOf(':');
-  if (idx === -1) return null;
-
-  const prefix = value.slice(0, idx);
-  const local = value.slice(idx + 1);
-
-  const ns = rdfStoreManager.namespaces.value[prefix];
-  if (!ns) return null;
-
-  return ns + local;
-}
-
-function isLinkableIRI(value: string): boolean {
-  return expandIRI(value) !== null;
-}
-
-function iriHref(value: string): string | null {
-  return expandIRI(value);
+  return jsonLdContextManager.toPrefixed(predicate);
 }
 
 const TYPE_PREDICATES = [
@@ -762,7 +721,7 @@ function buildGraphElements(statements: readonly $rdf.Statement[]) {
       continue;
     }
 
-    addLiteral(nodesMap, s, p, toPrefixed(o), o, st);
+    addLiteral(nodesMap, s, p, jsonLdContextManager.toPrefixed(o), o, st);
 
     if (isTypePredicate(p) || !existingSubjects.has(o)) {
       continue;
@@ -891,13 +850,13 @@ function buildLiteralsForSubject(
       literals.push({
         predicate: getPredicateAlias(p),
         value: o,
-        isIRI: isIRI(o),
+        isIRI: jsonLdContextManager.isIRI(o),
         statement: st,
       });
     } else {
       literals.push({
         predicate: getPredicateAlias(p),
-        value: toPrefixed(o),
+        value: jsonLdContextManager.toPrefixed(o),
         isIRI: true,
         href: o,
         statement: st,
@@ -1091,7 +1050,7 @@ function addLiteral(
   nodesMap.get(subjectId)!.literals!.push({
     predicate: getPredicateAlias(predicate),
     value,
-    isIRI: Boolean(href) || isIRI(value),
+    isIRI: Boolean(href) || jsonLdContextManager.isIRI(value),
     href,
     statement,
   });
@@ -1118,7 +1077,7 @@ function createNode(
   return {
     data: {
       id,
-      label: toPrefixed(id),
+      label: jsonLdContextManager.toPrefixed(id),
       hasLiterals: data.literals && data.literals.length > 0,
       literalCount: data.literals?.length || 0,
       literals: data.literals,
@@ -1171,7 +1130,7 @@ function registerEdgeTap(graph: cytoscape.Core) {
     const edge = event.target;
     const predicateIRI = edge.data('predicateIRI');
     pulseEdge(edge);
-    const href = iriHref(predicateIRI);
+    const href = jsonLdContextManager.iriHref(predicateIRI);
     if (href) {
       window.open(href, '_blank', 'noopener,noreferrer');
     }

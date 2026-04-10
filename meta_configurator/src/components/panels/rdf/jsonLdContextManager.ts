@@ -1,6 +1,7 @@
 import {ref} from 'vue';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
+import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {getContextFromRdfCache, putContextInRdfCache} from './rdfIndexedDbManager';
 import {HttpProtocol, RdfMediaType, RdfProxyPath} from './rdfEnums';
 
@@ -10,6 +11,11 @@ interface JsonLdContextManagerStore {
   resolveContext: (ctx: any) => Promise<any | null>;
   extractContext: (json: any) => Record<string, any>;
   getEquivalentTerms: (term: string, context: Record<string, any>) => Set<string>;
+  isIRI: (value: string) => boolean;
+  toPrefixed: (iri: string) => string;
+  expandIRI: (value: string) => string | null;
+  isLinkableIRI: (value: string) => boolean;
+  iriHref: (value: string) => string | null;
 }
 
 enum JsonLdField {
@@ -63,6 +69,48 @@ export const jsonLdContextManager: JsonLdContextManagerStore = (() => {
     const compact = compactTerm(term, context);
     if (compact) out.add(compact);
     return out;
+  };
+
+  const isIRI = (value: string): boolean => {
+    return (
+      value.startsWith('http://') ||
+      value.startsWith('https://') ||
+      value.startsWith('urn:') ||
+      value.includes('://')
+    );
+  };
+
+  const toPrefixed = (iri: string): string => {
+    for (const [prefix, namespace] of Object.entries(rdfStoreManager.namespaces.value)) {
+      if (iri.startsWith(namespace)) {
+        return `${prefix}:${iri.slice(namespace.length)}`;
+      }
+    }
+    return iri;
+  };
+
+  const expandIRI = (value: string): string | null => {
+    if (isIRI(value)) {
+      return value;
+    }
+
+    const idx = value.indexOf(':');
+    if (idx === -1) return null;
+
+    const prefix = value.slice(0, idx);
+    const local = value.slice(idx + 1);
+    const namespace = rdfStoreManager.namespaces.value[prefix];
+    if (!namespace) return null;
+
+    return namespace + local;
+  };
+
+  const isLinkableIRI = (value: string): boolean => {
+    return expandIRI(value) !== null;
+  };
+
+  const iriHref = (value: string): string | null => {
+    return expandIRI(value);
   };
 
   const compactTerm = (fullIri: string, context: Record<string, any>): string | null => {
@@ -320,5 +368,10 @@ export const jsonLdContextManager: JsonLdContextManagerStore = (() => {
     resolveContext,
     extractContext,
     getEquivalentTerms,
+    isIRI,
+    toPrefixed,
+    expandIRI,
+    isLinkableIRI,
+    iriHref,
   };
 })();
