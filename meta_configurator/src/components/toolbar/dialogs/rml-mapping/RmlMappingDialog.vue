@@ -83,8 +83,7 @@ import Message from 'primevue/message';
 import Panel from 'primevue/panel';
 import {Codemirror} from 'vue-codemirror';
 import {basicSetup} from 'codemirror';
-import {syntaxHighlighting, HighlightStyle, StreamLanguage} from '@codemirror/language';
-import {tags} from '@lezer/highlight';
+import {syntaxHighlighting, StreamLanguage} from '@codemirror/language';
 import {EditorView} from '@codemirror/view';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {turtle} from '@codemirror/legacy-modes/mode/turtle';
@@ -98,6 +97,7 @@ import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {isDarkMode} from '@/utility/darkModeUtils';
+import {syntaxHighlightStyle} from '@/components/panels/rdf/rdfUtils';
 
 const showDialog = ref(false);
 const input = ref({});
@@ -118,21 +118,10 @@ const mappingServiceWarning: Ref<string> = computed(() => {
   return '';
 });
 
-const rmlHighlightStyle = HighlightStyle.define([
-  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
-  {tag: tags.variableName, color: '#82aaff'},
-  {tag: tags.string, color: '#c3e88d'},
-  {tag: tags.number, color: '#f78c6c'},
-  {tag: tags.operator, color: '#89ddff'},
-  {tag: tags.punctuation, color: '#abb2bf'},
-  {tag: tags.typeName, color: '#f07178'},
-  {tag: tags.propertyName, color: '#ffcb6b'},
-]);
-
 const extensions = computed(() => [
   basicSetup,
   StreamLanguage.define(turtle),
-  syntaxHighlighting(rmlHighlightStyle),
+  syntaxHighlighting(syntaxHighlightStyle),
   ...(isDarkMode.value ? [oneDark] : []),
   EditorView.lineWrapping,
 ]);

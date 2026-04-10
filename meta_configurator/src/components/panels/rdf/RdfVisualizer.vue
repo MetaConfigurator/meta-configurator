@@ -595,7 +595,7 @@ const TYPE_PREDICATES = [
 ];
 
 function createCyStyle(): cytoscape.StylesheetCSS[] {
-  const edgeLabelColor = isDark.value ? '#f8fafc' : '#111827';
+  const edgeLabelColor = isDark().value ? '#f8fafc' : '#111827';
   return [
     {
       selector: 'node',

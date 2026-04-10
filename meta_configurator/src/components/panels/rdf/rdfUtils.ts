@@ -1,9 +1,11 @@
 import {Parser} from 'sparqljs';
 import type * as $rdf from 'rdflib';
+import {HighlightStyle} from '@codemirror/language';
+import {tags} from '@lezer/highlight';
 import {useDark} from '@vueuse/core';
 import {computed} from 'vue';
 
-export const isDark = computed(() => useDark().value);
+export const isDark = () => computed(() => useDark().value);
 
 export enum RdfTermType {
   NamedNode = 'NamedNode',
@@ -31,6 +33,18 @@ export interface SelectedNodeData {
   label: string;
   literals?: RdfNodeLiteral[];
 }
+
+export const syntaxHighlightStyle = HighlightStyle.define([
+  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
+  {tag: tags.variableName, color: '#82aaff'},
+  {tag: tags.string, color: '#c3e88d'},
+  {tag: tags.number, color: '#f78c6c'},
+  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
+  {tag: tags.operator, color: '#89ddff'},
+  {tag: tags.punctuation, color: '#abb2bf'},
+  {tag: tags.typeName, color: '#f07178'},
+  {tag: tags.propertyName, color: '#ffcb6b'},
+]);
 
 export enum RdfChangeType {
   Add = 'add',

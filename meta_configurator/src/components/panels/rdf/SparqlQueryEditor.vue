@@ -20,12 +20,14 @@ import {computed, ref, shallowRef, watch} from 'vue';
 import {Codemirror} from 'vue-codemirror';
 import {basicSetup} from 'codemirror';
 import {sparql} from 'codemirror-lang-sparql';
-import {syntaxHighlighting, HighlightStyle} from '@codemirror/language';
-import {tags} from '@lezer/highlight';
+import {syntaxHighlighting} from '@codemirror/language';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {StateEffect, StateField} from '@codemirror/state';
 import {EditorView, Decoration} from '@codemirror/view';
-import {isDark} from '@/components/panels/rdf/rdfUtils';
+import {syntaxHighlightStyle} from '@/components/panels/rdf/rdfUtils';
+import {useDark} from '@vueuse/core';
+
+const dark = useDark();
 
 const props = withDefaults(
   defineProps<{
@@ -69,16 +71,6 @@ watch(localValue, value => {
   emit('update:modelValue', value);
 });
 
-const sparqlHighlightStyle = HighlightStyle.define([
-  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
-  {tag: tags.variableName, color: '#82aaff'},
-  {tag: tags.string, color: '#c3e88d'},
-  {tag: tags.number, color: '#f78c6c'},
-  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
-  {tag: tags.operator, color: '#89ddff'},
-  {tag: tags.punctuation, color: '#abb2bf'},
-]);
-
 const errorLineField = StateField.define({
   create() {
     return Decoration.none;
@@ -104,9 +96,9 @@ const errorLineField = StateField.define({
 const extensions = computed(() => [
   basicSetup,
   sparql(),
-  syntaxHighlighting(sparqlHighlightStyle),
+  syntaxHighlighting(syntaxHighlightStyle),
   errorLineField,
-  ...(isDark.value ? [oneDark] : []),
+  ...(dark.value ? [oneDark] : []),
 ]);
 
 watch(
