@@ -510,8 +510,8 @@ function confirmDeleteNode() {
     return;
   }
 
-  for (const st of result.deleted) {
-    jsonLdNodeManager.deleteStatement(st);
+  for (const statement of result.deleted) {
+    jsonLdNodeManager.deleteStatement(statement);
   }
 
   clearSelectedNode();
@@ -1327,17 +1327,9 @@ watch(
   align-items: center;
   justify-content: center;
   z-index: 50;
-  background: color-mix(in srgb, var(--p-surface-ground) 80%, transparent);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
   pointer-events: none;
-}
-
-.graph-freeze-message {
-  background: color-mix(in srgb, var(--p-surface-900) 70%, transparent);
-  color: var(--p-text-color);
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  text-align: center;
 }
 
 .graph-container {

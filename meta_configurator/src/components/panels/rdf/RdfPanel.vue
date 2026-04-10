@@ -7,12 +7,12 @@
       :sessionMode="SessionMode.DataEditor">
     </PanelSettings>
     <RmlMappingDialog ref="rmlMappingDialog" />
-    <Message v-if="parsingWarnings.length > 0" severity="warn">
+    <Message v-if="parsingWarnings.length > 0" severity="warn" class="m-2">
       <li v-for="err in parsingWarnings" :key="err.id">
         <span v-html="err.message" @click="handleLink"></span>
       </li>
     </Message>
-    <Message v-if="parsingErrors.length > 0" severity="error">
+    <Message v-if="parsingErrors.length > 0" severity="error" class="m-2">
       <li v-for="err in parsingErrors" :key="err.id">
         <span v-html="err.message" @click="handleLink"></span>
       </li>
@@ -164,5 +164,11 @@ function handleLink(event: MouseEvent) {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 </style>
