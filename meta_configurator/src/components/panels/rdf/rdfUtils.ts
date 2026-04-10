@@ -1,3 +1,5 @@
+import {Parser} from 'sparqljs';
+
 export enum RdfTermType {
   NamedNode = 'NamedNode',
   BlankNode = 'BlankNode',
@@ -108,3 +110,42 @@ WHERE
 export const predicateAliasMapping: Record<string, readonly string[]> = {
   '@type': ['rdf:type', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'],
 };
+
+export type SparqlValidationResult = {
+  valid: boolean;
+  errorMessage: string | null;
+  errorLine: number | null;
+};
+
+/**
+ * Shared SPARQL syntax validation used by RDF editors.
+ */
+export function validateSparqlSyntax(query: string): SparqlValidationResult {
+  try {
+    const parser = new Parser();
+    parser.parse(query);
+    return {
+      valid: true,
+      errorMessage: null,
+      errorLine: null,
+    };
+  } catch (err: any) {
+    const message = String(err?.message ?? 'Invalid SPARQL query syntax.');
+    const lineMatch = message.match(/line[:\s]+(\d+)/i);
+
+    if (lineMatch?.[1]) {
+      return {
+        valid: false,
+        errorMessage: message,
+        errorLine: parseInt(lineMatch[1], 10),
+      };
+    }
+
+    const locationLine = err?.location?.start?.line;
+    return {
+      valid: false,
+      errorMessage: message,
+      errorLine: typeof locationLine === 'number' ? locationLine : null,
+    };
+  }
+}

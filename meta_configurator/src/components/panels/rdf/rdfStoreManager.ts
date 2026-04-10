@@ -369,8 +369,8 @@ export const rdfStoreManager: RdfStore & {
 
   const rebuildStoreFromEditorData = async (data: any) => {
     if (!data) return;
-
     const resolvedContext = await jsonLdContextManager.syncFromData(data);
+
     const resolvedData =
       resolvedContext !== null && resolvedContext !== undefined
         ? {...data, '@context': resolvedContext}

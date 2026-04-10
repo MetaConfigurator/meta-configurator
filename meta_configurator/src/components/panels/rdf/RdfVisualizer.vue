@@ -165,7 +165,6 @@
     </Splitter>
   </div>
 </template>
-
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
@@ -1343,7 +1342,6 @@ watch(
   }
 );
 </script>
-
 <style scoped>
 .graph-panel {
   flex: 1;
@@ -1374,13 +1372,13 @@ watch(
   align-items: center;
   justify-content: center;
   z-index: 50;
-  background: rgba(0, 0, 0, 0.2);
+  background: color-mix(in srgb, var(--p-surface-ground) 80%, transparent);
   pointer-events: none;
 }
 
 .graph-freeze-message {
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
+  background: color-mix(in srgb, var(--p-surface-900) 70%, transparent);
+  color: var(--p-text-color);
   padding: 10px 14px;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -1403,6 +1401,7 @@ watch(
   background: transparent !important;
   border: none !important ;
 }
+
 .graph-dock {
   top: 50%;
   right: 16px;
@@ -1459,7 +1458,7 @@ watch(
 
 .properties-search-bar {
   padding: 10px 12px;
-  background: #f8fafc;
+  background: var(--p-surface-card);
 }
 
 .properties-search-input {
@@ -1479,7 +1478,7 @@ watch(
 }
 
 .search-icon {
-  color: #64748b;
+  color: var(--p-text-muted-color);
   font-size: 14px;
 }
 
@@ -1496,13 +1495,13 @@ watch(
 
 .result-label {
   font-size: 12px;
-  color: #334155;
+  color: var(--p-text-color);
   word-break: break-word;
 }
 
 .result-id {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--p-text-muted-color);
   word-break: break-word;
 }
 
@@ -1525,28 +1524,5 @@ watch(
 .properties-view {
   flex: 1;
   min-height: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-  .graph-container {
-    background: #1a202c;
-  }
-
-  .properties-search-bar {
-    background: #1a202c;
-    border-bottom-color: #334155;
-  }
-
-  .search-icon {
-    color: #94a3b8;
-  }
-
-  .result-label {
-    color: #e2e8f0;
-  }
-
-  .result-id {
-    color: #64748b;
-  }
 }
 </style>

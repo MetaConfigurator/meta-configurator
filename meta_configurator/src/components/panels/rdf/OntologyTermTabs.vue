@@ -333,7 +333,11 @@ async function focusMatchedRow(match: {about: string; propertyType: OntologyProp
 }
 
 .ontology-term-link {
-  color: #1976d2;
+  color: var(--p-primary-color);
   text-decoration: underline;
+}
+
+.ontology-term-link:hover {
+  color: var(--p-primary-hover-color, var(--p-primary-color));
 }
 </style>

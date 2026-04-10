@@ -25,6 +25,7 @@
                       <PanelSettings
                         panel-name="API Key and AI Settings"
                         settings-header="AI Settings"
+                        panel-display-name="AI Settings"
                         :panel-settings-path="['aiIntegration']"
                         :sessionMode="SessionMode.DataEditor">
                         <ApiKey />
@@ -222,7 +223,6 @@ import PanelSettings from '@/components/panels/shared-components/PanelSettings.v
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import {SessionMode} from '@/store/sessionMode';
-import {Parser} from 'sparqljs';
 import {ref, computed, watch} from 'vue';
 import TieredMenu from 'primevue/tieredmenu';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
@@ -252,6 +252,7 @@ import ToggleSwitch from 'primevue/toggleswitch';
 import {
   defaultQueryTemplate,
   formatCellValue,
+  validateSparqlSyntax,
   visualizationQueryExample_1,
   visualizationQueryExample_2,
   visualizationQueryTemplate,
@@ -431,7 +432,7 @@ const runQuery = async () => {
   errorMessage.value = null;
   errorLineNumber.value = null;
 
-  if (!validateSparqlSyntax()) return;
+  if (!validateCurrentSparqlSyntax()) return;
 
   const engine = new (window as any).Comunica.QueryEngine();
   const {content} = rdfStoreManager.exportAs('application/n-triples');
@@ -543,23 +544,13 @@ const runSelectQuery = async (engine: any, sources: any[]) => {
   }
 };
 
-const validateSparqlSyntax = (): boolean => {
-  try {
-    const parser = new Parser();
-    parser.parse(sparqlQuery.value);
-    return true;
-  } catch (err: any) {
-    errorMessage.value = err.message;
-    const lineMatch = err.message?.match(/line[:\s]+(\d+)/i);
-    if (lineMatch) {
-      errorLineNumber.value = parseInt(lineMatch[1], 10);
-    } else if (err.location?.start?.line) {
-      errorLineNumber.value = err.location.start.line;
-    } else {
-      errorLineNumber.value = null;
-    }
-    return false;
-  }
+const validateCurrentSparqlSyntax = (): boolean => {
+  const result = validateSparqlSyntax(sparqlQuery.value);
+  if (result.valid) return true;
+
+  errorMessage.value = result.errorMessage;
+  errorLineNumber.value = result.errorLine;
+  return false;
 };
 
 const setEditorText = (text: string, applyPrefixes: boolean = true) => {
@@ -581,17 +572,10 @@ const validateLive = () => {
     errorMessage.value = null;
     errorLineNumber.value = null;
 
-    try {
-      const parser = new Parser();
-      parser.parse(sparqlQuery.value);
-    } catch (err: any) {
-      errorMessage.value = err.message;
-      const lineMatch = err.message?.match(/line[:\s]+(\d+)/i);
-      if (lineMatch) {
-        errorLineNumber.value = parseInt(lineMatch[1], 10);
-      } else if (err.location?.start?.line) {
-        errorLineNumber.value = err.location.start.line;
-      }
+    const result = validateSparqlSyntax(sparqlQuery.value);
+    if (!result.valid) {
+      errorMessage.value = result.errorMessage;
+      errorLineNumber.value = result.errorLine;
     }
   }, 250);
 };

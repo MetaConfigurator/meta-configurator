@@ -497,7 +497,6 @@ initFilters();
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.5);
   cursor: not-allowed;
   pointer-events: auto;
 }

@@ -138,7 +138,6 @@ function onKeydown(event: KeyboardEvent) {
   event.stopPropagation();
 }
 </script>
-
 <style scoped>
 .sparql-query-editor {
   display: flex;
@@ -149,7 +148,7 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 :deep(.cm-editor) {
-  border: 1px solid var(--p-content-border-color, #d1d5db);
+  border: 1px solid var(--p-content-border-color, var(--p-border-color));
   border-radius: 0.375rem;
   overflow: hidden;
   height: 100%;
@@ -165,27 +164,27 @@ function onKeydown(event: KeyboardEvent) {
 .error-box {
   padding: 0.5rem;
   border-radius: 4px;
-  background-color: #ffe5e5;
-  color: #d8000c;
+  background-color: color-mix(in srgb, var(--p-red-500) 15%, var(--p-surface-ground));
+  color: var(--p-red-500);
   font-size: 0.875rem;
-  border: 1px solid #d8000c;
+  border: 1px solid var(--p-red-500);
   max-height: 150px;
   overflow: auto;
   white-space: pre-wrap;
 }
 
 :deep(.cm-error-line) {
-  border-left: 3px solid #f44336;
+  border-left: 3px solid var(--p-red-500);
   animation: errorPulse 0.5s ease-in-out;
 }
 
 @keyframes errorPulse {
   0%,
   100% {
-    background-color: #ffebee;
+    background-color: color-mix(in srgb, var(--p-red-500) 10%, var(--p-surface-ground));
   }
   50% {
-    background-color: #ffcdd2;
+    background-color: color-mix(in srgb, var(--p-red-500) 25%, var(--p-surface-ground));
   }
 }
 </style>

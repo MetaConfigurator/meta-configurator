@@ -14,7 +14,7 @@
       </div>
       <div v-if="selectedPrefix" class="content-pane">
         <Accordion v-model:value="activeAccordion" class="mb-3">
-          <AccordionPanel value="ontologyControls">
+          <AccordionPanel :value="ONTOLOGY_ACCORDION_SECTION.Controls">
             <AccordionHeader>Ontology Controls</AccordionHeader>
             <AccordionContent>
               <div class="flex flex-col gap-2">
@@ -85,13 +85,13 @@
             :rowsPerPage="ROWS_PER_PAGE"
             @preview-iri="onOntologyPreviewIri">
             <template #extra-tabs>
-              <Tab value="CustomQuery">Custom Query</Tab>
+              <Tab :value="ONTOLOGY_EXPLORER_TAB.CustomQuery">Custom Query</Tab>
             </template>
             <template #extra-panels>
-              <TabPanel value="CustomQuery">
+              <TabPanel :value="ONTOLOGY_EXPLORER_TAB.CustomQuery">
                 <div class="flex flex-col gap-2 mb-2 mt-2">
                   <Accordion v-model:value="customQueryAccordion">
-                    <AccordionPanel value="editor">
+                    <AccordionPanel :value="CUSTOM_QUERY_ACCORDION_SECTION.Editor">
                       <AccordionHeader>SPARQL Query Editor</AccordionHeader>
                       <AccordionContent>
                         <div class="custom-query-editor">
@@ -187,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, toRaw, watch} from 'vue';
+import {computed, ref, watch} from 'vue';
 import * as $rdf from 'rdflib';
 import Listbox from 'primevue/listbox';
 import InputText from 'primevue/inputtext';
@@ -203,12 +203,31 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Tab from 'primevue/tab';
 import TabPanel from 'primevue/tabpanel';
-import {Parser} from 'sparqljs';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import SparqlQueryEditor from '@/components/panels/rdf/SparqlQueryEditor.vue';
 import OntologyTermTabs from '@/components/panels/rdf/OntologyTermTabs.vue';
+import {
+  deleteOntologyFromRdfCache,
+  getOntologyFromRdfCache,
+  putOntologyInRdfCache,
+  type RdfCachedOntology,
+  type RdfOntologyRow,
+} from '@/components/panels/rdf/rdfIndexedDbManager';
+import {
+  CustomQueryAccordionSection,
+  OntologyAccordionSection,
+  OntologyExplorerTab,
+  RdfBindingName,
+  RdfMediaType,
+  RdfPredicateIri,
+  RdfPropertyType,
+  RdfPropertyTypeIri,
+  RdfProxyPath,
+  RdfStatusSeverity,
+} from '@/components/panels/rdf/rdfEnums';
+import {validateSparqlSyntax} from '@/components/panels/rdf/rdfUtils';
 
 const props = withDefaults(
   defineProps<{
@@ -232,13 +251,11 @@ const ontologyUrl = ref('');
 const isDownloading = ref(false);
 const isUploading = ref(false);
 const statusMessage = ref('');
-const statusSeverity = ref<'success' | 'info' | 'warn' | 'error'>('info');
+const statusSeverity = ref<RdfStatusSeverity>(RdfStatusSeverity.Info);
 const isQuerying = ref(false);
 const ontologyRows = ref<OntologyRow[]>([]);
 const ROWS_PER_PAGE = 100;
-const activePropertyTab = ref<'DatatypeProperty' | 'ObjectProperty' | 'Class' | 'CustomQuery'>(
-  'ObjectProperty'
-);
+const activePropertyTab = ref<OntologyExplorerTab>(OntologyExplorerTab.ObjectProperty);
 const customTableSearch = ref('');
 const selectedOntologyTabIri = ref('');
 const customQueryFirst = ref(0);
@@ -248,51 +265,28 @@ const selectedCustomQueryIri = ref('');
 const isRunningCustomQuery = ref(false);
 const customQueryErrorLineNumber = ref<number | null>(null);
 const customQueryErrorMessage = ref<string | null>(null);
-const customQueryAccordion = ref<string | null>('editor');
+const customQueryAccordion = ref<CustomQueryAccordionSection | null>(
+  CustomQueryAccordionSection.Editor
+);
 let customQueryValidateTimer: number | null = null;
 const pendingInitialIri = ref('');
 const isAutoSelectingPrefix = ref(false);
-const activeAccordion = ref<string | null>('ontologyControls');
+const activeAccordion = ref<OntologyAccordionSection | null>(OntologyAccordionSection.Controls);
 const deleteDialog = ref(false);
 const ontologyFileUploadRef = ref<any | null>(null);
 
-type CachedOntology = {
-  ontologyPrefix: string;
-  url: string;
-  content: string;
-  format: string;
-  contentType: string;
-  fetchedAt: string;
-  mergedGraphNTriples?: string;
-  ontologyQueryResults?: OntologyRow[];
-  queryResultsFetchedAt?: string;
-};
-
-type CachedGlobalGraph = {
-  id: 'global';
-  nTriples: string;
-  updatedAt: string;
-};
-
-type OntologyRow = {
-  about: string;
-  comment: string;
-  propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
-};
+type CachedOntology = RdfCachedOntology;
+type OntologyRow = RdfOntologyRow;
 
 type CustomQueryRow = Record<string, string>;
 
-const INDEXED_DB_NAME = 'rdf_ontology_cache_db';
-const INDEXED_DB_VERSION = 2;
-const INDEXED_DB_STORE = 'ontology_sources';
-const LEGACY_INDEXED_DB_STORE = 'ontologies';
-const INDEXED_DB_GRAPH_STORE = 'ontology_graphs';
-const ACCEPT_RDF_HEADER =
-  'application/rdf+xml, text/turtle, application/x-turtle, application/n-triples, text/n3, application/ld+json, application/json, application/xml, text/xml, text/plain';
-const RDF_FILE_ACCEPT =
-  '.rdf,.owl,.xml,.ttl,.nt,.n3,.jsonld,.json,application/rdf+xml,text/turtle,application/x-turtle,application/n-triples,text/n3,application/ld+json,application/json,application/xml,text/xml,text/plain';
+const ONTOLOGY_EXPLORER_TAB = OntologyExplorerTab;
+const ONTOLOGY_ACCORDION_SECTION = OntologyAccordionSection;
+const CUSTOM_QUERY_ACCORDION_SECTION = CustomQueryAccordionSection;
+
+const ACCEPT_RDF_HEADER = `${RdfMediaType.RdfXml}, ${RdfMediaType.Turtle}, ${RdfMediaType.XTurtle}, ${RdfMediaType.NTriples}, ${RdfMediaType.N3}, ${RdfMediaType.JsonLd}, ${RdfMediaType.Json}, ${RdfMediaType.Xml}, ${RdfMediaType.TextXml}, ${RdfMediaType.TextPlain}`;
+const RDF_FILE_ACCEPT = `.rdf,.owl,.xml,.ttl,.nt,.n3,.jsonld,.json,${RdfMediaType.RdfXml},${RdfMediaType.Turtle},${RdfMediaType.XTurtle},${RdfMediaType.NTriples},${RdfMediaType.N3},${RdfMediaType.JsonLd},${RdfMediaType.Json},${RdfMediaType.Xml},${RdfMediaType.TextXml},${RdfMediaType.TextPlain}`;
 const loadedCacheEntry = ref<CachedOntology | null>(null);
-let ontologyDbPromise: Promise<IDBDatabase> | null = null;
 let prefixLookupRequestId = 0;
 
 const prefixOptions = computed(() =>
@@ -301,7 +295,8 @@ const prefixOptions = computed(() =>
 const selectedCacheEntry = computed(() => {
   if (!selectedPrefix.value) return null;
   const entry = loadedCacheEntry.value;
-  if (!entry || entry.ontologyPrefix !== selectedPrefix.value) return null;
+  const selectedOntologyIri = getOntologyIriForPrefix(selectedPrefix.value);
+  if (!entry || !selectedOntologyIri || entry.ontologyIri !== selectedOntologyIri) return null;
   return entry;
 });
 
@@ -318,7 +313,7 @@ const customQueryColumns = computed(() => {
   return Array.from(columns);
 });
 const selectedRowIri = computed(() => {
-  return activePropertyTab.value === 'CustomQuery'
+  return activePropertyTab.value === OntologyExplorerTab.CustomQuery
     ? selectedCustomQueryIri.value
     : selectedOntologyTabIri.value;
 });
@@ -372,7 +367,15 @@ watch(
     }
     try {
       ontologyUrl.value = '';
-      const cachedEntry = await getOntologyFromIndexedDb(newPrefix);
+      const ontologyIri = getOntologyIriForPrefix(newPrefix);
+      if (!ontologyIri) {
+        setStatus(
+          `No ontology IRI found in @context for prefix "${newPrefix}".`,
+          RdfStatusSeverity.Warn
+        );
+        return;
+      }
+      const cachedEntry = await getOntologyFromIndexedDb(ontologyIri);
       if (requestId !== prefixLookupRequestId) return;
       loadedCacheEntry.value = cachedEntry;
       ontologyUrl.value = cachedEntry?.url ?? '';
@@ -381,7 +384,10 @@ watch(
       }
     } catch (error: any) {
       if (requestId !== prefixLookupRequestId) return;
-      setStatus(error?.message ?? 'Failed to read cached ontology from IndexedDB.', 'warn');
+      setStatus(
+        error?.message ?? 'Failed to read cached ontology from IndexedDB.',
+        RdfStatusSeverity.Warn
+      );
     }
   },
   {immediate: true}
@@ -390,7 +396,8 @@ watch(
 watch(
   () => props.sourceField,
   sourceField => {
-    activePropertyTab.value = sourceField === 'Object' ? 'Class' : 'ObjectProperty';
+    activePropertyTab.value =
+      sourceField === 'Object' ? OntologyExplorerTab.Class : OntologyExplorerTab.ObjectProperty;
     selectedOntologyTabIri.value = '';
   },
   {immediate: true}
@@ -399,23 +406,31 @@ watch(
 watch(
   selectedCacheEntry,
   entry => {
-    activeAccordion.value = entry ? null : 'ontologyControls';
+    activeAccordion.value = entry ? null : OntologyAccordionSection.Controls;
   },
   {immediate: true}
 );
 
 async function downloadAndCacheOntology() {
   if (!selectedPrefix.value) {
-    setStatus('Please select a prefix first.', 'warn');
+    setStatus('Please select a prefix first.', RdfStatusSeverity.Warn);
     return;
   }
   const ontologyPrefix = selectedPrefix.value;
+  const ontologyIri = getOntologyIriForPrefix(ontologyPrefix);
+  if (!ontologyIri) {
+    setStatus(
+      `No ontology IRI found in @context for prefix "${ontologyPrefix}".`,
+      RdfStatusSeverity.Warn
+    );
+    return;
+  }
 
   let parsedUrl: URL;
   try {
     parsedUrl = new URL(ontologyUrl.value);
   } catch {
-    setStatus('Please enter a valid URL.', 'warn');
+    setStatus('Please enter a valid URL.', RdfStatusSeverity.Warn);
     return;
   }
 
@@ -437,9 +452,9 @@ async function downloadAndCacheOntology() {
     const mergedGraphNTriples = serializeStoreToNTriples(store);
 
     const cacheEntry: CachedOntology = {
-      ontologyPrefix,
+      ontologyIri,
       url: parsedUrl.toString(),
-      content,
+      rawContent: content,
       format,
       contentType,
       fetchedAt: new Date().toISOString(),
@@ -453,31 +468,43 @@ async function downloadAndCacheOntology() {
       `Ontology for prefix "${ontologyPrefix}" was downloaded and cached in IndexedDB${
         usedProxy ? ' (via local proxy)' : ''
       }.`,
-      'success'
+      RdfStatusSeverity.Success
     );
   } catch (error: any) {
-    setStatus(error?.message ?? 'Failed to download ontology.', 'error');
+    setStatus(error?.message ?? 'Failed to download ontology.', RdfStatusSeverity.Error);
   } finally {
     isDownloading.value = false;
   }
 }
 
+/**
+ * Handles user-uploaded ontology files and stores the parsed graph cache.
+ */
 async function onOntologyFileSelected(event: any) {
   const file = Array.isArray(event?.files) ? event.files[0] : null;
   if (!file) return;
 
   if (!selectedPrefix.value) {
-    setStatus('Please select a prefix first.', 'warn');
+    setStatus('Please select a prefix first.', RdfStatusSeverity.Warn);
     ontologyFileUploadRef.value?.clear?.();
     return;
   }
   const ontologyPrefix = selectedPrefix.value;
+  const ontologyIri = getOntologyIriForPrefix(ontologyPrefix);
+  if (!ontologyIri) {
+    setStatus(
+      `No ontology IRI found in @context for prefix "${ontologyPrefix}".`,
+      RdfStatusSeverity.Warn
+    );
+    ontologyFileUploadRef.value?.clear?.();
+    return;
+  }
 
   isUploading.value = true;
   setStatus('');
 
   try {
-    const contentType = file.type || 'application/octet-stream';
+    const contentType = file.type || RdfMediaType.OctetStream;
     const format = detectRdfFormat(contentType, file.name);
     if (!format) {
       throw new Error('Only RDF files are supported.');
@@ -489,9 +516,9 @@ async function onOntologyFileSelected(event: any) {
     const mergedGraphNTriples = serializeStoreToNTriples(store);
 
     const cacheEntry: CachedOntology = {
-      ontologyPrefix,
+      ontologyIri,
       url: fileUrl,
-      content,
+      rawContent: content,
       format,
       contentType,
       fetchedAt: new Date().toISOString(),
@@ -503,16 +530,19 @@ async function onOntologyFileSelected(event: any) {
 
     setStatus(
       `Ontology file "${file.name}" for prefix "${ontologyPrefix}" was uploaded and cached in IndexedDB.`,
-      'success'
+      RdfStatusSeverity.Success
     );
   } catch (error: any) {
-    setStatus(error?.message ?? 'Failed to upload ontology file.', 'error');
+    setStatus(error?.message ?? 'Failed to upload ontology file.', RdfStatusSeverity.Error);
   } finally {
     isUploading.value = false;
     ontologyFileUploadRef.value?.clear?.();
   }
 }
 
+/**
+ * Fetches RDF content directly and falls back to the local proxy when CORS/network blocks direct access.
+ */
 async function fetchOntologyWithCorsFallback(
   targetUrl: string
 ): Promise<{response: Response; usedProxy: boolean}> {
@@ -522,7 +552,7 @@ async function fetchOntologyWithCorsFallback(
     });
     return {response: directResponse, usedProxy: false};
   } catch {
-    const proxyUrl = `/api/rdf-proxy?url=${encodeURIComponent(targetUrl)}`;
+    const proxyUrl = `${RdfProxyPath.Endpoint}?url=${encodeURIComponent(targetUrl)}`;
     const proxiedResponse = await fetch(proxyUrl, {
       headers: {Accept: ACCEPT_RDF_HEADER},
     });
@@ -530,31 +560,36 @@ async function fetchOntologyWithCorsFallback(
   }
 }
 
+/**
+ * Detects an rdflib-compatible parser format from response content-type and URL/file extension.
+ */
 function detectRdfFormat(contentTypeHeader: string, url: string): string | null {
   const contentType = contentTypeHeader.split(';')[0]!.trim().toLowerCase();
   const normalizedUrl = url.toLowerCase();
 
-  if (contentType === 'application/rdf+xml') return 'application/rdf+xml';
-  if (contentType === 'application/xml' || contentType === 'text/xml') return 'application/rdf+xml';
-  if (contentType === 'text/turtle' || contentType === 'application/x-turtle') return 'text/turtle';
-  if (contentType === 'application/n-triples') return 'application/n-triples';
-  if (contentType === 'text/n3') return 'text/n3';
-  if (contentType === 'application/ld+json') return 'application/ld+json';
-  if (contentType === 'application/json') return 'application/ld+json';
+  if (contentType === RdfMediaType.RdfXml) return RdfMediaType.RdfXml;
+  if (contentType === RdfMediaType.Xml || contentType === RdfMediaType.TextXml)
+    return RdfMediaType.RdfXml;
+  if (contentType === RdfMediaType.Turtle || contentType === RdfMediaType.XTurtle)
+    return RdfMediaType.Turtle;
+  if (contentType === RdfMediaType.NTriples) return RdfMediaType.NTriples;
+  if (contentType === RdfMediaType.N3) return RdfMediaType.N3;
+  if (contentType === RdfMediaType.JsonLd) return RdfMediaType.JsonLd;
+  if (contentType === RdfMediaType.Json) return RdfMediaType.JsonLd;
 
-  if (contentType === 'text/plain' || contentType === 'application/octet-stream') {
-    if (normalizedUrl.endsWith('.nt')) return 'application/n-triples';
-    if (normalizedUrl.endsWith('.ttl')) return 'text/turtle';
-    if (normalizedUrl.endsWith('.n3')) return 'text/n3';
+  if (contentType === RdfMediaType.TextPlain || contentType === RdfMediaType.OctetStream) {
+    if (normalizedUrl.endsWith('.nt')) return RdfMediaType.NTriples;
+    if (normalizedUrl.endsWith('.ttl')) return RdfMediaType.Turtle;
+    if (normalizedUrl.endsWith('.n3')) return RdfMediaType.N3;
     if (
       normalizedUrl.endsWith('.rdf') ||
       normalizedUrl.endsWith('.owl') ||
       normalizedUrl.endsWith('.xml')
     ) {
-      return 'application/rdf+xml';
+      return RdfMediaType.RdfXml;
     }
     if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json'))
-      return 'application/ld+json';
+      return RdfMediaType.JsonLd;
   }
 
   if (
@@ -562,13 +597,13 @@ function detectRdfFormat(contentTypeHeader: string, url: string): string | null 
     normalizedUrl.endsWith('.owl') ||
     normalizedUrl.endsWith('.xml')
   ) {
-    return 'application/rdf+xml';
+    return RdfMediaType.RdfXml;
   }
-  if (normalizedUrl.endsWith('.ttl')) return 'text/turtle';
-  if (normalizedUrl.endsWith('.nt')) return 'application/n-triples';
-  if (normalizedUrl.endsWith('.n3')) return 'text/n3';
+  if (normalizedUrl.endsWith('.ttl')) return RdfMediaType.Turtle;
+  if (normalizedUrl.endsWith('.nt')) return RdfMediaType.NTriples;
+  if (normalizedUrl.endsWith('.n3')) return RdfMediaType.N3;
   if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json'))
-    return 'application/ld+json';
+    return RdfMediaType.JsonLd;
 
   return null;
 }
@@ -594,6 +629,9 @@ function serializeStoreToNTriples(store: $rdf.Formula): string {
   return Array.from(triples).join('\n');
 }
 
+/**
+ * Loads ontology cards from cache or recomputes them by running the predefined ontology query.
+ */
 async function loadOntologyCards(forceRefresh = false) {
   const selectedEntry = selectedCacheEntry.value;
   if (!selectedEntry) {
@@ -616,14 +654,14 @@ async function loadOntologyCards(forceRefresh = false) {
       return;
     }
 
-    const globalGraph = await getGlobalGraphFromIndexedDb();
-    if (!globalGraph?.nTriples) {
+    const graphNTriples = cacheEntry.mergedGraphNTriples ?? '';
+    if (!graphNTriples.trim()) {
       ontologyRows.value = [];
       return;
     }
 
     const query = buildOntologyQuery();
-    const rows = await runSparqlOnCachedOntology(query, globalGraph.nTriples);
+    const rows = await runSparqlOnCachedOntology(query, graphNTriples);
     ontologyRows.value = rows;
 
     const updatedCacheEntry: CachedOntology = {
@@ -633,16 +671,16 @@ async function loadOntologyCards(forceRefresh = false) {
     };
     loadedCacheEntry.value = updatedCacheEntry;
     try {
-      await putOntologyToIndexedDb(updatedCacheEntry, false);
+      await putOntologyToIndexedDb(updatedCacheEntry);
     } catch (persistError: any) {
       setStatus(
         persistError?.message ?? 'Query results were loaded but could not be cached.',
-        'warn'
+        RdfStatusSeverity.Warn
       );
     }
   } catch (error: any) {
     ontologyRows.value = [];
-    setStatus(error?.message ?? 'Failed to query ontology terms.', 'error');
+    setStatus(error?.message ?? 'Failed to query ontology terms.', RdfStatusSeverity.Error);
   } finally {
     isQuerying.value = false;
   }
@@ -660,16 +698,16 @@ function buildOntologyQuery() {
       ?about a ?propertyType .
       FILTER(
         ?propertyType IN (
-          <http://www.w3.org/2002/07/owl#ObjectProperty>,
-          <http://www.w3.org/2002/07/owl#DatatypeProperty>,
-          <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property>,
-          <http://www.w3.org/2000/01/rdf-schema#Class>,
-          <http://www.w3.org/2002/07/owl#Class>
+          <${RdfPropertyTypeIri.OwlObjectProperty}>,
+          <${RdfPropertyTypeIri.OwlDatatypeProperty}>,
+          <${RdfPropertyTypeIri.RdfProperty}>,
+          <${RdfPropertyTypeIri.RdfsClass}>,
+          <${RdfPropertyTypeIri.OwlClass}>
         )
       )
       ${namespaceFilter}
       OPTIONAL {
-        ?about <http://www.w3.org/2000/01/rdf-schema#comment> ?commentTerm .
+        ?about <${RdfPredicateIri.RdfsComment}> ?commentTerm .
         FILTER(LANG(?commentTerm) = "" || LANGMATCHES(LANG(?commentTerm), "en"))
       }
     }
@@ -685,21 +723,17 @@ async function runSparqlOnCachedOntology(query: string, graphNTriples: string) {
   }
 
   const engine = new queryEngineCtor();
-  const sources = [{type: 'serialized', value: graphNTriples, mediaType: 'application/n-triples'}];
+  const sources = [{type: 'serialized', value: graphNTriples, mediaType: RdfMediaType.NTriples}];
   const stream = await engine.queryBindings(query, {sources});
 
   const rows: Array<{
     about: string;
     comment: string;
-    propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class';
+    propertyType: RdfPropertyType;
   }> = [];
   const seen = new Set<string>();
 
-  const pushRow = (
-    about: string,
-    comment: string,
-    propertyType: 'ObjectProperty' | 'DatatypeProperty' | 'Class'
-  ) => {
+  const pushRow = (about: string, comment: string, propertyType: RdfPropertyType) => {
     const key = `${about}::${propertyType}`;
     if (seen.has(key)) return;
     seen.add(key);
@@ -709,31 +743,31 @@ async function runSparqlOnCachedOntology(query: string, graphNTriples: string) {
   await new Promise<void>((resolve, reject) => {
     stream
       .on('data', (binding: any) => {
-        const about = getBindingValue(binding, 'about');
+        const about = getBindingValue(binding, RdfBindingName.About);
         if (!about) return;
-        const propertyTypeIri = getBindingValue(binding, 'propertyType');
-        const comment = getBindingValue(binding, 'comment');
+        const propertyTypeIri = getBindingValue(binding, RdfBindingName.PropertyType);
+        const comment = getBindingValue(binding, RdfBindingName.Comment);
 
-        if (propertyTypeIri === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property') {
-          pushRow(about, comment, 'DatatypeProperty');
-          pushRow(about, comment, 'ObjectProperty');
+        if (propertyTypeIri === RdfPropertyTypeIri.RdfProperty) {
+          pushRow(about, comment, RdfPropertyType.DatatypeProperty);
+          pushRow(about, comment, RdfPropertyType.ObjectProperty);
           return;
         }
 
-        if (propertyTypeIri === 'http://www.w3.org/2002/07/owl#DatatypeProperty') {
-          pushRow(about, comment, 'DatatypeProperty');
+        if (propertyTypeIri === RdfPropertyTypeIri.OwlDatatypeProperty) {
+          pushRow(about, comment, RdfPropertyType.DatatypeProperty);
           return;
         }
 
         if (
-          propertyTypeIri === 'http://www.w3.org/2000/01/rdf-schema#Class' ||
-          propertyTypeIri === 'http://www.w3.org/2002/07/owl#Class'
+          propertyTypeIri === RdfPropertyTypeIri.RdfsClass ||
+          propertyTypeIri === RdfPropertyTypeIri.OwlClass
         ) {
-          pushRow(about, comment, 'Class');
+          pushRow(about, comment, RdfPropertyType.Class);
           return;
         }
 
-        pushRow(about, comment, 'ObjectProperty');
+        pushRow(about, comment, RdfPropertyType.ObjectProperty);
       })
       .on('end', () => resolve())
       .on('error', (err: any) => reject(err));
@@ -745,13 +779,13 @@ async function runSparqlOnCachedOntology(query: string, graphNTriples: string) {
 async function runCustomSparqlQuery() {
   const entry = selectedCacheEntry.value;
   if (!entry) {
-    setStatus('Please select a prefix with a cached ontology first.', 'warn');
+    setStatus('Please select a prefix with a cached ontology first.', RdfStatusSeverity.Warn);
     return;
   }
 
   const query = customSparqlQuery.value;
   if (!query.trim()) {
-    setStatus('Please enter a SPARQL query.', 'warn');
+    setStatus('Please enter a SPARQL query.', RdfStatusSeverity.Warn);
     return;
   }
   if (!validateCustomSparqlSyntax(query, false)) {
@@ -761,7 +795,7 @@ async function runCustomSparqlQuery() {
 
   const queryEngineCtor = (window as any)?.Comunica?.QueryEngine;
   if (!queryEngineCtor) {
-    setStatus('SPARQL engine is not available.', 'error');
+    setStatus('SPARQL engine is not available.', RdfStatusSeverity.Error);
     return;
   }
 
@@ -770,9 +804,7 @@ async function runCustomSparqlQuery() {
     const cacheEntry = await ensureCacheEntryGraph(entry);
     const graphNTriples = cacheEntry.mergedGraphNTriples ?? '';
     const engine = new queryEngineCtor();
-    const sources = [
-      {type: 'serialized', value: graphNTriples, mediaType: 'application/n-triples'},
-    ];
+    const sources = [{type: 'serialized', value: graphNTriples, mediaType: RdfMediaType.NTriples}];
     const stream = await engine.queryBindings(query, {sources});
     const rows: CustomQueryRow[] = [];
 
@@ -795,37 +827,29 @@ async function runCustomSparqlQuery() {
     selectedCustomQueryIri.value = '';
     customQueryErrorMessage.value = null;
     customQueryAccordion.value = null;
-    setStatus(`Custom query returned ${rows.length} row(s).`, 'success');
+    setStatus(`Custom query returned ${rows.length} row(s).`, RdfStatusSeverity.Success);
   } catch (error: any) {
     customQueryErrorMessage.value = error?.message ?? 'Failed to execute custom query.';
-    setStatus(error?.message ?? 'Failed to execute custom query.', 'error');
+    setStatus(error?.message ?? 'Failed to execute custom query.', RdfStatusSeverity.Error);
   } finally {
     isRunningCustomQuery.value = false;
   }
 }
 
 function validateCustomSparqlSyntax(query: string, silent: boolean): boolean {
-  try {
-    const parser = new Parser();
-    parser.parse(query);
+  const result = validateSparqlSyntax(query);
+  if (result.valid) {
     customQueryErrorLineNumber.value = null;
     customQueryErrorMessage.value = null;
     return true;
-  } catch (err: any) {
-    const lineMatch = err?.message?.match(/line[:\s]+(\d+)/i);
-    if (lineMatch) {
-      customQueryErrorLineNumber.value = parseInt(lineMatch[1], 10);
-    } else if (err?.location?.start?.line) {
-      customQueryErrorLineNumber.value = err.location.start.line;
-    } else {
-      customQueryErrorLineNumber.value = null;
-    }
-    customQueryErrorMessage.value = err?.message ?? 'Invalid SPARQL query syntax.';
-    if (!silent) {
-      setStatus(err?.message ?? 'Invalid SPARQL query syntax.', 'error');
-    }
-    return false;
   }
+
+  customQueryErrorLineNumber.value = result.errorLine;
+  customQueryErrorMessage.value = result.errorMessage ?? 'Invalid SPARQL query syntax.';
+  if (!silent) {
+    setStatus(result.errorMessage ?? 'Invalid SPARQL query syntax.', RdfStatusSeverity.Error);
+  }
+  return false;
 }
 
 function validateCustomQueryLive() {
@@ -852,8 +876,12 @@ async function ensureCacheEntryGraph(entry: CachedOntology): Promise<CachedOntol
     return entry;
   }
 
-  const rootUrl = entry.url || `cached://${entry.ontologyPrefix}`;
-  const store = await parseRdfToStore(entry.content, rootUrl, entry.format);
+  const rootUrl = entry.url || `cached://${entry.ontologyIri}`;
+  const format = entry.format ?? detectRdfFormat(entry.contentType ?? '', rootUrl);
+  if (!format) {
+    throw new Error('Failed to regenerate cached ontology graph: missing RDF format.');
+  }
+  const store = await parseRdfToStore(entry.rawContent, rootUrl, format);
   const upgradedEntry: CachedOntology = {
     ...entry,
     mergedGraphNTriples: serializeStoreToNTriples(store),
@@ -886,261 +914,32 @@ function escapeForSparqlString(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
-function openOntologyDb(): Promise<IDBDatabase> {
-  if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
-    return Promise.reject(new Error('IndexedDB is not available.'));
-  }
-
-  if (ontologyDbPromise) return ontologyDbPromise;
-
-  ontologyDbPromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      const tx = request.transaction;
-
-      let ontologyStore: IDBObjectStore;
-      if (!db.objectStoreNames.contains(INDEXED_DB_STORE)) {
-        ontologyStore = db.createObjectStore(INDEXED_DB_STORE, {keyPath: 'ontologyPrefix'});
-      } else {
-        ontologyStore = tx!.objectStore(INDEXED_DB_STORE);
-      }
-
-      if (!db.objectStoreNames.contains(INDEXED_DB_GRAPH_STORE)) {
-        db.createObjectStore(INDEXED_DB_GRAPH_STORE, {keyPath: 'id'});
-      }
-
-      if (db.objectStoreNames.contains(LEGACY_INDEXED_DB_STORE) && tx) {
-        const legacyStore = tx.objectStore(LEGACY_INDEXED_DB_STORE);
-        legacyStore.openCursor().onsuccess = event => {
-          const cursor = (event.target as IDBRequest<IDBCursorWithValue | null>).result;
-          if (!cursor) return;
-          const normalized = normalizeCachedOntology(cursor.value as CachedOntology | undefined);
-          if (normalized) {
-            ontologyStore.put(normalized);
-          }
-          cursor.continue();
-        };
-      }
-    };
-
-    request.onsuccess = () => {
-      const db = request.result;
-      db.onversionchange = () => {
-        db.close();
-      };
-      resolve(db);
-    };
-
-    request.onerror = () => {
-      reject(new Error(request.error?.message || 'Failed to open IndexedDB.'));
-    };
-  });
-
-  ontologyDbPromise = ontologyDbPromise.catch(error => {
-    ontologyDbPromise = null;
-    throw error;
-  });
-
-  return ontologyDbPromise;
+async function getOntologyFromIndexedDb(ontologyIri: string): Promise<CachedOntology | null> {
+  return await getOntologyFromRdfCache(ontologyIri);
 }
 
-async function getOntologyFromIndexedDb(ontologyPrefix: string): Promise<CachedOntology | null> {
-  const db = await openOntologyDb();
-
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(INDEXED_DB_STORE, 'readonly');
-    const store = tx.objectStore(INDEXED_DB_STORE);
-    const request = store.get(ontologyPrefix);
-
-    request.onsuccess = () => {
-      const result = request.result as CachedOntology | undefined;
-      resolve(normalizeCachedOntology(result));
-    };
-
-    request.onerror = () => {
-      reject(new Error(request.error?.message || 'Failed to read ontology from IndexedDB.'));
-    };
-  });
+async function putOntologyToIndexedDb(entry: CachedOntology): Promise<void> {
+  await putOntologyInRdfCache(entry);
 }
 
-function normalizeCachedOntology(value: CachedOntology | undefined): CachedOntology | null {
-  if (!value) return null;
-  const ontologyPrefix = value.ontologyPrefix || (value as any).prefix;
-  if (!ontologyPrefix) return null;
-  return {
-    ...value,
-    ontologyPrefix,
-    mergedGraphNTriples:
-      typeof value.mergedGraphNTriples === 'string' ? value.mergedGraphNTriples : '',
-    ontologyQueryResults: Array.isArray(value.ontologyQueryResults)
-      ? value.ontologyQueryResults
-      : undefined,
-    queryResultsFetchedAt:
-      typeof value.queryResultsFetchedAt === 'string' ? value.queryResultsFetchedAt : undefined,
-  };
-}
-
-async function getAllOntologiesFromIndexedDb(): Promise<CachedOntology[]> {
-  const db = await openOntologyDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(INDEXED_DB_STORE, 'readonly');
-    const store = tx.objectStore(INDEXED_DB_STORE);
-    const request = store.getAll();
-
-    request.onsuccess = () => {
-      const rawEntries = Array.isArray(request.result) ? request.result : [];
-      const entries = rawEntries
-        .map(value => normalizeCachedOntology(value as CachedOntology | undefined))
-        .filter((value): value is CachedOntology => value !== null);
-      resolve(entries);
-    };
-
-    request.onerror = () => {
-      reject(new Error(request.error?.message || 'Failed to read ontologies from IndexedDB.'));
-    };
-  });
-}
-
-async function getGlobalGraphFromIndexedDb(): Promise<CachedGlobalGraph | null> {
-  const db = await openOntologyDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(INDEXED_DB_GRAPH_STORE, 'readonly');
-    const store = tx.objectStore(INDEXED_DB_GRAPH_STORE);
-    const request = store.get('global');
-
-    request.onsuccess = () => {
-      const value = request.result as CachedGlobalGraph | undefined;
-      resolve(value ?? null);
-    };
-
-    request.onerror = () => {
-      reject(new Error(request.error?.message || 'Failed to read RDF graph from IndexedDB.'));
-    };
-  });
-}
-
-async function putGlobalGraphToIndexedDb(graph: CachedGlobalGraph): Promise<void> {
-  const db = await openOntologyDb();
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(INDEXED_DB_GRAPH_STORE, 'readwrite');
-    const store = tx.objectStore(INDEXED_DB_GRAPH_STORE);
-    store.put(graph);
-
-    tx.oncomplete = () => resolve();
-    tx.onerror = () =>
-      reject(new Error(tx.error?.message || 'Failed to write RDF graph to IndexedDB.'));
-    tx.onabort = () => reject(new Error(tx.error?.message || 'IndexedDB graph write aborted.'));
-  });
-}
-
-async function rebuildAndStoreGlobalGraph(): Promise<CachedGlobalGraph> {
-  const entries = await getAllOntologiesFromIndexedDb();
-  const triples = new Set<string>();
-  for (const entry of entries) {
-    const lines = (await getEntryGraphNTriples(entry))
-      .split('\n')
-      .map(line => line.trim())
-      .filter(Boolean);
-    for (const line of lines) {
-      triples.add(line);
-    }
-  }
-
-  const graphEntry: CachedGlobalGraph = {
-    id: 'global',
-    nTriples: Array.from(triples).join('\n'),
-    updatedAt: new Date().toISOString(),
-  };
-  await putGlobalGraphToIndexedDb(graphEntry);
-  return graphEntry;
-}
-
-async function getEntryGraphNTriples(entry: CachedOntology): Promise<string> {
-  if (entry.mergedGraphNTriples) return entry.mergedGraphNTriples;
-
-  const rootUrl = entry.url || `cached://${entry.ontologyPrefix}`;
-  const rootStore = await parseRdfToStore(entry.content, rootUrl, entry.format);
-  return serializeStoreToNTriples(rootStore);
-}
-
-async function putOntologyToIndexedDb(
-  entry: CachedOntology,
-  rebuildGlobalGraph = true
-): Promise<void> {
-  if (!entry.ontologyPrefix) {
-    throw new Error('Failed to cache ontology: missing ontology prefix key.');
-  }
-
-  const db = await openOntologyDb();
-  const storableEntry = toStorableCachedOntology(entry);
-
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(INDEXED_DB_STORE, 'readwrite');
-    const store = tx.objectStore(INDEXED_DB_STORE);
-    store.put(storableEntry);
-
-    tx.oncomplete = () => resolve();
-    tx.onerror = () =>
-      reject(new Error(tx.error?.message || 'Failed to write ontology to IndexedDB.'));
-    tx.onabort = () => reject(new Error(tx.error?.message || 'IndexedDB write aborted.'));
-  });
-
-  if (rebuildGlobalGraph) {
-    await rebuildAndStoreGlobalGraph();
-  }
-}
-
-function toStorableCachedOntology(entry: CachedOntology): CachedOntology {
-  const rawEntry = toRaw(entry) as CachedOntology;
-  return {
-    ontologyPrefix: String(rawEntry.ontologyPrefix ?? ''),
-    url: String(rawEntry.url ?? ''),
-    content: String(rawEntry.content ?? ''),
-    format: String(rawEntry.format ?? ''),
-    contentType: String(rawEntry.contentType ?? ''),
-    fetchedAt: String(rawEntry.fetchedAt ?? ''),
-    mergedGraphNTriples: rawEntry.mergedGraphNTriples ? String(rawEntry.mergedGraphNTriples) : '',
-    ontologyQueryResults: (rawEntry.ontologyQueryResults ?? []).map(row => ({
-      about: String(row?.about ?? ''),
-      comment: String(row?.comment ?? ''),
-      propertyType:
-        row?.propertyType === 'DatatypeProperty' ||
-        row?.propertyType === 'ObjectProperty' ||
-        row?.propertyType === 'Class'
-          ? row.propertyType
-          : 'ObjectProperty',
-    })),
-    queryResultsFetchedAt: rawEntry.queryResultsFetchedAt
-      ? String(rawEntry.queryResultsFetchedAt)
-      : undefined,
-  };
-}
-
-async function deleteOntologyFromIndexedDb(ontologyPrefix: string): Promise<void> {
-  const db = await openOntologyDb();
-
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(INDEXED_DB_STORE, 'readwrite');
-    const store = tx.objectStore(INDEXED_DB_STORE);
-    store.delete(ontologyPrefix);
-
-    tx.oncomplete = () => resolve();
-    tx.onerror = () =>
-      reject(new Error(tx.error?.message || 'Failed to delete ontology from IndexedDB.'));
-    tx.onabort = () => reject(new Error(tx.error?.message || 'IndexedDB delete aborted.'));
-  });
-
-  await rebuildAndStoreGlobalGraph();
+async function deleteOntologyFromIndexedDb(ontologyIri: string): Promise<void> {
+  await deleteOntologyFromRdfCache(ontologyIri);
 }
 
 async function deleteCachedOntology() {
   if (!selectedPrefix.value) return;
 
   const prefixToDelete = selectedPrefix.value;
+  const ontologyIri = getOntologyIriForPrefix(prefixToDelete);
+  if (!ontologyIri) {
+    setStatus(
+      `No ontology IRI found in @context for prefix "${prefixToDelete}".`,
+      RdfStatusSeverity.Warn
+    );
+    return;
+  }
   try {
-    await deleteOntologyFromIndexedDb(prefixToDelete);
+    await deleteOntologyFromIndexedDb(ontologyIri);
     if (selectedPrefix.value === prefixToDelete) {
       loadedCacheEntry.value = null;
       ontologyRows.value = [];
@@ -1150,9 +949,12 @@ async function deleteCachedOntology() {
       ontologyUrl.value = '';
     }
     deleteDialog.value = false;
-    setStatus(`Cached ontology for prefix "${prefixToDelete}" was deleted from IndexedDB.`, 'info');
+    setStatus(
+      `Cached ontology for prefix "${prefixToDelete}" was deleted from IndexedDB.`,
+      RdfStatusSeverity.Info
+    );
   } catch (error: any) {
-    setStatus(error?.message ?? 'Failed to delete cached ontology.', 'error');
+    setStatus(error?.message ?? 'Failed to delete cached ontology.', RdfStatusSeverity.Error);
   }
 }
 
@@ -1219,11 +1021,15 @@ function findBestPrefixForIri(iri: string): string | null {
   return bestPrefix;
 }
 
+function getOntologyIriForPrefix(prefix: string): string {
+  return String(prefixNamespaces.value[prefix] ?? '').trim();
+}
+
 function normalizeIri(value: string | undefined): string {
   return (value ?? '').trim();
 }
 
-function setStatus(message: string, severity: 'success' | 'info' | 'warn' | 'error' = 'info') {
+function setStatus(message: string, severity: RdfStatusSeverity = RdfStatusSeverity.Info) {
   statusMessage.value = message;
   statusSeverity.value = severity;
 }
@@ -1299,7 +1105,7 @@ function collectFromContextObject(contextPart: any, out: Record<string, string>)
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed var(--p-content-border-color, #d1d5db);
+  border: 1px dashed var(--p-content-border-color);
   border-radius: 0.5rem;
   min-height: 0;
 }
@@ -1333,7 +1139,7 @@ function collectFromContextObject(contextPart: any, out: Record<string, string>)
 
 .custom-query-cell.iri {
   cursor: pointer;
-  color: var(--p-primary-color, #2563eb);
+  color: var(--p-primary-color);
   text-decoration: underline;
 }
 

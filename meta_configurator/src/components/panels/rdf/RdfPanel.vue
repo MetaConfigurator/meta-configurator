@@ -142,7 +142,7 @@ function handleLink(event: MouseEvent) {
 <style scoped>
 .alert-list :deep(.alert-link),
 :deep(.alert-link) {
-  color: #1d4ed8;
+  color: var(--p-primary-500);
   text-decoration: none;
   font-weight: 500;
 }

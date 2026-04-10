@@ -231,14 +231,13 @@ const emit = defineEmits<{
   (e: 'property-link-click', lit: SelectedNodeData['literals'][number], event: MouseEvent): void;
 }>();
 </script>
-
 <style scoped>
 .properties-panel-wrapper {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--p-surface-card);
   overflow: hidden;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  box-shadow: -2px 0 8px color-mix(in srgb, var(--p-surface-900) 10%, transparent);
 }
 
 .properties-content {
@@ -290,7 +289,7 @@ const emit = defineEmits<{
   gap: 10px;
   font-weight: 700;
   font-size: 13px;
-  color: black;
+  color: var(--p-text-color);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -300,7 +299,7 @@ const emit = defineEmits<{
   align-items: flex-start;
   gap: 8px;
   padding: 8px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--p-border-color);
   word-break: break-word;
   width: 100%;
 }
@@ -334,7 +333,7 @@ const emit = defineEmits<{
 .kv-value,
 .prop-text {
   font-size: 13px;
-  color: #475569;
+  color: var(--p-text-muted-color);
   line-height: 1.35;
   word-break: break-word;
 }
@@ -378,18 +377,24 @@ const emit = defineEmits<{
 }
 
 .link {
-  color: #2563eb;
-  text-decoration: none;
+  color: var(--p-primary-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .link {
+    color: var(--p-primary-300, var(--p-primary-color));
+  }
 }
 
 .link:hover {
+  color: var(--p-primary-hover-color);
   text-decoration: underline;
 }
 
 .card-empty {
   padding: 16px;
   text-align: center;
-  color: #94a3b8;
+  color: var(--p-text-muted-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -422,33 +427,5 @@ const emit = defineEmits<{
 
 .property-list-move {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  .properties-panel-wrapper {
-    background: #1a202c;
-    border-left-color: #4a5568;
-  }
-
-  .card-title {
-    color: #e2e8f0;
-  }
-
-  .kv-value,
-  .prop-text {
-    color: #cbd5e0;
-  }
-
-  .kv-row {
-    border-bottom-color: #4a5568;
-  }
-
-  .link {
-    color: #a5b4fc;
-  }
-
-  .card-empty {
-    color: #64748b;
-  }
 }
 </style>
