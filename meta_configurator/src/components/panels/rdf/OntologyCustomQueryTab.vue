@@ -1,24 +1,26 @@
 <template>
-  <div class="custom-query-tabs-wrapper">
-    <Tabs v-model:value="activeCustomQueryTab" class="custom-query-tabs">
+  <div class="tabs-wrapper">
+    <Tabs v-model:value="activeCustomQueryTab" class="tabs">
       <TabList>
         <Tab value="query">Query</Tab>
         <Tab value="results">Results</Tab>
       </TabList>
       <TabPanels>
         <TabPanel value="query">
-          <div class="custom-query-panel-content">
-            <div class="custom-query-editor">
+          <div class="panel-content">
+            <div class="editor">
               <SparqlQueryEditor
+                ref="editorRef"
+                class="editor-instance"
                 v-model="customSparqlQuery"
                 :errorLine="customQueryErrorLineNumber"
                 :errorMessage="customQueryErrorMessage" />
-            </div>
-            <div class="flex justify-end">
               <Button
                 label="Run Query"
                 icon="pi pi-play"
                 size="small"
+                class="run-query-button"
+                :style="{bottom: `${runQueryButtonBottomOffset}px`}"
                 :loading="isRunningCustomQuery"
                 :disabled="!props.selectedCacheEntry || !customSparqlQuery.trim()"
                 @click="runCustomSparqlQuery" />
@@ -26,16 +28,16 @@
           </div>
         </TabPanel>
         <TabPanel value="results">
-          <div class="custom-query-results-panel">
+          <div class="results-panel">
             <div class="table-search mb-2">
               <InputText
                 v-model.trim="customTableSearch"
                 placeholder="Search query results"
                 class="w-full" />
             </div>
-            <div class="custom-query-results-table-wrapper">
+            <div class="results-table-wrapper">
               <DataTable
-                class="custom-query-results-table"
+                class="results-table"
                 :value="filteredCustomQueryRows"
                 v-model:first="customQueryFirst"
                 size="small"
@@ -55,7 +57,7 @@
                   <template #body="{data}">
                     <button
                       type="button"
-                      class="custom-query-cell"
+                      class="cell"
                       :class="{iri: isLikelyIri(normalizePotentialIri(data[column]))}"
                       @click="onCustomQueryValueClick(data[column])">
                       {{ data[column] }}
@@ -72,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {computed, nextTick, ref, watch} from 'vue';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import DataTable from 'primevue/datatable';
@@ -112,6 +114,8 @@ const isRunningCustomQuery = ref(false);
 const customQueryErrorLineNumber = ref<number | null>(null);
 const customQueryErrorMessage = ref<string | null>(null);
 const activeCustomQueryTab = ref<'query' | 'results'>('query');
+const editorRef = ref<any>(null);
+const runQueryButtonBottomOffset = ref(12);
 let customQueryValidateTimer: number | null = null;
 
 const filteredCustomQueryRows = computed(() =>
@@ -146,6 +150,14 @@ watch(
 watch(customSparqlQuery, () => {
   validateCustomQueryLive();
 });
+
+watch(
+  customQueryErrorMessage,
+  () => {
+    updateRunQueryButtonOffset();
+  },
+  {immediate: true}
+);
 
 async function runCustomSparqlQuery() {
   const entry = props.selectedCacheEntry;
@@ -294,36 +306,45 @@ function isLikelyIri(value: string): boolean {
   if (/\s/.test(value)) return false;
   return /^[A-Za-z][A-Za-z0-9+.-]*:.+/.test(value);
 }
+
+function updateRunQueryButtonOffset() {
+  void nextTick(() => {
+    const editorRoot = editorRef.value?.$el as HTMLElement | undefined;
+    const errorBox = editorRoot?.querySelector('.error-box') as HTMLElement | null;
+    const errorHeight = errorBox ? errorBox.offsetHeight + 8 : 0;
+    runQueryButtonBottomOffset.value = 12 + errorHeight;
+  });
+}
 </script>
 
 <style scoped>
-.custom-query-tabs-wrapper {
+.tabs-wrapper {
   height: 100%;
   min-height: 0;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
-.custom-query-tabs {
+.tabs {
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
-.custom-query-tabs :deep(.p-tabpanels) {
+.tabs :deep(.p-tabpanels) {
   flex: 1;
   min-height: 0;
   padding-top: 0.5rem;
 }
 
-.custom-query-tabs :deep(.p-tabpanel) {
+.tabs :deep(.p-tabpanel) {
   height: 100%;
   min-height: 0;
   padding: 0;
 }
 
-.custom-query-panel-content {
+.panel-content {
   height: 100%;
   min-height: 0;
   display: flex;
@@ -331,7 +352,7 @@ function isLikelyIri(value: string): boolean {
   gap: 0.5rem;
 }
 
-.custom-query-cell {
+.cell {
   all: unset;
   display: block;
   width: 100%;
@@ -339,53 +360,69 @@ function isLikelyIri(value: string): boolean {
   color: inherit;
 }
 
-.custom-query-cell.iri {
+.cell.iri {
   cursor: pointer;
   color: var(--p-primary-color);
   text-decoration: underline;
 }
 
-.custom-query-editor {
+.editor {
   flex: 1;
   min-height: 0;
+  position: relative;
 }
 
-.custom-query-results-panel {
+.editor-instance {
+  height: 100%;
+}
+
+.editor :deep(.cm-scroller) {
+  padding-bottom: 3.25rem;
+}
+
+.run-query-button {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+}
+
+.results-panel {
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
-.custom-query-results-table-wrapper {
+.results-table-wrapper {
   flex: 1;
   min-height: 0;
   overflow-x: auto;
 }
 
-.custom-query-results-table {
+.results-table {
   height: 100%;
 }
 
-.custom-query-results-table :deep(.p-datatable) {
+.results-table :deep(.p-datatable) {
   height: 100%;
 }
 
-.custom-query-results-table :deep(.p-datatable-table-container) {
+.results-table :deep(.p-datatable-table-container) {
   overflow-x: auto !important;
 }
 
-.custom-query-results-table :deep(.p-datatable-table) {
+.results-table :deep(.p-datatable-table) {
   width: max-content;
   min-width: 100%;
 }
 
-.custom-query-results-table :deep(.p-datatable-thead > tr > th),
-.custom-query-results-table :deep(.p-datatable-tbody > tr > td) {
+.results-table :deep(.p-datatable-thead > tr > th),
+.results-table :deep(.p-datatable-tbody > tr > td) {
   white-space: nowrap;
 }
 
-.custom-query-results-table :deep(.custom-query-cell) {
+.results-table :deep(.cell) {
   display: inline-block;
   width: max-content;
   max-width: none;
