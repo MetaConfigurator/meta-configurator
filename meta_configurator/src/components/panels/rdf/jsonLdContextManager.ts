@@ -86,6 +86,10 @@ export const jsonLdContextManager: JsonLdContextManagerStore = (() => {
         return `${prefix}:${iri.slice(namespace.length)}`;
       }
     }
+    const xsdNs = 'http://www.w3.org/2001/XMLSchema#';
+    if (iri.startsWith(xsdNs)) {
+      return `xsd:${iri.slice(xsdNs.length)}`;
+    }
     return iri;
   };
 

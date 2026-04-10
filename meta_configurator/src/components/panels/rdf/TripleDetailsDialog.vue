@@ -86,13 +86,13 @@
               :options="objectDatatypeOptions"
               optionLabel="label"
               optionValue="value"
-              class="min-w-[200px]"
+              class="flex-1 min-w-[200px]"
               placeholder="Type" />
             <InputText
               v-else
               v-model.trim="localTriple.objectDatatype"
               placeholder="Datatype IRI or prefix"
-              class="min-w-[200px]" />
+              class="flex-1 min-w-[200px]" />
           </template>
           <template v-if="localTriple.objectType === RdfTermType.NamedNode">
             <Select
@@ -152,6 +152,12 @@ import {
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
+import {
+  COMMON_DATATYPES,
+  isCommonDatatype,
+  validateLiteralBeforeSave,
+} from '@/components/panels/rdf/tripleLiteralValidationService';
 import RdfOntologyExplorer from '@/components/panels/rdf/RdfOntologyExplorer.vue';
 
 const props = withDefaults(
@@ -179,24 +185,6 @@ const predicateTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode
 const objectTypeOptions = [
   {label: 'Named Node', value: RdfTermType.NamedNode},
   {label: 'Literal', value: RdfTermType.Literal},
-];
-
-const COMMON_DATATYPES = [
-  {label: 'Unspecified', value: ''},
-  {label: 'xsd:string', value: 'http://www.w3.org/2001/XMLSchema#string'},
-  {label: 'xsd:boolean', value: 'http://www.w3.org/2001/XMLSchema#boolean'},
-  {label: 'xsd:integer', value: 'http://www.w3.org/2001/XMLSchema#integer'},
-  {label: 'xsd:decimal', value: 'http://www.w3.org/2001/XMLSchema#decimal'},
-  {label: 'xsd:double', value: 'http://www.w3.org/2001/XMLSchema#double'},
-  {label: 'xsd:float', value: 'http://www.w3.org/2001/XMLSchema#float'},
-  {label: 'xsd:date', value: 'http://www.w3.org/2001/XMLSchema#date'},
-  {label: 'xsd:dateTime', value: 'http://www.w3.org/2001/XMLSchema#dateTime'},
-  {label: 'xsd:time', value: 'http://www.w3.org/2001/XMLSchema#time'},
-  {label: 'xsd:duration', value: 'http://www.w3.org/2001/XMLSchema#duration'},
-  {label: 'xsd:anyURI', value: 'http://www.w3.org/2001/XMLSchema#anyURI'},
-  {label: 'xsd:long', value: 'http://www.w3.org/2001/XMLSchema#long'},
-  {label: 'xsd:short', value: 'http://www.w3.org/2001/XMLSchema#short'},
-  {label: 'xsd:byte', value: 'http://www.w3.org/2001/XMLSchema#byte'},
 ];
 
 const localTriple = ref<TripleTransferObject>({...props.triple});
@@ -274,29 +262,12 @@ function applyOntologySelection(iri: string) {
   ontologyExplorerDialog.value = false;
 }
 
-function toPrefixed(iri: string): string {
-  for (const [prefix, ns] of Object.entries(rdfStoreManager.namespaces.value)) {
-    if (iri.startsWith(ns)) {
-      return `${prefix}:${iri.slice(ns.length)}`;
-    }
-  }
-  const xsdNs = 'http://www.w3.org/2001/XMLSchema#';
-  if (iri.startsWith(xsdNs)) {
-    return `xsd:${iri.slice(xsdNs.length)}`;
-  }
-  return iri;
-}
-
-function isCommonDatatype(value: string) {
-  return COMMON_DATATYPES.some(opt => opt.value === value);
-}
-
 const objectDatatypeOptions = computed(() => {
   const current = localTriple.value.objectDatatype ?? '';
   if (!current || isCommonDatatype(current)) {
     return COMMON_DATATYPES;
   }
-  return [{label: toPrefixed(current), value: current}, ...COMMON_DATATYPES];
+  return [{label: jsonLdContextManager.toPrefixed(current), value: current}, ...COMMON_DATATYPES];
 });
 
 watch(
@@ -328,11 +299,21 @@ function close() {
   visible.value = false;
 }
 
+function showDialogError(summary: string, details: string) {
+  useErrorService().onError({summary, details});
+}
+
 function saveTriple() {
+  const validationError = validateLiteralBeforeSave(localTriple.value);
+  if (validationError) {
+    showDialogError('Invalid Literal Value', validationError);
+    return;
+  }
+
   const action = localTriple.value.statement ? RdfChangeType.Edit : RdfChangeType.Add;
   const result = TripleEditorService.addOrEdit(localTriple.value);
   if (!result.success) {
-    useErrorService().onError(result.errorMessage!);
+    showDialogError('Unable To Save Triple', result.errorMessage ?? 'Unknown error occurred.');
     return;
   }
   emit('saved', {action, triple: localTriple.value});
