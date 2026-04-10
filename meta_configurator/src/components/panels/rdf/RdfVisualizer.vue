@@ -1,75 +1,22 @@
 <template>
   <div style="width: 100%; height: 100%; display: flex; position: relative">
-    <Dialog
-      v-model:visible="showLargeGraphPrompt"
-      header="Large graph detected"
-      modal
-      :closable="false">
-      <Message severity="secondary" variant="simple" :closable="false">
-        <template #default>
-          This graph contains <strong>{{ nodeCount }}</strong> nodes. Rendering may be slow for
-          graphs with more than <strong>{{ settings.rdf.maximumNodesToVisualize }}</strong> nodes.
-          <br />
-          You can adjust this value in the settings. Do you want to continue?
-        </template>
-      </Message>
-      <template #footer>
-        <Button label="No" icon="pi pi-times" text @click="confirmRender(false)" />
-        <Button label="Yes" icon="pi pi-check" text @click="confirmRender(true)" />
-      </template>
-    </Dialog>
-    <Dialog v-model:visible="deletePropertyDialog" header="Confirm" modal>
-      <div class="flex items-center gap-4">
-        <i class="pi pi-exclamation-triangle !text-3xl" />
-        <span>Are you sure you want to delete the selected property?</span>
-      </div>
-      <template #footer>
-        <Button
-          label="No"
-          icon="pi pi-times"
-          text
-          @click="deletePropertyDialog = false"
-          severity="secondary"
-          variant="text" />
-        <Button
-          label="Yes"
-          icon="pi pi-check"
-          text
-          @click="confirmDeleteProperty"
-          severity="danger" />
-      </template>
-    </Dialog>
-    <Dialog v-model:visible="deleteNodeDialog" header="Confirm" modal>
-      <div class="flex items-center gap-4">
-        <i class="pi pi-exclamation-triangle !text-3xl" />
-        <span>Are you sure you want to delete the selected node?</span>
-      </div>
-      <template #footer>
-        <Button
-          label="No"
-          icon="pi pi-times"
-          text
-          @click="deleteNodeDialog = false"
-          severity="secondary"
-          variant="text" />
-        <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteNode" severity="danger" />
-      </template>
-    </Dialog>
-    <Dialog
-      v-model:visible="renameNodeDialog"
-      header="Rename Node"
-      modal
-      maximizable
-      :style="{width: '520px'}">
-      <div class="flex flex-col gap-3">
-        <label class="text-sm font-medium">Node IRI</label>
-        <InputText v-model.trim="renameNodeValue" placeholder="Enter new IRI" />
-      </div>
-      <template #footer>
-        <Button label="Cancel" severity="secondary" @click="renameNodeDialog = false" />
-        <Button label="Save" @click="confirmRenameNode" />
-      </template>
-    </Dialog>
+    <RdfVisualizerDialogs
+      :showLargeGraphPrompt="showLargeGraphPrompt"
+      :nodeCount="nodeCount"
+      :maximumNodesToVisualize="settings.rdf.maximumNodesToVisualize"
+      :deletePropertyDialog="deletePropertyDialog"
+      :deleteNodeDialog="deleteNodeDialog"
+      :renameNodeDialog="renameNodeDialog"
+      :renameNodeValue="renameNodeValue"
+      @update:showLargeGraphPrompt="showLargeGraphPrompt = $event"
+      @confirm-render="confirmRender"
+      @update:deletePropertyDialog="deletePropertyDialog = $event"
+      @confirm-delete-property="confirmDeleteProperty"
+      @update:deleteNodeDialog="deleteNodeDialog = $event"
+      @confirm-delete-node="confirmDeleteNode"
+      @update:renameNodeDialog="renameNodeDialog = $event"
+      @update:renameNodeValue="renameNodeValue = $event"
+      @confirm-rename-node="confirmRenameNode" />
     <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
       <SplitterPanel class="graph-panel">
         <div class="graph-wrapper" :class="{'graph-frozen': hasGraphError}">
@@ -113,66 +60,36 @@
         v-if="propertiesPanelVisible"
         :size="propertiesPanelSize"
         :minSize="propertiesPanelMinSize">
-        <ScrollPanel class="properties-scroll" :class="{'properties-frozen': hasGraphError}">
-          <div class="properties-search-bar">
-            <div class="properties-search-input">
-              <AutoComplete
-                v-model="nodeSearchQuery"
-                :suggestions="nodeSearchResults"
-                optionLabel="label"
-                placeholder="Search nodes..."
-                :disabled="hasGraphError"
-                :forceSelection="false"
-                :autoHighlight="true"
-                @complete="onNodeSearch"
-                @item-select="selectNodeById($event.value.id)">
-                <template #option="slotProps">
-                  <div class="result-option">
-                    <span class="result-label">{{ slotProps.option.label }}</span>
-                    <span class="result-id">{{ slotProps.option.id }}</span>
-                  </div>
-                </template>
-              </AutoComplete>
-              <Button
-                v-if="nodeSearchQuery"
-                class="search-clear-btn"
-                icon="pi pi-times"
-                text
-                rounded
-                size="small"
-                :disabled="hasGraphError"
-                @click="clearNodeSearch" />
-            </div>
-          </div>
-          <RdfVisualizerPropertiesView
-            class="properties-view"
-            :selectedNode="selectedNode"
-            :readOnly="props.readOnly"
-            :isRefreshingNode="isRefreshingNode"
-            :propertyUpdateKey="propertyUpdateKey"
-            :iriHref="jsonLdContextManager.iriHref"
-            :isIRI="jsonLdContextManager.isIRI"
-            :isLinkableIRI="jsonLdContextManager.isLinkableIRI"
-            @edit-node="editSelectedNode"
-            @delete-node="deleteSelectedNode"
-            @delete-property="deleteProperty"
-            @edit-property="editProperty"
-            @add-property="addPropertyToSelected"
-            @add-node="addNodeFromVisualizer"
-            @property-link-click="handlePropertyLinkClick" />
-        </ScrollPanel>
+        <RdfVisualizerSidebar
+          :hasGraphError="hasGraphError"
+          :nodeSearchQuery="nodeSearchQuery"
+          :nodeSearchResults="nodeSearchResults"
+          :selectedNode="selectedNode"
+          :readOnly="props.readOnly"
+          :isRefreshingNode="isRefreshingNode"
+          :propertyUpdateKey="propertyUpdateKey"
+          :iriHref="jsonLdContextManager.iriHref"
+          :isIRI="jsonLdContextManager.isIRI"
+          :isLinkableIRI="jsonLdContextManager.isLinkableIRI"
+          @update:nodeSearchQuery="nodeSearchQuery = $event"
+          @node-search-complete="onNodeSearch"
+          @select-node-by-id="selectNodeById"
+          @clear-node-search="clearNodeSearch"
+          @edit-node="editSelectedNode"
+          @delete-node="deleteSelectedNode"
+          @delete-property="deleteProperty"
+          @edit-property="editProperty"
+          @add-property="addPropertyToSelected"
+          @add-node="addNodeFromVisualizer"
+          @property-link-click="handlePropertyLinkClick" />
       </SplitterPanel>
     </Splitter>
   </div>
 </template>
 <script setup lang="ts">
-import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
-import ScrollPanel from 'primevue/scrollpanel';
-import AutoComplete from 'primevue/autocomplete';
-import InputText from 'primevue/inputtext';
 import {ref, computed, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
@@ -184,7 +101,6 @@ import {
   type SelectedNodeData,
   RdfTermType,
   type RdfTermTypeString,
-  predicateAliasMapping,
 } from '@/components/panels/rdf/rdfUtils';
 import Dock from 'primevue/dock';
 import Splitter from 'primevue/splitter';
@@ -196,11 +112,23 @@ import {
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
-import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
 import {useCurrentData} from '@/data/useDataLink';
 import {isDark} from '@/components/panels/rdf/rdfUtils';
+import {
+  CY_LAYOUT,
+  createCyStyle,
+  isTypePredicate,
+} from '@/components/panels/rdf/rdfVisualizerGraphStyle';
+import {
+  buildGraphElements,
+  buildLiteralsForSubject,
+  countNodes,
+} from '@/components/panels/rdf/rdfVisualizerGraphElements';
+import RdfVisualizerDialogs from '@/components/panels/rdf/RdfVisualizerDialogs.vue';
+import RdfVisualizerSidebar from '@/components/panels/rdf/RdfVisualizerSidebar.vue';
 
 const settings = useSettings();
+const darkMode = isDark();
 const showLargeGraphPrompt = ref(false);
 const nodeCount = ref(0);
 const isLoading = ref(false);
@@ -353,19 +281,6 @@ function exportGraphImage() {
   link.href = dataUrl;
   link.download = `rdf-graph-${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
   link.click();
-}
-
-function countNodes(statements: readonly $rdf.Statement[]): number {
-  const nodes = new Set<string>();
-
-  for (const st of statements) {
-    nodes.add(st.subject.value);
-    if (st.object.termType !== RdfTermType.Literal) {
-      nodes.add(st.object.value);
-    }
-  }
-
-  return nodes.size;
 }
 
 function confirmRender(allow: boolean) {
@@ -578,156 +493,10 @@ function handlePropertyLinkClick(lit: RdfNodeLiteral, event: MouseEvent) {
   });
 }
 
-function getPredicateAlias(predicate: string): string {
-  for (const [alias, uris] of Object.entries(predicateAliasMapping)) {
-    if (uris.includes(predicate)) {
-      return alias;
-    }
-  }
-  return jsonLdContextManager.toPrefixed(predicate);
-}
-
-const TYPE_PREDICATES = [
-  'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
-  'https://www.w3.org/1999/02/22-rdf-syntax-ns#type',
-  'rdf:type',
-  '@type',
-];
-
-function createCyStyle(): cytoscape.StylesheetCSS[] {
-  const edgeLabelColor = isDark().value ? '#f8fafc' : '#111827';
-  return [
-    {
-      selector: 'node',
-      css: {
-        'background-color': '#4299e1',
-        'border-width': '2',
-        'border-color': '#2c5282',
-        label: 'data(label)',
-        'text-valign': 'center',
-        'text-halign': 'center',
-        'min-width': '60',
-        'min-height': '30',
-        color: '#fff',
-        'font-size': '12px',
-        'font-weight': 'bold',
-        'text-wrap': 'wrap',
-        'text-max-width': '80px',
-        width: (node: any) => {
-          return node.data('label').length * 7;
-        },
-        height: '30',
-        padding: '15px',
-        shape: 'roundrectangle',
-        'transition-property': 'background-color, border-color, border-width',
-        'transition-duration': 300,
-      },
-    },
-    {
-      selector: 'node.selected',
-      css: {
-        'background-color': '#22c55e',
-        'border-width': '4',
-        'border-color': '#15803d',
-      },
-    },
-    {
-      selector: 'node[hasLiterals]',
-      css: {
-        'border-color': '#f6ad55',
-        'border-width': '3',
-      },
-    },
-    {
-      selector: 'edge',
-      css: {
-        width: '2',
-        'line-color': '#a0aec0',
-        'target-arrow-color': '#a0aec0',
-        'target-arrow-shape': 'triangle',
-        'curve-style': 'bezier',
-        'control-point-step-size': 100,
-        label: 'data(label)',
-        color: edgeLabelColor,
-        'font-size': '12px',
-        'text-rotation': 'autorotate',
-        'text-background-opacity': 0,
-        'text-margin-y': -12,
-        'transition-property': 'line-color, width',
-        'transition-duration': 300,
-      },
-    },
-  ];
-}
-
 function applyCyTheme() {
   if (!cy) return;
-  cy.style(createCyStyle());
+  cy.style(createCyStyle(darkMode.value));
   cy.resize();
-}
-
-const CY_LAYOUT: cytoscape.LayoutOptions = {
-  name: 'cose-bilkent',
-  animate: true,
-  animationDuration: 1000,
-  animationEasing: 'ease-in-out-cubic',
-  randomize: true,
-  idealEdgeLength: 220,
-  nodeRepulsion: 9000,
-  edgeElasticity: 100,
-  gravity: 80,
-  numIter: 1000000,
-  tile: true,
-  tilingPaddingVertical: 10,
-  tilingPaddingHorizontal: 10,
-  nodeDimensionsIncludeLabels: true,
-  avoidOverlap: true,
-  avoidOverlapPadding: 50,
-};
-
-function isTypePredicate(predicate: string): boolean {
-  return (
-    TYPE_PREDICATES.includes(predicate) ||
-    predicate.endsWith('#type') ||
-    predicate.endsWith('/type')
-  );
-}
-
-function buildGraphElements(statements: readonly $rdf.Statement[]) {
-  const nodesMap = new Map<
-    string,
-    {
-      literals?: RdfNodeLiteral[];
-    }
-  >();
-  const edges: any[] = [];
-  const existingSubjects = new Set<string>(statements.map(st => st.subject.value));
-
-  for (const st of statements) {
-    const s = st.subject.value;
-    const p = st.predicate.value;
-    const o = st.object.value;
-
-    ensureNode(nodesMap, s);
-
-    if (st.object.termType === RdfTermType.Literal) {
-      addLiteral(nodesMap, s, p, o, undefined, st);
-      continue;
-    }
-
-    addLiteral(nodesMap, s, p, jsonLdContextManager.toPrefixed(o), o, st);
-
-    if (isTypePredicate(p) || !existingSubjects.has(o)) {
-      continue;
-    }
-
-    ensureNode(nodesMap, o);
-    edges.push(createEdge(s, p, o));
-  }
-
-  const nodes = Array.from(nodesMap.entries()).map(([id, data]) => createNode(id, data));
-
-  return [...nodes, ...edges];
 }
 
 function setupCytoscape(elements: cytoscape.ElementDefinition[]) {
@@ -740,7 +509,7 @@ function setupCytoscape(elements: cytoscape.ElementDefinition[]) {
   return cytoscape({
     container: container.value,
     elements,
-    style: createCyStyle(),
+    style: createCyStyle(darkMode.value),
     layout: CY_LAYOUT,
   });
 }
@@ -765,7 +534,11 @@ function renderGraph(statements: readonly $rdf.Statement[]) {
   isLoading.value = true;
   let didInitialFit = false;
   let overlapRetryCount = 0;
-  const elements = buildGraphElements(statements);
+  const elements = buildGraphElements(
+    statements,
+    jsonLdContextManager.toPrefixed,
+    jsonLdContextManager.isIRI
+  );
 
   const graph = setupCytoscape(elements);
   if (!graph) return;
@@ -855,44 +628,18 @@ function isNamedNodeTerm(term: any): boolean {
   return term.termType !== RdfTermType.Literal;
 }
 
-function buildLiteralsForSubject(
-  subjectId: string,
-  statements: readonly $rdf.Statement[]
-): RdfNodeLiteral[] {
-  const literals: RdfNodeLiteral[] = [];
-
-  for (const st of statements) {
-    if (st.subject.value !== subjectId) continue;
-    const p = st.predicate.value;
-    const o = st.object.value;
-    if (st.object.termType === RdfTermType.Literal) {
-      literals.push({
-        predicate: getPredicateAlias(p),
-        value: o,
-        isIRI: jsonLdContextManager.isIRI(o),
-        statement: st,
-      });
-    } else {
-      literals.push({
-        predicate: getPredicateAlias(p),
-        value: jsonLdContextManager.toPrefixed(o),
-        isIRI: true,
-        href: o,
-        statement: st,
-      });
-    }
-  }
-
-  return literals;
-}
-
 function updateNodeData(subjectId: string) {
   if (!cy) return;
   const node = cy.getElementById(subjectId);
   if (!node || node.length === 0) return;
   const subjectStatements = rdfStoreManager.getStatementsBySubject(subjectId);
   if (subjectStatements.length === 0) return;
-  const literals = buildLiteralsForSubject(subjectId, subjectStatements);
+  const literals = buildLiteralsForSubject(
+    subjectId,
+    subjectStatements,
+    jsonLdContextManager.toPrefixed,
+    jsonLdContextManager.isIRI
+  );
   node.data({
     ...node.data(),
     literals,
@@ -972,7 +719,12 @@ async function refreshSelectedNodeFromStore() {
   const subjectId = selectedNode.value.id;
   const needsRefresh = hasEdgeDiffForSubject(subjectId);
   const subjectStatements = rdfStoreManager.getStatementsBySubject(subjectId);
-  const literals = buildLiteralsForSubject(subjectId, subjectStatements);
+  const literals = buildLiteralsForSubject(
+    subjectId,
+    subjectStatements,
+    jsonLdContextManager.toPrefixed,
+    jsonLdContextManager.isIRI
+  );
   selectedNode.value = {
     ...selectedNode.value,
     literals,
@@ -1037,71 +789,6 @@ function clearSelectedNode() {
   }
   selectedCyNode.value = null;
   selectedNode.value = null;
-}
-
-function ensureNode(
-  nodesMap: Map<
-    string,
-    {
-      literals?: RdfNodeLiteral[];
-    }
-  >,
-  id: string
-) {
-  if (!nodesMap.has(id)) {
-    nodesMap.set(id, {literals: []});
-  }
-}
-
-function addLiteral(
-  nodesMap: Map<
-    string,
-    {
-      literals?: RdfNodeLiteral[];
-    }
-  >,
-  subjectId: string,
-  predicate: string,
-  value: string,
-  href?: string,
-  statement?: $rdf.Statement
-) {
-  nodesMap.get(subjectId)!.literals!.push({
-    predicate: getPredicateAlias(predicate),
-    value,
-    isIRI: Boolean(href) || jsonLdContextManager.isIRI(value),
-    href,
-    statement,
-  });
-}
-
-function createEdge(source: string, predicate: string, target: string) {
-  return {
-    data: {
-      id: `${source}-${predicate}-${target}`,
-      source,
-      target,
-      label: getPredicateAlias(predicate),
-      predicateIRI: predicate,
-    },
-  };
-}
-
-function createNode(
-  id: string,
-  data: {
-    literals?: RdfNodeLiteral[];
-  }
-) {
-  return {
-    data: {
-      id,
-      label: jsonLdContextManager.toPrefixed(id),
-      hasLiterals: data.literals && data.literals.length > 0,
-      literalCount: data.literals?.length || 0,
-      literals: data.literals,
-    },
-  };
 }
 
 function enableGraphInteractions(graph: cytoscape.Core) {
@@ -1259,7 +946,7 @@ onMounted(() => {
 });
 
 watch(
-  () => isDark.value,
+  () => darkMode.value,
   () => {
     applyCyTheme();
   }
@@ -1411,75 +1098,5 @@ watch(
 .rdf-splitter {
   width: 100%;
   height: 100%;
-}
-
-.properties-search-bar {
-  padding: 10px 12px;
-  background: var(--p-surface-card);
-}
-
-.properties-search-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.properties-search-input :deep(.p-autocomplete) {
-  width: 100%;
-  flex: 1;
-}
-
-.properties-search-input :deep(.p-autocomplete-input) {
-  width: 100%;
-  font-size: 13px;
-}
-
-.search-icon {
-  color: var(--p-text-muted-color);
-  font-size: 14px;
-}
-
-.search-clear-btn {
-  margin-left: auto;
-}
-
-.result-option {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 4px 2px;
-}
-
-.result-label {
-  font-size: 12px;
-  color: var(--p-text-color);
-  word-break: break-word;
-}
-
-.result-id {
-  font-size: 11px;
-  color: var(--p-text-muted-color);
-  word-break: break-word;
-}
-
-.properties-scroll {
-  width: 100%;
-  height: 100%;
-}
-
-.properties-frozen {
-  pointer-events: none;
-  opacity: 0.6;
-  filter: grayscale(0.2);
-}
-
-.properties-scroll :deep(.p-scrollpanel-content) {
-  display: flex;
-  flex-direction: column;
-}
-
-.properties-view {
-  flex: 1;
-  min-height: 0;
 }
 </style>
