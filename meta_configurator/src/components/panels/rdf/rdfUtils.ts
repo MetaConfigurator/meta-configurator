@@ -1,4 +1,5 @@
 import {Parser} from 'sparqljs';
+import type * as $rdf from 'rdflib';
 
 export enum RdfTermType {
   NamedNode = 'NamedNode',
@@ -12,6 +13,20 @@ export enum RdfTermType {
 }
 
 export type RdfTermTypeString = `${RdfTermType}`;
+
+export type RdfNodeLiteral = {
+  predicate: string;
+  value: string;
+  isIRI: boolean;
+  href?: string;
+  statement?: $rdf.Statement;
+};
+
+export interface SelectedNodeData {
+  id: string;
+  label: string;
+  literals?: RdfNodeLiteral[];
+}
 
 export enum RdfChangeType {
   Add = 'add',

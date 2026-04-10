@@ -13,6 +13,7 @@
         <div class="step-panel">
           <PanelSettings
             panel-name="API Key and AI Settings"
+            panel-display-name="API Key and AI Settings"
             settings-header="AI Settings"
             :panel-settings-path="['aiIntegration']"
             :sessionMode="SessionMode.DataEditor">

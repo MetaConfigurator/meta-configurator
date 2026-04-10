@@ -180,6 +180,8 @@ import type * as $rdf from 'rdflib';
 import {rdfStoreManager, type RdfChange} from '@/components/panels/rdf/rdfStoreManager';
 import {useSettings} from '@/settings/useSettings';
 import {
+  type RdfNodeLiteral,
+  type SelectedNodeData,
   RdfTermType,
   type RdfTermTypeString,
   predicateAliasMapping,
@@ -197,20 +199,6 @@ import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
 import {useCurrentData} from '@/data/useDataLink';
-
-interface SelectedNodeData {
-  id: string;
-  label: string;
-  literals?: RdfNodeLiteral[];
-}
-
-type RdfNodeLiteral = {
-  predicate: string;
-  value: string;
-  isIRI: boolean;
-  href?: string;
-  statement?: $rdf.Statement;
-};
 
 const isDark = useDark();
 const settings = useSettings();

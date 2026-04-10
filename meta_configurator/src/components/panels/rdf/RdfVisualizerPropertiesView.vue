@@ -193,23 +193,11 @@
 </template>
 
 <script setup lang="ts">
-import type * as $rdf from 'rdflib';
 import Card from 'primevue/card';
 import ProgressSpinner from 'primevue/progressspinner';
 import Divider from 'primevue/divider';
 import Button from 'primevue/button';
-
-interface SelectedNodeData {
-  id: string;
-  label: string;
-  literals?: Array<{
-    predicate: string;
-    value: string;
-    isIRI: boolean;
-    href?: string;
-    statement?: $rdf.Statement;
-  }>;
-}
+import type {RdfNodeLiteral, SelectedNodeData} from '@/components/panels/rdf/rdfUtils';
 
 defineProps<{
   selectedNode: SelectedNodeData | null;
@@ -224,11 +212,11 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'delete-node'): void;
   (e: 'edit-node'): void;
-  (e: 'delete-property', lit: SelectedNodeData['literals'][number]): void;
-  (e: 'edit-property', lit: SelectedNodeData['literals'][number]): void;
+  (e: 'delete-property', lit: RdfNodeLiteral): void;
+  (e: 'edit-property', lit: RdfNodeLiteral): void;
   (e: 'add-property'): void;
   (e: 'add-node'): void;
-  (e: 'property-link-click', lit: SelectedNodeData['literals'][number], event: MouseEvent): void;
+  (e: 'property-link-click', lit: RdfNodeLiteral, event: MouseEvent): void;
 }>();
 </script>
 <style scoped>
