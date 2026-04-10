@@ -186,9 +186,13 @@ import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
 import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
-import {downloadFile} from '@/utility/rdfUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
-import {formatCellValue, RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
+import {
+  downloadFile,
+  formatCellValue,
+  RdfChangeType,
+  RdfTermType,
+} from '@/components/panels/rdf/rdfUtils';
 import {
   TripleEditorService,
   type TripleTransferObject,

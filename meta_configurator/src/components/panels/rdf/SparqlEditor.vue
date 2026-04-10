@@ -207,12 +207,12 @@ import RdfVisualizationHelpDialog from '@/components/panels/rdf/RdfVisualization
 import ToggleSwitch from 'primevue/toggleswitch';
 import {
   defaultQueryTemplate,
+  downloadFile,
   formatCellValue,
   validateSparqlSyntax,
   visualizationQueryTemplate,
 } from '@/components/panels/rdf/rdfUtils';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
-import {downloadFile} from '@/utility/rdfUtils';
 import SparqlQueryEditor from '@/components/panels/rdf/SparqlQueryEditor.vue';
 
 enum QueryResultMode {

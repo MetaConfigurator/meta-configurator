@@ -2,27 +2,8 @@ import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import type {TripleTransferObject} from '@/components/panels/rdf/tripleEditorService';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 
-export type DatatypeOption = {label: string; value: string};
-
-export const COMMON_DATATYPES: DatatypeOption[] = [
-  {label: 'Unspecified', value: ''},
-  {label: 'xsd:string', value: 'http://www.w3.org/2001/XMLSchema#string'},
-  {label: 'xsd:boolean', value: 'http://www.w3.org/2001/XMLSchema#boolean'},
-  {label: 'xsd:integer', value: 'http://www.w3.org/2001/XMLSchema#integer'},
-  {label: 'xsd:decimal', value: 'http://www.w3.org/2001/XMLSchema#decimal'},
-  {label: 'xsd:double', value: 'http://www.w3.org/2001/XMLSchema#double'},
-  {label: 'xsd:float', value: 'http://www.w3.org/2001/XMLSchema#float'},
-  {label: 'xsd:date', value: 'http://www.w3.org/2001/XMLSchema#date'},
-  {label: 'xsd:dateTime', value: 'http://www.w3.org/2001/XMLSchema#dateTime'},
-  {label: 'xsd:time', value: 'http://www.w3.org/2001/XMLSchema#time'},
-  {label: 'xsd:duration', value: 'http://www.w3.org/2001/XMLSchema#duration'},
-  {label: 'xsd:anyURI', value: 'http://www.w3.org/2001/XMLSchema#anyURI'},
-  {label: 'xsd:long', value: 'http://www.w3.org/2001/XMLSchema#long'},
-  {label: 'xsd:short', value: 'http://www.w3.org/2001/XMLSchema#short'},
-  {label: 'xsd:byte', value: 'http://www.w3.org/2001/XMLSchema#byte'},
-];
-
 const XSD_NS = 'http://www.w3.org/2001/XMLSchema#';
+
 const XSD = {
   string: `${XSD_NS}string`,
   boolean: `${XSD_NS}boolean`,
@@ -39,6 +20,26 @@ const XSD = {
   short: `${XSD_NS}short`,
   byte: `${XSD_NS}byte`,
 } as const;
+
+export type DatatypeOption = {label: string; value: string};
+
+export const COMMON_DATATYPES: DatatypeOption[] = [
+  {label: 'Unspecified', value: ''},
+  {label: 'xsd:string', value: XSD.string},
+  {label: 'xsd:boolean', value: XSD.boolean},
+  {label: 'xsd:integer', value: XSD.integer},
+  {label: 'xsd:decimal', value: XSD.decimal},
+  {label: 'xsd:double', value: XSD.double},
+  {label: 'xsd:float', value: XSD.float},
+  {label: 'xsd:date', value: XSD.date},
+  {label: 'xsd:dateTime', value: XSD.dateTime},
+  {label: 'xsd:time', value: XSD.time},
+  {label: 'xsd:duration', value: XSD.duration},
+  {label: 'xsd:anyURI', value: XSD.anyURI},
+  {label: 'xsd:long', value: XSD.long},
+  {label: 'xsd:short', value: XSD.short},
+  {label: 'xsd:byte', value: XSD.byte},
+];
 
 export function isCommonDatatype(value: string): boolean {
   return COMMON_DATATYPES.some(opt => opt.value === value);
