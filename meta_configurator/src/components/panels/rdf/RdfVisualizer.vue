@@ -200,14 +200,16 @@ import {useCurrentData} from '@/data/useDataLink';
 interface SelectedNodeData {
   id: string;
   label: string;
-  literals?: Array<{
-    predicate: string;
-    value: string;
-    isIRI: boolean;
-    href?: string;
-    statement?: $rdf.Statement;
-  }>;
+  literals?: RdfNodeLiteral[];
 }
+
+type RdfNodeLiteral = {
+  predicate: string;
+  value: string;
+  isIRI: boolean;
+  href?: string;
+  statement?: $rdf.Statement;
+};
 
 const isDark = useDark();
 const settings = useSettings();
@@ -227,13 +229,7 @@ const deletePropertyDialog = ref(false);
 const renameNodeDialog = ref(false);
 const renameNodeValue = ref('');
 const propertyUpdateKey = ref(0);
-const propertyToDelete = ref<{
-  predicate: string;
-  value: string;
-  isIRI: boolean;
-  href?: string;
-  statement?: $rdf.Statement;
-} | null>(null);
+const propertyToDelete = ref<RdfNodeLiteral | null>(null);
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
@@ -480,7 +476,7 @@ function editSelectedNode() {
   renameNodeDialog.value = true;
 }
 
-function deleteProperty(lit: {predicate: string; value: string; isIRI: boolean}) {
+function deleteProperty(lit: RdfNodeLiteral) {
   propertyToDelete.value = lit;
   deletePropertyDialog.value = true;
 }
@@ -548,13 +544,7 @@ function confirmRenameNode() {
   refreshAndSelectNode(newId);
 }
 
-function editProperty(lit: {
-  predicate: string;
-  value: string;
-  isIRI: boolean;
-  href?: string;
-  statement?: $rdf.Statement;
-}) {
+function editProperty(lit: RdfNodeLiteral) {
   if (!selectedNode.value) return;
   const statement = lit.statement;
   const fallbackObject = lit.href ?? expandIRI(lit.value) ?? lit.value;
@@ -592,10 +582,7 @@ function addNodeFromVisualizer() {
   emit('add-node');
 }
 
-function handlePropertyLinkClick(
-  lit: {predicate: string; value: string; isIRI: boolean; href?: string},
-  event: MouseEvent
-) {
+function handlePropertyLinkClick(lit: RdfNodeLiteral, event: MouseEvent) {
   const iri = lit.href || iriHref(lit.value);
   if (!iri || !cy) return;
   const node = cy.getElementById(iri);
@@ -757,12 +744,7 @@ function buildGraphElements(statements: readonly $rdf.Statement[]) {
   const nodesMap = new Map<
     string,
     {
-      literals?: Array<{
-        predicate: string;
-        value: string;
-        isIRI: boolean;
-        statement?: $rdf.Statement;
-      }>;
+      literals?: RdfNodeLiteral[];
     }
   >();
   const edges: any[] = [];
@@ -898,20 +880,8 @@ function isNamedNodeTerm(term: any): boolean {
 function buildLiteralsForSubject(
   subjectId: string,
   statements: readonly $rdf.Statement[]
-): Array<{
-  predicate: string;
-  value: string;
-  isIRI: boolean;
-  href?: string;
-  statement?: $rdf.Statement;
-}> {
-  const literals: Array<{
-    predicate: string;
-    value: string;
-    isIRI: boolean;
-    href?: string;
-    statement?: $rdf.Statement;
-  }> = [];
+): RdfNodeLiteral[] {
+  const literals: RdfNodeLiteral[] = [];
 
   for (const st of statements) {
     if (st.subject.value !== subjectId) continue;
@@ -1095,12 +1065,7 @@ function ensureNode(
   nodesMap: Map<
     string,
     {
-      literals?: Array<{
-        predicate: string;
-        value: string;
-        isIRI: boolean;
-        statement?: $rdf.Statement;
-      }>;
+      literals?: RdfNodeLiteral[];
     }
   >,
   id: string
@@ -1114,13 +1079,7 @@ function addLiteral(
   nodesMap: Map<
     string,
     {
-      literals?: Array<{
-        predicate: string;
-        value: string;
-        isIRI: boolean;
-        href?: string;
-        statement?: $rdf.Statement;
-      }>;
+      literals?: RdfNodeLiteral[];
     }
   >,
   subjectId: string,
@@ -1153,12 +1112,7 @@ function createEdge(source: string, predicate: string, target: string) {
 function createNode(
   id: string,
   data: {
-    literals?: Array<{
-      predicate: string;
-      value: string;
-      isIRI: boolean;
-      statement?: $rdf.Statement;
-    }>;
+    literals?: RdfNodeLiteral[];
   }
 ) {
   return {
