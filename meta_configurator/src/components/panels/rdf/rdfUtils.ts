@@ -35,15 +35,15 @@ export interface SelectedNodeData {
 }
 
 export const syntaxHighlightStyle = HighlightStyle.define([
-  {tag: tags.keyword, color: '#c792ea', fontWeight: 'bold'},
-  {tag: tags.variableName, color: '#82aaff'},
-  {tag: tags.string, color: '#c3e88d'},
-  {tag: tags.number, color: '#f78c6c'},
-  {tag: tags.comment, color: '#5c6370', fontStyle: 'italic'},
-  {tag: tags.operator, color: '#89ddff'},
-  {tag: tags.punctuation, color: '#abb2bf'},
-  {tag: tags.typeName, color: '#f07178'},
-  {tag: tags.propertyName, color: '#ffcb6b'},
+  {tag: tags.keyword, color: 'var(--p-purple-400)', fontWeight: 'bold'},
+  {tag: tags.variableName, color: 'var(--p-primary-400)'},
+  {tag: tags.string, color: 'var(--p-green-400)'},
+  {tag: tags.number, color: 'var(--p-orange-400)'},
+  {tag: tags.comment, color: 'var(--p-text-muted-color)', fontStyle: 'italic'},
+  {tag: tags.operator, color: 'var(--p-cyan-400)'},
+  {tag: tags.punctuation, color: 'var(--p-text-color)'},
+  {tag: tags.typeName, color: 'var(--p-red-400)'},
+  {tag: tags.propertyName, color: 'var(--p-yellow-400)'},
 ]);
 
 export enum RdfChangeType {

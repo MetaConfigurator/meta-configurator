@@ -96,9 +96,10 @@ import {useDebounceFn} from '@vueuse/core';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
-import {isDarkMode} from '@/utility/darkModeUtils';
 import {syntaxHighlightStyle} from '@/components/panels/rdf/rdfUtils';
+import {useDark} from '@vueuse/core';
 
+const dark = useDark();
 const showDialog = ref(false);
 const input = ref({});
 const result = ref('');
@@ -122,7 +123,7 @@ const extensions = computed(() => [
   basicSetup,
   StreamLanguage.define(turtle),
   syntaxHighlighting(syntaxHighlightStyle),
-  ...(isDarkMode.value ? [oneDark] : []),
+  ...(dark.value ? [oneDark] : []),
   EditorView.lineWrapping,
 ]);
 
@@ -312,10 +313,10 @@ label {
   margin-top: 0.5rem;
   padding: 0.5rem;
   border-radius: 4px;
-  background-color: #ffe5e5;
-  color: #d8000c;
+  background-color: var(--p-red-100);
+  color: var(--p-red-700);
   font-size: 0.875rem;
-  border: 1px solid #d8000c;
+  border: 1px solid var(--p-red-700);
   flex-shrink: 0;
   max-height: 150px;
   overflow: auto;
