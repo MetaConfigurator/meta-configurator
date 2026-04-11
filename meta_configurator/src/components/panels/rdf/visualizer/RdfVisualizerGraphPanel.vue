@@ -30,7 +30,7 @@
         <ProgressSpinner v-if="isLoading" class="loading-overlay" />
       </Transition>
       <div v-if="hasGraphError" class="graph-freeze-overlay">
-        <Message severity="error" :closable="false">
+        <Message severity="error" :closable="false" class="solid-message">
           Graph is disabled because the data contains errors.
         </Message>
       </div>
@@ -107,7 +107,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   z-index: 50;
-  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(2px);
   pointer-events: none;
 }
@@ -176,5 +175,10 @@ onMounted(() => {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 100;
+}
+
+.solid-message {
+  background-color: var(--p-red-100) !important;
+  opacity: 1;
 }
 </style>

@@ -57,7 +57,7 @@ export enum OntologyExplorerTab {
   DatatypeProperty = 'DatatypeProperty',
   ObjectProperty = 'ObjectProperty',
   Class = 'Class',
-  CustomQuery = 'CustomQuery',
+  SPARQL = 'SPARQL',
 }
 
 export enum OntologyAccordionSection {

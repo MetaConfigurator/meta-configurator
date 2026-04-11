@@ -231,13 +231,13 @@ async function runCustomSparqlQuery() {
     customQueryErrorMessage.value = null;
     emit('select-iri', '');
     emit('status', {
-      message: `Custom query returned ${rows.length} row(s).`,
+      message: `SPARQL query returned ${rows.length} row(s).`,
       severity: RdfStatusSeverity.Success,
     });
   } catch (error: any) {
-    customQueryErrorMessage.value = error?.message ?? 'Failed to execute custom query.';
+    customQueryErrorMessage.value = error?.message ?? 'Failed to execute SPARQL query.';
     emit('status', {
-      message: error?.message ?? 'Failed to execute custom query.',
+      message: error?.message ?? 'Failed to execute SPARQL query.',
       severity: RdfStatusSeverity.Error,
     });
   } finally {

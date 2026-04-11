@@ -85,18 +85,18 @@
             :rowsPerPage="ROWS_PER_PAGE"
             @preview-iri="onOntologyPreviewIri">
             <template #extra-tabs>
-              <Tab :value="ONTOLOGY_EXPLORER_TAB.CustomQuery">Custom Query</Tab>
+              <Tab :value="ONTOLOGY_EXPLORER_TAB.SPARQL">SPARQL</Tab>
             </template>
             <template #extra-panels>
-              <TabPanel :value="ONTOLOGY_EXPLORER_TAB.CustomQuery">
-                <RdfOntologyCustomQueryTab
+              <TabPanel :value="ONTOLOGY_EXPLORER_TAB.SPARQL">
+                <RdfOntologySparqlTab
                   :selectedCacheEntry="selectedCacheEntry"
                   :rowsPerPage="ROWS_PER_PAGE"
-                  :defaultQuery="DEFAULT_CUSTOM_SPARQL_QUERY"
+                  :defaultQuery="DEFAULT_SPARQL_QUERY"
                   :ensureCacheEntryGraph="ensureCacheEntryGraph"
                   :putOntologyToIndexedDb="putOntologyToIndexedDb"
-                  @select-iri="onCustomQueryIriSelect"
-                  @status="onCustomQueryStatus" />
+                  @select-iri="onSparqlQueryIriSelect"
+                  @status="onSparqlQueryStatus" />
               </TabPanel>
             </template>
           </RdfOntologyTermTabs>
@@ -156,7 +156,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import RdfOntologyTermTabs from '@/components/panels/rdf/ontology-explorer/RdfOntologyTermTabs.vue';
-import RdfOntologyCustomQueryTab from '@/components/panels/rdf/ontology-explorer/RdfOntologyCustomQueryTab.vue';
+import RdfOntologySparqlTab from '@/components/panels/rdf/ontology-explorer/RdfOntologySparqlTab.vue';
 import {
   deleteOntologyFromRdfCache,
   getOntologyFromRdfCache,
@@ -215,8 +215,8 @@ const ontologyRows = ref<OntologyRow[]>([]);
 const ROWS_PER_PAGE = 100;
 const activePropertyTab = ref<OntologyExplorerTab>(OntologyExplorerTab.ObjectProperty);
 const selectedOntologyTabIri = ref('');
-const DEFAULT_CUSTOM_SPARQL_QUERY = 'SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 100';
-const selectedCustomQueryIri = ref('');
+const DEFAULT_SPARQL_QUERY = 'SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 100';
+const selectedSparqlQueryIri = ref('');
 const pendingInitialIri = ref('');
 const isAutoSelectingPrefix = ref(false);
 const activeAccordion = ref<OntologyAccordionSection | null>(OntologyAccordionSection.Controls);
@@ -244,8 +244,8 @@ const selectedCacheEntry = computed(() => {
 });
 
 const selectedRowIri = computed(() => {
-  return activePropertyTab.value === OntologyExplorerTab.CustomQuery
-    ? selectedCustomQueryIri.value
+  return activePropertyTab.value === OntologyExplorerTab.SPARQL
+    ? selectedSparqlQueryIri.value
     : selectedOntologyTabIri.value;
 });
 const canSelectCurrentIri = computed(() => isLikelyIri(selectedRowIri.value));
@@ -284,7 +284,7 @@ watch(
     }
     statusMessage.value = '';
     ontologyRows.value = [];
-    selectedCustomQueryIri.value = '';
+    selectedSparqlQueryIri.value = '';
     selectedOntologyTabIri.value = '';
     loadedCacheEntry.value = null;
     if (!newPrefix) {
@@ -547,7 +547,7 @@ async function deleteCachedOntology() {
       loadedCacheEntry.value = null;
       ontologyRows.value = [];
       selectedOntologyTabIri.value = '';
-      selectedCustomQueryIri.value = '';
+      selectedSparqlQueryIri.value = '';
       ontologyUrl.value = '';
     }
     deleteDialog.value = false;
@@ -569,11 +569,11 @@ function selectCurrentIri() {
   emit('select-iri', selectedRowIri.value);
 }
 
-function onCustomQueryIriSelect(iri: string) {
-  selectedCustomQueryIri.value = iri;
+function onSparqlQueryIriSelect(iri: string) {
+  selectedSparqlQueryIri.value = iri;
 }
 
-function onCustomQueryStatus(payload: {message: string; severity: RdfStatusSeverity}) {
+function onSparqlQueryStatus(payload: {message: string; severity: RdfStatusSeverity}) {
   setStatus(payload.message, payload.severity);
 }
 
