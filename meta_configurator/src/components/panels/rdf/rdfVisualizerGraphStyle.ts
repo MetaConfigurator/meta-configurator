@@ -15,28 +15,39 @@ export function isTypePredicate(predicate: string): boolean {
   );
 }
 
+function getCssVar(variable: string): string {
+  if (typeof window === 'undefined') return '';
+  return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+}
+
 export function createCyStyle(isDarkMode: boolean): cytoscape.StylesheetCSS[] {
-  const edgeLabelColor = isDarkMode ? '#f8fafc' : '#111827';
+  const nodeBg = getCssVar('--p-blue-400');
+  const nodeBorder = getCssVar('--p-blue-700');
+  const nodeText = getCssVar('--p-blue-contrast-color');
+  const nodeSelectedBg = getCssVar('--p-green-500');
+  const nodeSelectedBorder = getCssVar('--p-green-700');
+  const nodeLiteralBorder = getCssVar('--p-orange-300');
+  const edgeColor = getCssVar('--p-surface-400');
+  const edgeLabelColor = isDarkMode ? getCssVar('--p-surface-0') : getCssVar('--p-surface-900');
+
   return [
     {
       selector: 'node',
       css: {
-        'background-color': '#4299e1',
+        'background-color': nodeBg,
         'border-width': '2',
-        'border-color': '#2c5282',
+        'border-color': nodeBorder,
         label: 'data(label)',
         'text-valign': 'center',
         'text-halign': 'center',
         'min-width': '60',
         'min-height': '30',
-        color: '#fff',
+        color: nodeText,
         'font-size': '12px',
         'font-weight': 'bold',
         'text-wrap': 'wrap',
         'text-max-width': '80px',
-        width: (node: any) => {
-          return node.data('label').length * 7;
-        },
+        width: (node: any) => node.data('label').length * 7,
         height: '30',
         padding: '15px',
         shape: 'roundrectangle',
@@ -47,15 +58,15 @@ export function createCyStyle(isDarkMode: boolean): cytoscape.StylesheetCSS[] {
     {
       selector: 'node.selected',
       css: {
-        'background-color': '#22c55e',
+        'background-color': nodeSelectedBg,
         'border-width': '4',
-        'border-color': '#15803d',
+        'border-color': nodeSelectedBorder,
       },
     },
     {
       selector: 'node[hasLiterals]',
       css: {
-        'border-color': '#f6ad55',
+        'border-color': nodeLiteralBorder,
         'border-width': '3',
       },
     },
@@ -63,8 +74,8 @@ export function createCyStyle(isDarkMode: boolean): cytoscape.StylesheetCSS[] {
       selector: 'edge',
       css: {
         width: '2',
-        'line-color': '#a0aec0',
-        'target-arrow-color': '#a0aec0',
+        'line-color': edgeColor,
+        'target-arrow-color': edgeColor,
         'target-arrow-shape': 'triangle',
         'curve-style': 'bezier',
         'control-point-step-size': 100,

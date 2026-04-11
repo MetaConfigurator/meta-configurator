@@ -37,9 +37,7 @@
                         @click.stop
                         @keydown.stop
                         class="w-full mt-2"
-                        placeholder="Describe the query you want. For example: 
-What is the average age of all people?" />
-
+                        :placeholder="USER_COMMENTS_PLACEHOLDER" />
                       <Message severity="warn" class="mb-2">
                         <span>Generated SPARQL queries may require manual review.</span>
                       </Message>
@@ -99,7 +97,6 @@ What is the average age of all people?" />
               filterDisplay="menu"
               scrollHeight="flex"
               :rows="50"
-              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
               :rowsPerPageOptions="[10, 20, 50]"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results">
               <template v-if="columns.length > 0" #header>
@@ -220,6 +217,9 @@ enum QueryResultMode {
   CONSTRUCT = 'construct',
   SELECT = 'select',
 }
+
+const USER_COMMENTS_PLACEHOLDER = `Describe the query you want. For example:
+What is the average age of all people?`;
 
 const queryMode = ref<QueryResultMode>(QueryResultMode.SELECT);
 const isLoading = ref(false);
@@ -390,8 +390,8 @@ const runQuery = async () => {
   if (!validateCurrentSparqlSyntax()) return;
 
   const engine = new (window as any).Comunica.QueryEngine();
-  const {content} = rdfStoreManager.exportAs('application/n-triples');
-  const sources = [{type: 'serialized', value: content, mediaType: 'application/n-triples'}];
+  const {content} = rdfStoreManager.exportAs(RdfMediaType.NTriples);
+  const sources = [{type: 'serialized', value: content, mediaType: RdfMediaType.NTriples}];
 
   if (enableVisualization.value) {
     if (!isValidVisualizationConstruct(sparqlQuery.value)) {
