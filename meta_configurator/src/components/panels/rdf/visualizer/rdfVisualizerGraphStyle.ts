@@ -1,4 +1,5 @@
 import type cytoscape from 'cytoscape';
+import {isDark} from '@/components/panels/rdf/rdfUtils';
 
 export const TYPE_PREDICATES = [
   'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
@@ -20,7 +21,8 @@ function getCssVar(variable: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
 }
 
-export function createCyStyle(isDarkMode: boolean): cytoscape.StylesheetCSS[] {
+export function createCyStyle(): cytoscape.StylesheetCSS[] {
+  const isDarkMode = isDark();
   const nodeBg = getCssVar('--p-blue-400');
   const nodeBorder = getCssVar('--p-blue-700');
   const nodeText = getCssVar('--p-text-color');
@@ -28,7 +30,9 @@ export function createCyStyle(isDarkMode: boolean): cytoscape.StylesheetCSS[] {
   const nodeSelectedBorder = getCssVar('--p-green-700');
   const nodeLiteralBorder = getCssVar('--p-orange-300');
   const edgeColor = getCssVar('--p-surface-400');
-  const edgeLabelColor = isDarkMode ? getCssVar('--p-surface-0') : getCssVar('--p-surface-900');
+  const edgeLabelColor = isDarkMode.value
+    ? getCssVar('--p-surface-0')
+    : getCssVar('--p-surface-900');
 
   return [
     {

@@ -6,13 +6,6 @@
     style="width: 500px"
     @update:visible="emit('update:visible', $event)">
     <div class="flex flex-col gap-3 text-sm">
-      <Message severity="info" :closable="false">
-        <b>Visualization mode</b> works by directly consuming RDF triples. Only
-        <b>SPARQL CONSTRUCT queries</b> are supported.
-      </Message>
-      <Divider align="left" type="dashed">
-        <span class="font-semibold text-sm">Required query structure</span>
-      </Divider>
       <ul class="pl-4 list-disc leading-relaxed">
         <li>The query <b>must be a CONSTRUCT query</b></li>
         <li>

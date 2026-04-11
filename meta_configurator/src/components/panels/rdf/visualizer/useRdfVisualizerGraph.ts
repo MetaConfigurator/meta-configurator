@@ -10,7 +10,6 @@ cytoscape.use(coseBilkent);
 type NodeSelectHandler = (node: cytoscape.NodeSingular, nodeData: any) => void;
 
 export function useRdfVisualizerGraph(options: {
-  darkMode: Ref<boolean>;
   toPrefixed: (value: string) => string;
   isIRI: (value: string) => boolean;
   onNodeSelected: NodeSelectHandler;
@@ -25,7 +24,7 @@ export function useRdfVisualizerGraph(options: {
 
   function applyCyTheme() {
     if (!cy.value) return;
-    cy.value.style(createCyStyle(options.darkMode.value));
+    cy.value.style(createCyStyle());
     cy.value.resize();
   }
 
@@ -141,7 +140,7 @@ export function useRdfVisualizerGraph(options: {
     return cytoscape({
       container: container.value,
       elements,
-      style: createCyStyle(options.darkMode.value),
+      style: createCyStyle(),
       layout: CY_LAYOUT,
     });
   }

@@ -155,7 +155,6 @@ const {
   startResizeObserver,
   destroyGraph,
 } = useRdfVisualizerGraph({
-  darkMode,
   toPrefixed: jsonLdContextManager.toPrefixed,
   isIRI: jsonLdContextManager.isIRI,
   onNodeSelected: (node, nodeData) => {
