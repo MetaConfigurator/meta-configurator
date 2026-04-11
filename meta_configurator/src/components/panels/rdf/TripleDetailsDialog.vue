@@ -157,7 +157,7 @@ import {
   isCommonDatatype,
   validateLiteralBeforeSave,
 } from '@/components/panels/rdf/tripleLiteralValidationService';
-import RdfOntologyExplorer from '@/components/panels/rdf/RdfOntologyExplorer.vue';
+import RdfOntologyExplorer from '@/components/panels/rdf/ontology-explorer/RdfOntologyExplorer.vue';
 
 const props = withDefaults(
   defineProps<{

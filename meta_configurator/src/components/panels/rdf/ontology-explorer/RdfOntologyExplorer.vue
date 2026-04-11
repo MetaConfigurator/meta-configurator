@@ -75,7 +75,7 @@
 
         <div v-if="isQuerying" class="text-sm text-muted-color">Loading terms...</div>
         <div v-else class="table-wrapper">
-          <OntologyTermTabs
+          <RdfOntologyTermTabs
             v-model="activePropertyTab"
             :rows="ontologyRows"
             :sourceField="props.sourceField"
@@ -89,7 +89,7 @@
             </template>
             <template #extra-panels>
               <TabPanel :value="ONTOLOGY_EXPLORER_TAB.CustomQuery">
-                <OntologyCustomQueryTab
+                <RdfOntologyCustomQueryTab
                   :selectedCacheEntry="selectedCacheEntry"
                   :rowsPerPage="ROWS_PER_PAGE"
                   :defaultQuery="DEFAULT_CUSTOM_SPARQL_QUERY"
@@ -99,7 +99,7 @@
                   @status="onCustomQueryStatus" />
               </TabPanel>
             </template>
-          </OntologyTermTabs>
+          </RdfOntologyTermTabs>
           <div class="selection-bar mt-2">
             <InputText :modelValue="selectedRowIri" class="selection-input" readonly />
             <Button
@@ -140,7 +140,6 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
-import * as $rdf from 'rdflib';
 import Listbox from 'primevue/listbox';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -156,8 +155,8 @@ import TabPanel from 'primevue/tabpanel';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
-import OntologyTermTabs from '@/components/panels/rdf/OntologyTermTabs.vue';
-import OntologyCustomQueryTab from '@/components/panels/rdf/OntologyCustomQueryTab.vue';
+import RdfOntologyTermTabs from '@/components/panels/rdf/ontology-explorer/RdfOntologyTermTabs.vue';
+import RdfOntologyCustomQueryTab from '@/components/panels/rdf/ontology-explorer/RdfOntologyCustomQueryTab.vue';
 import {
   deleteOntologyFromRdfCache,
   getOntologyFromRdfCache,
@@ -173,9 +172,20 @@ import {
   RdfPredicateIri,
   RdfPropertyType,
   RdfPropertyTypeIri,
-  RdfProxyPath,
   RdfStatusSeverity,
 } from '@/components/panels/rdf/rdfEnums';
+import {useOntologyImport} from '@/components/panels/rdf/ontology-explorer/useOntologyImport';
+import {
+  detectRdfFormat,
+  escapeForSparqlString,
+  extractPrefixNamespaces,
+  formatDate,
+  getBindingValue,
+  isLikelyIri,
+  normalizeIri,
+  parseRdfToStore,
+  serializeStoreToNTriples,
+} from '@/components/panels/rdf/ontology-explorer/rdfOntologyUtils';
 
 const props = withDefaults(
   defineProps<{
@@ -219,8 +229,6 @@ type OntologyRow = RdfOntologyRow;
 const ONTOLOGY_EXPLORER_TAB = OntologyExplorerTab;
 const ONTOLOGY_ACCORDION_SECTION = OntologyAccordionSection;
 
-const ACCEPT_RDF_HEADER = `${RdfMediaType.RdfXml}, ${RdfMediaType.Turtle}, ${RdfMediaType.XTurtle}, ${RdfMediaType.NTriples}, ${RdfMediaType.N3}, ${RdfMediaType.JsonLd}, ${RdfMediaType.Json}, ${RdfMediaType.Xml}, ${RdfMediaType.TextXml}, ${RdfMediaType.TextPlain}`;
-const RDF_FILE_ACCEPT = `.rdf,.owl,.xml,.ttl,.nt,.n3,.jsonld,.json,${RdfMediaType.RdfXml},${RdfMediaType.Turtle},${RdfMediaType.XTurtle},${RdfMediaType.NTriples},${RdfMediaType.N3},${RdfMediaType.JsonLd},${RdfMediaType.Json},${RdfMediaType.Xml},${RdfMediaType.TextXml},${RdfMediaType.TextPlain}`;
 const loadedCacheEntry = ref<CachedOntology | null>(null);
 let prefixLookupRequestId = 0;
 
@@ -329,223 +337,18 @@ watch(
   {immediate: true}
 );
 
-async function downloadAndCacheOntology() {
-  if (!selectedPrefix.value) {
-    setStatus('Please select a prefix first.', RdfStatusSeverity.Warn);
-    return;
-  }
-  const ontologyPrefix = selectedPrefix.value;
-  const ontologyIri = getOntologyIriForPrefix(ontologyPrefix);
-  if (!ontologyIri) {
-    setStatus(
-      `No ontology IRI found in @context for prefix "${ontologyPrefix}".`,
-      RdfStatusSeverity.Warn
-    );
-    return;
-  }
-
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(ontologyUrl.value);
-  } catch {
-    setStatus('Please enter a valid URL.', RdfStatusSeverity.Warn);
-    return;
-  }
-
-  isDownloading.value = true;
-  setStatus('');
-
-  try {
-    const {response, usedProxy} = await fetchOntologyWithCorsFallback(parsedUrl.toString());
-    if (!response.ok) {
-      throw new Error(`Download failed with HTTP ${response.status} for ${parsedUrl.toString()}.`);
-    }
-    const contentType = response.headers.get('content-type') ?? '';
-    const format = detectRdfFormat(contentType, parsedUrl.toString());
-    if (!format) {
-      throw new Error(`Only RDF files are supported (${parsedUrl.toString()}).`);
-    }
-    const content = await response.text();
-    const store = await parseRdfToStore(content, parsedUrl.toString(), format);
-    const mergedGraphNTriples = serializeStoreToNTriples(store);
-
-    const cacheEntry: CachedOntology = {
-      ontologyIri,
-      url: parsedUrl.toString(),
-      rawContent: content,
-      format,
-      contentType,
-      fetchedAt: new Date().toISOString(),
-      mergedGraphNTriples,
-    };
-    loadedCacheEntry.value = cacheEntry;
-    await putOntologyToIndexedDb(cacheEntry);
-    await loadOntologyCards();
-
-    setStatus(
-      `Ontology for prefix "${ontologyPrefix}" was downloaded and cached in IndexedDB${
-        usedProxy ? ' (via local proxy)' : ''
-      }.`,
-      RdfStatusSeverity.Success
-    );
-  } catch (error: any) {
-    setStatus(error?.message ?? 'Failed to download ontology.', RdfStatusSeverity.Error);
-  } finally {
-    isDownloading.value = false;
-  }
-}
-
-/**
- * Handles user-uploaded ontology files and stores the parsed graph cache.
- */
-async function onOntologyFileSelected(event: any) {
-  const file = Array.isArray(event?.files) ? event.files[0] : null;
-  if (!file) return;
-
-  if (!selectedPrefix.value) {
-    setStatus('Please select a prefix first.', RdfStatusSeverity.Warn);
-    ontologyFileUploadRef.value?.clear?.();
-    return;
-  }
-  const ontologyPrefix = selectedPrefix.value;
-  const ontologyIri = getOntologyIriForPrefix(ontologyPrefix);
-  if (!ontologyIri) {
-    setStatus(
-      `No ontology IRI found in @context for prefix "${ontologyPrefix}".`,
-      RdfStatusSeverity.Warn
-    );
-    ontologyFileUploadRef.value?.clear?.();
-    return;
-  }
-
-  isUploading.value = true;
-  setStatus('');
-
-  try {
-    const contentType = file.type || RdfMediaType.OctetStream;
-    const format = detectRdfFormat(contentType, file.name);
-    if (!format) {
-      throw new Error('Only RDF files are supported.');
-    }
-
-    const content = await file.text();
-    const fileUrl = `file://${encodeURIComponent(file.name)}`;
-    const store = await parseRdfToStore(content, fileUrl, format);
-    const mergedGraphNTriples = serializeStoreToNTriples(store);
-
-    const cacheEntry: CachedOntology = {
-      ontologyIri,
-      url: fileUrl,
-      rawContent: content,
-      format,
-      contentType,
-      fetchedAt: new Date().toISOString(),
-      mergedGraphNTriples,
-    };
-    loadedCacheEntry.value = cacheEntry;
-    await putOntologyToIndexedDb(cacheEntry);
-    await loadOntologyCards();
-
-    setStatus(
-      `Ontology file "${file.name}" for prefix "${ontologyPrefix}" was uploaded and cached in IndexedDB.`,
-      RdfStatusSeverity.Success
-    );
-  } catch (error: any) {
-    setStatus(error?.message ?? 'Failed to upload ontology file.', RdfStatusSeverity.Error);
-  } finally {
-    isUploading.value = false;
-    ontologyFileUploadRef.value?.clear?.();
-  }
-}
-
-/**
- * Fetches RDF content directly and falls back to the local proxy when CORS/network blocks direct access.
- */
-async function fetchOntologyWithCorsFallback(
-  targetUrl: string
-): Promise<{response: Response; usedProxy: boolean}> {
-  try {
-    const directResponse = await fetch(targetUrl, {
-      headers: {Accept: ACCEPT_RDF_HEADER},
-    });
-    return {response: directResponse, usedProxy: false};
-  } catch {
-    const proxyUrl = `${RdfProxyPath.Endpoint}?url=${encodeURIComponent(targetUrl)}`;
-    const proxiedResponse = await fetch(proxyUrl, {
-      headers: {Accept: ACCEPT_RDF_HEADER},
-    });
-    return {response: proxiedResponse, usedProxy: true};
-  }
-}
-
-/**
- * Detects an rdflib-compatible parser format from response content-type and URL/file extension.
- */
-function detectRdfFormat(contentTypeHeader: string, url: string): string | null {
-  const contentType = contentTypeHeader.split(';')[0]!.trim().toLowerCase();
-  const normalizedUrl = url.toLowerCase();
-
-  if (contentType === RdfMediaType.RdfXml) return RdfMediaType.RdfXml;
-  if (contentType === RdfMediaType.Xml || contentType === RdfMediaType.TextXml)
-    return RdfMediaType.RdfXml;
-  if (contentType === RdfMediaType.Turtle || contentType === RdfMediaType.XTurtle)
-    return RdfMediaType.Turtle;
-  if (contentType === RdfMediaType.NTriples) return RdfMediaType.NTriples;
-  if (contentType === RdfMediaType.N3) return RdfMediaType.N3;
-  if (contentType === RdfMediaType.JsonLd) return RdfMediaType.JsonLd;
-  if (contentType === RdfMediaType.Json) return RdfMediaType.JsonLd;
-
-  if (contentType === RdfMediaType.TextPlain || contentType === RdfMediaType.OctetStream) {
-    if (normalizedUrl.endsWith('.nt')) return RdfMediaType.NTriples;
-    if (normalizedUrl.endsWith('.ttl')) return RdfMediaType.Turtle;
-    if (normalizedUrl.endsWith('.n3')) return RdfMediaType.N3;
-    if (
-      normalizedUrl.endsWith('.rdf') ||
-      normalizedUrl.endsWith('.owl') ||
-      normalizedUrl.endsWith('.xml')
-    ) {
-      return RdfMediaType.RdfXml;
-    }
-    if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json'))
-      return RdfMediaType.JsonLd;
-  }
-
-  if (
-    normalizedUrl.endsWith('.rdf') ||
-    normalizedUrl.endsWith('.owl') ||
-    normalizedUrl.endsWith('.xml')
-  ) {
-    return RdfMediaType.RdfXml;
-  }
-  if (normalizedUrl.endsWith('.ttl')) return RdfMediaType.Turtle;
-  if (normalizedUrl.endsWith('.nt')) return RdfMediaType.NTriples;
-  if (normalizedUrl.endsWith('.n3')) return RdfMediaType.N3;
-  if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json'))
-    return RdfMediaType.JsonLd;
-
-  return null;
-}
-
-function parseRdfToStore(content: string, baseUri: string, format: string): Promise<$rdf.Formula> {
-  return new Promise((resolve, reject) => {
-    const store = $rdf.graph();
-    $rdf.parse(content, store as $rdf.Formula, baseUri, format, err => {
-      if (err) {
-        reject(new Error(`The ontology content at "${baseUri}" is not valid RDF.`));
-        return;
-      }
-      resolve(store as $rdf.Formula);
-    });
-  });
-}
-
-function serializeStoreToNTriples(store: $rdf.Formula): string {
-  const triples = new Set<string>();
-  for (const statement of store.statements) {
-    triples.add(statement.toNT());
-  }
-  return Array.from(triples).join('\n');
-}
+const {RDF_FILE_ACCEPT, downloadAndCacheOntology, onOntologyFileSelected} = useOntologyImport({
+  selectedPrefix,
+  ontologyUrl,
+  loadedCacheEntry,
+  isDownloading,
+  isUploading,
+  ontologyFileUploadRef,
+  getOntologyIriForPrefix,
+  setStatus,
+  putOntologyToIndexedDb,
+  loadOntologyCards,
+});
 
 /**
  * Loads ontology cards from cache or recomputes them by running the predefined ontology query.
@@ -714,20 +517,6 @@ async function ensureCacheEntryGraph(entry: CachedOntology): Promise<CachedOntol
   return upgradedEntry;
 }
 
-function getBindingValue(binding: any, name: string): string {
-  for (const key of binding.keys()) {
-    const keyName = key?.value ?? key?.name ?? String(key).replace(/^\?/, '');
-    if (keyName === name) {
-      return binding.get(key)?.value ?? '';
-    }
-  }
-  return '';
-}
-
-function escapeForSparqlString(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-}
-
 async function getOntologyFromIndexedDb(ontologyIri: string): Promise<CachedOntology | null> {
   return await getOntologyFromRdfCache(ontologyIri);
 }
@@ -795,13 +584,6 @@ function onOntologyPreviewIri(iri: string) {
   }
 }
 
-function isLikelyIri(value: string): boolean {
-  if (!value) return false;
-  if (value.startsWith('_:')) return false;
-  if (/\s/.test(value)) return false;
-  return /^[A-Za-z][A-Za-z0-9+.-]*:.+/.test(value);
-}
-
 function tryAutoSelectFromInitialIri() {
   if (!pendingInitialIri.value || !prefixes.value.length) return;
   const bestPrefix = findBestPrefixForIri(pendingInitialIri.value);
@@ -831,50 +613,9 @@ function getOntologyIriForPrefix(prefix: string): string {
   return String(prefixNamespaces.value[prefix] ?? '').trim();
 }
 
-function normalizeIri(value: string | undefined): string {
-  return (value ?? '').trim();
-}
-
 function setStatus(message: string, severity: RdfStatusSeverity = RdfStatusSeverity.Info) {
   statusMessage.value = message;
   statusSeverity.value = severity;
-}
-
-function formatDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
-}
-
-function extractPrefixNamespaces(context: any): Record<string, string> {
-  const out: Record<string, string> = {};
-
-  if (Array.isArray(context)) {
-    for (const part of context) {
-      collectFromContextObject(part, out);
-    }
-  } else {
-    collectFromContextObject(context, out);
-  }
-
-  return out;
-}
-
-function collectFromContextObject(contextPart: any, out: Record<string, string>) {
-  if (!contextPart || typeof contextPart !== 'object' || Array.isArray(contextPart)) {
-    return;
-  }
-
-  for (const [key, value] of Object.entries(contextPart)) {
-    if (typeof value === 'string') {
-      out[key] = value;
-      continue;
-    }
-
-    if (value && typeof value === 'object' && '@id' in value && typeof value['@id'] === 'string') {
-      out[key] = value['@id'];
-    }
-  }
 }
 </script>
 

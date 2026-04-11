@@ -9,7 +9,7 @@
         },
       }">
       <div class="space-y-4 mb-2">
-        <Accordion :value="activeAccordion" @update:value="emit('update:activeAccordion', $event)">
+        <Accordion :value="activeAccordion" @update:activeAccordion="emit('update:activeAccordion', $event)">
           <AccordionPanel value="aiPanel">
             <AccordionHeader>Use AI assistance to generate SPARQL queries</AccordionHeader>
             <AccordionContent>
