@@ -443,7 +443,7 @@ function addNodeFromVisualizer() {
 function handlePropertyLinkClick(lit: RdfNodeLiteral, event: MouseEvent) {
   const iri = lit.href || jsonLdContextManager.iriHref(lit.value);
   if (!iri) return;
-  event.preventDefault();
+  void event;
   focusNodeById(iri);
 }
 
