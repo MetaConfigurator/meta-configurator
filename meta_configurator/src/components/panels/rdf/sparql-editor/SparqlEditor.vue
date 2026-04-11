@@ -35,8 +35,7 @@
             :filters="filters"
             :exportMenuItems="exportMenuItems"
             @update:filters="filters = $event"
-            @clear-filters="clearFilters"
-            @toggle-export-popover="toggleExportPopover" />
+            @clear-filters="clearFilters" />
         </TabPanel>
 
         <TabPanel value="visualizer">
@@ -82,7 +81,6 @@ const enableResult = ref(false);
 const enableVisualization = ref(false);
 const results = ref<Record<string, string>[]>([]);
 const columns = ref<string[]>([]);
-const exportPopover = ref();
 const errorMessage = ref<string | null>(null);
 const errorLineNumber = ref<number | null>(null);
 const filters = ref<Record<string, any>>({});
@@ -141,12 +139,11 @@ const {suggestSparqlQuery} = useSparqlAiAssistant({
   },
 });
 
-const {exportMenuItems, toggleExportPopover} = useSparqlExport({
+const {exportMenuItems} = useSparqlExport({
   queryMode,
   results,
   columns,
   statements,
-  exportPopover,
 });
 
 watch(

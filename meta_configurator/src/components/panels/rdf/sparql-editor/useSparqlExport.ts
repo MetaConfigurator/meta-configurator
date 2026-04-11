@@ -27,7 +27,6 @@ export function useSparqlExport(options: {
   results: Ref<Record<string, string>[]>;
   columns: Ref<string[]>;
   statements: Ref<$rdf.Statement[]>;
-  exportPopover: Ref<any>;
 }) {
   function exportAs(format: string) {
     const serialized = rdfStoreManager.exportAs(format, options.statements.value);
@@ -69,12 +68,7 @@ export function useSparqlExport(options: {
     options.queryMode.value === QueryResultMode.CONSTRUCT ? exportOnConstruct : exportOnSelect
   );
 
-  const toggleExportPopover = (event: Event) => {
-    options.exportPopover.value.toggle(event);
-  };
-
   return {
     exportMenuItems,
-    toggleExportPopover,
   };
 }

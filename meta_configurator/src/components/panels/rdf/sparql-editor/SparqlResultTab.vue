@@ -25,7 +25,7 @@
               severity="contrast"
               text
               :disabled="!results.length"
-              @click="emit('toggle-export-popover', $event)" />
+              @click="toggleExportPopover" />
             <TieredMenu ref="exportPopover" :model="exportMenuItems" popup />
           </div>
           <IconField>
@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import {ref} from 'vue';
 import TieredMenu from 'primevue/tieredmenu';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
@@ -87,8 +88,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:filters', value: Record<string, any>): void;
   (e: 'clear-filters'): void;
-  (e: 'toggle-export-popover', event: Event): void;
 }>();
+
+const exportPopover = ref<any>(null);
 
 function updateGlobalFilter(value: string | null) {
   const nextFilters = {
@@ -99,6 +101,10 @@ function updateGlobalFilter(value: string | null) {
     },
   };
   emit('update:filters', nextFilters);
+}
+
+function toggleExportPopover(event: Event) {
+  exportPopover.value?.toggle?.(event);
 }
 </script>
 
