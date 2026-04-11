@@ -23,7 +23,7 @@ function getCssVar(variable: string): string {
 export function createCyStyle(isDarkMode: boolean): cytoscape.StylesheetCSS[] {
   const nodeBg = getCssVar('--p-blue-400');
   const nodeBorder = getCssVar('--p-blue-700');
-  const nodeText = getCssVar('--p-blue-contrast-color');
+  const nodeText = getCssVar('--p-text-color');
   const nodeSelectedBg = getCssVar('--p-green-500');
   const nodeSelectedBorder = getCssVar('--p-green-700');
   const nodeLiteralBorder = getCssVar('--p-orange-300');
