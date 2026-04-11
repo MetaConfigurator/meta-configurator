@@ -84,7 +84,7 @@ import Tabs from 'primevue/tabs';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import TabList from 'primevue/tablist';
-import SparqlQueryEditor from '@/components/panels/rdf/SparqlQueryEditor.vue';
+import SparqlQueryEditor from '@/components/panels/rdf/sparql-editor/SparqlQueryEditor.vue';
 import type {RdfCachedOntology} from '@/components/panels/rdf/rdfIndexedDbManager';
 import {RdfMediaType, RdfStatusSeverity} from '@/components/panels/rdf/rdfEnums';
 import {validateSparqlSyntax} from '@/components/panels/rdf/rdfUtils';
