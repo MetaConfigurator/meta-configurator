@@ -1,19 +1,16 @@
-/**
- * Canonical names used by the shared RDF cache database.
- */
-export enum RdfCacheConfig {
-  DbName = 'rdf_ontology_cache_db',
-  StoreName = 'rdf_cache',
-  DbVersion = 5,
-}
-
-export const RDF_CACHE_DB_NAME = RdfCacheConfig.DbName;
-export const RDF_CACHE_DB_VERSION = RdfCacheConfig.DbVersion;
-export const RDF_CACHE_STORE = RdfCacheConfig.StoreName;
+export const RDF_CACHE_DB_NAME = 'rdf_ontology_cache_db';
+export const RDF_CACHE_DB_VERSION = 5;
+export const RDF_CACHE_STORE = 'rdf_cache';
 
 type RdfStoreName = typeof RDF_CACHE_STORE;
 
 export type OntologyPropertyType = 'DatatypeProperty' | 'ObjectProperty' | 'Class';
+
+const VALID_PROPERTY_TYPES = new Set<OntologyPropertyType>([
+  'DatatypeProperty',
+  'ObjectProperty',
+  'Class',
+]);
 
 export type RdfOntologyRow = {
   about: string;
@@ -44,9 +41,6 @@ export type RdfCachedContext = {
 
 let rdfCacheDbPromise: Promise<IDBDatabase> | null = null;
 
-/**
- * Opens (and memoizes) the shared RDF IndexedDB database connection.
- */
 export function openRdfCacheDb(): Promise<IDBDatabase> {
   if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
     return Promise.reject(new Error('IndexedDB is not available.'));
@@ -54,7 +48,7 @@ export function openRdfCacheDb(): Promise<IDBDatabase> {
 
   if (rdfCacheDbPromise) return rdfCacheDbPromise;
 
-  rdfCacheDbPromise = new Promise((resolve, reject) => {
+  rdfCacheDbPromise = new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(RDF_CACHE_DB_NAME, RDF_CACHE_DB_VERSION);
 
     request.onupgradeneeded = () => {
@@ -70,12 +64,9 @@ export function openRdfCacheDb(): Promise<IDBDatabase> {
       resolve(db);
     };
 
-    request.onerror = () => {
-      reject(new Error(request.error?.message || 'Failed to open RDF IndexedDB cache.'));
-    };
-  });
-
-  rdfCacheDbPromise = rdfCacheDbPromise.catch(error => {
+    request.onerror = () =>
+      reject(new Error(request.error?.message ?? 'Failed to open RDF IndexedDB cache.'));
+  }).catch(error => {
     rdfCacheDbPromise = null;
     throw error;
   });
@@ -89,126 +80,90 @@ export async function getFromRdfStore<T>(
 ): Promise<T | null> {
   const db = await openRdfCacheDb();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readonly');
-    const store = tx.objectStore(storeName);
-    const request = store.get(key);
-
-    request.onsuccess = () => {
-      resolve((request.result as T | undefined) ?? null);
-    };
-    request.onerror = () => {
-      reject(new Error(request.error?.message || `Failed to read from "${storeName}".`));
-    };
+    const request = db.transaction(storeName, 'readonly').objectStore(storeName).get(key);
+    request.onsuccess = () => resolve((request.result as T | undefined) ?? null);
+    request.onerror = () =>
+      reject(new Error(request.error?.message ?? `Failed to read from "${storeName}".`));
   });
 }
 
-/**
- * Reads all records from a specific RDF object store.
- */
 export async function getAllFromRdfStore<T>(storeName: RdfStoreName): Promise<T[]> {
   const db = await openRdfCacheDb();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readonly');
-    const store = tx.objectStore(storeName);
-    const request = store.getAll();
-
-    request.onsuccess = () => {
-      resolve((Array.isArray(request.result) ? request.result : []) as T[]);
-    };
-    request.onerror = () => {
-      reject(new Error(request.error?.message || `Failed to read from "${storeName}".`));
-    };
+    const request = db.transaction(storeName, 'readonly').objectStore(storeName).getAll();
+    request.onsuccess = () => resolve((request.result ?? []) as T[]);
+    request.onerror = () =>
+      reject(new Error(request.error?.message ?? `Failed to read all from "${storeName}".`));
   });
 }
 
-/**
- * Writes/updates a single record in an RDF object store.
- */
+async function runRwTransaction(
+  storeName: RdfStoreName,
+  operation: (store: IDBObjectStore) => void,
+  errorPrefix: string
+): Promise<void> {
+  const db = await openRdfCacheDb();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    operation(tx.objectStore(storeName));
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(new Error(tx.error?.message ?? `${errorPrefix} "${storeName}".`));
+    tx.onabort = () =>
+      reject(new Error(tx.error?.message ?? `${errorPrefix} "${storeName}" was aborted.`));
+  });
+}
+
 export async function putInRdfStore<T>(storeName: RdfStoreName, value: T): Promise<void> {
-  const db = await openRdfCacheDb();
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readwrite');
-    const store = tx.objectStore(storeName);
-    store.put(value);
-
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(new Error(tx.error?.message || `Failed to write to "${storeName}".`));
-    tx.onabort = () =>
-      reject(new Error(tx.error?.message || `Write to "${storeName}" was aborted.`));
-  });
+  await runRwTransaction(storeName, store => store.put(value), 'Failed to write to');
 }
 
-/**
- * Deletes a single record from an RDF object store.
- */
 export async function deleteFromRdfStore(storeName: RdfStoreName, key: IDBValidKey): Promise<void> {
-  const db = await openRdfCacheDb();
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readwrite');
-    const store = tx.objectStore(storeName);
-    store.delete(key);
-
-    tx.oncomplete = () => resolve();
-    tx.onerror = () =>
-      reject(new Error(tx.error?.message || `Failed to delete from "${storeName}".`));
-    tx.onabort = () =>
-      reject(new Error(tx.error?.message || `Delete from "${storeName}" was aborted.`));
-  });
+  await runRwTransaction(storeName, store => store.delete(key), 'Failed to delete from');
 }
 
-/**
- * Normalizes external cache keys to a stable IndexedDB key format.
- */
 export function getRdfCacheKey(rawKey: string): string {
   return String(rawKey ?? '').trim();
 }
 
-/**
- * Normalizes potentially incomplete ontology cache records
- * into the canonical {@link RdfCachedOntology} shape.
- */
+function str(value: unknown, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+function normalizeOntologyRow(row: Partial<RdfOntologyRow>): RdfOntologyRow {
+  return {
+    about: String(row?.about ?? ''),
+    comment: String(row?.comment ?? ''),
+    propertyType: VALID_PROPERTY_TYPES.has(row?.propertyType as OntologyPropertyType)
+      ? (row.propertyType as OntologyPropertyType)
+      : 'ObjectProperty',
+  };
+}
+
 export function normalizeOntologyCacheEntry(
   value: Partial<RdfCachedOntology> | undefined
 ): RdfCachedOntology | null {
   if (!value) return null;
 
-  const ontologyIri =
-    typeof value.ontologyIri === 'string' ? getRdfCacheKey(value.ontologyIri) : '';
+  const ontologyIri = getRdfCacheKey(str(value.ontologyIri));
   if (!ontologyIri) return null;
 
-  const rawContent = typeof value.rawContent === 'string' ? value.rawContent : '';
-
   return {
-    key: getRdfCacheKey(value.key ?? ontologyIri),
+    key: getRdfCacheKey(str(value.key, ontologyIri)),
     ontologyIri,
-    url: typeof value.url === 'string' ? value.url : '',
-    rawContent,
-    format: typeof value.format === 'string' ? value.format : undefined,
-    contentType: typeof value.contentType === 'string' ? value.contentType : undefined,
-    fetchedAt: typeof value.fetchedAt === 'string' ? value.fetchedAt : '',
-    mergedGraphNTriples:
-      typeof value.mergedGraphNTriples === 'string' ? value.mergedGraphNTriples : '',
+    url: str(value.url),
+    rawContent: str(value.rawContent),
+    format: str(value.format) || undefined,
+    contentType: str(value.contentType) || undefined,
+    fetchedAt: str(value.fetchedAt),
+    mergedGraphNTriples: str(value.mergedGraphNTriples) || undefined,
     ontologyQueryResults: Array.isArray(value.ontologyQueryResults)
-      ? value.ontologyQueryResults.map(row => ({
-          about: String(row?.about ?? ''),
-          comment: String(row?.comment ?? ''),
-          propertyType:
-            row?.propertyType === 'DatatypeProperty' ||
-            row?.propertyType === 'ObjectProperty' ||
-            row?.propertyType === 'Class'
-              ? row.propertyType
-              : 'ObjectProperty',
-        }))
+      ? value.ontologyQueryResults.map(normalizeOntologyRow)
       : undefined,
-    queryResultsFetchedAt:
-      typeof value.queryResultsFetchedAt === 'string' ? value.queryResultsFetchedAt : undefined,
-    lastSparqlQuery: typeof value.lastSparqlQuery === 'string' ? value.lastSparqlQuery : undefined,
+    queryResultsFetchedAt: str(value.queryResultsFetchedAt) || undefined,
+    lastSparqlQuery: str(value.lastSparqlQuery) || undefined,
   };
 }
 
-/**
- * Reads one ontology cache record by ontology IRI.
- */
 export async function getOntologyFromRdfCache(
   ontologyIri: string
 ): Promise<RdfCachedOntology | null> {
@@ -218,32 +173,22 @@ export async function getOntologyFromRdfCache(
   return normalizeOntologyCacheEntry(result ?? undefined);
 }
 
-/**
- * Stores one ontology cache record.
- */
 export async function putOntologyInRdfCache(entry: Partial<RdfCachedOntology>): Promise<void> {
-  const normalizedEntry = normalizeOntologyCacheEntry(entry);
-  if (!normalizedEntry?.ontologyIri) {
+  const normalized = normalizeOntologyCacheEntry(entry);
+  if (!normalized?.ontologyIri) {
     throw new Error('Failed to cache ontology: missing ontology IRI key.');
   }
   await putInRdfStore(RDF_CACHE_STORE, {
-    ...normalizedEntry,
-    key: getRdfCacheKey(normalizedEntry.ontologyIri),
+    ...normalized,
+    key: getRdfCacheKey(normalized.ontologyIri),
   });
 }
 
-/**
- * Removes one ontology cache record by ontology IRI.
- */
 export async function deleteOntologyFromRdfCache(ontologyIri: string): Promise<void> {
   const key = getRdfCacheKey(ontologyIri);
-  if (!key) return;
-  await deleteFromRdfStore(RDF_CACHE_STORE, key);
+  if (key) await deleteFromRdfStore(RDF_CACHE_STORE, key);
 }
 
-/**
- * Reads one JSON-LD context cache record by URL.
- */
 export async function getContextFromRdfCache(url: string): Promise<RdfCachedContext | null> {
   const key = getRdfCacheKey(url);
   if (!key) return null;
@@ -252,25 +197,20 @@ export async function getContextFromRdfCache(url: string): Promise<RdfCachedCont
 
   return {
     key,
-    url: typeof result.url === 'string' ? result.url : key,
-    rawContent: typeof result.rawContent === 'string' ? result.rawContent : '',
-    fetchedAt: typeof result.fetchedAt === 'string' ? result.fetchedAt : '',
+    url: str(result.url, key),
+    rawContent: str(result.rawContent),
+    fetchedAt: str(result.fetchedAt),
   };
 }
 
-/**
- * Stores one JSON-LD context cache record.
- */
 export async function putContextInRdfCache(entry: Partial<RdfCachedContext>): Promise<void> {
-  const key = getRdfCacheKey(String(entry.url ?? entry.key ?? ''));
-  if (!key) {
-    throw new Error('Failed to cache context: missing context URL key.');
-  }
+  const key = getRdfCacheKey(str(entry.url ?? entry.key ?? ''));
+  if (!key) throw new Error('Failed to cache context: missing context URL key.');
 
-  await putInRdfStore(RDF_CACHE_STORE, {
+  await putInRdfStore<RdfCachedContext>(RDF_CACHE_STORE, {
     key,
     url: key,
-    rawContent: String(entry.rawContent ?? ''),
-    fetchedAt: String(entry.fetchedAt ?? new Date().toISOString()),
-  } satisfies RdfCachedContext);
+    rawContent: str(entry.rawContent),
+    fetchedAt: str(entry.fetchedAt) || new Date().toISOString(),
+  });
 }
