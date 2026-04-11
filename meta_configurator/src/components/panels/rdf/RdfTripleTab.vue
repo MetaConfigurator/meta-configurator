@@ -35,56 +35,19 @@
       <span class="font-semibold">{{ data.subject }}</span>
     </template>
     <template #header>
-      <div class="flex justify-between items-center w-full flex-nowrap">
-        <div class="flex items-center gap-1 flex-shrink-0">
-          <Button
-            label="Add"
-            icon="pi pi-plus"
-            severity="contrast"
-            variant="text"
-            @click="openNewDialog" />
-          <Button
-            label="Edit"
-            icon="pi pi-pen-to-square"
-            severity="contrast"
-            variant="text"
-            @click="openEditDialog"
-            :disabled="!selectedTriple" />
-          <Button
-            label="Delete"
-            icon="pi pi-trash"
-            severity="contrast"
-            variant="text"
-            @click="confirmDeleteSelected"
-            :disabled="!selectedTriple" />
-          <Button
-            label="Export"
-            icon="pi pi-upload"
-            severity="contrast"
-            text
-            :disabled="items.length === 0"
-            @click="toggleExportPopover" />
-          <TieredMenu ref="exportPopover" :model="exportMenuItems" popup />
-          <Button
-            label="SPARQL"
-            icon="pi pi-search"
-            severity="contrast"
-            variant="text"
-            :disabled="items.length === 0"
-            @click="openSparqlEditor" />
-          <Button
-            label="Visualize"
-            icon="pi pi-globe"
-            severity="contrast"
-            variant="text"
-            :disabled="filteredRows.length === 0 || items.length === 0"
-            @click="openVisualizer" />
-        </div>
-        <IconField class="flex items-center gap-1 flex-shrink-0">
-          <Button type="button" icon="pi pi-filter-slash" variant="text" @click="clearFilter()" />
-          <InputText v-model="filters['global'].value" placeholder="Search ..." />
-        </IconField>
-      </div>
+      <RdfTripleToolbar
+        :hasSelection="Boolean(selectedTriple)"
+        :hasItems="items.length > 0"
+        :hasFilteredRows="filteredRows.length > 0"
+        :globalFilterValue="filters?.global?.value ?? null"
+        :exportMenuItems="exportMenuItems"
+        @add="openNewDialog"
+        @edit="openEditDialog"
+        @delete="confirmDeleteSelected"
+        @sparql="openSparqlEditor"
+        @visualize="openVisualizer"
+        @clear-filters="clearFilter"
+        @update:globalFilterValue="updateGlobalFilter" />
     </template>
     <Column frozen selectionMode="single" headerStyle="width: 3rem"> </Column>
     <Column field="subject" header="Subject" sortable>
@@ -174,10 +137,8 @@ import DataTable from 'primevue/datatable';
 import type {DataTableFilterEvent} from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
-import IconField from 'primevue/iconfield';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import TieredMenu from 'primevue/tieredmenu';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {FilterMatchMode} from '@primevue/core/api';
@@ -198,6 +159,7 @@ import {
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
 import TripleDetailsDialog from '@/components/panels/rdf/TripleDetailsDialog.vue';
+import RdfTripleToolbar from '@/components/panels/rdf/RdfTripleToolbar.vue';
 import {useSettings} from '@/settings/useSettings';
 import {RdfMediaType} from './rdfEnums';
 
@@ -214,7 +176,6 @@ const emit = defineEmits<{
   (e: 'zoom_into_path', path: Path): void;
 }>();
 
-const exportPopover = ref();
 const first = ref(0);
 const rowsPerPage = ref(50);
 const dataSession = getSessionForMode(SessionMode.DataEditor);
@@ -281,9 +242,15 @@ const items = computed(() => {
   return mappedItems;
 });
 
-const toggleExportPopover = (event: Event) => {
-  exportPopover.value.toggle(event);
-};
+function updateGlobalFilter(value: string | null) {
+  filters.value = {
+    ...filters.value,
+    global: {
+      ...(filters.value?.global ?? {}),
+      value,
+    },
+  };
+}
 
 function onUserSelect() {
   isUserSelection.value = true;

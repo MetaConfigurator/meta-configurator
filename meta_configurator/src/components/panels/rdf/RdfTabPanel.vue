@@ -15,7 +15,7 @@
                   background: '{primary.color}',
                 },
               }">
-              <RdfContextEditorPanel
+              <RdfContextTab
                 :sessionMode="SessionMode.DataEditor"
                 :dataIsUnparsable="props.dataIsUnparsable"
                 :dataIsInJsonLd="props.dataIsInJsonLd" />
@@ -23,7 +23,7 @@
           </div>
         </TabPanel>
         <TabPanel value="triple">
-          <RdfTripleEditorPanel
+          <RdfTripleTab
             :dataIsUnparsable="props.dataIsUnparsable"
             :dataIsInJsonLd="props.dataIsInJsonLd"
             @zoom_into_path="zoomIntoPath" />
@@ -34,8 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import RdfTripleEditorPanel from '@/components/panels/rdf/RdfTripleEditorPanel.vue';
-import RdfContextEditorPanel from '@/components/panels/rdf/RdfContextEditorPanel.vue';
+import RdfTripleTab from '@/components/panels/rdf/RdfTripleTab.vue';
+import RdfContextTab from '@/components/panels/rdf/RdfContextTab.vue';
 import ScrollPanel from 'primevue/scrollpanel';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';

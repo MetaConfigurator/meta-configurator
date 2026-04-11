@@ -465,7 +465,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         },
         groupBySubject: {
           type: 'boolean',
-          description: 'Whether to group RDF triples by subject.',
+          description:
+            'Group RDF triples by subject in the RDF viewer. If set to true, triples will be grouped by their subject, which can make it easier to explore the data. If set to false, triples will be shown in a flat list.',
           default: false,
         },
         maximumTriplesToShow: {

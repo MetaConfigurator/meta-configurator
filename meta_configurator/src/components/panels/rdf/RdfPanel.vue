@@ -18,7 +18,7 @@
       </li>
     </Message>
     <div class="panel-content">
-      <RdfEditorPanel
+      <RdfTabPanel
         :dataIsUnparsable="dataIsUnparsable"
         :dataIsInJsonLd="dataIsInJsonLd"
         @zoom_into_path="zoomIntoPath" />
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import {ref, watch, computed} from 'vue';
-import RdfEditorPanel from '@/components/panels/rdf/RdfEditorPanel.vue';
+import RdfTabPanel from '@/components/panels/rdf/RdfTabPanel.vue';
 import {SessionMode} from '@/store/sessionMode';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
