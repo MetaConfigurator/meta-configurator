@@ -32,7 +32,7 @@
     :rowsPerPageOptions="[10, 20, 50]"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} triples">
     <template v-if="groupBySubject" #groupheader="{data}">
-      <span class="font-semibold">{{ data.subject }}</span>
+      <span class="grouped-subject">{{ data.subject }}</span>
     </template>
     <template #header>
       <RdfTripleToolbar
@@ -476,5 +476,9 @@ initFilters();
 .disabled-wrapper > * {
   pointer-events: none;
   opacity: 0.5;
+}
+
+.grouped-subject {
+  font-weight: bold;
 }
 </style>
