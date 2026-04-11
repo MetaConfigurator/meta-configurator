@@ -82,7 +82,7 @@
       <label class="text-sm font-medium">Node IRI</label>
       <InputText
         :modelValue="renameNodeValue"
-        @update:modelValue="emit('update:renameNodeValue', $event)"
+        @update:modelValue="emit('update:renameNodeValue', $event || '')"
         placeholder="Enter new IRI" />
     </div>
     <template #footer>

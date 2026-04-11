@@ -199,6 +199,7 @@ import {
 } from '@/components/panels/rdf/tripleEditorService';
 import TripleDetailsDialog from '@/components/panels/rdf/TripleDetailsDialog.vue';
 import {useSettings} from '@/settings/useSettings';
+import {RdfMediaType} from './rdfEnums';
 
 const settings = useSettings();
 const groupBySubject = computed(() => settings.value.rdf.groupBySubject);
@@ -234,17 +235,17 @@ const exportMenuItems = [
   {
     label: 'Turtle',
     icon: 'pi pi-file',
-    command: () => exportAs('text/turtle'),
+    command: () => exportAs(RdfMediaType.Turtle),
   },
   {
     label: 'N-Triples',
     icon: 'pi pi-file',
-    command: () => exportAs('application/n-triples'),
+    command: () => exportAs(RdfMediaType.NTriples),
   },
   {
     label: 'RDF/XML',
     icon: 'pi pi-file',
-    command: () => exportAs('application/rdf+xml'),
+    command: () => exportAs(RdfMediaType.RdfXml),
   },
 ];
 
@@ -508,10 +509,5 @@ initFilters();
 .disabled-wrapper > * {
   pointer-events: none;
   opacity: 0.5;
-}
-
-.fixed-toggle {
-  width: 110px;
-  min-width: 110px;
 }
 </style>

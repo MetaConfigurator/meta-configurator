@@ -165,10 +165,4 @@ function handleLink(event: MouseEvent) {
   min-height: 0;
   overflow: hidden;
 }
-
-.messages {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 </style>

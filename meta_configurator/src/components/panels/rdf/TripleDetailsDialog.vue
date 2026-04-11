@@ -78,8 +78,7 @@
               onLabel="Custom"
               offLabel="List"
               onIcon="pi pi-pencil"
-              offIcon="pi pi-list"
-              class="fixed-toggle" />
+              offIcon="pi pi-list" />
             <Select
               v-if="!useCustomDatatype"
               v-model="localTriple.objectDatatype"

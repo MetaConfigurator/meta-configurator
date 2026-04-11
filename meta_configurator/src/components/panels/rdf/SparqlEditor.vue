@@ -214,6 +214,7 @@ import {
 } from '@/components/panels/rdf/rdfUtils';
 import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
 import SparqlQueryEditor from '@/components/panels/rdf/SparqlQueryEditor.vue';
+import {RdfMediaType} from './rdfEnums';
 
 enum QueryResultMode {
   CONSTRUCT = 'construct',
@@ -245,17 +246,17 @@ const exportOnConstruct = [
   {
     label: 'Turtle',
     icon: 'pi pi-file',
-    command: () => exportAs('text/turtle'),
+    command: () => exportAs(RdfMediaType.Turtle),
   },
   {
     label: 'N-Triples',
     icon: 'pi pi-file',
-    command: () => exportAs('application/n-triples'),
+    command: () => exportAs(RdfMediaType.NTriples),
   },
   {
     label: 'RDF/XML',
     icon: 'pi pi-file',
-    command: () => exportAs('application/rdf+xml'),
+    command: () => exportAs(RdfMediaType.RdfXml),
   },
 ];
 

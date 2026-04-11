@@ -5,6 +5,7 @@ import {tags} from '@lezer/highlight';
 import {useDark} from '@vueuse/core';
 import {computed} from 'vue';
 import type {Path} from '@/utility/path';
+import {RdfMediaType} from './rdfEnums';
 
 export const isDark = () => computed(() => useDark().value);
 
@@ -207,14 +208,14 @@ export function areJsonLdPathsEqual(path1: Path, path2: Path): boolean {
 
 function getFileExtension(format: string): string {
   switch (format) {
-    case 'text/turtle':
+    case RdfMediaType.Turtle:
       return 'ttl';
-    case 'application/n-triples':
-    case 'text/plain':
+    case RdfMediaType.NTriples:
+    case RdfMediaType.TextPlain:
       return 'nt';
-    case 'application/ld+json':
+    case RdfMediaType.JsonLd:
       return 'jsonld';
-    case 'application/rdf+xml':
+    case RdfMediaType.RdfXml:
       return 'rdf';
     case 'text/csv':
       return 'csv';
