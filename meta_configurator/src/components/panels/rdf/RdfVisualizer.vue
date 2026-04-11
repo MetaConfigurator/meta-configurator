@@ -17,45 +17,19 @@
       @update:renameNodeDialog="renameNodeDialog = $event"
       @update:renameNodeValue="renameNodeValue = $event"
       @confirm-rename-node="confirmRenameNode" />
+
     <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
-      <SplitterPanel class="graph-panel">
-        <div class="graph-wrapper" :class="{'graph-frozen': hasGraphError}">
-          <div ref="container" class="graph-container" :class="{'graph-loaded': graphLoaded}"></div>
-          <Dock :model="dockItems" position="right" class="graph-dock">
-            <template #itemicon="{item}">
-              <Button
-                :icon="item.icon"
-                rounded
-                raised
-                :disabled="hasGraphError"
-                v-tooltip.left="item.label"
-                @click="item.command" />
-            </template>
-          </Dock>
-          <Dock
-            v-if="!props.readOnly"
-            :model="bottomDockItems"
-            position="bottom"
-            class="graph-dock-bottom">
-            <template #itemicon="{item}">
-              <Button
-                :icon="item.icon"
-                rounded
-                raised
-                v-tooltip.top="item.label"
-                @click="item.command" />
-            </template>
-          </Dock>
-          <Transition name="fade">
-            <ProgressSpinner v-if="isLoading" class="loading-overlay" />
-          </Transition>
-          <div v-if="hasGraphError" class="graph-freeze-overlay">
-            <Message severity="error" :closable="false">
-              Graph is disabled because the data contains errors.
-            </Message>
-          </div>
-        </div>
+      <SplitterPanel>
+        <RdfVisualizerGraphPane
+          :readOnly="props.readOnly"
+          :hasGraphError="hasGraphError"
+          :graphLoaded="graphLoaded"
+          :isLoading="isLoading"
+          :dockItems="dockItems"
+          :bottomDockItems="bottomDockItems"
+          @container-change="onGraphContainerChange" />
       </SplitterPanel>
+
       <SplitterPanel
         v-if="propertiesPanelVisible"
         :size="propertiesPanelSize"
@@ -86,14 +60,13 @@
     </Splitter>
   </div>
 </template>
+
 <script setup lang="ts">
-import Button from 'primevue/button';
-import Message from 'primevue/message';
-import ProgressSpinner from 'primevue/progressspinner';
-import {ref, computed, onMounted, onUnmounted, watch, nextTick} from 'vue';
-import cytoscape from 'cytoscape';
-import coseBilkent from 'cytoscape-cose-bilkent';
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+import type cytoscape from 'cytoscape';
 import type * as $rdf from 'rdflib';
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
 import {rdfStoreManager, type RdfChange} from '@/components/panels/rdf/rdfStoreManager';
 import {useSettings} from '@/settings/useSettings';
 import {
@@ -101,10 +74,8 @@ import {
   type SelectedNodeData,
   RdfTermType,
   type RdfTermTypeString,
+  isDark,
 } from '@/components/panels/rdf/rdfUtils';
-import Dock from 'primevue/dock';
-import Splitter from 'primevue/splitter';
-import SplitterPanel from 'primevue/splitterpanel';
 import {
   TripleEditorService,
   type TripleTransferObject,
@@ -113,27 +84,20 @@ import {useErrorService} from '@/utility/errorServiceInstance';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import {useCurrentData} from '@/data/useDataLink';
-import {isDark} from '@/components/panels/rdf/rdfUtils';
+import {isTypePredicate} from '@/components/panels/rdf/rdfVisualizerGraphStyle';
 import {
-  CY_LAYOUT,
-  createCyStyle,
-  isTypePredicate,
-} from '@/components/panels/rdf/rdfVisualizerGraphStyle';
-import {
-  buildGraphElements,
   buildLiteralsForSubject,
   countNodes,
 } from '@/components/panels/rdf/rdfVisualizerGraphElements';
+import {useRdfVisualizerGraph} from '@/components/panels/rdf/useRdfVisualizerGraph';
 import RdfVisualizerDialogs from '@/components/panels/rdf/RdfVisualizerDialogs.vue';
 import RdfVisualizerSidebar from '@/components/panels/rdf/RdfVisualizerSidebar.vue';
+import RdfVisualizerGraphPane from '@/components/panels/rdf/RdfVisualizerGraphPane.vue';
 
 const settings = useSettings();
 const darkMode = isDark();
 const showLargeGraphPrompt = ref(false);
 const nodeCount = ref(0);
-const isLoading = ref(false);
-const graphLoaded = ref(false);
-const physicsEnabled = ref(false);
 const propertiesPanelVisible = ref(true);
 const propertiesPanelSize = computed(() => (propertiesPanelVisible.value ? 28 : 0));
 const propertiesPanelMinSize = computed(() => (propertiesPanelVisible.value ? 16 : 0));
@@ -146,6 +110,11 @@ const renameNodeDialog = ref(false);
 const renameNodeValue = ref('');
 const propertyUpdateKey = ref(0);
 const propertyToDelete = ref<RdfNodeLiteral | null>(null);
+const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
+const selectedNode = ref<SelectedNodeData | null>(null);
+const nodeSearchQuery = ref<{id: string; label: string} | string | null>('');
+const unsubscribeStore = ref<null | (() => void)>(null);
+const graphResizeObserver = ref<ResizeObserver | null>(null);
 
 const emit = defineEmits<{
   (e: 'cancel-render'): void;
@@ -166,6 +135,42 @@ const props = withDefaults(
     dataIsInJsonLd: true,
   }
 );
+
+const {
+  container,
+  cy,
+  isLoading,
+  graphLoaded,
+  physicsEnabled,
+  applyCyTheme,
+  exportGraphImage,
+  renderGraph,
+  zoomIn,
+  zoomOut,
+  zoomFit,
+  zoomToSelected: zoomToSelectedGraph,
+  selectNodeById: selectGraphNodeById,
+  togglePhysics,
+  focusNodeById,
+  startResizeObserver,
+  destroyGraph,
+} = useRdfVisualizerGraph({
+  darkMode,
+  toPrefixed: jsonLdContextManager.toPrefixed,
+  isIRI: jsonLdContextManager.isIRI,
+  onNodeSelected: (node, nodeData) => {
+    selectNode(node, nodeData);
+  },
+  onCanvasTap: () => {
+    clearSelectedNode();
+  },
+  onEdgeTap: predicateIri => {
+    const href = jsonLdContextManager.iriHref(predicateIri);
+    if (href) {
+      window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  },
+});
 
 const dockItems = computed(() => [
   {
@@ -228,7 +233,6 @@ const bottomDockItems = computed(() => [
 ]);
 
 const hasGraphError = computed(() => props.dataIsUnparsable || !props.dataIsInJsonLd);
-const nodeSearchQuery = ref<{id: string; label: string} | string | null>('');
 
 const allNodes = computed(() => {
   const ids = new Set<string>();
@@ -258,29 +262,25 @@ const nodeSearchResults = computed(() => {
     .slice(0, 8);
 });
 
-cytoscape.use(coseBilkent);
-const selectedCyNode = ref<cytoscape.NodeSingular | null>(null);
-const container = ref<HTMLDivElement | null>(null);
-const selectedNode = ref<SelectedNodeData | null>(null);
-const unsubscribeStore = ref<null | (() => void)>(null);
-
-let cy: cytoscape.Core | null = null;
-
 function togglePropertiesPanel() {
   propertiesPanelVisible.value = !propertiesPanelVisible.value;
 }
 
-function exportGraphImage() {
-  if (!cy) return;
-  const dataUrl = cy.png({
-    bg: '#ffffff',
-    full: false,
-    scale: 2,
+function onGraphContainerChange(element: HTMLDivElement | null) {
+  container.value = element;
+  if (element && !graphResizeObserver.value) {
+    graphResizeObserver.value = startResizeObserver();
+  }
+  void nextTick(() => {
+    maybeRenderGraph();
   });
-  const link = document.createElement('a');
-  link.href = dataUrl;
-  link.download = `rdf-graph-${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
-  link.click();
+}
+
+function maybeRenderGraph() {
+  if (!container.value) return;
+  if (showLargeGraphPrompt.value) return;
+  if (hasGraphError.value) return;
+  renderGraph(props.statements);
 }
 
 function confirmRender(allow: boolean) {
@@ -288,37 +288,15 @@ function confirmRender(allow: boolean) {
 
   if (!allow) {
     emit('cancel-render');
-
-    if (cy) {
-      cy.destroy();
-      cy = null;
-    }
+    destroyGraph();
     return;
   }
 
   renderGraph(props.statements);
 }
 
-function zoomIn() {
-  animateZoom(1.2, true);
-}
-
-function zoomOut() {
-  animateZoom(1 / 1.2, false);
-}
-
-function zoomFit() {
-  if (!cy) return;
-  animateFit(cy.elements(), 30, 400);
-}
-
 function zoomToSelected() {
-  if (!cy) return;
-
-  const node = selectedCyNode.value ?? cy.nodes(':selected').first();
-  if (!node || node.length === 0) return;
-
-  animateFit(node, 80, 400);
+  zoomToSelectedGraph(selectedCyNode.value);
 }
 
 function onNodeSearch(event: {query: string}) {
@@ -330,32 +308,18 @@ function clearNodeSearch() {
 }
 
 function selectNodeById(nodeId: string) {
-  if (!cy) return;
-  const node = cy.getElementById(nodeId);
-  if (!node || node.length === 0) return;
-  selectNode(node, node.data());
-  animateFit(node, 80, 400);
+  selectGraphNodeById(nodeId);
 }
 
-function togglePhysics() {
-  if (!cy) return;
-
-  physicsEnabled.value = !physicsEnabled.value;
-
-  if (physicsEnabled.value) {
-    const layout = buildPhysicsLayout();
-    layout!.on('layoutstop', () => {
-      physicsEnabled.value = false;
-    });
-    layout!.run();
-  }
-}
-
-function selectNode(node: any, nodeData: any) {
+function selectNode(node: cytoscape.NodeSingular, nodeData: any) {
   clearSelectedNode();
   node.addClass('selected');
   selectedCyNode.value = node;
-  selectedNode.value = toSelectedNodeData(nodeData);
+  selectedNode.value = {
+    id: nodeData.id,
+    label: nodeData.label,
+    literals: nodeData.literals,
+  };
   propertyUpdateKey.value++;
 }
 
@@ -410,8 +374,7 @@ function confirmDeleteNode() {
 
   clearSelectedNode();
   deleteNodeDialog.value = false;
-  const updatedStatements = rdfStoreManager.statements.value;
-  renderGraph(updatedStatements);
+  renderGraph(rdfStoreManager.statements.value);
 }
 
 function confirmRenameNode() {
@@ -479,133 +442,14 @@ function addNodeFromVisualizer() {
 
 function handlePropertyLinkClick(lit: RdfNodeLiteral, event: MouseEvent) {
   const iri = lit.href || jsonLdContextManager.iriHref(lit.value);
-  if (!iri || !cy) return;
-  const node = cy.getElementById(iri);
-  if (!node || node.length === 0) return;
+  if (!iri) return;
   event.preventDefault();
-  cy.animate({
-    fit: {
-      eles: node,
-      padding: 80,
-    },
-    duration: 400,
-    easing: 'ease-in-out-cubic',
-  });
-}
-
-function applyCyTheme() {
-  if (!cy) return;
-  cy.style(createCyStyle(darkMode.value));
-  cy.resize();
-}
-
-function setupCytoscape(elements: cytoscape.ElementDefinition[]) {
-  if (!container.value) return null;
-
-  if (cy) {
-    cy.destroy();
-  }
-
-  return cytoscape({
-    container: container.value,
-    elements,
-    style: createCyStyle(darkMode.value),
-    layout: CY_LAYOUT,
-  });
-}
-
-function attachCytoscapeEvents(graph: cytoscape.Core, initialFit: () => void) {
-  enableGraphInteractions(graph);
-  registerLayoutStop(graph, initialFit);
-  registerNodeTap(graph);
-  registerNodeDoubleTap(graph);
-  registerCanvasTap(graph);
-  registerEdgeTap(graph);
-  registerEdgeHover(graph);
-}
-
-function renderGraph(statements: readonly $rdf.Statement[]) {
-  if (!container.value) return;
-
-  isLoading.value = true;
-  let didInitialFit = false;
-  const elements = buildGraphElements(
-    statements,
-    jsonLdContextManager.toPrefixed,
-    jsonLdContextManager.isIRI
-  );
-
-  const graph = setupCytoscape(elements);
-  if (!graph) return;
-  cy = graph;
-
-  attachCytoscapeEvents(graph, () => {
-    if (didInitialFit) return;
-    didInitialFit = true;
-    resizeAndFit(graph);
-  });
-}
-
-function animateZoom(factor: number, centerOnSelected: boolean) {
-  if (!cy) return;
-  cy.stop(true);
-  const currentZoom = cy.zoom();
-  const animationConfig: any = {
-    zoom: currentZoom * factor,
-    duration: 300,
-    easing: 'ease-in-out-cubic',
-  };
-  if (centerOnSelected) {
-    const selectedNodes = cy.nodes(':selected');
-    if (selectedNodes.length > 0) {
-      animationConfig.center = {eles: selectedNodes};
-    }
-  }
-  cy.animate(animationConfig);
-}
-
-function animateFit(eles: cytoscape.Collection, padding: number, duration: number) {
-  if (!cy) return;
-  cy.animate({
-    fit: {
-      eles,
-      padding,
-    },
-    duration,
-    easing: 'ease-in-out-cubic',
-  });
-}
-
-function buildPhysicsLayout() {
-  if (!cy) return;
-  const randomInRange = (min: number, max: number) => min + Math.random() * (max - min);
-  return cy.layout({
-    name: 'cose-bilkent',
-    animate: true,
-    animationDuration: 1000,
-    randomize: true,
-    idealEdgeLength: randomInRange(160, 280),
-    edgeElasticity: randomInRange(70, 140),
-    gravity: randomInRange(70, 130),
-    numIter: 15000,
-  });
-}
-
-function toSelectedNodeData(nodeData: any): SelectedNodeData {
-  return {
-    id: nodeData.id,
-    label: nodeData.label,
-    literals: nodeData.literals,
-  };
-}
-
-function isNamedNodeTerm(term: any): boolean {
-  return term.termType !== RdfTermType.Literal;
+  focusNodeById(iri);
 }
 
 function updateNodeData(subjectId: string) {
-  if (!cy) return;
-  const node = cy.getElementById(subjectId);
+  if (!cy.value) return;
+  const node = cy.value.getElementById(subjectId);
   if (!node || node.length === 0) return;
   const subjectStatements = rdfStoreManager.getStatementsBySubject(subjectId);
   if (subjectStatements.length === 0) return;
@@ -637,6 +481,10 @@ function getSubjectIds(change: RdfChange): Set<string> {
   return ids;
 }
 
+function isNamedNodeTerm(term: any): boolean {
+  return term.termType !== RdfTermType.Literal;
+}
+
 function isStructuralChange(change: RdfChange): boolean {
   const oldSt = change.oldStatement;
   const newSt = change.newStatement;
@@ -661,8 +509,8 @@ function isStructuralChange(change: RdfChange): boolean {
 }
 
 function hasEdgeDiffForSubject(subjectId: string): boolean {
-  if (!cy) return true;
-  const currentEdges = cy.edges(`[source = "${subjectId}"]`);
+  if (!cy.value) return true;
+  const currentEdges = cy.value.edges(`[source = "${subjectId}"]`);
   const currentKeys = new Set<string>();
   currentEdges.forEach(edge => {
     const source = edge.data('source');
@@ -709,8 +557,8 @@ async function refreshSelectedNodeFromStore() {
   updateNodeData(subjectId);
   if (needsRefresh) {
     renderGraph(rdfStoreManager.statements.value);
-    if (cy) {
-      const node = cy.getElementById(subjectId);
+    if (cy.value) {
+      const node = cy.value.getElementById(subjectId);
       if (node && node.length > 0) {
         selectNode(node, node.data());
       }
@@ -721,8 +569,8 @@ async function refreshSelectedNodeFromStore() {
 
 function refreshAndSelectNode(nodeId: string) {
   renderGraph(rdfStoreManager.statements.value);
-  if (!cy) return;
-  const node = cy.getElementById(nodeId);
+  if (!cy.value) return;
+  const node = cy.value.getElementById(nodeId);
   if (!node || node.length === 0) return;
   selectNode(node, node.data());
 }
@@ -745,8 +593,8 @@ function handleRdfChange(change: RdfChange) {
   if (isStructuralChange(change)) {
     const toReselect = selectedNode.value?.id;
     renderGraph(rdfStoreManager.statements.value);
-    if (toReselect && cy) {
-      const node = cy.getElementById(toReselect);
+    if (toReselect && cy.value) {
+      const node = cy.value.getElementById(toReselect);
       if (node && node.length > 0) {
         selectNode(node, node.data());
       } else {
@@ -764,133 +612,26 @@ function clearSelectedNode() {
   selectedNode.value = null;
 }
 
-function enableGraphInteractions(graph: cytoscape.Core) {
-  graph.userPanningEnabled(true);
-  graph.userZoomingEnabled(true);
-  graph.boxSelectionEnabled(true);
-}
-
-function registerLayoutStop(graph: cytoscape.Core, initialFit: () => void) {
-  graph.on('layoutstop', () => {
-    isLoading.value = false;
-    graphLoaded.value = true;
-    initialFit();
-  });
-}
-
-function registerNodeTap(graph: cytoscape.Core) {
-  graph.on('tap', 'node', event => {
-    const node = event.target;
-    const nodeData = node.data();
-    pulseNode(node);
-    selectNode(node, nodeData);
-  });
-}
-
-function registerNodeDoubleTap(graph: cytoscape.Core) {
-  graph.on('dblclick', 'node', event => {
-    const node = event.target;
-    const nodeData = node.data();
-    selectNode(node, nodeData);
-    zoomToSelected();
-  });
-}
-
-function registerCanvasTap(graph: cytoscape.Core) {
-  graph.on('tap', event => {
-    if (event.target === graph) {
-      clearSelectedNode();
-    }
-  });
-}
-
-function registerEdgeTap(graph: cytoscape.Core) {
-  graph.on('tap', 'edge', event => {
-    const edge = event.target;
-    const predicateIRI = edge.data('predicateIRI');
-    pulseEdge(edge);
-    const href = jsonLdContextManager.iriHref(predicateIRI);
-    if (href) {
-      window.open(href, '_blank', 'noopener,noreferrer');
-    }
-  });
-}
-
-function registerEdgeHover(graph: cytoscape.Core) {
-  graph.on('mouseover', 'edge', () => {
-    if (container.value) {
-      container.value.style.cursor = 'pointer';
-    }
-  });
-  graph.on('mouseout', 'edge', () => {
-    if (container.value) {
-      container.value.style.cursor = 'default';
-    }
-  });
-}
-
-function pulseNode(node: cytoscape.NodeSingular) {
-  node.animate({
-    style: {'border-width': 6},
-    duration: 200,
-    complete: function () {
-      node.animate({
-        style: {'border-width': 4},
-        duration: 200,
-      });
-    },
-  });
-}
-
-function pulseEdge(edge: cytoscape.EdgeSingular) {
-  edge.animate({
-    style: {width: 5},
-    duration: 200,
-    complete: function () {
-      edge.animate({
-        style: {width: 2},
-        duration: 200,
-      });
-    },
-  });
-}
-
-function resizeAndFit(graph: cytoscape.Core) {
-  graph.resize();
-  graph.fit(undefined, 30);
-}
-
 onMounted(() => {
   nodeCount.value = countNodes(props.statements);
 
   if (nodeCount.value > settings.value.rdf.maximumNodesToVisualize) {
     showLargeGraphPrompt.value = true;
   } else {
-    if (!hasGraphError.value) {
-      renderGraph(props.statements);
-    }
+    maybeRenderGraph();
   }
 
   unsubscribeStore.value = rdfStoreManager.onChange(handleRdfChange);
+});
 
-  const resizeObserver = new ResizeObserver(() => {
-    if (cy) {
-      cy.resize();
-      cy.fit(undefined, 30);
-    }
-  });
-
-  onUnmounted(() => {
-    if (unsubscribeStore.value) {
-      unsubscribeStore.value();
-      unsubscribeStore.value = null;
-    }
-    resizeObserver.disconnect();
-    if (cy) {
-      cy.destroy();
-      cy = null;
-    }
-  });
+onUnmounted(() => {
+  if (unsubscribeStore.value) {
+    unsubscribeStore.value();
+    unsubscribeStore.value = null;
+  }
+  graphResizeObserver.value?.disconnect();
+  graphResizeObserver.value = null;
+  destroyGraph();
 });
 
 watch(
@@ -916,9 +657,7 @@ watch(
       needsGraphRefresh.value = false;
       return;
     }
-    if (!container.value) return;
-    if (showLargeGraphPrompt.value) return;
-    renderGraph(props.statements);
+    maybeRenderGraph();
   }
 );
 
@@ -944,107 +683,8 @@ watch(
 
 defineExpose({refreshSelectedNodeFromStore, refreshAndSelectNode});
 </script>
+
 <style scoped>
-.graph-panel {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  min-width: 0;
-}
-
-.graph-wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.graph-frozen .graph-container,
-.graph-frozen .graph-dock {
-  pointer-events: none;
-  opacity: 0.6;
-  filter: grayscale(0.2);
-}
-
-.graph-freeze-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-  pointer-events: none;
-}
-
-.graph-container {
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  opacity: 0;
-  transition: opacity 0.5s ease-in-out;
-}
-
-.graph-container.graph-loaded {
-  opacity: 1;
-}
-
-.graph-dock :deep(.p-dock-list-container) {
-  background: transparent !important;
-  border: none !important ;
-}
-
-.graph-dock {
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
-  z-index: 60;
-}
-
-.graph-dock-bottom {
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  z-index: 60;
-}
-
-.graph-dock-bottom :deep(.p-dock-list-container) {
-  background: transparent !important;
-  border: none !important ;
-}
-
-.graph-dock :deep(.p-dock) {
-  background: transparent;
-}
-
-.graph-dock :deep(.p-dock-list) {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0;
-}
-
-.graph-dock-bottom :deep(.p-dock) {
-  background: transparent;
-}
-
-.graph-dock-bottom :deep(.p-dock-list) {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  padding: 0;
-}
-
-.loading-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
-}
-
 .rdf-splitter {
   width: 100%;
   height: 100%;
