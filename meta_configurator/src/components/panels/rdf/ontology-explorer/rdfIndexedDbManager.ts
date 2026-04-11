@@ -7,15 +7,6 @@ export enum RdfCacheConfig {
   DbVersion = 5,
 }
 
-/**
- * Previous store names kept for one-time migration cleanup.
- */
-export enum RdfLegacyStoreName {
-  OntologySources = 'ontology_sources',
-  OntologyGraphs = 'ontology_graphs',
-  JsonLdContexts = 'jsonld_contexts',
-}
-
 export const RDF_CACHE_DB_NAME = RdfCacheConfig.DbName;
 export const RDF_CACHE_DB_VERSION = RdfCacheConfig.DbVersion;
 export const RDF_CACHE_STORE = RdfCacheConfig.StoreName;
@@ -28,11 +19,6 @@ export type RdfOntologyRow = {
   about: string;
   comment: string;
   propertyType: OntologyPropertyType;
-};
-
-type LegacyCachedOntology = {
-  content?: unknown;
-  lastCustomSparqlQuery?: unknown;
 };
 
 export type RdfCachedOntology = {
@@ -75,17 +61,6 @@ export function openRdfCacheDb(): Promise<IDBDatabase> {
       const db = request.result;
       if (!db.objectStoreNames.contains(RDF_CACHE_STORE)) {
         db.createObjectStore(RDF_CACHE_STORE, {keyPath: 'key'});
-      }
-
-      const obsoleteStores = [
-        RdfLegacyStoreName.OntologySources,
-        RdfLegacyStoreName.OntologyGraphs,
-        RdfLegacyStoreName.JsonLdContexts,
-      ];
-      for (const storeName of obsoleteStores) {
-        if (db.objectStoreNames.contains(storeName)) {
-          db.deleteObjectStore(storeName);
-        }
       }
     };
 
@@ -189,14 +164,11 @@ export function getRdfCacheKey(rawKey: string): string {
 }
 
 /**
- * Normalizes potentially incomplete or legacy ontology cache records
+ * Normalizes potentially incomplete ontology cache records
  * into the canonical {@link RdfCachedOntology} shape.
  */
 export function normalizeOntologyCacheEntry(
-  value:
-    | Partial<RdfCachedOntology>
-    | (Partial<RdfCachedOntology> & LegacyCachedOntology)
-    | undefined
+  value: Partial<RdfCachedOntology> | undefined
 ): RdfCachedOntology | null {
   if (!value) return null;
 
@@ -204,12 +176,7 @@ export function normalizeOntologyCacheEntry(
     typeof value.ontologyIri === 'string' ? getRdfCacheKey(value.ontologyIri) : '';
   if (!ontologyIri) return null;
 
-  const rawContent =
-    typeof value.rawContent === 'string'
-      ? value.rawContent
-      : typeof value.content === 'string'
-      ? value.content
-      : '';
+  const rawContent = typeof value.rawContent === 'string' ? value.rawContent : '';
 
   return {
     key: getRdfCacheKey(value.key ?? ontologyIri),
@@ -235,12 +202,7 @@ export function normalizeOntologyCacheEntry(
       : undefined,
     queryResultsFetchedAt:
       typeof value.queryResultsFetchedAt === 'string' ? value.queryResultsFetchedAt : undefined,
-    lastSparqlQuery:
-      typeof value.lastSparqlQuery === 'string'
-        ? value.lastSparqlQuery
-        : typeof value.lastCustomSparqlQuery === 'string'
-        ? value.lastCustomSparqlQuery
-        : undefined,
+    lastSparqlQuery: typeof value.lastSparqlQuery === 'string' ? value.lastSparqlQuery : undefined,
   };
 }
 
@@ -252,10 +214,7 @@ export async function getOntologyFromRdfCache(
 ): Promise<RdfCachedOntology | null> {
   const key = getRdfCacheKey(ontologyIri);
   if (!key) return null;
-  const result = await getFromRdfStore<Partial<RdfCachedOntology> & LegacyCachedOntology>(
-    RDF_CACHE_STORE,
-    key
-  );
+  const result = await getFromRdfStore<Partial<RdfCachedOntology>>(RDF_CACHE_STORE, key);
   return normalizeOntologyCacheEntry(result ?? undefined);
 }
 
