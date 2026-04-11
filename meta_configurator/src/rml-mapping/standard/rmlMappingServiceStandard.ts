@@ -1,6 +1,4 @@
 import type {RmlMappingService} from '@/rml-mapping/rmlMappingService';
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import {queryRmlMapping} from '@/utility/ai/aiEndpoint';
 import {RML_INPUT_EXAMPLE, RML_OUTPUT_EXAMPLE} from '@/rml-mapping/standard/rmlExamples';

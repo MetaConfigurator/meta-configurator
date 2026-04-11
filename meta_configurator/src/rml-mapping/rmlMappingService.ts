@@ -1,5 +1,3 @@
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-
 export interface RmlMappingService {
   validateMappingConfig(config: string, input: any): {success: boolean; message: string};
   generateMappingSuggestion(
