@@ -20,7 +20,7 @@
 
     <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
       <SplitterPanel>
-        <RdfVisualizerGraphPane
+        <RdfVisualizerGraphPanel
           :readOnly="props.readOnly"
           :hasGraphError="hasGraphError"
           :graphLoaded="graphLoaded"
@@ -92,7 +92,7 @@ import {
 import {useRdfVisualizerGraph} from '@/components/panels/rdf/visualizer/useRdfVisualizerGraph';
 import RdfVisualizerDialogs from '@/components/panels/rdf/visualizer/RdfVisualizerDialogs.vue';
 import RdfVisualizerSidebar from '@/components/panels/rdf/visualizer/RdfVisualizerSidebar.vue';
-import RdfVisualizerGraphPane from '@/components/panels/rdf/visualizer/RdfVisualizerGraphPane.vue';
+import RdfVisualizerGraphPanel from '@/components/panels/rdf/visualizer/RdfVisualizerGraphPanel.vue';
 
 const settings = useSettings();
 const darkMode = isDark();
