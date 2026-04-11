@@ -2,8 +2,8 @@ import {ref, type Ref} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
-import {CY_LAYOUT, createCyStyle} from '@/components/panels/rdf/rdfVisualizerGraphStyle';
-import {buildGraphElements} from '@/components/panels/rdf/rdfVisualizerGraphElements';
+import {CY_LAYOUT, createCyStyle} from '@/components/panels/rdf/visualizer/rdfVisualizerGraphStyle';
+import {buildGraphElements} from '@/components/panels/rdf/visualizer/rdfVisualizerGraphElements';
 
 cytoscape.use(coseBilkent);
 

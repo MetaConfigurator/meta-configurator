@@ -54,7 +54,7 @@
 import ScrollPanel from 'primevue/scrollpanel';
 import AutoComplete from 'primevue/autocomplete';
 import Button from 'primevue/button';
-import RdfVisualizerPropertiesView from '@/components/panels/rdf/RdfVisualizerPropertiesView.vue';
+import RdfVisualizerPropertiesView from '@/components/panels/rdf/visualizer/RdfVisualizerPropertiesView.vue';
 import type {RdfNodeLiteral, SelectedNodeData} from '@/components/panels/rdf/rdfUtils';
 
 defineProps<{

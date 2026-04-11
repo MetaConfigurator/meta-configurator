@@ -5,7 +5,7 @@ import {
   RdfTermType,
   predicateAliasMapping,
 } from '@/components/panels/rdf/rdfUtils';
-import {isTypePredicate} from '@/components/panels/rdf/rdfVisualizerGraphStyle';
+import {isTypePredicate} from '@/components/panels/rdf/visualizer/rdfVisualizerGraphStyle';
 
 type NodeLiteralContainer = {
   literals?: RdfNodeLiteral[];

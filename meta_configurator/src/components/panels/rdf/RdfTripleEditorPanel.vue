@@ -185,7 +185,7 @@ import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import SparqlEditor from '@/components/panels/rdf/SparqlEditor.vue';
-import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
+import RdfVisualizer from '@/components/panels/rdf/visualizer/RdfVisualizer.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {
   downloadFile,

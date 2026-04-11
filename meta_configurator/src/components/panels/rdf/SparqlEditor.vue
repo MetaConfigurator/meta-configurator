@@ -80,7 +80,7 @@
               </div>
             </ScrollPanel>
           </div>
-          <RdfVisualizationHelpDialog v-model:visible="visualizationHelpDialog" />
+          <RdfVisualizerHelpDialog v-model:visible="visualizationHelpDialog" />
         </TabPanel>
         <TabPanel value="result">
           <div class="datatable-wrapper">
@@ -199,8 +199,8 @@ import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import {ScrollPanel} from 'primevue';
 import * as $rdf from 'rdflib';
-import RdfVisualizer from '@/components/panels/rdf/RdfVisualizer.vue';
-import RdfVisualizationHelpDialog from '@/components/panels/rdf/RdfVisualizationHelpDialog.vue';
+import RdfVisualizer from '@/components/panels/rdf/visualizer/RdfVisualizer.vue';
+import RdfVisualizerHelpDialog from '@/components/panels/rdf/visualizer/RdfVisualizerHelpDialog.vue';
 import ToggleSwitch from 'primevue/toggleswitch';
 import {
   defaultQueryTemplate,

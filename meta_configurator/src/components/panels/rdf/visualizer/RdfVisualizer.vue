@@ -84,15 +84,15 @@ import {useErrorService} from '@/utility/errorServiceInstance';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import {useCurrentData} from '@/data/useDataLink';
-import {isTypePredicate} from '@/components/panels/rdf/rdfVisualizerGraphStyle';
+import {isTypePredicate} from '@/components/panels/rdf/visualizer/rdfVisualizerGraphStyle';
 import {
   buildLiteralsForSubject,
   countNodes,
-} from '@/components/panels/rdf/rdfVisualizerGraphElements';
-import {useRdfVisualizerGraph} from '@/components/panels/rdf/useRdfVisualizerGraph';
-import RdfVisualizerDialogs from '@/components/panels/rdf/RdfVisualizerDialogs.vue';
-import RdfVisualizerSidebar from '@/components/panels/rdf/RdfVisualizerSidebar.vue';
-import RdfVisualizerGraphPane from '@/components/panels/rdf/RdfVisualizerGraphPane.vue';
+} from '@/components/panels/rdf/visualizer/rdfVisualizerGraphElements';
+import {useRdfVisualizerGraph} from '@/components/panels/rdf/visualizer/useRdfVisualizerGraph';
+import RdfVisualizerDialogs from '@/components/panels/rdf/visualizer/RdfVisualizerDialogs.vue';
+import RdfVisualizerSidebar from '@/components/panels/rdf/visualizer/RdfVisualizerSidebar.vue';
+import RdfVisualizerGraphPane from '@/components/panels/rdf/visualizer/RdfVisualizerGraphPane.vue';
 
 const settings = useSettings();
 const darkMode = isDark();
