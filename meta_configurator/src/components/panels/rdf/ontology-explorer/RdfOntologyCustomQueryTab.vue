@@ -58,7 +58,9 @@
                     <button
                       type="button"
                       class="cell"
-                      :class="{iri: isLikelyIri(normalizePotentialIri(data[column]))}"
+                      :class="{
+                        iri: jsonLdContextManager.isIRI(normalizePotentialIri(data[column])),
+                      }"
                       @click="onCustomQueryValueClick(data[column])">
                       {{ data[column] }}
                     </button>
@@ -85,7 +87,8 @@ import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import TabList from 'primevue/tablist';
 import SparqlQueryEditor from '@/components/panels/rdf/sparql-editor/SparqlQueryEditor.vue';
-import type {RdfCachedOntology} from '@/components/panels/rdf/rdfIndexedDbManager';
+import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
+import type {RdfCachedOntology} from '@/components/panels/rdf/ontology-explorer/rdfIndexedDbManager';
 import {RdfMediaType, RdfStatusSeverity} from '@/components/panels/rdf/rdfEnums';
 import {validateSparqlSyntax} from '@/components/panels/rdf/rdfUtils';
 
@@ -286,7 +289,7 @@ function filterCustomQueryRows(rows: CustomQueryRow[], query: string) {
 
 function onCustomQueryValueClick(rawValue: unknown) {
   const iri = normalizePotentialIri(rawValue);
-  selectedCustomQueryIri.value = iri && isLikelyIri(iri) ? iri : '';
+  selectedCustomQueryIri.value = iri && jsonLdContextManager.isIRI(iri) ? iri : '';
   emit('select-iri', selectedCustomQueryIri.value);
 }
 
@@ -298,13 +301,6 @@ function normalizePotentialIri(value: unknown): string {
     return trimmed.slice(1, -1).trim();
   }
   return trimmed;
-}
-
-function isLikelyIri(value: string): boolean {
-  if (!value) return false;
-  if (value.startsWith('_:')) return false;
-  if (/\s/.test(value)) return false;
-  return /^[A-Za-z][A-Za-z0-9+.-]*:.+/.test(value);
 }
 
 function updateRunQueryButtonOffset() {

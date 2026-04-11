@@ -163,7 +163,7 @@ import {
   putOntologyInRdfCache,
   type RdfCachedOntology,
   type RdfOntologyRow,
-} from '@/components/panels/rdf/rdfIndexedDbManager';
+} from '@/components/panels/rdf/ontology-explorer/rdfIndexedDbManager';
 import {
   OntologyAccordionSection,
   OntologyExplorerTab,

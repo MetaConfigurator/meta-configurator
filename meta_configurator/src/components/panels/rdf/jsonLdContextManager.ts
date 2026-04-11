@@ -2,7 +2,10 @@ import {ref} from 'vue';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import {getContextFromRdfCache, putContextInRdfCache} from './rdfIndexedDbManager';
+import {
+  getContextFromRdfCache,
+  putContextInRdfCache,
+} from './ontology-explorer/rdfIndexedDbManager';
 import {HttpProtocol, RdfMediaType, RdfProxyPath} from './rdfEnums';
 
 interface JsonLdContextManagerStore {

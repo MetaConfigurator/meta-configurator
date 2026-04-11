@@ -1,5 +1,5 @@
 import type {Ref} from 'vue';
-import type {RdfCachedOntology} from '@/components/panels/rdf/rdfIndexedDbManager';
+import type {RdfCachedOntology} from '@/components/panels/rdf/ontology-explorer/rdfIndexedDbManager';
 import {RdfMediaType, RdfProxyPath, RdfStatusSeverity} from '@/components/panels/rdf/rdfEnums';
 import {
   detectRdfFormat,

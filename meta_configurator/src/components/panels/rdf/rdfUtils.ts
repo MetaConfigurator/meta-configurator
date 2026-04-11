@@ -144,6 +144,16 @@ WHERE
 
 export const predicateAliasMapping: Record<string, readonly string[]> = {
   '@type': ['rdf:type', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'],
+  '@value': ['rdf:value', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#value'],
+  '@language': ['dc:language', 'http://purl.org/dc/elements/1.1/language'],
+  '@datatype': ['rdf:datatype', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#datatype'],
+  '@graph': ['http://www.w3.org/2004/03/trix/rdfg-1/Graph'],
+  '@list': ['rdf:List', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List'],
+  '@set': ['rdf:Bag', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag'],
+  '@first': ['rdf:first', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first'],
+  '@rest': ['rdf:rest', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'],
+  '@nil': ['rdf:nil', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil'],
+  '@reverse': ['owl:inverseOf', 'http://www.w3.org/2002/07/owl#inverseOf'],
 };
 
 export type SparqlValidationResult = {
