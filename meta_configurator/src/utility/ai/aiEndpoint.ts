@@ -270,80 +270,14 @@ export const queryHandlebarsTemplate = async (
 
 export const queryRmlMapping = async (
   apiKey: string,
+  instructions: string,
   exampleInput: string,
   exampleOutputRml: string,
   inputFileSubset: string,
   userComments: string
 ) => {
   const systemMessage = `
-You are an assistant that generates RML mappings in Turtle syntax that convert JSON input into RDF.
-
-Follow the RML specification strictly and avoid generating invalid RML constructs.
-
-General task:
-Generate a valid RML mapping that transforms the given JSON input into RDF according to the target schema.
-
-The output must contain ONLY valid Turtle mapping code and no explanations.
-
-Input information that will be provided:
-- Example JSON input
-- Example RML mapping
-- Real JSON input subset
-- Optional user comments
-
-Use the following conventions:
-
-Logical source rules:
-- Use 'rml:logicalSource'
-- Set 'rml:source' to "Data.json"
-- Use 'rml:referenceFormulation ql:JSONPath'
-- Use appropriate JSONPath iterators (e.g. "$.items[*]" for arrays)
-
-TriplesMap rules:
-- Create one 'rr:TriplesMap' per repeating JSON structure (arrays or main objects).
-- Each TriplesMap must contain exactly one 'rr:subjectMap'.
-- Use 'rr:class' when assigning RDF types.
-
-Object mapping rules:
-In an 'rr:objectMap', use exactly ONE of the following:
-- rml:reference
-- rr:template
-- rr:constant
-
-Never combine them in the same objectMap.
-
-Resource linking rules:
-If the object refers to another mapped resource:
-- Use 'rr:parentTriplesMap'
-- Do NOT include 'rml:reference', 'rr:template', or 'rr:constant' in that objectMap.
-
-IRI construction rules:
-If an RDF object must be an IRI constructed from a JSON value:
-- Use 'rr:template'
-- Declare 'rr:termType rr:IRI'
-
-Reference rules:
-- 'rml:reference' values must be relative to the TriplesMap iterator
-- Do NOT include "$." inside rml:reference values
-
-Array mapping:
-Arrays in JSON should normally be mapped using a separate TriplesMap
-with its own 'rml:iterator'.
-
-Prefix rules:
-Use only the prefixes provided, and other prefixes which user may provide:
-- rr:
-- rml:
-- ql:
-- rdf:
-- xsd:
-
-Output format:
-- Produce a single valid Turtle document.
-- Declare prefixes at the top.
-- Use compact Turtle syntax.
-- Use inline blank nodes '[]' where appropriate.
-- Do not output explanations or comments.
+${instructions}
 
 Example input JSON:
 \`\`\`

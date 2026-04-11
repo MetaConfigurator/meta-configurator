@@ -1,7 +1,11 @@
 import type {RmlMappingService} from '@/rml-mapping/rmlMappingService';
 import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import {queryRmlMapping} from '@/utility/ai/aiEndpoint';
-import {RML_INPUT_EXAMPLE, RML_OUTPUT_EXAMPLE} from '@/rml-mapping/standard/rmlExamples';
+import {
+  RML_INSTRUCTIONS,
+  RML_INPUT_EXAMPLE,
+  RML_OUTPUT_EXAMPLE,
+} from '@/rml-mapping/standard/rmlExamples';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import * as RmlMapper from '@comake/rmlmapper-js';
 import {Parser as N3Parser} from 'n3';
@@ -56,6 +60,7 @@ export class RmlMappingServiceStandard implements RmlMappingService {
 
     const resultPromise = queryRmlMapping(
       apiKey,
+      RML_INSTRUCTIONS,
       rmlInputExampleStr,
       rmlOutputExampleStr,
       inputDataSubsetStr,
