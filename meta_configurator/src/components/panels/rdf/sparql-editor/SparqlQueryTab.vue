@@ -74,7 +74,7 @@
         </div>
       </div>
     </ScrollPanel>
-    <RdfVisualizerHelpDialog
+    <VisualizationHelpDialog
       :visible="visualizationHelpDialog"
       @update:visible="emit('update:visualizationHelpDialog', $event)" />
   </div>
@@ -95,7 +95,7 @@ import Button from 'primevue/button';
 import {ScrollPanel} from 'primevue';
 import ToggleSwitch from 'primevue/toggleswitch';
 import SparqlQueryEditor from '@/components/panels/rdf/sparql-editor/SparqlQueryEditor.vue';
-import RdfVisualizerHelpDialog from '@/components/panels/rdf/visualizer/RdfVisualizerHelpDialog.vue';
+import VisualizationHelpDialog from '@/components/panels/rdf/sparql-editor/VisualizationHelpDialog.vue';
 
 defineProps<{
   activeAccordion: string | null;

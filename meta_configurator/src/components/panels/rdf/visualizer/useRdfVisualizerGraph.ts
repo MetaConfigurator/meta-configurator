@@ -31,7 +31,6 @@ export function useRdfVisualizerGraph(options: {
   function exportGraphImage() {
     if (!cy.value) return;
     const dataUrl = cy.value.png({
-      bg: '#ffffff',
       full: false,
       scale: 2,
     });
