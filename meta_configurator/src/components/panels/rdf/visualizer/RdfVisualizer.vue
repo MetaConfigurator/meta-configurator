@@ -18,7 +18,7 @@
       @update:renameNodeValue="renameNodeValue = $event"
       @confirm-rename-node="confirmRenameNode" />
 
-    <Splitter class="rdf-splitter" :gutter-size="propertiesPanelVisible ? 8 : 0">
+    <Splitter style="width: 100%; height: 100%" :gutter-size="propertiesPanelVisible ? 8 : 0">
       <SplitterPanel>
         <RdfVisualizerGraphPanel
           :readOnly="props.readOnly"
@@ -271,11 +271,11 @@ function onGraphContainerChange(element: HTMLDivElement | null) {
     graphResizeObserver.value = startResizeObserver();
   }
   void nextTick(() => {
-    maybeRenderGraph();
+    requestRenderGraph();
   });
 }
 
-function maybeRenderGraph() {
+function requestRenderGraph() {
   if (!container.value) return;
   if (showLargeGraphPrompt.value) return;
   if (hasGraphError.value) return;
@@ -617,7 +617,7 @@ onMounted(() => {
   if (nodeCount.value > settings.value.rdf.maximumNodesToVisualize) {
     showLargeGraphPrompt.value = true;
   } else {
-    maybeRenderGraph();
+    requestRenderGraph();
   }
 
   unsubscribeStore.value = rdfStoreManager.onChange(handleRdfChange);
@@ -656,7 +656,7 @@ watch(
       needsGraphRefresh.value = false;
       return;
     }
-    maybeRenderGraph();
+    requestRenderGraph();
   }
 );
 
@@ -682,10 +682,3 @@ watch(
 
 defineExpose({refreshSelectedNodeFromStore, refreshAndSelectNode});
 </script>
-
-<style scoped>
-.rdf-splitter {
-  width: 100%;
-  height: 100%;
-}
-</style>
