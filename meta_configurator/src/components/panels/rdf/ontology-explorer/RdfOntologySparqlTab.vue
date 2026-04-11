@@ -1,6 +1,6 @@
 <template>
   <div class="tabs-wrapper">
-    <Tabs v-model:value="activeCustomQueryTab" class="tabs">
+    <Tabs v-model:value="activeSparqlTab" class="tabs">
       <TabList>
         <Tab value="query">Query</Tab>
         <Tab value="results">Results</Tab>
@@ -12,18 +12,18 @@
               <SparqlQueryEditor
                 ref="editorRef"
                 class="editor-instance"
-                v-model="customSparqlQuery"
-                :errorLine="customQueryErrorLineNumber"
-                :errorMessage="customQueryErrorMessage" />
+                v-model="sparqlQuery"
+                :errorLine="queryErrorLineNumber"
+                :errorMessage="queryErrorMessage" />
               <Button
                 label="Run Query"
                 icon="pi pi-play"
                 size="small"
                 class="run-query-button"
                 :style="{bottom: `${runQueryButtonBottomOffset}px`}"
-                :loading="isRunningCustomQuery"
-                :disabled="!props.selectedCacheEntry || !customSparqlQuery.trim()"
-                @click="runCustomSparqlQuery" />
+                :loading="isRunningQuery"
+                :disabled="!props.selectedCacheEntry || !sparqlQuery.trim()"
+                @click="runSparqlQuery" />
             </div>
           </div>
         </TabPanel>
@@ -31,15 +31,15 @@
           <div class="results-panel">
             <div class="table-search mb-2">
               <InputText
-                v-model.trim="customTableSearch"
+                v-model.trim="tableSearch"
                 placeholder="Search query results"
                 class="w-full" />
             </div>
             <div class="results-table-wrapper">
               <DataTable
                 class="results-table"
-                :value="filteredCustomQueryRows"
-                v-model:first="customQueryFirst"
+                :value="filteredQueryRows"
+                v-model:first="queryFirst"
                 size="small"
                 stripedRows
                 paginator
@@ -50,7 +50,7 @@
                 scrollHeight="flex"
                 scrollDirection="both">
                 <Column
-                  v-for="column in customQueryColumns"
+                  v-for="column in queryColumns"
                   :key="column"
                   :field="column"
                   :header="column">
@@ -61,7 +61,7 @@
                       :class="{
                         iri: jsonLdContextManager.isIRI(normalizePotentialIri(data[column])),
                       }"
-                      @click="onCustomQueryValueClick(data[column])">
+                      @click="onQueryValueClick(data[column])">
                       {{ data[column] }}
                     </button>
                   </template>
@@ -93,7 +93,7 @@ import {RdfMediaType, RdfStatusSeverity} from '@/components/panels/rdf/rdfEnums'
 import {validateSparqlSyntax} from '@/components/panels/rdf/rdfUtils';
 
 type CachedOntology = RdfCachedOntology;
-type CustomQueryRow = Record<string, string>;
+type QueryRow = Record<string, string>;
 
 const props = defineProps<{
   selectedCacheEntry: CachedOntology | null;
@@ -108,25 +108,23 @@ const emit = defineEmits<{
   (e: 'status', payload: {message: string; severity: RdfStatusSeverity}): void;
 }>();
 
-const customTableSearch = ref('');
-const customQueryFirst = ref(0);
-const customSparqlQuery = ref(props.defaultQuery);
-const customQueryRows = ref<CustomQueryRow[]>([]);
-const selectedCustomQueryIri = ref('');
-const isRunningCustomQuery = ref(false);
-const customQueryErrorLineNumber = ref<number | null>(null);
-const customQueryErrorMessage = ref<string | null>(null);
-const activeCustomQueryTab = ref<'query' | 'results'>('query');
+const tableSearch = ref('');
+const queryFirst = ref(0);
+const sparqlQuery = ref(props.defaultQuery);
+const queryRows = ref<QueryRow[]>([]);
+const selectedQueryIri = ref('');
+const isRunningQuery = ref(false);
+const queryErrorLineNumber = ref<number | null>(null);
+const queryErrorMessage = ref<string | null>(null);
+const activeSparqlTab = ref<'query' | 'results'>('query');
 const editorRef = ref<any>(null);
 const runQueryButtonBottomOffset = ref(12);
-let customQueryValidateTimer: number | null = null;
+let queryValidateTimer: number | null = null;
 
-const filteredCustomQueryRows = computed(() =>
-  filterCustomQueryRows(customQueryRows.value, customTableSearch.value)
-);
-const customQueryColumns = computed(() => {
+const filteredQueryRows = computed(() => filterQueryRows(queryRows.value, tableSearch.value));
+const queryColumns = computed(() => {
   const columns = new Set<string>();
-  for (const row of customQueryRows.value) {
+  for (const row of queryRows.value) {
     for (const key of Object.keys(row)) {
       columns.add(key);
     }
@@ -137,32 +135,32 @@ const customQueryColumns = computed(() => {
 watch(
   () => props.selectedCacheEntry,
   entry => {
-    customQueryRows.value = [];
-    selectedCustomQueryIri.value = '';
-    customQueryFirst.value = 0;
-    customTableSearch.value = '';
-    activeCustomQueryTab.value = 'query';
-    customSparqlQuery.value = entry?.lastCustomSparqlQuery ?? props.defaultQuery;
-    customQueryErrorLineNumber.value = null;
-    customQueryErrorMessage.value = null;
+    queryRows.value = [];
+    selectedQueryIri.value = '';
+    queryFirst.value = 0;
+    tableSearch.value = '';
+    activeSparqlTab.value = 'query';
+    sparqlQuery.value = entry?.lastSparqlQuery ?? props.defaultQuery;
+    queryErrorLineNumber.value = null;
+    queryErrorMessage.value = null;
     emit('select-iri', '');
   },
   {immediate: true}
 );
 
-watch(customSparqlQuery, () => {
-  validateCustomQueryLive();
+watch(sparqlQuery, () => {
+  validateQueryLive();
 });
 
 watch(
-  customQueryErrorMessage,
+  queryErrorMessage,
   () => {
     updateRunQueryButtonOffset();
   },
   {immediate: true}
 );
 
-async function runCustomSparqlQuery() {
+async function runSparqlQuery() {
   const entry = props.selectedCacheEntry;
   if (!entry) {
     emit('status', {
@@ -172,15 +170,15 @@ async function runCustomSparqlQuery() {
     return;
   }
 
-  const query = customSparqlQuery.value;
+  const query = sparqlQuery.value;
   if (!query.trim()) {
     emit('status', {message: 'Please enter a SPARQL query.', severity: RdfStatusSeverity.Warn});
     return;
   }
-  if (!validateCustomSparqlSyntax(query, false)) {
+  if (!validateTabSparqlSyntax(query, false)) {
     return;
   }
-  customQueryErrorMessage.value = null;
+  queryErrorMessage.value = null;
 
   const queryEngineCtor = (window as any)?.Comunica?.QueryEngine;
   if (!queryEngineCtor) {
@@ -188,13 +186,13 @@ async function runCustomSparqlQuery() {
     return;
   }
 
-  isRunningCustomQuery.value = true;
-  activeCustomQueryTab.value = 'results';
+  isRunningQuery.value = true;
+  activeSparqlTab.value = 'results';
   try {
     const cacheEntry = await props.ensureCacheEntryGraph(entry);
     const cacheEntryWithQuery: CachedOntology = {
       ...cacheEntry,
-      lastCustomSparqlQuery: query,
+      lastSparqlQuery: query,
     };
     try {
       await props.putOntologyToIndexedDb(cacheEntryWithQuery);
@@ -209,12 +207,12 @@ async function runCustomSparqlQuery() {
     const engine = new queryEngineCtor();
     const sources = [{type: 'serialized', value: graphNTriples, mediaType: RdfMediaType.NTriples}];
     const stream = await engine.queryBindings(query, {sources});
-    const rows: CustomQueryRow[] = [];
+    const rows: QueryRow[] = [];
 
     await new Promise<void>((resolve, reject) => {
       stream
         .on('data', (binding: any) => {
-          const row: CustomQueryRow = {};
+          const row: QueryRow = {};
           for (const key of binding.keys()) {
             const keyName = key?.value ?? key?.name ?? String(key).replace(/^\?/, '');
             row[keyName] = binding.get(key)?.value ?? '';
@@ -225,36 +223,36 @@ async function runCustomSparqlQuery() {
         .on('error', (err: any) => reject(err));
     });
 
-    customQueryRows.value = rows;
-    customQueryFirst.value = 0;
-    selectedCustomQueryIri.value = '';
-    customQueryErrorMessage.value = null;
+    queryRows.value = rows;
+    queryFirst.value = 0;
+    selectedQueryIri.value = '';
+    queryErrorMessage.value = null;
     emit('select-iri', '');
     emit('status', {
       message: `SPARQL query returned ${rows.length} row(s).`,
       severity: RdfStatusSeverity.Success,
     });
   } catch (error: any) {
-    customQueryErrorMessage.value = error?.message ?? 'Failed to execute SPARQL query.';
+    queryErrorMessage.value = error?.message ?? 'Failed to execute SPARQL query.';
     emit('status', {
       message: error?.message ?? 'Failed to execute SPARQL query.',
       severity: RdfStatusSeverity.Error,
     });
   } finally {
-    isRunningCustomQuery.value = false;
+    isRunningQuery.value = false;
   }
 }
 
-function validateCustomSparqlSyntax(query: string, silent: boolean): boolean {
+function validateTabSparqlSyntax(query: string, silent: boolean): boolean {
   const result = validateSparqlSyntax(query);
   if (result.valid) {
-    customQueryErrorLineNumber.value = null;
-    customQueryErrorMessage.value = null;
+    queryErrorLineNumber.value = null;
+    queryErrorMessage.value = null;
     return true;
   }
 
-  customQueryErrorLineNumber.value = result.errorLine;
-  customQueryErrorMessage.value = result.errorMessage ?? 'Invalid SPARQL query syntax.';
+  queryErrorLineNumber.value = result.errorLine;
+  queryErrorMessage.value = result.errorMessage ?? 'Invalid SPARQL query syntax.';
   if (!silent) {
     emit('status', {
       message: result.errorMessage ?? 'Invalid SPARQL query syntax.',
@@ -264,22 +262,22 @@ function validateCustomSparqlSyntax(query: string, silent: boolean): boolean {
   return false;
 }
 
-function validateCustomQueryLive() {
-  if (customQueryValidateTimer) {
-    window.clearTimeout(customQueryValidateTimer);
+function validateQueryLive() {
+  if (queryValidateTimer) {
+    window.clearTimeout(queryValidateTimer);
   }
-  customQueryValidateTimer = window.setTimeout(() => {
-    const query = customSparqlQuery.value;
+  queryValidateTimer = window.setTimeout(() => {
+    const query = sparqlQuery.value;
     if (!query.trim()) {
-      customQueryErrorLineNumber.value = null;
-      customQueryErrorMessage.value = null;
+      queryErrorLineNumber.value = null;
+      queryErrorMessage.value = null;
       return;
     }
-    validateCustomSparqlSyntax(query, true);
+    validateTabSparqlSyntax(query, true);
   }, 250);
 }
 
-function filterCustomQueryRows(rows: CustomQueryRow[], query: string) {
+function filterQueryRows(rows: QueryRow[], query: string) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return rows;
   return rows.filter(row =>
@@ -287,10 +285,10 @@ function filterCustomQueryRows(rows: CustomQueryRow[], query: string) {
   );
 }
 
-function onCustomQueryValueClick(rawValue: unknown) {
+function onQueryValueClick(rawValue: unknown) {
   const iri = normalizePotentialIri(rawValue);
-  selectedCustomQueryIri.value = iri && jsonLdContextManager.isIRI(iri) ? iri : '';
-  emit('select-iri', selectedCustomQueryIri.value);
+  selectedQueryIri.value = iri && jsonLdContextManager.isIRI(iri) ? iri : '';
+  emit('select-iri', selectedQueryIri.value);
 }
 
 function normalizePotentialIri(value: unknown): string {
