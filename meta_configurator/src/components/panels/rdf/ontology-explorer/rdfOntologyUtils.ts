@@ -1,48 +1,45 @@
 import * as $rdf from 'rdflib';
 import {RdfMediaType} from '@/components/panels/rdf/rdfEnums';
 
+const CONTENT_TYPE_MAP: Record<string, string> = {
+  [RdfMediaType.RdfXml]: RdfMediaType.RdfXml,
+  [RdfMediaType.Xml]: RdfMediaType.RdfXml,
+  [RdfMediaType.TextXml]: RdfMediaType.RdfXml,
+  [RdfMediaType.Turtle]: RdfMediaType.Turtle,
+  [RdfMediaType.XTurtle]: RdfMediaType.Turtle,
+  [RdfMediaType.NTriples]: RdfMediaType.NTriples,
+  [RdfMediaType.N3]: RdfMediaType.N3,
+  [RdfMediaType.JsonLd]: RdfMediaType.JsonLd,
+  [RdfMediaType.Json]: RdfMediaType.JsonLd,
+};
+
+const EXTENSION_MAP: Record<string, string> = {
+  '.ttl': RdfMediaType.Turtle,
+  '.nt': RdfMediaType.NTriples,
+  '.n3': RdfMediaType.N3,
+  '.rdf': RdfMediaType.RdfXml,
+  '.owl': RdfMediaType.RdfXml,
+  '.xml': RdfMediaType.RdfXml,
+  '.jsonld': RdfMediaType.JsonLd,
+  '.json': RdfMediaType.JsonLd,
+};
+
+function formatFromExtension(url: string): string | null {
+  const lower = url.toLowerCase();
+  return Object.entries(EXTENSION_MAP).find(([ext]) => lower.endsWith(ext))?.[1] ?? null;
+}
+
 export function detectRdfFormat(contentTypeHeader: string, url: string): string | null {
   const contentType = contentTypeHeader.split(';')[0]!.trim().toLowerCase();
-  const normalizedUrl = url.toLowerCase();
 
-  if (contentType === RdfMediaType.RdfXml) return RdfMediaType.RdfXml;
-  if (contentType === RdfMediaType.Xml || contentType === RdfMediaType.TextXml)
-    return RdfMediaType.RdfXml;
-  if (contentType === RdfMediaType.Turtle || contentType === RdfMediaType.XTurtle)
-    return RdfMediaType.Turtle;
-  if (contentType === RdfMediaType.NTriples) return RdfMediaType.NTriples;
-  if (contentType === RdfMediaType.N3) return RdfMediaType.N3;
-  if (contentType === RdfMediaType.JsonLd) return RdfMediaType.JsonLd;
-  if (contentType === RdfMediaType.Json) return RdfMediaType.JsonLd;
+  const fromContentType = CONTENT_TYPE_MAP[contentType];
+  if (fromContentType) return fromContentType;
 
-  if (contentType === RdfMediaType.TextPlain || contentType === RdfMediaType.OctetStream) {
-    if (normalizedUrl.endsWith('.nt')) return RdfMediaType.NTriples;
-    if (normalizedUrl.endsWith('.ttl')) return RdfMediaType.Turtle;
-    if (normalizedUrl.endsWith('.n3')) return RdfMediaType.N3;
-    if (
-      normalizedUrl.endsWith('.rdf') ||
-      normalizedUrl.endsWith('.owl') ||
-      normalizedUrl.endsWith('.xml')
-    ) {
-      return RdfMediaType.RdfXml;
-    }
-    if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json')) {
-      return RdfMediaType.JsonLd;
-    }
-  }
+  const isGenericContentType =
+    contentType === RdfMediaType.TextPlain || contentType === RdfMediaType.OctetStream;
 
-  if (
-    normalizedUrl.endsWith('.rdf') ||
-    normalizedUrl.endsWith('.owl') ||
-    normalizedUrl.endsWith('.xml')
-  ) {
-    return RdfMediaType.RdfXml;
-  }
-  if (normalizedUrl.endsWith('.ttl')) return RdfMediaType.Turtle;
-  if (normalizedUrl.endsWith('.nt')) return RdfMediaType.NTriples;
-  if (normalizedUrl.endsWith('.n3')) return RdfMediaType.N3;
-  if (normalizedUrl.endsWith('.jsonld') || normalizedUrl.endsWith('.json')) {
-    return RdfMediaType.JsonLd;
+  if (isGenericContentType || !fromContentType) {
+    return formatFromExtension(url);
   }
 
   return null;
@@ -58,27 +55,29 @@ export function parseRdfToStore(
     $rdf.parse(content, store as $rdf.Formula, baseUri, format, err => {
       if (err) {
         reject(new Error(`The ontology content at "${baseUri}" is not valid RDF.`));
-        return;
+      } else {
+        resolve(store as $rdf.Formula);
       }
-      resolve(store as $rdf.Formula);
     });
   });
 }
 
 export function serializeStoreToNTriples(store: $rdf.Formula): string {
-  const triples = new Set<string>();
-  for (const statement of store.statements) {
-    triples.add(statement.toNT());
-  }
-  return Array.from(triples).join('\n');
+  return [...new Set(store.statements.map(s => s.toNT()))].join('\n');
 }
 
-export function getBindingValue(binding: any, name: string): string {
-  for (const key of binding.keys()) {
-    const keyName = key?.value ?? key?.name ?? String(key).replace(/^\?/, '');
-    if (keyName === name) {
-      return binding.get(key)?.value ?? '';
-    }
+function normalizeKeyName(key: unknown): string {
+  if (key && typeof key === 'object' && 'value' in key) return String((key as any).value);
+  if (key && typeof key === 'object' && 'name' in key) return String((key as any).name);
+  return String(key).replace(/^\?/, '');
+}
+
+export function getBindingValue(
+  binding: Map<unknown, {value: string} | undefined>,
+  name: string
+): string {
+  for (const [key, val] of binding.entries()) {
+    if (normalizeKeyName(key) === name) return val?.value ?? '';
   }
   return '';
 }
@@ -88,49 +87,39 @@ export function escapeForSparqlString(value: string): string {
 }
 
 export function isLikelyIri(value: string): boolean {
-  if (!value) return false;
-  if (value.startsWith('_:')) return false;
-  if (/\s/.test(value)) return false;
-  return /^[A-Za-z][A-Za-z0-9+.-]*:.+/.test(value);
+  return (
+    Boolean(value) &&
+    !value.startsWith('_:') &&
+    !/\s/.test(value) &&
+    /^[A-Za-z][A-Za-z0-9+.-]*:.+/.test(value)
+  );
 }
 
 export function normalizeIri(value: string | undefined): string {
   return (value ?? '').trim();
 }
 
-export function formatDate(value: string) {
+export function formatDate(value: string): string {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
-export function extractPrefixNamespaces(context: any): Record<string, string> {
-  const out: Record<string, string> = {};
+function collectPrefixes(contextPart: unknown, out: Record<string, string>): void {
+  if (!contextPart || typeof contextPart !== 'object' || Array.isArray(contextPart)) return;
 
-  if (Array.isArray(context)) {
-    for (const part of context) {
-      collectFromContextObject(part, out);
-    }
-  } else {
-    collectFromContextObject(context, out);
-  }
-
-  return out;
-}
-
-function collectFromContextObject(contextPart: any, out: Record<string, string>) {
-  if (!contextPart || typeof contextPart !== 'object' || Array.isArray(contextPart)) {
-    return;
-  }
-
-  for (const [key, value] of Object.entries(contextPart)) {
+  for (const [key, value] of Object.entries(contextPart as Record<string, unknown>)) {
     if (typeof value === 'string') {
       out[key] = value;
-      continue;
-    }
-
-    if (value && typeof value === 'object' && '@id' in value && typeof value['@id'] === 'string') {
-      out[key] = value['@id'];
+    } else if (typeof value === 'object' && value !== null && '@id' in value) {
+      const id = (value as Record<string, unknown>)['@id'];
+      if (typeof id === 'string') out[key] = id;
     }
   }
+}
+
+export function extractPrefixNamespaces(context: unknown): Record<string, string> {
+  const out: Record<string, string> = {};
+  const parts = Array.isArray(context) ? context : [context];
+  parts.forEach(part => collectPrefixes(part, out));
+  return out;
 }

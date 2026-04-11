@@ -44,7 +44,7 @@
         @add="openNewDialog"
         @edit="openEditDialog"
         @delete="confirmDeleteSelected"
-        @sparql="openSparqlEditor"
+        @sparql="openSparqlDialog"
         @visualize="openVisualizer"
         @clear-filters="clearFilter"
         @update:globalFilterValue="updateGlobalFilter" />
@@ -109,7 +109,7 @@
     maximizable
     :style="{width: '1200px', height: '1200px'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
-    <SparqlEditor />
+    <SparqlDialog />
   </Dialog>
   <Dialog
     v-model:visible="visualizerDialog"
@@ -145,7 +145,7 @@ import {FilterMatchMode} from '@primevue/core/api';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import SparqlEditor from '@/components/panels/rdf/sparql-editor/SparqlEditor.vue';
+import SparqlDialog from '@/components/panels/rdf/sparql-editor/SparqlDialog.vue';
 import RdfVisualizer from '@/components/panels/rdf/visualizer/RdfVisualizer.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {
@@ -297,7 +297,7 @@ const openVisualizer = () => {
   visualizerDialog.value = true;
 };
 
-const openSparqlEditor = () => {
+const openSparqlDialog = () => {
   sparqlDialog.value = true;
 };
 

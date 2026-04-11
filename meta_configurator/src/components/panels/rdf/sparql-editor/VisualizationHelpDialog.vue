@@ -38,7 +38,6 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
 import Card from 'primevue/card';
-import Message from 'primevue/message';
 import Divider from 'primevue/divider';
 import {
   visualizationQueryExample_1,
