@@ -4,19 +4,21 @@
       panel-name="RDF View"
       :panel-settings-path="['rdf']"
       panel-display-name="RDF View"
-      :sessionMode="SessionMode.DataEditor">
-    </PanelSettings>
+      :sessionMode="SessionMode.DataEditor" />
     <RmlMappingDialog ref="rmlMappingDialog" />
+    <ImportTurtleDialog ref="importTurtleDialog" />
+
     <Message v-if="parsingWarnings.length > 0" severity="warn" class="m-2">
-      <li v-for="err in parsingWarnings" :key="err.id">
-        <span v-html="err.message" @click="handleLink"></span>
+      <li v-for="warn in parsingWarnings" :key="warn.id">
+        <span v-html="warn.message" @click="handleLink" />
       </li>
     </Message>
     <Message v-if="parsingErrors.length > 0" severity="error" class="m-2">
       <li v-for="err in parsingErrors" :key="err.id">
-        <span v-html="err.message" @click="handleLink"></span>
+        <span v-html="err.message" @click="handleLink" />
       </li>
     </Message>
+
     <div class="panel-content">
       <RdfTabPanel
         :dataIsUnparsable="dataIsUnparsable"
@@ -28,117 +30,138 @@
 
 <script setup lang="ts">
 import {ref, watch, computed} from 'vue';
+import Message from 'primevue/message';
 import RdfTabPanel from '@/components/panels/rdf/RdfTabPanel.vue';
-import {SessionMode} from '@/store/sessionMode';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
+import ImportTurtleDialog from '@/components/toolbar/dialogs/turtle-import/ImportTurtleDialog.vue';
+import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
-import Message from 'primevue/message';
 
 const props = defineProps<{
   sessionMode: SessionMode;
 }>();
+
 const emit = defineEmits<{
   (e: 'zoom_into_path', path: Path): void;
 }>();
+
 const session = getSessionForMode(props.sessionMode);
+
 const rmlMappingDialog = ref();
+const importTurtleDialog = ref();
+
+function showRmlMappingDialog() {
+  rmlMappingDialog.value?.show();
+}
+
+function showImportTurtleDialog() {
+  importTurtleDialog.value?.show();
+}
+
 const dataIsUnparsable = ref(false);
 const dataIsInJsonLd = ref(false);
 const missingContext = ref(false);
 
 const parsingErrors = computed(() => {
-  const baseErrors = rdfStoreManager.parseErrors.value.map((msg, index) => ({
+  const errors = rdfStoreManager.parseErrors.value.map((msg, index) => ({
     id: `parse-error-${index}`,
     message: msg,
   }));
 
   if (dataIsUnparsable.value) {
-    baseErrors.push({
+    errors.push({
       id: 'data-unparsable',
       message: 'Your data contains syntax errors. Please correct them before proceeding.',
     });
   }
 
-  return baseErrors;
+  return errors;
 });
 
 const parsingWarnings = computed(() => {
-  const baseWarnings = rdfStoreManager.parseWarnings.value.map((msg, index) => ({
+  const warnings = rdfStoreManager.parseWarnings.value.map((msg, index) => ({
     id: `parse-warn-${index}`,
     message: msg,
   }));
 
   if (missingContext.value) {
-    baseWarnings.push({
+    warnings.push({
       id: 'missing-context',
       message: 'Missing @context section in the JSON-LD data.',
     });
   }
 
   if (!dataIsInJsonLd.value) {
-    baseWarnings.push({
+    warnings.push({
       id: 'data-not-jsonld',
-      message: `To use this panel, your data must be in expected JSON-LD format. 
-      If your data is already in JSON format, you can use <a href="#" class="alert-link" data-action="open-rml">JSON to JSON-LD</a> converter.`,
+      message:
+        `To use this panel, your data must be in expected JSON-LD format. ` +
+        `If your data is already in JSON format, you can use ` +
+        `<a href="#" class="alert-link" data-action="open-rml">JSON to JSON-LD</a> converter, ` +
+        `or directly import <a href="#" class="alert-link" data-action="open-turtle">Turtle</a> data.`,
     });
   }
 
-  return baseWarnings;
+  return warnings;
 });
 
 watch(
   () => getDataForMode(props.sessionMode).isDataUnparseable(),
-  dataIsUnparsableValue => {
-    dataIsUnparsable.value = dataIsUnparsableValue;
+  value => {
+    dataIsUnparsable.value = value;
   },
   {immediate: true}
 );
 
 watch(
   () => getDataForMode(props.sessionMode).data.value,
-  dataValue => {
-    dataIsInJsonLd.value = hasJsonLdFormat(dataValue);
+  value => {
+    dataIsInJsonLd.value = hasJsonLdFormat(value);
   },
   {immediate: true}
 );
 
-function hasJsonLdFormat(input: Object): boolean {
+function hasJsonLdFormat(input: unknown): boolean {
   if (!input || typeof input !== 'object') {
     missingContext.value = true;
     return false;
   }
+
   const data = input as Record<string, unknown>;
   const hasContext = '@context' in data;
-
   missingContext.value = !hasContext;
 
   if (!hasContext) return false;
 
-  const keys = Object.keys(data).filter(k => k !== '@context');
-  return keys.length > 0;
+  return Object.keys(data).some(k => k !== '@context');
 }
 
-function zoomIntoPath(path: Path) {
+function zoomIntoPath(path: Path): void {
   session.updateCurrentPath(path);
   session.updateCurrentSelectedElement(session.currentPath.value);
 }
 
-function showRmlMappingDialog() {
-  rmlMappingDialog.value?.show();
-}
+function handleLink(event: MouseEvent): void {
+  const target = event.target;
 
-function handleLink(event: MouseEvent) {
-  const target = event.target as HTMLElement | null;
-  if (!target) return;
-  if (target instanceof HTMLAnchorElement && target.dataset.action === 'open-rml') {
+  if (!(target instanceof HTMLAnchorElement)) return;
+
+  const actions: Record<string, () => void> = {
+    'open-rml': showRmlMappingDialog,
+    'open-turtle': showImportTurtleDialog,
+  };
+
+  const action = actions[target.dataset.action ?? ''];
+  if (action) {
     event.preventDefault();
-    showRmlMappingDialog();
+    action();
   }
 }
 </script>
+
 <style scoped>
 .alert-list :deep(.alert-link),
 :deep(.alert-link) {
