@@ -4,7 +4,6 @@ import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
 import type {Path} from '@/utility/path';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
-import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
 import {useSettings} from '@/settings/useSettings';
 import {RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
 
@@ -315,13 +314,8 @@ export const rdfStoreManager: RdfStore & {
 
   const findMatchingStatementIndex = async (path: Path): Promise<number> => {
     const jsonLdObj = jsonLdNodeManager.extractJsonLdByPath(path);
-    if (!jsonLdObj) {
-      return -1;
-    }
-    const resolvedContext = await jsonLdContextManager.resolveContext(jsonLdObj['@context']);
-    if (resolvedContext) {
-      jsonLdObj['@context'] = resolvedContext;
-    }
+    if (!jsonLdObj) return -1;
+
     const tempStore = $rdf.graph();
     const baseUri = 'http://example.org/';
     await new Promise<void>((resolve, reject) => {
@@ -369,14 +363,8 @@ export const rdfStoreManager: RdfStore & {
 
   const rebuildStoreFromEditorData = async (data: any) => {
     if (!data) return;
-    const resolvedContext = await jsonLdContextManager.syncFromData(data);
 
-    const resolvedData =
-      resolvedContext !== null && resolvedContext !== undefined
-        ? {...data, '@context': resolvedContext}
-        : data;
-
-    _jsonLdText.value = JSON.stringify(resolvedData, null, 2);
+    _jsonLdText.value = JSON.stringify(data, null, 2);
     clearStore();
 
     _jsonObject.value = JSON.parse(_jsonLdText.value);

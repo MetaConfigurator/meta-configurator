@@ -252,15 +252,14 @@ const canSelectCurrentIri = computed(() => isLikelyIri(selectedRowIri.value));
 
 watch(
   () => data.data.value,
-  async dataValue => {
-    const resolvedContext = await jsonLdContextManager.syncFromData(dataValue);
-    prefixNamespaces.value = extractPrefixNamespaces(resolvedContext);
+  _ => {
+    const resolvedContext = jsonLdContextManager.getContextText();
+    prefixNamespaces.value = extractPrefixNamespaces(JSON.parse(resolvedContext));
     prefixes.value = Object.keys(prefixNamespaces.value);
 
     if (selectedPrefix.value && !prefixes.value.includes(selectedPrefix.value)) {
       selectedPrefix.value = null;
     }
-
     tryAutoSelectFromInitialIri();
   },
   {immediate: true, deep: true}

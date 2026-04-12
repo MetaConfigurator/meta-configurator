@@ -7,6 +7,7 @@ import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {defaultJsonLdSchema} from '@/components/panels/rdf/rdfUtils';
+import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -19,6 +20,13 @@ const data = getDataForMode(props.sessionMode);
 
 const currentSchema = computed(() => {
   return new JsonSchemaWrapper(JSON.parse(defaultJsonLdSchema), props.sessionMode, true);
+});
+
+const parsingErrors = computed(() => {
+  return rdfStoreManager.parseErrors.value.map((msg, index) => ({
+    id: index,
+    message: msg,
+  }));
 });
 
 function updatePath(newPath: Path) {
@@ -52,7 +60,7 @@ const currentData = computed(() => {
   <div
     :class="[
       'p-5 space-y-3 flex flex-col',
-      {'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable},
+      {'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable || parsingErrors.length > 0},
     ]">
     <div v-if="dataIsInJsonLd && !dataIsUnparsable">
       <CurrentPathBreadcrumb

@@ -43,12 +43,12 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
 
   const findPath = (statement: $rdf.Statement): Path | undefined => {
     const json = data.data.value;
-    const context = jsonLdContextManager.extractContext(json);
     const equivs: TripleEquivs = {
-      subject: jsonLdContextManager.getEquivalentTerms(statement.subject.value, context),
-      predicate: jsonLdContextManager.getEquivalentTerms(statement.predicate.value, context),
-      object: jsonLdContextManager.getEquivalentTerms(statement.object.value, context),
+      subject: jsonLdContextManager.getEquivalentTerms(statement.subject.value),
+      predicate: jsonLdContextManager.getEquivalentTerms(statement.predicate.value),
+      object: jsonLdContextManager.getEquivalentTerms(statement.object.value),
     };
+    console.log(equivs);
     return findPathInJson(json, [], equivs) as Path;
   };
 

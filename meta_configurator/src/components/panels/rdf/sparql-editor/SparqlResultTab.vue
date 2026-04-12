@@ -15,7 +15,8 @@
       scrollHeight="flex"
       :rows="50"
       :rowsPerPageOptions="[10, 20, 50]"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results">
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="{first} to {last} of {totalRecords} records">
       <template v-if="columns.length > 0" #header>
         <div class="flex items-center justify-between w-full">
           <div class="flex items-center gap-2">
