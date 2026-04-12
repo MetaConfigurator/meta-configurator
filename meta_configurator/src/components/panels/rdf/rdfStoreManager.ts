@@ -90,14 +90,13 @@ export const rdfStoreManager: RdfStore & {
   };
 
   const parseJsonLdIntoStore = async (jsonLdText: string) => {
-    const baseUri = 'http://example.org/';
     _parseErrors.value = [];
     try {
       await new Promise<void>((resolve, reject) => {
         $rdf.parse(
           jsonLdText,
           _store.value as $rdf.Formula,
-          baseUri,
+          settings.value.rdf.baseUri,
           'application/ld+json',
           err => {
             if (err) {
@@ -294,12 +293,17 @@ export const rdfStoreManager: RdfStore & {
         tempStore.setPrefixForURI(prefix, iri);
       });
       statements.forEach(st => tempStore.add(st));
-      serialized = $rdf.serialize(null, tempStore as $rdf.Formula, 'http://example.org/', format);
+      serialized = $rdf.serialize(
+        null,
+        tempStore as $rdf.Formula,
+        settings.value.rdf.baseUrl,
+        format
+      );
     } else {
       serialized = $rdf.serialize(
         null,
         _store.value as $rdf.Formula,
-        'http://example.org/',
+        settings.value.rdf.baseUri,
         format
       );
     }
@@ -317,12 +321,11 @@ export const rdfStoreManager: RdfStore & {
     if (!jsonLdObj) return -1;
 
     const tempStore = $rdf.graph();
-    const baseUri = 'http://example.org/';
     await new Promise<void>((resolve, reject) => {
       $rdf.parse(
         JSON.stringify(jsonLdObj, null, 2),
         tempStore as $rdf.Formula,
-        baseUri,
+        settings.value.rdf.baseUri,
         'application/ld+json',
         _ => {
           resolve();

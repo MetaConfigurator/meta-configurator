@@ -450,6 +450,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       type: 'object',
       required: [
         'sparqlEndpointUrl',
+        'baseUri',
         'groupBySubject',
         'maximumTriplesToShow',
         'maximumNodesToVisualize',
@@ -461,6 +462,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'string',
           description: 'The SPARQL endpoint to use for querying RDF data.',
           default: 'https://dbpedia.org/sparql',
+          format: 'uri',
+        },
+        baseUri: {
+          type: 'string',
+          description: 'The base URI to use for resolving relative IRIs in RDF data.',
+          default: 'http://example.com/',
           format: 'uri',
         },
         groupBySubject: {
