@@ -19,6 +19,9 @@ const userConfig: UserConfig = defineConfig({
     coverage: {
       provider: 'c8',
     },
+    deps: {
+      inline: ['rdflib', 'n3', 'jsonld'],
+    },
   },
 });
 

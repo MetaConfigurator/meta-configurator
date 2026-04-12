@@ -169,7 +169,6 @@ export class RmlMappingServiceStandard implements RmlMappingService {
     config: string
   ): Promise<{resultData: any; success: boolean; message: string}> {
     try {
-      console.log(config);
       const sourceFileName = extractSingleRmlSourceFile(config);
       const inputFiles = {[sourceFileName]: JSON.stringify(input)};
       const prefixes = await extractPrefixes(config);

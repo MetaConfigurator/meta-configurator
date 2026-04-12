@@ -1,4 +1,4 @@
-import {ref, type Ref} from 'vue';
+import {ref} from 'vue';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import type * as $rdf from 'rdflib';
