@@ -97,6 +97,32 @@ function convertLineToCursorPosition(text: string, line: number): {row: number; 
   return {row, column};
 }
 
+function extractSingleRmlSourceFile(config: string): string {
+  const sourceRegex = /rml:source\s+"((?:\\"|[^"])*)"/g;
+  const sources = new Set<string>();
+
+  for (const match of config.matchAll(sourceRegex)) {
+    const rawSource = match[1] ?? '';
+    const normalizedSource = rawSource.replace(/\\"/g, '"').trim();
+    if (normalizedSource) {
+      sources.add(normalizedSource);
+    }
+  }
+
+  if (sources.size === 0) {
+    throw new Error('No rml:source "<file>" was found in the mapping configuration');
+  }
+
+  if (sources.size > 1) {
+    throw new Error(
+      `Multiple different rml:source files found (${Array.from(sources).join(', ')}). ` +
+        `Only one source file is supported`
+    );
+  }
+
+  return Array.from(sources)[0]!;
+}
+
 export class RmlMappingServiceStandard implements RmlMappingService {
   async generateMappingSuggestion(
     input: any,
@@ -143,7 +169,9 @@ export class RmlMappingServiceStandard implements RmlMappingService {
     config: string
   ): Promise<{resultData: any; success: boolean; message: string}> {
     try {
-      const inputFiles = {'Data.json': JSON.stringify(input)};
+      console.log(config);
+      const sourceFileName = extractSingleRmlSourceFile(config);
+      const inputFiles = {[sourceFileName]: JSON.stringify(input)};
       const prefixes = await extractPrefixes(config);
       const rdfResult = await RmlMapper.parseTurtle(config, inputFiles, RML_MAPPER_OPTIONS);
       const resultData = await convertRdfToJsonLd(rdfResult, prefixes);
