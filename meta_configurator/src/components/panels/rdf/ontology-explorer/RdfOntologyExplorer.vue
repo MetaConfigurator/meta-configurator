@@ -180,7 +180,6 @@ import {
   extractPrefixNamespaces,
   formatDate,
   getBindingValue,
-  isLikelyIri,
   normalizeIri,
   parseRdfToStore,
   serializeStoreToNTriples,
@@ -247,7 +246,7 @@ const selectedRowIri = computed(() => {
     ? selectedSparqlQueryIri.value
     : selectedOntologyTabIri.value;
 });
-const canSelectCurrentIri = computed(() => isLikelyIri(selectedRowIri.value));
+const canSelectCurrentIri = computed(() => jsonLdContextManager.isIRI(selectedRowIri.value));
 
 watch(
   () => data.data.value,

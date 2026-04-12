@@ -68,6 +68,7 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
+import {normalizeIri} from './rdfOntologyUtils';
 
 export type OntologyPropertyType = 'DatatypeProperty' | 'ObjectProperty' | 'Class';
 type ActiveTab = OntologyPropertyType | string;
@@ -266,10 +267,6 @@ function buildOntologyTermHref(about: string): string {
   if (!namespace) return about;
   if (about.startsWith(namespace)) return about;
   return `${namespace}${termNameFromIri(about)}`;
-}
-
-function normalizeIri(value: string | undefined): string {
-  return (value ?? '').trim();
 }
 
 function rowMatchesIri(rowAbout: string, iri: string, namespace: string): boolean {

@@ -72,13 +72,26 @@ function normalizeKeyName(key: unknown): string {
   return String(key).replace(/^\?/, '');
 }
 
-export function getBindingValue(
-  binding: Map<unknown, {value: string} | undefined>,
-  name: string
-): string {
-  for (const [key, val] of binding.entries()) {
-    if (normalizeKeyName(key) === name) return val?.value ?? '';
+export function getBindingValue(binding: any, name: string): string {
+  if (!binding) return '';
+
+  // Comunica bindings expose keys() + get(key)
+  if (typeof binding.keys === 'function' && typeof binding.get === 'function') {
+    for (const key of binding.keys()) {
+      if (normalizeKeyName(key) === name) {
+        return binding.get(key)?.value ?? '';
+      }
+    }
+    return '';
   }
+
+  // Map-like fallback
+  if (typeof binding.entries === 'function') {
+    for (const [key, val] of binding.entries()) {
+      if (normalizeKeyName(key) === name) return val?.value ?? '';
+    }
+  }
+
   return '';
 }
 
@@ -112,15 +125,6 @@ export function buildOntologyQuery(namespace: string): string {
     GROUP BY ?about ?propertyType
     ORDER BY STR(?about)
   `;
-}
-
-export function isLikelyIri(value: string): boolean {
-  return (
-    Boolean(value) &&
-    !value.startsWith('_:') &&
-    !/\s/.test(value) &&
-    /^[A-Za-z][A-Za-z0-9+.-]*:.+/.test(value)
-  );
 }
 
 export function normalizeIri(value: string | undefined): string {

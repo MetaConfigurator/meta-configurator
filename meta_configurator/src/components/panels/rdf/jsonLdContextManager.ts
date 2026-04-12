@@ -80,10 +80,10 @@ export const jsonLdContextManager: JsonLdContextManagerStore = (() => {
 
   const isIRI = (value: string): boolean => {
     return (
-      value.startsWith('http://') ||
-      value.startsWith('https://') ||
-      value.startsWith('urn:') ||
-      value.includes('://')
+      Boolean(value) &&
+      !value.startsWith('_:') &&
+      !/\s/.test(value) &&
+      /^[A-Za-z][A-Za-z0-9+.-]*:.+/.test(value)
     );
   };
 
