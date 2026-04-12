@@ -48,7 +48,6 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
       predicate: jsonLdContextManager.getEquivalentTerms(statement.predicate.value),
       object: jsonLdContextManager.getEquivalentTerms(statement.object.value),
     };
-    console.log(equivs);
     return findPathInJson(json, [], equivs) as Path;
   };
 

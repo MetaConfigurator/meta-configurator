@@ -169,7 +169,6 @@ import {
   OntologyExplorerTab,
   RdfBindingName,
   RdfMediaType,
-  RdfPredicateIri,
   RdfPropertyType,
   RdfPropertyTypeIri,
   RdfStatusSeverity,
@@ -177,7 +176,7 @@ import {
 import {useOntologyImport} from '@/components/panels/rdf/ontology-explorer/useOntologyImport';
 import {
   detectRdfFormat,
-  escapeForSparqlString,
+  buildOntologyQuery,
   extractPrefixNamespaces,
   formatDate,
   getBindingValue,
@@ -349,9 +348,6 @@ const {RDF_FILE_ACCEPT, downloadAndCacheOntology, onOntologyFileSelected} = useO
   loadOntologyCards,
 });
 
-/**
- * Loads ontology cards from cache or recomputes them by running the predefined ontology query.
- */
 async function loadOntologyCards(forceRefresh = false) {
   const selectedEntry = selectedCacheEntry.value;
   if (!selectedEntry) {
@@ -379,7 +375,10 @@ async function loadOntologyCards(forceRefresh = false) {
       return;
     }
 
-    const query = buildOntologyQuery();
+    const namespace = selectedPrefix.value
+      ? prefixNamespaces.value[selectedPrefix.value] ?? ''
+      : '';
+    const query = buildOntologyQuery(namespace);
     const rows = await runSparqlOnCachedOntology(query, graphNTriples);
     ontologyRows.value = rows;
 
@@ -403,36 +402,6 @@ async function loadOntologyCards(forceRefresh = false) {
   } finally {
     isQuerying.value = false;
   }
-}
-
-function buildOntologyQuery() {
-  const namespace = selectedPrefix.value ? prefixNamespaces.value[selectedPrefix.value] ?? '' : '';
-
-  const namespaceFilter = namespace
-    ? `FILTER(STRSTARTS(STR(?about), "${escapeForSparqlString(namespace)}"))`
-    : '';
-
-  return `
-    SELECT ?about ?propertyType (SAMPLE(?commentTerm) AS ?comment) WHERE {
-      ?about a ?propertyType .
-      FILTER(
-        ?propertyType IN (
-          <${RdfPropertyTypeIri.OwlObjectProperty}>,
-          <${RdfPropertyTypeIri.OwlDatatypeProperty}>,
-          <${RdfPropertyTypeIri.RdfProperty}>,
-          <${RdfPropertyTypeIri.RdfsClass}>,
-          <${RdfPropertyTypeIri.OwlClass}>
-        )
-      )
-      ${namespaceFilter}
-      OPTIONAL {
-        ?about <${RdfPredicateIri.RdfsComment}> ?commentTerm .
-        FILTER(LANG(?commentTerm) = "" || LANGMATCHES(LANG(?commentTerm), "en"))
-      }
-    }
-    GROUP BY ?about ?propertyType
-    ORDER BY STR(?about)
-  `;
 }
 
 async function runSparqlOnCachedOntology(query: string, graphNTriples: string) {

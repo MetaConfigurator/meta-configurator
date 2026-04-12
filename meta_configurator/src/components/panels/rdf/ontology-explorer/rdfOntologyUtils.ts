@@ -1,5 +1,5 @@
 import * as $rdf from 'rdflib';
-import {RdfMediaType} from '@/components/panels/rdf/rdfEnums';
+import {RdfMediaType, RdfPredicateIri, RdfPropertyTypeIri} from '@/components/panels/rdf/rdfEnums';
 
 const CONTENT_TYPE_MAP: Record<string, string> = {
   [RdfMediaType.RdfXml]: RdfMediaType.RdfXml,
@@ -84,6 +84,34 @@ export function getBindingValue(
 
 export function escapeForSparqlString(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+export function buildOntologyQuery(namespace: string): string {
+  const namespaceFilter = namespace
+    ? `FILTER(STRSTARTS(STR(?about), "${escapeForSparqlString(namespace)}"))`
+    : '';
+
+  return `
+    SELECT ?about ?propertyType (SAMPLE(?commentTerm) AS ?comment) WHERE {
+      ?about a ?propertyType .
+      FILTER(
+        ?propertyType IN (
+          <${RdfPropertyTypeIri.OwlObjectProperty}>,
+          <${RdfPropertyTypeIri.OwlDatatypeProperty}>,
+          <${RdfPropertyTypeIri.RdfProperty}>,
+          <${RdfPropertyTypeIri.RdfsClass}>,
+          <${RdfPropertyTypeIri.OwlClass}>
+        )
+      )
+      ${namespaceFilter}
+      OPTIONAL {
+        ?about <${RdfPredicateIri.RdfsComment}> ?commentTerm .
+        FILTER(LANG(?commentTerm) = "" || LANGMATCHES(LANG(?commentTerm), "en"))
+      }
+    }
+    GROUP BY ?about ?propertyType
+    ORDER BY STR(?about)
+  `;
 }
 
 export function isLikelyIri(value: string): boolean {
