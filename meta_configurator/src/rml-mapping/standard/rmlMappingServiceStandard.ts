@@ -11,73 +11,124 @@ import * as RmlMapper from '@comake/rmlmapper-js';
 import {Parser as N3Parser} from 'n3';
 import jsonld from 'jsonld';
 
-const RML_ERROR_MESSAGE = (reason: string) => `
-Data mapping failed. Please check the mapping configuration. 
-Use <a href="https://rml.io/specs/rml/" target="_blank">https://rml.io/specs/rml/</a> 
-to validate and fix your RML expression. Reason: ${reason}.
-`;
+const IGNORED_PREFIX_NAMES = new Set(['rr', 'rml', 'ql']);
 
-const options = {
-  toRDF: true,
-  replace: false,
-};
-
-const ignoredPrefixNames = new Set(['rr', 'rml', 'ql']);
-
-const ignoredIRIs = new Set([
+const IGNORED_IRIS = new Set([
   'http://www.w3.org/ns/r2rml#',
   'http://semweb.mmlab.be/ns/rml#',
   'http://semweb.mmlab.be/ns/ql#',
 ]);
+
+const RML_MAPPER_OPTIONS = {toRDF: true, replace: false};
+
+const RML_SPEC_URL = 'https://rml.io/specs/rml/';
+
+function buildErrorMessage(reason: string): string {
+  return (
+    `Data mapping failed. Please check the mapping configuration. ` +
+    `Use <a href="${RML_SPEC_URL}" target="_blank">${RML_SPEC_URL}</a> ` +
+    `to validate and fix your RML expression. Reason: ${reason}.`
+  );
+}
+
+function logInputSizeReduction(original: any, reduced: any): void {
+  const originalKb = (JSON.stringify(original).length / 1024).toFixed(2);
+  const reducedKb = (JSON.stringify(reduced).length / 1024).toFixed(2);
+  console.log(`Reduced input data from ${originalKb} KB to ${reducedKb} KB`);
+}
+
+function logPromptSizes(inputExample: string, outputExample: string, inputSubset: string): void {
+  const exampleKb = ((inputExample.length + outputExample.length) / 1024).toFixed(2);
+  const subsetKb = (inputSubset.length / 1024).toFixed(2);
+  console.log(
+    `Sizes of the different input files in KB:` +
+      ` rml example files: ${exampleKb}` +
+      ` inputDataSubset: ${subsetKb}`
+  );
+}
+
+function isErrorWithLine(error: unknown): error is {message: string; context: {line: number}} {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'context' in error &&
+    typeof (error as any).context === 'object' &&
+    'line' in (error as any).context
+  );
+}
+
+async function extractPrefixes(config: string): Promise<Record<string, string>> {
+  let prefixes: Record<string, string> = {};
+
+  await new N3Parser().parse(
+    config,
+    (_error: any, _quad: any, prefixMap: Record<string, string>) => {
+      if (prefixMap) {
+        prefixes = Object.fromEntries(
+          Object.entries(prefixMap).filter(
+            ([name, iri]) => !IGNORED_PREFIX_NAMES.has(name) && !IGNORED_IRIS.has(iri)
+          )
+        );
+      }
+    }
+  );
+
+  return prefixes;
+}
+
+async function convertRdfToJsonLd(rdfResult: any, prefixes: Record<string, string>): Promise<any> {
+  const expanded = await jsonld.fromRDF(rdfResult, {format: 'application/n-quads'});
+  return jsonld.compact(expanded, {'@context': prefixes});
+}
+
+function convertLineToCursorPosition(text: string, line: number): {row: number; column: number} {
+  const lines = text.split('\n');
+  let row = 0;
+  let column = line;
+
+  for (let i = 0; i < lines.length; i++) {
+    if (column < lines[i]!.length) {
+      row = i;
+      break;
+    }
+    column -= lines[i]!.length + 1;
+  }
+
+  return {row, column};
+}
 
 export class RmlMappingServiceStandard implements RmlMappingService {
   async generateMappingSuggestion(
     input: any,
     userComments: string
   ): Promise<{config: string; success: boolean; message: string}> {
-    const inputDataSubset = trimDataToMaxSize(input);
-    console.log(
-      'Reduced input data from ' +
-        JSON.stringify(input).length / 1024 +
-        ' KB to ' +
-        JSON.stringify(inputDataSubset).length / 1024 +
-        ' KB'
-    );
+    const inputSubset = trimDataToMaxSize(input);
+    logInputSizeReduction(input, inputSubset);
 
-    const apiKey = getApiKey();
+    const [inputExampleStr, outputExampleStr, inputSubsetStr] = [
+      JSON.stringify(RML_INPUT_EXAMPLE),
+      JSON.stringify(RML_OUTPUT_EXAMPLE),
+      JSON.stringify(inputSubset),
+    ];
+    logPromptSizes(inputExampleStr, outputExampleStr, inputSubsetStr);
 
-    const rmlInputExampleStr = JSON.stringify(RML_INPUT_EXAMPLE);
-    const rmlOutputExampleStr = JSON.stringify(RML_OUTPUT_EXAMPLE);
-    const inputDataSubsetStr = JSON.stringify(inputDataSubset);
-
-    console.log(
-      'Sizes of the different input files in KB:' +
-        ' rml example files: ' +
-        ((rmlInputExampleStr.length + rmlOutputExampleStr.length) / 1024).toFixed(2) +
-        ' inputDataSubset: ' +
-        (inputDataSubsetStr.length / 1024).toFixed(2)
-    );
-
-    const resultPromise = queryRmlMapping(
-      apiKey,
+    const responseStr = await queryRmlMapping(
+      getApiKey(),
       RML_INSTRUCTIONS,
-      rmlInputExampleStr,
-      rmlOutputExampleStr,
-      inputDataSubsetStr,
+      inputExampleStr,
+      outputExampleStr,
+      inputSubsetStr,
       userComments
     );
 
-    const responseStr = await resultPromise;
-
     try {
-      const fixedExpression = fixGeneratedExpression(responseStr, ['turtle']);
       return {
-        config: fixedExpression,
+        config: fixGeneratedExpression(responseStr, ['turtle']),
         success: true,
         message: 'Data mapping suggestion generated successfully.',
       };
     } catch (e) {
-      console.error('Error generating mapping suggestion: ', e);
+      console.error('Error generating mapping suggestion:', e);
       return {
         config: responseStr,
         success: false,
@@ -92,88 +143,36 @@ export class RmlMappingServiceStandard implements RmlMappingService {
     config: string
   ): Promise<{resultData: any; success: boolean; message: string}> {
     try {
-      const inputFiles = {
-        'Data.json': `${JSON.stringify(input)}`,
-      };
+      const inputFiles = {'Data.json': JSON.stringify(input)};
+      const prefixes = await extractPrefixes(config);
+      const rdfResult = await RmlMapper.parseTurtle(config, inputFiles, RML_MAPPER_OPTIONS);
+      const resultData = await convertRdfToJsonLd(rdfResult, prefixes);
 
-      let prefixes: Record<string, string> = {};
-
-      new N3Parser().parse(config, (error: any, quads: any, prefixMap: Record<string, string>) => {
-        if (prefixMap) {
-          prefixes = Object.fromEntries(
-            Object.entries(prefixMap).filter(([name, iri]) => {
-              return !ignoredPrefixNames.has(name) && !ignoredIRIs.has(iri);
-            })
-          );
-        }
-      });
-
-      const result = await RmlMapper.parseTurtle(config, inputFiles, options);
-
-      const expanded = await jsonld.fromRDF(result, {
-        format: 'application/n-quads',
-      });
-
-      const final_jsonld = await jsonld.compact(expanded, prefixes);
-
-      return {
-        resultData: final_jsonld,
-        success: true,
-        message: 'Data mapping performed successfully.',
-      };
+      return {resultData, success: true, message: 'Data mapping performed successfully.'};
     } catch (e: any) {
-      console.error('Error performing data mapping: ', e);
+      console.error('Error performing data mapping:', e);
       return {
         resultData: {},
         success: false,
-        message: RML_ERROR_MESSAGE(e.message),
+        message: buildErrorMessage(e.message),
       };
     }
   }
 
-  validateMappingConfig(config: string, input: any): {success: boolean; message: string} {
+  validateMappingConfig(config: string): {success: boolean; message: string} {
     try {
-      let _ = new N3Parser().parse(config);
+      new N3Parser().parse(config);
       return {success: true, message: 'Mapping configuration is valid.'};
     } catch (error) {
-      if (
-        error &&
-        typeof error === 'object' &&
-        'context' in error &&
-        error.context &&
-        typeof error.context === 'object' &&
-        'line' in error.context
-      ) {
-        const cursorPosition = this.convertTextPositionToCursorPosition(
-          config,
-          error.context.line as number
-        );
+      if (isErrorWithLine(error)) {
+        const {row} = convertLineToCursorPosition(config, error.context.line);
         return {
           success: false,
-          message: 'Error reason: ' + error.message + ' (row ' + cursorPosition.row + ').',
+          message: `Error reason: ${error.message} (row ${row}).`,
         };
-      } else {
-        return {success: false, message: 'Unknown error'};
       }
+
+      return {success: false, message: 'Unknown error'};
     }
-  }
-
-  convertTextPositionToCursorPosition(
-    text: string,
-    position: number
-  ): {row: number; column: number} {
-    const lines = text.split('\n');
-    let row = 0;
-    let column = position;
-
-    for (let i = 0; i < lines.length; i++) {
-      if (column < lines[i]!.length) {
-        row = i;
-        break;
-      }
-      column -= lines[i]!.length + 1;
-    }
-
-    return {row, column};
   }
 }
