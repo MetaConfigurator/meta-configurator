@@ -74,6 +74,10 @@ describe('schemaToMarkdown samples coverage', async () => {
       );
       const expected = cleanMarkdownContent(expectedMd.trimEnd()); // ignore trailing newline diffs
 
+      // print source schema path for easier debugging
+      if (actualMd !== expected) {
+        console.error(`Schema path: ${c.schemaPath}`);
+      }
       expect(actualMd).toBe(expected);
     });
   }

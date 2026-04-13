@@ -576,7 +576,17 @@ function resolveArrayItemNode(
       if (referenceObject) {
         itemObjectPath = referenceObject.absolutePath;
       }
-      return objectDefs.get(pathToString(itemObjectPath));
+      const itemNode = objectDefs.get(pathToString(itemObjectPath));
+      // If the resolved item is itself an array (nested arrays), recurse until we reach
+      // a non-array type so that e.g. array-of-array-of-Ref still produces an edge.
+      if (
+        itemNode &&
+        !isSchemaThatDeservesANode(itemNode.schema) &&
+        itemNode.schema.type === 'array'
+      ) {
+        return resolveArrayItemNode(itemNode.absolutePath, itemNode.schema, objectDefs);
+      }
+      return itemNode;
     }
   }
   return undefined;
@@ -680,12 +690,24 @@ export function generateObjectSpecialPropertyEdges(
     );
   }
   if (schema.$ref) {
-    if (isExternalRef(schema.$ref) && isExternalRef(schema.$ref)) {
+    if (isExternalRef(schema.$ref)) {
       generateObjectSubSchemaEdge(
         node,
         {$ref: schema.$ref},
         [...node.absolutePath, '$ref'],
         EdgeType.EXTERNAL_REFERENCE,
+        objectDefs,
+        graph
+      );
+    } else {
+      // Internal $ref on a node that also has other keywords (e.g. properties).
+      // In JSON Schema 2019-09+ this is equivalent to allOf:[{$ref}] combined with the
+      // sibling keywords, so we model it as an ALL_OF edge to the referenced schema.
+      generateObjectSubSchemaEdge(
+        node,
+        {$ref: schema.$ref},
+        [...node.absolutePath, '$ref'],
+        EdgeType.ALL_OF,
         objectDefs,
         graph
       );
