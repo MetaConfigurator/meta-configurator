@@ -167,6 +167,7 @@ import {
 import {
   OntologyAccordionSection,
   OntologyExplorerTab,
+  OntologySourceField,
   RdfBindingName,
   RdfMediaType,
   RdfPropertyType,
@@ -188,11 +189,11 @@ import {
 const props = withDefaults(
   defineProps<{
     initialIri?: string;
-    sourceField?: 'Predicate' | 'Object';
+    sourceField?: OntologySourceField;
   }>(),
   {
     initialIri: '',
-    sourceField: 'Predicate',
+    sourceField: OntologySourceField.Predicate,
   }
 );
 const emit = defineEmits<{
@@ -320,7 +321,9 @@ watch(
   () => props.sourceField,
   sourceField => {
     activePropertyTab.value =
-      sourceField === 'Object' ? OntologyExplorerTab.Class : OntologyExplorerTab.ObjectProperty;
+      sourceField === OntologySourceField.Object
+        ? OntologyExplorerTab.Class
+        : OntologyExplorerTab.ObjectProperty;
     selectedOntologyTabIri.value = '';
   },
   {immediate: true}

@@ -68,9 +68,10 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
+import {OntologySourceField, RdfPropertyType} from '@/components/panels/rdf/rdfEnums';
 import {normalizeIri} from './rdfOntologyUtils';
 
-export type OntologyPropertyType = 'DatatypeProperty' | 'ObjectProperty' | 'Class';
+export type OntologyPropertyType = `${RdfPropertyType}`;
 type ActiveTab = OntologyPropertyType | string;
 
 type OntologyRow = {
@@ -89,7 +90,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: ActiveTab;
     rows: OntologyRow[];
-    sourceField: 'Predicate' | 'Object';
+    sourceField: OntologySourceField;
     selectedPrefix: string | null;
     prefixNamespaces: Record<string, string>;
     initialIri?: string;
@@ -107,39 +108,57 @@ const emit = defineEmits<{
 }>();
 
 const ontologyTabItems: TabSpec[] = [
-  {value: 'DatatypeProperty', label: 'DatatypeProperty', searchPlaceholder: 'Search properties'},
-  {value: 'ObjectProperty', label: 'ObjectProperty', searchPlaceholder: 'Search properties'},
-  {value: 'Class', label: 'Class', searchPlaceholder: 'Search classes'},
+  {
+    value: RdfPropertyType.DatatypeProperty,
+    label: RdfPropertyType.DatatypeProperty,
+    searchPlaceholder: 'Search properties',
+  },
+  {
+    value: RdfPropertyType.ObjectProperty,
+    label: RdfPropertyType.ObjectProperty,
+    searchPlaceholder: 'Search properties',
+  },
+  {value: RdfPropertyType.Class, label: RdfPropertyType.Class, searchPlaceholder: 'Search classes'},
 ];
 
 const internalActiveTab = ref<ActiveTab>(props.modelValue);
 const tableSearch = ref('');
 const selectedRowsByType = reactive<Record<OntologyPropertyType, OntologyRow | null>>({
-  DatatypeProperty: null,
-  ObjectProperty: null,
-  Class: null,
+  [RdfPropertyType.DatatypeProperty]: null,
+  [RdfPropertyType.ObjectProperty]: null,
+  [RdfPropertyType.Class]: null,
 });
 const firstByType = reactive<Record<OntologyPropertyType, number>>({
-  DatatypeProperty: 0,
-  ObjectProperty: 0,
-  Class: 0,
+  [RdfPropertyType.DatatypeProperty]: 0,
+  [RdfPropertyType.ObjectProperty]: 0,
+  [RdfPropertyType.Class]: 0,
 });
 const tableRefsByType = reactive<Record<OntologyPropertyType, any | null>>({
-  DatatypeProperty: null,
-  ObjectProperty: null,
-  Class: null,
+  [RdfPropertyType.DatatypeProperty]: null,
+  [RdfPropertyType.ObjectProperty]: null,
+  [RdfPropertyType.Class]: null,
 });
 
-const isPredicateMode = computed(() => props.sourceField === 'Predicate');
+const isPredicateMode = computed(() => props.sourceField === OntologySourceField.Predicate);
 const rowsByType = computed<Record<OntologyPropertyType, OntologyRow[]>>(() => ({
-  DatatypeProperty: props.rows.filter(row => row.propertyType === 'DatatypeProperty'),
-  ObjectProperty: props.rows.filter(row => row.propertyType === 'ObjectProperty'),
-  Class: props.rows.filter(row => row.propertyType === 'Class'),
+  [RdfPropertyType.DatatypeProperty]: props.rows.filter(
+    row => row.propertyType === RdfPropertyType.DatatypeProperty
+  ),
+  [RdfPropertyType.ObjectProperty]: props.rows.filter(
+    row => row.propertyType === RdfPropertyType.ObjectProperty
+  ),
+  [RdfPropertyType.Class]: props.rows.filter(row => row.propertyType === RdfPropertyType.Class),
 }));
 const filteredRowsByType = computed<Record<OntologyPropertyType, OntologyRow[]>>(() => ({
-  DatatypeProperty: filterRows(rowsByType.value.DatatypeProperty, tableSearch.value),
-  ObjectProperty: filterRows(rowsByType.value.ObjectProperty, tableSearch.value),
-  Class: filterRows(rowsByType.value.Class, tableSearch.value),
+  [RdfPropertyType.DatatypeProperty]: filterRows(
+    rowsByType.value[RdfPropertyType.DatatypeProperty],
+    tableSearch.value
+  ),
+  [RdfPropertyType.ObjectProperty]: filterRows(
+    rowsByType.value[RdfPropertyType.ObjectProperty],
+    tableSearch.value
+  ),
+  [RdfPropertyType.Class]: filterRows(rowsByType.value[RdfPropertyType.Class], tableSearch.value),
 }));
 
 const selectedRowIri = computed(() => {
@@ -174,7 +193,10 @@ watch(selectedRowIri, value => {
 watch(
   () => props.sourceField,
   sourceField => {
-    internalActiveTab.value = sourceField === 'Object' ? 'Class' : 'ObjectProperty';
+    internalActiveTab.value =
+      sourceField === OntologySourceField.Object
+        ? RdfPropertyType.Class
+        : RdfPropertyType.ObjectProperty;
     clearSelections();
     emit('preview-iri', '');
   },
@@ -209,23 +231,27 @@ watch(
 );
 
 function resetPaging() {
-  firstByType.DatatypeProperty = 0;
-  firstByType.ObjectProperty = 0;
-  firstByType.Class = 0;
+  firstByType[RdfPropertyType.DatatypeProperty] = 0;
+  firstByType[RdfPropertyType.ObjectProperty] = 0;
+  firstByType[RdfPropertyType.Class] = 0;
 }
 
 function clearSelections() {
-  selectedRowsByType.DatatypeProperty = null;
-  selectedRowsByType.ObjectProperty = null;
-  selectedRowsByType.Class = null;
+  selectedRowsByType[RdfPropertyType.DatatypeProperty] = null;
+  selectedRowsByType[RdfPropertyType.ObjectProperty] = null;
+  selectedRowsByType[RdfPropertyType.Class] = null;
 }
 
 function isOntologyPropertyType(value: string): value is OntologyPropertyType {
-  return value === 'DatatypeProperty' || value === 'ObjectProperty' || value === 'Class';
+  return (
+    value === RdfPropertyType.DatatypeProperty ||
+    value === RdfPropertyType.ObjectProperty ||
+    value === RdfPropertyType.Class
+  );
 }
 
 function isTabEnabled(propertyType: OntologyPropertyType): boolean {
-  if (propertyType === 'Class') return !isPredicateMode.value;
+  if (propertyType === RdfPropertyType.Class) return !isPredicateMode.value;
   return isPredicateMode.value;
 }
 

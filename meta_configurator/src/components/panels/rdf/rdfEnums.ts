@@ -68,3 +68,8 @@ export enum OntologyAccordionSection {
 export enum CustomQueryAccordionSection {
   Editor = 'editor',
 }
+
+export enum OntologySourceField {
+  Predicate = 'Predicate',
+  Object = 'Object',
+}

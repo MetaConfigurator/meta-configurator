@@ -60,7 +60,7 @@
             severity="contrast"
             variant="text"
             rounded
-            @click="openOntologyExplorer('Predicate')" />
+            @click="openOntologyExplorer(OntologySourceField.Predicate)" />
         </div>
       </div>
       <div>
@@ -112,7 +112,7 @@
             severity="contrast"
             variant="text"
             rounded
-            @click="openOntologyExplorer('Object')" />
+            @click="openOntologyExplorer(OntologySourceField.Object)" />
         </div>
       </div>
     </div>
@@ -158,6 +158,7 @@ import {
   validateLiteralBeforeSave,
 } from '@/components/panels/rdf/tripleLiteralValidationService';
 import RdfOntologyExplorer from '@/components/panels/rdf/ontology-explorer/RdfOntologyExplorer.vue';
+import {OntologySourceField} from '@/components/panels/rdf/rdfEnums';
 
 const props = withDefaults(
   defineProps<{
@@ -176,7 +177,7 @@ const emit = defineEmits<{
 const visible = ref(false);
 const useCustomDatatype = ref(false);
 const ontologyExplorerDialog = ref(false);
-const ontologyExplorerTarget = ref<'Predicate' | 'Object'>('Predicate');
+const ontologyExplorerTarget = ref<OntologySourceField>(OntologySourceField.Predicate);
 const ontologyExplorerInitialIri = ref('');
 
 const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
@@ -241,10 +242,10 @@ const ontologyExplorerDialogTitle = computed(
   () => `Ontology Explorer (${ontologyExplorerTarget.value})`
 );
 
-function openOntologyExplorer(target: 'Predicate' | 'Object') {
+function openOntologyExplorer(target: OntologySourceField) {
   ontologyExplorerTarget.value = target;
   ontologyExplorerInitialIri.value =
-    target === 'Predicate'
+    target === OntologySourceField.Predicate
       ? (localTriple.value.predicate ?? '').trim()
       : localTriple.value.objectType === RdfTermType.NamedNode
       ? (localTriple.value.object ?? '').trim()
@@ -253,7 +254,7 @@ function openOntologyExplorer(target: 'Predicate' | 'Object') {
 }
 
 function applyOntologySelection(iri: string) {
-  if (ontologyExplorerTarget.value === 'Predicate') {
+  if (ontologyExplorerTarget.value === OntologySourceField.Predicate) {
     localTriple.value.predicate = iri;
   } else {
     localTriple.value.objectType = RdfTermType.NamedNode;
