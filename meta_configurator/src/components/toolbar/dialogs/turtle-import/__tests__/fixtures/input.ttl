@@ -1,0 +1,20 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix m4i: <http://w3id.org/nfdi4ing/metadata4ing#>.
+@prefix unit: <http://qudt.org/vocab/unit/>.
+@prefix local: <https://www.example.org/>.
+@prefix schema: <https://schema.org/>.
+
+local:run_fenics_simulation
+    a m4i:Method;
+    m4i:hasParameter local:variable_element_size;
+    m4i:investigates local:variable_max_von_mises_stress.
+local:variable_element_size
+    a schema:PropertyValue;
+    rdfs:label "element_size";
+    schema:unitCode unit:M;
+    schema:value 2.5E-2 .
+local:variable_max_von_mises_stress
+    a schema:PropertyValue;
+    rdfs:label "max_von_mises_stress";
+    schema:unitCode unit:MegaPA;
+    schema:value 2.997915075586333E8 .
