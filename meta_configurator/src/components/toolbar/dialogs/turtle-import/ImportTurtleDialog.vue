@@ -27,34 +27,34 @@ function requestUploadFile() {
   requestUploadFileToRef(currentUserDataString);
 }
 
-watch(
-  () => currentUserDataString.value,
-  async (newValue, _) => {
-    if (!newValue) return;
-    isLoading.value = true;
-    try {
-      const jsonldResult = await turtleToJsonLD(newValue);
-      useCurrentData().setData(jsonldResult);
-      toastService.add({
-        severity: 'info',
-        summary: 'Successfull',
-        detail: 'Conversion finished.',
-        life: 3000,
-      });
-    } catch (error) {
-      toastService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error,
-        life: 10000,
-      });
-    } finally {
-      isLoading.value = false;
-      hideDialog();
-      currentUserDataString.value = '';
-    }
+async function importTurtleData(turtle: string): Promise<void> {
+  isLoading.value = true;
+  try {
+    const jsonldResult = await turtleToJsonLD(turtle);
+    useCurrentData().setData(jsonldResult);
+    toastService.add({
+      severity: 'info',
+      summary: 'Successful',
+      detail: 'Conversion finished.',
+      life: 3000,
+    });
+  } catch (error) {
+    toastService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error,
+      life: 10000,
+    });
+  } finally {
+    isLoading.value = false;
+    hideDialog();
+    currentUserDataString.value = '';
   }
-);
+}
+
+watch(currentUserDataString, newValue => {
+  if (newValue) importTurtleData(newValue);
+});
 
 defineExpose({show: openDialog, close: hideDialog});
 </script>
