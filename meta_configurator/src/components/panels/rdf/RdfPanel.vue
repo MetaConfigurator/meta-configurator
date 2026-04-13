@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import {ref, watch, computed} from 'vue';
 import Message from 'primevue/message';
-import RdfTabPanel from '@/components/panels/rdf/RdfTabPanel.vue';
+import RdfTabPanel from '@/components/panels/rdf/rdf-authoring/RdfTabPanel.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 import ImportTurtleDialog from '@/components/toolbar/dialogs/turtle-import/ImportTurtleDialog.vue';

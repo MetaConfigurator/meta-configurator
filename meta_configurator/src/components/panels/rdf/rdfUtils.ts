@@ -15,6 +15,11 @@ export enum RdfTermType {
   NamedNode = 'NamedNode',
   BlankNode = 'BlankNode',
   Literal = 'Literal',
+  Variable = 'Variable',
+  DefaultGraph = 'DefaultGraph',
+  Quad = 'Quad',
+  Collection = 'Collection',
+  Empty = 'Empty',
 }
 
 export type RdfTermTypeString = `${RdfTermType}`;

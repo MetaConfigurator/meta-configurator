@@ -34,8 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import RdfTripleTab from '@/components/panels/rdf/RdfTripleTab.vue';
-import RdfContextTab from '@/components/panels/rdf/RdfContextTab.vue';
+import RdfTripleTab from '@/components/panels/rdf/rdf-authoring/RdfTripleTab.vue';
+import RdfContextTab from '@/components/panels/rdf/rdf-authoring/RdfContextTab.vue';
 import ScrollPanel from 'primevue/scrollpanel';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';

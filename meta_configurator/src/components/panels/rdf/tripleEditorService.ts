@@ -25,12 +25,10 @@ const OK: TripleEditorResult = {success: true};
 export class TripleEditorService {
   static addOrEdit(dto: TripleTransferObject): TripleEditorResult {
     const subjectNode = createNode(dto.subject, dto.subjectType);
-    if (subjectNode.termType === RdfTermType.Literal)
-      return {success: false, errorMessage: 'Subject cannot be a Literal.'};
 
     const predicateNode = createNode(dto.predicate, dto.predicateType);
-    if (predicateNode.termType === RdfTermType.Literal)
-      return {success: false, errorMessage: 'Predicate cannot be a Literal.'};
+    if (predicateNode.termType !== RdfTermType.NamedNode)
+      return {success: false, errorMessage: 'Predicate must be a Named Node.'};
 
     const objectNode = createNode(dto.object, dto.objectType, dto.objectDatatype);
     const newStatement = $rdf.st(

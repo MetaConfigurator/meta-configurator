@@ -34,7 +34,9 @@
               v-model.trim="localTriple.subject"
               required
               class="flex-1 min-w-[260px]"
-              :disabled="props.disableSubject" />
+              :disabled="
+                props.disableSubject || localTriple.subjectType === RdfTermType.BlankNode
+              " />
           </template>
         </div>
       </div>
@@ -93,11 +95,12 @@
               placeholder="Datatype IRI or prefix"
               class="flex-1 min-w-[200px]" />
           </template>
-          <template v-if="localTriple.objectType === RdfTermType.NamedNode">
+          <template v-if="localTriple.objectType !== RdfTermType.Literal">
             <Select
               v-model="localTriple.object"
               :options="filteredObjectNodes"
               editable
+              :disabled="localTriple.objectType === RdfTermType.BlankNode"
               optionLabel="label"
               optionValue="value"
               placeholder="Select or type IRI"
@@ -117,12 +120,24 @@
       </div>
     </div>
     <template #footer>
-      <div class="flex justify-end gap-2 pt-3">
-        <Button label="Cancel" severity="secondary" @click="visible = false" />
-        <Button label="Save" @click="saveTriple" />
+      <div class="flex items-center gap-2 pt-3 w-full">
+        <Button
+          v-if="showBlankNodeHint"
+          label="Blank Node Handling"
+          icon="pi pi-question-circle"
+          severity="secondary"
+          variant="text"
+          @click="helpDialogVisible = true" />
+        <div class="flex gap-2 ml-auto">
+          <Button label="Cancel" severity="secondary" @click="visible = false" />
+          <Button label="Save" @click="saveTriple" />
+        </div>
       </div>
     </template>
   </Dialog>
+  <RdfTripleDetailHelpDialog
+    :visible="helpDialogVisible"
+    @update:visible="helpDialogVisible = $event" />
   <Dialog
     v-model:visible="ontologyExplorerDialog"
     :header="ontologyExplorerDialogTitle"
@@ -159,6 +174,7 @@ import {
 } from '@/components/panels/rdf/tripleLiteralValidationService';
 import RdfOntologyExplorer from '@/components/panels/rdf/ontology-explorer/RdfOntologyExplorer.vue';
 import {OntologySourceField} from '@/components/panels/rdf/rdfEnums';
+import RdfTripleDetailHelpDialog from '@/components/panels/rdf/rdf-authoring/RdfTripleDetailHelpDialog.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -175,18 +191,21 @@ const emit = defineEmits<{
 }>();
 
 const visible = ref(false);
+const helpDialogVisible = ref(false);
 const useCustomDatatype = ref(false);
 const ontologyExplorerDialog = ref(false);
 const ontologyExplorerTarget = ref<OntologySourceField>(OntologySourceField.Predicate);
 const ontologyExplorerInitialIri = ref('');
-
-const subjectTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
+const subjectTypeOptions = [
+  {label: 'Named Node', value: RdfTermType.NamedNode},
+  {label: 'Blank Node', value: RdfTermType.BlankNode},
+];
 const predicateTypeOptions = [{label: 'Named Node', value: RdfTermType.NamedNode}];
 const objectTypeOptions = [
   {label: 'Named Node', value: RdfTermType.NamedNode},
+  {label: 'Blank Node', value: RdfTermType.BlankNode},
   {label: 'Literal', value: RdfTermType.Literal},
 ];
-
 const localTriple = ref<TripleTransferObject>({...props.triple});
 
 watch(
@@ -237,6 +256,12 @@ const filteredObjectNodes = computed(() => {
 const filteredPredicateNodes = computed(() => {
   return filterByQuery(predicates.value, localTriple.value.predicate);
 });
+
+const showBlankNodeHint = computed(
+  () =>
+    localTriple.value.subjectType === RdfTermType.BlankNode ||
+    localTriple.value.objectType === RdfTermType.BlankNode
+);
 
 const ontologyExplorerDialogTitle = computed(
   () => `Ontology Explorer (${ontologyExplorerTarget.value})`
@@ -293,10 +318,12 @@ function open() {
   localTriple.value = {...props.triple, objectDatatype: props.triple.objectDatatype ?? ''};
   useCustomDatatype.value =
     Boolean(props.triple.objectDatatype) && !isCommonDatatype(props.triple.objectDatatype ?? '');
+  helpDialogVisible.value = false;
   visible.value = true;
 }
 
 function close() {
+  helpDialogVisible.value = false;
   visible.value = false;
 }
 

@@ -81,8 +81,8 @@
       </template>
     </Column>
   </DataTable>
-  <TripleDetailsDialog
-    ref="tripleDetailsDialog"
+  <RdfTripleDetail
+    ref="rdfTripleDetail"
     :triple="triple"
     :disableSubject="disableSubject"
     @saved="handleTripleSaved" />
@@ -125,7 +125,7 @@
       :dataIsUnparsable="props.dataIsUnparsable"
       :dataIsInJsonLd="props.dataIsInJsonLd"
       @cancel-render="closeVisualizer"
-      @edit-triple="openTripleEditorFromVisualizer"
+      @edit-triple="openTripleEditor"
       @add-node="openNewNodeFromVisualizer" />
   </Dialog>
 </template>
@@ -158,10 +158,10 @@ import {
   TripleEditorService,
   type TripleTransferObject,
 } from '@/components/panels/rdf/tripleEditorService';
-import TripleDetailsDialog from '@/components/panels/rdf/TripleDetailsDialog.vue';
-import RdfTripleToolbar from '@/components/panels/rdf/RdfTripleToolbar.vue';
+import RdfTripleDetail from '@/components/panels/rdf/rdf-authoring/RdfTripleDetail.vue';
+import RdfTripleToolbar from '@/components/panels/rdf/rdf-authoring/RdfTripleToolbar.vue';
 import {useSettings} from '@/settings/useSettings';
-import {RdfMediaType} from './rdfEnums';
+import {RdfMediaType} from '../rdfEnums';
 
 const settings = useSettings();
 const groupBySubject = computed(() => settings.value.rdf.groupBySubject);
@@ -186,7 +186,7 @@ const visualizerDialog = ref(false);
 const visualizerRef = ref<InstanceType<typeof RdfVisualizer> | null>(null);
 
 const loading = ref(false);
-const tripleDetailsDialog = ref<InstanceType<typeof TripleDetailsDialog> | null>(null);
+const rdfTripleDetail = ref<InstanceType<typeof RdfTripleDetail> | null>(null);
 const disableSubject = ref(false);
 const isUserSelection = ref(false);
 const selectedTriple = ref();
@@ -345,7 +345,7 @@ const openNewDialog = () => {
     statement: undefined,
   };
   disableSubject.value = false;
-  tripleDetailsDialog.value?.open();
+  rdfTripleDetail.value?.open();
 };
 
 const openNewNodeFromVisualizer = () => {
@@ -368,10 +368,10 @@ const openEditDialog = () => {
   };
 
   disableSubject.value = false;
-  tripleDetailsDialog.value?.open();
+  rdfTripleDetail.value?.open();
 };
 
-function openTripleEditorFromVisualizer(payload: TripleTransferObject) {
+function openTripleEditor(payload: TripleTransferObject) {
   if (payload.statement) {
     const st = payload.statement;
     triple.value = {
@@ -399,7 +399,7 @@ function openTripleEditorFromVisualizer(payload: TripleTransferObject) {
     };
     disableSubject.value = true;
   }
-  tripleDetailsDialog.value?.open();
+  rdfTripleDetail.value?.open();
 }
 
 function handleTripleSaved(payload: {action: RdfChangeType; triple: TripleTransferObject}) {
