@@ -1,16 +1,12 @@
+import {RdfPropertyType} from '@/components/panels/rdf/rdfEnums';
+
 export const RDF_CACHE_DB_NAME = 'rdf_ontology_cache_db';
 export const RDF_CACHE_DB_VERSION = 5;
 export const RDF_CACHE_STORE = 'rdf_cache';
 
 type RdfStoreName = typeof RDF_CACHE_STORE;
 
-export type OntologyPropertyType = 'DatatypeProperty' | 'ObjectProperty' | 'Class';
-
-const VALID_PROPERTY_TYPES = new Set<OntologyPropertyType>([
-  'DatatypeProperty',
-  'ObjectProperty',
-  'Class',
-]);
+export type OntologyPropertyType = `${RdfPropertyType}`;
 
 export type RdfOntologyRow = {
   about: string;
@@ -38,6 +34,21 @@ export type RdfCachedContext = {
   rawContent: string;
   fetchedAt: string;
 };
+
+const VALID_PROPERTY_TYPES = new Set<OntologyPropertyType>([
+  RdfPropertyType.DatatypeProperty,
+  RdfPropertyType.ObjectProperty,
+  RdfPropertyType.Class,
+]);
+
+function toString(value: unknown, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+function toOptionalString(value: unknown): string | undefined {
+  const s = toString(value);
+  return s || undefined;
+}
 
 let rdfCacheDbPromise: Promise<IDBDatabase> | null = null;
 
@@ -87,17 +98,15 @@ export async function getFromRdfStore<T>(
   });
 }
 
-export async function getAllFromRdfStore<T>(storeName: RdfStoreName): Promise<T[]> {
-  const db = await openRdfCacheDb();
-  return new Promise((resolve, reject) => {
-    const request = db.transaction(storeName, 'readonly').objectStore(storeName).getAll();
-    request.onsuccess = () => resolve((request.result ?? []) as T[]);
-    request.onerror = () =>
-      reject(new Error(request.error?.message ?? `Failed to read all from "${storeName}".`));
-  });
+export async function putInRdfStore<T>(storeName: RdfStoreName, value: T): Promise<void> {
+  await runTransaction(storeName, store => store.put(value), 'Failed to write to');
 }
 
-async function runRwTransaction(
+export async function deleteFromRdfStore(storeName: RdfStoreName, key: IDBValidKey): Promise<void> {
+  await runTransaction(storeName, store => store.delete(key), 'Failed to delete from');
+}
+
+async function runTransaction(
   storeName: RdfStoreName,
   operation: (store: IDBObjectStore) => void,
   errorPrefix: string
@@ -113,29 +122,17 @@ async function runRwTransaction(
   });
 }
 
-export async function putInRdfStore<T>(storeName: RdfStoreName, value: T): Promise<void> {
-  await runRwTransaction(storeName, store => store.put(value), 'Failed to write to');
-}
-
-export async function deleteFromRdfStore(storeName: RdfStoreName, key: IDBValidKey): Promise<void> {
-  await runRwTransaction(storeName, store => store.delete(key), 'Failed to delete from');
-}
-
 export function getRdfCacheKey(rawKey: string): string {
   return String(rawKey ?? '').trim();
 }
 
-function str(value: unknown, fallback = ''): string {
-  return typeof value === 'string' ? value : fallback;
-}
-
 function normalizeOntologyRow(row: Partial<RdfOntologyRow>): RdfOntologyRow {
   return {
-    about: String(row?.about ?? ''),
-    comment: String(row?.comment ?? ''),
+    about: toString(row?.about),
+    comment: toString(row?.comment),
     propertyType: VALID_PROPERTY_TYPES.has(row?.propertyType as OntologyPropertyType)
       ? (row.propertyType as OntologyPropertyType)
-      : 'ObjectProperty',
+      : RdfPropertyType.ObjectProperty,
   };
 }
 
@@ -144,23 +141,23 @@ export function normalizeOntologyCacheEntry(
 ): RdfCachedOntology | null {
   if (!value) return null;
 
-  const ontologyIri = getRdfCacheKey(str(value.ontologyIri));
+  const ontologyIri = getRdfCacheKey(toString(value.ontologyIri));
   if (!ontologyIri) return null;
 
   return {
-    key: getRdfCacheKey(str(value.key, ontologyIri)),
+    key: getRdfCacheKey(toString(value.key, ontologyIri)),
     ontologyIri,
-    url: str(value.url),
-    rawContent: str(value.rawContent),
-    format: str(value.format) || undefined,
-    contentType: str(value.contentType) || undefined,
-    fetchedAt: str(value.fetchedAt),
-    mergedGraphNTriples: str(value.mergedGraphNTriples) || undefined,
+    url: toString(value.url),
+    rawContent: toString(value.rawContent),
+    format: toOptionalString(value.format),
+    contentType: toOptionalString(value.contentType),
+    fetchedAt: toString(value.fetchedAt),
+    mergedGraphNTriples: toOptionalString(value.mergedGraphNTriples),
     ontologyQueryResults: Array.isArray(value.ontologyQueryResults)
       ? value.ontologyQueryResults.map(normalizeOntologyRow)
       : undefined,
-    queryResultsFetchedAt: str(value.queryResultsFetchedAt) || undefined,
-    lastSparqlQuery: str(value.lastSparqlQuery) || undefined,
+    queryResultsFetchedAt: toOptionalString(value.queryResultsFetchedAt),
+    lastSparqlQuery: toOptionalString(value.lastSparqlQuery),
   };
 }
 
@@ -187,30 +184,4 @@ export async function putOntologyInRdfCache(entry: Partial<RdfCachedOntology>): 
 export async function deleteOntologyFromRdfCache(ontologyIri: string): Promise<void> {
   const key = getRdfCacheKey(ontologyIri);
   if (key) await deleteFromRdfStore(RDF_CACHE_STORE, key);
-}
-
-export async function getContextFromRdfCache(url: string): Promise<RdfCachedContext | null> {
-  const key = getRdfCacheKey(url);
-  if (!key) return null;
-  const result = await getFromRdfStore<Partial<RdfCachedContext>>(RDF_CACHE_STORE, key);
-  if (!result) return null;
-
-  return {
-    key,
-    url: str(result.url, key),
-    rawContent: str(result.rawContent),
-    fetchedAt: str(result.fetchedAt),
-  };
-}
-
-export async function putContextInRdfCache(entry: Partial<RdfCachedContext>): Promise<void> {
-  const key = getRdfCacheKey(str(entry.url ?? entry.key ?? ''));
-  if (!key) throw new Error('Failed to cache context: missing context URL key.');
-
-  await putInRdfStore<RdfCachedContext>(RDF_CACHE_STORE, {
-    key,
-    url: key,
-    rawContent: str(entry.rawContent),
-    fetchedAt: str(entry.fetchedAt) || new Date().toISOString(),
-  });
 }
