@@ -80,6 +80,50 @@ describe('tests for more difficult scenarios and special cases that result as a 
     expect(graph.edges.length).toBe(2); // one edge from the root node to the array entry node and one edge from the array entry node to the enum node
   });
 
+  it('$defs node with both $ref and properties should have edge from that node to the referenced schema', () => {
+    const schema: TopLevelSchema = {
+      type: 'object',
+      $defs: {
+        Quantity: {
+          type: 'object',
+          properties: {
+            Value: {type: 'number'},
+            Unit: {type: 'string'},
+          },
+        },
+        Time: {
+          title: 'Time',
+          $ref: '#/$defs/Quantity',
+          properties: {
+            Value: {minimum: 0, type: 'number'},
+            Unit: {type: 'string'},
+          },
+          required: ['Unit', 'Value'],
+        },
+      },
+      properties: {
+        duration: {$ref: '#/$defs/Time'},
+      },
+    };
+
+    const defs = identifyAllObjects(schema);
+    const graph = new SchemaGraph([], []);
+    populateGraph(defs, graph);
+    trimGraph(graph);
+
+    const timeNode = graph.nodes.find(n => n.name === 'Time');
+    expect(timeNode).toBeDefined();
+
+    const quantityNode = graph.nodes.find(n => n.name === 'Quantity');
+    expect(quantityNode).toBeDefined();
+
+    // Time node must have an edge pointing to Quantity (via its $ref)
+    const edgeTimeToQuantity = graph.edges.find(
+      e => e.start === timeNode && e.end === quantityNode
+    );
+    expect(edgeTimeToQuantity).toBeDefined();
+  });
+
   it('object property has a reference but also defines its own things and both nodes (referenced sub-schema and own definition of sub-schema) should be connected with an edge', () => {
     let schema: TopLevelSchema = {
       $defs: {
