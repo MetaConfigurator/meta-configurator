@@ -118,7 +118,9 @@ describe('tests for more difficult scenarios and special cases that result as a 
     expect(quantityNode).toBeDefined();
 
     // Time node must have an edge pointing to Quantity (via its $ref)
-    const edgeTimeToQuantity = graph.edges.find(e => e.start === timeNode && e.end === quantityNode);
+    const edgeTimeToQuantity = graph.edges.find(
+      e => e.start === timeNode && e.end === quantityNode
+    );
     expect(edgeTimeToQuantity).toBeDefined();
   });
 
