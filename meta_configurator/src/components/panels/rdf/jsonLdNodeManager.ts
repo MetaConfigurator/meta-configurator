@@ -4,6 +4,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
+import {RdfMediaType} from '@/components/panels/rdf/rdfEnums';
 
 export interface JsonLdDoc {
   '@context': any;
@@ -31,7 +32,7 @@ export const jsonLdNodeManager: JsonLdNodeManagerStore = (() => {
   const data = getDataForMode(SessionMode.DataEditor);
 
   const rebuildFromStore = (): void => {
-    const {content} = rdfStoreManager.exportAs('application/ld+json');
+    const {content} = rdfStoreManager.exportAs(RdfMediaType.JsonLd);
     const parsed = JSON.parse(content);
     data.setData(normalizeJsonLdRoot(parsed));
   };

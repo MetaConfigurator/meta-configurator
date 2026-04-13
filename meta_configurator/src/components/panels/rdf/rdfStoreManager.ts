@@ -2,12 +2,12 @@ import {readonly, ref, computed, watch, type Ref} from 'vue';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import * as $rdf from 'rdflib';
+import jsonld from 'jsonld';
 import type {Path} from '@/utility/path';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
 import {useSettings} from '@/settings/useSettings';
 import {RdfChangeType, RdfTermType} from '@/components/panels/rdf/rdfUtils';
-
-const settings = useSettings();
+import {RdfMediaType} from '@/components/panels/rdf/rdfEnums';
 
 export type RdfChange = {
   type: RdfChangeType;
@@ -47,121 +47,150 @@ interface RdfStore {
   getStatementsBySubject: (subjectId: string) => $rdf.Statement[];
 }
 
+const settings = useSettings();
+const jsonLdContextCache: Record<string, any> = {};
+let isJsonLdDocumentLoaderConfigured = false;
+
+function configureJsonLdDocumentLoaderCache() {
+  if (isJsonLdDocumentLoaderConfigured) return;
+
+  const {documentLoaders} = jsonld as any;
+  const createBaseLoader = documentLoaders?.node ?? documentLoaders?.xhr ?? null;
+
+  if (!createBaseLoader) return;
+
+  const baseLoader = createBaseLoader();
+  (jsonld as any).documentLoader = async (url: string, options?: any) => {
+    if (!jsonLdContextCache[url]) {
+      jsonLdContextCache[url] = await baseLoader(url, options);
+    }
+    return jsonLdContextCache[url];
+  };
+
+  isJsonLdDocumentLoaderConfigured = true;
+}
+
 export const rdfStoreManager: RdfStore & {
   onChange: (cb: RdfChangeCallback) => () => void;
 } = (() => {
-  const _jsonLdText = ref<string>('');
-  const _jsonObject = ref<any>(null);
-  const _callbacks = new Set<RdfChangeCallback>();
   const _store = ref<$rdf.IndexedFormula | null>(null);
   const _statements = ref<$rdf.Statement[]>([]);
   const _parseErrors = ref<string[]>([]);
   const _parseWarnings = ref<string[]>([]);
+  const _callbacks = new Set<RdfChangeCallback>();
 
-  const namespaces = computed<Record<string, string>>(() => {
-    if (!_store.value) return {};
-    return {..._store.value.namespaces};
-  });
+  const namespaces = computed<Record<string, string>>(() =>
+    _store.value ? {..._store.value.namespaces} : {}
+  );
 
-  const clearStore = () => {
+  function notify(change: RdfChange) {
+    _callbacks.forEach(cb => cb(change));
+  }
+
+  function clearStore() {
     _store.value = $rdf.graph();
-  };
+  }
 
-  const applyContextPrefixes = async (parsed: any) => {
-    if (!parsed['@context']) return;
+  function updateStatements() {
+    _parseWarnings.value = [];
+    const all = [..._store.value!.statements];
+    const max = settings.value.rdf.maximumTriplesToShow;
 
-    const ctx = parsed['@context'];
-    if (Array.isArray(ctx)) {
-      for (const part of ctx) {
-        await applyContextPrefixes({['@context']: part});
+    if (all.length > max) {
+      _statements.value = all.slice(0, max);
+      _parseWarnings.value = [
+        `The number of triples (${all.length}) exceeds the maximum limit (${max}). ` +
+          `Only the first ${max} triples are shown. You can adjust this limit in the settings.`,
+      ];
+    } else {
+      _statements.value = all;
+    }
+  }
+
+  async function applyContextPrefixes(parsed: any) {
+    const ctx = parsed?.['@context'];
+    if (!ctx) return;
+
+    const contexts = Array.isArray(ctx) ? ctx : [ctx];
+
+    for (const part of contexts) {
+      if (!part || typeof part !== 'object') continue;
+      for (const [prefix, ns] of Object.entries(part)) {
+        if (typeof ns === 'string') {
+          _store.value!.setPrefixForURI(prefix, ns);
+        }
       }
-      return;
     }
+  }
 
-    if (!ctx || typeof ctx !== 'object') {
-      return;
-    }
+  async function parseRdfText(jsonLdText: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      $rdf.parse(
+        jsonLdText,
+        _store.value as $rdf.Formula,
+        settings.value.rdf.baseUri,
+        RdfMediaType.JsonLd,
+        err => (err ? reject(err) : resolve())
+      );
+    });
+  }
 
-    for (const [prefix, ns] of Object.entries(ctx)) {
-      if (typeof ns === 'string') {
-        _store.value!.setPrefixForURI(prefix, ns);
-      }
-    }
-  };
-
-  const parseJsonLdIntoStore = async (jsonLdText: string) => {
+  async function parseJsonLdIntoStore(jsonLdText: string) {
     _parseErrors.value = [];
+    configureJsonLdDocumentLoaderCache();
+
     try {
-      await new Promise<void>((resolve, reject) => {
-        $rdf.parse(
-          jsonLdText,
-          _store.value as $rdf.Formula,
-          settings.value.rdf.baseUri,
-          'application/ld+json',
-          err => {
-            if (err) {
-              const msg = err.message || String(err);
-              _parseErrors.value.push(msg);
-              reject(err);
-            } else {
-              resolve();
-            }
-          }
-        );
-      });
+      await parseRdfText(jsonLdText);
     } catch (error: any) {
-      const msg = error?.message || String(error);
+      const msg = error?.message ?? String(error);
       if (!_parseErrors.value.includes(msg)) {
         _parseErrors.value.push(msg);
       }
     }
-  };
+  }
 
-  const updateStatements = () => {
-    _parseWarnings.value = [];
-    const all = [..._store.value!.statements];
-    const max = settings.value.rdf.maximumTriplesToShow;
-    _statements.value = all.length > max ? all.slice(0, max) : all;
-    if (all.length > max) {
-      _parseWarnings.value = [
-        `The number of triples (${all.length}) exceeds the maximum limit (${max}). Only the first ${max} triples are shown.
-        You can adjust this limit in the settings.`,
-      ];
-    }
-  };
+  function editStatement(
+    oldStatement: $rdf.Statement,
+    newStatement: $rdf.Statement
+  ): {success: boolean; errorMessage: string} {
+    if (!_store.value) return {success: false, errorMessage: 'Store is not initialized.'};
 
-  const deleteStatement = (statement: $rdf.Statement): {success: boolean; errorMessage: string} => {
-    if (!_store.value) {
-      return {success: false, errorMessage: 'Store is not initialized.'};
+    try {
+      _store.value.removeStatement(oldStatement);
+      _store.value.add(newStatement);
+      updateStatements();
+      notify({type: RdfChangeType.Edit, oldStatement, newStatement});
+      return {success: true, errorMessage: ''};
+    } catch (error: any) {
+      return {success: false, errorMessage: error.message ?? 'Unknown error occurred.'};
     }
-    if (!statement) {
-      return {success: false, errorMessage: 'No statement provided.'};
-    }
+  }
+
+  function deleteStatement(statement: $rdf.Statement): {success: boolean; errorMessage: string} {
+    if (!_store.value) return {success: false, errorMessage: 'Store is not initialized.'};
+    if (!statement) return {success: false, errorMessage: 'No statement provided.'};
 
     try {
       _store.value.removeStatement(statement);
       updateStatements();
-      _callbacks.forEach(cb => cb({type: RdfChangeType.Delete, oldStatement: statement}));
+      notify({type: RdfChangeType.Delete, oldStatement: statement});
       return {success: true, errorMessage: ''};
     } catch (error: any) {
-      return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
+      return {success: false, errorMessage: error.message ?? 'Unknown error occurred.'};
     }
-  };
+  }
 
-  const deleteStatementsBySubject = (
-    subjectId: string
-  ): {success: boolean; errorMessage: string; deleted: $rdf.Statement[]} => {
-    if (!_store.value) {
+  function deleteStatementsBySubject(subjectId: string): {
+    success: boolean;
+    errorMessage: string;
+    deleted: $rdf.Statement[];
+  } {
+    if (!_store.value)
       return {success: false, errorMessage: 'Store is not initialized.', deleted: []};
-    }
-    if (!subjectId) {
-      return {success: false, errorMessage: 'No subject provided.', deleted: []};
-    }
+    if (!subjectId) return {success: false, errorMessage: 'No subject provided.', deleted: []};
 
     const toDelete = _store.value.statements.filter(st => st.subject.value === subjectId);
-    if (toDelete.length === 0) {
-      return {success: true, errorMessage: '', deleted: []};
-    }
+    if (toDelete.length === 0) return {success: true, errorMessage: '', deleted: []};
 
     try {
       for (const st of toDelete) {
@@ -169,81 +198,49 @@ export const rdfStoreManager: RdfStore & {
       }
       updateStatements();
       for (const st of toDelete) {
-        _callbacks.forEach(cb => cb({type: RdfChangeType.Delete, oldStatement: st}));
+        notify({type: RdfChangeType.Delete, oldStatement: st});
       }
       return {success: true, errorMessage: '', deleted: toDelete};
     } catch (error: any) {
       return {
         success: false,
-        errorMessage: error.message || 'Unknown error occurred.',
+        errorMessage: error.message ?? 'Unknown error occurred.',
         deleted: [],
       };
     }
-  };
+  }
 
-  const editStatement = (
-    oldStatement: $rdf.Statement,
-    newStatement: $rdf.Statement
-  ): {success: boolean; errorMessage: string} => {
-    if (!_store.value) {
-      return {success: false, errorMessage: 'Store is not initialized.'};
-    }
-
-    try {
-      _store.value.removeStatement(oldStatement);
-      _store.value.add(newStatement);
-      updateStatements();
-      _callbacks.forEach(cb => cb({type: RdfChangeType.Edit, oldStatement, newStatement}));
-      return {success: true, errorMessage: ''};
-    } catch (error: any) {
-      return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
-    }
-  };
-
-  const addStatement = (
+  function addStatement(
     statement: $rdf.Statement,
     isNewNode: boolean
-  ): {success: boolean; errorMessage: string} => {
-    if (!_store.value) {
-      return {success: false, errorMessage: 'Store is not initialized.'};
-    }
-    if (!statement) {
-      return {success: false, errorMessage: 'No statement provided.'};
+  ): {success: boolean; errorMessage: string} {
+    if (!_store.value) return {success: false, errorMessage: 'Store is not initialized.'};
+    if (!statement) return {success: false, errorMessage: 'No statement provided.'};
+
+    if (isNewNode && containsSubject(statement)) {
+      return {success: false, errorMessage: 'Subject already exists in the store.'};
     }
 
-    if (isNewNode) {
-      if (containsSubject(statement)) {
-        return {success: false, errorMessage: 'Subject already exists in the store.'};
-      }
-    }
     try {
       _store.value.add(statement);
       updateStatements();
-      _callbacks.forEach(cb => cb({type: RdfChangeType.Add, newStatement: statement}));
+      notify({type: RdfChangeType.Add, newStatement: statement});
       return {success: true, errorMessage: ''};
     } catch (error: any) {
-      return {success: false, errorMessage: error.message || 'Unknown error occurred.'};
+      return {success: false, errorMessage: error.message ?? 'Unknown error occurred.'};
     }
-  };
+  }
 
-  const renameSubjectNode = (
+  function renameSubjectNode(
     oldId: string,
     newId: string
-  ): {success: boolean; errorMessage: string} => {
-    if (!_store.value) {
-      return {success: false, errorMessage: 'Store is not initialized.'};
-    }
-    if (!oldId || !newId) {
-      return {success: false, errorMessage: 'Invalid node IRI.'};
-    }
-    if (oldId === newId) {
-      return {success: true, errorMessage: ''};
-    }
+  ): {success: boolean; errorMessage: string} {
+    if (!_store.value) return {success: false, errorMessage: 'Store is not initialized.'};
+    if (!oldId || !newId) return {success: false, errorMessage: 'Invalid node IRI.'};
+    if (oldId === newId) return {success: true, errorMessage: ''};
 
     const hasConflict = _store.value.statements.some(st => st.subject.value === newId);
-    if (hasConflict) {
-      return {success: false, errorMessage: 'A node with this IRI already exists.'};
-    }
+    if (hasConflict) return {success: false, errorMessage: 'A node with this IRI already exists.'};
 
     const affected = _store.value.statements.filter(
       st =>
@@ -251,15 +248,11 @@ export const rdfStoreManager: RdfStore & {
         (st.object.termType === RdfTermType.NamedNode && st.object.value === oldId)
     );
 
-    if (affected.length === 0) {
-      return {success: true, errorMessage: ''};
-    }
+    if (affected.length === 0) return {success: true, errorMessage: ''};
 
     for (const st of affected) {
       const delResult = deleteStatement(st);
-      if (!delResult.success) {
-        return delResult;
-      }
+      if (!delResult.success) return delResult;
     }
 
     for (const st of affected) {
@@ -268,129 +261,104 @@ export const rdfStoreManager: RdfStore & {
         st.object.termType === RdfTermType.NamedNode && st.object.value === oldId
           ? $rdf.sym(newId)
           : st.object;
-      const newStatement = $rdf.st(subject, st.predicate, object, st.graph);
-      const addResult = addStatement(newStatement, false);
-      if (!addResult.success) {
-        return addResult;
-      }
+      const addResult = addStatement($rdf.st(subject, st.predicate, object, st.graph), false);
+      if (!addResult.success) return addResult;
     }
 
     return {success: true, errorMessage: ''};
-  };
+  }
 
-  const exportAs = (
+  function buildTempStore(statements: $rdf.Statement[]): $rdf.IndexedFormula {
+    const tempStore = $rdf.graph();
+    const namespaces = _store.value?.namespaces ?? {};
+    for (const [prefix, iri] of Object.entries(namespaces)) {
+      tempStore.setPrefixForURI(prefix, iri);
+    }
+    statements.forEach(st => tempStore.add(st));
+    return tempStore;
+  }
+
+  function serializeStore(store: $rdf.IndexedFormula, format: string): string | undefined {
+    return $rdf.serialize(null, store as $rdf.Formula, settings.value.rdf.baseUri, format);
+  }
+
+  function exportAs(
     format: string,
     statements?: $rdf.Statement[]
-  ): {content: string | undefined; success: boolean; errorMessage: string} => {
-    let serialized: string | undefined = '';
-    if (!_store.value) {
+  ): {content: string | undefined; success: boolean; errorMessage: string} {
+    if (!_store.value)
       return {content: '', success: false, errorMessage: 'Store is not initialized.'};
-    }
-    if (statements) {
-      const tempStore = $rdf.graph();
-      const namespaces = _store.value.namespaces ?? {};
-      Object.entries(namespaces).forEach(([prefix, iri]) => {
-        tempStore.setPrefixForURI(prefix, iri);
-      });
-      statements.forEach(st => tempStore.add(st));
-      serialized = $rdf.serialize(
-        null,
-        tempStore as $rdf.Formula,
-        settings.value.rdf.baseUrl,
-        format
-      );
-    } else {
-      serialized = $rdf.serialize(
-        null,
-        _store.value as $rdf.Formula,
-        settings.value.rdf.baseUri,
-        format
-      );
-    }
 
-    return {content: serialized, success: true, errorMessage: ''};
-  };
+    const targetStore = statements ? buildTempStore(statements) : _store.value;
+    const content = serializeStore(targetStore as $rdf.IndexedFormula, format);
 
-  const onChange = (cb: RdfChangeCallback) => {
-    _callbacks.add(cb);
-    return () => _callbacks.delete(cb);
-  };
-
-  const findMatchingStatementIndex = async (path: Path): Promise<number> => {
-    const jsonLdObj = jsonLdNodeManager.extractJsonLdByPath(path);
-    if (!jsonLdObj) return -1;
-
-    const tempStore = $rdf.graph();
-    await new Promise<void>((resolve, reject) => {
-      $rdf.parse(
-        JSON.stringify(jsonLdObj, null, 2),
-        tempStore as $rdf.Formula,
-        settings.value.rdf.baseUri,
-        'application/ld+json',
-        _ => {
-          resolve();
-        }
-      );
-    });
-    if (tempStore.statements.length !== 1) {
-      return -1;
-    }
-    const idx = findStatementIndex(tempStore.statements[0]!);
-    return idx !== -1 ? idx : -1;
-  };
-
-  const containsSubject = (statement: $rdf.Statement): boolean => {
-    if (!_store.value) {
-      return false;
-    }
-
-    return _store.value.statements.some(st => st.subject.value === statement.subject.value);
-  };
-
-  const getStatementsBySubject = (subjectId: string): $rdf.Statement[] => {
-    if (!_store.value) {
-      return [];
-    }
-    return _store.value.statements.filter(st => st.subject.value === subjectId);
-  };
+    return {content, success: true, errorMessage: ''};
+  }
 
   function findStatementIndex(statement: $rdf.Statement): number {
-    const index = rdfStoreManager.statements.value.findIndex(
+    return _statements.value.findIndex(
       st =>
         st.subject.value === statement.subject.value &&
         st.predicate.value === statement.predicate.value &&
         st.object.value === statement.object.value
     );
-    return index >= 0 ? index : -1;
   }
 
-  const rebuildStoreFromEditorData = async (data: any) => {
+  async function findMatchingStatementIndex(path: Path): Promise<number> {
+    const jsonLdObj = jsonLdNodeManager.extractJsonLdByPath(path);
+    if (!jsonLdObj) return -1;
+
+    const tempStore = $rdf.graph();
+    await new Promise<void>(resolve => {
+      $rdf.parse(
+        JSON.stringify(jsonLdObj, null, 2),
+        tempStore as $rdf.Formula,
+        settings.value.rdf.baseUri,
+        RdfMediaType.JsonLd,
+        () => resolve()
+      );
+    });
+
+    if (tempStore.statements.length !== 1) return -1;
+    return findStatementIndex(tempStore.statements[0]!);
+  }
+
+  function containsSubject(statement: $rdf.Statement): boolean {
+    return (
+      _store.value?.statements.some(st => st.subject.value === statement.subject.value) ?? false
+    );
+  }
+
+  function getStatementsBySubject(subjectId: string): $rdf.Statement[] {
+    return _store.value?.statements.filter(st => st.subject.value === subjectId) ?? [];
+  }
+
+  async function rebuildStoreFromEditorData(data: any) {
     if (!data) return;
 
-    _jsonLdText.value = JSON.stringify(data, null, 2);
+    const jsonLdText = JSON.stringify(data, null, 2);
+    const jsonObject = JSON.parse(jsonLdText);
+
     clearStore();
-
-    _jsonObject.value = JSON.parse(_jsonLdText.value);
-    await applyContextPrefixes(_jsonObject.value);
-
-    await parseJsonLdIntoStore(_jsonLdText.value);
+    await applyContextPrefixes(jsonObject);
+    await parseJsonLdIntoStore(jsonLdText);
     updateStatements();
-  };
+  }
 
   watch(
     () => getDataForMode(SessionMode.DataEditor).data.value,
-    async data => {
-      await rebuildStoreFromEditorData(data);
-    }
+    data => rebuildStoreFromEditorData(data)
   );
 
   watch(
     () => settings.value.rdf.maximumTriplesToShow,
-    async () => {
-      const data = getDataForMode(SessionMode.DataEditor).data.value;
-      await rebuildStoreFromEditorData(data);
-    }
+    () => rebuildStoreFromEditorData(getDataForMode(SessionMode.DataEditor).data.value)
   );
+
+  const onChange = (cb: RdfChangeCallback) => {
+    _callbacks.add(cb);
+    return () => _callbacks.delete(cb);
+  };
 
   return {
     store: readonly(_store),

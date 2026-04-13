@@ -20,6 +20,7 @@ export enum RdfMediaType {
   Json = 'application/json',
   TextPlain = 'text/plain',
   OctetStream = 'application/octet-stream',
+  NQuads = 'application/n-quads',
 }
 
 export enum RdfPropertyType {

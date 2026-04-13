@@ -23,12 +23,6 @@ class MockBindingsStream extends EventEmitter {
     this.rows = rows;
   }
 
-  async getMetadata() {
-    return {
-      variables: [{value: 'subject'}, {value: 'predicate'}, {value: 'object'}],
-    };
-  }
-
   emitRows() {
     const subjectVar = {value: 'subject'};
     const predicateVar = {value: 'predicate'};
@@ -72,7 +66,7 @@ async function waitUntil(predicate: () => boolean, timeoutMs = 2500) {
 }
 
 describe('useSparqlRunner + useSparqlExport', () => {
-  it('loads JSON-LD via rdfStoreManager, runs query, and exports expected CSV', async () => {
+  it('loads JSON-LD via rdfStoreManager, runs query, and exports query result as CSV', async () => {
     vi.resetModules();
     (globalThis as any).window = globalThis as any;
 

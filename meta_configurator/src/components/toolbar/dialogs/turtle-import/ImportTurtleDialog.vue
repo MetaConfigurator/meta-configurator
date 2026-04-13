@@ -3,7 +3,6 @@
 import {type Ref, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {
   requestUploadFileToRef,
   turtleToJsonLD,
@@ -69,7 +68,6 @@ defineExpose({show: openDialog, close: hideDialog});
       </Message>
       <div class="flex align-items-center justify-content-center gap-2">
         <Button label="Select File" @click="requestUploadFile" :disabled="isLoading" />
-        <FontAwesomeIcon icon="fa-regular" class="text-green-500" />
       </div>
 
       <div v-if="isLoading" class="mt-3 text-sm text-gray-500">Importing, please wait...</div>
@@ -83,19 +81,5 @@ defineExpose({show: openDialog, close: hideDialog});
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.vertical-center {
-  display: flex;
-  align-items: center;
-}
-
-.warning-box {
-  background-color: var(--yellow-100);
-  color: var(--yellow-900);
-  border: 1px solid var(--yellow-300);
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
 }
 </style>

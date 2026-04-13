@@ -12,7 +12,7 @@ function readFixture(name: string): string {
 }
 
 describe('RmlMappingServiceStandard.performRmlMapping', () => {
-  it('maps input JSON using mapping config and matches expected JSON-LD', async () => {
+  it('Reads JSON input and applies RML mapping, then matches expected JSON-LD', async () => {
     const input = JSON.parse(readFixture('input.json'));
     const mappingConfig = readFixture('mapping.ttl');
     const expectedResult = JSON.parse(readFixture('expected.json'));
