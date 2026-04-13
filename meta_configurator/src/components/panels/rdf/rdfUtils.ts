@@ -9,15 +9,12 @@ import {RdfMediaType} from './rdfEnums';
 
 export const isDark = () => computed(() => useDark().value);
 
+export const XSD_NS = 'http://www.w3.org/2001/XMLSchema#';
+
 export enum RdfTermType {
   NamedNode = 'NamedNode',
   BlankNode = 'BlankNode',
   Literal = 'Literal',
-  Variable = 'Variable',
-  DefaultGraph = 'DefaultGraph',
-  Quad = 'Quad',
-  Collection = 'Collection',
-  Empty = 'Empty',
 }
 
 export type RdfTermTypeString = `${RdfTermType}`;

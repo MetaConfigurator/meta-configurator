@@ -2,6 +2,7 @@ import {ref, watch} from 'vue';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
+import {XSD_NS} from '@/components/panels/rdf/rdfUtils';
 
 interface JsonLdContextManagerStore {
   getContextText: () => string;
@@ -103,9 +104,8 @@ export const jsonLdContextManager: JsonLdContextManagerStore = (() => {
       }
     }
 
-    const xsdNs = 'http://www.w3.org/2001/XMLSchema#';
-    if (iri.startsWith(xsdNs)) {
-      return `xsd:${iri.slice(xsdNs.length)}`;
+    if (iri.startsWith(XSD_NS)) {
+      return `xsd:${iri.slice(XSD_NS.length)}`;
     }
 
     return iri;

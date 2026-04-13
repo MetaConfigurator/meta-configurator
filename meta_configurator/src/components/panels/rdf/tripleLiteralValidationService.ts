@@ -1,8 +1,6 @@
-import {RdfTermType} from '@/components/panels/rdf/rdfUtils';
+import {RdfTermType, XSD_NS} from '@/components/panels/rdf/rdfUtils';
 import type {TripleTransferObject} from '@/components/panels/rdf/tripleEditorService';
 import {jsonLdContextManager} from '@/components/panels/rdf/jsonLdContextManager';
-
-const XSD_NS = 'http://www.w3.org/2001/XMLSchema#';
 
 const XSD = {
   string: `${XSD_NS}string`,

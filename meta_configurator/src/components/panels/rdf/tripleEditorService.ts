@@ -2,7 +2,7 @@ import * as $rdf from 'rdflib';
 import type {NamedNode, BlankNode, Literal} from 'rdflib';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
 import {jsonLdNodeManager} from '@/components/panels/rdf/jsonLdNodeManager';
-import {RdfTermType, type RdfTermTypeString} from '@/components/panels/rdf/rdfUtils';
+import {RdfTermType, type RdfTermTypeString, XSD_NS} from '@/components/panels/rdf/rdfUtils';
 
 export interface TripleTransferObject {
   subject: string;
@@ -81,7 +81,7 @@ function expandDatatype(value: string): string {
   const suffix = value.slice(idx + 1);
   const ns = rdfStoreManager.namespaces.value[prefix];
 
-  return ns ? ns + suffix : prefix === 'xsd' ? `http://www.w3.org/2001/XMLSchema#${suffix}` : value;
+  return ns ? ns + suffix : prefix === 'xsd' ? `${XSD_NS}${suffix}` : value;
 }
 
 function createNode(
