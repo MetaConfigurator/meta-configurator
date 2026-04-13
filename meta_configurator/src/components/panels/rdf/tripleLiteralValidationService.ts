@@ -135,7 +135,7 @@ function validateCommonDatatypeLiteral(value: string, datatype: string): string 
     case XSD.anyURI:
       return jsonLdContextManager.isIRI(value)
         ? null
-        : 'Expected a valid absolute URI (e.g. https://example.org/resource).';
+        : 'Expected a valid absolute URI (e.g. https://qudt.org/vocab/unit/M).';
     case XSD.long:
       return isIntegerLexical(value) &&
         isInBigIntRange(value, BigInt('-9223372036854775808'), BigInt('9223372036854775807'))
