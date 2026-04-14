@@ -62,7 +62,6 @@ function selectedMode(newMode: SessionMode) {
 }
 
 const modeSelector = ref();
-
 </script>
 
 <template>
