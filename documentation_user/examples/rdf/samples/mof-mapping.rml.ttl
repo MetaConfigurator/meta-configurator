@@ -1,0 +1,43 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix ex: <http://example.org/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<#SynthesisSource> rml:source "Data.json" ; rml:referenceFormulation ql:JSONPath ; rml:iterator "$.Synthesis[*]" .
+
+<#SynthesisTriplesMap>
+  rml:logicalSource <#SynthesisSource> ;
+  rr:subjectMap [ rr:template "http://example.org/synthesis/{Hardware.Component[0]._id}" ; rr:class obo:COB_0000082 ] ;
+  rr:predicateObjectMap [ rr:predicate schema:identifier ; rr:objectMap [ rml:reference "Hardware.Component[0]._id" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:RO_0000086 ; rr:objectMap [ rml:reference "Hardware.Component[0]._type" ] ] ;
+  rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "Metadata._description" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:OBI_0000299 ; rr:objectMap [ rml:reference "Metadata._product" ] ] .
+
+<#ReagentSource> rml:source "Data.json" ; rml:referenceFormulation ql:JSONPath ; rml:iterator "$.Synthesis[*].Reagents.Reagent[*]" .
+
+<#ReagentTriplesMap>
+  rml:logicalSource <#ReagentSource> ;
+  rr:subjectMap [ rr:template "http://example.org/reagent/{_id}" ; rr:class obo:CHEBI_24431 ] ;
+  rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "_name" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:RO_0000087 ; rr:objectMap [ rml:reference "_role" ] ] .
+
+<#PrepStepSource> rml:source "Data.json" ; rml:referenceFormulation ql:JSONPath ; rml:iterator "$.Synthesis[*].Procedure.Prep.Step[*]" .
+
+<#PrepStepTriplesMap>
+  rml:logicalSource <#PrepStepSource> ;
+  rr:subjectMap [ rr:template "http://example.org/step/prep/{_vessel}-{_order}" ; rr:class obo:OBI_0000070 ] ;
+  rr:predicateObjectMap [ rr:predicate obo:OBI_0000293 ; rr:objectMap [ rr:constant "Prep" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:RO_0000057 ; rr:objectMap [ rr:template "http://example.org/reagent/{_reagent}" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:RO_0000056 ; rr:objectMap [ rml:reference "$xml_type" ] ] ;
+  rr:predicateObjectMap [ rr:predicate obo:OBI_0001937 ; rr:objectMap [ rr:template "http://example.org/quantity/prep/{_vessel}-{_order}/amount" ] ] .
+
+<#PrepAmountValueMap>
+  rml:logicalSource <#PrepStepSource> ;
+  rr:subjectMap [ rr:template "http://example.org/quantity/prep/{_vessel}-{_order}/amount" ; rr:class schema:PropertyValue ] ;
+  rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rr:constant "amount" ] ] ;
+  rr:predicateObjectMap [ rr:predicate schema:value ; rr:objectMap [ rml:reference "_amount.Value" ; rr:datatype xsd:double ] ] ;
+  rr:predicateObjectMap [ rr:predicate schema:unitCode ; rr:objectMap [ rr:template "http://qudt.org/vocab/unit/{_amount.Unit}" ] ] .

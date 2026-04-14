@@ -1,0 +1,24 @@
+{
+  "Synthesis": [
+    {
+      "Hardware": { "Component": [{ "_id": "S-1", "_type": "glass vial" }] },
+      "Metadata": { "_description": "S-1", "_product": "MIL-88B (Fe)" },
+      "Procedure": {
+        "Prep": {
+          "Step": [
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4 }, "_reagent": "FeCl3", "_order": 0 },
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4 }, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliL", "Value": 4 }, "_reagent": "DMF", "_order": 2 }
+          ]
+        }
+      },
+      "Reagents": {
+        "Reagent": [
+          { "_id": "FeCl3", "_name": "FeCl3", "_role": "substrate" },
+          { "_id": "Benzene-1%252C4-dicarboxylic%2520acid", "_name": "Benzene-1,4-dicarboxylic acid", "_role": "ligand" },
+          { "_id": "DMF", "_name": "DMF", "_role": "solvent" }
+        ]
+      }
+    }
+  ]
+}

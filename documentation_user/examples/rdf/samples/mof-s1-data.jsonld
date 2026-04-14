@@ -1,0 +1,42 @@
+{
+  "@context": {
+    "ex": "http://example.org/",
+    "obo": "http://purl.obolibrary.org/obo/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "qudt": "http://qudt.org/vocab/unit/"
+  },
+  "@graph": [
+    {
+      "@id": "ex:synthesis/S-1",
+      "@type": "obo:COB_0000082",
+      "schema:identifier": "S-1",
+      "obo:RO_0000086": "glass vial",
+      "obo:BFO_0000051": [{ "@id": "ex:step/prep/S-1-0" }],
+      "obo:OBI_0000299": "MIL-88B (Fe)",
+      "rdfs:label": "S-1"
+    },
+    {
+      "@id": "ex:step/prep/S-1-0",
+      "@type": "obo:OBI_0000070",
+      "obo:RO_0000056": "Add",
+      "obo:OBI_0001937": { "@id": "ex:quantity/prep/S-1-0/amount" },
+      "obo:OBI_0000293": "Prep",
+      "obo:RO_0000057": { "@id": "ex:reagent/FeCl3" }
+    },
+    {
+      "@id": "ex:quantity/prep/S-1-0/amount",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "amount",
+      "schema:unitCode": { "@id": "qudt:MilliMOL" },
+      "schema:value": { "@type": "xsd:double", "@value": "4.0E-1" }
+    },
+    {
+      "@id": "ex:reagent/FeCl3",
+      "@type": "obo:CHEBI_24431",
+      "obo:RO_0000087": "substrate",
+      "rdfs:label": "FeCl3"
+    }
+  ]
+}

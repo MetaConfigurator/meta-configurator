@@ -1,0 +1,16 @@
+{
+  "parameters": [
+    {
+      "name": "element_size",
+      "value": 0.025,
+      "unit": "M"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "max_von_mises_stress",
+      "value": 299791507.5586333,
+      "unit": "MegaPA"
+    }
+  ]
+}
