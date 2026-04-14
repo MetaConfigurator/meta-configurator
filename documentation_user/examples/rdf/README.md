@@ -1,14 +1,14 @@
-# MetaConfigurator Semantic Workflow User Guide
+# MetaConfigurator RDF Panel User Guide
 
-This guide explains a practical, end-user RDF workflow in MetaConfigurator.  
-You will move from plain JSON to a queryable and visual knowledge graph:
+This guide explains how to use the RDF panel in MetaConfigurator. You will move from plain JSON to a queryable and visual knowledge graph:
 
-1. Start from structured JSON.
-2. Convert JSON to JSON-LD with RML.
-3. Review and edit triples in the RDF panel.
-4. Use ontology assistance when choosing IRIs.
-5. Run SPARQL queries (optionally with AI drafting).
-6. Explore and refine the graph visually.
+1. Start from structured JSON in the Data tab.
+2. Open the RDF panel.
+3. Convert JSON to JSON-LD with RML.
+4. Review and edit triples in the RDF panel.
+5. Use ontology assistance when choosing IRIs.
+6. Run SPARQL queries (optionally with AI drafting).
+7. Explore and refine the graph visually.
 
 ---
 
@@ -17,14 +17,14 @@ You will move from plain JSON to a queryable and visual knowledge graph:
 - `images/`: screenshots used in this guide.
 - `samples/`: reusable examples (`.json`, `.jsonld`, `.ttl`, `.sparql`).
 
-Main samples:
+We use two main examples throughout this document: a simple simulation dataset and a MOF dataset.
 
 - [`samples/simulation-data.json`](./samples/simulation-data.json)
-- [`samples/simulation-mapping.rml.ttl`](./samples/simulation-mapping.rml.ttl)
+- [`samples/simulation-mapping.ttl`](./samples/simulation-mapping.ttl)
 - [`samples/simulation-data.jsonld`](./samples/simulation-data.jsonld)
 - [`samples/simulation-query.sparql`](./samples/simulation-query.sparql)
 - [`samples/mof-s1-data.json`](./samples/mof-s1-data.json)
-- [`samples/mof-mapping.rml.ttl`](./samples/mof-mapping.rml.ttl)
+- [`samples/mof-mapping.ttl`](./samples/mof-mapping.ttl)
 - [`samples/mof-s1-data.jsonld`](./samples/mof-s1-data.jsonld)
 - [`samples/mof-prep-query.sparql`](./samples/mof-prep-query.sparql)
 
@@ -39,15 +39,21 @@ Begin with your normal structured JSON (simulation data, lab records, process lo
 
 ![RDF panel with JSON input](./images/MC-RDF-JSON.png)
 
-What this means:
+Open the RDF panel in the Data tab by clicking the globe icon.
+
+![Opening RDF Panel](./images/RDF-Panel.png)
+
+Initially, the panel shows a warning that your data is not in JSON-LD format. This means:
 
 - Your data is already valid JSON.
 - It is not yet ready for semantic querying until converted to JSON-LD.
 
-If the RDF panel warns that data is not in expected JSON-LD format, use:
+Now you have two options to proceed:
 
-- **JSON to JSON-LD** (RML conversion), or
-- **Turtle import** if you already have RDF in Turtle.
+- Use the **JSON to JSON-LD** (RML conversion) tool, or
+- Use **Turtle import** if your data is already in RDF/Turtle format.
+
+Before using RML mapping, review the RML documentation at [this link](https://rml.io/docs/rml/introduction/).
 
 ---
 
@@ -55,17 +61,17 @@ If the RDF panel warns that data is not in expected JSON-LD format, use:
 
 Use the RML mapping dialog to define how JSON fields become RDF entities and relationships.
 
-You can:
+Again, you can proceed in two ways:
 
-- paste an existing RML mapping, or
-- generate a draft mapping with AI and then adjust it.
+- Paste an existing RML mapping, or
+- Generate a draft mapping with AI and then adjust it.
 
 ![RML mapping dialog](./images/MC-RDF-RML-1.png)
 
 Sample mappings:
 
-- Simulation mapping: [`samples/simulation-mapping.rml.ttl`](./samples/simulation-mapping.rml.ttl)
-- MOF mapping: [`samples/mof-mapping.rml.ttl`](./samples/mof-mapping.rml.ttl)
+- Simulation mapping: [`samples/simulation-mapping.ttl`](./samples/simulation-mapping.ttl)
+- MOF mapping: [`samples/mof-mapping.ttl`](./samples/mof-mapping.ttl)
 
 Practical recommendation:
 
@@ -81,7 +87,10 @@ After conversion, the RDF panel gives two synchronized tabs:
 - **Context**: manage prefix and context definitions.
 - **Triples**: manage subject-predicate-object statements.
 
-![Triples view](./images/MC-RDF-JSON-LD-2.png)
+![Context view](./images/MC-RDF-JSON-LD-2.png)
+
+![Triples view](./images/MC-RDF-JSON-LD-1.png)
+
 ![Triple edit modal](./images/MC-RDF-Modal.png)
 
 Typical tasks in the **Triples** tab:
@@ -91,7 +100,9 @@ Typical tasks in the **Triples** tab:
 - Export graph data as Turtle, N-Triples, or RDF/XML.
 - Open SPARQL and visualization directly from the same toolbar.
 
-Useful behavior to know:
+Note: If you filter data in the Triples tab and then open the visualization dialog, you will see only the graph for the filtered data, not the entire dataset.
+
+Useful behaviors to know:
 
 - Selecting a triple helps you locate the corresponding JSON-LD path.
 - You can edit by selecting a row and using **Edit** (or double-clicking a row).
@@ -109,6 +120,7 @@ Sample JSON-LD outputs:
 When editing predicates or object IRIs, open **Ontology Explorer** for guided selection.
 
 ![Ontology explorer](./images/MC-RDF-Ontology-1.png)
+
 ![Ontology explorer SPARQL](./images/MC-RDF-Ontology-3.png)
 
 What you can do there:
@@ -129,10 +141,14 @@ This is especially helpful for consistent use of units, classes, and shared voca
 Open SPARQL from the triples toolbar to validate and analyze your graph.
 
 ![SPARQL AI generation](./images/MC-RDF-SPARQL-1.png)
+
 ![SPARQL result table](./images/MC-RDF-SPARQL-2.png)
+
 ![MOF SPARQL result](./images/MC-RDF-SPARQL-3.png)
 
-In this dialog you can:
+![SPARQL visualization hints](./images/MC-RDF-SPARQL-4.png)
+
+In this dialog, you can:
 
 - Write or paste SPARQL manually.
 - Ask AI to draft a query from a natural-language prompt.
@@ -143,6 +159,7 @@ Visualization note:
 
 - You can enable query-result visualization mode.
 - This mode expects a graph-shaped query result (CONSTRUCT-style output).
+- You can also click the visualization help icon near the toggle for more information on how to create a valid query for visualization.
 
 Sample queries:
 
@@ -155,15 +172,16 @@ Sample queries:
 
 Use **Visualize** to inspect relationships as a graph.
 
-![Simulation KG](./images/MC-RDF-KG-1.png)
-![MOF KG](./images/MC-RDF-KG-2.png)
+![Simulation Knowledge Graph](./images/MC-RDF-KG-1.png)
+
+![MOF Knowledge Graph](./images/MC-RDF-KG-2.png)
 
 Two visualization modes:
 
 - From RDF Triples tab: **editable graph** (rename node, add/delete properties, add/delete nodes).
 - From SPARQL visualizer tab: **read-only graph** for query result exploration.
 
-Useful tools in graph view:
+Useful actions in the visualization dialog:
 
 - Node search and quick focus.
 - Zoom controls and fit-to-view.
@@ -195,3 +213,4 @@ For very large graphs, the app warns before rendering and lets you continue or c
 - Use ontology IRIs for units/classes/properties instead of only plain text.
 - Review AI-generated mapping/query drafts before trusting them.
 - If the triple list is shortened due to display limits, increase RDF display limits in settings before final review.
+- Use Named Nodes (nodes with `@id`) instead of Blank Nodes. This makes it easier to find and edit triples in the Text view.
