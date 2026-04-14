@@ -143,9 +143,9 @@ Open SPARQL from the triples toolbar to validate and analyze your graph.
 In this dialog, you can:
 
 - Write or paste SPARQL manually.
-- Ask AI to draft a query from a natural-language prompt.
+- Ask AI to draft a query from a natural-language prompt. You can ask question from your data, since a subset of your JSON-LD data is being sent to the AI-endpoint.
 - Run query and inspect results in a filterable table.
-- Export results (for example CSV for tabular results).
+- Export results (CSV for tabular outputs when visualization is disabled, and RDF-based extensions for visualization-based queries).
 
 Visualization note:
 
