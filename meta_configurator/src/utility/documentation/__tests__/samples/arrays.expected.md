@@ -6,15 +6,15 @@
     - [nestedArraysAndObjectsProperty entry](#%2Fproperties%2FnestedArraysAndObjectsProperty%2Fitems)
 
 ---
-### [My Schema](#root)
+### <a id="root"></a>[My Schema](#root)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| numberArrayProperty | number\[\] | false | \- |
-| objectArrayProperty | [objectArrayProperty entry\[\]](#%2Fproperties%2FobjectArrayProperty%2Fitems) | false | \- |
-| nestedArraysProperty | nestedArraysProperty entry\[\] | false | \- |
-| nestedArraysAndObjectsProperty | [nestedArraysAndObjectsProperty entry\[\]](#%2Fproperties%2FnestedArraysAndObjectsProperty%2Fitems) | false | \- |
+| <a id="%2Fproperties%2FnumberArrayProperty%2Fitems"></a>numberArrayProperty | number\[\] | <span style="color:salmon">false</span> | \- |
+| objectArrayProperty | <u>[objectArrayProperty entry\[\]](#%2Fproperties%2FobjectArrayProperty%2Fitems)</u> | <span style="color:salmon">false</span> | \- |
+| <a id="%2Fproperties%2FnestedArraysProperty%2Fitems%2Fitems%2Fitems"></a>nestedArraysProperty | string\[\] | <span style="color:salmon">false</span> | \- |
+| nestedArraysAndObjectsProperty | <u>[nestedArraysAndObjectsProperty entry\[\]](#%2Fproperties%2FnestedArraysAndObjectsProperty%2Fitems)</u> | <span style="color:salmon">false</span> | \- |
 
 #### Example
 
@@ -45,12 +45,12 @@
 }
 ```
 ---
-### [objectArrayProperty entry](#%2Fproperties%2FobjectArrayProperty%2Fitems)
+### <a id="%2Fproperties%2FobjectArrayProperty%2Fitems"></a>[objectArrayProperty entry](#%2Fproperties%2FobjectArrayProperty%2Fitems)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| booleanProperty | boolean | false | \- |
+| <a id="%2Fproperties%2FobjectArrayProperty%2Fitems%2Fproperties%2FbooleanProperty"></a>booleanProperty | boolean | <span style="color:salmon">false</span> | \- |
 
 #### Example
 
@@ -60,12 +60,12 @@
 }
 ```
 ---
-### [nestedArraysAndObjectsProperty entry](#%2Fproperties%2FnestedArraysAndObjectsProperty%2Fitems)
+### <a id="%2Fproperties%2FnestedArraysAndObjectsProperty%2Fitems"></a>[nestedArraysAndObjectsProperty entry](#%2Fproperties%2FnestedArraysAndObjectsProperty%2Fitems)
 #### Properties
 
 | Name | Type | Required | Description |
 |------|------|------|------|
-| arrayProp | string\[\] | false | \- |
+| <a id="%2Fproperties%2FnestedArraysAndObjectsProperty%2Fitems%2Fproperties%2FarrayProp%2Fitems"></a>arrayProp | string\[\] | <span style="color:salmon">false</span> | \- |
 
 #### Example
 

@@ -9,7 +9,6 @@ import Message from 'primevue/message';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
-import {DataMappingServiceStml} from '@/data-mapping/stml/dataMappingServiceStml';
 import {DataMappingServiceJsonata} from '@/data-mapping/jsonata/dataMappingServiceJsonata';
 import type {DataMappingService} from '@/data-mapping/dataMappingService';
 import type {Editor} from 'brace';
@@ -35,19 +34,15 @@ const isLoadingMapping = ref(false);
 
 const settings = useSettings();
 
-const mappingServiceTypes = ['Advanced (JSONata)', 'SimpleTransformationMappingLanguage (STML)'];
+const mappingServiceTypes = ['Advanced (JSONata)'];
 
 const mappingServiceWarnings = [
   'The JSONata mapping service is very expressive flexible, but may generate invalid mappings for complex inputs, which have to manually be corrected.',
-  'The STML mapping service usually generates valid mappings, but it can perform only simple source to target path mappings and value transformations. WARNING: It supports executing arbitrary JavaScript functions as transformations, which may lead to security issues if the input is not properly sanitized.',
 ];
 
 const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]);
 
 const mappingService: Ref<DataMappingService> = computed(() => {
-  if (selectedMappingServiceType.value === 'SimpleTransformationMappingLanguage (STML)') {
-    return new DataMappingServiceStml();
-  }
   if (selectedMappingServiceType.value === 'Advanced (JSONata)') {
     return new DataMappingServiceJsonata();
   }

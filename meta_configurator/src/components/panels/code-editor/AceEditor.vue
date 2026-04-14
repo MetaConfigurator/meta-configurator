@@ -35,6 +35,11 @@ let editor: Ref<Editor | undefined> = ref(undefined);
 
 onMounted(() => {
   editor.value = ace.edit(editor_id);
+
+  editor.value.getSession().setUseWrapMode(true);
+  editor.value.setOption('wrap', true);
+  editor.value.setOption('hScrollBarAlwaysVisible', false);
+
   setupAceMode(editor.value, settings.value);
   setupAceProperties(editor.value, settings.value);
 

@@ -1,0 +1,28 @@
+name: Tag Version
+on:
+  push:
+    branches:
+      - main
+      - develop
+permissions:
+  contents: write
+jobs:
+  tag-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Create tag if version is new
+        run: |
+          VERSION=$(node -p "require('./meta_configurator/package.json').version")
+          TAG="v$VERSION"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists, skipping."
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+            echo "Created and pushed tag $TAG."
+          fi
