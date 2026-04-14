@@ -78,7 +78,6 @@ useMagicKeys({
     }
   },
 });
-
 </script>
 
 <template>
