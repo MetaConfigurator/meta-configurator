@@ -2,8 +2,6 @@
 import {ref} from 'vue';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {useMagicKeys} from '@vueuse/core';
-import {focus} from '@/utility/focusUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 import Select from 'primevue/select';
@@ -65,19 +63,6 @@ function selectedMode(newMode: SessionMode) {
 
 const modeSelector = ref();
 
-useMagicKeys({
-  passive: false,
-  onEventFired(event) {
-    if (event.key === 'f' && event.ctrlKey) {
-      const fromAce = (window as any).__fromAceEditor;
-
-      if (fromAce) {
-        event.preventDefault();
-        focus('searchBar');
-      }
-    }
-  },
-});
 </script>
 
 <template>

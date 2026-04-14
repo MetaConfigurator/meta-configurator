@@ -20,10 +20,10 @@ const searchTerm: Ref<string> = ref('');
 useMagicKeys({
   passive: false,
   onEventFired(event) {
-    if (event.key === 'f' && event.ctrlKey) {
+    if (event.key === 'f' && (event.ctrlKey || event.metaKey)) {
       const fromAce = (window as any).__fromAceEditor;
-
-      if (fromAce) {
+      const searchBarFocused = document.activeElement?.id === 'searchBar';
+      if (fromAce || searchBarFocused) {
         event.preventDefault();
         focus('searchBar');
       }
@@ -65,10 +65,40 @@ const showSearchResultsMenu = event => {
   searchResultMenu.value?.show(event, event.target);
   focus('searchBar');
 };
+import {computed} from 'vue';
+let mode = useSessionStore().currentMode;
+let session = getSessionForMode(mode);
+const currentIndex = computed(() => {
+  if (!session.currentSelectedElement.value || session.currentSearchResults.value.length === 0)
+    return 0;
+  return (
+    session.currentSearchResults.value.findIndex(
+      r => r.path === session.currentSelectedElement.value
+    ) + 1
+  ); // +1 for 1-based index
+});
+const totalMatches = computed(() => session.currentSearchResults.value.length);
+
+function goNext() {
+  const results = session.currentSearchResults.value;
+  if (results.length === 0) return;
+
+  const idx = results.findIndex(r => r.path === session.currentSelectedElement.value);
+  const nextIdx = (idx + 1) % results.length;
+  session.currentSelectedElement.value = results[nextIdx].path;
+}
+function goPrev() {
+  const results = session.currentSearchResults.value;
+  if (results.length === 0) return;
+
+  const idx = results.findIndex(r => r.path === session.currentSelectedElement.value);
+  const prevIdx = (idx - 1 + results.length) % results.length;
+  session.currentSelectedElement.value = results[prevIdx].path;
+}
 </script>
 
 <template>
-  <span class="p-input-icon-left ml-5" style="width: 14rem">
+  <span class="p-input-icon-left ml-5 flex items-center" style="width: 14rem">
     <i class="pi" style="font-size: 0.9rem" />
     <InputText
       show-clear
@@ -78,7 +108,31 @@ const showSearchResultsMenu = event => {
       @focus="showSearchResultsMenu"
       @blur="() => searchResultMenu.value?.hide()"
       id="searchBar" />
+    <!-- Match counter -->
+
+    <!-- Next button -->
   </span>
+  <template v-if="searchTerm">
+    <div class="search-controls">
+      <span class="search-counter ml-1">{{ currentIndex }}/{{ totalMatches }}</span>
+      <Button
+        v-tooltip.bottom="'Previous match'"
+        class="ml-1 p-button-sm search-nav-btn"
+        text
+        :disabled="totalMatches === 0"
+        @click="goPrev">
+        <i class="pi pi-chevron-up" />
+      </Button>
+      <Button
+        v-tooltip.bottom="'Next match'"
+        class="p-button-sm search-nav-btn"
+        text
+        :disabled="totalMatches === 0"
+        @click="goNext">
+        <i class="pi pi-chevron-down" />
+      </Button>
+    </div>
+  </template>
   <!-- search results menu -->
   <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems">
     <template #item="slotProps">
@@ -94,6 +148,30 @@ const showSearchResultsMenu = event => {
 </template>
 
 <style scoped>
+.search-nav-btn {
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 !important;
+  font-size: 0.75rem;
+  color: var(--p-primary-active-color);
+}
+.search-nav-btn:hover:enabled {
+  background-color: var(--surface-hover);
+}
+.search-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.search-counter {
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+.search-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.5rem;
+}
 .toolbar-button {
   font-weight: bold;
   font-size: large;
