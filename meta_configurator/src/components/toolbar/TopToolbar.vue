@@ -5,6 +5,8 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 import Select from 'primevue/select';
+import {useMagicKeys} from '@vueuse/core';
+import {focus} from '@/utility/focusUtils';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import ModeSelector from '@/components/toolbar/ModeSelector.vue';
 import TopToolbarMenuButtons from '@/components/toolbar/TopToolbarMenuButtons.vue';
@@ -62,6 +64,20 @@ function selectedMode(newMode: SessionMode) {
 }
 
 const modeSelector = ref();
+
+useMagicKeys({
+  passive: false,
+  onEventFired(event) {
+    if (event.key === 'f' && (event.ctrlKey || event.metaKey)) {
+      const fromAce = (window as any).__fromAceEditor;
+      const searchBarFocused = document.activeElement?.id === 'searchBar';
+      if (fromAce || searchBarFocused) {
+        event.preventDefault();
+        focus('searchBar');
+      }
+    }
+  },
+});
 
 </script>
 
