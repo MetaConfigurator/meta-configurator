@@ -4,18 +4,15 @@ This guide explains how to use the RDF panel in MetaConfigurator. You will move 
 
 1. Start from structured JSON in the Data tab.
 2. Open the RDF panel.
-3. Convert JSON to JSON-LD with RML.
+3. Convert JSON to JSON-LD with RML (optionally with AI drafting).
 4. Review and edit triples in the RDF panel.
 5. Use ontology assistance when choosing IRIs.
-6. Run SPARQL queries (optionally with AI drafting).
+6. Run SPARQL queries (also with AI drafting).
 7. Explore and refine the graph visually.
 
 ---
 
-## Folder Contents
-
-- `images/`: screenshots used in this guide.
-- `samples/`: reusable examples (`.json`, `.jsonld`, `.ttl`, `.sparql`).
+## Data
 
 We use two main examples throughout this document: a simple simulation dataset and a MOF dataset.
 
@@ -23,9 +20,10 @@ We use two main examples throughout this document: a simple simulation dataset a
 - [`samples/simulation-mapping.ttl`](./samples/simulation-mapping.ttl)
 - [`samples/simulation-data.jsonld`](./samples/simulation-data.jsonld)
 - [`samples/simulation-query.sparql`](./samples/simulation-query.sparql)
-- [`samples/mof-s1-data.json`](./samples/mof-s1-data.json)
+
+- [`samples/mof-data.json`](./samples/mof-data.json)
 - [`samples/mof-mapping.ttl`](./samples/mof-mapping.ttl)
-- [`samples/mof-s1-data.jsonld`](./samples/mof-s1-data.jsonld)
+- [`samples/mof-data.jsonld`](./samples/mof-data.jsonld)
 - [`samples/mof-prep-query.sparql`](./samples/mof-prep-query.sparql)
 
 ---
@@ -35,9 +33,7 @@ We use two main examples throughout this document: a simple simulation dataset a
 Begin with your normal structured JSON (simulation data, lab records, process logs, etc.).
 
 - Simulation example: [`samples/simulation-data.json`](./samples/simulation-data.json)
-- MOF example: [`samples/mof-s1-data.json`](./samples/mof-s1-data.json)
-
-![RDF panel with JSON input](./images/MC-RDF-JSON.png)
+- MOF example: [`samples/mof-data.json`](./samples/mof-data.json)
 
 Open the RDF panel in the Data tab by clicking the globe icon.
 
@@ -48,12 +44,14 @@ Initially, the panel shows a warning that your data is not in JSON-LD format. Th
 - Your data is already valid JSON.
 - It is not yet ready for semantic querying until converted to JSON-LD.
 
+![RDF panel with JSON input](./images/MC-RDF-JSON.png)
+
 Now you have two options to proceed:
 
 - Use the **JSON to JSON-LD** (RML conversion) tool, or
 - Use **Turtle import** if your data is already in RDF/Turtle format.
 
-Before using RML mapping, review the RML documentation at [this link](https://rml.io/docs/rml/introduction/).
+Before using RML mapping, please review the RML documentation at [this link](https://rml.io/docs/rml/introduction/).
 
 ---
 
@@ -102,16 +100,10 @@ Typical tasks in the **Triples** tab:
 
 Note: If you filter data in the Triples tab and then open the visualization dialog, you will see only the graph for the filtered data, not the entire dataset.
 
-Useful behaviors to know:
-
-- Selecting a triple helps you locate the corresponding JSON-LD path.
-- You can edit by selecting a row and using **Edit** (or double-clicking a row).
-- Literal objects can include datatype selection; custom datatype is also supported.
-
 Sample JSON-LD outputs:
 
 - Simulation: [`samples/simulation-data.jsonld`](./samples/simulation-data.jsonld)
-- MOF S-1: [`samples/mof-s1-data.jsonld`](./samples/mof-s1-data.jsonld)
+- MOF : [`samples/mof-data.jsonld`](./samples/mof-data.jsonld)
 
 ---
 

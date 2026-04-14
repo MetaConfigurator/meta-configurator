@@ -11,14 +11,17 @@
     rml:referenceFormulation ql:JSONPath ;
     rml:iterator "$"
   ] ;
+  
   rr:subjectMap [
     rr:template "https://www.example.org/run_fenics_simulation" ;
     rr:class m4i:Method
   ] ;
+  
   rr:predicateObjectMap [
     rr:predicate m4i:hasParameter ;
     rr:objectMap [ rr:parentTriplesMap <#ParameterMapping> ]
   ] ;
+  
   rr:predicateObjectMap [
     rr:predicate m4i:investigates ;
     rr:objectMap [ rr:parentTriplesMap <#MetricMapping> ]
@@ -30,15 +33,28 @@
     rml:referenceFormulation ql:JSONPath ;
     rml:iterator "$.parameters[*]"
   ] ;
+  
   rr:subjectMap [
     rr:template "https://www.example.org/variable_{name}" ;
     rr:class schema:PropertyValue
   ] ;
-  rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "name" ] ] ;
-  rr:predicateObjectMap [ rr:predicate schema:value ; rr:objectMap [ rml:reference "value" ] ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate rdfs:label ;
+    rr:objectMap [ rml:reference "name" ]
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate schema:value ;
+    rr:objectMap [ rml:reference "value" ]
+  ] ;
+  
   rr:predicateObjectMap [
     rr:predicate schema:unitCode ;
-    rr:objectMap [ rr:template "http://qudt.org/vocab/unit/{unit}" ; rr:termType rr:IRI ]
+    rr:objectMap [
+      rr:template "http://qudt.org/vocab/unit/{unit}" ;
+      rr:termType rr:IRI
+    ]
   ] .
 
 <#MetricMapping>
@@ -47,13 +63,26 @@
     rml:referenceFormulation ql:JSONPath ;
     rml:iterator "$.metrics[*]"
   ] ;
+  
   rr:subjectMap [
     rr:template "https://www.example.org/variable_{name}" ;
     rr:class schema:PropertyValue
   ] ;
-  rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "name" ] ] ;
-  rr:predicateObjectMap [ rr:predicate schema:value ; rr:objectMap [ rml:reference "value" ] ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate rdfs:label ;
+    rr:objectMap [ rml:reference "name" ]
+  ] ;
+  
+  rr:predicateObjectMap [
+    rr:predicate schema:value ;
+    rr:objectMap [ rml:reference "value" ]
+  ] ;
+  
   rr:predicateObjectMap [
     rr:predicate schema:unitCode ;
-    rr:objectMap [ rr:template "http://qudt.org/vocab/unit/{unit}" ; rr:termType rr:IRI ]
+    rr:objectMap [
+      rr:template "http://qudt.org/vocab/unit/{unit}" ;
+      rr:termType rr:IRI
+    ]
   ] .

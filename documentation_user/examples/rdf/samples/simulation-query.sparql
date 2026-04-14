@@ -1,10 +1,12 @@
+PREFIX m4i: <http://w3id.org/nfdi4ing/metadata4ing#>
 PREFIX schema: <https://schema.org/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?parameter ?value ?unit
-WHERE {
-  ?param a schema:PropertyValue ;
-         rdfs:label ?parameter ;
-         schema:value ?value ;
-         schema:unitCode ?unit .
-}
+SELECT ?element_size ?max_von_mises_stress WHERE {
+  ?method a m4i:Method .
+  ?method m4i:hasParameter ?element_size_param .
+  ?element_size_param a schema:PropertyValue ;
+                      schema:value ?element_size .
+  ?method m4i:investigates ?stress_param .
+  ?stress_param a schema:PropertyValue ;
+                schema:value ?max_von_mises_stress .
+} ORDER BY ASC(?element_size)
