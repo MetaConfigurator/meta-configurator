@@ -40,9 +40,13 @@ If the object refers to another mapped resource:
 - Do NOT include 'rml:reference', 'rr:template', or 'rr:constant' in that objectMap.
 
 IRI construction rules:
-If an RDF object must be an IRI constructed from a JSON value:
+If an RDF subject or object must be an IRI constructed from a JSON value:
 - Use 'rr:template'
 - Declare 'rr:termType rr:IRI'
+- ALWAYS construct full absolute IRIs (e.g. "http://example.com/resource/{id}")
+- DO NOT use prefixed names inside templates (e.g. NEVER generate "ex:resource/{id}" or "local:value_{name}")
+- DO NOT generate relative IRIs
+- Ensure the template expands to a valid absolute IRI after substitution
 
 Reference rules:
 - 'rml:reference' values must be relative to the TriplesMap iterator
@@ -59,6 +63,11 @@ Use only the prefixes provided, and other prefixes which user may provide:
 - ql:
 - rdf:
 - xsd:
+
+IMPORTANT prefix constraint:
+- Prefixed names (e.g. ex:Person) may ONLY be used for classes and predicates
+- Prefixed names MUST NOT be used inside rr:template strings
+- All IRIs generated via rr:template MUST be full absolute IRIs
 
 Output format:
 - Produce a single valid Turtle document.

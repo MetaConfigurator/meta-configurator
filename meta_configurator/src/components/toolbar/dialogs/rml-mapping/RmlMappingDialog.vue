@@ -49,14 +49,7 @@
         <Divider />
         <label class="block font-semibold mb-2">Mapping Configuration</label>
         <div class="editor-block">
-          <codemirror
-            v-model="rmlConfig"
-            class="rml-codemirror"
-            :autofocus="false"
-            :indent-with-tab="true"
-            :tab-size="2"
-            :extensions="extensions"
-            @ready="handleReady" />
+          <div ref="editorHost" class="rml-ace-editor" :id="editorId" />
         </div>
         <div v-if="errorMessage.length" class="error-box">
           <span v-html="errorMessage"></span>
@@ -74,19 +67,17 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, watch, type Ref, nextTick, shallowRef} from 'vue';
+import {ref, computed, watch, type Ref, nextTick, onUnmounted} from 'vue';
 import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import Message from 'primevue/message';
 import Panel from 'primevue/panel';
-import {Codemirror} from 'vue-codemirror';
-import {basicSetup} from 'codemirror';
-import {syntaxHighlighting, StreamLanguage} from '@codemirror/language';
-import {EditorView} from '@codemirror/view';
-import {oneDark} from '@codemirror/theme-one-dark';
-import {turtle} from '@codemirror/legacy-modes/mode/turtle';
+import * as ace from 'brace';
+import type {Editor} from 'brace';
+import 'brace/theme/clouds';
+import 'brace/theme/clouds_midnight';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
@@ -96,20 +87,23 @@ import {useDebounceFn} from '@vueuse/core';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
-import {syntaxHighlightStyle} from '@/components/panels/rdf/rdfUtils';
-import {useDark} from '@vueuse/core';
+import {isDarkMode} from '@/utility/darkModeUtils';
+import {RmlCustomMode} from '@/components/panels/rdf/aceSyntaxHighlighting';
 
-const dark = useDark();
 const showDialog = ref(false);
 const input = ref({});
 const result = ref('');
 const rmlConfig = ref('');
-const view = shallowRef<EditorView | null>(null);
 const resultIsValid = ref(false);
 const errorMessage = ref('');
 const userComments = ref('');
 const isLoadingMapping = ref(false);
 const hasUserComments = computed(() => userComments.value.trim().length > 0);
+const editorId = 'rml-mapping-editor-' + Math.random();
+const editor = ref<Editor | null>(null);
+const editorHost = ref<HTMLElement | null>(null);
+let isUpdatingFromOutside = false;
+let resizeObserver: ResizeObserver | null = null;
 
 const mappingService: Ref<RmlMappingService> = computed(() => {
   return new RmlMappingServiceStandard();
@@ -119,24 +113,87 @@ const mappingServiceWarning: Ref<string> = computed(() => {
   return '';
 });
 
-const extensions = computed(() => [
-  basicSetup,
-  StreamLanguage.define(turtle),
-  syntaxHighlighting(syntaxHighlightStyle),
-  ...(dark.value ? [oneDark] : []),
-  EditorView.lineWrapping,
-]);
+function ensureEditorCreated() {
+  if (editor.value) return;
+  const instance = ace.edit(editorId);
+  editor.value = instance;
 
-const handleReady = (payload: {view: EditorView}) => {
-  view.value = payload.view;
-};
+  instance.getSession().setMode(new (RmlCustomMode as any)());
+  instance.getSession().setUseWrapMode(true);
+  instance.getSession().setTabSize(2);
+  instance.setOption('wrap', true);
+  instance.setShowPrintMargin(false);
+  instance.setTheme(isDarkMode.value ? 'ace/theme/clouds_midnight' : 'ace/theme/clouds');
+  instance.setValue(rmlConfig.value ?? '', -1);
+
+  instance.on('change', () => {
+    if (isUpdatingFromOutside) {
+      isUpdatingFromOutside = false;
+      return;
+    }
+    rmlConfig.value = instance.getValue();
+  });
+
+  if (editorHost.value && !resizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      editor.value?.resize();
+    });
+    resizeObserver.observe(editorHost.value);
+  }
+}
+
+function setEditorValueFromOutside(value: string) {
+  if (!editor.value) return;
+  const current = editor.value.getValue();
+  if (current === value) return;
+
+  isUpdatingFromOutside = true;
+  editor.value.setValue(value ?? '', -1);
+  isUpdatingFromOutside = false;
+}
+
+function destroyEditor() {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+    resizeObserver = null;
+  }
+  if (!editor.value) return;
+  editor.value.destroy();
+  editor.value.container.remove();
+  editor.value = null;
+}
 
 watch(showDialog, async visible => {
   if (visible) {
     await nextTick();
     rmlConfig.value = result.value;
+    ensureEditorCreated();
+    if (editor.value) {
+      setEditorValueFromOutside(rmlConfig.value ?? '');
+      editor.value.resize();
+      editor.value.focus();
+      window.setTimeout(() => editor.value?.resize(), 0);
+    }
+  } else {
+    destroyEditor();
   }
 });
+
+watch(
+  () => rmlConfig.value,
+  value => {
+    if (!editor.value) return;
+    setEditorValueFromOutside(value ?? '');
+  }
+);
+
+watch(
+  () => isDarkMode.value,
+  isDark => {
+    if (!editor.value) return;
+    editor.value.setTheme(isDark ? 'ace/theme/clouds_midnight' : 'ace/theme/clouds');
+  }
+);
 
 function openDialog() {
   resetDialog();
@@ -219,6 +276,10 @@ function performMapping() {
 }
 
 defineExpose({show: openDialog, close: hideDialog});
+
+onUnmounted(() => {
+  destroyEditor();
+});
 </script>
 
 <style scoped>
@@ -287,7 +348,7 @@ label {
   overflow: hidden;
 }
 
-.rml-codemirror {
+.rml-ace-editor {
   flex: 1;
   min-height: 0;
   width: 100%;
@@ -296,17 +357,13 @@ label {
   flex-direction: column;
 }
 
-.rml-codemirror :deep(.cm-editor) {
+.rml-ace-editor :deep(.ace_editor) {
   flex: 1;
   min-height: 0;
   width: 100%;
   height: 100%;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 14px;
-}
-
-.rml-codemirror :deep(.cm-content) {
-  min-height: 100%;
 }
 
 .error-box {
@@ -321,10 +378,5 @@ label {
   max-height: 150px;
   overflow: auto;
   white-space: pre-wrap;
-}
-
-.rml-codemirror :deep(.cm-scroller) {
-  overflow: auto;
-  height: 100%;
 }
 </style>

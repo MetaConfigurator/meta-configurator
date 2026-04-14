@@ -1,14 +1,6 @@
 <template>
   <div class="sparql-query-editor">
-    <codemirror
-      v-model="localValue"
-      :autofocus="autofocus"
-      :indent-with-tab="true"
-      :tab-size="2"
-      :extensions="extensions"
-      @ready="handleReady"
-      @click.stop="onClick"
-      @keydown.stop="onKeydown" />
+    <div class="ace-container" :id="editor_id" />
     <div v-if="errorMessage" class="error-box">
       {{ errorMessage }}
     </div>
@@ -16,19 +8,15 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, shallowRef, watch} from 'vue';
-import {Codemirror} from 'vue-codemirror';
-import {basicSetup} from 'codemirror';
-import {sparql} from 'codemirror-lang-sparql';
-import {syntaxHighlighting} from '@codemirror/language';
-import {oneDark} from '@codemirror/theme-one-dark';
-import {StateEffect, StateField} from '@codemirror/state';
-import {EditorView, Decoration} from '@codemirror/view';
-import {syntaxHighlightStyle} from '@/components/panels/rdf/rdfUtils';
-import {useDark} from '@vueuse/core';
+import {onMounted, onUnmounted, ref, watch} from 'vue';
+import type {Editor} from 'brace';
+import * as ace from 'brace';
+import 'brace/theme/clouds';
+import 'brace/theme/clouds_midnight';
+import {isDark} from '@/components/panels/rdf/rdfUtils';
+import {SparqlCustomMode} from '@/components/panels/rdf/aceSyntaxHighlighting';
 
-const dark = useDark();
-
+const darkMode = isDark();
 const props = withDefaults(
   defineProps<{
     modelValue: string;
@@ -49,87 +37,123 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void;
 }>();
 
-const localValue = ref(props.modelValue);
-const view = shallowRef<any>(null);
+const editor_id = 'sparql-editor-' + Math.random();
+const editor = ref<Editor | null>(null);
+const markerId = ref<number | null>(null);
+let isUpdatingFromOutside = false;
+let stopClickListener: ((event: Event) => void) | null = null;
+let stopKeydownListener: ((event: Event) => void) | null = null;
 
-const addErrorLine = StateEffect.define<number>();
-const clearErrorLines = StateEffect.define<null>();
-const errorLineMark = Decoration.line({
-  attributes: {class: 'cm-error-line'},
+function applyErrorLine(line: number | null | undefined) {
+  if (!editor.value) return;
+
+  const session = editor.value.getSession();
+  if (markerId.value !== null) {
+    session.removeMarker(markerId.value);
+    markerId.value = null;
+  }
+  session.clearAnnotations();
+
+  if (!line || line <= 0) return;
+
+  const aceLine = line - 1;
+  const RangeCtor = ace.acequire('ace/range').Range;
+  markerId.value = session.addMarker(
+    new RangeCtor(aceLine, 0, aceLine, 1),
+    'ace-error-line',
+    'fullLine',
+    true
+  );
+  session.setAnnotations([
+    {
+      row: aceLine,
+      column: 0,
+      text: props.errorMessage ?? 'Query error',
+      type: 'error',
+    },
+  ]);
+}
+
+onMounted(() => {
+  const instance = ace.edit(editor_id);
+  editor.value = instance;
+
+  instance.getSession().setMode(new (SparqlCustomMode as any)());
+  instance.getSession().setUseWrapMode(true);
+  instance.getSession().setTabSize(2);
+  instance.setOption('wrap', true);
+  instance.setShowPrintMargin(false);
+  instance.setTheme(darkMode.value ? 'ace/theme/clouds_midnight' : 'ace/theme/clouds');
+  instance.setValue(props.modelValue ?? '', -1);
+
+  if (props.autofocus) {
+    instance.focus();
+  }
+
+  instance.on('change', () => {
+    if (isUpdatingFromOutside) {
+      isUpdatingFromOutside = false;
+      return;
+    }
+    emit('update:modelValue', instance.getValue());
+  });
+
+  stopClickListener = (event: Event) => {
+    if (props.stopEvents) event.stopPropagation();
+  };
+  stopKeydownListener = (event: Event) => {
+    if (props.stopEvents) event.stopPropagation();
+  };
+  instance.container.addEventListener('click', stopClickListener);
+  instance.container.addEventListener('keydown', stopKeydownListener);
+
+  applyErrorLine(props.errorLine);
+});
+
+onUnmounted(() => {
+  if (!editor.value) return;
+  if (stopClickListener) {
+    editor.value.container.removeEventListener('click', stopClickListener);
+    stopClickListener = null;
+  }
+  if (stopKeydownListener) {
+    editor.value.container.removeEventListener('keydown', stopKeydownListener);
+    stopKeydownListener = null;
+  }
+  editor.value.destroy();
+  editor.value.container.remove();
+  editor.value = null;
 });
 
 watch(
   () => props.modelValue,
   value => {
-    if (value !== localValue.value) {
-      localValue.value = value;
-    }
+    if (!editor.value) return;
+    const current = editor.value.getValue();
+    if (value === current) return;
+    isUpdatingFromOutside = true;
+    editor.value.setValue(value ?? '', -1);
   }
 );
-
-watch(localValue, value => {
-  emit('update:modelValue', value);
-});
-
-const errorLineField = StateField.define({
-  create() {
-    return Decoration.none;
-  },
-  update(decorations, tr) {
-    decorations = decorations.map(tr.changes);
-    for (const effect of tr.effects) {
-      if (effect.is(addErrorLine)) {
-        const lineNumber = effect.value;
-        const maxLine = tr.state.doc.lines;
-        const safeLine = Math.max(1, Math.min(maxLine, lineNumber));
-        const line = tr.state.doc.line(safeLine);
-        decorations = decorations.update({add: [errorLineMark.range(line.from)]});
-      } else if (effect.is(clearErrorLines)) {
-        decorations = Decoration.none;
-      }
-    }
-    return decorations;
-  },
-  provide: f => EditorView.decorations.from(f),
-});
-
-const extensions = computed(() => [
-  basicSetup,
-  sparql(),
-  syntaxHighlighting(syntaxHighlightStyle),
-  errorLineField,
-  ...(dark.value ? [oneDark] : []),
-]);
 
 watch(
   () => props.errorLine,
   line => {
-    if (!view.value) return;
-    view.value.dispatch({effects: clearErrorLines.of(null)});
-    if (line && line > 0) {
-      view.value.dispatch({effects: addErrorLine.of(line)});
-    }
+    applyErrorLine(line);
   },
   {immediate: true}
 );
 
-function handleReady(payload: {view: any}) {
-  view.value = payload.view;
-  if (props.errorLine && props.errorLine > 0) {
-    view.value.dispatch({effects: addErrorLine.of(props.errorLine)});
+watch(
+  () => props.errorMessage,
+  () => {
+    if (props.errorLine && props.errorLine > 0) {
+      applyErrorLine(props.errorLine);
+    }
   }
-}
-
-function onClick(event: MouseEvent) {
-  if (!props.stopEvents) return;
-  event.stopPropagation();
-}
-
-function onKeydown(event: KeyboardEvent) {
-  if (!props.stopEvents) return;
-  event.stopPropagation();
-}
+);
 </script>
+
 <style scoped>
 .sparql-query-editor {
   display: flex;
@@ -139,44 +163,32 @@ function onKeydown(event: KeyboardEvent) {
   height: 100%;
 }
 
-:deep(.cm-editor) {
+.ace-container {
   border: 1px solid var(--p-content-border-color, var(--p-border-color));
   border-radius: 0.375rem;
   overflow: hidden;
+  min-height: 12rem;
   height: 100%;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 14px;
 }
 
-:deep(.cm-scroller) {
-  overflow: auto;
-  min-height: 12rem;
-}
-
 .error-box {
+  margin-top: 0.5rem;
   padding: 0.5rem;
   border-radius: 4px;
-  background-color: color-mix(in srgb, var(--p-red-500) 15%, var(--p-surface-ground));
-  color: var(--p-red-500);
+  background-color: var(--p-red-100);
+  color: var(--p-red-700);
   font-size: 0.875rem;
-  border: 1px solid var(--p-red-500);
+  border: 1px solid var(--p-red-700);
+  flex-shrink: 0;
   max-height: 150px;
   overflow: auto;
   white-space: pre-wrap;
 }
 
-:deep(.cm-error-line) {
-  border-left: 3px solid var(--p-red-500);
-  animation: errorPulse 0.5s ease-in-out;
-}
-
-@keyframes errorPulse {
-  0%,
-  100% {
-    background-color: color-mix(in srgb, var(--p-red-500) 10%, var(--p-surface-ground));
-  }
-  50% {
-    background-color: color-mix(in srgb, var(--p-red-500) 25%, var(--p-surface-ground));
-  }
+:deep(.ace-error-line) {
+  position: absolute;
+  background-color: color-mix(in srgb, var(--p-red-500) 20%, transparent);
 }
 </style>
