@@ -2,6 +2,7 @@ import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pathUtils';
+import {removeFromRequiredArray} from '@/utility/requiredUtils';
 import {SessionMode} from '@/store/sessionMode';
 
 export function replacePropertyNameUtils(
@@ -61,11 +62,8 @@ export function updateParentRequiredPropsValue(
   );
   if (parentRequiredPropsPath) {
     const requiredProps = dataAt(parentRequiredPropsPath, schemaData) ?? [];
-    const requiredIndex = requiredProps.indexOf(oldPropertyName);
-    if (requiredIndex !== -1) {
-      const updatedRequiredProps = requiredProps.filter(
-        (_: string, index: number) => index !== requiredIndex
-      );
+    const updatedRequiredProps = removeFromRequiredArray(requiredProps, oldPropertyName);
+    if (updatedRequiredProps !== requiredProps) {
       updatedRequiredProps.push(newPropertyName);
       updateDataFct(parentRequiredPropsPath, updatedRequiredProps);
     }

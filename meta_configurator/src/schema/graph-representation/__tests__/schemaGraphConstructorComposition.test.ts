@@ -1,5 +1,4 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import type {Path} from '@/utility/path';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaGraphTypes';
 import {
@@ -7,7 +6,7 @@ import {
   generateObjectAttributes,
   generateObjectSpecialPropertyEdges,
   generateObjectFallbackDisplayName,
-  identifyObjects,
+  identifyAllObjects,
   isObjectSchema,
   isSchemaThatDeservesANode,
 } from '../schemaGraphConstructor';
@@ -20,7 +19,6 @@ vi.mock('@/dataformats/formatRegistry', () => ({
 }));
 
 describe('test schema graph constructor with objects and compositional keywords', () => {
-  let currentPath: Path;
   let schema: TopLevelSchema = {
     type: 'object',
     required: ['propertyObject'],
@@ -115,14 +113,7 @@ describe('test schema graph constructor with objects and compositional keywords'
   let defs: Map<string, SchemaObjectNodeData>;
 
   beforeEach(() => {
-    currentPath = [];
-    defs = new Map();
-
-    identifyObjects(currentPath, schema, defs, false, schema);
-    // @ts-ignore
-    for (const [key, value] of Object.entries(schema.$defs)) {
-      identifyObjects(['$defs', key], value, defs, true, schema);
-    }
+    defs = identifyAllObjects(schema);
   });
 
   it('identify objects', () => {
