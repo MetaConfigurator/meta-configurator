@@ -7,7 +7,7 @@
     :draggable="false"
     :style="{width: '800px', height: '500px'}"
     contentStyle="overflow-y: auto">
-    <div class="flex flex-col gap-6 w-full">
+    <div ref="tripleDetailRoot" class="flex flex-col gap-6 w-full">
       <div>
         <label class="block font-bold mb-3">Subject</label>
         <div class="flex gap-2 w-full items-center">
@@ -153,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {computed, nextTick, onUnmounted, ref, watch} from 'vue';
 import ToggleButton from 'primevue/togglebutton';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
@@ -207,6 +207,55 @@ const objectTypeOptions = [
   {label: 'Literal', value: RdfTermType.Literal},
 ];
 const localTriple = ref<TripleTransferObject>({...props.triple});
+const tripleDetailRoot = ref<HTMLElement | null>(null);
+
+let stopClickListener: ((event: Event) => void) | null = null;
+let stopKeydownListener: ((event: Event) => void) | null = null;
+
+function detachPropagationGuards() {
+  const root = tripleDetailRoot.value;
+  if (!root) {
+    stopClickListener = null;
+    stopKeydownListener = null;
+    return;
+  }
+
+  if (stopClickListener) {
+    root.removeEventListener('click', stopClickListener);
+    stopClickListener = null;
+  }
+  if (stopKeydownListener) {
+    root.removeEventListener('keydown', stopKeydownListener);
+    stopKeydownListener = null;
+  }
+}
+
+watch(
+  visible,
+  async isVisible => {
+    detachPropagationGuards();
+    if (!isVisible) return;
+
+    await nextTick();
+    const root = tripleDetailRoot.value;
+    if (!root) return;
+
+    stopClickListener = (event: Event) => {
+      event.stopPropagation();
+    };
+    stopKeydownListener = (event: Event) => {
+      event.stopPropagation();
+    };
+
+    root.addEventListener('click', stopClickListener);
+    root.addEventListener('keydown', stopKeydownListener);
+  },
+  {flush: 'post'}
+);
+
+onUnmounted(() => {
+  detachPropagationGuards();
+});
 
 watch(
   () => props.triple,

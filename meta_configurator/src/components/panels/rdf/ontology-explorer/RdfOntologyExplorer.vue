@@ -1,5 +1,5 @@
 <template>
-  <div class="rdf-ontology-explorer p-3">
+  <div ref="explorerRoot" class="rdf-ontology-explorer p-3">
     <div class="explorer-layout">
       <div class="prefix-pane">
         <Listbox
@@ -139,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 import Listbox from 'primevue/listbox';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -221,6 +221,10 @@ const isAutoSelectingPrefix = ref(false);
 const activeAccordion = ref<OntologyAccordionSection | null>(OntologyAccordionSection.Controls);
 const deleteDialog = ref(false);
 const ontologyFileUploadRef = ref<any | null>(null);
+const explorerRoot = ref<HTMLElement | null>(null);
+
+let stopClickListener: ((event: Event) => void) | null = null;
+let stopKeydownListener: ((event: Event) => void) | null = null;
 
 type CachedOntology = RdfCachedOntology;
 type OntologyRow = RdfOntologyRow;
@@ -230,6 +234,35 @@ const ONTOLOGY_ACCORDION_SECTION = OntologyAccordionSection;
 
 const loadedCacheEntry = ref<CachedOntology | null>(null);
 let prefixLookupRequestId = 0;
+
+onMounted(() => {
+  const root = explorerRoot.value;
+  if (!root) return;
+
+  stopClickListener = (event: Event) => {
+    event.stopPropagation();
+  };
+  stopKeydownListener = (event: Event) => {
+    event.stopPropagation();
+  };
+
+  root.addEventListener('click', stopClickListener);
+  root.addEventListener('keydown', stopKeydownListener);
+});
+
+onUnmounted(() => {
+  const root = explorerRoot.value;
+  if (!root) return;
+
+  if (stopClickListener) {
+    root.removeEventListener('click', stopClickListener);
+    stopClickListener = null;
+  }
+  if (stopKeydownListener) {
+    root.removeEventListener('keydown', stopKeydownListener);
+    stopKeydownListener = null;
+  }
+});
 
 const prefixOptions = computed(() =>
   prefixes.value.map(prefix => ({label: prefix, value: prefix}))
