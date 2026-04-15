@@ -60,8 +60,7 @@ watch(selectedType, () => {
   }
 });
 
-function clickedAttribute(event: MouseEvent) {
-  event.stopPropagation();
+function clickedAttribute() {
   emit('select_element', props.data.absolutePath);
 }
 function updateAttributeName() {
@@ -101,7 +100,7 @@ function getHandleTop() {
   <div
     class="attribute-item"
     :class="{'bg-yellow-100': isHighlighted(), 'vue-flow__node-schemaattribute': !isHighlighted()}"
-    @click="clickedAttribute($event)"
+    @click="clickedAttribute()"
     v-on:click.stop>
     <div v-if="!isEditable()">
       <span :class="{'line-through': props.data.deprecated}">{{ props.data.name }}</span>

@@ -90,8 +90,7 @@ function doubleClickedNode() {
   emit('zoom_into_element', props.data.absolutePath);
 }
 
-function clickedAttribute(path: Path, event?: MouseEvent) {
-  if (event) event.stopPropagation();
+function clickedAttribute(path: Path) {
   emit('select_element', path);
 }
 

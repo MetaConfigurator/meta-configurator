@@ -116,7 +116,7 @@ function handleCopy(event: ClipboardEvent) {
 function handlePaste(event: ClipboardEvent) {
   pasteFromClipboard();
   event.preventDefault(); // override default browser paste
-}   
+}
 
 async function copyToClipboard() {
   if (!selectedData.value) {
@@ -126,11 +126,11 @@ async function copyToClipboard() {
 
   const schema = schemaData.dataAt(schemaSession.currentSelectedElement.value);
 
-let metaType = selectedData.value.getNodeType();
+  let metaType = selectedData.value.getNodeType();
 
-if (schema.enum != undefined) {
-  metaType = 'schemaenum';
-}
+  if (schema.enum != undefined) {
+    metaType = 'schemaenum';
+  }
 
   const dataToCopy = structuredClone(schema);
 
@@ -152,18 +152,18 @@ async function pasteFromClipboard() {
     // Read JSON string from system clipboard
     const clipboardText = await navigator.clipboard.readText();
     const data = JSON.parse(clipboardText);
-
-    console.log('Pasting from system clipboard:', data);
-
+    
     if (data.type === 'object') {
       const objectPath = addSchemaObject(schemaData, false, data);
       selectElement(objectPath);
       return;
     }
     if (data.enum != undefined) {
+      console.log('Detected enum in clipboard data');
       const enumPath = findAvailableSchemaId(schemaData, ['$defs'], 'enum');
       schemaData.setDataAt(enumPath, data);
       selectElement(enumPath);
+      return;
     }
 
     // ATTRIBUTE (extended logic)
