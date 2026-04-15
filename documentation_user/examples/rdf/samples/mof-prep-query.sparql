@@ -1,0 +1,18 @@
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <https://schema.org/>
+
+SELECT ?synthesis ?step ?reagentLabel ?amount ?unit
+WHERE {
+  ?synthesis obo:BFO_0000051 ?step .
+
+  ?step obo:OBI_0000293 "Prep" ;
+        obo:RO_0000057 ?reagent ;
+        obo:OBI_0001937 ?amountNode .
+
+  ?amountNode schema:value ?amount ;
+              schema:unitCode ?unit .
+
+  ?reagent rdfs:label ?reagentLabel .
+}
+ORDER BY ?synthesis ?step

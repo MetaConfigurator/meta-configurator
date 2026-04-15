@@ -159,4 +159,15 @@ export class ManagedData {
     }
     return this.history;
   }
+
+  /**
+   * Indicates whether the current string representation of the data
+   * could not be parsed successfully.
+   *
+   * If `true`, `unparseableDataString` contains the last attempted
+   * string that failed to parse, and `data` is not updated with it.
+   */
+  public isDataUnparseable(): boolean {
+    return this.unparseableDataString.value !== null;
+  }
 }

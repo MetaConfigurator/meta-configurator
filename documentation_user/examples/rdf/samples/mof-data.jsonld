@@ -1,0 +1,562 @@
+{
+  "@context": {
+    "ex": "http://example.org/",
+    "chmo": "http://purl.obolibrary.org/obo/CHMO_",
+    "obo": "http://purl.obolibrary.org/obo/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "ex:quantity/prep/S-1-0/amount",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "amount",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/MilliMOL"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "4.0E-1"
+      }
+    },
+    {
+      "@id": "ex:quantity/prep/S-1-1/amount",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "amount",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/MilliMOL"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "4.0E-1"
+      }
+    },
+    {
+      "@id": "ex:quantity/prep/S-1-2/amount",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "amount",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/MilliL"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "4.0E0"
+      }
+    },
+    {
+      "@id": "ex:quantity/prep/S-2-0/amount",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "amount",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/MilliMOL"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "4.0E-1"
+      }
+    },
+    {
+      "@id": "ex:quantity/prep/S-2-1/amount",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "amount",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/MilliMOL"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "4.0E-1"
+      }
+    },
+    {
+      "@id": "ex:quantity/prep/S-2-2/amount",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "amount",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/MilliL"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "4.0E0"
+      }
+    },
+    {
+      "@id": "ex:quantity/reaction/S-1-0/temperature",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "temperature"
+    },
+    {
+      "@id": "ex:quantity/reaction/S-1-0/time",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "time",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/MIN"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "3.0E1"
+      }
+    },
+    {
+      "@id": "ex:quantity/reaction/S-1-1/temperature",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "temperature",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/DEG_C"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "1.2E2"
+      }
+    },
+    {
+      "@id": "ex:quantity/reaction/S-1-1/time",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "time",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/DAY"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "1.0E0"
+      }
+    },
+    {
+      "@id": "ex:quantity/reaction/S-2-0/temperature",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "temperature"
+    },
+    {
+      "@id": "ex:quantity/reaction/S-2-0/time",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "time",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/MIN"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "3.0E1"
+      }
+    },
+    {
+      "@id": "ex:quantity/reaction/S-2-1/temperature",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "temperature",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/DEG_C"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "1.2E2"
+      }
+    },
+    {
+      "@id": "ex:quantity/reaction/S-2-1/time",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "time",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/DAY"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "1.0E0"
+      }
+    },
+    {
+      "@id": "ex:quantity/workup/S-1-0/pressure",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "pressure"
+    },
+    {
+      "@id": "ex:quantity/workup/S-1-0/temperature",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "temperature"
+    },
+    {
+      "@id": "ex:quantity/workup/S-1-0/time",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "time"
+    },
+    {
+      "@id": "ex:quantity/workup/S-1-1/pressure",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "pressure",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/PA"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "0.0E0"
+      }
+    },
+    {
+      "@id": "ex:quantity/workup/S-1-1/temperature",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "temperature",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/DEG_C"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "1.2E2"
+      }
+    },
+    {
+      "@id": "ex:quantity/workup/S-1-1/time",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "time",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/DAY"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "1.0E0"
+      }
+    },
+    {
+      "@id": "ex:quantity/workup/S-2-0/pressure",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "pressure"
+    },
+    {
+      "@id": "ex:quantity/workup/S-2-0/temperature",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "temperature"
+    },
+    {
+      "@id": "ex:quantity/workup/S-2-0/time",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "time"
+    },
+    {
+      "@id": "ex:quantity/workup/S-2-1/pressure",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "pressure",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/PA"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "0.0E0"
+      }
+    },
+    {
+      "@id": "ex:quantity/workup/S-2-1/temperature",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "temperature",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/DEG_C"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "1.2E2"
+      }
+    },
+    {
+      "@id": "ex:quantity/workup/S-2-1/time",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "time",
+      "schema:unitCode": {
+        "@id": "http://qudt.org/vocab/unit/DAY"
+      },
+      "schema:value": {
+        "@type": "xsd:double",
+        "@value": "1.0E0"
+      }
+    },
+    {
+      "@id": "ex:reagent/Benzene-1%25252C4-dicarboxylic%252520acid",
+      "@type": "obo:CHEBI_24431",
+      "obo:RO_0000087": "ligand",
+      "rdfs:label": "Benzene-1,4-dicarboxylic acid"
+    },
+    {
+      "@id": "ex:reagent/DMF",
+      "@type": "obo:CHEBI_24431",
+      "obo:RO_0000087": "solvent",
+      "rdfs:label": "DMF"
+    },
+    {
+      "@id": "ex:reagent/EtOH",
+      "@type": "obo:CHEBI_24431",
+      "obo:RO_0000087": "solvent",
+      "rdfs:label": "EtOH"
+    },
+    {
+      "@id": "ex:reagent/FeCl3",
+      "@type": "obo:CHEBI_24431",
+      "obo:RO_0000087": "substrate",
+      "rdfs:label": "FeCl3"
+    },
+    {
+      "@id": "ex:reagent/FeCl3%2525C2%2525B76H2O",
+      "@type": "obo:CHEBI_24431",
+      "obo:RO_0000087": "substrate",
+      "rdfs:label": "FeCl3·6H2O"
+    },
+    {
+      "@id": "ex:step/prep/S-1-0",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Prep",
+      "obo:OBI_0001937": {
+        "@id": "ex:quantity/prep/S-1-0/amount"
+      },
+      "obo:RO_0000056": "Add",
+      "obo:RO_0000057": {
+        "@id": "ex:reagent/FeCl3"
+      }
+    },
+    {
+      "@id": "ex:step/prep/S-1-1",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Prep",
+      "obo:OBI_0001937": {
+        "@id": "ex:quantity/prep/S-1-1/amount"
+      },
+      "obo:RO_0000056": "Add",
+      "obo:RO_0000057": {
+        "@id": "ex:reagent/Benzene-1%25252C4-dicarboxylic%252520acid"
+      }
+    },
+    {
+      "@id": "ex:step/prep/S-1-2",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Prep",
+      "obo:OBI_0001937": {
+        "@id": "ex:quantity/prep/S-1-2/amount"
+      },
+      "obo:RO_0000056": "Add",
+      "obo:RO_0000057": {
+        "@id": "ex:reagent/DMF"
+      }
+    },
+    {
+      "@id": "ex:step/prep/S-2-0",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Prep",
+      "obo:OBI_0001937": {
+        "@id": "ex:quantity/prep/S-2-0/amount"
+      },
+      "obo:RO_0000056": "Add",
+      "obo:RO_0000057": {
+        "@id": "ex:reagent/FeCl3%2525C2%2525B76H2O"
+      }
+    },
+    {
+      "@id": "ex:step/prep/S-2-1",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Prep",
+      "obo:OBI_0001937": {
+        "@id": "ex:quantity/prep/S-2-1/amount"
+      },
+      "obo:RO_0000056": "Add",
+      "obo:RO_0000057": {
+        "@id": "ex:reagent/Benzene-1%25252C4-dicarboxylic%252520acid"
+      }
+    },
+    {
+      "@id": "ex:step/prep/S-2-2",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Prep",
+      "obo:OBI_0001937": {
+        "@id": "ex:quantity/prep/S-2-2/amount"
+      },
+      "obo:RO_0000056": "Add",
+      "obo:RO_0000057": {
+        "@id": "ex:reagent/DMF"
+      }
+    },
+    {
+      "@id": "ex:step/reaction/S-1-0",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Reaction",
+      "obo:OBI_0001937": [
+        {
+          "@id": "ex:quantity/reaction/S-1-0/temperature"
+        },
+        {
+          "@id": "ex:quantity/reaction/S-1-0/time"
+        }
+      ],
+      "obo:RO_0000056": "Sonicate"
+    },
+    {
+      "@id": "ex:step/reaction/S-1-1",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Reaction",
+      "obo:OBI_0001937": [
+        {
+          "@id": "ex:quantity/reaction/S-1-1/temperature"
+        },
+        {
+          "@id": "ex:quantity/reaction/S-1-1/time"
+        }
+      ],
+      "obo:RO_0000056": "HeatChill"
+    },
+    {
+      "@id": "ex:step/reaction/S-2-0",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Reaction",
+      "obo:OBI_0001937": [
+        {
+          "@id": "ex:quantity/reaction/S-2-0/temperature"
+        },
+        {
+          "@id": "ex:quantity/reaction/S-2-0/time"
+        }
+      ],
+      "obo:RO_0000056": "Sonicate"
+    },
+    {
+      "@id": "ex:step/reaction/S-2-1",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Reaction",
+      "obo:OBI_0001937": [
+        {
+          "@id": "ex:quantity/reaction/S-2-1/temperature"
+        },
+        {
+          "@id": "ex:quantity/reaction/S-2-1/time"
+        }
+      ],
+      "obo:RO_0000056": "HeatChill"
+    },
+    {
+      "@id": "ex:step/workup/S-1-0",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Workup",
+      "obo:OBI_0001937": [
+        {
+          "@id": "ex:quantity/workup/S-1-0/pressure"
+        },
+        {
+          "@id": "ex:quantity/workup/S-1-0/temperature"
+        },
+        {
+          "@id": "ex:quantity/workup/S-1-0/time"
+        }
+      ],
+      "obo:RO_0000056": "WashSolid",
+      "obo:RO_0000057": {
+        "@id": "ex:reagent/EtOH"
+      }
+    },
+    {
+      "@id": "ex:step/workup/S-1-1",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Workup",
+      "obo:OBI_0001937": [
+        {
+          "@id": "ex:quantity/workup/S-1-1/pressure"
+        },
+        {
+          "@id": "ex:quantity/workup/S-1-1/temperature"
+        },
+        {
+          "@id": "ex:quantity/workup/S-1-1/time"
+        }
+      ],
+      "obo:RO_0000056": "Dry"
+    },
+    {
+      "@id": "ex:step/workup/S-2-0",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Workup",
+      "obo:OBI_0001937": [
+        {
+          "@id": "ex:quantity/workup/S-2-0/pressure"
+        },
+        {
+          "@id": "ex:quantity/workup/S-2-0/temperature"
+        },
+        {
+          "@id": "ex:quantity/workup/S-2-0/time"
+        }
+      ],
+      "obo:RO_0000056": "WashSolid",
+      "obo:RO_0000057": {
+        "@id": "ex:reagent/EtOH"
+      }
+    },
+    {
+      "@id": "ex:step/workup/S-2-1",
+      "@type": "obo:OBI_0000070",
+      "obo:OBI_0000293": "Workup",
+      "obo:OBI_0001937": [
+        {
+          "@id": "ex:quantity/workup/S-2-1/pressure"
+        },
+        {
+          "@id": "ex:quantity/workup/S-2-1/temperature"
+        },
+        {
+          "@id": "ex:quantity/workup/S-2-1/time"
+        }
+      ],
+      "obo:RO_0000056": "Dry"
+    },
+    {
+      "@id": "ex:synthesis/S-1",
+      "@type": "obo:CHMO_0000568",
+      "obo:BFO_0000051": [
+        {
+          "@id": "ex:step/prep/S-1-0"
+        },
+        {
+          "@id": "ex:step/prep/S-1-1"
+        },
+        {
+          "@id": "ex:step/prep/S-1-2"
+        },
+        {
+          "@id": "ex:step/reaction/S-1-0"
+        },
+        {
+          "@id": "ex:step/reaction/S-1-1"
+        },
+        {
+          "@id": "ex:step/workup/S-1-0"
+        },
+        {
+          "@id": "ex:step/workup/S-1-1"
+        }
+      ],
+      "obo:OBI_0000299": "MIL-88B (Fe)",
+      "obo:RO_0000086": "glass vial",
+      "rdfs:label": "S-1",
+      "schema:identifier": "S-1"
+    },
+    {
+      "@id": "ex:synthesis/S-2",
+      "@type": "obo:CHMO_0000568",
+      "obo:BFO_0000051": [
+        {
+          "@id": "ex:step/prep/S-2-0"
+        },
+        {
+          "@id": "ex:step/prep/S-2-1"
+        },
+        {
+          "@id": "ex:step/prep/S-2-2"
+        },
+        {
+          "@id": "ex:step/reaction/S-2-0"
+        },
+        {
+          "@id": "ex:step/reaction/S-2-1"
+        },
+        {
+          "@id": "ex:step/workup/S-2-0"
+        },
+        {
+          "@id": "ex:step/workup/S-2-1"
+        }
+      ],
+      "obo:OBI_0000299": "MIL-88B+MIL101 (mix phases)",
+      "obo:RO_0000086": "glass vial",
+      "rdfs:label": "S-2",
+      "schema:identifier": "S-2"
+    }
+  ]
+}

@@ -448,7 +448,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     rdf: {
       type: 'object',
-      required: ['sparqlEndpointUrl'],
+      required: [
+        'sparqlEndpointUrl',
+        'baseUri',
+        'groupBySubject',
+        'maximumTriplesToShow',
+        'maximumNodesToVisualize',
+      ],
       additionalProperties: false,
       description: 'Settings for RDF data.',
       properties: {
@@ -457,6 +463,30 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description: 'The SPARQL endpoint to use for querying RDF data.',
           default: 'https://dbpedia.org/sparql',
           format: 'uri',
+        },
+        baseUri: {
+          type: 'string',
+          description: 'The base URI to use for resolving relative IRIs in RDF data.',
+          default: 'http://example.com/',
+          format: 'uri',
+        },
+        groupBySubject: {
+          type: 'boolean',
+          description:
+            'Group RDF triples by subject in the RDF viewer. If set to true, triples will be grouped by their subject, which can make it easier to explore the data. If set to false, triples will be shown in a flat list.',
+          default: false,
+        },
+        maximumTriplesToShow: {
+          type: 'integer',
+          description:
+            'The maximum number of RDF triples to show in the RDF viewer. If the number of triples exceeds this value, only a subset will be shown to avoid performance issues.',
+          default: 500,
+        },
+        maximumNodesToVisualize: {
+          type: 'integer',
+          description:
+            'The maximum number of nodes to visualize in the RDF graph. If the number of nodes exceeds this value, a warning will be shown to the user before rendering the graph, as rendering may be slow for large graphs.',
+          default: 50,
         },
       },
     },

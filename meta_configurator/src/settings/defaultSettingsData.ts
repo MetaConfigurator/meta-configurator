@@ -111,6 +111,10 @@ export const SETTINGS_DATA_DEFAULT = {
   },
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
+    baseUri: 'https://example.com/',
+    maximumTriplesToShow: 500,
+    maximumNodesToVisualize: 100,
+    groupBySubject: false,
   },
   aiIntegration: {
     model: 'gpt-4o-mini',

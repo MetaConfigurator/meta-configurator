@@ -1,0 +1,45 @@
+{
+  "@context": {
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "m4i": "http://w3id.org/nfdi4ing/metadata4ing#",
+    "unit": "http://qudt.org/vocab/unit/",
+    "local": "https://www.example.org/",
+    "schema": "https://schema.org/"
+  },
+  "@graph": [
+    {
+      "@id": "local:run_fenics_simulation",
+      "@type": "m4i:Method",
+      "m4i:hasParameter": {
+        "@id": "local:variable_element_size"
+      },
+      "m4i:investigates": {
+        "@id": "local:variable_max_von_mises_stress"
+      }
+    },
+    {
+      "@id": "local:variable_element_size",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "element_size",
+      "schema:unitCode": {
+        "@id": "unit:M"
+      },
+      "schema:value": {
+        "@type": "http://www.w3.org/2001/XMLSchema#double",
+        "@value": "2.5E-2"
+      }
+    },
+    {
+      "@id": "local:variable_max_von_mises_stress",
+      "@type": "schema:PropertyValue",
+      "rdfs:label": "max_von_mises_stress",
+      "schema:unitCode": {
+        "@id": "unit:MegaPA"
+      },
+      "schema:value": {
+        "@type": "http://www.w3.org/2001/XMLSchema#double",
+        "@value": "2.997915075586333E8"
+      }
+    }
+  ]
+}

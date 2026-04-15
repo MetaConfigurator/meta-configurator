@@ -1,0 +1,449 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix chmo: <http://purl.obolibrary.org/obo/CHMO_> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+##################################################
+# SOURCES
+##################################################
+
+<#SynthesisSource>
+    rml:source "Data.json" ;
+    rml:referenceFormulation ql:JSONPath ;
+    rml:iterator "$.Synthesis[*]" .
+
+<#ReagentSource>
+    rml:source "Data.json" ;
+    rml:referenceFormulation ql:JSONPath ;
+    rml:iterator "$.Synthesis[*].Reagents.Reagent[*]" .
+
+<#PrepStepSource>
+    rml:source "Data.json" ;
+    rml:referenceFormulation ql:JSONPath ;
+    rml:iterator "$.Synthesis[*].Procedure.Prep.Step[*]" .
+
+<#ReactionStepSource>
+    rml:source "Data.json" ;
+    rml:referenceFormulation ql:JSONPath ;
+    rml:iterator "$.Synthesis[*].Procedure.Reaction.Step[*]" .
+
+<#WorkupStepSource>
+    rml:source "Data.json" ;
+    rml:referenceFormulation ql:JSONPath ;
+    rml:iterator "$.Synthesis[*].Procedure.Workup.Step[*]" .
+
+##################################################
+# SYNTHESIS
+##################################################
+
+<#SynthesisTriplesMap>
+    rml:logicalSource <#SynthesisSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/synthesis/{Hardware.Component[0]._id}" ;
+        rr:class chmo:0000568
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:identifier ;
+        rr:objectMap [ rml:reference "Hardware.Component[0]._id" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:RO_0000086 ;
+        rr:objectMap [ rml:reference "Hardware.Component[0]._type" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rml:reference "Metadata._description" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0000299 ;
+        rr:objectMap [ rml:reference "Metadata._product" ]
+    ] .
+
+##################################################
+# REAGENTS
+##################################################
+
+<#ReagentTriplesMap>
+    rml:logicalSource <#ReagentSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/reagent/{_id}" ;
+        rr:class obo:CHEBI_24431
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rml:reference "_name" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:RO_0000087 ;
+        rr:objectMap [ rml:reference "_role" ]
+    ] .
+
+##################################################
+# PREP STEPS
+##################################################
+
+<#PrepStepTriplesMap>
+    rml:logicalSource <#PrepStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/step/prep/{_vessel}-{_order}" ;
+        rr:class obo:OBI_0000070
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0000293 ;
+        rr:objectMap [ rr:constant "Prep" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:RO_0000056 ;
+        rr:objectMap [ rml:reference "$xml_type" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0001937 ;
+        rr:objectMap [
+            rr:template "http://example.org/quantity/prep/{_vessel}-{_order}/amount"
+        ]
+    ] .
+
+<#PrepAmountValueMap>
+    rml:logicalSource <#PrepStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/quantity/prep/{_vessel}-{_order}/amount" ;
+        rr:class schema:PropertyValue
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rr:constant "amount" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:value ;
+        rr:objectMap [
+            rml:reference "_amount.Value" ;
+            rr:datatype xsd:double
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:unitCode ;
+        rr:objectMap [
+            rr:template "http://qudt.org/vocab/unit/{_amount.Unit}"
+        ]
+    ] .
+
+##################################################
+# REACTION STEPS
+##################################################
+
+<#ReactionStepTriplesMap>
+    rml:logicalSource <#ReactionStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/step/reaction/{_vessel}-{_order}" ;
+        rr:class obo:OBI_0000070
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0000293 ;
+        rr:objectMap [ rr:constant "Reaction" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:RO_0000056 ;
+        rr:objectMap [ rml:reference "$xml_type" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0001937 ;
+        rr:objectMap [
+            rr:template "http://example.org/quantity/reaction/{_vessel}-{_order}/temperature"
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0001937 ;
+        rr:objectMap [
+            rr:template "http://example.org/quantity/reaction/{_vessel}-{_order}/time"
+        ]
+    ] .
+
+<#ReactionTemperatureValueMap>
+    rml:logicalSource <#ReactionStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/quantity/reaction/{_vessel}-{_order}/temperature" ;
+        rr:class schema:PropertyValue
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rr:constant "temperature" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:value ;
+        rr:objectMap [
+            rml:reference "_temp.Value" ;
+            rr:datatype xsd:double
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:unitCode ;
+        rr:objectMap [
+            rr:template "http://qudt.org/vocab/unit/{_temp.Unit}"
+        ]
+    ] .
+
+<#ReactionTimeValueMap>
+    rml:logicalSource <#ReactionStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/quantity/reaction/{_vessel}-{_order}/time" ;
+        rr:class schema:PropertyValue
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rr:constant "time" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:value ;
+        rr:objectMap [
+            rml:reference "_time.Value" ;
+            rr:datatype xsd:double
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:unitCode ;
+        rr:objectMap [
+            rr:template "http://qudt.org/vocab/unit/{_time.Unit}"
+        ]
+    ] .
+
+##################################################
+# WORKUP STEPS
+##################################################
+
+<#WorkupStepTriplesMap>
+    rml:logicalSource <#WorkupStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/step/workup/{_vessel}-{_order}" ;
+        rr:class obo:OBI_0000070
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0000293 ;
+        rr:objectMap [ rr:constant "Workup" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:RO_0000056 ;
+        rr:objectMap [ rml:reference "$xml_type" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0001937 ;
+        rr:objectMap [
+            rr:template "http://example.org/quantity/workup/{_vessel}-{_order}/temperature"
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0001937 ;
+        rr:objectMap [
+            rr:template "http://example.org/quantity/workup/{_vessel}-{_order}/time"
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:OBI_0001937 ;
+        rr:objectMap [
+            rr:template "http://example.org/quantity/workup/{_vessel}-{_order}/pressure"
+        ]
+    ] .
+
+<#WorkupTemperatureValueMap>
+    rml:logicalSource <#WorkupStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/quantity/workup/{_vessel}-{_order}/temperature" ;
+        rr:class schema:PropertyValue
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rr:constant "temperature" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:value ;
+        rr:objectMap [
+            rml:reference "_temp.Value" ;
+            rr:datatype xsd:double
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:unitCode ;
+        rr:objectMap [
+            rr:template "http://qudt.org/vocab/unit/{_temp.Unit}"
+        ]
+    ] .
+
+<#WorkupTimeValueMap>
+    rml:logicalSource <#WorkupStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/quantity/workup/{_vessel}-{_order}/time" ;
+        rr:class schema:PropertyValue
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rr:constant "time" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:value ;
+        rr:objectMap [
+            rml:reference "_time.Value" ;
+            rr:datatype xsd:double
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:unitCode ;
+        rr:objectMap [
+            rr:template "http://qudt.org/vocab/unit/{_time.Unit}"
+        ]
+    ] .
+
+<#WorkupPressureValueMap>
+    rml:logicalSource <#WorkupStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/quantity/workup/{_vessel}-{_order}/pressure" ;
+        rr:class schema:PropertyValue
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate rdfs:label ;
+        rr:objectMap [ rr:constant "pressure" ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:value ;
+        rr:objectMap [
+            rml:reference "_pressure.Value" ;
+            rr:datatype xsd:double
+        ]
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate schema:unitCode ;
+        rr:objectMap [
+            rr:template "http://qudt.org/vocab/unit/{_pressure.Unit}"
+        ]
+    ] .
+
+##################################################
+# RELATIONS
+##################################################
+
+<#SynthesisToPrep>
+    rml:logicalSource <#PrepStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/synthesis/{_vessel}"
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:BFO_0000051 ;
+        rr:objectMap [
+            rr:template "http://example.org/step/prep/{_vessel}-{_order}"
+        ]
+    ] .
+
+<#SynthesisToReaction>
+    rml:logicalSource <#ReactionStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/synthesis/{_vessel}"
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:BFO_0000051 ;
+        rr:objectMap [
+            rr:template "http://example.org/step/reaction/{_vessel}-{_order}"
+        ]
+    ] .
+
+<#SynthesisToWorkup>
+    rml:logicalSource <#WorkupStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/synthesis/{_vessel}"
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:BFO_0000051 ;
+        rr:objectMap [
+            rr:template "http://example.org/step/workup/{_vessel}-{_order}"
+        ]
+    ] .
+
+<#PrepStepToReagent>
+    rml:logicalSource <#PrepStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/step/prep/{_vessel}-{_order}"
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:RO_0000057 ;
+        rr:objectMap [
+            rr:parentTriplesMap <#ReagentTriplesMap> ;
+            rr:joinCondition [
+                rr:child "_reagent" ;
+                rr:parent "_name"
+            ]
+        ]
+    ] .
+
+<#WorkupStepToReagent>
+    rml:logicalSource <#WorkupStepSource> ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/step/workup/{_vessel}-{_order}"
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate obo:RO_0000057 ;
+        rr:objectMap [
+            rr:parentTriplesMap <#ReagentTriplesMap> ;
+            rr:joinCondition [
+                rr:child "_solvent" ;
+                rr:parent "_name"
+            ]
+        ]
+    ] .

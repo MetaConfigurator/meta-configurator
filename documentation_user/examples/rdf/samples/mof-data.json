@@ -1,0 +1,70 @@
+{
+  "Synthesis": [
+    {
+      "Hardware": { "Component": [{ "_id": "S-1", "_type": "glass vial" }] },
+      "Metadata": { "_description": "S-1", "_product": "MIL-88B (Fe)" },
+      "Procedure": {
+        "Prep": {
+          "Step": [
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "FeCl3", "_order": 0 },
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
+            { "_vessel": "S-1", "$xml_type": "Add", "_amount": { "Unit": "MilliL", "Value": 4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "DMF", "_order": 2 }
+          ]
+        },
+        "Reaction": {
+          "Step": [
+            { "_vessel": "S-1", "$xml_type": "Sonicate", "_time": { "Value": 30.0, "Unit": "MIN", "$xml_append": "${Value} ${Unit}" }, "_order": 0 },
+            { "_comment": "In: oven", "_vessel": "S-1", "$xml_type": "HeatChill", "_temp": { "Unit": "DEG_C", "Value": 120.0, "$xml_append": "${Value} ${Unit}" }, "_time": { "Value": 1, "Unit":"DAY", "$xml_append": "${Value} ${Unit}" }, "_order": 1 }
+          ]
+        },
+        "Workup": {
+          "Step": [
+            { "_vessel": "S-1", "$xml_type": "WashSolid", "_solvent": "EtOH", "_order": 0 },
+            { "_vessel": "S-1", "$xml_type": "Dry", "_temp": { "Unit": "DEG_C", "Value": 120.0, "$xml_append": "${Value} ${Unit}" }, "_time": { "Value": 1, "Unit":"DAY", "$xml_append": "${Value} ${Unit}" }, "_pressure": { "Unit": "PA", "Value": 0, "$xml_append": "${Value} ${Unit}" }, "_order": 1 }
+          ]
+        }
+      },
+      "Reagents": {
+        "Reagent": [
+          { "_id": "FeCl3", "_name": "FeCl3", "_role": "substrate" },
+          { "_id": "Benzene-1%252C4-dicarboxylic%2520acid", "_name": "Benzene-1,4-dicarboxylic acid", "_role": "ligand" },
+          { "_id": "DMF", "_name": "DMF", "_role": "solvent" },
+          { "_id": "EtOH", "_name": "EtOH", "_role": "solvent" }
+        ]
+      }
+    },
+    {
+      "Hardware": { "Component": [{ "_id": "S-2", "_type": "glass vial" }] },
+      "Metadata": { "_description": "S-2", "_product": "MIL-88B+MIL101 (mix phases)" },
+      "Procedure": {
+        "Prep": {
+          "Step": [
+            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "FeCl3·6H2O", "_order": 0 },
+            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "MilliMOL", "Value": 0.4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "Benzene-1,4-dicarboxylic acid", "_order": 1 },
+            { "_vessel": "S-2", "$xml_type": "Add", "_amount": { "Unit": "MilliL", "Value": 4, "$xml_append": "${Value} ${Unit}" }, "_reagent": "DMF", "_order": 2 }
+          ]
+        },
+        "Reaction": {
+          "Step": [
+            { "_vessel": "S-2", "$xml_type": "Sonicate", "_time": { "Value": 30.0, "Unit": "MIN", "$xml_append": "${Value} ${Unit}" }, "_order": 0 },
+            { "_comment": "In: oven", "_vessel": "S-2", "$xml_type": "HeatChill", "_temp": { "Unit": "DEG_C", "Value": 120.0, "$xml_append": "${Value} ${Unit}" }, "_time": { "Value": 1, "Unit":"DAY", "$xml_append": "${Value} ${Unit}" }, "_order": 1 }
+          ]
+        },
+        "Workup": {
+          "Step": [
+            { "_vessel": "S-2", "$xml_type": "WashSolid", "_solvent": "EtOH", "_order": 0 },
+            { "_vessel": "S-2", "$xml_type": "Dry", "_temp": { "Unit": "DEG_C", "Value": 120.0, "$xml_append": "${Value} ${Unit}" }, "_time": { "Value": 1, "Unit":"DAY", "$xml_append": "${Value} ${Unit}" }, "_pressure": { "Unit": "PA", "Value": 0, "$xml_append": "${Value} ${Unit}" }, "_order": 1 }
+          ]
+        }
+      },
+      "Reagents": {
+        "Reagent": [
+          { "_id": "FeCl3%25C2%25B76H2O", "_name": "FeCl3·6H2O", "_role": "substrate" },
+          { "_id": "Benzene-1%252C4-dicarboxylic%2520acid", "_name": "Benzene-1,4-dicarboxylic acid", "_role": "ligand" },
+          { "_id": "DMF", "_name": "DMF", "_role": "solvent" },
+          { "_id": "EtOH", "_name": "EtOH", "_role": "solvent" }
+        ]
+      }
+    }
+  ]
+}

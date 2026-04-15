@@ -1,0 +1,12 @@
+PREFIX m4i: <http://w3id.org/nfdi4ing/metadata4ing#>
+PREFIX schema: <https://schema.org/>
+
+SELECT ?element_size ?max_von_mises_stress WHERE {
+  ?method a m4i:Method .
+  ?method m4i:hasParameter ?element_size_param .
+  ?element_size_param a schema:PropertyValue ;
+                      schema:value ?element_size .
+  ?method m4i:investigates ?stress_param .
+  ?stress_param a schema:PropertyValue ;
+                schema:value ?max_von_mises_stress .
+} ORDER BY ASC(?element_size)

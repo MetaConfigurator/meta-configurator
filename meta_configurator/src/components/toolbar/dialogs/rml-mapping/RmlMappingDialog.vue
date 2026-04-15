@@ -1,0 +1,382 @@
+<template>
+  <Dialog
+    v-model:visible="showDialog"
+    header="Convert JSON data to JSON-LD using RML"
+    modal
+    maximizable
+    :style="{width: '80vw', height: '80vh'}">
+    <div class="rml-dialog-body">
+      <Message severity="warn" v-if="mappingServiceWarning.length">
+        <span v-html="mappingServiceWarning"></span>
+      </Message>
+      <Panel header="Use AI assistance to generate RML configuration" toggleable class="rml-panel">
+        <div class="step-panel">
+          <PanelSettings
+            panel-name="API Key and AI Settings"
+            panel-display-name="API Key and AI Settings"
+            settings-header="AI Settings"
+            :panel-settings-path="['aiIntegration']"
+            :sessionMode="SessionMode.DataEditor">
+            <ApiKey />
+          </PanelSettings>
+          <ApiKeyWarning />
+          <p class="text-sm text-gray-700">
+            This tool converts the JSON data from the <strong>Data Editor</strong> to
+            <strong>JSON-LD</strong>. You have to provide extra instructions below to guide the
+            mapping. You can skip this step and directly paste your RML mapping configuration in the
+            Mapping Configuration.
+          </p>
+          <div class="hints-block">
+            <label for="userComments" class="block font-semibold mb-1">
+              Mapping Instructions <span class="text-red-600">*</span>
+            </label>
+            <Textarea
+              id="userComments"
+              required
+              v-model="userComments"
+              class="w-full rml-hints-textarea"
+              placeholder="Describe how to map the JSON to JSON-LD: target classes, how to build IRIs, rename fields, data types, and any joins." />
+          </div>
+          <Button
+            label="Generate Suggestion"
+            icon="pi pi-wand"
+            @click="generateMappingSuggestion"
+            :loading="isLoadingMapping"
+            :disabled="!hasUserComments || isLoadingMapping" />
+        </div>
+      </Panel>
+      <div class="step-panel step-panel-grow">
+        <Divider />
+        <label class="block font-semibold mb-2">Mapping Configuration</label>
+        <div class="editor-block">
+          <div ref="editorHost" class="rml-ace-editor" :id="editorId" />
+        </div>
+        <div v-if="errorMessage.length" class="error-box">
+          <span v-html="errorMessage"></span>
+        </div>
+      </div>
+    </div>
+    <template #footer>
+      <Button
+        v-if="resultIsValid"
+        label="Perform Mapping"
+        icon="pi pi-play"
+        @click="performMapping" />
+    </template>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import {ref, computed, watch, type Ref, nextTick, onUnmounted} from 'vue';
+import Dialog from 'primevue/dialog';
+import Textarea from 'primevue/textarea';
+import Button from 'primevue/button';
+import Divider from 'primevue/divider';
+import Message from 'primevue/message';
+import Panel from 'primevue/panel';
+import * as ace from 'brace';
+import type {Editor} from 'brace';
+import 'brace/theme/clouds';
+import 'brace/theme/clouds_midnight';
+import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
+import {SessionMode} from '@/store/sessionMode';
+import {getDataForMode} from '@/data/useDataLink';
+import {RmlMappingServiceStandard} from '@/rml-mapping/standard/rmlMappingServiceStandard';
+import type {RmlMappingService} from '@/rml-mapping/rmlMappingService';
+import {useDebounceFn} from '@vueuse/core';
+import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
+import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
+import {useErrorService} from '@/utility/errorServiceInstance';
+import {isDarkMode} from '@/utility/darkModeUtils';
+import {RmlCustomMode} from '@/components/panels/rdf/aceSyntaxHighlighting';
+
+const showDialog = ref(false);
+const input = ref({});
+const result = ref('');
+const rmlConfig = ref('');
+const resultIsValid = ref(false);
+const errorMessage = ref('');
+const userComments = ref('');
+const isLoadingMapping = ref(false);
+const hasUserComments = computed(() => userComments.value.trim().length > 0);
+const editorId = 'rml-mapping-editor-' + Math.random();
+const editor = ref<Editor | null>(null);
+const editorHost = ref<HTMLElement | null>(null);
+let isUpdatingFromOutside = false;
+let resizeObserver: ResizeObserver | null = null;
+
+const mappingService: Ref<RmlMappingService> = computed(() => {
+  return new RmlMappingServiceStandard();
+});
+
+const mappingServiceWarning: Ref<string> = computed(() => {
+  return '';
+});
+
+function ensureEditorCreated() {
+  if (editor.value) return;
+  const instance = ace.edit(editorId);
+  editor.value = instance;
+
+  instance.getSession().setMode(new (RmlCustomMode as any)());
+  instance.getSession().setUseWrapMode(true);
+  instance.getSession().setTabSize(2);
+  instance.setOption('wrap', true);
+  instance.setShowPrintMargin(false);
+  instance.setTheme(isDarkMode.value ? 'ace/theme/clouds_midnight' : 'ace/theme/clouds');
+  instance.setValue(rmlConfig.value ?? '', -1);
+
+  instance.on('change', () => {
+    if (isUpdatingFromOutside) {
+      isUpdatingFromOutside = false;
+      return;
+    }
+    rmlConfig.value = instance.getValue();
+  });
+
+  if (editorHost.value && !resizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      editor.value?.resize();
+    });
+    resizeObserver.observe(editorHost.value);
+  }
+}
+
+function setEditorValueFromOutside(value: string) {
+  if (!editor.value) return;
+  const current = editor.value.getValue();
+  if (current === value) return;
+
+  isUpdatingFromOutside = true;
+  editor.value.setValue(value ?? '', -1);
+  isUpdatingFromOutside = false;
+}
+
+function destroyEditor() {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+    resizeObserver = null;
+  }
+  if (!editor.value) return;
+  editor.value.destroy();
+  editor.value.container.remove();
+  editor.value = null;
+}
+
+watch(showDialog, async visible => {
+  if (visible) {
+    await nextTick();
+    rmlConfig.value = result.value;
+    ensureEditorCreated();
+    if (editor.value) {
+      setEditorValueFromOutside(rmlConfig.value ?? '');
+      editor.value.resize();
+      editor.value.focus();
+      window.setTimeout(() => editor.value?.resize(), 0);
+    }
+  } else {
+    destroyEditor();
+  }
+});
+
+watch(
+  () => rmlConfig.value,
+  value => {
+    if (!editor.value) return;
+    setEditorValueFromOutside(value ?? '');
+  }
+);
+
+watch(
+  () => isDarkMode.value,
+  isDark => {
+    if (!editor.value) return;
+    editor.value.setTheme(isDark ? 'ace/theme/clouds_midnight' : 'ace/theme/clouds');
+  }
+);
+
+function openDialog() {
+  resetDialog();
+  input.value = getDataForMode(SessionMode.DataEditor).data.value;
+  showDialog.value = true;
+}
+
+function hideDialog() {
+  showDialog.value = false;
+}
+
+function resetDialog() {
+  errorMessage.value = '';
+  userComments.value = '';
+  input.value = {};
+  result.value = '';
+  rmlConfig.value = '';
+  resultIsValid.value = false;
+}
+
+function validateConfig(config: string, input: any) {
+  const validationResult = mappingService.value.validateMappingConfig(config, input);
+  if (!validationResult.success) {
+    errorMessage.value = validationResult.message;
+    resultIsValid.value = false;
+  } else {
+    errorMessage.value = '';
+    resultIsValid.value = true;
+  }
+}
+
+const validateLive = useDebounceFn(() => {
+  if (!rmlConfig.value) return;
+  validateConfig(rmlConfig.value, input.value);
+}, 100);
+
+watch(rmlConfig, () => {
+  validateLive();
+});
+
+function generateMappingSuggestion() {
+  isLoadingMapping.value = true;
+  mappingService.value
+    .generateMappingSuggestion(input.value, userComments.value)
+    .then(res => {
+      result.value = res.config;
+      rmlConfig.value = res.config;
+      if (res.success) {
+        errorMessage.value = '';
+      } else {
+        errorMessage.value = res.message;
+      }
+      isLoadingMapping.value = false;
+      validateConfig(res.config, input.value);
+    })
+    .catch(error => {
+      useErrorService().onError(error);
+    })
+    .finally(() => {
+      isLoadingMapping.value = false;
+    });
+}
+
+function performMapping() {
+  const config = rmlConfig.value;
+  if (!config) {
+    errorMessage.value = 'No mapping configuration available.';
+    return;
+  }
+
+  mappingService.value.performRmlMapping(input.value, config).then(res => {
+    if (res.success) {
+      errorMessage.value = '';
+      getDataForMode(SessionMode.DataEditor).setData(res.resultData);
+      hideDialog();
+    } else {
+      errorMessage.value = res.message;
+    }
+  });
+}
+
+defineExpose({show: openDialog, close: hideDialog});
+
+onUnmounted(() => {
+  destroyEditor();
+});
+</script>
+
+<style scoped>
+label {
+  font-size: 0.9rem;
+}
+
+.rml-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+.rml-panel {
+  flex: 0 0 auto;
+}
+
+.step-panel {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step-panel-grow {
+  flex: 1;
+  min-height: 320px;
+}
+
+.hints-block {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hints-block :deep(.p-textarea),
+.hints-block :deep(textarea) {
+  flex: 1;
+  min-height: 180px;
+  height: 180px;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.editor-block {
+  flex: 1;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid var(--p-primary-active-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+:deep(.p-dialog-content) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rml-ace-editor {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.rml-ace-editor :deep(.ace_editor) {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.error-box {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: var(--p-red-100);
+  color: var(--p-red-700);
+  font-size: 0.875rem;
+  border: 1px solid var(--p-red-700);
+  flex-shrink: 0;
+  max-height: 150px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+</style>

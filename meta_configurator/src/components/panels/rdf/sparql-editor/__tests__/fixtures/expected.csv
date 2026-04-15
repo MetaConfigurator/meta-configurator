@@ -1,0 +1,12 @@
+?subject,?predicate,?object
+https://www.example.org/run_fenics_simulation,http://w3id.org/nfdi4ing/metadata4ing#hasParameter,https://www.example.org/variable_element_size
+https://www.example.org/run_fenics_simulation,http://w3id.org/nfdi4ing/metadata4ing#investigates,https://www.example.org/variable_max_von_mises_stress
+https://www.example.org/run_fenics_simulation,http://www.w3.org/1999/02/22-rdf-syntax-ns#type,http://w3id.org/nfdi4ing/metadata4ing#Method
+https://www.example.org/variable_element_size,http://www.w3.org/1999/02/22-rdf-syntax-ns#type,https://schema.org/PropertyValue
+https://www.example.org/variable_element_size,http://www.w3.org/2000/01/rdf-schema#label,element_size
+https://www.example.org/variable_element_size,https://schema.org/unitCode,http://qudt.org/vocab/unit/M
+https://www.example.org/variable_element_size,https://schema.org/value,2.5E-2
+https://www.example.org/variable_max_von_mises_stress,http://www.w3.org/1999/02/22-rdf-syntax-ns#type,https://schema.org/PropertyValue
+https://www.example.org/variable_max_von_mises_stress,http://www.w3.org/2000/01/rdf-schema#label,max_von_mises_stress
+https://www.example.org/variable_max_von_mises_stress,https://schema.org/unitCode,http://qudt.org/vocab/unit/MegaPA
+https://www.example.org/variable_max_von_mises_stress,https://schema.org/value,2.997915075586333E8

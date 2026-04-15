@@ -8,6 +8,7 @@
 * [Schema Selection List](examples/schema_selection_list) (Provide your users a pre-defined list of schemas to choose from; useful for organizations)
 * [AI Assistance](examples/ai_assistance) (Shows how to use AI-assisted features for schema and data creation/editing, as well as data transformation)
 * [External References](examples/external_references) (Shows how to handle external references in MetaConfigurator)
+* [RDF Panel](examples/rdf) (How to use RDF Panel in MetaConfigurator)
 
 ## Load a Schema
 

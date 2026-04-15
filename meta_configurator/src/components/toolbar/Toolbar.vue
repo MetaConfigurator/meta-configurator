@@ -8,6 +8,7 @@ import InitialSchemaSelectionDialog from '@/components/toolbar/dialogs/InitialSc
 import AboutDialog from '@/components/toolbar/dialogs/AboutDialog.vue';
 import DataMappingDialog from '@/components/toolbar/dialogs/data-mapping/DataMappingDialog.vue';
 import ImportCsvDialog from '@/components/toolbar/dialogs/csvimport/ImportCsvDialog.vue';
+import ImportTurtleDialog from '@/components/toolbar/dialogs/turtle-import/ImportTurtleDialog.vue';
 import SaveSnapshotDialog from '@/components/toolbar/dialogs/snapshot/SaveSnapshotDialog.vue';
 import CodeGenerationDialog from '@/components/toolbar/dialogs/code-generation/CodeGenerationDialog.vue';
 import FetchedSchemasSelectionDialog from '@/components/toolbar/dialogs/FetchedSchemasSelectionDialog.vue';
@@ -18,6 +19,7 @@ import {hasCurrentNewsChanged, setCurrentNewsHash} from '@/components/toolbar/cu
 import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExportDialog.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
+import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -101,12 +103,20 @@ function showCsvImportDialog() {
   csvImportDialog.value?.show();
 }
 
+function showTurtleImportDialog() {
+  turtleImportDialog.value?.show();
+}
+
 function showSnapshotDialog() {
   snapshotDialog.value?.show();
 }
 
 function showDataMappingDialog() {
   dataMappingDialog.value?.show();
+}
+
+function showRmlMappingDialog() {
+  rmlMappingDialog.value?.show();
 }
 
 async function showSchemaStoreDialog(): Promise<void> {
@@ -146,6 +156,8 @@ const dataExportDialog = ref();
 const fetchedSchemasSelectionDialog = ref();
 const urlInputDialog = ref();
 const dataMappingDialog = ref();
+const rmlMappingDialog = ref();
+const turtleImportDialog = ref();
 
 defineExpose({
   showInitialSchemaDialog: showInitialDialog,
@@ -177,6 +189,8 @@ defineExpose({
 
   <ImportCsvDialog ref="csvImportDialog" />
 
+  <ImportTurtleDialog ref="turtleImportDialog" />
+
   <SaveSnapshotDialog ref="snapshotDialog" />
 
   <CodeGenerationDialog ref="codeGenerationDialog" />
@@ -188,6 +202,8 @@ defineExpose({
   <UrlInputDialog ref="urlInputDialog" />
 
   <DataMappingDialog ref="dataMappingDialog" />
+
+  <RmlMappingDialog ref="rmlMappingDialog" />
 
   <AboutDialog
     :visible="showAboutDialog"
@@ -202,6 +218,8 @@ defineExpose({
     @show-import-csv-dialog="() => showCsvImportDialog()"
     @show-snapshot-dialog="() => showSnapshotDialog()"
     @show-data-mapping-dialog="() => showDataMappingDialog()"
+    @show-rml-mapping-dialog="() => showRmlMappingDialog()"
+    @show-import-turtle-dialog="() => showTurtleImportDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 
