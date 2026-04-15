@@ -152,7 +152,7 @@ async function pasteFromClipboard() {
     // Read JSON string from system clipboard
     const clipboardText = await navigator.clipboard.readText();
     const data = JSON.parse(clipboardText);
-    
+
     if (data.type === 'object') {
       const objectPath = addSchemaObject(schemaData, false, data);
       selectElement(objectPath);
