@@ -64,7 +64,7 @@ defineExpose({show: openDialog, close: hideDialog});
       class="flex flex-column gap-3 bigger-dialog-content"
       :style="{cursor: isLoading ? 'wait' : 'default'}">
       <Message severity="warn" :closable="false" icon="pi pi-exclamation-triangle">
-        Importing a Turtle file will overwrite existing data in the text view.
+        Importing a Turtle file will overwrite your existing data. The schema will remain unchanged.
       </Message>
       <div class="flex align-items-center justify-content-center gap-2">
         <Button label="Select File" @click="requestUploadFile" :disabled="isLoading" />

@@ -5,7 +5,7 @@
     modal
     maximizable
     :draggable="false"
-    :style="{width: '800px', height: '500px'}"
+    :style="{width: '50vw', height: '50vh'}"
     contentStyle="overflow-y: auto">
     <div ref="tripleDetailRoot" class="flex flex-col gap-6 w-full">
       <div>

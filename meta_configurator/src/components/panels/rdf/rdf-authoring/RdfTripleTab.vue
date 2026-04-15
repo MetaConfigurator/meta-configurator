@@ -107,7 +107,7 @@
     header="SPARQL"
     modal
     maximizable
-    :style="{width: '1200px', height: '1200px'}"
+    :style="{width: '80vw', height: '80vh'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
     <SparqlDialog />
   </Dialog>
@@ -116,7 +116,7 @@
     header="Visualization"
     modal
     maximizable
-    :style="{width: '1200px', height: '1200px'}"
+    :style="{width: '80vw', height: '80vh'}"
     :contentStyle="{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}">
     <RdfVisualizer
       ref="visualizerRef"

@@ -4,7 +4,7 @@
     header="Convert JSON data to JSON-LD using RML"
     modal
     maximizable
-    :style="{width: '800px', height: '800px'}">
+    :style="{width: '80vw', height: '80vh'}">
     <div class="rml-dialog-body">
       <Message severity="warn" v-if="mappingServiceWarning.length">
         <span v-html="mappingServiceWarning"></span>

@@ -3,7 +3,7 @@
     :visible="visible"
     header="Blank Node Handling"
     modal
-    style="width: 500px"
+    :style="{width: '50vw'}"
     @update:visible="emit('update:visible', $event)">
     <div class="flex flex-col gap-3 text-sm">
       <ul class="pl-4 list-disc leading-relaxed">
