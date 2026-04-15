@@ -107,6 +107,13 @@ onMounted(() => {
   nextTick(() => {
     fitView();
   });
+  document.addEventListener('copy', handleCopy);
+  document.addEventListener('paste', handlePaste);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('copy', handleCopy);
+  document.removeEventListener('paste', handlePaste);
 });
 
 function handleCopy(event: ClipboardEvent) {
@@ -510,7 +517,7 @@ function updateExternalReferenceValue(
 </script>
 
 <template>
-  <div class="layout-flow" @copy="handleCopy" @paste="handlePaste">
+  <div class="layout-flow">
     <VueFlow
       :nodes="activeNodes"
       :edges="activeEdges"
