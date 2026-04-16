@@ -1,38 +1,26 @@
-export type JsonSchemaType =
-  | 'string'
-  | 'number'
-  | 'integer'
-  | 'object'
-  | 'array'
-  | 'boolean'
-  | 'null';
+import type {SchemaPropertyType} from '@/schema/jsonSchemaType.ts';
 
-const COMMON = ['title', 'description', 'default', 'examples', 'enum', 'const'];
 
-const GENERIC = ['allOf', 'anyOf', 'oneOf', 'not'];
-
-export const SUPPORTED_KEYWORDS: Record<JsonSchemaType, string[]> = {
-  string: [...COMMON, ...GENERIC, 'minLength', 'maxLength', 'pattern', 'format'],
-  number: [
-    ...COMMON,
-    ...GENERIC,
-    'minimum',
-    'maximum',
-    'exclusiveMinimum',
-    'exclusiveMaximum',
-    'multipleOf',
-  ],
-  integer: [
-    ...COMMON,
-    ...GENERIC,
-    'minimum',
-    'maximum',
-    'exclusiveMinimum',
-    'exclusiveMaximum',
-    'multipleOf',
-  ],
-  object: [...COMMON, ...GENERIC, 'properties', 'required', 'additionalProperties'],
-  array: [...COMMON, ...GENERIC, 'items', 'minItems', 'maxItems', 'uniqueItems'],
-  boolean: [...COMMON, ...GENERIC],
-  null: [...COMMON, ...GENERIC],
-};
+export const CONSTRAINED_KEYWORDS: Record<string, SchemaPropertyType[]> = {
+  minLength: ['string'],
+  maxLength: ['string'],
+  pattern: ['string'],
+  format: ['string'],
+  minimum: ['number', 'integer'],
+  maximum: ['number', 'integer'],
+  exclusiveMinimum: ['number', 'integer'],
+  exclusiveMaximum: ['number', 'integer'],
+  multipleOf: ['number', 'integer'],
+  properties: ['object'],
+  patternProperties: ['object'],
+  required: ['object'],
+  additionalProperties: ['object'],
+  propertyNames: ['object'],
+  items: ['array'],
+  minItems: ['array'],
+  maxItems: ['array'],
+  uniqueItems: ['array'],
+  contains: ['array'],
+  maxContains: ['array'],
+  minContains: ['array'],
+}
