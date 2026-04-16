@@ -109,27 +109,25 @@ function goPrev() {
       @blur="() => searchResultMenu.value?.hide()"
       id="searchBar" />
   </span>
-  <template v-if="searchTerm">
-    <div class="search-controls">
-      <span class="search-counter ml-1">{{ currentIndex }}/{{ totalMatches }}</span>
-      <Button
-        v-tooltip.bottom="'Previous match'"
-        class="ml-1 p-button-sm search-nav-btn"
-        text
-        :disabled="totalMatches === 0"
-        @click="goPrev">
-        <i class="pi pi-chevron-up" />
-      </Button>
-      <Button
-        v-tooltip.bottom="'Next match'"
-        class="p-button-sm search-nav-btn"
-        text
-        :disabled="totalMatches === 0"
-        @click="goNext">
-        <i class="pi pi-chevron-down" />
-      </Button>
-    </div>
-  </template>
+  <div class="search-controls" v-if="searchTerm">
+    <span class="search-counter ml-1">{{ currentIndex }}/{{ totalMatches }}</span>
+    <Button
+      v-tooltip.bottom="'Previous match'"
+      class="ml-1 p-button-sm search-nav-btn"
+      text
+      :disabled="totalMatches === 0"
+      @click="goPrev">
+      <i class="pi pi-chevron-up" />
+    </Button>
+    <Button
+      v-tooltip.bottom="'Next match'"
+      class="p-button-sm search-nav-btn"
+      text
+      :disabled="totalMatches === 0"
+      @click="goNext">
+      <i class="pi pi-chevron-down" />
+    </Button>
+  </div>
   <!-- search results menu -->
   <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems">
     <template #item="slotProps">
