@@ -2,11 +2,11 @@
 import {ref} from 'vue';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {useMagicKeys} from '@vueuse/core';
+import {focus} from '@/utility/focusUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 import Select from 'primevue/select';
-import {useMagicKeys} from '@vueuse/core';
-import {focus} from '@/utility/focusUtils';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import ModeSelector from '@/components/toolbar/ModeSelector.vue';
 import TopToolbarMenuButtons from '@/components/toolbar/TopToolbarMenuButtons.vue';
@@ -26,6 +26,8 @@ const emit = defineEmits<{
   (e: 'show-codegen-dialog', schemaMode: boolean): void;
   (e: 'show-data-export-dialog', schemaMode: boolean): void;
   (e: 'show-data-mapping-dialog'): void;
+  (e: 'show-rml-mapping-dialog'): void;
+  (e: 'show-import-turtle-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -63,22 +65,25 @@ function selectedMode(newMode: SessionMode) {
   emit('mode-selected', newMode);
 }
 
+function showRmlMappingDialog() {
+  emit('show-rml-mapping-dialog');
+}
+
+function showTurtleImportDialog() {
+  emit('show-import-turtle-dialog');
+}
+
 const modeSelector = ref();
 
 useMagicKeys({
   passive: false,
   onEventFired(event) {
-    if (event.key === 'f' && (event.ctrlKey || event.metaKey)) {
-      const fromAce = (window as any).__fromAceEditor;
-      const searchBarFocused = document.activeElement?.id === 'searchBar';
-      if (fromAce || searchBarFocused) {
-        event.preventDefault();
-        focus('searchBar');
-      }
+    if (event.key === 'f' && event.ctrlKey) {
+      event.preventDefault();
+      focus('searchBar');
     }
   },
 });
-
 </script>
 
 <template>
@@ -103,7 +108,9 @@ useMagicKeys({
           @show-import-csv-dialog="() => showCsvImportDialog()"
           @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()" />
+          @show-data-mapping-dialog="() => showDataMappingDialog()"
+          @show-rml-mapping-dialog="() => showRmlMappingDialog()"
+          @show-import-turtle-dialog="() => showTurtleImportDialog()" />
 
         <Divider layout="vertical" />
 
@@ -170,7 +177,9 @@ useMagicKeys({
           @show-import-csv-dialog="() => showCsvImportDialog()"
           @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()" />
+          @show-data-mapping-dialog="() => showDataMappingDialog()"
+          @show-rml-mapping-dialog="() => showRmlMappingDialog()"
+          @show-import-turtle-dialog="() => showTurtleImportDialog()" />
       </div>
 
       <!-- RIGHT side: format selector -->

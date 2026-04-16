@@ -51,14 +51,12 @@ onMounted(() => {
     editor.value.setReadOnly(true);
   }
 
-  // FIX: Allow browser Ctrl+F for searching in the editor, instead of opening the Ace Editor search box
-  editor.value.on('focus', () => {
-    (window as any).__fromAceEditor = true;
+  // watch for changes in the editor container size and resize the editor accordingly
+  const observer = new ResizeObserver(() => {
+    editor.value?.resize();
   });
-
-  editor.value.on('blur', () => {
-    (window as any).__fromAceEditor = false;
-  });
+  const el = document.getElementById(editor_id);
+  if (el) observer.observe(el);
 });
 
 // watch for changes in the data format and update the editor accordingly
