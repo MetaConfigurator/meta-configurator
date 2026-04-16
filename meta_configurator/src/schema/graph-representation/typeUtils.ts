@@ -1,7 +1,8 @@
 import type {JsonSchemaObjectType, SchemaPropertyTypes} from '@/schema/jsonSchemaType';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 import {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
-import type {Path} from '@/utility/path';
+import type {Path} from '@/utility/path'
+import { cleanupSchemaByType } from '../cleanupSchemaByType';
 
 export type AttributeTypeChoice = {label: string; schema: JsonSchemaObjectType};
 
@@ -111,6 +112,7 @@ export function applyNewType(
 ) {
   if (typeSchema.type !== undefined) {
     currentSchema.type = typeSchema.type;
+    cleanupSchemaByType(currentSchema, typeSchema.type);
     if (typeSchema.type === 'array') {
       if (
         currentSchema.items === undefined ||
@@ -131,6 +133,7 @@ export function applyNewType(
 
   if (typeSchema.$ref) {
     currentSchema.$ref = typeSchema.$ref;
+     cleanupSchemaByType(currentSchema, '$ref');
   } else {
     delete currentSchema.$ref;
   }
