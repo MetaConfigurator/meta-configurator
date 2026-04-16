@@ -108,9 +108,6 @@ function goPrev() {
       @focus="showSearchResultsMenu"
       @blur="() => searchResultMenu.value?.hide()"
       id="searchBar" />
-    <!-- Match counter -->
-
-    <!-- Next button -->
   </span>
   <template v-if="searchTerm">
     <div class="search-controls">
