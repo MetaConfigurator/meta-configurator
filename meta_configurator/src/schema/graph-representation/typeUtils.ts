@@ -133,7 +133,6 @@ export function applyNewType(
 
   if (typeSchema.$ref) {
     currentSchema.$ref = typeSchema.$ref;
-    cleanupSchemaByType(currentSchema, '$ref');
   } else {
     delete currentSchema.$ref;
   }
