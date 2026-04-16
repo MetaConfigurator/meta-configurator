@@ -1,6 +1,5 @@
 import type {SchemaPropertyType} from '@/schema/jsonSchemaType.ts';
 
-
 export const CONSTRAINED_KEYWORDS: Record<string, SchemaPropertyType[]> = {
   minLength: ['string'],
   maxLength: ['string'],
@@ -23,4 +22,4 @@ export const CONSTRAINED_KEYWORDS: Record<string, SchemaPropertyType[]> = {
   contains: ['array'],
   maxContains: ['array'],
   minContains: ['array'],
-}
+};

@@ -2,7 +2,6 @@ import {describe, expect, it, vi} from 'vitest';
 import {type JsonSchemaType} from '../jsonSchemaType';
 import {cleanupSchemaByType} from '@/schema/cleanupSchemaByType.ts';
 
-
 describe('test cleanupSchemaByType', () => {
   const schema: any = {
     required: ['a'],
@@ -13,7 +12,7 @@ describe('test cleanupSchemaByType', () => {
         properties: {
           name: {
             type: 'string',
-          }
+          },
         },
       },
       str: {
@@ -35,7 +34,6 @@ describe('test cleanupSchemaByType', () => {
       },
     },
   } as JsonSchemaType;
-
 
   it('test changing obj to something else removes the object constraints', () => {
     // initial object schema should have object-specific constraints
@@ -69,8 +67,7 @@ describe('test cleanupSchemaByType', () => {
     // string-specific constraints should be removed
     expect(stringSchema).not.toHaveProperty('minLength');
     expect(stringSchema).not.toHaveProperty('pattern');
-
-});
+  });
 
   it('test changing number to something else removes the number constraints', () => {
     // initial number schema should have number-specific constraints
@@ -89,4 +86,3 @@ describe('test cleanupSchemaByType', () => {
     expect(numberSchema).not.toHaveProperty('maximum');
   });
 });
-
