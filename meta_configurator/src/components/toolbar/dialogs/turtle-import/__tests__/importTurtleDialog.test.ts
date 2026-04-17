@@ -44,15 +44,15 @@ describe('ImportTurtleDialog', () => {
       },
     }));
 
-    vi.doMock('@/components/toolbar/dialogs/turtle-import/importTurtleUtils', async () => {
-      const actual = await vi.importActual<any>(
-        '@/components/toolbar/dialogs/turtle-import/importTurtleUtils'
-      );
+    const requestUploadFileToRefMock = vi.fn((resultString: {value: string}) => {
+      resultString.value = inputTurtle;
+    });
+    const turtleToJsonLDMock = vi.fn().mockResolvedValue(expectedJson);
+
+    vi.doMock('@/components/toolbar/dialogs/turtle-import/importTurtleUtils', () => {
       return {
-        ...actual,
-        requestUploadFileToRef: (resultString: {value: string}) => {
-          resultString.value = inputTurtle;
-        },
+        requestUploadFileToRef: requestUploadFileToRefMock,
+        turtleToJsonLD: turtleToJsonLDMock,
       };
     });
 
@@ -105,6 +105,8 @@ describe('ImportTurtleDialog', () => {
     await flushPromises();
     await waitUntil(() => setDataMock.mock.calls.length > 0);
 
+    expect(requestUploadFileToRefMock).toHaveBeenCalledTimes(1);
+    expect(turtleToJsonLDMock).toHaveBeenCalledWith(inputTurtle);
     expect(setDataMock).toHaveBeenCalledTimes(1);
     expect(setDataMock.mock.calls[0]?.[0]).toEqual(expectedJson);
 
