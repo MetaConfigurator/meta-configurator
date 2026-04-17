@@ -89,6 +89,10 @@ export const rdfStoreManager: RdfStore & {
 
   function clearStore() {
     _store.value = $rdf.graph();
+    // Materialize RDF collections as rdf:first/rdf:rest triples instead of rdflib Collection terms.
+    if (_store.value.rdfFactory?.supports) {
+      _store.value.rdfFactory.supports.COLLECTIONS = false;
+    }
   }
 
   function updateStatements() {

@@ -91,7 +91,7 @@ function createNode(
     case RdfTermType.NamedNode:
       return $rdf.sym(value);
     case RdfTermType.BlankNode:
-      return $rdf.blankNode();
+      return $rdf.blankNode(normalizeBlankNodeId(value));
     case RdfTermType.Literal:
       return datatype
         ? $rdf.literal(value, $rdf.sym(expandDatatype(datatype)))
@@ -99,4 +99,9 @@ function createNode(
     default:
       throw new Error(`Unknown term type: ${type}`);
   }
+}
+
+function normalizeBlankNodeId(value: string): string | undefined {
+  if (!value) return undefined;
+  return value.startsWith('_:') ? value.slice(2) : value;
 }

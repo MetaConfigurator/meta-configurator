@@ -8,12 +8,20 @@
     <div class="flex flex-col gap-3 text-sm">
       <ul class="pl-4 list-disc leading-relaxed">
         <li>
-          Choosing <code>Blank Node</code> for subject or object always creates a new internal blank
-          node at root level on save.
+          Choosing <code>Blank Node</code> for a new subject or object creates a new internal blank
+          node on save.
+        </li>
+        <li>
+          When you edit an existing triple that already references a blank node, the blank node id
+          is preserved instead of creating a new one.
         </li>
         <li>
           Existing blank nodes are not listed in subject/object dropdowns. Those lists contain only
           named node IRIs.
+        </li>
+        <li>
+          Tracking active selection between RDF View and Text View is currently not working for
+          triples containing blank nodes.
         </li>
         <li>Blank nodes do not support IRI-based rename.</li>
       </ul>

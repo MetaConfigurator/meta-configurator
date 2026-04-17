@@ -1,9 +1,11 @@
 import {useFileDialog} from '@vueuse/core';
 import {readFileContentToStringRef} from '@/utility/readFileContent';
 import {RdfMediaType} from '@/components/panels/rdf/rdfEnums';
+import {useSettings} from '@/settings/useSettings';
 import type {Ref} from 'vue';
-import * as N3 from 'n3';
-import * as jsonld from 'jsonld';
+import * as $rdf from 'rdflib';
+
+const settings = useSettings();
 
 export function requestUploadFileToRef(resultString: Ref<string>): void {
   const {open, onChange, reset} = useFileDialog({
@@ -24,37 +26,62 @@ export function requestUploadFileToRef(resultString: Ref<string>): void {
 /**
  * Converts Turtle format RDF data to JSON-LD.
  * @param turtleString - The input string in Turtle format
- * @returns Promise resolving to a compacted JSON-LD object
+ * @returns Promise resolving to a JSON-LD object
  */
 export async function turtleToJsonLD(turtleString: string): Promise<any> {
-  const {quads, prefixes} = await parseTurtle(turtleString);
-  const nquads = await serializeToNQuads(quads);
-  const expanded = await jsonld.fromRDF(nquads, {format: RdfMediaType.NQuads});
-  const context = buildContext(prefixes);
-  return Object.keys(context).length > 0 ? jsonld.compact(expanded, context) : expanded;
+  const store = await parseTurtle(turtleString);
+  const serialized = serialize(store, RdfMediaType.JsonLd);
+  const parsed = typeof serialized === 'string' ? JSON.parse(serialized) : serialized;
+  return ensureGraphWrapper(parsed);
 }
 
-function parseTurtle(turtleString: string): Promise<{quads: N3.Quad[]; prefixes: N3.Prefixes}> {
+function parseTurtle(turtleString: string): Promise<$rdf.IndexedFormula> {
   return new Promise((resolve, reject) => {
-    const quads: N3.Quad[] = [];
-    new N3.Parser().parse(turtleString, (error, quad, prefixes) => {
-      if (error) reject(error);
-      else if (quad) quads.push(quad);
-      else resolve({quads, prefixes: prefixes ?? {}});
-    });
+    const store = $rdf.graph();
+
+    $rdf.parse(
+      turtleString,
+      store as $rdf.Formula,
+      settings.value.rdf.baseUri,
+      RdfMediaType.Turtle,
+      error => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(store);
+      }
+    );
   });
 }
 
-function serializeToNQuads(quads: N3.Quad[]): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const writer = new N3.Writer({format: 'N-Quads'});
-    quads.forEach(q => writer.addQuad(q));
-    writer.end((error, result) => (error ? reject(error) : resolve(result)));
-  });
+function serialize(store: $rdf.IndexedFormula, format: string): string {
+  const serialized = $rdf.serialize(
+    null,
+    store as $rdf.Formula,
+    settings.value.rdf.baseUri,
+    format
+  );
+  if (!serialized) {
+    throw new Error('Failed to serialize Turtle data to JSON-LD.');
+  }
+  return serialized;
 }
 
-function buildContext(prefixes: N3.Prefixes): Record<string, N3.NamedNode<string>> {
-  return Object.fromEntries(
-    Object.entries(prefixes).filter(([prefix]) => Boolean(prefix))
-  ) as Record<string, N3.NamedNode<string>>;
+function ensureGraphWrapper(data: any): any {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return data;
+  }
+
+  if ('@graph' in data) {
+    return data;
+  }
+
+  const {'@context': context, ...rest} = data;
+  const hasRootData = Object.keys(rest).length > 0;
+
+  return {
+    ...(context !== undefined ? {'@context': context} : {}),
+    '@graph': hasRootData ? [rest] : [],
+  };
 }
