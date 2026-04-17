@@ -1,0 +1,25 @@
+import type {SchemaPropertyType} from '@/schema/jsonSchemaType.ts';
+
+export const CONSTRAINED_KEYWORDS: Record<string, SchemaPropertyType[]> = {
+  minLength: ['string'],
+  maxLength: ['string'],
+  pattern: ['string'],
+  format: ['string'],
+  minimum: ['number', 'integer'],
+  maximum: ['number', 'integer'],
+  exclusiveMinimum: ['number', 'integer'],
+  exclusiveMaximum: ['number', 'integer'],
+  multipleOf: ['number', 'integer'],
+  properties: ['object'],
+  patternProperties: ['object'],
+  required: ['object'],
+  additionalProperties: ['object'],
+  propertyNames: ['object'],
+  items: ['array'],
+  minItems: ['array'],
+  maxItems: ['array'],
+  uniqueItems: ['array'],
+  contains: ['array'],
+  maxContains: ['array'],
+  minContains: ['array'],
+};
