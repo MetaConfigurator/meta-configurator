@@ -125,7 +125,9 @@
                     <span class="prop-text-group">
                       <a
                         class="kv-value link"
-                        :href="iriHref(lit.predicate) || lit.predicate"
+                        :href="
+                          lit.statement?.predicate.value || iriHref(lit.predicate) || lit.predicate
+                        "
                         target="_blank"
                         rel="noopener noreferrer">
                         {{ lit.predicate }}

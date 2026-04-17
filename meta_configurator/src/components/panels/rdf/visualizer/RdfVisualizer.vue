@@ -442,7 +442,14 @@ function addNodeFromVisualizer() {
 function handlePropertyLinkClick(lit: RdfNodeLiteral, event: MouseEvent) {
   const iri = lit.href || jsonLdContextManager.iriHref(lit.value);
   if (!iri) return;
-  void event;
+
+  if (cy.value?.getElementById(iri)?.length) {
+    event.preventDefault();
+    event.stopPropagation();
+    selectGraphNodeById(iri);
+    return;
+  }
+
   focusNodeById(iri);
 }
 
