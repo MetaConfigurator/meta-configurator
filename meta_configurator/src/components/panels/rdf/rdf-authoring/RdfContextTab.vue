@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import CurrentPathBreadcrumb from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
 import {computed, ref, watch} from 'vue';
@@ -28,10 +27,6 @@ const parsingErrors = computed(() => {
     message: msg,
   }));
 });
-
-function updatePath(newPath: Path) {
-  session.updateCurrentPath(newPath);
-}
 
 function updateData(path: Path, newValue: any) {
   data.setDataAt(path, newValue);
@@ -69,11 +64,6 @@ watch(
       {'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable || parsingErrors.length > 0},
     ]">
     <div v-if="dataIsInJsonLd && !dataIsUnparsable">
-      <CurrentPathBreadcrumb
-        :session-mode="props.sessionMode"
-        :root-name="'document root'"
-        :path="session.currentPath.value"
-        @update:path="newPath => updatePath(newPath)" />
       <div class="flex-grow overflow-y-scroll">
         <PropertiesPanel
           :currentSchema="currentSchema"
