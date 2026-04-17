@@ -2,7 +2,7 @@
 import CurrentPathBreadcrumb from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
-import {computed} from 'vue';
+import {computed, ref, watch} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
@@ -51,9 +51,15 @@ function selectPath(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
-const currentData = computed(() => {
-  return getDataForMode(props.sessionMode).dataAt(['@context']);
-});
+const currentData = ref<any>(undefined);
+
+watch(
+  () => data.data.value,
+  () => {
+    currentData.value = getDataForMode(props.sessionMode).dataAt(['@context']);
+  },
+  {deep: true, immediate: true}
+);
 </script>
 
 <template>

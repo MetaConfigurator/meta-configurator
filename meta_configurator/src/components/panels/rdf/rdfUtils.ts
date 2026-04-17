@@ -66,7 +66,8 @@ export const defaultJsonLdSchema = `
     {
       "title": "URI",
       "type": "string",
-      "format": "uri"
+      "format": "uri",
+      "additionalProperties": true
     },
     {
       "title": "Object",
@@ -81,7 +82,8 @@ export const defaultJsonLdSchema = `
           {
             "title": "URI",
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "additionalProperties": true
           },
           {
             "title": "Object",
