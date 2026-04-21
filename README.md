@@ -65,10 +65,17 @@ Creating structured data files (or schemas) manually can be complex and error-pr
 
 *   **Documentation Generation** – Generate documentation from JSON schemas, with export to a Markdown file.
 
-*  **AI-Assisted Schema/Data Creation and Editing** – Use AI to help create or edit schemas and instance data with natural language inputs.
+*   **AI-Assisted Schema/Data Creation and Editing** – Use AI to help create or edit schemas and instance data with natural language inputs.
 
-* **AI-Assisted Transformation of Instance Data** – Automatically transform existing instance data to conform to the target schema using AI-generated mappings, which are then applied deterministically. This also works for very large documents.
+*   **AI-Assisted Transformation of Instance Data** – Automatically transform existing instance data to conform to the target schema using AI-generated mappings, which are then applied deterministically. This also works for very large documents.
   
+*   **Transformation to JSON-LD** – Convert JSON data to JSON-LD using AI-assisted RML mapping.
+
+*   **RDF Authoring Panel** – Inspect and edit RDF data through two synchronized tabs: **Context** and **Triples** in RDF Panel.
+
+*   **RDF Data Exploration** – Run AI-assisted SPARQL queries on RDF data and inspect or visualize the results.
+
+*   **Knowledge Graph Visualization** – Display RDF triples as an interactive graph, synchronized with the JSON-LD document.
 
 🛠️ Development
 ---------------
@@ -107,7 +114,7 @@ Explore how to use MetaConfigurator with real-world examples:
 
 *   **[External References](./documentation_user/examples/external_references)** – Learn how to handle external references in MetaConfigurator.
 
-
+*   **[RDF Panel](./documentation_user/examples/rdf)** – Learn how to use MetaConfigurator to explore Semantic data.
 
 📚 Read the full [User Documentation](./documentation_user).
 
