@@ -4,6 +4,8 @@ import StringProperty from '@/components/panels/gui-editor/properties/StringProp
 import NumberProperty from '@/components/panels/gui-editor/properties/NumberProperty.vue';
 import SimpleObjectProperty from '@/components/panels/gui-editor/properties/SimpleObjectProperty.vue';
 import SimpleArrayProperty from '@/components/panels/gui-editor/properties/SimpleArrayProperty.vue';
+import DateProperty from '@/components/panels/gui-editor/properties/DateProperty.vue';
+import EmailProperty from '@/components/panels/gui-editor/properties/EmailProperty.vue';
 import type {
   AddItemTreeNodeData,
   ConfigTreeNodeData,
@@ -79,6 +81,16 @@ export function resolveCorrespondingComponent(
   if (nodeData.schema.hasType('string')) {
     // @ts-ignore
     return h(StringProperty, propsObject);
+  }
+
+  if (nodeData.schema.hasType('string') && nodeData.schema.format === 'date') {
+    // @ts-ignore
+    return h(DateProperty, propsObject);
+  }
+
+  if (nodeData.schema.hasType('string') && nodeData.schema.format === 'email') {
+    // @ts-ignore
+    return h(EmailProperty, propsObject);
   }
 
   if (nodeData.schema.hasType('boolean')) {
