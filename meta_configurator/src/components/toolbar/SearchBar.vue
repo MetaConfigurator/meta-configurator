@@ -145,7 +145,7 @@ function goPrev() {
 <style>
 .search-results-menu .p-menu-list {
   max-height: calc(100vh - 120px);
-  overflow-y: auto ;
+  overflow-y: auto;
 }
 .search-nav-btn {
   min-width: 1.6rem;
