@@ -23,9 +23,12 @@ const dateValue = ref<Date | undefined>(
   props.propertyData ? new Date(props.propertyData) : undefined
 );
 
-watch(() => props.propertyData, newVal => {
-  dateValue.value = newVal ? new Date(newVal) : undefined;
-});
+watch(
+  () => props.propertyData,
+  newVal => {
+    dateValue.value = newVal ? new Date(newVal) : undefined;
+  }
+);
 
 function updateValue(newDate: Date | undefined) {
   if (!newDate) {
