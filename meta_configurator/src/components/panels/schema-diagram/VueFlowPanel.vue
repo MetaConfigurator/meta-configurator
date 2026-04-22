@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {ComputedRef, Ref} from 'vue';
-import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+import {computed, nextTick, onMounted, ref, watch} from 'vue';
 
 import {getNodesInside, useVueFlow, VueFlow} from '@vue-flow/core';
 import SchemaObjectNode from '@/components/panels/schema-diagram/SchemaObjectNode.vue';
@@ -48,7 +48,11 @@ import SchemaExternalReferenceNode from '@/components/panels/schema-diagram/Sche
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 import {useErrorService} from '@/utility/errorServiceInstance.ts';
 import {pathToJsonPointer} from '@/utility/pathUtils.ts';
-import {stringToIdentifier, urlStringToIdentifier} from '@/utility/stringToIdentifier.ts';
+import {urlStringToIdentifier} from '@/utility/stringToIdentifier.ts';
+import {
+  copySelectedSchemaToClipboard,
+  pasteSchemaFromClipboard,
+} from '@/components/panels/schema-diagram/schemaClipboardUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -107,102 +111,35 @@ onMounted(() => {
   nextTick(() => {
     fitView();
   });
-  document.addEventListener('copy', handleCopy);
-  document.addEventListener('paste', handlePaste);
 });
 
-onUnmounted(() => {
-  document.removeEventListener('copy', handleCopy);
-  document.removeEventListener('paste', handlePaste);
-});
-
-function handleCopy(event: ClipboardEvent) {
-  copyToClipboard();
-  event.preventDefault(); // override default browser copy
+async function handleCopy(event?: ClipboardEvent) {
+  await copyToClipboard(event);
+  event?.preventDefault(); // override default browser copy
 }
-function handlePaste(event: ClipboardEvent) {
-  pasteFromClipboard();
-  event.preventDefault(); // override default browser paste
+async function handlePaste(event?: ClipboardEvent) {
+  await pasteFromClipboard(event);
+  event?.preventDefault(); // override default browser paste
 }
 
-async function copyToClipboard() {
-  if (!selectedData.value) {
-    console.log('No element selected to copy');
-    return;
-  }
+async function copyToClipboard(event?: ClipboardEvent) {
+  await copySelectedSchemaToClipboard(
+    event,
+    schemaData,
+    selectedData.value,
+    schemaSession.currentSelectedElement.value
+  );
+}
 
-  const schema = schemaData.dataAt(schemaSession.currentSelectedElement.value);
-
-  let metaType = selectedData.value.getNodeType();
-
-  if (schema.enum != undefined) {
-    metaType = 'schemaenum';
-  }
-
-  const dataToCopy = structuredClone(schema);
-
-  // if no type is given and metatype is object overwrite the type
-  if (!dataToCopy.type && metaType === 'schemaobject') {
-    dataToCopy.type = 'object';
-  }
-
+async function pasteFromClipboard(event?: ClipboardEvent) {
   try {
-    await navigator.clipboard.writeText(JSON.stringify(dataToCopy, null, 2));
-    console.log('Copied to system clipboard:', dataToCopy);
-  } catch (err) {
-    console.error('Failed to write to clipboard:', err);
-  }
-}
-
-async function pasteFromClipboard() {
-  try {
-    // Read JSON string from system clipboard
-    const clipboardText = await navigator.clipboard.readText();
-    const data = JSON.parse(clipboardText);
-
-    if (data.type === 'object') {
-      const objectPath = addSchemaObject(schemaData, false, data);
-      selectElement(objectPath);
-      return;
-    }
-    if (data.enum != undefined) {
-      console.log('Detected enum in clipboard data');
-      const enumPath = findAvailableSchemaId(schemaData, ['$defs'], 'enum');
-      schemaData.setDataAt(enumPath, data);
-      selectElement(enumPath);
-      return;
-    }
-
-    // ATTRIBUTE (extended logic)
-    if (data.metaType === 'attribute') {
-      const selectedPath = schemaSession.currentSelectedElement.value;
-
-      if (!selectedPath || selectedPath.length === 0) {
-        console.log('Select an object to paste attribute into');
-        return;
-      }
-
-      // ensure attribute goes into properties of selected object
-      const basePath = [...selectedPath, 'properties'];
-
-      // preferred name logic
-      let preferredName = 'property';
-
-      if (data.schema?.title) {
-        preferredName = data.schema.title;
-      } else if (data.schema?.name) {
-        preferredName = data.schema.name;
-      }
-
-      const attributePath = findAvailableSchemaId(schemaData, basePath, preferredName);
-
-      schemaData.setDataAt(attributePath, data.schema);
-      selectElement(attributePath);
-    }
+    const pastedPath = await pasteSchemaFromClipboard(event, schemaData, selectedData.value);
+    selectElement(pastedPath);
   } catch (err) {
     console.error('Failed to read from clipboard:', err);
   }
 }
+
 // scroll to the current selected element when it changes
 watch(
   schemaSession.currentSelectedElement,
@@ -517,7 +454,11 @@ function updateExternalReferenceValue(
 </script>
 
 <template>
-  <div class="layout-flow">
+  <div
+    class="layout-flow"
+    tabindex="0"
+    @copy="handleCopy"
+    @paste="handlePaste">
     <VueFlow
       :nodes="activeNodes"
       :edges="activeEdges"
