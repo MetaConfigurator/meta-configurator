@@ -48,7 +48,11 @@ import SchemaExternalReferenceNode from '@/components/panels/schema-diagram/Sche
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 import {useErrorService} from '@/utility/errorServiceInstance.ts';
 import {pathToJsonPointer} from '@/utility/pathUtils.ts';
-import {stringToIdentifier, urlStringToIdentifier} from '@/utility/stringToIdentifier.ts';
+import {urlStringToIdentifier} from '@/utility/stringToIdentifier.ts';
+import {
+  copySelectedSchemaToClipboard,
+  pasteSchemaFromClipboard,
+} from '@/components/panels/schema-diagram/schemaClipboardUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -109,6 +113,33 @@ onMounted(() => {
     fitView();
   });
 });
+
+async function handleCopy(event?: ClipboardEvent) {
+  await copyToClipboard(event);
+  event?.preventDefault(); // override default browser copy
+}
+async function handlePaste(event?: ClipboardEvent) {
+  await pasteFromClipboard(event);
+  event?.preventDefault(); // override default browser paste
+}
+
+async function copyToClipboard(event?: ClipboardEvent) {
+  await copySelectedSchemaToClipboard(
+    event,
+    schemaData,
+    selectedData.value,
+    schemaSession.currentSelectedElement.value
+  );
+}
+
+async function pasteFromClipboard(event?: ClipboardEvent) {
+  try {
+    const pastedPath = await pasteSchemaFromClipboard(event, schemaData, selectedData.value);
+    selectElement(pastedPath);
+  } catch (err) {
+    console.error('Failed to read from clipboard:', err);
+  }
+}
 
 // scroll to the current selected element when it changes
 watch(
@@ -424,7 +455,7 @@ function updateExternalReferenceValue(
 </script>
 
 <template>
-  <div class="layout-flow">
+  <div class="layout-flow" tabindex="0" @copy="handleCopy" @paste="handlePaste">
     <VueFlow
       :nodes="activeNodes"
       :edges="activeEdges"
