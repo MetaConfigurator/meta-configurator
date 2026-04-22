@@ -454,11 +454,7 @@ function updateExternalReferenceValue(
 </script>
 
 <template>
-  <div
-    class="layout-flow"
-    tabindex="0"
-    @copy="handleCopy"
-    @paste="handlePaste">
+  <div class="layout-flow" tabindex="0" @copy="handleCopy" @paste="handlePaste">
     <VueFlow
       :nodes="activeNodes"
       :edges="activeEdges"
