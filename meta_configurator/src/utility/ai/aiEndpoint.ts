@@ -25,7 +25,7 @@ export const queryOpenAI = async (
   }
 
   try {
-    console.log('Querying OpenAI with messages: ', ...messages);
+    console.debug('Querying AI endpoint with messages: ', ...messages);
     const response = await axios.post(
       endpoint,
       {
@@ -42,7 +42,7 @@ export const queryOpenAI = async (
       }
     );
     const resultSchema: string = response.data.choices[0].message.content;
-    console.log('Result schema from AI prompt:', resultSchema, 'based on messages:', messages);
+    console.debug('Result schema from AI prompt:', resultSchema, 'based on messages:', messages);
     return resultSchema;
   } catch (error) {
     console.error('Error querying OpenAI:', error);

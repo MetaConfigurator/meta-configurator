@@ -2,8 +2,9 @@
 Dialog that shows information about the application and the licenses of the used icons.
 Emits an update:visible event when the dialog is closed.
 -->
-<script setup lang="ts">
+<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
 import Dialog from 'primevue/dialog';
+import Tag from 'primevue/tag';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 defineProps<{visible: boolean}>();
@@ -13,6 +14,7 @@ defineEmits<{
 }>();
 
 const appVersion = __APP_VERSION__;
+const isExperimental = __APP_EXPERIMENTAL__;
 </script>
 
 <template>
@@ -26,7 +28,6 @@ const appVersion = __APP_VERSION__;
     </p>
     <p>It is currently in alpha stage, so expect bugs and missing features.</p>
     <p>MetaConfigurator is open source and licensed under the MIT license.</p>
-    <p class="text-sm text-gray-500">Version {{ appVersion }}</p>
     <p>
       Check our
       <a
@@ -37,6 +38,11 @@ const appVersion = __APP_VERSION__;
         <span class="pi pi-github mr-1" />GitHub
       </a>
       for more information
+    </p>
+    <hr class="my-2" />
+    <p class="text-sm text-gray-500">
+      Version {{ appVersion }}
+      <Tag v-if="isExperimental" severity="warn" value="Experimental" class="ml-2 tag" />
     </p>
     <hr class="my-2" />
     <p>Felix Neubauer, Paul Bredl, Minye Xu, Keyuriben Patel, Jürgen Pleiss, Benjamin Uekermann</p>
@@ -67,4 +73,8 @@ const appVersion = __APP_VERSION__;
   </Dialog>
 </template>
 
-<style scoped></style>
+<style scoped>
+.tag {
+  background-color: var(--p-primary-color);
+}
+</style>

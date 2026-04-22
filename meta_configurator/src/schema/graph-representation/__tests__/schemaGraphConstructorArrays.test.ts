@@ -7,6 +7,8 @@ import {
   generateObjectFallbackDisplayName,
   identifyAllObjects,
   isSchemaThatDeservesANode,
+  populateGraph,
+  trimGraph,
 } from '../schemaGraphConstructor';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
@@ -251,6 +253,46 @@ describe('test schema graph constructor with objects and attributes, without adv
         schema
       )
     ).toEqual('person');
+  });
+
+  it('array of array pointing to a referenced object should create an edge to that object', () => {
+    const nestedArraySchema: TopLevelSchema = {
+      type: 'object',
+      $defs: {
+        Row: {
+          type: 'object',
+          properties: {
+            value: {type: 'number'},
+          },
+        },
+      },
+      properties: {
+        matrix: {
+          type: 'array',
+          items: {
+            type: 'array',
+            items: {$ref: '#/$defs/Row'},
+          },
+        },
+      },
+    };
+
+    const nestedDefs = identifyAllObjects(nestedArraySchema);
+    const nestedGraph = new SchemaGraph([], []);
+    populateGraph(nestedDefs, nestedGraph);
+    trimGraph(nestedGraph);
+
+    const rootNode = nestedGraph.nodes.find(n => n.absolutePath.length === 0);
+    expect(rootNode).toBeDefined();
+
+    const rowNode = nestedGraph.nodes.find(n => n.name === 'Row');
+    expect(rowNode).toBeDefined();
+
+    // There must be an edge from root to Row driven by the nested-array property
+    const edgeToRow = nestedGraph.edges.find(e => e.start === rootNode && e.end === rowNode);
+    expect(edgeToRow).toBeDefined();
+    expect(edgeToRow?.isArray).toBe(true);
+    expect(edgeToRow?.label).toBe('matrix');
   });
 
   it('generate attribute edges', () => {

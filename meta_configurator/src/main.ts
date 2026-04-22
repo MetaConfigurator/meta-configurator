@@ -7,7 +7,6 @@ import Tooltip from 'primevue/tooltip';
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
 import {useAppRouter} from './router/router';
-import ErrorService from '@/utility/errorService';
 import {registerIcons} from '@/fontawesome';
 
 import {registerDefaultDataFormats} from '@/dataformats/defaultFormats';
@@ -17,6 +16,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {registerDefaultPanelTypes} from '@/components/panels/defaultPanelTypes';
 import {definePreset} from '@primevue/themes';
 import {initErrorService, useErrorService} from '@/utility/errorServiceInstance';
+import {initApiKey} from '@/utility/ai/apiKey';
 
 // @ts-ignore
 const app = createApp(App);
@@ -90,6 +90,7 @@ app.config.errorHandler = (error: unknown) => useErrorService().onError(error);
 registerIcons();
 registerDefaultDataFormats();
 registerDefaultPanelTypes();
+initApiKey();
 
 // warn the user if he closes the app
 window.addEventListener('beforeunload', event => {
