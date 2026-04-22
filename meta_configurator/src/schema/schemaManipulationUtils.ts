@@ -153,11 +153,10 @@ export function addSchemaObject(
   return objectPath;
 }
 
-
 export function addSchemaEnum(
-    schemaData: ManagedData,
-    schema: any = undefined,
-    identifier: string | undefined = undefined
+  schemaData: ManagedData,
+  schema: any = undefined,
+  identifier: string | undefined = undefined
 ) {
   let enumPath: Path;
 

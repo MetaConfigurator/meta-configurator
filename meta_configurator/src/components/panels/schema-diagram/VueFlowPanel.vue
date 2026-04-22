@@ -114,7 +114,6 @@ onMounted(() => {
   });
 });
 
-
 async function handleCopy(event?: ClipboardEvent) {
   await copyToClipboard(event);
   event?.preventDefault(); // override default browser copy
