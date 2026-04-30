@@ -77,12 +77,6 @@ export function resolveCorrespondingComponent(
       ...propsObject,
     });
   }
-
-  if (nodeData.schema.hasType('string')) {
-    // @ts-ignore
-    return h(StringProperty, propsObject);
-  }
-
   if (nodeData.schema.hasType('string') && nodeData.schema.format === 'date') {
     // @ts-ignore
     return h(DateProperty, propsObject);
@@ -91,6 +85,10 @@ export function resolveCorrespondingComponent(
   if (nodeData.schema.hasType('string') && nodeData.schema.format === 'email') {
     // @ts-ignore
     return h(EmailProperty, propsObject);
+  }
+  if (nodeData.schema.hasType('string')) {
+    // @ts-ignore
+    return h(StringProperty, propsObject);
   }
 
   if (nodeData.schema.hasType('boolean')) {
