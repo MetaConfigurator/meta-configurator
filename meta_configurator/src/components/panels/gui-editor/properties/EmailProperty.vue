@@ -23,9 +23,12 @@ const emit = defineEmits<{
 
 const newPropertyData = ref(props.propertyData);
 
-watch(() => props.propertyData, newVal => {
-  newPropertyData.value = newVal;
-});
+watch(
+  () => props.propertyData,
+  newVal => {
+    newPropertyData.value = newVal;
+  }
+);
 
 function updateValue() {
   emit('update:propertyData', newPropertyData.value);
