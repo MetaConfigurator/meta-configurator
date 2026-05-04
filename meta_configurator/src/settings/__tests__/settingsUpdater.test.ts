@@ -40,6 +40,7 @@ describe('test settings updater', () => {
         c: 5,
       },
     },
+    schemaDiagram: {},
     panels: {
       dataEditor: [
         {
@@ -75,6 +76,9 @@ describe('test settings updater', () => {
         f: 3,
         g: 4,
       },
+    },
+    schemaDiagram: {
+      showNullableCheckbox: true,
     },
     panels: {
       dataEditor: [
@@ -128,6 +132,9 @@ describe('test settings updater', () => {
           g: 4,
         },
       },
+      schemaDiagram: {
+        showNullableCheckbox: true,
+      },
       panels: {
         dataEditor: [
           {
@@ -167,6 +174,7 @@ describe('test settings updater', () => {
           c: 5,
         },
       },
+      schemaDiagram: {},
       panels: {
         dataEditor: [
           {

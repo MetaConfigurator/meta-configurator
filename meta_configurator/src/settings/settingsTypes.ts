@@ -54,6 +54,7 @@ export interface SettingsInterfaceSchemaDiagram {
   vertical: boolean;
   showAttributes: boolean;
   showEnumValues: boolean;
+  showNullableCheckbox: boolean;
   maxAttributesToShow: number;
   maxEnumValuesToShow: number;
   moveViewToSelectedElement: boolean;

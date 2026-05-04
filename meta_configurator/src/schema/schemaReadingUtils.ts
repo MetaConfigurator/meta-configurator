@@ -2,11 +2,13 @@ import type {
   JsonSchemaObjectType,
   JsonSchemaType,
   SchemaPropertyType,
+  SchemaPropertyTypes,
 } from '@/schema/jsonSchemaType';
-import {NUMBER_OF_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
+import {NUMBER_OF_PROPERTY_TYPES, SCHEMA_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
 import type {ManagedData} from '@/data/managedData';
 import type {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
+import {resolveInternalReferenceSchema} from '@/schema/schemaReferenceUtils';
 
 /**
  * Returns a string representation of the type of the property.
@@ -100,6 +102,130 @@ export function doesSchemaHaveType(
     return type === types;
   }
   return false;
+}
+
+export function doesSchemaAllowNull(
+  schema: JsonSchemaObjectType,
+  rootSchema?: JsonSchemaType
+): boolean {
+  return getAllowedTypesOfSchema(schema, rootSchema).includes('null');
+}
+
+export function getAllowedTypesOfSchema(
+  schema: JsonSchemaObjectType,
+  rootSchema?: JsonSchemaType
+): SchemaPropertyType[] {
+  const directTypes = normalizeTypes(schema.type);
+  if (directTypes.length > 0) {
+    return directTypes;
+  }
+
+  if (schema.$ref && rootSchema) {
+    const referencedSchema = resolveInternalReferenceSchema(schema.$ref, rootSchema);
+    if (referencedSchema) {
+      return inferTypesFromSchema(referencedSchema, rootSchema);
+    }
+  }
+
+  return [];
+}
+
+export function setSchemaNullable(
+  schema: JsonSchemaObjectType,
+  nullable: boolean,
+  rootSchema?: JsonSchemaType
+) {
+  if (nullable) {
+    const nonNullableTypes = getAllowedTypesOfSchema(schema, rootSchema).filter(
+      type => type !== 'null'
+    );
+    const nextTypes = [...new Set([...nonNullableTypes, 'null'])];
+    schema.type = nextTypes.length === 1 ? nextTypes[0] : nextTypes;
+    return;
+  }
+
+  const nextTypes = normalizeTypes(schema.type).filter(type => type !== 'null');
+  if (nextTypes.length === 0) {
+    delete schema.type;
+  } else {
+    schema.type = nextTypes.length === 1 ? nextTypes[0] : nextTypes;
+  }
+}
+
+function normalizeTypes(types: SchemaPropertyTypes | undefined): SchemaPropertyType[] {
+  if (types === undefined) {
+    return [];
+  }
+  return Array.isArray(types) ? [...types] : [types];
+}
+
+function inferTypesFromSchema(
+  schema: JsonSchemaObjectType,
+  rootSchema?: JsonSchemaType
+): SchemaPropertyType[] {
+  const directTypes = normalizeTypes(schema.type);
+  if (directTypes.length > 0) {
+    return directTypes;
+  }
+
+  if (schema.$ref && rootSchema) {
+    const referencedSchema = resolveInternalReferenceSchema(schema.$ref, rootSchema);
+    if (referencedSchema) {
+      return inferTypesFromSchema(referencedSchema, rootSchema);
+    }
+  }
+
+  if (
+    schema.properties !== undefined ||
+    schema.patternProperties !== undefined ||
+    schema.required !== undefined ||
+    schema.dependentRequired !== undefined ||
+    schema.additionalProperties !== undefined
+  ) {
+    return ['object'];
+  }
+
+  if (
+    schema.items !== undefined ||
+    schema.prefixItems !== undefined ||
+    schema.contains !== undefined ||
+    schema.minItems !== undefined ||
+    schema.maxItems !== undefined ||
+    schema.uniqueItems !== undefined
+  ) {
+    return ['array'];
+  }
+
+  if (schema.const !== undefined) {
+    return inferTypesFromValue(schema.const);
+  }
+
+  if (schema.enum !== undefined && schema.enum.length > 0) {
+    return [...new Set(schema.enum.flatMap(value => inferTypesFromValue(value)))];
+  }
+
+  return [];
+}
+
+function inferTypesFromValue(value: unknown): SchemaPropertyType[] {
+  if (value === null) {
+    return ['null'];
+  }
+  if (Array.isArray(value)) {
+    return ['array'];
+  }
+  switch (typeof value) {
+    case 'string':
+      return ['string'];
+    case 'boolean':
+      return ['boolean'];
+    case 'number':
+      return [Number.isInteger(value) ? 'integer' : 'number'];
+    case 'object':
+      return ['object'];
+    default:
+      return [...SCHEMA_PROPERTY_TYPES];
+  }
 }
 
 export function getSchemaTitle(schema: TopLevelJsonSchemaWrapper) {
