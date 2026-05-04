@@ -217,6 +217,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'vertical',
         'showAttributes',
         'showEnumValues',
+        'showNullableCheckbox',
         'maxAttributesToShow',
         'maxEnumValuesToShow',
         'moveViewToSelectedElement',
@@ -248,6 +249,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'boolean',
           description:
             'If set to true, the enum values of the schema will be displayed in the schema diagram.',
+          default: true,
+        },
+        showNullableCheckbox: {
+          type: 'boolean',
+          description:
+            'If set to true, highlighted attributes in schema diagram edit mode will show a checkbox for toggling nullable types.',
           default: true,
         },
         maxAttributesToShow: {

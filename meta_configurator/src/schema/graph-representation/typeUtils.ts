@@ -1,8 +1,13 @@
-import type {JsonSchemaObjectType, SchemaPropertyTypes} from '@/schema/jsonSchemaType';
+import type {
+  JsonSchemaObjectType,
+  SchemaPropertyType,
+  SchemaPropertyTypes,
+} from '@/schema/jsonSchemaType';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 import {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import type {Path} from '@/utility/path';
 import {cleanupSchemaByType} from '../cleanupSchemaByType';
+import {doesSchemaAllowNull} from '@/schema/schemaReadingUtils';
 
 export type AttributeTypeChoice = {label: string; schema: JsonSchemaObjectType};
 
@@ -88,18 +93,23 @@ function isSchemaMatchingTypeChoice(
   if (schema === undefined || typeChoiceSchema === undefined) {
     return false;
   }
-  if (schema.type !== typeChoiceSchema.type) {
+  if (typeChoiceSchema.$ref !== undefined) {
+    return schema.$ref === typeChoiceSchema.$ref && !isSchemaOnlyNull(schema);
+  }
+
+  const comparableSchema = getNonNullableSchemaVariant(schema);
+  if (comparableSchema.type !== typeChoiceSchema.type) {
     return false;
   }
 
-  if (schema.type === 'array') {
+  if (comparableSchema.type === 'array') {
     return isSchemaMatchingTypeChoice(
-      schema.items as JsonSchemaObjectType,
+      comparableSchema.items as JsonSchemaObjectType,
       typeChoiceSchema.items as JsonSchemaObjectType
     );
   }
 
-  if (schema.$ref != typeChoiceSchema.$ref) {
+  if (comparableSchema.$ref != typeChoiceSchema.$ref) {
     return false;
   }
 
@@ -151,4 +161,32 @@ export function isSimpleType(typeDescription: string): boolean {
     'boolean[]',
     'null[]',
   ].includes(typeDescription);
+}
+
+function getNonNullableSchemaVariant(schema: JsonSchemaObjectType): JsonSchemaObjectType {
+  const directTypes = normalizeTypes(schema.type);
+  const nonNullableTypes = directTypes.filter(type => type !== 'null');
+  if (nonNullableTypes.length === directTypes.length) {
+    return schema;
+  }
+
+  const comparableSchema: JsonSchemaObjectType = {...schema};
+  if (nonNullableTypes.length === 0) {
+    delete comparableSchema.type;
+  } else {
+    comparableSchema.type = nonNullableTypes.length === 1 ? nonNullableTypes[0] : nonNullableTypes;
+  }
+  return comparableSchema;
+}
+
+function normalizeTypes(types: SchemaPropertyTypes | undefined): SchemaPropertyType[] {
+  if (types === undefined) {
+    return [];
+  }
+  return Array.isArray(types) ? [...types] : [types];
+}
+
+function isSchemaOnlyNull(schema: JsonSchemaObjectType) {
+  const directTypes = normalizeTypes(schema.type);
+  return directTypes.length === 1 && directTypes[0] === 'null';
 }

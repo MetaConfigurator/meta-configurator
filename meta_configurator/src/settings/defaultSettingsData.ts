@@ -37,6 +37,7 @@ export const SETTINGS_DATA_DEFAULT = {
     vertical: true,
     showAttributes: true,
     showEnumValues: true,
+    showNullableCheckbox: true,
     maxAttributesToShow: 30,
     maxEnumValuesToShow: 10,
     moveViewToSelectedElement: false,
