@@ -166,7 +166,7 @@ onUnmounted(() => {
           class="h-full"
           style="min-width: 0"
           :layout="width < 600 ? 'vertical' : 'horizontal'"
-          :key="props.sessionMode">
+          :key="panels">
           <SplitterPanel
             v-for="(panel, index) in panels"
             :key="`${panel.sessionMode}-${index}`"
