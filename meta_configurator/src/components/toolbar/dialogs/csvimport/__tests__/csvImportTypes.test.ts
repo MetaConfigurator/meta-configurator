@@ -32,11 +32,11 @@ describe('CsvImportColumnMappingData', () => {
     expect(path).toEqual(['updated']);
   });
 
-  it('getPathForJsonDocument reflects changes to the pathAfterRowIndex ref', () => {
+  it('getPathForJsonDocument reflects changes to the pathAfterRowIndex string', () => {
     const pathBeforeRowIndex = ref('root');
     const column = new CsvImportColumnMappingData(0, 'col', pathBeforeRowIndex);
 
-    column.pathAfterRowIndex.value = 'custom_field';
+    column.pathAfterRowIndex = 'custom_field';
     const path = column.getPathForJsonDocument(0);
 
     expect(path).toEqual(['root', 0, 'custom_field']);
