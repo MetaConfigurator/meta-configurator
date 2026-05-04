@@ -37,9 +37,9 @@ let panelsDefinition: SettingsInterfacePanels = settings.value.panels;
 // any setting is changed, which is not necessary and leads to Ace Editor becoming blank if settings were modified via
 // Ace Editor
 watchImmediate(
-  () => settings.value,
-  newSettings => {
-    const panels = newSettings.panels;
+  () => settings,
+  settings => {
+    const panels = settings.value.panels;
     if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition)) {
       panelsDefinition = panels;
     }

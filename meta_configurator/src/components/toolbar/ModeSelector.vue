@@ -68,7 +68,7 @@ function onTabChange(event: {index: number}) {
   const idx = event.index;
   const item = tabs.value[idx];
   if (item?.command) {
-    item.command({originalEvent: new Event('tab-change'), item});
+    (item.command as () => void)();
   }
 }
 </script>
