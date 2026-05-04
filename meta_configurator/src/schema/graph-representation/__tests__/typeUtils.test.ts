@@ -1,9 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {reactive} from 'vue';
-import {
-  collectTypeChoices,
-  determineTypeChoiceBySchema,
-} from '../typeUtils';
+import {collectTypeChoices, determineTypeChoiceBySchema} from '../typeUtils';
 import {SchemaObjectNodeData} from '../schemaGraphTypes';
 import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {getAllowedTypesOfSchema, setSchemaNullable} from '@/schema/schemaReadingUtils';

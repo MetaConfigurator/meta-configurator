@@ -16,8 +16,7 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
     metaSchema.$defs!.jsonSchema = DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA;
   }
   if (!metaSchemaSettings.allowMultipleTypes) {
-    metaSchema.$defs!.typeDefinition =
-      DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE;
+    metaSchema.$defs!.typeDefinition = DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE;
   }
   if (!metaSchemaSettings.showAdditionalPropertiesButton) {
     metaSchema.$defs!.objectSubSchema!.metaConfigurator = {

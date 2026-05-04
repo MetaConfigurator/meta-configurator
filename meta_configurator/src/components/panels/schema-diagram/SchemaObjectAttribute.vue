@@ -56,11 +56,7 @@ function updateRequired() {
 }
 
 function updateNullable(event: Event) {
-  emit(
-    'update_attribute_nullable',
-    props.data,
-    (event.target as HTMLInputElement).checked
-  );
+  emit('update_attribute_nullable', props.data, (event.target as HTMLInputElement).checked);
 }
 
 const attrName = ref(props.data.name);
