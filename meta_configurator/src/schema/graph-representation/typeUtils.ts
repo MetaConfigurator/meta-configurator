@@ -45,7 +45,7 @@ export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeCh
   const objectDefs = collectObjectAndEnumDefinitionPathsFromNodes(nodesData);
 
   objectDefs.forEach(def => {
-    const objectName: string = def[def.length - 1].toString();
+    const objectName: string = def[def.length - 1]!.toString();
     const pathAsJsonPointer = pathToJsonPointer(def);
     result.push({
       label: objectName,
@@ -122,7 +122,7 @@ export function applyNewType(
 ) {
   if (typeSchema.type !== undefined) {
     currentSchema.type = typeSchema.type;
-    cleanupSchemaByType(currentSchema, typeSchema.type);
+    cleanupSchemaByType(currentSchema, typeSchema.type as SchemaPropertyType);
     if (typeSchema.type === 'array') {
       if (
         currentSchema.items === undefined ||

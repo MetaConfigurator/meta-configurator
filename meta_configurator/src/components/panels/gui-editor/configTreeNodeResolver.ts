@@ -1,6 +1,7 @@
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {
   AddPropertyTreeNode,
+  ConfigDataTreeNode,
   ConfigDataTreeNodeType,
   GuiEditorTreeNode,
 } from '@/components/panels/gui-editor/configDataTreeNode';
@@ -247,7 +248,7 @@ export class ConfigTreeNodeResolver {
     mode: SessionMode,
     {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters
   ): GuiEditorTreeNode | undefined {
-    const advanced = {
+    const advanced: ConfigDataTreeNode = {
       data: {
         name: schema.title ?? '',
         schema: schema,
@@ -272,7 +273,7 @@ export class ConfigTreeNodeResolver {
       ),
     };
 
-    if (advanced.children.length > 0) {
+    if ((advanced.children?.length ?? 0) > 0) {
       return advanced;
     }
 
@@ -297,7 +298,9 @@ export class ConfigTreeNodeResolver {
     const optionalProperties = this.createSchemaPropertiesChildNodes(
       mode,
       parameters,
-      key => !parameters.schema.isRequired(key) && !parameters.schema.properties[key].deprecated
+      key =>
+        !parameters.schema.isRequired(key) &&
+        !parameters.schema.properties[key]?.deprecated
     );
     const additionalProperties = this.createDataPropertiesChildNodes(
       mode,
@@ -307,7 +310,8 @@ export class ConfigTreeNodeResolver {
     const deprecatedProperties = this.createSchemaPropertiesChildNodes(
       mode,
       parameters,
-      key => parameters.schema.properties[key].deprecated && !parameters.schema.isRequired(key)
+      key =>
+        !!parameters.schema.properties[key]?.deprecated && !parameters.schema.isRequired(key)
     );
     return requiredProperties.concat(
       optionalProperties,
@@ -532,7 +536,11 @@ export class ConfigTreeNodeResolver {
     if (userSelectionOneOf !== undefined) {
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.type;
-      const newTypeSchema = typeSchema(schema.type[userSelectionOneOf.index], mode);
+      const selectedType = schema.type[userSelectionOneOf.index];
+      if (!selectedType) {
+        return [];
+      }
+      const newTypeSchema = typeSchema(selectedType, mode);
       const mergedSchema = new JsonSchemaWrapper(
         {
           allOf: [baseSchema, newTypeSchema.jsonSchema ?? {}],
@@ -563,6 +571,9 @@ export class ConfigTreeNodeResolver {
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.oneOf;
       const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
+      if (!subSchemaOneOf) {
+        return [];
+      }
       const mergedSchema = new JsonSchemaWrapper(
         {
           allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
@@ -593,7 +604,7 @@ export class ConfigTreeNodeResolver {
       const baseSchema = {...schema.jsonSchema};
       delete baseSchema.anyOf;
       const subSchemasAnyOf = userSelectionAnyOf.map(userSelectionEntry => {
-        return schema.anyOf[userSelectionEntry.index].jsonSchema ?? {};
+        return schema.anyOf[userSelectionEntry.index]?.jsonSchema ?? {};
       });
       const mergedSchema = safeMergeSchemas(baseSchema, ...subSchemasAnyOf);
       if (!mergedSchema) {

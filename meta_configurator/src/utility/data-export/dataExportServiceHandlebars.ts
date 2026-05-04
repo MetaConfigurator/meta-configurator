@@ -15,7 +15,7 @@ Handlebars.registerHelper('default', (value: any, defaultValue: any) =>
   value !== undefined && value !== null && value !== '' ? value : defaultValue
 );
 
-Handlebars.registerHelper('exists', function (value: any, options: any) {
+Handlebars.registerHelper('exists', function (this: any, value: any, options: any) {
   const currentContext: any = this;
   return value !== undefined && value !== null && value !== ''
     ? options.fn(currentContext)
@@ -24,7 +24,7 @@ Handlebars.registerHelper('exists', function (value: any, options: any) {
 
 Handlebars.registerHelper(
   'compare',
-  function (left: any, operator: string, right: any, options: any) {
+  function (this: any, left: any, operator: string, right: any, options: any) {
     const currentContext: any = this;
     let result = false;
     switch (operator) {

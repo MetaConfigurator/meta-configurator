@@ -174,7 +174,9 @@ function applySchemaConstantsOnData(schema: JsonSchemaType, data: any): any {
         data = {};
       }
       if (key in data) {
-        applySchemaConstantsOnData(propertySchema, data[key]);
+        if (propertySchema !== undefined) {
+          applySchemaConstantsOnData(propertySchema, data[key]);
+        }
       }
     }
   }

@@ -124,47 +124,47 @@ describe('test schema graph constructor with objects and attributes, without adv
     rootNode.attributes = generateObjectAttributes(rootNode.absolutePath, rootNode.schema, defs);
     expect(rootNode.attributes.length).toEqual(6);
 
-    expect(rootNode.attributes[0].name).toEqual('propertyArrayToSimple');
-    expect(rootNode.attributes[0].title).toEqual(undefined);
-    expect(rootNode.attributes[0].absolutePath).toEqual(['properties', 'propertyArrayToSimple']);
-    expect(rootNode.attributes[0].deprecated).toBeFalsy();
-    expect(rootNode.attributes[0].required).toBeFalsy();
+    expect(rootNode.attributes[0]!.name).toEqual('propertyArrayToSimple');
+    expect(rootNode.attributes[0]!.title).toEqual(undefined);
+    expect(rootNode.attributes[0]!.absolutePath).toEqual(['properties', 'propertyArrayToSimple']);
+    expect(rootNode.attributes[0]!.deprecated).toBeFalsy();
+    expect(rootNode.attributes[0]!.required).toBeFalsy();
 
-    expect(rootNode.attributes[1].name).toEqual('propertyArrayToComplex');
-    expect(rootNode.attributes[1].title).toEqual(undefined);
-    expect(rootNode.attributes[1].absolutePath).toEqual(['properties', 'propertyArrayToComplex']);
-    expect(rootNode.attributes[1].deprecated).toBeFalsy();
-    expect(rootNode.attributes[1].required).toBeFalsy();
+    expect(rootNode.attributes[1]!.name).toEqual('propertyArrayToComplex');
+    expect(rootNode.attributes[1]!.title).toEqual(undefined);
+    expect(rootNode.attributes[1]!.absolutePath).toEqual(['properties', 'propertyArrayToComplex']);
+    expect(rootNode.attributes[1]!.deprecated).toBeFalsy();
+    expect(rootNode.attributes[1]!.required).toBeFalsy();
 
-    expect(rootNode.attributes[2].name).toEqual('propertyArrayToRefSimple');
-    expect(rootNode.attributes[2].title).toEqual(undefined);
-    expect(rootNode.attributes[2].absolutePath).toEqual(['properties', 'propertyArrayToRefSimple']);
-    expect(rootNode.attributes[2].deprecated).toBeFalsy();
-    expect(rootNode.attributes[2].required).toBeFalsy();
+    expect(rootNode.attributes[2]!.name).toEqual('propertyArrayToRefSimple');
+    expect(rootNode.attributes[2]!.title).toEqual(undefined);
+    expect(rootNode.attributes[2]!.absolutePath).toEqual(['properties', 'propertyArrayToRefSimple']);
+    expect(rootNode.attributes[2]!.deprecated).toBeFalsy();
+    expect(rootNode.attributes[2]!.required).toBeFalsy();
 
-    expect(rootNode.attributes[3].name).toEqual('propertyArrayToRefComplexWithTitle');
-    expect(rootNode.attributes[3].title).toEqual(undefined);
-    expect(rootNode.attributes[3].absolutePath).toEqual([
+    expect(rootNode.attributes[3]!.name).toEqual('propertyArrayToRefComplexWithTitle');
+    expect(rootNode.attributes[3]!.title).toEqual(undefined);
+    expect(rootNode.attributes[3]!.absolutePath).toEqual([
       'properties',
       'propertyArrayToRefComplexWithTitle',
     ]);
-    expect(rootNode.attributes[3].deprecated).toBeFalsy();
-    expect(rootNode.attributes[3].required).toBeFalsy();
+    expect(rootNode.attributes[3]!.deprecated).toBeFalsy();
+    expect(rootNode.attributes[3]!.required).toBeFalsy();
 
-    expect(rootNode.attributes[4].name).toEqual('propertyRefToArraySimple');
-    expect(rootNode.attributes[4].title).toEqual(undefined);
-    expect(rootNode.attributes[4].absolutePath).toEqual(['properties', 'propertyRefToArraySimple']);
-    expect(rootNode.attributes[4].deprecated).toBeFalsy();
-    expect(rootNode.attributes[4].required).toBeFalsy();
+    expect(rootNode.attributes[4]!.name).toEqual('propertyRefToArraySimple');
+    expect(rootNode.attributes[4]!.title).toEqual(undefined);
+    expect(rootNode.attributes[4]!.absolutePath).toEqual(['properties', 'propertyRefToArraySimple']);
+    expect(rootNode.attributes[4]!.deprecated).toBeFalsy();
+    expect(rootNode.attributes[4]!.required).toBeFalsy();
 
-    expect(rootNode.attributes[5].name).toEqual('propertyRefToArrayComplex');
-    expect(rootNode.attributes[5].title).toEqual(undefined);
-    expect(rootNode.attributes[5].absolutePath).toEqual([
+    expect(rootNode.attributes[5]!.name).toEqual('propertyRefToArrayComplex');
+    expect(rootNode.attributes[5]!.title).toEqual(undefined);
+    expect(rootNode.attributes[5]!.absolutePath).toEqual([
       'properties',
       'propertyRefToArrayComplex',
     ]);
-    expect(rootNode.attributes[5].deprecated).toBeFalsy();
-    expect(rootNode.attributes[5].required).toBeFalsy();
+    expect(rootNode.attributes[5]!.deprecated).toBeFalsy();
+    expect(rootNode.attributes[5]!.required).toBeFalsy();
   });
 
   it('generate attribute type description', () => {
@@ -174,27 +174,27 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     const attrPropArraySimple = rootNode.attributes[0];
     // array of booleans
-    expect(attrPropArraySimple.typeDescription).toEqual('boolean[]');
+    expect(attrPropArraySimple!.typeDescription).toEqual('boolean[]');
 
     const attrPropArrayComplex = rootNode.attributes[1];
     // array to inlined object.
-    expect(attrPropArrayComplex.typeDescription).toEqual('propertyArrayToComplex entry[]');
+    expect(attrPropArrayComplex!.typeDescription).toEqual('propertyArrayToComplex entry[]');
 
     const attrPropArrayRefSimple = rootNode.attributes[2];
     // array to ref of simple type
-    expect(attrPropArrayRefSimple.typeDescription).toEqual('string[]');
+    expect(attrPropArrayRefSimple!.typeDescription).toEqual('string[]');
 
     const attrPropArrayRefComplexWithTitle = rootNode.attributes[3];
     // array to ref of complex type
-    expect(attrPropArrayRefComplexWithTitle.typeDescription).toEqual('PersonTitle[]');
+    expect(attrPropArrayRefComplexWithTitle!.typeDescription).toEqual('PersonTitle[]');
 
     const attrPropRefToArraySimple = rootNode.attributes[4];
     // reference to array of booleans
-    expect(attrPropRefToArraySimple.typeDescription).toEqual('arrayProperty');
+    expect(attrPropRefToArraySimple!.typeDescription).toEqual('arrayProperty');
 
     const attrPropRefToArrayComplex = rootNode.attributes[5];
     // reference to array of objects. We take the name of the object as the type description
-    expect(attrPropRefToArrayComplex.typeDescription).toEqual('arrayObjectProperty');
+    expect(attrPropRefToArrayComplex!.typeDescription).toEqual('arrayObjectProperty');
   });
 
   it('generate object fallback display name', () => {
@@ -310,26 +310,26 @@ describe('test schema graph constructor with objects and attributes, without adv
     }
 
     // for this array, because the object is inlined, the edge is to the inlined object
-    expect(graph.edges[0].end.absolutePath).toEqual([
+    expect(graph.edges[0]!.end.absolutePath).toEqual([
       'properties',
       'propertyArrayToComplex',
       'items',
     ]);
-    expect(graph.edges[0].edgeType).toEqual(EdgeType.ATTRIBUTE);
-    expect(graph.edges[0].isArray).toEqual(true);
-    expect(graph.edges[0].label).toEqual('propertyArrayToComplex');
+    expect(graph.edges[0]!.edgeType).toEqual(EdgeType.ATTRIBUTE);
+    expect(graph.edges[0]!.isArray).toEqual(true);
+    expect(graph.edges[0]!.label).toEqual('propertyArrayToComplex');
 
     // for this array, because the object is not inlined, the edge is to the object node
-    expect(graph.edges[1].end.absolutePath).toEqual(['$defs', 'person']);
-    expect(graph.edges[1].edgeType).toEqual(EdgeType.ATTRIBUTE);
-    expect(graph.edges[1].isArray).toEqual(true);
-    expect(graph.edges[1].label).toEqual('propertyArrayToRefComplexWithTitle');
+    expect(graph.edges[1]!.end.absolutePath).toEqual(['$defs', 'person']);
+    expect(graph.edges[1]!.edgeType).toEqual(EdgeType.ATTRIBUTE);
+    expect(graph.edges[1]!.isArray).toEqual(true);
+    expect(graph.edges[1]!.label).toEqual('propertyArrayToRefComplexWithTitle');
 
     // this is a very tricky one: it needs resolving of the reference to the array and then the object behind the array
-    expect(graph.edges[2].end.absolutePath).toEqual(['$defs', 'arrayObjectProperty', 'items']);
-    expect(graph.edges[2].edgeType).toEqual(EdgeType.ATTRIBUTE);
-    expect(graph.edges[2].isArray).toEqual(true);
-    expect(graph.edges[2].label).toEqual('propertyRefToArrayComplex');
+    expect(graph.edges[2]!.end.absolutePath).toEqual(['$defs', 'arrayObjectProperty', 'items']);
+    expect(graph.edges[2]!.edgeType).toEqual(EdgeType.ATTRIBUTE);
+    expect(graph.edges[2]!.isArray).toEqual(true);
+    expect(graph.edges[2]!.label).toEqual('propertyRefToArrayComplex');
 
     graph.edges = [];
     const propArrayComplexItem = defs.get('properties.propertyArrayToComplex.items')!;

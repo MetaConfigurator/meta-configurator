@@ -9,7 +9,7 @@ import {
 } from '@/components/panels/code-editor/aceUtility';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
-import {watchImmediate} from '@vueuse/core/index';
+import {watchImmediate} from '@vueuse/core';
 import {useSettings} from '@/settings/useSettings';
 import {sizeOf} from '@/utility/sizeOf';
 

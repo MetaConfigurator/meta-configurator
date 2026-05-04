@@ -2,6 +2,7 @@ import {openClearDataEditorDialog} from '@/components/toolbar/clearFile';
 import {toastService} from '@/utility/toastService';
 import {useDataSource} from '@/data/dataSource';
 import {schemaCollection} from '@/packaged-schemas/schemaCollection';
+import type {SchemaOption} from '@/packaged-schemas/schemaOption';
 import {adaptComplexitySettingsToLoadedSchema} from '@/settings/settingsUpdater';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
@@ -13,14 +14,18 @@ import {useErrorService} from '@/utility/errorServiceInstance';
  */
 export function loadExampleSchema(schemaKey: string): void {
   try {
-    let selectedSchema: any = schemaCollection.find(schema => schema.key === schemaKey);
+    let selectedSchema = schemaCollection.find((schema: SchemaOption) => schema.key === schemaKey);
+    if (!selectedSchema?.schema) {
+      throw new Error(`Unable to find example schema "${schemaKey}".`);
+    }
+    const schemaToLoad = selectedSchema.schema;
     selectedSchema = structuredClone(selectedSchema);
     const schemaName = selectedSchema.label || 'Unknown Schema';
-    useDataSource().userSchemaData.value = selectedSchema?.schema;
+    useDataSource().userSchemaData.value = schemaToLoad;
     useDataSource().newSchemaWasFetched.value = true;
     // this will adapt the meta schema settings to enable/disable multiple types, boolean schema support, etc.
     const userSettings = getDataForMode(SessionMode.Settings).data.value;
-    adaptComplexitySettingsToLoadedSchema(userSettings, selectedSchema?.schema);
+    adaptComplexitySettingsToLoadedSchema(userSettings, schemaToLoad);
 
     openClearDataEditorDialog();
 

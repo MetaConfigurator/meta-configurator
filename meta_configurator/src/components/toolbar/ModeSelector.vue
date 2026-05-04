@@ -4,6 +4,7 @@ import type {MenuItem} from 'primevue/menuitem';
 import TabMenu from 'primevue/tabmenu';
 import {modeToMenuTitle, SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
+import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -15,7 +16,7 @@ const emit = defineEmits<{
 
 const settings = useSettings();
 
-function getTabs(settings): MenuItem[] {
+function getTabs(settings: SettingsInterfaceRoot): MenuItem[] {
   const items: MenuItem[] = [];
 
   items.push({
@@ -56,18 +57,18 @@ watch(
   () => props.currentMode,
   mode => {
     const idx = tabs.value.findIndex(
-      (t, i) => t.command && tabs.value[i].label === modeToMenuTitle(mode)
+      (t, i) => t.command && tabs.value[i]?.label === modeToMenuTitle(mode)
     );
     if (idx >= 0) activeIndex.value = idx;
   },
   {immediate: true}
 );
 
-function onTabChange(event) {
+function onTabChange(event: {index: number}) {
   const idx = event.index;
   const item = tabs.value[idx];
   if (item?.command) {
-    item.command(event);
+    item.command({originalEvent: new Event('tab-change'), item});
   }
 }
 </script>

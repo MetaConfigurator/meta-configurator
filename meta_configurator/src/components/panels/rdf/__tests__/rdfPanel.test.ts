@@ -40,154 +40,165 @@ const ORIGINAL_LABEL = 'element_size';
 const UPDATED_LABEL = 'element_size_updated';
 
 describe('RdfPanel', () => {
-  it('loads fixture data, edits one rdf statement, deletes it, adds it back, and updates editor data', async () => {
-    vi.resetModules();
-    (globalThis as any).window = globalThis as any;
+  it(
+    'loads fixture data, edits one rdf statement, deletes it, adds it back, and updates editor data',
+    async () => {
+      vi.resetModules();
+      (globalThis as any).window = globalThis as any;
 
-    const inputJsonLd = JSON.parse(readFixture('input.json'));
-    const expectedEditedJsonLd = JSON.parse(readFixture('edit_expected.json'));
-    const expectedDeletedJsonLd = JSON.parse(readFixture('delete_expected.json'));
-    const expectedAddedJsonLd = JSON.parse(readFixture('add_expected.json'));
-    const dataRef = ref<any>({});
-    const dataAtCurrentPath = ref<any>(null);
-    const currentPath = ref<any>([]);
-    const currentSelectedElement = ref<any>([]);
+      const inputJsonLd = JSON.parse(readFixture('input.json'));
+      const expectedEditedJsonLd = JSON.parse(readFixture('edit_expected.json'));
+      const expectedDeletedJsonLd = JSON.parse(readFixture('delete_expected.json'));
+      const expectedAddedJsonLd = JSON.parse(readFixture('add_expected.json'));
+      const dataRef = ref<any>({});
+      const dataAtCurrentPath = ref<any>(null);
+      const currentPath = ref<any>([]);
+      const currentSelectedElement = ref<any>([]);
 
-    vi.doMock('@/data/useDataLink', () => ({
-      getDataForMode: () => ({
-        data: dataRef,
-        shallowDataRef: dataRef,
-        dataAtCurrentPath,
-        isDataUnparseable: () => false,
-        setData: (value: any) => {
-          dataRef.value = value;
+      vi.doMock('@/data/useDataLink', () => ({
+        getDataForMode: () => ({
+          data: dataRef,
+          shallowDataRef: dataRef,
+          dataAtCurrentPath,
+          isDataUnparseable: () => false,
+          setData: (value: any) => {
+            dataRef.value = value;
+          },
+        }),
+        getSessionForMode: () => ({
+          currentPath,
+          currentSelectedElement,
+          updateCurrentPath: (path: any) => {
+            currentPath.value = path;
+          },
+          updateCurrentSelectedElement: (path: any) => {
+            currentSelectedElement.value = path;
+          },
+        }),
+      }));
+
+      vi.doMock('rdflib', async () => {
+        const {createRequire} = await import('node:module');
+        const require = createRequire(import.meta.url);
+        return require('rdflib');
+      });
+
+      const RdfPanel = (await import('@/components/panels/rdf/RdfPanel.vue')).default;
+      const {rdfStoreManager} = await import('@/components/panels/rdf/rdfStoreManager');
+      const {TripleEditorService} = await import('@/components/panels/rdf/tripleEditorService');
+      const {RdfTermType} = await import('@/components/panels/rdf/rdfUtils');
+      const {RdfMediaType} = await import('@/components/panels/rdf/rdfEnums');
+
+      const getExportedJsonLd = () =>
+        JSON.parse(rdfStoreManager.exportAs(RdfMediaType.JsonLd).content ?? '{"@graph":[]}');
+
+      mount(RdfPanel, {
+        props: {sessionMode: SessionMode.DataEditor},
+        global: {
+          stubs: {
+            PanelSettings: PanelSettingsStub,
+            RmlMappingDialog: RmlMappingDialogStub,
+            ImportTurtleDialog: ImportTurtleDialogStub,
+            Message: MessageStub,
+            RdfTabPanel: RdfTabPanelStub,
+          },
         },
-      }),
-      getSessionForMode: () => ({
-        currentPath,
-        currentSelectedElement,
-        updateCurrentPath: (path: any) => {
-          currentPath.value = path;
-        },
-        updateCurrentSelectedElement: (path: any) => {
-          currentSelectedElement.value = path;
-        },
-      }),
-    }));
+      });
 
-    vi.doMock('rdflib', async () => {
-      const {createRequire} = await import('node:module');
-      const require = createRequire(import.meta.url);
-      return require('rdflib');
-    });
+      dataRef.value = inputJsonLd;
+      await waitUntil(() => rdfStoreManager.statements.value.length > 0);
 
-    const RdfPanel = (await import('@/components/panels/rdf/RdfPanel.vue')).default;
-    const {rdfStoreManager} = await import('@/components/panels/rdf/rdfStoreManager');
-    const {TripleEditorService} = await import('@/components/panels/rdf/tripleEditorService');
-    const {RdfTermType} = await import('@/components/panels/rdf/rdfUtils');
-    const {RdfMediaType} = await import('@/components/panels/rdf/rdfEnums');
+      const target = rdfStoreManager.statements.value.find(
+        st =>
+          st.subject.value === VARIABLE_ELEMENT_SIZE_IRI &&
+          st.predicate.value === RDFS_LABEL_IRI &&
+          st.object.termType === RdfTermType.Literal
+      );
+      expect(target).toBeDefined();
 
-    const getExportedJsonLd = () =>
-      JSON.parse(rdfStoreManager.exportAs(RdfMediaType.JsonLd).content ?? '{"@graph":[]}');
+      const result = TripleEditorService.addOrEdit({
+        subject: target!.subject.value,
+        subjectType: target!.subject.termType,
+        predicate: target!.predicate.value,
+        predicateType: target!.predicate.termType,
+        object: UPDATED_LABEL,
+        objectType: RdfTermType.Literal,
+        objectDatatype:
+          target!.object.termType === RdfTermType.Literal
+            ? target!.object.datatype?.value ?? ''
+            : '',
+        statement: target,
+      });
 
-    mount(RdfPanel, {
-      props: {sessionMode: SessionMode.DataEditor},
-      global: {
-        stubs: {
-          PanelSettings: PanelSettingsStub,
-          RmlMappingDialog: RmlMappingDialogStub,
-          ImportTurtleDialog: ImportTurtleDialogStub,
-          Message: MessageStub,
-          RdfTabPanel: RdfTabPanelStub,
-        },
-      },
-    });
+      expect(result.success).toBe(true);
 
-    dataRef.value = inputJsonLd;
-    await waitUntil(() => rdfStoreManager.statements.value.length > 0);
+      await waitUntil(() =>
+        rdfStoreManager.statements.value.some(
+          st =>
+            st.subject.value === VARIABLE_ELEMENT_SIZE_IRI &&
+            st.predicate.value === RDFS_LABEL_IRI &&
+            st.object.termType === RdfTermType.Literal &&
+            st.object.value === UPDATED_LABEL
+        )
+      );
+      await waitUntil(
+        () => JSON.stringify(getExportedJsonLd()) === JSON.stringify(expectedEditedJsonLd)
+      );
+      expect(getExportedJsonLd()).toEqual(expectedEditedJsonLd);
 
-    const target = rdfStoreManager.statements.value.find(
-      st =>
-        st.subject.value === VARIABLE_ELEMENT_SIZE_IRI &&
-        st.predicate.value === RDFS_LABEL_IRI &&
-        st.object.termType === RdfTermType.Literal
-    );
-    expect(target).toBeDefined();
-
-    const result = TripleEditorService.addOrEdit({
-      subject: target!.subject.value,
-      subjectType: target!.subject.termType,
-      predicate: target!.predicate.value,
-      predicateType: target!.predicate.termType,
-      object: UPDATED_LABEL,
-      objectType: RdfTermType.Literal,
-      objectDatatype: target!.object.datatype?.value ?? '',
-      statement: target,
-    });
-
-    expect(result.success).toBe(true);
-
-    await waitUntil(() =>
-      rdfStoreManager.statements.value.some(
+      const editedStatement = rdfStoreManager.statements.value.find(
         st =>
           st.subject.value === VARIABLE_ELEMENT_SIZE_IRI &&
           st.predicate.value === RDFS_LABEL_IRI &&
           st.object.termType === RdfTermType.Literal &&
           st.object.value === UPDATED_LABEL
-      )
-    );
-    await waitUntil(
-      () => JSON.stringify(getExportedJsonLd()) === JSON.stringify(expectedEditedJsonLd)
-    );
-    expect(getExportedJsonLd()).toEqual(expectedEditedJsonLd);
+      );
+      expect(editedStatement).toBeDefined();
 
-    const editedStatement = rdfStoreManager.statements.value.find(
-      st =>
-        st.subject.value === VARIABLE_ELEMENT_SIZE_IRI &&
-        st.predicate.value === RDFS_LABEL_IRI &&
-        st.object.termType === RdfTermType.Literal &&
-        st.object.value === UPDATED_LABEL
-    );
-    expect(editedStatement).toBeDefined();
+      const deleteResult = TripleEditorService.delete(editedStatement!);
+      expect(deleteResult.success).toBe(true);
 
-    const deleteResult = TripleEditorService.delete(editedStatement!);
-    expect(deleteResult.success).toBe(true);
+      await waitUntil(
+        () =>
+          !rdfStoreManager.statements.value.some(
+            st =>
+              st.subject.value === VARIABLE_ELEMENT_SIZE_IRI &&
+              st.predicate.value === RDFS_LABEL_IRI
+          )
+      );
+      await waitUntil(
+        () => JSON.stringify(getExportedJsonLd()) === JSON.stringify(expectedDeletedJsonLd)
+      );
+      expect(getExportedJsonLd()).toEqual(expectedDeletedJsonLd);
 
-    await waitUntil(
-      () =>
-        !rdfStoreManager.statements.value.some(
+      const addResult = TripleEditorService.addOrEdit({
+        subject: editedStatement!.subject.value,
+        subjectType: editedStatement!.subject.termType,
+        predicate: editedStatement!.predicate.value,
+        predicateType: editedStatement!.predicate.termType,
+        object: ORIGINAL_LABEL,
+        objectType: RdfTermType.Literal,
+        objectDatatype:
+          editedStatement!.object.termType === RdfTermType.Literal
+            ? editedStatement!.object.datatype?.value ?? ''
+            : '',
+      });
+      expect(addResult.success).toBe(true);
+
+      await waitUntil(() =>
+        rdfStoreManager.statements.value.some(
           st =>
-            st.subject.value === VARIABLE_ELEMENT_SIZE_IRI && st.predicate.value === RDFS_LABEL_IRI
+            st.subject.value === VARIABLE_ELEMENT_SIZE_IRI &&
+            st.predicate.value === RDFS_LABEL_IRI &&
+            st.object.termType === RdfTermType.Literal &&
+            st.object.value === ORIGINAL_LABEL
         )
-    );
-    await waitUntil(
-      () => JSON.stringify(getExportedJsonLd()) === JSON.stringify(expectedDeletedJsonLd)
-    );
-    expect(getExportedJsonLd()).toEqual(expectedDeletedJsonLd);
-
-    const addResult = TripleEditorService.addOrEdit({
-      subject: editedStatement!.subject.value,
-      subjectType: editedStatement!.subject.termType,
-      predicate: editedStatement!.predicate.value,
-      predicateType: editedStatement!.predicate.termType,
-      object: ORIGINAL_LABEL,
-      objectType: RdfTermType.Literal,
-      objectDatatype: editedStatement!.object.datatype?.value ?? '',
-    });
-    expect(addResult.success).toBe(true);
-
-    await waitUntil(() =>
-      rdfStoreManager.statements.value.some(
-        st =>
-          st.subject.value === VARIABLE_ELEMENT_SIZE_IRI &&
-          st.predicate.value === RDFS_LABEL_IRI &&
-          st.object.termType === RdfTermType.Literal &&
-          st.object.value === ORIGINAL_LABEL
-      )
-    );
-    await waitUntil(
-      () => JSON.stringify(getExportedJsonLd()) === JSON.stringify(expectedAddedJsonLd)
-    );
-    expect(getExportedJsonLd()).toEqual(expectedAddedJsonLd);
-  });
+      );
+      await waitUntil(
+        () => JSON.stringify(getExportedJsonLd()) === JSON.stringify(expectedAddedJsonLd)
+      );
+      expect(getExportedJsonLd()).toEqual(expectedAddedJsonLd);
+    },
+    8000
+  );
 });

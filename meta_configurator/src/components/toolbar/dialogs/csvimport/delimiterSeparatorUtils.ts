@@ -17,7 +17,7 @@ function getMostUsedDelimiter(csv: string, delimiters: LabelledValue[]): Labelle
   const delimiterCount = delimiters.map(delimiter => {
     return csv.split(delimiter.value).length;
   });
-  return delimiters[delimiterCount.indexOf(Math.max(...delimiterCount))];
+  return delimiters[delimiterCount.indexOf(Math.max(...delimiterCount))] ?? delimiters[0]!;
 }
 
 // we check for the occurrence count of the separator, but only for separators that are surrounded by integers
@@ -29,7 +29,7 @@ function getMostUsedDecimalSeparator(
   const separatorCount = separators.map(separator => {
     return csv.split(generateFloatRegexFull(delimiterValue, separator.value)).length;
   });
-  return separators[separatorCount.indexOf(Math.max(...separatorCount))];
+  return separators[separatorCount.indexOf(Math.max(...separatorCount))] ?? separators[0]!;
 }
 
 export function computeMostUsedDelimiterAndDecimalSeparator(csv: string): {
@@ -44,7 +44,7 @@ export function computeMostUsedDelimiterAndDecimalSeparator(csv: string): {
   if (availableDecimalSeparators.length === 1) {
     return {
       delimiterSuggestion: delimiter,
-      decimalSeparatorSuggestion: availableDecimalSeparators[0],
+      decimalSeparatorSuggestion: availableDecimalSeparators[0]!,
     };
   }
 

@@ -172,22 +172,34 @@ export class ValidationService {
     }
     if (result.properties) {
       for (const key of Object.keys(result.properties)) {
+        const propertySchema = result.properties[key];
+        if (propertySchema === undefined) {
+          continue;
+        }
         result.properties[key] = this.updateReferencesAndReplaceCustomKeywords(
-          result.properties[key]
+          propertySchema
         );
       }
     }
     if (result.patternProperties) {
       for (const key of Object.keys(result.patternProperties)) {
+        const patternPropertySchema = result.patternProperties[key];
+        if (patternPropertySchema === undefined) {
+          continue;
+        }
         result.patternProperties[key] = this.updateReferencesAndReplaceCustomKeywords(
-          result.patternProperties[key]
+          patternPropertySchema
         );
       }
     }
     if (result.dependentSchemas) {
       for (const key of Object.keys(result.dependentSchemas)) {
+        const dependentSchema = result.dependentSchemas[key];
+        if (dependentSchema === undefined) {
+          continue;
+        }
         result.dependentSchemas[key] = this.updateReferencesAndReplaceCustomKeywords(
-          result.dependentSchemas[key]
+          dependentSchema
         );
       }
     }

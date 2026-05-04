@@ -66,17 +66,21 @@ class RecordingVisitor extends JsonSchemaVisitor {
   }
 }
 
+function asSchema(schema: JsonSchemaType): JsonSchemaType {
+  return schema;
+}
+
 describe('JsonSchemaVisitor', () => {
   it('visits a simple object schema', () => {
     const visitor = new RecordingVisitor();
-    const schema = {type: 'object', title: 'Root'};
+    const schema = asSchema({type: 'object', title: 'Root'});
     visitor.traverse(schema);
 
     expect(visitor.schemas).toHaveLength(1);
-    expect(visitor.schemas[0].schema).toBe(schema);
-    expect(visitor.schemas[0].ctx.depth).toBe(0);
-    expect(visitor.schemas[0].ctx.path).toEqual([]);
-    expect(visitor.schemas[0].ctx.parentKind).toBeNull();
+    expect(visitor.schemas[0]!.schema).toBe(schema);
+    expect(visitor.schemas[0]!.ctx.depth).toBe(0);
+    expect(visitor.schemas[0]!.ctx.path).toEqual([]);
+    expect(visitor.schemas[0]!.ctx.parentKind).toBeNull();
   });
 
   it('visits a boolean schema', () => {
@@ -84,42 +88,42 @@ describe('JsonSchemaVisitor', () => {
     visitor.traverse(true);
 
     expect(visitor.booleans).toHaveLength(1);
-    expect(visitor.booleans[0].value).toBe(true);
+    expect(visitor.booleans[0]!.value).toBe(true);
   });
 
   it('visits properties with correct context', () => {
     const visitor = new RecordingVisitor();
-    const schema = {
+    const schema = asSchema({
       type: 'object',
       properties: {
         name: {type: 'string'},
         age: {type: 'number'},
       },
-    };
+    });
     visitor.traverse(schema);
 
     expect(visitor.properties).toHaveLength(2);
-    expect(visitor.properties[0].name).toBe('name');
-    expect(visitor.properties[0].ctx.path).toEqual(['properties', 'name']);
-    expect(visitor.properties[0].ctx.parentKind).toBe('property');
-    expect(visitor.properties[1].name).toBe('age');
-    expect(visitor.properties[1].ctx.path).toEqual(['properties', 'age']);
+    expect(visitor.properties[0]!.name).toBe('name');
+    expect(visitor.properties[0]!.ctx.path).toEqual(['properties', 'name']);
+    expect(visitor.properties[0]!.ctx.parentKind).toBe('property');
+    expect(visitor.properties[1]!.name).toBe('age');
+    expect(visitor.properties[1]!.ctx.path).toEqual(['properties', 'age']);
   });
 
   it('visits patternProperties', () => {
     const visitor = new RecordingVisitor();
-    const schema = {
+    const schema = asSchema({
       type: 'object',
       patternProperties: {
         '^S_': {type: 'string'},
       },
-    };
+    });
     visitor.traverse(schema);
 
     expect(visitor.patternProperties).toHaveLength(1);
-    expect(visitor.patternProperties[0].pattern).toBe('^S_');
-    expect(visitor.patternProperties[0].ctx.parentKind).toBe('pattern');
-    expect(visitor.patternProperties[0].ctx.path).toEqual(['patternProperties', '^S_']);
+    expect(visitor.patternProperties[0]!.pattern).toBe('^S_');
+    expect(visitor.patternProperties[0]!.ctx.parentKind).toBe('pattern');
+    expect(visitor.patternProperties[0]!.ctx.path).toEqual(['patternProperties', '^S_']);
   });
 
   it('visits $ref', () => {
@@ -127,16 +131,16 @@ describe('JsonSchemaVisitor', () => {
     visitor.traverse({$ref: '#/$defs/foo'});
 
     expect(visitor.refs).toHaveLength(1);
-    expect(visitor.refs[0].ref).toBe('#/$defs/foo');
+    expect(visitor.refs[0]!.ref).toBe('#/$defs/foo');
   });
 
   it('visits allOf, anyOf, oneOf', () => {
     const visitor = new RecordingVisitor();
-    const schema = {
+    const schema = asSchema({
       allOf: [{type: 'object'}],
       anyOf: [{type: 'string'}, {type: 'number'}],
       oneOf: [{type: 'boolean'}],
-    };
+    });
     visitor.traverse(schema);
 
     const keywords = visitor.compositionals.map(c => c.keyword);
@@ -150,7 +154,7 @@ describe('JsonSchemaVisitor', () => {
     visitor.traverse({not: {type: 'string'}});
 
     expect(visitor.compositionals).toHaveLength(1);
-    expect(visitor.compositionals[0].keyword).toBe('not');
+    expect(visitor.compositionals[0]!.keyword).toBe('not');
   });
 
   it('visits if/then/else', () => {
@@ -165,7 +169,7 @@ describe('JsonSchemaVisitor', () => {
     expect(conditionalKeywords).toContain('if');
     expect(conditionalKeywords).toContain('then');
     expect(conditionalKeywords).toContain('else');
-    expect(visitor.conditionals[2].schema).toBe(true);
+    expect(visitor.conditionals[2]!.schema).toBe(true);
   });
 
   it('visits $defs', () => {
@@ -181,8 +185,8 @@ describe('JsonSchemaVisitor', () => {
     const names = visitor.definitions.map(d => d.name);
     expect(names).toContain('foo');
     expect(names).toContain('bar');
-    expect(visitor.definitions[0].ctx.parentKind).toBe('definition');
-    expect(visitor.definitions[0].ctx.path).toEqual(['$defs', 'foo']);
+    expect(visitor.definitions[0]!.ctx.parentKind).toBe('definition');
+    expect(visitor.definitions[0]!.ctx.path).toEqual(['$defs', 'foo']);
   });
 
   it('visits legacy definitions keyword', () => {
@@ -190,8 +194,8 @@ describe('JsonSchemaVisitor', () => {
     visitor.traverse({definitions: {myDef: {type: 'object'}}});
 
     expect(visitor.definitions).toHaveLength(1);
-    expect(visitor.definitions[0].name).toBe('myDef');
-    expect(visitor.definitions[0].ctx.path).toEqual(['definitions', 'myDef']);
+    expect(visitor.definitions[0]!.name).toBe('myDef');
+    expect(visitor.definitions[0]!.ctx.path).toEqual(['definitions', 'myDef']);
   });
 
   it('visits items as single schema', () => {
@@ -199,8 +203,8 @@ describe('JsonSchemaVisitor', () => {
     visitor.traverse({type: 'array', items: {type: 'string'}});
 
     expect(visitor.subSchemaKeywords).toHaveLength(1);
-    expect(visitor.subSchemaKeywords[0].keyword).toBe('items');
-    expect(visitor.subSchemaKeywords[0].ctx.path).toEqual(['items']);
+    expect(visitor.subSchemaKeywords[0]!.keyword).toBe('items');
+    expect(visitor.subSchemaKeywords[0]!.ctx.path).toEqual(['items']);
   });
 
   it('visits items as array (tuple)', () => {
@@ -208,8 +212,8 @@ describe('JsonSchemaVisitor', () => {
     visitor.traverse({type: 'array', items: [{type: 'string'}, {type: 'number'}]});
 
     expect(visitor.subSchemaKeywords).toHaveLength(2);
-    expect(visitor.subSchemaKeywords[0].ctx.path).toEqual(['items', 0]);
-    expect(visitor.subSchemaKeywords[1].ctx.path).toEqual(['items', 1]);
+    expect(visitor.subSchemaKeywords[0]!.ctx.path).toEqual(['items', 0]);
+    expect(visitor.subSchemaKeywords[1]!.ctx.path).toEqual(['items', 1]);
   });
 
   it('visits additionalProperties', () => {
@@ -284,8 +288,8 @@ describe('JsonSchemaVisitor', () => {
     });
 
     expect(visitor.definitions).toHaveLength(1);
-    expect(visitor.definitions[0].name).toBe('credit_card');
-    expect(visitor.definitions[0].ctx.path).toEqual(['dependentSchemas', 'credit_card']);
+    expect(visitor.definitions[0]!.name).toBe('credit_card');
+    expect(visitor.definitions[0]!.ctx.path).toEqual(['dependentSchemas', 'credit_card']);
   });
 
   it('skips array-valued dependencies, visits schema-valued ones', () => {
@@ -298,19 +302,19 @@ describe('JsonSchemaVisitor', () => {
     } as any);
 
     expect(visitor.definitions).toHaveLength(1);
-    expect(visitor.definitions[0].name).toBe('address');
+    expect(visitor.definitions[0]!.name).toBe('address');
   });
 
   it('visits $dynamicRef and $recursiveRef', () => {
     const visitor = new RecordingVisitor();
     visitor.traverse({$dynamicRef: '#myAnchor'} as any);
     expect(visitor.refs).toHaveLength(1);
-    expect(visitor.refs[0].ref).toBe('#myAnchor');
+    expect(visitor.refs[0]!.ref).toBe('#myAnchor');
 
     const visitor2 = new RecordingVisitor();
     visitor2.traverse({$recursiveRef: '#'} as any);
     expect(visitor2.refs).toHaveLength(1);
-    expect(visitor2.refs[0].ref).toBe('#');
+    expect(visitor2.refs[0]!.ref).toBe('#');
   });
 
   it('handles prefixItems', () => {
@@ -319,7 +323,7 @@ describe('JsonSchemaVisitor', () => {
 
     const prefixItemKeywords = visitor.subSchemaKeywords.filter(k => k.keyword === 'prefixItems');
     expect(prefixItemKeywords).toHaveLength(2);
-    expect(prefixItemKeywords[0].ctx.path).toEqual(['prefixItems', 0]);
-    expect(prefixItemKeywords[1].ctx.path).toEqual(['prefixItems', 1]);
+    expect(prefixItemKeywords[0]!.ctx.path).toEqual(['prefixItems', 0]);
+    expect(prefixItemKeywords[1]!.ctx.path).toEqual(['prefixItems', 1]);
   });
 });

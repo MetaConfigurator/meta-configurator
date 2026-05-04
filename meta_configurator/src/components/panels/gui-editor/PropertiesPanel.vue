@@ -507,19 +507,19 @@ const schemaInfoOverlay = ref<InstanceType<typeof SchemaInfoOverlay> | undefined
 const allowShowOverlay = ref(true);
 const overlayShowScheduled = ref(false);
 
-const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
+const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: Event) => {
   const relevantErrors = getValidationResults(nodeData.absolutePath).errors;
   // @ts-ignore
   schemaInfoOverlay.value?.showPanel(
     nodeData.schema,
-    nodeData.name,
+    String(nodeData.name),
     nodeData.parentSchema,
     relevantErrors,
     event
   );
 };
 const showInfoOverlayPanelDebounced = useDebounceFn(
-  (nodeData: ConfigTreeNodeData, event: MouseEvent) => {
+  (nodeData: ConfigTreeNodeData, event: Event) => {
     if (allowShowOverlay.value && overlayShowScheduled.value) {
       showInfoOverlayPanelInstantly(nodeData, event);
     }
@@ -527,7 +527,7 @@ const showInfoOverlayPanelDebounced = useDebounceFn(
   1000
 );
 
-function showInfoOverlayPanel(nodeData: ConfigTreeNodeData, event: MouseEvent) {
+function showInfoOverlayPanel(nodeData: ConfigTreeNodeData, event: Event) {
   overlayShowScheduled.value = true;
   showInfoOverlayPanelDebounced(nodeData, event);
 }
@@ -608,7 +608,9 @@ function zoomIntoPath(path: Path) {
             @update_tree="updateTree"
             @click="() => clickedPropertyData(slotProps.node.data)"
             bodyClass="w-full"
-            @keydown.ctrl.i="event => showInfoOverlayPanelInstantly(slotProps.node.data, event)"
+            @keydown.ctrl.i="
+              (event: KeyboardEvent) => showInfoOverlayPanelInstantly(slotProps.node.data, event)
+            "
             :data-testid="'property-data-' + pathToString(slotProps.node.data.absolutePath)" />
         </span>
 

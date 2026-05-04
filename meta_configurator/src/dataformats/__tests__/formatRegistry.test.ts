@@ -8,7 +8,7 @@ import {PathIndexLinkJson} from '../pathIndexLinkJson';
 import {PathIndexLinkYaml} from '../pathIndexLinkYaml';
 
 function setDataFormat(format: string | undefined) {
-  useDataSource().settingsData.value.dataFormat = format;
+  useDataSource().settingsData.value.dataFormat = format as any;
   triggerRef(useDataSource().settingsData);
 }
 

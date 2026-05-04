@@ -7,7 +7,7 @@ export function mergeAllOfs(schema: JsonSchemaType, deep: boolean = true): JsonS
     return schema;
   }
 
-  return mergeAllOf(schema, {
+  return mergeAllOf(schema as any, {
     deep: deep,
     resolvers: {
       defaultResolver: mergeAllOf.options.resolvers.title,
@@ -31,7 +31,7 @@ export function mergeAllOfs(schema: JsonSchemaType, deep: boolean = true): JsonS
         return result;
       },
     },
-  });
+  } as any);
 }
 export function safeMergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
   try {

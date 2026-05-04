@@ -261,7 +261,10 @@ async function submitPromptExportDocument() {
   // if the schema defines export formats, the user prompt is ignored and the selected export format is used
   if (documentExportFormatNames.value.length > 0) {
     const exportFormatName = selectedExportFormat.value;
-    const exportFormatDef = documentExportFormats.value![exportFormatName];
+    const exportFormatDef = documentExportFormats.value?.[exportFormatName];
+    if (!exportFormatDef) {
+      throw new Error(`Unknown export format "${exportFormatName}".`);
+    }
     // if export format is just a string, it is the URL
     if (typeof exportFormatDef === 'string') {
       userPrompt = await fetchExternalContentText(exportFormatDef);

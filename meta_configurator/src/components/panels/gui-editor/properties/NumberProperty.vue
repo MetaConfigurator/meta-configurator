@@ -5,7 +5,7 @@ import {computed} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import {GuiConstants} from '@/constants';
-import type {ValidationResult} from '@/schema/validationService';
+import type {ValidationResult} from '@/schema/validationUtils';
 import type {PathElement} from '@/utility/path';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
 import {useSettings} from '@/settings/useSettings';

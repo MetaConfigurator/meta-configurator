@@ -1,4 +1,4 @@
-import {ref, type Ref} from 'vue';
+import {ref, type Ref, unref} from 'vue';
 import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 import type {Path} from '@/utility/path';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
@@ -16,11 +16,11 @@ export class CsvImportColumnMappingData {
 
   public getPathForJsonDocument(rowIndex: number): Path {
     return jsonPointerToPathTyped(
-      '/' + this.pathBeforeRowIndex + '/' + rowIndex + '/' + this.pathAfterRowIndex
+      '/' + unref(this.pathBeforeRowIndex) + '/' + rowIndex + '/' + unref(this.pathAfterRowIndex)
     );
   }
 
   public getTablePathForJsonDocument(): Path {
-    return jsonPointerToPathTyped('/' + this.pathBeforeRowIndex);
+    return jsonPointerToPathTyped('/' + unref(this.pathBeforeRowIndex));
   }
 }

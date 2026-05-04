@@ -28,7 +28,7 @@ export const SUPPORTED_LANGUAGES = [
 ].sort((a, b) => a.localeCompare(b));
 
 export async function quicktypeJSON(targetLanguage: string, typeName: string, jsonString: string) {
-  const jsonInput = jsonInputForTargetLanguage(targetLanguage);
+  const jsonInput = jsonInputForTargetLanguage(targetLanguage as any);
 
   // We could add multiple samples for the same desired
   // type, or many sources for other types. Here we're
@@ -43,7 +43,7 @@ export async function quicktypeJSON(targetLanguage: string, typeName: string, js
 
   return await quicktype({
     inputData,
-    lang: targetLanguage,
+    lang: targetLanguage as any,
   });
 }
 
@@ -63,7 +63,7 @@ export async function quicktypeJSONSchema(
 
   return await quicktype({
     inputData,
-    lang: removeParametersFromLanguage(targetLanguage),
+    lang: removeParametersFromLanguage(targetLanguage) as any,
     rendererOptions: getRendererOptions(targetLanguage),
   });
 }

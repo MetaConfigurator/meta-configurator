@@ -140,7 +140,7 @@ export function setSchemaNullable(
       type => type !== 'null'
     );
     const nextTypes = [...new Set([...nonNullableTypes, 'null'])];
-    schema.type = nextTypes.length === 1 ? nextTypes[0] : nextTypes;
+    schema.type = (nextTypes.length === 1 ? nextTypes[0]! : nextTypes) as SchemaPropertyTypes;
     return;
   }
 
@@ -148,7 +148,7 @@ export function setSchemaNullable(
   if (nextTypes.length === 0) {
     delete schema.type;
   } else {
-    schema.type = nextTypes.length === 1 ? nextTypes[0] : nextTypes;
+    schema.type = (nextTypes.length === 1 ? nextTypes[0]! : nextTypes) as SchemaPropertyTypes;
   }
 }
 

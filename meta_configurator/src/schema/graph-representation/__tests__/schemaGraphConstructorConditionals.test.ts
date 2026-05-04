@@ -89,13 +89,13 @@ describe('test schema graph constructor with conditionals', () => {
     rootNode.attributes = generateObjectAttributes(rootNode.absolutePath, rootNode.schema, defs);
 
     expect(rootNode.attributes.length).toEqual(2);
-    expect(rootNode.attributes[0].name).toEqual('propertySimple');
-    expect(rootNode.attributes[0].title).toEqual(undefined);
-    expect(rootNode.attributes[0].absolutePath).toEqual(['properties', 'propertySimple']);
+    expect(rootNode.attributes[0]!.name).toEqual('propertySimple');
+    expect(rootNode.attributes[0]!.title).toEqual(undefined);
+    expect(rootNode.attributes[0]!.absolutePath).toEqual(['properties', 'propertySimple']);
 
-    expect(rootNode.attributes[1].name).toEqual('propertyObject');
-    expect(rootNode.attributes[1].title).toEqual(undefined);
-    expect(rootNode.attributes[1].absolutePath).toEqual(['properties', 'propertyObject']);
+    expect(rootNode.attributes[1]!.name).toEqual('propertyObject');
+    expect(rootNode.attributes[1]!.title).toEqual(undefined);
+    expect(rootNode.attributes[1]!.absolutePath).toEqual(['properties', 'propertyObject']);
   });
 
   it('deal with "then" that only implicitly has object type', () => {
@@ -104,9 +104,9 @@ describe('test schema graph constructor with conditionals', () => {
     thenNode.attributes = generateObjectAttributes(thenNode.absolutePath, thenNode.schema, defs);
 
     expect(thenNode.attributes.length).toEqual(1);
-    expect(thenNode.attributes[0].name).toEqual('propertyObject');
-    expect(thenNode.attributes[0].title).toEqual(undefined);
-    expect(thenNode.attributes[0].absolutePath).toEqual(['then', 'properties', 'propertyObject']);
+    expect(thenNode.attributes[0]!.name).toEqual('propertyObject');
+    expect(thenNode.attributes[0]!.title).toEqual(undefined);
+    expect(thenNode.attributes[0]!.absolutePath).toEqual(['then', 'properties', 'propertyObject']);
   });
 
   it('generate object title', () => {
@@ -183,13 +183,13 @@ describe('test schema graph constructor with conditionals', () => {
     }
 
     // note that the order of the edges as in the same order as in the generation function: if, then, else
-    expect(graph.edges[0].end.absolutePath).toEqual(['$defs', 'researcher']);
-    expect(graph.edges[0].edgeType).toEqual(EdgeType.IF);
-    expect(graph.edges[0].label).toEqual(EdgeType.IF);
+    expect(graph.edges[0]!.end.absolutePath).toEqual(['$defs', 'researcher']);
+    expect(graph.edges[0]!.edgeType).toEqual(EdgeType.IF);
+    expect(graph.edges[0]!.label).toEqual(EdgeType.IF);
 
-    expect(graph.edges[1].end.absolutePath).toEqual(['then']);
-    expect(graph.edges[1].edgeType).toEqual(EdgeType.THEN);
-    expect(graph.edges[1].label).toEqual(EdgeType.THEN);
+    expect(graph.edges[1]!.end.absolutePath).toEqual(['then']);
+    expect(graph.edges[1]!.edgeType).toEqual(EdgeType.THEN);
+    expect(graph.edges[1]!.label).toEqual(EdgeType.THEN);
   });
 
   it('trim graph', () => {

@@ -3,7 +3,7 @@ Main component of the application.
 Combines the code editor and the gui editor.
 -->
 <script lang="ts" setup>
-import {computed, onMounted, onUnmounted, type Ref, ref, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 import 'primeicons/primeicons.css';
 import SplitterPanel from 'primevue/splitterpanel';
 import Splitter from 'primevue/splitter';
@@ -15,13 +15,13 @@ import {useConfirm} from 'primevue/useconfirm';
 import {confirmationService} from '@/utility/confirmationService';
 import {toastService} from '@/utility/toastService';
 import {useAppRouter} from '@/router/router';
-import {useDropZone, useWindowSize, watchImmediate} from '@vueuse/core/index';
+import {useDropZone, useWindowSize, watchImmediate} from '@vueuse/core';
 import {readFileContentToDataLink} from '@/utility/readFileContent';
 import {getDataForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
 import {modeToRoute, SessionMode} from '@/store/sessionMode';
 import {useSessionStore} from '@/store/sessionStore';
-import type {SettingsInterfacePanels, SettingsInterfaceRoot} from '@/settings/settingsTypes';
+import type {SettingsInterfacePanels} from '@/settings/settingsTypes';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import {updateSettingsWithDefaults} from '@/settings/settingsUpdater';
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
@@ -37,16 +37,18 @@ let panelsDefinition: SettingsInterfacePanels = settings.value.panels;
 // any setting is changed, which is not necessary and leads to Ace Editor becoming blank if settings were modified via
 // Ace Editor
 watchImmediate(
-  () => settings,
-  (settings: Ref<SettingsInterfaceRoot>) => {
-    let panels = settings.value.panels;
+  () => settings.value,
+  newSettings => {
+    const panels = newSettings.panels;
     if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition)) {
       panelsDefinition = panels;
     }
     // fix panels if they are not defined
     for (let mode of Object.values(SessionMode)) {
       if (!panels[mode]) {
-        panels[mode] = structuredClone(SETTINGS_DATA_DEFAULT.panels[mode]);
+        panels[mode] = structuredClone(
+          SETTINGS_DATA_DEFAULT.panels[mode]
+        ) as SettingsInterfacePanels[typeof mode];
       }
     }
   }
@@ -164,10 +166,10 @@ onUnmounted(() => {
           class="h-full"
           style="min-width: 0"
           :layout="width < 600 ? 'vertical' : 'horizontal'"
-          :key="panels">
+          :key="props.sessionMode">
           <SplitterPanel
             v-for="(panel, index) in panels"
-            :key="index + panel"
+            :key="`${panel.sessionMode}-${index}`"
             :min-size="10"
             :size="panel.size"
             :resizable="true">

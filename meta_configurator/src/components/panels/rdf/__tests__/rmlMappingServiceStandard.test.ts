@@ -23,4 +23,32 @@ describe('RmlMappingServiceStandard.performRmlMapping', () => {
     expect(result.success).toBe(true);
     expect(result.resultData).toEqual(expectedResult);
   });
+
+  it('excludes rr/rml/ql prefixes from the JSON-LD @context', async () => {
+    const input = JSON.parse(readFixture('input.json'));
+    const mappingConfig = readFixture('mapping.ttl');
+
+    const service = new RmlMappingServiceStandard();
+    const result = await service.performRmlMapping(input, mappingConfig);
+
+    expect(result.success).toBe(true);
+    const context = result.resultData['@context'];
+    expect(context).not.toHaveProperty('rr');
+    expect(context).not.toHaveProperty('rml');
+    expect(context).not.toHaveProperty('ql');
+  });
+
+  it('includes non-ignored prefixes in the JSON-LD @context', async () => {
+    const input = JSON.parse(readFixture('input.json'));
+    const mappingConfig = readFixture('mapping.ttl');
+
+    const service = new RmlMappingServiceStandard();
+    const result = await service.performRmlMapping(input, mappingConfig);
+
+    expect(result.success).toBe(true);
+    const context = result.resultData['@context'];
+    expect(context).toHaveProperty('m4i', 'http://w3id.org/nfdi4ing/metadata4ing#');
+    expect(context).toHaveProperty('schema', 'https://schema.org/');
+    expect(context).toHaveProperty('rdfs', 'http://www.w3.org/2000/01/rdf-schema#');
+  });
 });

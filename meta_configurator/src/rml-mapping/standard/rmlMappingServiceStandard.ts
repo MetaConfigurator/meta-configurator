@@ -62,14 +62,13 @@ async function extractPrefixes(config: string): Promise<Record<string, string>> 
 
   await new N3Parser().parse(
     config,
-    (_error: any, _quad: any, prefixMap: Record<string, string>) => {
-      if (prefixMap) {
-        prefixes = Object.fromEntries(
-          Object.entries(prefixMap).filter(
-            ([name, iri]) => !IGNORED_PREFIX_NAMES.has(name) && !IGNORED_IRIS.has(iri)
-          )
-        );
-      }
+    {
+      onQuad: () => {},
+      onPrefix: (prefix, iri) => {
+        if (!IGNORED_PREFIX_NAMES.has(prefix) && !IGNORED_IRIS.has(iri.value)) {
+          prefixes[prefix] = iri.value;
+        }
+      },
     }
   );
 

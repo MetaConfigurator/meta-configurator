@@ -27,8 +27,9 @@ export function requestUploadFileToRef(resultString: Ref<string>, resultTableNam
   });
 
   onChange((files: FileList | null) => {
-    if (files && files.length > 0) {
-      resultTableName.value = stringToIdentifier(files[0].name, true); // Get the name of the first file
+    const firstFile = files?.[0];
+    if (firstFile) {
+      resultTableName.value = stringToIdentifier(firstFile.name, true); // Get the name of the first file
       readFileContentToStringRef(files, resultString);
     }
     reset(); // Reset the file dialog after selection
@@ -149,7 +150,7 @@ export function detectPropertiesOfTableInJson(json: any, tablePath: Path): strin
   const table = _.get(json, pathToString(tablePath));
   if (Array.isArray(table)) {
     if (table.length > 0) {
-      return Object.keys(table[0]);
+      return Object.keys(table[0] ?? {});
     }
   }
   return [];
@@ -186,7 +187,7 @@ function countKeyMatches(
     arrayIndex++
   ) {
     const arrayElement = arrayData[arrayIndex];
-    const primaryKeyValue = arrayElement[foreignKeyAttribute];
+    const primaryKeyValue = arrayElement?.[foreignKeyAttribute];
     const matchingLookupRow = lookupValuesInCsv(lookupCsv, primaryKeyColumn, primaryKeyValue);
     if (matchingLookupRow) {
       result += 1;

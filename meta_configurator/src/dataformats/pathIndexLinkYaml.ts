@@ -45,8 +45,8 @@ export class PathIndexLinkYaml implements PathIndexLink {
 
     visit(document, {
       Pair(_, pair) {
-        const pairKey: Node | null = pair.key;
-        const pairValue: Node | null = pair.value;
+        const pairKey = pair.key as Node | null;
+        const pairValue = pair.value as Node | null;
         if (pairKey && pairValue) {
           if (
             (pairKey.range &&
@@ -63,7 +63,7 @@ export class PathIndexLinkYaml implements PathIndexLink {
       },
       Seq: (key, seq: YAMLSeq) => {
         seq.items.forEach((item, index) => {
-          const itemNode: Node = item;
+          const itemNode = item as Node;
           if (
             itemNode &&
             itemNode.range &&

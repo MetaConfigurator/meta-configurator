@@ -14,7 +14,7 @@ function buildSettings(overrides: Partial<SettingsInterfaceMetaSchema> = {}) {
 
 function validateSchemaCandidate(
   settings: Partial<SettingsInterfaceMetaSchema>,
-  schemaCandidate: TopLevelSchema
+  schemaCandidate: any
 ) {
   const metaSchema = buildMetaSchema(buildSettings(settings));
   const validationService = new ValidationService(metaSchema);
@@ -24,7 +24,15 @@ function validateSchemaCandidate(
 describe('metaSchemaBuilder', () => {
   describe('type validation with allowMultipleTypes disabled', () => {
     it('accepts all individual simple types', () => {
-      const simpleTypes = ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string'];
+      const simpleTypes = [
+        'array',
+        'boolean',
+        'integer',
+        'null',
+        'number',
+        'object',
+        'string',
+      ] as const;
 
       for (const type of simpleTypes) {
         const result = validateSchemaCandidate(
@@ -41,7 +49,7 @@ describe('metaSchemaBuilder', () => {
     });
 
     it('accepts nullable unions with exactly one non-null type', () => {
-      const nullableTypes = ['array', 'boolean', 'integer', 'number', 'object', 'string'];
+      const nullableTypes = ['array', 'boolean', 'integer', 'number', 'object', 'string'] as const;
 
       for (const type of nullableTypes) {
         const schemaCandidate =
@@ -95,7 +103,7 @@ describe('metaSchemaBuilder', () => {
     it('still rejects empty type arrays', () => {
       const result = validateSchemaCandidate(
         {allowMultipleTypes: false},
-        {type: [] as unknown as TopLevelSchema['type']}
+        {type: []}
       );
 
       expect(result.errors.length).toBeGreaterThan(0);
