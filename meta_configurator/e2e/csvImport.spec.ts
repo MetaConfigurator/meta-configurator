@@ -8,6 +8,7 @@ import {
     setCsvTablePath,
     submitCsvImport,
     uploadCsvFile,
+    uploadCsvFileAndCheckProgress,
 } from './utilsCsvImport';
 import {SessionMode} from '../src/store/sessionMode';
 
@@ -47,4 +48,23 @@ test('Import CSV with custom table path and renamed column', async ({page}) => {
             {name: 'Bob', location: 'Munich', role: 'Designer'},
         ],
     });
+});
+
+test('CSV file upload progresses reliably for 15 consecutive attempts in the same session without reload', async ({page}) => {
+    test.setTimeout(60000);
+    await openApp(page, 'settings_testpanel.json');
+
+    for (let attempt = 1; attempt <= 15; attempt++) {
+        await test.step(`csv upload attempt ${attempt}`, async () => {
+            await openCsvImportDialog(page);
+            try {
+                await uploadCsvFileAndCheckProgress(page, 'data_people.csv', 4000);
+            } catch (error) {
+                throw new Error(`CSV upload attempt ${attempt} got stuck before parsing completed`, {
+                    cause: error instanceof Error ? error : undefined,
+                });
+            }
+            await submitCsvImport(page);
+        });
+    }
 });

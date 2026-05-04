@@ -1,26 +1,17 @@
-import {useFileDialog} from '@vueuse/core';
 import {readFileContentToStringRef} from '@/utility/readFileContent';
 import {RdfMediaType} from '@/components/panels/rdf/rdfEnums';
 import {useSettings} from '@/settings/useSettings';
 import type {Ref} from 'vue';
 import * as $rdf from 'rdflib';
+import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
 
 const settings = useSettings();
+const turtleFileDialog = createLazySingleFileDialog('.ttl');
 
 export function requestUploadFileToRef(resultString: Ref<string>): void {
-  const {open, onChange, reset} = useFileDialog({
-    accept: '.ttl',
-    multiple: false,
+  turtleFileDialog.openForSelection(files => {
+    readFileContentToStringRef(files, resultString);
   });
-
-  onChange((files: FileList | null) => {
-    if (files && files.length > 0) {
-      readFileContentToStringRef(files, resultString);
-    }
-    reset();
-  });
-
-  setTimeout(open, 3);
 }
 
 /**

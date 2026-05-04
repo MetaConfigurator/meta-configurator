@@ -19,6 +19,18 @@ export async function uploadCsvFile(page: Page, filename: string) {
     await expect(page.getByTestId('csv-submit-import')).toBeVisible();
 }
 
+export async function uploadCsvFileAndCheckProgress(page: Page, filename: string, timeoutMs: number = 5000) {
+    const [fileChooser] = await Promise.all([
+        page.waitForEvent('filechooser', {timeout: timeoutMs}),
+        page.getByTestId('csv-select-file').click({timeout: timeoutMs}),
+    ]);
+    await fileChooser.setFiles(path.join(fixturesDir, filename));
+    await expect(
+        page.getByTestId('csv-submit-import'),
+        'CSV import dialog did not progress past file selection'
+    ).toBeVisible({timeout: timeoutMs});
+}
+
 export async function expandImportOptions(page: Page) {
     await page.getByTestId('csv-import-options-toggle').click();
 }
