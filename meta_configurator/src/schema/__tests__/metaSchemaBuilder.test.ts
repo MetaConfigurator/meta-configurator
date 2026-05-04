@@ -3,7 +3,6 @@ import {buildMetaSchema} from '@/schema/metaSchemaBuilder';
 import {ValidationService} from '@/schema/validationService';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfaceMetaSchema} from '@/settings/settingsTypes';
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 
 function buildSettings(overrides: Partial<SettingsInterfaceMetaSchema> = {}) {
   return {

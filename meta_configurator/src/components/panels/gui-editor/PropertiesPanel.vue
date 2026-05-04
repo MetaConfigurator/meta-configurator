@@ -509,7 +509,6 @@ const overlayShowScheduled = ref(false);
 
 const showInfoOverlayPanelInstantly = (nodeData: ConfigTreeNodeData, event: Event) => {
   const relevantErrors = getValidationResults(nodeData.absolutePath).errors;
-  // @ts-ignore
   schemaInfoOverlay.value?.showPanel(
     nodeData.schema,
     String(nodeData.name),

@@ -63,6 +63,7 @@ const panels = computed(() => {
     };
   });
 });
+const panelsKey = computed(() => JSON.stringify(panels.value));
 
 let {width} = useWindowSize();
 
@@ -166,7 +167,7 @@ onUnmounted(() => {
           class="h-full"
           style="min-width: 0"
           :layout="width < 600 ? 'vertical' : 'horizontal'"
-          :key="panels">
+          :key="panelsKey">
           <SplitterPanel
             v-for="(panel, index) in panels"
             :key="`${panel.sessionMode}-${index}`"

@@ -82,7 +82,7 @@ function requestUploadFile() {
   requestUploadFileToRef(currentUserDataString, pathBeforeRowIndex);
 }
 
-watch(currentUserDataString, newValue => {
+watch(currentUserDataString, () => {
   const {delimiterSuggestion, decimalSeparatorSuggestion} =
     computeMostUsedDelimiterAndDecimalSeparator(currentUserDataString.value);
   delimiter.value = delimiterSuggestion;
@@ -90,7 +90,7 @@ watch(currentUserDataString, newValue => {
   // isInferSchema.value = isSchemaEmpty(useCurrentSchema().schemaRaw.value);
   loadCsvFromInput();
 });
-watch([decimalSeparator, delimiter], newValue => {
+watch([decimalSeparator, delimiter], () => {
   loadCsvFromInput();
 });
 
@@ -109,7 +109,7 @@ function loadCsvFromInput() {
 }
 
 // Watch for changes in currentUserCsv and update fields shown to user accordingly
-watch(currentUserCsv, newValue => {
+watch(currentUserCsv, () => {
   if (currentUserCsv.value.length > 0) {
     // Get the first row of the CSV file and use it as the column names
     const firstRow = currentUserCsv.value[0];
@@ -378,14 +378,14 @@ defineExpose({show: openDialog, close: hideDialog});
               </tr>
             </thead>
             <tbody>
-              <tr v-for="column in currentColumnMapping">
+              <tr v-for="column in currentColumnMapping" :key="column.index">
                 <td>{{ column.name }}</td>
                 <td>
                   <span class="text-xs">/{{ column.pathBeforeRowIndex }}/ROW_INDEX/</span>
                   <span class="text-xs" v-if="isExpandWithLookupTables"
                     >{{ foreignKey.value }}/</span
                   >
-                  <InputText v-model="column.pathAfterRowIndex" :data-testid="'csv-column-path-' + column.name" class="fixed-width" />
+                  <InputText v-model="column.pathAfterRowIndex.value" :data-testid="'csv-column-path-' + column.name" class="fixed-width" />
                 </td>
                 <!--td v-if="isInferSchema">
                 <InputText v-model="column.titleInSchema" class="fixed-width" />

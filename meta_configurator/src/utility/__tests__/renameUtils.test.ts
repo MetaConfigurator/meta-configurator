@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
-import {replacePropertyNameUtils, updateReferences} from '../renameUtils';
+import {replacePropertyNameUtils} from '../renameUtils';
 import {META_SCHEMA_SIMPLIFIED} from '../../packaged-schemas/metaSchemaSimplified';
 import {type Path} from '../path';
 import _ from 'lodash';

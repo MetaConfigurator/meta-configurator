@@ -7,7 +7,6 @@ import {pathToJsonPointer} from '@/utility/pathUtils';
 import {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import type {Path} from '@/utility/path';
 import {cleanupSchemaByType} from '../cleanupSchemaByType';
-import {doesSchemaAllowNull} from '@/schema/schemaReadingUtils';
 
 export type AttributeTypeChoice = {label: string; schema: JsonSchemaObjectType};
 

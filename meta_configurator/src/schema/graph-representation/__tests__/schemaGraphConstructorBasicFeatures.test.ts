@@ -1,6 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import type {Path} from '@/utility/path';
 import {EdgeType, SchemaGraph, SchemaObjectNodeData} from '../schemaGraphTypes';
 import {
   generateAttributeEdges,
@@ -18,8 +17,7 @@ vi.mock('@/dataformats/formatRegistry', () => ({
 }));
 
 describe('test schema graph constructor with objects and attributes, without advanced keywords such as oneOf', () => {
-  let currentPath: Path;
-  let schema: TopLevelSchema = {
+  const schema: TopLevelSchema = {
     type: 'object',
     required: ['propertyObject'],
     $defs: {

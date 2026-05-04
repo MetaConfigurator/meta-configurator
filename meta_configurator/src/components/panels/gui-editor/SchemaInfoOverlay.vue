@@ -44,7 +44,7 @@ const keepOpen = ref(false);
 const showPanel = (
   schema: JsonSchemaWrapper,
   propertyName: string,
-  parentSchema: JsonSchemaWrapper,
+  parentSchema: JsonSchemaWrapper | undefined,
   validationErrors: ErrorObject[],
   event: Event
 ) => {
