@@ -16,7 +16,8 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
     metaSchema.$defs!.jsonSchema = DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA;
   }
   if (!metaSchemaSettings.allowMultipleTypes) {
-    metaSchema.$defs!.typeDefinition = DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES;
+    metaSchema.$defs!.typeDefinition =
+      DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE;
   }
   if (!metaSchemaSettings.showAdditionalPropertiesButton) {
     metaSchema.$defs!.objectSubSchema!.metaConfigurator = {
@@ -104,10 +105,33 @@ const DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA = {
     'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
 };
 
-const DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES = {
+const DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE = {
   properties: {
     type: {
-      $ref: '#/$defs/simpleTypes',
+      oneOf: [
+        {
+          $ref: '#/$defs/simpleTypes',
+        },
+        {
+          title: 'Nullable type union',
+          type: 'array',
+          minItems: 2,
+          maxItems: 2,
+          uniqueItems: true,
+          allOf: [
+            {
+              contains: {
+                const: 'null',
+              },
+            },
+            {
+              contains: {
+                enum: ['array', 'boolean', 'integer', 'number', 'object', 'string'],
+              },
+            },
+          ],
+        },
+      ],
     },
   },
 };
