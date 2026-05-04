@@ -389,7 +389,7 @@ defineExpose({show: openDialog, close: hideDialog});
                     >{{ foreignKey.value }}/</span
                   >
                   <InputText
-                    v-model="column.pathAfterRowIndex.value"
+                    v-model="column.pathAfterRowIndex"
                     :data-testid="'csv-column-path-' + column.name"
                     class="fixed-width" />
                 </td>
