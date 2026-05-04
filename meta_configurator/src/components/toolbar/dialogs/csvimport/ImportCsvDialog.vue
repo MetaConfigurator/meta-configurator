@@ -310,7 +310,10 @@ defineExpose({show: openDialog, close: hideDialog});
               <label for="delimiter" class="mr-2">
                 <b>Path for the resulting array in the document:</b>
               </label>
-              <InputText v-model="pathBeforeRowIndex" data-testid="csv-table-path-input" class="fixed-width" />
+              <InputText
+                v-model="pathBeforeRowIndex"
+                data-testid="csv-table-path-input"
+                class="fixed-width" />
             </div>
           </div>
           <div v-else>
@@ -385,7 +388,10 @@ defineExpose({show: openDialog, close: hideDialog});
                   <span class="text-xs" v-if="isExpandWithLookupTables"
                     >{{ foreignKey.value }}/</span
                   >
-                  <InputText v-model="column.pathAfterRowIndex.value" :data-testid="'csv-column-path-' + column.name" class="fixed-width" />
+                  <InputText
+                    v-model="column.pathAfterRowIndex.value"
+                    :data-testid="'csv-column-path-' + column.name"
+                    class="fixed-width" />
                 </td>
                 <!--td v-if="isInferSchema">
                 <InputText v-model="column.titleInSchema" class="fixed-width" />

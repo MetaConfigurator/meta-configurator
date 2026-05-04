@@ -40,13 +40,13 @@ export function writeSchemaRequiredDefaultsToData(
               );
             } else if (property.hasType('array')) {
               if (property.items && property.minItems > 0) {
-              writeSchemaRequiredDefaultsToData(
-                data,
-                path.concat(propertyName, '0'),
-                property.items!,
-                updateDataFct
-              );
-            }
+                writeSchemaRequiredDefaultsToData(
+                  data,
+                  path.concat(propertyName, '0'),
+                  property.items!,
+                  updateDataFct
+                );
+              }
             }
           }
         }

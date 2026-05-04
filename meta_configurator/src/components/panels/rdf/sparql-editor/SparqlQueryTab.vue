@@ -121,7 +121,7 @@ const emit = defineEmits<{
 }>();
 
 function updateActiveAccordion(value: string | string[] | null | undefined) {
-  emit('update:activeAccordion', Array.isArray(value) ? (value[0] ?? null) : (value ?? null));
+  emit('update:activeAccordion', Array.isArray(value) ? value[0] ?? null : value ?? null);
 }
 </script>
 

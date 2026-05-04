@@ -66,7 +66,7 @@ describe('schemaToMarkdown samples coverage', async () => {
       const schemaPreprocessed = preprocessOneTime(schema);
       const title =
         typeof schemaPreprocessed === 'object' && schemaPreprocessed !== null
-          ? (schemaPreprocessed.title ?? 'Untitled schema')
+          ? schemaPreprocessed.title ?? 'Untitled schema'
           : 'Untitled schema';
       const schemaGraph = constructSchemaGraph(
         schemaPreprocessed,

@@ -60,17 +60,14 @@ function isErrorWithLine(error: unknown): error is {message: string; context: {l
 async function extractPrefixes(config: string): Promise<Record<string, string>> {
   let prefixes: Record<string, string> = {};
 
-  await new N3Parser().parse(
-    config,
-    {
-      onQuad: () => {},
-      onPrefix: (prefix, iri) => {
-        if (!IGNORED_PREFIX_NAMES.has(prefix) && !IGNORED_IRIS.has(iri.value)) {
-          prefixes[prefix] = iri.value;
-        }
-      },
-    }
-  );
+  await new N3Parser().parse(config, {
+    onQuad: () => {},
+    onPrefix: (prefix, iri) => {
+      if (!IGNORED_PREFIX_NAMES.has(prefix) && !IGNORED_IRIS.has(iri.value)) {
+        prefixes[prefix] = iri.value;
+      }
+    },
+  });
 
   return prefixes;
 }

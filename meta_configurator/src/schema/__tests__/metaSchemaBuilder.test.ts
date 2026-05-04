@@ -100,10 +100,7 @@ describe('metaSchemaBuilder', () => {
     });
 
     it('still rejects empty type arrays', () => {
-      const result = validateSchemaCandidate(
-        {allowMultipleTypes: false},
-        {type: []}
-      );
+      const result = validateSchemaCandidate({allowMultipleTypes: false}, {type: []});
 
       expect(result.errors.length).toBeGreaterThan(0);
     });

@@ -138,7 +138,10 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     expect(rootNode.attributes[2]!.name).toEqual('propertyArrayToRefSimple');
     expect(rootNode.attributes[2]!.title).toEqual(undefined);
-    expect(rootNode.attributes[2]!.absolutePath).toEqual(['properties', 'propertyArrayToRefSimple']);
+    expect(rootNode.attributes[2]!.absolutePath).toEqual([
+      'properties',
+      'propertyArrayToRefSimple',
+    ]);
     expect(rootNode.attributes[2]!.deprecated).toBeFalsy();
     expect(rootNode.attributes[2]!.required).toBeFalsy();
 
@@ -153,7 +156,10 @@ describe('test schema graph constructor with objects and attributes, without adv
 
     expect(rootNode.attributes[4]!.name).toEqual('propertyRefToArraySimple');
     expect(rootNode.attributes[4]!.title).toEqual(undefined);
-    expect(rootNode.attributes[4]!.absolutePath).toEqual(['properties', 'propertyRefToArraySimple']);
+    expect(rootNode.attributes[4]!.absolutePath).toEqual([
+      'properties',
+      'propertyRefToArraySimple',
+    ]);
     expect(rootNode.attributes[4]!.deprecated).toBeFalsy();
     expect(rootNode.attributes[4]!.required).toBeFalsy();
 

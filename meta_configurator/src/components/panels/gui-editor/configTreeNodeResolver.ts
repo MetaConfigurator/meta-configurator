@@ -298,9 +298,7 @@ export class ConfigTreeNodeResolver {
     const optionalProperties = this.createSchemaPropertiesChildNodes(
       mode,
       parameters,
-      key =>
-        !parameters.schema.isRequired(key) &&
-        !parameters.schema.properties[key]?.deprecated
+      key => !parameters.schema.isRequired(key) && !parameters.schema.properties[key]?.deprecated
     );
     const additionalProperties = this.createDataPropertiesChildNodes(
       mode,
@@ -310,8 +308,7 @@ export class ConfigTreeNodeResolver {
     const deprecatedProperties = this.createSchemaPropertiesChildNodes(
       mode,
       parameters,
-      key =>
-        !!parameters.schema.properties[key]?.deprecated && !parameters.schema.isRequired(key)
+      key => !!parameters.schema.properties[key]?.deprecated && !parameters.schema.isRequired(key)
     );
     return requiredProperties.concat(
       optionalProperties,

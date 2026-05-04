@@ -176,9 +176,7 @@ export class ValidationService {
         if (propertySchema === undefined) {
           continue;
         }
-        result.properties[key] = this.updateReferencesAndReplaceCustomKeywords(
-          propertySchema
-        );
+        result.properties[key] = this.updateReferencesAndReplaceCustomKeywords(propertySchema);
       }
     }
     if (result.patternProperties) {
@@ -187,9 +185,8 @@ export class ValidationService {
         if (patternPropertySchema === undefined) {
           continue;
         }
-        result.patternProperties[key] = this.updateReferencesAndReplaceCustomKeywords(
-          patternPropertySchema
-        );
+        result.patternProperties[key] =
+          this.updateReferencesAndReplaceCustomKeywords(patternPropertySchema);
       }
     }
     if (result.dependentSchemas) {
@@ -198,9 +195,8 @@ export class ValidationService {
         if (dependentSchema === undefined) {
           continue;
         }
-        result.dependentSchemas[key] = this.updateReferencesAndReplaceCustomKeywords(
-          dependentSchema
-        );
+        result.dependentSchemas[key] =
+          this.updateReferencesAndReplaceCustomKeywords(dependentSchema);
       }
     }
 

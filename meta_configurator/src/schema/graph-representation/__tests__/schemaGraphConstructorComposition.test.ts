@@ -369,12 +369,18 @@ describe('test schema graph constructor with objects and compositional keywords'
     expect(graph.edges[10]!.edgeType).toEqual(EdgeType.ALL_OF);
     expect(graph.edges[10]!.label).toEqual(EdgeType.ALL_OF);
 
-    expect(graph.edges[11]!.start.absolutePath).toEqual(['$defs', 'compositionalWithoutObjectType']);
+    expect(graph.edges[11]!.start.absolutePath).toEqual([
+      '$defs',
+      'compositionalWithoutObjectType',
+    ]);
     expect(graph.edges[11]!.end.absolutePath).toEqual(['$defs', 'person']);
     expect(graph.edges[11]!.edgeType).toEqual(EdgeType.ONE_OF);
     expect(graph.edges[11]!.label).toEqual(EdgeType.ONE_OF);
 
-    expect(graph.edges[12]!.start.absolutePath).toEqual(['$defs', 'compositionalWithoutObjectType']);
+    expect(graph.edges[12]!.start.absolutePath).toEqual([
+      '$defs',
+      'compositionalWithoutObjectType',
+    ]);
     expect(graph.edges[12]!.end.absolutePath).toEqual(['$defs', 'animal']);
     expect(graph.edges[12]!.edgeType).toEqual(EdgeType.ONE_OF);
     expect(graph.edges[12]!.label).toEqual(EdgeType.ONE_OF);

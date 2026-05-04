@@ -7,31 +7,34 @@ export function mergeAllOfs(schema: JsonSchemaType, deep: boolean = true): JsonS
     return schema;
   }
 
-  return mergeAllOf(schema as any, {
-    deep: deep,
-    resolvers: {
-      defaultResolver: mergeAllOf.options.resolvers.title,
-      // add additional resolvers here, most of the keywords are NOT supported by default
-      conditions: function (values: any[][]) {
-        return values.flat(); // just merge all conditions
-      },
-      metaConfigurator: function (values: any[][]) {
-        let result = {
-          advanced: false,
-          hideAddPropertyButton: false,
-        };
-        for (const value of values) {
-          if ('advanced' in value && value.advanced) {
-            result.advanced = true;
+  return mergeAllOf(
+    schema as any,
+    {
+      deep: deep,
+      resolvers: {
+        defaultResolver: mergeAllOf.options.resolvers.title,
+        // add additional resolvers here, most of the keywords are NOT supported by default
+        conditions: function (values: any[][]) {
+          return values.flat(); // just merge all conditions
+        },
+        metaConfigurator: function (values: any[][]) {
+          let result = {
+            advanced: false,
+            hideAddPropertyButton: false,
+          };
+          for (const value of values) {
+            if ('advanced' in value && value.advanced) {
+              result.advanced = true;
+            }
+            if ('hideAddPropertyButton' in value && value.hideAddPropertyButton) {
+              result.hideAddPropertyButton = true;
+            }
           }
-          if ('hideAddPropertyButton' in value && value.hideAddPropertyButton) {
-            result.hideAddPropertyButton = true;
-          }
-        }
-        return result;
+          return result;
+        },
       },
-    },
-  } as any);
+    } as any
+  );
 }
 export function safeMergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
   try {
