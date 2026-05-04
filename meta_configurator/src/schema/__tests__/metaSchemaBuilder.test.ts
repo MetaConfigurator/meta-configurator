@@ -22,7 +22,7 @@ function validateSchemaCandidate(
 }
 
 describe('metaSchemaBuilder', () => {
-  describe('allowMultipleTypes disabled', () => {
+  describe('type validation with allowMultipleTypes disabled', () => {
     it('accepts all individual simple types', () => {
       const simpleTypes = ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string'];
 
@@ -102,7 +102,7 @@ describe('metaSchemaBuilder', () => {
     });
   });
 
-  describe('allowMultipleTypes enabled', () => {
+  describe('type validation with allowMultipleTypes enabled', () => {
     it('accepts unrestricted multi-type unions', () => {
       const result = validateSchemaCandidate(
         {allowMultipleTypes: true},
@@ -131,8 +131,8 @@ describe('metaSchemaBuilder', () => {
     });
   });
 
-  describe('other pre-existing restrictions', () => {
-    it('still rejects nested boolean schemas when allowBooleanSchema is disabled', () => {
+  describe('boolean schema validation', () => {
+    it('rejects nested boolean schemas when allowBooleanSchema is disabled', () => {
       const result = validateSchemaCandidate(
         {allowBooleanSchema: false},
         {
@@ -146,7 +146,7 @@ describe('metaSchemaBuilder', () => {
       expect(result.errors.length).toBeGreaterThan(0);
     });
 
-    it('still accepts nested boolean schemas when allowBooleanSchema is enabled', () => {
+    it('accepts nested boolean schemas when allowBooleanSchema is enabled', () => {
       const result = validateSchemaCandidate(
         {allowBooleanSchema: true},
         {
@@ -160,7 +160,10 @@ describe('metaSchemaBuilder', () => {
       expect(result.errors).toEqual([]);
     });
 
-    it('still allows ordinary object schemas in simplified mode', () => {
+  });
+
+  describe('ordinary object schema validation', () => {
+    it('accepts ordinary object schemas in simplified mode', () => {
       const result = validateSchemaCandidate(
         {
           allowBooleanSchema: false,

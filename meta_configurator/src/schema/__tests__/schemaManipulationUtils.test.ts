@@ -1,62 +1,161 @@
-import {describe, it, vi} from 'vitest';
-import {META_SCHEMA_SIMPLIFIED} from '../../packaged-schemas/metaSchemaSimplified';
-import {JsonSchemaWrapper} from '../jsonSchemaWrapper';
-import {type JsonSchemaType} from '../jsonSchemaType';
-import {SessionMode} from '../../store/sessionMode';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {shallowRef} from 'vue';
+import {ManagedData} from '@/data/managedData';
+import {SessionMode} from '@/store/sessionMode';
+import {extractInlinedSchemaElement} from '@/schema/schemaManipulationUtils';
 
-// avoid constructing useDataLink store through imports, it is not required for this component
-vi.mock('@/data/useDataLink', () => ({
-  getSchemaForMode: vi.fn(),
-  getDataForMode: vi.fn(),
-  useCurrentData: vi.fn(),
-  useCurrentSchema: vi.fn(),
-  getUserSelectionForMode: vi.fn(),
-  getValidationForMode: vi.fn(),
-  getSessionForMode: vi.fn(),
+vi.mock('@/dataformats/formatRegistry', () => ({
+  useDataConverter: () => ({
+    stringify: (data: any) => JSON.stringify(data),
+    parse: (data: string) => JSON.parse(data),
+  }),
 }));
 
-describe('test schemaManipulationUtils', () => {
-  const schema = {
-    required: ['a'],
-    properties: {
-      a: {
+describe('schemaManipulationUtils', () => {
+  let schemaData: ManagedData;
+
+  beforeEach(() => {
+    schemaData = new ManagedData(
+      shallowRef({
         type: 'object',
         properties: {
-          a1: {
-            type: 'object',
-          },
-          a2: {
+          a: {
             type: 'object',
             properties: {
-              a2a: {
-                type: 'string',
+              a1: {
+                type: 'object',
+              },
+              a2: {
+                type: 'object',
+                properties: {
+                  a2a: {
+                    type: 'string',
+                  },
+                },
+              },
+              a3: {
+                type: 'object',
+                $ref: '#/properties/a/properties/a2',
               },
             },
           },
-          a3: {
+          b: {
             type: 'object',
-            $ref: '#/properties/a/a2',
+            $ref: '#/properties/a',
+          },
+          c: {
+            type: 'string',
+            $ref: '#/properties/a/properties/a1',
+          },
+        },
+      }),
+      SessionMode.SchemaEditor
+    );
+  });
+
+  it('extracts an inlined schema into $defs and rewrites references to the extracted path', () => {
+    const extractedPath = extractInlinedSchemaElement(
+      ['properties', 'a', 'properties', 'a2'],
+      schemaData,
+      'a2'
+    );
+
+    expect(extractedPath).toEqual(['$defs', 'a2']);
+    expect(schemaData.data.value).toEqual({
+      type: 'object',
+      properties: {
+        a: {
+          type: 'object',
+          properties: {
+            a1: {
+              type: 'object',
+            },
+            a2: {
+              $ref: '#/$defs/a2',
+            },
+            a3: {
+              type: 'object',
+              $ref: '#/$defs/a2',
+            },
+          },
+        },
+        b: {
+          type: 'object',
+          $ref: '#/properties/a',
+        },
+        c: {
+          type: 'string',
+          $ref: '#/properties/a/properties/a1',
+        },
+      },
+      $defs: {
+        a2: {
+          type: 'object',
+          properties: {
+            a2a: {
+              type: 'string',
+            },
           },
         },
       },
-      b: {
-        type: 'object',
-        $ref: '#/properties/a',
+    });
+  });
+
+  it('reuses an existing matching definition when duplicate reuse is enabled', () => {
+    schemaData.setDataAt(['$defs', 'sharedObject'], {
+      type: 'object',
+      properties: {
+        a2a: {
+          type: 'string',
+        },
       },
-      c: {
-        type: 'string',
-        $ref: '#/properties/a/a1',
+    });
+
+    const extractedPath = extractInlinedSchemaElement(
+      ['properties', 'a', 'properties', 'a2'],
+      schemaData,
+      'sharedObject',
+      true
+    );
+
+    expect(extractedPath).toEqual(['$defs', 'sharedObject']);
+    expect(schemaData.data.value).toEqual({
+      type: 'object',
+      properties: {
+        a: {
+          type: 'object',
+          properties: {
+            a1: {
+              type: 'object',
+            },
+            a2: {
+              $ref: '#/$defs/sharedObject',
+            },
+            a3: {
+              type: 'object',
+              $ref: '#/$defs/sharedObject',
+            },
+          },
+        },
+        b: {
+          type: 'object',
+          $ref: '#/properties/a',
+        },
+        c: {
+          type: 'string',
+          $ref: '#/properties/a/properties/a1',
+        },
       },
-    },
-  } as JsonSchemaType;
-
-  const schemaWrapper = new JsonSchemaWrapper(schema, SessionMode.DataEditor, false);
-
-  const metaSchemaWrapper = new JsonSchemaWrapper(
-    META_SCHEMA_SIMPLIFIED,
-    SessionMode.SchemaEditor,
-    false
-  );
-
-  it('test extracting one element schema to the definitions section', () => {});
+      $defs: {
+        sharedObject: {
+          type: 'object',
+          properties: {
+            a2a: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    });
+  });
 });
