@@ -18,7 +18,7 @@ import type {ErrorObject} from 'ajv';
 import {useSessionStore} from '@/store/sessionStore';
 
 const schemaRef: Ref<JsonSchemaWrapper | undefined> = ref();
-const propertyNameRef: Ref<String> = ref('');
+const propertyNameRef: Ref<string> = ref('');
 const parentSchemaRef: Ref<JsonSchemaWrapper | undefined> = ref();
 const validationErrorsRef: Ref<ErrorObject[]> = ref([]);
 
@@ -44,9 +44,9 @@ const keepOpen = ref(false);
 const showPanel = (
   schema: JsonSchemaWrapper,
   propertyName: string,
-  parentSchema: JsonSchemaWrapper,
+  parentSchema: JsonSchemaWrapper | undefined,
   validationErrors: ErrorObject[],
-  event
+  event: Event
 ) => {
   schemaRef.value = schema;
   propertyNameRef.value = propertyName;

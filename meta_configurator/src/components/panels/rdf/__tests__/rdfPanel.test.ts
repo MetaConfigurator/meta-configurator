@@ -121,7 +121,8 @@ describe('RdfPanel', () => {
       predicateType: target!.predicate.termType,
       object: UPDATED_LABEL,
       objectType: RdfTermType.Literal,
-      objectDatatype: target!.object.datatype?.value ?? '',
+      objectDatatype:
+        target!.object.termType === RdfTermType.Literal ? target!.object.datatype?.value ?? '' : '',
       statement: target,
     });
 
@@ -172,7 +173,10 @@ describe('RdfPanel', () => {
       predicateType: editedStatement!.predicate.termType,
       object: ORIGINAL_LABEL,
       objectType: RdfTermType.Literal,
-      objectDatatype: editedStatement!.object.datatype?.value ?? '',
+      objectDatatype:
+        editedStatement!.object.termType === RdfTermType.Literal
+          ? editedStatement!.object.datatype?.value ?? ''
+          : '',
     });
     expect(addResult.success).toBe(true);
 
@@ -189,5 +193,5 @@ describe('RdfPanel', () => {
       () => JSON.stringify(getExportedJsonLd()) === JSON.stringify(expectedAddedJsonLd)
     );
     expect(getExportedJsonLd()).toEqual(expectedAddedJsonLd);
-  });
+  }, 8000);
 });

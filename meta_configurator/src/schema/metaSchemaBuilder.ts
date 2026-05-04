@@ -1,11 +1,11 @@
 import type {SettingsInterfaceMetaSchema} from '@/settings/settingsTypes';
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {META_SCHEMA_SIMPLIFIED} from '@/packaged-schemas/metaSchemaSimplified';
-import {updateSettingsWithDefaults} from '@/settings/settingsUpdater';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema): TopLevelSchema {
   let metaSchema = structuredClone(META_SCHEMA_SIMPLIFIED);
+  const defs = metaSchema.$defs as Record<string, any>;
 
   if (!metaSchemaSettings) {
     // if no settings are provided, use the default settings
@@ -13,76 +13,75 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
   }
 
   if (!metaSchemaSettings.allowBooleanSchema) {
-    metaSchema.$defs!.jsonSchema = DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA;
+    defs.jsonSchema = DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA;
   }
   if (!metaSchemaSettings.allowMultipleTypes) {
-    metaSchema.$defs!.typeDefinition = DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE;
+    defs.typeDefinition = DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE;
   }
   if (!metaSchemaSettings.showAdditionalPropertiesButton) {
-    metaSchema.$defs!.objectSubSchema!.metaConfigurator = {
+    defs.objectSubSchema!.metaConfigurator = {
       hideAddPropertyButton: true,
     };
   }
 
   if (metaSchemaSettings.markMoreFieldsAsAdvanced) {
-    metaSchema.$defs!.constProperty!.properties!.const.metaConfigurator = {
+    defs.constProperty.properties.const.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!.enumProperty!.properties!.enum.metaConfigurator = {
+    defs.enumProperty.properties.enum.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!.objectProperty!.properties!.additionalProperties.metaConfigurator = {
+    defs.objectProperty.properties.additionalProperties.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!.stringProperty!.properties!.maxLength.metaConfigurator = {
+    defs.stringProperty.properties.maxLength.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!.stringProperty!.properties!.minLength.metaConfigurator = {
+    defs.stringProperty.properties.minLength.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!.stringProperty!.properties!.pattern.metaConfigurator = {
+    defs.stringProperty.properties.pattern.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!.arrayProperty!.properties!.minItems.metaConfigurator = {
+    defs.arrayProperty.properties.minItems.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!.arrayProperty!.properties!.maxItems.metaConfigurator = {
+    defs.arrayProperty.properties.maxItems.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!.arrayProperty!.properties!.uniqueItems.metaConfigurator = {
+    defs.arrayProperty.properties.uniqueItems.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!['meta-data']!.properties!.examples.metaConfigurator = {
+    defs['meta-data'].properties.examples.metaConfigurator = {
       advanced: true,
     };
-    metaSchema.$defs!['meta-data']!.properties!.default.metaConfigurator = {
+    defs['meta-data'].properties.default.metaConfigurator = {
       advanced: true,
     };
   }
 
   if (metaSchemaSettings.objectTypesComfort) {
-    metaSchema.$defs.enumProperty.allOf = ALL_OF_ENUM_PROPERTY;
-    metaSchema.$defs.constProperty.allOf = ALL_OF_CONST_PROPERTY;
-    metaSchema.$defs['meta-data'].allOf = ALL_OF_META_DATA;
+    defs.enumProperty.allOf = ALL_OF_ENUM_PROPERTY;
+    defs.constProperty.allOf = ALL_OF_CONST_PROPERTY;
+    defs['meta-data'].allOf = ALL_OF_META_DATA;
   }
 
   if (metaSchemaSettings.showJsonLdFields) {
-    for (const key in JSON_LD_DEFS) {
-      const value: any = JSON_LD_DEFS[key];
-      metaSchema.$defs[key] = value;
+    for (const [key, value] of Object.entries(JSON_LD_DEFS)) {
+      defs[key] = value as JsonSchemaObjectType;
     }
-    metaSchema.$defs.rootObjectSubSchema!.allOf! = [
+    defs.rootObjectSubSchema.allOf = [
       {
         $ref: '#/$defs/jsonLdContextHaving',
       },
-      ...metaSchema.$defs.rootObjectSubSchema!.allOf!,
+      ...defs.rootObjectSubSchema.allOf,
     ];
 
-    metaSchema.$defs.objectSubSchema!.allOf! = [
+    defs.objectSubSchema.allOf = [
       {
         $ref: '#/$defs/jsonLdCommon',
       },
-      ...metaSchema.$defs.objectSubSchema!.allOf!,
+      ...defs.objectSubSchema.allOf,
     ];
   }
 
@@ -91,20 +90,20 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
     !metaSchemaSettings.allowMultipleTypes ||
     metaSchemaSettings.objectTypesComfort;
   if (simplified) {
-    metaSchema.$defs.jsonMetaSchema.title = 'Simplified JSON Schema Meta Schema';
+    defs.jsonMetaSchema.title = 'Simplified JSON Schema Meta Schema';
   }
 
   return metaSchema;
 }
 
-const DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA = {
+const DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA: JsonSchemaObjectType = {
   title: 'Json schema',
   $ref: '#/$defs/objectSubSchema',
   $comment:
     'This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.',
 };
 
-const DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE = {
+const DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE: JsonSchemaObjectType = {
   properties: {
     type: {
       oneOf: [
@@ -135,7 +134,7 @@ const DEF_TYPE_DEFINITION_WITHOUT_MULTIPLE_TYPES_EXCEPT_NULLABLE = {
   },
 };
 
-const ALL_OF_ENUM_PROPERTY = [
+const ALL_OF_ENUM_PROPERTY: JsonSchemaObjectType[] = [
   {
     if: {
       $ref: '#/$defs/hasTypeArray',
@@ -208,7 +207,7 @@ const ALL_OF_ENUM_PROPERTY = [
   },
 ];
 
-const ALL_OF_CONST_PROPERTY = [
+const ALL_OF_CONST_PROPERTY: JsonSchemaObjectType[] = [
   {
     if: {
       $ref: '#/$defs/hasTypeArray',
@@ -271,7 +270,7 @@ const ALL_OF_CONST_PROPERTY = [
   },
 ];
 
-const ALL_OF_META_DATA = [
+const ALL_OF_META_DATA: JsonSchemaObjectType[] = [
   {
     if: {
       $ref: '#/$defs/hasTypeArray',

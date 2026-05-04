@@ -32,6 +32,9 @@ test('Edit the feature testing example schema using the GUI Editor, testing basi
 
     // Set the heightInMeter property to the value 10
     await editNumberOrIntProperty(page, ['heightInMeter'], 10)
+    await expect
+        .poll(async () => (await tpGetData(page, SessionMode.DataEditor)).heightInMeter)
+        .toBe(10)
 
     // Expect a Schema Violation Symbol because the height value is invalid
     await checkPropertySchemaViolation(page, ['heightInMeter'], true)

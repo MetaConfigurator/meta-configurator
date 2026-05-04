@@ -7,7 +7,6 @@ import {pathToJsonPointer} from '@/utility/pathUtils';
 import {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import type {Path} from '@/utility/path';
 import {cleanupSchemaByType} from '../cleanupSchemaByType';
-import {doesSchemaAllowNull} from '@/schema/schemaReadingUtils';
 
 export type AttributeTypeChoice = {label: string; schema: JsonSchemaObjectType};
 
@@ -45,7 +44,7 @@ export function collectTypeChoices(nodesData: SchemaNodeData[]): AttributeTypeCh
   const objectDefs = collectObjectAndEnumDefinitionPathsFromNodes(nodesData);
 
   objectDefs.forEach(def => {
-    const objectName: string = def[def.length - 1].toString();
+    const objectName: string = def[def.length - 1]!.toString();
     const pathAsJsonPointer = pathToJsonPointer(def);
     result.push({
       label: objectName,
@@ -122,7 +121,7 @@ export function applyNewType(
 ) {
   if (typeSchema.type !== undefined) {
     currentSchema.type = typeSchema.type;
-    cleanupSchemaByType(currentSchema, typeSchema.type);
+    cleanupSchemaByType(currentSchema, typeSchema.type as SchemaPropertyType);
     if (typeSchema.type === 'array') {
       if (
         currentSchema.items === undefined ||

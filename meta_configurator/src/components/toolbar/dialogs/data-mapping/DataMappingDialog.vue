@@ -40,9 +40,9 @@ const mappingServiceWarnings = [
   'The JSONata mapping service is very expressive flexible, but may generate invalid mappings for complex inputs, which have to manually be corrected.',
 ];
 
-const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]);
+const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]!);
 
-const mappingService: Ref<DataMappingService> = computed(() => {
+const mappingService = computed<DataMappingService>(() => {
   if (selectedMappingServiceType.value === 'Advanced (JSONata)') {
     return new DataMappingServiceJsonata();
   }
@@ -50,7 +50,7 @@ const mappingService: Ref<DataMappingService> = computed(() => {
   throw new Error('Invalid mapping service type');
 });
 
-const mappingServiceWarning: Ref<string> = computed(() => {
+const mappingServiceWarning = computed<string>(() => {
   const index = mappingServiceTypes.indexOf(selectedMappingServiceType.value);
   return mappingServiceWarnings[index] || '';
 });

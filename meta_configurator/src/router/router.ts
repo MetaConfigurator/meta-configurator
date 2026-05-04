@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory, createWebHistory} from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import {useSessionStore} from '@/store/sessionStore';
 import {SessionMode} from '@/store/sessionMode';
 import SchemaEditorView from '@/views/SchemaEditorView.vue';

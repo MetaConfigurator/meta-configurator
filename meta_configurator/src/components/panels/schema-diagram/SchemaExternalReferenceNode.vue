@@ -57,7 +57,7 @@ function updateReferenceValue() {
       'External reference value is not defined. This should not happen. Please report this issue.'
     );
   }
-  emit('update_external_reference_value', props.data, props.data.reference, newName);
+  emit('update_external_reference_value', props.data, newName);
 }
 
 function deleteExternalReference() {

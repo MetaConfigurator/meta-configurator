@@ -77,9 +77,12 @@ function validationErrorsToAnnotations(editor: Editor, errors: ErrorObject[]): A
     }
 
     const index = positions[instancePathKey];
-    let position;
+    if (index === undefined) {
+      continue;
+    }
+    let position: {row: number; column: number};
     if (index in cachedPositionsForIndices) {
-      position = cachedPositionsForIndices[index];
+      position = cachedPositionsForIndices[index]!;
     } else {
       position = editor.session.doc.indexToPosition(index, 0);
       cachedPositionsForIndices[index] = position;
