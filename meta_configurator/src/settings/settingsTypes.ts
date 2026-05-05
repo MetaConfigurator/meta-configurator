@@ -124,6 +124,7 @@ export interface SettingsInterfaceAiIntegraton {
   maxTokens: number;
   temperature: number;
   endpoint: string;
+  endpointProxy?: string;
 }
 
 export interface SettingsInterfaceSchemaSelectionList {

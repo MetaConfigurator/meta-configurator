@@ -551,14 +551,24 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'https://api.openai.com/v1/',
             // Perplexity (OpenAI-compatible)
             'https://api.perplexity.ai/',
-            // OpenRouter (aggregator, OpenAI-compatible)
-            // 'https://api.openrouter.ai/v1/', seems to not support this kind of authentication
+            // OpenRouter — aggregator with 200+ models (requires relay due to CORS)
+            'https://openrouter.ai/api/v1/',
             // Academic / institutional deployments (OpenAI-compatible)
             'https://chat-ai.academiccloud.de/v1/',
             'https://api.helmholtz-blablador.fz-juelich.de/v1/',
             // Custom/self-hosted proxy
             'https://my-llm-proxy.example.com/v1/',
           ],
+        },
+        endpointProxy: {
+          type: 'string',
+          description:
+            'URL of a self-hosted MetaConfigurator AI Relay (e.g. http://localhost:8080). ' +
+            'When set, AI requests are forwarded to this relay instead of calling the provider endpoint directly. ' +
+            'The relay holds your provider API key server-side — you do not need to enter it in the browser. ' +
+            'Leave empty to call the provider endpoint directly.',
+          default: '',
+          examples: ['http://localhost:8080', 'https://your-relay.example.com'],
         },
       },
     },

@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
-import {openApp} from './utils';
-import {tpGetData} from './utilsTestPanel';
+import {openApp} from '../../tests/shared/utils';
+import {tpGetData} from '../../tests/shared/utilsTestPanel';
 import {
     expandImportOptions,
     openCsvImportDialog,
@@ -9,7 +9,7 @@ import {
     submitCsvImport,
     uploadCsvFile,
     uploadCsvFileAndCheckProgress,
-} from './utilsCsvImport';
+} from '../../tests/shared/utilsCsvImport';
 import {SessionMode} from '../src/store/sessionMode';
 
 test('Import CSV as standalone table with default paths', async ({page}) => {

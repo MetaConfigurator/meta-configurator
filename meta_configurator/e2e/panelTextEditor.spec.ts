@@ -4,10 +4,10 @@ import {
     getCurrentDataFormat,
     openApp,
     selectInitialSchemaFromExamples
-} from "./utils";
+} from "../../tests/shared/utils";
 import {SessionMode} from "../src/store/sessionMode";
-import {checkCodeEditorForText, forceCodeEditorText} from "./utilsCodeEditor";
-import {tpForceData, tpGetData} from "./utilsTestPanel";
+import {checkCodeEditorForText, forceCodeEditorText} from "../../tests/shared/utilsCodeEditor";
+import {tpForceData, tpGetData} from "../../tests/shared/utilsTestPanel";
 
 
 test('Select an example schema, enter some value and change the data format. Then check the code editor content for the data in the new format.', async ({ page }) => {

@@ -5,9 +5,9 @@ import {
     getCurrentEditorMode,
     openApp,
     openAppWithMode
-} from "./utils";
+} from "../../tests/shared/utils";
 import {SessionMode} from "../src/store/sessionMode";
-import {tpGetData} from "./utilsTestPanel";
+import {tpGetData} from "../../tests/shared/utilsTestPanel";
 
 test('Open the app and check that the initial mode is Data Editor', async ({ page }) => {
     // Go to the app

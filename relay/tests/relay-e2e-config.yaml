@@ -1,0 +1,27 @@
+# Relay configuration for end-to-end tests.
+# Points to a local mock LLM server started by the test fixture.
+relay_password: ""
+
+allowed_origins:
+  - "http://localhost:5173"
+
+rate_limits:
+  enabled: false
+  requests_per_minute: 1000
+  requests_per_hour: 100000
+  requests_per_day: 1000000
+
+limits:
+  max_request_tokens: 10000
+  max_daily_tokens_per_ip: 0
+  max_request_bytes: 2097152
+
+request_timeout: 30
+enable_streaming: false
+enable_models_proxy: false
+log_level: INFO
+
+endpoints:
+  - name: mock-llm
+    url: http://localhost:9999
+    api_key: ""

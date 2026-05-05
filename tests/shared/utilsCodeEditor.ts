@@ -1,6 +1,5 @@
-import { SessionMode} from "../src/store/sessionMode";
-import {Page} from "playwright";
-import {expect} from "@playwright/test";
+import { SessionMode} from "../../meta_configurator/src/store/sessionMode";
+import {expect, type Page} from "./playwright";
 import {selectAll} from "./utils";
 
 

@@ -2,16 +2,16 @@ import { test, expect } from '@playwright/test';
 import {
     forceEditorMode,
     openApp, selectInitialSchemaFromExamples,
-} from "./utils";
+} from "../../tests/shared/utils";
 import {
     addArrayItem, checkPropertyExistence, checkPropertyRequired,
     checkPropertySchemaViolation,
     checkStringProperty, editBooleanProperty,
     editNumberOrIntProperty,
     editStringProperty, expandOrCollapseProperty
-} from "./utilsGuiEditor";
+} from "../../tests/shared/utilsGuiEditor";
 import {SessionMode} from "../src/store/sessionMode";
-import {tpForceCurrentSelectedElement, tpForceData, tpGetData} from "./utilsTestPanel";
+import {tpForceCurrentSelectedElement, tpForceData, tpGetData} from "../../tests/shared/utilsTestPanel";
 
 test('Edit the feature testing example schema using the GUI Editor, testing basic editing and schema violations', async ({ page }) => {
     // Go to the app, pre-loading the test settings

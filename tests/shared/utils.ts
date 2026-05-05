@@ -1,6 +1,5 @@
-import {modeToMenuTitle, modeToRoute, SessionMode} from "../src/store/sessionMode";
-import {Page} from "playwright";
-import {expect} from "@playwright/test";
+import {modeToMenuTitle, modeToRoute, SessionMode} from "../../meta_configurator/src/store/sessionMode";
+import {expect, type Page} from "./playwright";
 import * as os from "node:os";
 
 const dataFormats = [ 'json', 'yaml', 'xml' ];
