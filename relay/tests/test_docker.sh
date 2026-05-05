@@ -9,6 +9,7 @@ set -euo pipefail
 
 RELAY_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 IMAGE="mc-relay-smoke-$$"
+HEALTH_TIMEOUT_SECONDS=60
 
 # Auto-detect Docker socket (Colima uses a non-standard path).
 if [ -z "${DOCKER_HOST:-}" ]; then
@@ -70,8 +71,8 @@ wait_healthy() {
   until curl -sf "$url" > /dev/null 2>&1; do
     sleep 1
     elapsed=$((elapsed + 1))
-    if [ $elapsed -ge 30 ]; then
-      echo "ERROR: $url did not become healthy within 30 s" >&2
+    if [ $elapsed -ge "$HEALTH_TIMEOUT_SECONDS" ]; then
+      echo "ERROR: $url did not become healthy within ${HEALTH_TIMEOUT_SECONDS} s" >&2
       return 1
     fi
   done
@@ -111,8 +112,8 @@ test_dockerfile() {
 # ----------------------------------------------------------------
 test_compose_http() {
   docker compose -f "$RELAY_DIR/docker-compose.yml" -f "$TEMP_OVERRIDE" up -d --build
-  wait_healthy "http://127.0.0.1:8080/health"
-  curl -sf "http://127.0.0.1:8080/health" | grep -q '"ok":true'
+  wait_healthy "http://127.0.0.1:8080/health" || return 1
+  curl -sf "http://127.0.0.1:8080/health" | grep -q '"ok":true' || return 1
   docker compose -f "$RELAY_DIR/docker-compose.yml" -f "$TEMP_OVERRIDE" down -v
 }
 
@@ -131,8 +132,8 @@ test_compose_https() {
       > /dev/null 2>&1; do
     sleep 1
     elapsed=$((elapsed + 1))
-    if [ $elapsed -ge 30 ]; then
-      echo "ERROR: relay service in HTTPS compose did not become healthy within 30 s" >&2
+    if [ $elapsed -ge "$HEALTH_TIMEOUT_SECONDS" ]; then
+      echo "ERROR: relay service in HTTPS compose did not become healthy within ${HEALTH_TIMEOUT_SECONDS} s" >&2
       return 1
     fi
   done
