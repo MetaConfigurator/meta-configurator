@@ -44,6 +44,7 @@ endpoints:
     url: http://localhost:9999
     api_key: "test"
 EOF
+chmod 644 "$TEMP_CONFIG"
 
 # Compose override — replaces the config.yaml volume with our temp config.
 # This avoids touching the real config.yaml entirely.
@@ -76,6 +77,12 @@ wait_healthy() {
       return 1
     fi
   done
+}
+
+show_compose_logs() {
+  local compose_file=$1
+  echo "--- relay logs ($compose_file) ---" >&2
+  docker compose -f "$compose_file" -f "$TEMP_OVERRIDE" logs relay >&2 || true
 }
 
 PASS=0
@@ -112,7 +119,10 @@ test_dockerfile() {
 # ----------------------------------------------------------------
 test_compose_http() {
   docker compose -f "$RELAY_DIR/docker-compose.yml" -f "$TEMP_OVERRIDE" up -d --build
-  wait_healthy "http://127.0.0.1:8080/health" || return 1
+  wait_healthy "http://127.0.0.1:8080/health" || {
+    show_compose_logs "$RELAY_DIR/docker-compose.yml"
+    return 1
+  }
   curl -sf "http://127.0.0.1:8080/health" | grep -q '"ok":true' || return 1
   docker compose -f "$RELAY_DIR/docker-compose.yml" -f "$TEMP_OVERRIDE" down -v
 }
@@ -134,6 +144,7 @@ test_compose_https() {
     elapsed=$((elapsed + 1))
     if [ $elapsed -ge "$HEALTH_TIMEOUT_SECONDS" ]; then
       echo "ERROR: relay service in HTTPS compose did not become healthy within ${HEALTH_TIMEOUT_SECONDS} s" >&2
+      show_compose_logs "$RELAY_DIR/docker-compose.https.yml"
       return 1
     fi
   done
