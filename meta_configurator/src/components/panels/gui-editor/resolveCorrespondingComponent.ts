@@ -5,7 +5,6 @@ import NumberProperty from '@/components/panels/gui-editor/properties/NumberProp
 import SimpleObjectProperty from '@/components/panels/gui-editor/properties/SimpleObjectProperty.vue';
 import SimpleArrayProperty from '@/components/panels/gui-editor/properties/SimpleArrayProperty.vue';
 import DateProperty from '@/components/panels/gui-editor/properties/DateProperty.vue';
-import EmailProperty from '@/components/panels/gui-editor/properties/EmailProperty.vue';
 import type {
   AddItemTreeNodeData,
   ConfigTreeNodeData,
@@ -83,9 +82,22 @@ export function resolveCorrespondingComponent(
   }
 
   if (nodeData.schema.hasType('string') && nodeData.schema.format === 'email') {
-    // @ts-ignore
-    return h(EmailProperty, propsObject);
+    if (!nodeData.schema.examples || nodeData.schema.examples.length === 0) {
+      const schemaWithEmailExample = new Proxy(nodeData.schema, {
+        get(target, prop) {
+          if (prop === 'examples') return ['email@example.com'];
+          return (target as any)[prop];
+        },
+      });
+      // @ts-ignore
+      return h(StringProperty, {
+        ...propsObject,
+        propertySchema: schemaWithEmailExample,
+      });
+    }
+    // if user already has examples, fall through to normal StringProperty
   }
+
   if (nodeData.schema.hasType('string')) {
     // @ts-ignore
     return h(StringProperty, propsObject);
