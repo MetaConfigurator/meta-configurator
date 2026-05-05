@@ -102,8 +102,8 @@ test_dockerfile() {
     -p 18090:8080 \
     -v "$TEMP_CONFIG:/app/config.yaml:ro" \
     "$IMAGE" || return 1
-  wait_healthy "http://localhost:18090/health" || return 1
-  curl -sf "http://localhost:18090/health" | grep -q '"ok":true' || return 1
+  wait_healthy "http://127.0.0.1:18090/health" || return 1
+  curl -sf "http://127.0.0.1:18090/health" | grep -q '"ok":true' || return 1
   docker rm -f "mc-relay-df-$$" || true
   docker rmi -f "$IMAGE" || true
 }
@@ -111,8 +111,8 @@ test_dockerfile() {
 # ----------------------------------------------------------------
 test_compose_http() {
   docker compose -f "$RELAY_DIR/docker-compose.yml" -f "$TEMP_OVERRIDE" up -d --build
-  wait_healthy "http://localhost:8080/health"
-  curl -sf "http://localhost:8080/health" | grep -q '"ok":true'
+  wait_healthy "http://127.0.0.1:8080/health"
+  curl -sf "http://127.0.0.1:8080/health" | grep -q '"ok":true'
   docker compose -f "$RELAY_DIR/docker-compose.yml" -f "$TEMP_OVERRIDE" down -v
 }
 
@@ -127,7 +127,7 @@ test_compose_https() {
 
   local elapsed=0
   until docker compose -f "$RELAY_DIR/docker-compose.https.yml" -f "$TEMP_OVERRIDE" exec -T relay \
-      python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')" \
+      python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')" \
       > /dev/null 2>&1; do
     sleep 1
     elapsed=$((elapsed + 1))
@@ -138,7 +138,7 @@ test_compose_https() {
   done
 
   RESPONSE=$(docker compose -f "$RELAY_DIR/docker-compose.https.yml" -f "$TEMP_OVERRIDE" exec -T relay \
-    python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8080/health').read().decode())")
+    python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8080/health').read().decode())")
   echo "$RESPONSE" | grep -q '"ok":true'
   docker compose -f "$RELAY_DIR/docker-compose.https.yml" -f "$TEMP_OVERRIDE" down -v
 }

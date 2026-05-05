@@ -12,12 +12,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  python-tests:
-    name: Python unit tests
+  relay-tests:
+    name: Relay tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./relay
     steps:
       - uses: actions/checkout@v4
 
@@ -25,17 +22,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
+      - name: Install relay dependencies
+        working-directory: ./relay
         run: pip install -r requirements.txt -r requirements-dev.txt
 
-      - name: Run tests
+      - name: Run relay Python tests
+        working-directory: ./relay
         run: pytest tests/ -v
-
-  docker-tests:
-    name: Docker smoke tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -49,25 +42,12 @@ jobs:
           docker buildx version
           docker compose version
 
-      - name: Run Docker smoke tests
+      - name: Run relay Docker smoke tests
         run: bash relay/tests/test_docker.sh
-
-  relay-e2e-tests:
-    name: Relay E2E tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./meta_configurator
-    steps:
-      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
 
       - name: Cache npm dependencies
         uses: actions/cache@v3
@@ -87,18 +67,19 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install MetaConfigurator dependencies
+        working-directory: ./meta_configurator
         run: npm ci
 
-      - name: Install relay dependencies
-        run: pip install -r ../relay/requirements.txt
-
       - name: Build MetaConfigurator
+        working-directory: ./meta_configurator
         run: npm run build --if-present
 
       - name: Install Playwright browsers
+        working-directory: ./meta_configurator
         run: npx playwright install --with-deps
 
       - name: Start dev server and run relay E2E tests
+        working-directory: ./meta_configurator
         run: npx start-server-and-test dev http://localhost:5173 test:e2e:relay
 
       - name: Upload relay Playwright HTML report
