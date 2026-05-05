@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - 'relay/**'
+      - 'meta_configurator/e2e/**'
+      - 'meta_configurator/src/**'
+      - 'meta_configurator/package.json'
+      - 'meta_configurator/package-lock.json'
+      - 'tests/shared/**'
   workflow_dispatch:
 
 jobs:
@@ -46,3 +51,59 @@ jobs:
 
       - name: Run Docker smoke tests
         run: bash relay/tests/test_docker.sh
+
+  relay-e2e-tests:
+    name: Relay E2E tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./meta_configurator
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            meta_configurator/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('meta_configurator/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('meta_configurator/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install MetaConfigurator dependencies
+        run: npm ci
+
+      - name: Install relay dependencies
+        run: pip install -r ../relay/requirements.txt
+
+      - name: Build MetaConfigurator
+        run: npm run build --if-present
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Start dev server and run relay E2E tests
+        run: npx start-server-and-test dev http://localhost:5173 test:e2e:relay
+
+      - name: Upload relay Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-relay
+          path: ${{ github.workspace }}/meta_configurator/playwright-report/

@@ -2,14 +2,14 @@ import { test, expect} from '@playwright/test';
 import {
     forceEditorMode,
     openApp,
-} from "./utils";
+} from "../../tests/shared/utils";
 import {SessionMode} from "../src/store/sessionMode";
 import {
     tpForceCurrentPath,
     tpForceCurrentSelectedElement, tpForceData, tpForceSchema,
     tpGetCurrentPath,
     tpGetCurrentSelectedElement, tpGetData, tpGetSchema
-} from "./utilsTestPanel";
+} from "../../tests/shared/utilsTestPanel";
 
 test('Test whether the path selection and detection in the test panel work as expected.', async ({ page }) => {
     // Go to the app, pre-loading the schema

@@ -6,10 +6,8 @@ mock upstream HTTP calls without real network access.
 """
 
 import json
-import time
 from typing import Any
 
-import pytest
 import responses as rsps_lib
 
 from app import (
@@ -409,6 +407,30 @@ def test_oversized_body_returns_413():
             headers={"Content-Type": "application/json"},
         )
     assert resp.status_code == 413
+
+
+def test_non_integer_max_tokens_returns_400():
+    app = create_app(make_config())
+    with app.test_client() as client:
+        resp = _post_json(
+            client,
+            "/v1/chat/completions",
+            {"model": "gpt-4o", "messages": [], "max_tokens": "abc"},
+        )
+    assert resp.status_code == 400
+    assert resp.get_json()["error"]["type"] == "relay_error"
+
+
+def test_negative_max_tokens_returns_400():
+    app = create_app(make_config())
+    with app.test_client() as client:
+        resp = _post_json(
+            client,
+            "/v1/chat/completions",
+            {"model": "gpt-4o", "messages": [], "max_tokens": -1},
+        )
+    assert resp.status_code == 400
+    assert resp.get_json()["error"]["type"] == "relay_error"
 
 
 # ===========================================================================

@@ -237,7 +237,7 @@ def create_app(config: RelayConfig) -> Flask:
     # -----------------------------------------------------------------------
 
     def _client_ip() -> str:
-        return request.headers.get("X-Forwarded-For", request.remote_addr or "")
+        return request.remote_addr or ""
 
     rl = config.rate_limits
     default_limits = (
@@ -279,6 +279,17 @@ def create_app(config: RelayConfig) -> Flask:
 
     def _error(message: str, error_type: str, status: int) -> tuple[Response, int]:
         return jsonify({"error": {"message": message, "type": error_type}}), status
+
+    def _parse_max_tokens(value: object) -> tuple[Optional[int], Optional[Response]]:
+        if value is None:
+            return config.limits.max_request_tokens, None
+        try:
+            parsed = int(value)
+        except (TypeError, ValueError):
+            return None, _error("max_tokens must be an integer", "relay_error", 400)[0]
+        if parsed < 0:
+            return None, _error("max_tokens must be non-negative", "relay_error", 400)[0]
+        return parsed, None
 
     def _upstream_headers(ep: EndpointConfig) -> dict[str, str]:
         prefix = ep.auth_prefix
@@ -393,7 +404,9 @@ def create_app(config: RelayConfig) -> Flask:
             )
 
         # Token cap + daily limit
-        raw_max_tokens = parsed.get("max_tokens", config.limits.max_request_tokens)
+        raw_max_tokens, token_parse_err = _parse_max_tokens(parsed.get("max_tokens"))
+        if token_parse_err:
+            return token_parse_err, 400
         capped_tokens, token_ok = token_tracker.check_and_track(ip, raw_max_tokens)
         if not token_ok:
             return _error("Daily token limit exceeded for your IP", "token_limit_error", 429)
@@ -417,6 +430,9 @@ def create_app(config: RelayConfig) -> Flask:
         except requests.ConnectionError:
             _log("POST", upstream_path, 502, time.monotonic() - start, model)
             return _error("Upstream connection failed", "relay_error", 502)
+        except requests.RequestException:
+            _log("POST", upstream_path, 502, time.monotonic() - start, model)
+            return _error("Upstream request failed", "relay_error", 502)
 
         if is_stream:
             content_type = upstream_resp.headers.get("Content-Type", "text/event-stream")
@@ -476,6 +492,7 @@ if __name__ == "__main__":
     config_path = os.environ.get("CONFIG_PATH", "config.yaml")
     cfg = load_config(config_path)
     flask_app = create_app(cfg)
+    host = os.environ.get("HOST", "0.0.0.0")
     port = int(os.environ.get("PORT", "8080"))
-    logging.getLogger(__name__).info("MC Relay starting on port %d (development server)", port)
-    flask_app.run(host="0.0.0.0", port=port, debug=False)
+    logging.getLogger(__name__).info("MC Relay starting on %s:%d (development server)", host, port)
+    flask_app.run(host=host, port=port, debug=False)

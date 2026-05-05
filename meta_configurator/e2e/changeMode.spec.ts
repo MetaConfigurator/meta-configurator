@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {forceEditorMode, getCurrentEditorMode, openApp} from "./utils";
+import {forceEditorMode, getCurrentEditorMode, openApp} from "../../tests/shared/utils";
 import {SessionMode} from "../src/store/sessionMode";
 
 

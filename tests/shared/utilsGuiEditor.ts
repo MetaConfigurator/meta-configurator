@@ -1,7 +1,7 @@
-import {Page} from "playwright";
-import {expect} from "@playwright/test";
-import {Path, PathElement} from "../src/utility/path";
-import {pathToString} from "../src/utility/pathUtils";
+import {expect, type Page} from "./playwright";
+import type { Locator } from "./playwright";
+import {Path, PathElement} from "../../meta_configurator/src/utility/path";
+import {pathToString} from "../../meta_configurator/src/utility/pathUtils";
 
 
 export async function checkPropertyExistence(page: Page, propertyPath: Path, shouldBeVisible: boolean) {

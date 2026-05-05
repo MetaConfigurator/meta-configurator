@@ -1,5 +1,4 @@
-import {Page} from 'playwright';
-import {expect} from '@playwright/test';
+import {expect, type Page} from './playwright';
 import path from 'node:path';
 
 const fixturesDir = path.resolve(process.cwd(), 'e2e/test-fixtures');

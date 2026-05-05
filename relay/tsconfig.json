@@ -1,0 +1,20 @@
+{
+  "extends": "../meta_configurator/tsconfig.node.json",
+  "include": [
+    "playwright.config.ts",
+    "tests/**/*.ts",
+    "../tests/shared/**/*.ts"
+  ],
+  "compilerOptions": {
+    "composite": false,
+    "lib": ["ES2020", "DOM"],
+    "module": "Node16",
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["meta_configurator/src/*"]
+    },
+    "typeRoots": ["../meta_configurator/node_modules/@types"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  }
+}

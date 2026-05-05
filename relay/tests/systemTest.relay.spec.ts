@@ -11,22 +11,23 @@
  * schema document equals the echo response the mock LLM produced.
  */
 
-import {test, expect} from '@playwright/test';
+import {test, expect} from '../../tests/shared/playwright';
 import * as http from 'node:http';
 import {ChildProcess, spawn} from 'node:child_process';
 import * as path from 'node:path';
-import {openApp, forceEditorMode} from './utils';
-import {SessionMode} from '../src/store/sessionMode';
-import {tpGetData} from './utilsTestPanel';
-import {aiPanelEnterCreatePrompt, aiPanelSubmitCreate} from './utilsAiPanel';
+import {openApp, forceEditorMode} from '../../tests/shared/utils';
+import {SessionMode} from '../../meta_configurator/src/store/sessionMode';
+import {tpGetData} from '../../tests/shared/utilsTestPanel';
+import {aiPanelEnterCreatePrompt, aiPanelSubmitCreate} from '../../tests/shared/utilsAiPanel';
 
 const MOCK_LLM_PORT = 9999;
 const RELAY_PORT = 18081;
-const RELAY_DIR = path.join(__dirname, '..', '..', 'relay');
-const RELAY_CONFIG = path.join(__dirname, 'test-fixtures', 'relay-e2e-config.yaml');
+const RELAY_DIR = path.join(__dirname, '..');
+const RELAY_CONFIG = path.join(__dirname, 'relay-e2e-config.yaml');
 
 let mockLlmServer: http.Server | null = null;
 let relayProcess: ChildProcess | null = null;
+let relayStartupError = '';
 
 // ---------------------------------------------------------------------------
 // Mock LLM server — echoes the user message content wrapped in {"request": ...}
@@ -90,24 +91,36 @@ function stopMockLlmServer(): Promise<void> {
 
 function startRelay(): Promise<void> {
     return new Promise((resolve, reject) => {
-        // Use python3 if available, fall back to python
         const python = process.platform === 'win32' ? 'python' : 'python3';
+        relayStartupError = '';
 
         relayProcess = spawn(python, ['app.py'], {
             cwd: RELAY_DIR,
             env: {
                 ...process.env,
                 CONFIG_PATH: RELAY_CONFIG,
+                HOST: '127.0.0.1',
                 PORT: String(RELAY_PORT),
             },
         });
 
         relayProcess.stdout?.on('data', data => process.stderr.write(`[relay] ${data}`));
-        relayProcess.stderr?.on('data', data => process.stderr.write(`[relay] ${data}`));
-        relayProcess.on('error', err => process.stderr.write(`[relay spawn error] ${err}\n`));
+        relayProcess.stderr?.on('data', data => {
+            const text = String(data);
+            relayStartupError += text;
+            process.stderr.write(`[relay] ${text}`);
+        });
+        relayProcess.on('error', err => {
+            relayStartupError += String(err);
+            process.stderr.write(`[relay spawn error] ${err}\n`);
+        });
 
         const deadline = Date.now() + 15000;
         const poll = () => {
+            if (relayProcess?.exitCode !== null && relayProcess?.exitCode !== undefined) {
+                reject(new Error(`Relay exited early with code ${relayProcess.exitCode}: ${relayStartupError.trim()}`));
+                return;
+            }
             const req = http.get(`http://127.0.0.1:${RELAY_PORT}/health`, res => {
                 if (res.statusCode === 200) {
                     resolve();
@@ -120,7 +133,7 @@ function startRelay(): Promise<void> {
             });
             req.on('error', () => {
                 if (Date.now() < deadline) setTimeout(poll, 300);
-                else reject(new Error('Relay failed to start within 15 s'));
+                else reject(new Error(`Relay failed to start within 15 s: ${relayStartupError.trim()}`));
             });
         };
         setTimeout(poll, 500);

@@ -1,5 +1,4 @@
-import {Page} from 'playwright';
-import {expect} from '@playwright/test';
+import {expect, type Page} from './playwright';
 
 export async function aiPanelEnterCreatePrompt(page: Page, prompt: string) {
     const textarea = page.getByTestId('ai-prompt-create-input');
