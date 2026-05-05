@@ -122,6 +122,7 @@ export const SETTINGS_DATA_DEFAULT = {
     maxTokens: 5000,
     temperature: 0.0,
     endpoint: 'https://api.openai.com/v1/',
+    endpointProxy: '',
   },
   schemaSelectionLists: [
     {

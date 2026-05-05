@@ -17,21 +17,22 @@ const rememberOptions = ref([
 </script>
 
 <template>
-  MetaConfigurator supports the OpenAI API (including other AI endpoints using the same API). Define
-  your endpoint in the settings.
-  <br />
-  For OpenAI, generate your API Key
-  <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>. Usage of the
-  OpenAI API normally requires balance on the OpenAI account. One-time purchase of balance is
-  possible without permanently connecting your credit card with your account. Check this
-  <a href="https://platform.openai.com/docs/pricing" target="_blank">link</a> for pricing.
-  <br />
-  MetaConfigurator by default uses the gpt-4o-mini model, which has very low cost. For improved
-  results you can change to more performant models in the settings tab.
+  MetaConfigurator supports any LLM provider that implements the OpenAI API — including OpenAI,
+  Perplexity, OpenRouter, Helmholtz Blablador, Academic Cloud, and others. Switch between providers
+  by changing the endpoint and model in the settings.
   <br />
   <br />
-  Your key is stored only in your browser and sent directly to your chosen provider. It is never
-  sent to MetaConfigurator servers.
+  To use a provider directly from the browser, enter your API key below. The key is stored only in
+  your browser and sent directly to the provider — it is never sent to MetaConfigurator servers.
+  However, storing API keys in the browser carries risk: any script running on the page can
+  potentially read them, and keys may be exposed in browser history or developer tools.
+  <br />
+  <br />
+  For better security, consider using the
+  <a href="https://github.com/MetaConfigurator/meta-configurator/tree/main/relay" target="_blank"
+    >MetaConfigurator Relay</a
+  >: a lightweight self-hosted proxy that holds your provider API key server-side. When a relay is
+  configured, no key needs to be entered here.
   <span class="api-key-container">
     <span>Key:</span>
     <Password v-model="apiKey" placeholder="Enter your API Key" :feedback="false" />

@@ -15,13 +15,27 @@ export const queryOpenAI = async (
   if (!model) model = settings.model;
   if (!max_tokens) max_tokens = settings.maxTokens;
   if (!temperature) temperature = settings.temperature;
-  if (!endpoint) endpoint = settings.endpoint;
 
-  if (!endpoint.startsWith('https://')) {
-    endpoint = `${BASE_URL}/${endpoint}`;
-  }
-  if (!endpoint.endsWith('/chat/completions')) {
-    endpoint = `${endpoint}chat/completions`;
+  const proxyUrl = settings.endpointProxy?.trim();
+  const extraHeaders: Record<string, string> = {};
+
+  if (proxyUrl) {
+    // Route through the self-hosted relay.
+    // Pass the configured upstream endpoint so the relay can forward there directly
+    // rather than relying on a static model→endpoint mapping.
+    endpoint = proxyUrl.replace(/\/$/, '') + '/v1/chat/completions';
+    const upstreamEndpoint = (settings.endpoint ?? '').trim();
+    if (upstreamEndpoint) {
+      extraHeaders['X-Relay-Endpoint'] = upstreamEndpoint;
+    }
+  } else {
+    if (!endpoint) endpoint = settings.endpoint;
+    if (!endpoint.startsWith('https://')) {
+      endpoint = `${BASE_URL}/${endpoint}`;
+    }
+    if (!endpoint.endsWith('/chat/completions')) {
+      endpoint = `${endpoint}chat/completions`;
+    }
   }
 
   try {
@@ -38,14 +52,17 @@ export const queryOpenAI = async (
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
+          ...extraHeaders,
         },
       }
     );
     const resultSchema: string = response.data.choices[0].message.content;
     console.debug('Result schema from AI prompt:', resultSchema, 'based on messages:', messages);
     return resultSchema;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error querying OpenAI:', error);
+    const apiMessage = error?.response?.data?.error?.message;
+    if (apiMessage) throw new Error(apiMessage);
     throw error;
   }
 };

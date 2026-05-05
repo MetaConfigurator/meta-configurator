@@ -1,0 +1,41 @@
+name: Relay Tests
+
+on:
+  push:
+    paths:
+      - 'relay/**'
+  workflow_dispatch:
+
+jobs:
+  python-tests:
+    name: Python unit tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./relay
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+  docker-tests:
+    name: Docker smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Docker Compose and buildx plugins
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y docker-compose-plugin docker-buildx-plugin
+
+      - name: Run Docker smoke tests
+        run: bash relay/tests/test_docker.sh
