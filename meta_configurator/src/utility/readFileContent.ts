@@ -35,6 +35,9 @@ async function readFileContentFromFileList(
     return Promise.reject(new Error('Please select exactly one file'));
   }
   const file = files[0];
+  if (!file) {
+    return Promise.reject(new Error('Please select exactly one file'));
+  }
   const fileContentAsString = readFileContent(file);
 
   if (parseInput) {
@@ -99,6 +102,6 @@ export function readFileContentForFunction(
       }
     })
     .catch(error => {
-      errorService.onError(error);
+      useErrorService().onError(error);
     });
 }

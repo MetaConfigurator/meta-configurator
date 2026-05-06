@@ -48,7 +48,12 @@ import SchemaExternalReferenceNode from '@/components/panels/schema-diagram/Sche
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 import {useErrorService} from '@/utility/errorServiceInstance.ts';
 import {pathToJsonPointer} from '@/utility/pathUtils.ts';
-import {stringToIdentifier, urlStringToIdentifier} from '@/utility/stringToIdentifier.ts';
+import {urlStringToIdentifier} from '@/utility/stringToIdentifier.ts';
+import {
+  copySelectedSchemaToClipboard,
+  pasteSchemaFromClipboard,
+} from '@/components/panels/schema-diagram/schemaClipboardUtils';
+import {doesSchemaAllowNull, setSchemaNullable} from '@/schema/schemaReadingUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -109,6 +114,33 @@ onMounted(() => {
     fitView();
   });
 });
+
+async function handleCopy(event?: ClipboardEvent) {
+  await copyToClipboard(event);
+  event?.preventDefault(); // override default browser copy
+}
+async function handlePaste(event?: ClipboardEvent) {
+  await pasteFromClipboard(event);
+  event?.preventDefault(); // override default browser paste
+}
+
+async function copyToClipboard(event?: ClipboardEvent) {
+  await copySelectedSchemaToClipboard(
+    event,
+    schemaData,
+    selectedData.value,
+    schemaSession.currentSelectedElement.value
+  );
+}
+
+async function pasteFromClipboard(event?: ClipboardEvent) {
+  try {
+    const pastedPath = await pasteSchemaFromClipboard(event, schemaData, selectedData.value);
+    selectElement(pastedPath);
+  } catch (err) {
+    console.error('Failed to read from clipboard:', err);
+  }
+}
 
 // scroll to the current selected element when it changes
 watch(
@@ -343,9 +375,18 @@ function updateAttributeType(
   attributeData: SchemaObjectAttributeData,
   newType: AttributeTypeChoice
 ) {
-  //attributeData.typeDescription = newType.label;
   const attributeSchema = structuredClone(schemaData.dataAt(attributeData.absolutePath));
+  const shouldRemainNullable = doesSchemaAllowNull(attributeSchema, schemaData.data.value);
   applyNewType(attributeSchema, newType.schema);
+  if (shouldRemainNullable) {
+    setSchemaNullable(attributeSchema, true, schemaData.data.value);
+  }
+  schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
+}
+
+function updateAttributeNullable(attributeData: SchemaObjectAttributeData, nullable: boolean) {
+  const attributeSchema = structuredClone(schemaData.dataAt(attributeData.absolutePath));
+  setSchemaNullable(attributeSchema, nullable, schemaData.data.value);
   schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
 }
 
@@ -424,7 +465,7 @@ function updateExternalReferenceValue(
 </script>
 
 <template>
-  <div class="layout-flow">
+  <div class="layout-flow" tabindex="0" @copy="handleCopy" @paste="handlePaste">
     <VueFlow
       :nodes="activeNodes"
       :edges="activeEdges"
@@ -455,6 +496,7 @@ function updateExternalReferenceValue(
           @update_attribute_name="updateAttributeName"
           @update_attribute_type="updateAttributeType"
           @update_attribute_required="updateAttributeRequired"
+          @update_attribute_nullable="updateAttributeNullable"
           @delete_element="deleteElement"
           @add_attribute="addAttribute"
           @extract_inlined_element="extractInlinedElement"

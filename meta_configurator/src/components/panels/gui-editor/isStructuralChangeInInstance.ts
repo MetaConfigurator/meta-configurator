@@ -1,5 +1,3 @@
-import type {GuiEditorTreeNode} from '@/components/panels/gui-editor/configDataTreeNode.ts';
-
 export function isStructuralChangeInInstance(oldObject: any, newObject: any): boolean {
   // algorithm to determine whether any key or structure has changed between oldObject and newObject
   // changes in values of existing keys are not considered structural changes

@@ -98,9 +98,10 @@ No specific format is enforced, but commit messages should start with a verb and
 ## Releases
 
 Releases are managed manually by maintainers. When a set of changes on `develop` is deemed stable, a maintainer will:
-1. Update the version in `meta_configurator/package.json`
-2. Add a changelog entry
-3. Merge `develop` into `main`
+1. Update the version in `meta_configurator/package.json` and `codemeta.json`.
+2. Run `npm install` to update the lock file version.
+3. Add a changelog entry to `CHANGELOG.md` following the format defined in that file
+4. Merge `develop` into `main`
 
 ---
 

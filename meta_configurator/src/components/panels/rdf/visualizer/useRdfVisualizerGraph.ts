@@ -77,7 +77,7 @@ export function useRdfVisualizerGraph(options: {
     const node = selectedNode ?? cy.value.nodes(':selected').first();
     if (!node || node.length === 0) return;
 
-    animateFit(node, 80, 400);
+    animateFit(node as any, 80, 400);
   }
 
   function focusNodeById(nodeId: string) {
@@ -189,14 +189,14 @@ export function useRdfVisualizerGraph(options: {
     const randomInRange = (min: number, max: number) => min + Math.random() * (max - min);
     return cy.value.layout({
       name: 'cose-bilkent',
-      animate: true,
+      animate: 'end',
       animationDuration: 1000,
       randomize: true,
       idealEdgeLength: randomInRange(160, 280),
       edgeElasticity: randomInRange(70, 140),
       gravity: randomInRange(70, 130),
       numIter: 15000,
-    });
+    } as any);
   }
 
   function enableGraphInteractions(graph: cytoscape.Core) {

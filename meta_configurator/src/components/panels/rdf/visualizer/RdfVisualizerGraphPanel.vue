@@ -13,7 +13,7 @@
             raised
             :disabled="hasGraphError"
             v-tooltip.left="item.label"
-            @click="item.command" />
+            @click="event => item.command?.({originalEvent: event, item})" />
         </template>
       </Dock>
       <Dock v-if="!readOnly" :model="bottomDockItems" position="bottom" class="graph-dock-bottom">
@@ -23,7 +23,7 @@
             rounded
             raised
             v-tooltip.top="item.label"
-            @click="item.command" />
+            @click="event => item.command?.({originalEvent: event, item})" />
         </template>
       </Dock>
       <Transition name="fade">

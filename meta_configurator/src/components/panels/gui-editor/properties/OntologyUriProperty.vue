@@ -7,7 +7,7 @@ import AutoComplete from 'primevue/autocomplete';
 import _ from 'lodash';
 import {dataToString} from '@/utility/dataToString';
 import type {PathElement} from '@/utility/path';
-import type {ValidationResult} from '@/schema/validationService';
+import type {ValidationResult} from '@/schema/validationUtils';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
 import {findSuggestionsForSearchTerm} from '@/utility/rdf/findSuggestionsForSearchTerm';

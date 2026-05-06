@@ -1,0 +1,25 @@
+{
+  "latestNewsHash": -1,
+  "aiIntegration": {
+    "model": "mock-model",
+    "maxTokens": 100,
+    "temperature": 0.0,
+    "endpoint": "http://localhost:9999",
+    "endpointProxy": "http://localhost:18081"
+  },
+  "panels": {
+    "schemaEditor": [
+      {
+        "panelType": "aiPrompts",
+        "mode": "schemaEditor",
+        "size": 50
+      },
+      {
+        "panelType": "test",
+        "mode": "schemaEditor",
+        "size": 50
+      }
+    ],
+    "hidden": ["debug"]
+  }
+}

@@ -1,5 +1,4 @@
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import type {Ref} from 'vue';
 
 export interface DataMappingService {
   sanitizeMappingConfig(config: string, input: any): string;

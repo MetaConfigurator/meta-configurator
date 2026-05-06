@@ -34,7 +34,7 @@ watch(possibleArrays, (newPossibleArrays: string[]) => {
   if (newPossibleArrays.length == 0) {
     selectedArrayPointer.value = null;
   } else if (newPossibleArrays.length == 1) {
-    selectedArrayPointer.value = possibleArrays.value[0];
+    selectedArrayPointer.value = possibleArrays.value[0] ?? null;
   } else {
     // if there are multiple arrays, we do not change the selection
   }

@@ -73,6 +73,9 @@ function trimDataToNPropertiesPerObject(data: any, n: number): any {
     const keys = Object.keys(data);
     for (let i = 0; i < Math.min(n, keys.length); i++) {
       const key = keys[i];
+      if (key === undefined) {
+        continue;
+      }
       newObject[key] = trimDataToNPropertiesPerObject(data[key], n);
     }
     return newObject;

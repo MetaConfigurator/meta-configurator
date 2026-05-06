@@ -153,11 +153,26 @@ export function addSchemaObject(
   return objectPath;
 }
 
-export function addSchemaEnum(schemaData: ManagedData) {
-  const enumPath = findAvailableSchemaId(schemaData, ['$defs'], 'enum');
-  schemaData.setDataAt(enumPath, {
-    type: 'string',
-    enum: ['VAL_1', 'VAL_2'],
-  });
+export function addSchemaEnum(
+  schemaData: ManagedData,
+  schema: any = undefined,
+  identifier: string | undefined = undefined
+) {
+  let enumPath: Path;
+
+  if (identifier !== undefined) {
+    enumPath = findAvailableSchemaId(schemaData, ['$defs'], identifier, true);
+  } else {
+    enumPath = findAvailableSchemaId(schemaData, ['$defs'], 'enum');
+  }
+
+  if (schema !== undefined) {
+    schemaData.setDataAt(enumPath, schema);
+  } else {
+    schemaData.setDataAt(enumPath, {
+      type: 'string',
+      enum: ['VAL_1', 'VAL_2'],
+    });
+  }
   return enumPath;
 }
