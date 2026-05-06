@@ -84,9 +84,9 @@ export function resolveCorrespondingComponent(
   if (nodeData.schema.hasType('string') && nodeData.schema.format === 'email') {
     if (!nodeData.schema.examples || nodeData.schema.examples.length === 0) {
       // if there is no example e-mail provided, add one directly to the schema
-      const underlyingSchema = nodeData.schema.jsonSchema
+      const underlyingSchema = nodeData.schema.jsonSchema;
       if (underlyingSchema) {
-        underlyingSchema.examples = ["example@email.com"]
+        underlyingSchema.examples = ['example@email.com'];
       }
     }
   }
