@@ -83,19 +83,12 @@ export function resolveCorrespondingComponent(
 
   if (nodeData.schema.hasType('string') && nodeData.schema.format === 'email') {
     if (!nodeData.schema.examples || nodeData.schema.examples.length === 0) {
-      const schemaWithEmailExample = new Proxy(nodeData.schema, {
-        get(target, prop) {
-          if (prop === 'examples') return ['email@example.com'];
-          return (target as any)[prop];
-        },
-      });
-      // @ts-ignore
-      return h(StringProperty, {
-        ...propsObject,
-        propertySchema: schemaWithEmailExample,
-      });
+      // if there is no example e-mail provided, add one directly to the schema
+      const underlyingSchema = nodeData.schema.jsonSchema
+      if (underlyingSchema) {
+        underlyingSchema.examples = ["example@email.com"]
+      }
     }
-    // if user already has examples, fall through to normal StringProperty
   }
 
   if (nodeData.schema.hasType('string')) {
