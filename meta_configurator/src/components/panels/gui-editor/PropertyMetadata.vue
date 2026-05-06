@@ -156,7 +156,7 @@ function focusOnPropertyLabel(): void {
         @focus="focusEditingLabel()"
         @keydown.stop
         @blur="updatePropertyName"
-        @keyup.enter="updatePropertyName"
+        @keydown.enter.prevent="updatePropertyName"
         class="scroll-my-60 snap-start"
         :class="{
           'text-indigo-700': canZoomIn(),
