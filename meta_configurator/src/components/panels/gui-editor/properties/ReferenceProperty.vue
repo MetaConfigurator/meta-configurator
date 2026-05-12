@@ -43,36 +43,43 @@ const availableDefinitions = computed<string[]>(() => {
 
 // is the current value an external reference (no #/)
 const isExternalReference = computed(() => {
-  return props.propertyData !== undefined &&
+  return (
+    props.propertyData !== undefined &&
     props.propertyData !== '' &&
-    !props.propertyData.startsWith('#/');
+    !props.propertyData.startsWith('#/')
+  );
 });
 
 const currentValue = ref(props.propertyData ?? '');
 
-watch(() => props.propertyData, newVal => {
-  currentValue.value = newVal ?? '';
-});
+watch(
+  () => props.propertyData,
+  newVal => {
+    currentValue.value = newVal ?? '';
+  }
+);
 
 // filter suggestions based on what user types
 const filteredSuggestions = ref<string[]>([]);
 
 // watch currentValue and update suggestions as user types
-watch(currentValue, (newVal) => {
+watch(currentValue, newVal => {
   const query = (newVal ?? '').toLowerCase();
   if (query === '') {
     // show all definitions if empty
     filteredSuggestions.value = availableDefinitions.value;
   } else {
-    filteredSuggestions.value = availableDefinitions.value
-      .filter(path => path.toLowerCase().includes(query));
+    filteredSuggestions.value = availableDefinitions.value.filter(path =>
+      path.toLowerCase().includes(query)
+    );
   }
 });
 
 function searchSuggestions(event: {query: string}) {
   const query = event.query.toLowerCase();
-  filteredSuggestions.value = availableDefinitions.value
-    .filter(path => path.toLowerCase().includes(query));
+  filteredSuggestions.value = availableDefinitions.value.filter(path =>
+    path.toLowerCase().includes(query)
+  );
 }
 
 function updateValue(newValue: string | {value: string} | undefined) {

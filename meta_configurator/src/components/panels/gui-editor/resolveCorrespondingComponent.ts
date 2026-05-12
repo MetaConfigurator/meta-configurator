@@ -68,7 +68,6 @@ export function resolveCorrespondingComponent(
       ...propsObject,
       sessionMode: mode,
     });
-
   }
   if (nodeData.schema.hasType('string') && hasTwoOrMoreExamples(nodeData.schema)) {
     // @ts-ignore

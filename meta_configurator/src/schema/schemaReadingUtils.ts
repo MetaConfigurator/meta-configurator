@@ -38,19 +38,19 @@ export function getTypeDescription(schema: JsonSchemaObjectType): string {
 }
 export function getAvailableDefinitionPaths(schema: any): string[] {
   const paths: string[] = [];
-  
+
   if (schema?.$defs) {
     Object.keys(schema.$defs).forEach(key => {
       paths.push(`#/$defs/${key}`);
     });
   }
-  
+
   if (schema?.definitions) {
     Object.keys(schema.definitions).forEach(key => {
       paths.push(`#/definitions/${key}`);
     });
   }
-  
+
   return paths.sort();
 }
 export function isSchemaEmpty(schema: JsonSchemaType): boolean {
