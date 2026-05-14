@@ -62,7 +62,7 @@ export function resolveCorrespondingComponent(
       isTypeUnion: true,
     });
   }
-  if (nodeData.schema.hasType('string') && nodeData.name === '$ref') {
+  if (mode == 'schemaEditor' && nodeData.schema.hasType('string') && nodeData.name === '$ref') {
     // @ts-ignore
     return h(ReferenceProperty, {
       ...propsObject,

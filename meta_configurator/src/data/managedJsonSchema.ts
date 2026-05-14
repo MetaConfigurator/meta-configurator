@@ -14,7 +14,6 @@ import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
 import {writeSchemaRequiredDefaultsToData} from '@/schema/writeDefaultsToData';
 import {useDataSource} from '@/data/dataSource';
 import {detectSchemaFeatures, type SchemaFeatures} from '@/schema/detectSchemaFeatures.ts';
-import {getAvailableDefinitionPaths} from '@/schema/schemaReadingUtils';
 /**
  * This class manages the schema and provides easy access to its content.
  */
@@ -43,13 +42,6 @@ export class ManagedJsonSchema {
 
   private _schemaPreprocessed: Ref<JsonSchemaTypePreprocessed>;
 
-  private _availableDefinitions = computed(() => {
-    return getAvailableDefinitionPaths(this._schemaRaw.value);
-  });
-
-  get availableDefinitions(): ComputedRef<string[]> {
-    return this._availableDefinitions;
-  }
   /**
    * The json schema as a TopLevelJsonSchema object
    */
