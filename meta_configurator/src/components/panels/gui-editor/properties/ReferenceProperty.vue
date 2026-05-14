@@ -30,9 +30,9 @@ const emit = defineEmits<{
 // In SchemaEditor mode, get definitions from the schema being edited (userSchemaData)
 // In other modes, get definitions from the schema that validates the current data
 const availableDefinitions = computed<string[]>(() => {
-    // In SchemaEditor, get definitions from the user schema data (what's being edited)
-    const userSchemaData = getDataForMode(SessionModeEnum.SchemaEditor).data.value;
-    return getAvailableDefinitionPaths(userSchemaData);
+  // In SchemaEditor, get definitions from the user schema data (what's being edited)
+  const userSchemaData = getDataForMode(SessionModeEnum.SchemaEditor).data.value;
+  return getAvailableDefinitionPaths(userSchemaData);
 });
 
 // is the current value an external reference (no #/)
