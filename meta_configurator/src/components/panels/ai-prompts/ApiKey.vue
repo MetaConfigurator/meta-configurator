@@ -17,22 +17,31 @@ const rememberOptions = ref([
 </script>
 
 <template>
-  MetaConfigurator supports any LLM provider that implements the OpenAI API — including OpenAI,
-  Perplexity, OpenRouter, Helmholtz Blablador, Academic Cloud, and others. Switch between providers
-  by changing the endpoint and model in the settings.
+  MetaConfigurator works with any LLM provider that follows the OpenAI API format, including
+  OpenAI, Perplexity, OpenRouter, Groq, Mistral, DeepSeek, and others. You can configure the
+  connection method and model in the settings below. There are three backend options:
   <br />
   <br />
-  To use a provider directly from the browser, enter your API key below. The key is stored only in
-  your browser and sent directly to the provider — it is never sent to MetaConfigurator servers.
-  However, storing API keys in the browser carries risk: any script running on the page can
-  potentially read them, and keys may be exposed in browser history or developer tools.
+  <strong>CORS Compatible Endpoint</strong>: the browser talks directly to the AI provider. Only a
+  handful of public APIs (OpenAI and Perplexity) actually allow this. If you use this option, enter
+  your API key below. The key stays in your browser and goes straight to the provider, not to any
+  MetaConfigurator server. Keep in mind that storing API keys in the browser has some risk, since
+  any script running on the page could potentially read them.
   <br />
   <br />
-  For better security, consider using the
+  <strong>HTTPS Relay</strong>: requests go through a self-hosted
   <a href="https://github.com/MetaConfigurator/meta-configurator/tree/main/relay" target="_blank"
     >MetaConfigurator Relay</a
-  >: a lightweight self-hosted proxy that holds your provider API key server-side. When a relay is
-  configured, no key needs to be entered here.
+  >
+  over HTTPS. This is the right choice when MetaConfigurator is served over HTTPS, which is the
+  case for the stable and experimental public releases. The relay keeps the provider API key on the
+  server, so you do not need to enter anything here. Note that you cannot point this at an HTTP
+  relay from an HTTPS page; browsers will block that due to mixed-content rules.
+  <br />
+  <br />
+  <strong>HTTP Relay</strong>: the same idea as the HTTPS relay, but over plain HTTP. This only
+  makes sense when you are running MetaConfigurator locally over HTTP, for example during
+  development. It will not work when accessed from an HTTPS page for the same mixed-content reason.
   <span class="api-key-container">
     <span>Key:</span>
     <Password v-model="apiKey" placeholder="Enter your API Key" :feedback="false" />

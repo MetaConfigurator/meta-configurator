@@ -1,35 +1,42 @@
 import axios from 'axios';
 import {useSettings} from '@/settings/useSettings';
+import {throwAiRequestError} from '@/utility/ai/aiRequestError';
 
 const BASE_URL = 'https://api.openai.com/v1';
+
+const KNOWN_SETTINGS_FIELDS = new Set(['model', 'temperature', 'backend']);
 
 export const queryOpenAI = async (
   apiKey: string,
   messages: {role: 'system' | 'user'; content: string}[],
   model: string | undefined = undefined,
-  max_tokens: number | undefined = undefined,
   temperature: number | undefined = undefined,
   endpoint: string | undefined = undefined
 ) => {
   const settings = useSettings().value.aiIntegration;
   if (!model) model = settings.model;
-  if (!max_tokens) max_tokens = settings.maxTokens;
   if (!temperature) temperature = settings.temperature;
 
-  const proxyUrl = settings.endpointProxy?.trim();
+  // Collect any extra model parameters the user added beyond the known fields
+  const extraModelParams: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(settings)) {
+    if (!KNOWN_SETTINGS_FIELDS.has(key)) {
+      extraModelParams[key] = value;
+    }
+  }
+
+  const backend = settings.backend;
   const extraHeaders: Record<string, string> = {};
 
-  if (proxyUrl) {
+  if ('relay' in backend) {
     // Route through the self-hosted relay.
-    // Pass the configured upstream endpoint so the relay can forward there directly
-    // rather than relying on a static model→endpoint mapping.
-    endpoint = proxyUrl.replace(/\/$/, '') + '/v1/chat/completions';
-    const upstreamEndpoint = (settings.endpoint ?? '').trim();
-    if (upstreamEndpoint) {
-      extraHeaders['X-Relay-Endpoint'] = upstreamEndpoint;
+    // Pass the configured upstream endpoint so the relay can forward there directly.
+    endpoint = backend.relay.replace(/\/$/, '') + '/v1/chat/completions';
+    if (backend.endpoint) {
+      extraHeaders['X-Relay-Endpoint'] = backend.endpoint.trim();
     }
   } else {
-    if (!endpoint) endpoint = settings.endpoint;
+    if (!endpoint) endpoint = backend.endpoint;
     if (!endpoint.startsWith('https://')) {
       endpoint = `${BASE_URL}/${endpoint}`;
     }
@@ -38,32 +45,28 @@ export const queryOpenAI = async (
     }
   }
 
+  const requestBody: Record<string, unknown> = {
+    model,
+    messages,
+    temperature,
+    ...extraModelParams,
+  };
+
   try {
     console.debug('Querying AI endpoint with messages: ', ...messages);
-    const response = await axios.post(
-      endpoint,
-      {
-        model,
-        messages,
-        max_tokens: max_tokens,
-        temperature: temperature,
+    const response = await axios.post(endpoint, requestBody, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        ...extraHeaders,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-          ...extraHeaders,
-        },
-      }
-    );
+    });
     const resultSchema: string = response.data.choices[0].message.content;
     console.debug('Result schema from AI prompt:', resultSchema, 'based on messages:', messages);
     return resultSchema;
   } catch (error: any) {
-    console.error('Error querying OpenAI:', error);
-    const apiMessage = error?.response?.data?.error?.message;
-    if (apiMessage) throw new Error(apiMessage);
-    throw error;
+    console.error('Error querying AI endpoint:', error);
+    throwAiRequestError(error, settings.backend);
   }
 };
 
