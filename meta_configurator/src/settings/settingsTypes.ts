@@ -119,12 +119,20 @@ export interface SettingsInterfaceRdf {
   maximumNodesToVisualize: number;
 }
 
+export interface AiBackendCorsEndpoint {
+  endpoint: string;
+}
+
+export interface AiBackendRelay {
+  relay: string;
+  endpoint: string;
+}
+
 export interface SettingsInterfaceAiIntegraton {
   model: string;
-  maxTokens: number;
   temperature: number;
-  endpoint: string;
-  endpointProxy?: string;
+  backend: AiBackendCorsEndpoint | AiBackendRelay;
+  [key: string]: unknown;
 }
 
 export interface SettingsInterfaceSchemaSelectionList {

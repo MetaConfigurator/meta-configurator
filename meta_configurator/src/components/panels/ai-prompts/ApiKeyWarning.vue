@@ -11,7 +11,7 @@ import {useSettings} from '@/settings/useSettings';
 
 const apiKey: Ref<string> = getApiKeyRef();
 const settings = useSettings();
-const usingProxy = computed(() => !!settings.value.aiIntegration.endpointProxy?.trim());
+const usingProxy = computed(() => 'relay' in settings.value.aiIntegration.backend);
 const showWarning = computed(() => !usingProxy.value && apiKey.value.length <= 1);
 </script>
 
