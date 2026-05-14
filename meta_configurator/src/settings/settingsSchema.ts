@@ -586,12 +586,10 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
                 relay: {
                   type: 'string',
                   title: 'Relay URL (HTTPS)',
-                  description: 'Address of your self-hosted MetaConfigurator relay. Has to start with https://.',
+                  description:
+                    'Address of your self-hosted MetaConfigurator relay. Has to start with https://.',
                   pattern: '^https://',
-                  examples: [
-                    'https://your-relay.example.com',
-                    'https://relay.myorg.com',
-                  ],
+                  examples: ['https://your-relay.example.com', 'https://relay.myorg.com'],
                 },
                 endpoint: {
                   type: 'string',
@@ -644,12 +642,10 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
                 relay: {
                   type: 'string',
                   title: 'Relay URL (HTTP)',
-                  description: 'Address of your self-hosted MetaConfigurator relay. Has to start with http://.',
+                  description:
+                    'Address of your self-hosted MetaConfigurator relay. Has to start with http://.',
                   pattern: '^http://',
-                  examples: [
-                    'http://localhost:8080',
-                    'http://localhost:18081',
-                  ],
+                  examples: ['http://localhost:8080', 'http://localhost:18081'],
                 },
                 endpoint: {
                   type: 'string',

@@ -17,9 +17,9 @@ const rememberOptions = ref([
 </script>
 
 <template>
-  MetaConfigurator works with any LLM provider that follows the OpenAI API format, including
-  OpenAI, Perplexity, OpenRouter, Groq, Mistral, DeepSeek, and others. You can configure the
-  connection method and model in the settings below. There are three backend options:
+  MetaConfigurator works with any LLM provider that follows the OpenAI API format, including OpenAI,
+  Perplexity, OpenRouter, Groq, Mistral, DeepSeek, and others. You can configure the connection
+  method and model in the settings below. There are three backend options:
   <br />
   <br />
   <strong>CORS Compatible Endpoint</strong>: the browser talks directly to the AI provider. Only a
@@ -33,8 +33,8 @@ const rememberOptions = ref([
   <a href="https://github.com/MetaConfigurator/meta-configurator/tree/main/relay" target="_blank"
     >MetaConfigurator Relay</a
   >
-  over HTTPS. This is the right choice when MetaConfigurator is served over HTTPS, which is the
-  case for the stable and experimental public releases. The relay keeps the provider API key on the
+  over HTTPS. This is the right choice when MetaConfigurator is served over HTTPS, which is the case
+  for the stable and experimental public releases. The relay keeps the provider API key on the
   server, so you do not need to enter anything here. Note that you cannot point this at an HTTP
   relay from an HTTPS page; browsers will block that due to mixed-content rules.
   <br />
