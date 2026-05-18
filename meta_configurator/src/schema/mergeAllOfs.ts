@@ -7,6 +7,14 @@ export function mergeAllOfs(schema: JsonSchemaType, deep: boolean = true): JsonS
     return schema;
   }
 
+  try {
+    return mergeAllOfWithResolvers(schema, deep);
+  } catch (error) {
+    return mergeAllOfWithResolvers(stripNonValidationFields(schema), deep);
+  }
+}
+
+function mergeAllOfWithResolvers(schema: JsonSchemaType, deep: boolean): JsonSchemaType {
   return mergeAllOf(
     schema as any,
     {
@@ -36,17 +44,39 @@ export function mergeAllOfs(schema: JsonSchemaType, deep: boolean = true): JsonS
     } as any
   );
 }
-export function safeMergeAllOfs(schema: JsonSchemaType): JsonSchemaType {
+export function safeMergeAllOfs(schema: JsonSchemaType, deep: boolean = true): JsonSchemaType {
   try {
-    return mergeAllOfs(schema);
+    return mergeAllOfs(schema, deep);
   } catch (e) {
     return false;
   }
 }
 
 export function areSchemasCompatible(...schemas: JsonSchemaType[]): boolean {
-  const mergeResult = safeMergeSchemas(...schemas);
-  return mergeResult != false;
+  const strippedSchemas = schemas.map(schema => stripNonValidationFields(schema));
+
+  if (strippedSchemas.some(schema => schema === false)) {
+    return false;
+  }
+
+  // empty-object schemas are neutral: they impose no constraints, so they're
+  // always compatible with anything. Drop them before delegating to the merger.
+  const relevantSchemas = strippedSchemas.filter(
+    schema => !(typeof schema === 'object' && schema !== null && !Array.isArray(schema) && Object.keys(schema).length === 0)
+  );
+
+  if (relevantSchemas.length === 0) {
+    return true;
+  }
+
+  // Even a single remaining schema must be checked: a top-level allOf that the
+  // merger can't reconcile (e.g. multiple `contains` with disjoint enums after
+  // const -> enum normalization) is a genuine incompatibility that must propagate
+  // up so the caller can drop the option. Use a shallow merge so unrelated
+  // nested allOfs (which will be resolved when their own subtree is processed)
+  // don't cause false negatives here.
+  const combined = {allOf: relevantSchemas};
+  return safeMergeAllOfs(combined, false) !== false;
 }
 
 export function safeMergeSchemas(...schemas: JsonSchemaType[]): JsonSchemaType | false {
@@ -62,3 +92,37 @@ export function mergeSchemas(...schemas: JsonSchemaType[]): JsonSchemaType {
   };
   return mergeAllOfs(combinedSchema);
 }
+
+function stripNonValidationFields(schema: JsonSchemaType): JsonSchemaType {
+  if (typeof schema !== 'object' || schema === null) {
+    return schema;
+  }
+
+  if (Array.isArray(schema)) {
+    return schema.map(item => stripNonValidationFields(item));
+  }
+
+  const stripped: Record<string, any> = {};
+  for (const [key, value] of Object.entries(schema)) {
+    if (NON_VALIDATION_FIELDS.has(key)) {
+      continue;
+    }
+    stripped[key] = stripNonValidationFields(value as JsonSchemaType);
+  }
+  return stripped;
+}
+
+const NON_VALIDATION_FIELDS = new Set([
+  'title',
+  'description',
+  '$comment',
+  'default',
+  'examples',
+  'deprecated',
+  'readOnly',
+  'writeOnly',
+  'metaConfigurator',
+  '$id',
+  '$schema',
+  'id',
+]);
