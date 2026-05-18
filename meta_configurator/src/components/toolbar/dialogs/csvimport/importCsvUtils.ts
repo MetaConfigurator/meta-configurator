@@ -1,4 +1,3 @@
-import {useFileDialog} from '@vueuse/core';
 import {readFileContentToStringRef} from '@/utility/readFileContent';
 import type {Ref} from 'vue';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
@@ -18,26 +17,18 @@ import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
+
+const csvFileDialog = createLazySingleFileDialog('.csv');
 
 export function requestUploadFileToRef(resultString: Ref<string>, resultTableName: Ref<string>) {
-  const {open, onChange, reset} = useFileDialog({
-    // accept only json, schema.json, yaml, yml, xml and xsd files
-    accept: '.csv',
-    multiple: false,
-  });
-
-  onChange((files: FileList | null) => {
-    if (files && files.length > 0) {
-      resultTableName.value = stringToIdentifier(files[0].name, true); // Get the name of the first file
+  csvFileDialog.openForSelection(files => {
+    const firstFile = files?.[0];
+    if (firstFile) {
+      resultTableName.value = stringToIdentifier(firstFile.name, true); // Get the name of the first file
       readFileContentToStringRef(files, resultString);
     }
-    reset(); // Reset the file dialog after selection
   });
-
-  // opening it with a small delay might fix the issue of the dialog opening but onChange never triggering
-  setTimeout(() => {
-    open();
-  }, 3);
 }
 
 export function inferSchemaForNewDataAndMergeIntoCurrentSchema(
@@ -149,7 +140,7 @@ export function detectPropertiesOfTableInJson(json: any, tablePath: Path): strin
   const table = _.get(json, pathToString(tablePath));
   if (Array.isArray(table)) {
     if (table.length > 0) {
-      return Object.keys(table[0]);
+      return Object.keys(table[0] ?? {});
     }
   }
   return [];
@@ -186,7 +177,7 @@ function countKeyMatches(
     arrayIndex++
   ) {
     const arrayElement = arrayData[arrayIndex];
-    const primaryKeyValue = arrayElement[foreignKeyAttribute];
+    const primaryKeyValue = arrayElement?.[foreignKeyAttribute];
     const matchingLookupRow = lookupValuesInCsv(lookupCsv, primaryKeyColumn, primaryKeyValue);
     if (matchingLookupRow) {
       result += 1;

@@ -6,9 +6,13 @@ import {lookupValuesInCsv} from '@/components/toolbar/dialogs/csvimport/importCs
 
 export function writeCsvToData(csv: any[], columnMapping: CsvImportColumnMappingData[]) {
   const currentData = getDataForMode(SessionMode.DataEditor);
+  const firstColumn = columnMapping[0];
+  if (!firstColumn) {
+    return;
+  }
 
   let rowIndexOffset = 0;
-  const arrayPath = columnMapping[0].getTablePathForJsonDocument();
+  const arrayPath = firstColumn.getTablePathForJsonDocument();
   // if there already exists an array at the path, append the new data to it, by setting the rowIndexOffset
   const dataAtPath = currentData.dataAt(arrayPath);
   if (Array.isArray(dataAtPath)) {
@@ -34,9 +38,13 @@ export function expandCsvDataIntoTable(
   columnMapping: CsvImportColumnMappingData[]
 ) {
   const currentData = getDataForMode(SessionMode.DataEditor);
+  const firstColumn = columnMapping[0];
+  if (!firstColumn) {
+    return;
+  }
 
-  const arrayPath = columnMapping[0].getTablePathForJsonDocument();
-  const arrayData: any[] = currentData.dataAt(arrayPath);
+  const arrayPath = firstColumn.getTablePathForJsonDocument();
+  const arrayData: any[] = currentData.dataAt(arrayPath) ?? [];
   for (let arrayIndex = 0; arrayIndex < arrayData.length; arrayIndex++) {
     const arrayElement = arrayData[arrayIndex];
     const primaryKeyValue = arrayElement[foreignKeyAttribute];

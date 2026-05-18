@@ -17,7 +17,7 @@ export function schemaGraphToVueFlowNodes(graph: SchemaGraph): Node[] {
     return {
       id: pathToNodeId(data.absolutePath),
       position: {x: Math.random() * 500, y: Math.random() * 500},
-      label: data.name,
+      label: data.name ?? '',
       type: data.getNodeType(),
       data: data,
     };

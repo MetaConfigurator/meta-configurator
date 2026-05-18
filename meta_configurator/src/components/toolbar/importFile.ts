@@ -1,29 +1,22 @@
-import {useFileDialog} from '@vueuse/core';
 import {readFileContentForFunction} from '@/utility/readFileContent';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import type {ManagedData} from '@/data/managedData';
 import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
+import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
+
+const importSchemaFileDialog = createLazySingleFileDialog(
+  '.json, .yaml, .yml, .xml, .schema.json',
+  5
+);
 
 /**
  * Opens a file dialog to select a JSON schema to import.
  */
 export function openImportSchemaDialog(): void {
-  const {open, onChange, reset} = useFileDialog({
-    // accept only json, schema.json, yaml, yml, xml and xsd files
-    accept: '.json, .yaml, .yml, .xml, .schema.json',
-    multiple: false,
-  });
-
-  onChange((files: FileList | null) => {
+  importSchemaFileDialog.openForSelection(files => {
     readFileContentForFunction(files, importSchema);
-    reset(); // Reset the file dialog after selection
   });
-
-  // opening it with a small delay might fix the issue of the dialog opening but onChange never triggering
-  setTimeout(() => {
-    open();
-  }, 5);
 }
 
 function importSchema(importedSchema: any) {

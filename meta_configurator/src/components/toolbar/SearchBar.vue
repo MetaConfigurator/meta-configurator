@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {type Ref, ref} from 'vue';
+import {computed, type Ref, ref} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import {useSessionStore} from '@/store/sessionStore';
@@ -47,7 +47,7 @@ watchDebounced(
     searchInDataAndSchema(searchTerm.value)
       .then(searchResults => {
         if (searchResults.length > 0) {
-          session.currentSelectedElement.value = searchResults[0].path;
+          session.currentSelectedElement.value = searchResults[0]!.path;
         }
         session.currentSearchResults.value = searchResults;
         searchResultItems.value = searchResults
@@ -61,11 +61,10 @@ watchDebounced(
   {debounce: 500}
 );
 
-const showSearchResultsMenu = event => {
+const showSearchResultsMenu = (event: FocusEvent) => {
   searchResultMenu.value?.show(event, event.target);
   focus('searchBar');
 };
-import {computed} from 'vue';
 let mode = useSessionStore().currentMode;
 let session = getSessionForMode(mode);
 const currentIndex = computed(() => {
@@ -85,7 +84,7 @@ function goNext() {
 
   const idx = results.findIndex(r => r.path === session.currentSelectedElement.value);
   const nextIdx = (idx + 1) % results.length;
-  session.currentSelectedElement.value = results[nextIdx].path;
+  session.currentSelectedElement.value = results[nextIdx]!.path;
 }
 function goPrev() {
   const results = session.currentSearchResults.value;
@@ -93,7 +92,7 @@ function goPrev() {
 
   const idx = results.findIndex(r => r.path === session.currentSelectedElement.value);
   const prevIdx = (idx - 1 + results.length) % results.length;
-  session.currentSelectedElement.value = results[prevIdx].path;
+  session.currentSelectedElement.value = results[prevIdx]!.path;
 }
 </script>
 
@@ -129,7 +128,7 @@ function goPrev() {
     </Button>
   </div>
   <!-- search results menu -->
-  <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems">
+  <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems" class="search-results-menu">
     <template #item="slotProps">
       <div class="px-3 py-2">
         <div class="font-bold">{{ slotProps.item.label }}</div>
@@ -142,7 +141,11 @@ function goPrev() {
   </Button>
 </template>
 
-<style scoped>
+<style>
+.search-results-menu .p-menu-list {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
 .search-nav-btn {
   min-width: 1.6rem;
   height: 1.6rem;

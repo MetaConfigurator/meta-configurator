@@ -1,12 +1,9 @@
 import {
   EdgeType,
-  SchemaElementData,
   type SchemaGraph,
   SchemaNodeData,
-  SchemaObjectNodeData,
 } from '@/schema/graph-representation/schemaGraphTypes';
 import {pathToString} from '@/utility/pathUtils';
-import type {Path} from '@/utility/path';
 
 export interface HierarchyNode {
   graphNode: SchemaNodeData;

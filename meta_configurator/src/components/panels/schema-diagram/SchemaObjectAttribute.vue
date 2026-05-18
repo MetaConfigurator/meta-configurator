@@ -15,6 +15,7 @@ import {
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useSettings} from '@/settings/useSettings';
+import {doesSchemaAllowNull} from '@/schema/schemaReadingUtils';
 
 const settings = useSettings();
 
@@ -42,11 +43,20 @@ const emit = defineEmits<{
     attributeData: SchemaObjectAttributeData,
     required: boolean
   ): void;
+  (
+    e: 'update_attribute_nullable',
+    attributeData: SchemaObjectAttributeData,
+    nullable: boolean
+  ): void;
   (e: 'delete_element', objectData: SchemaElementData): void;
 }>();
 
 function updateRequired() {
   emit('update_attribute_required', props.data, props.data.required);
+}
+
+function updateNullable(event: Event) {
+  emit('update_attribute_nullable', props.data, (event.target as HTMLInputElement).checked);
 }
 
 const attrName = ref(props.data.name);
@@ -81,6 +91,10 @@ function isEditable() {
 
 function isHighlighted() {
   return props.selectedData && props.selectedData == props.data;
+}
+
+function isNullable() {
+  return doesSchemaAllowNull(props.data.schema);
 }
 
 function getHandleId() {
@@ -122,9 +136,11 @@ function getHandleTop() {
       <div class="vue-flow-attribute-inline">
         <input
           type="checkbox"
-          class="vue-flow-required-checkbox"
+          class="vue-flow-attribute-checkbox"
           v-model="props.data.required"
           @change="updateRequired"
+          aria-label="Required property"
+          title="Required: controls whether this property must be present."
           @mousedown.stop
           @click.stop
           @dblclick.stop
@@ -140,6 +156,19 @@ function getHandleTop() {
           @click.stop
           @dblclick.stop
           placeholder="Select Type" />
+
+        <input
+          v-if="settings.schemaDiagram.showNullableCheckbox"
+          type="checkbox"
+          class="vue-flow-attribute-checkbox"
+          :checked="isNullable()"
+          @change="updateNullable"
+          aria-label="Nullable property"
+          title="Nullable: allows this property to be null in addition to its current type."
+          @mousedown.stop
+          @click.stop
+          @dblclick.stop
+          @keydown.stop />
 
         <Button
           class="vue-flow-attribute-button vue-flow-attribute-input-dimensions"
@@ -164,7 +193,7 @@ function getHandleTop() {
 </template>
 
 <style>
-.vue-flow-required-checkbox {
+.vue-flow-attribute-checkbox {
   margin: 0 4px;
   transform: scale(0.8);
 }

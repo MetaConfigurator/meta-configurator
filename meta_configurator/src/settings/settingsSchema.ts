@@ -217,6 +217,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'vertical',
         'showAttributes',
         'showEnumValues',
+        'showNullableCheckbox',
         'maxAttributesToShow',
         'maxEnumValuesToShow',
         'moveViewToSelectedElement',
@@ -248,6 +249,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'boolean',
           description:
             'If set to true, the enum values of the schema will be displayed in the schema diagram.',
+          default: true,
+        },
+        showNullableCheckbox: {
+          type: 'boolean',
+          description:
+            'If set to true, highlighted attributes in schema diagram edit mode will show a checkbox for toggling nullable types.',
           default: true,
         },
         maxAttributesToShow: {
@@ -492,9 +499,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     aiIntegration: {
       type: 'object',
-      required: ['model', 'maxTokens', 'temperature', 'endpoint'],
-      additionalProperties: false,
-      description: 'Settings for AI API.',
+      required: ['model', 'temperature', 'backend'],
+      additionalProperties: {
+        title: 'Custom Model Parameter',
+        oneOf: [{type: 'string'}, {type: 'number'}, {type: 'boolean'}],
+      },
+      description: 'Settings for the AI integration.',
       properties: {
         model: {
           type: 'string',
@@ -521,12 +531,6 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'x-ai/grok-4-fast:free',
           ],
         },
-        maxTokens: {
-          type: 'integer',
-          description: 'The maximum number of tokens to generate.',
-          default: 5000,
-          minimum: 1,
-        },
         temperature: {
           type: 'number',
           description: 'The sampling temperature for the AI API.',
@@ -534,23 +538,153 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           minimum: 0.0,
           maximum: 1.0,
         },
-        endpoint: {
-          type: 'string',
+        backend: {
           description:
-            'The endpoint to use for the AI API. Must follow the OpenAI API specification.',
-          default: 'https://api.openai.com/v1/',
-          examples: [
-            // OpenAI official
-            'https://api.openai.com/v1/',
-            // Perplexity (OpenAI-compatible)
-            'https://api.perplexity.ai/',
-            // OpenRouter (aggregator, OpenAI-compatible)
-            // 'https://api.openrouter.ai/v1/', seems to not support this kind of authentication
-            // Academic / institutional deployments (OpenAI-compatible)
-            'https://chat-ai.academiccloud.de/v1/',
-            'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-            // Custom/self-hosted proxy
-            'https://my-llm-proxy.example.com/v1/',
+            'How MetaConfigurator connects to the AI API. ' +
+            'Use "CORS Compatible Endpoint" if your provider supports direct browser access (only a few do). ' +
+            'Use "HTTPS Relay" when MetaConfigurator is served over HTTPS, which is the case for the stable and experimental releases. ' +
+            'Use "HTTP Relay" only when running MetaConfigurator locally over HTTP. ' +
+            'Browsers will block requests that mix HTTPS and HTTP due to mixed-content restrictions.',
+          oneOf: [
+            {
+              title: 'CORS Compatible Endpoint',
+              type: 'object',
+              description:
+                'The browser connects directly to the AI API. ' +
+                'Only a handful of public APIs (OpenAI, Perplexity) allow this kind of cross-origin browser request. ' +
+                'Most providers (OpenRouter, Groq, Mistral, etc.) will reject browser requests with a CORS error, so you would need a relay for those.',
+              required: ['endpoint'],
+              additionalProperties: false,
+              properties: {
+                endpoint: {
+                  type: 'string',
+                  title: 'Endpoint URL',
+                  description:
+                    'The base URL of the AI provider. Needs to follow the OpenAI API format.',
+                  default: 'https://api.openai.com/v1/',
+                  examples: [
+                    // Known CORS-compatible endpoints
+                    'https://api.openai.com/v1/',
+                    'https://api.perplexity.ai/',
+                    // Custom self-hosted CORS proxy
+                    'https://my-cors-proxy.example.com/v1/',
+                  ],
+                },
+              },
+            },
+            {
+              title: 'HTTPS Relay',
+              type: 'object',
+              description:
+                'Requests go through a self-hosted HTTPS relay instead of directly to the provider. ' +
+                'Use this when MetaConfigurator is served over HTTPS, which is the case for the stable and experimental public releases. ' +
+                'The relay keeps the provider API key on the server, so you do not need to enter it in the browser. ' +
+                'Note that you cannot point this at an HTTP relay from an HTTPS page, as browsers will block mixed-content requests.',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {
+                  type: 'string',
+                  title: 'Relay URL (HTTPS)',
+                  description:
+                    'Address of your self-hosted MetaConfigurator relay. Has to start with https://.',
+                  pattern: '^https://',
+                  examples: ['https://your-relay.example.com', 'https://relay.myorg.com'],
+                },
+                endpoint: {
+                  type: 'string',
+                  title: 'Upstream Endpoint URL',
+                  description:
+                    'The AI provider endpoint that the relay will forward requests to. Needs to follow the OpenAI API format.',
+                  default: 'https://api.openai.com/v1/',
+                  examples: [
+                    // OpenAI
+                    'https://api.openai.com/v1/',
+                    // Perplexity
+                    'https://api.perplexity.ai/',
+                    // OpenRouter — aggregator with 200+ models
+                    'https://openrouter.ai/api/v1/',
+                    // xAI (Grok)
+                    'https://api.x.ai/v1/',
+                    // Mistral AI
+                    'https://api.mistral.ai/v1/',
+                    // Groq
+                    'https://api.groq.com/openai/v1/',
+                    // DeepSeek
+                    'https://api.deepseek.com/v1/',
+                    // Together AI
+                    'https://api.together.xyz/v1/',
+                    // Fireworks AI
+                    'https://api.fireworks.ai/inference/v1/',
+                    // Cohere (OpenAI-compatible)
+                    'https://api.cohere.com/compatibility/v1/',
+                    // Google Gemini (OpenAI-compatible)
+                    'https://generativelanguage.googleapis.com/v1beta/openai/',
+                    // Academic / institutional deployments
+                    'https://chat-ai.academiccloud.de/v1/',
+                    'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                    // Custom self-hosted proxy
+                    'https://my-llm-proxy.example.com/v1/',
+                  ],
+                },
+              },
+            },
+            {
+              title: 'HTTP Relay',
+              type: 'object',
+              description:
+                'Same as the HTTPS Relay, but over plain HTTP. ' +
+                'This only makes sense when running MetaConfigurator locally over HTTP, for example during development. ' +
+                'It will not work when accessed from an HTTPS page, because browsers block mixed-content requests in that case.',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {
+                  type: 'string',
+                  title: 'Relay URL (HTTP)',
+                  description:
+                    'Address of your self-hosted MetaConfigurator relay. Has to start with http://.',
+                  pattern: '^http://',
+                  examples: ['http://localhost:8080', 'http://localhost:18081'],
+                },
+                endpoint: {
+                  type: 'string',
+                  title: 'Upstream Endpoint URL',
+                  description:
+                    'The AI provider endpoint that the relay will forward requests to. Needs to follow the OpenAI API format.',
+                  default: 'https://api.openai.com/v1/',
+                  examples: [
+                    // OpenAI
+                    'https://api.openai.com/v1/',
+                    // Perplexity
+                    'https://api.perplexity.ai/',
+                    // OpenRouter — aggregator with 200+ models
+                    'https://openrouter.ai/api/v1/',
+                    // xAI (Grok)
+                    'https://api.x.ai/v1/',
+                    // Mistral AI
+                    'https://api.mistral.ai/v1/',
+                    // Groq
+                    'https://api.groq.com/openai/v1/',
+                    // DeepSeek
+                    'https://api.deepseek.com/v1/',
+                    // Together AI
+                    'https://api.together.xyz/v1/',
+                    // Fireworks AI
+                    'https://api.fireworks.ai/inference/v1/',
+                    // Cohere (OpenAI-compatible)
+                    'https://api.cohere.com/compatibility/v1/',
+                    // Google Gemini (OpenAI-compatible)
+                    'https://generativelanguage.googleapis.com/v1beta/openai/',
+                    // Academic / institutional deployments
+                    'https://chat-ai.academiccloud.de/v1/',
+                    'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                    // Custom self-hosted proxy
+                    'https://my-llm-proxy.example.com/v1/',
+                  ],
+                },
+              },
+            },
           ],
         },
       },

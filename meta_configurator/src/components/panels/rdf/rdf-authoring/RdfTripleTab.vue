@@ -26,7 +26,6 @@
     frozenHeader
     :rowAttrs="{tabindex: 0}"
     @row-dblclick="openEditDialog"
-    @filter="onFilter"
     :globalFilterFields="['subject', 'predicate', 'object']"
     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
     :rowsPerPageOptions="[10, 20, 50]"
@@ -38,7 +37,7 @@
       <RdfTripleToolbar
         :hasSelection="Boolean(selectedTriple)"
         :hasItems="items.length > 0"
-        :hasFilteredRows="filteredRows.length > 0"
+        :hasFilteredRows="filteredItems.length > 0"
         :globalFilterValue="filters?.global?.value ?? null"
         :exportMenuItems="exportMenuItems"
         @add="openNewDialog"
@@ -134,7 +133,6 @@
 import {nextTick} from 'vue';
 import {ref, computed, watch} from 'vue';
 import DataTable from 'primevue/datatable';
-import type {DataTableFilterEvent} from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -166,7 +164,6 @@ import {RdfMediaType} from '../rdfEnums';
 const settings = useSettings();
 const groupBySubject = computed(() => settings.value.rdf.groupBySubject);
 
-const filteredRows = ref<any[]>([]);
 const props = defineProps<{
   dataIsUnparsable: boolean;
   dataIsInJsonLd: boolean;
@@ -230,16 +227,13 @@ const initFilters = () => {
 };
 
 const items = computed(() => {
-  const mappedItems = rdfStoreManager.statements.value.map((statement, index) => ({
+  return rdfStoreManager.statements.value.map((statement, index) => ({
     id: index,
     subject: translateIRI(statement.subject.value),
     predicate: translateIRI(statement.predicate.value),
     object: translateIRI(statement.object.value),
     statement: statement,
   }));
-
-  loading.value = false;
-  return mappedItems;
 });
 
 function updateGlobalFilter(value: string | null) {
@@ -281,13 +275,41 @@ async function selectRowByIndex(index: number) {
   }
 }
 
-function onFilter(e: DataTableFilterEvent) {
-  filteredRows.value = e.filteredValue ?? [];
-}
+const filteredItems = computed(() => {
+  const currentItems = items.value;
+  const currentFilters = filters.value ?? {};
 
-const filteredStatements = computed(() =>
-  (filteredRows.value.length ? filteredRows.value : items.value).map(row => row.statement)
-);
+  const globalNeedle = getFilterNeedle(currentFilters.global);
+  const subjectNeedle = getFilterNeedle(currentFilters.subject);
+  const predicateNeedle = getFilterNeedle(currentFilters.predicate);
+  const objectNeedle = getFilterNeedle(currentFilters.object);
+
+  if (!globalNeedle && !subjectNeedle && !predicateNeedle && !objectNeedle) {
+    return currentItems;
+  }
+
+  return currentItems.filter(row => {
+    const subject = String(row.subject ?? '');
+    const predicate = String(row.predicate ?? '');
+    const object = String(row.object ?? '');
+
+    if (subjectNeedle && !matchesContains(subject, subjectNeedle)) return false;
+    if (predicateNeedle && !matchesContains(predicate, predicateNeedle)) return false;
+    if (objectNeedle && !matchesContains(object, objectNeedle)) return false;
+
+    if (globalNeedle) {
+      return (
+        matchesContains(subject, globalNeedle) ||
+        matchesContains(predicate, globalNeedle) ||
+        matchesContains(object, globalNeedle)
+      );
+    }
+
+    return true;
+  });
+});
+
+const filteredStatements = computed(() => filteredItems.value.map(row => row.statement));
 
 const confirmDeleteSelected = () => {
   deleteDialog.value = true;
@@ -441,6 +463,13 @@ watch(
   }
 );
 
+watch(
+  () => rdfStoreManager.statements.value,
+  () => {
+    loading.value = false;
+  }
+);
+
 function onRowClick(event: any) {
   const path = jsonLdNodeManager.findPath(event.data.statement);
   if (path) {
@@ -450,6 +479,18 @@ function onRowClick(event: any) {
 
 function translateIRI(iriTerm: string) {
   return iriTerm;
+}
+
+function getFilterNeedle(filterMeta: any): string | null {
+  const raw =
+    filterMeta?.value ??
+    (Array.isArray(filterMeta?.constraints) ? filterMeta.constraints[0]?.value : null);
+  const text = typeof raw === 'string' ? raw.trim() : String(raw ?? '').trim();
+  return text.length ? text.toLocaleLowerCase() : null;
+}
+
+function matchesContains(value: string, needle: string): boolean {
+  return value.toLocaleLowerCase().includes(needle);
 }
 
 function exportAs(format: string) {

@@ -90,7 +90,7 @@ function toggleExportPopover(event: Event) {
   exportPopover.value?.toggle?.(event);
 }
 
-function onGlobalFilterChange(value: string | null) {
-  emit('update:globalFilterValue', value);
+function onGlobalFilterChange(value: string | undefined) {
+  emit('update:globalFilterValue', value ?? null);
 }
 </script>

@@ -5,7 +5,7 @@ import InputText from 'primevue/inputtext';
 import {generatePlaceholderText} from '@/utility/propertyPlaceholderGenerator';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {PathElement} from '@/utility/path';
-import type {ValidationResult} from '@/schema/validationService';
+import type {ValidationResult} from '@/schema/validationUtils';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
 import {useSettings} from '@/settings/useSettings';
 

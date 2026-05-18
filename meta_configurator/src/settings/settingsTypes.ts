@@ -54,6 +54,7 @@ export interface SettingsInterfaceSchemaDiagram {
   vertical: boolean;
   showAttributes: boolean;
   showEnumValues: boolean;
+  showNullableCheckbox: boolean;
   maxAttributesToShow: number;
   maxEnumValuesToShow: number;
   moveViewToSelectedElement: boolean;
@@ -118,11 +119,20 @@ export interface SettingsInterfaceRdf {
   maximumNodesToVisualize: number;
 }
 
+export interface AiBackendCorsEndpoint {
+  endpoint: string;
+}
+
+export interface AiBackendRelay {
+  relay: string;
+  endpoint: string;
+}
+
 export interface SettingsInterfaceAiIntegraton {
   model: string;
-  maxTokens: number;
   temperature: number;
-  endpoint: string;
+  backend: AiBackendCorsEndpoint | AiBackendRelay;
+  [key: string]: unknown;
 }
 
 export interface SettingsInterfaceSchemaSelectionList {

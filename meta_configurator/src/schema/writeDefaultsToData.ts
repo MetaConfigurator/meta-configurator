@@ -23,6 +23,9 @@ export function writeSchemaRequiredDefaultsToData(
   if (schemaProperties) {
     for (const propertyName in schemaProperties) {
       const property = schemaProperties[propertyName];
+      if (!property) {
+        continue;
+      }
       if (requiredProperties.includes(propertyName)) {
         if (!document[propertyName]) {
           if (property.default) {
@@ -40,7 +43,7 @@ export function writeSchemaRequiredDefaultsToData(
                 writeSchemaRequiredDefaultsToData(
                   data,
                   path.concat(propertyName, '0'),
-                  property.items,
+                  property.items!,
                   updateDataFct
                 );
               }

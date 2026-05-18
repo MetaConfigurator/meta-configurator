@@ -78,6 +78,7 @@ export class MenuItems {
       },
       {
         label: 'Import Data...',
+        key: 'import-data',
         icon: 'fa-solid fa-file-import',
         items: [
           {

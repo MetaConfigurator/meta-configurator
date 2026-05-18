@@ -30,7 +30,9 @@ export function updateCursorPositionBasedOnPath(
   currentPath: Path
 ) {
   const position = determineCursorPosition(editor, editorContent, currentPath);
-  editor.gotoLine(position.row + 1, position.column, true); // row is 1-based, column is 0-based
+  editor.clearSelection();
+  editor.moveCursorToPosition(position);
+  editor.renderer.scrollCursorIntoView();
 }
 
 /**

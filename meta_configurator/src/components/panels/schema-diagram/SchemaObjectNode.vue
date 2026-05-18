@@ -52,6 +52,11 @@ const emit = defineEmits<{
     attributeData: SchemaObjectAttributeData,
     required: boolean
   ): void;
+  (
+    e: 'update_attribute_nullable',
+    attributeData: SchemaObjectAttributeData,
+    nullable: boolean
+  ): void;
 }>();
 
 const objectName = ref(props.data.name || '');
@@ -60,6 +65,10 @@ const settings = useSettings();
 
 function updateAttributeRequired(attributeData: SchemaObjectAttributeData, required: boolean) {
   emit('update_attribute_required', attributeData, required);
+}
+
+function updateAttributeNullable(attributeData: SchemaObjectAttributeData, nullable: boolean) {
+  emit('update_attribute_nullable', attributeData, nullable);
 }
 
 function isObjectEditable() {
@@ -222,6 +231,7 @@ function isAttributeHighlighted() {
       @update_attribute_name="updateAttributeName"
       @update_attribute_type="updateAttributeType"
       @update_attribute_required="updateAttributeRequired"
+      @update_attribute_nullable="updateAttributeNullable"
       @delete_element="deleteElement" />
 
     <div v-if="isObjectEditable()">

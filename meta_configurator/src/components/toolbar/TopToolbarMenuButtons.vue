@@ -110,20 +110,26 @@ function getMenuItems(settings: SettingsInterfaceRoot, positionBottom: boolean):
 // computed property function to get menu items to allow for updating of the menu items
 const menuItems = computed(() => getMenuItems(settings.value, props.showBottomMenu));
 
-const itemMenuRefs = ref(new Map<string, typeof Menu>());
+const itemMenuRefs = ref(new Map<string, {toggle?: (event: Event) => void}>());
 
-function setItemMenuRef(item: MenuItem, menu: typeof Menu) {
-  itemMenuRefs.value.set(getLabelOfItem(item), menu);
+function setItemMenuRef(item: MenuItem, menu: {toggle?: (event: Event) => void} | null) {
+  const label = getLabelOfItem(item);
+  if (!label || !menu) {
+    return;
+  }
+  itemMenuRefs.value.set(label, menu);
 }
 function handleItemButtonClick(item: MenuItem, event: Event) {
   if (item.items) {
     const label = getLabelOfItem(item);
     if (label !== undefined) {
       const menu = itemMenuRefs.value.get(label);
-      menu.toggle(event);
+      if (menu?.toggle) {
+        menu.toggle(event);
+      }
     }
   } else if (item.command) {
-    item.command({item, originalEvent: event});
+    item.command?.({item, originalEvent: event} as any);
   }
 }
 function getLabelOfItem(item: MenuItem): string | undefined {
@@ -158,7 +164,7 @@ function isHighlighted(item: MenuItem) {
 
 <template>
   <!-- menu items -->
-  <div v-for="item in menuItems" :key="item.label">
+  <div v-for="item in menuItems" :key="getLabelOfItem(item) ?? item.key ?? ''">
     <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
     <Button
       v-else
@@ -177,7 +183,7 @@ function isHighlighted(item: MenuItem) {
       v-if="item.items"
       :model="item.items"
       :popup="true"
-      :ref="itemMenu => setItemMenuRef(item, itemMenu)">
+      :ref="itemMenu => setItemMenuRef(item, itemMenu as any)">
       <template #itemicon="slotProps">
         <div v-if="slotProps.item.icon !== undefined">
           <FontAwesomeIcon

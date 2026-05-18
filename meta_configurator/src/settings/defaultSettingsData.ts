@@ -37,6 +37,7 @@ export const SETTINGS_DATA_DEFAULT = {
     vertical: true,
     showAttributes: true,
     showEnumValues: true,
+    showNullableCheckbox: true,
     maxAttributesToShow: 30,
     maxEnumValuesToShow: 10,
     moveViewToSelectedElement: false,
@@ -118,9 +119,11 @@ export const SETTINGS_DATA_DEFAULT = {
   },
   aiIntegration: {
     model: 'gpt-4o-mini',
-    maxTokens: 5000,
+    max_tokens: 5000,
     temperature: 0.0,
-    endpoint: 'https://api.openai.com/v1/',
+    backend: {
+      endpoint: 'https://api.openai.com/v1/',
+    },
   },
   schemaSelectionLists: [
     {

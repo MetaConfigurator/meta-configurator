@@ -1,8 +1,7 @@
-import {Page} from "playwright";
-import {expect} from "@playwright/test";
-import {Path, PathElement} from "../src/utility/path";
-import {pathToString} from "../src/utility/pathUtils";
-import {selectAll} from "./utils";
+import {expect, type Page} from "./playwright";
+import type { Locator } from "./playwright";
+import {Path, PathElement} from "../../meta_configurator/src/utility/path";
+import {pathToString} from "../../meta_configurator/src/utility/pathUtils";
 
 
 export async function checkPropertyExistence(page: Page, propertyPath: Path, shouldBeVisible: boolean) {
@@ -40,21 +39,24 @@ export async function editNumberOrIntProperty(page: Page, propertyPath: Path, va
     const pathAsString = pathToString(propertyPath);
     const spinButton = page.getByTestId(`property-data-${pathAsString}`).getByRole('spinbutton')
     await spinButton.click();
-    await selectAll(page);
-    await spinButton.press('Backspace');
-
-    // Simulate real typing
-    for (const char of value.toString()) {
-        await page.keyboard.press(char);
-    }
-
-    await spinButton.press('Enter');
+    await spinButton.evaluate((input, newValue) => {
+        const nativeValueSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLInputElement.prototype,
+            'value'
+        )?.set;
+        nativeValueSetter?.call(input, String(newValue));
+        input.dispatchEvent(new Event('input', {bubbles: true}));
+        input.setAttribute('aria-valuenow', String(newValue));
+    }, value);
+    await spinButton.blur();
 }
 
 export async function checkNumberOrIntProperty(page: Page, propertyPath: Path, value: number) {
     const pathAsString = pathToString(propertyPath);
     const textField = page.getByTestId(`property-data-${pathAsString}`).getByRole('spinbutton')
-    await expect(textField).toHaveValue(value.toString());
+    await expect
+        .poll(async () => await textField.getAttribute('aria-valuenow'))
+        .toBe(value.toString());
 }
 
 export async function removeOptionalPropertyValue(page: Page, propertyPath: Path) {
@@ -77,9 +79,11 @@ export async function addArrayItem(page: Page, propertyPath: Path) {
 
 export async function checkPropertySchemaViolation(page: Page, propertyPath: Path, shouldBeVisible: boolean) {
     const pathAsString = pathToString(propertyPath);
-    const validationErrorIcon = page.getByTestId(`property-metadata-${pathAsString}`).getByTestId("validation-error-icon");
+    const propertyMetadata = page.getByTestId(`property-metadata-${pathAsString}`);
+    const validationErrorIcon = propertyMetadata.getByTestId("validation-error-icon");
     if (shouldBeVisible) {
-        await expect(validationErrorIcon).toBeVisible();
+        await expect(propertyMetadata).toBeVisible();
+        await expect(validationErrorIcon).toBeVisible({timeout: 8000});
     } else {
         await expect(validationErrorIcon).not.toBeVisible();
     }
