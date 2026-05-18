@@ -62,7 +62,13 @@ export function areSchemasCompatible(...schemas: JsonSchemaType[]): boolean {
   // empty-object schemas are neutral: they impose no constraints, so they're
   // always compatible with anything. Drop them before delegating to the merger.
   const relevantSchemas = strippedSchemas.filter(
-    schema => !(typeof schema === 'object' && schema !== null && !Array.isArray(schema) && Object.keys(schema).length === 0)
+    schema =>
+      !(
+        typeof schema === 'object' &&
+        schema !== null &&
+        !Array.isArray(schema) &&
+        Object.keys(schema).length === 0
+      )
   );
 
   if (relevantSchemas.length === 0) {
