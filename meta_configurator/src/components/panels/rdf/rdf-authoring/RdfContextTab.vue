@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
-import {computed, ref, watch} from 'vue';
+import {computed, toRaw} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
@@ -18,7 +18,7 @@ const session = getSessionForMode(props.sessionMode);
 const data = getDataForMode(props.sessionMode);
 
 const currentSchema = computed(() => {
-  return new JsonSchemaWrapper(JSON.parse(defaultJsonLdSchema), props.sessionMode, true);
+  return new JsonSchemaWrapper(structuredClone(defaultJsonLdSchema), props.sessionMode, true);
 });
 
 const parsingErrors = computed(() => {
@@ -37,24 +37,14 @@ function removeProperty(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
-function zoomIntoPath(pathToAdd: Path) {
-  session.updateCurrentPath(session.currentPath.value.concat(pathToAdd));
-  session.updateCurrentSelectedElement(session.currentPath.value);
-}
-
 function selectPath(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
-const currentData = ref<any>(undefined);
-
-watch(
-  () => data.data.value,
-  () => {
-    currentData.value = getDataForMode(props.sessionMode).dataAt(['@context']);
-  },
-  {deep: true, immediate: true}
-);
+const currentData = computed(() => {
+  const contextData = data.dataAt(['@context']);
+  return contextData === undefined ? undefined : structuredClone(toRaw(contextData));
+});
 </script>
 
 <template>
@@ -71,7 +61,6 @@ watch(
           :currentData="currentData"
           :sessionMode="props.sessionMode"
           :table-header="undefined"
-          @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
           @remove_property="removeProperty"
           @select_path="selectedPath => selectPath(selectedPath)"
           @update_data="updateData" />
