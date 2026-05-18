@@ -6,7 +6,7 @@ import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationUtils';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
-import {getSchemaForMode, getDataForMode} from '@/data/useDataLink';
+import {getDataForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
 import type {SessionMode} from '@/store/sessionMode';
 import {SessionMode as SessionModeEnum} from '@/store/sessionMode';
@@ -71,14 +71,22 @@ watch(currentValue, newVal => {
 
 function searchSuggestions(event: {query: string}) {
   const query = event.query.toLowerCase();
-  filteredSuggestions.value = availableDefinitions.value.filter(path =>
-    path.toLowerCase().includes(query)
-  );
+  if (query === '') {
+    filteredSuggestions.value = availableDefinitions.value;
+  } else {
+    filteredSuggestions.value = availableDefinitions.value.filter(path =>
+      path.toLowerCase().includes(query)
+    );
+  }
 }
 
-function updateValue(newValue: string | {value: string} | undefined) {
-  const val = typeof newValue === 'object' ? newValue?.value : newValue;
-  emit('update:propertyData', val);
+function onOptionMouseDown(item: string) {
+  currentValue.value = item;
+  emit('update:propertyData', item);
+}
+
+function onBlur() {
+  emit('update:propertyData', currentValue.value || undefined);
 }
 </script>
 
@@ -90,8 +98,8 @@ function updateValue(newValue: string | {value: string} | undefined) {
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="currentValue"
     :disabled="isReadOnly(props.propertySchema)"
-    @blur="updateValue(currentValue)"
-    @keyup.enter="updateValue(currentValue)"
+    @blur="emit('update:propertyData', currentValue || undefined)"
+    @keyup.enter="emit('update:propertyData', currentValue || undefined)"
     @keydown.down.stop
     @keydown.up.stop
     @keydown.left.stop
@@ -101,7 +109,6 @@ function updateValue(newValue: string | {value: string} | undefined) {
   <!-- internal reference: show autocomplete with suggestions -->
   <AutoComplete
     v-else
-    ref="autocompleteRef"
     class="tableInput w-full"
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="currentValue"
@@ -110,14 +117,19 @@ function updateValue(newValue: string | {value: string} | undefined) {
     :disabled="isReadOnly(props.propertySchema)"
     :input-style="{width: '100%'}"
     @complete="searchSuggestions"
-    @item-select="updateValue($event.value)"
-    @blur="updateValue(currentValue)"
-    @keyup.enter="updateValue(currentValue)"
+    @blur="onBlur"
+    @keyup.enter="emit('update:propertyData', currentValue || undefined)"
     @keydown.down.stop
     @keydown.up.stop
     @keydown.left.stop
     @keydown.right.stop
-    placeholder="#/$defs/MyType" />
+    placeholder="#/$defs/MyType">
+    <template #option="{option}">
+      <div @mousedown.prevent="onOptionMouseDown(option)">
+        {{ option }}
+      </div>
+    </template>
+  </AutoComplete>
 </template>
 
 <style scoped>
