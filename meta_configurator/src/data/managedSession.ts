@@ -79,14 +79,18 @@ export class ManagedSession {
   }
 
   /**
-   * Returns true if the node or any of its children is highlighted.
+   * Returns true if the node is selected, or if the node or any of its children matches a search result.
    */
   public isNodeHighlighted(node: ConfigDataTreeNode) {
+    const selectedPath = pathToString(this.currentSelectedElement.value);
+    if (node.key && node.key === selectedPath) {
+      return true;
+    }
+
     return this.currentSearchResults.value
       .map(searchResult => searchResult.path)
       .map(path => pathToString(path))
       .some(path => node.key && path.startsWith(node.key));
-    // TODO: also highlight, when node is currentSelectedElement
   }
 
   public effectiveSchemaAtCurrentPath: Ref<EffectiveSchema> = computed(() =>

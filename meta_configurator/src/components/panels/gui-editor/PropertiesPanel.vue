@@ -86,8 +86,12 @@ watch(
     const pathToCutOff = session.currentPath.value;
     const relativePath = absolutePath.slice(pathToCutOff.length);
     if (relativePath.length > 0) {
-      // cut off last element, because we want to expand until last element, but not expand children of last element
-      const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
+      const selectedSchema = props.currentSchema.subSchemaAt(relativePath);
+      const selectedNodeIsExpandable =
+        selectedSchema?.hasType('object') || selectedSchema?.hasType('array');
+      const relativePathToExpand = selectedNodeIsExpandable
+        ? relativePath
+        : relativePath.slice(0, relativePath.length - 1);
       expandElementsByPath(relativePathToExpand);
     }
     scrollToPath(absolutePath);
@@ -553,6 +557,10 @@ function zoomIntoPath(path: Path) {
   overlayShowScheduled.value = false;
   emit('zoom_into_path', path);
 }
+
+function isNodeHighlighted(node: GuiEditorTreeNode) {
+  return node.type !== TreeNodeType.ADVANCED_PROPERTY && session.isNodeHighlighted(node);
+}
 </script>
 
 <template>
@@ -578,6 +586,7 @@ function zoomIntoPath(path: Path) {
           v-if="displayAsRegularProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
+          :class="{'bg-yellow-50 rounded-sm': isNodeHighlighted(slotProps.node)}"
           @mouseenter="event => showInfoOverlayPanel(slotProps.node.data, event)"
           @mouseleave="closeInfoOverlayPanel">
           <PropertyMetadata
@@ -585,7 +594,7 @@ function zoomIntoPath(path: Path) {
             :validationResults="getValidationResults(slotProps.node.data.absolutePath)"
             :node="slotProps.node"
             :type="slotProps.node.type"
-            :highlighted="session.isNodeHighlighted(slotProps.node)"
+            :highlighted="isNodeHighlighted(slotProps.node)"
             @zoom_into_path="zoomIntoPath"
             @update_property_name="
               (oldName, newName) =>
@@ -597,7 +606,11 @@ function zoomIntoPath(path: Path) {
         </span>
 
         <!-- data nodes, actual edit fields for the data -->
-        <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 47%" class="w-full">
+        <span
+          v-if="displayAsRegularProperty(slotProps.node)"
+          style="max-width: 47%"
+          class="w-full"
+          :class="{'bg-yellow-50 rounded-sm': isNodeHighlighted(slotProps.node)}">
           <PropertyData
             class="w-full"
             :nodeData="slotProps.node.data"
