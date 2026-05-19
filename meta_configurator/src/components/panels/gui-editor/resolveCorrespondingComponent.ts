@@ -17,6 +17,11 @@ import {getDataForMode, getSessionForMode, getValidationForMode} from '@/data/us
 import {typeSchema} from '@/schema/schemaProcessingUtils';
 import type {SessionMode} from '@/store/sessionMode';
 import OntologyUriProperty from '@/components/panels/gui-editor/properties/OntologyUriProperty.vue';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
+import {
+  representativeCompositionSchema,
+  shouldShowCompositionSelection,
+} from '@/components/panels/gui-editor/guiSchemaCompositionUtils';
 
 /**
  * Resolves the corresponding component for a given node.
@@ -26,97 +31,117 @@ export function resolveCorrespondingComponent(
   nodeData: ConfigTreeNodeData | AddItemTreeNodeData,
   mode: SessionMode
 ): VNode {
-  const propsObject = buildProperties(nodeData, mode);
+  return resolveCorrespondingComponentForSchema(nodeData, nodeData.schema, mode);
+}
 
-  if (nodeData.schema.oneOf.length > 0) {
+function resolveCorrespondingComponentForSchema(
+  nodeData: ConfigTreeNodeData | AddItemTreeNodeData,
+  schema: JsonSchemaWrapper,
+  mode: SessionMode
+): VNode {
+  const propsObject = buildProperties(nodeData, mode, schema);
+
+  if (schema.oneOf.length > 0) {
+    if (!shouldShowCompositionSelection(schema, schema.oneOf, 'oneOf', mode)) {
+      const representativeSchema = representativeCompositionSchema(schema, schema.oneOf, 'oneOf', mode);
+      if (representativeSchema) {
+        return resolveCorrespondingComponentForSchema(nodeData, representativeSchema, mode);
+      }
+    }
     // @ts-ignore
     return h(OneOfSelectionProperty, {
       ...propsObject,
-      possibleSchemas: nodeData.schema.oneOf,
+      possibleSchemas: schema.oneOf,
       isTypeUnion: false,
     });
   }
-  if (nodeData.schema.anyOf.length > 0) {
+  if (schema.anyOf.length > 0) {
+    if (!shouldShowCompositionSelection(schema, schema.anyOf, 'anyOf', mode)) {
+      const representativeSchema = representativeCompositionSchema(schema, schema.anyOf, 'anyOf', mode);
+      if (representativeSchema) {
+        return resolveCorrespondingComponentForSchema(nodeData, representativeSchema, mode);
+      }
+    }
     // @ts-ignore
     return h(AnyOfSelectionProperty, {
       ...propsObject,
-      possibleSchemas: nodeData.schema.anyOf,
+      possibleSchemas: schema.anyOf,
     });
   }
 
-  if (nodeData.schema.enum !== undefined) {
+  if (schema.enum !== undefined) {
     // @ts-ignore
     return h(EnumProperty, {
       ...propsObject,
-      possibleValues: nodeData.schema.enum,
+      possibleValues: schema.enum,
     });
   }
 
-  if (nodeData.schema.type.length > 1) {
+  if (schema.type.length > 1) {
     // union type
     // @ts-ignore
     return h(OneOfSelectionProperty, {
       ...propsObject,
-      possibleSchemas: nodeData.schema.type.map(type => typeSchema(type, mode)),
+      possibleSchemas: schema.type.map(type => typeSchema(type, mode)),
       isTypeUnion: true,
     });
   }
 
-  if (nodeData.schema.hasType('string') && hasTwoOrMoreExamples(nodeData.schema)) {
+  if (schema.hasType('string') && hasTwoOrMoreExamples(schema)) {
     // @ts-ignore
     return h(EnumProperty, {
       ...propsObject,
-      possibleValues: nodeData.schema.examples,
+      possibleValues: schema.examples,
     });
   }
 
-  if (nodeData.schema.hasType('string') && isOntologyUri(nodeData.schema)) {
+  if (schema.hasType('string') && isOntologyUri(schema)) {
     // @ts-ignore
     return h(OntologyUriProperty, {
       ...propsObject,
     });
   }
-  if (nodeData.schema.hasType('string') && nodeData.schema.format === 'date') {
+  if (schema.hasType('string') && schema.format === 'date') {
     // @ts-ignore
     return h(DateProperty, propsObject);
   }
 
-  if (nodeData.schema.hasType('string') && nodeData.schema.format === 'email') {
-    if (!nodeData.schema.examples || nodeData.schema.examples.length === 0) {
+  if (schema.hasType('string') && schema.format === 'email') {
+    if (!schema.examples || schema.examples.length === 0) {
       // if there is no example e-mail provided, add one directly to the schema
-      const underlyingSchema = nodeData.schema.jsonSchema;
+      const underlyingSchema = schema.jsonSchema;
       if (underlyingSchema) {
         underlyingSchema.examples = ['example@email.com'];
       }
     }
   }
 
-  if (nodeData.schema.hasType('string')) {
+  if (schema.hasType('string')) {
     // @ts-ignore
     return h(StringProperty, propsObject);
   }
 
-  if (nodeData.schema.hasType('boolean')) {
+  if (schema.hasType('boolean')) {
     // @ts-ignore
     return h(BooleanProperty, propsObject);
   }
 
-  if (nodeData.schema.hasType('number') || nodeData.schema.hasType('integer')) {
+  if (schema.hasType('number') || schema.hasType('integer')) {
     // @ts-ignore
     return h(NumberProperty, propsObject);
   }
 
-  if (nodeData.schema.hasType('object') || nodeData.schema.properties !== undefined) {
+  if (schema.hasType('object') || schema.properties !== undefined) {
     // @ts-ignore
     return h(SimpleObjectProperty, propsObject);
   }
 
-  if (nodeData.schema.hasType('array')) {
+  if (schema.hasType('array')) {
     // @ts-ignore
     return h(SimpleArrayProperty, propsObject);
   }
 
-  if (nodeData.schema.hasType('null')) {
+  if (schema.hasType('null')) {
     // @ts-ignore
     return h(EnumProperty, {
       ...propsObject,
@@ -124,7 +149,7 @@ export function resolveCorrespondingComponent(
     });
   }
 
-  return h('p', `Property ${nodeData.name} with type ${nodeData.schema.type} is not supported`);
+  return h('p', `Property ${nodeData.name} with type ${schema.type} is not supported`);
 }
 
 function hasTwoOrMoreExamples(schema: any): boolean {
@@ -139,11 +164,15 @@ function isOntologyUri(schema: any): boolean {
   );
 }
 
-function buildProperties(nodeData: ConfigTreeNodeData | AddItemTreeNodeData, mode: SessionMode) {
+function buildProperties(
+  nodeData: ConfigTreeNodeData | AddItemTreeNodeData,
+  mode: SessionMode,
+  schema: JsonSchemaWrapper = nodeData.schema
+) {
   return {
     propertyName: nodeData.name,
     propertyData: getDataForMode(mode).dataAt(nodeData.absolutePath),
-    propertySchema: nodeData.schema,
+    propertySchema: schema,
     parentSchema: nodeData.parentSchema,
     relativePath: nodeData.relativePath,
     absolutePath: nodeData.absolutePath,
