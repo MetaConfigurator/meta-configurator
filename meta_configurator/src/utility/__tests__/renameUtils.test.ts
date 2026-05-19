@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
-import {replacePropertyNameUtils} from '../renameUtils';
+import {replacePropertyNameUtils, updateReferences} from '../renameUtils';
 import {META_SCHEMA_SIMPLIFIED} from '../../packaged-schemas/metaSchemaSimplified';
 import {type Path} from '../path';
 import _ from 'lodash';
@@ -204,6 +204,61 @@ describe('test renameUtils', () => {
       properties: {
         simulationSettings: {
           $ref: '#/$defs/SimulationSettingsRenamed',
+        },
+      },
+    });
+  });
+
+  it('updates only matching $ref targets when references are rewritten directly', () => {
+    const currentData = {
+      properties: {
+        source: {
+          type: 'object',
+        },
+        consumer: {
+          $ref: '#/properties/source',
+        },
+        nestedConsumer: {
+          allOf: [
+            {
+              $ref: '#/properties/source/child',
+            },
+          ],
+        },
+        unrelated: {
+          $ref: '#/properties/sourceExtra',
+        },
+      },
+    };
+
+    const updateDataFct = (subPath: Path, newValue: any) => {
+      _.set(currentData, subPath, newValue);
+    };
+
+    updateReferences(
+      ['properties', 'source'],
+      ['properties', 'renamedSource'],
+      currentData,
+      updateDataFct
+    );
+
+    expect(currentData).toEqual({
+      properties: {
+        source: {
+          type: 'object',
+        },
+        consumer: {
+          $ref: '#/properties/renamedSource',
+        },
+        nestedConsumer: {
+          allOf: [
+            {
+              $ref: '#/properties/renamedSource/child',
+            },
+          ],
+        },
+        unrelated: {
+          $ref: '#/properties/sourceExtra',
         },
       },
     });

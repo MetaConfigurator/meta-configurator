@@ -2,7 +2,10 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {shallowRef} from 'vue';
 import {ManagedData} from '@/data/managedData';
 import {SessionMode} from '@/store/sessionMode';
-import {extractInlinedSchemaElement} from '@/schema/schemaManipulationUtils';
+import {
+  extractAllInlinedSchemaElements,
+  extractInlinedSchemaElement,
+} from '@/schema/schemaManipulationUtils';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -151,6 +154,71 @@ describe('schemaManipulationUtils', () => {
           type: 'object',
           properties: {
             a2a: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    });
+  });
+
+  it('extracts inlined subschemas that are nested inside an existing $defs entry', () => {
+    schemaData = new ManagedData(
+      shallowRef({
+        type: 'object',
+        properties: {
+          vehicle: {
+            $ref: '#/$defs/vehicle',
+          },
+        },
+        $defs: {
+          vehicle: {
+            type: 'object',
+            properties: {
+              path: {
+                type: 'object',
+                properties: {
+                  waypoint: {
+                    type: 'string',
+                  },
+                },
+              },
+              pathCopy: {
+                $ref: '#/$defs/vehicle/properties/path',
+              },
+            },
+          },
+        },
+      }),
+      SessionMode.SchemaEditor
+    );
+
+    const extractedCount = extractAllInlinedSchemaElements(schemaData, false, true);
+
+    expect(extractedCount).toBe(1);
+    expect(schemaData.data.value).toEqual({
+      type: 'object',
+      properties: {
+        vehicle: {
+          $ref: '#/$defs/vehicle',
+        },
+      },
+      $defs: {
+        vehicle: {
+          type: 'object',
+          properties: {
+            path: {
+              $ref: '#/$defs/path',
+            },
+            pathCopy: {
+              $ref: '#/$defs/path',
+            },
+          },
+        },
+        path: {
+          type: 'object',
+          properties: {
+            waypoint: {
               type: 'string',
             },
           },
