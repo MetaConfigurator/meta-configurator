@@ -43,7 +43,12 @@ function resolveCorrespondingComponentForSchema(
 
   if (schema.oneOf.length > 0) {
     if (!shouldShowCompositionSelection(schema, schema.oneOf, 'oneOf', mode)) {
-      const representativeSchema = representativeCompositionSchema(schema, schema.oneOf, 'oneOf', mode);
+      const representativeSchema = representativeCompositionSchema(
+        schema,
+        schema.oneOf,
+        'oneOf',
+        mode
+      );
       if (representativeSchema) {
         return resolveCorrespondingComponentForSchema(nodeData, representativeSchema, mode);
       }
@@ -57,7 +62,12 @@ function resolveCorrespondingComponentForSchema(
   }
   if (schema.anyOf.length > 0) {
     if (!shouldShowCompositionSelection(schema, schema.anyOf, 'anyOf', mode)) {
-      const representativeSchema = representativeCompositionSchema(schema, schema.anyOf, 'anyOf', mode);
+      const representativeSchema = representativeCompositionSchema(
+        schema,
+        schema.anyOf,
+        'anyOf',
+        mode
+      );
       if (representativeSchema) {
         return resolveCorrespondingComponentForSchema(nodeData, representativeSchema, mode);
       }

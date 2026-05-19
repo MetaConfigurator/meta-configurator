@@ -197,5 +197,4 @@ describe('resolveCorrespondingComponent', () => {
 
     expect(vnode.type).toBe(SimpleObjectProperty);
   });
-
 });

@@ -11,7 +11,9 @@ export function shouldShowCompositionSelection(
   mode: SessionMode
 ): boolean {
   const guiSchemas = subSchemas
-    .map(subSchema => representativeCompositionSchema(schema, [subSchema], compositionKeyword, mode))
+    .map(subSchema =>
+      representativeCompositionSchema(schema, [subSchema], compositionKeyword, mode)
+    )
     .map(mergedSchema => stripValidationOnlyFieldsForGui(mergedSchema?.jsonSchema))
     .filter(normalizedSchema => normalizedSchema !== undefined);
 
