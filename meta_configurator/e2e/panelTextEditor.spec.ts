@@ -61,7 +61,7 @@ test('Select an example schema, enter some value and change the data format. The
 
 test('Change the internal data and check if the code editor is updated properly', async ({ page }) => {
     // Go to the app, pre-loading the schema
-    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json');
 
     // Confirm that the initial data is an empty object
     await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
@@ -75,7 +75,7 @@ test('Change the internal data and check if the code editor is updated properly'
 
 test('Change the code editor content and check if the internal data is updated properly', async ({ page }) => {
     // Go to the app, pre-loading the schema
-    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json');
 
     // Confirm that the initial data is an empty object
     await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
@@ -89,7 +89,7 @@ test('Change the code editor content and check if the internal data is updated p
 });
 
 test('Undo and redo in the code editor use the global history', async ({ page }) => {
-    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json');
 
     await forceCodeEditorText(page, '{ "name": "Alex" }', SessionMode.DataEditor);
     expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({ name: 'Alex' });
