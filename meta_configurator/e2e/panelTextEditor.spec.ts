@@ -3,10 +3,12 @@ import {
     forceDataFormat,
     getCurrentDataFormat,
     openApp,
-    selectInitialSchemaFromExamples
+    redo,
+    selectInitialSchemaFromExamples,
+    undo
 } from "../../tests/shared/utils";
 import {SessionMode} from "../src/store/sessionMode";
-import {checkCodeEditorForText, forceCodeEditorText} from "../../tests/shared/utilsCodeEditor";
+import {checkCodeEditorForText, forceCodeEditorText, getCodeEditor} from "../../tests/shared/utilsCodeEditor";
 import {tpForceData, tpGetData} from "../../tests/shared/utilsTestPanel";
 
 
@@ -84,4 +86,22 @@ test('Change the code editor content and check if the internal data is updated p
     // Validate that the internal data is updated correctly
     const dataAfterNameEnter = await tpGetData(page, SessionMode.DataEditor);
     expect(dataAfterNameEnter).toEqual({ name: 'Alex' });
+});
+
+test('Undo and redo in the code editor use the global history', async ({ page }) => {
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+
+    await forceCodeEditorText(page, '{ "name": "Alex" }', SessionMode.DataEditor);
+    expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({ name: 'Alex' });
+
+    await getCodeEditor(page, SessionMode.DataEditor).click();
+    await undo(page);
+    await page.waitForTimeout(300);
+    expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({});
+    await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
+
+    await redo(page);
+    await page.waitForTimeout(300);
+    expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({ name: 'Alex' });
+    await checkCodeEditorForText(page, '"name": "Alex"', SessionMode.DataEditor);
 });

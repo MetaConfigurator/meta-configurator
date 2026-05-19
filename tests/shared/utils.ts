@@ -104,3 +104,18 @@ export async function selectAll(page: Page) {
     const modifier = isMac ? 'Meta' : 'Control';
     await page.keyboard.press(`${modifier}+A`);
 }
+
+export async function undo(page: Page) {
+    const isMac = os.platform() === 'darwin';
+    const modifier = isMac ? 'Meta' : 'Control';
+    await page.keyboard.press(`${modifier}+Z`);
+}
+
+export async function redo(page: Page) {
+    const isMac = os.platform() === 'darwin';
+    if (isMac) {
+        await page.keyboard.press('Meta+Shift+Z');
+    } else {
+        await page.keyboard.press('Control+Y');
+    }
+}
