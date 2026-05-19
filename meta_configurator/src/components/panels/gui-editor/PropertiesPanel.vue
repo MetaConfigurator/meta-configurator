@@ -82,19 +82,14 @@ watch(
     // if something else is selected, unselect the last clicked element
     lastClickedElement.value = [];
 
-    const absolutePath = session.currentSelectedElement.value;
-    const pathToCutOff = session.currentPath.value;
-    const relativePath = absolutePath.slice(pathToCutOff.length);
-    if (relativePath.length > 0) {
-      const selectedSchema = props.currentSchema.subSchemaAt(relativePath);
-      const selectedNodeIsExpandable =
-        selectedSchema?.hasType('object') || selectedSchema?.hasType('array');
-      const relativePathToExpand = selectedNodeIsExpandable
-        ? relativePath
-        : relativePath.slice(0, relativePath.length - 1);
-      expandElementsByPath(relativePathToExpand);
+    const wasExpanded = expandToSelectedElement();
+    scrollToPath(session.currentSelectedElement.value);
+    if (!wasExpanded) {
+      updateTree();
+      window.setTimeout(() => {
+        scrollToPath(session.currentSelectedElement.value);
+      }, 0);
     }
-    scrollToPath(absolutePath);
   },
   {deep: true}
 );
@@ -216,6 +211,9 @@ function updateTree(initial: boolean = false) {
     if (initial) {
       expandEmptyArraysAndObjectsRecursively(currentTree.value!, props.currentPath);
     }
+    if (!arePathsEqual(lastClickedElement.value, session.currentSelectedElement.value)) {
+      expandToSelectedElement();
+    }
     loading.value = false;
   }, 0);
 }
@@ -253,12 +251,10 @@ function updateData(subPath: Path, newValue: any) {
   updateTree();
 }
 
-function clickedPropertyData(nodeData: ConfigTreeNodeData) {
+function selectPropertyPath(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
-  if (data.dataAt(path) != undefined) {
-    lastClickedElement.value = path;
-    emit('select_path', path);
-  }
+  lastClickedElement.value = path;
+  emit('select_path', path);
 }
 
 function removeProperty(subPath: Path) {
@@ -451,9 +447,26 @@ function displayAsRegularProperty(node: any) {
   );
 }
 
-function expandElementsByPath(relativePath: Path) {
+function expandToSelectedElement(): boolean {
+  const absolutePath = session.currentSelectedElement.value;
+  const pathToCutOff = session.currentPath.value;
+  const relativePath = absolutePath.slice(pathToCutOff.length);
+  if (relativePath.length === 0) {
+    return true;
+  }
+
+  const selectedSchema = props.currentSchema.subSchemaAt(relativePath);
+  const selectedNodeIsExpandable =
+    selectedSchema?.hasType('object') || selectedSchema?.hasType('array');
+  const relativePathToExpand = selectedNodeIsExpandable
+    ? relativePath
+    : relativePath.slice(0, relativePath.length - 1);
+  return expandElementsByPath(relativePathToExpand);
+}
+
+function expandElementsByPath(relativePath: Path): boolean {
   if (relativePath.length == 0) {
-    return;
+    return true;
   }
 
   let currentNode = currentTree.value;
@@ -476,15 +489,14 @@ function expandElementsByPath(relativePath: Path) {
       }
     }
     if (childNodeToExpand === undefined) {
-      break;
+      return false;
     }
 
     expandElementChildren(childNodeToExpand);
     session.expand([childNodeToExpand.key!]);
-
-    // update current node, so the next iteration which is one level deeper will use this node to search next child
     currentNode = childNodeToExpand;
   }
+  return true;
 }
 
 function scrollToPath(absolutePath: Path) {
@@ -618,7 +630,8 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
             @update_property_value="updateData"
             @remove_property="removeProperty"
             @update_tree="updateTree"
-            @click="() => clickedPropertyData(slotProps.node.data)"
+            @click="() => selectPropertyPath(slotProps.node.data)"
+            @focusin="() => selectPropertyPath(slotProps.node.data)"
             bodyClass="w-full"
             @keydown.ctrl.i="
               (event: KeyboardEvent) => showInfoOverlayPanelInstantly(slotProps.node.data, event)

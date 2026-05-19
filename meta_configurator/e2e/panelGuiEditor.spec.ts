@@ -11,7 +11,12 @@ import {
     editStringProperty, expandOrCollapseProperty
 } from "../../tests/shared/utilsGuiEditor";
 import {SessionMode} from "../src/store/sessionMode";
-import {tpForceCurrentSelectedElement, tpForceData, tpGetData} from "../../tests/shared/utilsTestPanel";
+import {
+    tpForceCurrentSelectedElement,
+    tpForceData,
+    tpGetCurrentSelectedElement,
+    tpGetData
+} from "../../tests/shared/utilsTestPanel";
 
 test('Edit the feature testing example schema using the GUI Editor, testing basic editing and schema violations', async ({ page }) => {
     // Go to the app, pre-loading the test settings
@@ -104,6 +109,26 @@ test('Test whether selecting an element, of which the parent is collapsed in the
     await tpForceCurrentSelectedElement(page, SessionMode.SchemaEditor, elementOfInterest);
     // Expect that the elementOfInterest is now visible
     await checkPropertyExistence(page, elementOfInterest, true)
+});
+
+test('Selecting a nested field below a oneOf property expands the full visible branch', async ({ page }) => {
+    await openApp(page, 'settings_testpanel.json', null, null)
+    await selectInitialSchemaFromExamples(page, 'Autonomous Vehicle Schema');
+    await forceEditorMode(page, SessionMode.SchemaEditor)
+
+    const elementOfInterest = ['properties', 'SimulationName', 'type']
+    await checkPropertyExistence(page, elementOfInterest, false)
+
+    await tpForceCurrentSelectedElement(page, SessionMode.SchemaEditor, elementOfInterest);
+    await checkPropertyExistence(page, elementOfInterest, true)
+});
+
+test('Clicking an empty GUI field selects its path', async ({ page }) => {
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+
+    await page.getByTestId('property-data-name').click()
+
+    expect(await tpGetCurrentSelectedElement(page, SessionMode.DataEditor)).toEqual(['name'])
 });
 
 
