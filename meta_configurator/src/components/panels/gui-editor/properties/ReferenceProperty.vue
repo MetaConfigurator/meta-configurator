@@ -50,16 +50,14 @@ function onInput(event: Event) {
   const val = (event.target as HTMLInputElement).value;
   currentValue.value = val;
   const query = val.toLowerCase();
-  filteredSuggestions.value = query === ''
-    ? getDefinitions()
-    : getDefinitions().filter(p => p.toLowerCase().includes(query));
+  filteredSuggestions.value =
+    query === '' ? getDefinitions() : getDefinitions().filter(p => p.toLowerCase().includes(query));
 }
 
 function searchSuggestions(event: {query: string}) {
   const query = event.query.toLowerCase();
-  filteredSuggestions.value = query === ''
-    ? getDefinitions()
-    : getDefinitions().filter(p => p.toLowerCase().includes(query));
+  filteredSuggestions.value =
+    query === '' ? getDefinitions() : getDefinitions().filter(p => p.toLowerCase().includes(query));
 }
 
 function onItemSelect(event: {value: string}) {
