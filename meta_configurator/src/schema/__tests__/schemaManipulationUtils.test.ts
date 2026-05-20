@@ -350,5 +350,4 @@ describe('schemaManipulationUtils', () => {
       },
     });
   });
-
 });
