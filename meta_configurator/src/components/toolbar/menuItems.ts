@@ -14,6 +14,7 @@ import {openImportSchemaDialog} from '@/components/toolbar/importFile';
 import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchemaDefinitions';
 import {resolveSchemaReferences} from '@/components/toolbar/resolveSchemaReferences.ts';
 import {bundleSchema} from '@/components/toolbar/bundleSchema.ts';
+import {sortSchemaPropertiesAlphabeticallyAction} from '@/components/toolbar/sortSchemaProperties.ts';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -219,6 +220,11 @@ export class MenuItems {
             label: 'Bundle External References into the same File',
             icon: 'fa-solid fa-file-zipper',
             command: bundleSchema,
+          },
+          {
+            label: 'Sort All Schema Properties Alphabetically',
+            icon: 'fa-solid fa-arrow-down-a-z',
+            command: sortSchemaPropertiesAlphabeticallyAction,
           },
         ],
       },
