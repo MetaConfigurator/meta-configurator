@@ -8,6 +8,7 @@ import {watchDebounced} from '@vueuse/core';
 import type {SessionMode} from '@/store/sessionMode';
 import {getValidationForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
+import {filterOutAncestorErrors} from '@/components/panels/code-editor/filterAnnotations';
 
 /**
  * Sets up the editor to show validation errors.
@@ -23,6 +24,9 @@ export function setupAnnotationsFromValidationErrors(editor: Editor, mode: Sessi
     }
 
     let {errors} = getValidationForMode(mode).currentValidationResult.value;
+
+    // drop parent-level annotations so the text editor only highlights leaf violations
+    errors = filterOutAncestorErrors(errors);
 
     const supportsBulkPathDetermination = usePathIndexLink().determineIndexesOfPaths !== undefined;
 
