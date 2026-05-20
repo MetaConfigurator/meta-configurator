@@ -1,6 +1,5 @@
-<!-- Reference property: autocomplete for $ref values -->
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {ref, watch, nextTick} from 'vue';
 import AutoComplete from 'primevue/autocomplete';
 import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationUtils';
@@ -10,7 +9,6 @@ import {getDataForMode} from '@/data/useDataLink';
 import {useSettings} from '@/settings/useSettings';
 import type {SessionMode} from '@/store/sessionMode';
 import {SessionMode as SessionModeEnum} from '@/store/sessionMode';
-import InputText from 'primevue/inputtext';
 import {getAvailableDefinitionPaths} from '@/schema/schemaReadingUtils';
 
 const props = defineProps<{
@@ -27,24 +25,9 @@ const emit = defineEmits<{
   (e: 'update:propertyData', newValue: string | undefined): void;
 }>();
 
-// In SchemaEditor mode, get definitions from the schema being edited (userSchemaData)
-// In other modes, get definitions from the schema that validates the current data
-const availableDefinitions = computed<string[]>(() => {
-  // In SchemaEditor, get definitions from the user schema data (what's being edited)
-  const userSchemaData = getDataForMode(SessionModeEnum.SchemaEditor).data.value;
-  return getAvailableDefinitionPaths(userSchemaData);
-});
-
-// is the current value an external reference (no #/)
-const isExternalReference = computed(() => {
-  return (
-    props.propertyData !== undefined &&
-    props.propertyData !== '' &&
-    !props.propertyData.startsWith('#/')
-  );
-});
-
 const currentValue = ref(props.propertyData ?? '');
+const filteredSuggestions = ref<string[]>([]);
+const autoCompleteRef = ref();
 
 watch(
   () => props.propertyData,
@@ -53,36 +36,35 @@ watch(
   }
 );
 
-// filter suggestions based on what user types
-const filteredSuggestions = ref<string[]>([]);
+function getDefinitions() {
+  const userSchemaData = getDataForMode(SessionModeEnum.SchemaEditor).data.value;
+  return getAvailableDefinitionPaths(userSchemaData);
+}
 
-// watch currentValue and update suggestions as user types
-watch(currentValue, newVal => {
-  const query = (newVal ?? '').toLowerCase();
-  if (query === '') {
-    // show all definitions if empty
-    filteredSuggestions.value = availableDefinitions.value;
-  } else {
-    filteredSuggestions.value = availableDefinitions.value.filter(path =>
-      path.toLowerCase().includes(query)
-    );
-  }
-});
+function onFocus() {
+  filteredSuggestions.value = getDefinitions();
+  nextTick(() => autoCompleteRef.value?.show());
+}
+
+function onInput(event: Event) {
+  const val = (event.target as HTMLInputElement).value;
+  currentValue.value = val;
+  const query = val.toLowerCase();
+  filteredSuggestions.value = query === ''
+    ? getDefinitions()
+    : getDefinitions().filter(p => p.toLowerCase().includes(query));
+}
 
 function searchSuggestions(event: {query: string}) {
   const query = event.query.toLowerCase();
-  if (query === '') {
-    filteredSuggestions.value = availableDefinitions.value;
-  } else {
-    filteredSuggestions.value = availableDefinitions.value.filter(path =>
-      path.toLowerCase().includes(query)
-    );
-  }
+  filteredSuggestions.value = query === ''
+    ? getDefinitions()
+    : getDefinitions().filter(p => p.toLowerCase().includes(query));
 }
 
-function onOptionMouseDown(item: string) {
-  currentValue.value = item;
-  emit('update:propertyData', item);
+function onItemSelect(event: {value: string}) {
+  currentValue.value = event.value;
+  emit('update:propertyData', event.value);
 }
 
 function onBlur() {
@@ -91,24 +73,8 @@ function onBlur() {
 </script>
 
 <template>
-  <!-- if external reference, just show plain input — don't disturb with suggestions -->
-  <InputText
-    v-if="isExternalReference"
-    class="h-8 tableInput w-full"
-    :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
-    v-model="currentValue"
-    :disabled="isReadOnly(props.propertySchema)"
-    @blur="emit('update:propertyData', currentValue || undefined)"
-    @keyup.enter="emit('update:propertyData', currentValue || undefined)"
-    @keydown.down.stop
-    @keydown.up.stop
-    @keydown.left.stop
-    @keydown.right.stop
-    placeholder="External reference URL" />
-
-  <!-- internal reference: show autocomplete with suggestions -->
   <AutoComplete
-    v-else
+    ref="autoCompleteRef"
     class="tableInput w-full"
     :class="{'underline decoration-wavy decoration-red-600': !props.validationResults.valid}"
     v-model="currentValue"
@@ -116,16 +82,20 @@ function onBlur() {
     :editable="true"
     :disabled="isReadOnly(props.propertySchema)"
     :input-style="{width: '100%'}"
+    :min-length="0"
+    placeholder="#/$defs/MyType or external URL"
     @complete="searchSuggestions"
+    @focus="onFocus"
+    @input="onInput"
+    @item-select="onItemSelect"
     @blur="onBlur"
     @keyup.enter="emit('update:propertyData', currentValue || undefined)"
     @keydown.down.stop
     @keydown.up.stop
     @keydown.left.stop
-    @keydown.right.stop
-    placeholder="#/$defs/MyType">
+    @keydown.right.stop>
     <template #option="{option}">
-      <div @mousedown.prevent="onOptionMouseDown(option)">
+      <div @mousedown.prevent="onItemSelect({value: option})">
         {{ option }}
       </div>
     </template>
