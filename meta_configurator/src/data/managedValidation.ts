@@ -9,6 +9,7 @@ import {sizeOf} from '@/utility/sizeOf';
 // Import worker as ESM
 import ValidationWorker from '@/workers/validationWorker?worker';
 import {removeExternalReferences} from '@/schema/removeExternalReferences.ts';
+import {collapseUnionErrors} from '@/schema/collapseUnionErrors';
 
 export class ManagedValidation {
   private worker: Worker;
@@ -23,7 +24,7 @@ export class ManagedValidation {
       if (!resolver) return;
 
       if (type === 'VALIDATION_COMPLETE') {
-        resolver(new ValidationResult(result.errors || []));
+        resolver(new ValidationResult(collapseUnionErrors(result.errors || [])));
       } else if (type === 'VALIDATION_ERROR') {
         console.error('Validation worker error:', error);
         resolver(new ValidationResult([]));
