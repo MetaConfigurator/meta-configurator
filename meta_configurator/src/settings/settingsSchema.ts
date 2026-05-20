@@ -186,9 +186,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         propertySorting: {
           type: 'string',
           description:
-            "The sorting of the properties in the GUI editor. If set to 'priorityOrder', the order will be required properties first, then optional properties, then additional and pattern properties and finally deprecated properties. If set to 'dataOrder', the properties will be displayed in the order they are in the configuration object. If set to 'schemaOrder', the properties will be sorted according to the order in the schema.",
+            "The sorting of the properties in the GUI editor. If set to 'priorityOrder', the order will be required properties first, then optional properties, then additional and pattern properties and finally deprecated properties. If set to 'dataOrder', the properties will be displayed in the order they are in the configuration object. If set to 'schemaOrder', the properties will be sorted according to the order in the schema. If set to 'alphabeticalOrder', schema properties will be sorted alphabetically by name.",
           default: 'schemaOrder',
-          enum: ['priorityOrder', 'schemaOrder', 'dataOrder'],
+          enum: ['priorityOrder', 'schemaOrder', 'dataOrder', 'alphabeticalOrder'],
         },
         hideAddPropertyButton: {
           type: 'boolean',
