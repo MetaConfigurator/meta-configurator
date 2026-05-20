@@ -18,9 +18,7 @@ export function filterOutAncestorErrors(errors: ErrorObject[]): ErrorObject[] {
   const effectivePaths = errors.map(effectiveLeafPath);
   return errors.filter((_, i) => {
     const descendantPrefix = effectivePaths[i] + '/';
-    return !effectivePaths.some(
-      (other, j) => j !== i && other.startsWith(descendantPrefix)
-    );
+    return !effectivePaths.some((other, j) => j !== i && other.startsWith(descendantPrefix));
   });
 }
 
