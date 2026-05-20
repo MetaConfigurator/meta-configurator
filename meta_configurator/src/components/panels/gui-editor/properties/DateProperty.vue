@@ -4,7 +4,7 @@ import {ref, watch} from 'vue';
 import DatePicker from 'primevue/datepicker';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {PathElement} from '@/utility/path';
-import type {ValidationResult} from '@/schema/validationService';
+import type {ValidationResult} from '@/schema/validationUtils';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
 
 const props = defineProps<{
@@ -30,12 +30,13 @@ watch(
   }
 );
 
-function updateValue(newDate: Date | undefined) {
+function updateValue(value: Date | (Date | null)[] | Date[] | null | undefined) {
+  // DatePicker is used in single-date mode here, so we only handle a single Date (or empty).
+  const newDate = value instanceof Date ? value : undefined;
   if (!newDate) {
     emit('update:propertyData', undefined);
     return;
   }
-  // convert Date back to ISO date string (YYYY-MM-DD)
   const isoString = newDate.toISOString().split('T')[0];
   emit('update:propertyData', isoString);
 }
