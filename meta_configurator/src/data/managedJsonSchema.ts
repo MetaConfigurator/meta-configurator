@@ -1,4 +1,4 @@
-import type {Ref, ShallowRef, ComputedRef} from 'vue';
+import type {Ref, ShallowRef} from 'vue';
 import {ref} from 'vue';
 import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
