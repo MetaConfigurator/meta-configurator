@@ -17,6 +17,7 @@ import {getDataForMode, getSessionForMode, getValidationForMode} from '@/data/us
 import {typeSchema} from '@/schema/schemaProcessingUtils';
 import type {SessionMode} from '@/store/sessionMode';
 import OntologyUriProperty from '@/components/panels/gui-editor/properties/OntologyUriProperty.vue';
+import ReferenceProperty from '@/components/panels/gui-editor/properties/ReferenceProperty.vue';
 
 /**
  * Resolves the corresponding component for a given node.
@@ -61,7 +62,13 @@ export function resolveCorrespondingComponent(
       isTypeUnion: true,
     });
   }
-
+  if (mode == 'schemaEditor' && nodeData.schema.hasType('string') && nodeData.name === '$ref') {
+    // @ts-ignore
+    return h(ReferenceProperty, {
+      ...propsObject,
+      sessionMode: mode,
+    });
+  }
   if (nodeData.schema.hasType('string') && hasTwoOrMoreExamples(nodeData.schema)) {
     // @ts-ignore
     return h(EnumProperty, {

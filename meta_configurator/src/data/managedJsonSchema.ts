@@ -14,7 +14,6 @@ import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
 import {writeSchemaRequiredDefaultsToData} from '@/schema/writeDefaultsToData';
 import {useDataSource} from '@/data/dataSource';
 import {detectSchemaFeatures, type SchemaFeatures} from '@/schema/detectSchemaFeatures.ts';
-
 /**
  * This class manages the schema and provides easy access to its content.
  */
@@ -126,7 +125,6 @@ export class ManagedJsonSchema {
       this.mode
     );
     this._schemaFeatures!.value = detectSchemaFeatures(this._schemaRaw.value);
-
     if (useDataSource().newSchemaWasFetched) {
       // add defaults to user data, but only when new schema was fetched, not after every schema edit
       const data = getDataForMode(this.mode);
