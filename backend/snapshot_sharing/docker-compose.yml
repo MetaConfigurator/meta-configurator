@@ -33,6 +33,10 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASS: ${REDIS_PASS:-localdev}
+      # Local dev / e2e tests run many requests in quick succession — disable
+      # the per-endpoint rate limiter unless explicitly turned on. The HTTPS
+      # production compose leaves this default-on.
+      RATELIMIT_ENABLED: ${RATELIMIT_ENABLED:-false}
 
   mongo:
     image: mongo:latest

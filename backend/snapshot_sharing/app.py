@@ -95,7 +95,10 @@ else:
         print(f"Redis connection failed: {e}")
 
 
-# Set up Flask-Limiter
+# Set up Flask-Limiter. Honor RATELIMIT_ENABLED=false so e2e tests / local
+# dev can bypass the per-endpoint limits without making the test slow.
+if os.getenv("RATELIMIT_ENABLED", "true").lower() == "false":
+    app.config["RATELIMIT_ENABLED"] = False
 limiter = Limiter(get_remote_address, app=app, storage_uri=LIMITER_STORAGE_URI)
 
 # Set up logging to print to a file
