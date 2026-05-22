@@ -1,0 +1,45 @@
+name: Snapshot Sharing Tests
+
+on:
+  push:
+    paths:
+      - 'backend/snapshot_sharing/**'
+      - '.github/workflows/snapshot-sharing-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    name: Python unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install snapshot_sharing dependencies
+        working-directory: ./backend/snapshot_sharing
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run pytest
+        working-directory: ./backend/snapshot_sharing
+        run: pytest tests/ -v
+
+  docker-e2e:
+    name: Docker e2e tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Show Docker tool versions
+        run: |
+          docker version
+          docker buildx version
+          docker compose version
+
+      - name: Run snapshot_sharing docker e2e
+        run: bash backend/snapshot_sharing/tests/test_docker.sh

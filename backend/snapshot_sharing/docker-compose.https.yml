@@ -1,0 +1,116 @@
+# Standalone HTTPS deployment of snapshot_sharing.
+#
+# Brings up the Flask app, Mongo, Redis, an nginx reverse proxy and a
+# Let's Encrypt companion. Useful when you want to run only this service.
+# For the multi-service joint deployment see ../docker-compose.yml.
+#
+# Required env vars (typically loaded from .env or .env.prod next to this file):
+#   BASE_DOMAIN        public hostname (e.g. metaconfigurator.informatik.uni-stuttgart.de)
+#   LETSENCRYPT_EMAIL  contact email for Let's Encrypt
+#   MONGO_PASS         root password for the bundled Mongo
+#   REDIS_PASS         password for the bundled Redis
+#
+# Deploy:
+#   cp .env.example .env
+#   # Edit .env with real values
+#   docker compose -f docker-compose.https.yml up -d
+
+services:
+
+  snapshot_sharing:
+    container_name: snapshot_sharing
+    build: .
+    expose:
+      - "5000"
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - snapshot-network
+    environment:
+      VIRTUAL_HOST: ${BASE_DOMAIN}
+      VIRTUAL_PORT: 5000
+      LETSENCRYPT_HOST: ${BASE_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+      FLASK_ENV: production
+      MONGO_USER: root
+      MONGO_PASS: ${MONGO_PASS:?MONGO_PASS variable is not set}
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DB: metaconfigurator
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASS: ${REDIS_PASS:?REDIS_PASS variable is not set}
+      FLASK_ENABLE_SSL: "false"
+
+  mongo:
+    image: mongo:latest
+    container_name: snapshot_sharing-mongo
+    restart: unless-stopped
+    networks:
+      - snapshot-network
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS:?MONGO_PASS variable is not set}
+      MONGO_INITDB_DATABASE: metaconfigurator
+
+  redis:
+    image: redis:latest
+    container_name: snapshot_sharing-redis
+    restart: unless-stopped
+    networks:
+      - snapshot-network
+    command:
+      - /bin/sh
+      - -c
+      # $$ keeps docker compose from expanding the variable; the redis container
+      # reads REDIS_PASS from the environment.
+      - redis-server --requirepass "$${REDIS_PASS:?REDIS_PASS variable is not set}"
+    environment:
+      REDIS_PASS: ${REDIS_PASS:?REDIS_PASS variable is not set}
+    volumes:
+      - redis-data:/var/lib/redis/data
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:latest
+    container_name: snapshot_sharing-nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - snapshot-network
+    restart: unless-stopped
+
+  letsencrypt:
+    image: nginxproxy/acme-companion:latest
+    container_name: snapshot_sharing-nginx-letsencrypt
+    depends_on:
+      - nginx-proxy
+    environment:
+      NGINX_PROXY_CONTAINER: snapshot_sharing-nginx-proxy
+      DEFAULT_EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+    networks:
+      - snapshot-network
+    restart: unless-stopped
+
+networks:
+  snapshot-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  redis-data:
+  acme-challenges:

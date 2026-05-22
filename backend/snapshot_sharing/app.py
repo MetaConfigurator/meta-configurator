@@ -45,6 +45,11 @@ CORS(app, resources={
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
+# When TESTING=true the app swaps real Mongo/Redis for in-memory mocks and
+# uses the limiter's memory backend. Lets unit tests import this module
+# without any running infrastructure.
+TESTING = os.getenv("TESTING", "").lower() == "true"
+
 # Get MongoDB credentials and connection info from environment variables
 MONGO_USER = os.getenv("MONGO_USER", "root")
 MONGO_PASS = os.getenv("MONGO_PASS", "example")
@@ -52,18 +57,21 @@ MONGO_HOST = os.getenv("MONGO_HOST", "mongo")
 MONGO_PORT = os.getenv("MONGO_PORT", "27017")
 MONGO_DB = os.getenv("MONGO_DB", "metaconfigurator")
 
-app.logger.debug(
-    f"Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}"
-)
+if TESTING:
+    import mongomock
 
-# MongoDB connection
-client = MongoClient(
-    host=MONGO_HOST,
-    port=int(MONGO_PORT),
-    username=MONGO_USER,
-    password=MONGO_PASS,
-    authSource="admin",
-)
+    client = mongomock.MongoClient()
+else:
+    app.logger.debug(
+        f"Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}"
+    )
+    client = MongoClient(
+        host=MONGO_HOST,
+        port=int(MONGO_PORT),
+        username=MONGO_USER,
+        password=MONGO_PASS,
+        authSource="admin",
+    )
 db = client[MONGO_DB]
 
 # Set up Redis connection
@@ -74,18 +82,21 @@ REDIS_PASS = os.getenv("REDIS_PASS", None)
 # Construct the Redis URL including the password
 REDIS_URL = f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0"
 
-# Initialize Redis client
-redis_client = redis.Redis.from_url(REDIS_URL)
+if TESTING:
+    # In-memory limiter, no Redis ping.
+    LIMITER_STORAGE_URI = "memory://"
+else:
+    LIMITER_STORAGE_URI = REDIS_URL
+    redis_client = redis.Redis.from_url(REDIS_URL)
+    try:
+        redis_client.ping()
+        print("Redis connected successfully")
+    except redis.ConnectionError as e:
+        print(f"Redis connection failed: {e}")
 
-try:
-    redis_client.ping()
-    print("Redis connected successfully")
-except redis.ConnectionError as e:
-    print(f"Redis connection failed: {e}")
 
-
-# Set up Flask-Limiter with Redis
-limiter = Limiter(get_remote_address, app=app, storage_uri=REDIS_URL)
+# Set up Flask-Limiter
+limiter = Limiter(get_remote_address, app=app, storage_uri=LIMITER_STORAGE_URI)
 
 # Set up logging to print to a file
 logging.basicConfig(

@@ -3,7 +3,7 @@ name: Relay Tests
 on:
   push:
     paths:
-      - 'relay/**'
+      - 'backend/relay/**'
       - 'meta_configurator/e2e/**'
       - 'meta_configurator/src/**'
       - 'meta_configurator/package.json'
@@ -23,11 +23,11 @@ jobs:
           python-version: '3.12'
 
       - name: Install relay dependencies
-        working-directory: ./relay
+        working-directory: ./backend/relay
         run: pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Run relay Python tests
-        working-directory: ./relay
+        working-directory: ./backend/relay
         run: pytest tests/ -v
 
       - name: Set up Docker Buildx
@@ -43,7 +43,7 @@ jobs:
           docker compose version
 
       - name: Run relay Docker smoke tests
-        run: bash relay/tests/test_docker.sh
+        run: bash backend/relay/tests/test_docker.sh
 
       - uses: actions/setup-node@v3
         with:

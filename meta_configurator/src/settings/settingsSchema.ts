@@ -647,8 +647,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
                   type: 'string',
                   title: 'Relay URL',
                   description: 'The public address of the Uni Stuttgart relay.',
-                  default: 'https://metaconfigurator.informatik.uni-stuttgart.de:8443',
-                  const: 'https://metaconfigurator.informatik.uni-stuttgart.de:8443',
+                  default: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+                  const: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
                 },
                 endpoint: {
                   type: 'string',

@@ -11,14 +11,14 @@
  * schema document equals the echo response the mock LLM produced.
  */
 
-import {test, expect} from '../../tests/shared/playwright';
+import {test, expect} from '../../../tests/shared/playwright';
 import * as http from 'node:http';
 import {ChildProcess, spawn} from 'node:child_process';
 import * as path from 'node:path';
-import {openApp, forceEditorMode} from '../../tests/shared/utils';
-import {SessionMode} from '../../meta_configurator/src/store/sessionMode';
-import {tpGetData} from '../../tests/shared/utilsTestPanel';
-import {aiPanelEnterCreatePrompt, aiPanelSubmitCreate} from '../../tests/shared/utilsAiPanel';
+import {openApp, forceEditorMode} from '../../../tests/shared/utils';
+import {SessionMode} from '../../../meta_configurator/src/store/sessionMode';
+import {tpGetData} from '../../../tests/shared/utilsTestPanel';
+import {aiPanelEnterCreatePrompt, aiPanelSubmitCreate} from '../../../tests/shared/utilsAiPanel';
 
 const MOCK_LLM_PORT = 9999;
 const RELAY_PORT = 18081;
