@@ -103,6 +103,8 @@ SNAPSHOT_EXPIRY_DAYS = timedelta(
     days=30
 )  # Snapshot not accessed for 30 days will be deleted
 CHECK_INTERVAL = 86400  # 1 day in seconds
+ALLOWED_MODES = {"data", "schema", "settings"}
+DEFAULT_MODE = "data"
 
 
 def is_file_length_valid(file_content):
@@ -127,6 +129,14 @@ def add_snapshot():
         schema = request_data.get("schema")
         settings = request_data.get("settings")
         snapshot_id = request_data.get("snapshot_id")
+        mode = request_data.get("mode", DEFAULT_MODE)
+        if mode not in ALLOWED_MODES:
+            return (
+                jsonify(
+                    {"error": f"Invalid mode '{mode}'. Allowed values: {sorted(ALLOWED_MODES)}"}
+                ),
+                400,
+            )
 
         if not all(map(is_file_length_valid, [data, schema, settings])):
             return jsonify({"error": "One or more files too large"}), 413
@@ -172,6 +182,7 @@ def add_snapshot():
                 "data_id": data_id,
                 "schema_id": schema_id,
                 "settings_id": settings_id,
+                "mode": mode,
                 "metadata": {
                     "creationDate": creation_date,
                     "lastAccessDate": creation_date,
@@ -216,10 +227,16 @@ def get_snapshot(snapshot_id):
             },
         )
 
+        # Default mode for legacy snapshots that pre-date the mode field.
+        mode = snapshot.get("mode") or DEFAULT_MODE
+        if mode not in ALLOWED_MODES:
+            mode = DEFAULT_MODE
+
         response = {
             "data": data["file"],
             "schema": schema["file"],
             "settings": settings["file"],
+            "mode": mode,
         }
 
         return jsonify(response)

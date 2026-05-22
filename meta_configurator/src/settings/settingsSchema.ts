@@ -529,6 +529,10 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'deepseek/deepseek-v3.2-exp',
             'x-ai/grok-4-fast',
             'x-ai/grok-4-fast:free',
+            // Helmholtz Blablador (via Uni Stuttgart Relay preset)
+            'alias-code',
+            'alias-fast',
+            'alias-large',
           ],
         },
         temperature: {
@@ -626,6 +630,33 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
                     // Custom self-hosted proxy
                     'https://my-llm-proxy.example.com/v1/',
                   ],
+                },
+              },
+            },
+            {
+              title: 'Uni Stuttgart Relay',
+              type: 'object',
+              description:
+                'Pre-configured relay hosted at the University of Stuttgart. ' +
+                'Routes requests through the Helmholtz Blablador endpoint. ' +
+                'Set the top-level "model" field to one of: alias-code, alias-fast, alias-large.',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {
+                  type: 'string',
+                  title: 'Relay URL',
+                  description: 'The public address of the Uni Stuttgart relay.',
+                  default: 'https://metaconfigurator.informatik.uni-stuttgart.de:8443',
+                  const: 'https://metaconfigurator.informatik.uni-stuttgart.de:8443',
+                },
+                endpoint: {
+                  type: 'string',
+                  title: 'Upstream Endpoint URL',
+                  description:
+                    'The AI provider endpoint that the relay forwards requests to. Fixed to Helmholtz Blablador for this preset.',
+                  default: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                  const: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
                 },
               },
             },
