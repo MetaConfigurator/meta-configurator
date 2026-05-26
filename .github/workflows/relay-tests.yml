@@ -1,17 +1,6 @@
 name: Relay Tests
 
 on:
-  push:
-    paths:
-      - 'backend/relay/**'
-      - 'backend/docker-compose.yml'
-      - 'backend/*.sh'
-      - 'meta_configurator/e2e/**'
-      - 'meta_configurator/src/**'
-      - 'meta_configurator/package.json'
-      - 'meta_configurator/package-lock.json'
-      - 'tests/shared/**'
-      - '.github/workflows/relay-tests.yml'
   pull_request:
     paths:
       - 'backend/relay/**'
