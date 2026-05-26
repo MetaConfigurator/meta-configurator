@@ -8,9 +8,8 @@ import type {
 import {NUMBER_OF_PROPERTY_TYPES, SCHEMA_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
 import type {ManagedData} from '@/data/managedData';
-import type {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
 import {resolveInternalReferenceSchema} from '@/schema/schemaReferenceUtils';
-import {nonBooleanSchema} from '@/schema/schemaProcessingUtils';
+import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
 import {ValidationService} from '@/schema/validationService';
 
 /**
