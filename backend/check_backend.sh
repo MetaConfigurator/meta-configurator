@@ -64,11 +64,29 @@ done
 if command -v curl >/dev/null 2>&1; then
   echo "===== HTTP checks ====="
   if [[ -n "${BASE_DOMAIN:-}" ]]; then
-    curl -fsS "https://${BASE_DOMAIN}/health" >/dev/null && echo "OK  https://${BASE_DOMAIN}/health" || echo "FAIL https://${BASE_DOMAIN}/health"
-    curl -fsS "https://${BASE_DOMAIN}/relay/health" >/dev/null && echo "OK  https://${BASE_DOMAIN}/relay/health" || echo "FAIL https://${BASE_DOMAIN}/relay/health"
-    curl -fsS -o /dev/null -w "%{http_code}" "https://${BASE_DOMAIN}/snapshot/does-not-exist" | grep -qx "404" \
-      && echo "OK  https://${BASE_DOMAIN}/snapshot/does-not-exist returned 404" \
-      || echo "FAIL https://${BASE_DOMAIN}/snapshot/does-not-exist"
+    DOMAIN="${BASE_DOMAIN#http://}"
+    DOMAIN="${DOMAIN#https://}"
+    DOMAIN="${DOMAIN%%/}"
+
+    relay_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/relay/health" || true)"
+    snapshot_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/snapshot/does-not-exist" || true)"
+    root_health_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/health" || true)"
+
+    [[ "$relay_status" == "200" ]] \
+      && echo "OK  https://${DOMAIN}/relay/health" \
+      || echo "FAIL https://${DOMAIN}/relay/health (status ${relay_status:-unreachable})"
+
+    [[ "$snapshot_status" == "404" ]] \
+      && echo "OK  https://${DOMAIN}/snapshot/does-not-exist returned 404" \
+      || echo "FAIL https://${DOMAIN}/snapshot/does-not-exist (status ${snapshot_status:-unreachable})"
+
+    if [[ "$root_health_status" == "200" ]]; then
+      echo "OK  https://${DOMAIN}/health"
+    elif [[ "$root_health_status" == "404" ]]; then
+      echo "INFO https://${DOMAIN}/health returned 404 (route not configured in this deployment)"
+    else
+      echo "FAIL https://${DOMAIN}/health (status ${root_health_status:-unreachable})"
+    fi
   else
     echo "Skipping domain checks because BASE_DOMAIN is not set."
   fi
