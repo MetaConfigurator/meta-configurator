@@ -37,21 +37,6 @@ curl http://localhost:5000/snapshot/missing-id   # → 404, service is up
 Ports / passwords can be overridden via a `.env` file next to `docker-compose.yml`
 (see `.env.example`). Defaults are fine for local use.
 
-To stop the local stack without deleting MongoDB / Redis data:
-
-```bash
-docker compose stop
-```
-
-To remove the containers but keep the data volumes:
-
-```bash
-docker compose down
-```
-
-Do not use `docker compose down -v` unless you explicitly want to delete the
-named `mongo-data` and `redis-data` volumes.
-
 ### 3. Docker + HTTPS — standalone production
 
 For deploying *only* this service behind its own nginx + Let's Encrypt
@@ -68,30 +53,6 @@ docker compose -f docker-compose.https.yml up -d --build
 For deploying alongside the other backend services behind a single shared
 reverse proxy, use the parent `backend/docker-compose.yml`. See
 [../README.md](../README.md).
-
-## Safe update workflow
-
-When code has changed and you want to redeploy without losing persisted data:
-
-```bash
-cd backend/snapshot_sharing
-docker compose stop
-git pull
-docker compose up -d --build
-docker compose ps
-```
-
-For the joint production stack, run the same pattern from `backend/` instead,
-using the parent compose file.
-
-Important:
-
-- Do not replace `stop` or `down` with `down -v` unless you intend to wipe the
-  MongoDB and Redis data.
-- Keep the same `MONGO_PASS` and `REDIS_PASS` values when reusing an existing
-  MongoDB / Redis volume.
-- If you are unsure whether the data volume still exists, check `docker volume ls`
-  before restarting.
 
 ## Configuration
 

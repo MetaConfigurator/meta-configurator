@@ -41,7 +41,9 @@ split-service architecture.
 
 ## Running services
 
-Every service supports three deployment modes:
+Use `docker compose`, not the legacy `docker-compose`.
+
+Each service supports three deployment modes:
 
 | Mode | Command | When |
 |---|---|---|
@@ -59,26 +61,13 @@ docker compose up -d --build     # uses ./docker-compose.yml
 See each service's `README.md` for service-specific setup (config files,
 secrets, …).
 
-## Stopping services safely
+## Operations
 
-To stop the joint stack without deleting persistent data:
+From `backend/`, the common joint-stack commands are:
 
 ```bash
-cd backend
+docker compose up -d --build
 docker compose stop
-```
-
-Or use the helper script:
-
-```bash
-cd backend
-bash stop_backend.sh
-```
-
-If you want to remove the containers but keep the data volumes:
-
-```bash
-cd backend
 docker compose down
 ```
 
@@ -87,25 +76,23 @@ MongoDB and Redis volumes as well. In this stack, snapshot-sharing persists
 its database in the named volume `mongo-data`, so `down -v` removes the stored
 database contents.
 
-## Updating code safely
-
-When backend code or compose files have changed, use this rollout pattern on
-the server:
+When code changed, the usual redeploy is:
 
 ```bash
-cd backend
 docker compose stop
 git pull
 docker compose up -d --build
 docker compose ps
 ```
 
-Equivalent helper script for the startup step:
+If only one service changed, rebuild and restart just that service:
 
 ```bash
-cd backend
-bash start_backend.sh
+docker compose up -d --build snapshot_sharing
 ```
+
+The other containers keep running. This also works for `relay` and future
+services added to the joint compose file.
 
 Notes:
 
@@ -119,15 +106,17 @@ Notes:
 
 ## Helper scripts
 
-The joint stack ships with three small operational scripts in `backend/`:
+The helper scripts in `backend/` wrap the compose commands above:
 
-- `bash stop_backend.sh [path-to-env-file]` stops all containers gracefully and
-  then prints `docker compose ps`.
-- `bash start_backend.sh [path-to-env-file]` starts the full stack with
-  `up -d --build` and then prints `docker compose ps`.
+- `bash start_backend.sh [path-to-env-file]` builds and starts the full stack.
+- `bash stop_backend.sh [path-to-env-file]` stops the full stack without
+  deleting data.
+- `bash start_backend_service.sh [path-to-env-file] <service-name>` rebuilds
+  and starts one service.
+- `bash stop_backend_service.sh [path-to-env-file] <service-name>` stops one
+  service.
 - `bash check_backend.sh [path-to-env-file]` prints overall container status,
-  checks that each expected service is running, shows recent logs per service,
-  and performs simple HTTP checks when `curl` and `BASE_DOMAIN` are available.
+  shows recent logs, and runs simple HTTP checks.
 
 If no env file is passed, the scripts default to `backend/.env`.
 

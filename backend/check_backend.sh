@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_FILE="${1:-$SCRIPT_DIR/.env}"
+source "$SCRIPT_DIR/_compose_helpers.sh"
 SERVICES=(
   snapshot_sharing
   mongo
@@ -12,25 +12,14 @@ SERVICES=(
   letsencrypt
 )
 
-if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
-  COMPOSE_CMD=(docker compose)
-elif command -v docker-compose >/dev/null 2>&1; then
-  COMPOSE_CMD=(docker-compose)
-else
-  echo "Docker Compose is not installed." >&2
-  exit 1
-fi
+resolve_compose_cmd
+resolve_env_file "$SCRIPT_DIR" "${1:-$SCRIPT_DIR/.env}"
 
-COMPOSE_ARGS=()
 if [[ -f "$ENV_FILE" ]]; then
-  COMPOSE_ARGS+=(--env-file "$ENV_FILE")
   set -a
   # shellcheck disable=SC1090
   source "$ENV_FILE"
   set +a
-elif [[ "$ENV_FILE" != "$SCRIPT_DIR/.env" ]]; then
-  echo "Env file not found: $ENV_FILE" >&2
-  exit 1
 fi
 
 cd "$SCRIPT_DIR"

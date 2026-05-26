@@ -33,18 +33,6 @@ docker compose up -d --build
 
 Or use the helper scripts: `bash build.sh && bash run.sh`.
 
-To stop the local relay container:
-
-```bash
-docker compose stop
-```
-
-To remove the containers after stopping them:
-
-```bash
-docker compose down
-```
-
 ### 3. Docker + HTTPS — standalone production
 
 For deploying *only* the relay behind its own nginx + Let's Encrypt:
@@ -63,25 +51,6 @@ For deploying alongside the other backend services behind a single shared
 reverse proxy, use the parent `backend/docker-compose.yml` — the joint stack
 mounts the relay at `https://${BASE_DOMAIN}/relay/`. See
 [../README.md](../README.md).
-
-## Safe update workflow
-
-When relay code or configuration has changed:
-
-```bash
-cd backend/relay
-docker compose stop
-git pull
-docker compose up -d --build
-docker compose ps
-```
-
-For the joint production stack, run the update from `backend/` instead so the
-shared reverse proxy and sibling services stay in sync with the parent compose
-file.
-
-If only `config.yaml` changed and the image did not, `docker compose up -d`
-is usually enough; keep `--build` for code or Dockerfile changes.
 
 ## Connect to MetaConfigurator
 
