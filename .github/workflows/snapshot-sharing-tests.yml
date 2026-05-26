@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  unit-tests:
-    name: Python unit tests
+  snapshot-sharing-tests:
+    name: Snapshot sharing tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,19 +26,10 @@ jobs:
         working-directory: ./backend/snapshot_sharing
         run: pytest tests/ -v
 
-  docker-e2e:
-    name: Docker e2e tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Show Docker tool versions
         run: |
           docker version
-          docker buildx version
+          docker buildx version || true
           docker compose version
 
       - name: Run snapshot_sharing docker e2e
