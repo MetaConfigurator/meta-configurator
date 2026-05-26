@@ -3,15 +3,67 @@ import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/set
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {detectSchemaFeatures} from '@/schema/detectSchemaFeatures';
+import {SETTINGS_SCHEMA} from '@/settings/settingsSchema';
+import type {Path} from '@/utility/path';
+import {getObjectSchemaAtDataPath, getParentObjectSchemaAtDataPath} from '@/utility/pathUtils';
+import {ValidationService} from '@/schema/validationService';
 
-export function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
+function isPlainObject(value: unknown) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+export function addDefaultsForMissingFields(
+  userFile: any,
+  defaultsFile: any,
+  rootSchema: TopLevelSchema = SETTINGS_SCHEMA,
+  userRoot: any = userFile,
+  path: Path = [],
+  validationService: ValidationService = new ValidationService(rootSchema)
+) {
   for (const key in defaultsFile) {
+    const fullPath = [...path, key];
     if (!(key in userFile)) {
-      userFile[key] = defaultsFile[key];
+      const parentSchema = getParentObjectSchemaAtDataPath(
+        rootSchema,
+        fullPath,
+        userRoot,
+        validationService
+      );
+      const propertyName = fullPath[fullPath.length - 1];
+      if (
+        typeof propertyName !== 'string' ||
+        !(parentSchema?.required ?? []).includes(propertyName)
+      ) {
+        continue;
+      }
+
+      if (
+        isPlainObject(defaultsFile[key]) &&
+        getObjectSchemaAtDataPath(rootSchema, fullPath, userRoot, validationService)
+      ) {
+        userFile[key] = {};
+        addDefaultsForMissingFields(
+          userFile[key],
+          defaultsFile[key],
+          rootSchema,
+          userRoot,
+          fullPath,
+          validationService
+        );
+      } else {
+        userFile[key] = defaultsFile[key];
+      }
 
       // element itself was existing, but maybe it has some missing fields
-    } else if (typeof defaultsFile[key] === 'object' && !Array.isArray(defaultsFile[key])) {
-      addDefaultsForMissingFields(userFile[key], defaultsFile[key]);
+    } else if (isPlainObject(defaultsFile[key])) {
+      addDefaultsForMissingFields(
+        userFile[key],
+        defaultsFile[key],
+        rootSchema,
+        userRoot,
+        fullPath,
+        validationService
+      );
     }
   }
 }
@@ -51,7 +103,7 @@ export function fixPanels(userData: SettingsInterfaceRoot, defaultData: Settings
 }
 
 export function updateSettingsWithDefaults(settings: any, defaultSettings: any): any {
-  addDefaultsForMissingFields(settings, defaultSettings);
+  addDefaultsForMissingFields(settings, defaultSettings, SETTINGS_SCHEMA, settings);
   fixPanels(settings, defaultSettings);
   migrateSettingsVersion(settings);
   return settings;

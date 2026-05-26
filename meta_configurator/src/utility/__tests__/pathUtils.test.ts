@@ -4,6 +4,8 @@ import {
   arePathsEqual,
   asciiToPath,
   dataPathToSchemaPath,
+  getObjectSchemaAtDataPath,
+  getParentObjectSchemaAtDataPath,
   getParentElementRequiredPropsPath,
   jsonPointerToPath,
   jsonPointerToPathTyped,
@@ -116,6 +118,184 @@ describe('test pathUtils', () => {
     const expectedResult = ['properties', 'foo', 'required'];
     const requiredProps = getParentElementRequiredPropsPath(schema, path);
     expect(requiredProps).toEqual(expectedResult);
+  });
+
+  it('resolves the matching oneOf object schema variant for a data path', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        backend: {
+          oneOf: [
+            {
+              type: 'object',
+              required: ['endpoint'],
+              additionalProperties: false,
+              properties: {
+                endpoint: {type: 'string'},
+              },
+            },
+            {
+              type: 'object',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {type: 'string'},
+                endpoint: {type: 'string'},
+              },
+            },
+          ],
+        },
+      },
+    };
+    const data = {
+      backend: {
+        endpoint: 'https://api.openai.com/v1/',
+      },
+    };
+
+    const schemaAtPath = getObjectSchemaAtDataPath(schema, ['backend'], data);
+    const parentSchema = getParentObjectSchemaAtDataPath(schema, ['backend', 'endpoint'], data);
+
+    expect(schemaAtPath?.required).toEqual(['endpoint']);
+    expect(parentSchema?.required).toEqual(['endpoint']);
+  });
+
+  it('returns the root object schema for the empty data path', () => {
+    const schema = {
+      type: 'object',
+      required: ['backend'],
+      properties: {
+        backend: {
+          type: 'object',
+          required: ['endpoint'],
+          properties: {
+            endpoint: {type: 'string'},
+          },
+        },
+      },
+    };
+    const data = {
+      backend: {
+        endpoint: 'https://api.openai.com/v1/',
+      },
+    };
+
+    const schemaAtRoot = getObjectSchemaAtDataPath(schema, [], data);
+
+    expect(schemaAtRoot?.required).toEqual(['backend']);
+  });
+
+  it('resolves nested object schemas along a normal property path', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        aiIntegration: {
+          type: 'object',
+          required: ['backend'],
+          properties: {
+            backend: {
+              type: 'object',
+              required: ['endpoint'],
+              properties: {
+                endpoint: {type: 'string'},
+              },
+            },
+          },
+        },
+      },
+    };
+    const data = {
+      aiIntegration: {
+        backend: {
+          endpoint: 'https://api.openai.com/v1/',
+        },
+      },
+    };
+
+    const schemaAtPath = getObjectSchemaAtDataPath(schema, ['aiIntegration', 'backend'], data);
+    const parentSchema = getParentObjectSchemaAtDataPath(
+      schema,
+      ['aiIntegration', 'backend', 'endpoint'],
+      data
+    );
+
+    expect(schemaAtPath?.required).toEqual(['endpoint']);
+    expect(parentSchema?.required).toEqual(['endpoint']);
+  });
+
+  it('resolves the relay variant when relay-specific properties are present', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        backend: {
+          oneOf: [
+            {
+              type: 'object',
+              required: ['endpoint'],
+              additionalProperties: false,
+              properties: {
+                endpoint: {type: 'string'},
+              },
+            },
+            {
+              type: 'object',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {type: 'string', pattern: '^https://'},
+                endpoint: {type: 'string'},
+              },
+            },
+          ],
+        },
+      },
+    };
+    const data = {
+      backend: {
+        relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+        endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+      },
+    };
+
+    const schemaAtPath = getObjectSchemaAtDataPath(schema, ['backend'], data);
+
+    expect(schemaAtPath?.required).toEqual(['relay', 'endpoint']);
+  });
+
+  it('falls back to the first declared oneOf variant when none validate fully', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        backend: {
+          oneOf: [
+            {
+              type: 'object',
+              required: ['endpoint'],
+              additionalProperties: false,
+              properties: {
+                endpoint: {type: 'string'},
+              },
+            },
+            {
+              type: 'object',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {type: 'string', pattern: '^https://'},
+                endpoint: {type: 'string'},
+              },
+            },
+          ],
+        },
+      },
+    };
+    const data = {
+      backend: {},
+    };
+
+    const schemaAtPath = getObjectSchemaAtDataPath(schema, ['backend'], data);
+
+    expect(schemaAtPath?.required).toEqual(['endpoint']);
   });
 
   it('should correctly detect whether to paths are equal', () => {
