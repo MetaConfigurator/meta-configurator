@@ -5,6 +5,10 @@ on:
     paths:
       - 'backend/snapshot_sharing/**'
       - '.github/workflows/snapshot-sharing-tests.yml'
+  pull_request:
+    paths:
+      - 'backend/snapshot_sharing/**'
+      - '.github/workflows/snapshot-sharing-tests.yml'
   workflow_dispatch:
 
 jobs:
