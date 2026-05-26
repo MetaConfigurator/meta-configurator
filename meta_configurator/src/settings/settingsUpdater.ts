@@ -5,7 +5,10 @@ import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {detectSchemaFeatures} from '@/schema/detectSchemaFeatures';
 import {SETTINGS_SCHEMA} from '@/settings/settingsSchema';
 import type {Path} from '@/utility/path';
-import {getObjectSchemaAtDataPath, getParentObjectSchemaAtDataPath} from '@/schema/schemaReadingUtils';
+import {
+  getObjectSchemaAtDataPath,
+  getParentObjectSchemaAtDataPath,
+} from '@/schema/schemaReadingUtils';
 import {ValidationService} from '@/schema/validationService';
 
 function isPlainObject(value: unknown) {

@@ -82,8 +82,8 @@ export function resolveObjectSchemaVariant(
     return schema;
   }
 
-  const fullyMatchingVariant = variants.find(variant =>
-    validationService.validateSubSchema(variant, currentData).valid
+  const fullyMatchingVariant = variants.find(
+    variant => validationService.validateSubSchema(variant, currentData).valid
   );
   if (fullyMatchingVariant) {
     return fullyMatchingVariant;
@@ -98,7 +98,11 @@ export function getObjectSchemaAtDataPath(
   rootData: any,
   validationService: ValidationService = new ValidationService(rootSchema)
 ): JsonSchemaObjectType | undefined {
-  let currentSchema = resolveObjectSchemaVariant(nonBooleanSchema(rootSchema), rootData, validationService);
+  let currentSchema = resolveObjectSchemaVariant(
+    nonBooleanSchema(rootSchema),
+    rootData,
+    validationService
+  );
   let currentData = rootData;
 
   for (const segment of path) {

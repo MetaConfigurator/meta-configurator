@@ -32,7 +32,11 @@ vi.mock('@/components/panels/panelTypeRegistry', () => ({
   },
 }));
 
-import {addDefaultsForMissingFields, fixPanels, updateSettingsWithDefaults} from '../settingsUpdater';
+import {
+  addDefaultsForMissingFields,
+  fixPanels,
+  updateSettingsWithDefaults,
+} from '../settingsUpdater';
 
 describe('test settings updater', () => {
   let userSettings: any = {

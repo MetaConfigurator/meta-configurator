@@ -1,5 +1,8 @@
 import {describe, expect, it, vi} from 'vitest';
-import {getObjectSchemaAtDataPath, getParentObjectSchemaAtDataPath} from '@/schema/schemaReadingUtils';
+import {
+  getObjectSchemaAtDataPath,
+  getParentObjectSchemaAtDataPath,
+} from '@/schema/schemaReadingUtils';
 
 vi.mock('@/data/useDataLink', () => ({
   getSchemaForMode: vi.fn(),
