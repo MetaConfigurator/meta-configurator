@@ -3,12 +3,14 @@ import type {
   JsonSchemaType,
   SchemaPropertyType,
   SchemaPropertyTypes,
+  TopLevelSchema,
 } from '@/schema/jsonSchemaType';
 import {NUMBER_OF_PROPERTY_TYPES, SCHEMA_PROPERTY_TYPES} from '@/schema/jsonSchemaType';
 import type {Path} from '@/utility/path';
 import type {ManagedData} from '@/data/managedData';
-import type {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
 import {resolveInternalReferenceSchema} from '@/schema/schemaReferenceUtils';
+import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
+import {ValidationService} from '@/schema/validationService';
 
 /**
  * Returns a string representation of the type of the property.
@@ -61,6 +63,65 @@ export function isSchemaEmpty(schema: JsonSchemaType): boolean {
     return false;
   }
   return Object.keys(schema).length === 0;
+}
+
+export function resolveObjectSchemaVariant(
+  schema: JsonSchemaObjectType | undefined,
+  currentData: any,
+  validationService: ValidationService
+): JsonSchemaObjectType | undefined {
+  if (!schema?.oneOf?.length) {
+    return schema;
+  }
+
+  const variants = schema.oneOf
+    .map(variant => nonBooleanSchema(variant))
+    .filter((variant): variant is JsonSchemaObjectType => variant !== undefined);
+
+  if (variants.length === 0) {
+    return schema;
+  }
+
+  const fullyMatchingVariant = variants.find(
+    variant => validationService.validateSubSchema(variant, currentData).valid
+  );
+  if (fullyMatchingVariant) {
+    return fullyMatchingVariant;
+  }
+
+  return variants[0];
+}
+
+export function getObjectSchemaAtDataPath(
+  rootSchema: TopLevelSchema,
+  path: Path,
+  rootData: any,
+  validationService: ValidationService = new ValidationService(rootSchema)
+): JsonSchemaObjectType | undefined {
+  let currentSchema = resolveObjectSchemaVariant(
+    nonBooleanSchema(rootSchema),
+    rootData,
+    validationService
+  );
+  let currentData = rootData;
+
+  for (const segment of path) {
+    currentSchema = resolveObjectSchemaVariant(currentSchema, currentData, validationService);
+    const nextSchema = nonBooleanSchema(currentSchema?.properties?.[segment] as JsonSchemaType);
+    currentData = currentData?.[segment];
+    currentSchema = resolveObjectSchemaVariant(nextSchema, currentData, validationService);
+  }
+
+  return currentSchema;
+}
+
+export function getParentObjectSchemaAtDataPath(
+  rootSchema: TopLevelSchema,
+  path: Path,
+  rootData: any,
+  validationService: ValidationService = new ValidationService(rootSchema)
+): JsonSchemaObjectType | undefined {
+  return getObjectSchemaAtDataPath(rootSchema, path.slice(0, -1), rootData, validationService);
 }
 
 export function findAvailableSchemaId(

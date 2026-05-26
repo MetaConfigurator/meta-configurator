@@ -11,6 +11,13 @@ RELAY_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 IMAGE="mc-relay-smoke-$$"
 HEALTH_TIMEOUT_SECONDS=60
 
+# Dummy env vars expected by docker-compose.https.yml. The HTTPS smoke test
+# only starts the relay container, not nginx-proxy / letsencrypt, so these
+# placeholders are never observed externally — they just have to be set so
+# compose-file interpolation succeeds.
+export RELAY_HOSTNAME="${RELAY_HOSTNAME:-relay.test.example.com}"
+export LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-test@example.com}"
+
 # Auto-detect Docker socket (Colima uses a non-standard path).
 if [ -z "${DOCKER_HOST:-}" ]; then
   COLIMA_SOCK="$HOME/.colima/default/docker.sock"

@@ -118,11 +118,12 @@ export const SETTINGS_DATA_DEFAULT = {
     groupBySubject: false,
   },
   aiIntegration: {
-    model: 'gpt-4o-mini',
+    model: 'alias-fast',
     max_tokens: 5000,
     temperature: 0.0,
     backend: {
-      endpoint: 'https://api.openai.com/v1/',
+      relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+      endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
     },
   },
   schemaSelectionLists: [

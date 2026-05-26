@@ -29,21 +29,36 @@ app.wsgi_app = ProxyFix(
     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1
 )
 
-# Allow requests from your frontend origin
+# Allow requests from configured frontend origins.
+DEFAULT_CORS_ORIGINS = [
+    "http://localhost:5173",  # local dev server
+    "https://metaconfigurator.github.io",  # experimental GitHub Pages
+    "https://logende.github.io",  # prod stable release and other accesses by Logende GitHub account
+    "https://www.metaconfigurator.org",  # prod stable release
+    "https://metaconfigurator.org",  # apex domain variant
+    "https://metaconfigurator.informatik.uni-stuttgart.de",  # Uni Stuttgart deployment
+]
+
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)).split(",")
+    if origin.strip()
+]
+
 CORS(app, resources={
     r"/*": {
-        "origins": [
-            "http://localhost:5173",  # local dev server
-            "https://metaconfigurator.github.io",  # experimental GitHub Pages
-            "https://logende.github.io",  # prod stable release and other accesses by Logende GitHub account
-            "https://www.metaconfigurator.org"  # prod stable release
-        ],
+        "origins": CORS_ALLOWED_ORIGINS,
         "supports_credentials": True
     }
 })
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
+
+# When TESTING=true the app swaps real Mongo/Redis for in-memory mocks and
+# uses the limiter's memory backend. Lets unit tests import this module
+# without any running infrastructure.
+TESTING = os.getenv("TESTING", "").lower() == "true"
 
 # Get MongoDB credentials and connection info from environment variables
 MONGO_USER = os.getenv("MONGO_USER", "root")
@@ -52,18 +67,21 @@ MONGO_HOST = os.getenv("MONGO_HOST", "mongo")
 MONGO_PORT = os.getenv("MONGO_PORT", "27017")
 MONGO_DB = os.getenv("MONGO_DB", "metaconfigurator")
 
-app.logger.debug(
-    f"Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}"
-)
+if TESTING:
+    import mongomock
 
-# MongoDB connection
-client = MongoClient(
-    host=MONGO_HOST,
-    port=int(MONGO_PORT),
-    username=MONGO_USER,
-    password=MONGO_PASS,
-    authSource="admin",
-)
+    client = mongomock.MongoClient()
+else:
+    app.logger.debug(
+        f"Connecting to MongoDB at mongodb://{MONGO_USER}:<hidden>@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}"
+    )
+    client = MongoClient(
+        host=MONGO_HOST,
+        port=int(MONGO_PORT),
+        username=MONGO_USER,
+        password=MONGO_PASS,
+        authSource="admin",
+    )
 db = client[MONGO_DB]
 
 # Set up Redis connection
@@ -74,18 +92,24 @@ REDIS_PASS = os.getenv("REDIS_PASS", None)
 # Construct the Redis URL including the password
 REDIS_URL = f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0"
 
-# Initialize Redis client
-redis_client = redis.Redis.from_url(REDIS_URL)
+if TESTING:
+    # In-memory limiter, no Redis ping.
+    LIMITER_STORAGE_URI = "memory://"
+else:
+    LIMITER_STORAGE_URI = REDIS_URL
+    redis_client = redis.Redis.from_url(REDIS_URL)
+    try:
+        redis_client.ping()
+        print("Redis connected successfully")
+    except redis.ConnectionError as e:
+        print(f"Redis connection failed: {e}")
 
-try:
-    redis_client.ping()
-    print("Redis connected successfully")
-except redis.ConnectionError as e:
-    print(f"Redis connection failed: {e}")
 
-
-# Set up Flask-Limiter with Redis
-limiter = Limiter(get_remote_address, app=app, storage_uri=REDIS_URL)
+# Set up Flask-Limiter. Honor RATELIMIT_ENABLED=false so e2e tests / local
+# dev can bypass the per-endpoint limits without making the test slow.
+if os.getenv("RATELIMIT_ENABLED", "true").lower() == "false":
+    app.config["RATELIMIT_ENABLED"] = False
+limiter = Limiter(get_remote_address, app=app, storage_uri=LIMITER_STORAGE_URI)
 
 # Set up logging to print to a file
 logging.basicConfig(
@@ -103,6 +127,8 @@ SNAPSHOT_EXPIRY_DAYS = timedelta(
     days=30
 )  # Snapshot not accessed for 30 days will be deleted
 CHECK_INTERVAL = 86400  # 1 day in seconds
+ALLOWED_MODES = {"data", "schema", "settings"}
+DEFAULT_MODE = "data"
 
 
 def is_file_length_valid(file_content):
@@ -127,6 +153,14 @@ def add_snapshot():
         schema = request_data.get("schema")
         settings = request_data.get("settings")
         snapshot_id = request_data.get("snapshot_id")
+        mode = request_data.get("mode", DEFAULT_MODE)
+        if mode not in ALLOWED_MODES:
+            return (
+                jsonify(
+                    {"error": f"Invalid mode '{mode}'. Allowed values: {sorted(ALLOWED_MODES)}"}
+                ),
+                400,
+            )
 
         if not all(map(is_file_length_valid, [data, schema, settings])):
             return jsonify({"error": "One or more files too large"}), 413
@@ -172,6 +206,7 @@ def add_snapshot():
                 "data_id": data_id,
                 "schema_id": schema_id,
                 "settings_id": settings_id,
+                "mode": mode,
                 "metadata": {
                     "creationDate": creation_date,
                     "lastAccessDate": creation_date,
@@ -216,10 +251,16 @@ def get_snapshot(snapshot_id):
             },
         )
 
+        # Default mode for legacy snapshots that pre-date the mode field.
+        mode = snapshot.get("mode") or DEFAULT_MODE
+        if mode not in ALLOWED_MODES:
+            mode = DEFAULT_MODE
+
         response = {
             "data": data["file"],
             "schema": schema["file"],
             "settings": settings["file"],
+            "mode": mode,
         }
 
         return jsonify(response)

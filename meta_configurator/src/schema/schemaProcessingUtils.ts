@@ -4,21 +4,8 @@ import type {
   SchemaPropertyType,
 } from '@/schema/jsonSchemaType';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
+import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
 import type {SessionMode} from '@/store/sessionMode';
-
-/**
- * @returns the schema if it is not a boolean, otherwise
- * returns an empty object if the schema is true, or undefined if the schema is false
- */
-export function nonBooleanSchema(schema: JsonSchemaType): JsonSchemaObjectType | undefined {
-  if (schema === true) {
-    return {};
-  }
-  if (schema === false) {
-    return undefined;
-  }
-  return schema;
-}
 
 /**
  * Coverts an array of schemas to an array of JsonSchema objects.
