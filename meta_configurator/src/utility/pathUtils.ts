@@ -1,9 +1,6 @@
 import type {Path, PathElement} from '@/utility/path';
 import pointer from 'json-pointer';
 import {dataAt} from '@/utility/resolveDataAtPath';
-import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
-import {nonBooleanSchema, resolveObjectSchemaVariant} from '@/schema/schemaProcessingUtils';
-import {ValidationService} from '@/schema/validationService';
 
 /**
  * Converts a path to a string.
@@ -98,34 +95,6 @@ export function dataPathToSchemaPath(dataPath: Path): Path {
   }
 
   return schemaPath;
-}
-
-export function getObjectSchemaAtDataPath(
-  rootSchema: TopLevelSchema,
-  path: Path,
-  rootData: any,
-  validationService: ValidationService = new ValidationService(rootSchema)
-): JsonSchemaObjectType | undefined {
-  let currentSchema = resolveObjectSchemaVariant(nonBooleanSchema(rootSchema), rootData, validationService);
-  let currentData = rootData;
-
-  for (const segment of path) {
-    currentSchema = resolveObjectSchemaVariant(currentSchema, currentData, validationService);
-    const nextSchema = nonBooleanSchema(currentSchema?.properties?.[segment] as JsonSchemaType);
-    currentData = currentData?.[segment];
-    currentSchema = resolveObjectSchemaVariant(nextSchema, currentData, validationService);
-  }
-
-  return currentSchema;
-}
-
-export function getParentObjectSchemaAtDataPath(
-  rootSchema: TopLevelSchema,
-  path: Path,
-  rootData: any,
-  validationService: ValidationService = new ValidationService(rootSchema)
-): JsonSchemaObjectType | undefined {
-  return getObjectSchemaAtDataPath(rootSchema, path.slice(0, -1), rootData, validationService);
 }
 
 export function getParentElementRequiredPropsPath(

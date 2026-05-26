@@ -5,7 +5,6 @@ import type {
 } from '@/schema/jsonSchemaType';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {SessionMode} from '@/store/sessionMode';
-import {ValidationService} from '@/schema/validationService';
 
 /**
  * @returns the schema if it is not a boolean, otherwise
@@ -67,31 +66,4 @@ export function schemaFromObject(
  */
 export function typeSchema(type: SchemaPropertyType, mode: SessionMode): JsonSchemaWrapper {
   return new JsonSchemaWrapper({type}, mode, false);
-}
-
-export function resolveObjectSchemaVariant(
-  schema: JsonSchemaObjectType | undefined,
-  currentData: any,
-  validationService: ValidationService
-): JsonSchemaObjectType | undefined {
-  if (!schema?.oneOf?.length) {
-    return schema;
-  }
-
-  const variants = schema.oneOf
-    .map(variant => nonBooleanSchema(variant))
-    .filter((variant): variant is JsonSchemaObjectType => variant !== undefined);
-
-  if (variants.length === 0) {
-    return schema;
-  }
-
-  const fullyMatchingVariant = variants.find(variant =>
-    validationService.validateSubSchema(variant, currentData).valid
-  );
-  if (fullyMatchingVariant) {
-    return fullyMatchingVariant;
-  }
-
-  return variants[0];
 }
