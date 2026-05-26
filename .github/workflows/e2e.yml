@@ -3,8 +3,14 @@ name: E2E Tests
 on:
   push:
     branches: [develop]
+    paths:
+      - 'meta_configurator/**'
+      - '.github/workflows/e2e.yml'
   pull_request:
     branches: [develop]
+    paths:
+      - 'meta_configurator/**'
+      - '.github/workflows/e2e.yml'
 
 jobs:
   e2e:
