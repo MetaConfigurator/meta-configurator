@@ -29,15 +29,25 @@ app.wsgi_app = ProxyFix(
     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1
 )
 
-# Allow requests from your frontend origin
+# Allow requests from configured frontend origins.
+DEFAULT_CORS_ORIGINS = [
+    "http://localhost:5173",  # local dev server
+    "https://metaconfigurator.github.io",  # experimental GitHub Pages
+    "https://logende.github.io",  # prod stable release and other accesses by Logende GitHub account
+    "https://www.metaconfigurator.org",  # prod stable release
+    "https://metaconfigurator.org",  # apex domain variant
+    "https://metaconfigurator.informatik.uni-stuttgart.de",  # Uni Stuttgart deployment
+]
+
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)).split(",")
+    if origin.strip()
+]
+
 CORS(app, resources={
     r"/*": {
-        "origins": [
-            "http://localhost:5173",  # local dev server
-            "https://metaconfigurator.github.io",  # experimental GitHub Pages
-            "https://logende.github.io",  # prod stable release and other accesses by Logende GitHub account
-            "https://www.metaconfigurator.org"  # prod stable release
-        ],
+        "origins": CORS_ALLOWED_ORIGINS,
         "supports_credentials": True
     }
 })

@@ -42,6 +42,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASS: ${REDIS_PASS:?REDIS_PASS variable is not set}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,https://metaconfigurator.github.io,https://logende.github.io,https://www.metaconfigurator.org,https://metaconfigurator.org,https://metaconfigurator.informatik.uni-stuttgart.de}
       FLASK_ENABLE_SSL: "false"
 
   mongo:

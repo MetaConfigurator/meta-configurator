@@ -59,6 +59,78 @@ docker compose up -d --build     # uses ./docker-compose.yml
 See each service's `README.md` for service-specific setup (config files,
 secrets, …).
 
+## Stopping services safely
+
+To stop the joint stack without deleting persistent data:
+
+```bash
+cd backend
+docker compose stop
+```
+
+Or use the helper script:
+
+```bash
+cd backend
+bash stop_backend.sh
+```
+
+If you want to remove the containers but keep the data volumes:
+
+```bash
+cd backend
+docker compose down
+```
+
+Do not use `docker compose down -v` unless you explicitly want to delete the
+MongoDB and Redis volumes as well. In this stack, snapshot-sharing persists
+its database in the named volume `mongo-data`, so `down -v` removes the stored
+database contents.
+
+## Updating code safely
+
+When backend code or compose files have changed, use this rollout pattern on
+the server:
+
+```bash
+cd backend
+docker compose stop
+git pull
+docker compose up -d --build
+docker compose ps
+```
+
+Equivalent helper script for the startup step:
+
+```bash
+cd backend
+bash start_backend.sh
+```
+
+Notes:
+
+- Keep using the same compose project name as before, otherwise Docker may
+  create fresh volumes with different names and the services will appear to
+  start with empty state.
+- Keep `MONGO_PASS` and `REDIS_PASS` unchanged unless you are intentionally
+  migrating credentials and know how the existing data stores were initialized.
+- Before a production update, consider verifying that the expected volumes
+  still exist with `docker volume ls`.
+
+## Helper scripts
+
+The joint stack ships with three small operational scripts in `backend/`:
+
+- `bash stop_backend.sh [path-to-env-file]` stops all containers gracefully and
+  then prints `docker compose ps`.
+- `bash start_backend.sh [path-to-env-file]` starts the full stack with
+  `up -d --build` and then prints `docker compose ps`.
+- `bash check_backend.sh [path-to-env-file]` prints overall container status,
+  checks that each expected service is running, shows recent logs per service,
+  and performs simple HTTP checks when `curl` and `BASE_DOMAIN` are available.
+
+If no env file is passed, the scripts default to `backend/.env`.
+
 ## Adding a new backend service
 
 The structure is intentionally repetitive so new services follow the same
