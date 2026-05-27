@@ -5,6 +5,7 @@ import {ValidationService} from '@/schema/validationService';
 import {ValidationResult} from '@/schema/validationUtils';
 import {useSettings} from '@/settings/useSettings';
 import {sizeOf} from '@/utility/sizeOf';
+import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 
 // Import worker as ESM
 import ValidationWorker from '@/workers/validationWorker?worker';
@@ -15,7 +16,10 @@ export class ManagedValidation {
   private worker: Worker;
   private pendingTasks: Map<string, (result: ValidationResult) => void> = new Map();
 
-  constructor(public mode: SessionMode) {
+  constructor(
+    public mode: SessionMode,
+    private validationSchemaRaw?: Ref<JsonSchemaType>
+  ) {
     this.worker = new ValidationWorker();
 
     this.worker.onmessage = (e: MessageEvent) => {
@@ -37,14 +41,14 @@ export class ManagedValidation {
       this.updateValidationResultAsync();
     });
 
-    watch(getSchemaForMode(this.mode).schemaRaw, () => {
+    watch(this.getValidationSchemaRaw(), () => {
       this.updateValidationResultAsync();
     });
   }
 
   // this service is used by other components, to validate for example conditionals
   public currentValidationService = computed(() => {
-    const schema = getSchemaForMode(this.mode).schemaRaw.value;
+    const schema = this.getValidationSchemaRaw().value;
     return new ValidationService(schema ?? {});
   });
 
@@ -80,7 +84,7 @@ export class ManagedValidation {
       }
 
       // duplicate the schema and remove external references to avoid ajv trying to fetch them and throwing an error if they are not available
-      const schema = JSON.parse(JSON.stringify(getSchemaForMode(this.mode).schemaRaw.value));
+      const schema = JSON.parse(JSON.stringify(this.getValidationSchemaRaw().value));
       removeExternalReferences(schema);
 
       try {
@@ -97,5 +101,9 @@ export class ManagedValidation {
         this.updateValidationResultAsync();
       }
     }, 500);
+  }
+
+  private getValidationSchemaRaw(): Ref<JsonSchemaType> {
+    return this.validationSchemaRaw ?? getSchemaForMode(this.mode).schemaRaw;
   }
 }

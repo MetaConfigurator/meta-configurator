@@ -96,6 +96,10 @@ export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema)
   return metaSchema;
 }
 
+export function buildFullMetaSchema(): TopLevelSchema {
+  return structuredClone(META_SCHEMA_SIMPLIFIED);
+}
+
 const DEF_JSON_SCHEMA_WITHOUT_BOOLEAN_SCHEMA: JsonSchemaObjectType = {
   title: 'Json schema',
   $ref: '#/$defs/objectSubSchema',
