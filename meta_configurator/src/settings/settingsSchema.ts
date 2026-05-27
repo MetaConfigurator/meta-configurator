@@ -6,8 +6,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   description: 'MetaConfigurator settings',
   type: 'object',
   required: [
+    'settingsVersion',
+    'latestNewsHash',
     'dataFormat',
     'toolbarTitle',
+    'hideSchemaEditor',
+    'hideSettings',
     'performance',
     'textEditor',
     'guiEditor',
@@ -19,6 +23,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     'backend',
     'rdf',
     'aiIntegration',
+    'schemaSelectionLists',
   ],
   additionalProperties: false,
   properties: {
@@ -357,7 +362,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     metaSchema: {
       type: 'object',
-      required: ['allowBooleanSchema', 'allowMultipleTypes', 'objectTypesComfort'],
+      required: [
+        'allowBooleanSchema',
+        'allowMultipleTypes',
+        'objectTypesComfort',
+        'markMoreFieldsAsAdvanced',
+        'showAdditionalPropertiesButton',
+        'showJsonLdFields',
+      ],
       additionalProperties: false,
       description:
         'Meta Schema related settings belong here. They affect the functionality of the schema editor. By making the meta schema more expressive (e.g., by allowing multiple data types for a property), the schema editor will be more powerful but also more complicated.',
@@ -811,7 +823,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'Which panels to show in the editor and their order.',
       items: {
         type: 'object',
-        required: ['panelType', 'mode'],
+        required: ['panelType', 'mode', 'size'],
         additionalProperties: false,
         title: 'Panel',
         description: 'Panel type and tool mode.',
