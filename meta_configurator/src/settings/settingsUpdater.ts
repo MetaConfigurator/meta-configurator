@@ -154,7 +154,11 @@ function migrateSettingsVersion(userSettings: any) {
     userSettings.settingsVersion = '1.0.4';
     // if the current settings data AI endpoint entry is untouched, update it to the new defaults
     const aiIntegration = userSettings.aiIntegration;
-    if (aiIntegration.model === "gpt-4o-mini" && aiIntegration.backend && aiIntegration.backend.endpoint === "https://api.openai.com/v1/") {
+    if (
+      aiIntegration.model === 'gpt-4o-mini' &&
+      aiIntegration.backend &&
+      aiIntegration.backend.endpoint === 'https://api.openai.com/v1/'
+    ) {
       userSettings.aiIntegration = {
         model: 'alias-fast',
         max_tokens: 5000,
@@ -163,9 +167,8 @@ function migrateSettingsVersion(userSettings: any) {
           relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
           endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
         },
-      }
+      };
     }
-
   }
 }
 

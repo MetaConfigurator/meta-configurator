@@ -622,8 +622,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
                   pattern: '^https://',
                   examples: ['https://your-relay.example.com', 'https://relay.myorg.com'],
                   not: {
-                    const: "https://metaconfigurator.informatik.uni-stuttgart.de/relay"
-                  }
+                    const: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+                  },
                 },
                 endpoint: {
                   type: 'string',

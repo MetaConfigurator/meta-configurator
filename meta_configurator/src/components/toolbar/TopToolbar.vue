@@ -333,5 +333,4 @@ useMagicKeys({
     flex-basis: 5.25rem;
   }
 }
-
 </style>
