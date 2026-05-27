@@ -148,6 +148,25 @@ function migrateSettingsVersion(userSettings: any) {
       }
     }
   }
+
+  if (userSettings.settingsVersion === '1.0.3') {
+    // migrate from 1.0.3 to 1.0.4
+    userSettings.settingsVersion = '1.0.4';
+    // if the current settings data AI endpoint entry is untouched, update it to the new defaults
+    const aiIntegration = userSettings.aiIntegration;
+    if (aiIntegration.model === "gpt-4o-mini" && aiIntegration.backend && aiIntegration.backend.endpoint === "https://api.openai.com/v1/") {
+      userSettings.aiIntegration = {
+        model: 'alias-fast',
+        max_tokens: 5000,
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      }
+    }
+
+  }
 }
 
 export function adaptComplexitySettingsToLoadedSchema(userSettings: any, schema: TopLevelSchema) {
