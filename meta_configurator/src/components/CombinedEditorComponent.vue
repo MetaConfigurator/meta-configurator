@@ -159,10 +159,10 @@ onUnmounted(() => {
   <ConfirmDialog />
 
   <div class="w-full h-full flex" style="max-height: 100%">
-    <main class="flex flex-col w-full h-full">
+    <main class="flex flex-col w-full h-full min-h-0">
       <!-- toolbar -->
       <Toolbar ref="toolbarRef" :current-mode="props.sessionMode" @mode-selected="updateMode" />
-      <div class="flex-grow overflow-hidden" ref="mainPanel" id="mainpanel">
+      <div class="flex-grow min-h-0 overflow-hidden" ref="mainPanel" id="mainpanel">
         <Splitter
           class="h-full"
           style="min-width: 0"

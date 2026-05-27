@@ -163,40 +163,50 @@ function isHighlighted(item: MenuItem) {
 </script>
 
 <template>
-  <!-- menu items -->
-  <div v-for="item in menuItems" :key="getLabelOfItem(item) ?? item.key ?? ''">
-    <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
-    <Button
-      v-else
-      circular
-      text
-      :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
-      size="small"
-      v-tooltip.right="item.label"
-      :id="item.key ?? ''"
-      :disabled="isDisabled(item)"
-      @click="event => handleItemButtonClick(item, event)">
-      <FontAwesomeIcon :icon="item.icon!!" />
-    </Button>
+  <div class="toolbar-menu-buttons">
+    <!-- menu items -->
+    <div v-for="item in menuItems" :key="getLabelOfItem(item) ?? item.key ?? ''">
+      <span v-if="item.separator" class="menu-separator text-lg p-2 text-gray-300">|</span>
+      <Button
+        v-else
+        circular
+        text
+        :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
+        size="small"
+        v-tooltip.right="item.label"
+        :id="item.key ?? ''"
+        :disabled="isDisabled(item)"
+        @click="event => handleItemButtonClick(item, event)">
+        <FontAwesomeIcon :icon="item.icon!!" />
+      </Button>
 
-    <Menu
-      v-if="item.items"
-      :model="item.items"
-      :popup="true"
-      :ref="itemMenu => setItemMenuRef(item, itemMenu as any)">
-      <template #itemicon="slotProps">
-        <div v-if="slotProps.item.icon !== undefined">
-          <FontAwesomeIcon
-            :icon="slotProps.item.icon ?? []"
-            style="min-width: 1.5rem"
-            class="mr-3" />
-        </div>
-      </template>
-    </Menu>
+      <Menu
+        v-if="item.items"
+        :model="item.items"
+        :popup="true"
+        :ref="itemMenu => setItemMenuRef(item, itemMenu as any)">
+        <template #itemicon="slotProps">
+          <div v-if="slotProps.item.icon !== undefined">
+            <FontAwesomeIcon
+              :icon="slotProps.item.icon ?? []"
+              style="min-width: 1.5rem"
+              class="mr-3" />
+          </div>
+        </template>
+      </Menu>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.toolbar-menu-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .toolbar-button {
   font-weight: bold;
   font-size: large;
@@ -204,7 +214,18 @@ function isHighlighted(item: MenuItem) {
   padding: 0.35rem !important;
 }
 
+.menu-separator {
+  display: inline-flex;
+  align-items: center;
+}
+
 .highlighted-icon {
   color: var(--p-highlight-color) !important;
+}
+
+@media (max-width: 900px) {
+  .menu-separator {
+    display: none;
+  }
 }
 </style>
