@@ -305,6 +305,6 @@ function inferTypesFromValue(value: unknown): SchemaPropertyType[] {
   }
 }
 
-export function getSchemaTitle(schema: TopLevelJsonSchemaWrapper) {
-  return schema.title || 'Untitled schema';
+export function getSchemaTitle(schema: TopLevelSchema) {
+  return nonBooleanSchema(schema)?.title || 'Untitled schema';
 }

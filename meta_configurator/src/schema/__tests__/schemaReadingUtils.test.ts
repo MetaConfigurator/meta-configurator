@@ -3,6 +3,7 @@ import {
   getObjectSchemaAtDataPath,
   getParentObjectSchemaAtDataPath,
 } from '@/schema/schemaReadingUtils';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 
 vi.mock('@/data/useDataLink', () => ({
   getSchemaForMode: vi.fn(),
@@ -16,7 +17,7 @@ vi.mock('@/data/useDataLink', () => ({
 
 describe('schemaReadingUtils', () => {
   it('resolves the matching oneOf object schema variant for a data path', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         backend: {
@@ -56,7 +57,7 @@ describe('schemaReadingUtils', () => {
   });
 
   it('returns the root object schema for the empty data path', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       required: ['backend'],
       properties: {
@@ -81,7 +82,7 @@ describe('schemaReadingUtils', () => {
   });
 
   it('resolves nested object schemas along a normal property path', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         aiIntegration: {
@@ -119,7 +120,7 @@ describe('schemaReadingUtils', () => {
   });
 
   it('resolves the relay variant when relay-specific properties are present', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         backend: {
@@ -158,7 +159,7 @@ describe('schemaReadingUtils', () => {
   });
 
   it('falls back to the first declared oneOf variant when none validate fully', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         backend: {
@@ -194,7 +195,7 @@ describe('schemaReadingUtils', () => {
   });
 
   it('returns undefined for a missing object path', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         backend: {
@@ -217,7 +218,7 @@ describe('schemaReadingUtils', () => {
   });
 
   it('returns undefined for parent schema when the property path has no object parent', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         endpoint: {type: 'string'},
@@ -233,7 +234,7 @@ describe('schemaReadingUtils', () => {
   });
 
   it('returns scalar property schemas at the resolved leaf path', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         endpoint: {type: 'string'},
@@ -249,7 +250,7 @@ describe('schemaReadingUtils', () => {
   });
 
   it('falls back to the first declared variant when relay pattern does not validate', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         backend: {

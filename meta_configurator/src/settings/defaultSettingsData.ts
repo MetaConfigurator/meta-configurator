@@ -31,6 +31,9 @@ export const SETTINGS_DATA_DEFAULT = {
     hideAddPropertyButton: true,
     showBorderAroundInputFields: true,
     showSchemaTitleAsHeader: true,
+    useScientificNotationForLargeAndSmallNumbers: true,
+    scientificNotationUpperThreshold: 1e21,
+    scientificNotationLowerThreshold: 1e-7,
   },
   schemaDiagram: {
     editMode: true,

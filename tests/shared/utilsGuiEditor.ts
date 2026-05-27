@@ -37,26 +37,16 @@ export async function editBooleanProperty(page: Page, propertyPath: Path, value:
 
 export async function editNumberOrIntProperty(page: Page, propertyPath: Path, value: number) {
     const pathAsString = pathToString(propertyPath);
-    const spinButton = page.getByTestId(`property-data-${pathAsString}`).getByRole('spinbutton')
-    await spinButton.click();
-    await spinButton.evaluate((input, newValue) => {
-        const nativeValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLInputElement.prototype,
-            'value'
-        )?.set;
-        nativeValueSetter?.call(input, String(newValue));
-        input.dispatchEvent(new Event('input', {bubbles: true}));
-        input.setAttribute('aria-valuenow', String(newValue));
-    }, value);
-    await spinButton.blur();
+    const textField = page.getByTestId(`property-data-${pathAsString}`).getByRole('textbox')
+    await textField.click();
+    await textField.fill(value.toString());
+    await textField.blur();
 }
 
 export async function checkNumberOrIntProperty(page: Page, propertyPath: Path, value: number) {
     const pathAsString = pathToString(propertyPath);
-    const textField = page.getByTestId(`property-data-${pathAsString}`).getByRole('spinbutton')
-    await expect
-        .poll(async () => await textField.getAttribute('aria-valuenow'))
-        .toBe(value.toString());
+    const textField = page.getByTestId(`property-data-${pathAsString}`).getByRole('textbox')
+    await expect(textField).toHaveValue(value.toString());
 }
 
 export async function removeOptionalPropertyValue(page: Page, propertyPath: Path) {

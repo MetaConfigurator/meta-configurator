@@ -171,6 +171,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'hideAddPropertyButton',
         'showBorderAroundInputFields',
         'showSchemaTitleAsHeader',
+        'useScientificNotationForLargeAndSmallNumbers',
+        'scientificNotationUpperThreshold',
+        'scientificNotationLowerThreshold',
       ],
       additionalProperties: false,
       description: 'GUI Editor related settings belong here.',
@@ -207,6 +210,26 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description:
             'If set to true, the title of the schema will be shown as a header in the GUI editor.',
           default: true,
+        },
+        useScientificNotationForLargeAndSmallNumbers: {
+          type: 'boolean',
+          description:
+            'If set to true, numeric values in the GUI editor will use scientific notation when they are greater than or equal to the upper threshold or smaller than or equal to the lower threshold. Scientific notation can be entered regardless of this setting.',
+          default: true,
+        },
+        scientificNotationUpperThreshold: {
+          type: 'number',
+          description:
+            'The absolute value at or above which numbers in the GUI editor are displayed in scientific notation when scientific notation display is enabled.',
+          default: 1e21,
+          exclusiveMinimum: 0,
+        },
+        scientificNotationLowerThreshold: {
+          type: 'number',
+          description:
+            'The non-zero absolute value at or below which numbers in the GUI editor are displayed in scientific notation when scientific notation display is enabled.',
+          default: 1e-7,
+          exclusiveMinimum: 0,
         },
       },
     },
