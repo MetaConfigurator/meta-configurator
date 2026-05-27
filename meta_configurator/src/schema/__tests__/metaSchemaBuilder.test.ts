@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {buildMetaSchema} from '@/schema/metaSchemaBuilder';
+import {buildFullMetaSchema, buildMetaSchema} from '@/schema/metaSchemaBuilder';
 import {ValidationService} from '@/schema/validationService';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfaceMetaSchema} from '@/settings/settingsTypes';
@@ -17,6 +17,11 @@ function validateSchemaCandidate(
 ) {
   const metaSchema = buildMetaSchema(buildSettings(settings));
   const validationService = new ValidationService(metaSchema);
+  return validationService.validate(schemaCandidate);
+}
+
+function validateWithFullMetaSchema(schemaCandidate: any) {
+  const validationService = new ValidationService(buildFullMetaSchema());
   return validationService.validate(schemaCandidate);
 }
 
@@ -182,6 +187,26 @@ describe('metaSchemaBuilder', () => {
           required: ['name'],
         }
       );
+
+      expect(result.errors).toEqual([]);
+    });
+  });
+
+  describe('full meta schema validation', () => {
+    it('accepts nested boolean schemas independently of simplified GUI settings', () => {
+      const result = validateWithFullMetaSchema({
+        type: 'object',
+        properties: {
+          maybeAnything: true,
+          definitelyNothing: false,
+        },
+      });
+
+      expect(result.errors).toEqual([]);
+    });
+
+    it('accepts unrestricted multi-type unions independently of simplified GUI settings', () => {
+      const result = validateWithFullMetaSchema({type: ['string', 'number']});
 
       expect(result.errors).toEqual([]);
     });
