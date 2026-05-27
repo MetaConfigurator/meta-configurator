@@ -47,6 +47,9 @@ export interface SettingsInterfaceGuiEditor {
   hideAddPropertyButton: boolean;
   showBorderAroundInputFields: boolean;
   showSchemaTitleAsHeader: boolean;
+  useScientificNotationForLargeAndSmallNumbers: boolean;
+  scientificNotationUpperThreshold: number;
+  scientificNotationLowerThreshold: number;
 }
 
 export interface SettingsInterfaceSchemaDiagram {
