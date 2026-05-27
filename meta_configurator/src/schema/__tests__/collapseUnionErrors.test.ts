@@ -293,8 +293,8 @@ describe('collapseUnionErrors', () => {
     expect(additionalPropertiesError!.message).toContain('variant 2');
     expect(additionalPropertiesError!.message).toContain('variant 3');
     expect(additionalPropertiesError!.message).toContain('must be object');
-    expect(
-      collapsed.filter(error => error.instancePath === '/additionalProperties')
-    ).toHaveLength(1);
+    expect(collapsed.filter(error => error.instancePath === '/additionalProperties')).toHaveLength(
+      1
+    );
   });
 });

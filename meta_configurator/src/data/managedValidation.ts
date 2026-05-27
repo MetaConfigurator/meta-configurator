@@ -16,10 +16,7 @@ export class ManagedValidation {
   private worker: Worker;
   private pendingTasks: Map<string, (result: ValidationResult) => void> = new Map();
 
-  constructor(
-    public mode: SessionMode,
-    private validationSchemaRaw?: Ref<JsonSchemaType>
-  ) {
+  constructor(public mode: SessionMode, private validationSchemaRaw?: Ref<JsonSchemaType>) {
     this.worker = new ValidationWorker();
 
     this.worker.onmessage = (e: MessageEvent) => {
