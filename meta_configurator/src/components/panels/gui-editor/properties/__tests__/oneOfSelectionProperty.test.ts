@@ -45,7 +45,7 @@ describe('OneOfSelectionProperty', () => {
     selectedTypeUnionOptions.value = new Map();
     expand.mockClear();
 
-    const backendSchema = SETTINGS_SCHEMA.properties!.aiIntegration!.properties!.backend!;
+    const backendSchema = (SETTINGS_SCHEMA as any).properties.aiIntegration.properties.backend;
     const propertySchema = new JsonSchemaWrapper(backendSchema, SessionMode.Settings, false);
 
     const wrapper = mount(OneOfSelectionProperty, {

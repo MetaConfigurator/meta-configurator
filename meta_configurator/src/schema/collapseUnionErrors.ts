@@ -43,6 +43,7 @@ function directBranchesOf(
     if (isUnderDeeperSummary(e.schemaPath, summary.schemaPath, allSummaryPaths)) return;
 
     const branchSeg = e.schemaPath.slice(branchPrefix.length).split('/', 1)[0];
+    if (branchSeg === undefined) return;
     const branchIdx = Number.parseInt(branchSeg, 10);
     if (!Number.isFinite(branchIdx) || branchIdx < 0) return;
 
