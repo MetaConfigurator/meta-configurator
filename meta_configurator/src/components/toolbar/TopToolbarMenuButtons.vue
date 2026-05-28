@@ -26,6 +26,8 @@ const emit = defineEmits<{
   (e: 'show-data-mapping-dialog'): void;
   (e: 'show-rml-mapping-dialog'): void;
   (e: 'show-import-turtle-dialog'): void;
+  (e: 'show-import-xml-dialog'): void;
+  (e: 'show-xml-export-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -38,7 +40,9 @@ const topMenuBar = new MenuItems(
   showDataMappingDialog,
   inferSchemaFromSampleData,
   showRmlMappingDialog,
-  showTurtleImportDialog
+  showTurtleImportDialog,
+  showXmlImportDialog,
+  showXmlExportDialog
 );
 
 function showSchemaSelectionDialog() {
@@ -71,6 +75,14 @@ function showRmlMappingDialog() {
 
 function showTurtleImportDialog() {
   emit('show-import-turtle-dialog');
+}
+
+function showXmlImportDialog() {
+  emit('show-import-xml-dialog');
+}
+
+function showXmlExportDialog() {
+  emit('show-xml-export-dialog');
 }
 
 function inferSchemaFromSampleData() {
