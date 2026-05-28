@@ -2,7 +2,7 @@ import {modeToMenuTitle, modeToRoute, SessionMode} from "../../meta_configurator
 import {expect, type Page} from "./playwright";
 import * as os from "node:os";
 
-const dataFormats = [ 'json', 'yaml', 'xml' ];
+const dataFormats = [ 'json', 'yaml' ];
 
 
 export async function getCurrentEditorMode(page: Page): Promise<SessionMode> {

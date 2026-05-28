@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {ref, watchEffect} from 'vue';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useMagicKeys} from '@vueuse/core';
 import {focus} from '@/utility/focusUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
+import {DataFormat} from '@/settings/settingsTypes';
 import Select from 'primevue/select';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import ModeSelector from '@/components/toolbar/ModeSelector.vue';
@@ -28,10 +29,18 @@ const emit = defineEmits<{
   (e: 'show-data-mapping-dialog'): void;
   (e: 'show-rml-mapping-dialog'): void;
   (e: 'show-import-turtle-dialog'): void;
+  (e: 'show-import-xml-dialog'): void;
+  (e: 'show-xml-export-dialog'): void;
 }>();
 
 const settings = useSettings();
 const dataFormatOptions = formatRegistry.getFormatNames();
+
+watchEffect(() => {
+  if (!dataFormatOptions.includes(settings.value.dataFormat)) {
+    settings.value.dataFormat = DataFormat.JSON;
+  }
+});
 
 async function showSchemaSelectionDialog() {
   emit('show-schema-selection-dialog');
@@ -73,6 +82,14 @@ function showTurtleImportDialog() {
   emit('show-import-turtle-dialog');
 }
 
+function showXmlImportDialog() {
+  emit('show-import-xml-dialog');
+}
+
+function showXmlExportDialog() {
+  emit('show-xml-export-dialog');
+}
+
 const modeSelector = ref();
 
 useMagicKeys({
@@ -110,7 +127,9 @@ useMagicKeys({
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()"
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-          @show-import-turtle-dialog="() => showTurtleImportDialog()" />
+          @show-import-turtle-dialog="() => showTurtleImportDialog()"
+          @show-import-xml-dialog="() => showXmlImportDialog()"
+          @show-xml-export-dialog="() => showXmlExportDialog()" />
 
         <Divider layout="vertical" />
 
@@ -175,7 +194,9 @@ useMagicKeys({
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()"
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-          @show-import-turtle-dialog="() => showTurtleImportDialog()" />
+          @show-import-turtle-dialog="() => showTurtleImportDialog()"
+          @show-import-xml-dialog="() => showXmlImportDialog()"
+          @show-xml-export-dialog="() => showXmlExportDialog()" />
       </div>
 
       <!-- RIGHT side: format selector -->
