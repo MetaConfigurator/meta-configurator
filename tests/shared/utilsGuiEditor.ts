@@ -1,8 +1,7 @@
-import {Page} from "playwright";
-import {expect} from "@playwright/test";
-import {Path, PathElement} from "../src/utility/path";
-import {pathToString} from "../src/utility/pathUtils";
-import {selectAll} from "./utils";
+import {expect, type Page} from "./playwright";
+import type { Locator } from "./playwright";
+import {Path, PathElement} from "../../meta_configurator/src/utility/path";
+import {pathToString} from "../../meta_configurator/src/utility/pathUtils";
 
 
 export async function checkPropertyExistence(page: Page, propertyPath: Path, shouldBeVisible: boolean) {
@@ -38,22 +37,15 @@ export async function editBooleanProperty(page: Page, propertyPath: Path, value:
 
 export async function editNumberOrIntProperty(page: Page, propertyPath: Path, value: number) {
     const pathAsString = pathToString(propertyPath);
-    const spinButton = page.getByTestId(`property-data-${pathAsString}`).getByRole('spinbutton')
-    await spinButton.click();
-    await selectAll(page);
-    await spinButton.press('Backspace');
-
-    // Simulate real typing
-    for (const char of value.toString()) {
-        await page.keyboard.press(char);
-    }
-
-    await spinButton.press('Enter');
+    const textField = page.getByTestId(`property-data-${pathAsString}`).getByRole('textbox')
+    await textField.click();
+    await textField.fill(value.toString());
+    await textField.blur();
 }
 
 export async function checkNumberOrIntProperty(page: Page, propertyPath: Path, value: number) {
     const pathAsString = pathToString(propertyPath);
-    const textField = page.getByTestId(`property-data-${pathAsString}`).getByRole('spinbutton')
+    const textField = page.getByTestId(`property-data-${pathAsString}`).getByRole('textbox')
     await expect(textField).toHaveValue(value.toString());
 }
 
@@ -77,9 +69,11 @@ export async function addArrayItem(page: Page, propertyPath: Path) {
 
 export async function checkPropertySchemaViolation(page: Page, propertyPath: Path, shouldBeVisible: boolean) {
     const pathAsString = pathToString(propertyPath);
-    const validationErrorIcon = page.getByTestId(`property-metadata-${pathAsString}`).getByTestId("validation-error-icon");
+    const propertyMetadata = page.getByTestId(`property-metadata-${pathAsString}`);
+    const validationErrorIcon = propertyMetadata.getByTestId("validation-error-icon");
     if (shouldBeVisible) {
-        await expect(validationErrorIcon).toBeVisible();
+        await expect(propertyMetadata).toBeVisible();
+        await expect(validationErrorIcon).toBeVisible({timeout: 8000});
     } else {
         await expect(validationErrorIcon).not.toBeVisible();
     }

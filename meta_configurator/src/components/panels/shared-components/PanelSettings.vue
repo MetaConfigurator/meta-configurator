@@ -77,6 +77,7 @@ const settingsName = computed(() => {
         text
         severity="secondary"
         v-tooltip.left="'Copy text to clipboard'"
+        :data-testid="`copy-to-clipboard-${sessionMode}`"
         @click="copyToClipboard()">
         <FontAwesomeIcon icon="fa-regular fa-clone" />
       </Button>

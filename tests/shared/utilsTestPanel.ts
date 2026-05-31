@@ -1,8 +1,7 @@
-import {Page} from "playwright";
-import {expect} from "@playwright/test";
-import {Path} from "../src/utility/path";
-import {jsonPointerToPathTyped, pathToJsonPointer} from "../src/utility/pathUtils";
-import {SessionMode} from "../src/store/sessionMode";
+import {expect, type Page} from "./playwright";
+import type {Path} from "../../meta_configurator/src/utility/path";
+import {jsonPointerToPathTyped, pathToJsonPointer} from "../../meta_configurator/src/utility/pathUtils";
+import {SessionMode} from "../../meta_configurator/src/store/sessionMode";
 
 
 export async function tpGetCurrentSelectedElement(page: Page, mode: SessionMode, expectNonRootPath: boolean = true): Promise<Path> {

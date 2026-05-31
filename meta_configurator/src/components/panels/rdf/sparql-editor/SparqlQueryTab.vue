@@ -9,7 +9,7 @@
         },
       }">
       <div class="space-y-4 mb-2">
-        <Accordion :value="activeAccordion" @update:value="emit('update:activeAccordion', $event)">
+        <Accordion :value="activeAccordion" @update:value="updateActiveAccordion">
           <AccordionPanel value="aiPanel">
             <AccordionHeader>Use AI assistance to generate SPARQL queries</AccordionHeader>
             <AccordionContent>
@@ -119,6 +119,10 @@ const emit = defineEmits<{
   (e: 'run-query'): void;
   (e: 'open-visualization-help'): void;
 }>();
+
+function updateActiveAccordion(value: string | string[] | null | undefined) {
+  emit('update:activeAccordion', Array.isArray(value) ? value[0] ?? null : value ?? null);
+}
 </script>
 
 <style scoped>

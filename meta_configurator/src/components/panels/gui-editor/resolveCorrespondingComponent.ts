@@ -4,6 +4,7 @@ import StringProperty from '@/components/panels/gui-editor/properties/StringProp
 import NumberProperty from '@/components/panels/gui-editor/properties/NumberProperty.vue';
 import SimpleObjectProperty from '@/components/panels/gui-editor/properties/SimpleObjectProperty.vue';
 import SimpleArrayProperty from '@/components/panels/gui-editor/properties/SimpleArrayProperty.vue';
+import DateProperty from '@/components/panels/gui-editor/properties/DateProperty.vue';
 import type {
   AddItemTreeNodeData,
   ConfigTreeNodeData,
@@ -16,6 +17,7 @@ import {getDataForMode, getSessionForMode, getValidationForMode} from '@/data/us
 import {typeSchema} from '@/schema/schemaProcessingUtils';
 import type {SessionMode} from '@/store/sessionMode';
 import OntologyUriProperty from '@/components/panels/gui-editor/properties/OntologyUriProperty.vue';
+import ReferenceProperty from '@/components/panels/gui-editor/properties/ReferenceProperty.vue';
 
 /**
  * Resolves the corresponding component for a given node.
@@ -60,7 +62,13 @@ export function resolveCorrespondingComponent(
       isTypeUnion: true,
     });
   }
-
+  if (mode == 'schemaEditor' && nodeData.schema.hasType('string') && nodeData.name === '$ref') {
+    // @ts-ignore
+    return h(ReferenceProperty, {
+      ...propsObject,
+      sessionMode: mode,
+    });
+  }
   if (nodeData.schema.hasType('string') && hasTwoOrMoreExamples(nodeData.schema)) {
     // @ts-ignore
     return h(EnumProperty, {
@@ -74,6 +82,20 @@ export function resolveCorrespondingComponent(
     return h(OntologyUriProperty, {
       ...propsObject,
     });
+  }
+  if (nodeData.schema.hasType('string') && nodeData.schema.format === 'date') {
+    // @ts-ignore
+    return h(DateProperty, propsObject);
+  }
+
+  if (nodeData.schema.hasType('string') && nodeData.schema.format === 'email') {
+    if (!nodeData.schema.examples || nodeData.schema.examples.length === 0) {
+      // if there is no example e-mail provided, add one directly to the schema
+      const underlyingSchema = nodeData.schema.jsonSchema;
+      if (underlyingSchema) {
+        underlyingSchema.examples = ['example@email.com'];
+      }
+    }
   }
 
   if (nodeData.schema.hasType('string')) {

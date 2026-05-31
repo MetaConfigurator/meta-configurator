@@ -261,7 +261,10 @@ async function submitPromptExportDocument() {
   // if the schema defines export formats, the user prompt is ignored and the selected export format is used
   if (documentExportFormatNames.value.length > 0) {
     const exportFormatName = selectedExportFormat.value;
-    const exportFormatDef = documentExportFormats.value![exportFormatName];
+    const exportFormatDef = documentExportFormats.value?.[exportFormatName];
+    if (!exportFormatDef) {
+      throw new Error(`Unknown export format "${exportFormatName}".`);
+    }
     // if export format is just a string, it is the URL
     if (typeof exportFormatDef === 'string') {
       userPrompt = await fetchExternalContentText(exportFormatDef);
@@ -315,9 +318,11 @@ function selectRootElement() {
         class="flex flex-col space-y-4"
         v-if="isDocumentEmpty() && props.functionQueryDocumentCreation !== undefined">
         <label>Prompt to Create {{ props.labelDocumentType }}</label>
-        <Textarea v-model="promptCreateDocument" />
-        <Button @click="submitPromptCreateDocument()">Create {{ props.labelDocumentType }}</Button>
-        <ProgressSpinner v-if="isLoadingChangeAnswer" />
+        <Textarea v-model="promptCreateDocument" data-testid="ai-prompt-create-input" />
+        <Button @click="submitPromptCreateDocument()" data-testid="ai-prompt-create-submit"
+          >Create {{ props.labelDocumentType }}</Button
+        >
+        <ProgressSpinner v-if="isLoadingChangeAnswer" data-testid="ai-prompt-loading" />
       </div>
 
       <!-- Modify Document Prompt -->

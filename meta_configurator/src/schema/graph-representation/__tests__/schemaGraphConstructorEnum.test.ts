@@ -82,21 +82,21 @@ describe('test schema graph constructor with objects and attributes with enums',
     rootNode.attributes = generateObjectAttributes(rootNode.absolutePath, rootNode.schema, defs);
 
     expect(rootNode.attributes.length).toEqual(4);
-    expect(rootNode.attributes[0].name).toEqual('propertyEnum');
-    expect(rootNode.attributes[0].title).toEqual(undefined);
-    expect(rootNode.attributes[0].absolutePath).toEqual(['properties', 'propertyEnum']);
+    expect(rootNode.attributes[0]!.name).toEqual('propertyEnum');
+    expect(rootNode.attributes[0]!.title).toEqual(undefined);
+    expect(rootNode.attributes[0]!.absolutePath).toEqual(['properties', 'propertyEnum']);
 
-    expect(rootNode.attributes[1].name).toEqual('propertyEnumMixed');
-    expect(rootNode.attributes[1].title).toEqual(undefined);
-    expect(rootNode.attributes[1].absolutePath).toEqual(['properties', 'propertyEnumMixed']);
+    expect(rootNode.attributes[1]!.name).toEqual('propertyEnumMixed');
+    expect(rootNode.attributes[1]!.title).toEqual(undefined);
+    expect(rootNode.attributes[1]!.absolutePath).toEqual(['properties', 'propertyEnumMixed']);
 
-    expect(rootNode.attributes[2].name).toEqual('propertyEnumRef1');
-    expect(rootNode.attributes[2].title).toEqual(undefined);
-    expect(rootNode.attributes[2].absolutePath).toEqual(['properties', 'propertyEnumRef1']);
+    expect(rootNode.attributes[2]!.name).toEqual('propertyEnumRef1');
+    expect(rootNode.attributes[2]!.title).toEqual(undefined);
+    expect(rootNode.attributes[2]!.absolutePath).toEqual(['properties', 'propertyEnumRef1']);
 
-    expect(rootNode.attributes[3].name).toEqual('propertyEnumRef2');
-    expect(rootNode.attributes[3].title).toEqual(undefined);
-    expect(rootNode.attributes[3].absolutePath).toEqual(['properties', 'propertyEnumRef2']);
+    expect(rootNode.attributes[3]!.name).toEqual('propertyEnumRef2');
+    expect(rootNode.attributes[3]!.title).toEqual(undefined);
+    expect(rootNode.attributes[3]!.absolutePath).toEqual(['properties', 'propertyEnumRef2']);
   });
 
   it('generate attribute edges', () => {
@@ -112,25 +112,25 @@ describe('test schema graph constructor with objects and attributes with enums',
     for (const edge of graph.edges) {
       expect(edge.start.absolutePath).toEqual([]);
     }
-    expect(graph.edges[0].end.absolutePath).toEqual(['properties', 'propertyEnum']);
-    expect(graph.edges[0].edgeType).toEqual(EdgeType.ATTRIBUTE);
-    expect(graph.edges[0].label).toEqual('propertyEnum');
-    expect(graph.edges[0].end.getNodeType() == 'schemaenum').toBeTruthy();
+    expect(graph.edges[0]!.end.absolutePath).toEqual(['properties', 'propertyEnum']);
+    expect(graph.edges[0]!.edgeType).toEqual(EdgeType.ATTRIBUTE);
+    expect(graph.edges[0]!.label).toEqual('propertyEnum');
+    expect(graph.edges[0]!.end.getNodeType() == 'schemaenum').toBeTruthy();
 
-    expect(graph.edges[1].end.absolutePath).toEqual(['properties', 'propertyEnumMixed']);
-    expect(graph.edges[1].edgeType).toEqual(EdgeType.ATTRIBUTE);
-    expect(graph.edges[1].label).toEqual('propertyEnumMixed');
-    expect(graph.edges[1].end.getNodeType() == 'schemaenum').toBeTruthy();
+    expect(graph.edges[1]!.end.absolutePath).toEqual(['properties', 'propertyEnumMixed']);
+    expect(graph.edges[1]!.edgeType).toEqual(EdgeType.ATTRIBUTE);
+    expect(graph.edges[1]!.label).toEqual('propertyEnumMixed');
+    expect(graph.edges[1]!.end.getNodeType() == 'schemaenum').toBeTruthy();
 
-    expect(graph.edges[2].end.absolutePath).toEqual(['$defs', 'enumString']);
-    expect(graph.edges[2].edgeType).toEqual(EdgeType.ATTRIBUTE);
-    expect(graph.edges[2].label).toEqual('propertyEnumRef1');
-    expect(graph.edges[2].end.getNodeType() == 'schemaenum').toBeTruthy();
+    expect(graph.edges[2]!.end.absolutePath).toEqual(['$defs', 'enumString']);
+    expect(graph.edges[2]!.edgeType).toEqual(EdgeType.ATTRIBUTE);
+    expect(graph.edges[2]!.label).toEqual('propertyEnumRef1');
+    expect(graph.edges[2]!.end.getNodeType() == 'schemaenum').toBeTruthy();
 
-    expect(graph.edges[3].end.absolutePath).toEqual(['$defs', 'enumInt']);
-    expect(graph.edges[3].edgeType).toEqual(EdgeType.ATTRIBUTE);
-    expect(graph.edges[3].label).toEqual('propertyEnumRef2');
-    expect(graph.edges[3].end.getNodeType() == 'schemaenum').toBeTruthy();
+    expect(graph.edges[3]!.end.absolutePath).toEqual(['$defs', 'enumInt']);
+    expect(graph.edges[3]!.edgeType).toEqual(EdgeType.ATTRIBUTE);
+    expect(graph.edges[3]!.label).toEqual('propertyEnumRef2');
+    expect(graph.edges[3]!.end.getNodeType() == 'schemaenum').toBeTruthy();
   });
 
   it('trim enum values', () => {

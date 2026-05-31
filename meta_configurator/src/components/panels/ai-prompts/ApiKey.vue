@@ -17,21 +17,32 @@ const rememberOptions = ref([
 </script>
 
 <template>
-  MetaConfigurator supports the OpenAI API (including other AI endpoints using the same API). Define
-  your endpoint in the settings.
-  <br />
-  For OpenAI, generate your API Key
-  <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>. Usage of the
-  OpenAI API normally requires balance on the OpenAI account. One-time purchase of balance is
-  possible without permanently connecting your credit card with your account. Check this
-  <a href="https://platform.openai.com/docs/pricing" target="_blank">link</a> for pricing.
-  <br />
-  MetaConfigurator by default uses the gpt-4o-mini model, which has very low cost. For improved
-  results you can change to more performant models in the settings tab.
+  MetaConfigurator works with any LLM provider that follows the OpenAI API format, including OpenAI,
+  Perplexity, OpenRouter, Groq, Mistral, DeepSeek, and others. You can configure the connection
+  method and model in the settings below.
   <br />
   <br />
-  Your key is stored only in your browser and sent directly to your chosen provider. It is never
-  sent to MetaConfigurator servers.
+  By default, MetaConfigurator uses the public <strong>Uni Stuttgart Relay</strong>, which forwards
+  to <strong>Helmholtz Blablador</strong>. In that preset, no API key is needed in the browser.
+  Availability is best-effort and cannot be guaranteed.
+  <br />
+  <br />
+  In <strong>AI Endpoint Settings</strong>, you can also switch to:
+  <br />
+  <strong>Direct Endpoint</strong>: the browser talks directly to the provider. This only works if
+  the provider allows browser CORS requests. Your API key stays in the browser.
+  <br />
+  <strong>HTTPS Relay</strong>: requests go through any
+  <a
+    href="https://github.com/MetaConfigurator/meta-configurator/tree/main/backend/relay"
+    target="_blank"
+    >MetaConfigurator Relay</a
+  >
+  over HTTPS, including a self-hosted one. The relay keeps the provider API key on the server, so
+  you usually do not need to enter one here.
+  <br />
+  <strong>HTTP Relay</strong>: the same idea for local HTTP-only development. It will not work from
+  an HTTPS MetaConfigurator page.
   <span class="api-key-container">
     <span>Key:</span>
     <Password v-model="apiKey" placeholder="Enter your API Key" :feedback="false" />

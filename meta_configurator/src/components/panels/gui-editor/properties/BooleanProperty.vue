@@ -6,7 +6,7 @@ They are represented as a select button with two options: true and false.
 import SelectButton from 'primevue/selectbutton';
 import {computed, ref} from 'vue';
 import type {PathElement} from '@/utility/path';
-import type {ValidationResult} from '@/schema/validationService';
+import type {ValidationResult} from '@/schema/validationUtils';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
 

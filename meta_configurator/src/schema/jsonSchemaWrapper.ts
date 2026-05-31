@@ -3,12 +3,8 @@ import type {
   JsonSchemaType,
   SchemaPropertyType,
 } from '@/schema/jsonSchemaType';
-import {
-  nonBooleanSchema,
-  schemaArray,
-  schemaFromObject,
-  schemaRecord,
-} from '@/schema/schemaProcessingUtils';
+import {schemaArray, schemaFromObject, schemaRecord} from '@/schema/schemaProcessingUtils';
+import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
 import type {Path, PathElement} from '@/utility/path';
 import {resolveAndTransform} from '@/schema/schemaLazyResolver';
 import _ from 'lodash';
@@ -65,7 +61,7 @@ export class JsonSchemaWrapper {
       const requiredProperties = this.required ?? [];
       for (const key of Object.keys(this.properties)) {
         if (requiredProperties.includes(key)) {
-          result[key] = this.properties[key].initialValue();
+          result[key] = this.properties[key]!.initialValue();
         }
       }
       return result;
@@ -73,8 +69,8 @@ export class JsonSchemaWrapper {
     if (this.hasType('array')) {
       const result = [];
 
-      if (this.items && this.minLength > 0) {
-        for (let i = 0; i < this.minLength; i++) {
+      if (this.items && this.minItems > 0) {
+        for (let i = 0; i < this.minItems; i++) {
           result.push(this.items.initialValue());
         }
       }

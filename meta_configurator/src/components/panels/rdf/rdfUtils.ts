@@ -3,6 +3,7 @@ import type * as $rdf from 'rdflib';
 import {useDark} from '@vueuse/core';
 import {computed} from 'vue';
 import type {Path} from '@/utility/path';
+import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
 import {RdfMediaType} from './rdfEnums';
 
 export const isDark = () => computed(() => useDark().value);
@@ -60,40 +61,46 @@ export const formatCellValue = (value: unknown): string => {
   return stringValue;
 };
 
-export const defaultJsonLdSchema = `
-{
-  "oneOf": [
+const jsonLdContextStringSchema: JsonSchemaObjectType = {
+  title: 'String',
+  type: 'string',
+};
+
+const jsonLdContextNestedObjectSchema: JsonSchemaObjectType = {
+  title: 'Object',
+  type: 'object',
+  additionalProperties: {
+    oneOf: [
+      jsonLdContextStringSchema,
+      {
+        title: 'Object',
+        type: 'object',
+        additionalProperties: true,
+      },
+    ],
+  },
+};
+
+export const defaultJsonLdSchema: JsonSchemaObjectType = {
+  title: 'JSON-LD @context',
+  oneOf: [
+    jsonLdContextStringSchema,
     {
-      "title": "URI",
-      "type": "string",
-      "format": "uri"
+      title: 'Object',
+      type: 'object',
+      additionalProperties: {
+        oneOf: [jsonLdContextStringSchema, jsonLdContextNestedObjectSchema],
+      },
     },
     {
-      "title": "Object",
-      "type": "object",
-      "additionalProperties": true
+      title: 'Array of Strings or Objects',
+      type: 'array',
+      items: {
+        oneOf: [jsonLdContextStringSchema, jsonLdContextNestedObjectSchema],
+      },
     },
-    {
-      "title": "Array of URIs or Objects",
-      "type": "array",
-      "items": {
-        "oneOf": [
-          {
-            "title": "URI",
-            "type": "string",
-            "format": "uri"
-          },
-          {
-            "title": "Object",
-            "type": "object",
-            "additionalProperties": true
-          }
-        ]
-      }
-    }
-  ]
-}
-`.trim();
+  ],
+};
 
 export const visualizationQueryExample_1 = `
 CONSTRUCT {

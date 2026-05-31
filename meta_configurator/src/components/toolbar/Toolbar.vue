@@ -9,6 +9,8 @@ import AboutDialog from '@/components/toolbar/dialogs/AboutDialog.vue';
 import DataMappingDialog from '@/components/toolbar/dialogs/data-mapping/DataMappingDialog.vue';
 import ImportCsvDialog from '@/components/toolbar/dialogs/csvimport/ImportCsvDialog.vue';
 import ImportTurtleDialog from '@/components/toolbar/dialogs/turtle-import/ImportTurtleDialog.vue';
+import ImportXmlDialog from '@/components/toolbar/dialogs/xml-import/ImportXmlDialog.vue';
+import XmlExportDialog from '@/components/toolbar/dialogs/xml-export/XmlExportDialog.vue';
 import SaveSnapshotDialog from '@/components/toolbar/dialogs/snapshot/SaveSnapshotDialog.vue';
 import CodeGenerationDialog from '@/components/toolbar/dialogs/code-generation/CodeGenerationDialog.vue';
 import FetchedSchemasSelectionDialog from '@/components/toolbar/dialogs/FetchedSchemasSelectionDialog.vue';
@@ -107,6 +109,14 @@ function showTurtleImportDialog() {
   turtleImportDialog.value?.show();
 }
 
+function showXmlImportDialog() {
+  xmlImportDialog.value?.show();
+}
+
+function showXmlExportDialog() {
+  xmlExportDialog.value?.show();
+}
+
 function showSnapshotDialog() {
   snapshotDialog.value?.show();
 }
@@ -158,6 +168,8 @@ const urlInputDialog = ref();
 const dataMappingDialog = ref();
 const rmlMappingDialog = ref();
 const turtleImportDialog = ref();
+const xmlImportDialog = ref();
+const xmlExportDialog = ref();
 
 defineExpose({
   showInitialSchemaDialog: showInitialDialog,
@@ -191,6 +203,10 @@ defineExpose({
 
   <ImportTurtleDialog ref="turtleImportDialog" />
 
+  <ImportXmlDialog ref="xmlImportDialog" />
+
+  <XmlExportDialog ref="xmlExportDialog" />
+
   <SaveSnapshotDialog ref="snapshotDialog" />
 
   <CodeGenerationDialog ref="codeGenerationDialog" />
@@ -220,6 +236,8 @@ defineExpose({
     @show-data-mapping-dialog="() => showDataMappingDialog()"
     @show-rml-mapping-dialog="() => showRmlMappingDialog()"
     @show-import-turtle-dialog="() => showTurtleImportDialog()"
+    @show-import-xml-dialog="() => showXmlImportDialog()"
+    @show-xml-export-dialog="() => showXmlExportDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 

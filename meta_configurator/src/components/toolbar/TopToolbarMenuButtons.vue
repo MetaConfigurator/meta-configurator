@@ -26,6 +26,8 @@ const emit = defineEmits<{
   (e: 'show-data-mapping-dialog'): void;
   (e: 'show-rml-mapping-dialog'): void;
   (e: 'show-import-turtle-dialog'): void;
+  (e: 'show-import-xml-dialog'): void;
+  (e: 'show-xml-export-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -38,7 +40,9 @@ const topMenuBar = new MenuItems(
   showDataMappingDialog,
   inferSchemaFromSampleData,
   showRmlMappingDialog,
-  showTurtleImportDialog
+  showTurtleImportDialog,
+  showXmlImportDialog,
+  showXmlExportDialog
 );
 
 function showSchemaSelectionDialog() {
@@ -71,6 +75,14 @@ function showRmlMappingDialog() {
 
 function showTurtleImportDialog() {
   emit('show-import-turtle-dialog');
+}
+
+function showXmlImportDialog() {
+  emit('show-import-xml-dialog');
+}
+
+function showXmlExportDialog() {
+  emit('show-xml-export-dialog');
 }
 
 function inferSchemaFromSampleData() {
@@ -110,20 +122,26 @@ function getMenuItems(settings: SettingsInterfaceRoot, positionBottom: boolean):
 // computed property function to get menu items to allow for updating of the menu items
 const menuItems = computed(() => getMenuItems(settings.value, props.showBottomMenu));
 
-const itemMenuRefs = ref(new Map<string, typeof Menu>());
+const itemMenuRefs = ref(new Map<string, {toggle?: (event: Event) => void}>());
 
-function setItemMenuRef(item: MenuItem, menu: typeof Menu) {
-  itemMenuRefs.value.set(getLabelOfItem(item), menu);
+function setItemMenuRef(item: MenuItem, menu: {toggle?: (event: Event) => void} | null) {
+  const label = getLabelOfItem(item);
+  if (!label || !menu) {
+    return;
+  }
+  itemMenuRefs.value.set(label, menu);
 }
 function handleItemButtonClick(item: MenuItem, event: Event) {
   if (item.items) {
     const label = getLabelOfItem(item);
     if (label !== undefined) {
       const menu = itemMenuRefs.value.get(label);
-      menu.toggle(event);
+      if (menu?.toggle) {
+        menu.toggle(event);
+      }
     }
   } else if (item.command) {
-    item.command({item, originalEvent: event});
+    item.command?.({item, originalEvent: event} as any);
   }
 }
 function getLabelOfItem(item: MenuItem): string | undefined {
@@ -157,40 +175,50 @@ function isHighlighted(item: MenuItem) {
 </script>
 
 <template>
-  <!-- menu items -->
-  <div v-for="item in menuItems" :key="item.label">
-    <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
-    <Button
-      v-else
-      circular
-      text
-      :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
-      size="small"
-      v-tooltip.right="item.label"
-      :id="item.key ?? ''"
-      :disabled="isDisabled(item)"
-      @click="event => handleItemButtonClick(item, event)">
-      <FontAwesomeIcon :icon="item.icon!!" />
-    </Button>
+  <div class="toolbar-menu-buttons">
+    <!-- menu items -->
+    <div v-for="item in menuItems" :key="getLabelOfItem(item) ?? item.key ?? ''">
+      <span v-if="item.separator" class="menu-separator text-lg p-2 text-gray-300">|</span>
+      <Button
+        v-else
+        circular
+        text
+        :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
+        size="small"
+        v-tooltip.right="item.label"
+        :id="item.key ?? ''"
+        :disabled="isDisabled(item)"
+        @click="event => handleItemButtonClick(item, event)">
+        <FontAwesomeIcon :icon="item.icon!!" />
+      </Button>
 
-    <Menu
-      v-if="item.items"
-      :model="item.items"
-      :popup="true"
-      :ref="itemMenu => setItemMenuRef(item, itemMenu)">
-      <template #itemicon="slotProps">
-        <div v-if="slotProps.item.icon !== undefined">
-          <FontAwesomeIcon
-            :icon="slotProps.item.icon ?? []"
-            style="min-width: 1.5rem"
-            class="mr-3" />
-        </div>
-      </template>
-    </Menu>
+      <Menu
+        v-if="item.items"
+        :model="item.items"
+        :popup="true"
+        :ref="itemMenu => setItemMenuRef(item, itemMenu as any)">
+        <template #itemicon="slotProps">
+          <div v-if="slotProps.item.icon !== undefined">
+            <FontAwesomeIcon
+              :icon="slotProps.item.icon ?? []"
+              style="min-width: 1.5rem"
+              class="mr-3" />
+          </div>
+        </template>
+      </Menu>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.toolbar-menu-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .toolbar-button {
   font-weight: bold;
   font-size: large;
@@ -198,7 +226,18 @@ function isHighlighted(item: MenuItem) {
   padding: 0.35rem !important;
 }
 
+.menu-separator {
+  display: inline-flex;
+  align-items: center;
+}
+
 .highlighted-icon {
   color: var(--p-highlight-color) !important;
+}
+
+@media (max-width: 900px) {
+  .menu-separator {
+    display: none;
+  }
 }
 </style>

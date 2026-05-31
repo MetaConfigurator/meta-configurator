@@ -1,9 +1,14 @@
 import {getDataForMode} from '@/data/useDataLink';
-import {SessionMode} from '@/store/sessionMode';
+import {
+  SessionMode,
+  documentTypeDescriptionToMode,
+  modeToDocumentTypeDescription,
+} from '@/store/sessionMode';
 import {computed, type Ref} from 'vue';
 import {useSettings} from '@/settings/useSettings';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {useSessionStore} from '@/store/sessionStore';
 
 const settings = useSettings();
 
@@ -56,7 +61,8 @@ export async function storeCurrentSnapshot(
   const data = getDataForMode(SessionMode.DataEditor).data.value;
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
   const settings = getDataForMode(SessionMode.Settings).data.value;
-  const result = await storeSnapshot(data, schema, settings, infoRef, errorRef);
+  const mode = modeToDocumentTypeDescription(useSessionStore().currentMode);
+  const result = await storeSnapshot(data, schema, settings, mode, infoRef, errorRef);
   const snapshotId = result['snapshot_id'];
   resultSnapshotLink.value = `${FRONTEND_URL.value}/?snapshot=${snapshotId}`;
   return snapshotId;
@@ -66,6 +72,7 @@ async function storeSnapshot(
   data: any,
   schema: any,
   settings: any,
+  mode: string,
   infoRef: Ref<string>,
   errorRef: Ref<string>
 ) {
@@ -73,6 +80,7 @@ async function storeSnapshot(
     data: data,
     schema: schema,
     settings: settings,
+    mode: mode,
   };
 
   infoRef.value = 'Storing snapshot...';
@@ -102,7 +110,10 @@ async function getSnapshot(snapshotId: string, isProject: boolean = false) {
   return response.json();
 }
 
-export async function restoreSnapshot(snapshotId: string, isProject: boolean = false) {
+export async function restoreSnapshot(
+  snapshotId: string,
+  isProject: boolean = false
+): Promise<SessionMode> {
   const result = await getSnapshot(snapshotId, isProject);
   if ('error' in result) {
     const errorMessage =
@@ -124,6 +135,7 @@ export async function restoreSnapshot(snapshotId: string, isProject: boolean = f
   getDataForMode(SessionMode.DataEditor).setData(data);
   getDataForMode(SessionMode.SchemaEditor).setData(schema);
   getDataForMode(SessionMode.Settings).setData(settings);
+  return documentTypeDescriptionToMode(result['mode']);
 }
 
 async function handleErrors(response: Response, errorRef: Ref<string> | null) {

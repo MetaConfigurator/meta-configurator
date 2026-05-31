@@ -93,12 +93,12 @@ const emit = defineEmits<{
 
 const exportPopover = ref<any>(null);
 
-function updateGlobalFilter(value: string | null) {
+function updateGlobalFilter(value: string | undefined) {
   const nextFilters = {
     ...props.filters,
     global: {
       ...(props.filters.global ?? {}),
-      value,
+      value: value ?? null,
     },
   };
   emit('update:filters', nextFilters);

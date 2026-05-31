@@ -5,7 +5,7 @@ import {
   getTypeDescription,
   isSubSchemaDefinedInDefinitions,
 } from '@/schema/schemaReadingUtils';
-import {jsonPointerToPath, pathToString} from '@/utility/pathUtils';
+import {pathToString} from '@/utility/pathUtils';
 import {useSettings} from '@/settings/useSettings';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import {dataAt} from '@/utility/resolveDataAtPath';
@@ -23,6 +23,7 @@ import {
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {isExternalRef} from '@/schema/externalReferences.ts';
 import {JsonSchemaVisitor, type VisitorContext} from '@/schema/jsonSchemaVisitor.ts';
+import {resolveInternalReferencePath} from '@/schema/schemaReferenceUtils';
 
 const settings = useSettings();
 
@@ -396,6 +397,10 @@ export function generateAttributeTypeDescription(
     }
   }
 
+  if (doesSchemaHaveType(schema, 'null', true) && !typeDescription.includes('null')) {
+    typeDescription += ', null';
+  }
+
   return typeDescription;
 }
 
@@ -555,10 +560,12 @@ function resolveReferenceNode(
         return undefined;
       }
     }
-    const refPath = jsonPointerToPath(schema.$ref.replace('#', ''));
-    const refPathString = pathToString(refPath);
-    if (objectDefs.has(refPathString)) {
-      return objectDefs.get(refPathString);
+    const refPath = resolveInternalReferencePath(schema.$ref);
+    if (refPath) {
+      const refPathString = pathToString(refPath);
+      if (objectDefs.has(refPathString)) {
+        return objectDefs.get(refPathString);
+      }
     }
   }
   return undefined;

@@ -47,6 +47,9 @@ export interface SettingsInterfaceGuiEditor {
   hideAddPropertyButton: boolean;
   showBorderAroundInputFields: boolean;
   showSchemaTitleAsHeader: boolean;
+  useScientificNotationForLargeAndSmallNumbers: boolean;
+  scientificNotationUpperThreshold: number;
+  scientificNotationLowerThreshold: number;
 }
 
 export interface SettingsInterfaceSchemaDiagram {
@@ -54,6 +57,7 @@ export interface SettingsInterfaceSchemaDiagram {
   vertical: boolean;
   showAttributes: boolean;
   showEnumValues: boolean;
+  showNullableCheckbox: boolean;
   maxAttributesToShow: number;
   maxEnumValuesToShow: number;
   moveViewToSelectedElement: boolean;
@@ -94,12 +98,12 @@ export enum PropertySorting {
   PRIORITY_ORDER = 'priorityOrder',
   SCHEMA_ORDER = 'schemaOrder',
   DATA_ORDER = 'dataOrder',
+  ALPHABETICAL_ORDER = 'alphabeticalOrder',
 }
 
 export enum DataFormat {
   JSON = 'json',
   YAML = 'yaml',
-  XML = 'xml',
 }
 
 export interface SettingsInterfaceBackend {
@@ -118,11 +122,20 @@ export interface SettingsInterfaceRdf {
   maximumNodesToVisualize: number;
 }
 
+export interface AiBackendCorsEndpoint {
+  endpoint: string;
+}
+
+export interface AiBackendRelay {
+  relay: string;
+  endpoint: string;
+}
+
 export interface SettingsInterfaceAiIntegraton {
   model: string;
-  maxTokens: number;
   temperature: number;
-  endpoint: string;
+  backend: AiBackendCorsEndpoint | AiBackendRelay;
+  [key: string]: unknown;
 }
 
 export interface SettingsInterfaceSchemaSelectionList {

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {ref, watchEffect} from 'vue';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useMagicKeys} from '@vueuse/core';
 import {focus} from '@/utility/focusUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
+import {DataFormat} from '@/settings/settingsTypes';
 import Select from 'primevue/select';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import ModeSelector from '@/components/toolbar/ModeSelector.vue';
@@ -28,10 +29,18 @@ const emit = defineEmits<{
   (e: 'show-data-mapping-dialog'): void;
   (e: 'show-rml-mapping-dialog'): void;
   (e: 'show-import-turtle-dialog'): void;
+  (e: 'show-import-xml-dialog'): void;
+  (e: 'show-xml-export-dialog'): void;
 }>();
 
 const settings = useSettings();
 const dataFormatOptions = formatRegistry.getFormatNames();
+
+watchEffect(() => {
+  if (!dataFormatOptions.includes(settings.value.dataFormat)) {
+    settings.value.dataFormat = DataFormat.JSON;
+  }
+});
 
 async function showSchemaSelectionDialog() {
   emit('show-schema-selection-dialog');
@@ -73,6 +82,14 @@ function showTurtleImportDialog() {
   emit('show-import-turtle-dialog');
 }
 
+function showXmlImportDialog() {
+  emit('show-import-xml-dialog');
+}
+
+function showXmlExportDialog() {
+  emit('show-xml-export-dialog');
+}
+
 const modeSelector = ref();
 
 useMagicKeys({
@@ -110,35 +127,33 @@ useMagicKeys({
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()"
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-          @show-import-turtle-dialog="() => showTurtleImportDialog()" />
+          @show-import-turtle-dialog="() => showTurtleImportDialog()"
+          @show-import-xml-dialog="() => showXmlImportDialog()"
+          @show-xml-export-dialog="() => showXmlExportDialog()" />
 
         <Divider layout="vertical" />
 
         <SearchBar />
       </div>
 
-      <!-- CENTER: TopToolbarMenuButtons + SearchBar -->
-      <div class="center-section"></div>
-
-      <!-- RIGHT: Logo + title + buttons -->
-      <Button
-        :class="{
-          'toolbar-button': true,
-          'highlighted-icon': props.currentMode === SessionMode.Settings,
-        }"
-        circular
-        text
-        size="small"
-        v-if="!settings.hideSettings"
-        v-tooltip.bottom="'Settings'"
-        data-testid="mode-settings-button"
-        @click="() => selectedMode(SessionMode.Settings)">
-        <FontAwesomeIcon icon="fa-solid fa-gear" />
-      </Button>
-
       <Divider layout="vertical" />
 
       <div class="right-section">
+        <Button
+          :class="{
+            'toolbar-button': true,
+            'highlighted-icon': props.currentMode === SessionMode.Settings,
+          }"
+          circular
+          text
+          size="small"
+          v-if="!settings.hideSettings"
+          v-tooltip.bottom="'Settings'"
+          data-testid="mode-settings-button"
+          @click="() => selectedMode(SessionMode.Settings)">
+          <FontAwesomeIcon icon="fa-solid fa-gear" />
+        </Button>
+
         <div class="flex space-x-2 items-center">
           <span class="pi pi-sitemap" style="font-size: 1.7rem" />
           <p class="font-semibold text-lg" data-testid="toolbar-title">
@@ -179,7 +194,9 @@ useMagicKeys({
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()"
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-          @show-import-turtle-dialog="() => showTurtleImportDialog()" />
+          @show-import-turtle-dialog="() => showTurtleImportDialog()"
+          @show-import-xml-dialog="() => showXmlImportDialog()"
+          @show-xml-export-dialog="() => showXmlExportDialog()" />
       </div>
 
       <!-- RIGHT side: format selector -->
@@ -200,13 +217,17 @@ useMagicKeys({
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 0;
 }
 
 /* Shared styling for both rows */
 .toolbar-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
   padding: 0.3rem 0.75rem;
+  gap: 0.5rem;
 }
 
 /* Top row should spread items across */
@@ -230,26 +251,26 @@ useMagicKeys({
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 /* Sections inside the top row */
 .left-section {
   display: flex;
   align-items: center;
-}
-
-.center-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1; /* take all available space */
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-width: 0;
+  flex: 1 1 32rem;
 }
 
 .right-section {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
 /* Custom button style */
@@ -264,5 +285,73 @@ useMagicKeys({
   height: 1.75rem;
   line-height: 0.7rem;
   padding: 0;
+}
+
+@media (max-width: 960px) {
+  .bottom-left {
+    flex: 1 1 0;
+  }
+
+  .right-section {
+    gap: 0.5rem;
+  }
+
+  .format-switch-container {
+    flex: 0 0 6.25rem;
+  }
+
+  .custom-select {
+    width: 100%;
+  }
+
+  :deep(.p-divider-vertical) {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .toolbar-row {
+    padding: 0.35rem 0.5rem;
+  }
+
+  .toolbar-top,
+  .toolbar-bottom {
+    justify-content: flex-start;
+  }
+
+  .left-section,
+  .right-section {
+    width: 100%;
+  }
+
+  .left-section {
+    order: 2;
+  }
+
+  .right-section {
+    order: 1;
+    justify-content: flex-start;
+  }
+
+  .right-section p {
+    font-size: 0.95rem;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .right-section > .flex {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .left-section {
+    gap: 0.2rem;
+  }
+
+  .format-switch-container {
+    flex-basis: 5.25rem;
+  }
 }
 </style>

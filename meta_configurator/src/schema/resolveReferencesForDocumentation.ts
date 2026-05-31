@@ -1,11 +1,14 @@
 import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
-import {dataAt} from '@/utility/resolveDataAtPath';
-import {jsonPointerToPathTyped} from '@/utility/pathUtils';
 import {cloneDeep} from 'lodash';
 import {mergeAllOfs} from '@/schema/mergeAllOfs';
 import type {Path} from '@/utility/path';
 import {doesSchemaHaveType} from '@/schema/schemaReadingUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import {
+  resolveInternalReferencePath,
+  resolveInternalReferenceSchema,
+} from '@/schema/schemaReferenceUtils';
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 // this code is not recursive and also mainly developed for the documentation view, not sure how generally applicable it is
 export function resolveReferencesForDocumentation(subSchema: any, rootSchema: TopLevelSchema): any {
@@ -14,8 +17,7 @@ export function resolveReferencesForDocumentation(subSchema: any, rootSchema: To
   }
   if (subSchema.$ref) {
     const refJsonPointer = subSchema.$ref;
-    const refPath = jsonPointerToPathTyped(refJsonPointer);
-    const schemaAtRef = dataAt(refPath, rootSchema);
+    const schemaAtRef = resolveInternalReferenceSchema(refJsonPointer, rootSchema);
     // copy subSchema
     const subSchemaWithoutRef = cloneDeep(subSchema);
     delete subSchemaWithoutRef.$ref;
@@ -40,8 +42,7 @@ export function collectReferences(subSchema: any, rootSchema: TopLevelSchema): S
   }
   if (subSchema.$ref) {
     const refJsonPointer = subSchema.$ref;
-    const refPath = jsonPointerToPathTyped(refJsonPointer);
-    const schemaAtRef = dataAt(refPath, rootSchema);
+    const schemaAtRef = resolveInternalReferenceSchema(refJsonPointer, rootSchema);
     const result = collectReferences(schemaAtRef, rootSchema);
     result.add(refJsonPointer);
     return result;
@@ -57,8 +58,10 @@ export function findTargetPath(
 ): Path {
   const schemaAtPath: JsonSchemaObjectType = dataAt(path, rootSchema);
   if (schemaAtPath && schemaAtPath.$ref) {
-    const newPath = jsonPointerToPathTyped(schemaAtPath.$ref);
-    return findTargetPath(newPath, rootSchema, goThroughArray);
+    const newPath = resolveInternalReferencePath(schemaAtPath.$ref);
+    if (newPath) {
+      return findTargetPath(newPath, rootSchema, goThroughArray);
+    }
   }
 
   if (goThroughArray && doesSchemaHaveType(schemaAtPath, 'array', true)) {

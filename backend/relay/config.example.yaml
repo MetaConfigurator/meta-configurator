@@ -1,0 +1,109 @@
+# MetaConfigurator Relay — example configuration
+#
+# Copy to config.yaml and fill in your provider API keys.
+# Keep config.yaml private: chmod 600 config.yaml
+
+# ---------------------------------------------------------------------------
+# Authentication
+# ---------------------------------------------------------------------------
+
+# Clients must send this as a Bearer token: Authorization: Bearer <relay_password>
+# Leave empty ("") to allow all requests without authentication.
+# Set a strong random value when the relay is publicly reachable:
+#   openssl rand -base64 32
+relay_password: ""
+
+# ---------------------------------------------------------------------------
+# CORS — which browser origins may call the relay
+# ---------------------------------------------------------------------------
+
+# Leave empty ([]) to allow any origin (fine for local use).
+allowed_origins:
+  - "https://www.metaconfigurator.org"
+  - "https://metaconfigurator.github.io"
+  - "http://localhost:5173"
+
+# ---------------------------------------------------------------------------
+# Rate limiting (per client IP)
+# ---------------------------------------------------------------------------
+
+rate_limits:
+  enabled: true
+  requests_per_minute: 20
+  requests_per_hour: 200
+  requests_per_day: 1000
+
+# ---------------------------------------------------------------------------
+# Usage limits
+# ---------------------------------------------------------------------------
+
+limits:
+  # Caps the max_tokens value per request (prevents runaway token use).
+  max_request_tokens: 10000
+  # Max tokens a single IP may use in 24 h. Set to 0 to disable.
+  max_daily_tokens_per_ip: 100000
+  # Max request body size in bytes.
+  max_request_bytes: 2097152
+
+# ---------------------------------------------------------------------------
+# Other settings
+# ---------------------------------------------------------------------------
+
+# Seconds to wait for the upstream provider before returning a timeout error.
+request_timeout: 180
+
+enable_streaming: true       # Pass through streaming responses.
+enable_models_proxy: true    # Expose GET /v1/models.
+log_level: INFO              # DEBUG, INFO, WARNING, or ERROR.
+
+# ---------------------------------------------------------------------------
+# Endpoints
+# ---------------------------------------------------------------------------
+#
+# Add one entry per provider. Set the matching "Endpoint" URL in MetaConfigurator
+# and the relay will route requests to that provider automatically.
+#
+# The relay matches the "Endpoint" URL from MetaConfigurator against the `url`
+# field here to decide which api_key to inject. If no match, the first entry
+# is used as the default.
+
+endpoints:
+
+  - name: perplexity
+    url: https://api.perplexity.ai
+    api_key: "pplx-YOUR_PERPLEXITY_KEY_HERE"
+
+  - name: openai
+    url: https://api.openai.com/v1
+    api_key: "sk-YOUR_OPENAI_KEY_HERE"
+
+  - name: openrouter
+    url: https://openrouter.ai/api/v1
+    api_key: "sk-or-YOUR_OPENROUTER_KEY_HERE"
+    extra_headers:
+      HTTP-Referer: "https://www.metaconfigurator.org"
+      X-Title: "MetaConfigurator"
+
+  - name: helmholtz-blablador
+    url: https://api.helmholtz-blablador.fz-juelich.de/v1
+    api_key: "YOUR_HELMHOLTZ_KEY_HERE"
+
+  - name: academiccloud
+    url: https://chat-ai.academiccloud.de/v1
+    api_key: "YOUR_ACADEMICCLOUD_KEY_HERE"
+
+# ---------------------------------------------------------------------------
+# Additional providers (uncomment and edit as needed)
+# ---------------------------------------------------------------------------
+
+# Ollama — local inference, no API key required
+# - name: ollama
+#   url: http://localhost:11434/v1
+#   api_key: "ollama"
+
+# Azure OpenAI — uses a different auth header
+# - name: azure-openai
+#   url: "https://YOUR_RESOURCE.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT"
+#   api_key: "YOUR_AZURE_KEY"
+#   auth_header: "api-key"
+#   auth_prefix: ""

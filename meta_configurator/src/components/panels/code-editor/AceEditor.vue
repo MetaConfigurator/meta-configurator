@@ -19,9 +19,14 @@ import {
 } from '@/components/panels/code-editor/setupLinkToSelectionAndData';
 import {useSettings} from '@/settings/useSettings';
 import {modeToDocumentTypeDescription, SessionMode} from '@/store/sessionMode';
-import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
+import {
+  connectAceUndoManagerToGlobalUndo,
+  setupAceMode,
+  setupAceProperties,
+} from '@/components/panels/shared-components/aceUtils';
 import Message from 'primevue/message';
 import {sizeOf} from '@/utility/sizeOf';
+import {getDataForMode} from '@/data/useDataLink';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -42,6 +47,7 @@ onMounted(() => {
 
   setupAceMode(editor.value, settings.value);
   setupAceProperties(editor.value, settings.value);
+  connectAceUndoManagerToGlobalUndo(editor.value, getDataForMode(props.sessionMode).undoManager);
 
   setupLinkToData(editor.value, props.sessionMode);
   setupLinkToCurrentSelection(editor.value, props.sessionMode);
@@ -70,13 +76,7 @@ watch(
 );
 
 function isEditorReadOnly(): boolean {
-  const dataFormat = settings.value.dataFormat;
-  const mode = props.sessionMode;
-
-  // if the editor is in schema/settings mode, XML is in read only because it will mess up the structure otherwise
-  return (
-    (mode === SessionMode.SchemaEditor || mode === SessionMode.Settings) && dataFormat === 'xml'
-  );
+  return false;
 }
 
 const featuresDisabledForPerformance = computed(() => {

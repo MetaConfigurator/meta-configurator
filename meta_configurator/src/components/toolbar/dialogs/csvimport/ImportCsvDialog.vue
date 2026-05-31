@@ -82,7 +82,7 @@ function requestUploadFile() {
   requestUploadFileToRef(currentUserDataString, pathBeforeRowIndex);
 }
 
-watch(currentUserDataString, newValue => {
+watch(currentUserDataString, () => {
   const {delimiterSuggestion, decimalSeparatorSuggestion} =
     computeMostUsedDelimiterAndDecimalSeparator(currentUserDataString.value);
   delimiter.value = delimiterSuggestion;
@@ -90,7 +90,7 @@ watch(currentUserDataString, newValue => {
   // isInferSchema.value = isSchemaEmpty(useCurrentSchema().schemaRaw.value);
   loadCsvFromInput();
 });
-watch([decimalSeparator, delimiter], newValue => {
+watch([decimalSeparator, delimiter], () => {
   loadCsvFromInput();
 });
 
@@ -109,10 +109,15 @@ function loadCsvFromInput() {
 }
 
 // Watch for changes in currentUserCsv and update fields shown to user accordingly
-watch(currentUserCsv, newValue => {
+watch(currentUserCsv, () => {
   if (currentUserCsv.value.length > 0) {
     // Get the first row of the CSV file and use it as the column names
-    const columns = Object.keys(currentUserCsv.value[0]);
+    const firstRow = currentUserCsv.value[0];
+    if (!firstRow) {
+      currentColumnMapping.value = [];
+      return;
+    }
+    const columns = Object.keys(firstRow);
     currentColumnMapping.value = columns.map((column, index) => {
       return new CsvImportColumnMappingData(index, column, pathBeforeRowIndex);
     });
@@ -131,7 +136,7 @@ watch(currentUserCsv, newValue => {
 
   // by default, select the first table to expand
   if (possiblePreviousTables.value.length > 0) {
-    tableToExpand.value = possiblePreviousTables.value[0];
+    tableToExpand.value = possiblePreviousTables.value[0]!;
   }
 
   possiblePrimaryKeyProps.value = currentColumnMapping.value.map(column => {
@@ -141,7 +146,7 @@ watch(currentUserCsv, newValue => {
     };
   });
   if (possiblePrimaryKeyProps.value.length > 0) {
-    primaryKeyProp.value = possiblePrimaryKeyProps.value[0];
+    primaryKeyProp.value = possiblePrimaryKeyProps.value[0]!;
   }
 });
 
@@ -159,16 +164,19 @@ watch(tableToExpand, newValue => {
   // select the best matching foreign key property
   if (possibleForeignKeyProps.value.length > 0 && currentColumnMapping.value.length > 0) {
     const arrayPath = jsonPointerToPathTyped('/' + tableToExpand.value.value);
-    const bestMatchingForeignKey = findBestMatchingForeignKeyAttribute(
-      arrayPath,
-      currentUserCsv.value,
-      possibleForeignKeyProps.value.map(prop => prop.value),
-      primaryKeyProp.value.value
-    );
-    foreignKey.value = {
-      label: bestMatchingForeignKey,
-      value: bestMatchingForeignKey,
-    };
+    const bestMatchingForeignKey =
+      findBestMatchingForeignKeyAttribute(
+        arrayPath,
+        currentUserCsv.value,
+        possibleForeignKeyProps.value.map(prop => prop.value),
+        primaryKeyProp.value.value
+      ) ?? possibleForeignKeyProps.value[0]?.value;
+    if (bestMatchingForeignKey) {
+      foreignKey.value = {
+        label: bestMatchingForeignKey,
+        value: bestMatchingForeignKey,
+      };
+    }
   }
   // update pathBeforeRowIndex to the table path
   pathBeforeRowIndex.value = pathToJsonPointer(newValue.value).slice(1);
@@ -227,6 +235,7 @@ defineExpose({show: openDialog, close: hideDialog});
       <div class="flex align-items-center">
         <Button
           label="Select CSV Document"
+          data-testid="csv-select-file"
           @click="requestUploadFile"
           class="p-button-raised p-button-rounded"></Button>
         <FontAwesomeIcon
@@ -239,7 +248,8 @@ defineExpose({show: openDialog, close: hideDialog});
         v-if="currentUserDataString.length > 0"
         header="Import Options"
         toggleable
-        :collapsed="true">
+        :collapsed="true"
+        :pt="{pcToggleButton: {root: {'data-testid': 'csv-import-options-toggle'}}}">
         <div>
           <div class="flex align-items-center vertical-center">
             <label for="delimiter" class="mr-2"><b>Delimiter in the CSV document:</b></label>
@@ -300,7 +310,10 @@ defineExpose({show: openDialog, close: hideDialog});
               <label for="delimiter" class="mr-2">
                 <b>Path for the resulting array in the document:</b>
               </label>
-              <InputText v-model="pathBeforeRowIndex" class="fixed-width" />
+              <InputText
+                v-model="pathBeforeRowIndex"
+                data-testid="csv-table-path-input"
+                class="fixed-width" />
             </div>
           </div>
           <div v-else>
@@ -368,14 +381,17 @@ defineExpose({show: openDialog, close: hideDialog});
               </tr>
             </thead>
             <tbody>
-              <tr v-for="column in currentColumnMapping">
+              <tr v-for="column in currentColumnMapping" :key="column.index">
                 <td>{{ column.name }}</td>
                 <td>
                   <span class="text-xs">/{{ column.pathBeforeRowIndex }}/ROW_INDEX/</span>
                   <span class="text-xs" v-if="isExpandWithLookupTables"
                     >{{ foreignKey.value }}/</span
                   >
-                  <InputText v-model="column.pathAfterRowIndex" class="fixed-width" />
+                  <InputText
+                    v-model="column.pathAfterRowIndex"
+                    :data-testid="'csv-column-path-' + column.name"
+                    class="fixed-width" />
                 </td>
                 <!--td v-if="isInferSchema">
                 <InputText v-model="column.titleInSchema" class="fixed-width" />
@@ -389,6 +405,7 @@ defineExpose({show: openDialog, close: hideDialog});
       <Button
         v-if="currentUserCsv.length > 0"
         @click="submitImport"
+        data-testid="csv-submit-import"
         class="p-button-raised p-button-rounded"
         label="Import"></Button>
     </div>

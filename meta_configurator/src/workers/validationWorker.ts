@@ -17,7 +17,6 @@ interface ValidationWorkerResponse {
   taskId: string;
 }
 
-import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import {ValidationResult} from '@/schema/validationUtils';
 

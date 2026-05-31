@@ -1,8 +1,50 @@
+# Joint HTTPS deployment of all MetaConfigurator backend services.
+#
+# A single nginx reverse proxy (nginxproxy/nginx-proxy) is the only thing
+# exposed publicly. It terminates TLS (cert via acme-companion) and routes
+# requests to the appropriate service container by URL path:
+#
+#     https://${BASE_DOMAIN}/snapshot/*  →  snapshot_sharing
+#     https://${BASE_DOMAIN}/project/*   →  snapshot_sharing
+#     https://${BASE_DOMAIN}/relay/*     →  relay   (path stripped)
+#     https://${BASE_DOMAIN}/health      →  relay   (kept for convenience)
+#     https://${BASE_DOMAIN}/            →  snapshot_sharing (catch-all)
+#
+# Each service runs in its own container with no published ports — only the
+# nginx-proxy can reach them via the shared `backend-network`. If one service
+# crashes, nginx returns 502 for that path; the others stay up.
+#
+# Adding a new service:
+#   1. Create backend/<service_name>/ with its own Dockerfile + app.
+#   2. Add a service block to this compose file modeled on `relay` below:
+#        - build: ./<service_name>
+#        - expose the internal port
+#        - VIRTUAL_HOST=${BASE_DOMAIN}
+#        - VIRTUAL_PATH=/<service_name>/
+#        - VIRTUAL_DEST=/                  (strips the prefix before forwarding)
+#        - VIRTUAL_PORT=<internal_port>
+#        - networks: [backend-network]
+#   3. The new service is reachable at https://${BASE_DOMAIN}/<service_name>/.
+#
+# TLS / Let's Encrypt anchoring:
+#   The acme-companion issues one certificate per LETSENCRYPT_HOST it sees on a
+#   container that also has VIRTUAL_HOST. Since all our services share the same
+#   hostname (BASE_DOMAIN), we only need LETSENCRYPT_HOST set once — anchored
+#   on snapshot_sharing below. New services do NOT need to set LETSENCRYPT_*.
+#
+# Required env (load via .env next to this file):
+#   BASE_DOMAIN, LETSENCRYPT_EMAIL, MONGO_PASS, REDIS_PASS
+# See .env.example.
+
 services:
 
-  backend:
-    container_name: backend
-    build: .
+  # -------------------------------------------------------------------------
+  # snapshot_sharing — stable, lightweight; mounted at the root.
+  # -------------------------------------------------------------------------
+
+  snapshot_sharing:
+    container_name: snapshot_sharing
+    build: ./snapshot_sharing
     expose:
       - "5000"
     restart: unless-stopped
@@ -10,59 +52,84 @@ services:
       - mongo
       - redis
     networks:
-      - app-network
+      - backend-network
     environment:
-      VIRTUAL_HOST: metaconfigurator.informatik.uni-stuttgart.de
+      VIRTUAL_HOST: ${BASE_DOMAIN:?BASE_DOMAIN is not set}
+      VIRTUAL_PATH: /
       VIRTUAL_PORT: 5000
-      LETSENCRYPT_HOST: metaconfigurator.informatik.uni-stuttgart.de
-      LETSENCRYPT_EMAIL: felix.neubauer@ipvs.uni-stuttgart.de
-      FLASK_ENV: development
+      LETSENCRYPT_HOST: ${BASE_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
+      FLASK_ENV: production
+      FLASK_ENABLE_SSL: "false"
       MONGO_USER: root
+      MONGO_PASS: ${MONGO_PASS:?MONGO_PASS is not set}
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       MONGO_DB: metaconfigurator
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      FLASK_ENABLE_SSL: "false"
-    env_file:
-      - .env.prod
+      REDIS_PASS: ${REDIS_PASS:?REDIS_PASS is not set}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,https://metaconfigurator.github.io,https://logende.github.io,https://www.metaconfigurator.org,https://metaconfigurator.org,https://metaconfigurator.informatik.uni-stuttgart.de}
 
   mongo:
     image: mongo:latest
-    container_name: mongo
+    container_name: snapshot_sharing-mongo
     restart: unless-stopped
     networks:
-      - app-network
+      - backend-network
     volumes:
       - mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
       MONGO_INITDB_DATABASE: metaconfigurator
-    env_file:
-      - .env.prod
 
   redis:
     image: redis:latest
-    container_name: redis
+    container_name: snapshot_sharing-redis
+    restart: unless-stopped
+    networks:
+      - backend-network
     command:
       - /bin/sh
       - -c
-      # - Double dollars, so that the variable is not expanded by Docker Compose
-      # - Surround by quotes, so that the shell does not split the password
-      # - The ${variable:?message} syntax causes shell to exit with a non-zero
-      #   code and print a message, when the variable is not set or empty
-      - redis-server --requirepass "$${REDIS_PASS:?REDIS_PASS variable is not set}"
+      - redis-server --requirepass "$${REDIS_PASS}"
+    environment:
+      REDIS_PASS: ${REDIS_PASS}
     volumes:
-      - redis:/var/lib/redis/data
+      - redis-data:/var/lib/redis/data
+
+  # -------------------------------------------------------------------------
+  # relay — LLM proxy. Mounted at /relay/.
+  # The path is stripped before forwarding (VIRTUAL_DEST=/), so the relay app
+  # sees its routes (e.g. /v1/chat/completions) unchanged.
+  # -------------------------------------------------------------------------
+
+  relay:
+    container_name: relay
+    build: ./relay
+    expose:
+      - "8080"
     restart: unless-stopped
-    env_file:
-    - .env.prod
     networks:
-      - app-network
+      - backend-network
+    volumes:
+      - ./relay/config.yaml:/app/config.yaml:ro
+    environment:
+      VIRTUAL_HOST: ${BASE_DOMAIN}
+      VIRTUAL_PATH: /relay/
+      VIRTUAL_DEST: /
+      VIRTUAL_PORT: 8080
+      # No LETSENCRYPT_* — the cert is anchored on snapshot_sharing and reused
+      # for every service that shares the same VIRTUAL_HOST.
+
+  # -------------------------------------------------------------------------
+  # Shared reverse proxy + Let's Encrypt companion
+  # -------------------------------------------------------------------------
 
   nginx-proxy:
-    image: jwilder/nginx-proxy
-    container_name: nginx-proxy
+    image: nginxproxy/nginx-proxy:latest
+    container_name: backend-nginx-proxy
     ports:
       - "80:80"
       - "443:443"
@@ -72,31 +139,31 @@ services:
       - ./certs:/etc/nginx/certs
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
-      - app-network
+      - backend-network
     restart: unless-stopped
 
   letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    container_name: nginx-letsencrypt
+    image: nginxproxy/acme-companion:latest
+    container_name: backend-nginx-letsencrypt
     depends_on:
       - nginx-proxy
     environment:
-      NGINX_PROXY_CONTAINER: nginx-proxy
-      DEFAULT_EMAIL: felix.neubauer@ipvs.uni-stuttgart.de
+      NGINX_PROXY_CONTAINER: backend-nginx-proxy
+      DEFAULT_EMAIL: ${LETSENCRYPT_EMAIL}
     volumes:
       - ./certs:/etc/nginx/certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/nginx/vhost.d
       - acme-challenges:/usr/share/nginx/html
     networks:
-      - app-network
+      - backend-network
     restart: unless-stopped
 
 networks:
-  app-network:
+  backend-network:
     driver: bridge
 
 volumes:
   mongo-data:
-  redis:
+  redis-data:
   acme-challenges:

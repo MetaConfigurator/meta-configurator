@@ -44,7 +44,7 @@ To avoid/fix merge conflicts due to the automated formatting, you can do either:
 
 ## Tests
 
-For detailed testing descriptions, see [the testing documentation](TESTING.md)
+For detailed testing descriptions, see [the testing documentation](../tests/README.md)
 
 In short, run unit tests and end-to-end tests the following way:
 

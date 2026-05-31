@@ -18,6 +18,10 @@ export class ToastService implements ToastServiceMethods {
   removeGroup(group: string): void {
     this.toast?.removeGroup(group);
   }
+
+  remove(message: ToastMessageOptions): void {
+    this.toast?.remove(message);
+  }
 }
 
 export const toastService = new ToastService();
