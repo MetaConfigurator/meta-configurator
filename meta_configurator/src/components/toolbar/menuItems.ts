@@ -14,6 +14,7 @@ import {openImportSchemaDialog} from '@/components/toolbar/importFile';
 import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchemaDefinitions';
 import {resolveSchemaReferences} from '@/components/toolbar/resolveSchemaReferences.ts';
 import {bundleSchema} from '@/components/toolbar/bundleSchema.ts';
+import {sortSchemaPropertiesAlphabeticallyAction} from '@/components/toolbar/sortSchemaProperties.ts';
 
 /**
  * Helper class that contains the menu items for the top menu bar.
@@ -30,6 +31,8 @@ export class MenuItems {
   private readonly inferJsonSchemaFromSampleData: () => void;
   private readonly showRMLMappingDialog: () => void;
   private readonly showImportTurtleDialog: () => void;
+  private readonly showImportXmlDialog: () => void;
+  private readonly showXmlExportDialog: () => void;
 
   constructor(
     showSchemaSelectionDialog: () => void,
@@ -40,7 +43,9 @@ export class MenuItems {
     showDataMappingDialog: () => void,
     inferJsonSchemaFromSampleData: () => void,
     showRMLMappingDialog: () => void,
-    showImportTurtleDialog: () => void
+    showImportTurtleDialog: () => void,
+    showImportXmlDialog: () => void,
+    showXmlExportDialog: () => void
   ) {
     this.showSchemaSelectionDialog = showSchemaSelectionDialog;
     this.showImportCsvDialog = showImportCsvDialog;
@@ -51,6 +56,8 @@ export class MenuItems {
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
     this.showRMLMappingDialog = showRMLMappingDialog;
     this.showImportTurtleDialog = showImportTurtleDialog;
+    this.showImportXmlDialog = showImportXmlDialog;
+    this.showXmlExportDialog = showXmlExportDialog;
   }
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
@@ -78,6 +85,7 @@ export class MenuItems {
       },
       {
         label: 'Import Data...',
+        key: 'import-data',
         icon: 'fa-solid fa-file-import',
         items: [
           {
@@ -90,6 +98,11 @@ export class MenuItems {
             icon: 'fa-solid fa-globe',
             command: this.showImportTurtleDialog,
           },
+          {
+            label: 'Import XML Data',
+            icon: 'fa-solid fa-file-code',
+            command: this.showImportXmlDialog,
+          },
         ],
       },
       {
@@ -97,6 +110,17 @@ export class MenuItems {
         icon: 'fa-solid fa-download',
         command: () =>
           downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
+      },
+      {
+        label: 'Export Data...',
+        icon: 'fa-solid fa-file-export',
+        items: [
+          {
+            label: 'Export to XML',
+            icon: 'fa-solid fa-file-code',
+            command: this.showXmlExportDialog,
+          },
+        ],
       },
       {
         label: 'Utility...',
@@ -218,6 +242,11 @@ export class MenuItems {
             label: 'Bundle External References into the same File',
             icon: 'fa-solid fa-file-zipper',
             command: bundleSchema,
+          },
+          {
+            label: 'Sort All Schema Properties Alphabetically',
+            icon: 'fa-solid fa-arrow-down-a-z',
+            command: sortSchemaPropertiesAlphabeticallyAction,
           },
         ],
       },

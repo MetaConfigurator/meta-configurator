@@ -52,9 +52,8 @@ function newEmptyFile({
 
 function clearFile(dataLink: ManagedData) {
   dataLink.setData({});
-  let mode = useSessionStore().currentMode;
-  getSessionForMode(mode).updateCurrentPath([]); // todo introduce reset method
-  getSessionForMode(mode).updateCurrentSelectedElement([]);
+  getSessionForMode(dataLink.mode).updateCurrentPath([]); // todo introduce reset method
+  getSessionForMode(dataLink.mode).updateCurrentSelectedElement([]);
 }
 
 /**

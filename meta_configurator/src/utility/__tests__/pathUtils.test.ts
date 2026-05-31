@@ -11,7 +11,6 @@ import {
   pathToJsonPointer,
   pathToString,
 } from '../pathUtils';
-import {dataAt} from '../resolveDataAtPath';
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({

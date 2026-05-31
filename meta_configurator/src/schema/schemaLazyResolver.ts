@@ -1,6 +1,6 @@
 import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import pointer from 'json-pointer';
-import {nonBooleanSchema} from '@/schema/schemaProcessingUtils';
+import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
 import {areSchemasCompatible, mergeAllOfs, safeMergeSchemas} from '@/schema/mergeAllOfs';
 import {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode} from '@/data/useDataLink';
@@ -127,7 +127,7 @@ function attemptMergeOneOfsIntoAnyOfs(schema: JsonSchemaType) {
     let someAnyOfHasMultipleOneOfOptions = false;
 
     for (let i = 0; i < schema.anyOf.length; i++) {
-      const subSchemaAnyOf = schema.anyOf[i];
+      const subSchemaAnyOf = schema.anyOf[i]!;
 
       const mergedOneOfs: JsonSchemaType[] = [];
 
@@ -140,7 +140,7 @@ function attemptMergeOneOfsIntoAnyOfs(schema: JsonSchemaType) {
 
       if (mergedOneOfs.length == 1) {
         // if anyOf has just one compatible oneOf: merge it
-        schema.anyOf[i] = mergedOneOfs[0];
+        schema.anyOf[i] = mergedOneOfs[0]!;
       } else if (mergedOneOfs.length > 1) {
         someAnyOfHasMultipleOneOfOptions = true;
       }
@@ -223,7 +223,7 @@ function mergeSingularOneOf(schema: JsonSchemaType, mode: SessionMode): JsonSche
       const copiedSchema: JsonSchemaObjectType = {...schema};
       delete copiedSchema.oneOf;
       return safeMergeSchemas(
-        resolveAndTransform(schema.oneOf![0], mode),
+        resolveAndTransform(schema.oneOf[0]!, mode),
         resolveAndTransform(copiedSchema, mode)
       );
     } else if (schema.oneOf!!.length == 0) {
@@ -245,7 +245,7 @@ function mergeSingularAnyOf(schema: JsonSchemaType, mode: SessionMode): JsonSche
       const copiedSchema: JsonSchemaObjectType = {...schema};
       delete copiedSchema.anyOf;
       return safeMergeSchemas(
-        resolveAndTransform(schema.anyOf!![0], mode),
+        resolveAndTransform(schema.anyOf[0]!, mode),
         resolveAndTransform(copiedSchema, mode)
       );
     } else if (schema.anyOf!!.length == 0) {
@@ -266,7 +266,7 @@ function resolveReference(
   let preprocessedRefSchemas = preprocessedRefSchemasMap.get(mode)!;
   let refSchema: any;
   if (preprocessedRefSchemas.has(refString)) {
-    refSchema = preprocessedRefSchemas.get(refString);
+    refSchema = preprocessedRefSchemas.get(refString)!;
   } else {
     let rootSchema = getSchemaForMode(mode).schemaPreprocessed.value;
     try {

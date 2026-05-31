@@ -7,6 +7,7 @@ import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphCon
 import type {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import {updateReferences} from '@/utility/renameUtils';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
+import _ from 'lodash';
 
 export function extractAllInlinedSchemaElements(
   schemaData: ManagedData,
@@ -33,7 +34,7 @@ export function extractAllInlinedSchemaElements(
       node.title,
       node.fallbackDisplayName
     );
-    extractInlinedSchemaElement(node.absolutePath, schemaData, newIdentifier);
+    extractInlinedSchemaElement(node.absolutePath, schemaData, newIdentifier, true);
     nodesExtracted++;
   });
 
@@ -57,23 +58,17 @@ export function extractInlinedSchemaElement(
   };
 
   if (forgetIfDuplicateExists) {
-    // if an existing definition exists with the same content, we can just reference that
-    const existingElementDefPath = ['$defs', elementName];
-    const existingElementDef = dataAt(existingElementDefPath, schemaData.data.value);
-    if (existingElementDef) {
-      if (JSON.stringify(existingElementDef) === JSON.stringify(dataAtPath)) {
-        const referenceToNewElement = '#' + pathToJsonPointer(existingElementDefPath);
-        schemaData.setDataAt(absoluteElementPath, {
-          $ref: referenceToNewElement,
-        });
-        updateReferences(
-          absoluteElementPath,
-          existingElementDefPath,
-          schemaData.data.value,
-          updateDataFct
-        );
-        return existingElementDefPath;
-      }
+    // if an equivalent definition already exists anywhere in $defs (not just at the
+    // candidate name), reference that one instead of creating a duplicate. This collapses
+    // identical sub-schemas
+    const existingDefPath = doesIdenticalSchemaDefinitionExist(schemaData, dataAtPath);
+    if (existingDefPath) {
+      const referenceToExistingElement = '#' + pathToJsonPointer(existingDefPath);
+      schemaData.setDataAt(absoluteElementPath, {
+        $ref: referenceToExistingElement,
+      });
+      updateReferences(absoluteElementPath, existingDefPath, schemaData.data.value, updateDataFct);
+      return existingDefPath;
     }
   }
 
@@ -85,6 +80,32 @@ export function extractInlinedSchemaElement(
   });
   updateReferences(absoluteElementPath, newElementId, schemaData.data.value, updateDataFct);
   return newElementId;
+}
+
+/**
+ * Looks through every entry in the schema's top-level $defs and (legacy) definitions
+ * sections and returns the path of the first one whose content is deeply equal to
+ * `schemaToCheck`. Returns undefined if no such definition exists.
+ *
+ * Used to avoid creating duplicate definition entries when extracting sub-schemas: if an
+ * equivalent definition is already there, the caller can reference it instead.
+ */
+export function doesIdenticalSchemaDefinitionExist(
+  schemaData: ManagedData,
+  schemaToCheck: any
+): Path | undefined {
+  for (const defsKey of ['$defs', 'definitions']) {
+    const defs = dataAt([defsKey], schemaData.data.value);
+    if (!defs || typeof defs !== 'object') {
+      continue;
+    }
+    for (const name of Object.keys(defs)) {
+      if (_.isEqual(defs[name], schemaToCheck)) {
+        return [defsKey, name];
+      }
+    }
+  }
+  return undefined;
 }
 
 export function createIdentifierForExtractedElement(

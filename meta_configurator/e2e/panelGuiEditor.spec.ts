@@ -2,16 +2,21 @@ import { test, expect } from '@playwright/test';
 import {
     forceEditorMode,
     openApp, selectInitialSchemaFromExamples,
-} from "./utils";
+} from "../../tests/shared/utils";
 import {
     addArrayItem, checkPropertyExistence, checkPropertyRequired,
     checkPropertySchemaViolation,
     checkStringProperty, editBooleanProperty,
     editNumberOrIntProperty,
     editStringProperty, expandOrCollapseProperty
-} from "./utilsGuiEditor";
+} from "../../tests/shared/utilsGuiEditor";
 import {SessionMode} from "../src/store/sessionMode";
-import {tpForceCurrentSelectedElement, tpForceData, tpGetData} from "./utilsTestPanel";
+import {
+    tpForceCurrentSelectedElement,
+    tpForceData,
+    tpGetCurrentSelectedElement,
+    tpGetData
+} from "../../tests/shared/utilsTestPanel";
 
 test('Edit the feature testing example schema using the GUI Editor, testing basic editing and schema violations', async ({ page }) => {
     // Go to the app, pre-loading the test settings
@@ -32,6 +37,9 @@ test('Edit the feature testing example schema using the GUI Editor, testing basi
 
     // Set the heightInMeter property to the value 10
     await editNumberOrIntProperty(page, ['heightInMeter'], 10)
+    await expect
+        .poll(async () => (await tpGetData(page, SessionMode.DataEditor)).heightInMeter)
+        .toBe(10)
 
     // Expect a Schema Violation Symbol because the height value is invalid
     await checkPropertySchemaViolation(page, ['heightInMeter'], true)
@@ -101,6 +109,26 @@ test('Test whether selecting an element, of which the parent is collapsed in the
     await tpForceCurrentSelectedElement(page, SessionMode.SchemaEditor, elementOfInterest);
     // Expect that the elementOfInterest is now visible
     await checkPropertyExistence(page, elementOfInterest, true)
+});
+
+test('Selecting a nested field below a oneOf property expands the full visible branch', async ({ page }) => {
+    await openApp(page, 'settings_testpanel.json', null, null)
+    await selectInitialSchemaFromExamples(page, 'Autonomous Vehicle Schema');
+    await forceEditorMode(page, SessionMode.SchemaEditor)
+
+    const elementOfInterest = ['properties', 'SimulationName', 'type']
+    await checkPropertyExistence(page, elementOfInterest, false)
+
+    await tpForceCurrentSelectedElement(page, SessionMode.SchemaEditor, elementOfInterest);
+    await checkPropertyExistence(page, elementOfInterest, true)
+});
+
+test('Clicking an empty GUI field selects its path', async ({ page }) => {
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+
+    await page.getByTestId('property-data-name').click()
+
+    expect(await tpGetCurrentSelectedElement(page, SessionMode.DataEditor)).toEqual(['name'])
 });
 
 

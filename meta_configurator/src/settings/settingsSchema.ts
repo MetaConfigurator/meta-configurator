@@ -6,8 +6,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   description: 'MetaConfigurator settings',
   type: 'object',
   required: [
+    'settingsVersion',
+    'latestNewsHash',
     'dataFormat',
     'toolbarTitle',
+    'hideSchemaEditor',
+    'hideSettings',
     'performance',
     'textEditor',
     'guiEditor',
@@ -19,6 +23,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     'backend',
     'rdf',
     'aiIntegration',
+    'schemaSelectionLists',
   ],
   additionalProperties: false,
   properties: {
@@ -40,7 +45,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       type: 'string',
       description: 'The data format to use for the configuration files.',
       default: 'json',
-      enum: ['json', 'yaml', 'xml'],
+      enum: ['json', 'yaml'],
     },
     toolbarTitle: {
       type: 'string',
@@ -171,6 +176,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'hideAddPropertyButton',
         'showBorderAroundInputFields',
         'showSchemaTitleAsHeader',
+        'useScientificNotationForLargeAndSmallNumbers',
+        'scientificNotationUpperThreshold',
+        'scientificNotationLowerThreshold',
       ],
       additionalProperties: false,
       description: 'GUI Editor related settings belong here.',
@@ -186,9 +194,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         propertySorting: {
           type: 'string',
           description:
-            "The sorting of the properties in the GUI editor. If set to 'priorityOrder', the order will be required properties first, then optional properties, then additional and pattern properties and finally deprecated properties. If set to 'dataOrder', the properties will be displayed in the order they are in the configuration object. If set to 'schemaOrder', the properties will be sorted according to the order in the schema.",
+            "The sorting of the properties in the GUI editor. If set to 'priorityOrder', the order will be required properties first, then optional properties, then additional and pattern properties and finally deprecated properties. If set to 'dataOrder', the properties will be displayed in the order they are in the configuration object. If set to 'schemaOrder', the properties will be sorted according to the order in the schema. If set to 'alphabeticalOrder', schema properties will be sorted alphabetically by name.",
           default: 'schemaOrder',
-          enum: ['priorityOrder', 'schemaOrder', 'dataOrder'],
+          enum: ['priorityOrder', 'schemaOrder', 'dataOrder', 'alphabeticalOrder'],
         },
         hideAddPropertyButton: {
           type: 'boolean',
@@ -208,6 +216,26 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'If set to true, the title of the schema will be shown as a header in the GUI editor.',
           default: true,
         },
+        useScientificNotationForLargeAndSmallNumbers: {
+          type: 'boolean',
+          description:
+            'If set to true, numeric values in the GUI editor will use scientific notation when they are greater than or equal to the upper threshold or smaller than or equal to the lower threshold. Scientific notation can be entered regardless of this setting.',
+          default: true,
+        },
+        scientificNotationUpperThreshold: {
+          type: 'number',
+          description:
+            'The absolute value at or above which numbers in the GUI editor are displayed in scientific notation when scientific notation display is enabled.',
+          default: 1e21,
+          exclusiveMinimum: 0,
+        },
+        scientificNotationLowerThreshold: {
+          type: 'number',
+          description:
+            'The non-zero absolute value at or below which numbers in the GUI editor are displayed in scientific notation when scientific notation display is enabled.',
+          default: 1e-7,
+          exclusiveMinimum: 0,
+        },
       },
     },
     schemaDiagram: {
@@ -217,6 +245,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'vertical',
         'showAttributes',
         'showEnumValues',
+        'showNullableCheckbox',
         'maxAttributesToShow',
         'maxEnumValuesToShow',
         'moveViewToSelectedElement',
@@ -248,6 +277,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           type: 'boolean',
           description:
             'If set to true, the enum values of the schema will be displayed in the schema diagram.',
+          default: true,
+        },
+        showNullableCheckbox: {
+          type: 'boolean',
+          description:
+            'If set to true, highlighted attributes in schema diagram edit mode will show a checkbox for toggling nullable types.',
           default: true,
         },
         maxAttributesToShow: {
@@ -327,7 +362,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     metaSchema: {
       type: 'object',
-      required: ['allowBooleanSchema', 'allowMultipleTypes', 'objectTypesComfort'],
+      required: [
+        'allowBooleanSchema',
+        'allowMultipleTypes',
+        'objectTypesComfort',
+        'markMoreFieldsAsAdvanced',
+        'showAdditionalPropertiesButton',
+        'showJsonLdFields',
+      ],
       additionalProperties: false,
       description:
         'Meta Schema related settings belong here. They affect the functionality of the schema editor. By making the meta schema more expressive (e.g., by allowing multiple data types for a property), the schema editor will be more powerful but also more complicated.',
@@ -492,9 +534,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     aiIntegration: {
       type: 'object',
-      required: ['model', 'maxTokens', 'temperature', 'endpoint'],
-      additionalProperties: false,
-      description: 'Settings for AI API.',
+      required: ['model', 'temperature', 'backend'],
+      additionalProperties: {
+        title: 'Custom Model Parameter',
+        oneOf: [{type: 'string'}, {type: 'number'}, {type: 'boolean'}],
+      },
+      description: 'Settings for the AI integration.',
       properties: {
         model: {
           type: 'string',
@@ -519,13 +564,11 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'deepseek/deepseek-v3.2-exp',
             'x-ai/grok-4-fast',
             'x-ai/grok-4-fast:free',
+            // Helmholtz Blablador (via Uni Stuttgart Relay preset)
+            'alias-code',
+            'alias-fast',
+            'alias-large',
           ],
-        },
-        maxTokens: {
-          type: 'integer',
-          description: 'The maximum number of tokens to generate.',
-          default: 5000,
-          minimum: 1,
         },
         temperature: {
           type: 'number',
@@ -534,23 +577,183 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           minimum: 0.0,
           maximum: 1.0,
         },
-        endpoint: {
-          type: 'string',
+        backend: {
           description:
-            'The endpoint to use for the AI API. Must follow the OpenAI API specification.',
-          default: 'https://api.openai.com/v1/',
-          examples: [
-            // OpenAI official
-            'https://api.openai.com/v1/',
-            // Perplexity (OpenAI-compatible)
-            'https://api.perplexity.ai/',
-            // OpenRouter (aggregator, OpenAI-compatible)
-            // 'https://api.openrouter.ai/v1/', seems to not support this kind of authentication
-            // Academic / institutional deployments (OpenAI-compatible)
-            'https://chat-ai.academiccloud.de/v1/',
-            'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-            // Custom/self-hosted proxy
-            'https://my-llm-proxy.example.com/v1/',
+            'How MetaConfigurator connects to the AI API. ' +
+            'Use "CORS Compatible Endpoint" if your provider supports direct browser access (only a few do). ' +
+            'Use "HTTPS Relay" when MetaConfigurator is served over HTTPS, which is the case for the stable and experimental releases. ' +
+            'Use "HTTP Relay" only when running MetaConfigurator locally over HTTP. ' +
+            'Browsers will block requests that mix HTTPS and HTTP due to mixed-content restrictions.',
+          oneOf: [
+            {
+              title: 'CORS Compatible Endpoint',
+              type: 'object',
+              description:
+                'The browser connects directly to the AI API. ' +
+                'Only a handful of public APIs (OpenAI, Perplexity) allow this kind of cross-origin browser request. ' +
+                'Most providers (OpenRouter, Groq, Mistral, etc.) will reject browser requests with a CORS error, so you would need a relay for those.',
+              required: ['endpoint'],
+              additionalProperties: false,
+              properties: {
+                endpoint: {
+                  type: 'string',
+                  title: 'Endpoint URL',
+                  description:
+                    'The base URL of the AI provider. Needs to follow the OpenAI API format.',
+                  default: 'https://api.openai.com/v1/',
+                  examples: [
+                    // Known CORS-compatible endpoints
+                    'https://api.openai.com/v1/',
+                    'https://api.perplexity.ai/',
+                    // Custom self-hosted CORS proxy
+                    'https://my-cors-proxy.example.com/v1/',
+                  ],
+                },
+              },
+            },
+            {
+              title: 'Uni Stuttgart Relay',
+              type: 'object',
+              description:
+                'Pre-configured relay hosted at the University of Stuttgart. ' +
+                'Routes requests through the Helmholtz Blablador endpoint. ' +
+                'Set the top-level "model" field to one of: alias-code, alias-fast, alias-large.',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {
+                  type: 'string',
+                  title: 'Relay URL',
+                  description: 'The public address of the Uni Stuttgart relay.',
+                  default: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+                  const: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+                },
+                endpoint: {
+                  type: 'string',
+                  title: 'Upstream Endpoint URL',
+                  description:
+                    'The AI provider endpoint that the relay forwards requests to. Fixed to Helmholtz Blablador for this preset.',
+                  default: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                  const: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                },
+              },
+            },
+            {
+              title: 'HTTPS Relay',
+              type: 'object',
+              description:
+                'Requests go through a self-hosted HTTPS relay instead of directly to the provider. ' +
+                'Use this when MetaConfigurator is served over HTTPS, which is the case for the stable and experimental public releases. ' +
+                'The relay keeps the provider API key on the server, so you do not need to enter it in the browser. ' +
+                'Note that you cannot point this at an HTTP relay from an HTTPS page, as browsers will block mixed-content requests.',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {
+                  type: 'string',
+                  title: 'Relay URL (HTTPS)',
+                  description:
+                    'Address of your self-hosted MetaConfigurator relay. Has to start with https://.',
+                  pattern: '^https://',
+                  examples: ['https://your-relay.example.com', 'https://relay.myorg.com'],
+                  not: {
+                    const: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+                  },
+                },
+                endpoint: {
+                  type: 'string',
+                  title: 'Upstream Endpoint URL',
+                  description:
+                    'The AI provider endpoint that the relay will forward requests to. Needs to follow the OpenAI API format.',
+                  default: 'https://api.openai.com/v1/',
+                  examples: [
+                    // OpenAI
+                    'https://api.openai.com/v1/',
+                    // Perplexity
+                    'https://api.perplexity.ai/',
+                    // OpenRouter — aggregator with 200+ models
+                    'https://openrouter.ai/api/v1/',
+                    // xAI (Grok)
+                    'https://api.x.ai/v1/',
+                    // Mistral AI
+                    'https://api.mistral.ai/v1/',
+                    // Groq
+                    'https://api.groq.com/openai/v1/',
+                    // DeepSeek
+                    'https://api.deepseek.com/v1/',
+                    // Together AI
+                    'https://api.together.xyz/v1/',
+                    // Fireworks AI
+                    'https://api.fireworks.ai/inference/v1/',
+                    // Cohere (OpenAI-compatible)
+                    'https://api.cohere.com/compatibility/v1/',
+                    // Google Gemini (OpenAI-compatible)
+                    'https://generativelanguage.googleapis.com/v1beta/openai/',
+                    // Academic / institutional deployments
+                    'https://chat-ai.academiccloud.de/v1/',
+                    'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                    // Custom self-hosted proxy
+                    'https://my-llm-proxy.example.com/v1/',
+                  ],
+                },
+              },
+            },
+            {
+              title: 'HTTP Relay',
+              type: 'object',
+              description:
+                'Same as the HTTPS Relay, but over plain HTTP. ' +
+                'This only makes sense when running MetaConfigurator locally over HTTP, for example during development. ' +
+                'It will not work when accessed from an HTTPS page, because browsers block mixed-content requests in that case.',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {
+                  type: 'string',
+                  title: 'Relay URL (HTTP)',
+                  description:
+                    'Address of your self-hosted MetaConfigurator relay. Has to start with http://.',
+                  pattern: '^http://',
+                  examples: ['http://localhost:8080', 'http://localhost:18081'],
+                },
+                endpoint: {
+                  type: 'string',
+                  title: 'Upstream Endpoint URL',
+                  description:
+                    'The AI provider endpoint that the relay will forward requests to. Needs to follow the OpenAI API format.',
+                  default: 'https://api.openai.com/v1/',
+                  examples: [
+                    // OpenAI
+                    'https://api.openai.com/v1/',
+                    // Perplexity
+                    'https://api.perplexity.ai/',
+                    // OpenRouter — aggregator with 200+ models
+                    'https://openrouter.ai/api/v1/',
+                    // xAI (Grok)
+                    'https://api.x.ai/v1/',
+                    // Mistral AI
+                    'https://api.mistral.ai/v1/',
+                    // Groq
+                    'https://api.groq.com/openai/v1/',
+                    // DeepSeek
+                    'https://api.deepseek.com/v1/',
+                    // Together AI
+                    'https://api.together.xyz/v1/',
+                    // Fireworks AI
+                    'https://api.fireworks.ai/inference/v1/',
+                    // Cohere (OpenAI-compatible)
+                    'https://api.cohere.com/compatibility/v1/',
+                    // Google Gemini (OpenAI-compatible)
+                    'https://generativelanguage.googleapis.com/v1beta/openai/',
+                    // Academic / institutional deployments
+                    'https://chat-ai.academiccloud.de/v1/',
+                    'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                    // Custom self-hosted proxy
+                    'https://my-llm-proxy.example.com/v1/',
+                  ],
+                },
+              },
+            },
           ],
         },
       },
@@ -620,7 +823,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'Which panels to show in the editor and their order.',
       items: {
         type: 'object',
-        required: ['panelType', 'mode'],
+        required: ['panelType', 'mode', 'size'],
         additionalProperties: false,
         title: 'Panel',
         description: 'Panel type and tool mode.',

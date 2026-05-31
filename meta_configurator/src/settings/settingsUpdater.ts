@@ -3,15 +3,70 @@ import type {SettingsInterfacePanel, SettingsInterfaceRoot} from '@/settings/set
 import {panelTypeRegistry} from '@/components/panels/panelTypeRegistry';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {detectSchemaFeatures} from '@/schema/detectSchemaFeatures';
+import {SETTINGS_SCHEMA} from '@/settings/settingsSchema';
+import type {Path} from '@/utility/path';
+import {
+  getObjectSchemaAtDataPath,
+  getParentObjectSchemaAtDataPath,
+} from '@/schema/schemaReadingUtils';
+import {ValidationService} from '@/schema/validationService';
 
-export function addDefaultsForMissingFields(userFile: any, defaultsFile: any) {
+function isPlainObject(value: unknown) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+export function addDefaultsForMissingFields(
+  userFile: any,
+  defaultsFile: any,
+  rootSchema: TopLevelSchema = SETTINGS_SCHEMA,
+  userRoot: any = userFile,
+  path: Path = [],
+  validationService: ValidationService = new ValidationService(rootSchema)
+) {
   for (const key in defaultsFile) {
+    const fullPath = [...path, key];
     if (!(key in userFile)) {
-      userFile[key] = defaultsFile[key];
+      const parentSchema = getParentObjectSchemaAtDataPath(
+        rootSchema,
+        fullPath,
+        userRoot,
+        validationService
+      );
+      const propertyName = fullPath[fullPath.length - 1];
+      if (
+        typeof propertyName !== 'string' ||
+        !(parentSchema?.required ?? []).includes(propertyName)
+      ) {
+        continue;
+      }
+
+      if (
+        isPlainObject(defaultsFile[key]) &&
+        getObjectSchemaAtDataPath(rootSchema, fullPath, userRoot, validationService)
+      ) {
+        userFile[key] = {};
+        addDefaultsForMissingFields(
+          userFile[key],
+          defaultsFile[key],
+          rootSchema,
+          userRoot,
+          fullPath,
+          validationService
+        );
+      } else {
+        userFile[key] = defaultsFile[key];
+      }
 
       // element itself was existing, but maybe it has some missing fields
-    } else if (typeof defaultsFile[key] === 'object' && !Array.isArray(defaultsFile[key])) {
-      addDefaultsForMissingFields(userFile[key], defaultsFile[key]);
+    } else if (isPlainObject(defaultsFile[key])) {
+      addDefaultsForMissingFields(
+        userFile[key],
+        defaultsFile[key],
+        rootSchema,
+        userRoot,
+        fullPath,
+        validationService
+      );
     }
   }
 }
@@ -51,7 +106,7 @@ export function fixPanels(userData: SettingsInterfaceRoot, defaultData: Settings
 }
 
 export function updateSettingsWithDefaults(settings: any, defaultSettings: any): any {
-  addDefaultsForMissingFields(settings, defaultSettings);
+  addDefaultsForMissingFields(settings, defaultSettings, SETTINGS_SCHEMA, settings);
   fixPanels(settings, defaultSettings);
   migrateSettingsVersion(settings);
   return settings;
@@ -91,6 +146,28 @@ function migrateSettingsVersion(userSettings: any) {
       if (index > -1) {
         hiddenPanels.splice(index, 1);
       }
+    }
+  }
+
+  if (userSettings.settingsVersion === '1.0.3') {
+    // migrate from 1.0.3 to 1.0.4
+    userSettings.settingsVersion = '1.0.4';
+    // if the current settings data AI endpoint entry is untouched, update it to the new defaults
+    const aiIntegration = userSettings.aiIntegration;
+    if (
+      aiIntegration.model === 'gpt-4o-mini' &&
+      aiIntegration.backend &&
+      aiIntegration.backend.endpoint === 'https://api.openai.com/v1/'
+    ) {
+      userSettings.aiIntegration = {
+        model: 'alias-fast',
+        max_tokens: 5000,
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      };
     }
   }
 }

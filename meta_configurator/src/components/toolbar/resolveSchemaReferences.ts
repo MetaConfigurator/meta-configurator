@@ -3,6 +3,7 @@ import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 import {useErrorService} from '@/utility/errorServiceInstance.ts';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 
 /**
  * Goes through the schema and resolves all references.
@@ -10,17 +11,22 @@ import {useErrorService} from '@/utility/errorServiceInstance.ts';
  */
 export async function resolveSchemaReferences(): Promise<void> {
   const managedSchemaData = getDataForMode(SessionMode.SchemaEditor);
-  const schemaData = managedSchemaData.data.value;
+  const schemaData = managedSchemaData.data.value as TopLevelSchema;
   try {
     // count definitions for info message
+    const schemaObject = schemaData as TopLevelSchema & {
+      $defs?: Record<string, unknown>;
+      definitions?: Record<string, unknown>;
+    };
     const definitionCount =
-      Object.keys(schemaData.$defs || {}).length + Object.keys(schemaData.definitions || {}).length;
+      Object.keys(schemaObject.$defs || {}).length +
+      Object.keys(schemaObject.definitions || {}).length;
 
     let resolvedSchema = await $RefParser.dereference(schemaData, {mutateInputSchema: false});
 
     // remove definitions, as they should not be needed anymore
-    delete resolvedSchema.$defs;
-    delete resolvedSchema.definitions;
+    delete (resolvedSchema as any).$defs;
+    delete (resolvedSchema as any).definitions;
 
     // serialize and deserialize the schema, in case of circular reference, this will fail. Good to catch early
     resolvedSchema = JSON.parse(JSON.stringify(resolvedSchema));

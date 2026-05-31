@@ -34,10 +34,15 @@ export function wasNodeAddedOrEdgesChanged(oldNodes: Node[], newNodes: Node[]): 
       }
       // edges changed only if an attribute type changed and the new or old value was a schema object instead of a simple type
       for (let i = 0; i < newAttributes.length; i++) {
-        if (newAttributes[i].typeDescription !== oldAttributes[i].typeDescription) {
+        const newAttribute = newAttributes[i];
+        const oldAttribute = oldAttributes[i];
+        if (!newAttribute || !oldAttribute) {
+          return true;
+        }
+        if (newAttribute.typeDescription !== oldAttribute.typeDescription) {
           if (
-            !isSimpleType(newAttributes[i].typeDescription) ||
-            !isSimpleType(oldAttributes[i].typeDescription)
+            !isSimpleType(newAttribute.typeDescription) ||
+            !isSimpleType(oldAttribute.typeDescription)
           ) {
             return true;
           }

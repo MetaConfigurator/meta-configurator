@@ -53,6 +53,7 @@ import {
   copySelectedSchemaToClipboard,
   pasteSchemaFromClipboard,
 } from '@/components/panels/schema-diagram/schemaClipboardUtils';
+import {doesSchemaAllowNull, setSchemaNullable} from '@/schema/schemaReadingUtils';
 
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
@@ -374,9 +375,18 @@ function updateAttributeType(
   attributeData: SchemaObjectAttributeData,
   newType: AttributeTypeChoice
 ) {
-  //attributeData.typeDescription = newType.label;
   const attributeSchema = structuredClone(schemaData.dataAt(attributeData.absolutePath));
+  const shouldRemainNullable = doesSchemaAllowNull(attributeSchema, schemaData.data.value);
   applyNewType(attributeSchema, newType.schema);
+  if (shouldRemainNullable) {
+    setSchemaNullable(attributeSchema, true, schemaData.data.value);
+  }
+  schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
+}
+
+function updateAttributeNullable(attributeData: SchemaObjectAttributeData, nullable: boolean) {
+  const attributeSchema = structuredClone(schemaData.dataAt(attributeData.absolutePath));
+  setSchemaNullable(attributeSchema, nullable, schemaData.data.value);
   schemaData.setDataAt(attributeData.absolutePath, attributeSchema);
 }
 
@@ -486,6 +496,7 @@ function updateExternalReferenceValue(
           @update_attribute_name="updateAttributeName"
           @update_attribute_type="updateAttributeType"
           @update_attribute_required="updateAttributeRequired"
+          @update_attribute_nullable="updateAttributeNullable"
           @delete_element="deleteElement"
           @add_attribute="addAttribute"
           @extract_inlined_element="extractInlinedElement"

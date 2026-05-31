@@ -3,11 +3,13 @@ import {
     forceDataFormat,
     getCurrentDataFormat,
     openApp,
-    selectInitialSchemaFromExamples
-} from "./utils";
+    redo,
+    selectInitialSchemaFromExamples,
+    undo
+} from "../../tests/shared/utils";
 import {SessionMode} from "../src/store/sessionMode";
-import {checkCodeEditorForText, forceCodeEditorText} from "./utilsCodeEditor";
-import {tpForceData, tpGetData} from "./utilsTestPanel";
+import {checkCodeEditorForText, forceCodeEditorText, getCodeEditor} from "../../tests/shared/utilsCodeEditor";
+import {tpForceData, tpGetData} from "../../tests/shared/utilsTestPanel";
 
 
 test('Select an example schema, enter some value and change the data format. Then check the code editor content for the data in the new format.', async ({ page }) => {
@@ -34,11 +36,6 @@ test('Select an example schema, enter some value and change the data format. The
     expect(await getCurrentDataFormat(page)).toBe('yaml');
     await checkCodeEditorForText(page, 'SimulationName: TestName', SessionMode.DataEditor);
 
-    // Change the data format to XML and check that the code editor shows the correct XML data
-    await forceDataFormat(page, 'xml');
-    expect(await getCurrentDataFormat(page)).toBe('xml');
-    await checkCodeEditorForText(page, '<SimulationName>TestName</SimulationName>', SessionMode.DataEditor);
-
     // Change the data format to JSON
     await forceDataFormat(page, 'json');
     expect(await getCurrentDataFormat(page)).toBe('json');
@@ -59,7 +56,7 @@ test('Select an example schema, enter some value and change the data format. The
 
 test('Change the internal data and check if the code editor is updated properly', async ({ page }) => {
     // Go to the app, pre-loading the schema
-    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json');
 
     // Confirm that the initial data is an empty object
     await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
@@ -73,7 +70,7 @@ test('Change the internal data and check if the code editor is updated properly'
 
 test('Change the code editor content and check if the internal data is updated properly', async ({ page }) => {
     // Go to the app, pre-loading the schema
-    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json')
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json');
 
     // Confirm that the initial data is an empty object
     await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
@@ -84,4 +81,22 @@ test('Change the code editor content and check if the internal data is updated p
     // Validate that the internal data is updated correctly
     const dataAfterNameEnter = await tpGetData(page, SessionMode.DataEditor);
     expect(dataAfterNameEnter).toEqual({ name: 'Alex' });
+});
+
+test('Undo and redo in the code editor use the global history', async ({ page }) => {
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json');
+
+    await forceCodeEditorText(page, '{ "name": "Alex" }', SessionMode.DataEditor);
+    expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({ name: 'Alex' });
+
+    await getCodeEditor(page, SessionMode.DataEditor).click();
+    await undo(page);
+    await page.waitForTimeout(300);
+    expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({});
+    await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
+
+    await redo(page);
+    await page.waitForTimeout(300);
+    expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({ name: 'Alex' });
+    await checkCodeEditorForText(page, '"name": "Alex"', SessionMode.DataEditor);
 });

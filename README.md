@@ -114,7 +114,7 @@ Explore how to use MetaConfigurator with real-world examples:
 
 *   **[External References](./documentation_user/examples/external_references)** – Learn how to handle external references in MetaConfigurator.
 
-*   **[RDF Panel](./documentation_user/examples/rdf)** – Learn how to use MetaConfigurator to explore Semantic data.
+*   **[RDF Panel](./documentation_user/examples/rdf)** – Learn how to use MetaConfigurator to create, explore and edit Semantic RDF data.
 
 📚 Read the full [User Documentation](./documentation_user).
 

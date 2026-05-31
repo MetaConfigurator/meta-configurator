@@ -64,7 +64,10 @@ describe('schemaToMarkdown samples coverage', async () => {
 
       const schema: TopLevelSchema = JSON.parse(schemaJson);
       const schemaPreprocessed = preprocessOneTime(schema);
-      const title = schemaPreprocessed.title ?? 'Untitled schema';
+      const title =
+        typeof schemaPreprocessed === 'object' && schemaPreprocessed !== null
+          ? schemaPreprocessed.title ?? 'Untitled schema'
+          : 'Untitled schema';
       const schemaGraph = constructSchemaGraph(
         schemaPreprocessed,
         useSettings().value.documentation.mergeAllOfs

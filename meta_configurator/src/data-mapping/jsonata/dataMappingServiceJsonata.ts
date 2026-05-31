@@ -82,11 +82,12 @@ export class DataMappingServiceJsonata implements DataMappingService {
         message: 'Data mapping performed successfully.',
       };
     } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
       console.error('Error performing data mapping: ', e);
       return {
         resultData: {},
         success: false,
-        message: `Data mapping failed. Please check the mapping configuration. Use <a href="https://try.jsonata.org/" target="_blank">https://try.jsonata.org/</a> to validate and fix your JSONata expression. Reason: ${e.message}.`,
+        message: `Data mapping failed. Please check the mapping configuration. Use <a href="https://try.jsonata.org/" target="_blank">https://try.jsonata.org/</a> to validate and fix your JSONata expression. Reason: ${message}.`,
       };
     }
   }
@@ -155,11 +156,12 @@ export class DataMappingServiceJsonata implements DataMappingService {
     let column = position;
 
     for (let i = 0; i < lines.length; i++) {
-      if (column < lines[i].length) {
+      const line = lines[i]!;
+      if (column < line.length) {
         row = i;
         break;
       }
-      column -= lines[i].length + 1; // +1 for the newline character
+      column -= line.length + 1; // +1 for the newline character
     }
 
     return {row, column};

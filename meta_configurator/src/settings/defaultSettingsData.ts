@@ -2,7 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
-  settingsVersion: '1.0.3',
+  settingsVersion: '1.0.4',
   latestNewsHash: 0,
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
@@ -31,12 +31,16 @@ export const SETTINGS_DATA_DEFAULT = {
     hideAddPropertyButton: true,
     showBorderAroundInputFields: true,
     showSchemaTitleAsHeader: true,
+    useScientificNotationForLargeAndSmallNumbers: true,
+    scientificNotationUpperThreshold: 1e21,
+    scientificNotationLowerThreshold: 1e-7,
   },
   schemaDiagram: {
     editMode: true,
     vertical: true,
     showAttributes: true,
     showEnumValues: true,
+    showNullableCheckbox: true,
     maxAttributesToShow: 30,
     maxEnumValuesToShow: 10,
     moveViewToSelectedElement: false,
@@ -117,10 +121,13 @@ export const SETTINGS_DATA_DEFAULT = {
     groupBySubject: false,
   },
   aiIntegration: {
-    model: 'gpt-4o-mini',
-    maxTokens: 5000,
+    model: 'alias-fast',
+    max_tokens: 5000,
     temperature: 0.0,
-    endpoint: 'https://api.openai.com/v1/',
+    backend: {
+      relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+      endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+    },
   },
   schemaSelectionLists: [
     {

@@ -4,7 +4,7 @@ import {onMounted, ref} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
 import {restoreSnapshot} from '@/utility/backend/backendApi';
 import {getDataForMode} from '@/data/useDataLink';
-import {SessionMode} from '@/store/sessionMode';
+import {SessionMode, documentTypeDescriptionToMode, modeToRoute} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
 import {updateSettingsWithDefaults, overwriteSettings} from '@/settings/settingsUpdater';
@@ -30,6 +30,12 @@ onMounted(() => {
   const query = route.query;
   let usesCustomSettings = false;
   let skipSchemaDialog = false;
+  let targetMode: SessionMode = SessionMode.DataEditor;
+
+  // MODE — explicit query param overrides everything else (lowest priority is the default 'data').
+  if ('mode' in query) {
+    targetMode = documentTypeDescriptionToMode(query.mode);
+  }
 
   // SETTINGS
   if ('settings' in query) {
@@ -76,7 +82,12 @@ onMounted(() => {
     const snapshotId = query.snapshot as string;
     usesCustomSettings = true;
     skipSchemaDialog = true;
-    restoreSnapshot(snapshotId).finally(() => (snapshotFetched.value = true));
+    restoreSnapshot(snapshotId)
+      .then(mode => {
+        // Explicit ?mode= in the URL wins over the snapshot's stored mode.
+        if (!('mode' in query)) targetMode = mode;
+      })
+      .finally(() => (snapshotFetched.value = true));
   }
 
   // PROJECT
@@ -85,7 +96,11 @@ onMounted(() => {
     const projectId = query.project as string;
     usesCustomSettings = true;
     skipSchemaDialog = true;
-    restoreSnapshot(projectId, true).finally(() => (snapshotFetched.value = true));
+    restoreSnapshot(projectId, true)
+      .then(mode => {
+        if (!('mode' in query)) targetMode = mode;
+      })
+      .finally(() => (snapshotFetched.value = true));
   }
 
   // Default settings fallback
@@ -124,7 +139,7 @@ onMounted(() => {
     });
 
   waitForAllOrTimeout().then(() => {
-    useAppRouter().push('/data');
+    useAppRouter().push(modeToRoute(targetMode));
   });
 });
 </script>

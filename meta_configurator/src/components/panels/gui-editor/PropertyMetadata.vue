@@ -93,7 +93,7 @@ function zoomIntoPath() {
   }
 }
 
-function updatePropertyName(event) {
+function updatePropertyName(event: KeyboardEvent | FocusEvent) {
   const target = event.target as HTMLElement;
   let text = target.innerText;
 
@@ -103,12 +103,12 @@ function updatePropertyName(event) {
   if (isPropertyNameEditable(props.type)) {
     emit('update_property_name', props.node.data.name as string, text);
   } else {
-    event.target.innerText = props.node.data.name;
+    target.innerText = String(props.node.data.name);
   }
 
   isEditingPropertyName.value = false;
   emit('stop_editing_property_name');
-  event.target.contenteditable = false;
+  target.contentEditable = 'false';
   showPencil.value = true;
 }
 
@@ -156,7 +156,7 @@ function focusOnPropertyLabel(): void {
         @focus="focusEditingLabel()"
         @keydown.stop
         @blur="updatePropertyName"
-        @keyup.enter="updatePropertyName"
+        @keydown.enter.prevent="updatePropertyName"
         class="scroll-my-60 snap-start"
         :class="{
           'text-indigo-700': canZoomIn(),

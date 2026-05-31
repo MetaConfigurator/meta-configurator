@@ -2,6 +2,7 @@ import type {Editor} from 'brace';
 import {watchImmediate} from '@vueuse/core';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {isDarkMode} from '@/utility/darkModeUtils';
+import type {UndoManager} from '@/data/undoManager';
 
 /**
  * change the mode depending on the data format.
@@ -47,4 +48,30 @@ export function setupAceProperties(editor: Editor, settings: SettingsInterfaceRo
       }
     );
   }, 0);
+}
+
+export function connectAceUndoManagerToGlobalUndo(editor: Editor, undoManager: UndoManager) {
+  editor.getSession().setUndoManager({
+    execute() {},
+    undo() {
+      undoManager.undo();
+      return undefined as any;
+    },
+    redo() {
+      undoManager.redo();
+    },
+    reset() {
+      undoManager.clear();
+    },
+    hasUndo() {
+      return undoManager.canUndo.value;
+    },
+    hasRedo() {
+      return undoManager.canRedo.value;
+    },
+    isClean() {
+      return !undoManager.canUndo.value;
+    },
+    markClean() {},
+  } as any);
 }
