@@ -131,8 +131,8 @@ defineExpose({show: openDialog, close: hideDialog});
       <p class="dialog-intro">
         Convert the current JSON Schema into another modeling language. Each result can be copied or
         downloaded. These conversions are usually lossy and ambiguous: different valid results are
-        possible depending on the conventions used by the conversion algorithms. Verify the converted
-        schema before using it.
+        possible depending on the conventions used by the conversion algorithms. Verify the
+        converted schema before using it.
       </p>
 
       <div class="form">

@@ -283,8 +283,7 @@ describe('test settings updater', () => {
       },
       backend: {
         snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-        schemaConverterUrl:
-          'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
       },
       aiIntegration: {
         model: 'alias-fast',
