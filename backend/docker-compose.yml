@@ -124,18 +124,18 @@ services:
       # for every service that shares the same VIRTUAL_HOST.
 
   # -------------------------------------------------------------------------
-  # schema_converter — universal schema conversion service.
+  # schema_converter — schema conversion orchestration service.
   # Mounted at /schema-converter/ (path stripped before forwarding).
-  # Source: https://github.com/Logende/universal-schema-converter
+  # Source: https://github.com/MetaConfigurator/schema-conversion-orchestrator
   #
   # The image is published to GHCR by the schema-converter CI on every push
   # to main.  For local builds replace `image:` with:
-  #   build: /path/to/universal-schema-converter/schema-conversion-orchestrator
+  #   build: /path/to/schema-conversion-orchestrator
   # -------------------------------------------------------------------------
 
   schema_converter:
     container_name: schema_converter
-    image: ghcr.io/logende/schema-conversion-orchestrator:latest
+    image: ghcr.io/metaconfigurator/schema-conversion-orchestrator:latest
     expose:
       - "5002"
     restart: unless-stopped

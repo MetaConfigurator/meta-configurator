@@ -492,7 +492,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         schemaConverterUrl: {
           type: 'string',
           description:
-            'URL of the universal-schema-converter service, used by "Import/Export Schema" to ' +
+            'URL of the Schema Conversion Orchestrator service, used by "Import/Export Schema" to ' +
             'convert between JSON Schema and formats like XSD, SHACL, LinkML and MdModels.',
           default: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
           format: 'uri',

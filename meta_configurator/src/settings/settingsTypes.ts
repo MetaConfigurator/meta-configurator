@@ -109,7 +109,7 @@ export enum DataFormat {
 export interface SettingsInterfaceBackend {
   // Full base URL of the snapshot-sharing service (project & snapshot sharing).
   snapshotSharingUrl: string;
-  // Full URL of the universal-schema-converter service.
+  // Full URL of the Schema Conversion Orchestrator service.
   schemaConverterUrl: string;
 }
 

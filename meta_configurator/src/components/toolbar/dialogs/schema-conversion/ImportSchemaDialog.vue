@@ -1,7 +1,7 @@
 <!--
   Import a schema from another modeling language (XSD, SHACL, LinkML, MdModels, …)
   into MetaConfigurator by converting it to JSON Schema via the
-  universal-schema-converter service.
+  Schema Conversion Orchestrator service.
 
   Flow: select a file -> source language is auto-detected (and adjustable) ->
   convert -> the ranked attempts are shown. Each successful attempt can be

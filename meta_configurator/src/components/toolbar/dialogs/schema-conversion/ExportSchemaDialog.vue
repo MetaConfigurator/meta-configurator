@@ -1,7 +1,7 @@
 <!--
   Export the current MetaConfigurator schema (JSON Schema) to another modeling
   language (XSD, SHACL, LinkML, MdModels, GraphQL, …) via the
-  universal-schema-converter service.
+  Schema Conversion Orchestrator service.
 
   Flow: pick a target language -> convert -> the ranked attempts are shown.
   Each successful attempt can be copied to the clipboard or downloaded as a file.

@@ -1,6 +1,6 @@
 /**
- * Communication with the universal-schema-converter service
- * (https://github.com/Logende/universal-schema-converter).
+ * Communication with the Schema Conversion Orchestrator service
+ * (https://github.com/MetaConfigurator/schema-conversion-orchestrator).
  *
  * The service exposes a single `/convert` endpoint that takes a schema in some
  * source language and a desired target language, finds one or more conversion
