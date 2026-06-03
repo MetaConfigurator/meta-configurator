@@ -31,8 +31,12 @@ function ok(result: string, path = [step('Xsd', 'JsonSchema')]): ConversionAttem
   return {success: true, result, conversionPath: path};
 }
 
-function fail(result: string, path = [step('Xsd', 'JsonSchema')]): ConversionAttempt {
-  return {success: false, result, conversionPath: path};
+function fail(
+  result: string,
+  path = [step('Xsd', 'JsonSchema')],
+  failedStepIndex: number | null = null
+): ConversionAttempt {
+  return {success: false, result, conversionPath: path, failedStepIndex};
 }
 
 function jsonResponse(body: unknown, {okFlag = true, status = 200} = {}): Response {
@@ -131,20 +135,17 @@ describe('failedStepIndex', () => {
     expect(failedStepIndex(ok('whatever'))).toBe(-1);
   });
 
-  it('identifies the failing edge from the backend error message', () => {
+  it('returns the failing edge index reported by the backend', () => {
     const path = [
       step('Xsd', 'MdModels', 'FlaskApp', 'xsd2md'),
       step('MdModels', 'Shex', 'FlaskApp', 'md2shex'),
     ];
-    const attempt = fail(
-      'Conversion failed at step from MdModels to Shex via FlaskApp because of error: boom',
-      path
-    );
+    const attempt = fail('boom', path, 1);
     expect(failedStepIndex(attempt)).toBe(1);
   });
 
-  it('returns -1 when the error message does not match the known format', () => {
-    expect(failedStepIndex(fail('some unrelated error'))).toBe(-1);
+  it('returns -1 when the backend did not pinpoint a step', () => {
+    expect(failedStepIndex(fail('some unrelated error', undefined, null))).toBe(-1);
   });
 });
 

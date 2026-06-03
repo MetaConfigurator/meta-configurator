@@ -24,6 +24,12 @@ export interface ConversionStep {
   targetLanguage: string;
   serviceName: string;
   converterName: string;
+  /** Underlying library that performs this step (e.g. "linkml"), if known. */
+  library?: string | null;
+  /** Installed version of that library, if known. */
+  libraryVersion?: string | null;
+  /** Link to the library's homepage / package page, if known. */
+  libraryUrl?: string | null;
 }
 
 /** A single conversion attempt along one path. */
@@ -32,6 +38,11 @@ export interface ConversionAttempt {
   /** Converted schema when `success`, otherwise the error message. */
   result: string;
   conversionPath: ConversionStep[];
+  /**
+   * 0-based index into `conversionPath` of the step that caused the failure,
+   * or null for successful attempts (and failures without a specific step).
+   */
+  failedStepIndex?: number | null;
 }
 
 /** A schema language as understood by the converter, plus UI metadata. */
@@ -119,34 +130,16 @@ export function selectDisplayedAttempts(
 }
 
 /**
- * For a failed attempt, determine which step (edge) of the path caused the
- * failure, so it can be highlighted. The backend embeds this in the error
- * message ("... failed at step from <source> to <target> via <service> ..."),
- * which we match against the conversion path. Returns -1 if it cannot be
- * determined (or the attempt succeeded).
+ * For a failed attempt, the index of the path step (edge) that caused the
+ * failure, so it can be highlighted. The backend reports this directly as
+ * `failedStepIndex`. Returns -1 when the attempt succeeded or the backend did
+ * not pinpoint a step.
  */
 export function failedStepIndex(attempt: ConversionAttempt): number {
-  if (attempt.success) {
+  if (attempt.success || attempt.failedStepIndex == null) {
     return -1;
   }
-  const match = /failed at step from (\S+) to (\S+) via (.+?) because of error/i.exec(
-    attempt.result ?? ''
-  );
-  if (!match) {
-    return -1;
-  }
-  const source = match[1];
-  const target = match[2];
-  const service = match[3];
-  if (!source || !target || !service) {
-    return -1;
-  }
-  return attempt.conversionPath.findIndex(
-    step =>
-      step.sourceLanguage === source &&
-      step.targetLanguage === target &&
-      step.serviceName === service.trim()
-  );
+  return attempt.failedStepIndex;
 }
 
 /** Default file extension to suggest when downloading a converted schema. */
