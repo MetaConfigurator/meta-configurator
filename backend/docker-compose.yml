@@ -124,6 +124,31 @@ services:
       # for every service that shares the same VIRTUAL_HOST.
 
   # -------------------------------------------------------------------------
+  # schema_converter — universal schema conversion service.
+  # Mounted at /schema-converter/ (path stripped before forwarding).
+  # Source: https://github.com/Logende/universal-schema-converter
+  #
+  # The image is published to GHCR by the schema-converter CI on every push
+  # to main.  For local builds replace `image:` with:
+  #   build: /path/to/universal-schema-converter/schema-conversion-orchestrator
+  # -------------------------------------------------------------------------
+
+  schema_converter:
+    container_name: schema_converter
+    image: ghcr.io/logende/schema-conversion-orchestrator:latest
+    expose:
+      - "5002"
+    restart: unless-stopped
+    networks:
+      - backend-network
+    environment:
+      VIRTUAL_HOST: ${BASE_DOMAIN}
+      VIRTUAL_PATH: /schema-converter/
+      VIRTUAL_DEST: /
+      VIRTUAL_PORT: 5002
+      # No LETSENCRYPT_* — cert is anchored on snapshot_sharing.
+
+  # -------------------------------------------------------------------------
   # Shared reverse proxy + Let's Encrypt companion
   # -------------------------------------------------------------------------
 
