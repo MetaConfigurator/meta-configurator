@@ -2,7 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
-  settingsVersion: '1.0.4',
+  settingsVersion: '1.0.5',
   latestNewsHash: 0,
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
@@ -111,7 +111,8 @@ export const SETTINGS_DATA_DEFAULT = {
       'https://metaconfigurator.github.io/meta-configurator',
   },
   backend: {
-    hostname: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+    snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+    schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
   },
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',

@@ -252,7 +252,7 @@ describe('test settings updater', () => {
     });
   });
 
-  it('does not force relay defaults back into a direct AI endpoint config', () => {
+  it('resets existing 1.0.4 AI settings to the 1.0.5 Uni Stuttgart relay preset', () => {
     const userFile = {
       settingsVersion: '1.0.4',
       panels: {
@@ -260,6 +260,9 @@ describe('test settings updater', () => {
         schemaEditor: [],
         settings: [],
         hidden: [],
+      },
+      backend: {
+        hostname: 'https://old.example.org',
       },
       aiIntegration: {
         model: 'gpt-4o-mini',
@@ -271,15 +274,20 @@ describe('test settings updater', () => {
     };
 
     const defaultsFile = {
-      settingsVersion: '1.0.4',
+      settingsVersion: '1.0.5',
       panels: {
         dataEditor: [],
         schemaEditor: [],
         settings: [],
         hidden: [],
       },
+      backend: {
+        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+      },
       aiIntegration: {
         model: 'alias-fast',
+        max_tokens: 5000,
         temperature: 0,
         backend: {
           relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
@@ -290,53 +298,11 @@ describe('test settings updater', () => {
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.aiIntegration.backend).toEqual({
-      endpoint: 'https://api.openai.com/v1/',
+    expect(userFile.settingsVersion).toBe('1.0.5');
+    expect(userFile.backend).toEqual({
+      snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+      schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
     });
-    expect(userFile.aiIntegration.model).toBe('gpt-4o-mini');
-  });
-
-  it('migrates untouched 1.0.3 AI defaults to the 1.0.4 Uni Stuttgart relay preset', () => {
-    const userFile = {
-      settingsVersion: '1.0.3',
-      panels: {
-        dataEditor: [],
-        schemaEditor: [],
-        settings: [],
-        hidden: [],
-      },
-      aiIntegration: {
-        model: 'gpt-4o-mini',
-        max_tokens: 5000,
-        temperature: 0.0,
-        backend: {
-          endpoint: 'https://api.openai.com/v1/',
-        },
-      },
-    };
-
-    const defaultsFile = {
-      settingsVersion: '1.0.4',
-      panels: {
-        dataEditor: [],
-        schemaEditor: [],
-        settings: [],
-        hidden: [],
-      },
-      aiIntegration: {
-        model: 'alias-fast',
-        max_tokens: 5000,
-        temperature: 0.0,
-        backend: {
-          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
-          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-        },
-      },
-    };
-
-    updateSettingsWithDefaults(userFile, defaultsFile);
-
-    expect(userFile.settingsVersion).toBe('1.0.4');
     expect(userFile.aiIntegration).toEqual({
       model: 'alias-fast',
       max_tokens: 5000,
@@ -348,7 +314,52 @@ describe('test settings updater', () => {
     });
   });
 
-  it('keeps customized 1.0.3 AI settings while still bumping to 1.0.4', () => {
+  it('does not force relay defaults back into a direct AI endpoint config', () => {
+    const userFile = {
+      settingsVersion: '1.0.5',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      aiIntegration: {
+        model: 'gpt-4o-mini',
+        temperature: 0,
+        backend: {
+          endpoint: 'https://api.openai.com/v1/',
+        },
+      },
+    };
+
+    const defaultsFile = {
+      settingsVersion: '1.0.5',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        temperature: 0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.settingsVersion).toBe('1.0.5');
+    expect(userFile.aiIntegration.backend).toEqual({
+      endpoint: 'https://api.openai.com/v1/',
+    });
+    expect(userFile.aiIntegration.model).toBe('gpt-4o-mini');
+  });
+
+  it('resets customized 1.0.3 AI settings while bumping to 1.0.5', () => {
     const userFile = {
       settingsVersion: '1.0.3',
       panels: {
@@ -368,7 +379,7 @@ describe('test settings updater', () => {
     };
 
     const defaultsFile = {
-      settingsVersion: '1.0.4',
+      settingsVersion: '1.0.5',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -388,13 +399,14 @@ describe('test settings updater', () => {
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.settingsVersion).toBe('1.0.4');
+    expect(userFile.settingsVersion).toBe('1.0.5');
     expect(userFile.aiIntegration).toEqual({
-      model: 'gpt-4o',
-      max_tokens: 1234,
-      temperature: 0.2,
+      model: 'alias-fast',
+      max_tokens: 5000,
+      temperature: 0.0,
       backend: {
-        endpoint: 'https://api.openai.com/v1/',
+        relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+        endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
       },
     });
   });

@@ -31,6 +31,9 @@ const emit = defineEmits<{
   (e: 'show-import-turtle-dialog'): void;
   (e: 'show-import-xml-dialog'): void;
   (e: 'show-xml-export-dialog'): void;
+  (e: 'show-import-schema-dialog'): void;
+  (e: 'show-export-schema-dialog'): void;
+  (e: 'show-infer-schema-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -90,6 +93,18 @@ function showXmlExportDialog() {
   emit('show-xml-export-dialog');
 }
 
+function showImportSchemaDialog() {
+  emit('show-import-schema-dialog');
+}
+
+function showExportSchemaDialog() {
+  emit('show-export-schema-dialog');
+}
+
+function showInferSchemaDialog() {
+  emit('show-infer-schema-dialog');
+}
+
 const modeSelector = ref();
 
 useMagicKeys({
@@ -129,7 +144,10 @@ useMagicKeys({
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
           @show-import-turtle-dialog="() => showTurtleImportDialog()"
           @show-import-xml-dialog="() => showXmlImportDialog()"
-          @show-xml-export-dialog="() => showXmlExportDialog()" />
+          @show-xml-export-dialog="() => showXmlExportDialog()"
+          @show-import-schema-dialog="() => showImportSchemaDialog()"
+          @show-export-schema-dialog="() => showExportSchemaDialog()"
+          @show-infer-schema-dialog="() => showInferSchemaDialog()" />
 
         <Divider layout="vertical" />
 
@@ -196,7 +214,10 @@ useMagicKeys({
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
           @show-import-turtle-dialog="() => showTurtleImportDialog()"
           @show-import-xml-dialog="() => showXmlImportDialog()"
-          @show-xml-export-dialog="() => showXmlExportDialog()" />
+          @show-xml-export-dialog="() => showXmlExportDialog()"
+          @show-import-schema-dialog="() => showImportSchemaDialog()"
+          @show-export-schema-dialog="() => showExportSchemaDialog()"
+          @show-infer-schema-dialog="() => showInferSchemaDialog()" />
       </div>
 
       <!-- RIGHT side: format selector -->
