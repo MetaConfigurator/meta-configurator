@@ -58,9 +58,29 @@ function copyError() {
         <span
           class="path-edge"
           :class="{'edge-failed': i === failedIndex}"
-          :title="i === failedIndex ? 'This step failed — see the error below' : undefined">
-          <span class="converter-name" :title="step.converterName">{{ step.converterName }}</span>
+          tabindex="0">
+          <span class="converter-name">{{ step.converterName }}</span>
           <span class="arrow">→</span>
+          <!-- Rich hover/focus tooltip: library name, version and clickable link. -->
+          <span class="edge-tooltip" role="tooltip">
+            <span class="tooltip-converter">{{ step.converterName }}</span>
+            <span v-if="step.library" class="tooltip-library">
+              Library: {{ step.library
+              }}<template v-if="step.libraryVersion"> v{{ step.libraryVersion }}</template>
+            </span>
+            <span v-else class="tooltip-library tooltip-muted">Library: unknown</span>
+            <a
+              v-if="step.libraryUrl"
+              class="tooltip-link"
+              :href="step.libraryUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ step.libraryUrl }}</a
+            >
+            <span v-if="i === failedIndex" class="tooltip-failed"
+              >This step failed — see the error below.</span
+            >
+          </span>
         </span>
         <span
           v-if="i === attempt.conversionPath.length - 1"
@@ -144,6 +164,9 @@ function copyError() {
   flex-direction: column;
   align-items: center;
   line-height: 1.1;
+  position: relative;
+  cursor: help;
+  outline: none;
 }
 
 .converter-name {
@@ -153,6 +176,94 @@ function copyError() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Rich tooltip shown above the edge on hover/focus; stays interactive so the
+   library link can be clicked (it is a descendant, so :hover persists). */
+.edge-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 11rem;
+  max-width: 22rem;
+  margin-bottom: 6px;
+  padding: 0.5rem 0.6rem;
+  background: var(--p-surface-900, #111827);
+  color: var(--p-surface-0, #f9fafb);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-size: 0.72rem;
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+  z-index: 30;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.path-edge:hover .edge-tooltip,
+.path-edge:focus-within .edge-tooltip,
+.path-edge:focus .edge-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Caret pointing down at the edge; also bridges the 6px gap so moving the
+   cursor into the tooltip does not dismiss it. */
+.edge-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 16px;
+  height: 6px;
+  transform: translateX(-50%);
+  background: transparent;
+}
+
+.edge-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--p-surface-900, #111827);
+}
+
+.tooltip-converter {
+  font-weight: 700;
+}
+
+.tooltip-library {
+  color: var(--p-surface-200, #e5e7eb);
+}
+
+.tooltip-muted {
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.tooltip-link {
+  color: var(--p-primary-300, #93c5fd);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.tooltip-link:hover {
+  text-decoration: underline;
+  filter: brightness(1.15);
+}
+
+.tooltip-failed {
+  margin-top: 0.15rem;
+  color: var(--p-red-300, #fca5a5);
+  font-weight: 600;
 }
 
 .arrow {

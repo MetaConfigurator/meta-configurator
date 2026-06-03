@@ -73,10 +73,11 @@ describe('ConversionAttemptView', () => {
     expect(wrapper.find('.action-slot').exists()).toBe(false);
   });
 
-  it('highlights the failing edge in red based on the error message', () => {
+  it('highlights the failing edge in red based on the backend failedStepIndex', () => {
     const wrapper = mountView({
       success: false,
       result: 'Conversion failed at step from MdModels to Shex via FlaskApp because of error: boom',
+      failedStepIndex: 1,
       conversionPath: [
         step('Xsd', 'MdModels', 'FlaskApp', 'xsd2md'),
         step('MdModels', 'Shex', 'FlaskApp', 'md2shex'),
@@ -89,12 +90,49 @@ describe('ConversionAttemptView', () => {
     expect(edges[1]!.classes()).toContain('edge-failed');
   });
 
-  it('does not highlight any edge when the failing step cannot be determined', () => {
+  it('does not highlight any edge when the backend did not pinpoint a step', () => {
     const wrapper = mountView({
       success: false,
       result: 'an opaque error with no step info',
+      failedStepIndex: null,
       conversionPath: [step('Xsd', 'JsonSchema', 'FlaskApp', 'xsd2js')],
     });
     expect(wrapper.findAll('.edge-failed')).toHaveLength(0);
+  });
+
+  it('shows the library name, version and clickable url in the edge tooltip', () => {
+    const wrapper = mountView({
+      success: true,
+      result: 'ok',
+      conversionPath: [
+        {
+          sourceLanguage: 'Xsd',
+          targetLanguage: 'JsonSchema',
+          serviceName: 'FlaskApp',
+          converterName: 'xsd2js',
+          library: 'xsd2jsonschema',
+          libraryVersion: '0.3.7',
+          libraryUrl: 'https://www.npmjs.com/package/xsd2jsonschema',
+        },
+      ],
+    });
+    const tooltip = wrapper.find('.edge-tooltip');
+    expect(tooltip.exists()).toBe(true);
+    expect(tooltip.text()).toContain('xsd2jsonschema');
+    expect(tooltip.text()).toContain('v0.3.7');
+    const link = tooltip.find('a.tooltip-link');
+    expect(link.exists()).toBe(true);
+    expect(link.attributes('href')).toBe('https://www.npmjs.com/package/xsd2jsonschema');
+  });
+
+  it('falls back to "Library: unknown" when no library metadata is present', () => {
+    const wrapper = mountView({
+      success: true,
+      result: 'ok',
+      conversionPath: [step('Xsd', 'JsonSchema', 'FlaskApp', 'xsd2js')],
+    });
+    const tooltip = wrapper.find('.edge-tooltip');
+    expect(tooltip.text()).toContain('Library: unknown');
+    expect(tooltip.find('a.tooltip-link').exists()).toBe(false);
   });
 });
