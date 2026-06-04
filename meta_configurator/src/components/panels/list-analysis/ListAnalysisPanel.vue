@@ -137,7 +137,7 @@ function exportTableAsCsv() {
             </div>
             <div v-else>
               <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
-              <span style="display: inline-block; width: 20px;"></span>
+              <span style="display: inline-block; width: 20px"></span>
               <ToggleButton
                 v-model="editMode"
                 onLabel="Read Only"

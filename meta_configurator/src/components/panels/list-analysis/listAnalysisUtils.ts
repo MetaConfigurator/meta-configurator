@@ -29,7 +29,11 @@ export function createItemsRowsObjectsFromJson(itemsJson: any): {
   return {rows: rows, columns};
 }
 
-export function createItemRow(itemJson: any, columns: TableColumnDefinition[], rowIndex: number): any {
+export function createItemRow(
+  itemJson: any,
+  columns: TableColumnDefinition[],
+  rowIndex: number
+): any {
   const row: any = {};
 
   for (const column of columns) {
@@ -48,7 +52,9 @@ export function createItemRow(itemJson: any, columns: TableColumnDefinition[], r
 }
 
 export function createItemRowsArraysFromObjects(itemsRowsObjects: any[]): any[][] {
-  const columnNames = Object.keys(itemsRowsObjects[0]).filter(columnName => columnName !== '__originalIndex');
+  const columnNames = Object.keys(itemsRowsObjects[0]).filter(
+    columnName => columnName !== '__originalIndex'
+  );
 
   return itemsRowsObjects.map((itemRow: any) => {
     return createItemRowArray(itemRow, columnNames);
