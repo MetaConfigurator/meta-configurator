@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import {SessionMode} from '@/store/sessionMode';
-import {computed, type ComputedRef, onMounted, ref, type Ref, watch} from 'vue';
+import {computed, type ComputedRef, ref, type Ref, watch} from 'vue';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import type {Path} from '@/utility/path';
-import {getDataForMode} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
+import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
+import ToggleButton from 'primevue/togglebutton';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
@@ -13,9 +15,11 @@ import {
   convertToCSV,
   createItemRowsArraysFromObjects,
   createItemsRowsObjectsFromJson,
+  type TableColumnDefinition,
 } from '@/components/panels/list-analysis/listAnalysisUtils';
 import {ScrollPanel} from 'primevue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
+import TableCellEditor from '@/components/panels/list-analysis/TableCellEditor.vue';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -55,21 +59,45 @@ const selectedArray: Ref<any | null> = computed(() => {
   return data.dataAt(selectedArrayPath.value);
 });
 
-// rows is an array of objects, each objects having an attribute for each column, with the name as given in the columnNames
-const tableData: ComputedRef<null | {rows: any[]; columnNames: string[]}> = computed(() => {
+const editMode = ref(false);
+
+const currentSchema = computed(() => {
   if (selectedArrayPath.value == null) {
     return null;
   }
-  const currentData = data.dataAt(selectedArrayPath.value);
-  return createItemsRowsObjectsFromJson(currentData);
+  const schema = getSchemaForMode(props.sessionMode);
+  return schema.schemaWrapperAtPath(selectedArrayPath.value);
 });
+
+interface TableData {
+  rows: any[];
+  columns: TableColumnDefinition[];
+}
+
+const tableData: ComputedRef<null | TableData> = computed(() => {
+  if (selectedArray.value == null) {
+    return null;
+  }
+
+  return createItemsRowsObjectsFromJson(selectedArray.value);
+});
+
+function schemaForColumn(columnPath: Path): JsonSchemaWrapper {
+  if (currentSchema.value == null) {
+    return new JsonSchemaWrapper({}, props.sessionMode, false);
+  }
+
+  const itemSchema = currentSchema.value.items;
+  return itemSchema.subSchemaAt(columnPath) ?? itemSchema;
+}
 
 function exportTableAsCsv() {
   if (tableData.value == null) {
     return;
   }
   const itemRowsArrays = createItemRowsArraysFromObjects(tableData.value.rows);
-  const allRowsForCsv = [tableData.value.columnNames].concat(itemRowsArrays);
+  const columnLabels = tableData.value.columns.map(column => column.label);
+  const allRowsForCsv = [columnLabels].concat(itemRowsArrays);
   const csvContent = convertToCSV(allRowsForCsv);
   const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -109,13 +137,21 @@ function exportTableAsCsv() {
             </div>
             <div v-else>
               <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
+              <span style="display: inline-block; width: 20px;"></span>
+              <ToggleButton
+                v-model="editMode"
+                onLabel="Read Only"
+                offLabel="Edit Mode"
+                onIcon="pi pi-eye"
+                offIcon="pi pi-pencil"
+                :aria-label="editMode ? 'Switch to read only mode' : 'Switch to edit mode'" />
             </div>
           </div>
 
           <div v-if="tableData" class="mt-3">
             <div style="overflow: auto; min-width: 0; max-width: 90%">
               <DataTable
-                :value="selectedArray"
+                :value="tableData.rows"
                 showGridlines
                 stripedRows
                 resizable-columns
@@ -124,11 +160,27 @@ function exportTableAsCsv() {
                 :rows="30"
                 size="small">
                 <Column
-                  v-for="columnName in tableData.columnNames"
-                  :field="columnName"
-                  :header="columnName"
+                  v-for="column in tableData.columns"
+                  :key="column.pointer"
+                  :field="column.field"
+                  :header="column.label"
                   :style="{maxWidth: '200px'}"
-                  :sortable="true" />
+                  :sortable="true">
+                  <template #body="{data}">
+                    <div v-if="!editMode">{{ data[column.field] }}</div>
+                    <div v-else>
+                      <TableCellEditor
+                        :value="data[column.field]"
+                        :schema="schemaForColumn(column.path)"
+                        :absolutePath="
+                          selectedArrayPath
+                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                            : column.path
+                        "
+                        :sessionMode="props.sessionMode" />
+                    </div>
+                  </template>
+                </Column>
               </DataTable>
             </div>
 
