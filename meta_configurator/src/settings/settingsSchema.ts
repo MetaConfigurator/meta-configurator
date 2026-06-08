@@ -6,8 +6,12 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
   description: 'MetaConfigurator settings',
   type: 'object',
   required: [
+    'settingsVersion',
+    'latestNewsHash',
     'dataFormat',
     'toolbarTitle',
+    'hideSchemaEditor',
+    'hideSettings',
     'performance',
     'textEditor',
     'guiEditor',
@@ -19,14 +23,15 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     'backend',
     'rdf',
     'aiIntegration',
+    'schemaSelectionLists',
   ],
   additionalProperties: false,
   properties: {
     settingsVersion: {
       type: 'string',
       description: 'The version of the settings file.',
-      default: '1.0.2',
-      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3'],
+      default: '1.0.5',
+      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5'],
       readOnly: true,
     },
     latestNewsHash: {
@@ -40,7 +45,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       type: 'string',
       description: 'The data format to use for the configuration files.',
       default: 'json',
-      enum: ['json', 'yaml', 'xml'],
+      enum: ['json', 'yaml'],
     },
     toolbarTitle: {
       type: 'string',
@@ -171,6 +176,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'hideAddPropertyButton',
         'showBorderAroundInputFields',
         'showSchemaTitleAsHeader',
+        'useScientificNotationForLargeAndSmallNumbers',
+        'scientificNotationUpperThreshold',
+        'scientificNotationLowerThreshold',
       ],
       additionalProperties: false,
       description: 'GUI Editor related settings belong here.',
@@ -207,6 +215,26 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description:
             'If set to true, the title of the schema will be shown as a header in the GUI editor.',
           default: true,
+        },
+        useScientificNotationForLargeAndSmallNumbers: {
+          type: 'boolean',
+          description:
+            'If set to true, numeric values in the GUI editor will use scientific notation when they are greater than or equal to the upper threshold or smaller than or equal to the lower threshold. Scientific notation can be entered regardless of this setting.',
+          default: true,
+        },
+        scientificNotationUpperThreshold: {
+          type: 'number',
+          description:
+            'The absolute value at or above which numbers in the GUI editor are displayed in scientific notation when scientific notation display is enabled.',
+          default: 1e21,
+          exclusiveMinimum: 0,
+        },
+        scientificNotationLowerThreshold: {
+          type: 'number',
+          description:
+            'The non-zero absolute value at or below which numbers in the GUI editor are displayed in scientific notation when scientific notation display is enabled.',
+          default: 1e-7,
+          exclusiveMinimum: 0,
         },
       },
     },
@@ -334,7 +362,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     metaSchema: {
       type: 'object',
-      required: ['allowBooleanSchema', 'allowMultipleTypes', 'objectTypesComfort'],
+      required: [
+        'allowBooleanSchema',
+        'allowMultipleTypes',
+        'objectTypesComfort',
+        'markMoreFieldsAsAdvanced',
+        'showAdditionalPropertiesButton',
+        'showJsonLdFields',
+      ],
       additionalProperties: false,
       description:
         'Meta Schema related settings belong here. They affect the functionality of the schema editor. By making the meta schema more expressive (e.g., by allowing multiple data types for a property), the schema editor will be more powerful but also more complicated.',
@@ -441,14 +476,25 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     backend: {
       type: 'object',
-      required: ['hostname'],
+      required: ['snapshotSharingUrl', 'schemaConverterUrl'],
       additionalProperties: false,
-      description: 'Settings for the backend.',
+      description:
+        'URLs of the MetaConfigurator backend services. Each service has its own full URL so ' +
+        'they can be hosted independently. (The AI relay is configured separately under AI Integration.)',
       properties: {
-        hostname: {
+        snapshotSharingUrl: {
           type: 'string',
-          description: 'The hostname of the backend server.',
+          description:
+            'Base URL of the snapshot-sharing service, used for sharing projects and snapshots.',
           default: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+          format: 'uri',
+        },
+        schemaConverterUrl: {
+          type: 'string',
+          description:
+            'URL of the Schema Conversion Orchestrator service, used by "Import/Export Schema" to ' +
+            'convert between JSON Schema and formats like XSD, SHACL, LinkML and MdModels.',
+          default: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
           format: 'uri',
         },
       },
@@ -529,6 +575,10 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'deepseek/deepseek-v3.2-exp',
             'x-ai/grok-4-fast',
             'x-ai/grok-4-fast:free',
+            // Helmholtz Blablador (via Uni Stuttgart Relay preset)
+            'alias-code',
+            'alias-fast',
+            'alias-large',
           ],
         },
         temperature: {
@@ -573,6 +623,33 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
               },
             },
             {
+              title: 'Uni Stuttgart Relay',
+              type: 'object',
+              description:
+                'Pre-configured relay hosted at the University of Stuttgart. ' +
+                'Routes requests through the Helmholtz Blablador endpoint. ' +
+                'Set the top-level "model" field to one of: alias-code, alias-fast, alias-large.',
+              required: ['relay', 'endpoint'],
+              additionalProperties: false,
+              properties: {
+                relay: {
+                  type: 'string',
+                  title: 'Relay URL',
+                  description: 'The public address of the Uni Stuttgart relay.',
+                  default: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+                  const: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+                },
+                endpoint: {
+                  type: 'string',
+                  title: 'Upstream Endpoint URL',
+                  description:
+                    'The AI provider endpoint that the relay forwards requests to. Fixed to Helmholtz Blablador for this preset.',
+                  default: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                  const: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+                },
+              },
+            },
+            {
               title: 'HTTPS Relay',
               type: 'object',
               description:
@@ -590,6 +667,9 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
                     'Address of your self-hosted MetaConfigurator relay. Has to start with https://.',
                   pattern: '^https://',
                   examples: ['https://your-relay.example.com', 'https://relay.myorg.com'],
+                  not: {
+                    const: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+                  },
                 },
                 endpoint: {
                   type: 'string',
@@ -754,7 +834,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
       description: 'Which panels to show in the editor and their order.',
       items: {
         type: 'object',
-        required: ['panelType', 'mode'],
+        required: ['panelType', 'mode', 'size'],
         additionalProperties: false,
         title: 'Panel',
         description: 'Panel type and tool mode.',

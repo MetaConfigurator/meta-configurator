@@ -1,13 +1,14 @@
 import {mount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, test, vi} from 'vitest';
 import NumberProperty from '../NumberProperty.vue';
-import InputNumber from 'primevue/inputnumber';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {GuiConstants} from '@/constants';
 import {SessionMode} from '@/store/sessionMode';
 import {ValidationResult} from '@/schema/validationUtils';
 import {config} from '@vue/test-utils';
 import {defaultOptions} from 'primevue/config';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 config.global.mocks['$primevue'] = {
   config: defaultOptions,
@@ -24,17 +25,34 @@ vi.mock('@/data/useDataLink', () => ({
   getSessionForMode: vi.fn(),
 }));
 
+const settings = structuredClone(SETTINGS_DATA_DEFAULT);
+
+vi.mock('@/settings/useSettings', () => ({
+  useSettings: vi.fn(() => ({
+    value: settings,
+  })),
+}));
+
 describe('NumberProperty', () => {
   let wrapper: any;
-  let inputNumber: any;
+  let inputText: any;
+
+  function mountComponent(props: any) {
+    wrapper = mount(NumberProperty, {
+      props,
+    });
+    inputText = wrapper.findComponent(InputText);
+  }
+
+  beforeEach(() => {
+    settings.guiEditor.useScientificNotationForLargeAndSmallNumbers = true;
+    settings.guiEditor.scientificNotationUpperThreshold = 1e21;
+    settings.guiEditor.scientificNotationLowerThreshold = 1e-7;
+  });
 
   function mountBeforeEach(props: any) {
     beforeEach(() => {
-      // @ts-ignore
-      wrapper = mount(NumberProperty, {
-        props: props,
-      });
-      inputNumber = wrapper.findComponent(InputNumber);
+      mountComponent(props);
     });
     afterEach(() => {
       wrapper.unmount();
@@ -57,15 +75,10 @@ describe('NumberProperty', () => {
       };
       mountBeforeEach(props);
 
-      it('should correctly setup the input number', () => {
-        expect(inputNumber.props().modelValue).toBe(data);
-        expect(inputNumber.props().minFractionDigits).toBe(0);
-        expect(inputNumber.props().maxFractionDigits).toBe(0);
-        expect(inputNumber.props().step).toBe(1);
-        expect(inputNumber.props().min).toBeNull();
-        expect(inputNumber.props().max).toBeNull();
-        expect(inputNumber.props().mode).toBe('decimal');
-        expect(inputNumber.props().placeholder).toBe('foo');
+      it('should correctly setup the input text and step buttons', () => {
+        expect(inputText.props().modelValue).toBe(data === undefined ? '' : String(data));
+        expect(inputText.attributes().placeholder).toBe('foo');
+        expect(wrapper.findAllComponents(Button)).toHaveLength(2);
       });
     });
   });
@@ -87,15 +100,10 @@ describe('NumberProperty', () => {
       };
       mountBeforeEach(props);
 
-      it('should correctly setup the input number', () => {
-        expect(inputNumber.props().modelValue).toBe(data);
-        expect(inputNumber.props().minFractionDigits).toBe(0);
-        expect(inputNumber.props().maxFractionDigits).toBe(GuiConstants.NUMBER_MAX_DECIMAL_PLACES);
-        expect(inputNumber.props().step).toBe(0.5);
-        expect(inputNumber.props().min).toBeNull();
-        expect(inputNumber.props().max).toBeNull();
-        expect(inputNumber.props().mode).toBe('decimal');
-        expect(inputNumber.props().placeholder).toBe('foo');
+      it('should correctly setup the input text without step buttons', () => {
+        expect(inputText.props().modelValue).toBe(data === undefined ? '' : String(data));
+        expect(inputText.attributes().placeholder).toBe('foo');
+        expect(wrapper.findAllComponents(Button)).toHaveLength(0);
       });
     });
   });
@@ -115,27 +123,124 @@ describe('NumberProperty', () => {
     });
 
     test('on value change to 0', async () => {
-      inputNumber.vm.$emit('update:modelValue', 0);
+      inputText.vm.$emit('update:modelValue', '0');
       await wrapper.vm.$nextTick();
       expect(wrapper.emitted('update:propertyData')).toStrictEqual([[0]]);
     });
 
-    test('on value change to 2', async () => {
-      inputNumber.vm.$emit('update:modelValue', 2);
+    test('on value change to 2e9', async () => {
+      inputText.vm.$emit('update:modelValue', '2e9');
       await wrapper.vm.$nextTick();
-      expect(wrapper.emitted('update:propertyData')).toStrictEqual([[2]]);
+      expect(wrapper.emitted('update:propertyData')).toStrictEqual([[2000000000]]);
     });
 
-    test('on value change to undefined', async () => {
-      inputNumber.vm.$emit('update:modelValue', undefined);
+    test('does not emit for non-integer values on integer fields', async () => {
+      inputText.vm.$emit('update:modelValue', '1.2e-1');
       await wrapper.vm.$nextTick();
       expect(wrapper.emitted('update:propertyData')).not.toBeDefined();
     });
 
-    test('on value change to null', async () => {
-      inputNumber.vm.$emit('update:modelValue', null);
+    test('on empty value', async () => {
+      inputText.vm.$emit('update:modelValue', '');
       await wrapper.vm.$nextTick();
       expect(wrapper.emitted('update:propertyData')).not.toBeDefined();
     });
+  });
+
+  test('emits scientific notation for number fields', async () => {
+    mountComponent({
+      propertyName: 'foo',
+      propertyData: 1,
+      validationResults: new ValidationResult([]),
+      propertySchema: new JsonSchemaWrapper(
+        {
+          type: 'number',
+        },
+        SessionMode.DataEditor,
+        false
+      ),
+    });
+
+    inputText.vm.$emit('update:modelValue', '1.2e-3');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.emitted('update:propertyData')).toStrictEqual([[0.0012]]);
+    wrapper.unmount();
+  });
+
+  test('steps integer fields using multipleOf', async () => {
+    mountComponent({
+      propertyName: 'foo',
+      propertyData: 1,
+      validationResults: new ValidationResult([]),
+      propertySchema: new JsonSchemaWrapper(
+        {
+          type: 'integer',
+          multipleOf: 5,
+        },
+        SessionMode.DataEditor,
+        false
+      ),
+    });
+
+    await wrapper.findAllComponents(Button)[0]!.trigger('click');
+    expect(wrapper.emitted('update:propertyData')).toStrictEqual([[6]]);
+    wrapper.unmount();
+  });
+
+  test('displays large values in scientific notation above the upper threshold', () => {
+    settings.guiEditor.scientificNotationUpperThreshold = 1e9;
+    mountComponent({
+      propertyName: 'foo',
+      propertyData: 2e9,
+      validationResults: new ValidationResult([]),
+      propertySchema: new JsonSchemaWrapper(
+        {
+          type: 'number',
+        },
+        SessionMode.DataEditor,
+        false
+      ),
+    });
+
+    expect(inputText.props().modelValue).toBe('2e+9');
+    wrapper.unmount();
+  });
+
+  test('displays small values in scientific notation below the lower threshold', () => {
+    settings.guiEditor.scientificNotationLowerThreshold = 1e-4;
+    mountComponent({
+      propertyName: 'foo',
+      propertyData: 1.2e-5,
+      validationResults: new ValidationResult([]),
+      propertySchema: new JsonSchemaWrapper(
+        {
+          type: 'number',
+        },
+        SessionMode.DataEditor,
+        false
+      ),
+    });
+
+    expect(inputText.props().modelValue).toBe('1.2e-5');
+    wrapper.unmount();
+  });
+
+  test('expands scientific notation when display setting is disabled', () => {
+    settings.guiEditor.useScientificNotationForLargeAndSmallNumbers = false;
+    mountComponent({
+      propertyName: 'foo',
+      propertyData: 2e9,
+      validationResults: new ValidationResult([]),
+      propertySchema: new JsonSchemaWrapper(
+        {
+          type: 'number',
+        },
+        SessionMode.DataEditor,
+        false
+      ),
+    });
+
+    expect(inputText.props().modelValue).toBe('2000000000');
+    wrapper.unmount();
   });
 });

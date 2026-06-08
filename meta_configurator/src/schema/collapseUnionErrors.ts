@@ -6,6 +6,11 @@ const isUnionSummary = (e: ErrorObject): boolean => UNION_KEYWORDS.has(e.keyword
 
 type BranchItem = {kind: 'leaf'; message: string} | {kind: 'innerSummary'; index: number};
 
+type Branches = {
+  items: Map<number, BranchItem[]>;
+  absorbedErrorIndices: Set<number>;
+};
+
 /**
  * True when `errorPath` sits inside another summary that is itself nested strictly
  * inside `outerSummaryPath`. Used to skip errors that belong to a deeper summary and
@@ -24,35 +29,108 @@ function isUnderDeeperSummary(
   );
 }
 
+function branchIndexUnderSummary(error: ErrorObject, summary: ErrorObject): number | undefined {
+  const branchPrefix = summary.schemaPath + '/';
+  if (!error.schemaPath.startsWith(branchPrefix)) return undefined;
+
+  const branchSeg = error.schemaPath.slice(branchPrefix.length).split('/', 1)[0];
+  const branchIdx = Number.parseInt(branchSeg ?? '', 10);
+  return Number.isFinite(branchIdx) && branchIdx >= 0 ? branchIdx : undefined;
+}
+
+function branchItemFromError(error: ErrorObject, index: number): BranchItem {
+  return isUnionSummary(error)
+    ? {kind: 'innerSummary', index}
+    : {kind: 'leaf', message: error.message ?? 'invalid'};
+}
+
+function addBranchItem(
+  result: Branches,
+  branchIdx: number,
+  item: BranchItem,
+  absorbedErrorIdx: number
+): void {
+  appendTo(result.items, branchIdx, item);
+  result.absorbedErrorIndices.add(absorbedErrorIdx);
+}
+
 /**
  * Groups the immediate sub-errors of one summary by branch index. Each sub-error is
  * tagged as either a leaf (a regular schema violation) or an innerSummary (a nested
  * oneOf/anyOf that gets recursed into during formatting).
  */
-function directBranchesOf(
-  summary: ErrorObject,
+function branchesOf(
+  summaryIdx: number,
   errors: readonly ErrorObject[],
   allSummaryPaths: readonly string[]
-): Map<number, BranchItem[]> {
-  const branchPrefix = summary.schemaPath + '/';
-  const branches = new Map<number, BranchItem[]>();
+): Branches {
+  const result: Branches = {items: new Map(), absorbedErrorIndices: new Set()};
+
+  collectSchemaPathBranchErrors(result, summaryIdx, errors, allSummaryPaths);
+  collectReferencedBranchErrors(result, summaryIdx, errors, allSummaryPaths);
+
+  return result;
+}
+
+function collectSchemaPathBranchErrors(
+  result: Branches,
+  summaryIdx: number,
+  errors: readonly ErrorObject[],
+  allSummaryPaths: readonly string[]
+): void {
+  const summary = errors[summaryIdx]!;
 
   errors.forEach((e, i) => {
     if (e === summary) return;
-    if (!e.schemaPath.startsWith(branchPrefix)) return;
     if (isUnderDeeperSummary(e.schemaPath, summary.schemaPath, allSummaryPaths)) return;
 
-    const branchSeg = e.schemaPath.slice(branchPrefix.length).split('/', 1)[0];
-    const branchIdx = Number.parseInt(branchSeg, 10);
-    if (!Number.isFinite(branchIdx) || branchIdx < 0) return;
-
-    const item: BranchItem = isUnionSummary(e)
-      ? {kind: 'innerSummary', index: i}
-      : {kind: 'leaf', message: e.message ?? 'invalid'};
-    appendTo(branches, branchIdx, item);
+    const branchIdx = branchIndexUnderSummary(e, summary);
+    if (branchIdx === undefined) return;
+    addBranchItem(result, branchIdx, branchItemFromError(e, i), i);
   });
+}
 
-  return branches;
+function collectReferencedBranchErrors(
+  result: Branches,
+  summaryIdx: number,
+  errors: readonly ErrorObject[],
+  allSummaryPaths: readonly string[]
+): void {
+  const referencedErrors = referencedBranchErrorIndices(summaryIdx, errors, allSummaryPaths);
+  if (referencedErrors.length === 0) return;
+
+  const branchIdx = nextBranchIndex(result.items);
+  for (const errorIdx of referencedErrors) {
+    const error = errors[errorIdx]!;
+    addBranchItem(result, branchIdx, {kind: 'leaf', message: error.message ?? 'invalid'}, errorIdx);
+  }
+}
+
+function nextBranchIndex(branches: Map<number, BranchItem[]>): number {
+  return branches.size > 0 ? Math.max(...branches.keys()) + 1 : 0;
+}
+
+function referencedBranchErrorIndices(
+  summaryIdx: number,
+  errors: readonly ErrorObject[],
+  allSummaryPaths: readonly string[]
+): number[] {
+  const summary = errors[summaryIdx]!;
+  const branchPrefix = summary.schemaPath + '/';
+  const result: number[] = [];
+
+  for (let i = summaryIdx - 1; i >= 0; i--) {
+    const error = errors[i]!;
+
+    if (error.instancePath !== summary.instancePath) break;
+    if (isUnionSummary(error)) break;
+    if (error.schemaPath.startsWith(branchPrefix)) continue;
+    if (allSummaryPaths.some(p => error.schemaPath.startsWith(p + '/'))) break;
+
+    result.unshift(i);
+  }
+
+  return result;
 }
 
 function appendTo<K, V>(map: Map<K, V[]>, key: K, value: V): void {
@@ -89,7 +167,7 @@ function formatSummary(
   allSummaryPaths: readonly string[]
 ): string {
   const summary = errors[summaryIdx]!;
-  const branches = directBranchesOf(summary, errors, allSummaryPaths);
+  const branches = branchesOf(summaryIdx, errors, allSummaryPaths).items;
 
   const bulletLines: string[] = [];
   for (const [branchIdx, items] of [...branches.entries()].sort(([a], [b]) => a - b)) {
@@ -114,7 +192,8 @@ function formatBranchBullets(
   const bullets: string[] = [];
   const leafMessages = items
     .filter((it): it is Extract<BranchItem, {kind: 'leaf'}> => it.kind === 'leaf')
-    .map(it => it.message);
+    .map(it => it.message)
+    .filter((message, index, messages) => messages.indexOf(message) === index);
   if (leafMessages.length > 0) {
     bullets.push(`${BULLET_PREFIX}${variantLabel}: ${leafMessages.join('; ')}`);
   }
@@ -146,9 +225,9 @@ function topLevelSummaryIndices(
 
 /**
  * Collapses each oneOf/anyOf cluster of AJV errors into a single summary error whose
- * message walks the variant tree with hierarchical numbering ("variant 1.2.1") and
- * parentheses delimiting each nested union, with the originating oneOf/anyOf keyword
- * preserved at every level. The function is idempotent.
+ * message walks the variant tree with hierarchical numbering ("variant 1.2.1").
+ * The originating oneOf/anyOf keyword is preserved at every level. The function is
+ * idempotent.
  */
 export function collapseUnionErrors(errors: ErrorObject[]): ErrorObject[] {
   const summaryIndices: number[] = [];
@@ -159,11 +238,13 @@ export function collapseUnionErrors(errors: ErrorObject[]): ErrorObject[] {
 
   const allSummaryPaths = summaryIndices.map(i => errors[i]!.schemaPath);
   const replacements = new Map<number, ErrorObject>();
+  const replacementBranches = new Map<number, Branches>();
 
   for (const topIdx of topLevelSummaryIndices(summaryIndices, errors)) {
     const summary = errors[topIdx]!;
-    const branches = directBranchesOf(summary, errors, allSummaryPaths);
-    if (branches.size === 0) continue; // nothing to enrich; leave the summary alone
+    const branches = branchesOf(topIdx, errors, allSummaryPaths);
+    if (branches.items.size === 0) continue; // nothing to enrich; leave the summary alone
+    replacementBranches.set(topIdx, branches);
     replacements.set(topIdx, {
       ...summary,
       message: formatSummary(topIdx, '', errors, allSummaryPaths),
@@ -179,6 +260,11 @@ export function collapseUnionErrors(errors: ErrorObject[]): ErrorObject[] {
     if (replacements.has(i)) return;
     if (replacedPathPrefixes.some(p => e.schemaPath.startsWith(p))) dropped.add(i);
   });
+  for (const branches of replacementBranches.values()) {
+    for (const i of branches.absorbedErrorIndices) {
+      dropped.add(i);
+    }
+  }
 
   return errors.map((e, i) => replacements.get(i) ?? e).filter((_, i) => !dropped.has(i));
 }

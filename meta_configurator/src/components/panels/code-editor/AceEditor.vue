@@ -76,13 +76,7 @@ watch(
 );
 
 function isEditorReadOnly(): boolean {
-  const dataFormat = settings.value.dataFormat;
-  const mode = props.sessionMode;
-
-  // if the editor is in schema/settings mode, XML is in read only because it will mess up the structure otherwise
-  return (
-    (mode === SessionMode.SchemaEditor || mode === SessionMode.Settings) && dataFormat === 'xml'
-  );
+  return false;
 }
 
 const featuresDisabledForPerformance = computed(() => {

@@ -26,6 +26,11 @@ const emit = defineEmits<{
   (e: 'show-data-mapping-dialog'): void;
   (e: 'show-rml-mapping-dialog'): void;
   (e: 'show-import-turtle-dialog'): void;
+  (e: 'show-import-xml-dialog'): void;
+  (e: 'show-xml-export-dialog'): void;
+  (e: 'show-import-schema-dialog'): void;
+  (e: 'show-export-schema-dialog'): void;
+  (e: 'show-infer-schema-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -38,7 +43,11 @@ const topMenuBar = new MenuItems(
   showDataMappingDialog,
   inferSchemaFromSampleData,
   showRmlMappingDialog,
-  showTurtleImportDialog
+  showTurtleImportDialog,
+  showXmlImportDialog,
+  showXmlExportDialog,
+  showImportSchemaDialog,
+  showExportSchemaDialog
 );
 
 function showSchemaSelectionDialog() {
@@ -73,8 +82,33 @@ function showTurtleImportDialog() {
   emit('show-import-turtle-dialog');
 }
 
+function showXmlImportDialog() {
+  emit('show-import-xml-dialog');
+}
+
+function showXmlExportDialog() {
+  emit('show-xml-export-dialog');
+}
+
+function showImportSchemaDialog() {
+  emit('show-import-schema-dialog');
+}
+
+function showExportSchemaDialog() {
+  emit('show-export-schema-dialog');
+}
+
 function inferSchemaFromSampleData() {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
+  const isEmptyData =
+    data === null ||
+    data === undefined ||
+    (typeof data === 'object' && Object.keys(data).length === 0);
+  if (isEmptyData) {
+    // No in-app data to infer from — let the user pick instance files instead.
+    emit('show-infer-schema-dialog');
+    return;
+  }
   const inferredSchema = inferJsonSchema(data);
   if (inferredSchema) {
     getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferredSchema;
@@ -163,40 +197,50 @@ function isHighlighted(item: MenuItem) {
 </script>
 
 <template>
-  <!-- menu items -->
-  <div v-for="item in menuItems" :key="getLabelOfItem(item) ?? item.key ?? ''">
-    <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
-    <Button
-      v-else
-      circular
-      text
-      :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
-      size="small"
-      v-tooltip.right="item.label"
-      :id="item.key ?? ''"
-      :disabled="isDisabled(item)"
-      @click="event => handleItemButtonClick(item, event)">
-      <FontAwesomeIcon :icon="item.icon!!" />
-    </Button>
+  <div class="toolbar-menu-buttons">
+    <!-- menu items -->
+    <div v-for="item in menuItems" :key="getLabelOfItem(item) ?? item.key ?? ''">
+      <span v-if="item.separator" class="menu-separator text-lg p-2 text-gray-300">|</span>
+      <Button
+        v-else
+        circular
+        text
+        :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
+        size="small"
+        v-tooltip.right="item.label"
+        :id="item.key ?? ''"
+        :disabled="isDisabled(item)"
+        @click="event => handleItemButtonClick(item, event)">
+        <FontAwesomeIcon :icon="item.icon!!" />
+      </Button>
 
-    <Menu
-      v-if="item.items"
-      :model="item.items"
-      :popup="true"
-      :ref="itemMenu => setItemMenuRef(item, itemMenu as any)">
-      <template #itemicon="slotProps">
-        <div v-if="slotProps.item.icon !== undefined">
-          <FontAwesomeIcon
-            :icon="slotProps.item.icon ?? []"
-            style="min-width: 1.5rem"
-            class="mr-3" />
-        </div>
-      </template>
-    </Menu>
+      <Menu
+        v-if="item.items"
+        :model="item.items"
+        :popup="true"
+        :ref="itemMenu => setItemMenuRef(item, itemMenu as any)">
+        <template #itemicon="slotProps">
+          <div v-if="slotProps.item.icon !== undefined">
+            <FontAwesomeIcon
+              :icon="slotProps.item.icon ?? []"
+              style="min-width: 1.5rem"
+              class="mr-3" />
+          </div>
+        </template>
+      </Menu>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.toolbar-menu-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .toolbar-button {
   font-weight: bold;
   font-size: large;
@@ -204,7 +248,18 @@ function isHighlighted(item: MenuItem) {
   padding: 0.35rem !important;
 }
 
+.menu-separator {
+  display: inline-flex;
+  align-items: center;
+}
+
 .highlighted-icon {
   color: var(--p-highlight-color) !important;
+}
+
+@media (max-width: 900px) {
+  .menu-separator {
+    display: none;
+  }
 }
 </style>

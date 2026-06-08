@@ -2,7 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
-  settingsVersion: '1.0.3',
+  settingsVersion: '1.0.5',
   latestNewsHash: 0,
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
@@ -31,6 +31,9 @@ export const SETTINGS_DATA_DEFAULT = {
     hideAddPropertyButton: true,
     showBorderAroundInputFields: true,
     showSchemaTitleAsHeader: true,
+    useScientificNotationForLargeAndSmallNumbers: true,
+    scientificNotationUpperThreshold: 1e21,
+    scientificNotationLowerThreshold: 1e-7,
   },
   schemaDiagram: {
     editMode: true,
@@ -108,7 +111,8 @@ export const SETTINGS_DATA_DEFAULT = {
       'https://metaconfigurator.github.io/meta-configurator',
   },
   backend: {
-    hostname: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+    snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+    schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
   },
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
@@ -118,11 +122,12 @@ export const SETTINGS_DATA_DEFAULT = {
     groupBySubject: false,
   },
   aiIntegration: {
-    model: 'gpt-4o-mini',
+    model: 'alias-fast',
     max_tokens: 5000,
     temperature: 0.0,
     backend: {
-      endpoint: 'https://api.openai.com/v1/',
+      relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+      endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
     },
   },
   schemaSelectionLists: [
