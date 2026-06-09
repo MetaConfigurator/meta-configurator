@@ -27,14 +27,19 @@ watch(
 );
 
 const validationResults = computed(() => {
-  return getValidationForMode(props.sessionMode)
-    .currentValidationResult.value.filterForPath(props.absolutePath);
+  return getValidationForMode(props.sessionMode).currentValidationResult.value.filterForPath(
+    props.absolutePath
+  );
 });
 
 const data = getDataForMode(props.sessionMode);
 const isBoolean = computed(() => typeof props.value === 'boolean');
 
 function updateStore(newValue: any) {
+  if (typeof newValue === 'boolean') {
+    data.setDataAt(props.absolutePath, newValue);
+    return;
+  }
   if (props.schema.hasType('number') || props.schema.hasType('integer')) {
     const num = Number(newValue);
     data.setDataAt(props.absolutePath, Number.isNaN(num) ? newValue : num);
