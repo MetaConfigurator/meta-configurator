@@ -3,14 +3,14 @@ import {SessionMode} from '@/store/sessionMode';
 import {computed, type ComputedRef, ref, type Ref, watch} from 'vue';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import type {Path} from '@/utility/path';
-import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
+import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
 import ToggleButton from 'primevue/togglebutton';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
-import {jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
+import {arePathsEqual, jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
 import {
   convertToCSV,
   createItemRowsArraysFromObjects,
@@ -26,6 +26,7 @@ const props = defineProps<{
 }>();
 
 const data = getDataForMode(props.sessionMode);
+const session = getSessionForMode(props.sessionMode);
 
 const possibleArrays: Ref<string[]> = computed(() => {
   return identifyArraysInJson(data.data.value, [], false, true).map((path: Path) => {
@@ -89,6 +90,14 @@ function schemaForColumn(columnPath: Path): JsonSchemaWrapper {
 
   const itemSchema = currentSchema.value.items;
   return itemSchema.subSchemaAt(columnPath) ?? itemSchema;
+}
+
+function selectTableCell(path: Path) {
+  session.updateCurrentSelectedElement(path);
+}
+
+function isSelectedCell(path: Path): boolean {
+  return arePathsEqual(session.currentSelectedElement.value, path);
 }
 
 function exportTableAsCsv() {
@@ -167,8 +176,43 @@ function exportTableAsCsv() {
                   :style="{maxWidth: '200px'}"
                   :sortable="true">
                   <template #body="{data}">
-                    <div v-if="!editMode">{{ data[column.field] }}</div>
-                    <div v-else>
+                    <div
+                      v-if="!editMode"
+                      class="table-cell-content"
+                      :class="{
+                        'bg-yellow-50 rounded-sm': isSelectedCell(
+                          selectedArrayPath
+                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                            : column.path
+                        ),
+                      }"
+                      @click="selectTableCell(
+                        selectedArrayPath
+                          ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                          : column.path
+                      )">
+                      {{ data[column.field] }}
+                    </div>
+                    <div
+                      v-else
+                      class="table-cell-content"
+                      :class="{
+                        'bg-yellow-50 rounded-sm': isSelectedCell(
+                          selectedArrayPath
+                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                            : column.path
+                        ),
+                      }"
+                      @click="selectTableCell(
+                        selectedArrayPath
+                          ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                          : column.path
+                      )"
+                      @focusin="selectTableCell(
+                        selectedArrayPath
+                          ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                          : column.path
+                      )">
                       <TableCellEditor
                         :value="data[column.field]"
                         :schema="schemaForColumn(column.path)"

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
-import InputText from 'primevue/inputtext';
-import Checkbox from 'primevue/checkbox';
+import type {ConfigTreeNodeData} from '@/components/panels/gui-editor/configDataTreeNode';
+import {resolveCorrespondingComponent} from '@/components/panels/gui-editor/resolveCorrespondingComponent';
 import {getDataForMode, getValidationForMode} from '@/data/useDataLink';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {Path} from '@/utility/path';
 import type {SessionMode} from '@/store/sessionMode';
 import type {ValidationResult} from '@/schema/validationUtils';
+import {computed} from 'vue';
 
 const props = defineProps<{
   value: any;
@@ -15,17 +15,15 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
-const isFocused = ref(false);
-const internalValue = ref(props.value);
+const data = getDataForMode(props.sessionMode);
 
-watch(
-  () => props.value,
-  newValue => {
-    if (!isFocused.value) {
-      internalValue.value = newValue;
-    }
-  }
-);
+const nodeData = computed<ConfigTreeNodeData>(() => ({
+  name: props.absolutePath[props.absolutePath.length - 1] ?? '',
+  schema: props.schema,
+  absolutePath: props.absolutePath,
+  relativePath: props.absolutePath,
+  depth: props.absolutePath.length,
+}));
 
 const validationResults = computed<ValidationResult>(() => {
   return getValidationForMode(props.sessionMode).currentValidationResult.value.filterForPath(
@@ -33,60 +31,40 @@ const validationResults = computed<ValidationResult>(() => {
   );
 });
 
-const data = getDataForMode(props.sessionMode);
+function normalizeValueForSchema(schema: JsonSchemaWrapper, value: any): any {
+  if (value === null || value === undefined || value === '') {
+    return value;
+  }
+
+  if (schema.hasType('number') || schema.hasType('integer')) {
+    const numericValue = Number(value);
+    return Number.isNaN(numericValue) ? value : numericValue;
+  }
+
+  return value;
+}
 
 function updateStore(newValue: any) {
-  data.setDataAt(props.absolutePath, newValue);
+  const normalizedValue = normalizeValueForSchema(props.schema, newValue);
+  data.setDataAt(props.absolutePath, normalizedValue);
 }
-
-function onTextInput(value: any) {
-  internalValue.value = value;
-  if (isFocused.value) {
-    updateStore(value);
-  }
-}
-
-function onCheckboxChange() {
-  updateStore(internalValue.value);
-}
-
-// Determine input type based on actual value type, not schema
-const isActualBoolean = computed(() => typeof props.value === 'boolean');
 </script>
 
 <template>
   <div class="table-cell-editor">
-    <Checkbox
-      v-if="isActualBoolean"
-      v-model="internalValue"
-      binary
-      @change="onCheckboxChange"
-      @focus="isFocused = true"
-      @blur="isFocused = false"
-      :class="{'p-invalid': !validationResults.valid}" />
-
-    <InputText
-      v-else
-      class="h-8 tableInput w-full"
-      :class="{'underline decoration-wavy decoration-red-600': !validationResults.valid}"
-      :model-value="internalValue"
-      @update:model-value="onTextInput"
-      @focus="isFocused = true"
-      @blur="isFocused = false"
-      @keydown.down.stop
-      @keydown.up.stop
-      @keydown.left.stop
-      @keydown.right.stop
-      @keyup.enter="updateStore(internalValue)" />
+    <Component
+      :is="resolveCorrespondingComponent(nodeData, props.sessionMode)"
+      :sessionMode="props.sessionMode"
+      :propertyName="nodeData.name"
+      :propertyData="props.value"
+      :propertySchema="props.schema"
+      :validationResults="validationResults"
+      @update:propertyData="updateStore" />
   </div>
 </template>
 
 <style scoped>
-.tableInput {
-  border: 1px solid #d1d5db;
-}
-
-:deep(.p-inputtext) {
-  box-shadow: none !important;
+.table-cell-editor {
+  width: 100%;
 }
 </style>
