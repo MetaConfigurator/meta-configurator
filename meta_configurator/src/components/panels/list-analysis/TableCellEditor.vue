@@ -27,8 +27,9 @@ watch(
 );
 
 const validationResults = computed(() => {
-  return getValidationForMode(props.sessionMode)
-    .currentValidationResult.value.filterForPath(props.absolutePath);
+  return getValidationForMode(props.sessionMode).currentValidationResult.value.filterForPath(
+    props.absolutePath
+  );
 });
 
 const data = getDataForMode(props.sessionMode);
