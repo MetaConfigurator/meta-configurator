@@ -186,11 +186,13 @@ function exportTableAsCsv() {
                             : column.path
                         ),
                       }"
-                      @click="selectTableCell(
-                        selectedArrayPath
-                          ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                          : column.path
-                      )">
+                      @click="
+                        selectTableCell(
+                          selectedArrayPath
+                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                            : column.path
+                        )
+                      ">
                       {{ data[column.field] }}
                     </div>
                     <div
@@ -203,16 +205,20 @@ function exportTableAsCsv() {
                             : column.path
                         ),
                       }"
-                      @click="selectTableCell(
-                        selectedArrayPath
-                          ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                          : column.path
-                      )"
-                      @focusin="selectTableCell(
-                        selectedArrayPath
-                          ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                          : column.path
-                      )">
+                      @click="
+                        selectTableCell(
+                          selectedArrayPath
+                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                            : column.path
+                        )
+                      "
+                      @focusin="
+                        selectTableCell(
+                          selectedArrayPath
+                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
+                            : column.path
+                        )
+                      ">
                       <TableCellEditor
                         :value="data[column.field]"
                         :schema="schemaForColumn(column.path)"
