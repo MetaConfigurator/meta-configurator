@@ -11,13 +11,25 @@ Demonstration and Introduction video from the Allotrope Connect Workshop 2025 (c
 
 ## Requirements
 
-To use the AI-assisted features, you need to have an OpenAI API key (or API key of another LLM endpoint provider). 
-You can obtain an API key by signing up on the [OpenAI website](https://platform.openai.com/signup/).
+By default, MetaConfigurator uses the public **Uni Stuttgart Relay**, which forwards to
+**Helmholtz Blablador**. In that default setup, no browser API key is required.
+Availability is best-effort and cannot be guaranteed.
+
+If you switch to a direct provider connection, you need an API key from that LLM provider
+(for example from [OpenAI](https://platform.openai.com/signup/)).
 
 ## Endpoint Configuration
 
 To configure the LLM endpoint, open an AI-assisted feature (e.g., `Show AI Prompts View` button in the top menu bar) and expand the expandable/collapsible dialog.
 Here, you can enter your API key and select the desired LLM endpoint (e.g., OpenAI GPT-4, Perplexity, or a custom endpoint) and other parameters.
+
+The AI Endpoint Settings support three connection modes:
+
+- **Uni Stuttgart Relay / HTTPS Relay**: use the default public relay or any other HTTPS MetaConfigurator relay.
+- **Direct Endpoint**: connect straight from the browser to an LLM endpoint. This only works if that endpoint allows CORS requests.
+- **HTTP Relay**: local HTTP-only variant for development.
+
+If you want to self-host a relay, see [`backend/relay/README.md`](../../../backend/relay/README.md).
 
 <img alt="AI Endpoint Configuration" src="ai_settings.png" width="400"/>
 

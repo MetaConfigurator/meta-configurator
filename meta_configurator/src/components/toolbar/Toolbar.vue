@@ -9,6 +9,8 @@ import AboutDialog from '@/components/toolbar/dialogs/AboutDialog.vue';
 import DataMappingDialog from '@/components/toolbar/dialogs/data-mapping/DataMappingDialog.vue';
 import ImportCsvDialog from '@/components/toolbar/dialogs/csvimport/ImportCsvDialog.vue';
 import ImportTurtleDialog from '@/components/toolbar/dialogs/turtle-import/ImportTurtleDialog.vue';
+import ImportXmlDialog from '@/components/toolbar/dialogs/xml-import/ImportXmlDialog.vue';
+import XmlExportDialog from '@/components/toolbar/dialogs/xml-export/XmlExportDialog.vue';
 import SaveSnapshotDialog from '@/components/toolbar/dialogs/snapshot/SaveSnapshotDialog.vue';
 import CodeGenerationDialog from '@/components/toolbar/dialogs/code-generation/CodeGenerationDialog.vue';
 import FetchedSchemasSelectionDialog from '@/components/toolbar/dialogs/FetchedSchemasSelectionDialog.vue';
@@ -20,6 +22,9 @@ import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExpor
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
+import ImportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/ImportSchemaDialog.vue';
+import ExportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/ExportSchemaDialog.vue';
+import InferSchemaDialog from '@/components/toolbar/dialogs/schema-infer/InferSchemaDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -107,6 +112,26 @@ function showTurtleImportDialog() {
   turtleImportDialog.value?.show();
 }
 
+function showXmlImportDialog() {
+  xmlImportDialog.value?.show();
+}
+
+function showXmlExportDialog() {
+  xmlExportDialog.value?.show();
+}
+
+function showImportSchemaDialog() {
+  importSchemaDialog.value?.show();
+}
+
+function showExportSchemaDialog() {
+  exportSchemaDialog.value?.show();
+}
+
+function showInferSchemaDialog() {
+  inferSchemaDialog.value?.show();
+}
+
 function showSnapshotDialog() {
   snapshotDialog.value?.show();
 }
@@ -158,6 +183,11 @@ const urlInputDialog = ref();
 const dataMappingDialog = ref();
 const rmlMappingDialog = ref();
 const turtleImportDialog = ref();
+const xmlImportDialog = ref();
+const xmlExportDialog = ref();
+const importSchemaDialog = ref();
+const exportSchemaDialog = ref();
+const inferSchemaDialog = ref();
 
 defineExpose({
   showInitialSchemaDialog: showInitialDialog,
@@ -191,6 +221,10 @@ defineExpose({
 
   <ImportTurtleDialog ref="turtleImportDialog" />
 
+  <ImportXmlDialog ref="xmlImportDialog" />
+
+  <XmlExportDialog ref="xmlExportDialog" />
+
   <SaveSnapshotDialog ref="snapshotDialog" />
 
   <CodeGenerationDialog ref="codeGenerationDialog" />
@@ -204,6 +238,12 @@ defineExpose({
   <DataMappingDialog ref="dataMappingDialog" />
 
   <RmlMappingDialog ref="rmlMappingDialog" />
+
+  <ImportSchemaDialog ref="importSchemaDialog" />
+
+  <ExportSchemaDialog ref="exportSchemaDialog" />
+
+  <InferSchemaDialog ref="inferSchemaDialog" />
 
   <AboutDialog
     :visible="showAboutDialog"
@@ -220,6 +260,11 @@ defineExpose({
     @show-data-mapping-dialog="() => showDataMappingDialog()"
     @show-rml-mapping-dialog="() => showRmlMappingDialog()"
     @show-import-turtle-dialog="() => showTurtleImportDialog()"
+    @show-import-xml-dialog="() => showXmlImportDialog()"
+    @show-xml-export-dialog="() => showXmlExportDialog()"
+    @show-import-schema-dialog="() => showImportSchemaDialog()"
+    @show-export-schema-dialog="() => showExportSchemaDialog()"
+    @show-infer-schema-dialog="() => showInferSchemaDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 

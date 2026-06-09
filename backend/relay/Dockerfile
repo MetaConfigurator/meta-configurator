@@ -1,11 +1,12 @@
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
+ENV HOME=/home/relay
 
 WORKDIR /app
 
 # Create a non-root user.
-RUN adduser --disabled-password --no-create-home relay
+RUN adduser --disabled-password --home /home/relay relay
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

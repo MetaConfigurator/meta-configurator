@@ -1,10 +1,10 @@
 # Use the official Python image
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 # Set environment variable to prevent buffering of output
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 # Default to not using SSL directly in the app when behind proxy
-ENV FLASK_ENABLE_SSL false
+ENV FLASK_ENABLE_SSL=false
 
 # Install OpenSSL for generating certificates
 RUN apt-get update && apt-get install -y openssl && apt-get clean
