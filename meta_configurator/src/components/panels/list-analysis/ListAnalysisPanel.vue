@@ -180,7 +180,7 @@ function exportTableAsCsv() {
                       v-if="!editMode"
                       class="table-cell-content"
                       :class="{
-                        'bg-yellow-50 rounded-sm': isSelectedCell(
+                        'bg-yellow-200 rounded-sm text-gray-900': isSelectedCell(
                           selectedArrayPath
                             ? [...selectedArrayPath, data.__originalIndex, ...column.path]
                             : column.path

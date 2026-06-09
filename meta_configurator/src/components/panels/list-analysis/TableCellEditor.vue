@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type {ConfigTreeNodeData} from '@/components/panels/gui-editor/configDataTreeNode';
-import {resolveCorrespondingComponent} from '@/components/panels/gui-editor/resolveCorrespondingComponent';
+import {computed, ref, watch} from 'vue';
+import InputText from 'primevue/inputtext';
+import Checkbox from 'primevue/checkbox';
 import {getDataForMode, getValidationForMode} from '@/data/useDataLink';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {Path} from '@/utility/path';
 import type {SessionMode} from '@/store/sessionMode';
-import type {ValidationResult} from '@/schema/validationUtils';
-import {computed} from 'vue';
 
 const props = defineProps<{
   value: any;
@@ -15,56 +14,68 @@ const props = defineProps<{
   sessionMode: SessionMode;
 }>();
 
-const data = getDataForMode(props.sessionMode);
+const isFocused = ref(false);
+const internalValue = ref(props.value);
 
-const nodeData = computed<ConfigTreeNodeData>(() => ({
-  name: props.absolutePath[props.absolutePath.length - 1] ?? '',
-  schema: props.schema,
-  absolutePath: props.absolutePath,
-  relativePath: props.absolutePath,
-  depth: props.absolutePath.length,
-}));
+watch(
+  () => props.value,
+  newValue => {
+    if (!isFocused.value) {
+      internalValue.value = newValue;
+    }
+  }
+);
 
-const validationResults = computed<ValidationResult>(() => {
-  return getValidationForMode(props.sessionMode).currentValidationResult.value.filterForPath(
-    props.absolutePath
-  );
+const validationResults = computed(() => {
+  return getValidationForMode(props.sessionMode)
+    .currentValidationResult.value.filterForPath(props.absolutePath);
 });
 
-function normalizeValueForSchema(schema: JsonSchemaWrapper, value: any): any {
-  if (value === null || value === undefined || value === '') {
-    return value;
-  }
-
-  if (schema.hasType('number') || schema.hasType('integer')) {
-    const numericValue = Number(value);
-    return Number.isNaN(numericValue) ? value : numericValue;
-  }
-
-  return value;
-}
+const data = getDataForMode(props.sessionMode);
+const isBoolean = computed(() => typeof props.value === 'boolean');
 
 function updateStore(newValue: any) {
-  const normalizedValue = normalizeValueForSchema(props.schema, newValue);
-  data.setDataAt(props.absolutePath, normalizedValue);
+  if (props.schema.hasType('number') || props.schema.hasType('integer')) {
+    const num = Number(newValue);
+    data.setDataAt(props.absolutePath, Number.isNaN(num) ? newValue : num);
+  } else {
+    data.setDataAt(props.absolutePath, newValue);
+  }
+}
+
+function onTextInput(value: any) {
+  internalValue.value = value;
+  if (isFocused.value) updateStore(value);
+}
+
+function onCheckboxChange() {
+  updateStore(internalValue.value);
 }
 </script>
 
 <template>
   <div class="table-cell-editor">
-    <Component
-      :is="resolveCorrespondingComponent(nodeData, props.sessionMode)"
-      :sessionMode="props.sessionMode"
-      :propertyName="nodeData.name"
-      :propertyData="props.value"
-      :propertySchema="props.schema"
-      :validationResults="validationResults"
-      @update:propertyData="updateStore" />
+    <Checkbox
+      v-if="isBoolean"
+      v-model="internalValue"
+      binary
+      @change="onCheckboxChange"
+      @focus="isFocused = true"
+      @blur="isFocused = false"
+      :class="{'p-invalid': !validationResults.valid}" />
+
+    <InputText
+      v-else
+      class="h-8 w-full"
+      :class="{'underline decoration-wavy decoration-red-600': !validationResults.valid}"
+      :model-value="internalValue"
+      @update:model-value="onTextInput"
+      @focus="isFocused = true"
+      @blur="isFocused = false"
+      @keydown.down.stop
+      @keydown.up.stop
+      @keydown.left.stop
+      @keydown.right.stop
+      @keyup.enter="updateStore(internalValue)" />
   </div>
 </template>
-
-<style scoped>
-.table-cell-editor {
-  width: 100%;
-}
-</style>
