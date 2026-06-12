@@ -33,7 +33,11 @@ function visitObjectSchemas(
 
   if (schema.properties) {
     for (const [propertyName, propertySchema] of Object.entries(schema.properties)) {
-      visitObjectSchemas(propertySchema, collectPropertySamples(objectSamples, propertyName), options);
+      visitObjectSchemas(
+        propertySchema,
+        collectPropertySamples(objectSamples, propertyName),
+        options
+      );
     }
   }
 
@@ -50,7 +54,11 @@ function visitObjectSchemas(
   }
 
   if (schema.additionalProperties !== undefined) {
-    visitObjectSchemas(schema.additionalProperties, objectSamples.flatMap(sample => Object.values(sample)), options);
+    visitObjectSchemas(
+      schema.additionalProperties,
+      objectSamples.flatMap(sample => Object.values(sample)),
+      options
+    );
   }
 
   if (schema.items !== undefined) {
@@ -87,7 +95,9 @@ function maybeConvertToPatternProperties(
     return;
   }
 
-  const propertyValues = propertyNames.flatMap(propertyName => collectPropertySamples(objectSamples, propertyName));
+  const propertyValues = propertyNames.flatMap(propertyName =>
+    collectPropertySamples(objectSamples, propertyName)
+  );
   if (propertyValues.length < options.minMatchingKeys) {
     return;
   }
@@ -99,7 +109,9 @@ function maybeConvertToPatternProperties(
 
   delete schema.properties;
   if (schema.required) {
-    schema.required = schema.required.filter(requiredProperty => !propertyNames.includes(requiredProperty));
+    schema.required = schema.required.filter(
+      requiredProperty => !propertyNames.includes(requiredProperty)
+    );
     if (schema.required.length === 0) {
       delete schema.required;
     }
@@ -110,9 +122,7 @@ function detectPattern(
   propertyNames: string[],
   options: DetectPatternPropertiesOptions
 ): string | null {
-  const numericSuffixMatch = propertyNames.map(propertyName =>
-    propertyName.match(/^(.*?)(\d+)$/)
-  );
+  const numericSuffixMatch = propertyNames.map(propertyName => propertyName.match(/^(.*?)(\d+)$/));
   const allHaveNumericSuffix = numericSuffixMatch.every(match => match !== null);
   const numericBases = allHaveNumericSuffix
     ? numericSuffixMatch.map(match => match?.[1] ?? '')

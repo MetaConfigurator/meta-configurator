@@ -32,7 +32,8 @@ function formatValidationErrors(errors: {instancePath?: string; message?: string
   return errors
     .slice(0, 3)
     .map(error => {
-      const location = error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/';
+      const location =
+        error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/';
       const message = error.message ?? 'Unknown validation error';
       return `${location}: ${message}`;
     })
@@ -49,7 +50,9 @@ function tryCommitRefinedSchema(candidateSchema: TopLevelSchema): boolean {
       toastService.add({
         severity: 'error',
         summary: 'Schema not applied',
-        detail: `The refined schema does not match the current data. ${formatValidationErrors(validationResult.errors)}`,
+        detail: `The refined schema does not match the current data. ${formatValidationErrors(
+          validationResult.errors
+        )}`,
         life: 7000,
       });
       return false;
@@ -83,7 +86,9 @@ export function applySchemaRefinements(selection: RefineSchemaSelection): boolea
     toastService.add({
       severity: 'warn',
       summary: 'Not implemented yet',
-      detail: `Refine Schema is already wired to run directly. The execution logic for ${selectedRefinements.join(', ')} still needs to be implemented.`,
+      detail: `Refine Schema is already wired to run directly. The execution logic for ${selectedRefinements.join(
+        ', '
+      )} still needs to be implemented.`,
       life: 5000,
     });
     return false;

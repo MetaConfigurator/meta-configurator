@@ -95,7 +95,11 @@ function visitSchemaAndSamples(
   if (schema.properties) {
     const objectSamples = collectObjectSamples(samples);
     for (const [propertyName, propertySchema] of Object.entries(schema.properties)) {
-      visitSchemaAndSamples(propertySchema, collectPropertySamples(objectSamples, propertyName), visitor);
+      visitSchemaAndSamples(
+        propertySchema,
+        collectPropertySamples(objectSamples, propertyName),
+        visitor
+      );
     }
   }
 

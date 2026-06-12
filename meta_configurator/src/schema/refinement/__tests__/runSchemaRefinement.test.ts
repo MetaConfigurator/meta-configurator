@@ -57,12 +57,7 @@ describe('runSchemaRefinement', () => {
       },
     } as const;
 
-    const data = [
-      {status: 'OPEN'},
-      {status: 'CLOSED'},
-      {status: 'OPEN'},
-      {status: 'OPEN'},
-    ];
+    const data = [{status: 'OPEN'}, {status: 'CLOSED'}, {status: 'OPEN'}, {status: 'OPEN'}];
 
     const refined = runSchemaRefinement(schema, data, {
       detectEnums: DETECT_ENUMS_DEFAULTS,

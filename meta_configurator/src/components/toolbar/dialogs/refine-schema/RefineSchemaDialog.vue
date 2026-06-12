@@ -16,9 +16,7 @@ import type {
   RefineSchemaAllowedType,
   RefineSchemaSelection,
 } from '@/schema/refinement/refineSchemaTypes';
-import {
-  applySchemaRefinements,
-} from '@/components/toolbar/refineSchema';
+import {applySchemaRefinements} from '@/components/toolbar/refineSchema';
 
 const showDialog = ref(false);
 
@@ -63,8 +61,7 @@ function createDetectAdditionalPropertiesState() {
   return {
     minProperties: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.minProperties,
     similarityThreshold: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.similarityThreshold,
-    minMatchingSubProperties:
-      DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.minMatchingSubProperties,
+    minMatchingSubProperties: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.minMatchingSubProperties,
     requireSameValueType: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.requireSameValueType,
   };
 }
@@ -198,10 +195,7 @@ defineExpose({show: openDialog, close: hideDialog});
             </div>
 
             <div class="parameter-checkbox">
-              <Checkbox
-                v-model="addExamples.uniqueOnly"
-                binary
-                input-id="add-examples-unique" />
+              <Checkbox v-model="addExamples.uniqueOnly" binary input-id="add-examples-unique" />
               <label for="add-examples-unique">Only unique examples</label>
             </div>
 
@@ -264,7 +258,10 @@ defineExpose({show: openDialog, close: hideDialog});
             <div class="parameter-types">
               <span class="parameter-label">Allowed types</span>
               <div class="type-checkbox-list">
-                <div v-for="allowedType in allowedTypes" :key="allowedType" class="parameter-checkbox">
+                <div
+                  v-for="allowedType in allowedTypes"
+                  :key="allowedType"
+                  class="parameter-checkbox">
                   <Checkbox
                     v-model="detectEnums.allowedTypes"
                     :input-id="`detect-enums-${allowedType}`"

@@ -32,7 +32,11 @@ function visitObjectSchemas(
 
   if (schema.properties) {
     for (const [propertyName, propertySchema] of Object.entries(schema.properties)) {
-      visitObjectSchemas(propertySchema, collectPropertySamples(objectSamples, propertyName), options);
+      visitObjectSchemas(
+        propertySchema,
+        collectPropertySamples(objectSamples, propertyName),
+        options
+      );
     }
   }
 
@@ -132,7 +136,9 @@ function maybeConvertToAdditionalProperties(
   schema.additionalProperties = inferSchemaFromValues(propertyValues);
   delete schema.properties;
   if (schema.required) {
-    schema.required = schema.required.filter(requiredProperty => !propertyNames.includes(requiredProperty));
+    schema.required = schema.required.filter(
+      requiredProperty => !propertyNames.includes(requiredProperty)
+    );
     if (schema.required.length === 0) {
       delete schema.required;
     }

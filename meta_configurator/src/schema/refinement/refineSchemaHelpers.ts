@@ -5,14 +5,9 @@ export function isSchemaObject(schema: JsonSchemaType): schema is JsonSchemaObje
   return typeof schema === 'object' && schema !== null;
 }
 
-export function getValueType(value: unknown):
-  | 'null'
-  | 'array'
-  | 'boolean'
-  | 'integer'
-  | 'number'
-  | 'object'
-  | 'string' {
+export function getValueType(
+  value: unknown
+): 'null' | 'array' | 'boolean' | 'integer' | 'number' | 'object' | 'string' {
   if (value === null) {
     return 'null';
   }
@@ -132,7 +127,9 @@ function fixEmptyArraySchemas(schema: JsonSchemaType): JsonSchemaType {
     const value = schema[key];
     if (Array.isArray(value)) {
       schema[key] = value.map(element =>
-        isSchemaObject(element) || typeof element === 'boolean' ? fixEmptyArraySchemas(element) : element
+        isSchemaObject(element) || typeof element === 'boolean'
+          ? fixEmptyArraySchemas(element)
+          : element
       );
     } else if (isSchemaObject(value) || typeof value === 'boolean') {
       schema[key] = fixEmptyArraySchemas(value);
@@ -146,7 +143,5 @@ export function collectPropertySamples(
   objectSamples: Record<string, unknown>[],
   propertyName: string
 ): unknown[] {
-  return objectSamples
-    .filter(sample => propertyName in sample)
-    .map(sample => sample[propertyName]);
+  return objectSamples.filter(sample => propertyName in sample).map(sample => sample[propertyName]);
 }

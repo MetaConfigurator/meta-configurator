@@ -78,7 +78,10 @@ function visitSchemaAndSamples(
     return;
   }
 
-  visitor(schema, samples.filter(sample => shouldIncludeValue(sample, options)));
+  visitor(
+    schema,
+    samples.filter(sample => shouldIncludeValue(sample, options))
+  );
 
   if (schema.properties) {
     const objectSamples = collectObjectSamples(samples);
@@ -135,7 +138,9 @@ function visitSchemaAndSamples(
   }
 
   for (const schemaList of [schema.allOf, schema.anyOf, schema.oneOf]) {
-    schemaList?.forEach(childSchema => visitSchemaAndSamples(childSchema, samples, options, visitor));
+    schemaList?.forEach(childSchema =>
+      visitSchemaAndSamples(childSchema, samples, options, visitor)
+    );
   }
 
   for (const childSchema of [schema.if, schema.then, schema.else, schema.not, schema.contains]) {
