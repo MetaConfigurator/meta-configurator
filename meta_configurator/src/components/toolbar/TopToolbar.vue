@@ -34,6 +34,7 @@ const emit = defineEmits<{
   (e: 'show-import-schema-dialog'): void;
   (e: 'show-export-schema-dialog'): void;
   (e: 'show-infer-schema-dialog'): void;
+  (e: 'show-refine-schema-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -73,6 +74,9 @@ function showDataMappingDialog() {
   emit('show-data-mapping-dialog');
 }
 
+function showRefineSchemaDialog() {
+  emit('show-refine-schema-dialog');
+}
 function selectedMode(newMode: SessionMode) {
   emit('mode-selected', newMode);
 }
@@ -147,7 +151,8 @@ useMagicKeys({
           @show-xml-export-dialog="() => showXmlExportDialog()"
           @show-import-schema-dialog="() => showImportSchemaDialog()"
           @show-export-schema-dialog="() => showExportSchemaDialog()"
-          @show-infer-schema-dialog="() => showInferSchemaDialog()" />
+          @show-infer-schema-dialog="() => showInferSchemaDialog()"
+          @show-refine-schema-dialog="() => showRefineSchemaDialog()" />
 
         <Divider layout="vertical" />
 
@@ -220,7 +225,8 @@ useMagicKeys({
           @show-xml-export-dialog="() => showXmlExportDialog()"
           @show-import-schema-dialog="() => showImportSchemaDialog()"
           @show-export-schema-dialog="() => showExportSchemaDialog()"
-          @show-infer-schema-dialog="() => showInferSchemaDialog()" />
+          @show-infer-schema-dialog="() => showInferSchemaDialog()"
+          @show-refine-schema-dialog="() => showRefineSchemaDialog()" />
       </div>
 
       <!-- RIGHT side: format selector -->

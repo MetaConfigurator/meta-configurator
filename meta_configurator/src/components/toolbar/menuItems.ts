@@ -28,6 +28,7 @@ export class MenuItems {
   private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
   private readonly showDataExportDialog: (schemaMode: boolean) => void;
   private readonly showDataMappingDialog: () => void;
+  private readonly showRefineSchemaDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
   private readonly showRMLMappingDialog: () => void;
   private readonly showImportTurtleDialog: () => void;
@@ -49,7 +50,9 @@ export class MenuItems {
     showImportXmlDialog: () => void,
     showXmlExportDialog: () => void,
     showImportSchemaDialog: () => void,
-    showExportSchemaDialog: () => void
+    showExportSchemaDialog: () => void,
+    showRefineSchemaDialog: () => void,
+    inferJsonSchemaFromSampleData: () => void
   ) {
     this.showSchemaSelectionDialog = showSchemaSelectionDialog;
     this.showImportCsvDialog = showImportCsvDialog;
@@ -57,6 +60,7 @@ export class MenuItems {
     this.showCodeGenerationDialog = showCodeGenerationDialog;
     this.showDataExportDialog = showDataExportDialog;
     this.showDataMappingDialog = showDataMappingDialog;
+    this.showRefineSchemaDialog = showRefineSchemaDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
     this.showRMLMappingDialog = showRMLMappingDialog;
     this.showImportTurtleDialog = showImportTurtleDialog;
@@ -275,6 +279,11 @@ export class MenuItems {
             label: 'Sort All Schema Properties Alphabetically',
             icon: 'fa-solid fa-arrow-down-a-z',
             command: sortSchemaPropertiesAlphabeticallyAction,
+          },
+          {
+            label: 'Refine Schema...',
+            icon: 'fa-solid fa-wand-magic-sparkles',
+            command: this.showRefineSchemaDialog,
           },
         ],
       },

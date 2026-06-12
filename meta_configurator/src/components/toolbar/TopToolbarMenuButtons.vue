@@ -31,6 +31,7 @@ const emit = defineEmits<{
   (e: 'show-import-schema-dialog'): void;
   (e: 'show-export-schema-dialog'): void;
   (e: 'show-infer-schema-dialog'): void;
+  (e: 'show-refine-schema-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -47,7 +48,9 @@ const topMenuBar = new MenuItems(
   showXmlImportDialog,
   showXmlExportDialog,
   showImportSchemaDialog,
-  showExportSchemaDialog
+  showExportSchemaDialog,
+  showRefineSchemaDialog,
+  inferSchemaFromSampleData
 );
 
 function showSchemaSelectionDialog() {
@@ -96,6 +99,10 @@ function showImportSchemaDialog() {
 
 function showExportSchemaDialog() {
   emit('show-export-schema-dialog');
+}
+
+function showRefineSchemaDialog() {
+  emit('show-refine-schema-dialog');
 }
 
 function inferSchemaFromSampleData() {

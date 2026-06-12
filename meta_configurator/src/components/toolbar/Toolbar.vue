@@ -19,6 +19,7 @@ import NewsDialog from '@/components/toolbar/dialogs/NewsDialog.vue';
 import {useSettings} from '@/settings/useSettings';
 import {hasCurrentNewsChanged, setCurrentNewsHash} from '@/components/toolbar/currentNews';
 import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExportDialog.vue';
+import RefineSchemaDialog from '@/components/toolbar/dialogs/refine-schema/RefineSchemaDialog.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
@@ -144,6 +145,10 @@ function showRmlMappingDialog() {
   rmlMappingDialog.value?.show();
 }
 
+function showRefineSchemaDialog() {
+  refineSchemaDialog.value?.show();
+}
+
 async function showSchemaStoreDialog(): Promise<void> {
   try {
     // Wait for the fetch to complete
@@ -188,6 +193,7 @@ const xmlExportDialog = ref();
 const importSchemaDialog = ref();
 const exportSchemaDialog = ref();
 const inferSchemaDialog = ref();
+const refineSchemaDialog = ref();
 
 defineExpose({
   showInitialSchemaDialog: showInitialDialog,
@@ -244,6 +250,7 @@ defineExpose({
   <ExportSchemaDialog ref="exportSchemaDialog" />
 
   <InferSchemaDialog ref="inferSchemaDialog" />
+  <RefineSchemaDialog ref="refineSchemaDialog" />
 
   <AboutDialog
     :visible="showAboutDialog"
@@ -265,6 +272,7 @@ defineExpose({
     @show-import-schema-dialog="() => showImportSchemaDialog()"
     @show-export-schema-dialog="() => showExportSchemaDialog()"
     @show-infer-schema-dialog="() => showInferSchemaDialog()"
+    @show-refine-schema-dialog="() => showRefineSchemaDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 
