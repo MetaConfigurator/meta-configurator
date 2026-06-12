@@ -1,4 +1,5 @@
 import {describe, expect, it} from 'vitest';
+import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {runSchemaRefinement} from '@/schema/refinement/runSchemaRefinement';
 import {
   ADD_EXAMPLES_DEFAULTS,
@@ -7,9 +8,15 @@ import {
   DETECT_PATTERN_PROPERTIES_DEFAULTS,
 } from '@/schema/refinement/refineSchemaTypes';
 
+function expectObjectSchema(schema: TopLevelSchema): asserts schema is JsonSchemaObjectType {
+  if (typeof schema !== 'object' || schema === null) {
+    throw new Error('Expected an object schema');
+  }
+}
+
 describe('runSchemaRefinement', () => {
   it('adds examples from current data', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'array',
       items: {
         type: 'object',
@@ -32,6 +39,7 @@ describe('runSchemaRefinement', () => {
     const refined = runSchemaRefinement(schema, data, {
       addExamples: ADD_EXAMPLES_DEFAULTS,
     });
+    expectObjectSchema(refined);
 
     expect(refined.items).toEqual({
       type: 'object',
@@ -45,7 +53,7 @@ describe('runSchemaRefinement', () => {
   });
 
   it('detects enums from repeated values', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'array',
       items: {
         type: 'object',
@@ -62,6 +70,7 @@ describe('runSchemaRefinement', () => {
     const refined = runSchemaRefinement(schema, data, {
       detectEnums: DETECT_ENUMS_DEFAULTS,
     });
+    expectObjectSchema(refined);
 
     expect(refined.items).toEqual({
       type: 'object',
@@ -75,7 +84,7 @@ describe('runSchemaRefinement', () => {
   });
 
   it('detects additionalProperties from similar dynamic object entries', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         Felix: {
@@ -103,7 +112,7 @@ describe('runSchemaRefinement', () => {
           required: ['name', 'firstname'],
         },
       },
-    } as const;
+    };
 
     const data = {
       Felix: {name: 'F', firstname: 'N'},
@@ -114,6 +123,7 @@ describe('runSchemaRefinement', () => {
     const refined = runSchemaRefinement(schema, data, {
       detectAdditionalProperties: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS,
     });
+    expectObjectSchema(refined);
 
     expect(refined.properties).toBeUndefined();
     expect(refined.additionalProperties).toEqual({
@@ -127,14 +137,14 @@ describe('runSchemaRefinement', () => {
   });
 
   it('detects patternProperties from matching key names', () => {
-    const schema = {
+    const schema: TopLevelSchema = {
       type: 'object',
       properties: {
         sensor_001: {type: 'number'},
         sensor_002: {type: 'number'},
         sensor_003: {type: 'number'},
       },
-    } as const;
+    };
 
     const data = {
       sensor_001: 12.4,
@@ -145,6 +155,7 @@ describe('runSchemaRefinement', () => {
     const refined = runSchemaRefinement(schema, data, {
       detectPatternProperties: DETECT_PATTERN_PROPERTIES_DEFAULTS,
     });
+    expectObjectSchema(refined);
 
     expect(refined.properties).toBeUndefined();
     expect(refined.patternProperties).toEqual({

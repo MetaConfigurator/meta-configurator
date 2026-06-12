@@ -49,8 +49,7 @@ const topMenuBar = new MenuItems(
   showXmlExportDialog,
   showImportSchemaDialog,
   showExportSchemaDialog,
-  showRefineSchemaDialog,
-  inferSchemaFromSampleData
+  showRefineSchemaDialog
 );
 
 function showSchemaSelectionDialog() {

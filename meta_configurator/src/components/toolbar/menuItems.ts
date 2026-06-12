@@ -51,8 +51,7 @@ export class MenuItems {
     showXmlExportDialog: () => void,
     showImportSchemaDialog: () => void,
     showExportSchemaDialog: () => void,
-    showRefineSchemaDialog: () => void,
-    inferJsonSchemaFromSampleData: () => void
+    showRefineSchemaDialog: () => void
   ) {
     this.showSchemaSelectionDialog = showSchemaSelectionDialog;
     this.showImportCsvDialog = showImportCsvDialog;
