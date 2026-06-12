@@ -1,0 +1,5 @@
+Random memo format
+------------------
+Section A: this is plain prose.
+Section B: values maybe = maybe not.
+Nothing here is reliably parseable as a known structured document.

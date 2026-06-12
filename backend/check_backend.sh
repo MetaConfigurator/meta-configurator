@@ -8,6 +8,7 @@ SERVICES=(
   mongo
   redis
   relay
+  import_backend
   nginx-proxy
   letsencrypt
 )
@@ -58,12 +59,17 @@ if command -v curl >/dev/null 2>&1; then
     DOMAIN="${DOMAIN%%/}"
 
     relay_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/relay/health" || true)"
+    import_backend_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/import-backend/health" || true)"
     snapshot_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/snapshot/does-not-exist" || true)"
     root_health_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/health" || true)"
 
     [[ "$relay_status" == "200" ]] \
       && echo "OK  https://${DOMAIN}/relay/health" \
       || echo "FAIL https://${DOMAIN}/relay/health (status ${relay_status:-unreachable})"
+
+    [[ "$import_backend_status" == "200" ]] \
+      && echo "OK  https://${DOMAIN}/import-backend/health" \
+      || echo "FAIL https://${DOMAIN}/import-backend/health (status ${import_backend_status:-unreachable})"
 
     [[ "$snapshot_status" == "404" ]] \
       && echo "OK  https://${DOMAIN}/snapshot/does-not-exist returned 404" \

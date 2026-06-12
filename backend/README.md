@@ -94,6 +94,13 @@ docker compose up -d --build snapshot_sharing
 The other containers keep running. This also works for `relay` and future
 services added to the joint compose file.
 
+The current browser-facing services in the joint stack are:
+
+- `snapshot_sharing` at `/`
+- `relay` at `/relay/`
+- `import_backend` at `/import-backend/`
+- `schema_converter` at `/schema-converter/`
+
 Notes:
 
 - Keep using the same compose project name as before, otherwise Docker may

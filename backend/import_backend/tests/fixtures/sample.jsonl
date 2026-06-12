@@ -1,0 +1,3 @@
+{"event":"ingest_start","run_id":"r-001","at":"2026-03-27T12:00:00Z","meta":{"source":"ftp","batch":"b-17"}}
+{"event":"file_parsed","run_id":"r-001","file":"samples_a.csv","rows":1242,"warnings":[]}
+{"event":"mapping_complete","run_id":"r-001","mapped_records":1238,"errors":[{"row":88,"message":"missing concentration"}]}

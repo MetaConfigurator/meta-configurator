@@ -1,0 +1,13 @@
+Flask
+flask_cors
+flask_limiter
+gunicorn
+werkzeug
+PyYAML
+xmltodict
+gemmi
+rdflib
+tree-sitter
+tree-sitter-cpp
+tree-sitter-python
+tree-sitter-java

@@ -4,11 +4,12 @@
 # exposed publicly. It terminates TLS (cert via acme-companion) and routes
 # requests to the appropriate service container by URL path:
 #
-#     https://${BASE_DOMAIN}/snapshot/*  →  snapshot_sharing
-#     https://${BASE_DOMAIN}/project/*   →  snapshot_sharing
-#     https://${BASE_DOMAIN}/relay/*     →  relay   (path stripped)
-#     https://${BASE_DOMAIN}/health      →  relay   (kept for convenience)
-#     https://${BASE_DOMAIN}/            →  snapshot_sharing (catch-all)
+#     https://${BASE_DOMAIN}/snapshot/*        -> snapshot_sharing
+#     https://${BASE_DOMAIN}/project/*         -> snapshot_sharing
+#     https://${BASE_DOMAIN}/relay/*           -> relay            (path stripped)
+#     https://${BASE_DOMAIN}/import-backend/*  -> import_backend   (path stripped)
+#     https://${BASE_DOMAIN}/health            -> relay            (kept for convenience)
+#     https://${BASE_DOMAIN}/                  -> snapshot_sharing (catch-all)
 #
 # Each service runs in its own container with no published ports — only the
 # nginx-proxy can reach them via the shared `backend-network`. If one service
@@ -123,6 +124,25 @@ services:
       # No LETSENCRYPT_* — the cert is anchored on snapshot_sharing and reused
       # for every service that shares the same VIRTUAL_HOST.
 
+  # -------------------------------------------------------------------------
+  # import_backend - format detection and parser service.
+  # Mounted at /import-backend/ (path stripped before forwarding).
+  # -------------------------------------------------------------------------
+  import_backend:
+    container_name: import_backend
+    build: ./import_backend
+    expose:
+      - "5000"
+    restart: unless-stopped
+    networks:
+      - backend-network
+    environment:
+      VIRTUAL_HOST: ${BASE_DOMAIN}
+      VIRTUAL_PATH: /import-backend/
+      VIRTUAL_DEST: /
+      VIRTUAL_PORT: 5000
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,https://metaconfigurator.github.io,https://logende.github.io,https://www.metaconfigurator.org,https://metaconfigurator.org,https://metaconfigurator.informatik.uni-stuttgart.de}
+      # No LETSENCRYPT_* - cert is anchored on snapshot_sharing.
   # -------------------------------------------------------------------------
   # schema_converter — schema conversion orchestration service.
   # Mounted at /schema-converter/ (path stripped before forwarding).

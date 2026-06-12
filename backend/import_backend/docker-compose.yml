@@ -1,0 +1,14 @@
+# Local Docker deployment of the import backend (no HTTPS, no reverse proxy).
+#
+# Reachable at http://localhost:${IMPORT_BACKEND_PORT:-5000}.
+#
+# For the HTTPS variant see docker-compose.https.yml.
+# For the joint deployment see ../docker-compose.yml.
+
+services:
+  import_backend:
+    container_name: import_backend
+    build: .
+    ports:
+      - "${IMPORT_BACKEND_PORT:-5000}:5000"
+    restart: unless-stopped

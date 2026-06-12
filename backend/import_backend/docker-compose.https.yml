@@ -1,0 +1,59 @@
+# Standalone HTTPS deployment of the import backend.
+#
+# Brings up the import backend behind its own nginx reverse proxy with
+# automatic Let's Encrypt certificates. For the multi-service deployment see
+# ../docker-compose.yml, where the service is mounted at /import-backend/.
+
+services:
+  import_backend:
+    container_name: import_backend
+    build: .
+    expose:
+      - "5000"
+    restart: unless-stopped
+    networks:
+      - import-backend-network
+    environment:
+      VIRTUAL_HOST: ${IMPORT_BACKEND_HOSTNAME:?IMPORT_BACKEND_HOSTNAME is not set}
+      VIRTUAL_PORT: 5000
+      LETSENCRYPT_HOST: ${IMPORT_BACKEND_HOSTNAME:?IMPORT_BACKEND_HOSTNAME is not set}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:latest
+    container_name: import-backend-nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - import-backend-network
+    restart: unless-stopped
+
+  letsencrypt:
+    image: nginxproxy/acme-companion:latest
+    container_name: import-backend-nginx-letsencrypt
+    depends_on:
+      - nginx-proxy
+    environment:
+      NGINX_PROXY_CONTAINER: import-backend-nginx-proxy
+      DEFAULT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+    networks:
+      - import-backend-network
+    restart: unless-stopped
+
+networks:
+  import-backend-network:
+    driver: bridge
+
+volumes:
+  acme-challenges:
