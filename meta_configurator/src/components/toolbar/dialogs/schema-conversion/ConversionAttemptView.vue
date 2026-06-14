@@ -55,10 +55,7 @@ function copyError() {
       <span class="attempt-rank">#{{ index + 1 }}</span>
       <template v-for="(step, i) in attempt.conversionPath" :key="i">
         <span class="lang-node">{{ languageLabel(step.sourceLanguage) }}</span>
-        <span
-          class="path-edge"
-          :class="{'edge-failed': i === failedIndex}"
-          tabindex="0">
+        <span class="path-edge" :class="{'edge-failed': i === failedIndex}" tabindex="0">
           <span class="converter-name">{{ step.converterName }}</span>
           <span class="arrow">→</span>
           <!-- Rich hover/focus tooltip: library name, version and clickable link. -->

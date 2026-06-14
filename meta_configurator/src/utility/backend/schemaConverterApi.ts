@@ -64,6 +64,7 @@ export const JSON_SCHEMA_LANGUAGE = 'JsonSchema';
  */
 export const IMPORT_SOURCE_LANGUAGES: SchemaLanguageOption[] = [
   {label: 'XSD (XML Schema)', value: 'Xsd', extensions: ['.xsd']},
+  {label: 'DTD (Document Type Definition)', value: 'Dtd', extensions: ['.dtd']},
   {label: 'SHACL (Turtle)', value: 'SHACL_TTL', extensions: ['.ttl', '.shacl']},
   {label: 'LinkML', value: 'LinkMl', extensions: ['.yaml', '.yml', '.linkml']},
   {label: 'MdModels', value: 'MdModels', extensions: ['.md', '.markdown']},
