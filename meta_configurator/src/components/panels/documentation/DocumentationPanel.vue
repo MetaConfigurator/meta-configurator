@@ -54,33 +54,33 @@ function attachCopyButtons() {
 
   codeBlocks.forEach(codeElement => {
     const preElement = codeElement.parentElement as HTMLElement;
-    
+
     // Check if we've already added a button to this pre element
     if (preElement.dataset.copyButtonAdded === 'true') return;
-    
+
     // Mark as processed
     preElement.dataset.copyButtonAdded = 'true';
-    
+
     // Create the copy button
     const copyButton = document.createElement('button');
     copyButton.className = 'code-copy-btn';
     copyButton.type = 'button';
     copyButton.setAttribute('aria-label', 'Copy code');
     copyButton.textContent = 'Copy';
-    
+
     // Add click handler
-    copyButton.addEventListener('click', async (e) => {
+    copyButton.addEventListener('click', async e => {
       e.preventDefault();
       const codeText = codeElement.textContent || '';
-      
+
       try {
         await navigator.clipboard.writeText(codeText);
-        
+
         // Show "Copied!" feedback
         const originalText = copyButton.textContent;
         copyButton.textContent = 'Copied!';
         copyButton.classList.add('copied');
-        
+
         // Revert after 2 seconds
         setTimeout(() => {
           copyButton.textContent = originalText;
@@ -90,7 +90,7 @@ function attachCopyButtons() {
         console.error('Failed to copy code:', err);
         copyButton.textContent = 'Copy failed';
         copyButton.classList.add('copy-failed');
-        
+
         // Revert after 2 seconds
         setTimeout(() => {
           copyButton.textContent = 'Copy';
@@ -98,7 +98,7 @@ function attachCopyButtons() {
         }, 2000);
       }
     });
-    
+
     // Insert button into the pre element
     preElement.insertBefore(copyButton, codeElement);
   });
