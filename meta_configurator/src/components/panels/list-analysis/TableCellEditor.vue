@@ -12,6 +12,7 @@ const props = defineProps<{
   schema: JsonSchemaWrapper;
   absolutePath: Path;
   sessionMode: SessionMode;
+  highlighted?: boolean;
 }>();
 
 const isFocused = ref(false);
@@ -59,7 +60,7 @@ function onCheckboxChange() {
 </script>
 
 <template>
-  <div class="table-cell-editor">
+  <div class="table-cell-editor" :class="{'rounded-sm bg-yellow-200': highlighted}">
     <Checkbox
       v-if="isBoolean"
       v-model="internalValue"
@@ -72,7 +73,10 @@ function onCheckboxChange() {
     <InputText
       v-else
       class="h-8 w-full"
-      :class="{'underline decoration-wavy decoration-red-600': !validationResults.valid}"
+      :class="{
+        'underline decoration-wavy decoration-red-600': !validationResults.valid,
+        '!bg-yellow-200': highlighted,
+      }"
       :model-value="internalValue"
       @update:model-value="onTextInput"
       @focus="isFocused = true"

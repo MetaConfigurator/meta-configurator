@@ -38,12 +38,7 @@ export function createItemRow(
 
   for (const column of columns) {
     const columnData = dataAt(column.path, itemJson);
-
-    if (columnData !== undefined) {
-      row[column.field] = columnData;
-    } else {
-      row[column.field] = null;
-    }
+    row[column.field] = columnData ?? null;
   }
 
   row.__originalIndex = rowIndex;

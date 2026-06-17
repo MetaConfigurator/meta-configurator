@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {SessionMode} from '@/store/sessionMode';
-import {computed, type ComputedRef, ref, type Ref, watch} from 'vue';
+import {computed, type ComputedRef, nextTick, ref, type Ref, watch} from 'vue';
 import {identifyArraysInJson} from '@/utility/arrayPathUtils';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
@@ -10,7 +10,12 @@ import Button from 'primevue/button';
 import ToggleButton from 'primevue/togglebutton';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
-import {arePathsEqual, jsonPointerToPathTyped, pathToJsonPointer} from '@/utility/pathUtils';
+import {
+  arePathsEqual,
+  jsonPointerToPathTyped,
+  pathToJsonPointer,
+  pathToString,
+} from '@/utility/pathUtils';
 import {
   convertToCSV,
   createItemRowsArraysFromObjects,
@@ -62,6 +67,10 @@ const selectedArray: Ref<any | null> = computed(() => {
 
 const editMode = ref(false);
 
+const rowsPerPage = 30;
+// index of the first displayed row; bound to the paginator so we can jump pages
+const firstRow = ref(0);
+
 const currentSchema = computed(() => {
   if (selectedArrayPath.value == null) {
     return null;
@@ -92,12 +101,55 @@ function schemaForColumn(columnPath: Path): JsonSchemaWrapper {
   return itemSchema.subSchemaAt(columnPath) ?? itemSchema;
 }
 
+function cellPath(rowData: any, column: TableColumnDefinition): Path {
+  return selectedArrayPath.value
+    ? [...selectedArrayPath.value, rowData.__originalIndex, ...column.path]
+    : column.path;
+}
+
+function cellElementId(path: Path): string {
+  return 'table-cell_' + pathToString(path);
+}
+
 function selectTableCell(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
 function isSelectedCell(path: Path): boolean {
   return arePathsEqual(session.currentSelectedElement.value, path);
+}
+
+// scroll to (and paginate to) the cell that matches the currently selected element,
+// so a selection made in another panel (e.g. the GUI editor) reveals the cell here.
+watch(session.currentSelectedElement, selected => scrollToSelectedCell(selected), {deep: true});
+
+function scrollToSelectedCell(selected: Path) {
+  const arrayPath = selectedArrayPath.value;
+  if (arrayPath == null || tableData.value == null) {
+    return;
+  }
+  // the selection must point inside the array currently shown in the table
+  if (
+    selected.length <= arrayPath.length ||
+    !arePathsEqual(arrayPath, selected.slice(0, arrayPath.length))
+  ) {
+    return;
+  }
+  const rowPosition = tableData.value.rows.findIndex(
+    row => String(row.__originalIndex) === String(selected[arrayPath.length])
+  );
+  if (rowPosition < 0) {
+    return;
+  }
+  // jump to the page containing the row, then scroll the cell into view
+  firstRow.value = Math.floor(rowPosition / rowsPerPage) * rowsPerPage;
+  nextTick(() => {
+    window.setTimeout(() => {
+      document
+        .getElementById(cellElementId(selected))
+        ?.scrollIntoView({block: 'center', behavior: 'smooth'});
+    }, 5);
+  });
 }
 
 function exportTableAsCsv() {
@@ -146,8 +198,8 @@ function exportTableAsCsv() {
             </div>
             <div v-else>
               <SelectButton v-model="selectedArrayPointer" :options="possibleArrays" />
-              <span style="display: inline-block; width: 20px"></span>
               <ToggleButton
+                class="ml-5"
                 v-model="editMode"
                 onLabel="Read Only"
                 offLabel="Edit Mode"
@@ -161,12 +213,13 @@ function exportTableAsCsv() {
             <div style="overflow: auto; min-width: 0; max-width: 90%">
               <DataTable
                 :value="tableData.rows"
+                v-model:first="firstRow"
                 showGridlines
                 stripedRows
                 resizable-columns
                 removable-sort
                 paginator
-                :rows="30"
+                :rows="rowsPerPage"
                 size="small">
                 <Column
                   v-for="column in tableData.columns"
@@ -175,58 +228,29 @@ function exportTableAsCsv() {
                   :header="column.label"
                   :style="{maxWidth: '200px'}"
                   :sortable="true">
-                  <template #body="{data}">
+                  <template #body="{data: rowData}">
                     <div
                       v-if="!editMode"
-                      class="table-cell-content"
+                      :id="cellElementId(cellPath(rowData, column))"
+                      class="table-cell-content rounded-sm"
                       :class="{
-                        'bg-yellow-200 rounded-sm text-gray-900': isSelectedCell(
-                          selectedArrayPath
-                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                            : column.path
-                        ),
+                        'bg-yellow-200 text-gray-900': isSelectedCell(cellPath(rowData, column)),
                       }"
-                      @click="
-                        selectTableCell(
-                          selectedArrayPath
-                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                            : column.path
-                        )
-                      ">
-                      {{ data[column.field] }}
+                      @click="selectTableCell(cellPath(rowData, column))">
+                      {{ rowData[column.field] }}
                     </div>
                     <div
                       v-else
-                      class="table-cell-content"
-                      :class="{
-                        'bg-yellow-50 rounded-sm': isSelectedCell(
-                          selectedArrayPath
-                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                            : column.path
-                        ),
-                      }"
-                      @click="
-                        selectTableCell(
-                          selectedArrayPath
-                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                            : column.path
-                        )
-                      "
-                      @focusin="
-                        selectTableCell(
-                          selectedArrayPath
-                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                            : column.path
-                        )
-                      ">
+                      :id="cellElementId(cellPath(rowData, column))"
+                      class="table-cell-content rounded-sm"
+                      :class="{'bg-yellow-200': isSelectedCell(cellPath(rowData, column))}"
+                      @click="selectTableCell(cellPath(rowData, column))"
+                      @focusin="selectTableCell(cellPath(rowData, column))">
                       <TableCellEditor
-                        :value="data[column.field]"
+                        :value="rowData[column.field]"
                         :schema="schemaForColumn(column.path)"
-                        :absolutePath="
-                          selectedArrayPath
-                            ? [...selectedArrayPath, data.__originalIndex, ...column.path]
-                            : column.path
-                        "
+                        :absolutePath="cellPath(rowData, column)"
+                        :highlighted="isSelectedCell(cellPath(rowData, column))"
                         :sessionMode="props.sessionMode" />
                     </div>
                   </template>
