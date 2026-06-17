@@ -22,6 +22,9 @@ import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExpor
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
+import ImportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/ImportSchemaDialog.vue';
+import ExportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/ExportSchemaDialog.vue';
+import InferSchemaDialog from '@/components/toolbar/dialogs/schema-infer/InferSchemaDialog.vue';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -117,6 +120,18 @@ function showXmlExportDialog() {
   xmlExportDialog.value?.show();
 }
 
+function showImportSchemaDialog() {
+  importSchemaDialog.value?.show();
+}
+
+function showExportSchemaDialog() {
+  exportSchemaDialog.value?.show();
+}
+
+function showInferSchemaDialog() {
+  inferSchemaDialog.value?.show();
+}
+
 function showSnapshotDialog() {
   snapshotDialog.value?.show();
 }
@@ -170,6 +185,9 @@ const rmlMappingDialog = ref();
 const turtleImportDialog = ref();
 const xmlImportDialog = ref();
 const xmlExportDialog = ref();
+const importSchemaDialog = ref();
+const exportSchemaDialog = ref();
+const inferSchemaDialog = ref();
 
 defineExpose({
   showInitialSchemaDialog: showInitialDialog,
@@ -221,6 +239,12 @@ defineExpose({
 
   <RmlMappingDialog ref="rmlMappingDialog" />
 
+  <ImportSchemaDialog ref="importSchemaDialog" />
+
+  <ExportSchemaDialog ref="exportSchemaDialog" />
+
+  <InferSchemaDialog ref="inferSchemaDialog" />
+
   <AboutDialog
     :visible="showAboutDialog"
     @update:visible="newValue => (showAboutDialog = newValue)" />
@@ -238,6 +262,9 @@ defineExpose({
     @show-import-turtle-dialog="() => showTurtleImportDialog()"
     @show-import-xml-dialog="() => showXmlImportDialog()"
     @show-xml-export-dialog="() => showXmlExportDialog()"
+    @show-import-schema-dialog="() => showImportSchemaDialog()"
+    @show-export-schema-dialog="() => showExportSchemaDialog()"
+    @show-infer-schema-dialog="() => showInferSchemaDialog()"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 

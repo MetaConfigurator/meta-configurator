@@ -28,6 +28,9 @@ const emit = defineEmits<{
   (e: 'show-import-turtle-dialog'): void;
   (e: 'show-import-xml-dialog'): void;
   (e: 'show-xml-export-dialog'): void;
+  (e: 'show-import-schema-dialog'): void;
+  (e: 'show-export-schema-dialog'): void;
+  (e: 'show-infer-schema-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -42,7 +45,9 @@ const topMenuBar = new MenuItems(
   showRmlMappingDialog,
   showTurtleImportDialog,
   showXmlImportDialog,
-  showXmlExportDialog
+  showXmlExportDialog,
+  showImportSchemaDialog,
+  showExportSchemaDialog
 );
 
 function showSchemaSelectionDialog() {
@@ -85,8 +90,25 @@ function showXmlExportDialog() {
   emit('show-xml-export-dialog');
 }
 
+function showImportSchemaDialog() {
+  emit('show-import-schema-dialog');
+}
+
+function showExportSchemaDialog() {
+  emit('show-export-schema-dialog');
+}
+
 function inferSchemaFromSampleData() {
   const data = getDataForMode(SessionMode.DataEditor).data.value;
+  const isEmptyData =
+    data === null ||
+    data === undefined ||
+    (typeof data === 'object' && Object.keys(data).length === 0);
+  if (isEmptyData) {
+    // No in-app data to infer from — let the user pick instance files instead.
+    emit('show-infer-schema-dialog');
+    return;
+  }
   const inferredSchema = inferJsonSchema(data);
   if (inferredSchema) {
     getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferredSchema;

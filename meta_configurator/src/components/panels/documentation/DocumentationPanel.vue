@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {SessionMode} from '@/store/sessionMode';
-import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref, watch, nextTick} from 'vue';
 import {getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {schemaToMarkdown} from '@/utility/documentation/schemaToMarkdown';
 import {downloadMarkdown} from '@/components/panels/documentation/downloadMarkdown';
@@ -44,6 +44,73 @@ const renderedHtml = computed(() => converter.makeHtml(markdown.value));
 
 // DOM ref for rendered markdown
 const docsRef = ref<HTMLElement | null>(null);
+
+// Add copy buttons to code blocks
+function attachCopyButtons() {
+  if (!docsRef.value) return;
+
+  // Find all code blocks (pre > code)
+  const codeBlocks = docsRef.value.querySelectorAll('pre > code');
+
+  codeBlocks.forEach(codeElement => {
+    const preElement = codeElement.parentElement as HTMLElement;
+
+    // Check if we've already added a button to this pre element
+    if (preElement.dataset.copyButtonAdded === 'true') return;
+
+    // Mark as processed
+    preElement.dataset.copyButtonAdded = 'true';
+
+    // Create the copy button
+    const copyButton = document.createElement('button');
+    copyButton.className = 'code-copy-btn';
+    copyButton.type = 'button';
+    copyButton.setAttribute('aria-label', 'Copy code');
+    copyButton.textContent = 'Copy';
+
+    // Add click handler
+    copyButton.addEventListener('click', async e => {
+      e.preventDefault();
+      const codeText = codeElement.textContent || '';
+
+      try {
+        await navigator.clipboard.writeText(codeText);
+
+        // Show "Copied!" feedback
+        const originalText = copyButton.textContent;
+        copyButton.textContent = 'Copied!';
+        copyButton.classList.add('copied');
+
+        // Revert after 2 seconds
+        setTimeout(() => {
+          copyButton.textContent = originalText;
+          copyButton.classList.remove('copied');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy code:', err);
+        copyButton.textContent = 'Copy failed';
+        copyButton.classList.add('copy-failed');
+
+        // Revert after 2 seconds
+        setTimeout(() => {
+          copyButton.textContent = 'Copy';
+          copyButton.classList.remove('copy-failed');
+        }, 2000);
+      }
+    });
+
+    // Insert button into the pre element
+    preElement.insertBefore(copyButton, codeElement);
+  });
+}
+
+// Watch for HTML changes and attach copy buttons
+watch(renderedHtml, () => {
+  // Use nextTick-like behavior: wait for DOM to update
+  nextTick(() => {
+    attachCopyButtons();
+  });
+});
 
 // scroll when selection changes
 watch(
@@ -89,7 +156,12 @@ function onAnchorClick(evt: MouseEvent) {
   }
 }
 
-onMounted(() => docsRef.value?.addEventListener('click', onAnchorClick));
+onMounted(() => {
+  docsRef.value?.addEventListener('click', onAnchorClick);
+  // the renderedHtml watcher is lazy, so attach buttons for the already-rendered
+  // content on initial mount as well
+  attachCopyButtons();
+});
 onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
 </script>
 
@@ -272,6 +344,43 @@ onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
   border-radius: 4px;
   overflow-x: auto;
   margin-top: 1em;
+  position: relative;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: var(--p-primary-background);
+  color: var(--p-primary-active-color);
+  border: 1px solid var(--p-border-color, #666);
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.code-copy-btn:hover {
+  background-color: var(--p-highlight-color);
+  border-color: var(--p-primary-active-color);
+}
+
+.code-copy-btn:active {
+  transform: scale(0.95);
+}
+
+.code-copy-btn.copied {
+  background-color: var(--p-success-color, #28a745);
+  border-color: var(--p-success-color, #28a745);
+  color: white;
+}
+
+.code-copy-btn.copy-failed {
+  background-color: var(--p-error-color, #dc3545);
+  border-color: var(--p-error-color, #dc3545);
+  color: white;
 }
 
 .download-btn {
