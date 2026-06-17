@@ -1,43 +1,55 @@
 import _ from 'lodash';
 import {dataAt} from '@/utility/resolveDataAtPath';
+import type {Path} from '@/utility/path';
 import {jsonPointerToPathTyped} from '@/utility/pathUtils';
+
+export interface TableColumnDefinition {
+  pointer: string;
+  field: string;
+  label: string;
+  path: Path;
+}
 
 export function createItemsRowsObjectsFromJson(itemsJson: any): {
   rows: any[];
-  columnNames: string[];
+  columns: TableColumnDefinition[];
 } {
-  const columnNames = collectItemColumnNames(itemsJson);
+  const columnPointers = collectItemColumnNames(itemsJson);
+  const columns: TableColumnDefinition[] = Array.from(columnPointers).map(columnPointer => ({
+    pointer: columnPointer,
+    field: formatJsonPointerAsPropertyName(columnPointer),
+    label: formatJsonPointerForUser(columnPointer),
+    path: jsonPointerToPathTyped(columnPointer),
+  }));
 
-  const rows = itemsJson.map((itemJson: any) => {
-    return createItemRow(itemJson, columnNames);
+  const rows = itemsJson.map((itemJson: any, index: number) => {
+    return createItemRow(itemJson, columns, index);
   });
 
-  const columnNamesFormatted: string[] = Array.from(columnNames).map((columnName: string) => {
-    return formatJsonPointerForUser(columnName);
-  });
-
-  return {rows: rows, columnNames: columnNamesFormatted};
+  return {rows: rows, columns};
 }
 
-export function createItemRow(itemJson: any, columnNames: Set<string>): any {
+export function createItemRow(
+  itemJson: any,
+  columns: TableColumnDefinition[],
+  rowIndex: number
+): any {
   const row: any = {};
 
-  for (const columnName of columnNames) {
-    const columnData = dataAt(jsonPointerToPathTyped(columnName), itemJson);
-
-    const formattedColumnName = formatJsonPointerAsPropertyName(columnName);
-    if (columnData !== undefined) {
-      row[formattedColumnName] = columnData;
-    } else {
-      row[formattedColumnName] = null;
-    }
+  for (const column of columns) {
+    const columnData = dataAt(column.path, itemJson);
+    row[column.field] = columnData ?? null;
   }
+
+  row.__originalIndex = rowIndex;
 
   return row;
 }
 
 export function createItemRowsArraysFromObjects(itemsRowsObjects: any[]): any[][] {
-  const columnNames = Object.keys(itemsRowsObjects[0]);
+  const columnNames = Object.keys(itemsRowsObjects[0]).filter(
+    columnName => columnName !== '__originalIndex'
+  );
 
   return itemsRowsObjects.map((itemRow: any) => {
     return createItemRowArray(itemRow, columnNames);

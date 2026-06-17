@@ -123,7 +123,9 @@ export function arePathsEqual(path1: Path, path2: Path): boolean {
   }
 
   for (let i = 0; i < path1.length; i++) {
-    if (path1[i] !== path2[i]) {
+    // Compare via string representation so that array indices stored as a number
+    // (e.g. 2) and as a string (e.g. "2") are treated as equal.
+    if (String(path1[i]) !== String(path2[i])) {
       return false;
     }
   }
