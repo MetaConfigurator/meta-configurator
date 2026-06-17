@@ -173,8 +173,11 @@ useMagicKeys({
         </Button>
 
         <div class="flex space-x-2 items-center">
-          <span class="pi pi-sitemap" style="font-size: 1.7rem" />
-          <p class="font-semibold text-lg" data-testid="toolbar-title">
+          <img src="/logo.svg" alt="MetaConfigurator logo" style="height: 2.2rem; width: auto" />
+          <p
+            class="font-semibold text-lg"
+            style="font-family: 'Jost', sans-serif"
+            data-testid="toolbar-title">
             {{ settings.toolbarTitle || 'MetaConfigurator' }}
           </p>
         </div>
