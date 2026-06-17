@@ -156,7 +156,12 @@ function onAnchorClick(evt: MouseEvent) {
   }
 }
 
-onMounted(() => docsRef.value?.addEventListener('click', onAnchorClick));
+onMounted(() => {
+  docsRef.value?.addEventListener('click', onAnchorClick);
+  // the renderedHtml watcher is lazy, so attach buttons for the already-rendered
+  // content on initial mount as well
+  attachCopyButtons();
+});
 onUnmounted(() => docsRef.value?.removeEventListener('click', onAnchorClick));
 </script>
 
