@@ -13,7 +13,7 @@ import {useSessionStore} from '@/store/sessionStore';
 const settings = useSettings();
 
 const BACKEND_URL = computed(() => {
-  return settings.value.backend.hostname;
+  return settings.value.backend.snapshotSharingUrl.replace(/\/+$/, '');
 });
 
 const FRONTEND_URL = computed(() => {

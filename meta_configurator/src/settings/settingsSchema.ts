@@ -30,8 +30,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     settingsVersion: {
       type: 'string',
       description: 'The version of the settings file.',
-      default: '1.0.2',
-      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3'],
+      default: '1.0.5',
+      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5'],
       readOnly: true,
     },
     latestNewsHash: {
@@ -476,14 +476,25 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     backend: {
       type: 'object',
-      required: ['hostname'],
+      required: ['snapshotSharingUrl', 'schemaConverterUrl'],
       additionalProperties: false,
-      description: 'Settings for the backend.',
+      description:
+        'URLs of the MetaConfigurator backend services. Each service has its own full URL so ' +
+        'they can be hosted independently. (The AI relay is configured separately under AI Integration.)',
       properties: {
-        hostname: {
+        snapshotSharingUrl: {
           type: 'string',
-          description: 'The hostname of the backend server.',
+          description:
+            'Base URL of the snapshot-sharing service, used for sharing projects and snapshots.',
           default: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+          format: 'uri',
+        },
+        schemaConverterUrl: {
+          type: 'string',
+          description:
+            'URL of the Schema Conversion Orchestrator service, used by "Import/Export Schema" to ' +
+            'convert between JSON Schema and formats like XSD, SHACL, LinkML and MdModels.',
+          default: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
           format: 'uri',
         },
       },

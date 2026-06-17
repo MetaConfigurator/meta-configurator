@@ -31,6 +31,9 @@ const emit = defineEmits<{
   (e: 'show-import-turtle-dialog'): void;
   (e: 'show-import-xml-dialog'): void;
   (e: 'show-xml-export-dialog'): void;
+  (e: 'show-import-schema-dialog'): void;
+  (e: 'show-export-schema-dialog'): void;
+  (e: 'show-infer-schema-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -90,6 +93,18 @@ function showXmlExportDialog() {
   emit('show-xml-export-dialog');
 }
 
+function showImportSchemaDialog() {
+  emit('show-import-schema-dialog');
+}
+
+function showExportSchemaDialog() {
+  emit('show-export-schema-dialog');
+}
+
+function showInferSchemaDialog() {
+  emit('show-infer-schema-dialog');
+}
+
 const modeSelector = ref();
 
 useMagicKeys({
@@ -129,7 +144,10 @@ useMagicKeys({
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
           @show-import-turtle-dialog="() => showTurtleImportDialog()"
           @show-import-xml-dialog="() => showXmlImportDialog()"
-          @show-xml-export-dialog="() => showXmlExportDialog()" />
+          @show-xml-export-dialog="() => showXmlExportDialog()"
+          @show-import-schema-dialog="() => showImportSchemaDialog()"
+          @show-export-schema-dialog="() => showExportSchemaDialog()"
+          @show-infer-schema-dialog="() => showInferSchemaDialog()" />
 
         <Divider layout="vertical" />
 
@@ -155,8 +173,11 @@ useMagicKeys({
         </Button>
 
         <div class="flex space-x-2 items-center">
-          <span class="pi pi-sitemap" style="font-size: 1.7rem" />
-          <p class="font-semibold text-lg" data-testid="toolbar-title">
+          <img src="/logo.svg" alt="MetaConfigurator logo" style="height: 2.2rem; width: auto" />
+          <p
+            class="font-semibold text-lg"
+            style="font-family: 'Jost', sans-serif"
+            data-testid="toolbar-title">
             {{ settings.toolbarTitle || 'MetaConfigurator' }}
           </p>
         </div>
@@ -196,7 +217,10 @@ useMagicKeys({
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
           @show-import-turtle-dialog="() => showTurtleImportDialog()"
           @show-import-xml-dialog="() => showXmlImportDialog()"
-          @show-xml-export-dialog="() => showXmlExportDialog()" />
+          @show-xml-export-dialog="() => showXmlExportDialog()"
+          @show-import-schema-dialog="() => showImportSchemaDialog()"
+          @show-export-schema-dialog="() => showExportSchemaDialog()"
+          @show-infer-schema-dialog="() => showInferSchemaDialog()" />
       </div>
 
       <!-- RIGHT side: format selector -->

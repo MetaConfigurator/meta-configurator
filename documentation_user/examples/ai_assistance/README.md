@@ -31,7 +31,7 @@ The AI Endpoint Settings support three connection modes:
 
 If you want to self-host a relay, see [`backend/relay/README.md`](../../../backend/relay/README.md).
 
-<img alt="AI Endpoint Configuration" src="ai_settings.png" width="400"/>
+<img alt="AI Endpoint Configuration" src="figs/ai_settings.png" width="400"/>
 
 ## How to Use AI Assistance
 

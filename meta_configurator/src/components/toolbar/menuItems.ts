@@ -33,6 +33,8 @@ export class MenuItems {
   private readonly showImportTurtleDialog: () => void;
   private readonly showImportXmlDialog: () => void;
   private readonly showXmlExportDialog: () => void;
+  private readonly showImportSchemaDialog: () => void;
+  private readonly showExportSchemaDialog: () => void;
 
   constructor(
     showSchemaSelectionDialog: () => void,
@@ -45,7 +47,9 @@ export class MenuItems {
     showRMLMappingDialog: () => void,
     showImportTurtleDialog: () => void,
     showImportXmlDialog: () => void,
-    showXmlExportDialog: () => void
+    showXmlExportDialog: () => void,
+    showImportSchemaDialog: () => void,
+    showExportSchemaDialog: () => void
   ) {
     this.showSchemaSelectionDialog = showSchemaSelectionDialog;
     this.showImportCsvDialog = showImportCsvDialog;
@@ -58,6 +62,8 @@ export class MenuItems {
     this.showImportTurtleDialog = showImportTurtleDialog;
     this.showImportXmlDialog = showImportXmlDialog;
     this.showXmlExportDialog = showXmlExportDialog;
+    this.showImportSchemaDialog = showImportSchemaDialog;
+    this.showExportSchemaDialog = showExportSchemaDialog;
   }
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
@@ -188,40 +194,55 @@ export class MenuItems {
   public getSchemaEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
     let result: MenuItem[] = [
       {
-        label: 'New Schema...',
+        label: 'Clear Schema',
         icon: 'fa-regular fa-file',
+        command: clearCurrentFile,
+        key: 'clear-schema',
+      },
+      {
+        label: 'Open / Import / Infer Schema...',
+        icon: 'fa-regular fa-folder-open',
+        key: 'open-import-infer-schema',
         items: [
           {
-            label: 'New empty Schema',
-            icon: 'fa-regular fa-file',
-            command: clearCurrentFile,
+            label: 'Open Schema...',
+            icon: 'fa-regular fa-folder-open',
+            command: () => this.showSchemaSelectionDialog(),
           },
           {
-            label: 'Infer Schema from Data',
+            label: 'Insert JSON Schema...',
+            icon: 'fa-solid fa-file-import',
+            command: openImportSchemaDialog,
+          },
+          {
+            label: 'Infer Schema from Data...',
             icon: 'fa-solid fa-wand-magic-sparkles',
             command: this.inferJsonSchemaFromSampleData,
           },
-        ],
-      },
-      {
-        label: 'Open JSON Schema...',
-        icon: 'fa-regular fa-folder-open',
-        command: () => this.showSchemaSelectionDialog(),
-      },
-      {
-        label: 'Insert Schema...',
-        icon: 'fa-solid fa-file-import',
-        items: [
           {
-            label: 'JSON Schema',
-            command: openImportSchemaDialog,
+            label: 'Import Schema from another format...',
+            icon: 'fa-solid fa-file-arrow-down',
+            command: this.showImportSchemaDialog,
           },
         ],
       },
       {
-        label: 'Download Schema',
-        icon: 'fa-solid fa-download',
-        command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
+        label: 'Export Schema...',
+        icon: 'fa-solid fa-file-export',
+        key: 'export-schema',
+        items: [
+          {
+            label: 'Download as JSON Schema',
+            icon: 'fa-solid fa-download',
+            command: () =>
+              downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
+          },
+          {
+            label: 'Export Schema to another format...',
+            icon: 'fa-solid fa-file-arrow-up',
+            command: this.showExportSchemaDialog,
+          },
+        ],
       },
       {
         label: 'Utility...',
