@@ -2,8 +2,13 @@
 > You are using MetaConfigurator? Please [get in touch with us and give us feedback](https://forms.gle/MHKvrkMfdymH8TDs5)!
 
 
-MetaConfigurator - A powerful JSON Schema Editor and Form/Code/Documentation Generator
-================
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="meta_configurator/public/logo-dark.svg" />
+    <img src="meta_configurator/public/logo.svg" alt="MetaConfigurator logo" height="40" valign="middle" />
+  </picture>
+  MetaConfigurator - A powerful JSON Schema Editor and Form/Code/Documentation Generator
+</h1>
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MetaConfigurator/meta-configurator/e2e.yml?label=End%20to%20End%20Tests)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MetaConfigurator/meta-configurator/npm-test.yml?label=Unit%20Tests)
@@ -113,6 +118,8 @@ Explore how to use MetaConfigurator with real-world examples:
 *   **[AI Assistance](./documentation_user/examples/ai_assistance)** – Learn how to use AI-assisted features for schema and data creation/editing, as well as data transformation.
 
 *   **[External References](./documentation_user/examples/external_references)** – Learn how to handle external references in MetaConfigurator.
+
+*   **[Schema Conversion](./documentation_user/examples/schema_conversion)** – Learn how to import schemas from other formats (XSD, SHACL, LinkML, MD-Models, ...) into JSON Schema and export JSON Schema to other formats.
 
 *   **[RDF Panel](./documentation_user/examples/rdf)** – Learn how to use MetaConfigurator to create, explore and edit Semantic RDF data.
 
