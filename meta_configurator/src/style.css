@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/Jost-variable.woff2') format('woff2');
+}
+
 @tailwind base;
 
 @tailwind components;

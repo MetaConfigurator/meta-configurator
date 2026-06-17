@@ -70,6 +70,7 @@ function textResponse(text: string, {okFlag = false, status = 502} = {}): Respon
 describe('detectSourceLanguage', () => {
   it('detects languages from file extensions', () => {
     expect(detectSourceLanguage('schema.xsd')?.value).toBe('Xsd');
+    expect(detectSourceLanguage('doc.dtd')?.value).toBe('Dtd');
     expect(detectSourceLanguage('shapes.ttl')?.value).toBe('SHACL_TTL');
     expect(detectSourceLanguage('model.yaml')?.value).toBe('LinkMl');
     expect(detectSourceLanguage('model.linkml')?.value).toBe('LinkMl');
