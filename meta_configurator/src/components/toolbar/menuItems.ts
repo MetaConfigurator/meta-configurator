@@ -1,4 +1,4 @@
-import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
+import {openUploadFileDialog, openUploadSettingsDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {clearCurrentFile} from '@/components/toolbar/clearFile';
 import {useSessionStore} from '@/store/sessionStore';
@@ -69,7 +69,7 @@ export class MenuItems {
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
     let result: MenuItem[] = [
       {
-        label: 'New Data...',
+        label: 'New Data / Generate Data...',
         icon: 'fa-regular fa-file',
         items: [
           {
@@ -85,15 +85,15 @@ export class MenuItems {
         ],
       },
       {
-        label: 'Open Data',
-        icon: 'fa-regular fa-folder-open',
-        command: () => openUploadFileDialog(getDataForMode(SessionMode.DataEditor)),
-      },
-      {
-        label: 'Import Data...',
+        label: 'Open / Import Data...',
         key: 'import-data',
-        icon: 'fa-solid fa-file-import',
+        icon: 'fa-regular fa-folder-open',
         items: [
+          {
+            label: 'Open JSON/YAML Data',
+            icon: 'fa-solid fa-folder-open',
+            command: () => openUploadFileDialog(getDataForMode(SessionMode.DataEditor)),
+          },
           {
             label: 'Import CSV Data',
             icon: 'fa-solid fa-table',
@@ -112,15 +112,15 @@ export class MenuItems {
         ],
       },
       {
-        label: 'Download Data',
-        icon: 'fa-solid fa-download',
-        command: () =>
-          downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
-      },
-      {
         label: 'Export Data...',
         icon: 'fa-solid fa-file-export',
         items: [
+          {
+            label: 'Download JSON/YAML Data',
+            icon: 'fa-solid fa-download',
+            command: () =>
+              downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
+          },
           {
             label: 'Export to XML',
             icon: 'fa-solid fa-file-code',
@@ -194,30 +194,37 @@ export class MenuItems {
   public getSchemaEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
     let result: MenuItem[] = [
       {
-        label: 'Clear Schema',
+        label: 'New Schema / Infer Schema...',
         icon: 'fa-regular fa-file',
-        command: clearCurrentFile,
-        key: 'clear-schema',
+        key: 'new-schema',
+        items: [
+          {
+            label: 'Clear Schema',
+            icon: 'fa-regular fa-file',
+            command: clearCurrentFile,
+            key: 'clear-schema',
+          },
+          {
+            label: 'Infer Schema from Data...',
+            icon: 'fa-solid fa-wand-magic-sparkles',
+            command: this.inferJsonSchemaFromSampleData,
+          },
+        ]
       },
       {
-        label: 'Open / Import / Infer Schema...',
+        label: 'Open / Import Schema...',
         icon: 'fa-regular fa-folder-open',
         key: 'open-import-infer-schema',
         items: [
           {
             label: 'Open Schema...',
-            icon: 'fa-regular fa-folder-open',
+            icon: 'fa-solid fa-folder-open',
             command: () => this.showSchemaSelectionDialog(),
           },
           {
             label: 'Insert JSON Schema...',
             icon: 'fa-solid fa-file-import',
             command: openImportSchemaDialog,
-          },
-          {
-            label: 'Infer Schema from Data...',
-            icon: 'fa-solid fa-wand-magic-sparkles',
-            command: this.inferJsonSchemaFromSampleData,
           },
           {
             label: 'Import Schema from another format...',
@@ -366,10 +373,7 @@ export class MenuItems {
       {
         label: 'Open settings file',
         icon: 'fa-regular fa-folder-open',
-        command: () => {
-          throw new Error('Not implemented yet');
-        },
-        disabled: true,
+        command: openUploadSettingsDialog,
       },
       {
         label: 'Save settings file',
