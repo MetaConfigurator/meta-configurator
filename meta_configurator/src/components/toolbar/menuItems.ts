@@ -209,7 +209,7 @@ export class MenuItems {
             icon: 'fa-solid fa-wand-magic-sparkles',
             command: this.inferJsonSchemaFromSampleData,
           },
-        ]
+        ],
       },
       {
         label: 'Open / Import Schema...',
