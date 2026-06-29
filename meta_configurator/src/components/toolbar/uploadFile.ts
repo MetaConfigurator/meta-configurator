@@ -1,10 +1,13 @@
-import {readFileContentToDataLink} from '@/utility/readFileContent';
+import {readFileContentForFunction, readFileContentToDataLink} from '@/utility/readFileContent';
 import {getDataForMode} from '@/data/useDataLink';
 import type {ManagedData} from '@/data/managedData';
 import {SessionMode} from '@/store/sessionMode';
 import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
+import {updateSettingsWithDefaults} from '@/settings/settingsUpdater';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 const uploadDataFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .xml, .schema.json');
+const uploadSettingsFileDialog = createLazySingleFileDialog('.json, .yaml, .yml');
 
 /**
  * Opens a file dialog to select a file to upload.
@@ -22,4 +25,18 @@ export function openUploadFileDialog(resultDataLink: ManagedData): void {
  */
 export function openUploadSchemaDialog(): void {
   return openUploadFileDialog(getDataForMode(SessionMode.SchemaEditor));
+}
+
+/**
+ * Opens a file dialog to select a settings file to upload.
+ */
+export function openUploadSettingsDialog(): void {
+  uploadSettingsFileDialog.openForSelection(files => {
+    readFileContentForFunction(files, settings => {
+      const defaultSettings: any = structuredClone(SETTINGS_DATA_DEFAULT);
+      getDataForMode(SessionMode.Settings).setData(
+        updateSettingsWithDefaults(settings, defaultSettings)
+      );
+    });
+  });
 }
