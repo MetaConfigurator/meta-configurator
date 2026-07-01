@@ -152,7 +152,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
       },
     };
 
-    const result = extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema);
+    extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema);
 
     // Foo got renamed to Foo2
     expect(rootSchema.data.value.$defs.Foo2).toEqual({type: 'string'});
