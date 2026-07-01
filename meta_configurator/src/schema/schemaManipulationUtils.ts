@@ -129,7 +129,10 @@ export function createIdentifierForExtractedElement(
   return identifier;
 }
 
-export function extractGeneratedDefinitionsFromSubSchema(subSchema: any, schemaData: ManagedData): any {
+export function extractGeneratedDefinitionsFromSubSchema(
+  subSchema: any,
+  schemaData: ManagedData
+): any {
   if (subSchema === null || typeof subSchema !== 'object' || Array.isArray(subSchema)) {
     return subSchema;
   }

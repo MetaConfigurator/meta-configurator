@@ -120,7 +120,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
         contact: {$ref: '#/$defs/address'},
       },
       $defs: {
-        address: addressDef,  // identical content
+        address: addressDef, // identical content
       },
     };
 
@@ -146,7 +146,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
         Bar: {
           type: 'object',
           properties: {
-            relatedFoo: {$ref: '#/$defs/Foo'},  // this must become Foo2
+            relatedFoo: {$ref: '#/$defs/Foo'}, // this must become Foo2
           },
         },
       },
