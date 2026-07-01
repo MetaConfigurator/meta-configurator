@@ -129,6 +129,63 @@ export function createIdentifierForExtractedElement(
   return identifier;
 }
 
+export function extractGeneratedDefinitionsFromSubSchema(subSchema: any, schemaData: ManagedData): any {
+  if (subSchema === null || typeof subSchema !== 'object' || Array.isArray(subSchema)) {
+    return subSchema;
+  }
+
+  const localDefinitions: {defsKey: string; name: string; content: any}[] = [];
+  for (const defsKey of ['$defs', 'definitions']) {
+    const localDefs = subSchema[defsKey];
+    if (localDefs === undefined || localDefs === null || typeof localDefs !== 'object') {
+      continue;
+    }
+    delete subSchema[defsKey];
+    for (const definitionName of Object.keys(localDefs)) {
+      localDefinitions.push({defsKey, name: definitionName, content: localDefs[definitionName]});
+    }
+  }
+
+  if (localDefinitions.length === 0) {
+    return subSchema;
+  }
+
+  const pathMappings: {oldLocalPath: Path; newRootPath: Path; content: any}[] = [];
+  for (const {defsKey, name, content} of localDefinitions) {
+    let newRootPath = doesIdenticalSchemaDefinitionExist(schemaData, content);
+    if (newRootPath === undefined) {
+      newRootPath = findAvailableSchemaId(schemaData, ['$defs'], name, true);
+    }
+    pathMappings.push({oldLocalPath: [defsKey, name], newRootPath, content});
+  }
+
+  const rewriteTargets: any[] = [subSchema, ...pathMappings.map(m => m.content)];
+  for (const {oldLocalPath, newRootPath} of pathMappings) {
+    for (const target of rewriteTargets) {
+      updateReferences(oldLocalPath, newRootPath, target, (path, newValue) => {
+        setValueAtPath(target, path, newValue);
+      });
+    }
+  }
+
+  for (const {newRootPath, content} of pathMappings) {
+    if (schemaData.dataAt(newRootPath) === undefined) {
+      schemaData.setDataAt(newRootPath, content);
+    }
+  }
+
+  return subSchema;
+}
+
+function setValueAtPath(root: any, path: Path, value: any): void {
+  if (path.length === 0) return;
+  let current = root;
+  for (let i = 0; i < path.length - 1; i++) {
+    current = current[path[i]!];
+  }
+  current[path[path.length - 1]!] = value;
+}
+
 export function addSchemaObject(
   schemaData: ManagedData,
   connectWithRootIfRootEmpty: boolean = true,
