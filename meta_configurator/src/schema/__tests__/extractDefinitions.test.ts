@@ -105,6 +105,44 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
     expect(result.properties.contact.$ref).toBe('#/$defs/address2');
   });
 
+  it('renames definition if same name already exists at root with different content', () => {
+    // root already has an "address" with different content
+    rootSchema.setDataAt(['$defs', 'address'], {
+      type: 'object',
+      properties: {fullAddress: {type: 'string'}},
+    });
+
+    // AI generates its own "address" with different content
+    const aiResponse = {
+      type: 'object',
+      properties: {
+        contact: {$ref: '#/$defs/address'},
+      },
+      $defs: {
+        address: {
+          type: 'object',
+          properties: {street: {type: 'string'}, city: {type: 'string'}},
+        },
+      },
+    };
+
+    const result = extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema);
+
+    // should be renamed to address2 to avoid clash
+    expect(rootSchema.data.value.$defs.address2).toEqual({
+      type: 'object',
+      properties: {street: {type: 'string'}, city: {type: 'string'}},
+    });
+
+    // original address untouched
+    expect(rootSchema.data.value.$defs.address).toEqual({
+      type: 'object',
+      properties: {fullAddress: {type: 'string'}},
+    });
+
+    // $ref updated to new name
+    expect(result.properties.contact.$ref).toBe('#/$defs/address2');
+  });
   it('does not duplicate if identical definition already exists at root', () => {
     const addressDef = {
       type: 'object',
@@ -128,6 +166,34 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
 
     // address2 should NOT have been created
     expect(rootSchema.data.value.$defs.address2).toBeUndefined();
+  });
+
+  it('does not duplicate if identical definition already exists at root but under different key', () => {
+    const addressDef = {
+      type: 'object',
+      properties: {street: {type: 'string'}, city: {type: 'string'}},
+    };
+
+    // root already has exact same address content
+    rootSchema.setDataAt(['$defs', 'adresse'], addressDef);
+
+    const aiResponse = {
+      type: 'object',
+      properties: {
+        contact: {$ref: '#/$defs/address'},
+      },
+      $defs: {
+        address: addressDef,  // identical content
+      },
+    };
+
+    extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema);
+
+    // address should NOT have been created
+    expect(rootSchema.data.value.$defs.address).toBeUndefined();
+
+    // reference should point to existing definition
+    expect(aiResponse.properties.contact.$ref).toBe('#/$defs/adresse');
   });
 
   it('fixes cross references between generated definitions when one gets renamed', () => {
@@ -163,4 +229,6 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
     // original Foo (number) untouched
     expect(rootSchema.data.value.$defs.Foo).toEqual({type: 'number'});
   });
+
+  
 });

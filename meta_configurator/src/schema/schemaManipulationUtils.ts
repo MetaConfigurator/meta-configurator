@@ -129,7 +129,10 @@ export function createIdentifierForExtractedElement(
   return identifier;
 }
 
-export function extractGeneratedDefinitionsFromSubSchema(subSchema: any, schemaData: ManagedData): any {
+export function extractGeneratedDefinitionsFromSubSchema(
+  subSchema: any,
+  rootSchemaData: ManagedData
+): any {
   if (subSchema === null || typeof subSchema !== 'object' || Array.isArray(subSchema)) {
     return subSchema;
   }
@@ -152,11 +155,11 @@ export function extractGeneratedDefinitionsFromSubSchema(subSchema: any, schemaD
 
   const pathMappings: {oldLocalPath: Path; newRootPath: Path; content: any}[] = [];
   for (const {defsKey, name, content} of localDefinitions) {
-    let newRootPath = doesIdenticalSchemaDefinitionExist(schemaData, content);
-    if (newRootPath === undefined) {
-      newRootPath = findAvailableSchemaId(schemaData, ['$defs'], name, true);
+    let newDefinitionPath = doesIdenticalSchemaDefinitionExist(rootSchemaData, content);
+    if (newDefinitionPath === undefined) {
+      newDefinitionPath = findAvailableSchemaId(rootSchemaData, ['$defs'], name, true);
     }
-    pathMappings.push({oldLocalPath: [defsKey, name], newRootPath, content});
+    pathMappings.push({oldLocalPath: [defsKey, name], newRootPath: newDefinitionPath, content});
   }
 
   const rewriteTargets: any[] = [subSchema, ...pathMappings.map(m => m.content)];
@@ -169,8 +172,8 @@ export function extractGeneratedDefinitionsFromSubSchema(subSchema: any, schemaD
   }
 
   for (const {newRootPath, content} of pathMappings) {
-    if (schemaData.dataAt(newRootPath) === undefined) {
-      schemaData.setDataAt(newRootPath, content);
+    if (rootSchemaData.dataAt(newRootPath) === undefined) {
+      rootSchemaData.setDataAt(newRootPath, content);
     }
   }
 
