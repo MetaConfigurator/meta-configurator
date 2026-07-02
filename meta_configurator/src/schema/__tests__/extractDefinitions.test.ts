@@ -158,7 +158,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
         contact: {$ref: '#/$defs/address'},
       },
       $defs: {
-        address: addressDef,  // identical content
+        address: addressDef, // identical content
       },
     };
 
@@ -212,13 +212,13 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
         Bar: {
           type: 'object',
           properties: {
-            relatedFoo: {$ref: '#/$defs/Foo'},  // this must become Foo2
+            relatedFoo: {$ref: '#/$defs/Foo'}, // this must become Foo2
           },
         },
       },
     };
 
-    const result = extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema);
+    extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema);
 
     // Foo got renamed to Foo2
     expect(rootSchema.data.value.$defs.Foo2).toEqual({type: 'string'});
@@ -229,6 +229,10 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
     // original Foo (number) untouched
     expect(rootSchema.data.value.$defs.Foo).toEqual({type: 'number'});
   });
+<<<<<<< HEAD
 
   
 });
+=======
+});
+>>>>>>> 0d67435d05ab6b72b8c2b1c7ed715e802414f921

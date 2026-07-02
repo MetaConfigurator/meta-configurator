@@ -28,7 +28,6 @@ import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schem
 import {extractGeneratedDefinitionsFromSubSchema} from '@/schema/schemaManipulationUtils';
 import type {ManagedData} from '@/data/managedData';
 
-
 const props = defineProps<{
   sessionMode: SessionMode;
   defaultTextCreateDocument: string;

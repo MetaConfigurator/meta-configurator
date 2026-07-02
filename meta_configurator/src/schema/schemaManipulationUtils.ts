@@ -131,7 +131,11 @@ export function createIdentifierForExtractedElement(
 
 export function extractGeneratedDefinitionsFromSubSchema(
   subSchema: any,
+<<<<<<< HEAD
   rootSchemaData: ManagedData
+=======
+  schemaData: ManagedData
+>>>>>>> 0d67435d05ab6b72b8c2b1c7ed715e802414f921
 ): any {
   if (subSchema === null || typeof subSchema !== 'object' || Array.isArray(subSchema)) {
     return subSchema;
