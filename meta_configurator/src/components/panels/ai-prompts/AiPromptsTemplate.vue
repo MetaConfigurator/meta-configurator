@@ -25,8 +25,7 @@ import {
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
 import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schemaProcessor';
-import {extractGeneratedDefinitionsFromSubSchema} from '@/schema/schemaManipulationUtils';
-import type {ManagedData} from '@/data/managedData';
+import {postProcessSchemaModification} from '@/schema/schemaManipulationUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -215,12 +214,7 @@ function processResult(
   }
 }
 
-function postProcessSchemaModification(responseObject: any, schemaData: ManagedData): any {
-  if (responseObject === null || typeof responseObject !== 'object') {
-    return responseObject;
-  }
-  return extractGeneratedDefinitionsFromSubSchema(responseObject, schemaData);
-}
+
 
 function applyEditorDocument() {
   try {

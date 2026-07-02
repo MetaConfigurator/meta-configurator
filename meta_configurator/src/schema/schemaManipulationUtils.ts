@@ -128,7 +128,17 @@ export function createIdentifierForExtractedElement(
   }
   return identifier;
 }
-
+export function postProcessSchemaModification(responseObject: any, schemaData: ManagedData): any {
+  if (responseObject === null || typeof responseObject !== 'object') {
+    return responseObject;
+  }
+  const response = extractGeneratedDefinitionsFromSubSchema(responseObject, schemaData);
+  // if response is a object which contains a $schema property, remove this property, as it is not allowed in sub-schemas
+  if (response && typeof response === 'object' && '$schema' in response) {
+    delete response.$schema;
+  }
+  return response;
+}
 export function extractGeneratedDefinitionsFromSubSchema(
   subSchema: any,
   rootSchemaData: ManagedData
