@@ -131,11 +131,7 @@ export function createIdentifierForExtractedElement(
 
 export function extractGeneratedDefinitionsFromSubSchema(
   subSchema: any,
-<<<<<<< HEAD
   rootSchemaData: ManagedData
-=======
-  schemaData: ManagedData
->>>>>>> 0d67435d05ab6b72b8c2b1c7ed715e802414f921
 ): any {
   if (subSchema === null || typeof subSchema !== 'object' || Array.isArray(subSchema)) {
     return subSchema;
@@ -170,7 +166,7 @@ export function extractGeneratedDefinitionsFromSubSchema(
   for (const {oldLocalPath, newRootPath} of pathMappings) {
     for (const target of rewriteTargets) {
       updateReferences(oldLocalPath, newRootPath, target, (path, newValue) => {
-        setValueAtPath(target, path, newValue);
+        _.set(target, path, newValue);
       });
     }
   }
@@ -182,15 +178,6 @@ export function extractGeneratedDefinitionsFromSubSchema(
   }
 
   return subSchema;
-}
-
-function setValueAtPath(root: any, path: Path, value: any): void {
-  if (path.length === 0) return;
-  let current = root;
-  for (let i = 0; i < path.length - 1; i++) {
-    current = current[path[i]!];
-  }
-  current[path[path.length - 1]!] = value;
 }
 
 export function addSchemaObject(
