@@ -214,8 +214,6 @@ function processResult(
   }
 }
 
-
-
 function applyEditorDocument() {
   try {
     const dataFormat = settings.value.dataFormat;

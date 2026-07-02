@@ -2,7 +2,10 @@ import {describe, it, expect, beforeEach, vi} from 'vitest';
 import {shallowRef} from 'vue';
 import {ManagedData} from '@/data/managedData';
 import {SessionMode} from '@/store/sessionMode';
-import {extractGeneratedDefinitionsFromSubSchema, postProcessSchemaModification} from '@/schema/schemaManipulationUtils';
+import {
+  extractGeneratedDefinitionsFromSubSchema,
+  postProcessSchemaModification,
+} from '@/schema/schemaManipulationUtils';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -145,7 +148,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
         contact: {$ref: '#/$defs/address'},
       },
       $defs: {
-        address: addressDef,  // identical content
+        address: addressDef, // identical content
       },
     };
 
@@ -193,7 +196,6 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
   });
 });
 
-
 describe('postProcessSchemaModification', () => {
   let rootSchema: ManagedData;
 
@@ -216,7 +218,6 @@ describe('postProcessSchemaModification', () => {
   });
 
   it('executes extractGeneratedDefinitionsFromSubSchema and removes $schema property if exists', () => {
-
     // root already has a "Foo" so AI-generated Foo will become Foo2
     rootSchema.setDataAt(['$defs', 'Foo'], {type: 'number'});
 
