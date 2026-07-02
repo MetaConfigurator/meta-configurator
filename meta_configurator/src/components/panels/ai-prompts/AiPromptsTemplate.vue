@@ -25,6 +25,7 @@ import {
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
 import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schemaProcessor';
+import {postProcessSchemaModification} from '@/schema/schemaManipulationUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -202,11 +203,12 @@ function processResult(
   pathForResponse: Path
 ) {
   if (validJson) {
-    // if the response is valid, it is applied directly
+    if (data.mode === SessionMode.SchemaEditor && pathForResponse.length > 0) {
+      responseObject = postProcessSchemaModification(responseObject, data);
+    }
     newDocument.value = '';
     data.setDataAt(pathForResponse, responseObject);
   } else {
-    // otherwise, the invalid response is shown to the user, who can try to figure out what went wrong and fix it
     newDocument.value = response;
     newDocumentPath.value = pathForResponse;
   }

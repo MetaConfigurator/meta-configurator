@@ -128,6 +128,67 @@ export function createIdentifierForExtractedElement(
   }
   return identifier;
 }
+export function postProcessSchemaModification(responseObject: any, schemaData: ManagedData): any {
+  if (responseObject === null || typeof responseObject !== 'object') {
+    return responseObject;
+  }
+  const response = extractGeneratedDefinitionsFromSubSchema(responseObject, schemaData);
+  // if response is a object which contains a $schema property, remove this property, as it is not allowed in sub-schemas
+  if (response && typeof response === 'object' && '$schema' in response) {
+    delete response.$schema;
+  }
+  return response;
+}
+export function extractGeneratedDefinitionsFromSubSchema(
+  subSchema: any,
+  rootSchemaData: ManagedData
+): any {
+  if (subSchema === null || typeof subSchema !== 'object' || Array.isArray(subSchema)) {
+    return subSchema;
+  }
+
+  const localDefinitions: {defsKey: string; name: string; content: any}[] = [];
+  for (const defsKey of ['$defs', 'definitions']) {
+    const localDefs = subSchema[defsKey];
+    if (localDefs === undefined || localDefs === null || typeof localDefs !== 'object') {
+      continue;
+    }
+    delete subSchema[defsKey];
+    for (const definitionName of Object.keys(localDefs)) {
+      localDefinitions.push({defsKey, name: definitionName, content: localDefs[definitionName]});
+    }
+  }
+
+  if (localDefinitions.length === 0) {
+    return subSchema;
+  }
+
+  const pathMappings: {oldLocalPath: Path; newRootPath: Path; content: any}[] = [];
+  for (const {defsKey, name, content} of localDefinitions) {
+    let newDefinitionPath = doesIdenticalSchemaDefinitionExist(rootSchemaData, content);
+    if (newDefinitionPath === undefined) {
+      newDefinitionPath = findAvailableSchemaId(rootSchemaData, ['$defs'], name, true);
+    }
+    pathMappings.push({oldLocalPath: [defsKey, name], newRootPath: newDefinitionPath, content});
+  }
+
+  const rewriteTargets: any[] = [subSchema, ...pathMappings.map(m => m.content)];
+  for (const {oldLocalPath, newRootPath} of pathMappings) {
+    for (const target of rewriteTargets) {
+      updateReferences(oldLocalPath, newRootPath, target, (path, newValue) => {
+        _.set(target, path, newValue);
+      });
+    }
+  }
+
+  for (const {newRootPath, content} of pathMappings) {
+    if (rootSchemaData.dataAt(newRootPath) === undefined) {
+      rootSchemaData.setDataAt(newRootPath, content);
+    }
+  }
+
+  return subSchema;
+}
 
 export function addSchemaObject(
   schemaData: ManagedData,
