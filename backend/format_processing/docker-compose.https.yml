@@ -1,27 +1,27 @@
-# Standalone HTTPS deployment of the import backend.
+# Standalone HTTPS deployment of the format processing service.
 #
-# Brings up the import backend behind its own nginx reverse proxy with
+# Brings up the format processing service behind its own nginx reverse proxy with
 # automatic Let's Encrypt certificates. For the multi-service deployment see
-# ../docker-compose.yml, where the service is mounted at /import-backend/.
+# ../docker-compose.yml, where the service is mounted at /format-processing/.
 
 services:
-  import_backend:
-    container_name: import_backend
+  format_processing:
+    container_name: format_processing
     build: .
     expose:
       - "5000"
     restart: unless-stopped
     networks:
-      - import-backend-network
+      - format-processing-network
     environment:
-      VIRTUAL_HOST: ${IMPORT_BACKEND_HOSTNAME:?IMPORT_BACKEND_HOSTNAME is not set}
+      VIRTUAL_HOST: ${FORMAT_PROCESSING_HOSTNAME:?FORMAT_PROCESSING_HOSTNAME is not set}
       VIRTUAL_PORT: 5000
-      LETSENCRYPT_HOST: ${IMPORT_BACKEND_HOSTNAME:?IMPORT_BACKEND_HOSTNAME is not set}
+      LETSENCRYPT_HOST: ${FORMAT_PROCESSING_HOSTNAME:?FORMAT_PROCESSING_HOSTNAME is not set}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
 
   nginx-proxy:
     image: nginxproxy/nginx-proxy:latest
-    container_name: import-backend-nginx-proxy
+    container_name: format-processing-nginx-proxy
     ports:
       - "80:80"
       - "443:443"
@@ -31,16 +31,16 @@ services:
       - ./certs:/etc/nginx/certs
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
-      - import-backend-network
+      - format-processing-network
     restart: unless-stopped
 
   letsencrypt:
     image: nginxproxy/acme-companion:latest
-    container_name: import-backend-nginx-letsencrypt
+    container_name: format-processing-nginx-letsencrypt
     depends_on:
       - nginx-proxy
     environment:
-      NGINX_PROXY_CONTAINER: import-backend-nginx-proxy
+      NGINX_PROXY_CONTAINER: format-processing-nginx-proxy
       DEFAULT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
     volumes:
       - ./certs:/etc/nginx/certs
@@ -48,11 +48,11 @@ services:
       - /etc/nginx/vhost.d
       - acme-challenges:/usr/share/nginx/html
     networks:
-      - import-backend-network
+      - format-processing-network
     restart: unless-stopped
 
 networks:
-  import-backend-network:
+  format-processing-network:
     driver: bridge
 
 volumes:

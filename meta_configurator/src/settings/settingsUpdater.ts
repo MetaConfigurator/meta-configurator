@@ -187,6 +187,33 @@ function migrateSettingsVersion(userSettings: any) {
       delete userSettings.backend.hostname;
     }
   }
+
+  if (userSettings.settingsVersion === '1.0.5') {
+    // migrate from 1.0.5 to 1.0.6
+    userSettings.settingsVersion = '1.0.6';
+  }
+
+  if (userSettings.backend) {
+    if ('importBackendUrl' in userSettings.backend && !('formatProcessingUrl' in userSettings.backend)) {
+      const oldUrl = userSettings.backend.importBackendUrl;
+      userSettings.backend.formatProcessingUrl =
+        typeof oldUrl === 'string'
+          ? oldUrl.replace(/\/import-backend\/?$/, '/format-processing')
+          : oldUrl;
+    }
+
+    const allowedBackendKeys = new Set([
+      'snapshotSharingUrl',
+      'schemaConverterUrl',
+      'formatProcessingUrl',
+    ]);
+
+    for (const key of Object.keys(userSettings.backend)) {
+      if (!allowedBackendKeys.has(key)) {
+        delete userSettings.backend[key];
+      }
+    }
+  }
 }
 
 export function adaptComplexitySettingsToLoadedSchema(userSettings: any, schema: TopLevelSchema) {

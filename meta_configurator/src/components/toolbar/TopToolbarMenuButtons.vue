@@ -24,6 +24,7 @@ const emit = defineEmits<{
   (e: 'show-codegen-dialog', schemaMode: boolean): void;
   (e: 'show-data-export-dialog', schemaMode: boolean): void;
   (e: 'show-data-mapping-dialog'): void;
+  (e: 'show-data-import-ai-dialog'): void;
   (e: 'show-rml-mapping-dialog'): void;
   (e: 'show-import-turtle-dialog'): void;
   (e: 'show-import-xml-dialog'): void;
@@ -42,6 +43,7 @@ const topMenuBar = new MenuItems(
   showCodeGenerationDialog,
   showDataExportDialog,
   showDataMappingDialog,
+  showDataImportAiDialog,
   inferSchemaFromSampleData,
   showRmlMappingDialog,
   showTurtleImportDialog,
@@ -74,6 +76,10 @@ function showDataExportDialog(schemaMode: boolean) {
 
 function showDataMappingDialog() {
   emit('show-data-mapping-dialog');
+}
+
+function showDataImportAiDialog() {
+  emit('show-data-import-ai-dialog');
 }
 
 function showRmlMappingDialog() {

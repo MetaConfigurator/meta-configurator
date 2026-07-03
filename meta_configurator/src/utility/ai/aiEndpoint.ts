@@ -260,6 +260,159 @@ User comments for clarification: \`\`\`${userComments}\`\`\``;
   ]);
 };
 
+export const queryJavascriptExpression = async (
+  apiKey: string,
+  jsReferenceGuide: string,
+  exampleInput: string,
+  exampleInputSchema: string,
+  exampleOutput: string,
+  exampleOutputSchema: string,
+  exampleCode: string,
+  inputFileSubset: string,
+  inputFileSchema: string,
+  targetSchema: string,
+  userComments: string
+) => {
+  const systemMessage = [
+    'You are a JavaScript data mapping expert.',
+    '',
+    'TASK',
+    'Generate JavaScript code that transforms an input JSON object into a new object',
+    'that satisfies the provided target JSON Schema.',
+    '',
+    'STRICT OUTPUT RULES (MUST FOLLOW)',
+    '- Output ONLY JavaScript code. No markdown. No backticks. No explanation.',
+    '- The code MUST define: function transform(input) { ... }',
+    '- transform(input) MUST return the mapped object.',
+    '- Do NOT use imports, require, export, or external libraries.',
+    '- Do NOT access network, file system, environment variables, Date.now, random, or global state.',
+    '- Prefer safe access (optional chaining) and sensible fallbacks (null).',
+    '- Keep it simple and conservative: map existing values, avoid inventing new data.',
+    '',
+    'REFERENCE (guidelines & allowed patterns)',
+    jsReferenceGuide,
+    '',
+    'EXAMPLE INPUT',
+    exampleInput,
+    '',
+    'EXAMPLE INPUT SCHEMA',
+    exampleInputSchema,
+    '',
+    'EXAMPLE OUTPUT SCHEMA',
+    exampleOutputSchema,
+    '',
+    'EXAMPLE MAPPING CODE',
+    exampleCode,
+    '',
+    'EXAMPLE OUTPUT (intended)',
+    exampleOutput,
+  ].join('\n');
+
+  const userMessageParts = [
+    'REAL INPUT SUBSET',
+    inputFileSubset,
+    '',
+    'REAL INPUT SCHEMA',
+    inputFileSchema,
+    '',
+    'TARGET OUTPUT SCHEMA',
+    targetSchema,
+    '',
+    'Generate the JavaScript mapping code now.',
+    'Remember: output ONLY code that defines function transform(input) { ... }',
+    'and returns the result object.',
+  ];
+
+  if (userComments && userComments.length > 0) {
+    userMessageParts.push('', 'USER HINTS', userComments);
+  }
+
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: userMessageParts.join('\n')},
+  ]);
+};
+
+export const queryJavascriptImportExpression = async (
+  apiKey: string,
+  inputFileName: string,
+  inputFileType: string,
+  inputFileSubset: string,
+  targetSchema: string | undefined,
+  userComments: string,
+  allowSchemaInference: boolean,
+  dynamicImportInstruction: string
+) => {
+  const hasSchema = typeof targetSchema === 'string' && targetSchema.trim().length > 0;
+  const schemaInstruction = hasSchema
+    ? [
+        'TARGET SCHEMA (MUST MATCH)',
+        '- The returned JSON MUST validate against this schema.',
+        '- Ensure all required properties exist (do not omit required fields).',
+        '- Ensure types match exactly (e.g., integer vs number vs string).',
+        '- If a required value cannot be derived, set it to null (or a conservative default matching the schema type).',
+        '',
+        targetSchema!,
+      ].join('\n')
+    : allowSchemaInference
+      ? 'No schema is provided. Infer a suitable JSON structure from the input format and content.'
+      : 'No schema is provided.';
+
+  const safeDynamicImportInstruction =
+    typeof dynamicImportInstruction === 'string' && dynamicImportInstruction.trim().length > 0
+      ? dynamicImportInstruction
+      : 'Use dynamic imports only if they materially improve robustness; otherwise avoid them.';
+
+  const systemMessage = [
+    'You are a JavaScript data import expert.',
+    'Generate valid, executable, and robust JavaScript code for parsing raw file content.',
+    'Output ONLY JavaScript code. No markdown. No backticks. No explanation.',
+    'The code MUST define: function transform(input) { ... } OR async function transform(input) { ... }',
+    '"input" is the full file content as a string.',
+    'transform(input) MUST return a plain JSON object or JSON array.',
+    'Never return undefined, NaN, Infinity, Date instances, Map, Set, or class instances.',
+    ...(hasSchema
+      ? [
+          'A target schema is provided. The returned JSON MUST validate against it. Schema conformance has priority.',
+        ]
+      : [
+          'If no schema is provided, infer a suitable JSON structure from the input format and content.',
+        ]),
+    'Parse structured text conservatively.',
+    'Parse hierarchical blocks or sections as nested objects when appropriate instead of flattening everything into top-level key/value pairs.',
+    'For OpenFOAM files, ignore banner/comment art and parse named brace blocks as nested objects.',
+    'For OpenFOAM files, parse `name { ... }` as `{ "name": { ... } }`.',
+    'For OpenFOAM files, parse `key value;` as a property and remove the trailing semicolon.',
+    'For OpenFOAM files, keep top-level entries at the top level and block entries inside their block object.',
+    'Ignore comments, decorative lines, separators, braces-only lines, and empty lines when they are not data.',
+    'When parsing "key: value" lines, split only on the first ":".',
+    'Only coerce to numbers when clearly numeric; otherwise keep strings or use null.',
+    'Treat date/time-like values as strings unless the schema clearly requires something else.',
+    'JavaScript imports are allowed when useful. Prefer await importModule("package-or-url"); top-level static imports are also allowed if clearly needed.',
+    safeDynamicImportInstruction,
+  ].join('\n');
+
+  const userMessageParts = [
+    `Input file name: ${inputFileName}`,
+    `Input file type: ${inputFileType || 'unknown'}`,
+    '',
+    'Input file subset:',
+    inputFileSubset,
+    '',
+    schemaInstruction,
+    'Generate the JavaScript parser now.',
+  ];
+
+  if (userComments && userComments.length > 0) {
+    userMessageParts.push('', 'User hints:', userComments);
+  }
+
+  return queryOpenAI(apiKey, [
+    {role: 'system', content: systemMessage},
+    {role: 'user', content: userMessageParts.join('\n')},
+  ]);
+};
+
 export const queryHandlebarsTemplate = async (
   apiKey: string,
   exampleInput: string,

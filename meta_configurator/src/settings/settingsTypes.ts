@@ -111,6 +111,8 @@ export interface SettingsInterfaceBackend {
   snapshotSharingUrl: string;
   // Full URL of the Schema Conversion Orchestrator service.
   schemaConverterUrl: string;
+  // Full URL of the format processing service for multi-format data parsing.
+  formatProcessingUrl: string;
 }
 
 export interface SettingsInterfacFrontend {

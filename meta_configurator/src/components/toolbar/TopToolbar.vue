@@ -27,6 +27,7 @@ const emit = defineEmits<{
   (e: 'show-codegen-dialog', schemaMode: boolean): void;
   (e: 'show-data-export-dialog', schemaMode: boolean): void;
   (e: 'show-data-mapping-dialog'): void;
+  (e: 'show-data-import-ai-dialog'): void;
   (e: 'show-rml-mapping-dialog'): void;
   (e: 'show-import-turtle-dialog'): void;
   (e: 'show-import-xml-dialog'): void;
@@ -72,6 +73,10 @@ function showDataExportDialog(schemaMode: boolean) {
 
 function showDataMappingDialog() {
   emit('show-data-mapping-dialog');
+}
+
+function showDataImportAiDialog() {
+  emit('show-data-import-ai-dialog');
 }
 
 function showRefineSchemaDialog() {
@@ -145,6 +150,7 @@ useMagicKeys({
           @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()"
+          @show-data-import-ai-dialog="() => showDataImportAiDialog()"
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
           @show-import-turtle-dialog="() => showTurtleImportDialog()"
           @show-import-xml-dialog="() => showXmlImportDialog()"
@@ -219,6 +225,7 @@ useMagicKeys({
           @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
           @show-snapshot-dialog="() => showSnapshotDialog()"
           @show-data-mapping-dialog="() => showDataMappingDialog()"
+          @show-data-import-ai-dialog="() => showDataImportAiDialog()"
           @show-rml-mapping-dialog="() => showRmlMappingDialog()"
           @show-import-turtle-dialog="() => showTurtleImportDialog()"
           @show-import-xml-dialog="() => showXmlImportDialog()"

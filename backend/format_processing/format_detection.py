@@ -1,4 +1,4 @@
-"""Public detection entry point for the import backend package."""
+"""Public detection entry point for the format processing service package."""
 
 from pathlib import Path
 import sys

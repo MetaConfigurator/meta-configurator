@@ -7,6 +7,7 @@ import {openUploadSchemaDialog} from '@/components/toolbar/uploadFile';
 import InitialSchemaSelectionDialog from '@/components/toolbar/dialogs/InitialSchemaSelectionDialog.vue';
 import AboutDialog from '@/components/toolbar/dialogs/AboutDialog.vue';
 import DataMappingDialog from '@/components/toolbar/dialogs/data-mapping/DataMappingDialog.vue';
+import DataImportAiDialog from '@/components/toolbar/dialogs/data-import-ai/DataImportAiDialog.vue';
 import ImportCsvDialog from '@/components/toolbar/dialogs/csvimport/ImportCsvDialog.vue';
 import ImportTurtleDialog from '@/components/toolbar/dialogs/turtle-import/ImportTurtleDialog.vue';
 import ImportXmlDialog from '@/components/toolbar/dialogs/xml-import/ImportXmlDialog.vue';
@@ -141,6 +142,10 @@ function showDataMappingDialog() {
   dataMappingDialog.value?.show();
 }
 
+function showDataImportAiDialog() {
+  dataImportAiDialog.value?.show();
+}
+
 function showRmlMappingDialog() {
   rmlMappingDialog.value?.show();
 }
@@ -186,6 +191,7 @@ const dataExportDialog = ref();
 const fetchedSchemasSelectionDialog = ref();
 const urlInputDialog = ref();
 const dataMappingDialog = ref();
+const dataImportAiDialog = ref();
 const rmlMappingDialog = ref();
 const turtleImportDialog = ref();
 const xmlImportDialog = ref();
@@ -243,6 +249,8 @@ defineExpose({
 
   <DataMappingDialog ref="dataMappingDialog" />
 
+  <DataImportAiDialog ref="dataImportAiDialog" />
+
   <RmlMappingDialog ref="rmlMappingDialog" />
 
   <ImportSchemaDialog ref="importSchemaDialog" />
@@ -265,6 +273,7 @@ defineExpose({
     @show-import-csv-dialog="() => showCsvImportDialog()"
     @show-snapshot-dialog="() => showSnapshotDialog()"
     @show-data-mapping-dialog="() => showDataMappingDialog()"
+    @show-data-import-ai-dialog="() => showDataImportAiDialog()"
     @show-rml-mapping-dialog="() => showRmlMappingDialog()"
     @show-import-turtle-dialog="() => showTurtleImportDialog()"
     @show-import-xml-dialog="() => showXmlImportDialog()"

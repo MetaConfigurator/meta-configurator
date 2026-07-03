@@ -98,7 +98,7 @@ The current browser-facing services in the joint stack are:
 
 - `snapshot_sharing` at `/`
 - `relay` at `/relay/`
-- `import_backend` at `/import-backend/`
+- `format_processing` at `/format-processing/`
 - `schema_converter` at `/schema-converter/`
 
 Notes:

@@ -1,4 +1,7 @@
-import type {DataMappingService} from '@/data-mapping/dataMappingService';
+import type {
+  DataMappingService,
+  DataMappingSuggestionRetryContext,
+} from '@/data-mapping/dataMappingService';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
@@ -19,7 +22,8 @@ export class DataMappingServiceJsonata implements DataMappingService {
   async generateMappingSuggestion(
     input: any,
     targetSchema: TopLevelSchema,
-    userComments: string
+    userComments: string,
+    _retryContext?: DataMappingSuggestionRetryContext
   ): Promise<{config: string; success: boolean; message: string}> {
     const inputDataSubset = trimDataToMaxSize(input);
 

@@ -1,0 +1,14 @@
+# Local Docker deployment of the format processing service (no HTTPS, no reverse proxy).
+#
+# Reachable at http://localhost:${FORMAT_PROCESSING_PORT:-5000}.
+#
+# For the HTTPS variant see docker-compose.https.yml.
+# For the joint deployment see ../docker-compose.yml.
+
+services:
+  format_processing:
+    container_name: format_processing
+    build: .
+    ports:
+      - "${FORMAT_PROCESSING_PORT:-5000}:5000"
+    restart: unless-stopped

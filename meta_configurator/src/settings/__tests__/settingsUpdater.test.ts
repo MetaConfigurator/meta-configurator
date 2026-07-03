@@ -252,7 +252,7 @@ describe('test settings updater', () => {
     });
   });
 
-  it('resets existing 1.0.4 AI settings to the 1.0.5 Uni Stuttgart relay preset', () => {
+  it('resets existing 1.0.4 AI settings to the 1.0.6 Uni Stuttgart relay preset', () => {
     const userFile = {
       settingsVersion: '1.0.4',
       panels: {
@@ -274,7 +274,7 @@ describe('test settings updater', () => {
     };
 
     const defaultsFile = {
-      settingsVersion: '1.0.5',
+      settingsVersion: '1.0.6',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -284,6 +284,7 @@ describe('test settings updater', () => {
       backend: {
         snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
         schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
       },
       aiIntegration: {
         model: 'alias-fast',
@@ -298,10 +299,11 @@ describe('test settings updater', () => {
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.settingsVersion).toBe('1.0.5');
+    expect(userFile.settingsVersion).toBe('1.0.6');
     expect(userFile.backend).toEqual({
       snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
       schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
     });
     expect(userFile.aiIntegration).toEqual({
       model: 'alias-fast',
@@ -333,7 +335,7 @@ describe('test settings updater', () => {
     };
 
     const defaultsFile = {
-      settingsVersion: '1.0.5',
+      settingsVersion: '1.0.6',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -352,14 +354,14 @@ describe('test settings updater', () => {
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.settingsVersion).toBe('1.0.5');
+    expect(userFile.settingsVersion).toBe('1.0.6');
     expect(userFile.aiIntegration.backend).toEqual({
       endpoint: 'https://api.openai.com/v1/',
     });
     expect(userFile.aiIntegration.model).toBe('gpt-4o-mini');
   });
 
-  it('resets customized 1.0.3 AI settings while bumping to 1.0.5', () => {
+  it('resets customized 1.0.3 AI settings while bumping to 1.0.6', () => {
     const userFile = {
       settingsVersion: '1.0.3',
       panels: {
@@ -379,7 +381,7 @@ describe('test settings updater', () => {
     };
 
     const defaultsFile = {
-      settingsVersion: '1.0.5',
+      settingsVersion: '1.0.6',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -399,7 +401,7 @@ describe('test settings updater', () => {
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.settingsVersion).toBe('1.0.5');
+    expect(userFile.settingsVersion).toBe('1.0.6');
     expect(userFile.aiIntegration).toEqual({
       model: 'alias-fast',
       max_tokens: 5000,
@@ -408,6 +410,184 @@ describe('test settings updater', () => {
         relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
         endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
       },
+    });
+  });
+
+  it('adds the new format processing URL while bumping from 1.0.5 to 1.0.6', () => {
+    const userFile = {
+      settingsVersion: '1.0.5',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      backend: {
+        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    const defaultsFile = {
+      settingsVersion: '1.0.6',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      backend: {
+        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.settingsVersion).toBe('1.0.6');
+    expect(userFile.backend).toEqual({
+      snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+      schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+    });
+  });
+
+  it('renames importBackendUrl to formatProcessingUrl during settings migration', () => {
+    const userFile = {
+      settingsVersion: '1.0.6',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      backend: {
+        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        importBackendUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/import-backend',
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    const defaultsFile = {
+      settingsVersion: '1.0.6',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      backend: {
+        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.backend).toEqual({
+      snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+      schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+    });
+  });
+
+  it('removes legacy backend settings objects that no longer exist in 1.0.6', () => {
+    const userFile = {
+      settingsVersion: '1.0.6',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      backend: {
+        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+        snapshotBackend: {
+          hostName: 'https://snapshot.example.com',
+        },
+        importBackend: {
+          hostName: 'https://import.example.com',
+        },
+        importedBackend: {
+          hostName: 'https://imported.example.com',
+        },
+        hostname: 'https://legacy.example.com',
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    const defaultsFile = {
+      settingsVersion: '1.0.6',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      backend: {
+        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.backend).toEqual({
+      snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+      schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
     });
   });
 });

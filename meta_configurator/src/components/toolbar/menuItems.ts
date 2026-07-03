@@ -28,6 +28,7 @@ export class MenuItems {
   private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
   private readonly showDataExportDialog: (schemaMode: boolean) => void;
   private readonly showDataMappingDialog: () => void;
+  private readonly showDataImportAiDialog: () => void;
   private readonly showRefineSchemaDialog: () => void;
   private readonly inferJsonSchemaFromSampleData: () => void;
   private readonly showRMLMappingDialog: () => void;
@@ -44,6 +45,7 @@ export class MenuItems {
     showCodeGenerationDialog: (schemaMode: boolean) => void,
     showDataExportDialog: (schemaMode: boolean) => void,
     showDataMappingDialog: () => void,
+    showDataImportAiDialog: () => void,
     inferJsonSchemaFromSampleData: () => void,
     showRMLMappingDialog: () => void,
     showImportTurtleDialog: () => void,
@@ -59,6 +61,7 @@ export class MenuItems {
     this.showCodeGenerationDialog = showCodeGenerationDialog;
     this.showDataExportDialog = showDataExportDialog;
     this.showDataMappingDialog = showDataMappingDialog;
+    this.showDataImportAiDialog = showDataImportAiDialog;
     this.showRefineSchemaDialog = showRefineSchemaDialog;
     this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
     this.showRMLMappingDialog = showRMLMappingDialog;
@@ -111,6 +114,11 @@ export class MenuItems {
             label: 'Import XML Data',
             icon: 'fa-solid fa-file-code',
             command: this.showImportXmlDialog,
+          },
+          {
+            label: 'Import Data with AI',
+            icon: 'fa-solid fa-robot',
+            command: this.showDataImportAiDialog,
           },
         ],
       },
