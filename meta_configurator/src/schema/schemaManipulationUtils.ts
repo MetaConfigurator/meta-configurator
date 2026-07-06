@@ -128,11 +128,19 @@ export function createIdentifierForExtractedElement(
   }
   return identifier;
 }
-export function postProcessSchemaModification(responseObject: any, schemaData: ManagedData): any {
+export function postProcessSchemaModification(
+  responseObject: any,
+  schemaData: ManagedData,
+  bundledDefinitionNames: string[] = []
+): any {
   if (responseObject === null || typeof responseObject !== 'object') {
     return responseObject;
   }
-  const response = extractGeneratedDefinitionsFromSubSchema(responseObject, schemaData);
+  const response = extractGeneratedDefinitionsFromSubSchema(
+    responseObject,
+    schemaData,
+    bundledDefinitionNames
+  );
   // if response is a object which contains a $schema property, remove this property, as it is not allowed in sub-schemas
   if (response && typeof response === 'object' && '$schema' in response) {
     delete response.$schema;
@@ -141,7 +149,8 @@ export function postProcessSchemaModification(responseObject: any, schemaData: M
 }
 export function extractGeneratedDefinitionsFromSubSchema(
   subSchema: any,
-  rootSchemaData: ManagedData
+  rootSchemaData: ManagedData,
+  bundledDefinitionNames: string[] = []
 ): any {
   if (subSchema === null || typeof subSchema !== 'object' || Array.isArray(subSchema)) {
     return subSchema;
@@ -163,13 +172,31 @@ export function extractGeneratedDefinitionsFromSubSchema(
     return subSchema;
   }
 
-  const pathMappings: {oldLocalPath: Path; newRootPath: Path; content: any}[] = [];
+  const pathMappings: {oldLocalPath: Path; newRootPath: Path; content: any; wasBundled: boolean}[] =
+    [];
   for (const {defsKey, name, content} of localDefinitions) {
-    let newDefinitionPath = doesIdenticalSchemaDefinitionExist(rootSchemaData, content);
-    if (newDefinitionPath === undefined) {
-      newDefinitionPath = findAvailableSchemaId(rootSchemaData, ['$defs'], name, true);
+    const wasBundled = bundledDefinitionNames.includes(name);
+
+    if (wasBundled) {
+      const originalPath: Path = ['$defs', name];
+      pathMappings.push({
+        oldLocalPath: [defsKey, name],
+        newRootPath: originalPath,
+        content,
+        wasBundled: true,
+      });
+    } else {
+      let newDefinitionPath = doesIdenticalSchemaDefinitionExist(rootSchemaData, content);
+      if (newDefinitionPath === undefined) {
+        newDefinitionPath = findAvailableSchemaId(rootSchemaData, ['$defs'], name, true);
+      }
+      pathMappings.push({
+        oldLocalPath: [defsKey, name],
+        newRootPath: newDefinitionPath,
+        content,
+        wasBundled: false,
+      });
     }
-    pathMappings.push({oldLocalPath: [defsKey, name], newRootPath: newDefinitionPath, content});
   }
 
   const rewriteTargets: any[] = [subSchema, ...pathMappings.map(m => m.content)];
@@ -181,8 +208,10 @@ export function extractGeneratedDefinitionsFromSubSchema(
     }
   }
 
-  for (const {newRootPath, content} of pathMappings) {
-    if (rootSchemaData.dataAt(newRootPath) === undefined) {
+  for (const {newRootPath, content, wasBundled} of pathMappings) {
+    if (wasBundled) {
+      rootSchemaData.setDataAt(newRootPath, content);
+    } else if (rootSchemaData.dataAt(newRootPath) === undefined) {
       rootSchemaData.setDataAt(newRootPath, content);
     }
   }

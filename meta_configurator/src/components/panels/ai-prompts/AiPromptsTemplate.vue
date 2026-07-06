@@ -164,27 +164,85 @@ function submitPromptCreateDocument() {
     });
 }
 
+function bundleReferencedDefinitions(
+  subSchema: any,
+  path: Path
+): {bundledSubSchema: any; bundledDefinitionNames: string[]} {
+  if (
+    path.length === 0 ||
+    data.mode !== SessionMode.SchemaEditor ||
+    subSchema === null ||
+    typeof subSchema !== 'object'
+  ) {
+    return {bundledSubSchema: subSchema, bundledDefinitionNames: []};
+  }
+
+  const rootSchemaRaw = schema.schemaRaw.value as any;
+  const bundledSubSchema = _.cloneDeep(subSchema);
+  const bundledDefinitionNames: string[] = [];
+
+  const refs = collectRefs(bundledSubSchema);
+
+  for (const ref of refs) {
+    if (!ref.startsWith('#/$defs/') && !ref.startsWith('#/definitions/')) continue;
+
+    const parts = ref.replace('#/', '').split('/');
+    const defsKey = parts[0]!;
+    const defName = parts[1]!;
+
+    const defContent = rootSchemaRaw?.[defsKey]?.[defName];
+    if (defContent === undefined) continue;
+
+    if (!bundledSubSchema[defsKey]) bundledSubSchema[defsKey] = {};
+    bundledSubSchema[defsKey][defName] = _.cloneDeep(defContent);
+    bundledDefinitionNames.push(defName);
+  }
+
+  return {bundledSubSchema, bundledDefinitionNames};
+}
+
+function collectRefs(obj: any): string[] {
+  if (obj === null || typeof obj !== 'object') return [];
+  const refs: string[] = [];
+  if (Array.isArray(obj)) {
+    for (const item of obj) refs.push(...collectRefs(item));
+  } else {
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === '$ref' && typeof value === 'string') {
+        refs.push(value);
+      } else {
+        refs.push(...collectRefs(value));
+      }
+    }
+  }
+  return refs;
+}
+
 function submitPromptModifyDocument() {
   const openApiKey = getApiKey();
   const relevantSubDocument = data.dataAt(currentElement.value);
   const relevantSubSchema = schema.schemaWrapperAtPath(currentElement.value).jsonSchema!;
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
+  const {bundledSubSchema, bundledDefinitionNames} = bundleReferencedDefinitions(
+    relevantSubSchema,
+    currentElement.value
+  );
   const response = props.functionQueryDocumentModification(
     openApiKey,
     promptModifyDocument.value,
     JSON.stringify(relevantSubDocument),
-    JSON.stringify(removeCustomFieldsFromSchema(relevantSubSchema))
+    JSON.stringify(removeCustomFieldsFromSchema(bundledSubSchema))
   );
 
   response
     .then(value => {
       try {
         const json = fixAndParseGeneratedJson(value);
-        processResult(value, true, json, currentElement.value);
+        processResult(value, true, json, currentElement.value, bundledDefinitionNames);
       } catch (e) {
         console.error('Failed to parse JSON', e);
-        processResult(value, false, null, currentElement.value);
+        processResult(value, false, null, currentElement.value, bundledDefinitionNames);
       }
     })
     .catch(e => {
@@ -200,11 +258,12 @@ function processResult(
   response: string,
   validJson: boolean,
   responseObject: any,
-  pathForResponse: Path
+  pathForResponse: Path,
+  bundledDefinitionNames: string[] = []
 ) {
   if (validJson) {
     if (data.mode === SessionMode.SchemaEditor && pathForResponse.length > 0) {
-      responseObject = postProcessSchemaModification(responseObject, data);
+      responseObject = postProcessSchemaModification(responseObject, data, bundledDefinitionNames);
     }
     newDocument.value = '';
     data.setDataAt(pathForResponse, responseObject);
