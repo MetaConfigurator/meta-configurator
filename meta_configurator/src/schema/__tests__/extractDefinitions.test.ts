@@ -32,10 +32,6 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
     );
   });
   it('bundles referenced definitions into sub-schema before sending to AI', () => {
-    const subSchema = {
-      $ref: '#/$defs/ConservationStatus',
-    };
-
     const rootSchemaRaw = {
       $defs: {
         ConservationStatus: {
