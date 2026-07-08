@@ -53,7 +53,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
       },
     };
 
-    const result = extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema, [
+    extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema, [
       'ConservationStatus',
     ]);
 
