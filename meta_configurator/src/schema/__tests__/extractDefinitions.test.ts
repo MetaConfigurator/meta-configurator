@@ -32,15 +32,6 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
     );
   });
   it('bundles referenced definitions into sub-schema before sending to AI', () => {
-    const rootSchemaRaw = {
-      $defs: {
-        ConservationStatus: {
-          type: 'string',
-          enum: ['Least Concern', 'Endangered', 'Extinct'],
-        },
-      },
-    };
-
     // manually simulate what bundleReferencedDefinitions does conceptually
     // now AI receives this bundled version, updates it, returns it
     const aiResponse = {
