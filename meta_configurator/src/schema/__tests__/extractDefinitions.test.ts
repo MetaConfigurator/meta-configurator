@@ -53,9 +53,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
       },
     };
 
-    extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema, [
-      'ConservationStatus',
-    ]);
+    extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema, ['ConservationStatus']);
 
     // original updated, no duplicate
     expect(rootSchema.data.value.$defs.ConservationStatus.enum).toContain('Very Endangered');
