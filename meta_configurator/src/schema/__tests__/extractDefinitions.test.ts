@@ -41,14 +41,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
       },
     };
 
-    // manually simulate what bundleReferencedDefinitions does
-    const bundledSubSchema = {
-      $ref: '#/$defs/ConservationStatus',
-      $defs: {
-        ConservationStatus: rootSchemaRaw.$defs.ConservationStatus,
-      },
-    };
-
+    // manually simulate what bundleReferencedDefinitions does conceptually
     // now AI receives this bundled version, updates it, returns it
     const aiResponse = {
       $ref: '#/$defs/ConservationStatus',
