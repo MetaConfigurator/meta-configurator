@@ -300,14 +300,12 @@ export function bundleReferencedDefinitions(
   const bundledDefinitionNames: string[] = [];
 
   const refs = collectRefs(bundledSubSchema);
-
   for (const ref of refs) {
     if (!ref.startsWith('#/$defs/') && !ref.startsWith('#/definitions/')) continue;
 
     const parts = ref.replace('#/', '').split('/');
     const defsKey = parts[0]!;
     const defName = parts[1]!;
-
     const defContent = rootSchemaRaw?.[defsKey]?.[defName];
     if (defContent === undefined) continue;
 
@@ -315,8 +313,7 @@ export function bundleReferencedDefinitions(
     bundledSubSchema[defsKey][defName] = _.cloneDeep(defContent);
     bundledDefinitionNames.push(defName);
   }
-
-  return {bundledSubSchema, bundledDefinitionNames};
+   return {bundledSubSchema, bundledDefinitionNames};
 }
 
 function collectRefs(obj: any): string[] {

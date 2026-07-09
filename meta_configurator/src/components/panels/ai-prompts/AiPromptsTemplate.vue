@@ -166,25 +166,22 @@ function submitPromptCreateDocument() {
 
 function submitPromptModifyDocument() {
   const openApiKey = getApiKey();
-  const relevantSubDocument = data.dataAt(currentElement.value);
-  const relevantSubSchema = schema.schemaWrapperAtPath(currentElement.value).jsonSchema!;
+  let relevantSubDocument = data.dataAt(currentElement.value);
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
 
-  let bundledSubSchema = relevantSubSchema;
   let bundledDefinitionNames: string[] = [];
-
   if (data.mode === SessionMode.SchemaEditor && currentElement.value.length > 0) {
-    const result = bundleReferencedDefinitions(relevantSubSchema, schema.schemaRaw.value);
-    bundledSubSchema = result.bundledSubSchema;
-    bundledDefinitionNames = result.bundledDefinitionNames;
+    const bundledResult = bundleReferencedDefinitions(relevantSubDocument, data.data.value);
+    relevantSubDocument = bundledResult.bundledSubSchema;
+    bundledDefinitionNames = bundledResult.bundledDefinitionNames;
   }
 
   const response = props.functionQueryDocumentModification(
     openApiKey,
     promptModifyDocument.value,
     JSON.stringify(relevantSubDocument),
-    JSON.stringify(removeCustomFieldsFromSchema(bundledSubSchema))
+    JSON.stringify(removeCustomFieldsFromSchema(relevantSubDocument))
   );
 
   response
