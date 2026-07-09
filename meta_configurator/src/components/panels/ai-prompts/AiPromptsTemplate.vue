@@ -25,7 +25,7 @@ import {
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
 import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schemaProcessor';
-import {postProcessSchemaModification} from '@/schema/schemaManipulationUtils';
+import {postProcessSchemaModification, bundleReferencedDefinitions} from '@/schema/schemaManipulationUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -164,70 +164,22 @@ function submitPromptCreateDocument() {
     });
 }
 
-function bundleReferencedDefinitions(
-  subSchema: any,
-  path: Path
-): {bundledSubSchema: any; bundledDefinitionNames: string[]} {
-  if (
-    path.length === 0 ||
-    data.mode !== SessionMode.SchemaEditor ||
-    subSchema === null ||
-    typeof subSchema !== 'object'
-  ) {
-    return {bundledSubSchema: subSchema, bundledDefinitionNames: []};
-  }
-
-  const rootSchemaRaw = schema.schemaRaw.value as any;
-  const bundledSubSchema = _.cloneDeep(subSchema);
-  const bundledDefinitionNames: string[] = [];
-
-  const refs = collectRefs(bundledSubSchema);
-
-  for (const ref of refs) {
-    if (!ref.startsWith('#/$defs/') && !ref.startsWith('#/definitions/')) continue;
-
-    const parts = ref.replace('#/', '').split('/');
-    const defsKey = parts[0]!;
-    const defName = parts[1]!;
-
-    const defContent = rootSchemaRaw?.[defsKey]?.[defName];
-    if (defContent === undefined) continue;
-
-    if (!bundledSubSchema[defsKey]) bundledSubSchema[defsKey] = {};
-    bundledSubSchema[defsKey][defName] = _.cloneDeep(defContent);
-    bundledDefinitionNames.push(defName);
-  }
-
-  return {bundledSubSchema, bundledDefinitionNames};
-}
-
-function collectRefs(obj: any): string[] {
-  if (obj === null || typeof obj !== 'object') return [];
-  const refs: string[] = [];
-  if (Array.isArray(obj)) {
-    for (const item of obj) refs.push(...collectRefs(item));
-  } else {
-    for (const [key, value] of Object.entries(obj)) {
-      if (key === '$ref' && typeof value === 'string') {
-        refs.push(value);
-      } else {
-        refs.push(...collectRefs(value));
-      }
-    }
-  }
-  return refs;
-}
-
 function submitPromptModifyDocument() {
   const openApiKey = getApiKey();
   const relevantSubDocument = data.dataAt(currentElement.value);
   const relevantSubSchema = schema.schemaWrapperAtPath(currentElement.value).jsonSchema!;
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
-  const {bundledSubSchema, bundledDefinitionNames} = bundleReferencedDefinitions(
-    relevantSubSchema,
-    currentElement.value
-  );
+
+  let bundledSubSchema = relevantSubSchema;
+  let bundledDefinitionNames: string[] = [];
+
+  if (data.mode === SessionMode.SchemaEditor && currentElement.value.length > 0) {
+    const result = bundleReferencedDefinitions(relevantSubSchema, schema.schemaRaw.value);
+    bundledSubSchema = result.bundledSubSchema;
+    bundledDefinitionNames = result.bundledDefinitionNames;
+  }
+
   const response = props.functionQueryDocumentModification(
     openApiKey,
     promptModifyDocument.value,

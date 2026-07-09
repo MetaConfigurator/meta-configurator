@@ -287,3 +287,51 @@ export function addSchemaEnum(
   }
   return enumPath;
 }
+
+export function bundleReferencedDefinitions(
+  subSchema: any,
+  rootSchemaRaw: any
+): {bundledSubSchema: any; bundledDefinitionNames: string[]} {
+  if (subSchema === null || typeof subSchema !== 'object') {
+    return {bundledSubSchema: subSchema, bundledDefinitionNames: []};
+  }
+
+  const bundledSubSchema = _.cloneDeep(subSchema);
+  const bundledDefinitionNames: string[] = [];
+
+  const refs = collectRefs(bundledSubSchema);
+
+  for (const ref of refs) {
+    if (!ref.startsWith('#/$defs/') && !ref.startsWith('#/definitions/')) continue;
+
+    const parts = ref.replace('#/', '').split('/');
+    const defsKey = parts[0]!;
+    const defName = parts[1]!;
+
+    const defContent = rootSchemaRaw?.[defsKey]?.[defName];
+    if (defContent === undefined) continue;
+
+    if (!bundledSubSchema[defsKey]) bundledSubSchema[defsKey] = {};
+    bundledSubSchema[defsKey][defName] = _.cloneDeep(defContent);
+    bundledDefinitionNames.push(defName);
+  }
+
+  return {bundledSubSchema, bundledDefinitionNames};
+}
+
+function collectRefs(obj: any): string[] {
+  if (obj === null || typeof obj !== 'object') return [];
+  const refs: string[] = [];
+  if (Array.isArray(obj)) {
+    for (const item of obj) refs.push(...collectRefs(item));
+  } else {
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === '$ref' && typeof value === 'string') {
+        refs.push(value);
+      } else {
+        refs.push(...collectRefs(value));
+      }
+    }
+  }
+  return refs;
+}
