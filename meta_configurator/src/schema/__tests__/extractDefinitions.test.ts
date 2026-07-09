@@ -2,7 +2,10 @@ import {describe, it, expect, beforeEach, vi} from 'vitest';
 import {shallowRef} from 'vue';
 import {ManagedData} from '@/data/managedData';
 import {SessionMode} from '@/store/sessionMode';
-import {extractGeneratedDefinitionsFromSubSchema, bundleReferencedDefinitions} from '@/schema/schemaManipulationUtils';
+import {
+  extractGeneratedDefinitionsFromSubSchema,
+  bundleReferencedDefinitions,
+} from '@/schema/schemaManipulationUtils';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -43,11 +46,9 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
       },
     };
 
-    const result = extractGeneratedDefinitionsFromSubSchema(
-      aiResponse,
-      rootSchema,
-      ['ConservationStatus']
-    );
+    const result = extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema, [
+      'ConservationStatus',
+    ]);
 
     expect(result.$defs).toBeUndefined();
     expect(rootSchema.data.value.$defs.ConservationStatus.enum).toContain('Very Endangered');
@@ -65,11 +66,7 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
       },
     };
 
-    const result = extractGeneratedDefinitionsFromSubSchema(
-      aiResponse,
-      rootSchema,
-      []
-    );
+    const result = extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema, []);
 
     expect(result.$defs).toBeUndefined();
     expect(rootSchema.data.value.$defs.ConservationStatus.enum).not.toContain('Very Endangered');
@@ -87,11 +84,9 @@ describe('extractGeneratedDefinitionsFromSubSchema', () => {
       },
     };
 
-    const result = extractGeneratedDefinitionsFromSubSchema(
-      aiResponse,
-      rootSchema,
-      ['ConservationStatus']
-    );
+    const result = extractGeneratedDefinitionsFromSubSchema(aiResponse, rootSchema, [
+      'ConservationStatus',
+    ]);
 
     expect(rootSchema.data.value.$defs.ConservationStatus.enum).toContain('Very Endangered');
     expect(rootSchema.data.value.$defs.ConservationStatus2).toBeUndefined();

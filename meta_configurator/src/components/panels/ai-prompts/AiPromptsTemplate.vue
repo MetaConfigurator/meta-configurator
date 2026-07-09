@@ -25,7 +25,10 @@ import {
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
 import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schemaProcessor';
-import {postProcessSchemaModification, bundleReferencedDefinitions} from '@/schema/schemaManipulationUtils';
+import {
+  postProcessSchemaModification,
+  bundleReferencedDefinitions,
+} from '@/schema/schemaManipulationUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;

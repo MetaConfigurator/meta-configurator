@@ -313,7 +313,7 @@ export function bundleReferencedDefinitions(
     bundledSubSchema[defsKey][defName] = _.cloneDeep(defContent);
     bundledDefinitionNames.push(defName);
   }
-   return {bundledSubSchema, bundledDefinitionNames};
+  return {bundledSubSchema, bundledDefinitionNames};
 }
 
 function collectRefs(obj: any): string[] {
