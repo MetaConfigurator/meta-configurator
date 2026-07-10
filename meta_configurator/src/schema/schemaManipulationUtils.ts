@@ -7,6 +7,7 @@ import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphCon
 import type {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import {updateReferences} from '@/utility/renameUtils';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
+import {collectAllRefs, resolveInternalReferencePath} from '@/schema/schemaReferenceUtils';
 import _ from 'lodash';
 
 export function extractAllInlinedSchemaElements(
@@ -175,28 +176,14 @@ export function extractGeneratedDefinitionsFromSubSchema(
   const pathMappings: {oldLocalPath: Path; newRootPath: Path; content: any; wasBundled: boolean}[] =
     [];
   for (const {defsKey, name, content} of localDefinitions) {
+    // bundled definitions already exist in the root schema and keep their original path,
+    // new definitions get a free path (or are collapsed into an identical existing one)
     const wasBundled = bundledDefinitionNames.includes(name);
-
-    if (wasBundled) {
-      const originalPath: Path = ['$defs', name];
-      pathMappings.push({
-        oldLocalPath: [defsKey, name],
-        newRootPath: originalPath,
-        content,
-        wasBundled: true,
-      });
-    } else {
-      let newDefinitionPath = doesIdenticalSchemaDefinitionExist(rootSchemaData, content);
-      if (newDefinitionPath === undefined) {
-        newDefinitionPath = findAvailableSchemaId(rootSchemaData, ['$defs'], name, true);
-      }
-      pathMappings.push({
-        oldLocalPath: [defsKey, name],
-        newRootPath: newDefinitionPath,
-        content,
-        wasBundled: false,
-      });
-    }
+    const newRootPath: Path = wasBundled
+      ? [defsKey, name]
+      : doesIdenticalSchemaDefinitionExist(rootSchemaData, content) ??
+        findAvailableSchemaId(rootSchemaData, ['$defs'], name, true);
+    pathMappings.push({oldLocalPath: [defsKey, name], newRootPath, content, wasBundled});
   }
 
   const rewriteTargets: any[] = [subSchema, ...pathMappings.map(m => m.content)];
@@ -209,9 +196,9 @@ export function extractGeneratedDefinitionsFromSubSchema(
   }
 
   for (const {newRootPath, content, wasBundled} of pathMappings) {
-    if (wasBundled) {
-      rootSchemaData.setDataAt(newRootPath, content);
-    } else if (rootSchemaData.dataAt(newRootPath) === undefined) {
+    // bundled definitions are written back unconditionally so that AI modifications
+    // to them take effect in the root schema
+    if (wasBundled || rootSchemaData.dataAt(newRootPath) === undefined) {
       rootSchemaData.setDataAt(newRootPath, content);
     }
   }
@@ -288,6 +275,14 @@ export function addSchemaEnum(
   return enumPath;
 }
 
+/**
+ * Copies all root schema definitions that the given sub-schema references (directly or
+ * transitively) into a clone of the sub-schema, so it can be understood standalone,
+ * e.g. by an AI that only sees the sub-schema. The counterpart
+ * extractGeneratedDefinitionsFromSubSchema moves the definitions back to the root
+ * afterwards; the returned bundledDefinitionNames tell it which definitions existed
+ * before and therefore may be overwritten at their original location.
+ */
 export function bundleReferencedDefinitions(
   subSchema: any,
   rootSchemaRaw: any
@@ -299,36 +294,38 @@ export function bundleReferencedDefinitions(
   const bundledSubSchema = _.cloneDeep(subSchema);
   const bundledDefinitionNames: string[] = [];
 
-  const refs = collectRefs(bundledSubSchema);
-  for (const ref of refs) {
-    if (!ref.startsWith('#/$defs/') && !ref.startsWith('#/definitions/')) continue;
+  const pendingRefs = collectAllRefs(bundledSubSchema);
+  const visitedRefs = new Set<string>();
+  while (pendingRefs.length > 0) {
+    const ref = pendingRefs.shift()!;
+    if (visitedRefs.has(ref)) {
+      continue;
+    }
+    visitedRefs.add(ref);
 
-    const parts = ref.replace('#/', '').split('/');
-    const defsKey = parts[0]!;
-    const defName = parts[1]!;
-    const defContent = rootSchemaRaw?.[defsKey]?.[defName];
-    if (defContent === undefined) continue;
+    const refPath = resolveInternalReferencePath(ref);
+    if (refPath === undefined || refPath.length < 2) {
+      continue;
+    }
+    // a ref pointing into a definition (however deep) requires bundling the whole definition
+    const defsKey = String(refPath[0]);
+    const definitionName = String(refPath[1]);
+    if (defsKey !== '$defs' && defsKey !== 'definitions') {
+      continue;
+    }
 
-    if (!bundledSubSchema[defsKey]) bundledSubSchema[defsKey] = {};
-    bundledSubSchema[defsKey][defName] = _.cloneDeep(defContent);
-    bundledDefinitionNames.push(defName);
+    const definition = dataAt([defsKey, definitionName], rootSchemaRaw);
+    if (definition === undefined || bundledSubSchema[defsKey]?.[definitionName] !== undefined) {
+      continue;
+    }
+
+    if (bundledSubSchema[defsKey] === undefined) {
+      bundledSubSchema[defsKey] = {};
+    }
+    bundledSubSchema[defsKey][definitionName] = _.cloneDeep(definition);
+    bundledDefinitionNames.push(definitionName);
+    // definitions can reference other definitions, which then need to be bundled as well
+    pendingRefs.push(...collectAllRefs(definition));
   }
   return {bundledSubSchema, bundledDefinitionNames};
-}
-
-function collectRefs(obj: any): string[] {
-  if (obj === null || typeof obj !== 'object') return [];
-  const refs: string[] = [];
-  if (Array.isArray(obj)) {
-    for (const item of obj) refs.push(...collectRefs(item));
-  } else {
-    for (const [key, value] of Object.entries(obj)) {
-      if (key === '$ref' && typeof value === 'string') {
-        refs.push(value);
-      } else {
-        refs.push(...collectRefs(value));
-      }
-    }
-  }
-  return refs;
 }

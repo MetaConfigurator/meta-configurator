@@ -170,9 +170,11 @@ function submitPromptCreateDocument() {
 function submitPromptModifyDocument() {
   const openApiKey = getApiKey();
   let relevantSubDocument = data.dataAt(currentElement.value);
+  const relevantSubSchema = schema.schemaWrapperAtPath(currentElement.value).jsonSchema!;
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
 
+  // when modifying a sub-schema, bundle the definitions it references into it, so that the AI knows them and can modify them as well
   let bundledDefinitionNames: string[] = [];
   if (data.mode === SessionMode.SchemaEditor && currentElement.value.length > 0) {
     const bundledResult = bundleReferencedDefinitions(relevantSubDocument, data.data.value);
@@ -184,7 +186,7 @@ function submitPromptModifyDocument() {
     openApiKey,
     promptModifyDocument.value,
     JSON.stringify(relevantSubDocument),
-    JSON.stringify(removeCustomFieldsFromSchema(relevantSubDocument))
+    JSON.stringify(removeCustomFieldsFromSchema(relevantSubSchema))
   );
 
   response
@@ -371,8 +373,8 @@ function selectRootElement() {
               <FontAwesomeIcon icon="fa-solid fa-circle-info" />
             </Button>
           </span>
-          <Textarea v-model="promptModifyDocument" />
-          <Button @click="submitPromptModifyDocument()"
+          <Textarea v-model="promptModifyDocument" data-testid="ai-prompt-modify-input" />
+          <Button @click="submitPromptModifyDocument()" data-testid="ai-prompt-modify-submit"
             >Modify {{ props.labelDocumentType }}</Button
           >
           <ProgressSpinner v-if="isLoadingChangeAnswer" />
