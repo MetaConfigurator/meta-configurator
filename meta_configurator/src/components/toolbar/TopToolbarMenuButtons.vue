@@ -7,10 +7,8 @@ import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 import {SessionMode} from '@/store/sessionMode';
-import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
-import {inferJsonSchema} from '@/schema/inferJsonSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -111,20 +109,7 @@ function showRefineSchemaDialog() {
 }
 
 function inferSchemaFromSampleData() {
-  const data = getDataForMode(SessionMode.DataEditor).data.value;
-  const isEmptyData =
-    data === null ||
-    data === undefined ||
-    (typeof data === 'object' && Object.keys(data).length === 0);
-  if (isEmptyData) {
-    // No in-app data to infer from — let the user pick instance files instead.
-    emit('show-infer-schema-dialog');
-    return;
-  }
-  const inferredSchema = inferJsonSchema(data);
-  if (inferredSchema) {
-    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferredSchema;
-  }
+  emit('show-infer-schema-dialog');
 }
 
 function getMenuItems(settings: SettingsInterfaceRoot, positionBottom: boolean): MenuItem[] {

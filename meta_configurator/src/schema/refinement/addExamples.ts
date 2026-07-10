@@ -17,13 +17,26 @@ export function addExamplesToSchema(
   data: unknown,
   options: AddExamplesOptions
 ): TopLevelSchema {
-  visitSchemaAndSamples(schema, [data], options, (schemaNode, samples) => {
+  return addExamplesToSchemaFromSamples(schema, [data], options);
+}
+
+export function addExamplesToSchemaFromSamples(
+  schema: TopLevelSchema,
+  samples: unknown[],
+  options: AddExamplesOptions
+): TopLevelSchema {
+  visitSchemaAndSamples(schema, samples, options, (schemaNode, samplesForNode) => {
+    if (schemaNode.enum || schemaNode.const !== undefined) {
+      delete schemaNode.examples;
+      return;
+    }
+
     const schemaTypes = getSchemaTypes(schemaNode);
     if (schemaTypes.length === 0 || schemaTypes.some(type => !EXAMPLE_SUPPORTED_TYPES.has(type))) {
       return;
     }
 
-    const mergedExamples = mergeExamples(schemaNode.examples ?? [], samples, options);
+    const mergedExamples = mergeExamples(schemaNode.examples ?? [], samplesForNode, options);
     if (mergedExamples.length > 0) {
       schemaNode.examples = mergedExamples;
     }

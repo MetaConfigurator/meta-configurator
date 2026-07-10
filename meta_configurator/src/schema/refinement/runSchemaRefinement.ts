@@ -1,9 +1,12 @@
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {addExamplesToSchema} from '@/schema/refinement/addExamples';
-import {detectAdditionalPropertiesInSchema} from '@/schema/refinement/detectAdditionalProperties';
-import {detectEnumsInSchema} from '@/schema/refinement/detectEnums';
-import {detectPatternPropertiesInSchema} from '@/schema/refinement/detectPatternProperties';
+import {addExamplesToSchemaFromSamples} from '@/schema/refinement/addExamples';
+import {
+  detectAdditionalPropertiesInSchemaFromSamples,
+} from '@/schema/refinement/detectAdditionalProperties';
+import {detectEnumsInSchemaFromSamples} from '@/schema/refinement/detectEnums';
+import {extractSubSchemasIntoReferences} from '@/schema/refinement/extractSubSchemasIntoReferences';
 import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes';
+import {sortSchemaPropertiesAlphabetically} from '@/components/panels/gui-editor/sortingUtils';
 import _ from 'lodash';
 
 export function runSchemaRefinement(
@@ -11,19 +14,37 @@ export function runSchemaRefinement(
   data: unknown,
   selection: RefineSchemaSelection
 ): TopLevelSchema {
-  const refinedSchema = _.cloneDeep(schema);
+  return runSchemaRefinementOnSamples(schema, [data], selection);
+}
 
-  if (selection.detectPatternProperties) {
-    detectPatternPropertiesInSchema(refinedSchema, data, selection.detectPatternProperties);
-  }
+export function runSchemaRefinementOnSamples(
+  schema: TopLevelSchema,
+  samples: unknown[],
+  selection: RefineSchemaSelection
+): TopLevelSchema {
+  let refinedSchema = _.cloneDeep(schema);
+
   if (selection.detectAdditionalProperties) {
-    detectAdditionalPropertiesInSchema(refinedSchema, data, selection.detectAdditionalProperties);
+    detectAdditionalPropertiesInSchemaFromSamples(
+      refinedSchema,
+      samples,
+      selection.detectAdditionalProperties
+    );
   }
   if (selection.addExamples) {
-    addExamplesToSchema(refinedSchema, data, selection.addExamples);
+    addExamplesToSchemaFromSamples(refinedSchema, samples, selection.addExamples);
   }
   if (selection.detectEnums) {
-    detectEnumsInSchema(refinedSchema, data, selection.detectEnums);
+    detectEnumsInSchemaFromSamples(refinedSchema, samples, selection.detectEnums);
+  }
+  if (selection.extractSubSchemasIntoReferences) {
+    refinedSchema = extractSubSchemasIntoReferences(
+      refinedSchema,
+      selection.extractSubSchemasIntoReferences
+    );
+  }
+  if (selection.sortSchemaPropertiesAlphabetically) {
+    refinedSchema = sortSchemaPropertiesAlphabetically(refinedSchema);
   }
 
   return refinedSchema;

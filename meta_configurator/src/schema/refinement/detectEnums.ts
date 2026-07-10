@@ -18,14 +18,24 @@ export function detectEnumsInSchema(
   data: unknown,
   options: DetectEnumsOptions
 ): TopLevelSchema {
-  visitSchemaAndSamples(schema, [data], (schemaNode, samples) => {
+  return detectEnumsInSchemaFromSamples(schema, [data], options);
+}
+
+export function detectEnumsInSchemaFromSamples(
+  schema: TopLevelSchema,
+  samples: unknown[],
+  options: DetectEnumsOptions
+): TopLevelSchema {
+  visitSchemaAndSamples(schema, samples, (schemaNode, samplesForNode) => {
     if (schemaNode.enum || schemaNode.const !== undefined) {
+      delete schemaNode.examples;
       return;
     }
 
-    const enumValues = detectEnumValues(schemaNode, samples, options);
+    const enumValues = detectEnumValues(schemaNode, samplesForNode, options);
     if (enumValues !== null) {
       schemaNode.enum = enumValues;
+      delete schemaNode.examples;
     }
   });
 

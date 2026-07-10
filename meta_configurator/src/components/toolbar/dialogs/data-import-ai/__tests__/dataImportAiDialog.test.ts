@@ -1,0 +1,220 @@
+import {describe, expect, it, vi, beforeEach} from 'vitest';
+import {defineComponent, nextTick, ref} from 'vue';
+import {flushPromises, mount} from '@vue/test-utils';
+
+const DialogStub = defineComponent({
+  props: {
+    visible: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  template: '<div v-if="visible"><slot /></div>',
+});
+
+const ButtonStub = defineComponent({
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    label: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['click'],
+  template:
+    '<button type="button" :disabled="disabled" @click="$emit(\'click\')">{{ label }}<slot /></button>',
+});
+
+const TextareaStub = defineComponent({
+  props: {
+    modelValue: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['update:modelValue'],
+  template:
+    '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+});
+
+const SelectStub = defineComponent({
+  props: {
+    modelValue: {
+      type: [String, Object],
+      default: '',
+    },
+  },
+  emits: ['update:modelValue'],
+  template: '<div><slot /></div>',
+});
+
+const InputTextStub = defineComponent({
+  props: {
+    modelValue: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['update:modelValue'],
+  template:
+    '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+});
+
+const MessageStub = defineComponent({template: '<div><slot /></div>'});
+const DividerStub = defineComponent({template: '<hr />'});
+const SlotStub = defineComponent({template: '<div><slot /></div>'});
+const EmptyStub = defineComponent({template: '<div />'});
+
+type MockEditor = {
+  container: {innerHTML: string};
+  destroy: ReturnType<typeof vi.fn>;
+  getSession: () => {
+    setMode: ReturnType<typeof vi.fn>;
+    setUseWorker: ReturnType<typeof vi.fn>;
+  };
+  getValue: ReturnType<typeof vi.fn>;
+  setValue: ReturnType<typeof vi.fn>;
+  state: {currentValue: string};
+};
+
+function createMockEditor(): MockEditor {
+  const state = {currentValue: ''};
+  const session = {
+    setMode: vi.fn(),
+    setUseWorker: vi.fn(),
+  };
+
+  return {
+    container: {innerHTML: ''},
+    destroy: vi.fn(),
+    getSession: () => session,
+    getValue: vi.fn(() => state.currentValue),
+    setValue: vi.fn((value: string) => {
+      state.currentValue = value;
+    }),
+    state,
+  };
+}
+
+async function setupDialog() {
+  vi.resetModules();
+
+  const apiKeyRef = ref('');
+  const settingsRef = ref({
+    backend: {
+      formatProcessingUrl: 'http://127.0.0.1:5001',
+    },
+    textEditor: {
+      tabSize: 2,
+    },
+  });
+  const editors: MockEditor[] = [];
+  const aceEditMock = vi.fn(() => {
+    const editor = createMockEditor();
+    editors.push(editor);
+    return editor;
+  });
+
+  vi.doMock('primevue/dialog', () => ({default: DialogStub}));
+  vi.doMock('primevue/button', () => ({default: ButtonStub}));
+  vi.doMock('primevue/textarea', () => ({default: TextareaStub}));
+  vi.doMock('primevue/select', () => ({default: SelectStub}));
+  vi.doMock('primevue/inputtext', () => ({default: InputTextStub}));
+  vi.doMock('primevue/message', () => ({default: MessageStub}));
+  vi.doMock('primevue/divider', () => ({default: DividerStub}));
+  vi.doMock('@/components/panels/ai-prompts/ApiKey.vue', () => ({default: EmptyStub}));
+  vi.doMock('@/components/panels/ai-prompts/ApiKeyWarning.vue', () => ({default: EmptyStub}));
+  vi.doMock('@/components/panels/shared-components/PanelSettings.vue', () => ({default: SlotStub}));
+  vi.doMock('@/components/panels/shared-components/aceUtils', () => ({
+    setupAceProperties: vi.fn(),
+  }));
+  vi.doMock('@/settings/useSettings', () => ({
+    useSettings: () => settingsRef,
+  }));
+  vi.doMock('@/utility/ai/apiKey', () => ({
+    getApiKeyRef: () => apiKeyRef,
+  }));
+  vi.doMock('@/data/useDataLink', () => ({
+    getDataForMode: vi.fn(() => ({
+      data: ref({}),
+      setData: vi.fn(),
+    })),
+    getSchemaForMode: vi.fn(() => ({
+      schemaRaw: ref({}),
+    })),
+  }));
+  vi.doMock('brace', () => ({
+    edit: aceEditMock,
+  }));
+  vi.doMock('brace/mode/javascript', () => ({}));
+
+  const DataImportAiDialog = (
+    await import('@/components/toolbar/dialogs/data-import-ai/DataImportAiDialog.vue')
+  ).default;
+
+  const wrapper = mount(DataImportAiDialog, {
+    attachTo: document.body,
+  });
+
+  return {wrapper, apiKeyRef, aceEditMock, editors};
+}
+
+describe('DataImportAiDialog', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('initializes the Ace editor when an API key is added after opening the dialog', async () => {
+    const {wrapper, apiKeyRef, aceEditMock, editors} = await setupDialog();
+
+    (wrapper.vm as any).show();
+    await nextTick();
+    await flushPromises();
+
+    expect(aceEditMock).not.toHaveBeenCalled();
+
+    apiKeyRef.value = 'test-key';
+    await nextTick();
+    await flushPromises();
+
+    expect(aceEditMock).toHaveBeenCalledTimes(1);
+    expect(editors[0]?.setValue).toHaveBeenCalledWith(
+      `function transform(input) {\n  return input;\n}`,
+      -1
+    );
+  });
+
+  it('preserves the current script when the editor is torn down and recreated', async () => {
+    const {wrapper, apiKeyRef, editors} = await setupDialog();
+
+    apiKeyRef.value = 'test-key';
+    (wrapper.vm as any).show();
+    await nextTick();
+    await flushPromises();
+
+    const firstEditor = editors[0];
+    expect(firstEditor).toBeDefined();
+    if (!firstEditor) {
+      throw new Error('Expected the initial editor to be created.');
+    }
+
+    firstEditor.state.currentValue = `function transform(input) {\n  return {source: input};\n}`;
+
+    apiKeyRef.value = '';
+    await nextTick();
+    await flushPromises();
+
+    expect(firstEditor.destroy).toHaveBeenCalledTimes(1);
+
+    apiKeyRef.value = 'test-key-again';
+    await nextTick();
+    await flushPromises();
+
+    const recreatedEditor = editors[1];
+    expect(recreatedEditor).toBeDefined();
+    expect(recreatedEditor?.setValue).toHaveBeenCalledWith(firstEditor.state.currentValue, -1);
+  });
+});

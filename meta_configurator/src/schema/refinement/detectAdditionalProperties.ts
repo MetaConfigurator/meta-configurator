@@ -14,7 +14,15 @@ export function detectAdditionalPropertiesInSchema(
   data: unknown,
   options: DetectAdditionalPropertiesOptions
 ): TopLevelSchema {
-  visitObjectSchemas(schema, [data], options);
+  return detectAdditionalPropertiesInSchemaFromSamples(schema, [data], options);
+}
+
+export function detectAdditionalPropertiesInSchemaFromSamples(
+  schema: TopLevelSchema,
+  samples: unknown[],
+  options: DetectAdditionalPropertiesOptions
+): TopLevelSchema {
+  visitObjectSchemas(schema, samples, options);
   return schema;
 }
 

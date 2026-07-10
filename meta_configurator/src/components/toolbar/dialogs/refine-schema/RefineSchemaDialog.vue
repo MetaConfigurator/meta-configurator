@@ -10,7 +10,8 @@ import {
   ADD_EXAMPLES_DEFAULTS,
   DETECT_ADDITIONAL_PROPERTIES_DEFAULTS,
   DETECT_ENUMS_DEFAULTS,
-  DETECT_PATTERN_PROPERTIES_DEFAULTS,
+  EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS,
+  SORT_SCHEMA_PROPERTIES_DEFAULTS,
 } from '@/schema/refinement/refineSchemaTypes';
 import type {
   RefineSchemaAllowedType,
@@ -20,22 +21,23 @@ import {applySchemaRefinements} from '@/components/toolbar/refineSchema';
 
 const showDialog = ref(false);
 
+const enableSortSchemaPropertiesAlphabetically = ref(false);
 const enableAddExamples = ref(false);
 const enableDetectEnums = ref(false);
 const enableDetectAdditionalProperties = ref(false);
-const enableDetectPatternProperties = ref(false);
+const enableExtractSubSchemasIntoReferences = ref(false);
 
 const addExamples = ref(createAddExamplesState());
 const detectEnums = ref(createDetectEnumsState());
 const detectAdditionalProperties = ref(createDetectAdditionalPropertiesState());
-const detectPatternProperties = ref(createDetectPatternPropertiesState());
 
 const hasSelectedRefinements = computed(
   () =>
+    enableSortSchemaPropertiesAlphabetically.value ||
     enableAddExamples.value ||
     enableDetectEnums.value ||
     enableDetectAdditionalProperties.value ||
-    enableDetectPatternProperties.value
+    enableExtractSubSchemasIntoReferences.value
 );
 
 const allowedTypes: RefineSchemaAllowedType[] = ['string', 'integer', 'boolean'];
@@ -66,25 +68,16 @@ function createDetectAdditionalPropertiesState() {
   };
 }
 
-function createDetectPatternPropertiesState() {
-  return {
-    minMatchingKeys: DETECT_PATTERN_PROPERTIES_DEFAULTS.minMatchingKeys,
-    requireCommonPrefix: DETECT_PATTERN_PROPERTIES_DEFAULTS.requireCommonPrefix,
-    requireNumericSuffix: DETECT_PATTERN_PROPERTIES_DEFAULTS.requireNumericSuffix,
-    similarityThreshold: DETECT_PATTERN_PROPERTIES_DEFAULTS.similarityThreshold,
-  };
-}
-
 function resetDialog() {
+  enableSortSchemaPropertiesAlphabetically.value = false;
   enableAddExamples.value = false;
   enableDetectEnums.value = false;
   enableDetectAdditionalProperties.value = false;
-  enableDetectPatternProperties.value = false;
+  enableExtractSubSchemasIntoReferences.value = false;
 
   addExamples.value = createAddExamplesState();
   detectEnums.value = createDetectEnumsState();
   detectAdditionalProperties.value = createDetectAdditionalPropertiesState();
-  detectPatternProperties.value = createDetectPatternPropertiesState();
 }
 
 function openDialog() {
@@ -98,13 +91,16 @@ function hideDialog() {
 
 function buildSelection(): RefineSchemaSelection {
   return {
+    sortSchemaPropertiesAlphabetically: enableSortSchemaPropertiesAlphabetically.value
+      ? SORT_SCHEMA_PROPERTIES_DEFAULTS
+      : undefined,
     addExamples: enableAddExamples.value ? createAddExamplesStateFromCurrent() : undefined,
     detectEnums: enableDetectEnums.value ? createDetectEnumsStateFromCurrent() : undefined,
     detectAdditionalProperties: enableDetectAdditionalProperties.value
       ? createDetectAdditionalPropertiesStateFromCurrent()
       : undefined,
-    detectPatternProperties: enableDetectPatternProperties.value
-      ? createDetectPatternPropertiesStateFromCurrent()
+    extractSubSchemasIntoReferences: enableExtractSubSchemasIntoReferences.value
+      ? EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS
       : undefined,
   };
 }
@@ -135,15 +131,6 @@ function createDetectAdditionalPropertiesStateFromCurrent() {
   };
 }
 
-function createDetectPatternPropertiesStateFromCurrent() {
-  return {
-    minMatchingKeys: detectPatternProperties.value.minMatchingKeys,
-    requireCommonPrefix: detectPatternProperties.value.requireCommonPrefix,
-    requireNumericSuffix: detectPatternProperties.value.requireNumericSuffix,
-    similarityThreshold: detectPatternProperties.value.similarityThreshold,
-  };
-}
-
 function applySelectedRefinements() {
   if (!hasSelectedRefinements.value) {
     return;
@@ -171,6 +158,28 @@ defineExpose({show: openDialog, close: hideDialog});
       </Message>
 
       <div class="refinement-list">
+        <Panel class="refinement-panel">
+          <template #header>
+            <div class="refinement-title-row">
+              <Checkbox
+                v-model="enableSortSchemaPropertiesAlphabetically"
+                binary
+                input-id="refine-sort-schema-properties-alphabetically" />
+              <label
+                class="refinement-title"
+                for="refine-sort-schema-properties-alphabetically">
+                Sort Schema Properties Alphabetically
+              </label>
+            </div>
+          </template>
+
+          <p class="refinement-description">
+            Sort schema keys recursively, including <code>properties</code>,
+            <code>patternProperties</code>, <code>dependentSchemas</code>, and
+            <code>$defs</code>.
+          </p>
+        </Panel>
+
         <Panel class="refinement-panel">
           <template #header>
             <div class="refinement-title-row">
@@ -341,60 +350,21 @@ defineExpose({show: openDialog, close: hideDialog});
           <template #header>
             <div class="refinement-title-row">
               <Checkbox
-                v-model="enableDetectPatternProperties"
+                v-model="enableExtractSubSchemasIntoReferences"
                 binary
-                input-id="refine-detect-pattern-properties" />
-              <label class="refinement-title" for="refine-detect-pattern-properties">
-                Detect Pattern Properties
+                input-id="refine-extract-sub-schemas-into-references" />
+              <label
+                class="refinement-title"
+                for="refine-extract-sub-schemas-into-references">
+                Extract Sub-schemas into References
               </label>
             </div>
           </template>
 
           <p class="refinement-description">
-            Detect key naming patterns and convert them into
-            <code>patternProperties</code> rules.
+            Move inlined object and enum sub-schemas into <code>$defs</code> and replace them with
+            shared <code>$ref</code> references.
           </p>
-
-          <div v-if="enableDetectPatternProperties" class="parameter-grid">
-            <div class="parameter-field">
-              <label for="detect-pattern-min-keys">Minimum number of matching keys</label>
-              <InputNumber
-                input-id="detect-pattern-min-keys"
-                v-model="detectPatternProperties.minMatchingKeys"
-                :min="1"
-                :max="1000"
-                :use-grouping="false" />
-            </div>
-
-            <div class="parameter-field">
-              <label for="detect-pattern-similarity">Similarity threshold</label>
-              <InputNumber
-                input-id="detect-pattern-similarity"
-                v-model="detectPatternProperties.similarityThreshold"
-                :min="0"
-                :max="1"
-                :step="0.05"
-                :min-fraction-digits="0"
-                :max-fraction-digits="2"
-                :use-grouping="false" />
-            </div>
-
-            <div class="parameter-checkbox">
-              <Checkbox
-                v-model="detectPatternProperties.requireCommonPrefix"
-                binary
-                input-id="detect-pattern-common-prefix" />
-              <label for="detect-pattern-common-prefix">Require common prefix</label>
-            </div>
-
-            <div class="parameter-checkbox">
-              <Checkbox
-                v-model="detectPatternProperties.requireNumericSuffix"
-                binary
-                input-id="detect-pattern-numeric-suffix" />
-              <label for="detect-pattern-numeric-suffix">Require numeric suffix</label>
-            </div>
-          </div>
         </Panel>
       </div>
 

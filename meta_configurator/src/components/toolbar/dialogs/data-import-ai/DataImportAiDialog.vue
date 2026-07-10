@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, onMounted, ref, type Ref, watch} from 'vue';
+import {computed, nextTick, onBeforeUnmount, ref, type Ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -129,23 +129,28 @@ const isCurrentImportModeDisabled = computed(() =>
   )
 );
 
-onMounted(() => {
-  watch(
-    () => generatedScript.value,
-    newValue => {
-      if (newValue.length > 0 && editor.value) {
-        editor.value.setValue(newValue, -1);
-      }
+watch(
+  () => generatedScript.value,
+  newValue => {
+    if (editor.value && editor.value.getValue() !== newValue) {
+      editor.value.setValue(newValue, -1);
     }
-  );
+  }
+);
+
+watch([showDialog, usesJavascriptStep, hasApiKey], async ([visible, usesJavascriptEditor, hasKey]) => {
+  if (!visible || !usesJavascriptEditor || !hasKey) {
+    destroyEditor();
+    return;
+  }
+
+  await nextTick();
+  initializeEditor();
+  editor.value?.setValue(generatedScript.value, -1);
 });
 
-watch(showDialog, async visible => {
-  if (visible) {
-    await nextTick();
-    initializeEditor();
-    editor.value?.setValue(generatedScript.value, -1);
-  }
+onBeforeUnmount(() => {
+  destroyEditor();
 });
 
 watch([canUseDirectParse, hasApiKey], () => {
@@ -222,6 +227,10 @@ function getEditorSnapshot(): string {
 }
 
 function getCurrentScript(): string {
+  if (!hasApiKey.value || !usesJavascriptStep.value) {
+    return generatedScript.value;
+  }
+
   return editor.value?.getValue() ?? generatedScript.value;
 }
 
@@ -309,18 +318,26 @@ function initializeEditor() {
     return;
   }
 
-  if (editor.value) {
-    editor.value.destroy();
-    editor.value.container.innerHTML = '';
-    editor.value = null;
-    editorInitialized.value = false;
-  }
+  destroyEditor(false);
 
   editor.value = ace.edit(editorId);
   setupAceProperties(editor.value, settings.value);
   editor.value.getSession().setMode('ace/mode/javascript');
   editor.value.getSession().setUseWorker(false);
   editorInitialized.value = true;
+}
+
+function destroyEditor(preserveCurrentValue = true) {
+  if (!editor.value) {
+    return;
+  }
+
+  const currentValue = preserveCurrentValue ? editor.value.getValue() : generatedScript.value;
+  editor.value.destroy();
+  editor.value.container.innerHTML = '';
+  editor.value = null;
+  editorInitialized.value = false;
+  generatedScript.value = currentValue;
 }
 
 function onFileSelected(event: Event) {

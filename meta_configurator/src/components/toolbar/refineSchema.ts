@@ -3,21 +3,18 @@ import {SessionMode} from '@/store/sessionMode';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {runSchemaRefinement} from '@/schema/refinement/runSchemaRefinement';
 import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes';
-import {
-  ADD_EXAMPLES_DEFAULTS,
-  DETECT_ADDITIONAL_PROPERTIES_DEFAULTS,
-  DETECT_ENUMS_DEFAULTS,
-  DETECT_PATTERN_PROPERTIES_DEFAULTS,
-} from '@/schema/refinement/refineSchemaTypes';
 import {ValidationService} from '@/schema/validationService';
 import {toastService} from '@/utility/toastService';
 
 function getSelectedRefinementLabels(selection: RefineSchemaSelection): string[] {
   return [
+    selection.sortSchemaPropertiesAlphabetically ? 'Sort Schema Properties Alphabetically' : undefined,
     selection.addExamples ? 'Add Examples' : undefined,
     selection.detectEnums ? 'Detect Enums' : undefined,
     selection.detectAdditionalProperties ? 'Detect Additional Properties' : undefined,
-    selection.detectPatternProperties ? 'Detect Pattern Properties' : undefined,
+    selection.extractSubSchemasIntoReferences
+      ? 'Extract Sub-schemas into References'
+      : undefined,
   ].filter((label): label is string => label !== undefined);
 }
 

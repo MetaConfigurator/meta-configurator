@@ -1,5 +1,7 @@
 export type RefineSchemaAllowedType = 'string' | 'integer' | 'boolean';
 
+export type SortSchemaPropertiesOptions = Record<string, never>;
+
 export interface AddExamplesOptions {
   maxExamplesPerField: number;
   uniqueOnly: boolean;
@@ -20,19 +22,20 @@ export interface DetectAdditionalPropertiesOptions {
   requireSameValueType: boolean;
 }
 
-export interface DetectPatternPropertiesOptions {
-  minMatchingKeys: number;
-  requireCommonPrefix: boolean;
-  requireNumericSuffix: boolean;
-  similarityThreshold: number;
+export interface ExtractSubSchemasIntoReferencesOptions {
+  extractRootElement: boolean;
+  extractEnums: boolean;
 }
 
 export interface RefineSchemaSelection {
+  sortSchemaPropertiesAlphabetically?: SortSchemaPropertiesOptions;
   addExamples?: AddExamplesOptions;
   detectEnums?: DetectEnumsOptions;
   detectAdditionalProperties?: DetectAdditionalPropertiesOptions;
-  detectPatternProperties?: DetectPatternPropertiesOptions;
+  extractSubSchemasIntoReferences?: ExtractSubSchemasIntoReferencesOptions;
 }
+
+export const SORT_SCHEMA_PROPERTIES_DEFAULTS: SortSchemaPropertiesOptions = {};
 
 export const ADD_EXAMPLES_DEFAULTS: AddExamplesOptions = {
   maxExamplesPerField: 4,
@@ -54,9 +57,7 @@ export const DETECT_ADDITIONAL_PROPERTIES_DEFAULTS: DetectAdditionalPropertiesOp
   requireSameValueType: true,
 };
 
-export const DETECT_PATTERN_PROPERTIES_DEFAULTS: DetectPatternPropertiesOptions = {
-  minMatchingKeys: 3,
-  requireCommonPrefix: true,
-  requireNumericSuffix: false,
-  similarityThreshold: 0.8,
+export const EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS: ExtractSubSchemasIntoReferencesOptions = {
+  extractRootElement: false,
+  extractEnums: true,
 };
