@@ -25,7 +25,10 @@ import {
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
 import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schemaProcessor';
-import {postProcessSchemaModification} from '@/schema/schemaManipulationUtils';
+import {
+  postProcessSchemaModification,
+  bundleReferencedDefinitions,
+} from '@/schema/schemaManipulationUtils';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -166,10 +169,19 @@ function submitPromptCreateDocument() {
 
 function submitPromptModifyDocument() {
   const openApiKey = getApiKey();
-  const relevantSubDocument = data.dataAt(currentElement.value);
+  let relevantSubDocument = data.dataAt(currentElement.value);
   const relevantSubSchema = schema.schemaWrapperAtPath(currentElement.value).jsonSchema!;
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
+
+  // when modifying a sub-schema, bundle the definitions it references into it, so that the AI knows them and can modify them as well
+  let bundledDefinitionNames: string[] = [];
+  if (data.mode === SessionMode.SchemaEditor && currentElement.value.length > 0) {
+    const bundledResult = bundleReferencedDefinitions(relevantSubDocument, data.data.value);
+    relevantSubDocument = bundledResult.bundledSubSchema;
+    bundledDefinitionNames = bundledResult.bundledDefinitionNames;
+  }
+
   const response = props.functionQueryDocumentModification(
     openApiKey,
     promptModifyDocument.value,
@@ -181,10 +193,10 @@ function submitPromptModifyDocument() {
     .then(value => {
       try {
         const json = fixAndParseGeneratedJson(value);
-        processResult(value, true, json, currentElement.value);
+        processResult(value, true, json, currentElement.value, bundledDefinitionNames);
       } catch (e) {
         console.error('Failed to parse JSON', e);
-        processResult(value, false, null, currentElement.value);
+        processResult(value, false, null, currentElement.value, bundledDefinitionNames);
       }
     })
     .catch(e => {
@@ -200,11 +212,12 @@ function processResult(
   response: string,
   validJson: boolean,
   responseObject: any,
-  pathForResponse: Path
+  pathForResponse: Path,
+  bundledDefinitionNames: string[] = []
 ) {
   if (validJson) {
     if (data.mode === SessionMode.SchemaEditor && pathForResponse.length > 0) {
-      responseObject = postProcessSchemaModification(responseObject, data);
+      responseObject = postProcessSchemaModification(responseObject, data, bundledDefinitionNames);
     }
     newDocument.value = '';
     data.setDataAt(pathForResponse, responseObject);
@@ -360,8 +373,8 @@ function selectRootElement() {
               <FontAwesomeIcon icon="fa-solid fa-circle-info" />
             </Button>
           </span>
-          <Textarea v-model="promptModifyDocument" />
-          <Button @click="submitPromptModifyDocument()"
+          <Textarea v-model="promptModifyDocument" data-testid="ai-prompt-modify-input" />
+          <Button @click="submitPromptModifyDocument()" data-testid="ai-prompt-modify-submit"
             >Modify {{ props.labelDocumentType }}</Button
           >
           <ProgressSpinner v-if="isLoadingChangeAnswer" />
