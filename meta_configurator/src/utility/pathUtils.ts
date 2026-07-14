@@ -10,15 +10,13 @@ import {dataAt} from '@/utility/resolveDataAtPath';
  * @param path the path to convert
  */
 export function pathToString(path: Path): string {
-  return path.length === 0
-    ? ''
-    : path
-        .reduce(
-          (prev: string, val: PathElement) =>
-            prev + (typeof val === 'number' ? `[${val}]` : `.${val}`),
-          ''
-        )
-        .slice(1);
+  const result = path.reduce(
+    (prev: string, val: PathElement) => prev + (typeof val === 'number' ? `[${val}]` : `.${val}`),
+    ''
+  );
+  // only strip the separator dot introduced by a leading string element,
+  // array notation of a leading number element (e.g. '[0]') must stay intact
+  return result.startsWith('.') ? result.slice(1) : result;
 }
 
 /**

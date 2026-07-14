@@ -579,9 +579,10 @@ export class ConfigTreeNodeResolver {
    * Determines whether an "add item" node should be added to the tree.
    */
   private shouldAddAddItemNode(schema: JsonSchemaWrapper, data: any) {
-    if (data !== undefined && !Array.isArray(data)) {
-      return false;
-    }
+    // note that the add item node is offered even when the data at this node is not an
+    // array (e.g. the default empty object of a new document, or leftover data from an
+    // earlier schema): the GUI would otherwise appear empty for array schemas with no
+    // way to fix the data. Adding an item then replaces the old value (undo is available).
     if (schema.maxItems !== undefined && data !== undefined && data.length >= schema.maxItems) {
       return false;
     }

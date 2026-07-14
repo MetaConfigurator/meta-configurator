@@ -289,7 +289,16 @@ function updatePropertyName(subPath: Path, oldName: string, newName: string) {
 }
 
 function addItem(relativePath: Path, newValue: any) {
-  updateData(relativePath, newValue);
+  const parentPath = relativePath.slice(0, -1);
+  const parentData = dataAt(parentPath, props.currentData);
+  if (parentData !== undefined && !Array.isArray(parentData)) {
+    // the data does not contain an array at this path yet (e.g. the default empty object
+    // of a new document, or leftover data from an earlier schema): replace it with an
+    // array containing the new item. The old value can be restored via undo.
+    updateData(parentPath, [newValue]);
+  } else {
+    updateData(relativePath, newValue);
+  }
   updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
