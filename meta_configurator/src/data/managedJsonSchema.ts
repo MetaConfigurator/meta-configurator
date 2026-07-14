@@ -94,9 +94,18 @@ export class ManagedJsonSchema {
         const oneOfSelection = getUserSelectionForMode(
           this.mode
         ).currentSelectedOneOfOptions.value.get(pathToString(currentPath));
-        if (oneOfSelection !== undefined) {
+        const selectedSubSchema = schema.oneOf[oneOfSelection?.index ?? -1];
+        if (selectedSubSchema !== undefined) {
+          // merge the selected oneOf sub-schema with the base schema (without the oneOf),
+          // so that properties defined next to the oneOf are not lost
+          const baseSchema = {...schema.jsonSchema};
+          delete baseSchema.oneOf;
+          const mergedSchema = new JsonSchemaWrapper(
+            {allOf: [baseSchema, selectedSubSchema.jsonSchema ?? {}]},
+            this.mode
+          );
           currentEffectiveSchema = calculateEffectiveSchema(
-            schema.oneOf[oneOfSelection.index],
+            mergedSchema,
             getDataForMode(this.mode).dataAt(currentPath),
             currentPath
           );

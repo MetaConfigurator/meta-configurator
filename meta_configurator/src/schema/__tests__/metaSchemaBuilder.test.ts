@@ -211,4 +211,55 @@ describe('metaSchemaBuilder', () => {
       expect(result.errors).toEqual([]);
     });
   });
+
+  describe('type inference from type specific keywords', () => {
+    it('validates type specific keywords even when "type" is not declared', () => {
+      // "maximum" implies a number schema, so its value must be a number
+      expect(validateWithFullMetaSchema({maximum: 5}).errors).toEqual([]);
+      expect(validateWithFullMetaSchema({maximum: 'five'}).errors).not.toEqual([]);
+
+      // "maxLength" implies a string schema, so its value must be a non-negative integer
+      expect(validateWithFullMetaSchema({maxLength: 5}).errors).toEqual([]);
+      expect(validateWithFullMetaSchema({maxLength: -1}).errors).not.toEqual([]);
+    });
+
+    it('still recognizes object schemas by their "properties" keyword', () => {
+      expect(
+        validateWithFullMetaSchema({properties: {foo: {type: 'string'}}, required: ['foo']}).errors
+      ).toEqual([]);
+      expect(validateWithFullMetaSchema({properties: {}, required: [5]}).errors).not.toEqual([]);
+    });
+  });
+
+  describe('hasNoTypeInformation definition', () => {
+    function getTypeIndicatingKeywords(): string[] {
+      const defs = buildFullMetaSchema().$defs as Record<string, any>;
+      return defs.hasNoTypeInformation.not.anyOf.map(
+        (entry: {required: string[]}) => entry.required[0]
+      );
+    }
+
+    it('derives the type indicating keywords from the meta schema definitions', () => {
+      const keywords = getTypeIndicatingKeywords();
+
+      // keywords that directly determine the type or value of a subschema
+      expect(keywords).toContain('type');
+      expect(keywords).toContain('enum');
+      expect(keywords).toContain('const');
+      expect(keywords).toContain('$ref');
+      // type specific field keywords imply their type as well
+      expect(keywords).toContain('maximum');
+      expect(keywords).toContain('items');
+      expect(keywords).toContain('pattern');
+      expect(keywords).toContain('properties');
+    });
+
+    it('does not treat type neutral keywords as type information', () => {
+      const keywords = getTypeIndicatingKeywords();
+
+      expect(keywords).not.toContain('title');
+      expect(keywords).not.toContain('description');
+      expect(keywords).not.toContain('default');
+    });
+  });
 });

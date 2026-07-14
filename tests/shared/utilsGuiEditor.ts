@@ -49,6 +49,16 @@ export async function checkNumberOrIntProperty(page: Page, propertyPath: Path, v
     await expect(textField).toHaveValue(value.toString());
 }
 
+export async function editSelectProperty(page: Page, propertyPath: Path, value: string) {
+    // properties rendered as an editable select (e.g. the "type" field in the schema editor)
+    // accept typed input in their combobox
+    const pathAsString = pathToString(propertyPath);
+    const comboInput = page.getByTestId(`property-data-${pathAsString}`).getByRole('combobox').first();
+    await comboInput.click();
+    await comboInput.fill(value);
+    await comboInput.press('Enter');
+}
+
 export async function removeOptionalPropertyValue(page: Page, propertyPath: Path) {
     const pathAsString = pathToString(propertyPath);
     const removeButton = page.getByTestId(`property-data-${pathAsString}`).getByRole('button', { name: 'Remove' });
