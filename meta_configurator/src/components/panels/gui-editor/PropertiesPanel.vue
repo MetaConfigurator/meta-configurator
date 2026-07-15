@@ -251,6 +251,15 @@ function updateData(subPath: Path, newValue: any) {
   updateTree();
 }
 
+function reorderArray(parentRelativePath: Path, fromIndex: number, toIndex: number) {
+  const parentData = dataAt(parentRelativePath, props.currentData);
+  if (!Array.isArray(parentData)) return;
+  const newArray = parentData.slice();
+  const [item] = newArray.splice(fromIndex, 1);
+  newArray.splice(toIndex, 0, item);
+  updateData(parentRelativePath, newArray);
+}
+
 function selectPropertyPath(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
   lastClickedElement.value = path;
@@ -617,6 +626,7 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
             :type="slotProps.node.type"
             :highlighted="isNodeHighlighted(slotProps.node)"
             @zoom_into_path="zoomIntoPath"
+            @reorder_array="reorderArray"
             @update_property_name="
               (oldName, newName) =>
                 updatePropertyName(slotProps.node.data.relativePath, oldName, newName)

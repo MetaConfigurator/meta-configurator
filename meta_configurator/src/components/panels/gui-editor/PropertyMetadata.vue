@@ -6,6 +6,7 @@ import type {
   GuiEditorTreeNode,
 } from '@/components/panels/gui-editor/configDataTreeNode';
 import type {Path} from '@/utility/path';
+import {computed} from 'vue';
 import {ref} from 'vue';
 import {pathToString} from '@/utility/pathUtils';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -37,7 +38,57 @@ const emit = defineEmits<{
   (e: 'update_property_name', old_name: string, new_name: string): void;
   (e: 'start_editing_property_name'): void;
   (e: 'stop_editing_property_name'): void;
+  (e: 'reorder_array', parentRelativePath: Path, fromIndex: number, toIndex: number): void;
 }>();
+
+const isArrayItem = computed(() => {
+  const rp = props.node.data.relativePath as Path | undefined;
+  if (!rp || rp.length === 0) return false;
+  const last = rp[rp.length - 1];
+  return typeof last === 'number';
+});
+
+function onDragStart(event: DragEvent) {
+  if (!isArrayItem.value) return;
+  const rp = props.node.data.relativePath as Path;
+  const fromIndex = rp[rp.length - 1] as number;
+  const parent = rp.slice(0, -1);
+  try {
+    event.dataTransfer?.setData('application/json', JSON.stringify({from: fromIndex, parent}));
+    // needed for Firefox
+    event.dataTransfer?.setData('text/plain', '');
+    event.dataTransfer!.effectAllowed = 'move';
+  } catch (e) {
+    // ignore
+  }
+}
+
+function onDragOver(event: DragEvent) {
+  if (!isArrayItem.value) return;
+  event.preventDefault();
+  event.dataTransfer!.dropEffect = 'move';
+}
+
+function onDrop(event: DragEvent) {
+  if (!isArrayItem.value) return;
+  event.preventDefault();
+  const payload = event.dataTransfer?.getData('application/json');
+  if (!payload) return;
+  let parsed: any;
+  try {
+    parsed = JSON.parse(payload);
+  } catch (e) {
+    return;
+  }
+  const fromIndex = parsed.from as number;
+  const fromParent = parsed.parent as Path;
+  const rp = props.node.data.relativePath as Path;
+  const toIndex = rp[rp.length - 1] as number;
+  const toParent = rp.slice(0, -1);
+  // only reorder within the same parent array
+  if (JSON.stringify(fromParent) !== JSON.stringify(toParent)) return;
+  emit('reorder_array', toParent, fromIndex, toIndex);
+}
 
 const settings = useSettings();
 const isEditingPropertyName = ref(false);
@@ -143,7 +194,22 @@ function focusOnPropertyLabel(): void {
 </script>
 
 <template>
-  <span class="flex flex-row w-full items-center">
+  <span
+    class="flex flex-row w-full items-center"
+    :draggable="isArrayItem"
+    @dragstart="onDragStart"
+    @dragover="onDragOver"
+    @drop="onDrop">
+    <span v-if="isArrayItem" class="drag-handle mr-2 cursor-grab" title="Drag to reorder" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="3" r="1" fill="#9CA3AF" />
+        <circle cx="4" cy="8" r="1" fill="#9CA3AF" />
+        <circle cx="4" cy="13" r="1" fill="#9CA3AF" />
+        <circle cx="11" cy="3" r="1" fill="#9CA3AF" />
+        <circle cx="11" cy="8" r="1" fill="#9CA3AF" />
+        <circle cx="11" cy="13" r="1" fill="#9CA3AF" />
+      </svg>
+    </span>
     <span
       class="mr-2"
       :class="{'hover:underline cursor-pointer': canZoomIn(), 'bg-yellow-100': highlighted}"
@@ -184,3 +250,13 @@ function focusOnPropertyLabel(): void {
 </template>
 
 <style scoped></style>
+<style scoped>
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+</style>
