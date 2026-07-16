@@ -6,7 +6,7 @@ import {
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
-import {type Ref, ref , watch} from 'vue';
+import {type Ref, ref, watch} from 'vue';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
