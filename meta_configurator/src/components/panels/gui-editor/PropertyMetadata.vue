@@ -200,8 +200,17 @@ function focusOnPropertyLabel(): void {
     @dragstart="onDragStart"
     @dragover="onDragOver"
     @drop="onDrop">
-    <span v-if="isArrayItem" class="drag-handle mr-2 cursor-grab" title="Drag to reorder" aria-hidden="true">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <span
+      v-if="isArrayItem"
+      class="drag-handle mr-2 cursor-grab"
+      title="Drag to reorder"
+      aria-hidden="true">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg">
         <circle cx="4" cy="3" r="1" fill="#9CA3AF" />
         <circle cx="4" cy="8" r="1" fill="#9CA3AF" />
         <circle cx="4" cy="13" r="1" fill="#9CA3AF" />
