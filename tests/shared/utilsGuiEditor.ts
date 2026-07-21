@@ -77,6 +77,34 @@ export async function addArrayItem(page: Page, propertyPath: Path) {
     await addButton.click();
 }
 
+/**
+ * Reorders an array item by dragging it onto another item's row, dropping above ('before') or
+ * below ('after') that row depending on `position`. Dispatches HTML5 drag events with a shared
+ * DataTransfer, since Playwright's synthetic mouse movements do not trigger native drag-and-drop.
+ */
+export async function reorderArrayItemByDragAndDrop(page: Page, fromPath: Path, toPath: Path, position: 'before' | 'after' = 'before') {
+    const source = page.getByTestId(`property-metadata-${pathToString(fromPath)}`);
+    const target = page.getByTestId(`property-metadata-${pathToString(toPath)}`);
+    const box = (await target.boundingBox())!;
+    const clientX = box.x + box.width / 2;
+    const clientY = box.y + box.height * (position === 'after' ? 0.75 : 0.25);
+    const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
+    await source.dispatchEvent('dragstart', { dataTransfer });
+    await target.dispatchEvent('dragover', { dataTransfer, clientX, clientY });
+    await target.dispatchEvent('drop', { dataTransfer, clientX, clientY });
+    await source.dispatchEvent('dragend', { dataTransfer });
+}
+
+/**
+ * Reorders an array item via the keyboard: focuses the item's field and presses Alt+ArrowUp /
+ * Alt+ArrowDown (Option+Arrow on Mac) to move it by one slot.
+ */
+export async function reorderArrayItemByKeyboard(page: Page, itemPath: Path, direction: 'up' | 'down') {
+    const field = page.getByTestId(`property-data-${pathToString(itemPath)}`).getByRole('textbox');
+    await field.click();
+    await field.press(direction === 'up' ? 'Alt+ArrowUp' : 'Alt+ArrowDown');
+}
+
 export async function checkPropertySchemaViolation(page: Page, propertyPath: Path, shouldBeVisible: boolean) {
     const pathAsString = pathToString(propertyPath);
     const propertyMetadata = page.getByTestId(`property-metadata-${pathAsString}`);
@@ -93,7 +121,9 @@ export async function checkPropertyRequired(page: Page, propertyPath: Path, shou
     const pathAsString = pathToString(propertyPath);
     const requiredIcon = page.getByTestId(`property-metadata-${pathAsString}`).getByTestId("required-star");
     if (shouldBeVisible) {
-        await expect(requiredIcon).toBeVisible();
+        // generous timeout: this is often the first assertion after a schema loads, so it also
+        // waits out the async schema load and tree render
+        await expect(requiredIcon).toBeVisible({timeout: 15000});
     } else {
         await expect(requiredIcon).not.toBeVisible();
     }
