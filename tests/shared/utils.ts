@@ -81,6 +81,10 @@ export async function selectInitialSchemaFromExamples(page: Page, schemaName: st
 
     // Select the schema from the example schema options
     await page.getByRole('option', { name: schemaName }).click();
+
+    // Wait for the selection UI to dismiss so callers don't race the (async) schema load
+    // and the subsequent GUI render.
+    await expect(page.getByRole('option', { name: schemaName })).not.toBeVisible();
 }
 
 export async function getCurrentDataFormat(page: Page): Promise<string> {
