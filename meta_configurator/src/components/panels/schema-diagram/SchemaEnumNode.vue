@@ -6,7 +6,7 @@ import {
 import type {Path} from '@/utility/path';
 import {Handle, Position} from '@vue-flow/core';
 import {useSettings} from '@/settings/useSettings';
-import {type Ref, ref} from 'vue';
+import {type Ref, ref, watch} from 'vue';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -22,7 +22,15 @@ const props = defineProps<{
 }>();
 
 const settings = useSettings();
-const enumValues: Ref<string[]> = ref(props.data.values.slice());
+const enumValues: Ref<string[]> = ref([...props.data.values]);
+
+watch(
+  () => props.data.values,
+  newValues => {
+    enumValues.value = [...newValues];
+  },
+  {deep: true}
+);
 
 const emit = defineEmits<{
   (e: 'select_element', path: Path): void;
