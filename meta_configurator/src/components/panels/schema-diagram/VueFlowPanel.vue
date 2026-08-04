@@ -293,11 +293,9 @@ function updateData(absolutePath: Path, newValue: any) {
 }
 
 function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, newName: string) {
-  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
-  // that a new node was added (because different name) and then rebuild whole graph.
-  objectData.name = newName;
+  if (oldName === newName) return;
 
-  objectData.absolutePath = replacePropertyNameUtils(
+  const newPath = replacePropertyNameUtils(
     objectData.absolutePath,
     oldName,
     newName,
@@ -306,9 +304,11 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
     updateData
   );
 
-  selectElement(objectData.absolutePath);
-
-  // TODO: when renaming happens, also force update in the GUI
+  if (pathToJsonPointer(newPath) !== pathToJsonPointer(objectData.absolutePath)) {
+    objectData.name = newName;
+    objectData.absolutePath = newPath;
+    selectElement(objectData.absolutePath);
+  }
 }
 
 function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNodeData) {
@@ -327,11 +327,9 @@ function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNod
 }
 
 function updateAttributeName(attributeData: SchemaNodeData, oldName: string, newName: string) {
-  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
-  // that a new node was added (because different name) and then rebuild whole graph.
-  attributeData.name = newName;
+  if (oldName === newName) return;
 
-  attributeData.absolutePath = replacePropertyNameUtils(
+  const newPath = replacePropertyNameUtils(
     attributeData.absolutePath,
     oldName,
     newName,
@@ -340,9 +338,11 @@ function updateAttributeName(attributeData: SchemaNodeData, oldName: string, new
     updateData
   );
 
-  selectElement(attributeData.absolutePath);
-
-  // TODO: when renaming happens, also force update in the GUI
+  if (pathToJsonPointer(newPath) !== pathToJsonPointer(attributeData.absolutePath)) {
+    attributeData.name = newName;
+    attributeData.absolutePath = newPath;
+    selectElement(attributeData.absolutePath);
+  }
 }
 
 function updateAttributeRequired(attributeData: SchemaObjectAttributeData, required: boolean) {

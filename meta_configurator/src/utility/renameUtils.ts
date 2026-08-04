@@ -4,6 +4,33 @@ import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pathUtils';
 import {removeFromRequiredArray} from '@/utility/requiredUtils';
 import {SessionMode} from '@/store/sessionMode';
+import {confirmationService} from '@/utility/confirmationService';
+
+const RENAME_CONFLICT_ACTION = {
+  CANCEL: 'cancel',
+  OVERWRITE: 'overwrite',
+  KEEP_DATA_UNCHANGED: 'keep-data-unchanged',
+} as const;
+
+let isPromptingForConflict = false;
+
+function shouldPromptForRenameConflict(
+  currentData: any,
+  parentPath: Path,
+  oldName: string,
+  newName: string
+): boolean {
+  if (oldName === newName) {
+    return false;
+  }
+
+  const parentData = dataAt(parentPath, currentData);
+  if (!parentData || typeof parentData !== 'object' || Array.isArray(parentData)) {
+    return false;
+  }
+
+  return Object.prototype.hasOwnProperty.call(parentData, newName);
+}
 
 export function replacePropertyNameUtils(
   // relative or absolute path (depending on the provided data) to the property to rename
@@ -15,16 +42,87 @@ export function replacePropertyNameUtils(
   updateDataFct: (subPath: Path, newValue: any) => void
 ) {
   const parentPath = path.slice(0, -1);
+  if (shouldPromptForRenameConflict(currentData, parentPath, oldName, newName)) {
+    if (isPromptingForConflict) {
+      return path;
+    }
+
+    isPromptingForConflict = true;
+
+    confirmationService.require({
+      message: `The data already contains a field named "${newName}" at this location. Renaming would overwrite it. Choose how to proceed.`,
+      header: 'Rename conflict',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Proceed and overwrite data',
+      rejectLabel: 'Proceed but keep existing data',
+      accept: () => {
+        isPromptingForConflict = false;
+        applyRenameToData(
+          parentPath,
+          oldName,
+          newName,
+          currentData,
+          currentSchema,
+          updateDataFct,
+          RENAME_CONFLICT_ACTION.OVERWRITE
+        );
+      },
+      reject: () => {
+        isPromptingForConflict = false;
+        applyRenameToData(
+          parentPath,
+          oldName,
+          newName,
+          currentData,
+          currentSchema,
+          updateDataFct,
+          RENAME_CONFLICT_ACTION.KEEP_DATA_UNCHANGED
+        );
+      },
+      onHide: () => {
+        isPromptingForConflict = false;
+      },
+    });
+
+    return path;
+  }
+
+  applyRenameToData(
+    parentPath,
+    oldName,
+    newName,
+    currentData,
+    currentSchema,
+    updateDataFct,
+    RENAME_CONFLICT_ACTION.OVERWRITE
+  );
+
+  return parentPath.concat([newName]);
+}
+function applyRenameToData(
+  parentPath: Path,
+  oldName: string,
+  newName: string,
+  currentData: any,
+  currentSchema: JsonSchemaWrapper,
+  updateDataFct: (subPath: Path, newValue: any) => void,
+  action: typeof RENAME_CONFLICT_ACTION[keyof typeof RENAME_CONFLICT_ACTION] = RENAME_CONFLICT_ACTION.OVERWRITE
+) {
   let dataAtParentPath = dataAt(parentPath, currentData) ?? {};
-  // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
   dataAtParentPath = structuredClone(dataAtParentPath);
-  dataAtParentPath = updateKeyName(dataAtParentPath, oldName, newName);
+
+  if (action === RENAME_CONFLICT_ACTION.KEEP_DATA_UNCHANGED) {
+    // Option C: Keep existing target property data ("name") untouched
+  } else {
+    // Option B: Overwrite target key with old key's value
+    dataAtParentPath = updateKeyName(dataAtParentPath, oldName, newName);
+  }
 
   if (dataAt([newName], dataAtParentPath) === undefined) {
     dataAtParentPath[newName] = initializeNewProperty(parentPath, newName, currentSchema);
   }
 
-  updateDataFct(parentPath, dataAtParentPath);
+  updateDataFct(parentPath, { ...dataAtParentPath });
   updateReferences(
     parentPath.concat([oldName]),
     parentPath.concat([newName]),
@@ -32,13 +130,10 @@ export function replacePropertyNameUtils(
     updateDataFct
   );
 
-  if (currentSchema.mode == SessionMode.SchemaEditor) {
+  if (currentSchema.mode === SessionMode.SchemaEditor) {
     updateParentRequiredPropsValue(currentData, parentPath, oldName, newName, updateDataFct);
   }
-
-  return parentPath.concat([newName]);
 }
-
 function updateKeyName(object: any, oldKey: string, newKey: string): any {
   let modifiedObj: any = {};
 
