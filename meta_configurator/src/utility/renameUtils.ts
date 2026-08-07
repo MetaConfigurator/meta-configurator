@@ -1,7 +1,11 @@
 import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pathUtils';
+import {
+  findSchemaPathForDataPath,
+  getParentElementRequiredPropsPath,
+  pathToJsonPointer,
+} from '@/utility/pathUtils';
 import {removeFromRequiredArray} from '@/utility/requiredUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {confirmationService} from '@/utility/confirmationService';
@@ -32,6 +36,81 @@ function shouldPromptForRenameConflict(
   return Object.prototype.hasOwnProperty.call(parentData, newName);
 }
 
+// Walks the INSTANCE DATA (not the schema) and collects every data path whose governing schema matches schemaObjectPath.
+export function findDataPathsUsingSchema(
+  schemaObjectPath: Path,
+  data: any,
+  schemaRoot: any,
+  currentPath: Path = []
+): Path[] {
+  const result: Path[] = [];
+
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    const governingSchemaPath = findSchemaPathForDataPath(currentPath, schemaRoot);
+    const isMatch =
+      governingSchemaPath &&
+      pathToJsonPointer(governingSchemaPath) === pathToJsonPointer(schemaObjectPath);
+    if (isMatch) {
+      console.log(
+        'match at',
+        pathToJsonPointer(currentPath),
+        'governed by',
+        pathToJsonPointer(governingSchemaPath!)
+      );
+      result.push(currentPath);
+    }
+  }
+
+  if (data && typeof data === 'object') {
+    for (const key of Object.keys(data)) {
+      result.push(
+        ...findDataPathsUsingSchema(
+          schemaObjectPath,
+          data[key],
+          schemaRoot,
+          currentPath.concat([key])
+        )
+      );
+    }
+  }
+
+  return result;
+}
+
+// Applies the rename decision (overwrite / keep-unchanged) to every affected data
+
+function syncPropertyRenameToInstanceData(
+ schemaObjectPath: Path,
+  oldName: string,
+  newName: string,
+  action: typeof RENAME_CONFLICT_ACTION[keyof typeof RENAME_CONFLICT_ACTION],
+  schemaRoot: any,
+  instanceData: any,
+  updateInstanceDataFct: (subPath: Path, newValue: any) => void
+) {
+  const affectedDataPaths = findDataPathsUsingSchema(schemaObjectPath, instanceData, schemaRoot);
+  console.log(pathToJsonPointer(schemaObjectPath),
+              '-> affected:', affectedDataPaths.map(pathToJsonPointer));
+
+  for (const dataPath of affectedDataPaths) {
+    const obj = dataAt(dataPath, instanceData);
+    if (!obj || typeof obj !== 'object' || !Object.prototype.hasOwnProperty.call(obj, oldName)) {
+      continue;
+    }
+
+    let updated;
+    if (action === RENAME_CONFLICT_ACTION.KEEP_DATA_UNCHANGED) {
+      updated = structuredClone(obj);
+      delete updated[oldName];
+    } else {
+      updated = updateKeyName(structuredClone(obj), oldName, newName);
+    }
+
+    console.log(action, 'at', pathToJsonPointer(dataPath));
+    updateInstanceDataFct(dataPath, updated);
+  }
+}
+
 export function replacePropertyNameUtils(
   // relative or absolute path (depending on the provided data) to the property to rename
   path: Path,
@@ -39,7 +118,9 @@ export function replacePropertyNameUtils(
   newName: string,
   currentData: any,
   currentSchema: JsonSchemaWrapper,
-  updateDataFct: (subPath: Path, newValue: any) => void
+  updateDataFct: (subPath: Path, newValue: any) => void,
+  instanceData?: any,
+  updateInstanceDataFct?: (subPath: Path, newValue: any) => void
 ) {
   const parentPath = path.slice(0, -1);
   if (shouldPromptForRenameConflict(currentData, parentPath, oldName, newName)) {
@@ -64,7 +145,9 @@ export function replacePropertyNameUtils(
           currentData,
           currentSchema,
           updateDataFct,
-          RENAME_CONFLICT_ACTION.OVERWRITE
+          RENAME_CONFLICT_ACTION.OVERWRITE,
+          instanceData,
+          updateInstanceDataFct
         );
       },
       reject: () => {
@@ -76,7 +159,9 @@ export function replacePropertyNameUtils(
           currentData,
           currentSchema,
           updateDataFct,
-          RENAME_CONFLICT_ACTION.KEEP_DATA_UNCHANGED
+          RENAME_CONFLICT_ACTION.KEEP_DATA_UNCHANGED,
+          instanceData,
+          updateInstanceDataFct
         );
       },
       onHide: () => {
@@ -94,7 +179,9 @@ export function replacePropertyNameUtils(
     currentData,
     currentSchema,
     updateDataFct,
-    RENAME_CONFLICT_ACTION.OVERWRITE
+    RENAME_CONFLICT_ACTION.OVERWRITE,
+    instanceData,
+    updateInstanceDataFct
   );
 
   return parentPath.concat([newName]);
@@ -106,13 +193,16 @@ function applyRenameToData(
   currentData: any,
   currentSchema: JsonSchemaWrapper,
   updateDataFct: (subPath: Path, newValue: any) => void,
-  action: typeof RENAME_CONFLICT_ACTION[keyof typeof RENAME_CONFLICT_ACTION] = RENAME_CONFLICT_ACTION.OVERWRITE
+  action: (typeof RENAME_CONFLICT_ACTION)[keyof typeof RENAME_CONFLICT_ACTION] = RENAME_CONFLICT_ACTION.OVERWRITE,
+  instanceData?: any,
+  updateInstanceDataFct?: (subPath: Path, newValue: any) => void
 ) {
   let dataAtParentPath = dataAt(parentPath, currentData) ?? {};
   dataAtParentPath = structuredClone(dataAtParentPath);
 
   if (action === RENAME_CONFLICT_ACTION.KEEP_DATA_UNCHANGED) {
-    // Option C: Keep existing target property data ("name") untouched
+    // Option C: drop the old key,Keep existing target property data ("name") untouched
+    delete dataAtParentPath[oldName];
   } else {
     // Option B: Overwrite target key with old key's value
     dataAtParentPath = updateKeyName(dataAtParentPath, oldName, newName);
@@ -122,7 +212,7 @@ function applyRenameToData(
     dataAtParentPath[newName] = initializeNewProperty(parentPath, newName, currentSchema);
   }
 
-  updateDataFct(parentPath, { ...dataAtParentPath });
+  updateDataFct(parentPath, {...dataAtParentPath});
   updateReferences(
     parentPath.concat([oldName]),
     parentPath.concat([newName]),
@@ -133,13 +223,33 @@ function applyRenameToData(
   if (currentSchema.mode === SessionMode.SchemaEditor) {
     updateParentRequiredPropsValue(currentData, parentPath, oldName, newName, updateDataFct);
   }
+  if (instanceData !== undefined && updateInstanceDataFct !== undefined) {
+    const schemaObjectPath =
+      parentPath[parentPath.length - 1] === 'properties' ? parentPath.slice(0, -1) : parentPath;
+    syncPropertyRenameToInstanceData(
+      schemaObjectPath,
+      oldName,
+      newName,
+      action,
+      currentData,
+      instanceData,
+      updateInstanceDataFct
+    );
+  }
 }
+
+// Rebuilds object with oldKey replaced by newKey. Rewritten (not renamed in-place while  iterating) because the old version could get overwritten if newKey already existed
+// later in the same object's key order.
 function updateKeyName(object: any, oldKey: string, newKey: string): any {
   let modifiedObj: any = {};
 
-  for (let [k, v] of Object.entries(object))
-    if (k === oldKey) modifiedObj[newKey] = v;
-    else modifiedObj[k] = v;
+  const oldValue = object[oldKey];
+
+  for (const [k, v] of Object.entries(object)) {
+    if (k === oldKey) continue;
+    modifiedObj[k] = v;
+  }
+  modifiedObj[newKey] = oldValue; // always wins, regardless of original key order
 
   return modifiedObj;
 }
