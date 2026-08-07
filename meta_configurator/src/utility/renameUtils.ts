@@ -80,17 +80,20 @@ export function findDataPathsUsingSchema(
 // Applies the rename decision (overwrite / keep-unchanged) to every affected data
 
 function syncPropertyRenameToInstanceData(
- schemaObjectPath: Path,
+  schemaObjectPath: Path,
   oldName: string,
   newName: string,
-  action: typeof RENAME_CONFLICT_ACTION[keyof typeof RENAME_CONFLICT_ACTION],
+  action: (typeof RENAME_CONFLICT_ACTION)[keyof typeof RENAME_CONFLICT_ACTION],
   schemaRoot: any,
   instanceData: any,
   updateInstanceDataFct: (subPath: Path, newValue: any) => void
 ) {
   const affectedDataPaths = findDataPathsUsingSchema(schemaObjectPath, instanceData, schemaRoot);
-  console.log(pathToJsonPointer(schemaObjectPath),
-              '-> affected:', affectedDataPaths.map(pathToJsonPointer));
+  console.log(
+    pathToJsonPointer(schemaObjectPath),
+    '-> affected:',
+    affectedDataPaths.map(pathToJsonPointer)
+  );
 
   for (const dataPath of affectedDataPaths) {
     const obj = dataAt(dataPath, instanceData);

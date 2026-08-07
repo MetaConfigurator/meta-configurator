@@ -145,9 +145,8 @@ export function findSchemaPathForDataPath(dataPath: Path, schemaRoot: any): Path
   let schemaPath: Path = resolveRef([], schemaRoot);
 
   for (const el of dataPath) {
-    schemaPath = typeof el === 'number'
-      ? schemaPath.concat(['items'])
-      : schemaPath.concat(['properties', el]);
+    schemaPath =
+      typeof el === 'number' ? schemaPath.concat(['items']) : schemaPath.concat(['properties', el]);
 
     if (dataAt(schemaPath, schemaRoot) === undefined) return undefined;
     schemaPath = resolveRef(schemaPath, schemaRoot);
