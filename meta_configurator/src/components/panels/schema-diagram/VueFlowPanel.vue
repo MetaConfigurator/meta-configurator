@@ -307,8 +307,6 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
     schemaData.data.value,
     schemaSchema.schemaWrapper.value,
     updateData,
-    instanceData.data.value, // NEW
-    (path, newValue) => instanceData.setDataAt(path, newValue) // NEW
   );
 
   if (pathToJsonPointer(newPath) !== pathToJsonPointer(objectData.absolutePath)) {
@@ -335,6 +333,12 @@ function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNod
 
 function updateAttributeName(attributeData: SchemaNodeData, oldName: string, newName: string) {
   if (oldName === newName) return;
+
+   const parentPath = attributeData.absolutePath.slice(0, -1);
+  const parentSchemaData = schemaData.dataAt(parentPath);
+  if (!parentSchemaData || !Object.prototype.hasOwnProperty.call(parentSchemaData, oldName)) {
+    return;
+  }
   // pass instanceData + writer so the property rename also syncs into the data.
   const newPath = replacePropertyNameUtils(
     attributeData.absolutePath,
