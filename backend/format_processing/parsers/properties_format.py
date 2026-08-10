@@ -7,17 +7,17 @@ from parsers.key_value_utils import strip_wrapping_quotes
 
 
 def parse_data(content: str) -> Optional[ParserAttempt]:
-    if re.search(r'^\s*\[.+\]\s*$', content, flags=re.MULTILINE):
+    if re.search(r"^\s*\[.+\]\s*$", content, flags=re.MULTILINE):
         return None
 
     parsed: Dict[str, str] = {}
     assignment_count = 0
     for raw_line in content.splitlines():
         line = raw_line.strip()
-        if not line or line.startswith('#') or line.startswith('!'):
+        if not line or line.startswith("#") or line.startswith("!"):
             continue
 
-        match = re.match(r'^([^:=\s][^:=]*)\s*([:=])\s*(.*)$', line)
+        match = re.match(r"^([^:=\s][^:=]*)\s*([:=])\s*(.*)$", line)
         if not match:
             return None
 
@@ -30,8 +30,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
         return None
 
     return ParserAttempt(
-        format='properties',
+        format="properties",
         parsed_json=parsed,
-        parser_name='properties-text-parser',
+        parser_name="properties-text-parser",
     )
-

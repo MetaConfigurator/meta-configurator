@@ -15,8 +15,9 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
         return None
 
     has_toml_signals = (
-        re.search(r'^\s*\[.+\]\s*$', content, flags=re.MULTILINE) is not None
-        or re.search(r'^\s*[A-Za-z0-9_\-\.]+\s*=\s*.+$', content, flags=re.MULTILINE) is not None
+        re.search(r"^\s*\[.+\]\s*$", content, flags=re.MULTILINE) is not None
+        or re.search(r"^\s*[A-Za-z0-9_\-\.]+\s*=\s*.+$", content, flags=re.MULTILINE)
+        is not None
     )
     if not has_toml_signals:
         return None
@@ -30,8 +31,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
         return None
 
     return ParserAttempt(
-        format='toml',
+        format="toml",
         parsed_json=parsed,
-        parser_name='python-tomllib',
+        parser_name="python-tomllib",
     )
-

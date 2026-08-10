@@ -6,7 +6,7 @@ from parsers.common_preprocess import preprocess_data_for_ai
 
 
 def parse_data(content: str) -> Optional[ParserAttempt]:
-    if '<' in content[:200] and '>' in content[:200]:
+    if "<" in content[:200] and ">" in content[:200]:
         return None
 
     parser = ConfigParser(interpolation=None)
@@ -23,8 +23,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
         for section in parser.sections()
     }
     return ParserAttempt(
-        format='ini',
+        format="ini",
         parsed_json=data,
-        parser_name='python-configparser',
+        parser_name="python-configparser",
     )
-

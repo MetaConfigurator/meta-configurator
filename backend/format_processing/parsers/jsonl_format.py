@@ -22,8 +22,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
         return None
 
     return ParserAttempt(
-        format='jsonl',
+        format="jsonl",
         parsed_json=parsed_rows,
-        parser_name='python-json-lines',
+        parser_name="python-json-lines",
     )
-

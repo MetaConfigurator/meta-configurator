@@ -1,3 +1,1 @@
 """Format processing service package."""
-
-

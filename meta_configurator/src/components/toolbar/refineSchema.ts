@@ -6,23 +6,11 @@ import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes'
 import {ValidationService} from '@/schema/validationService';
 import {toastService} from '@/utility/toastService';
 
-function getSelectedRefinementLabels(selection: RefineSchemaSelection): string[] {
-  return [
-    selection.sortSchemaPropertiesAlphabetically ? 'Sort Schema Properties Alphabetically' : undefined,
-    selection.addExamples ? 'Add Examples' : undefined,
-    selection.detectEnums ? 'Detect Enums' : undefined,
-    selection.detectAdditionalProperties ? 'Detect Additional Properties' : undefined,
-    selection.extractSubSchemasIntoReferences
-      ? 'Extract Sub-schemas into References'
-      : undefined,
-  ].filter((label): label is string => label !== undefined);
-}
-
-function buildRefinedSchemaCandidate(_selection: RefineSchemaSelection): TopLevelSchema | null {
+function buildRefinedSchemaCandidate(selection: RefineSchemaSelection): TopLevelSchema {
   const currentSchema = getDataForMode(SessionMode.SchemaEditor).data.value as TopLevelSchema;
   const currentData = getDataForMode(SessionMode.DataEditor).data.value;
 
-  return runSchemaRefinement(currentSchema, currentData, _selection);
+  return runSchemaRefinement(currentSchema, currentData, selection);
 }
 
 function formatValidationErrors(errors: {instancePath?: string; message?: string}[]): string {
@@ -77,19 +65,5 @@ function tryCommitRefinedSchema(candidateSchema: TopLevelSchema): boolean {
 
 export function applySchemaRefinements(selection: RefineSchemaSelection): boolean {
   const refinedSchemaCandidate = buildRefinedSchemaCandidate(selection);
-
-  if (refinedSchemaCandidate === null) {
-    const selectedRefinements = getSelectedRefinementLabels(selection);
-    toastService.add({
-      severity: 'warn',
-      summary: 'Not implemented yet',
-      detail: `Refine Schema is already wired to run directly. The execution logic for ${selectedRefinements.join(
-        ', '
-      )} still needs to be implemented.`,
-      life: 5000,
-    });
-    return false;
-  }
-
   return tryCommitRefinedSchema(refinedSchemaCandidate);
 }

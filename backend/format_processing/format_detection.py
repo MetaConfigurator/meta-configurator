@@ -11,5 +11,4 @@ from detection_service import detect_format_and_parse
 from format_detection_core import gemmi, xmltodict, yaml
 from models import DetectionResult
 
-__all__ = ['DetectionResult', 'detect_format_and_parse', 'gemmi', 'xmltodict', 'yaml']
-
+__all__ = ["DetectionResult", "detect_format_and_parse", "gemmi", "xmltodict", "yaml"]

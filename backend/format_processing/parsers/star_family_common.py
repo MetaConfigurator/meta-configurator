@@ -8,11 +8,11 @@ from format_detection_core import gemmi
 
 _CIF_TAG_PATTERNS = [
     re.compile(
-        r'^\s*_(?:audit|atom_site|cell|chemical|database|diffrn|entity|exptl|publ|refine|space_group|struct|symmetry)[_.]',
+        r"^\s*_(?:audit|atom_site|cell|chemical|database|diffrn|entity|exptl|publ|refine|space_group|struct|symmetry)[_.]",
         re.MULTILINE,
     ),
     re.compile(
-        r'^\s*_(?:audit|atom_site|cell|chemical|database|diffrn|entity|exptl|publ|refine|space_group|struct|symmetry)_',
+        r"^\s*_(?:audit|atom_site|cell|chemical|database|diffrn|entity|exptl|publ|refine|space_group|struct|symmetry)_",
         re.MULTILINE,
     ),
 ]
@@ -23,26 +23,26 @@ def normalize_star_family_input(content: str) -> str:
     normalized_lines: List[str] = []
 
     def quote_if_needed(token: str) -> str:
-        if token in {'?', '.'}:
+        if token in {"?", "."}:
             return token
-        if token == '':
+        if token == "":
             return "''"
         if re.search(r"\s", token):
             return "'" + token.replace("'", "\\'") + "'"
         return token
 
     def split_loop_row_with_tab_support(raw: str) -> List[str]:
-        if '\t' not in raw:
+        if "\t" not in raw:
             try:
                 return shlex.split(raw, posix=True)
             except Exception:
                 return raw.split()
 
         tokens: List[str] = []
-        for segment in raw.split('\t'):
+        for segment in raw.split("\t"):
             stripped = segment.strip()
-            if stripped == '':
-                tokens.append('')
+            if stripped == "":
+                tokens.append("")
                 continue
             try:
                 segment_tokens = shlex.split(stripped, posix=True)
@@ -50,7 +50,7 @@ def normalize_star_family_input(content: str) -> str:
                 segment_tokens = stripped.split()
 
             if len(segment_tokens) == 0:
-                tokens.append('')
+                tokens.append("")
             else:
                 tokens.extend(segment_tokens)
         return tokens
@@ -59,40 +59,42 @@ def normalize_star_family_input(content: str) -> str:
         tokens = split_loop_row_with_tab_support(raw)
         if len(tokens) > column_count:
             head = tokens[: column_count - 1]
-            tail = ' '.join(tokens[column_count - 1 :])
+            tail = " ".join(tokens[column_count - 1 :])
             tokens = [*head, tail]
 
         if len(tokens) != column_count:
             return raw
 
-        return ' '.join(quote_if_needed(token) for token in tokens)
+        return " ".join(quote_if_needed(token) for token in tokens)
 
     i = 0
     while i < len(source_lines):
         raw_line = source_lines[i]
         stripped = raw_line.strip()
-        if stripped.startswith('data_'):
-            block_name = re.sub(r'\s+', '_', stripped[5:].strip())
-            normalized_lines.append(f'data_{block_name}')
+        if stripped.startswith("data_"):
+            block_name = re.sub(r"\s+", "_", stripped[5:].strip())
+            normalized_lines.append(f"data_{block_name}")
             i += 1
             continue
-        if stripped.startswith('_'):
+        if stripped.startswith("_"):
             parts = stripped.split(None, 1)
             if len(parts) == 1:
-                next_stripped = source_lines[i + 1].strip() if i + 1 < len(source_lines) else ''
-                if next_stripped != ';':
-                    normalized_lines.append(f'{parts[0]} ?')
+                next_stripped = (
+                    source_lines[i + 1].strip() if i + 1 < len(source_lines) else ""
+                )
+                if next_stripped != ";":
+                    normalized_lines.append(f"{parts[0]} ?")
                     i += 1
                     continue
-        if stripped == 'loop_':
-            normalized_lines.append('loop_')
+        if stripped == "loop_":
+            normalized_lines.append("loop_")
             i += 1
 
             loop_headers: List[str] = []
             while i < len(source_lines):
                 header_line = source_lines[i]
                 header_stripped = header_line.strip()
-                if header_stripped.startswith('_'):
+                if header_stripped.startswith("_"):
                     loop_headers.append(header_stripped)
                     normalized_lines.append(header_stripped)
                     i += 1
@@ -105,26 +107,28 @@ def normalize_star_family_input(content: str) -> str:
             while i < len(source_lines):
                 row_line = source_lines[i]
                 row_stripped = row_line.strip()
-                if row_stripped == '' or row_stripped.startswith('#'):
+                if row_stripped == "" or row_stripped.startswith("#"):
                     normalized_lines.append(row_line)
                     i += 1
                     continue
                 if (
-                    row_stripped.startswith('_')
-                    or row_stripped == 'loop_'
-                    or row_stripped.startswith('data_')
+                    row_stripped.startswith("_")
+                    or row_stripped == "loop_"
+                    or row_stripped.startswith("data_")
                 ):
                     break
-                if row_stripped == ';':
+                if row_stripped == ";":
                     break
 
-                normalized_lines.append(process_loop_row(row_stripped, len(loop_headers)))
+                normalized_lines.append(
+                    process_loop_row(row_stripped, len(loop_headers))
+                )
                 i += 1
             continue
         normalized_lines.append(raw_line)
         i += 1
 
-    return '\n'.join(normalized_lines)
+    return "\n".join(normalized_lines)
 
 
 def parse_star_document(content: str) -> Optional[Any]:
@@ -132,7 +136,7 @@ def parse_star_document(content: str) -> Optional[Any]:
         return None
 
     snippet = content[:2000]
-    if not ('data_' in snippet or 'loop_' in snippet or 'save_' in snippet):
+    if not ("data_" in snippet or "loop_" in snippet or "save_" in snippet):
         return None
 
     try:
@@ -149,11 +153,11 @@ def looks_like_cif(content: str) -> bool:
 
 def parse_star_family_document(content: str) -> Optional[tuple[Any, str]]:
     doc = parse_star_document(content)
-    parser_name = 'gemmi-star-family'
+    parser_name = "gemmi-star-family"
     if doc is None:
         normalized_content = normalize_star_family_input(content)
         doc = parse_star_document(normalized_content)
-        parser_name = 'gemmi-star-family (normalized)'
+        parser_name = "gemmi-star-family (normalized)"
     if doc is None or len(doc) == 0:
         return None
     return doc, parser_name
@@ -164,4 +168,3 @@ def document_to_gemmi_json(doc: Any) -> Optional[Dict[str, Any]]:
         return json.loads(doc.as_json(lowercase_names=False))
     except Exception:
         return None
-

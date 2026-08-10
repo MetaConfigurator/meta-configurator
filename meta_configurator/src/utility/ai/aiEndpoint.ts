@@ -340,8 +340,7 @@ export const queryJavascriptImportExpression = async (
   inputFileSubset: string,
   targetSchema: string | undefined,
   userComments: string,
-  allowSchemaInference: boolean,
-  dynamicImportInstruction: string
+  allowSchemaInference: boolean
 ) => {
   const hasSchema = typeof targetSchema === 'string' && targetSchema.trim().length > 0;
   const schemaInstruction = hasSchema
@@ -355,13 +354,8 @@ export const queryJavascriptImportExpression = async (
         targetSchema!,
       ].join('\n')
     : allowSchemaInference
-      ? 'No schema is provided. Infer a suitable JSON structure from the input format and content.'
-      : 'No schema is provided.';
-
-  const safeDynamicImportInstruction =
-    typeof dynamicImportInstruction === 'string' && dynamicImportInstruction.trim().length > 0
-      ? dynamicImportInstruction
-      : 'Use dynamic imports only if they materially improve robustness; otherwise avoid them.';
+    ? 'No schema is provided. Infer a suitable JSON structure from the input format and content.'
+    : 'No schema is provided.';
 
   const systemMessage = [
     'You are a JavaScript data import expert.',
@@ -388,8 +382,7 @@ export const queryJavascriptImportExpression = async (
     'When parsing "key: value" lines, split only on the first ":".',
     'Only coerce to numbers when clearly numeric; otherwise keep strings or use null.',
     'Treat date/time-like values as strings unless the schema clearly requires something else.',
-    'JavaScript imports are allowed when useful. Prefer await importModule("package-or-url"); top-level static imports are also allowed if clearly needed.',
-    safeDynamicImportInstruction,
+    'Do not use imports, require, network APIs, browser storage, DOM APIs, eval, Function, or constructor-based dynamic code.',
   ].join('\n');
 
   const userMessageParts = [

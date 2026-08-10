@@ -27,6 +27,7 @@ import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {getApiKeyRef} from '@/utility/ai/apiKey';
+import {canQueryAi} from '@/utility/ai/aiAvailability';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {toastService} from '@/utility/toastService';
 import {
@@ -79,12 +80,13 @@ const lastFailedConfig = ref('');
 const selectedMappingMethod = ref<MappingMethod>('source-data');
 const selectedMappingLanguage = ref<MappingGenerationLanguage>('jsonata');
 const refinementOptions = ref<SchemaRefinementOptionsController | null>(null);
+let validationRunId = 0;
 
 const apiKey = getApiKeyRef();
 const settings = useSettings();
 const dataEditorLink = getDataForMode(SessionMode.DataEditor);
 const schemaEditorLink = getDataForMode(SessionMode.SchemaEditor);
-const hasApiKey = computed(() => apiKey.value.trim().length > 0);
+const canUseAi = computed(() => canQueryAi(apiKey.value));
 const usesMappingFunction = computed(() => selectedMappingMethod.value !== 'direct-ai');
 const usesInferredSourceSchema = computed(
   () => selectedMappingMethod.value === 'inferred-source-schema'
@@ -119,7 +121,7 @@ const mappingLanguageWarning = computed(() => {
 
   return selectedMappingLanguage.value === 'jsonata'
     ? 'The JSONata mapping service is expressive and flexible, but may generate invalid mappings for complex inputs that have to be corrected manually.'
-    : 'JavaScript mappings execute code. Only use this mode with trusted inputs or sandboxed execution.';
+    : 'JavaScript mappings run in an isolated worker. Network access, imports, browser storage, DOM access, dynamic code, and long-running execution are blocked.';
 });
 const suggestionButtonLabel = computed(() =>
   hasValidationErrorForSuggestion.value && shouldUseRetryContext()
@@ -128,8 +130,8 @@ const suggestionButtonLabel = computed(() =>
 );
 const apiKeyMessage = computed(() =>
   usesMappingFunction.value
-    ? 'AI-generated mapping suggestions are disabled until an LLM API key is configured. You can still write or edit a mapping manually and run it.'
-    : 'Direct AI mapping is disabled until an LLM API key is configured.'
+    ? 'AI-generated mapping suggestions are disabled until an AI endpoint or relay is configured. You can still write or edit a mapping manually and run it.'
+    : 'Direct AI mapping is disabled until an AI endpoint or relay is configured.'
 );
 
 watch(result, newValue => {
@@ -224,7 +226,6 @@ function saveSuggestionRetryContext(validationError: string, failedConfig: strin
 function initializeEditor() {
   const container = document.getElementById(editorId);
   if (!container) {
-    console.log('Unable to initialize editor because element is not found.');
     return;
   }
 
@@ -262,7 +263,8 @@ function updateEditorMode() {
   }
 }
 
-function validateConfig(config: string, currentInput: unknown) {
+async function validateConfig(config: string, currentInput: unknown) {
+  const currentValidationRunId = ++validationRunId;
   if (!usesMappingFunction.value) {
     resultIsValid.value = false;
     return;
@@ -275,7 +277,13 @@ function validateConfig(config: string, currentInput: unknown) {
     return;
   }
 
-  const validationResult = mappingService.value.validateMappingConfig(trimmedConfig, currentInput);
+  const validationResult = await mappingService.value.validateMappingConfig(
+    trimmedConfig,
+    currentInput
+  );
+  if (currentValidationRunId !== validationRunId) {
+    return;
+  }
   if (!validationResult.success) {
     errorMessage.value = validationResult.message;
     statusMessage.value = '';
@@ -293,7 +301,7 @@ function revalidateCurrentEditorContent() {
   }
 
   const editorContent = editor.value.getValue() ?? '';
-  validateConfig(editorContent, preparedInput.value);
+  void validateConfig(editorContent, preparedInput.value);
 }
 
 function buildSelection(): RefineSchemaSelection | null {
@@ -315,10 +323,10 @@ async function generateMappingSuggestion() {
   if (!usesMappingFunction.value) {
     return;
   }
-  if (!hasApiKey.value) {
+  if (!canUseAi.value) {
     statusMessage.value = '';
     errorMessage.value =
-      'AI-generated mapping suggestions are disabled until an API key is configured.';
+      'AI-generated mapping suggestions are disabled until AI access is configured.';
     return;
   }
   if (!hasCurrentData.value) {
@@ -374,7 +382,7 @@ async function generateMappingSuggestion() {
       errorMessage.value = response.message;
     }
 
-    validateConfig(response.config, preparedInput.value);
+    await validateConfig(response.config, preparedInput.value);
   } catch (error) {
     useErrorService().onError(error);
   } finally {
@@ -412,9 +420,9 @@ function performMapping() {
 }
 
 async function executeDirectAiMapping() {
-  if (!hasApiKey.value) {
+  if (!canUseAi.value) {
     statusMessage.value = '';
-    errorMessage.value = 'Direct AI mapping is disabled until an API key is configured.';
+    errorMessage.value = 'Direct AI mapping is disabled until AI access is configured.';
     return;
   }
   if (!hasCurrentData.value) {
@@ -488,7 +496,7 @@ defineExpose({show: openDialog, close: hideDialog});
         <span v-html="mappingLanguageWarning"></span>
       </Message>
 
-      <Message v-if="!hasApiKey" severity="info" :closable="false">
+      <Message v-if="!canUseAi" severity="info" :closable="false">
         {{ apiKeyMessage }}
       </Message>
 
@@ -548,7 +556,7 @@ defineExpose({show: openDialog, close: hideDialog});
         @click="generateMappingSuggestion"
         class="w-full"
         :loading="isLoadingMapping"
-        :disabled="!hasApiKey || !hasCurrentData || !hasTargetSchema || isLoadingMapping" />
+        :disabled="!canUseAi || !hasCurrentData || !hasTargetSchema || isLoadingMapping" />
 
       <Button
         v-else
@@ -557,7 +565,7 @@ defineExpose({show: openDialog, close: hideDialog});
         @click="executeDirectAiMapping"
         class="w-full"
         :loading="isLoadingMapping"
-        :disabled="!hasApiKey || !hasCurrentData || !hasTargetSchema || isLoadingMapping" />
+        :disabled="!canUseAi || !hasCurrentData || !hasTargetSchema || isLoadingMapping" />
 
       <div v-show="usesMappingFunction" class="mapping-editor-section">
         <Divider />

@@ -12,7 +12,9 @@ import {
   type FormatProcessingDetectionResult,
 } from '@/utility/backend/formatProcessingApi';
 import {makeJsonCompatible} from '@/utility/jsonCompatible';
+import {canQueryAi} from '@/utility/ai/aiAvailability';
 import {generateJavascriptSchemaMappingSuggestion} from '@/data-mapping/javascript/generateJavascriptSchemaMappingSuggestion';
+import {executeSandboxedJavascriptTransform} from '@/utility/sandboxedJavascript';
 
 export type DataImportAiSchemaSource = 'infer_from_data' | 'use_current_schema';
 export type DataImportAiRetryContext = {
@@ -29,7 +31,6 @@ export type DataImportAiGenerationContext = {
   targetSchema?: TopLevelSchema;
   promptHints: {
     noSchemaInstruction: string;
-    dynamicImportInstruction: string;
     backendPromptInstruction: string;
     backendDisplayText: string;
   };
@@ -46,7 +47,6 @@ export type DataImportExecutionResult = {
 
 export class DataImportAiService {
   private readonly maxSubsetChars = 12000;
-  private readonly moduleCdnBaseUrl = 'https://esm.sh/';
 
   sanitizeInputDocument(input: string): string {
     return input;
@@ -86,8 +86,7 @@ export class DataImportAiService {
   ): Promise<{success: boolean; message: string}> {
     try {
       const sanitizedConfig = this.sanitizeGeneratedScript(config);
-      const transformFn = await this.compileTransformFunction(sanitizedConfig);
-      const rawResult = await Promise.resolve(transformFn(sampleInput));
+      const rawResult = await executeSandboxedJavascriptTransform(sanitizedConfig, sampleInput);
       this.normalizeResult(rawResult);
       return {success: true, message: 'Generated JavaScript is valid.'};
     } catch (e: any) {
@@ -149,8 +148,7 @@ export class DataImportAiService {
         inputSubset,
         targetSchemaStr,
         combinedUserComments,
-        context.schemaSource === 'infer_from_data',
-        context.promptHints.dynamicImportInstruction
+        context.schemaSource === 'infer_from_data'
       );
       const fixed = fixGeneratedExpression(responseStr, ['javascript', 'js']);
       return {
@@ -189,11 +187,11 @@ export class DataImportAiService {
       }
 
       const apiKey = getApiKey();
-      if (!apiKey || apiKey.trim().length === 0) {
+      if (!canQueryAi(apiKey)) {
         return {
           config: '',
           success: false,
-          message: 'Missing API key. Please set your API key first.',
+          message: 'AI access is not configured. Please configure an API endpoint or relay first.',
         };
       }
 
@@ -264,8 +262,7 @@ export class DataImportAiService {
   ): Promise<DataImportExecutionResult> {
     try {
       const sanitizedConfig = this.sanitizeGeneratedScript(config);
-      const transformFn = await this.compileTransformFunction(sanitizedConfig);
-      const rawResult = await Promise.resolve(transformFn(inputDocument));
+      const rawResult = await executeSandboxedJavascriptTransform(sanitizedConfig, inputDocument);
       return this.prepareImportResult(
         rawResult,
         schemaSource,
@@ -316,11 +313,11 @@ export class DataImportAiService {
   ): Promise<DataImportExecutionResult> {
     try {
       const apiKey = getApiKey();
-      if (!apiKey || apiKey.trim().length === 0) {
+      if (!canQueryAi(apiKey)) {
         return {
           resultData: {},
           success: false,
-          message: 'Missing API key. Please set your API key first.',
+          message: 'AI access is not configured. Please configure an API endpoint or relay first.',
         };
       }
 
@@ -391,9 +388,6 @@ export class DataImportAiService {
     const sanitizedInput = this.sanitizeInputDocument(inputDocument);
     const noSchemaInstruction =
       'If no schema is given, derive a suitable target structure from the uploaded data.';
-    const dynamicImportInstruction =
-      'When external libraries are needed, prefer library-based parsing via await importModule("package-or-url") inside transform. Bare package names are resolved via esm.sh.';
-
     if (schemaSource === 'use_current_schema') {
       if (!currentSchema || Object.keys(currentSchema).length === 0) {
         return {
@@ -414,7 +408,6 @@ export class DataImportAiService {
           targetSchema: cloneDeep(currentSchema),
           promptHints: {
             noSchemaInstruction,
-            dynamicImportInstruction,
             backendPromptInstruction: backendPromptHint,
             backendDisplayText,
           },
@@ -433,7 +426,6 @@ export class DataImportAiService {
         schemaSource,
         promptHints: {
           noSchemaInstruction,
-          dynamicImportInstruction,
           backendPromptInstruction: backendPromptHint,
           backendDisplayText,
         },
@@ -466,146 +458,6 @@ export class DataImportAiService {
       success: true,
       message: successMessage,
     };
-  }
-
-  private async compileTransformFunction(
-    code: string
-  ): Promise<(input: unknown) => unknown | Promise<unknown>> {
-    const importModule = this.importModule.bind(this);
-    const transformedCode = this.rewriteStaticImports(code);
-    const wrapper = `
-"use strict";
-${transformedCode}
-if (typeof importModule !== "function") {
-  throw new Error("Runtime helper importModule(specifier) is not available.");
-}
-if (typeof transform !== "function") {
-  throw new Error("Mapping must define a function: transform(input).");
-}
-return transform;
-`;
-    const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as new (
-      ...args: string[]
-    ) => (
-      importModule: (specifier: string) => Promise<unknown>
-    ) => Promise<(input: unknown) => unknown | Promise<unknown>>;
-    const factory = new AsyncFunction('importModule', wrapper) as (
-      importModule: (specifier: string) => Promise<unknown>
-    ) => Promise<(input: unknown) => unknown | Promise<unknown>>;
-    return factory(importModule);
-  }
-
-  private async importModule(specifier: string): Promise<unknown> {
-    const resolvedSpecifier = this.resolveModuleSpecifier(specifier);
-    return import(/* @vite-ignore */ resolvedSpecifier);
-  }
-
-  private resolveModuleSpecifier(specifier: string): string {
-    if (typeof specifier !== 'string') {
-      throw new Error('Module specifier must be a string.');
-    }
-
-    const normalizedSpecifier = specifier.trim();
-    if (normalizedSpecifier.length === 0) {
-      throw new Error('Module specifier must not be empty.');
-    }
-
-    if (normalizedSpecifier.startsWith('http://') || normalizedSpecifier.startsWith('https://')) {
-      return normalizedSpecifier;
-    }
-
-    if (normalizedSpecifier.startsWith('.') || normalizedSpecifier.startsWith('/')) {
-      return normalizedSpecifier;
-    }
-
-    if (!/^[A-Za-z0-9@/_\-.]+$/.test(normalizedSpecifier)) {
-      throw new Error(
-        `Invalid module specifier "${normalizedSpecifier}". Only npm package names and URLs are allowed.`
-      );
-    }
-
-    return `${this.moduleCdnBaseUrl}${encodeURI(normalizedSpecifier)}`;
-  }
-
-  private rewriteStaticImports(code: string): string {
-    const lines = code.split('\n');
-    const importStatements: string[] = [];
-    const otherStatements: string[] = [];
-    let importIndex = 0;
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith('import ')) {
-        otherStatements.push(line);
-        continue;
-      }
-
-      const sideEffectMatch = trimmed.match(/^import\s+['"]([^'"]+)['"]\s*;?$/);
-      if (sideEffectMatch) {
-        importStatements.push(`await importModule(${JSON.stringify(sideEffectMatch[1])});`);
-        continue;
-      }
-
-      const fromMatch = trimmed.match(/^import\s+(.+?)\s+from\s+['"]([^'"]+)['"]\s*;?$/);
-      if (!fromMatch) {
-        otherStatements.push(line);
-        continue;
-      }
-
-      importIndex += 1;
-      const importClauseRaw = fromMatch[1];
-      const moduleSpecifier = fromMatch[2];
-      if (!importClauseRaw || !moduleSpecifier) {
-        otherStatements.push(line);
-        continue;
-      }
-      const importClause = importClauseRaw.trim();
-      const moduleVarName = `__importedModule${importIndex}`;
-      importStatements.push(
-        `const ${moduleVarName} = await importModule(${JSON.stringify(moduleSpecifier)});`
-      );
-
-      if (importClause.startsWith('* as ')) {
-        const namespaceName = importClause.substring(5).trim();
-        importStatements.push(`const ${namespaceName} = ${moduleVarName};`);
-        continue;
-      }
-
-      if (importClause.startsWith('{')) {
-        importStatements.push(
-          `const ${this.convertNamedImportClauseToDestructure(importClause)} = ${moduleVarName};`
-        );
-        continue;
-      }
-
-      const clauseParts = importClause.split(',');
-      const defaultImportName = clauseParts[0]?.trim();
-      if (defaultImportName) {
-        importStatements.push(
-          `const ${defaultImportName} = ${moduleVarName}.default ?? ${moduleVarName};`
-        );
-      }
-
-      const trailingClause = clauseParts.slice(1).join(',').trim();
-      if (trailingClause.startsWith('{')) {
-        importStatements.push(
-          `const ${this.convertNamedImportClauseToDestructure(trailingClause)} = ${moduleVarName};`
-        );
-      } else if (trailingClause.startsWith('* as ')) {
-        const namespaceName = trailingClause.substring(5).trim();
-        importStatements.push(`const ${namespaceName} = ${moduleVarName};`);
-      }
-    }
-
-    return [...importStatements, ...otherStatements].join('\n');
-  }
-
-  private convertNamedImportClauseToDestructure(importClause: string): string {
-    const normalized = importClause
-      .trim()
-      .replace(/\bas\b/g, ':')
-      .replace(/\s+/g, ' ');
-    return normalized.startsWith('{') ? normalized : `{${normalized}}`;
   }
 
   private buildRetryHints(retryContext?: DataImportAiRetryContext): string {

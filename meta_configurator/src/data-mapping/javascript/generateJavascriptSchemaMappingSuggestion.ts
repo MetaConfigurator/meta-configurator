@@ -2,6 +2,7 @@ import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
 import {queryJavascriptExpression} from '@/utility/ai/aiEndpoint';
+import {canQueryAi} from '@/utility/ai/aiAvailability';
 import type {DataMappingSuggestionRetryContext} from '@/data-mapping/dataMappingService';
 import {
   JS_REFERENCE_GUIDE,
@@ -42,11 +43,11 @@ export async function generateJavascriptSchemaMappingSuggestion(
   backendPromptHint: string = ''
 ): Promise<{config: string; success: boolean; message: string}> {
   const apiKey = getApiKey();
-  if (!apiKey || apiKey.trim().length === 0) {
+  if (!canQueryAi(apiKey)) {
     return {
       config: '',
       success: false,
-      message: 'Missing API key. Please set your API key first.',
+      message: 'AI access is not configured. Please configure an API endpoint or relay first.',
     };
   }
 

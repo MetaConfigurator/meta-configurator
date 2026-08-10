@@ -14,6 +14,4 @@ class DetectionResult:
     message: str
     display_text: str
     parser_name: Optional[str] = None
-    ai_prompt_hint: str = ''
-
-
+    ai_prompt_hint: str = ""

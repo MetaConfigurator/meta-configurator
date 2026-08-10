@@ -22,10 +22,9 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
     if not parsed_json:
         return None
 
-    normalized_suffix = ' (normalized)' if '(normalized)' in parser_name else ''
+    normalized_suffix = " (normalized)" if "(normalized)" in parser_name else ""
     return ParserAttempt(
-        format='cif',
+        format="cif",
         parsed_json=parsed_json,
-        parser_name=f'gemmi-cif-json{normalized_suffix}',
+        parser_name=f"gemmi-cif-json{normalized_suffix}",
     )
-

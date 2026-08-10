@@ -18,6 +18,7 @@ services:
       VIRTUAL_PORT: 5000
       LETSENCRYPT_HOST: ${FORMAT_PROCESSING_HOSTNAME:?FORMAT_PROCESSING_HOSTNAME is not set}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://metaconfigurator.github.io,https://logende.github.io,https://www.metaconfigurator.org,https://metaconfigurator.org,https://metaconfigurator.informatik.uni-stuttgart.de}
 
   nginx-proxy:
     image: nginxproxy/nginx-proxy:latest

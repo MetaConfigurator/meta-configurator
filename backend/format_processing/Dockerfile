@@ -6,9 +6,9 @@ ENV HOME=/home/format-processing
 WORKDIR /app
 
 # Create a non-root user.
-RUN adduser --disabled-password --home /home/format-processing format-processing
+RUN adduser --disabled-password --gecos "" --home /home/format-processing format-processing
 
-COPY requirements.txt requirements-dev.txt ./
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .

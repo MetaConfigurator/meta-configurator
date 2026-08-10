@@ -71,40 +71,42 @@ class ParserAttempt:
 
 def _get_extension(file_name: str) -> str:
     if not isinstance(file_name, str):
-        return ''
+        return ""
     file_name = file_name.strip().lower()
-    if '.' not in file_name:
-        return ''
-    return file_name.rsplit('.', 1)[1]
+    if "." not in file_name:
+        return ""
+    return file_name.rsplit(".", 1)[1]
 
 
 def _tree_sitter_node_text(node: Any, source_bytes: bytes) -> str:
-    return source_bytes[node.start_byte : node.end_byte].decode('utf-8', errors='replace')
+    return source_bytes[node.start_byte : node.end_byte].decode(
+        "utf-8", errors="replace"
+    )
 
 
 def _compact_tree_text(text: str, max_length: int = 200) -> str:
-    compact = re.sub(r'\s+', ' ', text.strip())
+    compact = re.sub(r"\s+", " ", text.strip())
     if len(compact) <= max_length:
         return compact
-    return compact[: max_length - 3] + '...'
+    return compact[: max_length - 3] + "..."
 
 
 def _normalize_comment_text(text: str) -> str:
     normalized = text.strip()
-    if normalized.startswith('#'):
+    if normalized.startswith("#"):
         return normalized[1:].strip()
-    if normalized.startswith('///'):
+    if normalized.startswith("///"):
         return normalized[3:].strip()
-    if normalized.startswith('//'):
+    if normalized.startswith("//"):
         return normalized[2:].strip()
-    if normalized.startswith('/*') and normalized.endswith('*/'):
+    if normalized.startswith("/*") and normalized.endswith("*/"):
         normalized = normalized[2:-2]
-    normalized = re.sub(r'^\s*\*\s?', '', normalized, flags=re.MULTILINE)
+    normalized = re.sub(r"^\s*\*\s?", "", normalized, flags=re.MULTILINE)
     return normalized.strip()
 
 
 def _iter_named_descendants(node: Any):
-    for child in getattr(node, 'named_children', []):
+    for child in getattr(node, "named_children", []):
         yield child
         yield from _iter_named_descendants(child)
 
@@ -113,12 +115,12 @@ def _coerce_literal(text: str) -> Any:
     stripped = text.strip()
     if len(stripped) >= 2 and stripped[0] == stripped[-1] and stripped[0] in {'"', "'"}:
         return stripped[1:-1]
-    if re.fullmatch(r'-?\d+', stripped):
+    if re.fullmatch(r"-?\d+", stripped):
         try:
             return int(stripped)
         except Exception:
             return stripped
-    if re.fullmatch(r'-?\d+\.\d+(?:[eE][+-]?\d+)?', stripped):
+    if re.fullmatch(r"-?\d+\.\d+(?:[eE][+-]?\d+)?", stripped):
         try:
             return float(stripped)
         except Exception:
@@ -127,17 +129,17 @@ def _coerce_literal(text: str) -> Any:
 
 
 def _count_tree_sitter_nodes(node: Any) -> Dict[str, int]:
-    named_nodes = 1 if getattr(node, 'is_named', False) else 0
-    error_nodes = 1 if node.type == 'ERROR' or getattr(node, 'is_error', False) else 0
+    named_nodes = 1 if getattr(node, "is_named", False) else 0
+    error_nodes = 1 if node.type == "ERROR" or getattr(node, "is_error", False) else 0
     total_nodes = 1
 
-    for child in getattr(node, 'children', []):
+    for child in getattr(node, "children", []):
         child_counts = _count_tree_sitter_nodes(child)
-        named_nodes += child_counts['named']
-        error_nodes += child_counts['error']
-        total_nodes += child_counts['total']
+        named_nodes += child_counts["named"]
+        error_nodes += child_counts["error"]
+        total_nodes += child_counts["total"]
 
-    return {'named': named_nodes, 'error': error_nodes, 'total': total_nodes}
+    return {"named": named_nodes, "error": error_nodes, "total": total_nodes}
 
 
 def _serialize_tree_sitter_node(
@@ -150,26 +152,28 @@ def _serialize_tree_sitter_node(
     text_limit: int = 160,
 ) -> Dict[str, Any]:
     serialized: Dict[str, Any] = {
-        'type': node.type,
-        'start_line': node.start_point.row + 1,
-        'start_column': node.start_point.column,
-        'end_line': node.end_point.row + 1,
-        'end_column': node.end_point.column,
-        'named': bool(getattr(node, 'is_named', False)),
-        'error': bool(node.type == 'ERROR' or getattr(node, 'is_error', False)),
+        "type": node.type,
+        "start_line": node.start_point.row + 1,
+        "start_column": node.start_point.column,
+        "end_line": node.end_point.row + 1,
+        "end_column": node.end_point.column,
+        "named": bool(getattr(node, "is_named", False)),
+        "error": bool(node.type == "ERROR" or getattr(node, "is_error", False)),
     }
 
-    named_children = list(getattr(node, 'named_children', []))
+    named_children = list(getattr(node, "named_children", []))
     if len(named_children) == 0:
-        text = _compact_tree_text(_tree_sitter_node_text(node, source_bytes), max_length=text_limit)
+        text = _compact_tree_text(
+            _tree_sitter_node_text(node, source_bytes), max_length=text_limit
+        )
         if text:
-            serialized['text'] = text
+            serialized["text"] = text
         return serialized
 
-    serialized['child_count'] = len(named_children)
+    serialized["child_count"] = len(named_children)
     if depth >= max_depth:
-        serialized['truncated'] = True
-        serialized['preview'] = _compact_tree_text(
+        serialized["truncated"] = True
+        serialized["preview"] = _compact_tree_text(
             _tree_sitter_node_text(node, source_bytes),
             max_length=text_limit,
         )
@@ -189,11 +193,11 @@ def _serialize_tree_sitter_node(
     if len(named_children) > max_children:
         children.append(
             {
-                'type': '__truncated_children__',
-                'remaining': len(named_children) - max_children,
+                "type": "__truncated_children__",
+                "remaining": len(named_children) - max_children,
             }
         )
-    serialized['children'] = children
+    serialized["children"] = children
     return serialized
 
 
@@ -213,7 +217,7 @@ def _try_tree_sitter_source(
     if not detector(content):
         return None
 
-    source_bytes = content.encode('utf-8', errors='replace')
+    source_bytes = content.encode("utf-8", errors="replace")
     try:
         parser = Parser(language)
         tree = parser.parse(source_bytes)
@@ -225,12 +229,12 @@ def _try_tree_sitter_source(
         return None
 
     counts = _count_tree_sitter_nodes(root)
-    if counts['named'] < 2:
+    if counts["named"] < 2:
         return None
-    if counts['error'] > max(3, counts['named'] // 2):
+    if counts["error"] > max(3, counts["named"] // 2):
         return None
 
-    top_level_types = {child.type for child in getattr(root, 'named_children', [])}
+    top_level_types = {child.type for child in getattr(root, "named_children", [])}
     if required_top_level_types and not (top_level_types & required_top_level_types):
         return None
 
@@ -253,4 +257,3 @@ def _to_json_safe(value: Any) -> Any:
     if isinstance(value, (str, int, float, bool)) or value is None:
         return value
     return str(value)
-

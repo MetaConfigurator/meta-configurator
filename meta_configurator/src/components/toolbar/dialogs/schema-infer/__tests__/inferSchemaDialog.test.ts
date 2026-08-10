@@ -105,11 +105,9 @@ async function setupDialog({
   }));
 
   const uploadedFileEntries = Object.keys(uploadedFiles).map(name => ({name}));
-  const fileListMock = {
-    length: uploadedFileEntries.length,
+  const fileListMock = Object.assign(uploadedFileEntries, {
     item: (index: number) => uploadedFileEntries[index] ?? null,
-    ...uploadedFileEntries,
-  };
+  });
   vi.doMock('@/utility/fileDialogUtils', () => ({
     createLazySingleFileDialog: () => ({
       openForSelection: (handler: (files: any) => void) => handler(fileListMock),
@@ -119,7 +117,7 @@ async function setupDialog({
     readFileContent: vi.fn(async (file: {name: string}) => uploadedFiles[file.name]),
   }));
   vi.doMock('@/data/useDataLink', () => ({
-    getDataForMode: (mode: SessionMode) =>
+    getDataForMode: (mode: string) =>
       mode === SessionMode.DataEditor
         ? {
             data: {value: currentData},
@@ -185,12 +183,12 @@ describe('InferSchemaDialog', () => {
   it('defaults to the existing Data Editor content when data is already loaded', async () => {
     const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock, toastAddMock} =
       await setupDialog({
-      currentData: {
-        name: 'Alice',
-        age: 30,
-        active: true,
-      },
-    });
+        currentData: {
+          name: 'Alice',
+          age: 30,
+          active: true,
+        },
+      });
 
     await openDialog(wrapper);
     expect(wrapper.text()).toContain('Current data');
@@ -212,11 +210,7 @@ describe('InferSchemaDialog', () => {
   });
 
   it('allows switching from existing data to manually selected files', async () => {
-    const {
-      wrapper,
-      dataEditorSetDataMock,
-      schemaEditorSetDataMock,
-    } = await setupDialog({
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock} = await setupDialog({
       currentData: {
         fromExisting: 'keep out',
       },
@@ -265,21 +259,18 @@ describe('InferSchemaDialog', () => {
   });
 
   it('starts in manual file mode when no current data is available', async () => {
-    const {
-      wrapper,
-      dataEditorSetDataMock,
-      schemaEditorSetDataMock,
-      toastAddMock,
-    } = await setupDialog({
-      currentData: {},
-      uploadedFiles: {
-        'data.json': '{"name":"Alice","age":30}',
-      },
-    });
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock, toastAddMock} =
+      await setupDialog({
+        currentData: {},
+        uploadedFiles: {
+          'data.json': '{"name":"Alice","age":30}',
+        },
+      });
 
     await openDialog(wrapper);
 
-    const currentDataOption = wrapper.get('[data-option-value="current"]').element as HTMLButtonElement;
+    const currentDataOption = wrapper.get('[data-option-value="current"]')
+      .element as HTMLButtonElement;
     const filesOption = wrapper.get('[data-option-value="files"]').element as HTMLButtonElement;
     expect(currentDataOption.disabled).toBe(true);
     expect(filesOption.disabled).toBe(false);

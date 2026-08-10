@@ -1,7 +1,12 @@
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {DataMappingSuggestionRetryContext} from '@/data-mapping/dataMappingService';
-import {fixAndParseGeneratedJson, fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
+import {
+  fixAndParseGeneratedJson,
+  fixGeneratedExpression,
+  getApiKey,
+} from '@/components/panels/ai-prompts/aiPromptUtils';
 import {queryOpenAI} from '@/utility/ai/aiEndpoint';
+import {canQueryAi} from '@/utility/ai/aiAvailability';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import {
   JS_REFERENCE_GUIDE,
@@ -45,11 +50,11 @@ export async function generateMappingFunctionSuggestion(
   params: GenerateMappingFunctionSuggestionParams
 ): Promise<{config: string; success: boolean; message: string}> {
   const apiKey = getApiKey();
-  if (!apiKey || apiKey.trim().length === 0) {
+  if (!canQueryAi(apiKey)) {
     return {
       config: '',
       success: false,
-      message: 'Missing API key. Please set your API key first.',
+      message: 'AI access is not configured. Please configure an API endpoint or relay first.',
     };
   }
 
@@ -60,18 +65,27 @@ export async function generateMappingFunctionSuggestion(
 
   try {
     return {
-      config: fixGeneratedExpression(response, params.language === 'jsonata' ? ['jsonata', 'json'] : ['javascript', 'js']),
+      config: fixGeneratedExpression(
+        response,
+        params.language === 'jsonata' ? ['jsonata', 'json'] : ['javascript', 'js']
+      ),
       success: true,
       message:
         params.method === 'source-data'
-          ? `${formatLanguageLabel(params.language)} mapping generated from source data and target schema.`
-          : `${formatLanguageLabel(params.language)} mapping generated from inferred source schema and target schema.`,
+          ? `${formatLanguageLabel(
+              params.language
+            )} mapping generated from source data and target schema.`
+          : `${formatLanguageLabel(
+              params.language
+            )} mapping generated from inferred source schema and target schema.`,
     };
   } catch (error) {
     return {
       config: response,
       success: false,
-      message: `Failed to generate ${formatLanguageLabel(params.language)} mapping. ${error instanceof Error ? error.message : String(error)}`,
+      message: `Failed to generate ${formatLanguageLabel(params.language)} mapping. ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }
@@ -82,11 +96,11 @@ export async function performDirectAiTargetSchemaMapping(
   userComments: string
 ): Promise<{resultData: unknown; success: boolean; message: string}> {
   const apiKey = getApiKey();
-  if (!apiKey || apiKey.trim().length === 0) {
+  if (!canQueryAi(apiKey)) {
     return {
       resultData: {},
       success: false,
-      message: 'Missing API key. Please set your API key first.',
+      message: 'AI access is not configured. Please configure an API endpoint or relay first.',
     };
   }
 
@@ -125,7 +139,9 @@ export async function performDirectAiTargetSchemaMapping(
     return {
       resultData: {},
       success: false,
-      message: `Direct AI mapping failed. ${error instanceof Error ? error.message : String(error)}`,
+      message: `Direct AI mapping failed. ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }
@@ -141,14 +157,22 @@ Remember: JSONata is a declarative query and transformation language with syntax
 Example input file: \`\`\`${JSON.stringify(JSONATA_INPUT_EXAMPLE)}\`\`\`.
 Example input schema: \`\`\`${JSON.stringify(JSONATA_INPUT_EXAMPLE_SCHEMA)}\`\`\`.
 Example output schema: \`\`\`${JSON.stringify(JSONATA_OUTPUT_EXAMPLE_SCHEMA)}\`\`\`.
-For these examples you should generate the following JSONata expression: \`\`\`${JSON.stringify(JSONATA_EXPRESSION)}\`\`\`.
-The expression would transform the input file to the following output file (as intended): \`\`\`${JSON.stringify(JSONATA_OUTPUT_EXAMPLE)}\`\`\`.
+For these examples you should generate the following JSONata expression: \`\`\`${JSON.stringify(
+    JSONATA_EXPRESSION
+  )}\`\`\`.
+The expression would transform the input file to the following output file (as intended): \`\`\`${JSON.stringify(
+    JSONATA_OUTPUT_EXAMPLE
+  )}\`\`\`.
 Return ONLY a valid JSONata expression with no surrounding explanation.`;
 
   const userMessage =
     params.method === 'source-data'
       ? buildJsonataDataUserMessage(params.inputData, params.targetSchema, params.userComments)
-      : buildJsonataSchemaUserMessage(params.sourceSchema, params.targetSchema, params.userComments);
+      : buildJsonataSchemaUserMessage(
+          params.sourceSchema,
+          params.targetSchema,
+          params.userComments
+        );
 
   return queryOpenAI(apiKey, [
     {role: 'system', content: systemMessage},

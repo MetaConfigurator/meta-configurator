@@ -14,7 +14,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
     for index in range(len(lines) - 2):
         header_line = lines[index].strip()
         separator_line = lines[index + 1].strip()
-        if '|' not in header_line or '|' not in separator_line:
+        if "|" not in header_line or "|" not in separator_line:
             continue
 
         header_cells = split_markdown_table_row(header_line)
@@ -28,7 +28,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
         cursor = index + 2
         while cursor < len(lines):
             candidate = lines[cursor].strip()
-            if not candidate or '|' not in candidate:
+            if not candidate or "|" not in candidate:
                 break
             candidate_cells = split_markdown_table_row(candidate)
             if len(candidate_cells) != len(header_cells):
@@ -41,10 +41,9 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
 
         rows = [header_cells, *[split_markdown_table_row(line) for line in data_lines]]
         return ParserAttempt(
-            format='markdown_table',
+            format="markdown_table",
             parsed_json=rows_to_objects_or_arrays(rows),
-            parser_name='markdown-table-parser',
+            parser_name="markdown-table-parser",
         )
 
     return None
-

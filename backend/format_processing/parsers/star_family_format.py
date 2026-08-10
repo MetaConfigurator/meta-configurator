@@ -19,8 +19,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
         return None
 
     return ParserAttempt(
-        format='star_family',
+        format="star_family",
         parsed_json=parsed_json,
-        parser_name=f'{parser_name}-json',
+        parser_name=f"{parser_name}-json",
     )
-

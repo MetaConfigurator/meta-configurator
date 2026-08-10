@@ -8,13 +8,13 @@ TARGET_DOCUMENT_SIZE_BYTES = 64 * 1024
 INITIAL_ARRAY_LIMIT = 64
 MIN_ARRAY_LIMIT = 2
 OBJECT_KEY_FACTOR = 8
-LONG_DATA_FIELD_TOKENS = ('_data', 'pxrd', 'spectrum', 'intensity', 'signal', 'raw')
+LONG_DATA_FIELD_TOKENS = ("_data", "pxrd", "spectrum", "intensity", "signal", "raw")
 
 
 def _truncate_string(value: str, max_length: int) -> str:
     if len(value) <= max_length:
         return value
-    return f'{value[:max_length]}...[TRUNCATED_{len(value) - max_length}_CHARS]'
+    return f"{value[:max_length]}...[TRUNCATED_{len(value) - max_length}_CHARS]"
 
 
 def _coerce_positive_int(value: Any, default: int, minimum: int) -> int:
@@ -28,29 +28,31 @@ def _coerce_positive_int(value: Any, default: int, minimum: int) -> int:
 def _resolve_preprocess_options(options: Optional[Dict[str, Any]]) -> Dict[str, int]:
     raw_options = options if isinstance(options, dict) else {}
     return {
-        'max_string_len': _coerce_positive_int(raw_options.get('max_string_len'), MAX_STRING_LEN, 1),
-        'max_data_field_len': _coerce_positive_int(
-            raw_options.get('max_data_field_len'),
+        "max_string_len": _coerce_positive_int(
+            raw_options.get("max_string_len"), MAX_STRING_LEN, 1
+        ),
+        "max_data_field_len": _coerce_positive_int(
+            raw_options.get("max_data_field_len"),
             MAX_DATA_FIELD_LEN,
             1,
         ),
-        'target_document_size_kb': _coerce_positive_int(
-            raw_options.get('target_document_size_kb'),
+        "target_document_size_kb": _coerce_positive_int(
+            raw_options.get("target_document_size_kb"),
             TARGET_DOCUMENT_SIZE_BYTES // 1024,
             1,
         ),
-        'initial_array_limit': _coerce_positive_int(
-            raw_options.get('initial_array_limit'),
+        "initial_array_limit": _coerce_positive_int(
+            raw_options.get("initial_array_limit"),
             INITIAL_ARRAY_LIMIT,
             1,
         ),
-        'min_array_limit': _coerce_positive_int(
-            raw_options.get('min_array_limit'),
+        "min_array_limit": _coerce_positive_int(
+            raw_options.get("min_array_limit"),
             MIN_ARRAY_LIMIT,
             1,
         ),
-        'object_key_factor': _coerce_positive_int(
-            raw_options.get('object_key_factor'),
+        "object_key_factor": _coerce_positive_int(
+            raw_options.get("object_key_factor"),
             OBJECT_KEY_FACTOR,
             1,
         ),
@@ -59,7 +61,9 @@ def _resolve_preprocess_options(options: Optional[Dict[str, Any]]) -> Dict[str, 
 
 def _serialize_size_bytes(value: Any) -> int:
     return len(
-        json.dumps(value, ensure_ascii=False, separators=(',', ':'), default=str).encode('utf-8')
+        json.dumps(
+            value, ensure_ascii=False, separators=(",", ":"), default=str
+        ).encode("utf-8")
     )
 
 
@@ -74,7 +78,9 @@ def _truncate_scalar(
         return value
 
     max_length = max_string_len
-    if field_name and any(token in field_name.lower() for token in LONG_DATA_FIELD_TOKENS):
+    if field_name and any(
+        token in field_name.lower() for token in LONG_DATA_FIELD_TOKENS
+    ):
         max_length = max_data_field_len
     return _truncate_string(value, max_length)
 
@@ -109,7 +115,7 @@ def _trim_structure(
             for item in value[:array_limit]
         ]
         if len(value) > array_limit:
-            processed_items.append({'__truncated_items__': len(value) - array_limit})
+            processed_items.append({"__truncated_items__": len(value) - array_limit})
         return processed_items
 
     if isinstance(value, dict):
@@ -126,7 +132,7 @@ def _trim_structure(
                 field_name=string_key,
             )
         if len(keys) > object_key_limit:
-            result['__truncated_keys__'] = len(keys) - object_key_limit
+            result["__truncated_keys__"] = len(keys) - object_key_limit
         return result
 
     if isinstance(value, tuple):
@@ -149,12 +155,12 @@ def preprocess_data_for_ai(
 ) -> Any:
     del depth  # Kept for backward compatibility with older call sites.
     options = _resolve_preprocess_options(preprocess_options)
-    target_document_size_bytes = options['target_document_size_kb'] * 1024
-    initial_array_limit = options['initial_array_limit']
-    min_array_limit = min(options['min_array_limit'], initial_array_limit)
-    object_key_factor = options['object_key_factor']
-    max_string_len = options['max_string_len']
-    max_data_field_len = options['max_data_field_len']
+    target_document_size_bytes = options["target_document_size_kb"] * 1024
+    initial_array_limit = options["initial_array_limit"]
+    min_array_limit = min(options["min_array_limit"], initial_array_limit)
+    object_key_factor = options["object_key_factor"]
+    max_string_len = options["max_string_len"]
+    max_data_field_len = options["max_data_field_len"]
 
     # Fast path for already small values after scalar truncation.
     initial = _trim_structure(
@@ -185,4 +191,3 @@ def preprocess_data_for_ai(
         array_limit = max(min_array_limit, array_limit // 2)
 
     return latest
-

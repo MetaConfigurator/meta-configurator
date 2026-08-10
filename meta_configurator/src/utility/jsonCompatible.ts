@@ -41,7 +41,10 @@ function convertToJsonCompatible(
   }
 
   if (isArrayBufferView(value)) {
-    return Array.from(value as ArrayLike<number>);
+    if (value instanceof DataView) {
+      return Array.from(new Uint8Array(value.buffer, value.byteOffset, value.byteLength));
+    }
+    return Array.from(value as unknown as ArrayLike<number>);
   }
 
   if (value instanceof ArrayBuffer) {

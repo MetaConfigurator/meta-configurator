@@ -198,6 +198,9 @@ async function setupDialog({
           maxDocumentSizeForSchemaInference: 10_000_000,
           minObjectPropertyCountToPreserve: 1000,
         },
+        aiIntegration: {
+          backend: {endpoint: 'https://api.openai.com/v1/'},
+        },
       }),
   }));
   vi.doMock('@/utility/ai/apiKey', () => ({
@@ -269,17 +272,14 @@ describe('DataMappingDialog', () => {
       },
       required: ['fullName'],
     };
-    const {
-      wrapper,
-      schemaEditorSetDataMock,
-      generateMappingFunctionSuggestionMock,
-    } = await setupDialog({
-      currentData: [
-        {name: 'Alice', age: 30},
-        {name: 'Bob', age: 41},
-      ],
-      currentSchema,
-    });
+    const {wrapper, schemaEditorSetDataMock, generateMappingFunctionSuggestionMock} =
+      await setupDialog({
+        currentData: [
+          {name: 'Alice', age: 30},
+          {name: 'Bob', age: 41},
+        ],
+        currentSchema,
+      });
 
     generateMappingFunctionSuggestionMock.mockResolvedValue({
       config: 'function transform(input) { return input; }',

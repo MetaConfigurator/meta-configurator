@@ -50,6 +50,17 @@ the Flask app still sees routes like `/detect-format-and-parse`.
 - `POST /detect-format-and-parse`
 - `POST /preprocess-for-ai`
 
+## Configuration
+
+- `CORS_ALLOWED_ORIGINS`: comma-separated browser origins. If unset, the known
+  MetaConfigurator production and local-development origins are used.
+- `MAX_FILE_LENGTH`: maximum UTF-8 size of the imported content or preprocessing data
+  (default: `500000` bytes).
+- `MAX_REQUEST_LENGTH`: maximum HTTP request size, including JSON overhead
+  (default: `1000000` bytes).
+- `RATELIMIT_STORAGE_URI`: Flask-Limiter storage URI. The joint backend uses its
+  Redis service; standalone development defaults to in-memory counters.
+
 ## Testing
 
 ```bash

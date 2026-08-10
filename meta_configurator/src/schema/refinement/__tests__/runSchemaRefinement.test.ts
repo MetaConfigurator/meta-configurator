@@ -9,7 +9,7 @@ import {
   SORT_SCHEMA_PROPERTIES_DEFAULTS,
 } from '@/schema/refinement/refineSchemaTypes';
 
-function expectObjectSchema(schema: TopLevelSchema): asserts schema is JsonSchemaObjectType {
+function expectObjectSchema(schema: unknown): asserts schema is JsonSchemaObjectType {
   if (typeof schema !== 'object' || schema === null) {
     throw new Error('Expected an object schema');
   }
@@ -32,9 +32,13 @@ describe('runSchemaRefinement', () => {
       },
     };
 
-    const refined = runSchemaRefinement(schema, {}, {
-      sortSchemaPropertiesAlphabetically: SORT_SCHEMA_PROPERTIES_DEFAULTS,
-    });
+    const refined = runSchemaRefinement(
+      schema,
+      {},
+      {
+        sortSchemaPropertiesAlphabetically: SORT_SCHEMA_PROPERTIES_DEFAULTS,
+      }
+    );
     expectObjectSchema(refined);
 
     expect(Object.keys(refined.properties ?? {})).toEqual(['age', 'name', 'zip']);
@@ -154,9 +158,13 @@ describe('runSchemaRefinement', () => {
       },
     };
 
-    const refined = runSchemaRefinement(schema, {status: 'OPEN'}, {
-      addExamples: ADD_EXAMPLES_DEFAULTS,
-    });
+    const refined = runSchemaRefinement(
+      schema,
+      {status: 'OPEN'},
+      {
+        addExamples: ADD_EXAMPLES_DEFAULTS,
+      }
+    );
     expectObjectSchema(refined);
 
     expect(refined).toEqual({
@@ -236,9 +244,13 @@ describe('runSchemaRefinement', () => {
       },
     };
 
-    const refined = runSchemaRefinement(schema, {person: {name: 'Ada'}}, {
-      extractSubSchemasIntoReferences: EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS,
-    });
+    const refined = runSchemaRefinement(
+      schema,
+      {person: {name: 'Ada'}},
+      {
+        extractSubSchemasIntoReferences: EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS,
+      }
+    );
     expectObjectSchema(refined);
 
     expect(refined.properties?.person).toEqual({

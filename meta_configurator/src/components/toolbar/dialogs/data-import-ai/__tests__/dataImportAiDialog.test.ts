@@ -110,6 +110,9 @@ async function setupDialog() {
     textEditor: {
       tabSize: 2,
     },
+    aiIntegration: {
+      backend: {endpoint: 'https://api.openai.com/v1/'},
+    },
   });
   const editors: MockEditor[] = [];
   const aceEditMock = vi.fn(() => {
@@ -216,5 +219,21 @@ describe('DataImportAiDialog', () => {
     const recreatedEditor = editors[1];
     expect(recreatedEditor).toBeDefined();
     expect(recreatedEditor?.setValue).toHaveBeenCalledWith(firstEditor.state.currentValue, -1);
+  });
+
+  it('enables AI modes through a relay without requiring a browser API key', async () => {
+    const {wrapper, apiKeyRef, aceEditMock} = await setupDialog();
+    const settings = (await import('@/settings/useSettings')).useSettings();
+    settings.value.aiIntegration.backend = {
+      relay: 'https://metaconfigurator.example/relay',
+      endpoint: 'https://provider.example/v1/',
+    };
+
+    expect(apiKeyRef.value).toBe('');
+    (wrapper.vm as any).show();
+    await nextTick();
+    await flushPromises();
+
+    expect(aceEditMock).toHaveBeenCalledTimes(1);
   });
 });

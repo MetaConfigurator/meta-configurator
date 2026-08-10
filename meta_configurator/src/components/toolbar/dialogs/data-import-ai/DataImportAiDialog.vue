@@ -16,6 +16,7 @@ import 'brace/mode/javascript';
 import {setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 import {useSettings} from '@/settings/useSettings';
 import {getApiKeyRef} from '@/utility/ai/apiKey';
+import {canQueryAi} from '@/utility/ai/aiAvailability';
 import {
   DataImportAiService,
   type DataImportAiSchemaSource,
@@ -81,7 +82,7 @@ const settings = useSettings();
 const apiKey = getApiKeyRef();
 const dataImportAiService = new DataImportAiService();
 const formatProcessingUrl = computed(() => settings.value.backend.formatProcessingUrl);
-const hasApiKey = computed(() => apiKey.value.trim().length > 0);
+const canUseAi = computed(() => canQueryAi(apiKey.value));
 const formatProcessingUnavailableNotice = computed(
   () =>
     `The format processing service at ${formatProcessingUrl.value} is currently unavailable. Backend-dependent modes are disabled. Manual JavaScript import and full AI import remain available.`
@@ -93,7 +94,7 @@ const formatProcessingFallbackNotice = computed(
 const canUseDirectParse = computed(
   () => backendRecognized.value && parsedJsonFromBackend.value !== null
 );
-const canUseAiNormalizeParsed = computed(() => canUseDirectParse.value && hasApiKey.value);
+const canUseAiNormalizeParsed = computed(() => canUseDirectParse.value && canUseAi.value);
 const importModeOptions = computed(() => {
   return [
     {
@@ -114,7 +115,7 @@ const importModeOptions = computed(() => {
     {
       label: 'Full AI import',
       value: 'full_ai_import' as DataImportAiMode,
-      disabled: !hasApiKey.value,
+      disabled: !canUseAi.value,
     },
   ];
 });
@@ -138,22 +139,25 @@ watch(
   }
 );
 
-watch([showDialog, usesJavascriptStep, hasApiKey], async ([visible, usesJavascriptEditor, hasKey]) => {
-  if (!visible || !usesJavascriptEditor || !hasKey) {
-    destroyEditor();
-    return;
-  }
+watch(
+  [showDialog, usesJavascriptStep, canUseAi],
+  async ([visible, usesJavascriptEditor, aiAvailable]) => {
+    if (!visible || !usesJavascriptEditor || !aiAvailable) {
+      destroyEditor();
+      return;
+    }
 
-  await nextTick();
-  initializeEditor();
-  editor.value?.setValue(generatedScript.value, -1);
-});
+    await nextTick();
+    initializeEditor();
+    editor.value?.setValue(generatedScript.value, -1);
+  }
+);
 
 onBeforeUnmount(() => {
   destroyEditor();
 });
 
-watch([canUseDirectParse, hasApiKey], () => {
+watch([canUseDirectParse, canUseAi], () => {
   if (isCurrentImportModeDisabled.value) {
     selectedImportMode.value = getDefaultImportMode();
   }
@@ -227,7 +231,7 @@ function getEditorSnapshot(): string {
 }
 
 function getCurrentScript(): string {
-  if (!hasApiKey.value || !usesJavascriptStep.value) {
+  if (!canUseAi.value || !usesJavascriptStep.value) {
     return generatedScript.value;
   }
 
@@ -424,9 +428,9 @@ function generateSuggestion() {
     errorMessage.value = 'Please select a file first.';
     return;
   }
-  if (!hasApiKey.value) {
+  if (!canUseAi.value) {
     statusMessage.value = '';
-    errorMessage.value = 'AI suggestion generation is disabled until an API key is configured.';
+    errorMessage.value = 'AI suggestion generation is disabled until AI access is configured.';
     return;
   }
   if (selectedImportMode.value === 'ai_normalize_parsed' && !canUseDirectParse.value) {
@@ -444,8 +448,8 @@ function generateSuggestion() {
     selectedImportMode.value === 'ai_normalize_parsed'
       ? 'Generating AI normalization JavaScript from parsed backend data...'
       : hasValidationErrorForSuggestion.value
-        ? 'Generating improved JavaScript parser suggestion based on the validation error...'
-        : 'Generating JavaScript parser suggestion...';
+      ? 'Generating improved JavaScript parser suggestion based on the validation error...'
+      : 'Generating JavaScript parser suggestion...';
   errorMessage.value = '';
 
   const suggestionPromise =
@@ -599,9 +603,9 @@ async function importWithFullAi() {
     errorMessage.value = 'Please select a file first.';
     return;
   }
-  if (!hasApiKey.value) {
+  if (!canUseAi.value) {
     statusMessage.value = '';
-    errorMessage.value = 'Full AI import is disabled until an API key is configured.';
+    errorMessage.value = 'Full AI import is disabled until AI access is configured.';
     return;
   }
 
@@ -649,17 +653,17 @@ const suggestionButtonLabel = computed(() =>
   hasValidationErrorForSuggestion.value
     ? 'Regenerate Suggestion for Previous Error'
     : selectedImportMode.value === 'ai_normalize_parsed'
-      ? 'Generate AI Normalization JavaScript'
-      : 'Generate JavaScript Suggestion'
+    ? 'Generate AI Normalization JavaScript'
+    : 'Generate JavaScript Suggestion'
 );
 const importButtonLabel = computed(() =>
   pendingImportConfirmation.value
     ? 'Import Anyway'
     : selectedImportMode.value === 'full_ai_import'
-      ? 'Import with Full AI (No JS)'
-      : selectedImportMode.value === 'direct_parse' && canUseDirectParse.value
-        ? 'Import Directly (No AI Call)'
-        : 'Import Data'
+    ? 'Import with Full AI (No JS)'
+    : selectedImportMode.value === 'direct_parse' && canUseDirectParse.value
+    ? 'Import Directly (No AI Call)'
+    : 'Import Data'
 );
 </script>
 
@@ -684,9 +688,9 @@ const importButtonLabel = computed(() =>
         {{ formatProcessingUnavailableNotice }}
       </Message>
 
-      <Message severity="info" v-if="!hasApiKey">
-        AI-assisted suggestion and import modes are disabled until an LLM API key is configured.
-        Backend parsing and manual JavaScript import remain available.
+      <Message severity="info" v-if="!canUseAi">
+        AI-assisted suggestion and import modes are disabled until an AI endpoint or relay is
+        configured. Backend parsing and manual JavaScript import remain available.
       </Message>
 
       <Message severity="info">
@@ -750,7 +754,7 @@ const importButtonLabel = computed(() =>
         class="w-full"
         :disabled="
           uploadedContent.length === 0 ||
-          !hasApiKey ||
+          !canUseAi ||
           isLoadingSuggestion ||
           isImportingData ||
           isDetectingFormat
@@ -761,8 +765,12 @@ const importButtonLabel = computed(() =>
       <div class="mt-6" v-if="usesJavascriptStep">
         <Divider />
         <label :for="editorId" class="block font-semibold mb-2">Generated JavaScript</label>
+        <Message severity="info" :closable="false" class="mb-3">
+          JavaScript runs in an isolated worker. Network access, imports, browser storage, DOM
+          access, dynamic code, and long-running execution are blocked.
+        </Message>
         <Textarea
-          v-if="!hasApiKey"
+          v-if="!canUseAi"
           v-model="generatedScript"
           class="w-full import-script-textarea"
           auto-resize

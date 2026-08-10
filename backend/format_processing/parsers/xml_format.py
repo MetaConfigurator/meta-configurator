@@ -7,7 +7,7 @@ from parsers.common_preprocess import preprocess_data_for_ai
 def parse_data(content: str) -> Optional[ParserAttempt]:
     if xmltodict is None:
         return None
-    if '<' not in content or '>' not in content:
+    if "<" not in content or ">" not in content:
         return None
 
     try:
@@ -19,8 +19,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
         return None
 
     return ParserAttempt(
-        format='xml',
+        format="xml",
         parsed_json=parsed,
-        parser_name='xmltodict-parse',
+        parser_name="xmltodict-parse",
     )
-

@@ -9,7 +9,7 @@ def parse_delimited_rows(content: str, delimiter: str) -> Optional[List[List[str
     if len(lines) < 2:
         return None
 
-    reader = csv.reader(io.StringIO('\n'.join(lines)), delimiter=delimiter)
+    reader = csv.reader(io.StringIO("\n".join(lines)), delimiter=delimiter)
     rows = list(reader)
     if len(rows) < 2:
         return None
@@ -34,18 +34,17 @@ def rows_to_objects_or_arrays(rows: List[List[str]]) -> Any:
 
 def split_markdown_table_row(line: str) -> List[str]:
     stripped = line.strip()
-    if stripped.startswith('|'):
+    if stripped.startswith("|"):
         stripped = stripped[1:]
-    if stripped.endswith('|'):
+    if stripped.endswith("|"):
         stripped = stripped[:-1]
-    return [cell.strip() for cell in stripped.split('|')]
+    return [cell.strip() for cell in stripped.split("|")]
 
 
 def is_markdown_separator_row(cells: List[str]) -> bool:
     if len(cells) < 2:
         return False
     for cell in cells:
-        if not re.fullmatch(r':?-{3,}:?', cell.strip()):
+        if not re.fullmatch(r":?-{3,}:?", cell.strip()):
             return False
     return True
-

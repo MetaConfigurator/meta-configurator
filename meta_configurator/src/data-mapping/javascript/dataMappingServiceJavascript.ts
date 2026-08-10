@@ -7,6 +7,7 @@ import {trimDataToMaxSize} from '@/utility/trimData';
 import {cloneDeep} from 'lodash';
 import {generateJavascriptSchemaMappingSuggestion} from '@/data-mapping/javascript/generateJavascriptSchemaMappingSuggestion';
 import {getBackendPreprocessedInputForAi} from '@/data-mapping/getBackendPreprocessedInputForAi';
+import {executeSandboxedJavascriptTransform} from '@/utility/sandboxedJavascript';
 
 export class DataMappingServiceJavascript implements DataMappingService {
   async generateMappingSuggestion(
@@ -32,8 +33,7 @@ export class DataMappingServiceJavascript implements DataMappingService {
   ): Promise<{resultData: any; success: boolean; message: string}> {
     try {
       const sanitizedConfig = this.sanitizeMappingConfig(config, input);
-      const transformFn = this.compileTransformFunction(sanitizedConfig);
-      const result = await Promise.resolve(transformFn(input));
+      const result = await executeSandboxedJavascriptTransform(sanitizedConfig, input);
       return {
         resultData: result,
         success: true,
@@ -59,31 +59,18 @@ export class DataMappingServiceJavascript implements DataMappingService {
       .trim();
   }
 
-  validateMappingConfig(config: string, input: any): {success: boolean; message: string} {
+  async validateMappingConfig(
+    config: string,
+    input: any
+  ): Promise<{success: boolean; message: string}> {
     const inputDataSubset = trimDataToMaxSize(input);
 
     try {
       const sanitizedConfig = this.sanitizeMappingConfig(config, inputDataSubset);
-      const transformFn = this.compileTransformFunction(sanitizedConfig);
-      transformFn(inputDataSubset);
+      await executeSandboxedJavascriptTransform(sanitizedConfig, inputDataSubset);
       return {success: true, message: 'Mapping configuration is valid.'};
     } catch (e: any) {
       return {success: false, message: `Error: ${e?.message ?? String(e)}`};
     }
-  }
-
-  private compileTransformFunction(code: string): (input: any) => any {
-    const wrapper = `
-"use strict";
-${code}
-if (typeof transform !== "function") {
-  throw new Error("Mapping must define a function: transform(input).");
-}
-return transform;
-`;
-
-    // eslint-disable-next-line no-new-func
-    const factory = new Function(wrapper) as () => (input: any) => any;
-    return factory();
   }
 }

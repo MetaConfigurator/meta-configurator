@@ -7,7 +7,10 @@ export type DataMappingSuggestionRetryContext = {
 
 export interface DataMappingService {
   sanitizeMappingConfig(config: string, input: any): string;
-  validateMappingConfig(config: string, input: any): {success: boolean; message: string};
+  validateMappingConfig(
+    config: string,
+    input: any
+  ): {success: boolean; message: string} | Promise<{success: boolean; message: string}>;
   sanitizeInputDocument(input: any): any;
   generateMappingSuggestion(
     input: any,
