@@ -28,7 +28,6 @@ import PanelSettings from '@/components/panels/shared-components/PanelSettings.v
 import {useErrorService} from '@/utility/errorServiceInstance';
 import {getApiKeyRef} from '@/utility/ai/apiKey';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {ValidationService} from '@/schema/validationService';
 import {toastService} from '@/utility/toastService';
 import {
   generateMappingFunctionSuggestion,
@@ -445,12 +444,6 @@ async function executeDirectAiMapping() {
       return;
     }
 
-    const validationResult = validateAgainstTargetSchema(response.resultData);
-    if (!validationResult.success) {
-      errorMessage.value = validationResult.message;
-      return;
-    }
-
     dataEditorLink.setData(response.resultData);
     toastService.add({
       severity: 'success',
@@ -464,39 +457,6 @@ async function executeDirectAiMapping() {
   } finally {
     isLoadingMapping.value = false;
   }
-}
-
-function validateAgainstTargetSchema(resultData: unknown): {success: boolean; message: string} {
-  try {
-    const validationResult = new ValidationService(targetSchema.value).validate(resultData);
-    if (validationResult.valid) {
-      return {success: true, message: 'Result matches the target schema.'};
-    }
-
-    return {
-      success: false,
-      message: `The AI result does not match the target schema. ${formatValidationErrors(
-        validationResult.errors
-      )}`,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: `The AI result could not be validated against the target schema. ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
-}
-
-function formatValidationErrors(errors: {instancePath?: string; message?: string}[]): string {
-  return errors
-    .slice(0, 3)
-    .map(error => {
-      const location =
-        error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/';
-      const message = error.message ?? 'Unknown validation error';
-      return `${location}: ${message}`;
-    })
-    .join(' | ');
 }
 
 defineExpose({show: openDialog, close: hideDialog});

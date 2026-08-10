@@ -355,4 +355,38 @@ describe('DataMappingDialog', () => {
     expect(dataEditorSetDataMock).toHaveBeenCalledWith({fullName: 'Ada Lovelace'});
     expect(schemaEditorSetDataMock).not.toHaveBeenCalled();
   });
+
+  it('applies a direct AI result without validating it against the target schema', async () => {
+    const currentData = {
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+    };
+    const currentSchema = {
+      type: 'object',
+      properties: {
+        fullName: {type: 'string'},
+      },
+      required: ['fullName'],
+    };
+    const {wrapper, dataEditorSetDataMock, performDirectAiTargetSchemaMappingMock} =
+      await setupDialog({
+        currentData,
+        currentSchema,
+      });
+    const schemaInvalidResult = {unexpected: true};
+
+    performDirectAiTargetSchemaMappingMock.mockResolvedValue({
+      resultData: schemaInvalidResult,
+      success: true,
+      message: 'AI mapping executed successfully.',
+    });
+
+    await openDialog(wrapper);
+    await wrapper.findAll('select')[0]!.setValue('direct-ai');
+    await flushPromises();
+    await button(wrapper, 'Execute AI Mapping')!.trigger('click');
+    await flushPromises();
+
+    expect(dataEditorSetDataMock).toHaveBeenCalledWith(schemaInvalidResult);
+  });
 });
