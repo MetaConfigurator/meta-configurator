@@ -696,21 +696,22 @@ describe('test renameUtils', () => {
   });
 
   it('finds instance data paths for nested properties inside nested arrays', () => {
-  const schema = {
-    type: 'object',
-    properties: {
-      groups: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            people: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  name: {
-                    type: 'string',
+    const schema = {
+      type: 'object',
+      properties: {
+        groups: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              people: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: {
+                      type: 'string',
+                    },
                   },
                 },
               },
@@ -718,44 +719,29 @@ describe('test renameUtils', () => {
           },
         },
       },
-    },
-  };
+    };
 
-  const data = {
-    groups: [
-      {
-        people: [
-          {name: 'Alice'},
-          {name: 'Bob'},
-        ],
-      },
-      {
-        people: [
-          {name: 'Charlie'},
-        ],
-      },
-    ],
-  };
+    const data = {
+      groups: [
+        {
+          people: [{name: 'Alice'}, {name: 'Bob'}],
+        },
+        {
+          people: [{name: 'Charlie'}],
+        },
+      ],
+    };
 
-  const result = findDataPathsUsingSchema(
-    [
-      'properties',
-      'groups',
-      'items',
-      'properties',
-      'people',
-      'items',
-      'properties',
-      'name',
-    ],
-    data,
-    schema
-  );
+    const result = findDataPathsUsingSchema(
+      ['properties', 'groups', 'items', 'properties', 'people', 'items', 'properties', 'name'],
+      data,
+      schema
+    );
 
-  expect(result).toEqual([
-    ['groups', 0, 'people', 0, 'name'],
-    ['groups', 0, 'people', 1, 'name'],
-    ['groups', 1, 'people', 0, 'name'],
-  ]);
-});
+    expect(result).toEqual([
+      ['groups', 0, 'people', 0, 'name'],
+      ['groups', 0, 'people', 1, 'name'],
+      ['groups', 1, 'people', 0, 'name'],
+    ]);
+  });
 });
