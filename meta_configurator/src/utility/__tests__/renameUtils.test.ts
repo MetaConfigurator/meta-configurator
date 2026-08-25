@@ -7,7 +7,6 @@ import {JsonSchemaWrapper} from '../../schema/jsonSchemaWrapper';
 import {type JsonSchemaType} from '../../schema/jsonSchemaType';
 import {SessionMode} from '../../store/sessionMode';
 import {confirmationService} from '../confirmationService';
-import {findSchemaPathForDataPath} from '../pathUtils';
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
