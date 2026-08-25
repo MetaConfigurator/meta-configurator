@@ -45,23 +45,23 @@ export function findDataPathsUsingSchema(
 ): Path[] {
   const result: Path[] = [];
 
-  if (data && typeof data === 'object' && !Array.isArray(data)) {
-    const governingSchemaPath = findSchemaPathForDataPath(currentPath, schemaRoot);
-    const isMatch =
-      governingSchemaPath &&
-      pathToJsonPointer(governingSchemaPath) === pathToJsonPointer(schemaObjectPath);
-    if (isMatch) {
-      console.log(
-        'match at',
-        pathToJsonPointer(currentPath),
-        'governed by',
-        pathToJsonPointer(governingSchemaPath!)
-      );
-      result.push(currentPath);
-    }
+  const governingSchemaPath = findSchemaPathForDataPath(currentPath, schemaRoot);
+
+  const isMatch =
+    governingSchemaPath &&
+    pathToJsonPointer(governingSchemaPath) === pathToJsonPointer(schemaObjectPath);
+
+  if (isMatch) {
+    result.push(currentPath);
   }
 
-  if (data && typeof data === 'object') {
+  if (Array.isArray(data)) {
+    data.forEach((item, index) => {
+      result.push(
+        ...findDataPathsUsingSchema(schemaObjectPath, item, schemaRoot, currentPath.concat([index]))
+      );
+    });
+  } else if (data && typeof data === 'object') {
     for (const key of Object.keys(data)) {
       result.push(
         ...findDataPathsUsingSchema(
@@ -80,17 +80,20 @@ export function findDataPathsUsingSchema(
 // Applies the rename decision (overwrite / keep-unchanged) to every affected data
 
 function syncPropertyRenameToInstanceData(
- schemaObjectPath: Path,
+  schemaObjectPath: Path,
   oldName: string,
   newName: string,
-  action: typeof RENAME_CONFLICT_ACTION[keyof typeof RENAME_CONFLICT_ACTION],
+  action: (typeof RENAME_CONFLICT_ACTION)[keyof typeof RENAME_CONFLICT_ACTION],
   schemaRoot: any,
   instanceData: any,
   updateInstanceDataFct: (subPath: Path, newValue: any) => void
 ) {
   const affectedDataPaths = findDataPathsUsingSchema(schemaObjectPath, instanceData, schemaRoot);
-  console.log(pathToJsonPointer(schemaObjectPath),
-              '-> affected:', affectedDataPaths.map(pathToJsonPointer));
+  console.log(
+    pathToJsonPointer(schemaObjectPath),
+    '-> affected:',
+    affectedDataPaths.map(pathToJsonPointer)
+  );
 
   for (const dataPath of affectedDataPaths) {
     const obj = dataAt(dataPath, instanceData);
