@@ -145,6 +145,7 @@ export function findSchemaPathForDataPath(dataPath: Path, schemaRoot: any): Path
   let schemaPath: Path = resolveRef([], schemaRoot);
 
   for (const el of dataPath) {
+<<<<<<< HEAD
     if (typeof el === 'number') {
       schemaPath = schemaPath.concat(['items']);
     } else {
@@ -162,6 +163,10 @@ export function findSchemaPathForDataPath(dataPath: Path, schemaRoot: any): Path
         schemaPath = additionalPropertiesPath;
       }
     }
+=======
+    schemaPath =
+      typeof el === 'number' ? schemaPath.concat(['items']) : schemaPath.concat(['properties', el]);
+>>>>>>> 2125ed817e307a1e44f7c1f74df0d6f61960960e
 
     schemaPath = resolveRef(schemaPath, schemaRoot);
   }

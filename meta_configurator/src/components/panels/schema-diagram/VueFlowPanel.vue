@@ -306,7 +306,7 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
     newName,
     schemaData.data.value,
     schemaSchema.schemaWrapper.value,
-    updateData,
+    updateData
   );
 
   if (pathToJsonPointer(newPath) !== pathToJsonPointer(objectData.absolutePath)) {
@@ -334,7 +334,7 @@ function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNod
 function updateAttributeName(attributeData: SchemaNodeData, oldName: string, newName: string) {
   if (oldName === newName) return;
 
-   const parentPath = attributeData.absolutePath.slice(0, -1);
+  const parentPath = attributeData.absolutePath.slice(0, -1);
   const parentSchemaData = schemaData.dataAt(parentPath);
   if (!parentSchemaData || !Object.prototype.hasOwnProperty.call(parentSchemaData, oldName)) {
     return;
