@@ -284,7 +284,8 @@ describe('test settings updater', () => {
       backend: {
         snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
         schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+        formatProcessingUrl:
+          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
       },
       aiIntegration: {
         model: 'alias-fast',
@@ -447,7 +448,8 @@ describe('test settings updater', () => {
       backend: {
         snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
         schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+        formatProcessingUrl:
+          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
       },
       aiIntegration: {
         model: 'alias-fast',
@@ -504,7 +506,8 @@ describe('test settings updater', () => {
       backend: {
         snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
         schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+        formatProcessingUrl:
+          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
       },
       aiIntegration: {
         model: 'alias-fast',
@@ -537,7 +540,8 @@ describe('test settings updater', () => {
       backend: {
         snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
         schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+        formatProcessingUrl:
+          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
         snapshotBackend: {
           hostName: 'https://snapshot.example.com',
         },
@@ -570,7 +574,8 @@ describe('test settings updater', () => {
       backend: {
         snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
         schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+        formatProcessingUrl:
+          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
       },
       aiIntegration: {
         model: 'alias-fast',

@@ -57,7 +57,8 @@ export const DETECT_ADDITIONAL_PROPERTIES_DEFAULTS: DetectAdditionalPropertiesOp
   requireSameValueType: true,
 };
 
-export const EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS: ExtractSubSchemasIntoReferencesOptions = {
-  extractRootElement: false,
-  extractEnums: true,
-};
+export const EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS: ExtractSubSchemasIntoReferencesOptions =
+  {
+    extractRootElement: false,
+    extractEnums: true,
+  };

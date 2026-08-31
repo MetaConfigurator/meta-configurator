@@ -22,7 +22,8 @@ const props = withDefaults(
     addExamplesDescription?: string;
   }>(),
   {
-    addExamplesDescription: 'Add real example values from the current input data to matching schema fields.',
+    addExamplesDescription:
+      'Add real example values from the current input data to matching schema fields.',
   }
 );
 
@@ -145,9 +146,7 @@ defineExpose<SchemaRefinementOptionsController>({
             v-model="enableSortSchemaPropertiesAlphabetically"
             binary
             :input-id="fieldId('sort-schema-properties-alphabetically')" />
-          <label
-            class="refinement-title"
-            :for="fieldId('sort-schema-properties-alphabetically')">
+          <label class="refinement-title" :for="fieldId('sort-schema-properties-alphabetically')">
             Sort Schema Properties Alphabetically
           </label>
         </div>
@@ -155,8 +154,7 @@ defineExpose<SchemaRefinementOptionsController>({
 
       <p class="refinement-description">
         Sort schema keys recursively, including <code>properties</code>,
-        <code>patternProperties</code>, <code>dependentSchemas</code>, and
-        <code>$defs</code>.
+        <code>patternProperties</code>, <code>dependentSchemas</code>, and <code>$defs</code>.
       </p>
     </Panel>
 
@@ -250,10 +248,7 @@ defineExpose<SchemaRefinementOptionsController>({
         <div class="parameter-types">
           <span class="parameter-label">Allowed types</span>
           <div class="type-checkbox-list">
-            <div
-              v-for="allowedType in allowedTypes"
-              :key="allowedType"
-              class="parameter-checkbox">
+            <div v-for="allowedType in allowedTypes" :key="allowedType" class="parameter-checkbox">
               <Checkbox
                 v-model="detectEnums.allowedTypes"
                 :input-id="fieldId(`detect-enums-${allowedType}`)"

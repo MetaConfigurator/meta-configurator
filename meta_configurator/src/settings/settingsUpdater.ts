@@ -194,7 +194,10 @@ function migrateSettingsVersion(userSettings: any) {
   }
 
   if (userSettings.backend) {
-    if ('importBackendUrl' in userSettings.backend && !('formatProcessingUrl' in userSettings.backend)) {
+    if (
+      'importBackendUrl' in userSettings.backend &&
+      !('formatProcessingUrl' in userSettings.backend)
+    ) {
       const oldUrl = userSettings.backend.importBackendUrl;
       userSettings.backend.formatProcessingUrl =
         typeof oldUrl === 'string'

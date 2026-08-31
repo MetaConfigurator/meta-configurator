@@ -1,8 +1,6 @@
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {addExamplesToSchemaFromSamples} from '@/schema/refinement/addExamples';
-import {
-  detectAdditionalPropertiesInSchemaFromSamples,
-} from '@/schema/refinement/detectAdditionalProperties';
+import {detectAdditionalPropertiesInSchemaFromSamples} from '@/schema/refinement/detectAdditionalProperties';
 import {detectEnumsInSchemaFromSamples} from '@/schema/refinement/detectEnums';
 import {extractSubSchemasIntoReferences} from '@/schema/refinement/extractSubSchemasIntoReferences';
 import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes';

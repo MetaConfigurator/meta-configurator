@@ -196,9 +196,7 @@ defineExpose({show: openDialog, close: hideDialog});
               </Button>
             </div>
 
-            <p class="file-picker-description">
-              Select exactly one JSON file to use as input.
-            </p>
+            <p class="file-picker-description">Select exactly one JSON file to use as input.</p>
 
             <div v-if="hasSelectedFile" class="selected-files">
               <div class="selected-files-label">1 file selected</div>
