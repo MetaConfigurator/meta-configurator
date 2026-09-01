@@ -545,7 +545,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     aiIntegration: {
       type: 'object',
-      required: ['model', 'temperature', 'backend'],
+      required: ['model', 'backend'],
       additionalProperties: {
         title: 'Custom Model Parameter',
         oneOf: [{type: 'string'}, {type: 'number'}, {type: 'boolean'}],

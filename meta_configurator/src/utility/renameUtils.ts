@@ -4,6 +4,7 @@ import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pathUtils';
 import {removeFromRequiredArray} from '@/utility/requiredUtils';
 import {SessionMode} from '@/store/sessionMode';
+import {toRaw} from 'vue';
 
 export function replacePropertyNameUtils(
   // relative or absolute path (depending on the provided data) to the property to rename
@@ -17,7 +18,7 @@ export function replacePropertyNameUtils(
   const parentPath = path.slice(0, -1);
   let dataAtParentPath = dataAt(parentPath, currentData) ?? {};
   // note: cloning the data before adjusting it, because otherwise the original data would already be changed and then the updateData call would detect a change and not trigger the ref
-  dataAtParentPath = structuredClone(dataAtParentPath);
+  dataAtParentPath = structuredClone(toRaw(dataAtParentPath));
   dataAtParentPath = updateKeyName(dataAtParentPath, oldName, newName);
 
   if (dataAt([newName], dataAtParentPath) === undefined) {
@@ -81,7 +82,7 @@ export function updateReferences(
   const oldRef = '#' + oldPathStr;
   const newRef = '#' + newPathStr;
 
-  const references = findReferences(oldPathStr, currentData);
+  const references = findReferences(oldPathStr, toRaw(currentData));
   references.forEach((ref: any) => {
     const refPath = ref.path;
     const refValue = ref.value;
