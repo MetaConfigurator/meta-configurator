@@ -54,8 +54,8 @@ class TestFormatDetection(unittest.TestCase):
                 self.assertEqual(result.format, expected_format)
                 self.assertIsNotNone(result.parsed_json)
                 self.assertIsNotNone(result.preprocessed_for_ai)
-                self.assertTrue(result.display_text)
-                self.assertIn("Backend recognized", result.display_text)
+                self.assertTrue(result.message)
+                self.assertIn("Backend recognized", result.message)
                 self.assertTrue(result.ai_prompt_hint)
                 if expected_format == "ttl":
                     self.assertIsInstance(result.parsed_json, dict)
@@ -77,7 +77,7 @@ class TestFormatDetection(unittest.TestCase):
         self.assertEqual(result.format, "unknown")
         self.assertIsNone(result.parsed_json)
         self.assertIsNone(result.preprocessed_for_ai)
-        self.assertIn("Falling back to AI mapping", result.display_text)
+        self.assertIn("Falling back to AI mapping", result.message)
 
     def test_star_when_gemmi_available(self) -> None:
         if format_detection_module.gemmi is None:

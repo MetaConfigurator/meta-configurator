@@ -60,7 +60,7 @@ export function buildHandlebarsUserMessage(
   inputFileSchema: string,
   outputDescription: string
 ): string {
-  return `Input file subset: \`\`\`${inputFileSubset}\`\`\`.  
+  return `Input file subset: \`\`\`${inputFileSubset}\`\`\`.
   Input file schema: \`\`\`${inputFileSchema}\`\`\`.
   The goal is to generate a handlebars Template. Description or example of the desired output document: \`\`\`${outputDescription}\`\`\`. Keep it simple and conservative. Avoid adding new values that do not exist.`;
 }

@@ -12,7 +12,7 @@ import {
 } from '@/components/panels/ai-prompts/aiPromptUtils';
 import {queryOpenAI} from '@/utility/ai/aiEndpoint';
 import {AI_ACCESS_UNAVAILABLE_MESSAGE, canQueryAi} from '@/utility/ai/aiAvailability';
-import {trimDataToMaxSize} from '@/utility/trimData';
+import {prepareDataForAiPrompt} from '@/utility/ai/prepareDataForAiPrompt';
 import {
   CLOSING_INSTRUCTIONS,
   CODE_FENCE_LANGUAGES,
@@ -99,6 +99,8 @@ export async function performDirectAiTargetSchemaMapping(
       {role: 'user', content: buildDirectMappingUserMessage(inputData, targetSchema, userComments)},
     ]);
 
+    // Deliberately do not reject imperfect output here. Mapping is exploratory and users should
+    // be able to inspect and correct a useful partial result in the Data Editor.
     return {
       resultData: fixAndParseGeneratedJson(response),
       success: true,
@@ -120,7 +122,7 @@ function buildDirectMappingUserMessage(
 ): string {
   const messageParts = [
     'CURRENT JSON DATA',
-    JSON.stringify(inputData),
+    JSON.stringify(prepareDataForAiPrompt(inputData)),
     '',
     'TARGET JSON SCHEMA',
     JSON.stringify(targetSchema),
@@ -136,7 +138,7 @@ function buildDirectMappingUserMessage(
 function buildMappingUserMessage(request: MappingFunctionSuggestionRequest): string {
   const messageParts =
     request.method === 'source-data'
-      ? ['REAL INPUT DATA SUBSET', JSON.stringify(trimDataToMaxSize(request.inputData))]
+      ? ['REAL INPUT DATA SUBSET', JSON.stringify(prepareDataForAiPrompt(request.inputData))]
       : ['SOURCE INPUT SCHEMA', JSON.stringify(request.sourceSchema)];
 
   if (request.method === 'source-data' && request.inputDataSchema !== undefined) {

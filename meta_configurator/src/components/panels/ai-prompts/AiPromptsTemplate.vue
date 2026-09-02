@@ -26,7 +26,7 @@ import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schem
 import {
   postProcessSchemaModification,
   bundleReferencedDefinitions,
-} from '@/schema/schemaManipulationUtils';
+} from '@/schema/schemaDefinitionBundling';
 import {getErrorMessage} from '@/utility/getErrorMessage';
 
 const props = defineProps<{
@@ -38,7 +38,8 @@ const props = defineProps<{
   labelDocumentType: string;
   labelModifyInfo: string | undefined;
   functionQueryDocumentCreation:
-    ((apiKey: string, prompt: string, schema: string) => Promise<string>) | undefined;
+    | ((apiKey: string, prompt: string, schema: string) => Promise<string>)
+    | undefined;
   functionQueryDocumentModification: (
     apiKey: string,
     prompt: string,

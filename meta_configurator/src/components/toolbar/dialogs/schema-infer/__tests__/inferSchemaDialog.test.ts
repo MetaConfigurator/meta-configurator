@@ -9,6 +9,7 @@ import {
   PanelStub,
   PersistentDialogStub,
   SelectButtonStub,
+  openDialog,
 } from '@/components/toolbar/dialogs/__tests__/dialogTestUtils';
 
 async function setupDialog({
@@ -91,11 +92,6 @@ async function setupDialog({
     schemaEditorSetDataMock,
     toastAddMock,
   };
-}
-
-async function openDialog(wrapper: any) {
-  (wrapper.vm as any).show();
-  await flushPromises();
 }
 
 async function selectSource(wrapper: any, source: 'current' | 'files') {

@@ -556,4 +556,65 @@ describe('runSchemaRefinement', () => {
       required: ['firstName', 'lastName', 'age', 'active'],
     });
   });
+  it('gives each oneOf branch only the samples that branch accepts', () => {
+    const schema: TopLevelSchema = {
+      oneOf: [
+        {
+          type: 'object',
+          required: ['kind', 'unit'],
+          properties: {kind: {const: 'measurement'}, unit: {type: 'string'}},
+        },
+        {
+          type: 'object',
+          required: ['kind', 'author'],
+          properties: {kind: {const: 'note'}, author: {type: 'string'}},
+        },
+      ],
+    };
+
+    const refined = runSchemaRefinementFromSamples(
+      schema,
+      [
+        {kind: 'measurement', unit: 'kelvin'},
+        {kind: 'measurement', unit: 'pascal'},
+        {kind: 'note', author: 'Ada'},
+      ],
+      {addExamples: ADD_EXAMPLES_DEFAULTS}
+    );
+
+    expectObjectSchema(refined);
+    const [measurementBranch, noteBranch] = refined.oneOf as JsonSchemaObjectType[];
+    expect(measurementBranch?.properties?.unit).toEqual({
+      type: 'string',
+      examples: ['kelvin', 'pascal'],
+    });
+    // "Ada" belongs to the note branch, so it must not show up as a unit example
+    expect(noteBranch?.properties?.author).toEqual({type: 'string', examples: ['Ada']});
+  });
+
+  it('keeps giving every allOf branch all samples, since each branch describes them', () => {
+    const schema: TopLevelSchema = {
+      allOf: [
+        {type: 'object', properties: {name: {type: 'string'}}},
+        {type: 'object', properties: {status: {type: 'string'}}},
+      ],
+    };
+
+    const refined = runSchemaRefinementFromSamples(
+      schema,
+      [
+        {name: 'Ada', status: 'OPEN'},
+        {name: 'Grace', status: 'CLOSED'},
+      ],
+      {addExamples: ADD_EXAMPLES_DEFAULTS}
+    );
+
+    expectObjectSchema(refined);
+    const [nameBranch, statusBranch] = refined.allOf as JsonSchemaObjectType[];
+    expect(nameBranch?.properties?.name).toEqual({type: 'string', examples: ['Ada', 'Grace']});
+    expect(statusBranch?.properties?.status).toEqual({
+      type: 'string',
+      examples: ['OPEN', 'CLOSED'],
+    });
+  });
 });

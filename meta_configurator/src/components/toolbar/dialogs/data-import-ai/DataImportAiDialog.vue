@@ -11,7 +11,7 @@ import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import {SessionMode} from '@/store/sessionMode';
-import {FORMAT_PROCESSING_FILE_ACCEPT} from '@/utility/backend/formatProcessingApi';
+import {AI_IMPORT_FILE_ACCEPT} from '@/utility/backend/formatProcessingApi';
 import {SCHEMA_SOURCE_OPTIONS, useDataImportAiDialog} from './useDataImportAiDialog';
 
 // reactive() unwraps the refs of the composable, so the template reads them as dialog.<name>
@@ -37,8 +37,8 @@ defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
       </PanelSettings>
       <ApiKeyWarning />
 
-      <Message severity="warn" v-if="dialog.isFormatProcessingUnavailable">
-        {{ dialog.formatProcessingUnavailableNotice }}
+      <Message severity="warn" v-if="dialog.formatProcessingErrorMessage.length > 0">
+        {{ dialog.formatProcessingErrorNotice }}
       </Message>
 
       <Message severity="info" v-if="!dialog.canUseAi">
@@ -64,7 +64,7 @@ defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
           id="import-ai-file"
           type="file"
           class="w-full"
-          :accept="FORMAT_PROCESSING_FILE_ACCEPT"
+          :accept="AI_IMPORT_FILE_ACCEPT"
           @change="dialog.onFileSelected" />
         <p v-if="dialog.selectedFileName.length > 0" class="text-sm mt-2">
           {{ dialog.selectedFileName }} ({{ dialog.selectedFileSize }} bytes)
@@ -114,8 +114,9 @@ defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
           Generated JavaScript
         </label>
         <Message severity="info" :closable="false" class="mb-3">
-          JavaScript runs in an isolated worker. Network access, imports, browser storage, DOM
-          access, dynamic code, and long-running execution are blocked.
+          JavaScript runs in a Web Worker, off the main thread and without DOM access, and common
+          network, import and storage calls are rejected. This keeps accidents in check rather than
+          sandboxing untrusted code, so only run code you would run yourself.
         </Message>
         <Textarea
           v-if="!dialog.canUseAi"

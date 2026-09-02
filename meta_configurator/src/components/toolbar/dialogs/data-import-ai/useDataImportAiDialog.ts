@@ -73,7 +73,7 @@ export function useDataImportAiDialog() {
     uploadedContent,
     backendDisplayText,
     backendPromptHint,
-    isFormatProcessingUnavailable,
+    formatProcessingErrorMessage,
     parsedJsonFromBackend,
     preprocessedJsonForAi,
     isDetectingFormat,
@@ -91,11 +91,11 @@ export function useDataImportAiDialog() {
   );
 
   const canUseAi = computed(() => canQueryAi(apiKey.value));
-  const formatProcessingUnavailableNotice = computed(
-    () =>
-      `The format processing service at ${settings.value.backend.formatProcessingUrl} is currently ` +
-      `unavailable. Backend-dependent modes are disabled. Manual JavaScript import and full AI ` +
-      `import remain available.`
+  const formatProcessingErrorNotice = computed(() =>
+    formatProcessingErrorMessage.value
+      ? `${formatProcessingErrorMessage.value} Backend-dependent modes are disabled. ` +
+        `Manual JavaScript import and full AI import remain available.`
+      : ''
   );
   const canUseAiNormalizeParsed = computed(() => canUseDirectParse.value && canUseAi.value);
   const importModeOptions = computed(() => [
@@ -564,7 +564,7 @@ export function useDataImportAiDialog() {
     errorMessage,
     warningMessage,
     backendDisplayText,
-    isFormatProcessingUnavailable,
+    formatProcessingErrorMessage,
     selectedImportMode,
     selectedSchemaSource,
     isLoadingSuggestion,
@@ -576,7 +576,7 @@ export function useDataImportAiDialog() {
     generatedScript,
     editorElementId,
     canUseAi,
-    formatProcessingUnavailableNotice,
+    formatProcessingErrorNotice,
     importModeOptions,
     usesJavascriptStep,
     suggestionButtonLabel,

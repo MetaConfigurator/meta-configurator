@@ -16,6 +16,7 @@ import {
   PanelStub,
   SelectStub,
   SlotStub,
+  openDialog,
 } from '@/components/toolbar/dialogs/__tests__/dialogTestUtils';
 
 async function setupDialog({
@@ -152,12 +153,6 @@ async function setupDialog({
     validateJsonataMappingMock,
     editors,
   };
-}
-
-async function openDialog(wrapper: any) {
-  (wrapper.vm as any).show();
-  await nextTick();
-  await flushPromises();
 }
 
 describe('DataMappingDialog', () => {

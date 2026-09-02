@@ -90,16 +90,22 @@ export function assertSafeJavascriptTransformSource(source: string): void {
   for (const forbidden of FORBIDDEN_SOURCE_PATTERNS) {
     if (forbidden.pattern.test(source)) {
       throw new Error(
-        `JavaScript mapping cannot use ${forbidden.description}. External access and dynamic code are disabled.`
+        `JavaScript mapping cannot use ${forbidden.description}. It is meant to transform the given input only.`
       );
     }
   }
 }
 
 /**
- * Executes a generated transform in a dedicated worker. The worker has no DOM
- * or Web Storage access, network-related globals are disabled, imports and
- * dynamic code construction are rejected, and runaway code is terminated.
+ * Runs a generated transform in a dedicated worker: it keeps the transform off the main
+ * thread, away from the DOM, and terminates runaway code, and the checks below make the
+ * usual accidental network, import and storage calls fail early.
+ *
+ * This is a guard rail, not a security boundary. The worker is same-origin, and denylists
+ * of globals and source patterns can be worked around, for instance through computed
+ * property access. MetaConfigurator is a static web app, so the code executed here is the
+ * user's own, run in the user's browser under its normal protections - treat the mapping
+ * code with the same trust as any other code you would paste into a page.
  */
 export function executeSandboxedJavascriptTransform(
   source: string,
@@ -109,7 +115,7 @@ export function executeSandboxedJavascriptTransform(
   assertSafeJavascriptTransformSource(source);
 
   if (typeof Worker === 'undefined') {
-    throw new Error('Sandboxed JavaScript execution is not supported by this browser.');
+    throw new Error('This browser cannot run the mapping, because it has no Web Worker support.');
   }
 
   const workerUrl = URL.createObjectURL(new Blob([WORKER_SOURCE], {type: 'text/javascript'}));

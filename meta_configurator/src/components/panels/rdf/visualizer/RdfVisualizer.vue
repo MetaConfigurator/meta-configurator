@@ -252,7 +252,7 @@ const nodeSearchResults = computed(() => {
   const rawQuery =
     typeof nodeSearchQuery.value === 'string'
       ? nodeSearchQuery.value
-      : (nodeSearchQuery.value?.label ?? '');
+      : nodeSearchQuery.value?.label ?? '';
   const query = rawQuery.trim().toLowerCase();
   if (!query) return [];
   return allNodes.value

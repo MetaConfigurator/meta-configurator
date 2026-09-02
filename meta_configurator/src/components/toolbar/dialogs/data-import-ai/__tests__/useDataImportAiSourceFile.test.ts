@@ -40,8 +40,7 @@ describe('AI import source file', () => {
       format: 'properties',
       parsed_json: {value: 1},
       preprocessed_for_ai: {value: 1},
-      message: 'Recognized properties.',
-      display_text: 'Backend recognized properties.',
+      message: 'Backend recognized properties.',
       ai_prompt_hint: 'Input contains key-value pairs.',
     });
 

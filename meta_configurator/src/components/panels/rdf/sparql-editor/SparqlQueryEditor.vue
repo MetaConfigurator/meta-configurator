@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref, watch} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import * as ace from 'brace';
 import 'brace/theme/clouds';
 import 'brace/theme/clouds_midnight';
@@ -33,11 +33,19 @@ const props = withDefaults(
 const queryText = defineModel<string>({required: true});
 
 const errorLineMarkerId = ref<number | null>(null);
-const {editorElementId, editor, createEditor, destroyEditor} = useAceEditor(
-  'sparql-editor',
-  queryText,
-  {mode: new (SparqlCustomMode as any)(), useWrapMode: true}
-);
+const {editorElementId, editor, createEditor} = useAceEditor('sparql-editor', queryText, {
+  mode: new (SparqlCustomMode as any)(),
+  useWrapMode: true,
+  // The composable owns the editor lifecycle, so it also runs this teardown on destroy.
+  configureEditor: createdEditor => {
+    createdEditor.container.addEventListener('click', stopEventFromLeavingEditor);
+    createdEditor.container.addEventListener('keydown', stopEventFromLeavingEditor);
+    return () => {
+      createdEditor.container.removeEventListener('click', stopEventFromLeavingEditor);
+      createdEditor.container.removeEventListener('keydown', stopEventFromLeavingEditor);
+    };
+  },
+});
 
 function stopEventFromLeavingEditor(event: Event) {
   if (props.stopEvents) {
@@ -82,15 +90,7 @@ onMounted(() => {
   if (props.autofocus) {
     editor.value.focus();
   }
-  editor.value.container.addEventListener('click', stopEventFromLeavingEditor);
-  editor.value.container.addEventListener('keydown', stopEventFromLeavingEditor);
   applyErrorLine(props.errorLine);
-});
-
-onUnmounted(() => {
-  editor.value?.container.removeEventListener('click', stopEventFromLeavingEditor);
-  editor.value?.container.removeEventListener('keydown', stopEventFromLeavingEditor);
-  destroyEditor();
 });
 
 watch(() => props.errorLine, applyErrorLine, {immediate: true});

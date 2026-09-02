@@ -1,6 +1,13 @@
-import {defineComponent} from 'vue';
-import type {DOMWrapper} from '@vue/test-utils';
+import {defineComponent, nextTick} from 'vue';
+import {flushPromises, type DOMWrapper} from '@vue/test-utils';
 import {vi} from 'vitest';
+
+/** Opens a dialog through its exposed show() and waits until it is rendered. */
+export async function openDialog(wrapper: {vm: unknown}): Promise<void> {
+  (wrapper.vm as {show: () => void}).show();
+  await nextTick();
+  await flushPromises();
+}
 
 export const DialogStub = defineComponent({
   props: {visible: {type: Boolean, default: false}},

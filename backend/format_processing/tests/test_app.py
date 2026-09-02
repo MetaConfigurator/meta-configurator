@@ -1,6 +1,16 @@
+import pytest
+
 import app as app_module
 
 app = app_module.app
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limits():
+    """The limiter counts across tests, so every test starts with a fresh budget."""
+    with app.app_context():
+        app_module.limiter.reset()
+    yield
 
 
 def test_configured_cors_origins_replace_defaults(monkeypatch):
@@ -69,6 +79,17 @@ def test_detect_format_rejects_oversized_content():
 
     assert response.status_code == 413
     assert response.get_json() == {"error": "Input file too large"}
+
+
+def test_rate_limited_requests_explain_the_limit():
+    client = app.test_client()
+    payload = {"file_name": "sample.csv", "file_type": "text/csv", "content": "a,b\n1,2\n"}
+
+    responses = [client.post("/detect-format-and-parse", json=payload) for _ in range(21)]
+    rate_limited = responses[-1]
+
+    assert rate_limited.status_code == 429
+    assert "try again" in rate_limited.get_json()["error"]
 
 
 def test_global_request_limit_returns_json():

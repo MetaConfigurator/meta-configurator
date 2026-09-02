@@ -21,7 +21,7 @@ import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {executeSandboxedJavascriptTransform} from '@/utility/sandboxedJavascript';
 import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
 import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
-import {trimDataToMaxSize} from '@/utility/trimData';
+import {prepareDataForAiPrompt, truncateTextForAiPrompt} from '@/utility/ai/prepareDataForAiPrompt';
 import {getErrorMessage} from '@/utility/getErrorMessage';
 import {
   buildImportParserSystemMessage,
@@ -91,22 +91,15 @@ type ImportResultMessages = {
 const CURRENT_SCHEMA_EMPTY_MESSAGE =
   'Current schema is empty. Switch schema source or load a schema first.';
 
-/** Longest string value kept in an AI prompt preview before it is truncated. */
-const MAXIMUM_PROMPT_STRING_LENGTH = 4000;
 /** Characters of the uploaded document that are sent to the LLM for parser generation. */
 const MAXIMUM_INPUT_SUBSET_CHARACTERS = 12000;
 
-/** Returns null when the format processing service could not be reached. */
 export async function detectFormatAndParseInBackend(
   fileName: string,
   fileType: string,
   inputDocument: string
-): Promise<FormatProcessingDetectionResult | null> {
-  try {
-    return await detectFormatAndParseWithFormatProcessing(fileName, fileType, inputDocument);
-  } catch {
-    return null;
-  }
+): Promise<FormatProcessingDetectionResult> {
+  return detectFormatAndParseWithFormatProcessing(fileName, fileType, inputDocument);
 }
 
 /** Runs the generated script on a sample input to catch failures before the real import. */
@@ -268,18 +261,14 @@ export async function runFullAiImport(
     const aiResponse = usesCurrentSchema
       ? await queryDataConversionToJson(
           apiKey,
-          request.inputDocument,
+          buildFullAiImportUserMessage(request),
           JSON.stringify(request.currentSchema)
         )
       : await queryOpenAI(apiKey, [
           {role: 'system', content: FULL_AI_IMPORT_SYSTEM_MESSAGE},
           {
             role: 'user',
-            content: joinPromptSections([
-              formatBackendHints(request),
-              `Input document:\n${request.inputDocument}`,
-              request.userComments ? `User hints: ${request.userComments}` : '',
-            ]),
+            content: buildFullAiImportUserMessage(request),
           },
         ]);
 
@@ -329,7 +318,10 @@ function buildImportParserUserMessage(
     `Input file name: ${request.inputFileName || 'uploaded-file'}`,
     `Input file type: ${request.inputFileType || 'unknown'}`,
     formatBackendHints(request),
-    `Input file subset:\n${request.inputDocument.slice(0, MAXIMUM_INPUT_SUBSET_CHARACTERS)}`,
+    `Input file subset:\n${truncateTextForAiPrompt(
+      request.inputDocument,
+      MAXIMUM_INPUT_SUBSET_CHARACTERS
+    )}`,
     buildTargetSchemaInstruction(usesCurrentSchema ? request.currentSchema : undefined),
     IMPORT_PARSER_CLOSING_INSTRUCTION,
     request.userComments ? `User hints:\n${request.userComments}` : '',
@@ -344,37 +336,29 @@ function buildNormalizationUserMessage(
   return joinPromptSections([
     formatBackendHints(request),
     'Parsed JSON preview (truncated for prompt efficiency):\n' +
-      JSON.stringify(trimDataToMaxSize(truncateLongStrings(dataForPrompt)), null, 2),
+      JSON.stringify(prepareDataForAiPrompt(dataForPrompt), null, 2),
     NORMALIZATION_CLOSING_INSTRUCTION,
     request.userComments ? `User hints:\n${request.userComments}` : '',
     buildGeneratedCodeRetryHints(request.retryContext),
   ]);
 }
 
-/** Shortens long string values so that a single field cannot blow up the prompt. */
-function truncateLongStrings(value: unknown): unknown {
-  if (typeof value === 'string') {
-    if (value.length <= MAXIMUM_PROMPT_STRING_LENGTH) {
-      return value;
-    }
-    return `${value.slice(0, MAXIMUM_PROMPT_STRING_LENGTH)}...[TRUNCATED_${
-      value.length - MAXIMUM_PROMPT_STRING_LENGTH
-    }_CHARS]`;
-  }
-  if (Array.isArray(value)) {
-    return value.map(truncateLongStrings);
-  }
-  if (value !== null && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.entries(value).map(([propertyName, propertyValue]) => [
-        propertyName,
-        truncateLongStrings(propertyValue),
-      ])
-    );
-  }
-  return value;
+function buildFullAiImportUserMessage(request: FullAiImportRequest): string {
+  return joinPromptSections([
+    formatBackendHints(request),
+    `Input document:\n${truncateTextForAiPrompt(
+      request.inputDocument,
+      MAXIMUM_INPUT_SUBSET_CHARACTERS
+    )}`,
+    request.userComments ? `User hints: ${request.userComments}` : '',
+  ]);
 }
 
+/**
+ * Validating against the current schema only warns: a mismatching import is still handed
+ * back with `requiresConfirmation`, so the user can take a partially correct result and fix
+ * it, instead of the import discarding everything the LLM produced.
+ */
 function prepareImportResult(
   rawResult: unknown,
   schemaSource: DataImportAiSchemaSource,

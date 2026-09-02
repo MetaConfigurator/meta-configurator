@@ -112,7 +112,7 @@ export function useDataMappingDialog() {
     }
     return selectedMappingLanguage.value === 'jsonata'
       ? 'The JSONata mapping service is expressive and flexible, but may generate invalid mappings for complex inputs that have to be corrected manually.'
-      : 'JavaScript mappings run in an isolated worker. Network access, imports, browser storage, DOM access, dynamic code, and long-running execution are blocked.';
+      : 'JavaScript runs in a Web Worker, off the main thread and without DOM access, and common network, import and storage calls are rejected. This keeps accidents in check rather than sandboxing untrusted code, so only run code you would run yourself.';
   });
   const suggestionButtonLabel = computed(() =>
     suggestionRetryContext.value && shouldUseRetryContext()
@@ -303,6 +303,8 @@ export function useDataMappingDialog() {
   }
 
   function applySuccessfulMapping(resultData: unknown, message: string) {
+    // Do not gate this on target-schema validation: a partially correct mapping is useful for
+    // manual correction, whereas rejecting it would discard the generated result completely.
     statusMessage.value = message;
     errorMessage.value = '';
     clearSuggestionRetryContext();

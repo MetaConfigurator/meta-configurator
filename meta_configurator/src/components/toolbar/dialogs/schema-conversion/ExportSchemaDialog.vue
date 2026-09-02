@@ -18,6 +18,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
+import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
 import {toastService} from '@/utility/toastService';
 import ConversionAttemptView from '@/components/toolbar/dialogs/schema-conversion/ConversionAttemptView.vue';
 import {
@@ -71,7 +72,7 @@ async function convert() {
     return;
   }
   const schema = getDataForMode(SessionMode.SchemaEditor).data.value;
-  if (!schema || (typeof schema === 'object' && Object.keys(schema).length === 0)) {
+  if (isSchemaEmpty(schema)) {
     requestError.value = 'The current schema is empty. There is nothing to export.';
     return;
   }

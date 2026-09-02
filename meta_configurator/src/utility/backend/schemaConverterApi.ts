@@ -10,7 +10,7 @@
  */
 import {computed} from 'vue';
 import {useSettings} from '@/settings/useSettings';
-import {getErrorMessage} from '@/utility/getErrorMessage';
+import {isObjectRecord, postJsonToBackend} from '@/utility/backend/backendJsonRequest';
 
 const settings = useSettings();
 
@@ -180,45 +180,16 @@ export async function requestSchemaConversion(
   sourceLanguage: string,
   targetLanguage: string
 ): Promise<ConversionAttempt[]> {
-  const url = `${SCHEMA_CONVERTER_URL.value}/convert`;
+  const responseBody = await postJsonToBackend({
+    baseUrl: SCHEMA_CONVERTER_URL.value,
+    endpointPath: '/convert',
+    requestBody: {sourceLanguage, targetLanguage, schema},
+    serviceName: 'schema conversion service',
+  });
 
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({sourceLanguage, targetLanguage, schema}),
-    });
-  } catch (error) {
-    throw new Error(
-      `Could not reach the schema conversion service at ${SCHEMA_CONVERTER_URL.value}. ` +
-        `Please make sure the service is running and reachable. ` +
-        `(${getErrorMessage(error)})`
-    );
-  }
-
-  const contentType = response.headers.get('content-type') ?? '';
-  if (!contentType.includes('application/json')) {
-    const text = await response.text().catch(() => '');
-    throw new Error(
-      `Unexpected response from the schema conversion service (status ${response.status}). ` +
-        (text ? `Response: ${text.slice(0, 300)}` : 'The response was not JSON.')
-    );
-  }
-
-  const body = await response.json();
-
-  if (!response.ok) {
-    const message =
-      body && typeof body.error === 'string'
-        ? body.error
-        : `Schema conversion request failed with status ${response.status}.`;
-    throw new Error(message);
-  }
-
-  if (!body || !Array.isArray(body.results)) {
+  if (!isObjectRecord(responseBody) || !Array.isArray(responseBody.results)) {
     throw new Error('Invalid response from the schema conversion service: missing "results".');
   }
 
-  return body.results as ConversionAttempt[];
+  return responseBody.results as ConversionAttempt[];
 }

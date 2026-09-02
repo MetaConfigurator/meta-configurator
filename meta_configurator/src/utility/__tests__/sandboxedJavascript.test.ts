@@ -30,7 +30,7 @@ describe('sandboxed JavaScript source validation', () => {
     ],
   ])('rejects %s', (_description, source) => {
     expect(() => assertSafeJavascriptTransformSource(source)).toThrow(
-      'External access and dynamic code are disabled.'
+      'It is meant to transform the given input only.'
     );
   });
 

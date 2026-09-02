@@ -1,5 +1,6 @@
-import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {JsonSchemaVisitor, type VisitorContext} from '@/schema/jsonSchemaVisitor';
+import {ValidationService} from '@/schema/validationService';
 import {allowItemsInInferredEmptyArraySchemas} from '@/schema/inferJsonSchema';
 import {inferSchema} from '@jsonhero/schema-infer';
 
@@ -214,16 +215,23 @@ class JsonSchemaSamplesVisitor extends JsonSchemaVisitor {
       return;
     }
 
-    if (Array.isArray(schemas)) {
-      schemas.forEach((_schema, index) => {
-        this.samplesByPath.set(
-          this.serializeSchemaPath([...context.path, keyword, index]),
-          parentSamples
-        );
-      });
-    } else {
+    if (!Array.isArray(schemas)) {
       this.samplesByPath.set(this.serializeSchemaPath([...context.path, keyword]), parentSamples);
+      return;
     }
+
+    // Every "allOf" branch describes the same sample, while a sample belongs to only one
+    // "oneOf"/"anyOf" branch: giving each branch all samples would derive its examples,
+    // enums and additional properties from data of a sibling branch.
+    const branchSelectsItsOwnSamples = keyword === 'oneOf' || keyword === 'anyOf';
+    schemas.forEach((branchSchema, index) => {
+      this.samplesByPath.set(
+        this.serializeSchemaPath([...context.path, keyword, index]),
+        branchSelectsItsOwnSamples
+          ? selectSamplesMatchingSchema(branchSchema, parentSamples)
+          : parentSamples
+      );
+    });
   }
 
   protected visitConditional(
@@ -277,6 +285,25 @@ function collectAdditionalPropertySamples(
       .filter(([key]) => !explicitProperties.has(key) && !matchingPatternPropertyNames.has(key))
       .map(([, value]) => value);
   });
+}
+
+/** Returns the samples that the branch schema accepts, or none when it cannot be compiled. */
+function selectSamplesMatchingSchema(branchSchema: JsonSchemaType, samples: unknown[]): unknown[] {
+  if (branchSchema === true) {
+    return samples;
+  }
+  if (branchSchema === false) {
+    return [];
+  }
+
+  let validationService: ValidationService;
+  try {
+    validationService = new ValidationService(branchSchema as TopLevelSchema);
+  } catch {
+    // An unusable branch schema must not silently inherit the samples of its siblings.
+    return [];
+  }
+  return samples.filter(sample => validationService.validate(sample).valid);
 }
 
 export function visitSchemaWithSamples(

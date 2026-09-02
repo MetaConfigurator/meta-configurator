@@ -12,6 +12,5 @@ class DetectionResult:
     parsed_json: Optional[Any]
     preprocessed_for_ai: Optional[Any]
     message: str
-    display_text: str
     parser_name: Optional[str] = None
     ai_prompt_hint: str = ""

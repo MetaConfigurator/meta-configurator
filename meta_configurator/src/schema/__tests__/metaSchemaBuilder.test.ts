@@ -44,8 +44,8 @@ describe('metaSchemaBuilder', () => {
           type === 'array'
             ? {type, items: {type: 'string'}}
             : type === 'object'
-              ? {type, properties: {}}
-              : {type}
+            ? {type, properties: {}}
+            : {type}
         );
 
         expect(result.errors, `type ${type} should be valid`).toEqual([]);
@@ -60,8 +60,8 @@ describe('metaSchemaBuilder', () => {
           type === 'array'
             ? {type: ['array', 'null'], items: {type: 'string'}}
             : type === 'object'
-              ? {type: ['object', 'null'], properties: {}}
-              : {type: [type, 'null']};
+            ? {type: ['object', 'null'], properties: {}}
+            : {type: [type, 'null']};
 
         const result = validateSchemaCandidate({allowMultipleTypes: false}, schemaCandidate);
         expect(result.errors, `nullable type ${type} should be valid`).toEqual([]);

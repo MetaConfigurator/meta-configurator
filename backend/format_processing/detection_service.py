@@ -243,7 +243,6 @@ def detect_format_and_parse(
             parsed_json=None,
             preprocessed_for_ai=None,
             message=message,
-            display_text=message,
         )
 
     file_extension = core.get_file_extension(file_name)
@@ -255,7 +254,7 @@ def detect_format_and_parse(
     for supported_format in formats_to_try:
         parsing_result = supported_format.parse_data(content)
         if parsing_result:
-            display_text = _build_display_text(
+            message = _build_detection_message(
                 parsing_result.format, parsing_result.parser_name
             )
             preprocessed_data = preprocess_data_for_ai(
@@ -266,8 +265,7 @@ def detect_format_and_parse(
                 format=parsing_result.format,
                 parsed_json=core.to_json_safe(parsing_result.parsed_json),
                 preprocessed_for_ai=core.to_json_safe(preprocessed_data),
-                message=display_text,
-                display_text=display_text,
+                message=message,
                 parser_name=parsing_result.parser_name,
                 ai_prompt_hint=supported_format.ai_prompt_hint,
             )
@@ -281,12 +279,11 @@ def detect_format_and_parse(
         parsed_json=None,
         preprocessed_for_ai=None,
         message=message,
-        display_text=message,
         ai_prompt_hint="",
     )
 
 
-def _build_display_text(format_name: str, parser_name: Optional[str]) -> str:
+def _build_detection_message(format_name: str, parser_name: Optional[str]) -> str:
     supported_format = SUPPORTED_FORMAT_BY_NAME.get(format_name)
     display_name = (
         supported_format.display_name if supported_format else format_name

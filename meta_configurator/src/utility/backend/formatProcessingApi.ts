@@ -1,6 +1,6 @@
 import {computed} from 'vue';
 import {useSettings} from '@/settings/useSettings';
-import {getErrorMessage} from '@/utility/getErrorMessage';
+import {isObjectRecord, postJsonToBackend} from '@/utility/backend/backendJsonRequest';
 
 const settings = useSettings();
 
@@ -12,7 +12,6 @@ const FORMAT_PROCESSING_DATA_FILE_EXTENSIONS = [
   '.xml',
   '.jsonl',
   '.ndjson',
-  '.yml',
   '.toml',
   '.ini',
   '.cfg',
@@ -33,9 +32,14 @@ const FORMAT_PROCESSING_DATA_FILE_EXTENSIONS = [
   '.mcif',
 ] as const;
 
-export const FORMAT_PROCESSING_FILE_ACCEPT = [
+/** The formats only the format processing service can parse, for "Import Other Data". */
+export const FORMAT_PROCESSING_FILE_ACCEPT = FORMAT_PROCESSING_DATA_FILE_EXTENSIONS.join(',');
+
+/** Every format the AI import dialog accepts: locally parsed ones and backend-only ones. */
+export const AI_IMPORT_FILE_ACCEPT = [
   '.json',
   '.yaml',
+  '.yml',
   ...FORMAT_PROCESSING_DATA_FILE_EXTENSIONS,
 ].join(',');
 
@@ -45,14 +49,8 @@ export interface FormatProcessingDetectionResult {
   parsed_json: unknown;
   preprocessed_for_ai: unknown;
   message: string;
-  display_text: string;
   parser_name?: string | null;
   ai_prompt_hint?: string | null;
-}
-
-export function shouldUseFormatProcessingForFile(fileName: string): boolean {
-  const normalized = fileName.trim().toLowerCase();
-  return FORMAT_PROCESSING_DATA_FILE_EXTENSIONS.some(ext => normalized.endsWith(ext));
 }
 
 export async function detectFormatAndParseWithFormatProcessing(
@@ -71,7 +69,6 @@ export async function detectFormatAndParseWithFormatProcessing(
     typeof responseBody.recognized !== 'boolean' ||
     typeof responseBody.format !== 'string' ||
     typeof responseBody.message !== 'string' ||
-    typeof responseBody.display_text !== 'string' ||
     !isOptionalNullableString(responseBody.parser_name) ||
     !isOptionalNullableString(responseBody.ai_prompt_hint)
   ) {
@@ -84,7 +81,6 @@ export async function detectFormatAndParseWithFormatProcessing(
     parsed_json: responseBody.parsed_json ?? null,
     preprocessed_for_ai: responseBody.preprocessed_for_ai ?? null,
     message: responseBody.message,
-    display_text: responseBody.display_text,
     parser_name: getNullableString(responseBody.parser_name),
     ai_prompt_hint: getNullableString(responseBody.ai_prompt_hint),
   };
@@ -94,60 +90,12 @@ async function postToFormatProcessing(
   endpointPath: string,
   requestBody: unknown
 ): Promise<unknown> {
-  let serializedRequestBody: string;
-  try {
-    serializedRequestBody = JSON.stringify(requestBody);
-  } catch (error) {
-    throw new Error(
-      `Could not serialize the format processing request. (${getErrorMessage(error)})`
-    );
-  }
-
-  let response: Response;
-  try {
-    response = await fetch(`${FORMAT_PROCESSING_URL.value}${endpointPath}`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: serializedRequestBody,
-    });
-  } catch (error) {
-    throw new Error(
-      `Could not reach the format processing service at ${FORMAT_PROCESSING_URL.value}. ` +
-        `Please make sure the service is running and reachable. ` +
-        `(${getErrorMessage(error)})`
-    );
-  }
-
-  const contentType = response.headers.get('content-type') ?? '';
-  if (!contentType.toLowerCase().includes('application/json')) {
-    const text = await response.text().catch(() => '');
-    throw new Error(
-      `Unexpected response from the format processing service (status ${response.status}). ` +
-        (text ? `Response: ${text.slice(0, 300)}` : 'The response was not JSON.')
-    );
-  }
-
-  let responseBody: unknown;
-  try {
-    responseBody = await response.json();
-  } catch (error) {
-    throw new Error(
-      `Format processing service returned invalid JSON (status ${response.status}). ` +
-        `(${getErrorMessage(error)})`
-    );
-  }
-  if (!response.ok) {
-    const responseError =
-      isObjectRecord(responseBody) && typeof responseBody.error === 'string'
-        ? responseBody.error
-        : `Format processing service request failed with status ${response.status}.`;
-    throw new Error(responseError);
-  }
-  return responseBody;
-}
-
-function isObjectRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
+  return postJsonToBackend({
+    baseUrl: FORMAT_PROCESSING_URL.value,
+    endpointPath,
+    requestBody,
+    serviceName: 'format processing service',
+  });
 }
 
 function getNullableString(value: unknown): string | null {

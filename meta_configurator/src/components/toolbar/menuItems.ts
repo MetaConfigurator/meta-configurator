@@ -1,4 +1,8 @@
-import {openUploadFileDialog, openUploadSettingsDialog} from '@/components/toolbar/uploadFile';
+import {
+  openImportOtherDataDialog,
+  openUploadFileDialog,
+  openUploadSettingsDialog,
+} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {clearCurrentFile} from '@/components/toolbar/clearFile';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
@@ -65,6 +69,11 @@ export class MenuItems {
             label: 'Open JSON/YAML Data',
             icon: 'fa-solid fa-folder-open',
             command: () => openUploadFileDialog(getDataForMode(SessionMode.DataEditor)),
+          },
+          {
+            label: 'Import Other Data (XML, TOML, CSV, STAR, ...)',
+            icon: 'fa-solid fa-file-import',
+            command: openImportOtherDataDialog,
           },
           {
             label: 'Import CSV Data',

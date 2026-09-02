@@ -1,3 +1,4 @@
+import {jsonResponse, textResponse} from '@/utility/backend/__tests__/backendResponseStubs';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/settings/useSettings', () => ({
@@ -7,54 +8,26 @@ vi.mock('@/settings/useSettings', () => ({
 }));
 
 import {
+  AI_IMPORT_FILE_ACCEPT,
   detectFormatAndParseWithFormatProcessing,
   FORMAT_PROCESSING_FILE_ACCEPT,
-  shouldUseFormatProcessingForFile,
 } from '@/utility/backend/formatProcessingApi';
 
-function jsonResponse(body: unknown, {okFlag = true, status = 200} = {}): Response {
-  return {
-    ok: okFlag,
-    status,
-    headers: {
-      get: (h: string) => (h.toLowerCase() === 'content-type' ? 'application/json' : null),
-    },
-    json: async () => body,
-    text: async () => JSON.stringify(body),
-  } as unknown as Response;
-}
+describe('file accept filters', () => {
+  it('offers only backend-only formats for the separate other-data import', () => {
+    const acceptedExtensions = FORMAT_PROCESSING_FILE_ACCEPT.split(',');
 
-function textResponse(text: string, {okFlag = false, status = 502} = {}): Response {
-  return {
-    ok: okFlag,
-    status,
-    headers: {get: () => 'text/html'},
-    json: async () => {
-      throw new Error('not json');
-    },
-    text: async () => text,
-  } as unknown as Response;
-}
-
-describe('shouldUseFormatProcessingForFile', () => {
-  it('uses the format processing service for backend-only formats', () => {
-    expect(shouldUseFormatProcessingForFile('dataset.xml')).toBe(true);
-    expect(shouldUseFormatProcessingForFile('values.toml')).toBe(true);
-    expect(shouldUseFormatProcessingForFile('sample.cif')).toBe(true);
-    expect(shouldUseFormatProcessingForFile('table.md')).toBe(true);
+    expect(acceptedExtensions).toEqual(expect.arrayContaining(['.xml', '.toml', '.cif', '.mpif']));
+    expect(acceptedExtensions).not.toContain('.json');
+    expect(acceptedExtensions).not.toContain('.yaml');
   });
 
-  it('keeps plain json/yaml on the existing local parser path', () => {
-    expect(shouldUseFormatProcessingForFile('data.json')).toBe(false);
-    expect(shouldUseFormatProcessingForFile('data.yaml')).toBe(false);
-    expect(shouldUseFormatProcessingForFile('model.py')).toBe(false);
-  });
+  it('offers locally parsed and backend-only formats for the AI import', () => {
+    const acceptedExtensions = AI_IMPORT_FILE_ACCEPT.split(',');
 
-  it('offers the extended file filter for open-data imports', () => {
-    expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.xml');
-    expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.toml');
-    expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.cif');
-    expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.mpif');
+    expect(acceptedExtensions).toEqual(
+      expect.arrayContaining(['.json', '.yaml', '.yml', '.xml', '.cif'])
+    );
   });
 });
 
@@ -74,7 +47,6 @@ describe('detectFormatAndParseWithFormatProcessing', () => {
         parsed_json: {root: {value: 1}},
         preprocessed_for_ai: {root: {value: 1}},
         message: 'Backend recognized XML.',
-        display_text: 'Backend recognized XML.',
         parser_name: 'xml_format',
         ai_prompt_hint: 'Input is XML.',
       })
@@ -160,7 +132,7 @@ describe('detectFormatAndParseWithFormatProcessing', () => {
         'application/json',
         circularContent as unknown as string
       )
-    ).rejects.toThrow(/Could not serialize the format processing request/);
+    ).rejects.toThrow(/Could not serialize the format processing service request/);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

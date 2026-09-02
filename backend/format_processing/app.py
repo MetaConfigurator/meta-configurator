@@ -10,7 +10,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.exceptions import RequestEntityTooLarge, TooManyRequests
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from detection_service import detect_format_and_parse
@@ -132,6 +132,22 @@ def _handle_json_route_errors(view_function: Callable) -> Callable:
 @app.errorhandler(RequestEntityTooLarge)
 def request_too_large(_error):
     return jsonify({"error": "Request body too large"}), 413
+
+
+@app.errorhandler(TooManyRequests)
+def too_many_requests(error):
+    # The frontend shows this message as it is, so it has to say what the user can do.
+    return (
+        jsonify(
+            {
+                "error": (
+                    "Too many format processing requests in a short time "
+                    f"({error.description}). Please wait a moment and try again."
+                )
+            }
+        ),
+        429,
+    )
 
 
 @app.route("/health", methods=["GET"])

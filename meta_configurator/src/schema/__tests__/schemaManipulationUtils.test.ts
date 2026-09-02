@@ -3,13 +3,15 @@ import {shallowRef} from 'vue';
 import {ManagedData} from '@/data/managedData';
 import {SessionMode} from '@/store/sessionMode';
 import {
-  bundleReferencedDefinitions,
   doesIdenticalSchemaDefinitionExist,
   extractAllInlinedSchemaElements,
-  extractGeneratedDefinitionsFromSubSchema,
   extractInlinedSchemaElement,
-  postProcessSchemaModification,
 } from '@/schema/schemaManipulationUtils';
+import {
+  bundleReferencedDefinitions,
+  extractGeneratedDefinitionsFromSubSchema,
+  postProcessSchemaModification,
+} from '@/schema/schemaDefinitionBundling';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({

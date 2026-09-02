@@ -1,6 +1,7 @@
 import {computed, ref} from 'vue';
 import {readFileContent} from '@/utility/readFileContent';
 import {detectFormatAndParseInBackend} from './dataImportAiService';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 /** Owns the selected file and its asynchronous backend format-detection lifecycle. */
 export function useDataImportAiSourceFile() {
@@ -11,7 +12,7 @@ export function useDataImportAiSourceFile() {
   const backendDisplayText = ref('');
   const backendPromptHint = ref('');
   const backendRecognized = ref(false);
-  const isFormatProcessingUnavailable = ref(false);
+  const formatProcessingErrorMessage = ref('');
   const parsedJsonFromBackend = ref<unknown | null>(null);
   const preprocessedJsonForAi = ref<unknown | null>(null);
   const isDetectingFormat = ref(false);
@@ -74,15 +75,8 @@ export function useDataImportAiSourceFile() {
         return;
       }
 
-      isFormatProcessingUnavailable.value = detectionResult === null;
-      if (detectionResult === null) {
-        backendDisplayText.value =
-          'Backend format detection unavailable. Falling back to AI mapping.';
-        return;
-      }
-
       backendRecognized.value = detectionResult.recognized;
-      backendDisplayText.value = detectionResult.display_text ?? detectionResult.message;
+      backendDisplayText.value = detectionResult.message;
       backendPromptHint.value = detectionResult.ai_prompt_hint ?? '';
       parsedJsonFromBackend.value = detectionResult.recognized
         ? detectionResult.parsed_json ?? null
@@ -90,6 +84,12 @@ export function useDataImportAiSourceFile() {
       preprocessedJsonForAi.value = detectionResult.recognized
         ? detectionResult.preprocessed_for_ai ?? null
         : null;
+    } catch (error) {
+      // The service reports why it failed, so the user sees that reason instead of a
+      // generic "backend unavailable" for rate limits, oversized files or parse errors.
+      if (fileSequence === selectedFileSequence) {
+        formatProcessingErrorMessage.value = getErrorMessage(error);
+      }
     } finally {
       if (fileSequence === selectedFileSequence) {
         isDetectingFormat.value = false;
@@ -102,7 +102,7 @@ export function useDataImportAiSourceFile() {
     backendDisplayText.value = '';
     backendPromptHint.value = '';
     backendRecognized.value = false;
-    isFormatProcessingUnavailable.value = false;
+    formatProcessingErrorMessage.value = '';
     parsedJsonFromBackend.value = null;
     preprocessedJsonForAi.value = null;
   }
@@ -114,7 +114,7 @@ export function useDataImportAiSourceFile() {
     uploadedContent,
     backendDisplayText,
     backendPromptHint,
-    isFormatProcessingUnavailable,
+    formatProcessingErrorMessage,
     parsedJsonFromBackend,
     preprocessedJsonForAi,
     isDetectingFormat,

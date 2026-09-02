@@ -216,16 +216,19 @@ describe('data import AI service', () => {
       inputDocument: 'name=Ada',
       schemaSource: 'use_current_schema',
       currentSchema,
-      backendDisplayText: '',
-      backendPromptHint: '',
-      userComments: '',
+      backendDisplayText: 'Recognized dotenv.',
+      backendPromptHint: 'Keep values as strings.',
+      userComments: 'Treat name as the title.',
     });
 
-    expect(queryDataConversionToJsonMock).toHaveBeenCalledWith(
-      'test-api-key',
-      'name=Ada',
-      JSON.stringify(currentSchema)
-    );
+    // The hints reach the LLM on the current-schema path just like on the inferred one.
+    const [apiKey, userMessage, schemaArgument] = queryDataConversionToJsonMock.mock.calls[0]!;
+    expect(apiKey).toBe('test-api-key');
+    expect(schemaArgument).toBe(JSON.stringify(currentSchema));
+    expect(userMessage).toContain('name=Ada');
+    expect(userMessage).toContain('Recognized dotenv.');
+    expect(userMessage).toContain('Keep values as strings.');
+    expect(userMessage).toContain('Treat name as the title.');
     expect(queryOpenAiMock).not.toHaveBeenCalled();
     expect(result).toEqual({
       resultData: {name: 'Ada'},
@@ -234,13 +237,15 @@ describe('data import AI service', () => {
     });
   });
 
-  it('returns null when backend format detection is unavailable', async () => {
+  it('reports why backend format detection failed instead of hiding the reason', async () => {
     const {detectFormatAndParseInBackend, detectFormatAndParseWithFormatProcessingMock} =
       await setupDataImportAiService();
-    detectFormatAndParseWithFormatProcessingMock.mockRejectedValue(new Error('offline'));
+    detectFormatAndParseWithFormatProcessingMock.mockRejectedValue(
+      new Error('Input file too large')
+    );
 
     await expect(
       detectFormatAndParseInBackend('sample.cif', 'chemical/x-cif', 'data_sample')
-    ).resolves.toBeNull();
+    ).rejects.toThrow('Input file too large');
   });
 });
