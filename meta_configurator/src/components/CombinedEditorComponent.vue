@@ -31,6 +31,7 @@ const props = defineProps<{
 }>();
 
 const settings = useSettings();
+const settingsData = getDataForMode(SessionMode.Settings);
 let panelsDefinition: SettingsInterfacePanels = settings.value.panels;
 
 // update panelsDefinition only when underlying data changes. Otherwise, all panels will be rebuilt every time
@@ -46,9 +47,12 @@ watchImmediate(
     // fix panels if they are not defined
     for (let mode of Object.values(SessionMode)) {
       if (!panels[mode]) {
-        panels[mode] = structuredClone(
-          SETTINGS_DATA_DEFAULT.panels[mode]
-        ) as SettingsInterfacePanels[typeof mode];
+        settingsData.setDataAt(
+          ['panels', mode],
+          structuredClone(
+            SETTINGS_DATA_DEFAULT.panels[mode]
+          ) as SettingsInterfacePanels[typeof mode]
+        );
       }
     }
   }
@@ -83,9 +87,10 @@ onMounted(() => {
 
     // update user settings by adding default value for missing fields
     // also performs settings migration in case of outdated settings
-    const userSettings = getDataForMode(SessionMode.Settings).data.value;
+    const userSettings = settingsData.data.value;
     const defaultSettings: any = structuredClone(SETTINGS_DATA_DEFAULT);
     updateSettingsWithDefaults(userSettings, defaultSettings);
+    settingsData.setData(userSettings);
   }
 });
 
