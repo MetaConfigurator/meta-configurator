@@ -1,156 +1,22 @@
 import {describe, expect, it, vi} from 'vitest';
-import {defineComponent, nextTick, ref} from 'vue';
+import {nextTick, ref} from 'vue';
 import {flushPromises, mount} from '@vue/test-utils';
-
-const DialogStub = defineComponent({
-  props: {
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  template: '<div v-if="visible"><slot /></div>',
-});
-
-const ButtonStub = defineComponent({
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['click'],
-  template:
-    '<button type="button" :disabled="disabled" @click="$emit(\'click\')">{{ label }}<slot /></button>',
-});
-
-const SelectStub = defineComponent({
-  props: {
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    options: {
-      type: Array,
-      default: () => [],
-    },
-    optionLabel: {
-      type: String,
-      default: 'label',
-    },
-    optionValue: {
-      type: String,
-      default: 'value',
-    },
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    getOptionLabel(option: Record<string, string>) {
-      return option[this.optionLabel];
-    },
-    getOptionValue(option: Record<string, string>) {
-      return option[this.optionValue];
-    },
-  },
-  template:
-    '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option v-for="option in options" :key="String(getOptionValue(option))" :value="String(getOptionValue(option))">{{ getOptionLabel(option) }}</option></select>',
-});
-
-const InputTextStub = defineComponent({
-  props: {
-    modelValue: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue'],
-  template:
-    '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-});
-
-const MessageStub = defineComponent({template: '<div><slot /></div>'});
-const DividerStub = defineComponent({template: '<hr />'});
-const PanelStub = defineComponent({template: '<div><slot name="header" /><slot /></div>'});
-const SlotStub = defineComponent({template: '<div><slot /></div>'});
-const EmptyStub = defineComponent({template: '<div />'});
-
-const CheckboxStub = defineComponent({
-  props: {
-    modelValue: {type: [Boolean, Array], default: false},
-    binary: {type: Boolean, default: false},
-    inputId: {type: String, default: ''},
-    value: {type: String, default: ''},
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    onChange(event: Event) {
-      const checked = (event.target as HTMLInputElement).checked;
-      if (this.binary) {
-        this.$emit('update:modelValue', checked);
-        return;
-      }
-
-      const current = Array.isArray(this.modelValue) ? [...this.modelValue] : [];
-      const next = checked
-        ? [...current, this.value]
-        : current.filter(entry => entry !== this.value);
-      this.$emit('update:modelValue', next);
-    },
-  },
-  template:
-    '<input :id="inputId" type="checkbox" :checked="binary ? !!modelValue : Array.isArray(modelValue) && modelValue.includes(value)" @change="onChange" />',
-});
-
-const InputNumberStub = defineComponent({
-  props: {
-    modelValue: {type: Number, default: 0},
-    inputId: {type: String, default: ''},
-  },
-  emits: ['update:modelValue'],
-  template:
-    '<input :id="inputId" type="number" :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />',
-});
-
-type MockEditor = {
-  container: {innerHTML: string};
-  destroy: ReturnType<typeof vi.fn>;
-  getSession: () => {
-    setMode: ReturnType<typeof vi.fn>;
-    setUseWorker: ReturnType<typeof vi.fn>;
-  };
-  getValue: ReturnType<typeof vi.fn>;
-  on: ReturnType<typeof vi.fn>;
-  setValue: ReturnType<typeof vi.fn>;
-  state: {currentValue: string};
-};
-
-function createMockEditor(): MockEditor {
-  const state = {currentValue: ''};
-  const session = {
-    setMode: vi.fn(),
-    setUseWorker: vi.fn(),
-  };
-
-  return {
-    container: {innerHTML: ''},
-    destroy: vi.fn(),
-    getSession: () => session,
-    getValue: vi.fn(() => state.currentValue),
-    on: vi.fn(),
-    setValue: vi.fn((value: string) => {
-      state.currentValue = value;
-    }),
-    state,
-  };
-}
-
-function button(wrapper: any, text: string) {
-  return wrapper.findAll('button').find((entry: any) => entry.text().includes(text));
-}
+import {
+  ButtonStub,
+  CheckboxStub,
+  createMockAceEditor,
+  DialogStub,
+  DividerStub,
+  EmptyStub,
+  findButtonByText,
+  InputNumberStub,
+  InputTextStub,
+  MessageStub,
+  type MockAceEditor,
+  PanelStub,
+  SelectStub,
+  SlotStub,
+} from '@/components/toolbar/dialogs/__tests__/dialogTestUtils';
 
 async function setupDialog({
   currentData,
@@ -174,9 +40,9 @@ async function setupDialog({
   const validateJsonataMappingMock = vi
     .fn()
     .mockResolvedValue({success: true, message: 'Mapping configuration is valid.'});
-  const editors: MockEditor[] = [];
+  const editors: MockAceEditor[] = [];
   const aceEditMock = vi.fn(() => {
-    const editor = createMockEditor();
+    const editor = createMockAceEditor();
     editors.push(editor);
     return editor;
   });
@@ -325,7 +191,7 @@ describe('DataMappingDialog', () => {
     await flushPromises();
     await wrapper.get('#mapping-inferred-source-schema-add-examples').setValue(true);
     await flushPromises();
-    await button(wrapper, 'Generate Suggestion')!.trigger('click');
+    await findButtonByText(wrapper, 'Generate Suggestion').trigger('click');
     await flushPromises();
 
     expect(generateMappingFunctionSuggestionMock).toHaveBeenCalledTimes(1);
@@ -355,7 +221,7 @@ describe('DataMappingDialog', () => {
     });
 
     await openDialog(wrapper);
-    await button(wrapper, 'Generate Suggestion')!.trigger('click');
+    await findButtonByText(wrapper, 'Generate Suggestion').trigger('click');
     await flushPromises();
 
     expect(wrapper.text()).toContain('Mapping generation failed.');
@@ -381,12 +247,12 @@ describe('DataMappingDialog', () => {
     await openDialog(wrapper);
     await wrapper.findAll('select')[1]!.setValue('javascript');
     await flushPromises();
-    await button(wrapper, 'Generate Suggestion')!.trigger('click');
+    await findButtonByText(wrapper, 'Generate Suggestion').trigger('click');
     await flushPromises();
 
     expect(wrapper.text()).toContain('Regenerate Suggestion for Previous Error');
 
-    await button(wrapper, 'Regenerate Suggestion for Previous Error')!.trigger('click');
+    await findButtonByText(wrapper, 'Regenerate Suggestion for Previous Error').trigger('click');
     await flushPromises();
 
     expect(generateMappingFunctionSuggestionMock.mock.calls[1]![0].retryContext).toEqual({
@@ -430,7 +296,7 @@ describe('DataMappingDialog', () => {
     expect(wrapper.text()).toContain('Execute AI Mapping');
     expect(wrapper.text()).not.toContain('Generate Suggestion');
 
-    await button(wrapper, 'Execute AI Mapping')!.trigger('click');
+    await findButtonByText(wrapper, 'Execute AI Mapping').trigger('click');
     await flushPromises();
 
     expect(performDirectAiTargetSchemaMappingMock).toHaveBeenCalledWith(
@@ -470,7 +336,7 @@ describe('DataMappingDialog', () => {
     await openDialog(wrapper);
     await wrapper.findAll('select')[0]!.setValue('direct-ai');
     await flushPromises();
-    await button(wrapper, 'Execute AI Mapping')!.trigger('click');
+    await findButtonByText(wrapper, 'Execute AI Mapping').trigger('click');
     await flushPromises();
 
     expect(dataEditorSetDataMock).toHaveBeenCalledWith(schemaInvalidResult);

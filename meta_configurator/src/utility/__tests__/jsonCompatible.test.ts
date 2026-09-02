@@ -42,6 +42,32 @@ describe('makeJsonCompatible', () => {
 
     expect(makeJsonCompatible([sharedValue, sharedValue])).toEqual([{name: 'Ada'}, {name: 'Ada'}]);
   });
+
+  it('converts built-in objects to stable JSON values', () => {
+    const bytes = new Uint8Array([1, 2, 3]);
+    const error = new Error('failed');
+    error.stack = undefined;
+
+    expect(
+      makeJsonCompatible({
+        date: new Date('2026-09-02T12:00:00.000Z'),
+        invalidDate: new Date(Number.NaN),
+        expression: /schema/gi,
+        error,
+        bytes,
+        map: new Map<unknown, unknown>([[42, 'answer']]),
+        set: new Set([1, 2]),
+      })
+    ).toEqual({
+      date: '2026-09-02T12:00:00.000Z',
+      invalidDate: null,
+      expression: '/schema/gi',
+      error: {name: 'Error', message: 'failed'},
+      bytes: [1, 2, 3],
+      map: {'42': 'answer'},
+      set: [1, 2],
+    });
+  });
 });
 
 describe('hasJsonContent', () => {

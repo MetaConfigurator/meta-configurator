@@ -13,8 +13,13 @@ import {
 import {queryOpenAI} from '@/utility/ai/aiEndpoint';
 import {AI_ACCESS_UNAVAILABLE_MESSAGE, canQueryAi} from '@/utility/ai/aiAvailability';
 import {trimDataToMaxSize} from '@/utility/trimData';
-import {JAVASCRIPT_MAPPING_SYSTEM_MESSAGE} from '@/data-mapping/javascript/javascriptExamples';
-import {JSONATA_MAPPING_SYSTEM_MESSAGE} from '@/data-mapping/jsonata/jsonataExamples';
+import {
+  CLOSING_INSTRUCTIONS,
+  CODE_FENCE_LANGUAGES,
+  DIRECT_AI_MAPPING_SYSTEM_MESSAGE,
+  LANGUAGE_LABELS,
+  SYSTEM_MESSAGES,
+} from '@/data-mapping/dataMappingPrompts';
 import {getErrorMessage} from '@/utility/getErrorMessage';
 
 export type MappingGenerationLanguage = 'jsonata' | 'javascript';
@@ -38,62 +43,6 @@ export type MappingFunctionSuggestionRequest =
       method: 'inferred-source-schema';
       sourceSchema: TopLevelSchema;
     });
-
-const LANGUAGE_LABELS: Record<MappingGenerationLanguage, string> = {
-  jsonata: 'JSONata',
-  javascript: 'JavaScript',
-};
-
-const CODE_FENCE_LANGUAGES: Record<MappingGenerationLanguage, string[]> = {
-  jsonata: ['jsonata', 'json'],
-  javascript: ['javascript', 'js'],
-};
-
-const SYSTEM_MESSAGES: Record<MappingGenerationLanguage, string> = {
-  jsonata: JSONATA_MAPPING_SYSTEM_MESSAGE,
-  javascript: JAVASCRIPT_MAPPING_SYSTEM_MESSAGE,
-};
-
-const DIRECT_AI_MAPPING_SYSTEM_MESSAGE = [
-  'You are a JSON data transformation expert.',
-  'Transform the provided JSON document so that the result strictly satisfies the target JSON schema.',
-  'Return ONLY valid JSON. No markdown. No explanation.',
-  'Preserve information conservatively when possible, but target schema compliance has priority.',
-  'Never omit required properties. If a required value cannot be derived, use null or a conservative default that matches the schema type.',
-].join('\n');
-
-const CLOSING_INSTRUCTIONS: Record<
-  MappingGenerationLanguage,
-  Record<MappingGenerationMethod, string[]>
-> = {
-  jsonata: {
-    'source-data': [
-      'Generate a multi-line JSONata expression that transforms the input data to satisfy the target schema.',
-      'Use the actual input data preview, its schema when provided, and the target schema.',
-      'Return only the JSONata expression.',
-    ],
-    'inferred-source-schema': [
-      'Generate a multi-line JSONata expression that maps documents matching the source schema to the target schema.',
-      'If the source schema contains examples, use them as hints.',
-      'Do not assume fields that are not described by the source schema.',
-      'Return only the JSONata expression.',
-    ],
-  },
-  javascript: {
-    'source-data': [
-      'Generate the JavaScript mapping code now.',
-      'Use the actual input data preview, its schema when provided, and the target schema.',
-      'Remember: output ONLY code that defines function transform(input) { ... } and returns the result object.',
-    ],
-    'inferred-source-schema': [
-      'Generate the JavaScript mapping code now.',
-      'The function must accept input documents matching the source schema and return output that satisfies the target schema.',
-      'If the source schema contains examples, use them as hints.',
-      'Do not rely on runtime data examples beyond the source schema.',
-      'Remember: output ONLY code that defines function transform(input) { ... } and returns the result object.',
-    ],
-  },
-};
 
 export async function generateMappingFunctionSuggestion(
   request: MappingFunctionSuggestionRequest

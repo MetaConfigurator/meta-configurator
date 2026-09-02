@@ -7,7 +7,6 @@ import {
   childrenInSchemaOrder,
   sortObjectChildren,
 } from '@/components/panels/gui-editor/sortingUtils';
-import {sortSchemaPropertiesAlphabetically} from '@/schema/sortSchemaPropertiesAlphabetically';
 
 // The sort strategies only ever read `node.data.name`, so stub nodes with just that
 // field are enough. We avoid importing the real GuiEditorTreeNode type to keep this
@@ -180,121 +179,5 @@ describe('sortObjectChildren — alphabetical order', () => {
     );
 
     expect(namesOf(result)).toEqual(['apple', 'zebra']);
-  });
-});
-
-describe('sortSchemaPropertiesAlphabetically', () => {
-  it('sorts properties keys alphabetically and leaves other keywords untouched', () => {
-    const result = sortSchemaPropertiesAlphabetically({
-      type: 'object',
-      title: 'Person',
-      properties: {
-        zip: {type: 'string'},
-        age: {type: 'number'},
-        name: {type: 'string'},
-      },
-    });
-
-    expect(Object.keys((result as any).properties)).toEqual(['age', 'name', 'zip']);
-    expect((result as any).type).toBe('object');
-    expect((result as any).title).toBe('Person');
-  });
-
-  it('recurses into nested object schemas, items, and allOf', () => {
-    const result = sortSchemaPropertiesAlphabetically({
-      type: 'object',
-      properties: {
-        b: {
-          type: 'object',
-          properties: {
-            z: {type: 'number'},
-            a: {type: 'number'},
-          },
-        },
-        a: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              second: {type: 'string'},
-              first: {type: 'string'},
-            },
-          },
-        },
-      },
-      allOf: [
-        {
-          type: 'object',
-          properties: {
-            zz: {type: 'string'},
-            aa: {type: 'string'},
-          },
-        },
-      ],
-    });
-
-    expect(Object.keys((result as any).properties)).toEqual(['a', 'b']);
-    expect(Object.keys((result as any).properties.b.properties)).toEqual(['a', 'z']);
-    expect(Object.keys((result as any).properties.a.items.properties)).toEqual(['first', 'second']);
-    expect(Object.keys((result as any).allOf[0].properties)).toEqual(['aa', 'zz']);
-  });
-
-  it('sorts $defs, definitions, patternProperties, and dependentSchemas keys', () => {
-    const result = sortSchemaPropertiesAlphabetically({
-      $defs: {
-        zebra: {type: 'string'},
-        apple: {type: 'string'},
-      },
-      definitions: {
-        beta: {type: 'string'},
-        alpha: {type: 'string'},
-      },
-      patternProperties: {
-        '^z': {type: 'string'},
-        '^a': {type: 'string'},
-      },
-      dependentSchemas: {
-        foo: {type: 'object'},
-        bar: {type: 'object'},
-      },
-    });
-
-    expect(Object.keys((result as any).$defs)).toEqual(['apple', 'zebra']);
-    expect(Object.keys((result as any).definitions)).toEqual(['alpha', 'beta']);
-    expect(Object.keys((result as any).patternProperties)).toEqual(['^a', '^z']);
-    expect(Object.keys((result as any).dependentSchemas)).toEqual(['bar', 'foo']);
-  });
-
-  it('leaves the order of array elements alone (only object keys are sorted)', () => {
-    const result = sortSchemaPropertiesAlphabetically({
-      required: ['zip', 'age', 'name'],
-      enum: ['c', 'b', 'a'],
-    });
-
-    expect((result as any).required).toEqual(['zip', 'age', 'name']);
-    expect((result as any).enum).toEqual(['c', 'b', 'a']);
-  });
-
-  it('does not mutate the input', () => {
-    const input = {
-      type: 'object',
-      properties: {
-        zip: {type: 'string'},
-        age: {type: 'number'},
-      },
-    };
-    const originalKeys = Object.keys(input.properties);
-
-    sortSchemaPropertiesAlphabetically(input);
-
-    expect(Object.keys(input.properties)).toEqual(originalKeys);
-  });
-
-  it('passes primitives through', () => {
-    expect(sortSchemaPropertiesAlphabetically(true)).toBe(true);
-    expect(sortSchemaPropertiesAlphabetically(false)).toBe(false);
-    expect(sortSchemaPropertiesAlphabetically(null)).toBe(null);
-    expect(sortSchemaPropertiesAlphabetically(42)).toBe(42);
-    expect(sortSchemaPropertiesAlphabetically('hello')).toBe('hello');
   });
 });

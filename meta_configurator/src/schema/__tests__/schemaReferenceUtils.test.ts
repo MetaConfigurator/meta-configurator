@@ -46,6 +46,17 @@ describe('collectAllRefs', () => {
     expect(collectAllRefs(schema)).toEqual(['#/$defs/Shared']);
   });
 
+  it('collects dynamic and recursive references as well as regular references', () => {
+    const schema = {
+      $dynamicRef: '#meta',
+      properties: {
+        child: {$recursiveRef: '#'},
+      },
+    };
+
+    expect(collectAllRefs(schema)).toEqual(['#meta', '#']);
+  });
+
   it('returns an empty array for schemas without refs', () => {
     expect(collectAllRefs({type: 'string'})).toEqual([]);
     expect(collectAllRefs(true)).toEqual([]);
@@ -59,6 +70,13 @@ describe('resolveInternalReferencePath', () => {
 
   it('returns undefined for external references', () => {
     expect(resolveInternalReferencePath('https://example.com/schema.json')).toBeUndefined();
+  });
+
+  it('decodes escaped JSON Pointer path segments', () => {
+    expect(resolveInternalReferencePath('#/$defs/path~1name~0value')).toEqual([
+      '$defs',
+      'path/name~value',
+    ]);
   });
 });
 
@@ -75,5 +93,11 @@ describe('resolveInternalReferenceSchema', () => {
 
   it('returns undefined when the referenced schema does not exist', () => {
     expect(resolveInternalReferenceSchema('#/$defs/Missing', rootSchema)).toBeUndefined();
+  });
+
+  it('returns undefined when the reference points to a boolean schema', () => {
+    expect(
+      resolveInternalReferenceSchema('#/$defs/Disabled', {$defs: {Disabled: false}})
+    ).toBeUndefined();
   });
 });

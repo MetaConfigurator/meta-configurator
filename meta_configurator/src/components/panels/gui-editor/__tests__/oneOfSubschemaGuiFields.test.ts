@@ -9,32 +9,15 @@
  */
 import {beforeAll, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
+import {installWorkerTestDouble} from '@/data/__tests__/managedValidationTestUtils';
 
-class FakeWorker {
-  onmessage: ((e: any) => void) | null = null;
-  postMessage() {}
-  terminate() {}
-}
-(globalThis as any).Worker = FakeWorker;
+installWorkerTestDouble();
 
-// ManagedValidation spawns a web worker and participates in a circular import that
-// vitest cannot resolve; replace it with a synchronous, lazily evaluated equivalent.
 vi.mock('@/data/managedValidation', async () => {
-  const {computed, ref} = await import('vue');
-  const {ValidationService} = await import('@/schema/validationService');
-  const {ValidationResult} = await import('@/schema/validationUtils');
-  class ManagedValidation {
-    constructor(
-      public mode: any,
-      private validationSchemaRaw?: any
-    ) {}
-    currentValidationService = computed(
-      () => new ValidationService(this.validationSchemaRaw?.value ?? {})
-    );
-    currentValidationResult = ref(new ValidationResult([]));
-    updateValidationResultAsync() {}
-  }
-  return {ManagedValidation};
+  const {createManagedValidationModuleTestDouble} = await import(
+    '@/data/__tests__/managedValidationTestUtils'
+  );
+  return createManagedValidationModuleTestDouble();
 });
 
 let SessionMode: any;

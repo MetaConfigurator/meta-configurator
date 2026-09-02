@@ -1,105 +1,19 @@
 import {describe, expect, it, vi, beforeEach} from 'vitest';
-import {defineComponent, nextTick, ref} from 'vue';
+import {nextTick, ref} from 'vue';
 import {flushPromises, mount} from '@vue/test-utils';
-
-const DialogStub = defineComponent({
-  props: {
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  template: '<div v-if="visible"><slot /></div>',
-});
-
-const ButtonStub = defineComponent({
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['click'],
-  template:
-    '<button type="button" :disabled="disabled" @click="$emit(\'click\')">{{ label }}<slot /></button>',
-});
-
-const TextareaStub = defineComponent({
-  props: {
-    modelValue: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue'],
-  template:
-    '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-});
-
-const SelectStub = defineComponent({
-  props: {
-    modelValue: {
-      type: [String, Object],
-      default: '',
-    },
-  },
-  emits: ['update:modelValue'],
-  template: '<div><slot /></div>',
-});
-
-const InputTextStub = defineComponent({
-  props: {
-    modelValue: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['update:modelValue'],
-  template:
-    '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-});
-
-const MessageStub = defineComponent({template: '<div><slot /></div>'});
-const DividerStub = defineComponent({template: '<hr />'});
-const SlotStub = defineComponent({template: '<div><slot /></div>'});
-const EmptyStub = defineComponent({template: '<div />'});
-
-type MockEditor = {
-  container: {innerHTML: string};
-  destroy: ReturnType<typeof vi.fn>;
-  getSession: () => {
-    setMode: ReturnType<typeof vi.fn>;
-    setUseWorker: ReturnType<typeof vi.fn>;
-  };
-  on: ReturnType<typeof vi.fn>;
-  getValue: ReturnType<typeof vi.fn>;
-  setValue: ReturnType<typeof vi.fn>;
-  state: {currentValue: string};
-};
-
-function createMockEditor(): MockEditor {
-  const state = {currentValue: ''};
-  const session = {
-    setMode: vi.fn(),
-    setUseWorker: vi.fn(),
-  };
-
-  return {
-    container: {innerHTML: ''},
-    destroy: vi.fn(),
-    getSession: () => session,
-    on: vi.fn(),
-    getValue: vi.fn(() => state.currentValue),
-    setValue: vi.fn((value: string) => {
-      state.currentValue = value;
-    }),
-    state,
-  };
-}
+import {
+  ButtonStub,
+  createMockAceEditor,
+  DialogStub,
+  DividerStub,
+  EmptyStub,
+  InputTextStub,
+  MessageStub,
+  type MockAceEditor,
+  SelectStub,
+  SlotStub,
+  TextareaStub,
+} from '@/components/toolbar/dialogs/__tests__/dialogTestUtils';
 
 async function setupDialog() {
   vi.resetModules();
@@ -116,9 +30,9 @@ async function setupDialog() {
       backend: {endpoint: 'https://api.openai.com/v1/'},
     },
   });
-  const editors: MockEditor[] = [];
+  const editors: MockAceEditor[] = [];
   const aceEditMock = vi.fn(() => {
-    const editor = createMockEditor();
+    const editor = createMockAceEditor();
     editors.push(editor);
     return editor;
   });

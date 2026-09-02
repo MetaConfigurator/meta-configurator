@@ -1,4 +1,21 @@
 import axios from 'axios';
+import {
+  buildDataConversionFromJsonSystemMessage,
+  buildDataConversionToJsonSystemMessage,
+  buildDataModificationSystemMessage,
+  buildDataQuestionSystemMessage,
+  buildHandlebarsSystemMessage,
+  buildHandlebarsUserMessage,
+  buildRmlMappingSystemMessage,
+  buildRmlMappingUserMessage,
+  buildSchemaModificationSystemMessage,
+  buildSchemaQuestionSystemMessage,
+  buildSettingsModificationSystemMessage,
+  buildSettingsQuestionSystemMessage,
+  buildSparqlSystemMessage,
+  buildSparqlUserMessage,
+  SCHEMA_CREATION_SYSTEM_MESSAGE,
+} from '@/utility/ai/aiPrompts';
 import {useSettings} from '@/settings/useSettings';
 import {throwAiRequestError} from '@/utility/ai/aiRequestError';
 
@@ -74,9 +91,8 @@ export const querySchemaCreation = async (
   apiKey: string,
   schemaDescriptionNaturalLanguage: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Create a JSON schema based on the schema description by the user. Return no other text than a fully valid JSON schema document. When appropriate, put sub-schema definitions into the $defs section. `;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {role: 'system', content: SCHEMA_CREATION_SYSTEM_MESSAGE},
     {role: 'user', content: schemaDescriptionNaturalLanguage},
   ]);
 };
@@ -86,9 +102,8 @@ export const querySchemaModification = async (
   schemaChangeDescriptionNaturalLanguage: string,
   fullSchema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Modify the provided JSON schema based on the schema change description by the user. Return no other text than a fully valid JSON schema document. No other explanation or words. When appropriate, put sub-schema definitions into the $defs section. The schema to modify is: \`\`\`${fullSchema}\`\`\``;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {role: 'system', content: buildSchemaModificationSystemMessage(fullSchema)},
     {role: 'user', content: schemaChangeDescriptionNaturalLanguage},
   ]);
 };
@@ -98,9 +113,8 @@ export const querySchemaQuestion = async (
   schemaQueryNaturalLanguage: string,
   fullSchema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Explain/summarize/query the provided JSON schema based on the prompt by the user. The schema to query is: \`\`\`${fullSchema}\`\`\`. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {role: 'system', content: buildSchemaQuestionSystemMessage(fullSchema)},
     {role: 'user', content: schemaQueryNaturalLanguage},
   ]);
 };
@@ -110,9 +124,8 @@ export const queryDataConversionToJson = async (
   dataInOtherFormat: string,
   schema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Convert the data input provided by the user (in any format) into a JSON document which satisfies the following schema: \`\`\`${schema}\`\`\`. Return no other text than a fully valid JSON document satisfying the schema. No other explanation or words.`;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {role: 'system', content: buildDataConversionToJsonSystemMessage(schema)},
     {role: 'user', content: dataInOtherFormat},
   ]);
 };
@@ -123,9 +136,8 @@ export const queryDataConversionFromJson = async (
   jsonData: string,
   schema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Convert the JSON document \`\`\`${jsonData}\`\`\` into the format provided by the user. The user will provide a format description or an example file with different data of the target format. The JSON document follows the schema \`\`\`${schema}\`\`\`. Return no other text than a document matching the user provided example or description. No other explanation or words.`;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {role: 'system', content: buildDataConversionFromJsonSystemMessage(jsonData, schema)},
     {role: 'user', content: descriptionOrDataInOtherFormat},
   ]);
 };
@@ -136,9 +148,8 @@ export const queryDataModification = async (
   data: string,
   schema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Modify the provided JSON document based on the data change description by the user. Return no other text than a fully valid JSON document. The document to modify is: \`\`\`${data}\`\`\`. The resulting JSON document needs to satisfy the JSON schema \`\`\`${schema}\`\`\``;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {role: 'system', content: buildDataModificationSystemMessage(data, schema)},
     {role: 'user', content: dataChangeDescriptionNaturalLanguage},
   ]);
 };
@@ -149,9 +160,8 @@ export const queryDataQuestion = async (
   data: string,
   schema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Explain/summarize/query the provided JSON document based on the prompt by the user. The document to query is: \`\`\`${data}\`\`\`. The JSON schema for the document is \`\`\`${schema}\`\`\`. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {role: 'system', content: buildDataQuestionSystemMessage(data, schema)},
     {role: 'user', content: dataQuestionNaturalLanguage},
   ]);
 };
@@ -162,9 +172,11 @@ export const querySettingsModification = async (
   currentSettings: string,
   settingsSchema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Modify the provided settings based on the settings change description by the user. Return no other text than a fully valid JSON document. The settings to modify are: \`\`\`${currentSettings}\`\`\`. The resulting JSON document needs to satisfy the JSON schema \`\`\`${settingsSchema}\`\`\``;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {
+      role: 'system',
+      content: buildSettingsModificationSystemMessage(currentSettings, settingsSchema),
+    },
     {role: 'user', content: settingsChangeDescriptionNaturalLanguage},
   ]);
 };
@@ -175,9 +187,8 @@ export const querySettingsQuestion = async (
   data: string,
   schema: string
 ) => {
-  const systemMessage = `You are a JSON schema expert. Explain/summarize/query the user settings of the MetaConfigurator web app based on the prompt by the user. The settings to query is: \`\`\`${data}\`\`\`. The JSON schema for the settings is \`\`\`${schema}\`\`\`. Use normal natural language sentences for the responses but avoid special formatting. Keep the response short and concise.`;
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
+    {role: 'system', content: buildSettingsQuestionSystemMessage(data, schema)},
     {role: 'user', content: settingsQuestionNaturalLanguage},
   ]);
 };
@@ -192,21 +203,20 @@ export const queryHandlebarsTemplate = async (
   inputFileSchema: string,
   outputDescription: string
 ) => {
-  const systemMessage = `You are a JSON and Handlebars Text Templating expert. Your task is to generate a Handlebars Template for transforming the user input JSON document to a text document as desired by the user.
-  Only output **valid Handlebars** template syntax. Do not use any other templating language or surrounding text.
-  Example input file: \`\`\`${exampleInput}\`\`\`.
-  Example input schema: \`\`\`${exampleInputSchema}\`\`\`.
-  Example output: \`\`\`${exampleOutput}\`\`\`.
-  For these examples you should generate the following Template: \`\`\`${exampleExpression}\`\`\`.
-  The output description can also be natural language texts or other data structures (e.g., XML, or other formats), but the output must always be a text document.`;
-
-  const userMessage = `Input file subset: \`\`\`${inputFileSubset}\`\`\`.  
-  Input file schema: \`\`\`${inputFileSchema}\`\`\`.
-  The goal is to generate a handlebars Template. Description or example of the desired output document: \`\`\`${outputDescription}\`\`\`. Keep it simple and conservative. Avoid adding new values that do not exist.`;
-
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
-    {role: 'user', content: userMessage},
+    {
+      role: 'system',
+      content: buildHandlebarsSystemMessage(
+        exampleInput,
+        exampleInputSchema,
+        exampleOutput,
+        exampleExpression
+      ),
+    },
+    {
+      role: 'user',
+      content: buildHandlebarsUserMessage(inputFileSubset, inputFileSchema, outputDescription),
+    },
   ]);
 };
 
@@ -218,47 +228,12 @@ export const queryRmlMapping = async (
   inputFileSubset: string,
   userComments: string
 ) => {
-  const systemMessage = `
-${instructions}
-
-Example input JSON:
-\`\`\`
-${exampleInput}
-\`\`\`
-
-Example RML mapping:
-\`\`\`
-${exampleOutputRml}
-\`\`\`
-`;
-
-  let userMessage = `
-Real input JSON subset:
-\`\`\`
-${inputFileSubset}
-\`\`\`
-
-Requirements:
-- Keep the mapping minimal and accurate.
-- Only map fields that exist in the input JSON.
-- Do not invent values or fields.
-
-Return ONLY the RML mapping in valid Turtle syntax.
-`;
-
-  if (userComments && userComments.length > 0) {
-    userMessage += `
-
-Additional user comments:
-\`\`\`
-${userComments}
-\`\`\`
-`;
-  }
-
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
-    {role: 'user', content: userMessage},
+    {
+      role: 'system',
+      content: buildRmlMappingSystemMessage(instructions, exampleInput, exampleOutputRml),
+    },
+    {role: 'user', content: buildRmlMappingUserMessage(inputFileSubset, userComments)},
   ]);
 };
 
@@ -269,73 +244,11 @@ export const generateSparqlSuggestion = async (
   prefixBlock: string,
   visualizationMode: boolean = false
 ) => {
-  const baseSystemMessage = `
-You are a SPARQL expert assistant.
-
-Goal:
-Generate a VALID SPARQL query for a JSON-LD/RDF dataset based on the user's intent.
-
-General rules:
-1) Do NOT invent prefixes. Use only the provided PREFIX block.
-2) Prefer patterns that exist in the input graph.
-3) If the user's request is ambiguous, make a sensible assumption and keep the query broad but safe.
-4) Do NOT output any explanation. Output ONLY the VALID SPARQL query text.
-`.trim();
-
-  const visualizationSystemRules = `
-Additional mandatory rules:
-- Output MUST be a SPARQL CONSTRUCT query.
-- The CONSTRUCT template MUST be EXACTLY:
-  CONSTRUCT { ?subject ?predicate ?object . }
-  Other construct patterns are NOT allowed.
-  DO NOT CHANGE the CONSTRUCT template. Use BIND in the WHERE clause to define ?subject, ?predicate, and ?object.
-- The WHERE clause MUST bind ?subject, ?predicate, and ?object.
-- ?predicate MUST be an IRI (NamedNode), never a literal.
-`.trim();
-
-  const selectSystemRules = `
-Additional mandatory rules:
-- Output MUST be a SPARQL SELECT query.
-`.trim();
-
-  const systemMessage = visualizationMode
-    ? `${baseSystemMessage}\n\n${visualizationSystemRules}`
-    : `${baseSystemMessage}\n\n${selectSystemRules}`;
-
-  const visualizationFallback = `
-If the user intent is unclear, use:
-CONSTRUCT { ?subject ?predicate ?object . }
-WHERE { ?subject ?predicate ?object . }
-`.trim();
-
-  const selectFallback = `
-If the user intent is unclear, use:
-SELECT * WHERE { ?s ?p ?o . } LIMIT 100
-`.trim();
-
-  const safePrefixBlock = prefixBlock?.trim() || '(empty)';
-
-  const userMessage = `
-PREFIX block (MUST be placed at the very top of your output, verbatim; remove unused final prefixes):
-\`\`\`
-${safePrefixBlock}
-\`\`\`
-
-${visualizationMode ? visualizationFallback : selectFallback}
-
-JSON-LD content (treat as the only dataset; write a query that works against it):
-\`\`\`json
-${jsonLdContent}
-\`\`\`
-
-User intent / comments:
-\`\`\`
-${(userComments ?? '').trim() || '(none)'}
-\`\`\`
-`.trim();
-
   return queryOpenAI(apiKey, [
-    {role: 'system', content: systemMessage},
-    {role: 'user', content: userMessage},
+    {role: 'system', content: buildSparqlSystemMessage(visualizationMode)},
+    {
+      role: 'user',
+      content: buildSparqlUserMessage(jsonLdContent, userComments, prefixBlock, visualizationMode),
+    },
   ]);
 };

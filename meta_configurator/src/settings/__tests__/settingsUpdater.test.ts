@@ -38,6 +38,37 @@ import {
   updateSettingsWithDefaults,
 } from '../settingsUpdater';
 
+const PREVIOUS_BACKEND_SETTINGS = {
+  snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+  schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+};
+
+const CURRENT_BACKEND_SETTINGS = {
+  ...PREVIOUS_BACKEND_SETTINGS,
+  formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+};
+
+function createSettingsMigrationFixture(settingsVersion: string, backend: Record<string, unknown>) {
+  return {
+    settingsVersion,
+    panels: {
+      dataEditor: [],
+      schemaEditor: [],
+      settings: [],
+      hidden: [],
+    },
+    backend: {...backend},
+    aiIntegration: {
+      model: 'alias-fast',
+      temperature: 0,
+      backend: {
+        relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+        endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+      },
+    },
+  };
+}
+
 describe('test settings updater', () => {
   const userSettings: any = {
     a: {
@@ -415,184 +446,39 @@ describe('test settings updater', () => {
   });
 
   it('adds the new format processing URL while bumping from 1.0.5 to 1.0.6', () => {
-    const userFile = {
-      settingsVersion: '1.0.5',
-      panels: {
-        dataEditor: [],
-        schemaEditor: [],
-        settings: [],
-        hidden: [],
-      },
-      backend: {
-        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-      },
-      aiIntegration: {
-        model: 'alias-fast',
-        temperature: 0.0,
-        backend: {
-          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
-          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-        },
-      },
-    };
-
-    const defaultsFile = {
-      settingsVersion: '1.0.6',
-      panels: {
-        dataEditor: [],
-        schemaEditor: [],
-        settings: [],
-        hidden: [],
-      },
-      backend: {
-        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl:
-          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
-      },
-      aiIntegration: {
-        model: 'alias-fast',
-        temperature: 0.0,
-        backend: {
-          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
-          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-        },
-      },
-    };
+    const userFile = createSettingsMigrationFixture('1.0.5', PREVIOUS_BACKEND_SETTINGS);
+    const defaultsFile = createSettingsMigrationFixture('1.0.6', CURRENT_BACKEND_SETTINGS);
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
     expect(userFile.settingsVersion).toBe('1.0.6');
-    expect(userFile.backend).toEqual({
-      snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-      schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
-    });
+    expect(userFile.backend).toEqual(CURRENT_BACKEND_SETTINGS);
   });
 
   it('renames importBackendUrl to formatProcessingUrl during settings migration', () => {
-    const userFile = {
-      settingsVersion: '1.0.6',
-      panels: {
-        dataEditor: [],
-        schemaEditor: [],
-        settings: [],
-        hidden: [],
-      },
-      backend: {
-        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        importBackendUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/import-backend',
-      },
-      aiIntegration: {
-        model: 'alias-fast',
-        temperature: 0.0,
-        backend: {
-          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
-          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-        },
-      },
-    };
-
-    const defaultsFile = {
-      settingsVersion: '1.0.6',
-      panels: {
-        dataEditor: [],
-        schemaEditor: [],
-        settings: [],
-        hidden: [],
-      },
-      backend: {
-        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl:
-          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
-      },
-      aiIntegration: {
-        model: 'alias-fast',
-        temperature: 0.0,
-        backend: {
-          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
-          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-        },
-      },
-    };
+    const userFile = createSettingsMigrationFixture('1.0.6', {
+      ...PREVIOUS_BACKEND_SETTINGS,
+      importBackendUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/import-backend',
+    });
+    const defaultsFile = createSettingsMigrationFixture('1.0.6', CURRENT_BACKEND_SETTINGS);
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.backend).toEqual({
-      snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-      schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
-    });
+    expect(userFile.backend).toEqual(CURRENT_BACKEND_SETTINGS);
   });
 
   it('removes legacy backend settings objects that no longer exist in 1.0.6', () => {
-    const userFile = {
-      settingsVersion: '1.0.6',
-      panels: {
-        dataEditor: [],
-        schemaEditor: [],
-        settings: [],
-        hidden: [],
-      },
-      backend: {
-        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl:
-          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
-        snapshotBackend: {
-          hostName: 'https://snapshot.example.com',
-        },
-        importBackend: {
-          hostName: 'https://import.example.com',
-        },
-        importedBackend: {
-          hostName: 'https://imported.example.com',
-        },
-        hostname: 'https://legacy.example.com',
-      },
-      aiIntegration: {
-        model: 'alias-fast',
-        temperature: 0.0,
-        backend: {
-          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
-          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-        },
-      },
-    };
-
-    const defaultsFile = {
-      settingsVersion: '1.0.6',
-      panels: {
-        dataEditor: [],
-        schemaEditor: [],
-        settings: [],
-        hidden: [],
-      },
-      backend: {
-        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-        formatProcessingUrl:
-          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
-      },
-      aiIntegration: {
-        model: 'alias-fast',
-        temperature: 0.0,
-        backend: {
-          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
-          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
-        },
-      },
-    };
+    const userFile = createSettingsMigrationFixture('1.0.6', {
+      ...CURRENT_BACKEND_SETTINGS,
+      snapshotBackend: {hostName: 'https://snapshot.example.com'},
+      importBackend: {hostName: 'https://import.example.com'},
+      importedBackend: {hostName: 'https://imported.example.com'},
+      hostname: 'https://legacy.example.com',
+    });
+    const defaultsFile = createSettingsMigrationFixture('1.0.6', CURRENT_BACKEND_SETTINGS);
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.backend).toEqual({
-      snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
-      schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
-      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
-    });
+    expect(userFile.backend).toEqual(CURRENT_BACKEND_SETTINGS);
   });
 });

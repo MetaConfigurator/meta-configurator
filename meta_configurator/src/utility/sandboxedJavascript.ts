@@ -2,7 +2,7 @@ const DEFAULT_EXECUTION_TIMEOUT_MS = 10_000;
 
 const FORBIDDEN_SOURCE_PATTERNS: {pattern: RegExp; description: string}[] = [
   {
-    pattern: /\bimport\s*(?:\(|[{'"*\w])/,
+    pattern: /\bimport(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*(?:\r?\n|$))*(?:\(|[{'"*\w])/,
     description: 'module imports',
   },
   {

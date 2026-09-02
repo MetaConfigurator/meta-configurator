@@ -8,6 +8,7 @@ import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 import {getApiKeyRef} from '@/utility/ai/apiKey';
 import {canQueryAi} from '@/utility/ai/aiAvailability';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 import {
   generateImportScriptSuggestion,
   generateNormalizationScriptSuggestion,
@@ -56,7 +57,6 @@ export function useDataImportAiDialog() {
   const errorMessage = ref('');
   const warningMessage = ref('');
   const selectedImportMode = ref<DataImportAiMode>('javascript_mapping');
-  const javascriptInputMode = ref<'raw' | 'parsed'>('raw');
   const selectedSchemaSource = ref(INFER_SCHEMA_OPTION);
   const isLoadingSuggestion = ref(false);
   const isImportingData = ref(false);
@@ -184,7 +184,7 @@ export function useDataImportAiDialog() {
     clearSuggestionRetryContext();
     clearPendingImportConfirmation();
   });
-  watch(selectedSchemaSource, clearPendingImportConfirmation);
+  watch([selectedSchemaSource, userComments], clearPendingImportConfirmation);
 
   function openDialog() {
     resetDialog();
@@ -252,9 +252,12 @@ export function useDataImportAiDialog() {
     schemaSource: DataImportAiSchemaSource,
     message: string
   ) {
+    const inferredSchema =
+      schemaSource === 'infer_from_data' ? inferJsonSchema(resultData) : undefined;
+
     getDataForMode(SessionMode.DataEditor).setData(resultData);
-    if (schemaSource === 'infer_from_data') {
-      getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferJsonSchema(resultData);
+    if (inferredSchema !== undefined) {
+      getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferredSchema;
     }
 
     statusMessage.value = message;
@@ -338,7 +341,6 @@ export function useDataImportAiDialog() {
 
   function resetFileDependentImportState() {
     selectedImportMode.value = getDefaultImportMode();
-    javascriptInputMode.value = 'raw';
     clearSuggestionRetryContext();
     clearPendingImportConfirmation();
   }
@@ -374,10 +376,11 @@ export function useDataImportAiDialog() {
       }
 
       generatedScript.value = result.config;
-      javascriptInputMode.value = normalizesParsedData ? 'parsed' : 'raw';
       clearSuggestionRetryContext();
       statusMessage.value = result.message;
       errorMessage.value = '';
+    } catch (error) {
+      showError(`Failed to generate JavaScript suggestion. Reason: ${getErrorMessage(error)}.`);
     } finally {
       isLoadingSuggestion.value = false;
     }
@@ -453,6 +456,8 @@ export function useDataImportAiDialog() {
     try {
       const result = await executeImport(schemaSource, getCurrentSchema());
       handleImportResult(result, schemaSource, mode, editorSnapshot);
+    } catch (error) {
+      showError(`Import failed. Reason: ${getErrorMessage(error)}.`);
     } finally {
       isImportingData.value = false;
     }
@@ -470,8 +475,7 @@ export function useDataImportAiDialog() {
       return;
     }
 
-    const usesParsedInput =
-      selectedImportMode.value === 'ai_normalize_parsed' || javascriptInputMode.value === 'parsed';
+    const usesParsedInput = selectedImportMode.value === 'ai_normalize_parsed';
     if (usesParsedInput && parsedJsonFromBackend.value === null) {
       showError('No parsed backend JSON available for AI normalization.');
       return;

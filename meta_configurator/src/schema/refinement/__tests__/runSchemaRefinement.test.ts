@@ -1,6 +1,9 @@
 import {describe, expect, it} from 'vitest';
 import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
-import {runSchemaRefinement} from '@/schema/refinement/runSchemaRefinement';
+import {
+  runSchemaRefinement,
+  runSchemaRefinementFromSamples,
+} from '@/schema/refinement/runSchemaRefinement';
 import {
   ADD_EXAMPLES_DEFAULTS,
   DETECT_ADDITIONAL_PROPERTIES_DEFAULTS,
@@ -16,6 +19,76 @@ function expectObjectSchema(schema: unknown): asserts schema is JsonSchemaObject
 }
 
 describe('runSchemaRefinement', () => {
+  it('returns a deep copy without mutating the input schema', () => {
+    const schema: TopLevelSchema = {
+      type: 'object',
+      properties: {name: {type: 'string'}},
+    };
+
+    const refined = runSchemaRefinement(schema, {name: 'Ada'}, {});
+    expectObjectSchema(refined);
+    refined.properties = {};
+
+    expect(refined).not.toBe(schema);
+    expect(schema).toEqual({
+      type: 'object',
+      properties: {name: {type: 'string'}},
+    });
+  });
+
+  it('combines observations from several root data instances', () => {
+    const schema: TopLevelSchema = {
+      type: 'object',
+      properties: {
+        name: {type: 'string'},
+        status: {type: 'string'},
+      },
+    };
+
+    const refined = runSchemaRefinementFromSamples(
+      schema,
+      [
+        {name: 'Ada', status: 'OPEN'},
+        {name: 'Grace', status: 'CLOSED'},
+        {name: 'Linus', status: 'OPEN'},
+        {name: 'Margaret', status: 'OPEN'},
+      ],
+      {
+        addExamples: ADD_EXAMPLES_DEFAULTS,
+        detectEnums: DETECT_ENUMS_DEFAULTS,
+      }
+    );
+    expectObjectSchema(refined);
+
+    expect(refined.properties?.name).toEqual({
+      type: 'string',
+      examples: ['Ada', 'Grace', 'Linus', 'Margaret'],
+    });
+    expect(refined.properties?.status).toEqual({
+      type: 'string',
+      enum: ['OPEN', 'CLOSED'],
+    });
+  });
+
+  it('honors example limits and duplicate handling options', () => {
+    const schema: TopLevelSchema = {
+      type: 'array',
+      items: {type: 'string'},
+    };
+
+    const refined = runSchemaRefinement(schema, ['Ada', 'Ada', 'Grace'], {
+      addExamples: {
+        maxExamplesPerField: 2,
+        uniqueOnly: false,
+        ignoreNullValues: true,
+      },
+    });
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.items);
+
+    expect(refined.items.examples).toEqual(['Ada', 'Ada']);
+  });
+
   it('sorts schema properties alphabetically as a refinement step', () => {
     const schema: TopLevelSchema = {
       type: 'object',

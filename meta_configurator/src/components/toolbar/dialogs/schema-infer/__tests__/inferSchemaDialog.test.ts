@@ -1,81 +1,15 @@
 import {describe, expect, it, vi} from 'vitest';
-import {defineComponent} from 'vue';
 import {flushPromises, mount} from '@vue/test-utils';
-
-const DialogStub = defineComponent({template: '<div><slot /></div>'});
-const ButtonStub = defineComponent({
-  props: {
-    disabled: {type: Boolean, default: false},
-    label: {type: String, default: ''},
-  },
-  emits: ['click'],
-  template:
-    '<button type="button" :disabled="disabled" @click="$emit(\'click\')">{{ label }}<slot /></button>',
-});
-const MessageStub = defineComponent({template: '<div class="message"><slot /></div>'});
-const PanelStub = defineComponent({template: '<div><slot name="header" /><slot /></div>'});
-const SelectButtonStub = defineComponent({
-  props: {
-    modelValue: {type: String, default: ''},
-    options: {type: Array, default: () => []},
-    optionLabel: {type: String, default: 'label'},
-    optionValue: {type: String, default: 'value'},
-    optionDisabled: {type: String, default: 'disabled'},
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    getOptionLabel(option: any) {
-      return option[this.optionLabel];
-    },
-    getOptionValue(option: any) {
-      return option[this.optionValue];
-    },
-    isDisabled(option: any) {
-      return Boolean(option[this.optionDisabled]);
-    },
-  },
-  template:
-    '<div class="select-button-stub"><button v-for="option in options" :key="getOptionValue(option)" type="button" :data-option-value="String(getOptionValue(option))" :disabled="isDisabled(option)" @click="$emit(\'update:modelValue\', getOptionValue(option))">{{ getOptionLabel(option) }}</button></div>',
-});
-const CheckboxStub = defineComponent({
-  props: {
-    modelValue: {type: [Boolean, Array], default: false},
-    binary: {type: Boolean, default: false},
-    inputId: {type: String, default: ''},
-    value: {type: String, default: ''},
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    onChange(event: Event) {
-      const checked = (event.target as HTMLInputElement).checked;
-      if (this.binary) {
-        this.$emit('update:modelValue', checked);
-        return;
-      }
-
-      const current = Array.isArray(this.modelValue) ? [...this.modelValue] : [];
-      const next = checked
-        ? [...current, this.value]
-        : current.filter(entry => entry !== this.value);
-      this.$emit('update:modelValue', next);
-    },
-  },
-  template:
-    '<input :id="inputId" type="checkbox" :checked="binary ? !!modelValue : Array.isArray(modelValue) && modelValue.includes(value)" @change="onChange" />',
-});
-const InputNumberStub = defineComponent({
-  props: {
-    modelValue: {type: Number, default: 0},
-    inputId: {type: String, default: ''},
-  },
-  emits: ['update:modelValue'],
-  template:
-    '<input :id="inputId" type="number" :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />',
-});
-
-function button(wrapper: any, text: string) {
-  return wrapper.findAll('button').find((b: any) => b.text().includes(text));
-}
+import {
+  ButtonStub,
+  CheckboxStub,
+  findButtonByText,
+  InputNumberStub,
+  MessageStub,
+  PanelStub,
+  PersistentDialogStub,
+  SelectButtonStub,
+} from '@/components/toolbar/dialogs/__tests__/dialogTestUtils';
 
 async function setupDialog({
   currentData,
@@ -140,7 +74,7 @@ async function setupDialog({
   const wrapper = mount(InferSchemaDialog, {
     global: {
       stubs: {
-        Dialog: DialogStub,
+        Dialog: PersistentDialogStub,
         Button: ButtonStub,
         SelectButton: SelectButtonStub,
         Checkbox: CheckboxStub,
@@ -170,12 +104,12 @@ async function selectSource(wrapper: any, source: 'current' | 'files') {
 }
 
 async function selectUploadedFiles(wrapper: any) {
-  await button(wrapper, 'Select data files').trigger('click');
+  await findButtonByText(wrapper, 'Select data files').trigger('click');
   await flushPromises();
 }
 
 async function applyInference(wrapper: any) {
-  await button(wrapper, 'Infer Schema').trigger('click');
+  await findButtonByText(wrapper, 'Infer Schema').trigger('click');
   await flushPromises();
 }
 
@@ -246,7 +180,7 @@ describe('InferSchemaDialog', () => {
     await openDialog(wrapper);
     await wrapper.get('#infer-add-examples').setValue(true);
     await flushPromises();
-    await button(wrapper, 'Apply and Infer Schema').trigger('click');
+    await findButtonByText(wrapper, 'Apply and Infer Schema').trigger('click');
     await flushPromises();
 
     expect(dataEditorSetDataMock).not.toHaveBeenCalled();
