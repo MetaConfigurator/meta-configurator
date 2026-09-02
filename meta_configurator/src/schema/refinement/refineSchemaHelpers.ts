@@ -1,6 +1,6 @@
 import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {JsonSchemaVisitor, type VisitorContext} from '@/schema/jsonSchemaVisitor';
-import {fixEmptyArraySchemas} from '@/schema/inferJsonSchema';
+import {allowItemsInInferredEmptyArraySchemas} from '@/schema/inferJsonSchema';
 import {inferSchema} from '@jsonhero/schema-infer';
 
 function isSchemaObject(schema: JsonSchemaType): schema is JsonSchemaObjectType {
@@ -53,7 +53,7 @@ export function schemaAllowsValueType(schema: JsonSchemaObjectType, valueType: s
 
 /** Enum and const schemas already describe their values, so examples add nothing. */
 export function dropExamplesFromFixedValueSchema(schema: JsonSchemaObjectType): boolean {
-  if (!schema.enum && schema.const === undefined) {
+  if (schema.enum === undefined && schema.const === undefined) {
     return false;
   }
   delete schema.examples;
@@ -109,7 +109,9 @@ export function inferSchemaFromValues(values: unknown[]): JsonSchemaType {
     return true;
   }
 
-  const inferredArraySchema = fixEmptyArraySchemas(inferSchema(values).toJSONSchema());
+  const inferredArraySchema = allowItemsInInferredEmptyArraySchemas(
+    inferSchema(values).toJSONSchema()
+  );
   if (isSchemaObject(inferredArraySchema) && inferredArraySchema.type === 'array') {
     return inferredArraySchema.items ?? true;
   }
@@ -187,7 +189,7 @@ class JsonSchemaSamplesVisitor extends JsonSchemaVisitor {
 
     if (keyword === 'items' && arrayIndex === undefined) {
       this.setSamplesForContext(context, collectArrayItemSamples(parentSamples));
-    } else if (keyword === 'prefixItems' && arrayIndex !== undefined) {
+    } else if ((keyword === 'items' || keyword === 'prefixItems') && arrayIndex !== undefined) {
       this.setSamplesForContext(context, collectSamplesAtArrayIndex(parentSamples, arrayIndex));
     } else if (keyword === 'additionalProperties') {
       this.setSamplesForContext(
@@ -198,7 +200,7 @@ class JsonSchemaSamplesVisitor extends JsonSchemaVisitor {
         )
       );
     } else if (keyword === 'contains') {
-      this.setSamplesForContext(context, parentSamples);
+      this.setSamplesForContext(context, collectArrayItemSamples(parentSamples));
     }
   }
 

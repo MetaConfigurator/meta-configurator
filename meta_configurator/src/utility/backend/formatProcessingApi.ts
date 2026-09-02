@@ -79,10 +79,6 @@ export interface FormatProcessingPreprocessResult {
   ai_prompt_hint?: string | null;
 }
 
-interface FormatProcessingErrorResponse {
-  error?: string;
-}
-
 export function shouldUseFormatProcessingForFile(fileName: string): boolean {
   const normalized = fileName.trim().toLowerCase();
   return FORMAT_PROCESSING_DATA_FILE_EXTENSIONS.some(ext => normalized.endsWith(ext));
@@ -93,20 +89,20 @@ export async function detectFormatAndParseWithFormatProcessing(
   fileType: string,
   content: string
 ): Promise<FormatProcessingDetectionResult> {
-  const responseBody = await postToFormatProcessing<Partial<FormatProcessingDetectionResult>>(
-    '/detect-format-and-parse',
-    {
-      file_name: fileName,
-      file_type: fileType,
-      content,
-    }
-  );
+  const responseBody = await postToFormatProcessing('/detect-format-and-parse', {
+    file_name: fileName,
+    file_type: fileType,
+    content,
+  });
 
   if (
+    !isObjectRecord(responseBody) ||
     typeof responseBody.recognized !== 'boolean' ||
     typeof responseBody.format !== 'string' ||
     typeof responseBody.message !== 'string' ||
-    typeof responseBody.display_text !== 'string'
+    typeof responseBody.display_text !== 'string' ||
+    !isOptionalNullableString(responseBody.parser_name) ||
+    !isOptionalNullableString(responseBody.ai_prompt_hint)
   ) {
     throw new Error('Invalid response from the format processing service.');
   }
@@ -118,8 +114,8 @@ export async function detectFormatAndParseWithFormatProcessing(
     preprocessed_for_ai: responseBody.preprocessed_for_ai ?? null,
     message: responseBody.message,
     display_text: responseBody.display_text,
-    parser_name: responseBody.parser_name ?? null,
-    ai_prompt_hint: responseBody.ai_prompt_hint ?? null,
+    parser_name: getNullableString(responseBody.parser_name),
+    ai_prompt_hint: getNullableString(responseBody.ai_prompt_hint),
   };
 }
 
@@ -128,16 +124,18 @@ export async function preprocessParsedDataForAiWithFormatProcessing(
   format: string = 'json',
   preprocessOptions?: FormatProcessingPreprocessOptions
 ): Promise<FormatProcessingPreprocessResult> {
-  const responseBody = await postToFormatProcessing<Partial<FormatProcessingPreprocessResult>>(
-    '/preprocess-for-ai',
-    {
-      data,
-      format,
-      preprocess_options: preprocessOptions,
-    }
-  );
+  const responseBody = await postToFormatProcessing('/preprocess-for-ai', {
+    data,
+    format,
+    preprocess_options: preprocessOptions,
+  });
 
-  if (typeof responseBody.format !== 'string' || typeof responseBody.display_text !== 'string') {
+  if (
+    !isObjectRecord(responseBody) ||
+    typeof responseBody.format !== 'string' ||
+    typeof responseBody.display_text !== 'string' ||
+    !isOptionalNullableString(responseBody.ai_prompt_hint)
+  ) {
     throw new Error('Invalid response from the format processing service.');
   }
 
@@ -145,17 +143,29 @@ export async function preprocessParsedDataForAiWithFormatProcessing(
     format: responseBody.format,
     preprocessed_for_ai: responseBody.preprocessed_for_ai ?? data,
     display_text: responseBody.display_text,
-    ai_prompt_hint: responseBody.ai_prompt_hint ?? null,
+    ai_prompt_hint: getNullableString(responseBody.ai_prompt_hint),
   };
 }
 
-async function postToFormatProcessing<T>(endpointPath: string, requestBody: unknown): Promise<T> {
+async function postToFormatProcessing(
+  endpointPath: string,
+  requestBody: unknown
+): Promise<unknown> {
+  let serializedRequestBody: string;
+  try {
+    serializedRequestBody = JSON.stringify(requestBody);
+  } catch (error) {
+    throw new Error(
+      `Could not serialize the format processing request. (${getErrorMessage(error)})`
+    );
+  }
+
   let response: Response;
   try {
     response = await fetch(`${FORMAT_PROCESSING_URL.value}${endpointPath}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(requestBody),
+      body: serializedRequestBody,
     });
   } catch (error) {
     throw new Error(
@@ -166,7 +176,7 @@ async function postToFormatProcessing<T>(endpointPath: string, requestBody: unkn
   }
 
   const contentType = response.headers.get('content-type') ?? '';
-  if (!contentType.includes('application/json')) {
+  if (!contentType.toLowerCase().includes('application/json')) {
     const text = await response.text().catch(() => '');
     throw new Error(
       `Unexpected response from the format processing service (status ${response.status}). ` +
@@ -174,12 +184,33 @@ async function postToFormatProcessing<T>(endpointPath: string, requestBody: unkn
     );
   }
 
-  const responseBody = (await response.json()) as T & FormatProcessingErrorResponse;
-  if (!response.ok) {
+  let responseBody: unknown;
+  try {
+    responseBody = await response.json();
+  } catch (error) {
     throw new Error(
-      responseBody.error ||
-        `Format processing service request failed with status ${response.status}.`
+      `Format processing service returned invalid JSON (status ${response.status}). ` +
+        `(${getErrorMessage(error)})`
     );
   }
+  if (!response.ok) {
+    const responseError =
+      isObjectRecord(responseBody) && typeof responseBody.error === 'string'
+        ? responseBody.error
+        : `Format processing service request failed with status ${response.status}.`;
+    throw new Error(responseError);
+  }
   return responseBody;
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function getNullableString(value: unknown): string | null {
+  return typeof value === 'string' ? value : null;
+}
+
+function isOptionalNullableString(value: unknown): value is string | null | undefined {
+  return value === undefined || value === null || typeof value === 'string';
 }

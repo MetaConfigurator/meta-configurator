@@ -29,6 +29,7 @@ import {toastService} from '@/utility/toastService';
 import {
   generateMappingFunctionSuggestion,
   performDirectAiTargetSchemaMapping,
+  type MappingFunctionSuggestionRequest,
   type MappingGenerationLanguage,
   type MappingGenerationMethod,
 } from '@/data-mapping/dataMappingAi';
@@ -62,6 +63,11 @@ const mappingLanguageOptions: {label: string; value: MappingGenerationLanguage}[
   {label: 'JavaScript', value: 'javascript'},
 ];
 
+const mappingServices: Record<MappingGenerationLanguage, DataMappingService> = {
+  javascript: new DataMappingServiceJavascript(),
+  jsonata: new DataMappingServiceJsonata(),
+};
+
 const editorModeByMappingLanguage: Record<MappingGenerationLanguage, string> = {
   javascript: 'ace/mode/javascript',
   jsonata: 'ace/mode/jsoniq',
@@ -75,9 +81,7 @@ const statusMessage = ref('');
 const errorMessage = ref('');
 const userComments = ref('');
 const isLoadingMapping = ref(false);
-const hasValidationErrorForSuggestion = ref(false);
-const lastValidationError = ref('');
-const lastFailedConfig = ref('');
+const suggestionRetryContext = ref<GeneratedCodeRetryContext>();
 const selectedMappingMethod = ref<MappingMethod>('source-data');
 const selectedMappingLanguage = ref<MappingGenerationLanguage>('jsonata');
 const refinementOptions = ref<SchemaRefinementOptionsController | null>(null);
@@ -91,11 +95,7 @@ const usesMappingFunction = computed(() => selectedMappingMethod.value !== 'dire
 const usesInferredSourceSchema = computed(
   () => selectedMappingMethod.value === 'inferred-source-schema'
 );
-const mappingService = computed<DataMappingService>(() =>
-  selectedMappingLanguage.value === 'javascript'
-    ? new DataMappingServiceJavascript()
-    : new DataMappingServiceJsonata()
-);
+const mappingService = computed(() => mappingServices[selectedMappingLanguage.value]);
 const preparedInput = computed(() => mappingService.value.sanitizeInputDocument(sourceData.value));
 const hasCurrentData = computed(() => hasJsonContent(sourceData.value));
 const targetSchema = computed(() => schemaEditorLink.data.value as TopLevelSchema);
@@ -124,7 +124,7 @@ const mappingLanguageWarning = computed(() => {
     : 'JavaScript mappings run in an isolated worker. Network access, imports, browser storage, DOM access, dynamic code, and long-running execution are blocked.';
 });
 const suggestionButtonLabel = computed(() =>
-  hasValidationErrorForSuggestion.value && shouldUseRetryContext()
+  suggestionRetryContext.value && shouldUseRetryContext()
     ? 'Regenerate Suggestion for Previous Error'
     : 'Generate Suggestion'
 );
@@ -201,23 +201,19 @@ function showError(message: string) {
 }
 
 function clearSuggestionRetryContext() {
-  hasValidationErrorForSuggestion.value = false;
-  lastValidationError.value = '';
-  lastFailedConfig.value = '';
+  suggestionRetryContext.value = undefined;
 }
 
 function shouldUseRetryContext(): boolean {
   return usesMappingFunction.value && selectedMappingLanguage.value === 'javascript';
 }
 
-function saveSuggestionRetryContext(validationError: string, failedConfig: string) {
+function saveSuggestionRetryContext(validationError: string, failedCode: string) {
   if (!shouldUseRetryContext()) {
     return;
   }
 
-  hasValidationErrorForSuggestion.value = true;
-  lastValidationError.value = validationError;
-  lastFailedConfig.value = failedConfig;
+  suggestionRetryContext.value = {validationError, previousCode: failedCode};
 }
 
 async function validateConfig(mappingConfiguration: string, currentInput: unknown) {
@@ -259,19 +255,40 @@ function revalidateCurrentEditorContent() {
   void validateConfig(generatedMappingConfiguration.value, preparedInput.value);
 }
 
-function buildSelection(): RefineSchemaSelection | null {
-  return refinementOptions.value?.buildSelection() ?? null;
-}
-
 function buildInferredSourceSchema(): TopLevelSchema {
   let sourceSchema = inferJsonSchema(preparedInput.value) as TopLevelSchema;
-  const selection = buildSelection();
+  const refinementSelection: RefineSchemaSelection | null =
+    refinementOptions.value?.buildSelection() ?? null;
 
-  if (usesInferredSourceSchema.value && hasSelectedRefinements.value && selection) {
-    sourceSchema = runSchemaRefinement(sourceSchema, preparedInput.value, selection);
+  if (usesInferredSourceSchema.value && hasSelectedRefinements.value && refinementSelection) {
+    sourceSchema = runSchemaRefinement(sourceSchema, preparedInput.value, refinementSelection);
   }
 
   return sourceSchema;
+}
+
+function buildMappingSuggestionRequest(
+  retryContext?: GeneratedCodeRetryContext
+): MappingFunctionSuggestionRequest {
+  const sharedRequestFields = {
+    language: selectedMappingLanguage.value,
+    targetSchema: targetSchema.value,
+    userComments: userComments.value,
+    retryContext,
+  };
+
+  if (selectedMappingMethod.value === 'source-data') {
+    return {...sharedRequestFields, method: 'source-data', inputData: preparedInput.value};
+  }
+  if (selectedMappingMethod.value === 'inferred-source-schema') {
+    return {
+      ...sharedRequestFields,
+      method: 'inferred-source-schema',
+      sourceSchema: buildInferredSourceSchema(),
+    };
+  }
+
+  throw new Error('Direct AI mapping does not generate a reusable mapping function.');
 }
 
 function canStartAiMapping(aiUnavailableMessage: string): boolean {
@@ -322,40 +339,22 @@ async function generateMappingSuggestion() {
   statusMessage.value = '';
   errorMessage.value = '';
 
-  const retryContext: GeneratedCodeRetryContext | undefined =
-    hasValidationErrorForSuggestion.value && shouldUseRetryContext()
-      ? {
-          validationError: lastValidationError.value,
-          previousCode: lastFailedConfig.value,
-        }
-      : undefined;
+  const retryContext = shouldUseRetryContext() ? suggestionRetryContext.value : undefined;
 
   try {
-    const sharedRequestFields = {
-      language: selectedMappingLanguage.value,
-      targetSchema: targetSchema.value,
-      userComments: userComments.value,
-      retryContext,
-    };
     const suggestionResult = await generateMappingFunctionSuggestion(
-      selectedMappingMethod.value === 'source-data'
-        ? {...sharedRequestFields, method: 'source-data', inputData: preparedInput.value}
-        : {
-            ...sharedRequestFields,
-            method: 'inferred-source-schema',
-            sourceSchema: buildInferredSourceSchema(),
-          }
+      buildMappingSuggestionRequest(retryContext)
     );
 
-    generatedMappingConfiguration.value = suggestionResult.config;
-    if (suggestionResult.success) {
-      statusMessage.value = suggestionResult.message;
-      errorMessage.value = '';
-      clearSuggestionRetryContext();
-    } else {
+    if (!suggestionResult.success) {
       showError(suggestionResult.message);
+      return;
     }
 
+    generatedMappingConfiguration.value = suggestionResult.config;
+    statusMessage.value = suggestionResult.message;
+    errorMessage.value = '';
+    clearSuggestionRetryContext();
     await validateConfig(suggestionResult.config, preparedInput.value);
   } catch (error) {
     useErrorService().onError(error);

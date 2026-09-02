@@ -1,8 +1,7 @@
-import ast
 import re
 from dataclasses import dataclass
 from datetime import date, datetime, time
-from typing import Any, Callable, Collection, Dict, List, Optional, Sequence
+from typing import Any, Callable, Collection, Dict, Iterator, Optional, Sequence
 
 try:
     import yaml
@@ -63,7 +62,7 @@ JAVA_LANGUAGE = (
 )
 
 
-@dataclass
+@dataclass(frozen=True)
 class ParserAttempt:
     format: str
     parsed_json: Any
@@ -124,21 +123,6 @@ def compact_tree_text(text: str, max_length: int = 200) -> str:
     return compact[: max_length - 3] + "..."
 
 
-def extract_compact_named_child_texts(
-    parent_node: Any,
-    source_bytes: bytes,
-    *,
-    included_child_types: Optional[Collection[str]] = None,
-) -> List[str]:
-    if parent_node is None:
-        return []
-    return [
-        compact_tree_text(get_tree_sitter_node_text(child_node, source_bytes))
-        for child_node in getattr(parent_node, "named_children", [])
-        if included_child_types is None or child_node.type in included_child_types
-    ]
-
-
 def summarize_tree_sitter_node(
     node: Any,
     source_bytes: bytes,
@@ -169,19 +153,10 @@ def normalize_comment_text(text: str) -> str:
     return normalized.strip()
 
 
-def iterate_named_descendants(node: Any):
+def iterate_named_descendants(node: Any) -> Iterator[Any]:
     for child in getattr(node, "named_children", []):
         yield child
         yield from iterate_named_descendants(child)
-
-
-def coerce_literal(text: str) -> Any:
-    """Turn source-literal text into the matching Python value, else the plain text."""
-    stripped_text = text.strip()
-    try:
-        return ast.literal_eval(stripped_text)
-    except (ValueError, SyntaxError, MemoryError, RecursionError):
-        return stripped_text
 
 
 def _count_tree_sitter_nodes(node: Any) -> Dict[str, int]:

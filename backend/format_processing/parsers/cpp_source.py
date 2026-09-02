@@ -225,12 +225,14 @@ def _summarize_cpp_translation_unit(
             orphan_comments.extend(comments)
             continue
         if child.type == "preproc_include":
+            orphan_comments.extend(comments)
             include_value = get_first_named_child_text(
                 child, source_bytes, {"system_lib_string", "string_literal"}
             )
             if include_value:
                 includes.append(include_value)
         elif child.type == "using_declaration":
+            orphan_comments.extend(comments)
             namespace_name = _extract_cpp_using_namespace(child, source_bytes)
             if namespace_name:
                 using_namespaces.append(namespace_name)
@@ -239,6 +241,7 @@ def _summarize_cpp_translation_unit(
         elif child.type == "function_definition":
             functions.append(_summarize_cpp_function(child, source_bytes, comments))
         elif child.type == "expression_statement":
+            orphan_comments.extend(comments)
             top_level_calls.extend(_collect_cpp_calls(child, source_bytes))
         else:
             orphan_comments.extend(comments)

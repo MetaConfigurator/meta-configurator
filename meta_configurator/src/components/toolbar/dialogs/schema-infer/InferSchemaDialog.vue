@@ -74,13 +74,16 @@ function selectInstanceFile() {
  * Returns the data to infer from, wrapped so that a null data value stays distinguishable
  * from an unavailable source. Reports the reason and returns null when nothing is usable.
  */
-async function resolveInputData(): Promise<{data: unknown} | null> {
+async function resolveInputData(): Promise<{
+  data: unknown;
+  shouldLoadIntoDataEditor: boolean;
+} | null> {
   if (usesCurrentDataSource.value) {
     if (!hasCurrentData.value) {
       errorMessage.value = 'Please load data into the Data Editor first.';
       return null;
     }
-    return {data: currentDataLink.data.value};
+    return {data: currentDataLink.data.value, shouldLoadIntoDataEditor: false};
   }
 
   if (!selectedFile.value) {
@@ -90,8 +93,7 @@ async function resolveInputData(): Promise<{data: unknown} | null> {
 
   const fileText = await readFileContent(selectedFile.value);
   const fileData = formatRegistry.getFormat('json').dataConverter.parse(fileText);
-  currentDataLink.setData(fileData);
-  return {data: fileData};
+  return {data: fileData, shouldLoadIntoDataEditor: true};
 }
 
 function inferAndRefineSchema(inputData: unknown): TopLevelSchema {
@@ -119,12 +121,15 @@ async function inferSchemaAndApplyRefinements() {
       return;
     }
 
-    const successDetail = buildSuccessDetail();
-    getDataForMode(SessionMode.SchemaEditor).setData(inferAndRefineSchema(inputData.data));
+    const inferredSchema = inferAndRefineSchema(inputData.data);
+    if (inputData.shouldLoadIntoDataEditor) {
+      currentDataLink.setData(inputData.data);
+    }
+    getDataForMode(SessionMode.SchemaEditor).setData(inferredSchema);
     toastService.add({
       severity: 'success',
       summary: 'Schema inferred',
-      detail: successDetail,
+      detail: buildSuccessDetail(),
       life: 3000,
     });
     hideDialog();
@@ -149,8 +154,8 @@ defineExpose({show: openDialog, close: hideDialog});
     :style="{width: '50rem', maxWidth: '95vw'}">
     <div class="dialog-content" :style="{cursor: isLoading ? 'wait' : 'default'}">
       <Message severity="info" :closable="false">
-        Choose whether the schema should be inferred from the current Data Editor content or from
-        uploaded JSON files.
+        Choose whether the schema should be inferred from the current Data Editor content or from an
+        uploaded JSON file.
       </Message>
 
       <div class="input-source-card">

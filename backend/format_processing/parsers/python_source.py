@@ -33,7 +33,7 @@ def looks_like_python_source(content: str) -> bool:
                 r"^\s*import\s+[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*"
                 r"(?:\s+as\s+[A-Za-z_]\w*)?"
             ),
-            r"^\s*def\s+[A-Za-z_]\w*\s*\(",
+            r"^\s*(?:async\s+)?def\s+[A-Za-z_]\w*\s*\(",
             r"^\s*class\s+[A-Za-z_]\w*(?:\([^)]*\))?\s*:",
             r"^\s*@[\w\.]+\s*(?:\([^)]*\))?\s*$",
             r'^\s*if\s+__name__\s*==\s*[\'"]__main__[\'"]\s*:',
@@ -75,6 +75,8 @@ def _summarize_python_function(
 ) -> Dict[str, Any]:
     name_node = find_first_named_child(node, {"identifier"})
     parameter_node = find_first_named_child(node, {"parameters"})
+    body_node = find_first_named_child(node, {"block"})
+    signature_end = body_node.start_byte if body_node is not None else node.end_byte
 
     return {
         "line": node.start_point.row + 1,
@@ -84,12 +86,14 @@ def _summarize_python_function(
             else None
         ),
         "signature": compact_tree_text(
-            get_tree_sitter_node_text(node, source_bytes).split(":", 1)[0]
+            source_bytes[node.start_byte : signature_end].decode(
+                "utf-8", errors="replace"
+            )
         ),
         "parameters": extract_compact_argument_texts(parameter_node, source_bytes),
         "comments": comments,
         **summarize_callable_body(
-            find_first_named_child(node, {"block"}),
+            body_node,
             source_bytes,
             declaration_types=ASSIGNMENT_TYPES,
             loop_types=LOOP_TYPES,
@@ -98,6 +102,21 @@ def _summarize_python_function(
             collect_calls=_collect_python_calls,
         ),
     }
+
+
+def _unwrap_python_definition(node: Any) -> Optional[Any]:
+    if node.type != "decorated_definition":
+        return node
+    return find_first_named_child(node, {"class_definition", "function_definition"})
+
+
+def _summarize_python_class_method(
+    node: Any, source_bytes: bytes, comments: List[str]
+) -> Optional[Dict[str, Any]]:
+    method_node = _unwrap_python_definition(node)
+    if method_node is None:
+        return None
+    return _summarize_python_function(method_node, source_bytes, comments)
 
 
 def _summarize_python_class(
@@ -109,8 +128,8 @@ def _summarize_python_class(
         comments,
         kind="class",
         body_types={"block"},
-        method_types={"function_definition"},
-        summarize_method=_summarize_python_function,
+        method_types={"decorated_definition", "function_definition"},
+        summarize_method=_summarize_python_class_method,
     )
 
 
@@ -129,13 +148,21 @@ def _summarize_python_module(
             orphan_comments.extend(comments)
             continue
         if child.type in IMPORT_TYPES:
+            orphan_comments.extend(comments)
             imports.append(
                 compact_tree_text(get_tree_sitter_node_text(child, source_bytes))
             )
-        elif child.type == "class_definition":
-            classes.append(_summarize_python_class(child, source_bytes, comments))
-        elif child.type == "function_definition":
-            functions.append(_summarize_python_function(child, source_bytes, comments))
+            continue
+
+        definition_node = _unwrap_python_definition(child)
+        if definition_node is not None and definition_node.type == "class_definition":
+            classes.append(
+                _summarize_python_class(definition_node, source_bytes, comments)
+            )
+        elif definition_node is not None and definition_node.type == "function_definition":
+            functions.append(
+                _summarize_python_function(definition_node, source_bytes, comments)
+            )
         else:
             orphan_comments.extend(comments)
 
@@ -159,6 +186,7 @@ def parse_data(content: str) -> Optional[ParserAttempt]:
             "import_statement",
             "import_from_statement",
             "class_definition",
+            "decorated_definition",
             "function_definition",
         },
         format_name="python_source",

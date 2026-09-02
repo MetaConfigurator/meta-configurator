@@ -270,6 +270,35 @@ REGISTER(run)->withName("demo");
 
         self.assertIn("TRUNCATED", preprocessed["description"])
 
+    def test_preprocessing_preserves_unknown_format_name_in_display_text(self) -> None:
+        result = detection_service.preprocess_parsed_data_for_ai(
+            {"value": 1}, format_name="custom_format"
+        )
+
+        self.assertEqual(result["format"], "custom_format")
+        self.assertIn("custom_format", result["display_text"])
+        self.assertEqual(
+            result["ai_prompt_hint"],
+            detection_service.SUPPORTED_FORMAT_BY_NAME["json"].ai_prompt_hint,
+        )
+
+    def test_python_summary_supports_decorators_and_typed_signatures(self) -> None:
+        result = detect_format_and_parse(
+            "typed.py",
+            "text/x-python",
+            "@cache\ndef convert(value: dict[str, int]) -> list[int]:\n"
+            "    return list(value.values())\n",
+        )
+
+        self.assertTrue(result.recognized)
+        self.assertEqual(result.format, "python_source")
+        functions = result.parsed_json["summary"]["functions"]
+        self.assertEqual(functions[0]["name"], "convert")
+        self.assertEqual(
+            functions[0]["signature"],
+            "def convert(value: dict[str, int]) -> list[int]:",
+        )
+
     def test_library_parsers_handle_escapes_the_old_text_parsers_missed(self) -> None:
         properties_result = detect_format_and_parse(
             "app.properties",

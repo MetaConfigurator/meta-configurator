@@ -83,6 +83,58 @@ describe('runSchemaRefinement', () => {
     });
   });
 
+  it('adds examples to nullable primitive fields', () => {
+    const schema: TopLevelSchema = {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          nickname: {type: ['string', 'null']},
+        },
+      },
+    };
+
+    const refined = runSchemaRefinement(
+      schema,
+      [{nickname: 'Ada'}, {nickname: null}, {nickname: 'Grace'}],
+      {addExamples: ADD_EXAMPLES_DEFAULTS}
+    );
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.items);
+    expectObjectSchema(refined.items.properties?.nickname);
+
+    expect(refined.items.properties.nickname.examples).toEqual(['Ada', 'Grace']);
+  });
+
+  it('routes array item samples to contains schemas', () => {
+    const schema: TopLevelSchema = {
+      type: 'array',
+      contains: {type: 'string'},
+    };
+
+    const refined = runSchemaRefinement(schema, ['Ada', 'Grace'], {
+      addExamples: ADD_EXAMPLES_DEFAULTS,
+    });
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.contains);
+
+    expect(refined.contains.examples).toEqual(['Ada', 'Grace']);
+  });
+
+  it('routes samples by position for legacy tuple-style items schemas', () => {
+    const schema = {
+      type: 'array',
+      items: [{type: 'string'}, {type: 'integer'}],
+    } as unknown as TopLevelSchema;
+
+    const refined = runSchemaRefinement(schema, ['Ada', 42], {
+      addExamples: ADD_EXAMPLES_DEFAULTS,
+    }) as unknown as {items: JsonSchemaObjectType[]};
+
+    expect(refined.items[0]!.examples).toEqual(['Ada']);
+    expect(refined.items[1]!.examples).toEqual([42]);
+  });
+
   it('uses schema traversal paths without refining unrelated definitions', () => {
     const schema: TopLevelSchema = {
       allOf: [
@@ -148,6 +200,21 @@ describe('runSchemaRefinement', () => {
         },
       },
     });
+  });
+
+  it('does not infer an enum after discarding incompatible observations', () => {
+    const schema: TopLevelSchema = {
+      type: 'array',
+      items: {},
+    };
+
+    const refined = runSchemaRefinement(schema, ['OPEN', 'OPEN', 'OPEN', 'OPEN', {code: 1}], {
+      detectEnums: DETECT_ENUMS_DEFAULTS,
+    });
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.items);
+
+    expect(refined.items.enum).toBeUndefined();
   });
 
   it('removes examples when a field becomes an enum', () => {

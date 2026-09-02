@@ -43,3 +43,11 @@ def test_global_request_limit_returns_json():
 
     assert response.status_code == 413
     assert response.get_json() == {"error": "Request body too large"}
+
+
+def test_rejects_non_object_json_request():
+    client = app.test_client()
+    response = client.post("/detect-format-and-parse", json=["content"])
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "Request data must be a JSON object"}

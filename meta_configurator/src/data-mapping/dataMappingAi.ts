@@ -1,6 +1,8 @@
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import {
   buildGeneratedCodeRetryHints,
+  type DataMappingResult,
+  type DataMappingSuggestionResult,
   type GeneratedCodeRetryContext,
 } from '@/data-mapping/dataMappingService';
 import {
@@ -12,14 +14,7 @@ import {queryOpenAI} from '@/utility/ai/aiEndpoint';
 import {AI_ACCESS_UNAVAILABLE_MESSAGE, canQueryAi} from '@/utility/ai/aiAvailability';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import {JAVASCRIPT_MAPPING_SYSTEM_MESSAGE} from '@/data-mapping/javascript/javascriptExamples';
-import {
-  JSONATA_EXPRESSION,
-  JSONATA_INPUT_EXAMPLE,
-  JSONATA_INPUT_EXAMPLE_SCHEMA,
-  JSONATA_OUTPUT_EXAMPLE,
-  JSONATA_OUTPUT_EXAMPLE_SCHEMA,
-  JSONATA_REFERENCE_GUIDE,
-} from '@/data-mapping/jsonata/jsonataExamples';
+import {JSONATA_MAPPING_SYSTEM_MESSAGE} from '@/data-mapping/jsonata/jsonataExamples';
 import {getErrorMessage} from '@/utility/getErrorMessage';
 
 export type MappingGenerationLanguage = 'jsonata' | 'javascript';
@@ -37,7 +32,7 @@ export type MappingFunctionSuggestionRequest =
       method: 'source-data';
       inputData: unknown;
       /** Schema of the input data, added to the prompt as extra guidance when known. */
-      inputDataSchema?: unknown;
+      inputDataSchema?: JsonSchemaType;
     })
   | (SharedMappingSuggestionRequestFields & {
       method: 'inferred-source-schema';
@@ -54,25 +49,18 @@ const CODE_FENCE_LANGUAGES: Record<MappingGenerationLanguage, string[]> = {
   javascript: ['javascript', 'js'],
 };
 
-const JSONATA_SYSTEM_MESSAGE = `You are a JSON and JSONata Data Mapping expert. Your task is to generate a JSONata expression for transforming JSON input documents to satisfy the given target JSON schema.
-Only output valid JSONata, which is a single JSON-like expression. Do not use JavaScript-style blocks or function declarations like "function($x) {...}".
-Remember: JSONata is a declarative query and transformation language with syntax similar to JSON. It does not support full function declarations. Transformations must be inline.
-\`\`\`${JSON.stringify(JSONATA_REFERENCE_GUIDE)}\`\`\`
-Example input file: \`\`\`${JSON.stringify(JSONATA_INPUT_EXAMPLE)}\`\`\`.
-Example input schema: \`\`\`${JSON.stringify(JSONATA_INPUT_EXAMPLE_SCHEMA)}\`\`\`.
-Example output schema: \`\`\`${JSON.stringify(JSONATA_OUTPUT_EXAMPLE_SCHEMA)}\`\`\`.
-For these examples you should generate the following JSONata expression: \`\`\`${JSON.stringify(
-  JSONATA_EXPRESSION
-)}\`\`\`.
-The expression would transform the input file to the following output file (as intended): \`\`\`${JSON.stringify(
-  JSONATA_OUTPUT_EXAMPLE
-)}\`\`\`.
-Return ONLY a valid JSONata expression with no surrounding explanation.`;
-
 const SYSTEM_MESSAGES: Record<MappingGenerationLanguage, string> = {
-  jsonata: JSONATA_SYSTEM_MESSAGE,
+  jsonata: JSONATA_MAPPING_SYSTEM_MESSAGE,
   javascript: JAVASCRIPT_MAPPING_SYSTEM_MESSAGE,
 };
+
+const DIRECT_AI_MAPPING_SYSTEM_MESSAGE = [
+  'You are a JSON data transformation expert.',
+  'Transform the provided JSON document so that the result strictly satisfies the target JSON schema.',
+  'Return ONLY valid JSON. No markdown. No explanation.',
+  'Preserve information conservatively when possible, but target schema compliance has priority.',
+  'Never omit required properties. If a required value cannot be derived, use null or a conservative default that matches the schema type.',
+].join('\n');
 
 const CLOSING_INSTRUCTIONS: Record<
   MappingGenerationLanguage,
@@ -81,7 +69,7 @@ const CLOSING_INSTRUCTIONS: Record<
   jsonata: {
     'source-data': [
       'Generate a multi-line JSONata expression that transforms the input data to satisfy the target schema.',
-      'Use only the actual input data preview and the target schema. Do not rely on any additional inferred source schema.',
+      'Use the actual input data preview, its schema when provided, and the target schema.',
       'Return only the JSONata expression.',
     ],
     'inferred-source-schema': [
@@ -94,7 +82,7 @@ const CLOSING_INSTRUCTIONS: Record<
   javascript: {
     'source-data': [
       'Generate the JavaScript mapping code now.',
-      'Use only the actual input data preview and the target schema. Do not rely on an additional inferred source schema.',
+      'Use the actual input data preview, its schema when provided, and the target schema.',
       'Remember: output ONLY code that defines function transform(input) { ... } and returns the result object.',
     ],
     'inferred-source-schema': [
@@ -109,7 +97,7 @@ const CLOSING_INSTRUCTIONS: Record<
 
 export async function generateMappingFunctionSuggestion(
   request: MappingFunctionSuggestionRequest
-): Promise<{config: string; success: boolean; message: string}> {
+): Promise<DataMappingSuggestionResult> {
   const apiKey = getApiKey();
   if (!canQueryAi(apiKey)) {
     return {config: '', success: false, message: AI_ACCESS_UNAVAILABLE_MESSAGE};
@@ -121,12 +109,16 @@ export async function generateMappingFunctionSuggestion(
       {role: 'system', content: SYSTEM_MESSAGES[request.language]},
       {role: 'user', content: buildMappingUserMessage(request)},
     ]);
+    const mappingConfiguration = fixGeneratedExpression(
+      generatedConfiguration,
+      CODE_FENCE_LANGUAGES[request.language]
+    );
+    if (mappingConfiguration.length === 0) {
+      throw new Error('The AI returned an empty mapping configuration.');
+    }
 
     return {
-      config: fixGeneratedExpression(
-        generatedConfiguration,
-        CODE_FENCE_LANGUAGES[request.language]
-      ),
+      config: mappingConfiguration,
       success: true,
       message:
         request.method === 'source-data'
@@ -146,35 +138,16 @@ export async function performDirectAiTargetSchemaMapping(
   inputData: unknown,
   targetSchema: TopLevelSchema,
   userComments: string
-): Promise<{resultData: unknown; success: boolean; message: string}> {
+): Promise<DataMappingResult> {
   const apiKey = getApiKey();
   if (!canQueryAi(apiKey)) {
     return {resultData: {}, success: false, message: AI_ACCESS_UNAVAILABLE_MESSAGE};
   }
 
-  const systemMessage = [
-    'You are a JSON data transformation expert.',
-    'Transform the provided JSON document so that the result strictly satisfies the target JSON schema.',
-    'Return ONLY valid JSON. No markdown. No explanation.',
-    'Preserve information conservatively when possible, but target schema compliance has priority.',
-    'Never omit required properties. If a required value cannot be derived, use null or a conservative default that matches the schema type.',
-  ].join('\n');
-
-  const userMessageParts = [
-    'CURRENT JSON DATA',
-    JSON.stringify(inputData),
-    '',
-    'TARGET JSON SCHEMA',
-    JSON.stringify(targetSchema),
-  ];
-  if (userComments.trim().length > 0) {
-    userMessageParts.push('', 'USER HINTS', userComments.trim());
-  }
-
   try {
     const response = await queryOpenAI(apiKey, [
-      {role: 'system', content: systemMessage},
-      {role: 'user', content: userMessageParts.join('\n')},
+      {role: 'system', content: DIRECT_AI_MAPPING_SYSTEM_MESSAGE},
+      {role: 'user', content: buildDirectMappingUserMessage(inputData, targetSchema, userComments)},
     ]);
 
     return {
@@ -189,6 +162,22 @@ export async function performDirectAiTargetSchemaMapping(
       message: `Direct AI mapping failed. ${getErrorMessage(error)}`,
     };
   }
+}
+
+function buildDirectMappingUserMessage(
+  inputData: unknown,
+  targetSchema: TopLevelSchema,
+  userComments: string
+): string {
+  const messageParts = [
+    'CURRENT JSON DATA',
+    JSON.stringify(inputData),
+    '',
+    'TARGET JSON SCHEMA',
+    JSON.stringify(targetSchema),
+  ];
+  appendOptionalPromptSection(messageParts, 'USER HINTS', userComments);
+  return messageParts.join('\n');
 }
 
 /**
@@ -213,14 +202,21 @@ function buildMappingUserMessage(request: MappingFunctionSuggestionRequest): str
     ...CLOSING_INSTRUCTIONS[request.language][request.method]
   );
 
-  if (request.userComments.trim().length > 0) {
-    messageParts.push('', 'USER HINTS', request.userComments.trim());
-  }
+  appendOptionalPromptSection(messageParts, 'USER HINTS', request.userComments);
 
   const retryHints = buildGeneratedCodeRetryHints(request.retryContext);
-  if (retryHints.length > 0) {
-    messageParts.push('', 'RETRY CONTEXT', retryHints);
-  }
+  appendOptionalPromptSection(messageParts, 'RETRY CONTEXT', retryHints);
 
   return messageParts.join('\n');
+}
+
+function appendOptionalPromptSection(
+  messageParts: string[],
+  sectionHeading: string,
+  sectionContent: string
+): void {
+  const trimmedSectionContent = sectionContent.trim();
+  if (trimmedSectionContent.length > 0) {
+    messageParts.push('', sectionHeading, trimmedSectionContent);
+  }
 }

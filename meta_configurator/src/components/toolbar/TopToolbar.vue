@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, watchEffect} from 'vue';
+import {watchEffect} from 'vue';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useMagicKeys} from '@vueuse/core';
@@ -34,16 +34,6 @@ watchEffect(() => {
   }
 });
 
-function showAboutDialog() {
-  emit('show-about-dialog');
-}
-
-function selectedMode(newMode: SessionMode) {
-  emit('mode-selected', newMode);
-}
-
-const modeSelector = ref();
-
 useMagicKeys({
   passive: false,
   onEventFired(event) {
@@ -62,9 +52,8 @@ useMagicKeys({
       <!-- LEFT: ModeSelector -->
       <div class="left-section">
         <ModeSelector
-          ref="modeSelector"
           :current-mode="props.currentMode"
-          @mode-selected="newMode => selectedMode(newMode)"
+          @mode-selected="newMode => emit('mode-selected', newMode)"
           data-testid="mode-selector" />
 
         <Divider layout="vertical" />
@@ -93,7 +82,7 @@ useMagicKeys({
           v-if="!settings.hideSettings"
           v-tooltip.bottom="'Settings'"
           data-testid="mode-settings-button"
-          @click="() => selectedMode(SessionMode.Settings)">
+          @click="emit('mode-selected', SessionMode.Settings)">
           <FontAwesomeIcon icon="fa-solid fa-gear" />
         </Button>
 
@@ -113,7 +102,7 @@ useMagicKeys({
           class="toolbar-button"
           size="small"
           v-tooltip.bottom="'About'"
-          @click="() => showAboutDialog()">
+          @click="emit('show-about-dialog')">
           <FontAwesomeIcon icon="fa-solid fa-circle-info" />
         </Button>
 

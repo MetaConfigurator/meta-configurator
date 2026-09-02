@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from dataclasses import asdict
 from functools import wraps
 from typing import Any, Callable, Dict
 
@@ -79,7 +80,7 @@ def is_payload_length_valid(value) -> bool:
     return len(serialized.encode("utf-8")) <= MAX_FILE_LENGTH
 
 
-class InvalidRequest(Exception):
+class _InvalidRequest(Exception):
     """A client error carrying the message and status code to return."""
 
     def __init__(self, message: str, status_code: int = 400):
@@ -88,40 +89,41 @@ class InvalidRequest(Exception):
         self.status_code = status_code
 
 
-def read_request_payload(required_field: str, too_large_message: str) -> Dict[str, Any]:
+def _read_request_payload(
+    required_field: str, too_large_message: str
+) -> Dict[str, Any]:
     """Returns the JSON body once the required field is present and small enough."""
     request_data = request.get_json(silent=True)
     if not request_data:
-        raise InvalidRequest("Missing request data")
+        raise _InvalidRequest("Missing request data")
+    if not isinstance(request_data, dict):
+        raise _InvalidRequest("Request data must be a JSON object")
     if required_field not in request_data:
-        raise InvalidRequest(f'Missing required field "{required_field}"')
+        raise _InvalidRequest(f'Missing required field "{required_field}"')
     if not is_payload_length_valid(request_data[required_field]):
-        raise InvalidRequest(too_large_message, 413)
+        raise _InvalidRequest(too_large_message, 413)
     return request_data
 
 
-def json_error_responses(route_name: str) -> Callable:
+def _handle_json_route_errors(view_function: Callable) -> Callable:
     """Answers client errors with their JSON message and hides unexpected errors."""
 
-    def decorate(view_function: Callable) -> Callable:
-        @wraps(view_function)
-        def wrapped_view(*args, **kwargs):
-            try:
-                return view_function(*args, **kwargs)
-            except InvalidRequest as invalid_request:
-                return (
-                    jsonify({"error": invalid_request.message}),
-                    invalid_request.status_code,
-                )
-            except RequestEntityTooLarge:
-                raise
-            except Exception as error:
-                app.logger.error(f"Error in {route_name}: {error}")
-                return jsonify({"error": "Internal server error"}), 500
+    @wraps(view_function)
+    def wrapped_view(*args, **kwargs):
+        try:
+            return view_function(*args, **kwargs)
+        except _InvalidRequest as invalid_request:
+            return (
+                jsonify({"error": invalid_request.message}),
+                invalid_request.status_code,
+            )
+        except RequestEntityTooLarge:
+            raise
+        except Exception:
+            app.logger.exception("Unhandled error while processing %s", request.path)
+            return jsonify({"error": "Internal server error"}), 500
 
-        return wrapped_view
-
-    return decorate
+    return wrapped_view
 
 
 @app.errorhandler(RequestEntityTooLarge)
@@ -136,40 +138,29 @@ def health():
 
 @app.route("/detect-format-and-parse", methods=["POST"])
 @limiter.limit("20 per minute")
-@json_error_responses("detect-format-and-parse")
+@_handle_json_route_errors
 def detect_format_and_parse_route():
-    request_data = read_request_payload("content", "Input file too large")
+    request_data = _read_request_payload("content", "Input file too large")
 
     result = detect_format_and_parse(
         file_name=request_data.get("file_name", ""),
         file_type=request_data.get("file_type", ""),
-        raw_content=request_data.get("content", ""),
+        raw_content=request_data["content"],
         preprocess_options=request_data.get("preprocess_options"),
     )
 
-    return jsonify(
-        {
-            "recognized": result.recognized,
-            "format": result.format,
-            "parsed_json": result.parsed_json,
-            "preprocessed_for_ai": result.preprocessed_for_ai,
-            "message": result.message,
-            "display_text": result.display_text,
-            "parser_name": result.parser_name,
-            "ai_prompt_hint": result.ai_prompt_hint,
-        }
-    )
+    return jsonify(asdict(result))
 
 
 @app.route("/preprocess-for-ai", methods=["POST"])
 @limiter.limit("30 per minute")
-@json_error_responses("preprocess-for-ai")
+@_handle_json_route_errors
 def preprocess_for_ai_route():
-    request_data = read_request_payload("data", "Input data too large")
+    request_data = _read_request_payload("data", "Input data too large")
 
     return jsonify(
         preprocess_parsed_data_for_ai(
-            parsed_data=request_data.get("data"),
+            parsed_data=request_data["data"],
             format_name=request_data.get("format", "json"),
             preprocess_options=request_data.get("preprocess_options"),
         )

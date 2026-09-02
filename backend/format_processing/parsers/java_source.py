@@ -173,8 +173,10 @@ def _summarize_java_program(
             orphan_comments.extend(comments)
             continue
         if child.type == "package_declaration":
+            orphan_comments.extend(comments)
             package_name = _extract_statement_value(child, source_bytes, "package")
         elif child.type == "import_declaration":
+            orphan_comments.extend(comments)
             import_value = _extract_statement_value(child, source_bytes, "import")
             if import_value:
                 imports.append(import_value)

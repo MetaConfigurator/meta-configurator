@@ -168,6 +168,12 @@ async function setupDialog({
   const onErrorMock = vi.fn();
   const generateMappingFunctionSuggestionMock = vi.fn();
   const performDirectAiTargetSchemaMappingMock = vi.fn();
+  const validateJavascriptMappingMock = vi
+    .fn()
+    .mockResolvedValue({success: true, message: 'Mapping configuration is valid.'});
+  const validateJsonataMappingMock = vi
+    .fn()
+    .mockResolvedValue({success: true, message: 'Mapping configuration is valid.'});
   const editors: MockEditor[] = [];
   const aceEditMock = vi.fn(() => {
     const editor = createMockEditor();
@@ -231,6 +237,28 @@ async function setupDialog({
     generateMappingFunctionSuggestion: generateMappingFunctionSuggestionMock,
     performDirectAiTargetSchemaMapping: performDirectAiTargetSchemaMappingMock,
   }));
+  vi.doMock('@/data-mapping/javascript/dataMappingServiceJavascript', () => ({
+    DataMappingServiceJavascript: class {
+      sanitizeInputDocument(inputData: unknown) {
+        return inputData;
+      }
+
+      validateMappingConfig(mappingConfiguration: string, inputData: unknown) {
+        return validateJavascriptMappingMock(mappingConfiguration, inputData);
+      }
+    },
+  }));
+  vi.doMock('@/data-mapping/jsonata/dataMappingServiceJsonata', () => ({
+    DataMappingServiceJsonata: class {
+      sanitizeInputDocument(inputData: unknown) {
+        return inputData;
+      }
+
+      validateMappingConfig(mappingConfiguration: string, inputData: unknown) {
+        return validateJsonataMappingMock(mappingConfiguration, inputData);
+      }
+    },
+  }));
   vi.doMock('brace', () => ({
     edit: aceEditMock,
   }));
@@ -253,6 +281,8 @@ async function setupDialog({
     toastAddMock,
     generateMappingFunctionSuggestionMock,
     performDirectAiTargetSchemaMappingMock,
+    validateJavascriptMappingMock,
+    validateJsonataMappingMock,
     editors,
   };
 }
@@ -307,6 +337,61 @@ describe('DataMappingDialog', () => {
     expect(request.sourceSchema.items.properties.name.examples).toEqual(['Alice', 'Bob']);
     expect(request.sourceSchema.items.properties.age.examples).toEqual([30, 41]);
     expect(schemaEditorSetDataMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the generation error visible when no mapping configuration was returned', async () => {
+    const {wrapper, generateMappingFunctionSuggestionMock} = await setupDialog({
+      currentData: {name: 'Ada'},
+      currentSchema: {
+        type: 'object',
+        properties: {fullName: {type: 'string'}},
+      },
+    });
+    generateMappingFunctionSuggestionMock.mockResolvedValue({
+      config: '',
+      success: false,
+      message: 'Mapping generation failed.',
+    });
+
+    await openDialog(wrapper);
+    await button(wrapper, 'Generate Suggestion')!.trigger('click');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Mapping generation failed.');
+  });
+
+  it('includes a failed JavaScript validation in the next suggestion request', async () => {
+    const {wrapper, generateMappingFunctionSuggestionMock, validateJavascriptMappingMock} =
+      await setupDialog({
+        currentData: {name: 'Ada'},
+        currentSchema: {type: 'object'},
+      });
+    const failedMappingCode = 'function transform() { return {}; }';
+    generateMappingFunctionSuggestionMock.mockResolvedValue({
+      config: failedMappingCode,
+      success: true,
+      message: 'Mapping generated.',
+    });
+    validateJavascriptMappingMock.mockResolvedValue({
+      success: false,
+      message: 'fullName is required',
+    });
+
+    await openDialog(wrapper);
+    await wrapper.findAll('select')[1]!.setValue('javascript');
+    await flushPromises();
+    await button(wrapper, 'Generate Suggestion')!.trigger('click');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Regenerate Suggestion for Previous Error');
+
+    await button(wrapper, 'Regenerate Suggestion for Previous Error')!.trigger('click');
+    await flushPromises();
+
+    expect(generateMappingFunctionSuggestionMock.mock.calls[1]![0].retryContext).toEqual({
+      validationError: 'fullName is required',
+      previousCode: failedMappingCode,
+    });
   });
 
   it('executes direct AI mapping and applies the returned result to the Data Editor', async () => {

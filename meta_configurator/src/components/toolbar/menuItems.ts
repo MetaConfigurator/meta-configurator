@@ -1,7 +1,6 @@
 import {openUploadFileDialog, openUploadSettingsDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {clearCurrentFile} from '@/components/toolbar/clearFile';
-import {useSessionStore} from '@/store/sessionStore';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import {useDataSource} from '@/data/dataSource';
@@ -37,8 +36,6 @@ export type MenuItemDialogActions = {
 
 /** Provides the menu items for the top menu bar. */
 export class MenuItems {
-  sessionStore = useSessionStore();
-
   constructor(private readonly dialogActions: MenuItemDialogActions) {}
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
@@ -161,8 +158,7 @@ export class MenuItems {
 
     if (settings.panels.hidden.includes('aiPrompts')) {
       result = result.filter(menuItem => {
-        // exclude the "Utility" menu item
-        return !(menuItem.label === 'Utility');
+        return menuItem.key !== 'utility';
       });
     }
 
@@ -172,7 +168,7 @@ export class MenuItems {
   }
 
   public getSchemaEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-    let result: MenuItem[] = [
+    const result: MenuItem[] = [
       {
         label: 'New Schema / Infer Schema...',
         icon: 'fa-regular fa-file',
@@ -354,7 +350,7 @@ export class MenuItems {
   }
 
   public getSettingsMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-    let result: MenuItem[] = [
+    const result: MenuItem[] = [
       {
         label: 'Open settings file',
         icon: 'fa-regular fa-folder-open',
@@ -408,7 +404,7 @@ export class MenuItems {
     mode: SessionMode,
     settings: SettingsInterfaceRoot
   ): MenuItem[] {
-    let result: MenuItem[] = [];
+    const result: MenuItem[] = [];
 
     for (const panelTypeName of panelTypeRegistry.getPanelTypeNames()) {
       const panelTypeDefinition = panelTypeRegistry.getPanelTypeDefinition(panelTypeName);
@@ -422,8 +418,6 @@ export class MenuItems {
           this.generateTogglePanelButton(
             mode,
             panelTypeName,
-            mode,
-            panelTypeDefinition.icon,
             panelTypeDefinition.icon,
             panelTypeDefinition.label,
             settings
@@ -436,64 +430,61 @@ export class MenuItems {
   }
 
   private generateTogglePanelButton(
-    buttonMode: SessionMode,
+    mode: SessionMode,
     panelTypeName: string,
-    panelMode: SessionMode,
-    iconNameEnabled: string,
-    iconNameDisabled: string,
+    iconName: string,
     description: string,
     settings: SettingsInterfaceRoot
   ): MenuItem {
     return this.generateToggleButton(
       () =>
-        settings.panels[buttonMode].find(
-          panel => panel.panelType === panelTypeName && panel.mode === panelMode
+        settings.panels[mode].find(
+          panel => panel.panelType === panelTypeName && panel.mode === mode
         ) !== undefined,
       () => {
         const panels = settings.panels;
-        panels[buttonMode].push({
+        panels[mode].push({
           panelType: panelTypeName,
-          mode: panelMode,
+          mode,
           size: 40,
         });
       },
       () => {
         const panels = settings.panels;
-        panels[buttonMode] = panels[buttonMode].filter(
-          panel => !(panel.panelType === panelTypeName && panel.mode === panelMode)
+        panels[mode] = panels[mode].filter(
+          panel => !(panel.panelType === panelTypeName && panel.mode === mode)
         );
       },
-      iconNameEnabled,
-      iconNameDisabled,
+      iconName,
+      iconName,
       `Show ${description}`,
       `Hide ${description}`
     );
   }
 
   private generateToggleButton(
-    conditionActive: () => boolean,
-    actionActivate: () => void,
-    actionDeactivate: () => void,
-    iconNameEnabled: string,
-    iconNameDisabled: string,
-    descriptionActivate: string,
-    descriptionDeactivate: string
+    isActive: () => boolean,
+    activate: () => void,
+    deactivate: () => void,
+    activeIconName: string,
+    inactiveIconName: string,
+    activationDescription: string,
+    deactivationDescription: string
   ): MenuItem {
-    if (conditionActive()) {
+    if (isActive()) {
       return {
         position: 'top',
-        label: descriptionDeactivate,
-        icon: iconNameDisabled,
+        label: deactivationDescription,
+        icon: inactiveIconName,
         highlighted: true,
-        command: actionDeactivate,
-      };
-    } else {
-      return {
-        position: 'top',
-        label: descriptionActivate,
-        icon: iconNameEnabled,
-        command: actionActivate,
+        command: deactivate,
       };
     }
+    return {
+      position: 'top',
+      label: activationDescription,
+      icon: activeIconName,
+      command: activate,
+    };
   }
 }

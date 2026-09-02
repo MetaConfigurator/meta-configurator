@@ -3,7 +3,7 @@
  Synchronized with file data from the store.
  -->
 <script setup lang="ts">
-import {computed, onMounted, type Ref, ref, watch} from 'vue';
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
 import type {Editor} from 'brace';
 import * as ace from 'brace';
 import 'brace/mode/javascript';
@@ -18,7 +18,7 @@ import {
   setupLinkToData,
 } from '@/components/panels/code-editor/setupLinkToSelectionAndData';
 import {useSettings} from '@/settings/useSettings';
-import {modeToDocumentTypeDescription, SessionMode} from '@/store/sessionMode';
+import {SessionMode} from '@/store/sessionMode';
 import {
   connectAceUndoManagerToGlobalUndo,
   setupAceMode,
@@ -27,6 +27,7 @@ import {
 import Message from 'primevue/message';
 import {sizeOf} from '@/utility/sizeOf';
 import {getDataForMode} from '@/data/useDataLink';
+import {createAceEditorElementId} from '@/components/panels/shared-components/useAceEditor';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -34,50 +35,44 @@ const props = defineProps<{
 
 const settings = useSettings();
 
-// random id is used to enable multiple Ace Editors of same sessionMode on the same page
-const editor_id = 'code-editor-' + props.sessionMode + '-' + Math.random();
-let editor: Ref<Editor | undefined> = ref(undefined);
+const editorElementId = createAceEditorElementId(`code-editor-${props.sessionMode}`);
+const editor = ref<Editor | null>(null);
+let editorResizeObserver: ResizeObserver | null = null;
+let disposeAceMode: (() => void) | undefined;
+let disposeAceProperties: (() => void) | undefined;
 
 onMounted(() => {
-  editor.value = ace.edit(editor_id);
+  editor.value = ace.edit(editorElementId);
 
   editor.value.getSession().setUseWrapMode(true);
   editor.value.setOption('wrap', true);
   editor.value.setOption('hScrollBarAlwaysVisible', false);
 
-  setupAceMode(editor.value, settings.value);
-  setupAceProperties(editor.value, settings.value);
+  disposeAceMode = setupAceMode(editor.value, settings.value);
+  disposeAceProperties = setupAceProperties(editor.value, settings.value);
   connectAceUndoManagerToGlobalUndo(editor.value, getDataForMode(props.sessionMode).undoManager);
 
   setupLinkToData(editor.value, props.sessionMode);
   setupLinkToCurrentSelection(editor.value, props.sessionMode);
   setupAnnotationsFromValidationErrors(editor.value, props.sessionMode);
 
-  if (isEditorReadOnly()) {
-    editor.value.setReadOnly(true);
-  }
-
-  // watch for changes in the editor container size and resize the editor accordingly
-  const observer = new ResizeObserver(() => {
+  editorResizeObserver = new ResizeObserver(() => {
     editor.value?.resize();
   });
-  const el = document.getElementById(editor_id);
-  if (el) observer.observe(el);
+  const editorElement = document.getElementById(editorElementId);
+  if (editorElement) {
+    editorResizeObserver.observe(editorElement);
+  }
 });
 
-// watch for changes in the data format and update the editor accordingly
-watch(
-  () => settings.value.dataFormat,
-  _ => {
-    if (editor.value) {
-      editor.value.setReadOnly(isEditorReadOnly());
-    }
-  }
-);
-
-function isEditorReadOnly(): boolean {
-  return false;
-}
+onBeforeUnmount(() => {
+  editorResizeObserver?.disconnect();
+  editorResizeObserver = null;
+  disposeAceMode?.();
+  disposeAceProperties?.();
+  editor.value?.destroy();
+  editor.value = null;
+});
 
 const featuresDisabledForPerformance = computed(() => {
   if (!editor.value) {
@@ -93,16 +88,9 @@ const featuresDisabledForPerformance = computed(() => {
 </script>
 
 <template>
-  <Message v-if="isEditorReadOnly()" severity="warn"
-    >Read-Only Mode: Making changes to XML in the text editor might lead to unwanted changes in the
-    underlying JSON {{ modeToDocumentTypeDescription(props.sessionMode) }} document, because of
-    ambiguity and technical restrictions in XML to JSON conversion.</Message
-  >
   <Message v-if="featuresDisabledForPerformance" severity="warn"
     >Some editor features are disabled for performance reasons due to the large size of the
     document.</Message
   >
-  <div class="h-full" :id="editor_id" />
+  <div class="h-full" :id="editorElementId" />
 </template>
-
-<style scoped></style>

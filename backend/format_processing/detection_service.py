@@ -26,8 +26,8 @@ from parsers import (
 )
 
 
-ParserFunc = Callable[[str], Optional[core.ParserAttempt]]
-ContentPriorityDetector = Callable[[str], bool]
+ParserFunction = Callable[[str], Optional[core.ParserAttempt]]
+ContentDetectionFunction = Callable[[str], bool]
 
 
 @dataclass(frozen=True)
@@ -35,10 +35,10 @@ class SupportedFormat:
     name: str
     display_name: str
     ai_prompt_hint: str
-    parse_data: ParserFunc
+    parse_data: ParserFunction
     file_extensions: tuple[str, ...]
     mime_type_markers: tuple[str, ...]
-    content_priority_detector: ContentPriorityDetector
+    content_detector: Optional[ContentDetectionFunction] = None
 
     def get_match_tier(
         self, file_extension: str, mime_type: str, content: str
@@ -48,13 +48,9 @@ class SupportedFormat:
             return 0
         if any(marker in mime_type for marker in self.mime_type_markers):
             return 1
-        if self.content_priority_detector(content):
+        if self.content_detector is not None and self.content_detector(content):
             return 2
         return 3
-
-
-def _never_prioritize_from_content(_content: str) -> bool:
-    return False
 
 
 SUPPORTED_FORMATS = (
@@ -68,7 +64,7 @@ SUPPORTED_FORMATS = (
         parse_data=json_format.parse_data,
         file_extensions=("json",),
         mime_type_markers=("json",),
-        content_priority_detector=json_format.looks_like_json,
+        content_detector=json_format.looks_like_json,
     ),
     SupportedFormat(
         name="jsonl",
@@ -80,7 +76,7 @@ SUPPORTED_FORMATS = (
         parse_data=jsonl_format.parse_data,
         file_extensions=("json", "jsonl", "ndjson"),
         mime_type_markers=("json",),
-        content_priority_detector=json_format.looks_like_json,
+        content_detector=json_format.looks_like_json,
     ),
     SupportedFormat(
         name="yaml",
@@ -92,7 +88,6 @@ SUPPORTED_FORMATS = (
         parse_data=yaml_format.parse_data,
         file_extensions=("yaml", "yml"),
         mime_type_markers=("yaml", "yml"),
-        content_priority_detector=_never_prioritize_from_content,
     ),
     SupportedFormat(
         name="xml",
@@ -104,7 +99,7 @@ SUPPORTED_FORMATS = (
         parse_data=xml_format.parse_data,
         file_extensions=("xml",),
         mime_type_markers=("xml",),
-        content_priority_detector=xml_format.looks_like_xml,
+        content_detector=xml_format.looks_like_xml,
     ),
     SupportedFormat(
         name="toml",
@@ -116,7 +111,6 @@ SUPPORTED_FORMATS = (
         parse_data=toml_format.parse_data,
         file_extensions=("toml",),
         mime_type_markers=(),
-        content_priority_detector=_never_prioritize_from_content,
     ),
     SupportedFormat(
         name="ini",
@@ -128,7 +122,6 @@ SUPPORTED_FORMATS = (
         parse_data=ini_format.parse_data,
         file_extensions=("ini", "cfg", "conf"),
         mime_type_markers=(),
-        content_priority_detector=_never_prioritize_from_content,
     ),
     SupportedFormat(
         name="dotenv",
@@ -140,7 +133,7 @@ SUPPORTED_FORMATS = (
         parse_data=dotenv_format.parse_data,
         file_extensions=("env",),
         mime_type_markers=(),
-        content_priority_detector=dotenv_format.looks_like_dotenv,
+        content_detector=dotenv_format.looks_like_dotenv,
     ),
     SupportedFormat(
         name="properties",
@@ -152,7 +145,7 @@ SUPPORTED_FORMATS = (
         parse_data=properties_format.parse_data,
         file_extensions=("properties",),
         mime_type_markers=(),
-        content_priority_detector=properties_format.looks_like_properties,
+        content_detector=properties_format.looks_like_properties,
     ),
     SupportedFormat(
         name="cpp_source",
@@ -176,7 +169,7 @@ SUPPORTED_FORMATS = (
             "h",
         ),
         mime_type_markers=("c++", "cpp", "x-c++"),
-        content_priority_detector=cpp_source.looks_like_cpp_source,
+        content_detector=cpp_source.looks_like_cpp_source,
     ),
     SupportedFormat(
         name="python_source",
@@ -189,7 +182,7 @@ SUPPORTED_FORMATS = (
         parse_data=python_source.parse_data,
         file_extensions=("py", "pyw"),
         mime_type_markers=("python", "x-python"),
-        content_priority_detector=python_source.looks_like_python_source,
+        content_detector=python_source.looks_like_python_source,
     ),
     SupportedFormat(
         name="java_source",
@@ -202,7 +195,7 @@ SUPPORTED_FORMATS = (
         parse_data=java_source.parse_data,
         file_extensions=("java",),
         mime_type_markers=("java",),
-        content_priority_detector=java_source.looks_like_java_source,
+        content_detector=java_source.looks_like_java_source,
     ),
     SupportedFormat(
         name="tsv",
@@ -214,7 +207,7 @@ SUPPORTED_FORMATS = (
         parse_data=tsv_format.parse_data,
         file_extensions=("tsv",),
         mime_type_markers=("tsv",),
-        content_priority_detector=tsv_format.looks_like_tsv,
+        content_detector=tsv_format.looks_like_tsv,
     ),
     SupportedFormat(
         name="csv",
@@ -226,7 +219,7 @@ SUPPORTED_FORMATS = (
         parse_data=csv_format.parse_data,
         file_extensions=("csv",),
         mime_type_markers=("csv",),
-        content_priority_detector=csv_format.looks_like_csv,
+        content_detector=csv_format.looks_like_csv,
     ),
     SupportedFormat(
         name="markdown_table",
@@ -238,7 +231,7 @@ SUPPORTED_FORMATS = (
         parse_data=markdown_table_format.parse_data,
         file_extensions=("md", "markdown"),
         mime_type_markers=("markdown",),
-        content_priority_detector=markdown_table_format.looks_like_markdown_table,
+        content_detector=markdown_table_format.looks_like_markdown_table,
     ),
     SupportedFormat(
         name="ttl",
@@ -250,7 +243,7 @@ SUPPORTED_FORMATS = (
         parse_data=ttl_format.parse_data,
         file_extensions=("ttl", "turtle", "rdf"),
         mime_type_markers=("text/turtle", "application/turtle", "rdf"),
-        content_priority_detector=ttl_format.looks_like_turtle,
+        content_detector=ttl_format.looks_like_turtle,
     ),
     SupportedFormat(
         name="cif",
@@ -263,7 +256,7 @@ SUPPORTED_FORMATS = (
         parse_data=cif_format.parse_data,
         file_extensions=("cif", "mmcif", "mcif"),
         mime_type_markers=("cif",),
-        content_priority_detector=cif_format.looks_like_cif,
+        content_detector=cif_format.looks_like_cif,
     ),
     SupportedFormat(
         name="star_family",
@@ -276,7 +269,7 @@ SUPPORTED_FORMATS = (
         parse_data=star_family_format.parse_data,
         file_extensions=("mpif", "star", "cif", "mmcif", "mcif"),
         mime_type_markers=("cif",),
-        content_priority_detector=star_family_format.looks_like_star_family,
+        content_detector=star_family_format.looks_like_star_family,
     ),
 )
 
@@ -351,16 +344,25 @@ def preprocess_parsed_data_for_ai(
     format_name: str = "json",
     preprocess_options: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    supported_format = (
-        SUPPORTED_FORMAT_BY_NAME.get(format_name) or SUPPORTED_FORMAT_BY_NAME["json"]
+    supported_format = SUPPORTED_FORMAT_BY_NAME.get(format_name)
+    fallback_format = SUPPORTED_FORMAT_BY_NAME["json"]
+    display_name = (
+        supported_format.display_name
+        if supported_format is not None
+        else format_name or fallback_format.display_name
+    )
+    ai_prompt_hint = (
+        supported_format.ai_prompt_hint
+        if supported_format is not None
+        else fallback_format.ai_prompt_hint
     )
     return {
         "format": format_name,
         "preprocessed_for_ai": core.to_json_safe(
             preprocess_data_for_ai(parsed_data, preprocess_options)
         ),
-        "display_text": f"Backend prepared AI preview for {supported_format.display_name}.",
-        "ai_prompt_hint": supported_format.ai_prompt_hint,
+        "display_text": f"Backend prepared AI preview for {display_name}.",
+        "ai_prompt_hint": ai_prompt_hint,
     }
 
 

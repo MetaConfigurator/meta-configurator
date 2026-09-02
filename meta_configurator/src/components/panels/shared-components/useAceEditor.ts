@@ -8,10 +8,17 @@ import {useSettings} from '@/settings/useSettings';
 export type AceEditorMode = string | object;
 
 export type AceEditorSetup = {
-  mode: AceEditorMode;
+  mode?: AceEditorMode;
   useWrapMode?: boolean;
   onContentChanged?: (content: string) => void;
+  configureEditor?: (editor: Editor) => void | (() => void);
 };
+
+let nextAceEditorId = 0;
+
+export function createAceEditorElementId(editorElementIdPrefix: string): string {
+  return `${editorElementIdPrefix}-${nextAceEditorId++}`;
+}
 
 /**
  * Shared lifecycle for the Ace editors embedded in dialogs and panels: it creates the
@@ -26,10 +33,11 @@ export function useAceEditor(
   content: Ref<string>,
   setup: AceEditorSetup
 ) {
-  const editorElementId = `${editorElementIdPrefix}-${Math.random()}`;
+  const editorElementId = createAceEditorElementId(editorElementIdPrefix);
   const editor = ref<Editor | null>(null);
   const settings = useSettings();
   let isApplyingContentToEditor = false;
+  let disposeEditorConfiguration: (() => void) | undefined;
 
   function createEditor(): void {
     if (!document.getElementById(editorElementId)) {
@@ -40,7 +48,12 @@ export function useAceEditor(
     const createdEditor = ace.edit(editorElementId);
     editor.value = createdEditor;
 
-    setupAceProperties(createdEditor, settings.value);
+    const disposeAceProperties = setupAceProperties(createdEditor, settings.value);
+    const disposeCallerConfiguration = setup.configureEditor?.(createdEditor);
+    disposeEditorConfiguration = () => {
+      disposeCallerConfiguration?.();
+      disposeAceProperties();
+    };
     createdEditor.getSession().setUseWorker(false);
     if (setup.useWrapMode) {
       createdEditor.getSession().setUseWrapMode(true);
@@ -50,11 +63,14 @@ export function useAceEditor(
       if (isApplyingContentToEditor) {
         return;
       }
-      content.value = createdEditor.getValue();
-      setup.onContentChanged?.(createdEditor.getValue());
+      const newContent = createdEditor.getValue();
+      content.value = newContent;
+      setup.onContentChanged?.(newContent);
     });
 
-    setEditorMode(setup.mode);
+    if (setup.mode) {
+      setEditorMode(setup.mode);
+    }
     applyContentToEditor(content.value);
   }
 
@@ -63,6 +79,8 @@ export function useAceEditor(
       return;
     }
     content.value = editor.value.getValue();
+    disposeEditorConfiguration?.();
+    disposeEditorConfiguration = undefined;
     editor.value.destroy();
     editor.value.container.innerHTML = '';
     editor.value = null;
@@ -77,8 +95,11 @@ export function useAceEditor(
       return;
     }
     isApplyingContentToEditor = true;
-    editor.value.setValue(newContent, -1);
-    isApplyingContentToEditor = false;
+    try {
+      editor.value.setValue(newContent, -1);
+    } finally {
+      isApplyingContentToEditor = false;
+    }
   }
 
   watch(content, applyContentToEditor);

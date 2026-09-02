@@ -1,4 +1,8 @@
-import type {DataMappingResult, DataMappingService} from '@/data-mapping/dataMappingService';
+import type {
+  DataMappingResult,
+  DataMappingService,
+  DataMappingValidationResult,
+} from '@/data-mapping/dataMappingService';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import {cloneDeep} from 'lodash';
 import {executeSandboxedJavascriptTransform} from '@/utility/sandboxedJavascript';
@@ -11,10 +15,7 @@ export class DataMappingServiceJavascript implements DataMappingService {
     mappingConfiguration: string
   ): Promise<DataMappingResult> {
     try {
-      const mappingResultData = await executeSandboxedJavascriptTransform(
-        fixGeneratedJavascript(mappingConfiguration),
-        inputData
-      );
+      const mappingResultData = await this.executeMapping(inputData, mappingConfiguration);
       return {
         resultData: mappingResultData,
         success: true,
@@ -36,17 +37,21 @@ export class DataMappingServiceJavascript implements DataMappingService {
   async validateMappingConfig(
     mappingConfiguration: string,
     inputData: unknown
-  ): Promise<{success: boolean; message: string}> {
+  ): Promise<DataMappingValidationResult> {
     const inputDataSubset = trimDataToMaxSize(inputData);
 
     try {
-      await executeSandboxedJavascriptTransform(
-        fixGeneratedJavascript(mappingConfiguration),
-        inputDataSubset
-      );
+      await this.executeMapping(inputDataSubset, mappingConfiguration);
       return {success: true, message: 'Mapping configuration is valid.'};
     } catch (error) {
       return {success: false, message: `Error: ${getErrorMessage(error)}`};
     }
+  }
+
+  private executeMapping(inputData: unknown, mappingConfiguration: string): Promise<unknown> {
+    return executeSandboxedJavascriptTransform(
+      fixGeneratedJavascript(mappingConfiguration),
+      inputData
+    );
   }
 }

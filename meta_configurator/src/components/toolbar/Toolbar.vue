@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {ref, type Ref} from 'vue';
 import TopToolbar from '@/components/toolbar/TopToolbar.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {fetchSchemasFromJSONSchemaStore} from '@/components/toolbar/fetchSchemasFromJsonSchemaStore';
@@ -28,6 +28,9 @@ import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappin
 import ImportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/ImportSchemaDialog.vue';
 import ExportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/ExportSchemaDialog.vue';
 import InferSchemaDialog from '@/components/toolbar/dialogs/schema-infer/InferSchemaDialog.vue';
+import type {SchemaOption} from '@/packaged-schemas/schemaOption';
+
+defineOptions({name: 'MainToolbar'});
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -40,8 +43,57 @@ const emit = defineEmits<{
 const showAboutDialog = ref(false);
 const showNewsDialog = ref(false);
 
-function handleUserSchemaDialogSelectionDefault(option: 'JsonStore' | 'File' | 'URL') {
-  switch (option) {
+interface ShowableDialogController {
+  show: () => void;
+}
+
+interface ModeAwareDialogController extends ShowableDialogController {
+  activateSchemaMode: () => void;
+  activateDataMode: () => void;
+}
+
+interface FetchedSchemasDialogController extends ShowableDialogController {
+  setSchemas: (schemas: SchemaOption[]) => void;
+}
+
+const initialSchemaSelectionDialog = ref<ShowableDialogController | null>(null);
+const csvImportDialog = ref<ShowableDialogController | null>(null);
+const snapshotDialog = ref<ShowableDialogController | null>(null);
+const codeGenerationDialog = ref<ModeAwareDialogController | null>(null);
+const dataExportDialog = ref<ModeAwareDialogController | null>(null);
+const fetchedSchemasSelectionDialog = ref<FetchedSchemasDialogController | null>(null);
+const urlInputDialog = ref<ShowableDialogController | null>(null);
+const dataMappingDialog = ref<ShowableDialogController | null>(null);
+const dataImportAiDialog = ref<ShowableDialogController | null>(null);
+const rmlMappingDialog = ref<ShowableDialogController | null>(null);
+const turtleImportDialog = ref<ShowableDialogController | null>(null);
+const xmlImportDialog = ref<ShowableDialogController | null>(null);
+const xmlExportDialog = ref<ShowableDialogController | null>(null);
+const importSchemaDialog = ref<ShowableDialogController | null>(null);
+const exportSchemaDialog = ref<ShowableDialogController | null>(null);
+const inferSchemaDialog = ref<ShowableDialogController | null>(null);
+const refineSchemaDialog = ref<ShowableDialogController | null>(null);
+
+function showDialog(dialog: Ref<ShowableDialogController | null>): void {
+  dialog.value?.show();
+}
+
+function showModeAwareDialog(
+  dialog: Ref<ModeAwareDialogController | null>,
+  useSchemaMode: boolean
+): void {
+  if (useSchemaMode) {
+    dialog.value?.activateSchemaMode();
+  } else {
+    dialog.value?.activateDataMode();
+  }
+  dialog.value?.show();
+}
+
+function handleUserSchemaDialogSelectionDefault(
+  selectedSource: 'JsonStore' | 'File' | 'URL'
+): void {
+  switch (selectedSource) {
     case 'JsonStore':
       showSchemaStoreDialog();
       break;
@@ -49,16 +101,16 @@ function handleUserSchemaDialogSelectionDefault(option: 'JsonStore' | 'File' | '
       openUploadSchemaDialog();
       break;
     case 'URL':
-      showUrlDialog();
+      showDialog(urlInputDialog);
       break;
   }
 }
 
 async function handleUserSchemaDialogSelectionCustom(label: string) {
-  const schemas = useSettings().value.schemaSelectionLists.find(
+  const configuredSchemas = useSettings().value.schemaSelectionLists.find(
     list => list.label === label
   )?.schemas;
-  if (!schemas) {
+  if (!configuredSchemas) {
     useErrorService().onError(
       new Error(`Could not find schema selection list with label: ${label}`)
     );
@@ -66,117 +118,43 @@ async function handleUserSchemaDialogSelectionCustom(label: string) {
   }
   // schemas is either an URL to a JSON document that specifies the schemas, or directly an array of schemas
   // if it is an URL, first resolve it and then proceed
-  let schemaList: {label: string; url: string}[] = [];
-  if (typeof schemas === 'string') {
+  let schemaList: SchemaOption[] = [];
+  if (typeof configuredSchemas === 'string') {
     try {
-      const fetchedContent = await fetchExternalContent(schemas);
+      const fetchedContent = await fetchExternalContent(configuredSchemas);
       schemaList = await fetchedContent.json();
-    } catch (error) {
+    } catch {
       useErrorService().onError(
-        new Error(`Could not fetch schema selection list from URL: ${schemas}`)
+        new Error(`Could not fetch schema selection list from URL: ${configuredSchemas}`)
       );
       return;
     }
-  } else if (Array.isArray(schemas)) {
-    schemaList = schemas;
+  } else if (Array.isArray(configuredSchemas)) {
+    schemaList = configuredSchemas;
   } else {
     useErrorService().onError(
       new Error(`Invalid schema selection list format for label: ${label}`)
     );
     return;
   }
-  fetchedSchemasSelectionDialog.value.setSchemas(schemaList);
-  fetchedSchemasSelectionDialog.value.show();
-}
-
-function showCodeGenerationDialog(schemaMode: boolean) {
-  if (schemaMode) {
-    codeGenerationDialog.value?.activateSchemaMode();
-  } else {
-    codeGenerationDialog.value?.activateDataMode();
-  }
-  codeGenerationDialog.value?.show();
-}
-
-function showDataExportDialog(schemaMode: boolean) {
-  if (schemaMode) {
-    dataExportDialog.value?.activateSchemaMode();
-  } else {
-    dataExportDialog.value?.activateDataMode();
-  }
-  dataExportDialog.value?.show();
-}
-
-function showImportCsvDialog() {
-  csvImportDialog.value?.show();
-}
-
-function showImportTurtleDialog() {
-  turtleImportDialog.value?.show();
-}
-
-function showImportXmlDialog() {
-  xmlImportDialog.value?.show();
-}
-
-function showXmlExportDialog() {
-  xmlExportDialog.value?.show();
-}
-
-function showImportSchemaDialog() {
-  importSchemaDialog.value?.show();
-}
-
-function showExportSchemaDialog() {
-  exportSchemaDialog.value?.show();
-}
-
-function showInferSchemaDialog() {
-  inferSchemaDialog.value?.show();
-}
-
-function showSnapshotDialog() {
-  snapshotDialog.value?.show();
-}
-
-function showDataMappingDialog() {
-  dataMappingDialog.value?.show();
-}
-
-function showDataImportAiDialog() {
-  dataImportAiDialog.value?.show();
-}
-
-function showRmlMappingDialog() {
-  rmlMappingDialog.value?.show();
-}
-
-function showRefineSchemaDialog() {
-  refineSchemaDialog.value?.show();
+  fetchedSchemasSelectionDialog.value?.setSchemas(schemaList);
+  fetchedSchemasSelectionDialog.value?.show();
 }
 
 async function showSchemaStoreDialog(): Promise<void> {
   try {
-    // Wait for the fetch to complete
-    fetchedSchemasSelectionDialog.value.setSchemas(await fetchSchemasFromJSONSchemaStore());
-    fetchedSchemasSelectionDialog.value.show();
+    fetchedSchemasSelectionDialog.value?.setSchemas(await fetchSchemasFromJSONSchemaStore());
+    fetchedSchemasSelectionDialog.value?.show();
   } catch (error) {
     useErrorService().onError(error);
   }
 }
 
-function showUrlDialog() {
-  urlInputDialog.value?.show();
-}
-
-const initialSchemaSelectionDialog = ref();
-
-// Function to show the category selection dialog
 const showSchemaSelectionDialog = () => {
-  initialSchemaSelectionDialog.value?.show();
+  showDialog(initialSchemaSelectionDialog);
 };
 
-const showInitialDialog = () => {
+const showInitialSchemaDialog = () => {
   const settings = useSettings().value;
   if (hasCurrentNewsChanged(settings.latestNewsHash)) {
     showNewsDialog.value = true;
@@ -185,44 +163,28 @@ const showInitialDialog = () => {
   }
 };
 
-const csvImportDialog = ref();
-const snapshotDialog = ref();
-const codeGenerationDialog = ref();
-const dataExportDialog = ref();
-const fetchedSchemasSelectionDialog = ref();
-const urlInputDialog = ref();
-const dataMappingDialog = ref();
-const dataImportAiDialog = ref();
-const rmlMappingDialog = ref();
-const turtleImportDialog = ref();
-const xmlImportDialog = ref();
-const xmlExportDialog = ref();
-const importSchemaDialog = ref();
-const exportSchemaDialog = ref();
-const inferSchemaDialog = ref();
-const refineSchemaDialog = ref();
-
 /** The dialog-opening callbacks the toolbar menus trigger, passed down as one prop. */
 const dialogActions: MenuItemDialogActions = {
   showSchemaSelectionDialog,
-  showImportCsvDialog,
-  showSnapshotDialog,
-  showCodeGenerationDialog,
-  showDataExportDialog,
-  showDataMappingDialog,
-  showDataImportAiDialog,
-  showInferSchemaDialog,
-  showRmlMappingDialog,
-  showImportTurtleDialog,
-  showImportXmlDialog,
-  showXmlExportDialog,
-  showImportSchemaDialog,
-  showExportSchemaDialog,
-  showRefineSchemaDialog,
+  showImportCsvDialog: () => showDialog(csvImportDialog),
+  showSnapshotDialog: () => showDialog(snapshotDialog),
+  showCodeGenerationDialog: useSchemaMode =>
+    showModeAwareDialog(codeGenerationDialog, useSchemaMode),
+  showDataExportDialog: useSchemaMode => showModeAwareDialog(dataExportDialog, useSchemaMode),
+  showDataMappingDialog: () => showDialog(dataMappingDialog),
+  showDataImportAiDialog: () => showDialog(dataImportAiDialog),
+  showInferSchemaDialog: () => showDialog(inferSchemaDialog),
+  showRmlMappingDialog: () => showDialog(rmlMappingDialog),
+  showImportTurtleDialog: () => showDialog(turtleImportDialog),
+  showImportXmlDialog: () => showDialog(xmlImportDialog),
+  showXmlExportDialog: () => showDialog(xmlExportDialog),
+  showImportSchemaDialog: () => showDialog(importSchemaDialog),
+  showExportSchemaDialog: () => showDialog(exportSchemaDialog),
+  showRefineSchemaDialog: () => showDialog(refineSchemaDialog),
 };
 
 defineExpose({
-  showInitialSchemaDialog: showInitialDialog,
+  showInitialSchemaDialog,
 });
 </script>
 
@@ -290,5 +252,3 @@ defineExpose({
     :dialog-actions="dialogActions"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
-
-<style scoped></style>

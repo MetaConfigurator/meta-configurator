@@ -4,6 +4,7 @@ from typing import Any, Callable, Collection, Dict, Iterator, List, Optional, Tu
 
 from format_detection_core import (
     compact_tree_text,
+    find_first_named_child,
     get_tree_sitter_node_text,
     iterate_named_descendants,
     normalize_comment_text,
@@ -11,8 +12,8 @@ from format_detection_core import (
     summarize_tree_sitter_node,
 )
 
-SummarizeNodeFunc = Callable[[Any, bytes], Dict[str, Any]]
-CollectCallsFunc = Callable[[Any, bytes], List[Dict[str, Any]]]
+SummarizeNodeFunction = Callable[[Any, bytes], Dict[str, Any]]
+CollectCallsFunction = Callable[[Any, bytes], List[Dict[str, Any]]]
 
 
 def iterate_named_children_with_comments(
@@ -29,19 +30,16 @@ def iterate_named_children_with_comments(
             continue
         yield child, pending_comments
         pending_comments = []
-    yield None, pending_comments
+    if pending_comments:
+        yield None, pending_comments
 
 
 def get_first_named_child_text(
     node: Any, source_bytes: bytes, child_types: Collection[str]
 ) -> Optional[str]:
-    return next(
-        (
-            get_tree_sitter_node_text(child, source_bytes)
-            for child in getattr(node, "named_children", [])
-            if child.type in child_types
-        ),
-        None,
+    child = find_first_named_child(node, child_types)
+    return (
+        get_tree_sitter_node_text(child, source_bytes) if child is not None else None
     )
 
 
@@ -57,14 +55,7 @@ def collect_calls_from_descendants(
     for descendant in iterate_named_descendants(node):
         if descendant.type not in call_types:
             continue
-        argument_node = next(
-            (
-                child
-                for child in getattr(descendant, "named_children", [])
-                if child.type == argument_list_type
-            ),
-            None,
-        )
+        argument_node = find_first_named_child(descendant, {argument_list_type})
         calls.append(
             {
                 "line": descendant.start_point.row + 1,
@@ -91,8 +82,8 @@ def summarize_callable_body(
     declaration_types: Collection[str],
     loop_types: Collection[str],
     conditional_types: Collection[str],
-    summarize_declaration: SummarizeNodeFunc,
-    collect_calls: CollectCallsFunc,
+    summarize_declaration: SummarizeNodeFunction,
+    collect_calls: CollectCallsFunction,
 ) -> Dict[str, Any]:
     """Summarizes the local declarations, calls, loops and conditionals of a body."""
     declarations: List[Dict[str, Any]] = []
@@ -124,25 +115,20 @@ def summarize_class_like_node(
     kind: str,
     body_types: Collection[str],
     method_types: Collection[str],
-    summarize_method: Callable[[Any, bytes, List[str]], Dict[str, Any]],
+    summarize_method: Callable[[Any, bytes, List[str]], Optional[Dict[str, Any]]],
     name_types: Collection[str] = ("identifier",),
 ) -> Dict[str, Any]:
     """Summarizes a class-like declaration together with the methods in its body."""
-    body = next(
-        (
-            child
-            for child in getattr(node, "named_children", [])
-            if child.type in body_types
-        ),
-        None,
-    )
+    body = find_first_named_child(node, body_types)
     methods: List[Dict[str, Any]] = []
     if body is not None:
         for child, method_comments in iterate_named_children_with_comments(
             body, source_bytes
         ):
             if child is not None and child.type in method_types:
-                methods.append(summarize_method(child, source_bytes, method_comments))
+                method_summary = summarize_method(child, source_bytes, method_comments)
+                if method_summary is not None:
+                    methods.append(method_summary)
 
     return {
         "line": node.start_point.row + 1,

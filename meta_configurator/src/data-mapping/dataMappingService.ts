@@ -10,6 +10,12 @@ export type DataMappingResult = {
   message: string;
 };
 
+export type DataMappingSuggestionResult = {
+  config: string;
+  success: boolean;
+  message: string;
+};
+
 export type DataMappingValidationResult = {
   success: boolean;
   message: string;

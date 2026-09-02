@@ -1,4 +1,8 @@
-import type {DataMappingResult, DataMappingService} from '@/data-mapping/dataMappingService';
+import type {
+  DataMappingResult,
+  DataMappingService,
+  DataMappingValidationResult,
+} from '@/data-mapping/dataMappingService';
 import jsonata from 'jsonata';
 import {cloneDeep} from 'lodash';
 import {trimDataToMaxSize} from '@/utility/trimData';
@@ -10,7 +14,7 @@ export class DataMappingServiceJsonata implements DataMappingService {
     mappingConfiguration: string
   ): Promise<DataMappingResult> {
     try {
-      const mappingResultData = await jsonata(mappingConfiguration).evaluate(inputData);
+      const mappingResultData = await this.executeMapping(inputData, mappingConfiguration);
       return {
         resultData: mappingResultData,
         success: true,
@@ -51,10 +55,10 @@ export class DataMappingServiceJsonata implements DataMappingService {
   async validateMappingConfig(
     mappingConfiguration: string,
     inputData: unknown
-  ): Promise<{success: boolean; message: string}> {
+  ): Promise<DataMappingValidationResult> {
     const inputDataSubset = trimDataToMaxSize(inputData);
     try {
-      await jsonata(mappingConfiguration).evaluate(inputDataSubset);
+      await this.executeMapping(inputDataSubset, mappingConfiguration);
       return {success: true, message: 'Mapping configuration is valid.'};
     } catch (error) {
       if (
@@ -76,6 +80,10 @@ export class DataMappingServiceJsonata implements DataMappingService {
         return {success: false, message: 'Unknown error'};
       }
     }
+  }
+
+  private executeMapping(inputData: unknown, mappingConfiguration: string): Promise<unknown> {
+    return jsonata(mappingConfiguration).evaluate(inputData);
   }
 
   private convertTextPositionToCursorPosition(

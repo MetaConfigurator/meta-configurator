@@ -1,9 +1,10 @@
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {AddExamplesOptions} from '@/schema/refinement/refineSchemaTypes';
 import {
   dropExamplesFromFixedValueSchema,
   getSchemaTypes,
   getValueType,
+  schemaAllowsValueType,
   uniqueByJsonValue,
   visitSchemaWithSamples,
 } from '@/schema/refinement/refineSchemaHelpers';
@@ -21,11 +22,16 @@ export function addExamplesToSchemaFromSamples(
     }
 
     const schemaTypes = getSchemaTypes(schemaNode);
-    if (schemaTypes.length === 0 || schemaTypes.some(type => !EXAMPLE_SUPPORTED_TYPES.has(type))) {
+    if (schemaTypes.length === 0 || !schemaTypes.some(type => EXAMPLE_SUPPORTED_TYPES.has(type))) {
       return;
     }
 
-    const mergedExamples = mergeExamples(schemaNode.examples ?? [], samplesForNode, options);
+    const mergedExamples = mergeExamples(
+      schemaNode,
+      schemaNode.examples ?? [],
+      samplesForNode,
+      options
+    );
     if (mergedExamples.length > 0) {
       schemaNode.examples = mergedExamples;
     }
@@ -35,12 +41,14 @@ export function addExamplesToSchemaFromSamples(
 }
 
 function mergeExamples(
+  schemaNode: JsonSchemaObjectType,
   existingExamples: unknown[],
   samples: unknown[],
   options: AddExamplesOptions
 ): unknown[] {
-  const candidateValues = [...existingExamples, ...samples].filter(value =>
-    canBeUsedAsExample(value, options)
+  const candidateValues = [...existingExamples, ...samples].filter(
+    value =>
+      canBeUsedAsExample(value, options) && schemaAllowsValueType(schemaNode, getValueType(value))
   );
   const selectedValues = options.uniqueOnly ? uniqueByJsonValue(candidateValues) : candidateValues;
   return selectedValues.slice(0, options.maxExamplesPerField);

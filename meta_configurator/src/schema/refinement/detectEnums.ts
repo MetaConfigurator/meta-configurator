@@ -11,8 +11,6 @@ import {
   visitSchemaWithSamples,
 } from '@/schema/refinement/refineSchemaHelpers';
 
-const ENUM_CANDIDATE_TYPES = new Set(['string', 'integer', 'boolean']);
-
 export function detectEnumsInSchemaFromSamples(
   schema: TopLevelSchema,
   samples: unknown[],
@@ -23,10 +21,7 @@ export function detectEnumsInSchemaFromSamples(
       return;
     }
 
-    const primitiveSamples = samplesForNode.filter(sample =>
-      ENUM_CANDIDATE_TYPES.has(getValueType(sample))
-    );
-    const enumValues = detectEnumValues(schemaNode, primitiveSamples, options);
+    const enumValues = detectEnumValues(schemaNode, samplesForNode, options);
     if (enumValues !== null) {
       schemaNode.enum = enumValues;
       delete schemaNode.examples;

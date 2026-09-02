@@ -9,6 +9,7 @@ vi.mock('@/settings/useSettings', () => ({
 import {
   detectFormatAndParseWithFormatProcessing,
   FORMAT_PROCESSING_FILE_ACCEPT,
+  preprocessParsedDataForAiWithFormatProcessing,
   shouldUseFormatProcessingForFile,
 } from '@/utility/backend/formatProcessingApi';
 
@@ -107,6 +108,13 @@ describe('detectFormatAndParseWithFormatProcessing', () => {
     ).rejects.toThrow('Input file too large');
   });
 
+  it('uses a status-based error when a non-2xx json body has no error message', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(null, {okFlag: false, status: 500}));
+    await expect(
+      detectFormatAndParseWithFormatProcessing('sample.xml', 'application/xml', '<x/>')
+    ).rejects.toThrow('Format processing service request failed with status 500.');
+  });
+
   it('throws a friendly error when the service is unreachable', async () => {
     fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
     await expect(
@@ -126,5 +134,81 @@ describe('detectFormatAndParseWithFormatProcessing', () => {
     await expect(
       detectFormatAndParseWithFormatProcessing('sample.xml', 'application/xml', '<x/>')
     ).rejects.toThrow(/Invalid response/);
+  });
+
+  it('throws a friendly error when a JSON response cannot be decoded', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: {get: () => 'Application/JSON; charset=utf-8'},
+      json: async () => Promise.reject(new SyntaxError('Unexpected token')),
+      text: async () => '',
+    } as unknown as Response);
+
+    await expect(
+      detectFormatAndParseWithFormatProcessing('sample.xml', 'application/xml', '<x/>')
+    ).rejects.toThrow(/returned invalid JSON/);
+  });
+});
+
+describe('preprocessParsedDataForAiWithFormatProcessing', () => {
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal('fetch', fetchMock);
+  });
+
+  it('POSTs preprocessing options and returns the shortened data', async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        format: 'json',
+        preprocessed_for_ai: {items: [1]},
+        display_text: 'Reduced array entries.',
+        ai_prompt_hint: 'Input was shortened.',
+      })
+    );
+
+    const result = await preprocessParsedDataForAiWithFormatProcessing({items: [1, 2, 3]}, 'json', {
+      initial_array_limit: 1,
+    });
+
+    expect(result.preprocessed_for_ai).toEqual({items: [1]});
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe('http://mock-format-processing/preprocess-for-ai');
+    expect(JSON.parse(init.body)).toEqual({
+      data: {items: [1, 2, 3]},
+      format: 'json',
+      preprocess_options: {initial_array_limit: 1},
+    });
+  });
+
+  it('falls back to the submitted data when no preprocessed value is returned', async () => {
+    const submittedData = {items: [1, 2, 3]};
+    fetchMock.mockResolvedValue(
+      jsonResponse({format: 'json', display_text: 'No preprocessing needed.'})
+    );
+
+    const result = await preprocessParsedDataForAiWithFormatProcessing(submittedData);
+
+    expect(result.preprocessed_for_ai).toBe(submittedData);
+  });
+
+  it('rejects malformed successful responses', async () => {
+    fetchMock.mockResolvedValue(jsonResponse([]));
+
+    await expect(preprocessParsedDataForAiWithFormatProcessing({value: 1})).rejects.toThrow(
+      /Invalid response/
+    );
+  });
+
+  it('reports request bodies that cannot be serialized', async () => {
+    const circularData: Record<string, unknown> = {};
+    circularData.self = circularData;
+
+    await expect(preprocessParsedDataForAiWithFormatProcessing(circularData)).rejects.toThrow(
+      /Could not serialize the format processing request/
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

@@ -13,9 +13,10 @@ function convertToJsonCompatible(
 
   switch (typeof value) {
     case 'string':
-    case 'number':
     case 'boolean':
       return value;
+    case 'number':
+      return Number.isFinite(value) ? value : null;
     case 'bigint':
       return value.toString();
     case 'undefined':
@@ -33,11 +34,14 @@ function convertToJsonCompatible(
   }
 
   if (value instanceof Error) {
-    return {
+    const serializedError: Record<string, string> = {
       name: value.name,
       message: value.message,
-      stack: value.stack,
     };
+    if (value.stack !== undefined) {
+      serializedError.stack = value.stack;
+    }
+    return serializedError;
   }
 
   if (isArrayBufferView(value)) {
@@ -51,54 +55,53 @@ function convertToJsonCompatible(
     return Array.from(new Uint8Array(value));
   }
 
-  if (Array.isArray(value)) {
-    return value.map(item => {
-      const converted = convertToJsonCompatible(item, seen, true);
-      return converted === undefined ? null : converted;
-    });
+  if (seen.has(value)) {
+    return '[Circular]';
   }
 
-  if (value instanceof Set) {
-    return Array.from(value, item => {
-      const converted = convertToJsonCompatible(item, seen, true);
-      return converted === undefined ? null : converted;
-    });
-  }
+  seen.add(value);
+  try {
+    if (Array.isArray(value)) {
+      return Array.from(value, item => {
+        const converted = convertToJsonCompatible(item, seen, true);
+        return converted === undefined ? null : converted;
+      });
+    }
 
-  if (value instanceof Map) {
-    const result: Record<string, unknown> = {};
-    for (const [key, entryValue] of value.entries()) {
-      const converted = convertToJsonCompatible(entryValue, seen, false);
-      if (converted !== undefined) {
-        result[String(key)] = converted;
+    if (value instanceof Set) {
+      return Array.from(value, item => {
+        const converted = convertToJsonCompatible(item, seen, true);
+        return converted === undefined ? null : converted;
+      });
+    }
+
+    if (value instanceof Map) {
+      const convertedEntries: Record<string, unknown> = {};
+      for (const [key, entryValue] of value.entries()) {
+        const convertedValue = convertToJsonCompatible(entryValue, seen, false);
+        if (convertedValue !== undefined) {
+          convertedEntries[String(key)] = convertedValue;
+        }
       }
-    }
-    return result;
-  }
-
-  if (typeof value === 'object') {
-    if (seen.has(value)) {
-      return '[Circular]';
+      return convertedEntries;
     }
 
-    seen.add(value);
-    const result: Record<string, unknown> = {};
+    const convertedProperties: Record<string, unknown> = {};
     for (const [key, entryValue] of Object.entries(value as Record<string, unknown>)) {
-      const converted = convertToJsonCompatible(entryValue, seen, false);
-      if (converted !== undefined) {
-        result[key] = converted;
+      const convertedValue = convertToJsonCompatible(entryValue, seen, false);
+      if (convertedValue !== undefined) {
+        convertedProperties[key] = convertedValue;
       }
     }
+    return convertedProperties;
+  } finally {
     seen.delete(value);
-    return result;
   }
-
-  return insideArray ? null : undefined;
 }
 
-export function makeJsonCompatible<T>(value: T): T {
+export function makeJsonCompatible(value: unknown): unknown {
   const converted = convertToJsonCompatible(value, new WeakSet(), false);
-  return (converted === undefined ? null : converted) as T;
+  return converted === undefined ? null : converted;
 }
 
 export function hasJsonContent(value: unknown): boolean {

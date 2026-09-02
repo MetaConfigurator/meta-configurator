@@ -48,6 +48,7 @@ export type ParsedDataNormalizationRequest = BackendDetectionHints & {
   userComments: string;
   schemaSource: DataImportAiSchemaSource;
   currentSchema: TopLevelSchema | undefined;
+  retryContext?: GeneratedCodeRetryContext;
 };
 
 export type FullAiImportRequest = BackendDetectionHints & {
@@ -224,10 +225,8 @@ export async function generateNormalizationScriptSuggestion(
       inputData: dataForPrompt,
       inputDataSchema: inferJsonSchema(dataForPrompt),
       targetSchema: request.currentSchema as TopLevelSchema,
-      userComments: joinPromptSections([
-        formatBackendHints(request),
-        request.userComments,
-      ]),
+      userComments: joinPromptSections([formatBackendHints(request), request.userComments]),
+      retryContext: request.retryContext,
     });
   }
 
@@ -332,7 +331,8 @@ export async function runFullAiImport(
       request.currentSchema,
       {
         mismatchMessagePrefix: 'AI-converted JSON does not match current schema',
-        confirmationMessage: 'Data imported via full AI conversion despite schema mismatch warning.',
+        confirmationMessage:
+          'Data imported via full AI conversion despite schema mismatch warning.',
         successMessage: 'Data imported successfully via full AI conversion.',
       }
     );
@@ -402,6 +402,7 @@ function buildNormalizationUserMessage(
       JSON.stringify(trimDataToMaxSize(truncateLongStrings(dataForPrompt)), null, 2),
     'Please generate a robust transform(input) implementation with helper functions for scalar coercion and optional parsing of table-like text fields.',
     request.userComments ? `User hints:\n${request.userComments}` : '',
+    buildGeneratedCodeRetryHints(request.retryContext),
   ]);
 }
 

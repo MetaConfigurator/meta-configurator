@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
-import type {MenuItem} from 'primevue/menuitem';
+import {computed} from 'vue';
+import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
 import {MenuItems, type MenuItemDialogActions} from '@/components/toolbar/menuItems';
 import Button from 'primevue/button';
@@ -17,59 +17,46 @@ const props = defineProps<{
 }>();
 
 const settings = useSettings();
-const topMenuBar = new MenuItems(props.dialogActions);
+const menuItemsProvider = new MenuItems(props.dialogActions);
 
-function getMenuItems(settings: SettingsInterfaceRoot, positionBottom: boolean): MenuItem[] {
-  let result: MenuItem[];
-
+function getMenuItemsForCurrentMode(currentSettings: SettingsInterfaceRoot): MenuItem[] {
   switch (props.currentMode) {
     case SessionMode.DataEditor:
-      result = topMenuBar.getDataEditorMenuItems(settings);
-      break;
+      return menuItemsProvider.getDataEditorMenuItems(currentSettings);
     case SessionMode.SchemaEditor:
-      result = topMenuBar.getSchemaEditorMenuItems(settings);
-      break;
+      return menuItemsProvider.getSchemaEditorMenuItems(currentSettings);
     case SessionMode.Settings:
-      result = topMenuBar.getSettingsMenuItems(settings);
-      break;
+      return menuItemsProvider.getSettingsMenuItems(currentSettings);
     default:
       return [];
   }
-  result = result.filter(menuItem => {
-    let itemIsForBottom = true;
-    if (menuItem.position && menuItem.position == 'top') {
-      itemIsForBottom = false;
-    }
-    return itemIsForBottom === positionBottom;
-  });
-  return result;
 }
 
-// computed property function to get menu items to allow for updating of the menu items
-const menuItems = computed(() => getMenuItems(settings.value, props.showBottomMenu));
+const menuItems = computed(() =>
+  getMenuItemsForCurrentMode(settings.value).filter(
+    menuItem => (menuItem.position !== 'top') === props.showBottomMenu
+  )
+);
 
-const itemMenuRefs = ref(new Map<string, {toggle?: (event: Event) => void}>());
+type PopupMenuController = {toggle: (event: Event) => void};
+const popupMenuByItem = new WeakMap<MenuItem, PopupMenuController>();
 
-function setItemMenuRef(item: MenuItem, menu: {toggle?: (event: Event) => void} | null) {
-  const label = getLabelOfItem(item);
-  if (!label || !menu) {
+function setPopupMenu(item: MenuItem, menu: PopupMenuController | null): void {
+  if (!menu) {
+    popupMenuByItem.delete(item);
     return;
   }
-  itemMenuRefs.value.set(label, menu);
+  popupMenuByItem.set(item, menu);
 }
-function handleItemButtonClick(item: MenuItem, event: Event) {
+
+function handleItemButtonClick(item: MenuItem, event: Event): void {
   if (item.items) {
-    const label = getLabelOfItem(item);
-    if (label !== undefined) {
-      const menu = itemMenuRefs.value.get(label);
-      if (menu?.toggle) {
-        menu.toggle(event);
-      }
-    }
-  } else if (item.command) {
-    item.command?.({item, originalEvent: event} as any);
+    popupMenuByItem.get(item)?.toggle(event);
+    return;
   }
+  item.command?.({item, originalEvent: event} as MenuItemCommandEvent);
 }
+
 function getLabelOfItem(item: MenuItem): string | undefined {
   if (!item.label) {
     return undefined;
@@ -80,49 +67,44 @@ function getLabelOfItem(item: MenuItem): string | undefined {
   return item.label();
 }
 
-function isDisabled(item: MenuItem) {
-  if (!item.disabled) {
-    return false;
-  }
-  if (typeof item.disabled === 'boolean') {
-    return item.disabled;
-  }
-  return item.disabled();
+function getMenuItemKey(item: MenuItem, index: number): string {
+  return item.key ?? `${getLabelOfItem(item) ?? 'separator'}-${index}`;
 }
-function isHighlighted(item: MenuItem) {
-  if (!item.highlighted) {
+
+function evaluateBooleanProperty(value: boolean | (() => boolean) | undefined): boolean {
+  if (!value) {
     return false;
   }
-  if (typeof item.highlighted === 'boolean') {
-    return item.highlighted;
-  }
-  return item.highlighted();
+  return typeof value === 'boolean' ? value : value();
 }
 </script>
 
 <template>
   <div class="toolbar-menu-buttons">
     <!-- menu items -->
-    <div v-for="item in menuItems" :key="getLabelOfItem(item) ?? item.key ?? ''">
+    <div v-for="(item, index) in menuItems" :key="getMenuItemKey(item, index)">
       <span v-if="item.separator" class="menu-separator text-lg p-2 text-gray-300">|</span>
       <Button
         v-else
         circular
         text
-        :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
+        :class="{
+          'toolbar-button': true,
+          'highlighted-icon': evaluateBooleanProperty(item.highlighted),
+        }"
         size="small"
-        v-tooltip.right="item.label"
+        v-tooltip.right="getLabelOfItem(item)"
         :id="item.key ?? ''"
-        :disabled="isDisabled(item)"
-        @click="event => handleItemButtonClick(item, event)">
-        <FontAwesomeIcon :icon="item.icon!!" />
+        :disabled="evaluateBooleanProperty(item.disabled)"
+        @click="handleItemButtonClick(item, $event)">
+        <FontAwesomeIcon v-if="item.icon" :icon="item.icon" />
       </Button>
 
       <Menu
         v-if="item.items"
         :model="item.items"
         :popup="true"
-        :ref="itemMenu => setItemMenuRef(item, itemMenu as any)">
+        :ref="itemMenu => setPopupMenu(item, itemMenu as unknown as PopupMenuController)">
         <template #itemicon="slotProps">
           <div v-if="slotProps.item.icon !== undefined">
             <FontAwesomeIcon
