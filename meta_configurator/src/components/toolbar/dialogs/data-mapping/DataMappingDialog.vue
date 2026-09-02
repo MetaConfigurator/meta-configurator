@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {reactive} from 'vue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -16,39 +17,18 @@ import {
   useDataMappingDialog,
 } from '@/components/toolbar/dialogs/data-mapping/useDataMappingDialog';
 
-const {
-  showDialog,
-  refinementOptions,
-  mappingConfigurationIsValid,
-  statusMessage,
-  errorMessage,
-  userComments,
-  isLoadingMapping,
-  selectedMappingMethod,
-  selectedMappingLanguage,
-  editorElementId,
-  canUseAi,
-  usesMappingFunction,
-  usesInferredSourceSchema,
-  hasCurrentData,
-  hasTargetSchema,
-  mappingMethodNotice,
-  mappingLanguageWarning,
-  suggestionButtonLabel,
-  apiKeyMessage,
-  openDialog,
-  hideDialog,
-  generateMappingSuggestion,
-  performMapping,
-  executeDirectAiMapping,
-} = useDataMappingDialog();
+const dataMappingDialog = useDataMappingDialog();
+// reactive() unwraps the refs of the composable, so the template reads them as dialog.<name>
+const dialog = reactive(dataMappingDialog);
+// The template ref has to bind to the ref itself, which reactive() would unwrap.
+const refinementOptions = dataMappingDialog.refinementOptions;
 
-defineExpose({show: openDialog, close: hideDialog});
+defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
 </script>
 
 <template>
   <Dialog
-    v-model:visible="showDialog"
+    v-model:visible="dialog.showDialog"
     header="Convert Data to Target Schema"
     :modal="true"
     :style="{width: '56rem', maxWidth: '95vw'}">
@@ -65,22 +45,22 @@ defineExpose({show: openDialog, close: hideDialog});
       <ApiKeyWarning />
 
       <Message severity="info" :closable="false">
-        {{ mappingMethodNotice }}
+        {{ dialog.mappingMethodNotice }}
       </Message>
 
-      <Message v-if="mappingLanguageWarning.length" severity="warn" :closable="false">
-        {{ mappingLanguageWarning }}
+      <Message v-if="dialog.mappingLanguageWarning.length" severity="warn" :closable="false">
+        {{ dialog.mappingLanguageWarning }}
       </Message>
 
-      <Message v-if="!canUseAi" severity="info" :closable="false">
-        {{ apiKeyMessage }}
+      <Message v-if="!dialog.canUseAi" severity="info" :closable="false">
+        {{ dialog.apiKeyMessage }}
       </Message>
 
-      <Message v-if="!hasCurrentData" severity="warn" :closable="false">
+      <Message v-if="!dialog.hasCurrentData" severity="warn" :closable="false">
         No data is currently loaded in the Data Editor. Load data first before converting it.
       </Message>
 
-      <Message v-if="!hasTargetSchema" severity="warn" :closable="false">
+      <Message v-if="!dialog.hasTargetSchema" severity="warn" :closable="false">
         No target schema is currently loaded in the Schema Editor.
       </Message>
 
@@ -91,10 +71,12 @@ defineExpose({show: openDialog, close: hideDialog});
       </p>
 
       <div class="field-group">
-        <label for="userComments" class="block font-semibold mb-1">Additional Mapping Hints</label>
+        <label for="userComments" class="block font-semibold mb-1">
+          Additional Mapping Hints
+        </label>
         <InputText
           id="userComments"
-          v-model="userComments"
+          v-model="dialog.userComments"
           class="w-full"
           placeholder="e.g., rename fields, format dates..." />
       </div>
@@ -102,17 +84,17 @@ defineExpose({show: openDialog, close: hideDialog});
       <div class="field-group">
         <label class="block font-semibold mb-1">Mapping Method</label>
         <Select
-          v-model="selectedMappingMethod"
+          v-model="dialog.selectedMappingMethod"
           :options="MAPPING_METHOD_OPTIONS"
           option-label="label"
           option-value="value"
           class="w-full" />
       </div>
 
-      <div v-if="usesMappingFunction" class="field-group">
+      <div v-if="dialog.usesMappingFunction" class="field-group">
         <label class="block font-semibold mb-1">Mapping Language</label>
         <Select
-          v-model="selectedMappingLanguage"
+          v-model="dialog.selectedMappingLanguage"
           :options="MAPPING_LANGUAGE_OPTIONS"
           option-label="label"
           option-value="value"
@@ -120,47 +102,51 @@ defineExpose({show: openDialog, close: hideDialog});
       </div>
 
       <SchemaRefinementOptions
-        v-if="usesInferredSourceSchema"
+        v-if="dialog.usesInferredSourceSchema"
         ref="refinementOptions"
         id-prefix="mapping-inferred-source-schema"
         :show-data-independent-steps="false"
         add-examples-description="Add real example values from the current input data to the locally inferred source schema before it is sent to the LLM." />
 
       <Button
-        v-if="usesMappingFunction"
-        :label="suggestionButtonLabel"
+        v-if="dialog.usesMappingFunction"
+        :label="dialog.suggestionButtonLabel"
         icon="pi pi-wand"
-        @click="generateMappingSuggestion"
+        @click="dialog.generateMappingSuggestion"
         class="w-full"
-        :loading="isLoadingMapping"
-        :disabled="!canUseAi || !hasCurrentData || !hasTargetSchema || isLoadingMapping" />
+        :loading="dialog.isLoadingMapping"
+        :disabled="dialog.isMappingActionDisabled" />
 
       <Button
         v-else
         label="Execute AI Mapping"
         icon="pi pi-play"
-        @click="executeDirectAiMapping"
+        @click="dialog.executeDirectAiMapping"
         class="w-full"
-        :loading="isLoadingMapping"
-        :disabled="!canUseAi || !hasCurrentData || !hasTargetSchema || isLoadingMapping" />
+        :loading="dialog.isLoadingMapping"
+        :disabled="dialog.isMappingActionDisabled" />
 
-      <div v-show="usesMappingFunction" class="mapping-editor-section">
+      <div v-show="dialog.usesMappingFunction" class="mapping-editor-section">
         <Divider />
-        <label :for="editorElementId" class="block font-semibold mb-2">Mapping Function</label>
+        <label :for="dialog.editorElementId" class="block font-semibold mb-2"
+          >Mapping Function</label
+        >
         <div class="editor-wrapper">
-          <div :id="editorElementId" class="editor-surface" />
+          <div :id="dialog.editorElementId" class="editor-surface" />
         </div>
         <Button
-          v-if="mappingConfigurationIsValid"
+          v-if="dialog.mappingConfigurationIsValid"
           label="Perform Mapping"
           icon="pi pi-play"
           class="mt-4 w-full"
-          @click="performMapping" />
+          @click="dialog.performMapping" />
       </div>
 
-      <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
-      <Message severity="error" v-if="errorMessage.length">
-        {{ errorMessage }}
+      <Message severity="info" v-if="dialog.statusMessage.length">{{
+        dialog.statusMessage
+      }}</Message>
+      <Message severity="error" v-if="dialog.errorMessage.length">
+        {{ dialog.errorMessage }}
       </Message>
     </div>
   </Dialog>

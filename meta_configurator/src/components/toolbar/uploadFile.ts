@@ -17,7 +17,7 @@ import {
 import {useErrorService} from '@/utility/errorServiceInstance';
 
 const uploadDataFileDialog = createLazySingleFileDialog(FORMAT_PROCESSING_FILE_ACCEPT);
-const uploadSchemaFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .xml, .schema.json');
+const uploadSchemaFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .schema.json');
 const uploadSettingsFileDialog = createLazySingleFileDialog('.json, .yaml, .yml');
 
 async function importDataFileViaSelectedBackend(

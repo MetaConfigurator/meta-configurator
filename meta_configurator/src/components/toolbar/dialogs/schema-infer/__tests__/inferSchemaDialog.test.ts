@@ -109,7 +109,7 @@ async function setupDialog({
     item: (index: number) => uploadedFileEntries[index] ?? null,
   });
   vi.doMock('@/utility/fileDialogUtils', () => ({
-    createLazySingleFileDialog: () => ({
+    createLazyMultiFileDialog: () => ({
       openForSelection: (handler: (files: any) => void) => handler(fileListMock),
     }),
   }));
@@ -170,7 +170,7 @@ async function selectSource(wrapper: any, source: 'current' | 'files') {
 }
 
 async function selectUploadedFiles(wrapper: any) {
-  await button(wrapper, 'Select data file').trigger('click');
+  await button(wrapper, 'Select data files').trigger('click');
   await flushPromises();
 }
 
@@ -274,7 +274,7 @@ describe('InferSchemaDialog', () => {
     const filesOption = wrapper.get('[data-option-value="files"]').element as HTMLButtonElement;
     expect(currentDataOption.disabled).toBe(true);
     expect(filesOption.disabled).toBe(false);
-    expect(wrapper.text()).toContain('No file selected yet.');
+    expect(wrapper.text()).toContain('No files selected yet.');
 
     await selectUploadedFiles(wrapper);
     await applyInference(wrapper);
@@ -287,6 +287,34 @@ describe('InferSchemaDialog', () => {
     expect(schema.properties.name.type).toBe('string');
     expect(schema.properties.age.type).toBe('integer');
     expect(toastAddMock).toHaveBeenCalledWith(expect.objectContaining({severity: 'success'}));
+  });
+
+  it('infers one schema satisfying all selected files, without touching the Data Editor', async () => {
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock, toastAddMock} =
+      await setupDialog({
+        currentData: {},
+        uploadedFiles: {
+          'first.json': '{"name":"Alice","age":30}',
+          'second.yaml': 'name: Bob\nnickname: Bobby\n',
+        },
+      });
+
+    await openDialog(wrapper);
+    await selectUploadedFiles(wrapper);
+    await applyInference(wrapper);
+
+    expect(wrapper.text()).toContain('2 files selected');
+    // Several instances have no single data document to show, so the editor keeps its content.
+    expect(dataEditorSetDataMock).not.toHaveBeenCalled();
+    expect(schemaEditorSetDataMock).toHaveBeenCalledTimes(1);
+    const schema = schemaEditorSetDataMock.mock.calls[0]![0];
+    expect(schema.properties.name.type).toBe('string');
+    expect(schema.properties.age.type).toBe('integer');
+    expect(schema.properties.nickname.type).toBe('string');
+    expect(schema.required).toEqual(['name']);
+    expect(toastAddMock).toHaveBeenCalledWith(
+      expect.objectContaining({detail: expect.stringContaining('2 selected data instances')})
+    );
   });
 
   it('shows a parse error when a selected file cannot be read as JSON', async () => {
@@ -304,7 +332,7 @@ describe('InferSchemaDialog', () => {
     await selectUploadedFiles(wrapper);
     await applyInference(wrapper);
 
-    expect(wrapper.text()).toContain('Could not infer a schema from the selected file');
+    expect(wrapper.text()).toContain('Could not infer a schema from the selected files');
     expect(dataEditorSetDataMock).not.toHaveBeenCalled();
     expect(schemaEditorSetDataMock).not.toHaveBeenCalled();
   });

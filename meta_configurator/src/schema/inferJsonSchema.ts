@@ -5,16 +5,33 @@ import {useSettings} from '@/settings/useSettings';
 import {JsonSchemaVisitor} from '@/schema/jsonSchemaVisitor';
 
 export function inferJsonSchema(sampleData: unknown): JsonSchemaType {
+  return inferJsonSchemaFromSamples([sampleData]);
+}
+
+/**
+ * Infers a single schema that satisfies all given data instances: every instance
+ * refines the inference further, so the result accepts each of them.
+ */
+export function inferJsonSchemaFromSamples(samples: unknown[]): JsonSchemaType {
+  if (samples.length === 0) {
+    throw new Error('No data instances were provided for schema inference.');
+  }
+
   const {maxDocumentSizeForSchemaInference, minObjectPropertyCountToPreserve} =
     useSettings().value.performance;
   const maximumSizeInKiB = maxDocumentSizeForSchemaInference / 1024;
-  const trimmedSampleData = trimDataToMaxSize(
-    sampleData,
-    maximumSizeInKiB,
-    minObjectPropertyCountToPreserve
-  );
 
-  return allowItemsInInferredEmptyArraySchemas(inferSchema(trimmedSampleData).toJSONSchema());
+  let inference: ReturnType<typeof inferSchema> | undefined;
+  for (const sample of samples) {
+    const trimmedSample = trimDataToMaxSize(
+      sample,
+      maximumSizeInKiB,
+      minObjectPropertyCountToPreserve
+    );
+    inference = inferSchema(trimmedSample, inference);
+  }
+
+  return allowItemsInInferredEmptyArraySchemas(inference!.toJSONSchema());
 }
 
 export function allowItemsInInferredEmptyArraySchemas(schema: JsonSchemaType): JsonSchemaType {

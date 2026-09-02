@@ -119,6 +119,11 @@ export function useDataMappingDialog() {
       ? 'Regenerate Suggestion for Previous Error'
       : 'Generate Suggestion'
   );
+  /** The AI actions need a configured endpoint, data to map and a schema to map it to. */
+  const isMappingActionDisabled = computed(
+    () =>
+      !canUseAi.value || !hasCurrentData.value || !hasTargetSchema.value || isLoadingMapping.value
+  );
   const apiKeyMessage = computed(() =>
     usesMappingFunction.value
       ? 'AI-generated mapping suggestions are disabled until an AI endpoint or relay is configured. You can still write or edit a mapping manually and run it.'
@@ -419,6 +424,7 @@ export function useDataMappingDialog() {
     mappingMethodNotice,
     mappingLanguageWarning,
     suggestionButtonLabel,
+    isMappingActionDisabled,
     apiKeyMessage,
     openDialog,
     hideDialog,

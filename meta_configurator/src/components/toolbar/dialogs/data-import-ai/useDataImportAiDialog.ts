@@ -120,6 +120,10 @@ export function useDataImportAiDialog() {
       disabled: !canUseAi.value,
     },
   ]);
+  const isBusy = computed(
+    () => isImportingData.value || isLoadingSuggestion.value || isDetectingFormat.value
+  );
+  const hasUploadedFile = computed(() => uploadedContent.value.length > 0);
   const usesJavascriptStep = computed(
     () =>
       selectedImportMode.value === 'javascript_mapping' ||
@@ -129,6 +133,12 @@ export function useDataImportAiDialog() {
     importModeOptions.value.some(
       option => option.value === selectedImportMode.value && option.disabled
     )
+  );
+  const isSuggestionDisabled = computed(
+    () => !hasUploadedFile.value || !canUseAi.value || isBusy.value
+  );
+  const isImportDisabled = computed(
+    () => !hasUploadedFile.value || isCurrentImportModeDisabled.value || isBusy.value
   );
   const suggestionButtonLabel = computed(() => {
     if (hasValidationErrorForSuggestion.value) {
@@ -545,7 +555,6 @@ export function useDataImportAiDialog() {
     showDialog,
     selectedFileName,
     selectedFileSize,
-    uploadedContent,
     userComments,
     statusMessage,
     errorMessage,
@@ -557,13 +566,15 @@ export function useDataImportAiDialog() {
     isLoadingSuggestion,
     isImportingData,
     isDetectingFormat,
+    isBusy,
+    isSuggestionDisabled,
+    isImportDisabled,
     generatedScript,
     editorElementId,
     canUseAi,
     formatProcessingUnavailableNotice,
     importModeOptions,
     usesJavascriptStep,
-    isCurrentImportModeDisabled,
     suggestionButtonLabel,
     importButtonLabel,
     openDialog,

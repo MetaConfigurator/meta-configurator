@@ -9,10 +9,10 @@ import type {SchemaRefinementOptionsController} from '@/schema/refinement/schema
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
 import {readFileContent} from '@/utility/readFileContent';
-import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
+import {createLazyMultiFileDialog} from '@/utility/fileDialogUtils';
 import {formatRegistry} from '@/dataformats/formatRegistry';
-import {inferJsonSchema} from '@/schema/inferJsonSchema';
-import {runSchemaRefinement} from '@/schema/refinement/runSchemaRefinement';
+import {inferJsonSchemaFromSamples} from '@/schema/inferJsonSchema';
+import {runSchemaRefinementFromSamples} from '@/schema/refinement/runSchemaRefinement';
 import {toastService} from '@/utility/toastService';
 import SchemaRefinementOptions from '@/components/toolbar/dialogs/shared/SchemaRefinementOptions.vue';
 import {hasJsonContent} from '@/utility/jsonCompatible';
@@ -22,24 +22,28 @@ const showDialog = ref(false);
 const isLoading = ref(false);
 const errorMessage = ref('');
 const inputSource = ref<'current' | 'files'>('files');
-const selectedFile = ref<File | null>(null);
+const selectedFiles = ref<File[]>([]);
 const refinementOptions = ref<SchemaRefinementOptionsController | null>(null);
 
 const currentDataLink = getDataForMode(SessionMode.DataEditor);
-const fileDialog = createLazySingleFileDialog('.json');
+const fileDialog = createLazyMultiFileDialog(formatRegistry.getFileExtensions().join(','));
 const hasCurrentData = computed(() => hasJsonContent(currentDataLink.data.value));
-const hasSelectedFile = computed(() => selectedFile.value !== null);
 const usesCurrentDataSource = computed(() => inputSource.value === 'current');
 const canInfer = computed(() =>
-  usesCurrentDataSource.value ? hasCurrentData.value : hasSelectedFile.value
+  usesCurrentDataSource.value ? hasCurrentData.value : selectedFiles.value.length > 0
 );
-const selectedFileName = computed(() => selectedFile.value?.name ?? '');
+const selectedFileNames = computed(() => selectedFiles.value.map(file => file.name));
+const selectedFilesLabel = computed(() =>
+  selectedFiles.value.length === 1
+    ? '1 file selected'
+    : `${selectedFiles.value.length} files selected`
+);
 const hasSelectedRefinements = computed(
   () => refinementOptions.value?.hasSelectedRefinements() ?? false
 );
 const inputSourceOptions = computed(() => [
   {label: 'Current data', value: 'current', disabled: !hasCurrentData.value},
-  {label: 'Upload file', value: 'files'},
+  {label: 'Upload files', value: 'files'},
 ]);
 const applyButtonLabel = computed(() =>
   hasSelectedRefinements.value ? 'Apply and Infer Schema' : 'Infer Schema'
@@ -49,7 +53,7 @@ function resetDialog() {
   errorMessage.value = '';
   isLoading.value = false;
   inputSource.value = hasCurrentData.value ? 'current' : 'files';
-  selectedFile.value = null;
+  selectedFiles.value = [];
 }
 
 function openDialog() {
@@ -63,19 +67,25 @@ function hideDialog() {
   showDialog.value = false;
 }
 
-function selectInstanceFile() {
+function selectInstanceFiles() {
   fileDialog.openForSelection(files => {
-    selectedFile.value = files.item(0);
+    selectedFiles.value = Array.from(files);
     errorMessage.value = '';
   });
 }
 
+/** Parses one uploaded instance with the data format its file name belongs to. */
+async function parseInstanceFile(file: File): Promise<unknown> {
+  return formatRegistry.parseFileContent(file.name, await readFileContent(file));
+}
+
 /**
- * Returns the data to infer from, wrapped so that a null data value stays distinguishable
- * from an unavailable source. Reports the reason and returns null when nothing is usable.
+ * Returns the data instances to infer from, or null when the selected source has none.
+ * A single uploaded file is also loaded into the Data Editor, so that the user sees the
+ * data the schema belongs to; several instances have no single data document to show.
  */
-async function resolveInputData(): Promise<{
-  data: unknown;
+async function resolveInputSamples(): Promise<{
+  samples: unknown[];
   shouldLoadIntoDataEditor: boolean;
 } | null> {
   if (usesCurrentDataSource.value) {
@@ -83,32 +93,37 @@ async function resolveInputData(): Promise<{
       errorMessage.value = 'Please load data into the Data Editor first.';
       return null;
     }
-    return {data: currentDataLink.data.value, shouldLoadIntoDataEditor: false};
+    return {samples: [currentDataLink.data.value], shouldLoadIntoDataEditor: false};
   }
 
-  if (!selectedFile.value) {
-    errorMessage.value = 'Please select a data file first.';
+  if (selectedFiles.value.length === 0) {
+    errorMessage.value = 'Please select at least one data file first.';
     return null;
   }
 
-  const fileText = await readFileContent(selectedFile.value);
-  const fileData = formatRegistry.getFormat('json').dataConverter.parse(fileText);
-  return {data: fileData, shouldLoadIntoDataEditor: true};
+  const samples = await Promise.all(selectedFiles.value.map(parseInstanceFile));
+  return {samples, shouldLoadIntoDataEditor: samples.length === 1};
 }
 
-function inferAndRefineSchema(inputData: unknown): TopLevelSchema {
-  const inferredSchema = inferJsonSchema(inputData) as TopLevelSchema;
+function inferAndRefineSchema(samples: unknown[]): TopLevelSchema {
+  const inferredSchema = inferJsonSchemaFromSamples(samples) as TopLevelSchema;
   const selection = hasSelectedRefinements.value ? refinementOptions.value?.buildSelection() : null;
-  return selection ? runSchemaRefinement(inferredSchema, inputData, selection) : inferredSchema;
+  return selection
+    ? runSchemaRefinementFromSamples(inferredSchema, samples, selection)
+    : inferredSchema;
 }
 
-function buildSuccessDetail(): string {
+function buildSuccessDetail(sampleCount: number, loadedIntoDataEditor: boolean): string {
   const schemaDescription = hasSelectedRefinements.value
     ? 'a refined JSON Schema'
     : 'a JSON Schema';
-  return usesCurrentDataSource.value
-    ? `Generated ${schemaDescription} from the current data.`
-    : `Loaded the selected file into the Data Editor and generated ${schemaDescription}.`;
+  if (usesCurrentDataSource.value) {
+    return `Generated ${schemaDescription} from the current data.`;
+  }
+  if (loadedIntoDataEditor) {
+    return `Loaded the selected file into the Data Editor and generated ${schemaDescription}.`;
+  }
+  return `Generated ${schemaDescription} satisfying all ${sampleCount} selected data instances.`;
 }
 
 async function inferSchemaAndApplyRefinements() {
@@ -116,27 +131,30 @@ async function inferSchemaAndApplyRefinements() {
   errorMessage.value = '';
 
   try {
-    const inputData = await resolveInputData();
-    if (!inputData) {
+    const inputSamples = await resolveInputSamples();
+    if (!inputSamples) {
       return;
     }
 
-    const inferredSchema = inferAndRefineSchema(inputData.data);
-    if (inputData.shouldLoadIntoDataEditor) {
-      currentDataLink.setData(inputData.data);
+    const inferredSchema = inferAndRefineSchema(inputSamples.samples);
+    if (inputSamples.shouldLoadIntoDataEditor) {
+      currentDataLink.setData(inputSamples.samples[0]);
     }
     getDataForMode(SessionMode.SchemaEditor).setData(inferredSchema);
     toastService.add({
       severity: 'success',
       summary: 'Schema inferred',
-      detail: buildSuccessDetail(),
+      detail: buildSuccessDetail(
+        inputSamples.samples.length,
+        inputSamples.shouldLoadIntoDataEditor
+      ),
       life: 3000,
     });
     hideDialog();
   } catch (error) {
     const prefix = usesCurrentDataSource.value
       ? 'Could not infer a schema from the current data.'
-      : 'Could not infer a schema from the selected file. Make sure it is a valid JSON data instance.';
+      : 'Could not infer a schema from the selected files. Make sure they are valid JSON or YAML data instances.';
     errorMessage.value = `${prefix} (${getErrorMessage(error)})`;
   } finally {
     isLoading.value = false;
@@ -154,8 +172,9 @@ defineExpose({show: openDialog, close: hideDialog});
     :style="{width: '50rem', maxWidth: '95vw'}">
     <div class="dialog-content" :style="{cursor: isLoading ? 'wait' : 'default'}">
       <Message severity="info" :closable="false">
-        Choose whether the schema should be inferred from the current Data Editor content or from an
-        uploaded JSON file.
+        Choose whether the schema should be inferred from the current Data Editor content or from
+        uploaded JSON or YAML files. With several files the schema is built to satisfy all of them,
+        so the more representative instances you provide, the more accurate it becomes.
       </Message>
 
       <div class="input-source-card">
@@ -173,26 +192,30 @@ defineExpose({show: openDialog, close: hideDialog});
         <template v-if="!usesCurrentDataSource">
           <div class="file-picker-card">
             <div class="file-picker-header">
-              <span class="font-semibold">Selected Data File</span>
-              <Button :disabled="isLoading" :loading="isLoading" @click="selectInstanceFile">
-                Select data file
+              <span class="font-semibold">Selected Data Files</span>
+              <Button :disabled="isLoading" :loading="isLoading" @click="selectInstanceFiles">
+                Select data files
               </Button>
             </div>
 
-            <p class="file-picker-description">Select exactly one JSON file to use as input.</p>
+            <p class="file-picker-description">
+              Select one or more JSON or YAML files to use as input.
+            </p>
 
-            <div v-if="hasSelectedFile" class="selected-files">
-              <div class="selected-files-label">1 file selected</div>
-              <div class="selected-file-name">{{ selectedFileName }}</div>
+            <div v-if="selectedFileNames.length > 0" class="selected-files">
+              <div class="selected-files-label">{{ selectedFilesLabel }}</div>
+              <div v-for="fileName in selectedFileNames" :key="fileName" class="selected-file-name">
+                {{ fileName }}
+              </div>
             </div>
 
-            <p v-else class="file-picker-empty">No file selected yet.</p>
+            <p v-else class="file-picker-empty">No files selected yet.</p>
           </div>
         </template>
       </div>
 
       <Message v-if="!hasCurrentData" severity="warn" :closable="false">
-        No data is currently loaded in the Data Editor. Use file upload instead.
+        No data is currently loaded in the Data Editor. Upload data files instead.
       </Message>
 
       <SchemaRefinementOptions

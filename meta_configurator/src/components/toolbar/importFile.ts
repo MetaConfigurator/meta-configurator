@@ -5,10 +5,7 @@ import type {ManagedData} from '@/data/managedData';
 import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
 import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
 
-const importSchemaFileDialog = createLazySingleFileDialog(
-  '.json, .yaml, .yml, .xml, .schema.json',
-  5
-);
+const importSchemaFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .schema.json', 5);
 
 /**
  * Opens a file dialog to select a JSON schema to import.

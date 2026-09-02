@@ -12,7 +12,15 @@ export function runSchemaRefinement(
   data: unknown,
   selection: RefineSchemaSelection
 ): TopLevelSchema {
-  const samples = [data];
+  return runSchemaRefinementFromSamples(schema, [data], selection);
+}
+
+/** Refines the schema against several data instances, such as several uploaded files. */
+export function runSchemaRefinementFromSamples(
+  schema: TopLevelSchema,
+  samples: unknown[],
+  selection: RefineSchemaSelection
+): TopLevelSchema {
   let refinedSchema = cloneDeep(schema);
 
   if (selection.detectAdditionalProperties) {
