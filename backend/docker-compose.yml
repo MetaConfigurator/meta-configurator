@@ -134,6 +134,8 @@ services:
     expose:
       - "5000"
     restart: unless-stopped
+    depends_on:
+      - redis
     networks:
       - backend-network
     environment:

@@ -85,10 +85,10 @@ export function useDataImportAiSourceFile() {
       backendDisplayText.value = detectionResult.display_text ?? detectionResult.message;
       backendPromptHint.value = detectionResult.ai_prompt_hint ?? '';
       parsedJsonFromBackend.value = detectionResult.recognized
-        ? (detectionResult.parsed_json ?? null)
+        ? detectionResult.parsed_json ?? null
         : null;
       preprocessedJsonForAi.value = detectionResult.recognized
-        ? (detectionResult.preprocessed_for_ai ?? null)
+        ? detectionResult.preprocessed_for_ai ?? null
         : null;
     } finally {
       if (fileSequence === selectedFileSequence) {

@@ -21,10 +21,17 @@ const props = withDefaults(
   defineProps<{
     idPrefix: string;
     addExamplesDescription?: string;
+    /**
+     * Whether to offer the steps that only restructure the schema itself. Dialogs that
+     * refine a schema against data hide them, because the schema menu offers them
+     * separately for the schema that is loaded in the editor.
+     */
+    showDataIndependentSteps?: boolean;
   }>(),
   {
     addExamplesDescription:
       'Add real example values from the current input data to matching schema fields.',
+    showDataIndependentSteps: true,
   }
 );
 
@@ -58,17 +65,24 @@ function reset() {
 
 function hasSelectedRefinements(): boolean {
   return (
-    enableSortSchemaPropertiesAlphabetically.value ||
+    isDataIndependentStepSelected(enableSortSchemaPropertiesAlphabetically.value) ||
     enableAddExamples.value ||
     enableDetectEnums.value ||
     enableDetectAdditionalProperties.value ||
-    enableExtractSubSchemasIntoReferences.value
+    isDataIndependentStepSelected(enableExtractSubSchemasIntoReferences.value)
   );
+}
+
+/** Hidden steps never contribute a selection, even if they were enabled before. */
+function isDataIndependentStepSelected(isEnabled: boolean): boolean {
+  return props.showDataIndependentSteps && isEnabled;
 }
 
 function buildSelection(): RefineSchemaSelection {
   return {
-    sortSchemaPropertiesAlphabetically: enableSortSchemaPropertiesAlphabetically.value
+    sortSchemaPropertiesAlphabetically: isDataIndependentStepSelected(
+      enableSortSchemaPropertiesAlphabetically.value
+    )
       ? cloneDeep(SORT_SCHEMA_PROPERTIES_DEFAULTS)
       : undefined,
     addExamples: enableAddExamples.value ? cloneDeep(addExamples.value) : undefined,
@@ -76,7 +90,9 @@ function buildSelection(): RefineSchemaSelection {
     detectAdditionalProperties: enableDetectAdditionalProperties.value
       ? cloneDeep(detectAdditionalProperties.value)
       : undefined,
-    extractSubSchemasIntoReferences: enableExtractSubSchemasIntoReferences.value
+    extractSubSchemasIntoReferences: isDataIndependentStepSelected(
+      enableExtractSubSchemasIntoReferences.value
+    )
       ? cloneDeep(EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS)
       : undefined,
   };
@@ -92,6 +108,7 @@ defineExpose<SchemaRefinementOptionsController>({
 <template>
   <div class="refinement-list">
     <RefinementOptionPanel
+      v-if="showDataIndependentSteps"
       v-model:enabled="enableSortSchemaPropertiesAlphabetically"
       title="Sort Schema Properties Alphabetically"
       :input-id="fieldId('sort-schema-properties-alphabetically')">
@@ -248,6 +265,7 @@ defineExpose<SchemaRefinementOptionsController>({
     </RefinementOptionPanel>
 
     <RefinementOptionPanel
+      v-if="showDataIndependentSteps"
       v-model:enabled="enableExtractSubSchemasIntoReferences"
       title="Extract Sub-schemas into References"
       :input-id="fieldId('extract-sub-schemas-into-references')">

@@ -65,6 +65,11 @@ CORS(
     },
 )
 
+# Honor RATELIMIT_ENABLED=false so local dev and e2e tests can send many requests
+# in quick succession without hitting the per-endpoint limits.
+if os.getenv("RATELIMIT_ENABLED", "true").lower() == "false":
+    app.config["RATELIMIT_ENABLED"] = False
+
 limiter = Limiter(
     get_remote_address,
     app=app,

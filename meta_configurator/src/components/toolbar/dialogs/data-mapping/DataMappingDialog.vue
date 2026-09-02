@@ -123,6 +123,7 @@ defineExpose({show: openDialog, close: hideDialog});
         v-if="usesInferredSourceSchema"
         ref="refinementOptions"
         id-prefix="mapping-inferred-source-schema"
+        :show-data-independent-steps="false"
         add-examples-description="Add real example values from the current input data to the locally inferred source schema before it is sent to the LLM." />
 
       <Button

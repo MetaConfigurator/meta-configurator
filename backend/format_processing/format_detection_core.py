@@ -3,23 +3,27 @@ from dataclasses import dataclass
 from datetime import date, datetime, time
 from typing import Any
 
+# Optional third-party parser libraries. They are imported here and re-exported
+# (the "import x as x" form) so that the parser modules can share one import site and
+# degrade gracefully when a library is not installed. The redundant alias plus the
+# noqa marker keep linters and type checkers from reporting them as unused.
 try:
-    import yaml
+    import yaml as yaml  # noqa: F401
 except ModuleNotFoundError:  # pragma: no cover
     yaml = None
 
 try:
-    import xmltodict
+    import xmltodict as xmltodict  # noqa: F401
 except ModuleNotFoundError:  # pragma: no cover
     xmltodict = None
 
 try:
-    import gemmi
+    import gemmi as gemmi  # noqa: F401
 except ModuleNotFoundError:  # pragma: no cover
     gemmi = None
 
 try:
-    import rdflib
+    import rdflib as rdflib  # noqa: F401
 except ModuleNotFoundError:  # pragma: no cover
     rdflib = None
 

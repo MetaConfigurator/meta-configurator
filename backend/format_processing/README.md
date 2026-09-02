@@ -58,7 +58,11 @@ the Flask app still sees routes like `/detect-format-and-parse`.
 - `MAX_REQUEST_LENGTH`: maximum HTTP request size, including JSON overhead
   (default: `1000000` bytes).
 - `RATELIMIT_STORAGE_URI`: Flask-Limiter storage URI. The joint backend uses its
-  Redis service; standalone development defaults to in-memory counters.
+  Redis service; standalone development defaults to in-memory counters. Percent-encode
+  reserved characters in the password, since the credentials are part of the URI.
+- `RATELIMIT_ENABLED`: set to `false` to switch the per-endpoint rate limits off. The
+  local `docker-compose.yml` does this, because dev and e2e runs send many requests in
+  quick succession; the HTTPS and joint deployments leave the limits on.
 
 ## Testing
 

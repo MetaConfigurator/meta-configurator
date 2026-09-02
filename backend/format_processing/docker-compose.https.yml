@@ -3,6 +3,15 @@
 # Brings up the format processing service behind its own nginx reverse proxy with
 # automatic Let's Encrypt certificates. For the multi-service deployment see
 # ../docker-compose.yml, where the service is mounted at /format-processing/.
+#
+# Required env vars (load from .env next to this file):
+#   FORMAT_PROCESSING_HOSTNAME  public hostname for this service
+#                               (e.g. format-processing.metaconfigurator.informatik.uni-stuttgart.de)
+#   LETSENCRYPT_EMAIL           contact email for Let's Encrypt
+#
+# Deploy:
+#   cp .env.example .env   # then set FORMAT_PROCESSING_HOSTNAME, LETSENCRYPT_EMAIL
+#   docker compose -f docker-compose.https.yml up -d --build
 
 services:
   format_processing:

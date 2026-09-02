@@ -253,7 +253,7 @@ export class MenuItems {
             command: sortSchemaPropertiesAlphabeticallyAction,
           },
           {
-            label: 'Refine Schema...',
+            label: 'Refine Schema based on Data...',
             icon: 'fa-solid fa-wand-magic-sparkles',
             command: this.dialogActions.showRefineSchemaDialog,
           },

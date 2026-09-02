@@ -153,34 +153,38 @@ def normalize_star_family_input(content: str) -> str:
     return "\n".join(normalized_lines)
 
 
-def _parse_star_document(content: str) -> Optional[Any]:
+def _parse_star_document_as_json(star_text: str) -> Optional[Dict[str, Any]]:
+    """Reads STAR-family text with gemmi, returning None when it yields no document."""
     if gemmi is None:
         return None
 
-    content_prefix = content[:2000]
-    if not any(marker in content_prefix for marker in ("data_", "loop_", "save_")):
+    if not any(marker in star_text[:2000] for marker in ("data_", "loop_", "save_")):
         return None
 
     try:
-        return gemmi.cif.read_string(content)
-    except Exception:
-        return None
-
-
-def parse_star_family_json(content: str) -> Optional[tuple[Dict[str, Any], str]]:
-    """Parse STAR-family content into gemmi JSON, retrying once with normalized input.
-
-    Returns the parsed JSON together with the name of the parser variant that worked."""
-    parsed_document = _parse_star_document(content)
-    parser_name = "gemmi-star-family"
-    if parsed_document is None:
-        parsed_document = _parse_star_document(normalize_star_family_input(content))
-        parser_name = "gemmi-star-family (normalized)"
-    if parsed_document is None or len(parsed_document) == 0:
-        return None
-
-    try:
+        parsed_document = gemmi.cif.read_string(star_text)
+        if len(parsed_document) == 0:
+            return None
         parsed_json = json.loads(parsed_document.as_json(lowercase_names=False))
     except Exception:
         return None
-    return (parsed_json, parser_name) if parsed_json else None
+
+    return parsed_json or None
+
+
+def parse_star_family_json(content: str) -> Optional[tuple[Dict[str, Any], str]]:
+    """Parses STAR-family content and reports which parser variant succeeded.
+
+    The gemmi library always gets the input as it is first. Only when the library
+    cannot read it - loose real-world files use block names with spaces, tags without
+    a value or unquoted loop rows - is our own normalization applied and gemmi retried.
+    """
+    parsed_json = _parse_star_document_as_json(content)
+    if parsed_json:
+        return parsed_json, "gemmi-star-family"
+
+    parsed_json = _parse_star_document_as_json(normalize_star_family_input(content))
+    if parsed_json:
+        return parsed_json, "gemmi-star-family (normalized)"
+
+    return None

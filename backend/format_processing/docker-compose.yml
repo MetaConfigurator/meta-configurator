@@ -3,7 +3,11 @@
 # Reachable at http://localhost:${FORMAT_PROCESSING_PORT:-5000}.
 #
 # For the HTTPS variant see docker-compose.https.yml.
-# For the joint deployment see ../docker-compose.yml.
+# For the multi-service joint deployment see ../docker-compose.yml.
+#
+# Deploy:
+#   docker compose up -d --build
+#   curl http://localhost:5000/health   # -> {"status":"ok"}
 
 services:
   format_processing:
@@ -12,3 +16,8 @@ services:
     ports:
       - "${FORMAT_PROCESSING_PORT:-5000}:5000"
     restart: unless-stopped
+    environment:
+      # Local dev / e2e tests run many requests in quick succession - disable the
+      # per-endpoint rate limiter unless explicitly turned on. The HTTPS and joint
+      # deployments leave this default-on.
+      RATELIMIT_ENABLED: ${RATELIMIT_ENABLED:-false}
