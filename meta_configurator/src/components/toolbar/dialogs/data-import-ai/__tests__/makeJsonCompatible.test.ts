@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {hasJsonContent, makeJsonCompatible} from '@/utility/jsonCompatible';
+import {makeJsonCompatible} from '@/components/toolbar/dialogs/data-import-ai/makeJsonCompatible';
 
 describe('makeJsonCompatible', () => {
   it('normalizes values that JSON cannot represent', () => {
@@ -68,17 +68,4 @@ describe('makeJsonCompatible', () => {
       set: [1, 2],
     });
   });
-});
-
-describe('hasJsonContent', () => {
-  it.each([null, undefined, [], {}])('returns false for empty content %#', value => {
-    expect(hasJsonContent(value)).toBe(false);
-  });
-
-  it.each([false, 0, '', [null], {value: null}])(
-    'returns true for loaded JSON content %#',
-    value => {
-      expect(hasJsonContent(value)).toBe(true);
-    }
-  );
 });

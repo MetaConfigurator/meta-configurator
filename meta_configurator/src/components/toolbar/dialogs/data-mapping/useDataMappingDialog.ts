@@ -24,7 +24,7 @@ import type {SchemaRefinementOptionsController} from '@/schema/refinement/schema
 import {getApiKeyRef} from '@/utility/ai/apiKey';
 import {canQueryAi} from '@/utility/ai/aiAvailability';
 import {useErrorService} from '@/utility/errorServiceInstance';
-import {hasJsonContent} from '@/utility/jsonCompatible';
+import {hasJsonContent} from '@/utility/hasJsonContent';
 import {toastService} from '@/utility/toastService';
 
 /** A mapping function in one of the supported languages, or a direct one-shot AI mapping. */

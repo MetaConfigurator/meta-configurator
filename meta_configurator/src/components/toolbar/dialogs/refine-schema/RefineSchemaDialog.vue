@@ -8,7 +8,7 @@ import {applySchemaRefinements} from '@/components/toolbar/refineSchema';
 import SchemaRefinementOptions from '@/components/toolbar/dialogs/shared/SchemaRefinementOptions.vue';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
-import {hasJsonContent} from '@/utility/jsonCompatible';
+import {hasJsonContent} from '@/utility/hasJsonContent';
 
 const showDialog = ref(false);
 const refinementOptions = ref<SchemaRefinementOptionsController | null>(null);

@@ -10,7 +10,7 @@ import {
   detectFormatAndParseWithFormatProcessing,
   type FormatProcessingDetectionResult,
 } from '@/utility/backend/formatProcessingApi';
-import {makeJsonCompatible} from '@/utility/jsonCompatible';
+import {makeJsonCompatible} from '@/components/toolbar/dialogs/data-import-ai/makeJsonCompatible';
 import {AI_ACCESS_UNAVAILABLE_MESSAGE, canQueryAi} from '@/utility/ai/aiAvailability';
 import {
   buildGeneratedCodeRetryHints,

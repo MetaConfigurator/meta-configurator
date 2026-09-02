@@ -15,7 +15,7 @@ import {inferJsonSchemaFromSamples} from '@/schema/inferJsonSchema';
 import {runSchemaRefinementFromSamples} from '@/schema/refinement/runSchemaRefinement';
 import {toastService} from '@/utility/toastService';
 import SchemaRefinementOptions from '@/components/toolbar/dialogs/shared/SchemaRefinementOptions.vue';
-import {hasJsonContent} from '@/utility/jsonCompatible';
+import {hasJsonContent} from '@/utility/hasJsonContent';
 import {getErrorMessage} from '@/utility/getErrorMessage';
 
 const showDialog = ref(false);
