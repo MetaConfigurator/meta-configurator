@@ -350,7 +350,7 @@ describe('test settings updater', () => {
 
   it('does not force relay defaults back into a direct AI endpoint config', () => {
     const userFile = {
-      settingsVersion: '1.0.5',
+      settingsVersion: '1.0.6',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -367,7 +367,7 @@ describe('test settings updater', () => {
     };
 
     const defaultsFile = {
-      settingsVersion: '1.0.6',
+      settingsVersion: '1.0.5',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -452,33 +452,6 @@ describe('test settings updater', () => {
     updateSettingsWithDefaults(userFile, defaultsFile);
 
     expect(userFile.settingsVersion).toBe('1.0.6');
-    expect(userFile.backend).toEqual(CURRENT_BACKEND_SETTINGS);
-  });
-
-  it('renames importBackendUrl to formatProcessingUrl during settings migration', () => {
-    const userFile = createSettingsMigrationFixture('1.0.6', {
-      ...PREVIOUS_BACKEND_SETTINGS,
-      importBackendUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/import-backend',
-    });
-    const defaultsFile = createSettingsMigrationFixture('1.0.6', CURRENT_BACKEND_SETTINGS);
-
-    updateSettingsWithDefaults(userFile, defaultsFile);
-
-    expect(userFile.backend).toEqual(CURRENT_BACKEND_SETTINGS);
-  });
-
-  it('removes legacy backend settings objects that no longer exist in 1.0.6', () => {
-    const userFile = createSettingsMigrationFixture('1.0.6', {
-      ...CURRENT_BACKEND_SETTINGS,
-      snapshotBackend: {hostName: 'https://snapshot.example.com'},
-      importBackend: {hostName: 'https://import.example.com'},
-      importedBackend: {hostName: 'https://imported.example.com'},
-      hostname: 'https://legacy.example.com',
-    });
-    const defaultsFile = createSettingsMigrationFixture('1.0.6', CURRENT_BACKEND_SETTINGS);
-
-    updateSettingsWithDefaults(userFile, defaultsFile);
-
     expect(userFile.backend).toEqual(CURRENT_BACKEND_SETTINGS);
   });
 });

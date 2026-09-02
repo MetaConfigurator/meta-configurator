@@ -11,13 +11,14 @@ import {useErrorService} from '@/utility/errorServiceInstance';
 async function generateSampleData(schema: any): Promise<any> {
   try {
     // Use dynamic import for better bundling compatibility
-    const {JSONSchemaFaker} = await import('json-schema-faker');
+    const {generate} = await import('json-schema-faker');
 
-    JSONSchemaFaker.option('alwaysFakeOptionals', true);
-    JSONSchemaFaker.option('minItems', 1);
-    JSONSchemaFaker.option('failOnInvalidFormat', false);
-
-    return await JSONSchemaFaker.resolve(schema);
+    return await generate(schema, {
+      alwaysFakeOptionals: true,
+      minItems: 1,
+      // Generate a placeholder for unsupported types instead of failing the whole document.
+      failOnInvalidTypes: false,
+    });
   } catch (error) {
     console.error('Error loading json-schema-faker:', error);
     throw new Error('Failed to load schema faker dependencies');
