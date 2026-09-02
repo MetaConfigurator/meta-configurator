@@ -6,6 +6,28 @@ import {
 import {SessionMode} from "../src/store/sessionMode";
 import {tpForceCurrentSelectedElement, tpGetData} from "../../tests/shared/utilsTestPanel";
 import {aiPanelEnterModifyPrompt, aiPanelSubmitModify} from "../../tests/shared/utilsAiPanel";
+import {
+    addObjectPropertyWithName,
+    checkPropertyExistence,
+    editNumberOrIntProperty,
+    selectOneOfPropertySchema,
+} from "../../tests/shared/utilsGuiEditor";
+
+test('adds a custom AI model parameter from the AI Prompts panel settings.', async ({ page }) => {
+    await openApp(page, 'settings_aipanel.json', null, 'schema_minimal.schema.json');
+    await forceEditorMode(page, SessionMode.SchemaEditor);
+
+    await page.getByRole('button', {name: 'AI Prompts View'}).click();
+    await addObjectPropertyWithName(page, ['aiIntegration'], 'top_p');
+
+    await checkPropertyExistence(page, ['aiIntegration', 'top_p'], true);
+    await selectOneOfPropertySchema(page, ['aiIntegration', 'top_p'], '1: type: number');
+    await editNumberOrIntProperty(page, ['aiIntegration', 'top_p'], 0.9);
+
+    await expect.poll(() => page.evaluate(() => {
+        return JSON.parse(localStorage.getItem('settingsData') ?? '{}').aiIntegration?.top_p;
+    })).toBe(0.9);
+});
 
 test('AI schema modification bundles referenced definitions and updates them in place.', async ({ page }) => {
     // what the mock AI returns: the bundled ConservationStatus definition with the enum value "Very Endangered" added

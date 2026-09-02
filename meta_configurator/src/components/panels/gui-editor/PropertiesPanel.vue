@@ -712,7 +712,7 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
           @keyup.enter="
             addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
           "
-          :data-testid="'add-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="'add-property-' + pathToString(slotProps.node.data.absolutePath as Path)">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{

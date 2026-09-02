@@ -40,9 +40,9 @@ export function replacePropertyNameUtils(
 }
 
 function updateKeyName(object: any, oldKey: string, newKey: string): any {
-  let modifiedObj: any = {};
+  const modifiedObj: any = {};
 
-  for (let [k, v] of Object.entries(object))
+  for (const [k, v] of Object.entries(object))
     if (k === oldKey) modifiedObj[newKey] = v;
     else modifiedObj[k] = v;
 
