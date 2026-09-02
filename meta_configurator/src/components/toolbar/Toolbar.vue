@@ -22,6 +22,7 @@ import {hasCurrentNewsChanged, setCurrentNewsHash} from '@/components/toolbar/cu
 import DataExportDialog from '@/components/toolbar/dialogs/data-export/DataExportDialog.vue';
 import RefineSchemaDialog from '@/components/toolbar/dialogs/refine-schema/RefineSchemaDialog.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
+import type {MenuItemDialogActions} from '@/components/toolbar/menuItems';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
 import RmlMappingDialog from '@/components/toolbar/dialogs/rml-mapping/RmlMappingDialog.vue';
 import ImportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/ImportSchemaDialog.vue';
@@ -106,15 +107,15 @@ function showDataExportDialog(schemaMode: boolean) {
   dataExportDialog.value?.show();
 }
 
-function showCsvImportDialog() {
+function showImportCsvDialog() {
   csvImportDialog.value?.show();
 }
 
-function showTurtleImportDialog() {
+function showImportTurtleDialog() {
   turtleImportDialog.value?.show();
 }
 
-function showXmlImportDialog() {
+function showImportXmlDialog() {
   xmlImportDialog.value?.show();
 }
 
@@ -201,6 +202,25 @@ const exportSchemaDialog = ref();
 const inferSchemaDialog = ref();
 const refineSchemaDialog = ref();
 
+/** The dialog-opening callbacks the toolbar menus trigger, passed down as one prop. */
+const dialogActions: MenuItemDialogActions = {
+  showSchemaSelectionDialog,
+  showImportCsvDialog,
+  showSnapshotDialog,
+  showCodeGenerationDialog,
+  showDataExportDialog,
+  showDataMappingDialog,
+  showDataImportAiDialog,
+  showInferSchemaDialog,
+  showRmlMappingDialog,
+  showImportTurtleDialog,
+  showImportXmlDialog,
+  showXmlExportDialog,
+  showImportSchemaDialog,
+  showExportSchemaDialog,
+  showRefineSchemaDialog,
+};
+
 defineExpose({
   showInitialSchemaDialog: showInitialDialog,
 });
@@ -267,21 +287,7 @@ defineExpose({
   <TopToolbar
     :current-mode="props.currentMode"
     @show-about-dialog="() => (showAboutDialog = true)"
-    @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
-    @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
-    @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
-    @show-import-csv-dialog="() => showCsvImportDialog()"
-    @show-snapshot-dialog="() => showSnapshotDialog()"
-    @show-data-mapping-dialog="() => showDataMappingDialog()"
-    @show-data-import-ai-dialog="() => showDataImportAiDialog()"
-    @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-    @show-import-turtle-dialog="() => showTurtleImportDialog()"
-    @show-import-xml-dialog="() => showXmlImportDialog()"
-    @show-xml-export-dialog="() => showXmlExportDialog()"
-    @show-import-schema-dialog="() => showImportSchemaDialog()"
-    @show-export-schema-dialog="() => showExportSchemaDialog()"
-    @show-infer-schema-dialog="() => showInferSchemaDialog()"
-    @show-refine-schema-dialog="() => showRefineSchemaDialog()"
+    :dialog-actions="dialogActions"
     @mode-selected="newMode => emit('mode-selected', newMode)" />
 </template>
 

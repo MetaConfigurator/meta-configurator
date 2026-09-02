@@ -83,6 +83,42 @@ describe('runSchemaRefinement', () => {
     });
   });
 
+  it('uses schema traversal paths without refining unrelated definitions', () => {
+    const schema: TopLevelSchema = {
+      allOf: [
+        {
+          type: 'object',
+          properties: {
+            name: {type: 'string'},
+          },
+        },
+      ],
+      $defs: {
+        unusedStatus: {
+          type: 'string',
+          enum: ['OPEN'],
+          examples: ['OPEN'],
+        },
+      },
+    };
+
+    const refined = runSchemaRefinement(
+      schema,
+      {name: 'Ada'},
+      {addExamples: ADD_EXAMPLES_DEFAULTS}
+    );
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.allOf?.[0]);
+    expectObjectSchema(refined.allOf?.[0].properties?.name);
+
+    expect(refined.allOf?.[0].properties?.name.examples).toEqual(['Ada']);
+    expect(refined.$defs?.unusedStatus).toEqual({
+      type: 'string',
+      enum: ['OPEN'],
+      examples: ['OPEN'],
+    });
+  });
+
   it('detects enums from repeated values', () => {
     const schema: TopLevelSchema = {
       type: 'array',
@@ -175,6 +211,41 @@ describe('runSchemaRefinement', () => {
           enum: ['OPEN', 'CLOSED'],
         },
       },
+    });
+  });
+
+  it('detects additionalProperties inside a oneOf branch, like the other refinements', () => {
+    const schema: TopLevelSchema = {
+      oneOf: [
+        {
+          type: 'object',
+          properties: {
+            alpha: {type: 'object', properties: {id: {type: 'string'}, unit: {type: 'string'}}},
+            beta: {type: 'object', properties: {id: {type: 'string'}, unit: {type: 'string'}}},
+            gamma: {type: 'object', properties: {id: {type: 'string'}, unit: {type: 'string'}}},
+          },
+        },
+      ],
+    };
+
+    const data = {
+      alpha: {id: 'a', unit: 'K'},
+      beta: {id: 'b', unit: 'bar'},
+      gamma: {id: 'c', unit: 'mg'},
+    };
+
+    const refined = runSchemaRefinement(schema, data, {
+      detectAdditionalProperties: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS,
+    });
+    expectObjectSchema(refined);
+
+    const branchSchema = refined.oneOf?.[0];
+    expectObjectSchema(branchSchema);
+    expect(branchSchema.properties).toBeUndefined();
+    expect(branchSchema.additionalProperties).toEqual({
+      type: 'object',
+      properties: {id: {type: 'string'}, unit: {type: 'string'}},
+      required: ['id', 'unit'],
     });
   });
 

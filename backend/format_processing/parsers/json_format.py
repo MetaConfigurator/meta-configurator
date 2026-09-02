@@ -2,12 +2,14 @@ import json
 from typing import Optional
 
 from format_detection_core import ParserAttempt
-from parsers.common_preprocess import preprocess_data_for_ai
+
+
+def looks_like_json(content: str) -> bool:
+    return content.lstrip().startswith(("{", "["))
 
 
 def parse_data(content: str) -> Optional[ParserAttempt]:
-    stripped = content.strip()
-    if not stripped.startswith("{") and not stripped.startswith("["):
+    if not looks_like_json(content):
         return None
     try:
         parsed = json.loads(content)

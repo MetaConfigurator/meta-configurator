@@ -1,90 +1,38 @@
-import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {DetectAdditionalPropertiesOptions} from '@/schema/refinement/refineSchemaTypes';
 import {
-  collectArrayItemSamples,
   collectObjectSamples,
   collectPropertySamples,
   getValueType,
   inferSchemaFromValues,
-  isSchemaObject,
+  visitSchemaWithSamples,
 } from '@/schema/refinement/refineSchemaHelpers';
-
-export function detectAdditionalPropertiesInSchema(
-  schema: TopLevelSchema,
-  data: unknown,
-  options: DetectAdditionalPropertiesOptions
-): TopLevelSchema {
-  return detectAdditionalPropertiesInSchemaFromSamples(schema, [data], options);
-}
 
 export function detectAdditionalPropertiesInSchemaFromSamples(
   schema: TopLevelSchema,
   samples: unknown[],
   options: DetectAdditionalPropertiesOptions
 ): TopLevelSchema {
-  visitObjectSchemas(schema, samples, options);
+  visitSchemaWithSamples(schema, samples, (schemaNode, samplesForNode) => {
+    maybeConvertPropertiesToAdditionalProperties(
+      schemaNode,
+      collectObjectSamples(samplesForNode),
+      options
+    );
+  });
+
   return schema;
 }
 
-function visitObjectSchemas(
-  schema: JsonSchemaType,
-  samples: unknown[],
-  options: DetectAdditionalPropertiesOptions
-) {
-  if (!isSchemaObject(schema)) {
-    return;
-  }
-
-  const objectSamples = collectObjectSamples(samples);
-  maybeConvertToAdditionalProperties(schema, objectSamples, options);
-
-  if (schema.properties) {
-    for (const [propertyName, propertySchema] of Object.entries(schema.properties)) {
-      visitObjectSchemas(
-        propertySchema,
-        collectPropertySamples(objectSamples, propertyName),
-        options
-      );
-    }
-  }
-
-  if (schema.additionalProperties !== undefined) {
-    const additionalPropertyValues = objectSamples.flatMap(sample => Object.values(sample));
-    visitObjectSchemas(schema.additionalProperties, additionalPropertyValues, options);
-  }
-
-  if (schema.patternProperties) {
-    for (const [pattern, patternSchema] of Object.entries(schema.patternProperties)) {
-      const regex = new RegExp(pattern);
-      const patternValues = objectSamples.flatMap(sample =>
-        Object.entries(sample)
-          .filter(([key]) => regex.test(key))
-          .map(([, value]) => value)
-      );
-      visitObjectSchemas(patternSchema, patternValues, options);
-    }
-  }
-
-  if (schema.items !== undefined) {
-    visitObjectSchemas(schema.items, collectArrayItemSamples(samples), options);
-  }
-
-  if (schema.prefixItems) {
-    const arraySamples = samples.filter(Array.isArray);
-    schema.prefixItems.forEach((prefixSchema, index) => {
-      const prefixSamples = arraySamples
-        .filter(sample => index < sample.length)
-        .map(sample => sample[index]);
-      visitObjectSchemas(prefixSchema, prefixSamples, options);
-    });
-  }
-}
-
-function maybeConvertToAdditionalProperties(
+/**
+ * Replaces the listed properties of a map-like object by a single additionalProperties
+ * schema, so that a schema inferred from one sample does not hard-code its keys.
+ */
+function maybeConvertPropertiesToAdditionalProperties(
   schema: JsonSchemaObjectType,
   objectSamples: Record<string, unknown>[],
   options: DetectAdditionalPropertiesOptions
-) {
+): void {
   if (schema.type !== 'object' || !schema.properties || schema.additionalProperties !== undefined) {
     return;
   }
@@ -97,58 +45,79 @@ function maybeConvertToAdditionalProperties(
   const propertyValues = propertyNames
     .flatMap(propertyName => collectPropertySamples(objectSamples, propertyName))
     .filter(value => value !== undefined);
-
   if (propertyValues.length < options.minProperties) {
     return;
   }
-
-  const valueTypes = new Set(propertyValues.map(value => getValueType(value)));
-  if (options.requireSameValueType && valueTypes.size !== 1) {
-    return;
-  }
-
-  if ([...valueTypes].some(type => type === 'null' || type === 'array')) {
-    return;
-  }
-
-  let similarity = 1;
-  if (valueTypes.has('object')) {
-    const objectPropertySets = propertyValues
-      .filter(
-        (value): value is Record<string, unknown> =>
-          typeof value === 'object' && value !== null && !Array.isArray(value)
-      )
-      .map(value => new Set(Object.keys(value)));
-
-    const union = new Set<string>();
-    const intersection = new Set<string>(objectPropertySets[0] ? [...objectPropertySets[0]] : []);
-    objectPropertySets.forEach(propertySet => {
-      propertySet.forEach(key => union.add(key));
-      [...intersection].forEach(key => {
-        if (!propertySet.has(key)) {
-          intersection.delete(key);
-        }
-      });
-    });
-
-    similarity = union.size === 0 ? 1 : intersection.size / union.size;
-    if (intersection.size < options.minMatchingSubProperties) {
-      return;
-    }
-  }
-
-  if (similarity < options.similarityThreshold) {
+  if (!arePropertyValuesInterchangeable(propertyValues, options)) {
     return;
   }
 
   schema.additionalProperties = inferSchemaFromValues(propertyValues);
   delete schema.properties;
-  if (schema.required) {
-    schema.required = schema.required.filter(
-      requiredProperty => !propertyNames.includes(requiredProperty)
-    );
-    if (schema.required.length === 0) {
-      delete schema.required;
-    }
+  removeConvertedPropertiesFromRequired(schema, propertyNames);
+}
+
+/** Map entries look alike: same value type, and for objects a shared enough key set. */
+function arePropertyValuesInterchangeable(
+  propertyValues: unknown[],
+  options: DetectAdditionalPropertiesOptions
+): boolean {
+  const valueTypes = new Set(propertyValues.map(value => getValueType(value)));
+  if (options.requireSameValueType && valueTypes.size !== 1) {
+    return false;
+  }
+  if (valueTypes.has('null') || valueTypes.has('array')) {
+    return false;
+  }
+  if (!valueTypes.has('object')) {
+    return true;
+  }
+
+  const {sharedKeyCount, keySetSimilarity} = compareObjectKeySets(propertyValues);
+  return (
+    sharedKeyCount >= options.minMatchingSubProperties &&
+    keySetSimilarity >= options.similarityThreshold
+  );
+}
+
+/** How many keys all object values share, and that count relative to all keys seen. */
+function compareObjectKeySets(values: unknown[]): {
+  sharedKeyCount: number;
+  keySetSimilarity: number;
+} {
+  const keySets = values
+    .filter(value => getValueType(value) === 'object')
+    .map(value => new Set(Object.keys(value as Record<string, unknown>)));
+
+  const sharedKeys = new Set(keySets[0] ?? []);
+  const allKeys = new Set<string>();
+  for (const keySet of keySets) {
+    keySet.forEach(key => allKeys.add(key));
+    sharedKeys.forEach(key => {
+      if (!keySet.has(key)) {
+        sharedKeys.delete(key);
+      }
+    });
+  }
+
+  return {
+    sharedKeyCount: sharedKeys.size,
+    keySetSimilarity: allKeys.size === 0 ? 1 : sharedKeys.size / allKeys.size,
+  };
+}
+
+function removeConvertedPropertiesFromRequired(
+  schema: JsonSchemaObjectType,
+  convertedPropertyNames: string[]
+): void {
+  if (!schema.required) {
+    return;
+  }
+
+  schema.required = schema.required.filter(
+    requiredProperty => !convertedPropertyNames.includes(requiredProperty)
+  );
+  if (schema.required.length === 0) {
+    delete schema.required;
   }
 }

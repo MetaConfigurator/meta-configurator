@@ -2,7 +2,7 @@
 import {computed, ref} from 'vue';
 import type {MenuItem} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
-import {MenuItems} from '@/components/toolbar/menuItems';
+import {MenuItems, type MenuItemDialogActions} from '@/components/toolbar/menuItems';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
@@ -13,104 +13,11 @@ import {useSettings} from '@/settings/useSettings';
 const props = defineProps<{
   currentMode: SessionMode;
   showBottomMenu: boolean;
-}>();
-
-const emit = defineEmits<{
-  (e: 'show-schema-selection-dialog'): void;
-  (e: 'show-import-csv-dialog'): void;
-  (e: 'show-snapshot-dialog'): void;
-  (e: 'show-codegen-dialog', schemaMode: boolean): void;
-  (e: 'show-data-export-dialog', schemaMode: boolean): void;
-  (e: 'show-data-mapping-dialog'): void;
-  (e: 'show-data-import-ai-dialog'): void;
-  (e: 'show-rml-mapping-dialog'): void;
-  (e: 'show-import-turtle-dialog'): void;
-  (e: 'show-import-xml-dialog'): void;
-  (e: 'show-xml-export-dialog'): void;
-  (e: 'show-import-schema-dialog'): void;
-  (e: 'show-export-schema-dialog'): void;
-  (e: 'show-infer-schema-dialog'): void;
-  (e: 'show-refine-schema-dialog'): void;
+  dialogActions: MenuItemDialogActions;
 }>();
 
 const settings = useSettings();
-const topMenuBar = new MenuItems(
-  showSchemaSelectionDialog,
-  showCsvImportDialog,
-  showSnapshotDialog,
-  showCodeGenerationDialog,
-  showDataExportDialog,
-  showDataMappingDialog,
-  showDataImportAiDialog,
-  inferSchemaFromSampleData,
-  showRmlMappingDialog,
-  showTurtleImportDialog,
-  showXmlImportDialog,
-  showXmlExportDialog,
-  showImportSchemaDialog,
-  showExportSchemaDialog,
-  showRefineSchemaDialog
-);
-
-function showSchemaSelectionDialog() {
-  emit('show-schema-selection-dialog');
-}
-
-function showCsvImportDialog() {
-  emit('show-import-csv-dialog');
-}
-
-function showSnapshotDialog() {
-  emit('show-snapshot-dialog');
-}
-
-function showCodeGenerationDialog(schemaMode: boolean) {
-  emit('show-codegen-dialog', schemaMode);
-}
-
-function showDataExportDialog(schemaMode: boolean) {
-  emit('show-data-export-dialog', schemaMode);
-}
-
-function showDataMappingDialog() {
-  emit('show-data-mapping-dialog');
-}
-
-function showDataImportAiDialog() {
-  emit('show-data-import-ai-dialog');
-}
-
-function showRmlMappingDialog() {
-  emit('show-rml-mapping-dialog');
-}
-
-function showTurtleImportDialog() {
-  emit('show-import-turtle-dialog');
-}
-
-function showXmlImportDialog() {
-  emit('show-import-xml-dialog');
-}
-
-function showXmlExportDialog() {
-  emit('show-xml-export-dialog');
-}
-
-function showImportSchemaDialog() {
-  emit('show-import-schema-dialog');
-}
-
-function showExportSchemaDialog() {
-  emit('show-export-schema-dialog');
-}
-
-function showRefineSchemaDialog() {
-  emit('show-refine-schema-dialog');
-}
-
-function inferSchemaFromSampleData() {
-  emit('show-infer-schema-dialog');
-}
+const topMenuBar = new MenuItems(props.dialogActions);
 
 function getMenuItems(settings: SettingsInterfaceRoot, positionBottom: boolean): MenuItem[] {
   let result: MenuItem[];

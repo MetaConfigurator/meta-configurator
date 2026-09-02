@@ -3,7 +3,6 @@ import {computed, nextTick, ref} from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes';
 import type {SchemaRefinementOptionsController} from '@/schema/refinement/schemaRefinementOptionsController';
 import {applySchemaRefinements} from '@/components/toolbar/refineSchema';
 import SchemaRefinementOptions from '@/components/toolbar/dialogs/shared/SchemaRefinementOptions.vue';
@@ -25,22 +24,9 @@ function hideDialog() {
   showDialog.value = false;
 }
 
-function buildSelection(): RefineSchemaSelection | null {
-  return refinementOptions.value?.buildSelection() ?? null;
-}
-
 function applySelectedRefinements() {
-  if (!hasSelectedRefinements.value) {
-    return;
-  }
-
-  const selection = buildSelection();
-  if (!selection) {
-    return;
-  }
-
-  const appliedSuccessfully = applySchemaRefinements(selection);
-  if (appliedSuccessfully) {
+  const selection = hasSelectedRefinements.value ? refinementOptions.value?.buildSelection() : null;
+  if (selection && applySchemaRefinements(selection)) {
     hideDialog();
   }
 }
@@ -89,13 +75,5 @@ defineExpose({show: openDialog, close: hideDialog});
   justify-content: flex-end;
   gap: 0.75rem;
   margin-top: 0.5rem;
-}
-
-:deep(.refinement-panel .p-panel-header) {
-  padding: 1rem;
-}
-
-:deep(.refinement-panel .p-panel-content) {
-  padding: 1rem;
 }
 </style>

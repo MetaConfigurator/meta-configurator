@@ -1,6 +1,5 @@
 import csv
 import io
-import re
 from typing import Any, List, Optional
 
 
@@ -30,21 +29,3 @@ def rows_to_objects_or_arrays(rows: List[List[str]]) -> Any:
     if len(set(header)) == len(header) and all(col.strip() for col in header):
         return [dict(zip(header, row)) for row in data_rows]
     return rows
-
-
-def split_markdown_table_row(line: str) -> List[str]:
-    stripped = line.strip()
-    if stripped.startswith("|"):
-        stripped = stripped[1:]
-    if stripped.endswith("|"):
-        stripped = stripped[:-1]
-    return [cell.strip() for cell in stripped.split("|")]
-
-
-def is_markdown_separator_row(cells: List[str]) -> bool:
-    if len(cells) < 2:
-        return False
-    for cell in cells:
-        if not re.fullmatch(r":?-{3,}:?", cell.strip()):
-            return False
-    return True

@@ -4,23 +4,16 @@ import {detectAdditionalPropertiesInSchemaFromSamples} from '@/schema/refinement
 import {detectEnumsInSchemaFromSamples} from '@/schema/refinement/detectEnums';
 import {extractSubSchemasIntoReferences} from '@/schema/refinement/extractSubSchemasIntoReferences';
 import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes';
-import {sortSchemaPropertiesAlphabetically} from '@/components/panels/gui-editor/sortingUtils';
-import _ from 'lodash';
+import {sortSchemaPropertiesAlphabetically} from '@/schema/sortSchemaPropertiesAlphabetically';
+import {cloneDeep} from 'lodash';
 
 export function runSchemaRefinement(
   schema: TopLevelSchema,
   data: unknown,
   selection: RefineSchemaSelection
 ): TopLevelSchema {
-  return runSchemaRefinementOnSamples(schema, [data], selection);
-}
-
-export function runSchemaRefinementOnSamples(
-  schema: TopLevelSchema,
-  samples: unknown[],
-  selection: RefineSchemaSelection
-): TopLevelSchema {
-  let refinedSchema = _.cloneDeep(schema);
+  const samples = [data];
+  let refinedSchema = cloneDeep(schema);
 
   if (selection.detectAdditionalProperties) {
     detectAdditionalPropertiesInSchemaFromSamples(

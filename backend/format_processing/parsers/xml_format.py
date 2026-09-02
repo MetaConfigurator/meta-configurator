@@ -1,13 +1,17 @@
+import re
 from typing import Optional
 
 from format_detection_core import ParserAttempt, xmltodict
-from parsers.common_preprocess import preprocess_data_for_ai
+
+
+def looks_like_xml(content: str) -> bool:
+    return "<?xml" in content[:200] or bool(
+        re.search(r"<[A-Za-z_][^>]*>", content[:500])
+    )
 
 
 def parse_data(content: str) -> Optional[ParserAttempt]:
-    if xmltodict is None:
-        return None
-    if "<" not in content or ">" not in content:
+    if xmltodict is None or not looks_like_xml(content):
         return None
 
     try:

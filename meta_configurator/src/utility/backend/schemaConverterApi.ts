@@ -10,6 +10,7 @@
  */
 import {computed} from 'vue';
 import {useSettings} from '@/settings/useSettings';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 const settings = useSettings();
 
@@ -192,7 +193,7 @@ export async function requestSchemaConversion(
     throw new Error(
       `Could not reach the schema conversion service at ${SCHEMA_CONVERTER_URL.value}. ` +
         `Please make sure the service is running and reachable. ` +
-        `(${error instanceof Error ? error.message : String(error)})`
+        `(${getErrorMessage(error)})`
     );
   }
 

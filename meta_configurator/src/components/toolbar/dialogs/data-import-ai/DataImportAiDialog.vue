@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, onBeforeUnmount, ref, type Ref, watch} from 'vue';
+import {computed, nextTick, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -10,15 +10,19 @@ import Textarea from 'primevue/textarea';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
-import type {Editor} from 'brace';
-import * as ace from 'brace';
 import 'brace/mode/javascript';
-import {setupAceProperties} from '@/components/panels/shared-components/aceUtils';
+import {useAceEditor} from '@/components/panels/shared-components/useAceEditor';
 import {useSettings} from '@/settings/useSettings';
 import {getApiKeyRef} from '@/utility/ai/apiKey';
 import {canQueryAi} from '@/utility/ai/aiAvailability';
 import {
-  DataImportAiService,
+  detectFormatAndParseInBackend,
+  generateImportScriptSuggestion,
+  generateNormalizationScriptSuggestion,
+  runDirectParsedImport,
+  runFullAiImport,
+  runImportWithGeneratedScript,
+  validateGeneratedImportScript,
   type DataImportAiSchemaSource,
   type DataImportExecutionResult,
 } from './dataImportAiService';
@@ -26,6 +30,9 @@ import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {FORMAT_PROCESSING_FILE_ACCEPT} from '@/utility/backend/formatProcessingApi';
+import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
+import {readFileContent} from '@/utility/readFileContent';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 
 type DataImportAiMode =
   | 'javascript_mapping'
@@ -41,10 +48,16 @@ type PendingImportConfirmation = {
   confirmedMessage: string;
 };
 
+const DEFAULT_TRANSFORM_SCRIPT = `function transform(input) {
+  return input;
+}`;
+const INFER_SCHEMA_OPTION = 'Infer schema from imported data';
+const USE_CURRENT_SCHEMA_OPTION = 'Use current schema from app';
+const SCHEMA_SOURCE_OPTIONS = [INFER_SCHEMA_OPTION, USE_CURRENT_SCHEMA_OPTION];
+/** Sample size used to smoke-test a generated parser before running the real import. */
+const VALIDATION_SAMPLE_CHARACTERS = 2048;
+
 const showDialog = ref(false);
-const editorId = 'data-import-ai-' + Math.random();
-const editorInitialized: Ref<boolean> = ref(false);
-const editor: Ref<Editor | null> = ref(null);
 
 const selectedFileName = ref('');
 const selectedFileSize = ref(0);
@@ -59,66 +72,61 @@ const backendDisplayText = ref('');
 const backendPromptHint = ref('');
 const backendRecognized = ref(false);
 const isFormatProcessingUnavailable = ref(false);
-const parsedJsonFromBackend: Ref<unknown | null> = ref(null);
-const preprocessedJsonForAi: Ref<unknown | null> = ref(null);
+const parsedJsonFromBackend = ref<unknown | null>(null);
+const preprocessedJsonForAi = ref<unknown | null>(null);
 const selectedImportMode = ref<DataImportAiMode>('javascript_mapping');
-const jsInputMode = ref<'raw' | 'parsed'>('raw');
-const inferSchemaOption = 'Infer schema from imported data';
-const useCurrentSchemaOption = 'Use current schema from app';
-const schemaSourceOptions = [inferSchemaOption, useCurrentSchemaOption];
-const selectedSchemaSource = ref(inferSchemaOption);
+const javascriptInputMode = ref<'raw' | 'parsed'>('raw');
+const selectedSchemaSource = ref(INFER_SCHEMA_OPTION);
 const isLoadingSuggestion = ref(false);
 const isImportingData = ref(false);
 const isDetectingFormat = ref(false);
 const hasValidationErrorForSuggestion = ref(false);
 const lastValidationError = ref('');
 const lastFailedScript = ref('');
-const pendingImportConfirmation: Ref<PendingImportConfirmation | null> = ref(null);
-const generatedScript = ref(`function transform(input) {
-  return input;
-}`);
+const pendingImportConfirmation = ref<PendingImportConfirmation | null>(null);
+const generatedScript = ref(DEFAULT_TRANSFORM_SCRIPT);
 
 const settings = useSettings();
 const apiKey = getApiKeyRef();
-const dataImportAiService = new DataImportAiService();
-const formatProcessingUrl = computed(() => settings.value.backend.formatProcessingUrl);
+const {editorElementId, createEditor, destroyEditor} = useAceEditor(
+  'data-import-ai',
+  generatedScript,
+  {mode: 'ace/mode/javascript'}
+);
+
 const canUseAi = computed(() => canQueryAi(apiKey.value));
 const formatProcessingUnavailableNotice = computed(
   () =>
-    `The format processing service at ${formatProcessingUrl.value} is currently unavailable. Backend-dependent modes are disabled. Manual JavaScript import and full AI import remain available.`
-);
-const formatProcessingFallbackNotice = computed(
-  () =>
-    'If the format processing service is unavailable, only backend-dependent modes are affected. Manual JavaScript import and full AI import remain available.'
+    `The format processing service at ${settings.value.backend.formatProcessingUrl} is currently ` +
+    `unavailable. Backend-dependent modes are disabled. Manual JavaScript import and full AI ` +
+    `import remain available.`
 );
 const canUseDirectParse = computed(
   () => backendRecognized.value && parsedJsonFromBackend.value !== null
 );
 const canUseAiNormalizeParsed = computed(() => canUseDirectParse.value && canUseAi.value);
-const importModeOptions = computed(() => {
-  return [
-    {
-      label: 'Generate JavaScript mapping from raw input',
-      value: 'javascript_mapping' as DataImportAiMode,
-      disabled: false,
-    },
-    {
-      label: 'Use parsed result directly',
-      value: 'direct_parse' as DataImportAiMode,
-      disabled: !canUseDirectParse.value,
-    },
-    {
-      label: 'Use parsed result and AI normalize it',
-      value: 'ai_normalize_parsed' as DataImportAiMode,
-      disabled: !canUseAiNormalizeParsed.value,
-    },
-    {
-      label: 'Full AI import',
-      value: 'full_ai_import' as DataImportAiMode,
-      disabled: !canUseAi.value,
-    },
-  ];
-});
+const importModeOptions = computed(() => [
+  {
+    label: 'Generate JavaScript mapping from raw input',
+    value: 'javascript_mapping' as DataImportAiMode,
+    disabled: false,
+  },
+  {
+    label: 'Use parsed result directly',
+    value: 'direct_parse' as DataImportAiMode,
+    disabled: !canUseDirectParse.value,
+  },
+  {
+    label: 'Use parsed result and AI normalize it',
+    value: 'ai_normalize_parsed' as DataImportAiMode,
+    disabled: !canUseAiNormalizeParsed.value,
+  },
+  {
+    label: 'Full AI import',
+    value: 'full_ai_import' as DataImportAiMode,
+    disabled: !canUseAi.value,
+  },
+]);
 const usesJavascriptStep = computed(
   () =>
     selectedImportMode.value === 'javascript_mapping' ||
@@ -126,36 +134,42 @@ const usesJavascriptStep = computed(
 );
 const isCurrentImportModeDisabled = computed(() =>
   importModeOptions.value.some(
-    option => option.value === selectedImportMode.value && option.disabled === true
+    option => option.value === selectedImportMode.value && option.disabled
   )
 );
-
-watch(
-  () => generatedScript.value,
-  newValue => {
-    if (editor.value && editor.value.getValue() !== newValue) {
-      editor.value.setValue(newValue, -1);
-    }
+const suggestionButtonLabel = computed(() => {
+  if (hasValidationErrorForSuggestion.value) {
+    return 'Regenerate Suggestion for Previous Error';
   }
-);
+  return selectedImportMode.value === 'ai_normalize_parsed'
+    ? 'Generate AI Normalization JavaScript'
+    : 'Generate JavaScript Suggestion';
+});
+const importButtonLabel = computed(() => {
+  if (pendingImportConfirmation.value) {
+    return 'Import Anyway';
+  }
+  if (selectedImportMode.value === 'full_ai_import') {
+    return 'Import with Full AI (No JS)';
+  }
+  if (selectedImportMode.value === 'direct_parse' && canUseDirectParse.value) {
+    return 'Import Directly (No AI Call)';
+  }
+  return 'Import Data';
+});
 
 watch(
   [showDialog, usesJavascriptStep, canUseAi],
-  async ([visible, usesJavascriptEditor, aiAvailable]) => {
-    if (!visible || !usesJavascriptEditor || !aiAvailable) {
+  async ([isDialogVisible, usesJavascriptEditor, isAiAvailable]) => {
+    if (!isDialogVisible || !usesJavascriptEditor || !isAiAvailable) {
       destroyEditor();
       return;
     }
 
     await nextTick();
-    initializeEditor();
-    editor.value?.setValue(generatedScript.value, -1);
+    createEditor();
   }
 );
-
-onBeforeUnmount(() => {
-  destroyEditor();
-});
 
 watch([canUseDirectParse, canUseAi], () => {
   if (isCurrentImportModeDisabled.value) {
@@ -177,29 +191,17 @@ function hideDialog() {
 }
 
 function resetDialog() {
-  selectedFileName.value = '';
-  selectedFileSize.value = 0;
-  selectedFileType.value = '';
-  uploadedContent.value = '';
+  clearSelectedFile();
   userComments.value = '';
   statusMessage.value = '';
   errorMessage.value = '';
-  warningMessage.value = '';
-  formatDetectionMessage.value = '';
-  backendDisplayText.value = '';
-  backendPromptHint.value = '';
-  backendRecognized.value = false;
-  isFormatProcessingUnavailable.value = false;
-  parsedJsonFromBackend.value = null;
-  preprocessedJsonForAi.value = null;
-  selectedImportMode.value = 'javascript_mapping';
-  jsInputMode.value = 'raw';
-  selectedSchemaSource.value = getDefaultSchemaSourceOption();
-  clearSuggestionRetryContext();
-  generatedScript.value = `function transform(input) {
-  return input;
-}`;
-  clearPendingImportConfirmation();
+  selectedSchemaSource.value = hasCurrentSchema() ? USE_CURRENT_SCHEMA_OPTION : INFER_SCHEMA_OPTION;
+  generatedScript.value = DEFAULT_TRANSFORM_SCRIPT;
+}
+
+function showError(message: string) {
+  statusMessage.value = '';
+  errorMessage.value = message;
 }
 
 function clearSuggestionRetryContext() {
@@ -213,29 +215,38 @@ function clearPendingImportConfirmation() {
   warningMessage.value = '';
 }
 
+function resetFormatDetection() {
+  formatDetectionMessage.value = '';
+  backendDisplayText.value = '';
+  backendPromptHint.value = '';
+  backendRecognized.value = false;
+  isFormatProcessingUnavailable.value = false;
+  parsedJsonFromBackend.value = null;
+  preprocessedJsonForAi.value = null;
+}
+
 function getSelectedSchemaSource(): DataImportAiSchemaSource {
-  return selectedSchemaSource.value === useCurrentSchemaOption
+  return selectedSchemaSource.value === USE_CURRENT_SCHEMA_OPTION
     ? 'use_current_schema'
     : 'infer_from_data';
 }
 
+function getCurrentSchema(): TopLevelSchema | undefined {
+  return getDataForMode(SessionMode.SchemaEditor).data.value;
+}
+
+function hasCurrentSchema(): boolean {
+  const currentSchema = getCurrentSchema();
+  return currentSchema !== undefined && !isSchemaEmpty(currentSchema);
+}
+
 function getDefaultImportMode(): DataImportAiMode {
-  if (canUseDirectParse.value) {
-    return 'direct_parse';
-  }
-  return 'javascript_mapping';
+  return canUseDirectParse.value ? 'direct_parse' : 'javascript_mapping';
 }
 
+/** The script the import runs on, which is only relevant for the JavaScript-based modes. */
 function getEditorSnapshot(): string {
-  return usesJavascriptStep.value ? getCurrentScript() : '';
-}
-
-function getCurrentScript(): string {
-  if (!canUseAi.value || !usesJavascriptStep.value) {
-    return generatedScript.value;
-  }
-
-  return editor.value?.getValue() ?? generatedScript.value;
+  return usesJavascriptStep.value ? generatedScript.value : '';
 }
 
 function finalizeImport(
@@ -253,27 +264,34 @@ function finalizeImport(
   hideDialog();
 }
 
+/**
+ * A schema mismatch only warns the first time; importing again with unchanged settings
+ * confirms it. Returns true once such a pending import has been confirmed and applied.
+ */
 function maybeConfirmPendingImport(
   mode: DataImportAiMode,
   schemaSource: DataImportAiSchemaSource,
   editorSnapshot: string
 ): boolean {
-  const pending = pendingImportConfirmation.value;
-  if (!pending) {
+  const pendingImport = pendingImportConfirmation.value;
+  if (!pendingImport) {
     return false;
   }
 
   const matchesCurrentContext =
-    pending.mode === mode &&
-    pending.schemaSource === schemaSource &&
-    pending.editorSnapshot === editorSnapshot;
-
+    pendingImport.mode === mode &&
+    pendingImport.schemaSource === schemaSource &&
+    pendingImport.editorSnapshot === editorSnapshot;
   if (!matchesCurrentContext) {
     clearPendingImportConfirmation();
     return false;
   }
 
-  finalizeImport(pending.resultData, pending.schemaSource, pending.confirmedMessage);
+  finalizeImport(
+    pendingImport.resultData,
+    pendingImport.schemaSource,
+    pendingImport.confirmedMessage
+  );
   return true;
 }
 
@@ -284,8 +302,7 @@ function handleImportResult(
   editorSnapshot: string
 ) {
   if (!result.success) {
-    statusMessage.value = '';
-    errorMessage.value = result.message;
+    showError(result.message);
     clearPendingImportConfirmation();
     return;
   }
@@ -307,332 +324,264 @@ function handleImportResult(
   finalizeImport(result.resultData, schemaSource, result.message);
 }
 
-function hasCurrentSchema(): boolean {
-  const currentSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
-  return !!currentSchema && Object.keys(currentSchema).length > 0;
-}
-
-function getDefaultSchemaSourceOption(): string {
-  return hasCurrentSchema() ? useCurrentSchemaOption : inferSchemaOption;
-}
-
-function initializeEditor() {
-  const container = document.getElementById(editorId);
-  if (!container) {
+async function onFileSelected(event: Event) {
+  const selectedFile = (event.target as HTMLInputElement).files?.[0];
+  if (!selectedFile) {
+    clearSelectedFile();
     return;
   }
 
-  destroyEditor(false);
-
-  editor.value = ace.edit(editorId);
-  setupAceProperties(editor.value, settings.value);
-  editor.value.getSession().setMode('ace/mode/javascript');
-  editor.value.getSession().setUseWorker(false);
-  editorInitialized.value = true;
-}
-
-function destroyEditor(preserveCurrentValue = true) {
-  if (!editor.value) {
-    return;
-  }
-
-  const currentValue = preserveCurrentValue ? editor.value.getValue() : generatedScript.value;
-  editor.value.destroy();
-  editor.value.container.innerHTML = '';
-  editor.value = null;
-  editorInitialized.value = false;
-  generatedScript.value = currentValue;
-}
-
-function onFileSelected(event: Event) {
-  const inputElement = event.target as HTMLInputElement;
-  const file = inputElement.files?.[0];
-
-  if (!file) {
-    selectedFileName.value = '';
-    selectedFileSize.value = 0;
-    selectedFileType.value = '';
-    uploadedContent.value = '';
-    formatDetectionMessage.value = '';
-    backendDisplayText.value = '';
-    backendPromptHint.value = '';
-    backendRecognized.value = false;
-    isFormatProcessingUnavailable.value = false;
-    parsedJsonFromBackend.value = null;
-    preprocessedJsonForAi.value = null;
-    selectedImportMode.value = getDefaultImportMode();
-    jsInputMode.value = 'raw';
+  selectedFileName.value = selectedFile.name;
+  selectedFileSize.value = selectedFile.size;
+  selectedFileType.value = selectedFile.type || '';
+  try {
+    uploadedContent.value = await readFileContent(selectedFile);
     clearSuggestionRetryContext();
     clearPendingImportConfirmation();
-    return;
-  }
-
-  selectedFileName.value = file.name;
-  selectedFileSize.value = file.size;
-  selectedFileType.value = file.type || '';
-
-  const reader = new FileReader();
-  reader.onload = async () => {
-    uploadedContent.value = dataImportAiService.sanitizeInputDocument(String(reader.result ?? ''));
-    clearSuggestionRetryContext();
-    clearPendingImportConfirmation();
-    formatDetectionMessage.value = '';
-    backendDisplayText.value = '';
-    backendPromptHint.value = '';
-    backendRecognized.value = false;
-    isFormatProcessingUnavailable.value = false;
-    parsedJsonFromBackend.value = null;
-    preprocessedJsonForAi.value = null;
+    resetFormatDetection();
     selectedImportMode.value = 'javascript_mapping';
 
-    if (uploadedContent.value.length === 0) {
-      return;
+    if (uploadedContent.value.length > 0) {
+      await detectSelectedFileFormat();
     }
+  } catch {
+    errorMessage.value = 'Failed to read selected file.';
+  }
+}
 
-    isDetectingFormat.value = true;
-    try {
-      const detectionResult = await dataImportAiService.detectFormatAndParseInBackend(
-        selectedFileName.value,
-        selectedFileType.value,
-        uploadedContent.value
-      );
-      isFormatProcessingUnavailable.value = detectionResult.message.includes(
-        'Backend format detection unavailable'
-      );
+function clearSelectedFile() {
+  selectedFileName.value = '';
+  selectedFileSize.value = 0;
+  selectedFileType.value = '';
+  uploadedContent.value = '';
+  resetFormatDetection();
+  selectedImportMode.value = getDefaultImportMode();
+  javascriptInputMode.value = 'raw';
+  clearSuggestionRetryContext();
+  clearPendingImportConfirmation();
+}
+
+async function detectSelectedFileFormat() {
+  isDetectingFormat.value = true;
+  try {
+    const detectionResult = await detectFormatAndParseInBackend(
+      selectedFileName.value,
+      selectedFileType.value,
+      uploadedContent.value
+    );
+    isFormatProcessingUnavailable.value = detectionResult === null;
+
+    if (detectionResult === null) {
+      backendRecognized.value = false;
+      backendDisplayText.value =
+        'Backend format detection unavailable. Falling back to AI mapping.';
+      backendPromptHint.value = '';
+      parsedJsonFromBackend.value = null;
+      preprocessedJsonForAi.value = null;
+    } else {
       backendRecognized.value = detectionResult.recognized;
       backendDisplayText.value = detectionResult.display_text ?? detectionResult.message;
       backendPromptHint.value = detectionResult.ai_prompt_hint ?? '';
-      parsedJsonFromBackend.value =
-        detectionResult.recognized && detectionResult.parsed_json !== undefined
-          ? detectionResult.parsed_json
-          : null;
-      preprocessedJsonForAi.value =
-        detectionResult.recognized && detectionResult.preprocessed_for_ai !== undefined
-          ? detectionResult.preprocessed_for_ai
-          : null;
-      formatDetectionMessage.value = backendDisplayText.value;
-      selectedImportMode.value = getDefaultImportMode();
-    } finally {
-      isDetectingFormat.value = false;
+      parsedJsonFromBackend.value = detectionResult.recognized
+        ? detectionResult.parsed_json ?? null
+        : null;
+      preprocessedJsonForAi.value = detectionResult.recognized
+        ? detectionResult.preprocessed_for_ai ?? null
+        : null;
     }
-  };
-  reader.onerror = () => {
-    errorMessage.value = 'Failed to read selected file.';
-  };
-  reader.readAsText(file);
+
+    formatDetectionMessage.value = backendDisplayText.value;
+    selectedImportMode.value = getDefaultImportMode();
+  } finally {
+    isDetectingFormat.value = false;
+  }
 }
 
-function generateSuggestion() {
+async function generateSuggestion() {
   if (uploadedContent.value.length === 0) {
-    statusMessage.value = '';
-    errorMessage.value = 'Please select a file first.';
+    showError('Please select a file first.');
     return;
   }
   if (!canUseAi.value) {
-    statusMessage.value = '';
-    errorMessage.value = 'AI suggestion generation is disabled until AI access is configured.';
+    showError('AI suggestion generation is disabled until AI access is configured.');
     return;
   }
-  if (selectedImportMode.value === 'ai_normalize_parsed' && !canUseDirectParse.value) {
-    statusMessage.value = '';
-    errorMessage.value = 'AI normalization requires parsed backend data.';
+
+  const normalizesParsedData = selectedImportMode.value === 'ai_normalize_parsed';
+  if (normalizesParsedData && !canUseDirectParse.value) {
+    showError('AI normalization requires parsed backend data.');
     return;
   }
 
   clearPendingImportConfirmation();
-
   const schemaSource = getSelectedSchemaSource();
-  const currentSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
   isLoadingSuggestion.value = true;
-  statusMessage.value =
-    selectedImportMode.value === 'ai_normalize_parsed'
-      ? 'Generating AI normalization JavaScript from parsed backend data...'
-      : hasValidationErrorForSuggestion.value
-      ? 'Generating improved JavaScript parser suggestion based on the validation error...'
-      : 'Generating JavaScript parser suggestion...';
+  statusMessage.value = getSuggestionProgressMessage(normalizesParsedData);
   errorMessage.value = '';
 
-  const suggestionPromise =
-    selectedImportMode.value === 'ai_normalize_parsed' && canUseDirectParse.value
-      ? dataImportAiService.generateNormalizationSuggestionFromParsedData(
-          parsedJsonFromBackend.value,
-          preprocessedJsonForAi.value ?? parsedJsonFromBackend.value,
-          userComments.value,
+  try {
+    const result = normalizesParsedData
+      ? await generateNormalizationScriptSuggestion({
+          parsedData: parsedJsonFromBackend.value,
+          preprocessedDataForAi: preprocessedJsonForAi.value ?? parsedJsonFromBackend.value,
+          userComments: userComments.value,
           schemaSource,
-          currentSchema,
-          backendDisplayText.value,
-          backendPromptHint.value
-        )
-      : dataImportAiService.generateSuggestion(
-          selectedFileName.value || 'uploaded-file',
-          selectedFileType.value,
-          uploadedContent.value,
-          userComments.value,
+          currentSchema: getCurrentSchema(),
+          backendDisplayText: backendDisplayText.value,
+          backendPromptHint: backendPromptHint.value,
+        })
+      : await generateImportScriptSuggestion({
+          inputFileName: selectedFileName.value || 'uploaded-file',
+          inputFileType: selectedFileType.value,
+          inputDocument: uploadedContent.value,
+          userComments: userComments.value,
           schemaSource,
-          currentSchema,
-          backendDisplayText.value,
-          backendPromptHint.value,
-          hasValidationErrorForSuggestion.value
+          currentSchema: getCurrentSchema(),
+          backendDisplayText: backendDisplayText.value,
+          backendPromptHint: backendPromptHint.value,
+          retryContext: hasValidationErrorForSuggestion.value
             ? {
                 validationError: lastValidationError.value,
-                previousScript: lastFailedScript.value,
+                previousCode: lastFailedScript.value,
               }
-            : undefined
-        );
+            : undefined,
+        });
 
-  suggestionPromise
-    .then(result => {
-      if (!result.success) {
-        statusMessage.value = '';
-        errorMessage.value = result.message;
-        return;
-      }
+    if (!result.success) {
+      showError(result.message);
+      return;
+    }
 
-      generatedScript.value = result.config;
-      if (editor.value) {
-        editor.value.setValue(result.config, -1);
-      }
-      jsInputMode.value = selectedImportMode.value === 'ai_normalize_parsed' ? 'parsed' : 'raw';
-      clearSuggestionRetryContext();
-      statusMessage.value = result.message;
-      errorMessage.value = '';
-    })
-    .finally(() => {
-      isLoadingSuggestion.value = false;
-    });
+    generatedScript.value = result.config;
+    javascriptInputMode.value = normalizesParsedData ? 'parsed' : 'raw';
+    clearSuggestionRetryContext();
+    statusMessage.value = result.message;
+    errorMessage.value = '';
+  } finally {
+    isLoadingSuggestion.value = false;
+  }
 }
 
-async function importWithAi() {
+function getSuggestionProgressMessage(normalizesParsedData: boolean): string {
+  if (normalizesParsedData) {
+    return 'Generating AI normalization JavaScript from parsed backend data...';
+  }
+  return hasValidationErrorForSuggestion.value
+    ? 'Generating improved JavaScript parser suggestion based on the validation error...'
+    : 'Generating JavaScript parser suggestion...';
+}
+
+/**
+ * Shared tail of every import mode: confirm a pending schema mismatch, show progress,
+ * run the mode-specific import and report its outcome.
+ */
+async function runImport(
+  mode: DataImportAiMode,
+  editorSnapshot: string,
+  progressMessage: string,
+  executeImport: (
+    schemaSource: DataImportAiSchemaSource,
+    currentSchema: TopLevelSchema | undefined
+  ) => Promise<DataImportExecutionResult>
+) {
+  const schemaSource = getSelectedSchemaSource();
+  if (maybeConfirmPendingImport(mode, schemaSource, editorSnapshot)) {
+    return;
+  }
+
+  isImportingData.value = true;
+  statusMessage.value = progressMessage;
+  errorMessage.value = '';
+
+  try {
+    const result = await executeImport(schemaSource, getCurrentSchema());
+    handleImportResult(result, schemaSource, mode, editorSnapshot);
+  } finally {
+    isImportingData.value = false;
+  }
+}
+
+async function importWithGeneratedScript() {
   if (uploadedContent.value.length === 0) {
-    statusMessage.value = '';
-    errorMessage.value = 'Please select a file first.';
-    return;
-  }
-  const editorContent = getCurrentScript();
-  if (editorContent.trim().length === 0) {
-    statusMessage.value = '';
-    errorMessage.value = 'No JavaScript parser available.';
+    showError('Please select a file first.');
     return;
   }
 
-  const useParsedInput =
-    selectedImportMode.value === 'ai_normalize_parsed' || jsInputMode.value === 'parsed';
-  if (useParsedInput && parsedJsonFromBackend.value === null) {
-    statusMessage.value = '';
-    errorMessage.value = 'No parsed backend JSON available for AI normalization.';
+  const currentScript = generatedScript.value;
+  if (currentScript.trim().length === 0) {
+    showError('No JavaScript parser available.');
     return;
   }
 
-  const sampleInput = useParsedInput
-    ? parsedJsonFromBackend.value ?? uploadedContent.value.slice(0, 2048)
-    : uploadedContent.value.slice(0, 2048);
-  const validation = await dataImportAiService.validateGeneratedScript(editorContent, sampleInput);
+  const usesParsedInput =
+    selectedImportMode.value === 'ai_normalize_parsed' || javascriptInputMode.value === 'parsed';
+  if (usesParsedInput && parsedJsonFromBackend.value === null) {
+    showError('No parsed backend JSON available for AI normalization.');
+    return;
+  }
+
+  const inputForTransform = usesParsedInput ? parsedJsonFromBackend.value : uploadedContent.value;
+  const validationSample = usesParsedInput
+    ? parsedJsonFromBackend.value
+    : uploadedContent.value.slice(0, VALIDATION_SAMPLE_CHARACTERS);
+
+  const validation = await validateGeneratedImportScript(currentScript, validationSample);
   if (!validation.success) {
     hasValidationErrorForSuggestion.value = true;
     lastValidationError.value = validation.message;
-    lastFailedScript.value = editorContent;
-    statusMessage.value = '';
-    errorMessage.value = validation.message;
+    lastFailedScript.value = currentScript;
+    showError(validation.message);
     return;
   }
 
-  const schemaSource = getSelectedSchemaSource();
-  const currentSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
-  if (maybeConfirmPendingImport(selectedImportMode.value, schemaSource, editorContent)) {
-    return;
-  }
-  isImportingData.value = true;
-  statusMessage.value = 'Importing data...';
-  errorMessage.value = '';
-  const inputForTransform = useParsedInput
-    ? parsedJsonFromBackend.value ?? uploadedContent.value
-    : uploadedContent.value;
-
-  dataImportAiService
-    .performImport(inputForTransform, editorContent, schemaSource, currentSchema)
-    .then(result => {
-      handleImportResult(result, schemaSource, selectedImportMode.value, editorContent);
-    })
-    .finally(() => {
-      isImportingData.value = false;
-    });
+  await runImport(
+    selectedImportMode.value,
+    currentScript,
+    'Importing data...',
+    (schemaSource, currentSchema) =>
+      runImportWithGeneratedScript(inputForTransform, currentScript, schemaSource, currentSchema)
+  );
 }
 
 async function importDirectlyParsedJson() {
   if (!canUseDirectParse.value || parsedJsonFromBackend.value === null) {
-    statusMessage.value = '';
-    errorMessage.value = 'No parsed JSON is available for direct import.';
+    showError('No parsed JSON is available for direct import.');
     return;
   }
 
-  const schemaSource = getSelectedSchemaSource();
-  if (maybeConfirmPendingImport('direct_parse', schemaSource, '')) {
-    return;
-  }
-
-  isImportingData.value = true;
-  statusMessage.value = 'Importing directly parsed data...';
-  errorMessage.value = '';
-  const currentSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
-
-  dataImportAiService
-    .performDirectImport(parsedJsonFromBackend.value, schemaSource, currentSchema)
-    .then(result => {
-      const recoveredResult =
-        !result.success && result.message.includes('does not match current schema')
-          ? dataImportAiService.prepareImportResult(
-              parsedJsonFromBackend.value,
-              schemaSource,
-              currentSchema,
-              'Parsed JSON does not match current schema',
-              'Data imported via direct backend parsing despite schema mismatch warning.',
-              'Data imported successfully via direct backend parsing.'
-            )
-          : result;
-
-      handleImportResult(recoveredResult, schemaSource, 'direct_parse', '');
-    })
-    .finally(() => {
-      isImportingData.value = false;
-    });
+  await runImport(
+    'direct_parse',
+    getEditorSnapshot(),
+    'Importing directly parsed data...',
+    (schemaSource, currentSchema) =>
+      runDirectParsedImport(parsedJsonFromBackend.value, schemaSource, currentSchema)
+  );
 }
 
 async function importWithFullAi() {
   if (uploadedContent.value.length === 0) {
-    statusMessage.value = '';
-    errorMessage.value = 'Please select a file first.';
+    showError('Please select a file first.');
     return;
   }
   if (!canUseAi.value) {
-    statusMessage.value = '';
-    errorMessage.value = 'Full AI import is disabled until AI access is configured.';
+    showError('Full AI import is disabled until AI access is configured.');
     return;
   }
 
-  const schemaSource = getSelectedSchemaSource();
-  if (maybeConfirmPendingImport('full_ai_import', schemaSource, '')) {
-    return;
-  }
-  isImportingData.value = true;
-  statusMessage.value = 'Importing with full AI conversion...';
-  errorMessage.value = '';
-  const currentSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
-
-  dataImportAiService
-    .performFullAiImport(
-      uploadedContent.value,
-      schemaSource,
-      currentSchema,
-      backendDisplayText.value,
-      backendPromptHint.value,
-      userComments.value
-    )
-    .then(result => {
-      handleImportResult(result, schemaSource, 'full_ai_import', '');
-    })
-    .finally(() => {
-      isImportingData.value = false;
-    });
+  await runImport(
+    'full_ai_import',
+    getEditorSnapshot(),
+    'Importing with full AI conversion...',
+    (schemaSource, currentSchema) =>
+      runFullAiImport({
+        inputDocument: uploadedContent.value,
+        schemaSource,
+        currentSchema,
+        backendDisplayText: backendDisplayText.value,
+        backendPromptHint: backendPromptHint.value,
+        userComments: userComments.value,
+      })
+  );
 }
 
 function importData() {
@@ -644,27 +593,10 @@ function importData() {
     importDirectlyParsedJson();
     return;
   }
-  importWithAi();
+  importWithGeneratedScript();
 }
 
 defineExpose({show: openDialog, close: hideDialog});
-
-const suggestionButtonLabel = computed(() =>
-  hasValidationErrorForSuggestion.value
-    ? 'Regenerate Suggestion for Previous Error'
-    : selectedImportMode.value === 'ai_normalize_parsed'
-    ? 'Generate AI Normalization JavaScript'
-    : 'Generate JavaScript Suggestion'
-);
-const importButtonLabel = computed(() =>
-  pendingImportConfirmation.value
-    ? 'Import Anyway'
-    : selectedImportMode.value === 'full_ai_import'
-    ? 'Import with Full AI (No JS)'
-    : selectedImportMode.value === 'direct_parse' && canUseDirectParse.value
-    ? 'Import Directly (No AI Call)'
-    : 'Import Data'
-);
 </script>
 
 <template>
@@ -693,13 +625,9 @@ const importButtonLabel = computed(() =>
         configured. Backend parsing and manual JavaScript import remain available.
       </Message>
 
-      <Message severity="info">
-        {{ formatProcessingFallbackNotice }}
-      </Message>
-
       <div class="flex items-center gap-2">
         <label class="font-semibold">Schema Source</label>
-        <Select v-model="selectedSchemaSource" :options="schemaSourceOptions" class="flex-1" />
+        <Select v-model="selectedSchemaSource" :options="SCHEMA_SOURCE_OPTIONS" class="flex-1" />
       </div>
       <p class="text-sm text-gray-400">
         Choose whether the import should infer a schema from the uploaded data or use the schema
@@ -764,7 +692,7 @@ const importButtonLabel = computed(() =>
 
       <div class="mt-6" v-if="usesJavascriptStep">
         <Divider />
-        <label :for="editorId" class="block font-semibold mb-2">Generated JavaScript</label>
+        <label :for="editorElementId" class="block font-semibold mb-2">Generated JavaScript</label>
         <Message severity="info" :closable="false" class="mb-3">
           JavaScript runs in an isolated worker. Network access, imports, browser storage, DOM
           access, dynamic code, and long-running execution are blocked.
@@ -776,7 +704,7 @@ const importButtonLabel = computed(() =>
           auto-resize
           placeholder="function transform(input) {\n  return input;\n}" />
         <div v-else class="border rounded h-72 overflow-hidden">
-          <div :id="editorId" class="h-full w-full" />
+          <div :id="editorElementId" class="h-full w-full" />
         </div>
       </div>
 

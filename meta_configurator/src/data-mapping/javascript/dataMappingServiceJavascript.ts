@@ -1,76 +1,52 @@
-import type {
-  DataMappingService,
-  DataMappingSuggestionRetryContext,
-} from '@/data-mapping/dataMappingService';
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {DataMappingResult, DataMappingService} from '@/data-mapping/dataMappingService';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import {cloneDeep} from 'lodash';
-import {generateJavascriptSchemaMappingSuggestion} from '@/data-mapping/javascript/generateJavascriptSchemaMappingSuggestion';
-import {getBackendPreprocessedInputForAi} from '@/data-mapping/getBackendPreprocessedInputForAi';
 import {executeSandboxedJavascriptTransform} from '@/utility/sandboxedJavascript';
+import {fixGeneratedJavascript} from '@/components/panels/ai-prompts/aiPromptUtils';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 export class DataMappingServiceJavascript implements DataMappingService {
-  async generateMappingSuggestion(
-    input: any,
-    targetSchema: TopLevelSchema,
-    userComments: string,
-    retryContext?: DataMappingSuggestionRetryContext
-  ): Promise<{config: string; success: boolean; message: string}> {
-    const preview = await getBackendPreprocessedInputForAi(input, 'json');
-    return generateJavascriptSchemaMappingSuggestion(
-      preview.inputPreview,
-      targetSchema,
-      userComments,
-      retryContext,
-      preview.backendDisplayText,
-      preview.backendPromptHint
-    );
-  }
-
   async performDataMapping(
-    input: any,
-    config: string
-  ): Promise<{resultData: any; success: boolean; message: string}> {
+    inputData: unknown,
+    mappingConfiguration: string
+  ): Promise<DataMappingResult> {
     try {
-      const sanitizedConfig = this.sanitizeMappingConfig(config, input);
-      const result = await executeSandboxedJavascriptTransform(sanitizedConfig, input);
+      const mappingResultData = await executeSandboxedJavascriptTransform(
+        fixGeneratedJavascript(mappingConfiguration),
+        inputData
+      );
       return {
-        resultData: result,
+        resultData: mappingResultData,
         success: true,
         message: 'Data mapping performed successfully.',
       };
-    } catch (e: any) {
+    } catch (error) {
       return {
         resultData: {},
         success: false,
-        message: `Data mapping failed. Reason: ${e?.message ?? String(e)}.`,
+        message: `Data mapping failed. Reason: ${getErrorMessage(error)}.`,
       };
     }
   }
 
-  sanitizeInputDocument(input: any): any {
-    return cloneDeep(input);
-  }
-
-  sanitizeMappingConfig(config: string, _input: any): string {
-    return config
-      .replace(/```(javascript|js)?/gi, '')
-      .replace(/```/g, '')
-      .trim();
+  sanitizeInputDocument(inputData: unknown): unknown {
+    return cloneDeep(inputData);
   }
 
   async validateMappingConfig(
-    config: string,
-    input: any
+    mappingConfiguration: string,
+    inputData: unknown
   ): Promise<{success: boolean; message: string}> {
-    const inputDataSubset = trimDataToMaxSize(input);
+    const inputDataSubset = trimDataToMaxSize(inputData);
 
     try {
-      const sanitizedConfig = this.sanitizeMappingConfig(config, inputDataSubset);
-      await executeSandboxedJavascriptTransform(sanitizedConfig, inputDataSubset);
+      await executeSandboxedJavascriptTransform(
+        fixGeneratedJavascript(mappingConfiguration),
+        inputDataSubset
+      );
       return {success: true, message: 'Mapping configuration is valid.'};
-    } catch (e: any) {
-      return {success: false, message: `Error: ${e?.message ?? String(e)}`};
+    } catch (error) {
+      return {success: false, message: `Error: ${getErrorMessage(error)}`};
     }
   }
 }

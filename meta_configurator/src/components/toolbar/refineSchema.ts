@@ -5,55 +5,33 @@ import {runSchemaRefinement} from '@/schema/refinement/runSchemaRefinement';
 import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes';
 import {ValidationService} from '@/schema/validationService';
 import {toastService} from '@/utility/toastService';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
-function buildRefinedSchemaCandidate(selection: RefineSchemaSelection): TopLevelSchema {
-  const currentSchema = getDataForMode(SessionMode.SchemaEditor).data.value as TopLevelSchema;
-  const currentData = getDataForMode(SessionMode.DataEditor).data.value;
-
-  return runSchemaRefinement(currentSchema, currentData, selection);
-}
-
-function formatValidationErrors(errors: {instancePath?: string; message?: string}[]): string {
-  return errors
-    .slice(0, 3)
-    .map(error => {
-      const location =
-        error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/';
-      const message = error.message ?? 'Unknown validation error';
-      return `${location}: ${message}`;
-    })
-    .join(' | ');
-}
-
-function tryCommitRefinedSchema(candidateSchema: TopLevelSchema): boolean {
-  const currentData = getDataForMode(SessionMode.DataEditor).data.value;
+/**
+ * Refines the current schema and applies it, but only if the current data still
+ * validates against it. Returns whether the refined schema was applied.
+ */
+export function applySchemaRefinements(selection: RefineSchemaSelection): boolean {
   const schemaEditorData = getDataForMode(SessionMode.SchemaEditor);
+  const currentData = getDataForMode(SessionMode.DataEditor).data.value;
+  const refinedSchema = runSchemaRefinement(
+    schemaEditorData.data.value as TopLevelSchema,
+    currentData,
+    selection
+  );
 
-  try {
-    const validationResult = new ValidationService(candidateSchema).validate(currentData);
-    if (!validationResult.valid) {
-      toastService.add({
-        severity: 'error',
-        summary: 'Schema not applied',
-        detail: `The refined schema does not match the current data. ${formatValidationErrors(
-          validationResult.errors
-        )}`,
-        life: 7000,
-      });
-      return false;
-    }
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+  const rejectionReason = getSchemaRejectionReason(refinedSchema, currentData);
+  if (rejectionReason) {
     toastService.add({
       severity: 'error',
       summary: 'Schema not applied',
-      detail: `The refined schema could not be validated: ${message}`,
+      detail: rejectionReason,
       life: 7000,
     });
     return false;
   }
 
-  schemaEditorData.setData(candidateSchema);
+  schemaEditorData.setData(refinedSchema);
   toastService.add({
     severity: 'success',
     summary: 'Schema applied',
@@ -63,7 +41,30 @@ function tryCommitRefinedSchema(candidateSchema: TopLevelSchema): boolean {
   return true;
 }
 
-export function applySchemaRefinements(selection: RefineSchemaSelection): boolean {
-  const refinedSchemaCandidate = buildRefinedSchemaCandidate(selection);
-  return tryCommitRefinedSchema(refinedSchemaCandidate);
+/** Returns why the refined schema must not be applied, or null when it is fine. */
+function getSchemaRejectionReason(
+  candidateSchema: TopLevelSchema,
+  currentData: unknown
+): string | null {
+  try {
+    const validationResult = new ValidationService(candidateSchema).validate(currentData);
+    if (validationResult.valid) {
+      return null;
+    }
+    return `The refined schema does not match the current data. ${formatValidationErrors(
+      validationResult.errors
+    )}`;
+  } catch (error) {
+    return `The refined schema could not be validated: ${getErrorMessage(error)}`;
+  }
+}
+
+function formatValidationErrors(errors: {instancePath?: string; message?: string}[]): string {
+  return errors
+    .slice(0, 3)
+    .map(error => {
+      const location = error.instancePath?.length ? error.instancePath : '/';
+      return `${location}: ${error.message ?? 'Unknown validation error'}`;
+    })
+    .join(' | ');
 }

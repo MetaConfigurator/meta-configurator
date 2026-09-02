@@ -1,7 +1,8 @@
 import {inferSchema} from '@jsonhero/schema-infer';
-import type {JsonSchemaType} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import {useSettings} from '@/settings/useSettings';
+import {JsonSchemaVisitor} from '@/schema/jsonSchemaVisitor';
 
 export function inferJsonSchema(sampleData: any): JsonSchemaType {
   return inferJsonSchemaFromMultiple([sampleData]);
@@ -29,16 +30,15 @@ export function inferJsonSchemaFromMultiple(samples: any[]): JsonSchemaType {
   return fixEmptyArraySchemas(inference!.toJSONSchema());
 }
 
-function fixEmptyArraySchemas(schema: any): any {
-  // schemas inferred from empty arrays have "items": false, which is not very useful and can break downstream logic
-  // instead, we change it to "items": true, which means "any type"
-  if (schema && typeof schema === 'object') {
+export function fixEmptyArraySchemas(schema: JsonSchemaType): JsonSchemaType {
+  new EmptyArraySchemaVisitor(false).traverse(schema);
+  return schema;
+}
+
+class EmptyArraySchemaVisitor extends JsonSchemaVisitor {
+  protected visitSchema(schema: JsonSchemaObjectType): void {
     if (schema.type === 'array' && schema.items === false) {
-      schema.items = true; // means “any type”
-    }
-    for (const key of Object.keys(schema)) {
-      schema[key] = fixEmptyArraySchemas(schema[key]);
+      schema.items = true;
     }
   }
-  return schema;
 }

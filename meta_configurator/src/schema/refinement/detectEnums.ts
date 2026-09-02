@@ -1,38 +1,32 @@
-import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType';
 import type {
   DetectEnumsOptions,
   RefineSchemaAllowedType,
 } from '@/schema/refinement/refineSchemaTypes';
 import {
-  collectArrayItemSamples,
-  collectObjectSamples,
-  collectPropertySamples,
-  getMatchingPatternPropertyNames,
+  dropExamplesFromFixedValueSchema,
   getValueType,
-  isSchemaObject,
   schemaAllowsValueType,
+  uniqueByJsonValue,
+  visitSchemaWithSamples,
 } from '@/schema/refinement/refineSchemaHelpers';
 
-export function detectEnumsInSchema(
-  schema: TopLevelSchema,
-  data: unknown,
-  options: DetectEnumsOptions
-): TopLevelSchema {
-  return detectEnumsInSchemaFromSamples(schema, [data], options);
-}
+const ENUM_CANDIDATE_TYPES = new Set(['string', 'integer', 'boolean']);
 
 export function detectEnumsInSchemaFromSamples(
   schema: TopLevelSchema,
   samples: unknown[],
   options: DetectEnumsOptions
 ): TopLevelSchema {
-  visitSchemaAndSamples(schema, samples, (schemaNode, samplesForNode) => {
-    if (schemaNode.enum || schemaNode.const !== undefined) {
-      delete schemaNode.examples;
+  visitSchemaWithSamples(schema, samples, (schemaNode, samplesForNode) => {
+    if (dropExamplesFromFixedValueSchema(schemaNode)) {
       return;
     }
 
-    const enumValues = detectEnumValues(schemaNode, samplesForNode, options);
+    const primitiveSamples = samplesForNode.filter(sample =>
+      ENUM_CANDIDATE_TYPES.has(getValueType(sample))
+    );
+    const enumValues = detectEnumValues(schemaNode, primitiveSamples, options);
     if (enumValues !== null) {
       schemaNode.enum = enumValues;
       delete schemaNode.examples;
@@ -42,6 +36,10 @@ export function detectEnumsInSchemaFromSamples(
   return schema;
 }
 
+/**
+ * Returns the enum values the samples justify, or null when they look too varied,
+ * too few, too repetitive-free or of a type the schema or the options do not allow.
+ */
 function detectEnumValues(
   schemaNode: JsonSchemaObjectType,
   samples: unknown[],
@@ -64,17 +62,7 @@ function detectEnumValues(
     return null;
   }
 
-  const uniqueValues: unknown[] = [];
-  const seen = new Set<string>();
-  for (const sample of samples) {
-    const key = JSON.stringify(sample);
-    if (seen.has(key)) {
-      continue;
-    }
-    seen.add(key);
-    uniqueValues.push(sample);
-  }
-
+  const uniqueValues = uniqueByJsonValue(samples);
   if (uniqueValues.length > options.maxUniqueValues) {
     return null;
   }
@@ -85,83 +73,4 @@ function detectEnumValues(
   }
 
   return uniqueValues;
-}
-
-function visitSchemaAndSamples(
-  schema: JsonSchemaType,
-  samples: unknown[],
-  visitor: (schemaNode: JsonSchemaObjectType, samples: unknown[]) => void
-) {
-  if (!isSchemaObject(schema)) {
-    return;
-  }
-
-  const primitiveSamples = samples.filter(sample => {
-    const valueType = getValueType(sample);
-    return valueType === 'string' || valueType === 'integer' || valueType === 'boolean';
-  });
-  visitor(schema, primitiveSamples);
-
-  if (schema.properties) {
-    const objectSamples = collectObjectSamples(samples);
-    for (const [propertyName, propertySchema] of Object.entries(schema.properties)) {
-      visitSchemaAndSamples(
-        propertySchema,
-        collectPropertySamples(objectSamples, propertyName),
-        visitor
-      );
-    }
-  }
-
-  if (schema.patternProperties) {
-    const objectSamples = collectObjectSamples(samples);
-    for (const [pattern, patternSchema] of Object.entries(schema.patternProperties)) {
-      const regex = new RegExp(pattern);
-      const patternSamples = objectSamples.flatMap(sample =>
-        Object.entries(sample)
-          .filter(([key]) => regex.test(key))
-          .map(([, value]) => value)
-      );
-      visitSchemaAndSamples(patternSchema, patternSamples, visitor);
-    }
-  }
-
-  if (schema.additionalProperties !== undefined) {
-    const objectSamples = collectObjectSamples(samples);
-    const explicitProperties = new Set(Object.keys(schema.properties ?? {}));
-    const additionalPropertySamples = objectSamples.flatMap(sample => {
-      const matchingPatternPropertyNames = getMatchingPatternPropertyNames(
-        Object.keys(sample),
-        schema.patternProperties
-      );
-      return Object.entries(sample)
-        .filter(([key]) => !explicitProperties.has(key) && !matchingPatternPropertyNames.has(key))
-        .map(([, value]) => value);
-    });
-    visitSchemaAndSamples(schema.additionalProperties, additionalPropertySamples, visitor);
-  }
-
-  if (schema.items !== undefined) {
-    visitSchemaAndSamples(schema.items, collectArrayItemSamples(samples), visitor);
-  }
-
-  if (schema.prefixItems) {
-    const arraySamples = samples.filter(Array.isArray);
-    schema.prefixItems.forEach((prefixSchema, index) => {
-      const prefixSamples = arraySamples
-        .filter(sample => index < sample.length)
-        .map(sample => sample[index]);
-      visitSchemaAndSamples(prefixSchema, prefixSamples, visitor);
-    });
-  }
-
-  for (const schemaList of [schema.allOf, schema.anyOf, schema.oneOf]) {
-    schemaList?.forEach(childSchema => visitSchemaAndSamples(childSchema, samples, visitor));
-  }
-
-  for (const childSchema of [schema.if, schema.then, schema.else, schema.not, schema.contains]) {
-    if (childSchema !== undefined) {
-      visitSchemaAndSamples(childSchema, samples, visitor);
-    }
-  }
 }

@@ -1,7 +1,8 @@
+import ast
 import re
 from dataclasses import dataclass
 from datetime import date, datetime, time
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Collection, Dict, List, Optional, Sequence
 
 try:
     import yaml
@@ -69,7 +70,12 @@ class ParserAttempt:
     parser_name: str
 
 
-def _get_extension(file_name: str) -> str:
+def has_ini_style_section_headers(content: str) -> bool:
+    """Whether the content contains "[section]" lines, which rule out flat key-value formats."""
+    return re.search(r"^\s*\[.+\]\s*$", content, flags=re.MULTILINE) is not None
+
+
+def get_file_extension(file_name: str) -> str:
     if not isinstance(file_name, str):
         return ""
     file_name = file_name.strip().lower()
@@ -78,20 +84,78 @@ def _get_extension(file_name: str) -> str:
     return file_name.rsplit(".", 1)[1]
 
 
-def _tree_sitter_node_text(node: Any, source_bytes: bytes) -> str:
+def matches_source_patterns(
+    content: str,
+    source_patterns: Sequence[str],
+    *,
+    maximum_characters: int = 12000,
+) -> bool:
+    content_prefix = content[:maximum_characters]
+    return any(
+        re.search(pattern, content_prefix, flags=re.MULTILINE) is not None
+        for pattern in source_patterns
+    )
+
+
+def get_tree_sitter_node_text(node: Any, source_bytes: bytes) -> str:
     return source_bytes[node.start_byte : node.end_byte].decode(
         "utf-8", errors="replace"
     )
 
 
-def _compact_tree_text(text: str, max_length: int = 200) -> str:
+def find_first_named_child(
+    parent_node: Any,
+    child_types: Collection[str],
+) -> Optional[Any]:
+    return next(
+        (
+            child_node
+            for child_node in getattr(parent_node, "named_children", [])
+            if child_node.type in child_types
+        ),
+        None,
+    )
+
+
+def compact_tree_text(text: str, max_length: int = 200) -> str:
     compact = re.sub(r"\s+", " ", text.strip())
     if len(compact) <= max_length:
         return compact
     return compact[: max_length - 3] + "..."
 
 
-def _normalize_comment_text(text: str) -> str:
+def extract_compact_named_child_texts(
+    parent_node: Any,
+    source_bytes: bytes,
+    *,
+    included_child_types: Optional[Collection[str]] = None,
+) -> List[str]:
+    if parent_node is None:
+        return []
+    return [
+        compact_tree_text(get_tree_sitter_node_text(child_node, source_bytes))
+        for child_node in getattr(parent_node, "named_children", [])
+        if included_child_types is None or child_node.type in included_child_types
+    ]
+
+
+def summarize_tree_sitter_node(
+    node: Any,
+    source_bytes: bytes,
+    *,
+    text_limit: int = 140,
+) -> Dict[str, Any]:
+    return {
+        "line": node.start_point.row + 1,
+        "type": node.type,
+        "text": compact_tree_text(
+            get_tree_sitter_node_text(node, source_bytes),
+            max_length=text_limit,
+        ),
+    }
+
+
+def normalize_comment_text(text: str) -> str:
     normalized = text.strip()
     if normalized.startswith("#"):
         return normalized[1:].strip()
@@ -105,27 +169,19 @@ def _normalize_comment_text(text: str) -> str:
     return normalized.strip()
 
 
-def _iter_named_descendants(node: Any):
+def iterate_named_descendants(node: Any):
     for child in getattr(node, "named_children", []):
         yield child
-        yield from _iter_named_descendants(child)
+        yield from iterate_named_descendants(child)
 
 
-def _coerce_literal(text: str) -> Any:
-    stripped = text.strip()
-    if len(stripped) >= 2 and stripped[0] == stripped[-1] and stripped[0] in {'"', "'"}:
-        return stripped[1:-1]
-    if re.fullmatch(r"-?\d+", stripped):
-        try:
-            return int(stripped)
-        except Exception:
-            return stripped
-    if re.fullmatch(r"-?\d+\.\d+(?:[eE][+-]?\d+)?", stripped):
-        try:
-            return float(stripped)
-        except Exception:
-            return stripped
-    return stripped
+def coerce_literal(text: str) -> Any:
+    """Turn source-literal text into the matching Python value, else the plain text."""
+    stripped_text = text.strip()
+    try:
+        return ast.literal_eval(stripped_text)
+    except (ValueError, SyntaxError, MemoryError, RecursionError):
+        return stripped_text
 
 
 def _count_tree_sitter_nodes(node: Any) -> Dict[str, int]:
@@ -142,7 +198,7 @@ def _count_tree_sitter_nodes(node: Any) -> Dict[str, int]:
     return {"named": named_nodes, "error": error_nodes, "total": total_nodes}
 
 
-def _serialize_tree_sitter_node(
+def serialize_tree_sitter_node(
     node: Any,
     source_bytes: bytes,
     *,
@@ -163,8 +219,8 @@ def _serialize_tree_sitter_node(
 
     named_children = list(getattr(node, "named_children", []))
     if len(named_children) == 0:
-        text = _compact_tree_text(
-            _tree_sitter_node_text(node, source_bytes), max_length=text_limit
+        text = compact_tree_text(
+            get_tree_sitter_node_text(node, source_bytes), max_length=text_limit
         )
         if text:
             serialized["text"] = text
@@ -173,14 +229,14 @@ def _serialize_tree_sitter_node(
     serialized["child_count"] = len(named_children)
     if depth >= max_depth:
         serialized["truncated"] = True
-        serialized["preview"] = _compact_tree_text(
-            _tree_sitter_node_text(node, source_bytes),
+        serialized["preview"] = compact_tree_text(
+            get_tree_sitter_node_text(node, source_bytes),
             max_length=text_limit,
         )
         return serialized
 
     children = [
-        _serialize_tree_sitter_node(
+        serialize_tree_sitter_node(
             child,
             source_bytes,
             depth=depth + 1,
@@ -201,7 +257,7 @@ def _serialize_tree_sitter_node(
     return serialized
 
 
-def _try_tree_sitter_source(
+def try_parse_with_tree_sitter(
     *,
     content: str,
     language: Any,
@@ -211,6 +267,7 @@ def _try_tree_sitter_source(
     format_name: str,
     parser_name: str,
     summarizer: Callable[[Any, bytes, Dict[str, int]], Dict[str, Any]],
+    minimum_named_nodes: int = 2,
 ) -> Optional[ParserAttempt]:
     if language is None or Parser is None:
         return None
@@ -224,34 +281,36 @@ def _try_tree_sitter_source(
     except Exception:
         return None
 
-    root = tree.root_node
-    if root is None or root.type != expected_root_type:
+    root_node = tree.root_node
+    if root_node is None or root_node.type != expected_root_type:
         return None
 
-    counts = _count_tree_sitter_nodes(root)
-    if counts["named"] < 2:
+    node_counts = _count_tree_sitter_nodes(root_node)
+    if node_counts["named"] < minimum_named_nodes:
         return None
-    if counts["error"] > max(3, counts["named"] // 2):
+    if node_counts["error"] > max(3, node_counts["named"] // 2):
         return None
 
-    top_level_types = {child.type for child in getattr(root, "named_children", [])}
+    top_level_types = {
+        child.type for child in getattr(root_node, "named_children", [])
+    }
     if required_top_level_types and not (top_level_types & required_top_level_types):
         return None
 
     return ParserAttempt(
         format=format_name,
-        parsed_json=summarizer(root, source_bytes, counts),
+        parsed_json=summarizer(root_node, source_bytes, node_counts),
         parser_name=parser_name,
     )
 
 
-def _to_json_safe(value: Any) -> Any:
+def to_json_safe(value: Any) -> Any:
     if isinstance(value, dict):
-        return {str(k): _to_json_safe(v) for k, v in value.items()}
+        return {str(k): to_json_safe(v) for k, v in value.items()}
     if isinstance(value, list):
-        return [_to_json_safe(v) for v in value]
+        return [to_json_safe(v) for v in value]
     if isinstance(value, tuple):
-        return [_to_json_safe(v) for v in value]
+        return [to_json_safe(v) for v in value]
     if isinstance(value, (datetime, date, time)):
         return value.isoformat()
     if isinstance(value, (str, int, float, bool)) or value is None:

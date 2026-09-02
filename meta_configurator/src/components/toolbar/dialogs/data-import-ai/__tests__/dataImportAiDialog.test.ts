@@ -75,6 +75,7 @@ type MockEditor = {
     setMode: ReturnType<typeof vi.fn>;
     setUseWorker: ReturnType<typeof vi.fn>;
   };
+  on: ReturnType<typeof vi.fn>;
   getValue: ReturnType<typeof vi.fn>;
   setValue: ReturnType<typeof vi.fn>;
   state: {currentValue: string};
@@ -91,6 +92,7 @@ function createMockEditor(): MockEditor {
     container: {innerHTML: ''},
     destroy: vi.fn(),
     getSession: () => session,
+    on: vi.fn(),
     getValue: vi.fn(() => state.currentValue),
     setValue: vi.fn((value: string) => {
       state.currentValue = value;

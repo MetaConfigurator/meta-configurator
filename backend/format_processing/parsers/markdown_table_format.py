@@ -1,49 +1,58 @@
+import re
 from typing import List, Optional
 
+from markdown_it import MarkdownIt
+
 from format_detection_core import ParserAttempt
-from parsers.common_preprocess import preprocess_data_for_ai
-from parsers.tabular_utils import (
-    is_markdown_separator_row,
-    rows_to_objects_or_arrays,
-    split_markdown_table_row,
-)
+from parsers.tabular_utils import rows_to_objects_or_arrays
+
+
+MARKDOWN_PARSER = MarkdownIt().enable("table")
+
+
+def looks_like_markdown_table(content: str) -> bool:
+    """Cheap pre-check that avoids a full Markdown parse during format detection."""
+    return bool(
+        re.search(r"^\s*\|.+\|\s*$", content, flags=re.MULTILINE)
+        and re.search(
+            r"^\s*\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?\s*$",
+            content,
+            flags=re.MULTILINE,
+        )
+    )
+
+
+def _extract_first_table_rows(content: str) -> Optional[List[List[str]]]:
+    """Return the cells of the first GFM table, header row first."""
+    rows: List[List[str]] = []
+    current_row: Optional[List[str]] = None
+    inside_table = False
+
+    for token in MARKDOWN_PARSER.parse(content):
+        if token.type == "table_open":
+            inside_table = True
+        elif token.type == "table_close":
+            return rows or None
+        elif not inside_table:
+            continue
+        elif token.type == "tr_open":
+            current_row = []
+        elif token.type == "tr_close" and current_row is not None:
+            rows.append(current_row)
+            current_row = None
+        elif token.type == "inline" and current_row is not None:
+            current_row.append(token.content.strip())
+
+    return None
 
 
 def parse_data(content: str) -> Optional[ParserAttempt]:
-    lines = [line.rstrip() for line in content.splitlines()]
-    for index in range(len(lines) - 2):
-        header_line = lines[index].strip()
-        separator_line = lines[index + 1].strip()
-        if "|" not in header_line or "|" not in separator_line:
-            continue
+    rows = _extract_first_table_rows(content)
+    if rows is None or len(rows) < 2 or len(rows[0]) < 2:
+        return None
 
-        header_cells = split_markdown_table_row(header_line)
-        separator_cells = split_markdown_table_row(separator_line)
-        if len(header_cells) < 2 or len(header_cells) != len(separator_cells):
-            continue
-        if not is_markdown_separator_row(separator_cells):
-            continue
-
-        data_lines: List[str] = []
-        cursor = index + 2
-        while cursor < len(lines):
-            candidate = lines[cursor].strip()
-            if not candidate or "|" not in candidate:
-                break
-            candidate_cells = split_markdown_table_row(candidate)
-            if len(candidate_cells) != len(header_cells):
-                break
-            data_lines.append(candidate)
-            cursor += 1
-
-        if len(data_lines) == 0:
-            continue
-
-        rows = [header_cells, *[split_markdown_table_row(line) for line in data_lines]]
-        return ParserAttempt(
-            format="markdown_table",
-            parsed_json=rows_to_objects_or_arrays(rows),
-            parser_name="markdown-table-parser",
-        )
-
-    return None
+    return ParserAttempt(
+        format="markdown_table",
+        parsed_json=rows_to_objects_or_arrays(rows),
+        parser_name="markdown-it-py",
+    )

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
+import {ref} from 'vue';
+import {cloneDeep} from 'lodash';
 import Checkbox from 'primevue/checkbox';
 import InputNumber from 'primevue/inputnumber';
-import Panel from 'primevue/panel';
+import RefinementOptionPanel from '@/components/toolbar/dialogs/shared/RefinementOptionPanel.vue';
 import {
   ADD_EXAMPLES_DEFAULTS,
   DETECT_ADDITIONAL_PROPERTIES_DEFAULTS,
@@ -27,52 +28,17 @@ const props = withDefaults(
   }
 );
 
+const selectableEnumTypes: RefineSchemaAllowedType[] = ['string', 'integer', 'boolean'];
+
 const enableSortSchemaPropertiesAlphabetically = ref(false);
 const enableAddExamples = ref(false);
 const enableDetectEnums = ref(false);
 const enableDetectAdditionalProperties = ref(false);
 const enableExtractSubSchemasIntoReferences = ref(false);
 
-const addExamples = ref(createAddExamplesState());
-const detectEnums = ref(createDetectEnumsState());
-const detectAdditionalProperties = ref(createDetectAdditionalPropertiesState());
-
-const hasSelectedRefinementsState = computed(
-  () =>
-    enableSortSchemaPropertiesAlphabetically.value ||
-    enableAddExamples.value ||
-    enableDetectEnums.value ||
-    enableDetectAdditionalProperties.value ||
-    enableExtractSubSchemasIntoReferences.value
-);
-
-const allowedTypes: RefineSchemaAllowedType[] = ['string', 'integer', 'boolean'];
-
-function createAddExamplesState() {
-  return {
-    maxExamplesPerField: ADD_EXAMPLES_DEFAULTS.maxExamplesPerField,
-    uniqueOnly: ADD_EXAMPLES_DEFAULTS.uniqueOnly,
-    ignoreNullValues: ADD_EXAMPLES_DEFAULTS.ignoreNullValues,
-  };
-}
-
-function createDetectEnumsState() {
-  return {
-    minObservedValues: DETECT_ENUMS_DEFAULTS.minObservedValues,
-    minDuplicateRatio: DETECT_ENUMS_DEFAULTS.minDuplicateRatio,
-    maxUniqueValues: DETECT_ENUMS_DEFAULTS.maxUniqueValues,
-    allowedTypes: [...DETECT_ENUMS_DEFAULTS.allowedTypes],
-  };
-}
-
-function createDetectAdditionalPropertiesState() {
-  return {
-    minProperties: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.minProperties,
-    similarityThreshold: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.similarityThreshold,
-    minMatchingSubProperties: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.minMatchingSubProperties,
-    requireSameValueType: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS.requireSameValueType,
-  };
-}
+const addExamples = ref(cloneDeep(ADD_EXAMPLES_DEFAULTS));
+const detectEnums = ref(cloneDeep(DETECT_ENUMS_DEFAULTS));
+const detectAdditionalProperties = ref(cloneDeep(DETECT_ADDITIONAL_PROPERTIES_DEFAULTS));
 
 function fieldId(suffix: string): string {
   return `${props.idPrefix}-${suffix}`;
@@ -85,50 +51,36 @@ function reset() {
   enableDetectAdditionalProperties.value = false;
   enableExtractSubSchemasIntoReferences.value = false;
 
-  addExamples.value = createAddExamplesState();
-  detectEnums.value = createDetectEnumsState();
-  detectAdditionalProperties.value = createDetectAdditionalPropertiesState();
+  addExamples.value = cloneDeep(ADD_EXAMPLES_DEFAULTS);
+  detectEnums.value = cloneDeep(DETECT_ENUMS_DEFAULTS);
+  detectAdditionalProperties.value = cloneDeep(DETECT_ADDITIONAL_PROPERTIES_DEFAULTS);
 }
 
 function hasSelectedRefinements(): boolean {
-  return hasSelectedRefinementsState.value;
+  return (
+    enableSortSchemaPropertiesAlphabetically.value ||
+    enableAddExamples.value ||
+    enableDetectEnums.value ||
+    enableDetectAdditionalProperties.value ||
+    enableExtractSubSchemasIntoReferences.value
+  );
 }
 
 function buildSelection(): RefineSchemaSelection {
   return {
     sortSchemaPropertiesAlphabetically: enableSortSchemaPropertiesAlphabetically.value
-      ? SORT_SCHEMA_PROPERTIES_DEFAULTS
+      ? cloneDeep(SORT_SCHEMA_PROPERTIES_DEFAULTS)
       : undefined,
-    addExamples: enableAddExamples.value
-      ? {
-          maxExamplesPerField: addExamples.value.maxExamplesPerField,
-          uniqueOnly: addExamples.value.uniqueOnly,
-          ignoreNullValues: addExamples.value.ignoreNullValues,
-        }
-      : undefined,
-    detectEnums: enableDetectEnums.value
-      ? {
-          minObservedValues: detectEnums.value.minObservedValues,
-          minDuplicateRatio: detectEnums.value.minDuplicateRatio,
-          maxUniqueValues: detectEnums.value.maxUniqueValues,
-          allowedTypes: [...detectEnums.value.allowedTypes],
-        }
-      : undefined,
+    addExamples: enableAddExamples.value ? cloneDeep(addExamples.value) : undefined,
+    detectEnums: enableDetectEnums.value ? cloneDeep(detectEnums.value) : undefined,
     detectAdditionalProperties: enableDetectAdditionalProperties.value
-      ? {
-          minProperties: detectAdditionalProperties.value.minProperties,
-          similarityThreshold: detectAdditionalProperties.value.similarityThreshold,
-          minMatchingSubProperties: detectAdditionalProperties.value.minMatchingSubProperties,
-          requireSameValueType: detectAdditionalProperties.value.requireSameValueType,
-        }
+      ? cloneDeep(detectAdditionalProperties.value)
       : undefined,
     extractSubSchemasIntoReferences: enableExtractSubSchemasIntoReferences.value
-      ? EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS
+      ? cloneDeep(EXTRACT_SUB_SCHEMAS_INTO_REFERENCES_DEFAULTS)
       : undefined,
   };
 }
-
-reset();
 
 defineExpose<SchemaRefinementOptionsController>({
   reset,
@@ -139,38 +91,21 @@ defineExpose<SchemaRefinementOptionsController>({
 
 <template>
   <div class="refinement-list">
-    <Panel class="refinement-panel">
-      <template #header>
-        <div class="refinement-title-row">
-          <Checkbox
-            v-model="enableSortSchemaPropertiesAlphabetically"
-            binary
-            :input-id="fieldId('sort-schema-properties-alphabetically')" />
-          <label class="refinement-title" :for="fieldId('sort-schema-properties-alphabetically')">
-            Sort Schema Properties Alphabetically
-          </label>
-        </div>
-      </template>
+    <RefinementOptionPanel
+      v-model:enabled="enableSortSchemaPropertiesAlphabetically"
+      title="Sort Schema Properties Alphabetically"
+      :input-id="fieldId('sort-schema-properties-alphabetically')">
+      Sort schema keys recursively, including <code>properties</code>,
+      <code>patternProperties</code>, <code>dependentSchemas</code>, and <code>$defs</code>.
+    </RefinementOptionPanel>
 
-      <p class="refinement-description">
-        Sort schema keys recursively, including <code>properties</code>,
-        <code>patternProperties</code>, <code>dependentSchemas</code>, and <code>$defs</code>.
-      </p>
-    </Panel>
+    <RefinementOptionPanel
+      v-model:enabled="enableAddExamples"
+      title="Add Examples"
+      :input-id="fieldId('add-examples')">
+      {{ addExamplesDescription }}
 
-    <Panel class="refinement-panel">
-      <template #header>
-        <div class="refinement-title-row">
-          <Checkbox v-model="enableAddExamples" binary :input-id="fieldId('add-examples')" />
-          <label class="refinement-title" :for="fieldId('add-examples')">Add Examples</label>
-        </div>
-      </template>
-
-      <p class="refinement-description">
-        {{ addExamplesDescription }}
-      </p>
-
-      <div v-if="enableAddExamples" class="parameter-grid">
+      <template #parameters>
         <div class="parameter-field">
           <label :for="fieldId('add-examples-max')">Max examples per field</label>
           <InputNumber
@@ -196,22 +131,16 @@ defineExpose<SchemaRefinementOptionsController>({
             :input-id="fieldId('add-examples-ignore-null')" />
           <label :for="fieldId('add-examples-ignore-null')">Ignore null values</label>
         </div>
-      </div>
-    </Panel>
-
-    <Panel class="refinement-panel">
-      <template #header>
-        <div class="refinement-title-row">
-          <Checkbox v-model="enableDetectEnums" binary :input-id="fieldId('detect-enums')" />
-          <label class="refinement-title" :for="fieldId('detect-enums')">Detect Enums</label>
-        </div>
       </template>
+    </RefinementOptionPanel>
 
-      <p class="refinement-description">
-        Detect fields with a small repeating value set and turn them into schema enums.
-      </p>
+    <RefinementOptionPanel
+      v-model:enabled="enableDetectEnums"
+      title="Detect Enums"
+      :input-id="fieldId('detect-enums')">
+      Detect fields with a small repeating value set and turn them into schema enums.
 
-      <div v-if="enableDetectEnums" class="parameter-grid">
+      <template #parameters>
         <div class="parameter-field">
           <label :for="fieldId('detect-enums-min-observed')">Minimum observed values</label>
           <InputNumber
@@ -248,7 +177,10 @@ defineExpose<SchemaRefinementOptionsController>({
         <div class="parameter-types">
           <span class="parameter-label">Allowed types</span>
           <div class="type-checkbox-list">
-            <div v-for="allowedType in allowedTypes" :key="allowedType" class="parameter-checkbox">
+            <div
+              v-for="allowedType in selectableEnumTypes"
+              :key="allowedType"
+              class="parameter-checkbox">
               <Checkbox
                 v-model="detectEnums.allowedTypes"
                 :input-id="fieldId(`detect-enums-${allowedType}`)"
@@ -257,28 +189,17 @@ defineExpose<SchemaRefinementOptionsController>({
             </div>
           </div>
         </div>
-      </div>
-    </Panel>
-
-    <Panel class="refinement-panel">
-      <template #header>
-        <div class="refinement-title-row">
-          <Checkbox
-            v-model="enableDetectAdditionalProperties"
-            binary
-            :input-id="fieldId('detect-additional-properties')" />
-          <label class="refinement-title" :for="fieldId('detect-additional-properties')">
-            Detect Additional Properties
-          </label>
-        </div>
       </template>
+    </RefinementOptionPanel>
 
-      <p class="refinement-description">
-        Detect dynamic object keys that should be represented through
-        <code>additionalProperties</code>.
-      </p>
+    <RefinementOptionPanel
+      v-model:enabled="enableDetectAdditionalProperties"
+      title="Detect Additional Properties"
+      :input-id="fieldId('detect-additional-properties')">
+      Detect dynamic object keys that should be represented through
+      <code>additionalProperties</code>.
 
-      <div v-if="enableDetectAdditionalProperties" class="parameter-grid">
+      <template #parameters>
         <div class="parameter-field">
           <label :for="fieldId('detect-additional-min-properties')">
             Minimum number of properties
@@ -323,27 +244,16 @@ defineExpose<SchemaRefinementOptionsController>({
             :input-id="fieldId('detect-additional-same-type')" />
           <label :for="fieldId('detect-additional-same-type')">Require same value type</label>
         </div>
-      </div>
-    </Panel>
-
-    <Panel class="refinement-panel">
-      <template #header>
-        <div class="refinement-title-row">
-          <Checkbox
-            v-model="enableExtractSubSchemasIntoReferences"
-            binary
-            :input-id="fieldId('extract-sub-schemas-into-references')" />
-          <label class="refinement-title" :for="fieldId('extract-sub-schemas-into-references')">
-            Extract Sub-schemas into References
-          </label>
-        </div>
       </template>
+    </RefinementOptionPanel>
 
-      <p class="refinement-description">
-        Move inlined object and enum sub-schemas into <code>$defs</code> and replace them with
-        shared <code>$ref</code> references.
-      </p>
-    </Panel>
+    <RefinementOptionPanel
+      v-model:enabled="enableExtractSubSchemasIntoReferences"
+      title="Extract Sub-schemas into References"
+      :input-id="fieldId('extract-sub-schemas-into-references')">
+      Move inlined object and enum sub-schemas into <code>$defs</code> and replace them with shared
+      <code>$ref</code> references.
+    </RefinementOptionPanel>
   </div>
 </template>
 
@@ -352,34 +262,6 @@ defineExpose<SchemaRefinementOptionsController>({
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
-}
-
-.refinement-panel {
-  overflow: hidden;
-}
-
-.refinement-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.refinement-title {
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.refinement-description {
-  margin: 0;
-  color: var(--text-color-secondary);
-}
-
-.parameter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
 }
 
 .parameter-field,
@@ -403,5 +285,9 @@ defineExpose<SchemaRefinementOptionsController>({
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;
+}
+
+label {
+  font-size: 0.9rem;
 }
 </style>

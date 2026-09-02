@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, ref, watch, type Ref} from 'vue';
+import {computed, nextTick, ref, watch} from 'vue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -13,15 +13,11 @@ import {DataMappingServiceJavascript} from '@/data-mapping/javascript/dataMappin
 import {DataMappingServiceJsonata} from '@/data-mapping/jsonata/dataMappingServiceJsonata';
 import type {
   DataMappingService,
-  DataMappingSuggestionRetryContext,
+  GeneratedCodeRetryContext,
 } from '@/data-mapping/dataMappingService';
-import type {Editor} from 'brace';
-import * as ace from 'brace';
 import 'brace/mode/javascript';
 import 'brace/mode/jsoniq';
-import 'brace/mode/text';
-import {setupAceProperties} from '@/components/panels/shared-components/aceUtils';
-import {useSettings} from '@/settings/useSettings';
+import {useAceEditor} from '@/components/panels/shared-components/useAceEditor';
 import {useDebounceFn} from '@vueuse/core';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
@@ -41,6 +37,8 @@ import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes'
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {runSchemaRefinement} from '@/schema/refinement/runSchemaRefinement';
 import SchemaRefinementOptions from '@/components/toolbar/dialogs/shared/SchemaRefinementOptions.vue';
+import {hasJsonContent} from '@/utility/jsonCompatible';
+import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
 
 type MappingMethod = MappingGenerationMethod | 'direct-ai';
 
@@ -64,12 +62,15 @@ const mappingLanguageOptions: {label: string; value: MappingGenerationLanguage}[
   {label: 'JavaScript', value: 'javascript'},
 ];
 
+const editorModeByMappingLanguage: Record<MappingGenerationLanguage, string> = {
+  javascript: 'ace/mode/javascript',
+  jsonata: 'ace/mode/jsoniq',
+};
+
 const showDialog = ref(false);
-const editorId = 'data-mapping-' + Math.random();
-const editor: Ref<Editor | null> = ref(null);
-const rawInput = ref<unknown>({});
-const result = ref('');
-const resultIsValid = ref(false);
+const sourceData = ref<unknown>({});
+const generatedMappingConfiguration = ref('');
+const mappingConfigurationIsValid = ref(false);
 const statusMessage = ref('');
 const errorMessage = ref('');
 const userComments = ref('');
@@ -80,10 +81,9 @@ const lastFailedConfig = ref('');
 const selectedMappingMethod = ref<MappingMethod>('source-data');
 const selectedMappingLanguage = ref<MappingGenerationLanguage>('jsonata');
 const refinementOptions = ref<SchemaRefinementOptionsController | null>(null);
-let validationRunId = 0;
+let latestValidationRequestId = 0;
 
 const apiKey = getApiKeyRef();
-const settings = useSettings();
 const dataEditorLink = getDataForMode(SessionMode.DataEditor);
 const schemaEditorLink = getDataForMode(SessionMode.SchemaEditor);
 const canUseAi = computed(() => canQueryAi(apiKey.value));
@@ -96,10 +96,10 @@ const mappingService = computed<DataMappingService>(() =>
     ? new DataMappingServiceJavascript()
     : new DataMappingServiceJsonata()
 );
-const preparedInput = computed(() => mappingService.value.sanitizeInputDocument(rawInput.value));
-const hasCurrentData = computed(() => hasLoadedData(rawInput.value));
+const preparedInput = computed(() => mappingService.value.sanitizeInputDocument(sourceData.value));
+const hasCurrentData = computed(() => hasJsonContent(sourceData.value));
 const targetSchema = computed(() => schemaEditorLink.data.value as TopLevelSchema);
-const hasTargetSchema = computed(() => hasLoadedData(targetSchema.value));
+const hasTargetSchema = computed(() => !isSchemaEmpty(targetSchema.value));
 const hasSelectedRefinements = computed(
   () => refinementOptions.value?.hasSelectedRefinements() ?? false
 );
@@ -134,26 +134,32 @@ const apiKeyMessage = computed(() =>
     : 'Direct AI mapping is disabled until an AI endpoint or relay is configured.'
 );
 
-watch(result, newValue => {
-  if (newValue.length > 0 && editor.value) {
-    editor.value.setValue(newValue, -1);
+const {editorElementId, createEditor, destroyEditor, setEditorMode} = useAceEditor(
+  'data-mapping',
+  generatedMappingConfiguration,
+  {
+    mode: editorModeByMappingLanguage[selectedMappingLanguage.value],
+    onContentChanged: useDebounceFn(
+      (mappingConfiguration: string) => validateConfig(mappingConfiguration, preparedInput.value),
+      100
+    ),
   }
-});
+);
 
-watch(showDialog, async visible => {
-  if (visible) {
-    await nextTick();
-    initializeEditor();
-    refinementOptions.value?.reset();
-    if (result.value.length > 0) {
-      editor.value?.setValue(result.value, -1);
-    }
+watch(showDialog, async isDialogVisible => {
+  if (!isDialogVisible) {
+    destroyEditor();
+    return;
   }
+
+  await nextTick();
+  createEditor();
+  refinementOptions.value?.reset();
 });
 
 watch(selectedMappingLanguage, () => {
   clearSuggestionRetryContext();
-  updateEditorMode();
+  setEditorMode(editorModeByMappingLanguage[selectedMappingLanguage.value]);
   revalidateCurrentEditorContent();
 });
 
@@ -180,33 +186,24 @@ function resetDialog() {
   statusMessage.value = '';
   errorMessage.value = '';
   userComments.value = '';
-  rawInput.value = dataEditorLink.data.value;
-  result.value = '';
-  resultIsValid.value = false;
+  sourceData.value = dataEditorLink.data.value;
+  generatedMappingConfiguration.value = '';
+  mappingConfigurationIsValid.value = false;
   selectedMappingMethod.value = 'source-data';
   selectedMappingLanguage.value = 'jsonata';
   clearSuggestionRetryContext();
   refinementOptions.value?.reset();
-  editor.value?.setValue('', -1);
+}
+
+function showError(message: string) {
+  statusMessage.value = '';
+  errorMessage.value = message;
 }
 
 function clearSuggestionRetryContext() {
   hasValidationErrorForSuggestion.value = false;
   lastValidationError.value = '';
   lastFailedConfig.value = '';
-}
-
-function hasLoadedData(data: unknown): boolean {
-  if (data === null || data === undefined) {
-    return false;
-  }
-  if (Array.isArray(data)) {
-    return data.length > 0;
-  }
-  if (typeof data === 'object') {
-    return Object.keys(data).length > 0;
-  }
-  return true;
 }
 
 function shouldUseRetryContext(): boolean {
@@ -223,85 +220,43 @@ function saveSuggestionRetryContext(validationError: string, failedConfig: strin
   lastFailedConfig.value = failedConfig;
 }
 
-function initializeEditor() {
-  const container = document.getElementById(editorId);
-  if (!container) {
-    return;
-  }
-
-  if (editor.value) {
-    editor.value.destroy();
-    editor.value.container.innerHTML = '';
-    editor.value = null;
-  }
-
-  editor.value = ace.edit(editorId);
-  setupAceProperties(editor.value, settings.value);
-  updateEditorMode();
-  editor.value.getSession().setUseWorker(false);
-
-  editor.value.on(
-    'change',
-    useDebounceFn(() => {
-      const editorContent = editor.value?.getValue() ?? '';
-      validateConfig(editorContent, preparedInput.value);
-    }, 100)
-  );
-}
-
-function updateEditorMode() {
-  if (!editor.value) {
-    return;
-  }
-
-  if (selectedMappingLanguage.value === 'javascript') {
-    editor.value.getSession().setMode('ace/mode/javascript');
-  } else if (selectedMappingLanguage.value === 'jsonata') {
-    editor.value.getSession().setMode('ace/mode/jsoniq');
-  } else {
-    editor.value.getSession().setMode('ace/mode/text');
-  }
-}
-
-async function validateConfig(config: string, currentInput: unknown) {
-  const currentValidationRunId = ++validationRunId;
+async function validateConfig(mappingConfiguration: string, currentInput: unknown) {
+  const currentValidationRequestId = ++latestValidationRequestId;
   if (!usesMappingFunction.value) {
-    resultIsValid.value = false;
+    mappingConfigurationIsValid.value = false;
     return;
   }
 
-  const trimmedConfig = config.trim();
-  if (trimmedConfig.length === 0) {
-    resultIsValid.value = false;
+  const trimmedMappingConfiguration = mappingConfiguration.trim();
+  if (trimmedMappingConfiguration.length === 0) {
+    mappingConfigurationIsValid.value = false;
     errorMessage.value = '';
     return;
   }
 
   const validationResult = await mappingService.value.validateMappingConfig(
-    trimmedConfig,
+    trimmedMappingConfiguration,
     currentInput
   );
-  if (currentValidationRunId !== validationRunId) {
+  if (currentValidationRequestId !== latestValidationRequestId) {
     return;
   }
   if (!validationResult.success) {
-    errorMessage.value = validationResult.message;
-    statusMessage.value = '';
-    resultIsValid.value = false;
-    saveSuggestionRetryContext(validationResult.message, trimmedConfig);
+    showError(validationResult.message);
+    mappingConfigurationIsValid.value = false;
+    saveSuggestionRetryContext(validationResult.message, trimmedMappingConfiguration);
   } else {
     errorMessage.value = '';
-    resultIsValid.value = true;
+    mappingConfigurationIsValid.value = true;
   }
 }
 
 function revalidateCurrentEditorContent() {
-  if (!editor.value || !usesMappingFunction.value) {
+  if (!usesMappingFunction.value) {
     return;
   }
 
-  const editorContent = editor.value.getValue() ?? '';
-  void validateConfig(editorContent, preparedInput.value);
+  void validateConfig(generatedMappingConfiguration.value, preparedInput.value);
 }
 
 function buildSelection(): RefineSchemaSelection | null {
@@ -319,24 +274,47 @@ function buildInferredSourceSchema(): TopLevelSchema {
   return sourceSchema;
 }
 
+function canStartAiMapping(aiUnavailableMessage: string): boolean {
+  let prerequisiteErrorMessage = '';
+  if (!canUseAi.value) {
+    prerequisiteErrorMessage = aiUnavailableMessage;
+  } else if (!hasCurrentData.value) {
+    prerequisiteErrorMessage = 'Please load data into the Data Editor first.';
+  } else if (!hasTargetSchema.value) {
+    prerequisiteErrorMessage = 'Please load the target schema into the Schema Editor first.';
+  }
+
+  if (prerequisiteErrorMessage.length === 0) {
+    return true;
+  }
+
+  showError(prerequisiteErrorMessage);
+  return false;
+}
+
+function applySuccessfulMapping(resultData: unknown, message: string) {
+  statusMessage.value = message;
+  errorMessage.value = '';
+  clearSuggestionRetryContext();
+  dataEditorLink.setData(resultData);
+  toastService.add({
+    severity: 'success',
+    summary: 'Data mapped',
+    detail: message,
+    life: 3000,
+  });
+  hideDialog();
+}
+
 async function generateMappingSuggestion() {
   if (!usesMappingFunction.value) {
     return;
   }
-  if (!canUseAi.value) {
-    statusMessage.value = '';
-    errorMessage.value =
-      'AI-generated mapping suggestions are disabled until AI access is configured.';
-    return;
-  }
-  if (!hasCurrentData.value) {
-    statusMessage.value = '';
-    errorMessage.value = 'Please load data into the Data Editor first.';
-    return;
-  }
-  if (!hasTargetSchema.value) {
-    statusMessage.value = '';
-    errorMessage.value = 'Please load the target schema into the Schema Editor first.';
+  if (
+    !canStartAiMapping(
+      'AI-generated mapping suggestions are disabled until AI access is configured.'
+    )
+  ) {
     return;
   }
 
@@ -344,45 +322,41 @@ async function generateMappingSuggestion() {
   statusMessage.value = '';
   errorMessage.value = '';
 
-  const retryContext: DataMappingSuggestionRetryContext | undefined =
+  const retryContext: GeneratedCodeRetryContext | undefined =
     hasValidationErrorForSuggestion.value && shouldUseRetryContext()
       ? {
           validationError: lastValidationError.value,
-          previousConfig: lastFailedConfig.value,
+          previousCode: lastFailedConfig.value,
         }
       : undefined;
 
   try {
-    const response =
+    const sharedRequestFields = {
+      language: selectedMappingLanguage.value,
+      targetSchema: targetSchema.value,
+      userComments: userComments.value,
+      retryContext,
+    };
+    const suggestionResult = await generateMappingFunctionSuggestion(
       selectedMappingMethod.value === 'source-data'
-        ? await generateMappingFunctionSuggestion({
-            language: selectedMappingLanguage.value,
-            method: 'source-data',
-            inputData: preparedInput.value,
-            targetSchema: targetSchema.value,
-            userComments: userComments.value,
-            retryContext,
-          })
-        : await generateMappingFunctionSuggestion({
-            language: selectedMappingLanguage.value,
+        ? {...sharedRequestFields, method: 'source-data', inputData: preparedInput.value}
+        : {
+            ...sharedRequestFields,
             method: 'inferred-source-schema',
             sourceSchema: buildInferredSourceSchema(),
-            targetSchema: targetSchema.value,
-            userComments: userComments.value,
-            retryContext,
-          });
+          }
+    );
 
-    result.value = response.config;
-    if (response.success) {
-      statusMessage.value = response.message;
+    generatedMappingConfiguration.value = suggestionResult.config;
+    if (suggestionResult.success) {
+      statusMessage.value = suggestionResult.message;
       errorMessage.value = '';
       clearSuggestionRetryContext();
     } else {
-      statusMessage.value = '';
-      errorMessage.value = response.message;
+      showError(suggestionResult.message);
     }
 
-    await validateConfig(response.config, preparedInput.value);
+    await validateConfig(suggestionResult.config, preparedInput.value);
   } catch (error) {
     useErrorService().onError(error);
   } finally {
@@ -390,49 +364,27 @@ async function generateMappingSuggestion() {
   }
 }
 
-function performMapping() {
-  const config = editor.value?.getValue()?.trim();
-  if (!config) {
-    errorMessage.value = 'No mapping configuration available.';
-    statusMessage.value = '';
+async function performMapping() {
+  const mappingConfiguration = generatedMappingConfiguration.value.trim();
+  if (!mappingConfiguration) {
+    showError('No mapping configuration available.');
     return;
   }
 
-  mappingService.value.performDataMapping(preparedInput.value, config).then(res => {
-    if (res.success) {
-      statusMessage.value = res.message;
-      errorMessage.value = '';
-      clearSuggestionRetryContext();
-      dataEditorLink.setData(res.resultData);
-      toastService.add({
-        severity: 'success',
-        summary: 'Data mapped',
-        detail: res.message,
-        life: 3000,
-      });
-      hideDialog();
-    } else {
-      statusMessage.value = '';
-      errorMessage.value = res.message;
-      saveSuggestionRetryContext(res.message, config);
-    }
-  });
+  const mappingResult = await mappingService.value.performDataMapping(
+    preparedInput.value,
+    mappingConfiguration
+  );
+  if (mappingResult.success) {
+    applySuccessfulMapping(mappingResult.resultData, mappingResult.message);
+  } else {
+    showError(mappingResult.message);
+    saveSuggestionRetryContext(mappingResult.message, mappingConfiguration);
+  }
 }
 
 async function executeDirectAiMapping() {
-  if (!canUseAi.value) {
-    statusMessage.value = '';
-    errorMessage.value = 'Direct AI mapping is disabled until AI access is configured.';
-    return;
-  }
-  if (!hasCurrentData.value) {
-    statusMessage.value = '';
-    errorMessage.value = 'Please load data into the Data Editor first.';
-    return;
-  }
-  if (!hasTargetSchema.value) {
-    statusMessage.value = '';
-    errorMessage.value = 'Please load the target schema into the Schema Editor first.';
+  if (!canStartAiMapping('Direct AI mapping is disabled until AI access is configured.')) {
     return;
   }
 
@@ -441,25 +393,18 @@ async function executeDirectAiMapping() {
   errorMessage.value = '';
 
   try {
-    const response = await performDirectAiTargetSchemaMapping(
-      rawInput.value,
+    const directMappingResult = await performDirectAiTargetSchemaMapping(
+      sourceData.value,
       targetSchema.value,
       userComments.value
     );
 
-    if (!response.success) {
-      errorMessage.value = response.message;
+    if (!directMappingResult.success) {
+      showError(directMappingResult.message);
       return;
     }
 
-    dataEditorLink.setData(response.resultData);
-    toastService.add({
-      severity: 'success',
-      summary: 'Data mapped',
-      detail: response.message,
-      life: 3000,
-    });
-    hideDialog();
+    applySuccessfulMapping(directMappingResult.resultData, directMappingResult.message);
   } catch (error) {
     useErrorService().onError(error);
   } finally {
@@ -493,7 +438,7 @@ defineExpose({show: openDialog, close: hideDialog});
       </Message>
 
       <Message v-if="mappingLanguageWarning.length" severity="warn" :closable="false">
-        <span v-html="mappingLanguageWarning"></span>
+        {{ mappingLanguageWarning }}
       </Message>
 
       <Message v-if="!canUseAi" severity="info" :closable="false">
@@ -569,12 +514,12 @@ defineExpose({show: openDialog, close: hideDialog});
 
       <div v-show="usesMappingFunction" class="mapping-editor-section">
         <Divider />
-        <label :for="editorId" class="block font-semibold mb-2">Mapping Function</label>
+        <label :for="editorElementId" class="block font-semibold mb-2">Mapping Function</label>
         <div class="editor-wrapper">
-          <div :id="editorId" class="editor-surface" />
+          <div :id="editorElementId" class="editor-surface" />
         </div>
         <Button
-          v-if="resultIsValid"
+          v-if="mappingConfigurationIsValid"
           label="Perform Mapping"
           icon="pi pi-play"
           class="mt-4 w-full"
@@ -583,7 +528,7 @@ defineExpose({show: openDialog, close: hideDialog});
 
       <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
       <Message severity="error" v-if="errorMessage.length">
-        <span v-html="errorMessage"></span>
+        {{ errorMessage }}
       </Message>
     </div>
   </Dialog>
@@ -621,13 +566,5 @@ defineExpose({show: openDialog, close: hideDialog});
 
 label {
   font-size: 0.9rem;
-}
-
-:deep(.refinement-panel .p-panel-header) {
-  padding: 1rem;
-}
-
-:deep(.refinement-panel .p-panel-content) {
-  padding: 1rem;
 }
 </style>

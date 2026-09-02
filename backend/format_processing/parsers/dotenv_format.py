@@ -1,43 +1,40 @@
 import re
-from typing import Dict, Optional
+from io import StringIO
+from typing import Optional
 
-from format_detection_core import ParserAttempt
-from parsers.common_preprocess import preprocess_data_for_ai
-from parsers.key_value_utils import strip_wrapping_quotes
+from dotenv.parser import parse_stream
+
+from format_detection_core import ParserAttempt, has_ini_style_section_headers
+
+
+def looks_like_dotenv(content: str) -> bool:
+    return bool(
+        re.search(
+            r"^\s*(export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=\s*.+$",
+            content,
+            flags=re.MULTILINE,
+        )
+    )
 
 
 def parse_data(content: str) -> Optional[ParserAttempt]:
-    if re.search(r"^\s*\[.+\]\s*$", content, flags=re.MULTILINE):
+    if has_ini_style_section_headers(content):
+        return None  # section headers mean this is INI or TOML, not dotenv
+
+    bindings = list(parse_stream(StringIO(content)))
+    if any(binding.error for binding in bindings):
         return None
 
-    parsed: Dict[str, str] = {}
-    assignment_count = 0
-    for raw_line in content.splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if line.startswith("export "):
-            line = line[7:].strip()
-        if "=" not in line:
-            return None
-
-        key, value = line.split("=", 1)
-        key = key.strip()
-        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key):
-            return None
-
-        value = value.strip()
-        if value and value[0] not in {'"', "'"} and " #" in value:
-            value = value.split(" #", 1)[0].rstrip()
-
-        parsed[key] = strip_wrapping_quotes(value)
-        assignment_count += 1
-
-    if assignment_count < 2:
+    assignments = {
+        binding.key: binding.value or ""
+        for binding in bindings
+        if binding.key is not None
+    }
+    if len(assignments) < 2:
         return None
 
     return ParserAttempt(
         format="dotenv",
-        parsed_json=parsed,
-        parser_name="dotenv-text-parser",
+        parsed_json=assignments,
+        parser_name="python-dotenv",
     )

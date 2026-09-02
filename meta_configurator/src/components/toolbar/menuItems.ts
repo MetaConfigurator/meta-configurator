@@ -16,61 +16,30 @@ import {resolveSchemaReferences} from '@/components/toolbar/resolveSchemaReferen
 import {bundleSchema} from '@/components/toolbar/bundleSchema.ts';
 import {sortSchemaPropertiesAlphabeticallyAction} from '@/components/toolbar/sortSchemaProperties.ts';
 
-/**
- * Helper class that contains the menu items for the top menu bar.
- */
+/** The dialog-opening callbacks the menu entries trigger, owned by the toolbar component. */
+export type MenuItemDialogActions = {
+  showSchemaSelectionDialog: () => void;
+  showImportCsvDialog: () => void;
+  showSnapshotDialog: () => void;
+  showCodeGenerationDialog: (schemaMode: boolean) => void;
+  showDataExportDialog: (schemaMode: boolean) => void;
+  showDataMappingDialog: () => void;
+  showDataImportAiDialog: () => void;
+  showInferSchemaDialog: () => void;
+  showRmlMappingDialog: () => void;
+  showImportTurtleDialog: () => void;
+  showImportXmlDialog: () => void;
+  showXmlExportDialog: () => void;
+  showImportSchemaDialog: () => void;
+  showExportSchemaDialog: () => void;
+  showRefineSchemaDialog: () => void;
+};
+
+/** Provides the menu items for the top menu bar. */
 export class MenuItems {
   sessionStore = useSessionStore();
 
-  private readonly showSchemaSelectionDialog: () => void;
-  private readonly showImportCsvDialog: () => void;
-  private readonly showSnapshotDialog: () => void;
-  private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
-  private readonly showDataExportDialog: (schemaMode: boolean) => void;
-  private readonly showDataMappingDialog: () => void;
-  private readonly showDataImportAiDialog: () => void;
-  private readonly showRefineSchemaDialog: () => void;
-  private readonly inferJsonSchemaFromSampleData: () => void;
-  private readonly showRMLMappingDialog: () => void;
-  private readonly showImportTurtleDialog: () => void;
-  private readonly showImportXmlDialog: () => void;
-  private readonly showXmlExportDialog: () => void;
-  private readonly showImportSchemaDialog: () => void;
-  private readonly showExportSchemaDialog: () => void;
-
-  constructor(
-    showSchemaSelectionDialog: () => void,
-    showImportCsvDialog: () => void,
-    showSnapshotDialog: () => void,
-    showCodeGenerationDialog: (schemaMode: boolean) => void,
-    showDataExportDialog: (schemaMode: boolean) => void,
-    showDataMappingDialog: () => void,
-    showDataImportAiDialog: () => void,
-    inferJsonSchemaFromSampleData: () => void,
-    showRMLMappingDialog: () => void,
-    showImportTurtleDialog: () => void,
-    showImportXmlDialog: () => void,
-    showXmlExportDialog: () => void,
-    showImportSchemaDialog: () => void,
-    showExportSchemaDialog: () => void,
-    showRefineSchemaDialog: () => void
-  ) {
-    this.showSchemaSelectionDialog = showSchemaSelectionDialog;
-    this.showImportCsvDialog = showImportCsvDialog;
-    this.showSnapshotDialog = showSnapshotDialog;
-    this.showCodeGenerationDialog = showCodeGenerationDialog;
-    this.showDataExportDialog = showDataExportDialog;
-    this.showDataMappingDialog = showDataMappingDialog;
-    this.showDataImportAiDialog = showDataImportAiDialog;
-    this.showRefineSchemaDialog = showRefineSchemaDialog;
-    this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
-    this.showRMLMappingDialog = showRMLMappingDialog;
-    this.showImportTurtleDialog = showImportTurtleDialog;
-    this.showImportXmlDialog = showImportXmlDialog;
-    this.showXmlExportDialog = showXmlExportDialog;
-    this.showImportSchemaDialog = showImportSchemaDialog;
-    this.showExportSchemaDialog = showExportSchemaDialog;
-  }
+  constructor(private readonly dialogActions: MenuItemDialogActions) {}
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
     let result: MenuItem[] = [
@@ -103,22 +72,22 @@ export class MenuItems {
           {
             label: 'Import CSV Data',
             icon: 'fa-solid fa-table',
-            command: this.showImportCsvDialog,
+            command: this.dialogActions.showImportCsvDialog,
           },
           {
             label: 'Import Turtle Data',
             icon: 'fa-solid fa-globe',
-            command: this.showImportTurtleDialog,
+            command: this.dialogActions.showImportTurtleDialog,
           },
           {
             label: 'Import XML Data',
             icon: 'fa-solid fa-file-code',
-            command: this.showImportXmlDialog,
+            command: this.dialogActions.showImportXmlDialog,
           },
           {
             label: 'Import Data with AI',
             icon: 'fa-solid fa-robot',
-            command: this.showDataImportAiDialog,
+            command: this.dialogActions.showDataImportAiDialog,
           },
         ],
       },
@@ -135,7 +104,7 @@ export class MenuItems {
           {
             label: 'Export to XML',
             icon: 'fa-solid fa-file-code',
-            command: this.showXmlExportDialog,
+            command: this.dialogActions.showXmlExportDialog,
           },
         ],
       },
@@ -147,24 +116,24 @@ export class MenuItems {
           {
             label: 'Transform Data to match the Schema...',
             icon: 'fa-solid fa-wand-magic-sparkles',
-            command: this.showDataMappingDialog,
+            command: this.dialogActions.showDataMappingDialog,
           },
           {
             label: 'Export Data via Text Template...',
             icon: 'fa-solid fa-file-export',
-            command: () => this.showDataExportDialog(false),
+            command: () => this.dialogActions.showDataExportDialog(false),
           },
           {
             label: 'Transform JSON Data to JSON-LD',
             icon: 'fa-solid fa-gears',
-            command: this.showRMLMappingDialog,
+            command: this.dialogActions.showRmlMappingDialog,
           },
         ],
       },
       {
         label: 'Share Snapshot...',
         icon: 'fa-solid fa-share',
-        command: this.showSnapshotDialog,
+        command: this.dialogActions.showSnapshotDialog,
         key: 'snapshot',
       },
       {
@@ -218,7 +187,7 @@ export class MenuItems {
           {
             label: 'Infer Schema from Data...',
             icon: 'fa-solid fa-wand-magic-sparkles',
-            command: this.inferJsonSchemaFromSampleData,
+            command: this.dialogActions.showInferSchemaDialog,
           },
         ],
       },
@@ -230,7 +199,7 @@ export class MenuItems {
           {
             label: 'Open Schema...',
             icon: 'fa-solid fa-folder-open',
-            command: () => this.showSchemaSelectionDialog(),
+            command: () => this.dialogActions.showSchemaSelectionDialog(),
           },
           {
             label: 'Insert JSON Schema...',
@@ -240,7 +209,7 @@ export class MenuItems {
           {
             label: 'Import Schema from another format...',
             icon: 'fa-solid fa-file-arrow-down',
-            command: this.showImportSchemaDialog,
+            command: this.dialogActions.showImportSchemaDialog,
           },
         ],
       },
@@ -258,7 +227,7 @@ export class MenuItems {
           {
             label: 'Export Schema to another format...',
             icon: 'fa-solid fa-file-arrow-up',
-            command: this.showExportSchemaDialog,
+            command: this.dialogActions.showExportSchemaDialog,
           },
         ],
       },
@@ -290,19 +259,19 @@ export class MenuItems {
           {
             label: 'Refine Schema...',
             icon: 'fa-solid fa-wand-magic-sparkles',
-            command: this.showRefineSchemaDialog,
+            command: this.dialogActions.showRefineSchemaDialog,
           },
         ],
       },
       {
         label: 'Generate Source Code...',
         icon: 'fa-solid fa-file-code',
-        command: () => this.showCodeGenerationDialog(true),
+        command: () => this.dialogActions.showCodeGenerationDialog(true),
       },
       {
         label: 'Share Snapshot...',
         icon: 'fa-solid fa-share',
-        command: this.showSnapshotDialog,
+        command: this.dialogActions.showSnapshotDialog,
         key: 'snapshot',
       },
       {

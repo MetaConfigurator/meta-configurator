@@ -2,7 +2,6 @@ import json
 from typing import Optional
 
 from format_detection_core import ParserAttempt
-from parsers.common_preprocess import preprocess_data_for_ai
 
 
 def parse_data(content: str) -> Optional[ParserAttempt]:

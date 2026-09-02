@@ -6,8 +6,8 @@ import {
   childrenInPriorityOrder,
   childrenInSchemaOrder,
   sortObjectChildren,
-  sortSchemaPropertiesAlphabetically,
 } from '@/components/panels/gui-editor/sortingUtils';
+import {sortSchemaPropertiesAlphabetically} from '@/schema/sortSchemaPropertiesAlphabetically';
 
 // The sort strategies only ever read `node.data.name`, so stub nodes with just that
 // field are enough. We avoid importing the real GuiEditorTreeNode type to keep this

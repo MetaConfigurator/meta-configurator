@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+from functools import wraps
+from typing import Any, Callable, Dict
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -77,6 +79,51 @@ def is_payload_length_valid(value) -> bool:
     return len(serialized.encode("utf-8")) <= MAX_FILE_LENGTH
 
 
+class InvalidRequest(Exception):
+    """A client error carrying the message and status code to return."""
+
+    def __init__(self, message: str, status_code: int = 400):
+        super().__init__(message)
+        self.message = message
+        self.status_code = status_code
+
+
+def read_request_payload(required_field: str, too_large_message: str) -> Dict[str, Any]:
+    """Returns the JSON body once the required field is present and small enough."""
+    request_data = request.get_json(silent=True)
+    if not request_data:
+        raise InvalidRequest("Missing request data")
+    if required_field not in request_data:
+        raise InvalidRequest(f'Missing required field "{required_field}"')
+    if not is_payload_length_valid(request_data[required_field]):
+        raise InvalidRequest(too_large_message, 413)
+    return request_data
+
+
+def json_error_responses(route_name: str) -> Callable:
+    """Answers client errors with their JSON message and hides unexpected errors."""
+
+    def decorate(view_function: Callable) -> Callable:
+        @wraps(view_function)
+        def wrapped_view(*args, **kwargs):
+            try:
+                return view_function(*args, **kwargs)
+            except InvalidRequest as invalid_request:
+                return (
+                    jsonify({"error": invalid_request.message}),
+                    invalid_request.status_code,
+                )
+            except RequestEntityTooLarge:
+                raise
+            except Exception as error:
+                app.logger.error(f"Error in {route_name}: {error}")
+                return jsonify({"error": "Internal server error"}), 500
+
+        return wrapped_view
+
+    return decorate
+
+
 @app.errorhandler(RequestEntityTooLarge)
 def request_too_large(_error):
     return jsonify({"error": "Request body too large"}), 413
@@ -89,78 +136,44 @@ def health():
 
 @app.route("/detect-format-and-parse", methods=["POST"])
 @limiter.limit("20 per minute")
+@json_error_responses("detect-format-and-parse")
 def detect_format_and_parse_route():
-    try:
-        request_data = request.get_json(silent=True)
-        if not request_data:
-            return jsonify({"error": "Missing request data"}), 400
+    request_data = read_request_payload("content", "Input file too large")
 
-        if "content" not in request_data:
-            return jsonify({"error": 'Missing required field "content"'}), 400
+    result = detect_format_and_parse(
+        file_name=request_data.get("file_name", ""),
+        file_type=request_data.get("file_type", ""),
+        raw_content=request_data.get("content", ""),
+        preprocess_options=request_data.get("preprocess_options"),
+    )
 
-        file_name = request_data.get("file_name", "")
-        file_type = request_data.get("file_type", "")
-        content = request_data.get("content", "")
-        preprocess_options = request_data.get("preprocess_options")
-
-        if not is_payload_length_valid(content):
-            return jsonify({"error": "Input file too large"}), 413
-
-        result = detect_format_and_parse(
-            file_name=file_name,
-            file_type=file_type,
-            raw_content=content,
-            preprocess_options=preprocess_options,
-        )
-
-        return jsonify(
-            {
-                "recognized": result.recognized,
-                "format": result.format,
-                "parsed_json": result.parsed_json,
-                "preprocessed_for_ai": result.preprocessed_for_ai,
-                "message": result.message,
-                "display_text": result.display_text,
-                "parser_name": result.parser_name,
-                "ai_prompt_hint": result.ai_prompt_hint,
-            }
-        )
-    except RequestEntityTooLarge:
-        raise
-    except Exception as e:
-        app.logger.error(f"Error in detect-format-and-parse: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+    return jsonify(
+        {
+            "recognized": result.recognized,
+            "format": result.format,
+            "parsed_json": result.parsed_json,
+            "preprocessed_for_ai": result.preprocessed_for_ai,
+            "message": result.message,
+            "display_text": result.display_text,
+            "parser_name": result.parser_name,
+            "ai_prompt_hint": result.ai_prompt_hint,
+        }
+    )
 
 
 @app.route("/preprocess-for-ai", methods=["POST"])
 @limiter.limit("30 per minute")
+@json_error_responses("preprocess-for-ai")
 def preprocess_for_ai_route():
-    try:
-        request_data = request.get_json(silent=True)
-        if not request_data:
-            return jsonify({"error": "Missing request data"}), 400
+    request_data = read_request_payload("data", "Input data too large")
 
-        if "data" not in request_data:
-            return jsonify({"error": 'Missing required field "data"'}), 400
-
-        data = request_data.get("data")
-        format_name = request_data.get("format", "json")
-        preprocess_options = request_data.get("preprocess_options")
-
-        if not is_payload_length_valid(data):
-            return jsonify({"error": "Input data too large"}), 413
-
-        result = preprocess_parsed_data_for_ai(
-            parsed_data=data,
-            format_name=format_name,
-            preprocess_options=preprocess_options,
+    return jsonify(
+        preprocess_parsed_data_for_ai(
+            parsed_data=request_data.get("data"),
+            format_name=request_data.get("format", "json"),
+            preprocess_options=request_data.get("preprocess_options"),
         )
-        return jsonify(result)
-    except RequestEntityTooLarge:
-        raise
-    except Exception as e:
-        app.logger.error(f"Error in preprocess-for-ai: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+    )
 
 
 if __name__ == "__main__":

@@ -13,29 +13,16 @@ import ModeSelector from '@/components/toolbar/ModeSelector.vue';
 import TopToolbarMenuButtons from '@/components/toolbar/TopToolbarMenuButtons.vue';
 import SearchBar from '@/components/toolbar/SearchBar.vue';
 import Divider from 'primevue/divider';
+import type {MenuItemDialogActions} from '@/components/toolbar/menuItems';
 
 const props = defineProps<{
   currentMode: SessionMode;
+  dialogActions: MenuItemDialogActions;
 }>();
 
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
-  (e: 'show-schema-selection-dialog'): void;
-  (e: 'show-import-csv-dialog'): void;
-  (e: 'show-snapshot-dialog'): void;
   (e: 'show-about-dialog'): void;
-  (e: 'show-codegen-dialog', schemaMode: boolean): void;
-  (e: 'show-data-export-dialog', schemaMode: boolean): void;
-  (e: 'show-data-mapping-dialog'): void;
-  (e: 'show-data-import-ai-dialog'): void;
-  (e: 'show-rml-mapping-dialog'): void;
-  (e: 'show-import-turtle-dialog'): void;
-  (e: 'show-import-xml-dialog'): void;
-  (e: 'show-xml-export-dialog'): void;
-  (e: 'show-import-schema-dialog'): void;
-  (e: 'show-export-schema-dialog'): void;
-  (e: 'show-infer-schema-dialog'): void;
-  (e: 'show-refine-schema-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -47,71 +34,12 @@ watchEffect(() => {
   }
 });
 
-async function showSchemaSelectionDialog() {
-  emit('show-schema-selection-dialog');
-}
-
-function showCsvImportDialog() {
-  emit('show-import-csv-dialog');
-}
-
-function showSnapshotDialog() {
-  emit('show-snapshot-dialog');
-}
-
 function showAboutDialog() {
   emit('show-about-dialog');
 }
 
-function showCodeGenerationDialog(schemaMode: boolean) {
-  emit('show-codegen-dialog', schemaMode);
-}
-
-function showDataExportDialog(schemaMode: boolean) {
-  emit('show-data-export-dialog', schemaMode);
-}
-
-function showDataMappingDialog() {
-  emit('show-data-mapping-dialog');
-}
-
-function showDataImportAiDialog() {
-  emit('show-data-import-ai-dialog');
-}
-
-function showRefineSchemaDialog() {
-  emit('show-refine-schema-dialog');
-}
 function selectedMode(newMode: SessionMode) {
   emit('mode-selected', newMode);
-}
-
-function showRmlMappingDialog() {
-  emit('show-rml-mapping-dialog');
-}
-
-function showTurtleImportDialog() {
-  emit('show-import-turtle-dialog');
-}
-
-function showXmlImportDialog() {
-  emit('show-import-xml-dialog');
-}
-
-function showXmlExportDialog() {
-  emit('show-xml-export-dialog');
-}
-
-function showImportSchemaDialog() {
-  emit('show-import-schema-dialog');
-}
-
-function showExportSchemaDialog() {
-  emit('show-export-schema-dialog');
-}
-
-function showInferSchemaDialog() {
-  emit('show-infer-schema-dialog');
 }
 
 const modeSelector = ref();
@@ -144,21 +72,7 @@ useMagicKeys({
         <TopToolbarMenuButtons
           :show-bottom-menu="false"
           :current-mode="props.currentMode"
-          @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
-          @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
-          @show-import-csv-dialog="() => showCsvImportDialog()"
-          @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
-          @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()"
-          @show-data-import-ai-dialog="() => showDataImportAiDialog()"
-          @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-          @show-import-turtle-dialog="() => showTurtleImportDialog()"
-          @show-import-xml-dialog="() => showXmlImportDialog()"
-          @show-xml-export-dialog="() => showXmlExportDialog()"
-          @show-import-schema-dialog="() => showImportSchemaDialog()"
-          @show-export-schema-dialog="() => showExportSchemaDialog()"
-          @show-infer-schema-dialog="() => showInferSchemaDialog()"
-          @show-refine-schema-dialog="() => showRefineSchemaDialog()" />
+          :dialog-actions="props.dialogActions" />
 
         <Divider layout="vertical" />
 
@@ -219,21 +133,7 @@ useMagicKeys({
         <TopToolbarMenuButtons
           :show-bottom-menu="true"
           :current-mode="props.currentMode"
-          @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
-          @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
-          @show-import-csv-dialog="() => showCsvImportDialog()"
-          @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
-          @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()"
-          @show-data-import-ai-dialog="() => showDataImportAiDialog()"
-          @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-          @show-import-turtle-dialog="() => showTurtleImportDialog()"
-          @show-import-xml-dialog="() => showXmlImportDialog()"
-          @show-xml-export-dialog="() => showXmlExportDialog()"
-          @show-import-schema-dialog="() => showImportSchemaDialog()"
-          @show-export-schema-dialog="() => showExportSchemaDialog()"
-          @show-infer-schema-dialog="() => showInferSchemaDialog()"
-          @show-refine-schema-dialog="() => showRefineSchemaDialog()" />
+          :dialog-actions="props.dialogActions" />
       </div>
 
       <!-- RIGHT side: format selector -->

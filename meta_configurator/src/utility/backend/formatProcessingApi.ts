@@ -1,5 +1,6 @@
 import {computed} from 'vue';
 import {useSettings} from '@/settings/useSettings';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 const settings = useSettings();
 
@@ -78,6 +79,10 @@ export interface FormatProcessingPreprocessResult {
   ai_prompt_hint?: string | null;
 }
 
+interface FormatProcessingErrorResponse {
+  error?: string;
+}
+
 export function shouldUseFormatProcessingForFile(fileName: string): boolean {
   const normalized = fileName.trim().toLowerCase();
   return FORMAT_PROCESSING_DATA_FILE_EXTENSIONS.some(ext => normalized.endsWith(ext));
@@ -88,64 +93,33 @@ export async function detectFormatAndParseWithFormatProcessing(
   fileType: string,
   content: string
 ): Promise<FormatProcessingDetectionResult> {
-  const url = `${FORMAT_PROCESSING_URL.value}/detect-format-and-parse`;
-
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        file_name: fileName,
-        file_type: fileType,
-        content,
-      }),
-    });
-  } catch (error) {
-    throw new Error(
-      `Could not reach the format processing service at ${FORMAT_PROCESSING_URL.value}. ` +
-        `Please make sure the service is running and reachable. ` +
-        `(${error instanceof Error ? error.message : String(error)})`
-    );
-  }
-
-  const contentType = response.headers.get('content-type') ?? '';
-  if (!contentType.includes('application/json')) {
-    const text = await response.text().catch(() => '');
-    throw new Error(
-      `Unexpected response from the format processing service (status ${response.status}). ` +
-        (text ? `Response: ${text.slice(0, 300)}` : 'The response was not JSON.')
-    );
-  }
-
-  const body = (await response.json()) as Partial<FormatProcessingDetectionResult> & {
-    error?: string;
-  };
-
-  if (!response.ok) {
-    throw new Error(
-      body.error || `Format processing service request failed with status ${response.status}.`
-    );
-  }
+  const responseBody = await postToFormatProcessing<Partial<FormatProcessingDetectionResult>>(
+    '/detect-format-and-parse',
+    {
+      file_name: fileName,
+      file_type: fileType,
+      content,
+    }
+  );
 
   if (
-    typeof body.recognized !== 'boolean' ||
-    typeof body.format !== 'string' ||
-    typeof body.message !== 'string' ||
-    typeof body.display_text !== 'string'
+    typeof responseBody.recognized !== 'boolean' ||
+    typeof responseBody.format !== 'string' ||
+    typeof responseBody.message !== 'string' ||
+    typeof responseBody.display_text !== 'string'
   ) {
     throw new Error('Invalid response from the format processing service.');
   }
 
   return {
-    recognized: body.recognized,
-    format: body.format,
-    parsed_json: body.parsed_json ?? null,
-    preprocessed_for_ai: body.preprocessed_for_ai ?? null,
-    message: body.message,
-    display_text: body.display_text,
-    parser_name: body.parser_name ?? null,
-    ai_prompt_hint: body.ai_prompt_hint ?? null,
+    recognized: responseBody.recognized,
+    format: responseBody.format,
+    parsed_json: responseBody.parsed_json ?? null,
+    preprocessed_for_ai: responseBody.preprocessed_for_ai ?? null,
+    message: responseBody.message,
+    display_text: responseBody.display_text,
+    parser_name: responseBody.parser_name ?? null,
+    ai_prompt_hint: responseBody.ai_prompt_hint ?? null,
   };
 }
 
@@ -154,24 +128,40 @@ export async function preprocessParsedDataForAiWithFormatProcessing(
   format: string = 'json',
   preprocessOptions?: FormatProcessingPreprocessOptions
 ): Promise<FormatProcessingPreprocessResult> {
-  const url = `${FORMAT_PROCESSING_URL.value}/preprocess-for-ai`;
+  const responseBody = await postToFormatProcessing<Partial<FormatProcessingPreprocessResult>>(
+    '/preprocess-for-ai',
+    {
+      data,
+      format,
+      preprocess_options: preprocessOptions,
+    }
+  );
 
+  if (typeof responseBody.format !== 'string' || typeof responseBody.display_text !== 'string') {
+    throw new Error('Invalid response from the format processing service.');
+  }
+
+  return {
+    format: responseBody.format,
+    preprocessed_for_ai: responseBody.preprocessed_for_ai ?? data,
+    display_text: responseBody.display_text,
+    ai_prompt_hint: responseBody.ai_prompt_hint ?? null,
+  };
+}
+
+async function postToFormatProcessing<T>(endpointPath: string, requestBody: unknown): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(url, {
+    response = await fetch(`${FORMAT_PROCESSING_URL.value}${endpointPath}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        data,
-        format,
-        preprocess_options: preprocessOptions,
-      }),
+      body: JSON.stringify(requestBody),
     });
   } catch (error) {
     throw new Error(
       `Could not reach the format processing service at ${FORMAT_PROCESSING_URL.value}. ` +
         `Please make sure the service is running and reachable. ` +
-        `(${error instanceof Error ? error.message : String(error)})`
+        `(${getErrorMessage(error)})`
     );
   }
 
@@ -184,24 +174,12 @@ export async function preprocessParsedDataForAiWithFormatProcessing(
     );
   }
 
-  const body = (await response.json()) as Partial<FormatProcessingPreprocessResult> & {
-    error?: string;
-  };
-
+  const responseBody = (await response.json()) as T & FormatProcessingErrorResponse;
   if (!response.ok) {
     throw new Error(
-      body.error || `Format processing service request failed with status ${response.status}.`
+      responseBody.error ||
+        `Format processing service request failed with status ${response.status}.`
     );
   }
-
-  if (typeof body.format !== 'string' || typeof body.display_text !== 'string') {
-    throw new Error('Invalid response from the format processing service.');
-  }
-
-  return {
-    format: body.format,
-    preprocessed_for_ai: body.preprocessed_for_ai ?? data,
-    display_text: body.display_text,
-    ai_prompt_hint: body.ai_prompt_hint ?? null,
-  };
+  return responseBody;
 }

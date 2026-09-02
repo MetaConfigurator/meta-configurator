@@ -5,7 +5,6 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import SelectButton from 'primevue/selectbutton';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import type {RefineSchemaSelection} from '@/schema/refinement/refineSchemaTypes';
 import type {SchemaRefinementOptionsController} from '@/schema/refinement/schemaRefinementOptionsController';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
@@ -16,6 +15,8 @@ import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {runSchemaRefinement} from '@/schema/refinement/runSchemaRefinement';
 import {toastService} from '@/utility/toastService';
 import SchemaRefinementOptions from '@/components/toolbar/dialogs/shared/SchemaRefinementOptions.vue';
+import {hasJsonContent} from '@/utility/jsonCompatible';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 const showDialog = ref(false);
 const isLoading = ref(false);
@@ -26,7 +27,7 @@ const refinementOptions = ref<SchemaRefinementOptionsController | null>(null);
 
 const currentDataLink = getDataForMode(SessionMode.DataEditor);
 const fileDialog = createLazySingleFileDialog('.json');
-const hasCurrentData = computed(() => hasInferableCurrentData(currentDataLink.data.value));
+const hasCurrentData = computed(() => hasJsonContent(currentDataLink.data.value));
 const hasSelectedFile = computed(() => selectedFile.value !== null);
 const usesCurrentDataSource = computed(() => inputSource.value === 'current');
 const canInfer = computed(() =>
@@ -47,43 +48,19 @@ const applyButtonLabel = computed(() =>
 function resetDialog() {
   errorMessage.value = '';
   isLoading.value = false;
-  inputSource.value = hasInferableCurrentData(currentDataLink.data.value) ? 'current' : 'files';
+  inputSource.value = hasCurrentData.value ? 'current' : 'files';
   selectedFile.value = null;
-  refinementOptions.value?.reset();
 }
 
 function openDialog() {
   resetDialog();
   showDialog.value = true;
-  nextTick(() => {
-    refinementOptions.value?.reset();
-  });
+  // The options component is only mounted with the dialog, so reset it once it exists.
+  nextTick(() => refinementOptions.value?.reset());
 }
 
 function hideDialog() {
   showDialog.value = false;
-}
-
-function parseInstanceText(text: string): any {
-  const jsonConverter = formatRegistry.getFormat('json').dataConverter;
-  return jsonConverter.parse(text);
-}
-
-async function parseInstance(file: File): Promise<any> {
-  return parseInstanceText(await readFileContent(file));
-}
-
-function hasInferableCurrentData(data: unknown): boolean {
-  if (data === null || data === undefined) {
-    return false;
-  }
-  if (Array.isArray(data)) {
-    return data.length > 0;
-  }
-  if (typeof data === 'object') {
-    return Object.keys(data).length > 0;
-  }
-  return true;
 }
 
 function selectInstanceFile() {
@@ -93,8 +70,43 @@ function selectInstanceFile() {
   });
 }
 
-function buildSelection(): RefineSchemaSelection | null {
-  return refinementOptions.value?.buildSelection() ?? null;
+/**
+ * Returns the data to infer from, wrapped so that a null data value stays distinguishable
+ * from an unavailable source. Reports the reason and returns null when nothing is usable.
+ */
+async function resolveInputData(): Promise<{data: unknown} | null> {
+  if (usesCurrentDataSource.value) {
+    if (!hasCurrentData.value) {
+      errorMessage.value = 'Please load data into the Data Editor first.';
+      return null;
+    }
+    return {data: currentDataLink.data.value};
+  }
+
+  if (!selectedFile.value) {
+    errorMessage.value = 'Please select a data file first.';
+    return null;
+  }
+
+  const fileText = await readFileContent(selectedFile.value);
+  const fileData = formatRegistry.getFormat('json').dataConverter.parse(fileText);
+  currentDataLink.setData(fileData);
+  return {data: fileData};
+}
+
+function inferAndRefineSchema(inputData: unknown): TopLevelSchema {
+  const inferredSchema = inferJsonSchema(inputData) as TopLevelSchema;
+  const selection = hasSelectedRefinements.value ? refinementOptions.value?.buildSelection() : null;
+  return selection ? runSchemaRefinement(inferredSchema, inputData, selection) : inferredSchema;
+}
+
+function buildSuccessDetail(): string {
+  const schemaDescription = hasSelectedRefinements.value
+    ? 'a refined JSON Schema'
+    : 'a JSON Schema';
+  return usesCurrentDataSource.value
+    ? `Generated ${schemaDescription} from the current data.`
+    : `Loaded the selected file into the Data Editor and generated ${schemaDescription}.`;
 }
 
 async function inferSchemaAndApplyRefinements() {
@@ -102,47 +114,13 @@ async function inferSchemaAndApplyRefinements() {
   errorMessage.value = '';
 
   try {
-    let schema: TopLevelSchema;
-    let successDetail: string;
-    const selection = buildSelection();
-
-    if (usesCurrentDataSource.value) {
-      const currentData = currentDataLink.data.value;
-
-      if (!hasInferableCurrentData(currentData)) {
-        errorMessage.value = 'Please load data into the Data Editor first.';
-        return;
-      }
-
-      schema = inferJsonSchema(currentData) as TopLevelSchema;
-
-      if (hasSelectedRefinements.value && selection) {
-        schema = runSchemaRefinement(schema, currentData, selection);
-      }
-
-      successDetail = hasSelectedRefinements.value
-        ? 'Generated a refined JSON Schema from the current data.'
-        : 'Generated a JSON Schema from the current data.';
-    } else {
-      if (!selectedFile.value) {
-        errorMessage.value = 'Please select a data file first.';
-        return;
-      }
-
-      const instance = await parseInstance(selectedFile.value);
-      currentDataLink.setData(instance);
-      schema = inferJsonSchema(instance) as TopLevelSchema;
-
-      if (hasSelectedRefinements.value && selection) {
-        schema = runSchemaRefinement(schema, instance, selection);
-      }
-
-      successDetail = hasSelectedRefinements.value
-        ? 'Loaded the selected file into the Data Editor and generated a refined JSON Schema.'
-        : 'Loaded the selected file into the Data Editor and generated a JSON Schema.';
+    const inputData = await resolveInputData();
+    if (!inputData) {
+      return;
     }
 
-    getDataForMode(SessionMode.SchemaEditor).setData(schema);
+    const successDetail = buildSuccessDetail();
+    getDataForMode(SessionMode.SchemaEditor).setData(inferAndRefineSchema(inputData.data));
     toastService.add({
       severity: 'success',
       summary: 'Schema inferred',
@@ -154,7 +132,7 @@ async function inferSchemaAndApplyRefinements() {
     const prefix = usesCurrentDataSource.value
       ? 'Could not infer a schema from the current data.'
       : 'Could not infer a schema from the selected file. Make sure it is a valid JSON data instance.';
-    errorMessage.value = `${prefix} (${error instanceof Error ? error.message : String(error)})`;
+    errorMessage.value = `${prefix} (${getErrorMessage(error)})`;
   } finally {
     isLoading.value = false;
   }
@@ -305,13 +283,5 @@ defineExpose({show: openDialog, close: hideDialog});
 
 :deep(.input-source-select .p-button) {
   min-width: 8.75rem;
-}
-
-:deep(.refinement-panel .p-panel-header) {
-  padding: 1rem;
-}
-
-:deep(.refinement-panel .p-panel-content) {
-  padding: 1rem;
 }
 </style>

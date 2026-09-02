@@ -1,12 +1,15 @@
 from typing import Optional
 
 from format_detection_core import ParserAttempt
-from parsers.common_preprocess import preprocess_data_for_ai
 from parsers.tabular_utils import parse_delimited_rows, rows_to_objects_or_arrays
 
 
+def looks_like_tsv(content: str) -> bool:
+    return "\t" in content and "\n" in content
+
+
 def parse_data(content: str) -> Optional[ParserAttempt]:
-    if "\n" not in content or "\t" not in content:
+    if not looks_like_tsv(content):
         return None
 
     rows = parse_delimited_rows(content, "\t")
