@@ -9,7 +9,6 @@ vi.mock('@/settings/useSettings', () => ({
 import {
   detectFormatAndParseWithFormatProcessing,
   FORMAT_PROCESSING_FILE_ACCEPT,
-  preprocessParsedDataForAiWithFormatProcessing,
   shouldUseFormatProcessingForFile,
 } from '@/utility/backend/formatProcessingApi';
 
@@ -42,19 +41,20 @@ describe('shouldUseFormatProcessingForFile', () => {
     expect(shouldUseFormatProcessingForFile('dataset.xml')).toBe(true);
     expect(shouldUseFormatProcessingForFile('values.toml')).toBe(true);
     expect(shouldUseFormatProcessingForFile('sample.cif')).toBe(true);
-    expect(shouldUseFormatProcessingForFile('model.py')).toBe(true);
+    expect(shouldUseFormatProcessingForFile('table.md')).toBe(true);
   });
 
   it('keeps plain json/yaml on the existing local parser path', () => {
     expect(shouldUseFormatProcessingForFile('data.json')).toBe(false);
     expect(shouldUseFormatProcessingForFile('data.yaml')).toBe(false);
+    expect(shouldUseFormatProcessingForFile('model.py')).toBe(false);
   });
 
   it('offers the extended file filter for open-data imports', () => {
     expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.xml');
     expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.toml');
     expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.cif');
-    expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.java');
+    expect(FORMAT_PROCESSING_FILE_ACCEPT).toContain('.mpif');
   });
 });
 
@@ -149,66 +149,18 @@ describe('detectFormatAndParseWithFormatProcessing', () => {
       detectFormatAndParseWithFormatProcessing('sample.xml', 'application/xml', '<x/>')
     ).rejects.toThrow(/returned invalid JSON/);
   });
-});
-
-describe('preprocessParsedDataForAiWithFormatProcessing', () => {
-  const fetchMock = vi.fn();
-
-  beforeEach(() => {
-    fetchMock.mockReset();
-    vi.stubGlobal('fetch', fetchMock);
-  });
-
-  it('POSTs preprocessing options and returns the shortened data', async () => {
-    fetchMock.mockResolvedValue(
-      jsonResponse({
-        format: 'json',
-        preprocessed_for_ai: {items: [1]},
-        display_text: 'Reduced array entries.',
-        ai_prompt_hint: 'Input was shortened.',
-      })
-    );
-
-    const result = await preprocessParsedDataForAiWithFormatProcessing({items: [1, 2, 3]}, 'json', {
-      initial_array_limit: 1,
-    });
-
-    expect(result.preprocessed_for_ai).toEqual({items: [1]});
-    const [url, init] = fetchMock.mock.calls[0]!;
-    expect(url).toBe('http://mock-format-processing/preprocess-for-ai');
-    expect(JSON.parse(init.body)).toEqual({
-      data: {items: [1, 2, 3]},
-      format: 'json',
-      preprocess_options: {initial_array_limit: 1},
-    });
-  });
-
-  it('falls back to the submitted data when no preprocessed value is returned', async () => {
-    const submittedData = {items: [1, 2, 3]};
-    fetchMock.mockResolvedValue(
-      jsonResponse({format: 'json', display_text: 'No preprocessing needed.'})
-    );
-
-    const result = await preprocessParsedDataForAiWithFormatProcessing(submittedData);
-
-    expect(result.preprocessed_for_ai).toBe(submittedData);
-  });
-
-  it('rejects malformed successful responses', async () => {
-    fetchMock.mockResolvedValue(jsonResponse([]));
-
-    await expect(preprocessParsedDataForAiWithFormatProcessing({value: 1})).rejects.toThrow(
-      /Invalid response/
-    );
-  });
 
   it('reports request bodies that cannot be serialized', async () => {
-    const circularData: Record<string, unknown> = {};
-    circularData.self = circularData;
+    const circularContent = {} as Record<string, unknown>;
+    circularContent.self = circularContent;
 
-    await expect(preprocessParsedDataForAiWithFormatProcessing(circularData)).rejects.toThrow(
-      /Could not serialize the format processing request/
-    );
+    await expect(
+      detectFormatAndParseWithFormatProcessing(
+        'sample.json',
+        'application/json',
+        circularContent as unknown as string
+      )
+    ).rejects.toThrow(/Could not serialize the format processing request/);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

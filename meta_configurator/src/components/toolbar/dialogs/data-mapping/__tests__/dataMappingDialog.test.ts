@@ -194,7 +194,8 @@ async function setupDialog({
   vi.doMock('@/components/panels/ai-prompts/ApiKeyWarning.vue', () => ({default: EmptyStub}));
   vi.doMock('@/components/panels/shared-components/PanelSettings.vue', () => ({default: SlotStub}));
   vi.doMock('@/components/panels/shared-components/aceUtils', () => ({
-    setupAceProperties: vi.fn(),
+    // setupAceProperties returns the callback that stops its settings watchers.
+    setupAceProperties: vi.fn(() => vi.fn()),
   }));
   vi.doMock('@/settings/useSettings', () => ({
     useSettings: () =>

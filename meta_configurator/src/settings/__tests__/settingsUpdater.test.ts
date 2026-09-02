@@ -39,7 +39,7 @@ import {
 } from '../settingsUpdater';
 
 describe('test settings updater', () => {
-  let userSettings: any = {
+  const userSettings: any = {
     a: {
       b: {
         c: 5,
@@ -71,7 +71,7 @@ describe('test settings updater', () => {
     },
   };
 
-  let defaultSettings: any = {
+  const defaultSettings: any = {
     a: {
       b: {
         c: 1,

@@ -13,7 +13,7 @@ from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from detection_service import detect_format_and_parse, preprocess_parsed_data_for_ai
+from detection_service import detect_format_and_parse
 
 app = Flask(__name__)
 
@@ -72,7 +72,7 @@ limiter = Limiter(
 )
 
 
-def is_payload_length_valid(value) -> bool:
+def _is_within_file_size_limit(value: Any) -> bool:
     if isinstance(value, str):
         serialized = value
     else:
@@ -89,19 +89,17 @@ class _InvalidRequest(Exception):
         self.status_code = status_code
 
 
-def _read_request_payload(
-    required_field: str, too_large_message: str
-) -> Dict[str, Any]:
-    """Returns the JSON body once the required field is present and small enough."""
+def _read_import_request() -> Dict[str, Any]:
+    """Returns the JSON body once the file content is present and small enough."""
     request_data = request.get_json(silent=True)
     if not request_data:
         raise _InvalidRequest("Missing request data")
     if not isinstance(request_data, dict):
         raise _InvalidRequest("Request data must be a JSON object")
-    if required_field not in request_data:
-        raise _InvalidRequest(f'Missing required field "{required_field}"')
-    if not is_payload_length_valid(request_data[required_field]):
-        raise _InvalidRequest(too_large_message, 413)
+    if "content" not in request_data:
+        raise _InvalidRequest('Missing required field "content"')
+    if not _is_within_file_size_limit(request_data["content"]):
+        raise _InvalidRequest("Input file too large", 413)
     return request_data
 
 
@@ -140,7 +138,7 @@ def health():
 @limiter.limit("20 per minute")
 @_handle_json_route_errors
 def detect_format_and_parse_route():
-    request_data = _read_request_payload("content", "Input file too large")
+    request_data = _read_import_request()
 
     result = detect_format_and_parse(
         file_name=request_data.get("file_name", ""),
@@ -150,21 +148,6 @@ def detect_format_and_parse_route():
     )
 
     return jsonify(asdict(result))
-
-
-@app.route("/preprocess-for-ai", methods=["POST"])
-@limiter.limit("30 per minute")
-@_handle_json_route_errors
-def preprocess_for_ai_route():
-    request_data = _read_request_payload("data", "Input data too large")
-
-    return jsonify(
-        preprocess_parsed_data_for_ai(
-            parsed_data=request_data["data"],
-            format_name=request_data.get("format", "json"),
-            preprocess_options=request_data.get("preprocess_options"),
-        )
-    )
 
 
 if __name__ == "__main__":

@@ -694,7 +694,9 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
           @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
           @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)"
-          :data-testid="'add-item-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="
+            'add-item-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0, -1))
+          ">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{ slotProps.node.data.label }}</span>
@@ -712,7 +714,9 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
           @keyup.enter="
             addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
           "
-          :data-testid="'add-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="
+            'add-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0, -1))
+          ">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{
@@ -726,7 +730,10 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
           class="text-gray-500"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
-          :data-testid="'advanced-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="
+            'advanced-property-' +
+            pathToString((slotProps.node.data.absolutePath as Path).slice(0, -1))
+          ">
           Advanced
         </span>
         <span

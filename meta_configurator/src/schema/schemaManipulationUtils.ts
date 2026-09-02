@@ -181,8 +181,8 @@ export function extractGeneratedDefinitionsFromSubSchema(
     const wasBundled = bundledDefinitionNames.includes(name);
     const newRootPath: Path = wasBundled
       ? [defsKey, name]
-      : doesIdenticalSchemaDefinitionExist(rootSchemaData, content) ??
-        findAvailableSchemaId(rootSchemaData, ['$defs'], name, true);
+      : (doesIdenticalSchemaDefinitionExist(rootSchemaData, content) ??
+        findAvailableSchemaId(rootSchemaData, ['$defs'], name, true));
     pathMappings.push({oldLocalPath: [defsKey, name], newRootPath, content, wasBundled});
   }
 

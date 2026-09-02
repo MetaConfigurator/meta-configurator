@@ -200,7 +200,7 @@ export const queryHandlebarsTemplate = async (
   For these examples you should generate the following Template: \`\`\`${exampleExpression}\`\`\`.
   The output description can also be natural language texts or other data structures (e.g., XML, or other formats), but the output must always be a text document.`;
 
-  let userMessage = `Input file subset: \`\`\`${inputFileSubset}\`\`\`.  
+  const userMessage = `Input file subset: \`\`\`${inputFileSubset}\`\`\`.  
   Input file schema: \`\`\`${inputFileSchema}\`\`\`.
   The goal is to generate a handlebars Template. Description or example of the desired output document: \`\`\`${outputDescription}\`\`\`. Keep it simple and conservative. Avoid adding new values that do not exist.`;
 

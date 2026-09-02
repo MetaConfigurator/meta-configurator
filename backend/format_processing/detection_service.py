@@ -8,15 +8,12 @@ from preprocess import preprocess_data_for_ai
 from parsers import (
     cif_format,
     csv_format,
-    cpp_source,
     dotenv_format,
     ini_format,
-    java_source,
     json_format,
     jsonl_format,
     markdown_table_format,
     properties_format,
-    python_source,
     star_family_format,
     toml_format,
     tsv_format,
@@ -146,56 +143,6 @@ SUPPORTED_FORMATS = (
         file_extensions=("properties",),
         mime_type_markers=(),
         content_detector=properties_format.looks_like_properties,
-    ),
-    SupportedFormat(
-        name="cpp_source",
-        display_name="C++ source code",
-        ai_prompt_hint=(
-            "Input is C++ source code parsed by the backend into a compact syntax tree "
-            "plus semantic summary. Preserve syntax tree structure, includes, "
-            "declarations, classes, functions, and calls while mapping."
-        ),
-        parse_data=cpp_source.parse_data,
-        file_extensions=(
-            "cpp",
-            "cc",
-            "cxx",
-            "c++",
-            "hpp",
-            "hh",
-            "hxx",
-            "ipp",
-            "tpp",
-            "h",
-        ),
-        mime_type_markers=("c++", "cpp", "x-c++"),
-        content_detector=cpp_source.looks_like_cpp_source,
-    ),
-    SupportedFormat(
-        name="python_source",
-        display_name="Python source code",
-        ai_prompt_hint=(
-            "Input is Python source code parsed by the backend into a compact syntax "
-            "tree plus semantic summary. Preserve syntax tree structure, imports, "
-            "classes, functions, and call structure while mapping."
-        ),
-        parse_data=python_source.parse_data,
-        file_extensions=("py", "pyw"),
-        mime_type_markers=("python", "x-python"),
-        content_detector=python_source.looks_like_python_source,
-    ),
-    SupportedFormat(
-        name="java_source",
-        display_name="Java source code",
-        ai_prompt_hint=(
-            "Input is Java source code parsed by the backend into a compact syntax tree "
-            "plus semantic summary. Preserve syntax tree structure, package, imports, "
-            "classes, methods, loops, conditionals, and call structure while mapping."
-        ),
-        parse_data=java_source.parse_data,
-        file_extensions=("java",),
-        mime_type_markers=("java",),
-        content_detector=java_source.looks_like_java_source,
     ),
     SupportedFormat(
         name="tsv",
@@ -337,33 +284,6 @@ def detect_format_and_parse(
         display_text=message,
         ai_prompt_hint="",
     )
-
-
-def preprocess_parsed_data_for_ai(
-    parsed_data: Any,
-    format_name: str = "json",
-    preprocess_options: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    supported_format = SUPPORTED_FORMAT_BY_NAME.get(format_name)
-    fallback_format = SUPPORTED_FORMAT_BY_NAME["json"]
-    display_name = (
-        supported_format.display_name
-        if supported_format is not None
-        else format_name or fallback_format.display_name
-    )
-    ai_prompt_hint = (
-        supported_format.ai_prompt_hint
-        if supported_format is not None
-        else fallback_format.ai_prompt_hint
-    )
-    return {
-        "format": format_name,
-        "preprocessed_for_ai": core.to_json_safe(
-            preprocess_data_for_ai(parsed_data, preprocess_options)
-        ),
-        "display_text": f"Backend prepared AI preview for {display_name}.",
-        "ai_prompt_hint": ai_prompt_hint,
-    }
 
 
 def _build_display_text(format_name: str, parser_name: Optional[str]) -> str:

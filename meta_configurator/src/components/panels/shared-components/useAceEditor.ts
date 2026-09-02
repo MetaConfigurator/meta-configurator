@@ -1,6 +1,10 @@
 import {onBeforeUnmount, ref, watch, type Ref} from 'vue';
 import * as ace from 'brace';
 import type {Editor} from 'brace';
+// The mode files reference the global that importing brace itself installs, so they must
+// be imported here, after brace, instead of in the components that select a mode.
+import 'brace/mode/javascript';
+import 'brace/mode/jsoniq';
 import {setupAceProperties} from '@/components/panels/shared-components/aceUtils';
 import {useSettings} from '@/settings/useSettings';
 

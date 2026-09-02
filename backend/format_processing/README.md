@@ -1,8 +1,8 @@
 # Format Processing Service
 
 The format processing service provides backend-side format detection, parsing, and AI
-preprocessing for imported data. It is the service that powers endpoints like
-`/detect-format-and-parse` and `/preprocess-for-ai`.
+preprocessing for imported data. It is the service behind the `/detect-format-and-parse`
+endpoint used by the AI-assisted data import.
 
 ## Run modes
 
@@ -48,13 +48,12 @@ the Flask app still sees routes like `/detect-format-and-parse`.
 
 - `GET /health`
 - `POST /detect-format-and-parse`
-- `POST /preprocess-for-ai`
 
 ## Configuration
 
 - `CORS_ALLOWED_ORIGINS`: comma-separated browser origins. If unset, the known
   MetaConfigurator production and local-development origins are used.
-- `MAX_FILE_LENGTH`: maximum UTF-8 size of the imported content or preprocessing data
+- `MAX_FILE_LENGTH`: maximum UTF-8 size of the imported content
   (default: `500000` bytes).
 - `MAX_REQUEST_LENGTH`: maximum HTTP request size, including JSON overhead
   (default: `1000000` bytes).

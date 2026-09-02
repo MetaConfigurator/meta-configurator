@@ -11,12 +11,10 @@ async function setupMappingServices() {
     trimDataToMaxSize: (value: unknown) => ({preview: value}),
   }));
 
-  const {DataMappingServiceJavascript} = await import(
-    '@/data-mapping/javascript/dataMappingServiceJavascript'
-  );
-  const {DataMappingServiceJsonata} = await import(
-    '@/data-mapping/jsonata/dataMappingServiceJsonata'
-  );
+  const {DataMappingServiceJavascript} =
+    await import('@/data-mapping/javascript/dataMappingServiceJavascript');
+  const {DataMappingServiceJsonata} =
+    await import('@/data-mapping/jsonata/dataMappingServiceJsonata');
   return {
     DataMappingServiceJavascript,
     DataMappingServiceJsonata,

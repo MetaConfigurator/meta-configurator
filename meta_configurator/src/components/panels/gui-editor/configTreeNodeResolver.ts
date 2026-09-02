@@ -212,7 +212,7 @@ export class ConfigTreeNodeResolver {
     mode: SessionMode,
     parameters: TreeNodeResolvingParameters
   ) {
-    let result = sortObjectChildren(
+    const result = sortObjectChildren(
       settings.value.guiEditor.propertySorting,
       parameters.schema,
       filter => this.createSchemaPropertiesChildNodes(mode, parameters, filter),

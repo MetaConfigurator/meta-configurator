@@ -13,30 +13,6 @@ from format_detection import detect_format_and_parse
 from preprocess import preprocess_data_for_ai
 
 
-# Expected envelope contents per source code format: language, tree-sitter root type,
-# the summary keys the parser fills and one symbol that must show up in the summary.
-SOURCE_CODE_EXPECTATIONS = {
-    "cpp_source": {
-        "language": "cpp",
-        "root_type": "translation_unit",
-        "summary_keys": ["includes", "classes", "functions"],
-        "expected_function_name": "main",
-    },
-    "python_source": {
-        "language": "python",
-        "root_type": "module",
-        "summary_keys": ["imports", "classes", "functions"],
-        "expected_function_name": "build",
-    },
-    "java_source": {
-        "language": "java",
-        "root_type": "program",
-        "summary_keys": ["package", "imports", "classes"],
-        "expected_class_name": "Job",
-    },
-}
-
-
 class TestFormatDetection(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -44,29 +20,6 @@ class TestFormatDetection(unittest.TestCase):
 
     def _read_fixture(self, name: str) -> str:
         return (self.fixture_dir / name).read_text(encoding="utf-8")
-
-    def _assert_source_code_summary(self, parsed_json, expectations) -> None:
-        self.assertIsInstance(parsed_json, dict)
-        self.assertEqual(parsed_json.get("language"), expectations["language"])
-        self.assertEqual(parsed_json.get("root_type"), expectations["root_type"])
-        self.assertEqual(parsed_json.get("representation"), "syntax_tree_with_summary")
-        self.assertIn("syntax_tree", parsed_json)
-
-        summary = parsed_json.get("summary", {})
-        for summary_key in expectations["summary_keys"]:
-            self.assertIn(summary_key, summary)
-        for summary_key, expected_name in (
-            ("functions", expectations.get("expected_function_name")),
-            ("classes", expectations.get("expected_class_name")),
-        ):
-            if expected_name is None:
-                continue
-            self.assertTrue(
-                any(
-                    isinstance(entry, dict) and entry.get("name") == expected_name
-                    for entry in summary.get(summary_key, [])
-                )
-            )
 
     def test_detects_known_formats(self) -> None:
         cases = [
@@ -83,9 +36,6 @@ class TestFormatDetection(unittest.TestCase):
             ("sample.env", "text/plain", "dotenv"),
             ("sample.properties", "text/plain", "properties"),
             ("sample.md", "text/markdown", "markdown_table"),
-            ("sample.cpp", "text/x-c++src", "cpp_source"),
-            ("sample.py", "text/x-python", "python_source"),
-            ("sample.java", "text/x-java-source", "java_source"),
         ]
 
         for file_name, mime_type, expected_format in cases:
@@ -119,10 +69,6 @@ class TestFormatDetection(unittest.TestCase):
                     first_block = next(iter(result.parsed_json.values()))
                     self.assertIsInstance(first_block, dict)
                     self.assertIn("_mpif_audit_creation_date", first_block)
-                if expected_format in SOURCE_CODE_EXPECTATIONS:
-                    self._assert_source_code_summary(
-                        result.parsed_json, SOURCE_CODE_EXPECTATIONS[expected_format]
-                    )
 
     def test_unknown_format_falls_back_cleanly(self) -> None:
         content = self._read_fixture("sample.unknown.txt")
@@ -157,27 +103,6 @@ class TestFormatDetection(unittest.TestCase):
         )
         self.assertGreaterEqual(
             len(result.parsed_json["sample_001"]["_atom_site_label"]), 3
-        )
-
-    def test_cpp_summary_lists_top_level_calls(self) -> None:
-        content = """
-#include <registry.h>
-
-static void run(int value)
-{
-  registerHandler(value);
-}
-
-REGISTER(run)->withName("demo");
-""".strip()
-        result = detect_format_and_parse("registry.cpp", "text/x-c++src", content)
-        self.assertTrue(result.recognized)
-        self.assertEqual(result.format, "cpp_source")
-        summary = result.parsed_json.get("summary", {})
-        self.assertIn("REGISTER", [call["callee"] for call in summary["top_level_calls"]])
-        self.assertIn(
-            "registerHandler",
-            [call["callee"] for function in summary["functions"] for call in function["calls"]],
         )
 
     def test_preprocessed_for_ai_truncates_large_string_fields(self) -> None:
@@ -269,35 +194,6 @@ REGISTER(run)->withName("demo");
         )
 
         self.assertIn("TRUNCATED", preprocessed["description"])
-
-    def test_preprocessing_preserves_unknown_format_name_in_display_text(self) -> None:
-        result = detection_service.preprocess_parsed_data_for_ai(
-            {"value": 1}, format_name="custom_format"
-        )
-
-        self.assertEqual(result["format"], "custom_format")
-        self.assertIn("custom_format", result["display_text"])
-        self.assertEqual(
-            result["ai_prompt_hint"],
-            detection_service.SUPPORTED_FORMAT_BY_NAME["json"].ai_prompt_hint,
-        )
-
-    def test_python_summary_supports_decorators_and_typed_signatures(self) -> None:
-        result = detect_format_and_parse(
-            "typed.py",
-            "text/x-python",
-            "@cache\ndef convert(value: dict[str, int]) -> list[int]:\n"
-            "    return list(value.values())\n",
-        )
-
-        self.assertTrue(result.recognized)
-        self.assertEqual(result.format, "python_source")
-        functions = result.parsed_json["summary"]["functions"]
-        self.assertEqual(functions[0]["name"], "convert")
-        self.assertEqual(
-            functions[0]["signature"],
-            "def convert(value: dict[str, int]) -> list[int]:",
-        )
 
     def test_library_parsers_handle_escapes_the_old_text_parsers_missed(self) -> None:
         properties_result = detect_format_and_parse(

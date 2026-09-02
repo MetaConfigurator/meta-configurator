@@ -24,7 +24,10 @@ vi.mock('@/data/managedValidation', async () => {
   const {ValidationService} = await import('@/schema/validationService');
   const {ValidationResult} = await import('@/schema/validationUtils');
   class ManagedValidation {
-    constructor(public mode: any, private validationSchemaRaw?: any) {}
+    constructor(
+      public mode: any,
+      private validationSchemaRaw?: any
+    ) {}
     currentValidationService = computed(
       () => new ValidationService(this.validationSchemaRaw?.value ?? {})
     );

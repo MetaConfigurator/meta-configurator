@@ -22,17 +22,6 @@ def test_detect_format_rejects_oversized_content():
     assert response.get_json() == {"error": "Input file too large"}
 
 
-def test_preprocess_rejects_oversized_data():
-    client = app.test_client()
-    response = client.post(
-        "/preprocess-for-ai",
-        json={"format": "json", "data": "x" * (MAX_FILE_LENGTH + 1)},
-    )
-
-    assert response.status_code == 413
-    assert response.get_json() == {"error": "Input data too large"}
-
-
 def test_global_request_limit_returns_json():
     client = app.test_client()
     response = client.post(

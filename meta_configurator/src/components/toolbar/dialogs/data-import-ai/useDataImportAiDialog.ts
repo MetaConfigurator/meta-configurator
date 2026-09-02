@@ -22,10 +22,7 @@ import {
 import {useDataImportAiSourceFile} from './useDataImportAiSourceFile';
 
 export type DataImportAiMode =
-  | 'javascript_mapping'
-  | 'direct_parse'
-  | 'ai_normalize_parsed'
-  | 'full_ai_import';
+  'javascript_mapping' | 'direct_parse' | 'ai_normalize_parsed' | 'full_ai_import';
 
 type PendingImportConfirmation = {
   resultData: unknown;

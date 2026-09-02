@@ -9,7 +9,6 @@ import Textarea from 'primevue/textarea';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
-import 'brace/mode/javascript';
 import {SessionMode} from '@/store/sessionMode';
 import {FORMAT_PROCESSING_FILE_ACCEPT} from '@/utility/backend/formatProcessingApi';
 import {SCHEMA_SOURCE_OPTIONS, useDataImportAiDialog} from './useDataImportAiDialog';

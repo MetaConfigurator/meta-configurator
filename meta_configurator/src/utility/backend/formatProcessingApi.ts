@@ -31,19 +31,6 @@ const FORMAT_PROCESSING_DATA_FILE_EXTENSIONS = [
   '.cif',
   '.mmcif',
   '.mcif',
-  '.cpp',
-  '.cc',
-  '.cxx',
-  '.c++',
-  '.hpp',
-  '.hh',
-  '.hxx',
-  '.ipp',
-  '.tpp',
-  '.h',
-  '.py',
-  '.pyw',
-  '.java',
 ] as const;
 
 export const FORMAT_PROCESSING_FILE_ACCEPT = [
@@ -60,22 +47,6 @@ export interface FormatProcessingDetectionResult {
   message: string;
   display_text: string;
   parser_name?: string | null;
-  ai_prompt_hint?: string | null;
-}
-
-export interface FormatProcessingPreprocessOptions {
-  target_document_size_kb?: number;
-  initial_array_limit?: number;
-  min_array_limit?: number;
-  object_key_factor?: number;
-  max_string_len?: number;
-  max_data_field_len?: number;
-}
-
-export interface FormatProcessingPreprocessResult {
-  format: string;
-  preprocessed_for_ai: unknown;
-  display_text: string;
   ai_prompt_hint?: string | null;
 }
 
@@ -115,34 +86,6 @@ export async function detectFormatAndParseWithFormatProcessing(
     message: responseBody.message,
     display_text: responseBody.display_text,
     parser_name: getNullableString(responseBody.parser_name),
-    ai_prompt_hint: getNullableString(responseBody.ai_prompt_hint),
-  };
-}
-
-export async function preprocessParsedDataForAiWithFormatProcessing(
-  data: unknown,
-  format: string = 'json',
-  preprocessOptions?: FormatProcessingPreprocessOptions
-): Promise<FormatProcessingPreprocessResult> {
-  const responseBody = await postToFormatProcessing('/preprocess-for-ai', {
-    data,
-    format,
-    preprocess_options: preprocessOptions,
-  });
-
-  if (
-    !isObjectRecord(responseBody) ||
-    typeof responseBody.format !== 'string' ||
-    typeof responseBody.display_text !== 'string' ||
-    !isOptionalNullableString(responseBody.ai_prompt_hint)
-  ) {
-    throw new Error('Invalid response from the format processing service.');
-  }
-
-  return {
-    format: responseBody.format,
-    preprocessed_for_ai: responseBody.preprocessed_for_ai ?? data,
-    display_text: responseBody.display_text,
     ai_prompt_hint: getNullableString(responseBody.ai_prompt_hint),
   };
 }
