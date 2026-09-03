@@ -14,6 +14,15 @@ import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchem
 import {resolveSchemaReferences} from '@/components/toolbar/resolveSchemaReferences.ts';
 import {bundleSchema} from '@/components/toolbar/bundleSchema.ts';
 import {sortSchemaPropertiesAlphabeticallyAction} from '@/components/toolbar/sortSchemaProperties.ts';
+import {hasJsonContent} from '@/utility/hasJsonContent';
+
+function hasData(): boolean {
+  return hasJsonContent(getDataForMode(SessionMode.DataEditor).data.value);
+}
+
+function hasSchema(): boolean {
+  return hasJsonContent(getDataForMode(SessionMode.SchemaEditor).data.value);
+}
 
 /** The dialog-opening callbacks the menu entries trigger, owned by the toolbar component. */
 export type MenuItemDialogActions = {
@@ -48,11 +57,13 @@ export class MenuItems {
             label: 'Clear Data',
             icon: 'fa-regular fa-file',
             command: clearCurrentFile,
+            disabled: () => !hasData(),
           },
           {
             label: 'Generate Data...',
             icon: 'fa-solid fa-gears',
             command: openGenerateDataDialog,
+            disabled: () => !hasSchema(),
           },
         ],
       },
@@ -91,6 +102,7 @@ export class MenuItems {
       {
         label: 'Export Data...',
         icon: 'fa-solid fa-file-export',
+        disabled: () => !hasData(),
         items: [
           {
             label: 'Download JSON/YAML Data',
@@ -109,11 +121,13 @@ export class MenuItems {
         label: 'Utility...',
         icon: 'fa-solid fa-wrench',
         key: 'utility',
+        disabled: () => !hasData(),
         items: [
           {
             label: 'Transform Data to match the Schema...',
             icon: 'fa-solid fa-wand-magic-sparkles',
             command: this.dialogActions.showDataMappingDialog,
+            disabled: () => !hasSchema(),
           },
           {
             label: 'Export Data via Text Template...',
@@ -132,6 +146,7 @@ export class MenuItems {
         icon: 'fa-solid fa-share',
         command: this.dialogActions.showSnapshotDialog,
         key: 'snapshot',
+        disabled: () => !hasData() && !hasSchema(),
       },
       {
         separator: true,
@@ -179,11 +194,13 @@ export class MenuItems {
             icon: 'fa-regular fa-file',
             command: clearCurrentFile,
             key: 'clear-schema',
+            disabled: () => !hasSchema(),
           },
           {
             label: 'Infer Schema from Data...',
             icon: 'fa-solid fa-wand-magic-sparkles',
             command: this.dialogActions.showInferSchemaDialog,
+            disabled: () => !hasData(),
           },
         ],
       },
@@ -213,6 +230,7 @@ export class MenuItems {
         label: 'Export Schema...',
         icon: 'fa-solid fa-file-export',
         key: 'export-schema',
+        disabled: () => !hasSchema(),
         items: [
           {
             label: 'Download as JSON Schema',
@@ -231,6 +249,7 @@ export class MenuItems {
         label: 'Utility...',
         icon: 'fa-solid fa-wrench',
         key: 'utility',
+        disabled: () => !hasSchema(),
         items: [
           {
             label: 'Extract All Inlined Schema Elements into Definitions and use References',
@@ -256,6 +275,7 @@ export class MenuItems {
             label: 'Refine Schema based on Data...',
             icon: 'fa-solid fa-wand-magic-sparkles',
             command: this.dialogActions.showRefineSchemaDialog,
+            disabled: () => !hasData(),
           },
         ],
       },
@@ -263,12 +283,14 @@ export class MenuItems {
         label: 'Generate Source Code...',
         icon: 'fa-solid fa-file-code',
         command: () => this.dialogActions.showCodeGenerationDialog(true),
+        disabled: () => !hasSchema(),
       },
       {
         label: 'Share Snapshot...',
         icon: 'fa-solid fa-share',
         command: this.dialogActions.showSnapshotDialog,
         key: 'snapshot',
+        disabled: () => !hasData() && !hasSchema(),
       },
       {
         separator: true,
