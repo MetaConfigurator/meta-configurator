@@ -1,17 +1,16 @@
-import {computed, nextTick, ref, watch} from 'vue';
+import {computed, nextTick, ref, shallowRef, watch} from 'vue';
 import {useAceEditor} from '@/components/panels/shared-components/useAceEditor';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
 import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
-import {useSettings} from '@/settings/useSettings';
 import {SessionMode} from '@/store/sessionMode';
 import {getApiKeyRef} from '@/utility/ai/apiKey';
 import {canQueryAi} from '@/utility/ai/aiAvailability';
 import {getErrorMessage} from '@/utility/getErrorMessage';
 import {
   generateImportScriptSuggestion,
-  generateNormalizationScriptSuggestion,
+  generateParsedDataMappingScriptSuggestion,
   runDirectParsedImport,
   runFullAiImport,
   runImportWithGeneratedScript,
@@ -21,11 +20,12 @@ import {
   type GeneratedScriptResult,
 } from './dataImportAiService';
 import {useDataImportAiSourceFile} from './useDataImportAiSourceFile';
+import {isJsonLdDocument} from '@/utility/rdf/isJsonLdDocument';
 
 export type DataImportAiMode =
   | 'javascript_mapping'
   | 'direct_parse'
-  | 'ai_normalize_parsed'
+  | 'map_parsed_to_schema'
   | 'full_ai_import';
 
 type PendingImportConfirmation = {
@@ -44,8 +44,8 @@ type ImportExecutor = (
 const DEFAULT_TRANSFORM_SCRIPT = `function transform(input) {
   return input;
 }`;
-export const INFER_SCHEMA_OPTION = 'Infer schema from imported data';
-export const USE_CURRENT_SCHEMA_OPTION = 'Use current schema from app';
+export const INFER_SCHEMA_OPTION = 'Automatic schema handling';
+export const USE_CURRENT_SCHEMA_OPTION = 'Validate against current schema';
 export const SCHEMA_SOURCE_OPTIONS = [INFER_SCHEMA_OPTION, USE_CURRENT_SCHEMA_OPTION];
 /** Sample size used to smoke-test a generated parser before running the real import. */
 const VALIDATION_SAMPLE_CHARACTERS = 2048;
@@ -63,7 +63,8 @@ export function useDataImportAiDialog() {
   const hasValidationErrorForSuggestion = ref(false);
   const lastValidationError = ref('');
   const lastFailedScript = ref('');
-  const pendingImportConfirmation = ref<PendingImportConfirmation | null>(null);
+  // shallowRef: keeps the imported document raw, see useDataImportAiSourceFile.
+  const pendingImportConfirmation = shallowRef<PendingImportConfirmation | null>(null);
   const generatedScript = ref(DEFAULT_TRANSFORM_SCRIPT);
 
   const {
@@ -82,7 +83,6 @@ export function useDataImportAiDialog() {
     resetSourceFile,
   } = useDataImportAiSourceFile();
 
-  const settings = useSettings();
   const apiKey = getApiKeyRef();
   const {editorElementId, createEditor, destroyEditor} = useAceEditor(
     'data-import-ai',
@@ -97,29 +97,36 @@ export function useDataImportAiDialog() {
         `Manual JavaScript import and full AI import remain available.`
       : ''
   );
-  const canUseAiNormalizeParsed = computed(() => canUseDirectParse.value && canUseAi.value);
-  const importModeOptions = computed(() => [
-    {
-      label: 'Generate JavaScript mapping from raw input',
-      value: 'javascript_mapping' as DataImportAiMode,
-      disabled: false,
-    },
-    {
-      label: 'Use parsed result directly',
-      value: 'direct_parse' as DataImportAiMode,
-      disabled: !canUseDirectParse.value,
-    },
-    {
-      label: 'Use parsed result and AI normalize it',
-      value: 'ai_normalize_parsed' as DataImportAiMode,
-      disabled: !canUseAiNormalizeParsed.value,
-    },
-    {
+  const usesCurrentSchema = computed(
+    () => selectedSchemaSource.value === USE_CURRENT_SCHEMA_OPTION
+  );
+  const importModeOptions = computed(() => {
+    const options = [
+      {
+        label: 'Generate JavaScript mapping from raw input',
+        value: 'javascript_mapping' as DataImportAiMode,
+        disabled: false,
+      },
+      {
+        label: 'Use parsed result directly',
+        value: 'direct_parse' as DataImportAiMode,
+        disabled: !canUseDirectParse.value,
+      },
+    ];
+    if (usesCurrentSchema.value && hasCurrentSchema()) {
+      options.push({
+        label: 'Map parsed data to schema with AI',
+        value: 'map_parsed_to_schema',
+        disabled: !canUseDirectParse.value || !canUseAi.value,
+      });
+    }
+    options.push({
       label: 'Full AI import',
-      value: 'full_ai_import' as DataImportAiMode,
+      value: 'full_ai_import',
       disabled: !canUseAi.value,
-    },
-  ]);
+    });
+    return options;
+  });
   const isBusy = computed(
     () => isImportingData.value || isLoadingSuggestion.value || isDetectingFormat.value
   );
@@ -127,13 +134,14 @@ export function useDataImportAiDialog() {
   const usesJavascriptStep = computed(
     () =>
       selectedImportMode.value === 'javascript_mapping' ||
-      selectedImportMode.value === 'ai_normalize_parsed'
+      selectedImportMode.value === 'map_parsed_to_schema'
   );
-  const isCurrentImportModeDisabled = computed(() =>
-    importModeOptions.value.some(
-      option => option.value === selectedImportMode.value && option.disabled
-    )
-  );
+  const isCurrentImportModeDisabled = computed(() => {
+    const selectedOption = importModeOptions.value.find(
+      option => option.value === selectedImportMode.value
+    );
+    return selectedOption === undefined || selectedOption.disabled;
+  });
   const isSuggestionDisabled = computed(
     () => !hasUploadedFile.value || !canUseAi.value || isBusy.value
   );
@@ -144,8 +152,8 @@ export function useDataImportAiDialog() {
     if (hasValidationErrorForSuggestion.value) {
       return 'Regenerate Suggestion for Previous Error';
     }
-    return selectedImportMode.value === 'ai_normalize_parsed'
-      ? 'Generate AI Normalization JavaScript'
+    return selectedImportMode.value === 'map_parsed_to_schema'
+      ? 'Generate Mapping'
       : 'Generate JavaScript Suggestion';
   });
   const importButtonLabel = computed(() => {
@@ -174,7 +182,7 @@ export function useDataImportAiDialog() {
     }
   );
 
-  watch([canUseDirectParse, canUseAi], () => {
+  watch([canUseDirectParse, canUseAi, selectedSchemaSource], () => {
     if (isCurrentImportModeDisabled.value) {
       selectedImportMode.value = getDefaultImportMode();
     }
@@ -253,7 +261,9 @@ export function useDataImportAiDialog() {
     message: string
   ) {
     const inferredSchema =
-      schemaSource === 'infer_from_data' ? inferJsonSchema(resultData) : undefined;
+      schemaSource === 'infer_from_data'
+        ? inferSchemaUnlessJsonLd(resultData)
+        : undefined;
 
     getDataForMode(SessionMode.DataEditor).setData(resultData);
     if (inferredSchema !== undefined) {
@@ -264,6 +274,12 @@ export function useDataImportAiDialog() {
     errorMessage.value = '';
     clearPendingImportConfirmation();
     hideDialog();
+  }
+
+  function inferSchemaUnlessJsonLd(resultData: unknown): TopLevelSchema {
+    // JSON-LD serializations can have very different structures for equivalent RDF data.
+    // Leave them schema-free unless the user deliberately imports against the current schema.
+    return isJsonLdDocument(resultData) ? {} : inferJsonSchema(resultData);
   }
 
   /**
@@ -333,6 +349,9 @@ export function useDataImportAiDialog() {
     try {
       if (await selectSourceFile(event)) {
         selectedImportMode.value = getDefaultImportMode();
+        if (isJsonLdDocument(parsedJsonFromBackend.value)) {
+          selectedSchemaSource.value = INFER_SCHEMA_OPTION;
+        }
       }
     } catch {
       showError('Failed to read selected file.');
@@ -355,20 +374,20 @@ export function useDataImportAiDialog() {
       return;
     }
 
-    const normalizesParsedData = selectedImportMode.value === 'ai_normalize_parsed';
-    if (normalizesParsedData && !canUseDirectParse.value) {
-      showError('AI normalization requires parsed backend data.');
+    const mapsParsedDataToSchema = selectedImportMode.value === 'map_parsed_to_schema';
+    if (mapsParsedDataToSchema && (!canUseDirectParse.value || !usesCurrentSchema.value)) {
+      showError('Schema mapping requires parsed backend data and the current schema.');
       return;
     }
 
     clearPendingImportConfirmation();
     const schemaSource = getSelectedSchemaSource();
     isLoadingSuggestion.value = true;
-    statusMessage.value = getSuggestionProgressMessage(normalizesParsedData);
+    statusMessage.value = getSuggestionProgressMessage(mapsParsedDataToSchema);
     errorMessage.value = '';
 
     try {
-      const result = await requestScriptSuggestion(normalizesParsedData, schemaSource);
+      const result = await requestScriptSuggestion(mapsParsedDataToSchema, schemaSource);
 
       if (!result.success) {
         showError(result.message);
@@ -387,7 +406,7 @@ export function useDataImportAiDialog() {
   }
 
   function requestScriptSuggestion(
-    normalizesParsedData: boolean,
+    mapsParsedDataToSchema: boolean,
     schemaSource: DataImportAiSchemaSource
   ): Promise<GeneratedScriptResult> {
     const sharedRequest = {
@@ -398,8 +417,8 @@ export function useDataImportAiDialog() {
       backendPromptHint: backendPromptHint.value,
       retryContext: getSuggestionRetryContext(),
     };
-    if (normalizesParsedData) {
-      return generateNormalizationScriptSuggestion({
+    if (mapsParsedDataToSchema) {
+      return generateParsedDataMappingScriptSuggestion({
         ...sharedRequest,
         parsedData: parsedJsonFromBackend.value,
         preprocessedDataForAi: preprocessedJsonForAi.value ?? parsedJsonFromBackend.value,
@@ -422,14 +441,14 @@ export function useDataImportAiDialog() {
       : undefined;
   }
 
-  function getSuggestionProgressMessage(normalizesParsedData: boolean): string {
+  function getSuggestionProgressMessage(mapsParsedDataToSchema: boolean): string {
     if (hasValidationErrorForSuggestion.value) {
-      return normalizesParsedData
-        ? 'Generating improved AI normalization JavaScript based on the validation error...'
+      return mapsParsedDataToSchema
+        ? 'Generating an improved schema mapping from the validation error...'
         : 'Generating improved JavaScript parser suggestion based on the validation error...';
     }
-    if (normalizesParsedData) {
-      return 'Generating AI normalization JavaScript from parsed backend data...';
+    if (mapsParsedDataToSchema) {
+      return 'Generating schema mapping from parsed data...';
     }
     return 'Generating JavaScript parser suggestion...';
   }
@@ -475,9 +494,9 @@ export function useDataImportAiDialog() {
       return;
     }
 
-    const usesParsedInput = selectedImportMode.value === 'ai_normalize_parsed';
+    const usesParsedInput = selectedImportMode.value === 'map_parsed_to_schema';
     if (usesParsedInput && parsedJsonFromBackend.value === null) {
-      showError('No parsed backend JSON available for AI normalization.');
+      showError('No parsed backend JSON is available for schema mapping.');
       return;
     }
 

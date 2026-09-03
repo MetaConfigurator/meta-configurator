@@ -113,7 +113,7 @@ describe('StringProperty', () => {
     });
 
     it('should correctly setup the input field', () => {
-      expect(inputField.props().modelValue).toBe(1);
+      expect(inputField.props().modelValue).toBe('1');
     });
   });
 

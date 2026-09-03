@@ -77,6 +77,14 @@ describe('GUI editor tree for a schema with array type at the root level', () =>
     expect(children[0].type).toBe(TreeNodeType.ADD_ITEM);
   });
 
+  it('offers an add item node when the invalid data is null', () => {
+    getDataForMode(SessionMode.DataEditor).setData(null);
+
+    const children = buildRootChildren();
+    expect(children.length).toBe(1);
+    expect(children[0].type).toBe(TreeNodeType.ADD_ITEM);
+  });
+
   it('shows one node per array item plus an add item node with well-formed keys', () => {
     getDataForMode(SessionMode.DataEditor).setData([{name: 'Alex'}, {name: 'Bob'}]);
 

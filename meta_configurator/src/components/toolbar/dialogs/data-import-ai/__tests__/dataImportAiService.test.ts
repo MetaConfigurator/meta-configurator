@@ -46,34 +46,8 @@ async function setupDataImportAiService() {
 }
 
 describe('data import AI service', () => {
-  it('includes a failed normalization script in the next generated prompt', async () => {
-    const {generateNormalizationScriptSuggestion, queryOpenAiMock} =
-      await setupDataImportAiService();
-    queryOpenAiMock.mockResolvedValue('function transform(input) { return {...input}; }');
-
-    await generateNormalizationScriptSuggestion({
-      parsedData: {value: '1'},
-      preprocessedDataForAi: {value: '1'},
-      userComments: 'Convert numeric values.',
-      schemaSource: 'infer_from_data',
-      currentSchema: undefined,
-      backendDisplayText: 'Backend recognized properties.',
-      backendPromptHint: 'Input contains key-value pairs.',
-      retryContext: {
-        validationError: 'Parser output must be an object.',
-        previousCode: 'function transform() { return 1; }',
-      },
-    });
-
-    const userMessage = queryOpenAiMock.mock.calls[0]![1][1].content;
-    expect(userMessage).toContain('Backend recognized properties.');
-    expect(userMessage).toContain('Convert numeric values.');
-    expect(userMessage).toContain('Parser output must be an object.');
-    expect(userMessage).toContain('function transform() { return 1; }');
-  });
-
-  it('forwards normalization retry context to the shared mapping generator', async () => {
-    const {generateNormalizationScriptSuggestion, generateMappingFunctionSuggestionMock} =
+  it('forwards parsed-data mapping context to the shared mapping generator', async () => {
+    const {generateParsedDataMappingScriptSuggestion, generateMappingFunctionSuggestionMock} =
       await setupDataImportAiService();
     generateMappingFunctionSuggestionMock.mockResolvedValue({
       config: 'function transform(input) { return input; }',
@@ -85,10 +59,10 @@ describe('data import AI service', () => {
       previousCode: 'function transform() { return {}; }',
     };
 
-    await generateNormalizationScriptSuggestion({
+    await generateParsedDataMappingScriptSuggestion({
       parsedData: {firstName: 'Ada'},
       preprocessedDataForAi: {firstName: 'Ada'},
-      userComments: '',
+      userComments: 'Keep the original name as an alias.',
       schemaSource: 'use_current_schema',
       currentSchema: {type: 'object', properties: {name: {type: 'string'}}},
       backendDisplayText: '',
@@ -97,7 +71,11 @@ describe('data import AI service', () => {
     });
 
     expect(generateMappingFunctionSuggestionMock).toHaveBeenCalledWith(
-      expect.objectContaining({retryContext})
+      expect.objectContaining({
+        retryContext,
+        targetSchema: {type: 'object', properties: {name: {type: 'string'}}},
+        userComments: 'Keep the original name as an alias.',
+      })
     );
   });
 

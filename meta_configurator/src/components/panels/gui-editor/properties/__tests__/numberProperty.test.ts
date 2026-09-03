@@ -243,4 +243,42 @@ describe('NumberProperty', () => {
     expect(inputText.props().modelValue).toBe('2000000000');
     wrapper.unmount();
   });
+
+  test.each([
+    ['null', null, 'null'],
+    ['string', 'invalid', 'invalid'],
+    ['object', {value: 1}, 'value: 1'],
+  ])('renders invalid %s data without throwing', (_type, propertyData, expectedDisplay) => {
+    expect(() =>
+      mountComponent({
+        propertyName: 'foo',
+        propertyData,
+        validationResults: new ValidationResult([]),
+        propertySchema: new JsonSchemaWrapper(
+          {
+            type: 'number',
+          },
+          SessionMode.DataEditor,
+          false
+        ),
+      })
+    ).not.toThrow();
+
+    expect(inputText.props().modelValue).toBe(expectedDisplay);
+    wrapper.unmount();
+  });
+
+  test('handles an invalid value received after mounting', async () => {
+    mountComponent({
+      propertyName: 'foo',
+      propertyData: 1,
+      validationResults: new ValidationResult([]),
+      propertySchema: new JsonSchemaWrapper({type: 'number'}, SessionMode.DataEditor, false),
+    });
+
+    await wrapper.setProps({propertyData: null});
+
+    expect(inputText.props().modelValue).toBe('null');
+    wrapper.unmount();
+  });
 });

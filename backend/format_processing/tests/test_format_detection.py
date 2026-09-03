@@ -59,10 +59,27 @@ class TestFormatDetection(unittest.TestCase):
                 self.assertTrue(result.ai_prompt_hint)
                 if expected_format == "ttl":
                     self.assertIsInstance(result.parsed_json, dict)
-                    self.assertTrue(
-                        "triples" in result.parsed_json
-                        or "raw_ttl" in result.parsed_json
+                    self.assertIn("@graph", result.parsed_json)
+                    self.assertEqual(
+                        result.parsed_json["@context"]["ex"],
+                        "http://example.org/",
                     )
+                    self.assertEqual(
+                        result.parsed_json["@context"]["dct"],
+                        "http://purl.org/dc/terms/",
+                    )
+                    self.assertIsInstance(result.parsed_json["@graph"], list)
+                    sample_node = next(
+                        node
+                        for node in result.parsed_json["@graph"]
+                        if node.get("@id") == "ex:sample1"
+                    )
+                    self.assertEqual(sample_node["@type"], "ex:Experiment")
+                    self.assertEqual(
+                        sample_node["dct:title"],
+                        "TTL parser smoke test",
+                    )
+                    self.assertIn("compacted JSON-LD", result.ai_prompt_hint)
                 if expected_format == "star_family" and file_name == "sample.mpif":
                     self.assertIsInstance(result.parsed_json, dict)
                     self.assertGreaterEqual(len(result.parsed_json), 1)

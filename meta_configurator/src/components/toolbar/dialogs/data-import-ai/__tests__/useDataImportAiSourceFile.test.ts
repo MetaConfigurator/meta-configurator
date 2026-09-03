@@ -52,6 +52,8 @@ describe('AI import source file', () => {
     expect(sourceFile.selectedFileName.value).toBe('example.properties');
     expect(sourceFile.uploadedContent.value).toBe('value=1');
     expect(sourceFile.parsedJsonFromBackend.value).toEqual({value: 1});
+    // the parsed document is posted to the sandbox worker, which cannot clone reactive proxies
+    expect(() => structuredClone(sourceFile.parsedJsonFromBackend.value)).not.toThrow();
     expect(sourceFile.canUseDirectParse.value).toBe(true);
     expect(sourceFile.backendDisplayText.value).toBe('Backend recognized properties.');
   });

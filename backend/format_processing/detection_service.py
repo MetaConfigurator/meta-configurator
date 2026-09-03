@@ -184,8 +184,9 @@ SUPPORTED_FORMATS = (
         name="ttl",
         display_name="Turtle / RDF",
         ai_prompt_hint=(
-            "Input is Turtle/RDF already parsed by the backend. Preserve triples, "
-            "predicates, namespaces, and object types while mapping."
+            "Input is Turtle/RDF converted by the backend to compacted JSON-LD. Preserve "
+            "@context, @id, @type, predicates, literal values, datatypes, and language tags "
+            "while mapping."
         ),
         parse_data=ttl_format.parse_data,
         file_extensions=("ttl", "turtle", "rdf"),

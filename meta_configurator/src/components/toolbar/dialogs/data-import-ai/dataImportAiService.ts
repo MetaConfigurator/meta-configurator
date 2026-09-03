@@ -21,15 +21,13 @@ import {inferJsonSchema} from '@/schema/inferJsonSchema';
 import {executeSandboxedJavascriptTransform} from '@/utility/sandboxedJavascript';
 import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
 import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
-import {prepareDataForAiPrompt, truncateTextForAiPrompt} from '@/utility/ai/prepareDataForAiPrompt';
+import {truncateTextForAiPrompt} from '@/utility/ai/prepareDataForAiPrompt';
 import {getErrorMessage} from '@/utility/getErrorMessage';
 import {
   buildImportParserSystemMessage,
   buildTargetSchemaInstruction,
   FULL_AI_IMPORT_SYSTEM_MESSAGE,
   IMPORT_PARSER_CLOSING_INSTRUCTION,
-  NORMALIZATION_CLOSING_INSTRUCTION,
-  NORMALIZATION_SYSTEM_MESSAGE,
 } from '@/components/toolbar/dialogs/data-import-ai/dataImportAiPrompts';
 
 export type DataImportAiSchemaSource = 'infer_from_data' | 'use_current_schema';
@@ -50,7 +48,7 @@ export type ImportScriptGenerationRequest = BackendDetectionHints & {
   retryContext?: GeneratedCodeRetryContext;
 };
 
-export type ParsedDataNormalizationRequest = BackendDetectionHints & {
+export type ParsedDataSchemaMappingRequest = BackendDetectionHints & {
   parsedData: unknown;
   preprocessedDataForAi: unknown;
   userComments: string;
@@ -157,52 +155,25 @@ export async function generateImportScriptSuggestion(
   }
 }
 
-/**
- * Asks the LLM for a `transform(input)` script that normalizes the JSON the backend
- * already parsed, either towards the current schema or towards a cleaner structure.
- */
-export async function generateNormalizationScriptSuggestion(
-  request: ParsedDataNormalizationRequest
+/** Maps the backend's parsed JSON to the schema currently loaded in the app. */
+export async function generateParsedDataMappingScriptSuggestion(
+  request: ParsedDataSchemaMappingRequest
 ): Promise<GeneratedScriptResult> {
   const dataForPrompt = request.preprocessedDataForAi ?? request.parsedData;
 
-  if (request.schemaSource === 'use_current_schema') {
-    if (!hasUsableSchema(request.currentSchema)) {
-      return {config: '', success: false, message: CURRENT_SCHEMA_EMPTY_MESSAGE};
-    }
-    return generateMappingFunctionSuggestion({
-      language: 'javascript',
-      method: 'source-data',
-      inputData: dataForPrompt,
-      inputDataSchema: inferJsonSchema(dataForPrompt),
-      targetSchema: request.currentSchema as TopLevelSchema,
-      userComments: joinPromptSections([formatBackendHints(request), request.userComments]),
-      retryContext: request.retryContext,
-    });
+  if (request.schemaSource !== 'use_current_schema' || !hasUsableSchema(request.currentSchema)) {
+    return {config: '', success: false, message: CURRENT_SCHEMA_EMPTY_MESSAGE};
   }
 
-  const apiKey = getApiKey();
-  if (!canQueryAi(apiKey)) {
-    return {config: '', success: false, message: AI_ACCESS_UNAVAILABLE_MESSAGE};
-  }
-
-  try {
-    const generatedScript = await queryOpenAI(apiKey, [
-      {role: 'system', content: NORMALIZATION_SYSTEM_MESSAGE},
-      {role: 'user', content: buildNormalizationUserMessage(request, dataForPrompt)},
-    ]);
-    return {
-      config: fixGeneratedJavascript(generatedScript),
-      success: true,
-      message: 'Generated AI normalization JavaScript from parsed backend data.',
-    };
-  } catch (error) {
-    return {
-      config: '',
-      success: false,
-      message: `Failed to generate AI normalization script. Reason: ${getErrorMessage(error)}.`,
-    };
-  }
+  return generateMappingFunctionSuggestion({
+    language: 'javascript',
+    method: 'source-data',
+    inputData: dataForPrompt,
+    inputDataSchema: inferJsonSchema(dataForPrompt),
+    targetSchema: request.currentSchema as TopLevelSchema,
+    userComments: joinPromptSections([formatBackendHints(request), request.userComments]),
+    retryContext: request.retryContext,
+  });
 }
 
 export async function runImportWithGeneratedScript(
@@ -324,20 +295,6 @@ function buildImportParserUserMessage(
     )}`,
     buildTargetSchemaInstruction(usesCurrentSchema ? request.currentSchema : undefined),
     IMPORT_PARSER_CLOSING_INSTRUCTION,
-    request.userComments ? `User hints:\n${request.userComments}` : '',
-    buildGeneratedCodeRetryHints(request.retryContext),
-  ]);
-}
-
-function buildNormalizationUserMessage(
-  request: ParsedDataNormalizationRequest,
-  dataForPrompt: unknown
-): string {
-  return joinPromptSections([
-    formatBackendHints(request),
-    'Parsed JSON preview (truncated for prompt efficiency):\n' +
-      JSON.stringify(prepareDataForAiPrompt(dataForPrompt), null, 2),
-    NORMALIZATION_CLOSING_INSTRUCTION,
     request.userComments ? `User hints:\n${request.userComments}` : '',
     buildGeneratedCodeRetryHints(request.retryContext),
   ]);

@@ -1,4 +1,4 @@
-import {computed, ref} from 'vue';
+import {computed, ref, shallowRef} from 'vue';
 import {readFileContent} from '@/utility/readFileContent';
 import {detectFormatAndParseInBackend} from './dataImportAiService';
 import {getErrorMessage} from '@/utility/getErrorMessage';
@@ -13,8 +13,10 @@ export function useDataImportAiSourceFile() {
   const backendPromptHint = ref('');
   const backendRecognized = ref(false);
   const formatProcessingErrorMessage = ref('');
-  const parsedJsonFromBackend = ref<unknown | null>(null);
-  const preprocessedJsonForAi = ref<unknown | null>(null);
+  // shallowRef: a deep ref would hand out a reactive proxy of the parsed document, and such
+  // a proxy cannot be structured-cloned into the sandbox or validation worker.
+  const parsedJsonFromBackend = shallowRef<unknown | null>(null);
+  const preprocessedJsonForAi = shallowRef<unknown | null>(null);
   const isDetectingFormat = ref(false);
   let selectedFileSequence = 0;
 

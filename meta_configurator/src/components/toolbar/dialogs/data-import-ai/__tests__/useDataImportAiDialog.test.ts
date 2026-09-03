@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
-import {effectScope, nextTick, ref} from 'vue';
+import {effectScope, nextTick, ref, shallowRef} from 'vue';
 
 type SetupOptions = {
   currentData?: unknown;
@@ -23,7 +23,7 @@ async function setupDataImportDialog(options: SetupOptions = {}) {
   const inferredSchemaRef = ref<Record<string, unknown>>({});
   const inferJsonSchemaMock = vi.fn(() => inferredSchema);
   const generateImportScriptSuggestionMock = vi.fn();
-  const generateNormalizationScriptSuggestionMock = vi.fn();
+  const generateParsedDataMappingScriptSuggestionMock = vi.fn();
   const runDirectParsedImportMock = vi.fn();
   const runFullAiImportMock = vi.fn();
   const runImportWithGeneratedScriptMock = vi.fn();
@@ -36,12 +36,12 @@ async function setupDataImportDialog(options: SetupOptions = {}) {
     uploadedContent,
     backendDisplayText: ref('Backend recognized properties.'),
     backendPromptHint: ref('Input contains key-value pairs.'),
-    isFormatProcessingUnavailable: ref(false),
-    parsedJsonFromBackend: ref(parsedData),
-    preprocessedJsonForAi: ref(parsedData),
+    formatProcessingErrorMessage: ref(''),
+    parsedJsonFromBackend: shallowRef(parsedData),
+    preprocessedJsonForAi: shallowRef(parsedData),
     isDetectingFormat: ref(false),
     canUseDirectParse: ref(true),
-    selectSourceFile: vi.fn(),
+    selectSourceFile: vi.fn().mockResolvedValue(true),
     resetSourceFile: vi.fn(),
   };
 
@@ -70,14 +70,14 @@ async function setupDataImportDialog(options: SetupOptions = {}) {
   }));
   vi.doMock('../dataImportAiService', () => ({
     generateImportScriptSuggestion: generateImportScriptSuggestionMock,
-    generateNormalizationScriptSuggestion: generateNormalizationScriptSuggestionMock,
+    generateParsedDataMappingScriptSuggestion: generateParsedDataMappingScriptSuggestionMock,
     runDirectParsedImport: runDirectParsedImportMock,
     runFullAiImport: runFullAiImportMock,
     runImportWithGeneratedScript: runImportWithGeneratedScriptMock,
     validateGeneratedImportScript: validateGeneratedImportScriptMock,
   }));
 
-  const {useDataImportAiDialog, USE_CURRENT_SCHEMA_OPTION} = await import(
+  const {INFER_SCHEMA_OPTION, useDataImportAiDialog, USE_CURRENT_SCHEMA_OPTION} = await import(
     '../useDataImportAiDialog'
   );
   const scope = effectScope();
@@ -89,12 +89,13 @@ async function setupDataImportDialog(options: SetupOptions = {}) {
   return {
     dialog,
     scope,
+    INFER_SCHEMA_OPTION,
     USE_CURRENT_SCHEMA_OPTION,
     dataEditorSetDataMock,
     inferredSchema,
     inferredSchemaRef,
     inferJsonSchemaMock,
-    generateNormalizationScriptSuggestionMock,
+    generateParsedDataMappingScriptSuggestionMock,
     runDirectParsedImportMock,
     runFullAiImportMock,
     runImportWithGeneratedScriptMock,
@@ -126,6 +127,10 @@ describe('useDataImportAiDialog', () => {
 
     expect(setup.runDirectParsedImportMock).toHaveBeenCalledTimes(1);
     expect(setup.dataEditorSetDataMock).toHaveBeenCalledWith({unexpected: true});
+    // the imported data is posted to the validation worker, which cannot clone reactive proxies
+    expect(() =>
+      structuredClone(setup.dataEditorSetDataMock.mock.calls[0][0])
+    ).not.toThrow();
     expect(setup.dialog.statusMessage.value).toBe('Imported after confirmation.');
     setup.scope.stop();
   });
@@ -144,6 +149,41 @@ describe('useDataImportAiDialog', () => {
     expect(setup.inferJsonSchemaMock).toHaveBeenCalledWith([{name: 'Ada'}]);
     expect(setup.dataEditorSetDataMock).toHaveBeenCalledWith([{name: 'Ada'}]);
     expect(setup.inferredSchemaRef.value).toEqual(setup.inferredSchema);
+    setup.scope.stop();
+  });
+
+  it('does not infer a structural schema for JSON-LD data', async () => {
+    const jsonLdData = {
+      '@context': {hobbit: 'https://w3id.org/hobbit/vocab#'},
+      '@id': 'hobbit:result',
+      '@type': 'hobbit:AnalysisResult',
+    };
+    const setup = await setupDataImportDialog({parsedData: jsonLdData});
+    setup.dialog.selectedImportMode.value = 'direct_parse';
+    setup.runDirectParsedImportMock.mockResolvedValue({
+      resultData: jsonLdData,
+      success: true,
+      message: 'Imported directly.',
+    });
+
+    await setup.dialog.importData();
+
+    expect(setup.inferJsonSchemaMock).not.toHaveBeenCalled();
+    expect(setup.dataEditorSetDataMock).toHaveBeenCalledWith(jsonLdData);
+    expect(setup.inferredSchemaRef.value).toEqual({});
+    setup.scope.stop();
+  });
+
+  it('defaults a detected JSON-LD file to automatic schema handling', async () => {
+    const setup = await setupDataImportDialog({
+      parsedData: {'@graph': [{'@id': 'https://example.org/result'}]},
+    });
+    setup.dialog.openDialog();
+    expect(setup.dialog.selectedSchemaSource.value).toBe(setup.USE_CURRENT_SCHEMA_OPTION);
+
+    await setup.dialog.onFileSelected(new Event('change'));
+
+    expect(setup.dialog.selectedSchemaSource.value).toBe(setup.INFER_SCHEMA_OPTION);
     setup.scope.stop();
   });
 
@@ -167,16 +207,17 @@ describe('useDataImportAiDialog', () => {
     setup.scope.stop();
   });
 
-  it('uses raw input after switching away from an AI normalization suggestion', async () => {
+  it('uses raw input after switching away from a parsed-data mapping suggestion', async () => {
     const setup = await setupDataImportDialog({
       parsedData: {name: 'Ada'},
       uploadedContent: 'name=Ada',
     });
-    setup.dialog.selectedImportMode.value = 'ai_normalize_parsed';
-    setup.generateNormalizationScriptSuggestionMock.mockResolvedValue({
+    setup.dialog.selectedSchemaSource.value = setup.USE_CURRENT_SCHEMA_OPTION;
+    setup.dialog.selectedImportMode.value = 'map_parsed_to_schema';
+    setup.generateParsedDataMappingScriptSuggestionMock.mockResolvedValue({
       config: 'function transform(input) { return input; }',
       success: true,
-      message: 'Generated normalization.',
+      message: 'Generated mapping.',
     });
     setup.validateGeneratedImportScriptMock.mockResolvedValue({success: true, message: 'valid'});
     setup.runImportWithGeneratedScriptMock.mockResolvedValue({
@@ -187,6 +228,7 @@ describe('useDataImportAiDialog', () => {
 
     await setup.dialog.generateSuggestion();
     setup.dialog.selectedImportMode.value = 'javascript_mapping';
+    setup.dialog.selectedSchemaSource.value = setup.INFER_SCHEMA_OPTION;
     await nextTick();
     await setup.dialog.importData();
 
@@ -200,6 +242,25 @@ describe('useDataImportAiDialog', () => {
       'infer_from_data',
       expect.any(Object)
     );
+    setup.scope.stop();
+  });
+
+  it('offers parsed-data schema mapping only when using the current schema', async () => {
+    const setup = await setupDataImportDialog();
+    const getModeValues = () => setup.dialog.importModeOptions.value.map(option => option.value);
+
+    expect(getModeValues()).not.toContain('map_parsed_to_schema');
+
+    setup.dialog.selectedSchemaSource.value = setup.USE_CURRENT_SCHEMA_OPTION;
+    await nextTick();
+    expect(getModeValues()).toContain('map_parsed_to_schema');
+
+    setup.dialog.selectedImportMode.value = 'map_parsed_to_schema';
+    setup.dialog.selectedSchemaSource.value = setup.INFER_SCHEMA_OPTION;
+    await nextTick();
+
+    expect(getModeValues()).not.toContain('map_parsed_to_schema');
+    expect(setup.dialog.selectedImportMode.value).toBe('direct_parse');
     setup.scope.stop();
   });
 

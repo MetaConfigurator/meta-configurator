@@ -32,11 +32,8 @@ const FORMAT_PROCESSING_DATA_FILE_EXTENSIONS = [
   '.mcif',
 ] as const;
 
-/** The formats only the format processing service can parse, for "Import Other Data". */
-export const FORMAT_PROCESSING_FILE_ACCEPT = FORMAT_PROCESSING_DATA_FILE_EXTENSIONS.join(',');
-
-/** Every format the AI import dialog accepts: locally parsed ones and backend-only ones. */
-export const AI_IMPORT_FILE_ACCEPT = [
+/** Every format supported by the advanced import dialog. */
+export const ADVANCED_DATA_IMPORT_FILE_ACCEPT = [
   '.json',
   '.yaml',
   '.yml',

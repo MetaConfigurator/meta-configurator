@@ -11,7 +11,7 @@ import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import {SessionMode} from '@/store/sessionMode';
-import {AI_IMPORT_FILE_ACCEPT} from '@/utility/backend/formatProcessingApi';
+import {ADVANCED_DATA_IMPORT_FILE_ACCEPT} from '@/utility/backend/formatProcessingApi';
 import {SCHEMA_SOURCE_OPTIONS, useDataImportAiDialog} from './useDataImportAiDialog';
 
 // reactive() unwraps the refs of the composable, so the template reads them as dialog.<name>
@@ -23,7 +23,7 @@ defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
 <template>
   <Dialog
     v-model:visible="dialog.showDialog"
-    header="Import Data with AI"
+    header="Advanced Data Import"
     :modal="true"
     :style="{width: '50vw'}">
     <div class="space-y-4">
@@ -47,15 +47,15 @@ defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
       </Message>
 
       <div class="flex items-center gap-2">
-        <label class="font-semibold">Schema Source</label>
+        <label class="font-semibold">Schema Handling</label>
         <Select
           v-model="dialog.selectedSchemaSource"
           :options="SCHEMA_SOURCE_OPTIONS"
           class="flex-1" />
       </div>
       <p class="text-sm text-gray-400">
-        Choose whether the import should infer a schema from the uploaded data or use the schema
-        currently loaded in the app.
+        Automatic handling infers a schema for regular data and leaves JSON-LD schema-free. Choose
+        the current schema only when the imported data should be validated against it.
       </p>
 
       <div>
@@ -64,7 +64,7 @@ defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
           id="import-ai-file"
           type="file"
           class="w-full"
-          :accept="AI_IMPORT_FILE_ACCEPT"
+          :accept="ADVANCED_DATA_IMPORT_FILE_ACCEPT"
           @change="dialog.onFileSelected" />
         <p v-if="dialog.selectedFileName.length > 0" class="text-sm mt-2">
           {{ dialog.selectedFileName }} ({{ dialog.selectedFileSize }} bytes)
@@ -91,12 +91,14 @@ defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
         </div>
       </div>
 
-      <div>
+      <div
+        v-if="dialog.selectedImportMode !== 'direct_parse'"
+        data-testid="additional-import-hints">
         <label class="block font-semibold mb-1">Additional Hints</label>
         <InputText
           v-model="dialog.userComments"
           class="w-full"
-          placeholder="e.g. parse chemistry STAR and normalize units" />
+          placeholder="e.g. map temperature and unit fields" />
       </div>
 
       <Button

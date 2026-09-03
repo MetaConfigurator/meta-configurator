@@ -1,8 +1,4 @@
-import {
-  openImportOtherDataDialog,
-  openUploadFileDialog,
-  openUploadSettingsDialog,
-} from '@/components/toolbar/uploadFile';
+import {openUploadFileDialog, openUploadSettingsDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {clearCurrentFile} from '@/components/toolbar/clearFile';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
@@ -71,11 +67,6 @@ export class MenuItems {
             command: () => openUploadFileDialog(getDataForMode(SessionMode.DataEditor)),
           },
           {
-            label: 'Import Other Data (XML, TOML, CSV, STAR, ...)',
-            icon: 'fa-solid fa-file-import',
-            command: openImportOtherDataDialog,
-          },
-          {
             label: 'Import CSV Data',
             icon: 'fa-solid fa-table',
             command: this.dialogActions.showImportCsvDialog,
@@ -91,7 +82,7 @@ export class MenuItems {
             command: this.dialogActions.showImportXmlDialog,
           },
           {
-            label: 'Import Data with AI',
+            label: 'Advanced Data Import...',
             icon: 'fa-solid fa-robot',
             command: this.dialogActions.showDataImportAiDialog,
           },

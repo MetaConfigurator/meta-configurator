@@ -31,31 +31,6 @@ const TARGET_SCHEMA_INSTRUCTION_LINES = [
 const NO_SCHEMA_INSTRUCTION =
   'No schema is provided. Infer a suitable JSON structure from the input format and content.';
 
-export const NORMALIZATION_SYSTEM_MESSAGE = [
-  'You are a JavaScript data normalization expert.',
-  'Generate JavaScript code only, no markdown.',
-  'The code must define: function transform(input) { ... }',
-  'Input is ALREADY PARSED JSON object/array (not raw text).',
-  'Return a NEW normalized JSON object/array (do not just return input).',
-  'Do not use import/require/external libraries.',
-  '',
-  'Normalization goals (high priority):',
-  '1) Preserve all important information.',
-  '2) Improve structure: break packed string blobs into structured objects/arrays when feasible.',
-  '3) Normalize scalar types: convert numeric strings to numbers, "true"/"false" to booleans.',
-  '4) Convert placeholders like "?", "", "undefined", "null", "-" to null when semantically empty.',
-  '5) Keep units/labels as strings when needed; do not over-convert identifiers.',
-  '6) For tabular blocks encoded in text, parse rows into arrays of objects when possible.',
-  '',
-  'Quality constraints:',
-  '- The output must be valid JSON-compatible data.',
-  '- Avoid destructive dropping of fields.',
-  '- If unsure about a field, keep original value.',
-].join('\n');
-
-export const NORMALIZATION_CLOSING_INSTRUCTION =
-  'Please generate a robust transform(input) implementation with helper functions for scalar coercion and optional parsing of table-like text fields.';
-
 export const FULL_AI_IMPORT_SYSTEM_MESSAGE =
   'Convert the provided input to JSON. Return only valid JSON object or JSON array. Do not add explanation text. Preserve information conservatively.';
 

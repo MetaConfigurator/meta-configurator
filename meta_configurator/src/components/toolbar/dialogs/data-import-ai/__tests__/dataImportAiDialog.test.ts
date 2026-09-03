@@ -154,4 +154,16 @@ describe('DataImportAiDialog', () => {
 
     expect(aceEditMock).toHaveBeenCalledTimes(1);
   });
+
+  it('hides additional hints when importing the backend result directly', async () => {
+    const {wrapper} = await setupDialog();
+
+    (wrapper.vm as any).show();
+    await nextTick();
+    expect(wrapper.find('[data-testid="additional-import-hints"]').exists()).toBe(true);
+
+    await wrapper.findAll('select')[1]!.setValue('direct_parse');
+
+    expect(wrapper.find('[data-testid="additional-import-hints"]').exists()).toBe(false);
+  });
 });

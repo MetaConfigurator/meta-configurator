@@ -176,7 +176,8 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
   if (!node.leaf && node.type === TreeNodeType.SCHEMA_PROPERTY) {
     const userData = dataAt(nodePath, props.currentData);
     const isEmptyArray = Array.isArray(userData) && userData.length === 0;
-    const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
+    const isEmptyObject =
+      userData !== null && typeof userData === 'object' && Object.keys(userData).length === 0;
     if (userData === undefined || isEmptyArray || isEmptyObject) {
       const schema = node.data.schema;
       // expand empty arrays and objects with no predefined properties (will be expected to have addProperty button)
@@ -459,7 +460,12 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
 }
 
 function findNameForNewProperty(objectSchema: JsonSchemaWrapper | undefined, data: any) {
-  if (objectSchema === undefined || data === undefined) {
+  if (
+    objectSchema === undefined ||
+    data === null ||
+    typeof data !== 'object' ||
+    Array.isArray(data)
+  ) {
     return 'yourNewProperty';
   }
 

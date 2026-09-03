@@ -8,22 +8,13 @@ vi.mock('@/settings/useSettings', () => ({
 }));
 
 import {
-  AI_IMPORT_FILE_ACCEPT,
+  ADVANCED_DATA_IMPORT_FILE_ACCEPT,
   detectFormatAndParseWithFormatProcessing,
-  FORMAT_PROCESSING_FILE_ACCEPT,
 } from '@/utility/backend/formatProcessingApi';
 
-describe('file accept filters', () => {
-  it('offers only backend-only formats for the separate other-data import', () => {
-    const acceptedExtensions = FORMAT_PROCESSING_FILE_ACCEPT.split(',');
-
-    expect(acceptedExtensions).toEqual(expect.arrayContaining(['.xml', '.toml', '.cif', '.mpif']));
-    expect(acceptedExtensions).not.toContain('.json');
-    expect(acceptedExtensions).not.toContain('.yaml');
-  });
-
-  it('offers locally parsed and backend-only formats for the AI import', () => {
-    const acceptedExtensions = AI_IMPORT_FILE_ACCEPT.split(',');
+describe('advanced import file accept filter', () => {
+  it('offers locally parsed and backend-supported formats', () => {
+    const acceptedExtensions = ADVANCED_DATA_IMPORT_FILE_ACCEPT.split(',');
 
     expect(acceptedExtensions).toEqual(
       expect.arrayContaining(['.json', '.yaml', '.yml', '.xml', '.cif'])

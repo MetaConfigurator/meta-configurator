@@ -86,4 +86,24 @@ describe('BooleanProperty', () => {
       });
     });
   });
+
+  it('renders invalid data as an unselected value without throwing', () => {
+    let invalidDataWrapper: ReturnType<typeof mount> | undefined;
+    expect(() => {
+      invalidDataWrapper = mount(BooleanProperty, {
+        props: {
+        propertyName: 'foo',
+        propertyData: {invalid: true},
+        validationResults: new ValidationResult([]),
+        propertySchema: new JsonSchemaWrapper(
+          {type: 'boolean'},
+          SessionMode.DataEditor,
+          false
+        ),
+        },
+      });
+    }).not.toThrow();
+    expect(invalidDataWrapper!.findComponent(SelectButton).props().modelValue).toBeUndefined();
+    invalidDataWrapper!.unmount();
+  });
 });
