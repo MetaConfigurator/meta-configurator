@@ -130,3 +130,40 @@ export function arePathsEqual(path1: Path, path2: Path): boolean {
 
   return true;
 }
+
+/** Follows $ref until it hits a real schema. */
+function resolveRef(schemaPath: Path, schemaRoot: any): Path {
+  const schema = dataAt(schemaPath, schemaRoot);
+  if (schema && typeof schema === 'object' && typeof schema.$ref === 'string') {
+    return resolveRef(jsonPointerToPathTyped(schema.$ref), schemaRoot);
+  }
+  return schemaPath;
+}
+
+// Reverse lookup: given a path in the DATA, find which schema path governs it.
+export function findSchemaPathForDataPath(dataPath: Path, schemaRoot: any): Path | undefined {
+  let schemaPath: Path = resolveRef([], schemaRoot);
+
+  for (const el of dataPath) {
+    if (typeof el === 'number') {
+      schemaPath = schemaPath.concat(['items']);
+    } else {
+      const propertyPath = schemaPath.concat(['properties', el]);
+
+      if (dataAt(propertyPath, schemaRoot) !== undefined) {
+        schemaPath = propertyPath;
+      } else {
+        const additionalPropertiesPath = schemaPath.concat(['additionalProperties']);
+
+        if (dataAt(additionalPropertiesPath, schemaRoot) === undefined) {
+          return undefined;
+        }
+
+        schemaPath = additionalPropertiesPath;
+      }
+    }
+
+    schemaPath = resolveRef(schemaPath, schemaRoot);
+  }
+  return schemaPath;
+}

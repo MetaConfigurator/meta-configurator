@@ -54,7 +54,9 @@ import {
   pasteSchemaFromClipboard,
 } from '@/components/panels/schema-diagram/schemaClipboardUtils';
 import {doesSchemaAllowNull, setSchemaNullable} from '@/schema/schemaReadingUtils';
-
+import {findDataPathsUsingSchema} from '@/utility/renameUtils';
+import {dataAt} from '@/utility/resolveDataAtPath';
+import {confirmationService} from '@/utility/confirmationService';
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
   (e: 'select_element', path: Path): void;
@@ -72,6 +74,9 @@ const schemaSession = getSessionForMode(SessionMode.SchemaEditor);
 const dataSchema = getSchemaForMode(SessionMode.DataEditor);
 const schemaSchema = getSchemaForMode(SessionMode.SchemaEditor);
 
+// Link to the actual instance data document (previously this component only touched the schema)
+const instanceData = getDataForMode(SessionMode.DataEditor);
+let isPromptingForDeleteConflict = false;
 const forceFitView = ref(true);
 
 const activeNodes: Ref<Node[]> = ref<Node[]>([]);
@@ -293,11 +298,9 @@ function updateData(absolutePath: Path, newValue: any) {
 }
 
 function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, newName: string) {
-  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
-  // that a new node was added (because different name) and then rebuild whole graph.
-  objectData.name = newName;
+  if (oldName === newName) return;
 
-  objectData.absolutePath = replacePropertyNameUtils(
+  const newPath = replacePropertyNameUtils(
     objectData.absolutePath,
     oldName,
     newName,
@@ -306,9 +309,11 @@ function updateObjectOrEnumName(objectData: SchemaElementData, oldName: string, 
     updateData
   );
 
-  selectElement(objectData.absolutePath);
-
-  // TODO: when renaming happens, also force update in the GUI
+  if (pathToJsonPointer(newPath) !== pathToJsonPointer(objectData.absolutePath)) {
+    objectData.name = newName;
+    objectData.absolutePath = newPath;
+    selectElement(objectData.absolutePath);
+  }
 }
 
 function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNodeData) {
@@ -327,22 +332,30 @@ function extractInlinedElement(elementData: SchemaObjectNodeData | SchemaEnumNod
 }
 
 function updateAttributeName(attributeData: SchemaNodeData, oldName: string, newName: string) {
-  // change name in node before replacing name in schema. Otherwise, when the schema change is detected, it would also compute
-  // that a new node was added (because different name) and then rebuild whole graph.
-  attributeData.name = newName;
+  if (oldName === newName) return;
 
-  attributeData.absolutePath = replacePropertyNameUtils(
+  const parentPath = attributeData.absolutePath.slice(0, -1);
+  const parentSchemaData = schemaData.dataAt(parentPath);
+  if (!parentSchemaData || !Object.prototype.hasOwnProperty.call(parentSchemaData, oldName)) {
+    return;
+  }
+  // pass instanceData + writer so the property rename also syncs into the data.
+  const newPath = replacePropertyNameUtils(
     attributeData.absolutePath,
     oldName,
     newName,
     schemaData.data.value,
     schemaSchema.schemaWrapper.value,
-    updateData
+    updateData,
+    instanceData.data.value, // NEW
+    (path, newValue) => instanceData.setDataAt(path, newValue) // NEW
   );
 
-  selectElement(attributeData.absolutePath);
-
-  // TODO: when renaming happens, also force update in the GUI
+  if (pathToJsonPointer(newPath) !== pathToJsonPointer(attributeData.absolutePath)) {
+    attributeData.name = newName;
+    attributeData.absolutePath = newPath;
+    selectElement(attributeData.absolutePath);
+  }
 }
 
 function updateAttributeRequired(attributeData: SchemaObjectAttributeData, required: boolean) {
@@ -391,7 +404,62 @@ function updateAttributeNullable(attributeData: SchemaObjectAttributeData, nulla
 }
 
 function deleteElement(objectData: SchemaElementData) {
-  deleteSchemaElement(schemaData, objectData.absolutePath);
+  const absolutePath = objectData.absolutePath;
+
+  // Only a PROPERTY deletion (path ends in ['properties', name]) corresponds to an
+  // actual key in the instance data. Deleting a whole object/enum DEFINITION doesn't
+  // remove any single data key by itself (removing it just breaks whatever $ref'd it).
+  const isPropertyDeletion = absolutePath[absolutePath.length - 2] === 'properties';
+
+  if (!isPropertyDeletion) {
+    deleteSchemaElement(schemaData, absolutePath);
+    return;
+  }
+
+  const propertyName = absolutePath[absolutePath.length - 1] as string;
+  const schemaObjectPath = absolutePath.slice(0, -2); // the object schema owning this property
+
+  const affectedDataPaths = findDataPathsUsingSchema(
+    schemaObjectPath,
+    instanceData.data.value,
+    schemaData.data.value
+  ).filter(p => {
+    const obj = dataAt(p, instanceData.data.value);
+    return (
+      obj && typeof obj === 'object' && Object.prototype.hasOwnProperty.call(obj, propertyName)
+    );
+  });
+
+  // schema-side delete always happens regardless of what the user decides for data
+  deleteSchemaElement(schemaData, absolutePath);
+
+  if (affectedDataPaths.length === 0) return;
+
+  if (isPromptingForDeleteConflict) return;
+  isPromptingForDeleteConflict = true;
+
+  // per requirement: ALWAYS ask, no silent auto-delete of data
+  confirmationService.require({
+    header: 'Delete field from data?',
+    icon: 'pi pi-exclamation-triangle',
+    message: `Delete field "${propertyName}" from ${affectedDataPaths.length} location(s) in the instance data too?`,
+    acceptLabel: 'Delete from data',
+    rejectLabel: 'Keep data unchanged',
+    accept: () => {
+      isPromptingForDeleteConflict = false;
+      for (const dataPath of affectedDataPaths) {
+        const obj = structuredClone(dataAt(dataPath, instanceData.data.value));
+        delete obj[propertyName];
+        instanceData.setDataAt(dataPath, obj);
+      }
+    },
+    reject: () => {
+      isPromptingForDeleteConflict = false;
+    },
+    onHide: () => {
+      isPromptingForDeleteConflict = false;
+    },
+  });
 }
 
 function addAttribute(objectData: SchemaElementData) {
