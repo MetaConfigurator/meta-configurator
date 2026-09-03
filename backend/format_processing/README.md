@@ -71,3 +71,11 @@ cd backend/format_processing
 pip install -r requirements.txt -r requirements-dev.txt
 pytest tests/ -v
 ```
+
+The fast Python suite covers every supported format through both the detection layer and
+the HTTP endpoint. To additionally build and exercise the production image, Compose
+definitions, non-root user, and Redis-backed rate limiter, run from the repository root:
+
+```bash
+bash backend/format_processing/tests/test_docker.sh
+```

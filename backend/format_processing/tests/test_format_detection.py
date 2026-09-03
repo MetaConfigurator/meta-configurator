@@ -11,6 +11,7 @@ import detection_service
 import format_detection as format_detection_module
 from format_detection import detect_format_and_parse
 from preprocess import preprocess_data_for_ai
+from tests.format_cases import KNOWN_FORMAT_FIXTURES
 
 
 class TestFormatDetection(unittest.TestCase):
@@ -22,23 +23,7 @@ class TestFormatDetection(unittest.TestCase):
         return (self.fixture_dir / name).read_text(encoding="utf-8")
 
     def test_detects_known_formats(self) -> None:
-        cases = [
-            ("sample.json", "application/json", "json"),
-            ("sample.yaml", "application/yaml", "yaml"),
-            ("sample.xml", "application/xml", "xml"),
-            ("sample.csv", "text/csv", "csv"),
-            ("sample.tsv", "text/tab-separated-values", "tsv"),
-            ("sample.ttl", "text/turtle", "ttl"),
-            ("sample.mpif", "text/plain", "star_family"),
-            ("sample.toml", "application/toml", "toml"),
-            ("sample.ini", "text/plain", "ini"),
-            ("sample.jsonl", "application/json", "jsonl"),
-            ("sample.env", "text/plain", "dotenv"),
-            ("sample.properties", "text/plain", "properties"),
-            ("sample.md", "text/markdown", "markdown_table"),
-        ]
-
-        for file_name, mime_type, expected_format in cases:
+        for file_name, mime_type, expected_format in KNOWN_FORMAT_FIXTURES:
             with self.subTest(file_name=file_name):
                 if expected_format == "yaml" and format_detection_module.yaml is None:
                     self.skipTest(
