@@ -2,13 +2,10 @@ import {readFileContentForFunction} from '@/utility/readFileContent';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 import type {ManagedData} from '@/data/managedData';
-import {findAvailableSchemaId} from '@/schema/schemaReadingUtils';
+import {findAvailableSchemaId, isSchemaEmpty} from '@/schema/schemaReadingUtils';
 import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
 
-const importSchemaFileDialog = createLazySingleFileDialog(
-  '.json, .yaml, .yml, .xml, .schema.json',
-  5
-);
+const importSchemaFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .schema.json', 5);
 
 /**
  * Opens a file dialog to select a JSON schema to import.
@@ -22,11 +19,8 @@ export function openImportSchemaDialog(): void {
 function importSchema(importedSchema: any) {
   const currentUserSchema = getDataForMode(SessionMode.SchemaEditor);
 
-  // if the current user schema is an empty object or null, set the imported schema as the current user schema
-  if (
-    currentUserSchema.data.value === null ||
-    Object.keys(currentUserSchema.data.value).length === 0
-  ) {
+  // if there is no schema yet, the imported schema simply becomes the current one
+  if (isSchemaEmpty(currentUserSchema.data.value)) {
     currentUserSchema.setData(importedSchema);
     return;
   }

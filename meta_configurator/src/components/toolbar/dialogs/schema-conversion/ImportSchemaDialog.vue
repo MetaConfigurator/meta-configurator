@@ -33,6 +33,7 @@ import {
   selectDisplayedAttempts,
   type ConversionAttempt,
 } from '@/utility/backend/schemaConverterApi';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 const showDialog = ref(false);
 const isLoading = ref(false);
@@ -109,7 +110,7 @@ async function convert() {
       requestError.value = 'The service returned no conversion attempts for this input.';
     }
   } catch (error) {
-    requestError.value = error instanceof Error ? error.message : String(error);
+    requestError.value = getErrorMessage(error);
   } finally {
     isLoading.value = false;
   }

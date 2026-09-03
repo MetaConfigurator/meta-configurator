@@ -244,7 +244,7 @@ function applyRenameToData(
 // Rebuilds object with oldKey replaced by newKey. Rewritten (not renamed in-place while  iterating) because the old version could get overwritten if newKey already existed
 // later in the same object's key order.
 function updateKeyName(object: any, oldKey: string, newKey: string): any {
-  let modifiedObj: any = {};
+  const modifiedObj: any = {};
 
   const oldValue = object[oldKey];
 

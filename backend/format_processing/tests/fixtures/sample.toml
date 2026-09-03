@@ -1,0 +1,28 @@
+[project]
+name = "meta-configurator"
+version = "2.4.1"
+active = true
+
+[project.owner]
+name = "Data Team"
+email = "data-team@example.org"
+
+[[pipeline]]
+id = "ingest-01"
+retry_count = 3
+enabled = true
+
+[pipeline.source]
+type = "ftp"
+host = "ftp.example.org"
+path = "/incoming/set-a"
+
+[[pipeline]]
+id = "ingest-02"
+retry_count = 1
+enabled = false
+
+[pipeline.source]
+type = "s3"
+bucket = "chemistry-uploads"
+prefix = "weekly/"

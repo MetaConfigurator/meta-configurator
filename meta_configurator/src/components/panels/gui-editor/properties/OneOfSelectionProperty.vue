@@ -153,10 +153,10 @@ function applySchemaConstantsOnDataBasedOnSelection(
   }
 }
 function applySchemaConstantsOnData(schema: JsonSchemaType, data: any): any {
-  if (typeof schema !== 'object') {
+  if (schema === null || typeof schema !== 'object') {
     return data;
   }
-  if (typeof data !== 'object') {
+  if (data === null || typeof data !== 'object') {
     return data;
   }
 

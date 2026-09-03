@@ -6,9 +6,6 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import SelectButton from 'primevue/selectbutton';
-import * as ace from 'brace';
-import {type Editor} from 'brace';
-import {watchImmediate} from '@vueuse/core';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
@@ -16,7 +13,8 @@ import _ from 'lodash';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 import type {Path} from '@/utility/path';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
+import {setupAceMode} from '@/components/panels/shared-components/aceUtils';
+import {useAceEditor} from '@/components/panels/shared-components/useAceEditor';
 import {
   fixAndParseGeneratedJson,
   fixGeneratedExpression,
@@ -28,7 +26,8 @@ import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schem
 import {
   postProcessSchemaModification,
   bundleReferencedDefinitions,
-} from '@/schema/schemaManipulationUtils';
+} from '@/schema/schemaDefinitionBundling';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -85,11 +84,6 @@ const documentExportFormatNames: Ref<string[]> = computed(() => {
   return documentExportFormats.value ? Object.keys(documentExportFormats.value) : [];
 });
 
-// random id is used to enable multiple Ace Editors of same sessionMode on the same page
-// the editor only is a fallback option if the returned response by the AI is not valid JSON
-const editor_id = 'ai-prompts-' + Math.random();
-const editor_id_export = 'ai-prompts-export-' + Math.random();
-
 const promptCreateDocument: Ref<string> = ref(props.defaultTextCreateDocument);
 const promptModifyDocument: Ref<string> = ref(props.defaultTextModifyDocument);
 const promptQuestionDocument: Ref<string> = ref(props.defaultTextQuestionDocument);
@@ -114,29 +108,16 @@ const newDocument: Ref<string> = ref('');
 const newDocumentPath: Ref<Path> = ref([]);
 const exportedDocument: Ref<string> = ref('');
 
+const {editorElementId: correctedDocumentEditorId, createEditor: createCorrectedDocumentEditor} =
+  useAceEditor('ai-prompts', newDocument, {
+    configureEditor: editor => setupAceMode(editor, settings.value),
+  });
+const {editorElementId: exportedDocumentEditorId, createEditor: createExportedDocumentEditor} =
+  useAceEditor('ai-prompts-export', exportedDocument, {});
+
 onMounted(() => {
-  const editor: Editor = ace.edit(editor_id);
-  setupAceMode(editor, settings.value);
-  setupAceProperties(editor, settings.value);
-
-  // watch changes to newDocument and update the data in the editor accordingly
-  watchImmediate(
-    () => newDocument.value,
-    newValue => {
-      editor.setValue(newValue);
-      editor.clearSelection();
-    }
-  );
-
-  const editor_export: Editor = ace.edit(editor_id_export);
-  setupAceProperties(editor_export, settings.value);
-  watchImmediate(
-    () => exportedDocument.value,
-    newValue => {
-      editor_export.setValue(newValue);
-      editor_export.clearSelection();
-    }
-  );
+  createCorrectedDocumentEditor();
+  createExportedDocumentEditor();
 });
 
 function submitPromptCreateDocument() {
@@ -230,14 +211,15 @@ function processResult(
 function applyEditorDocument() {
   try {
     const dataFormat = settings.value.dataFormat;
-    const editorContent = ace.edit(editor_id).getValue();
-    // parse the data in the editor as JavaScript Object according to the parser of the current data format
-    const data = formatRegistry.getFormat(dataFormat).dataConverter.parse(editorContent);
-    data.setDataAt(newDocumentPath.value, data);
+    const correctedDocument = formatRegistry
+      .getFormat(dataFormat)
+      .dataConverter.parse(newDocument.value);
+    data.setDataAt(newDocumentPath.value, correctedDocument);
     newDocument.value = '';
     newDocumentPath.value = [];
-  } catch (e) {
-    console.error('Failed to parse JSON', e);
+  } catch (error) {
+    console.error('Failed to parse corrected document', error);
+    errorMessage.value = getErrorMessage(error);
   }
 }
 
@@ -389,7 +371,7 @@ function selectRootElement() {
           applying the change.</Message
         >
         <div class="parent-container">
-          <div class="h-full editor" :id="editor_id" />
+          <div class="h-full editor" :id="correctedDocumentEditorId" />
         </div>
         <Button @click="applyEditorDocument()">Apply {{ props.labelDocumentType }}</Button>
       </div>
@@ -456,7 +438,7 @@ function selectRootElement() {
         <div v-show="exportedDocument.length > 0">
           <b>Resulting Document in Target Format</b>
           <div class="parent-container">
-            <div class="h-full editor" :id="editor_id_export" />
+            <div class="h-full editor" :id="exportedDocumentEditorId" />
           </div>
         </div>
       </Panel>

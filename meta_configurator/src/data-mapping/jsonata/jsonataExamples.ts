@@ -1,4 +1,4 @@
-export const JSONATA_INPUT_EXAMPLE =
+const JSONATA_INPUT_EXAMPLE =
   '{\n' +
   '  "person": {\n' +
   '    "firstName": "Alice",\n' +
@@ -37,7 +37,7 @@ export const JSONATA_INPUT_EXAMPLE =
   '  ]\n' +
   '}';
 
-export const JSONATA_INPUT_EXAMPLE_SCHEMA =
+const JSONATA_INPUT_EXAMPLE_SCHEMA =
   '{\n' +
   '  "$schema": "https://json-schema.org/draft/2020-12/schema",\n' +
   '  "$id": "https://example.com/schema/experiment-input.json",\n' +
@@ -125,7 +125,7 @@ export const JSONATA_INPUT_EXAMPLE_SCHEMA =
   '  "required": ["person", "experiments"]\n' +
   '}';
 
-export const JSONATA_OUTPUT_EXAMPLE =
+const JSONATA_OUTPUT_EXAMPLE =
   '{\n' +
   '  "fullName": "Alice Smith",\n' +
   '  "isAdult": true,\n' +
@@ -161,7 +161,7 @@ export const JSONATA_OUTPUT_EXAMPLE =
   '  "totalChemicalAmount": 33\n' +
   '}';
 
-export const JSONATA_EXPRESSION =
+const JSONATA_EXPRESSION =
   '{\n' +
   '  "fullName": person.firstName & " " & person.lastName,\n' +
   '  "isAdult": person.age >= 18,\n' +
@@ -194,7 +194,7 @@ export const JSONATA_EXPRESSION =
   '  )\n' +
   '}';
 
-export const JSONATA_OUTPUT_EXAMPLE_SCHEMA =
+const JSONATA_OUTPUT_EXAMPLE_SCHEMA =
   '{\n' +
   '  "$schema": "http://json-schema.org/draft-07/schema#",\n' +
   '  "title": "Person Experiment Summary",\n' +
@@ -268,7 +268,7 @@ export const JSONATA_OUTPUT_EXAMPLE_SCHEMA =
   '  ]\n' +
   '}\n'; // todo: add descriptions?
 
-export const JSONATA_REFERENCE_GUIDE =
+const JSONATA_REFERENCE_GUIDE =
   'JSONata Reference Guide\n' +
   '\n' +
   'IMPORTANT: ONLY generate VALID JSONata syntax.\n' +
@@ -335,3 +335,19 @@ export const JSONATA_REFERENCE_GUIDE =
   'JSONata is a declarative functional query language for transforming JSON, supporting types like string, number, boolean, null, object, array, and function. It processes data as sequences: empty sequences are ignored, singletons are returned as raw values, and multi-item sequences are returned as arrays—with automatic flattening of nested sequences. Path expressions apply functional stages such as map (seq.expr), filter (seq[expr]), sort (seq^(expr)), reduce (seq{...}), and context binding (@$ and #$). Operator precedence affects how expressions are evaluated and can be overridden using parentheses, which also scope variables.\n' +
   'JSONata supports functional programming constructs, including variables, functions, and recursion, enabling powerful and expressive data transformations. Variables, prefixed with $, can store values or functions and have block-local scope. Functions are first-class citizens, can be defined anonymously or assigned to variables, and may use typed signatures for input validation. Recursive and tail-recursive functions are supported, allowing efficient deep operations like factorial computation without stack overflow. Higher-order functions enable functional composition by accepting or returning other functions, such as a $twice function that applies another function twice.\n' +
   '\n';
+
+/** Shared system prompt for generating a JSONata mapping expression. */
+export const JSONATA_MAPPING_SYSTEM_MESSAGE = `You are a JSON and JSONata Data Mapping expert. Your task is to generate a JSONata expression for transforming JSON input documents to satisfy the given target JSON schema.
+Only output valid JSONata, which is a single JSON-like expression. Do not use JavaScript-style blocks or function declarations like "function($x) {...}".
+Remember: JSONata is a declarative query and transformation language with syntax similar to JSON. It does not support full function declarations. Transformations must be inline.
+\`\`\`${JSON.stringify(JSONATA_REFERENCE_GUIDE)}\`\`\`
+Example input file: \`\`\`${JSON.stringify(JSONATA_INPUT_EXAMPLE)}\`\`\`.
+Example input schema: \`\`\`${JSON.stringify(JSONATA_INPUT_EXAMPLE_SCHEMA)}\`\`\`.
+Example output schema: \`\`\`${JSON.stringify(JSONATA_OUTPUT_EXAMPLE_SCHEMA)}\`\`\`.
+For these examples you should generate the following JSONata expression: \`\`\`${JSON.stringify(
+  JSONATA_EXPRESSION
+)}\`\`\`.
+The expression would transform the input file to the following output file (as intended): \`\`\`${JSON.stringify(
+  JSONATA_OUTPUT_EXAMPLE
+)}\`\`\`.
+Return ONLY a valid JSONata expression with no surrounding explanation.`;

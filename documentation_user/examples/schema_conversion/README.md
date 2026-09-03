@@ -10,7 +10,7 @@ A public instance is used by default; the endpoint can be changed in the setting
 
 ## Importing a schema from another format
 
-Switch to the **Schema Editor** tab. In the top menu bar, open **`Open / Import / Infer Schema...` → `Import Schema from another format...`**.
+Switch to the **Schema Editor** tab. In the top menu bar, open **`Open / Import Schema...` → `Import Schema from another format...`**.
 
 In the dialog:
 

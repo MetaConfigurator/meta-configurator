@@ -30,8 +30,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     settingsVersion: {
       type: 'string',
       description: 'The version of the settings file.',
-      default: '1.0.5',
-      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5'],
+      default: '1.0.6',
+      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5', '1.0.6'],
       readOnly: true,
     },
     latestNewsHash: {
@@ -476,7 +476,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     backend: {
       type: 'object',
-      required: ['snapshotSharingUrl', 'schemaConverterUrl'],
+      required: ['snapshotSharingUrl', 'schemaConverterUrl', 'formatProcessingUrl'],
       additionalProperties: false,
       description:
         'URLs of the MetaConfigurator backend services. Each service has its own full URL so ' +
@@ -495,6 +495,14 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
             'URL of the Schema Conversion Orchestrator service, used by "Import/Export Schema" to ' +
             'convert between JSON Schema and formats like XSD, SHACL, LinkML and MdModels.',
           default: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+          format: 'uri',
+        },
+        formatProcessingUrl: {
+          type: 'string',
+          description:
+            'URL of the format processing service, used by "Open Data" to parse additional input ' +
+            'formats such as XML, TOML, INI, Turtle, CSV/TSV, STAR/CIF and source code files.',
+          default: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
           format: 'uri',
         },
       },
@@ -545,7 +553,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     },
     aiIntegration: {
       type: 'object',
-      required: ['model', 'temperature', 'backend'],
+      required: ['model', 'backend'],
       additionalProperties: {
         title: 'Custom Model Parameter',
         oneOf: [{type: 'string'}, {type: 'number'}, {type: 'boolean'}],

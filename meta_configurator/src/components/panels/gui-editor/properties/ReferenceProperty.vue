@@ -10,10 +10,11 @@ import {useSettings} from '@/settings/useSettings';
 import type {SessionMode} from '@/store/sessionMode';
 import {SessionMode as SessionModeEnum} from '@/store/sessionMode';
 import {getAvailableDefinitionPaths} from '@/schema/schemaReadingUtils';
+import {dataToString} from '@/utility/dataToString';
 
 const props = defineProps<{
   propertyName: PathElement;
-  propertyData: string | undefined;
+  propertyData: unknown;
   propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
   sessionMode: SessionMode;
@@ -25,16 +26,20 @@ const emit = defineEmits<{
   (e: 'update:propertyData', newValue: string | undefined): void;
 }>();
 
-const currentValue = ref(props.propertyData ?? '');
+const currentValue = ref(formatReferenceValue(props.propertyData));
 const filteredSuggestions = ref<string[]>([]);
 const autoCompleteRef = ref();
 
 watch(
   () => props.propertyData,
   newVal => {
-    currentValue.value = newVal ?? '';
+    currentValue.value = formatReferenceValue(newVal);
   }
 );
+
+function formatReferenceValue(value: unknown): string {
+  return typeof value === 'string' ? value : dataToString(value);
+}
 
 function getDefinitions() {
   const userSchemaData = getDataForMode(SessionModeEnum.SchemaEditor).data.value;

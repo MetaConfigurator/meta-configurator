@@ -7,12 +7,10 @@ holds the provider key server-side and the API key field is optional in that cas
 import {computed, type Ref} from 'vue';
 import Message from 'primevue/message';
 import {getApiKeyRef} from '@/utility/ai/apiKey';
-import {useSettings} from '@/settings/useSettings';
+import {canQueryAi} from '@/utility/ai/aiAvailability';
 
 const apiKey: Ref<string> = getApiKeyRef();
-const settings = useSettings();
-const usingProxy = computed(() => 'relay' in settings.value.aiIntegration.backend);
-const showWarning = computed(() => !usingProxy.value && apiKey.value.length <= 1);
+const showWarning = computed(() => !canQueryAi(apiKey.value));
 </script>
 
 <template>

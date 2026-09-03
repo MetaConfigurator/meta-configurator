@@ -9,29 +9,15 @@
  */
 import {beforeAll, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
+import {installWorkerTestDouble} from '@/data/__tests__/managedValidationTestUtils';
 
-class FakeWorker {
-  onmessage: ((e: any) => void) | null = null;
-  postMessage() {}
-  terminate() {}
-}
-(globalThis as any).Worker = FakeWorker;
+installWorkerTestDouble();
 
-// ManagedValidation spawns a web worker and participates in a circular import that
-// vitest cannot resolve; replace it with a synchronous, lazily evaluated equivalent.
 vi.mock('@/data/managedValidation', async () => {
-  const {computed, ref} = await import('vue');
-  const {ValidationService} = await import('@/schema/validationService');
-  const {ValidationResult} = await import('@/schema/validationUtils');
-  class ManagedValidation {
-    constructor(public mode: any, private validationSchemaRaw?: any) {}
-    currentValidationService = computed(
-      () => new ValidationService(this.validationSchemaRaw?.value ?? {})
-    );
-    currentValidationResult = ref(new ValidationResult([]));
-    updateValidationResultAsync() {}
-  }
-  return {ManagedValidation};
+  const {createManagedValidationModuleTestDouble} = await import(
+    '@/data/__tests__/managedValidationTestUtils'
+  );
+  return createManagedValidationModuleTestDouble();
 });
 
 let SessionMode: any;
@@ -85,6 +71,14 @@ describe('GUI editor tree for a schema with array type at the root level', () =>
 
   it('offers an add item node when the data is a non-array value (e.g. leftover data)', () => {
     getDataForMode(SessionMode.DataEditor).setData({legacy: 'value'});
+
+    const children = buildRootChildren();
+    expect(children.length).toBe(1);
+    expect(children[0].type).toBe(TreeNodeType.ADD_ITEM);
+  });
+
+  it('offers an add item node when the invalid data is null', () => {
+    getDataForMode(SessionMode.DataEditor).setData(null);
 
     const children = buildRootChildren();
     expect(children.length).toBe(1);

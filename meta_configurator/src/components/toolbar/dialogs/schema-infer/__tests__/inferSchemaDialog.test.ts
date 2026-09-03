@@ -1,32 +1,29 @@
 import {describe, expect, it, vi} from 'vitest';
-import {defineComponent} from 'vue';
 import {flushPromises, mount} from '@vue/test-utils';
+import {
+  ButtonStub,
+  CheckboxStub,
+  findButtonByText,
+  InputNumberStub,
+  MessageStub,
+  PanelStub,
+  PersistentDialogStub,
+  SelectButtonStub,
+  openDialog,
+} from '@/components/toolbar/dialogs/__tests__/dialogTestUtils';
 
-// --- Stubs ------------------------------------------------------------------
-
-const DialogStub = defineComponent({template: '<div><slot /></div>'});
-const ButtonStub = defineComponent({
-  props: {disabled: {type: Boolean, default: false}},
-  emits: ['click'],
-  template:
-    '<button type="button" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
-});
-const MessageStub = defineComponent({template: '<div class="message"><slot /></div>'});
-const IconStub = defineComponent({template: '<i />'});
-
-function button(wrapper: any, text: string) {
-  return wrapper.findAll('button').find((b: any) => b.text().includes(text));
-}
-
-/**
- * Mounts the dialog with a fake multi-file picker that returns the given files
- * (name -> text content), a stubbed schema target, and the *real* format
- * registry + inference. Returns the wrapper plus the captured setData mock.
- */
-async function setupDialog(files: Record<string, string>) {
+async function setupDialog({
+  currentData,
+  uploadedFiles = {},
+}: {
+  currentData: unknown;
+  uploadedFiles?: Record<string, string>;
+}) {
   vi.resetModules();
 
-  const setDataMock = vi.fn();
+  const {SessionMode} = await import('@/store/sessionMode');
+  const dataEditorSetDataMock = vi.fn();
+  const schemaEditorSetDataMock = vi.fn();
   const toastAddMock = vi.fn();
 
   vi.doMock('@/settings/useSettings', () => ({
@@ -42,21 +39,32 @@ async function setupDialog(files: Record<string, string>) {
     }),
   }));
 
-  const fileObjects = Object.keys(files).map(name => ({name}));
+  const uploadedFileEntries = Object.keys(uploadedFiles).map(name => ({name}));
+  const fileListMock = Object.assign(uploadedFileEntries, {
+    item: (index: number) => uploadedFileEntries[index] ?? null,
+  });
   vi.doMock('@/utility/fileDialogUtils', () => ({
     createLazyMultiFileDialog: () => ({
-      openForSelection: (handler: (files: any) => void) => handler(fileObjects),
+      openForSelection: (handler: (files: any) => void) => handler(fileListMock),
     }),
   }));
   vi.doMock('@/utility/readFileContent', () => ({
-    readFileContent: vi.fn(async (file: {name: string}) => files[file.name]),
+    readFileContent: vi.fn(async (file: {name: string}) => uploadedFiles[file.name]),
   }));
   vi.doMock('@/data/useDataLink', () => ({
-    getDataForMode: () => ({setData: setDataMock}),
+    getDataForMode: (mode: string) =>
+      mode === SessionMode.DataEditor
+        ? {
+            data: {value: currentData},
+            setData: dataEditorSetDataMock,
+          }
+        : {
+            data: {value: {}},
+            setData: schemaEditorSetDataMock,
+          },
   }));
   vi.doMock('@/utility/toastService', () => ({toastService: {add: toastAddMock}}));
 
-  // Use the real format registry, with the default JSON + YAML formats registered.
   const {registerDefaultDataFormats} = await import('@/dataformats/defaultFormats');
   registerDefaultDataFormats();
 
@@ -67,87 +75,195 @@ async function setupDialog(files: Record<string, string>) {
   const wrapper = mount(InferSchemaDialog, {
     global: {
       stubs: {
-        Dialog: DialogStub,
+        Dialog: PersistentDialogStub,
         Button: ButtonStub,
+        SelectButton: SelectButtonStub,
+        Checkbox: CheckboxStub,
+        InputNumber: InputNumberStub,
         Message: MessageStub,
-        FontAwesomeIcon: IconStub,
+        Panel: PanelStub,
       },
     },
   });
 
-  return {wrapper, setDataMock, toastAddMock};
+  return {
+    wrapper,
+    dataEditorSetDataMock,
+    schemaEditorSetDataMock,
+    toastAddMock,
+  };
 }
 
-async function selectFiles(wrapper: any) {
-  (wrapper.vm as any).show();
+async function selectSource(wrapper: any, source: 'current' | 'files') {
+  await wrapper.get(`[data-option-value="${source}"]`).trigger('click');
   await flushPromises();
-  await button(wrapper, 'Select instance').trigger('click');
+}
+
+async function selectUploadedFiles(wrapper: any) {
+  await findButtonByText(wrapper, 'Select data files').trigger('click');
+  await flushPromises();
+}
+
+async function applyInference(wrapper: any) {
+  await findButtonByText(wrapper, 'Infer Schema').trigger('click');
   await flushPromises();
 }
 
 describe('InferSchemaDialog', () => {
-  it('infers a JSON Schema satisfying multiple YAML (.yaml/.yml) instances', async () => {
-    const {wrapper, setDataMock, toastAddMock} = await setupDialog({
-      'a.yaml': 'name: Alice\nage: 30\n',
-      'b.yml': 'name: Bob\nage: 41\ncity: NYC\n',
-    });
+  it('defaults to the existing Data Editor content when data is already loaded', async () => {
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock, toastAddMock} =
+      await setupDialog({
+        currentData: {
+          name: 'Alice',
+          age: 30,
+          active: true,
+        },
+      });
 
-    await selectFiles(wrapper);
+    await openDialog(wrapper);
+    expect(wrapper.text()).toContain('Current data');
+    expect(wrapper.text()).not.toContain('top-level');
+    await applyInference(wrapper);
 
-    expect(setDataMock).toHaveBeenCalledTimes(1);
-    const schema = setDataMock.mock.calls[0]![0];
+    expect(wrapper.text()).toContain('Choose whether the schema should be inferred');
+    expect(dataEditorSetDataMock).not.toHaveBeenCalled();
+    expect(schemaEditorSetDataMock).toHaveBeenCalledTimes(1);
+    const schema = schemaEditorSetDataMock.mock.calls[0]![0];
     expect(schema.type).toBe('object');
     expect(schema.properties.name.type).toBe('string');
     expect(schema.properties.age.type).toBe('integer');
-    // city only appears in one instance -> present as an optional property
-    expect(schema.properties.city.type).toBe('string');
-    expect(schema.required).toEqual(expect.arrayContaining(['name', 'age']));
-    expect(schema.required).not.toContain('city');
+    expect(schema.properties.active.type).toBe('boolean');
+    expect(schema.required).toEqual(expect.arrayContaining(['name', 'age', 'active']));
 
     expect(toastAddMock).toHaveBeenCalledWith(expect.objectContaining({severity: 'success'}));
-    // No error message shown.
     expect(wrapper.text()).not.toContain('Could not infer');
   });
 
-  it('parses a YAML file as YAML, not JSON (regression for the dataFormat parse error)', async () => {
-    // This exact content previously triggered:
-    // 'JSON Parse error: Unexpected identifier "dataFormat"'
-    const {wrapper, setDataMock} = await setupDialog({
-      'settings.yaml': 'dataFormat: json\nperformance:\n  maxErrorsToShow: 10\n',
+  it('allows switching from existing data to manually selected files', async () => {
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock} = await setupDialog({
+      currentData: {
+        fromExisting: 'keep out',
+      },
+      uploadedFiles: {
+        'patient.json': '{"fromFile":true,"count":3}',
+      },
     });
 
-    await selectFiles(wrapper);
+    await openDialog(wrapper);
+    await selectSource(wrapper, 'files');
+    await selectUploadedFiles(wrapper);
+    await applyInference(wrapper);
 
-    expect(wrapper.text()).not.toContain('Could not infer');
-    expect(setDataMock).toHaveBeenCalledTimes(1);
-    const schema = setDataMock.mock.calls[0]![0];
+    expect(wrapper.text()).toContain('1 file selected');
+    expect(dataEditorSetDataMock).toHaveBeenCalledTimes(1);
+    expect(dataEditorSetDataMock).toHaveBeenCalledWith({fromFile: true, count: 3});
+    expect(schemaEditorSetDataMock).toHaveBeenCalledTimes(1);
+    const schema = schemaEditorSetDataMock.mock.calls[0]![0];
     expect(schema.type).toBe('object');
-    expect(schema.properties.dataFormat.type).toBe('string');
-    expect(schema.properties.performance.type).toBe('object');
+    expect(schema.properties.fromFile.type).toBe('boolean');
+    expect(schema.properties.count.type).toBe('integer');
+    expect(schema.properties.fromExisting).toBeUndefined();
   });
 
-  it('still parses explicit .json instances', async () => {
-    const {wrapper, setDataMock} = await setupDialog({
-      'data.json': '{"name": "Alice", "age": 30}',
+  it('applies selected schema refinements to the currently loaded data', async () => {
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock} = await setupDialog({
+      currentData: [
+        {name: 'Alice', age: 30},
+        {name: 'Bob', age: 41, city: 'NYC'},
+      ],
     });
 
-    await selectFiles(wrapper);
+    await openDialog(wrapper);
+    await wrapper.get('#infer-add-examples').setValue(true);
+    await flushPromises();
+    await findButtonByText(wrapper, 'Apply and Infer Schema').trigger('click');
+    await flushPromises();
 
-    expect(setDataMock).toHaveBeenCalledTimes(1);
-    const schema = setDataMock.mock.calls[0]![0];
+    expect(dataEditorSetDataMock).not.toHaveBeenCalled();
+    expect(schemaEditorSetDataMock).toHaveBeenCalledTimes(1);
+    const schema = schemaEditorSetDataMock.mock.calls[0]![0];
+    expect(schema.type).toBe('array');
+    expect(schema.items.properties.name.examples).toEqual(['Alice', 'Bob']);
+    expect(schema.items.properties.age.examples).toEqual([30, 41]);
+    expect(schema.items.properties.city.examples).toEqual(['NYC']);
+  });
+
+  it('starts in manual file mode when no current data is available', async () => {
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock, toastAddMock} =
+      await setupDialog({
+        currentData: {},
+        uploadedFiles: {
+          'data.json': '{"name":"Alice","age":30}',
+        },
+      });
+
+    await openDialog(wrapper);
+
+    const currentDataOption = wrapper.get('[data-option-value="current"]')
+      .element as HTMLButtonElement;
+    const filesOption = wrapper.get('[data-option-value="files"]').element as HTMLButtonElement;
+    expect(currentDataOption.disabled).toBe(true);
+    expect(filesOption.disabled).toBe(false);
+    expect(wrapper.text()).toContain('No files selected yet.');
+
+    await selectUploadedFiles(wrapper);
+    await applyInference(wrapper);
+
+    expect(dataEditorSetDataMock).toHaveBeenCalledTimes(1);
+    expect(dataEditorSetDataMock).toHaveBeenCalledWith({name: 'Alice', age: 30});
+    expect(schemaEditorSetDataMock).toHaveBeenCalledTimes(1);
+    const schema = schemaEditorSetDataMock.mock.calls[0]![0];
+    expect(schema.type).toBe('object');
     expect(schema.properties.name.type).toBe('string');
     expect(schema.properties.age.type).toBe('integer');
+    expect(toastAddMock).toHaveBeenCalledWith(expect.objectContaining({severity: 'success'}));
   });
 
-  it('shows an error message when a file cannot be parsed', async () => {
-    const {wrapper, setDataMock} = await setupDialog({
-      // invalid as both JSON and YAML (unclosed flow mapping)
-      'broken.json': '{ this is : not valid : json ]',
+  it('infers one schema satisfying all selected files, without touching the Data Editor', async () => {
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock, toastAddMock} =
+      await setupDialog({
+        currentData: {},
+        uploadedFiles: {
+          'first.json': '{"name":"Alice","age":30}',
+          'second.yaml': 'name: Bob\nnickname: Bobby\n',
+        },
+      });
+
+    await openDialog(wrapper);
+    await selectUploadedFiles(wrapper);
+    await applyInference(wrapper);
+
+    expect(wrapper.text()).toContain('2 files selected');
+    // Several instances have no single data document to show, so the editor keeps its content.
+    expect(dataEditorSetDataMock).not.toHaveBeenCalled();
+    expect(schemaEditorSetDataMock).toHaveBeenCalledTimes(1);
+    const schema = schemaEditorSetDataMock.mock.calls[0]![0];
+    expect(schema.properties.name.type).toBe('string');
+    expect(schema.properties.age.type).toBe('integer');
+    expect(schema.properties.nickname.type).toBe('string');
+    expect(schema.required).toEqual(['name']);
+    expect(toastAddMock).toHaveBeenCalledWith(
+      expect.objectContaining({detail: expect.stringContaining('2 selected data instances')})
+    );
+  });
+
+  it('shows a parse error when a selected file cannot be read as JSON', async () => {
+    const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock} = await setupDialog({
+      currentData: {
+        name: 'Alice',
+      },
+      uploadedFiles: {
+        'broken.json': '{ this is : not valid : json ]',
+      },
     });
 
-    await selectFiles(wrapper);
+    await openDialog(wrapper);
+    await selectSource(wrapper, 'files');
+    await selectUploadedFiles(wrapper);
+    await applyInference(wrapper);
 
-    expect(setDataMock).not.toHaveBeenCalled();
-    expect(wrapper.text()).toContain('Could not infer');
+    expect(wrapper.text()).toContain('Could not infer a schema from the selected files');
+    expect(dataEditorSetDataMock).not.toHaveBeenCalled();
+    expect(schemaEditorSetDataMock).not.toHaveBeenCalled();
   });
 });

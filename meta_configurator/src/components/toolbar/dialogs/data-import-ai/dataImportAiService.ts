@@ -1,0 +1,386 @@
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import {
+  fixAndParseGeneratedJson,
+  fixGeneratedJavascript,
+  getApiKey,
+} from '@/components/panels/ai-prompts/aiPromptUtils';
+import {queryDataConversionToJson, queryOpenAI} from '@/utility/ai/aiEndpoint';
+import {ValidationService} from '@/schema/validationService';
+import {
+  detectFormatAndParseWithFormatProcessing,
+  type FormatProcessingDetectionResult,
+} from '@/utility/backend/formatProcessingApi';
+import {makeJsonCompatible} from '@/components/toolbar/dialogs/data-import-ai/makeJsonCompatible';
+import {AI_ACCESS_UNAVAILABLE_MESSAGE, canQueryAi} from '@/utility/ai/aiAvailability';
+import {
+  buildGeneratedCodeRetryHints,
+  type GeneratedCodeRetryContext,
+} from '@/data-mapping/dataMappingService';
+import {generateMappingFunctionSuggestion} from '@/data-mapping/dataMappingAi';
+import {inferJsonSchema} from '@/schema/inferJsonSchema';
+import {executeSandboxedJavascriptTransform} from '@/utility/sandboxedJavascript';
+import {isSchemaEmpty} from '@/schema/schemaReadingUtils';
+import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
+import {truncateTextForAiPrompt} from '@/utility/ai/prepareDataForAiPrompt';
+import {getErrorMessage} from '@/utility/getErrorMessage';
+import {
+  buildImportParserSystemMessage,
+  buildTargetSchemaInstruction,
+  FULL_AI_IMPORT_SYSTEM_MESSAGE,
+  IMPORT_PARSER_CLOSING_INSTRUCTION,
+} from '@/components/toolbar/dialogs/data-import-ai/dataImportAiPrompts';
+
+export type DataImportAiSchemaSource = 'infer_from_data' | 'use_current_schema';
+
+/** The backend format detection result as it is fed into the AI prompts. */
+type BackendDetectionHints = {
+  backendDisplayText: string;
+  backendPromptHint: string;
+};
+
+export type ImportScriptGenerationRequest = BackendDetectionHints & {
+  inputFileName: string;
+  inputFileType: string;
+  inputDocument: string;
+  userComments: string;
+  schemaSource: DataImportAiSchemaSource;
+  currentSchema: TopLevelSchema | undefined;
+  retryContext?: GeneratedCodeRetryContext;
+};
+
+export type ParsedDataSchemaMappingRequest = BackendDetectionHints & {
+  parsedData: unknown;
+  preprocessedDataForAi: unknown;
+  userComments: string;
+  schemaSource: DataImportAiSchemaSource;
+  currentSchema: TopLevelSchema | undefined;
+  retryContext?: GeneratedCodeRetryContext;
+};
+
+export type FullAiImportRequest = BackendDetectionHints & {
+  inputDocument: string;
+  schemaSource: DataImportAiSchemaSource;
+  currentSchema: TopLevelSchema | undefined;
+  userComments: string;
+};
+
+export type GeneratedScriptResult = {
+  config: string;
+  success: boolean;
+  message: string;
+};
+
+export type DataImportExecutionResult = {
+  resultData: unknown;
+  success: boolean;
+  message: string;
+  requiresConfirmation?: boolean;
+  warningMessage?: string;
+  confirmedMessage?: string;
+};
+
+/** The wording of the outcome messages, which names the import mode that produced them. */
+type ImportResultMessages = {
+  mismatchMessagePrefix: string;
+  confirmationMessage: string;
+  successMessage: string;
+};
+
+const CURRENT_SCHEMA_EMPTY_MESSAGE =
+  'Current schema is empty. Switch schema source or load a schema first.';
+
+/** Characters of the uploaded document that are sent to the LLM for parser generation. */
+const MAXIMUM_INPUT_SUBSET_CHARACTERS = 12000;
+
+export async function detectFormatAndParseInBackend(
+  fileName: string,
+  fileType: string,
+  inputDocument: string
+): Promise<FormatProcessingDetectionResult> {
+  return detectFormatAndParseWithFormatProcessing(fileName, fileType, inputDocument);
+}
+
+/** Runs the generated script on a sample input to catch failures before the real import. */
+export async function validateGeneratedImportScript(
+  generatedScript: string,
+  sampleInput: unknown
+): Promise<{success: boolean; message: string}> {
+  try {
+    const transformationResult = await executeSandboxedJavascriptTransform(
+      fixGeneratedJavascript(generatedScript),
+      sampleInput
+    );
+    normalizeImportResult(transformationResult);
+    return {success: true, message: 'Generated JavaScript is valid.'};
+  } catch (error) {
+    return {success: false, message: `Error: ${getErrorMessage(error)}`};
+  }
+}
+
+/** Asks the LLM for a `transform(input)` parser for the raw content of the uploaded file. */
+export async function generateImportScriptSuggestion(
+  request: ImportScriptGenerationRequest
+): Promise<GeneratedScriptResult> {
+  const usesCurrentSchema = request.schemaSource === 'use_current_schema';
+  if (usesCurrentSchema && !hasUsableSchema(request.currentSchema)) {
+    return {config: '', success: false, message: CURRENT_SCHEMA_EMPTY_MESSAGE};
+  }
+
+  const apiKey = getApiKey();
+  if (!canQueryAi(apiKey)) {
+    return {config: '', success: false, message: AI_ACCESS_UNAVAILABLE_MESSAGE};
+  }
+
+  try {
+    const generatedScript = await queryOpenAI(apiKey, [
+      {
+        role: 'system',
+        content: buildImportParserSystemMessage(usesCurrentSchema),
+      },
+      {role: 'user', content: buildImportParserUserMessage(request, usesCurrentSchema)},
+    ]);
+    return {
+      config: fixGeneratedJavascript(generatedScript),
+      success: true,
+      message: usesCurrentSchema
+        ? 'Generated a JavaScript parser for the current app schema.'
+        : 'Generated a JavaScript parser and inferred the schema from the imported data.',
+    };
+  } catch (error) {
+    return {
+      config: '',
+      success: false,
+      message: `Failed to generate JavaScript parser. Reason: ${getErrorMessage(error)}.`,
+    };
+  }
+}
+
+/** Maps the backend's parsed JSON to the schema currently loaded in the app. */
+export async function generateParsedDataMappingScriptSuggestion(
+  request: ParsedDataSchemaMappingRequest
+): Promise<GeneratedScriptResult> {
+  const dataForPrompt = request.preprocessedDataForAi ?? request.parsedData;
+
+  if (request.schemaSource !== 'use_current_schema' || !hasUsableSchema(request.currentSchema)) {
+    return {config: '', success: false, message: CURRENT_SCHEMA_EMPTY_MESSAGE};
+  }
+
+  return generateMappingFunctionSuggestion({
+    language: 'javascript',
+    method: 'source-data',
+    inputData: dataForPrompt,
+    inputDataSchema: inferJsonSchema(dataForPrompt),
+    targetSchema: request.currentSchema as TopLevelSchema,
+    userComments: joinPromptSections([formatBackendHints(request), request.userComments]),
+    retryContext: request.retryContext,
+  });
+}
+
+export async function runImportWithGeneratedScript(
+  inputDocument: unknown,
+  generatedScript: string,
+  schemaSource: DataImportAiSchemaSource,
+  currentSchema: TopLevelSchema | undefined
+): Promise<DataImportExecutionResult> {
+  try {
+    const transformationResult = await executeSandboxedJavascriptTransform(
+      fixGeneratedJavascript(generatedScript),
+      inputDocument
+    );
+    return prepareImportResult(transformationResult, schemaSource, currentSchema, {
+      mismatchMessagePrefix: 'Imported JSON does not match current schema',
+      confirmationMessage: 'Data imported despite schema mismatch warning.',
+      successMessage: 'Data imported successfully.',
+    });
+  } catch (error) {
+    return failedImport(`Import failed. Reason: ${getErrorMessage(error)}.`);
+  }
+}
+
+export async function runDirectParsedImport(
+  parsedData: unknown,
+  schemaSource: DataImportAiSchemaSource,
+  currentSchema: TopLevelSchema | undefined
+): Promise<DataImportExecutionResult> {
+  try {
+    return prepareImportResult(parsedData, schemaSource, currentSchema, {
+      mismatchMessagePrefix: 'Parsed JSON does not match current schema',
+      confirmationMessage:
+        'Data imported via direct backend parsing despite schema mismatch warning.',
+      successMessage: 'Data imported successfully via direct backend parsing.',
+    });
+  } catch (error) {
+    return failedImport(`Direct parsing import failed. Reason: ${getErrorMessage(error)}.`);
+  }
+}
+
+/** Converts the uploaded document to JSON with a single LLM call, without any script. */
+export async function runFullAiImport(
+  request: FullAiImportRequest
+): Promise<DataImportExecutionResult> {
+  const usesCurrentSchema = request.schemaSource === 'use_current_schema';
+  if (usesCurrentSchema && !hasUsableSchema(request.currentSchema)) {
+    return failedImport(CURRENT_SCHEMA_EMPTY_MESSAGE);
+  }
+
+  const apiKey = getApiKey();
+  if (!canQueryAi(apiKey)) {
+    return failedImport(AI_ACCESS_UNAVAILABLE_MESSAGE);
+  }
+
+  try {
+    const aiResponse = usesCurrentSchema
+      ? await queryDataConversionToJson(
+          apiKey,
+          buildFullAiImportUserMessage(request),
+          JSON.stringify(request.currentSchema)
+        )
+      : await queryOpenAI(apiKey, [
+          {role: 'system', content: FULL_AI_IMPORT_SYSTEM_MESSAGE},
+          {
+            role: 'user',
+            content: buildFullAiImportUserMessage(request),
+          },
+        ]);
+
+    return prepareImportResult(
+      fixAndParseGeneratedJson(aiResponse),
+      request.schemaSource,
+      request.currentSchema,
+      {
+        mismatchMessagePrefix: 'AI-converted JSON does not match current schema',
+        confirmationMessage:
+          'Data imported via full AI conversion despite schema mismatch warning.',
+        successMessage: 'Data imported successfully via full AI conversion.',
+      }
+    );
+  } catch (error) {
+    return failedImport(`Full AI import failed. Reason: ${getErrorMessage(error)}.`);
+  }
+}
+
+function hasUsableSchema(schema: TopLevelSchema | undefined): boolean {
+  return schema !== undefined && !isSchemaEmpty(schema);
+}
+
+function failedImport(message: string): DataImportExecutionResult {
+  return {resultData: {}, success: false, message};
+}
+
+function joinPromptSections(sections: string[]): string {
+  return sections
+    .map(section => section.trim())
+    .filter(section => section.length > 0)
+    .join('\n\n');
+}
+
+function formatBackendHints(hints: BackendDetectionHints): string {
+  return joinPromptSections([
+    hints.backendDisplayText ? `Backend detection: ${hints.backendDisplayText}` : '',
+    hints.backendPromptHint ? `Backend parser guidance: ${hints.backendPromptHint}` : '',
+  ]);
+}
+
+function buildImportParserUserMessage(
+  request: ImportScriptGenerationRequest,
+  usesCurrentSchema: boolean
+): string {
+  return joinPromptSections([
+    `Input file name: ${request.inputFileName || 'uploaded-file'}`,
+    `Input file type: ${request.inputFileType || 'unknown'}`,
+    formatBackendHints(request),
+    `Input file subset:\n${truncateTextForAiPrompt(
+      request.inputDocument,
+      MAXIMUM_INPUT_SUBSET_CHARACTERS
+    )}`,
+    buildTargetSchemaInstruction(usesCurrentSchema ? request.currentSchema : undefined),
+    IMPORT_PARSER_CLOSING_INSTRUCTION,
+    request.userComments ? `User hints:\n${request.userComments}` : '',
+    buildGeneratedCodeRetryHints(request.retryContext),
+  ]);
+}
+
+function buildFullAiImportUserMessage(request: FullAiImportRequest): string {
+  return joinPromptSections([
+    formatBackendHints(request),
+    `Input document:\n${truncateTextForAiPrompt(
+      request.inputDocument,
+      MAXIMUM_INPUT_SUBSET_CHARACTERS
+    )}`,
+    request.userComments ? `User hints: ${request.userComments}` : '',
+  ]);
+}
+
+/**
+ * Validating against the current schema only warns: a mismatching import is still handed
+ * back with `requiresConfirmation`, so the user can take a partially correct result and fix
+ * it, instead of the import discarding everything the LLM produced.
+ */
+function prepareImportResult(
+  rawResult: unknown,
+  schemaSource: DataImportAiSchemaSource,
+  currentSchema: TopLevelSchema | undefined,
+  messages: ImportResultMessages
+): DataImportExecutionResult {
+  const normalizedResult = normalizeImportResult(rawResult);
+  if (schemaSource !== 'use_current_schema') {
+    return {resultData: normalizedResult, success: true, message: messages.successMessage};
+  }
+  if (!hasUsableSchema(currentSchema)) {
+    return failedImport(CURRENT_SCHEMA_EMPTY_MESSAGE);
+  }
+
+  const schema = currentSchema as TopLevelSchema;
+  const adaptedResult = adaptResultToSchemaRoot(normalizedResult, schema);
+  const validationErrors = new ValidationService(schema).validate(adaptedResult).errors;
+  if (validationErrors.length === 0) {
+    return {resultData: adaptedResult, success: true, message: messages.successMessage};
+  }
+
+  const formattedValidationErrors = validationErrors
+    .slice(0, 5)
+    .map(error => `${error.message} at "${error.instancePath}"`)
+    .join('; ');
+  return {
+    resultData: adaptedResult,
+    success: true,
+    message: 'Schema mismatch detected. Click import again to continue anyway.',
+    requiresConfirmation: true,
+    warningMessage: `${messages.mismatchMessagePrefix}: ${formattedValidationErrors}`,
+    confirmedMessage: messages.confirmationMessage,
+  };
+}
+
+function normalizeImportResult(result: unknown): unknown {
+  const parsedResult = typeof result === 'string' ? JSON.parse(result) : result;
+  const normalizedResult = makeJsonCompatible(parsedResult);
+  if (normalizedResult === null || typeof normalizedResult !== 'object') {
+    throw new Error('Parser output must be a JSON object or array.');
+  }
+  return normalizedResult;
+}
+
+/**
+ * Wraps the result into the single required root property of the schema, so that a
+ * parser returning only the payload still validates against such a schema.
+ */
+function adaptResultToSchemaRoot(result: unknown, schema: TopLevelSchema): unknown {
+  const schemaObject = nonBooleanSchema(schema);
+  const requiredPropertyNames = schemaObject?.required ?? [];
+  const schemaProperties = schemaObject?.properties;
+  if (requiredPropertyNames.length !== 1 || !schemaProperties) {
+    return result;
+  }
+
+  const requiredRootPropertyName = requiredPropertyNames[0];
+  if (!requiredRootPropertyName || !(requiredRootPropertyName in schemaProperties)) {
+    return result;
+  }
+  if (result !== null && typeof result === 'object' && !Array.isArray(result)) {
+    if (requiredRootPropertyName in (result as Record<string, unknown>)) {
+      return result;
+    }
+  }
+
+  return {[requiredRootPropertyName]: result};
+}
