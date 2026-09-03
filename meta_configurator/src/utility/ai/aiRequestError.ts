@@ -5,6 +5,7 @@ export function throwAiRequestError(
   backend: AiBackendCorsEndpoint | AiBackendRelay
 ): never {
   const status: number | undefined = error?.response?.status;
+  const errorType: string | undefined = error?.response?.data?.error?.type;
   const machineMessage: string =
     error?.response?.data?.error?.message ?? error?.message ?? String(error);
 
@@ -34,6 +35,16 @@ export function throwAiRequestError(
     return raise(
       'The request was rejected by the API (400 Bad Request). A model parameter is likely wrong or not supported by the selected model. ' +
         'For example, some models use "max_completion_tokens" instead of "max_tokens". Check your custom model parameters in the AI settings.'
+    );
+  }
+
+  // A relay forwards to the provider with its own API key, so a rate limit hit there
+  // is not the user's: saying otherwise confuses users who have not used the relay yet.
+  if (status === 429 && errorType === 'upstream_rate_limit_error') {
+    return raise(
+      'The relay has reached its own rate limit at the AI provider (429 Too Many Requests). ' +
+        'That quota is shared by everyone using the relay, so this is not caused by your own usage. ' +
+        'Please try again later, or configure your own endpoint and API key in the AI settings.'
     );
   }
 

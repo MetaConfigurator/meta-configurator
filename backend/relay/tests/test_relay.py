@@ -11,11 +11,14 @@ from typing import Any
 import responses as rsps_lib
 
 from app import (
+    CLIENT_RATE_LIMIT_MESSAGE,
+    UPSTREAM_RATE_LIMIT_MESSAGE,
     EndpointConfig,
     LimitsConfig,
     RateLimitConfig,
     RelayConfig,
     create_app,
+    estimate_prompt_tokens,
     find_endpoint,
 )
 
@@ -193,6 +196,41 @@ def test_upstream_api_key_injected_not_client_key():
 
 
 @rsps_lib.activate
+def test_upstream_rate_limit_is_reported_as_the_relays_own_quota():
+    rsps_lib.add(
+        rsps_lib.POST,
+        f"{UPSTREAM}/chat/completions",
+        json={"error": {"message": "You exceeded your current quota", "type": "rate_limit_error"}},
+        status=429,
+    )
+
+    app = create_app(make_config())
+    with app.test_client() as client:
+        resp = _post_json(client, "/v1/chat/completions", {"model": "gpt-4o", "messages": []})
+
+    assert resp.status_code == 429
+    error = resp.get_json()["error"]
+    assert error["type"] == "upstream_rate_limit_error"
+    # the caller must not be told that they exceeded a limit they never used
+    assert error["message"] == UPSTREAM_RATE_LIMIT_MESSAGE
+    assert "You exceeded your current quota" not in error["message"]
+
+
+@rsps_lib.activate
+def test_streamed_upstream_rate_limit_is_reported_as_the_relays_own_quota():
+    rsps_lib.add(rsps_lib.POST, f"{UPSTREAM}/chat/completions", body="rate limited", status=429)
+
+    app = create_app(make_config())
+    with app.test_client() as client:
+        resp = _post_json(
+            client, "/v1/chat/completions", {"model": "gpt-4o", "messages": [], "stream": True}
+        )
+
+    assert resp.status_code == 429
+    assert resp.get_json()["error"]["type"] == "upstream_rate_limit_error"
+
+
+@rsps_lib.activate
 def test_upstream_error_passed_through():
     rsps_lib.add(rsps_lib.POST, f"{UPSTREAM}/chat/completions", json={"error": "bad key"}, status=401)
 
@@ -340,7 +378,9 @@ def test_rate_limit_error_has_correct_type():
         resp = _post_json(client, "/v1/chat/completions", {"model": "gpt-4o", "messages": []})
 
     assert resp.status_code == 429
-    assert resp.get_json()["error"]["type"] == "rate_limit_error"
+    error = resp.get_json()["error"]
+    assert error["type"] == "rate_limit_error"
+    assert error["message"] == CLIENT_RATE_LIMIT_MESSAGE
 
 
 def test_health_is_exempt_from_rate_limiting():
@@ -393,6 +433,37 @@ def test_max_tokens_within_limit_unchanged():
         _post_json(client, "/v1/chat/completions", {"model": "gpt-4o", "messages": [], "max_tokens": 500})
 
     assert captured_body[0]["max_tokens"] == 500
+
+
+@rsps_lib.activate
+def test_large_prompt_counts_towards_the_daily_token_limit():
+    """A big prompt with a small max_tokens must not slip past the daily cap."""
+    for _ in range(3):
+        rsps_lib.add(rsps_lib.POST, f"{UPSTREAM}/chat/completions", json={"choices": []}, status=200)
+
+    # 40000 characters of prompt ~ 10000 tokens, so the second request exceeds the cap
+    limits = LimitsConfig(
+        max_request_tokens=10000, max_daily_tokens_per_ip=15000, max_request_bytes=2 * 1024 * 1024
+    )
+    app = create_app(make_config(limits=limits))
+
+    body = {
+        "model": "gpt-4o",
+        "max_tokens": 1,
+        "messages": [{"role": "user", "content": "x" * 40000}],
+    }
+    with app.test_client() as client:
+        first = _post_json(client, "/v1/chat/completions", body)
+        second = _post_json(client, "/v1/chat/completions", body)
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+    assert second.get_json()["error"]["type"] == "token_limit_error"
+
+
+def test_prompt_token_estimate_scales_with_request_size():
+    assert estimate_prompt_tokens(0) == 0
+    assert estimate_prompt_tokens(4000) == 1000
 
 
 def test_oversized_body_returns_413():
