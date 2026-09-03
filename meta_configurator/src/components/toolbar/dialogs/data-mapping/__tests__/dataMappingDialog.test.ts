@@ -22,17 +22,30 @@ import {
 async function setupDialog({
   currentData,
   currentSchema,
+  integrationPipeline,
 }: {
   currentData: unknown;
   currentSchema: Record<string, unknown>;
+  integrationPipeline?: {
+    mockedAiResponse: string;
+    executeGeneratedMapping: (source: string, input: unknown) => unknown;
+  };
 }) {
   vi.resetModules();
 
   const apiKeyRef = ref('test-key');
-  const dataEditorSetDataMock = vi.fn();
+  const dataEditorData = ref<unknown>(currentData);
+  const dataEditorSetDataMock = vi.fn((newData: unknown) => {
+    dataEditorData.value = newData;
+  });
   const schemaEditorSetDataMock = vi.fn();
   const toastAddMock = vi.fn();
   const onErrorMock = vi.fn();
+  const queryOpenAIMock = vi.fn().mockResolvedValue(integrationPipeline?.mockedAiResponse);
+  const executeSandboxedJavascriptTransformMock = vi.fn(
+    async (source: string, input: unknown) =>
+      integrationPipeline?.executeGeneratedMapping(source, input)
+  );
   const generateMappingFunctionSuggestionMock = vi.fn();
   const performDirectAiTargetSchemaMappingMock = vi.fn();
   const validateJavascriptMappingMock = vi
@@ -78,13 +91,14 @@ async function setupDialog({
       }),
   }));
   vi.doMock('@/utility/ai/apiKey', () => ({
+    getApiKey: () => apiKeyRef.value,
     getApiKeyRef: () => apiKeyRef,
   }));
   vi.doMock('@/data/useDataLink', () => ({
     getDataForMode: (mode: string) =>
       mode === 'dataEditor'
         ? {
-            data: ref(currentData),
+            data: dataEditorData,
             setData: dataEditorSetDataMock,
           }
         : {
@@ -101,32 +115,42 @@ async function setupDialog({
       },
     }),
   }));
-  vi.doMock('@/data-mapping/dataMappingAi', () => ({
-    generateMappingFunctionSuggestion: generateMappingFunctionSuggestionMock,
-    performDirectAiTargetSchemaMapping: performDirectAiTargetSchemaMappingMock,
-  }));
-  vi.doMock('@/data-mapping/javascript/dataMappingServiceJavascript', () => ({
-    DataMappingServiceJavascript: class {
-      sanitizeInputDocument(inputData: unknown) {
-        return inputData;
-      }
+  if (integrationPipeline) {
+    vi.doUnmock('@/data-mapping/dataMappingAi');
+    vi.doUnmock('@/data-mapping/javascript/dataMappingServiceJavascript');
+    vi.doUnmock('@/data-mapping/jsonata/dataMappingServiceJsonata');
+    vi.doMock('@/utility/ai/aiEndpoint', () => ({queryOpenAI: queryOpenAIMock}));
+    vi.doMock('@/utility/sandboxedJavascript', () => ({
+      executeSandboxedJavascriptTransform: executeSandboxedJavascriptTransformMock,
+    }));
+  } else {
+    vi.doMock('@/data-mapping/dataMappingAi', () => ({
+      generateMappingFunctionSuggestion: generateMappingFunctionSuggestionMock,
+      performDirectAiTargetSchemaMapping: performDirectAiTargetSchemaMappingMock,
+    }));
+    vi.doMock('@/data-mapping/javascript/dataMappingServiceJavascript', () => ({
+      DataMappingServiceJavascript: class {
+        sanitizeInputDocument(inputData: unknown) {
+          return inputData;
+        }
 
-      validateMappingConfig(mappingConfiguration: string, inputData: unknown) {
-        return validateJavascriptMappingMock(mappingConfiguration, inputData);
-      }
-    },
-  }));
-  vi.doMock('@/data-mapping/jsonata/dataMappingServiceJsonata', () => ({
-    DataMappingServiceJsonata: class {
-      sanitizeInputDocument(inputData: unknown) {
-        return inputData;
-      }
+        validateMappingConfig(mappingConfiguration: string, inputData: unknown) {
+          return validateJavascriptMappingMock(mappingConfiguration, inputData);
+        }
+      },
+    }));
+    vi.doMock('@/data-mapping/jsonata/dataMappingServiceJsonata', () => ({
+      DataMappingServiceJsonata: class {
+        sanitizeInputDocument(inputData: unknown) {
+          return inputData;
+        }
 
-      validateMappingConfig(mappingConfiguration: string, inputData: unknown) {
-        return validateJsonataMappingMock(mappingConfiguration, inputData);
-      }
-    },
-  }));
+        validateMappingConfig(mappingConfiguration: string, inputData: unknown) {
+          return validateJsonataMappingMock(mappingConfiguration, inputData);
+        }
+      },
+    }));
+  }
   vi.doMock('brace', () => ({
     edit: aceEditMock,
   }));
@@ -144,6 +168,7 @@ async function setupDialog({
 
   return {
     wrapper,
+    dataEditorData,
     dataEditorSetDataMock,
     schemaEditorSetDataMock,
     toastAddMock,
@@ -151,6 +176,8 @@ async function setupDialog({
     performDirectAiTargetSchemaMappingMock,
     validateJavascriptMappingMock,
     validateJsonataMappingMock,
+    queryOpenAIMock,
+    executeSandboxedJavascriptTransformMock,
     editors,
   };
 }
@@ -233,6 +260,73 @@ describe('DataMappingDialog', () => {
     expect(request.sourceSchema.type).toBe('array');
     expect(request.sourceSchema.items.properties.name.examples).toEqual(['Alice', 'Bob']);
     expect(request.sourceSchema.items.properties.age.examples).toEqual([30, 41]);
+    expect(schemaEditorSetDataMock).not.toHaveBeenCalled();
+  });
+
+  it('integrates inferred source-schema generation, validation, execution, and Data Editor storage', async () => {
+    const currentData = {
+      first_name: 'Ada',
+      last_name: 'Lovelace',
+    };
+    const currentSchema = {
+      type: 'object',
+      properties: {
+        fullName: {type: 'string'},
+      },
+      required: ['fullName'],
+    };
+    const generatedJavascript = [
+      'function transform(input) {',
+      "  return {fullName: input.first_name + ' ' + input.last_name};",
+      '}',
+    ].join('\n');
+    const mockedAiResponse = `\`\`\`javascript\n${generatedJavascript}\n\`\`\``;
+    const mappedData = {fullName: 'Ada Lovelace'};
+    const {
+      wrapper,
+      dataEditorData,
+      dataEditorSetDataMock,
+      schemaEditorSetDataMock,
+      queryOpenAIMock,
+      executeSandboxedJavascriptTransformMock,
+    } = await setupDialog({
+      currentData,
+      currentSchema,
+      integrationPipeline: {
+        mockedAiResponse,
+        executeGeneratedMapping: (_source, input) => {
+          const person = input as typeof currentData;
+          return {fullName: `${person.first_name} ${person.last_name}`};
+        },
+      },
+    });
+
+    await openDialog(wrapper);
+    await wrapper.findAll('select')[0]!.setValue('inferred-source-schema');
+    await flushPromises();
+    await findButtonByText(wrapper, 'Generate Suggestion').trigger('click');
+    await flushPromises();
+
+    expect(queryOpenAIMock).toHaveBeenCalledOnce();
+    const aiMessages = queryOpenAIMock.mock.calls[0]![1] as {role: string; content: string}[];
+    const userMessage = aiMessages[1]!.content;
+    expect(userMessage).toContain('SOURCE INPUT SCHEMA');
+    expect(userMessage).toContain('"first_name"');
+    expect(userMessage).toContain('"examples":["Ada"]');
+    expect(userMessage).toContain('TARGET OUTPUT SCHEMA');
+    expect(userMessage).toContain('"fullName"');
+    expect(userMessage).not.toContain('REAL INPUT DATA SUBSET');
+    expect(executeSandboxedJavascriptTransformMock).toHaveBeenCalledWith(
+      generatedJavascript,
+      currentData
+    );
+
+    await findButtonByText(wrapper, 'Perform Mapping').trigger('click');
+    await flushPromises();
+
+    expect(executeSandboxedJavascriptTransformMock).toHaveBeenCalledTimes(2);
+    expect(dataEditorSetDataMock).toHaveBeenCalledWith(mappedData);
+    expect(dataEditorData.value).toEqual(mappedData);
     expect(schemaEditorSetDataMock).not.toHaveBeenCalled();
   });
 
