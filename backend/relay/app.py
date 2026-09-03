@@ -107,15 +107,15 @@ def load_config(path: str) -> RelayConfig:
     rl_raw = raw.get("rate_limits", {})
     rate_limits = RateLimitConfig(
         enabled=rl_raw.get("enabled", True),
-        requests_per_minute=rl_raw.get("requests_per_minute", 20),
-        requests_per_hour=rl_raw.get("requests_per_hour", 200),
-        requests_per_day=rl_raw.get("requests_per_day", 1000),
+        requests_per_minute=rl_raw.get("requests_per_minute", 10),
+        requests_per_hour=rl_raw.get("requests_per_hour", 60),
+        requests_per_day=rl_raw.get("requests_per_day", 200),
     )
 
     lim_raw = raw.get("limits", {})
     limits = LimitsConfig(
         max_request_tokens=lim_raw.get("max_request_tokens", 10000),
-        max_daily_tokens_per_ip=lim_raw.get("max_daily_tokens_per_ip", 100000),
+        max_daily_tokens_per_ip=lim_raw.get("max_daily_tokens_per_ip", 50000),
         max_request_bytes=lim_raw.get("max_request_bytes", 2 * 1024 * 1024),
     )
 
@@ -139,6 +139,19 @@ def load_config(path: str) -> RelayConfig:
         enable_models_proxy=raw.get("enable_models_proxy", True),
         log_level=raw.get("log_level", "INFO").upper(),
     )
+
+
+# Hitting the relay's own per-IP limit and hitting the quota the relay itself has at
+# the provider are different problems for the user, so they get different messages.
+CLIENT_RATE_LIMIT_MESSAGE = (
+    "Too many requests from your IP address to this relay. "
+    "Please wait a moment before trying again."
+)
+UPSTREAM_RATE_LIMIT_MESSAGE = (
+    "This relay has reached its own rate limit at the AI provider it forwards to. "
+    "That quota is shared by everyone using this relay, so it is not caused by your usage. "
+    "Please try again later, or configure your own AI endpoint and API key in the AI settings."
+)
 
 
 # ---------------------------------------------------------------------------
@@ -168,9 +181,23 @@ def find_endpoint(
 
 
 # ---------------------------------------------------------------------------
-# Token tracker (per-IP daily cap, uses max_tokens as estimate)
+# Token tracker (per-IP daily cap, estimated from prompt size and max_tokens)
 # No library covers this use-case; kept as a lightweight custom class.
 # ---------------------------------------------------------------------------
+
+# Rough characters-per-token ratio, good enough to bound usage across models.
+CHARACTERS_PER_TOKEN = 4
+
+
+def estimate_prompt_tokens(request_bytes: int) -> int:
+    """Estimate the prompt tokens a request body will cost upstream.
+
+    The provider charges for the prompt as well, and MetaConfigurator sends whole
+    documents (imports, mappings, schemas), so the prompt usually dominates the
+    cost. Counting only max_tokens would let one client send megabyte prompts all
+    day while barely touching the daily cap.
+    """
+    return request_bytes // CHARACTERS_PER_TOKEN
 
 
 class TokenTracker:
@@ -180,8 +207,13 @@ class TokenTracker:
         # ip -> list of (unix_timestamp, tokens_used)
         self._usage: dict[str, list[tuple[float, int]]] = {}
 
-    def check_and_track(self, ip: str, requested_tokens: int) -> tuple[int, bool]:
+    def check_and_track(
+        self, ip: str, requested_tokens: int, prompt_tokens: int = 0
+    ) -> tuple[int, bool]:
         """Cap requested_tokens to max_request_tokens, check daily limit.
+
+        The daily limit is charged *prompt_tokens* plus the capped completion
+        tokens, since the provider bills both.
 
         Returns (capped_tokens, allowed).
         Set max_daily_tokens_per_ip to 0 in config to disable daily tracking.
@@ -190,14 +222,15 @@ class TokenTracker:
         # 0 means "no daily token limit"
         if self._cfg.max_daily_tokens_per_ip <= 0:
             return capped, True
+        charged = capped + prompt_tokens
         now = self._now()
         cutoff = now - 86400
         entries = self._usage.setdefault(ip, [])
         self._usage[ip] = [(ts, tok) for ts, tok in entries if ts >= cutoff]
         used_today = sum(tok for _, tok in self._usage[ip])
-        if used_today + capped > self._cfg.max_daily_tokens_per_ip:
+        if used_today + charged > self._cfg.max_daily_tokens_per_ip:
             return capped, False
-        self._usage[ip].append((now, capped))
+        self._usage[ip].append((now, charged))
         return capped, True
 
 
@@ -259,7 +292,7 @@ def create_app(config: RelayConfig) -> Flask:
 
     @app.errorhandler(429)
     def _rate_limit_error(e):
-        return jsonify({"error": {"message": "Rate limit exceeded", "type": "rate_limit_error"}}), 429
+        return jsonify({"error": {"message": CLIENT_RATE_LIMIT_MESSAGE, "type": "rate_limit_error"}}), 429
 
     # -----------------------------------------------------------------------
     # Helpers
@@ -290,6 +323,16 @@ def create_app(config: RelayConfig) -> Flask:
         if parsed < 0:
             return None, _error("max_tokens must be non-negative", "relay_error", 400)[0]
         return parsed, None
+
+    def _upstream_rate_limited(ep: EndpointConfig, path: str) -> tuple[Response, int]:
+        """Report an upstream 429 as the relay's own exhausted quota.
+
+        Passing the provider's message through instead would tell the caller they
+        exceeded a rate limit they never used: the quota belongs to the relay's API
+        key and is shared by every client of this relay.
+        """
+        log.warning("upstream rate limit reached endpoint=%s path=%s", ep.name, path)
+        return _error(UPSTREAM_RATE_LIMIT_MESSAGE, "upstream_rate_limit_error", 429)
 
     def _upstream_headers(ep: EndpointConfig) -> dict[str, str]:
         prefix = ep.auth_prefix
@@ -347,6 +390,8 @@ def create_app(config: RelayConfig) -> Flask:
         try:
             resp = requests.get(url, headers=_upstream_headers(ep), timeout=config.request_timeout)
             _log("GET", "/v1/models", resp.status_code, time.monotonic() - start)
+            if resp.status_code == 429:
+                return _upstream_rate_limited(ep, "/v1/models")
             return Response(
                 resp.content,
                 status=resp.status_code,
@@ -407,9 +452,18 @@ def create_app(config: RelayConfig) -> Flask:
         raw_max_tokens, token_parse_err = _parse_max_tokens(parsed.get("max_tokens"))
         if token_parse_err:
             return token_parse_err, 400
-        capped_tokens, token_ok = token_tracker.check_and_track(ip, raw_max_tokens)
+        capped_tokens, token_ok = token_tracker.check_and_track(
+            ip, raw_max_tokens, estimate_prompt_tokens(len(body))
+        )
         if not token_ok:
-            return _error("Daily token limit exceeded for your IP", "token_limit_error", 429)
+            return _error(
+                "Daily token limit exceeded for your IP address. This relay shares one "
+                "provider quota between all of its users, so each address gets a fixed "
+                "share per day. Please try again tomorrow, or configure your own AI "
+                "endpoint and API key in the AI settings.",
+                "token_limit_error",
+                429,
+            )
         if capped_tokens != raw_max_tokens:
             parsed["max_tokens"] = capped_tokens
             body = json.dumps(parsed).encode()
@@ -433,6 +487,11 @@ def create_app(config: RelayConfig) -> Flask:
         except requests.RequestException:
             _log("POST", upstream_path, 502, time.monotonic() - start, model)
             return _error("Upstream request failed", "relay_error", 502)
+
+        if upstream_resp.status_code == 429:
+            upstream_resp.close()
+            _log("POST", upstream_path, 429, time.monotonic() - start, model)
+            return _upstream_rate_limited(ep, upstream_path)
 
         if is_stream:
             content_type = upstream_resp.headers.get("Content-Type", "text/event-stream")
