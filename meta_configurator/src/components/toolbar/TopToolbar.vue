@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {watchEffect} from 'vue';
+import {computed, watchEffect} from 'vue';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useMagicKeys} from '@vueuse/core';
@@ -14,6 +14,7 @@ import TopToolbarMenuButtons from '@/components/toolbar/TopToolbarMenuButtons.vu
 import SearchBar from '@/components/toolbar/SearchBar.vue';
 import Divider from 'primevue/divider';
 import type {MenuItemDialogActions} from '@/components/toolbar/menuItems';
+import {getDataForMode} from '@/data/useDataLink';
 
 const props = defineProps<{
   currentMode: SessionMode;
@@ -26,11 +27,16 @@ const emit = defineEmits<{
 }>();
 
 const settings = useSettings();
+const settingsData = getDataForMode(SessionMode.Settings);
 const dataFormatOptions = formatRegistry.getFormatNames();
+const dataFormat = computed({
+  get: () => settings.value.dataFormat,
+  set: value => settingsData.setDataAt(['dataFormat'], value),
+});
 
 watchEffect(() => {
-  if (!dataFormatOptions.includes(settings.value.dataFormat)) {
-    settings.value.dataFormat = DataFormat.JSON;
+  if (!dataFormatOptions.includes(dataFormat.value)) {
+    dataFormat.value = DataFormat.JSON;
   }
 });
 
@@ -129,7 +135,7 @@ useMagicKeys({
       <div class="format-switch-container" v-if="settings.textEditor.showFormatSelector">
         <Select
           :options="dataFormatOptions"
-          v-model="settings.dataFormat"
+          v-model="dataFormat"
           size="small"
           class="custom-select"
           data-testid="format-selector" />

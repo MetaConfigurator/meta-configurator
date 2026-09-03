@@ -59,6 +59,13 @@ export async function editSelectProperty(page: Page, propertyPath: Path, value: 
     await comboInput.press('Enter');
 }
 
+export async function selectOneOfPropertySchema(page: Page, propertyPath: Path, option: string) {
+    const pathAsString = pathToString(propertyPath);
+    const comboInput = page.getByTestId(`property-data-${pathAsString}`).getByRole('combobox');
+    await comboInput.click();
+    await page.getByRole('option', {name: option}).click();
+}
+
 export async function removeOptionalPropertyValue(page: Page, propertyPath: Path) {
     const pathAsString = pathToString(propertyPath);
     const removeButton = page.getByTestId(`property-data-${pathAsString}`).getByRole('button', { name: 'Remove' });
@@ -69,6 +76,22 @@ export async function addObjectProperty(page: Page, propertyPath: Path) {
     const pathAsString = pathToString(propertyPath);
     const addButton = page.getByTestId(`add-property-${pathAsString}`);
     await addButton.click();
+}
+
+export async function addObjectPropertyWithName(page: Page, propertyPath: Path, name: string) {
+    const temporaryPropertyPath = pathToString(propertyPath.concat('yourNewProperty'));
+    const editableLabel = page.locator(`[id="_label_${temporaryPropertyPath}"]`);
+
+    // Initial settings migration can rebuild a panel just after it opens. Retry the add action if
+    // that rebuild removes the temporary, not-yet-persisted property row before it can be renamed.
+    for (let attempt = 0; attempt < 3 && !(await editableLabel.isVisible()); attempt++) {
+        await addObjectProperty(page, propertyPath);
+        await editableLabel.waitFor({state: 'visible', timeout: 1000}).catch(() => undefined);
+    }
+
+    await expect(editableLabel).toBeEditable();
+    await editableLabel.fill(name);
+    await editableLabel.press('Enter');
 }
 
 export async function addArrayItem(page: Page, propertyPath: Path) {
