@@ -41,26 +41,21 @@ const panelsDefinition = shallowRef<SettingsInterfacePanels>(
 // update panelsDefinition only when underlying data changes. Otherwise, all panels will be rebuilt every time
 // any setting is changed, which is not necessary and leads to Ace Editor becoming blank if settings were modified via
 // Ace Editor
-watchImmediate(
-  settings,
-  currentSettings => {
-    const panels = currentSettings.panels;
-    if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition.value)) {
-      panelsDefinition.value = structuredClone(panels);
-    }
-    // fix panels if they are not defined
-    for (let mode of Object.values(SessionMode)) {
-      if (!panels[mode]) {
-        settingsData.setDataAt(
-          ['panels', mode],
-          structuredClone(
-            SETTINGS_DATA_DEFAULT.panels[mode]
-          ) as SettingsInterfacePanels[typeof mode]
-        );
-      }
+watchImmediate(settings, currentSettings => {
+  const panels = currentSettings.panels;
+  if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition.value)) {
+    panelsDefinition.value = structuredClone(panels);
+  }
+  // fix panels if they are not defined
+  for (let mode of Object.values(SessionMode)) {
+    if (!panels[mode]) {
+      settingsData.setDataAt(
+        ['panels', mode],
+        structuredClone(SETTINGS_DATA_DEFAULT.panels[mode]) as SettingsInterfacePanels[typeof mode]
+      );
     }
   }
-);
+});
 
 const panels = computed(() => {
   return panelsDefinition.value[props.sessionMode].map(panel => {

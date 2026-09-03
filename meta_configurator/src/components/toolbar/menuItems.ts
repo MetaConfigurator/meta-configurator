@@ -358,16 +358,10 @@ export class MenuItems {
       this.generateToggleButton(
         () => settings.metaSchema.showJsonLdFields,
         () => {
-          getDataForMode(SessionMode.Settings).setDataAt(
-            ['metaSchema', 'showJsonLdFields'],
-            true
-          );
+          getDataForMode(SessionMode.Settings).setDataAt(['metaSchema', 'showJsonLdFields'], true);
         },
         () => {
-          getDataForMode(SessionMode.Settings).setDataAt(
-            ['metaSchema', 'showJsonLdFields'],
-            false
-          );
+          getDataForMode(SessionMode.Settings).setDataAt(['metaSchema', 'showJsonLdFields'], false);
         },
         'fa-solid fa-circle-nodes',
         'fa-solid fa-circle-nodes',
@@ -472,14 +466,17 @@ export class MenuItems {
           panel => panel.panelType === panelTypeName && panel.mode === mode
         ) !== undefined,
       () => {
-        getDataForMode(SessionMode.Settings).setDataAt(['panels', mode], [
-          ...settings.panels[mode],
-          {
-            panelType: panelTypeName,
-            mode,
-            size: 40,
-          },
-        ]);
+        getDataForMode(SessionMode.Settings).setDataAt(
+          ['panels', mode],
+          [
+            ...settings.panels[mode],
+            {
+              panelType: panelTypeName,
+              mode,
+              size: 40,
+            },
+          ]
+        );
       },
       () => {
         getDataForMode(SessionMode.Settings).setDataAt(

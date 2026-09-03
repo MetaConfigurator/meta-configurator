@@ -7,9 +7,7 @@ import {SessionMode} from '@/store/sessionMode';
 import {setCurrentNewsHash} from '../currentNews';
 
 it('notifies the shallow settings store when the current news is dismissed permanently', async () => {
-  const settings = shallowRef(
-    structuredClone(SETTINGS_DATA_DEFAULT) as SettingsInterfaceRoot
-  );
+  const settings = shallowRef(structuredClone(SETTINGS_DATA_DEFAULT) as SettingsInterfaceRoot);
   const settingsData = new ManagedData(settings, SessionMode.Settings);
   const settingsWatcher = vi.fn();
   watch(settings, settingsWatcher);

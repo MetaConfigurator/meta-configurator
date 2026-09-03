@@ -31,9 +31,7 @@ describe('Ace settings reactivity', () => {
 
   it('updates the editor when nested settings in the shallow store change', async () => {
     vi.useFakeTimers();
-    const settings = shallowRef(
-      structuredClone(SETTINGS_DATA_DEFAULT) as SettingsInterfaceRoot
-    );
+    const settings = shallowRef(structuredClone(SETTINGS_DATA_DEFAULT) as SettingsInterfaceRoot);
     const settingsData = new ManagedData(settings, SessionMode.Settings);
     const {editor, session} = editorDouble();
 
