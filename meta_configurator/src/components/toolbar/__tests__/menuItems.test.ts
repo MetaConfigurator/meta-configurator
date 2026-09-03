@@ -23,8 +23,15 @@ import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 
 // the editor content the mocked data link serves to the menu entries
-const editorData = (useDataLink as unknown as {editorData: Record<string, {value: unknown}>})
-  .editorData;
+const editorData = (
+  useDataLink as unknown as {
+    editorData: {
+      dataEditor: {value: unknown};
+      schemaEditor: {value: unknown};
+      settings: {value: unknown};
+    };
+  }
+).editorData;
 
 // the menu entries only reference the dialog actions, they are never invoked here
 const menuItems = new MenuItems({} as MenuItemDialogActions);

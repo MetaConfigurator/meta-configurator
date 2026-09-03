@@ -110,7 +110,7 @@ const exportedDocument: Ref<string> = ref('');
 
 const {editorElementId: correctedDocumentEditorId, createEditor: createCorrectedDocumentEditor} =
   useAceEditor('ai-prompts', newDocument, {
-    configureEditor: editor => setupAceMode(editor, settings.value),
+    configureEditor: editor => setupAceMode(editor, settings),
   });
 const {editorElementId: exportedDocumentEditorId, createEditor: createExportedDocumentEditor} =
   useAceEditor('ai-prompts-export', exportedDocument, {});
