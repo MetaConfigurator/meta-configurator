@@ -92,14 +92,10 @@ describe('BooleanProperty', () => {
     expect(() => {
       invalidDataWrapper = mount(BooleanProperty, {
         props: {
-        propertyName: 'foo',
-        propertyData: {invalid: true},
-        validationResults: new ValidationResult([]),
-        propertySchema: new JsonSchemaWrapper(
-          {type: 'boolean'},
-          SessionMode.DataEditor,
-          false
-        ),
+          propertyName: 'foo',
+          propertyData: {invalid: true},
+          validationResults: new ValidationResult([]),
+          propertySchema: new JsonSchemaWrapper({type: 'boolean'}, SessionMode.DataEditor, false),
         },
       });
     }).not.toThrow();

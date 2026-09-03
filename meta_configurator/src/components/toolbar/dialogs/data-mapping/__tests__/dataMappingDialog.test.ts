@@ -42,9 +42,8 @@ async function setupDialog({
   const toastAddMock = vi.fn();
   const onErrorMock = vi.fn();
   const queryOpenAIMock = vi.fn().mockResolvedValue(integrationPipeline?.mockedAiResponse);
-  const executeSandboxedJavascriptTransformMock = vi.fn(
-    async (source: string, input: unknown) =>
-      integrationPipeline?.executeGeneratedMapping(source, input)
+  const executeSandboxedJavascriptTransformMock = vi.fn(async (source: string, input: unknown) =>
+    integrationPipeline?.executeGeneratedMapping(source, input)
   );
   const generateMappingFunctionSuggestionMock = vi.fn();
   const performDirectAiTargetSchemaMappingMock = vi.fn();

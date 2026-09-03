@@ -128,9 +128,7 @@ describe('useDataImportAiDialog', () => {
     expect(setup.runDirectParsedImportMock).toHaveBeenCalledTimes(1);
     expect(setup.dataEditorSetDataMock).toHaveBeenCalledWith({unexpected: true});
     // the imported data is posted to the validation worker, which cannot clone reactive proxies
-    expect(() =>
-      structuredClone(setup.dataEditorSetDataMock.mock.calls[0][0])
-    ).not.toThrow();
+    expect(() => structuredClone(setup.dataEditorSetDataMock.mock.calls[0][0])).not.toThrow();
     expect(setup.dialog.statusMessage.value).toBe('Imported after confirmation.');
     setup.scope.stop();
   });

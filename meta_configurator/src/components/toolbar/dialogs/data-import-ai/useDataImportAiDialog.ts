@@ -261,9 +261,7 @@ export function useDataImportAiDialog() {
     message: string
   ) {
     const inferredSchema =
-      schemaSource === 'infer_from_data'
-        ? inferSchemaUnlessJsonLd(resultData)
-        : undefined;
+      schemaSource === 'infer_from_data' ? inferSchemaUnlessJsonLd(resultData) : undefined;
 
     getDataForMode(SessionMode.DataEditor).setData(resultData);
     if (inferredSchema !== undefined) {

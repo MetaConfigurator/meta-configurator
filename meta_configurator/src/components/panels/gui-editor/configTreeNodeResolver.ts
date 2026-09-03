@@ -588,11 +588,7 @@ export class ConfigTreeNodeResolver {
     // array (e.g. the default empty object of a new document, or leftover data from an
     // earlier schema): the GUI would otherwise appear empty for array schemas with no
     // way to fix the data. Adding an item then replaces the old value (undo is available).
-    if (
-      schema.maxItems !== undefined &&
-      Array.isArray(data) &&
-      data.length >= schema.maxItems
-    ) {
+    if (schema.maxItems !== undefined && Array.isArray(data) && data.length >= schema.maxItems) {
       return false;
     }
     if (schema.items.isAlwaysFalse) {
