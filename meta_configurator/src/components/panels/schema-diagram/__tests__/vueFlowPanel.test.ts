@@ -6,7 +6,7 @@ import {deleteSchemaElement} from '@/utility/deleteUtils';
 import {confirmationService} from '@/utility/confirmationService';
 
 describe('VueFlowPanel delete behavior', () => {
-   it('deletes the field from the schema but keeps instance data when user chooses keep data', () => {
+  it('deletes the field from the schema but keeps instance data when user chooses keep data', () => {
     const schemaData = new ManagedData(
       shallowRef({
         type: 'object',
