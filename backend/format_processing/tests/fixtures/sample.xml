@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog generatedAt="2026-03-27T14:15:00Z" source="instrument-cluster">
+  <experiment id="exp-001" status="complete">
+    <title>Thermal stability profile</title>
+    <operator>Jane Doe</operator>
+    <measurements>
+      <measurement key="temp" unit="C">25.4</measurement>
+      <measurement key="pressure" unit="kPa">101.3</measurement>
+      <measurement key="humidity" unit="percent">40.0</measurement>
+    </measurements>
+    <attachments>
+      <file type="raw">run_001.dat</file>
+      <file type="processed">run_001_summary.json</file>
+    </attachments>
+  </experiment>
+  <experiment id="exp-002" status="pending">
+    <title>Reference calibration</title>
+    <operator>John Roe</operator>
+    <measurements />
+  </experiment>
+</catalog>

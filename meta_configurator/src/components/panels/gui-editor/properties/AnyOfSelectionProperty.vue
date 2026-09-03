@@ -31,13 +31,13 @@ const emit = defineEmits<{
   (e: 'update:tree'): void;
 }>();
 
-function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption {
-  for (let option of possibleOptions) {
+function findOptionBySubSchemaIndex(index: number): OneOfAnyOfSelectionOption | undefined {
+  for (const option of possibleOptions) {
     if (option.index === index) {
       return option;
     }
   }
-  throw new Error(`Could not find option with index ${index}`);
+  return undefined;
 }
 
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined> = computed({
@@ -51,7 +51,9 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined
     // use instances from the possible options array
     // otherwise the multiselect will not show the selected options
     // as it compares by reference
-    return optionsFromStore.map(option => findOptionBySubSchemaIndex(option.index));
+    return optionsFromStore
+      .map(option => findOptionBySubSchemaIndex(option.index))
+      .filter((option): option is OneOfAnyOfSelectionOption => option !== undefined);
   },
 
   set(selectedOptions: OneOfAnyOfSelectionOption[] | undefined) {

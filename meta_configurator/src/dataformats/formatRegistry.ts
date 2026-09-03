@@ -40,6 +40,49 @@ export class FormatRegistry {
   public getFormatNames(): string[] {
     return Array.from(this.formats.keys());
   }
+
+  /**
+   * Returns the file extensions of all registered formats, for example to build the
+   * accept filter of a file dialog.
+   */
+  public getFileExtensions(): string[] {
+    return Array.from(this.formats.values()).flatMap(format => format.fileExtensions);
+  }
+
+  /**
+   * Returns the format whose file extensions match the given file name, or undefined
+   * when no registered format claims that extension.
+   */
+  public getFormatForFileName(fileName: string): DataFormatDefinition | undefined {
+    const lowerCaseFileName = fileName.trim().toLowerCase();
+    return Array.from(this.formats.values()).find(format =>
+      format.fileExtensions.some(fileExtension => lowerCaseFileName.endsWith(fileExtension))
+    );
+  }
+
+  /**
+   * Parses the content of an uploaded file. The file extension decides the format when a
+   * registered format claims it; otherwise every registered format is tried in
+   * registration order, and the error of the last attempt is thrown when none succeeds.
+   */
+  public parseFileContent(fileName: string, fileContent: string): unknown {
+    const formatForFileName = this.getFormatForFileName(fileName);
+    if (formatForFileName) {
+      return formatForFileName.dataConverter.parse(fileContent);
+    }
+
+    let lastParseError: unknown = new Error(
+      `No data format is registered that could parse "${fileName}".`
+    );
+    for (const format of this.formats.values()) {
+      try {
+        return format.dataConverter.parse(fileContent);
+      } catch (parseError) {
+        lastParseError = parseError;
+      }
+    }
+    throw lastParseError;
+  }
 }
 
 /**

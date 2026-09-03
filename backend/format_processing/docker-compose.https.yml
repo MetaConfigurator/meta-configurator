@@ -1,0 +1,69 @@
+# Standalone HTTPS deployment of the format processing service.
+#
+# Brings up the format processing service behind its own nginx reverse proxy with
+# automatic Let's Encrypt certificates. For the multi-service deployment see
+# ../docker-compose.yml, where the service is mounted at /format-processing/.
+#
+# Required env vars (load from .env next to this file):
+#   FORMAT_PROCESSING_HOSTNAME  public hostname for this service
+#                               (e.g. format-processing.metaconfigurator.informatik.uni-stuttgart.de)
+#   LETSENCRYPT_EMAIL           contact email for Let's Encrypt
+#
+# Deploy:
+#   cp .env.example .env   # then set FORMAT_PROCESSING_HOSTNAME, LETSENCRYPT_EMAIL
+#   docker compose -f docker-compose.https.yml up -d --build
+
+services:
+  format_processing:
+    container_name: format_processing
+    build: .
+    expose:
+      - "5000"
+    restart: unless-stopped
+    networks:
+      - format-processing-network
+    environment:
+      VIRTUAL_HOST: ${FORMAT_PROCESSING_HOSTNAME:?FORMAT_PROCESSING_HOSTNAME is not set}
+      VIRTUAL_PORT: 5000
+      LETSENCRYPT_HOST: ${FORMAT_PROCESSING_HOSTNAME:?FORMAT_PROCESSING_HOSTNAME is not set}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://metaconfigurator.github.io,https://logende.github.io,https://www.metaconfigurator.org,https://metaconfigurator.org,https://metaconfigurator.informatik.uni-stuttgart.de}
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:latest
+    container_name: format-processing-nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - format-processing-network
+    restart: unless-stopped
+
+  letsencrypt:
+    image: nginxproxy/acme-companion:latest
+    container_name: format-processing-nginx-letsencrypt
+    depends_on:
+      - nginx-proxy
+    environment:
+      NGINX_PROXY_CONTAINER: format-processing-nginx-proxy
+      DEFAULT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+    networks:
+      - format-processing-network
+    restart: unless-stopped
+
+networks:
+  format-processing-network:
+    driver: bridge
+
+volumes:
+  acme-challenges:

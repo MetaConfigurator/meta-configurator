@@ -1,0 +1,3 @@
+services:
+  format_processing:
+    container_name: ${FORMAT_PROCESSING_SMOKE_CONTAINER_NAME}

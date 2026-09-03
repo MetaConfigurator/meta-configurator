@@ -1,5 +1,5 @@
 import {toastService} from '@/utility/toastService';
-import {sortSchemaPropertiesAlphabetically} from '@/components/panels/gui-editor/sortingUtils';
+import {sortSchemaPropertiesAlphabetically} from '@/schema/sortSchemaPropertiesAlphabetically';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
 

@@ -8,6 +8,7 @@ SERVICES=(
   mongo
   redis
   relay
+  format_processing
   nginx-proxy
   letsencrypt
 )
@@ -58,12 +59,17 @@ if command -v curl >/dev/null 2>&1; then
     DOMAIN="${DOMAIN%%/}"
 
     relay_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/relay/health" || true)"
+    format_processing_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/format-processing/health" || true)"
     snapshot_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/snapshot/does-not-exist" || true)"
     root_health_status="$(curl -sS -o /dev/null -w "%{http_code}" "https://${DOMAIN}/health" || true)"
 
     [[ "$relay_status" == "200" ]] \
       && echo "OK  https://${DOMAIN}/relay/health" \
       || echo "FAIL https://${DOMAIN}/relay/health (status ${relay_status:-unreachable})"
+
+    [[ "$format_processing_status" == "200" ]] \
+      && echo "OK  https://${DOMAIN}/format-processing/health" \
+      || echo "FAIL https://${DOMAIN}/format-processing/health (status ${format_processing_status:-unreachable})"
 
     [[ "$snapshot_status" == "404" ]] \
       && echo "OK  https://${DOMAIN}/snapshot/does-not-exist returned 404" \

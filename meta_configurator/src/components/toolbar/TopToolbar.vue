@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref, watchEffect} from 'vue';
+import {computed, watchEffect} from 'vue';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {useMagicKeys} from '@vueuse/core';
@@ -13,28 +13,17 @@ import ModeSelector from '@/components/toolbar/ModeSelector.vue';
 import TopToolbarMenuButtons from '@/components/toolbar/TopToolbarMenuButtons.vue';
 import SearchBar from '@/components/toolbar/SearchBar.vue';
 import Divider from 'primevue/divider';
+import type {MenuItemDialogActions} from '@/components/toolbar/menuItems';
 import {getDataForMode} from '@/data/useDataLink';
 
 const props = defineProps<{
   currentMode: SessionMode;
+  dialogActions: MenuItemDialogActions;
 }>();
 
 const emit = defineEmits<{
   (e: 'mode-selected', newMode: SessionMode): void;
-  (e: 'show-schema-selection-dialog'): void;
-  (e: 'show-import-csv-dialog'): void;
-  (e: 'show-snapshot-dialog'): void;
   (e: 'show-about-dialog'): void;
-  (e: 'show-codegen-dialog', schemaMode: boolean): void;
-  (e: 'show-data-export-dialog', schemaMode: boolean): void;
-  (e: 'show-data-mapping-dialog'): void;
-  (e: 'show-rml-mapping-dialog'): void;
-  (e: 'show-import-turtle-dialog'): void;
-  (e: 'show-import-xml-dialog'): void;
-  (e: 'show-xml-export-dialog'): void;
-  (e: 'show-import-schema-dialog'): void;
-  (e: 'show-export-schema-dialog'): void;
-  (e: 'show-infer-schema-dialog'): void;
 }>();
 
 const settings = useSettings();
@@ -50,68 +39,6 @@ watchEffect(() => {
     dataFormat.value = DataFormat.JSON;
   }
 });
-
-async function showSchemaSelectionDialog() {
-  emit('show-schema-selection-dialog');
-}
-
-function showCsvImportDialog() {
-  emit('show-import-csv-dialog');
-}
-
-function showSnapshotDialog() {
-  emit('show-snapshot-dialog');
-}
-
-function showAboutDialog() {
-  emit('show-about-dialog');
-}
-
-function showCodeGenerationDialog(schemaMode: boolean) {
-  emit('show-codegen-dialog', schemaMode);
-}
-
-function showDataExportDialog(schemaMode: boolean) {
-  emit('show-data-export-dialog', schemaMode);
-}
-
-function showDataMappingDialog() {
-  emit('show-data-mapping-dialog');
-}
-
-function selectedMode(newMode: SessionMode) {
-  emit('mode-selected', newMode);
-}
-
-function showRmlMappingDialog() {
-  emit('show-rml-mapping-dialog');
-}
-
-function showTurtleImportDialog() {
-  emit('show-import-turtle-dialog');
-}
-
-function showXmlImportDialog() {
-  emit('show-import-xml-dialog');
-}
-
-function showXmlExportDialog() {
-  emit('show-xml-export-dialog');
-}
-
-function showImportSchemaDialog() {
-  emit('show-import-schema-dialog');
-}
-
-function showExportSchemaDialog() {
-  emit('show-export-schema-dialog');
-}
-
-function showInferSchemaDialog() {
-  emit('show-infer-schema-dialog');
-}
-
-const modeSelector = ref();
 
 useMagicKeys({
   passive: false,
@@ -131,9 +58,8 @@ useMagicKeys({
       <!-- LEFT: ModeSelector -->
       <div class="left-section">
         <ModeSelector
-          ref="modeSelector"
           :current-mode="props.currentMode"
-          @mode-selected="newMode => selectedMode(newMode)"
+          @mode-selected="newMode => emit('mode-selected', newMode)"
           data-testid="mode-selector" />
 
         <Divider layout="vertical" />
@@ -141,19 +67,7 @@ useMagicKeys({
         <TopToolbarMenuButtons
           :show-bottom-menu="false"
           :current-mode="props.currentMode"
-          @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
-          @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
-          @show-import-csv-dialog="() => showCsvImportDialog()"
-          @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
-          @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()"
-          @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-          @show-import-turtle-dialog="() => showTurtleImportDialog()"
-          @show-import-xml-dialog="() => showXmlImportDialog()"
-          @show-xml-export-dialog="() => showXmlExportDialog()"
-          @show-import-schema-dialog="() => showImportSchemaDialog()"
-          @show-export-schema-dialog="() => showExportSchemaDialog()"
-          @show-infer-schema-dialog="() => showInferSchemaDialog()" />
+          :dialog-actions="props.dialogActions" />
 
         <Divider layout="vertical" />
 
@@ -174,7 +88,7 @@ useMagicKeys({
           v-if="!settings.hideSettings"
           v-tooltip.bottom="'Settings'"
           data-testid="mode-settings-button"
-          @click="() => selectedMode(SessionMode.Settings)">
+          @click="emit('mode-selected', SessionMode.Settings)">
           <FontAwesomeIcon icon="fa-solid fa-gear" />
         </Button>
 
@@ -194,7 +108,7 @@ useMagicKeys({
           class="toolbar-button"
           size="small"
           v-tooltip.bottom="'About'"
-          @click="() => showAboutDialog()">
+          @click="emit('show-about-dialog')">
           <FontAwesomeIcon icon="fa-solid fa-circle-info" />
         </Button>
 
@@ -214,19 +128,7 @@ useMagicKeys({
         <TopToolbarMenuButtons
           :show-bottom-menu="true"
           :current-mode="props.currentMode"
-          @show-codegen-dialog="schemaMode => showCodeGenerationDialog(schemaMode)"
-          @show-data-export-dialog="schemaMode => showDataExportDialog(schemaMode)"
-          @show-import-csv-dialog="() => showCsvImportDialog()"
-          @show-schema-selection-dialog="() => showSchemaSelectionDialog()"
-          @show-snapshot-dialog="() => showSnapshotDialog()"
-          @show-data-mapping-dialog="() => showDataMappingDialog()"
-          @show-rml-mapping-dialog="() => showRmlMappingDialog()"
-          @show-import-turtle-dialog="() => showTurtleImportDialog()"
-          @show-import-xml-dialog="() => showXmlImportDialog()"
-          @show-xml-export-dialog="() => showXmlExportDialog()"
-          @show-import-schema-dialog="() => showImportSchemaDialog()"
-          @show-export-schema-dialog="() => showExportSchemaDialog()"
-          @show-infer-schema-dialog="() => showInferSchemaDialog()" />
+          :dialog-actions="props.dialogActions" />
       </div>
 
       <!-- RIGHT side: format selector -->

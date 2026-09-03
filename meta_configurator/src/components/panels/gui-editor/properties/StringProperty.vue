@@ -8,10 +8,11 @@ import type {PathElement} from '@/utility/path';
 import type {ValidationResult} from '@/schema/validationUtils';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
 import {useSettings} from '@/settings/useSettings';
+import {dataToString} from '@/utility/dataToString';
 
 const props = defineProps<{
   propertyName: PathElement;
-  propertyData: string | undefined;
+  propertyData: unknown;
   propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
@@ -22,9 +23,12 @@ const emit = defineEmits<{
   (e: 'update:propertyData', newValue: string | undefined): void;
 }>();
 
-const polishedPropertyData = computed(() => {
+const polishedPropertyData = computed<string>(() => {
   if (props.propertyData === undefined) {
     return '';
+  }
+  if (typeof props.propertyData === 'string') {
+    return props.propertyData;
   }
   if (typeof props.propertyData === 'object') {
     // if the property data is an empty object, we return an empty string
@@ -32,14 +36,14 @@ const polishedPropertyData = computed(() => {
       return '';
     }
     // if the property data is an object with properties, we stringify it to display it in the input field
-    return JSON.stringify(props.propertyData);
+    return dataToString(props.propertyData);
   }
-  return props.propertyData;
+  return dataToString(props.propertyData);
 });
 
 // new reference to the property data, so that we can emit the update event
 // only when the user is done editing and not on every keystroke
-const newPropertyData = ref(props.propertyData);
+const newPropertyData = ref<string | undefined>(polishedPropertyData.value);
 
 // update the newPropertyData reference when the props change
 watch(polishedPropertyData, setNewPropertyData);
