@@ -74,7 +74,7 @@ export function useDataMappingDialog() {
   const isLoadingMapping = ref(false);
   const suggestionRetryContext = ref<GeneratedCodeRetryContext>();
   const selectedMappingMethod = ref<MappingMethod>('source-data');
-  const selectedMappingLanguage = ref<MappingGenerationLanguage>('jsonata');
+  const selectedMappingLanguage = ref<MappingGenerationLanguage>('javascript');
   const refinementOptions = ref<SchemaRefinementOptionsController | null>(null);
   let latestValidationRequestId = 0;
 
@@ -102,7 +102,7 @@ export function useDataMappingDialog() {
       return 'Direct AI Mapping sends the current data together with the current target schema to the LLM and applies the transformed result directly. No reusable mapping function is generated.';
     }
     if (selectedMappingMethod.value === 'inferred-source-schema') {
-      return 'This method infers a source schema locally from the current data, optionally applies the selected refinement steps, and sends only the generated source schema plus the current target schema to the LLM.';
+      return 'This method infers a source schema locally. Source Schema Inference Options can refine it before it and the target schema are sent to the LLM.';
     }
     return 'This method sends the current data together with the current target schema to the LLM and generates a reusable mapping function.';
   });
@@ -186,7 +186,7 @@ export function useDataMappingDialog() {
     generatedMappingConfiguration.value = '';
     mappingConfigurationIsValid.value = false;
     selectedMappingMethod.value = 'source-data';
-    selectedMappingLanguage.value = 'jsonata';
+    selectedMappingLanguage.value = 'javascript';
     clearSuggestionRetryContext();
     refinementOptions.value?.reset();
   }

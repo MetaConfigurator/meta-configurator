@@ -156,6 +156,41 @@ async function setupDialog({
 }
 
 describe('DataMappingDialog', () => {
+  it('shows collapsed source-schema inference options and defaults to JavaScript', async () => {
+    const {wrapper} = await setupDialog({
+      currentData: [{name: 'Alice'}, {name: 'Bob'}],
+      currentSchema: {type: 'object'},
+    });
+
+    await openDialog(wrapper);
+    expect(wrapper.find('[data-testid="source-schema-inference-options"]').exists()).toBe(false);
+    expect((wrapper.findAll('select')[1]!.element as HTMLSelectElement).value).toBe('javascript');
+
+    await wrapper.findAll('select')[0]!.setValue('inferred-source-schema');
+    await flushPromises();
+
+    const inferenceOptions = wrapper.get('[data-testid="source-schema-inference-options"]');
+    expect(inferenceOptions.text()).toContain('Source Schema Inference Options');
+    expect(inferenceOptions.attributes('data-collapsed')).toBe('true');
+    expect(inferenceOptions.text()).toContain('Add Examples');
+    expect(inferenceOptions.text()).toContain('Detect Enums');
+    expect(inferenceOptions.text()).toContain('Detect Additional Properties');
+    expect(
+      (wrapper.get('#mapping-inferred-source-schema-add-examples').element as HTMLInputElement)
+        .checked
+    ).toBe(true);
+    expect(
+      (wrapper.get('#mapping-inferred-source-schema-detect-enums').element as HTMLInputElement)
+        .checked
+    ).toBe(true);
+    expect(
+      (
+        wrapper.get('#mapping-inferred-source-schema-detect-additional-properties')
+          .element as HTMLInputElement
+      ).checked
+    ).toBe(true);
+  });
+
   it('uses the inferred and refined source schema without overwriting the current target schema', async () => {
     const currentSchema = {
       type: 'object',

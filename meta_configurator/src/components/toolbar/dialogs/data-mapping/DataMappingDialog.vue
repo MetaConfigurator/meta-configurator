@@ -6,6 +6,7 @@ import Button from 'primevue/button';
 import Select from 'primevue/select';
 import Divider from 'primevue/divider';
 import Message from 'primevue/message';
+import Panel from 'primevue/panel';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
@@ -101,12 +102,19 @@ defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
           class="w-full" />
       </div>
 
-      <SchemaRefinementOptions
+      <Panel
         v-if="dialog.usesInferredSourceSchema"
-        ref="refinementOptions"
-        id-prefix="mapping-inferred-source-schema"
-        :show-data-independent-steps="false"
-        add-examples-description="Add real example values from the current input data to the locally inferred source schema before it is sent to the LLM." />
+        header="Source Schema Inference Options"
+        toggleable
+        :collapsed="true"
+        data-testid="source-schema-inference-options">
+        <SchemaRefinementOptions
+          ref="refinementOptions"
+          id-prefix="mapping-inferred-source-schema"
+          :show-data-independent-steps="false"
+          data-dependent-steps-enabled-by-default
+          add-examples-description="Add real example values from the current input data to the locally inferred source schema before it is sent to the LLM." />
+      </Panel>
 
       <Button
         v-if="dialog.usesMappingFunction"

@@ -124,7 +124,14 @@ export const InputNumberStub = defineComponent({
 
 export const MessageStub = defineComponent({template: '<div class="message"><slot /></div>'});
 export const DividerStub = defineComponent({template: '<hr />'});
-export const PanelStub = defineComponent({template: '<div><slot name="header" /><slot /></div>'});
+export const PanelStub = defineComponent({
+  props: {
+    header: {type: String, default: ''},
+    collapsed: {type: Boolean, default: false},
+  },
+  template:
+    '<div :data-collapsed="String(collapsed)"><span>{{ header }}</span><slot name="header" /><slot /></div>',
+});
 export const SlotStub = defineComponent({template: '<div><slot /></div>'});
 export const EmptyStub = defineComponent({template: '<div />'});
 

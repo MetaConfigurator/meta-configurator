@@ -27,20 +27,23 @@ const props = withDefaults(
      * separately for the schema that is loaded in the editor.
      */
     showDataIndependentSteps?: boolean;
+    /** Enable examples, enum detection, and additional-property detection after each reset. */
+    dataDependentStepsEnabledByDefault?: boolean;
   }>(),
   {
     addExamplesDescription:
       'Add real example values from the current input data to matching schema fields.',
     showDataIndependentSteps: true,
+    dataDependentStepsEnabledByDefault: false,
   }
 );
 
 const selectableEnumTypes: RefineSchemaAllowedType[] = ['string', 'integer', 'boolean'];
 
 const enableSortSchemaPropertiesAlphabetically = ref(false);
-const enableAddExamples = ref(false);
-const enableDetectEnums = ref(false);
-const enableDetectAdditionalProperties = ref(false);
+const enableAddExamples = ref(props.dataDependentStepsEnabledByDefault);
+const enableDetectEnums = ref(props.dataDependentStepsEnabledByDefault);
+const enableDetectAdditionalProperties = ref(props.dataDependentStepsEnabledByDefault);
 const enableExtractSubSchemasIntoReferences = ref(false);
 
 const addExamples = ref(cloneDeep(ADD_EXAMPLES_DEFAULTS));
@@ -53,9 +56,9 @@ function fieldId(suffix: string): string {
 
 function reset() {
   enableSortSchemaPropertiesAlphabetically.value = false;
-  enableAddExamples.value = false;
-  enableDetectEnums.value = false;
-  enableDetectAdditionalProperties.value = false;
+  enableAddExamples.value = props.dataDependentStepsEnabledByDefault;
+  enableDetectEnums.value = props.dataDependentStepsEnabledByDefault;
+  enableDetectAdditionalProperties.value = props.dataDependentStepsEnabledByDefault;
   enableExtractSubSchemasIntoReferences.value = false;
 
   addExamples.value = cloneDeep(ADD_EXAMPLES_DEFAULTS);
