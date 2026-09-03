@@ -2,7 +2,7 @@ Flask==3.0.3
 flask-cors==6.0.2
 flask-limiter==4.1.1
 gunicorn==25.3.0
-Werkzeug==3.0.3
+Werkzeug==3.1.6
 PyYAML==6.0.3
 xmltodict==1.0.4
 gemmi==0.7.5
