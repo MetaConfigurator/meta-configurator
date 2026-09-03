@@ -29,6 +29,7 @@ import ImportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/I
 import ExportSchemaDialog from '@/components/toolbar/dialogs/schema-conversion/ExportSchemaDialog.vue';
 import InferSchemaDialog from '@/components/toolbar/dialogs/schema-infer/InferSchemaDialog.vue';
 import type {SchemaOption} from '@/packaged-schemas/schemaOption';
+import {getDataForMode} from '@/data/useDataLink';
 
 defineOptions({name: 'MainToolbar'});
 
@@ -199,8 +200,7 @@ defineExpose({
           showSchemaSelectionDialog();
 
           if (dontShowAgain) {
-            const settings = useSettings().value;
-            setCurrentNewsHash(settings);
+            setCurrentNewsHash(getDataForMode(SessionMode.Settings));
           }
         }
       }

@@ -330,17 +330,21 @@ export class MenuItems {
           settings.metaSchema.allowMultipleTypes &&
           !settings.metaSchema.markMoreFieldsAsAdvanced,
         () => {
-          const metaSchema = settings.metaSchema;
-          metaSchema.allowBooleanSchema = true;
-          metaSchema.allowMultipleTypes = true;
-          metaSchema.markMoreFieldsAsAdvanced = false;
+          getDataForMode(SessionMode.Settings).updateData(currentSettings => {
+            const metaSchema = currentSettings.metaSchema;
+            metaSchema.allowBooleanSchema = true;
+            metaSchema.allowMultipleTypes = true;
+            metaSchema.markMoreFieldsAsAdvanced = false;
+          });
         },
         () => {
-          const metaSchema = settings.metaSchema;
-          metaSchema.allowBooleanSchema = false;
-          metaSchema.allowMultipleTypes = false;
-          metaSchema.markMoreFieldsAsAdvanced = true;
-          metaSchema.objectTypesComfort = true;
+          getDataForMode(SessionMode.Settings).updateData(currentSettings => {
+            const metaSchema = currentSettings.metaSchema;
+            metaSchema.allowBooleanSchema = false;
+            metaSchema.allowMultipleTypes = false;
+            metaSchema.markMoreFieldsAsAdvanced = true;
+            metaSchema.objectTypesComfort = true;
+          });
         },
         'fa-solid fa-lock',
         'fa-solid fa-lock-open',
@@ -354,12 +358,16 @@ export class MenuItems {
       this.generateToggleButton(
         () => settings.metaSchema.showJsonLdFields,
         () => {
-          const metaSchema = settings.metaSchema;
-          metaSchema.showJsonLdFields = true;
+          getDataForMode(SessionMode.Settings).setDataAt(
+            ['metaSchema', 'showJsonLdFields'],
+            true
+          );
         },
         () => {
-          const metaSchema = settings.metaSchema;
-          metaSchema.showJsonLdFields = false;
+          getDataForMode(SessionMode.Settings).setDataAt(
+            ['metaSchema', 'showJsonLdFields'],
+            false
+          );
         },
         'fa-solid fa-circle-nodes',
         'fa-solid fa-circle-nodes',
@@ -464,17 +472,21 @@ export class MenuItems {
           panel => panel.panelType === panelTypeName && panel.mode === mode
         ) !== undefined,
       () => {
-        const panels = settings.panels;
-        panels[mode].push({
-          panelType: panelTypeName,
-          mode,
-          size: 40,
-        });
+        getDataForMode(SessionMode.Settings).setDataAt(['panels', mode], [
+          ...settings.panels[mode],
+          {
+            panelType: panelTypeName,
+            mode,
+            size: 40,
+          },
+        ]);
       },
       () => {
-        const panels = settings.panels;
-        panels[mode] = panels[mode].filter(
-          panel => !(panel.panelType === panelTypeName && panel.mode === mode)
+        getDataForMode(SessionMode.Settings).setDataAt(
+          ['panels', mode],
+          settings.panels[mode].filter(
+            panel => !(panel.panelType === panelTypeName && panel.mode === mode)
+          )
         );
       },
       iconName,

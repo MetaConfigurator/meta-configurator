@@ -52,7 +52,7 @@ export function useAceEditor(
     const createdEditor = ace.edit(editorElementId);
     editor.value = createdEditor;
 
-    const disposeAceProperties = setupAceProperties(createdEditor, settings.value);
+    const disposeAceProperties = setupAceProperties(createdEditor, settings);
     const disposeCallerConfiguration = setup.configureEditor?.(createdEditor);
     disposeEditorConfiguration = () => {
       disposeCallerConfiguration?.();

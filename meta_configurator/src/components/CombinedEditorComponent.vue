@@ -3,7 +3,7 @@ Main component of the application.
 Combines the code editor and the gui editor.
 -->
 <script lang="ts" setup>
-import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
 import 'primeicons/primeicons.css';
 import SplitterPanel from 'primevue/splitterpanel';
 import Splitter from 'primevue/splitter';
@@ -32,17 +32,21 @@ const props = defineProps<{
 
 const settings = useSettings();
 const settingsData = getDataForMode(SessionMode.Settings);
-let panelsDefinition: SettingsInterfacePanels = settings.value.panels;
+// Keep an isolated snapshot: nested writes happen before a shallow-ref notification, so sharing
+// settings.value.panels here would make old and new definitions indistinguishable in the watcher.
+const panelsDefinition = shallowRef<SettingsInterfacePanels>(
+  structuredClone(settings.value.panels)
+);
 
 // update panelsDefinition only when underlying data changes. Otherwise, all panels will be rebuilt every time
 // any setting is changed, which is not necessary and leads to Ace Editor becoming blank if settings were modified via
 // Ace Editor
 watchImmediate(
-  () => settings,
-  settings => {
-    const panels = settings.value.panels;
-    if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition)) {
-      panelsDefinition = panels;
+  settings,
+  currentSettings => {
+    const panels = currentSettings.panels;
+    if (JSON.stringify(panels) !== JSON.stringify(panelsDefinition.value)) {
+      panelsDefinition.value = structuredClone(panels);
     }
     // fix panels if they are not defined
     for (let mode of Object.values(SessionMode)) {
@@ -59,7 +63,7 @@ watchImmediate(
 );
 
 const panels = computed(() => {
-  return panelsDefinition[props.sessionMode].map(panel => {
+  return panelsDefinition.value[props.sessionMode].map(panel => {
     return {
       component: panelTypeRegistry.getPanelTypeDefinition(panel.panelType).getComponent(),
       sessionMode: panel.mode,
