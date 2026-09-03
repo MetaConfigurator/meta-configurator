@@ -27,6 +27,11 @@ export class ManagedData {
 
   private history: UndoManager | null = null;
 
+  private readonly historyData = computed({
+    get: () => _.cloneDeep(this.data.value),
+    set: value => this.setData(value),
+  });
+
   /**
    * The data. This is a computed property that keeps the data and the string representation in sync.
    */
@@ -152,7 +157,7 @@ export class ManagedData {
 
   public get undoManager(): UndoManager {
     if (this.history === null) {
-      this.history = useDebouncedRefHistory(this.unparsedData, {
+      this.history = useDebouncedRefHistory(this.historyData, {
         capacity: 150,
         debounce: 100,
       });

@@ -100,3 +100,20 @@ test('Undo and redo in the code editor use the global history', async ({ page })
     expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({ name: 'Alex' });
     await checkCodeEditorForText(page, '"name": "Alex"', SessionMode.DataEditor);
 });
+
+test('Undo restores data in the currently selected format after editing YAML', async ({ page }) => {
+    await openApp(page, 'settings_testpanel.json', null, 'schema_medium.schema.json');
+
+    await forceDataFormat(page, 'yaml');
+    await forceCodeEditorText(page, 'name: Alex', SessionMode.DataEditor);
+    expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({name: 'Alex'});
+
+    await forceDataFormat(page, 'json');
+    await getCodeEditor(page, SessionMode.DataEditor).click();
+    await undo(page);
+    await page.waitForTimeout(300);
+
+    expect(await getCurrentDataFormat(page)).toBe('json');
+    expect(await tpGetData(page, SessionMode.DataEditor)).toEqual({});
+    await checkCodeEditorForText(page, '{}', SessionMode.DataEditor);
+});
