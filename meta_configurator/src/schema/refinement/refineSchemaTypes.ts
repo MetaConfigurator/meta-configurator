@@ -6,6 +6,7 @@ export interface AddExamplesOptions {
   maxExamplesPerField: number;
   uniqueOnly: boolean;
   ignoreNullValues: boolean;
+  ignoreEmptyStrings: boolean;
 }
 
 export interface DetectEnumsOptions {
@@ -41,6 +42,7 @@ export const ADD_EXAMPLES_DEFAULTS: AddExamplesOptions = {
   maxExamplesPerField: 4,
   uniqueOnly: true,
   ignoreNullValues: true,
+  ignoreEmptyStrings: true,
 };
 
 export const DETECT_ENUMS_DEFAULTS: DetectEnumsOptions = {

@@ -81,12 +81,46 @@ describe('runSchemaRefinement', () => {
         maxExamplesPerField: 2,
         uniqueOnly: false,
         ignoreNullValues: true,
+        ignoreEmptyStrings: true,
       },
     });
     expectObjectSchema(refined);
     expectObjectSchema(refined.items);
 
     expect(refined.items.examples).toEqual(['Ada', 'Ada']);
+  });
+
+  it('ignores empty strings as examples by default', () => {
+    const schema: TopLevelSchema = {
+      type: 'array',
+      items: {type: 'string'},
+    };
+
+    const refined = runSchemaRefinement(schema, ['', 'Ada', ''], {
+      addExamples: ADD_EXAMPLES_DEFAULTS,
+    });
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.items);
+
+    expect(refined.items.examples).toEqual(['Ada']);
+  });
+
+  it('can retain empty strings as examples when configured', () => {
+    const schema: TopLevelSchema = {
+      type: 'array',
+      items: {type: 'string'},
+    };
+
+    const refined = runSchemaRefinement(schema, ['', 'Ada'], {
+      addExamples: {
+        ...ADD_EXAMPLES_DEFAULTS,
+        ignoreEmptyStrings: false,
+      },
+    });
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.items);
+
+    expect(refined.items.examples).toEqual(['', 'Ada']);
   });
 
   it('sorts schema properties alphabetically as a refinement step', () => {
@@ -152,6 +186,142 @@ describe('runSchemaRefinement', () => {
           type: 'string',
           examples: ['Stuttgart', 'Berlin', 'Muenchen'],
         },
+      },
+    });
+  });
+
+  it('refines fields and dynamic maps inside nested objects and array items', () => {
+    const schema: TopLevelSchema = {
+      type: 'object',
+      properties: {
+        container: {
+          type: 'object',
+          properties: {
+            people: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: {type: 'string'},
+                  role: {type: 'string'},
+                  readings: {
+                    type: 'object',
+                    properties: {
+                      north: {type: 'integer'},
+                      south: {type: 'integer'},
+                      west: {type: 'integer'},
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const refined = runSchemaRefinement(
+      schema,
+      {
+        container: {
+          people: [
+            {name: 'Ada', role: 'ADMIN', readings: {north: 1, south: 2, west: 3}},
+            {name: 'Grace', role: 'USER', readings: {north: 4, south: 5, west: 6}},
+            {name: 'Linus', role: 'USER', readings: {north: 7, south: 8, west: 9}},
+            {name: 'Margaret', role: 'USER', readings: {north: 10, south: 11, west: 12}},
+          ],
+        },
+      },
+      {
+        detectAdditionalProperties: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS,
+        addExamples: ADD_EXAMPLES_DEFAULTS,
+        detectEnums: DETECT_ENUMS_DEFAULTS,
+      }
+    );
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.properties?.container);
+    expectObjectSchema(refined.properties.container.properties?.people);
+    expectObjectSchema(refined.properties.container.properties.people.items);
+
+    const personSchema = refined.properties.container.properties.people.items;
+    expect(personSchema.properties?.name).toEqual({
+      type: 'string',
+      examples: ['Ada', 'Grace', 'Linus', 'Margaret'],
+    });
+    expect(personSchema.properties?.role).toEqual({
+      type: 'string',
+      enum: ['ADMIN', 'USER'],
+    });
+    expect(personSchema.properties?.readings).toEqual({
+      type: 'object',
+      additionalProperties: {
+        type: 'integer',
+        examples: [1, 2, 3, 4],
+      },
+    });
+  });
+
+  it('aggregates all data instances governed by a reused definition', () => {
+    const schema: TopLevelSchema = {
+      type: 'object',
+      properties: {
+        primary: {$ref: '#/$defs/person'},
+        others: {
+          type: 'array',
+          items: {$ref: '#/$defs/person'},
+        },
+      },
+      $defs: {
+        person: {
+          type: 'object',
+          properties: {
+            name: {type: 'string'},
+            role: {type: 'string'},
+            readings: {
+              type: 'object',
+              properties: {
+                north: {type: 'integer'},
+                south: {type: 'integer'},
+                west: {type: 'integer'},
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const refined = runSchemaRefinement(
+      schema,
+      {
+        primary: {name: 'Ada', role: 'ADMIN', readings: {north: 1, south: 2, west: 3}},
+        others: [
+          {name: 'Grace', role: 'USER', readings: {north: 4, south: 5, west: 6}},
+          {name: 'Linus', role: 'USER', readings: {north: 7, south: 8, west: 9}},
+          {name: 'Margaret', role: 'USER', readings: {north: 10, south: 11, west: 12}},
+        ],
+      },
+      {
+        detectAdditionalProperties: DETECT_ADDITIONAL_PROPERTIES_DEFAULTS,
+        addExamples: ADD_EXAMPLES_DEFAULTS,
+        detectEnums: DETECT_ENUMS_DEFAULTS,
+      }
+    );
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.$defs?.person);
+
+    expect(refined.$defs.person.properties?.name).toEqual({
+      type: 'string',
+      examples: ['Ada', 'Grace', 'Linus', 'Margaret'],
+    });
+    expect(refined.$defs.person.properties?.role).toEqual({
+      type: 'string',
+      enum: ['ADMIN', 'USER'],
+    });
+    expect(refined.$defs.person.properties?.readings).toEqual({
+      type: 'object',
+      additionalProperties: {
+        type: 'integer',
+        examples: [1, 2, 3, 4],
       },
     });
   });
@@ -590,6 +760,46 @@ describe('runSchemaRefinement', () => {
     });
     // "Ada" belongs to the note branch, so it must not show up as a unit example
     expect(noteBranch?.properties?.author).toEqual({type: 'string', examples: ['Ada']});
+  });
+
+  it('routes matching oneOf samples into referenced branch definitions', () => {
+    const schema: TopLevelSchema = {
+      oneOf: [{$ref: '#/$defs/measurement'}, {$ref: '#/$defs/note'}],
+      $defs: {
+        measurement: {
+          type: 'object',
+          required: ['kind', 'unit'],
+          properties: {kind: {const: 'measurement'}, unit: {type: 'string'}},
+        },
+        note: {
+          type: 'object',
+          required: ['kind', 'author'],
+          properties: {kind: {const: 'note'}, author: {type: 'string'}},
+        },
+      },
+    };
+
+    const refined = runSchemaRefinementFromSamples(
+      schema,
+      [
+        {kind: 'measurement', unit: 'kelvin'},
+        {kind: 'measurement', unit: 'pascal'},
+        {kind: 'note', author: 'Ada'},
+      ],
+      {addExamples: ADD_EXAMPLES_DEFAULTS}
+    );
+
+    expectObjectSchema(refined);
+    expectObjectSchema(refined.$defs?.measurement);
+    expectObjectSchema(refined.$defs?.note);
+    expect(refined.$defs.measurement.properties?.unit).toEqual({
+      type: 'string',
+      examples: ['kelvin', 'pascal'],
+    });
+    expect(refined.$defs.note.properties?.author).toEqual({
+      type: 'string',
+      examples: ['Ada'],
+    });
   });
 
   it('keeps giving every allOf branch all samples, since each branch describes them', () => {

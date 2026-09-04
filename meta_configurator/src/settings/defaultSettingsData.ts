@@ -2,7 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
-  settingsVersion: '1.0.6',
+  settingsVersion: '1.0.7',
   latestNewsHash: 0,
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
@@ -12,6 +12,7 @@ export const SETTINGS_DATA_DEFAULT = {
     maxDocumentSizeForValidation: 1024000, // 1 MiB
     maxDocumentSizeForCursorSynchronization: 1240000, // 1 MiB
     maxDocumentSizeForSchemaInference: 40960, // 40 KiB
+    maxSchemaSizeForDataSynchronization: 1024000, // 1 MiB
     minObjectPropertyCountToPreserve: 16, // when large document is trimmed, this is minimum count of object properties to be preserved
     maxShownChildrenInGuiEditor: 50,
     maxErrorsToShow: 15,
