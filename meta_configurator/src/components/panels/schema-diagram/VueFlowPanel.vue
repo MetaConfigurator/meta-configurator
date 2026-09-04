@@ -421,8 +421,7 @@ function deleteElement(objectData: SchemaElementData) {
   const schemaObjectPath = absolutePath.slice(0, -2); // the object schema owning this property
 
   const schemaIsSmallEnoughToSynchronize =
-    sizeOf(schemaData.data.value) <=
-    settings.value.performance.maxSchemaSizeForDataSynchronization;
+    sizeOf(schemaData.data.value) <= settings.value.performance.maxSchemaSizeForDataSynchronization;
   const affectedDataPaths = schemaIsSmallEnoughToSynchronize
     ? findDataPathsUsingSchema(
         schemaObjectPath,

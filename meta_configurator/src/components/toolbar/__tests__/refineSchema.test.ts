@@ -27,9 +27,7 @@ describe('schema refinement validation', () => {
     }
     const data = {vessels: [{volume: 0}, {volume: 0}]};
 
-    expect(
-      getSchemaRefinementRejectionReason(originalSchema, refinedSchema, data)
-    ).toBeNull();
+    expect(getSchemaRefinementRejectionReason(originalSchema, refinedSchema, data)).toBeNull();
   });
 
   it('reports only errors introduced by refinement', () => {
@@ -43,11 +41,7 @@ describe('schema refinement validation', () => {
       required: ['name', 'status'],
     };
 
-    const rejectionReason = getSchemaRefinementRejectionReason(
-      originalSchema,
-      refinedSchema,
-      {}
-    );
+    const rejectionReason = getSchemaRefinementRejectionReason(originalSchema, refinedSchema, {});
 
     expect(rejectionReason).toContain("must have required property 'status'");
     expect(rejectionReason).not.toContain("must have required property 'name'");

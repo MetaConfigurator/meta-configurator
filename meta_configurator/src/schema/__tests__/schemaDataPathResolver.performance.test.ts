@@ -60,9 +60,7 @@ describe('SchemaDataPathResolver performance', () => {
     );
     const exampleForwardMeasurement = measureMedian(() => {
       const resolver = new SchemaDataPathResolver(schema);
-      return exampleDataPaths.map(dataPath =>
-        resolver.findSchemaPathsForDataPath(dataPath, data)
-      );
+      return exampleDataPaths.map(dataPath => resolver.findSchemaPathsForDataPath(dataPath, data));
     });
 
     const timings = {

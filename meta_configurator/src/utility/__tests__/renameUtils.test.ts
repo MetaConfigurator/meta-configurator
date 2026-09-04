@@ -771,11 +771,7 @@ describe('test renameUtils', () => {
       ],
     };
     const mutableInstanceData = {person: {name: 'Ada'}};
-    const schemaWrapper = new JsonSchemaWrapper(
-      mutableSchema,
-      SessionMode.SchemaEditor,
-      false
-    );
+    const schemaWrapper = new JsonSchemaWrapper(mutableSchema, SessionMode.SchemaEditor, false);
 
     replacePropertyNameUtils(
       ['allOf', 0, 'properties', 'person', 'properties', 'name'],
@@ -811,11 +807,7 @@ describe('test renameUtils', () => {
       },
     };
     const mutableInstanceData = {people: [{name: 'Ada'}, {name: 'Grace'}]};
-    const schemaWrapper = new JsonSchemaWrapper(
-      mutableSchema,
-      SessionMode.SchemaEditor,
-      false
-    );
+    const schemaWrapper = new JsonSchemaWrapper(mutableSchema, SessionMode.SchemaEditor, false);
     const updatedInstancePaths: Path[] = [];
 
     replacePropertyNameUtils(
@@ -848,11 +840,7 @@ describe('test renameUtils', () => {
       properties: {name: {type: 'string'}},
     };
     const mutableInstanceData = {name: 'Ada'};
-    const schemaWrapper = new JsonSchemaWrapper(
-      mutableSchema,
-      SessionMode.SchemaEditor,
-      false
-    );
+    const schemaWrapper = new JsonSchemaWrapper(mutableSchema, SessionMode.SchemaEditor, false);
     const updateInstanceData = vi.fn();
     const settings = useSettings();
     const previousLimit = settings.value.performance.maxSchemaSizeForDataSynchronization;

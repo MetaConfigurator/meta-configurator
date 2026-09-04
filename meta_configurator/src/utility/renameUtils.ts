@@ -1,10 +1,7 @@
 import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {
-  getParentElementRequiredPropsPath,
-  pathToJsonPointer,
-} from '@/utility/pathUtils';
+import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pathUtils';
 import {findDataPathsUsingSchema} from '@/schema/schemaDataPathResolver';
 import {removeFromRequiredArray} from '@/utility/requiredUtils';
 import {SessionMode} from '@/store/sessionMode';
@@ -49,10 +46,7 @@ function syncPropertyRenameToInstanceData(
   instanceData: any,
   updateInstanceDataFct: (subPath: Path, newValue: any) => void
 ) {
-  if (
-    sizeOf(schemaRoot) >
-    useSettings().value.performance.maxSchemaSizeForDataSynchronization
-  ) {
+  if (sizeOf(schemaRoot) > useSettings().value.performance.maxSchemaSizeForDataSynchronization) {
     return;
   }
 

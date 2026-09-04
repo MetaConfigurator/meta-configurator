@@ -9,10 +9,7 @@ describe('SchemaDataPathResolver', () => {
   it('returns every allOf schema path governing one data property', () => {
     const schema: TopLevelSchema = {
       type: 'object',
-      allOf: [
-        {properties: {name: {type: 'string'}}},
-        {properties: {name: {minLength: 2}}},
-      ],
+      allOf: [{properties: {name: {type: 'string'}}}, {properties: {name: {minLength: 2}}}],
     };
 
     expect(findSchemaPathsForDataPath(['name'], {name: 'Ada'}, schema)).toEqual([
@@ -26,17 +23,11 @@ describe('SchemaDataPathResolver', () => {
       type: 'object',
       patternProperties: {
         '^metric_': {type: 'number'},
-        '_celsius$': {minimum: -273.15},
+        _celsius$: {minimum: -273.15},
       },
     };
 
-    expect(
-      findSchemaPathsForDataPath(
-        ['metric_celsius'],
-        {metric_celsius: 21},
-        schema
-      )
-    ).toEqual([
+    expect(findSchemaPathsForDataPath(['metric_celsius'], {metric_celsius: 21}, schema)).toEqual([
       ['patternProperties', '^metric_'],
       ['patternProperties', '_celsius$'],
     ]);
@@ -111,12 +102,8 @@ describe('SchemaDataPathResolver', () => {
     };
     const data = ['label', 42, true];
 
-    expect(findSchemaPathsForDataPath([0], data, schema)).toEqual([
-      ['prefixItems', 0],
-    ]);
+    expect(findSchemaPathsForDataPath([0], data, schema)).toEqual([['prefixItems', 0]]);
     expect(findSchemaPathsForDataPath([1], data, schema)).toEqual([['contains']]);
-    expect(findSchemaPathsForDataPath([2], data, schema)).toEqual([
-      ['unevaluatedItems'],
-    ]);
+    expect(findSchemaPathsForDataPath([2], data, schema)).toEqual([['unevaluatedItems']]);
   });
 });

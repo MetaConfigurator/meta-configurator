@@ -97,11 +97,7 @@ export class SchemaDataPathResolver {
         );
       } else if (value && typeof value === 'object') {
         Object.entries(value).forEach(([key, child]) =>
-          visitData(
-            child,
-            dataPath.concat(key),
-            this.findChildSchemaPaths(schemaPaths, key, child)
-          )
+          visitData(child, dataPath.concat(key), this.findChildSchemaPaths(schemaPaths, key, child))
         );
       }
     };
@@ -116,10 +112,7 @@ export class SchemaDataPathResolver {
     for (const match of this.mapDataPathsToSchemaPaths(data)) {
       for (const schemaPath of match.schemaPaths) {
         const key = serializePath(schemaPath);
-        dataPathsBySchemaPath.set(key, [
-          ...(dataPathsBySchemaPath.get(key) ?? []),
-          match.dataPath,
-        ]);
+        dataPathsBySchemaPath.set(key, [...(dataPathsBySchemaPath.get(key) ?? []), match.dataPath]);
       }
     }
 
@@ -131,9 +124,7 @@ export class SchemaDataPathResolver {
 
   public findDataPathsUsingSchema(schemaPath: Path, data: unknown): Path[] {
     return this.mapDataPathsToSchemaPaths(data)
-      .filter(match =>
-        match.schemaPaths.some(candidate => arePathsEqual(candidate, schemaPath))
-      )
+      .filter(match => match.schemaPaths.some(candidate => arePathsEqual(candidate, schemaPath)))
       .map(match => match.dataPath);
   }
 
@@ -153,12 +144,7 @@ export class SchemaDataPathResolver {
       }
 
       if (typeof pathElement === 'number') {
-        const match = this.findArrayItemSchemaPaths(
-          parentPath,
-          parentSchema,
-          pathElement,
-          value
-        );
+        const match = this.findArrayItemSchemaPaths(parentPath, parentSchema, pathElement, value);
         candidates.push(...match.paths);
         deferredUnevaluatedPaths.push(...match.unevaluatedPaths);
         evaluated ||= match.evaluated;
@@ -242,7 +228,10 @@ export class SchemaDataPathResolver {
       evaluated = true;
     }
 
-    if (parentSchema.contains !== undefined && this.schemaMatchesValue(parentSchema.contains, value)) {
+    if (
+      parentSchema.contains !== undefined &&
+      this.schemaMatchesValue(parentSchema.contains, value)
+    ) {
       paths.push(parentPath.concat('contains'));
       evaluated = true;
     }
@@ -276,16 +265,9 @@ export class SchemaDataPathResolver {
       return result;
     }
 
-    if (
-      typeof schema.$ref === 'string' &&
-      (schema.$ref === '#' || schema.$ref.startsWith('#/'))
-    ) {
+    if (typeof schema.$ref === 'string' && (schema.$ref === '#' || schema.$ref.startsWith('#/'))) {
       result.push(
-        ...this.expandApplicableSchemaPaths(
-          jsonPointerToPath(schema.$ref),
-          value,
-          nextVisited
-        )
+        ...this.expandApplicableSchemaPaths(jsonPointerToPath(schema.$ref), value, nextVisited)
       );
     }
 
