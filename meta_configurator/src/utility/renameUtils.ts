@@ -1,14 +1,13 @@
 import type {Path} from '@/utility/path';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {
-  findSchemaPathForDataPath,
-  getParentElementRequiredPropsPath,
-  pathToJsonPointer,
-} from '@/utility/pathUtils';
+import {getParentElementRequiredPropsPath, pathToJsonPointer} from '@/utility/pathUtils';
+import {findDataPathsUsingSchema} from '@/schema/schemaDataPathResolver';
 import {removeFromRequiredArray} from '@/utility/requiredUtils';
 import {SessionMode} from '@/store/sessionMode';
 import {confirmationService} from '@/utility/confirmationService';
+import {sizeOf} from '@/utility/sizeOf';
+import {useSettings} from '@/settings/useSettings';
 
 const RENAME_CONFLICT_ACTION = {
   CANCEL: 'cancel',
@@ -36,47 +35,6 @@ function shouldPromptForRenameConflict(
   return Object.prototype.hasOwnProperty.call(parentData, newName);
 }
 
-// Walks the INSTANCE DATA (not the schema) and collects every data path whose governing schema matches schemaObjectPath.
-export function findDataPathsUsingSchema(
-  schemaObjectPath: Path,
-  data: any,
-  schemaRoot: any,
-  currentPath: Path = []
-): Path[] {
-  const result: Path[] = [];
-
-  const governingSchemaPath = findSchemaPathForDataPath(currentPath, schemaRoot);
-
-  const isMatch =
-    governingSchemaPath &&
-    pathToJsonPointer(governingSchemaPath) === pathToJsonPointer(schemaObjectPath);
-
-  if (isMatch) {
-    result.push(currentPath);
-  }
-
-  if (Array.isArray(data)) {
-    data.forEach((item, index) => {
-      result.push(
-        ...findDataPathsUsingSchema(schemaObjectPath, item, schemaRoot, currentPath.concat([index]))
-      );
-    });
-  } else if (data && typeof data === 'object') {
-    for (const key of Object.keys(data)) {
-      result.push(
-        ...findDataPathsUsingSchema(
-          schemaObjectPath,
-          data[key],
-          schemaRoot,
-          currentPath.concat([key])
-        )
-      );
-    }
-  }
-
-  return result;
-}
-
 // Applies the rename decision (overwrite / keep-unchanged) to every affected data
 
 function syncPropertyRenameToInstanceData(
@@ -88,6 +46,10 @@ function syncPropertyRenameToInstanceData(
   instanceData: any,
   updateInstanceDataFct: (subPath: Path, newValue: any) => void
 ) {
+  if (sizeOf(schemaRoot) > useSettings().value.performance.maxSchemaSizeForDataSynchronization) {
+    return;
+  }
+
   const affectedDataPaths = findDataPathsUsingSchema(schemaObjectPath, instanceData, schemaRoot);
   console.log(
     pathToJsonPointer(schemaObjectPath),

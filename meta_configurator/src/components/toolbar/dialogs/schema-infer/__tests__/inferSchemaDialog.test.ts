@@ -188,6 +188,22 @@ describe('InferSchemaDialog', () => {
     expect(schema.items.properties.city.examples).toEqual(['NYC']);
   });
 
+  it('can include empty strings in examples when the option is disabled', async () => {
+    const {wrapper, schemaEditorSetDataMock} = await setupDialog({
+      currentData: [{name: ''}, {name: 'Alice'}],
+    });
+
+    await openDialog(wrapper);
+    await wrapper.get('#infer-add-examples').setValue(true);
+    await flushPromises();
+    await wrapper.get('#infer-add-examples-ignore-empty-strings').setValue(false);
+    await findButtonByText(wrapper, 'Apply and Infer Schema').trigger('click');
+    await flushPromises();
+
+    const schema = schemaEditorSetDataMock.mock.calls[0]![0];
+    expect(schema.items.properties.name.examples).toEqual(['', 'Alice']);
+  });
+
   it('starts in manual file mode when no current data is available', async () => {
     const {wrapper, dataEditorSetDataMock, schemaEditorSetDataMock, toastAddMock} =
       await setupDialog({

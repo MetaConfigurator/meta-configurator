@@ -54,9 +54,10 @@ import {
   pasteSchemaFromClipboard,
 } from '@/components/panels/schema-diagram/schemaClipboardUtils';
 import {doesSchemaAllowNull, setSchemaNullable} from '@/schema/schemaReadingUtils';
-import {findDataPathsUsingSchema} from '@/utility/renameUtils';
+import {findDataPathsUsingSchema} from '@/schema/schemaDataPathResolver';
 import {dataAt} from '@/utility/resolveDataAtPath';
 import {confirmationService} from '@/utility/confirmationService';
+import {sizeOf} from '@/utility/sizeOf';
 const emit = defineEmits<{
   (e: 'update_current_path', path: Path): void;
   (e: 'select_element', path: Path): void;
@@ -419,16 +420,20 @@ function deleteElement(objectData: SchemaElementData) {
   const propertyName = absolutePath[absolutePath.length - 1] as string;
   const schemaObjectPath = absolutePath.slice(0, -2); // the object schema owning this property
 
-  const affectedDataPaths = findDataPathsUsingSchema(
-    schemaObjectPath,
-    instanceData.data.value,
-    schemaData.data.value
-  ).filter(p => {
-    const obj = dataAt(p, instanceData.data.value);
-    return (
-      obj && typeof obj === 'object' && Object.prototype.hasOwnProperty.call(obj, propertyName)
-    );
-  });
+  const schemaIsSmallEnoughToSynchronize =
+    sizeOf(schemaData.data.value) <= settings.value.performance.maxSchemaSizeForDataSynchronization;
+  const affectedDataPaths = schemaIsSmallEnoughToSynchronize
+    ? findDataPathsUsingSchema(
+        schemaObjectPath,
+        instanceData.data.value,
+        schemaData.data.value
+      ).filter(p => {
+        const obj = dataAt(p, instanceData.data.value);
+        return (
+          obj && typeof obj === 'object' && Object.prototype.hasOwnProperty.call(obj, propertyName)
+        );
+      })
+    : [];
 
   // schema-side delete always happens regardless of what the user decides for data
   deleteSchemaElement(schemaData, absolutePath);

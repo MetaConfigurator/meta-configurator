@@ -1,8 +1,9 @@
-import type {JsonSchemaObjectType, JsonSchemaType, TopLevelSchema} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {JsonSchemaVisitor, type VisitorContext} from '@/schema/jsonSchemaVisitor';
-import {ValidationService} from '@/schema/validationService';
 import {allowItemsInInferredEmptyArraySchemas} from '@/schema/inferJsonSchema';
+import {SchemaDataPathResolver} from '@/schema/schemaDataPathResolver';
 import {inferSchema} from '@jsonhero/schema-infer';
+import {dataAt} from '@/utility/resolveDataAtPath';
 
 function isSchemaObject(schema: JsonSchemaType): schema is JsonSchemaObjectType {
   return typeof schema === 'object' && schema !== null;
@@ -73,36 +74,11 @@ export function uniqueByJsonValue(values: unknown[]): unknown[] {
   });
 }
 
-function getMatchingPatternPropertyNames(
-  keys: string[],
-  patternProperties: Record<string, JsonSchemaType> | undefined
-): Set<string> {
-  const matchingKeys = new Set<string>();
-  if (!patternProperties) {
-    return matchingKeys;
-  }
-
-  for (const pattern of Object.keys(patternProperties)) {
-    const regex = new RegExp(pattern);
-    for (const key of keys) {
-      if (regex.test(key)) {
-        matchingKeys.add(key);
-      }
-    }
-  }
-
-  return matchingKeys;
-}
-
 export function collectObjectSamples(samples: unknown[]): Record<string, unknown>[] {
   return samples.filter(
     (sample): sample is Record<string, unknown> =>
       typeof sample === 'object' && sample !== null && !Array.isArray(sample)
   );
-}
-
-function collectArrayItemSamples(samples: unknown[]): unknown[] {
-  return samples.flatMap(sample => (Array.isArray(sample) ? sample : []));
 }
 
 export function inferSchemaFromValues(values: unknown[]): JsonSchemaType {
@@ -126,184 +102,38 @@ export function collectPropertySamples(
   return objectSamples.filter(sample => propertyName in sample).map(sample => sample[propertyName]);
 }
 
+function serializeSchemaPath(schemaPath: readonly (string | number)[]): string {
+  return JSON.stringify(schemaPath.map(String));
+}
+
 class JsonSchemaSamplesVisitor extends JsonSchemaVisitor {
   private readonly samplesByPath = new Map<string, unknown[]>();
-  private readonly schemasByPath = new Map<string, JsonSchemaObjectType>();
 
   constructor(
     samples: unknown[],
+    schemaRoot: JsonSchemaType,
     private readonly visitSchemaNode: (schema: JsonSchemaObjectType, samples: unknown[]) => void
   ) {
     super(false);
-    this.samplesByPath.set(this.serializeSchemaPath([]), samples);
+    const resolver = new SchemaDataPathResolver(schemaRoot);
+
+    for (const sample of samples) {
+      for (const match of resolver.mapDataPathsToSchemaPaths(sample)) {
+        const value = dataAt(match.dataPath, sample);
+        for (const schemaPath of match.schemaPaths) {
+          const key = serializeSchemaPath(schemaPath);
+          this.samplesByPath.set(key, [...(this.samplesByPath.get(key) ?? []), value]);
+        }
+      }
+    }
   }
 
   protected visitSchema(schema: JsonSchemaObjectType, context: VisitorContext): void {
-    const serializedPath = this.serializeSchemaPath(context.path);
-    this.schemasByPath.set(serializedPath, schema);
-    if (this.samplesByPath.has(serializedPath)) {
-      this.visitSchemaNode(schema, this.samplesByPath.get(serializedPath) ?? []);
+    const samplesForNode = this.samplesByPath.get(serializeSchemaPath(context.path));
+    if (samplesForNode) {
+      this.visitSchemaNode(schema, samplesForNode);
     }
   }
-
-  protected visitProperty(name: string, _schema: JsonSchemaType, context: VisitorContext): void {
-    const parentSamples = this.getParentSamples(context, 2);
-    if (parentSamples) {
-      this.setSamplesForContext(
-        context,
-        collectPropertySamples(collectObjectSamples(parentSamples), name)
-      );
-    }
-  }
-
-  protected visitPatternProperty(
-    pattern: string,
-    _schema: JsonSchemaType,
-    context: VisitorContext
-  ): void {
-    const parentSamples = this.getParentSamples(context, 2);
-    if (!parentSamples) {
-      return;
-    }
-
-    const regex = new RegExp(pattern);
-    const matchingSamples = collectObjectSamples(parentSamples).flatMap(sample =>
-      Object.entries(sample)
-        .filter(([key]) => regex.test(key))
-        .map(([, value]) => value)
-    );
-    this.setSamplesForContext(context, matchingSamples);
-  }
-
-  protected visitSubSchemaKeyword(
-    keyword: string,
-    _schema: JsonSchemaType,
-    context: VisitorContext
-  ): void {
-    const lastPathSegment = context.path[context.path.length - 1];
-    const arrayIndex = typeof lastPathSegment === 'number' ? lastPathSegment : undefined;
-    const parentSegmentCount = arrayIndex === undefined ? 1 : 2;
-    const parentSamples = this.getParentSamples(context, parentSegmentCount);
-    if (!parentSamples) {
-      return;
-    }
-
-    if (keyword === 'items' && arrayIndex === undefined) {
-      this.setSamplesForContext(context, collectArrayItemSamples(parentSamples));
-    } else if ((keyword === 'items' || keyword === 'prefixItems') && arrayIndex !== undefined) {
-      this.setSamplesForContext(context, collectSamplesAtArrayIndex(parentSamples, arrayIndex));
-    } else if (keyword === 'additionalProperties') {
-      this.setSamplesForContext(
-        context,
-        collectAdditionalPropertySamples(
-          parentSamples,
-          this.getParentSchema(context, parentSegmentCount)
-        )
-      );
-    } else if (keyword === 'contains') {
-      this.setSamplesForContext(context, collectArrayItemSamples(parentSamples));
-    }
-  }
-
-  protected visitCompositional(
-    keyword: string,
-    schemas: JsonSchemaType | JsonSchemaType[],
-    context: VisitorContext
-  ): void {
-    const parentSamples = this.samplesByPath.get(this.serializeSchemaPath(context.path));
-    if (!parentSamples) {
-      return;
-    }
-
-    if (!Array.isArray(schemas)) {
-      this.samplesByPath.set(this.serializeSchemaPath([...context.path, keyword]), parentSamples);
-      return;
-    }
-
-    // Every "allOf" branch describes the same sample, while a sample belongs to only one
-    // "oneOf"/"anyOf" branch: giving each branch all samples would derive its examples,
-    // enums and additional properties from data of a sibling branch.
-    const branchSelectsItsOwnSamples = keyword === 'oneOf' || keyword === 'anyOf';
-    schemas.forEach((branchSchema, index) => {
-      this.samplesByPath.set(
-        this.serializeSchemaPath([...context.path, keyword, index]),
-        branchSelectsItsOwnSamples
-          ? selectSamplesMatchingSchema(branchSchema, parentSamples)
-          : parentSamples
-      );
-    });
-  }
-
-  protected visitConditional(
-    _keyword: string,
-    _schema: JsonSchemaType,
-    context: VisitorContext
-  ): void {
-    const parentSamples = this.getParentSamples(context, 1);
-    if (parentSamples) {
-      this.setSamplesForContext(context, parentSamples);
-    }
-  }
-
-  private getParentSamples(context: VisitorContext, segmentCount: number): unknown[] | undefined {
-    return this.samplesByPath.get(this.serializeSchemaPath(context.path.slice(0, -segmentCount)));
-  }
-
-  private getParentSchema(
-    context: VisitorContext,
-    segmentCount: number
-  ): JsonSchemaObjectType | undefined {
-    return this.schemasByPath.get(this.serializeSchemaPath(context.path.slice(0, -segmentCount)));
-  }
-
-  private setSamplesForContext(context: VisitorContext, samples: unknown[]): void {
-    this.samplesByPath.set(this.serializeSchemaPath(context.path), samples);
-  }
-
-  private serializeSchemaPath(schemaPath: readonly (string | number)[]): string {
-    return JSON.stringify(schemaPath);
-  }
-}
-
-function collectSamplesAtArrayIndex(samples: unknown[], index: number): unknown[] {
-  return samples
-    .filter((sample): sample is unknown[] => Array.isArray(sample) && index < sample.length)
-    .map(sample => sample[index]);
-}
-
-function collectAdditionalPropertySamples(
-  samples: unknown[],
-  schema: JsonSchemaObjectType | undefined
-): unknown[] {
-  const explicitProperties = new Set(Object.keys(schema?.properties ?? {}));
-  return collectObjectSamples(samples).flatMap(sample => {
-    const matchingPatternPropertyNames = getMatchingPatternPropertyNames(
-      Object.keys(sample),
-      schema?.patternProperties
-    );
-    return Object.entries(sample)
-      .filter(([key]) => !explicitProperties.has(key) && !matchingPatternPropertyNames.has(key))
-      .map(([, value]) => value);
-  });
-}
-
-/** Returns the samples that the branch schema accepts, or none when it cannot be compiled. */
-function selectSamplesMatchingSchema(branchSchema: JsonSchemaType, samples: unknown[]): unknown[] {
-  if (branchSchema === true) {
-    return samples;
-  }
-  if (branchSchema === false) {
-    return [];
-  }
-
-  let validationService: ValidationService;
-  try {
-    validationService = new ValidationService(branchSchema as TopLevelSchema);
-  } catch {
-    // An unusable branch schema must not silently inherit the samples of its siblings.
-    return [];
-  }
-  return samples.filter(sample => validationService.validate(sample).valid);
 }
 
 export function visitSchemaWithSamples(
@@ -311,5 +141,5 @@ export function visitSchemaWithSamples(
   samples: unknown[],
   visitSchemaNode: (schemaNode: JsonSchemaObjectType, samples: unknown[]) => void
 ): void {
-  new JsonSchemaSamplesVisitor(samples, visitSchemaNode).traverse(schema);
+  new JsonSchemaSamplesVisitor(samples, schema, visitSchemaNode).traverse(schema);
 }

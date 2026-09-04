@@ -1,5 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
-import {replacePropertyNameUtils, updateReferences, findDataPathsUsingSchema} from '../renameUtils';
+import {replacePropertyNameUtils, updateReferences} from '../renameUtils';
+import {findDataPathsUsingSchema} from '@/schema/schemaDataPathResolver';
 import {META_SCHEMA_SIMPLIFIED} from '../../packaged-schemas/metaSchemaSimplified';
 import {type Path} from '../path';
 import _ from 'lodash';
@@ -7,6 +8,7 @@ import {JsonSchemaWrapper} from '../../schema/jsonSchemaWrapper';
 import {type JsonSchemaType} from '../../schema/jsonSchemaType';
 import {SessionMode} from '../../store/sessionMode';
 import {confirmationService} from '../confirmationService';
+import {useSettings} from '@/settings/useSettings';
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
@@ -743,5 +745,124 @@ describe('test renameUtils', () => {
       ['groups', 0, 'people', 1, 'name'],
       ['groups', 1, 'people', 0, 'name'],
     ]);
+  });
+
+  it('renames instance data when one of several allOf paths owns the property', () => {
+    const mutableSchema: JsonSchemaType = {
+      type: 'object',
+      allOf: [
+        {
+          properties: {
+            person: {
+              type: 'object',
+              properties: {name: {type: 'string'}},
+            },
+          },
+        },
+        {
+          properties: {
+            person: {
+              type: 'object',
+              required: ['name'],
+              properties: {name: {minLength: 2}},
+            },
+          },
+        },
+      ],
+    };
+    const mutableInstanceData = {person: {name: 'Ada'}};
+    const schemaWrapper = new JsonSchemaWrapper(mutableSchema, SessionMode.SchemaEditor, false);
+
+    replacePropertyNameUtils(
+      ['allOf', 0, 'properties', 'person', 'properties', 'name'],
+      'name',
+      'fullName',
+      mutableSchema,
+      schemaWrapper,
+      (path, value) => _.set(mutableSchema, path, value),
+      mutableInstanceData,
+      (path, value) => _.set(mutableInstanceData, path, value)
+    );
+
+    expect(mutableInstanceData).toEqual({person: {fullName: 'Ada'}});
+  });
+
+  it('updates each referenced instance once when several schema paths reach the same definition', () => {
+    const mutableSchema: JsonSchemaType = {
+      type: 'object',
+      properties: {
+        people: {
+          type: 'array',
+          items: {
+            $ref: '#/$defs/person',
+            allOf: [{$ref: '#/$defs/person'}],
+          },
+        },
+      },
+      $defs: {
+        person: {
+          type: 'object',
+          properties: {name: {type: 'string'}},
+        },
+      },
+    };
+    const mutableInstanceData = {people: [{name: 'Ada'}, {name: 'Grace'}]};
+    const schemaWrapper = new JsonSchemaWrapper(mutableSchema, SessionMode.SchemaEditor, false);
+    const updatedInstancePaths: Path[] = [];
+
+    replacePropertyNameUtils(
+      ['$defs', 'person', 'properties', 'name'],
+      'name',
+      'fullName',
+      mutableSchema,
+      schemaWrapper,
+      (path, value) => _.set(mutableSchema, path, value),
+      mutableInstanceData,
+      (path, value) => {
+        updatedInstancePaths.push(path);
+        _.set(mutableInstanceData, path, value);
+      }
+    );
+
+    expect(updatedInstancePaths).toEqual([
+      ['people', 0],
+      ['people', 1],
+    ]);
+    expect(mutableInstanceData).toEqual({
+      people: [{fullName: 'Ada'}, {fullName: 'Grace'}],
+    });
+  });
+
+  it('skips instance synchronization when the schema exceeds the configured size limit', () => {
+    const mutableSchema: JsonSchemaType = {
+      type: 'object',
+      description: 'x'.repeat(2_000),
+      properties: {name: {type: 'string'}},
+    };
+    const mutableInstanceData = {name: 'Ada'};
+    const schemaWrapper = new JsonSchemaWrapper(mutableSchema, SessionMode.SchemaEditor, false);
+    const updateInstanceData = vi.fn();
+    const settings = useSettings();
+    const previousLimit = settings.value.performance.maxSchemaSizeForDataSynchronization;
+    settings.value.performance.maxSchemaSizeForDataSynchronization = 1_000;
+
+    try {
+      replacePropertyNameUtils(
+        ['properties', 'name'],
+        'name',
+        'fullName',
+        mutableSchema,
+        schemaWrapper,
+        (path, value) => _.set(mutableSchema, path, value),
+        mutableInstanceData,
+        updateInstanceData
+      );
+    } finally {
+      settings.value.performance.maxSchemaSizeForDataSynchronization = previousLimit;
+    }
+
+    expect(mutableSchema.properties).toEqual({fullName: {type: 'string'}});
+    expect(mutableInstanceData).toEqual({name: 'Ada'});
+    expect(updateInstanceData).not.toHaveBeenCalled();
   });
 });

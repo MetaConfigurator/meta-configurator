@@ -58,5 +58,8 @@ function canBeUsedAsExample(value: unknown, options: AddExamplesOptions): boolea
   if (value === null) {
     return !options.ignoreNullValues;
   }
+  if (value === '') {
+    return !options.ignoreEmptyStrings;
+  }
   return EXAMPLE_SUPPORTED_TYPES.has(getValueType(value));
 }
