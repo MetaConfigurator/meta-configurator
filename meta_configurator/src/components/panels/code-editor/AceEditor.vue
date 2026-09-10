@@ -48,8 +48,8 @@ onMounted(() => {
   editor.value.setOption('wrap', true);
   editor.value.setOption('hScrollBarAlwaysVisible', false);
 
-  disposeAceMode = setupAceMode(editor.value, settings.value);
-  disposeAceProperties = setupAceProperties(editor.value, settings.value);
+  disposeAceMode = setupAceMode(editor.value, settings);
+  disposeAceProperties = setupAceProperties(editor.value, settings);
   connectAceUndoManagerToGlobalUndo(editor.value, getDataForMode(props.sessionMode).undoManager);
 
   setupLinkToData(editor.value, props.sessionMode);
