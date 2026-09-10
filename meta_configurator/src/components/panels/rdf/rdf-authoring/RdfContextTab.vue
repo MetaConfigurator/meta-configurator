@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import CurrentPathBreadcrumb from '@/components/panels/shared-components/CurrentPathBreadcrump.vue';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
-import {computed} from 'vue';
+import {computed, toRaw} from 'vue';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
@@ -19,7 +18,7 @@ const session = getSessionForMode(props.sessionMode);
 const data = getDataForMode(props.sessionMode);
 
 const currentSchema = computed(() => {
-  return new JsonSchemaWrapper(JSON.parse(defaultJsonLdSchema), props.sessionMode, true);
+  return new JsonSchemaWrapper(structuredClone(defaultJsonLdSchema), props.sessionMode, true);
 });
 
 const parsingErrors = computed(() => {
@@ -28,10 +27,6 @@ const parsingErrors = computed(() => {
     message: msg,
   }));
 });
-
-function updatePath(newPath: Path) {
-  session.updateCurrentPath(newPath);
-}
 
 function updateData(path: Path, newValue: any) {
   data.setDataAt(path, newValue);
@@ -42,17 +37,13 @@ function removeProperty(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
-function zoomIntoPath(pathToAdd: Path) {
-  session.updateCurrentPath(session.currentPath.value.concat(pathToAdd));
-  session.updateCurrentSelectedElement(session.currentPath.value);
-}
-
 function selectPath(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
 const currentData = computed(() => {
-  return getDataForMode(props.sessionMode).dataAt(['@context']);
+  const contextData = data.dataAt(['@context']);
+  return contextData === undefined ? undefined : structuredClone(toRaw(contextData));
 });
 </script>
 
@@ -63,11 +54,6 @@ const currentData = computed(() => {
       {'disabled-wrapper': !dataIsInJsonLd || dataIsUnparsable || parsingErrors.length > 0},
     ]">
     <div v-if="dataIsInJsonLd && !dataIsUnparsable">
-      <CurrentPathBreadcrumb
-        :session-mode="props.sessionMode"
-        :root-name="'document root'"
-        :path="session.currentPath.value"
-        @update:path="newPath => updatePath(newPath)" />
       <div class="flex-grow overflow-y-scroll">
         <PropertiesPanel
           :currentSchema="currentSchema"
@@ -75,7 +61,6 @@ const currentData = computed(() => {
           :currentData="currentData"
           :sessionMode="props.sessionMode"
           :table-header="undefined"
-          @zoom_into_path="pathToAdd => zoomIntoPath(pathToAdd)"
           @remove_property="removeProperty"
           @select_path="selectedPath => selectPath(selectedPath)"
           @update_data="updateData" />

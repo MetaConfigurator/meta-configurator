@@ -1,7 +1,7 @@
 import {computed, shallowRef} from 'vue';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {buildMetaSchema} from '@/schema/metaSchemaBuilder';
+import {buildFullMetaSchema, buildMetaSchema} from '@/schema/metaSchemaBuilder';
 import {SETTINGS_SCHEMA} from '@/settings/settingsSchema';
 import {useLocalStorage} from '@vueuse/core';
 
@@ -13,13 +13,18 @@ const dataSource = {
   newSchemaWasFetched: shallowRef<boolean>(false),
 
   // data of the settings editor
-  settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT)),
+  settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT), {
+    shallow: true,
+  }),
 };
 
 // Schema source and data source are separated, because metaSchemaData accesses the settingsData, which it could not do if they were defined within the same object.
 const schemaSource = {
   // restricted meta schema of the schema editor
   metaSchemaData: computed(() => buildMetaSchema(dataSource.settingsData.value.metaSchema)),
+
+  // unrestricted meta schema used to validate schemas, independently of the GUI complexity mode
+  fullMetaSchemaData: computed(() => buildFullMetaSchema()),
 
   // settings schema of the settings editor
   settingsSchemaData: shallowRef<TopLevelSchema>(SETTINGS_SCHEMA),

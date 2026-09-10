@@ -14,7 +14,6 @@ import {clearPreprocessedRefSchemaCache} from '@/schema/schemaLazyResolver';
 import {writeSchemaRequiredDefaultsToData} from '@/schema/writeDefaultsToData';
 import {useDataSource} from '@/data/dataSource';
 import {detectSchemaFeatures, type SchemaFeatures} from '@/schema/detectSchemaFeatures.ts';
-
 /**
  * This class manages the schema and provides easy access to its content.
  */
@@ -95,9 +94,18 @@ export class ManagedJsonSchema {
         const oneOfSelection = getUserSelectionForMode(
           this.mode
         ).currentSelectedOneOfOptions.value.get(pathToString(currentPath));
-        if (oneOfSelection !== undefined) {
+        const selectedSubSchema = schema.oneOf[oneOfSelection?.index ?? -1];
+        if (selectedSubSchema !== undefined) {
+          // merge the selected oneOf sub-schema with the base schema (without the oneOf),
+          // so that properties defined next to the oneOf are not lost
+          const baseSchema = {...schema.jsonSchema};
+          delete baseSchema.oneOf;
+          const mergedSchema = new JsonSchemaWrapper(
+            {allOf: [baseSchema, selectedSubSchema.jsonSchema ?? {}]},
+            this.mode
+          );
           currentEffectiveSchema = calculateEffectiveSchema(
-            schema.oneOf[oneOfSelection.index],
+            mergedSchema,
             getDataForMode(this.mode).dataAt(currentPath),
             currentPath
           );
@@ -126,7 +134,6 @@ export class ManagedJsonSchema {
       this.mode
     );
     this._schemaFeatures!.value = detectSchemaFeatures(this._schemaRaw.value);
-
     if (useDataSource().newSchemaWasFetched) {
       // add defaults to user data, but only when new schema was fetched, not after every schema edit
       const data = getDataForMode(this.mode);

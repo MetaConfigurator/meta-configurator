@@ -8,7 +8,7 @@ import type {
 import {TreeNodeType} from '@/components/panels/gui-editor/configDataTreeNode';
 import type {Path} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
-import {PropertySorting} from '@/settings/settingsTypes';
+import {sortObjectChildren} from '@/components/panels/gui-editor/sortingUtils';
 import _ from 'lodash';
 import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/schema/effectiveSchemaCalculator';
@@ -205,26 +205,19 @@ export class ConfigTreeNodeResolver {
   }
 
   /**
-   * Creates children nodes for an object node, sorted according to the order defined
-   * in the settings.
+   * Returns the children of an object node, ordered according to the GUI editor's
+   * `propertySorting` setting and followed by the optional Advanced and AddProperty nodes.
    */
   private createObjectChildrenTreeNodes(
     mode: SessionMode,
     parameters: TreeNodeResolvingParameters
   ) {
-    const propertySorting = settings.value.guiEditor.propertySorting;
-    let result: GuiEditorTreeNode[] = [];
-
-    if (propertySorting === PropertySorting.SCHEMA_ORDER) {
-      result = this.createObjectChildrenNodesAccordingToSchemaOrder(mode, parameters);
-    }
-    if (propertySorting === PropertySorting.DATA_ORDER) {
-      result = this.createObjectChildrenNodesAccordingToDataOrder(mode, parameters);
-    }
-
-    if (propertySorting === PropertySorting.PRIORITY_ORDER) {
-      result = this.createObjectChildrenNodesPriorityOrder(mode, parameters);
-    }
+    const result = sortObjectChildren(
+      settings.value.guiEditor.propertySorting,
+      parameters.schema,
+      filter => this.createSchemaPropertiesChildNodes(mode, parameters, filter),
+      filter => this.createDataPropertiesChildNodes(mode, parameters, filter)
+    );
 
     const advanced = this.createTreeNodeOfAdvancedProperty(mode, parameters);
 
@@ -278,76 +271,6 @@ export class ConfigTreeNodeResolver {
     }
 
     return undefined;
-  }
-
-  /**
-   * Creates children nodes for an object node, sorted according to the priority order.
-   * The priority order is:
-   * 1. required properties
-   * 2. optional properties
-   * 3. additional properties (including pattern properties)
-   * 4. deprecated properties
-   */
-  private createObjectChildrenNodesPriorityOrder(
-    mode: SessionMode,
-    parameters: TreeNodeResolvingParameters
-  ) {
-    const requiredProperties = this.createSchemaPropertiesChildNodes(mode, parameters, key =>
-      parameters.schema.isRequired(key)
-    );
-    const optionalProperties = this.createSchemaPropertiesChildNodes(
-      mode,
-      parameters,
-      key => !parameters.schema.isRequired(key) && !parameters.schema.properties[key]?.deprecated
-    );
-    const additionalProperties = this.createDataPropertiesChildNodes(
-      mode,
-      parameters,
-      key => !parameters.schema.properties || !parameters.schema.properties[key]
-    ); // filter out properties that are already in the schema
-    const deprecatedProperties = this.createSchemaPropertiesChildNodes(
-      mode,
-      parameters,
-      key => !!parameters.schema.properties[key]?.deprecated && !parameters.schema.isRequired(key)
-    );
-    return requiredProperties.concat(
-      optionalProperties,
-      additionalProperties,
-      deprecatedProperties
-    );
-  }
-
-  /**
-   * Creates property children nodes for an object node, sorted in the same order as the properties occur in the data.
-   */
-  private createObjectChildrenNodesAccordingToDataOrder(
-    mode: SessionMode,
-    parameters: TreeNodeResolvingParameters
-  ) {
-    const dataProperties = this.createDataPropertiesChildNodes(mode, parameters);
-    const schemaProperties = this.createSchemaPropertiesChildNodes(
-      mode,
-      parameters,
-      key => !dataProperties.find(node => node.data.name === key)
-    );
-
-    return dataProperties.concat(schemaProperties);
-  }
-
-  /**
-   * Creates property children nodes for an object node, sorted in the same order as the properties occur in the schema.
-   */
-  private createObjectChildrenNodesAccordingToSchemaOrder(
-    mode: SessionMode,
-    parameters: TreeNodeResolvingParameters
-  ) {
-    const schemaProperties = this.createSchemaPropertiesChildNodes(mode, parameters);
-    const dataProperties = this.createDataPropertiesChildNodes(
-      mode,
-      parameters,
-      key => !parameters.schema.properties || !parameters.schema.properties[key]
-    );
-    return schemaProperties.concat(dataProperties);
   }
 
   private createSchemaPropertiesChildNodes(
@@ -633,7 +556,12 @@ export class ConfigTreeNodeResolver {
       // if the data is a primitive type, we cannot add a property
       return false;
     }
-    if (schema.maxProperties !== undefined && Object.keys(data).length >= schema.maxProperties) {
+    if (
+      schema.maxProperties !== undefined &&
+      data !== null &&
+      typeof data === 'object' &&
+      Object.keys(data).length >= schema.maxProperties
+    ) {
       return false;
     }
     if (schema.metaConfigurator?.hideAddPropertyButton) {
@@ -656,14 +584,15 @@ export class ConfigTreeNodeResolver {
    * Determines whether an "add item" node should be added to the tree.
    */
   private shouldAddAddItemNode(schema: JsonSchemaWrapper, data: any) {
-    if (data !== undefined && !Array.isArray(data)) {
-      return false;
-    }
-    if (schema.maxItems !== undefined && data !== undefined && data.length >= schema.maxItems) {
+    // note that the add item node is offered even when the data at this node is not an
+    // array (e.g. the default empty object of a new document, or leftover data from an
+    // earlier schema): the GUI would otherwise appear empty for array schemas with no
+    // way to fix the data. Adding an item then replaces the old value (undo is available).
+    if (schema.maxItems !== undefined && Array.isArray(data) && data.length >= schema.maxItems) {
       return false;
     }
     if (schema.items.isAlwaysFalse) {
-      return data?.length < (schema.prefixItems?.length ?? 0);
+      return Array.isArray(data) && data.length < (schema.prefixItems?.length ?? 0);
     }
     return true;
   }

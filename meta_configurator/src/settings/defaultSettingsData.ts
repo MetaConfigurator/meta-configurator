@@ -2,7 +2,7 @@
  * The default settings data.
  */
 export const SETTINGS_DATA_DEFAULT = {
-  settingsVersion: '1.0.3',
+  settingsVersion: '1.0.7',
   latestNewsHash: 0,
   dataFormat: 'json',
   toolbarTitle: 'MetaConfigurator',
@@ -12,6 +12,7 @@ export const SETTINGS_DATA_DEFAULT = {
     maxDocumentSizeForValidation: 1024000, // 1 MiB
     maxDocumentSizeForCursorSynchronization: 1240000, // 1 MiB
     maxDocumentSizeForSchemaInference: 40960, // 40 KiB
+    maxSchemaSizeForDataSynchronization: 1024000, // 1 MiB
     minObjectPropertyCountToPreserve: 16, // when large document is trimmed, this is minimum count of object properties to be preserved
     maxShownChildrenInGuiEditor: 50,
     maxErrorsToShow: 15,
@@ -31,6 +32,9 @@ export const SETTINGS_DATA_DEFAULT = {
     hideAddPropertyButton: true,
     showBorderAroundInputFields: true,
     showSchemaTitleAsHeader: true,
+    useScientificNotationForLargeAndSmallNumbers: true,
+    scientificNotationUpperThreshold: 1e21,
+    scientificNotationLowerThreshold: 1e-7,
   },
   schemaDiagram: {
     editMode: true,
@@ -108,7 +112,9 @@ export const SETTINGS_DATA_DEFAULT = {
       'https://metaconfigurator.github.io/meta-configurator',
   },
   backend: {
-    hostname: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+    snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+    schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+    formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
   },
   rdf: {
     sparqlEndpointUrl: 'https://dbpedia.org/sparql',
@@ -118,11 +124,13 @@ export const SETTINGS_DATA_DEFAULT = {
     groupBySubject: false,
   },
   aiIntegration: {
-    model: 'gpt-4o-mini',
-    maxTokens: 5000,
+    model: 'alias-fast',
+    max_tokens: 5000,
     temperature: 0.0,
-    endpoint: 'https://api.openai.com/v1/',
-    endpointProxy: '',
+    backend: {
+      relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+      endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+    },
   },
   schemaSelectionLists: [
     {

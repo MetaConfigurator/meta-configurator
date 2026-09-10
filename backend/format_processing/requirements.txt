@@ -1,0 +1,13 @@
+Flask==3.0.3
+flask-cors==6.0.2
+flask-limiter==4.1.1
+gunicorn==25.3.0
+Werkzeug==3.0.3
+PyYAML==6.0.3
+xmltodict==1.0.4
+gemmi==0.7.5
+rdflib==7.6.0
+redis==7.4.0
+python-dotenv==1.2.3
+jproperties==2.1.2
+markdown-it-py==4.2.0

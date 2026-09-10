@@ -97,48 +97,54 @@ function goPrev() {
 </script>
 
 <template>
-  <span class="p-input-icon-left ml-5 flex items-center" style="width: 14rem">
-    <i class="pi" style="font-size: 0.9rem" />
-    <InputText
-      show-clear
-      class="h-7 w-full"
-      placeholder="Search for data or property"
-      v-model="searchTerm"
-      @focus="showSearchResultsMenu"
-      @blur="() => searchResultMenu.value?.hide()"
-      id="searchBar" />
-  </span>
-  <div class="search-controls" v-if="searchTerm">
-    <span class="search-counter ml-1">{{ currentIndex }}/{{ totalMatches }}</span>
-    <Button
-      v-tooltip.bottom="'Previous match'"
-      class="ml-1 p-button-sm search-nav-btn"
-      text
-      :disabled="totalMatches === 0"
-      @click="goPrev">
-      <i class="pi pi-chevron-up" />
-    </Button>
-    <Button
-      v-tooltip.bottom="'Next match'"
-      class="p-button-sm search-nav-btn"
-      text
-      :disabled="totalMatches === 0"
-      @click="goNext">
-      <i class="pi pi-chevron-down" />
+  <div class="search-bar">
+    <span class="search-input-wrapper p-input-icon-left flex items-center">
+      <i class="pi" style="font-size: 0.9rem" />
+      <InputText
+        show-clear
+        class="h-7 w-full"
+        placeholder="Search for data or property"
+        v-model="searchTerm"
+        @focus="showSearchResultsMenu"
+        @blur="() => searchResultMenu.value?.hide()"
+        id="searchBar" />
+    </span>
+    <div class="search-controls" v-if="searchTerm">
+      <span class="search-counter ml-1">{{ currentIndex }}/{{ totalMatches }}</span>
+      <Button
+        v-tooltip.bottom="'Previous match'"
+        class="ml-1 p-button-sm search-nav-btn"
+        text
+        :disabled="totalMatches === 0"
+        @click="goPrev">
+        <i class="pi pi-chevron-up" />
+      </Button>
+      <Button
+        v-tooltip.bottom="'Next match'"
+        class="p-button-sm search-nav-btn"
+        text
+        :disabled="totalMatches === 0"
+        @click="goNext">
+        <i class="pi pi-chevron-down" />
+      </Button>
+    </div>
+    <!-- search results menu -->
+    <Menu
+      :popup="true"
+      ref="searchResultMenu"
+      :model="searchResultItems"
+      class="search-results-menu">
+      <template #item="slotProps">
+        <div class="px-3 py-2">
+          <div class="font-bold">{{ slotProps.item.label }}</div>
+          <div class="text-xs">{{ slotProps.item.data }}</div>
+        </div>
+      </template>
+    </Menu>
+    <Button class="toolbar-button" text :disabled="!searchTerm" @click="() => (searchTerm = '')">
+      <i class="pi pi-times" />
     </Button>
   </div>
-  <!-- search results menu -->
-  <Menu :popup="true" ref="searchResultMenu" :model="searchResultItems" class="search-results-menu">
-    <template #item="slotProps">
-      <div class="px-3 py-2">
-        <div class="font-bold">{{ slotProps.item.label }}</div>
-        <div class="text-xs">{{ slotProps.item.data }}</div>
-      </div>
-    </template>
-  </Menu>
-  <Button class="toolbar-button" text :disabled="!searchTerm" @click="() => (searchTerm = '')">
-    <i class="pi pi-times" />
-  </Button>
 </template>
 
 <style>
@@ -160,6 +166,18 @@ function goPrev() {
   opacity: 0.5;
   cursor: not-allowed;
 }
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 1.25rem;
+  min-width: 0;
+}
+.search-input-wrapper {
+  flex: 1 1 14rem;
+  min-width: 8rem;
+  max-width: 14rem;
+}
 .search-counter {
   font-size: 0.85rem;
   color: var(--text-color);
@@ -175,5 +193,22 @@ function goPrev() {
   font-size: large;
   color: var(--p-primary-active-color);
   padding: 0.35rem !important;
+}
+
+@media (max-width: 720px) {
+  .search-bar {
+    flex: 1 1 100%;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .search-input-wrapper {
+    max-width: none;
+    min-width: 0;
+  }
+
+  .search-controls {
+    margin-left: 0;
+  }
 }
 </style>

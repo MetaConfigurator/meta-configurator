@@ -1,10 +1,14 @@
-import {readFileContentToDataLink} from '@/utility/readFileContent';
+import {readFileContentForFunction, readFileContentToDataLink} from '@/utility/readFileContent';
 import {getDataForMode} from '@/data/useDataLink';
 import type {ManagedData} from '@/data/managedData';
 import {SessionMode} from '@/store/sessionMode';
 import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
+import {updateSettingsWithDefaults} from '@/settings/settingsUpdater';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
-const uploadDataFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .xml, .schema.json');
+const uploadDataFileDialog = createLazySingleFileDialog('.json, .yaml, .yml');
+const uploadSchemaFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .schema.json');
+const uploadSettingsFileDialog = createLazySingleFileDialog('.json, .yaml, .yml');
 
 /**
  * Opens a file dialog to select a file to upload.
@@ -12,7 +16,9 @@ const uploadDataFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .xm
  * @param resultDataLink The DataLink to which the file content should be written
  */
 export function openUploadFileDialog(resultDataLink: ManagedData): void {
-  uploadDataFileDialog.openForSelection(files => {
+  const fileDialog =
+    resultDataLink.mode === SessionMode.DataEditor ? uploadDataFileDialog : uploadSchemaFileDialog;
+  fileDialog.openForSelection(files => {
     readFileContentToDataLink(files, resultDataLink);
   });
 }
@@ -22,4 +28,18 @@ export function openUploadFileDialog(resultDataLink: ManagedData): void {
  */
 export function openUploadSchemaDialog(): void {
   return openUploadFileDialog(getDataForMode(SessionMode.SchemaEditor));
+}
+
+/**
+ * Opens a file dialog to select a settings file to upload.
+ */
+export function openUploadSettingsDialog(): void {
+  uploadSettingsFileDialog.openForSelection(files => {
+    readFileContentForFunction(files, settings => {
+      const defaultSettings: any = structuredClone(SETTINGS_DATA_DEFAULT);
+      getDataForMode(SessionMode.Settings).setData(
+        updateSettingsWithDefaults(settings, defaultSettings)
+      );
+    });
+  });
 }

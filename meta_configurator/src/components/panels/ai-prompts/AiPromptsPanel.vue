@@ -22,7 +22,7 @@ const props = defineProps<{
       :sessionMode="props.sessionMode">
       <p>
         Use AI to create or modify the current document. Supports any OpenAI-compatible provider —
-        configure your endpoint and model in the settings below.
+        configure your backend connection, endpoint, and model in the settings below.
       </p>
       <br />
       <ApiKey />

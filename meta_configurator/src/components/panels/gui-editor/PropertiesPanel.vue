@@ -35,6 +35,7 @@ import {
   getValidationForMode,
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
+import {moveArrayItem} from '@/utility/moveArrayItem';
 import type {SessionMode} from '@/store/sessionMode';
 import _, {debounce} from 'lodash';
 import {replacePropertyNameUtils} from '@/utility/renameUtils';
@@ -82,15 +83,14 @@ watch(
     // if something else is selected, unselect the last clicked element
     lastClickedElement.value = [];
 
-    const absolutePath = session.currentSelectedElement.value;
-    const pathToCutOff = session.currentPath.value;
-    const relativePath = absolutePath.slice(pathToCutOff.length);
-    if (relativePath.length > 0) {
-      // cut off last element, because we want to expand until last element, but not expand children of last element
-      const relativePathToExpand = relativePath.slice(0, relativePath.length - 1);
-      expandElementsByPath(relativePathToExpand);
+    const wasExpanded = expandToSelectedElement();
+    scrollToPath(session.currentSelectedElement.value);
+    if (!wasExpanded) {
+      updateTree();
+      window.setTimeout(() => {
+        scrollToPath(session.currentSelectedElement.value);
+      }, 0);
     }
-    scrollToPath(absolutePath);
   },
   {deep: true}
 );
@@ -176,7 +176,8 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
   if (!node.leaf && node.type === TreeNodeType.SCHEMA_PROPERTY) {
     const userData = dataAt(nodePath, props.currentData);
     const isEmptyArray = Array.isArray(userData) && userData.length === 0;
-    const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
+    const isEmptyObject =
+      userData !== null && typeof userData === 'object' && Object.keys(userData).length === 0;
     if (userData === undefined || isEmptyArray || isEmptyObject) {
       const schema = node.data.schema;
       // expand empty arrays and objects with no predefined properties (will be expected to have addProperty button)
@@ -211,6 +212,9 @@ function updateTree(initial: boolean = false) {
     nodesToDisplay.value = determineNodesToDisplay(computeTree());
     if (initial) {
       expandEmptyArraysAndObjectsRecursively(currentTree.value!, props.currentPath);
+    }
+    if (!arePathsEqual(lastClickedElement.value, session.currentSelectedElement.value)) {
+      expandToSelectedElement();
     }
     loading.value = false;
   }, 0);
@@ -249,12 +253,45 @@ function updateData(subPath: Path, newValue: any) {
   updateTree();
 }
 
-function clickedPropertyData(nodeData: ConfigTreeNodeData) {
-  const path = nodeData.absolutePath;
-  if (data.dataAt(path) != undefined) {
-    lastClickedElement.value = path;
-    emit('select_path', path);
+function reorderArray(parentRelativePath: Path, fromIndex: number, toIndex: number) {
+  // read the live store rather than props.currentData: a value just committed via blur()
+  // (see onReorderKeydown) is written synchronously to the store but not yet to the prop
+  const parentData = data.dataAt(props.currentPath.concat(parentRelativePath));
+  if (!Array.isArray(parentData)) return;
+  if (toIndex < 0 || toIndex >= parentData.length || fromIndex === toIndex) return;
+  updateData(parentRelativePath, moveArrayItem(parentData, fromIndex, toIndex));
+}
+
+/**
+ * Alt+ArrowUp / Alt+ArrowDown (Option+Arrow on Mac) moves the selected array item up or down.
+ * Registered in the capture phase because the leaf input components stop arrow-key propagation
+ * (to keep the cursor out of the tree's row navigation), so a bubbling listener would never fire.
+ * The active item comes from the selection, which the value field sets on focus; focus follows
+ * the moved item so the shortcut can be repeated.
+ */
+function onReorderKeydown(event: KeyboardEvent) {
+  if (!event.altKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) {
+    return;
   }
+  const relativePath = session.currentSelectedElement.value.slice(props.currentPath.length);
+  const fromIndex = relativePath[relativePath.length - 1];
+  if (typeof fromIndex !== 'number') {
+    return;
+  }
+  event.preventDefault();
+  // commit an unconfirmed value in the focused field (e.g. a text field not yet blurred) so the
+  // move applies to the current field content, not the previously stored value
+  (document.activeElement as HTMLElement | null)?.blur();
+  const parentRelativePath = relativePath.slice(0, -1);
+  const toIndex = fromIndex + (event.key === 'ArrowUp' ? -1 : 1);
+  reorderArray(parentRelativePath, fromIndex, toIndex);
+  focusOnPath(props.currentPath.concat(parentRelativePath, toIndex));
+}
+
+function selectPropertyPath(nodeData: ConfigTreeNodeData) {
+  const path = nodeData.absolutePath;
+  lastClickedElement.value = path;
+  emit('select_path', path);
 }
 
 function removeProperty(subPath: Path) {
@@ -289,7 +326,16 @@ function updatePropertyName(subPath: Path, oldName: string, newName: string) {
 }
 
 function addItem(relativePath: Path, newValue: any) {
-  updateData(relativePath, newValue);
+  const parentPath = relativePath.slice(0, -1);
+  const parentData = dataAt(parentPath, props.currentData);
+  if (parentData !== undefined && !Array.isArray(parentData)) {
+    // the data does not contain an array at this path yet (e.g. the default empty object
+    // of a new document, or leftover data from an earlier schema): replace it with an
+    // array containing the new item. The old value can be restored via undo.
+    updateData(parentPath, [newValue]);
+  } else {
+    updateData(relativePath, newValue);
+  }
   updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
@@ -414,7 +460,12 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
 }
 
 function findNameForNewProperty(objectSchema: JsonSchemaWrapper | undefined, data: any) {
-  if (objectSchema === undefined || data === undefined) {
+  if (
+    objectSchema === undefined ||
+    data === null ||
+    typeof data !== 'object' ||
+    Array.isArray(data)
+  ) {
     return 'yourNewProperty';
   }
 
@@ -447,9 +498,26 @@ function displayAsRegularProperty(node: any) {
   );
 }
 
-function expandElementsByPath(relativePath: Path) {
+function expandToSelectedElement(): boolean {
+  const absolutePath = session.currentSelectedElement.value;
+  const pathToCutOff = session.currentPath.value;
+  const relativePath = absolutePath.slice(pathToCutOff.length);
+  if (relativePath.length === 0) {
+    return true;
+  }
+
+  const selectedSchema = props.currentSchema.subSchemaAt(relativePath);
+  const selectedNodeIsExpandable =
+    selectedSchema?.hasType('object') || selectedSchema?.hasType('array');
+  const relativePathToExpand = selectedNodeIsExpandable
+    ? relativePath
+    : relativePath.slice(0, relativePath.length - 1);
+  return expandElementsByPath(relativePathToExpand);
+}
+
+function expandElementsByPath(relativePath: Path): boolean {
   if (relativePath.length == 0) {
-    return;
+    return true;
   }
 
   let currentNode = currentTree.value;
@@ -472,15 +540,14 @@ function expandElementsByPath(relativePath: Path) {
       }
     }
     if (childNodeToExpand === undefined) {
-      break;
+      return false;
     }
 
     expandElementChildren(childNodeToExpand);
     session.expand([childNodeToExpand.key!]);
-
-    // update current node, so the next iteration which is one level deeper will use this node to search next child
     currentNode = childNodeToExpand;
   }
+  return true;
 }
 
 function scrollToPath(absolutePath: Path) {
@@ -553,6 +620,10 @@ function zoomIntoPath(path: Path) {
   overlayShowScheduled.value = false;
   emit('zoom_into_path', path);
 }
+
+function isNodeHighlighted(node: GuiEditorTreeNode) {
+  return node.type !== TreeNodeType.ADVANCED_PROPERTY && session.isNodeHighlighted(node);
+}
 </script>
 
 <template>
@@ -570,6 +641,7 @@ function zoomIntoPath(path: Path) {
     :loading="loadingDebounced"
     v-model:expandedKeys="session.currentExpandedElements.value"
     @nodeExpand="expandElementChildren"
+    @keydown.capture="onReorderKeydown"
     :filters="treeTableFilters">
     <Column field="name" :header="tableHeader" expander>
       <template #body="slotProps">
@@ -578,15 +650,17 @@ function zoomIntoPath(path: Path) {
           v-if="displayAsRegularProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
-          @mouseenter="event => showInfoOverlayPanel(slotProps.node.data, event)"
-          @mouseleave="closeInfoOverlayPanel">
+          :class="{'bg-yellow-50 rounded-sm': isNodeHighlighted(slotProps.node)}">
           <PropertyMetadata
             :sessionMode="props.sessionMode"
             :validationResults="getValidationResults(slotProps.node.data.absolutePath)"
             :node="slotProps.node"
             :type="slotProps.node.type"
-            :highlighted="session.isNodeHighlighted(slotProps.node)"
+            :highlighted="isNodeHighlighted(slotProps.node)"
+            @hover_metadata="event => showInfoOverlayPanel(slotProps.node.data, event)"
+            @unhover_metadata="closeInfoOverlayPanel"
             @zoom_into_path="zoomIntoPath"
+            @reorder_array="reorderArray"
             @update_property_name="
               (oldName, newName) =>
                 updatePropertyName(slotProps.node.data.relativePath, oldName, newName)
@@ -597,7 +671,11 @@ function zoomIntoPath(path: Path) {
         </span>
 
         <!-- data nodes, actual edit fields for the data -->
-        <span v-if="displayAsRegularProperty(slotProps.node)" style="max-width: 47%" class="w-full">
+        <span
+          v-if="displayAsRegularProperty(slotProps.node)"
+          style="max-width: 47%"
+          class="w-full"
+          :class="{'bg-yellow-50 rounded-sm': isNodeHighlighted(slotProps.node)}">
           <PropertyData
             class="w-full"
             :nodeData="slotProps.node.data"
@@ -605,7 +683,8 @@ function zoomIntoPath(path: Path) {
             @update_property_value="updateData"
             @remove_property="removeProperty"
             @update_tree="updateTree"
-            @click="() => clickedPropertyData(slotProps.node.data)"
+            @click="() => selectPropertyPath(slotProps.node.data)"
+            @focusin="() => selectPropertyPath(slotProps.node.data)"
             bodyClass="w-full"
             @keydown.ctrl.i="
               (event: KeyboardEvent) => showInfoOverlayPanelInstantly(slotProps.node.data, event)
@@ -621,7 +700,9 @@ function zoomIntoPath(path: Path) {
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
           @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
           @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)"
-          :data-testid="'add-item-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="
+            'add-item-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0, -1))
+          ">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{ slotProps.node.data.label }}</span>
@@ -639,7 +720,7 @@ function zoomIntoPath(path: Path) {
           @keyup.enter="
             addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
           "
-          :data-testid="'add-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="'add-property-' + pathToString(slotProps.node.data.absolutePath as Path)">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{
@@ -653,7 +734,10 @@ function zoomIntoPath(path: Path) {
           class="text-gray-500"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
-          :data-testid="'advanced-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="
+            'advanced-property-' +
+            pathToString((slotProps.node.data.absolutePath as Path).slice(0, -1))
+          ">
           Advanced
         </span>
         <span

@@ -12,11 +12,11 @@ Resolving References in the Schema Tab
 
 In the menu bar of the schema tab, there is a set of `utility` options for resolving all references or bundling a whole schema, as well as an inverse option (extract all inlined schema elements into definitions and replace them with references).
 
-![Reference Utilities](./ref_utility.png)
+![Reference Utilities](./figs/ref_utility.png)
 
 Furthermore, the schema diagram visualizes external references as nodes with a blue color frame and provides a button to resolve the reference directly in the diagram.
 
-![Reference in Diagram](./ref_diagram.png)
+![Reference in Diagram](./figs/ref_diagram.png)
 
 Dealing with Cyclic References
 ------------------------------

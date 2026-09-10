@@ -11,15 +11,27 @@ Demonstration and Introduction video from the Allotrope Connect Workshop 2025 (c
 
 ## Requirements
 
-To use the AI-assisted features, you need to have an OpenAI API key (or API key of another LLM endpoint provider). 
-You can obtain an API key by signing up on the [OpenAI website](https://platform.openai.com/signup/).
+By default, MetaConfigurator uses the public **Uni Stuttgart Relay**, which forwards to
+**Helmholtz Blablador**. In that default setup, no browser API key is required.
+Availability is best-effort and cannot be guaranteed.
+
+If you switch to a direct provider connection, you need an API key from that LLM provider
+(for example from [OpenAI](https://platform.openai.com/signup/)).
 
 ## Endpoint Configuration
 
 To configure the LLM endpoint, open an AI-assisted feature (e.g., `Show AI Prompts View` button in the top menu bar) and expand the expandable/collapsible dialog.
 Here, you can enter your API key and select the desired LLM endpoint (e.g., OpenAI GPT-4, Perplexity, or a custom endpoint) and other parameters.
 
-<img alt="AI Endpoint Configuration" src="ai_settings.png" width="400"/>
+The AI Endpoint Settings support three connection modes:
+
+- **Uni Stuttgart Relay / HTTPS Relay**: use the default public relay or any other HTTPS MetaConfigurator relay.
+- **Direct Endpoint**: connect straight from the browser to an LLM endpoint. This only works if that endpoint allows CORS requests.
+- **HTTP Relay**: local HTTP-only variant for development.
+
+If you want to self-host a relay, see [`backend/relay/README.md`](../../../backend/relay/README.md).
+
+<img alt="AI Endpoint Configuration" src="figs/ai_settings.png" width="400"/>
 
 ## How to Use AI Assistance
 
@@ -28,11 +40,17 @@ Here, you can enter your API key and select the desired LLM endpoint (e.g., Open
 Open the AI Prompts View by clicking the `Show AI Prompts View` button in the top menu bar.
 Now you can enter prompts to create or edit schemas using natural language.
 
-### Schema Mapping and Data Transformation
+### Data Import
+
+In the `Data` tab, click `Open / Import Data...` -> `Advanced Data Import...`.
+Depending on the input format, AI can generate a JavaScript conversion function, map the parsed data onto the current schema, or convert the whole document directly.
+See [Data Import](../data_import) for the import modes and when to use which.
+
+### Data to Schema Mapping
 
 In the `Data` tab, click `Utility...` -> `Transform Data to match the Schema...`.
-This will open a dialog to generate a mapping configuration to map the current data to the target schema using AI.
-The generated mapping configuration can be reviewed and adjusted before applying it to transform the data.
+This generates a reusable mapping function (JSONata or JavaScript) that converts the current data to the target schema, or applies the transformation directly.
+See [Data to Schema Mapping](../data_to_schema_mapping) for the available methods and options.
 
 ### Data Transformation to other Formats
 

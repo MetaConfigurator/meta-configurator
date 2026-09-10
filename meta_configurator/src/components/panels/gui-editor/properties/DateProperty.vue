@@ -4,12 +4,12 @@ import {ref, watch} from 'vue';
 import DatePicker from 'primevue/datepicker';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {PathElement} from '@/utility/path';
-import type {ValidationResult} from '@/schema/validationService';
+import type {ValidationResult} from '@/schema/validationUtils';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
 
 const props = defineProps<{
   propertyName: PathElement;
-  propertyData: string | undefined;
+  propertyData: unknown;
   propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
@@ -19,23 +19,30 @@ const emit = defineEmits<{
 }>();
 
 // convert string to Date for the picker
-const dateValue = ref<Date | undefined>(
-  props.propertyData ? new Date(props.propertyData) : undefined
-);
+const dateValue = ref<Date | undefined>(parseDate(props.propertyData));
 
 watch(
   () => props.propertyData,
   newVal => {
-    dateValue.value = newVal ? new Date(newVal) : undefined;
+    dateValue.value = parseDate(newVal);
   }
 );
 
-function updateValue(newDate: Date | undefined) {
-  if (!newDate) {
+function parseDate(value: unknown): Date | undefined {
+  if (typeof value !== 'string' || value.length === 0) {
+    return undefined;
+  }
+  const parsedDate = new Date(value);
+  return Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate;
+}
+
+function updateValue(value: Date | (Date | null)[] | Date[] | null | undefined) {
+  // DatePicker is used in single-date mode here, so we only handle a single Date (or empty).
+  const newDate = value instanceof Date ? value : undefined;
+  if (!newDate || Number.isNaN(newDate.getTime())) {
     emit('update:propertyData', undefined);
     return;
   }
-  // convert Date back to ISO date string (YYYY-MM-DD)
   const isoString = newDate.toISOString().split('T')[0];
   emit('update:propertyData', isoString);
 }

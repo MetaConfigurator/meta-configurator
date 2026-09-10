@@ -32,7 +32,7 @@ const sessionList: ManagedSession[] = [
 
 const validationList: ManagedValidation[] = [
   new ManagedValidation(SessionMode.DataEditor),
-  new ManagedValidation(SessionMode.SchemaEditor),
+  new ManagedValidation(SessionMode.SchemaEditor, schemaSource.fullMetaSchemaData),
   new ManagedValidation(SessionMode.Settings),
 ];
 

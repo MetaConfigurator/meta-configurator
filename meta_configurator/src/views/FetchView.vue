@@ -4,8 +4,7 @@ import {onMounted, ref} from 'vue';
 import {useSessionStore} from '@/store/sessionStore';
 import {restoreSnapshot} from '@/utility/backend/backendApi';
 import {getDataForMode} from '@/data/useDataLink';
-import {SessionMode} from '@/store/sessionMode';
-import {useSettings} from '@/settings/useSettings';
+import {SessionMode, documentTypeDescriptionToMode, modeToRoute} from '@/store/sessionMode';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
 import {updateSettingsWithDefaults, overwriteSettings} from '@/settings/settingsUpdater';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
@@ -13,7 +12,7 @@ import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 defineProps({settings_url: String});
 
 const sessionStore = useSessionStore();
-const settings = useSettings();
+const settingsData = getDataForMode(SessionMode.Settings);
 
 // Track all asynchronous tasks
 const settingsFetched = ref(true); // default true unless overridden
@@ -22,14 +21,21 @@ const dataFetched = ref(true);
 const snapshotFetched = ref(true);
 
 onMounted(() => {
-  const userSettings = getDataForMode(SessionMode.Settings).data.value;
+  const userSettings = settingsData.data.value;
   const defaultSettings: any = structuredClone(SETTINGS_DATA_DEFAULT);
   updateSettingsWithDefaults(userSettings, defaultSettings);
+  settingsData.setData(userSettings);
 
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
   let usesCustomSettings = false;
   let skipSchemaDialog = false;
+  let targetMode: SessionMode = SessionMode.DataEditor;
+
+  // MODE — explicit query param overrides everything else (lowest priority is the default 'data').
+  if ('mode' in query) {
+    targetMode = documentTypeDescriptionToMode(query.mode);
+  }
 
   // SETTINGS
   if ('settings' in query) {
@@ -39,8 +45,9 @@ onMounted(() => {
     fetchExternalContent(settingsUrl)
       .then(res => res.json())
       .then(json => {
-        const userSettings = getDataForMode(SessionMode.Settings).data.value;
+        const userSettings = settingsData.data.value;
         overwriteSettings(userSettings, json);
+        settingsData.setData(userSettings);
       })
       .finally(() => (settingsFetched.value = true));
   }
@@ -76,7 +83,12 @@ onMounted(() => {
     const snapshotId = query.snapshot as string;
     usesCustomSettings = true;
     skipSchemaDialog = true;
-    restoreSnapshot(snapshotId).finally(() => (snapshotFetched.value = true));
+    restoreSnapshot(snapshotId)
+      .then(mode => {
+        // Explicit ?mode= in the URL wins over the snapshot's stored mode.
+        if (!('mode' in query)) targetMode = mode;
+      })
+      .finally(() => (snapshotFetched.value = true));
   }
 
   // PROJECT
@@ -85,14 +97,18 @@ onMounted(() => {
     const projectId = query.project as string;
     usesCustomSettings = true;
     skipSchemaDialog = true;
-    restoreSnapshot(projectId, true).finally(() => (snapshotFetched.value = true));
+    restoreSnapshot(projectId, true)
+      .then(mode => {
+        if (!('mode' in query)) targetMode = mode;
+      })
+      .finally(() => (snapshotFetched.value = true));
   }
 
   // Default settings fallback
   if (!usesCustomSettings) {
-    settings.value.hideSettings = false;
-    settings.value.hideSchemaEditor = false;
-    settings.value.toolbarTitle = 'MetaConfigurator';
+    settingsData.setDataAt(['hideSettings'], false);
+    settingsData.setDataAt(['hideSchemaEditor'], false);
+    settingsData.setDataAt(['toolbarTitle'], 'MetaConfigurator');
   }
 
   if (skipSchemaDialog) {
@@ -124,7 +140,7 @@ onMounted(() => {
     });
 
   waitForAllOrTimeout().then(() => {
-    useAppRouter().push('/data');
+    useAppRouter().push(modeToRoute(targetMode));
   });
 });
 </script>

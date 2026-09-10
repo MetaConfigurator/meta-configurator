@@ -49,6 +49,8 @@ const isExperimental = __APP_EXPERIMENTAL__;
     <p>Institute for Visualization and Interactive Systems, University of Stuttgart</p>
     <p>Universitätsstrasse 38D, 70569 Stuttgart, Germany</p>
     <hr class="my-2" />
+    <p>Logo by Devesh Harshad Talsania</p>
+    <hr class="my-2" />
     <p>Icons by FontAwesome <FontAwesomeIcon icon="fa-solid fa-font-awesome" /></p>
     <p>
       Licensed under

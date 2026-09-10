@@ -1,6 +1,6 @@
 import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import pointer from 'json-pointer';
-import {nonBooleanSchema} from '@/schema/schemaProcessingUtils';
+import {nonBooleanSchema} from '@/schema/schemaTypeUtils';
 import {areSchemasCompatible, mergeAllOfs, safeMergeSchemas} from '@/schema/mergeAllOfs';
 import {SessionMode} from '@/store/sessionMode';
 import {getSchemaForMode} from '@/data/useDataLink';

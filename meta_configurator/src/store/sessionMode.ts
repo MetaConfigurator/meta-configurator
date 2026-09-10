@@ -36,3 +36,14 @@ export function modeToRoute(mode: SessionMode): string {
       return '/settings';
   }
 }
+
+export function documentTypeDescriptionToMode(value: unknown): SessionMode {
+  switch (value) {
+    case 'schema':
+      return SessionMode.SchemaEditor;
+    case 'settings':
+      return SessionMode.Settings;
+    default:
+      return SessionMode.DataEditor;
+  }
+}

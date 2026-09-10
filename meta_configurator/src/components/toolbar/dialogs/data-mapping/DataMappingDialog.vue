@@ -1,217 +1,68 @@
 <script setup lang="ts">
-import {ref, computed, watch, type Ref, onMounted, nextTick} from 'vue';
+import {reactive} from 'vue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import Divider from 'primevue/divider';
 import Message from 'primevue/message';
+import Panel from 'primevue/panel';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
-import {SessionMode} from '@/store/sessionMode';
-import {getDataForMode} from '@/data/useDataLink';
-import {DataMappingServiceJsonata} from '@/data-mapping/jsonata/dataMappingServiceJsonata';
-import type {DataMappingService} from '@/data-mapping/dataMappingService';
-import type {Editor} from 'brace';
-import * as ace from 'brace';
-import {setupAceProperties} from '@/components/panels/shared-components/aceUtils';
-import {useSettings} from '@/settings/useSettings';
-import {useDebounceFn} from '@vueuse/core';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
-import {useErrorService} from '@/utility/errorServiceInstance';
+import SchemaRefinementOptions from '@/components/toolbar/dialogs/shared/SchemaRefinementOptions.vue';
+import {SessionMode} from '@/store/sessionMode';
+import {
+  MAPPING_LANGUAGE_OPTIONS,
+  MAPPING_METHOD_OPTIONS,
+  useDataMappingDialog,
+} from '@/components/toolbar/dialogs/data-mapping/useDataMappingDialog';
 
-const showDialog = ref(false);
-const editor_id = 'data-mapping-' + Math.random();
-const editorInitialized: Ref<boolean> = ref(false);
-const editor: Ref<Editor | null> = ref(null);
-const input = ref({});
-const result = ref('');
-const resultIsValid = ref(false);
-const statusMessage = ref('');
-const errorMessage = ref('');
-const userComments = ref('');
-const isLoadingMapping = ref(false);
+const dataMappingDialog = useDataMappingDialog();
+// reactive() unwraps the refs of the composable, so the template reads them as dialog.<name>
+const dialog = reactive(dataMappingDialog);
+// The template ref has to bind to the ref itself, which reactive() would unwrap.
+const refinementOptions = dataMappingDialog.refinementOptions;
 
-const settings = useSettings();
-
-const mappingServiceTypes = ['Advanced (JSONata)'];
-
-const mappingServiceWarnings = [
-  'The JSONata mapping service is very expressive flexible, but may generate invalid mappings for complex inputs, which have to manually be corrected.',
-];
-
-const selectedMappingServiceType: Ref<string> = ref(mappingServiceTypes[0]!);
-
-const mappingService = computed<DataMappingService>(() => {
-  if (selectedMappingServiceType.value === 'Advanced (JSONata)') {
-    return new DataMappingServiceJsonata();
-  }
-  // Add other mapping service types here
-  throw new Error('Invalid mapping service type');
-});
-
-const mappingServiceWarning = computed<string>(() => {
-  const index = mappingServiceTypes.indexOf(selectedMappingServiceType.value);
-  return mappingServiceWarnings[index] || '';
-});
-
-onMounted(() => {
-  // when a new result is generated: replace the editor content with it
-  watch(
-    () => result.value,
-    newValue => {
-      if (newValue.length > 0) {
-        editor.value = ace.edit(editor_id);
-        editor.value?.setValue(newValue, -1);
-      }
-    }
-  );
-});
-
-watch(showDialog, async visible => {
-  // when the dialog turns visible, initialize the editor
-  if (visible) {
-    await nextTick(); // Wait until dialog content is rendered
-    initializeEditor();
-
-    if (result.value.length > 0) {
-      editor.value?.setValue(result.value, -1);
-    }
-  }
-});
-
-function openDialog() {
-  // when the dialog is opened, reset old values and load the current input data into the component, sanitize it
-  resetDialog();
-  input.value = getDataForMode(SessionMode.DataEditor).data.value;
-  input.value = mappingService.value.sanitizeInputDocument(input.value);
-  showDialog.value = true;
-}
-
-function hideDialog() {
-  showDialog.value = false;
-}
-
-function resetDialog() {
-  statusMessage.value = '';
-  errorMessage.value = '';
-  userComments.value = '';
-  input.value = {};
-  result.value = '';
-  resultIsValid.value = false;
-}
-
-function initializeEditor() {
-  const container = document.getElementById(editor_id);
-
-  if (!container) {
-    console.log('Unable to initialize editor because element is not found.');
-    return;
-  }
-
-  // Destroy any existing editor if present
-  if (editor.value) {
-    editor.value.destroy();
-    editor.value.container.innerHTML = ''; // Clean up old editor DOM
-    editor.value = null;
-    editorInitialized.value = false;
-  }
-
-  editor.value = ace.edit(editor_id);
-  setupAceProperties(editor.value, settings.value);
-
-  editorInitialized.value = true;
-
-  editor.value.on(
-    'change',
-    useDebounceFn(() => {
-      const editorContent = editor.value?.getValue();
-      if (editorContent) {
-        validateConfig(editorContent, input.value);
-      }
-    }, 100)
-  );
-}
-
-function validateConfig(config: string, input: any) {
-  const validationResult = mappingService.value.validateMappingConfig(config, input);
-  if (!validationResult.success) {
-    errorMessage.value = validationResult.message;
-    statusMessage.value = '';
-    resultIsValid.value = false;
-  } else {
-    errorMessage.value = '';
-    resultIsValid.value = true;
-  }
-}
-
-function generateMappingSuggestion() {
-  isLoadingMapping.value = true;
-  const targetSchema = getDataForMode(SessionMode.SchemaEditor).data.value;
-  mappingService.value
-    .generateMappingSuggestion(input.value, targetSchema, userComments.value)
-    .then(res => {
-      result.value = res.config;
-      if (res.success) {
-        statusMessage.value = res.message;
-        errorMessage.value = '';
-      } else {
-        statusMessage.value = '';
-        errorMessage.value = res.message;
-      }
-      validateConfig(res.config, input.value);
-    })
-    .catch(error => {
-      useErrorService().onError(error);
-    })
-    .finally(() => {
-      isLoadingMapping.value = false;
-    });
-}
-
-function performMapping() {
-  const config = editor.value?.getValue();
-  if (!config) {
-    errorMessage.value = 'No mapping configuration available.';
-    statusMessage.value = '';
-    return;
-  }
-
-  mappingService.value.performDataMapping(input.value, config).then(res => {
-    if (res.success) {
-      statusMessage.value = res.message;
-      errorMessage.value = '';
-      // write the result data to the data editor
-      getDataForMode(SessionMode.DataEditor).setData(res.resultData);
-      hideDialog();
-    } else {
-      statusMessage.value = '';
-      errorMessage.value = res.message;
-    }
-  });
-}
-
-defineExpose({show: openDialog, close: hideDialog});
+defineExpose({show: dialog.openDialog, close: dialog.hideDialog});
 </script>
 
 <template>
   <Dialog
-    v-model:visible="showDialog"
+    v-model:visible="dialog.showDialog"
     header="Convert Data to Target Schema"
     :modal="true"
-    :style="{width: '50vw'}">
-    <div class="space-y-4">
+    :style="{width: '56rem', maxWidth: '95vw'}">
+    <div class="dialog-content">
       <PanelSettings
+        panel-name="API Key and AI Settings"
         panel-display-name="API Key and AI Settings"
         settings-header="AI Settings"
         :panel-settings-path="['aiIntegration']"
         :sessionMode="SessionMode.DataEditor">
         <ApiKey />
       </PanelSettings>
+
       <ApiKeyWarning />
 
-      <Message severity="warn" v-if="mappingServiceWarning.length">
-        <span v-html="mappingServiceWarning"></span>
+      <Message severity="info" :closable="false">
+        {{ dialog.mappingMethodNotice }}
+      </Message>
+
+      <Message v-if="dialog.mappingLanguageWarning.length" severity="warn" :closable="false">
+        {{ dialog.mappingLanguageWarning }}
+      </Message>
+
+      <Message v-if="!dialog.canUseAi" severity="info" :closable="false">
+        {{ dialog.apiKeyMessage }}
+      </Message>
+
+      <Message v-if="!dialog.hasCurrentData" severity="warn" :closable="false">
+        No data is currently loaded in the Data Editor. Load data first before converting it.
+      </Message>
+
+      <Message v-if="!dialog.hasTargetSchema" severity="warn" :closable="false">
+        No target schema is currently loaded in the Schema Editor.
       </Message>
 
       <p class="text-sm text-gray-700">
@@ -220,53 +71,125 @@ defineExpose({show: openDialog, close: hideDialog});
         below to guide the mapping.
       </p>
 
-      <div>
-        <label for="userComments" class="block font-semibold mb-1">Additional Mapping Hints</label>
+      <div class="field-group">
+        <label for="userComments" class="block font-semibold mb-1">
+          Additional Mapping Hints
+        </label>
         <InputText
           id="userComments"
-          v-model="userComments"
+          v-model="dialog.userComments"
           class="w-full"
           placeholder="e.g., rename fields, format dates..." />
       </div>
 
-      <div class="flex items-center gap-2">
-        <label class="font-semibold">Mapping Method</label>
+      <div class="field-group">
+        <label class="block font-semibold mb-1">Mapping Method</label>
         <Select
-          v-model="selectedMappingServiceType"
-          :options="mappingServiceTypes"
-          class="flex-1" />
+          v-model="dialog.selectedMappingMethod"
+          :options="MAPPING_METHOD_OPTIONS"
+          option-label="label"
+          option-value="value"
+          class="w-full" />
       </div>
 
-      <Button
-        label="Generate Suggestion"
-        icon="pi pi-wand"
-        @click="generateMappingSuggestion"
-        class="w-full"
-        :loading="isLoadingMapping" />
+      <div v-if="dialog.usesMappingFunction" class="field-group">
+        <label class="block font-semibold mb-1">Mapping Language</label>
+        <Select
+          v-model="dialog.selectedMappingLanguage"
+          :options="MAPPING_LANGUAGE_OPTIONS"
+          option-label="label"
+          option-value="value"
+          class="w-full" />
+      </div>
 
-      <div class="mt-6">
+      <Panel
+        v-if="dialog.usesInferredSourceSchema"
+        header="Source Schema Inference Options"
+        toggleable
+        :collapsed="true"
+        data-testid="source-schema-inference-options">
+        <SchemaRefinementOptions
+          ref="refinementOptions"
+          id-prefix="mapping-inferred-source-schema"
+          :show-data-independent-steps="false"
+          data-dependent-steps-enabled-by-default
+          add-examples-description="Add real example values from the current input data to the locally inferred source schema before it is sent to the LLM." />
+      </Panel>
+
+      <Button
+        v-if="dialog.usesMappingFunction"
+        :label="dialog.suggestionButtonLabel"
+        icon="pi pi-wand"
+        @click="dialog.generateMappingSuggestion"
+        class="w-full"
+        :loading="dialog.isLoadingMapping"
+        :disabled="dialog.isMappingActionDisabled" />
+
+      <Button
+        v-else
+        label="Execute AI Mapping"
+        icon="pi pi-play"
+        @click="dialog.executeDirectAiMapping"
+        class="w-full"
+        :loading="dialog.isLoadingMapping"
+        :disabled="dialog.isMappingActionDisabled" />
+
+      <div v-show="dialog.usesMappingFunction" class="mapping-editor-section">
         <Divider />
-        <label :for="editor_id" class="block font-semibold mb-2">Mapping Configuration</label>
-        <div class="border rounded h-72 overflow-hidden">
-          <div :id="editor_id" class="h-full w-full" />
+        <label :for="dialog.editorElementId" class="block font-semibold mb-2"
+          >Mapping Function</label
+        >
+        <div class="editor-wrapper">
+          <div :id="dialog.editorElementId" class="editor-surface" />
         </div>
         <Button
-          v-if="resultIsValid"
+          v-if="dialog.mappingConfigurationIsValid"
           label="Perform Mapping"
           icon="pi pi-play"
           class="mt-4 w-full"
-          @click="performMapping" />
+          @click="dialog.performMapping" />
       </div>
 
-      <Message severity="info" v-if="statusMessage.length">{{ statusMessage }}</Message>
-      <Message severity="error" v-if="errorMessage.length">
-        <span v-html="errorMessage"></span>
+      <Message severity="info" v-if="dialog.statusMessage.length">{{
+        dialog.statusMessage
+      }}</Message>
+      <Message severity="error" v-if="dialog.errorMessage.length">
+        {{ dialog.errorMessage }}
       </Message>
     </div>
   </Dialog>
 </template>
 
 <style scoped>
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mapping-editor-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-wrapper {
+  border: 1px solid var(--surface-border);
+  border-radius: var(--content-border-radius);
+  height: 18rem;
+  overflow: hidden;
+}
+
+.editor-surface {
+  width: 100%;
+  height: 100%;
+}
+
 label {
   font-size: 0.9rem;
 }

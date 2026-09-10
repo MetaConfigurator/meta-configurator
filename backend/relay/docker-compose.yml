@@ -1,0 +1,21 @@
+# Local Docker deployment of the relay (no HTTPS, no reverse proxy).
+#
+# Reachable at http://localhost:${RELAY_PORT:-8080}.
+#
+# For the HTTPS variant see docker-compose.https.yml.
+# For the multi-service joint deployment see ../docker-compose.yml.
+#
+# Deploy:
+#   cp config.example.yaml config.yaml  # then fill in api_keys / relay_password
+#   docker compose up -d --build
+#   curl http://localhost:8080/health   # → {"endpoints":..., "ok":true}
+
+services:
+  relay:
+    container_name: relay
+    build: .
+    ports:
+      - "${RELAY_PORT:-8080}:8080"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    restart: unless-stopped

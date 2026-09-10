@@ -1,0 +1,74 @@
+# Standalone HTTPS deployment of the relay.
+#
+# Brings up the relay behind its own nginx reverse proxy with automatic
+# Let's Encrypt certificates. Useful for hosting only the relay on its own
+# server / hostname. For the multi-service joint deployment see
+# ../docker-compose.yml — the joint stack puts the relay behind the shared
+# nginx-proxy at /relay/.
+#
+# Required env vars (load from .env next to this file):
+#   RELAY_HOSTNAME     public hostname for this relay
+#                      (e.g. relay.metaconfigurator.informatik.uni-stuttgart.de)
+#   LETSENCRYPT_EMAIL  contact email for Let's Encrypt
+#
+# Deploy:
+#   cp config.example.yaml config.yaml          # then fill in api_keys / relay_password
+#   cp .env.example .env                        # then set RELAY_HOSTNAME, LETSENCRYPT_EMAIL
+#   docker compose -f docker-compose.https.yml up -d --build
+
+services:
+
+  relay:
+    container_name: relay
+    build: .
+    expose:
+      - "8080"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    restart: unless-stopped
+    networks:
+      - relay-network
+    environment:
+      VIRTUAL_HOST: ${RELAY_HOSTNAME:?RELAY_HOSTNAME is not set}
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: ${RELAY_HOSTNAME:?RELAY_HOSTNAME is not set}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:latest
+    container_name: relay-nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - relay-network
+    restart: unless-stopped
+
+  letsencrypt:
+    image: nginxproxy/acme-companion:latest
+    container_name: relay-nginx-letsencrypt
+    depends_on:
+      - nginx-proxy
+    environment:
+      NGINX_PROXY_CONTAINER: relay-nginx-proxy
+      DEFAULT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is not set}
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/vhost.d
+      - acme-challenges:/usr/share/nginx/html
+    networks:
+      - relay-network
+    restart: unless-stopped
+
+networks:
+  relay-network:
+    driver: bridge
+
+volumes:
+  acme-challenges:

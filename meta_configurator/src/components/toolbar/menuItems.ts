@@ -1,7 +1,6 @@
-import {openUploadFileDialog} from '@/components/toolbar/uploadFile';
+import {openUploadFileDialog, openUploadSettingsDialog} from '@/components/toolbar/uploadFile';
 import {downloadFile} from '@/components/toolbar/downloadFile';
 import {clearCurrentFile} from '@/components/toolbar/clearFile';
-import {useSessionStore} from '@/store/sessionStore';
 import {openGenerateDataDialog} from '@/components/toolbar/createSampleData';
 import {getDataForMode, useCurrentData} from '@/data/useDataLink';
 import {useDataSource} from '@/data/dataSource';
@@ -14,118 +13,140 @@ import {openImportSchemaDialog} from '@/components/toolbar/importFile';
 import {extractInlinedSchemaDefinitions} from '@/components/toolbar/extractSchemaDefinitions';
 import {resolveSchemaReferences} from '@/components/toolbar/resolveSchemaReferences.ts';
 import {bundleSchema} from '@/components/toolbar/bundleSchema.ts';
+import {sortSchemaPropertiesAlphabeticallyAction} from '@/components/toolbar/sortSchemaProperties.ts';
+import {hasJsonContent} from '@/utility/hasJsonContent';
 
-/**
- * Helper class that contains the menu items for the top menu bar.
- */
+function hasData(): boolean {
+  return hasJsonContent(getDataForMode(SessionMode.DataEditor).data.value);
+}
+
+function hasSchema(): boolean {
+  return hasJsonContent(getDataForMode(SessionMode.SchemaEditor).data.value);
+}
+
+/** The dialog-opening callbacks the menu entries trigger, owned by the toolbar component. */
+export type MenuItemDialogActions = {
+  showSchemaSelectionDialog: () => void;
+  showImportCsvDialog: () => void;
+  showSnapshotDialog: () => void;
+  showCodeGenerationDialog: (schemaMode: boolean) => void;
+  showDataExportDialog: (schemaMode: boolean) => void;
+  showDataMappingDialog: () => void;
+  showDataImportAiDialog: () => void;
+  showInferSchemaDialog: () => void;
+  showRmlMappingDialog: () => void;
+  showImportTurtleDialog: () => void;
+  showImportXmlDialog: () => void;
+  showXmlExportDialog: () => void;
+  showImportSchemaDialog: () => void;
+  showExportSchemaDialog: () => void;
+  showRefineSchemaDialog: () => void;
+};
+
+/** Provides the menu items for the top menu bar. */
 export class MenuItems {
-  sessionStore = useSessionStore();
-
-  private readonly showSchemaSelectionDialog: () => void;
-  private readonly showImportCsvDialog: () => void;
-  private readonly showSnapshotDialog: () => void;
-  private readonly showCodeGenerationDialog: (schemaMode: boolean) => void;
-  private readonly showDataExportDialog: (schemaMode: boolean) => void;
-  private readonly showDataMappingDialog: () => void;
-  private readonly inferJsonSchemaFromSampleData: () => void;
-  private readonly showRMLMappingDialog: () => void;
-  private readonly showImportTurtleDialog: () => void;
-
-  constructor(
-    showSchemaSelectionDialog: () => void,
-    showImportCsvDialog: () => void,
-    showSnapshotDialog: () => void,
-    showCodeGenerationDialog: (schemaMode: boolean) => void,
-    showDataExportDialog: (schemaMode: boolean) => void,
-    showDataMappingDialog: () => void,
-    inferJsonSchemaFromSampleData: () => void,
-    showRMLMappingDialog: () => void,
-    showImportTurtleDialog: () => void
-  ) {
-    this.showSchemaSelectionDialog = showSchemaSelectionDialog;
-    this.showImportCsvDialog = showImportCsvDialog;
-    this.showSnapshotDialog = showSnapshotDialog;
-    this.showCodeGenerationDialog = showCodeGenerationDialog;
-    this.showDataExportDialog = showDataExportDialog;
-    this.showDataMappingDialog = showDataMappingDialog;
-    this.inferJsonSchemaFromSampleData = inferJsonSchemaFromSampleData;
-    this.showRMLMappingDialog = showRMLMappingDialog;
-    this.showImportTurtleDialog = showImportTurtleDialog;
-  }
+  constructor(private readonly dialogActions: MenuItemDialogActions) {}
 
   public getDataEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
     let result: MenuItem[] = [
       {
-        label: 'New Data...',
+        label: 'New Data / Generate Data...',
         icon: 'fa-regular fa-file',
         items: [
           {
             label: 'Clear Data',
             icon: 'fa-regular fa-file',
             command: clearCurrentFile,
+            disabled: () => !hasData(),
           },
           {
             label: 'Generate Data...',
             icon: 'fa-solid fa-gears',
             command: openGenerateDataDialog,
+            disabled: () => !hasSchema(),
           },
         ],
       },
       {
-        label: 'Open Data',
-        icon: 'fa-regular fa-folder-open',
-        command: () => openUploadFileDialog(getDataForMode(SessionMode.DataEditor)),
-      },
-      {
-        label: 'Import Data...',
+        label: 'Open / Import Data...',
         key: 'import-data',
-        icon: 'fa-solid fa-file-import',
+        icon: 'fa-regular fa-folder-open',
         items: [
+          {
+            label: 'Open JSON/YAML Data',
+            icon: 'fa-solid fa-folder-open',
+            command: () => openUploadFileDialog(getDataForMode(SessionMode.DataEditor)),
+          },
           {
             label: 'Import CSV Data',
             icon: 'fa-solid fa-table',
-            command: this.showImportCsvDialog,
+            command: this.dialogActions.showImportCsvDialog,
           },
           {
             label: 'Import Turtle Data',
             icon: 'fa-solid fa-globe',
-            command: this.showImportTurtleDialog,
+            command: this.dialogActions.showImportTurtleDialog,
+          },
+          {
+            label: 'Import XML Data',
+            icon: 'fa-solid fa-file-code',
+            command: this.dialogActions.showImportXmlDialog,
+          },
+          {
+            label: 'Advanced Data Import...',
+            icon: 'fa-solid fa-robot',
+            command: this.dialogActions.showDataImportAiDialog,
           },
         ],
       },
       {
-        label: 'Download Data',
-        icon: 'fa-solid fa-download',
-        command: () =>
-          downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
+        label: 'Export Data...',
+        icon: 'fa-solid fa-file-export',
+        disabled: () => !hasData(),
+        items: [
+          {
+            label: 'Download JSON/YAML Data',
+            icon: 'fa-solid fa-download',
+            command: () =>
+              downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', false),
+          },
+          {
+            label: 'Export to XML',
+            icon: 'fa-solid fa-file-code',
+            command: this.dialogActions.showXmlExportDialog,
+          },
+        ],
       },
       {
         label: 'Utility...',
         icon: 'fa-solid fa-wrench',
         key: 'utility',
+        disabled: () => !hasData(),
         items: [
           {
             label: 'Transform Data to match the Schema...',
             icon: 'fa-solid fa-wand-magic-sparkles',
-            command: this.showDataMappingDialog,
+            command: this.dialogActions.showDataMappingDialog,
+            disabled: () => !hasSchema(),
           },
           {
             label: 'Export Data via Text Template...',
             icon: 'fa-solid fa-file-export',
-            command: () => this.showDataExportDialog(false),
+            command: () => this.dialogActions.showDataExportDialog(false),
           },
           {
             label: 'Transform JSON Data to JSON-LD',
             icon: 'fa-solid fa-gears',
-            command: this.showRMLMappingDialog,
+            command: this.dialogActions.showRmlMappingDialog,
           },
         ],
       },
       {
         label: 'Share Snapshot...',
         icon: 'fa-solid fa-share',
-        command: this.showSnapshotDialog,
+        command: this.dialogActions.showSnapshotDialog,
         key: 'snapshot',
+        disabled: () => !hasData() && !hasSchema(),
       },
       {
         separator: true,
@@ -152,8 +173,7 @@ export class MenuItems {
 
     if (settings.panels.hidden.includes('aiPrompts')) {
       result = result.filter(menuItem => {
-        // exclude the "Utility" menu item
-        return !(menuItem.label === 'Utility');
+        return menuItem.key !== 'utility';
       });
     }
 
@@ -163,47 +183,73 @@ export class MenuItems {
   }
 
   public getSchemaEditorMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-    let result: MenuItem[] = [
+    const result: MenuItem[] = [
       {
-        label: 'New Schema...',
+        label: 'New Schema / Infer Schema...',
         icon: 'fa-regular fa-file',
+        key: 'new-schema',
         items: [
           {
-            label: 'New empty Schema',
+            label: 'Clear Schema',
             icon: 'fa-regular fa-file',
             command: clearCurrentFile,
+            key: 'clear-schema',
+            disabled: () => !hasSchema(),
           },
           {
-            label: 'Infer Schema from Data',
+            label: 'Infer Schema from Data...',
             icon: 'fa-solid fa-wand-magic-sparkles',
-            command: this.inferJsonSchemaFromSampleData,
+            command: this.dialogActions.showInferSchemaDialog,
+            disabled: () => !hasData(),
           },
         ],
       },
       {
-        label: 'Open JSON Schema...',
+        label: 'Open / Import Schema...',
         icon: 'fa-regular fa-folder-open',
-        command: () => this.showSchemaSelectionDialog(),
-      },
-      {
-        label: 'Insert Schema...',
-        icon: 'fa-solid fa-file-import',
+        key: 'open-import-infer-schema',
         items: [
           {
-            label: 'JSON Schema',
+            label: 'Open Schema...',
+            icon: 'fa-solid fa-folder-open',
+            command: () => this.dialogActions.showSchemaSelectionDialog(),
+          },
+          {
+            label: 'Insert JSON Schema...',
+            icon: 'fa-solid fa-file-import',
             command: openImportSchemaDialog,
+          },
+          {
+            label: 'Import Schema from another format...',
+            icon: 'fa-solid fa-file-arrow-down',
+            command: this.dialogActions.showImportSchemaDialog,
           },
         ],
       },
       {
-        label: 'Download Schema',
-        icon: 'fa-solid fa-download',
-        command: () => downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
+        label: 'Export Schema...',
+        icon: 'fa-solid fa-file-export',
+        key: 'export-schema',
+        disabled: () => !hasSchema(),
+        items: [
+          {
+            label: 'Download as JSON Schema',
+            icon: 'fa-solid fa-download',
+            command: () =>
+              downloadFile(useDataSource().userSchemaData.value.title ?? 'untitled', true),
+          },
+          {
+            label: 'Export Schema to another format...',
+            icon: 'fa-solid fa-file-arrow-up',
+            command: this.dialogActions.showExportSchemaDialog,
+          },
+        ],
       },
       {
         label: 'Utility...',
         icon: 'fa-solid fa-wrench',
         key: 'utility',
+        disabled: () => !hasSchema(),
         items: [
           {
             label: 'Extract All Inlined Schema Elements into Definitions and use References',
@@ -220,18 +266,31 @@ export class MenuItems {
             icon: 'fa-solid fa-file-zipper',
             command: bundleSchema,
           },
+          {
+            label: 'Sort All Schema Properties Alphabetically',
+            icon: 'fa-solid fa-arrow-down-a-z',
+            command: sortSchemaPropertiesAlphabeticallyAction,
+          },
+          {
+            label: 'Refine Schema based on Data...',
+            icon: 'fa-solid fa-wand-magic-sparkles',
+            command: this.dialogActions.showRefineSchemaDialog,
+            disabled: () => !hasData(),
+          },
         ],
       },
       {
         label: 'Generate Source Code...',
         icon: 'fa-solid fa-file-code',
-        command: () => this.showCodeGenerationDialog(true),
+        command: () => this.dialogActions.showCodeGenerationDialog(true),
+        disabled: () => !hasSchema(),
       },
       {
         label: 'Share Snapshot...',
         icon: 'fa-solid fa-share',
-        command: this.showSnapshotDialog,
+        command: this.dialogActions.showSnapshotDialog,
         key: 'snapshot',
+        disabled: () => !hasData() && !hasSchema(),
       },
       {
         separator: true,
@@ -271,17 +330,21 @@ export class MenuItems {
           settings.metaSchema.allowMultipleTypes &&
           !settings.metaSchema.markMoreFieldsAsAdvanced,
         () => {
-          const metaSchema = settings.metaSchema;
-          metaSchema.allowBooleanSchema = true;
-          metaSchema.allowMultipleTypes = true;
-          metaSchema.markMoreFieldsAsAdvanced = false;
+          getDataForMode(SessionMode.Settings).updateData(currentSettings => {
+            const metaSchema = currentSettings.metaSchema;
+            metaSchema.allowBooleanSchema = true;
+            metaSchema.allowMultipleTypes = true;
+            metaSchema.markMoreFieldsAsAdvanced = false;
+          });
         },
         () => {
-          const metaSchema = settings.metaSchema;
-          metaSchema.allowBooleanSchema = false;
-          metaSchema.allowMultipleTypes = false;
-          metaSchema.markMoreFieldsAsAdvanced = true;
-          metaSchema.objectTypesComfort = true;
+          getDataForMode(SessionMode.Settings).updateData(currentSettings => {
+            const metaSchema = currentSettings.metaSchema;
+            metaSchema.allowBooleanSchema = false;
+            metaSchema.allowMultipleTypes = false;
+            metaSchema.markMoreFieldsAsAdvanced = true;
+            metaSchema.objectTypesComfort = true;
+          });
         },
         'fa-solid fa-lock',
         'fa-solid fa-lock-open',
@@ -295,12 +358,10 @@ export class MenuItems {
       this.generateToggleButton(
         () => settings.metaSchema.showJsonLdFields,
         () => {
-          const metaSchema = settings.metaSchema;
-          metaSchema.showJsonLdFields = true;
+          getDataForMode(SessionMode.Settings).setDataAt(['metaSchema', 'showJsonLdFields'], true);
         },
         () => {
-          const metaSchema = settings.metaSchema;
-          metaSchema.showJsonLdFields = false;
+          getDataForMode(SessionMode.Settings).setDataAt(['metaSchema', 'showJsonLdFields'], false);
         },
         'fa-solid fa-circle-nodes',
         'fa-solid fa-circle-nodes',
@@ -313,14 +374,11 @@ export class MenuItems {
   }
 
   public getSettingsMenuItems(settings: SettingsInterfaceRoot): MenuItem[] {
-    let result: MenuItem[] = [
+    const result: MenuItem[] = [
       {
         label: 'Open settings file',
         icon: 'fa-regular fa-folder-open',
-        command: () => {
-          throw new Error('Not implemented yet');
-        },
-        disabled: true,
+        command: openUploadSettingsDialog,
       },
       {
         label: 'Save settings file',
@@ -370,7 +428,7 @@ export class MenuItems {
     mode: SessionMode,
     settings: SettingsInterfaceRoot
   ): MenuItem[] {
-    let result: MenuItem[] = [];
+    const result: MenuItem[] = [];
 
     for (const panelTypeName of panelTypeRegistry.getPanelTypeNames()) {
       const panelTypeDefinition = panelTypeRegistry.getPanelTypeDefinition(panelTypeName);
@@ -384,8 +442,6 @@ export class MenuItems {
           this.generateTogglePanelButton(
             mode,
             panelTypeName,
-            mode,
-            panelTypeDefinition.icon,
             panelTypeDefinition.icon,
             panelTypeDefinition.label,
             settings
@@ -398,64 +454,68 @@ export class MenuItems {
   }
 
   private generateTogglePanelButton(
-    buttonMode: SessionMode,
+    mode: SessionMode,
     panelTypeName: string,
-    panelMode: SessionMode,
-    iconNameEnabled: string,
-    iconNameDisabled: string,
+    iconName: string,
     description: string,
     settings: SettingsInterfaceRoot
   ): MenuItem {
     return this.generateToggleButton(
       () =>
-        settings.panels[buttonMode].find(
-          panel => panel.panelType === panelTypeName && panel.mode === panelMode
+        settings.panels[mode].find(
+          panel => panel.panelType === panelTypeName && panel.mode === mode
         ) !== undefined,
       () => {
-        const panels = settings.panels;
-        panels[buttonMode].push({
-          panelType: panelTypeName,
-          mode: panelMode,
-          size: 40,
-        });
-      },
-      () => {
-        const panels = settings.panels;
-        panels[buttonMode] = panels[buttonMode].filter(
-          panel => !(panel.panelType === panelTypeName && panel.mode === panelMode)
+        getDataForMode(SessionMode.Settings).setDataAt(
+          ['panels', mode],
+          [
+            ...settings.panels[mode],
+            {
+              panelType: panelTypeName,
+              mode,
+              size: 40,
+            },
+          ]
         );
       },
-      iconNameEnabled,
-      iconNameDisabled,
+      () => {
+        getDataForMode(SessionMode.Settings).setDataAt(
+          ['panels', mode],
+          settings.panels[mode].filter(
+            panel => !(panel.panelType === panelTypeName && panel.mode === mode)
+          )
+        );
+      },
+      iconName,
+      iconName,
       `Show ${description}`,
       `Hide ${description}`
     );
   }
 
   private generateToggleButton(
-    conditionActive: () => boolean,
-    actionActivate: () => void,
-    actionDeactivate: () => void,
-    iconNameEnabled: string,
-    iconNameDisabled: string,
-    descriptionActivate: string,
-    descriptionDeactivate: string
+    isActive: () => boolean,
+    activate: () => void,
+    deactivate: () => void,
+    activeIconName: string,
+    inactiveIconName: string,
+    activationDescription: string,
+    deactivationDescription: string
   ): MenuItem {
-    if (conditionActive()) {
+    if (isActive()) {
       return {
         position: 'top',
-        label: descriptionDeactivate,
-        icon: iconNameDisabled,
+        label: deactivationDescription,
+        icon: inactiveIconName,
         highlighted: true,
-        command: actionDeactivate,
-      };
-    } else {
-      return {
-        position: 'top',
-        label: descriptionActivate,
-        icon: iconNameEnabled,
-        command: actionActivate,
+        command: deactivate,
       };
     }
+    return {
+      position: 'top',
+      label: activationDescription,
+      icon: activeIconName,
+      command: activate,
+    };
   }
 }

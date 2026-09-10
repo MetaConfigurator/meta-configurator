@@ -25,6 +25,7 @@ export interface SettingsInterfacePerformance {
   maxDocumentSizeForValidation: number; // in bytes
   maxDocumentSizeForCursorSynchronization: number; // in bytes
   maxDocumentSizeForSchemaInference: number; // in bytes
+  maxSchemaSizeForDataSynchronization: number; // in bytes
   minObjectPropertyCountToPreserve: number; // when large document is trimmed, this is minimum count of object properties to be preserved
   maxShownChildrenInGuiEditor: number;
   maxErrorsToShow: number;
@@ -47,6 +48,9 @@ export interface SettingsInterfaceGuiEditor {
   hideAddPropertyButton: boolean;
   showBorderAroundInputFields: boolean;
   showSchemaTitleAsHeader: boolean;
+  useScientificNotationForLargeAndSmallNumbers: boolean;
+  scientificNotationUpperThreshold: number;
+  scientificNotationLowerThreshold: number;
 }
 
 export interface SettingsInterfaceSchemaDiagram {
@@ -95,16 +99,21 @@ export enum PropertySorting {
   PRIORITY_ORDER = 'priorityOrder',
   SCHEMA_ORDER = 'schemaOrder',
   DATA_ORDER = 'dataOrder',
+  ALPHABETICAL_ORDER = 'alphabeticalOrder',
 }
 
 export enum DataFormat {
   JSON = 'json',
   YAML = 'yaml',
-  XML = 'xml',
 }
 
 export interface SettingsInterfaceBackend {
-  hostname: string;
+  // Full base URL of the snapshot-sharing service (project & snapshot sharing).
+  snapshotSharingUrl: string;
+  // Full URL of the Schema Conversion Orchestrator service.
+  schemaConverterUrl: string;
+  // Full URL of the format processing service for multi-format data parsing.
+  formatProcessingUrl: string;
 }
 
 export interface SettingsInterfacFrontend {
@@ -119,12 +128,20 @@ export interface SettingsInterfaceRdf {
   maximumNodesToVisualize: number;
 }
 
+export interface AiBackendCorsEndpoint {
+  endpoint: string;
+}
+
+export interface AiBackendRelay {
+  relay: string;
+  endpoint: string;
+}
+
 export interface SettingsInterfaceAiIntegraton {
   model: string;
-  maxTokens: number;
   temperature: number;
-  endpoint: string;
-  endpointProxy?: string;
+  backend: AiBackendCorsEndpoint | AiBackendRelay;
+  [key: string]: unknown;
 }
 
 export interface SettingsInterfaceSchemaSelectionList {

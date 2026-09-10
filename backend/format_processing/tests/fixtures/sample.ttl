@@ -1,0 +1,8 @@
+@prefix ex: <http://example.org/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+
+ex:sample1
+  a ex:Experiment ;
+  dct:title "TTL parser smoke test" ;
+  ex:temperature "120" ;
+  ex:unit "C" .

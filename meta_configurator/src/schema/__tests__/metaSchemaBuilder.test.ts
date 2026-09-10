@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {buildMetaSchema} from '@/schema/metaSchemaBuilder';
+import {buildFullMetaSchema, buildMetaSchema} from '@/schema/metaSchemaBuilder';
 import {ValidationService} from '@/schema/validationService';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import type {SettingsInterfaceMetaSchema} from '@/settings/settingsTypes';
@@ -17,6 +17,11 @@ function validateSchemaCandidate(
 ) {
   const metaSchema = buildMetaSchema(buildSettings(settings));
   const validationService = new ValidationService(metaSchema);
+  return validationService.validate(schemaCandidate);
+}
+
+function validateWithFullMetaSchema(schemaCandidate: any) {
+  const validationService = new ValidationService(buildFullMetaSchema());
   return validationService.validate(schemaCandidate);
 }
 
@@ -184,6 +189,77 @@ describe('metaSchemaBuilder', () => {
       );
 
       expect(result.errors).toEqual([]);
+    });
+  });
+
+  describe('full meta schema validation', () => {
+    it('accepts nested boolean schemas independently of simplified GUI settings', () => {
+      const result = validateWithFullMetaSchema({
+        type: 'object',
+        properties: {
+          maybeAnything: true,
+          definitelyNothing: false,
+        },
+      });
+
+      expect(result.errors).toEqual([]);
+    });
+
+    it('accepts unrestricted multi-type unions independently of simplified GUI settings', () => {
+      const result = validateWithFullMetaSchema({type: ['string', 'number']});
+
+      expect(result.errors).toEqual([]);
+    });
+  });
+
+  describe('type inference from type specific keywords', () => {
+    it('validates type specific keywords even when "type" is not declared', () => {
+      // "maximum" implies a number schema, so its value must be a number
+      expect(validateWithFullMetaSchema({maximum: 5}).errors).toEqual([]);
+      expect(validateWithFullMetaSchema({maximum: 'five'}).errors).not.toEqual([]);
+
+      // "maxLength" implies a string schema, so its value must be a non-negative integer
+      expect(validateWithFullMetaSchema({maxLength: 5}).errors).toEqual([]);
+      expect(validateWithFullMetaSchema({maxLength: -1}).errors).not.toEqual([]);
+    });
+
+    it('still recognizes object schemas by their "properties" keyword', () => {
+      expect(
+        validateWithFullMetaSchema({properties: {foo: {type: 'string'}}, required: ['foo']}).errors
+      ).toEqual([]);
+      expect(validateWithFullMetaSchema({properties: {}, required: [5]}).errors).not.toEqual([]);
+    });
+  });
+
+  describe('hasNoTypeInformation definition', () => {
+    function getTypeIndicatingKeywords(): string[] {
+      const defs = buildFullMetaSchema().$defs as Record<string, any>;
+      return defs.hasNoTypeInformation.not.anyOf.map(
+        (entry: {required: string[]}) => entry.required[0]
+      );
+    }
+
+    it('derives the type indicating keywords from the meta schema definitions', () => {
+      const keywords = getTypeIndicatingKeywords();
+
+      // keywords that directly determine the type or value of a subschema
+      expect(keywords).toContain('type');
+      expect(keywords).toContain('enum');
+      expect(keywords).toContain('const');
+      expect(keywords).toContain('$ref');
+      // type specific field keywords imply their type as well
+      expect(keywords).toContain('maximum');
+      expect(keywords).toContain('items');
+      expect(keywords).toContain('pattern');
+      expect(keywords).toContain('properties');
+    });
+
+    it('does not treat type neutral keywords as type information', () => {
+      const keywords = getTypeIndicatingKeywords();
+
+      expect(keywords).not.toContain('title');
+      expect(keywords).not.toContain('description');
+      expect(keywords).not.toContain('default');
     });
   });
 });

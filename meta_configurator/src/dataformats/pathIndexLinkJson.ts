@@ -13,6 +13,22 @@ import {pathToJsonPointer} from '@/utility/pathUtils';
 import {useErrorService} from '@/utility/errorServiceInstance';
 
 /**
+ * For an object-property the CST's `range.start` points at the whitespace before the
+ * key, so using it directly would land the cursor/annotation on the previous row. For
+ * an array-element the same applies to leading whitespace. Pick the offset of the
+ * meaningful token instead: the opening quote of the key, or the value's first token.
+ */
+function startIndexOfNode(node: CstNode): number {
+  if (node.kind === 'object-property') {
+    return node.keyToken.offset;
+  }
+  if (node.kind === 'array-element') {
+    return node.valueNode.range.start;
+  }
+  return node.range.start;
+}
+
+/**
  * Implementation of PathIndexLink for JSON data.
  */
 export class PathIndexLinkJson implements PathIndexLink {
@@ -189,7 +205,7 @@ export class PathIndexLinkJson implements PathIndexLink {
   ) {
     const pathKey = pathToJsonPointer(currentPath);
     if (paths.has(pathKey) && !(pathKey in result)) {
-      result[pathKey] = currentNode.range.start;
+      result[pathKey] = startIndexOfNode(currentNode);
       if (Object.keys(result).length === paths.size) {
         return; // all paths found
       }
