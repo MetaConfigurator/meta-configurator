@@ -74,6 +74,43 @@ with Helmholtz Blablador as the upstream.
 All options are documented in `config.example.yaml`. Copy it to `config.yaml`
 and fill in your provider API keys — everything else has sensible defaults.
 
+### Rate limits
+
+Two independent limits protect the relay, and clients can tell them apart by the
+`type` field of the error response:
+
+| Situation | Status | `type` |
+| --- | --- | --- |
+| The client's IP exceeded the relay's own limits (`rate_limits`) or daily token cap | 429 | `rate_limit_error` / `token_limit_error` |
+| The relay's API key exceeded the provider's limit | 429 | `upstream_rate_limit_error` |
+
+The second case is reported with the relay's own message instead of the
+provider's, since the exhausted quota belongs to the relay and is shared by all
+of its clients: telling that caller they exceeded a rate limit would be wrong.
+It is also logged as a warning (`upstream rate limit reached endpoint=...`),
+which is the signal to raise the quota at the provider or slow clients down.
+
+### Sizing the limits
+
+A public relay shares **one** provider quota between all of its users, so the
+per-IP limits decide how much of it a single client can consume before everyone
+else is locked out. This has happened in production: one user exhausted the
+upstream quota and the relay became unusable for the rest of the day.
+
+Defaults are therefore deliberately tight: 10 requests per minute, 60 per hour
+and 200 per day per IP, plus 50,000 estimated tokens per IP per day.
+
+`max_daily_tokens_per_ip` is the limit that actually protects the quota. A
+request is charged its prompt size (roughly one token per 4 bytes of request
+body) plus its capped `max_tokens`, because the provider bills both and
+MetaConfigurator sends whole documents to the AI. Counting only `max_tokens`
+would let a client send megabyte prompts all day for almost no charge. The
+request counters exist to stop bursts, not to bound cost.
+
+Raise the values only if your provider quota is large or the relay is not public.
+Users who need more throughput should configure their own API key in the AI
+settings instead.
+
 ## Security
 
 - Deploy behind HTTPS — Bearer tokens over plain HTTP are interceptable.

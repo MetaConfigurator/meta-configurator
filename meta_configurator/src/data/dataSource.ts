@@ -13,7 +13,9 @@ const dataSource = {
   newSchemaWasFetched: shallowRef<boolean>(false),
 
   // data of the settings editor
-  settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT)),
+  settingsData: useLocalStorage('settingsData', structuredClone(SETTINGS_DATA_DEFAULT), {
+    shallow: true,
+  }),
 };
 
 // Schema source and data source are separated, because metaSchemaData accesses the settingsData, which it could not do if they were defined within the same object.

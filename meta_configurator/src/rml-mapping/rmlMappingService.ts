@@ -1,5 +1,5 @@
 export interface RmlMappingService {
-  validateMappingConfig(config: string, input: any): {success: boolean; message: string};
+  validateMappingConfig(config: string): {success: boolean; message: string};
   generateMappingSuggestion(
     input: any,
     userComments: string

@@ -187,6 +187,16 @@ function migrateSettingsVersion(userSettings: any) {
       delete userSettings.backend.hostname;
     }
   }
+
+  if (userSettings.settingsVersion === '1.0.5') {
+    // migrate from 1.0.5 to 1.0.6
+    userSettings.settingsVersion = '1.0.6';
+  }
+
+  if (userSettings.settingsVersion === '1.0.6') {
+    // migrate from 1.0.6 to 1.0.7
+    userSettings.settingsVersion = '1.0.7';
+  }
 }
 
 export function adaptComplexitySettingsToLoadedSchema(userSettings: any, schema: TopLevelSchema) {

@@ -1,6 +1,6 @@
 <template>
   <div class="sparql-query-editor">
-    <div class="ace-container" :id="editor_id" />
+    <div class="ace-container" :id="editorElementId" />
     <div v-if="errorMessage" class="error-box">
       {{ errorMessage }}
     </div>
@@ -8,18 +8,15 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref, watch} from 'vue';
-import type {Editor} from 'brace';
+import {onMounted, ref, watch} from 'vue';
 import * as ace from 'brace';
 import 'brace/theme/clouds';
 import 'brace/theme/clouds_midnight';
-import {isDark} from '@/components/panels/rdf/rdfUtils';
 import {SparqlCustomMode} from '@/components/panels/rdf/aceSyntaxHighlighting';
+import {useAceEditor} from '@/components/panels/shared-components/useAceEditor';
 
-const darkMode = isDark();
 const props = withDefaults(
   defineProps<{
-    modelValue: string;
     autofocus?: boolean;
     stopEvents?: boolean;
     errorLine?: number | null;
@@ -33,40 +30,52 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void;
-}>();
+const queryText = defineModel<string>({required: true});
 
-const editor_id = 'sparql-editor-' + Math.random();
-const editor = ref<Editor | null>(null);
-const markerId = ref<number | null>(null);
-let isUpdatingFromOutside = false;
-let stopClickListener: ((event: Event) => void) | null = null;
-let stopKeydownListener: ((event: Event) => void) | null = null;
+const errorLineMarkerId = ref<number | null>(null);
+const {editorElementId, editor, createEditor} = useAceEditor('sparql-editor', queryText, {
+  mode: new (SparqlCustomMode as any)(),
+  useWrapMode: true,
+  // The composable owns the editor lifecycle, so it also runs this teardown on destroy.
+  configureEditor: createdEditor => {
+    createdEditor.container.addEventListener('click', stopEventFromLeavingEditor);
+    createdEditor.container.addEventListener('keydown', stopEventFromLeavingEditor);
+    return () => {
+      createdEditor.container.removeEventListener('click', stopEventFromLeavingEditor);
+      createdEditor.container.removeEventListener('keydown', stopEventFromLeavingEditor);
+    };
+  },
+});
+
+function stopEventFromLeavingEditor(event: Event) {
+  if (props.stopEvents) {
+    event.stopPropagation();
+  }
+}
 
 function applyErrorLine(line: number | null | undefined) {
   if (!editor.value) return;
 
   const session = editor.value.getSession();
-  if (markerId.value !== null) {
-    session.removeMarker(markerId.value);
-    markerId.value = null;
+  if (errorLineMarkerId.value !== null) {
+    session.removeMarker(errorLineMarkerId.value);
+    errorLineMarkerId.value = null;
   }
   session.clearAnnotations();
 
   if (!line || line <= 0) return;
 
-  const aceLine = line - 1;
-  const RangeCtor = ace.acequire('ace/range').Range;
-  markerId.value = session.addMarker(
-    new RangeCtor(aceLine, 0, aceLine, 1),
+  const zeroBasedLine = line - 1;
+  const Range = ace.acequire('ace/range').Range;
+  errorLineMarkerId.value = session.addMarker(
+    new Range(zeroBasedLine, 0, zeroBasedLine, 1),
     'ace-error-line',
     'fullLine',
     true
   );
   session.setAnnotations([
     {
-      row: aceLine,
+      row: zeroBasedLine,
       column: 0,
       text: props.errorMessage ?? 'Query error',
       type: 'error',
@@ -75,74 +84,16 @@ function applyErrorLine(line: number | null | undefined) {
 }
 
 onMounted(() => {
-  const instance = ace.edit(editor_id);
-  editor.value = instance;
-
-  instance.getSession().setMode(new (SparqlCustomMode as any)());
-  instance.getSession().setUseWrapMode(true);
-  instance.getSession().setTabSize(2);
-  instance.setOption('wrap', true);
-  instance.setShowPrintMargin(false);
-  instance.setTheme(darkMode.value ? 'ace/theme/clouds_midnight' : 'ace/theme/clouds');
-  instance.setValue(props.modelValue ?? '', -1);
+  createEditor();
+  if (!editor.value) return;
 
   if (props.autofocus) {
-    instance.focus();
+    editor.value.focus();
   }
-
-  instance.on('change', () => {
-    if (isUpdatingFromOutside) {
-      isUpdatingFromOutside = false;
-      return;
-    }
-    emit('update:modelValue', instance.getValue());
-  });
-
-  stopClickListener = (event: Event) => {
-    if (props.stopEvents) event.stopPropagation();
-  };
-  stopKeydownListener = (event: Event) => {
-    if (props.stopEvents) event.stopPropagation();
-  };
-  instance.container.addEventListener('click', stopClickListener);
-  instance.container.addEventListener('keydown', stopKeydownListener);
-
   applyErrorLine(props.errorLine);
 });
 
-onUnmounted(() => {
-  if (!editor.value) return;
-  if (stopClickListener) {
-    editor.value.container.removeEventListener('click', stopClickListener);
-    stopClickListener = null;
-  }
-  if (stopKeydownListener) {
-    editor.value.container.removeEventListener('keydown', stopKeydownListener);
-    stopKeydownListener = null;
-  }
-  editor.value.destroy();
-  editor.value.container.remove();
-  editor.value = null;
-});
-
-watch(
-  () => props.modelValue,
-  value => {
-    if (!editor.value) return;
-    const current = editor.value.getValue();
-    if (value === current) return;
-    isUpdatingFromOutside = true;
-    editor.value.setValue(value ?? '', -1);
-  }
-);
-
-watch(
-  () => props.errorLine,
-  line => {
-    applyErrorLine(line);
-  },
-  {immediate: true}
-);
+watch(() => props.errorLine, applyErrorLine, {immediate: true});
 
 watch(
   () => props.errorMessage,

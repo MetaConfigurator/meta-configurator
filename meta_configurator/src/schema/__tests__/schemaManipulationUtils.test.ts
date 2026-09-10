@@ -3,13 +3,15 @@ import {shallowRef} from 'vue';
 import {ManagedData} from '@/data/managedData';
 import {SessionMode} from '@/store/sessionMode';
 import {
-  bundleReferencedDefinitions,
   doesIdenticalSchemaDefinitionExist,
   extractAllInlinedSchemaElements,
-  extractGeneratedDefinitionsFromSubSchema,
   extractInlinedSchemaElement,
-  postProcessSchemaModification,
 } from '@/schema/schemaManipulationUtils';
+import {
+  bundleReferencedDefinitions,
+  extractGeneratedDefinitionsFromSubSchema,
+  postProcessSchemaModification,
+} from '@/schema/schemaDefinitionBundling';
 
 vi.mock('@/dataformats/formatRegistry', () => ({
   useDataConverter: () => ({
@@ -355,25 +357,27 @@ describe('schemaManipulationUtils', () => {
   });
 });
 
+function createSchemaModificationRoot(): ManagedData {
+  return new ManagedData(
+    shallowRef({
+      type: 'object',
+      properties: {
+        owner: {$ref: '#/$defs/owner'},
+      },
+      $defs: {
+        breed: {type: 'string', enum: ['Siamese', 'Persian']},
+        owner: {type: 'object', properties: {name: {type: 'string'}}},
+      },
+    }),
+    SessionMode.SchemaEditor
+  );
+}
+
 describe('extractGeneratedDefinitionsFromSubSchema', () => {
   let rootSchema: ManagedData;
 
   beforeEach(() => {
-    // this is the full schema already in the document
-    // AI does NOT see this — it only sees the sub-element you selected
-    rootSchema = new ManagedData(
-      shallowRef({
-        type: 'object',
-        properties: {
-          owner: {$ref: '#/$defs/owner'},
-        },
-        $defs: {
-          breed: {type: 'string', enum: ['Siamese', 'Persian']},
-          owner: {type: 'object', properties: {name: {type: 'string'}}},
-        },
-      }),
-      SessionMode.SchemaEditor
-    );
+    rootSchema = createSchemaModificationRoot();
   });
 
   it('moves $defs from AI sub-schema response up to root', () => {
@@ -606,19 +610,7 @@ describe('postProcessSchemaModification', () => {
   let rootSchema: ManagedData;
 
   beforeEach(() => {
-    rootSchema = new ManagedData(
-      shallowRef({
-        type: 'object',
-        properties: {
-          owner: {$ref: '#/$defs/owner'},
-        },
-        $defs: {
-          breed: {type: 'string', enum: ['Siamese', 'Persian']},
-          owner: {type: 'object', properties: {name: {type: 'string'}}},
-        },
-      }),
-      SessionMode.SchemaEditor
-    );
+    rootSchema = createSchemaModificationRoot();
   });
 
   it('executes extractGeneratedDefinitionsFromSubSchema and removes $schema property if exists', () => {

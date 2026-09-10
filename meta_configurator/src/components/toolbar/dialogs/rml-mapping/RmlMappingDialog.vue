@@ -6,9 +6,6 @@
     maximizable
     :style="{width: '80vw', height: '80vh'}">
     <div class="rml-dialog-body">
-      <Message severity="warn" v-if="mappingServiceWarning.length">
-        <span v-html="mappingServiceWarning"></span>
-      </Message>
       <Panel header="Use AI assistance to generate RML configuration" toggleable class="rml-panel">
         <div class="step-panel">
           <PanelSettings
@@ -27,13 +24,13 @@
             Mapping Configuration.
           </p>
           <div class="hints-block">
-            <label for="userComments" class="block font-semibold mb-1">
+            <label for="mappingInstructions" class="block font-semibold mb-1">
               Mapping Instructions <span class="text-red-600">*</span>
             </label>
             <Textarea
-              id="userComments"
+              id="mappingInstructions"
               required
-              v-model="userComments"
+              v-model="mappingInstructions"
               class="w-full rml-hints-textarea"
               placeholder="Describe how to map the JSON to JSON-LD: target classes, how to build IRIs, rename fields, data types, and any joins." />
           </div>
@@ -41,163 +38,112 @@
             label="Generate Suggestion"
             icon="pi pi-wand"
             @click="generateMappingSuggestion"
-            :loading="isLoadingMapping"
-            :disabled="!hasUserComments || isLoadingMapping" />
+            :loading="isGeneratingSuggestion"
+            :disabled="!hasMappingInstructions || isGeneratingSuggestion" />
         </div>
       </Panel>
       <div class="step-panel step-panel-grow">
         <Divider />
         <label class="block font-semibold mb-2">Mapping Configuration</label>
         <div class="editor-block">
-          <div ref="editorHost" class="rml-ace-editor" :id="editorId" />
+          <div ref="editorHost" class="rml-ace-editor" :id="editorElementId" />
         </div>
         <div v-if="errorMessage.length" class="error-box">
-          <span v-html="errorMessage"></span>
+          <span>{{ errorMessage }}</span>
         </div>
       </div>
     </div>
     <template #footer>
       <Button
-        v-if="resultIsValid"
+        v-if="isMappingConfigurationValid"
         label="Perform Mapping"
         icon="pi pi-play"
+        :loading="isPerformingMapping"
+        :disabled="isPerformingMapping"
         @click="performMapping" />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import {ref, computed, watch, type Ref, nextTick, onUnmounted} from 'vue';
+import {ref, computed, watch, nextTick, onUnmounted} from 'vue';
 import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
-import Message from 'primevue/message';
 import Panel from 'primevue/panel';
-import * as ace from 'brace';
-import type {Editor} from 'brace';
 import 'brace/theme/clouds';
 import 'brace/theme/clouds_midnight';
 import ApiKey from '@/components/panels/ai-prompts/ApiKey.vue';
 import {SessionMode} from '@/store/sessionMode';
 import {getDataForMode} from '@/data/useDataLink';
 import {RmlMappingServiceStandard} from '@/rml-mapping/standard/rmlMappingServiceStandard';
-import type {RmlMappingService} from '@/rml-mapping/rmlMappingService';
 import {useDebounceFn} from '@vueuse/core';
 import ApiKeyWarning from '@/components/panels/ai-prompts/ApiKeyWarning.vue';
 import PanelSettings from '@/components/panels/shared-components/PanelSettings.vue';
 import {useErrorService} from '@/utility/errorServiceInstance';
-import {isDarkMode} from '@/utility/darkModeUtils';
 import {RmlCustomMode} from '@/components/panels/rdf/aceSyntaxHighlighting';
+import {useAceEditor} from '@/components/panels/shared-components/useAceEditor';
 
 const showDialog = ref(false);
-const input = ref({});
-const result = ref('');
-const rmlConfig = ref('');
-const resultIsValid = ref(false);
+const inputData = ref<unknown>({});
+const mappingConfiguration = ref('');
+const isMappingConfigurationValid = ref(false);
 const errorMessage = ref('');
-const userComments = ref('');
-const isLoadingMapping = ref(false);
-const hasUserComments = computed(() => userComments.value.trim().length > 0);
-const editorId = 'rml-mapping-editor-' + Math.random();
-const editor = ref<Editor | null>(null);
+const mappingInstructions = ref('');
+const isGeneratingSuggestion = ref(false);
+const isPerformingMapping = ref(false);
+const hasMappingInstructions = computed(() => mappingInstructions.value.trim().length > 0);
 const editorHost = ref<HTMLElement | null>(null);
-let isUpdatingFromOutside = false;
-let resizeObserver: ResizeObserver | null = null;
+let editorResizeObserver: ResizeObserver | null = null;
 
-const mappingService: Ref<RmlMappingService> = computed(() => {
-  return new RmlMappingServiceStandard();
-});
+const mappingService = new RmlMappingServiceStandard();
 
-const mappingServiceWarning: Ref<string> = computed(() => {
-  return '';
-});
+const validateMappingConfigurationDebounced = useDebounceFn(() => {
+  validateMappingConfiguration(mappingConfiguration.value);
+}, 100);
 
-function ensureEditorCreated() {
-  if (editor.value) return;
-  const instance = ace.edit(editorId);
-  editor.value = instance;
-
-  instance.getSession().setMode(new (RmlCustomMode as any)());
-  instance.getSession().setUseWrapMode(true);
-  instance.getSession().setTabSize(2);
-  instance.setOption('wrap', true);
-  instance.setShowPrintMargin(false);
-  instance.setTheme(isDarkMode.value ? 'ace/theme/clouds_midnight' : 'ace/theme/clouds');
-  instance.setValue(rmlConfig.value ?? '', -1);
-
-  instance.on('change', () => {
-    if (isUpdatingFromOutside) {
-      isUpdatingFromOutside = false;
-      return;
-    }
-    rmlConfig.value = instance.getValue();
-  });
-
-  if (editorHost.value && !resizeObserver) {
-    resizeObserver = new ResizeObserver(() => {
-      editor.value?.resize();
-    });
-    resizeObserver.observe(editorHost.value);
+const {editorElementId, editor, createEditor, destroyEditor} = useAceEditor(
+  'rml-mapping-editor',
+  mappingConfiguration,
+  {
+    mode: new (RmlCustomMode as any)(),
+    useWrapMode: true,
+    onContentChanged: validateMappingConfigurationDebounced,
   }
-}
+);
 
-function setEditorValueFromOutside(value: string) {
-  if (!editor.value) return;
-  const current = editor.value.getValue();
-  if (current === value) return;
-
-  isUpdatingFromOutside = true;
-  editor.value.setValue(value ?? '', -1);
-  isUpdatingFromOutside = false;
-}
-
-function destroyEditor() {
-  if (resizeObserver) {
-    resizeObserver.disconnect();
-    resizeObserver = null;
-  }
-  if (!editor.value) return;
-  editor.value.destroy();
-  editor.value.container.remove();
-  editor.value = null;
-}
-
-watch(showDialog, async visible => {
-  if (visible) {
-    await nextTick();
-    rmlConfig.value = result.value;
-    ensureEditorCreated();
-    if (editor.value) {
-      setEditorValueFromOutside(rmlConfig.value ?? '');
-      editor.value.resize();
-      editor.value.focus();
-      window.setTimeout(() => editor.value?.resize(), 0);
-    }
-  } else {
+watch(showDialog, async isDialogVisible => {
+  if (!isDialogVisible) {
+    stopObservingEditorResize();
     destroyEditor();
+    return;
   }
+
+  await nextTick();
+  createEditor();
+  observeEditorResize();
+  editor.value?.focus();
+  // The dialog is still animating open, so resize once its final size is settled.
+  window.setTimeout(() => editor.value?.resize(), 0);
 });
 
-watch(
-  () => rmlConfig.value,
-  value => {
-    if (!editor.value) return;
-    setEditorValueFromOutside(value ?? '');
+function observeEditorResize() {
+  if (!editorHost.value || editorResizeObserver) {
+    return;
   }
-);
+  editorResizeObserver = new ResizeObserver(() => editor.value?.resize());
+  editorResizeObserver.observe(editorHost.value);
+}
 
-watch(
-  () => isDarkMode.value,
-  isDark => {
-    if (!editor.value) return;
-    editor.value.setTheme(isDark ? 'ace/theme/clouds_midnight' : 'ace/theme/clouds');
-  }
-);
+function stopObservingEditorResize() {
+  editorResizeObserver?.disconnect();
+  editorResizeObserver = null;
+}
 
 function openDialog() {
   resetDialog();
-  input.value = getDataForMode(SessionMode.DataEditor).data.value;
+  inputData.value = getDataForMode(SessionMode.DataEditor).data.value;
   showDialog.value = true;
 }
 
@@ -207,79 +153,72 @@ function hideDialog() {
 
 function resetDialog() {
   errorMessage.value = '';
-  userComments.value = '';
-  input.value = {};
-  result.value = '';
-  rmlConfig.value = '';
-  resultIsValid.value = false;
+  mappingInstructions.value = '';
+  inputData.value = {};
+  mappingConfiguration.value = '';
+  isMappingConfigurationValid.value = false;
+  isGeneratingSuggestion.value = false;
+  isPerformingMapping.value = false;
 }
 
-function validateConfig(config: string, input: any) {
-  const validationResult = mappingService.value.validateMappingConfig(config, input);
-  if (!validationResult.success) {
-    errorMessage.value = validationResult.message;
-    resultIsValid.value = false;
-  } else {
+function validateMappingConfiguration(configuration: string): void {
+  if (configuration.trim().length === 0) {
     errorMessage.value = '';
-    resultIsValid.value = true;
+    isMappingConfigurationValid.value = false;
+    return;
+  }
+
+  const validationResult = mappingService.validateMappingConfig(configuration);
+  errorMessage.value = validationResult.success ? '' : validationResult.message;
+  isMappingConfigurationValid.value = validationResult.success;
+}
+
+async function generateMappingSuggestion(): Promise<void> {
+  isGeneratingSuggestion.value = true;
+  try {
+    const generationResult = await mappingService.generateMappingSuggestion(
+      inputData.value,
+      mappingInstructions.value
+    );
+    mappingConfiguration.value = generationResult.config;
+    validateMappingConfiguration(generationResult.config);
+    if (!generationResult.success && isMappingConfigurationValid.value) {
+      errorMessage.value = generationResult.message;
+    }
+  } catch (error) {
+    useErrorService().onError(error);
+  } finally {
+    isGeneratingSuggestion.value = false;
   }
 }
 
-const validateLive = useDebounceFn(() => {
-  if (!rmlConfig.value) return;
-  validateConfig(rmlConfig.value, input.value);
-}, 100);
-
-watch(rmlConfig, () => {
-  validateLive();
-});
-
-function generateMappingSuggestion() {
-  isLoadingMapping.value = true;
-  mappingService.value
-    .generateMappingSuggestion(input.value, userComments.value)
-    .then(res => {
-      result.value = res.config;
-      rmlConfig.value = res.config;
-      if (res.success) {
-        errorMessage.value = '';
-      } else {
-        errorMessage.value = res.message;
-      }
-      isLoadingMapping.value = false;
-      validateConfig(res.config, input.value);
-    })
-    .catch(error => {
-      useErrorService().onError(error);
-    })
-    .finally(() => {
-      isLoadingMapping.value = false;
-    });
-}
-
-function performMapping() {
-  const config = rmlConfig.value;
-  if (!config) {
+async function performMapping(): Promise<void> {
+  const configuration = mappingConfiguration.value;
+  if (!configuration) {
     errorMessage.value = 'No mapping configuration available.';
     return;
   }
 
-  mappingService.value.performRmlMapping(input.value, config).then(res => {
-    if (res.success) {
+  isPerformingMapping.value = true;
+  try {
+    const mappingResult = await mappingService.performRmlMapping(inputData.value, configuration);
+    if (mappingResult.success) {
       errorMessage.value = '';
-      getDataForMode(SessionMode.DataEditor).setData(res.resultData);
+      getDataForMode(SessionMode.DataEditor).setData(mappingResult.resultData);
       hideDialog();
     } else {
-      errorMessage.value = res.message;
+      errorMessage.value = mappingResult.message;
     }
-  });
+  } catch (error) {
+    useErrorService().onError(error);
+  } finally {
+    isPerformingMapping.value = false;
+  }
 }
 
-defineExpose({show: openDialog, close: hideDialog});
+onUnmounted(stopObservingEditorResize);
 
-onUnmounted(() => {
-  destroyEditor();
-});
+defineExpose({show: openDialog, close: hideDialog});
 </script>
 
 <style scoped>
