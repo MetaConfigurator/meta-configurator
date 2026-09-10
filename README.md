@@ -107,6 +107,12 @@ Explore how to use MetaConfigurator with real-world examples:
 
 *   **[Schema Creation](./documentation_user/examples/schema_creation)** – Learn how to create and edit JSON schemas using different methods (inference from data, exploring existing schemas, manual editing).
 
+*   **[Data Import](./documentation_user/examples/data_import)** – Learn how to load data into MetaConfigurator: JSON/YAML, Turtle, XML, CSV, and the advanced import for many further formats.
+
+*   **[Schema Inference and Refinement](./documentation_user/examples/schema_inference_and_refinement)** – Learn how to derive a JSON schema from data and refine it with examples, enums and references.
+
+*   **[Data to Schema Mapping](./documentation_user/examples/data_to_schema_mapping)** – Learn how to convert data so that it matches a target schema, using AI-generated mapping functions.
+
 *   **[MOF Synthesis Example](./documentation_user/examples/mof_synthesis)** – Demonstrates schema generation, CSV import, and JSON export.
 
 *   **[Configurator Builder](./documentation_user/examples/configurator_building)** – Learn how to create and share pre-configured MetaConfigurator URLs.

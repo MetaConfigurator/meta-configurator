@@ -5,7 +5,6 @@ import {useSessionStore} from '@/store/sessionStore';
 import {restoreSnapshot} from '@/utility/backend/backendApi';
 import {getDataForMode} from '@/data/useDataLink';
 import {SessionMode, documentTypeDescriptionToMode, modeToRoute} from '@/store/sessionMode';
-import {useSettings} from '@/settings/useSettings';
 import {fetchExternalContent} from '@/utility/fetchExternalContent';
 import {updateSettingsWithDefaults, overwriteSettings} from '@/settings/settingsUpdater';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
@@ -13,7 +12,7 @@ import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 defineProps({settings_url: String});
 
 const sessionStore = useSessionStore();
-const settings = useSettings();
+const settingsData = getDataForMode(SessionMode.Settings);
 
 // Track all asynchronous tasks
 const settingsFetched = ref(true); // default true unless overridden
@@ -22,9 +21,10 @@ const dataFetched = ref(true);
 const snapshotFetched = ref(true);
 
 onMounted(() => {
-  const userSettings = getDataForMode(SessionMode.Settings).data.value;
+  const userSettings = settingsData.data.value;
   const defaultSettings: any = structuredClone(SETTINGS_DATA_DEFAULT);
   updateSettingsWithDefaults(userSettings, defaultSettings);
+  settingsData.setData(userSettings);
 
   const route = useAppRouter().currentRoute.value;
   const query = route.query;
@@ -45,8 +45,9 @@ onMounted(() => {
     fetchExternalContent(settingsUrl)
       .then(res => res.json())
       .then(json => {
-        const userSettings = getDataForMode(SessionMode.Settings).data.value;
+        const userSettings = settingsData.data.value;
         overwriteSettings(userSettings, json);
+        settingsData.setData(userSettings);
       })
       .finally(() => (settingsFetched.value = true));
   }
@@ -105,9 +106,9 @@ onMounted(() => {
 
   // Default settings fallback
   if (!usesCustomSettings) {
-    settings.value.hideSettings = false;
-    settings.value.hideSchemaEditor = false;
-    settings.value.toolbarTitle = 'MetaConfigurator';
+    settingsData.setDataAt(['hideSettings'], false);
+    settingsData.setDataAt(['hideSchemaEditor'], false);
+    settingsData.setDataAt(['toolbarTitle'], 'MetaConfigurator');
   }
 
   if (skipSchemaDialog) {

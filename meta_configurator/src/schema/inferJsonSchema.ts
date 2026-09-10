@@ -1,44 +1,48 @@
 import {inferSchema} from '@jsonhero/schema-infer';
-import type {JsonSchemaType} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import {useSettings} from '@/settings/useSettings';
+import {JsonSchemaVisitor} from '@/schema/jsonSchemaVisitor';
 
-export function inferJsonSchema(sampleData: any): JsonSchemaType {
-  return inferJsonSchemaFromMultiple([sampleData]);
+export function inferJsonSchema(sampleData: unknown): JsonSchemaType {
+  return inferJsonSchemaFromSamples([sampleData]);
 }
 
 /**
- * Infers a single JSON Schema that satisfies *all* of the given data instances.
- * Each instance refines the inference (via @jsonhero/schema-infer), so the
- * resulting schema accepts every provided instance.
+ * Infers a single schema that satisfies all given data instances: every instance
+ * refines the inference further, so the result accepts each of them.
  */
-export function inferJsonSchemaFromMultiple(samples: any[]): JsonSchemaType {
+export function inferJsonSchemaFromSamples(samples: unknown[]): JsonSchemaType {
   if (samples.length === 0) {
     throw new Error('No data instances were provided for schema inference.');
   }
-  // trim sample data if needed
-  const maximumSizeInKiB = useSettings().value.performance.maxDocumentSizeForSchemaInference / 1024; // convert bytes to KiB
-  const minObjectPropertyCountToPreserve =
-    useSettings().value.performance.minObjectPropertyCountToPreserve;
 
-  let inference = undefined;
+  const {maxDocumentSizeForSchemaInference, minObjectPropertyCountToPreserve} =
+    useSettings().value.performance;
+  const maximumSizeInKiB = maxDocumentSizeForSchemaInference / 1024;
+
+  let inference: ReturnType<typeof inferSchema> | undefined;
   for (const sample of samples) {
-    const trimmed = trimDataToMaxSize(sample, maximumSizeInKiB, minObjectPropertyCountToPreserve);
-    inference = inferSchema(trimmed, inference);
+    const trimmedSample = trimDataToMaxSize(
+      sample,
+      maximumSizeInKiB,
+      minObjectPropertyCountToPreserve
+    );
+    inference = inferSchema(trimmedSample, inference);
   }
-  return fixEmptyArraySchemas(inference!.toJSONSchema());
+
+  return allowItemsInInferredEmptyArraySchemas(inference!.toJSONSchema());
 }
 
-function fixEmptyArraySchemas(schema: any): any {
-  // schemas inferred from empty arrays have "items": false, which is not very useful and can break downstream logic
-  // instead, we change it to "items": true, which means "any type"
-  if (schema && typeof schema === 'object') {
+export function allowItemsInInferredEmptyArraySchemas(schema: JsonSchemaType): JsonSchemaType {
+  new EmptyArraySchemaVisitor(false).traverse(schema);
+  return schema;
+}
+
+class EmptyArraySchemaVisitor extends JsonSchemaVisitor {
+  protected visitSchema(schema: JsonSchemaObjectType): void {
     if (schema.type === 'array' && schema.items === false) {
-      schema.items = true; // means “any type”
-    }
-    for (const key of Object.keys(schema)) {
-      schema[key] = fixEmptyArraySchemas(schema[key]);
+      schema.items = true;
     }
   }
-  return schema;
 }

@@ -74,8 +74,8 @@ import {
   type SelectedNodeData,
   RdfTermType,
   type RdfTermTypeString,
-  isDark,
 } from '@/components/panels/rdf/rdfUtils';
+import {isDarkMode} from '@/utility/darkModeUtils';
 import {
   TripleEditorService,
   type TripleTransferObject,
@@ -95,7 +95,6 @@ import RdfVisualizerSidebar from '@/components/panels/rdf/visualizer/RdfVisualiz
 import RdfVisualizerGraphPanel from '@/components/panels/rdf/visualizer/RdfVisualizerGraphPanel.vue';
 
 const settings = useSettings();
-const darkMode = isDark();
 const showLargeGraphPrompt = ref(false);
 const nodeCount = ref(0);
 const propertiesPanelVisible = ref(true);
@@ -640,12 +639,7 @@ onUnmounted(() => {
   destroyGraph();
 });
 
-watch(
-  () => darkMode.value,
-  () => {
-    applyCyTheme();
-  }
-);
+watch(isDarkMode, applyCyTheme);
 
 watch(
   () => rdfStoreManager.statements.value,

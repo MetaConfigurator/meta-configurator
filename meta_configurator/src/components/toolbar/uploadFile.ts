@@ -6,7 +6,8 @@ import {createLazySingleFileDialog} from '@/utility/fileDialogUtils';
 import {updateSettingsWithDefaults} from '@/settings/settingsUpdater';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
-const uploadDataFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .xml, .schema.json');
+const uploadDataFileDialog = createLazySingleFileDialog('.json, .yaml, .yml');
+const uploadSchemaFileDialog = createLazySingleFileDialog('.json, .yaml, .yml, .schema.json');
 const uploadSettingsFileDialog = createLazySingleFileDialog('.json, .yaml, .yml');
 
 /**
@@ -15,7 +16,9 @@ const uploadSettingsFileDialog = createLazySingleFileDialog('.json, .yaml, .yml'
  * @param resultDataLink The DataLink to which the file content should be written
  */
 export function openUploadFileDialog(resultDataLink: ManagedData): void {
-  uploadDataFileDialog.openForSelection(files => {
+  const fileDialog =
+    resultDataLink.mode === SessionMode.DataEditor ? uploadDataFileDialog : uploadSchemaFileDialog;
+  fileDialog.openForSelection(files => {
     readFileContentToDataLink(files, resultDataLink);
   });
 }

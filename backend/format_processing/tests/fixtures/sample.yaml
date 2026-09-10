@@ -1,0 +1,35 @@
+metadata:
+  project: meta-configurator
+  owners:
+    - team: data-import
+      members: [alice, bob]
+    - team: validation
+      members:
+        - carol
+        - dan
+  release:
+    version: 2.4.1
+    date: 2026-03-27
+
+pipelines:
+  - id: ingest-01
+    enabled: true
+    source:
+      type: ftp
+      host: ftp.example.org
+      path: /incoming/set-a
+    transforms:
+      - step: normalize
+        options:
+          trim: true
+          drop_nulls: false
+      - step: enrich
+        options:
+          lookup: country-codes
+          fallback: unknown
+  - id: ingest-02
+    enabled: false
+    source:
+      type: s3
+      bucket: chemistry-uploads
+      prefix: weekly/

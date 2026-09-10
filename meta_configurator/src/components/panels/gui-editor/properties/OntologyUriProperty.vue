@@ -52,7 +52,7 @@ const valueProperty = computed({
   },
   set(newValueOption: {name: string; value: any} | string | undefined) {
     const currentPrefix = determinePrefix(props.propertyData);
-    const newValue = typeof newValueOption === 'object' ? newValueOption.value : newValueOption;
+    const newValue = getSelectionValue(newValueOption);
     const newFullValue = joinPrefixAndValue(currentPrefix, newValue, false);
     emit('update:propertyData', newFullValue);
 
@@ -66,13 +66,22 @@ const valuePropertyPrefix = computed({
   },
   set(newPrefixOption: {name: string; value: any} | string | undefined) {
     const currentValue = determineValue(props.propertyData);
-    const newPrefix = typeof newPrefixOption === 'object' ? newPrefixOption.value : newPrefixOption;
+    const newPrefix = getSelectionValue(newPrefixOption);
     const newFullValue = joinPrefixAndValue(newPrefix, currentValue, false);
     emit('update:propertyData', newFullValue);
 
     updatePossibleValues(currentValue, newPrefix);
   },
 });
+
+function getSelectionValue(
+  selection: {name: string; value: any} | string | null | undefined
+): string | undefined {
+  if (typeof selection === 'string') {
+    return selection;
+  }
+  return selection && typeof selection.value === 'string' ? selection.value : undefined;
+}
 
 function determinePrefix(fullValue: any) {
   if (typeof fullValue === 'string') {

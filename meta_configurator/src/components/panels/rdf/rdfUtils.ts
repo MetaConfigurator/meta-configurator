@@ -1,12 +1,8 @@
 import {Parser} from 'sparqljs';
 import type * as $rdf from 'rdflib';
-import {useDark} from '@vueuse/core';
-import {computed} from 'vue';
 import type {Path} from '@/utility/path';
 import type {JsonSchemaObjectType} from '@/schema/jsonSchemaType';
 import {RdfMediaType} from './rdfEnums';
-
-export const isDark = () => computed(() => useDark().value);
 
 export const XSD_NS = 'http://www.w3.org/2001/XMLSchema#';
 

@@ -26,7 +26,7 @@ const RML_SPEC_URL = 'https://rml.io/specs/rml/';
 function buildErrorMessage(reason: string): string {
   return (
     `Data mapping failed. Please check the mapping configuration. ` +
-    `Use <a href="${RML_SPEC_URL}" target="_blank">${RML_SPEC_URL}</a> ` +
+    `Use ${RML_SPEC_URL} ` +
     `to validate and fix your RML expression. Reason: ${reason}.`
   );
 }
@@ -58,7 +58,7 @@ function isErrorWithLine(error: unknown): error is {message: string; context: {l
 }
 
 async function extractPrefixes(config: string): Promise<Record<string, string>> {
-  let prefixes: Record<string, string> = {};
+  const prefixes: Record<string, string> = {};
 
   await new N3Parser().parse(config, {
     onQuad: () => {},

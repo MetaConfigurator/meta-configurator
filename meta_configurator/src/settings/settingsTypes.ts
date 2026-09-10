@@ -25,6 +25,7 @@ export interface SettingsInterfacePerformance {
   maxDocumentSizeForValidation: number; // in bytes
   maxDocumentSizeForCursorSynchronization: number; // in bytes
   maxDocumentSizeForSchemaInference: number; // in bytes
+  maxSchemaSizeForDataSynchronization: number; // in bytes
   minObjectPropertyCountToPreserve: number; // when large document is trimmed, this is minimum count of object properties to be preserved
   maxShownChildrenInGuiEditor: number;
   maxErrorsToShow: number;
@@ -111,6 +112,8 @@ export interface SettingsInterfaceBackend {
   snapshotSharingUrl: string;
   // Full URL of the Schema Conversion Orchestrator service.
   schemaConverterUrl: string;
+  // Full URL of the format processing service for multi-format data parsing.
+  formatProcessingUrl: string;
 }
 
 export interface SettingsInterfacFrontend {

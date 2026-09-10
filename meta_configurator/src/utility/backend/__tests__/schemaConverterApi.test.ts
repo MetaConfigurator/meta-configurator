@@ -1,3 +1,4 @@
+import {jsonResponse, textResponse} from '@/utility/backend/__tests__/backendResponseStubs';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 // The schema converter URL is derived from settings at module load, so stub the
@@ -38,34 +39,6 @@ function fail(
 ): ConversionAttempt {
   return {success: false, result, conversionPath: path, failedStepIndex};
 }
-
-function jsonResponse(body: unknown, {okFlag = true, status = 200} = {}): Response {
-  return {
-    ok: okFlag,
-    status,
-    headers: {
-      get: (h: string) => (h.toLowerCase() === 'content-type' ? 'application/json' : null),
-    },
-    json: async () => body,
-    text: async () => JSON.stringify(body),
-  } as unknown as Response;
-}
-
-function textResponse(text: string, {okFlag = false, status = 502} = {}): Response {
-  return {
-    ok: okFlag,
-    status,
-    headers: {get: () => 'text/html'},
-    json: async () => {
-      throw new Error('not json');
-    },
-    text: async () => text,
-  } as unknown as Response;
-}
-
-// ---------------------------------------------------------------------------
-// Pure helpers
-// ---------------------------------------------------------------------------
 
 describe('detectSourceLanguage', () => {
   it('detects languages from file extensions', () => {
