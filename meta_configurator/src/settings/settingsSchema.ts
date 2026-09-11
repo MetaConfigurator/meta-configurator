@@ -30,8 +30,8 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
     settingsVersion: {
       type: 'string',
       description: 'The version of the settings file.',
-      default: '1.0.6',
-      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5', '1.0.6'],
+      default: '1.0.7',
+      enum: ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5', '1.0.6', '1.0.7'],
       readOnly: true,
     },
     latestNewsHash: {
@@ -68,6 +68,7 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
         'maxDocumentSizeForValidation',
         'maxDocumentSizeForCursorSynchronization',
         'maxDocumentSizeForSchemaInference',
+        'maxSchemaSizeForDataSynchronization',
         'minObjectPropertyCountToPreserve',
         'maxShownChildrenInGuiEditor',
         'maxErrorsToShow',
@@ -95,6 +96,13 @@ export const SETTINGS_SCHEMA: TopLevelSchema = {
           description:
             'The maximum size of the document to infer the schema from in bytes. If the document is larger, a smart algorithm is used to trim the document first and then infer the schema from the smaller, trimmed input document.',
           default: 250000, // 250 KB
+          minimum: 1000,
+        },
+        maxSchemaSizeForDataSynchronization: {
+          type: 'integer',
+          description:
+            'The maximum schema size in bytes for synchronizing schema property renames and deletions with instance data. For larger schemas, schema changes will not automatically modify instance data.',
+          default: 1000000, // 1 MB
           minimum: 1000,
         },
         minObjectPropertyCountToPreserve: {

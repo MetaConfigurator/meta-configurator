@@ -151,6 +151,14 @@ defineExpose<SchemaRefinementOptionsController>({
             :input-id="fieldId('add-examples-ignore-null')" />
           <label :for="fieldId('add-examples-ignore-null')">Ignore null values</label>
         </div>
+
+        <div class="parameter-checkbox">
+          <Checkbox
+            v-model="addExamples.ignoreEmptyStrings"
+            binary
+            :input-id="fieldId('add-examples-ignore-empty-strings')" />
+          <label :for="fieldId('add-examples-ignore-empty-strings')">Ignore empty strings</label>
+        </div>
       </template>
     </RefinementOptionPanel>
 
