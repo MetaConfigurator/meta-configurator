@@ -1,6 +1,8 @@
 <!-- left side of the table, showing the metadata of a property -->
 
 <script setup lang="ts">
+import {schemaSelectionKey} from '@/data/schemaSelectionKey';
+import {schemaSelectionKind, hasSchemaSelection} from '@/data/schemaSelection';
 import type {
   ConfigDataTreeNodeType,
   GuiEditorTreeNode,
@@ -119,16 +121,13 @@ function canZoomIn(): boolean {
   }
   const schema = props.node.data.schema;
 
-  const dependsOnUserSelection = schema.anyOf.length > 0 || schema.oneOf.length > 0;
-  if (dependsOnUserSelection) {
-    const path = pathToString(props.node.data.absolutePath);
-    const hasUserSelectionOneOf = getUserSelectionForMode(
-      props.sessionMode
-    ).currentSelectedOneOfOptions.value.has(path);
-    const hasUserSelectionAnyOf = getUserSelectionForMode(
-      props.sessionMode
-    ).currentSelectedAnyOfOptions.value.has(path);
-    return hasUserSelectionOneOf || hasUserSelectionAnyOf;
+  if (schemaSelectionKind(schema)) {
+    return hasSchemaSelection(
+      schema,
+      ('schemaSelectionKey' in props.node.data ? props.node.data.schemaSelectionKey : undefined) ??
+        schemaSelectionKey(props.node.data.absolutePath),
+      getUserSelectionForMode(props.sessionMode)
+    );
   }
 
   return schema.hasType('object') || schema.hasType('array');
