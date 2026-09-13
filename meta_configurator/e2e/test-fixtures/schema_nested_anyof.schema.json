@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NestedConfigurationSchema",
+  "type": "object",
+  "properties": {
+    "configuration": {
+      "anyOf": [
+        {
+          "title": "ConfigurationOptionsSchema",
+          "anyOf": [
+            {
+              "title": "OptionASchema",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "example.OptionA",
+                  "type": "string"
+                },
+                "labels": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                }
+              },
+              "required": ["kind", "labels"],
+              "additionalProperties": false
+            },
+            {
+              "title": "OptionBSchema",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "example.OptionB",
+                  "type": "string"
+                }
+              },
+              "required": ["kind"],
+              "additionalProperties": false
+            },
+            {
+              "title": "OptionCSchema",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "example.OptionC",
+                  "type": "string"
+                },
+                "values": {
+                  "type": "array",
+                  "items": {"type": "number"}
+                }
+              },
+              "required": ["kind", "values"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        {"type": "null"}
+      ]
+    }
+  }
+}

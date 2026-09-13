@@ -43,6 +43,7 @@ import {isStructuralChangeInInstance} from '@/components/panels/gui-editor/isStr
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
+  schemaSelectionKey?: string;
   sessionMode: SessionMode;
   currentData: any;
   currentPath: Path;
@@ -140,7 +141,11 @@ function computeTree() {
     props.sessionMode,
     props.currentSchema,
     undefined,
-    props.currentPath
+    props.currentPath,
+    [],
+    0,
+    TreeNodeType.SCHEMA_PROPERTY,
+    props.schemaSelectionKey
   );
   currentTree.value!.children = treeNodeResolver.createChildNodesOfNode(
     props.sessionMode,
