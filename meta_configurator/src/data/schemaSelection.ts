@@ -1,5 +1,5 @@
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
-import {safeMergeSchemas} from '@/schema/mergeAllOfs';
+import {safeMergeAllOfs} from '@/schema/mergeAllOfs';
 import {typeSchema} from '@/schema/schemaProcessingUtils';
 import type {ManagedUserSchemaSelection} from '@/data/managedUserSchemaSelection';
 
@@ -55,7 +55,13 @@ export function resolveSchemaSelection(
   if (indices.some(index => !Number.isInteger(index) || !options[index])) return undefined;
   const base = {...schema.jsonSchema};
   delete base[kind];
-  const merged = safeMergeSchemas(base, ...indices.map(index => options[index]!.jsonSchema ?? {}));
+  // Merge shallowly, like JsonSchemaWrapper does: a deep merge also resolves nested
+  // allOfs/conditions of unrelated subtrees and can fail on schemas that are fine
+  // (e.g. the JSON meta-schema's "Subschema" option).
+  const merged = safeMergeAllOfs(
+    {allOf: [base, ...indices.map(index => options[index]!.jsonSchema ?? {})]},
+    false
+  );
   if (merged === false) return undefined;
   return {
     schema: new JsonSchemaWrapper(merged, schema.mode),
