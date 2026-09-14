@@ -10,15 +10,13 @@ import {dataAt} from '@/utility/resolveDataAtPath';
  * @param path the path to convert
  */
 export function pathToString(path: Path): string {
-  return path.length === 0
-    ? ''
-    : path
-        .reduce(
-          (prev: string, val: PathElement) =>
-            prev + (typeof val === 'number' ? `[${val}]` : `.${val}`),
-          ''
-        )
-        .slice(1);
+  const result = path.reduce(
+    (prev: string, val: PathElement) => prev + (typeof val === 'number' ? `[${val}]` : `.${val}`),
+    ''
+  );
+  // only strip the separator dot introduced by a leading string element,
+  // array notation of a leading number element (e.g. '[0]') must stay intact
+  return result.startsWith('.') ? result.slice(1) : result;
 }
 
 /**
@@ -123,7 +121,9 @@ export function arePathsEqual(path1: Path, path2: Path): boolean {
   }
 
   for (let i = 0; i < path1.length; i++) {
-    if (path1[i] !== path2[i]) {
+    // Compare via string representation so that array indices stored as a number
+    // (e.g. 2) and as a string (e.g. "2") are treated as equal.
+    if (String(path1[i]) !== String(path2[i])) {
       return false;
     }
   }

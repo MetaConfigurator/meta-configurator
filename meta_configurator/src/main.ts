@@ -17,6 +17,7 @@ import {registerDefaultPanelTypes} from '@/components/panels/defaultPanelTypes';
 import {definePreset} from '@primevue/themes';
 import {initErrorService, useErrorService} from '@/utility/errorServiceInstance';
 import {initApiKey} from '@/utility/ai/apiKey';
+import {hasJsonContent} from '@/utility/hasJsonContent';
 
 // @ts-ignore
 const app = createApp(App);
@@ -96,8 +97,8 @@ initApiKey();
 window.addEventListener('beforeunload', event => {
   // check if user made any changes and only then warn user
   if (
-    Object.keys(getDataForMode(SessionMode.DataEditor).data.value).length > 0 ||
-    Object.keys(getDataForMode(SessionMode.SchemaEditor).data.value).length > 0
+    hasJsonContent(getDataForMode(SessionMode.DataEditor).data.value) ||
+    hasJsonContent(getDataForMode(SessionMode.SchemaEditor).data.value)
   ) {
     event.returnValue = null;
   }

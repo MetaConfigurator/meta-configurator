@@ -12,7 +12,7 @@ import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUt
 
 const props = defineProps<{
   propertyName: PathElement;
-  propertyData: boolean | undefined;
+  propertyData: unknown;
   propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
@@ -28,13 +28,15 @@ const options = ref([
 
 const valueProperty = computed({
   get() {
-    return props.propertyData;
+    return typeof props.propertyData === 'boolean' ? props.propertyData : undefined;
   },
   set(newValue) {
     if (newValue === null || newValue === undefined) {
       // null is used when the user deselects the select button
       // we then switch to the other value
-      emit('update:propertyData', !props.propertyData);
+      const currentBooleanValue =
+        typeof props.propertyData === 'boolean' ? props.propertyData : false;
+      emit('update:propertyData', !currentBooleanValue);
     } else {
       emit('update:propertyData', newValue);
     }
