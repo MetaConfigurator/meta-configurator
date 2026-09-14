@@ -14,7 +14,7 @@ If you already have an instance dataset for which you want to create a schema, y
 3. Switch to the `schema editor` tab.
 4. In the top toolbar on the left click **"New Schema..." --> "Infer Schema from Data"**
 
-![Infer Schema from Data](./schema_inference_button.png)
+![Infer Schema from Data](./figs/schema_inference_button.png)
 
 A new schema will be created based on the data you provided.
 Note that it will only as complete as the data you provided.
@@ -33,7 +33,7 @@ Possibly the schema that you want to create is similar to an existing schema.
 You can open and edit/re-use or learn from existing schemas.
 To explore existing schemas, in the `schema editor` tab, in the top toolbar click **"Open JSON Schema..." --> "Open from JSON Schema Store"**.
 
-![Open from JSON Schema Store](./json_schema_store.png)
+![Open from JSON Schema Store](./figs/json_schema_store.png)
 
 You can then browse and search the JSON Schema Store for existing schemas.
 
@@ -43,7 +43,7 @@ There are different views in MetaConfigurator to create and edit schemas manuall
 Each has its own advantages and disadvantages.
 You can toggle (`on`/`off`) the different views using the buttons in the top toolbar:
 
-![View Toggle Buttons](./view_toggle_buttons.png)
+![View Toggle Buttons](./figs/view_toggle_buttons.png)
 
 In the menu bar you can also switch between a `Simple` and an `Advanced mode`.
 In the advanced mode, more complex schema features are available (e.g., boolean schemas, multiple types assigned to a property, etc.), but the GUI View looks more complex.
@@ -63,7 +63,7 @@ Some nodes might not allow editing their names, due to them being inlined in the
 To change their name more flexibly, you can press the `Extract inlined object schema to definitions' button.
 This will extract them into the `$defs` section of the schema and make their names editable.
 
-![Diagram View](./diagram_edit_object.png)
+![Diagram View](./figs/diagram_edit_object.png)
 
 #### AI Prompts View
 
@@ -72,20 +72,20 @@ Therefore, open the AI prompts view and enter your authentication token for your
 
 You can then enter prompts to create or edit schemas.
 
-![AI Prompts View](./ai_prompts_view.png)
+![AI Prompts View](./figs/ai_prompts_view.png)
 
 Resulting schema of the sbove prompt:
 
-![AI Prompts View](./ai_prompts_result.png)
+![AI Prompts View](./figs/ai_prompts_result.png)
 
 #### GUI View
 
 The GUI View shows all the different possible fields for a schema, based on the JSON Schema Meta Schema.
 It is useful to get to know all the different types of constraints, composition and other advanced schema features, but it can be a bit complex or overwhelming in the beginning.
 
-![GUI View](./gui_view.png)
+![GUI View](./figs/gui_view.png)
 
-![GUI View](./gui_view_advanced.png)
+![GUI View](./figs/gui_view_advanced.png)
 
 
 ## Hints and Tips

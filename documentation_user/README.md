@@ -3,11 +3,15 @@
 ## Examples / Tutorials
 * [Schema Creation](examples/schema_creation) (Shows how to create and edit schemas)
 * [MOF Synthesis Example](examples/mof_synthesis) (Demonstrates CSV Import, Schema Generation, Schema Editing, Data Editing, JSON Export)
+* [Data Import](examples/data_import) (Load data into MetaConfigurator: JSON/YAML, Turtle, XML, CSV, and the advanced import for many further formats)
+* [Schema Inference and Refinement](examples/schema_inference_and_refinement) (Derive a JSON schema from data and refine it with examples, enums and references)
+* [Data to Schema Mapping](examples/data_to_schema_mapping) (Convert data so that it matches a target schema, using AI-generated mapping functions)
 * [Configurator Building](examples/configurator_building) (Shows how to use MetaConfigurator as a Configurator Builder, allowing users to create and share URLs that open MetaConfigurator with preloaded schema, data, and settings)
 * [Code Generation](examples/code_generation) (Shows how to generate code in multiple programming languages from JSON schemas)
 * [Schema Selection List](examples/schema_selection_list) (Provide your users a pre-defined list of schemas to choose from; useful for organizations)
 * [AI Assistance](examples/ai_assistance) (Shows how to use AI-assisted features for schema and data creation/editing, as well as data transformation)
 * [External References](examples/external_references) (Shows how to handle external references in MetaConfigurator)
+* [Schema Conversion](examples/schema_conversion) (Import schemas from other formats (XSD, SHACL, LinkML, MD-Models, ...) into JSON Schema and export JSON Schema to other formats)
 * [RDF Panel](examples/rdf) (How to use RDF Panel in MetaConfigurator)
 
 ## Load a Schema

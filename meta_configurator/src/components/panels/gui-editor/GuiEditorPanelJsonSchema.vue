@@ -3,7 +3,6 @@ import CurrentPathBreadcrumb from '@/components/panels/shared-components/Current
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
 import type {Path} from '@/utility/path';
 import {computed} from 'vue';
-import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import type {SessionMode} from '@/store/sessionMode';
 import {useSettings} from '@/settings/useSettings';
@@ -39,13 +38,9 @@ function selectPath(path: Path) {
   session.updateCurrentSelectedElement(path);
 }
 
-const currentSchema = computed(() => {
-  const currSchema = session.effectiveSchemaAtCurrentPath?.value.schema;
-  if (!currSchema) {
-    return new JsonSchemaWrapper({}, props.sessionMode, false);
-  }
-  return currSchema;
-});
+const currentEffectiveSchema = computed(() =>
+  schema.effectiveSchemaAtPath(session.currentPath.value, false)
+);
 
 const tableHeader = computed(() => {
   if (settings.value.guiEditor.showSchemaTitleAsHeader) {
@@ -64,7 +59,8 @@ const tableHeader = computed(() => {
       @update:path="newPath => updatePath(newPath)" />
     <div class="flex-grow overflow-y-scroll">
       <PropertiesPanel
-        :currentSchema="currentSchema"
+        :currentSchema="currentEffectiveSchema.schema"
+        :schemaSelectionKey="currentEffectiveSchema.schemaSelectionKey"
         :currentPath="session.currentPath.value"
         :currentData="session.dataAtCurrentPath.value"
         :sessionMode="props.sessionMode"
