@@ -1,3 +1,4 @@
+import {schemaSelectionKey} from '@/data/schemaSelectionKey';
 import {mount, config} from '@vue/test-utils';
 import {computed, ref} from 'vue';
 import {describe, expect, it, vi} from 'vitest';
@@ -62,7 +63,9 @@ describe('OneOfSelectionProperty', () => {
 
     await wrapper.vm.$nextTick();
 
-    const selected = selectedOneOfOptions.value.get('aiIntegration.backend');
+    const selected = selectedOneOfOptions.value.get(
+      schemaSelectionKey(['aiIntegration', 'backend'])
+    );
     expect(selected).toBeDefined();
     expect(selected.index).toBe(1);
     expect(selected.name).toContain('Uni Stuttgart Relay');

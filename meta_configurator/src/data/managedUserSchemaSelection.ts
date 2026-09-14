@@ -1,7 +1,7 @@
 import type {Ref} from 'vue';
 import {ref} from 'vue';
 import type {Path} from '@/utility/path';
-import {pathToString} from '@/utility/pathUtils';
+import {schemaSelectionKey} from '@/data/schemaSelectionKey';
 import {SessionMode} from '@/store/sessionMode';
 import type {OneOfAnyOfSelectionOption} from '@/data/oneOfAnyOfSelectionOption';
 
@@ -10,47 +10,68 @@ export class ManagedUserSchemaSelection {
 
   /**
    * Selected options for oneOf in the schema.
-   * Key is the path as a string, value is the selected option.
+   * Key identifies the composition selector. It encodes the data path and composition steps.
    */
   public currentSelectedOneOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(
     new Map<string, OneOfAnyOfSelectionOption>([])
   );
   /**
    * Selected options for type unions in the schema.
-   * Key is the path as a string, value is the selected option.
+   * Key identifies the composition selector. It encodes the data path and composition steps.
    */
   public currentSelectedTypeUnionOptions: Ref<Map<string, OneOfAnyOfSelectionOption>> = ref(
     new Map<string, OneOfAnyOfSelectionOption>([])
   );
   /**
    * Selected options for anyOf in the schema.
-   * Key is the path as a string, value is an array of selected options.
+   * Key identifies the composition selector. It encodes the data path and composition steps.
    */
   public currentSelectedAnyOfOptions: Ref<Map<string, OneOfAnyOfSelectionOption[]>> = ref(
     new Map<string, OneOfAnyOfSelectionOption[]>([])
   );
 
-  public getSelectedOneOfOption(path: Path): OneOfAnyOfSelectionOption | undefined {
-    return this.currentSelectedOneOfOptions.value.get(pathToString(path));
+  public getSelectedOneOfOption(
+    pathOrSelectionKey: Path | string
+  ): OneOfAnyOfSelectionOption | undefined {
+    return this.currentSelectedOneOfOptions.value.get(this.selectionKey(pathOrSelectionKey));
   }
 
-  public getSelectedTypeUnionOption(path: Path): OneOfAnyOfSelectionOption | undefined {
-    return this.currentSelectedTypeUnionOptions.value.get(pathToString(path));
+  public getSelectedTypeUnionOption(
+    pathOrSelectionKey: Path | string
+  ): OneOfAnyOfSelectionOption | undefined {
+    return this.currentSelectedTypeUnionOptions.value.get(this.selectionKey(pathOrSelectionKey));
   }
 
-  public getSelectedAnyOfOptions(path: Path): OneOfAnyOfSelectionOption[] | undefined {
-    return this.currentSelectedAnyOfOptions.value.get(pathToString(path));
+  public getSelectedAnyOfOptions(
+    pathOrSelectionKey: Path | string
+  ): OneOfAnyOfSelectionOption[] | undefined {
+    return this.currentSelectedAnyOfOptions.value.get(this.selectionKey(pathOrSelectionKey));
   }
 
-  public setSelectedOneOfOption(path: Path, option: OneOfAnyOfSelectionOption): void {
-    this.currentSelectedOneOfOptions.value.set(pathToString(path), option);
+  public setSelectedOneOfOption(
+    pathOrSelectionKey: Path | string,
+    option: OneOfAnyOfSelectionOption
+  ): void {
+    this.currentSelectedOneOfOptions.value.set(this.selectionKey(pathOrSelectionKey), option);
   }
 
-  public setSelectedTypeUnionOption(path: Path, option: OneOfAnyOfSelectionOption): void {
-    this.currentSelectedTypeUnionOptions.value.set(pathToString(path), option);
+  public setSelectedTypeUnionOption(
+    pathOrSelectionKey: Path | string,
+    option: OneOfAnyOfSelectionOption
+  ): void {
+    this.currentSelectedTypeUnionOptions.value.set(this.selectionKey(pathOrSelectionKey), option);
   }
 
-  public setSelectedAnyOfOptions(path: Path, options: OneOfAnyOfSelectionOption[]): void {
-    this.currentSelectedAnyOfOptions.value.set(pathToString(path), options);
+  public setSelectedAnyOfOptions(
+    pathOrSelectionKey: Path | string,
+    options: OneOfAnyOfSelectionOption[]
+  ): void {
+    this.currentSelectedAnyOfOptions.value.set(this.selectionKey(pathOrSelectionKey), options);
+  }
+
+  private selectionKey(pathOrSelectionKey: Path | string): string {
+    return typeof pathOrSelectionKey === 'string'
+      ? pathOrSelectionKey
+      : schemaSelectionKey(pathOrSelectionKey);
   }
 }
