@@ -40,11 +40,17 @@ If you want to self-host a relay, see [`backend/relay/README.md`](../../../backe
 Open the AI Prompts View by clicking the `Show AI Prompts View` button in the top menu bar.
 Now you can enter prompts to create or edit schemas using natural language.
 
-### Schema Mapping and Data Transformation
+### Data Import
+
+In the `Data` tab, click `Open / Import Data...` -> `Advanced Data Import...`.
+Depending on the input format, AI can generate a JavaScript conversion function, map the parsed data onto the current schema, or convert the whole document directly.
+See [Data Import](../data_import) for the import modes and when to use which.
+
+### Data to Schema Mapping
 
 In the `Data` tab, click `Utility...` -> `Transform Data to match the Schema...`.
-This will open a dialog to generate a mapping configuration to map the current data to the target schema using AI.
-The generated mapping configuration can be reviewed and adjusted before applying it to transform the data.
+This generates a reusable mapping function (JSONata or JavaScript) that converts the current data to the target schema, or applies the transformation directly.
+See [Data to Schema Mapping](../data_to_schema_mapping) for the available methods and options.
 
 ### Data Transformation to other Formats
 

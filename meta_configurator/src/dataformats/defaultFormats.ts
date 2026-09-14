@@ -5,11 +5,13 @@ import {formatRegistry} from '@/dataformats/formatRegistry';
 import {PathIndexLinkYaml} from '@/dataformats/pathIndexLinkYaml';
 
 export const jsonFormat: DataFormatDefinition = {
+  fileExtensions: ['.json'],
   dataConverter: new DataConverterJson(),
   pathIndexLink: new PathIndexLinkJson(),
 };
 
 const yamlFormat: DataFormatDefinition = {
+  fileExtensions: ['.yaml', '.yml'],
   dataConverter: new DataConverterYaml(),
   pathIndexLink: new PathIndexLinkYaml(),
 };

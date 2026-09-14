@@ -4,6 +4,10 @@
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "composite": true,
+    // @vue/tsconfig stops at ES2020 and leaves newer built-ins to the project. Vite targets
+    // browsers with native ES modules, all of which support the ES2021 built-ins we use
+    // (String.replaceAll, Promise.any, WeakRef).
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

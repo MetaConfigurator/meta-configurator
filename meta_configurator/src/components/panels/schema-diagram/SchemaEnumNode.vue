@@ -138,7 +138,9 @@ const isEnumTruncated = computed(() => {
 
       <hr />
 
-      <div v-if="settings.schemaDiagram.showEnumValues" v-for="(value,index) in props.data!.values">
+      <div
+        v-if="settings.schemaDiagram.showEnumValues"
+        v-for="(value, index) in props.data!.values">
         <p v-if="index < maxEnumValuesToShow">
           {{ value }}
         </p>

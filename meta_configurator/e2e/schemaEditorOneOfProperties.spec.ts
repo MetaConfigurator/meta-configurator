@@ -1,11 +1,7 @@
 import {test, expect} from '@playwright/test';
 import {forceEditorMode, openApp} from '../../tests/shared/utils';
 import {SessionMode} from '../src/store/sessionMode';
-import {
-  tpForceCurrentPath,
-  tpForceData,
-  tpGetData,
-} from '../../tests/shared/utilsTestPanel';
+import {tpForceCurrentPath, tpForceData, tpGetData} from '../../tests/shared/utilsTestPanel';
 import {
   addArrayItem,
   checkPropertyExistence,
@@ -35,7 +31,11 @@ test('newly added oneOf subschema offers properties and required fields', async 
   await tpForceCurrentPath(page, SessionMode.SchemaEditor, ['properties', 'pet', 'oneOf']);
 
   // the existing element offers "properties" and "required" (after expanding it)
-  await page.getByRole('cell', {name: /^Item 1 :/}).getByRole('button').first().click();
+  await page
+    .getByRole('cell', {name: /^Item 1 :/})
+    .getByRole('button')
+    .first()
+    .click();
   await checkPropertyExistence(page, ['properties', 'pet', 'oneOf', 0, 'properties'], true);
   await checkPropertyExistence(page, ['properties', 'pet', 'oneOf', 0, 'required'], true);
 

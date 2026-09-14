@@ -2,7 +2,11 @@ import {test, expect} from '@playwright/test';
 import {openApp} from '../../tests/shared/utils';
 import {SessionMode} from '../src/store/sessionMode';
 import {tpForceData, tpGetCurrentPath, tpGetData} from '../../tests/shared/utilsTestPanel';
-import {addArrayItem, checkStringProperty, editStringProperty} from '../../tests/shared/utilsGuiEditor';
+import {
+  addArrayItem,
+  checkStringProperty,
+  editStringProperty,
+} from '../../tests/shared/utilsGuiEditor';
 
 /**
  * Regression test for the "schema with type array on root level does not work" bug:
@@ -22,9 +26,7 @@ test('root level array schema can be filled and edited via the GUI editor', asyn
 
   // the new item can be edited
   await editStringProperty(page, [0, 'name'], 'Alex');
-  await expect
-    .poll(async () => tpGetData(page, SessionMode.DataEditor))
-    .toEqual([{name: 'Alex'}]);
+  await expect.poll(async () => tpGetData(page, SessionMode.DataEditor)).toEqual([{name: 'Alex'}]);
 
   // more items can be appended
   await addArrayItem(page, []);

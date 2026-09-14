@@ -1,0 +1,4 @@
+sample_id,batch,compound,concentration_mg_ml,unit,comment
+s-001,b-17,NaCl,0.90,mg/mL,"baseline, no additive"
+s-002,b-17,KCl,1.10,mg/mL,"contains comma, verify quoting"
+s-003,b-18,CaCl2,0.55,mg/mL,"multi-word remark with spaces"
