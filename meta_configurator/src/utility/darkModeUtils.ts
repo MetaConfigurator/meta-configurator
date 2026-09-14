@@ -1,3 +1,7 @@
-import {computed} from 'vue';
+import {usePreferredDark} from '@vueuse/core';
 
-export const isDarkMode = computed(() => window.matchMedia('(prefers-color-scheme: dark)').matches);
+/**
+ * The app follows the operating system colour scheme (PrimeVue is configured with
+ * `darkModeSelector: 'system'`), so this reactive flag is the single source of truth.
+ */
+export const isDarkMode = usePreferredDark();

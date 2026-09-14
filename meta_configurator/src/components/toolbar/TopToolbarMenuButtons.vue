@@ -1,137 +1,62 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
-import type {MenuItem} from 'primevue/menuitem';
+import {computed} from 'vue';
+import type {MenuItem, MenuItemCommandEvent} from 'primevue/menuitem';
 import Menu from 'primevue/menu';
-import {MenuItems} from '@/components/toolbar/menuItems';
+import {MenuItems, type MenuItemDialogActions} from '@/components/toolbar/menuItems';
 import Button from 'primevue/button';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 import {SessionMode} from '@/store/sessionMode';
-import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
 import {useSettings} from '@/settings/useSettings';
-import {inferJsonSchema} from '@/schema/inferJsonSchema';
 
 const props = defineProps<{
   currentMode: SessionMode;
   showBottomMenu: boolean;
-}>();
-
-const emit = defineEmits<{
-  (e: 'show-schema-selection-dialog'): void;
-  (e: 'show-import-csv-dialog'): void;
-  (e: 'show-snapshot-dialog'): void;
-  (e: 'show-codegen-dialog', schemaMode: boolean): void;
-  (e: 'show-data-export-dialog', schemaMode: boolean): void;
-  (e: 'show-data-mapping-dialog'): void;
-  (e: 'show-rml-mapping-dialog'): void;
-  (e: 'show-import-turtle-dialog'): void;
+  dialogActions: MenuItemDialogActions;
 }>();
 
 const settings = useSettings();
-const topMenuBar = new MenuItems(
-  showSchemaSelectionDialog,
-  showCsvImportDialog,
-  showSnapshotDialog,
-  showCodeGenerationDialog,
-  showDataExportDialog,
-  showDataMappingDialog,
-  inferSchemaFromSampleData,
-  showRmlMappingDialog,
-  showTurtleImportDialog
-);
+const menuItemsProvider = new MenuItems(props.dialogActions);
 
-function showSchemaSelectionDialog() {
-  emit('show-schema-selection-dialog');
-}
-
-function showCsvImportDialog() {
-  emit('show-import-csv-dialog');
-}
-
-function showSnapshotDialog() {
-  emit('show-snapshot-dialog');
-}
-
-function showCodeGenerationDialog(schemaMode: boolean) {
-  emit('show-codegen-dialog', schemaMode);
-}
-
-function showDataExportDialog(schemaMode: boolean) {
-  emit('show-data-export-dialog', schemaMode);
-}
-
-function showDataMappingDialog() {
-  emit('show-data-mapping-dialog');
-}
-
-function showRmlMappingDialog() {
-  emit('show-rml-mapping-dialog');
-}
-
-function showTurtleImportDialog() {
-  emit('show-import-turtle-dialog');
-}
-
-function inferSchemaFromSampleData() {
-  const data = getDataForMode(SessionMode.DataEditor).data.value;
-  const inferredSchema = inferJsonSchema(data);
-  if (inferredSchema) {
-    getSchemaForMode(SessionMode.DataEditor).schemaRaw.value = inferredSchema;
-  }
-}
-
-function getMenuItems(settings: SettingsInterfaceRoot, positionBottom: boolean): MenuItem[] {
-  let result: MenuItem[];
-
+function getMenuItemsForCurrentMode(currentSettings: SettingsInterfaceRoot): MenuItem[] {
   switch (props.currentMode) {
     case SessionMode.DataEditor:
-      result = topMenuBar.getDataEditorMenuItems(settings);
-      break;
+      return menuItemsProvider.getDataEditorMenuItems(currentSettings);
     case SessionMode.SchemaEditor:
-      result = topMenuBar.getSchemaEditorMenuItems(settings);
-      break;
+      return menuItemsProvider.getSchemaEditorMenuItems(currentSettings);
     case SessionMode.Settings:
-      result = topMenuBar.getSettingsMenuItems(settings);
-      break;
+      return menuItemsProvider.getSettingsMenuItems(currentSettings);
     default:
       return [];
   }
-  result = result.filter(menuItem => {
-    let itemIsForBottom = true;
-    if (menuItem.position && menuItem.position == 'top') {
-      itemIsForBottom = false;
-    }
-    return itemIsForBottom === positionBottom;
-  });
-  return result;
 }
 
-// computed property function to get menu items to allow for updating of the menu items
-const menuItems = computed(() => getMenuItems(settings.value, props.showBottomMenu));
+const menuItems = computed(() =>
+  getMenuItemsForCurrentMode(settings.value).filter(
+    menuItem => (menuItem.position !== 'top') === props.showBottomMenu
+  )
+);
 
-const itemMenuRefs = ref(new Map<string, {toggle?: (event: Event) => void}>());
+type PopupMenuController = {toggle: (event: Event) => void};
+const popupMenuByItem = new WeakMap<MenuItem, PopupMenuController>();
 
-function setItemMenuRef(item: MenuItem, menu: {toggle?: (event: Event) => void} | null) {
-  const label = getLabelOfItem(item);
-  if (!label || !menu) {
+function setPopupMenu(item: MenuItem, menu: PopupMenuController | null): void {
+  if (!menu) {
+    popupMenuByItem.delete(item);
     return;
   }
-  itemMenuRefs.value.set(label, menu);
+  popupMenuByItem.set(item, menu);
 }
-function handleItemButtonClick(item: MenuItem, event: Event) {
+
+function handleItemButtonClick(item: MenuItem, event: Event): void {
   if (item.items) {
-    const label = getLabelOfItem(item);
-    if (label !== undefined) {
-      const menu = itemMenuRefs.value.get(label);
-      if (menu?.toggle) {
-        menu.toggle(event);
-      }
-    }
-  } else if (item.command) {
-    item.command?.({item, originalEvent: event} as any);
+    popupMenuByItem.get(item)?.toggle(event);
+    return;
   }
+  item.command?.({item, originalEvent: event} as MenuItemCommandEvent);
 }
+
 function getLabelOfItem(item: MenuItem): string | undefined {
   if (!item.label) {
     return undefined;
@@ -142,61 +67,66 @@ function getLabelOfItem(item: MenuItem): string | undefined {
   return item.label();
 }
 
-function isDisabled(item: MenuItem) {
-  if (!item.disabled) {
-    return false;
-  }
-  if (typeof item.disabled === 'boolean') {
-    return item.disabled;
-  }
-  return item.disabled();
+function getMenuItemKey(item: MenuItem, index: number): string {
+  return item.key ?? `${getLabelOfItem(item) ?? 'separator'}-${index}`;
 }
-function isHighlighted(item: MenuItem) {
-  if (!item.highlighted) {
+
+function evaluateBooleanProperty(value: boolean | (() => boolean) | undefined): boolean {
+  if (!value) {
     return false;
   }
-  if (typeof item.highlighted === 'boolean') {
-    return item.highlighted;
-  }
-  return item.highlighted();
+  return typeof value === 'boolean' ? value : value();
 }
 </script>
 
 <template>
-  <!-- menu items -->
-  <div v-for="item in menuItems" :key="getLabelOfItem(item) ?? item.key ?? ''">
-    <span v-if="item.separator" class="text-lg p-2 text-gray-300">|</span>
-    <Button
-      v-else
-      circular
-      text
-      :class="{'toolbar-button': true, 'highlighted-icon': isHighlighted(item)}"
-      size="small"
-      v-tooltip.right="item.label"
-      :id="item.key ?? ''"
-      :disabled="isDisabled(item)"
-      @click="event => handleItemButtonClick(item, event)">
-      <FontAwesomeIcon :icon="item.icon!!" />
-    </Button>
+  <div class="toolbar-menu-buttons">
+    <!-- menu items -->
+    <div v-for="(item, index) in menuItems" :key="getMenuItemKey(item, index)">
+      <span v-if="item.separator" class="menu-separator text-lg p-2 text-gray-300">|</span>
+      <Button
+        v-else
+        circular
+        text
+        :class="{
+          'toolbar-button': true,
+          'highlighted-icon': evaluateBooleanProperty(item.highlighted),
+        }"
+        size="small"
+        v-tooltip.right="getLabelOfItem(item)"
+        :id="item.key ?? ''"
+        :disabled="evaluateBooleanProperty(item.disabled)"
+        @click="handleItemButtonClick(item, $event)">
+        <FontAwesomeIcon v-if="item.icon" :icon="item.icon" />
+      </Button>
 
-    <Menu
-      v-if="item.items"
-      :model="item.items"
-      :popup="true"
-      :ref="itemMenu => setItemMenuRef(item, itemMenu as any)">
-      <template #itemicon="slotProps">
-        <div v-if="slotProps.item.icon !== undefined">
-          <FontAwesomeIcon
-            :icon="slotProps.item.icon ?? []"
-            style="min-width: 1.5rem"
-            class="mr-3" />
-        </div>
-      </template>
-    </Menu>
+      <Menu
+        v-if="item.items"
+        :model="item.items"
+        :popup="true"
+        :ref="itemMenu => setPopupMenu(item, itemMenu as unknown as PopupMenuController)">
+        <template #itemicon="slotProps">
+          <div v-if="slotProps.item.icon !== undefined">
+            <FontAwesomeIcon
+              :icon="slotProps.item.icon ?? []"
+              style="min-width: 1.5rem"
+              class="mr-3" />
+          </div>
+        </template>
+      </Menu>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.toolbar-menu-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .toolbar-button {
   font-weight: bold;
   font-size: large;
@@ -204,7 +134,18 @@ function isHighlighted(item: MenuItem) {
   padding: 0.35rem !important;
 }
 
+.menu-separator {
+  display: inline-flex;
+  align-items: center;
+}
+
 .highlighted-icon {
   color: var(--p-highlight-color) !important;
+}
+
+@media (max-width: 900px) {
+  .menu-separator {
+    display: none;
+  }
 }
 </style>

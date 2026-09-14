@@ -17,6 +17,7 @@ describe('formatRegistry', () => {
 
   it('should return the format for the given format name', () => {
     const format = {
+      fileExtensions: ['.test'],
       dataConverter: new DataConverterJson(),
       pathIndexLink: null,
     };
@@ -25,6 +26,53 @@ describe('formatRegistry', () => {
   });
   it('should return the json format if the format is not registered', () => {
     expect(formatRegistry.getFormat('notRegistered')).toBe(jsonFormat);
+  });
+});
+
+describe('file based format handling', () => {
+  const formatRegistry = new FormatRegistry();
+  formatRegistry.registerFormat('json', {
+    fileExtensions: ['.json'],
+    dataConverter: new DataConverterJson(),
+    pathIndexLink: null,
+  });
+  formatRegistry.registerFormat('yaml', {
+    fileExtensions: ['.yaml', '.yml'],
+    dataConverter: new DataConverterYaml(),
+    pathIndexLink: null,
+  });
+
+  it('should list the file extensions of every registered format', () => {
+    expect(formatRegistry.getFileExtensions()).toEqual(['.json', '.yaml', '.yml']);
+  });
+
+  it('should find the format of a file name regardless of casing', () => {
+    expect(formatRegistry.getFormatForFileName('Data.JSON')?.dataConverter).toBeInstanceOf(
+      DataConverterJson
+    );
+    expect(formatRegistry.getFormatForFileName('config.yml')?.dataConverter).toBeInstanceOf(
+      DataConverterYaml
+    );
+    expect(formatRegistry.getFormatForFileName('notes.txt')).toBeUndefined();
+  });
+
+  it('should parse a file with the format its extension belongs to', () => {
+    expect(formatRegistry.parseFileContent('person.json', '{"name":"Alice"}')).toEqual({
+      name: 'Alice',
+    });
+    expect(formatRegistry.parseFileContent('person.yaml', 'name: Alice\n')).toEqual({
+      name: 'Alice',
+    });
+  });
+
+  it('should report the parse error of the format claiming the extension', () => {
+    expect(() => formatRegistry.parseFileContent('broken.json', '{ not : json ]')).toThrow();
+  });
+
+  it('should try every registered format for an unknown extension', () => {
+    expect(formatRegistry.parseFileContent('person.unknown', 'name: Alice\n')).toEqual({
+      name: 'Alice',
+    });
   });
 });
 

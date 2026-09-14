@@ -1,0 +1,4 @@
+sample_id	batch	instrument	reading_a	reading_b	status
+s-001	b-17	spec-01	12.44	0.155	ok
+s-002	b-17	spec-01	12.39	0.162	ok
+s-003	b-18	spec-02	11.98	0.210	review

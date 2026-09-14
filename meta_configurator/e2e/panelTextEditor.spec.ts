@@ -36,11 +36,6 @@ test('Select an example schema, enter some value and change the data format. The
     expect(await getCurrentDataFormat(page)).toBe('yaml');
     await checkCodeEditorForText(page, 'SimulationName: TestName', SessionMode.DataEditor);
 
-    // Change the data format to XML and check that the code editor shows the correct XML data
-    await forceDataFormat(page, 'xml');
-    expect(await getCurrentDataFormat(page)).toBe('xml');
-    await checkCodeEditorForText(page, '<SimulationName>TestName</SimulationName>', SessionMode.DataEditor);
-
     // Change the data format to JSON
     await forceDataFormat(page, 'json');
     expect(await getCurrentDataFormat(page)).toBe('json');

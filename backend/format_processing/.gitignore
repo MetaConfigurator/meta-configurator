@@ -1,0 +1,6 @@
+__pycache__/
+parsers/__pycache__/
+.pytest_cache/
+certs/
+.env
+*.log

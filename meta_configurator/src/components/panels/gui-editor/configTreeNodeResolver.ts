@@ -1,3 +1,7 @@
+import {
+  schemaSelectionKey as selectionKeyForPath,
+  childSchemaSelectionKey,
+} from '@/data/schemaSelectionKey';
 import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {
   AddPropertyTreeNode,
@@ -6,15 +10,17 @@ import type {
   GuiEditorTreeNode,
 } from '@/components/panels/gui-editor/configDataTreeNode';
 import {TreeNodeType} from '@/components/panels/gui-editor/configDataTreeNode';
-import type {Path} from '@/utility/path';
+import type {Path, PathElement} from '@/utility/path';
 import {pathToString} from '@/utility/pathUtils';
 import {sortObjectChildren} from '@/components/panels/gui-editor/sortingUtils';
 import _ from 'lodash';
-import type {EffectiveSchema} from '@/schema/effectiveSchemaCalculator';
 import {calculateEffectiveSchema} from '@/schema/effectiveSchemaCalculator';
-import {safeMergeSchemas} from '@/schema/mergeAllOfs';
+import {
+  schemaSelectionKind,
+  hasSchemaSelection,
+  resolveSchemaSelection,
+} from '@/data/schemaSelection';
 import {useSettings} from '@/settings/useSettings';
-import {typeSchema} from '@/schema/schemaProcessingUtils';
 import type {SessionMode} from '@/store/sessionMode';
 import {getDataForMode, getUserSelectionForMode} from '@/data/useDataLink';
 
@@ -22,6 +28,7 @@ interface TreeNodeResolvingParameters {
   absolutePath: Path;
   relativePath: Path;
   schema: JsonSchemaWrapper;
+  schemaSelectionKey: string;
   depth: number;
 }
 
@@ -52,7 +59,8 @@ export class ConfigTreeNodeResolver {
     absolutePath: Path = [],
     relativePath: Path = [],
     depth: number = 0,
-    nodeType: ConfigDataTreeNodeType = TreeNodeType.SCHEMA_PROPERTY
+    nodeType: ConfigDataTreeNodeType = TreeNodeType.SCHEMA_PROPERTY,
+    schemaSelectionKey: string = selectionKeyForPath(absolutePath)
   ): GuiEditorTreeNode {
     const name = absolutePath[absolutePath.length - 1] ?? schema.title ?? 'root';
     const parentName = absolutePath[absolutePath.length - 2] ?? parentSchema?.title ?? 'root';
@@ -66,11 +74,12 @@ export class ConfigTreeNodeResolver {
         depth: depth,
         relativePath: relativePath,
         absolutePath: absolutePath,
+        schemaSelectionKey,
       },
       type: nodeType,
       key: pathToString(absolutePath),
       children: [],
-      leaf: this.isLeaf(mode, schema, depth, absolutePath),
+      leaf: this.isLeaf(mode, schema, depth, absolutePath, schemaSelectionKey),
     };
   }
 
@@ -81,35 +90,17 @@ export class ConfigTreeNodeResolver {
     mode: SessionMode,
     schema: JsonSchemaWrapper,
     depth: number,
-    absolutePath: Path
+    absolutePath: Path,
+    schemaSelectionKey: string
   ): boolean {
-    const dependsOnUserSelection = this.dependsOnUserSelection(schema);
-    if (dependsOnUserSelection) {
-      const path = pathToString(absolutePath);
-      const hasUserSelectionOneOf =
-        getUserSelectionForMode(mode).currentSelectedOneOfOptions.value.has(path);
-      const hasUserSelectionAnyOf =
-        getUserSelectionForMode(mode).currentSelectedAnyOfOptions.value.has(path);
-      const hasUserSelectionTypeUnion =
-        getUserSelectionForMode(mode).currentSelectedTypeUnionOptions.value.has(path);
-      if (!(hasUserSelectionOneOf || hasUserSelectionAnyOf || hasUserSelectionTypeUnion)) {
-        return true; // no user selection -> leaf node
-      }
+    if (depth >= settings.value.guiEditor.maximumDepth) return true;
+    if (schemaSelectionKind(schema)) {
+      return !hasSchemaSelection(schema, schemaSelectionKey, getUserSelectionForMode(mode));
     }
     const data = getDataForMode(mode).dataAt(absolutePath);
-
-    return (
-      (!dependsOnUserSelection && data && typeof data !== 'object') || // primitive type in data
-      (!schema.hasType('object') && !schema.hasType('array')) || // primitive type in schema
-      depth >= settings.value.guiEditor.maximumDepth // maximum depth reached
+    return Boolean(
+      (data && typeof data !== 'object') || (!schema.hasType('object') && !schema.hasType('array'))
     );
-  }
-
-  /**
-   * True if the schema depends on the user selection, i.e., if it has anyOf, oneOf or multiple types.
-   */
-  private dependsOnUserSelection(schema: JsonSchemaWrapper) {
-    return schema.anyOf.length > 0 || schema.oneOf.length > 0 || schema.type.length > 1;
   }
 
   /**
@@ -137,64 +128,51 @@ export class ConfigTreeNodeResolver {
       guiEditorTreeNode.data.absolutePath
     );
 
-    guiEditorTreeNode.children = this.createChildNodes(
-      mode,
-      guiEditorTreeNode.data.absolutePath,
-      guiEditorTreeNode.data.relativePath,
-      effectiveSchema,
-      guiEditorTreeNode.data.depth
-    );
+    guiEditorTreeNode.children = this.createChildNodes(mode, {
+      ...guiEditorTreeNode.data,
+      schema: effectiveSchema.schema,
+      schemaSelectionKey:
+        guiEditorTreeNode.data.schemaSelectionKey ??
+        selectionKeyForPath(guiEditorTreeNode.data.absolutePath),
+    });
     return guiEditorTreeNode.children as GuiEditorTreeNode[];
   }
 
   private createChildNodes(
     mode: SessionMode,
-    absolutePath: Path,
-    relativePath: Path = [],
-    effectiveSchema: EffectiveSchema,
-    depth = 0
+    parameters: TreeNodeResolvingParameters
   ): GuiEditorTreeNode[] {
+    const {absolutePath, relativePath, schema, schemaSelectionKey, depth} = parameters;
     const depthLimit = settings.value.guiEditor.maximumDepth;
-    const schema = effectiveSchema.schema;
+
+    if (schemaSelectionKind(schema)) {
+      const selected = resolveSchemaSelection(
+        schema,
+        schemaSelectionKey,
+        getUserSelectionForMode(mode)
+      );
+      return selected
+        ? [
+            this.createTreeNodeOfProperty(
+              mode,
+              selected.schema,
+              schema,
+              absolutePath,
+              relativePath,
+              depth + 1,
+              TreeNodeType.SCHEMA_PROPERTY,
+              selected.schemaSelectionKey
+            ),
+          ]
+        : [];
+    }
 
     let children: GuiEditorTreeNode[] = [];
-    if (schema.type.length > 1) {
-      children = this.createTypeUnionChildrenTreeNodes(mode, {
-        absolutePath,
-        relativePath,
-        schema,
-        depth,
-      });
-    }
-    if (schema.oneOf.length > 0) {
-      children = this.createOneOfChildrenTreeNodes(mode, {
-        absolutePath,
-        relativePath,
-        schema,
-        depth,
-      });
-    }
-    if (schema.anyOf.length > 0) {
-      children = children.concat(
-        this.createAnyOfChildrenTreeNodes(mode, {absolutePath, relativePath, schema, depth})
-      );
-    }
-
-    if (this.dependsOnUserSelection(schema)) {
-      // no further children should be added, those children get added to the corresponding nodes
-      return children;
-    }
-
-    children = [];
     if (schema.hasType('array') && depth < depthLimit) {
-      children = children.concat(
-        this.createArrayChildrenTreeNodes(mode, {absolutePath, relativePath, schema, depth})
-      );
+      children = children.concat(this.createArrayChildrenTreeNodes(mode, parameters));
     }
     if (schema.hasType('object') && depth < depthLimit) {
-      children = children.concat(
-        this.createObjectChildrenTreeNodes(mode, {absolutePath, relativePath, schema, depth})
-      );
+      children = children.concat(this.createObjectChildrenTreeNodes(mode, parameters));
     }
 
     if (children.length > settings.value.performance.maxShownChildrenInGuiEditor) {
@@ -212,7 +190,7 @@ export class ConfigTreeNodeResolver {
     mode: SessionMode,
     parameters: TreeNodeResolvingParameters
   ) {
-    let result = sortObjectChildren(
+    const result = sortObjectChildren(
       settings.value.guiEditor.propertySorting,
       parameters.schema,
       filter => this.createSchemaPropertiesChildNodes(mode, parameters, filter),
@@ -239,8 +217,9 @@ export class ConfigTreeNodeResolver {
    */
   private createTreeNodeOfAdvancedProperty(
     mode: SessionMode,
-    {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters
+    parameters: TreeNodeResolvingParameters
   ): GuiEditorTreeNode | undefined {
+    const {absolutePath, relativePath, schema, schemaSelectionKey, depth} = parameters;
     const advanced: ConfigDataTreeNode = {
       data: {
         name: schema.title ?? '',
@@ -250,17 +229,13 @@ export class ConfigTreeNodeResolver {
         depth: 0,
         relativePath: relativePath,
         absolutePath: absolutePath,
+        schemaSelectionKey,
       },
       type: TreeNodeType.ADVANCED_PROPERTY,
       key: pathToString(absolutePath) + '$advanced',
       children: this.createSchemaPropertiesChildNodes(
         mode,
-        {
-          absolutePath,
-          relativePath,
-          schema,
-          depth: depth + 1,
-        },
+        {...parameters, depth: depth + 1},
         () => true,
         true
       ),
@@ -273,12 +248,33 @@ export class ConfigTreeNodeResolver {
     return undefined;
   }
 
+  /** Descend one data edge, keeping branch identity and both paths in sync. */
+  private createDataChild(
+    mode: SessionMode,
+    parent: TreeNodeResolvingParameters,
+    key: PathElement,
+    schema: JsonSchemaWrapper,
+    type: ConfigDataTreeNodeType = TreeNodeType.SCHEMA_PROPERTY
+  ): GuiEditorTreeNode {
+    return this.createTreeNodeOfProperty(
+      mode,
+      schema,
+      parent.schema,
+      parent.absolutePath.concat(key),
+      parent.relativePath.concat(key),
+      parent.depth + 1,
+      type,
+      childSchemaSelectionKey(parent.schemaSelectionKey, key)
+    );
+  }
+
   private createSchemaPropertiesChildNodes(
     mode: SessionMode,
-    {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters,
+    parameters: TreeNodeResolvingParameters,
     filter: (key: string) => boolean = () => true,
     advanced = false
   ) {
+    const {absolutePath, schema} = parameters;
     return (
       Object.entries(schema.properties)
         // apply given filter
@@ -288,17 +284,7 @@ export class ConfigTreeNodeResolver {
           ([key, value]) =>
             this.isKeepInAdvancedSection(mode, value, absolutePath.concat(key)) === advanced
         )
-        .map(([key, value]) => {
-          const childPath = absolutePath.concat(key);
-          return this.createTreeNodeOfProperty(
-            mode,
-            value,
-            schema,
-            childPath,
-            relativePath.concat(key),
-            depth + 1
-          );
-        })
+        .map(([key, value]) => this.createDataChild(mode, parameters, key, value))
     );
   }
 
@@ -316,9 +302,10 @@ export class ConfigTreeNodeResolver {
 
   private createDataPropertiesChildNodes(
     mode: SessionMode,
-    {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters,
+    parameters: TreeNodeResolvingParameters,
     filter: (key: string) => boolean = () => true
   ) {
+    const {absolutePath, schema} = parameters;
     const data = getDataForMode(mode).dataAt(absolutePath);
     if (!data) {
       return [];
@@ -330,15 +317,7 @@ export class ConfigTreeNodeResolver {
         .filter(([key]) => filter(key))
         .map(([key]) => {
           if (schema.properties && schema.properties[key]) {
-            const childPath = absolutePath.concat(key);
-            return this.createTreeNodeOfProperty(
-              mode,
-              schema.properties[key],
-              schema,
-              childPath,
-              relativePath.concat(key),
-              depth + 1
-            );
+            return this.createDataChild(mode, parameters, key, schema.properties[key]);
           }
 
           let childSchema = schema.additionalProperties;
@@ -352,38 +331,19 @@ export class ConfigTreeNodeResolver {
             }
           });
 
-          const childPath = absolutePath.concat(key);
-          return this.createTreeNodeOfProperty(
-            mode,
-            childSchema,
-            schema,
-            childPath,
-            relativePath.concat(key),
-            depth + 1,
-            type
-          );
+          return this.createDataChild(mode, parameters, key, childSchema, type);
         })
     );
   }
 
-  private createArrayChildrenTreeNodes(
-    mode: SessionMode,
-    {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters
-  ) {
+  private createArrayChildrenTreeNodes(mode: SessionMode, parameters: TreeNodeResolvingParameters) {
+    const {absolutePath, relativePath, schema, depth} = parameters;
     const data = getDataForMode(mode).dataAt(absolutePath);
     let children: GuiEditorTreeNode[] = [];
     if (Array.isArray(data)) {
-      children = data.map((value: any, index: number) => {
-        const childPath = absolutePath.concat(index);
-        return this.createTreeNodeOfProperty(
-          mode,
-          schema.items,
-          schema,
-          childPath,
-          relativePath.concat(index),
-          depth + 1
-        );
-      });
+      children = data.map((_, index) =>
+        this.createDataChild(mode, parameters, index, schema.items)
+      );
     }
     let exceedsChildrenLimit = false;
     if (children.length > settings.value.performance.maxShownChildrenInGuiEditor) {
@@ -419,7 +379,12 @@ export class ConfigTreeNodeResolver {
   }
 
   private createAddItemTreeNode(
-    {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters,
+    {
+      absolutePath,
+      relativePath,
+      schema,
+      depth,
+    }: Omit<TreeNodeResolvingParameters, 'schemaSelectionKey'>,
     children: GuiEditorTreeNode[]
   ): GuiEditorTreeNode {
     const pathWithIndex = relativePath.concat(children.length);
@@ -446,105 +411,6 @@ export class ConfigTreeNodeResolver {
     };
   }
 
-  private createTypeUnionChildrenTreeNodes(
-    mode: SessionMode,
-    {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters
-  ) {
-    const userSelectionOneOf =
-      getUserSelectionForMode(mode).getSelectedTypeUnionOption(absolutePath);
-
-    if (userSelectionOneOf !== undefined) {
-      const baseSchema = {...schema.jsonSchema};
-      delete baseSchema.type;
-      const selectedType = schema.type[userSelectionOneOf.index];
-      if (!selectedType) {
-        return [];
-      }
-      const newTypeSchema = typeSchema(selectedType, mode);
-      const mergedSchema = new JsonSchemaWrapper(
-        {
-          allOf: [baseSchema, newTypeSchema.jsonSchema ?? {}],
-        },
-        mode
-      );
-      return [
-        this.createTreeNodeOfProperty(
-          mode,
-          mergedSchema,
-          schema,
-          absolutePath,
-          relativePath,
-          depth + 1
-        ),
-      ];
-    }
-    return [];
-  }
-
-  private createOneOfChildrenTreeNodes(
-    mode: SessionMode,
-    {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters
-  ) {
-    const userSelectionOneOf = getUserSelectionForMode(mode).getSelectedOneOfOption(absolutePath);
-
-    if (userSelectionOneOf !== undefined) {
-      const baseSchema = {...schema.jsonSchema};
-      delete baseSchema.oneOf;
-      const subSchemaOneOf = schema.oneOf[userSelectionOneOf.index];
-      if (!subSchemaOneOf) {
-        return [];
-      }
-      const mergedSchema = new JsonSchemaWrapper(
-        {
-          allOf: [baseSchema, subSchemaOneOf.jsonSchema ?? {}],
-        },
-        mode
-      );
-      return [
-        this.createTreeNodeOfProperty(
-          mode,
-          mergedSchema,
-          schema,
-          absolutePath,
-          relativePath,
-          depth + 1
-        ),
-      ];
-    }
-    return [];
-  }
-
-  private createAnyOfChildrenTreeNodes(
-    mode: SessionMode,
-    {absolutePath, relativePath, schema, depth}: TreeNodeResolvingParameters
-  ) {
-    const userSelectionAnyOf = getUserSelectionForMode(mode).getSelectedAnyOfOptions(absolutePath);
-
-    if (userSelectionAnyOf !== undefined) {
-      const baseSchema = {...schema.jsonSchema};
-      delete baseSchema.anyOf;
-      const subSchemasAnyOf = userSelectionAnyOf.map(userSelectionEntry => {
-        return schema.anyOf[userSelectionEntry.index]?.jsonSchema ?? {};
-      });
-      const mergedSchema = safeMergeSchemas(baseSchema, ...subSchemasAnyOf);
-      if (!mergedSchema) {
-        // user selected schemas that are not compatible -> can never be fulfilled
-        return [];
-      }
-      return [
-        this.createTreeNodeOfProperty(
-          mode,
-          new JsonSchemaWrapper(mergedSchema, mode),
-          schema,
-          absolutePath,
-          relativePath,
-          depth + 1
-        ),
-      ];
-    }
-    return [];
-  }
-
   /**
    * Determines whether an "add property" node should be added to the tree.
    */
@@ -556,7 +422,12 @@ export class ConfigTreeNodeResolver {
       // if the data is a primitive type, we cannot add a property
       return false;
     }
-    if (schema.maxProperties !== undefined && Object.keys(data).length >= schema.maxProperties) {
+    if (
+      schema.maxProperties !== undefined &&
+      data !== null &&
+      typeof data === 'object' &&
+      Object.keys(data).length >= schema.maxProperties
+    ) {
       return false;
     }
     if (schema.metaConfigurator?.hideAddPropertyButton) {
@@ -579,14 +450,15 @@ export class ConfigTreeNodeResolver {
    * Determines whether an "add item" node should be added to the tree.
    */
   private shouldAddAddItemNode(schema: JsonSchemaWrapper, data: any) {
-    if (data !== undefined && !Array.isArray(data)) {
-      return false;
-    }
-    if (schema.maxItems !== undefined && data !== undefined && data.length >= schema.maxItems) {
+    // note that the add item node is offered even when the data at this node is not an
+    // array (e.g. the default empty object of a new document, or leftover data from an
+    // earlier schema): the GUI would otherwise appear empty for array schemas with no
+    // way to fix the data. Adding an item then replaces the old value (undo is available).
+    if (schema.maxItems !== undefined && Array.isArray(data) && data.length >= schema.maxItems) {
       return false;
     }
     if (schema.items.isAlwaysFalse) {
-      return data?.length < (schema.prefixItems?.length ?? 0);
+      return Array.isArray(data) && data.length < (schema.prefixItems?.length ?? 0);
     }
     return true;
   }

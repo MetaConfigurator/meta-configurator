@@ -10,6 +10,7 @@ import {
   getParentObjectSchemaAtDataPath,
 } from '@/schema/schemaReadingUtils';
 import {ValidationService} from '@/schema/validationService';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 function isPlainObject(value: unknown) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -147,6 +148,54 @@ function migrateSettingsVersion(userSettings: any) {
         hiddenPanels.splice(index, 1);
       }
     }
+  }
+
+  if (userSettings.settingsVersion === '1.0.3') {
+    // migrate from 1.0.3 to 1.0.4
+    userSettings.settingsVersion = '1.0.4';
+    // if the current settings data AI endpoint entry is untouched, update it to the new defaults
+    const aiIntegration = userSettings.aiIntegration;
+    if (
+      aiIntegration.model === 'gpt-4o-mini' &&
+      aiIntegration.backend &&
+      aiIntegration.backend.endpoint === 'https://api.openai.com/v1/'
+    ) {
+      userSettings.aiIntegration = {
+        model: 'alias-fast',
+        max_tokens: 5000,
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      };
+    }
+  }
+
+  if (userSettings.settingsVersion === '1.0.4') {
+    // migrate from 1.0.4 to 1.0.5
+    userSettings.settingsVersion = '1.0.5';
+    // The previous 1.0.3 -> 1.0.4 migration only updated the AI integration when
+    // the settings still had the exact old OpenAI defaults, so many users never
+    // received the new free-of-charge AI assistant configuration. Reset the AI
+    // integration to the current defaults for everyone (Uni Stuttgart relay +
+    // Blablador endpoint). Users can change it again afterwards.
+    userSettings.aiIntegration = structuredClone(SETTINGS_DATA_DEFAULT.aiIntegration);
+    // The backend settings were unified to explicit per-service URLs; drop the
+    // obsolete single `hostname` field (the new fields are added from defaults).
+    if (userSettings.backend) {
+      delete userSettings.backend.hostname;
+    }
+  }
+
+  if (userSettings.settingsVersion === '1.0.5') {
+    // migrate from 1.0.5 to 1.0.6
+    userSettings.settingsVersion = '1.0.6';
+  }
+
+  if (userSettings.settingsVersion === '1.0.6') {
+    // migrate from 1.0.6 to 1.0.7
+    userSettings.settingsVersion = '1.0.7';
   }
 }
 

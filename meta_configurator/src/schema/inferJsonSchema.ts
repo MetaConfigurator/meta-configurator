@@ -1,27 +1,48 @@
 import {inferSchema} from '@jsonhero/schema-infer';
-import type {JsonSchemaType} from '@/schema/jsonSchemaType';
+import type {JsonSchemaObjectType, JsonSchemaType} from '@/schema/jsonSchemaType';
 import {trimDataToMaxSize} from '@/utility/trimData';
 import {useSettings} from '@/settings/useSettings';
+import {JsonSchemaVisitor} from '@/schema/jsonSchemaVisitor';
 
-export function inferJsonSchema(sampleData: any): JsonSchemaType {
-  // trim sample data if needed
-  const maximumSizeInKiB = useSettings().value.performance.maxDocumentSizeForSchemaInference / 1024; // convert bytes to KiB
-  const minObjectPropertyCountToPreserve =
-    useSettings().value.performance.minObjectPropertyCountToPreserve;
-  sampleData = trimDataToMaxSize(sampleData, maximumSizeInKiB, minObjectPropertyCountToPreserve);
-  return fixEmptyArraySchemas(inferSchema(sampleData).toJSONSchema());
+export function inferJsonSchema(sampleData: unknown): JsonSchemaType {
+  return inferJsonSchemaFromSamples([sampleData]);
 }
 
-function fixEmptyArraySchemas(schema: any): any {
-  // schemas inferred from empty arrays have "items": false, which is not very useful and can break downstream logic
-  // instead, we change it to "items": true, which means "any type"
-  if (schema && typeof schema === 'object') {
+/**
+ * Infers a single schema that satisfies all given data instances: every instance
+ * refines the inference further, so the result accepts each of them.
+ */
+export function inferJsonSchemaFromSamples(samples: unknown[]): JsonSchemaType {
+  if (samples.length === 0) {
+    throw new Error('No data instances were provided for schema inference.');
+  }
+
+  const {maxDocumentSizeForSchemaInference, minObjectPropertyCountToPreserve} =
+    useSettings().value.performance;
+  const maximumSizeInKiB = maxDocumentSizeForSchemaInference / 1024;
+
+  let inference: ReturnType<typeof inferSchema> | undefined;
+  for (const sample of samples) {
+    const trimmedSample = trimDataToMaxSize(
+      sample,
+      maximumSizeInKiB,
+      minObjectPropertyCountToPreserve
+    );
+    inference = inferSchema(trimmedSample, inference);
+  }
+
+  return allowItemsInInferredEmptyArraySchemas(inference!.toJSONSchema());
+}
+
+export function allowItemsInInferredEmptyArraySchemas(schema: JsonSchemaType): JsonSchemaType {
+  new EmptyArraySchemaVisitor(false).traverse(schema);
+  return schema;
+}
+
+class EmptyArraySchemaVisitor extends JsonSchemaVisitor {
+  protected visitSchema(schema: JsonSchemaObjectType): void {
     if (schema.type === 'array' && schema.items === false) {
-      schema.items = true; // means “any type”
-    }
-    for (const key of Object.keys(schema)) {
-      schema[key] = fixEmptyArraySchemas(schema[key]);
+      schema.items = true;
     }
   }
-  return schema;
 }

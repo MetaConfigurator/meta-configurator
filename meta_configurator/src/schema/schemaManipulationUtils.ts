@@ -7,6 +7,7 @@ import {constructSchemaGraph} from '@/schema/graph-representation/schemaGraphCon
 import type {SchemaNodeData} from '@/schema/graph-representation/schemaGraphTypes';
 import {updateReferences} from '@/utility/renameUtils';
 import {stringToIdentifier} from '@/utility/stringToIdentifier';
+import {collectAllRefs, resolveInternalReferencePath} from '@/schema/schemaReferenceUtils';
 import _ from 'lodash';
 
 export function extractAllInlinedSchemaElements(
@@ -128,7 +129,6 @@ export function createIdentifierForExtractedElement(
   }
   return identifier;
 }
-
 export function addSchemaObject(
   schemaData: ManagedData,
   connectWithRootIfRootEmpty: boolean = true,
