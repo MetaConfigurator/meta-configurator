@@ -9,7 +9,12 @@ import {getValidationForMode} from '@/data/useDataLink';
  * Wrapper around a schema and the data it was calculated for.
  */
 export class EffectiveSchema {
-  constructor(public schema: JsonSchemaWrapper, public data: any, public path: Path) {}
+  constructor(
+    public schema: JsonSchemaWrapper,
+    public data: any,
+    public path: Path,
+    public schemaSelectionKey?: string
+  ) {}
 }
 
 /**

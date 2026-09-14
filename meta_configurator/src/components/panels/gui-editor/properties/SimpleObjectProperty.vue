@@ -8,13 +8,15 @@ import {computed} from 'vue';
 
 const props = defineProps<{
   propertySchema: JsonSchemaWrapper;
-  propertyData: Object | undefined;
+  propertyData: unknown;
   expanded: boolean;
 }>();
 
 const numberOfProperties = computed(() =>
   Math.max(
-    Object.keys(props.propertyData ?? {}).length,
+    props.propertyData !== null && typeof props.propertyData === 'object'
+      ? Object.keys(props.propertyData).length
+      : 0,
     Object.keys(props.propertySchema.properties).length
   )
 );

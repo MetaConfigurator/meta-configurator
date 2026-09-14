@@ -41,17 +41,9 @@ async function readFileContentFromFileList(
   const fileContentAsString = readFileContent(file);
 
   if (parseInput) {
-    // parse the file content depending on the file suffix
-    const fileName = file.name;
-    for (const formatName of formatRegistry.getFormatNames()) {
-      if (fileName.toLowerCase().endsWith(formatName.toLowerCase())) {
-        return formatRegistry.getFormat(formatName).dataConverter.parse(await fileContentAsString);
-      }
-    }
-    throw new Error(`Unknown file format: ${fileName}`);
-  } else {
-    return fileContentAsString;
+    return formatRegistry.parseFileContent(file.name, await fileContentAsString);
   }
+  return fileContentAsString;
 }
 
 /**

@@ -1,5 +1,5 @@
 import type cytoscape from 'cytoscape';
-import {isDark} from '@/components/panels/rdf/rdfUtils';
+import {isDarkMode} from '@/utility/darkModeUtils';
 
 export const TYPE_PREDICATES = [
   'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
@@ -22,7 +22,6 @@ function getCssVar(variable: string): string {
 }
 
 export function createCyStyle(): cytoscape.StylesheetCSS[] {
-  const isDarkMode = isDark();
   const nodeBg = getCssVar('--p-blue-400');
   const nodeBorder = getCssVar('--p-blue-700');
   const nodeText = getCssVar('--p-text-color');

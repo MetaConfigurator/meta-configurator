@@ -6,9 +6,6 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import SelectButton from 'primevue/selectbutton';
-import * as ace from 'brace';
-import {type Editor} from 'brace';
-import {watchImmediate} from '@vueuse/core';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import {getDataForMode, getSchemaForMode, getSessionForMode} from '@/data/useDataLink';
 import {SessionMode} from '@/store/sessionMode';
@@ -16,7 +13,8 @@ import _ from 'lodash';
 import {pathToJsonPointer} from '@/utility/pathUtils';
 import type {Path} from '@/utility/path';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {setupAceMode, setupAceProperties} from '@/components/panels/shared-components/aceUtils';
+import {setupAceMode} from '@/components/panels/shared-components/aceUtils';
+import {useAceEditor} from '@/components/panels/shared-components/useAceEditor';
 import {
   fixAndParseGeneratedJson,
   fixGeneratedExpression,
@@ -25,6 +23,11 @@ import {
 import {fetchExternalContentText} from '@/utility/fetchExternalContent';
 import Panel from 'primevue/panel';
 import {removeCustomFieldsFromSchema} from '@/components/panels/ai-prompts/schemaProcessor';
+import {
+  postProcessSchemaModification,
+  bundleReferencedDefinitions,
+} from '@/schema/schemaDefinitionBundling';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -81,11 +84,6 @@ const documentExportFormatNames: Ref<string[]> = computed(() => {
   return documentExportFormats.value ? Object.keys(documentExportFormats.value) : [];
 });
 
-// random id is used to enable multiple Ace Editors of same sessionMode on the same page
-// the editor only is a fallback option if the returned response by the AI is not valid JSON
-const editor_id = 'ai-prompts-' + Math.random();
-const editor_id_export = 'ai-prompts-export-' + Math.random();
-
 const promptCreateDocument: Ref<string> = ref(props.defaultTextCreateDocument);
 const promptModifyDocument: Ref<string> = ref(props.defaultTextModifyDocument);
 const promptQuestionDocument: Ref<string> = ref(props.defaultTextQuestionDocument);
@@ -110,29 +108,16 @@ const newDocument: Ref<string> = ref('');
 const newDocumentPath: Ref<Path> = ref([]);
 const exportedDocument: Ref<string> = ref('');
 
+const {editorElementId: correctedDocumentEditorId, createEditor: createCorrectedDocumentEditor} =
+  useAceEditor('ai-prompts', newDocument, {
+    configureEditor: editor => setupAceMode(editor, settings),
+  });
+const {editorElementId: exportedDocumentEditorId, createEditor: createExportedDocumentEditor} =
+  useAceEditor('ai-prompts-export', exportedDocument, {});
+
 onMounted(() => {
-  const editor: Editor = ace.edit(editor_id);
-  setupAceMode(editor, settings.value);
-  setupAceProperties(editor, settings.value);
-
-  // watch changes to newDocument and update the data in the editor accordingly
-  watchImmediate(
-    () => newDocument.value,
-    newValue => {
-      editor.setValue(newValue);
-      editor.clearSelection();
-    }
-  );
-
-  const editor_export: Editor = ace.edit(editor_id_export);
-  setupAceProperties(editor_export, settings.value);
-  watchImmediate(
-    () => exportedDocument.value,
-    newValue => {
-      editor_export.setValue(newValue);
-      editor_export.clearSelection();
-    }
-  );
+  createCorrectedDocumentEditor();
+  createExportedDocumentEditor();
 });
 
 function submitPromptCreateDocument() {
@@ -165,10 +150,19 @@ function submitPromptCreateDocument() {
 
 function submitPromptModifyDocument() {
   const openApiKey = getApiKey();
-  const relevantSubDocument = data.dataAt(currentElement.value);
+  let relevantSubDocument = data.dataAt(currentElement.value);
   const relevantSubSchema = schema.schemaWrapperAtPath(currentElement.value).jsonSchema!;
   isLoadingChangeAnswer.value = true;
   errorMessage.value = '';
+
+  // when modifying a sub-schema, bundle the definitions it references into it, so that the AI knows them and can modify them as well
+  let bundledDefinitionNames: string[] = [];
+  if (data.mode === SessionMode.SchemaEditor && currentElement.value.length > 0) {
+    const bundledResult = bundleReferencedDefinitions(relevantSubDocument, data.data.value);
+    relevantSubDocument = bundledResult.bundledSubSchema;
+    bundledDefinitionNames = bundledResult.bundledDefinitionNames;
+  }
+
   const response = props.functionQueryDocumentModification(
     openApiKey,
     promptModifyDocument.value,
@@ -180,10 +174,10 @@ function submitPromptModifyDocument() {
     .then(value => {
       try {
         const json = fixAndParseGeneratedJson(value);
-        processResult(value, true, json, currentElement.value);
+        processResult(value, true, json, currentElement.value, bundledDefinitionNames);
       } catch (e) {
         console.error('Failed to parse JSON', e);
-        processResult(value, false, null, currentElement.value);
+        processResult(value, false, null, currentElement.value, bundledDefinitionNames);
       }
     })
     .catch(e => {
@@ -199,14 +193,16 @@ function processResult(
   response: string,
   validJson: boolean,
   responseObject: any,
-  pathForResponse: Path
+  pathForResponse: Path,
+  bundledDefinitionNames: string[] = []
 ) {
   if (validJson) {
-    // if the response is valid, it is applied directly
+    if (data.mode === SessionMode.SchemaEditor && pathForResponse.length > 0) {
+      responseObject = postProcessSchemaModification(responseObject, data, bundledDefinitionNames);
+    }
     newDocument.value = '';
     data.setDataAt(pathForResponse, responseObject);
   } else {
-    // otherwise, the invalid response is shown to the user, who can try to figure out what went wrong and fix it
     newDocument.value = response;
     newDocumentPath.value = pathForResponse;
   }
@@ -215,14 +211,15 @@ function processResult(
 function applyEditorDocument() {
   try {
     const dataFormat = settings.value.dataFormat;
-    const editorContent = ace.edit(editor_id).getValue();
-    // parse the data in the editor as JavaScript Object according to the parser of the current data format
-    const data = formatRegistry.getFormat(dataFormat).dataConverter.parse(editorContent);
-    data.setDataAt(newDocumentPath.value, data);
+    const correctedDocument = formatRegistry
+      .getFormat(dataFormat)
+      .dataConverter.parse(newDocument.value);
+    data.setDataAt(newDocumentPath.value, correctedDocument);
     newDocument.value = '';
     newDocumentPath.value = [];
-  } catch (e) {
-    console.error('Failed to parse JSON', e);
+  } catch (error) {
+    console.error('Failed to parse corrected document', error);
+    errorMessage.value = getErrorMessage(error);
   }
 }
 
@@ -358,8 +355,8 @@ function selectRootElement() {
               <FontAwesomeIcon icon="fa-solid fa-circle-info" />
             </Button>
           </span>
-          <Textarea v-model="promptModifyDocument" />
-          <Button @click="submitPromptModifyDocument()"
+          <Textarea v-model="promptModifyDocument" data-testid="ai-prompt-modify-input" />
+          <Button @click="submitPromptModifyDocument()" data-testid="ai-prompt-modify-submit"
             >Modify {{ props.labelDocumentType }}</Button
           >
           <ProgressSpinner v-if="isLoadingChangeAnswer" />
@@ -374,7 +371,7 @@ function selectRootElement() {
           applying the change.</Message
         >
         <div class="parent-container">
-          <div class="h-full editor" :id="editor_id" />
+          <div class="h-full editor" :id="correctedDocumentEditorId" />
         </div>
         <Button @click="applyEditorDocument()">Apply {{ props.labelDocumentType }}</Button>
       </div>
@@ -441,7 +438,7 @@ function selectRootElement() {
         <div v-show="exportedDocument.length > 0">
           <b>Resulting Document in Target Format</b>
           <div class="parent-container">
-            <div class="h-full editor" :id="editor_id_export" />
+            <div class="h-full editor" :id="exportedDocumentEditorId" />
           </div>
         </div>
       </Panel>

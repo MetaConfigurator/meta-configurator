@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.7.0] - 2026-06-17
+
+### Added
+
+- Add support for import of other schema formats and export to other schema formats (XSD, SHACL, LinkML, MD-Models, etc), see [the related documentation](documentation_user/examples/schema_conversion)
+- Add copy button for code examples in documentation view
+- Add Edit Mode for table view in data tab
+
+### Changed
+
+- New MetaConfigurator logo, created by Devesh Harshad Talsania
+
 ## [2.6.0] - 2026-05-31
 
 ### Added

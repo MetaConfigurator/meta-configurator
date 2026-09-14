@@ -31,6 +31,11 @@ export function fixGeneratedExpression(
   return json.trim();
 }
 
+/** Removes the markdown code fences an LLM tends to wrap generated JavaScript in. */
+export function fixGeneratedJavascript(generatedJavascript: string): string {
+  return fixGeneratedExpression(generatedJavascript, ['javascript', 'js']);
+}
+
 function hasMoreOpeningBrackets(input: string): boolean {
   const openingCount = (input.match(/\{/g) || []).length;
   const closingCount = (input.match(/\}/g) || []).length;

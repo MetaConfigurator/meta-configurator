@@ -37,14 +37,14 @@ Begin with your normal structured JSON (simulation data, lab records, process lo
 
 Open the RDF panel in the Data tab by clicking the globe icon.
 
-![Opening RDF Panel](./images/RDF-Panel.png)
+![Opening RDF Panel](./figs/RDF-Panel.png)
 
 Initially, the panel shows a warning that your data is not in JSON-LD format. This means:
 
 - Your data is already valid JSON.
 - It is not yet ready for semantic querying until converted to JSON-LD.
 
-![RDF panel with JSON input](./images/MC-RDF-JSON.png)
+![RDF panel with JSON input](./figs/MC-RDF-JSON.png)
 
 Now you have two options to proceed:
 
@@ -64,7 +64,7 @@ Again, you can proceed in two ways:
 - Paste an existing RML mapping, or
 - Generate a draft mapping with AI and then adjust it.
 
-![RML mapping dialog](./images/MC-RDF-RML-1.png)
+![RML mapping dialog](./figs/MC-RDF-RML-1.png)
 
 Sample mappings:
 
@@ -85,11 +85,11 @@ After conversion, the RDF panel gives two synchronized tabs:
 - **Context**: manage prefix and context definitions.
 - **Triples**: manage subject-predicate-object statements.
 
-![Context view](./images/MC-RDF-JSON-LD-2.png)
+![Context view](./figs/MC-RDF-JSON-LD-2.png)
 
-![Triples view](./images/MC-RDF-JSON-LD-1.png)
+![Triples view](./figs/MC-RDF-JSON-LD-1.png)
 
-![Triple edit modal](./images/MC-RDF-Modal.png)
+![Triple edit modal](./figs/MC-RDF-Modal.png)
 
 Typical tasks in the **Triples** tab:
 
@@ -111,9 +111,9 @@ Sample JSON-LD outputs:
 
 When editing predicates or object IRIs, open **Ontology Explorer** for guided selection.
 
-![Ontology explorer](./images/MC-RDF-Ontology-1.png)
+![Ontology explorer](./figs/MC-RDF-Ontology-1.png)
 
-![Ontology explorer SPARQL](./images/MC-RDF-Ontology-3.png)
+![Ontology explorer SPARQL](./figs/MC-RDF-Ontology-3.png)
 
 What you can do there:
 
@@ -132,13 +132,13 @@ This is especially helpful for consistent use of units, classes, and shared voca
 
 Open SPARQL from the triples toolbar to validate and analyze your graph.
 
-![SPARQL AI generation](./images/MC-RDF-SPARQL-1.png)
+![SPARQL AI generation](./figs/MC-RDF-SPARQL-1.png)
 
-![SPARQL result table](./images/MC-RDF-SPARQL-2.png)
+![SPARQL result table](./figs/MC-RDF-SPARQL-2.png)
 
-![MOF SPARQL result](./images/MC-RDF-SPARQL-3.png)
+![MOF SPARQL result](./figs/MC-RDF-SPARQL-3.png)
 
-![SPARQL visualization hints](./images/MC-RDF-SPARQL-4.png)
+![SPARQL visualization hints](./figs/MC-RDF-SPARQL-4.png)
 
 In this dialog, you can:
 
@@ -164,9 +164,9 @@ Sample queries:
 
 Use **Visualize** to inspect relationships as a graph.
 
-![Simulation Knowledge Graph](./images/MC-RDF-KG-1.png)
+![Simulation Knowledge Graph](./figs/MC-RDF-KG-1.png)
 
-![MOF Knowledge Graph](./images/MC-RDF-KG-2.png)
+![MOF Knowledge Graph](./figs/MC-RDF-KG-2.png)
 
 Two visualization modes:
 

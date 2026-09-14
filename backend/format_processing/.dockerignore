@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+certs/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+tests/
+*.log

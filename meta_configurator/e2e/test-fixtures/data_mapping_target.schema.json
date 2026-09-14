@@ -1,0 +1,10 @@
+{
+  "title": "Mapped Person",
+  "type": "object",
+  "properties": {
+    "fullName": {
+      "type": "string"
+    }
+  },
+  "required": ["fullName"]
+}

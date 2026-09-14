@@ -27,11 +27,15 @@ allowed_origins:
 # Rate limiting (per client IP)
 # ---------------------------------------------------------------------------
 
+# A public relay shares ONE provider quota between all of its users, so these
+# limits decide how much of that shared quota a single client may consume before
+# everyone else is locked out. Keep them tight: allow comfortable interactive use,
+# not bulk processing. Users who need more should configure their own API key.
 rate_limits:
   enabled: true
-  requests_per_minute: 20
-  requests_per_hour: 200
-  requests_per_day: 1000
+  requests_per_minute: 10
+  requests_per_hour: 60
+  requests_per_day: 200
 
 # ---------------------------------------------------------------------------
 # Usage limits
@@ -41,7 +45,11 @@ limits:
   # Caps the max_tokens value per request (prevents runaway token use).
   max_request_tokens: 10000
   # Max tokens a single IP may use in 24 h. Set to 0 to disable.
-  max_daily_tokens_per_ip: 100000
+  # A request is charged its prompt size (about one token per 4 bytes of body)
+  # plus its capped max_tokens, because the provider bills both and
+  # MetaConfigurator sends whole documents. This is the limit that actually
+  # protects the shared quota; the request counters above only stop bursts.
+  max_daily_tokens_per_ip: 50000
   # Max request body size in bytes.
   max_request_bytes: 2097152
 
