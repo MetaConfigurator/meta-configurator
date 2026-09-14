@@ -11,3 +11,15 @@ export async function aiPanelSubmitCreate(page: Page) {
     await expect(button).toBeVisible();
     await button.click();
 }
+
+export async function aiPanelEnterModifyPrompt(page: Page, prompt: string) {
+    const textarea = page.getByTestId('ai-prompt-modify-input');
+    await expect(textarea).toBeVisible();
+    await textarea.fill(prompt);
+}
+
+export async function aiPanelSubmitModify(page: Page) {
+    const button = page.getByTestId('ai-prompt-modify-submit');
+    await expect(button).toBeVisible();
+    await button.click();
+}

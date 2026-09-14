@@ -1,5 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {ref} from 'vue';
+import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
@@ -31,10 +33,45 @@ vi.mock('@/components/panels/panelTypeRegistry', () => ({
   },
 }));
 
-import {addDefaultsForMissingFields, fixPanels} from '../settingsUpdater';
+import {
+  addDefaultsForMissingFields,
+  fixPanels,
+  updateSettingsWithDefaults,
+} from '../settingsUpdater';
+
+const PREVIOUS_BACKEND_SETTINGS = {
+  snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+  schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+};
+
+const CURRENT_BACKEND_SETTINGS = {
+  ...PREVIOUS_BACKEND_SETTINGS,
+  formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+};
+
+function createSettingsMigrationFixture(settingsVersion: string, backend: Record<string, unknown>) {
+  return {
+    settingsVersion,
+    panels: {
+      dataEditor: [],
+      schemaEditor: [],
+      settings: [],
+      hidden: [],
+    },
+    backend: {...backend},
+    aiIntegration: {
+      model: 'alias-fast',
+      temperature: 0,
+      backend: {
+        relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+        endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+      },
+    },
+  };
+}
 
 describe('test settings updater', () => {
-  let userSettings: any = {
+  const userSettings: any = {
     a: {
       b: {
         c: 5,
@@ -66,7 +103,7 @@ describe('test settings updater', () => {
     },
   };
 
-  let defaultSettings: any = {
+  const defaultSettings: any = {
     a: {
       b: {
         c: 1,
@@ -118,23 +155,59 @@ describe('test settings updater', () => {
   it('test addDefaultsForMissingFields', () => {
     const userFile = structuredClone(userSettings);
     const defaultsFile = structuredClone(defaultSettings);
+    const schema: TopLevelSchema = {
+      type: 'object',
+      required: ['a', 'schemaDiagram', 'panels'],
+      properties: {
+        a: {
+          type: 'object',
+          required: ['b'],
+          properties: {
+            b: {
+              type: 'object',
+              required: ['c'],
+              properties: {
+                c: {type: 'number'},
+                d: {type: 'number'},
+              },
+            },
+            e: {
+              type: 'object',
+              required: ['f'],
+              properties: {
+                f: {type: 'number'},
+                g: {type: 'number'},
+              },
+            },
+          },
+        },
+        schemaDiagram: {
+          type: 'object',
+          properties: {
+            showNullableCheckbox: {type: 'boolean'},
+          },
+        },
+        panels: {
+          type: 'object',
+          required: ['dataEditor', 'schemaEditor', 'settings'],
+          properties: {
+            dataEditor: {type: 'array'},
+            schemaEditor: {type: 'array'},
+            settings: {type: 'array'},
+          },
+        },
+      },
+    };
 
-    addDefaultsForMissingFields(userFile, defaultsFile);
+    addDefaultsForMissingFields(userFile, defaultsFile, schema, userFile);
 
     expect(userFile).toEqual({
       a: {
         b: {
           c: 5,
-          d: 2,
-        },
-        e: {
-          f: 3,
-          g: 4,
         },
       },
-      schemaDiagram: {
-        showNullableCheckbox: true,
-      },
+      schemaDiagram: {},
       panels: {
         dataEditor: [
           {
@@ -209,5 +282,189 @@ describe('test settings updater', () => {
         ],
       },
     });
+  });
+
+  it('resets existing 1.0.4 AI settings to the 1.0.7 Uni Stuttgart relay preset', () => {
+    const userFile = {
+      settingsVersion: '1.0.4',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      backend: {
+        hostname: 'https://old.example.org',
+      },
+      aiIntegration: {
+        model: 'gpt-4o-mini',
+        temperature: 0,
+        backend: {
+          endpoint: 'https://api.openai.com/v1/',
+        },
+      },
+    };
+
+    const defaultsFile = {
+      settingsVersion: '1.0.7',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      backend: {
+        snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+        schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        formatProcessingUrl:
+          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        max_tokens: 5000,
+        temperature: 0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.settingsVersion).toBe('1.0.7');
+    expect(userFile.backend).toEqual({
+      snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+      schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+    });
+    expect(userFile.aiIntegration).toEqual({
+      model: 'alias-fast',
+      max_tokens: 5000,
+      temperature: 0.0,
+      backend: {
+        relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+        endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+      },
+    });
+  });
+
+  it('does not force relay defaults back into a direct AI endpoint config', () => {
+    const userFile = {
+      settingsVersion: '1.0.6',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      aiIntegration: {
+        model: 'gpt-4o-mini',
+        temperature: 0,
+        backend: {
+          endpoint: 'https://api.openai.com/v1/',
+        },
+      },
+    };
+
+    const defaultsFile = {
+      settingsVersion: '1.0.5',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        temperature: 0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.settingsVersion).toBe('1.0.7');
+    expect(userFile.aiIntegration.backend).toEqual({
+      endpoint: 'https://api.openai.com/v1/',
+    });
+    expect(userFile.aiIntegration.model).toBe('gpt-4o-mini');
+  });
+
+  it('resets customized 1.0.3 AI settings while bumping to 1.0.7', () => {
+    const userFile = {
+      settingsVersion: '1.0.3',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      aiIntegration: {
+        model: 'gpt-4o',
+        max_tokens: 1234,
+        temperature: 0.2,
+        backend: {
+          endpoint: 'https://api.openai.com/v1/',
+        },
+      },
+    };
+
+    const defaultsFile = {
+      settingsVersion: '1.0.7',
+      panels: {
+        dataEditor: [],
+        schemaEditor: [],
+        settings: [],
+        hidden: [],
+      },
+      aiIntegration: {
+        model: 'alias-fast',
+        max_tokens: 5000,
+        temperature: 0.0,
+        backend: {
+          relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+          endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+        },
+      },
+    };
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.settingsVersion).toBe('1.0.7');
+    expect(userFile.aiIntegration).toEqual({
+      model: 'alias-fast',
+      max_tokens: 5000,
+      temperature: 0.0,
+      backend: {
+        relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+        endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+      },
+    });
+  });
+
+  it('adds the new format processing URL while bumping from 1.0.5 to 1.0.7', () => {
+    const userFile = createSettingsMigrationFixture('1.0.5', PREVIOUS_BACKEND_SETTINGS);
+    const defaultsFile = createSettingsMigrationFixture('1.0.7', CURRENT_BACKEND_SETTINGS);
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.settingsVersion).toBe('1.0.7');
+    expect(userFile.backend).toEqual(CURRENT_BACKEND_SETTINGS);
+  });
+
+  it('adds the schema-data synchronization limit when migrating from 1.0.6', () => {
+    const userFile = structuredClone(SETTINGS_DATA_DEFAULT);
+    userFile.settingsVersion = '1.0.6';
+    delete (userFile.performance as Partial<typeof userFile.performance>)
+      .maxSchemaSizeForDataSynchronization;
+
+    updateSettingsWithDefaults(userFile, structuredClone(SETTINGS_DATA_DEFAULT));
+
+    expect(userFile.settingsVersion).toBe('1.0.7');
+    expect(userFile.performance.maxSchemaSizeForDataSynchronization).toBe(1024000);
   });
 });

@@ -2,6 +2,7 @@ import {describe, expect, it} from 'vitest';
 import type {ErrorObject} from 'ajv';
 import {collapseUnionErrors} from '@/schema/collapseUnionErrors';
 import {ValidationService} from '@/schema/validationService';
+import {buildFullMetaSchema} from '@/schema/metaSchemaBuilder';
 
 function err(overrides: Partial<ErrorObject>): ErrorObject {
   return {
@@ -273,6 +274,27 @@ describe('collapseUnionErrors', () => {
         '  • variant 1: must be <= 10',
         '  • variant 2: must be string',
       ].join('\n')
+    );
+  });
+
+  it('includes referenced oneOf branch errors when additionalProperties is an invalid schema value', () => {
+    const service = new ValidationService(buildFullMetaSchema());
+
+    const raw = service.validate({type: 'object', additionalProperties: 1}).errors;
+    const collapsed = collapseUnionErrors(raw);
+
+    const additionalPropertiesError = collapsed.find(
+      error => error.instancePath === '/additionalProperties'
+    );
+
+    expect(additionalPropertiesError).toBeDefined();
+    expect(additionalPropertiesError!.keyword).toBe('oneOf');
+    expect(additionalPropertiesError!.message).toContain('variant 1');
+    expect(additionalPropertiesError!.message).toContain('variant 2');
+    expect(additionalPropertiesError!.message).toContain('variant 3');
+    expect(additionalPropertiesError!.message).toContain('must be object');
+    expect(collapsed.filter(error => error.instancePath === '/additionalProperties')).toHaveLength(
+      1
     );
   });
 });

@@ -1,22 +1,19 @@
 import type {DataFormatDefinition} from '@/dataformats/dataFormatDefinition';
-import {DataConverterJson, DataConverterXml, DataConverterYaml} from '@/dataformats/dataConverter';
+import {DataConverterJson, DataConverterYaml} from '@/dataformats/dataConverter';
 import {PathIndexLinkJson} from '@/dataformats/pathIndexLinkJson';
 import {formatRegistry} from '@/dataformats/formatRegistry';
 import {PathIndexLinkYaml} from '@/dataformats/pathIndexLinkYaml';
 
 export const jsonFormat: DataFormatDefinition = {
+  fileExtensions: ['.json'],
   dataConverter: new DataConverterJson(),
   pathIndexLink: new PathIndexLinkJson(),
 };
 
 const yamlFormat: DataFormatDefinition = {
+  fileExtensions: ['.yaml', '.yml'],
   dataConverter: new DataConverterYaml(),
   pathIndexLink: new PathIndexLinkYaml(),
-};
-
-const xmlFormat: DataFormatDefinition = {
-  dataConverter: new DataConverterXml(),
-  pathIndexLink: null,
 };
 
 /**
@@ -25,5 +22,4 @@ const xmlFormat: DataFormatDefinition = {
 export function registerDefaultDataFormats() {
   formatRegistry.registerFormat('json', jsonFormat);
   formatRegistry.registerFormat('yaml', yamlFormat);
-  formatRegistry.registerFormat('xml', xmlFormat);
 }

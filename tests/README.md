@@ -19,11 +19,11 @@ pulling broad entry points into the test.
 Browser E2E tests are split by responsibility:
 
 - Main MetaConfigurator E2E tests: [meta_configurator/e2e](../meta_configurator/e2e)
-- Relay-specific browser E2E test: [relay/tests](../relay/tests)
+- Relay-specific browser E2E test: [relay/tests](../backend/relay/tests)
 - Shared Playwright helpers used by both: [tests/shared](shared)
 
 Run the main browser E2E suite with `npm run test:e2e`.
 Run the relay browser E2E suite with `npm run test:e2e:relay`.
 
 The relay also has Python unit tests and Docker smoke tests under
-[relay/tests](../relay/tests).
+[relay/tests](../backend/relay/tests).

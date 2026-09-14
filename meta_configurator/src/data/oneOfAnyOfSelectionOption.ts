@@ -35,3 +35,9 @@ export function schemaOptionToString(schema: JsonSchemaWrapper, index: number): 
 
   return `${index}: ${dataToString(schemaToDescribe, 1, 60)}`;
 }
+
+export function schemaSelectionOptions(schemas: JsonSchemaWrapper[]): OneOfAnyOfSelectionOption[] {
+  return schemas.map(
+    (schema, index) => new OneOfAnyOfSelectionOption(schemaOptionToString(schema, index), index)
+  );
+}

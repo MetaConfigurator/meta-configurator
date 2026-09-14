@@ -1,6 +1,8 @@
 name: Node.js CI
 
-on: [push, workflow_dispatch]
+on:
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,8 +13,6 @@ jobs:
         node-version: [18.x]
 
     permissions:
-      # Give the default GITHUB_TOKEN write permission to commit and push the
-      # added or changed files to the repository.
       contents: write
 
     defaults:
@@ -51,12 +51,12 @@ jobs:
       - name: Prettier
         run: npm run prettier
 
+      # Intentional: CI applies formatting and commits it back so contributors
+      # do not need to run the formatter manually before every push.
       - name: Commit format changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: apply formatting changes
           branch: ${{ github.head_ref }}
           status_options: "--untracked-files=no"
-          # only changed files in src/ and test/ will be committed
-          # because otherwise this bot commits node_modules/ and dist/
           file_pattern: "*"

@@ -1,0 +1,39 @@
+name: Format Processing Tests
+
+on:
+  pull_request:
+    paths:
+      - 'backend/format_processing/**'
+      - 'backend/docker-compose.yml'
+      - 'backend/.env.example'
+      - 'backend/check_backend.sh'
+      - '.github/workflows/format-processing-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  format-processing-tests:
+    name: Format processing tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install format processing dependencies
+        working-directory: ./backend/format_processing
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run format processing Python tests
+        working-directory: ./backend/format_processing
+        run: pytest tests/ -v
+
+      - name: Show Docker tool versions
+        run: |
+          docker version
+          docker buildx version || true
+          docker compose version
+
+      - name: Run format processing Docker smoke tests
+        run: bash backend/format_processing/tests/test_docker.sh

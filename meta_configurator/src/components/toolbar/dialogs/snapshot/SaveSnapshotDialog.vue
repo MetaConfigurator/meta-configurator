@@ -99,6 +99,8 @@ defineExpose({show: openDialog, close: hideDialog});
         <br />
         A snapshot will be deleted after not being accessed for 30 days.
         <br />
+        Snapshot availability is best-effort and cannot be guaranteed.
+        <br />
         <br />
         For a permanent storage of snapshots or permanent link to a custom "configurator", see our
         <a

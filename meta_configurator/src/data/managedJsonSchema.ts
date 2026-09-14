@@ -1,7 +1,8 @@
 import type {Ref, ShallowRef} from 'vue';
 import {ref} from 'vue';
 import type {Path} from '@/utility/path';
-import {pathToString} from '@/utility/pathUtils';
+import {schemaSelectionKey, childSchemaSelectionKey} from '@/data/schemaSelectionKey';
+import {resolveSchemaSelection} from '@/data/schemaSelection';
 import {watchDebounced} from '@vueuse/core';
 import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
 import {TopLevelJsonSchemaWrapper} from '@/schema/topLevelJsonSchemaWrapper';
@@ -78,39 +79,49 @@ export class ManagedJsonSchema {
   /**
    * Returns the effective schema at the given path, i.e., the schema that resolved data dependent keywords.
    */
-  public effectiveSchemaAtPath(path: Path): EffectiveSchema {
-    let currentEffectiveSchema: EffectiveSchema = calculateEffectiveSchema(
+  public effectiveSchemaAtPath(path: Path, resolveTargetSelection = true): EffectiveSchema {
+    let currentPath: Path = [];
+    let selectionKey = schemaSelectionKey(currentPath);
+    const data = getDataForMode(this.mode);
+    const selections = getUserSelectionForMode(this.mode);
+    let effective = calculateEffectiveSchema(
       this.schemaWrapper.value,
-      getDataForMode(this.mode).data.value,
-      []
+      data.data.value,
+      currentPath
     );
 
-    const currentPath = [];
-    for (const key of path) {
-      currentPath.push(key);
-      const schema = currentEffectiveSchema.schema.subSchema(key);
-
-      if (schema?.oneOf && schema.oneOf.length > 0) {
-        const oneOfSelection = getUserSelectionForMode(
-          this.mode
-        ).currentSelectedOneOfOptions.value.get(pathToString(currentPath));
-        if (oneOfSelection !== undefined) {
-          currentEffectiveSchema = calculateEffectiveSchema(
-            schema.oneOf[oneOfSelection.index],
-            getDataForMode(this.mode).dataAt(currentPath),
+    for (let depth = 0; depth <= path.length; depth++) {
+      // The GUI keeps the target's selectors visible. For other schema consumers,
+      // resolve them too. Ancestor selections must always be consumed to find children.
+      if (depth < path.length || resolveTargetSelection) {
+        // Each successful step reads a distinct, longer selection key. There cannot
+        // be more steps than stored choices, even for recursive schemas at one path.
+        const selectionCount =
+          selections.currentSelectedOneOfOptions.value.size +
+          selections.currentSelectedAnyOfOptions.value.size +
+          selections.currentSelectedTypeUnionOptions.value.size;
+        for (let step = 0; step < selectionCount; step++) {
+          const selected = resolveSchemaSelection(effective.schema, selectionKey, selections);
+          if (!selected) break;
+          selectionKey = selected.schemaSelectionKey;
+          effective = calculateEffectiveSchema(
+            selected.schema,
+            data.dataAt(currentPath),
             currentPath
           );
-          continue;
         }
       }
-
-      currentEffectiveSchema = calculateEffectiveSchema(
-        schema,
-        getDataForMode(this.mode).dataAt(currentPath),
+      if (depth === path.length) break;
+      const element = path[depth]!;
+      currentPath = currentPath.concat(element);
+      selectionKey = childSchemaSelectionKey(selectionKey, element);
+      effective = calculateEffectiveSchema(
+        effective.schema.subSchema(element),
+        data.dataAt(currentPath),
         currentPath
       );
     }
-    return currentEffectiveSchema;
+    return new EffectiveSchema(effective.schema, effective.data, currentPath, selectionKey);
   }
 
   public getCurrentSchemaFeatures(): SchemaFeatures {

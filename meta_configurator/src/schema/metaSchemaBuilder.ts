@@ -3,6 +3,10 @@ import type {JsonSchemaObjectType, TopLevelSchema} from '@/schema/jsonSchemaType
 import {META_SCHEMA_SIMPLIFIED} from '@/packaged-schemas/metaSchemaSimplified';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
+export function buildFullMetaSchema(): TopLevelSchema {
+  return structuredClone(META_SCHEMA_SIMPLIFIED);
+}
+
 export function buildMetaSchema(metaSchemaSettings: SettingsInterfaceMetaSchema): TopLevelSchema {
   let metaSchema = structuredClone(META_SCHEMA_SIMPLIFIED);
   const defs = metaSchema.$defs as Record<string, any>;
