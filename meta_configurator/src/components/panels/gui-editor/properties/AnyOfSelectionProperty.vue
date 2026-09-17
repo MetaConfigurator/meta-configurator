@@ -12,6 +12,9 @@ import type {SessionMode} from '@/store/sessionMode';
 import {getSessionForMode, getUserSelectionForMode} from '@/data/useDataLink';
 import {OneOfAnyOfSelectionOption, schemaSelectionOptions} from '@/data/oneOfAnyOfSelectionOption';
 import {useSettings} from '@/settings/useSettings';
+import {safeMergeSchemas} from '@/schema/mergeAllOfs';
+import {applySchemaConstantsOnData} from './applySchemaConstantsOnData';
+import _ from 'lodash';
 
 const props = defineProps<{
   propertyName: PathElement;
@@ -32,6 +35,7 @@ const possibleOptions = computed(() => schemaSelectionOptions(props.possibleSche
 
 const emit = defineEmits<{
   (e: 'update:tree'): void;
+  (e: 'update:propertyData', newValue: any | undefined): void;
 }>();
 
 const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined> = computed({
@@ -57,10 +61,28 @@ const valueProperty: WritableComputedRef<OneOfAnyOfSelectionOption[] | undefined
         selectedOptions
       );
       getSessionForMode(props.sessionMode).expand(props.absolutePath);
+      applySelectedConstants(selectedOptions);
       emit('update:tree');
     }
   },
 });
+
+function applySelectedConstants(selectedOptions: OneOfAnyOfSelectionOption[]) {
+  // Clearing the selection must not change the document. When several options
+  // are selected, apply only their merged constraints; conflicting choices must
+  // not overwrite data according to whichever option happened to come last.
+  if (selectedOptions.length === 0) return;
+  const baseSchema = {...props.propertySchema.jsonSchema};
+  delete baseSchema.anyOf;
+  const mergedSchema = safeMergeSchemas(
+    baseSchema,
+    ...selectedOptions.map(option => props.possibleSchemas[option.index]?.jsonSchema ?? {})
+  );
+  const result = applySchemaConstantsOnData(mergedSchema, props.propertyData);
+  if (!_.isEqual(result, props.propertyData)) {
+    emit('update:propertyData', result);
+  }
+}
 </script>
 
 <template>
