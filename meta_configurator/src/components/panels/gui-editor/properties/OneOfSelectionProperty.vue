@@ -6,7 +6,7 @@ import Select from 'primevue/select';
 import type {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import type {Path, PathElement} from '@/utility/path';
 import {schemaSelectionKey as selectionKeyForPath} from '@/data/schemaSelectionKey';
-import type {JsonSchemaType} from '@/schema/jsonSchemaType';
+import {applySchemaConstantsOnData} from './applySchemaConstantsOnData';
 import {safeMergeSchemas} from '@/schema/mergeAllOfs';
 import _ from 'lodash';
 import {getSessionForMode, getUserSelectionForMode, getValidationForMode} from '@/data/useDataLink';
@@ -134,36 +134,6 @@ function applySchemaConstantsOnDataBasedOnSelection(
   if (!_.isEqual(resultData, props.propertyData)) {
     emit('update:propertyData', resultData);
   }
-}
-function applySchemaConstantsOnData(schema: JsonSchemaType, data: any): any {
-  if (schema === null || typeof schema !== 'object') {
-    return data;
-  }
-  if (data === null || typeof data !== 'object') {
-    return data;
-  }
-
-  // note that in pre-processing all const is converted to an enum with just one entry
-  // hence, for us constants are equal to an enum of length 1.
-  if (schema.enum) {
-    if (schema.enum.length == 1) {
-      data = schema.enum[0];
-    }
-  }
-  if (schema.properties) {
-    for (const key in schema.properties) {
-      const propertySchema = schema.properties[key];
-      if (data === undefined) {
-        data = {};
-      }
-      if (key in data) {
-        if (propertySchema !== undefined) {
-          applySchemaConstantsOnData(propertySchema, data[key]);
-        }
-      }
-    }
-  }
-  return data;
 }
 </script>
 

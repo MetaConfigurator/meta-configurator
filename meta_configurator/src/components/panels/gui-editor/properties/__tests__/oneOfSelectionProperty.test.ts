@@ -10,6 +10,8 @@ import {ValidationService} from '@/schema/validationService';
 import {SETTINGS_SCHEMA} from '@/settings/settingsSchema';
 import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 import {SessionMode} from '@/store/sessionMode';
+import {preprocessOneTime} from '@/schema/oneTimeSchemaPreprocessor';
+import type {JsonSchemaType} from '@/schema/jsonSchemaType';
 
 config.global.mocks['$primevue'] = {
   config: defaultOptions,
@@ -41,6 +43,129 @@ vi.mock('@/settings/useSettings', () => ({
 }));
 
 describe('OneOfSelectionProperty', () => {
+  function mountSelection(branch: JsonSchemaType, data: unknown, isTypeUnion = false) {
+    selectedOneOfOptions.value = new Map();
+    selectedTypeUnionOptions.value = new Map();
+    const propertySchema = new JsonSchemaWrapper(
+      preprocessOneTime({oneOf: [branch, {type: 'string'}]}),
+      SessionMode.DataEditor,
+      false
+    );
+    const wrapper = mount(OneOfSelectionProperty, {
+      props: {
+        propertyName: 'model',
+        propertySchema,
+        propertyData: data,
+        absolutePath: ['model'],
+        possibleSchemas: propertySchema.oneOf,
+        isTypeUnion,
+        sessionMode: SessionMode.DataEditor,
+      },
+    });
+    return wrapper;
+  }
+
+  function selectFirst(wrapper: ReturnType<typeof mountSelection>) {
+    const select = wrapper.findComponent(Select);
+    select.vm.$emit('update:modelValue', select.props('options')![0]);
+    return wrapper.emitted('update:propertyData');
+  }
+
+  it('preserves explicit null in a nullable descendant while filling the selected model', () => {
+    const wrapper = mountSelection(
+      {
+        type: 'object',
+        properties: {
+          kind: {const: 'model'},
+          child: {type: ['object', 'null'], properties: {kind: {const: 'child'}}},
+        },
+      },
+      {child: null}
+    );
+    expect(selectFirst(wrapper)).toEqual([[{kind: 'model', child: null}]]);
+    wrapper.unmount();
+  });
+
+  it('does not create an object for properties on a non-object schema', () => {
+    const wrapper = mountSelection(
+      {
+        type: 'object',
+        properties: {
+          kind: {const: 'model'},
+          child: {type: 'null', properties: {kind: {const: 'child'}}},
+        },
+      },
+      {}
+    );
+    expect(selectFirst(wrapper)).toEqual([[{kind: 'model'}]]);
+    wrapper.unmount();
+  });
+
+  it('does not mutate input data or share object constants with the schema', () => {
+    const data = Object.freeze({nested: Object.freeze({kind: 'old', notes: 'keep'})});
+    const wrapper = mountSelection(
+      {
+        type: 'object',
+        properties: {
+          nested: {type: 'object', properties: {kind: {const: 'new'}}},
+          options: {const: {items: [1, 2]}},
+        },
+      },
+      data
+    );
+    const result = selectFirst(wrapper)![0]![0] as any;
+    expect(result).toEqual({nested: {kind: 'new', notes: 'keep'}, options: {items: [1, 2]}});
+    expect(data.nested.kind).toBe('old');
+    result.options.items.push(3);
+    expect((selectFirst(wrapper)![1]![0] as any).options).toEqual({items: [1, 2]});
+    wrapper.unmount();
+  });
+
+  it('does not apply constants from unselected descendant branches', () => {
+    const wrapper = mountSelection(
+      {
+        type: 'object',
+        properties: {
+          kind: {const: 'model'},
+          child: {
+            oneOf: [
+              {type: 'object', properties: {kind: {const: 'a'}}},
+              {type: 'object', properties: {kind: {const: 'b'}}},
+            ],
+          },
+        },
+      },
+      {}
+    );
+    expect(selectFirst(wrapper)).toEqual([[{kind: 'model'}]]);
+    wrapper.unmount();
+  });
+
+  it.each([42, ['keep']])('preserves existing non-object data %j', data => {
+    const wrapper = mountSelection({type: 'object', properties: {kind: {const: 'model'}}}, data);
+    expect(selectFirst(wrapper)).toBeUndefined();
+    wrapper.unmount();
+  });
+
+  it('does not emit a data update when constants already match', () => {
+    const wrapper = mountSelection(
+      {type: 'object', properties: {kind: {const: 'model'}}},
+      {kind: 'model'}
+    );
+    expect(selectFirst(wrapper)).toBeUndefined();
+    wrapper.unmount();
+  });
+
+  it('does not apply constants when choosing a type union', () => {
+    const wrapper = mountSelection(
+      {type: 'object', properties: {kind: {const: 'model'}}},
+      undefined,
+      true
+    );
+    expect(selectFirst(wrapper)).toBeUndefined();
+    wrapper.unmount();
+  });
+
   it('preselects the Uni Stuttgart relay option for the default AI backend settings', async () => {
     selectedOneOfOptions.value = new Map();
     selectedTypeUnionOptions.value = new Map();
