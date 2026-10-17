@@ -50,7 +50,7 @@
     "dagrejs": "^0.2.1",
     "fast-xml-parser": "^5.0.8",
     "flowbite": "^1.6.5",
-    "handlebars": "^4.7.9",
+    "handlebars": "^4.7.10",
     "js-yaml": "^4.3.2",
     "json-cst": "^1.2.0",
     "json-pointer": "^0.6.2",
