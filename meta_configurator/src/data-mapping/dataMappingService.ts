@@ -1,16 +1,53 @@
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+/** Context passed back to the LLM when a previously generated mapping or parser failed. */
+export type GeneratedCodeRetryContext = {
+  validationError: string;
+  previousCode: string;
+};
+
+export type DataMappingResult = {
+  resultData: unknown;
+  success: boolean;
+  message: string;
+};
+
+export type DataMappingSuggestionResult = {
+  config: string;
+  success: boolean;
+  message: string;
+};
+
+export type DataMappingValidationResult = {
+  success: boolean;
+  message: string;
+};
+
+/** Returns prompt hints describing the failed attempt, or an empty string without one. */
+export function buildGeneratedCodeRetryHints(retryContext?: GeneratedCodeRetryContext): string {
+  if (!retryContext) {
+    return '';
+  }
+
+  const validationError = retryContext.validationError.trim();
+  const previousCode = retryContext.previousCode.trim();
+  if (validationError.length === 0 || previousCode.length === 0) {
+    return '';
+  }
+
+  return [
+    'The previously generated code failed validation or execution.',
+    'Error:',
+    validationError,
+    'Previous code:',
+    previousCode,
+    'Generate an improved version that fixes this error and still solves the original task.',
+  ].join('\n');
+}
 
 export interface DataMappingService {
-  sanitizeMappingConfig(config: string, input: any): string;
-  validateMappingConfig(config: string, input: any): {success: boolean; message: string};
-  sanitizeInputDocument(input: any): any;
-  generateMappingSuggestion(
-    input: any,
-    targetSchema: TopLevelSchema,
-    userComments: string
-  ): Promise<{config: string; success: boolean; message: string}>;
-  performDataMapping(
-    input: any,
-    config: string
-  ): Promise<{resultData: any; success: boolean; message: string}>;
+  validateMappingConfig(
+    mappingConfiguration: string,
+    inputData: unknown
+  ): Promise<DataMappingValidationResult>;
+  sanitizeInputDocument(inputData: unknown): unknown;
+  performDataMapping(inputData: unknown, mappingConfiguration: string): Promise<DataMappingResult>;
 }

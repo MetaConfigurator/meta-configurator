@@ -153,5 +153,18 @@ describe('SimpleObjectProperty', () => {
         expect(spanWithCount.text()).toBe('0 properties');
       });
     });
+
+    describe('with null data', () => {
+      mountBeforeEach({
+        expanded: false,
+        propertyData: null,
+        propertySchema: new JsonSchemaWrapper({}, SessionMode.DataEditor, false),
+      });
+
+      it('shows the invalid value without throwing', () => {
+        expect(spanWithDescription.text()).toBe('null');
+        expect(spanWithCount.text()).toBe('0 properties');
+      });
+    });
   });
 });

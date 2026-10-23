@@ -9,7 +9,6 @@ import {SessionMode} from '@/store/sessionMode';
 import Panel from 'primevue/panel';
 import Button from 'primevue/button';
 import PropertiesPanel from '@/components/panels/gui-editor/PropertiesPanel.vue';
-import {JsonSchemaWrapper} from '@/schema/jsonSchemaWrapper';
 import {getDataForMode, getSchemaForMode} from '@/data/useDataLink';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
@@ -24,13 +23,9 @@ const props = defineProps<{
 const schema = getSchemaForMode(SessionMode.Settings);
 const data = getDataForMode(SessionMode.Settings);
 
-const currentSchema = computed(() => {
-  const currSchema = schema.effectiveSchemaAtPath(props.panelSettingsPath).schema;
-  if (!currSchema) {
-    return new JsonSchemaWrapper({}, SessionMode.Settings, false);
-  }
-  return currSchema;
-});
+const currentEffectiveSchema = computed(() =>
+  schema.effectiveSchemaAtPath(props.panelSettingsPath, false)
+);
 
 function updateData(path: Path, newValue: any) {
   data.setDataAt(path, newValue);
@@ -85,9 +80,10 @@ const settingsName = computed(() => {
     <slot></slot>
     <div class="properties-panel-container">
       <PropertiesPanel
-        v-if="currentSchema.jsonSchema"
+        v-if="currentEffectiveSchema.schema.jsonSchema"
         :table-header="settingsName"
-        :currentSchema="currentSchema"
+        :currentSchema="currentEffectiveSchema.schema"
+        :schemaSelectionKey="currentEffectiveSchema.schemaSelectionKey"
         :currentPath="props.panelSettingsPath"
         :currentData="data.dataAt(props.panelSettingsPath)"
         :sessionMode="SessionMode.Settings"

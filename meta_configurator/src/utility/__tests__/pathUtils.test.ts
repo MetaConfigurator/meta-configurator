@@ -36,6 +36,15 @@ describe('test pathUtils', () => {
     const path2: Path = ['properties', 'foo', 'bar'];
     const expectedResult2 = 'properties.foo.bar';
     expect(pathToString(path2)).toEqual(expectedResult2);
+
+    // paths starting with an array index (e.g. items of a root-level array)
+    const path3: Path = [0];
+    const expectedResult3 = '[0]';
+    expect(pathToString(path3)).toEqual(expectedResult3);
+
+    const path4: Path = [1, 'foo', 2];
+    const expectedResult4 = '[1].foo[2]';
+    expect(pathToString(path4)).toEqual(expectedResult4);
   });
 
   it('should correctly convert from path to json pointer', () => {

@@ -107,6 +107,12 @@ Explore how to use MetaConfigurator with real-world examples:
 
 *   **[Schema Creation](./documentation_user/examples/schema_creation)** – Learn how to create and edit JSON schemas using different methods (inference from data, exploring existing schemas, manual editing).
 
+*   **[Data Import](./documentation_user/examples/data_import)** – Learn how to load data into MetaConfigurator: JSON/YAML, Turtle, XML, CSV, and the advanced import for many further formats.
+
+*   **[Schema Inference and Refinement](./documentation_user/examples/schema_inference_and_refinement)** – Learn how to derive a JSON schema from data and refine it with examples, enums and references.
+
+*   **[Data to Schema Mapping](./documentation_user/examples/data_to_schema_mapping)** – Learn how to convert data so that it matches a target schema, using AI-generated mapping functions.
+
 *   **[MOF Synthesis Example](./documentation_user/examples/mof_synthesis)** – Demonstrates schema generation, CSV import, and JSON export.
 
 *   **[Configurator Builder](./documentation_user/examples/configurator_building)** – Learn how to create and share pre-configured MetaConfigurator URLs.
@@ -150,9 +156,12 @@ pages = {1--9}
 
 MetaConfigurator runs entirely **inside your browser** - it does **not** send your schemas, data, or anything you type to any server. The website itself is just a static page delivered by GitHub Pages (like downloading a PDF or image), and all the work happens locally on your computer.
 
-The exception is if you **click the “Share Snapshot” button**. Then, and only then, the snapshot you create is sent to a **University of Stuttgart** server so you can share a unique link with others.
+The only exceptions:
 
-Additionally, if you use the optional AI assistance functionality, relevant subsets of your schema and data are shared with the AI endpoint you configure in the MetaConfigurator settings (by default OpenAI). This will not accidentally happen, as an authentification key from the AI endpoint provider is needed to use the AI assistance features.
+- If you **click the “Share Snapshot” button** the snapshot you create is sent to a **University of Stuttgart** server so you can share a unique link with others.
+- If you use the **Advanced Data Import**. Then your data is sent to a **University of Stuttgart** server for advanced import processing and the result returned. The data is not stored/persisted on the server.
+
+Additionally, if you use the optional AI assistance functionality, relevant subsets of your schema and data are shared with the AI endpoint you configure in the MetaConfigurator settings (by default Blablador, a German academic LLM provider).
 
 **See our [full Privacy Policy](PRIVACY.md)** for more information.
 

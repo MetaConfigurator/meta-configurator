@@ -1,4 +1,4 @@
-import type {SettingsInterfaceRoot} from '@/settings/settingsTypes';
+import type {ManagedData} from '@/data/managedData';
 
 export const CURRENT_NEWS_HEADER = 'Get in touch with us.';
 
@@ -16,8 +16,8 @@ export function hasCurrentNewsChanged(latestSeenNewsHash: number): boolean {
   return latestSeenNewsHash !== getCurrentNewsHash() && latestSeenNewsHash !== -1;
 }
 
-export function setCurrentNewsHash(settings: SettingsInterfaceRoot) {
-  settings.latestNewsHash = getCurrentNewsHash();
+export function setCurrentNewsHash(settingsData: ManagedData) {
+  settingsData.setDataAt(['latestNewsHash'], getCurrentNewsHash());
 }
 
 function simpleHash(str: string): number {

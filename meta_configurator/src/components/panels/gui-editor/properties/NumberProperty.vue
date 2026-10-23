@@ -9,10 +9,11 @@ import type {ValidationResult} from '@/schema/validationUtils';
 import type {PathElement} from '@/utility/path';
 import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUtils';
 import {useSettings} from '@/settings/useSettings';
+import {dataToString} from '@/utility/dataToString';
 
 const props = defineProps<{
   propertyName: PathElement;
-  propertyData: number | undefined;
+  propertyData: unknown;
   propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
@@ -46,9 +47,12 @@ const stepValue = computed(() => {
   return props.propertySchema.multipleOf ?? 1;
 });
 
-function formatNumberForDisplay(value: number | undefined): string {
+function formatNumberForDisplay(value: unknown): string {
   if (value === undefined) {
     return '';
+  }
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return dataToString(value);
   }
   if (shouldUseScientificNotation(value)) {
     return value.toExponential();
@@ -144,7 +148,11 @@ function step(direction: 1 | -1) {
     return;
   }
 
-  const currentValue = parseNumber(inputValue.value) ?? props.propertyData ?? 0;
+  const currentPropertyValue =
+    typeof props.propertyData === 'number' && Number.isFinite(props.propertyData)
+      ? props.propertyData
+      : 0;
+  const currentValue = parseNumber(inputValue.value) ?? currentPropertyValue;
   const newValue = currentValue + direction * stepValue.value;
   if (Number.isInteger(newValue)) {
     inputValue.value = formatNumberForDisplay(newValue);

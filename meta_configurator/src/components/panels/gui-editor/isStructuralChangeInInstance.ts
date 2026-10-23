@@ -5,12 +5,22 @@ export function isStructuralChangeInInstance(oldObject: any, newObject: any): bo
   // also this algorithm is recursive, so if there are nested objects or arrays, we need to check for structural changes in those as well
 
   // if both are of primitive type, we can skip the check for structural changes
-  if (isOfPrimitiveType(oldObject) && isOfPrimitiveType(newObject)) {
+  const oldValueIsPrimitive = isOfPrimitiveType(oldObject);
+  const newValueIsPrimitive = isOfPrimitiveType(newObject);
+  if (oldValueIsPrimitive && newValueIsPrimitive) {
     return false;
+  }
+
+  if (oldValueIsPrimitive !== newValueIsPrimitive) {
+    return true;
   }
 
   // otherwise, if the types of oldObject and newObject are different, we can consider it a structural change
   if (typeof oldObject !== typeof newObject) {
+    return true;
+  }
+
+  if (Array.isArray(oldObject) !== Array.isArray(newObject)) {
     return true;
   }
 

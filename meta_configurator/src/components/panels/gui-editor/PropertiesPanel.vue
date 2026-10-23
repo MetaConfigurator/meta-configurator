@@ -35,6 +35,7 @@ import {
   getValidationForMode,
 } from '@/data/useDataLink';
 import {dataAt} from '@/utility/resolveDataAtPath';
+import {moveArrayItem} from '@/utility/moveArrayItem';
 import type {SessionMode} from '@/store/sessionMode';
 import _, {debounce} from 'lodash';
 import {replacePropertyNameUtils} from '@/utility/renameUtils';
@@ -42,6 +43,7 @@ import {isStructuralChangeInInstance} from '@/components/panels/gui-editor/isStr
 
 const props = defineProps<{
   currentSchema: JsonSchemaWrapper;
+  schemaSelectionKey?: string;
   sessionMode: SessionMode;
   currentData: any;
   currentPath: Path;
@@ -139,7 +141,11 @@ function computeTree() {
     props.sessionMode,
     props.currentSchema,
     undefined,
-    props.currentPath
+    props.currentPath,
+    [],
+    0,
+    TreeNodeType.SCHEMA_PROPERTY,
+    props.schemaSelectionKey
   );
   currentTree.value!.children = treeNodeResolver.createChildNodesOfNode(
     props.sessionMode,
@@ -175,7 +181,8 @@ function expandEmptyArraysAndObjectsRecursively(node: GuiEditorTreeNode, nodePat
   if (!node.leaf && node.type === TreeNodeType.SCHEMA_PROPERTY) {
     const userData = dataAt(nodePath, props.currentData);
     const isEmptyArray = Array.isArray(userData) && userData.length === 0;
-    const isEmptyObject = typeof userData === 'object' && Object.keys(userData).length === 0;
+    const isEmptyObject =
+      userData !== null && typeof userData === 'object' && Object.keys(userData).length === 0;
     if (userData === undefined || isEmptyArray || isEmptyObject) {
       const schema = node.data.schema;
       // expand empty arrays and objects with no predefined properties (will be expected to have addProperty button)
@@ -251,6 +258,41 @@ function updateData(subPath: Path, newValue: any) {
   updateTree();
 }
 
+function reorderArray(parentRelativePath: Path, fromIndex: number, toIndex: number) {
+  // read the live store rather than props.currentData: a value just committed via blur()
+  // (see onReorderKeydown) is written synchronously to the store but not yet to the prop
+  const parentData = data.dataAt(props.currentPath.concat(parentRelativePath));
+  if (!Array.isArray(parentData)) return;
+  if (toIndex < 0 || toIndex >= parentData.length || fromIndex === toIndex) return;
+  updateData(parentRelativePath, moveArrayItem(parentData, fromIndex, toIndex));
+}
+
+/**
+ * Alt+ArrowUp / Alt+ArrowDown (Option+Arrow on Mac) moves the selected array item up or down.
+ * Registered in the capture phase because the leaf input components stop arrow-key propagation
+ * (to keep the cursor out of the tree's row navigation), so a bubbling listener would never fire.
+ * The active item comes from the selection, which the value field sets on focus; focus follows
+ * the moved item so the shortcut can be repeated.
+ */
+function onReorderKeydown(event: KeyboardEvent) {
+  if (!event.altKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) {
+    return;
+  }
+  const relativePath = session.currentSelectedElement.value.slice(props.currentPath.length);
+  const fromIndex = relativePath[relativePath.length - 1];
+  if (typeof fromIndex !== 'number') {
+    return;
+  }
+  event.preventDefault();
+  // commit an unconfirmed value in the focused field (e.g. a text field not yet blurred) so the
+  // move applies to the current field content, not the previously stored value
+  (document.activeElement as HTMLElement | null)?.blur();
+  const parentRelativePath = relativePath.slice(0, -1);
+  const toIndex = fromIndex + (event.key === 'ArrowUp' ? -1 : 1);
+  reorderArray(parentRelativePath, fromIndex, toIndex);
+  focusOnPath(props.currentPath.concat(parentRelativePath, toIndex));
+}
+
 function selectPropertyPath(nodeData: ConfigTreeNodeData) {
   const path = nodeData.absolutePath;
   lastClickedElement.value = path;
@@ -289,7 +331,16 @@ function updatePropertyName(subPath: Path, oldName: string, newName: string) {
 }
 
 function addItem(relativePath: Path, newValue: any) {
-  updateData(relativePath, newValue);
+  const parentPath = relativePath.slice(0, -1);
+  const parentData = dataAt(parentPath, props.currentData);
+  if (parentData !== undefined && !Array.isArray(parentData)) {
+    // the data does not contain an array at this path yet (e.g. the default empty object
+    // of a new document, or leftover data from an earlier schema): replace it with an
+    // array containing the new item. The old value can be restored via undo.
+    updateData(parentPath, [newValue]);
+  } else {
+    updateData(relativePath, newValue);
+  }
   updateTree();
   const absolutePath = props.currentPath.concat(relativePath);
 
@@ -414,7 +465,12 @@ function addEmptyProperty(relativePath: Path, absolutePath: Path) {
 }
 
 function findNameForNewProperty(objectSchema: JsonSchemaWrapper | undefined, data: any) {
-  if (objectSchema === undefined || data === undefined) {
+  if (
+    objectSchema === undefined ||
+    data === null ||
+    typeof data !== 'object' ||
+    Array.isArray(data)
+  ) {
     return 'yourNewProperty';
   }
 
@@ -590,6 +646,7 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
     :loading="loadingDebounced"
     v-model:expandedKeys="session.currentExpandedElements.value"
     @nodeExpand="expandElementChildren"
+    @keydown.capture="onReorderKeydown"
     :filters="treeTableFilters">
     <Column field="name" :header="tableHeader" expander>
       <template #body="slotProps">
@@ -598,16 +655,17 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
           v-if="displayAsRegularProperty(slotProps.node)"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
-          :class="{'bg-yellow-50 rounded-sm': isNodeHighlighted(slotProps.node)}"
-          @mouseenter="event => showInfoOverlayPanel(slotProps.node.data, event)"
-          @mouseleave="closeInfoOverlayPanel">
+          :class="{'bg-yellow-50 rounded-sm': isNodeHighlighted(slotProps.node)}">
           <PropertyMetadata
             :sessionMode="props.sessionMode"
             :validationResults="getValidationResults(slotProps.node.data.absolutePath)"
             :node="slotProps.node"
             :type="slotProps.node.type"
             :highlighted="isNodeHighlighted(slotProps.node)"
+            @hover_metadata="event => showInfoOverlayPanel(slotProps.node.data, event)"
+            @unhover_metadata="closeInfoOverlayPanel"
             @zoom_into_path="zoomIntoPath"
+            @reorder_array="reorderArray"
             @update_property_name="
               (oldName, newName) =>
                 updatePropertyName(slotProps.node.data.relativePath, oldName, newName)
@@ -647,7 +705,9 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
           @click="addEmptyArrayEntry(slotProps.node.data.relativePath)"
           @keyup.enter="addEmptyArrayEntry(slotProps.node.data.relativePath)"
-          :data-testid="'add-item-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="
+            'add-item-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0, -1))
+          ">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{ slotProps.node.data.label }}</span>
@@ -665,7 +725,7 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
           @keyup.enter="
             addEmptyProperty(slotProps.node.data.relativePath, slotProps.node.data.absolutePath)
           "
-          :data-testid="'add-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="'add-property-' + pathToString(slotProps.node.data.absolutePath as Path)">
           <Button text severity="secondary" class="text-gray-500" style="margin-left: -1.5rem">
             <i class="pi pi-plus" />
             <span class="pl-2">{{
@@ -679,7 +739,10 @@ function isNodeHighlighted(node: GuiEditorTreeNode) {
           class="text-gray-500"
           style="width: 50%; min-width: 50%"
           :style="addNegativeMarginForTableStyle(slotProps.node.data.depth)"
-          :data-testid="'advanced-property-' + pathToString((slotProps.node.data.absolutePath as Path).slice(0,-1))">
+          :data-testid="
+            'advanced-property-' +
+            pathToString((slotProps.node.data.absolutePath as Path).slice(0, -1))
+          ">
           Advanced
         </span>
         <span

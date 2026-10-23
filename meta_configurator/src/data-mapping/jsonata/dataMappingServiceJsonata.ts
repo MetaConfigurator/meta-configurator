@@ -1,129 +1,64 @@
-import type {DataMappingService} from '@/data-mapping/dataMappingService';
-import type {TopLevelSchema} from '@/schema/jsonSchemaType';
-import {inferJsonSchema} from '@/schema/inferJsonSchema';
-import {fixGeneratedExpression, getApiKey} from '@/components/panels/ai-prompts/aiPromptUtils';
-import {queryJsonataExpression} from '@/utility/ai/aiEndpoint';
-import {
-  JSONATA_EXPRESSION,
-  JSONATA_INPUT_EXAMPLE,
-  JSONATA_INPUT_EXAMPLE_SCHEMA,
-  JSONATA_OUTPUT_EXAMPLE,
-  JSONATA_OUTPUT_EXAMPLE_SCHEMA,
-  JSONATA_REFERENCE_GUIDE,
-} from '@/data-mapping/jsonata/jsonataExamples';
+import type {
+  DataMappingResult,
+  DataMappingService,
+  DataMappingValidationResult,
+} from '@/data-mapping/dataMappingService';
 import jsonata from 'jsonata';
 import {cloneDeep} from 'lodash';
 import {trimDataToMaxSize} from '@/utility/trimData';
+import {getErrorMessage} from '@/utility/getErrorMessage';
 
 export class DataMappingServiceJsonata implements DataMappingService {
-  async generateMappingSuggestion(
-    input: any,
-    targetSchema: TopLevelSchema,
-    userComments: string
-  ): Promise<{config: string; success: boolean; message: string}> {
-    const inputDataSubset = trimDataToMaxSize(input);
-
-    // infer schema for input data
-    const inputFileSchema = inferJsonSchema(inputDataSubset);
-    const apiKey = getApiKey();
-
-    const jsonataReferenceStr = JSON.stringify(JSONATA_REFERENCE_GUIDE);
-    const jsonataInputExampleStr = JSON.stringify(JSONATA_INPUT_EXAMPLE);
-    const jsonataInputExampleSchemaStr = JSON.stringify(JSONATA_INPUT_EXAMPLE_SCHEMA);
-    const jsonataExpressionStr = JSON.stringify(JSONATA_EXPRESSION);
-    const jsonataOutputExampleStr = JSON.stringify(JSONATA_OUTPUT_EXAMPLE);
-    const jsonataOutputExampleSchemaStr = JSON.stringify(JSONATA_OUTPUT_EXAMPLE_SCHEMA);
-    const inputFileSchemaStr = JSON.stringify(inputFileSchema);
-    const targetSchemaStr = JSON.stringify(targetSchema);
-    const inputDataSubsetStr = JSON.stringify(inputDataSubset);
-    const resultPromise = queryJsonataExpression(
-      apiKey,
-      jsonataReferenceStr,
-      jsonataInputExampleStr,
-      jsonataInputExampleSchemaStr,
-      jsonataOutputExampleStr,
-      jsonataOutputExampleSchemaStr,
-      jsonataExpressionStr,
-      inputDataSubsetStr,
-      inputFileSchemaStr,
-      targetSchemaStr,
-      userComments
-    );
-
-    const responseStr = await resultPromise;
-
-    try {
-      const fixedExpression = fixGeneratedExpression(responseStr, ['jsonata', 'json']);
-      return {
-        config: fixedExpression,
-        success: true,
-        message: 'Data mapping suggestion generated successfully.',
-      };
-    } catch (e) {
-      console.error('Error generating mapping suggestion: ', e);
-      return {
-        config: responseStr,
-        success: false,
-        message:
-          'Failed to generate data mapping suggestion. Please check the console for more details.',
-      };
-    }
-  }
-
   async performDataMapping(
-    input: any,
-    config: string
-  ): Promise<{resultData: any; success: boolean; message: string}> {
+    inputData: unknown,
+    mappingConfiguration: string
+  ): Promise<DataMappingResult> {
     try {
-      const result = await jsonata(config).evaluate(input);
+      const mappingResultData = await this.executeMapping(inputData, mappingConfiguration);
       return {
-        resultData: result,
+        resultData: mappingResultData,
         success: true,
         message: 'Data mapping performed successfully.',
       };
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
-      console.error('Error performing data mapping: ', e);
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
       return {
         resultData: {},
         success: false,
-        message: `Data mapping failed. Please check the mapping configuration. Use <a href="https://try.jsonata.org/" target="_blank">https://try.jsonata.org/</a> to validate and fix your JSONata expression. Reason: ${message}.`,
+        message: `Data mapping failed. Please check the mapping configuration. Use https://try.jsonata.org/ to validate and fix your JSONata expression. Reason: ${errorMessage}.`,
       };
     }
   }
 
-  sanitizeInputDocument(input: any): any {
-    const result = cloneDeep(input);
-    // loop through nested JSON object which could also have array as children and remove all special characters from property names
-    this.removeSpecialCharactersRecursive(result);
-    return result;
+  sanitizeInputDocument(inputData: unknown): unknown {
+    const sanitizedInputData = cloneDeep(inputData);
+    this.removeSpecialCharactersFromPropertyNames(sanitizedInputData);
+    return sanitizedInputData;
   }
 
-  removeSpecialCharactersRecursive(data: any): void {
+  private removeSpecialCharactersFromPropertyNames(data: unknown): void {
     if (Array.isArray(data)) {
-      data.forEach(item => this.removeSpecialCharactersRecursive(item));
+      data.forEach(arrayItem => this.removeSpecialCharactersFromPropertyNames(arrayItem));
     } else if (data !== null && typeof data === 'object') {
-      for (const key of Object.keys(data)) {
-        const sanitizedKey = key.replace(/[^a-zA-Z0-9_]/g, '_');
-        if (sanitizedKey !== key) {
-          data[sanitizedKey] = data[key];
-          delete data[key];
+      const dataRecord = data as Record<string, unknown>;
+      for (const propertyName of Object.keys(dataRecord)) {
+        const sanitizedPropertyName = propertyName.replace(/[^a-zA-Z0-9_]/g, '_');
+        if (sanitizedPropertyName !== propertyName) {
+          dataRecord[sanitizedPropertyName] = dataRecord[propertyName];
+          delete dataRecord[propertyName];
         }
-        this.removeSpecialCharactersRecursive(data[sanitizedKey]);
+        this.removeSpecialCharactersFromPropertyNames(dataRecord[sanitizedPropertyName]);
       }
     }
   }
 
-  sanitizeMappingConfig(config: string, _input: any): string {
-    // JSONata natively supports special characters in property names via backtick syntax,
-    // so no transformation of the mapping config expression is required.
-    return config;
-  }
-
-  validateMappingConfig(config: string, input: any): {success: boolean; message: string} {
-    const inputDataSubset = trimDataToMaxSize(input);
+  async validateMappingConfig(
+    mappingConfiguration: string,
+    inputData: unknown
+  ): Promise<DataMappingValidationResult> {
+    const inputDataSubset = trimDataToMaxSize(inputData);
     try {
-      jsonata(config).evaluate(inputDataSubset);
+      await this.executeMapping(inputDataSubset, mappingConfiguration);
       return {success: true, message: 'Mapping configuration is valid.'};
     } catch (error) {
       if (
@@ -134,7 +69,7 @@ export class DataMappingServiceJsonata implements DataMappingService {
         'message' in error
       ) {
         const cursorPosition = this.convertTextPositionToCursorPosition(
-          config,
+          mappingConfiguration,
           error.position as number
         );
         return {
@@ -147,7 +82,11 @@ export class DataMappingServiceJsonata implements DataMappingService {
     }
   }
 
-  convertTextPositionToCursorPosition(
+  private executeMapping(inputData: unknown, mappingConfiguration: string): Promise<unknown> {
+    return jsonata(mappingConfiguration).evaluate(inputData);
+  }
+
+  private convertTextPositionToCursorPosition(
     text: string,
     position: number
   ): {row: number; column: number} {

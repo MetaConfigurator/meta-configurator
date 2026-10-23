@@ -9,7 +9,7 @@ import {isReadOnly} from '@/components/panels/gui-editor/configTreeNodeReadingUt
 
 const props = defineProps<{
   propertyName: PathElement;
-  propertyData: string | undefined;
+  propertyData: unknown;
   propertySchema: JsonSchemaWrapper;
   validationResults: ValidationResult;
 }>();
@@ -19,21 +19,27 @@ const emit = defineEmits<{
 }>();
 
 // convert string to Date for the picker
-const dateValue = ref<Date | undefined>(
-  props.propertyData ? new Date(props.propertyData) : undefined
-);
+const dateValue = ref<Date | undefined>(parseDate(props.propertyData));
 
 watch(
   () => props.propertyData,
   newVal => {
-    dateValue.value = newVal ? new Date(newVal) : undefined;
+    dateValue.value = parseDate(newVal);
   }
 );
+
+function parseDate(value: unknown): Date | undefined {
+  if (typeof value !== 'string' || value.length === 0) {
+    return undefined;
+  }
+  const parsedDate = new Date(value);
+  return Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate;
+}
 
 function updateValue(value: Date | (Date | null)[] | Date[] | null | undefined) {
   // DatePicker is used in single-date mode here, so we only handle a single Date (or empty).
   const newDate = value instanceof Date ? value : undefined;
-  if (!newDate) {
+  if (!newDate || Number.isNaN(newDate.getTime())) {
     emit('update:propertyData', undefined);
     return;
   }

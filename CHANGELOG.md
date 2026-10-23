@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.8.0] - 2026-10-23
+
+- Add new data import dialog which tries different parsers to load non-JSON-data and otherwise suggests generating import functions via LLM
+- Add new AI-assisted data to schema mapping functionalities (JavaScript as new mapping language and mapping generation via inferred source schema as alternative to the source data)
+- Add new schema-inference and schema-refinement options which make use of the instance data
+- Add drag and drop functionality for re-ordering array items in GUI view
+- Add support for nested anyOf/oneOf selection in GUI view
+- Add handling of required outside-references when using AI-assisted editing of a sub-schema
+- Update dependencies
+- Streamline menubar buttons
+- Fix minor bugs (GUI view synchronization broke sometimes and enum in diagram view was not always showing the right values)
+
 ## [2.7.0] - 2026-06-17
 
 ### Added

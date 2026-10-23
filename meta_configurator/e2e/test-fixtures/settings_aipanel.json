@@ -1,0 +1,43 @@
+{
+  "latestNewsHash": -1,
+  "toolbarTitle": "Test - AI Panel",
+  "panels": {
+    "dataEditor": [
+      {
+        "panelType": "textEditor",
+        "mode": "dataEditor",
+        "size": 50
+      },
+      {
+        "panelType": "test",
+        "mode": "dataEditor",
+        "size": 50
+      }
+    ],
+    "schemaEditor": [
+      {
+        "panelType": "aiPrompts",
+        "mode": "schemaEditor",
+        "size": 50
+      },
+      {
+        "panelType": "test",
+        "mode": "schemaEditor",
+        "size": 50
+      }
+    ],
+    "settings": [
+      {
+        "panelType": "textEditor",
+        "mode": "settings",
+        "size": 50
+      },
+      {
+        "panelType": "test",
+        "mode": "settings",
+        "size": 50
+      }
+    ],
+    "hidden": ["debug"]
+  }
+}

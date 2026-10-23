@@ -39,6 +39,7 @@ import {SessionMode} from '@/store/sessionMode';
 import type {Path} from '@/utility/path';
 import {getDataForMode, getSessionForMode} from '@/data/useDataLink';
 import {rdfStoreManager} from '@/components/panels/rdf/rdfStoreManager';
+import {isJsonLdDocument} from '@/utility/rdf/isJsonLdDocument';
 
 const props = defineProps<{
   sessionMode: SessionMode;
@@ -49,6 +50,7 @@ const emit = defineEmits<{
 }>();
 
 const session = getSessionForMode(props.sessionMode);
+const data = getDataForMode(props.sessionMode);
 
 const rmlMappingDialog = ref();
 const importTurtleDialog = ref();
@@ -63,7 +65,6 @@ function showImportTurtleDialog() {
 
 const dataIsUnparsable = ref(false);
 const dataIsInJsonLd = ref(false);
-const missingContext = ref(false);
 
 const parsingErrors = computed(() => {
   const errors = rdfStoreManager.parseErrors.value.map((msg, index) => ({
@@ -87,13 +88,6 @@ const parsingWarnings = computed(() => {
     message: msg,
   }));
 
-  if (missingContext.value) {
-    warnings.push({
-      id: 'missing-context',
-      message: 'Missing @context section in the JSON-LD data.',
-    });
-  }
-
   if (!dataIsInJsonLd.value) {
     warnings.push({
       id: 'data-not-jsonld',
@@ -109,7 +103,7 @@ const parsingWarnings = computed(() => {
 });
 
 watch(
-  () => getDataForMode(props.sessionMode).isDataUnparseable(),
+  () => data.isDataUnparseable(),
   value => {
     dataIsUnparsable.value = value;
   },
@@ -117,27 +111,12 @@ watch(
 );
 
 watch(
-  () => getDataForMode(props.sessionMode).data.value,
+  () => data.data.value,
   value => {
-    dataIsInJsonLd.value = hasJsonLdFormat(value);
+    dataIsInJsonLd.value = isJsonLdDocument(value);
   },
   {immediate: true}
 );
-
-function hasJsonLdFormat(input: unknown): boolean {
-  if (!input || typeof input !== 'object') {
-    missingContext.value = true;
-    return false;
-  }
-
-  const data = input as Record<string, unknown>;
-  const hasContext = '@context' in data;
-  missingContext.value = !hasContext;
-
-  if (!hasContext) return false;
-
-  return Object.keys(data).some(k => k !== '@context');
-}
 
 function zoomIntoPath(path: Path): void {
   session.updateCurrentPath(path);

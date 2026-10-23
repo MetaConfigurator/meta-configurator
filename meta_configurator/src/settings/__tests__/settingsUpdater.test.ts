@@ -1,6 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {ref} from 'vue';
 import type {TopLevelSchema} from '@/schema/jsonSchemaType';
+import {SETTINGS_DATA_DEFAULT} from '@/settings/defaultSettingsData';
 
 // avoid constructing useDataLink store through imports, it is not required for this component
 vi.mock('@/data/useDataLink', () => ({
@@ -38,8 +39,39 @@ import {
   updateSettingsWithDefaults,
 } from '../settingsUpdater';
 
+const PREVIOUS_BACKEND_SETTINGS = {
+  snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
+  schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+};
+
+const CURRENT_BACKEND_SETTINGS = {
+  ...PREVIOUS_BACKEND_SETTINGS,
+  formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
+};
+
+function createSettingsMigrationFixture(settingsVersion: string, backend: Record<string, unknown>) {
+  return {
+    settingsVersion,
+    panels: {
+      dataEditor: [],
+      schemaEditor: [],
+      settings: [],
+      hidden: [],
+    },
+    backend: {...backend},
+    aiIntegration: {
+      model: 'alias-fast',
+      temperature: 0,
+      backend: {
+        relay: 'https://metaconfigurator.informatik.uni-stuttgart.de/relay',
+        endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
+      },
+    },
+  };
+}
+
 describe('test settings updater', () => {
-  let userSettings: any = {
+  const userSettings: any = {
     a: {
       b: {
         c: 5,
@@ -71,7 +103,7 @@ describe('test settings updater', () => {
     },
   };
 
-  let defaultSettings: any = {
+  const defaultSettings: any = {
     a: {
       b: {
         c: 1,
@@ -252,7 +284,7 @@ describe('test settings updater', () => {
     });
   });
 
-  it('resets existing 1.0.4 AI settings to the 1.0.5 Uni Stuttgart relay preset', () => {
+  it('resets existing 1.0.4 AI settings to the 1.0.7 Uni Stuttgart relay preset', () => {
     const userFile = {
       settingsVersion: '1.0.4',
       panels: {
@@ -274,7 +306,7 @@ describe('test settings updater', () => {
     };
 
     const defaultsFile = {
-      settingsVersion: '1.0.5',
+      settingsVersion: '1.0.7',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -284,6 +316,8 @@ describe('test settings updater', () => {
       backend: {
         snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
         schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+        formatProcessingUrl:
+          'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
       },
       aiIntegration: {
         model: 'alias-fast',
@@ -298,10 +332,11 @@ describe('test settings updater', () => {
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.settingsVersion).toBe('1.0.5');
+    expect(userFile.settingsVersion).toBe('1.0.7');
     expect(userFile.backend).toEqual({
       snapshotSharingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de',
       schemaConverterUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/schema-converter',
+      formatProcessingUrl: 'https://metaconfigurator.informatik.uni-stuttgart.de/format-processing',
     });
     expect(userFile.aiIntegration).toEqual({
       model: 'alias-fast',
@@ -316,7 +351,7 @@ describe('test settings updater', () => {
 
   it('does not force relay defaults back into a direct AI endpoint config', () => {
     const userFile = {
-      settingsVersion: '1.0.5',
+      settingsVersion: '1.0.6',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -352,14 +387,14 @@ describe('test settings updater', () => {
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.settingsVersion).toBe('1.0.5');
+    expect(userFile.settingsVersion).toBe('1.0.7');
     expect(userFile.aiIntegration.backend).toEqual({
       endpoint: 'https://api.openai.com/v1/',
     });
     expect(userFile.aiIntegration.model).toBe('gpt-4o-mini');
   });
 
-  it('resets customized 1.0.3 AI settings while bumping to 1.0.5', () => {
+  it('resets customized 1.0.3 AI settings while bumping to 1.0.7', () => {
     const userFile = {
       settingsVersion: '1.0.3',
       panels: {
@@ -379,7 +414,7 @@ describe('test settings updater', () => {
     };
 
     const defaultsFile = {
-      settingsVersion: '1.0.5',
+      settingsVersion: '1.0.7',
       panels: {
         dataEditor: [],
         schemaEditor: [],
@@ -399,7 +434,7 @@ describe('test settings updater', () => {
 
     updateSettingsWithDefaults(userFile, defaultsFile);
 
-    expect(userFile.settingsVersion).toBe('1.0.5');
+    expect(userFile.settingsVersion).toBe('1.0.7');
     expect(userFile.aiIntegration).toEqual({
       model: 'alias-fast',
       max_tokens: 5000,
@@ -409,5 +444,27 @@ describe('test settings updater', () => {
         endpoint: 'https://api.helmholtz-blablador.fz-juelich.de/v1/',
       },
     });
+  });
+
+  it('adds the new format processing URL while bumping from 1.0.5 to 1.0.7', () => {
+    const userFile = createSettingsMigrationFixture('1.0.5', PREVIOUS_BACKEND_SETTINGS);
+    const defaultsFile = createSettingsMigrationFixture('1.0.7', CURRENT_BACKEND_SETTINGS);
+
+    updateSettingsWithDefaults(userFile, defaultsFile);
+
+    expect(userFile.settingsVersion).toBe('1.0.7');
+    expect(userFile.backend).toEqual(CURRENT_BACKEND_SETTINGS);
+  });
+
+  it('adds the schema-data synchronization limit when migrating from 1.0.6', () => {
+    const userFile = structuredClone(SETTINGS_DATA_DEFAULT);
+    userFile.settingsVersion = '1.0.6';
+    delete (userFile.performance as Partial<typeof userFile.performance>)
+      .maxSchemaSizeForDataSynchronization;
+
+    updateSettingsWithDefaults(userFile, structuredClone(SETTINGS_DATA_DEFAULT));
+
+    expect(userFile.settingsVersion).toBe('1.0.7');
+    expect(userFile.performance.maxSchemaSizeForDataSynchronization).toBe(1024000);
   });
 });

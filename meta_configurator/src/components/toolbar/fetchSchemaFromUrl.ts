@@ -16,8 +16,10 @@ export async function fetchSchemaFromUrl(schemaURL: string): Promise<void> {
   useDataSource().userSchemaData.value = schemaContent;
   useDataSource().newSchemaWasFetched.value = true;
   // this will adapt the meta schema settings to enable/disable multiple types, boolean schema support, etc.
-  const userSettings = getDataForMode(SessionMode.Settings).data.value;
+  const settingsData = getDataForMode(SessionMode.Settings);
+  const userSettings = settingsData.data.value;
   adaptComplexitySettingsToLoadedSchema(userSettings, schemaContent);
+  settingsData.setData(userSettings);
 
   openClearDataEditorDialog();
 
