@@ -97,8 +97,6 @@ No specific format is enforced, but commit messages should start with a verb and
 
 ## Releases
 
-## Releases
-
 Releases are managed manually by maintainers. The `develop` branch is the source of truth and all development must happen there. The `main` branch is reserved for stable releases and should not receive direct changes.
 
 When a set of changes on `develop` is deemed stable, a maintainer will:
@@ -110,17 +108,17 @@ When a set of changes on `develop` is deemed stable, a maintainer will:
 5. Create a temporary release branch from `main` and align its contents with `develop`:
 
    ```bash
-   git fetch origin
-
-   git checkout -b release-align-main origin/main
-   git read-tree --reset -u origin/develop
-
-   git commit -m "chore: align main with develop for release"
-   git push origin release-align-main
+   git fetch origin && \
+   git switch -C release-align-main origin/main && \
+   git read-tree --reset -u origin/develop && \
+   git commit -m "chore: align main with develop for release" && \
+   git push --force origin release-align-main
    ```
 
-6. Open a pull request from `release-align-main` to `main`.
-7. Merge the pull request.
+   `switch -C` and `--force` overwrite any leftover `release-align-main` from a previous release; `&&` stops at the first failing step so nothing is committed on the wrong branch.
+
+6. Open a pull request from `release-align-main` to `main`. Do not open it from `develop` or a branch based on it: their history diverges from `main`, which causes merge conflicts.
+7. Merge the pull request, then delete `release-align-main` locally and on the remote.
 
 ---
 
