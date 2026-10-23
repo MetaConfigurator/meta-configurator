@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "project": "meta-configurator",
+    "generatedAt": "2026-03-27T14:10:00Z",
+    "source": {
+      "system": "lab-a",
+      "version": "3.2.1"
+    }
+  },
+  "samples": [
+    {
+      "id": "s-001",
+      "temperatureC": 23.5,
+      "tags": ["baseline", "control"],
+      "measurements": {
+        "density": 1.002,
+        "ph": 7.1
+      }
+    },
+    {
+      "id": "s-002",
+      "temperatureC": 25.0,
+      "tags": ["treated"],
+      "measurements": {
+        "density": 1.015,
+        "ph": 6.8
+      }
+    }
+  ],
+  "notes": "This JSON file is intentionally valid and directly importable."
+}

@@ -1,0 +1,48 @@
+data_MOCOF-1 synthesis trial
+_mpif_audit_creation_date	2026-01-26
+_mpif_audit_generator_version	1.0
+_mpif_audit_publication_doi	''
+_mpif_audit_procedure_status	'test'
+
+#Section 1: Author details
+_mpif_audit_contact_author_name	'Endo, Kenichi'
+_mpif_audit_contact_author_email	kenichi.endo@ipoc.uni-stuttgart.de
+_mpif_audit_contact_author_id_orcid	0000-0002-4128-6514
+_mpif_audit_contact_author_address	'Pfaffenwaldring 55, 70569 Stuttgart, Germany'
+_mpif_audit_contact_author_phone	?
+
+#Section 2: Product General Information
+_mpif_product_type	'porous framework material'
+_mpif_product_cas	?
+_mpif_product_ccdc	''
+_mpif_product_name_common	''
+_mpif_product_name_systematic	''
+_mpif_product_formula	''
+_mpif_product_formula_weight
+_mpif_product_state	'solid'
+_mpif_product_color	''
+_mpif_product_handling_atmosphere	''
+_mpif_product_handling_note
+;
+Material is light-sensitive and should be handled under reduced light.
+Keep vial closed to avoid moisture uptake.
+;
+
+#Section 3: Synthesis General Information
+_mpif_synthesis_performed_date	undefined
+_mpif_synthesis_lab_temperature_C	undefined
+_mpif_synthesis_lab_humidity_percent	undefined
+_mpif_synthesis_type	'mix'
+_mpif_synthesis_react_temperature_C	120
+_mpif_synthesis_react_temperature_controller	''
+_mpif_synthesis_react_time	72
+_mpif_synthesis_react_time_unit	'h'
+_mpif_synthesis_react_atmosphere	'air'
+_mpif_synthesis_react_container	'microwave vial'
+_mpif_synthesis_react_note
+;
+Performed as a trial run.
+Minor color shift observed after 24 h.
+;
+_mpif_synthesis_product_amount	9.24
+_mpif_synthesis_product_amount_unit	'mg'

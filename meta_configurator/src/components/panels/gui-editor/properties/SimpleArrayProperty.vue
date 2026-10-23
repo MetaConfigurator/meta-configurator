@@ -6,12 +6,12 @@ import {dataToString} from '@/utility/dataToString';
 import {computed} from 'vue';
 
 const props = defineProps<{
-  propertyData: Array<any> | undefined;
+  propertyData: unknown;
   expanded: boolean;
 }>();
 
 const numberOfItems = computed(() => {
-  return props.propertyData?.length ?? 0;
+  return Array.isArray(props.propertyData) ? props.propertyData.length : 0;
 });
 
 const isArrayOrUndefined = computed(() => {

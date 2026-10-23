@@ -56,6 +56,8 @@ export interface ConfigTreeNodeData {
   parentName?: PathElement;
   relativePath: Path;
   absolutePath: Path;
+  /** Identifies this composition selector even when nested selectors share a data path. */
+  schemaSelectionKey?: string;
   depth: number;
 }
 

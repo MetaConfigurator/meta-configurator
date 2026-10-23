@@ -7,6 +7,12 @@ import type {PathIndexLink} from '@/dataformats/pathIndexLink';
  */
 export interface DataFormatDefinition {
   /**
+   * The file name extensions of this data format, each with a leading dot.
+   * They identify the format of an uploaded file and build file dialog filters.
+   */
+  fileExtensions: string[];
+
+  /**
    * The data converter for this data format.
    */
   dataConverter: DataConverter;

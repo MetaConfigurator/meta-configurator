@@ -923,16 +923,11 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
             },
           },
         },
-        {
-          required: ['properties'],
-          properties: {
-            properties: {
-              type: 'object',
-              description: 'If "properties" is present, the instance is validated as an object.',
-            },
-          },
-        },
       ],
+    },
+    hasNoTypeInformation: {
+      $comment:
+        'Matches subschemas that carry no type information at all. Filled programmatically below, based on the type indicating keywords the meta schema itself declares.',
     },
     hasTypeString: {
       anyOf: [
@@ -1089,3 +1084,86 @@ export const META_SCHEMA_SIMPLIFIED: TopLevelSchema = {
     },
   },
 };
+
+/**
+ * Derives the data dependent type conditions of the meta schema from the type specific
+ * field definitions themselves, instead of maintaining hardcoded keyword lists:
+ *
+ * 1. Each hasTypeX definition is extended so that the presence of any keyword of the
+ *    corresponding type also implies that type (e.g. "maximum" implies a number type,
+ *    "items" implies an array type), even when "type" is not declared.
+ * 2. The hasNoTypeInformation definition is filled with all keywords that indicate the
+ *    type or value of a subschema: the keywords of the definitions that directly
+ *    determine it (e.g. "type", "enum", "const", "$ref") plus all type specific field
+ *    keywords collected in step 1.
+ * 3. A fallback condition is added to typeSpecificFields: subschemas without any type
+ *    information (e.g. newly added oneOf/anyOf elements, which start as an empty object)
+ *    could still become an arbitrary JSON schema, so the GUI offers the fields of all
+ *    types (as the unrestricted JSON schema meta schema would). As soon as the subschema
+ *    contains any type information, only the matching fields remain.
+ */
+function initializeDerivedTypeConditions(metaSchema: TopLevelSchema) {
+  const defs = metaSchema.$defs as Record<string, any>;
+  const typeSpecificFieldsConditions: any[] = defs.typeSpecificFields.allOf;
+  const typeIndicatingKeywords = new Set<string>();
+
+  for (const defName of ['typeDefinition', 'enumProperty', 'constProperty', 'refProperty']) {
+    for (const keyword of Object.keys(defs[defName]?.properties ?? {})) {
+      typeIndicatingKeywords.add(keyword);
+    }
+  }
+
+  const typeSpecificFieldRefs: string[] = [];
+  for (const condition of typeSpecificFieldsConditions) {
+    const thenRef: string | undefined = condition.then?.$ref;
+    const ifRef: string | undefined = condition.if?.$ref;
+    if (!thenRef || !ifRef) {
+      continue;
+    }
+    typeSpecificFieldRefs.push(thenRef);
+    const keywords = Object.keys(defs[thenRef.split('/').pop()!]?.properties ?? {});
+    for (const keyword of keywords) {
+      typeIndicatingKeywords.add(keyword);
+    }
+    extendTypeConditionWithKeywordInference(defs[ifRef.split('/').pop()!], keywords);
+  }
+
+  defs.hasNoTypeInformation.not = {
+    anyOf: [...typeIndicatingKeywords].sort().map(keyword => ({required: [keyword]})),
+  };
+
+  typeSpecificFieldsConditions.push({
+    if: {
+      $ref: '#/$defs/hasNoTypeInformation',
+    },
+    then: {
+      allOf: typeSpecificFieldRefs.map(ref => ({$ref: ref})),
+    },
+  });
+}
+
+/**
+ * Extends a hasTypeX definition so that the presence of any of the given type specific
+ * keywords implies the type as well (e.g. a subschema with "maximum" but no declared
+ * "type" is treated as a number schema).
+ */
+function extendTypeConditionWithKeywordInference(typeCondition: any, keywords: string[]) {
+  if (typeCondition === undefined || keywords.length === 0) {
+    return;
+  }
+  const typeBranches: any[] = typeCondition.anyOf ?? typeCondition.oneOf ?? [];
+  // the original type matching branches must keep requiring the "type" keyword
+  // when it was required at the definition level
+  if (typeCondition.required !== undefined) {
+    for (const branch of typeBranches) {
+      branch.required = [...new Set([...(branch.required ?? []), ...typeCondition.required])];
+    }
+    delete typeCondition.required;
+  }
+  // with the additional keyword branches, several branches can match at the same time,
+  // so a oneOf must become an anyOf
+  delete typeCondition.oneOf;
+  typeCondition.anyOf = [...typeBranches, ...keywords.map(keyword => ({required: [keyword]}))];
+}
+
+initializeDerivedTypeConditions(META_SCHEMA_SIMPLIFIED);

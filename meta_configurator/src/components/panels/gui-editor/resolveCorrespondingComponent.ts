@@ -1,3 +1,4 @@
+import {schemaSelectionKind} from '@/data/schemaSelection';
 import EnumProperty from '@/components/panels/gui-editor/properties/EnumProperty.vue';
 import BooleanProperty from '@/components/panels/gui-editor/properties/BooleanProperty.vue';
 import StringProperty from '@/components/panels/gui-editor/properties/StringProperty.vue';
@@ -29,7 +30,8 @@ export function resolveCorrespondingComponent(
 ): VNode {
   const propsObject = buildProperties(nodeData, mode);
 
-  if (nodeData.schema.oneOf.length > 0) {
+  const selectionKind = schemaSelectionKind(nodeData.schema);
+  if (selectionKind === 'oneOf') {
     // @ts-ignore
     return h(OneOfSelectionProperty, {
       ...propsObject,
@@ -37,7 +39,7 @@ export function resolveCorrespondingComponent(
       isTypeUnion: false,
     });
   }
-  if (nodeData.schema.anyOf.length > 0) {
+  if (selectionKind === 'anyOf') {
     // @ts-ignore
     return h(AnyOfSelectionProperty, {
       ...propsObject,
@@ -53,7 +55,7 @@ export function resolveCorrespondingComponent(
     });
   }
 
-  if (nodeData.schema.type.length > 1) {
+  if (selectionKind === 'type') {
     // union type
     // @ts-ignore
     return h(OneOfSelectionProperty, {
@@ -154,6 +156,7 @@ function buildProperties(nodeData: ConfigTreeNodeData | AddItemTreeNodeData, mod
     parentSchema: nodeData.parentSchema,
     relativePath: nodeData.relativePath,
     absolutePath: nodeData.absolutePath,
+    schemaSelectionKey: 'schemaSelectionKey' in nodeData ? nodeData.schemaSelectionKey : undefined,
     validationResults: getValidationForMode(mode).currentValidationResult.value.filterForPath(
       nodeData.absolutePath
     ),

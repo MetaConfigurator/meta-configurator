@@ -48,12 +48,18 @@ describe('isStructuralChangeInInstance', () => {
     const oldIns = 1;
     const newIns = {a: 1};
     expect(isStructuralChangeInInstance(oldIns, newIns)).toBe(true);
+    expect(isStructuralChangeInInstance(null, newIns)).toBe(true);
   });
 
   it('primitive to array', async () => {
     const oldIns = 1;
     const newIns = [1];
     expect(isStructuralChangeInInstance(oldIns, newIns)).toBe(true);
+    expect(isStructuralChangeInInstance(null, newIns)).toBe(true);
+  });
+
+  it('array to object', async () => {
+    expect(isStructuralChangeInInstance([1], {0: 1})).toBe(true);
   });
 
   it('object where only values changed but not keys', async () => {

@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Animal",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "species": {
+      "type": "string"
+    },
+    "classification": {
+      "$ref": "#/$defs/Classification"
+    },
+    "age": {
+      "type": "number",
+      "minimum": 0
+    },
+    "gender": {
+      "type": "string",
+      "enum": ["Male", "Female", "Unknown"]
+    },
+    "habitat": {
+      "$ref": "#/$defs/Habitat"
+    },
+    "isEndangered": {
+      "type": "boolean"
+    },
+    "conservationStatus": {
+      "$ref": "#/$defs/ConservationStatus"
+    },
+    "characteristics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["id", "name", "species", "classification"],
+  "additionalProperties": false,
+  "$defs": {
+    "Classification": {
+      "type": "object",
+      "properties": {
+        "kingdom": {
+          "type": "string"
+        },
+        "phylum": {
+          "type": "string"
+        },
+        "class": {
+          "type": "string"
+        },
+        "order": {
+          "type": "string"
+        },
+        "family": {
+          "type": "string"
+        },
+        "genus": {
+          "type": "string"
+        },
+        "species": {
+          "type": "string"
+        }
+      },
+      "required": ["kingdom", "phylum", "class", "order", "family", "genus", "species"],
+      "additionalProperties": false
+    },
+    "Habitat": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "climate": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "ConservationStatus": {
+      "type": "string",
+      "enum": [
+        "Least Concern",
+        "Near Threatened",
+        "Vulnerable",
+        "Endangered",
+        "Critically Endangered",
+        "Extinct in the Wild",
+        "Extinct",
+        "Data Deficient",
+        "Not Evaluated"
+      ]
+    }
+  }
+}
