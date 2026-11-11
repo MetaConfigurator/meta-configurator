@@ -48,7 +48,7 @@
     "cytoscape": "^3.33.1",
     "cytoscape-cose-bilkent": "^4.1.0",
     "dagrejs": "^0.2.1",
-    "fast-xml-parser": "^5.0.8",
+    "fast-xml-parser": "^5.12.0",
     "flowbite": "^1.6.5",
     "handlebars": "^4.7.9",
     "js-yaml": "^4.3.2",
